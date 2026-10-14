@@ -47,7 +47,8 @@ static func explored(view: Dictionary) -> Array:
 	var out: Array = [home(view)]
 	var t: Dictionary = view.get("travel", {})
 	for c in t.get("visits", {}).keys() + (t.get("second_homes", []) as Array):
-		if not out.has(str(c)): out.append(str(c))
+		# a city the table does not have (a closed country's, q(189)) opens no fog
+		if not out.has(str(c)) and not P0Clusters.get_cluster(str(c)).is_empty(): out.append(str(c))
 	return out
 
 static func visits(view: Dictionary, cluster: String) -> int:
@@ -185,7 +186,7 @@ static func passport(view: Dictionary) -> Dictionary:
 	var rows: Array = [{cluster = h, icon = "home", title = str(P0Clusters.get_cluster(h).get("name", "")), state = "Home",
 		effect = "Your home city"}]
 	for c in order:
-		if c == h: continue
+		if c == h or P0Clusters.get_cluster(str(c)).is_empty(): continue   # a closed country's city is not shown or counted (q(189))
 		var t := tier(view, c)
 		rows.append({cluster = c, icon = "stamp", stamp = landmark_stamp(c),   # PASS-1: i-stamp (431:318), the landmark art when it has one
 			title = str(P0Clusters.get_cluster(c).get("name", "")), state = t,

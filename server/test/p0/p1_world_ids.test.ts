@@ -15,7 +15,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { CityCluster } from '../../src/p0/clusters.js';
+import { CityClusters, type CityCluster } from '../../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { generateCity, type WorldContent } from '../../src/p0/world.js';
 import { writtenCluster } from '../../src/p0/travel.js';
@@ -23,7 +23,8 @@ import { writtenCluster } from '../../src/p0/travel.js';
 const SNAPSHOT = new URL('./world_ids.snapshot.json', import.meta.url);
 const c: P0Content = loadP0Content();
 const w = (c as P0Content & { world: WorldContent }).world;
-const clusters = (c as P0Content & { clusters: { byId: Map<string, CityCluster> } }).clusters;
+// Every cluster of city_clusters.json, a closed country's too: hidden (q(189)), its places still keep their ids
+const clusters = CityClusters.load();
 
 interface Snapshot { _note: string; revision: number; cities: number; places: number; hash: Record<string, string> }
 

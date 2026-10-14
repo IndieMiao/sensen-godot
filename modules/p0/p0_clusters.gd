@@ -23,9 +23,13 @@ static func _load() -> void:
 	for i in f.size(): col[f[i]] = i
 	# A cluster's display name (content travel.cluster_names, as the server's loader): the id stays frozen
 	var names: Dictionary = (P0Logic.content().get("travel", {}) as Dictionary).get("cluster_names", {})
+	# q(189): a closed country's cities (content travel.closed_countries, as the server's loader) are not in the table:
+	# no bubble, search hit, nearest city or Nearby row
+	var closed: Array = (P0Logic.content().get("travel", {}) as Dictionary).get("closed_countries", [])
 	for r in table.get("rows", []):
 		var c := {}
 		for k in col: c[k] = r[col[k]]
+		if closed.has(str(c.get("country_code", ""))): continue
 		c.population = int(c.population)
 		c.members = int(c.members)
 		if names.has(c.id): c.name = str(names[c.id])

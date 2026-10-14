@@ -12,13 +12,13 @@
  *   --blockers      a beginner group whose tackle shop is kept off by other shops' 3 km: those groups move out to make room
  */
 import { readFileSync } from 'node:fs';
-import type { CityCluster } from '../src/p0/clusters.js';
+import { CityClusters, type CityCluster } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
 import { generateCity, km } from '../src/p0/world.js';
 import { MIN_POND_M, around, dryM, need, ruleOk, waterMap, type Place, type WaterMap } from './world_water_lib.js';
 
 const c = loadP0Content();
-const clusters = (c as P0Content & { clusters: { get(id: string): CityCluster | undefined } }).clusters;
+const clusters = CityClusters.load();   // every cluster, a closed country's too (q(189))
 
 const arg = (name: string) => process.argv.find(a => a.startsWith(`--${name}=`))?.slice(name.length + 3);
 const avoidAll: Record<string, [number, number][][]> = arg('avoid') ? JSON.parse(readFileSync(arg('avoid')!, 'utf8')) : {};

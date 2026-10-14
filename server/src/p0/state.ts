@@ -2,7 +2,7 @@
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots, clearNewBeds } from './garden.js';
-import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, writtenCluster, type TravelState } from './travel.js';
+import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, writtenCluster, type TravelState } from './travel.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { placeOf } from './world.js';
 
@@ -317,6 +317,16 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     }
   }
   if (t.day_hold && now >= t.day_hold.until) delete t.day_hold;   // q(173): the carried day is over
+  // q(189) ③: a city the table no longer has (a closed country's): the player is home, its Day Pass goes, and an accepted
+  // board request with a check-in there is dropped, free. Visits and stamps stay in the save (the view leaves them out).
+  for (const id of Object.keys(t.passes)) if (!openCity(c, id)) delete t.passes[id];
+  if (!openCity(c, t.here)) t.here = t.home;
+  for (const slots of Object.values(s.boards ?? {})) {
+    for (const slot of slots) {
+      const at = slot.req?.visit?.place, city = at ? clusterOf(c, at) : null;
+      if (city && !openCity(c, city)) { slot.req = null; slot.refill_at = now; }
+    }
+  }
   if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
     const f = fallbackOf(c, s.travel.home);
     if (f.near10.length) s.travel.fallback = f;

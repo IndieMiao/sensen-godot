@@ -5,13 +5,13 @@
  *   npx tsx tools/world_water_check.ts gn-5128581 [gn-…]   → JSON on stdout (wet, moved, failed, still_bad)
  *   --raw   checks the generated points, before the water table
  */
-import type { CityCluster } from '../src/p0/clusters.js';
+import { CityClusters, type CityCluster } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
 import { generateCity } from '../src/p0/world.js';
 import { fixCity, type Place } from './world_water_lib.js';
 
 const c = loadP0Content();
-const clusters = (c as P0Content & { clusters: { get(id: string): CityCluster | undefined } }).clusters;
+const clusters = CityClusters.load();   // every cluster, a closed country's too (q(189))
 const raw = process.argv.includes('--raw');
 const out = [];
 for (const id of process.argv.slice(2).filter(a => !a.startsWith('--'))) {

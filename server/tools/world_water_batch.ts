@@ -18,7 +18,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CityCluster } from '../src/p0/clusters.js';
+import { CityClusters } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
 import { writtenCluster } from '../src/p0/travel.js';
 import { generateCity, type WaterTable, type WorldContent } from '../src/p0/world.js';
@@ -32,7 +32,9 @@ mkdirSync(out, { recursive: true });
 
 const c = loadP0Content();
 const w = (c as P0Content & { world: WorldContent }).world;
-const clusters = (c as P0Content & { clusters: { byId: Map<string, CityCluster> } }).clusters;
+// Every cluster of city_clusters.json, a closed country's too (q(189)): their places are frozen and kept off water like
+// any other, only not served
+const clusters = CityClusters.load();
 
 interface Line { cluster: string; name?: string; tier?: string; places?: number; wet?: { id: string; water_m: number }[]; moved?: Move[];
   failed?: string[]; still_bad?: string[]; no_data?: true; error?: string; s?: number; mb?: number }
