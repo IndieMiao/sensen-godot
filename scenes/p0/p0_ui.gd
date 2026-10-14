@@ -118,6 +118,8 @@ var _dev_box: Control
 var _creel: UiCreelBadge
 var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where the creel sits while fishing
 var _status_text: Label
+var _trap_slots: PanelContainer   # `Trap slots 0/1` at the right of the creel row while the trap is picked (TRAP-2)
+var _trap_slots_text: Label
 var _hp: UiHpBar                # SGODOT-288 HPBar on mine floors 3–5, where the status line sits (it moves right)
 var _elite_hp: UiHpBar          # EnemyHP Kind=Elite under it while the elite fights (COMBAT-ELITE)
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
@@ -229,6 +231,21 @@ func _build_bar() -> void:
 	_status.add_child(_status_text)
 	_status.hide()
 	_kit.add_child(_status)   # kit theme for the C11XB type style
+	# TRAP-2 (不知火舞 B7 on 286): with the Fish Trap picked at a pond, `Trap slots 0/1` on the creel's row, right, in
+	# the creel badge's pill (radius 12) but the StatusLine type, Bold 12 and no icon (283 3fa2398f); its right edge as
+	# far in as the creel's left one
+	_trap_slots = PanelContainer.new()
+	_trap_slots.name = "TrapSlots"
+	_trap_slots.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, 12.0, UiTokens.COLOR_BORDER,
+		UiTokens.STROKE_DEFAULT).with_margins(10, 4, 10, 4))
+	_trap_slots.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_trap_slots.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_trap_slots.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_trap_slots.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
+	_trap_slots_text = UiKit.label("", UiTokens.STYLE_CAPTION_B12)
+	_trap_slots.add_child(_trap_slots_text)
+	_trap_slots.hide()
+	_kit.add_child(_trap_slots)
 	_hp = UiHpBar.new(UiHpBar.Kind.PLAYER)
 	_hp.position = _creel.position
 	_hp.hide()
@@ -428,6 +445,14 @@ func creel_landed(id: String) -> void:
 	if _creel: _creel.text = P0Logic.creel_line(view, creel_in_flight)
 func elite_bar() -> UiHpBar: return _elite_hp
 
+## The pond's `Trap slots 0/1` (P0Trap.slots_line while the trap is picked, else ""): on the creel's row, right, shown
+## with the creel badge; the pond sets it every frame, and a world or mode change hides it until then.
+func set_trap_slots(text: String) -> void:
+	if not is_node_ready(): return
+	if _trap_slots_text.text != text: _trap_slots_text.text = text
+	_trap_slots.position.y = _creel.position.y
+	_trap_slots.visible = text != "" and _creel.visible
+
 func set_status_line(text: String) -> void:
 	if not is_node_ready():
 		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
@@ -457,6 +482,7 @@ func set_surface(name: String) -> void:
 	if _radial.is_open(): _radial.close()
 	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
+	_trap_slots.visible = false   # the pond sets it again on its next frame
 	_status.visible = action and _status_text.text != ""
 	if _dev_box: _dev_box.visible = world
 	for b in _badges.values(): (b as Control).visible = false
@@ -484,6 +510,7 @@ func set_mode(mode: String, place := "") -> void:
 	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "sword" if mode == "combat" else "hoe")
 	_keys.tool_icon = _mode_tool
 	_creel.visible = mode == "fish"
+	_trap_slots.visible = false
 	set_status_line("")
 	_refresh_bar()
 
@@ -1481,7 +1508,7 @@ const SYS_SHIFT := 48.0
 func _place_under_hud() -> void:
 	var y := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top()
 	if _sys != null and is_instance_valid(_sys) and _sys.visible: y += SYS_SHIFT
-	for c in [_creel, _status]:
+	for c in [_creel, _status, _trap_slots]:
 		if c != null: (c as Control).position.y = y
 
 ## What the system line shows now ("" when it is down): tests and the runtime read it.
@@ -3655,6 +3682,7 @@ func begin_placement(spec: Dictionary) -> void:
 	_keys.visible = false
 	_bar.visible = false
 	_creel.visible = false
+	_trap_slots.visible = false
 	_status.visible = false
 	hud.set_row2_shown(false)
 	for m in _icons.values() + _name_bars.values() + _npc_tags.values() + _badges.values(): (m as Control).visible = false

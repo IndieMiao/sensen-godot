@@ -35,6 +35,18 @@ static func _runs_line(mine: Dictionary) -> String:
 	var runs: Dictionary = mine.get("runs", {})
 	return "Mine runs today %d/%d · Resets in %s" % [int(runs.get("used", 0)), int(runs.get("limit", 2)), P0Logic.span(float(runs.get("resets_in", 0)))]
 
+## Today's runs are all used (the card's title already says `Runs today 2/2`).
+static func _runs_spent(mine: Dictionary) -> bool:
+	var runs: Dictionary = mine.get("runs", {})
+	return int(runs.get("used", 0)) >= int(runs.get("limit", 2))
+
+## The mouth card's grey pill at 2/2 (MINE-GATE-EXPRESS-3 / -4, 安其拉 803b04d1, 不知火舞 8234faef; q(196)): only the
+## reset, `Resets in 9h 12m` — the title row has `Runs today 2/2` — and its tap toasts the whole line (_runs_line).
+static func _resets_pill(mine: Dictionary) -> Dictionary:
+	var runs: Dictionary = mine.get("runs", {})
+	return {"label": "Resets in %s" % P0Logic.span(float(runs.get("resets_in", 0))), "enabled": false, "amber": false,
+		"cmd": {}, "need": 0, "verb": "", "toast": _runs_line(mine), "pill": true}
+
 static func _floor(view: Dictionary, n: int) -> Dictionary:
 	var run = view.get("mine", {}).get("run", null)
 	if run == null: return {}
@@ -49,8 +61,9 @@ static func _floor(view: Dictionary, n: int) -> Dictionary:
 ## main key (LOCK-21 复议 2026-10-09). {title, fact, main, second, note}: title `The mine` · fact `Runs today 0/2`;
 ## main {label, enabled, amber, cmd, need, verb, toast} — `Enter mine · 2 Energy`, amber `Enter mine · Need 2 Energy`
 ## (the Energy card), grey `Enter mine · Bag full` (q(48)); with an unfinished run `Continue run · Free` and the second,
-## `New run · 2 Energy` (mine_entry_card) with its note `Current run will end`. With today's runs used up and none
-## unfinished there is no card: the mouth opens MINE-P0-8 (mine_runs_spent).
+## `New run · 2 Energy` (mine_entry_card) with its note `Current run will end`. With today's runs used up, the grey
+## pill `Resets in 9h 12m` (MINE-GATE-EXPRESS-3 / -4): in New run's place under Continue run, or alone with no run; at
+## 2/2 neither New run nor Express is offered.
 static func mine_mouth_card(view: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var fee := int(mine.get("floor_energy", 2))
@@ -58,7 +71,12 @@ static func mine_mouth_card(view: Dictionary) -> Dictionary:
 	var card := {"title": "The mine", "fact": "Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
 		"main": {}, "second": {}, "note": ""}
 	card["express"] = {}
-	if mine.get("run", null) != null:
+	if mine.get("run", null) != null and _runs_spent(mine):
+		# MINE-GATE-EXPRESS-4: the run in hand can always be finished; New run's place is the grey pill, and neither
+		# New run nor Express (a run of the day too) is offered; no note
+		card.main = _button("Continue run · Free", {"type": "mine_enter"})
+		card.second = _resets_pill(mine)
+	elif mine.get("run", null) != null:
 		card.main = _button("Continue run · Free", {"type": "mine_enter"})
 		var e := mine_entry_card(view)
 		card.second = {"label": e.label, "enabled": e.enabled, "amber": e.amber, "cmd": e.cmd, "toast": e.get("toast", ""),
@@ -67,6 +85,8 @@ static func mine_mouth_card(view: Dictionary) -> Dictionary:
 		card.note = str(e.line2)
 		# q(108) ①: New run and Express stack over one note, which names both: `Current run will end · Runs today 1/2`
 		if not card.express.is_empty() and card.note != "": card.note = "%s · %s" % [card.note, card.fact]
+	elif _runs_spent(mine):   # MINE-GATE-EXPRESS-3: no run and none left today, the grey pill alone
+		card.main = _resets_pill(mine)
 	elif not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
 		card.main = _button("Enter mine · Bag full", {}, false)
 		card.express = _express_button(mine, {})
@@ -94,7 +114,7 @@ static func _express_button(mine: Dictionary, entry: Dictionary) -> Dictionary:
 static func _button(label: String, cmd: Dictionary, enabled := true, amber := false, need := 0, verb := "") -> Dictionary:
 	return {"label": label, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need, "verb": verb, "toast": "" if enabled else label}
 
-## Today's runs are used up and none is left unfinished: the mouth's tap opens MINE-P0-8 (不知火舞 on 231, int11 ②).
+## Today's runs are used up and none is left unfinished (the mouth card's MINE-GATE-EXPRESS-3; it opened MINE-P0-8 in P0).
 static func mine_runs_spent(view: Dictionary) -> bool:
 	var mine: Dictionary = view.get("mine", {})
 	var runs: Dictionary = mine.get("runs", {})
@@ -417,6 +437,11 @@ static func run_complete(view: Dictionary, loot) -> Dictionary:
 
 ## The elite's second kill of the day drops no quartz (§13.3.4): the float that says so once.
 const QUARTZ_ONCE := "Quartz · first kill each day"   # q(116) ②: shown from the day's second elite on
+
+## Its float: a result line of its own over the kill's items (q(124) ⑦, as `Harvest 3 of 5 · bag full`), never joined
+## to them — `+3 Worm Bait · Quartz · first kill each day` read as if quartz came (李白 / 不知火舞 B7 on 286).
+static func quartz_once_float() -> Dictionary:
+	return {kind = "result", key = QUARTZ_ONCE, text = QUARTZ_ONCE, tone = UiFloatText.Tone.ITEM}
 
 # --- Gathering spots (farm) ---
 

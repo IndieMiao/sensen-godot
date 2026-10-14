@@ -89,6 +89,31 @@ func test_a_key_without_tool_shows_the_actions_own_tool() -> void:
 	ui.set_action({"verb": "Sow ×1", "sub": "2 Energy", "enabled": true, "amber": false, "cmd": {"type": "sow"}, "need": 2})
 	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("hoe"))
 
+## TRAP-2 (不知火舞 B7 on 286): with the Fish Trap picked at a pond, `Trap slots 0/1` on the creel's row, its right edge
+## as far in as the creel's left; only with the creel badge, and a mode change takes it down until the pond sets it.
+func test_trap_slots_pill_sits_on_the_creel_row_while_fishing() -> void:
+	ui.set_surface("pond")
+	ui.set_mode("fish")
+	await get_tree().process_frame
+	var v := {"fishing": {"trap": {"traps": [{"place": "pond_san_francisco_03"}], "slots": 2}}}
+	assert_str(P0Logic.P0Trap.slots_line(v)).is_equal("Trap slots 1/2")
+	assert_str(P0Logic.P0Trap.slots_line({"fishing": {"trap": {"traps": [], "slots": 0}}})).is_empty()   # below Lv5
+	ui.set_trap_slots(P0Logic.P0Trap.slots_line(v))
+	await get_tree().process_frame
+	var pill := ui._trap_slots
+	assert_bool(pill.visible).is_true()
+	assert_str(ui._trap_slots_text.text).is_equal("Trap slots 1/2")
+	assert_str(str(ui._trap_slots_text.theme_type_variation)).is_equal(str(UiTokens.STYLE_CAPTION_B12))   # StatusLine, Bold 12
+	assert_float(pill.position.y).is_equal(ui._creel.position.y)
+	assert_float(ui.root.size.x - pill.get_rect().end.x).is_equal_approx(ui._creel.position.x, 0.5)
+	ui.set_trap_slots("")   # the trap no longer picked
+	assert_bool(pill.visible).is_false()
+	ui.set_trap_slots("Trap slots 1/2")
+	ui.set_mode("mine")   # off the pond's bar: no creel, no pill
+	assert_bool(pill.visible).is_false()
+	ui.set_trap_slots("Trap slots 1/2")
+	assert_bool(pill.visible).is_false()
+
 func test_zero_energy_keys_show_the_verb_alone() -> void:
 	# q(122): `Light Torch` and `Set Trap`, no Free on the key (Free stays beside a paid choice: LOCK-21's rows, not keys)
 	ui.set_action(P0MaterialLogic._key("torch", "Light Torch", "Free", {"type": "mine_torch", "floor": 1}))
