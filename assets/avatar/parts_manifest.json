@@ -759,6 +759,16 @@
 			"thumb": "res://assets/avatar/thumbs/hairhat0_npc_tomo.png",
 			"tier": 0,
 			"unity_guid": ""
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1_npc_ivo",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1_npc_ivo.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1_npc_ivo.png",
+			"tier": 0,
+			"unity_guid": ""
 		}
 	],
 	"version": 1
