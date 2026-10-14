@@ -191,6 +191,7 @@ export interface P0State {
   facilities?: Facility[];       // P1 (SGODOT-239): facilities on plots
   facility_count?: number;       // facilities ever built (their ids)
   fires: number;                 // pots ever started (first fire is the tutorial ring)
+  title?: string;                // q(180): the title worn, a stable id (titles.ts); absent until the player picks one, never filled in
   rng: number;
   seq: number;
 }
