@@ -1,0 +1,458 @@
+{
+  "base": "ec5f9bde",
+  "unchanged_manifest_entries": 40,
+  "unchanged_files": [
+    {
+      "path": "assets/farm/art/blue_flower.glb",
+      "sha256": "5f35caf0bca057914bf4651d90d0f838275d9bd810675aba8a987d6eb7aa1dd8"
+    },
+    {
+      "path": "assets/farm/art/blue_flower.glb.import",
+      "sha256": "02d57f7f239bc8cddcd2d18d4ced7510df9ce18e1b9f9b687796ae770c837280"
+    },
+    {
+      "path": "assets/farm/art/bush.glb",
+      "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+    },
+    {
+      "path": "assets/farm/art/bush.glb.import",
+      "sha256": "dfa429745f29a66a4f66d5b1a35d3fc6f15a9018016522e983caf620b7dd37e4"
+    },
+    {
+      "path": "assets/farm/art/chef_sign_a.glb",
+      "sha256": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a"
+    },
+    {
+      "path": "assets/farm/art/chef_sign_a.glb.import",
+      "sha256": "29d39749da8ace746d152f5c849923d88d69a9456f5e2a94f900de77662d073b"
+    },
+    {
+      "path": "assets/farm/art/chef_sign_b.glb",
+      "sha256": "4aa4bce928d98e5f3d9131bbf76db888d3935e03924a4ea70eac99631c7ee708"
+    },
+    {
+      "path": "assets/farm/art/chef_sign_b.glb.import",
+      "sha256": "f4b68cd14ba4c1bc7e2b20b242b36f3d7a8183fd20d28bfc2e4c83d2e0055cea"
+    },
+    {
+      "path": "assets/farm/art/daisy.glb",
+      "sha256": "f67a010cafbf4825476a0a70f808d685d209f1ff28ff7ab1bb45c64ff0f09b00"
+    },
+    {
+      "path": "assets/farm/art/daisy.glb.import",
+      "sha256": "94e31116bdd5f1c7581636551c46a436636d52eda9cd460b4203312a9acb78ff"
+    },
+    {
+      "path": "assets/farm/art/deco_bench.glb",
+      "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599"
+    },
+    {
+      "path": "assets/farm/art/deco_bench.glb.import",
+      "sha256": "57324bfc258e40c1b7ffad016687cfb8218a590170f441107e5e02886bea5a94"
+    },
+    {
+      "path": "assets/farm/art/deco_birdbath.glb",
+      "sha256": "2372a9eeccd20c6304513978934698b51167119b6909aa4bb1a8272461c93010"
+    },
+    {
+      "path": "assets/farm/art/deco_birdbath.glb.import",
+      "sha256": "104cd7ccb1d380cded3df8e2ddd750b5bb41473513378a9096fa76475a4ca562"
+    },
+    {
+      "path": "assets/farm/art/deco_fence.glb",
+      "sha256": "4e1ad4403ec5520e15b632735fb92c7268c3932d49112a701767216382657276"
+    },
+    {
+      "path": "assets/farm/art/deco_fence.glb.import",
+      "sha256": "148c57c53b5387c65320fc0594d8022830112e7f8c1f93aaa6e3a8bb6fcaebca"
+    },
+    {
+      "path": "assets/farm/art/deco_fountain.glb",
+      "sha256": "38357c007890ac81b39587bac073d43d441cc05e13d92ea0f42fa6d5484561be"
+    },
+    {
+      "path": "assets/farm/art/deco_fountain.glb.import",
+      "sha256": "5cdd47cd6a001170dc796fd005ab37675b782cdc6f0b3dc9c696c5e12714db9e"
+    },
+    {
+      "path": "assets/farm/art/deco_lantern.glb",
+      "sha256": "28984ebd5ddb9f0766d45af71dffabc8daa66bedfb5409ca453da4bc4a88830a"
+    },
+    {
+      "path": "assets/farm/art/deco_lantern.glb.import",
+      "sha256": "52a06cdfdbc1e43d2f71bb2f514cf4a9c5d1a7ad64b87369a27af24c75831b9f"
+    },
+    {
+      "path": "assets/farm/art/deco_path.glb",
+      "sha256": "460dcbdfb94f4d3a363a07790a9e1bb8caeb97b6a34c3d27a1338a7cd06414c4"
+    },
+    {
+      "path": "assets/farm/art/deco_path.glb.import",
+      "sha256": "3550ca0cf5da91a62b7c3638f69095bf9a9200635b0dd98ed3f8488cc9328278"
+    },
+    {
+      "path": "assets/farm/art/deco_pergola.glb",
+      "sha256": "52688e3ae1ee33de34bff061e35009da1f518d46286ad4db2b3dc28be12a0b62"
+    },
+    {
+      "path": "assets/farm/art/deco_pergola.glb.import",
+      "sha256": "21103f02aaacaf3e21619be8fd7b93643b4bb22f1d8860ea7bf8f8cdf58c7768"
+    },
+    {
+      "path": "assets/farm/art/deco_planter.glb",
+      "sha256": "c62d2a4a005e7d707ef1f22e20483250b7ab1db377821f1e749ad74f1a1bce0f"
+    },
+    {
+      "path": "assets/farm/art/deco_planter.glb.import",
+      "sha256": "f20e4e1c9b22958d8cd60af5c8834fc725cb572919f2c099736846c765bcb41b"
+    },
+    {
+      "path": "assets/farm/art/deco_scarecrow.glb",
+      "sha256": "0fbb1ef580cee30ae7e0793a83bd76d478e946464d41df39e2c18ebbb35f850f"
+    },
+    {
+      "path": "assets/farm/art/deco_scarecrow.glb.import",
+      "sha256": "5580a9abb2fa2366389ccca1cb22a3ee2e4c196a739fd3375abc65ef35d7f880"
+    },
+    {
+      "path": "assets/farm/art/deco_windmill.glb",
+      "sha256": "50cd18920cda4a2505b75a3f3dfc1e41ade1cd73cfb99740d52f632d9edfd345"
+    },
+    {
+      "path": "assets/farm/art/deco_windmill.glb.import",
+      "sha256": "9d1df9eba2b0c40067326bcec1a1558e00851aebaf17f1c9f977737a7fdb41b0"
+    },
+    {
+      "path": "assets/farm/art/deco_windmill_sails.glb",
+      "sha256": "57d14191f2cc714b9ed1d389e68194c84b22c75c36d894e8af0cf41f4a518baf"
+    },
+    {
+      "path": "assets/farm/art/deco_windmill_sails.glb.import",
+      "sha256": "17dbb7b1bec4c2d5c85e8fc37b40a2204affdb5a520137565dbe1bb4a6f335a1"
+    },
+    {
+      "path": "assets/farm/art/fence.glb",
+      "sha256": "fe463effdc7c7d4c7b849cc358d28b0632c7be31f9f4b57b08df39292dbfb42e"
+    },
+    {
+      "path": "assets/farm/art/fence.glb.import",
+      "sha256": "3debd35b078c78bd5e701cdbd775e6327294bd4bc11599b91df97fdeba89fcc1"
+    },
+    {
+      "path": "assets/farm/art/grass_clump.glb",
+      "sha256": "857fc2b8fa5d0d3bb19485e3f927b4a8a73f89ac39f185163e2151181a3a1cec"
+    },
+    {
+      "path": "assets/farm/art/grass_clump.glb.import",
+      "sha256": "1925e7907924133714b5142eb4c8086a3ffac4e89719022fb38a7829f050f724"
+    },
+    {
+      "path": "assets/farm/art/greenhouse_base.glb",
+      "sha256": "6716b7af19456b79ea0c43571755836b8a10b2ae1c0dc3e40e0d694a424e9642"
+    },
+    {
+      "path": "assets/farm/art/greenhouse_base.glb.import",
+      "sha256": "b7f17b5bfbbf9e453efc0805a10ebc6dcfbf7f420ef812e9bb57321928798d1a"
+    },
+    {
+      "path": "assets/farm/art/greenhouse_glass.glb",
+      "sha256": "f24994f7add7bd049534ba9286094033989294bf7f83922a5f4b472a0f684b62"
+    },
+    {
+      "path": "assets/farm/art/greenhouse_glass.glb.import",
+      "sha256": "2d9b51372217451438c5ac736673816232adfdf602ac0daf6a05cb4468a97a59"
+    },
+    {
+      "path": "assets/farm/art/greenhouse_roof.glb",
+      "sha256": "efefadd61c24ed5573d4132127a4cf4e396d8924bc199e64fb5dfe86e3ef0634"
+    },
+    {
+      "path": "assets/farm/art/greenhouse_roof.glb.import",
+      "sha256": "a3ec30ad607853c6058b50902a2e4b5dfaf1e52de240845f71d62a46e698166e"
+    },
+    {
+      "path": "assets/farm/art/homestead_ground.png",
+      "sha256": "da9489c4f08110a37e2a7abc9f3035bea14b742c9e0c695c609e23913afdb442"
+    },
+    {
+      "path": "assets/farm/art/homestead_ground.png.import",
+      "sha256": "d1a2b745f0f07389f4965a5e1a9d10cb4a72e793506e01dfd62060ce85baa1df"
+    },
+    {
+      "path": "assets/farm/art/house_barn.glb",
+      "sha256": "202e01040977c2d33b78b75b06c11a68509cac894696eed52b8a6193289235e0"
+    },
+    {
+      "path": "assets/farm/art/house_barn.glb.import",
+      "sha256": "19bdd31f69fee45f6cf637b2cd2e7dc6f6b280034f14616870b779a2ddedcb2d"
+    },
+    {
+      "path": "assets/farm/art/house_cottage.glb",
+      "sha256": "9659ae84ec99890ead90cafce75bd3a897b85b8a35defc06776a53d7105f013c"
+    },
+    {
+      "path": "assets/farm/art/house_cottage.glb.import",
+      "sha256": "d4818d1e8578b1ecaad6993b2dae54950c5e9d81cd842051337ae5d636f2c34e"
+    },
+    {
+      "path": "assets/farm/art/house_dome.glb",
+      "sha256": "71c8d25c6b0d3f83e0cfd6fe0a1b88620835b532a0d1620bdb112fe7a926bc9e"
+    },
+    {
+      "path": "assets/farm/art/house_dome.glb.import",
+      "sha256": "a1c91a3378bb51aa5eb835223766f88a100872b0a05ebec4f5a02353220ad3ab"
+    },
+    {
+      "path": "assets/farm/art/house_east_asian.glb",
+      "sha256": "b57867abc4e16002f201f23cb5b81c611aca6da865e2ed63f32444f2dc009cf8"
+    },
+    {
+      "path": "assets/farm/art/house_east_asian.glb.import",
+      "sha256": "ffb0a41412800ec33c839eb97d017b978741488c16f30624f47dc4a70f32296f"
+    },
+    {
+      "path": "assets/farm/art/house_mushroom.glb",
+      "sha256": "1fc6e5a20ffd4e497bc13c29d0116d96895e956085fc747659b80ceff817b1c5"
+    },
+    {
+      "path": "assets/farm/art/house_mushroom.glb.import",
+      "sha256": "90849f10ad7f4702d4b51cc0e3b48fd704fd5b781085c40b098375052108ca36"
+    },
+    {
+      "path": "assets/farm/art/house_thatch.glb",
+      "sha256": "262d46653768a437b107d082e0dc53be721c4a9d7314e64e77fc84033a791b26"
+    },
+    {
+      "path": "assets/farm/art/house_thatch.glb.import",
+      "sha256": "3dfa721c1daf8cc8a7c3043c8701d49db00d7f0936963d369aa5d6d10e316e12"
+    },
+    {
+      "path": "assets/farm/art/house_windmill.glb",
+      "sha256": "d64346c24244fb9cd4bfaac36c342f37821590f6aed9bb8061c6f8e0f3c3a16b"
+    },
+    {
+      "path": "assets/farm/art/house_windmill.glb.import",
+      "sha256": "ecbd3439a2df9d3189e626c1a3749c013af2e4976ac1158f2e49138af84053b9"
+    },
+    {
+      "path": "assets/farm/art/meadow.png",
+      "sha256": "3f0dc02952aa3a74c86619189616f31f0eac5d340d37dc9d63893ce434a7c832"
+    },
+    {
+      "path": "assets/farm/art/meadow.png.import",
+      "sha256": "07e08e3a6fce94ccf7642fb3f70737b4e8b71fc75836d7b980fde006b5bcaf1e"
+    },
+    {
+      "path": "assets/farm/art/path_tile.glb",
+      "sha256": "75339f1881ccab6054ac370c5461f9a9de8743bb64cb9164da3d079e19b30d89"
+    },
+    {
+      "path": "assets/farm/art/path_tile.glb.import",
+      "sha256": "608d81addabf6775059185ea88ed849cc57ab18201cad4de0bf12f16bff65e50"
+    },
+    {
+      "path": "assets/farm/art/pink_flower.glb",
+      "sha256": "5b1f84380aa1ba435ad5d6807e935858499a7784579fe7162c873dcf3f434b56"
+    },
+    {
+      "path": "assets/farm/art/pink_flower.glb.import",
+      "sha256": "3ffa402b4f988b8936df49176b90545cbebc6905ee45a569bac98b7b0f1b70b8"
+    },
+    {
+      "path": "assets/farm/art/plot.glb",
+      "sha256": "e0b50452a57b18bd09f7ceae796bdea9b3ed5cf5536323e11fea9a47a3d5a609"
+    },
+    {
+      "path": "assets/farm/art/plot.glb.import",
+      "sha256": "1a18c3b12992a45adeeb3fb71ef0e47f06d211210825fa8c3e97aa11b40b9d6a"
+    },
+    {
+      "path": "assets/farm/art/previews/barn.png",
+      "sha256": "3529abef7550514104cb1ab2858613f6d03e2a705bdd80aeff1c0f4a242d1899"
+    },
+    {
+      "path": "assets/farm/art/previews/barn.png.import",
+      "sha256": "298cbcaedbf684af480f178f7f27002ca4c1a05135e9d1041a2b2ca67adfcee7"
+    },
+    {
+      "path": "assets/farm/art/previews/cottage.png",
+      "sha256": "8997757a00c0661245019c3c9a13b8ef504377be62a0d6b790a1d8960dd46896"
+    },
+    {
+      "path": "assets/farm/art/previews/cottage.png.import",
+      "sha256": "81f8c06b7f8576b0c97fe3d8159ef970f8b9d9b7d643b089114d0ff60b5c0c40"
+    },
+    {
+      "path": "assets/farm/art/previews/dome.png",
+      "sha256": "e4817b7634ba32b081306ab0720b630a51e0af32f2f88f3e0168f7c85acf8bc8"
+    },
+    {
+      "path": "assets/farm/art/previews/dome.png.import",
+      "sha256": "38b20560af60c063ce8f482f8027cf29a5cb55720cdff4a7bc6eebacc833b941"
+    },
+    {
+      "path": "assets/farm/art/previews/east_asian.png",
+      "sha256": "4f3f458154f5f18d3233915aa3cf56d581a3a4767f7645158fcb50f1a10ab487"
+    },
+    {
+      "path": "assets/farm/art/previews/east_asian.png.import",
+      "sha256": "4e44b0a4caa7c0b6d6d953530cf4b1e98dbaa93c51636d4e1dae19e940f10430"
+    },
+    {
+      "path": "assets/farm/art/previews/mushroom.png",
+      "sha256": "ce2848dff872c61a43a8c585c68b143c942ad3f135e481a3575c578d56bc9dae"
+    },
+    {
+      "path": "assets/farm/art/previews/mushroom.png.import",
+      "sha256": "ff58f7aeb30572734cb2179e0047a03a71c5e60d6bfe1216b178fa43c1f26f14"
+    },
+    {
+      "path": "assets/farm/art/previews/thatch.png",
+      "sha256": "b913648897130cfd651632bf5b00d057e560527611b78b53a99da9f488323e41"
+    },
+    {
+      "path": "assets/farm/art/previews/thatch.png.import",
+      "sha256": "a9b56333e86733f6d85391a847f37728b760671df7293a3dbd3aed72ff8204e5"
+    },
+    {
+      "path": "assets/farm/art/previews/windmill.png",
+      "sha256": "28760655844afd17929586bca5fff796685138d46394720c1380ad94df5b2a84"
+    },
+    {
+      "path": "assets/farm/art/previews/windmill.png.import",
+      "sha256": "10fe708f510696b4e3efb14597e9c0ed79946ff9ab55a48795a2c7c61924c421"
+    },
+    {
+      "path": "assets/farm/art/rock.glb",
+      "sha256": "57fb9355690ee13410ab318ce7a32d26bc6bbe5405c194bb75a38569d360699b"
+    },
+    {
+      "path": "assets/farm/art/rock.glb.import",
+      "sha256": "40362128ae9154e35257d67784b39de00cb2da35a313fc35f302f8fbc106449d"
+    },
+    {
+      "path": "assets/farm/art/sign.glb",
+      "sha256": "75254b93305b1b9c85bbd77fcbec8f1acc017e724d8c3258d0ea3054606f3350"
+    },
+    {
+      "path": "assets/farm/art/sign.glb.import",
+      "sha256": "a95892b4c664e549c32c137d591e4405b205eeaaf40d9a20cc5ba4e6b2714dad"
+    },
+    {
+      "path": "assets/farm/art/stepping_stone.glb",
+      "sha256": "4fd808beb407c3864a4e2b66f2e8fcd87d0499a983237257ed3fae52b723d047"
+    },
+    {
+      "path": "assets/farm/art/stepping_stone.glb.import",
+      "sha256": "ae5fd6ae26c8d3d96829746bdfa3c2cc864bf22c573522d281540b1d0e0b949b"
+    },
+    {
+      "path": "assets/farm/art/storage.glb",
+      "sha256": "cd27e5cae4917990801ce83d602fb1d530a7b4c2aa4ae25d4645e27b2ba7910f"
+    },
+    {
+      "path": "assets/farm/art/storage.glb.import",
+      "sha256": "17922a7b23ac351fc6e0a9cd1772312483742be6a34951f2b1a83e6b15dacbb5"
+    },
+    {
+      "path": "assets/farm/art/styles.json",
+      "sha256": "fd7e563861b1d3a1748f62e7506039c67b7911a7b690776e5cd43f66b32019b2"
+    },
+    {
+      "path": "assets/farm/art/tree_0.glb",
+      "sha256": "3bfffa86739891eb564a621c9a91cccd36626efd5794a49030ce7ed78a4a511c"
+    },
+    {
+      "path": "assets/farm/art/tree_0.glb.import",
+      "sha256": "ddafb4d23bba9a3940dcd5b96bfa505946f931ff3486f87145e397b3ffd19c69"
+    },
+    {
+      "path": "assets/farm/art/tree_1.glb",
+      "sha256": "37a08166c89f5085904907f939efa509007f37a6ac0b2092214a3a35594150a9"
+    },
+    {
+      "path": "assets/farm/art/tree_1.glb.import",
+      "sha256": "fe0f3dc91accc83a85f966421dd7582f7233e68fa2f12b2e82a9bd8d71ca3181"
+    },
+    {
+      "path": "assets/farm/art/tree_2.glb",
+      "sha256": "a8377b66ed8af762c72ceaf2d345a50e766d4d18f4bc59235bba45aa64cb63c4"
+    },
+    {
+      "path": "assets/farm/art/tree_2.glb.import",
+      "sha256": "2b017288a5416505ffb35be05cb681408129c16468af04fffbeacde2c835b8ba"
+    },
+    {
+      "path": "assets/farm/art/water/bank_grass.png",
+      "sha256": "2059acb14773b79d64e5e7f5fdceb5dcef553bc7380803efcec086ebab86b460"
+    },
+    {
+      "path": "assets/farm/art/water/bank_grass.png.import",
+      "sha256": "ad6d28a0783531111fd5d20394d610e3804a203dd7c15b947960ea6cc38c2190"
+    },
+    {
+      "path": "assets/farm/art/water/caustic_light.png",
+      "sha256": "f3c0321de4dce0d79909b86b03b6082eafdbe4d6e8dbcadfa98b046fb91ec704"
+    },
+    {
+      "path": "assets/farm/art/water/caustic_light.png.import",
+      "sha256": "e6e26a674b616cc54a5b23dcabe1f786c72a010add87890259df494204ba6fa1"
+    },
+    {
+      "path": "assets/farm/art/water/caustics.png",
+      "sha256": "c45c28e91d5aca21a391236804d509a7fcff7b633bdd30e596519901fa182196"
+    },
+    {
+      "path": "assets/farm/art/water/caustics.png.import",
+      "sha256": "cf26dcefbc98d632a196cff6999dde357200c15538a8cd7afe97f837b3bf38d0"
+    },
+    {
+      "path": "assets/farm/art/water/pebble_bed.png",
+      "sha256": "0107465d0296dc30517f5a0f0df3283c1e2386274eec3db926113aade98009ec"
+    },
+    {
+      "path": "assets/farm/art/water/pebble_bed.png.import",
+      "sha256": "8c62d76eed17c129ad94f13abd2fe07730bd6d2429c633de7f34bbf55dc57581"
+    },
+    {
+      "path": "assets/farm/art/water/sediment.png",
+      "sha256": "13d396e11c6d281f27817242a2fb34bbcd8741d259e3f4dc7f9ac535e73d975f"
+    },
+    {
+      "path": "assets/farm/art/water/sediment.png.import",
+      "sha256": "517cad156e4edb3fd5a49c367c55f192d89f2f2a739630f51f84dbc4e325275a"
+    },
+    {
+      "path": "assets/farm/art/water/shore_stone.png",
+      "sha256": "1b48d476b9cedfc855a8a5f40b54ea977da2af293361332e7b564935d3b3dd8e"
+    },
+    {
+      "path": "assets/farm/art/water/shore_stone.png.import",
+      "sha256": "5f9076fa9093a15a5a9cbc4a5458756d90b11796e408aa37027b4a685190eb3a"
+    },
+    {
+      "path": "assets/farm/art/water/surface_flow.png",
+      "sha256": "e29cdf4573dab94f7c9eaaf54ffd437050952f52ee564f13a1b0a78c2eb98548"
+    },
+    {
+      "path": "assets/farm/art/water/surface_flow.png.import",
+      "sha256": "fa6475f1d513b509ca0899436747c150d404d999f2359f3b42fed7cd1c1544a5"
+    },
+    {
+      "path": "assets/farm/art/well.glb",
+      "sha256": "e60fbb69d8c988886f43c3c7f5db205652bc62bb65407d9aea6b166d42904926"
+    },
+    {
+      "path": "assets/farm/art/well.glb.import",
+      "sha256": "9748e3a78be630cbbe1f0440ca44d9ac869e8e42c1d8fda6eda91a26005e83d5"
+    },
+    {
+      "path": "assets/farm/art/windmill_sails.glb",
+      "sha256": "74bbcf533dbb679198af74304bcdd1ed7238ffbbf2d252de08a6177c222d8013"
+    },
+    {
+      "path": "assets/farm/art/windmill_sails.glb.import",
+      "sha256": "3d76f5a768b9cefd1545fb270517046d788472b3b2607fb740dc72437bb5d8b5"
+    }
+  ]
+}

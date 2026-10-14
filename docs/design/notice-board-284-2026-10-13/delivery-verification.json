@@ -1,0 +1,38 @@
+[
+  {
+    "name": "SGODOT-284_Notice-Board_v1.1_notice-board-43deg.png",
+    "attachment_id": "d51628bd-4a2a-476e-91d9-952c75e57cae",
+    "sha256": "449e6ffc708768b90d975cd74be75d6574b4bf38c2d6ef6d8a62db62e6d036a0",
+    "bytes": 385555,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_Notice-Board_v1.1_notice-board-front.png",
+    "attachment_id": "28dbd448-5983-4908-9e65-7cc79937c672",
+    "sha256": "af21ea458bab4f33ccd7bf1245d661104bac8f869d68927bc21c87051ebc77c8",
+    "bytes": 76124,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_Notice-Board_v1.1_notice-board-top-grid.png",
+    "attachment_id": "f6b64707-3295-4294-b902-2fdc4456bfe6",
+    "sha256": "7b7de8432bb8c9e229a6912b8ffd1ddfd5be1a0ebe2a60bc595ed99cc1e0ae23",
+    "bytes": 127949,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_Notice-Board_v1.1_validation.json",
+    "attachment_id": "3efcb4a2-67a5-4a49-b44c-28595e69188c",
+    "sha256": "7de8d7d5a3299078964f6c22d8cd61ca3635592796e2c3627a5f5c1e4857e5f6",
+    "bytes": 13085,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]
