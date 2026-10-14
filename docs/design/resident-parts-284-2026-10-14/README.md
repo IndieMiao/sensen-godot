@@ -1,5 +1,11 @@
 # SGODOT-284 / q(171) · Granny Wu / Ivo NPC parts
 
+**Latest clothing revision:** [Ivo canvas shirt / charcoal shorts and revised footwear](ivo-cloth/README.md).
+Ivo now uses `cloth1_npc_ivo + shoes3`; Granny Wu uses `cloth11 + shoes5`.
+This supersedes the original cloth42 and footwear choices shown below. The new
+review includes both full cards and actual/3× postage heads, plus tests run on
+runtime head `7575a81b`. The accepted Granny Wu and Tomo hair remain unchanged.
+
 **Tomo increment:** [hairhat0_npc_tomo, final four-part validation and review](tomo/README.md)
 adds the approved warm dark brown hair to the same PR #407. The initial three-part
 evidence below remains unchanged; the increment confirms those files are preserved.
@@ -8,8 +14,9 @@ evidence below remains unchanged; the increment confirms those files are preserv
 
 Three NPC-only parts provide Granny Wu's silver bun/red pin and Ivo's mustard
 mining helmet/non-emissive headlamp/grey short beard. Granny Wu wears the
-approved green apron and no glasses; Ivo uses the approved original cloth42
-fallback. Its complex monster/stripe/multicolor atlas is why the optional
+approved green apron and no glasses; the initial Ivo review used original cloth42.
+That historical clothing choice was rejected by 不知火舞 and is superseded above.
+Its complex monster/stripe/multicolor atlas is why the optional
 `cloth42_npc_ivo` recolor was skipped. The existing runtime resident look table
 is unchanged; 苏烈 integrates the looks after approval.
 
@@ -68,7 +75,7 @@ coordinate changes.
 - [Combined validation](validation.json) includes dimensions and SHA-256 for
   all review images, the three part audits and the clothing decision.
 
-[Source and reproduction commands](../../../assets/avatar/source/README_284.md).
+[Runtime source and reproduction commands in #407](https://github.com/IndieMiao/sensen-godot/blob/feat/284-resident-parts/assets/avatar/source/README_284.md).
 [Named Blender sources and authority copies](../../../tools/art/source/resident_parts_284/README.md).
 
 The front/three-quarter sheets, two full cards, actual/3× stamp sheet and combined

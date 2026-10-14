@@ -1,0 +1,319 @@
+{
+  "issue": "SGODOT-284",
+  "request": "q(171)",
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "date": "2026-10-14",
+  "runtime_pr": 407,
+  "art_pr": 412,
+  "runtime_head": "7575a81b366ded5a016dc25749eb0412e9598a16",
+  "increment_base": "df3d49e0a5f7244befeb5843fc34adb8b6916443",
+  "scope": "One texture-only cloth mesh for Ivo; revised Ivo/Granny footwear in review fixture; runtime resident table unchanged.",
+  "runtime_tree_clean_after_tests": true,
+  "tests": {
+    "head": "7575a81b366ded5a016dc25749eb0412e9598a16",
+    "cases": 38,
+    "suites": 8,
+    "errors": 0,
+    "failures": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "orphans": 0,
+    "exit_code": 0,
+    "paths": [
+      "tests/catalog",
+      "tests/pipeline",
+      "tests/assembly/test_socket_placement.gd"
+    ],
+    "report_source": "reports/report_5/results.xml",
+    "command": "DISPLAY=:0 XAUTHORITY=/run/user/1000/xauth_RTHOGm GODOT_BIN=/home/deck/.local/bin/godot ./addons/gdUnit4/runtest.sh -a res://tests/catalog -a res://tests/pipeline -a res://tests/assembly/test_socket_placement.gd",
+    "qa_user_dir": "SensenResident284QA"
+  },
+  "import_validation": {
+    "checks": [
+      {
+        "check": "FBX byte-identical to cloth1",
+        "passed": true
+      },
+      {
+        "check": "Imported node types, hierarchy, transforms and skeleton rest match cloth1",
+        "passed": true
+      },
+      {
+        "check": "Cloth slot uses mesh attachment",
+        "passed": true
+      },
+      {
+        "check": "One mesh surface",
+        "passed": true
+      },
+      {
+        "check": "Extracted vertices, normals, UVs, indices, bones and weights match cloth1",
+        "passed": true
+      },
+      {
+        "check": "Bounds match cloth1",
+        "passed": true
+      },
+      {
+        "check": "All skin bind bones, names and poses match cloth1",
+        "passed": true
+      },
+      {
+        "check": "Runtime material binds the new Ivo texture",
+        "passed": true
+      },
+      {
+        "check": "Runtime texture size matches cloth1",
+        "passed": true
+      },
+      {
+        "check": "Material parameter unchanged: rim_strength",
+        "passed": true
+      },
+      {
+        "check": "Material parameter unchanged: ao_strength",
+        "passed": true
+      },
+      {
+        "check": "Material parameter unchanged: diffuse_strength",
+        "passed": true
+      },
+      {
+        "check": "Material parameter unchanged: emission_strength",
+        "passed": true
+      },
+      {
+        "check": "Material parameter unchanged: smoothness",
+        "passed": true
+      },
+      {
+        "check": "NPC catalog contains Ivo clothing",
+        "passed": true
+      },
+      {
+        "check": "Player clothing pool excludes Ivo clothing",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "part": {
+      "attach": "mesh",
+      "bounds": "[P: (-0.280469, 0.545456, -0.116736), S: (0.562752, 0.694843, 0.261729)]",
+      "id": "cloth1_npc_ivo",
+      "skin_binds": 59,
+      "slot": "cloth",
+      "surfaces": 1,
+      "texture_pixels": [
+        512,
+        512
+      ],
+      "triangles": 1629
+    }
+  },
+  "texture_validation": {
+    "shirt": {
+      "luminance_knots": [
+        168.92849999999999,
+        225.238,
+        239.6952
+      ],
+      "source_luminance_range": [
+        225.238,
+        239.6952
+      ],
+      "palette_shadow_mid_highlight": [
+        "7A5E3E",
+        "9C7A52",
+        "B8966A"
+      ],
+      "pixel_count": 655257,
+      "fraction": 0.6249017715454102,
+      "output_unique_colors": 22
+    },
+    "shorts": {
+      "luminance_knots": [
+        64.14439999999999,
+        66.0722,
+        70.0
+      ],
+      "source_luminance_range": [
+        64.14439999999999,
+        70.0
+      ],
+      "palette_shadow_mid_highlight": [
+        "26231F",
+        "3A3632",
+        "55504A"
+      ],
+      "pixel_count": 323303,
+      "fraction": 0.30832576751708984,
+      "output_unique_colors": 13
+    },
+    "id": "cloth1_npc_ivo",
+    "base": "cloth1",
+    "source_pixels": [
+      1024,
+      1024
+    ],
+    "details_pixel_count": 70016,
+    "details_fraction": 0.0667724609375,
+    "details_byte_identical": true,
+    "alpha_exact": true,
+    "fbx_byte_identical": true,
+    "sha256": {
+      "SK_dt_skin01.fbx": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02",
+      "T_ivo_cloth_D.png": "c6f8956a38a5d6389c2ca92de8efba91b07b47c281484d4061ae85fa6ef918b4"
+    }
+  },
+  "preservation_summary": {
+    "base": "df3d49e0a5f7244befeb5843fc34adb8b6916443",
+    "manifest_before": 42,
+    "manifest_after": 43,
+    "appended_ids": [
+      "cloth1_npc_ivo"
+    ],
+    "manifest_existing_entries_exact": true,
+    "manifest_text_prefix_exact": true,
+    "granny_hair_unchanged": true,
+    "unchanged_file_count": 416
+  },
+  "reproducibility": {
+    "command": [
+      "/home/deck/.herdr/worktrees/sensen-godot/wt-3d-scene/output/art-tools/bin/python",
+      "tools/art/recolor_ivo_cloth_284.py",
+      "--runtime-root",
+      "/home/deck/.herdr/worktrees/sensen-godot/wt-resident-284"
+    ],
+    "source_and_import_files_byte_identical": true,
+    "files": {
+      "assets/avatar/source/cloth1_npc_ivo/T_ivo_cloth_D.png.import": "1a7914030daea198c09689dec1b3f5753590f912418a07331fb28d7028d8c22e",
+      "assets/avatar/source/cloth1_npc_ivo/SK_dt_skin01.fbx.import": "4e11c3380597e2468828d53fd0dfb86975f861fa1ab1174b1f5a3fb5da7a7bd8",
+      "assets/avatar/source/cloth1_npc_ivo/SK_dt_skin01.fbx": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02",
+      "assets/avatar/source/cloth1_npc_ivo/T_ivo_cloth_D.png": "c6f8956a38a5d6389c2ca92de8efba91b07b47c281484d4061ae85fa6ef918b4"
+    }
+  },
+  "looks": {
+    "res_granny_wu": {
+      "slots": {
+        "hairHat": "hairhat80_npc_granny_wu",
+        "cloth": "cloth11",
+        "shoes": "shoes5"
+      }
+    },
+    "res_ivo": {
+      "slots": {
+        "hairHat": "hairhat_npc_ivo",
+        "mask": "mask16_npc_ivo",
+        "cloth": "cloth1_npc_ivo",
+        "shoes": "shoes3"
+      }
+    }
+  },
+  "renderer": {
+    "godot": "4.7.2",
+    "backend": "Vulkan Mobile",
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "physical_phone": false,
+    "windowed": true
+  },
+  "decisions": {
+    "ivo_cloth": "New cloth1_npc_ivo replaces the rejected cloth42; texture only, original FBX exact.",
+    "ivo_shoes": "Existing shoes3 black boots; no asset edits.",
+    "granny_shoes": "Existing shoes5 cream shoes; no asset edits.",
+    "granny_hair": "Retained already accepted silver texture; optional darkening not taken.",
+    "texture_details": "All light-grey/button RGBA pixels and all alpha bytes exact; source luminance variations preserved."
+  },
+  "images": {
+    "cards.png": {
+      "sha256": "4509ba5938ce42a56d8833089d42df5637fea748ed2272049657bde2ec20af80",
+      "pixels": [
+        324,
+        346
+      ]
+    },
+    "granny_wu_card.jpg": {
+      "sha256": "3d6f08a478113cf5848aaa4e3cef8f6a2ca04ce93adc94168fb4dbc2e43b8e24",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "granny_wu_stamp_32x40.png": {
+      "sha256": "caa3a73905564b3079d0ea6495198f3bcde5849f5ce7ce6984c8f789dfe371f7",
+      "pixels": [
+        32,
+        40
+      ]
+    },
+    "granny_wu_stamp_96x120.png": {
+      "sha256": "abd91e394b439b756b0065823ad16f76f566cbce9130b23ac74e816d9591ae91",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "ivo_card.jpg": {
+      "sha256": "3e0010fee3daeb6b9188745a84b9a8c21d8a3947405c4c622b430ad88cd334de",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "ivo_stamp_32x40.png": {
+      "sha256": "13851b297546d4b24c2bc83c540e227d437b9a120ce31843478dd526c5b0acf5",
+      "pixels": [
+        32,
+        40
+      ]
+    },
+    "ivo_stamp_96x120.png": {
+      "sha256": "1a2f4f52f961b0db4a7974e1ec9a28322f17b1c3f2ab8b3e40944c5682074597",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "npc-lineup-both.png": {
+      "sha256": "0207e77d5eae5fa82969cdb202bfd0fe9e13a39228143773a8890d37e71aff92",
+      "pixels": [
+        1224,
+        472
+      ]
+    },
+    "npc-lineup-front.png": {
+      "sha256": "7f083427bd40f02b49f84cdeef57b2e664d71eeca970be9947fdca3575d59ce2",
+      "pixels": [
+        624,
+        464
+      ]
+    },
+    "npc-lineup-three-quarter.png": {
+      "sha256": "ba53fc5ff1399e439925531f3a00f9a6589ae58ecbc3ec43f6da366216c3ad3e",
+      "pixels": [
+        624,
+        464
+      ]
+    },
+    "stamps.png": {
+      "sha256": "ff26bd6c4bc572d7a6a1745b09881f37614215600cb87d68759dee3f10359f2d",
+      "pixels": [
+        228,
+        196
+      ]
+    }
+  },
+  "portrait_script": {
+    "lineup_source": "tools/dev/npc_lineup.gd",
+    "lineup_source_sha256": "611b1092274306e9b27cf425e0232eb77071121ee27c8d6468721859d7da182b",
+    "lineup_fixture_sha256": "23722bb2e8a462dbb3d4add5f89ad9df4b4f59c6ed5bbf3173f80a0fd27f3eb4",
+    "portrait_baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+    "portrait_baker_committed": false,
+    "lineup_changes": [
+      "2 resident looks from fixture, no player column",
+      "Freeze idle at zero for open eyes",
+      "Camera distance 3.5 m and target Y 0.90 for complete feet",
+      "Short readable captions"
+    ]
+  }
+}
