@@ -153,13 +153,13 @@ func test_the_cookbook_strip_shows_cook_all_from_lv8_and_greys_it_with_the_gap()
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
 	k.open("cookbook")
-	assert_bool((k.drawer.get("_cook_all") as Control).visible).is_false()
+	assert_bool((k.drawer.get("_cook_all") as Control).is_visible_in_tree()).is_false()
 	rt.ui.close_modal()
 	await get_tree().process_frame
 	_set_view(_view(_plan("nothing_to_cook")))
 	k.open("cookbook")
 	var button: UiCommandButton = k.drawer.get("_cook_all")
-	assert_bool(button.visible).is_true()
+	assert_bool(button.is_visible_in_tree()).is_true()
 	assert_str(button.text).is_equal("Nothing to cook")
 	k.open_cook_all()   # greyed: no sheet (no empty sheet, LOCK-10)
 	assert_object(k.cook_all_sheet).is_null()
@@ -181,34 +181,36 @@ func test_the_filter_row_keeps_all_six_chips_and_cook_all_is_off_it() -> void:
 	assert_bool(cook_all.visible).is_true()
 	assert_bool(row.get_parent().is_ancestor_of(cook_all)).is_false()
 
-## The button stands on its own and moves where the frame puts it (不知火舞 on 286: A the heading by ×, B its own row on
-## top of the Cookbook page); it is shown from Cooking Lv8 on the Cookbook only, greyed `Nothing to cook` in either place.
-func test_cook_all_moves_between_the_heading_and_its_own_row() -> void:
+## COOK-ALL-ENTRY 2691:154923 / -OFF 2691:155077 (不知火舞 on 286): Cook All's own row under the mode tabs, above the
+## title strip, 34 high where the strip began and 4 above it (38 in all); the button right-aligned, its 44 hit 5 over the
+## row; the grid's bottom stays and the grid gives the 38. Greyed `Nothing to cook` in the same place; before Cooking
+## Lv8 no row at all.
+func test_cook_all_has_its_own_row_under_the_tabs() -> void:
 	var d := await _drawer(_view())
 	var cook_all := d.get("_cook_all") as UiCommandButton
-	var close := d.find_children("*", "UiCloseButton", true, false)[0] as Control
-	d.cook_all_at = P0KitchenDrawer.CookAllAt.HEADING
-	for i in 2: await get_tree().process_frame
-	assert_object(cook_all.get_parent()).is_same(close.get_parent())
-	assert_int(cook_all.get_index()).is_equal(close.get_index() - 1)
+	var row := cook_all.get_parent() as Control
+	var titles := (d.get("_titles") as Control).get_global_rect()
+	var r := row.get_global_rect()
+	var b := cook_all.get_global_rect()
+	var grid := (d.get("_pages") as Control).get_global_rect()
 	assert_bool(cook_all.is_visible_in_tree()).is_true()
-	d.tab = "experiment"
-	assert_bool(cook_all.is_visible_in_tree()).is_false()
-	d.tab = "cookbook"
-	d.cook_all_at = P0KitchenDrawer.CookAllAt.ROW
-	for i in 2: await get_tree().process_frame
-	assert_bool(d.get("_cookbook").is_ancestor_of(cook_all)).is_true()
-	assert_float(cook_all.get_global_rect().end.y).is_less_equal((d.get("_titles") as Control).get_global_rect().position.y)
+	assert_that([r.size.y, titles.position.y - r.end.y]).is_equal([34.0, 4.0])
+	assert_that([b.end.x, b.position.y, b.size.y]).is_equal([r.end.x, r.position.y - 5.0, 44.0])
 	d.view = _view(_plan("nothing_to_cook"))
 	d.refresh()
+	await get_tree().process_frame
 	assert_str(cook_all.text).is_equal("Nothing to cook")
-	assert_bool(cook_all.is_visible_in_tree()).is_true()
+	assert_float(cook_all.get_global_rect().end.x).is_equal(r.end.x)
 	var before := _view()
 	before.cooking.erase("cook_all")
 	d.view = before
 	d.refresh()
-	assert_bool(cook_all.is_visible_in_tree()).is_false()
-	assert_bool((cook_all.get_parent() as Control).visible).is_false()   # no empty row left behind
+	for i in 2: await get_tree().process_frame
+	assert_bool(row.visible).is_false()   # no empty row left behind
+	var grid_without := (d.get("_pages") as Control).get_global_rect()
+	assert_float((d.get("_titles") as Control).get_global_rect().position.y).is_equal(r.position.y)   # the strip back up
+	assert_float(grid_without.end.y).is_equal(grid.end.y)
+	assert_float(grid.size.y).is_equal_approx(grid_without.size.y - 38.0, 0.01)
 
 func _drawer(v: Dictionary) -> P0KitchenDrawer:
 	var host := Control.new()

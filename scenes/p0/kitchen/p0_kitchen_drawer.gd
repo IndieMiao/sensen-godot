@@ -74,10 +74,10 @@ signal unavailable(reason: String)
 signal double_changed(on: bool)
 ## Cook All (Cooking Lv8, §16 COOK-1, q(124)): the kitchen opens its sheet.
 signal cook_all_requested
-## Where Cook All stands (B7 ⑨, 不知火舞 on 286 6e15f758): it no longer shares the filter row, which keeps all six chips.
-## Its place waits for 不知火舞's frame — HEADING: the heading row, left of ×; ROW: its own row on top of the Cookbook page.
-enum CookAllAt { HEADING, ROW }
-var cook_all_at := CookAllAt.ROW: set = set_cook_all_at
+## Cook All's row (B7 ⑨, COOK-ALL-ENTRY 2691:154923 / -OFF 2691:155077; 不知火舞 on 286): under the mode tabs, above the
+## title strip, 34 high and 4 apart, the button right-aligned (its 44 px hit 5 over the row's top and bottom). It left the
+## filter row, which keeps all six chips; the grid's bottom stays where it was, the grid 38 shorter.
+const _COOK_ALL_ROW_H := 34.0
 
 var _stove: Label
 var _level: Label
@@ -97,10 +97,8 @@ var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit t
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
 var _pages: UiInventoryGrid
-var _cook_all: UiCommandButton   # from Cooking Lv8 on the Cookbook (P0KitchenLogic.cook_all); where: cook_all_at
-var _cook_all_row: HBoxContainer   # CookAllAt.ROW: the row on top of the Cookbook page, right-aligned
-var _heading_row: HBoxContainer
-var _close: UiCloseButton
+var _cook_all: UiCommandButton   # its own row on top of the Cookbook page, from Cooking Lv8 (P0KitchenLogic.cook_all)
+var _cook_all_row: Control
 var _book_chips: Control   # the Cookbook's filter chips (in their scroll window)
 var _bag: UiInventoryGrid
 var _slots_used: Label
@@ -123,11 +121,6 @@ func action_area() -> Control:
 func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	super(HEIGHT)
 	view = view_
-	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
-	_cook_all.name = "CookAll"
-	_cook_all.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_cook_all.activated.connect(func(): cook_all_requested.emit())
-	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
 	body.add_child(_heading())
 	_modes = UiSegmentTab.new([{label = "Cookbook", count = P0KitchenLogic.cookbook_count(view)}, {label = "Experiment"}])
 	_modes.changed.connect(func(i: int): set_tab("cookbook" if i == 0 else "experiment"))
@@ -137,29 +130,14 @@ func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	_experiment = _build_experiment()
 	body.add_child(_experiment)
 	tab = tab_
-	set_cook_all_at(cook_all_at)
 	refresh()
 
-func set_cook_all_at(v: CookAllAt) -> void:
-	cook_all_at = v
-	if _cook_all == null or _cook_all_row == null: return
-	if _cook_all.get_parent(): _cook_all.get_parent().remove_child(_cook_all)
-	if v == CookAllAt.HEADING:
-		_heading_row.add_child(_cook_all)
-		_heading_row.move_child(_cook_all, _close.get_index())
-	else:
-		_cook_all_row.add_child(_cook_all)
-	_show_cook_all()
-	_fit_heading()
-
-## Shown from Cooking Lv8 (greyed `Nothing to cook` included), on the Cookbook only, not while queueing; its own row goes
-## with it so no empty row is left.
+## Shown from Cooking Lv8 (greyed `Nothing to cook` included), not while queueing; its row goes with it, no empty row.
 func _show_cook_all() -> void:
 	if _cook_all == null: return
 	var all := P0KitchenLogic.cook_all(view)
-	_cook_all.visible = not all.is_empty() and not queue_mode and tab == "cookbook"
-	if _cook_all.visible: _cook_all.reason = str(all.button)
-	if _cook_all_row: _cook_all_row.visible = _cook_all.visible and cook_all_at == CookAllAt.ROW
+	_cook_all_row.visible = not all.is_empty() and not queue_mode
+	if _cook_all_row.visible: _cook_all.reason = str(all.button)
 
 func set_queue_mode(v: bool) -> void:
 	queue_mode = v
@@ -178,8 +156,6 @@ func set_tab(v: String) -> void:
 	_modes.selected = 0 if tab == "cookbook" else 1
 	_cookbook.visible = tab == "cookbook"
 	_experiment.visible = tab == "experiment"
-	_show_cook_all()
-	_fit_heading()
 	if changed: tab_changed.emit(tab)
 
 ## Redraw from `view` and `pot`; selections and scroll positions survive.
@@ -246,8 +222,6 @@ func _heading() -> Control:
 	var close := UiCloseButton.new()
 	close.pressed.connect(func(): close_requested.emit())
 	row.add_child(close)
-	_heading_row = row
-	_close = close
 	# COOK-2a / 2b: the 18 px heading sits at y 15 and the 44 px close at y 2; let the close overhang the pad.
 	var wrap := MarginContainer.new()
 	wrap.add_theme_constant_override(&"margin_top", -int(_CLOSE_OVERHANG))
@@ -265,8 +239,6 @@ func _fit_heading() -> void:
 	var sep := float(row.get_theme_constant(&"separation"))
 	var need := _stove_pill.get_combined_minimum_size().x + _level.get_minimum_size().x + _state.get_minimum_size().x \
 		+ UiTokens.SIZE_CLOSE + sep * 3.0
-	if _cook_all != null and _cook_all.visible and _cook_all.get_parent() == row:
-		need += _cook_all.get_combined_minimum_size().x + sep
 	_level.visible = need <= w
 
 # ---------------------------------------------------------------- Cookbook
@@ -274,11 +246,23 @@ func _build_cookbook() -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	# CookAllAt.ROW: Cook All on top of the page, right-aligned (`Nothing to cook` greyed when no known page has its
-	# ingredients, D-10, LOCK-10: the gap on the button, no empty sheet).
-	_cook_all_row = HBoxContainer.new()
-	_cook_all_row.alignment = BoxContainer.ALIGNMENT_END
+	# Cook All's row (`Nothing to cook` greyed when no known page has its ingredients, D-10, LOCK-10: the gap on the
+	# button, no empty sheet): the button keeps its 44 hit, grown leftwards from the row's right edge.
+	_cook_all_row = Control.new()
+	_cook_all_row.name = "CookAllRow"
+	_cook_all_row.custom_minimum_size.y = _COOK_ALL_ROW_H
+	_cook_all_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_cook_all_row.visible = false
+	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
+	_cook_all.name = "CookAll"
+	_cook_all.activated.connect(func(): cook_all_requested.emit())
+	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
+	_cook_all.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_cook_all.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	var over := (UiTokens.SIZE_TOUCH - _COOK_ALL_ROW_H) / 2.0
+	_cook_all.offset_top = -over
+	_cook_all.offset_bottom = _COOK_ALL_ROW_H + over
+	_cook_all_row.add_child(_cook_all)
 	v.add_child(_cook_all_row)
 	v.add_child(_build_titles())
 	# The filter chips, all six: All · Can cook · Common · Fine · Rare · Legendary (2318:125476).
