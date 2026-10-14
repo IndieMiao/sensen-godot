@@ -995,6 +995,11 @@
     "lat": 32.5335,
     "lng": -117.0395,
     "why": "SGODOT-280 (Tijuana without San Diego, 2026-10-13): generated against the San Ysidro / El Chaparral border crossing; 1 km into Zona Centro"
+   },
+   "gn-2036579~pond1": {
+    "lat": 41.145,
+    "lng": 126.218,
+    "why": "SGODOT-305 (Ji'an split out of Manp'o, 2026-10-14): generated across the Yalu in North Korea; onto the Chinese bank, north-east of the town"
    }
   },
   "room": {

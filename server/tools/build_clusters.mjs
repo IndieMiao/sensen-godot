@@ -83,6 +83,8 @@ const nearestSeed = r => {
 // The hand list of q(187) (SGODOT-280): cities taken out of the cluster the merge put them in, each its own from then on.
 const SPLIT_OUT = [
   { id: 'gn-5391811', why: 'San Diego (US, 1.4 M) had joined Tijuana (MX) 28 km away; players went to "San Diego" and stood in Tijuana' },
+  { id: 'gn-1843163', why: 'Ganghwa-gun (KR) had joined Kaesong (KP); North Korean cities do not open (SGODOT-305), Ganghwa does' },
+  { id: 'gn-2036579', why: 'Ji\'an, Jilin (CN) had joined Manp\'o (KP); North Korean cities do not open (SGODOT-305), Ji\'an does' },
 ];
 
 // Frozen assignments from the last build.
