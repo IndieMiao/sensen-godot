@@ -81,6 +81,9 @@ func _text(style: StringName, color: Color, at: Vector2) -> Label:
 	add_child(l)
 	return l
 
+## The spec the row draws (the counter's › card reads it).
+func spec() -> Dictionary: return _spec
+
 static func _released(e: InputEvent) -> bool:
 	return (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed) \
 		or (e is InputEventScreenTouch and not e.pressed and not DisplayServer.is_touchscreen_available())

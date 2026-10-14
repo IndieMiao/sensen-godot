@@ -249,10 +249,16 @@ func test_row_hoe_and_bag_upgrade_buy_rows() -> void:
 	assert_array(_labels(hoe)).is_equal(["unavailable:Farming Lv4 needed"])
 	assert_str(str(hoe.price.text)).is_equal("240 coins")
 	var up := P0ItemInfo.spec(v, "bag_upgrade_1", &"counter_buy", {counter = "homestead"})
-	assert_array(up.facts).is_equal(["+5 bag slots", "Reeds 4/10 · Timber 6/6"])
+	# line 3: the first material still short, the others short counted (不知火舞 on 284, q(174)); Timber is in, so none more
+	assert_array(up.facts).is_equal(["+5 bag slots", "Reeds 4/10"])
 	assert_array(_labels(up)).is_equal(["unavailable:Need 6 Reeds"])
+	v.shops.homestead.buy[0].materials[1].have = 2
+	assert_array(P0ItemInfo.spec(v, "bag_upgrade_1", &"counter_buy", {counter = "homestead"}).facts).is_equal(["+5 bag slots", "Reeds 4/10 · +1 more"])
 	v.shops.homestead.buy[0].materials[0].have = 10
-	assert_array(_labels(P0ItemInfo.spec(v, "bag_upgrade_1", &"counter_buy", {counter = "homestead"}))).is_equal(["secondary:Buy"])
+	v.shops.homestead.buy[0].materials[1].have = 6
+	var ready := P0ItemInfo.spec(v, "bag_upgrade_1", &"counter_buy", {counter = "homestead"})
+	assert_array(ready.facts).is_equal(["+5 bag slots", "Materials ready"])
+	assert_array(_labels(ready)).is_equal(["secondary:Buy"])
 
 func test_rods_in_gear_equip_or_show_equipped() -> void:
 	var starter := P0ItemInfo.spec(_view(), "rod_starter", &"gear")

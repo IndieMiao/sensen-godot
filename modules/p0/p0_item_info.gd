@@ -115,6 +115,9 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		out.quantity = 0
 	# Gift Clues (Fishing Lv7, q(167); 302 b308ee14): who of the residents met likes this dish, under the rarity line.
 	if kind == "dish": out.liked_by = P0Logic.liked_by_line(view, item_id)
+	if context == &"counter_buy":   # the › card's NeedTiles: what the buy takes (Bag Upgrades), however far the gate is
+		out.needs = (_offer(view, item_id, opts).get("materials", []) as Array).map(func(m): return {id = str(m.get("id", "")), name = str(m.get("name", "")),
+			have = int(m.get("have", 0)), need = int(m.get("need", 0)), icon = P0Logic.icon(str(m.get("id", "")))})
 	if rule.is_empty(): return out
 	for line in rule.get("facts", []):
 		var text := fill(str(line), t)
@@ -375,8 +378,9 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		owned_line = "In Gear" if rod.get("owned", false) else "",
 		# Row Hoe (market, LOCK-15 / 李白 q(46)): what it does, from view.gear.hoes.
 		tool_effect = ("Sows %d plots at once" % int(rod.sow)) if rod.has("sow") else "",
-		# A buy row's line 3 for goods made from materials (Bag Upgrade I): "Reeds 4/10 · Timber 6/6", else the stock.
-		need_line = SEP.join(PackedStringArray((offer.get("materials", []) as Array).map(func(m): return "%s %d/%d" % [str(m.get("name", "")), int(m.get("have", 0)), int(m.get("need", 0))]))) if not (offer.get("materials", []) as Array).is_empty() \
+		# A buy row's line 3 for goods made from materials (Bag Upgrade I): the first one still short and how many more are
+		# (`Hardwood 0/4 · +2 more`), `Materials ready` once all are in, else the stock (_materials_line).
+		need_line = _materials_line(offer) if not (offer.get("materials", []) as Array).is_empty() \
 			else (("Stock %d/1" % (0 if offer.get("owned", false) else 1)) if offer.get("once", false) else _stock_line(offer, count)),   # MARKET-SPECIALTY `Stock 1/1`
 		materials_short = _materials_short(offer),
 		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
@@ -454,6 +458,16 @@ static func _offer_use(view: Dictionary, offer: Dictionary) -> String:
 				var more := int(up.get("capacity", 0)) - int(view.get("bag", {}).get("capacity", 25))
 				return ("+%d bag slots" % more) if more > 0 else ""
 	return ""
+
+## A buy row's materials line (不知火舞 on 284, q(174)): the full list ran past the row beside a grey key (`Hardwood 0/4 ·
+## Clay 0/6 · C…`), so the first material still short and how many others are short too (`Hardwood 0/4 · +2 more`, the
+## game's `+N more`), `Hardwood 0/4` alone, or `Materials ready` once every one is in.
+static func _materials_line(offer: Dictionary) -> String:
+	var short: Array = (offer.get("materials", []) as Array).filter(func(m): return int(m.get("have", 0)) < int(m.get("need", 0)))
+	if short.is_empty(): return "Materials ready"
+	var first: Dictionary = short[0]
+	var line := "%s %d/%d" % [str(first.get("name", "")), int(first.get("have", 0)), int(first.get("need", 0))]
+	return line + ((SEP + "+%d more" % (short.size() - 1)) if short.size() > 1 else "")
 
 ## "10 Reeds" — the first material still short for a buy row, "" when all are in.
 static func _materials_short(offer: Dictionary) -> String:
