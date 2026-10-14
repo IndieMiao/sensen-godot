@@ -124,18 +124,23 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 		entry.keeper["look"] = keeper_look(str(entry.keeper.look), entry.get("residents", []))
 	return entry
 
-## A generated keeper's look set (world.keeper_looks `<role>_<climate>_<n>`), unless its hair is a resident's of the
-## same room: then the first of the role and climate's three sets that is not, the given one when all three are
-## (不知火舞 on 284: Lena under tea_subtropical_0's hairhat41, Tomo under market_subtropical_2's hairhat0). The room,
-## the keeper bar and the greeting card's portrait all read the entry, so they wear the same one.
+## A hair part's style: its NPC-only colour variants are the same style (Tomo's hairhat0_npc_tomo is hairhat0, darker).
+static func hair_style(part: String) -> String:
+	var cut := part.find("_npc_")
+	return part.substr(0, cut) if cut > 0 else part
+
+## A generated keeper's look set (world.keeper_looks `<role>_<climate>_<n>`), unless its hair style is a resident's of
+## the same room (a colour variant counts: hair_style): then the first of the role and climate's three sets that is
+## not, the given one when all three are (不知火舞 on 284: Lena's hairhat41, Tomo's darker hairhat0). The room, the
+## keeper bar and the greeting card's portrait all read the entry, so they wear the same one.
 static func keeper_look(look: String, residents: Array) -> String:
 	var looks: Dictionary = P0Logic.content().get("world", {}).get("keeper_looks", {})
 	var npcs: Dictionary = P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {})
 	var hair := {}
 	for id in residents:
-		var h := str(npcs.get(str(id), {}).get("slots", {}).get("hairHat", ""))
+		var h := hair_style(str(npcs.get(str(id), {}).get("slots", {}).get("hairHat", "")))
 		if h != "": hair[h] = true
-	var clashes := func(k: String) -> bool: return hair.has(str((looks.get(k, {}) as Dictionary).get("hairHat", "")))
+	var clashes := func(k: String) -> bool: return hair.has(hair_style(str((looks.get(k, {}) as Dictionary).get("hairHat", ""))))
 	if hair.is_empty() or not clashes.call(look): return look
 	var stem := look.substr(0, look.rfind("_"))
 	for i in 3:

@@ -57,9 +57,9 @@ func test_the_stamp_shows_a_face_an_initial_or_the_silhouette() -> void:
 	assert_object(pip.find_child("Initial", false, false)).is_null()
 	var hana: Control = auto_free(Stamp.new("res_hana", true))   # a resident without an illustration: their card
 	assert_str((hana.get("face") as AtlasTexture).atlas.resource_path).is_equal("res://assets/p0/art/residents/hana_card.jpg")
-	var wu: Control = auto_free(Stamp.new("res_granny_wu", true))   # no card yet
-	assert_object(wu.get("face")).is_null()
-	assert_str((wu.find_child("Initial", false, false) as Label).text).is_equal("G")
+	var mira: Control = auto_free(Stamp.new("res_mira", true))   # no card yet (her weekly route is P2)
+	assert_object(mira.get("face")).is_null()
+	assert_str((mira.find_child("Initial", false, false) as Label).text).is_equal("M")
 	var none: Control = auto_free(Stamp.new("res_hana", false))
 	assert_object(none.find_child("Initial", false, false)).is_null()
 	assert_vector(pip.custom_minimum_size).is_equal(Stamp.PASSPORT)
@@ -183,14 +183,14 @@ func test_a_held_postcard_is_never_hidden() -> void:
 func test_the_dialogue_bar_keeps_the_illustrations_and_takes_the_cards() -> void:
 	assert_str(P0Ui._portrait("pip").resource_path).is_equal("res://assets/p0/art/pip-portrait.jpg")
 	assert_str(P0Ui._portrait("kai").resource_path).is_equal("res://assets/p0/art/kai-portrait.jpg")
-	for key in ["hana", "sam", "lena", "rafa", "tomo", "theo", "nadia"]:
+	for key in ["hana", "sam", "lena", "rafa", "tomo", "theo", "nadia", "granny_wu", "ivo"]:
 		assert_str(P0Ui._portrait(key).resource_path).is_equal("res://assets/p0/art/residents/%s_card.jpg" % key)
-	assert_object(P0Ui._portrait("granny_wu")).is_null()
+	assert_object(P0Ui._portrait("mira")).is_null()
 	assert_object(P0Ui._portrait("")).is_null()
 	# every card has both crops, inside its 300 × 660
 	var crops: Dictionary = P0RoomAnchors.read_json(P0Ui.CROPS_PATH)
-	for key in ["pip", "kai", "hana", "sam", "lena", "rafa", "tomo", "theo", "nadia"]:
+	for key in ["pip", "kai", "hana", "sam", "lena", "rafa", "tomo", "theo", "nadia", "granny_wu", "ivo"]:
 		for kind in ["stamp", "face"]:
 			var r := (P0Ui.resident_crop(key, kind) as AtlasTexture).region
 			assert_bool(Rect2(0, 0, 300, 660).encloses(r)).override_failure_message("%s %s %s" % [key, kind, r]).is_true()
-	assert_int(crops.size()).is_greater_equal(9)
+	assert_int(crops.size()).is_greater_equal(11)
