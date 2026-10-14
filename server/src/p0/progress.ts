@@ -5,7 +5,7 @@ import { maxEnergy, nextTickIn, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 
 export type P0Event =
-  | { kind: 'trap'; action: 'set' | 'collected' | 'taken_back'; place: string; fish: number; left?: number }   // Fish Trap (SGODOT-283)
+  | { kind: 'trap'; action: 'set' | 'collected' | 'taken_back' | 'recalled'; place: string; fish: number; left?: number }   // Fish Trap (SGODOT-283)
   | { kind: 'energy'; delta: number; reason: string }
   // capped: the day's anti-script limit cut it (§4.3.4); nth: a pot's place among today's pots of its Cookbook page (1st
   // full, 2nd half, 3rd on none, §7.6.2), so the float can say `· 2nd today` / `No XP · 3rd today` (q(94))

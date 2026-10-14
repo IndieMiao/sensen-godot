@@ -331,7 +331,6 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.presence.place ??= null;
   letGoAway(c, s);
-  recallAwayTraps(c, s, now, []);   // q(177) ③: a trap left outside home (a home put back after a rollback, #393)
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
   // P1 (SGODOT-239, q(59) §1.1): facilities, and the 10 plots a save already at Homestead Lv3 has from this version on
@@ -344,6 +343,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   const run = s.mine?.run;
   if (run) while (run.floors.length < c.mine.floors.length) run.floors.push({ paid: false, broken: [], lit: false });
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
+  recallAwayTraps(c, s, now, []);   // q(177) ③: a trap left outside home (a home put back after a rollback, #393), once every field is filled
   s.v = SAVE_VERSION;
   return s;
 }

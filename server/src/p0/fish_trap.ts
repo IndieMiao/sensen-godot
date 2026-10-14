@@ -163,7 +163,9 @@ export function recallAwayTraps(c: P0Content, s: P0State, now: number, events: P
       fish++;
     }
     items.set(TRAP, (items.get(TRAP) ?? 0) + 1);
-    events.push({ kind: 'trap', action: 'taken_back', place: t.place, fish: t.fish.length, left: 0 });
+    // recalled, not taken_back: today's client says nothing for it (`Fish Trap back in your bag` would be wrong for a
+    // trap sent as a parcel), and the parcel float speaks for what did not fit (周瑜 on #399); any line takes a q row
+    events.push({ kind: 'trap', action: 'recalled', place: t.place, fish: t.fish.length, left: 0 });
   }
   s.traps = (s.traps ?? []).filter(t => !away.includes(t));
   if (fish) noteFishdex(c, s, now, events);

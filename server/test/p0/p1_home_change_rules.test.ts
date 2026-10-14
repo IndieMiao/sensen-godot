@@ -60,6 +60,15 @@ describe('q(173): a changed home carries its day to the new home\'s first fittin
     }
   });
 
+  it('a whole day apart (Tonga → Pago Pago, 24 h of zones): the new calendar must turn past the day first, 48 h', () => {
+    const s = sfSave('player-rules-09');
+    s.travel = { ...s.travel, home: 'gn-4032402', here: 'gn-4032402', home_chosen_at: T - DAY };   // Nuku'alofa, UTC+13
+    const hold = dayHoldFor(c, s, 'gn-5881576', T), next = { travel: { home: 'gn-5881576' } };   // Pago Pago, UTC−11
+    expect((hold.until - hold.start) / H).toBe(48);
+    expect(dayKey(c, next, hold.until) > hold.key).toBe(true);   // never back a date: no negative countdown after
+    expect(dayKey(c, next, hold.until - 1) <= hold.key).toBe(true);
+  });
+
   it('the day is kept: today\'s counts stay after the change', () => {
     const s = sfSave();
     s.day = { ...s.day, key: dayKey(c, s, T), drinks: 2, rest: 1 };
@@ -118,7 +127,7 @@ describe('q(177): traps in home ponds only; a change of home brings them in', ()
     expect(count(r.state.bag, TRAP)).toBe(traps + 1);
     const caught = Object.values(r.state.fishing.caught).reduce((a, b) => a + b, 0) - Object.values(set.fishing.caught).reduce((a, b) => a + b, 0);
     expect(caught).toBe(2);   // 20 h at one fish each 8 h
-    expect(r.events).toContainEqual(expect.objectContaining({ kind: 'trap', action: 'taken_back', place: 'pond_san_francisco_03', fish: 2 }));
+    expect(r.events).toContainEqual(expect.objectContaining({ kind: 'trap', action: 'recalled', place: 'pond_san_francisco_03', fish: 2 }));
     expect(r.events.some(e => e.kind === 'xp')).toBe(true);
   });
 
