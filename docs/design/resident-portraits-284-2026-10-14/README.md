@@ -36,3 +36,11 @@ This batch is the nine residents whose look exists today: Pip, Old Kai, Rafa, Ha
 
 ## Integration
 Only the runtime files go to farm-dev: the nine JPGs, their `.import` files and `portrait_crops.json`. The script and this folder stay on wp-3d-scene. 苏烈 then wires the stamp, the dialogue bar fallback and the profile face.
+
+## Second batch (2026-10-14): Granny Wu, Ivo, Tomo
+Drawn with the NPC parts of #407 (head 00ab44be), looks in `looks-final-granny-ivo-tomo.json`.
+- Granny Wu: `hairhat80_npc_granny_wu` (silver-white bun, red pin) with cloth11 and shoes5.
+- Ivo: `hairhat_npc_ivo` (mustard hard hat, brass lamp), `mask16_npc_ivo` (short grey beard), `cloth1_npc_ivo` (canvas shirt, charcoal shorts) and shoes3.
+- Tomo: `hairhat0_npc_tomo` (warm dark brown, so he no longer reads as a new player in the default look), with glass0, cloth0, shoes2 and messengerbag3. His card replaces the first batch's.
+
+`portrait_crops.json` now has eleven keys. `residents-11-cards.png` and `residents-11-stamps.png` show all eleven in table order (Mira is not in P1). Visual review: 不知火舞 on SGODOT-284 (87e87ff2, e07d1a16).
