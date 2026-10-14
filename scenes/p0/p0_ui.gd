@@ -3218,7 +3218,7 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 ## title too (P0Logic.title_card: `Master Gardener` · `Farming Lv10` · `New title`, its skill's icon; SGODOT-275).
 ## Kindred (q(171) ③; KINDRED-PIP 2620:134209): RewardMoment Milestone, no buttons, folded away as a title card —
 ## `Kindred · Pip`, their postcard's stamp in the item's place, `Postcard from Pip`, the strip `New title · Pip's Best
-## Friend` with the affinity heart; no pills (P0Kindred.card).
+## Friend` with the affinity float's heart at 14; no pills (P0Kindred.card).
 const PostcardStamp := preload("res://scenes/p0/panels/p0_postcard_stamp.gd")
 func show_kindred(spec: Dictionary) -> void:
 	var m := UiRewardMoment.new()
@@ -3227,7 +3227,8 @@ func show_kindred(spec: Dictionary) -> void:
 	m.item_art = PostcardStamp.new(str(spec.get("resident", "")), true, PostcardStamp.CARD)
 	m.item_name = str(spec.get("item_name", ""))
 	m.strip = str(spec.get("strip", ""))
-	m.strip_icon = P0Logic.icon("heart")
+	m.strip_icon = UiFloatText.HEART   # the affinity float's heart, color/float-affinity, 14 (不知火舞 on 284)
+	m.strip_icon_size = 14.0
 	show_moment(m)
 
 func show_title(spec: Dictionary) -> void:

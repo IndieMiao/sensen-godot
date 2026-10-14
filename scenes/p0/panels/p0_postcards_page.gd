@@ -4,8 +4,8 @@ extends VBoxContainer
 ##   earned    surfaceRaised, a 1 px border: the PostcardStamp (their face, or their initial), the name (C14 XB) and
 ##             their Kindred line in curly quotes (C11 B italic, secondary), uncut
 ##   unearned  no fill, a dashed border: the grey stamp and `Kindred · ?` (C12 B, secondary)
-## Every cell is as tall as the longest Kindred line of all the residents needs (3 lines now), earned or not, so the
-## grid never shifts as postcards come. Read-only: a cell does nothing. Built from the view (refresh follows it).
+## Every cell is as tall as the longest Kindred line of the residents on the page needs (3 lines in P1), earned or not,
+## so the grid never shifts as postcards come (不知火舞 on 284). Read-only: a cell does nothing. Built from the view (refresh follows it).
 ## Preloaded, no class_name (a new global class needs an editor import).
 
 const Kindred := preload("res://modules/p0/p0_kindred.gd")
@@ -53,7 +53,7 @@ func refresh(v: Dictionary) -> void:
 	for cell in model.cells: grid.add_child(_cell(cell))
 	_fit.call_deferred()
 
-## Every cell to the height the longest Kindred line needs at the cells' width (all residents, earned or not). Run
+## Every cell to the height the longest Kindred line needs at the cells' width (the page's residents, earned or not). Run
 ## again whenever the grid's width changes; the cells keep the width the grid gives them.
 func _fit() -> void:
 	if not is_inside_tree() or grid.get_child_count() == 0: return
@@ -76,7 +76,7 @@ func _fit() -> void:
 	probe.free()
 	name_probe.free()
 	var tallest := 0.0
-	for id in P0Logic.content().get("residents", {}):
+	for id in Kindred.open_residents():   # the residents on the page (q(193)): Mira's line joins with her in P2
 		var line := quoted(str(P0Logic.content().residents[id].get("lines", {}).get("Kindred", "")))
 		tallest = maxf(tallest, font.get_multiline_string_size(line, HORIZONTAL_ALIGNMENT_CENTER, text_w, fsize).y)
 	var h := _PAD.y + Stamp.PASSPORT.y + _STACK + name_h + _STACK + tallest + _PAD.w

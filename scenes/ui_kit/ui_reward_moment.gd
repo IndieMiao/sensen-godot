@@ -63,6 +63,8 @@ var quality := 0: set = set_quality
 var rewards: Array = []: set = set_rewards
 var strip := "": set = set_strip
 var strip_icon: Texture2D: set = set_strip_icon
+## The strip icon's side: 18, or 14 for the affinity heart (a Kindred card, 不知火舞 on 284).
+var strip_icon_size := 18.0: set = set_strip_icon_size
 ## Primary command; "" hides the whole actions block (catch cards).
 var primary := "": set = set_primary
 ## Unavailable reason (LOCK-10): replaces the primary label, the button stays tappable.
@@ -209,6 +211,7 @@ func set_rarity_word(v: String) -> void: rarity_word = v; _refresh()
 func set_quality(v: int) -> void: quality = v; _refresh()
 func set_strip(v: String) -> void: strip = v; _refresh()
 func set_strip_icon(v: Texture2D) -> void: strip_icon = v; _refresh()
+func set_strip_icon_size(v: float) -> void: strip_icon_size = v; _refresh()
 func set_primary(v: String) -> void: primary = v; _refresh()
 func set_primary_reason(v: String) -> void: primary_reason = v; _refresh()
 func set_secondary(v: String) -> void: secondary = v; _refresh()
@@ -250,7 +253,7 @@ static func strip_lines(text: String, font: Font, size: int, width: float) -> St
 ## The strip's text inside the card: its inner width less the strip's padding and, with one, the icon and its gap.
 func _fit_strip() -> void:
 	if _strip_text == null: return
-	var width := WIDTH - _PAD_X * 2.0 - _STRIP_PAD.x - _STRIP_PAD.z - ((_STRIP_ICON + _STRIP_GAP) if strip_icon != null else 0.0)
+	var width := WIDTH - _PAD_X * 2.0 - _STRIP_PAD.x - _STRIP_PAD.z - ((strip_icon_size + _STRIP_GAP) if strip_icon != null else 0.0)
 	_strip_text.text = strip_lines(strip, _strip_text.get_theme_font(&"font"), _strip_text.get_theme_font_size(&"font_size"), width)
 
 ## A clipped label has no natural width, so give the name its text width up to NAME_MAX_W (then …): short names
@@ -288,6 +291,7 @@ func _refresh() -> void:
 	_fit_strip()
 	_strip_icon.texture = strip_icon
 	_strip_icon.visible = strip_icon != null
+	_strip_icon.custom_minimum_size = Vector2(strip_icon_size, strip_icon_size)
 	_actions.visible = primary != "" or secondary != "" or note != ""
 	_primary.label = primary
 	_primary.reason = primary_reason

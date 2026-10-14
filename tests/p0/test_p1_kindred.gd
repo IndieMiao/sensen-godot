@@ -32,13 +32,15 @@ func test_the_arrival_cards_words() -> void:
 	var old: Dictionary = Kindred.card({}, {"kind": "kindred", "resident": "res_old_kai"})   # an older server: the names from the resident's
 	assert_array([old.item_name, old.strip]).is_equal(["Postcard from Old Kai", "New title · Old Kai's Best Friend"])
 
-## Every resident of the table in its order, the denominator all of them; an unearned cell names no one.
-func test_the_postcards_page_lists_every_resident_in_the_tables_order() -> void:
+## Every open resident in the table's order (q(193) ④: in world_gen's placement rules or a hand-written outpost), the
+## denominator how many they are; Mira (her weekly route is P2) is not on the page, no gap left; an unearned cell names no one.
+func test_the_postcards_page_lists_the_open_residents_in_the_tables_order() -> void:
 	var p: Dictionary = Kindred.postcards(_view())
 	var table: Array = P0Logic.content().get("residents", {}).keys()
-	assert_str(str(p.count)).is_equal("Postcards · 1/%d" % table.size())
-	assert_int(table.size()).is_equal(12)
-	assert_array(p.cells.map(func(c): return c.id)).is_equal(table)
+	var open: Array = table.filter(func(id): return id != "res_mira")
+	assert_array(Kindred.open_residents()).is_equal(open)
+	assert_str(str(p.count)).is_equal("Postcards · 1/11")
+	assert_array(p.cells.map(func(c): return c.id)).is_equal(open)
 	var pip: Dictionary = p.cells[table.find("res_pip")]
 	assert_array([pip.earned, pip.name, pip.text]).is_equal([true, "Pip", "Best friend on the whole route. Don't tell the pigeons."])
 	var kai: Dictionary = p.cells[table.find("res_old_kai")]
@@ -73,7 +75,8 @@ func test_the_kindred_event_shows_its_card() -> void:
 	var m := cards[0] as UiRewardMoment
 	assert_array([m.tone, m.event, m.item_name, m.strip]).is_equal([UiRewardMoment.Tone.MILESTONE, "Kindred · Pip",
 		"Postcard from Pip", "New title · Pip's Best Friend"])
-	assert_object(m.strip_icon).is_same(P0Logic.icon("heart"))
+	assert_object(m.strip_icon).is_same(UiFloatText.HEART)   # the affinity float's heart, 14 (不知火舞 on 284)
+	assert_float(m.strip_icon_size).is_equal(14.0)
 	assert_object(m.item_art).is_not_null()
 	assert_bool(m._icon.visible).is_false()   # the stamp alone in the disc's place
 	assert_array(m.rewards).is_empty()   # no pills
@@ -97,15 +100,17 @@ func test_the_passport_has_cities_and_postcards_pages() -> void:
 	for i in 3: await get_tree().process_frame
 	var page := d.find_child("Postcards", true, false) as Control
 	assert_bool(page.visible).is_true()
-	assert_str((page.find_child("Count", true, false) as Label).text).is_equal("Postcards · 1/12")
+	assert_str((page.find_child("Count", true, false) as Label).text).is_equal("Postcards · 1/11")
 	var cells: Array = page.find_child("Grid", true, false).get_children()
-	assert_int(cells.size()).is_equal(12)
+	assert_int(cells.size()).is_equal(11)
+	assert_object(page.find_child("Cell_res_mira", true, false)).is_null()   # not open in P1 (q(193))
 	var heights := cells.map(func(c): return (c as Control).custom_minimum_size.y)
 	assert_bool(heights.all(func(h): return is_equal_approx(h, heights[0]) and h > Stamp.PASSPORT.y)).is_true()
-	# as tall as the longest Kindred line needs at the cells' own width (q(171) ⑥), no taller: four lines of 11 at most
+	# as tall as the longest Kindred line of the page's residents needs at the cells' own width: three lines in P1
+	# (Mira's four-line one joins with her in P2; 不知火舞 on 284)
 	var line := page.find_child("Cell_res_pip", true, false).find_child("Line", true, false) as Label
 	assert_int(line.get_line_count()).is_less_equal(3)
-	assert_float(heights[0]).is_less_equal(12 + Stamp.PASSPORT.y + 4 + 22 + 4 + 4 * 16 + 12)
+	assert_float(heights[0]).is_less_equal(12 + Stamp.PASSPORT.y + 4 + 22 + 4 + 3 * 16 + 12)
 	var pip := page.find_child("Cell_res_pip", true, false)
 	assert_str((pip.find_child("Name", true, false) as Label).text).is_equal("Pip")
 	assert_str((pip.find_child("Line", true, false) as Label).text).is_equal("“Best friend on the whole route. Don't tell the pigeons.”")

@@ -25,22 +25,35 @@ static func card(_view: Dictionary, ev: Dictionary) -> Dictionary:
 		item_name = postcard if postcard != "" else "Postcard from %s" % who,
 		strip = "New title · %s" % (title if title != "" else "%s's Best Friend" % who)}
 
-## The Postcards page: {count: `Postcards · 3/12`, cells: [{id, name, text, earned}]} — every resident of the table in its
-## order, the denominator the residents there are (12 now). An earned cell's text is its Kindred line (the view's, as the
-## server gave it), uncut; an unearned one names no one.
+## The residents this world has a home for (q(193) ④: open = in world_gen's placement rules — fixed, rank, s_order —
+## or on a hand-written outpost), in the residents table's order, derived, never a written number. Mira, whose weekly
+## route is P2, is in none of them: not on the Postcards page and not counted (11 in P1, 12 once she joins).
+static func open_residents() -> Array:
+	var rules: Dictionary = P0Logic.content().get("world", {}).get("residents", {})
+	var homed := {}
+	for id in rules.get("fixed", {}).values(): homed[str(id)] = true
+	for r in rules.get("rank", []) + rules.get("s_order", []): homed[str(r.get("id", ""))] = true
+	for o in P0Outposts.all():
+		for id in o.get("residents", []): homed[str(id)] = true
+	return P0Logic.content().get("residents", {}).keys().filter(func(id): return homed.has(str(id)))
+
+## The Postcards page: {count: `Postcards · 3/11`, cells: [{id, name, text, earned}]} — every open resident (q(193) ④)
+## in the table's order, the denominator how many they are; the others are not on it, no gap left. An earned cell's
+## text is its Kindred line (the view's, as the server gave it), uncut; an unearned one names no one.
 static func postcards(view: Dictionary) -> Dictionary:
 	var table: Dictionary = P0Logic.content().get("residents", {})
+	var open := open_residents()
 	var mine: Dictionary = view.get("residents", {}) if view.get("residents", {}) is Dictionary else {}
 	var cells: Array = []
 	var got := 0
-	for id in table:
+	for id in open:
 		var k = mine.get(id, {}).get("kindred", null) if mine.get(id, {}) is Dictionary else null
 		var earned: bool = k is Dictionary
 		if earned: got += 1
 		var line := str(k.get("text", "")) if earned else ""
 		if earned and line == "": line = str(table[id].get("lines", {}).get("Kindred", ""))
 		cells.append({id = str(id), name = str(table[id].get("name", "")) if earned else "", text = line, earned = earned})
-	return {count = "Postcards · %d/%d" % [got, table.size()], cells = cells}
+	return {count = "Postcards · %d/%d" % [got, open.size()], cells = cells}
 
 ## A resident's initial for a stamp without its portrait yet (不知火舞 on 284: earned stamps never wear the grey
 ## silhouette, which is how an unearned one looks).
