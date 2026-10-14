@@ -306,6 +306,17 @@ static func _place(c: Control, anchor_x: float, x: float, y: float, w: float, h:
 
 ## Label centred on a band: Godot sizes a Label to the font's full line box, so the band may be shorter
 ## than the label; growing both ways keeps the text centred where the Figma text box sits.
+## A quick slot's name style (不知火舞 B7 286 6e15f758, option B): C10, broken only between words over the slot's full
+## 52; a word wider than that — `Chamomile`, `Strawberry` — sets the whole name in C9, the floor. A word wider still
+## at C9 is a naming matter (李白), not a smaller size. A hyphen is a break too (`Salt-` / `Grilled`).
+static func quick_name_style(title: String) -> StringName:
+	var th := UiKit.theme()
+	var font := th.get_font(&"font", UiTokens.STYLE_C10_B)
+	var fs := th.get_font_size(&"font_size", UiTokens.STYLE_C10_B)
+	for word in title.replace("-", "- ").split(" ", false):
+		if font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > UiTokens.SIZE_QUICK_SLOT_W: return UiTokens.STYLE_C9_B
+	return UiTokens.STYLE_C10_B
+
 static func _band_label(parent: Control, style: StringName, y: float, h: float, align := HORIZONTAL_ALIGNMENT_CENTER) -> Label:
 	var l := UiKit.label("", style)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -481,10 +492,14 @@ func _build_quick() -> void:
 	for side in [&"offset_right", &"offset_bottom"]: body.set(side, -_QUICK_PAD)
 	_surface.add_child(body)
 	_add_icon(body, UiTokens.SIZE_QUICK_SLOT_ICON, 0.0)
+	# The name block spans the slot's full width (the icon and the count keep the padding) and breaks only between
+	# words (quick_name_style; 不知火舞 B7 286 6e15f758, option B).
 	_name = _band_label(body, UiTokens.STYLE_C10_B, 0.0, _QUICK_NAME_H)
-	_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_name.offset_left = -_QUICK_PAD
+	_name.offset_right = _QUICK_PAD
+	_name.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_name.max_lines_visible = 2
-	_name.custom_minimum_size.x = w
+	_name.custom_minimum_size.x = w + _QUICK_PAD * 2.0
 	_qty = _band_label(body, UiTokens.STYLE_C10_XB, 0.0, _QUICK_QTY_H, HORIZONTAL_ALIGNMENT_RIGHT)
 	_new_ring = _box(_surface)
 	_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -646,6 +661,7 @@ func _refresh_quick(s: State) -> void:
 	_qty.offset_top = name_top + _QUICK_NAME_H
 	_qty.offset_bottom = name_top + _QUICK_NAME_H + _QUICK_QTY_H
 	_name.text = title
+	_name.theme_type_variation = quick_name_style(title)
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
 	var ghost := s == State.GHOST
