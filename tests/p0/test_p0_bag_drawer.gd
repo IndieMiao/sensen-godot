@@ -402,3 +402,14 @@ func test_each_bag_upgrade_says_its_own_five_slots() -> void:
 	v.bag.capacity = 25
 	for id in ["bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3"]:
 		assert_str(P0ItemInfo._offer_use(v, {"id": id, "to": "bag_cap"})).override_failure_message(id).is_equal("+5 bag slots")
+
+## 不知火舞 on #409: every tier wears the bag's icon (not the sprout stand-in), and a panel's coin price from 1,000 has
+## its comma, as HOME-1's `Bag Upgrade III · 1,000 coins`.
+func test_bag_upgrades_wear_the_bag_and_prices_have_commas() -> void:
+	for id in ["bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3"]:
+		assert_str(P0Logic.icon(id).resource_path).override_failure_message(id).is_equal(P0Logic.icon("bag").resource_path)
+	var v := {"coins": 0, "stall": {"buy": [{"id": "bag_upgrade_3", "price": 1000, "to": "bag_cap"}]}}   # the Homestead Stall's row
+	var s := P0ItemInfo.spec(v, "bag_upgrade_3", &"counter_buy")
+	assert_str(str(s.price.text)).is_equal("1,000 coins")
+	assert_array(s.buttons.map(func(b): return str(b.label))).contains(["Need 1,000 more coins"])
+	assert_str(str(P0ItemInfo.spec(v, "bag_upgrade_3", &"counter_buy", {"qty": 2}).price.line)).is_equal("2 × 1,000 coins")
