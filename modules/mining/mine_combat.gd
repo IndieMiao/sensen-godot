@@ -134,14 +134,7 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 	cooldown = maxf(0, cooldown - dt)
 	invulnerability = maxf(0, invulnerability - dt)
 	grace = maxf(0, grace - dt)
-	_swing_left = maxf(0, _swing_left - dt)
-	if is_instance_valid(_swing): _swing.visible = _swing_left > 0
-	for number in _numbers.duplicate():
-		number.left -= dt
-		number.label.position.y += dt * 0.5
-		if number.left <= 0:
-			number.label.queue_free()
-			_numbers.erase(number)
+	fade(dt)
 	if grace > 0: return
 	for id in enemies:
 		var enemy: Dictionary = enemies[id]
@@ -209,6 +202,19 @@ func hurt(mover: PlayerMover, monster_id: String, damage: int) -> void:
 	if enemies.has(monster_id):
 		mover.stop()
 		_slide(mover, (mover.position - enemies[monster_id].node.position).normalized() * 0.5)
+
+## The swing's flash and the floating numbers run out, nothing else: what a held fight still shows (a run that has just
+## completed keeps its last numbers rising while the banner is up, P0 mine).
+func fade(delta: float) -> void:
+	var dt := clampf(delta, 0, 0.1)
+	_swing_left = maxf(0, _swing_left - dt)
+	if is_instance_valid(_swing): _swing.visible = _swing_left > 0
+	for number in _numbers.duplicate():
+		number.left -= dt
+		number.label.position.y += dt * 0.5
+		if number.left <= 0:
+			number.label.queue_free()
+			_numbers.erase(number)
 
 func _number(point: Vector3, text: String, color: Color) -> void:
 	var label := _label(text, 42)

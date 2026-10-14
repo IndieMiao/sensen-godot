@@ -105,6 +105,18 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 		enemy.mover.grid = player_mover.grid
 		enemy.node.get_node("HealthFill").scale.x = maxf(0.01, float(hp) / float(enemy.spec.hp))
 
+## A monster the server reports down (`defeat`), shown down now as a sync to 0 HP would: its last damage number, then
+## gone. The elite whose fall completes the run needs it — that reply's view has no run left to sync from, so it stood
+## at its last HP under the Run complete banner (李元芳 B6, 283 86d07bd5).
+func down(i: int) -> void:
+	var id := mob_id(i)
+	var enemy = _actors.get(id, null)
+	if enemy == null or int(enemy.hp) <= 0: return
+	_number(enemy.node.position + Vector3(0, 1, 0), str(int(enemy.hp)), Color("fff3bd"))
+	enemy.hp = 0
+	enemy.node.visible = false
+	enemies.erase(id)
+
 ## The id a monster index goes by in the old combat ("slime_1" …) and back.
 static func mob_id(i: int) -> String: return "slime_%d" % (i + 1)
 static func mob_index(id: String) -> int: return id.trim_prefix("slime_").to_int() - 1
