@@ -3009,6 +3009,15 @@ const TitlesDrawer := preload("res://scenes/p0/panels/p0_titles_drawer.gd")
 const P0Titles := preload("res://modules/p0/p0_titles.gd")
 var title_pending := {}
 
+## The server did not put that pick on — refused, or no answer came (周瑜 on #417): the pick is dropped and the profile
+## shows the title the server says is worn.
+func title_not_worn(id: String) -> void:
+	if str(title_pending.get("id", "")) != id: return
+	title_pending = {}
+	if _profile != null and is_instance_valid(_profile) and not _profile.is_queued_for_deletion():
+		_profile.title_pending = {}
+		_profile.refresh(view)
+
 func open_titles(back := Callable()) -> UiDrawer:
 	var d: UiDrawer = TitlesDrawer.new(P0Titles.rows(view, title_pending))
 	d.theme = UiKit.theme()

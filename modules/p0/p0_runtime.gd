@@ -931,6 +931,7 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
 	if str(cmd.get("type", "")) in ["cook", "cook_all", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
@@ -1063,6 +1064,7 @@ func _harvest_stopped(v: Dictionary) -> void:
 ## A request that never got an answer (8 s, a 5xx or not JSON). The server URL goes to the log, not the screen.
 func _net_failed(msg: String, cmd := {}) -> void:
 	push_warning("P0: %s · %s" % [msg, session.base_url])
+	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	_end_resume()
 	if _launch_s >= 0.0 and session.view.is_empty():
 		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)

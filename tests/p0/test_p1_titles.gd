@@ -166,3 +166,22 @@ func test_closing_titles_goes_back_to_the_profile() -> void:
 	ui.back_modal()   # the scrim's tap
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("profile")
+
+## A pick the server did not take (refused, or no answer: P0Runtime calls title_not_worn) is dropped: the profile shows
+## the title the server says is worn again (周瑜 on #417).
+func test_a_pick_the_server_did_not_take_goes_back() -> void:
+	var ui: P0Ui = await _ui(_view(["milestone:home_cook", "kindred:res_pip"], "milestone:home_cook"))
+	ui.open_profile()
+	await await_idle_frame()
+	ui._profile.name_row.hit.pressed.emit()
+	await await_idle_frame()
+	var d: UiDrawer = ui._modal.find_children("*", "UiDrawer", true, false)[0]
+	(d.list.get_child(1) as Button).pressed.emit()
+	await await_idle_frame()
+	assert_str(ui._profile.name_row.title_label.text).is_equal("Pip's Best Friend")
+	ui.title_not_worn("req:req_res_pip_5")   # another pick's failure changes nothing
+	assert_str(ui._profile.name_row.title_label.text).is_equal("Pip's Best Friend")
+	ui.title_not_worn("kindred:res_pip")
+	await await_idle_frame()
+	assert_dict(ui.title_pending).is_empty()
+	assert_str(ui._profile.name_row.title_label.text).is_equal("Home Cook")
