@@ -1,0 +1,232 @@
+{
+  "_comment": "SGODOT-282 (282 c62a6ed9 ②, 上官婉儿 on 282): the farmhouse kitchen corner in the Standard Room (Homestead Lv5–9), same names as farmhouse.anchors.json. Stoves on range_cooker.glb's four burners (local ±0.15 x, ±0.175 z — measured ±0.145 / ±0.165, within 1 cm; 1 front left, 2 front right, 3 back right, so two stoves stand side by side), the hob top at 1.457 (its 1.375 on the floor); drop_pot 0.324 above it and cam_stove 0.26 above it as the Deluxe Room's hooks, badge_stove 0.43 above drop_pot as the Basic Room's. The Spice Rack is the art's own shelf over the sink (no prop); the Warming Cabinet is the Basic Room's placeholder (the Deluxe pantry at 0.6) as in the Basic Room, on the west wall facing +X (toward the camera, 不知火舞 on 282: by the east wall it showed its back), its back against the west wall's skirting board (its face at x −2.92), between the reading stool and the arched window (z −1.19), clear of the wall, the skirting, the window, the plants, the hanging basket and the stool (上官婉儿 282 650be64e, then the skirting). Door and spawn on the layout's entrance line (x 2.36).",
+  "anchors": [
+    {
+      "name": "use_stove_1",
+      "position": [
+        1.28,
+        1.457,
+        -2.545
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_1",
+      "position": [
+        1.28,
+        1.781,
+        -2.545
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "badge_stove_1",
+      "position": [
+        1.28,
+        2.211,
+        -2.545
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "cam_stove",
+      "position": [
+        1.28,
+        1.717,
+        -2.485
+      ]
+    },
+    {
+      "name": "use_stove_2",
+      "position": [
+        1.58,
+        1.457,
+        -2.545
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_2",
+      "position": [
+        1.58,
+        1.781,
+        -2.545
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "badge_stove_2",
+      "position": [
+        1.58,
+        2.211,
+        -2.545
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "cam_stove_2",
+      "position": [
+        1.58,
+        1.717,
+        -2.485
+      ]
+    },
+    {
+      "name": "use_stove_3",
+      "position": [
+        1.58,
+        1.457,
+        -2.895
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_3",
+      "position": [
+        1.58,
+        1.781,
+        -2.895
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "badge_stove_3",
+      "position": [
+        1.58,
+        2.211,
+        -2.895
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "cam_stove_3",
+      "position": [
+        1.58,
+        1.717,
+        -2.835
+      ]
+    },
+    {
+      "name": "stand_stove",
+      "position": [
+        1.43,
+        0.085,
+        -1.9
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "use_spice_rack",
+      "position": [
+        0.39,
+        2.4,
+        -2.78
+      ],
+      "module": "wall_shelf"
+    },
+    {
+      "name": "stand_spice_rack",
+      "position": [
+        0.39,
+        0.085,
+        -1.9
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "cam_spice_rack",
+      "position": [
+        0.39,
+        1.6,
+        -2.6
+      ]
+    },
+    {
+      "name": "use_warming_cabinet",
+      "position": [
+        -2.633,
+        1.36,
+        -1.19
+      ],
+      "module": "warming_cabinet"
+    },
+    {
+      "name": "badge_warming_cabinet",
+      "position": [
+        -2.633,
+        1.0,
+        -1.19
+      ],
+      "module": "warming_cabinet"
+    },
+    {
+      "name": "stand_warming_cabinet",
+      "position": [
+        -2.02,
+        0.085,
+        -1.19
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "cam_warming_cabinet",
+      "position": [
+        -2.52,
+        1.0,
+        -1.19
+      ]
+    },
+    {
+      "name": "cam_kitchen_corner",
+      "position": [
+        0.9,
+        1.2,
+        -2.5
+      ]
+    },
+    {
+      "name": "spawn",
+      "position": [
+        2.36,
+        0.085,
+        -1.9
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "exit",
+      "position": [
+        2.36,
+        0.085,
+        -2.65
+      ]
+    }
+  ],
+  "props": [
+    {
+      "name": "warming_cabinet",
+      "scene": "res://assets/props/warming_cabinet_placeholder/kitchen_pantry.glb",
+      "atlas": "res://assets/props/warming_cabinet_placeholder/room_albedo_ao.png",
+      "position": [
+        -2.675,
+        0.082,
+        -1.19
+      ],
+      "yaw_degrees": 90,
+      "scale": 0.6,
+      "level": 3,
+      "collider": {
+        "at": [
+          0,
+          1.1125,
+          0.07
+        ],
+        "size": [
+          0.94,
+          2.225,
+          0.95
+        ]
+      }
+    }
+  ]
+}

@@ -7,19 +7,30 @@ extends RefCounted
 ## Plots and facilities are solid; the player works a bed from the walkway beside it. Pure data: no nodes, unit-tested.
 
 const CELL_MM := 650
-const GRID := Vector2i(22, 22)
+## 22 × 24 from row −2: the yard's front reaches two rows past row 0 (q(172) A, 不知火舞 282 4ddb69db: the farm grows
+## toward the camera for a whole row of Homestead Lv7 beds), every older cell keeping its place in the world.
+const GRID := Vector2i(22, 24)
+const GRID_ORIGIN := Vector2i(0, -2)
 const COLUMNS := 6                    # P0's field; plots 0–29
 const ROWS := 5
 const EXTRA_COLUMNS := 2              # P1 (q(59)): plots 30–39, right of the field, from Homestead Lv3
 const P0_PLOTS := COLUMNS * ROWS
-const MAX_PLOTS := (COLUMNS + EXTRA_COLUMNS) * ROWS
+const GRID_PLOTS := (COLUMNS + EXTRA_COLUMNS) * ROWS   # 40: the field's own lattice, plots 0–39
+## Homestead Lv7 (q(172) A; 用户 on 302, 不知火舞 282 4ddb69db): 8 more beds, 40–47 left to right, a whole row in front of
+## the field (row −1: y 1, x 4–18) on its 2-cell lattice, the walkway y 2 between; the yard's front moved two rows toward
+## the camera at every level to make room, the beds come at Lv7. [col, row] as content.garden.plots 40–47 (the test holds
+## the two equal); sprinklers and Harvest All work on them as on the rest.
+const EDGE_PLOTS := [Vector2i(0, -1), Vector2i(1, -1), Vector2i(2, -1), Vector2i(3, -1), Vector2i(4, -1), Vector2i(5, -1),
+	Vector2i(6, -1), Vector2i(7, -1)]
+const MAX_PLOTS := 48
 const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the left
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
 ## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right and the
 ## rest bench (FARM-7, q(30)) on its left, two cells wide, clear of the beds, the stall and the mine.
 const ANCHORS := {
-	"spawn": Vector2i(9, 1), "exit": Vector2i(9, 0),
+	# q(172) A: the way in two rows nearer the camera (it was (9, 1) / (9, 0)), the field's new front row before it
+	"spawn": Vector2i(9, -1), "exit": Vector2i(9, -2),
 	"house": Vector2i(9, 16), "storage": Vector2i(14, 15),
 	"well": Vector2i(15, 13), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
 	# SGODOT-231 / q(45): five gathering spots on the farm edge (no Old Tree in P0) and the workbench on the house's
@@ -27,7 +38,7 @@ const ANCHORS := {
 	# P1 (q(59) §1.1): the two new columns take x 16–18 (rows 3–11) and x 19 straddles the Lv3 fence (12.95 m), so the well
 	# moves to the yard row between the field and the house, the Rock Pile to the back right corner and the Timber Grove
 	# to the front right corner, clear of the beds and of the way to the workbench (不知火舞 checks the places).
-	"spot_grove": Vector2i(16, 1), "spot_rock_pile": Vector2i(18, 13), "spot_reed_bank": Vector2i(2, 4),
+	"spot_grove": Vector2i(16, -1), "spot_rock_pile": Vector2i(18, 13), "spot_reed_bank": Vector2i(2, 4),
 	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(3, 17), "workbench": Vector2i(17, 16),
 	# P1 (SGODOT-288, §13.3.6): the Old Tree (Hardwood, Homestead Lv3) on the left edge between the Clay Bank and the
 	# mine mouth, in the gathering spots' column, off the beds (x 4–18) and the ways to the mine and the workbench
@@ -38,14 +49,14 @@ const ANCHORS := {
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
 	"well": Rect2i(15, 13, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
-	"spot_grove": Rect2i(16, 1, 1, 1), "spot_rock_pile": Rect2i(18, 13, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
+	"spot_grove": Rect2i(16, -1, 1, 1), "spot_rock_pile": Rect2i(18, 13, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
 	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(3, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
 	"spot_old_tree": Rect2i(2, 10, 1, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints. The yard ends inside the Homestead fence
 ## ring (FENCE_RING: its back stretch between rows 18 and 19, its east one in column 19), whatever the level — a wall
 ## one sees is never walked through or on (q(145)); the same rect as Decorate's (decor.yard.walk).
-const WALK_RECT := Rect2i(1, 0, 18, 19)
+const WALK_RECT := Rect2i(1, -2, 18, 21)   # x 1–18, y −2–18 (q(172) A: from y 0 before)
 const CROP_CODES := {
 	"crop_radish": "R", "crop_lettuce": "L", "crop_carrot": "C", "crop_chamomile": "H",
 	"crop_herb": "B", "crop_potato": "P", "crop_chili": "I", "crop_tomato": "M",
@@ -65,6 +76,7 @@ static func plot_count(view = null) -> int:
 ## [col, row] of a plot on the garden grid: content.garden.plots[id].
 static func grid_of(plot_id: int) -> Vector2i:
 	if plot_id < P0_PLOTS: return Vector2i(plot_id % COLUMNS, plot_id / COLUMNS)
+	if plot_id >= GRID_PLOTS: return EDGE_PLOTS[plot_id - GRID_PLOTS]
 	var k := plot_id - P0_PLOTS
 	return Vector2i(COLUMNS + k % EXTRA_COLUMNS, k / EXTRA_COLUMNS)
 
@@ -74,10 +86,12 @@ static func cell_of(plot_id: int) -> Vector2i:
 ## -1 when the cell is not a plot.
 static func id_of(cell: Vector2i) -> int:
 	var d := cell - PLOT_ORIGIN
-	if d.x < 0 or d.y < 0 or d.x % 2 != 0 or d.y % 2 != 0: return -1
+	if d.x % 2 != 0 or d.y % 2 != 0: return -1
 	var col := d.x / 2
 	var row := d.y / 2
-	if row >= ROWS: return -1
+	if col < 0 or row < 0 or row >= ROWS:
+		var edge := EDGE_PLOTS.find(Vector2i(col, row))
+		return GRID_PLOTS + edge if edge >= 0 else -1
 	if col < COLUMNS: return row * COLUMNS + col
 	if col < COLUMNS + EXTRA_COLUMNS: return P0_PLOTS + row * EXTRA_COLUMNS + col - COLUMNS
 	return -1
@@ -91,6 +105,7 @@ static func blueprint() -> FarmBlueprint:
 	bp.revision = 1
 	bp.display_name = "Homestead"
 	bp.grid = GRID
+	bp.grid_origin = GRID_ORIGIN
 	bp.cell_mm = CELL_MM
 	bp.cell_m = CELL_MM / 1000.0
 	bp.play_area_mm = GRID.x * CELL_MM
@@ -102,12 +117,13 @@ static func blueprint() -> FarmBlueprint:
 		for col in COLUMNS: cells.append(cell_of(row * COLUMNS + col))
 		for col in EXTRA_COLUMNS: cells.append(cell_of(P0_PLOTS + row * EXTRA_COLUMNS + col))
 		beds.append({"id": "row%d" % row, "cells": cells})
+	beds.append({"id": "edge", "cells": EDGE_PLOTS.map(func(g): return PLOT_ORIGIN + g * 2)})   # Homestead Lv7's 40–47
 	bp.anchors["beds"] = beds
 	for key in FarmBlueprint.MASK_NAMES: bp.masks[key] = []
-	for y in GRID.y:
+	for y in range(GRID_ORIGIN.y, GRID_ORIGIN.y + GRID.y):
 		var walkable := ""
 		var cultivable := ""
-		for x in GRID.x:
+		for x in range(GRID_ORIGIN.x, GRID_ORIGIN.x + GRID.x):
 			var c := Vector2i(x, y)
 			var plot := id_of(c) >= 0
 			cultivable += "1" if plot else "0"
@@ -125,7 +141,7 @@ static func blueprint() -> FarmBlueprint:
 ## Each segment is {pos: Vector3, yaw: float, stretch: float} (stretch scales fence.glb along its length).
 const FENCE_SEG := 1.24              # fence.glb length (m)
 const FENCE_FRONT_ROW := 13          # the yard row between the field and the farmhouse
-const FENCE_RING := {"west": 0.38, "east": 12.95, "back": -12.35, "front": 0.1}
+const FENCE_RING := {"west": 0.38, "east": 12.95, "back": -12.35, "front": 1.4}   # front 0.1 → 1.4: two rows nearer (q(172) A)
 
 static func fence_front(bp: FarmBlueprint) -> Array:
 	var door := bp.cell_to_world(ANCHORS.house)
@@ -237,6 +253,20 @@ const PLAQUE_CELL := Vector2i(7, 14)
 static func plaque_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(PLAQUE_CELL)
 
+## The Chef's Sign (Homestead Lv10, §7.7; SGODOT-282): a free-standing hanging sign on a post (上官婉儿's prop shape,
+## 不知火舞 on 282) left of the door, in the plaque's row, two cells left of it: the board hangs to the post's left, on the
+## grass left of the bench, clear of it on screen and tapped apart from it. Nearer the door are the path (x 8–10), the Lv3
+## front fence (row 13) and the plaque; one cell nearer, the board lay over the bench. Off the mine path (x 3–4).
+## Anchor `chef_sign`: the post's foot, +Z toward the camera. A yard object (no decor on it); solid once the sign is up.
+const CHEF_SIGN_CELL := Vector2i(5, 14)
+## The mine path's cell under its hanging board (0.15 m from the board's edge to the cell's middle at shoulder height):
+## not walked while the sign stands, so no one passes through the board (不知火舞 282 33835f54, B; 上官婉儿 56fa9620) —
+## the way to the mine goes by (4,13) or (4,15). Still a path to decor (nothing is placed on it).
+const CHEF_SIGN_BOARD_CELL := Vector2i(4, 14)
+
+static func chef_sign_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(CHEF_SIGN_CELL)
+
 ## The farmhouse Mailbox (§12.5.2, q(24); SGODOT-234 C): by the house's right wall, between the Homestead sign and the
 ## stall (about 1.45 m from each), clear of the door path, the fence and the field. Solid, one cell.
 const MAILBOX_CELL := Vector2i(12, 16)
@@ -268,9 +298,10 @@ static func pick_card(cands: Array, at: Vector3, current: String) -> String:
 static func block_points(bp: FarmBlueprint, points: Array) -> void:
 	for p in points:
 		var c := bp.world_to_cell(p)
-		if c.y < 0 or c.y >= bp.masks.walkable.size() or c.x < 0 or c.x >= GRID.x: continue
-		var row: String = bp.masks.walkable[c.y]
-		bp.masks.walkable[c.y] = row.substr(0, c.x) + "0" + row.substr(c.x + 1)
+		if not bp.in_bounds(c): continue
+		var r := c - bp.grid_origin
+		var row: String = bp.masks.walkable[r.y]
+		bp.masks.walkable[r.y] = row.substr(0, r.x) + "0" + row.substr(r.x + 1)
 
 ## True when a world point stands on a bed (the player steps up onto it): one of the beds the view has (哪吒 on #215:
 ## at Homestead Lv1–2 the place of 30–39 is plain ground, no step up); no view = any of the 40.

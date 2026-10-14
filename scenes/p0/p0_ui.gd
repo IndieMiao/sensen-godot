@@ -2194,6 +2194,8 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 		&"buy": command.emit({"type": "buy", "item": id, "qty": int(payload.get("qty", 1)), "shop": role})
 		&"sell": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
 		&"drink": command.emit({"type": "drink", "item": id, "shop": role})
+		# q(166): 2 regional items for 1 mineral; the server reads the climate where the player stands
+		&"barter": command.emit({"type": "barter", "item": str(payload.get("item", "")), "mineral": id, "shop": role})
 		&"lock", &"unlock": command.emit({"type": String(action), "item": id})
 		_: push_warning("P0 counter: no command for %s" % action)
 
@@ -2541,6 +2543,37 @@ func open_bite_board(outpost: Dictionary) -> UiDrawer:
 ## The open Bite Board, or null.
 func bite_board() -> UiDrawer:
 	return _bite_board if is_instance_valid(_bite_board) and modal_kind == "bite_board" else null
+
+## MAP-8 Nearby cities (q(159); Figma row 85, 不知火舞 on MAP-8): the map's `Nearby cities ›` pill opens it — the ten
+## cities nearest home, nearest first (P0Travel.nearby), with a Close 44 six above the sheet. A row's tap calls
+## `pick` with its city (the map closes this and flies there, P0Map.open_nearby_city).
+const NearbyDrawer := preload("res://scenes/p0/panels/p0_nearby_drawer.gd")
+
+func open_nearby_cities(pick: Callable) -> UiDrawer:
+	var home := str(P0Clusters.get_cluster(P0Travel.home(view)).get("name", ""))
+	var d: UiDrawer = NearbyDrawer.new(P0Travel.nearby(view), home)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.connect(&"city_pressed", func(cluster: String): pick.call(cluster))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "nearby"
+	return d
+
+## q(165) the Travel Post's Fare Board: Trip fares, read only (P0FareBoardDrawer: the seven tiers, every fare Free while
+## travel is), with a Close 44 six above the sheet as MAP-8's.
+const FareBoardDrawer := preload("res://scenes/p0/panels/p0_fare_board_drawer.gd")
+
+func open_fare_board() -> UiDrawer:
+	var d: UiDrawer = FareBoardDrawer.new(P0Travel.fares())
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "fare_board"
+	return d
 
 ## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
 ## leaves the room for that pond (go_pond); Details › lists its fish; Back and a tap outside return to the board, ×
@@ -3108,6 +3141,7 @@ func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
 	var b := UiMomentBanner.new()
 	b.kind = UiMomentBanner.Kind.COMPLETE if str(spec.get("kind", "")) == "complete" else UiMomentBanner.Kind.LEVEL_UP
 	b.level = str(spec.get("level", ""))
+	if spec.get("icon", null) is Texture2D: b.icon = spec.icon   # art in the disc's place (the Fish-dex badge)
 	b.title = str(spec.get("title", ""))
 	b.subtitle = str(spec.get("subtitle", ""))
 	b.rewards = (spec.get("rewards", []) as Array).map(func(r): return UiFloatText.pill(str(r.text), int(r.tone), r.get("icon", null)))
@@ -3142,6 +3176,33 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 	var dex: Array = view.get("fishing", {}).get("dex", [])
 	# a trap's cards come one after another from one reply: each counts the kinds up to its own (extras.dex_back)
 	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size() - int(extras.get("dex_back", 0)), dex.size()]
+	show_moment(m)
+
+## A Cookbook title (§7.6.1; 不知火舞 on 282): RewardMoment Milestone, no buttons — the title, `Cookbook 20/48`, `New title ·
+## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up.
+func show_title(spec: Dictionary) -> void:
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = str(spec.get("event", ""))
+	m.icon = P0Logic.icon("cookbook")
+	m.item_name = str(spec.get("item_name", ""))
+	m.strip = str(spec.get("strip", ""))
+	show_moment(m)
+
+## A Fish-dex milestone (§6.9.2; 不知火舞 on 283): the same RewardMoment Milestone as a Cookbook title, no buttons —
+## `Fish-dex 10/20` over the kind that made it; the whole dex a full MomentBanner instead (283 DEX-COMPLETE: the badge,
+## `Fish-dex complete` · `20/20`, pills `+50 Energy` `+300 coins` `Badge`, ≤ 3 s, no button). P0FishDex.milestone_card.
+## Queued after the catch's card like a level-up.
+func show_dex_milestone(spec: Dictionary) -> void:
+	if bool(spec.get("banner", false)):
+		show_banner(spec)
+		return
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = str(spec.get("event", ""))
+	m.icon = P0Logic.icon(str(spec.get("icon", "fish_crucian")))
+	m.item_name = str(spec.get("item_name", ""))
+	m.strip = str(spec.get("strip", ""))
 	show_moment(m)
 
 ## FISH-5 / 5-2 · a gate fish broke free, once per species (§4.8.6, q(55) / q(57)): `Too strong` (Fishing level) or
@@ -3495,7 +3556,8 @@ func placement_bar_rect() -> Rect2:
 
 ## A facility's status card (P1, SGODOT-241; q(59) §4): `Sprinkler · Waters 8 plots` and one button (Move); the
 ## caller highlights what it covers while the card shows (modal_kind "facility"). Sits where the quick bar was.
-## spec = {title, lead, icon, button, kind (&"secondary"), second, close, reason}; on_button runs after the card closes.
+## spec = {title, lead, icon, facts, button, kind (&"secondary"), second, close, reason}; on_button runs after the card closes;
+## button "" (with no reason) leaves the card without one (the Chef's Sign only says what it does).
 ## A placed decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move, the text button `Store` (spec.second,
 ## on_second) and a ✕ over its corner (spec.close). spec.reason greys the main button with it, LOCK-10 (a greenhouse
 ## with crops under it: `Move · Harvest first`, 李白); a tap says why.
@@ -3504,9 +3566,10 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	var reason := str(spec.get("reason", ""))
 	var buttons: Array = [{id = &"move", label = reason if reason != "" else str(spec.get("button", "Move")),
 		kind = &"unavailable" if reason != "" else StringName(spec.get("kind", &"secondary"))}]
+	if str(spec.get("button", "Move")) == "" and reason == "": buttons = []   # a card that only says (the Chef's Sign)
 	if str(spec.get("second", "")) != "": buttons.append({id = &"second", label = str(spec.second), kind = &"nav", chevron = false})
 	var card := {id = "facility", title = str(spec.get("title", "")), lead = str(spec.get("lead", "")),
-		icon = spec.get("icon", null), facts = [], buttons = buttons}
+		icon = spec.get("icon", null), facts = spec.get("facts", []), buttons = buttons}
 	var sheet := UiInfoSheet.new()
 	sheet.theme = UiKit.theme()
 	sheet.rules = func(_id, _ctx, _o): return card

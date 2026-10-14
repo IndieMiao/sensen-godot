@@ -27,7 +27,8 @@ func test_every_footprint_and_plot_of_the_garden_is_off_the_yard() -> void:
 	var walk: Array = _yard().get("walk", [])
 	assert_that(Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))).is_equal(P0Garden.WALK_RECT)   # q(145)
 	var bp := P0Garden.blueprint()   # the front fence, the sign, the plaque and the mailbox are objects too
-	for p in P0Garden.fence_block_points(bp) + [P0Garden.sign_point(bp), P0Garden.plaque_point(bp), P0Garden.mailbox_point(bp)]:
+	for p in P0Garden.fence_block_points(bp) + [P0Garden.sign_point(bp), P0Garden.plaque_point(bp), P0Garden.mailbox_point(bp),
+			P0Garden.chef_sign_point(bp)]:
 		var c := bp.world_to_cell(p)
 		assert_bool(_in("objects", c) or _in("field", c)).override_failure_message("object at %s" % str(c)).is_true()
 	for k in [P0Garden.ANCHORS.spawn, P0Garden.ANCHORS.exit]: assert_bool(_in("paths", k)).is_true()
@@ -48,10 +49,10 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(0, 18))).is_equal("Outside your yard")   # off the yard
 	for at in [Vector2i(9, 16), Vector2i(12, 16), Vector2i(6, 13)]:   # the house, the mailbox, the front fence
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Space taken")
-	for at in [Vector2i(9, 1), Vector2i(10, 0), Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
+	for at in [Vector2i(9, -1), Vector2i(10, -2), Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Keep the path clear")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 15))).is_equal("")
-	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 14))).is_equal("Keep the path clear")
+	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(3, 14))).is_equal("Keep the path clear")   # (4, 14) would reach the Chef's Sign's cell
 	v.decor.placed = [{"uid": 1, "id": "deco_bench", "x": 6, "y": 18, "rot": 0}]   # 2 × 1: cells 6–7, 18
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(7, 18))).is_equal("Space taken")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(7, 18), 0, 1)).is_equal("")   # moving the bench itself
@@ -95,8 +96,9 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	var grid := BlueprintGrid.new(bp)
 	var v := {"decor": {"placed": [], "cap": 999, "stored": {}}}
 	var n := 0
-	for y in bp.grid.y:
-		for x in bp.grid.x:
+	var o := bp.grid_origin   # rows from −2: the yard's front (q(172) A)
+	for y in range(o.y, o.y + bp.grid.y):
+		for x in range(o.x, o.x + bp.grid.x):
 			if P0Decor.reason(v, "deco_planter", Vector2i(x, y)) != "": continue
 			n += 1
 			v.decor.placed.append({"uid": n, "id": "deco_planter", "x": x, "y": y, "rot": 0})
@@ -104,8 +106,8 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_int(n).is_greater(60)   # plenty of yard is left to decorate
 	var from: Vector2i = P0Garden.ANCHORS.spawn
 	var reach := func(target: Vector3, within: float) -> bool:
-		for y in bp.grid.y:
-			for x in bp.grid.x:
+		for y in range(o.y, o.y + bp.grid.y):
+			for x in range(o.x, o.x + bp.grid.x):
 				var c := Vector2i(x, y)
 				if bp.cell_to_world(c).distance_to(target) > within or grid.astar.is_point_solid(c): continue
 				if c == from or not grid.path(from, c).is_empty(): return true
@@ -413,3 +415,12 @@ func test_the_player_walks_inside_the_fence_ring() -> void:
 	assert_bool(bp.is_walkable(corner)).is_true()
 	assert_int(maxi(19 - corner.x, 19 - corner.y)).is_less_equal(2)   # just inside the corner
 	assert_that(P0Farm.landing_cell(grid, P0Garden.ANCHORS.spawn)).is_equal(P0Garden.ANCHORS.spawn)   # where one may stand: there
+
+## q(172): Homestead Lv7's beds on the field's edge (40–47) are off Decorate from Lv7, as the field is; before it their
+## cells are yard (the server sends what stood there back to storage at the upgrade); the walkways between stay open.
+func test_lv7_beds_on_the_edge_are_off_the_yard_from_lv7() -> void:
+	var bed := P0Garden.cell_of(41)   # (6,1), in the field's new front row
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 40}}, [bed], {})).is_equal("")
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed], {})).is_equal(P0Decor.REASONS.decor_outside)
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [P0Garden.cell_of(47)], {})).is_equal(P0Decor.REASONS.decor_outside)
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed + Vector2i(1, 0)], {})).is_equal("")   # the walkway beside

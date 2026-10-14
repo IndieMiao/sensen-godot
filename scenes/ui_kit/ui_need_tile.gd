@@ -89,6 +89,17 @@ func progress() -> float:
 	if need <= 0: return 1.0
 	return minf(1.0, floorf(float(have) * 10.0 / float(need)) / 10.0)
 
+## A small mark at the ring's top-right (the Fish-dex badge on the profile's Fish tile, 283 PROFILE-1-DEX): `side`
+## square, its top-left at `at` from the ring's top-left (it may stand out of the ring). Returns it.
+func add_corner(tex: Texture2D, side: float, at: Vector2) -> TextureRect:
+	var r := UiKit.icon(tex, side)
+	r.name = "Corner"
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.size = Vector2(side, side)
+	r.position = at
+	_ring.add_child(r)
+	return r
+
 func ring_side() -> float:
 	return float({Size.L: UiTokens.SIZE_NEED_TILE_RING_L, Size.M: UiTokens.SIZE_NEED_TILE_RING_M,
 		Size.S: UiTokens.SIZE_NEED_TILE_RING_S}[size_class])

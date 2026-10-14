@@ -112,6 +112,11 @@ func test_pond_card_rows_in_order() -> void:
 	# Lv2: nothing over ×1 now at Clover and no Forecast yet; a trap there is the last row (POND-CARD-TRAP 2162:138260)
 	var lv2 := PondCard.info(_view(2, {}, "Dusk", "rain", [{"place": CLOVER, "fish": 2, "keep": 3}]), CLOVER, 2.4)
 	assert_array(lv2.facts).is_equal([["Distance", "2.4 km"], ["Recommended", "Lv6+"], ["Your trap", "2/3"]])
+	# Lv8: the one line becomes Biting now — the pool now, best first, no factors (不知火舞 on 283), never both
+	var lv8: Array = PondCard.info(_view(8), CLOVER, 2.4).facts
+	var labels := lv8.map(func(f): return str(f[0]))
+	assert_bool(labels.has("Biting now") and not labels.has("Biting more")).is_true()
+	assert_str(str(lv8[labels.find("Biting now")][1])).is_equal("?, Sea Bass · +3 more")   # the uncaught regional smelt first
 
 func test_details_lines_and_the_45_percent() -> void:
 	var rows := PondCard.fish_rows(_view(5, {"fish_catfish": 1}, "Dusk", "rain"), "pond_san_francisco_06")

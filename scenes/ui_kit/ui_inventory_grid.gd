@@ -32,6 +32,11 @@ var items: Array = []: set = set_items
 var capacity := 25: set = set_capacity
 ## Extra predicate (item -> bool), e.g. the drawer's category chip; empty = everything.
 var filter := Callable(): set = set_filter
+## Room for a mark over the cells (the gift drawer's `♥ +3`, RESIDENT-GIFT 1216:83527: 17 high, 2 above the cell):
+## rows sit `row_room` further apart (12 + 19 = 31) and the first row `top_room` down (22: 3 above the mark; 不知火舞 on
+## 302); 0 elsewhere.
+var row_room := 0.0: set = set_row_room
+var top_room := 0.0: set = set_top_room
 ## Counter "Sell here" view (2A): list only the items `can_sell` accepts.
 var sell_mode := false: set = set_sell_mode
 var can_sell := Callable(): set = set_can_sell
@@ -75,6 +80,16 @@ func set_density(v: UiItemCell.Density) -> void:
 	refresh()
 func set_capacity(v: int) -> void: capacity = v; refresh()
 func set_filter(v: Callable) -> void: filter = v; refresh()
+func set_row_room(v: float) -> void:
+	row_room = v
+	_grid.room = v
+	_grid.update_minimum_size()
+	_grid.queue_sort()
+func set_top_room(v: float) -> void:
+	top_room = v
+	_grid.top = v
+	_grid.update_minimum_size()
+	_grid.queue_sort()
 func set_sell_mode(v: bool) -> void: sell_mode = v; refresh()
 func set_can_sell(v: Callable) -> void: can_sell = v; refresh()
 
@@ -132,6 +147,9 @@ func refresh() -> void:
 			c.might_have = bool(it.get("might_have", false))
 			c.rack = bool(it.get("rack", false))
 			c.stored = bool(it.get("stored", false))
+			c.liked = bool(it.get("liked", false))
+			c.gain = it.get("gain", null)
+			c.gain_hit = bool(it.get("gain_hit", false))
 		else:
 			c.icon = null
 			c.quantity = ""
@@ -143,6 +161,9 @@ func refresh() -> void:
 			c.might_have = false
 			c.rack = false
 			c.stored = false
+			c.liked = false
+			c.gain = null
+			c.gain_hit = false
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
 	else:
@@ -189,17 +210,20 @@ class _Spread extends Container:
 		for c in _cells_shown(): cell = cell.max((c as Control).get_combined_minimum_size())
 		return cell
 
+	var room := 0.0   # UiInventoryGrid.row_room
+	var top := 0.0    # UiInventoryGrid.top_room
+
 	func _get_minimum_size() -> Vector2:
 		var n := _cells_shown().size()
 		if n == 0: return Vector2.ZERO
 		var cell := _cell()
 		var rows := ceili(n / float(COLUMNS))
-		return Vector2(COLUMNS * cell.x + (COLUMNS - 1) * _MIN_COLUMN_GAP, rows * cell.y + (rows - 1) * ROW_GAP)
+		return Vector2(COLUMNS * cell.x + (COLUMNS - 1) * _MIN_COLUMN_GAP, top + rows * cell.y + (rows - 1) * (ROW_GAP + room))
 
 	func _notification(what: int) -> void:
 		if what != NOTIFICATION_SORT_CHILDREN: return
 		var cell := _cell()
-		var pitch := Vector2(cell.x + gap_for(size.x), cell.y + ROW_GAP)
+		var pitch := Vector2(cell.x + gap_for(size.x), cell.y + ROW_GAP + room)
 		var shown := _cells_shown()
 		for i in shown.size():
-			fit_child_in_rect(shown[i], Rect2(Vector2(i % COLUMNS, floori(i / float(COLUMNS))) * pitch, cell))
+			fit_child_in_rect(shown[i], Rect2(Vector2(i % COLUMNS, floori(i / float(COLUMNS))) * pitch + Vector2(0, top), cell))

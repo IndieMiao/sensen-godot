@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 const H := 3600000.0
 
 func _view(extra := {}) -> Dictionary:
-	var v := {"facilities": [{"id": 3.0, "kind": "compost_bin", "plot": -1.0, "covers": [], "cell": [5.0, 14.0]}],
+	var v := {"facilities": [{"id": 3.0, "kind": "compost_bin", "plot": -1.0, "covers": [], "cell": [4.0, 15.0]}],
 		"decor": {"placed": [{"uid": 1.0, "id": "deco_planter", "x": 6.0, "y": 14.0, "rot": 0.0}], "cap": 20},
 		"compost": {"cap": 5.0, "used": 2.0, "left": 3.0, "resets_in": 9 * H + 12 * 60000.0},
 		"bag": {"capacity": 25, "slots": [{"id": "crop_radish", "qty": 24}, {"id": "seed_radish", "qty": 10},
@@ -18,25 +18,25 @@ func _view(extra := {}) -> Dictionary:
 ## The yard's rules and words (the server's yardBlock): free, the field, a path, a yard object, a piece, itself.
 func test_the_bin_keeps_to_the_yard() -> void:
 	var v := _view()
-	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(4, 15))).is_empty()
+	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(5, 15))).is_empty()
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(5, 5))).is_equal("Outside your yard")
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(9, 0))).is_equal("Keep the path clear")
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(8, 15))).is_equal("Space taken")
 	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(6, 14))).is_equal("Space taken")   # the planter
-	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(5, 14))).is_equal("Space taken")   # another bin's cell
-	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(5, 14), 3)).is_empty()            # its own, while it moves
+	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(4, 15))).is_equal("Space taken")   # another bin's cell
+	assert_str(P0FarmFacilities.yard_reason(v, Vector2i(4, 15), 3)).is_empty()            # its own, while it moves
 	assert_str(P0FarmFacilities.caption(v, -1, "compost_bin")).is_equal("Compost Bin · 1×1")
 	# and a decor piece keeps off the bin, as the server's spotBlock
-	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(5, 14))).is_equal("Space taken")
+	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(4, 15))).is_equal("Space taken")
 
 ## The preview starts on the free cell nearest where it is asked (beside the workbench), never a taken one.
 func test_the_nearest_free_yard_cell() -> void:
 	var v := _view()
-	var c := P0FarmFacilities.nearest_yard_cell(v, Vector2i(5, 14))
-	assert_bool(c != Vector2i(5, 14) and c != P0Decor.NONE).is_true()
+	var c := P0FarmFacilities.nearest_yard_cell(v, Vector2i(4, 15))
+	assert_bool(c != Vector2i(4, 15) and c != P0Decor.NONE).is_true()
 	assert_str(P0FarmFacilities.yard_reason(v, c)).is_empty()
-	assert_float(Vector2(c - Vector2i(5, 14)).length()).is_equal(1.0)   # one cell over
-	assert_that(P0FarmFacilities.nearest_yard_cell(v, Vector2i(5, 14), 3)).is_equal(Vector2i(5, 14))   # moving: where it is
+	assert_float(Vector2(c - Vector2i(4, 15)).length()).is_equal(1.0)   # one cell over
+	assert_that(P0FarmFacilities.nearest_yard_cell(v, Vector2i(4, 15), 3)).is_equal(Vector2i(4, 15))   # moving: where it is
 	# a new one beside the workbench's three cells (anchor 17, 16; its right side is scenery, #280), not behind it
 	# where the bench would hide it
 	assert_that(P0FarmFacilities.nearest_yard_cell({"facilities": [], "decor": {"placed": []}}, Vector2i(17, 16), -1, 1)).is_equal(Vector2i(15, 16))

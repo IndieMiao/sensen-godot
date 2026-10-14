@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest';
 import type { CityCluster } from '../../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { generateCity, type WorldContent } from '../../src/p0/world.js';
-import { homeCluster } from '../../src/p0/travel.js';
+import { writtenCluster } from '../../src/p0/travel.js';
 
 const SNAPSHOT = new URL('./world_ids.snapshot.json', import.meta.url);
 const c: P0Content = loadP0Content();
@@ -37,7 +37,7 @@ const hashOf = (lines: string[]) => createHash('sha256').update(lines.join('\n')
 
 describe('world place ids are frozen (SGODOT-280)', () => {
   it('every city\'s places keep their ids, kinds, names and ponds (test/p0/world_ids.snapshot.json)', () => {
-    const home = homeCluster(c);
+    const home = writtenCluster(c);
     const now: Record<string, string> = {};
     let places = 0;
     for (const cl of clusters.byId.values()) {

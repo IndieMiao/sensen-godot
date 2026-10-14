@@ -20,6 +20,9 @@ var play_area_mm := 0
 var play_area_m := 0.0
 var cell_m := 1.0
 var grid := Vector2i.ZERO
+## The first cell of the grid (its masks start there): (0, 0) everywhere but the P0 garden, whose front rows lie before
+## row 0 (Homestead Lv7's wider yard, q(172)) so every older cell keeps its place in the world. Not in the canonical form.
+var grid_origin := Vector2i.ZERO
 var masks: Dictionary = {}
 var paths: Array = []
 var blocks: Array = []
@@ -247,12 +250,13 @@ static func from_dict(d: Dictionary) -> FarmBlueprint:
 	return bp
 
 func in_bounds(c: Vector2i) -> bool:
-	return c.x >= 0 and c.y >= 0 and c.x < grid.x and c.y < grid.y
+	var d := c - grid_origin
+	return d.x >= 0 and d.y >= 0 and d.x < grid.x and d.y < grid.y
 
 func mask_has(mask: String, c: Vector2i) -> bool:
 	if not in_bounds(c) or not masks.has(mask):
 		return false
-	return (masks[mask] as PackedStringArray)[c.y][c.x] == "1"
+	return (masks[mask] as PackedStringArray)[c.y - grid_origin.y][c.x - grid_origin.x] == "1"
 
 func is_walkable(c: Vector2i) -> bool:
 	return mask_has("walkable", c)

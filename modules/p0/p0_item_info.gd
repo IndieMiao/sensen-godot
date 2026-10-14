@@ -58,6 +58,7 @@ static func rules() -> Dictionary:
 
 static func kind_of(view: Dictionary, item_id: String) -> String:
 	if P0Decor.is_decor(item_id): return "decor"   # Decorate (SGODOT-284): yard pieces live in Farm Storage
+	if is_card(item_id): return "card"   # a Recipe Card on a counter (§9.11.1 / §9.11.2): it turns its page Tasted
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "":
 		var head := item_id.split("_")[0]
@@ -108,6 +109,12 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		price = {},
 		quota = {},
 	}
+	if kind == "card":   # the dish it teaches on the title (the server names it), the card's own icon (282, P1 exit ⑦)
+		out.title = str(_offer(view, item_id, opts).get("name", P0Logic.item_name(view, card_page(item_id))))
+		out.icon = P0Logic.icon("recipe_card")
+		out.quantity = 0
+	# Gift Clues (Fishing Lv7, q(167); 302 b308ee14): who of the residents met likes this dish, under the rarity line.
+	if kind == "dish": out.liked_by = P0Logic.liked_by_line(view, item_id)
 	if rule.is_empty(): return out
 	for line in rule.get("facts", []):
 		var text := fill(str(line), t)
@@ -195,12 +202,30 @@ static func _stack(view: Dictionary, item_id: String) -> Dictionary:
 
 static func _counter(opts: Dictionary) -> String: return str(opts.get("counter", "homestead"))
 
+## Recipe Cards (§9.11.1 / §9.11.2): `recipe_card_<page>`, bought once at the counter that shelves it, its page Tasted.
+const CARD := "recipe_card_"
+static func is_card(item_id: String) -> bool: return item_id.begins_with(CARD)
+static func card_page(item_id: String) -> String: return item_id.trim_prefix(CARD)
+
+static func _card_line(view: Dictionary, offer: Dictionary, opts: Dictionary) -> String:
+	var rarity := int(offer.get("rarity", 0))
+	var word := P0Logic.rarity_name(view, rarity) if rarity > 0 else ""
+	if _counter(opts) != "market": return word
+	return ("Regional · %s" % word) if word != "" else "Regional"
+## The gift drawer's key: `Gift · +3` with the resident's points for this dish (Gift Clues, Fishing Lv7), `Gift · −2`
+## for the Mystery Dish, `Gift` without them (q(167); RESIDENT-GIFT 1216:83527).
+static func _gift_label(target: Dictionary) -> String:
+	if not target.has("preview"): return "Gift"
+	var n := int(target.preview)
+	return "Gift · %s" % (("+%d" % n) if n >= 0 else ("−%d" % -n))
+
 ## The shop's offer row for a Buy list: view.shops[role].buy (SGODOT-228), else the older stall / tackle lists.
 static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
 	var role := _counter(opts)
 	var lists := []
 	var shop: Dictionary = view.get("shops", {}).get(role, {})
 	if shop.has("buy"): lists.append(shop.buy)
+	if shop.has("cards"): lists.append(shop.cards)   # today's Recipe Cards on this counter: {id, page, name, rarity, price, need, owned}
 	lists.append(view.get("tackle", {}).get("buy", []) if role == "tackle" else view.get("stall", {}).get("buy", []))
 	for l in lists:
 		for o in l:
@@ -334,7 +359,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		gifted_line = "Gifted · can't be sold · can eat · can gift to a Resident" if stack.get("gifted", false) else "",
 		expires_line = ("Expires in " + P0Logic.span(float(stack.expires_in))) if stack.has("expires_in") else "",
 		affinity_line = "",
-		gift_label = ("Gift · +%d" % int(opts.target.preview)) if opts.get("target", {}).has("preview") else "Gift",
+		gift_label = _gift_label(opts.get("target", {})),
 		gift_near_label = ("Gift to %s" % str(opts.near.name)) if str(opts.get("near", {}).get("name", "")) != "" else "",
 		sell_all_label = _sell_all_label(count, sellable, here),
 		quota_resets_in = P0Logic.span(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
@@ -365,6 +390,9 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		footprint = P0Decor.footprint(item_id) if kind == "decor" else "",
 		decor_line = P0Decor.line(item_id) if kind == "decor" else "",
 		decor_third = _decor_third(view, item_id, offer) if kind == "decor" else "",
+		# Recipe Cards (§9.11.1 / §9.11.2): the rarity alone — `Fine` at the stall, `Regional · Legendary` for the
+		# Market's regional cards — beside a grey `Need 240 more coins` the row stays one line each (不知火舞 on 282).
+		card_line = _card_line(view, offer, opts) if kind == "card" else "",
 	}
 	var src := str(t.source)
 	t.count_source = ("%s · %s" % [t.count, src]) if src != "" and t.count != "" else ""

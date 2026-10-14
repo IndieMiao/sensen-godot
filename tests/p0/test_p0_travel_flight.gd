@@ -122,6 +122,23 @@ func test_an_arrival_rises_from_where_the_camera_is_and_lands_in_3_s() -> void:
 	rt.session.view = saved
 	rt.ui.set_view(saved)
 
+## 哪吒 on #335: the map's view keeps its fog at CityMapView.FOG_Z from the start, under everything it draws; a flight's
+## cover only puts its own route in between and leaves the fog as it is.
+func test_the_fog_sits_at_its_own_z_before_any_flight() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var fog := m.city_map.fog as CanvasItem
+	assert_int(fog.z_index).is_equal(CityMapView.FOG_Z)
+	assert_int(fog.z_index).is_less(P0TravelCover.ROUTE_Z)
+	for c in m.city_map.get_children():
+		if c != fog and c is CanvasItem: assert_int((c as CanvasItem).z_index).is_greater(fog.z_index)
+	var cover := P0TravelCover.new()
+	m.add_child(cover)
+	cover.adopt_route(m.city_map)
+	assert_int(fog.z_index).is_equal(CityMapView.FOG_Z)
+	cover.queue_free()
+
 func test_a_tap_after_the_first_half_second_lands_at_once_one_before_does_not() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -318,6 +335,29 @@ func test_a_first_visit_stamps_first_and_its_card_comes_after() -> void:
 	await get_tree().create_timer(P0Map.STAMP_S * 0.5 + 0.3).timeout
 	assert_str(rt.ui.modal_kind).is_equal("arrival_card")   # then the card
 	rt.ui.close_modal()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## 哪吒 on #338: another flight setting off during the stamp's beat — here a return to Los Angeles, landed at once —
+## takes the first visit's card with it: Tokyo's card never comes up over Los Angeles.
+func test_another_flight_during_the_stamp_takes_its_card_away() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)
+	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))   # Tokyo: its stamp's 1.5 s begin
+	m.on_arrival({kind = "arrival", cluster = LA, first = false, trip = 6, km = 8800})
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))   # down in Los Angeles inside Tokyo's beat
+	assert_bool(m.travelling()).is_false()
+	await get_tree().create_timer(P0Map.STAMP_S).timeout   # past Tokyo's beat
+	assert_str(rt.ui.modal_kind).is_not_equal("arrival_card")
+	rt.ui.close_modal()   # one left open would sit over the next test
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)

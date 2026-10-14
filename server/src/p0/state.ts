@@ -1,8 +1,8 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
-import { addPlots } from './garden.js';
-import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
+import { addPlots, clearNewBeds } from './garden.js';
+import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, writtenCluster, type TravelState } from './travel.js';
 import { placeOf } from './world.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
@@ -197,7 +197,8 @@ export const emptyDay = (key = ''): P0Day => ({
   key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
 });
 
-export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player)): P0State {
+/** opts.pending: the client creating the save can offer the home pick (SGODOT-303, routes' x-p0-features). */
+export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player), opts: { pending?: boolean } = {}): P0State {
   const plots: Plot[] = [];
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
@@ -223,7 +224,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
-    travel: freshTravel(c),
+    travel: freshTravel(c, opts.pending),
     seen: [],
     facilities: [], facility_count: 0,
     fires: 0,
@@ -290,14 +291,31 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.firsts = [...new Set(s.firsts)];
   }
   s.travel ??= freshTravel(c);   // a v5 save from a build without the block cannot exist, but never read one without it
-  // Until players choose a home (P2 second version), everyone's home is the content's city: a moved home moves saves
-  // home too (as SGODOT-270 did), and the frozen fallback list is made again for it (§11.2.3 "换城后重算一次").
-  if (s.travel.home !== homeCluster(c)) {
+  // A home the player picked stays (SGODOT-303, q(163)). A save that never picked one is the written city's (q(163) ③):
+  // if the written city moved (as SGODOT-270 did), it moves home too and its frozen fallback list is made again (§11.2.3
+  // "换城后重算一次"). A home the cluster table no longer knows goes back to the written city the same way.
+  const t = s.travel;
+  if (t.home !== writtenCluster(c) && (!t.home_chosen_at || !clusterById(c, t.home))) {
     const fresh = freshTravel(c);
-    s.travel.home = fresh.home; s.travel.here = fresh.home; s.travel.fallback = fresh.fallback;
+    t.home = fresh.home; t.here = fresh.home; t.fallback = fresh.fallback;
+    delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
+  }
+  // A server from before SGODOT-303 (a rollback to 0.2.5) moved a picked home back to the written city and kept the
+  // pick's fields it did not know (蒙恬 on #371): the frozen home set says where the player chose, so home goes back
+  // there, with its fallback list. A pick in a city the table no longer knows is dropped instead.
+  const picked = t.home_set ? clusterOf(c, t.home_set.pond) : null;
+  if (picked && picked !== t.home) {
+    if (t.home_chosen_at && (picked === writtenCluster(c) || clusterById(c, picked))) {
+      if (t.here === t.home) t.here = picked;
+      t.home = picked;
+      delete t.passes[picked];
+      t.fallback = fallbackOf(c, picked, t.farm_at);
+    } else {
+      delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
+    }
   }
   if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
-    const f = freshTravel(c).fallback;
+    const f = fallbackOf(c, s.travel.home, s.travel.farm_at);
     if (f.near10.length) s.travel.fallback = f;
   }
   s.req_done ??= [];
@@ -310,11 +328,32 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.presence.place ??= null;
-  // SGODOT-270: the home city moved (Shanghai → San Francisco). A pond that is no longer one of the home city's (gone
-  // from the map, or left in another city, as notePlace judges) is let go when the save loads: the place is forgotten,
-  // and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
-  // teaching pin returned. Old casts without a place are left alone.
-  // v5: "the home city's" becomes "a city the player holds a pass for" (home, or a Day Pass bought before).
+  letGoAway(c, s);
+  s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
+  s.seen ??= [];   // SGODOT-232 map markers, the same way
+  // P1 (SGODOT-239, q(59) §1.1): facilities, and the 10 plots a save already at Homestead Lv3 has from this version on
+  // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
+  s.facilities ??= [];
+  s.facility_count ??= s.facilities.reduce((m, f) => Math.max(m, f.id), 0);
+  clearNewBeds(c, s, addPlots(c, s), []);   // a save already at Lv7: pieces on the new beds back to storage (q(172))
+  // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
+  // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
+  const run = s.mine?.run;
+  if (run) while (run.floors.length < c.mine.floors.length) run.floors.push({ paid: false, broken: [], lit: false });
+  s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
+  s.v = SAVE_VERSION;
+  return s;
+}
+
+/**
+ * SGODOT-270: the home city moved (Shanghai → San Francisco). A pond that is no longer one of the home city's (gone
+ * from the map, or left in another city, as notePlace judges) is let go when the save loads: the place is forgotten,
+ * and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
+ * teaching pin returned. Old casts without a place are left alone.
+ * v5: "the home city's" becomes "a city the player holds a pass for" (home, or a Day Pass bought before).
+ * SGODOT-303: changing home lets go the same way.
+ */
+export function letGoAway(c: P0Content, s: P0State): void {
   const home = (id: string) => { const k = placeOf(c, id) ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
   if (s.presence.place && !home(s.presence.place)) s.presence.place = null;
   const cast = s.cast;
@@ -324,20 +363,6 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.energy.value = Math.max(s.energy.value, Math.min(cap, s.energy.value + c.fishing.cast_energy));
     s.cast = null;
   }
-  s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
-  s.seen ??= [];   // SGODOT-232 map markers, the same way
-  // P1 (SGODOT-239, q(59) §1.1): facilities, and the 10 plots a save already at Homestead Lv3 has from this version on
-  // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
-  s.facilities ??= [];
-  s.facility_count ??= s.facilities.reduce((m, f) => Math.max(m, f.id), 0);
-  addPlots(c, s);
-  // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
-  // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
-  const run = s.mine?.run;
-  if (run) while (run.floors.length < c.mine.floors.length) run.floors.push({ paid: false, broken: [], lit: false });
-  s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
-  s.v = SAVE_VERSION;
-  return s;
 }
 
 const freshMine = (): MineState => ({ run: null, count: 0, ended: null, swing_at: 0 });

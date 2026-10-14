@@ -497,6 +497,38 @@
     "coast"
    ]
   },
+  "home": {
+   "_note": "Choosing a home (SGODOT-303, q(160)–q(161)). cities: the open list beyond the written city (San Francisco is always open), the first step's hand-checked cities (temperate New York City, London, Tokyo; subtropical Los Angeles, Miami, Shanghai; tropical Singapore, Mexico City, Hong Kong; cool Stockholm, Copenhagen, Helsinki), each of M1 tier and up with a full home set; spot: 3 spots round the beginner pond, pond_km from it, apart_km between them, scatter_m per player (the 300 m from outposts and ponds is placement.farm_exclusion_m); change: one free change within days of the account or before Homestead before_level. Read by server/src/p0/home_city.ts.",
+   "cities": [
+    "gn-5128581",
+    "gn-2643743",
+    "gn-1850147",
+    "gn-5368361",
+    "gn-4164138",
+    "gn-1796236",
+    "gn-1880252",
+    "gn-3530597",
+    "gn-1819729",
+    "gn-2673730",
+    "gn-2618425",
+    "gn-658225"
+   ],
+   "spot": {
+    "pond_km": [
+     0.5,
+     3
+    ],
+    "apart_km": 1,
+    "scatter_m": [
+     100,
+     200
+    ]
+   },
+   "change": {
+    "days": 7,
+    "before_level": 2
+   }
+  },
   "overrides": {
    "_note": "q(114) ⑤: hand fixes by place id, laid over the generated city after everything else is placed, so nothing else in the city moves. A pin that landed in the sea or a lake gets a point on land at least 50 m from the water (a tackle shop within 300 m of its pond); before the freeze the same table takes a hand rename (`name`). `why`: what was wrong, who saw it, and the checks on the new point. Re-check the whole table once there is water data. Names in `why` are the ones the place had when it was found (q(125) later renamed generated ponds and their tackle shops; the id is what counts).",
    "gn-5368361~tackle2": {
@@ -505,9 +537,9 @@
     "why": "Los Angeles · Clover Tackle Shop stood on Hollenbeck Lake (34.040526, -118.21805; 司空震's six-city check on farm-dev 303ce619, 2026-10-10). Moved 116 m west to the houses across the Golden State Fwy between it and S Boyle Ave: 111 m from the lake (OSM relation 3244050), 94 m from Clover Cove, 40 m from the freeway."
    },
    "gn-5128581~pond0": {
-    "lat": 40.729257,
-    "lng": -74.013947,
-    "why": "New York · Blossom Pond stood on water (40.73032, -74.026693; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1075 m to land 28 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules. q(144) (2026-10-12): moved 25 m to (40.729257, -74.013947), 28 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
+    "lat": 40.734,
+    "lng": -74.0078,
+    "why": "New York · Blossom Pond stood on water (40.73032, -74.026693; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1075 m to land 28 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules. q(144) (2026-10-12): moved 25 m to (40.729257, -74.013947), 28 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts). SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off Pier 40 into the West Village, still the pond nearest the centre (under Pebble Creek's 2.5 km); moved 739 m from (40.729257, -74.013947), keeping the placement rules."
    },
    "gn-5128581~pond2": {
     "lat": 40.692192,
@@ -515,9 +547,9 @@
     "why": "New York · Reed Cove stood on water (40.692641, -74.013947; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 50 m to land 23 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
    },
    "gn-5128581~tackle0": {
-    "lat": 40.729984,
-    "lng": -74.013229,
-    "why": "New York · Blossom Tackle Shop stood on water (40.731021, -74.028876; found by tools/world_water_check.ts, 2026-10-10). Moved 1325 m to land 75 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+    "lat": 40.7355,
+    "lng": -74.0093,
+    "why": "New York · Blossom Tackle Shop stood on water (40.731021, -74.028876; found by tools/world_water_check.ts, 2026-10-10). Moved 1325 m to land 75 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules. SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off Pier 40, east of West St; 210 m from Mallard Pond, 3 km from Pebble and Lilac Tackle Shops; moved 697 m from (40.729984, -74.013229), keeping the placement rules."
    },
    "gn-5128581~tackle2": {
     "lat": 40.691273,
@@ -530,14 +562,14 @@
     "why": "New York · Clover Tackle Shop stood 34 m from water (40.702943, -74.061012; found by tools/world_water_check.ts, 2026-10-10). Moved 25 m to land 62 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
    },
    "gn-5128581~market0": {
-    "lat": 40.727091,
-    "lng": -74.01067,
-    "why": "New York · Bridge Market Square stood on water (40.727091, -74.022524; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1000 m to land 63 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+    "lat": 40.729,
+    "lng": -74.005,
+    "why": "New York · Bridge Market Square stood on water (40.727091, -74.022524; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1000 m to land 63 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules. SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Hudson waterfront into Hudson Square, 1.6 km from the centre, 600 m from Mallard Pond; moved 523 m from (40.727091, -74.01067), keeping the placement rules."
    },
    "gn-5128581~tea0": {
-    "lat": 40.746897,
-    "lng": -74.008496,
-    "why": "New York · Oak Tea House stood on water (40.739592, -74.018137; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1150 m to land 70 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+    "lat": 40.752574,
+    "lng": -74.002208,
+    "why": "New York · Oak Tea House stood on water (40.739592, -74.018137; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1150 m to land 70 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules. SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off Chelsea Piers, inland; moved 824 m from (40.746897, -74.008496), keeping the placement rules."
    },
    "gn-5128581~tea1": {
     "lat": 40.685654,
@@ -873,6 +905,71 @@
     "lat": 36.818097,
     "lng": 34.611517,
     "why": "Mersin · Heather Tackle Shop: moved 321 m inland from (36.815264, 34.612206) so the beginner pond's tackle shop could leave the container port and keep 3 km from it (不知火舞 on 280, 2026-10-12)."
+   },
+   "gn-1880252~pond2": {
+    "lat": 1.27,
+    "lng": 103.8178,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Tanjong Pagar container terminal to Mount Faber (a search had found only piers and Pulau Brani); moved 3736 m from (1.266661, 103.851245), keeping the placement rules."
+   },
+   "gn-1880252~tackle2": {
+    "lat": 1.2715,
+    "lng": 103.8195,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): with Tamarind Creek, 250 m from it, 3 km from the other tackle shops; moved 3520 m from (1.265941, 103.850675), keeping the placement rules."
+   },
+   "gn-1880252~tea0": {
+    "lat": 1.276,
+    "lng": 103.845,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Tanjong Pagar container terminal into Tanjong Pagar, 3 km from Banyan Tea House; moved 1147 m from (1.266078, 103.847823), keeping the placement rules."
+   },
+   "gn-1819729~pond0": {
+    "lat": 22.28568,
+    "lng": 114.155423,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sheung Wan ferry-pier waterfront (275 m); moved 275 m from (22.288141, 114.155656), keeping the placement rules."
+   },
+   "gn-1819729~tackle0": {
+    "lat": 22.285485,
+    "lng": 114.156618,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sheung Wan ferry-pier waterfront (213 m); moved 213 m from (22.2874, 114.156627), keeping the placement rules."
+   },
+   "gn-1819729~market0": {
+    "lat": 22.282805,
+    "lng": 114.155971,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sheung Wan ferry-pier waterfront (601 m); moved 601 m from (22.286571, 114.160162), keeping the placement rules."
+   },
+   "gn-1819729~tea2": {
+    "lat": 22.287354,
+    "lng": 114.14785,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sheung Wan ferry-pier waterfront (200 m); moved 200 m from (22.289144, 114.148019), keeping the placement rules."
+   },
+   "gn-2618425~pond0": {
+    "lat": 55.654228,
+    "lng": 12.570098,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sydhavnen harbour edge / Holmen (449 m); moved 449 m from (55.653526, 12.563042), keeping the placement rules."
+   },
+   "gn-2618425~tackle0": {
+    "lat": 55.655351,
+    "lng": 12.570098,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sydhavnen harbour edge / Holmen (564 m); moved 564 m from (55.652473, 12.562703), keeping the placement rules."
+   },
+   "gn-2618425~market0": {
+    "lat": 55.65827,
+    "lng": 12.570098,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sydhavnen harbour edge / Holmen (486 m); moved 486 m from (55.658093, 12.562352), keeping the placement rules."
+   },
+   "gn-2618425~pond2": {
+    "lat": 55.690453,
+    "lng": 12.594781,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off the Sydhavnen harbour edge / Holmen (375 m); moved 375 m from (55.688071, 12.599007), keeping the placement rules."
+   },
+   "gn-2618425~tea0": {
+    "lat": 55.6725,
+    "lng": 12.5925,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off Holmen (naval island) into Christianshavn; moved 1930 m from (55.686977, 12.609477), keeping the placement rules."
+   },
+   "gn-658225~tea0": {
+    "lat": 60.1845,
+    "lng": 24.96,
+    "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off Mustikkamaa island onto the mainland, Sörnäinen; moved 1766 m from (60.178866, 24.98987), keeping the placement rules."
    }
   },
   "room": {

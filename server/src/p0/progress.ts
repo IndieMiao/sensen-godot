@@ -35,18 +35,20 @@ export type P0Event =
   | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number; lucky?: true }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
+  | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts)
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // look: the stage it opens
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
+  | { kind: 'barter'; item: string; give: number; mineral: string; left: number }   // q(166): 2 regional items for 1 mineral
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
   | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
   | { kind: 'visit'; id: string; place: string }   // an explore request checked in at its outpost (§9.6.3)
   // q(134): a taken request's count grew (`Fresh Greens 3/5`; a basket's item, `Market Basket · Carrot 5/6`); done: full
   | { kind: 'request_progress'; id: string; have: number; qty: number; item?: string; done?: true }
-  | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number }   // Decorate (SGODOT-284)
+  | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number; reason?: 'plots' }   // Decorate (SGODOT-284); reason plots: Lv7's new beds (q(172))
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
   | { kind: 'kindred'; resident: string; postcard: string; title: string }   // first reached Kindred (q(171))
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
@@ -58,7 +60,7 @@ export type P0Event =
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
   // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[];
-      x?: number; y?: number }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then
+      x?: number; y?: number; reason?: 'plots' }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then; reason plots: moved off Lv7's new beds (q(172))
   | { kind: 'compost'; item: string; qty: number; used: number; cap: number }   // the Compost Bin turned crops into Compost (q(118) ③)
   | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)

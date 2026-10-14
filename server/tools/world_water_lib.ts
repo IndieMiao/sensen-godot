@@ -133,7 +133,7 @@ function bigPieces(cls: Uint8Array, w: number, h: number, want: 0 | 1, minPx: nu
   return out;
 }
 
-export interface WaterMap { north: number; west: number; w: number; h: number; dist: Float32Array }
+export interface WaterMap { north: number; west: number; w: number; h: number; dist: Float32Array; cls: Uint8Array }
 /**
  * Metres to the nearest water for each pixel of the box (south, west, north, east): 0 on any water (a small pool
  * included) and on an islet; WorldCover tiles are 3° and a box may straddle up to four; a missing tile is open sea.
@@ -172,8 +172,14 @@ export async function waterMap(south: number, west: number, north: number, east:
     edt1(f, w, dx, d, v, z);
     for (let x = 0; x < w; x++) { const i = y * w + x; dist[i] = WATER[cls[i]] || !bigLand[i] ? 0 : Math.sqrt(d[x]); }
   }
-  return { north: -y0 * DEG, west: x0 * DEG, w, h, dist };
+  return { north: -y0 * DEG, west: x0 * DEG, w, h, dist, cls };
 }
+
+/** The WorldCover class at a point of the box (50 built-up …), -1 outside it (SGODOT-303's farm spots). */
+export const classAt = (m: WaterMap, p: { lat: number; lng: number }) => {
+  const x = Math.floor((p.lng - m.west) / DEG), y = Math.floor((m.north - p.lat) / DEG);
+  return x < 0 || y < 0 || x >= m.w || y >= m.h ? -1 : m.cls[y * m.w + x];
+};
 
 /** Metres from water at a point (0 on water or an islet), -1 outside the box. */
 export const dryM = (m: WaterMap, p: { lat: number; lng: number }) => {

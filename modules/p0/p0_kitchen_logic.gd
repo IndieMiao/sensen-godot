@@ -834,3 +834,68 @@ static func cook_all(view: Dictionary) -> Dictionary:
 	out.facts = [["Stoves", "%d/%d" % [count - out.stoves.filter(func(s): return s.state == "Free").size(), count]],
 		["Queues", "%d/%d" % [queues, count]]]
 	return out
+
+# ---------------------------------------------------------------- Cookbook titles (§7.6.1; 不知火舞 on 282)
+## Home Cook comes with the P0 reward `cookbook_8` (its +50 Energy); Line Cook 20 / Head Chef 36 / Master Chef 48 count
+## Discovered pages and Muscle Memory counts Mastered ones (the server's `milestone` events, view.cooking.milestones).
+const HOME_COOK := "Home Cook"
+const NEW_TITLE := "New title"
+
+## A title's card (RewardMoment Milestone, no buttons; after the dish card): the title, how far the Cookbook is, and
+## `New title` with what came with it — `Cookbook 8/48` · `New title · +50 Energy`, `Cookbook 20/48` · `New title ·
+## +100 coins · Recipe Stand`, `Cookbook 36/48` · `New title · Warming Cabinet +4`, `Cookbook 48/48` · `New title ·
+## Gold frame`, `Mastered 10` · `New title`. No next tier here: the Cookbook's title strip says it. `ev` is the
+## `reward` (id cookbook_N) or the `milestone` event; {} for anything else (a Fish-dex milestone).
+static func title_card(view: Dictionary, ev: Dictionary) -> Dictionary:
+	var id := str(ev.get("id", ""))
+	var total := int(cooking(view).get("pages_total", 48))
+	var gifts: Array = []
+	if str(ev.get("kind", "")) == "reward":
+		if not id.begins_with("cookbook_"): return {}
+		if int(ev.get("energy", 0)) > 0: gifts.append("+%d Energy" % int(ev.energy))
+		return {event = HOME_COOK, item_name = "Cookbook %d/%d" % [int(id.trim_prefix("cookbook_")), total], strip = _title_strip(gifts)}
+	if str(ev.get("kind", "")) != "milestone" or id.begins_with("fishdex_"): return {}
+	var m := _milestone(view, id)
+	var mastered := str(m.get("counts", "")) == "mastered"
+	if int(ev.get("coins", 0)) > 0: gifts.append("+%d coins" % int(ev.coins))
+	if ev.get("decor", null) != null: gifts.append(P0Decor.name_of(str(ev.decor)))
+	if int(ev.get("cabinet", 0)) > 0: gifts.append("Warming Cabinet +%d" % int(ev.cabinet))
+	if id == "master_chef": gifts.append("Gold frame")
+	var need := int(m.get("need", 0))
+	return {event = str(ev.get("title", m.get("title", ""))),
+		item_name = ("Mastered %d" % need) if mastered else "Cookbook %d/%d" % [need, total], strip = _title_strip(gifts)}
+
+static func _title_strip(gifts: Array) -> String:
+	return " · ".join(PackedStringArray([NEW_TITLE] + gifts))
+
+static func _milestone(view: Dictionary, id: String) -> Dictionary:
+	for m in cooking(view).get("milestones", []):
+		if str(m.get("id", "")) == id: return m
+	return {}
+
+## The Cookbook's title strip (COOK-5: a line under the filter chips): Home Cook, then the Discovered milestones in
+## order, each {title, state, have, need}: reached (ink), the next one with its count (`Line Cook 12/20`), the rest later
+## (grey, the name only). Muscle Memory counts Mastered pages, its own axis: muscle_item.
+static func title_strip(view: Dictionary) -> Array:
+	var have := int(cooking(view).get("discovered", 0))
+	var home := int((P0Logic.content().get("rewards", {}).get("cookbook", [[8, 50]]) as Array)[0][0])
+	var out: Array = [{title = HOME_COOK, need = home, reached = have >= home}]
+	for m in cooking(view).get("milestones", []):
+		if str(m.get("counts", "")) == "discovered": out.append({title = str(m.title), need = int(m.need), reached = bool(m.reached)})
+	var next_found := false
+	for t in out:
+		t.have = have
+		if t.reached: t.state = "reached"
+		elif not next_found:
+			t.state = "next"
+			next_found = true
+		else: t.state = "later"
+	return out
+
+## The strip's last item, after its divider (COOK-TITLES 2575:133159): Muscle Memory and the Mastered pages toward it,
+## {title, have, need, reached} — `Muscle Memory 6/10` grey until reached, then the name alone in ink; {} without it.
+static func muscle_item(view: Dictionary) -> Dictionary:
+	for m in cooking(view).get("milestones", []):
+		if str(m.get("counts", "")) == "mastered":
+			return {title = str(m.title), have = int(cooking(view).get("mastered_count", 0)), need = int(m.need), reached = bool(m.get("reached", false))}
+	return {}

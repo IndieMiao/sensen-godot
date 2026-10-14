@@ -20,7 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CityCluster, Climate } from './clusters.js';
 import type { FishPlace, P0Content } from './content.js';
-import { homeCluster } from './travel.js';
+import { writtenCluster } from './travel.js';
 import { regionalFish as pondRegionalFish } from './fishing_world.js';
 
 export type Tier = 'S' | 'M1' | 'M2' | 'L1' | 'L2' | 'L3';
@@ -102,32 +102,47 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 let memberPop: Map<string, number> | null = null;
 /** A cluster's satellite towns (its member cities other than the seed): name and point, for q(32) place names. */
 let satellites: Map<string, { name: string; lat: number; lng: number }[]> = new Map();
+/** A cluster's state or province: its seed city's admin column in cities.tsv (MAP-8 Nearby cities, `Salinas · California`). */
+let admins: Map<string, string> = new Map();
 /**
  * q(114) ①: a cluster's population is the sum of its member cities (server/data/city_cluster_members.tsv over
  * server/data/cities.tsv). The cluster table keeps its seed city's own figure (Miami 487,014 alone, 780,231 with its
  * members), which would make a metro area an S-tier town. Read once; a cluster missing from the files keeps its own.
  */
 export function clusterPopulation(cl: CityCluster): number {
-  if (!memberPop) {
-    memberPop = new Map();
-    try {
-      const rows = (f: string) => readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => l && !l.startsWith('#')).map(l => l.split('\t'));
-      const cities = new Map(rows('server/data/cities.tsv').map(r => [r[0], r] as [string, string[]]));
-      for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) {
-        const row = cities.get(city);
-        memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (Number(row?.[7]) || 0));
-        if (row && city !== cluster) {
-          const list = satellites.get(cluster) ?? [];
-          list.push({ name: row[1], lat: Number(row[2]), lng: Number(row[3]) });
-          satellites.set(cluster, list);
-        }
+  loadMembers();
+  return Math.max(cl.population, memberPop!.get(cl.id) ?? 0);
+}
+
+/** A cluster's state or province (its seed city's admin in cities.tsv), "" when the files or the column have none. */
+export function clusterAdmin(id: string): string {
+  loadMembers();
+  return admins.get(id) ?? '';
+}
+
+/** Reads the member and city files once, for populations, satellites and admins. */
+function loadMembers(): void {
+  if (memberPop) return;
+  memberPop = new Map();
+  try {
+    const rows = (f: string) => readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => l && !l.startsWith('#')).map(l => l.split('\t'));
+    const cities = new Map(rows('server/data/cities.tsv').map(r => [r[0], r] as [string, string[]]));
+    for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) {
+      const row = cities.get(city);
+      memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (Number(row?.[7]) || 0));
+      const seed = cities.get(cluster);   // the cluster's id is its seed city's
+      if (seed?.[5] && !admins.has(cluster)) admins.set(cluster, seed[5]);
+      if (row && city !== cluster) {
+        const list = satellites.get(cluster) ?? [];
+        list.push({ name: row[1], lat: Number(row[2]), lng: Number(row[3]) });
+        satellites.set(cluster, list);
       }
-    } catch {
-      memberPop.clear();   // the files missing (a stripped image): every cluster keeps its own figure, never a 500 (哪吒 on #244)
-      satellites = new Map();
     }
+  } catch {
+    memberPop.clear();   // the files missing (a stripped image): every cluster keeps its own figure, never a 500 (哪吒 on #244)
+    satellites = new Map();
+    admins = new Map();
   }
-  return Math.max(cl.population, memberPop.get(cl.id) ?? 0);
 }
 
 /** §9.3.2: the larger of the population tier and the built-up-area tier (world.area_tier until there is area data). */
@@ -329,7 +344,7 @@ export function regionalFish(c: P0Content, cl: CityCluster): { fish: string; lev
   return pondRegionalFish(c, cl.id).map(f => ({ fish: f, level: level(f) }));
 }
 
-const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldContent }).world;
+export const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldContent }).world;
 
 /** A cluster's generated places, from the content's world block and the frozen cluster table. Throws for an unknown cluster. */
 /**
@@ -469,7 +484,7 @@ export function cityPlaces(c: P0Content, cluster: string): CityPlaces | null {
   const hit = cache.get(cluster);
   if (hit) { cache.delete(cluster); cache.set(cluster, hit); return hit; }
   const cl = (c as P0Content & { clusters?: { get(id: string): CityCluster | undefined } }).clusters?.get(cluster);
-  if (!cl || !worldOf(c) || cluster === homeCluster(c)) return null;   // the home city keeps its hand-written tables
+  if (!cl || !worldOf(c) || cluster === writtenCluster(c)) return null;   // the home city keeps its hand-written tables
   const made = generateCity(c, cl);
   cache.set(cluster, made);
   if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value!);

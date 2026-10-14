@@ -128,6 +128,7 @@ const OPACITY_EMPTY_ICON := 0.6
 # Space
 const SPACE_HUD_ROW_GAP := 8
 const SPACE_ITEM_ROW_GAP := 10
+const SPACE_KEY_COMPACT := 14
 const SPACE_OVERLAY_BLOCK := 12
 const SPACE_OVERLAY_BODY := 8
 const SPACE_PAGE := 16
@@ -411,4 +412,5 @@ const PENDING := {
 	"systemCard": "SystemCard 1237:87229, Wordmark (placeholder) 1187:82582, Spinner 1237:87185 and the SYS-LOADING screens (SGODOT-233): card padding 28 / 21 / 20 / 21, gap 10, icon disc 64 with a 32 icon, 6 above the button, the 0 10 28 card shadow; the wordmark's sprout 30, gap 6 and name 32 ExtraBold; the spinner's 28 ring with a 3 stroke; the scene loading's destination 18 ExtraBold are constants in UiSystemCard / UiWordmark / UiSpinner / P0SysScreen until the next token export adds them",
 	"elevatorPanel": "ElevatorPanel 1230:107860 / ElevatorRow 1230:107859 (SGODOT-231 / 235 B3): width 280, radius 16, padding 10 / 8 / 8, gaps 2, shadow 0 4 8 at 16 %, rows 44 with radius 10 and 12 side padding are constants in UiElevatorPanel until the next token export adds them",
 	"tipCard": "TipCard 1243:87540 (TUT-2, SGODOT-232 U6 / 235-B2): width 296, padding 14 / 12, gap 10, radius 16, one line 48, 22 px icon and the shadow (#2E3A33 at 8 %, size 28, offset 0 / 6: lighter than the main's 20 % / 0 / 10 / blur 28 so Godot reads as the same faint halo, 不知火舞 on 235-B2) are constants in UiTipCard until the next token export adds them; surface, border, text and BodyB14 are tokens",
+	"keyCompact": "space.keyCompact (14): the Compact command keys' side padding (Primary / Secondary / Blocked / Destructive), measured by 不知火舞 on BARTER-2 2570:132291, BARTER-LIST 2569:132290 and NPC-2 482:116 (Command surface: 14 each side, visible 34, narrowest 68); added by hand (2026-10-13) and kept by the exporter's fixed spaces; the full-size command keys keep space.page until they are checked against Figma",
 }

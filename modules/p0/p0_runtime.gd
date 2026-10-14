@@ -13,6 +13,7 @@ extends Node
 ## p0_until(name) -> bool.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
@@ -42,6 +43,9 @@ var catch_floats: Array = []
 ## …and the toast of a request that catch filled (q(134) ⑤; 周瑜 on #302): it waits for the same hand, then for the
 ## catch's Caught! card (take_catch_toast).
 var catch_toast := ""
+## The Fish-dex milestone card a landed catch's reply held (q(49); 苏烈 on #353): the world queues it after the catch's
+## Caught! card (take_catch_cards).
+var catch_cards: Array = []
 const TRAP_CARD_TITLE := "In your trap!"   # q(124) ①: a landed fish's card is `Caught!`
 const TRAP_CARD_AFTER_S := 0.3              # after the last fish lands in the creel
 var last_catch_extras := {}   # the same response's New city XP and first-fish Energy, for the Caught! card
@@ -160,6 +164,8 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	# left before a landed fish reached the hand: the request it filled still says so (q(134))
 	if world != w and catch_toast != "": ui.toast_success_when_clear(take_catch_toast(), false, true)
+	if world != w:   # …and a Fish-dex milestone it made still gets its card
+		for c in take_catch_cards(): ui.queue_card(c)
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	if session.space in ["map", "pond", "outpost"]: ui.cook_page_from_today = ""   # left home: Today's stove page goes (q(99))
@@ -445,6 +451,13 @@ func take_catch_toast() -> String:
 	catch_toast = ""
 	return held
 
+## The Fish-dex milestone card a landed catch's reply held (catch_cards), handed over once: the world queues it after
+## the catch's Caught! card.
+func take_catch_cards() -> Array:
+	var held := catch_cards
+	catch_cards = []
+	return held
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -504,10 +517,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
 	var world_lands := false   # the world shows this reply's landed fish: its floats wait for the hand
 	var filled_toast := ""     # a request this reply filled (q(134)): said after the reply's cards, below
+	var dex_cards: Array = []  # a Fish-dex milestone's card: after the catch's own card (q(49)), below
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
-	var card_energy: Array = []   # a trap's first-fish Energy events its card says (q(124) ①)
+	var card_energy: Array = []   # a trap's first-fish Energy events its card says (q(124) ①); a Cookbook title's too
+	var card_coins: Array = []    # a Cookbook title's coins, said on its card (+100 coins)
 	# Harvest ×N's first harvest goes into its XP line (`+20 XP · 5 plants · First harvest`, q(124) ②), no line of its own.
 	var folded_first: Array = []   # those firsts' xp events
 	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
@@ -527,6 +542,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
+	# A barter (q(166) ⑤): one Success toast `+1 Stone · −2 Pumpkin` says both sides, in place of the item floats
+	var barter_toast := P0Barter.toast(v, events)
+	if barter_toast != "": ui.toast_success(barter_toast)
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		if hushed.call(ev): continue
@@ -557,9 +575,24 @@ func _on_state(v: Dictionary, events: Array) -> void:
 						and trap_cards_now.any(func(k): return int(k.extras.get("energy", 0)) > 0):
 					card_energy.append(events[i - 1])
 				if str(ev.id).begins_with("first_fish_"): last_catch_extras["energy"] = int(ev.energy)
+				# Home Cook's +50 Energy is on its title card (不知火舞 on 282), a Fish-dex milestone's on its card (283), not floated
+				# too: grantOnce puts its own Energy just before it (reason reward, the same amount); at the cap it puts none, so
+				# the event before is another's
+				if (str(ev.id).begins_with("cookbook_") or str(ev.id).begins_with("fishdex_")) and int(ev.energy) > 0 and i > 0 \
+						and str(events[i - 1].get("kind", "")) == "energy" and str(events[i - 1].get("reason", "")) == "reward" \
+						and int(events[i - 1].get("delta", 0)) == int(ev.energy):
+					card_energy.append(events[i - 1])
+				if str(ev.id).begins_with("fishdex_"): _dex_energy[str(ev.id)] = int(ev.energy)
+			"milestone":
+				# a Cookbook title's coins (Line Cook +100) and a Fish-dex milestone's (+100 at 10 kinds) are on its card:
+				# noteMilestones / noteFishdex put them just before it
+				if int(ev.get("coins", 0)) > 0 and i > 0 \
+						and str(events[i - 1].get("kind", "")) == "coins" and int(events[i - 1].get("delta", 0)) == int(ev.coins):
+					card_coins.append(events[i - 1])
 			"first":
 				var what := str(ev.what)
 				if what.begins_with("catch:"):
+					_dex_fish = what.trim_prefix("catch:")   # a new kind: the one a Fish-dex milestone's card names
 					xp_lines.append("First catch! +%d XP" % int(ev.xp))
 					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
@@ -578,7 +611,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
 		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
-		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate"]: continue
+		# a title keeps its card away from the kitchen too, as a level-up keeps its banner
+		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate", "milestone", "reward"]: continue
 		match str(ev.get("kind", "")):
 			"arrival": _call("on_arrival", [ev])   # SGODOT-275: the map flies there and welcomes (q(108))
 			"energy":
@@ -622,12 +656,23 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if P0Decor.is_decor(iid) and int(ev.delta) > 0:   # bought at the stall, into Farm Storage (SGODOT-284)
 					ui.toast_decor_bought(iid)
 					continue
+				if barter_toast != "": continue   # a barter says both sides in its toast, below (q(166) ⑤)
 				# where a collected dish went (the kitchen's Keep toast); what a pot took (Cook All floats it, q(124))
 				if iid.begins_with("dish_") or int(ev.delta) < 0: _call("p0_event", [ev, v])
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
+			"reward", "milestone":
+				# Cookbook titles (§7.6.1): a card after the dish card, as a level-up's banner (deferred: COOK-4 first);
+				# a Fish-dex milestone is 周瑜's (SGODOT-283).
+				if str(ev.get("kind", "")) == "milestone" and str(ev.get("id", "")).begins_with("fishdex_"):
+					var dex_card := _fishdex_card(ev, v)
+					if dex_card.is_valid(): dex_cards.append(dex_card)
+					continue
+				var title := P0KitchenLogic.title_card(v, ev)
+				if not title.is_empty(): ui.queue_card.call_deferred(func(): ui.show_title(title))
 			"coins":
+				if card_coins.any(func(x): return is_same(x, ev)): continue
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
@@ -645,6 +690,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				else: _on_catch(ev, xp_lines)
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
+			"facility":   # Homestead Lv7's new beds took the Compost Bin's cell: it moved beside the workbench (q(172) ③)
+				if str(ev.get("reason", "")) == "plots":
+					var fname := str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(str(ev.get("facility_kind", "")), {}).get("name", ""))
+					ui.toast_success("%s · moved beside the Workbench" % fname, true)
 			"decor":   # Decorate (SGODOT-284, b706e141 ④): a piece stored says where it went, as a purchase does
 				if str(ev.get("action", "")) == "stored": ui.toast_success("%s · back in Farm Storage" % P0Decor.name_of(str(ev.get("item", ""))), true)
 			"trap":   # Fish Trap (SGODOT-283): the pond redraws its float; set / some left / taken back say so
@@ -765,8 +814,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			var landed_s := UiItemFly.FLIGHT_S + UiItemFly.DELAY_STEP_S * (mini(trap_got.size(), UiItemFly.MAX_PER_BATCH) - 1)
 			var toast := filled_toast   # a request the trap filled: after its cards (周瑜 on #302)
 			filled_toast = ""
+			var dex := dex_cards        # a Fish-dex milestone the trap made: after its In your trap! cards (苏烈 on #353)
+			dex_cards = []
 			get_tree().create_timer(landed_s + TRAP_CARD_AFTER_S).timeout.connect(func() -> void:
 				for k in cards: ui.queue_card(ui.show_catch.bind(str(k.fish), int(k.rarity), int(k.xp), k.extras, TRAP_CARD_TITLE))
+				for c in dex: ui.queue_card(c)
 				if toast != "": ui.toast_success_when_clear(toast, false, true))
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
@@ -778,6 +830,15 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# (their timer, above), anything else REQUEST_TOAST_AFTER_S on (a level-up's banner comes deferred). Bound to the UI
 	# (哪吒 on #188): a world left within the wait still gets it; held, it waits for a TipCard on screen too.
 	if settles_catch: catch_toast = filled_toast if world_lands else ""
+	# A Fish-dex milestone (q(49); 苏烈 on #353): a landed fish's after its Caught! card (held for the world's settle, as
+	# the toast), a trap's after its In your trap! cards (their timer, above), anything else at the end of the frame — after
+	# the Caught! card a fish the world does not show queues in this loop (_on_catch) and a level-up's deferred banner.
+	if settles_catch:
+		for c in take_catch_cards(): ui.queue_card(c)   # one a fish left in the air still comes
+		if world_lands:
+			catch_cards = dex_cards
+			dex_cards = []
+	for c in dex_cards: ui.queue_card.call_deferred(c)
 	if filled_toast != "" and not world_lands:
 		get_tree().create_timer(REQUEST_TOAST_AFTER_S).timeout.connect(ui.toast_success_when_clear.bind(filled_toast, false, true))
 	if wave_s > 0.0:
@@ -825,6 +886,18 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
 			ui.toast("Line in · Energy back")
+
+## A Fish-dex milestone (`milestone` event, id fishdex_N; SGODOT-283, §6.9.2; 不知火舞 on 283): a RewardMoment Milestone
+## after the catch's own card and floats (q(49)) — `Fish-dex 10/20` over the kind that made it, `+30 Energy · +100 coins`;
+## at 20 `Fish-dex complete` · `20/20` · `+50 Energy · +300 coins · Badge`. Its Energy and coins are on it, not floated.
+## The card to queue (bound to the UI: a world left before its turn still shows it), or an empty Callable.
+var _dex_fish := ""            # the reply's newest kind (its first catch), for the card's name
+var _dex_energy := {}          # fishdex_N → the Energy its reward granted
+func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
+	var id := str(ev.get("id", ""))
+	var spec := P0FishDex.milestone_card(v, id, _dex_fish, int(_dex_energy.get(id, 0)), int(ev.get("coins", 0)), str(ev.get("title", "")))
+	_dex_energy.erase(id)
+	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
@@ -1396,6 +1469,14 @@ func _dev_shot(dt: float) -> void:
 				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
+			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)
+				var row := ui.root.find_child("Barter_" + step[1], true, false) as UiShopRow
+				if row and row.buy: row.buy.activated.emit()
+			"scrollto":   # scrollto:Barter — the scroll holding that node brings it to its top (q(166) shots)
+				var at := ui.root.find_child(step[1], true, false) as Control
+				var sc: Node = at.get_parent() if at else null
+				while sc != null and not (sc is ScrollContainer): sc = sc.get_parent()
+				if sc: (sc as ScrollContainer).scroll_vertical = int(at.global_position.y - (sc.get_child(0) as Control).global_position.y)
 			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
 			# 256 ⑦⑧ shots: profskill:farming / profdex tap the profile's skill card / Fish tile; profspin:120 drags
 			# the outfit 120 px sideways (the spin's own gesture: press, past the slop, release).
@@ -1532,6 +1613,7 @@ func _dev_shot(dt: float) -> void:
 				ui.close_modal()
 				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
+			"closemodal": ui.close_modal()   # the card or sheet on top, as its ✕ (shots: a LOOK-PICK after an upgrade, 282)
 			"kitchen", "put":   # the farmhouse owns the cooking drawer (P0Farmhouse.p0_dev); elsewhere there is no stove
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: %s works in the farmhouse only" % step[0])
 			"cook": session.send({"type": "cook", "recipe": step[1]})

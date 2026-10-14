@@ -142,7 +142,7 @@
               "rect": [
                 0,
                 550,
-                51,
+                47,
                 64
               ],
               "children": [
@@ -151,7 +151,7 @@
                   "rect": [
                     0,
                     550,
-                    51,
+                    47,
                     44
                   ],
                   "variation": "CmdPrimaryCompact",
@@ -162,7 +162,7 @@
                   "rect": [
                     0,
                     600,
-                    51,
+                    47,
                     14
                   ],
                   "variation": "C9B",
@@ -173,18 +173,18 @@
             {
               "type": "VBoxContainer",
               "rect": [
-                57,
+                53,
                 550,
-                55,
+                51,
                 64
               ],
               "children": [
                 {
                   "type": "UiCommandButton",
                   "rect": [
-                    57,
+                    53,
                     550,
-                    55,
+                    51,
                     44
                   ],
                   "variation": "CmdSecondaryCompact",
@@ -193,9 +193,9 @@
                 {
                   "type": "Label",
                   "rect": [
-                    57,
+                    53,
                     600,
-                    55,
+                    51,
                     14
                   ],
                   "variation": "C9B",
@@ -206,18 +206,18 @@
             {
               "type": "VBoxContainer",
               "rect": [
-                118,
+                110,
                 550,
-                104,
+                100,
                 64
               ],
               "children": [
                 {
                   "type": "UiCommandButton",
                   "rect": [
-                    118,
+                    110,
                     550,
-                    104,
+                    100,
                     44
                   ],
                   "variation": "CmdBlockedCompact",
@@ -226,9 +226,9 @@
                 {
                   "type": "Label",
                   "rect": [
-                    118,
+                    110,
                     600,
-                    104,
+                    100,
                     14
                   ],
                   "variation": "C9B",
@@ -239,18 +239,18 @@
             {
               "type": "VBoxContainer",
               "rect": [
-                228,
+                216,
                 550,
-                54,
+                50,
                 64
               ],
               "children": [
                 {
                   "type": "UiCommandButton",
                   "rect": [
-                    228,
+                    216,
                     550,
-                    54,
+                    50,
                     44
                   ],
                   "variation": "CmdPrimaryCompact",
@@ -259,9 +259,9 @@
                 {
                   "type": "Label",
                   "rect": [
-                    228,
+                    216,
                     600,
-                    54,
+                    50,
                     14
                   ],
                   "variation": "C9B",

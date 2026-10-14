@@ -10,6 +10,7 @@ import type { Refusal } from './fishing.js';
 import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { putInStorage, stored } from './storage.js';
+import { bedCells } from './garden.js';
 
 export interface DecorItem { name: string; blurb?: string; price: number; size: [number, number]; pieces: number; homestead: number; buy: boolean }
 type Rect = [number, number, number, number];
@@ -50,7 +51,10 @@ export function spotBlock(c: P0Content, s: P0State, id: string, x: number, y: nu
 export function yardBlock(c: P0Content, s: P0State, cells: [number, number][], at: { x: number; y: number },
     ignore: { uid?: number; facility?: number } = {}): Refusal | null {
   const yard = decorOf(c)!.yard;
-  if (cells.some(cell => !inRect(cell, yard.walk) || yard.field.some(r => inRect(cell, r)))) return { code: 'decor_outside', detail: at };
+  // off the field, and off the beds the homestead has beyond it (Homestead Lv7's 40–47 on the field's edge, q(172))
+  const beds = bedCells(c, s);
+  if (cells.some(cell => !inRect(cell, yard.walk) || yard.field.some(r => inRect(cell, r)) || beds.has(`${cell[0]},${cell[1]}`)))
+    return { code: 'decor_outside', detail: at };
   const taken = new Set<string>();
   for (const p of s.decor?.placed ?? []) if (p.uid !== ignore.uid) for (const [px, py] of cellsOf(c, p.id, p.x, p.y, p.rot)) taken.add(`${px},${py}`);
   for (const f of s.facilities ?? []) if (f.cell && f.id !== ignore.facility) taken.add(`${f.cell[0]},${f.cell[1]}`);

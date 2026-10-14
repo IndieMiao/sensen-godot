@@ -12,7 +12,8 @@
  */
 import { createHash } from 'node:crypto';
 import type { Fish, FishSite, P0Content } from './content.js';
-import { clusterById, clusterOf, homeCluster, HOME_ALIAS } from './travel.js';
+import { clusterById, clusterOf, writtenCluster, HOME_ALIAS } from './travel.js';
+import { placeOf } from './world.js';
 
 export type Daypart = 'day' | 'dawn_dusk' | 'night';
 export type Weather = 'sun' | 'rain' | 'wind';
@@ -49,9 +50,9 @@ export function localClock(tz: string, at: number): { y: number; m: number; d: n
 
 /** The cluster a pond is in (its own field, its city's, or the home city's), and that cluster's time zone and climate. */
 export function pondCity(c: P0Content, place: string): { cluster: string; tz: string; climate: string } {
-  const cluster = clusterOf(c, place) ?? homeCluster(c);
+  const cluster = clusterOf(c, place) ?? writtenCluster(c);
   const cl = clusterById(c, cluster);
-  const home = cluster === homeCluster(c);
+  const home = cluster === writtenCluster(c);
   return {
     cluster,
     tz: cl?.timezone ?? (home ? c.profile.timezone : undefined) ?? 'UTC',
@@ -120,7 +121,7 @@ export function regionalFish(c: P0Content, cluster: string): string[] {
   for (const [city, fish] of Object.entries(r.curated)) {
     if ((HOME_ALIAS[city] ?? `city:${city}`) === cluster || clusterById(c, cluster)?.name.toLowerCase() === city) return [...fish];
   }
-  const climate = titleCase(clusterById(c, cluster)?.climate ?? (cluster === homeCluster(c) ? c.profile.climate : '') ?? '');
+  const climate = titleCase(clusterById(c, cluster)?.climate ?? (cluster === writtenCluster(c) ? c.profile.climate : '') ?? '');
   const g = r.groups[climate];
   if (!g) return [];
   const byId = (id: string) => c.fish.find(f => f.id === id);
@@ -173,6 +174,11 @@ export function everFish(c: P0Content, site: FishSite, cluster: string): Fish[] 
  * river has it" means for requests, map markers and the regional request pool (苏烈's obtainable, #224). */
 export function pondFishIds(c: P0Content, place?: string): Set<string> {
   const ids = new Set<string>();
+  if (place && !c.fishing.places[place]) {   // a generated pond (a home that is not the written city, SGODOT-303)
+    const p = placeOf(c, place), site = p && c.fishing.sites[p.site];
+    if (site) for (const f of everFish(c, site, p.cluster ?? clusterOf(c, place) ?? writtenCluster(c))) ids.add(f.id);
+    return ids;
+  }
   for (const [id, p] of Object.entries(c.fishing.places)) {
     if (place && id !== place) continue;
     const site = c.fishing.sites[p.site];

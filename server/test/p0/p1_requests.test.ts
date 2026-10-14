@@ -150,7 +150,7 @@ describe('regional templates (§9.6.3; drawn only once one of their items can be
 
   it('home climate, home city and other climates pick their own items', () => {
     const k = opened();
-    const pools = (need: Parameters<typeof regionalPool>[1]) => regionalPool(k, need);
+    const pools = (need: Parameters<typeof regionalPool>[2]) => regionalPool(k, null, need);
     expect(pools({ kind: 'crop', regional: 'zone' })).toEqual(['crop_pumpkin']);   // San Francisco is Temperate
     expect(pools({ kind: 'fish', regional: 'city' })).toEqual(['fish_arctic_char', 'fish_salmon']);   // San Francisco's two (q(109))
     expect(pools({ kind: 'crop', regional: 'other_zone' })).toEqual([]);            // the other climates' seeds are not on sale here
@@ -189,8 +189,8 @@ describe('Stamp Run (§9.6.3 explore: check in at another outpost)', () => {
     expect(eligible(c, s, 'market')).not.toContain('req_sys_explore_outpost');
     s.homestead.level = 2;
     expect(eligible(c, s, 'market')).toContain('req_sys_explore_outpost');
-    expect(visitPlaces(c, 'market')).not.toContain('sh_market_1');
-    expect(visitPlaces(c, 'market').length).toBe(3);
+    expect(visitPlaces(c, 'market', null)).not.toContain('sh_market_1');
+    expect(visitPlaces(c, 'market', null).length).toBe(3);
   });
 
   it('a tracked Stamp Run checks in when the player enters its outpost, then pays 40 at the board', () => {

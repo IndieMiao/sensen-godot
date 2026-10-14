@@ -20,7 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CityCluster } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
-import { homeCluster } from '../src/p0/travel.js';
+import { writtenCluster } from '../src/p0/travel.js';
 import { generateCity, type WaterTable, type WorldContent } from '../src/p0/world.js';
 import { fixCity, ruleOk, stats, type Move, type Place } from './world_water_lib.js';
 
@@ -49,7 +49,7 @@ if (args[0] === 'run') {
   const searchM = Number(opt('search', '3000'));
   const file = path.join(out, retry ? `retry-${retry}.jsonl` : `shard-${shard}-of-${of}.jsonl`);
   const done = new Set(readLines(file).filter(l => !l.error).map(l => l.cluster));
-  const home = homeCluster(c);   // hand-written, never generated
+  const home = writtenCluster(c);   // hand-written, never generated
   // In WorldCover tile order, cut into n runs: neighbours share a tile already opened (each new tile costs a few slow
   // round trips), so a shard is a stretch of the map rather than every n-th city.
   const tileKey = (cl: CityCluster) => `${String(Math.floor(cl.lat / 3) * 3 + 90).padStart(3, '0')}:${String(Math.floor(cl.lng / 3) * 3 + 180).padStart(3, '0')}:${cl.id}`;
@@ -90,7 +90,7 @@ if (args[0] === 'run') {
       if (!prior || prior.error || (l.failed?.length ?? 0) <= (prior.failed?.length ?? 0)) last.set(l.cluster, l);
     }
   }
-  const expected = [...clusters.byId.keys()].filter(id => id !== homeCluster(c));
+  const expected = [...clusters.byId.keys()].filter(id => id !== writtenCluster(c));
   const missing = expected.filter(id => !last.has(id) || last.get(id)!.error);
   const fixes: WaterTable['fixes'] = {};
   // a place given a hand fix since the run is the hand's (as a rerun would skip it)

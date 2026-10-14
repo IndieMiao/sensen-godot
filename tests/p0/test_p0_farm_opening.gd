@@ -25,7 +25,7 @@ func _farm() -> Dictionary:
 	var bp := P0Garden.blueprint()
 	var spawn := PlayerMover.new(bp, BlueprintGrid.new(bp)).position
 	var house := bp.cell_to_world(bp.anchor("house"))
-	return {spawn = spawn, mark = house + P0Farm.HOME_MARK, focus = spawn.lerp(house, 0.42)}
+	return {spawn = spawn, mark = house + P0Farm.HOME_MARK, focus = P0Farm.opening_point(bp, house)}
 
 func _area(inset: float) -> Rect2:
 	var top := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + inset

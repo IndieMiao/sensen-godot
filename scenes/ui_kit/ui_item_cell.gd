@@ -92,6 +92,18 @@ const _KITCHEN_NFC_LABEL := Vector2(25, 25)             # `Not for / cooking`: y
 const _KITCHEN_NFC_ALPHA := 0.25
 const _STORED_AT := Vector2(4, 38)   # InventoryCell: Icon/i-home 11×11 at (4, 38) on storage stacks (BAG-2-2)
 const _STORED_ICON := 11.0
+## Gift Clues (Fishing Lv7, q(167); 不知火舞 302 b308ee14): a resident met likes this dish — a solid 14 px ♥ 4 in from
+## the top-right corner, StatusBadge Gift's coral, no ring and no number; one look whoever and however much.
+const _LIKED_ICON := 14.0
+const _LIKED_INSET := 4.0
+const HEART_GLYPH := preload("res://assets/p0/icons/heart.svg")   # solid #E07A5F, the HP bar's heart
+## The gift drawer's mark (RESIDENT-GIFT 1216:83527; 不知火舞 on 302 b308ee14): what giving this dish adds, a 17 px pill
+## centred 2 above the cell — `♥ +3` green on the primary tint when the dish is one this resident loves or likes
+## (gain_hit; 不知火舞 on 283: by the hit, not the number), any other `♥ +2` / `♥ +1` grey ink on white, `−2` (the Mystery
+## Dish, no ♥) on the grey keys' fill; ExtraBold 10, padding 5 / 1, radius 8, a 1 px edgeStrong outline (Figma's unbound #D1CCC2, 不知火舞: the nearest token); kept while selected.
+const GAIN_H := 17.0
+const GAIN_GAP := 2.0
+const _GAIN_OUTLINE := UiTokens.COLOR_EDGE_STRONG
 const _QUICK_PAD := 4.0           # QuickSlot "Slot surface" padding
 const _QUICK_NAME_H := 22.0       # two-line name block, then the 12 px quantity line
 const _QUICK_QTY_H := 12.0
@@ -123,6 +135,12 @@ var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
 var rack := false: set = set_rack
 ## INVENTORY: the stack is in Farm Storage, not the bag — a small house at the bottom left (BAG-2-2).
 var stored := false: set = set_stored
+## INVENTORY: a resident met likes this dish (Gift Clues, Fishing Lv7): the ♥ at the top right.
+var liked := false: set = set_liked
+## INVENTORY, the gift drawer: what giving this dish adds (int; null hides the mark), drawn over the cell.
+var gain = null: set = set_gain
+## The gift drawer: the dish is one this resident loves or likes — its mark is green.
+var gain_hit := false: set = set_gain_hit
 ## KITCHEN unknown pages: each slot's family, e.g. ["W", "S"] — one dot per slot in its colour (FAMILY_COLORS).
 var families: Array = []: set = set_families
 ## KITCHEN unknown pages: per slot, the clue that lit it — the ingredient's own icon, or family_icon() when the clue
@@ -158,6 +176,9 @@ var _tag_label: Label
 var _chip: HBoxContainer
 var _chip_label: Label
 var _home: TextureRect
+var _liked: TextureRect
+var _gain: PanelContainer
+var _gain_label: Label
 
 func _init(d: Density = Density.INVENTORY) -> void:
 	density = d
@@ -187,6 +208,9 @@ func set_status(v: String) -> void: status = v; _refresh()
 func set_kitchen_state(v: KitchenState) -> void: kitchen_state = v; _refresh()
 func set_rack(v: bool) -> void: rack = v; _refresh()
 func set_stored(v: bool) -> void: stored = v; _refresh()
+func set_liked(v: bool) -> void: liked = v; _refresh()
+func set_gain(v) -> void: gain = v; _refresh()
+func set_gain_hit(v: bool) -> void: gain_hit = v; _refresh()
 func set_families(v: Array) -> void:
 	if v == families: return   # a grid refresh sets them on every cell
 	families = v
@@ -331,6 +355,23 @@ func _build_cell() -> void:
 		_home.self_modulate = UiTokens.COLOR_SECONDARY
 		_place(_home, 0.0, _STORED_AT.x, _STORED_AT.y, _STORED_ICON, _STORED_ICON)
 		_surface.add_child(_home)
+		_liked = UiKit.icon(HEART_GLYPH, _LIKED_ICON)
+		_liked.name = "Liked"
+		_place(_liked, 1.0, -_LIKED_INSET - _LIKED_ICON, _LIKED_INSET, _LIKED_ICON, _LIKED_ICON)
+		_surface.add_child(_liked)
+		_gain = PanelContainer.new()
+		_gain.name = "Gain"
+		_gain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_gain.anchor_left = 0.5
+		_gain.anchor_right = 0.5
+		_gain.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		_gain.offset_top = -GAIN_GAP - GAIN_H
+		_gain.offset_bottom = -GAIN_GAP
+		_gain_label = UiKit.label("", UiTokens.STYLE_C10_XB)
+		_gain_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_gain_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_gain.add_child(_gain_label)
+		add_child(_gain)
 		# InventoryCell State=new (1699:102396): 2 px color/new inside the cell, flashed once like the QuickSlot's.
 		_new_ring = _box(_surface)
 		_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -495,9 +536,21 @@ func _refresh() -> void:
 			_dot.visible = rarity > 0 and not empty and not dim and not (density == Density.KITCHEN and rack)
 			_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if dim else 1.0   # "Icon · dimmed" 35 %, as the ghost slot
 			if _home != null: _home.visible = stored and not empty
+			if _liked != null: _liked.visible = liked and not empty and not dim   # kept while selected
+			if _gain != null: _paint_gain(empty)
 			if rarity > 0:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))
 			if density == Density.KITCHEN: _refresh_kitchen(s, empty)
+
+func _paint_gain(empty: bool) -> void:
+	_gain.visible = gain != null and not empty
+	if not _gain.visible: return
+	var n := int(gain)
+	var hit := gain_hit and n > 0
+	var bg := UiTokens.COLOR_PRIMARY_TINT if hit else (UiTokens.COLOR_SURFACE_RAISED if n >= 0 else UiTokens.COLOR_DISABLED)
+	_gain.add_theme_stylebox_override(&"panel", UiStyleBox.make(bg, 8.0, _GAIN_OUTLINE, UiTokens.STROKE_DEFAULT).with_margins(5.0, 1.0, 5.0, 1.0))
+	_gain_label.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY if hit else UiTokens.COLOR_SECONDARY)
+	_gain_label.text = ("♥ +%d" % n) if n >= 0 else ("−%d" % -n)
 
 ## Kitchen/Cell: DEFAULT keeps the plain cell (status label); the other
 ## kitchen states draw the main's marks and their own labels.

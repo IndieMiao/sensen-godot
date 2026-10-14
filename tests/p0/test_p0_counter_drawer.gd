@@ -391,3 +391,51 @@ func test_keeper_card_frames_the_figure_by_its_outline() -> void:
 	assert_float(right.x).is_equal_approx(W, 0.5)
 	assert_float((H - right.y) / 3.0).is_between(10.0, 14.0)
 	assert_float((right.y - left.y) / H).is_less(0.84)
+
+## Recipe Cards (§9.11.1 / §9.11.2; 282, P1 exit ⑦): today's cards close the Buy page — the Stall's daily two, the
+## Market's regional ones — on the counter's product row: the dish on the title, the card's icon, its rarity (`Fine`,
+## `Regional · Rare` at the Market) and `New Cookbook page`, its price, one Buy and no stepper (不知火舞 on 282). Bought (the page in the Cookbook) it
+## stays on the shelf greyed `In Cookbook`; short of coins `Need 30 more coins`. Buy sends the counter's buy.
+func _with_cards() -> Dictionary:
+	var v := _view()
+	v.shops.homestead["cards"] = [
+		{"id": "recipe_card_dish_fish_soup", "page": "dish_fish_soup", "name": "Fresh Fish Soup", "rarity": 2, "price": 80, "need": 80, "owned": false},
+		{"id": "recipe_card_dish_grilled_fish", "page": "dish_grilled_fish", "name": "Grilled Fish", "rarity": 1, "price": 30, "need": 30, "owned": true}]
+	v.shops.market["cards"] = [
+		{"id": "recipe_card_dish_crispy_smelt", "page": "dish_crispy_smelt", "name": "Crispy Smelt", "rarity": 3, "price": 200, "need": 200, "owned": false}]
+	return v
+
+func _row_texts(row: UiShopRow) -> Array:
+	return [row._title.text, row._effect.text, row._gate.text, row._price.text, row.buy.label if row.buy.reason == "" else row.buy.reason,
+		row.stepper == null]
+
+func test_todays_recipe_cards_close_the_buy_page() -> void:
+	var d := _drawer("homestead", {}, "buy", _with_cards())
+	await _settle()
+	var ids := _row_ids(d)
+	assert_array(ids.slice(ids.size() - 2)).is_equal(["recipe_card_dish_fish_soup", "recipe_card_dish_grilled_fish"])
+	var soup: UiShopRow = d._rows["recipe_card_dish_fish_soup"]
+	assert_array(_row_texts(soup)).is_equal(["Fresh Fish Soup", "Fine", "New Cookbook page", "80 coins", "Buy", true])
+	assert_object(soup._icon.texture).is_same(P0Logic.icon("recipe_card"))
+	assert_str(str(_row_texts(d._rows["recipe_card_dish_grilled_fish"])[4])).is_equal("In Cookbook")
+	var got := []
+	d.action_requested.connect(func(a, id, p): got.append([a, id, p]))
+	soup.buy.activated.emit()
+	assert_array(got).is_equal([[&"buy", "recipe_card_dish_fish_soup", {qty = 1}]])
+	# not on the Decor page
+	d.set_section("decor")
+	await _settle()
+	assert_bool(_row_ids(d).any(func(id): return str(id).begins_with("recipe_card_"))).is_false()
+
+func test_a_market_sells_its_regional_cards_and_short_coins_grey_the_key() -> void:
+	var v := _with_cards()
+	v.coins = 170
+	var d := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"}, "buy", v)
+	await _settle()
+	assert_bool(_row_ids(d).has("recipe_card_dish_crispy_smelt")).is_true()
+	assert_array(_row_texts(d._rows["recipe_card_dish_crispy_smelt"])).is_equal(
+		["Crispy Smelt", "Regional · Rare", "New Cookbook page", "200 coins", "Need 30 more coins", true])
+	# City Specialty shows no card
+	var s := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"}, "specialty", v)
+	await _settle()
+	assert_bool(_row_ids(s).has("recipe_card_dish_crispy_smelt")).is_false()

@@ -23,6 +23,7 @@ import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
 import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, settleHere, travel } from './travel.js';
+import { chooseHome } from './home_city.js';
 import { noteProgress, takenCounts } from './request_progress.js';
 
 export type { P0Event } from './progress.js';
@@ -75,7 +76,8 @@ type P0CommandBody =
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
   | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
-  | { type: 'return_home' };
+  | { type: 'return_home' }
+  | { type: 'choose_home' | 'change_home'; city: string; spot: number };   // SGODOT-303 (home_city.ts): pick a home, change it once
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -213,8 +215,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (ids.length > 1) {
         const at = c.farming?.conveniences?.harvest_all;
         if (at === undefined || skillLevel(c, s, 'farming') < at) return fail('harvest_all_locked', { level: at ?? null });
-        const rows = new Set(ids.map(id => c.garden.plots[Number(id)]?.[1] ?? -1));
-        if (new Set(ids).size !== ids.length || rows.size !== 1 || rows.has(-1)) return fail('bad_plot', { row: true });
+        // a row by its plots' garden row; Homestead Lv7's front beds are row −1 (q(172)), so "no such plot" is null, not −1
+        const rows = new Set<number | null>(ids.map(id => c.garden.plots[Number(id)]?.[1] ?? null));
+        if (new Set(ids).size !== ids.length || rows.size !== 1 || rows.has(null)) return fail('bad_plot', { row: true });
       }
       const plots = ids.map(plotOf);
       if (plots.some(p => !p)) return fail('bad_plot');
@@ -405,6 +408,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       returnHome(s);
       break;
     }
+    case 'choose_home': case 'change_home': {
+      const refusal = chooseHome(c, s, cmd, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'read_inbox': {
       if (!Array.isArray(cmd.keys) || cmd.keys.length > 100 || cmd.keys.some(k => typeof k !== 'string')) return fail('bad_parcel');
       for (const u of s.inbox.updates) if (cmd.keys.includes(u.key)) u.read = true;
@@ -435,7 +443,7 @@ export function sellPrice(c: P0Content, id: string): number | null {
 }
 
 function rollDay(c: P0Content, s: P0State, now: number): void {
-  const key = dayKey(c, now);
+  const key = dayKey(c, s, now);
   if (s.day.key !== key) s.day = emptyDay(key);
   expireGiftMeals(s);
 }

@@ -1456,7 +1456,7 @@ static func _reward_moments() -> Control:
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", icon = _tex("dish_mystery"),
 		item_name = "Ingredients back", rarity_word = "9 refunds left today", primary = "OK"}), "Neutral · No dish, blessing refund"))
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.MILESTONE, event = "Home Cook", icon = _tex("cookbook"),
-		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
+		item_name = "Cookbook 8/48", strip = "New title · +50 Energy"}), "Milestone · no buttons"))
 	return row
 
 ## q(87): one parcel, several in one reply (the first one named, `+N more`), and a full Inbox (waiting for a place).

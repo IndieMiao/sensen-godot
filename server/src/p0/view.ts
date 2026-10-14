@@ -1,15 +1,15 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
 import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId, recipeById } from './content.js';
 import { count, freeSlots } from './bag.js';
-import { barterItems, barterRoom } from './barter.js';
+import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { burners, cookAllPlan, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
+import { catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
-import { expireGiftMeals, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
+import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
@@ -20,22 +20,24 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
 import { climateAt, clusterById, clusterOf, homeClimate } from './travel.js';
-import { cityPlaces } from './world.js';
+import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
+import { homeView } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
-import { homeCluster } from './travel.js';
+import { homeOf } from './travel.js';
+import { homeFacts } from './home.js';
 import { decorView } from './decor.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
-  if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
+  if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
   settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
@@ -58,8 +60,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     map_markers: mapMarkers(c, s, now),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
+    home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
-    travel: { ...s.travel, today: dayKey(c, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
+    travel: { ...s.travel, today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
+      // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
+      admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)) },
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({
@@ -78,10 +83,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       capacity: s.bag_cap, free: freeSlots(s),
       // Every slot says locked / gifted (the item-info rules gate Lock and Gift on these fields, SGODOT-224).
       slots: s.bag.map(b => ({ id: b.id, qty: b.qty, locked: s.locked.includes(b.id), gifted: !!b.gift,
-        ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, now) } : {}) })),
+        ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, s, now) } : {}) })),
     },
     drinks: drinksView(c, s, now),
-    shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop)])),
+    shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop, now)])),
     quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })),
       auto: s.storage_auto },   // last auto-store on coming home (q(40)): the client floats it once per new `at`
@@ -89,13 +94,14 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     gather: gatherView(c, s, now),
     workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
-    profile: { name: c.profile.name, city: c.profile.city, climate: c.profile.climate, since_ms: s.created_at,
+    profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
+    gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
     // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
-    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount,
+    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, s, now), amount: c.energy.rest_amount,
       away_h: c.energy.rest_away_h, away_ready_in: restReadyIn(c, s, now) },
     stall: {
       keeper: c.stall.keeper,
@@ -186,7 +192,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
           reach: rodById(c, id)?.reach ?? null };
       }),
     },
-    meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, now), eaten: s.day.eaten },
+    meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, s, now), eaten: s.day.eaten },
     items: Object.fromEntries(bagIds(c, s).map(id => [id, itemInfo(c, s, id)])),
     rarity_names: c.rarity_names,
     prices: Object.fromEntries(c.crops.map(crop => [crop.id, crop.price])),
@@ -295,7 +301,7 @@ function homesteadView(c: P0Content, s: P0State) {
 function drinksView(c: P0Content, s: P0State, now: number) {
   const max = maxEnergy(c, s), price = drinkPrice(c, s);
   return {
-    used: s.day.drinks, limit: c.drinks.daily, left: c.drinks.daily - s.day.drinks, resets_in: untilRollover(c, now),
+    used: s.day.drinks, limit: c.drinks.daily, left: c.drinks.daily - s.day.drinks, resets_in: untilRollover(c, s, now),
     price, need: price === null ? null : coinsNeeded(c, price), energy: c.drinks.energy,
     gain: Math.max(0, Math.min(c.drinks.energy, max - s.energy.value)), full: s.energy.value >= max,
     items: Object.entries(c.drinks.items).map(([id, d]) => ({ id, name: d.name, shop: d.shop })),
@@ -305,14 +311,14 @@ function drinksView(c: P0Content, s: P0State, now: number) {
 function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
   // a per-city quota shows the city the player is in (§11.7.3: one count per account × city cluster), and its scope
   // names it (NPC-3 482:120: `all San Francisco markets`)
-  const city = s.travel?.here ?? homeCluster(c);
+  const city = s.travel?.here ?? homeOf(c, s);
   const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
     : s.day.quota[quotaKey(c, q, city)] ?? 0;
-  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, now), scope: quotaScope(c, q, city) };
+  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
-function shopView(c: P0Content, s: P0State, shop: ShopId) {
+function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
   return {
     buy: catalog(c, shop, s).map(id => {
       const o = offerOf(c, id)!;
@@ -332,15 +338,21 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
     // regional: only this climate's regional items (`items` lists them), as the Market Square takes them (§9.13.1)
     sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota,
       ...(r.regional ? { regional: true, items: regionalItems(c, kind, climateAt(c, s)) } : {}) })),
-    // Barter at the Market Square keeper (§8.4.5): give n regional items for 1 mineral; room = how many more of each
-    // the next level lets come by barter.
-    barter: shop === 'market' && c.homestead.barter ? {
+    // Barter at the Market Square keeper (§8.4.5): give n regional items of this city's climate for 1 mineral; have
+    // counts no Gifted stack; spare = what the pick may take (0 when locked, less what a tracked request needs, as Sell
+    // All keeps back; q(166) review); room = how many more of each the next level lets come by barter, of `share` in all;
+    // resets_in = when today's barters come back (`Limit reached · 9h 12m`). None at the top level (nothing to climb to).
+    barter: shop === 'market' && c.homestead.barter && nextLevel(c, s) ? {
       give: c.homestead.barter.give, daily: c.homestead.barter.daily, left: Math.max(0, c.homestead.barter.daily - (s.day.barters ?? 0)),
-      items: barterItems(c).map(id => ({ id, name: itemName(c, id), have: count(s.bag, id) })),
-      minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id) })),
+      resets_in: untilRollover(c, s, now),
+      items: barterItems(c, climateAt(c, s)).map(id => {
+        const have = count(s.bag, id, 'skip');
+        return { id, name: itemName(c, id), have, spare: s.locked.includes(id) ? 0 : Math.max(0, have - protectedQty(s, id)) };
+      }),
+      minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id), share: barterShare(c, s, id) })),
     } : null,
-    // Recipe cards on this counter today (§7.16.1): the Stall's daily two, Market's climate cards. Bought = in the Cookbook.
-    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, c.profile.climate) : []).map(id => {
+    // Recipe cards on this counter today (§7.16.1): the Stall's daily two (home), a Market's city's climate cards (q(182)).
+    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, climateAt(c, s)) : []).map(id => {
       const page = cardPage(id), price = cardPrice(c, id) ?? 0, recipe = recipeById(c, page);
       return { id, page, name: recipe?.name ?? page, rarity: recipe ? recipeRarity(c, recipe) : 1, price, need: coinsNeeded(c, price),
         owned: s.cookbook.includes(page) };
@@ -349,9 +361,9 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
 }
 
 /** Ids a request could take, cheapest floor first: the fixed items, or every crop / fish / dish that fits its kind and rarity. */
-function candidates(c: P0Content, r: BoardRequest): string[] {
+function candidates(c: P0Content, s: P0State, r: BoardRequest): string[] {
   if (r.items.length || r.kind === 'visit') return r.items;
-  if (r.where === 'not_home') return [...farFish(c)].sort((a, b) => floorPrice(c, a) - floorPrice(c, b));   // Far Pond: q(128) estimates at the cheapest
+  if (r.where === 'not_home') return [...farFish(c, s)].sort((a, b) => floorPrice(c, a) - floorPrice(c, b));   // Far Pond: q(128) estimates at the cheapest
   const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
   return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
@@ -375,7 +387,7 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   const each = r.kind === 'visit' ? (r.visit?.done ? 1 : 0)
     : r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind as 'crop' }, [i])))
     : haveForRequest(c, s, r);
-  const cheapest = candidates(c, r)[0];
+  const cheapest = candidates(c, s, r)[0];
   const estimate = parts ? payout(c, r, parts)
     : { base: r.items.length > 1 ? r.items.reduce((n, i) => n + floorPrice(c, i) * r.qty, 0) : (cheapest ? floorPrice(c, cheapest) : 0) * r.qty, bonus: r.bonus };
   return {
@@ -448,6 +460,7 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     next_in: st.state === 'wait' ? requestOpensIn(c, s, id, now) : null,
     // §7.5.3 Recipe lesson: ready = `learn` teaches `recipe` now; wait = next_in ms; stage = from need_stage; none
     lesson: { state: lesson.state, recipe: lesson.recipe ?? null, next_in: lesson.next_in ?? null, need_stage: lesson.need_stage ?? null },
+    gift_points: giftPointsView(c, s, id),   // Fishing Lv7 Gift Clues: bag dish → what giving it adds (the drawer's ♥ +3)
     // q(171): their postcard in the Passport once Kindred gave it — `Postcard from Pip`, its text, when; null before
     kindred: r.kindred_at !== undefined ? { ...kindredGifts(c, id), at: r.kindred_at } : null,
   };
@@ -463,7 +476,7 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
   const fishing = skillLevel(c, s, 'fishing');
   const reed = c.fishing.rods.find(r => r.id === 'rod_reed');
   const nextFish = Object.fromEntries(Object.entries(c.fishing.sites).map(([site, def]) => {
-    const above = everFish(c, def, homeCluster(c)).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
+    const above = everFish(c, def, homeOf(c, s)).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
     return [site, above ? { id: above.id, level: above.level } : null];
   }));
   const tea = { cups_left: left, full, greet: left <= 0 ? 'cups_out' : full ? 'full' : 'cups_left', online };

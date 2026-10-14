@@ -1,5 +1,5 @@
 {
-  "_note": "Huangpu Travel Post on the Post Office kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/post_office/layout.json, floor top y 0.08. Sigrid works the postal counter from the staff side (seen over it from the room camera); tapping the counter is tapping her. Pip waits by the red post box. Spawn and exit at the blue door in the left wall; its prompt (badge_exit) sits over the door frame, clear of the player who comes in. The stamp desk (decor) is the packing table; the kit has no fee board or coffee pot, so those decor anchors are left out.",
+  "_note": "Huangpu Travel Post on the Post Office kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/post_office/layout.json, floor top y 0.08. Sigrid works the postal counter from the staff side (seen over it from the room camera); tapping the counter is tapping her. Pip waits by the red post box. Spawn and exit at the blue door in the left wall; its prompt (badge_exit) sits over the door frame, clear of the player who comes in. The Stamp Desk is the packing table (q(165): it opens the Passport). The kit has no fee board: the Fare Board (q(165), Trip fares) hangs on the world map on the back wall, its point in the half of the map the room camera shows, until its own board is made (不知火舞 on 302); no coffee pot.",
   "anchors": [
     {"name": "use_counter", "position": [-0.4, 1.39, -0.55], "module": "postal_counter"},
     {"name": "stand_counter", "position": [-0.4, 0.08, 0.35], "yaw_degrees": 0},
@@ -9,6 +9,7 @@
     {"name": "npc_pip", "position": [2.3, 0.08, 0.8], "yaw_degrees": 90},
     {"name": "stand_pip", "position": [1.65, 0.08, 0.6], "yaw_degrees": -90},
     {"name": "use_stamp_desk", "position": [0.31, 1.1, 1.64], "module": "packing_table"},
+    {"name": "use_fee_board", "position": [0.75, 2.68, -2.8], "module": "world_map"},
     {"name": "npc_sam", "position": [1.2, 0.08, -1.5], "yaw_degrees": 180},
     {"name": "stand_sam", "position": [1.2, 0.08, -0.8], "yaw_degrees": 0},
     {"name": "spawn", "position": [-2.6, 0.08, 1.29], "yaw_degrees": -90},

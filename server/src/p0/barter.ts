@@ -1,7 +1,9 @@
-/** Specialty barter (plan §8.4.5, SGODOT-282): a player who never mines can still climb the Homestead. At the Market
- * Square keeper, `give` of this climate's regional crops or fish become 1 Stone / Clay / Copper Ore / Quartz, into
- * farm storage. Each mineral at most `level_share` of the next level's need comes by barter (counted until the next
- * upgrade); at most `daily` barters a day. No affinity, no buyback quota, not a local delivery. */
+/** Specialty barter (plan §8.4.5, SGODOT-282 / 284): a player who never mines can still climb the Homestead. At any
+ * Market Square keeper, `give` of that city's climate's regional crops or fish (李白: the market's climate, as its
+ * buyback §9.13.1; from the regional data, not a hand list) become 1 Stone / Clay / Copper Ore / Quartz, into farm
+ * storage; a Gifted stack never goes (a gift is not turned into goods). Each mineral at most `level_share` of the next
+ * level's need comes by barter (counted until the next upgrade); at most `daily` barters a day. No affinity, no
+ * buyback quota, not a local delivery. */
 import type { P0Content } from './content.js';
 import { count, take } from './bag.js';
 import { nextLevel } from './homestead.js';
@@ -9,36 +11,45 @@ import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { putInStorage } from './storage.js';
 import type { Refusal } from './fishing.js';
+import { regionalOf } from './shops.js';
+import { climateAt } from './travel.js';
 
-/** Regional crops and fish this home climate can barter. */
-export function barterItems(c: P0Content): string[] {
-  return c.homestead.barter?.items[c.profile.climate] ?? [];
+/** The regional crops and fish a market of this climate takes in barter (the same test as its buyback, regionalOf). */
+export function barterItems(c: P0Content, zone: string): string[] {
+  return [...c.crops.map(x => x.id), ...c.fish.map(x => x.id)].filter(id => regionalOf(c, id, zone));
+}
+
+/** How many of a mineral barter may give toward the next level in all: `level_share` of its need there. */
+export function barterShare(c: P0Content, s: P0State, mineral: string): number {
+  const b = c.homestead.barter, next = nextLevel(c, s);
+  if (!b || !next) return 0;
+  return Math.floor((next.materials.find(([id]) => id === mineral)?.[1] ?? 0) * b.level_share);
 }
 
 /** How many of a mineral the next level still lets the player get by barter. */
 export function barterRoom(c: P0Content, s: P0State, mineral: string): number {
-  const b = c.homestead.barter, next = nextLevel(c, s);
-  if (!b || !next) return 0;
-  const need = next.materials.find(([id]) => id === mineral)?.[1] ?? 0;
-  return Math.max(0, Math.floor(need * b.level_share) - (s.homestead.bartered?.[mineral] ?? 0));
+  return Math.max(0, barterShare(c, s, mineral) - (s.homestead.bartered?.[mineral] ?? 0));
 }
 
-export function barter(c: P0Content, s: P0State, cmd: { item?: unknown; mineral?: unknown; shop?: unknown }, events: P0Event[]): Refusal | null {
+export function barter(c: P0Content, s: P0State, cmd: { item?: unknown; mineral?: unknown; shop?: unknown; place?: unknown }, events: P0Event[]): Refusal | null {
   const b = c.homestead.barter;
   if (!b) return { code: 'bad_item' };
   if (cmd.shop !== 'market') return { code: 'wrong_shop', detail: { shop: 'market' } };
   const item = String(cmd.item ?? ''), mineral = String(cmd.mineral ?? '');
   if (!b.minerals.includes(mineral)) return { code: 'not_barterable', detail: { mineral } };
-  if (!barterItems(c).includes(item)) return { code: 'not_barterable', detail: { item } };
+  if (!barterItems(c, climateAt(c, s, cmd.place)).includes(item)) return { code: 'not_barterable', detail: { item } };
   const done = s.day.barters ?? 0;
   if (done >= b.daily) return { code: 'barter_limit', detail: { daily: b.daily } };
   if (barterRoom(c, s, mineral) < 1) return { code: 'barter_share', detail: { mineral } };
-  if (count(s.bag, item) < b.give) return { code: 'not_enough', detail: { item, need: b.give, have: count(s.bag, item) } };
-  take(s.bag, item, b.give);
+  const have = count(s.bag, item, 'skip');   // Gifted stacks stay (李白)
+  if (have < b.give) return { code: 'not_enough', detail: { item, need: b.give, have } };
+  take(s.bag, item, b.give, 'skip');
   events.push({ kind: 'item', id: item, delta: -b.give });
   putInStorage(s, mineral, 1);
   events.push({ kind: 'item', id: mineral, delta: 1 });
   s.day.barters = done + 1;
   s.homestead.bartered = { ...(s.homestead.bartered ?? {}), [mineral]: (s.homestead.bartered?.[mineral] ?? 0) + 1 };
+  // the reply says it was a barter: the client's toast `+1 Stone · −2 Pumpkin` instead of the floats (q(166) ⑤)
+  events.push({ kind: 'barter', item, give: b.give, mineral, left: b.daily - s.day.barters });
   return null;
 }

@@ -2,7 +2,7 @@
 import { fishById, rodById, type Fish, type FishSite, type P0Content } from './content.js';
 import { pondAt, poolAt, type Pond } from './fishing_world.js';
 import { add, count, freeSlots, room, take } from './bag.js';
-import { clusterById, clusterOf, homeCluster } from './travel.js';
+import { clusterById, clusterOf, writtenCluster } from './travel.js';
 import { placeOf } from './world.js';
 import { firstXp, energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
@@ -127,7 +127,7 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
  */
 export function firstCatch(c: P0Content, s: P0State, now: number, fish: Fish, place: string | undefined, events: P0Event[], rod: boolean): void {
   const city = place ? clusterOf(c, place) ?? '' : '';
-  const cityName = clusterById(c, city)?.name || (city === homeCluster(c) ? c.profile.city : '');
+  const cityName = clusterById(c, city)?.name || (city === writtenCluster(c) ? c.profile.city : '');
   for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', rod ? c.fishing.first_landed_xp : 0],
     [`fishing_city:${city}`, city ? c.fishing.first_city_xp : 0]] as const) {
     if (xp <= 0) continue;

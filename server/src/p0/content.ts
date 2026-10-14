@@ -40,7 +40,7 @@ export interface FishSite { name: string; template: string; weights: number[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
 export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
-export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string }
+export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string; lat?: number; lng?: number }
 
 /** A Homestead look stage (LOOK-PICK, SGODOT-282): picked at `level`, a (timber) or b (stone). */
 export interface HomesteadLook { id: string; level: number; name: string; a: string; b: string }
@@ -127,6 +127,7 @@ export interface WorkbenchRecipe {
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
 export interface FacilityDef {
   name: string; cover: 'ring8' | 'block' | 'yard'; grow_cut: number;   // yard: on a yard cell, never a plot (Compost Bin)
+  start?: [number, number]; start_span?: number;   // a yard facility's first cell: nearest this (the workbench, its 3 cells: span 1)
   daily?: number;                          // Compost Bin: crops a player day it turns into Compost (q(118) ③, 5)
   size?: [number, number];                 // block: the plots it roofs (greenhouse 4 × 4, q(118) ②)
   cap_by_farming?: [number, number][];     // how many may stand by Farming level (greenhouse: Lv8 1, Lv10 2)
@@ -173,6 +174,7 @@ export interface P0Content {
     sites: Record<string, FishSite>;      // templates: pond (Pond) / river (River) / coast (Coast, P1)
     places: Record<string, FishPlace>;
     baits: Record<string, { shift: number[]; wait: number; regional_mult?: number }>;   // regional_mult: Spinner Lure 2 (§6.4.2)
+    creel?: { level: number; stack: number };   // P1 (content/fishing_p1.json): from this Fishing level a fish slot holds `stack` (§4.6.2 Lv10: 10 → 15)
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number;
     regrow_mult?: number; shop?: 'market' }>;   // P1: Orchard Feed halves a tree's regrowth; shop: sold at the Market
@@ -199,7 +201,7 @@ export interface P0Content {
     sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
     // Barter (§8.4.5, SGODOT-282): at the Market Square keeper, `give` of this climate's regional crops or fish for 1
     // mineral; a mineral at most `level_share` of the next level's need by barter; at most `daily` a day.
-    barter?: { give: number; minerals: string[]; level_share: number; daily: number; items: Record<string, string[]> };   // items: climate → ids
+    barter?: { give: number; minerals: string[]; level_share: number; daily: number };   // items: the market's climate's regional crops and fish (barter.ts)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
@@ -284,7 +286,7 @@ export interface P0Content {
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
   /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; how many of them the homestead has
    * is homestead.plots (the ids past P0's 30 come as wild). */
-  garden: { plots: [number, number][] };
+  garden: { plots: [number, number][]; origin?: [number, number]; pitch?: number };   // origin / pitch: a plot's yard cell (q(172))
   /** P1 (content/farm_garden.json): the Farming level each convenience comes at (§4.6.1: seed_saver 10) and Seed
    * Saver's chance per harvest. Absent = not in this build. */
   farming?: { conveniences?: Partial<Record<string, number>>; seed_saver_chance?: number };
@@ -306,8 +308,9 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
-    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[]; cluster?: string }[])
-      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}) }));
+    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[]; cluster?: string; lat?: number; lng?: number }[])
+      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}),
+        ...(typeof o.lat === 'number' && typeof o.lng === 'number' ? { lat: o.lat, lng: o.lng } : {}) }));   // lat/lng: SGODOT-303's 300 m
   }
   // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
   const clusters = path.join(dir, 'city_clusters.json');
