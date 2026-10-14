@@ -4,7 +4,6 @@
 
 ## 当前 UI 与 P0 美术
 
-- [刘备 · 居民 NPC 部件 SGODOT-284 / q(171)](resident-parts-284-2026-10-14/README.md)：Granny Wu 银白发髻/红簪、Ivo 矿工帽/灰短胡；追加三件 NPC-only 部件，含正面/侧面、全身卡、32×40 邮票及验证。
 - [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
 - [Mobile 3D asset workflow](mobile-3d-asset-workflow.md): English production guide for agents, based on the accepted Basic Room; reference analysis, reusable modeling, atlases, mobile budgets, Godot/Android checks and verified delivery.
 - [Basic Room (2026-10-06)](basic-room-2026-10-06/README.md): user-accepted Blender assets, reusable Godot room, offline movement benchmark and Android checks; includes committed review images and an evidence summary. Not a production release.

@@ -1,7 +1,7 @@
 # SGODOT-284 / q(171) · Granny Wu, Ivo and Tomo NPC parts
 
 刘备 · 2026-10-14. Specification and 不知火舞's final decisions:
-[spec-v1.1.md](../../../tools/art/source/resident_parts_284/spec-v1.1.md).
+[spec-v1.1.md in the wp-3d-scene art branch](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/tools/art/source/resident_parts_284/spec-v1.1.md).
 The design reference supplies color/shape direction; existing part scale and
 FBX frames remain authoritative. Review base: `farm-dev`, `a8e0b548`.
 
@@ -51,53 +51,55 @@ original filename, all FBX bytes, nodes, hierarchy, transforms, axes and units
 are retained. Source resolution remains 1024² and runtime remains 512² with
 the original mipmap/VRAM compression settings. Shader floats match hairhat0.
 
-## Rebuild and append
+## Runtime import and append (farm-dev)
 
-Run from the repository root. Texture generation requires Python with Pillow
-and NumPy; geometry generation uses Blender 5.2.2 LTS's bundled FBX parser/writer.
+This branch keeps the four source FBX/PNG directories, import settings, extracted
+parts/socket scenes/thumbnails, `recipes_284.json`, `parts_manifest.json` and
+`npc_only.json`. The pipeline runs from the repository root without art scripts:
 
 ```sh
-python3 tools/art/recolor_resident_parts_284.py
-python3 tools/art/recolor_tomo_284.py
-blender --background --factory-startup --python "$PWD/tools/art/build_resident_parts_284.py"
 godot --headless --path . --editor --import
 godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- res://assets/avatar/source/recipes_284.json --append
 ```
 
-The first delivery appended three entries (38 → 41). The Tomo increment output
-is `追加完成: 1 部件, 0 错误` (41 → 42), skipping the first three IDs. On the
-original base, the complete recipe now appends four entries (38 → 42). In this
-delivered tree all four IDs exist, so `--append` correctly skips them. To
-regenerate a changed new part, first remove only that new entry; keep all other
-entries intact, then append again. Never run extraction without `--append`.
-`npc_only.json` appends the same four IDs, excluding them from player outfits.
-The existing runtime NPC table is unchanged; 苏烈 registers the looks after merge.
+The recipe appends four entries on the original base (38 → 42). Already present
+IDs are skipped. To regenerate one changed part, remove only that part's manifest
+entry, retain every other entry, then run `--append` as documented in
+[README_229.md](README_229.md). Never extract without `--append`.
+`npc_only.json` excludes all four IDs from player outfits. Runtime NPC looks and
+production portraits are integrated separately by 上官婉儿 / 苏烈.
 
-## Review and checks
+## Art sources and review (在 wp-3d-scene)
+
+按 10-08 美术整合规则，审阅图、验证 JSON、生成/审核脚本和 Blender 源文件在
+**wp-3d-scene**，不随运行时 PR #407 进入 farm-dev。对应提交分支为
+[`wp-3d-scene-liubei-parts-284`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene-liubei-parts-284)，
+审阅材料从已检查的 `1e8da88e` 原样迁移。
+
+- [Review images, validation and delivery receipts](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/docs/design/resident-parts-284-2026-10-14/README.md).
+- [Tomo's final warm brown images and validation](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/docs/design/resident-parts-284-2026-10-14/tomo/README.md).
+- [Named Blender sources and specification](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene-liubei-parts-284/tools/art/source/resident_parts_284).
+- Art scripts in that branch: `tools/art/build_resident_parts_284.py`,
+  `prepare_resident_parts_review.py`, `recolor_resident_parts_284.py`,
+  `recolor_tomo_284.py`, and `verify_resident_parts_284.gd`.
+
+For regeneration, use an isolated art checkout containing the runtime/source
+assets from #407 and the companion art files above. The Python texture scripts
+require Pillow/NumPy; geometry generation uses Blender 5.2.2 LTS. Follow the
+review instructions in the art branch, including the unchanged, uncommitted
+portrait baker and a separate QA user-data directory. Those commands are for
+the art checkout, not a bare farm-dev checkout.
+
+## Runtime checks
+
+With an active display and isolated QA user data, run on the runtime branch:
 
 ```sh
-python3 tools/art/prepare_resident_parts_review.py --bake-script "$HOME/incoming/resident-parts/bake_resident_portraits.gd"
-godot --headless --path . --editor --import
-godot --headless --path . --script res://tools/art/verify_resident_parts_284.gd
 GODOT_BIN="$(command -v godot)" ./addons/gdUnit4/runtest.sh -a res://tests/catalog -a res://tests/pipeline -a res://tests/assembly/test_socket_placement.gd
-godot --path . --script res://output/resident-parts-284/npc_lineup_284.gd -- --out=output/resident-parts-284/npc-lineup.png
-godot --path . --script res://tools/art/bake_resident_portraits.gd -- --looks=output/resident-parts-284/looks-new.json --ids=res_granny_wu,res_ivo --out=output/resident-parts-284/portraits
 ```
 
-Use an active display for tests and captures. Preparation creates an uncommitted
-`override.cfg` with isolated `SensenResident284QA` data and a localhost:9 network
-endpoint, plus a local copy of the supplied baker. **Do not commit the baker, its
-UID or override.cfg**; it is owned by the separate portrait integration. The
-lineup fixture reuses `npc_lineup.gd` with two temporary resident looks, a frozen
-idle frame and adjusted camera distance/target to show complete feet. It does
-not edit `outpost_npcs.json` or the production lineup tool.
+The socket test includes all NPC hairHat entries, including Tomo. The art-only
+import verifier and saved evidence live in wp-3d-scene; the final runtime-head
+test result is recorded in PR #407's description.
 
-[Review images, test results and delivery receipt](../../../docs/design/resident-parts-284-2026-10-14/README.md).
 Cross-review: 后裔. Technical: 上官婉儿. Visual: 不知火舞. Merge after user approval.
-
-For Tomo's review, run preparation with `--tomo` and use
-`output/resident-parts-284-tomo` instead of `output/resident-parts-284` in the
-lineup and portrait commands; set the baker's `--ids=res_tomo`. The baker remains
-unchanged and uncommitted. Run the same required tests and import verifier;
-the socket test iterates all NPC hairHat parts, including Tomo. See the
-[Tomo incremental validation and images](../../../docs/design/resident-parts-284-2026-10-14/tomo/README.md).
