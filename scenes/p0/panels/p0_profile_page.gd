@@ -5,11 +5,12 @@ extends Control
 ## Guestbook / Second Home, the Crops and Cities collections). Full screen on the cream surface:
 ##   top bar     back + Profile + gear (Settings: Legal › Licenses and Version, q(129); 197 8d0d8212)
 ##   look        the saved outfit (BagCharacterPreview; a sideways drag turns it) + `Edit look ›` (the dressing room)
-##   identity    name, `City · Climate · Since Oct 2` (view.profile, SGODOT-228; a missing field hides its line)
+##   identity    name and, beside it, the title worn with its › (q(180) ④, LOCK-22 addition: _NameRow; opens Titles),
+##               `City · Climate · Since Oct 2` (view.profile, SGODOT-228; a missing field hides its line)
 ##   skills      three UiSkillCards; tapping one opens the skill details
 ##   farm        UiFarmCard: farm name, Level N, the farm's status line, › to HOME-1
 ##   Collections Fish-dex and Cookbook pages as M count NEED-TILEs
-## Emits back_pressed, edit_look_pressed, skill_pressed(skill), settings_pressed.
+## Emits back_pressed, edit_look_pressed, skill_pressed(skill), settings_pressed, title_pressed.
 
 signal back_pressed
 signal edit_look_pressed
@@ -19,7 +20,10 @@ signal settings_pressed
 signal collection_pressed(key: String)
 ## The farm card was tapped: HOME-1 (§10.6.2, int11).
 signal farm_pressed
+## The title beside the name was tapped: the Titles drawer (q(180) ⑤).
+signal title_pressed
 
+const P0Titles := preload("res://modules/p0/p0_titles.gd")
 const SKILLS := ["farming", "fishing", "cooking"]
 const _SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 const _MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -43,11 +47,15 @@ var _refreshed_ms := 0
 var _shown := {}   # the profile_data last drawn: rebuild only when it changes
 ## Back from the dressing room with Done (KEEP-P0-2): `Look saved` under the home line.
 var look_saved := false
+## A title just picked in Titles, {id, seq}, shown until the server's answer lands (P0Titles.worn); {} for none.
+var title_pending := {}
+var name_row: _NameRow
 
-func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false) -> void:
+func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false, title_pending_ := {}) -> void:
 	view = view_
 	safe_top = safe_top_
 	look_saved = look_saved_
+	title_pending = title_pending_
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var bg := ColorRect.new()
@@ -85,7 +93,7 @@ func update(view_: Dictionary) -> void:
 	view = view_
 	if Time.get_ticks_msec() - _refreshed_ms < 1000: return
 	_refreshed_ms = Time.get_ticks_msec()
-	if profile_data(view_) != _shown: refresh(view_)
+	if profile_data(view_, title_pending) != _shown: refresh(view_)
 
 ## Rebuild the facts below the outfit from a new view (the outfit and top bar stay).
 func refresh(view_: Dictionary) -> void:
@@ -95,14 +103,16 @@ func refresh(view_: Dictionary) -> void:
 		var c := _body.get_child(3)
 		_body.remove_child(c)
 		c.queue_free()
-	var d := profile_data(view)
+	var d := profile_data(view, title_pending)
 	_shown = d
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", int(_CONTENT_GAP))
 	_body.add_child(col)
 	var id := VBoxContainer.new()
 	id.add_theme_constant_override(&"separation", int(_CONTENT_GAP))
-	id.add_child(UiKit.label(str(d.name), UiTokens.STYLE_C14_XB))
+	name_row = _NameRow.new(str(d.name), str(d.title))
+	name_row.pressed.connect(func(): title_pressed.emit())
+	id.add_child(name_row)
 	if str(d.home_line) != "": id.add_child(UiKit.label(str(d.home_line), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	if look_saved: id.add_child(UiKit.label("Look saved", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY))   # KEEP-P0-2
 	col.add_child(id)
@@ -134,8 +144,8 @@ func refresh(view_: Dictionary) -> void:
 const _CORNER_BADGE := 22.0
 const _CORNER_AT := Vector2(36, -2)
 
-## Everything the page shows, from the server view (pure; tested).
-static func profile_data(view: Dictionary) -> Dictionary:
+## Everything the page shows, from the server view (pure; tested). pending: a title just picked (P0Titles.worn).
+static func profile_data(view: Dictionary, pending := {}) -> Dictionary:
 	var p: Dictionary = view.get("profile", {})
 	var home := []
 	for k in ["city", "climate"]:
@@ -152,6 +162,7 @@ static func profile_data(view: Dictionary) -> Dictionary:
 	var book := P0KitchenLogic.cookbook_progress(view)   # discovered pages / the pages shown (q(100))
 	return {
 		name = name if name != "" else "You",
+		title = P0Titles.worn_name(view, pending),   # "" with none: no title, no › (q(180) ④)
 		home_line = " · ".join(home),
 		skills = skills,
 		farm = {name = str(farm.get("name", "Your Homestead")),
@@ -199,6 +210,74 @@ static func _farm_status(view: Dictionary) -> String:
 	if ready != "": return "%s ready to harvest" % P0Logic.plural(P0Logic.item_name(view, ready))
 	if crop != "": return "%s ready in %s" % [P0Logic.plural(P0Logic.item_name(view, crop)), P0Logic.span(best)]
 	return ""
+
+## The name and, beside it, the title worn and its › (q(180) ④; PROFILE-1-TITLE 2595:133638, -LONG 2639:134878,
+## -CUT 2639:135042): the name C14XB; 8 on, the title C10B secondary; 4 on, the › C13XB secondary; each centred on
+## the name's line. The title and the › tap as one, 44 high — above and below the line, which keeps the name's height,
+## so nothing under it moves. On a line too short the title gives way first (P0Titles.fit). No title: the name alone.
+class _NameRow extends Control:
+	signal pressed
+	const GAP := 8.0
+	const CHEVRON_GAP := 4.0
+	const CHEVRON := "›"
+	var name_label: Label
+	var title_label: Label
+	var chevron: Label
+	var hit: Button
+	var _name := ""
+	var _title := ""
+
+	func _init(name_: String, title_: String) -> void:
+		_name = name_
+		_title = title_
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_label = UiKit.label(name_, UiTokens.STYLE_C14_XB)
+		name_label.name = "Name"
+		add_child(name_label)
+		title_label = UiKit.label(title_, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
+		title_label.name = "Title"
+		chevron = UiKit.label(CHEVRON, UiTokens.STYLE_C13_XB, UiTokens.COLOR_SECONDARY)
+		chevron.name = "Chevron"
+		hit = Button.new()
+		hit.name = "TitleHit"
+		hit.flat = true
+		hit.focus_mode = Control.FOCUS_NONE
+		for st in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
+			hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+		hit.pressed.connect(func(): pressed.emit())
+		for c in [title_label, chevron, hit]:
+			c.visible = title_ != ""
+			add_child(c)
+		title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _get_minimum_size() -> Vector2:
+		return Vector2(0, name_label.get_minimum_size().y if name_label != null else 0.0)
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED or what == NOTIFICATION_THEME_CHANGED or what == NOTIFICATION_ENTER_TREE: _layout()
+
+	static func _measure(l: Label) -> Callable:
+		var font := l.get_theme_font(&"font")
+		var fs := l.get_theme_font_size(&"font_size")
+		return func(t: String) -> float: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+
+	func _layout() -> void:
+		if not is_inside_tree() or size.x <= 0.0: return
+		var chevron_w: float = _measure(chevron).call(CHEVRON)
+		var f := P0Titles.fit(_name, _title, size.x, GAP, CHEVRON_GAP + chevron_w, _measure(name_label), _measure(title_label))
+		name_label.text = str(f.name)
+		title_label.text = str(f.title)
+		var h := size.y
+		for l in [name_label, title_label, chevron]: (l as Label).size = (l as Label).get_minimum_size()
+		name_label.position = Vector2(0, (h - name_label.size.y) * 0.5)
+		title_label.position = Vector2(name_label.size.x + GAP, (h - title_label.size.y) * 0.5)
+		chevron.position = Vector2(title_label.position.x + title_label.size.x + CHEVRON_GAP, (h - chevron.size.y) * 0.5)
+		var right := chevron.position.x + chevron.size.x
+		var w := maxf(UiTokens.SIZE_TOUCH, right - title_label.position.x)
+		hit.position = Vector2(title_label.position.x, (h - UiTokens.SIZE_TOUCH) * 0.5)
+		hit.size = Vector2(w, UiTokens.SIZE_TOUCH)
 
 func _look() -> Control:
 	var area := Control.new()

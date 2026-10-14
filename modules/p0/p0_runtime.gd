@@ -1491,6 +1491,13 @@ func _dev_shot(dt: float) -> void:
 				for n in ui.find_children("*", "", true, false):
 					if n.has_method("unfold"): n.unfold(step[1] if step.size() > 1 else "fishing", true)
 			"profile": ui.open_profile()
+			# q(180) shots: titles opens Titles from the profile's title; titlepick:<id> taps that row (ids keep their `:`)
+			"titles":
+				ui.open_profile()
+				ui._profile.title_pressed.emit()
+			"titlepick":
+				var row := ui.root.find_child(("Title_" + ":".join(step.slice(1)).replace(":", "_")).validate_node_name(), true, false)
+				if row is Button: (row as Button).pressed.emit()
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
