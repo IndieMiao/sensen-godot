@@ -1,0 +1,284 @@
+{
+ "hairhat0_noglass": {
+  "slots": {
+   "hairHat": "hairhat0",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "hairhat0_glass0": {
+  "slots": {
+   "hairHat": "hairhat0",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass0"
+  }
+ },
+ "hairhat0_glass1": {
+  "slots": {
+   "hairHat": "hairhat0",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass1"
+  }
+ },
+ "hairhat0_glass3": {
+  "slots": {
+   "hairHat": "hairhat0",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass3"
+  }
+ },
+ "hairhat0_glass5": {
+  "slots": {
+   "hairHat": "hairhat0",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass5"
+  }
+ },
+ "hairhat0_glass8": {
+  "slots": {
+   "hairHat": "hairhat0",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass8"
+  }
+ },
+ "hairhat20_noglass": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "hairhat20_glass0": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass0"
+  }
+ },
+ "hairhat20_glass1": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass1"
+  }
+ },
+ "hairhat20_glass3": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass3"
+  }
+ },
+ "hairhat20_glass5": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass5"
+  }
+ },
+ "hairhat20_glass8": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass8"
+  }
+ },
+ "hairhat41_noglass": {
+  "slots": {
+   "hairHat": "hairhat41",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "hairhat41_glass0": {
+  "slots": {
+   "hairHat": "hairhat41",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass0"
+  }
+ },
+ "hairhat41_glass1": {
+  "slots": {
+   "hairHat": "hairhat41",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass1"
+  }
+ },
+ "hairhat41_glass3": {
+  "slots": {
+   "hairHat": "hairhat41",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass3"
+  }
+ },
+ "hairhat41_glass5": {
+  "slots": {
+   "hairHat": "hairhat41",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass5"
+  }
+ },
+ "hairhat41_glass8": {
+  "slots": {
+   "hairHat": "hairhat41",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass8"
+  }
+ },
+ "hairhat43_noglass": {
+  "slots": {
+   "hairHat": "hairhat43",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "hairhat43_glass0": {
+  "slots": {
+   "hairHat": "hairhat43",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass0"
+  }
+ },
+ "hairhat43_glass1": {
+  "slots": {
+   "hairHat": "hairhat43",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass1"
+  }
+ },
+ "hairhat43_glass3": {
+  "slots": {
+   "hairHat": "hairhat43",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass3"
+  }
+ },
+ "hairhat43_glass5": {
+  "slots": {
+   "hairHat": "hairhat43",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass5"
+  }
+ },
+ "hairhat43_glass8": {
+  "slots": {
+   "hairHat": "hairhat43",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass8"
+  }
+ },
+ "hairhat51_noglass": {
+  "slots": {
+   "hairHat": "hairhat51",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "hairhat51_glass0": {
+  "slots": {
+   "hairHat": "hairhat51",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass0"
+  }
+ },
+ "hairhat51_glass1": {
+  "slots": {
+   "hairHat": "hairhat51",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass1"
+  }
+ },
+ "hairhat51_glass3": {
+  "slots": {
+   "hairHat": "hairhat51",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass3"
+  }
+ },
+ "hairhat51_glass5": {
+  "slots": {
+   "hairHat": "hairhat51",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass5"
+  }
+ },
+ "hairhat51_glass8": {
+  "slots": {
+   "hairHat": "hairhat51",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass8"
+  }
+ },
+ "hairhat70_noglass": {
+  "slots": {
+   "hairHat": "hairhat70",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "hairhat70_glass0": {
+  "slots": {
+   "hairHat": "hairhat70",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass0"
+  }
+ },
+ "hairhat70_glass1": {
+  "slots": {
+   "hairHat": "hairhat70",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass1"
+  }
+ },
+ "hairhat70_glass3": {
+  "slots": {
+   "hairHat": "hairhat70",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass3"
+  }
+ },
+ "hairhat70_glass5": {
+  "slots": {
+   "hairHat": "hairhat70",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass5"
+  }
+ },
+ "hairhat70_glass8": {
+  "slots": {
+   "hairHat": "hairhat70",
+   "cloth": "cloth1",
+   "shoes": "shoes1",
+   "glass": "glass8"
+  }
+ }
+}
