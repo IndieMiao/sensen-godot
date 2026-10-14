@@ -112,15 +112,21 @@ func test_the_passport_has_cities_and_postcards_pages() -> void:
 	for gone in ["Cell_res_mira", "Cell_res_ivo"]: assert_object(page.find_child(gone, true, false)).is_null()   # q(193)
 	var heights := cells.map(func(c): return (c as Control).custom_minimum_size.y)
 	assert_bool(heights.all(func(h): return is_equal_approx(h, heights[0]) and h > Stamp.PASSPORT.y)).is_true()
-	# as tall as the longest Kindred line of the page's residents needs at the cells' own width: three lines in P1
-	# (Mira's four-line one joins with her in P2; 不知火舞 on 284)
+	# as tall as the longest Kindred line of the page's residents needs at the cells' own width: three lines at most in P1
+	# (不知火舞 on 284)
 	var line := page.find_child("Cell_res_pip", true, false).find_child("Line", true, false) as Label
 	assert_int(line.get_line_count()).is_less_equal(3)
-	assert_float(heights[0]).is_less_equal(12 + Stamp.PASSPORT.y + 4 + 22 + 4 + 3 * 16 + 12)
+	# the frame's type (不知火舞 on 284): the line Bold Italic 10 (C10B), the name ExtraBold 12 (C12XB); the cells as tall
+	# as the name and the longest line need, Pip's being one of the three-line ones
+	assert_int(line.get_theme_font_size(&"font_size")).is_equal(10)
+	assert_object(line.get_theme_font(&"font")).is_same(UiKit.bold_italic())
+	var who := page.find_child("Cell_res_pip", true, false).find_child("Name", true, false) as Label
+	assert_int(who.get_theme_font_size(&"font_size")).is_equal(12)
+	assert_int(line.get_line_count()).is_equal(3)
+	assert_float(heights[0]).is_equal_approx(12 + Stamp.PASSPORT.y + 4 + who.get_minimum_size().y + 4 + line.get_minimum_size().y + 12, 1.0)
 	var pip := page.find_child("Cell_res_pip", true, false)
 	assert_str((pip.find_child("Name", true, false) as Label).text).is_equal("Pip")
 	assert_str((pip.find_child("Line", true, false) as Label).text).is_equal("“Best friend on the whole route. Don't tell the pigeons.”")
-	assert_object((pip.find_child("Line", true, false) as Label).get_theme_font(&"font")).is_same(UiKit.bold_italic())   # C11 B italic
 	assert_str((page.find_child("Cell_res_old_kai", true, false).find_child("Unknown", true, false) as Label).text).is_equal("Kindred · ?")
 
 ## Close goes back where it was opened from (the profile), else closes (the Stamp Desk); a city's Back returns here.
