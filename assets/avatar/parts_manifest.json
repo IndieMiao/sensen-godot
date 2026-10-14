@@ -769,6 +769,60 @@
 			"thumb": "res://assets/avatar/thumbs/cloth1_npc_ivo.png",
 			"tier": 0,
 			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat41_npc_auburn",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat41_npc_auburn.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat41_npc_auburn.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat43_npc_black",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat43_npc_black.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat43_npc_black.png",
+			"tier": 0,
+			"unity_guid": ""
 		}
 	],
 	"version": 1
