@@ -15,7 +15,6 @@ const GAP := 6.0
 const _PAD := Vector4(8, 12, 8, 12)   # left, top, right, bottom
 const _STACK := 4                      # stamp → name → line
 const _RADIUS := 12
-const _ITALIC_SKEW := 0.2              # Nunito has no italic: the bold face slanted, as the Bite Board's keeper line
 
 var view := {}
 var model := {}
@@ -60,7 +59,7 @@ func _fit() -> void:
 	var w := (grid.size.x - GAP * (COLS - 1)) / COLS
 	if w <= 0.0: return
 	var text_w := w - _PAD.x - _PAD.z
-	var font := _italic()
+	var font := UiKit.bold_italic()
 	# the sizes the cell's own labels get from the theme: read off probes styled the same way (a type variation's
 	# size is not found by name from here)
 	var probe := UiKit.label("x", UiTokens.STYLE_C11_B)
@@ -113,7 +112,7 @@ func _cell(c: Dictionary) -> PanelContainer:
 		line.name = "Line"
 		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.add_theme_font_override(&"font", _italic())
+		line.add_theme_font_override(&"font", UiKit.bold_italic())
 		col.add_child(line)
 	else:
 		var unknown := UiKit.label("Kindred · ?", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
@@ -148,11 +147,3 @@ static func _dash(cell: Control) -> void:
 			if left <= 0.0:
 				on = not on
 				left = 4.0 if on else 3.0
-
-static var _slant: FontVariation
-static func _italic() -> FontVariation:
-	if _slant == null:
-		_slant = FontVariation.new()
-		_slant.base_font = load(UiTokens.FONT_BOLD_PATH)
-		_slant.variation_transform = Transform2D(Vector2(1, 0), Vector2(-_ITALIC_SKEW, 1), Vector2.ZERO)
-	return _slant

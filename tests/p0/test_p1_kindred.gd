@@ -120,6 +120,7 @@ func test_the_passport_has_cities_and_postcards_pages() -> void:
 	var pip := page.find_child("Cell_res_pip", true, false)
 	assert_str((pip.find_child("Name", true, false) as Label).text).is_equal("Pip")
 	assert_str((pip.find_child("Line", true, false) as Label).text).is_equal("“Best friend on the whole route. Don't tell the pigeons.”")
+	assert_object((pip.find_child("Line", true, false) as Label).get_theme_font(&"font")).is_same(UiKit.bold_italic())   # C11 B italic
 	assert_str((page.find_child("Cell_res_old_kai", true, false).find_child("Unknown", true, false) as Label).text).is_equal("Kindred · ?")
 
 ## Close goes back where it was opened from (the profile), else closes (the Stamp Desk); a city's Back returns here.
