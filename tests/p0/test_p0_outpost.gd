@@ -6,6 +6,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## seats walk to the nearest free one, sit, skip seats other players hold, and the joystick stands up.
 
 const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
+const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 
 class Sample extends "res://scenes/p0/p0_outpost.gd":
 	var used: Array = []
@@ -715,3 +716,31 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 	var rig: AvatarRig = (r.npcs.npc_keeper.root as Node).find_children("*", "AvatarRig", true, false)[0]
 	var worn: Dictionary = rig.get("_desired")
 	for slot in look: assert_str(str(worn.get(StringName(slot), ""))).is_equal(str(look[slot]))
+
+## The S-tier trading post (the cabin, world_gen.json room.cabin) on the tea house's kit with its own anchors: Pip at the
+## tea house's first resident spot and its s_order resident (Old Kai or Theo now) at the second — it read the tea
+## house's anchors before and showed none of them (苏烈 / 上官婉儿 on 284). The server still names the tea house's file,
+## which 0.2.5 has; this client reads its own client_anchors for the room (周瑜 on #404: either may go out first).
+func test_the_cabin_shows_pip_and_its_second_resident() -> void:
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("cabin", {})
+	assert_str(str(room.anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")   # what every client can read
+	assert_str(str(room.client_anchors)).is_equal("res://assets/p0/outposts/cabin.anchors.json")
+	var names: Array = P0RoomAnchors.read_json(str(room.client_anchors)).get("anchors", []).map(func(a): return str(a.name))
+	assert_array(names).contains(["npc_pip", "stand_pip", "npc_kai", "stand_kai", "npc_theo", "stand_theo", "npc_keeper", "spawn", "exit"])
+	for second in ["res_theo", "res_old_kai"]:
+		var id := "gn-test%s~cabin0" % second
+		# as the server sends it (world.ts genOutposts): role post, the cabin flag, the room's `anchors`
+		P0CityPlaces.accept("gn-test" + second, {"detail": {"outposts": [{"id": id, "role": "post", "cabin": true,
+			"name": "Test Trading Post", "art": str(room.art), "anchors": str(room.anchors), "category": str(room.category),
+			"lat": 1.0, "lng": 1.0, "capacity": 12, "keeper": {"role": "Trader", "name": "Bea", "look": ""},
+			"residents": ["res_pip", second]}]}})
+		assert_str(str(P0Outposts.find(id).anchors)).is_equal(str(room.client_anchors))
+		var r := _room(id)
+		var kai_or_theo := "npc_theo" if second == "res_theo" else "npc_kai"
+		# the residents (the keeper here has no look: a generated one always has, and its spot is the tea house's)
+		assert_array(r.npcs.keys()).override_failure_message("%s: %s" % [id, str(r.npcs.keys())]).contains(["npc_pip", kai_or_theo])
+	# a tea house keeps the anchors the server names
+	P0CityPlaces.accept("gn-testtea", {"detail": {"outposts": [{"id": "gn-testtea~tea0", "role": "tea", "name": "Test Tea House",
+		"art": str(room.art), "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
+		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": ""}, "residents": []}]}})
+	assert_str(str(P0Outposts.find("gn-testtea~tea0").anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")

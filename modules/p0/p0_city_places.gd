@@ -110,6 +110,12 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 		if o.has(k): entry[k] = o[k]
 	entry["cluster"] = cluster
 	entry["anchors"] = str(o.get("anchors", room.get("anchors", "")))
+	# This client's own anchors for the room kind where they differ from the ones the server names (world.room[kind]
+	# .client_anchors): the S-tier trading post's cabin.anchors.json, which 0.2.5 and older do not have — the server
+	# keeps naming the tea house's for them, so it can go out before or after this client (周瑜 on #404).
+	var kind := "cabin" if bool(o.get("cabin", false)) else str(o.get("role", ""))
+	var own := str(P0Logic.content().get("world", {}).get("room", {}).get(kind, {}).get("client_anchors", ""))
+	if own != "": entry["anchors"] = own
 	return entry
 
 static func pond(id: String) -> Dictionary: return _ponds.get(id, {})
