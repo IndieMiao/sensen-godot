@@ -1,0 +1,26 @@
+{
+  "base": "hairhat0",
+  "id": "hairhat0_npc_tomo",
+  "source_pixels": [
+    1024,
+    1024
+  ],
+  "luminance_knots_min_median_max": [
+    148.56839999999997,
+    174.781,
+    184.49620000000002
+  ],
+  "palette_shadow_mid_highlight": [
+    "#2E1F16",
+    "#4A3324",
+    "#6B4C36"
+  ],
+  "alpha_exact": true,
+  "output_unique_colors": 72,
+  "non_hair_regions": "None: inspected source contains only hair islands.",
+  "fbx_byte_identical": true,
+  "sha256": {
+    "SM_hairHat0.fbx": "f0ace8d1c9c7412fcc8d74a10d82a413fce5875c1544bd217954aa60aeefd29d",
+    "T_tomo_hairHat_D.png": "4bd8dff9f9a171a73c61735e399bda4e73fdc2474841b50f7e2ed183e17341f3"
+  }
+}

@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+跳过已在清单里的 hairhat80_npc_granny_wu（条目与 .res 不动）
+跳过已在清单里的 hairhat_npc_ivo（条目与 .res 不动）
+跳过已在清单里的 mask16_npc_ivo（条目与 .res 不动）
+追加完成: 1 部件, 0 错误
+AvatarService: 13 NPC-only parts kept out of the player pools

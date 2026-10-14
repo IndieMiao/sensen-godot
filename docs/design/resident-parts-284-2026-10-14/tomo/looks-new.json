@@ -1,0 +1,11 @@
+{
+  "res_tomo": {
+    "slots": {
+      "hairHat": "hairhat0_npc_tomo",
+      "glass": "glass0",
+      "cloth": "cloth0",
+      "shoes": "shoes2",
+      "messengerBag": "messengerbag3"
+    }
+  }
+}

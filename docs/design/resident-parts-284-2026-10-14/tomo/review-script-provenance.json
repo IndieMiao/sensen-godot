@@ -1,0 +1,13 @@
+{
+  "lineup_source": "tools/dev/npc_lineup.gd",
+  "lineup_source_sha256": "611b1092274306e9b27cf425e0232eb77071121ee27c8d6468721859d7da182b",
+  "lineup_fixture_sha256": "7533607762803fc4cd70a35bb47fbe1747f5f0798699b90cbe56c4eead76fe57",
+  "portrait_baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+  "portrait_baker_committed": false,
+  "lineup_changes": [
+    "1 resident looks from fixture, no player column",
+    "Freeze idle at zero for open eyes",
+    "Camera distance 3.5 m and target Y 0.90 for complete feet",
+    "Short readable captions"
+  ]
+}
