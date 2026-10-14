@@ -320,3 +320,24 @@ describe('global generation (SGODOT-280)', () => {
     expect(r.events.some(e => e.kind === 'cast')).toBe(true);
   });
 });
+
+describe('residents wait for their rooms (q(193) ②, 周瑜 on #400)', () => {
+  // An S-tier town of 100,000–500,000 with highland and neither coast nor river: Granny Wu (under 100,000), Old Kai
+  // (coast) and Rafa (river) are out, so Ivo was next in the trading post's order — but his mine_hut is not built.
+  const town = [...clusters.byId.values()].find(cl => tierOf(w, cl) === 'S' && clusterPopulation(cl) >= 100_000 && !(w.coastal[cl.id] ?? []).length)!;
+  const withWorld = (world: WorldContent): P0Content => {
+    const o = Object.create(Object.getPrototypeOf(c), Object.getOwnPropertyDescriptors(c)) as P0Content & { world: WorldContent };
+    o.world = world;
+    return o;
+  };
+  const highland = { ...w, coastal: { ...w.coastal, [town.id]: ['highland'] } };
+
+  it('Ivo stays out of a trading post until the mine hut is a room; the next in order takes the seat', () => {
+    const cabin = generateCity(withWorld(highland), town, { water: false }).detail.outposts[0];
+    expect(cabin.residents).not.toContain('res_ivo');
+    expect(cabin.residents).toEqual([w.residents!.fixed.post, 'res_theo']);
+    const hut = { ...highland, room: { ...w.room, mine_hut: w.room.cabin } } as WorldContent;
+    expect(generateCity(withWorld(hut), town, { water: false }).detail.outposts[0].residents).toContain('res_ivo');
+  });
+});
+
