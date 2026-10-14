@@ -96,6 +96,10 @@ var _card := ""           # the one tappable whose prompt is open (SGODOT-250: o
 var _exit_armed := false
 var _leaving := false
 var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
+var _dt := 0.0            # this frame's step, for the prompt buttons' easing (spread)
+var _card_rect := Rect2() # the open name strip on screen last frame (spread's rule ②)
+var _in_row := {}         # buttons lined up over the open strip last frame (held there up to SPREAD_HOLD)
+var _spread_off := {}     # anchor name → {from, to, t}: each button's drawn offset easing to where spread puts it
 
 func setup(_args: Dictionary) -> void: pass
 
@@ -842,6 +846,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	else: _focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a zoom limit, about the same point
 	else: _update_camera()
+	_dt = dt
 	if rt: _markers(v)
 	_room_frame(v, dt)
 	if _perf_left >= 0.0:
@@ -894,6 +899,7 @@ func _markers(v: Dictionary) -> void:
 		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
 		spots[n] = cam.unproject_position(badge_at.global_position if badge_at else at)
 	spots = _marker_spots(spots)
+	spots = _spread_markers(marks, spots)
 	for n in marks:
 		var m: Dictionary = marks[n]
 		var id: String = "room:" + n
@@ -923,9 +929,124 @@ func _markers(v: Dictionary) -> void:
 			"npc": rt.ui.npc_tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
+	_card_rect = Rect2()
+	var bar = rt.ui._name_bars.get("room:" + _card) if _card != "" else null
+	if bar != null and (bar as Control).visible: _card_rect = (bar as UiWorldNameBar).full_rect()
 
 ## Where each prompt sits on screen ({anchor name: point}); a room may spread prompts that crowd (the farmhouse's stoves).
 func _marker_spots(spots: Dictionary) -> Dictionary: return spots
+
+# ---------------------------------------------------------------- prompt buttons kept apart (不知火舞 on 282)
+## Folded prompt buttons keep 44 px apart, centre to centre (① below), and none sits under the open name strip (②); only
+## where they are drawn changes — their icons, strips and what a tap opens stay. In the farmhouse and every outpost.
+##   ① Of two too close, the one later in spread_rank moves, out along the line between them, as little as it takes,
+##      kept 22 off the screen's sides: the door never moves, then the stoves (the farmhouse lays out their row first),
+##      the Spice Rack, the Warming Cabinet, then the rest (seats, pieces). Pushed to exactly 44 it moves on smoothly as
+##      the view moves, so it never jumps at the 44 line.
+##   ② Buttons whose disc comes within 14 of the open strip (their centre within 28) line up 6 above it, 44 apart, in
+##      that order; where that row does not fit (under the HUD, or wider than the screen) they stand beside the strip
+##      instead. One that joined the row stays in it until 4 px further clear (32, as q(146)), so a button on the edge does
+##      not hop in and out. Never hidden: by the stove one often taps the rack next to it. (不知火舞 282 cc517f08: from
+##      the disc's edge, not where it touches.)
+##   Every change of place eases in 0.12 s.
+const SPREAD_GAP := 44.0
+const SPREAD_HOLD := 4.0       # q(146): out of the strip's row only once this much further clear
+const SPREAD_SIDE := 22.0
+const SPREAD_EASE_S := 0.12
+const STRIP_REACH := 28.0      # a button's centre this near the strip: its disc's edge within 14 of it
+const STRIP_ABOVE := 6.0
+const BUTTON_R := 14.0
+
+static func spread_rank(n: String) -> int:
+	if n == "exit": return 0
+	if n.begins_with("use_stove"): return 1
+	if n == "use_spice_rack": return 2
+	if n == "use_warming_cabinet": return 3
+	return 4
+
+## Where the folded buttons are drawn (pure, tested): `spots` {name: point}, `buttons` the names drawn as buttons (not the
+## open one, which is its strip), `strip` the open strip's rect (empty: none), `screen` the screen, `top` the HUD's bottom,
+## `in_row` last frame's row. Returns {spots, row: {name: true}}.
+static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect2, top: float, in_row := {}) -> Dictionary:
+	var out := spots.duplicate()
+	# a button off the screen is not drawn (P0Ui.world_icon): left where it is, out of both rules
+	var order := buttons.filter(func(n): return screen.has_point(spots[n]))
+	order.sort_custom(func(a, b):
+		var ra := spread_rank(str(a))
+		var rb := spread_rank(str(b))
+		return ra < rb or (ra == rb and (spots[a] as Vector2).x < (spots[b] as Vector2).x))
+	var lo := screen.position.x + SPREAD_SIDE
+	var hi := screen.end.x - SPREAD_SIDE
+	for n in order:   # judged where they are drawn: the UI keeps every button 22 off the sides (P0Ui._keep_off_sides)
+		out[n] = Vector2(clampf((out[n] as Vector2).x, lo, hi), (out[n] as Vector2).y)
+	# ② the row over the open strip
+	var row := {}
+	var under: Array = []
+	if strip.has_area():
+		for n in order:
+			if n == "exit": continue
+			var reach := STRIP_REACH + (SPREAD_HOLD if in_row.has(n) else 0.0)
+			if strip.grow(reach).has_point(out[n]): under.append(n)
+	if not under.is_empty():
+		var y := strip.position.y - STRIP_ABOVE - BUTTON_R
+		var width := float(under.size() - 1) * SPREAD_GAP
+		if y - BUTTON_R >= top and width <= hi - lo:
+			var x0 := clampf(strip.get_center().x - width * 0.5, lo, hi - width)
+			for k in under.size(): out[under[k]] = Vector2(x0 + k * SPREAD_GAP, y)
+		else:   # beside the strip, outward 44 apart: as many on the left as fit there, the rest on the right (never stacked)
+			var left_x := strip.position.x - STRIP_ABOVE - BUTTON_R
+			var right_x := strip.end.x + STRIP_ABOVE + BUTTON_R
+			var left_room := maxi(0, floori((left_x - lo) / SPREAD_GAP) + 1) if left_x >= lo else 0
+			for k in under.size():
+				var x := (left_x - k * SPREAD_GAP) if k < left_room else (right_x + (k - left_room) * SPREAD_GAP)
+				out[under[k]] = Vector2(minf(x, hi), strip.get_center().y)
+		for n in under: row[n] = true
+	# ① two too close: the later one moves out along the line, to 44
+	var placed: Array = []
+	for n in order:
+		if spread_rank(str(n)) <= 1 and not row.has(n):   # the door and the stoves' row stay as laid out
+			placed.append(out[n])
+	for n in under + order.filter(func(m): return spread_rank(str(m)) > 1 and not row.has(m)):
+		var p: Vector2 = out[n]
+		for _pass in 8:
+			var clash := false
+			for q: Vector2 in placed:
+				var d := p.distance_to(q)
+				if d >= SPREAD_GAP - 0.01: continue
+				var dir: Vector2 = (p - q) / d if d > 0.01 else Vector2.UP
+				p = q + dir * SPREAD_GAP
+				p.x = clampf(p.x, lo, hi)
+				clash = true
+			if not clash: break
+		out[n] = p
+		placed.append(p)
+	return {spots = out, row = row}
+
+func _spread_markers(marks: Dictionary, spots: Dictionary) -> Dictionary:
+	var buttons: Array = []
+	for n in marks:
+		var kind := str(marks[n].get("kind", ""))
+		if (kind == "facility" or kind == "seat") and n != _card: buttons.append(n)
+	var screen := get_viewport().get_visible_rect()
+	var laid := spread(spots, buttons, _card_rect, screen, _safe_top() + HUD_BOTTOM, _in_row)
+	_in_row = laid.row
+	var out: Dictionary = laid.spots
+	for n in _spread_off.keys():   # a button gone from the screen starts afresh when it returns
+		if not out.has(n): _spread_off.erase(n)
+	for n in out.keys():   # each drawn offset eases to its new place in 0.12 s
+		var raw: Vector2 = spots[n]
+		var to: Vector2 = (out[n] as Vector2) - raw
+		var e: Dictionary = _spread_off.get(n, {from = Vector2.ZERO, to = Vector2.ZERO, t = 1.0})
+		if to.distance_to(e.to) > 0.5:
+			e = {from = _eased(e), to = to, t = 0.0}
+		e.t = minf(1.0, float(e.t) + _dt / SPREAD_EASE_S)
+		_spread_off[n] = e
+		out[n] = raw + _eased(e)
+	return out
+
+static func _eased(e: Dictionary) -> Vector2:
+	var t := float(e.t)
+	return (e.from as Vector2).lerp(e.to, 1.0 - (1.0 - t) * (1.0 - t))   # ease-out
 
 ## UiStatusBadge.State for a STATE-ICONS key, or -1 (unknown key, or the badge component is not in this build).
 static func badge_state(key: String) -> int:
@@ -1110,6 +1231,12 @@ func p0_dev(step: PackedStringArray) -> bool:
 			actor.teleport(P0RoomNav.nearest_walkable(bp, best))
 			_focus = actor.position   # as if walked there: the view comes along (kept inside the art)
 			_follow.held = false
+		"promptrects":   # the prompt buttons' centres and open strips on screen (shots: spacing checked by numbers, 282)
+			var out := {}
+			if rt:
+				for id in rt.ui._icons: if (rt.ui._icons[id] as Control).visible: out["icon " + str(id)] = (rt.ui._icons[id] as Control).get_global_rect().get_center()
+				for id in rt.ui._name_bars: if (rt.ui._name_bars[id] as Control).visible: out["strip " + str(id)] = (rt.ui._name_bars[id] as Control).get_global_rect()
+			print("P0_PROMPT_RECTS ", out)
 		"tap": walk_to(step[1])
 		"focus": focus(step[1])
 		"exit": leave()
