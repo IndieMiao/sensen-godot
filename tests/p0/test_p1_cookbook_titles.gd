@@ -152,7 +152,7 @@ func _drawer(v: Dictionary) -> P0KitchenDrawer:
 func test_the_title_strip_sits_between_the_tabs_and_the_chips() -> void:
 	var d: P0KitchenDrawer = await _drawer(_view(12, 6))
 	var titles := d.get("_titles") as Control
-	var chips_of := func() -> Rect2: return (d.find_child("CookAll", true, false) as Control).get_parent().get_global_rect()
+	var chips_of := func() -> Rect2: return (d.get("_book_chips") as Control).get_parent().get_global_rect()
 	var card := titles.get_global_rect()
 	var tabs := (d.get("_modes") as Control).get_global_rect()
 	var chips: Rect2 = chips_of.call()

@@ -166,6 +166,61 @@ func test_the_cookbook_strip_shows_cook_all_from_lv8_and_greys_it_with_the_gap()
 	rt.ui.close_modal()
 	await get_tree().process_frame
 
+## B7 ⑨ (不知火舞 on 286 6e15f758): the Cookbook's filter row is all six chips — All · Can cook · Common · Fine · Rare ·
+## Legendary, each whole on screen (2318:125476) — and Cook All is no longer at its right end.
+func test_the_filter_row_keeps_all_six_chips_and_cook_all_is_off_it() -> void:
+	var d := await _drawer(_view())
+	var row := d.get("_book_chips") as Control
+	var chips := row.find_children("*", "UiFilterChip", true, false)
+	assert_array(chips.map(func(c): return (c as Button).text)).is_equal(["All", "Can cook", "Common", "Fine", "Rare", "Legendary"])
+	var shown := (row.get_parent() as Control).get_global_rect()   # the chips' scroll window
+	for c in chips:
+		var r := (c as Control).get_global_rect()
+		assert_bool(shown.grow(0.5).encloses(r)).override_failure_message("%s at %s outside %s" % [(c as Button).text, r, shown]).is_true()
+	var cook_all := d.get("_cook_all") as Control
+	assert_bool(cook_all.visible).is_true()
+	assert_bool(row.get_parent().is_ancestor_of(cook_all)).is_false()
+
+## The button stands on its own and moves where the frame puts it (不知火舞 on 286: A the heading by ×, B its own row on
+## top of the Cookbook page); it is shown from Cooking Lv8 on the Cookbook only, greyed `Nothing to cook` in either place.
+func test_cook_all_moves_between_the_heading_and_its_own_row() -> void:
+	var d := await _drawer(_view())
+	var cook_all := d.get("_cook_all") as UiCommandButton
+	var close := d.find_children("*", "UiCloseButton", true, false)[0] as Control
+	d.cook_all_at = P0KitchenDrawer.CookAllAt.HEADING
+	for i in 2: await get_tree().process_frame
+	assert_object(cook_all.get_parent()).is_same(close.get_parent())
+	assert_int(cook_all.get_index()).is_equal(close.get_index() - 1)
+	assert_bool(cook_all.is_visible_in_tree()).is_true()
+	d.tab = "experiment"
+	assert_bool(cook_all.is_visible_in_tree()).is_false()
+	d.tab = "cookbook"
+	d.cook_all_at = P0KitchenDrawer.CookAllAt.ROW
+	for i in 2: await get_tree().process_frame
+	assert_bool(d.get("_cookbook").is_ancestor_of(cook_all)).is_true()
+	assert_float(cook_all.get_global_rect().end.y).is_less_equal((d.get("_titles") as Control).get_global_rect().position.y)
+	d.view = _view(_plan("nothing_to_cook"))
+	d.refresh()
+	assert_str(cook_all.text).is_equal("Nothing to cook")
+	assert_bool(cook_all.is_visible_in_tree()).is_true()
+	var before := _view()
+	before.cooking.erase("cook_all")
+	d.view = before
+	d.refresh()
+	assert_bool(cook_all.is_visible_in_tree()).is_false()
+	assert_bool((cook_all.get_parent() as Control).visible).is_false()   # no empty row left behind
+
+func _drawer(v: Dictionary) -> P0KitchenDrawer:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var d := P0KitchenDrawer.new(v)
+	d.animate = false
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	return d
+
 func test_cook_all_sends_closes_the_sheet_and_fires_the_pots_one_after_another() -> void:
 	_set_view(_view())
 	var r := await _farmhouse()

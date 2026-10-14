@@ -525,6 +525,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
 		"cookall":   # the Cookbook strip's Cook All, as a tap on it (282 shots)
 			if kitchen.drawer: (kitchen.drawer.get("_cook_all") as UiCommandButton).pressed.emit()
+		"cookallat":   # cookallat:heading|row — where the drawer puts Cook All (B7 ⑨ shots, until the frame says)
+			if kitchen.drawer: kitchen.drawer.cook_all_at = P0KitchenDrawer.CookAllAt.HEADING if step[1] == "heading" else P0KitchenDrawer.CookAllAt.ROW
 		"cookallgo":   # the sheet's `Cook All · N pots`, as a tap on it (282 shots)
 			if is_instance_valid(kitchen.cook_all_sheet) and kitchen.cook_all_sheet.cook_button: kitchen.cook_all_sheet.cook_button.pressed.emit()
 		"cookallrects":   # Cook All's sheet, its ×, the strip button and the floats on screen (282 shots: layout by numbers)

@@ -72,8 +72,12 @@ const _DOUBLE_ROW := 32.0
 signal unavailable(reason: String)
 ## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
 signal double_changed(on: bool)
-## Cook All on the Cookbook strip (Cooking Lv8, §16 COOK-1, q(124)): the kitchen opens its sheet.
+## Cook All (Cooking Lv8, §16 COOK-1, q(124)): the kitchen opens its sheet.
 signal cook_all_requested
+## Where Cook All stands (B7 ⑨, 不知火舞 on 286 6e15f758): it no longer shares the filter row, which keeps all six chips.
+## Its place waits for 不知火舞's frame — HEADING: the heading row, left of ×; ROW: its own row on top of the Cookbook page.
+enum CookAllAt { HEADING, ROW }
+var cook_all_at := CookAllAt.ROW: set = set_cook_all_at
 
 var _stove: Label
 var _level: Label
@@ -93,7 +97,11 @@ var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit t
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
 var _pages: UiInventoryGrid
-var _cook_all: UiCommandButton   # the Cookbook strip's right end, from Cooking Lv8 (P0KitchenLogic.cook_all)
+var _cook_all: UiCommandButton   # from Cooking Lv8 on the Cookbook (P0KitchenLogic.cook_all); where: cook_all_at
+var _cook_all_row: HBoxContainer   # CookAllAt.ROW: the row on top of the Cookbook page, right-aligned
+var _heading_row: HBoxContainer
+var _close: UiCloseButton
+var _book_chips: Control   # the Cookbook's filter chips (in their scroll window)
 var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
@@ -115,6 +123,11 @@ func action_area() -> Control:
 func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	super(HEIGHT)
 	view = view_
+	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
+	_cook_all.name = "CookAll"
+	_cook_all.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_cook_all.activated.connect(func(): cook_all_requested.emit())
+	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
 	body.add_child(_heading())
 	_modes = UiSegmentTab.new([{label = "Cookbook", count = P0KitchenLogic.cookbook_count(view)}, {label = "Experiment"}])
 	_modes.changed.connect(func(i: int): set_tab("cookbook" if i == 0 else "experiment"))
@@ -124,10 +137,33 @@ func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	_experiment = _build_experiment()
 	body.add_child(_experiment)
 	tab = tab_
+	set_cook_all_at(cook_all_at)
 	refresh()
+
+func set_cook_all_at(v: CookAllAt) -> void:
+	cook_all_at = v
+	if _cook_all == null or _cook_all_row == null: return
+	if _cook_all.get_parent(): _cook_all.get_parent().remove_child(_cook_all)
+	if v == CookAllAt.HEADING:
+		_heading_row.add_child(_cook_all)
+		_heading_row.move_child(_cook_all, _close.get_index())
+	else:
+		_cook_all_row.add_child(_cook_all)
+	_show_cook_all()
+	_fit_heading()
+
+## Shown from Cooking Lv8 (greyed `Nothing to cook` included), on the Cookbook only, not while queueing; its own row goes
+## with it so no empty row is left.
+func _show_cook_all() -> void:
+	if _cook_all == null: return
+	var all := P0KitchenLogic.cook_all(view)
+	_cook_all.visible = not all.is_empty() and not queue_mode and tab == "cookbook"
+	if _cook_all.visible: _cook_all.reason = str(all.button)
+	if _cook_all_row: _cook_all_row.visible = _cook_all.visible and cook_all_at == CookAllAt.ROW
 
 func set_queue_mode(v: bool) -> void:
 	queue_mode = v
+	_show_cook_all()
 	if _cook:
 		_cook.label = _verb()
 		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
@@ -142,6 +178,8 @@ func set_tab(v: String) -> void:
 	_modes.selected = 0 if tab == "cookbook" else 1
 	_cookbook.visible = tab == "cookbook"
 	_experiment.visible = tab == "experiment"
+	_show_cook_all()
+	_fit_heading()
 	if changed: tab_changed.emit(tab)
 
 ## Redraw from `view` and `pot`; selections and scroll positions survive.
@@ -208,6 +246,8 @@ func _heading() -> Control:
 	var close := UiCloseButton.new()
 	close.pressed.connect(func(): close_requested.emit())
 	row.add_child(close)
+	_heading_row = row
+	_close = close
 	# COOK-2a / 2b: the 18 px heading sits at y 15 and the 44 px close at y 2; let the close overhang the pad.
 	var wrap := MarginContainer.new()
 	wrap.add_theme_constant_override(&"margin_top", -int(_CLOSE_OVERHANG))
@@ -225,6 +265,8 @@ func _fit_heading() -> void:
 	var sep := float(row.get_theme_constant(&"separation"))
 	var need := _stove_pill.get_combined_minimum_size().x + _level.get_minimum_size().x + _state.get_minimum_size().x \
 		+ UiTokens.SIZE_CLOSE + sep * 3.0
+	if _cook_all != null and _cook_all.visible and _cook_all.get_parent() == row:
+		need += _cook_all.get_combined_minimum_size().x + sep
 	_level.visible = need <= w
 
 # ---------------------------------------------------------------- Cookbook
@@ -232,23 +274,20 @@ func _build_cookbook() -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# CookAllAt.ROW: Cook All on top of the page, right-aligned (`Nothing to cook` greyed when no known page has its
+	# ingredients, D-10, LOCK-10: the gap on the button, no empty sheet).
+	_cook_all_row = HBoxContainer.new()
+	_cook_all_row.alignment = BoxContainer.ALIGNMENT_END
+	_cook_all_row.visible = false
+	v.add_child(_cook_all_row)
 	v.add_child(_build_titles())
-	# The filter chips, and Cook All at the strip's right end from Cooking Lv8 (§16 COOK-1): `Nothing to cook` greyed
-	# when no known page has its ingredients (D-10, LOCK-10: the gap on the button, no empty sheet).
-	var strip := HBoxContainer.new()
-	strip.add_theme_constant_override(&"separation", 8)
+	# The filter chips, all six: All · Can cook · Common · Fine · Rare · Legendary (2318:125476).
 	var chips := _chips(P0KitchenLogic.COOKBOOK_CHIPS, func(i: int):
 		cookbook_chip = P0KitchenLogic.COOKBOOK_CHIPS[i]
 		_refresh_cookbook())
-	chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	strip.add_child(chips)
-	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
-	_cook_all.name = "CookAll"
-	_cook_all.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_cook_all.activated.connect(func(): cook_all_requested.emit())
-	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
-	strip.add_child(_cook_all)
-	v.add_child(strip)
+	_book_chips = chips.get_child(0)
+	_tighten(_book_chips)
+	v.add_child(chips)
 	v.add_child(_build_recipe())
 	_pages = UiInventoryGrid.new()
 	_pages.density = UiItemCell.Density.KITCHEN
@@ -423,9 +462,7 @@ static func _text(parent: Control, style: StringName, color: Color, r: Rect2) ->
 	return l
 
 func _refresh_cookbook() -> void:
-	var all := P0KitchenLogic.cook_all(view)
-	_cook_all.visible = not all.is_empty() and not queue_mode
-	if _cook_all.visible: _cook_all.reason = str(all.button)
+	_show_cook_all()
 	var order := P0KitchenLogic.cookbook_order(view, cookbook_chip)
 	_pages.capacity = order.size()
 	_pages.items = order.map(func(p): return P0KitchenLogic.page_cell(view, p))
@@ -601,6 +638,30 @@ func _refresh_experiment() -> void:
 	_apply_double(_exp_double, _cook, P0KitchenLogic.double_state(view, {}, pot), pot)
 	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 	_tried.visible = P0KitchenLogic.tried(view, pot)
+
+## The Cookbook's six chips as 2318:125476 draws them, so all fit the 336 row (B7 ⑨): 4 apart, 7 each side of the
+## word, at least 40 wide (All · Fine · Rare 40, Can cook 61, Common 60, Legendary 69 here).
+const _BOOK_CHIP_GAP := 4
+const _BOOK_CHIP_PAD := 7.0
+const _BOOK_CHIP_MIN := 40.0
+
+func _tighten(row: Control) -> void:
+	row.add_theme_constant_override(&"separation", _BOOK_CHIP_GAP)
+	for c in row.get_children():
+		var chip := c as UiFilterChip
+		chip.custom_minimum_size.x = _BOOK_CHIP_MIN
+		# The theme's boxes reach the chip only in the tree: narrow their sides on every theme change there, from the
+		# theme's own boxes (overrides off first; adding them notifies again, hence the meta guard).
+		chip.theme_changed.connect(func():
+			if not chip.is_inside_tree() or chip.get_meta(&"tightening", false): return
+			chip.set_meta(&"tightening", true)
+			for st in [&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus"]:
+				chip.remove_theme_stylebox_override(st)
+				var box := chip.get_theme_stylebox(st).duplicate() as StyleBox
+				box.content_margin_left = _BOOK_CHIP_PAD
+				box.content_margin_right = _BOOK_CHIP_PAD
+				chip.add_theme_stylebox_override(st, box)
+			chip.set_meta(&"tightening", false))
 
 func _chips(labels: Array, picked: Callable) -> Control:
 	var scroll := TouchScrollContainer.new()
