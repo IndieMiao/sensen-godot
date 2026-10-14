@@ -2,8 +2,8 @@ class_name P0MaterialCards
 extends RefCounted
 ## SGODOT-231 cards for the mine and the gathering spots, on the new shells (SGODOT-235 B3): the ElevatorPanel above the
 ## elevator key (MINE-P0-6, LOCK-21), and bottom Sheets with a Close 44 above them (UiDrawer, as the workbench and the
-## resident profile) for "The mine" from tapping the mouth (MINE-P0-1 / P0-8), the New run confirmation (MINE-P0-7)
-## and a spot that opens later (MAT-3). Sheet content follows the frames: ObjectHeader, Fact rows, then the fixed
+## resident profile) for the New run confirmation (MINE-P0-7) and a spot that opens later (MAT-3); the mouth itself
+## answers with its EntryCard, at 2/2 too (MINE-GATE-EXPRESS-3 / -4: the P0 "The mine" sheet MINE-P0-1 / P0-8 is gone). Sheet content follows the frames: ObjectHeader, Fact rows, then the fixed
 ## decision area (Cost, a note, one command, Dismiss). Copy and states come from P0MaterialLogic; these functions only
 ## lay them out and route taps back to the caller.
 
@@ -39,23 +39,6 @@ static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable)
 	ui._open_modal(panel, 0.0, false)
 	ui.modal_kind = "elevator"
 	return panel
-
-## MINE-P0-1 / P0-8: tapping the mouth shows what the mine is and today's runs; when no run is possible today the
-## only button is the grey reason (LOCK-10). Entering stays on the main action key (LOCK-21).
-static func open_mine_sheet(ui: P0Ui, view: Dictionary) -> UiDrawer:
-	var sheet := P0MaterialLogic.mine_sheet(view)
-	var d := _sheet(ui)
-	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
-	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
-	var button: Dictionary = sheet.button
-	if not button.is_empty():
-		_decision_gap(d)
-		var b := UiCommandButton.new("", UiCommandButton.Kind.PRIMARY)
-		b.reason = str(button.label)
-		b.unavailable_pressed.connect(func(text: String): ui.toast(text))
-		d.body.add_child(b)
-	_show(ui, d, "mine_sheet")
-	return d
 
 ## MINE-P0-7: from the EntryCard's New run · 2 Energy. ObjectHeader `The mine` / `New run`, the runs fact, then Cost
 ## `New run · 2 Energy`, `Your stored materials stay yours.`, Command/destructive `Start new run` (sends mine_new_run)

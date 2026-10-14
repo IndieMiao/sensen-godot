@@ -44,11 +44,12 @@ func test_mine_mouth_card_confirms_the_fee() -> void:
 	assert_that(cont.main.cmd).is_equal({"type": "mine_enter"})
 	assert_str(str(cont.second.label)).is_equal("New run · Clear Floor 2 first")
 	assert_bool(bool(cont.second.enabled)).is_false()
-	# Today's runs used up with none unfinished: no card, the mouth opens MINE-P0-8 (q(102)).
-	assert_bool(P0MaterialLogic.mine_runs_spent(_view(null, 200, 2))).is_true()
+	# Today's runs used up with none unfinished: the card's grey pill (MINE-GATE-EXPRESS-3, q(196)), its time in words
 	var late := _view(null, 200, 2)
 	late.mine.runs.resets_in = 2520000
-	assert_str(str(P0MaterialLogic.mine_sheet(late).button.label)).is_equal("Mine runs today 2/2 · Resets in 42m")   # not `42:00`
+	var spent := P0MaterialLogic.mine_mouth_card(late)
+	assert_str(str(spent.main.label)).is_equal("Resets in 42m")   # not `42:00`
+	assert_str(str(spent.main.toast)).is_equal("Mine runs today 2/2 · Resets in 42m")
 
 func test_entry_card_offers_new_run_only_after_floor_2() -> void:
 	assert_bool(bool(P0MaterialLogic.mine_entry_card(_view()).show)).is_false()
@@ -238,12 +239,6 @@ func test_mining_quick_bar_holds_torches_only() -> void:
 func test_mine_mouth_strip_sheet_and_status() -> void:
 	assert_str(str(P0WorldPrompts.mine(_view()).fact)).is_equal("Runs today 0/2")
 	assert_str(str(P0WorldPrompts.mine(_view(_run([_floor(1), _floor(2, false)]), 200, 1)).fact)).is_equal("Runs today 1/2")
-	var sheet := P0MaterialLogic.mine_sheet(_view())
-	assert_str(str(sheet.line)).is_equal("Mine five floors. Slimes from Floor 3.")
-	assert_that(sheet.facts).is_equal([["Runs today", "0/2"]])
-	var spent := P0MaterialLogic.mine_sheet(_view(null, 200, 2))
-	assert_str(str(spent.subtitle)).is_equal("No run · Runs today 2/2")
-	assert_that(spent.button).is_equal({"label": "Mine runs today 2/2 · Resets in 9h 12m", "enabled": false})
 	var confirm := P0MaterialLogic.new_run_sheet(_view(_run([_floor(1, true, CLEARED), _floor(2, true, CLEARED)], null), 200, 1))
 	assert_that(confirm.facts).is_equal([["Runs today", "1/2 → 2/2"]])
 	assert_that(confirm.confirm.cmd).is_equal({"type": "mine_new_run"})
