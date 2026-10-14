@@ -88,6 +88,7 @@ func test_drawer_rows_badges_and_sections() -> void:
 	assert_object(d.find_child("Section_Regional_fish", true, false)).is_not_null()
 	var line := d.find_child("KeeperLine", true, false) as Label
 	assert_int(line.max_lines_visible).is_equal(2)
+	assert_object(line.get_theme_font(&"font")).is_same(UiKit.bold_italic())   # Bold Italic, at 700 (不知火舞 on 284)
 	var hit := []
 	d.connect(&"pond_pressed", func(id: String): hit.append(id))
 	(fern as Button).pressed.emit()

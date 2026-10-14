@@ -1,8 +1,8 @@
 extends VBoxContainer
 ## The Passport's Postcards page (PASS-POSTCARDS 2627:134311; q(171) ⑥, 不知火舞 on 284): `Postcards · 3/10`, then
 ## a cell per resident, three to a row, in the residents table's order (P0Kindred.postcards):
-##   earned    surfaceRaised, a 1 px border: the PostcardStamp (their face, or their initial), the name (C14 XB) and
-##             their Kindred line in curly quotes (C11 B italic, secondary), uncut
+##   earned    surfaceRaised, a 1 px border: the PostcardStamp (their face, or their initial), the name (C12 XB, line 16)
+##             and their Kindred line in curly quotes (Bold Italic 10, line 13, secondary; the frame's values), uncut
 ##   unearned  no fill, a dashed border: the grey stamp and `Kindred · ?` (C12 B, secondary)
 ## Every cell is as tall as the longest Kindred line of the residents on the page needs (3 lines in P1), earned or not,
 ## so the grid never shifts as postcards come (不知火舞 on 284). Read-only: a cell does nothing. Built from the view (refresh follows it).
@@ -15,7 +15,6 @@ const GAP := 6.0
 const _PAD := Vector4(8, 12, 8, 12)   # left, top, right, bottom
 const _STACK := 4                      # stamp → name → line
 const _RADIUS := 12
-const _ITALIC_SKEW := 0.2              # Nunito has no italic: the bold face slanted, as the Bite Board's keeper line
 
 var view := {}
 var model := {}
@@ -60,27 +59,40 @@ func _fit() -> void:
 	var w := (grid.size.x - GAP * (COLS - 1)) / COLS
 	if w <= 0.0: return
 	var text_w := w - _PAD.x - _PAD.z
-	var font := _italic()
-	# the sizes the cell's own labels get from the theme: read off probes styled the same way (a type variation's
-	# size is not found by name from here)
-	var probe := UiKit.label("x", UiTokens.STYLE_C11_B)
-	var name_probe := UiKit.label("x", UiTokens.STYLE_C14_XB)
+	# measured as the cells' own labels lay out (their theme sizes and line spacing): hidden probes styled the same way,
+	# the line one wrapping at the cells' text width
+	var probe := _line_label("x")
+	var name_probe := _name_label("x")
 	probe.visible = false
 	name_probe.visible = false
 	add_child(probe)
 	add_child(name_probe)
-	var fsize := probe.get_theme_font_size(&"font_size")
+	probe.size = Vector2(text_w, 0)
 	var name_h := name_probe.get_minimum_size().y
+	var tallest := 0.0
+	for c in model.cells:   # the residents on the page (q(193)): Mira's line joins with her in P2
+		probe.text = quoted(str(P0Logic.content().residents[c.id].get("lines", {}).get("Kindred", "")))
+		tallest = maxf(tallest, probe.get_minimum_size().y)
 	remove_child(probe)
 	remove_child(name_probe)
 	probe.free()
 	name_probe.free()
-	var tallest := 0.0
-	for c in model.cells:   # the residents on the page (q(193)): Mira's line joins with her in P2
-		var line := quoted(str(P0Logic.content().residents[c.id].get("lines", {}).get("Kindred", "")))
-		tallest = maxf(tallest, font.get_multiline_string_size(line, HORIZONTAL_ALIGNMENT_CENTER, text_w, fsize).y)
 	var h := _PAD.y + Stamp.PASSPORT.y + _STACK + name_h + _STACK + tallest + _PAD.w
 	for c in grid.get_children(): (c as Control).custom_minimum_size.y = ceilf(h)
+
+## A cell's name: ExtraBold 12, line 16 (PASS-POSTCARDS).
+static func _name_label(text: String) -> Label:
+	var l := UiKit.label(text, UiTokens.STYLE_C12_XB)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	return l
+
+## A cell's Kindred line: Bold Italic 10, line 13, secondary, wrapping (PASS-POSTCARDS; 不知火舞 on 284).
+static func _line_label(text: String) -> Label:
+	var l := UiKit.label(text, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.add_theme_font_override(&"font", UiKit.bold_italic())
+	return l
 
 ## `“Best friend on the whole route. Don't tell the pigeons.”`
 static func quoted(line: String) -> String:
@@ -105,15 +117,11 @@ func _cell(c: Dictionary) -> PanelContainer:
 	stamp.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	col.add_child(stamp)
 	if earned:
-		var who := UiKit.label(str(c.name), UiTokens.STYLE_C14_XB)
+		var who := _name_label(str(c.name))
 		who.name = "Name"
-		who.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(who)
-		var line := UiKit.label(quoted(str(c.text)), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+		var line := _line_label(quoted(str(c.text)))
 		line.name = "Line"
-		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.add_theme_font_override(&"font", _italic())
 		col.add_child(line)
 	else:
 		var unknown := UiKit.label("Kindred · ?", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
@@ -148,11 +156,3 @@ static func _dash(cell: Control) -> void:
 			if left <= 0.0:
 				on = not on
 				left = 4.0 if on else 3.0
-
-static var _slant: FontVariation
-static func _italic() -> FontVariation:
-	if _slant == null:
-		_slant = FontVariation.new()
-		_slant.base_font = load(UiTokens.FONT_BOLD_PATH)
-		_slant.variation_transform = Transform2D(Vector2(1, 0), Vector2(-_ITALIC_SKEW, 1), Vector2.ZERO)
-	return _slant

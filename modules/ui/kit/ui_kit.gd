@@ -17,6 +17,22 @@ static func font(weight: StringName = &"regular") -> Font:
 		_fonts[weight] = load(path)
 	return _fonts[weight]
 
+## Bold Italic (Nunito has no italic face): the bold token's own font file and weight, slanted — the Bite Board
+## keeper's line and the Postcards' Kindred lines. Not a FontVariation over the bold FontVariation: nested, the inner
+## wght is lost and the line rendered thinner than Regular (不知火舞 on 284).
+const ITALIC_SKEW := 0.2
+static var _bold_italic: FontVariation
+static func bold_italic() -> FontVariation:
+	if _bold_italic == null:
+		var bold := font(&"bold") as FontVariation
+		_bold_italic = FontVariation.new()
+		_bold_italic.base_font = bold.base_font
+		_bold_italic.variation_opentype = bold.variation_opentype.duplicate()
+		# the slant is the x axis' y (Godot's FontVariation docs: Transform2D(1.0, slant, 0.0, 1.0, 0.0, 0.0)); the y axis'
+		# x, where it was, shears each glyph upright and showed no slant at all
+		_bold_italic.variation_transform = Transform2D(Vector2(1, ITALIC_SKEW), Vector2(0, 1), Vector2.ZERO)
+	return _bold_italic
+
 ## A Label using one of the UiTokens.STYLE_* variations; colour defaults to the text token.
 static func label(text: String, style: StringName, color := UiTokens.COLOR_TEXT) -> Label:
 	var l := Label.new()
