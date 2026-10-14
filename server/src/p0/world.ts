@@ -365,10 +365,16 @@ export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, pon
   const put = (o: GenOutpost | undefined, id: string) => { if (o && room(o) && known.has(id) && !o.residents.includes(id)) o.residents.push(id); };
   const placed = () => new Set(outposts.flatMap(o => o.residents));
 
+  // A resident whose rank home is a room not built yet (Ivo's mine_hut, q(193) ②) is placed nowhere, not even in a
+  // trading post: the room's kind must be one world.room has (周瑜 on #400).
+  const built = (id: string) => {
+    const at = rules.rank.find(r => r.id === id)?.at;
+    return !at || at.split(':')[0] in w.room;
+  };
   if (tier === 'S') {
     const cabin = outposts[0];
     put(cabin, rules.fixed.post);
-    const first = rules.s_order.find(ok);
+    const first = rules.s_order.find(r => ok(r) && built(r.id));
     if (first) put(cabin, first.id);
     return;
   }
