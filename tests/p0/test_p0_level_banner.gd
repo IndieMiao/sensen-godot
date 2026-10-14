@@ -218,5 +218,5 @@ func test_fishing_banners_say_new_for_you_as_their_milestone_row() -> void:
 	assert_str(sub.call(7)).is_equal("New for you · Silver Sturgeon, Gift Clues")
 	assert_str(sub.call(8)).is_equal("New for you · 2nd Fish Trap, Biting now")
 	assert_str(sub.call(9)).is_equal("New for you · River Eel, Quick Recast")
-	assert_str(sub.call(10)).is_equal("New for you · 3rd Fish Trap, Bigger Creel")
+	assert_str(sub.call(10)).is_equal("New for you · 3rd Fish Trap, Bigger Creel, Master Angler title")   # its title last (#398)
 	assert_str(P0Logic.level_banner(v, {"skill": "farming", "level": 6, "energy": 0, "gifts": []}).subtitle).starts_with("New for you · ")

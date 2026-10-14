@@ -57,12 +57,22 @@ static func card(view: Dictionary, place: String) -> Dictionary:
 		second = {"label": "Take back · Bag full", "enabled": false, "cmd": {}, "toast": "Bag full · free a slot first"}
 	return {"title": NAME, "fact": "%d/%d" % [fish, int(t.get("keep", 3))], "main": main, "second": second}
 
-## The trap's world prompt: `Fish Trap · 2/3`, Ready when it holds a fish.
+## The trap's world prompt, its name strip as q(109) ⑦ writes it: `Fish Trap · 2/3`, empty `Fish Trap · 0/3 · next in
+## 5h 12m`, full (it has stopped) `Fish Trap · 3/3 · Full`; Ready when it holds a fish.
 static func prompt(view: Dictionary, place: String) -> Dictionary:
 	var t := at(view, place)
 	if t.is_empty(): return {}
-	return {"id": ID, "icon": ID, "text": NAME, "fact": "%d/%d" % [int(t.get("fish", 0)), int(t.get("keep", 3))],
-		"ready": int(t.get("fish", 0)) > 0}
+	return {"id": ID, "icon": ID, "text": NAME, "fact": strip_fact(t), "ready": int(t.get("fish", 0)) > 0}
+
+## The name strip's fact: `2/3`, `0/3 · next in 5h 12m` (the wait as the view, advanced to now, has it) or `3/3 · Full`.
+static func strip_fact(t: Dictionary) -> String:
+	var fish := int(t.get("fish", 0))
+	var keep := int(t.get("keep", 3))
+	var fact := "%d/%d" % [fish, keep]
+	if fish >= keep: return fact + " · Full"
+	var left = t.get("next_in", null)
+	if fish == 0 and left != null: return fact + " · next in %s" % P0Logic.span(float(left))
+	return fact
 
 ## The pond card's fact row (q(109) ⑦): ["Your trap", "2/3"], [] when the player has none there.
 static func pond_fact(view: Dictionary, place: String) -> Array:

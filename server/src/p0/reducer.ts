@@ -215,8 +215,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (ids.length > 1) {
         const at = c.farming?.conveniences?.harvest_all;
         if (at === undefined || skillLevel(c, s, 'farming') < at) return fail('harvest_all_locked', { level: at ?? null });
-        const rows = new Set(ids.map(id => c.garden.plots[Number(id)]?.[1] ?? -1));
-        if (new Set(ids).size !== ids.length || rows.size !== 1 || rows.has(-1)) return fail('bad_plot', { row: true });
+        // a row by its plots' garden row; Homestead Lv7's front beds are row −1 (q(172)), so "no such plot" is null, not −1
+        const rows = new Set<number | null>(ids.map(id => c.garden.plots[Number(id)]?.[1] ?? null));
+        if (new Set(ids).size !== ids.length || rows.size !== 1 || rows.has(null)) return fail('bad_plot', { row: true });
       }
       const plots = ids.map(plotOf);
       if (plots.some(p => !p)) return fail('bad_plot');
@@ -304,7 +305,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'talk': case 'gift': case 'learn': {
       const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : cmd.type === 'learn' ? learn(c, s, cmd, now, events)
-        : giftResident(c, s, cmd, events);
+        : giftResident(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

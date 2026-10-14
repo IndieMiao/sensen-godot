@@ -48,8 +48,9 @@ export type P0Event =
   | { kind: 'visit'; id: string; place: string }   // an explore request checked in at its outpost (§9.6.3)
   // q(134): a taken request's count grew (`Fresh Greens 3/5`; a basket's item, `Market Basket · Carrot 5/6`); done: full
   | { kind: 'request_progress'; id: string; have: number; qty: number; item?: string; done?: true }
-  | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number }   // Decorate (SGODOT-284)
+  | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number; reason?: 'plots' }   // Decorate (SGODOT-284); reason plots: Lv7's new beds (q(172))
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
+  | { kind: 'kindred'; resident: string; postcard: string; title: string }   // first reached Kindred (q(171))
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
   | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared' | 'express' | 'express_unlocked'
       | 'hit' | 'defeat' | 'hurt' | 'knocked_out' | 'complete'; run: number; floor: number; cost: number;
@@ -59,7 +60,7 @@ export type P0Event =
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
   // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[];
-      x?: number; y?: number }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then
+      x?: number; y?: number; reason?: 'plots' }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then; reason plots: moved off Lv7's new beds (q(172))
   | { kind: 'compost'; item: string; qty: number; used: number; cap: number }   // the Compost Bin turned crops into Compost (q(118) ③)
   | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)

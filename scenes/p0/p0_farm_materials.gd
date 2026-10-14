@@ -210,7 +210,7 @@ static func mouth_stands(grid: BlueprintGrid, at: Vector3, from: Vector3) -> Arr
 	for dy in range(-reach, reach + 1):
 		for dx in range(-reach, reach + 1):
 			var cell := centre + Vector2i(dx, dy)
-			if cell.x < 0 or cell.y < 0 or cell.x >= bp.grid.x or cell.y >= bp.grid.y or grid.astar.is_point_solid(cell): continue
+			if not bp.in_bounds(cell) or grid.astar.is_point_solid(cell): continue   # the grid may start before row 0 (q(172) A)
 			var p := bp.cell_to_world(cell)
 			var d := flat(p, at)
 			if d > 0.5 and d < MOUTH_REACH - 0.5: out.append(p)

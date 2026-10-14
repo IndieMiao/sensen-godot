@@ -1,7 +1,7 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
-import { addPlots } from './garden.js';
+import { addPlots, clearNewBeds } from './garden.js';
 import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, writtenCluster, type TravelState } from './travel.js';
 import { placeOf } from './world.js';
 
@@ -90,6 +90,7 @@ export interface ResidentState {
   done_day: string;              // player day the last request was completed (one a day)
   done_at?: number;              // when the last request was completed (P1: the next one opens next_request_h later)
   lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
+  kindred_at?: number;           // q(171): when their postcard and title were given (first reached Kindred)
 }
 
 export interface Homestead {
@@ -299,6 +300,20 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     t.home = fresh.home; t.here = fresh.home; t.fallback = fresh.fallback;
     delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
   }
+  // A server from before SGODOT-303 (a rollback to 0.2.5) moved a picked home back to the written city and kept the
+  // pick's fields it did not know (蒙恬 on #371): the frozen home set says where the player chose, so home goes back
+  // there, with its fallback list. A pick in a city the table no longer knows is dropped instead.
+  const picked = t.home_set ? clusterOf(c, t.home_set.pond) : null;
+  if (picked && picked !== t.home) {
+    if (t.home_chosen_at && (picked === writtenCluster(c) || clusterById(c, picked))) {
+      if (t.here === t.home) t.here = picked;
+      t.home = picked;
+      delete t.passes[picked];
+      t.fallback = fallbackOf(c, picked, t.farm_at);
+    } else {
+      delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
+    }
+  }
   if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
     const f = fallbackOf(c, s.travel.home, s.travel.farm_at);
     if (f.near10.length) s.travel.fallback = f;
@@ -320,7 +335,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
   s.facilities ??= [];
   s.facility_count ??= s.facilities.reduce((m, f) => Math.max(m, f.id), 0);
-  addPlots(c, s);
+  clearNewBeds(c, s, addPlots(c, s), []);   // a save already at Lv7: pieces on the new beds back to storage (q(172))
   // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
   // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
   const run = s.mine?.run;

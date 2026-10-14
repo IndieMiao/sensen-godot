@@ -5,7 +5,8 @@
       "stage": "Familiar",
       "every_days": 7
     },
-    "next_request_h": 24
+    "next_request_h": 24,
+    "kindred": {"postcard": "Postcard from {name}", "title": "{name}'s Best Friend"}
   },
   "residents": {
     "res_pip": {
@@ -173,7 +174,7 @@
     },
     "res_mira": {
       "name": "Mira",
-      "role": "Travelling Trader",
+      "role": "Traveling Trader",
       "portrait": "mira",
       "likes": "Rare+",
       "gift_meal": "dish_grilled_fish",

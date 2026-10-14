@@ -170,7 +170,7 @@
         ],
         "bonus": 20,
         "type": "output",
-        "text": "Travellers need something to carry. Any Grilled dish or Dessert."
+        "text": "Travelers need something to carry. Any Grilled dish or Dessert."
       },
       "req_sys_dish_tea": {
         "title": "Afternoon Tea",

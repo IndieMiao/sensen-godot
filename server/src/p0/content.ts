@@ -127,6 +127,7 @@ export interface WorkbenchRecipe {
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
 export interface FacilityDef {
   name: string; cover: 'ring8' | 'block' | 'yard'; grow_cut: number;   // yard: on a yard cell, never a plot (Compost Bin)
+  start?: [number, number]; start_span?: number;   // a yard facility's first cell: nearest this (the workbench, its 3 cells: span 1)
   daily?: number;                          // Compost Bin: crops a player day it turns into Compost (q(118) ③, 5)
   size?: [number, number];                 // block: the plots it roofs (greenhouse 4 × 4, q(118) ②)
   cap_by_farming?: [number, number][];     // how many may stand by Farming level (greenhouse: Lv8 1, Lv10 2)
@@ -222,6 +223,9 @@ export interface P0Content {
     lesson?: { stage: string; every_days: number };
     /** §9.6.1: a resident's next request opens this long after the last one is done (24 h; P0's one_per_day = the player day). */
     next_request_h?: number;
+    /** q(171): what first reaching Kindred gives, `{name}` the resident's — `Postcard from Pip` into the Passport (its text
+     * their Kindred line) and the title `Pip's Best Friend`. */
+    kindred?: { postcard: string; title: string };
     gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
     mystery_line: string;
   };
@@ -282,7 +286,7 @@ export interface P0Content {
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
   /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; how many of them the homestead has
    * is homestead.plots (the ids past P0's 30 come as wild). */
-  garden: { plots: [number, number][] };
+  garden: { plots: [number, number][]; origin?: [number, number]; pitch?: number };   // origin / pitch: a plot's yard cell (q(172))
   /** P1 (content/farm_garden.json): the Farming level each convenience comes at (§4.6.1: seed_saver 10) and Seed
    * Saver's chance per harvest. Absent = not in this build. */
   farming?: { conveniences?: Partial<Record<string, number>>; seed_saver_chance?: number };

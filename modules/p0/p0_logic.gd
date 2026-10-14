@@ -935,6 +935,9 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		st["ready_in"] = maxf(0.0, float(st.get("ready_in", 0)) - elapsed_ms)
 	var cast = v.get("fishing", {}).get("cast", null)
 	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+	# a trap's next fish counts down (its name strip `· next in 5h 12m`, q(109) ⑦); the next read brings the fish itself
+	for t in v.get("fishing", {}).get("trap", {}).get("traps", []):
+		if t is Dictionary and t.get("next_in", null) != null: t["next_in"] = maxf(0.0, float(t.next_in) - elapsed_ms)
 	for parcel in v.get("inbox", {}).get("parcels", []):
 		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v
@@ -1128,12 +1131,11 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 	return ""
 
 ## Cooking conveniences by key (§7.2.2 / §4.6.3): the names the level banner and SKILL-1 use.
-## P1 adds Lv7–10's (the glossary, 李元芳 on 286: SKILL-1 showed their ids), and Lv10's title Chef (`Chef title`, after the
-## level's conveniences, 不知火舞 on 282).
+## P1 adds Lv7–10's (the glossary, 李元芳 on 286: SKILL-1 showed their ids); Lv10's title Chef is in TITLE_NAMES.
 const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double Clue", "hearty_mishap": "Hearty Mishap",
 	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire",
 	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
-	"chefs_touch": "Chef's Touch", "title_chef": "Chef title", "lucky_double": "Lucky Double"}
+	"chefs_touch": "Chef's Touch", "lucky_double": "Lucky Double"}   # Lv10's title Chef: TITLE_NAMES
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
 ## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)); the nine of them
 ## (Farming 6 / 7 / 8, Fishing 4 / 5 / 6 / 8 / 9, Cooking 4) as q(176) words them, from §4.6's "the day's difference".
@@ -1212,6 +1214,28 @@ static func _without_time(item: String) -> String:
 	for w in ONLY_AT_ROW.values(): item = item.trim_suffix(" (%s)" % w)
 	return item
 
+## Titles by key (§4.6 Lv10, appendix glossary; SGODOT-275): the one place their names live (奕星). A skill's title is
+## a `title_*` key among its conveniences in content, at the level it comes (farming.conveniences.title_master_gardener
+## 10); the level's line names it here, and its card follows the level banner (title_card).
+const TITLE_NAMES := {"title_master_gardener": "Master Gardener", "title_master_angler": "Master Angler", "title_chef": "Chef"}
+
+## A level's line for its title, after the level's other unlocks: `Chef title`, `Master Gardener title` (不知火舞 on 282).
+static func title_line(id: String) -> String: return "%s title" % str(TITLE_NAMES.get(id, id))
+
+## The titles a skill level brings: content <skill>.conveniences keys `title_*` at that level.
+static func level_titles(skill: String, level: int) -> Array:
+	var out: Array = []
+	var conv: Dictionary = content().get(skill, {}).get("conveniences", {})
+	for k in conv:
+		if str(k).begins_with("title_") and int(conv[k]) == level: out.append(str(k))
+	return out
+
+## A title's card (RewardMoment Milestone through P0Ui.show_title; §4.8.3 Lv10): the title, the level it came with
+## (`Farming Lv10`), `New title`, the skill's icon. Queued after that level's banner.
+static func title_card(skill: String, level: int, id: String) -> Dictionary:
+	return {event = str(TITLE_NAMES.get(id, id)), item_name = "%s Lv%d" % [skill.capitalize(), level], strip = "New title",
+		icon = icon(str(GATE_SKILL_ICONS.get(skill, "star")))}
+
 static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
 	match skill:
@@ -1224,10 +1248,15 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				out.append(item_name(view, id))
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
+			# a level that allows another of a facility (content facilities.kinds.<kind>.cap_by_farming, §4.6.1: the Greenhouse
+			# 1 at Lv8, 2 at Lv10): `2nd Greenhouse`, as q(178)'s `2nd Fish Trap` (q(179)); the first comes with its blueprint below
+			for kind in content().get("facilities", {}).get("kinds", {}).values():
+				for at in kind.get("cap_by_farming", []):
+					if int(at[0]) == level and int(at[1]) >= 2: out.append("%s %s" % [P0KitchenLogic.ordinal(int(at[1])), str(kind.get("name", ""))])
 			# P1 conveniences (content farming.conveniences: Seed Saver at Lv10, §4.6.1)
 			var conv: Dictionary = content().get("farming", {}).get("conveniences", {})
 			for k in conv:
-				if int(conv[k]) == level: out.append(str(FARMING_CONVENIENCE_NAMES.get(k, k)))
+				if int(conv[k]) == level and not str(k).begins_with("title_"): out.append(str(FARMING_CONVENIENCE_NAMES.get(k, k)))
 			# P1 facilities a level opens at the workbench (q(59) §1.6: `New for you · Cucumber, Sprinkler`)
 			for r in content().get("workbench", {}).get("recipes", []):
 				var gate: Array = r.get("gate", [])
@@ -1267,9 +1296,9 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:
 				if int(conv[k]) == level and not str(k).begins_with("title_"): out.append(str(CONVENIENCE_NAMES.get(k, k)))
-			for k in conv:   # the level's title last: `Lucky Double, Chef title` (不知火舞 on 282)
-				if int(conv[k]) == level and str(k).begins_with("title_"): out.append(str(CONVENIENCE_NAMES.get(k, k)))
 			if level == 4: out.push_front("third ingredient slot")   # SKILL-1 482:167
+	# the level's title last, in any track: `Lucky Double, Chef title`, `Seed Saver, Master Gardener title` (不知火舞 on 282)
+	for t in level_titles(skill, level): out.append(title_line(t))
 	return out
 
 ## `Fine fish now stay on the hook` when a level opens a whole rarity, else the fish by name (`Golden Koi now stays
@@ -1771,10 +1800,11 @@ const P1_UNLOCKS := {
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
 	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
 	# Lv7 (P1 exit C18, 李白 q(172)): the orchard and the sprinklers reach their most (perennial_slots 1 + level up to 8,
-	# sprinkler_max 3 + level up to 10), §8.6.2's lines; their notes come with q(172)
-	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": ""},
-	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": ""},
+	# sprinkler_max 3 + level up to 10), §8.6.2's lines; notes q(172) (李白 fac20ed1, 不知火舞)
+	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": "+1 slot"},
+	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": "+1 sprinkler"},
 	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
+	"plots_48": {"icon": "field", "text": "Plots 48", "note": "8 more to till"},   # Lv7 (q(172)): 40–47 on the field's edge
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
 }
 # Lv8's `stall_upgrade` has no line (不知火舞 on 282, 李元芳's c62a6ed9 ③): the stall is still the crate stand-in, with no

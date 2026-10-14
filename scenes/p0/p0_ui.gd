@@ -307,6 +307,7 @@ func set_view(v: Dictionary) -> void:
 	if compost_bin() != null: _compost.refresh(v)
 	if inbox() != null: _inbox.refresh(v)
 	if bite_board() != null: _bite_board.refresh(v)
+	if notice_board() != null: _notice_board.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
 
@@ -2544,6 +2545,39 @@ func open_bite_board(outpost: Dictionary) -> UiDrawer:
 func bite_board() -> UiDrawer:
 	return _bite_board if is_instance_valid(_bite_board) and modal_kind == "bite_board" else null
 
+## The Homestead Stall's Notice Board (q(164), SGODOT-284; 不知火舞's spec): from Homestead Lv5 the board by the stall
+## opens it, read-only. A row closes it and the map flies to that pin (show_on_map), moving nobody (q(31), k(1)).
+## The outposts' online counts are the map's (GET /p0/presence): the runtime asks on opening (notice_board_opened)
+## and hands them over (set_notice_online); until then no person badge shows.
+const NoticeBoardDrawer := preload("res://scenes/p0/panels/p0_notice_board_drawer.gd")
+signal notice_board_opened
+var _notice_board: UiDrawer
+var notice_online := {}   # outpost id → who is in, the last counts asked for
+
+func open_notice_board() -> UiDrawer:
+	var d: UiDrawer = NoticeBoardDrawer.new(view, notice_online)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.connect(&"place_pressed", func(go: String):
+		close_modal()
+		show_on_map.emit(map_target(go)))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	_notice_board = d
+	modal_kind = "notice_board"
+	notice_board_opened.emit()
+	return d
+
+## The open Notice Board, or null.
+func notice_board() -> UiDrawer:
+	return _notice_board if is_instance_valid(_notice_board) and modal_kind == "notice_board" else null
+
+## The outposts' online counts came: the open board's person badges follow.
+func set_notice_online(online: Dictionary) -> void:
+	notice_online = online
+	if notice_board() != null: _notice_board.call("set_online", online)
+
 ## MAP-8 Nearby cities (q(159); Figma row 85, 不知火舞 on MAP-8): the map's `Nearby cities ›` pill opens it — the ten
 ## cities nearest home, nearest first (P0Travel.nearby), with a Close 44 six above the sheet. A row's tap calls
 ## `pick` with its city (the map closes this and flies there, P0Map.open_nearby_city).
@@ -2559,6 +2593,20 @@ func open_nearby_cities(pick: Callable) -> UiDrawer:
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
 	modal_kind = "nearby"
+	return d
+
+## q(165) the Travel Post's Fare Board: Trip fares, read only (P0FareBoardDrawer: the seven tiers, every fare Free while
+## travel is), with a Close 44 six above the sheet as MAP-8's.
+const FareBoardDrawer := preload("res://scenes/p0/panels/p0_fare_board_drawer.gd")
+
+func open_fare_board() -> UiDrawer:
+	var d: UiDrawer = FareBoardDrawer.new(P0Travel.fares())
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "fare_board"
 	return d
 
 ## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
@@ -3165,12 +3213,13 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 	show_moment(m)
 
 ## A Cookbook title (§7.6.1; 不知火舞 on 282): RewardMoment Milestone, no buttons — the title, `Cookbook 20/48`, `New title ·
-## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up.
+## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up. A skill's Lv10
+## title too (P0Logic.title_card: `Master Gardener` · `Farming Lv10` · `New title`, its skill's icon; SGODOT-275).
 func show_title(spec: Dictionary) -> void:
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.MILESTONE
 	m.event = str(spec.get("event", ""))
-	m.icon = P0Logic.icon("cookbook")
+	m.icon = spec.get("icon", P0Logic.icon("cookbook"))   # a skill's title (P0Logic.title_card) brings its skill's icon
 	m.item_name = str(spec.get("item_name", ""))
 	m.strip = str(spec.get("strip", ""))
 	show_moment(m)
