@@ -28,8 +28,11 @@ const _MILESTONE_H := 77.0   # 安其拉 1699:102375: 40 → 77 with the NeedTil
 const _MILESTONE_PAD := Vector2(8.0, 4.0)
 const _MILESTONE_TEXT_X := 100.0
 const _SILHOUETTE := "fish_unknown"
-const _BADGE := 16.0
+## The Fish-dex badge in the heading row (283 FISH-6-COMPLETE; 不知火舞 9c93e46e / 382b72c2): 24, 6 right of the title's
+## ink (Figma's x 64 = its 58 + 6: the gap is the intent), y 1.
+const _BADGE := 24.0
 const _BADGE_GAP := 6.0
+const _BADGE_Y := 1.0
 ## From this Fishing level a silhouette says where to go (§6.9.1 路标; 不知火舞 on 283).
 const SIGNPOST_LEVEL := 8
 ## Only a fish that bites at one time alone says it: the others are only likelier then (不知火舞 on 283).
@@ -51,16 +54,19 @@ func _init(view: Dictionary = {}, fresh: Array = []) -> void:
 	title.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE)
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	heading.add_child(title)
-	if str(d.badge) != "":   # Fish-dex complete: a small badge right of the heading (安其拉's mark to come; the star till then)
+	if str(d.badge) != "":   # Fish-dex complete: its badge right of the heading (283 FISH-6-COMPLETE, 安其拉's mark)
 		var badge := TextureRect.new()
 		badge.name = "DexBadge"
-		badge.texture = P0Logic.icon("star")
+		badge.texture = badge_icon()
 		badge.tooltip_text = str(d.badge)
 		badge.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		badge.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		badge.custom_minimum_size = Vector2.ONE * _BADGE
 		badge.size = badge.custom_minimum_size
-		badge.position = Vector2(title.get_minimum_size().x + _BADGE_GAP, (_HEADING_H - _BADGE) * 0.5)
+		# the title's ink width as it is drawn: its font comes with the drawer's theme after this, so follow its minimum size
+		var follow := func(): badge.position = Vector2(title.get_minimum_size().x + _BADGE_GAP, _BADGE_Y)
+		title.minimum_size_changed.connect(follow)
+		follow.call()
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		heading.add_child(badge)
 	var close := UiNavButton.new("Close", true)
@@ -117,7 +123,7 @@ static func dex_data(view: Dictionary) -> Dictionary:
 				hint = signpost(FishWorld._fish(str(f.id))) if signposts and n <= 0 else ""})
 		if not fish.is_empty(): sections.append({name = P0Logic.rarity_name(view, r), fish = fish})
 	return {got = got, total = dex.size(), next = _next_line(view, got, dex.size()), sections = sections,
-		badge = _badge(got)}
+		badge = badge_for(got)}
 
 ## Where an uncaught fish is (from Lv8): its first water, the one time it bites at if it bites at one alone, its level —
 ## `River · night · Lv9`, `Pond · Lv5`; no weather (a day's, and the Bite Board's to say). "" for an unknown fish.
@@ -132,25 +138,46 @@ static func signpost(f: Dictionary) -> String:
 	return " · ".join(parts)
 
 ## The badge a reached Fish-dex milestone gives (content fishing.dex_milestones: `Fish-dex complete` at 20), else "".
-static func _badge(got: int) -> String:
+static func badge_for(got: int) -> String:
 	var badge := ""
 	for m in P0Logic.content().get("fishing", {}).get("dex_milestones", []):
 		if got >= int(m.get("kinds", 0)) and str(m.get("badge", "")) != "": badge = str(m.badge)
 	return badge
 
-## A Fish-dex milestone's card (§6.9.2; 不知火舞 on 283), {} for another id: {event, item_name, icon, strip}.
-##   10 kinds  `Fish-dex 10/20` · the kind that made it · `+30 Energy · +100 coins`
-##   20 kinds  `Fish-dex complete` · `20/20` · `+50 Energy · +300 coins · Badge` (its badge: the star till 安其拉's mark)
+## The Fish-dex badge (安其拉's mark, 283 badge_fishdex): the heading's, the profile's Fish tile's, the complete banner's.
+static func badge_icon() -> Texture2D: return GameUi.icon("i-badge-fishdex")
+
+## What the whole Fish-dex gave (the milestone row once complete, 283 FISH-6-COMPLETE): `+50 Energy · +300 coins · Badge`.
+static func complete_gifts() -> String:
+	var gifts := PackedStringArray()
+	for m in P0Logic.content().get("fishing", {}).get("dex_milestones", []):
+		if str(m.get("badge", "")) == "": continue
+		var kinds := int(m.get("kinds", 0))
+		for r in P0Logic.content().get("rewards", {}).get("fishdex", []):
+			if int(r[0]) == kinds and int(r[1]) > 0: gifts.append("+%d Energy" % int(r[1]))
+		if int(m.get("coins", 0)) > 0: gifts.append("+%d coins" % int(m.coins))
+		gifts.append("Badge")
+	return " · ".join(gifts)
+
+## A Fish-dex milestone's moment (§6.9.2; 不知火舞 on 283), {} for another id.
+##   10 kinds  a RewardMoment Milestone {event, item_name, icon, strip}: `Fish-dex 10/20` · the kind that made it ·
+##             `+30 Energy · +100 coins`
+##   20 kinds  a full MomentBanner {banner, kind, icon, title, subtitle, rewards, seconds} (283 DEX-COMPLETE): the badge,
+##             `Fish-dex complete` · `20/20`, pills `+50 Energy` (bolt) `+300 coins` (coin) `Badge` (the badge), ≤ 3 s, no button
 static func milestone_card(view: Dictionary, id: String, fish: String, energy: int, coins: int, badge: String) -> Dictionary:
 	if not id.begins_with("fishdex_"): return {}
 	var n := int(id.trim_prefix("fishdex_"))
 	var total: int = (view.get("fishing", {}).get("dex", []) as Array).size()
+	if badge != "":
+		var pills: Array = []
+		if energy > 0: pills.append({text = "+%d Energy" % energy, tone = UiFloatText.Tone.ENERGY_GAIN, icon = P0Logic.icon("energy")})
+		if coins > 0: pills.append({text = "+%d coins" % coins, tone = UiFloatText.Tone.COINS, icon = P0Logic.icon("coin")})
+		pills.append({text = "Badge", tone = UiFloatText.Tone.ITEM, icon = badge_icon()})
+		return {banner = true, kind = "complete", icon = badge_icon(), title = badge, subtitle = "%d/%d" % [n, total], rewards = pills,
+			seconds = 3.0}
 	var gifts := PackedStringArray()
 	if energy > 0: gifts.append("+%d Energy" % energy)
 	if coins > 0: gifts.append("+%d coins" % coins)
-	if badge != "":
-		gifts.append("Badge")
-		return {event = badge, item_name = "%d/%d" % [n, total], icon = "star", strip = " · ".join(gifts)}
 	return {event = "Fish-dex %d/%d" % [n, total], item_name = P0Logic.item_name(view, fish) if fish != "" else "",
 		icon = fish if fish != "" else "fish_crucian", strip = " · ".join(gifts)}
 
@@ -164,7 +191,7 @@ static func _milestone_coins(kinds: int) -> int:
 ## otherwise only the rod's reach, which is what holds the rest back (P0's eight fish never reach 10 kinds; no
 ## "N more to find", the NeedTile already says it — 不知火舞 233 walkthrough).
 static func _next_line(view: Dictionary, got: int, total: int) -> Array:
-	if total > 0 and got >= total and _badge(got) != "": return [_badge(got), ""]   # all found: the badge, not the rod
+	if total > 0 and got >= total and badge_for(got) != "": return [badge_for(got), complete_gifts()]   # all found: the badge and what it gave
 	for m in P0Logic.content().get("rewards", {}).get("fishdex", []):
 		if int(m[0]) > got and int(m[0]) <= total:
 			var coins := _milestone_coins(int(m[0]))   # P1: the coins with it (§6.9.2)

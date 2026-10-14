@@ -195,8 +195,8 @@ func test_the_sign_stands_beside_the_door_off_its_path_and_is_solid() -> void:
 	assert_bool(bp.world_to_cell(sign).x != P0Garden.ANCHORS.house.x).is_true()
 	P0Garden.block_points(bp, [sign])
 	var c := bp.world_to_cell(sign)
-	assert_str(str(bp.masks.walkable[c.y])[c.x]).is_equal("0")
-	assert_str(str(bp.masks.walkable[c.y])[P0Garden.ANCHORS.house.x]).is_equal("1")   # the door path stays open
+	assert_bool(bp.is_walkable(c)).is_false()
+	assert_bool(bp.is_walkable(Vector2i(P0Garden.ANCHORS.house.x, c.y))).is_true()   # the door path stays open
 
 ## The source label only breaks before ` · or ` (不知火舞 on 228): no-break spaces inside each part, U+2060 after a range's dash.
 func _plain(src: Dictionary) -> Dictionary:

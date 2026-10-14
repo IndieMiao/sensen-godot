@@ -71,7 +71,7 @@ function cabinetFree(c: P0Content, s: P0State): number {
 /** Whether all these portions find a place (checked before the pot is emptied; a Perfect pot makes two ids). */
 export function dishesFit(c: P0Content, s: P0State, dishes: [string, number][]): boolean {
   let free = cabinetFree(c, s);
-  const probe = { bag: s.bag.map(b => ({ ...b })), bag_cap: s.bag_cap };
+  const probe = { bag: s.bag.map(b => ({ ...b })), bag_cap: s.bag_cap, skills: s.skills };
   for (const [id, n] of dishes) {
     const kept = Math.min(n, free);
     free -= kept;

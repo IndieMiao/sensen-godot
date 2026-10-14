@@ -1,0 +1,71 @@
+{
+ "_note": "Hand input to server/tools/home_spots.ts run (SGODOT-303, 不知火舞 on 303). avoid: {cluster: polygons [[lat, lng], …]} no spot may stand in. pins: {cluster: [{replace_near, near, why}]}: the spot nearest replace_near is replaced by the valid spot nearest near (within 700 m), keeping every rule and the 800 m district name.",
+ "avoid": {
+  "gn-5128581": [
+   [
+    [
+     40.55,
+     -74.3
+    ],
+    [
+     40.55,
+     -74.1
+    ],
+    [
+     40.64,
+     -74.07
+    ],
+    [
+     40.69,
+     -74.035
+    ],
+    [
+     40.715,
+     -74.022
+    ],
+    [
+     40.74,
+     -74.018
+    ],
+    [
+     40.76,
+     -74.012
+    ],
+    [
+     40.8,
+     -73.977
+    ],
+    [
+     40.86,
+     -73.952
+    ],
+    [
+     40.95,
+     -73.93
+    ],
+    [
+     40.95,
+     -74.3
+    ]
+   ]
+  ]
+ },
+ "_avoid": {
+  "gn-5128581": "New York: across the Hudson is New Jersey (303 582765b3)"
+ },
+ "pins": {
+  "gn-1819729": [
+   {
+    "replace_near": [
+     22.2967,
+     114.1722
+    ],
+    "near": [
+     22.2775,
+     114.173
+    ],
+    "why": "Hong Kong: spot 3 was Tsim Sha Tsui across Victoria Harbour; Wan Chai on the island (303 575cdbfe)"
+   }
+  ]
+ }
+}

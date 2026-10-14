@@ -4,7 +4,7 @@
  * shelves `stall_daily` cards a day, drawn from pages not yet in the Cookbook and fixed for the day. */
 import { recipeById, type P0Content, type Recipe } from './content.js';
 import { coinsNeeded } from './homestead.js';
-import { homeClimate } from './travel.js';
+import { climateAt, homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import { cookable } from './cooking.js';
 import type { P0State } from './state.js';
@@ -51,10 +51,11 @@ export function marketCards(c: P0Content, climate: string): string[] {
   return c.cooking.cards ? carded(c).filter(r => r.card_zone === climate).map(r => CARD + r.id) : [];
 }
 
-/** Buy a card at the counter that shelves it: the page goes into the Cookbook (Tasted). */
-export function buyCard(c: P0Content, s: P0State, id: string, shop: string, events: P0Event[]): Refusal | null {
+/** Buy a card at the counter that shelves it: the page goes into the Cookbook (Tasted). A Market shelves its own city's
+ * climate cards (q(182), as its buy-back and barter): the place's city, else the one the player is in. */
+export function buyCard(c: P0Content, s: P0State, id: string, shop: string, events: P0Event[], place?: unknown): Refusal | null {
   const page = cardPage(id), price = cardPrice(c, id);
-  const shelved = shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, homeClimate(c, s)) : [];
+  const shelved = shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, climateAt(c, s, place)) : [];
   if (price === null || !shelved.includes(id)) return { code: 'bad_item' };
   if (s.cookbook.includes(page)) return { code: 'owned' };
   if (s.coins < coinsNeeded(c, price)) return { code: 'no_coins', detail: { need: coinsNeeded(c, price) - s.coins } };

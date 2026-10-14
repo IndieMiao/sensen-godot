@@ -173,7 +173,7 @@
     },
     "res_mira": {
       "name": "Mira",
-      "role": "Travelling Trader",
+      "role": "Traveling Trader",
       "portrait": "mira",
       "likes": "Rare+",
       "gift_meal": "dish_grilled_fish",
@@ -251,7 +251,7 @@
           "qty": 1,
           "coins": 100,
           "reward": {
-            "title": "Well Travelled"
+            "title": "Well Traveled"
           }
         }
       ]

@@ -2595,6 +2595,20 @@ func open_nearby_cities(pick: Callable) -> UiDrawer:
 	modal_kind = "nearby"
 	return d
 
+## q(165) the Travel Post's Fare Board: Trip fares, read only (P0FareBoardDrawer: the seven tiers, every fare Free while
+## travel is), with a Close 44 six above the sheet as MAP-8's.
+const FareBoardDrawer := preload("res://scenes/p0/panels/p0_fare_board_drawer.gd")
+
+func open_fare_board() -> UiDrawer:
+	var d: UiDrawer = FareBoardDrawer.new(P0Travel.fares())
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "fare_board"
+	return d
+
 ## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
 ## leaves the room for that pond (go_pond); Details › lists its fish; Back and a tap outside return to the board, ×
 ## closes both.
@@ -3161,6 +3175,7 @@ func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
 	var b := UiMomentBanner.new()
 	b.kind = UiMomentBanner.Kind.COMPLETE if str(spec.get("kind", "")) == "complete" else UiMomentBanner.Kind.LEVEL_UP
 	b.level = str(spec.get("level", ""))
+	if spec.get("icon", null) is Texture2D: b.icon = spec.icon   # art in the disc's place (the Fish-dex badge)
 	b.title = str(spec.get("title", ""))
 	b.subtitle = str(spec.get("subtitle", ""))
 	b.rewards = (spec.get("rewards", []) as Array).map(func(r): return UiFloatText.pill(str(r.text), int(r.tone), r.get("icon", null)))
@@ -3209,9 +3224,13 @@ func show_title(spec: Dictionary) -> void:
 	show_moment(m)
 
 ## A Fish-dex milestone (§6.9.2; 不知火舞 on 283): the same RewardMoment Milestone as a Cookbook title, no buttons —
-## `Fish-dex 10/20` over the kind that made it, or `Fish-dex complete` · `20/20` (P0FishDex.milestone_card). Queued after
-## the catch's card like a level-up.
+## `Fish-dex 10/20` over the kind that made it; the whole dex a full MomentBanner instead (283 DEX-COMPLETE: the badge,
+## `Fish-dex complete` · `20/20`, pills `+50 Energy` `+300 coins` `Badge`, ≤ 3 s, no button). P0FishDex.milestone_card.
+## Queued after the catch's card like a level-up.
 func show_dex_milestone(spec: Dictionary) -> void:
+	if bool(spec.get("banner", false)):
+		show_banner(spec)
+		return
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.MILESTONE
 	m.event = str(spec.get("event", ""))

@@ -36,8 +36,12 @@ func test_the_card_words() -> void:
 	var v := _view(10)
 	assert_dict(P0FishDex.milestone_card(v, "fishdex_10", "fish_snakehead", 30, 100, "")).is_equal(
 		{event = "Fish-dex 10/20", item_name = "Snakehead", icon = "fish_snakehead", strip = "+30 Energy · +100 coins"})
-	assert_dict(P0FishDex.milestone_card(_view(20), "fishdex_20", "fish_snakehead", 50, 300, "Fish-dex complete")).is_equal(
-		{event = "Fish-dex complete", item_name = "20/20", icon = "star", strip = "+50 Energy · +300 coins · Badge"})
+	# the whole dex: a full MomentBanner (283 DEX-COMPLETE) — the badge, its words, three pills, ≤ 3 s
+	var full := P0FishDex.milestone_card(_view(20), "fishdex_20", "fish_snakehead", 50, 300, "Fish-dex complete")
+	assert_that([full.banner, full.kind, full.title, full.subtitle, full.seconds]).is_equal([true, "complete", "Fish-dex complete", "20/20", 3.0])
+	assert_array(full.rewards.map(func(r): return [r.text, r.tone])).is_equal([["+50 Energy", UiFloatText.Tone.ENERGY_GAIN],
+		["+300 coins", UiFloatText.Tone.COINS], ["Badge", UiFloatText.Tone.ITEM]])
+	assert_object(full.icon).is_same(P0FishDex.badge_icon())
 	assert_str(str(P0FishDex.milestone_card(v, "fishdex_10", "fish_snakehead", 0, 100, "").strip)).is_equal("+100 coins")   # Energy capped out
 	assert_dict(P0FishDex.milestone_card(v, "line_cook", "", 0, 100, "")).is_empty()
 
@@ -55,8 +59,12 @@ func test_ten_kinds_show_their_card_and_float_no_energy_or_coins() -> void:
 func test_twenty_kinds_say_complete_with_the_badge() -> void:
 	rt.session.state_changed.emit(_view(20), _events(20, 50, 300, "Fish-dex complete"))
 	for i in 3: await get_tree().process_frame
-	var m := _card()
-	assert_that([m.event, m.item_name, m.strip]).is_equal(["Fish-dex complete", "20/20", "+50 Energy · +300 coins · Badge"])
+	assert_object(_card()).is_null()   # not a RewardMoment: the full banner (283 DEX-COMPLETE)
+	var b := rt.ui.root.find_children("*", "UiMomentBanner", true, false).front() as UiMomentBanner
+	assert_that([b.kind, b.title, b.subtitle, b.action]).is_equal([UiMomentBanner.Kind.COMPLETE, "Fish-dex complete", "20/20", ""])
+	assert_object(b.icon).is_same(P0FishDex.badge_icon())
+	assert_int(b.rewards.size()).is_equal(3)
+	assert_bool(_floats().any(func(t): return t.contains("+50 Energy") or t.contains("coins"))).is_false()   # on the banner only
 	rt.ui.close_modal()
 	await get_tree().process_frame
 

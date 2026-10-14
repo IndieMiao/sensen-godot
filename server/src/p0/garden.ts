@@ -17,7 +17,7 @@ import type { P0Event } from './progress.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
 import { add, count, room, take } from './bag.js';
-import { yardBlock } from './decor.js';
+import { cellsOf, yardBlock } from './decor.js';
 import { cropById } from './content.js';
 import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
@@ -117,6 +117,63 @@ export function growMs(c: P0Content, s: P0State, plot: Plot, grow_h: number): nu
 export function plotCount(c: P0Content, s: P0State): number {
   const p0 = c.start.tilled_plots + c.start.wild_plots;
   return Math.min(stepAt(c.homestead.plots, s.homestead.level, p0), c.garden?.plots.length ?? p0);
+}
+
+/** A plot's cell on the yard grid Decorate uses: content garden.origin + pitch × its [col, row] (P0Garden.PLOT_ORIGIN, beds
+ * two cells apart; Homestead Lv7's front beds are row −1, q(172)). */
+export function plotYardCell(c: P0Content, id: number): [number, number] | null {
+  const at = plotCell(c, id);
+  if (!at) return null;
+  const [ox, oy] = c.garden.origin ?? [4, 3], k = c.garden.pitch ?? 2;
+  return [ox + k * at[0], oy + k * at[1]];
+}
+
+/** The yard cells of the beds the homestead has now, `x,y`: Decorate keeps off them (q(172): Homestead Lv7's beds 40–47
+ * stand outside the field's rect). */
+export function bedCells(c: P0Content, s: P0State): Set<string> {
+  const out = new Set<string>();
+  for (let id = 0; id < plotCount(c, s); id++) { const at = plotYardCell(c, id); if (at) out.add(`${at[0]},${at[1]}`); }
+  return out;
+}
+
+/** What stood where beds were just added (Homestead Lv7's 40–47, q(172)) makes way: a piece goes back to Farm Storage,
+ * said as a piece stored (`Wooden Bench · back in Farm Storage`, q(120)); a yard facility (the Compost Bin), which has
+ * no storage, moves beside the workbench (`Compost Bin · moved beside the Workbench`, q(172) ③ 甲). */
+export function clearNewBeds(c: P0Content, s: P0State, added: number[], events: P0Event[]): void {
+  const cells = new Set(added.map(id => plotYardCell(c, id)).filter(at => at).map(at => `${at![0]},${at![1]}`));
+  if (cells.size === 0) return;
+  if (s.decor) s.decor.placed = s.decor.placed.filter(p => {
+    if (!cellsOf(c, p.id, p.x, p.y, p.rot).some(([x, y]) => cells.has(`${x},${y}`))) return true;
+    putInStorage(s, p.id, 1);
+    events.push({ kind: 'decor', action: 'stored', uid: p.uid, item: p.id, x: p.x, y: p.y, rot: p.rot, reason: 'plots' });
+    return false;
+  });
+  for (const f of s.facilities ?? []) {
+    if (!f.cell || !cells.has(`${f.cell[0]},${f.cell[1]}`)) continue;
+    const def = c.facilities.kinds[f.kind];
+    const to = nearestYardCell(c, s, def?.start ?? [17, 16], def?.start_span ?? 0, f.id);
+    if (!to) continue;   // no free yard cell at all: it stays (never on a real farm)
+    f.cell = to;
+    events.push({ kind: 'facility', action: 'moved', facility: f.id, facility_kind: f.kind, plot: -1, covered: 0, started: [],
+      x: to[0], y: to[1], reason: 'plots' });
+  }
+}
+
+/** The legal yard cell nearest `from` for a yard facility, as the client's first preview picks it (P0FarmFacilities.
+ * nearest_yard_cell): `span` cells either side count as `from` (the workbench's three), beside it first, then in front,
+ * behind last. null when none is legal. */
+export function nearestYardCell(c: P0Content, s: P0State, from: [number, number], span: number, facility?: number): [number, number] | null {
+  const walk = (c as P0Content & { decor?: { yard: { walk: [number, number, number, number] } } }).decor?.yard.walk;
+  if (!walk) return null;
+  let best: [number, number] | null = null, bestD = Infinity;
+  for (let y = walk[1]; y < walk[1] + walk[3]; y++) for (let x = walk[0]; x < walk[0] + walk[2]; x++) {
+    const dx = Math.max(0, Math.abs(x - from[0]) - span), dy = y - from[1];
+    const d = dx * dx + dy * dy + (dy !== 0 ? 0.25 : 0) + (dy > 0 ? 0.5 : 0);
+    if (d >= bestD || yardBlock(c, s, [[x, y]], { x, y }, { facility })) continue;
+    bestD = d;
+    best = [x, y];
+  }
+  return best;
 }
 
 /** Add the plots the Homestead level brings and does not have yet, as wild; the ids added (an upgrade, or a save
@@ -299,7 +356,7 @@ export function compost(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: u
   const have = count(s.bag, item, 'skip');
   if (have < qty) return { code: 'not_enough', detail: { item, have, need: qty } };
   const out = 'fert_compost';
-  const trial = { bag: structuredClone(s.bag), bag_cap: s.bag_cap };
+  const trial = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
   take(trial.bag, item, qty, 'skip');
   if (room(c, trial, out) < qty) return { code: 'bag_full', detail: { need: qty } };
   take(s.bag, item, qty, 'skip');

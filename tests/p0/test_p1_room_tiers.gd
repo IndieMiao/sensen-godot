@@ -103,6 +103,44 @@ func test_stoves_off_screen_keep_their_buttons_off_screen() -> void:
 		assert_bool(screen.has_point(spots[n])).override_failure_message("%s on screen at the door: %s" % [n, spots[n]]).is_false()
 	assert_dict(r._marker_spots(spots)).is_equal(spots)
 
+## Upgraded inside (HOME-1 from Profile is at home here too): the farmhouse reopens in its next room once — after the
+## level-up's banner and look cards and anything queued behind them, the stove idle — and not for a level in the same room.
+func test_an_upgrade_inside_reopens_the_farmhouse_in_its_next_room() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var r := _farmhouse(4)
+	r.rt = rt
+	var calls := [0]
+	var router_busy := [true]
+	r.set("reopen", func() -> bool:
+		calls[0] += 1
+		return not router_busy[0])
+	r.call("check_room", {"homestead": {"level": 4}})
+	assert_int(calls[0]).is_equal(0)   # the same room
+	var banner := Control.new()
+	rt.ui._open_modal(banner, 0.0)   # the level-up's banner is up
+	rt.ui.queue_card(func(): pass)    # and a look card waits behind it
+	r.call("check_room", {"homestead": {"level": 5}})
+	assert_int(calls[0]).is_equal(0)
+	rt.ui.close_modal()
+	rt.ui._card_queue.clear()
+	await get_tree().process_frame
+	r.call("check_room", {"homestead": {"level": 5}})
+	assert_int(calls[0]).is_equal(1)   # the router busy (another way in or out under way): not taken …
+	router_busy[0] = false
+	r.call("check_room", {"homestead": {"level": 5}})
+	assert_int(calls[0]).is_equal(2)   # … so the next frame tries again, and it is taken
+	r.call("check_room", {"homestead": {"level": 5}})
+	assert_int(calls[0]).is_equal(2)   # once taken, never again
+	var std := _farmhouse(6)
+	std.rt = rt
+	std.set("reopen", func() -> bool:
+		calls[0] += 10
+		return true)
+	std.call("check_room", {"homestead": {"level": 9}})
+	assert_int(calls[0]).is_equal(2)   # Lv6 → Lv9: still the Standard Room
+
 static func _aabb(n: Node3D) -> AABB:
 	var out := AABB()
 	var first := true

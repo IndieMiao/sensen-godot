@@ -2177,6 +2177,10 @@
       [
         3,
         40
+      ],
+      [
+        7,
+        48
       ]
     ],
     "_plots_note": "P1 紧凑农场：Lv1–2 30 格、Lv3 起 40 格（p1-step1 §1.1）；Lv4–10 的田数随 P1 第 3 步复跑后重定，在那之前仍 40。§8.3.2 的 200 → 600 是地理农场尺度，不用。",
@@ -2431,7 +2435,8 @@
         ],
         "unlocks": [
           "orchard_8",
-          "sprinklers_10"
+          "sprinklers_10",
+          "plots_48"
         ]
       },
       {
@@ -2855,7 +2860,7 @@
     },
     "res_old_kai": {
       "name": "Old Kai",
-      "role": "Harbour Elder",
+      "role": "Harbor Elder",
       "portrait": "kai",
       "likes": "Grilled",
       "gift_meal": "dish_grilled_crucian",

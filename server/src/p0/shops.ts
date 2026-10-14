@@ -122,7 +122,7 @@ export function walletNeed(c: P0Content, offer: { price: number; floor: boolean 
 
 export function buyItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; shop?: unknown; place?: unknown }, events: P0Event[]): Refusal | null {
   const shop = shopOf(cmd.shop), id = String(cmd.item ?? ''), qty = Number(cmd.qty ?? 1);
-  if (isCard(id)) return shop && qty === 1 ? buyCard(c, s, id, shop, events) : { code: shop ? 'bad_qty' : 'bad_item' };   // recipe cards (§7.16.1)
+  if (isCard(id)) return shop && qty === 1 ? buyCard(c, s, id, shop, events, cmd.place) : { code: shop ? 'bad_qty' : 'bad_item' };   // recipe cards (§7.16.1)
   if (!Number.isInteger(qty) || qty < 1 || qty > 99) return { code: 'bad_qty' };
   if (!shop || !catalog(c, shop, s, cmd.place).includes(id)) return { code: 'bad_item' };
   const offer = offerOf(c, id)!;

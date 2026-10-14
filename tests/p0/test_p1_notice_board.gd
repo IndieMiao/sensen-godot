@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 ## shop, travel post, by short name, kind or the pin's reason, who is in (0 shows none); each row goes to its pin.
 
 const P0NoticeBoard := preload("res://modules/p0/p0_notice_board.gd")
+const FarmArt = preload("res://modules/farm/farm_art.gd")
 const P0City := preload("res://modules/p0/p0_city.gd")
 const P0Ponds := preload("res://modules/p0/p0_ponds.gd")
 
@@ -148,18 +149,18 @@ func test_its_cell_is_yard_beside_the_stall_off_the_field_the_paths_and_the_othe
 	assert_int(absi(c.x - P0Garden.ANCHORS.storage.x) + absi(c.y - P0Garden.ANCHORS.storage.y)).is_equal(1)   # beside the stall
 	assert_bool(P0Garden.blueprint().is_walkable(c)).is_true()
 
-## The placeholder: a board on two posts with a roof, not the sign's outline; its strip `Notice Board`.
-func test_the_placeholder_and_its_strip() -> void:
-	var b: Node3D = auto_free(load("res://scenes/p0/p0_farm.gd").notice_board_prop(Vector3.ZERO))
-	for n in ["PostL", "PostR", "Board", "Roof"]: assert_object(b.get_node(n)).is_not_null()
-	var board := b.get_node("Board") as MeshInstance3D
-	assert_float(board.position.y - (board.mesh as BoxMesh).size.y * 0.5).is_greater_equal(0.6)   # off the grass
-	# 上官婉儿 on #375: below the roof it stays inside 0.32 of its middle — the stall's seed crate next door reaches 0.33
-	for m in b.get_children():
-		var half := (m as MeshInstance3D).position.x
-		var w: float = ((m as MeshInstance3D).mesh as BoxMesh).size.x * 0.5
-		var limit := 0.35 if str(m.name) == "Roof" else 0.32
-		assert_float(absf(half) + w).override_failure_message("%s reaches %.3f" % [m.name, absf(half) + w]).is_less_equal(limit)
+## 刘备's model (#395; 上官婉儿 284 c8ab943e): 1.595 m, inside ±0.35 (roof) of its cell's middle, the tap on its board's
+## centre (board_center (0, 1.17)), the strip over it at the `mark` socket; its strip `Notice Board`.
+func test_the_board_is_the_model_and_its_strip() -> void:
+	var farm = load("res://scenes/p0/p0_farm.gd")
+	var b: MeshInstance3D = auto_free(farm.notice_board_prop(Vector3.ZERO))
+	assert_object(b.mesh).is_same(FarmArt.mesh_for("notice_board"))
+	var box := b.mesh.get_aabb()
+	assert_float(box.end.y).is_equal_approx(1.595, 0.01)
+	assert_float(maxf(absf(box.position.x), absf(box.end.x))).is_less_equal(0.351)   # the roof; the feet ±0.30 under it
+	assert_bool(box.has_point(farm.NOTICE_HIT)).is_true()
+	assert_vector(farm.NOTICE_HIT).is_equal(Vector3(0, 1.17, 0))
+	assert_vector(farm.NOTICE_MARK).is_equal(Vector3(0, 1.75, 0))
 	assert_str(str(P0WorldPrompts.notice_board({}).text)).is_equal("Notice Board")
 
 ## A marked pond says why too, in place of its bite (NOTICE-BOARD 2608:133862: `Pond Catch · Pond Crucian 0/2`).

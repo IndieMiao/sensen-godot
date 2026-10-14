@@ -139,7 +139,7 @@ export function bagFitsFloor(c: P0Content, s: P0State, floor: number): boolean {
   if (room(c, s, 'stone') < stone) return false;
   for (const [id] of c.mine.floors[floor - 1].drops) {
     if (!id) continue;
-    const trial: BagHolder = { bag: structuredClone(s.bag), bag_cap: s.bag_cap };
+    const trial: BagHolder = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
     add(c, trial, 'stone', stone);
     if (room(c, trial, id) < 1) return false;
   }

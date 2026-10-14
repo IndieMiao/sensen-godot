@@ -38,7 +38,7 @@ P1 口径（方案 q 行）：田 Lv1–2 30 / Lv3 起 40（q(59)），Lv4–10 
      小幅改品质的便利不建模；料理品质沿用固定命中率。
   S6 天气每天随机（晴 50 / 雨 30 / 风 20），时段按会话开始时刻；鱼笼按 Pond 模板（无时段 / 天气）。
   S7 背包容量、鱼篓、摆件上限、仓库不建模；矿洞战斗必胜、不掉 HP；外城地区鱼沿用 sim_v3 的簇派生。
-  S8 特产换料：数据里 homestead.barter.items 现为空（= 当前构建里换不了）；主跑按方案 §8.4.5 规则补上
+  S8 特产换料：#364 起数据不再列 homestead.barter.items，换料物品按地区数据派生，与方案 §8.4.5 规则相同（原先 items 为空 = 换不了）
      （本带地区作物 + 本城 2 种地区鱼），"data" 模式按空表跑作对照。
 
 用法：
@@ -336,7 +336,7 @@ def p1_config(climate='Temperate', plot_ladder=None, barter='rule', orchard=4, g
     cfg['stall_salt'] = stall_salt          # (每日份数, 单价)：农场驿站卖岩盐的假设（s4 / s5）；None = 不卖（现数据）
     cfg['barter'] = dict(give=bt['give'], minerals=[mat(x) for x in bt['minerals']], share=bt['level_share'], per_day=bt['daily'],
                          salt=salt_rule, mineral_cap=mineral_cap, mode=barter, items=[i.split('_', 1)[1] if i.startswith(('crop_', 'fish_')) else i for i in bt['items'].get(climate, [])]
-                         if barter == 'data' else rule_items, data_items=bt['items'])
+                         if barter == 'data' and 'items' in bt else rule_items, data_items=bt.get('items', {}))   # #364 起数据不再列 items，按地区数据派生，同规则
     # --- 经济 ---
     cfg['initial_wallet'] = C['start']['coins']; cfg['wallet_floor'] = C['wallet_floor']
     cfg['cards'] = dict(prices={int(k): v for k, v in ck['cards']['prices'].items()}, stall_daily=ck['cards']['stall_daily'])
@@ -359,13 +359,18 @@ BASE_LADDER = [(1, 30), (3, 40), (7, 48)]
 GH_ANCHORS = [(0, 0), (4, 0)]
 
 
+# q(172) 的 8 格：用户 10-13 定「往下延伸、扩展农场边界」（302 64adaa0b），方向 A（奕星转，10-14 凌晨）——在现有 8 × 5 田
+# 靠镜头 / 出生点一侧加一整行 8 格（网格第 −1 行，世界格 y1，编号 40–47），篱笆前段前移；不放左沿（刘邦方案 C 作废）
+LV7_CELLS = [(c, -1) for c in range(8)]
+
+
 def grid_cells(n):
     if n <= len(_BASE_CELLS):
         return _BASE_CELLS[:n]
+    out = list(_BASE_CELLS) + LV7_CELLS[:n - len(_BASE_CELLS)]
     cols = max(c for c, _ in _BASE_CELLS) + 1
     rows = max(r for _, r in _BASE_CELLS) + 1
-    out = list(_BASE_CELLS)
-    for i in range(n - len(_BASE_CELLS)):      # 扩田：在网格下方加整行（8 格一行）
+    for i in range(n - len(out)):              # 超过 48 格时（只在敏感性里用到）才在网格下方加整行
         out.append((i % cols, rows + i // cols))
     return out
 
@@ -1445,7 +1450,7 @@ def main():
       '"驿站卖盐"是假设：只为下一级缺的岩盐买，每天 ≤ 1 份、20 金币，记在 A 类去向。卡在什么 = 全部 seed 最后 30 天按天计。')
     P()
     SALT = (1, 20)
-    MODES = [('data', 'data', None, '数据现状：barter.items 为空'),
+    MODES = [('data', 'data', None, '数据现状：#364 起按地区数据派生，同规则'),
              ('rule', 'rule', None, '方案 §8.4.5：矿物每级 ≤ 50%，岩盐不能换'),
              ('nocap', 'nocap', None, '矿物不设上限，岩盐不能换'),
              ('s1', 'salt_cap', None, '(s1) 岩盐也能换；岩盐与四种矿物都受每级 ≤ 50%'),
@@ -1495,7 +1500,7 @@ def main():
     P('| 情形 | 画像 | Fa10 | Fi10 | Co10 | Hs10 | 中界 | 日撞墙 d8–30 |')
     P('|---|---|---|---|---|---|---|---|')
     SR = {}
-    sens = [('主表（对照）', None, None), ('换料按数据现状（barter.items 为空 → 换不了）', dict(barter='data'), None),
+    sens = [('主表（对照）', None, None), ('换料按数据现状（#364 起同规则）', dict(barter='data'), None),
             ('V2 机器人卖法（每种鱼留 2、作物留 3）', None, dict(v2sell=True)),
             ('委托按 sim_v3 常数（30 分钟 15、重度 32 金币 / 日）', None, 'req_const'),
             ('委托接满板（30 分钟 3 单 / 日、重度 5 单 / 日）', None, 'req_full'),
@@ -1549,7 +1554,7 @@ def nomine_summary(NR, NM):
                 d.append(f'{who} {v - base:+.1f}')
         if d:
             drift.append(f'{key} ' + ' / '.join(d))
-    head = (f'**"只种田不挖矿也能走完十级"（§8.4.5）：** 现数据 `homestead.barter.items` 为空，换不了；按方案规则补上也不行——岩盐只出在矿洞且不能换（Lv2–5 共 15 份），'
+    head = (f'**"只种田不挖矿也能走完十级"（§8.4.5）：** 现数据（#364 起）换料物品按地区数据派生，与方案规则相同，仍然不行——岩盐只出在矿洞且不能换（Lv2–5 共 15 份），'
             f'铜 / 石英每级又只能换一半，从不下矿的人停在 Lv1。照常下矿的 5 分钟玩家 {("第 %.0f 天到 Lv10" % m5) if m5 else "也到不了 Lv10"}，30 分钟玩家第 {m30:.0f} 天。')
     body = '各假设：' + '；'.join(parts) + '。'
     stuck = [f'{k} 停在 Lv{hs_max(NR[("P5", k)]):.0f}' for k in ('s1', 's2', 's3', 's4', 's5') if k not in ok]

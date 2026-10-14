@@ -146,6 +146,23 @@ func replace_farm_instance(source: Node, args: Dictionary) -> void:
 	await _end_transition()
 
 
+## Whether replace_top_instance would take `source` now: on top, no other way in or out under way.
+func can_replace(source: Node) -> bool: return not _navigation_pending and source == top_instance()
+
+## The top world opened again in place, behind the loading cover — the farmhouse moving to its next room after an
+## upgrade made inside it (SGODOT-282) — the world below staying suspended under it.
+func replace_top_instance(source: Node, scene_path: String, args := {}) -> void:
+	if not can_replace(source): return
+	var packed := await _load_with_feedback(scene_path, args)
+	if packed == null: return
+	if not is_instance_valid(source) or source != top_instance():
+		_clear_transition()
+		return
+	_discard_top()
+	_push_packed(packed, args, false)
+	await _end_transition()
+
+
 func go_to_dressing() -> void:
 	open_instance(DRESS)
 

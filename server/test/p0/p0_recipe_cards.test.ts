@@ -70,3 +70,22 @@ describe('Recipe cards (§7.16.1)', () => {
     if (card.price + 40 > 60) expect(applyP0(c, poor, buy(card.id), T0)).toMatchObject({ ok: false, code: 'no_coins' });
   });
 });
+
+// q(182): a Market shelves its own city's climate cards, as its buy-back and barter do; the Stall stays the home's.
+describe('a Market sells the cards of the city it stands in (q(182))', () => {
+  const SINGAPORE = 'gn-1880252';   // Tropical; San Francisco is Temperate
+  const there = { space: 'outpost', place: `${SINGAPORE}~market0` };
+  const away = () => step(fresh(), { type: 'travel', to: SINGAPORE }).s;
+  it('away, the market shows and sells Tropical pages, not the home ones', () => {
+    const s = away();
+    const cards = viewOf(c, s, T0).shops.market.cards.map((x: { id: string }) => x.id);
+    expect(cards).toEqual(expect.arrayContaining(['recipe_card_dish_pineapple_barra', 'recipe_card_dish_pineapple_fish']));
+    expect(cards).not.toContain('recipe_card_dish_pumpkin_chowder');
+    expect(step(s, { ...buy('recipe_card_dish_pineapple_barra', 'market'), ...there } as P0Command).s.cookbook).toContain('dish_pineapple_barra');
+    expect(applyP0(c, s, { ...buy('recipe_card_dish_pumpkin_chowder', 'market'), ...there } as P0Command, T0)).toMatchObject({ ok: false, code: 'bad_item' });
+  });
+  it('the Stall keeps the home climate wherever the player is', () => {
+    const s = away();
+    expect(viewOf(c, s, T0).shops.homestead.cards).toEqual(viewOf(c, fresh(), T0).shops.homestead.cards);
+  });
+});
