@@ -25,14 +25,23 @@ static func card(_view: Dictionary, ev: Dictionary) -> Dictionary:
 		item_name = postcard if postcard != "" else "Postcard from %s" % who,
 		strip = "New title · %s" % (title if title != "" else "%s's Best Friend" % who)}
 
-## The residents this world has a home for (q(193) ④: open = in world_gen's placement rules — fixed, rank, s_order —
-## or on a hand-written outpost), in the residents table's order, derived, never a written number. Mira, whose weekly
-## route is P2, is in none of them: not on the Postcards page and not counted (11 in P1, 12 once she joins).
+## The residents this world has a home for (q(193) ④: open = a place in world_gen's placement rules, or a hand-written
+## outpost), in the residents table's order, derived, never a written number. A resident's rank entry is where they
+## live and counts once its room is built (its `at` a room of world.room: Ivo's mine_hut is not yet, q(193) ②); the
+## S-tier s_order counts for those without one (Granny Wu). Mira, whose weekly route is P2, is in none: 10 in P1 —
+## 11 once the Mine Hut is in, 12 with her.
 static func open_residents() -> Array:
-	var rules: Dictionary = P0Logic.content().get("world", {}).get("residents", {})
+	var world: Dictionary = P0Logic.content().get("world", {})
+	var rules: Dictionary = world.get("residents", {})
+	var rooms: Dictionary = world.get("room", {})
 	var homed := {}
+	var ranked := {}
 	for id in rules.get("fixed", {}).values(): homed[str(id)] = true
-	for r in rules.get("rank", []) + rules.get("s_order", []): homed[str(r.get("id", ""))] = true
+	for r in rules.get("rank", []):
+		ranked[str(r.get("id", ""))] = true
+		if rooms.has(str(r.get("at", "")).split(":")[0]): homed[str(r.get("id", ""))] = true
+	for r in rules.get("s_order", []):
+		if not ranked.has(str(r.get("id", ""))): homed[str(r.get("id", ""))] = true
 	for o in P0Outposts.all():
 		for id in o.get("residents", []): homed[str(id)] = true
 	return P0Logic.content().get("residents", {}).keys().filter(func(id): return homed.has(str(id)))
