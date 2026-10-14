@@ -1,0 +1,10 @@
+{
+  "res_ivo": {
+    "slots": {
+      "hairHat": "hairhat_npc_ivo",
+      "mask": "mask16_npc_ivo",
+      "cloth": "cloth1_npc_ivo",
+      "shoes": "shoes3"
+    }
+  }
+}

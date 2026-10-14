@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/home/deck/.herdr/worktrees/sensen-godot/wt-3d-scene/output/art-tools/bin/python",
+    "tools/art/recolor_ivo_cloth_284.py",
+    "--runtime-root",
+    "/home/deck/.herdr/worktrees/sensen-godot/wt-resident-284"
+  ],
+  "source_and_import_files_byte_identical": true,
+  "files": {
+    "assets/avatar/source/cloth1_npc_ivo/T_ivo_cloth_D.png.import": "1a7914030daea198c09689dec1b3f5753590f912418a07331fb28d7028d8c22e",
+    "assets/avatar/source/cloth1_npc_ivo/SK_dt_skin01.fbx.import": "4e11c3380597e2468828d53fd0dfb86975f861fa1ab1174b1f5a3fb5da7a7bd8",
+    "assets/avatar/source/cloth1_npc_ivo/SK_dt_skin01.fbx": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02",
+    "assets/avatar/source/cloth1_npc_ivo/T_ivo_cloth_D.png": "c6f8956a38a5d6389c2ca92de8efba91b07b47c281484d4061ae85fa6ef918b4"
+  }
+}

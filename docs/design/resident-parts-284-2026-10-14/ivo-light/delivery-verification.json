@@ -1,0 +1,38 @@
+[
+  {
+    "name": "SGODOT-284_IVO_LIGHT_v1_ivo_card.jpg",
+    "attachment_id": "32800b57-ae05-4c47-9266-a154d71fdad5",
+    "sha256": "b04047d7209249eef03d29afa41e4b007ded41529d21c19d9d96b68a5d68e89d",
+    "bytes": 24797,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_LIGHT_v1_stamps.png",
+    "attachment_id": "e9cbf82e-a486-491c-b2be-b121be6fd0ec",
+    "sha256": "c65e99fab78c262828de2ed5da5bb4778a0fb9ca7a6f01fc78001a16a9e42037",
+    "bytes": 17620,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_LIGHT_v1_validation.json",
+    "attachment_id": "21f6e7d9-4ec7-4b98-a488-dcb19dccd88c",
+    "sha256": "48e2329ddf5776301bb6835823e149d37b44ff1db092e5fc390c93447846b8af",
+    "bytes": 11600,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_LIGHT_v1_review-materials.zip",
+    "attachment_id": "abc7ce72-16fb-4e1f-b9b2-e1fd3cd74a9f",
+    "sha256": "21757d821755ca01a58e37d7b1e9f3770987835c71a441c3bdc2fe4b51c3abf4",
+    "bytes": 120459,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]

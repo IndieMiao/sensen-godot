@@ -1,0 +1,249 @@
+{
+	"checks": [
+		{
+			"check": "hairhat80_npc_granny_wu: imported node paths, types of frames and bone rest transforms match base",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: original FBX root name retained",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: one extracted static mesh and one surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: extracted triangles match actual FBX import",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: texture resolution equals base",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: extracted mesh transform exactly matches base",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: no compensating recipe offset or scale",
+			"passed": true
+		},
+		{
+			"check": "hairhat80_npc_granny_wu: actual NPC catalog lookup succeeds",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: imported node paths, types of frames and bone rest transforms match base",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: original FBX root name retained",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: one extracted static mesh and one surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: extracted triangles match actual FBX import",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: texture resolution equals base",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: extracted mesh transform exactly matches base",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: no compensating recipe offset or scale",
+			"passed": true
+		},
+		{
+			"check": "hairhat_npc_ivo: actual NPC catalog lookup succeeds",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: imported node paths, types of frames and bone rest transforms match base",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: original FBX root name retained",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: one extracted static mesh and one surface",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: extracted triangles match actual FBX import",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: texture resolution equals base",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: extracted mesh transform exactly matches base",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: no compensating recipe offset or scale",
+			"passed": true
+		},
+		{
+			"check": "mask16_npc_ivo: actual NPC catalog lookup succeeds",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: imported node paths, types of frames and bone rest transforms match base",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: original FBX root name retained",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: one extracted static mesh and one surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: extracted triangles match actual FBX import",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: texture resolution equals base",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: extracted mesh transform exactly matches base",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: no compensating recipe offset or scale",
+			"passed": true
+		},
+		{
+			"check": "hairhat0_npc_tomo: actual NPC catalog lookup succeeds",
+			"passed": true
+		},
+		{
+			"check": "Tomo: original FBX byte-identical",
+			"passed": true
+		},
+		{
+			"check": "Tomo: imported geometry, UVs and normals exactly match hairhat0",
+			"passed": true
+		},
+		{
+			"check": "Tomo: excluded from player catalog",
+			"passed": true
+		},
+		{
+			"check": "Ivo lamp/hat material has zero emission",
+			"passed": true
+		},
+		{
+			"check": "Ivo hat within largest existing runtime hairHat budget",
+			"passed": true
+		}
+	],
+	"existing_hairhat_triangles": {
+		"hairhat0": 1468,
+		"hairhat12_npc_mei": 2784,
+		"hairhat20": 670,
+		"hairhat36_npc_pip": 1214,
+		"hairhat36_npc_sigrid": 1360,
+		"hairhat41": 2312,
+		"hairhat43": 1156,
+		"hairhat51": 1103,
+		"hairhat70": 586,
+		"hairhat71_npc_kai": 648,
+		"hairhat80_npc_ama": 764
+	},
+	"failures": [],
+	"hairhat_budget": 2784,
+	"parts": {
+		"hairhat0_npc_tomo": {
+			"meshes": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat0_npc_tomo/T_tomo_hairHat_D.png",
+					"bounds": "[P: (-0.235986, -0.006991, -0.252073), S: (0.466144, 0.46161, 0.461818)]",
+					"emission_strength": 0.6,
+					"name": "hairHat",
+					"surfaces": 1,
+					"transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+				}
+			],
+			"offset_pos": "(0.0, 0.0, 0.0)",
+			"offset_rot_deg": "(0.0, 0.0, 0.0)",
+			"offset_scale": "(1.0, 1.0, 1.0)",
+			"texture_size": [
+				512,
+				512
+			],
+			"triangles": 1468
+		},
+		"hairhat80_npc_granny_wu": {
+			"meshes": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat80_npc_granny_wu/T_granny_wu_hairHat_D.png",
+					"bounds": "[P: (-0.227801, -0.017155, -0.336759), S: (0.455602, 0.580321, 0.526078)]",
+					"emission_strength": 0.6,
+					"name": "hairHat",
+					"surfaces": 1,
+					"transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+				}
+			],
+			"offset_pos": "(0.0, 0.0, 0.0)",
+			"offset_rot_deg": "(0.0, 0.0, 0.0)",
+			"offset_scale": "(1.0, 1.0, 1.0)",
+			"texture_size": [
+				512,
+				512
+			],
+			"triangles": 764
+		},
+		"hairhat_npc_ivo": {
+			"meshes": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat_npc_ivo/T_ivo_hairHat_D.png",
+					"bounds": "[P: (-0.258, 0.037024, -0.267525), S: (0.516, 0.375992, 0.565161)]",
+					"emission_strength": 0.0,
+					"name": "hairHat",
+					"surfaces": 1,
+					"transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+				}
+			],
+			"offset_pos": "(0.0, 0.0, 0.0)",
+			"offset_rot_deg": "(0.0, 0.0, 0.0)",
+			"offset_scale": "(1.0, 1.0, 1.0)",
+			"texture_size": [
+				512,
+				512
+			],
+			"triangles": 1423
+		},
+		"mask16_npc_ivo": {
+			"meshes": [
+				{
+					"albedo": "res://assets/avatar/source/mask16_npc_ivo/T_ivo_mask_D.png",
+					"bounds": "[P: (-0.18522, -0.021052, 0.023631), S: (0.367891, 0.074289, 0.172069)]",
+					"emission_strength": 0.3,
+					"name": "mask",
+					"surfaces": 1,
+					"transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+				}
+			],
+			"offset_pos": "(0.0, 0.0, 0.0)",
+			"offset_rot_deg": "(0.0, 0.0, 0.0)",
+			"offset_scale": "(1.0, 1.0, 1.0)",
+			"texture_size": [
+				512,
+				512
+			],
+			"triangles": 320
+		}
+	}
+}

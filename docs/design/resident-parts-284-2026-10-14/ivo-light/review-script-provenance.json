@@ -1,0 +1,9 @@
+{
+  "portrait_baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+  "portrait_baker_committed": false,
+  "portrait_ids": [
+    "res_ivo"
+  ],
+  "windowed": true,
+  "command": "godot --path . --script res://tools/art/bake_resident_portraits.gd -- --looks=output/resident-parts-284-ivo-light/looks-new.json --ids=res_ivo --out=output/resident-parts-284-ivo-light/portraits"
+}

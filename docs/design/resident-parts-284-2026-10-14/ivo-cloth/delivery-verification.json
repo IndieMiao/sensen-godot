@@ -1,0 +1,65 @@
+[
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_npc-lineup-front.png",
+    "attachment_id": "dca3ae4e-348b-4a08-a7a4-28060296613d",
+    "sha256": "7f083427bd40f02b49f84cdeef57b2e664d71eeca970be9947fdca3575d59ce2",
+    "bytes": 96022,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_npc-lineup-three-quarter.png",
+    "attachment_id": "a5421aa9-52b8-4aeb-9d5d-fa95d852dff9",
+    "sha256": "ba53fc5ff1399e439925531f3a00f9a6589ae58ecbc3ec43f6da366216c3ad3e",
+    "bytes": 91745,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_granny_wu_card.jpg",
+    "attachment_id": "84e4c60d-8621-40d7-955f-4e88da37a34c",
+    "sha256": "3d6f08a478113cf5848aaa4e3cef8f6a2ca04ce93adc94168fb4dbc2e43b8e24",
+    "bytes": 21887,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_ivo_card.jpg",
+    "attachment_id": "c81d642b-430f-44a8-bca6-62dc6a206df4",
+    "sha256": "3e0010fee3daeb6b9188745a84b9a8c21d8a3947405c4c622b430ad88cd334de",
+    "bytes": 24929,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_stamps.png",
+    "attachment_id": "0d52c636-f072-4ef0-a922-8812365dbb8c",
+    "sha256": "ff26bd6c4bc572d7a6a1745b09881f37614215600cb87d68759dee3f10359f2d",
+    "bytes": 29384,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_validation.json",
+    "attachment_id": "87cd2b9f-173d-4b5c-8379-cd86eb521fec",
+    "sha256": "4014ca80dd81d3540da18e5da98646988fc28604cb6bc7f292fe238c07e4498f",
+    "bytes": 9253,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_IVO_CLOTH_v1_review-materials.zip",
+    "attachment_id": "5896ab80-6cf1-4c21-b557-b9f39783b490",
+    "sha256": "f0efb7c916e9f9e746e513395d531c9335d74e15f1d4de403729343fe7a67723",
+    "bytes": 568965,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]

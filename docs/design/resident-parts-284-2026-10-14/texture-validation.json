@@ -1,0 +1,51 @@
+{
+  "granny": {
+    "size": [
+      512,
+      512
+    ],
+    "hair_luminance_knots": [
+      42.389599999999994,
+      60.80159999999999,
+      81.35399999999998
+    ],
+    "pin_luminance_knots": [
+      167.7866,
+      188.9262,
+      195.7818
+    ],
+    "alpha_exact": true,
+    "hair_unique_colors": 32
+  },
+  "beard": {
+    "size": [
+      512,
+      512
+    ],
+    "luminance_knots": [
+      207.48539999999997,
+      232.41320000000002,
+      243.6258
+    ],
+    "alpha_exact": true
+  },
+  "hat": {
+    "size": [
+      2048,
+      2048
+    ],
+    "same_size_as": "hairhat51",
+    "hair_luminance_knots": [
+      60.0246,
+      83.7988,
+      91.1518
+    ],
+    "palette": {
+      "cap": "C99A3A",
+      "band": "9E7628",
+      "brass": "9B7B46",
+      "lens": "F3E6C4",
+      "hair_mid": "B8B3AB"
+    }
+  }
+}

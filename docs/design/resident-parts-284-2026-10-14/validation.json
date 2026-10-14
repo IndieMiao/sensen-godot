@@ -1,0 +1,464 @@
+{
+  "issue": "SGODOT-284",
+  "request": "q(171)",
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "base": "a8e0b548",
+  "date": "2026-10-14",
+  "scope": "Three NPC-only parts; desktop Vulkan Mobile review. No runtime resident registration or release.",
+  "tests": {
+    "cases": 38,
+    "suites": 8,
+    "failures": 0,
+    "skipped": 0,
+    "paths": [
+      "tests/catalog",
+      "tests/pipeline",
+      "tests/assembly/test_socket_placement.gd"
+    ]
+  },
+  "import_validation": {
+    "checks": [
+      {
+        "check": "hairhat80_npc_granny_wu: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "Ivo lamp/hat material has zero emission",
+        "passed": true
+      },
+      {
+        "check": "Ivo hat within largest existing runtime hairHat budget",
+        "passed": true
+      }
+    ],
+    "existing_hairhat_triangles": {
+      "hairhat0": 1468,
+      "hairhat12_npc_mei": 2784,
+      "hairhat20": 670,
+      "hairhat36_npc_pip": 1214,
+      "hairhat36_npc_sigrid": 1360,
+      "hairhat41": 2312,
+      "hairhat43": 1156,
+      "hairhat51": 1103,
+      "hairhat70": 586,
+      "hairhat71_npc_kai": 648,
+      "hairhat80_npc_ama": 764
+    },
+    "failures": [],
+    "hairhat_budget": 2784,
+    "parts": {
+      "hairhat80_npc_granny_wu": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/hairhat80_npc_granny_wu/T_granny_wu_hairHat_D.png",
+            "bounds": "[P: (-0.227801, -0.017155, -0.336759), S: (0.455602, 0.580321, 0.526078)]",
+            "emission_strength": 0.6,
+            "name": "hairHat",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 764
+      },
+      "hairhat_npc_ivo": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/hairhat_npc_ivo/T_ivo_hairHat_D.png",
+            "bounds": "[P: (-0.258, 0.037024, -0.267525), S: (0.516, 0.375992, 0.565161)]",
+            "emission_strength": 0.0,
+            "name": "hairHat",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 1423
+      },
+      "mask16_npc_ivo": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/mask16_npc_ivo/T_ivo_mask_D.png",
+            "bounds": "[P: (-0.18522, -0.021052, 0.023631), S: (0.367891, 0.074289, 0.172069)]",
+            "emission_strength": 0.3,
+            "name": "mask",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 320
+      }
+    }
+  },
+  "geometry_validation": {
+    "hat": {
+      "all_non_geometry_objects_exact": true,
+      "version": 7700,
+      "global_axes_units_exact": true,
+      "model_names_hierarchy_transforms_exact": true,
+      "connections_exact": true,
+      "triangles": 1423,
+      "vertices": 785,
+      "sha256": "0d329ca1a7cb4122300e4286ebfe8a226826908e6b806c38dd4f4fc244f00d45",
+      "base": "hairhat51",
+      "retained_hair_component": 0,
+      "source_texture_size": [
+        2048,
+        2048
+      ]
+    },
+    "beard": {
+      "all_non_geometry_objects_exact": true,
+      "version": 7700,
+      "global_axes_units_exact": true,
+      "model_names_hierarchy_transforms_exact": true,
+      "connections_exact": true,
+      "triangles": 320,
+      "vertices": 162,
+      "sha256": "4c476d2733d348441983c44cefcd3477472d4f42dd4e4c9446f996be3da200d7",
+      "base": "mask16_npc_kai",
+      "hanging_length_before_cm": 11.651453971862793,
+      "bottom_below_head_origin_cm": 1.8838180303573608,
+      "jaw_fit_lift_cm": 2.0,
+      "full_height_ratio": 0.3333333424872196
+    },
+    "existing_hairhat_source_triangles": {
+      "hairhat12_npc_mei": 2784,
+      "hairhat36_npc_pip": 1214,
+      "hairhat0": 1468,
+      "hairhat36_npc_sigrid": 1360,
+      "hairhat51": 1103,
+      "hairhat20": 670,
+      "hairhat71_npc_kai": 648,
+      "hairhat70": 586,
+      "hairhat80_npc_ama": 764,
+      "hairhat41": 2312,
+      "hairhat43": 1156
+    },
+    "hat_budget": 2784,
+    "granny_fbx_byte_identical": true
+  },
+  "texture_validation": {
+    "granny": {
+      "size": [
+        512,
+        512
+      ],
+      "hair_luminance_knots": [
+        42.389599999999994,
+        60.80159999999999,
+        81.35399999999998
+      ],
+      "pin_luminance_knots": [
+        167.7866,
+        188.9262,
+        195.7818
+      ],
+      "alpha_exact": true,
+      "hair_unique_colors": 32
+    },
+    "beard": {
+      "size": [
+        512,
+        512
+      ],
+      "luminance_knots": [
+        207.48539999999997,
+        232.41320000000002,
+        243.6258
+      ],
+      "alpha_exact": true
+    },
+    "hat": {
+      "size": [
+        2048,
+        2048
+      ],
+      "same_size_as": "hairhat51",
+      "hair_luminance_knots": [
+        60.0246,
+        83.7988,
+        91.1518
+      ],
+      "palette": {
+        "cap": "C99A3A",
+        "band": "9E7628",
+        "brass": "9B7B46",
+        "lens": "F3E6C4",
+        "hair_mid": "B8B3AB"
+      }
+    }
+  },
+  "preservation_summary": {
+    "base": "a8e0b548186d8e24da263f64060469ec1dc67178",
+    "unchanged_file_count": 385,
+    "manifest_original_count": 38,
+    "manifest_final_count": 41,
+    "manifest_old_entries_and_prefix_exact": true,
+    "new_ids": [
+      "hairhat80_npc_granny_wu",
+      "hairhat_npc_ivo",
+      "mask16_npc_ivo"
+    ],
+    "npc_only_append_exact": true,
+    "original_outpost_npcs_unchanged": true
+  },
+  "reproducibility": {
+    "all_identical": true,
+    "artifacts": [
+      {
+        "path": "assets/avatar/source/hairhat80_npc_granny_wu/SM_hairHat80.fbx",
+        "first_sha256": "a4ea181a135b502a8ddea40d4244172d198c440b41ac2dad2ca1a31179ab0889",
+        "second_sha256": "a4ea181a135b502a8ddea40d4244172d198c440b41ac2dad2ca1a31179ab0889",
+        "byte_identical": true
+      },
+      {
+        "path": "assets/avatar/source/hairhat80_npc_granny_wu/T_granny_wu_hairHat_D.png",
+        "first_sha256": "e24deaa57d3a38a78e56b5ca71d2c4045c4162c7b3094a9ed904e02a9e368080",
+        "second_sha256": "e24deaa57d3a38a78e56b5ca71d2c4045c4162c7b3094a9ed904e02a9e368080",
+        "byte_identical": true
+      },
+      {
+        "path": "assets/avatar/source/hairhat_npc_ivo/SM_hairHat51.fbx",
+        "first_sha256": "0d329ca1a7cb4122300e4286ebfe8a226826908e6b806c38dd4f4fc244f00d45",
+        "second_sha256": "0d329ca1a7cb4122300e4286ebfe8a226826908e6b806c38dd4f4fc244f00d45",
+        "byte_identical": true
+      },
+      {
+        "path": "assets/avatar/source/hairhat_npc_ivo/T_ivo_hairHat_D.png",
+        "first_sha256": "f0624664f9986206f99b397bbaf90408db0ac08db285dd00304545ede9fa2d00",
+        "second_sha256": "f0624664f9986206f99b397bbaf90408db0ac08db285dd00304545ede9fa2d00",
+        "byte_identical": true
+      },
+      {
+        "path": "assets/avatar/source/mask16_npc_ivo/SM_mask16.fbx",
+        "first_sha256": "4c476d2733d348441983c44cefcd3477472d4f42dd4e4c9446f996be3da200d7",
+        "second_sha256": "4c476d2733d348441983c44cefcd3477472d4f42dd4e4c9446f996be3da200d7",
+        "byte_identical": true
+      },
+      {
+        "path": "assets/avatar/source/mask16_npc_ivo/T_ivo_mask_D.png",
+        "first_sha256": "b66832fb453e6b55c6a5c1120c12eec377665b52463f70f8c774fa542118f7b6",
+        "second_sha256": "b66832fb453e6b55c6a5c1120c12eec377665b52463f70f8c774fa542118f7b6",
+        "byte_identical": true
+      }
+    ]
+  },
+  "renderer": {
+    "godot": "4.7.2",
+    "blender": "5.2.2 LTS",
+    "backend": "Vulkan Mobile",
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "physical_phone": false
+  },
+  "decisions": {
+    "cloth42_npc_ivo": "Skipped: source texture contains a monster face, stripe pattern and multicolor decorations. Retain approved original cloth42 fallback instead of redesigning it.",
+    "granny_glasses": "None, per final review.",
+    "ivo_headlamp": "Matte ivory lens, emission_strength=0.",
+    "fbx_method": "Replace only Geometry inside original binary FBX tree; preserve all non-geometry objects, connections and global axes/units. Encoder canonicalizes FileId/CreationTime only."
+  },
+  "images": {
+    "granny_wu_card.jpg": {
+      "sha256": "33e1ca4d5ea7bdc67a1ea689c5639146a55644ce842e866d17f2499a433c13a5",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "npc-lineup-three-quarter.png": {
+      "sha256": "41023e7a52f9e9cc1e855ccf7274f1d88c31185e83fee0fd381e0449f3a71bf2",
+      "pixels": [
+        624,
+        464
+      ]
+    },
+    "ivo_card.jpg": {
+      "sha256": "1d09dabdc1d036f01afa4eb0301fa6dd076a8ecd1a720cfeb2812dcee292a82f",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "stamps.png": {
+      "sha256": "27988c1abc9a32b1d41ddd46bb81439af2f78d3b3d9830f4590e5291fbdfba56",
+      "pixels": [
+        228,
+        196
+      ]
+    },
+    "cards.png": {
+      "sha256": "82dc0471a8f606e6404dc030ed4c30198dea2d5bdb85897ec6514552b55289cf",
+      "pixels": [
+        324,
+        346
+      ]
+    },
+    "npc-lineup-both.png": {
+      "sha256": "614010f25f547bcf35805f832c1e9c1e9baab921afcc5a84bbca6126f22fdd14",
+      "pixels": [
+        1224,
+        472
+      ]
+    },
+    "ivo_stamp_96x120.png": {
+      "sha256": "756dbfe32245cb2bed6dd6ca9c493760156cbade3ec34920aeb24551b7af3b67",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "granny_wu_stamp_96x120.png": {
+      "sha256": "f5362433d7ad1f5b06b52c5d84cdaca52eb22ae8c77155b4293e05ab904b2b7e",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "ivo_stamp_32x40.png": {
+      "sha256": "4010e762f55cb1b9271b58a71e4532f000e2727938ce4e8d3b53de7c2564aa32",
+      "pixels": [
+        32,
+        40
+      ]
+    },
+    "npc-lineup-front.png": {
+      "sha256": "18f8f7209aa8c720ba54fce4a6619e51512eeba6a45ccf29e708fbd32dfd71d8",
+      "pixels": [
+        624,
+        464
+      ]
+    },
+    "granny_wu_stamp_32x40.png": {
+      "sha256": "d67cce022a96dc74c0aefddd929f1ea2eeb468f208f4cf7f472bf9cab888c1b0",
+      "pixels": [
+        32,
+        40
+      ]
+    }
+  },
+  "portrait_script": {
+    "lineup_source": "tools/dev/npc_lineup.gd",
+    "lineup_source_sha256": "611b1092274306e9b27cf425e0232eb77071121ee27c8d6468721859d7da182b",
+    "lineup_fixture_sha256": "798eedf54298f3b9c10fe9adac48a76611cc2e901e04a34d1cd70167643ee850",
+    "portrait_baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+    "portrait_baker_committed": false,
+    "lineup_changes": [
+      "Two resident looks from fixture, no player column",
+      "Freeze idle at zero for open eyes",
+      "Camera distance 3.5 m and target Y 0.90 for complete feet",
+      "Short readable captions"
+    ]
+  }
+}

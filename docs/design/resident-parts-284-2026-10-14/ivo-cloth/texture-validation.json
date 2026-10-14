@@ -1,0 +1,55 @@
+{
+  "shirt": {
+    "luminance_knots": [
+      168.92849999999999,
+      225.238,
+      239.6952
+    ],
+    "source_luminance_range": [
+      225.238,
+      239.6952
+    ],
+    "palette_shadow_mid_highlight": [
+      "7A5E3E",
+      "9C7A52",
+      "B8966A"
+    ],
+    "pixel_count": 655257,
+    "fraction": 0.6249017715454102,
+    "output_unique_colors": 22
+  },
+  "shorts": {
+    "luminance_knots": [
+      64.14439999999999,
+      66.0722,
+      70.0
+    ],
+    "source_luminance_range": [
+      64.14439999999999,
+      70.0
+    ],
+    "palette_shadow_mid_highlight": [
+      "26231F",
+      "3A3632",
+      "55504A"
+    ],
+    "pixel_count": 323303,
+    "fraction": 0.30832576751708984,
+    "output_unique_colors": 13
+  },
+  "id": "cloth1_npc_ivo",
+  "base": "cloth1",
+  "source_pixels": [
+    1024,
+    1024
+  ],
+  "details_pixel_count": 70016,
+  "details_fraction": 0.0667724609375,
+  "details_byte_identical": true,
+  "alpha_exact": true,
+  "fbx_byte_identical": true,
+  "sha256": {
+    "SK_dt_skin01.fbx": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02",
+    "T_ivo_cloth_D.png": "c6f8956a38a5d6389c2ca92de8efba91b07b47c281484d4061ae85fa6ef918b4"
+  }
+}

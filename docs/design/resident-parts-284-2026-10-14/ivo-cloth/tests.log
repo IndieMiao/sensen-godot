@@ -1,0 +1,326 @@
+ERROR: The remote port number must be between 1 and 65535 (inclusive).
+   at: connect_to_host (core/io/stream_peer_tcp.cpp:69)
+ERROR: Remote Debugger: Unable to connect to host '127.0.0.1:0'.
+   at: create_tcp (core/debugger/remote_debugger_peer.cpp:247)
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.330 - Forward Mobile - Using Device #0: AMD - AMD Custom GPU 0405 (RADV VANGOGH)
+
+AvatarService: 14 NPC-only parts kept out of the player pools
+[2J[H
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Scanning for test suites in: res://tests/catalog
+Scanning for test suites in: res://tests/pipeline
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/catalog/test_part_catalog.gd
+  res://tests/catalog/test_part_catalog.gd > test_load_valid STARTED
+  res://tests/catalog/test_part_catalog.gd > test_load_valid PASSED 8ms
+
+  res://tests/catalog/test_part_catalog.gd > test_load_missing_file_returns_null STARTED
+WARNING: PartCatalog: manifest 不存在 res://tests/fixtures/nope.json
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_file (res://modules/avatar/catalog/part_catalog.gd:31)
+         [1] test_load_missing_file_returns_null (res://tests/catalog/test_part_catalog.gd:15)
+         [2] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [3] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [4] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [5] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [6] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [7] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [8] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [9] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [10] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [11] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [12] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [13] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [14] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [15] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [16] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [17] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [18] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/catalog/test_part_catalog.gd > test_load_missing_file_returns_null PASSED 8ms
+
+  res://tests/catalog/test_part_catalog.gd > test_load_bad_schema_returns_null STARTED
+WARNING: PartCatalog: 缺字段 attach: { "id": "x", "slot": "cloth" }
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_file (res://modules/avatar/catalog/part_catalog.gd:45)
+         [1] test_load_bad_schema_returns_null (res://tests/catalog/test_part_catalog.gd:18)
+         [2] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [3] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [4] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [5] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [6] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [7] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [8] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [9] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [10] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [11] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [12] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [13] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [14] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [15] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [16] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [17] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [18] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/catalog/test_part_catalog.gd > test_load_bad_schema_returns_null PASSED 8ms
+
+  res://tests/catalog/test_part_catalog.gd > test_duplicate_id_returns_null STARTED
+WARNING: PartCatalog: 重复 id fx_cloth_a
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_from_file (res://modules/avatar/catalog/part_catalog.gd:64)
+         [1] test_duplicate_id_returns_null (res://tests/catalog/test_part_catalog.gd:28)
+         [2] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [3] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [4] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [5] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [6] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [7] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [8] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [9] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [10] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [11] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [12] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [13] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [14] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [15] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [16] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [17] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [18] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/catalog/test_part_catalog.gd > test_duplicate_id_returns_null PASSED 9ms
+
+Statistics: 4 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 55ms
+
+
+Run Test Suite: res://tests/catalog/test_demo_denylist.gd
+  res://tests/catalog/test_demo_denylist.gd > test_denied_part_disappears_from_slot_pool STARTED
+  res://tests/catalog/test_demo_denylist.gd > test_denied_part_disappears_from_slot_pool PASSED 9ms
+
+  res://tests/catalog/test_demo_denylist.gd > test_unknown_id_is_ignored_not_error STARTED
+  res://tests/catalog/test_demo_denylist.gd > test_unknown_id_is_ignored_not_error PASSED 9ms
+
+  res://tests/catalog/test_demo_denylist.gd > test_load_denylist_parses_ids STARTED
+  res://tests/catalog/test_demo_denylist.gd > test_load_denylist_parses_ids PASSED 9ms
+
+  res://tests/catalog/test_demo_denylist.gd > test_load_denylist_rejects_bad_version STARTED
+WARNING: PartCatalog: denylist 版本/格式非法 user://test_denylist.json
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] load_denylist (res://modules/avatar/catalog/part_catalog.gd:171)
+         [1] test_load_denylist_rejects_bad_version (res://tests/catalog/test_demo_denylist.gd:47)
+         [2] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [3] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [4] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [5] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [6] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [7] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [8] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [9] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [10] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [11] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [12] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [13] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [14] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [15] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [16] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [17] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [18] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/catalog/test_demo_denylist.gd > test_load_denylist_rejects_bad_version PASSED 9ms
+
+  res://tests/catalog/test_demo_denylist.gd > test_missing_file_is_empty_not_error STARTED
+  res://tests/catalog/test_demo_denylist.gd > test_missing_file_is_empty_not_error PASSED 8ms
+
+  res://tests/catalog/test_demo_denylist.gd > test_shipped_denylist_file_is_valid STARTED
+  res://tests/catalog/test_demo_denylist.gd > test_shipped_denylist_file_is_valid PASSED 8ms
+
+Statistics: 6 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 80ms
+
+
+Run Test Suite: res://tests/catalog/test_npc_only.gd
+  res://tests/catalog/test_npc_only.gd > test_an_empty_list_changes_nothing STARTED
+  res://tests/catalog/test_npc_only.gd > test_an_empty_list_changes_nothing PASSED 12ms
+
+  res://tests/catalog/test_npc_only.gd > test_an_npc_only_part_leaves_the_pools_but_stays_findable STARTED
+  res://tests/catalog/test_npc_only.gd > test_an_npc_only_part_leaves_the_pools_but_stays_findable PASSED 11ms
+
+  res://tests/catalog/test_npc_only.gd > test_a_saved_outfit_drops_npc_only_parts STARTED
+WARNING: AvatarService: 存档里的 hairhat51 已不存在，hairHat 回落为 'hairhat0'
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _drop_missing_parts (res://modules/avatar/avatar_service.gd:67)
+         [1] test_a_saved_outfit_drops_npc_only_parts (res://tests/catalog/test_npc_only.gd:51)
+         [2] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [3] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [4] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [5] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [6] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [7] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [8] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [9] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [10] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [11] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [12] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [13] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [14] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [15] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [16] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [17] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [18] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/catalog/test_npc_only.gd > test_a_saved_outfit_drops_npc_only_parts PASSED 10ms
+
+  res://tests/catalog/test_npc_only.gd > test_online_appearance_refuses_npc_only_parts_unless_for_an_npc STARTED
+  res://tests/catalog/test_npc_only.gd > test_online_appearance_refuses_npc_only_parts_unless_for_an_npc PASSED 8ms
+
+  res://tests/catalog/test_npc_only.gd > test_load_npc_only_parses_and_rejects_bad_files STARTED
+WARNING: PartCatalog: npc_only 版本/格式非法 user://test_npc_only.json
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] _load_ids (res://modules/avatar/catalog/part_catalog.gd:156)
+         [1] load_npc_only (res://modules/avatar/catalog/part_catalog.gd:149)
+         [2] test_load_npc_only_parses_and_rejects_bad_files (res://tests/catalog/test_npc_only.gd:73)
+         [3] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [4] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [5] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [6] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [7] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [8] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [9] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [10] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [11] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [12] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [13] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [14] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [15] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [16] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [17] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [18] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [19] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/catalog/test_npc_only.gd > test_load_npc_only_parses_and_rejects_bad_files PASSED 9ms
+
+  res://tests/catalog/test_npc_only.gd > test_the_shipped_list_is_valid STARTED
+  res://tests/catalog/test_npc_only.gd > test_the_shipped_list_is_valid PASSED 24ms
+
+Statistics: 6 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 109ms
+
+
+Run Test Suite: res://tests/pipeline/test_mixamo_retarget.gd
+  res://tests/pipeline/test_mixamo_retarget.gd > test_normalize_source_bone_names STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_normalize_source_bone_names PASSED 8ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_bone_map_targets_exist_in_rig STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_bone_map_targets_exist_in_rig PASSED 34ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_rotation_delta_is_carried_in_world_space STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_rotation_delta_is_carried_in_world_space PASSED 34ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_unmapped_bones_pinned_to_rest_with_single_key STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_unmapped_bones_pinned_to_rest_with_single_key PASSED 34ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_hips_translation_scaled_by_height_and_in_place_strips_xz STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_hips_translation_scaled_by_height_and_in_place_strips_xz PASSED 35ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_source_facing_backwards_is_corrected STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_source_facing_backwards_is_corrected PASSED 35ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_register_real_clips_updates_table STARTED
+  res://tests/pipeline/test_mixamo_retarget.gd > test_register_real_clips_updates_table PASSED 9ms
+
+  res://tests/pipeline/test_mixamo_retarget.gd > test_xbot_fixture_walk_animates_knee STARTED
+WARNING: Xbot 样例不存在，跳过（tmp/mixamo_fixture/Xbot.glb）
+     at: push_warning (core/variant/variant_utility.cpp:1033)
+     GDScript backtrace (most recent call first):
+         [0] test_xbot_fixture_walk_animates_knee (res://tests/pipeline/test_mixamo_retarget.gd:107)
+         [1] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+         [2] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+         [3] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [4] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [5] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+         [6] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [7] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+         [8] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [9] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+         [10] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [11] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:35)
+         [12] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [13] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:28)
+         [14] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+         [15] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+         [16] execute (res://addons/gdUnit4/src/core/_TestCase.gd:41)
+         [17] test_completed (res://addons/gdUnit4/src/core/_TestCase.gd:86)
+  res://tests/pipeline/test_mixamo_retarget.gd > test_xbot_fixture_walk_animates_knee PASSED 8ms
+
+Statistics: 8 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 245ms
+
+
+Run Test Suite: res://tests/pipeline/test_converted_assets.gd
+  res://tests/pipeline/test_converted_assets.gd > test_manifest_loads_and_parts_valid STARTED
+  res://tests/pipeline/test_converted_assets.gd > test_manifest_loads_and_parts_valid PASSED 410ms
+
+  res://tests/pipeline/test_converted_assets.gd > test_mesh_parts_have_toon_material STARTED
+  res://tests/pipeline/test_converted_assets.gd > test_mesh_parts_have_toon_material PASSED 365ms
+
+  res://tests/pipeline/test_converted_assets.gd > test_socket_scenes_are_not_bloated_with_whole_fbx STARTED
+  res://tests/pipeline/test_converted_assets.gd > test_socket_scenes_are_not_bloated_with_whole_fbx PASSED 361ms
+
+  res://tests/pipeline/test_converted_assets.gd > test_mesh_part_skin_bind_names_match_base_rig_bones STARTED
+  res://tests/pipeline/test_converted_assets.gd > test_mesh_part_skin_bind_names_match_base_rig_bones PASSED 111ms
+
+  res://tests/pipeline/test_converted_assets.gd > test_eyes_material_is_pure_black STARTED
+  res://tests/pipeline/test_converted_assets.gd > test_eyes_material_is_pure_black PASSED 9ms
+
+Statistics: 5 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 294ms
+
+
+Run Test Suite: res://tests/pipeline/test_base_rig.gd
+  res://tests/pipeline/test_base_rig.gd > test_base_rig_structure STARTED
+  res://tests/pipeline/test_base_rig.gd > test_base_rig_structure PASSED 34ms
+
+  res://tests/pipeline/test_base_rig.gd > test_animations_present_and_play STARTED
+  res://tests/pipeline/test_base_rig.gd > test_animations_present_and_play PASSED 124ms
+
+  res://tests/pipeline/test_base_rig.gd > test_slot_table_bones_exist_in_skeleton STARTED
+  res://tests/pipeline/test_base_rig.gd > test_slot_table_bones_exist_in_skeleton PASSED 33ms
+
+Statistics: 3 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 216ms
+
+
+Run Test Suite: res://tests/pipeline/test_extract_append.gd
+  res://tests/pipeline/test_extract_append.gd > test_appending_writes_what_the_default_mode_would_write_for_the_same_entries STARTED
+  res://tests/pipeline/test_extract_append.gd > test_appending_writes_what_the_default_mode_would_write_for_the_same_entries PASSED 8ms
+
+  res://tests/pipeline/test_extract_append.gd > test_the_shipped_manifest_stays_byte_for_byte_ahead_of_the_new_entries STARTED
+  res://tests/pipeline/test_extract_append.gd > test_the_shipped_manifest_stays_byte_for_byte_ahead_of_the_new_entries PASSED 11ms
+
+  res://tests/pipeline/test_extract_append.gd > test_nothing_to_add_leaves_the_text_alone_and_a_broken_text_is_refused STARTED
+  res://tests/pipeline/test_extract_append.gd > test_nothing_to_add_leaves_the_text_alone_and_a_broken_text_is_refused PASSED 8ms
+
+  res://tests/pipeline/test_extract_append.gd > test_only_ids_missing_from_the_manifest_are_extracted STARTED
+  res://tests/pipeline/test_extract_append.gd > test_only_ids_missing_from_the_manifest_are_extracted PASSED 8ms
+
+  res://tests/pipeline/test_extract_append.gd > test_entries_land_in_parts_not_in_a_later_top_level_array STARTED
+  res://tests/pipeline/test_extract_append.gd > test_entries_land_in_parts_not_in_a_later_top_level_array PASSED 9ms
+
+Statistics: 5 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 71ms
+
+
+Run Test Suite: res://tests/assembly/test_socket_placement.gd
+  res://tests/assembly/test_socket_placement.gd > test_every_hairhat_sits_on_the_head STARTED
+  res://tests/assembly/test_socket_placement.gd > test_every_hairhat_sits_on_the_head PASSED 1s 186ms
+
+Statistics: 1 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 200ms
+
+
+Overall Summary: 38 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (8/8)
+Executed test cases : (38/38)
+Total execution time: 3s 270ms
+ Open XML Report at: file:///home/deck/.herdr/worktrees/sensen-godot/wt-resident-284/reports/report_5/results.xml
+Open HTML Report at: file:///home/deck/.herdr/worktrees/sensen-godot/wt-resident-284/reports/report_5/index.html
+Exit code: 0
+Run dispose test resources
+Run tests ends with 0
