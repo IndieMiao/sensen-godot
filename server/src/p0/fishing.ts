@@ -73,7 +73,11 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null }
   const level = skillLevel(c, s, 'fishing');
   const wait = bait ? f.baits[bait].wait : 1;
   const rod = rodById(c, s.gear.rod) ?? f.rods[0];
-  const bite_ms = Math.round((f.bite_min_ms + draw(s) * (rod.bite_spread_ms ?? f.bite_spread_ms)) * wait);   // Carbon Rod 1.8 s span
+  // Quick Recast (Fishing Lv9, §4.6.2; 不知火舞 on 283: no toast, no mark): the cast after a landed fish at the same pond
+  // bites sooner. Every cast clears it, so a fish lost, a line in, another pond or the cast after that waits as usual.
+  const qr = f.quick_recast, quick = !!qr && level >= qr.level && s.fishing.quick === place;
+  delete s.fishing.quick;
+  const bite_ms = Math.round((f.bite_min_ms + draw(s) * (rod.bite_spread_ms ?? f.bite_spread_ms)) * wait * (quick ? qr!.wait : 1));   // Carbon Rod 1.8 s span
   const breaks = fish.level > level ? 'level' : fish.rarity > rod.reach ? 'rod' : null;
   s.cast = { fish: fish.id, site: siteId, place, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}) };
   events.push({ kind: 'cast', bite_in: bite_ms, rarity: fish.rarity, breaks, bait });
@@ -109,6 +113,8 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     events.push({ kind: 'item', id: fish.id, delta: 1 });
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
+    const qr = c.fishing.quick_recast;   // Quick Recast: a landed fish makes this pond's next cast quick (from Lv9)
+    if (qr && cast.place && skillLevel(c, s, 'fishing') >= qr.level) s.fishing.quick = cast.place;
     firstCatch(c, s, now, fish, cast.place, events, true);
     noteFishdex(c, s, now, events);
     return null;

@@ -50,12 +50,18 @@ export function notePresence(c: P0Content, s: P0State, space: unknown, now: numb
 export function notePlace(c: P0Content, s: P0State, space: unknown, place: unknown): void {
   if (typeof space !== 'string' || space === '') return;
   if (space === 'outpost' && typeof place === 'string') noteSeenAt(c, s, place);   // the map's ◆ there is seen (q(48))
-  if (space !== 'pond') { s.presence.place = null; return; }
+  if (space !== 'pond') { s.presence.place = null; leftQuick(s); return; }
   if (place === undefined || place === null || place === '') return;
   // v5: a known pond in a city the player's pass covers (home always); the pass itself is checked by requirePass.
   const p = typeof place === 'string' ? placeOf(c, place) : undefined;   // hand-written or generated (SGODOT-280)
   const cluster = p ? clusterOf(c, place as string) : null;
   s.presence.place = p && cluster && (cluster === s.travel.home || s.travel.passes[cluster]) ? place as string : null;
+  leftQuick(s);
+}
+
+/** Quick Recast is the very next cast at the pond where the fish landed (§4.6.2): leaving that pond ends it (苏烈 on #388). */
+function leftQuick(s: P0State): void {
+  if (s.fishing.quick && s.fishing.quick !== s.presence.place) delete s.fishing.quick;
 }
 
 /** ms until Rest opens by the away rule; 0 = open; null = the player has not left yet. */

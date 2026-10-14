@@ -77,6 +77,10 @@
       "rare_pct": 10,
       "xp_pct": 50
     },
+    "quick_recast": {
+      "level": 9,
+      "wait": 0.7
+    },
     "dex_milestones": [
       {
         "kinds": 10,
