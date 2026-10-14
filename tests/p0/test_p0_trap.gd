@@ -21,6 +21,23 @@ func test_the_key_sets_a_trap_or_says_why_not() -> void:
 	assert_that([full.sub, full.enabled]).is_equal(["Traps 1/1 · Fishing Lv8 adds 1", false])
 	assert_str(str(P0Trap.set_key(_view([_trap(BLOSSOM), _trap("a"), _trap("b")], 3, null), FERN).sub)).is_equal("Traps 3/3")
 
+## q(177) ②: traps go in home ponds only. At a pond of another city the key greys `Home ponds only` and a tap says
+## `Traps go in your home city's ponds` (the server's home_ponds_only too); a generated pond of the home city takes one,
+## and San Francisco's hand-written ponds are away once home is elsewhere (SGODOT-303).
+func test_the_key_greys_at_a_pond_outside_the_home_city() -> void:
+	var tokyo_pond := "gn-1850147~pond0"
+	var away := P0Trap.set_key(_view([]), tokyo_pond)   # no travel block: home is the written city, San Francisco
+	assert_that([away.verb, away.sub, away.enabled, away.toast, away.cmd]).is_equal(["Set Trap", "Home ponds only", false,
+		"Traps go in your home city's ponds", {}])
+	assert_str(str(P0Trap.set_key(_view([_trap(BLOSSOM)]), tokyo_pond).sub)).is_equal("Home ponds only")   # before the slots
+	var v := _view([])
+	v["travel"] = {"home": "gn-1850147", "here": "gn-1850147"}
+	var home := P0Trap.set_key(v, tokyo_pond)
+	assert_that([home.sub, home.enabled]).is_equal(["Free", true])
+	assert_str(str(P0Trap.set_key(v, FERN).sub)).is_equal("Home ponds only")
+	assert_bool(P0Trap.home_pond(_view([]), FERN)).is_true()
+	assert_str(str(P0Trap.refusal_text({"type": "set_trap"}, "home_ponds_only", {}))).is_equal("Traps go in your home city's ponds")
+
 func test_the_fishing_key_turns_into_set_trap_when_the_trap_is_picked() -> void:
 	var v := _view([])
 	v["energy"] = {"value": 100}
