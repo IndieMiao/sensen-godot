@@ -32,6 +32,7 @@ import { trapsView } from './fish_trap.js';
 import { homeOf } from './travel.js';
 import { homeFacts } from './home.js';
 import { decorView } from './decor.js';
+import { titlesView } from './titles.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -96,6 +97,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     homestead: homesteadView(c, s),
     profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
+    titles: titlesView(c, s),   // q(180): {list: title ids in the fixed order, wearing: the one worn or null} (titles.ts)
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
     gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),

@@ -25,6 +25,7 @@ import { emptyDay, type P0State, type Plot } from './state.js';
 import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, settleHere, travel } from './travel.js';
 import { chooseHome } from './home_city.js';
 import { noteProgress, takenCounts } from './request_progress.js';
+import { wearTitle } from './titles.js';
 
 export type { P0Event } from './progress.js';
 
@@ -75,6 +76,7 @@ type P0CommandBody =
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
+  | { type: 'wear_title'; id: string }   // q(180): put on a title the player has (titles.ts)
   | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
   | { type: 'return_home' }
   | { type: 'choose_home' | 'change_home'; city: string; spot: number };   // SGODOT-303 (home_city.ts): pick a home, change it once
@@ -411,6 +413,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'choose_home': case 'change_home': {
       const refusal = chooseHome(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'wear_title': {
+      const refusal = wearTitle(c, s, cmd);
+      if (refusal) return fail(refusal.code);
       break;
     }
     case 'read_inbox': {
