@@ -22,7 +22,6 @@ const _ROW_H := 81.0        # 12 + the 56 thumbnail + 12, and the 1 px line
 const _REGIONAL_GAP := 24
 const _ICON_TEXT_GAP := 10  # a regional fish's icon to its name
 const _FORECAST_GAP := 8
-const _ITALIC_SKEW := 0.2   # Nunito has no italic face: the bold one slanted for the keeper's line
 
 var view := {}
 var outpost := {}
@@ -80,7 +79,7 @@ func _build() -> void:
 	line.name = "KeeperLine"
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.max_lines_visible = 2
-	line.add_theme_font_override(&"font", _italic())
+	line.add_theme_font_override(&"font", UiKit.bold_italic())
 	page.add_child(line)
 	var titles: Array = model.titles
 	page.add_child(_section(str(titles[0])))
@@ -234,11 +233,3 @@ func _day(d: Dictionary) -> PanelContainer:
 		col.add_child(l)
 	card.add_child(col)
 	return card
-
-static var _slant: FontVariation
-static func _italic() -> FontVariation:
-	if _slant == null:
-		_slant = FontVariation.new()
-		_slant.base_font = load(UiTokens.FONT_BOLD_PATH)
-		_slant.variation_transform = Transform2D(Vector2(1, 0), Vector2(-_ITALIC_SKEW, 1), Vector2.ZERO)
-	return _slant

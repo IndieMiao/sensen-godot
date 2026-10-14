@@ -1504,6 +1504,7 @@ func _dev_shot(dt: float) -> void:
 			"passportpage": if ui.passport(): ui.passport().call("show_page", step[1])
 			"passportclose": if ui.passport(): (ui.passport().find_child("Close", true, false) as BaseButton).pressed.emit()
 			"kindredcard": ui.show_kindred(P0Kindred.card(session.current(), {"resident": step[1]}))   # kindredcard:res_pip
+			"biteboard": ui.open_bite_board(P0Outposts.by_role("tackle"))   # the home tackle shop's Bite Board (its keeper's line)
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
 			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)
