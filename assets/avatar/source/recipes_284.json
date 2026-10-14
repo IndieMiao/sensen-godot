@@ -131,6 +131,47 @@
       "fbx": "res://assets/avatar/source/mask16_npc_ivo/SM_mask16.fbx",
       "mesh_name": null,
       "src_files": []
+    },
+    {
+      "id": "hairhat0_npc_tomo",
+      "slot": "hairHat",
+      "attach": "socket",
+      "tier": 0,
+      "unity_guid": "",
+      "materials": [
+        {
+          "albedo": "res://assets/avatar/source/hairhat0_npc_tomo/T_tomo_hairHat_D.png",
+          "ao": null,
+          "floats": {
+            "rim_strength": 0.0,
+            "ao_strength": 0.5,
+            "diffuse_strength": 1.0,
+            "emission_strength": 0.6,
+            "smoothness": 0.1
+          }
+        }
+      ],
+      "offset": {
+        "pos": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rot": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "thumb_src": null,
+      "fbx": "res://assets/avatar/source/hairhat0_npc_tomo/SM_hairHat0.fbx",
+      "mesh_name": null,
+      "src_files": []
     }
   ]
 }

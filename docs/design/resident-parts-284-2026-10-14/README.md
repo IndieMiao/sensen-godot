@@ -1,5 +1,9 @@
 # SGODOT-284 / q(171) · Granny Wu / Ivo NPC parts
 
+**Tomo increment:** [hairhat0_npc_tomo, final four-part validation and review](tomo/README.md)
+adds the approved charcoal brown hair to the same PR #407. The initial three-part
+evidence below remains unchanged; the increment confirms those files are preserved.
+
 刘备 · 2026-10-14 · base `farm-dev` at `a8e0b548`.
 
 Three NPC-only parts provide Granny Wu's silver bun/red pin and Ivo's mustard

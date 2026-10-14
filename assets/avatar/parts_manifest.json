@@ -732,6 +732,33 @@
 			"thumb": "res://assets/avatar/thumbs/mask16_npc_ivo.png",
 			"tier": 0,
 			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat0_npc_tomo",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat0_npc_tomo.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat0_npc_tomo.png",
+			"tier": 0,
+			"unity_guid": ""
 		}
 	],
 	"version": 1

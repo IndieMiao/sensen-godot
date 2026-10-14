@@ -10,6 +10,10 @@ housing and ivory lens; FBX node names remain original. `ivo-short-beard.blend`
 retains `mask` and its original armature, with the shortened grey beard.
 Textures use relative paths to the delivered avatar source directories.
 Granny Wu's editable geometry is the byte-identical original `SM_hairHat80.fbx`.
+Tomo also retains the byte-identical original `SM_hairHat0.fbx`; his texture-only
+increment needs no Blender geometry export. `recolor_tomo_284.py` reproduces
+the charcoal brown shading, with `tomo-texture-validation.json` recording its
+palette, source luminance knots, alpha preservation and source hashes.
 
 `geometry-validation.json` records exact non-geometry FBX preservation and the
 beard's 1/3 vertical extent; `texture-validation.json` records the luminance

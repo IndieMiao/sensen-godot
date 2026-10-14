@@ -1,0 +1,47 @@
+[
+  {
+    "name": "SGODOT-284_TOMO_v1_npc-lineup-front.png",
+    "attachment_id": "5eae1316-0c52-4053-bd8f-1347ec3f98f2",
+    "sha256": "cc0655e8ce0ef30583e66c4cace677d3841de8166dc08292853fd3f6b58d448a",
+    "bytes": 50793,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_TOMO_v1_npc-lineup-three-quarter.png",
+    "attachment_id": "cc5bb29c-1630-4c12-8196-7229f76d0dd6",
+    "sha256": "d50d0c55e6dba86ffdf9d650f0b23fce8e5d01f8aae9d24e9266316605daf452",
+    "bytes": 48394,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_TOMO_v1_tomo_card.jpg",
+    "attachment_id": "089f8f8d-bd5e-49ee-a676-fe44ed141cd3",
+    "sha256": "941a0259f7562cf8cfc1b4684de24f2efd0f0e793b70c831761f47968aba06ef",
+    "bytes": 24423,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_TOMO_v1_stamps.png",
+    "attachment_id": "0dec6a5c-bad7-4d47-80ba-5817800cd793",
+    "sha256": "edaabace6b2a353af041ef85dd3387829a44ffa99eedbb0b9703fbc94b036e9a",
+    "bytes": 16677,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_TOMO_v1_validation.json",
+    "attachment_id": "8b594f52-03c8-4eb8-ac9f-4715c5c5e658",
+    "sha256": "58cd7b5041b35c15cb92e05d0fb58ba6c190120bb128566a05c95d50ed979235",
+    "bytes": 12165,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]

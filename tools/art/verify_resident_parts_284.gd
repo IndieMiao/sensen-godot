@@ -26,7 +26,7 @@ func part_info(id):
 	root.free();return info
 func run():
 	var avatar=root.get_node("Avatar")
-	var pairs=[["hairhat80_npc_ama","hairhat80_npc_granny_wu","SM_hairHat80.fbx"],["hairhat51","hairhat_npc_ivo","SM_hairHat51.fbx"],["mask16_npc_kai","mask16_npc_ivo","SM_mask16.fbx"]]
+	var pairs=[["hairhat80_npc_ama","hairhat80_npc_granny_wu","SM_hairHat80.fbx"],["hairhat51","hairhat_npc_ivo","SM_hairHat51.fbx"],["mask16_npc_kai","mask16_npc_ivo","SM_mask16.fbx"],["hairhat0","hairhat0_npc_tomo","SM_hairHat0.fbx"]]
 	for pair in pairs:
 		var before=load("res://assets/avatar/source/"+pair[0]+"/"+pair[2]).instantiate()
 		var after=load("res://assets/avatar/source/"+pair[1]+"/"+pair[2]).instantiate()
@@ -42,11 +42,17 @@ func run():
 		check(info.meshes[0].transform==original.meshes[0].transform,pair[1]+": extracted mesh transform exactly matches base")
 		check(info.offset_pos==str(Vector3.ZERO) and info.offset_rot_deg==str(Vector3.ZERO) and info.offset_scale==str(Vector3.ONE),pair[1]+": no compensating recipe offset or scale")
 		check(avatar.catalog.part(pair[1])!=null,pair[1]+": actual NPC catalog lookup succeeds")
+		if pair[1]=="hairhat0_npc_tomo":
+			check(FileAccess.get_file_as_bytes("res://assets/avatar/source/hairhat0/SM_hairHat0.fbx")==FileAccess.get_file_as_bytes("res://assets/avatar/source/hairhat0_npc_tomo/SM_hairHat0.fbx"),"Tomo: original FBX byte-identical")
+			var base_mesh=before.find_children("*","MeshInstance3D",true,false)[0].mesh
+			var new_mesh=after.find_children("*","MeshInstance3D",true,false)[0].mesh
+			check(var_to_bytes(base_mesh.surface_get_arrays(0))==var_to_bytes(new_mesh.surface_get_arrays(0)),"Tomo: imported geometry, UVs and normals exactly match hairhat0")
+			check(avatar.catalog.parts_for_slot(&"hairHat",false).all(func(p):return p.id!="hairhat0_npc_tomo"),"Tomo: excluded from player catalog")
 		before.free();after.free()
 	check(report.parts.hairhat_npc_ivo.meshes[0].emission_strength==0.0,"Ivo lamp/hat material has zero emission")
 	var maximum=0;var existing={}
 	for meta in avatar.catalog.parts_for_slot(&"hairHat",true):
-		if meta.id in ["hairhat_npc_ivo","hairhat80_npc_granny_wu"]:continue
+		if meta.id in ["hairhat_npc_ivo","hairhat80_npc_granny_wu","hairhat0_npc_tomo"]:continue
 		var info=part_info(meta.id);existing[meta.id]=info.triangles;maximum=maxi(maximum,info.triangles)
 	report.existing_hairhat_triangles=existing;report.hairhat_budget=maximum
 	check(report.parts.hairhat_npc_ivo.triangles<=maximum,"Ivo hat within largest existing runtime hairHat budget")
