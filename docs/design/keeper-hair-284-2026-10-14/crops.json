@@ -1,0 +1,46 @@
+{
+  "crops": {
+    "keeper_auburn": {
+      "face": [
+        83,
+        51,
+        160,
+        160
+      ],
+      "head_top": 57,
+      "jaw": [
+        163,
+        200
+      ],
+      "stamp": [
+        81,
+        47,
+        165,
+        207
+      ]
+    },
+    "keeper_black": {
+      "face": [
+        102,
+        50,
+        157,
+        157
+      ],
+      "head_top": 56,
+      "jaw": [
+        181,
+        196
+      ],
+      "stamp": [
+        100,
+        46,
+        162,
+        203
+      ]
+    }
+  },
+  "order": [
+    "keeper_auburn",
+    "keeper_black"
+  ]
+}

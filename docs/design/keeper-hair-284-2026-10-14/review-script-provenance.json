@@ -1,0 +1,15 @@
+{
+  "lineup_source": "tools/dev/npc_lineup.gd",
+  "lineup_source_sha256": "611b1092274306e9b27cf425e0232eb77071121ee27c8d6468721859d7da182b",
+  "lineup_fixture_sha256": "1fa8dabead4a6136a476b0ccfa9cf55f1d2e373bc81d416cf7d5a7425d9f862d",
+  "lineup_changes": [
+    "Two keeper fixtures, no player column",
+    "Frozen idle",
+    "Full-feet framing",
+    "Short labels"
+  ],
+  "baker_source": "wp-3d-scene:tools/art/bake_resident_portraits.gd",
+  "baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+  "baker_unchanged": true,
+  "baker_added_to_runtime_pr": false
+}

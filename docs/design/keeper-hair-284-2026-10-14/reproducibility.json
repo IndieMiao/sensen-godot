@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/home/deck/.herdr/worktrees/sensen-godot/wt-3d-scene/output/art-tools/bin/python",
+    "/home/deck/.herdr/worktrees/sensen-godot/wt-keeper-hair-review-284/tools/art/recolor_keeper_hair_284.py",
+    "--runtime-root",
+    "/home/deck/.herdr/worktrees/sensen-godot/wt-keeper-hair-284"
+  ],
+  "outputs_byte_identical": true,
+  "files": {
+    "assets/avatar/source/hairhat41_npc_auburn/SM_hairHat41.fbx": "ad74fdd4bdf1482853bc4349434ff86d1a765f57024d918d5531f86f5e7dfb3d",
+    "assets/avatar/source/hairhat41_npc_auburn/SM_hairHat41.fbx.import": "11196e62076dfd4076f0c8a27940fc90f6df48cfe309f91c24127b355013153b",
+    "assets/avatar/source/hairhat41_npc_auburn/T_auburn_hairHat41_D.png.import": "9b6199bb4df99635eb49db2a3c69b7ceba7641107655321fe4888ff593756d65",
+    "assets/avatar/source/hairhat41_npc_auburn/T_auburn_hairHat41_D.png": "04878e601e5e7bacf62570f871235846fbcbdadc88943253010f5533312b3929",
+    "assets/avatar/source/hairhat43_npc_black/T_black_hairHat43_D.png.import": "d5b8693bc7dfd7ed8487ae53c7b0210ca030da4fa0d325f5298d074f51a9ff96",
+    "assets/avatar/source/hairhat43_npc_black/T_black_hairHat43_D.png": "139d8089f30bc6ac1ec5f3bd03d4faee693aabee29528cbdfbb2e2b50dc6841b",
+    "assets/avatar/source/hairhat43_npc_black/SM_hairHat43.fbx": "0dea6d028d61b45bfb8332ce835c9ce730b53f2d1ecc0458b4005e6442748e7a",
+    "assets/avatar/source/hairhat43_npc_black/SM_hairHat43.fbx.import": "5b96d3d37ed631cf8c00f131f58d94837d81f04c4999bb7f8f3f84a7ac6d1599"
+  }
+}

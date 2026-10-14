@@ -1,0 +1,444 @@
+{
+  "issue": "SGODOT-284",
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "date": "2026-10-14",
+  "runtime_base": "6a6ebf14d43416a2631302c9f8722be36f51e4b2",
+  "runtime_head": "7ae449f52067941690471a004e3ff28fdbd808be",
+  "runtime_branch": "feat/284-keeper-hair",
+  "art_base": "5fbd5da5664043c48c6b0eb5973d2c16d399596d",
+  "art_branch": "wp-3d-scene-liubei-keeper-hair-284",
+  "scope": "Two texture-only NPC hair variants for generated-city keepers. Keeper looks are integrated separately by Su Lie; not for 0.2.6.",
+  "tests": {
+    "head": "7ae449f52067941690471a004e3ff28fdbd808be",
+    "cases": 38,
+    "suites": 8,
+    "failures": 0,
+    "errors": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "orphans": 0,
+    "exit_code": 0,
+    "paths": [
+      "tests/catalog",
+      "tests/pipeline",
+      "tests/assembly/test_socket_placement.gd"
+    ],
+    "qa_user_dir": "SensenKeeperHair284QA",
+    "report": "reports/report_1/results.xml"
+  },
+  "runtime_tree_clean_after_tests": true,
+  "import_validation": {
+    "checks": [
+      {
+        "check": "hairhat41_npc_auburn: exact original FBX bytes",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: imported nodes, hierarchy, transforms and bone rests exact",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: hairHat socket attachment",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original offsets and tier",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: extracted node names/types/transforms exact",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: one mesh/surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: extracted geometry, normals, UVs and indices exact",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: exact original bounds",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original shared shader",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original material emission_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original material smoothness",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original material ao_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original material diffuse_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original material rim_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: recolored texture actually bound",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: original runtime texture size",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: available to NPC catalog",
+        "passed": true
+      },
+      {
+        "check": "hairhat41_npc_auburn: excluded from player catalog",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: exact original FBX bytes",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: imported nodes, hierarchy, transforms and bone rests exact",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: hairHat socket attachment",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original offsets and tier",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: extracted node names/types/transforms exact",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: one mesh/surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: extracted geometry, normals, UVs and indices exact",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: exact original bounds",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original shared shader",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original material emission_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original material smoothness",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original material ao_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original material diffuse_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original material rim_strength",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: recolored texture actually bound",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: original runtime texture size",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: available to NPC catalog",
+        "passed": true
+      },
+      {
+        "check": "hairhat43_npc_black: excluded from player catalog",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "parts": {
+      "hairhat41_npc_auburn": {
+        "base": "hairhat41",
+        "bounds": "[P: (-0.350071, -0.385293, -0.403038), S: (0.781645, 0.611447, 0.794624)]",
+        "floats": {
+          "ao_strength": 0.1,
+          "diffuse_strength": 1.0,
+          "emission_strength": 0.7,
+          "rim_strength": 0.0,
+          "smoothness": 0.1
+        },
+        "mesh_transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]",
+        "surfaces": 1,
+        "texture_pixels": [
+          512,
+          512
+        ],
+        "triangles": 2312
+      },
+      "hairhat43_npc_black": {
+        "base": "hairhat43",
+        "bounds": "[P: (-0.086047, -0.281154, -0.4418), S: (0.507499, 0.481912, 0.68316)]",
+        "floats": {
+          "ao_strength": 0.1,
+          "diffuse_strength": 1.0,
+          "emission_strength": 0.3,
+          "rim_strength": 0.0,
+          "smoothness": 0.1
+        },
+        "mesh_transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, -0.0, -0.00224)]",
+        "surfaces": 1,
+        "texture_pixels": [
+          512,
+          512
+        ],
+        "triangles": 1156
+      }
+    }
+  },
+  "texture_validation": [
+    {
+      "base": "hairhat41",
+      "id": "hairhat41_npc_auburn",
+      "source_pixels": [
+        1024,
+        1024
+      ],
+      "mask_rule": "R < 128 and R-G < 20",
+      "hair_pixel_count": 724057,
+      "hair_fraction": 0.6905145645141602,
+      "preserved_pixel_count": 324519,
+      "non_hair_rgba_exact": true,
+      "alpha_exact": true,
+      "luminance_knots_min_median_max": [
+        5.9959999999999996,
+        64.1232,
+        101.1874
+      ],
+      "palette_shadow_mid_highlight": [
+        "#5E2F1C",
+        "#8A4A2E",
+        "#B06A45"
+      ],
+      "output_hair_unique_colors": 165,
+      "monotone_luminance_mapping": true,
+      "fbx_byte_identical": true,
+      "sha256": {
+        "SM_hairHat41.fbx": "ad74fdd4bdf1482853bc4349434ff86d1a765f57024d918d5531f86f5e7dfb3d",
+        "T_auburn_hairHat41_D.png": "04878e601e5e7bacf62570f871235846fbcbdadc88943253010f5533312b3929"
+      }
+    },
+    {
+      "base": "hairhat43",
+      "id": "hairhat43_npc_black",
+      "source_pixels": [
+        1024,
+        1024
+      ],
+      "mask_rule": "G-B > 30",
+      "hair_pixel_count": 1007648,
+      "hair_fraction": 0.960968017578125,
+      "preserved_pixel_count": 40928,
+      "non_hair_rgba_exact": true,
+      "alpha_exact": true,
+      "luminance_knots_min_median_max": [
+        192.26839999999999,
+        204.64899999999997,
+        210.58599999999998
+      ],
+      "palette_shadow_mid_highlight": [
+        "#161312",
+        "#2A2624",
+        "#4A4440"
+      ],
+      "output_hair_unique_colors": 57,
+      "monotone_luminance_mapping": true,
+      "fbx_byte_identical": true,
+      "sha256": {
+        "SM_hairHat43.fbx": "0dea6d028d61b45bfb8332ce835c9ce730b53f2d1ecc0458b4005e6442748e7a",
+        "T_black_hairHat43_D.png": "139d8089f30bc6ac1ec5f3bd03d4faee693aabee29528cbdfbb2e2b50dc6841b"
+      }
+    }
+  ],
+  "preservation_summary": {
+    "base": "6a6ebf14d43416a2631302c9f8722be36f51e4b2",
+    "manifest_before": 43,
+    "manifest_after": 45,
+    "appended_ids": [
+      "hairhat41_npc_auburn",
+      "hairhat43_npc_black"
+    ],
+    "manifest_existing_entries_exact": true,
+    "manifest_text_prefix_exact": true,
+    "import_parameters_match_bases": true,
+    "unchanged_file_count": 425
+  },
+  "reproducibility": {
+    "command": [
+      "/home/deck/.herdr/worktrees/sensen-godot/wt-3d-scene/output/art-tools/bin/python",
+      "/home/deck/.herdr/worktrees/sensen-godot/wt-keeper-hair-review-284/tools/art/recolor_keeper_hair_284.py",
+      "--runtime-root",
+      "/home/deck/.herdr/worktrees/sensen-godot/wt-keeper-hair-284"
+    ],
+    "outputs_byte_identical": true,
+    "files": {
+      "assets/avatar/source/hairhat41_npc_auburn/SM_hairHat41.fbx": "ad74fdd4bdf1482853bc4349434ff86d1a765f57024d918d5531f86f5e7dfb3d",
+      "assets/avatar/source/hairhat41_npc_auburn/SM_hairHat41.fbx.import": "11196e62076dfd4076f0c8a27940fc90f6df48cfe309f91c24127b355013153b",
+      "assets/avatar/source/hairhat41_npc_auburn/T_auburn_hairHat41_D.png.import": "9b6199bb4df99635eb49db2a3c69b7ceba7641107655321fe4888ff593756d65",
+      "assets/avatar/source/hairhat41_npc_auburn/T_auburn_hairHat41_D.png": "04878e601e5e7bacf62570f871235846fbcbdadc88943253010f5533312b3929",
+      "assets/avatar/source/hairhat43_npc_black/T_black_hairHat43_D.png.import": "d5b8693bc7dfd7ed8487ae53c7b0210ca030da4fa0d325f5298d074f51a9ff96",
+      "assets/avatar/source/hairhat43_npc_black/T_black_hairHat43_D.png": "139d8089f30bc6ac1ec5f3bd03d4faee693aabee29528cbdfbb2e2b50dc6841b",
+      "assets/avatar/source/hairhat43_npc_black/SM_hairHat43.fbx": "0dea6d028d61b45bfb8332ce835c9ce730b53f2d1ecc0458b4005e6442748e7a",
+      "assets/avatar/source/hairhat43_npc_black/SM_hairHat43.fbx.import": "5b96d3d37ed631cf8c00f131f58d94837d81f04c4999bb7f8f3f84a7ac6d1599"
+    }
+  },
+  "looks": {
+    "keeper_auburn": {
+      "slots": {
+        "hairHat": "hairhat41_npc_auburn",
+        "cloth": "cloth1",
+        "shoes": "shoes1"
+      }
+    },
+    "keeper_black": {
+      "slots": {
+        "hairHat": "hairhat43_npc_black",
+        "cloth": "cloth1",
+        "shoes": "shoes1"
+      }
+    }
+  },
+  "renderer": {
+    "godot": "4.7.2",
+    "backend": "Vulkan Mobile",
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "windowed": true,
+    "physical_phone": false
+  },
+  "decisions": {
+    "hair_only": "Inspected disjoint atlas color families; all non-hair RGBA pixels preserved exactly.",
+    "fbx": "Original bytes, filenames, nodes, axes, units and transforms retained.",
+    "materials": "Copied actual base floats: hair41 emission 0.7, hair43 0.3; both smoothness 0.1. All other shader floats exact.",
+    "scope": "Runtime PR only assets/avatar/**; review and art scripts in companion wp-3d-scene PR."
+  },
+  "images": {
+    "cards.png": {
+      "sha256": "b423e890ea7e001961d3ca242c40d4f8493d8e391288d798b4489a62c17b1baf",
+      "pixels": [
+        324,
+        346
+      ]
+    },
+    "keeper_auburn_card.jpg": {
+      "sha256": "619cc45b22e32198d293e92a74e5b96bc473bd1f6cfcab3e93f59170b1389f29",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "keeper_auburn_stamp_32x40.png": {
+      "sha256": "44a11abe4a28858344cc511f1cd2a435190d478e9f1a01d2b50468f927eedfb7",
+      "pixels": [
+        32,
+        40
+      ]
+    },
+    "keeper_auburn_stamp_96x120.png": {
+      "sha256": "1dba7310892badc87fd7dc2fcd08750b42123390f6e70521df577b52fc46958c",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "keeper_black_card.jpg": {
+      "sha256": "b19547805327c69c19cde1dc91b9d4cb587fd2d6144ebc01755cea946406348c",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "keeper_black_stamp_32x40.png": {
+      "sha256": "2ab3134709dae5b9c02e79ef526dcb836ccb2e766bed44feac824ac95612af51",
+      "pixels": [
+        32,
+        40
+      ]
+    },
+    "keeper_black_stamp_96x120.png": {
+      "sha256": "c34ad05cb2412b761adc8060e3d3bd0ddafdef52f09cdcf70d792f7b5f1e34a3",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "npc-lineup-both.png": {
+      "sha256": "9dbcd5ddd140642041dfcf6ea7d3d725cd860a75dd6ac3b69f1a235344e993ba",
+      "pixels": [
+        1224,
+        472
+      ]
+    },
+    "npc-lineup-front.png": {
+      "sha256": "4535fc68d45c6f50e8054f0e437b3a8e225109432cf3f3031e6fcb413c80b20f",
+      "pixels": [
+        624,
+        464
+      ]
+    },
+    "npc-lineup-three-quarter.png": {
+      "sha256": "868942f6a851f3e05a39fa3c202076bd307e6f7315d56bf33d776a3c6ea2d183",
+      "pixels": [
+        624,
+        464
+      ]
+    },
+    "stamps.png": {
+      "sha256": "4581172e28d0b875c918d72f516e2106d8ad62d4a292e7abfd14128d78ec6a99",
+      "pixels": [
+        228,
+        196
+      ]
+    },
+    "texture-comparison.png": {
+      "sha256": "87d77a2e2c7d4deea1df6d175cf6b37f3c2a771c7081a35f709be7a8ce2ec880",
+      "pixels": [
+        1040,
+        1080
+      ]
+    }
+  },
+  "portrait_script": {
+    "lineup_source": "tools/dev/npc_lineup.gd",
+    "lineup_source_sha256": "611b1092274306e9b27cf425e0232eb77071121ee27c8d6468721859d7da182b",
+    "lineup_fixture_sha256": "1fa8dabead4a6136a476b0ccfa9cf55f1d2e373bc81d416cf7d5a7425d9f862d",
+    "lineup_changes": [
+      "Two keeper fixtures, no player column",
+      "Frozen idle",
+      "Full-feet framing",
+      "Short labels"
+    ],
+    "baker_source": "wp-3d-scene:tools/art/bake_resident_portraits.gd",
+    "baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+    "baker_unchanged": true,
+    "baker_added_to_runtime_pr": false
+  }
+}

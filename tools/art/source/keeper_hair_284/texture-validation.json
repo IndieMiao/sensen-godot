@@ -1,0 +1,64 @@
+[
+  {
+    "base": "hairhat41",
+    "id": "hairhat41_npc_auburn",
+    "source_pixels": [
+      1024,
+      1024
+    ],
+    "mask_rule": "R < 128 and R-G < 20",
+    "hair_pixel_count": 724057,
+    "hair_fraction": 0.6905145645141602,
+    "preserved_pixel_count": 324519,
+    "non_hair_rgba_exact": true,
+    "alpha_exact": true,
+    "luminance_knots_min_median_max": [
+      5.9959999999999996,
+      64.1232,
+      101.1874
+    ],
+    "palette_shadow_mid_highlight": [
+      "#5E2F1C",
+      "#8A4A2E",
+      "#B06A45"
+    ],
+    "output_hair_unique_colors": 165,
+    "monotone_luminance_mapping": true,
+    "fbx_byte_identical": true,
+    "sha256": {
+      "SM_hairHat41.fbx": "ad74fdd4bdf1482853bc4349434ff86d1a765f57024d918d5531f86f5e7dfb3d",
+      "T_auburn_hairHat41_D.png": "04878e601e5e7bacf62570f871235846fbcbdadc88943253010f5533312b3929"
+    }
+  },
+  {
+    "base": "hairhat43",
+    "id": "hairhat43_npc_black",
+    "source_pixels": [
+      1024,
+      1024
+    ],
+    "mask_rule": "G-B > 30",
+    "hair_pixel_count": 1007648,
+    "hair_fraction": 0.960968017578125,
+    "preserved_pixel_count": 40928,
+    "non_hair_rgba_exact": true,
+    "alpha_exact": true,
+    "luminance_knots_min_median_max": [
+      192.26839999999999,
+      204.64899999999997,
+      210.58599999999998
+    ],
+    "palette_shadow_mid_highlight": [
+      "#161312",
+      "#2A2624",
+      "#4A4440"
+    ],
+    "output_hair_unique_colors": 57,
+    "monotone_luminance_mapping": true,
+    "fbx_byte_identical": true,
+    "sha256": {
+      "SM_hairHat43.fbx": "0dea6d028d61b45bfb8332ce835c9ce730b53f2d1ecc0458b4005e6442748e7a",
+      "T_black_hairHat43_D.png": "139d8089f30bc6ac1ec5f3bd03d4faee693aabee29528cbdfbb2e2b50dc6841b"
+    }
+  }
+]
