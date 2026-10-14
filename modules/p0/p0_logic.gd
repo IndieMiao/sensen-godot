@@ -1137,8 +1137,13 @@ const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double C
 	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
 	"chefs_touch": "Chef's Touch", "lucky_double": "Lucky Double"}   # Lv10's title Chef: TITLE_NAMES
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
-## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
-const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
+## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)); the nine of them
+## (Farming 6 / 7 / 8, Fishing 4 / 5 / 6 / 8 / 9, Cooking 4) as q(176) words them, from §4.6's "the day's difference".
+const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering",
+	"farming:7": "Today changes: fruit every two days", "farming:8": "Today changes: grow any climate's crops",
+	"fishing:4": "Today changes: River is your water now", "fishing:5": "Today changes: traps fish for you",
+	"fishing:6": "Today changes: Coast is your water now", "fishing:8": "Today changes: two traps to check",
+	"fishing:9": "Today changes: eels bite at night"}
 ## The day-changing level's action (q(59) §1.6): [label, banner action id].
 const DAY_ACTIONS := {"farming:6": ["Show Workbench", "show_workbench"]}
 
@@ -1170,7 +1175,12 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 			if id.begins_with("bait_") and bait == "": bait = id
 	var opens := level_unlocks(view, skill, lv)
 	var subtitle := ("New for you · " + ", ".join(opens)) if not opens.is_empty() else ""
-	if skill == "fishing": subtitle = fishing_unlock_line(view, lv)
+	# Fishing's banner reads like the other two, `New for you · ` and its milestone row (q(178) ⑥); a fish's one time only
+	# (`(night)`) is the Tip's Today changes there (q(176)). Lv2, the first session's, keeps `Fine fish now stay on the hook`
+	# (the break-free card it answers); a level with nothing new keeps its fish line.
+	if skill == "fishing":
+		if lv == 2 or opens.is_empty(): subtitle = fishing_unlock_line(view, lv)
+		else: subtitle = "New for you · " + ", ".join(opens.map(func(o): return _without_time(str(o))))
 	if skill == "cooking" and lv == 4:
 		title += " · 3rd slot"
 		subtitle = "Three-ingredient dishes now possible"
@@ -1192,6 +1202,18 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
 const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
+## Fishing's conveniences (content fishing.conveniences; §4.6.2, q(178) ③ / ⑤, f090617f): the 3-day Forecast, Gift Clues,
+## the pond card's Biting now (q(168)), Quick Recast and the Bigger Creel (15 a slot at Lv10, fishing.creel).
+const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gift_clue_highlight": "Gift Clues", "biting_now": "Biting now",
+	"quick_recast": "Quick Recast", "creel_15": "Bigger Creel"}
+## A fish that bites at one time only, as the milestone row names it (q(178) ④: `River Eel (night)`, the Lv9 night fishing).
+const ONLY_AT_ROW := {"night_only": "night", "dawn_dusk_only": "dawn & dusk"}
+
+## A milestone row's item without its `(night)` (the banner leaves the time to its Tip, q(178) ⑥).
+static func _without_time(item: String) -> String:
+	for w in ONLY_AT_ROW.values(): item = item.trim_suffix(" (%s)" % w)
+	return item
+
 ## Titles by key (§4.6 Lv10, appendix glossary; SGODOT-275): the one place their names live (奕星). A skill's title is
 ## a `title_*` key among its conveniences in content, at the level it comes (farming.conveniences.title_master_gardener
 ## 10); the level's line names it here, and its card follows the level banner (title_card).
@@ -1244,6 +1266,10 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3), then `Regional fish`
 			# last, as §14 writes it (`Next Lv3 · Reed Rod, Regional fish`).
 			out = skill_unlocks(view, "fishing", level)
+			for f in content().get("fish", []):   # a fish of one time only says when (q(178) ④: `River Eel (night)`)
+				var only := str(ONLY_AT_ROW.get(str(f.get("time", "")), "")) if f.get("time", null) is String else ""
+				var at := out.find(item_name(view, str(f.id)))
+				if only != "" and int(f.get("level", 1)) == level and at >= 0: out[at] = "%s (%s)" % [out[at], only]
 			var regional := out.has(REGIONAL_FISH)
 			out.erase(REGIONAL_FISH)
 			for o in view.get("stall", {}).get("buy", []):
@@ -1256,7 +1282,16 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				if str(g.get("skill", "")) == "fishing" and int(g.get("gate", 1)) == level and not out.has(name): out.append(name)
 			for r in content().get("fishing", {}).get("rods", []):
 				if int(r.get("level", 1)) == level and int(r.get("price", 0)) > 0: out.append(str(r.get("name", "")))
+			# a level that adds a trap (content fishing.trap.slots, §4.6.2: Lv8 the 2nd, Lv10 the 3rd; the first is the
+			# Fish Trap itself, bought at Lv5 above): `2nd Fish Trap` (q(178) ①; 286 e89ae800: Lv8 and Lv10 had no row)
+			for at in content().get("fishing", {}).get("trap", {}).get("slots", []):
+				if int(at[0]) == level and int(at[1]) >= 2:
+					out.append("%s %s" % [P0KitchenLogic.ordinal(int(at[1])), str(goods.get("trap_fish", {}).get("name", "Fish Trap"))])
 			if regional: out.append(REGIONAL_FISH)
+			# then the level's conveniences, as Farming and Cooking list theirs (q(178) ③: `Lv8 · 2nd Fish Trap, Biting now`)
+			var conv: Dictionary = content().get("fishing", {}).get("conveniences", {})
+			for k in conv:   # a title key is the title's (q(179): its own `… title` line), not a convenience (刘邦 on #366)
+				if int(conv[k]) == level and not str(k).begins_with("title_"): out.append(str(FISHING_CONVENIENCE_NAMES.get(k, k)))
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:

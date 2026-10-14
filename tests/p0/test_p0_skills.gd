@@ -39,9 +39,9 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 	# fish as one item at Lv3, after the gear (李白 on #214, §14 `Next Lv3 · Reed Rod, Regional fish`); the Carbon Rod
 	# and the Spinner Lure where they open (§6.4).
 	assert_array(fishing.milestones.map(func(m): return m.line)).is_equal([
-		"Lv2 · River Perch, Largemouth Bass, Rainbow Trout, Mackerel, Worm Bait", "Lv3 · Reed Rod, Regional fish",
-		"Lv4 · Golden Koi, Catfish", "Lv5 · Sea Bass, Spinner Lure, Fish Trap", "Lv6 · Carbon Rod", "Lv7 · Silver Sturgeon", "Lv9 · River Eel",
-		"Lv10 · Master Angler title"])   # its title (q(179), fishing.conveniences.title_master_angler)
+		"Lv2 · River Perch, Largemouth Bass, Rainbow Trout, Mackerel, Worm Bait", "Lv3 · Reed Rod, Regional fish, 3-day Forecast",
+		"Lv4 · Golden Koi, Catfish", "Lv5 · Sea Bass, Spinner Lure, Fish Trap", "Lv6 · Carbon Rod", "Lv7 · Silver Sturgeon, Gift Clues",
+		"Lv8 · 2nd Fish Trap, Biting now", "Lv9 · River Eel (night), Quick Recast", "Lv10 · 3rd Fish Trap, Bigger Creel, Master Angler title"])   # q(178): the traps Lv8 and Lv10 add, the conveniences; Lv10's title last (q(179))
 	assert_str(d.tracks[2].next).is_equal("Next: third ingredient slot")
 	var v := _view()
 	v.skills.farming = {"level": 4, "xp": 412}
@@ -174,3 +174,19 @@ func test_milestones_unfold_in_place_and_the_drawer_comes_back_to_the_profile() 
 	ui.close_top_layer()
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("profile")
+
+## A title key among Fishing's conveniences (Master Angler, q(179), #398) is the title's own line, never listed by its id
+## or as a convenience (刘邦 on #366): Lv10's row is its trap, the Bigger Creel, then the title.
+func test_a_title_key_is_not_listed_as_a_convenience() -> void:
+	assert_int(int(P0Logic.content().get("fishing", {}).get("conveniences", {}).get("title_master_angler", 0))).is_equal(10)
+	var row := P0Logic.level_unlocks(_view(), "fishing", 10)
+	assert_bool(row.any(func(x): return str(x).begins_with("title_"))).is_false()
+	assert_array(row).is_equal(["3rd Fish Trap", "Bigger Creel", "Master Angler title"])
+
+## The Skills page's levels for Fishing's conveniences are the rules' own levels where a rule has one (奕星 on q(178)):
+## the Bigger Creel is content fishing.creel (#386), Quick Recast fishing.quick_recast (#388).
+func test_the_conveniences_levels_match_their_rules() -> void:
+	var f: Dictionary = P0Logic.content().get("fishing", {})
+	var conv: Dictionary = f.get("conveniences", {})
+	assert_int(int(conv.get("creel_15", 0))).is_equal(int(f.get("creel", {}).get("level", -1)))
+	if f.has("quick_recast"): assert_int(int(conv.get("quick_recast", 0))).is_equal(int(f.quick_recast.get("level", -1)))
