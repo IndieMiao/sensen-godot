@@ -5,7 +5,7 @@ extends RefCounted
 ## title, at} from then on). Here:
 ##   card       the arrival's RewardMoment Milestone: `Kindred · Pip`, the resident's stamp, `Postcard from Pip`, the
 ##              strip `New title · Pip's Best Friend` (a heart before it), no pills.
-##   postcards  the Passport's Postcards page: `Postcards · 3/12` and a cell per resident in the residents table's order
+##   postcards  the Passport's Postcards page: `Postcards · 3/10` and a cell per resident in the residents table's order
 ##              (not by when it came) — earned: the stamp, the name, the Kindred line in quotes; not yet: a grey
 ##              silhouette and `Kindred · ?`.
 ## Pure and static. Preloaded, no class_name (a new global class needs an editor import).
@@ -46,23 +46,28 @@ static func open_residents() -> Array:
 		for id in o.get("residents", []): homed[str(id)] = true
 	return P0Logic.content().get("residents", {}).keys().filter(func(id): return homed.has(str(id)))
 
-## The Postcards page: {count: `Postcards · 3/11`, cells: [{id, name, text, earned}]} — every open resident (q(193) ④)
-## in the table's order, the denominator how many they are; the others are not on it, no gap left. An earned cell's
-## text is its Kindred line (the view's, as the server gave it), uncut; an unearned one names no one.
+## The Postcards page: {count: `Postcards · 3/10`, cells: [{id, name, text, earned}]} — every open resident (q(193) ④)
+## in the table's order, the denominator how many they are; the others are not on it, no gap left. A postcard the
+## player holds is always on it, even one whose resident this list leaves out (周瑜 on #400: never hide a reward the
+## server gave). An earned cell's text is its Kindred line (the view's, as the server gave it), uncut; an unearned one
+## names no one.
 static func postcards(view: Dictionary) -> Dictionary:
 	var table: Dictionary = P0Logic.content().get("residents", {})
 	var open := open_residents()
 	var mine: Dictionary = view.get("residents", {}) if view.get("residents", {}) is Dictionary else {}
+	var kindred := func(id) -> Variant:
+		return mine.get(id, {}).get("kindred", null) if mine.get(id, {}) is Dictionary else null
+	var shown: Array = table.keys().filter(func(id): return open.has(id) or kindred.call(id) is Dictionary)
 	var cells: Array = []
 	var got := 0
-	for id in open:
-		var k = mine.get(id, {}).get("kindred", null) if mine.get(id, {}) is Dictionary else null
+	for id in shown:
+		var k = kindred.call(id)
 		var earned: bool = k is Dictionary
 		if earned: got += 1
 		var line := str(k.get("text", "")) if earned else ""
 		if earned and line == "": line = str(table[id].get("lines", {}).get("Kindred", ""))
 		cells.append({id = str(id), name = str(table[id].get("name", "")) if earned else "", text = line, earned = earned})
-	return {count = "Postcards · %d/%d" % [got, open.size()], cells = cells}
+	return {count = "Postcards · %d/%d" % [got, shown.size()], cells = cells}
 
 ## A resident's initial for a stamp without its portrait yet (不知火舞 on 284: earned stamps never wear the grey
 ## silhouette, which is how an unearned one looks).

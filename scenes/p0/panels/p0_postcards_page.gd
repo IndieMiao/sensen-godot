@@ -1,5 +1,5 @@
 extends VBoxContainer
-## The Passport's Postcards page (PASS-POSTCARDS 2627:134311; q(171) ⑥, 不知火舞 on 284): `Postcards · 3/12`, then
+## The Passport's Postcards page (PASS-POSTCARDS 2627:134311; q(171) ⑥, 不知火舞 on 284): `Postcards · 3/10`, then
 ## a cell per resident, three to a row, in the residents table's order (P0Kindred.postcards):
 ##   earned    surfaceRaised, a 1 px border: the PostcardStamp (their face, or their initial), the name (C14 XB) and
 ##             their Kindred line in curly quotes (C11 B italic, secondary), uncut
@@ -76,8 +76,8 @@ func _fit() -> void:
 	probe.free()
 	name_probe.free()
 	var tallest := 0.0
-	for id in Kindred.open_residents():   # the residents on the page (q(193)): Mira's line joins with her in P2
-		var line := quoted(str(P0Logic.content().residents[id].get("lines", {}).get("Kindred", "")))
+	for c in model.cells:   # the residents on the page (q(193)): Mira's line joins with her in P2
+		var line := quoted(str(P0Logic.content().residents[c.id].get("lines", {}).get("Kindred", "")))
 		tallest = maxf(tallest, font.get_multiline_string_size(line, HORIZONTAL_ALIGNMENT_CENTER, text_w, fsize).y)
 	var h := _PAD.y + Stamp.PASSPORT.y + _STACK + name_h + _STACK + tallest + _PAD.w
 	for c in grid.get_children(): (c as Control).custom_minimum_size.y = ceilf(h)

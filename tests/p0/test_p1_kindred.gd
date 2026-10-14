@@ -154,3 +154,15 @@ func test_the_mine_hut_brings_ivo_onto_the_page() -> void:
 	assert_bool(with_hut.has("res_ivo")).is_true()
 	assert_int(with_hut.size()).is_equal(11)
 	assert_bool(Kindred.open_residents().has("res_ivo")).is_false()
+
+## A postcard the player holds is on the page even when its resident has no home here yet (周瑜 on #400): it joins in
+## the table's order and the count.
+func test_a_held_postcard_is_never_hidden() -> void:
+	var p: Dictionary = Kindred.postcards(_view({"res_pip": "Best friend on the whole route. Don't tell the pigeons.",
+		"res_ivo": "Down here, a friend is worth more than ore."}))
+	var ids: Array = p.cells.map(func(c): return c.id)
+	assert_str(str(p.count)).is_equal("Postcards · 2/11")
+	assert_bool(ids.has("res_ivo")).is_true()
+	assert_bool(ids.has("res_mira")).is_false()
+	var table: Array = P0Logic.content().get("residents", {}).keys()
+	assert_array(ids).is_equal(table.filter(func(id): return ids.has(id)))   # still the table's order
