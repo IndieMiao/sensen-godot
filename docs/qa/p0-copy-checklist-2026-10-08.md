@@ -98,10 +98,10 @@
 | 位置 | 应出现 |
 |---|---|
 | 矿口 | 点击触发，主行动键不显示矿口动词（q(102)）；名字条 `The mine · Runs today 0/2`；入口卡 `Enter mine · 2 Energy` / `Continue run · Free` / 次级 `New run · 2 Energy` + `Current run will end · Runs today 1/2` / 灰 `New run · Clear Floor 2 first` |
-| 矿口用尽 ★ | 点矿口直接开 MINE-P0-8，灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；不出 `Enter mine · No runs left`（q(102)） |
+| 矿口用尽 ★ | 点矿口出入口卡：标题行 `The mine · Runs today 2/2`，灰胶囊只写 `Resets in 9h 12m`，点它出 toast `Mine runs today 2/2 · Resets in 9h 12m`；有未完成局时绿键 `Continue run · Free` + 同一灰胶囊，不出 `New run` 与 Express、无小字；不出 `Enter mine · No runs left`（q(102)、q(196)） |
 | 满包 ★ | `Enter mine · Bag full` / `Floor 2 · Bag full`（不扣体力，q(48)）；岩石灰 `Bag full · free a slot to mine`；主行动键 `Mine · Bag full` |
 | 楼梯与电梯 ★ | 点击触发，主行动键不显示（q(102)）：下行梯名字条 `Floor 2 · 2 Energy`（到过只写 `Floor 2`），去没到过的层出小卡按钮 `Floor 2 · 2 Energy`；灰 `Floor 2 · Clear Floor 1 first`；上行梯名字条写目的地：第 1 层 `Farm`、第 2 层 `Floor 1`；电梯名字条 `Elevator`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
-| 矿口 Express ★ | 入口卡次级按钮 `Floor 5 · Express · Free`；有未完成局时与 `New run · 2 Energy` 上下排，下面只写一次 `Current run will end · Runs today 1/2`；没有未完成局不加小字；用尽只剩灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；电梯面板的 Express 不加小字（q(108)） |
+| 矿口 Express ★ | 入口卡次级按钮 `Floor 5 · Express · Free`；有未完成局时与 `New run · 2 Energy` 上下排，下面只写一次 `Current run will end · Runs today 1/2`；没有未完成局不加小字；用尽时不出 Express（Express 也算一局），只剩灰胶囊 `Resets in 9h 12m`（q(196)）；电梯面板的 Express 不加小字（q(108)） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
 | 火把 | `Light Torch` / `Lit · this floor` |
 | 矿洞说明页 ★ | `Mine five floors. Slimes from Floor 3.`（P1，q(110)） |
