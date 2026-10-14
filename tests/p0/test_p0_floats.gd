@@ -167,6 +167,34 @@ func test_a_held_harvest_counts_its_plants_in_one_xp_line() -> void:
 	assert_str(xp[0].text).is_equal("+40 XP · 20 plants")
 	rt.ui.fab_held = false
 
+## A tree's pick (不知火舞 on 286 6e15f758, q(124) ②'s two lines; q(195)): `+2 Apple` over one XP line, no plant count —
+## the first pick's planting XP, pick XP and First harvest together at different percentages write the total only
+## (`+19 XP · First harvest`); a later pick has one percentage and says it (`+1 XP · 50%`).
+func test_a_trees_pick_floats_its_fruit_over_one_xp_line() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var t := [1000]
+	rt.ui.float_clock = func(): return t[0]
+	var v := {"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []},
+		"skills": {"farming": {"level": 9}}, "names": {"crop_apple": "Apple", "crop_radish": "Radish"}, "crops": [{"id": "crop_apple", "perennial": true}]}
+	rt.session.view = v
+	var said := func(events: Array) -> Array:
+		t[0] += 5000
+		for f in _floats(rt.ui): f.free()
+		rt._on_state(v, events)
+		await get_tree().process_frame
+		return _floats(rt.ui).map(func(f): return f.text).filter(func(x): return not x.contains("Energy"))
+	var pick := [{"kind": "energy", "delta": -2, "reason": "pick"}, {"kind": "item", "id": "crop_apple", "delta": 2}]
+	assert_array(await said.call(pick + [{"kind": "xp", "skill": "farming", "amount": 3, "percent": 50},
+		{"kind": "xp", "skill": "farming", "amount": 1, "percent": 50},
+		{"kind": "first", "what": "harvest:crop_apple", "xp": 15},
+		{"kind": "xp", "skill": "farming", "amount": 15, "percent": 100}])).is_equal(["+19 XP · First harvest", "+2 Apple"])
+	assert_array(await said.call(pick + [{"kind": "xp", "skill": "farming", "amount": 1, "percent": 50}])).is_equal(["+1 XP · 50%", "+2 Apple"])
+	# an annual's single plot keeps its percentage
+	assert_array(await said.call([{"kind": "item", "id": "crop_radish", "delta": 1},
+		{"kind": "xp", "skill": "farming", "amount": 1, "percent": 50}])).is_equal(["+1 XP · 50%", "+1 Radish"])
+
 ## q(94) / 李白 copy audit A4: a pot's XP says which pot of its page today it is — the 2nd `+3 Cooking XP · 2nd today`
 ## (no percentage on top), the 3rd on `No XP · 3rd today` though it earns nothing; other XP keeps its `· 75%`.
 func test_a_pots_xp_float_says_the_2nd_and_3rd_of_its_page_today() -> void:

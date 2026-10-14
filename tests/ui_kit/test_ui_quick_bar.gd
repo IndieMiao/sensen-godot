@@ -429,3 +429,38 @@ func test_flash_rings_the_slot_of_a_new_item_once() -> void:
 	await get_tree().create_timer(0.2).timeout
 	assert_bool(cells[1].is_flashing()).is_false()
 
+
+## B7 (不知火舞 286 6e15f758, option B): a slot's name breaks only between words over the slot's full 52 (`Grapevine` /
+## `Cutting`, never `Grapevin` / `e Cutting`); a word wider than that at C10 sets the whole name in C9, the floor.
+func test_a_slot_name_breaks_between_words_and_steps_down_to_c9_only() -> void:
+	assert_str(String(UiItemCell.quick_name_style("Grapevine Cutting"))).is_equal(String(UiTokens.STYLE_C10_B))
+	assert_str(String(UiItemCell.quick_name_style("Radish Seeds"))).is_equal(String(UiTokens.STYLE_C10_B))
+	assert_str(String(UiItemCell.quick_name_style("Salt-Grilled Fish"))).is_equal(String(UiTokens.STYLE_C10_B))   # breaks at the hyphen
+	assert_str(String(UiItemCell.quick_name_style("Chamomile Seeds"))).is_equal(String(UiTokens.STYLE_C9_B))
+	assert_str(String(UiItemCell.quick_name_style("Strawberry"))).is_equal(String(UiTokens.STYLE_C9_B))
+	bar.slots = [{id = "cutting_grapevine", icon = T, title = "Grapevine Cutting", quantity = 1},
+		{id = "seed_chamomile", icon = T, title = "Chamomile Seeds", quantity = 5}]
+	await get_tree().process_frame
+	var label := bar.cells()[0]._name as Label
+	assert_int(label.autowrap_mode).is_equal(TextServer.AUTOWRAP_WORD)
+	assert_float(label.size.x).is_equal(float(UiTokens.SIZE_QUICK_SLOT_W))
+	assert_int(label.get_line_count()).is_equal(2)
+	assert_str(String((bar.cells()[1]._name as Label).theme_type_variation)).is_equal(String(UiTokens.STYLE_C9_B))
+
+## Every item name's words fit a slot at C9 (the floor): a new name that does not is a naming matter for 李白, not a
+## smaller size (不知火舞 B7).
+func test_every_item_name_fits_a_slot_at_c9() -> void:
+	var th := UiKit.theme()
+	var font := th.get_font(&"font", UiTokens.STYLE_C9_B)
+	var fs := th.get_font_size(&"font_size", UiTokens.STYLE_C9_B)
+	var c := P0Logic.content()
+	var names: Array = []
+	for cr in c.get("crops", []): names.append_array([str(cr.get("seed_name", "")), str(cr.get("name", ""))])
+	for k in c.get("goods", {}): names.append(str(c.goods[k].get("name", "")))
+	for k in c.get("materials", {}): names.append(str(c.materials[k].get("name", "")))
+	for r in c.get("cooking", {}).get("recipes", []): names.append(str(r.get("name", "")))
+	for k in c.get("tools", {}).get("names", {}): names.append(str(c.tools.names[k]))
+	for n in names:
+		for word in str(n).replace("-", "- ").split(" ", false):
+			assert_float(font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x).override_failure_message(str(n)) \
+				.is_less_equal(float(UiTokens.SIZE_QUICK_SLOT_W))

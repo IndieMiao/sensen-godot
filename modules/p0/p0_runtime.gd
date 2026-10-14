@@ -506,6 +506,9 @@ func release_travel() -> void:
 	travel_floats = []
 	ui.queue_floats(parts, anchor())
 
+## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
+const TREE_XP := "tree_xp"
+
 func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
@@ -563,6 +566,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var plants := events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") \
 		and int(e.get("delta", 0)) > 0).size()
 	if plants > 0: _held_plants = (_held_plants if ui.fab_held else 0) + plants
+	# A tree's pick (不知火舞 on 286 6e15f758, q(124) ②'s two lines; q(195)): `+2 Apple` over one XP line, no plant count.
+	# The first pick puts the planting's locked XP, the pick's own and the First harvest together, at different
+	# percentages, so its line writes the total only, `+19 XP · First harvest`; a later pick has one, `+1 XP · 50%`.
+	var tree_pick := plants == 1 and events.any(func(e): return str(e.get("kind", "")) == "item" and int(e.get("delta", 0)) > 0 \
+		and P0Logic.crop(v, str(e.get("id", ""))).get("perennial", false) == true)
+	var tree_total := tree_pick and (events.any(func(e): return str(e.get("kind", "")) == "first" and str(e.get("what", "")).begins_with("harvest:")) \
+		or events.filter(func(e): return str(e.get("kind", "")) == "xp" and str(e.get("skill", "")) == "farming").size() > 1)
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
@@ -584,7 +594,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					first_cook_xp.append(ev)
 				if what.begins_with("cook:") and not cook_card:
 					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
-				if what.begins_with("harvest:") and plants > 1: folded_first.append({amount = int(ev.amount), what = what})
+				if what.begins_with("harvest:") and (plants > 1 or tree_pick): folded_first.append({amount = int(ev.amount), what = what})
 				elif what.begins_with("harvest:"):
 					var crop := what.trim_prefix("harvest:")
 					floats.append({kind = "first", key = what, text = "First harvest! +%d XP · %s" % [int(ev.amount),
@@ -670,10 +680,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					# the 2nd pot of a page today says so instead of a percentage: +10 Cooking XP ★ · 2nd today (q(94)).
 					var fmt := ("%s Cooking XP" + (" ★" if good_pot else "")) if cook else "%s XP"
 					if cook and nth == 2: fmt += " · 2nd today"
-					elif int(ev.percent) < 100: fmt += " · %d%%%%" % int(ev.percent)
+					elif int(ev.percent) < 100 and not (tree_total and str(ev.skill) == "farming"): fmt += " · %d%%%%" % int(ev.percent)
 					var part := {kind = "xp", key = fmt, amount = int(ev.amount), fmt = fmt, tone = UiFloatText.Tone.XP}
 					# one plant per farming XP event: Harvest All's reply has one a plant, and the parts add up (3, not 3 × 3)
-					if plants > 0 and str(ev.skill) == "farming": part.merge({unit = "plants", count = 1})
+					if tree_pick and str(ev.skill) == "farming": part.key = TREE_XP   # one line for the tree's XP, uncounted
+					elif plants > 0 and str(ev.skill) == "farming": part.merge({unit = "plants", count = 1})
 					floats.append(part)
 			"item":
 				var iid := str(ev.id)
@@ -814,7 +825,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if not folded_first.is_empty():   # onto the row's first farming XP part, which the others merge into
 		var on = null
 		for p in floats:
-			if str(p.get("kind", "")) == "xp" and str(p.get("unit", "")) == "plants":
+			if str(p.get("kind", "")) == "xp" and (str(p.get("unit", "")) == "plants" or str(p.get("key", "")) == TREE_XP):
 				on = p
 				break
 		if on != null:

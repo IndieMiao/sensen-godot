@@ -62,6 +62,16 @@ func test_the_sprinkler_card_writes_its_state_on_the_button() -> void:
 	var card: Dictionary = P0MaterialLogic.workbench_model({"workbench": {"recipes": [_recipe()]}}, "facilities")[0]
 	assert_str(str(card.effect)).is_equal("Farming Lv6 · Waters 8 plots for you")   # FARM-5-FAC: the level first, unlocked too
 
+## FARM-5-FAC (不知火舞 B7 286 6e15f758): a facility that can be built says how many stand of how many may, left of
+## Build — `Sprinklers 2/6`; short of materials or at the cap (the grey key counts then, q(130)) the line stays empty.
+func test_a_buildable_facility_counts_beside_build() -> void:
+	var count := func(block, extra := {}) -> String:
+		return str(P0MaterialLogic.workbench_model({"workbench": {"recipes": [_recipe(block, extra)]}}, "facilities")[0].have)
+	assert_str(count.call(null, {"used": 2, "cap": 6})).is_equal("Sprinklers 2/6")
+	assert_str(count.call(null, {"name": "Greenhouse", "used": 0, "cap": 1})).is_equal("Greenhouses 0/1")
+	assert_str(count.call({"code": "missing_materials", "detail": {"item": "copper_ore", "need": 3, "have": 1}})).is_equal("")
+	assert_str(count.call({"code": "facility_cap", "detail": {"cap": 6, "used": 6}}, {"used": 6, "cap": 6})).is_equal("")
+
 ## q(136) (FAC-STATUS 2116:32993): a sprinkler's status card reads `Waters 8 plots · −15%`, the greenhouse's
 ## `16 plots · −25%` form, and Move — the card's one action — is the green primary key (it was the outlined secondary).
 func test_the_sprinkler_status_card_reads_its_cut_and_moves_on_the_primary_key() -> void:
