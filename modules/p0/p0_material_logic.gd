@@ -567,6 +567,10 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 		elif r.get("coins_need", null) != null:
 			card.cost.append({"id": "coin", "name": "Coins", "have": int(r.get("coins_have", 0)), "need": int(r.coins_need)})
 		card.button = _craft_button(r)
+		# a facility that can be built says how many stand of how many may, left of Build (FARM-5-FAC: `Sprinklers 2/6`;
+		# 不知火舞 B7 286 6e15f758); at the cap its grey key says it instead (q(130) ①)
+		if str(r.get("to", "")) == "field" and r.get("block", null) == null and r.has("cap"):
+			card.have = "%ss %d/%d" % [str(r.get("name", "")), int(r.get("used", 0)), int(r.get("cap", 0))]
 		# a facility says its level first, locked or not (FARM-5-FAC 2109:133018: `Farming Lv6 · Waters 8 plots for you`,
 		# `Farming Lv7 · 5 crops → 5 Compost a day`; 不知火舞 on 241 ba9359df)
 		var gate = r.get("gate", null)
