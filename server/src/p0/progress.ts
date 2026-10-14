@@ -50,6 +50,7 @@ export type P0Event =
   | { kind: 'request_progress'; id: string; have: number; qty: number; item?: string; done?: true }
   | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number; reason?: 'plots' }   // Decorate (SGODOT-284); reason plots: Lv7's new beds (q(172))
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
+  | { kind: 'kindred'; resident: string; postcard: string; title: string }   // first reached Kindred (q(171))
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
   | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared' | 'express' | 'express_unlocked'
       | 'hit' | 'defeat' | 'hurt' | 'knocked_out' | 'complete'; run: number; floor: number; cost: number;

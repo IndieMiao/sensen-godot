@@ -90,6 +90,7 @@ export interface ResidentState {
   done_day: string;              // player day the last request was completed (one a day)
   done_at?: number;              // when the last request was completed (P1: the next one opens next_request_h later)
   lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
+  kindred_at?: number;           // q(171): when their postcard and title were given (first reached Kindred)
 }
 
 export interface Homestead {

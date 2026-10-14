@@ -30,13 +30,33 @@ export function stageIndex(c: P0Content, points: number): number {
 const stageAt = (c: P0Content, name: string) => Math.max(0, c.affinity.stages.findIndex(([n]) => n === name));
 
 /** Points change, never below the floor of the current stage (q(33): a stage never goes back). */
-function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason: string, events: P0Event[], verdict?: string): void {
+function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason: string, now: number, events: P0Event[], verdict?: string): void {
   const r = residentState(s, id);
   const floor = c.affinity.stages[stageIndex(c, r.affinity)][1];
   const before = r.affinity;
   r.affinity = Math.max(floor, r.affinity + delta);
   events.push({ kind: 'affinity', resident: id, delta: r.affinity - before, total: r.affinity,
     stage: c.affinity.stages[stageIndex(c, r.affinity)][0], reason, ...(verdict ? { verdict } : {}) });
+  const kindred = c.affinity.stages.findIndex(([n]) => n === 'Kindred');
+  if (kindred > 0 && stageIndex(c, r.affinity) >= kindred && r.kindred_at === undefined) grantKindred(c, s, id, now, events);
+}
+
+/** q(171): the names of what reaching Kindred gives — the resident's postcard, its text (their Kindred line), the title. */
+export function kindredGifts(c: P0Content, id: string): { postcard: string; text: string; title: string } {
+  const def = residentDef(c, id)!, k = c.affinity.kindred ?? { postcard: 'Postcard from {name}', title: "{name}'s Best Friend" };
+  return { postcard: k.postcard.replace('{name}', def.name), text: def.lines.Kindred ?? '', title: k.title.replace('{name}', def.name) };
+}
+
+/**
+ * q(171): first reaching Kindred gives the resident's postcard (into the Passport, never the bag: kindred_at records
+ * it) and the title `<Name>'s Best Friend`, kept with the one-time rewards beside a Trusted request's. Once per resident;
+ * a save already at Kindred before this gets them with its next affinity change. The message-board line is P2 social.
+ */
+function grantKindred(c: P0Content, s: P0State, id: string, now: number, events: P0Event[]): void {
+  residentState(s, id).kindred_at = now;
+  const g = kindredGifts(c, id);
+  if (!s.rewards.includes(`title:${g.title}`)) s.rewards.push(`title:${g.title}`);
+  events.push({ kind: 'kindred', resident: id, postcard: g.postcard, title: g.title });
 }
 
 /** The resident's next request, or why there is none: done for today, a stage away, or none left. */
@@ -93,7 +113,7 @@ export function talk(c: P0Content, s: P0State, cmd: { resident?: unknown }, now:
   const r = residentState(s, id);
   if (r.chat_day !== s.day.key) {
     r.chat_day = s.day.key;
-    addAffinity(c, s, id, c.affinity.first_chat, 'chat', events);
+    addAffinity(c, s, id, c.affinity.first_chat, 'chat', now, events);
   }
   offerGiftMeal(c, s, id, now, events);
   return null;
@@ -171,7 +191,7 @@ export function giftPointsView(c: P0Content, s: P0State, id: string): Record<str
   return Object.fromEntries(bagDishes(c, s).map(item => [item, giftPoints(c, s, def, item).delta]));
 }
 
-export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown; item?: unknown }, events: P0Event[]): Refusal | null {
+export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown; item?: unknown }, now: number, events: P0Event[]): Refusal | null {
   const id = String(cmd.resident ?? ''), item = String(cmd.item ?? '');
   const def = residentDef(c, id);
   if (!def) return { code: 'bad_resident' };
@@ -185,7 +205,7 @@ export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown
   events.push({ kind: 'item', id: item, delta: -1 });
   r.gift_day = s.day.key;
   const pts = giftPoints(c, s, def, item);
-  addAffinity(c, s, id, pts.delta, 'gift', events, pts.verdict);
+  addAffinity(c, s, id, pts.delta, 'gift', now, events, pts.verdict);
   return null;
 }
 
@@ -230,7 +250,7 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
   r.done_at = now;
   noteDone(s, reqId);
   events.push({ kind: 'coins', delta: coins }, { kind: 'request', id: reqId, status: 'done', coins, bonus });
-  addAffinity(c, s, owner, c.affinity.request, 'request', events);
+  addAffinity(c, s, owner, c.affinity.request, 'request', now, events);
   if (q.reward) grantReward(c, s, owner, q, now, events);
   return null;
 }

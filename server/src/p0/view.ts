@@ -9,7 +9,7 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
-import { expireGiftMeals, giftClues, giftPointsView, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
+import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
@@ -461,6 +461,8 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     // §7.5.3 Recipe lesson: ready = `learn` teaches `recipe` now; wait = next_in ms; stage = from need_stage; none
     lesson: { state: lesson.state, recipe: lesson.recipe ?? null, next_in: lesson.next_in ?? null, need_stage: lesson.need_stage ?? null },
     gift_points: giftPointsView(c, s, id),   // Fishing Lv7 Gift Clues: bag dish → what giving it adds (the drawer's ♥ +3)
+    // q(171): their postcard in the Passport once Kindred gave it — `Postcard from Pip`, its text, when; null before
+    kindred: r.kindred_at !== undefined ? { ...kindredGifts(c, id), at: r.kindred_at } : null,
   };
 }
 
