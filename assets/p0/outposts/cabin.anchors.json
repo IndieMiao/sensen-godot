@@ -1,186 +1,25 @@
 {
   "_note": "S-tier trading post (the cabin) on the Coffee Shop kit (SGODOT-284; world_gen.json room.cabin): the tea house's anchors (its counter, tables, keeper, spawn and exit, as tea.anchors.json), with the cabin's own residents in its two resident spots — Pip at the first (where the tea house has Hana), the s_order resident at the second (where it has Lena): Old Kai or Theo now; Granny Wu, Rafa and Ivo join with their looks (§9.4.3: Pip + the first eligible of s_order). Without this file the cabin read the tea house's and showed none of them (苏烈 / 上官婉儿 on 284, 2026-10-14).",
   "anchors": [
-    {
-      "name": "use_counter",
-      "position": [
-        0.85,
-        1.25,
-        -1.6
-      ],
-      "module": "counter"
-    },
-    {
-      "name": "stand_counter",
-      "position": [
-        0.85,
-        0.05,
-        -1.0
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "npc_keeper",
-      "position": [
-        0.85,
-        0.05,
-        -2.4
-      ],
-      "yaw_degrees": 180
-    },
-    {
-      "name": "badge_keeper",
-      "position": [
-        0.85,
-        2.35,
-        -2.4
-      ]
-    },
-    {
-      "name": "stand_keeper",
-      "position": [
-        0.85,
-        0.05,
-        -1.0
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "use_tea_table_1",
-      "position": [
-        -1.34,
-        1.07,
-        0.55
-      ],
-      "module": "table"
-    },
-    {
-      "name": "seat_table1_1",
-      "position": [
-        -0.62,
-        0.715,
-        0.35
-      ],
-      "yaw_degrees": 90,
-      "module": "chair_2"
-    },
-    {
-      "name": "seat_table1_2",
-      "position": [
-        -2.13,
-        0.715,
-        0.55
-      ],
-      "yaw_degrees": -90,
-      "module": "chair"
-    },
-    {
-      "name": "use_tea_table_2",
-      "position": [
-        1.45,
-        1.07,
-        1.0
-      ],
-      "module": "table_2"
-    },
-    {
-      "name": "seat_table2_1",
-      "position": [
-        0.84,
-        0.715,
-        1.2
-      ],
-      "yaw_degrees": -90,
-      "module": "chair_3"
-    },
-    {
-      "name": "seat_table2_2",
-      "position": [
-        2.24,
-        0.715,
-        1.0
-      ],
-      "yaw_degrees": 90,
-      "module": "chair_4"
-    },
-    {
-      "name": "npc_pip",
-      "position": [
-        -0.6,
-        0.05,
-        -0.8
-      ],
-      "yaw_degrees": 180
-    },
-    {
-      "name": "stand_pip",
-      "position": [
-        -0.2,
-        0.05,
-        -0.1
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "npc_kai",
-      "position": [
-        2.5,
-        0.05,
-        -0.6
-      ],
-      "yaw_degrees": -90
-    },
-    {
-      "name": "npc_theo",
-      "position": [
-        2.5,
-        0.05,
-        -0.6
-      ],
-      "yaw_degrees": -90
-    },
-    {
-      "name": "stand_kai",
-      "position": [
-        1.8,
-        0.05,
-        -0.6
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "stand_theo",
-      "position": [
-        1.8,
-        0.05,
-        -0.6
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "spawn",
-      "position": [
-        -0.15,
-        0.05,
-        1.55
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "exit",
-      "position": [
-        0.2,
-        0.05,
-        2.7
-      ]
-    },
-    {
-      "name": "badge_exit",
-      "position": [
-        0.15,
-        0.0,
-        3.45
-      ]
-    }
+    {"name": "use_counter", "position": [0.85, 1.25, -1.6], "module": "counter"},
+    {"name": "stand_counter", "position": [0.85, 0.05, -1.0], "yaw_degrees": 0},
+    {"name": "npc_keeper", "position": [0.85, 0.05, -2.4], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [0.85, 2.35, -2.4]},
+    {"name": "stand_keeper", "position": [0.85, 0.05, -1.0], "yaw_degrees": 0},
+    {"name": "use_tea_table_1", "position": [-1.34, 1.07, 0.55], "module": "table"},
+    {"name": "seat_table1_1", "position": [-0.62, 0.715, 0.35], "yaw_degrees": 90, "module": "chair_2"},
+    {"name": "seat_table1_2", "position": [-2.13, 0.715, 0.55], "yaw_degrees": -90, "module": "chair"},
+    {"name": "use_tea_table_2", "position": [1.45, 1.07, 1.0], "module": "table_2"},
+    {"name": "seat_table2_1", "position": [0.84, 0.715, 1.2], "yaw_degrees": -90, "module": "chair_3"},
+    {"name": "seat_table2_2", "position": [2.24, 0.715, 1.0], "yaw_degrees": 90, "module": "chair_4"},
+    {"name": "npc_pip", "position": [-0.6, 0.05, -0.8], "yaw_degrees": 180},
+    {"name": "stand_pip", "position": [-0.2, 0.05, -0.1], "yaw_degrees": 0},
+    {"name": "npc_kai", "position": [2.5, 0.05, -0.6], "yaw_degrees": -90},
+    {"name": "npc_theo", "position": [2.5, 0.05, -0.6], "yaw_degrees": -90},
+    {"name": "stand_kai", "position": [1.8, 0.05, -0.6], "yaw_degrees": 90},
+    {"name": "stand_theo", "position": [1.8, 0.05, -0.6], "yaw_degrees": 90},
+    {"name": "spawn", "position": [-0.15, 0.05, 1.55], "yaw_degrees": 0},
+    {"name": "exit", "position": [0.2, 0.05, 2.7]},
+    {"name": "badge_exit", "position": [0.15, 0.0, 3.45]}
   ]
 }
