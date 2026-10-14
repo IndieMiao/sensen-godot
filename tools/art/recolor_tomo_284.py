@@ -26,7 +26,7 @@ def run():
     lum = pixels[..., :3].astype(float) @ np.array([0.2126, 0.7152, 0.0722])
     knots = np.array([lum.min(), np.median(lum), lum.max()])
     assert knots[0] < knots[1] < knots[2]
-    palette = np.array([[38, 30, 26], [59, 48, 42], [90, 74, 64]])
+    palette = np.array([[46, 31, 22], [74, 51, 36], [107, 76, 54]])
     output = pixels.copy()
     output[..., :3] = np.rint(np.stack([
         np.interp(lum, knots, palette[:, channel]) for channel in range(3)
@@ -43,7 +43,7 @@ def run():
         "base": "hairhat0", "id": "hairhat0_npc_tomo",
         "source_pixels": [pixels.shape[1], pixels.shape[0]],
         "luminance_knots_min_median_max": knots.tolist(),
-        "palette_shadow_mid_highlight": ["#261E1A", "#3B302A", "#5A4A40"],
+        "palette_shadow_mid_highlight": ["#2E1F16", "#4A3324", "#6B4C36"],
         "alpha_exact": bool(np.array_equal(pixels[..., 3], output[..., 3])),
         "output_unique_colors": len(np.unique(output[..., :3].reshape(-1, 3), axis=0)),
         "non_hair_regions": "None: inspected source contains only hair islands.",

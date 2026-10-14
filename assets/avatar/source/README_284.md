@@ -10,7 +10,7 @@ FBX frames remain authoritative. Review base: `farm-dev`, `a8e0b548`.
 | hairhat80_npc_granny_wu | hairhat80_npc_ama | Silver hair, warm red pin; FBX byte-identical | 764 |
 | hairhat_npc_ivo | hairhat51 | Rounded mustard helmet, brass headlamp, retained/shortened grey hair | 1423 |
 | mask16_npc_ivo | mask16_npc_kai | Grey jaw beard; one-third vertical extent | 320 |
-| hairhat0_npc_tomo | hairhat0 | Charcoal brown hair texture; FBX byte-identical | 1468 |
+| hairhat0_npc_tomo | hairhat0 | Warm dark brown hair texture; FBX byte-identical | 1468 |
 
 All four are static `SM_` socket parts, one mesh and one surface each. Original
 node names, hierarchy, transforms, axes, units and bone frames are preserved.
@@ -45,8 +45,8 @@ no `cloth42_npc_ivo` ID is registered. Final review looks are:
 
 Tomo is the October 14 increment authorized by 上官婉儿 after 不知火舞's review.
 The original hairhat0 texture contains only hair. Its complete luminance range
-is mapped monotonically through shadow #261E1A, median #3B302A and highlight
-#5A4A40, preserving strand shading and alpha. No geometry is changed: the
+is mapped monotonically through shadow #2E1F16, median #4A3324 and highlight
+#6B4C36, preserving strand shading and alpha. No geometry is changed: the
 original filename, all FBX bytes, nodes, hierarchy, transforms, axes and units
 are retained. Source resolution remains 1024² and runtime remains 512² with
 the original mipmap/VRAM compression settings. Shader floats match hairhat0.

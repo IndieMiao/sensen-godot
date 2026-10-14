@@ -1,13 +1,16 @@
 {
-  "base": "6475b892166e3691fb79e3f43c6d89601b6d3b98",
-  "manifest_before": 41,
+  "base": "5f2764131b8381b0a5d8082f4389e52433a46434",
+  "manifest_before": 42,
+  "manifest_during": 41,
   "manifest_after": 42,
-  "appended_ids": [
+  "reextracted_ids": [
     "hairhat0_npc_tomo"
   ],
-  "manifest_existing_entries_exact": true,
-  "manifest_text_prefix_exact": true,
-  "unchanged_file_count": 408,
+  "manifest_full_file_byte_identical": true,
+  "npc_only_byte_identical": true,
+  "recipes_byte_identical": true,
+  "all_source_files_except_tomo_png_byte_identical": true,
+  "unchanged_file_count": 418,
   "unchanged_files": {
     "assets/avatar/base/anim_placeholders.json": "ddbf35224f098b9a1835aa4eefd0a3758fba51eff7f524fb49eb4d94be85cff7",
     "assets/avatar/base/animations.res": "f5c0c26371928aa080110e44413074b294a6e419b2c846166ca06a0f7b28e02d",
@@ -15,6 +18,7 @@
     "assets/avatar/common/T_black.png": "6e0eb5421289a2a098d0d9f2cf60b1539d613ce703562018b238502e4a712e4f",
     "assets/avatar/common/T_black.png.import": "49a105feee4f3fb3bdc6be7bc5c413347e13f486bbf3afce8faf41ee358eed04",
     "assets/avatar/demo_denylist.json": "5baa4e68e8047fe63e783a2850c9ff5740e4be22950a1422813f019aae63876e",
+    "assets/avatar/npc_only.json": "934851fefccc6fabe3cbacf652a26c945618cb417ba67495153aa4a5191703e2",
     "assets/avatar/parts/body00.res": "c1f7f1948206f2013ad2ee3920032ace092acf1870e87ff48890dda7e0bb1f7e",
     "assets/avatar/parts/cloth0.res": "7ddd1a2061d6d92ea90e21a83460cb921f5d0a7258191447ec00050d0d7bc965",
     "assets/avatar/parts/cloth1.res": "a0be17981b0e7e99ea4939267aad6d32e08dbf16b990c8cccaf5a4545e7acc02",
@@ -36,6 +40,7 @@
     "assets/avatar/parts/glass8.res": "13836fbcd3c8d709ad2f90076eb8cab6f6f37a57de0c93bf8efca8f4e285c5f5",
     "assets/avatar/parts/glass8_scene.tscn": "066151ee2845c61543c15d2e659121d81a2f01ac2c6d7f5dff5ae5b5e73b8dd6",
     "assets/avatar/parts/hairhat0.res": "2dee63f000ba58fea6101090950eb07db17e94de5f9716e5956437db62539678",
+    "assets/avatar/parts/hairhat0_npc_tomo.res": "217f76efbbf3a4b9eb44bb1a69f84fed5b770d23ddf1c1e2e8e85ef3247105ba",
     "assets/avatar/parts/hairhat0_scene.tscn": "510406e32a2b014b629f1ec5c913642c827cdbad1e695aa35ee56db0eda9de38",
     "assets/avatar/parts/hairhat12_npc_mei.res": "48429e39dfe9705abd1304b6216f26ef4851a025535eff8e765d43434f07e7f0",
     "assets/avatar/parts/hairhat12_npc_mei_scene.tscn": "f65406c829eb6f2cfeb84898af89cb14fd959aa5d5ab67ced7df4ec1d4b24b60",
@@ -75,6 +80,7 @@
     "assets/avatar/parts/shoes3.res": "32c2599e63fdce259de2a4ba1e48734cd8a7c832e51a9faa18f70009cbb6953d",
     "assets/avatar/parts/shoes4.res": "6cfc8603d73df9d8442865ecef98f6b04a7cf28a9125ab926edf1816c0cec58a",
     "assets/avatar/parts/shoes5.res": "7235a99769ed5bfc3714087689d68cac556f79c01de793157f08047caaeca3ad",
+    "assets/avatar/parts_manifest.json": "788c16a2992380120473bc0695dac09074e5ad9eb9b99a4886d9fa80229b8eeb",
     "assets/avatar/source/README.md": "cf945840c347ba55e6cf27ab4dfecb0cadd97ee7719f17ecc648946251392834",
     "assets/avatar/source/README_229.md": "1ceaae2165cfac3ecc5427922ae916390d697ce3b0e111adde45cb5092fde030",
     "assets/avatar/source/README_batch2.md": "ad8721eec9c90774be21dfebbfcdd370ea845100b52de1638bc1182643f956c1",
@@ -156,6 +162,9 @@
     "assets/avatar/source/hairhat0/SM_hairHat0.fbx.import": "6dc07fb65bb0472ddad0f5586c89f8aea205d8b774e1b9e8a8656a35cc957b08",
     "assets/avatar/source/hairhat0/T_base_boy_hairHat_D.png": "83eb3e76199182afacd8aa4a2e0244c1a4ec285fb946c2876b6930ccc03f84c5",
     "assets/avatar/source/hairhat0/T_base_boy_hairHat_D.png.import": "aa8e9225161e74deac071d29d4f40313c2cf99bdd027fb26a73032a23a7c2882",
+    "assets/avatar/source/hairhat0_npc_tomo/SM_hairHat0.fbx": "f0ace8d1c9c7412fcc8d74a10d82a413fce5875c1544bd217954aa60aeefd29d",
+    "assets/avatar/source/hairhat0_npc_tomo/SM_hairHat0.fbx.import": "f2fe41acf0393ef0ecce9ae2da065b041c53d1304be66dba4ff76c17a4746ab9",
+    "assets/avatar/source/hairhat0_npc_tomo/T_tomo_hairHat_D.png.import": "9962fca8616847b59bc7cffb10a6cb250821cd0e6fb1595ac1f288ff38ade348",
     "assets/avatar/source/hairhat12_npc_mei/SM_hairHat12.fbx": "4ecdbc50ed36e2495064dd622b316125d60cb91d1bd2c14f1565c5b66ceb89d6",
     "assets/avatar/source/hairhat12_npc_mei/SM_hairHat12.fbx.import": "3e3966851c337c7aa2c00c709d786e263c89bcc8326db0e001353f50e915107d",
     "assets/avatar/source/hairhat12_npc_mei/T_skin11_hairHat_2_D.png": "a5bf6d94e4d1a3e4b5ea03e6703fe4520357caff9480b304bdfce701ff46e00a",
@@ -256,6 +265,7 @@
     "assets/avatar/source/mixamo/waving.fbx": "a294c65bda68f0044529eb35aed9c37bdb49c64823bec3710a769cb86cf678a9",
     "assets/avatar/source/mixamo/waving.fbx.import": "df82c66ab50a89bc024a8da684d9f40b0784c44e1387f555111d0503fdf47226",
     "assets/avatar/source/recipes_229.json": "e510b315a6b87f354faee9faa808db4606a3f041cb30ebe80f161903afeaa5f8",
+    "assets/avatar/source/recipes_284.json": "cc852ca77ee491833d828586e1626f81967d79bd937cc9cdfb7aa95fd0107ef3",
     "assets/avatar/source/recipes_batch2.json": "bceadab10aa3c243d47c3dbb09124f6cbb74dad87a330ab5e2b08ecc929aaaa3",
     "assets/avatar/source/shoes0/SK_DtBase.fbx": "86ec0836cfb0d62b946c7bdf505c596362cb3e8b497b51746f3aec0c7e3def3a",
     "assets/avatar/source/shoes0/SK_DtBase.fbx.import": "c3769c219d8706e90360314dc04df98428020173eb93d9a418e5b0ca5c99432d",
@@ -317,6 +327,8 @@
     "assets/avatar/thumbs/glass8.png.import": "c248fff58cf16697f2a976d84629898515b3798cd6d7d1053b545a01f7d0e4d6",
     "assets/avatar/thumbs/hairhat0.png": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6",
     "assets/avatar/thumbs/hairhat0.png.import": "1ada35de346fe5c9ebf412151934afd776380e3b6b4fc646ee171489f982144f",
+    "assets/avatar/thumbs/hairhat0_npc_tomo.png": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6",
+    "assets/avatar/thumbs/hairhat0_npc_tomo.png.import": "b85343b3e120823265b53599ada683f98c910ef54133163a9f5d366346686982",
     "assets/avatar/thumbs/hairhat12_npc_mei.png": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6",
     "assets/avatar/thumbs/hairhat12_npc_mei.png.import": "d2be4ad461d829643423e7eaac775c94223d0d314fb23e92404728c5fddd6a74",
     "assets/avatar/thumbs/hairhat20.png": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6",
@@ -416,6 +428,10 @@
     "tools/pipeline/inspect_rig.gd": "5f919427b7a7b0e7c417a0d28ff6f35c8998c146fc5341a7fc1a718bb906eda3",
     "tools/pipeline/inspect_rig.gd.uid": "d1cf8651959bef772c6ac66b16fa38124fd7bf5a2ac2a6867493903a1bf6d3ff",
     "tools/pipeline/mixamo_retarget.gd": "82731626cbef69416988458a36cae73b57fe892544ed379deec760a8cb9bab2c",
-    "tools/pipeline/mixamo_retarget.gd.uid": "0bc413c78a049a7b7aa7823ef3898c801702a376dfc70eefd228051290311d91"
-  }
+    "tools/pipeline/mixamo_retarget.gd.uid": "0bc413c78a049a7b7aa7823ef3898c801702a376dfc70eefd228051290311d91",
+    "assets/avatar/parts/hairhat0_npc_tomo_scene.tscn": "7161c879671abd5eed9e2409c0b9ae8c4aa2dfe0e0efbef303e2591d38ee5e70"
+  },
+  "reextracted_scene_only_random_node_ids_changed": true,
+  "original_node_ids_retained": true,
+  "all_avatar_assets_except_tomo_png_byte_identical": true
 }

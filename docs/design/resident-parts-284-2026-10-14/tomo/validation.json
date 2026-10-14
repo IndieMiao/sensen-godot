@@ -3,9 +3,9 @@
   "request": "q(171)",
   "author": "刘备",
   "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
-  "increment_base": "6475b892166e3691fb79e3f43c6d89601b6d3b98",
+  "increment_base": "5f2764131b8381b0a5d8082f4389e52433a46434",
   "date": "2026-10-14",
-  "scope": "One texture-only NPC hairHat increment; existing three parts preserved. Desktop Vulkan Mobile art review.",
+  "scope": "Tomo warm dark brown texture revision; previous #3B302A midtone superseded. All avatar assets except this PNG unchanged after single-part re-extraction; desktop Vulkan Mobile review.",
   "tests": {
     "cases": 38,
     "suites": 8,
@@ -280,38 +280,44 @@
       184.49620000000002
     ],
     "palette_shadow_mid_highlight": [
-      "#261E1A",
-      "#3B302A",
-      "#5A4A40"
+      "#2E1F16",
+      "#4A3324",
+      "#6B4C36"
     ],
     "alpha_exact": true,
-    "output_unique_colors": 68,
+    "output_unique_colors": 72,
     "non_hair_regions": "None: inspected source contains only hair islands.",
     "fbx_byte_identical": true,
     "sha256": {
       "SM_hairHat0.fbx": "f0ace8d1c9c7412fcc8d74a10d82a413fce5875c1544bd217954aa60aeefd29d",
-      "T_tomo_hairHat_D.png": "a5621ab0641a4942d8b6b72c577dac55ff77ec275524256e5a6a3a0204d378a6"
+      "T_tomo_hairHat_D.png": "4bd8dff9f9a171a73c61735e399bda4e73fdc2474841b50f7e2ed183e17341f3"
     }
   },
   "preservation_summary": {
-    "base": "6475b892166e3691fb79e3f43c6d89601b6d3b98",
-    "manifest_before": 41,
+    "base": "5f2764131b8381b0a5d8082f4389e52433a46434",
+    "manifest_before": 42,
+    "manifest_during": 41,
     "manifest_after": 42,
-    "appended_ids": [
+    "reextracted_ids": [
       "hairhat0_npc_tomo"
     ],
-    "manifest_existing_entries_exact": true,
-    "manifest_text_prefix_exact": true,
-    "unchanged_file_count": 408
+    "manifest_full_file_byte_identical": true,
+    "npc_only_byte_identical": true,
+    "recipes_byte_identical": true,
+    "all_source_files_except_tomo_png_byte_identical": true,
+    "unchanged_file_count": 418,
+    "reextracted_scene_only_random_node_ids_changed": true,
+    "original_node_ids_retained": true,
+    "all_avatar_assets_except_tomo_png_byte_identical": true
   },
   "reproducibility": {
     "initial_sha256": {
       "SM_hairHat0.fbx": "f0ace8d1c9c7412fcc8d74a10d82a413fce5875c1544bd217954aa60aeefd29d",
-      "T_tomo_hairHat_D.png": "a5621ab0641a4942d8b6b72c577dac55ff77ec275524256e5a6a3a0204d378a6"
+      "T_tomo_hairHat_D.png": "4bd8dff9f9a171a73c61735e399bda4e73fdc2474841b50f7e2ed183e17341f3"
     },
     "rebuilt_sha256": {
       "SM_hairHat0.fbx": "f0ace8d1c9c7412fcc8d74a10d82a413fce5875c1544bd217954aa60aeefd29d",
-      "T_tomo_hairHat_D.png": "a5621ab0641a4942d8b6b72c577dac55ff77ec275524256e5a6a3a0204d378a6"
+      "T_tomo_hairHat_D.png": "4bd8dff9f9a171a73c61735e399bda4e73fdc2474841b50f7e2ed183e17341f3"
     },
     "byte_identical": true
   },
@@ -334,49 +340,49 @@
   },
   "images": {
     "tomo_stamp_96x120.png": {
-      "sha256": "ef23bdc2c0a4c7fee26b215aecd84a4fe75149ce310225dda3abea988270a10b",
+      "sha256": "7d9543899a7131418a70fcf770dda5aa5ece3594b07d93782efe2f9a583d9e2f",
       "pixels": [
         96,
         120
       ]
     },
     "npc-lineup-three-quarter.png": {
-      "sha256": "d50d0c55e6dba86ffdf9d650f0b23fce8e5d01f8aae9d24e9266316605daf452",
+      "sha256": "f74694994ef7b65b1fcf1ceadbb46005e6f35d04348c1f6b9e4a2576070d1d05",
       "pixels": [
         316,
         464
       ]
     },
     "stamps.png": {
-      "sha256": "edaabace6b2a353af041ef85dd3387829a44ffa99eedbb0b9703fbc94b036e9a",
+      "sha256": "c1901337072a4c7f380ee0d1811d24fc02a30a47c2fa51c2d3a0cf1c84385c8c",
       "pixels": [
         120,
         196
       ]
     },
     "tomo_card.jpg": {
-      "sha256": "941a0259f7562cf8cfc1b4684de24f2efd0f0e793b70c831761f47968aba06ef",
+      "sha256": "a9af4a29b980d9352fcdcdca35747f37337a09c7ab087567dd9ec1d380332b1a",
       "pixels": [
         300,
         660
       ]
     },
     "npc-lineup-both.png": {
-      "sha256": "3f31c1d6794edabba064354e1db3f3935b5e8cb63eeafca2a3c5fa097a64b458",
+      "sha256": "887dfec3bcbe7aa03ceb54ed154a40326b9d2c7d51ac447dabf24d28603a031c",
       "pixels": [
         616,
         472
       ]
     },
     "tomo_stamp_32x40.png": {
-      "sha256": "da8103faf744a6eeddd35b4b4e97a6e6124bbaa1bbcb806d0fba35d04a7e737d",
+      "sha256": "5c2999596c1958c3131c19887073c27fb7f60f1d38281126d79aecb04bd5fd5d",
       "pixels": [
         32,
         40
       ]
     },
     "npc-lineup-front.png": {
-      "sha256": "cc0655e8ce0ef30583e66c4cace677d3841de8166dc08292853fd3f6b58d448a",
+      "sha256": "13e2eb5fe5a40453eb49e0f9740f26310f3ee9120dfe565f20f27bb418019462",
       "pixels": [
         316,
         464
@@ -386,7 +392,7 @@
   "portrait_script": {
     "lineup_source": "tools/dev/npc_lineup.gd",
     "lineup_source_sha256": "611b1092274306e9b27cf425e0232eb77071121ee27c8d6468721859d7da182b",
-    "lineup_fixture_sha256": "f9f028a8ed761808a49ef023de220a2f181c2eafef6b6f74c0a7d859feedfcdd",
+    "lineup_fixture_sha256": "7533607762803fc4cd70a35bb47fbe1747f5f0798699b90cbe56c4eead76fe57",
     "portrait_baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
     "portrait_baker_committed": false,
     "lineup_changes": [

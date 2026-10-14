@@ -27,7 +27,7 @@ s=s.replace('\t\trig.play_motion("idle")','\t\trig.play_motion("idle")\n\t\tvar 
 s=s.replace('Vector3(0.0, 1.0, 3.2), Vector3(1.9, 1.0, 2.6)','Vector3(0.0, 1.0, 3.5), Vector3(2.078125, 1.0, 2.84375)').replace('Vector3(0.0, 0.95, 0.0)','Vector3(0.0, 0.90, 0.0)')
 s='\n'.join('\t\tvar parts := "silver bun / cloth11 / shoes3" if entry.id=="res_granny_wu" else "miner helmet + grey beard / cloth42 / shoes4"' if l.startswith('\t\tvar parts := ') else l for l in s.splitlines())+'\n'
 if args.tomo:
- s='\n'.join('\t\tvar parts := "charcoal hair / glasses / white T / camera bag"' if l.startswith('\t\tvar parts := ') else l for l in s.splitlines())+'\n'
+ s='\n'.join('\t\tvar parts := "warm brown hair / glasses / white T / camera bag"' if l.startswith('\t\tvar parts := ') else l for l in s.splitlines())+'\n'
  s=s.replace('var cols := 2','var cols := 1')
 (OUT/'npc_lineup_284.gd').write_text(s)
 dest=ROOT/'tools/art/bake_resident_portraits.gd'
