@@ -1,0 +1,4137 @@
+{
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "spec": "SGODOT-282 v1.1",
+  "base_commit": "5fbd5da5",
+  "godot_import": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "assets": {
+      "a": {
+        "bounds": [
+          [
+            -0.280000001192093,
+            0.0,
+            0.0
+          ],
+          [
+            0.280000001192093,
+            1.3199999332428,
+            0.5
+          ]
+        ],
+        "groups": {
+          "cabinet": {
+            "bounds": [
+              [
+                -0.280000001192093,
+                0.0,
+                0.0
+              ],
+              [
+                0.280000001192093,
+                1.3199999332428,
+                0.5
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 622
+          },
+          "dish_1": {
+            "bounds": [
+              [
+                -0.199000000953674,
+                0.943000018596649,
+                0.246999993920326
+              ],
+              [
+                -0.0230000019073486,
+                1.06599998474121,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_2": {
+            "bounds": [
+              [
+                0.0230000000447035,
+                0.943000018596649,
+                0.246999993920326
+              ],
+              [
+                0.199000000953674,
+                1.067999958992,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_3": {
+            "bounds": [
+              [
+                -0.199000000953674,
+                0.666999995708466,
+                0.246999993920326
+              ],
+              [
+                -0.0230000019073486,
+                0.791999995708466,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_4": {
+            "bounds": [
+              [
+                0.0230000000447035,
+                0.666999995708466,
+                0.246999993920326
+              ],
+              [
+                0.199000000953674,
+                0.791999995708466,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 1,
+            "triangles": 144
+          },
+          "dish_5": {
+            "bounds": [
+              [
+                -0.199000000953674,
+                0.391000002622604,
+                0.246999993920326
+              ],
+              [
+                -0.0230000019073486,
+                0.516000032424927,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_6": {
+            "bounds": [
+              [
+                0.0230000000447035,
+                0.391000002622604,
+                0.246999993920326
+              ],
+              [
+                0.199000000953674,
+                0.513999998569489,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "glass": {
+            "bounds": [
+              [
+                -0.206000000238419,
+                0.395999997854233,
+                0.462000012397766
+              ],
+              [
+                0.206000000238419,
+                1.19400000572205,
+                0.462010025978088
+              ]
+            ],
+            "surfaces": 1,
+            "triangles": 2
+          },
+          "highlights": {
+            "bounds": [
+              [
+                -0.191349998116493,
+                0.834699988365173,
+                0.469999998807907
+              ],
+              [
+                0.174300000071526,
+                1.13635003566742,
+                0.470010012388229
+              ]
+            ],
+            "surfaces": 1,
+            "triangles": 4
+          }
+        },
+        "size": [
+          0.560000002384186,
+          1.3199999332428,
+          0.5
+        ],
+        "surfaces": 15,
+        "triangles": 1492
+      },
+      "b": {
+        "bounds": [
+          [
+            -0.280000001192093,
+            0.0,
+            0.0
+          ],
+          [
+            0.280000001192093,
+            1.3199999332428,
+            0.5
+          ]
+        ],
+        "groups": {
+          "cabinet": {
+            "bounds": [
+              [
+                -0.280000001192093,
+                0.0,
+                0.0
+              ],
+              [
+                0.280000001192093,
+                1.3199999332428,
+                0.5
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 622
+          },
+          "dish_1": {
+            "bounds": [
+              [
+                -0.199000000953674,
+                0.943000018596649,
+                0.246999993920326
+              ],
+              [
+                -0.0230000019073486,
+                1.06599998474121,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_2": {
+            "bounds": [
+              [
+                0.0230000000447035,
+                0.943000018596649,
+                0.246999993920326
+              ],
+              [
+                0.199000000953674,
+                1.067999958992,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_3": {
+            "bounds": [
+              [
+                -0.199000000953674,
+                0.666999995708466,
+                0.246999993920326
+              ],
+              [
+                -0.0230000019073486,
+                0.791999995708466,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_4": {
+            "bounds": [
+              [
+                0.0230000000447035,
+                0.666999995708466,
+                0.246999993920326
+              ],
+              [
+                0.199000000953674,
+                0.791999995708466,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 1,
+            "triangles": 144
+          },
+          "dish_5": {
+            "bounds": [
+              [
+                -0.199000000953674,
+                0.391000002622604,
+                0.246999993920326
+              ],
+              [
+                -0.0230000019073486,
+                0.516000032424927,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "dish_6": {
+            "bounds": [
+              [
+                0.0230000000447035,
+                0.391000002622604,
+                0.246999993920326
+              ],
+              [
+                0.199000000953674,
+                0.513999998569489,
+                0.423000007867813
+              ]
+            ],
+            "surfaces": 2,
+            "triangles": 144
+          },
+          "highlights": {
+            "bounds": [
+              [
+                -0.191349998116493,
+                0.834699988365173,
+                0.469999998807907
+              ],
+              [
+                0.174300000071526,
+                1.13635003566742,
+                0.470010012388229
+              ]
+            ],
+            "surfaces": 1,
+            "triangles": 4
+          }
+        },
+        "size": [
+          0.560000002384186,
+          1.3199999332428,
+          0.5
+        ],
+        "surfaces": 14,
+        "triangles": 1490
+      }
+    },
+    "captures": [
+      {
+        "camera_position": [
+          8.36163234710693,
+          14.8899669647217,
+          10.7047662734985
+        ],
+        "camera_size": 6.71999979019165,
+        "height": 800,
+        "id": "basic_room_a_43deg",
+        "pitch": 42.9999961853027,
+        "width": 360,
+        "yaw": 40.3050842285156
+      },
+      {
+        "camera_position": [
+          8.36163234710693,
+          14.8899669647217,
+          10.7047662734985
+        ],
+        "camera_size": 6.71999979019165,
+        "height": 800,
+        "id": "basic_room_b_43deg",
+        "pitch": 42.9999961853027,
+        "width": 360,
+        "yaw": 40.3050842285156
+      },
+      {
+        "camera_position": [
+          6.86163282394409,
+          14.4719667434692,
+          9.46476554870605
+        ],
+        "camera_size": 3.5,
+        "height": 800,
+        "id": "basic_room_b_detail",
+        "pitch": 42.9999961853027,
+        "width": 360,
+        "yaw": 40.3050842285156
+      },
+      {
+        "camera_position": [
+          8.87961196899414,
+          14.8899669647217,
+          10.2438592910767
+        ],
+        "camera_size": 6.71999979019165,
+        "height": 800,
+        "id": "standard_room_5_a_43deg",
+        "pitch": 42.9999961853027,
+        "width": 360,
+        "yaw": 43.0212745666504
+      },
+      {
+        "camera_position": [
+          8.87961196899414,
+          14.8899669647217,
+          10.2438592910767
+        ],
+        "camera_size": 6.71999979019165,
+        "height": 800,
+        "id": "standard_room_5_b_43deg",
+        "pitch": 42.9999961853027,
+        "width": 360,
+        "yaw": 43.0212745666504
+      },
+      {
+        "camera_position": [
+          7.31361246109009,
+          14.4719667434692,
+          9.50385856628418
+        ],
+        "camera_size": 3.5,
+        "height": 800,
+        "id": "standard_room_5_b_detail",
+        "pitch": 42.9999961853027,
+        "width": 360,
+        "yaw": 43.0212745666504
+      },
+      {
+        "camera_position": [
+          0.0,
+          0.660000026226044,
+          20.25
+        ],
+        "camera_size": 1.72000002861023,
+        "height": 1000,
+        "id": "a_front",
+        "pitch": 0.0,
+        "width": 1000,
+        "yaw": 0.0
+      },
+      {
+        "camera_position": [
+          10.9100723266602,
+          6.84033966064453,
+          15.8311986923218
+        ],
+        "camera_size": 1.72000002861023,
+        "height": 1000,
+        "id": "a_three_quarter",
+        "pitch": 18.0,
+        "width": 1000,
+        "yaw": 34.9999961853027
+      },
+      {
+        "camera_position": [
+          20.0,
+          0.660000026226044,
+          0.24999912083149
+        ],
+        "camera_size": 1.72000002861023,
+        "height": 1000,
+        "id": "a_side",
+        "pitch": 0.0,
+        "width": 1000,
+        "yaw": 90.0
+      },
+      {
+        "camera_position": [
+          0.0,
+          0.660000026226044,
+          20.25
+        ],
+        "camera_size": 1.72000002861023,
+        "height": 1000,
+        "id": "b_front",
+        "pitch": 0.0,
+        "width": 1000,
+        "yaw": 0.0
+      },
+      {
+        "camera_position": [
+          10.9100723266602,
+          6.84033966064453,
+          15.8311986923218
+        ],
+        "camera_size": 1.72000002861023,
+        "height": 1000,
+        "id": "b_three_quarter",
+        "pitch": 18.0,
+        "width": 1000,
+        "yaw": 34.9999961853027
+      },
+      {
+        "camera_position": [
+          20.0,
+          0.660000026226044,
+          0.24999912083149
+        ],
+        "camera_size": 1.72000002861023,
+        "height": 1000,
+        "id": "b_side",
+        "pitch": 0.0,
+        "width": 1000,
+        "yaw": 90.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "a identity node transform: cabinet",
+        "passed": true
+      },
+      {
+        "check": "a material exists: cabinet/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: cabinet/0",
+        "passed": true
+      },
+      {
+        "check": "a material exists: cabinet/1",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: cabinet/1",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: dish_1",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_1/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_1/0",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_1/1",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_1/1",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: dish_2",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_2/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_2/0",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_2/1",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_2/1",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: dish_3",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_3/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_3/0",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_3/1",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_3/1",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: dish_4",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_4/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_4/0",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: dish_5",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_5/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_5/0",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_5/1",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_5/1",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: dish_6",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_6/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_6/0",
+        "passed": true
+      },
+      {
+        "check": "a material exists: dish_6/1",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: dish_6/1",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: glass",
+        "passed": true
+      },
+      {
+        "check": "a material exists: glass/0",
+        "passed": true
+      },
+      {
+        "check": "A imported alpha pane is 0.15",
+        "passed": true
+      },
+      {
+        "check": "a identity node transform: highlights",
+        "passed": true
+      },
+      {
+        "check": "a material exists: highlights/0",
+        "passed": true
+      },
+      {
+        "check": "a imported opaque atlas / no emission: highlights/0",
+        "passed": true
+      },
+      {
+        "check": "a imported dimensions 0.56 x 1.32 x 0.50 m",
+        "passed": true
+      },
+      {
+        "check": "a grounded back-plane pivot, +Z front",
+        "passed": true
+      },
+      {
+        "check": "a actual imported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "a actual imported surfaces match manifest",
+        "passed": true
+      },
+      {
+        "check": "a root scale 1 / identity",
+        "passed": true
+      },
+      {
+        "check": "a independent mesh dish_1",
+        "passed": true
+      },
+      {
+        "check": "a dish left/right ordering 1",
+        "passed": true
+      },
+      {
+        "check": "a independent mesh dish_2",
+        "passed": true
+      },
+      {
+        "check": "a dish left/right ordering 2",
+        "passed": true
+      },
+      {
+        "check": "a independent mesh dish_3",
+        "passed": true
+      },
+      {
+        "check": "a dish left/right ordering 3",
+        "passed": true
+      },
+      {
+        "check": "a independent mesh dish_4",
+        "passed": true
+      },
+      {
+        "check": "a dish left/right ordering 4",
+        "passed": true
+      },
+      {
+        "check": "a independent mesh dish_5",
+        "passed": true
+      },
+      {
+        "check": "a dish left/right ordering 5",
+        "passed": true
+      },
+      {
+        "check": "a independent mesh dish_6",
+        "passed": true
+      },
+      {
+        "check": "a dish left/right ordering 6",
+        "passed": true
+      },
+      {
+        "check": "a empty socket top_center",
+        "passed": true
+      },
+      {
+        "check": "a exact socket top_center",
+        "passed": true
+      },
+      {
+        "check": "a empty socket door_center",
+        "passed": true
+      },
+      {
+        "check": "a exact socket door_center",
+        "passed": true
+      },
+      {
+        "check": "a empty socket glow",
+        "passed": true
+      },
+      {
+        "check": "a exact socket glow",
+        "passed": true
+      },
+      {
+        "check": "a asset contains no realtime light",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: cabinet",
+        "passed": true
+      },
+      {
+        "check": "b material exists: cabinet/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: cabinet/0",
+        "passed": true
+      },
+      {
+        "check": "b material exists: cabinet/1",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: cabinet/1",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: dish_1",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_1/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_1/0",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_1/1",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_1/1",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: dish_2",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_2/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_2/0",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_2/1",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_2/1",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: dish_3",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_3/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_3/0",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_3/1",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_3/1",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: dish_4",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_4/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_4/0",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: dish_5",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_5/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_5/0",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_5/1",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_5/1",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: dish_6",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_6/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_6/0",
+        "passed": true
+      },
+      {
+        "check": "b material exists: dish_6/1",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: dish_6/1",
+        "passed": true
+      },
+      {
+        "check": "b identity node transform: highlights",
+        "passed": true
+      },
+      {
+        "check": "b material exists: highlights/0",
+        "passed": true
+      },
+      {
+        "check": "b imported opaque atlas / no emission: highlights/0",
+        "passed": true
+      },
+      {
+        "check": "b imported dimensions 0.56 x 1.32 x 0.50 m",
+        "passed": true
+      },
+      {
+        "check": "b grounded back-plane pivot, +Z front",
+        "passed": true
+      },
+      {
+        "check": "b actual imported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "b actual imported surfaces match manifest",
+        "passed": true
+      },
+      {
+        "check": "b root scale 1 / identity",
+        "passed": true
+      },
+      {
+        "check": "b independent mesh dish_1",
+        "passed": true
+      },
+      {
+        "check": "b dish left/right ordering 1",
+        "passed": true
+      },
+      {
+        "check": "b independent mesh dish_2",
+        "passed": true
+      },
+      {
+        "check": "b dish left/right ordering 2",
+        "passed": true
+      },
+      {
+        "check": "b independent mesh dish_3",
+        "passed": true
+      },
+      {
+        "check": "b dish left/right ordering 3",
+        "passed": true
+      },
+      {
+        "check": "b independent mesh dish_4",
+        "passed": true
+      },
+      {
+        "check": "b dish left/right ordering 4",
+        "passed": true
+      },
+      {
+        "check": "b independent mesh dish_5",
+        "passed": true
+      },
+      {
+        "check": "b dish left/right ordering 5",
+        "passed": true
+      },
+      {
+        "check": "b independent mesh dish_6",
+        "passed": true
+      },
+      {
+        "check": "b dish left/right ordering 6",
+        "passed": true
+      },
+      {
+        "check": "b empty socket top_center",
+        "passed": true
+      },
+      {
+        "check": "b exact socket top_center",
+        "passed": true
+      },
+      {
+        "check": "b empty socket door_center",
+        "passed": true
+      },
+      {
+        "check": "b exact socket door_center",
+        "passed": true
+      },
+      {
+        "check": "b empty socket glow",
+        "passed": true
+      },
+      {
+        "check": "b exact socket glow",
+        "passed": true
+      },
+      {
+        "check": "b asset contains no realtime light",
+        "passed": true
+      },
+      {
+        "check": "basic_room actual character assembled",
+        "passed": true
+      },
+      {
+        "check": "Saved basic_room_a_43deg",
+        "passed": true
+      },
+      {
+        "check": "Saved basic_room_b_43deg",
+        "passed": true
+      },
+      {
+        "check": "Saved basic_room_b_detail",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 actual character assembled",
+        "passed": true
+      },
+      {
+        "check": "Saved standard_room_5_a_43deg",
+        "passed": true
+      },
+      {
+        "check": "Saved standard_room_5_b_43deg",
+        "passed": true
+      },
+      {
+        "check": "Saved standard_room_5_b_detail",
+        "passed": true
+      },
+      {
+        "check": "Saved a_front",
+        "passed": true
+      },
+      {
+        "check": "Saved a_three_quarter",
+        "passed": true
+      },
+      {
+        "check": "Saved a_side",
+        "passed": true
+      },
+      {
+        "check": "Saved b_front",
+        "passed": true
+      },
+      {
+        "check": "Saved b_three_quarter",
+        "passed": true
+      },
+      {
+        "check": "Saved b_side",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "placements": {
+      "basic_room": {
+        "existing_glow_position": [
+          -2.13000011444092,
+          0.749980032444,
+          -1.69000005722046
+        ],
+        "position": [
+          -2.85,
+          0.082,
+          -1.69
+        ],
+        "yaw": 90.0
+      },
+      "standard_room_5": {
+        "existing_glow_position": [
+          -2.19799995422363,
+          0.749980032444,
+          -1.19000005722046
+        ],
+        "position": [
+          -2.916,
+          0.082,
+          -1.19
+        ],
+        "yaw": 90.0
+      }
+    },
+    "renderer": "mobile"
+  },
+  "glb_uv_overlap": {
+    "checks": [
+      {
+        "check": "Main atlas is byte-identical to Deluxe and placeholder atlas",
+        "passed": true
+      },
+      {
+        "check": "sage sample inside original asset UV triangle",
+        "passed": true
+      },
+      {
+        "check": "sage original source mesh unchanged",
+        "passed": true
+      },
+      {
+        "check": "sage atlas patch nonblack / nonblank",
+        "passed": true
+      },
+      {
+        "check": "honey sample inside original asset UV triangle",
+        "passed": true
+      },
+      {
+        "check": "honey original source mesh unchanged",
+        "passed": true
+      },
+      {
+        "check": "honey atlas patch nonblack / nonblank",
+        "passed": true
+      },
+      {
+        "check": "brass sample inside original asset UV triangle",
+        "passed": true
+      },
+      {
+        "check": "brass original source mesh unchanged",
+        "passed": true
+      },
+      {
+        "check": "brass atlas patch nonblack / nonblank",
+        "passed": true
+      },
+      {
+        "check": "cream sample inside original asset UV triangle",
+        "passed": true
+      },
+      {
+        "check": "cream original source mesh unchanged",
+        "passed": true
+      },
+      {
+        "check": "cream atlas patch nonblack / nonblank",
+        "passed": true
+      },
+      {
+        "check": "leaf sample inside original asset UV triangle",
+        "passed": true
+      },
+      {
+        "check": "leaf original source mesh unchanged",
+        "passed": true
+      },
+      {
+        "check": "leaf atlas patch nonblack / nonblank",
+        "passed": true
+      },
+      {
+        "check": "a packed GLB dimensions",
+        "passed": true
+      },
+      {
+        "check": "a grounded back-plane pivot",
+        "passed": true
+      },
+      {
+        "check": "a exported triangle count",
+        "passed": true
+      },
+      {
+        "check": "a no rotated / scaled imported nodes",
+        "passed": true
+      },
+      {
+        "check": "a only cabinet, six dishes, glass cues and optional pane",
+        "passed": true
+      },
+      {
+        "check": "a no real-time light",
+        "passed": true
+      },
+      {
+        "check": "a exact empty socket top_center",
+        "passed": true
+      },
+      {
+        "check": "a exact empty socket door_center",
+        "passed": true
+      },
+      {
+        "check": "a exact empty socket glow",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: cabinet/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: cabinet/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: cabinet/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: cabinet/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_1/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_1/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_1/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_1/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_2/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_2/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_2/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_2/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_3/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_3/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_3/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_3/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_4/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_4/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_5/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_5/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_5/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_5/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_6/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_6/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: dish_6/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: dish_6/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: glass/Warming_Glass_A",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: glass/Warming_Glass_A",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_Glass_A",
+        "passed": true
+      },
+      {
+        "check": "a UVs sample approved palette centres: highlights/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a constant UV per triangle: highlights/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "a no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "a triangle winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "b packed GLB dimensions",
+        "passed": true
+      },
+      {
+        "check": "b grounded back-plane pivot",
+        "passed": true
+      },
+      {
+        "check": "b exported triangle count",
+        "passed": true
+      },
+      {
+        "check": "b no rotated / scaled imported nodes",
+        "passed": true
+      },
+      {
+        "check": "b only cabinet, six dishes, glass cues and optional pane",
+        "passed": true
+      },
+      {
+        "check": "b no real-time light",
+        "passed": true
+      },
+      {
+        "check": "b exact empty socket top_center",
+        "passed": true
+      },
+      {
+        "check": "b exact empty socket door_center",
+        "passed": true
+      },
+      {
+        "check": "b exact empty socket glow",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: cabinet/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: cabinet/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: cabinet/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: cabinet/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_1/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_1/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_1/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_1/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_2/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_2/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_2/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_2/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_3/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_3/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_3/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_3/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_4/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_4/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_5/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_5/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_5/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_5/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_6/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_6/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: dish_6/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: dish_6/Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_InteriorFood",
+        "passed": true
+      },
+      {
+        "check": "b UVs sample approved palette centres: highlights/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b constant UV per triangle: highlights/Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b material has no emission Warming_SharedAtlas",
+        "passed": true
+      },
+      {
+        "check": "b no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "b triangle winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: cabinet",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: highlights",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: dish_1",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: dish_2",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: dish_3",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: dish_4",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: dish_5",
+        "passed": true
+      },
+      {
+        "check": "A/B byte-identical geometry/material/UV: dish_6",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: room_shell",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: window_wall",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: back_wall",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: arched_window",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: window_garden",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: window_plant",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: green_door",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: entry_mat",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: hearth",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: kettle",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: fire",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: sink_cabinet",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: utensil_crock",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: wall_shelf",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: shelf_plant",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: hanging_towel",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: dining_table",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: checked_runner",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: chair",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: bench",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: daisy_jug",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: floor_plant",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: chair_opposite",
+        "passed": true
+      },
+      {
+        "check": "basic_room no penetrating mesh intersections: spice_rack",
+        "passed": true
+      },
+      {
+        "check": "basic_room overlap detector catches deliberate wall penetration",
+        "passed": true
+      },
+      {
+        "check": "basic_room twelve back-plane rays confirm wall/skirting clearance >1 mm",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: room_shell",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: window_wall",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: back_wall",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: arched_window",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: window_garden",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: green_door",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: entry_mat",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: door_frame",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: hearth",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: kettle",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: firewood_alcove",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: range_cooker",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: bookshelf",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: sink_cabinet",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: wall_shelf",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: hanging_cookware",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: hanging_towel",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: utensil_crock",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: counter_board",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: straw_hat",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: door_garden_fork",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: entry_basket",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: garden_boots",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: botanical_picture",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: bookcase_picture",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: window_daisies",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: window_hanging_basket",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: sofa",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: round_rope_rug",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: dining_rug",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: reading_stool",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: reading_cup",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: bookcase_stool",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: dining_table",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: checked_runner",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: chair",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: chair_cushion",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: rug_fringe",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: daisy_jug",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: tabletop_still_life",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: chair_far",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: far_chair_cushion",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: floor_monstera",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: entry_peace_lily",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: window_pothos",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: bookcase_pothos",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: pantry_pothos",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: hanging_pothos",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: window_extra_vine",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 no penetrating mesh intersections: bookcase_extra_vine",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 overlap detector catches deliberate wall penetration",
+        "passed": true
+      },
+      {
+        "check": "standard_room_5 twelve back-plane rays confirm wall/skirting clearance >1 mm",
+        "passed": true
+      },
+      {
+        "check": "Source has one vertical door mullion",
+        "passed": true
+      },
+      {
+        "check": "Source has no horizontal door mullion",
+        "passed": true
+      },
+      {
+        "check": "Source has three shelves",
+        "passed": true
+      },
+      {
+        "check": "Source has four named rounded feet",
+        "passed": true
+      },
+      {
+        "check": "Source has no text or lights",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "a": {
+        "triangles": 1492,
+        "size": [
+          0.5600000023841858,
+          1.3199999332427979,
+          0.5
+        ],
+        "bounds": [
+          [
+            -0.2800000011920929,
+            0.0,
+            0.0
+          ],
+          [
+            0.2800000011920929,
+            1.3199999332427979,
+            0.5
+          ]
+        ],
+        "nodes": [
+          "cabinet",
+          "dish_1",
+          "dish_2",
+          "dish_3",
+          "dish_4",
+          "dish_5",
+          "dish_6",
+          "glass",
+          "highlights"
+        ],
+        "sha256": "2cd9db841e453239401bb21cb9d3a63e89269b9b5ce1d2ab970d46264ef15db5"
+      },
+      "b": {
+        "triangles": 1490,
+        "size": [
+          0.5600000023841858,
+          1.3199999332427979,
+          0.5
+        ],
+        "bounds": [
+          [
+            -0.2800000011920929,
+            0.0,
+            0.0
+          ],
+          [
+            0.2800000011920929,
+            1.3199999332427979,
+            0.5
+          ]
+        ],
+        "nodes": [
+          "cabinet",
+          "dish_1",
+          "dish_2",
+          "dish_3",
+          "dish_4",
+          "dish_5",
+          "dish_6",
+          "highlights"
+        ],
+        "sha256": "544da56ab2f1d02d9179288894e29902e755babd47a60f664965c86f0235c8d5"
+      }
+    },
+    "swatches": [
+      {
+        "name": "sage",
+        "source_asset": "assets/rooms/deluxe_room_10/sink_cabinet.glb",
+        "source_sha256": "b1be266472faa1b9402f783dcd047e6a8592fe1426945539c0941b34a53c1fc4",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 474,
+        "pixel_xy": [
+          1134,
+          651
+        ],
+        "gltf_uv": [
+          0.5537989536921183,
+          0.3180374304453532
+        ],
+        "rgb8": [
+          117,
+          130,
+          89
+        ],
+        "patch_min": [
+          114,
+          126,
+          86
+        ],
+        "patch_max": [
+          121,
+          133,
+          91
+        ]
+      },
+      {
+        "name": "honey",
+        "source_asset": "assets/rooms/deluxe_room_10/kitchen_pantry.glb",
+        "source_sha256": "02f5fd3ee3510a018fe7a38b5e57177d62e25d5bfd7ba107944977eceb668818",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 227,
+        "pixel_xy": [
+          1706,
+          301
+        ],
+        "gltf_uv": [
+          0.8331002593040466,
+          0.14704002936681113
+        ],
+        "rgb8": [
+          205,
+          146,
+          88
+        ],
+        "patch_min": [
+          203,
+          145,
+          87
+        ],
+        "patch_max": [
+          205,
+          146,
+          88
+        ]
+      },
+      {
+        "name": "brass",
+        "source_asset": "assets/rooms/deluxe_room_10/kitchen_fittings.glb",
+        "source_sha256": "67f85fe925bc8d8b2376397c17c118a55c24129ea36da0b6139642aa7a50df6b",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 1331,
+        "pixel_xy": [
+          886,
+          81
+        ],
+        "gltf_uv": [
+          0.43267470598220825,
+          0.04002598921457926
+        ],
+        "rgb8": [
+          165,
+          132,
+          75
+        ],
+        "patch_min": [
+          160,
+          127,
+          72
+        ],
+        "patch_max": [
+          165,
+          132,
+          75
+        ]
+      },
+      {
+        "name": "cream",
+        "source_asset": "assets/rooms/deluxe_room_10/sink_cabinet.glb",
+        "source_sha256": "b1be266472faa1b9402f783dcd047e6a8592fe1426945539c0941b34a53c1fc4",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 1039,
+        "pixel_xy": [
+          1497,
+          1714
+        ],
+        "gltf_uv": [
+          0.7310163180033366,
+          0.8371591766675314
+        ],
+        "rgb8": [
+          242,
+          231,
+          212
+        ],
+        "patch_min": [
+          241,
+          230,
+          211
+        ],
+        "patch_max": [
+          242,
+          231,
+          212
+        ]
+      },
+      {
+        "name": "leaf",
+        "source_asset": "assets/rooms/deluxe_room_10/underloft_bookcase.glb",
+        "source_sha256": "a272a2e9e5be1d643b5843425905b07fcd9c86431db9fec1f551ff985efcae61",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 3195,
+        "pixel_xy": [
+          1928,
+          2002
+        ],
+        "gltf_uv": [
+          0.9417785207430521,
+          0.9775973359743754
+        ],
+        "rgb8": [
+          139,
+          155,
+          64
+        ],
+        "patch_min": [
+          137,
+          153,
+          64
+        ],
+        "patch_max": [
+          139,
+          155,
+          64
+        ]
+      }
+    ],
+    "rooms": {
+      "basic_room": {
+        "wall_clearance_rays_m": [
+          0.04999975115060806,
+          0.04999976605176926,
+          0.049999769777059555,
+          0.16499975323677063,
+          0.16499976813793182,
+          0.1649998128414154,
+          0.16499973833560944,
+          0.16499972343444824,
+          0.16499972343444824,
+          0.16499972343444824,
+          0.16499973833560944,
+          0.16499973833560944
+        ],
+        "pose": {
+          "position": [
+            -2.85,
+            0.082,
+            -1.69
+          ],
+          "yaw_degrees": 90
+        },
+        "world_bounds": [
+          [
+            -2.8499999046325684,
+            0.0820000022649765,
+            -1.9700000286102295
+          ],
+          [
+            -2.3499999046325684,
+            1.4019999504089355,
+            -1.409999966621399
+          ]
+        ],
+        "objects": [
+          {
+            "name": "room_shell",
+            "source": "assets/rooms/basic_room/room_shell.glb",
+            "sha256": "d873afcdb06cba9bb38e3865a0df48989016990ed769c853edd50b9c18383221",
+            "bounds": [
+              [
+                -3.2900002002716064,
+                -0.32999998331069946,
+                -3.2900002002716064
+              ],
+              [
+                3.2900002002716064,
+                0.11999999731779099,
+                3.2900002002716064
+              ]
+            ],
+            "axis_separation_m": [
+              -0.9400002956390381,
+              -0.037999995052814484,
+              -1.8800002336502075
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_wall",
+            "source": "assets/rooms/basic_room/window_wall.glb",
+            "sha256": "24d23039e2b107136e28f89dee734e89689fa897ef2759d4b7977cb08ae998c8",
+            "bounds": [
+              [
+                -3.2750003337860107,
+                -0.029999971389770508,
+                -3.2149999141693115
+              ],
+              [
+                -2.854999542236328,
+                3.7899999618530273,
+                3.2149999141693115
+              ]
+            ],
+            "axis_separation_m": [
+              0.004999637603759766,
+              -1.431999921798706,
+              -1.8049999475479126
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "back_wall",
+            "source": "assets/rooms/basic_room/back_wall.glb",
+            "sha256": "5da2d04d9621839e450e6984661e196c59ba046118fb64090eba8b1bb6b6ebc4",
+            "bounds": [
+              [
+                -3.119999885559082,
+                -0.029999971389770508,
+                -3.2749998569488525
+              ],
+              [
+                3.2149999141693115,
+                3.7899999618530273,
+                -2.8549997806549072
+              ]
+            ],
+            "axis_separation_m": [
+              -0.7699999809265137,
+              -1.431999921798706,
+              0.8849997520446777
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "arched_window",
+            "source": "assets/rooms/basic_room/arched_window.glb",
+            "sha256": "057c725b782f44476911c7da2042e739da50e3279679c66b749aa4e8d42e07c8",
+            "bounds": [
+              [
+                -3.0949997901916504,
+                1.0999999046325684,
+                -1.159999966621399
+              ],
+              [
+                -2.6049997806549072,
+                3.1500000953674316,
+                0.9599999785423279
+              ]
+            ],
+            "axis_separation_m": [
+              -0.24500012397766113,
+              -0.3020000457763672,
+              0.25
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_garden",
+            "source": "assets/rooms/basic_room/window_garden.glb",
+            "sha256": "099247035539431249ad5a7ea5602d0f58fc9e9849b43298a295cdff738fac60",
+            "bounds": [
+              [
+                -3.510000228881836,
+                1.1799999475479126,
+                -1.25
+              ],
+              [
+                -3.5099997520446777,
+                3.200000047683716,
+                1.0499999523162842
+              ]
+            ],
+            "axis_separation_m": [
+              0.6599998474121094,
+              -0.22200000286102295,
+              0.15999996662139893
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_plant",
+            "source": "assets/rooms/basic_room/window_plant.glb",
+            "sha256": "51ebb09f73c053f6919be872b4c180c11a40e2e0e4fe283032bc44f0c2ae9a6f",
+            "bounds": [
+              [
+                -2.994614839553833,
+                0.9922347068786621,
+                0.2421756535768509
+              ],
+              [
+                -2.4711408615112305,
+                1.8458367586135864,
+                0.6846227645874023
+              ]
+            ],
+            "axis_separation_m": [
+              -0.3788590431213379,
+              -0.40976524353027344,
+              1.6521756201982498
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "green_door",
+            "source": "assets/rooms/basic_room/green_door.glb",
+            "sha256": "1da6f4e6ef7e4b7f220ffb85429e34804d73e0745d306a558dace156610c2a95",
+            "bounds": [
+              [
+                1.3599998950958252,
+                -0.09000000357627869,
+                -3.0349998474121094
+              ],
+              [
+                2.700000047683716,
+                2.549999952316284,
+                -2.744999885559082
+              ]
+            ],
+            "axis_separation_m": [
+              3.7099997997283936,
+              -1.4919999539852142,
+              0.7749998569488525
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "entry_mat",
+            "source": "assets/rooms/basic_room/entry_mat.glb",
+            "sha256": "c1cdd9d4355c19d727e18f97090193aed36bea159a796a49b6a406cada9bc88e",
+            "bounds": [
+              [
+                1.4900000095367432,
+                0.0754999965429306,
+                -2.680000066757202
+              ],
+              [
+                2.569999933242798,
+                0.11949999630451202,
+                -2.120000123977661
+              ]
+            ],
+            "axis_separation_m": [
+              3.8399999141693115,
+              -0.03749999403953552,
+              0.15000009536743164
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "hearth",
+            "source": "assets/rooms/basic_room/hearth.glb",
+            "sha256": "763804624994a72b807b7522efb259317dd4d575ac644c9a7ff83e9e9e4a5a0d",
+            "bounds": [
+              [
+                -2.6549999713897705,
+                0.0820000022649765,
+                -3.0999999046325684
+              ],
+              [
+                -1.4449999332427979,
+                3.171999931335449,
+                -1.994999885559082
+              ]
+            ],
+            "axis_separation_m": [
+              -0.30500006675720215,
+              -1.319999948143959,
+              0.02499985694885254
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "kettle",
+            "source": "assets/rooms/basic_room/kettle.glb",
+            "sha256": "1de8937a1c46bcb95616ead70875a54759832e6c1126b4b548810ddba48255be",
+            "bounds": [
+              [
+                -2.3557870388031006,
+                1.397499918937683,
+                -2.5999999046325684
+              ],
+              [
+                -1.7442128658294678,
+                1.8399999141693115,
+                -2.119999885559082
+              ]
+            ],
+            "axis_separation_m": [
+              -0.0057871341705322266,
+              -0.004500031471252441,
+              0.14999985694885254
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "fire",
+            "source": "assets/rooms/basic_room/fire.glb",
+            "sha256": "5c9f837b0143f108adc5ecb5c21c22cf68ae7a28ac1288bb67cb3093a1eaff26",
+            "bounds": [
+              [
+                -2.2649998664855957,
+                0.28999999165534973,
+                -2.384999990463257
+              ],
+              [
+                -1.8899999856948853,
+                0.7099999785423279,
+                -2.115000009536743
+              ]
+            ],
+            "axis_separation_m": [
+              0.08500003814697266,
+              -0.6279999762773514,
+              0.14499998092651367
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "sink_cabinet",
+            "source": "assets/rooms/basic_room/sink_cabinet.glb",
+            "sha256": "19de9027dc46134330346269470a8f4ed1b62e9e56eecbd520a12b8a375b8467",
+            "bounds": [
+              [
+                -1.4550000429153442,
+                0.0820000022649765,
+                -3.0749998092651367
+              ],
+              [
+                0.5149999856948853,
+                1.736833095550537,
+                -2.0934996604919434
+              ]
+            ],
+            "axis_separation_m": [
+              0.8949998617172241,
+              -1.319999948143959,
+              0.12349963188171387
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "utensil_crock",
+            "source": "assets/rooms/basic_room/utensil_crock.glb",
+            "sha256": "a95fb3df6108b8c250045cc64480e8089baafd076f776cadc115b8ef12299469",
+            "bounds": [
+              [
+                -1.2678292989730835,
+                1.25,
+                -2.8181769847869873
+              ],
+              [
+                -0.9610695838928223,
+                1.943505048751831,
+                -2.5818231105804443
+              ]
+            ],
+            "axis_separation_m": [
+              1.0821706056594849,
+              -0.15199995040893555,
+              0.6118230819702148
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "wall_shelf",
+            "source": "assets/rooms/basic_room/wall_shelf.glb",
+            "sha256": "432a2c1d8b7263d9112dbd34619f4a50551747e911509f18dac30ff4e52b291b",
+            "bounds": [
+              [
+                -1.3700000047683716,
+                1.9849998950958252,
+                -2.9549999237060547
+              ],
+              [
+                0.4099999964237213,
+                2.7084999084472656,
+                -2.5249998569488525
+              ]
+            ],
+            "axis_separation_m": [
+              0.9799998998641968,
+              0.5829999446868896,
+              0.554999828338623
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "shelf_plant",
+            "source": "assets/rooms/basic_room/shelf_plant.glb",
+            "sha256": "a06ab874844a09cdaaac29f31e3e079a2ce197fd261bc43efc57f5196066e56f",
+            "bounds": [
+              [
+                -0.03763197362422943,
+                1.9663348197937012,
+                -2.9071829319000244
+              ],
+              [
+                0.4113145172595978,
+                2.832393169403076,
+                -2.3760225772857666
+              ]
+            ],
+            "axis_separation_m": [
+              2.312367931008339,
+              0.5643348693847656,
+              0.4060225486755371
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "hanging_towel",
+            "source": "assets/rooms/basic_room/hanging_towel.glb",
+            "sha256": "18ef3b6f8cd60a1463ddecfb9e5a797ec1505d79bc14b9974c0eabf6b31875e6",
+            "bounds": [
+              [
+                0.5350000262260437,
+                1.1288762092590332,
+                -2.9100000858306885
+              ],
+              [
+                0.9097349047660828,
+                2.0,
+                -2.7675161361694336
+              ]
+            ],
+            "axis_separation_m": [
+              2.884999930858612,
+              -0.27312374114990234,
+              0.7975161075592041
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "dining_table",
+            "source": "assets/rooms/basic_room/dining_table.glb",
+            "sha256": "79eefa8541f7f1ed21c00450ae011a97e4982580775d1bf763391c2a7f3e5edf",
+            "bounds": [
+              [
+                -1.0699999332427979,
+                0.09200000762939453,
+                0.03750002384185791
+              ],
+              [
+                0.8299999833106995,
+                1.2170000076293945,
+                1.2024999856948853
+              ]
+            ],
+            "axis_separation_m": [
+              1.2799999713897705,
+              -1.135000005364418,
+              1.4474999904632568
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "checked_runner",
+            "source": "assets/rooms/basic_room/checked_runner.glb",
+            "sha256": "172b27a625eda742a1072af52c6f55de419ea8388a0bd170db23693ca02bab60",
+            "bounds": [
+              [
+                -1.2000000476837158,
+                0.9552559852600098,
+                0.2595851421356201
+              ],
+              [
+                0.9100000262260437,
+                1.2428009510040283,
+                0.9804268479347229
+              ]
+            ],
+            "axis_separation_m": [
+              1.1499998569488525,
+              -0.4467439651489258,
+              1.669585108757019
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "chair",
+            "source": "assets/rooms/basic_room/chair.glb",
+            "sha256": "bcd5739715cf3f91cf2466157818c1950c64de23f799f3e1308306bfcc42c76d",
+            "bounds": [
+              [
+                0.869999885559082,
+                0.0820000171661377,
+                0.3049999475479126
+              ],
+              [
+                1.4500000476837158,
+                1.5520000457763672,
+                0.9350000023841858
+              ]
+            ],
+            "axis_separation_m": [
+              3.2199997901916504,
+              -1.3199999332427979,
+              1.7149999141693115
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "bench",
+            "source": "assets/rooms/basic_room/bench.glb",
+            "sha256": "c09726a1bb35447494c99d0de6f989ab682d91225d706c84c077bc1d55fe2cab",
+            "bounds": [
+              [
+                -2.9000000953674316,
+                0.08699998259544373,
+                0.6199999451637268
+              ],
+              [
+                -2.4200000762939453,
+                0.7520000338554382,
+                1.7400000095367432
+              ]
+            ],
+            "axis_separation_m": [
+              -0.42999982833862305,
+              -0.6700000315904617,
+              2.0299999117851257
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "daisy_jug",
+            "source": "assets/rooms/basic_room/daisy_jug.glb",
+            "sha256": "8a173c1f79eadcc776e4414d47259c9b72b2cd1b039889880381793ebee54a94",
+            "bounds": [
+              [
+                -0.2671408951282501,
+                1.2619999647140503,
+                0.3448694348335266
+              ],
+              [
+                0.25878944993019104,
+                1.9316508769989014,
+                0.8506619930267334
+              ]
+            ],
+            "axis_separation_m": [
+              2.0828590095043182,
+              -0.13999998569488525,
+              1.7548694014549255
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "floor_plant",
+            "source": "assets/rooms/basic_room/floor_plant.glb",
+            "sha256": "e56d49539c6d4e4a88b3b96bb14960aa905097b936ec066169e41cc4b3a8e253",
+            "bounds": [
+              [
+                2.355010986328125,
+                0.09000000357627869,
+                -2.347329616546631
+              ],
+              [
+                3.0065555572509766,
+                0.7979780435562134,
+                -1.8048354387283325
+              ]
+            ],
+            "axis_separation_m": [
+              4.705010890960693,
+              -0.7159780412912369,
+              -0.16516458988189697
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "chair_opposite",
+            "source": "assets/rooms/basic_room/chair.glb",
+            "sha256": "bcd5739715cf3f91cf2466157818c1950c64de23f799f3e1308306bfcc42c76d",
+            "bounds": [
+              [
+                -1.690000057220459,
+                0.0820000171661377,
+                0.3050000071525574
+              ],
+              [
+                -1.1099998950958252,
+                1.5520000457763672,
+                0.9350000619888306
+              ]
+            ],
+            "axis_separation_m": [
+              0.6599998474121094,
+              -1.3199999332427979,
+              1.7149999737739563
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "spice_rack",
+            "source": "assets/rooms/basic_room/wall_shelf.glb",
+            "sha256": "432a2c1d8b7263d9112dbd34619f4a50551747e911509f18dac30ff4e52b291b",
+            "bounds": [
+              [
+                -2.86995005607605,
+                1.5766500234603882,
+                -1.9933000802993774
+              ],
+              [
+                -2.6678497791290283,
+                1.91669499874115,
+                -1.1567000150680542
+              ]
+            ],
+            "axis_separation_m": [
+              -0.18215012550354004,
+              0.17465007305145264,
+              -0.5833001136779785
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          }
+        ],
+        "positive_control_intersections": 279
+      },
+      "standard_room_5": {
+        "wall_clearance_rays_m": [
+          0.004000010434538126,
+          0.00400001835078001,
+          0.004000027198344469,
+          0.09399990737438202,
+          0.093999944627285,
+          0.0939999520778656,
+          0.09399997442960739,
+          0.09399999678134918,
+          0.09400001913309097,
+          0.0939999669790268,
+          0.09400001168251038,
+          0.09400004893541336
+        ],
+        "pose": {
+          "position": [
+            -2.916,
+            0.082,
+            -1.19
+          ],
+          "yaw_degrees": 90
+        },
+        "world_bounds": [
+          [
+            -2.9159998893737793,
+            0.0820000022649765,
+            -1.4700000286102295
+          ],
+          [
+            -2.4159998893737793,
+            1.4019999504089355,
+            -0.9100000262260437
+          ]
+        ],
+        "objects": [
+          {
+            "name": "room_shell",
+            "source": "assets/rooms/standard_room_5/room_shell.glb",
+            "sha256": "7a2e169fab91bb81c3a9403d698049d7395f499e5110357d2036346ff03d5680",
+            "bounds": [
+              [
+                -3.299999952316284,
+                -0.3400000035762787,
+                -3.299999952316284
+              ],
+              [
+                3.299999952316284,
+                0.11999999731779099,
+                3.299999952316284
+              ]
+            ],
+            "axis_separation_m": [
+              -0.8840000629425049,
+              -0.037999995052814484,
+              -2.3899999260902405
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 68
+          },
+          {
+            "name": "window_wall",
+            "source": "assets/rooms/standard_room_5/window_wall.glb",
+            "sha256": "b2dda7d20845a632d44f2959659df8c82d1d85574d2c32aad073e30edfc4a001",
+            "bounds": [
+              [
+                -3.255000114440918,
+                -0.07500004768371582,
+                -3.234999895095825
+              ],
+              [
+                -2.8249995708465576,
+                3.494999885559082,
+                3.234999895095825
+              ]
+            ],
+            "axis_separation_m": [
+              -0.09100031852722168,
+              -1.4769999980926514,
+              -2.3249998688697815
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "back_wall",
+            "source": "assets/rooms/standard_room_5/back_wall.glb",
+            "sha256": "138b0ea2599a55847a0177549fa82a02d86804414c237e6ecb13a99e40614058",
+            "bounds": [
+              [
+                -3.0999999046325684,
+                -0.07500004768371582,
+                -3.254999876022339
+              ],
+              [
+                3.234999895095825,
+                3.494999885559082,
+                -2.825000047683716
+              ]
+            ],
+            "axis_separation_m": [
+              -0.6840000152587891,
+              -1.4769999980926514,
+              1.3550000190734863
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "arched_window",
+            "source": "assets/rooms/standard_room_5/arched_window.glb",
+            "sha256": "980693820a86db4dc0959fc4c683481ab4ad01a7ad394c1edb8b1569d9372d8e",
+            "bounds": [
+              [
+                -3.0950000286102295,
+                1.0999999046325684,
+                -0.85999995470047
+              ],
+              [
+                -2.6050000190734863,
+                3.1500000953674316,
+                1.2600001096725464
+              ]
+            ],
+            "axis_separation_m": [
+              -0.31099987030029297,
+              -0.3020000457763672,
+              0.05000007152557373
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_garden",
+            "source": "assets/rooms/standard_room_5/window_garden.glb",
+            "sha256": "fb0786e84e2643d521f199ee909665234c3c87c459f32020ee3753e18b66f768",
+            "bounds": [
+              [
+                -3.2899999618530273,
+                1.2999999523162842,
+                -0.949999988079071
+              ],
+              [
+                -3.2899999618530273,
+                3.0,
+                1.3499999046325684
+              ]
+            ],
+            "axis_separation_m": [
+              0.37400007247924805,
+              -0.10199999809265137,
+              -0.039999961853027344
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "green_door",
+            "source": "assets/rooms/standard_room_5/green_door.glb",
+            "sha256": "11d050216fdf45f32c92c036fb5841e8e137dab716c2a68c397556a25cc76b33",
+            "bounds": [
+              [
+                1.8500001430511475,
+                0.05000000074505806,
+                -3.0349998474121094
+              ],
+              [
+                2.870000123977661,
+                2.379999876022339,
+                -2.744999885559082
+              ]
+            ],
+            "axis_separation_m": [
+              4.266000032424927,
+              -1.3519999496638775,
+              1.2749998569488525
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "entry_mat",
+            "source": "assets/rooms/standard_room_5/entry_mat.glb",
+            "sha256": "87c257ae69d8236bafd4741943b5080e081ba8b9958b2701ea89fb33ef097099",
+            "bounds": [
+              [
+                1.8199999332427979,
+                0.0754999965429306,
+                -2.6600000858306885
+              ],
+              [
+                2.8999998569488525,
+                0.11949999630451202,
+                -2.1000001430511475
+              ]
+            ],
+            "axis_separation_m": [
+              4.235999822616577,
+              -0.03749999403953552,
+              0.630000114440918
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "door_frame",
+            "source": "assets/rooms/standard_room_5/door_frame.glb",
+            "sha256": "a89773e5b5c717c0597b113668713f65e5eab13b639e5a93316d51c7d4b62f91",
+            "bounds": [
+              [
+                1.6899998188018799,
+                -0.09000000357627869,
+                -3.0249998569488525
+              ],
+              [
+                3.0299999713897705,
+                2.549999952316284,
+                -2.8349997997283936
+              ]
+            ],
+            "axis_separation_m": [
+              4.105999708175659,
+              -1.4919999539852142,
+              1.364999771118164
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "hearth",
+            "source": "assets/rooms/standard_room_5/hearth.glb",
+            "sha256": "08eab4a1c83772bcd65a7fb563baf30fd0d59e73e06f583219d92fbf299bce44",
+            "bounds": [
+              [
+                -2.1549999713897705,
+                0.0820000022649765,
+                -3.179999828338623
+              ],
+              [
+                -1.0250000953674316,
+                3.181999921798706,
+                -2.0399999618530273
+              ]
+            ],
+            "axis_separation_m": [
+              0.2609999179840088,
+              -1.319999948143959,
+              0.5699999332427979
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "kettle",
+            "source": "assets/rooms/standard_room_5/kettle.glb",
+            "sha256": "5bd45627adcb67973e90b18a9e55e66061d45fe3d02c0ed927c81bdc88aa8034",
+            "bounds": [
+              [
+                -1.895787000656128,
+                1.3924999237060547,
+                -2.6600000858306885
+              ],
+              [
+                -1.2842130661010742,
+                1.834999918937683,
+                -2.180000066757202
+              ]
+            ],
+            "axis_separation_m": [
+              0.5202128887176514,
+              -0.00950002670288086,
+              0.7100000381469727
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "firewood_alcove",
+            "source": "assets/rooms/standard_room_5/firewood_alcove.glb",
+            "sha256": "475a2f0f90ca28e93e0c5c8d554cdf6cb75a2fb3881b74b96d649f1d92896a55",
+            "bounds": [
+              [
+                -1.0450000762939453,
+                0.0820000171661377,
+                -3.125
+              ],
+              [
+                -0.27500003576278687,
+                1.2070000171661377,
+                -2.2350001335144043
+              ]
+            ],
+            "axis_separation_m": [
+              1.370999813079834,
+              -1.1250000149011612,
+              0.7650001049041748
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "range_cooker",
+            "source": "assets/rooms/standard_room_5/range_cooker.glb",
+            "sha256": "9d47df1ac48adb40946de067e82d709d9a379fbfa895617eb76540d3d0c7ba19",
+            "bounds": [
+              [
+                1.0499999523162842,
+                0.0820000097155571,
+                -3.1500000953674316
+              ],
+              [
+                1.809999942779541,
+                1.4570000171661377,
+                -2.2049999237060547
+              ]
+            ],
+            "axis_separation_m": [
+              3.4659998416900635,
+              -1.3199999406933784,
+              0.7349998950958252
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "bookshelf",
+            "source": "assets/rooms/standard_room_5/bookshelf.glb",
+            "sha256": "0a0e7fd1f79c40ca83eb3c3de65bae83871873852dd6d20565f5c111144fd9c7",
+            "bounds": [
+              [
+                -3.1050000190734863,
+                0.0820000171661377,
+                -2.879999876022339
+              ],
+              [
+                -2.0749998092651367,
+                2.2920000553131104,
+                -2.2699997425079346
+              ]
+            ],
+            "axis_separation_m": [
+              -0.689000129699707,
+              -1.3199999332427979,
+              0.7999997138977051
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "sink_cabinet",
+            "source": "assets/rooms/standard_room_5/sink_cabinet.glb",
+            "sha256": "efb369c301f5daf8845409b05e58838be7f1097cbacf932f3e9bbecfd1f4f89c",
+            "bounds": [
+              [
+                -0.3787499666213989,
+                0.0820000022649765,
+                -3.1649999618530273
+              ],
+              [
+                1.0987499952316284,
+                1.736833095550537,
+                -2.183499813079834
+              ]
+            ],
+            "axis_separation_m": [
+              2.0372499227523804,
+              -1.319999948143959,
+              0.7134997844696045
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "wall_shelf",
+            "source": "assets/rooms/standard_room_5/wall_shelf.glb",
+            "sha256": "ce90e50120573b0bbe5211b5ce9bdd612b381e999fe655608ab0c4152bc0e2b4",
+            "bounds": [
+              [
+                -0.3799999952316284,
+                2.054999828338623,
+                -2.9900002479553223
+              ],
+              [
+                1.159999966621399,
+                2.7760000228881836,
+                -2.570000171661377
+              ]
+            ],
+            "axis_separation_m": [
+              2.035999894142151,
+              0.6529998779296875,
+              1.1000001430511475
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "hanging_cookware",
+            "source": "assets/rooms/standard_room_5/hanging_cookware.glb",
+            "sha256": "c0fb2c70a491c72ec5f0eeb1c47de77447eb26488769b2a29a0c25711d90fb09",
+            "bounds": [
+              [
+                -0.1499999761581421,
+                1.4749999046325684,
+                -2.9700000286102295
+              ],
+              [
+                0.7400000095367432,
+                2.1505136489868164,
+                -2.7300000190734863
+              ]
+            ],
+            "axis_separation_m": [
+              2.265999913215637,
+              0.07299995422363281,
+              1.2599999904632568
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "hanging_towel",
+            "source": "assets/rooms/standard_room_5/hanging_towel.glb",
+            "sha256": "75debfffe1d883545d33cbc74657e2779ade675caeb1773414108f93b8cfb01a",
+            "bounds": [
+              [
+                0.7574999332427979,
+                1.3977930545806885,
+                -2.9600002765655518
+              ],
+              [
+                1.162500023841858,
+                2.0670418739318848,
+                -2.741731643676758
+              ]
+            ],
+            "axis_separation_m": [
+              3.173499822616577,
+              -0.00420689582824707,
+              1.2717316150665283
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "utensil_crock",
+            "source": "assets/rooms/standard_room_5/utensil_crock.glb",
+            "sha256": "b00283219835e821518605718f1c5fb35c90a5309bc57b6830e2afb551560538",
+            "bounds": [
+              [
+                -0.9567153453826904,
+                1.2699999809265137,
+                -2.8745415210723877
+              ],
+              [
+                -0.7108556628227234,
+                1.8593342304229736,
+                -2.6854584217071533
+              ]
+            ],
+            "axis_separation_m": [
+              1.4592845439910889,
+              -0.13199996948242188,
+              1.2154583930969238
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "counter_board",
+            "source": "assets/rooms/standard_room_5/counter_board.glb",
+            "sha256": "76ab35396eccec51d2d138b7660ad96b46bc76b585bb304a851cd776fe207398",
+            "bounds": [
+              [
+                -1.040000081062317,
+                1.2709999084472656,
+                -2.6700000762939453
+              ],
+              [
+                -0.5387611985206604,
+                1.573488473892212,
+                -2.4099998474121094
+              ]
+            ],
+            "axis_separation_m": [
+              1.3759998083114624,
+              -0.13100004196166992,
+              0.9399998188018799
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "straw_hat",
+            "source": "assets/rooms/standard_room_5/straw_hat.glb",
+            "sha256": "5e547b920271970b640aacb57af33b0956b3740977f000474bc7a089cc2f9970",
+            "bounds": [
+              [
+                2.680000066757202,
+                1.6500000953674316,
+                -2.8299999237060547
+              ],
+              [
+                3.299999952316284,
+                2.2699999809265137,
+                -2.6399998664855957
+              ]
+            ],
+            "axis_separation_m": [
+              5.0959999561309814,
+              0.2480001449584961,
+              1.1699998378753662
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "door_garden_fork",
+            "source": "assets/rooms/standard_room_5/door_garden_fork.glb",
+            "sha256": "3fedd59b0f0b03838e86e7e1dfbabe240ff978a5ef14e06774b785d255641b79",
+            "bounds": [
+              [
+                2.839918851852417,
+                0.1406860202550888,
+                -2.8020119667053223
+              ],
+              [
+                3.138636827468872,
+                1.5012049674987793,
+                -2.7081398963928223
+              ]
+            ],
+            "axis_separation_m": [
+              5.255918741226196,
+              -1.2613139301538467,
+              1.2381398677825928
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "entry_basket",
+            "source": "assets/rooms/standard_room_5/entry_basket.glb",
+            "sha256": "45c863eb3c9d668c96807f3dbb5b56e6e4917987b3d3dd9410ec45f43f4a83cf",
+            "bounds": [
+              [
+                2.556999921798706,
+                0.08299998939037323,
+                -2.582989454269409
+              ],
+              [
+                3.0230000019073486,
+                0.8479999899864197,
+                -2.190999984741211
+              ]
+            ],
+            "axis_separation_m": [
+              4.972999811172485,
+              -0.7659999877214432,
+              0.7209999561309814
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "garden_boots",
+            "source": "assets/rooms/standard_room_5/garden_boots.glb",
+            "sha256": "97e02ce4414ecb8245162eeb7c4285cf95bc1c406eda224fa6270efdf3a76e0d",
+            "bounds": [
+              [
+                2.3155293464660645,
+                0.08300000429153442,
+                -2.0500600337982178
+              ],
+              [
+                2.787763833999634,
+                0.4830000400543213,
+                -1.6064677238464355
+              ]
+            ],
+            "axis_separation_m": [
+              4.731529235839844,
+              -0.4010000377893448,
+              0.13646769523620605
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "botanical_picture",
+            "source": "assets/rooms/standard_room_5/botanical_picture.glb",
+            "sha256": "49963d81f8f4e9127dbf5723cd41df42175385451ff623a1b8662a908102e760",
+            "bounds": [
+              [
+                -2.9825000762939453,
+                1.569000005722046,
+                1.4889999628067017
+              ],
+              [
+                -2.9000000953674316,
+                2.2309999465942383,
+                1.971000075340271
+              ]
+            ],
+            "axis_separation_m": [
+              -0.015999794006347656,
+              0.16700005531311035,
+              2.3989999890327454
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "bookcase_picture",
+            "source": "assets/rooms/standard_room_5/bookcase_picture.glb",
+            "sha256": "1a447012d448acaccdfb0982f576af5f846a7d320118f0e4a8f54717a381979b",
+            "bounds": [
+              [
+                -2.936000108718872,
+                2.2739999294281006,
+                -2.752500057220459
+              ],
+              [
+                -2.6039998531341553,
+                2.7200000286102295,
+                -2.6700000762939453
+              ]
+            ],
+            "axis_separation_m": [
+              -0.312000036239624,
+              0.871999979019165,
+              1.2000000476837158
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_daisies",
+            "source": "assets/rooms/standard_room_5/window_daisies.glb",
+            "sha256": "8df025aaf8ed822d1324c30469a731050066ffcdd7b95650ab41aadf751d337a",
+            "bounds": [
+              [
+                -2.98805570602417,
+                1.399999976158142,
+                0.5565112233161926
+              ],
+              [
+                -2.6505672931671143,
+                1.8553625345230103,
+                0.9004501700401306
+              ]
+            ],
+            "axis_separation_m": [
+              -0.26543259620666504,
+              -0.001999974250793457,
+              1.4665112495422363
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_hanging_basket",
+            "source": "assets/rooms/standard_room_5/window_hanging_basket.glb",
+            "sha256": "c2c1dd4c65fc2ca51f0aa51903de63053308faedff7f72d116516121bbd8af1b",
+            "bounds": [
+              [
+                -2.988499879837036,
+                2.569999933242798,
+                -1.3284999132156372
+              ],
+              [
+                -2.691499948501587,
+                3.122354507446289,
+                -1.031499981880188
+              ]
+            ],
+            "axis_separation_m": [
+              -0.22449994087219238,
+              1.1679999828338623,
+              -0.4184998869895935
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "sofa",
+            "source": "assets/rooms/standard_room_5/sofa.glb",
+            "sha256": "51a74b0da98b832c61017f3d61a1b23f815be593192c284998025d4c4c305264",
+            "bounds": [
+              [
+                -3.047999858856201,
+                0.0820000022649765,
+                -0.33000001311302185
+              ],
+              [
+                -2.013984441757202,
+                1.4269976615905762,
+                1.9700000286102295
+              ]
+            ],
+            "axis_separation_m": [
+              -0.6319999694824219,
+              -1.319999948143959,
+              0.5800000131130219
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "round_rope_rug",
+            "source": "assets/rooms/standard_room_5/round_rope_rug.glb",
+            "sha256": "56469a6d537348931150bc026e02f3e393d80bf348b8f70dff78569980f6e2de",
+            "bounds": [
+              [
+                -2.445000171661377,
+                0.09050000458955765,
+                0.41499996185302734
+              ],
+              [
+                -0.9550000429153442,
+                0.16092316806316376,
+                1.9049999713897705
+              ]
+            ],
+            "axis_separation_m": [
+              -0.029000282287597656,
+              -0.07892316579818726,
+              1.324999988079071
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "dining_rug",
+            "source": "assets/rooms/standard_room_5/dining_rug.glb",
+            "sha256": "af95018589a5f30a16101cb35677ebe0fb9eac34fd6480b0a818a82ee6a64251",
+            "bounds": [
+              [
+                -0.940000057220459,
+                0.08650000393390656,
+                0.1799999475479126
+              ],
+              [
+                1.7799999713897705,
+                0.1420000046491623,
+                2.380000114440918
+              ]
+            ],
+            "axis_separation_m": [
+              1.4759998321533203,
+              -0.06000000238418579,
+              1.0899999737739563
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "reading_stool",
+            "source": "assets/rooms/standard_room_5/reading_stool.glb",
+            "sha256": "1325ae22548dd3818b7c537367e072417f533df1c95f170e27a5e060dd7bc3ba",
+            "bounds": [
+              [
+                -2.440000057220459,
+                0.07747017592191696,
+                1.7300000190734863
+              ],
+              [
+                -1.8600001335144043,
+                0.6029999852180481,
+                2.309999942779541
+              ]
+            ],
+            "axis_separation_m": [
+              -0.024000167846679688,
+              -0.5209999829530716,
+              2.64000004529953
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "reading_cup",
+            "source": "assets/rooms/standard_room_5/reading_cup.glb",
+            "sha256": "343c83d86f03d1e0d0c875c082ea8a8adc3bd67869d70b0c5a203513dc91fcb8",
+            "bounds": [
+              [
+                -2.31000018119812,
+                0.5814999938011169,
+                1.899999976158142
+              ],
+              [
+                -1.908000111579895,
+                0.909000039100647,
+                2.1426596641540527
+              ]
+            ],
+            "axis_separation_m": [
+              0.10599970817565918,
+              -0.8204999566078186,
+              2.810000002384186
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "bookcase_stool",
+            "source": "assets/rooms/standard_room_5/bookcase_stool.glb",
+            "sha256": "8490d19ff403cdd9c7c043d22d5ded243043317b4b810a7be247aac89fcbeb69",
+            "bounds": [
+              [
+                -2.5399999618530273,
+                0.07934314757585526,
+                -2.009999990463257
+              ],
+              [
+                -2.052133798599243,
+                0.7129999995231628,
+                -1.5299999713897705
+              ]
+            ],
+            "axis_separation_m": [
+              -0.12400007247924805,
+              -0.6309999972581863,
+              0.059999942779541016
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "dining_table",
+            "source": "assets/rooms/standard_room_5/dining_table.glb",
+            "sha256": "195f78724afd11d68579fa8deb4ab3228af806dd0eb18cb4e72604f1f290e4b9",
+            "bounds": [
+              [
+                -0.4724999666213989,
+                0.09200000762939453,
+                0.6474999785423279
+              ],
+              [
+                1.3324999809265137,
+                1.2170000076293945,
+                1.8125
+              ]
+            ],
+            "axis_separation_m": [
+              1.9434999227523804,
+              -1.135000005364418,
+              1.5575000047683716
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "checked_runner",
+            "source": "assets/rooms/standard_room_5/checked_runner.glb",
+            "sha256": "f66dc5fbe991629fc3c93b6cb7dc7ef09eb590f88ed0804d3afb6c90c4c88736",
+            "bounds": [
+              [
+                -0.5960000157356262,
+                0.9552559852600098,
+                0.8695852160453796
+              ],
+              [
+                1.4084999561309814,
+                1.2428009510040283,
+                1.5904269218444824
+              ]
+            ],
+            "axis_separation_m": [
+              1.819999873638153,
+              -0.4467439651489258,
+              1.7795852422714233
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "chair",
+            "source": "assets/rooms/standard_room_5/chair.glb",
+            "sha256": "386c665868fc258efaa41342e29b2573b60d95e1dd14bb65af3da07bf2393217",
+            "bounds": [
+              [
+                -0.09000000357627869,
+                0.0820000171661377,
+                1.7149999141693115
+              ],
+              [
+                0.5299999713897705,
+                1.5320000648498535,
+                2.327000141143799
+              ]
+            ],
+            "axis_separation_m": [
+              2.3259998857975006,
+              -1.3199999332427979,
+              2.6249999403953552
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "chair_cushion",
+            "source": "assets/rooms/standard_room_5/chair_cushion.glb",
+            "sha256": "a3df63161e68baa5b55e210d25f990e73266753bc9b157daee869f3e7e2aadbd",
+            "bounds": [
+              [
+                -0.08757486939430237,
+                0.6693031787872314,
+                1.7649999856948853
+              ],
+              [
+                0.527574896812439,
+                0.8644999861717224,
+                2.358175754547119
+              ]
+            ],
+            "axis_separation_m": [
+              2.328425019979477,
+              -0.7326967716217041,
+              2.675000011920929
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "rug_fringe",
+            "source": "assets/rooms/standard_room_5/rug_fringe.glb",
+            "sha256": "456f866281788af941895c61f988a31ba8630e3b4e62b56daede87d3abee1ddc",
+            "bounds": [
+              [
+                -1.0206305980682373,
+                0.09740381687879562,
+                0.2920396327972412
+              ],
+              [
+                1.8605132102966309,
+                0.1166081428527832,
+                2.2589974403381348
+              ]
+            ],
+            "axis_separation_m": [
+              1.395369291305542,
+              -0.0346081405878067,
+              1.202039659023285
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "daisy_jug",
+            "source": "assets/rooms/standard_room_5/daisy_jug.glb",
+            "sha256": "df60d44453de91ae694061c09fb87d54b1e2eaeae2d0a8eee55ad031df0e50d4",
+            "bounds": [
+              [
+                -0.1971409171819687,
+                1.2619999647140503,
+                0.8948693871498108
+              ],
+              [
+                0.32878947257995605,
+                1.9316508769989014,
+                1.4006619453430176
+              ]
+            ],
+            "axis_separation_m": [
+              2.2188589721918106,
+              -0.13999998569488525,
+              1.8048694133758545
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "tabletop_still_life",
+            "source": "assets/rooms/standard_room_5/tabletop_still_life.glb",
+            "sha256": "6224fbe84bd9b9a477205ded9bcd1cb54333ca3d7a45a2a8372c3b516c109f79",
+            "bounds": [
+              [
+                0.3700000047683716,
+                1.2619999647140503,
+                0.9600000381469727
+              ],
+              [
+                1.371999979019165,
+                1.6788218021392822,
+                1.5426596403121948
+              ]
+            ],
+            "axis_separation_m": [
+              2.785999894142151,
+              -0.13999998569488525,
+              1.8700000643730164
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "chair_far",
+            "source": "assets/rooms/standard_room_5/chair.glb",
+            "sha256": "386c665868fc258efaa41342e29b2573b60d95e1dd14bb65af3da07bf2393217",
+            "bounds": [
+              [
+                0.32999998331069946,
+                0.0820000171661377,
+                0.13299980759620667
+              ],
+              [
+                0.949999988079071,
+                1.5320000648498535,
+                0.7450000643730164
+              ]
+            ],
+            "axis_separation_m": [
+              2.7459998726844788,
+              -1.3199999332427979,
+              1.0429998338222504
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "far_chair_cushion",
+            "source": "assets/rooms/standard_room_5/chair_cushion.glb",
+            "sha256": "a3df63161e68baa5b55e210d25f990e73266753bc9b157daee869f3e7e2aadbd",
+            "bounds": [
+              [
+                0.3324251174926758,
+                0.6693031787872314,
+                0.10182420164346695
+              ],
+              [
+                0.9475748538970947,
+                0.8644999861717224,
+                0.6949999928474426
+              ]
+            ],
+            "axis_separation_m": [
+              2.748425006866455,
+              -0.7326967716217041,
+              1.0118242278695107
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "floor_monstera",
+            "source": "assets/rooms/_shared/plants/monstera.glb",
+            "sha256": "121c5e310388bfefb9e63e53b37e6101192f5fded30b13d0b496a22d445d3eac",
+            "bounds": [
+              [
+                -3.4269862174987793,
+                0.08299999684095383,
+                1.5904922485351562
+              ],
+              [
+                -1.7655460834503174,
+                2.568021059036255,
+                3.20512056350708
+              ]
+            ],
+            "axis_separation_m": [
+              -1.010986328125,
+              -1.3189999535679817,
+              2.5004922747612
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "entry_peace_lily",
+            "source": "assets/rooms/_shared/plants/peace_lily.glb",
+            "sha256": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
+            "bounds": [
+              [
+                2.6320338249206543,
+                0.08299999684095383,
+                -2.3943734169006348
+              ],
+              [
+                3.2051758766174316,
+                0.9386000037193298,
+                -1.8664366006851196
+              ]
+            ],
+            "axis_separation_m": [
+              5.048033714294434,
+              -0.8566000014543533,
+              0.39643657207489014
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_pothos",
+            "source": "assets/rooms/_shared/plants/pothos.glb",
+            "sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+            "bounds": [
+              [
+                -2.962268114089966,
+                0.4279720187187195,
+                -0.8653430342674255
+              ],
+              [
+                -2.370863914489746,
+                1.8795249462127686,
+                -0.10510708391666412
+              ]
+            ],
+            "axis_separation_m": [
+              -0.5451359748840332,
+              -0.9740279316902161,
+              0.044656991958618164
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "bookcase_pothos",
+            "source": "assets/rooms/_shared/plants/pothos.glb",
+            "sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+            "bounds": [
+              [
+                -2.5756466388702393,
+                1.4170126914978027,
+                -2.619704008102417
+              ],
+              [
+                -1.9397072792053223,
+                2.7355990409851074,
+                -2.1010868549346924
+              ]
+            ],
+            "axis_separation_m": [
+              -0.15964674949645996,
+              0.015012741088867188,
+              0.6310868263244629
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "pantry_pothos",
+            "source": "assets/rooms/_shared/plants/pothos.glb",
+            "sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+            "bounds": [
+              [
+                0.815986692905426,
+                1.7150943279266357,
+                -2.8405730724334717
+              ],
+              [
+                1.3667347431182861,
+                2.767747163772583,
+                -2.409228801727295
+              ]
+            ],
+            "axis_separation_m": [
+              3.2319865822792053,
+              0.3130943775177002,
+              0.9392287731170654
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "hanging_pothos",
+            "source": "assets/rooms/_shared/plants/pothos.glb",
+            "sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+            "bounds": [
+              [
+                -2.997116804122925,
+                1.9912352561950684,
+                -1.4150813817977905
+              ],
+              [
+                -2.637542486190796,
+                2.8555185794830322,
+                -0.9651135206222534
+              ]
+            ],
+            "axis_separation_m": [
+              -0.2784574031829834,
+              0.5892353057861328,
+              -0.5048865079879761
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "window_extra_vine",
+            "source": "assets/rooms/_shared/plants/ivy_medium.glb",
+            "sha256": "31ef8a31299811dda145daea7afd704e3bf944119ecda47bc0c3e84a2006b6e9",
+            "bounds": [
+              [
+                -2.5103158950805664,
+                0.8503360748291016,
+                -0.5849912762641907
+              ],
+              [
+                -2.343254327774048,
+                1.6598199605941772,
+                -0.36563825607299805
+              ]
+            ],
+            "axis_separation_m": [
+              -0.09431600570678711,
+              -0.551663875579834,
+              0.325008749961853
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          },
+          {
+            "name": "bookcase_extra_vine",
+            "source": "assets/rooms/_shared/plants/ivy_long.glb",
+            "sha256": "a6c648bd64bf4dd5ae8b42b8b2913c793b3836dcaaa538d7be97a8ddc4cb0a93",
+            "bounds": [
+              [
+                -2.161982297897339,
+                1.5428253412246704,
+                -2.267624855041504
+              ],
+              [
+                -1.9213026762008667,
+                2.6675171852111816,
+                -2.09587025642395
+              ]
+            ],
+            "axis_separation_m": [
+              0.25401759147644043,
+              0.14082539081573486,
+              0.6258702278137207
+            ],
+            "penetrating_pairs": 0,
+            "floor_support_pairs": 0
+          }
+        ],
+        "positive_control_intersections": 357
+      }
+    },
+    "method": "GLB scene transforms -> actual triangle BVHs. All kit modules, instances, shared plants and approved seasoning props. AABB separation plus surface intersections; wall/back clearance also measured.",
+    "failures": []
+  },
+  "reproducibility": {
+    "identical": true,
+    "sha256": {
+      "assets/props/warming_cabinet/interior_food.png": "655d6d5bc3a93c425681b276e187d11ff0bd9b7a3f7e4a2d922c155f247629f5",
+      "assets/props/warming_cabinet/manifest.json": "aa2cbcd26247b91d9d9c355ee7d6727be5eb430bcc8cbcd1da08f1d937ed6c4c",
+      "assets/props/warming_cabinet/room_albedo_ao.png": "9802eca7bf7b4607d712fbb99c0d6ab3acf48ba2638a8734177160bbeb4f1360",
+      "assets/props/warming_cabinet/warming_cabinet_a.glb": "2cd9db841e453239401bb21cb9d3a63e89269b9b5ce1d2ab970d46264ef15db5",
+      "assets/props/warming_cabinet/warming_cabinet_b.glb": "544da56ab2f1d02d9179288894e29902e755babd47a60f664965c86f0235c8d5"
+    },
+    "previous_sha256": {
+      "assets/props/warming_cabinet/interior_food.png": "655d6d5bc3a93c425681b276e187d11ff0bd9b7a3f7e4a2d922c155f247629f5",
+      "assets/props/warming_cabinet/manifest.json": "aa2cbcd26247b91d9d9c355ee7d6727be5eb430bcc8cbcd1da08f1d937ed6c4c",
+      "assets/props/warming_cabinet/room_albedo_ao.png": "9802eca7bf7b4607d712fbb99c0d6ab3acf48ba2638a8734177160bbeb4f1360",
+      "assets/props/warming_cabinet/warming_cabinet_a.glb": "2cd9db841e453239401bb21cb9d3a63e89269b9b5ce1d2ab970d46264ef15db5",
+      "assets/props/warming_cabinet/warming_cabinet_b.glb": "544da56ab2f1d02d9179288894e29902e755babd47a60f664965c86f0235c8d5"
+    },
+    "blender": "5.2.2 LTS",
+    "source": "tools/art/build_warming_cabinet.py"
+  },
+  "media": [
+    {
+      "file": "a_front.png",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "sha256": "4810da6c4c6c03c5f0a2405f7b834e5865f8b531d9bbec39d091434a4741a4ec"
+    },
+    {
+      "file": "a_side.png",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "sha256": "5f001b5ac5a1e6eacf67792b12dbdeb23a586a96efe28eb11bb2436611bcff80"
+    },
+    {
+      "file": "a_three_quarter.png",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "sha256": "ac027276a55e1bb1c51c62f298b84e4e8af549b1a198d3bf85d9255a4fc92144"
+    },
+    {
+      "file": "b_front.png",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "sha256": "e9606ad18025439cc73b9fc93cfc2e679f861bdd365e8f899273d1c17f27a1f8"
+    },
+    {
+      "file": "b_side.png",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "sha256": "86511a0f109330d102c577a4ddc3819e9d824e64727fc2317ae2087ce4f97f09"
+    },
+    {
+      "file": "b_three_quarter.png",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "sha256": "2d6b7d980b83d8f24c8673dd77828d3416ec6f8f27146a85bcb69c900fb17683"
+    },
+    {
+      "file": "basic_room_a_43deg.png",
+      "dimensions": [
+        360,
+        800
+      ],
+      "sha256": "f6cd363a98994e0777a70f78e18f966fb433fe00257d712be49a25ffe88e9bc1"
+    },
+    {
+      "file": "basic_room_b_43deg.png",
+      "dimensions": [
+        360,
+        800
+      ],
+      "sha256": "1d4712649ba533c570e770ed0bb18a5338553083082355238bc409552a758aba"
+    },
+    {
+      "file": "basic_room_b_detail.png",
+      "dimensions": [
+        360,
+        800
+      ],
+      "sha256": "e60788e77fc28c5c6349f1f3733ca6004030e6036bde947a066ea4b268ca47f3"
+    },
+    {
+      "file": "standard_room_5_a_43deg.png",
+      "dimensions": [
+        360,
+        800
+      ],
+      "sha256": "bd29ae1b69dd8b288597027103c24368c7eaf4ac6d05cd71c318997d1a6681ef"
+    },
+    {
+      "file": "standard_room_5_b_43deg.png",
+      "dimensions": [
+        360,
+        800
+      ],
+      "sha256": "04d99b88185880dd4939a58f46db9fa1de2b23e7ff8500b02aab355348583065"
+    },
+    {
+      "file": "standard_room_5_b_detail.png",
+      "dimensions": [
+        360,
+        800
+      ],
+      "sha256": "643e02cdbf0fd4549b475b7ae268ce8b2c56c4481a509e7b62f18939dc292efc"
+    }
+  ],
+  "review_character_position": [
+    -0.85,
+    0.082,
+    -0.75
+  ]
+}

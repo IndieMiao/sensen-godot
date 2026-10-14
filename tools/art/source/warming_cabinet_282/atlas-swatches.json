@@ -1,0 +1,157 @@
+{
+  "atlas": "assets/props/warming_cabinet/room_albedo_ao.png",
+  "source_atlas": "assets/rooms/deluxe_room_10/room_albedo_ao.png",
+  "atlas_sha256": "9802eca7bf7b4607d712fbb99c0d6ab3acf48ba2638a8734177160bbeb4f1360",
+  "swatches": {
+    "sage": {
+      "source_asset": "assets/rooms/deluxe_room_10/sink_cabinet.glb",
+      "source_sha256": "b1be266472faa1b9402f783dcd047e6a8592fe1426945539c0941b34a53c1fc4",
+      "source_mesh": 0,
+      "source_primitive": 0,
+      "source_triangle": 474,
+      "pixel_xy": [
+        1134,
+        651
+      ],
+      "gltf_uv": [
+        0.5537989536921183,
+        0.3180374304453532
+      ],
+      "rgb8": [
+        117,
+        130,
+        89
+      ],
+      "patch_min": [
+        114,
+        126,
+        86
+      ],
+      "patch_max": [
+        121,
+        133,
+        91
+      ]
+    },
+    "honey": {
+      "source_asset": "assets/rooms/deluxe_room_10/kitchen_pantry.glb",
+      "source_sha256": "02f5fd3ee3510a018fe7a38b5e57177d62e25d5bfd7ba107944977eceb668818",
+      "source_mesh": 0,
+      "source_primitive": 0,
+      "source_triangle": 227,
+      "pixel_xy": [
+        1706,
+        301
+      ],
+      "gltf_uv": [
+        0.8331002593040466,
+        0.14704002936681113
+      ],
+      "rgb8": [
+        205,
+        146,
+        88
+      ],
+      "patch_min": [
+        203,
+        145,
+        87
+      ],
+      "patch_max": [
+        205,
+        146,
+        88
+      ]
+    },
+    "brass": {
+      "source_asset": "assets/rooms/deluxe_room_10/kitchen_fittings.glb",
+      "source_sha256": "67f85fe925bc8d8b2376397c17c118a55c24129ea36da0b6139642aa7a50df6b",
+      "source_mesh": 0,
+      "source_primitive": 0,
+      "source_triangle": 1331,
+      "pixel_xy": [
+        886,
+        81
+      ],
+      "gltf_uv": [
+        0.43267470598220825,
+        0.04002598921457926
+      ],
+      "rgb8": [
+        165,
+        132,
+        75
+      ],
+      "patch_min": [
+        160,
+        127,
+        72
+      ],
+      "patch_max": [
+        165,
+        132,
+        75
+      ]
+    },
+    "cream": {
+      "source_asset": "assets/rooms/deluxe_room_10/sink_cabinet.glb",
+      "source_sha256": "b1be266472faa1b9402f783dcd047e6a8592fe1426945539c0941b34a53c1fc4",
+      "source_mesh": 0,
+      "source_primitive": 0,
+      "source_triangle": 1039,
+      "pixel_xy": [
+        1497,
+        1714
+      ],
+      "gltf_uv": [
+        0.7310163180033366,
+        0.8371591766675314
+      ],
+      "rgb8": [
+        242,
+        231,
+        212
+      ],
+      "patch_min": [
+        241,
+        230,
+        211
+      ],
+      "patch_max": [
+        242,
+        231,
+        212
+      ]
+    },
+    "leaf": {
+      "source_asset": "assets/rooms/deluxe_room_10/underloft_bookcase.glb",
+      "source_sha256": "a272a2e9e5be1d643b5843425905b07fcd9c86431db9fec1f551ff985efcae61",
+      "source_mesh": 0,
+      "source_primitive": 0,
+      "source_triangle": 3195,
+      "pixel_xy": [
+        1928,
+        2002
+      ],
+      "gltf_uv": [
+        0.9417785207430521,
+        0.9775973359743754
+      ],
+      "rgb8": [
+        139,
+        155,
+        64
+      ],
+      "patch_min": [
+        137,
+        153,
+        64
+      ],
+      "patch_max": [
+        139,
+        155,
+        64
+      ]
+    }
+  }
+}

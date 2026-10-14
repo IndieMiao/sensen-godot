@@ -1,0 +1,125 @@
+{
+  "spec": "SGODOT-282 v1.1",
+  "units": "metres, Godot Y-up, +Z front",
+  "bounds": [
+    [
+      -0.28,
+      0,
+      0
+    ],
+    [
+      0.28,
+      1.32,
+      0.5
+    ]
+  ],
+  "pivot": "ground, width centre, back plane",
+  "collider": {
+    "at": [
+      0,
+      0.66,
+      0.25
+    ],
+    "size": [
+      0.56,
+      1.32,
+      0.5
+    ]
+  },
+  "sockets": {
+    "top_center": [
+      0,
+      1.32,
+      0.25
+    ],
+    "door_center": [
+      0,
+      0.795,
+      0.498
+    ],
+    "glow": [
+      0,
+      0.795,
+      0.25
+    ]
+  },
+  "groups": {
+    "cabinet": {
+      "triangles": 622,
+      "surfaces": 2
+    },
+    "dish_1": {
+      "triangles": 144,
+      "surfaces": 2
+    },
+    "dish_2": {
+      "triangles": 144,
+      "surfaces": 2
+    },
+    "dish_3": {
+      "triangles": 144,
+      "surfaces": 2
+    },
+    "dish_4": {
+      "triangles": 144,
+      "surfaces": 1
+    },
+    "dish_5": {
+      "triangles": 144,
+      "surfaces": 2
+    },
+    "dish_6": {
+      "triangles": 144,
+      "surfaces": 2
+    },
+    "highlights": {
+      "triangles": 4,
+      "surfaces": 1
+    },
+    "glass": {
+      "triangles": 2,
+      "surfaces": 1
+    }
+  },
+  "glass_alpha": 0.15,
+  "dish_order": "upper left, upper right, middle left, middle right, bottom left, bottom right",
+  "placements": {
+    "basic_room": {
+      "position": [
+        -2.85,
+        0.082,
+        -1.69
+      ],
+      "yaw_degrees": 90
+    },
+    "standard_room_5": {
+      "position": [
+        -2.916,
+        0.082,
+        -1.19
+      ],
+      "yaw_degrees": 90
+    }
+  },
+  "atlas_sha256": "9802eca7bf7b4607d712fbb99c0d6ab3acf48ba2638a8734177160bbeb4f1360",
+  "extra_palette": {
+    "amber": "E8AD4D",
+    "amber_light": "F3C46B",
+    "stew": "D98737",
+    "bread": "DDB05B"
+  },
+  "variants": {
+    "a": {
+      "file": "warming_cabinet_a.glb",
+      "triangles": 1492,
+      "surfaces": 15,
+      "meshes": 9
+    },
+    "b": {
+      "file": "warming_cabinet_b.glb",
+      "triangles": 1490,
+      "surfaces": 14,
+      "meshes": 8
+    }
+  }
+}
