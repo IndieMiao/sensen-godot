@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { everFish } from '../../src/p0/fishing_world.js';
-import type { CityCluster } from '../../src/p0/clusters.js';
+import { CityClusters, type CityCluster } from '../../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState } from '../../src/p0/state.js';
@@ -14,6 +14,8 @@ import { applyOverrides, applyWater, cityPlaces, clusterPopulation, generateCity
 const c: P0Content = loadP0Content();
 const w = (c as P0Content & { world: WorldContent }).world;
 const clusters = (c as P0Content & { clusters: { get(id: string): CityCluster | undefined; byId: Map<string, CityCluster> } }).clusters;
+/** Every cluster of city_clusters.json, a closed country's too (q(189): the game's table leaves those out). */
+const full = CityClusters.load();
 const SF = 'gn-5391959', LA = 'gn-5368361', SHANGHAI = 'gn-1796236', BEIJING = 'gn-1816670', NYC = 'gn-5128581', TOKYO = 'gn-1850147';
 const T = Date.parse('2026-10-10T18:00:00Z');
 
@@ -253,8 +255,8 @@ describe('global generation (SGODOT-280)', () => {
       const cluster = id.slice(0, id.indexOf('~'));
       let bare: CityPlaces;
       w.overrides = undefined;
-      try { bare = generateCity(c, clusters.get(cluster)!); } finally { w.overrides = saved; }
-      const city = cityPlaces(c, cluster)!;
+      try { bare = generateCity(c, full.get(cluster)!); } finally { w.overrides = saved; }
+      const city = cityPlaces(c, cluster) ?? generateCity(c, full.get(cluster)!);   // a closed country's city (q(189)): not served, still frozen
       const was = all(bare).find(p => p.id === id), now = all(city).find(p => p.id === id);
       expect(was, `${id} is a place the generator makes`).toBeDefined();
       if (fix.lat !== undefined) expect(now).toMatchObject({ lat: fix.lat, lng: fix.lng });
@@ -292,7 +294,7 @@ describe('global generation (SGODOT-280)', () => {
     for (const id of Object.keys(table!.fixes)) byCity.set(id.slice(0, id.indexOf('~')), [...(byCity.get(id.slice(0, id.indexOf('~'))) ?? []), id]);
     expect(Object.keys(table!.fixes).length).toBeGreaterThan(1000);
     for (const [cluster, ids] of byCity) {
-      const bare = generateCity(c, clusters.get(cluster)!, { water: false }), city = cityPlaces(c, cluster)!;
+      const bare = generateCity(c, full.get(cluster)!, { water: false }), city = cityPlaces(c, cluster) ?? generateCity(c, full.get(cluster)!);
       const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts];
       for (const id of ids) {
         const [lat, lng, fromLat, fromLng] = table!.fixes[id];

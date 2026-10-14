@@ -66,6 +66,14 @@ func test_trips_measure_from_the_home_base_point() -> void:
 	assert_int(int(P0Travel.trip(v, TOKYO).km)).is_equal(0)
 	assert_int(int(P0Travel.trip(v, SF).trip)).is_equal(6)
 
+func test_a_closed_city_in_the_save_is_neither_fog_hole_nor_passport_row() -> void:
+	# q(189): the server leaves a closed country's cities out of view.travel; were one there, the client skips it too
+	var v := _view({home = SF, here = SF, visits = {TOKYO: {n = 1, first_at = 2.0}, "gn-1871859": {n = 1, first_at = 1.0}}, stamps = []})
+	assert_array(P0Travel.explored(v)).is_equal([SF, TOKYO])
+	var p := P0Travel.passport(v)
+	assert_array(p.rows.map(func(r): return str(r.cluster))).is_equal([SF, TOKYO])
+	assert_str(str(p.facts[0][1])).is_equal("2")
+
 func test_the_travel_card_lines() -> void:
 	assert_str(P0Travel.grouped(1758)).is_equal("1,758")
 	assert_str(P0Travel.grouped(12)).is_equal("12")

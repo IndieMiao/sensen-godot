@@ -218,11 +218,21 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
   return null;
 }
 
+/** Whether a cluster is one the game has: the written city, or a row of the table (a closed country's is not, q(189)). */
+export const openCity = (c: P0Content, cluster: string): boolean => cluster === writtenCluster(c) || !!clusterById(c, cluster);
+
+/** view.travel (q(189) ③): visits, stamps and passes of a city the table no longer has are kept in the save, never shown. */
+export function travelShown(c: P0Content, t: TravelState): Pick<TravelState, 'visits' | 'stamps' | 'passes'> {
+  const keep = <V>(o: Record<string, V>) => Object.fromEntries(Object.entries(o).filter(([id]) => openCity(c, id)));
+  return { visits: keep(t.visits), stamps: t.stamps.filter(x => openCity(c, x.cluster)), passes: keep(t.passes) };
+}
+
 /** Explorer medals (§11.9.2) by the stamps counted up to today: after travel, and on any command, so a stamp
  * pushed to tomorrow earns its medal tomorrow without another trip (亚瑟 on #206). */
 export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
   const today = dayKey(c, s, now);
-  const counted = s.travel.stamps.filter(x => x.counted_on <= today).length;
+  // q(189) ③: a stamp of a city not in the table (a closed country's) is kept but not counted; medals already given stay
+  const counted = s.travel.stamps.filter(x => x.counted_on <= today && openCity(c, x.cluster)).length;
   for (const [n, e] of EXPLORER) {
     if (counted < n || s.travel.explorer >= n) continue;
     s.travel.explorer = n;

@@ -189,7 +189,7 @@ export interface P0Content {
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   /** Travel line data (content/travel_p2.json, SGODOT-275): landmark stamps by cluster (plan §11.9.3 表 11-18) and the
    * display names of clusters whose seed city is not the one players look for (none at present: San Diego, once gn-3981609's, is a cluster of its own, SGODOT-280). */
-  travel?: { landmarks?: Record<string, { landmark: string; stamp: string }>; cluster_names?: Record<string, string> };
+  travel?: { landmarks?: Record<string, { landmark: string; stamp: string }>; cluster_names?: Record<string, string>; closed_countries?: string[] };
   homestead: {
     max_level: number;
     warming_cabinet: number;                  // portions once unlocked (Lv3, §7.7)
@@ -318,6 +318,9 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   // Not enumerable: a structuredClone of the content (tests) leaves it out instead of copying a class without methods.
   if (existsSync(clusters)) {
     const table = CityClusters.load(clusters);
+    // q(189): a closed country's cities are not in the table the game reads (their generated places stay unchanged)
+    const closed = new Set(c.travel?.closed_countries ?? []);
+    for (const [id, cl] of table.byId) if (closed.has(cl.country_code)) table.byId.delete(id);
     // A cluster's display name (travel.cluster_names): the id stays frozen, only the name players read changes.
     for (const [id, name] of Object.entries(c.travel?.cluster_names ?? {})) { const cl = table.get(id); if (cl) cl.name = name; }
     Object.defineProperty(c, 'clusters', { value: table, enumerable: false, writable: true, configurable: true });

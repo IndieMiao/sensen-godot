@@ -761,3 +761,13 @@ func test_a_first_visits_city_ahead_is_measured_as_it_shows_unexplored() -> void
 	rt.ui.close_modal()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+func test_an_arrival_in_a_city_the_table_does_not_have_lets_go() -> void:
+	# q(189) / 亚瑟 on #387: a closed country's city (Pyongyang) is not in the client's table; an arrival there (only from
+	# another device) holds no flight and draws no cover
+	var m := _map()
+	await get_tree().process_frame
+	m.on_arrival({kind = "arrival", cluster = "gn-1871859", first = true, trip = 6, km = 9000})
+	assert_object(_cover(m)).is_null()
+	assert_bool(m.travelling()).is_false()
+

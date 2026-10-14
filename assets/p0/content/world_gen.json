@@ -1000,6 +1000,21 @@
     "lat": 41.145,
     "lng": 126.218,
     "why": "SGODOT-305 (Ji'an split out of Manp'o, 2026-10-14): generated across the Yalu in North Korea; onto the Chinese bank, north-east of the town"
+   },
+   "gn-2037886~pond1": {
+    "lat": 40.1635,
+    "lng": 124.418,
+    "why": "SGODOT-305 / q(189): generated on Wihwa Island in the Yalu, North Korean ground; onto the Chinese bank north-east of Dandong"
+   },
+   "gn-2037886~tackle1": {
+    "lat": 40.165,
+    "lng": 124.4205,
+    "why": "SGODOT-305 / q(189): with Sparrow Creek off Wihwa Island; 250 m from it, 3 km from Daisy Tackle Shop"
+   },
+   "gn-2036069~pond2": {
+    "lat": 41.825,
+    "lng": 126.94,
+    "why": "SGODOT-305 / q(189): generated across the Yalu in North Korea; onto the Chinese side north-east of Linjiang"
    }
   },
   "room": {

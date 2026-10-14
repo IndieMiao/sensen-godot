@@ -9,7 +9,7 @@ const LA := "gn-5368361"
 const FARM := Vector2(37.7558, -122.4345)   # the San Francisco homestead
 
 func test_the_cluster_table_matches_the_server() -> void:
-	assert_int(P0Clusters.count()).is_equal(12493)   # SPLIT_OUT: San Diego (SGODOT-280), Ganghwa-gun and Ji'an (SGODOT-305)
+	assert_int(P0Clusters.count()).is_equal(12452)   # 12,493 (SPLIT_OUT: San Diego, Ganghwa-gun, Ji'an) less North Korea's 41 (q(189))
 	var sf := P0Clusters.get_cluster(SF)
 	assert_str(str(sf.name)).is_equal("San Francisco")
 	assert_str(str(sf.climate)).is_equal("temperate")
@@ -33,3 +33,15 @@ func test_nearest_finds_the_cluster_under_the_camera() -> void:
 	assert_str(P0Clusters.nearest(37.80, -122.27)).is_equal(SF)          # Oakland is in San Francisco's cluster
 	assert_str(P0Clusters.nearest(35.68, 139.69)).is_equal(TOKYO)
 	assert_str(P0Clusters.nearest(0.0, -150.0)).is_equal("")            # the open Pacific
+
+func test_a_closed_country_s_cities_are_nowhere() -> void:
+	# q(189): North Korea's 41 clusters are not in the table — no bubble, search hit or nearest city; Ganghwa-gun (KR) and
+	# Ji'an (CN), once inside two of them, are open (q(191))
+	assert_bool(P0Clusters.get_cluster("gn-1871859").is_empty()).is_true()   # Pyongyang
+	assert_bool(P0Clusters.get_cluster("gn-1843163").is_empty()).is_false()   # Ganghwa-gun
+	assert_bool(P0Clusters.get_cluster("gn-2036579").is_empty()).is_false()   # Ji'an
+	for c in P0Clusters.all(): assert_str(str(c.country_code)).is_not_equal("KP")
+	for c in P0Clusters.in_box(37.5, 124.0, 43.0, 131.0, 0, 500): assert_str(str(c.country_code)).is_not_equal("KP")
+	var at := P0Clusters.nearest(39.0194, 125.7381)   # in Pyongyang
+	assert_bool(at == "" or str(P0Clusters.get_cluster(at).country_code) != "KP").is_true()
+

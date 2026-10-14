@@ -75,6 +75,10 @@
         "stamp": "stamp_philadelphia"
       }
     },
-    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp."
+    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp.",
+    "closed_countries": [
+      "KP"
+    ],
+    "_closed_countries": "Countries whose cities do not open (q(189), SGODOT-305): the city table skips their clusters on the server (content.ts) and the client (P0Clusters), so they are on no map, search, Nearby list or fallback list and cannot be travelled to or picked as home. Their generated places stay as they are, so world.revision does not change."
   }
 }
