@@ -97,11 +97,15 @@ function homeOffset(c: P0Content, s: Homed, at: number): number {
 
 /** Player day key: home-city time shifted back by the 04:00 rollover (§3.1.1). */
 export function dayKey(c: P0Content, s: Homed, now: number): string {
+  const hold = s?.travel?.day_hold;   // q(173): the day a home change carries over
+  if (hold && now >= hold.start && now < hold.until) return hold.key;
   return new Date(now + homeOffset(c, s, now) - c.day.rollover_hour * 3_600_000).toISOString().slice(0, 10);
 }
 
 /** The home-time 04:00 that ends player day `day` (YYYY-MM-DD): the next day's rollover, as an instant. */
 export function rolloverAfter(c: P0Content, s: Homed, day: string): number {
+  const hold = s?.travel?.day_hold;
+  if (hold && day === hold.key) return hold.until;   // q(173) ①: every "next 04:00" of the carried day is the stored one
   const local = Date.parse(`${day}T00:00:00Z`) + 86_400_000 + c.day.rollover_hour * 3_600_000;   // 04:00 the next day, home clock
   const guess = local - homeOffset(c, s, local);
   return local - homeOffset(c, s, guess);   // the offset in force at that moment (04:00 is clear of the 02:00 DST switch)

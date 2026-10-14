@@ -12,6 +12,9 @@ import { createHash } from 'node:crypto';
 import { add, count, room, stackLimit, take } from './bag.js';
 import { fishById, type Fish, type P0Content } from './content.js';
 import { pondAt, poolAt } from './fishing_world.js';
+import { grantItems } from './parcels.js';
+import { clusterOf } from './travel.js';
+import { placeOf } from './world.js';
 import { firstCatch, noteFishdex } from './fishing.js';
 import { gainXp, type P0Event } from './progress.js';
 import { scaledXp, skillLevel, xpPercent } from './rules.js';
@@ -48,7 +51,7 @@ const roll = (s: P0State, t: Trap, n: number, what: string) =>
 /** The fish a trap caught at an instant: Common / Fine of the pond's pool then (Rare one time in ten from Lv9). */
 function trapFish(c: P0Content, s: P0State, t: Trap, n: number, at: number): Fish | null {
   const r = rules(c);
-  const tiers = poolAt(c, c.fishing.sites[c.fishing.places[t.place]?.site ?? ''] ?? c.fishing.sites.pond, pondAt(c, t.place, at));
+  const tiers = poolAt(c, c.fishing.sites[placeOf(c, t.place)?.site ?? ''] ?? c.fishing.sites.pond, pondAt(c, t.place, at));
   const rare = skillLevel(c, s, 'fishing') >= r.rare_from && roll(s, t, n, 'rare') * 100 < r.rare_pct && tiers[2]?.length;
   const pool = rare ? tiers[2] : [...(tiers[0] ?? []), ...(tiers[1] ?? [])];
   if (!pool.length) return null;
@@ -76,15 +79,17 @@ export function nextFishIn(c: P0Content, t: Trap, now: number): number | null {
 }
 
 /** The pond the player is at, as a cast takes it (presence, checked against the pass by the reducer). */
+/** The pond the player is at, hand-written or generated (SGODOT-303: a home may be a generated city); '' at none. */
 const atPond = (c: P0Content, s: P0State) => {
   const place = s.presence.place ?? '';
-  return c.fishing.places[place] ? place : '';
+  return placeOf(c, place) ? place : '';
 };
 
 /** set_trap: from the bag into the pond the player is at. */
 export function setTrap(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
   const place = atPond(c, s);
   if (!place) return { code: 'not_at_pond' };
+  if (clusterOf(c, place) !== s.travel.home) return { code: 'home_ponds_only' };   // q(177) ②: `Set Trap · Home ponds only`
   if (count(s.bag, TRAP) < 1) return { code: 'no_trap' };
   s.traps ??= [];
   const slots = trapSlots(c, s);
@@ -133,6 +138,37 @@ export function collectTrap(c: P0Content, s: P0State, cmd: { take_back?: unknown
   }
   events.push({ kind: 'trap', action: back ? 'taken_back' : 'collected', place, fish: got.length, left: kept.length });
   return null;
+}
+
+/**
+ * q(177) ③: traps in ponds outside the home city (a home changed, or put back after a rollback) come in. Each is
+ * worked out to now as Collect would, its fish counted as Collect counts them (XP at the trap's share, first catches,
+ * the Fish-dex); fish and traps go into the bag, what does not fit becomes parcels (24 h, as any parcel).
+ */
+export function recallAwayTraps(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
+  const away = (s.traps ?? []).filter(t => clusterOf(c, t.place) !== s.travel.home);
+  if (!away.length) return;
+  const r = rules(c), level = skillLevel(c, s, 'fishing'), items = new Map<string, number>();
+  let fish = 0;
+  for (const t of away) {
+    settleTrap(c, s, t, now);
+    for (const id of t.fish) {
+      const f = fishById(c, id);
+      if (!f) continue;
+      s.fishing.caught[id] = (s.fishing.caught[id] ?? 0) + 1;
+      const pct = xpPercent(c, level, f.level);
+      gainXp(c, s, now, 'fishing', scaledXp(s, Math.round(c.fishing.catch_xp[f.rarity - 1] * r.xp_pct / 100), pct), pct, events);
+      firstCatch(c, s, now, f, t.place, events, false);
+      items.set(id, (items.get(id) ?? 0) + 1);
+      fish++;
+    }
+    items.set(TRAP, (items.get(TRAP) ?? 0) + 1);
+    events.push({ kind: 'trap', action: 'taken_back', place: t.place, fish: t.fish.length, left: 0 });
+  }
+  s.traps = (s.traps ?? []).filter(t => !away.includes(t));
+  if (fish) noteFishdex(c, s, now, events);
+  const bagged = grantItems(c, s, now, `trap_recall:${now}`, 'Fish Trap', [...items], events) ?? {};
+  for (const [id, n] of Object.entries(bagged)) events.push({ kind: 'item', id, delta: n });
 }
 
 /** How many of these Collect would take now: each fish in turn onto a matching stack or a free slot, one that does not

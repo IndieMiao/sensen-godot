@@ -12,7 +12,7 @@ import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
 import { cityInfo, clusterById, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
-import { homeCities, homeSpots, homeStatus } from './home_city.js';
+import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus } from './home_city.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
 /** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
@@ -83,7 +83,10 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (status !== 'open') return reply.send({ ok: false, code: 'home_not_open', detail: { city: cluster, status } });
     const spots = homeSpots(c, cluster, player);
     if (!spots) return reply.send({ ok: false, code: 'home_not_open', detail: { city: cluster, status: 'no_spot' } });
-    return reply.send({ ok: true, city: cluster, spots });
+    // q(173) ④: the change confirm card says when today's limits reset if the home moves here (a first pick: none)
+    const s = stateOf(player, req.headers), now = clock(s.clock_ms);
+    const resets_at = !s.travel.pending && changeOpen(c, s, now).open ? dayHoldFor(c, s, cluster, now).until : null;
+    return reply.send({ ok: true, city: cluster, spots, resets_at });
   });
 
   app.post('/v1/p0/commands', async (req, reply) => {

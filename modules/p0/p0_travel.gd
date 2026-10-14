@@ -103,9 +103,17 @@ static func trip_line(trip_info: Dictionary) -> String:
 static func flight_s(trip: int) -> float:
 	return 3.0 if trip <= 3 else 4.0 if trip <= 5 else 5.0
 
-## The trip tier to a cluster from the home farm, for browsing (the server's preview is authoritative).
+## q(184): the home's base point Trip distances are measured from — the written city's content point (San Francisco's
+## Noe Valley), another home's cluster centre; the picked farm spot only places the home pin (the server's homeBase).
+static func home_base(view: Dictionary) -> Vector2:
+	var h := home(view)
+	if h == P0Clusters.cluster_of_region(P0City.region()): return P0City.farm_at()
+	var cl := P0Clusters.get_cluster(h)
+	return Vector2(float(cl.lat), float(cl.lng)) if not cl.is_empty() else P0City.farm_at()
+
+## The trip tier to a cluster from the home's base point, for browsing (the server's preview is authoritative).
 static func trip(view: Dictionary, cluster: String) -> Dictionary:
-	return P0Clusters.trip(cluster, home(view), P0City.farm_at(), view.get("travel", {}).get("fallback", {}))
+	return P0Clusters.trip(cluster, home(view), home_base(view), view.get("travel", {}).get("fallback", {}))
 
 # ---------------------------------------------------------------- the Travel Post's Fare Board (q(165))
 ## q(165) Trip fares (§9.11.4 / §17.3.1, read only): the seven tiers in order, each {title `Trip 1 · Local`, line its

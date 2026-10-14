@@ -29,6 +29,11 @@ function record(s: P0State, p: Parcel | Omit<Parcel, 'expires_at'>, at: number, 
   s.inbox.updates = s.inbox.updates.slice(-UPDATES_KEPT);
 }
 
+/** q(173): a home change carries its day on to `until`, so a gift meal's parcel due to go at the old 04:00 lasts to it. */
+export function carryGiftParcels(s: P0State, oldEnd: number, until: number): void {
+  for (const p of s.inbox.parcels) if (p.gift && p.expires_at === oldEnd) p.expires_at = Math.min(p.created_at + PARCEL_LIFETIME_MS, until);
+}
+
 /** A resident's gift meal is gone at the player-day rollover (§3.4.5), even as a parcel. */
 function lifetimeEnd(c: P0Content, s: P0State, p: Omit<Parcel, 'expires_at'>, now: number): number {
   return p.gift ? Math.min(now + PARCEL_LIFETIME_MS, now + untilRollover(c, s, now)) : now + PARCEL_LIFETIME_MS;
