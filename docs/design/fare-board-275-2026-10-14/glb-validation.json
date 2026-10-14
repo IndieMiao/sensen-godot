@@ -1,0 +1,383 @@
+{
+  "checks": [
+    {
+      "check": "Existing atlas SHA-256 unchanged",
+      "passed": true
+    },
+    {
+      "check": "One merged mesh / one surface",
+      "passed": true
+    },
+    {
+      "check": "Single RoomKit_SharedAtlas material",
+      "passed": true
+    },
+    {
+      "check": "Kit convention: no duplicate embedded texture; runtime binds shared atlas",
+      "passed": true
+    },
+    {
+      "check": "Positions/normals/UV only; no vertex colors or extra texture channels",
+      "passed": true
+    },
+    {
+      "check": "Exported triangle count / budget",
+      "passed": true
+    },
+    {
+      "check": "Actual GLB dimensions 0.90 x 0.65 x 0.07",
+      "passed": true
+    },
+    {
+      "check": "Back centre pivot and forward +Z geometry",
+      "passed": true
+    },
+    {
+      "check": "Identity exported node scales and orientations",
+      "passed": true
+    },
+    {
+      "check": "Exact empty: board_center",
+      "passed": true
+    },
+    {
+      "check": "Exact empty: mark",
+      "passed": true
+    },
+    {
+      "check": "No degenerate mesh triangles",
+      "passed": true
+    },
+    {
+      "check": "Triangle winding agrees with shading normals",
+      "passed": true
+    },
+    {
+      "check": "Every exported UV is one of the six existing swatch centres",
+      "passed": true
+    },
+    {
+      "check": "Each triangle samples one constant atlas point: no wood grain / no UV interpolation across islands",
+      "passed": true
+    },
+    {
+      "check": "UV lies within actual source asset triangle: wood",
+      "passed": true
+    },
+    {
+      "check": "7x7 atlas footprint contains no black/blank pixels: wood",
+      "passed": true
+    },
+    {
+      "check": "UV lies within actual source asset triangle: board",
+      "passed": true
+    },
+    {
+      "check": "7x7 atlas footprint contains no black/blank pixels: board",
+      "passed": true
+    },
+    {
+      "check": "UV lies within actual source asset triangle: cream",
+      "passed": true
+    },
+    {
+      "check": "7x7 atlas footprint contains no black/blank pixels: cream",
+      "passed": true
+    },
+    {
+      "check": "UV lies within actual source asset triangle: red",
+      "passed": true
+    },
+    {
+      "check": "7x7 atlas footprint contains no black/blank pixels: red",
+      "passed": true
+    },
+    {
+      "check": "UV lies within actual source asset triangle: mustard",
+      "passed": true
+    },
+    {
+      "check": "7x7 atlas footprint contains no black/blank pixels: mustard",
+      "passed": true
+    },
+    {
+      "check": "UV lies within actual source asset triangle: teal",
+      "passed": true
+    },
+    {
+      "check": "7x7 atlas footprint contains no black/blank pixels: teal",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: room_shell",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: window_wall",
+      "passed": true
+    },
+    {
+      "check": "Nine wall rays confirm solid mounting surface at X=-3.21",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: post_office_sign",
+      "passed": true
+    },
+    {
+      "check": "Board top below actual postal sign by >= 0.1 m",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: postal_counter",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: magazine_rack",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: counter_computer",
+      "passed": true
+    },
+    {
+      "check": "No penetrating triangle overlap: sorting_cabinet",
+      "passed": true
+    },
+    {
+      "check": "Positive control detects deliberately misplaced board inside counter",
+      "passed": true
+    },
+    {
+      "check": "Seven named blank bars and seven colored dots",
+      "passed": true
+    },
+    {
+      "check": "No text objects or curves in editable source",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 1 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 2 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 3 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 4 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 5 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 6 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Actual bar height 0.030 m: Row 7 / blank ivory bar",
+      "passed": true
+    },
+    {
+      "check": "Seven actual bar centres have 0.065 m pitch",
+      "passed": true
+    }
+  ],
+  "swatches": [
+    {
+      "name": "wood",
+      "source_asset": "assets/rooms/post_office/sorting_cabinet.glb",
+      "source_triangle": 806,
+      "gltf_uv": [
+        0.385498046875,
+        0.503662109375
+      ],
+      "pixel_xy": [
+        789,
+        1031
+      ],
+      "rgb8": [
+        129,
+        66,
+        39
+      ],
+      "safe_radius_px": 3
+    },
+    {
+      "name": "board",
+      "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+      "source_triangle": 319,
+      "gltf_uv": [
+        0.160888671875,
+        0.222412109375
+      ],
+      "pixel_xy": [
+        329,
+        455
+      ],
+      "rgb8": [
+        38,
+        71,
+        85
+      ],
+      "safe_radius_px": 3
+    },
+    {
+      "name": "cream",
+      "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+      "source_triangle": 529,
+      "gltf_uv": [
+        0.672119140625,
+        0.202880859375
+      ],
+      "pixel_xy": [
+        1376,
+        415
+      ],
+      "rgb8": [
+        235,
+        220,
+        192
+      ],
+      "safe_radius_px": 3
+    },
+    {
+      "name": "red",
+      "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+      "source_triangle": 5034,
+      "gltf_uv": [
+        0.338134765625,
+        0.616943359375
+      ],
+      "pixel_xy": [
+        692,
+        1263
+      ],
+      "rgb8": [
+        166,
+        56,
+        48
+      ],
+      "safe_radius_px": 3
+    },
+    {
+      "name": "mustard",
+      "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+      "source_triangle": 180,
+      "gltf_uv": [
+        0.705810546875,
+        0.205810546875
+      ],
+      "pixel_xy": [
+        1445,
+        421
+      ],
+      "rgb8": [
+        155,
+        123,
+        70
+      ],
+      "safe_radius_px": 3
+    },
+    {
+      "name": "teal",
+      "source_asset": "assets/rooms/post_office/world_map.glb",
+      "source_triangle": 591,
+      "gltf_uv": [
+        0.590087890625,
+        0.530517578125
+      ],
+      "pixel_xy": [
+        1208,
+        1086
+      ],
+      "rgb8": [
+        84,
+        138,
+        156
+      ],
+      "safe_radius_px": 3
+    }
+  ],
+  "intersections": [
+    {
+      "name": "room_shell",
+      "raw_contact_pairs": 0,
+      "flush_wall_contact_pairs": 0,
+      "penetrating_pairs": 0
+    },
+    {
+      "name": "window_wall",
+      "raw_contact_pairs": 48,
+      "flush_wall_contact_pairs": 48,
+      "penetrating_pairs": 0
+    },
+    {
+      "name": "post_office_sign",
+      "raw_contact_pairs": 0,
+      "flush_wall_contact_pairs": 0,
+      "penetrating_pairs": 0
+    },
+    {
+      "name": "postal_counter",
+      "raw_contact_pairs": 0,
+      "flush_wall_contact_pairs": 0,
+      "penetrating_pairs": 0
+    },
+    {
+      "name": "magazine_rack",
+      "raw_contact_pairs": 0,
+      "flush_wall_contact_pairs": 0,
+      "penetrating_pairs": 0
+    },
+    {
+      "name": "counter_computer",
+      "raw_contact_pairs": 0,
+      "flush_wall_contact_pairs": 0,
+      "penetrating_pairs": 0
+    },
+    {
+      "name": "sorting_cabinet",
+      "raw_contact_pairs": 0,
+      "flush_wall_contact_pairs": 0,
+      "penetrating_pairs": 0
+    }
+  ],
+  "wall_plane_errors_m": [
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07,
+    2.0027160640978536e-07
+  ],
+  "sign_vertical_gap_m": 0.48500001430511475,
+  "positive_control_pairs": 129,
+  "asset": {
+    "triangles": 674,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.44999998807907104,
+        -0.32499998807907104,
+        0.0
+      ],
+      [
+        0.44999998807907104,
+        0.32500001788139343,
+        0.07000000029802322
+      ]
+    ],
+    "sha256": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98"
+  },
+  "failures": []
+}
