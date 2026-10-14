@@ -191,6 +191,10 @@ func test_the_mouth_card_states() -> void:
 	farm.rt.session.view = _mouth_view(null, 200, 2)   # no run, 2/2: the card stays, the pill alone (EXPRESS-3)
 	m.frame(farm.rt.session.current())
 	assert_bool(m.card_open()).is_true()
+	m.close_card()
+	m.tap_mouth()   # a fresh tap in this state opens the card too, not a drawer
+	m.frame(farm.rt.session.current())
+	assert_bool(m.card_open()).is_true()
 	assert_str(card.main_text()).starts_with("Resets in ")
 	assert_bool(card.state == UiEntryCard.State.UNAVAILABLE).is_true()
 	assert_bool(card.second_shown() or card.third_shown() or card.pill_text() != "").is_false()
