@@ -724,7 +724,9 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
 	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41")   # Lena's
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")
-	assert_str(str(looks.market_subtropical_0.hairHat)).is_equal("hairhat0")   # Tomo's
+	assert_str(str(looks.market_subtropical_0.hairHat)).is_equal("hairhat0")   # Tomo's style (his is the darker variant)
+	assert_str(P0CityPlaces.hair_style("hairhat0_npc_tomo")).is_equal("hairhat0")
+	assert_str(P0CityPlaces.hair_style("hairhat41")).is_equal("hairhat41")
 	assert_str(P0CityPlaces.keeper_look("market_subtropical_0", ["res_tomo"])).is_equal("market_subtropical_1")
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_1", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")   # no clash
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", [])).is_equal("tea_subtropical_0")
@@ -763,8 +765,8 @@ func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
 		for h in hairs: distinct[h] = true
 		assert_int(distinct.size()).override_failure_message("%s: %s" % [stem, hairs]).is_equal(3)
 
-## 不知火舞 on 284: no keeper set and no resident is the player's default hairhat0 + cloth0. Tomo waits for his
-## darker hairhat0 (上官婉儿's colour, with 刘备's batch); he is the one left.
+## 不知火舞 on 284: no keeper set and no resident is the player's default hairhat0 + cloth0 (Tomo wears the darker
+## hairhat0_npc_tomo, #407).
 func test_no_npc_wears_the_players_default_outfit() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
 	var keepers: Array = looks.keys().filter(func(k): return looks[k] is Dictionary and str(looks[k].get("hairHat", "")) == "hairhat0" \
@@ -773,7 +775,7 @@ func test_no_npc_wears_the_players_default_outfit() -> void:
 	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
 	var residents: Array = npcs.keys().filter(func(k): return str(npcs[k].slots.get("hairHat", "")) == "hairhat0" \
 		and str(npcs[k].slots.get("cloth", "")) == "cloth0")
-	assert_array(residents).is_equal(["res_tomo"])
+	assert_array(residents).is_empty()
 
 ## The S-tier trading post (the cabin, world_gen.json room.cabin) on the tea house's kit with its own anchors: Pip at the
 ## tea house's first resident spot and its s_order resident (Old Kai or Theo now) at the second — it read the tea
@@ -805,8 +807,7 @@ func test_the_cabin_shows_pip_and_its_second_resident() -> void:
 
 ## Every resident world_gen places (world.residents: fixed, rank once its room is built, the S-tier s_order) wears a
 ## look in outpost_npcs.json and has its spot in every room kind it can be placed in — else the room shows nobody
-## where the server put them (SGODOT-284: Rafa and Tomo came without a look, the cabin without Pip's spot). Granny Wu
-## waits for her NPC-only parts (刘备); she is the one name left to add.
+## where the server put them (SGODOT-284: Rafa, Tomo and Granny Wu came without a look, the cabin without Pip's spot).
 func test_every_placed_resident_has_a_look_and_a_spot_in_its_rooms() -> void:
 	var world: Dictionary = P0Logic.content().get("world", {})
 	var rules: Dictionary = world.get("residents", {})
@@ -827,7 +828,7 @@ func test_every_placed_resident_has_a_look_and_a_spot_in_its_rooms() -> void:
 		if built.get(str(r.id), true): add.call(str(r.id), "cabin")   # one whose own room is not built waits (Ivo, #403)
 	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
 	var missing: Array = kinds.keys().filter(func(id): return not npcs.has(id))
-	assert_array(missing).is_equal(["res_granny_wu"])
+	assert_array(missing).is_empty()
 	for id in kinds:
 		if not npcs.has(id): continue
 		var spot := str(npcs[id].get("anchor", ""))
