@@ -1,0 +1,187 @@
+{
+	"checks": [
+		{
+			"check": "hairhat41_npc_auburn: exact original FBX bytes",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: imported nodes, hierarchy, transforms and bone rests exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: hairHat socket attachment",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original offsets and tier",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: extracted node names/types/transforms exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: one mesh/surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: extracted geometry, normals, UVs and indices exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: exact original bounds",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original shared shader",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: recolored texture actually bound",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: original runtime texture size",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: available to NPC catalog",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_auburn: excluded from player catalog",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: exact original FBX bytes",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: imported nodes, hierarchy, transforms and bone rests exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: hairHat socket attachment",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original offsets and tier",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: extracted node names/types/transforms exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: one mesh/surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: extracted geometry, normals, UVs and indices exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: exact original bounds",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original shared shader",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: recolored texture actually bound",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: original runtime texture size",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: available to NPC catalog",
+			"passed": true
+		},
+		{
+			"check": "hairhat43_npc_black: excluded from player catalog",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"parts": {
+		"hairhat41_npc_auburn": {
+			"base": "hairhat41",
+			"bounds": "[P: (-0.350071, -0.385293, -0.403038), S: (0.781645, 0.611447, 0.794624)]",
+			"floats": {
+				"ao_strength": 0.1,
+				"diffuse_strength": 1.0,
+				"emission_strength": 0.7,
+				"rim_strength": 0.0,
+				"smoothness": 0.1
+			},
+			"mesh_transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]",
+			"surfaces": 1,
+			"texture_pixels": [
+				512,
+				512
+			],
+			"triangles": 2312
+		},
+		"hairhat43_npc_black": {
+			"base": "hairhat43",
+			"bounds": "[P: (-0.086047, -0.281154, -0.4418), S: (0.507499, 0.481912, 0.68316)]",
+			"floats": {
+				"ao_strength": 0.1,
+				"diffuse_strength": 1.0,
+				"emission_strength": 0.3,
+				"rim_strength": 0.0,
+				"smoothness": 0.1
+			},
+			"mesh_transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, -0.0, -0.00224)]",
+			"surfaces": 1,
+			"texture_pixels": [
+				512,
+				512
+			],
+			"triangles": 1156
+		}
+	}
+}

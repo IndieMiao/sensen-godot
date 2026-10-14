@@ -4,6 +4,7 @@
 
 ## 当前 UI 与 P0 美术
 
+- [刘备 · 生成城市掌柜发色变体 SGODOT-284](keeper-hair-284-2026-10-14/README.md)：hairhat41 红棕、hairhat43 软黑；保留饰件与原材质参数，含正面／3⁄4、全身卡／邮票及导入验证。两件 NPC 专用，苏烈后续接入 keeper_looks，不进 0.2.6。
 - [刘备 · #407 居民 NPC 部件审阅材料 SGODOT-284 / q(171)](resident-parts-284-2026-10-14/README.md)：Granny Wu 银白髻、Ivo 矿工帽/灰短胡/帆布棕衣服、Tomo 暖深棕发；五件的审阅图、验证记录、生成脚本与 Blender 源文件。[最新 Ivo 帽子明暗修订](resident-parts-284-2026-10-14/ivo-light/README.md)。运行时与配方由 #407 进入 farm-dev。
 - [刘备 · 费用板 SGODOT-275](fare-board-275-2026-10-14/README.md)：驿站七行无字挂墙板，674 面，复用原图集；含 43° 实景、正侧视、UV 与真实房间交叠验证，交亚瑟通过 props 接入。
 - [刘备 · 布告栏 SGODOT-284](notice-board-284-2026-10-13/README.md)：Lv5 独立双柱布告栏，v1.1 真实尺寸、原值顶点色、种子箱/井零交叠验证与三张 Godot 图；目标 0.2.6 之后，待双审。

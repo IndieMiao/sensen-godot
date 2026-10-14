@@ -1,0 +1,16 @@
+{
+  "keeper_auburn": {
+    "slots": {
+      "hairHat": "hairhat41_npc_auburn",
+      "cloth": "cloth1",
+      "shoes": "shoes1"
+    }
+  },
+  "keeper_black": {
+    "slots": {
+      "hairHat": "hairhat43_npc_black",
+      "cloth": "cloth1",
+      "shoes": "shoes1"
+    }
+  }
+}

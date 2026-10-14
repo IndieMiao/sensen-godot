@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-14" name="report_1" tests="38" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_part_catalog" package="tests/catalog" timestamp="2026-10-14T07:30:40" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="0.057">
+		<testcase name="test_load_valid" classname="test_part_catalog" time="0.008">
+		</testcase>
+		<testcase name="test_load_missing_file_returns_null" classname="test_part_catalog" time="0.009">
+		</testcase>
+		<testcase name="test_load_bad_schema_returns_null" classname="test_part_catalog" time="0.008">
+		</testcase>
+		<testcase name="test_duplicate_id_returns_null" classname="test_part_catalog" time="0.009">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="test_demo_denylist" package="tests/catalog" timestamp="2026-10-14T07:30:40" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="0.082">
+		<testcase name="test_denied_part_disappears_from_slot_pool" classname="test_demo_denylist" time="0.009">
+		</testcase>
+		<testcase name="test_unknown_id_is_ignored_not_error" classname="test_demo_denylist" time="0.009">
+		</testcase>
+		<testcase name="test_load_denylist_parses_ids" classname="test_demo_denylist" time="0.009">
+		</testcase>
+		<testcase name="test_load_denylist_rejects_bad_version" classname="test_demo_denylist" time="0.008">
+		</testcase>
+		<testcase name="test_missing_file_is_empty_not_error" classname="test_demo_denylist" time="0.007">
+		</testcase>
+		<testcase name="test_shipped_denylist_file_is_valid" classname="test_demo_denylist" time="0.008">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="test_npc_only" package="tests/catalog" timestamp="2026-10-14T07:30:40" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="0.114">
+		<testcase name="test_an_empty_list_changes_nothing" classname="test_npc_only" time="0.012">
+		</testcase>
+		<testcase name="test_an_npc_only_part_leaves_the_pools_but_stays_findable" classname="test_npc_only" time="0.012">
+		</testcase>
+		<testcase name="test_a_saved_outfit_drops_npc_only_parts" classname="test_npc_only" time="0.010">
+		</testcase>
+		<testcase name="test_online_appearance_refuses_npc_only_parts_unless_for_an_npc" classname="test_npc_only" time="0.009">
+		</testcase>
+		<testcase name="test_load_npc_only_parses_and_rejects_bad_files" classname="test_npc_only" time="0.009">
+		</testcase>
+		<testcase name="test_the_shipped_list_is_valid" classname="test_npc_only" time="0.027">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="test_mixamo_retarget" package="tests/pipeline" timestamp="2026-10-14T07:30:40" hostname="localhost" tests="8" failures="0" errors="0" skipped="0" flaky="0" time="0.247">
+		<testcase name="test_normalize_source_bone_names" classname="test_mixamo_retarget" time="0.008">
+		</testcase>
+		<testcase name="test_bone_map_targets_exist_in_rig" classname="test_mixamo_retarget" time="0.033">
+		</testcase>
+		<testcase name="test_rotation_delta_is_carried_in_world_space" classname="test_mixamo_retarget" time="0.034">
+		</testcase>
+		<testcase name="test_unmapped_bones_pinned_to_rest_with_single_key" classname="test_mixamo_retarget" time="0.033">
+		</testcase>
+		<testcase name="test_hips_translation_scaled_by_height_and_in_place_strips_xz" classname="test_mixamo_retarget" time="0.035">
+		</testcase>
+		<testcase name="test_source_facing_backwards_is_corrected" classname="test_mixamo_retarget" time="0.034">
+		</testcase>
+		<testcase name="test_register_real_clips_updates_table" classname="test_mixamo_retarget" time="0.011">
+		</testcase>
+		<testcase name="test_xbot_fixture_walk_animates_knee" classname="test_mixamo_retarget" time="0.008">
+		</testcase>
+	</testsuite>
+	<testsuite id="4" name="test_converted_assets" package="tests/pipeline" timestamp="2026-10-14T07:30:40" hostname="localhost" tests="5" failures="0" errors="0" skipped="0" flaky="0" time="1.420">
+		<testcase name="test_manifest_loads_and_parts_valid" classname="test_converted_assets" time="0.443">
+		</testcase>
+		<testcase name="test_mesh_parts_have_toon_material" classname="test_converted_assets" time="0.410">
+		</testcase>
+		<testcase name="test_socket_scenes_are_not_bloated_with_whole_fbx" classname="test_converted_assets" time="0.407">
+		</testcase>
+		<testcase name="test_mesh_part_skin_bind_names_match_base_rig_bones" classname="test_converted_assets" time="0.113">
+		</testcase>
+		<testcase name="test_eyes_material_is_pure_black" classname="test_converted_assets" time="0.011">
+		</testcase>
+	</testsuite>
+	<testsuite id="5" name="test_base_rig" package="tests/pipeline" timestamp="2026-10-14T07:30:42" hostname="localhost" tests="3" failures="0" errors="0" skipped="0" flaky="0" time="0.219">
+		<testcase name="test_base_rig_structure" classname="test_base_rig" time="0.035">
+		</testcase>
+		<testcase name="test_animations_present_and_play" classname="test_base_rig" time="0.125">
+		</testcase>
+		<testcase name="test_slot_table_bones_exist_in_skeleton" classname="test_base_rig" time="0.034">
+		</testcase>
+	</testsuite>
+	<testsuite id="6" name="test_extract_append" package="tests/pipeline" timestamp="2026-10-14T07:30:42" hostname="localhost" tests="5" failures="0" errors="0" skipped="0" flaky="0" time="0.072">
+		<testcase name="test_appending_writes_what_the_default_mode_would_write_for_the_same_entries" classname="test_extract_append" time="0.009">
+		</testcase>
+		<testcase name="test_the_shipped_manifest_stays_byte_for_byte_ahead_of_the_new_entries" classname="test_extract_append" time="0.010">
+		</testcase>
+		<testcase name="test_nothing_to_add_leaves_the_text_alone_and_a_broken_text_is_refused" classname="test_extract_append" time="0.009">
+		</testcase>
+		<testcase name="test_only_ids_missing_from_the_manifest_are_extracted" classname="test_extract_append" time="0.008">
+		</testcase>
+		<testcase name="test_entries_land_in_parts_not_in_a_later_top_level_array" classname="test_extract_append" time="0.009">
+		</testcase>
+	</testsuite>
+	<testsuite id="7" name="test_socket_placement" package="tests/assembly" timestamp="2026-10-14T07:30:42" hostname="localhost" tests="1" failures="0" errors="0" skipped="0" flaky="0" time="1.365">
+		<testcase name="test_every_hairhat_sits_on_the_head" classname="test_socket_placement" time="1.351">
+		</testcase>
+	</testsuite>
+</testsuites>

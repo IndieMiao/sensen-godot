@@ -1,0 +1,74 @@
+[
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_npc-lineup-front.png",
+    "attachment_id": "72043541-9ae6-4e68-837f-6113f6d7239d",
+    "sha256": "4535fc68d45c6f50e8054f0e437b3a8e225109432cf3f3031e6fcb413c80b20f",
+    "bytes": 87635,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_npc-lineup-three-quarter.png",
+    "attachment_id": "0ae0ac54-dde3-4048-bf79-2e45e9152712",
+    "sha256": "868942f6a851f3e05a39fa3c202076bd307e6f7315d56bf33d776a3c6ea2d183",
+    "bytes": 80410,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_keeper_auburn_card.jpg",
+    "attachment_id": "aaba778d-6b5b-4c86-b097-36e641816073",
+    "sha256": "619cc45b22e32198d293e92a74e5b96bc473bd1f6cfcab3e93f59170b1389f29",
+    "bytes": 27496,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_keeper_black_card.jpg",
+    "attachment_id": "332589d9-88ef-4e86-8b30-d511108f66ac",
+    "sha256": "b19547805327c69c19cde1dc91b9d4cb587fd2d6144ebc01755cea946406348c",
+    "bytes": 23733,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_stamps.png",
+    "attachment_id": "c32f1ce1-10cb-4b40-b12f-85aea3259a5b",
+    "sha256": "4581172e28d0b875c918d72f516e2106d8ad62d4a292e7abfd14128d78ec6a99",
+    "bytes": 39496,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_texture-comparison.png",
+    "attachment_id": "9bc75628-fb9a-4484-968c-2d9c65454fed",
+    "sha256": "87d77a2e2c7d4deea1df6d175cf6b37f3c2a771c7081a35f709be7a8ce2ec880",
+    "bytes": 440070,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_validation.json",
+    "attachment_id": "befc7e4b-d6c6-4b14-9261-84d96954b6c1",
+    "sha256": "400dbe6cbce47226c29b518d39f4b16458ee9257ab48435fcffe312bcc759006",
+    "bytes": 13892,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-284_KEEPER_HAIR_v1_review-materials.zip",
+    "attachment_id": "a395617c-17f8-4497-8ba4-68959b1899c4",
+    "sha256": "b0fe4f0ea8ddcbf091524bd6626ac2f65f32ffbd1eb801fe19af17ca4793775b",
+    "bytes": 1001727,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]
