@@ -1825,6 +1825,14 @@ static func bag_tier_note(view: Dictionary, id: String) -> String:
 	if owned: return "Bag %d → %d" % [int(before.get("capacity", now)), to]
 	return "Bag %d · after %s" % [to, str(before.get("name", "")).trim_prefix("Bag ")]
 
+## A Bag Upgrade's own slots: its capacity less the tier before it (Upgrade I: the bag's starting 25) — +5 each, whatever
+## the bag holds now (不知火舞 on 283, q(194): the buy row, its › card and the full-bag row say the same).
+static func bag_tier_slots(id: String) -> int:
+	var tier := _bag_tier(id)
+	if tier.is_empty(): return 0
+	var before := _bag_tier(str(tier.get("requires", "")))
+	return int(tier.get("capacity", 0)) - int(before.get("capacity", content().get("bag", {}).get("capacity", 25)))
+
 static func _bag_tier(id: String) -> Dictionary:
 	for t in content().get("bag_upgrades", []):
 		if str(t.get("id", "")) == id: return t

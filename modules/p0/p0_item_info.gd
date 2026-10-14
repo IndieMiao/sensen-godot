@@ -449,10 +449,10 @@ static func _offer_use(view: Dictionary, offer: Dictionary) -> String:
 	match str(offer.get("to", "")):
 		"storage": return "Goes to your Farm Storage"
 		"bag_cap":
-			for up in P0Logic.content().get("bag_upgrades", []):
-				if str(up.get("id", "")) != str(offer.get("id", "")): continue
-				var more := int(up.get("capacity", 0)) - int(view.get("bag", {}).get("capacity", 25))
-				return ("+%d bag slots" % more) if more > 0 else ""
+			# the tier's own slots (+5), not its capacity less the bag's now: Upgrade II, bought only after I, said `+10`
+			# to a bag still at 25 (不知火舞 on 283, q(194))
+			var more := P0Logic.bag_tier_slots(str(offer.get("id", "")))
+			return ("+%d bag slots" % more) if more > 0 else ""
 	return ""
 
 ## "10 Reeds" — the first material still short for a buy row, "" when all are in.

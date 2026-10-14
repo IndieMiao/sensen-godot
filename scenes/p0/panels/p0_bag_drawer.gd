@@ -223,21 +223,25 @@ static func storage_items(view: Dictionary, cat: String, at := "home") -> Array:
 		if in_category(it, cat): out.append(it)
 	return out
 
-## BAG-5: with every slot taken, where more room comes from — `Bag full · +5 slots at Homestead Lv3` while Bag
-## Upgrade I is locked, `Bag full · +5 slots · Bag Upgrade I` once it is for sale; "" when the bag has room or no
-## upgrade is left (the row only shows where it can lead somewhere).
+## BAG-5: with every slot taken, where more room comes from — the next Bag Upgrade not yet bought (P1 exit C13: it named
+## only Upgrade I, so the row went once I was bought, with II and III still ahead): `Bag full · +5 slots at Homestead
+## Lv6` while that tier's level is not reached, `Bag full · +5 slots · Bag Upgrade II` once it is for sale (I at Lv3, II
+## at Lv6, III at Lv9). "" when the bag has room, every tier is bought, or the view does not say a tier's state (an older
+## server): the row only shows where it can lead somewhere.
 static func bag_full_text(view: Dictionary) -> String:
 	var bag: Dictionary = view.get("bag", {})
 	var cap := int(bag.get("capacity", 25))
 	if (bag.get("slots", []) as Array).size() < cap: return ""
-	var state := str(view.get("homestead", {}).get("unlocks", {}).get("bag_upgrade_1", ""))
-	var ups: Array = P0Logic.content().get("bag_upgrades", [])
-	if ups.is_empty() or state in ["", "owned"]: return ""
-	var up: Dictionary = ups[0]
-	var more := int(up.get("capacity", cap)) - cap
-	if more <= 0: return ""
-	if state == "locked": return "Bag full · +%d slots at Homestead Lv%d" % [more, int(up.get("homestead", 0))]
-	return "Bag full · +%d slots · %s" % [more, str(up.get("name", ""))]
+	var unlocks: Dictionary = view.get("homestead", {}).get("unlocks", {})
+	for up in P0Logic.content().get("bag_upgrades", []):
+		var state := str(unlocks.get(str(up.get("id", "")), ""))
+		if state == "owned": continue
+		if state == "": return ""
+		var more := P0Logic.bag_tier_slots(str(up.get("id", "")))   # this tier's own +5 (q(194))
+		if more <= 0: return ""
+		if state == "locked": return "Bag full · +%d slots at Homestead Lv%d" % [more, int(up.get("homestead", 0))]
+		return "Bag full · +%d slots · %s" % [more, str(up.get("name", ""))]
+	return ""
 
 ## The line above the grid: `Materials · Bag first, then Farm Storage` when storage stacks follow.
 static func hint_for(cat: String, has_storage: bool) -> String:
