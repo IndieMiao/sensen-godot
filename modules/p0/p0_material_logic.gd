@@ -438,6 +438,11 @@ static func run_complete(view: Dictionary, loot) -> Dictionary:
 ## The elite's second kill of the day drops no quartz (§13.3.4): the float that says so once.
 const QUARTZ_ONCE := "Quartz · first kill each day"   # q(116) ②: shown from the day's second elite on
 
+## Its float: a result line of its own over the kill's items (q(124) ⑦, as `Harvest 3 of 5 · bag full`), never joined
+## to them — `+3 Worm Bait · Quartz · first kill each day` read as if quartz came (李白 / 不知火舞 B7 on 286).
+static func quartz_once_float() -> Dictionary:
+	return {kind = "result", key = QUARTZ_ONCE, text = QUARTZ_ONCE, tone = UiFloatText.Tone.ITEM}
+
 # --- Gathering spots (farm) ---
 
 ## Finger card and badge per spot (§13.2.2, STATE-ICONS): READY with "Tap to gather", a countdown, or the Homestead gate.

@@ -103,6 +103,7 @@ func test_trap_slots_pill_sits_on_the_creel_row_while_fishing() -> void:
 	var pill := ui._trap_slots
 	assert_bool(pill.visible).is_true()
 	assert_str(ui._trap_slots_text.text).is_equal("Trap slots 1/2")
+	assert_str(str(ui._trap_slots_text.theme_type_variation)).is_equal(str(UiTokens.STYLE_CAPTION_B12))   # StatusLine, Bold 12
 	assert_float(pill.position.y).is_equal(ui._creel.position.y)
 	assert_float(ui.root.size.x - pill.get_rect().end.x).is_equal_approx(ui._creel.position.x, 0.5)
 	ui.set_trap_slots("")   # the trap no longer picked

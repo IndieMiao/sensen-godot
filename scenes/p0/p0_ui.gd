@@ -232,7 +232,8 @@ func _build_bar() -> void:
 	_status.hide()
 	_kit.add_child(_status)   # kit theme for the C11XB type style
 	# TRAP-2 (不知火舞 B7 on 286): with the Fish Trap picked at a pond, `Trap slots 0/1` on the creel's row, right, in
-	# the creel badge's pill (radius 12, CaptionXB12); its right edge as far in as the creel's left one
+	# the creel badge's pill (radius 12) but the StatusLine type, Bold 12 and no icon (283 3fa2398f); its right edge as
+	# far in as the creel's left one
 	_trap_slots = PanelContainer.new()
 	_trap_slots.name = "TrapSlots"
 	_trap_slots.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, 12.0, UiTokens.COLOR_BORDER,
@@ -241,7 +242,7 @@ func _build_bar() -> void:
 	_trap_slots.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_trap_slots.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_trap_slots.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
-	_trap_slots_text = UiKit.label("", UiTokens.STYLE_CAPTION_XB12)
+	_trap_slots_text = UiKit.label("", UiTokens.STYLE_CAPTION_B12)
 	_trap_slots.add_child(_trap_slots_text)
 	_trap_slots.hide()
 	_kit.add_child(_trap_slots)

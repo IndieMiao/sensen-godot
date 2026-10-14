@@ -674,8 +674,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if rt.ui.bar_mode == "combat" and P0MaterialLogic.mobs_up(v, floor_n) == 0 and rock_count(floor_n) > 0:
 					rt.ui.set_mode("mine")
 				if bool(e.get("quartz_spent", false)):
-					rt.ui.queue_floats([{kind = "item", key = P0MaterialLogic.QUARTZ_ONCE, text = P0MaterialLogic.QUARTZ_ONCE,
-						tone = UiFloatText.Tone.ITEM}], rt.anchor())
+					rt.ui.queue_floats([P0MaterialLogic.quartz_once_float()], rt.anchor())
 			"knocked_out":   # the elite's last blow and the player's fall count as a win (q(116) ③): see _knocked_out
 				if not events.any(func(x): return str(x.get("kind", "")) == "mine" and str(x.get("action", "")) == "complete"): _knocked_out()
 			"complete": _run_complete(v, events)
