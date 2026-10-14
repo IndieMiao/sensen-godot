@@ -1217,7 +1217,9 @@ static func _without_time(item: String) -> String:
 ## Titles by key (§4.6 Lv10, appendix glossary; SGODOT-275): the one place their names live (奕星). A skill's title is
 ## a `title_*` key among its conveniences in content, at the level it comes (farming.conveniences.title_master_gardener
 ## 10); the level's line names it here, and its card follows the level banner (title_card).
-const TITLE_NAMES := {"title_master_gardener": "Master Gardener", "title_master_angler": "Master Angler", "title_chef": "Chef"}
+## Homestead Lv10's and the Explorer medals' titles (§11.9.2) are named here too, for the Titles drawer (q(180), P0Titles).
+const TITLE_NAMES := {"title_master_gardener": "Master Gardener", "title_master_angler": "Master Angler", "title_chef": "Chef",
+	"title_homestead_master": "Homestead Master", "title_wanderer": "Wanderer", "title_globetrotter": "Globetrotter"}
 
 ## A level's line for its title, after the level's other unlocks: `Chef title`, `Master Gardener title` (不知火舞 on 282).
 static func title_line(id: String) -> String: return "%s title" % str(TITLE_NAMES.get(id, id))

@@ -942,6 +942,7 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
 	if str(cmd.get("type", "")) in ["cook", "cook_all", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
@@ -1074,6 +1075,7 @@ func _harvest_stopped(v: Dictionary) -> void:
 ## A request that never got an answer (8 s, a 5xx or not JSON). The server URL goes to the log, not the screen.
 func _net_failed(msg: String, cmd := {}) -> void:
 	push_warning("P0: %s · %s" % [msg, session.base_url])
+	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	_end_resume()
 	if _launch_s >= 0.0 and session.view.is_empty():
 		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)
@@ -1502,6 +1504,13 @@ func _dev_shot(dt: float) -> void:
 				for n in ui.find_children("*", "", true, false):
 					if n.has_method("unfold"): n.unfold(step[1] if step.size() > 1 else "fishing", true)
 			"profile": ui.open_profile()
+			# q(180) shots: titles opens Titles from the profile's title; titlepick:<id> taps that row (ids keep their `:`)
+			"titles":
+				ui.open_profile()
+				ui._profile.title_pressed.emit()
+			"titlepick":
+				var row := ui.root.find_child(("Title_" + ":".join(step.slice(1)).replace(":", "_")).validate_node_name(), true, false)
+				if row is Button: (row as Button).pressed.emit()
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())

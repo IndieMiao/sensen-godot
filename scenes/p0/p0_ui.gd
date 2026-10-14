@@ -2831,7 +2831,8 @@ static func resident_profile_data(view_: Dictionary, id: String) -> Dictionary:
 
 ## A 44 Close above a bottom card or sheet, right-aligned `inset` in from its right edge and `gap` above its top
 ## (Close · 44 px: 6 above a sheet, 8 above the dialogue bar). It follows the content as it slides and resizes.
-func _close_above(content: Control, gap: float, inset := 0.0) -> void:
+## on_close: what Close does (close_modal: out to the world; close_layer for a drawer over the profile).
+func _close_above(content: Control, gap: float, inset := 0.0, on_close := Callable()) -> void:
 	var close := UiCloseButton.new()
 	close.theme = UiKit.theme()
 	close.size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE)
@@ -2839,7 +2840,7 @@ func _close_above(content: Control, gap: float, inset := 0.0) -> void:
 		if is_instance_valid(close):
 			close.position = content.position + Vector2(content.size.x - inset - UiTokens.SIZE_CLOSE, -gap - UiTokens.SIZE_CLOSE)
 	content.item_rect_changed.connect(follow)
-	close.pressed.connect(close_modal)
+	close.pressed.connect(on_close if on_close.is_valid() else close_modal)
 	_modal.add_child(close)
 	follow.call()
 
@@ -2975,7 +2976,7 @@ var _over_profile := false
 
 func open_profile(look_saved := false) -> void:
 	_over_profile = false
-	var page := P0ProfilePage.new(view, safe_top(), look_saved)
+	var page := P0ProfilePage.new(view, safe_top(), look_saved, title_pending)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
 	page.skill_pressed.connect(func(_skill: String):
@@ -2994,9 +2995,43 @@ func open_profile(look_saved := false) -> void:
 		_over_profile = true
 		open_home_panel(func(): open_profile()))
 	page.settings_pressed.connect(func(): open_settings(func(): open_profile()))
+	page.title_pressed.connect(func():
+		_over_profile = true
+		open_titles(func(): open_profile()))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## q(180) Titles (P0TitlesDrawer) from the title beside the name on the profile, over the profile, Close 44 above it as
+## MAP-8's. A row asks the server to wear that title and goes back to the profile, which shows it at once: the pick is
+## kept as pending ({id, seq}) until the server's answer moves the view past that seq (P0Titles.worn).
+const TitlesDrawer := preload("res://scenes/p0/panels/p0_titles_drawer.gd")
+const P0Titles := preload("res://modules/p0/p0_titles.gd")
+var title_pending := {}
+
+## The server did not put that pick on — refused, or no answer came (周瑜 on #417): the pick is dropped and the profile
+## shows the title the server says is worn.
+func title_not_worn(id: String) -> void:
+	if str(title_pending.get("id", "")) != id: return
+	title_pending = {}
+	if _profile != null and is_instance_valid(_profile) and not _profile.is_queued_for_deletion():
+		_profile.title_pending = {}
+		_profile.refresh(view)
+
+func open_titles(back := Callable()) -> UiDrawer:
+	var d: UiDrawer = TitlesDrawer.new(P0Titles.rows(view, title_pending))
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_layer)
+	d.connect(&"title_picked", func(id: String):
+		title_pending = {id = id, seq = int(view.get("seq", -1))}
+		command.emit({"type": "wear_title", "id": id})
+		close_layer())
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE, close_layer)
+	modal_kind = "titles"
+	_modal_back = back
+	return d
 
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
