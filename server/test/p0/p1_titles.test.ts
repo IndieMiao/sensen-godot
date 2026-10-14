@@ -24,6 +24,7 @@ const refusal = (s: P0State, cmd: P0Command) => { const r = applyP0(c, s, cmd, T
 function everything(): P0State {
   const s = fresh();
   s.homestead.level = 10;
+  s.homestead.plaque.push({ level: 10, at: T0 });
   s.inbox.granted.push('level:farming:10', 'level:fishing:10', 'level:cooking:10', 'req:req_res_kai_3', 'req:req_res_pip_5');
   s.firsts.push('milestone:muscle_memory', 'milestone:line_cook', 'milestone:master_chef', 'milestone:head_chef');
   s.rewards.push('cookbook_8');
@@ -52,11 +53,28 @@ describe('titles (q(180))', () => {
     const s = fresh();
     s.skills.farming = 10_000_000;
     s.homestead.level = 9;
+    s.homestead.plaque.push({ level: 9, at: T0 });
     s.travel.explorer = 30;
     expect(ownedTitles(c, s)).toEqual(['explorer:3']);
     s.inbox.granted.push('level:farming:9');   // a gift of another level names no title
     s.rewards.push('title:Route Buddy');   // only the request's own reward key counts (a text record changes with renames)
     expect(ownedTitles(c, s)).toEqual(['explorer:3']);
+  });
+
+  it('raised thresholds take nothing back: the records keep the Lv10 titles and Home Cook (q(180) ①)', () => {
+    const raised = structuredClone(c);
+    raised.homestead.max_level = 12;
+    for (const l of raised.homestead.levels) l.unlocks = l.unlocks.filter(u => u !== 'title_homestead_master');
+    raised.homestead.levels.push({ ...raised.homestead.levels.at(-1)!, level: 12, unlocks: ['title_homestead_master'] });
+    raised.farming!.conveniences!.title_master_gardener = 12;
+    raised.cooking.conveniences = { ...raised.cooking.conveniences, title_chef: 12 } as typeof raised.cooking.conveniences;
+    raised.rewards.cookbook = [[10, 50]];
+    for (const m of raised.cooking.milestones!) if (m.discovered !== undefined) m.discovered += 4;
+    expect(ownedTitles(raised, everything())).toEqual(ownedTitles(c, everything()));
+    // and a Lv10 homestead set by hand, with no plaque of the upgrade, has no Homestead Master
+    const hand = fresh();
+    hand.homestead.level = 10;
+    expect(ownedTitles(c, hand)).toEqual([]);
   });
 
   it('wears the first until one is picked, and that is not written: a title earlier in the order shows of itself', () => {
@@ -77,6 +95,8 @@ describe('titles (q(180))', () => {
     expect(s.title).toBe('kindred:res_pip');
     expect(titles(s)).toEqual({ list: ['explorer:3', 'kindred:res_pip'], wearing: 'kindred:res_pip' });
     s.homestead.level = 10;
+    s.homestead.plaque.push({ level: 10, at: T0 });
+    expect(titles(s).list[0]).toBe('homestead');
     expect(titles(s).wearing).toBe('kindred:res_pip');
     expect({ coins: s.coins, energy: s.energy.value }).toEqual({ coins: fresh().coins, energy: fresh().energy.value });   // free
   });
