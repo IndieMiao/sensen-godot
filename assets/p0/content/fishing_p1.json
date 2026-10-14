@@ -1,6 +1,9 @@
 {
   "_note": "P1 钓鱼第二段（周瑜，SGODOT-283；方案 §6.2.6–6.2.7、§6.3.1、§6.4，李白 q(109)）：Coast 模板；碳素竿（可收至 Legendary，提竿窗口 +0.8 s，绿带 +5 个百分点，条外损耗 ×0.9，咬钩随机幅 1.8 s）；亮片（Fishing Lv5、6 金币、每日 10 枚（账号级）、地区鱼权重 ×2）；天气（城市 × 当地日期哈希，晴 50 / 雨 30 / 风 20，城市当地 04:00 换日）与全服种子。鱼塘的鱼不再列在 sites 里，而是由鱼表的栖息 + 本城 2 种地区鱼 + 时段推出来（server/src/p0/fishing_world.ts，客户端 modules/p0/p0_fish_world.gd）。Clover Pond 改为 Coast 这一项在主文件 fishing.places 里。鱼笼 trap_fish（§6.8、q(109) ④⑦）：渔具铺 120 金币，Fishing Lv5；背包 Tackle 页堆叠 3；同时在水里 Lv5 1 / Lv8 2 / Lv10 3 只，每塘每人 1 只；每 8 h 1 条该塘 Common / Fine（Lv9 起 10% Rare），存 3；收取 XP 50%（server/src/p0/fish_trap.ts）。",
   "fishing": {
+    "conveniences": {
+      "title_master_angler": 10
+    },
     "sites": {
       "coast": {
         "name": "Coast",
