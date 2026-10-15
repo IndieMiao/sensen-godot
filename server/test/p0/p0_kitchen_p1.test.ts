@@ -6,6 +6,8 @@ import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reduc
 import { maxEnergy } from '../../src/p0/rules.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { cookable, fits, ingredientsFor, servingPicks } from '../../src/p0/cooking.js';
+import { ingredientStock } from '../../src/p0/kitchen_storage.js';
 
 const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 10, 2);
@@ -260,6 +262,24 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     expect(w1.picks).toHaveLength(3);
     expect(w1.saved).toMatchObject({ fish_crucian: 'dish_grilled_crucian' });
     expect(page('dish_carp_cakes').picks).toBeUndefined();   // cannot cook (one carp): no picks
+  });
+
+  it('picks reuse a set while it is all there: the same as picking every serving afresh, on a full Cookbook and stock', () => {
+    const s = cook(10, 10);
+    s.cookbook = c.cooking.recipes.map(r => r.id);
+    s.bag = [...c.fish.map(f => ({ id: f.id, qty: 7 })), ...c.crops.map(cr => ({ id: cr.id, qty: 5 })), { id: 'rock_salt', qty: 9 }];
+    s.bag_cap = 999;
+    for (const r of c.cooking.recipes.filter(r => cookable(c, r))) {
+      const stock = ingredientStock(c, s);
+      const fresh: string[][] = [];
+      while (fresh.length < 12) {
+        const set = ingredientsFor(c, s, r, stock);
+        if (!set || !fits(c, r, set)) break;
+        for (const id of set) stock.set(id, stock.get(id)! - 1);
+        fresh.push(set);
+      }
+      expect(servingPicks(c, s, r, 12)).toEqual(fresh);
+    }
   });
 
   it('the view lists the Lv7–10 conveniences once reached; Cook All is gone', () => {

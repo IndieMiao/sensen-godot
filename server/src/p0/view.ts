@@ -3,7 +3,7 @@ import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES
 import { count, freeSlots } from './bag.js';
 import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
-import { batchRoom, burners, cookSlots, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
+import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -168,11 +168,12 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         // Pot), and saved: why a picked item was rather kept (an accepted request, or another known page's id), so the
         // card shows a batch's ×N, its servings and the amber slot before Cook.
         const most = Math.max(1, (hasConvenience(c, s, 'batch_cook') ? batchRoom(c, s) : 1) * (bigPot(c, s) ? 2 : 1));
+        const index = keptIndex(c, s);
         const pages = book.pages.map(p => {
           const r = p.can_cook ? recipeById(c, p.id) : undefined;
           if (!r) return p;
-          const picks = servingPicks(c, s, r, most);
-          const why = keptReason(c, s, r);
+          const picks = servingPicks(c, s, r, most, index);
+          const why = keptReason(c, s, r, index);
           const saved = Object.fromEntries([...new Set(picks.flat())].flatMap(id => (why(id) ? [[id, why(id)]] : [])));
           return { ...p, picks, saved };
         });

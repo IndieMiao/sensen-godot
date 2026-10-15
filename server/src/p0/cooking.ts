@@ -88,7 +88,7 @@ export function tokenMatches(c: P0Content, token: string, id: string): boolean {
   return !!ing && ing.family === tag[1] && ing.rarity === Number(tag[2]);
 }
 
-function fits(c: P0Content, recipe: Recipe, items: string[]): boolean {
+export function fits(c: P0Content, recipe: Recipe, items: string[]): boolean {
   if (recipe.in.length !== items.length) return false;
   const used = new Array(items.length).fill(false);
   const place = (i: number): boolean => {
@@ -116,12 +116,12 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
  * is Grilled Crucian's). Without such a set, the cheapest set that fits still cooks this page (startPot cooks the
  * chosen page); null when nothing fits.
  */
-export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe, stock?: Map<string, number>): string[] | null {
+export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe, stock?: Map<string, number>, keptFn?: (id: string) => boolean): string[] | null {
   const left = new Map(stock ?? ingredientStock(c, s));
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
   // q(99): a tag slot takes last what another known page names (Pond Crucian for Grilled Crucian) or an accepted
   // request wants handed in (the tutorial included); with nothing else left it still takes them and cooks this page.
-  const kept = keptForLater(c, s, recipe);
+  const kept = keptFn ?? keptForLater(c, s, recipe);
   const later = (id: string) => (kept(id) ? 1 : 0);
   // Specific tokens first so a tag never eats the item a named slot needs.
   const order = [...recipe.in].sort((a, b) => Number(TAG.test(a)) - Number(TAG.test(b)));
@@ -162,11 +162,18 @@ function keptForLater(c: P0Content, s: P0State, recipe: Recipe): (id: string) =>
  * it, else the id of the first other known page that names it; null when it is free to take. The recipe card marks
  * such a slot and its toast says `Uses Pond Crucian saved for a request` / `… saved for Herb Grilled Fish`.
  */
-export function keptReason(c: P0Content, s: P0State, recipe: Recipe): (id: string) => string | null {
-  const pages = new Map<string, string>();
+export function keptReason(c: P0Content, s: P0State, recipe: Recipe, index: KeptIndex = keptIndex(c, s)): (id: string) => string | null {
+  return id => (index.wanted(id) ? 'request' : index.named.get(id)?.find(page => page !== recipe.id) ?? null);
+}
+
+/** What keptReason reads, built once for a whole view (刘邦 on #432: per page and per pick it ran every page again):
+ * named = item id → the known pages naming it, Cookbook order; wanted = an accepted request wants it. */
+export type KeptIndex = { named: Map<string, string[]>; wanted: (id: string) => boolean };
+export function keptIndex(c: P0Content, s: P0State): KeptIndex {
+  const named = new Map<string, string[]>();
   for (const r of cookablePages(c)) {
-    if (r.id === recipe.id || !s.cookbook.includes(r.id)) continue;
-    for (const t of r.in) if (!TAG.test(t) && !pages.has(t)) pages.set(t, r.id);
+    if (!s.cookbook.includes(r.id)) continue;
+    for (const t of r.in) if (!TAG.test(t) && !named.get(t)?.includes(r.id)) named.set(t, [...(named.get(t) ?? []), r.id]);
   }
   const ids = new Set<string>();
   for (const slot of [...s.boards.stall, ...s.boards.market]) {
@@ -179,7 +186,7 @@ export function keptReason(c: P0Content, s: P0State, recipe: Recipe): (id: strin
     if (q.need.id) ids.add(q.need.id); else needs.push(q.need);
   }
   const wanted = (id: string) => ids.has(id) || needs.some(n => itemKind(id) === n.kind && (n.rarity === undefined || (fishById(c, id)?.rarity ?? 0) === n.rarity));
-  return id => (wanted(id) ? 'request' : pages.get(id) ?? null);
+  return { named, wanted };
 }
 
 /**
@@ -188,14 +195,20 @@ export function keptReason(c: P0Content, s: P0State, recipe: Recipe): (id: strin
  * later serving. At most `most` sets; empty when not even one fits. A Big Pot pot takes two of them in a row and a
  * batch takes them pot after pot, so the recipe card can tell how many pots and servings the stock covers.
  */
-export function servingPicks(c: P0Content, s: P0State, recipe: Recipe, most: number): string[][] {
+export function servingPicks(c: P0Content, s: P0State, recipe: Recipe, most: number, index: KeptIndex = keptIndex(c, s)): string[][] {
   const stock = ingredientStock(c, s);
+  const why = keptReason(c, s, recipe, index);
+  const kept = (id: string) => why(id) !== null;
   const out: string[][] = [];
+  // While the last set is still all there the stove would pick it again (taking stock only removes options, so no
+  // earlier option can start fitting): reuse it and search again only once one of its items runs out.
+  const left = (set: string[]) => set.every(id => (stock.get(id) ?? 0) >= set.filter(x => x === id).length);
   while (out.length < most) {
-    const set = ingredientsFor(c, s, recipe, stock);
+    const last = out[out.length - 1];
+    const set = last && left(last) ? last : ingredientsFor(c, s, recipe, stock, kept);
     if (!set || !fits(c, recipe, set)) break;
     for (const id of set) stock.set(id, (stock.get(id) ?? 0) - 1);
-    out.push(set);
+    out.push([...set]);
   }
   return out;
 }
