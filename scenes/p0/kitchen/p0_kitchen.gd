@@ -599,7 +599,7 @@ func _catch(i: int) -> void:
 	if i == stove_index:
 		stage.set_cooking(true)
 		return
-	var mouth := room.anchor("drop_pot_%d" % (i + 1))
+	var mouth: Node3D = room.call("steam_from", i) if room.has_method("steam_from") else room.anchor("drop_pot_%d" % (i + 1))
 	if mouth: stage.puff_at(mouth)
 
 ## Where a batch's ingredients float (q(124) ④): just above the pot card (else the drawer), centred on the screen.

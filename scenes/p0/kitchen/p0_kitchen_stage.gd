@@ -38,6 +38,13 @@ var _steam: CPUParticles3D
 var _plate: Node3D
 var _base_glow := 0.0
 var _cooking := false
+## Where this pot's steam rises when not its mouth (the Big Pot's vent, 282 v1.1); null: just above the mouth. From the
+## vent it is a fine wisp, the puffs about 0.6 of the mouth's.
+var steam_point: Node3D
+const STEAM_LIFT := Vector3(0, 0.06, 0)
+const VENT_SCALE := 0.6
+const STEAM_SCALE := Vector2(0.6, 1.2)   # the mouth's puffs, scale_amount min / max
+const STEAM_RADIUS := 0.06
 
 func _ready() -> void:
 	_steam = _make_steam()
@@ -45,6 +52,13 @@ func _ready() -> void:
 	if glow_light: _base_glow = glow_light.light_energy
 
 func _process(_dt: float) -> void:
+	var vent := is_instance_valid(steam_point) and steam_point.is_inside_tree()
+	if vent: _steam.global_position = steam_point.global_position
+	else: _steam.position = STEAM_LIFT
+	var k := VENT_SCALE if vent else 1.0
+	_steam.scale_amount_min = STEAM_SCALE.x * k
+	_steam.scale_amount_max = STEAM_SCALE.y * k
+	_steam.emission_sphere_radius = STEAM_RADIUS * k
 	if cam == null: return
 	var px := world_per_px()
 	for id in _cards:
@@ -216,14 +230,14 @@ func is_cooking() -> bool: return _cooking
 
 ## Another stove's pot catches (Cook All, q(124)): a puff of steam at its mouth. The working stove's own pot uses
 ## set_cooking (the hearth and the steaming).
-func puff_at(mouth: Node3D) -> void:
+func puff_at(mouth: Node3D, life := 0.7) -> void:
 	var p := _make_steam()
 	p.one_shot = true
 	p.amount = 10
-	p.lifetime = 0.7
+	p.lifetime = life
 	mouth.add_child(p)   # in the tree first: emitting reads its global transform
 	p.emitting = true
-	get_tree().create_timer(1.0).timeout.connect(p.queue_free)
+	get_tree().create_timer(life + 0.3).timeout.connect(p.queue_free)
 
 func _puff() -> void:
 	var p := _make_steam()
@@ -245,9 +259,9 @@ func _make_steam() -> CPUParticles3D:
 	p.initial_velocity_min = 0.18
 	p.initial_velocity_max = 0.32
 	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
-	p.emission_sphere_radius = 0.06
-	p.scale_amount_min = 0.6
-	p.scale_amount_max = 1.2
+	p.emission_sphere_radius = STEAM_RADIUS
+	p.scale_amount_min = STEAM_SCALE.x
+	p.scale_amount_max = STEAM_SCALE.y
 	var curve := Curve.new()
 	curve.add_point(Vector2(0, 0.3))
 	curve.add_point(Vector2(1, 1.0))
@@ -266,7 +280,7 @@ func _make_steam() -> CPUParticles3D:
 	m.albedo_texture = _soft_dot()
 	mesh.material = m
 	p.mesh = mesh
-	p.position = Vector3(0, 0.06, 0)
+	p.position = STEAM_LIFT
 	return p
 
 ## The dish comes out: a plate slides towards the camera with the dish card and its rarity glow (none for Common).

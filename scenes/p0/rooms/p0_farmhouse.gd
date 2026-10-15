@@ -335,6 +335,8 @@ func _apply_pots(n: int, big: Array) -> void:
 		var pot := _pots.get_child(i) as Node3D
 		pot.visible = i < n
 		var variant := "pot_big" if big.has(i) else "pot_normal"
+		if pot.visible and _variants.get(i, variant) != variant: _swap_bounce(pot, variant)
+		_variants[i] = variant
 		(pot.get_node("pot_big") as Node3D).visible = variant == "pot_big"
 		(pot.get_node("pot_normal") as Node3D).visible = variant == "pot_normal"
 		var drop := anchor("drop_pot_%d" % (i + 1))
@@ -346,6 +348,57 @@ func _apply_pots(n: int, big: Array) -> void:
 			var lid := cooker.find_child("lid_%d" % k, true, false) as Node3D
 			if lid: lid.visible = n < k
 	for f in _fires: (f as Node3D).visible = int(str(f.name).trim_prefix("fire_")) <= n
+
+## The pot switched (282 v1.1, 不知火舞 5d6fcf56): a 0.15 s bounce 0.9 → 1.05 → 1, and on to the Big Pot a ~0.4 s puff
+## of steam from its vent.
+const SWAP_S := 0.15
+const SWAP_PUFF_S := 0.4
+var _variants := {}   # stove → the variant shown, for the switch's bounce
+func _swap_bounce(pot: Node3D, variant: String) -> void:
+	if not is_inside_tree(): return
+	pot.scale = Vector3.ONE * 0.9
+	var t := create_tween()
+	t.tween_property(pot, "scale", Vector3.ONE * 1.05, SWAP_S * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(pot, "scale", Vector3.ONE, SWAP_S * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if variant == "pot_big" and kitchen: kitchen.stage.puff_at(pot.get_node("pot_big/vent"), SWAP_PUFF_S)
+
+## Where stove i's steam rises: the Big Pot's vent while its lid is on, else the pot's mouth (drop_pot).
+func steam_from(i: int) -> Node3D:
+	var vent := _vent(i)
+	return vent if vent else anchor("drop_pot_%d" % (i + 1))
+
+## Stove i's Big Pot vent while its lid is on; null otherwise.
+func _vent(i: int) -> Node3D:
+	var pot := _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
+	if pot and pot.visible and (pot.get_node("pot_big") as Node3D).visible and not _lids_up.get(i, false): return pot.get_node("pot_big/vent")
+	return null
+
+## The Big Pot's lid (282 v1.1 / 5d6fcf56, LOCK-20: ingredients are seen landing in the pot): on while empty; up once
+## ingredients go in (the stove worked, composing, nothing cooking, with a page's ingredients over the pot — Cookbook
+## — or ingredients put in — Experiment); shut within 0.15 s once the fire is lit, the steam from its vent; up again
+## when the dish is ready, until it is collected (the steam and the dish come out of the mouth). Up: 0.06 higher, tilted
+## back 20° on its rear-edge pivot. The ordinary pot has none.
+const LID_S := 0.15
+const LID_RISE := 0.06
+const LID_TILT := -20.0
+var _lids_up := {}   # stove → lid up
+func _update_lids(v: Dictionary) -> void:
+	if _pots == null or kitchen == null: return
+	for i in _pots.get_child_count():
+		var pot := _pots.get_child(i) as Node3D
+		var st = P0KitchenLogic.stove(v, i)
+		var worked := i == kitchen.stove_index
+		var up: bool = pot.visible and _variants.get(i, "") == "pot_big" and (
+			(worked and kitchen.phase == "compose" and st == null and (kitchen.stage.ghost_count() > 0 or not kitchen.stage.card_ids().is_empty()))   # ingredients on it
+			or (st != null and float(st.get("ready_in", 0)) <= 0.0)          # ready, waiting to be collected
+			or (worked and kitchen.phase == "serve"))                        # the dish coming out
+		if bool(_lids_up.get(i, false)) == up: continue
+		_lids_up[i] = up
+		var lid := pot.get_node("pot_big/lid") as Node3D
+		var rest := Vector3(0, 0.181, -0.107)   # its resting place (stove_pot.glb: the lid's pivot on its rear edge)
+		var t := create_tween().set_parallel()
+		t.tween_property(lid, "position", rest + Vector3(0, LID_RISE if up else 0.0, 0), LID_S)
+		t.tween_property(lid, "rotation_degrees:x", LID_TILT if up else 0.0, LID_S)
 
 # ---------------------------------------------------------------- stove (COOK-1)
 ## Finger card and STATE-ICONS badge over the stove: Empty / countdown / Ready (plan §7.2.2 step 1).
@@ -473,6 +526,8 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	show_cabinet_plates(P0KitchenLogic.cabinet_plates(v))
 	if kitchen == null: return
 	show_pots()   # a stove opened (Lv4 / Lv8) or switched to the Big Pot
+	_update_lids(v)
+	kitchen.stage.steam_point = _vent(kitchen.stove_index)   # null: just above the mouth, as before
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
