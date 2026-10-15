@@ -11,13 +11,13 @@ const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 10, 2);
 const S = 1000, H = 3_600_000;
 const veteran = (): P0State => ({ ...freshState(c, 'kitchen-p1', T0, 7), created_at: T0 - 8 * 24 * H, fires: 1 });
-function step(s: P0State, cmd: P0Command, at = T0): { s: P0State; ev: P0Event[] } {
-  const r = applyP0(c, s, cmd, at);
+function step(s: P0State, cmd: P0Command, at = T0, cc = c): { s: P0State; ev: P0Event[] } {
+  const r = applyP0(cc, s, cmd, at);
   if (!r.ok) throw new Error(`${cmd.type}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
   return { s: r.state, ev: r.events };
 }
-const refusal = (s: P0State, cmd: P0Command, at = T0) => {
-  const r = applyP0(c, s, cmd, at);
+const refusal = (s: P0State, cmd: P0Command, at = T0, cc = c) => {
+  const r = applyP0(cc, s, cmd, at);
   return r.ok ? null : { code: r.code, detail: r.detail };
 };
 /** A dish kept the Keep way: the Warming Cabinet (Lv3+) first, then the bag. */
@@ -185,12 +185,26 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     expect(page(s).state).toBe('mastered');
   });
 
+  // Cook All is paused (user 10-15: 0.2.8 brings a batch cook of a page the player picks): the content no longer opens
+  // it at Cooking Lv8, so the command is locked and the view has no preview. Its code stays for 0.2.8; these tests
+  // run it on a copy of the content that opens it at Lv8 again (withCookAll).
+  const withCookAll = { ...c, cooking: { ...c.cooking, conveniences: { ...c.cooking.conveniences, cook_all: 8 } } };
+
+  it('Cook All is paused: locked at any Cooking level, no preview in the view, not among the conveniences', () => {
+    expect(c.cooking.conveniences.cook_all).toBeUndefined();
+    expect(c.cooking.conveniences.provisions_plus).toBeUndefined();   // Bigger Provisions waits for P2's Provisions: Lv8 opens nothing for now
+    expect(refusal(cook(10, 8), { type: 'cook_all' })).toMatchObject({ code: 'locked' });
+    expect(viewOf(c, cook(10, 8), T0).cooking.cook_all).toBeNull();
+    expect(viewOf(c, cook(10), T0).cooking.conveniences).not.toContain('cook_all');
+    expect(viewOf(c, cook(10), T0).cooking.conveniences).not.toContain('provisions_plus');
+  });
+
   it('Cook All (Lv8) fills every free stove with known pages, rarest first, at most 2 pots a page', () => {
-    expect(refusal(cook(7, 8), { type: 'cook_all' })).toMatchObject({ code: 'locked' });
+    expect(refusal(cook(7, 8), { type: 'cook_all' }, T0, withCookAll)).toMatchObject({ code: 'locked' });
     const s = cook(8, 8);
     s.cookbook.push('dish_herb_grilled_fish');
     s.bag.push({ id: 'fish_crucian', qty: 5 }, { id: 'wild_herb', qty: 3 });
-    const r = step(s, { type: 'cook_all' });
+    const r = step(s, { type: 'cook_all' }, T0, withCookAll);
     const pots = r.ev.filter(e => e.kind === 'pot');
     expect(pots.map(e => [e.dish, (e as { stove?: number }).stove])).toEqual([
       ['dish_herb_grilled_fish', 0], ['dish_herb_grilled_fish', 1], ['dish_grilled_crucian', 2],
@@ -198,23 +212,23 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     expect(r.s.queue).toMatchObject({ dish: 'dish_grilled_crucian' });
     const bare = cook(8, 8);
     bare.bag = [];
-    expect(refusal(bare, { type: 'cook_all' })?.code).toBe('nothing_to_cook');
+    expect(refusal(bare, { type: 'cook_all' }, T0, withCookAll)?.code).toBe('nothing_to_cook');
   });
 
   it("Cook All's preview (COOK-P1-4) is what cook_all then does: the same pots on the same stoves, nothing taken", () => {
-    expect(viewOf(c, cook(7, 8), T0).cooking.cook_all).toBeNull();   // before Cooking Lv8
+    expect(viewOf(withCookAll, cook(7, 8), T0).cooking.cook_all).toBeNull();   // before Cooking Lv8
     const s = cook(8, 8);
     s.cookbook.push('dish_herb_grilled_fish');
     s.bag.push({ id: 'fish_crucian', qty: 5 }, { id: 'wild_herb', qty: 3 });
     const bag = structuredClone(s.bag);
-    const plan = viewOf(c, s, T0).cooking.cook_all!;
+    const plan = viewOf(withCookAll, s, T0).cooking.cook_all!;
     expect(s.bag).toEqual(bag);   // the preview runs on a copy
     expect(plan.reason).toBeNull();
     expect(plan.stoves).toBe(3);
     expect(plan.pots.map(p => [p.dish, p.stove, p.when])).toEqual([
       ['dish_herb_grilled_fish', 0, 'now'], ['dish_herb_grilled_fish', 1, 'now'], ['dish_grilled_crucian', 2, 'now'],
       ['dish_grilled_crucian', 0, 'next']]);
-    const done = step(s, { type: 'cook_all' }).ev.filter(e => e.kind === 'pot');
+    const done = step(s, { type: 'cook_all' }, T0, withCookAll).ev.filter(e => e.kind === 'pot');
     expect(done.map(e => [e.dish, (e as { stove?: number }).stove, !!(e as { queued?: boolean }).queued]))
       .toEqual(plan.pots.map(p => [p.dish, p.stove, p.when === 'next']));
     // Uses: the planned pages' slots summed by token, against what the player holds
@@ -229,12 +243,12 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
   it("Cook All's preview says why nothing would start: nothing to cook, or no stove or queue free", () => {
     const bare = cook(8, 8);
     bare.bag = [];
-    expect(viewOf(c, bare, T0).cooking.cook_all).toMatchObject({ pots: [], reason: 'nothing_to_cook' });
+    expect(viewOf(withCookAll, bare, T0).cooking.cook_all).toMatchObject({ pots: [], reason: 'nothing_to_cook' });
     let full = cook(8, 8);
     full.bag.push({ id: 'fish_crucian', qty: 12 });
-    for (let k = 0; k < 3; k++) full = step(full, { type: 'cook_all' }, T0 + k * S).s;   // 2 pots a page each time: 6 = three stoves and their queues
+    for (let k = 0; k < 3; k++) full = step(full, { type: 'cook_all' }, T0 + k * S, withCookAll).s;   // 2 pots a page each time: 6 = three stoves and their queues
     expect([full.stove, ...full.burners.map(b => b.stove)].every(Boolean) && [full.queue, ...full.burners.map(b => b.queue)].every(Boolean)).toBe(true);
-    expect(viewOf(c, full, T0 + 3 * S).cooking.cook_all).toMatchObject({ pots: [], reason: 'no_space' });
+    expect(viewOf(withCookAll, full, T0 + 3 * S).cooking.cook_all).toMatchObject({ pots: [], reason: 'no_space' });
   });
 
   it('Lucky Double (Lv10): sometimes one more Plain portion; never with Double', () => {
@@ -253,7 +267,7 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
 
   it('the view lists the Lv7–10 conveniences once reached', () => {
     expect(viewOf(c, cook(10), T0).cooking.conveniences).toEqual(expect.arrayContaining(
-      ['steady_hand_2', 'fast_mastery', 'cook_all', 'provisions_plus', 'chefs_touch', 'title_chef', 'lucky_double']));
+      ['steady_hand_2', 'fast_mastery', 'chefs_touch', 'title_chef', 'lucky_double']));   // cook_all paused, provisions_plus P2
     expect(viewOf(c, cook(6), T0).cooking.conveniences).not.toContain('steady_hand_2');
   });
 });
