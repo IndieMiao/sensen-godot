@@ -163,9 +163,12 @@ func _exit_tree() -> void:
 ## Adds props to the art before module visibility and the walkable grid are read. By default the anchors file's
 ## placeholder props, named as modules and shown from their `level` (module_levels): `from` copies an art piece;
 ## `scene` instances a model (with `atlas`, its shared albedo; `collider` {at, size} in model units). A prop
-## whose source is missing is skipped, so its module and anchors stay hidden.
+## whose source is missing is skipped, so its module and anchors stay hidden. The file's `module_levels` gate the art's
+## own pieces the same way ({"spice_rack": 2}: the Basic Room's layout rack shows from Lv2).
 func _dress_art() -> void:
-	for p in P0RoomAnchors.props(P0RoomAnchors.read_json(anchors_path)):
+	var external := P0RoomAnchors.read_json(anchors_path)
+	for m in external.get("module_levels", {}): module_levels[str(m)] = int(external.module_levels[m])
+	for p in P0RoomAnchors.props(external):
 		var copy := _prop_node(p)
 		if copy == null: continue
 		copy.name = str(p.name)
@@ -378,13 +381,14 @@ static func review_clip(review: Dictionary) -> Vector2:
 	if SHADOW_KEYS.any(func(k): return review.has(k)): return Vector2(0.05, 4000.0)
 	return Vector2(0.05, 150.0)
 
-## The one hearth lamp at layout.fire_position. It exists before the art enters the tree, so the art's fire effect
-## drives this lamp instead of adding a second one (PR #29, SGODOT-236).
+## The one hearth lamp at layout.fire_position, or the anchors file's `hearth_glow` (the Basic Room's range: in front of
+## its burner, where the old hearth's lamp warmed the floor). It exists before the art enters the tree, so the art's
+## fire effect drives this lamp instead of adding a second one (PR #29, SGODOT-236).
 func _build_hearth_glow() -> void:
 	if not (layout.get("fire_position", null) is Array): return
 	var glow := OmniLight3D.new()
 	glow.name = "HearthGlow"
-	glow.position = P0RoomAnchors.vec(layout.fire_position)
+	glow.position = P0RoomAnchors.vec(P0RoomAnchors.read_json(anchors_path).get("hearth_glow", layout.fire_position))
 	glow.light_color = Color("ff9b35")
 	glow.light_energy = 0.75
 	glow.omni_range = 1.25
@@ -1205,6 +1209,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 			cam.position = room.global_position + P0RoomAnchors.vec(spec.position)
 			cam.look_at(room.global_position + P0RoomAnchors.vec(spec.target), Vector3.UP)
 		"noui": if rt: rt.ui.visible = false
+		"glowat":   # glowat:x:y:z — the hearth lamp moved to that layout point (shots: where its warm patch falls)
+			var glow := room.get_node_or_null("HearthGlow") as Node3D
+			if glow: glow.position = Vector3(float(step[1]), float(step[2]), float(step[3]))
 		"calibmesh": print("P0_CALIBMESH ", calib_mesh())
 		"calibrays":   # light sampling (camera unification step 2): P0_CALIB's points, px of its image, to 3D points
 			print("P0_CALIB3D ", JSON.stringify(calib_rays(JSON.parse_string(FileAccess.get_file_as_string(OS.get_environment("P0_CALIB"))))))

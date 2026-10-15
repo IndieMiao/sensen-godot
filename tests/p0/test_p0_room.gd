@@ -5,7 +5,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## room shell's tap → walk to the stand point → facility callback, run on the accepted Basic Room.
 
 const ROOM_ANCHORS := {"anchors": [
-	{"name": "use_stove_1", "position": [-2.05, 1.40, -2.36], "module": "hearth"},
+	{"name": "use_stove_1", "position": [-2.5, 0.98, -2.495], "module": "kitchen_range_3"},
 	{"name": "stand_stove", "position": [-2.05, 0.085, -1.55], "yaw_degrees": 0},
 	{"name": "cam_stove", "position": [-1.9, 1.3, -2.2]},
 	{"name": "use_stove_2", "position": [-0.9, 1.25, -2.6], "module": "stove_2"},
@@ -138,7 +138,7 @@ func test_basic_room_grid_keeps_furniture_solid_and_connects_door_and_stove() ->
 	var bp := r.bp
 	var at := func(x: float, z: float) -> Vector3: return Vector3(x, 0, z) + r.room.position
 	assert_bool(bp.is_walkable(bp.world_to_cell(at.call(-0.12, 0.62)))).override_failure_message("dining table").is_false()
-	assert_bool(bp.is_walkable(bp.world_to_cell(at.call(-2.05, -2.57)))).override_failure_message("hearth").is_false()
+	assert_bool(bp.is_walkable(bp.world_to_cell(at.call(-2.05, -2.53)))).override_failure_message("the range").is_false()
 	assert_bool(bp.is_walkable(bp.world_to_cell(at.call(-3.1, 0.0)))).override_failure_message("window wall").is_false()
 	assert_bool(bp.is_walkable(bp.world_to_cell(at.call(2.68, -2.07)))).override_failure_message("floor plant").is_false()
 	var path := r.grid.point_path(r.anchor("spawn").global_position, r.anchor("stand_stove").global_position)
@@ -151,7 +151,7 @@ func test_hidden_modules_hide_their_anchors() -> void:
 	assert_object(r.anchor("use_stove_1")).is_not_null()
 	assert_object(r.anchor("use_stove_2")).override_failure_message("stove_2 is not in the Basic Room").is_null()
 	assert_int(r.anchors("use_").size()).is_equal(1)
-	r.module_levels = {"hearth": 2}
+	r.module_levels = {"kitchen_range_3": 2}
 	r.refresh_modules()
 	assert_object(r.anchor("use_stove_1")).is_null()
 	assert_bool(r.p0_surface() == "room").is_true()
@@ -278,6 +278,8 @@ func test_the_room_has_one_hearth_lamp_ahead_of_the_art() -> void:
 	# …and the fire drives that very lamp (its light_path is relative to the fire node, Hou Yi's review on #32).
 	var fire: Node = r.art.get("fire")
 	assert_object(fire.get_node_or_null(fire.get("light_path"))).is_same(r.room.get_node("HearthGlow"))
+	# in front of the range's burner 1, not inside it (the anchors file's hearth_glow; 不知火舞 on 213 9feeb7ed)
+	assert_vector((r.room.get_node("HearthGlow") as Node3D).position).is_equal_approx(Vector3(-2.4725, 0.53, -2.0), Vector3.ONE * 0.001)
 
 func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	# Lv1: no Spice Rack, no Warming Cabinet (props hidden, their anchors absent, nothing to tap).
@@ -471,8 +473,8 @@ func test_pushed_in_stove_clears_the_cooking_drawer_on_a_360_by_800_screen() -> 
 	r._update_camera()
 	var drawer_top := 800.0 - P0KitchenDrawer.HEIGHT
 	var lowest := -INF
-	var hearth: Node3D = r.art.get_node("hearth")
-	for mi in hearth.find_children("*", "MeshInstance3D", true, false):
+	var stove: Node3D = r.art.get_node("kitchen_range_3")
+	for mi in stove.find_children("*", "MeshInstance3D", true, false):
 		var box: AABB = (mi as MeshInstance3D).global_transform * (mi as MeshInstance3D).get_aabb()
 		for i in 8: lowest = maxf(lowest, r.cam.unproject_position(box.get_endpoint(i)).y)
 	assert_float(lowest).override_failure_message("stove bottom %.0f vs drawer top %.0f" % [lowest, drawer_top]).is_less(drawer_top)
