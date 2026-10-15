@@ -1,5 +1,5 @@
 {
-  "_comment": "SGODOT-226 placeholder anchors on the accepted Basic Room (layout metres, Y up). The final farmhouse_lv1 (SGODOT-213) carries its own anchors in layout.json; delete this file then. Names follow WP7-B F-03 ③ and the Deluxe Room kitchen hooks (use_spice_rack / use_warming_cabinet). The Spice Rack (Lv2) and Warming Cabinet (Lv3) are placeholder props on the left wall by the hearth until farmhouse_lv1 brings them: the rack copies the Basic Room wall shelf (art director: passed); the cabinet is the Deluxe Room pantry at 0.6 (art director, SGODOT-226), shown only once that model is copied into assets/props/warming_cabinet_placeholder/ (pending approval). SGODOT-282 (不知火舞 b84a5e01 ①): stoves 2 and 3 are placeholder pot spots on the same hearth, Deluxe range_cooker spacing (0.33 m across, 0.48 m back): 1 left, 2 right, 3 back centre; each has its own cam_stove_N. They show from Homestead Lv4 / Lv8 (the server's stove count), not by module.",
+  "_comment": "SGODOT-226 placeholder anchors on the accepted Basic Room (layout metres, Y up). The final farmhouse_lv1 (SGODOT-213) carries its own anchors in layout.json; delete this file then. Names follow WP7-B F-03 ③ and the Deluxe Room kitchen hooks (use_spice_rack / use_warming_cabinet). The Spice Rack (Lv2) and Warming Cabinet (Lv3) are placeholder props on the left wall by the hearth until farmhouse_lv1 brings them: the rack copies the Basic Room wall shelf (art director: passed); the cabinet is now the Warming Cabinet model (SGODOT-282, glass option B, assets/props/warming_cabinet/; 上官婉儿's integration): scale 1, its back at x −2.850 where the placeholder's was, its own materials with the room's specular 0.28 (no atlas: it would cover the dishes), use_warming_cabinet on its top_center. SGODOT-282 (不知火舞 b84a5e01 ①): stoves 2 and 3 are placeholder pot spots on the same hearth, Deluxe range_cooker spacing (0.33 m across, 0.48 m back): 1 left, 2 right, 3 back centre; each has its own cam_stove_N. They show from Homestead Lv4 / Lv8 (the server's stove count), not by module.",
   "anchors": [
     {
       "name": "use_stove_1",
@@ -136,8 +136,8 @@
     {
       "name": "use_warming_cabinet",
       "position": [
-        -2.565,
-        1.36,
+        -2.6,
+        1.402,
         -1.69
       ],
       "module": "warming_cabinet"
@@ -145,7 +145,7 @@
     {
       "name": "badge_warming_cabinet",
       "position": [
-        -2.565,
+        -2.6,
         1.0,
         -1.69
       ],
@@ -201,26 +201,26 @@
     },
     {
       "name": "warming_cabinet",
-      "scene": "res://assets/props/warming_cabinet_placeholder/kitchen_pantry.glb",
-      "atlas": "res://assets/props/warming_cabinet_placeholder/room_albedo_ao.png",
+      "scene": "res://assets/props/warming_cabinet/warming_cabinet.glb",
+      "specular": 0.28,
       "position": [
-        -2.607,
+        -2.85,
         0.082,
         -1.69
       ],
       "yaw_degrees": 90,
-      "scale": 0.6,
+      "scale": 1,
       "level": 3,
       "collider": {
         "at": [
           0,
-          1.1125,
-          0.07
+          0.66,
+          0.25
         ],
         "size": [
-          0.94,
-          2.225,
-          0.95
+          0.56,
+          1.32,
+          0.5
         ]
       }
     }

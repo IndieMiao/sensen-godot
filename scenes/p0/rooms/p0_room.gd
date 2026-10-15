@@ -192,6 +192,15 @@ func _prop_node(p: Dictionary) -> Node3D:
 		mat.metallic_specular = 0.28
 		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 		for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	elif p.has("specular"):   # the model's own materials, only their specular set to the room's (the Warming Cabinet: 0.28)
+		for m in model.find_children("*", "MeshInstance3D", true, false):
+			var mi := m as MeshInstance3D
+			for i in mi.mesh.get_surface_count():
+				var own := mi.get_active_material(i) as BaseMaterial3D
+				if own == null: continue
+				var copy := own.duplicate() as BaseMaterial3D
+				copy.metallic_specular = float(p.specular)
+				mi.set_surface_override_material(i, copy)
 	var c: Dictionary = p.get("collider", {})
 	if not c.is_empty():
 		var body := StaticBody3D.new()
