@@ -3,7 +3,7 @@ import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES
 import { count, freeSlots } from './bag.js';
 import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
-import { burners, cookAllPlan, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
+import { batchRoom, burners, cookSlots, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -24,7 +24,7 @@ import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
-import { cookbookView, masteredCount } from './cookbook.js';
+import { cookbookView, hasConvenience, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
 import { homeView } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
@@ -150,7 +150,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       queued: queuedView(s, s.stove, s.queue, now),
       stoves: burners(c, s).map(b => b.stove ? { ...potView(s, b.stove, now), queued: queuedView(s, b.stove, b.queue, now) } : null),
       big_pot: bigPot(c, s),
-      cook_all: cookAllPlan(c, s, now),   // Cook All's preview (Cooking Lv8, COOK-P1-4): the pots it would start, or why none
+      // Batch Cook (Cooking Lv8, q(200)): how many pots the stoves can take now (empty stoves, then queue slots);
+      // null before Lv8. The card's stepper stops at this or at what the page's picks cover, whichever is less.
+      batch: hasConvenience(c, s, 'batch_cook') ? { room: batchRoom(c, s) } : null,
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
       rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
@@ -161,7 +163,20 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       // not shown), Lv4 lock, "You might have it" and Mastered; then Kitchen Mishaps, conveniences and trial refunds.
       ...(() => {
         const book = cookbookView(c, s, now);
-        return { cookbook: book.pages, pages_total: book.total, discovered: book.discovered, mishaps: book.mishaps,
+        // q(200) / q(201): each known page that can cook carries the servings its ingredients make, one set after
+        // another as the stove picks them (picks, at most what every stove and queue could take, doubled with the Big
+        // Pot), and saved: why a picked item was rather kept (an accepted request, or another known page's id), so the
+        // card shows a batch's ×N, its servings and the amber slot before Cook.
+        const most = Math.max(1, (hasConvenience(c, s, 'batch_cook') ? batchRoom(c, s) : 1) * (bigPot(c, s) ? 2 : 1));
+        const pages = book.pages.map(p => {
+          const r = p.can_cook ? recipeById(c, p.id) : undefined;
+          if (!r) return p;
+          const picks = servingPicks(c, s, r, most);
+          const why = keptReason(c, s, r);
+          const saved = Object.fromEntries([...new Set(picks.flat())].flatMap(id => (why(id) ? [[id, why(id)]] : [])));
+          return { ...p, picks, saved };
+        });
+        return { cookbook: pages, pages_total: book.total, discovered: book.discovered, mishaps: book.mishaps,
           conveniences: book.conveniences, third_slot: book.third_slot, trial_refunds: book.trial_refunds,
           // Cookbook milestones (§7.6.1): each title, what it counts (Discovered or Mastered), the need and whether reached.
           milestones: (c.cooking.milestones ?? []).map(m => ({ id: m.id, title: m.title, counts: m.mastered !== undefined ? 'mastered' : 'discovered',
