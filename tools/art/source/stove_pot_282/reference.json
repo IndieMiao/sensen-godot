@@ -1,0 +1,27 @@
+{
+  "spec": "SGODOT-282_stove-pot-big-pot-spec-v1.1.md",
+  "visual_review_comment": "5d6fcf56-5bc5-413e-98eb-f68b3654516c",
+  "scope": "Shape/color from actual concept; geometry and placements from v1.1; no generated concept added",
+  "files": [
+    {
+      "file": "SGODOT-282_stove-pot-big-pot-sheet-v1.png",
+      "sha256": "5cbf958ca9be92c2cc1ef1102dc8bb7e4636660a59f3ed4613a67b3c663deb19"
+    },
+    {
+      "file": "SGODOT-282_stove-pot-big-pot-spec-v1.1.md",
+      "sha256": "f7da9c30c4764cb6085a98065fd6a29bbb24ba0aa29c7974880928eedd69297c"
+    },
+    {
+      "file": "ref-deluxe-kitchen.png",
+      "sha256": "f0bf3c041c4ad6a48def86523516ead65be6acf05c676a0af1eaa4c09f9132e6"
+    },
+    {
+      "file": "ref-pot-sheet-a.png",
+      "sha256": "a786f7af1fc1b01c033e4782dc751b838246ff96b62e1c785d04a0f6f01b49f5"
+    },
+    {
+      "file": "ref-standard-godot.png",
+      "sha256": "544e96551cb6ddd357ef3c7f1f2235b377217ee68a8fccce8362ecc852dece71"
+    }
+  ]
+}

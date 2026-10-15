@@ -1,0 +1,205 @@
+{
+  "spec": "SGODOT-282 stove pot / big pot v1.1",
+  "units": "metres; Y up; +Z front",
+  "pivot": "bottom centre, Y=0",
+  "variants": {
+    "pot_normal": {
+      "triangles": 380,
+      "triangle_limit": 400,
+      "mouth": [
+        0,
+        0.14,
+        0
+      ],
+      "bounds": [
+        [
+          -0.11799,
+          0.0,
+          -0.106
+        ],
+        [
+          0.11799,
+          0.14,
+          0.106
+        ]
+      ],
+      "size_xyz": [
+        0.23598,
+        0.14,
+        0.212
+      ]
+    },
+    "pot_big": {
+      "triangles": 684,
+      "triangle_limit": 700,
+      "mouth": [
+        0,
+        0.18,
+        0
+      ],
+      "vent": [
+        0.062,
+        0.213,
+        0.039
+      ],
+      "lid_pivot": [
+        0,
+        0.181,
+        -0.107
+      ],
+      "bounds": [
+        [
+          -0.14,
+          0.0,
+          -0.107
+        ],
+        [
+          0.14,
+          0.242,
+          0.107
+        ]
+      ],
+      "size_xyz": [
+        0.28,
+        0.242,
+        0.214
+      ]
+    }
+  },
+  "triangles": 1064,
+  "groups": {
+    "normal": {
+      "triangles": 380,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.11799,
+          0.0,
+          -0.106
+        ],
+        [
+          0.11799,
+          0.14,
+          0.106
+        ]
+      ]
+    },
+    "big_body": {
+      "triangles": 460,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.14,
+          0.0,
+          -0.102367
+        ],
+        [
+          0.14,
+          0.18,
+          0.102367
+        ]
+      ]
+    },
+    "lid": {
+      "triangles": 224,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -0.107,
+          0.181,
+          -0.107
+        ],
+        [
+          0.107,
+          0.242,
+          0.107
+        ]
+      ]
+    }
+  },
+  "lid_open": {
+    "translation_delta": [
+      0,
+      0.06,
+      0
+    ],
+    "rotation_degrees": [
+      -20,
+      0,
+      0
+    ],
+    "note": "Godot local X=-20 raises the +Z front and tilts toward -Z rear. vent is fixed under pot_big: emitter should only run while closed."
+  },
+  "textures": [
+    "../warming_cabinet/room_albedo_ao.png",
+    "pottery_palette.png"
+  ],
+  "atlas_sha256": "9802eca7bf7b4607d712fbb99c0d6ab3acf48ba2638a8734177160bbeb4f1360",
+  "placements": {
+    "basic_room": {
+      "support": "hearth",
+      "y": 1.377,
+      "xz": [
+        [
+          -2.05,
+          -2.36
+        ],
+        [
+          -1.72,
+          -2.36
+        ],
+        [
+          -1.885,
+          -2.84
+        ]
+      ],
+      "hide": [
+        "kettle"
+      ]
+    },
+    "standard_room_5": {
+      "support": "range_cooker",
+      "y": 1.457,
+      "xz": [
+        [
+          1.28,
+          -2.545
+        ],
+        [
+          1.58,
+          -2.545
+        ],
+        [
+          1.58,
+          -2.895
+        ]
+      ],
+      "hide": [],
+      "yaw_degrees": [
+        0,
+        0,
+        45
+      ]
+    },
+    "deluxe_room_10": {
+      "support": "range_cooker",
+      "y": 1.291,
+      "xz": [
+        [
+          -3.915,
+          -0.381
+        ],
+        [
+          -4.245,
+          -0.381
+        ],
+        [
+          -3.915,
+          -0.859
+        ]
+      ],
+      "hide": []
+    }
+  },
+  "generator": "tools/art/build_stove_pot.py"
+}

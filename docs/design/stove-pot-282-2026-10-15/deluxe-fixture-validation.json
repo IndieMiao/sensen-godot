@@ -1,0 +1,17 @@
+{
+  "source": "assets/rooms/deluxe_room_10/kitchen_fittings.glb",
+  "source_sha256": "67f85fe925bc8d8b2376397c17c118a55c24129ea36da0b6139642aa7a50df6b",
+  "reference": "assets/rooms/basic_room/kettle.glb",
+  "reference_sha256": "1de8937a1c46bcb95616ead70875a54759832e6c1126b4b548810ddba48255be",
+  "kettle_source_position": [
+    -4.08,
+    1.305,
+    -0.55
+  ],
+  "removed_triangles": 1144,
+  "retained_triangles": 13136,
+  "max_vertex_distance_to_original_kettle_m": 3.8785544314515865e-07,
+  "all_original_binary_bytes_preserved": true,
+  "source_room_unchanged": true,
+  "output_sha256": "7268460d4653fa510087ac983ef48d186b8efb1ea2e0e14718281c50c0247aaf"
+}

@@ -1,0 +1,44 @@
+{
+  "atlas": "assets/props/warming_cabinet/room_albedo_ao.png",
+  "source_atlas": "assets/rooms/deluxe_room_10/room_albedo_ao.png",
+  "atlas_sha256": "9802eca7bf7b4607d712fbb99c0d6ab3acf48ba2638a8734177160bbeb4f1360",
+  "swatches": {
+    "honey": {
+      "source_asset": "assets/rooms/deluxe_room_10/kitchen_pantry.glb",
+      "source_sha256": "02f5fd3ee3510a018fe7a38b5e57177d62e25d5bfd7ba107944977eceb668818",
+      "source_mesh": 0,
+      "source_primitive": 0,
+      "source_triangle": 227,
+      "pixel_xy": [
+        1706,
+        301
+      ],
+      "gltf_uv": [
+        0.8331002593040466,
+        0.14704002936681113
+      ],
+      "rgb8": [
+        205,
+        146,
+        88
+      ],
+      "patch_min": [
+        203,
+        145,
+        87
+      ],
+      "patch_max": [
+        205,
+        146,
+        88
+      ]
+    }
+  },
+  "decision": "Existing atlas candidates skew yellow/brown (nearest ordinary clay RGB 175,121,71; deep clay 135,89,52). Use permitted 256-square auxiliary pottery/copper palette for approved red pottery family; retain existing honey wood on knob. Original atlas is unchanged.",
+  "extra_palette": {
+    "terracotta": "C87951",
+    "deep_clay": "A65B3B",
+    "inner_clay": "7E4731",
+    "copper": "E0A45D"
+  }
+}
