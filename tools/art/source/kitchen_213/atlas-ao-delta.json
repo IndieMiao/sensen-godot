@@ -1,0 +1,21 @@
+{
+  "method": "Same original GLB UVs; paired Cycles EMIT bake of 0.42 + 0.58*AO, distance 0.68 m, 64 AO samples, 32 Cycles samples. Linear-light new/old ratio only in back-left kitchen target triangles (x<1,z<-1), 8 px bake gutter. <2.5% ratio changes ignored; palette samples protected.",
+  "targets": [
+    "room_shell",
+    "window_wall",
+    "back_wall",
+    "sink_cabinet",
+    "utensil_crock",
+    "wall_shelf",
+    "shelf_plant"
+  ],
+  "affected_pixels": 75125,
+  "min_factor": 0.4500464654931461,
+  "max_factor": 2.380952380952381,
+  "source_baseline": "154ce6421448e26e42ee225ba7018638ae756394",
+  "bakes": {
+    "old": "d1264a265863587f1f7c5bdc438094fd347675ce773e314376ba26ac0412e8fd",
+    "new": "6da1fe5f0e1490d0e5a68286d66980d50e026b8c51a96717750560d1e36c8c6f"
+  },
+  "delta_sha256": "608ea5011e40a6a6380cb89e9acb2926e90d856aa6ba86b618c251a934f89273"
+}

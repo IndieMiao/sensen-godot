@@ -1,0 +1,252 @@
+{
+  "placement": {
+    "position": [
+      -2.05,
+      0.082,
+      -2.53
+    ],
+    "yaw_degrees": 0
+  },
+  "stove_top_local_y": 0.898,
+  "stove_top_world_y": 0.98,
+  "burner_pitch": 0.45,
+  "sockets_local": {
+    "stove_1_top": [
+      -0.45,
+      0.898,
+      0.035
+    ],
+    "fire_1": [
+      -0.4225,
+      0.15,
+      -0.005
+    ],
+    "stove_2_top": [
+      0,
+      0.898,
+      0.035
+    ],
+    "fire_2": [
+      0.0275,
+      0.15,
+      -0.005
+    ],
+    "stove_3_top": [
+      0.45,
+      0.898,
+      0.035
+    ],
+    "fire_3": [
+      0.47750000000000004,
+      0.15,
+      -0.005
+    ]
+  },
+  "sockets_world": {
+    "stove_1_top": [
+      -2.5,
+      0.98,
+      -2.495
+    ],
+    "fire_1": [
+      -2.4725,
+      0.232,
+      -2.535
+    ],
+    "stove_2_top": [
+      -2.05,
+      0.98,
+      -2.495
+    ],
+    "fire_2": [
+      -2.0225,
+      0.232,
+      -2.535
+    ],
+    "stove_3_top": [
+      -1.6,
+      0.98,
+      -2.495
+    ],
+    "fire_3": [
+      -1.5725,
+      0.232,
+      -2.535
+    ]
+  },
+  "assets": {
+    "kitchen_range_3": {
+      "name": "kitchen_range_3",
+      "vertices": 3611,
+      "triangles": 4916,
+      "surfaces": 3,
+      "bytes": 174920
+    },
+    "spice_rack": {
+      "name": "spice_rack",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 36404
+    },
+    "cookbook_wall": {
+      "name": "cookbook_wall",
+      "vertices": 366,
+      "triangles": 688,
+      "surfaces": 1,
+      "bytes": 20524
+    }
+  },
+  "cap_semantics": "Top burner caps lid_2/lid_3; hide each when unlocked, never hide the front arch. Default both visible.",
+  "atlas": {
+    "swatches": {
+      "cream": {
+        "source_asset": "assets/rooms/basic_room/hearth.glb",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 723,
+        "gltf_uv": [
+          0.0955960030357043,
+          0.4815455476442973
+        ],
+        "pixel_xy": [
+          195,
+          986
+        ],
+        "rgb8": [
+          239,
+          222,
+          199
+        ]
+      },
+      "stone": {
+        "source_asset": "assets/rooms/basic_room/hearth.glb",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 565,
+        "gltf_uv": [
+          0.6733711759249369,
+          0.6639712850252787
+        ],
+        "pixel_xy": [
+          1379,
+          1359
+        ],
+        "rgb8": [
+          209,
+          194,
+          173
+        ]
+      },
+      "iron": {
+        "source_asset": "assets/rooms/basic_room/kettle.glb",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 492,
+        "gltf_uv": [
+          0.6034694711367289,
+          0.14086739222208658
+        ],
+        "pixel_xy": [
+          1235,
+          288
+        ],
+        "rgb8": [
+          72,
+          64,
+          54
+        ]
+      },
+      "wood": {
+        "source_asset": "assets/rooms/basic_room/wall_shelf.glb",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 91,
+        "gltf_uv": [
+          0.7320755124092102,
+          0.6823233763376871
+        ],
+        "pixel_xy": [
+          1499,
+          1397
+        ],
+        "rgb8": [
+          186,
+          132,
+          69
+        ]
+      },
+      "green": {
+        "source_asset": "assets/rooms/basic_room/wall_shelf.glb",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 364,
+        "gltf_uv": [
+          0.8826737403869629,
+          0.19801543156305948
+        ],
+        "pixel_xy": [
+          1807,
+          405
+        ],
+        "rgb8": [
+          126,
+          148,
+          78
+        ]
+      },
+      "pages": {
+        "source_asset": "assets/rooms/basic_room/sink_cabinet.glb",
+        "source_mesh": 0,
+        "source_primitive": 0,
+        "source_triangle": 2037,
+        "gltf_uv": [
+          0.26368923981984455,
+          0.28106464942296344
+        ],
+        "pixel_xy": [
+          540,
+          575
+        ],
+        "rgb8": [
+          242,
+          231,
+          212
+        ]
+      },
+      "red": {
+        "gltf_uv": [
+          0.01953125,
+          0.12109375
+        ],
+        "pixel_xy": [
+          40,
+          248
+        ],
+        "rgb8": [
+          190,
+          63,
+          40
+        ],
+        "source": "new isolated unused atlas patch"
+      }
+    },
+    "baseline": "154ce6421448e26e42ee225ba7018638ae756394",
+    "original_atlas_sha256": "ddcfcd8e9d79949758332bb82483dbd71692199d9691dc16336b069f3ca52764",
+    "added_patch": {
+      "rect": [
+        32,
+        240,
+        16,
+        16
+      ],
+      "rgb8": [
+        190,
+        63,
+        40
+      ],
+      "purpose": "Red cookbook / chilli. Previously unused pixels; >=9 px outside every original UV island, including archived hearth/kettle."
+    },
+    "patched_atlas_sha256": "cb900e7fd32084d9576055e77c2cd155294c6912cf9afeb5e5d1c5567d383f65"
+  }
+}

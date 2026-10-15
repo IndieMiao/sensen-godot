@@ -4,6 +4,8 @@
 
 ## 当前 UI 与 P0 美术
 
+- [刘备 · Basic Room 三口灶角 SGODOT-213](kitchen-213-2026-10-16/README.md)：Stark 第二版三口砌筑灶、左墙四罐调味架和红封面菜谱书；0.98 m 锅位、六个世界挂点、真实房间审阅及交叠检查，附旧烟囱 AO 清理与程序接入说明。
+
 - [刘备 · 生成城市掌柜发色变体 SGODOT-284](keeper-hair-284-2026-10-14/README.md)：hairhat41 红棕、hairhat43 软黑；保留饰件与原材质参数，含正面／3⁄4、全身卡／邮票及导入验证。两件 NPC 专用，苏烈后续接入 keeper_looks，不进 0.2.6。
 - [刘备 · 保温柜 SGODOT-282](warming-cabinet-282-2026-10-14/README.md)：v1.1 鼠尾草绿柜体、三层六盘、玻璃 A/B；Basic/Standard 实景、实际导入和交叠验证。仅 wp-3d-scene 审阅，不进 0.2.6。
 - [刘备 · #407 居民 NPC 部件审阅材料 SGODOT-284 / q(171)](resident-parts-284-2026-10-14/README.md)：Granny Wu 银白髻、Ivo 矿工帽/灰短胡/帆布棕衣服、Tomo 暖深棕发；五件的审阅图、验证记录、生成脚本与 Blender 源文件。[最新 Ivo 帽子明暗修订](resident-parts-284-2026-10-14/ivo-light/README.md)。运行时与配方由 #407 进入 farm-dev。

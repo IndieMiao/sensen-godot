@@ -65,20 +65,6 @@
       "bytes": 19972
     },
     {
-      "name": "hearth",
-      "vertices": 1400,
-      "triangles": 2752,
-      "surfaces": 1,
-      "bytes": 97356
-    },
-    {
-      "name": "kettle",
-      "vertices": 590,
-      "triangles": 1144,
-      "surfaces": 1,
-      "bytes": 42096
-    },
-    {
       "name": "fire",
       "vertices": 180,
       "triangles": 348,
@@ -161,9 +147,31 @@
       "triangles": 1078,
       "surfaces": 1,
       "bytes": 45912
+    },
+    {
+      "name": "kitchen_range_3",
+      "vertices": 3611,
+      "triangles": 4916,
+      "surfaces": 3,
+      "bytes": 174920
+    },
+    {
+      "name": "spice_rack",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 36404
+    },
+    {
+      "name": "cookbook_wall",
+      "vertices": 366,
+      "triangles": 688,
+      "surfaces": 1,
+      "bytes": 20524
     }
   ],
-  "unique_triangles": 47256,
-  "scene_triangles": 48552,
-  "static_draw_surfaces": 23
+  "unique_triangles": 50260,
+  "scene_triangles": 51556,
+  "static_draw_surfaces": 26,
+  "scope": "Placed Basic Room kit; archived unplaced hearth/kettle files excluded. Review-only warming cabinet, pots and avatar excluded."
 }

@@ -1,0 +1,2579 @@
+{
+  "card": "SGODOT-213",
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "baseline": "154ce6421448e26e42ee225ba7018638ae756394",
+  "pot_dependency": "#434 / ddcd8b3c5b70aded6676d15a51d8bb6851010854",
+  "reports": {
+    "geometry": {
+      "checks": [
+        {
+          "check": "room_shell layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "room_shell GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "window_wall layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "window_wall GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "back_wall layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "back_wall GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "arched_window layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "arched_window GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "window_garden layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "window_garden GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "window_plant layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "window_plant GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "bench layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "bench GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "green_door layout unchanged",
+          "passed": true
+        },
+        {
+          "check": "green_door GLB byte-identical",
+          "passed": true
+        },
+        {
+          "check": "old hearth and kettle unplaced",
+          "passed": true
+        },
+        {
+          "check": "spice rack keeps approved location",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 GLB triangle count matches stats",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 texture map mode 1",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 unscaled nodes",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 approved constant atlas UVs",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 approved constant atlas UVs",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 approved constant atlas UVs",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 no degenerate triangles",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 normal and winding agreement",
+          "passed": true
+        },
+        {
+          "check": "range actual width 1.35 m",
+          "passed": true
+        },
+        {
+          "check": "empty local socket stove_1_top",
+          "passed": true
+        },
+        {
+          "check": "empty local socket fire_1",
+          "passed": true
+        },
+        {
+          "check": "empty local socket stove_2_top",
+          "passed": true
+        },
+        {
+          "check": "empty local socket fire_2",
+          "passed": true
+        },
+        {
+          "check": "empty local socket stove_3_top",
+          "passed": true
+        },
+        {
+          "check": "empty local socket fire_3",
+          "passed": true
+        },
+        {
+          "check": "two independent cap meshes",
+          "passed": true
+        },
+        {
+          "check": "spice_rack GLB triangle count matches stats",
+          "passed": true
+        },
+        {
+          "check": "spice_rack texture map mode 1",
+          "passed": true
+        },
+        {
+          "check": "spice_rack unscaled nodes",
+          "passed": true
+        },
+        {
+          "check": "spice_rack approved constant atlas UVs",
+          "passed": true
+        },
+        {
+          "check": "spice_rack no degenerate triangles",
+          "passed": true
+        },
+        {
+          "check": "spice_rack normal and winding agreement",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall GLB triangle count matches stats",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall texture map mode 1",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall unscaled nodes",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall approved constant atlas UVs",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall no degenerate triangles",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall normal and winding agreement",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of room_shell",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of window_wall",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of back_wall",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of arched_window",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of window_garden",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of window_plant",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of entry_mat",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of fire",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of sink_cabinet",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of utensil_crock",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of wall_shelf",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of shelf_plant",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of hanging_towel",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of dining_table",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of checked_runner",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of chair",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of bench",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of daisy_jug",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of floor_plant",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of spice_rack",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of cookbook_wall",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of chair_opposite",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 clear of warming_cabinet",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of room_shell",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of window_wall",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of back_wall",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of arched_window",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of window_garden",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of window_plant",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of entry_mat",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of fire",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of sink_cabinet",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of utensil_crock",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of wall_shelf",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of shelf_plant",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of hanging_towel",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of dining_table",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of checked_runner",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of chair",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of bench",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of daisy_jug",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of floor_plant",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of cookbook_wall",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of chair_opposite",
+          "passed": true
+        },
+        {
+          "check": "spice_rack clear of warming_cabinet",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of room_shell",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of window_wall",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of back_wall",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of arched_window",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of window_garden",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of window_plant",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of entry_mat",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of fire",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of sink_cabinet",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of utensil_crock",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of wall_shelf",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of shelf_plant",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of hanging_towel",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of dining_table",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of checked_runner",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of chair",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of bench",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of daisy_jug",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of floor_plant",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of chair_opposite",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall clear of warming_cabinet",
+          "passed": true
+        },
+        {
+          "check": "warming_cabinet clear of sink_cabinet",
+          "passed": true
+        },
+        {
+          "check": "warming_cabinet clear of arched_window",
+          "passed": true
+        },
+        {
+          "check": "warming_cabinet clear of bench",
+          "passed": true
+        },
+        {
+          "check": "warming_cabinet clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "sink_cabinet clear of arched_window",
+          "passed": true
+        },
+        {
+          "check": "sink_cabinet clear of bench",
+          "passed": true
+        },
+        {
+          "check": "sink_cabinet clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "arched_window clear of bench",
+          "passed": true
+        },
+        {
+          "check": "arched_window clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "bench clear of green_door",
+          "passed": true
+        },
+        {
+          "check": "stove_1_top real support plane at world Y .980",
+          "passed": true
+        },
+        {
+          "check": "stove_2_top real support plane at world Y .980",
+          "passed": true
+        },
+        {
+          "check": "stove_3_top real support plane at world Y .980",
+          "passed": true
+        },
+        {
+          "check": "burner spacing >=0.33 m",
+          "passed": true
+        },
+        {
+          "check": "firebox 1 front is genuinely open / ray reaches interior back",
+          "passed": true
+        },
+        {
+          "check": "firebox 2 front is genuinely open / ray reaches interior back",
+          "passed": true
+        },
+        {
+          "check": "firebox 3 front is genuinely open / ray reaches interior back",
+          "passed": true
+        },
+        {
+          "check": "positive control catches stove/wall penetration",
+          "passed": true
+        },
+        {
+          "check": "Big Pot 1 bottom touches .980 support",
+          "passed": true
+        },
+        {
+          "check": "Big Pot 1 does not penetrate stove or flue",
+          "passed": true
+        },
+        {
+          "check": "Big Pot 2 bottom touches .980 support",
+          "passed": true
+        },
+        {
+          "check": "Big Pot 2 does not penetrate stove or flue",
+          "passed": true
+        },
+        {
+          "check": "Big Pot 3 bottom touches .980 support",
+          "passed": true
+        },
+        {
+          "check": "Big Pot 3 does not penetrate stove or flue",
+          "passed": true
+        },
+        {
+          "check": "adjacent Big Pots 1/2 do not intersect",
+          "passed": true
+        },
+        {
+          "check": "adjacent Big Pots 2/3 do not intersect",
+          "passed": true
+        }
+      ],
+      "assets": {
+        "kitchen_range_3": {
+          "bounds": [
+            [
+              -0.675000011920929,
+              0.0,
+              -0.44300001859664917
+            ],
+            [
+              0.675000011920929,
+              1.5140000581741333,
+              0.30000001192092896
+            ]
+          ],
+          "size_xyz": [
+            1.350000023841858,
+            1.5140000581741333,
+            0.7430000305175781
+          ],
+          "triangles": 4916,
+          "surfaces": 3,
+          "sha256": "e6bc3e8d680cfcbdc8ed12f337fa009ba24b3ebc541848359be0a91ffeecfa0f",
+          "groups": {
+            "body": [
+              [
+                -0.675000011920929,
+                0.0,
+                -0.44300001859664917
+              ],
+              [
+                0.675000011920929,
+                1.5140000581741333,
+                0.30000001192092896
+              ]
+            ],
+            "lid_2": [
+              [
+                -0.12099999934434891,
+                0.8980000019073486,
+                -0.0860000029206276
+              ],
+              [
+                0.12099999934434891,
+                0.9538728594779968,
+                0.15600000321865082
+              ]
+            ],
+            "lid_3": [
+              [
+                0.32899999618530273,
+                0.8980000019073486,
+                -0.0860000029206276
+              ],
+              [
+                0.5709999799728394,
+                0.9538728594779968,
+                0.15600000321865082
+              ]
+            ]
+          }
+        },
+        "spice_rack": {
+          "bounds": [
+            [
+              -0.30000001192092896,
+              -0.14874328672885895,
+              -0.1419999897480011
+            ],
+            [
+              0.30000001192092896,
+              0.23549999296665192,
+              0.11799999326467514
+            ]
+          ],
+          "size_xyz": [
+            0.6000000238418579,
+            0.38424327969551086,
+            0.25999998301267624
+          ],
+          "triangles": 1296,
+          "surfaces": 1,
+          "sha256": "1dbc6b45342140b5f1ef4f6b292069cad31bbdd9e58beb3e88703bf86c8c573e",
+          "groups": {
+            "spice_rack.001": [
+              [
+                -0.30000001192092896,
+                -0.14874328672885895,
+                -0.1419999897480011
+              ],
+              [
+                0.30000001192092896,
+                0.23549999296665192,
+                0.11799999326467514
+              ]
+            ]
+          }
+        },
+        "cookbook_wall": {
+          "bounds": [
+            [
+              -0.17550000548362732,
+              -0.22499999403953552,
+              -0.000999998301267624
+            ],
+            [
+              0.17499999701976776,
+              0.3634999990463257,
+              0.09399999678134918
+            ]
+          ],
+          "size_xyz": [
+            0.3505000025033951,
+            0.5884999930858612,
+            0.0949999950826168
+          ],
+          "triangles": 688,
+          "surfaces": 1,
+          "sha256": "5880255f0c6ca77840902b18dc44ec2885839e84ecdf8fd7cb1faec878ffe2d5",
+          "groups": {
+            "cookbook_wall.001": [
+              [
+                -0.17550000548362732,
+                -0.22499999403953552,
+                -0.000999998301267624
+              ],
+              [
+                0.17499999701976776,
+                0.3634999990463257,
+                0.09399999678134918
+              ]
+            ]
+          }
+        }
+      },
+      "pairs": [
+        {
+          "a": "kitchen_range_3",
+          "b": "room_shell",
+          "axis_separation_m": [
+            -1.9150002002716064,
+            -0.037999995052814484,
+            -1.0600001811981201
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "window_wall",
+          "axis_separation_m": [
+            0.12999963760375977,
+            -1.6260000467300415,
+            -0.9849998950958252
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "back_wall",
+          "axis_separation_m": [
+            -1.744999885559082,
+            -1.6260000467300415,
+            -0.11800026893615723
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "arched_window",
+          "axis_separation_m": [
+            -0.12000012397766113,
+            -0.49600017070770264,
+            1.0700000524520874
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "window_garden",
+          "axis_separation_m": [
+            0.7849998474121094,
+            -0.4160001277923584,
+            0.9800000190734863
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "window_plant",
+          "axis_separation_m": [
+            -0.2538590431213379,
+            -0.6037653684616089,
+            2.472175672650337
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "green_door",
+          "axis_separation_m": [
+            2.734999895095825,
+            -1.6860000789165497,
+            -0.22800016403198242
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "entry_mat",
+          "axis_separation_m": [
+            2.865000009536743,
+            -0.03749999403953552,
+            -0.4500000476837158
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "fire",
+          "axis_separation_m": [
+            -0.41249990463256836,
+            -0.569999948143959,
+            -0.3900001049041748
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 139
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "sink_cabinet",
+          "axis_separation_m": [
+            0.059999942779541016,
+            -1.5140000730752945,
+            -0.8449997901916504
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "utensil_crock",
+          "axis_separation_m": [
+            0.24717068672180176,
+            -0.346000075340271,
+            -0.3911769390106201
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "wall_shelf",
+          "axis_separation_m": [
+            0.14499998092651367,
+            0.3889998197555542,
+            -0.4480001926422119
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "shelf_plant",
+          "axis_separation_m": [
+            1.477368026971817,
+            0.3703347444534302,
+            -0.5969774723052979
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "hanging_towel",
+          "axis_separation_m": [
+            1.9100000262260437,
+            -0.4671238660812378,
+            -0.20548391342163086
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "dining_table",
+          "axis_separation_m": [
+            0.30500006675720215,
+            -1.135000005364418,
+            2.2675000429153442
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "checked_runner",
+          "axis_separation_m": [
+            0.17499995231628418,
+            -0.6407440900802612,
+            2.4895851612091064
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "chair",
+          "axis_separation_m": [
+            2.244999885559082,
+            -1.4700000435113907,
+            2.534999966621399
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "bench",
+          "axis_separation_m": [
+            -0.30499982833862305,
+            -0.6700000315904617,
+            2.849999964237213
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "daisy_jug",
+          "axis_separation_m": [
+            1.1078591048717499,
+            -0.3340001106262207,
+            2.574869453907013
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "floor_plant",
+          "axis_separation_m": [
+            3.730010986328125,
+            -0.7159780412912369,
+            -0.11732959747314453
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "spice_rack",
+          "axis_separation_m": [
+            -0.013000011444091797,
+            -0.024743318557739258,
+            0.3549998998641968
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "cookbook_wall",
+          "axis_separation_m": [
+            0.14100003242492676,
+            0.4989999532699585,
+            0.6750000715255737
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "chair_opposite",
+          "axis_separation_m": [
+            -0.315000057220459,
+            -1.4700000435113907,
+            2.5350000262260437
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "kitchen_range_3",
+          "b": "warming_cabinet",
+          "axis_separation_m": [
+            -0.375,
+            -1.319999948143959,
+            0.25999999046325684
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "room_shell",
+          "axis_separation_m": [
+            -0.5780003070831299,
+            1.4512567594647408,
+            -2.0150002241134644
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "window_wall",
+          "axis_separation_m": [
+            -0.11700034141540527,
+            -1.9854999780654907,
+            -1.9399999380111694
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "back_wall",
+          "axis_separation_m": [
+            -0.40799999237060547,
+            -1.9854999780654907,
+            0.9799996614456177
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "arched_window",
+          "axis_separation_m": [
+            -0.36700010299682617,
+            -0.8555001020431519,
+            0.11500000953674316
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "window_garden",
+          "axis_separation_m": [
+            0.5379998683929443,
+            -0.7755000591278076,
+            0.02499997615814209
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "window_plant",
+          "axis_separation_m": [
+            -0.28261494636535645,
+            -0.2745800018310547,
+            1.517175629734993
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "green_door",
+          "axis_separation_m": [
+            4.071999788284302,
+            -0.9787431955337524,
+            0.8699997663497925
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "entry_mat",
+          "axis_separation_m": [
+            4.20199990272522,
+            1.4517567604780197,
+            0.24500000476837158
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "fire",
+          "axis_separation_m": [
+            0.024499893188476562,
+            0.9192568063735962,
+            0.4750000238418579
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "sink_cabinet",
+          "axis_separation_m": [
+            1.3969998359680176,
+            -0.16557633876800537,
+            0.2184995412826538
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "utensil_crock",
+          "axis_separation_m": [
+            1.5841705799102783,
+            -0.3722482919692993,
+            0.7068229913711548
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "wall_shelf",
+          "axis_separation_m": [
+            1.4819998741149902,
+            0.02949988842010498,
+            0.649999737739563
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "shelf_plant",
+          "axis_separation_m": [
+            2.8143679201602936,
+            0.010834813117980957,
+            0.501022458076477
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "hanging_towel",
+          "axis_separation_m": [
+            3.2469999194145203,
+            -0.42874324321746826,
+            0.892516016960144
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "dining_table",
+          "axis_separation_m": [
+            1.6419999599456787,
+            0.3542567491531372,
+            1.3125
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "checked_runner",
+          "axis_separation_m": [
+            1.5119998455047607,
+            0.3284558057785034,
+            1.5345851182937622
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "chair",
+          "axis_separation_m": [
+            3.5819997787475586,
+            0.01925671100616455,
+            1.5799999237060547
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "bench",
+          "axis_separation_m": [
+            -0.18800020217895508,
+            0.8192567229270935,
+            1.894999921321869
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "daisy_jug",
+          "axis_separation_m": [
+            2.4448589980602264,
+            -0.36039412021636963,
+            1.6198694109916687
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "floor_plant",
+          "axis_separation_m": [
+            5.067010879516602,
+            0.7732787132263184,
+            -0.07016468048095703
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "cookbook_wall",
+          "axis_separation_m": [
+            -0.10599994659423828,
+            0.13950002193450928,
+            -0.2799999713897705
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "chair_opposite",
+          "axis_separation_m": [
+            1.0219998359680176,
+            0.01925671100616455,
+            1.5799999833106995
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "spice_rack",
+          "b": "warming_cabinet",
+          "axis_separation_m": [
+            -0.1380000114440918,
+            0.1692568063735962,
+            -0.4650001525878906
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "room_shell",
+          "axis_separation_m": [
+            -0.42400026321411133,
+            1.9750000312924385,
+            -2.0855002403259277
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "window_wall",
+          "axis_separation_m": [
+            -0.10600042343139648,
+            -1.6949999332427979,
+            -2.010499954223633
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "back_wall",
+          "axis_separation_m": [
+            -0.2539999485015869,
+            -1.6949999332427979,
+            1.2999998331069946
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "arched_window",
+          "axis_separation_m": [
+            -0.22899985313415527,
+            -1.0550000667572021,
+            0.044499993324279785
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "window_garden",
+          "axis_separation_m": [
+            0.5489997863769531,
+            -1.1050000190734863,
+            -0.04550004005432129
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "window_plant",
+          "axis_separation_m": [
+            -0.1286149024963379,
+            0.24916326999664307,
+            1.4466756135225296
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "green_door",
+          "axis_separation_m": [
+            4.22599983215332,
+            -0.4549999237060547,
+            1.1899999380111694
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "entry_mat",
+          "axis_separation_m": [
+            4.355999946594238,
+            1.9755000323057175,
+            0.5650001764297485
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "fire",
+          "axis_separation_m": [
+            0.17849993705749512,
+            1.443000078201294,
+            0.7950001955032349
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "sink_cabinet",
+          "axis_separation_m": [
+            1.5509998798370361,
+            0.3581669330596924,
+            0.5384997129440308
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "utensil_crock",
+          "axis_separation_m": [
+            1.7381706237792969,
+            0.15149497985839844,
+            1.0268231630325317
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "wall_shelf",
+          "axis_separation_m": [
+            1.6359999179840088,
+            -0.6134998798370361,
+            0.9699999094009399
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "shelf_plant",
+          "axis_separation_m": [
+            2.968367964029312,
+            -0.7171649932861328,
+            0.821022629737854
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "hanging_towel",
+          "axis_separation_m": [
+            3.400999963283539,
+            0.09500002861022949,
+            1.212516188621521
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "dining_table",
+          "axis_separation_m": [
+            1.7960000038146973,
+            0.878000020980835,
+            1.2419999837875366
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "checked_runner",
+          "axis_separation_m": [
+            1.6659998893737793,
+            0.8521990776062012,
+            1.4640851020812988
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "chair",
+          "axis_separation_m": [
+            3.735999822616577,
+            0.5429999828338623,
+            1.5094999074935913
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "bench",
+          "axis_separation_m": [
+            -0.03400015830993652,
+            1.3429999947547913,
+            1.8244999051094055
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "daisy_jug",
+          "axis_separation_m": [
+            2.598859041929245,
+            0.16334915161132812,
+            1.5493693947792053
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "floor_plant",
+          "axis_separation_m": [
+            5.22101092338562,
+            1.2970219850540161,
+            0.24983549118041992
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "chair_opposite",
+          "axis_separation_m": [
+            1.1759998798370361,
+            0.5429999828338623,
+            1.509499967098236
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "cookbook_wall",
+          "b": "warming_cabinet",
+          "axis_separation_m": [
+            0.016000032424926758,
+            0.693000078201294,
+            -0.14499998092651367
+          ],
+          "intersections": 0,
+          "floor_contact_pairs": 0,
+          "intentional_fire_log_pairs": 0
+        },
+        {
+          "a": "warming_cabinet",
+          "b": "sink_cabinet",
+          "axis_separation_m": [
+            1.0349998474121094,
+            -1.319999948143959,
+            0.12349963188171387
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "warming_cabinet",
+          "b": "arched_window",
+          "axis_separation_m": [
+            -0.24500012397766113,
+            -0.3020000457763672,
+            0.25
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "warming_cabinet",
+          "b": "bench",
+          "axis_separation_m": [
+            -0.42999982833862305,
+            -0.6700000315904617,
+            2.0299999117851257
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "warming_cabinet",
+          "b": "green_door",
+          "axis_separation_m": [
+            3.7099997997283936,
+            -1.4919999539852142,
+            0.7749998569488525
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "sink_cabinet",
+          "b": "arched_window",
+          "axis_separation_m": [
+            1.2899997234344482,
+            -0.6368331909179688,
+            0.9334996938705444
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "sink_cabinet",
+          "b": "bench",
+          "axis_separation_m": [
+            1.1050000190734863,
+            -0.6700000315904617,
+            2.71349960565567
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "sink_cabinet",
+          "b": "green_door",
+          "axis_separation_m": [
+            0.7049999237060547,
+            -1.8268330991268158,
+            -0.3299999237060547
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "arched_window",
+          "b": "bench",
+          "axis_separation_m": [
+            -0.2950003147125244,
+            0.3479998707771301,
+            -0.3400000333786011
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "arched_window",
+          "b": "green_door",
+          "axis_separation_m": [
+            3.9649996757507324,
+            -1.4500000476837158,
+            1.584999918937683
+          ],
+          "intersections": 0
+        },
+        {
+          "a": "bench",
+          "b": "green_door",
+          "axis_separation_m": [
+            3.7799999713897705,
+            -0.8420000374317169,
+            3.364999830722809
+          ],
+          "intersections": 0
+        }
+      ],
+      "method": "Actual GLB vertices and transforms, AABB broad phase and triangle BVH intersections; ray tests prove stove support and true firebox cavities. Positive controls cover collision detector.",
+      "support_rays": [
+        {
+          "socket": "stove_1_top",
+          "radial_support_y": [
+            0.9800000190734863,
+            0.9800000190734863,
+            0.9800000190734863,
+            0.9800000190734863
+          ]
+        },
+        {
+          "socket": "stove_2_top",
+          "radial_support_y": [
+            0.9800000190734863,
+            0.9800000190734863,
+            0.9800000190734863,
+            0.9800000190734863
+          ]
+        },
+        {
+          "socket": "stove_3_top",
+          "radial_support_y": [
+            0.9800000190734863,
+            0.9800000190734863,
+            0.9800000190734863,
+            0.9800000190734863
+          ]
+        }
+      ],
+      "positive_control_pairs": 1353,
+      "pot_support_intersections": [
+        {
+          "stove": 1,
+          "contact_pairs": 120,
+          "penetration_pairs": 0
+        },
+        {
+          "stove": 2,
+          "contact_pairs": 120,
+          "penetration_pairs": 0
+        },
+        {
+          "stove": 3,
+          "contact_pairs": 120,
+          "penetration_pairs": 0
+        }
+      ],
+      "big_pot_world_bounds": [
+        [
+          [
+            -2.640000104904175,
+            0.9800000190734863,
+            -2.6019999980926514
+          ],
+          [
+            -2.359999895095825,
+            1.222000002861023,
+            -2.388000011444092
+          ]
+        ],
+        [
+          [
+            -2.190000057220459,
+            0.9800000190734863,
+            -2.6019999980926514
+          ],
+          [
+            -1.909999966621399,
+            1.222000002861023,
+            -2.388000011444092
+          ]
+        ],
+        [
+          [
+            -1.7400000095367432,
+            0.9800000190734863,
+            -2.6019999980926514
+          ],
+          [
+            -1.4600000381469727,
+            1.222000002861023,
+            -2.388000011444092
+          ]
+        ]
+      ],
+      "sockets_world": {
+        "stove_1_top": [
+          -2.5,
+          0.98,
+          -2.495
+        ],
+        "fire_1": [
+          -2.4725,
+          0.232,
+          -2.535
+        ],
+        "stove_2_top": [
+          -2.05,
+          0.98,
+          -2.495
+        ],
+        "fire_2": [
+          -2.0225,
+          0.232,
+          -2.535
+        ],
+        "stove_3_top": [
+          -1.6,
+          0.98,
+          -2.495
+        ],
+        "fire_3": [
+          -1.5725,
+          0.232,
+          -2.535
+        ]
+      },
+      "world_bounds": {
+        "room_shell": [
+          [
+            -3.2900002002716064,
+            -0.32999998331069946,
+            -3.2900002002716064
+          ],
+          [
+            3.2900002002716064,
+            0.11999999731779099,
+            3.2900002002716064
+          ]
+        ],
+        "window_wall": [
+          [
+            -3.2750003337860107,
+            -0.029999971389770508,
+            -3.2149999141693115
+          ],
+          [
+            -2.854999542236328,
+            3.7899999618530273,
+            3.2149999141693115
+          ]
+        ],
+        "back_wall": [
+          [
+            -3.119999885559082,
+            -0.029999971389770508,
+            -3.2749998569488525
+          ],
+          [
+            3.2149999141693115,
+            3.7899999618530273,
+            -2.8549997806549072
+          ]
+        ],
+        "arched_window": [
+          [
+            -3.0949997901916504,
+            1.0999999046325684,
+            -1.159999966621399
+          ],
+          [
+            -2.6049997806549072,
+            3.1500000953674316,
+            0.9599999785423279
+          ]
+        ],
+        "window_garden": [
+          [
+            -3.510000228881836,
+            1.1799999475479126,
+            -1.25
+          ],
+          [
+            -3.5099997520446777,
+            3.200000047683716,
+            1.0499999523162842
+          ]
+        ],
+        "window_plant": [
+          [
+            -2.994614839553833,
+            0.9922347068786621,
+            0.2421756535768509
+          ],
+          [
+            -2.4711408615112305,
+            1.8458367586135864,
+            0.6846227645874023
+          ]
+        ],
+        "green_door": [
+          [
+            1.3599998950958252,
+            -0.09000000357627869,
+            -3.0349998474121094
+          ],
+          [
+            2.700000047683716,
+            2.549999952316284,
+            -2.744999885559082
+          ]
+        ],
+        "entry_mat": [
+          [
+            1.4900000095367432,
+            0.0754999965429306,
+            -2.680000066757202
+          ],
+          [
+            2.569999933242798,
+            0.11949999630451202,
+            -2.120000123977661
+          ]
+        ],
+        "kitchen_range_3": [
+          [
+            -2.7249999046325684,
+            0.0820000022649765,
+            -2.9730000495910645
+          ],
+          [
+            -1.375,
+            1.596000075340271,
+            -2.2300000190734863
+          ]
+        ],
+        "fire": [
+          [
+            -2.6875,
+            0.23199999332427979,
+            -2.620000123977661
+          ],
+          [
+            -2.3125,
+            0.6519999504089355,
+            -2.3500001430511475
+          ]
+        ],
+        "sink_cabinet": [
+          [
+            -1.315000057220459,
+            0.0820000022649765,
+            -3.0749998092651367
+          ],
+          [
+            0.6549999713897705,
+            1.736833095550537,
+            -2.0934996604919434
+          ]
+        ],
+        "utensil_crock": [
+          [
+            -1.1278293132781982,
+            1.25,
+            -2.8181769847869873
+          ],
+          [
+            -0.821069598197937,
+            1.943505048751831,
+            -2.5818231105804443
+          ]
+        ],
+        "wall_shelf": [
+          [
+            -1.2300000190734863,
+            1.9849998950958252,
+            -2.9549999237060547
+          ],
+          [
+            0.5499999523162842,
+            2.7084999084472656,
+            -2.5249998569488525
+          ]
+        ],
+        "shelf_plant": [
+          [
+            0.10236802697181702,
+            1.9663348197937012,
+            -2.9071829319000244
+          ],
+          [
+            0.5513145327568054,
+            2.832393169403076,
+            -2.3760225772857666
+          ]
+        ],
+        "hanging_towel": [
+          [
+            0.5350000262260437,
+            1.1288762092590332,
+            -2.9100000858306885
+          ],
+          [
+            0.9097349047660828,
+            2.0,
+            -2.7675161361694336
+          ]
+        ],
+        "dining_table": [
+          [
+            -1.0699999332427979,
+            0.09200000762939453,
+            0.03750002384185791
+          ],
+          [
+            0.8299999833106995,
+            1.2170000076293945,
+            1.2024999856948853
+          ]
+        ],
+        "checked_runner": [
+          [
+            -1.2000000476837158,
+            0.9552559852600098,
+            0.2595851421356201
+          ],
+          [
+            0.9100000262260437,
+            1.2428009510040283,
+            0.9804268479347229
+          ]
+        ],
+        "chair": [
+          [
+            0.869999885559082,
+            0.0820000171661377,
+            0.3049999475479126
+          ],
+          [
+            1.4500000476837158,
+            1.5520000457763672,
+            0.9350000023841858
+          ]
+        ],
+        "bench": [
+          [
+            -2.9000000953674316,
+            0.08699998259544373,
+            0.6199999451637268
+          ],
+          [
+            -2.4200000762939453,
+            0.7520000338554382,
+            1.7400000095367432
+          ]
+        ],
+        "daisy_jug": [
+          [
+            -0.2671408951282501,
+            1.2619999647140503,
+            0.3448694348335266
+          ],
+          [
+            0.25878944993019104,
+            1.9316508769989014,
+            0.8506619930267334
+          ]
+        ],
+        "floor_plant": [
+          [
+            2.355010986328125,
+            0.09000000357627869,
+            -2.347329616546631
+          ],
+          [
+            3.0065555572509766,
+            0.7979780435562134,
+            -1.8048354387283325
+          ]
+        ],
+        "spice_rack": [
+          [
+            -2.9719998836517334,
+            1.5712567567825317,
+            -1.8750001192092896
+          ],
+          [
+            -2.7119998931884766,
+            1.9555000066757202,
+            -1.274999976158142
+          ]
+        ],
+        "cookbook_wall": [
+          [
+            -2.9609999656677246,
+            2.0950000286102295,
+            -1.5549999475479126
+          ],
+          [
+            -2.865999937057495,
+            2.683499813079834,
+            -1.2044999599456787
+          ]
+        ],
+        "chair_opposite": [
+          [
+            -1.690000057220459,
+            0.0820000171661377,
+            0.3050000071525574
+          ],
+          [
+            -1.1099998950958252,
+            1.5520000457763672,
+            0.9350000619888306
+          ]
+        ],
+        "warming_cabinet": [
+          [
+            -2.8499999046325684,
+            0.0820000022649765,
+            -1.9700000286102295
+          ],
+          [
+            -2.3499999046325684,
+            1.4019999504089355,
+            -1.409999966621399
+          ]
+        ]
+      },
+      "failures": []
+    },
+    "godot": {
+      "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+      "assets": {
+        "cookbook_wall": {
+          "bounds": [
+            [
+              -0.175500005483627,
+              -0.224999994039536,
+              -0.000999998301267624
+            ],
+            [
+              0.174999982118607,
+              0.363500028848648,
+              0.0939999967813492
+            ]
+          ],
+          "size_xyz": [
+            0.350499987602234,
+            0.588500022888184,
+            0.0949999988079071
+          ],
+          "surfaces": 1,
+          "triangles": 688
+        },
+        "kitchen_range_3": {
+          "bounds": [
+            [
+              -0.675000011920929,
+              0.0,
+              -0.443000018596649
+            ],
+            [
+              0.675000011920929,
+              1.51400005817413,
+              0.300000011920929
+            ]
+          ],
+          "size_xyz": [
+            1.35000002384186,
+            1.51400005817413,
+            0.743000030517578
+          ],
+          "surfaces": 3,
+          "triangles": 4916
+        },
+        "spice_rack": {
+          "bounds": [
+            [
+              -0.300000011920929,
+              -0.148743286728859,
+              -0.141999989748001
+            ],
+            [
+              0.300000011920929,
+              0.235499992966652,
+              0.118000000715256
+            ]
+          ],
+          "size_xyz": [
+            0.600000023841858,
+            0.384243279695511,
+            0.259999990463257
+          ],
+          "surfaces": 1,
+          "triangles": 1296
+        }
+      },
+      "captures": [
+        {
+          "camera_position": [
+            0.0,
+            0.75,
+            19.9449996948242
+          ],
+          "camera_size": 2.29999995231628,
+          "height": 960,
+          "id": "range_front",
+          "pitch": 0.0,
+          "width": 960,
+          "yaw": 0.0
+        },
+        {
+          "camera_position": [
+            10.3967361450195,
+            9.20236587524414,
+            14.7930774688721
+          ],
+          "camera_size": 2.29999995231628,
+          "height": 960,
+          "id": "range_three_quarter",
+          "pitch": 24.9999980926514,
+          "width": 960,
+          "yaw": 34.9999961853027
+        },
+        {
+          "camera_position": [
+            20.0,
+            0.75,
+            -0.0550008751451969
+          ],
+          "camera_size": 2.29999995231628,
+          "height": 960,
+          "id": "range_side",
+          "pitch": 0.0,
+          "width": 960,
+          "yaw": 90.0
+        },
+        {
+          "camera_position": [
+            9.46163272857666,
+            15.1399669647217,
+            11.1547660827637
+          ],
+          "camera_size": 10.75,
+          "height": 800,
+          "id": "basic_room_43deg_360",
+          "pitch": 42.9999961853027,
+          "width": 360,
+          "yaw": 40.3050842285156
+        },
+        {
+          "camera_position": [
+            7.81163263320923,
+            14.7999668121338,
+            9.20476627349854
+          ],
+          "camera_size": 3.45000004768372,
+          "height": 800,
+          "id": "kitchen_corner_360",
+          "pitch": 42.9999961853027,
+          "width": 360,
+          "yaw": 40.3050842285156
+        },
+        {
+          "camera_position": [
+            8.81163311004639,
+            14.8899669647217,
+            10.6047658920288
+          ],
+          "camera_size": 6.71999979019165,
+          "height": 800,
+          "id": "basic_gameplay_43deg_360",
+          "pitch": 42.9999961853027,
+          "width": 360,
+          "yaw": 40.3050842285156
+        },
+        {
+          "camera_position": [
+            5.46996307373047,
+            10.9499998092651,
+            13.4477100372314
+          ],
+          "camera_size": 2.25,
+          "height": 800,
+          "id": "level1_caps_360",
+          "pitch": 30.0,
+          "width": 360,
+          "yaw": 24.9999980926514
+        },
+        {
+          "camera_position": [
+            6.63721323013306,
+            4.90843820571899,
+            18.2355937957764
+          ],
+          "camera_size": 0.819999992847443,
+          "height": 960,
+          "id": "spice_rack_detail",
+          "pitch": 13.9999990463257,
+          "width": 960,
+          "yaw": 19.9999980926514
+        },
+        {
+          "camera_position": [
+            6.63721323013306,
+            4.90843820571899,
+            18.2355937957764
+          ],
+          "camera_size": 0.819999992847443,
+          "height": 960,
+          "id": "cookbook_wall_detail",
+          "pitch": 13.9999990463257,
+          "width": 960,
+          "yaw": 19.9999980926514
+        }
+      ],
+      "checks": [
+        {
+          "check": "kitchen_range_3 imported identity root",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 imported triangles",
+          "passed": true
+        },
+        {
+          "check": "kitchen_range_3 imported surfaces",
+          "passed": true
+        },
+        {
+          "check": "empty socket stove_1_top",
+          "passed": true
+        },
+        {
+          "check": "socket transform stove_1_top",
+          "passed": true
+        },
+        {
+          "check": "empty socket fire_1",
+          "passed": true
+        },
+        {
+          "check": "socket transform fire_1",
+          "passed": true
+        },
+        {
+          "check": "empty socket stove_2_top",
+          "passed": true
+        },
+        {
+          "check": "socket transform stove_2_top",
+          "passed": true
+        },
+        {
+          "check": "empty socket fire_2",
+          "passed": true
+        },
+        {
+          "check": "socket transform fire_2",
+          "passed": true
+        },
+        {
+          "check": "empty socket stove_3_top",
+          "passed": true
+        },
+        {
+          "check": "socket transform stove_3_top",
+          "passed": true
+        },
+        {
+          "check": "empty socket fire_3",
+          "passed": true
+        },
+        {
+          "check": "socket transform fire_3",
+          "passed": true
+        },
+        {
+          "check": "independent cap lid_2",
+          "passed": true
+        },
+        {
+          "check": "independent cap lid_3",
+          "passed": true
+        },
+        {
+          "check": "spice_rack imported identity root",
+          "passed": true
+        },
+        {
+          "check": "spice_rack imported triangles",
+          "passed": true
+        },
+        {
+          "check": "spice_rack imported surfaces",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall imported identity root",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall imported triangles",
+          "passed": true
+        },
+        {
+          "check": "cookbook_wall imported surfaces",
+          "passed": true
+        },
+        {
+          "check": "Saved range_front",
+          "passed": true
+        },
+        {
+          "check": "Saved range_three_quarter",
+          "passed": true
+        },
+        {
+          "check": "Saved range_side",
+          "passed": true
+        },
+        {
+          "check": "world socket stove_1_top",
+          "passed": true
+        },
+        {
+          "check": "world socket fire_1",
+          "passed": true
+        },
+        {
+          "check": "world socket stove_2_top",
+          "passed": true
+        },
+        {
+          "check": "world socket fire_2",
+          "passed": true
+        },
+        {
+          "check": "world socket stove_3_top",
+          "passed": true
+        },
+        {
+          "check": "world socket fire_3",
+          "passed": true
+        },
+        {
+          "check": "real avatar assembled",
+          "passed": true
+        },
+        {
+          "check": "Saved basic_room_43deg_360",
+          "passed": true
+        },
+        {
+          "check": "Saved kitchen_corner_360",
+          "passed": true
+        },
+        {
+          "check": "Saved basic_gameplay_43deg_360",
+          "passed": true
+        },
+        {
+          "check": "Saved level1_caps_360",
+          "passed": true
+        },
+        {
+          "check": "Saved spice_rack_detail",
+          "passed": true
+        },
+        {
+          "check": "Saved cookbook_wall_detail",
+          "passed": true
+        }
+      ],
+      "failures": [],
+      "renderer": "mobile",
+      "sockets": {
+        "fire_1": [
+          -2.47249984741211,
+          0.232000008225441,
+          -2.53500008583069
+        ],
+        "fire_2": [
+          -2.02250003814697,
+          0.232000008225441,
+          -2.53500008583069
+        ],
+        "fire_3": [
+          -1.57249999046326,
+          0.232000008225441,
+          -2.53500008583069
+        ],
+        "stove_1_top": [
+          -2.5,
+          0.980000019073486,
+          -2.49499988555908
+        ],
+        "stove_2_top": [
+          -2.04999995231628,
+          0.980000019073486,
+          -2.49499988555908
+        ],
+        "stove_3_top": [
+          -1.59999990463257,
+          0.980000019073486,
+          -2.49499988555908
+        ]
+      }
+    },
+    "atlas": {
+      "checks": [
+        {
+          "check": "Red patch does not touch any original UV island or 9-pixel gutter",
+          "passed": true
+        },
+        {
+          "check": "Atlas reconstructs exactly from original pixels + recorded AO delta + isolated red patch",
+          "passed": true
+        },
+        {
+          "check": "All changed pixels confined to declared kitchen AO target islands or new red patch",
+          "passed": true
+        },
+        {
+          "check": "Original atlas source hash matches pinned base",
+          "passed": true
+        },
+        {
+          "check": "New atlas matches contract hash",
+          "passed": true
+        }
+      ],
+      "original_glbs": 22,
+      "changed_pixels": 75380,
+      "patch": {
+        "rect": [
+          32,
+          240,
+          16,
+          16
+        ],
+        "rgb8": [
+          190,
+          63,
+          40
+        ],
+        "purpose": "Red cookbook / chilli. Previously unused pixels; >=9 px outside every original UV island, including archived hearth/kettle."
+      },
+      "same_texture_count": 1,
+      "size": [
+        2048,
+        2048
+      ],
+      "scope": "Existing UVs / original colour detail preserved. Local contact-AO delta removes old hearth shadow and updates moved/new props; no new runtime texture. See source atlas-ao-delta.json.",
+      "failures": []
+    },
+    "reproducibility": {
+      "checks": [
+        {
+          "file": "assets/rooms/basic_room/kitchen_range_3.glb",
+          "sha256": "e6bc3e8d680cfcbdc8ed12f337fa009ba24b3ebc541848359be0a91ffeecfa0f",
+          "passed": true
+        },
+        {
+          "file": "assets/rooms/basic_room/spice_rack.glb",
+          "sha256": "1dbc6b45342140b5f1ef4f6b292069cad31bbdd9e58beb3e88703bf86c8c573e",
+          "passed": true
+        },
+        {
+          "file": "assets/rooms/basic_room/cookbook_wall.glb",
+          "sha256": "5880255f0c6ca77840902b18dc44ec2885839e84ecdf8fd7cb1faec878ffe2d5",
+          "passed": true
+        },
+        {
+          "file": "assets/rooms/basic_room/room_albedo_ao.png",
+          "sha256": "cb900e7fd32084d9576055e77c2cd155294c6912cf9afeb5e5d1c5567d383f65",
+          "passed": true
+        },
+        {
+          "file": "assets/rooms/basic_room/layout.json",
+          "sha256": "6bde471fb1f2dfd31455bf8bc5f3e0013d059f099c24808988c2fb180a03b732",
+          "passed": true
+        },
+        {
+          "file": "assets/rooms/basic_room/asset_stats.json",
+          "sha256": "ebf152181aa97494a3ff87ee36539a28271109c58be6461ebab85b2cdd2abdcf",
+          "passed": true
+        }
+      ],
+      "failures": []
+    }
+  },
+  "summary": {
+    "geometry": {
+      "checks": 141,
+      "failures": 0
+    },
+    "godot": {
+      "checks": 39,
+      "failures": 0
+    },
+    "atlas": {
+      "checks": 5,
+      "failures": 0
+    },
+    "reproducibility": {
+      "checks": 6,
+      "failures": 0
+    }
+  },
+  "media": [
+    {
+      "file": "SGODOT-213_KITCHEN_v1_basic_gameplay_43deg_360.png",
+      "sha256": "e05270cd6bd7b159d081dc6170c9f05dae7a64fcc0940742bd73487568776932"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_basic_room_43deg_360.png",
+      "sha256": "7997bff605320041d2edea9e12b5ba6e04b89c1b84366b3cf9599c8f04a65dc3"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_cookbook_wall_detail.png",
+      "sha256": "bfa2ba4639cefe9225691cb95632b343273b4d4503ee551e7eba213cd3223f15"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_kitchen_corner_360.png",
+      "sha256": "29a1d7fb6367fff63ec23e9dab30818c50527d206b8162acfa5d5f8d04a069ac"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_level1_caps_360.png",
+      "sha256": "3b8cd9595a5f29ce3669480e47514290c4080ef7a4f282f2c1ecf9d15476f7d8"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_range_front.png",
+      "sha256": "463b5f223b6c5101491cd24dc8313bf2519ae8405faedff27123bf0deabb5d0a"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_range_side.png",
+      "sha256": "c771c1169114ed8800c96704f699adc89b11448b3d76afbd62ef94134f781f0a"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_range_three_quarter.png",
+      "sha256": "635a501f185e03acc6252e28bad804b92a889557871576b57a06b7d998f5a7c1"
+    },
+    {
+      "file": "SGODOT-213_KITCHEN_v1_spice_rack_detail.png",
+      "sha256": "013edacde0259593d81cb32af1944a5595b077aaa767eb58ac8df90cb0079c61"
+    }
+  ]
+}
