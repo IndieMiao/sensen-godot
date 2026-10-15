@@ -118,7 +118,7 @@
       "vertices": 7268,
       "triangles": 13136,
       "surfaces": 1,
-      "bytes": 524144
+      "bytes": 438400
     },
     {
       "name": "loft_structure",
@@ -285,7 +285,7 @@
   "unique_triangles": 129503,
   "scene_triangles": 157367,
   "static_draw_surfaces": 59,
-  "glb_bytes": 4501440,
+  "glb_bytes": 4415696,
   "atlas_bytes": 2520114,
   "placed_instances": 59,
   "materials": 3,
