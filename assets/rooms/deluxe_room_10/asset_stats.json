@@ -116,9 +116,9 @@
     {
       "name": "kitchen_fittings",
       "vertices": 7268,
-      "triangles": 14280,
+      "triangles": 13136,
       "surfaces": 1,
-      "bytes": 445224
+      "bytes": 524144
     },
     {
       "name": "loft_structure",
@@ -282,14 +282,14 @@
       "bytes": 55252
     }
   ],
-  "unique_triangles": 130647,
-  "scene_triangles": 158511,
+  "unique_triangles": 129503,
+  "scene_triangles": 157367,
   "static_draw_surfaces": 59,
-  "glb_bytes": 4422520,
+  "glb_bytes": 4501440,
   "atlas_bytes": 2520114,
   "placed_instances": 59,
   "materials": 3,
-  "local_scene_triangles": 139079,
+  "local_scene_triangles": 137935,
   "shared_scene_triangles": 19432,
   "shared_assets": [
     {
