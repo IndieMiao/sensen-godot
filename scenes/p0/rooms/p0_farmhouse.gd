@@ -219,7 +219,8 @@ func p0_space() -> String: return "home"
 
 ## The props show from the player's Homestead level (read before the walkable grid is built).
 func _dress_art() -> void:
-	if use_runtime: level = int(P0Runtime.ensure().session.current().get("homestead", {}).get("level", 1))
+	var view := P0Runtime.ensure().session.current() if use_runtime else {}
+	if use_runtime: level = int(view.get("homestead", {}).get("level", 1))
 	super()
 	# the light at the model's `glow` socket, inside the cabinet behind its open front (SGODOT-282 warming_cabinet.glb)
 	var socket := art.get_node("warming_cabinet").find_child("glow", true, false) as Node3D if art.has_node("warming_cabinet") else null
@@ -238,6 +239,7 @@ func _dress_art() -> void:
 		glow.position = t.origin
 		art.add_child(glow)
 		module_levels[glow.name] = module_levels.get("warming_cabinet", 3)
+	if use_runtime: show_cabinet_plates(P0KitchenLogic.cabinet_plates(view))   # before the first frame: no flash of six (刘邦 on #431)
 
 ## The Warming Cabinet shows dish_1 … dish_N for the N dishes it holds (q(202)): at once, no animation; its warm light
 ## stays on, empty or not.
