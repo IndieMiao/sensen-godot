@@ -1,0 +1,82 @@
+[
+  {
+    "file": "SGODOT-308_MINEHUT_v1_full_room_43deg_360.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "5f05a877ebd5db808712423c227484bdc789e0626eca990684905d69ef971ef8"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_full_room_panorama.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "ff0cab36d2654981a354cc60e365457ecfeec9d400177867a79d8f669c9605c2"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_gameplay_43deg_360.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "a81cbe63d0b66df2d2ece1e83f1a96d2bf3b7587113234756547da8c2da1ca78"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_ivo_character_detail.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "f7868df706519d764147aea13897b6e115ebbae2570381e9fe6ebd1adf7e7a71"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_ivo_position.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "bb540d5ecbf39889c386687e92dcff7e8943a2d5f61c925212f606b60f72318d"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_mine_entrance_detail.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "48e9850e1f082fbcf168cfce9f43e72be6e956f8b59a1e0632bb87b5863525f4"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_reference_comparison.png",
+    "size": [
+      2454,
+      1354
+    ],
+    "sha256": "5198b200099c8275cc0a0701a56c314da8884f66ac215f870824e9b139b95db7"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_sorting_table_detail.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "cfde3cebd5126429beeac68d72bb2102c274e1f47cabdd5415455a81f94c4b70"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_stove_detail.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "58b7c88eaf1d8c8dadfa317fc644d0e43d89797388197d6b3b4d4c685a485ee9"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_top_view.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "dfa42e63858abb0ff1f71f9ec0d6e1d9a6cc54e0c189426624bca20438c65462"
+  }
+]

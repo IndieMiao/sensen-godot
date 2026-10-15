@@ -1,0 +1,320 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 4864,
+      "triangles": 9380,
+      "surfaces": 1,
+      "bytes": 324480
+    },
+    {
+      "name": "left_wall",
+      "vertices": 392,
+      "triangles": 756,
+      "surfaces": 1,
+      "bytes": 27488
+    },
+    {
+      "name": "back_wall",
+      "vertices": 490,
+      "triangles": 956,
+      "surfaces": 1,
+      "bytes": 38780
+    },
+    {
+      "name": "mine_entrance",
+      "vertices": 4320,
+      "triangles": 8344,
+      "surfaces": 1,
+      "bytes": 502056
+    },
+    {
+      "name": "mine_lantern_-1",
+      "vertices": 144,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 13568
+    },
+    {
+      "name": "mine_lantern_glow_-1",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5204
+    },
+    {
+      "name": "mine_lantern_hanger_-1",
+      "vertices": 134,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 14896
+    },
+    {
+      "name": "mine_lantern_1",
+      "vertices": 144,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 13568
+    },
+    {
+      "name": "mine_lantern_glow_1",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5204
+    },
+    {
+      "name": "mine_lantern_hanger_1",
+      "vertices": 134,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 14892
+    },
+    {
+      "name": "hearth_stones",
+      "vertices": 118,
+      "triangles": 220,
+      "surfaces": 1,
+      "bytes": 21272
+    },
+    {
+      "name": "grilling_stove",
+      "vertices": 1280,
+      "triangles": 2416,
+      "surfaces": 1,
+      "bytes": 90288
+    },
+    {
+      "name": "stove_embers",
+      "vertices": 2112,
+      "triangles": 4160,
+      "surfaces": 1,
+      "bytes": 408464
+    },
+    {
+      "name": "firewood",
+      "vertices": 240,
+      "triangles": 432,
+      "surfaces": 1,
+      "bytes": 22492
+    },
+    {
+      "name": "square_stool",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 20080
+    },
+    {
+      "name": "sorting_bench",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46124
+    },
+    {
+      "name": "sorting_tray",
+      "vertices": 1580,
+      "triangles": 3096,
+      "surfaces": 1,
+      "bytes": 247116
+    },
+    {
+      "name": "quartz_and_tools",
+      "vertices": 428,
+      "triangles": 796,
+      "surfaces": 1,
+      "bytes": 66040
+    },
+    {
+      "name": "round_stool",
+      "vertices": 96,
+      "triangles": 176,
+      "surfaces": 1,
+      "bytes": 9692
+    },
+    {
+      "name": "rock_crate",
+      "vertices": 2008,
+      "triangles": 3916,
+      "surfaces": 1,
+      "bytes": 255488
+    },
+    {
+      "name": "salt_crate",
+      "vertices": 2140,
+      "triangles": 4176,
+      "surfaces": 1,
+      "bytes": 288024
+    },
+    {
+      "name": "rock_barrel",
+      "vertices": 3972,
+      "triangles": 7744,
+      "surfaces": 1,
+      "bytes": 574276
+    },
+    {
+      "name": "wood_stump",
+      "vertices": 1325,
+      "triangles": 2622,
+      "surfaces": 1,
+      "bytes": 99848
+    },
+    {
+      "name": "low_cabinet",
+      "vertices": 328,
+      "triangles": 632,
+      "surfaces": 1,
+      "bytes": 23760
+    },
+    {
+      "name": "cabinet_lantern",
+      "vertices": 144,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 13568
+    },
+    {
+      "name": "cabinet_lantern_glow",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5204
+    },
+    {
+      "name": "left_shelf",
+      "vertices": 410,
+      "triangles": 792,
+      "surfaces": 1,
+      "bytes": 32192
+    },
+    {
+      "name": "shelf_lantern",
+      "vertices": 144,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 13564
+    },
+    {
+      "name": "shelf_lantern_glow",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5200
+    },
+    {
+      "name": "hanging_pan",
+      "vertices": 214,
+      "triangles": 416,
+      "surfaces": 1,
+      "bytes": 17956
+    },
+    {
+      "name": "garlic_and_herbs",
+      "vertices": 464,
+      "triangles": 852,
+      "surfaces": 1,
+      "bytes": 37896
+    },
+    {
+      "name": "mine_plan",
+      "vertices": 294,
+      "triangles": 548,
+      "surfaces": 1,
+      "bytes": 24568
+    },
+    {
+      "name": "wall_pickaxe",
+      "vertices": 56,
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 6128
+    },
+    {
+      "name": "wall_short_axe",
+      "vertices": 24,
+      "triangles": 40,
+      "surfaces": 1,
+      "bytes": 3744
+    },
+    {
+      "name": "coiled_rope",
+      "vertices": 810,
+      "triangles": 1600,
+      "surfaces": 1,
+      "bytes": 60968
+    },
+    {
+      "name": "ivo_wall_helmet",
+      "vertices": 823,
+      "triangles": 1467,
+      "surfaces": 1,
+      "bytes": 55736
+    },
+    {
+      "name": "tied_sack",
+      "vertices": 348,
+      "triangles": 684,
+      "surfaces": 1,
+      "bytes": 26900
+    },
+    {
+      "name": "stone_sack",
+      "vertices": 1196,
+      "triangles": 2356,
+      "surfaces": 1,
+      "bytes": 208656
+    },
+    {
+      "name": "white_hide_rug",
+      "vertices": 166,
+      "triangles": 297,
+      "surfaces": 1,
+      "bytes": 9064
+    },
+    {
+      "name": "entry_plant_-1",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45792
+    },
+    {
+      "name": "entry_plant_1",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45788
+    },
+    {
+      "name": "exit_steps",
+      "vertices": 160,
+      "triangles": 312,
+      "surfaces": 1,
+      "bytes": 29836
+    },
+    {
+      "name": "exit_pickaxe_sign",
+      "vertices": 238,
+      "triangles": 448,
+      "surfaces": 1,
+      "bytes": 18960
+    }
+  ],
+  "unique_triangles": 65722,
+  "scene_triangles": 65722,
+  "static_draw_surfaces": 43,
+  "glb_bytes": 3794820,
+  "atlas_bytes": 1678169,
+  "placed_instances": 43,
+  "materials": 6
+}
