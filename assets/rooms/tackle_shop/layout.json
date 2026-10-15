@@ -1,0 +1,1168 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "2681:135486"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.08,
+            0
+          ],
+          "size": [
+            6.8,
+            0.32,
+            6.4
+          ]
+        },
+        {
+          "at": [
+            -3.27,
+            1.65,
+            0
+          ],
+          "size": [
+            0.22,
+            3.3,
+            6.4
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.65,
+            -3.07
+          ],
+          "size": [
+            6.8,
+            3.3,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            3.36,
+            0.75,
+            0
+          ],
+          "size": [
+            0.08,
+            1.5,
+            6.4
+          ]
+        },
+        {
+          "at": [
+            -2.05,
+            0.75,
+            3.16
+          ],
+          "size": [
+            2.7,
+            1.5,
+            0.08
+          ]
+        },
+        {
+          "at": [
+            2.05,
+            0.75,
+            3.16
+          ],
+          "size": [
+            2.7,
+            1.5,
+            0.08
+          ]
+        },
+        {
+          "at": [
+            0,
+            -0.08,
+            3.48
+          ],
+          "size": [
+            1.4,
+            0.32,
+            0.64
+          ]
+        },
+        {
+          "at": [
+            -0.74,
+            0.75,
+            3.48
+          ],
+          "size": [
+            0.08,
+            1.5,
+            0.7
+          ]
+        },
+        {
+          "at": [
+            0.74,
+            0.75,
+            3.48
+          ],
+          "size": [
+            0.08,
+            1.5,
+            0.7
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.75,
+            3.84
+          ],
+          "size": [
+            1.5,
+            1.5,
+            0.08
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "left_wall",
+      "file": "left_wall.glb",
+      "position": [
+        -3.27,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.07
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "porthole",
+      "file": "porthole.glb",
+      "position": [
+        -3.115,
+        2.08,
+        -1.37
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "porthole_view",
+      "file": "porthole_view.glb",
+      "position": [
+        -3.39,
+        2.08,
+        -1.37
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "curved_counter",
+      "file": "curved_counter.glb",
+      "position": [
+        -0.36,
+        0.08,
+        -1.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            1.94,
+            1.1,
+            0.88
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_ship_wheel",
+      "file": "counter_ship_wheel.glb",
+      "position": [
+        -0.36,
+        0.66,
+        -0.615
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_lantern",
+      "file": "counter_lantern.glb",
+      "position": [
+        -1.1,
+        1.2,
+        -1.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "wall_lantern",
+      "file": "wall_lantern.glb",
+      "position": [
+        -3.03,
+        2.33,
+        0.24
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "pendant_lamp",
+      "file": "pendant_lamp.glb",
+      "position": [
+        -1.5,
+        2.47,
+        -2.08
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "rod_rack",
+      "file": "rod_rack.glb",
+      "position": [
+        -2.92,
+        0.08,
+        0.17
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            0.94,
+            1.1,
+            0.36
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "float_barrel",
+      "file": "float_barrel.glb",
+      "position": [
+        -2.75,
+        0.08,
+        -0.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.24,
+            0
+          ],
+          "size": [
+            0.48,
+            0.48,
+            0.48
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "corner_open_shelf",
+      "file": "corner_open_shelf.glb",
+      "position": [
+        -2.3,
+        0.08,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.985,
+            0
+          ],
+          "size": [
+            1.18,
+            1.97,
+            0.7
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "corner_shelf_stock",
+      "file": "corner_shelf_stock.glb",
+      "position": [
+        -2.3,
+        0.08,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "right_low_shelf",
+      "file": "right_low_shelf.glb",
+      "position": [
+        2.25,
+        0.08,
+        -2.5
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.455,
+            0
+          ],
+          "size": [
+            1.62,
+            0.91,
+            0.59
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "right_shelf_stock",
+      "file": "right_shelf_stock.glb",
+      "position": [
+        2.25,
+        0.08,
+        -2.5
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "model_sailboat",
+      "file": "model_sailboat.glb",
+      "position": [
+        1.76,
+        1.03,
+        -2.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "yellow_boots",
+      "file": "yellow_boots.glb",
+      "position": [
+        2.61,
+        1.03,
+        -2.59
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "blue_map",
+      "file": "blue_map.glb",
+      "position": [
+        -0.48,
+        2.14,
+        -2.915
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "fish_board",
+      "file": "fish_board.glb",
+      "position": [
+        0.69,
+        1.99,
+        -2.91
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "hat_rail",
+      "file": "hat_rail.glb",
+      "position": [
+        2.12,
+        2.04,
+        -2.875
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "wall_hook_bar",
+      "file": "wall_hook_bar.glb",
+      "position": [
+        -0.25,
+        2.92,
+        -2.89
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "fish_sign",
+      "file": "fish_sign.glb",
+      "position": [
+        -3.1,
+        2.17,
+        1.29
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "bunting",
+      "file": "bunting.glb",
+      "position": [
+        -3.075,
+        1.87,
+        1.34
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "counter_square_tool",
+      "file": "counter_square_tool.glb",
+      "position": [
+        -0.7,
+        1.2,
+        -1.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "fishbowl_contents",
+      "file": "fishbowl_contents.glb",
+      "position": [
+        0.33,
+        1.2,
+        -1.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "fishbowl_glass",
+      "file": "fishbowl_glass.glb",
+      "position": [
+        0.33,
+        1.2,
+        -1.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "glass",
+      "cast_shadow": false
+    },
+    {
+      "name": "fishbowl_glints",
+      "file": "fishbowl_glints.glb",
+      "position": [
+        0.33,
+        1.2,
+        -1.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "anchor_rug",
+      "file": "anchor_rug.glb",
+      "position": [
+        0,
+        0.08,
+        0.83
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "kai_oar_barrel",
+      "file": "kai_oar_barrel.glb",
+      "position": [
+        -2.65,
+        0.08,
+        2.19
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.31,
+            0
+          ],
+          "size": [
+            0.54,
+            0.62,
+            0.54
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "kai_stool",
+      "file": "kai_stool.glb",
+      "position": [
+        -1.99,
+        0.08,
+        2.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.31,
+            0
+          ],
+          "size": [
+            0.48,
+            0.62,
+            0.48
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "kai_fishing_net",
+      "file": "kai_fishing_net.glb",
+      "position": [
+        -2.79,
+        0.09,
+        1.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "rafa_fishing_net",
+      "file": "rafa_fishing_net.glb",
+      "position": [
+        2.95,
+        0.09,
+        -0.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "shelf_pothos",
+      "file": "shelf_pothos.glb",
+      "position": [
+        -2.64,
+        2.09,
+        -2.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "rafa_plant",
+      "file": "rafa_plant.glb",
+      "position": [
+        2.98,
+        0.08,
+        0.32
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "shelf_small_plant",
+      "file": "shelf_small_plant.glb",
+      "position": [
+        2.97,
+        1.04,
+        -2.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    }
+  ],
+  "instances": [
+    {
+      "name": "rafa_float_barrel",
+      "asset": "float_barrel",
+      "position": [
+        3.0,
+        0.08,
+        -1.68
+      ],
+      "yaw_degrees": 15,
+      "scale": [
+        1.16,
+        1.16,
+        1.16
+      ]
+    }
+  ],
+  "camera": {
+    "position": [
+      10.342903237215966,
+      14.78996720124997,
+      10.342903237215967
+    ],
+    "target": [
+      0,
+      1.15,
+      0
+    ],
+    "size": 11.4
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "background": "EAD5C8",
+    "ambient_color": "FFF7F3",
+    "ambient": 0.52,
+    "sun_color": "FFF3EA",
+    "sun": 0.72,
+    "sun_position": [
+      -3,
+      8,
+      5
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.3,
+    "shadow_normal_bias": 2.0,
+    "shadow_distance": 25,
+    "points": []
+  },
+  "anchors": [
+    {
+      "name": "use_counter",
+      "position": [
+        -0.36,
+        1.2,
+        -0.85
+      ],
+      "module": "curved_counter",
+      "yaw_degrees": 0
+    },
+    {
+      "name": "stand_counter",
+      "position": [
+        -0.36,
+        0.08,
+        -0.02
+      ],
+      "module": "curved_counter",
+      "yaw_degrees": 0
+    },
+    {
+      "name": "npc_keeper",
+      "position": [
+        -0.36,
+        0.08,
+        -2.35
+      ],
+      "module": "curved_counter",
+      "yaw_degrees": 180
+    },
+    {
+      "name": "badge_keeper",
+      "position": [
+        -0.36,
+        1.98,
+        -2.35
+      ],
+      "module": "curved_counter",
+      "yaw_degrees": 180
+    },
+    {
+      "name": "stand_keeper",
+      "position": [
+        -0.36,
+        0.08,
+        -0.02
+      ],
+      "module": "curved_counter",
+      "yaw_degrees": 0
+    },
+    {
+      "name": "npc_kai",
+      "position": [
+        -1.85,
+        0.08,
+        1.55
+      ],
+      "module": "kai_stool",
+      "yaw_degrees": 135
+    },
+    {
+      "name": "stand_kai",
+      "position": [
+        -1.1,
+        0.08,
+        1.1
+      ],
+      "module": "kai_stool",
+      "yaw_degrees": -90
+    },
+    {
+      "name": "npc_rafa",
+      "position": [
+        1.85,
+        0.08,
+        -1.55
+      ],
+      "module": "rafa_float_barrel",
+      "yaw_degrees": 225
+    },
+    {
+      "name": "stand_rafa",
+      "position": [
+        1.3,
+        0.08,
+        -0.85
+      ],
+      "module": "rafa_float_barrel",
+      "yaw_degrees": 90
+    },
+    {
+      "name": "use_fish_board",
+      "position": [
+        0.69,
+        1.99,
+        -2.86
+      ],
+      "module": "fish_board",
+      "yaw_degrees": 0
+    },
+    {
+      "name": "stand_fish_board",
+      "position": [
+        0.96,
+        0.08,
+        -2.07
+      ],
+      "module": "fish_board",
+      "yaw_degrees": 0
+    },
+    {
+      "name": "spawn",
+      "position": [
+        0,
+        0.08,
+        0.83
+      ],
+      "module": "room_shell",
+      "yaw_degrees": 0
+    },
+    {
+      "name": "exit",
+      "position": [
+        0,
+        0.08,
+        3.4
+      ],
+      "module": "room_shell",
+      "yaw_degrees": 180
+    },
+    {
+      "name": "badge_exit",
+      "position": [
+        0,
+        0.3,
+        3.2
+      ],
+      "module": "room_shell",
+      "yaw_degrees": 180
+    },
+    {
+      "name": "sign_name",
+      "position": [
+        -3.02,
+        2.07,
+        1.29
+      ],
+      "module": "fish_sign",
+      "yaw_degrees": 90,
+      "size": [
+        0.72,
+        0.12
+      ]
+    }
+  ],
+  "spawn": [
+    0,
+    0.09,
+    0.83
+  ],
+  "review_contract": {
+    "game_view": {
+      "resolution": [
+        360,
+        800
+      ],
+      "pitch": 43,
+      "yaw": 45,
+      "orthographic_width_m": 6.72
+    },
+    "whole_room": {
+      "pitch": 43,
+      "yaw": 45,
+      "orthographic_width_m": 10.2
+    },
+    "framing_decision": "上官婉儿确认：6.72 m 游戏取景与完整房间全景两张分别验收；保留房间尺寸。"
+  },
+  "floor_size": [
+    6.8,
+    6.4
+  ],
+  "floor_y": 0.08,
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "central anchor rug",
+        "position": [
+          0,
+          0.08,
+          0.83
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "counter approach",
+        "position": [
+          -0.36,
+          0.08,
+          -0.02
+        ]
+      },
+      {
+        "name": "counter right aisle",
+        "position": [
+          1.05,
+          0.08,
+          -0.4
+        ]
+      },
+      {
+        "name": "fish board approach",
+        "position": [
+          0.96,
+          0.08,
+          -2.07
+        ]
+      },
+      {
+        "name": "return to public aisle",
+        "position": [
+          1.3,
+          0.08,
+          -0.32
+        ]
+      },
+      {
+        "name": "Rafa approach",
+        "position": [
+          1.3,
+          0.08,
+          -0.85
+        ]
+      },
+      {
+        "name": "Old Kai approach",
+        "position": [
+          -1.1,
+          0.08,
+          1.1
+        ]
+      },
+      {
+        "name": "open front exit",
+        "position": [
+          0,
+          0.08,
+          2.83
+        ],
+        "capture": "door"
+      }
+    ],
+    "blocked": [
+      {
+        "name": "curved counter",
+        "from": [
+          -0.36,
+          0.09,
+          -0.02
+        ],
+        "to": [
+          -0.36,
+          0.09,
+          -1.16
+        ],
+        "target": "curved_counter"
+      },
+      {
+        "name": "right shelf",
+        "from": [
+          2.25,
+          0.09,
+          -1.65
+        ],
+        "to": [
+          2.25,
+          0.09,
+          -2.5
+        ],
+        "target": "right_low_shelf"
+      },
+      {
+        "name": "rod rack",
+        "from": [
+          -2.15,
+          0.09,
+          0.17
+        ],
+        "to": [
+          -2.92,
+          0.09,
+          0.17
+        ],
+        "target": "rod_rack"
+      },
+      {
+        "name": "left wall",
+        "from": [
+          -2.7,
+          0.09,
+          -1.45
+        ],
+        "to": [
+          -3.8,
+          0.09,
+          -1.45
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "right floor edge",
+        "from": [
+          2.75,
+          0.09,
+          0.0
+        ],
+        "to": [
+          3.8,
+          0.09,
+          0
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "front floor edge",
+        "from": [
+          1.5,
+          0.09,
+          2.6
+        ],
+        "to": [
+          1.5,
+          0.09,
+          3.7
+        ],
+        "target": "room_shell"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "keeper clear aisle",
+        "from": [
+          -0.75,
+          0.09,
+          -2.22
+        ],
+        "to": [
+          0.75,
+          0.09,
+          -2.22
+        ],
+        "measure": [
+          [
+            -0.36,
+            0.73,
+            -2.96
+          ],
+          [
+            -0.36,
+            0.73,
+            -1.6
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 1.36
+      }
+    ],
+    "entrance": {
+      "inside": [
+        0,
+        0.09,
+        2.7
+      ],
+      "outside": [
+        0,
+        0.09,
+        3.47
+      ]
+    },
+    "slide": {
+      "from": [
+        2.9,
+        0.09,
+        -0.3
+      ],
+      "direction": [
+        1,
+        0,
+        0.8
+      ],
+      "tangent": [
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.55
+    },
+    "input_start": [
+      0,
+      0.09,
+      1.7
+    ],
+    "scale": {
+      "door": {
+        "applicable": false,
+        "reason": "Open front diorama exit; no door in approved Stark design."
+      },
+      "counter": {
+        "height": 1.12,
+        "source": "Curved worktop top minus floor"
+      },
+      "chair": {
+        "height": 0.62,
+        "source": "Kai stool seat top minus floor"
+      },
+      "table": {
+        "applicable": false,
+        "reason": "Only retail shelves, no table in the approved room."
+      }
+    }
+  }
+}

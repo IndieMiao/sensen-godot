@@ -1,0 +1,280 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light",
+    "guarded_detail_swatches": 21
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 6816,
+      "triangles": 13148,
+      "surfaces": 1,
+      "bytes": 532668
+    },
+    {
+      "name": "left_wall",
+      "vertices": 2344,
+      "triangles": 4552,
+      "surfaces": 1,
+      "bytes": 180532
+    },
+    {
+      "name": "back_wall",
+      "vertices": 2016,
+      "triangles": 3888,
+      "surfaces": 1,
+      "bytes": 158588
+    },
+    {
+      "name": "porthole",
+      "vertices": 902,
+      "triangles": 1624,
+      "surfaces": 1,
+      "bytes": 73952
+    },
+    {
+      "name": "porthole_view",
+      "vertices": 368,
+      "triangles": 708,
+      "surfaces": 1,
+      "bytes": 29332
+    },
+    {
+      "name": "curved_counter",
+      "vertices": 500,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 63420
+    },
+    {
+      "name": "counter_ship_wheel",
+      "vertices": 901,
+      "triangles": 1726,
+      "surfaces": 1,
+      "bytes": 80604
+    },
+    {
+      "name": "counter_lantern",
+      "vertices": 305,
+      "triangles": 578,
+      "surfaces": 1,
+      "bytes": 28688
+    },
+    {
+      "name": "wall_lantern",
+      "vertices": 369,
+      "triangles": 698,
+      "surfaces": 1,
+      "bytes": 34824
+    },
+    {
+      "name": "pendant_lamp",
+      "vertices": 382,
+      "triangles": 748,
+      "surfaces": 1,
+      "bytes": 31348
+    },
+    {
+      "name": "rod_rack",
+      "vertices": 500,
+      "triangles": 772,
+      "surfaces": 1,
+      "bytes": 55060
+    },
+    {
+      "name": "float_barrel",
+      "vertices": 236,
+      "triangles": 424,
+      "surfaces": 1,
+      "bytes": 25780
+    },
+    {
+      "name": "corner_open_shelf",
+      "vertices": 728,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 58180
+    },
+    {
+      "name": "corner_shelf_stock",
+      "vertices": 1000,
+      "triangles": 1928,
+      "surfaces": 1,
+      "bytes": 80980
+    },
+    {
+      "name": "right_low_shelf",
+      "vertices": 728,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 58176
+    },
+    {
+      "name": "right_shelf_stock",
+      "vertices": 1144,
+      "triangles": 2192,
+      "surfaces": 1,
+      "bytes": 96308
+    },
+    {
+      "name": "model_sailboat",
+      "vertices": 142,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 23636
+    },
+    {
+      "name": "yellow_boots",
+      "vertices": 684,
+      "triangles": 1344,
+      "surfaces": 1,
+      "bytes": 51416
+    },
+    {
+      "name": "blue_map",
+      "vertices": 450,
+      "triangles": 810,
+      "surfaces": 1,
+      "bytes": 38164
+    },
+    {
+      "name": "fish_board",
+      "vertices": 448,
+      "triangles": 840,
+      "surfaces": 1,
+      "bytes": 44356
+    },
+    {
+      "name": "hat_rail",
+      "vertices": 584,
+      "triangles": 1132,
+      "surfaces": 1,
+      "bytes": 47920
+    },
+    {
+      "name": "wall_hook_bar",
+      "vertices": 136,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 12436
+    },
+    {
+      "name": "fish_sign",
+      "vertices": 216,
+      "triangles": 416,
+      "surfaces": 1,
+      "bytes": 32736
+    },
+    {
+      "name": "bunting",
+      "vertices": 54,
+      "triangles": 88,
+      "surfaces": 1,
+      "bytes": 6712
+    },
+    {
+      "name": "counter_square_tool",
+      "vertices": 176,
+      "triangles": 336,
+      "surfaces": 1,
+      "bytes": 15392
+    },
+    {
+      "name": "fishbowl_contents",
+      "vertices": 1338,
+      "triangles": 2580,
+      "surfaces": 1,
+      "bytes": 105224
+    },
+    {
+      "name": "fishbowl_glass",
+      "vertices": 576,
+      "triangles": 1148,
+      "surfaces": 1,
+      "bytes": 41020
+    },
+    {
+      "name": "fishbowl_glints",
+      "vertices": 324,
+      "triangles": 636,
+      "surfaces": 1,
+      "bytes": 28636
+    },
+    {
+      "name": "anchor_rug",
+      "vertices": 928,
+      "triangles": 1468,
+      "surfaces": 1,
+      "bytes": 94564
+    },
+    {
+      "name": "kai_oar_barrel",
+      "vertices": 518,
+      "triangles": 1000,
+      "surfaces": 1,
+      "bytes": 46812
+    },
+    {
+      "name": "kai_stool",
+      "vertices": 112,
+      "triangles": 208,
+      "surfaces": 1,
+      "bytes": 12000
+    },
+    {
+      "name": "kai_fishing_net",
+      "vertices": 898,
+      "triangles": 1712,
+      "surfaces": 1,
+      "bytes": 85872
+    },
+    {
+      "name": "rafa_fishing_net",
+      "vertices": 898,
+      "triangles": 1712,
+      "surfaces": 1,
+      "bytes": 85652
+    },
+    {
+      "name": "shelf_pothos",
+      "vertices": 2914,
+      "triangles": 5276,
+      "surfaces": 1,
+      "bytes": 284800
+    },
+    {
+      "name": "rafa_plant",
+      "vertices": 832,
+      "triangles": 1468,
+      "surfaces": 1,
+      "bytes": 82596
+    },
+    {
+      "name": "shelf_small_plant",
+      "vertices": 832,
+      "triangles": 1468,
+      "surfaces": 1,
+      "bytes": 82676
+    }
+  ],
+  "unique_triangles": 60928,
+  "scene_triangles": 61352,
+  "static_draw_surfaces": 37,
+  "glb_bytes": 2811060,
+  "atlas_bytes": 2092234,
+  "placed_instances": 37,
+  "materials": 2,
+  "rod_rack_with_barrel_triangles": 1196,
+  "plant_budget_triangles": 8212,
+  "budget_limits": {
+    "placed_triangles": 200000,
+    "static_surfaces": 60,
+    "rod_rack_and_barrel": 1200
+  },
+  "budget_passed": true
+}

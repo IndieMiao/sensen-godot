@@ -1,0 +1,1716 @@
+{
+  "checks": [
+    {
+      "check": "room_shell triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "room_shell one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "room_shell does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "room_shell import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "room_shell finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "left_wall triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "left_wall one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "left_wall does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "left_wall import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "left_wall finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "back_wall triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "back_wall one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "back_wall does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "back_wall import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "back_wall finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "porthole triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "porthole one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "porthole does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "porthole import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "porthole finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "porthole_view triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "porthole_view one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "porthole_view does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "porthole_view import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "porthole_view finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "curved_counter triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "curved_counter one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "curved_counter does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "curved_counter import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "curved_counter finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "counter_ship_wheel triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "counter_ship_wheel one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "counter_ship_wheel does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "counter_ship_wheel import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "counter_ship_wheel finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "counter_lantern triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "counter_lantern one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "counter_lantern does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "counter_lantern import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "counter_lantern finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "wall_lantern triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "wall_lantern one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "wall_lantern does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "wall_lantern import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "wall_lantern finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "pendant_lamp triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "pendant_lamp one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "pendant_lamp does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "pendant_lamp import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "pendant_lamp finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "rod_rack triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "rod_rack one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "rod_rack does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "rod_rack import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "rod_rack finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "float_barrel triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "float_barrel one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "float_barrel does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "float_barrel import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "float_barrel finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "corner_open_shelf triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "corner_open_shelf one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "corner_open_shelf does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "corner_open_shelf import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "corner_open_shelf finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "corner_shelf_stock triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "corner_shelf_stock one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "corner_shelf_stock does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "corner_shelf_stock import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "corner_shelf_stock finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "right_low_shelf triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "right_low_shelf one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "right_low_shelf does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "right_low_shelf import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "right_low_shelf finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "right_shelf_stock triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "right_shelf_stock one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "right_shelf_stock does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "right_shelf_stock import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "right_shelf_stock finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "model_sailboat triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "model_sailboat one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "model_sailboat does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "model_sailboat import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "model_sailboat finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "yellow_boots triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "yellow_boots one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "yellow_boots does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "yellow_boots import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "yellow_boots finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "blue_map triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "blue_map one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "blue_map does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "blue_map import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "blue_map finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "fish_board triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "fish_board one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "fish_board does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "fish_board import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "fish_board finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "hat_rail triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "hat_rail one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "hat_rail does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "hat_rail import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "hat_rail finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "wall_hook_bar triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "wall_hook_bar one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "wall_hook_bar does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "wall_hook_bar import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "wall_hook_bar finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "fish_sign triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "fish_sign one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "fish_sign does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "fish_sign import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "fish_sign finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "bunting triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "bunting one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "bunting does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "bunting import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "bunting finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "counter_square_tool triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "counter_square_tool one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "counter_square_tool does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "counter_square_tool import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "counter_square_tool finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_contents triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_contents one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_contents does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_contents import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_contents finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glass triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glass one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glass does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glass import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glass finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glints triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glints one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glints does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glints import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "fishbowl_glints finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "anchor_rug triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "anchor_rug one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "anchor_rug does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "anchor_rug import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "anchor_rug finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "kai_oar_barrel triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "kai_oar_barrel one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "kai_oar_barrel does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "kai_oar_barrel import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "kai_oar_barrel finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "kai_stool triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "kai_stool one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "kai_stool does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "kai_stool import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "kai_stool finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "kai_fishing_net triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "kai_fishing_net one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "kai_fishing_net does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "kai_fishing_net import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "kai_fishing_net finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "rafa_fishing_net triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "rafa_fishing_net one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "rafa_fishing_net does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "rafa_fishing_net import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "rafa_fishing_net finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "shelf_pothos triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "shelf_pothos one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "shelf_pothos does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "shelf_pothos import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "shelf_pothos finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "rafa_plant triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "rafa_plant one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "rafa_plant does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "rafa_plant import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "rafa_plant finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "shelf_small_plant triangle count matches binary",
+      "passed": true
+    },
+    {
+      "check": "shelf_small_plant one mesh/surface",
+      "passed": true
+    },
+    {
+      "check": "shelf_small_plant does not embed atlas",
+      "passed": true
+    },
+    {
+      "check": "shelf_small_plant import texture map mode 1",
+      "passed": true
+    },
+    {
+      "check": "shelf_small_plant finite bounded atlas UV",
+      "passed": true
+    },
+    {
+      "check": "Placed scene <= 200k triangles",
+      "passed": true
+    },
+    {
+      "check": "Placed scene <= 60 surfaces",
+      "passed": true
+    },
+    {
+      "check": "Rod rack + 4 rods + float barrel <= 1200 triangles",
+      "passed": true
+    },
+    {
+      "check": "Exactly two float barrels",
+      "passed": true
+    },
+    {
+      "check": "Rod rack stands beside, outside porthole aperture",
+      "passed": true
+    },
+    {
+      "check": "No unexpected module-to-module or module-to-wall mesh crossing",
+      "passed": true
+    },
+    {
+      "check": "Negative control: fish board penetrating counter is detected",
+      "passed": true
+    },
+    {
+      "check": "stand_counter clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "npc_keeper clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "stand_keeper clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "npc_kai clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "stand_kai clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "npc_rafa clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "stand_rafa clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "stand_fish_board clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    },
+    {
+      "check": "spawn clears .21m avatar radius (conservative bounds)",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "room_shell": {
+      "triangles": 13148,
+      "world_bounds": [
+        [
+          -3.4000000953674316,
+          -0.2800000011920929,
+          -3.200000047683716
+        ],
+        [
+          3.4000000953674316,
+          0.07999999821186066,
+          3.799999952316284
+        ]
+      ],
+      "dimensions": [
+        6.800000190734863,
+        0.36000001430511475,
+        7.0
+      ],
+      "sha256": "f7a4ac2dc5b22b616a2f40fa307685b96d165e59eb1e9f6d74971669897abc8a"
+    },
+    "left_wall": {
+      "triangles": 4552,
+      "world_bounds": [
+        [
+          -3.4000003337860107,
+          0.0,
+          -3.1649999618530273
+        ],
+        [
+          -3.0349996089935303,
+          3.299999952316284,
+          3.1649999618530273
+        ]
+      ],
+      "dimensions": [
+        0.36500072479248047,
+        3.299999952316284,
+        6.329999923706055
+      ],
+      "sha256": "3ca4eaf3210276f2a13dda155b4474f3134b2afc17be7a891ae27935f85c7a57"
+    },
+    "back_wall": {
+      "triangles": 3888,
+      "world_bounds": [
+        [
+          -3.375,
+          0.0,
+          -3.1999998092651367
+        ],
+        [
+          3.375,
+          3.299999952316284,
+          -2.8350000381469727
+        ]
+      ],
+      "dimensions": [
+        6.75,
+        3.299999952316284,
+        0.36499977111816406
+      ],
+      "sha256": "f34be93dbebd44584435317559483dd6cb9a8fbc5ad66bf8c1f996591a1ee0ae"
+    },
+    "porthole": {
+      "triangles": 1624,
+      "world_bounds": [
+        [
+          -3.2150001525878906,
+          1.3499999046325684,
+          -2.0999999046325684
+        ],
+        [
+          -3.003999710083008,
+          2.809999942779541,
+          -0.6399999856948853
+        ]
+      ],
+      "dimensions": [
+        0.2110004425048828,
+        1.4600000381469727,
+        1.459999918937683
+      ],
+      "sha256": "086a88f1469fe7c0268eef6e1152ee205d1e3e01f2b861d0f5f92ba610b740ae"
+    },
+    "porthole_view": {
+      "triangles": 708,
+      "world_bounds": [
+        [
+          -3.3940000534057617,
+          1.4449999332427979,
+          -2.005000114440918
+        ],
+        [
+          -3.3600001335144043,
+          2.7149999141693115,
+          -0.7350000143051147
+        ]
+      ],
+      "dimensions": [
+        0.03399991989135742,
+        1.2699999809265137,
+        1.2700001001358032
+      ],
+      "sha256": "252531283904faa5829dfd98886874a48e9ca16cba670e9f2da5716793549997"
+    },
+    "curved_counter": {
+      "triangles": 972,
+      "world_bounds": [
+        [
+          -1.380163550376892,
+          0.0949999988079071,
+          -1.4399999380111694
+        ],
+        [
+          0.6601635217666626,
+          1.2000000476837158,
+          -0.6111999750137329
+        ]
+      ],
+      "dimensions": [
+        2.0403270721435547,
+        1.1050000190734863,
+        0.8287999629974365
+      ],
+      "sha256": "36039ff449532aed4a1099241d855c6535be3cc1b0adb5e0d3a3f5196e6de416"
+    },
+    "counter_ship_wheel": {
+      "triangles": 1726,
+      "world_bounds": [
+        [
+          -0.7039999961853027,
+          0.3160000145435333,
+          -0.6430000066757202
+        ],
+        [
+          -0.01600000262260437,
+          1.0040000677108765,
+          -0.5694999694824219
+        ]
+      ],
+      "dimensions": [
+        0.687999963760376,
+        0.6880000829696655,
+        0.07350003719329834
+      ],
+      "sha256": "0c3cf2185250a3c12e0f3776ea45e5e940e30baa35e9c17645ec2363cd4b227f"
+    },
+    "counter_lantern": {
+      "triangles": 578,
+      "world_bounds": [
+        [
+          -1.2024800777435303,
+          1.2000000476837158,
+          -1.2624800205230713
+        ],
+        [
+          -0.9975200295448303,
+          1.4900867938995361,
+          -1.0575199127197266
+        ]
+      ],
+      "dimensions": [
+        0.20496004819869995,
+        0.2900867462158203,
+        0.20496010780334473
+      ],
+      "sha256": "ffd2a835ff42aa91d65d83b2026de0a853db064d80dc085024b625aa13792b83"
+    },
+    "wall_lantern": {
+      "triangles": 698,
+      "world_bounds": [
+        [
+          -3.169999837875366,
+          2.3299999237060547,
+          0.10933800041675568
+        ],
+        [
+          -2.864932060241699,
+          2.6998605728149414,
+          0.37066197395324707
+        ]
+      ],
+      "dimensions": [
+        0.305067777633667,
+        0.3698606491088867,
+        0.2613239884376526
+      ],
+      "sha256": "9cbf5fe9b1e3b915386f9c4b42c62425d98624870e92290fbeb4a98b070d3d6a"
+    },
+    "pendant_lamp": {
+      "triangles": 748,
+      "world_bounds": [
+        [
+          -1.7400000095367432,
+          2.365000009536743,
+          -2.319999933242798
+        ],
+        [
+          -1.2599999904632568,
+          3.200000047683716,
+          -1.8399999141693115
+        ]
+      ],
+      "dimensions": [
+        0.48000001907348633,
+        0.8350000381469727,
+        0.48000001907348633
+      ],
+      "sha256": "dd320c0c8264855c067189b3180d68395060c5b9db56e5f2266c9da038b6941e"
+    },
+    "rod_rack": {
+      "triangles": 772,
+      "world_bounds": [
+        [
+          -3.0950000286102295,
+          0.07999998331069946,
+          -0.2800000011920929
+        ],
+        [
+          -2.7290000915527344,
+          1.7100741863250732,
+          0.6200000047683716
+        ]
+      ],
+      "dimensions": [
+        0.3659999370574951,
+        1.6300742626190186,
+        0.8999999761581421
+      ],
+      "sha256": "1dfa8de3d666be620432b791d73ea67fbb96ba29f7bb82d34f507eaade42267f"
+    },
+    "float_barrel": {
+      "triangles": 424,
+      "world_bounds": [
+        [
+          -2.990000009536743,
+          0.07999999821186066,
+          -0.9200000166893005
+        ],
+        [
+          -2.509999990463257,
+          0.7087499499320984,
+          -0.4399999976158142
+        ]
+      ],
+      "dimensions": [
+        0.48000001907348633,
+        0.6287499666213989,
+        0.48000001907348633
+      ],
+      "sha256": "877758124dd31ac200751b47d5178ab33595634fcdd80786976c33d240274d59"
+    },
+    "corner_open_shelf": {
+      "triangles": 1404,
+      "world_bounds": [
+        [
+          -2.9075000286102295,
+          0.08000004291534424,
+          -2.9149999618530273
+        ],
+        [
+          -1.6924998760223389,
+          2.0874998569488525,
+          -2.2049999237060547
+        ]
+      ],
+      "dimensions": [
+        1.2150001525878906,
+        2.0074996948242188,
+        0.7100000381469727
+      ],
+      "sha256": "d55afff56cb6e77f5a9d24242a0c6ed79c889ec318abb34c92c4806fd83ab2ec"
+    },
+    "corner_shelf_stock": {
+      "triangles": 1928,
+      "world_bounds": [
+        [
+          -2.7874999046325684,
+          0.23999999463558197,
+          -2.819999933242798
+        ],
+        [
+          -1.805999994277954,
+          2.296999931335449,
+          -2.2960000038146973
+        ]
+      ],
+      "dimensions": [
+        0.9814999103546143,
+        2.056999921798706,
+        0.5239999294281006
+      ],
+      "sha256": "1738e6bdf28e83d38351b20aa9cb9b7865b692eed902936b0be058a91c9d3ce9"
+    },
+    "right_low_shelf": {
+      "triangles": 1404,
+      "world_bounds": [
+        [
+          1.4225000143051147,
+          0.08000001311302185,
+          -2.8000001907348633
+        ],
+        [
+          3.0774998664855957,
+          1.027500033378601,
+          -2.1999998092651367
+        ]
+      ],
+      "dimensions": [
+        1.654999852180481,
+        0.9474999904632568,
+        0.6000003814697266
+      ],
+      "sha256": "25dd1acc003aa59f05ae74c3d8f774994cc903be7e6e345134d78c00632c96a5"
+    },
+    "right_shelf_stock": {
+      "triangles": 2192,
+      "world_bounds": [
+        [
+          1.537500023841858,
+          0.23999997973442078,
+          -2.7249999046325684
+        ],
+        [
+          2.9625000953674316,
+          0.7914999723434448,
+          -2.2750000953674316
+        ]
+      ],
+      "dimensions": [
+        1.4250000715255737,
+        0.5514999628067017,
+        0.4499998092651367
+      ],
+      "sha256": "679979ffe77921d54d1803b5d720068187e6d75e6289a999c416480a04ec15a3"
+    },
+    "model_sailboat": {
+      "triangles": 260,
+      "world_bounds": [
+        [
+          1.4282629489898682,
+          1.0549999475479126,
+          -2.6700000762939453
+        ],
+        [
+          2.1377577781677246,
+          1.7400000095367432,
+          -2.384133815765381
+        ]
+      ],
+      "dimensions": [
+        0.7094948291778564,
+        0.6850000619888306,
+        0.28586626052856445
+      ],
+      "sha256": "69e14e7674de8592998f6f0ec9c3f3191afcf2e8ce6567c3e93b94a04bf84a09"
+    },
+    "yellow_boots": {
+      "triangles": 1344,
+      "world_bounds": [
+        [
+          2.3899998664855957,
+          1.0299999713897705,
+          -2.684999942779541
+        ],
+        [
+          2.8299999237060547,
+          1.399999976158142,
+          -2.372999906539917
+        ]
+      ],
+      "dimensions": [
+        0.440000057220459,
+        0.3700000047683716,
+        0.312000036239624
+      ],
+      "sha256": "1aeb7c001f94bfb6727af4827066c0b1d346ef51b52a10104736235ca27a827a"
+    },
+    "blue_map": {
+      "triangles": 810,
+      "world_bounds": [
+        [
+          -1.162500023841858,
+          1.5425000190734863,
+          -2.932499885559082
+        ],
+        [
+          0.20250001549720764,
+          2.7375001907348633,
+          -2.859999895095825
+        ]
+      ],
+      "dimensions": [
+        1.3650000095367432,
+        1.195000171661377,
+        0.07249999046325684
+      ],
+      "sha256": "8eb221083e161914ceb442261f5af5312f16446c58e376e080e7792c9f33ba96"
+    },
+    "fish_board": {
+      "triangles": 840,
+      "world_bounds": [
+        [
+          0.3425000011920929,
+          1.462499976158142,
+          -2.932500123977661
+        ],
+        [
+          1.037500023841858,
+          2.5174999237060547,
+          -2.8480000495910645
+        ]
+      ],
+      "dimensions": [
+        0.6950000524520874,
+        1.0549999475479126,
+        0.08450007438659668
+      ],
+      "sha256": "fdc929cc81b748492d0bd5bb6a50c1ddaa17129bbc33f3bf9118fc27618f0f50"
+    },
+    "hat_rail": {
+      "triangles": 1132,
+      "world_bounds": [
+        [
+          1.4399998188018799,
+          1.789599895477295,
+          -2.9124999046325684
+        ],
+        [
+          2.799999952316284,
+          2.330399990081787,
+          -2.4558000564575195
+        ]
+      ],
+      "dimensions": [
+        1.3600001335144043,
+        0.5408000946044922,
+        0.45669984817504883
+      ],
+      "sha256": "458eded0d40556f6e7e94a49d8644e283c8183ca3a6a20d241cf910badab3309"
+    },
+    "wall_hook_bar": {
+      "triangles": 260,
+      "world_bounds": [
+        [
+          -0.8700000047683716,
+          2.8450000286102295,
+          -2.9700002670288086
+        ],
+        [
+          0.3700000047683716,
+          2.9649999141693115,
+          -2.8550000190734863
+        ]
+      ],
+      "dimensions": [
+        1.2400000095367432,
+        0.11999988555908203,
+        0.11500024795532227
+      ],
+      "sha256": "2b70d7ae2d6bd2b467bc38c80474d38e7e2d5a1cec168e76f9bbf10bf3d83f32"
+    },
+    "fish_sign": {
+      "triangles": 416,
+      "world_bounds": [
+        [
+          -3.134999990463257,
+          1.9750001430511475,
+          0.8149998784065247
+        ],
+        [
+          -3.0159997940063477,
+          2.371687650680542,
+          1.7649999856948853
+        ]
+      ],
+      "dimensions": [
+        0.11900019645690918,
+        0.39668750762939453,
+        0.9500001072883606
+      ],
+      "sha256": "c81e4ded709fe6ceab34210b3aa3b471758e24ee50b164f4a7e5bb6bc3fee8ca"
+    },
+    "bunting": {
+      "triangles": 88,
+      "world_bounds": [
+        [
+          -3.0829970836639404,
+          1.5771501064300537,
+          0.617077112197876
+        ],
+        [
+          -3.0430045127868652,
+          2.006331443786621,
+          2.0627739429473877
+        ]
+      ],
+      "dimensions": [
+        0.039992570877075195,
+        0.4291813373565674,
+        1.4456968307495117
+      ],
+      "sha256": "dfbb33ddff9e9d39934189d315a1c5d875f0e22475bf6eb3d6b41905ab3fb014"
+    },
+    "counter_square_tool": {
+      "triangles": 336,
+      "world_bounds": [
+        [
+          -0.8600000143051147,
+          1.2000000476837158,
+          -1.2549999952316284
+        ],
+        [
+          -0.5399999618530273,
+          1.4600000381469727,
+          -0.9670000076293945
+        ]
+      ],
+      "dimensions": [
+        0.3200000524520874,
+        0.25999999046325684,
+        0.2879999876022339
+      ],
+      "sha256": "926157658b01b1c37ffa080336383bc069ddc852aa8aad8eeeb76bd6dd3787fb"
+    },
+    "fishbowl_contents": {
+      "triangles": 2580,
+      "world_bounds": [
+        [
+          0.08000001311302185,
+          1.2000000476837158,
+          -1.2799999713897705
+        ],
+        [
+          0.5800000429153442,
+          1.600000023841858,
+          -0.7799999713897705
+        ]
+      ],
+      "dimensions": [
+        0.5,
+        0.3999999761581421,
+        0.5
+      ],
+      "sha256": "48e7131db132b773d605b56c90593f75b7434a5e4344c71e1a1195c49e26d6b6"
+    },
+    "fishbowl_glass": {
+      "triangles": 1148,
+      "world_bounds": [
+        [
+          0.04000002145767212,
+          1.215000033378601,
+          -1.3199999332427979
+        ],
+        [
+          0.6200000047683716,
+          1.6600000858306885,
+          -0.7400000095367432
+        ]
+      ],
+      "dimensions": [
+        0.5799999833106995,
+        0.4450000524520874,
+        0.5799999237060547
+      ],
+      "sha256": "70204b95a0b6c6772c0f40324e893ab8a5d980343544c9789ee6aa3d64b7bfd3"
+    },
+    "fishbowl_glints": {
+      "triangles": 636,
+      "world_bounds": [
+        [
+          0.07000002264976501,
+          1.346779465675354,
+          -1.2389999628067017
+        ],
+        [
+          0.5578027963638306,
+          1.6677942276000977,
+          -0.8209999799728394
+        ]
+      ],
+      "dimensions": [
+        0.48780277371406555,
+        0.32101476192474365,
+        0.4179999828338623
+      ],
+      "sha256": "11ff941dc39ce1a21fab511bf361011a33e4d0dd3aa6ccd0d6c4d3dbf70adb48"
+    },
+    "anchor_rug": {
+      "triangles": 1468,
+      "world_bounds": [
+        [
+          -1.0157818794250488,
+          0.07999999821186066,
+          -0.18578189611434937
+        ],
+        [
+          1.0157818794250488,
+          0.10694757103919983,
+          1.8457818031311035
+        ]
+      ],
+      "dimensions": [
+        2.0315637588500977,
+        0.026947572827339172,
+        2.0315637588500977
+      ],
+      "sha256": "994686b548a76cfbf66524a241d978d04b8cd51e7c63993e4c4fc578fabfc197"
+    },
+    "kai_oar_barrel": {
+      "triangles": 1000,
+      "world_bounds": [
+        [
+          -3.046339988708496,
+          0.07999999821186066,
+          1.9170202016830444
+        ],
+        [
+          -2.253660202026367,
+          1.495110273361206,
+          2.462979793548584
+        ]
+      ],
+      "dimensions": [
+        0.7926797866821289,
+        1.4151102304458618,
+        0.5459595918655396
+      ],
+      "sha256": "1d10a0cb2acb115b2b8972f844524779dbf2271b681a4f81b5659b14ae5318e2"
+    },
+    "kai_stool": {
+      "triangles": 208,
+      "world_bounds": [
+        [
+          -2.240000009536743,
+          0.08018898963928223,
+          1.9800000190734863
+        ],
+        [
+          -1.7400000095367432,
+          0.699999988079071,
+          2.4800000190734863
+        ]
+      ],
+      "dimensions": [
+        0.5,
+        0.6198109984397888,
+        0.5
+      ],
+      "sha256": "5a3bcbfeb9ec42cd7f38fd1de30f0c9d9aaee2ced338aed7c861cbacbbaaba06"
+    },
+    "kai_fishing_net": {
+      "triangles": 1712,
+      "world_bounds": [
+        [
+          -3.0958192348480225,
+          0.08400292694568634,
+          1.0838383436203003
+        ],
+        [
+          -2.488950252532959,
+          0.9229903221130371,
+          1.667006015777588
+        ]
+      ],
+      "dimensions": [
+        0.6068689823150635,
+        0.838987410068512,
+        0.5831676721572876
+      ],
+      "sha256": "493820cc19561b35db927a31c0a92f674aeb73e2ef9e1f6688246cb194bddbff"
+    },
+    "rafa_fishing_net": {
+      "triangles": 1712,
+      "world_bounds": [
+        [
+          2.718658208847046,
+          0.08382317423820496,
+          -0.8464051485061646
+        ],
+        [
+          3.1763970851898193,
+          0.8329904079437256,
+          -0.2633823752403259
+        ]
+      ],
+      "dimensions": [
+        0.45773887634277344,
+        0.7491672039031982,
+        0.5830227732658386
+      ],
+      "sha256": "a27000fe982045282f15fccdb92582d8d86bcbe2b3e5c27c296371cc7d788981"
+    },
+    "shelf_pothos": {
+      "triangles": 5276,
+      "world_bounds": [
+        [
+          -2.8588387966156006,
+          1.511235237121582,
+          -2.5573325157165527
+        ],
+        [
+          -2.407413959503174,
+          2.375518560409546,
+          -2.1542000770568848
+        ]
+      ],
+      "dimensions": [
+        0.45142483711242676,
+        0.8642833232879639,
+        0.40313243865966797
+      ],
+      "sha256": "1b0d39e3deac518a32c1022cc876cceaca3582443015d90b9585c41e57747a1e"
+    },
+    "rafa_plant": {
+      "triangles": 1468,
+      "world_bounds": [
+        [
+          2.666090488433838,
+          0.07999999821186066,
+          0.04659450054168701
+        ],
+        [
+          3.2985692024230957,
+          0.9976000189781189,
+          0.5850763916969299
+        ]
+      ],
+      "dimensions": [
+        0.6324787139892578,
+        0.9176000356674194,
+        0.5384818911552429
+      ],
+      "sha256": "b1c3ae1ca8729193d61cf5ba099efd19cc2bdeae3532bc03bca9005b20b4a17d"
+    },
+    "shelf_small_plant": {
+      "triangles": 1468,
+      "world_bounds": [
+        [
+          2.8764209747314453,
+          1.0399999618530273,
+          -2.481710195541382
+        ],
+        [
+          3.064969062805176,
+          1.3127999305725098,
+          -2.3210127353668213
+        ]
+      ],
+      "dimensions": [
+        0.18854808807373047,
+        0.2727999687194824,
+        0.16069746017456055
+      ],
+      "sha256": "ef843743677e9bf47d5768a71fc10a0df998deb0708a6bcac008a10da02e0932"
+    }
+  },
+  "intersections": [
+    {
+      "modules": [
+        "room_shell",
+        "left_wall"
+      ],
+      "contact_pairs": 2601,
+      "crossing_pairs": 1505,
+      "classification": "Foundation joins cutaway wall posts"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "back_wall"
+      ],
+      "contact_pairs": 1853,
+      "crossing_pairs": 1210,
+      "classification": "Foundation joins cutaway wall posts"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "rod_rack"
+      ],
+      "contact_pairs": 62,
+      "crossing_pairs": 13,
+      "classification": "Flush support on floor top; module entirely at/above floor"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "float_barrel"
+      ],
+      "contact_pairs": 42,
+      "crossing_pairs": 0,
+      "classification": "Flush support on floor top; module entirely at/above floor"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "anchor_rug"
+      ],
+      "contact_pairs": 412,
+      "crossing_pairs": 7,
+      "classification": "Flush support on floor top; module entirely at/above floor"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "kai_oar_barrel"
+      ],
+      "contact_pairs": 58,
+      "crossing_pairs": 1,
+      "classification": "Flush support on floor top; module entirely at/above floor"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "rafa_plant"
+      ],
+      "contact_pairs": 49,
+      "crossing_pairs": 0,
+      "classification": "Flush support on floor top; module entirely at/above floor"
+    },
+    {
+      "modules": [
+        "room_shell",
+        "rafa_float_barrel"
+      ],
+      "contact_pairs": 52,
+      "crossing_pairs": 1,
+      "classification": "Flush support on floor top; module entirely at/above floor"
+    },
+    {
+      "modules": [
+        "left_wall",
+        "back_wall"
+      ],
+      "contact_pairs": 2166,
+      "crossing_pairs": 1924,
+      "classification": "Timber corner joint"
+    },
+    {
+      "modules": [
+        "curved_counter",
+        "counter_lantern"
+      ],
+      "contact_pairs": 42,
+      "crossing_pairs": 0,
+      "classification": "flush/tangent contact"
+    },
+    {
+      "modules": [
+        "curved_counter",
+        "counter_square_tool"
+      ],
+      "contact_pairs": 18,
+      "crossing_pairs": 0,
+      "classification": "flush/tangent contact"
+    },
+    {
+      "modules": [
+        "curved_counter",
+        "fishbowl_contents"
+      ],
+      "contact_pairs": 65,
+      "crossing_pairs": 0,
+      "classification": "flush/tangent contact"
+    },
+    {
+      "modules": [
+        "fishbowl_contents",
+        "fishbowl_glass"
+      ],
+      "contact_pairs": 254,
+      "crossing_pairs": 254,
+      "classification": "Sand meets inside of glass vessel"
+    },
+    {
+      "modules": [
+        "fishbowl_glass",
+        "fishbowl_glints"
+      ],
+      "contact_pairs": 365,
+      "crossing_pairs": 235,
+      "classification": "Rim and highlight strips sit on glass surface"
+    }
+  ],
+  "scope": "Exported triangles between modules; intentional construction joints listed separately.",
+  "unexpected_intersections": [],
+  "negative_control_triangle_pairs": 288,
+  "standing_clearances": {
+    "stand_counter": {
+      "nearest_module_aabb": "counter_ship_wheel",
+      "horizontal_clearance_m": 0.5494999694824219
+    },
+    "npc_keeper": {
+      "nearest_module_aabb": "blue_map",
+      "horizontal_clearance_m": 0.5099998950958251
+    },
+    "stand_keeper": {
+      "nearest_module_aabb": "counter_ship_wheel",
+      "horizontal_clearance_m": 0.5494999694824219
+    },
+    "npc_kai": {
+      "nearest_module_aabb": "kai_stool",
+      "horizontal_clearance_m": 0.4300000190734863
+    },
+    "stand_kai": {
+      "nearest_module_aabb": "kai_stool",
+      "horizontal_clearance_m": 1.0881176617334944
+    },
+    "npc_rafa": {
+      "nearest_module_aabb": "right_low_shelf",
+      "horizontal_clearance_m": 0.6499998092651367
+    },
+    "stand_rafa": {
+      "nearest_module_aabb": "curved_counter",
+      "horizontal_clearance_m": 0.6398364782333374
+    },
+    "stand_fish_board": {
+      "nearest_module_aabb": "right_low_shelf",
+      "horizontal_clearance_m": 0.4804229528667457
+    },
+    "spawn": {
+      "nearest_module_aabb": "counter_ship_wheel",
+      "horizontal_clearance_m": 1.3995914277621249
+    }
+  },
+  "failures": []
+}

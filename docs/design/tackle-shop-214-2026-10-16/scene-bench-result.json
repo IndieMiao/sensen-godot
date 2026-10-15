@@ -1,0 +1,744 @@
+{
+	"adapter": "NVIDIA GeForce RTX 2060",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0900000035762787,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(0.0, 0.09, 0.83)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.0,
+					0.0900000035762787,
+					0.829999983310699
+				],
+				"from": [
+					0.0,
+					0.0900000035762787,
+					0.829999983310699
+				],
+				"name": "central anchor rug",
+				"reached": true,
+				"remaining_m": 0.010000005364418,
+				"seconds": 0.0,
+				"target": [
+					0.0,
+					0.0799999982118607,
+					0.829999983310699
+				]
+			},
+			"name": "Route: central anchor rug",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.333717465400696,
+					0.0899355858564377,
+					0.0420560725033283
+				],
+				"from": [
+					0.0,
+					0.0900000035762787,
+					0.829999983310699
+				],
+				"name": "counter approach",
+				"reached": true,
+				"remaining_m": 0.0681208074092865,
+				"seconds": 0.117,
+				"target": [
+					-0.360000014305115,
+					0.0799999982118607,
+					-0.0199999995529652
+				]
+			},
+			"name": "Route: counter approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.96866762638092,
+					0.0899362564086914,
+					-0.374016791582108
+				],
+				"from": [
+					-0.333717465400696,
+					0.0899355858564377,
+					0.0420560725033283
+				],
+				"name": "counter right aisle",
+				"reached": true,
+				"remaining_m": 0.0859581530094147,
+				"seconds": 0.383,
+				"target": [
+					1.04999995231628,
+					0.0799999982118607,
+					-0.400000005960464
+				]
+			},
+			"name": "Route: counter right aisle",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.960415661334991,
+					0.0899350121617317,
+					-1.98864662647247
+				],
+				"from": [
+					0.96866762638092,
+					0.0899362564086914,
+					-0.374016791582108
+				],
+				"name": "fish board approach",
+				"reached": true,
+				"remaining_m": 0.0819587558507919,
+				"seconds": 0.45,
+				"target": [
+					0.959999978542328,
+					0.0799999982118607,
+					-2.0699999332428
+				]
+			},
+			"name": "Route: fish board approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.28294432163239,
+					0.0899362936615944,
+					-0.403808236122131
+				],
+				"from": [
+					0.960415661334991,
+					0.0899350121617317,
+					-1.98864662647247
+				],
+				"name": "return to public aisle",
+				"reached": true,
+				"remaining_m": 0.0861013680696487,
+				"seconds": 0.45,
+				"target": [
+					1.29999995231628,
+					0.0799999982118607,
+					-0.319999992847443
+				]
+			},
+			"name": "Route: return to public aisle",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.29688060283661,
+					0.0899353548884392,
+					-0.768392622470856
+				],
+				"from": [
+					1.28294432163239,
+					0.0899362936615944,
+					-0.403808236122131
+				],
+				"name": "Rafa approach",
+				"reached": true,
+				"remaining_m": 0.0822691321372986,
+				"seconds": 0.117,
+				"target": [
+					1.29999995231628,
+					0.0799999982118607,
+					-0.850000023841858
+				]
+			},
+			"name": "Route: Rafa approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.019895195961,
+					0.0899356454610825,
+					1.03755748271942
+				],
+				"from": [
+					1.29688060283661,
+					0.0899353548884392,
+					-0.768392622470856
+				],
+				"name": "Old Kai approach",
+				"reached": true,
+				"remaining_m": 0.102051809430122,
+				"seconds": 0.8,
+				"target": [
+					-1.10000002384186,
+					0.0799999982118607,
+					1.10000002384186
+				]
+			},
+			"name": "Route: Old Kai approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.0376067385077477,
+					0.0899273455142975,
+					2.76390695571899
+				],
+				"from": [
+					-1.019895195961,
+					0.0899356454610825,
+					1.03755748271942
+				],
+				"name": "open front exit",
+				"reached": true,
+				"remaining_m": 0.076688326895237,
+				"seconds": 0.55,
+				"target": [
+					0.0,
+					0.0799999982118607,
+					2.82999992370605
+				]
+			},
+			"name": "Route: open front exit",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TackleShopArt/curved_counter/@StaticBody3D@23"
+				],
+				"final": [
+					-0.360000014305115,
+					0.0833336859941483,
+					-0.497539103031158
+				],
+				"from": [
+					-0.360000014305115,
+					0.0900000035762787,
+					-0.0199999995529652
+				],
+				"reached": false,
+				"remaining_m": 0.662494421005249,
+				"seconds": 0.88,
+				"target": [
+					-0.360000014305115,
+					0.0900000035762787,
+					-1.1599999666214
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/TackleShopArt/curved_counter/@StaticBody3D@23"
+			},
+			"name": "Blocked: curved counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TackleShopArt/right_low_shelf/@StaticBody3D@31"
+				],
+				"final": [
+					2.25,
+					0.0722604468464851,
+					-1.97653210163116
+				],
+				"from": [
+					2.25,
+					0.0900000035762787,
+					-1.64999997615814
+				],
+				"reached": false,
+				"remaining_m": 0.523768365383148,
+				"seconds": 0.867,
+				"target": [
+					2.25,
+					0.0900000035762787,
+					-2.5
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/TackleShopArt/right_low_shelf/@StaticBody3D@31"
+			},
+			"name": "Blocked: right shelf",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TackleShopArt/rod_rack/@StaticBody3D@25"
+				],
+				"final": [
+					-2.52500009536743,
+					0.0899269953370094,
+					0.170000001788139
+				],
+				"from": [
+					-2.15000009536743,
+					0.0900000035762787,
+					0.170000001788139
+				],
+				"reached": false,
+				"remaining_m": 0.394999980926514,
+				"seconds": 0.867,
+				"target": [
+					-2.92000007629395,
+					0.0900000035762787,
+					0.170000001788139
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/TackleShopArt/rod_rack/@StaticBody3D@25"
+			},
+			"name": "Blocked: rod rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TackleShopArt/room_shell/@StaticBody3D@5"
+				],
+				"final": [
+					-2.92605209350586,
+					0.0800789371132851,
+					-1.45000004768372
+				],
+				"from": [
+					-2.70000004768372,
+					0.0900000035762787,
+					-1.45000004768372
+				],
+				"reached": false,
+				"remaining_m": 0.874004185199738,
+				"seconds": 0.883,
+				"target": [
+					-3.79999995231628,
+					0.0900000035762787,
+					-1.45000004768372
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/TackleShopArt/room_shell/@StaticBody3D@5"
+			},
+			"name": "Blocked: left wall",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					3.08296585083008,
+					0.0723652690649033,
+					0.0
+				],
+				"from": [
+					2.75,
+					0.0900000035762787,
+					0.0
+				],
+				"reached": false,
+				"remaining_m": 0.717250943183899,
+				"seconds": 0.883,
+				"target": [
+					3.79999995231628,
+					0.0900000035762787,
+					0.0
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/TackleShopArt/room_shell/@StaticBody3D@9"
+			},
+			"name": "Blocked: right floor edge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TackleShopArt/room_shell/@StaticBody3D@13"
+				],
+				"final": [
+					1.5,
+					0.0800789371132851,
+					2.88855195045471
+				],
+				"from": [
+					1.5,
+					0.0900000035762787,
+					2.59999990463257
+				],
+				"reached": false,
+				"remaining_m": 0.811508774757385,
+				"seconds": 0.866,
+				"target": [
+					1.5,
+					0.0900000035762787,
+					3.70000004768372
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/TackleShopArt/room_shell/@StaticBody3D@13"
+			},
+			"name": "Blocked: front floor edge",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.36,
+				"measured_m": 1.3600001335144,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: keeper clear aisle",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.673828184604645,
+					0.0899339020252228,
+					-2.22000002861023
+				],
+				"from": [
+					-0.75,
+					0.0900000035762787,
+					-2.22000002861023
+				],
+				"reached": true,
+				"remaining_m": 0.0761718451976776,
+				"seconds": 0.416,
+				"target": [
+					0.75,
+					0.0900000035762787,
+					-2.22000002861023
+				]
+			},
+			"name": "Traverse: keeper clear aisle",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						0.0,
+						0.089932844042778,
+						2.77357482910156
+					],
+					"from": [
+						0.0,
+						0.0899366140365601,
+						3.38228368759155
+					],
+					"reached": true,
+					"remaining_m": 0.0735748112201691,
+					"seconds": 0.183,
+					"target": [
+						0.0,
+						0.0900000035762787,
+						2.70000004768372
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						0.0,
+						0.0899366140365601,
+						3.38228368759155
+					],
+					"from": [
+						0.0,
+						0.0900000035762787,
+						2.70000004768372
+					],
+					"reached": true,
+					"remaining_m": 0.0877163633704185,
+					"seconds": 0.217,
+					"target": [
+						0.0,
+						0.0900000035762787,
+						3.47000002861023
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					0.195217132568359,
+					-0.0000512227416038513,
+					1.28843355178833
+				],
+				"wall_torso_ray": {}
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.141666666666667,
+				0.304166666666667
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74545098096132,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"applicable": false,
+				"reason": "Open front diorama exit; no door in approved Stark design."
+			},
+			"name": "Scale category absent: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.66028780674508,
+				"difference": 0.0281995661605206,
+				"height": 1.12,
+				"ratio_to_H": 0.641667977053787,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392448718108789,
+				"difference": 0.0948905109489052,
+				"height": 0.62,
+				"ratio_to_H": 0.355209058726204,
+				"reason": ""
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"applicable": false,
+				"reason": "Only retail shelves, no table in the approved room."
+			},
+			"name": "Scale category absent: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 4037884,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				0.0,
+				0.0900000035762787,
+				0.829999983310699
+			],
+			"from": [
+				0.0,
+				0.0900000035762787,
+				0.829999983310699
+			],
+			"name": "central anchor rug",
+			"reached": true,
+			"remaining_m": 0.010000005364418,
+			"seconds": 0.0,
+			"target": [
+				0.0,
+				0.0799999982118607,
+				0.829999983310699
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.333717465400696,
+				0.0899355858564377,
+				0.0420560725033283
+			],
+			"from": [
+				0.0,
+				0.0900000035762787,
+				0.829999983310699
+			],
+			"name": "counter approach",
+			"reached": true,
+			"remaining_m": 0.0681208074092865,
+			"seconds": 0.117,
+			"target": [
+				-0.360000014305115,
+				0.0799999982118607,
+				-0.0199999995529652
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.96866762638092,
+				0.0899362564086914,
+				-0.374016791582108
+			],
+			"from": [
+				-0.333717465400696,
+				0.0899355858564377,
+				0.0420560725033283
+			],
+			"name": "counter right aisle",
+			"reached": true,
+			"remaining_m": 0.0859581530094147,
+			"seconds": 0.383,
+			"target": [
+				1.04999995231628,
+				0.0799999982118607,
+				-0.400000005960464
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.960415661334991,
+				0.0899350121617317,
+				-1.98864662647247
+			],
+			"from": [
+				0.96866762638092,
+				0.0899362564086914,
+				-0.374016791582108
+			],
+			"name": "fish board approach",
+			"reached": true,
+			"remaining_m": 0.0819587558507919,
+			"seconds": 0.45,
+			"target": [
+				0.959999978542328,
+				0.0799999982118607,
+				-2.0699999332428
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.28294432163239,
+				0.0899362936615944,
+				-0.403808236122131
+			],
+			"from": [
+				0.960415661334991,
+				0.0899350121617317,
+				-1.98864662647247
+			],
+			"name": "return to public aisle",
+			"reached": true,
+			"remaining_m": 0.0861013680696487,
+			"seconds": 0.45,
+			"target": [
+				1.29999995231628,
+				0.0799999982118607,
+				-0.319999992847443
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.29688060283661,
+				0.0899353548884392,
+				-0.768392622470856
+			],
+			"from": [
+				1.28294432163239,
+				0.0899362936615944,
+				-0.403808236122131
+			],
+			"name": "Rafa approach",
+			"reached": true,
+			"remaining_m": 0.0822691321372986,
+			"seconds": 0.117,
+			"target": [
+				1.29999995231628,
+				0.0799999982118607,
+				-0.850000023841858
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.019895195961,
+				0.0899356454610825,
+				1.03755748271942
+			],
+			"from": [
+				1.29688060283661,
+				0.0899353548884392,
+				-0.768392622470856
+			],
+			"name": "Old Kai approach",
+			"reached": true,
+			"remaining_m": 0.102051809430122,
+			"seconds": 0.8,
+			"target": [
+				-1.10000002384186,
+				0.0799999982118607,
+				1.10000002384186
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.0376067385077477,
+				0.0899273455142975,
+				2.76390695571899
+			],
+			"from": [
+				-1.019895195961,
+				0.0899356454610825,
+				1.03755748271942
+			],
+			"name": "open front exit",
+			"reached": true,
+			"remaining_m": 0.076688326895237,
+			"seconds": 0.55,
+			"target": [
+				0.0,
+				0.0799999982118607,
+				2.82999992370605
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "tackle_shop"
+}

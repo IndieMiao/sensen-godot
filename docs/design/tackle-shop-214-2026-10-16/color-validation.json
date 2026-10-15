@@ -1,0 +1,131 @@
+{
+  "method": "Corresponding architectural patches; 11x11 RGB median; circular HSV hue difference",
+  "limit_degrees": 10,
+  "max_difference_degrees": 6.387819976576878,
+  "samples": [
+    {
+      "component": "柱",
+      "reference": {
+        "point": [
+          53,
+          580
+        ],
+        "rgb8": [
+          251,
+          156,
+          107
+        ],
+        "hue_degrees": 20.416666666666675,
+        "saturation": 0.5737051792828686
+      },
+      "runtime": {
+        "point": [
+          97,
+          650
+        ],
+        "rgb8": [
+          248,
+          158,
+          89
+        ],
+        "hue_degrees": 26.037735849056602,
+        "saturation": 0.6411290322580645
+      },
+      "hue_difference_degrees": 5.6210691823899275,
+      "passed": true
+    },
+    {
+      "component": "梁",
+      "reference": {
+        "point": [
+          390,
+          184
+        ],
+        "rgb8": [
+          206,
+          105,
+          67
+        ],
+        "hue_degrees": 16.402877697841724,
+        "saturation": 0.6747572815533981
+      },
+      "runtime": {
+        "point": [
+          330,
+          365
+        ],
+        "rgb8": [
+          224,
+          144,
+          95
+        ],
+        "hue_degrees": 22.790697674418603,
+        "saturation": 0.5758928571428571
+      },
+      "hue_difference_degrees": 6.387819976576878,
+      "passed": true
+    },
+    {
+      "component": "墙",
+      "reference": {
+        "point": [
+          263,
+          390
+        ],
+        "rgb8": [
+          250,
+          203,
+          186
+        ],
+        "hue_degrees": 15.9375,
+        "saturation": 0.256
+      },
+      "runtime": {
+        "point": [
+          315,
+          440
+        ],
+        "rgb8": [
+          214,
+          194,
+          184
+        ],
+        "hue_degrees": 19.999999999999982,
+        "saturation": 0.14018691588785048
+      },
+      "hue_difference_degrees": 4.062499999999982,
+      "passed": true
+    },
+    {
+      "component": "地面",
+      "reference": {
+        "point": [
+          760,
+          1050
+        ],
+        "rgb8": [
+          245,
+          177,
+          153
+        ],
+        "hue_degrees": 15.652173913043475,
+        "saturation": 0.3755102040816327
+      },
+      "runtime": {
+        "point": [
+          880,
+          1100
+        ],
+        "rgb8": [
+          255,
+          203,
+          175
+        ],
+        "hue_degrees": 20.999999999999993,
+        "saturation": 0.3137254901960784
+      },
+      "hue_difference_degrees": 5.347826086956518,
+      "passed": true
+    }
+  ]
+}
