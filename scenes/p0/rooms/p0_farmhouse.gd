@@ -14,8 +14,7 @@ const STOVE := "use_stove_1"
 const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
-const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (placeholder; the art brings its own)
-const CABINET_GLOW_AT := Vector3(0, 1.1133, 0.795)   # in front of the cabinet door, in the placeholder's own units
+const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (the model has no lamp of its own)
 ## The room by Homestead level (§8.3.1, q(14); content homestead.rooms [[1, basic], [5, standard], [10, deluxe]]), only ever
 ## up. Each kit's kitchen corner keeps the P0 names — stoves 1–3 on its cooker, the Spice Rack, the Warming Cabinet — so the
 ## kitchen, the stage and the sheets work the same in all three; `hits` is hit_nodes (the art that takes each one's tap).
@@ -222,15 +221,21 @@ func p0_space() -> String: return "home"
 func _dress_art() -> void:
 	if use_runtime: level = int(P0Runtime.ensure().session.current().get("homestead", {}).get("level", 1))
 	super()
-	if art.has_node("warming_cabinet"):
-		var cabinet := art.get_node("warming_cabinet") as Node3D
+	# the light at the model's `glow` socket, inside the cabinet behind its open front (SGODOT-282 warming_cabinet.glb)
+	var socket := art.get_node("warming_cabinet").find_child("glow", true, false) as Node3D if art.has_node("warming_cabinet") else null
+	if socket:
 		var glow := OmniLight3D.new()
 		glow.name = "warming_cabinet_glow"   # a module of its own: shown with the cabinet
 		glow.light_color = CABINET_GLOW
 		glow.light_energy = 0.9
 		glow.omni_range = 1.1
 		glow.shadow_enabled = false
-		glow.position = cabinet.transform * CABINET_GLOW_AT   # wherever the room stands it
+		var t := Transform3D()   # the socket in the art's frame, wherever the room stands the cabinet (in the tree or not)
+		var n: Node = socket
+		while n != art:
+			t = (n as Node3D).transform * t
+			n = n.get_parent()
+		glow.position = t.origin
 		art.add_child(glow)
 		module_levels[glow.name] = module_levels.get("warming_cabinet", 3)
 
@@ -523,6 +528,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"doubleon":   # the Double toggle on, as a tap on it (282 shots)
 			if kitchen.drawer: kitchen.drawer.dev_double(true)
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
+		"cabinetglowoff":   # the Warming Cabinet's warm light off (282 shots: with and without, 上官婉儿)
+			if art.has_node("warming_cabinet_glow"): (art.get_node("warming_cabinet_glow") as Node3D).visible = false
 		"cookall":   # Cook All's sheet (282 shots; no key opens it while it is paused)
 			kitchen.open_cook_all()
 		"cookallgo":   # the sheet's `Cook All · N pots`, as a tap on it (282 shots)

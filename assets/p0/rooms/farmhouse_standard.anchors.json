@@ -1,5 +1,5 @@
 {
-  "_comment": "SGODOT-282 (282 c62a6ed9 ②, 上官婉儿 on 282): the farmhouse kitchen corner in the Standard Room (Homestead Lv5–9), same names as farmhouse.anchors.json. Stoves on range_cooker.glb's four burners (local ±0.15 x, ±0.175 z — measured ±0.145 / ±0.165, within 1 cm; 1 front left, 2 front right, 3 back right, so two stoves stand side by side), the hob top at 1.457 (its 1.375 on the floor); drop_pot 0.324 above it and cam_stove 0.26 above it as the Deluxe Room's hooks, badge_stove 0.43 above drop_pot as the Basic Room's. The Spice Rack is the art's own shelf over the sink (no prop); the Warming Cabinet is the Basic Room's placeholder (the Deluxe pantry at 0.6) as in the Basic Room, on the west wall facing +X (toward the camera, 不知火舞 on 282: by the east wall it showed its back), its back against the west wall's skirting board (its face at x −2.92), between the reading stool and the arched window (z −1.19), clear of the wall, the skirting, the window, the plants, the hanging basket and the stool (上官婉儿 282 650be64e, then the skirting). Door and spawn on the layout's entrance line (x 2.36).",
+  "_comment": "SGODOT-282 (282 c62a6ed9 ②, 上官婉儿 on 282): the farmhouse kitchen corner in the Standard Room (Homestead Lv5–9), same names as farmhouse.anchors.json. Stoves on range_cooker.glb's four burners (local ±0.15 x, ±0.175 z — measured ±0.145 / ±0.165, within 1 cm; 1 front left, 2 front right, 3 back right, so two stoves stand side by side), the hob top at 1.457 (its 1.375 on the floor); drop_pot 0.324 above it and cam_stove 0.26 above it as the Deluxe Room's hooks, badge_stove 0.43 above drop_pot as the Basic Room's. The Spice Rack is the art's own shelf over the sink (no prop); the Warming Cabinet is the Warming Cabinet model as in the Basic Room (SGODOT-282, glass option B; scale 1, its back at x −2.916, use_warming_cabinet on its top_center), on the west wall facing +X (toward the camera, 不知火舞 on 282: by the east wall it showed its back), its back against the west wall's skirting board (its face at x −2.92), between the reading stool and the arched window (z −1.19), clear of the wall, the skirting, the window, the plants, the hanging basket and the stool (上官婉儿 282 650be64e, then the skirting). Door and spawn on the layout's entrance line (x 2.36).",
   "anchors": [
     {
       "name": "use_stove_1",
@@ -144,8 +144,8 @@
     {
       "name": "use_warming_cabinet",
       "position": [
-        -2.633,
-        1.36,
+        -2.666,
+        1.402,
         -1.19
       ],
       "module": "warming_cabinet"
@@ -153,7 +153,7 @@
     {
       "name": "badge_warming_cabinet",
       "position": [
-        -2.633,
+        -2.666,
         1.0,
         -1.19
       ],
@@ -205,26 +205,26 @@
   "props": [
     {
       "name": "warming_cabinet",
-      "scene": "res://assets/props/warming_cabinet_placeholder/kitchen_pantry.glb",
-      "atlas": "res://assets/props/warming_cabinet_placeholder/room_albedo_ao.png",
+      "scene": "res://assets/props/warming_cabinet/warming_cabinet.glb",
+      "specular": 0.28,
       "position": [
-        -2.675,
+        -2.916,
         0.082,
         -1.19
       ],
       "yaw_degrees": 90,
-      "scale": 0.6,
+      "scale": 1,
       "level": 3,
       "collider": {
         "at": [
           0,
-          1.1125,
-          0.07
+          0.66,
+          0.25
         ],
         "size": [
-          0.94,
-          2.225,
-          0.95
+          0.56,
+          1.32,
+          0.5
         ]
       }
     }

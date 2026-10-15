@@ -59,21 +59,43 @@ func test_the_stoves_are_on_the_range_cookers_hob() -> void:
 		for a in 3:
 			for b in range(a + 1, 3): assert_float((spots[a] as Vector2).distance_to(spots[b])).is_greater(0.25)
 
-## The Warming Cabinet's glow stands in front of its door wherever the room puts the cabinet; the Deluxe Room has none of
+## The Warming Cabinet's glow sits at the model's glow socket, inside it, wherever the room puts the cabinet; the Deluxe Room has none of
 ## its own (its fittings), and only the Basic Room's hearth burns brighter while a pot cooks.
 func test_the_cabinet_glow_and_the_cooking_fire_follow_the_room() -> void:
 	var basic := _farmhouse(3)
-	assert_vector(basic.art.get_node("warming_cabinet_glow").position).is_equal_approx(Vector3(-2.13, 0.75, -1.69), Vector3.ONE * 0.002)
+	# the model's glow socket (0, 0.795, 0.25), its back at x −2.850 facing +X (SGODOT-282 warming_cabinet.glb)
+	assert_vector(basic.art.get_node("warming_cabinet_glow").position).is_equal_approx(Vector3(-2.6, 0.877, -1.69), Vector3.ONE * 0.002)
 	assert_object(basic.call("stove_fire")).is_not_null()
 	var standard := _farmhouse(5)
 	var cab := standard.art.get_node("warming_cabinet") as Node3D
 	var glow := standard.art.get_node("warming_cabinet_glow") as Node3D
-	assert_float(glow.position.x - cab.position.x).is_equal_approx(0.477, 0.002)   # it faces +X, as in the Basic Room
+	assert_float(glow.position.x - cab.position.x).is_equal_approx(0.25, 0.002)   # it faces +X, as in the Basic Room
 	assert_float(glow.position.z).is_equal_approx(cab.position.z, 0.002)
 	assert_object(standard.call("stove_fire")).is_null()
 	var deluxe := _farmhouse(10)
 	assert_bool(deluxe.art.has_node("warming_cabinet_glow")).is_false()
 	assert_object(deluxe.call("stove_fire")).is_null()
+
+## The Warming Cabinet model (SGODOT-282, glass option B; 上官婉儿's notes): its own materials — no atlas override, which
+## would cover the dishes — with the room's specular 0.28; all six dishes; scale 1 and its 0.56 × 1.32 × 0.50 collider;
+## use_warming_cabinet on its top_center.
+func test_the_warming_cabinet_is_the_model_with_its_own_materials() -> void:
+	for lv in [3, 5]:
+		var r := _farmhouse(lv)
+		var cab := r.art.get_node("warming_cabinet") as Node3D
+		assert_vector(cab.scale).is_equal(Vector3.ONE)
+		var meshes := cab.find_children("*", "MeshInstance3D", true, false)
+		assert_int(meshes.size()).is_equal(8)   # the cabinet, dish_1 … dish_6 and the door's two highlights
+		for m in meshes:
+			var mi := m as MeshInstance3D
+			assert_object(mi.material_override).is_null()
+			for i in mi.mesh.get_surface_count():
+				assert_float((mi.get_surface_override_material(i) as BaseMaterial3D).metallic_specular).is_equal_approx(0.28, 0.001)
+		for i in range(1, 7): assert_bool((cab.find_child("dish_%d" % i, true, false) as Node3D).visible).is_true()
+		var box := (cab.find_children("*", "CollisionShape3D", true, false)[0] as CollisionShape3D).shape as BoxShape3D
+		assert_vector(box.size).is_equal_approx(Vector3(0.56, 1.32, 0.5), Vector3.ONE * 0.001)
+		var top := (cab.find_child("top_center", true, false) as Node3D).global_position
+		assert_vector(r.anchor("use_warming_cabinet").global_position).is_equal_approx(top, Vector3.ONE * 0.002)
 
 ## The cabinet shows its door, not its back (不知火舞 on 282: by the Standard Room's east wall it faced away from the camera).
 func test_the_warming_cabinet_faces_the_camera() -> void:
