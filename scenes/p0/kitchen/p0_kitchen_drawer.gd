@@ -72,8 +72,9 @@ const _DOUBLE_ROW := 32.0
 signal unavailable(reason: String)
 ## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
 signal double_changed(on: bool)
-## Cook All on the Cookbook strip (Cooking Lv8, §16 COOK-1, q(124)): the kitchen opens its sheet.
-signal cook_all_requested
+## Cook All has no key here: paused (user 10-15; 0.2.8 brings a cook-this-page-in-batches on the recipe card), and the
+## filter row keeps all six chips where its key used to squeeze Rare / Legendary out (B7 ⑨). The kitchen's sheet and
+## firing (P0Kitchen.open_cook_all) stay for 0.2.8.
 
 var _stove: Label
 var _level: Label
@@ -93,7 +94,7 @@ var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit t
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
 var _pages: UiInventoryGrid
-var _cook_all: UiCommandButton   # the Cookbook strip's right end, from Cooking Lv8 (P0KitchenLogic.cook_all)
+var _book_chips: Control   # the Cookbook's filter chips (in their scroll window)
 var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
@@ -233,22 +234,13 @@ func _build_cookbook() -> VBoxContainer:
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(_build_titles())
-	# The filter chips, and Cook All at the strip's right end from Cooking Lv8 (§16 COOK-1): `Nothing to cook` greyed
-	# when no known page has its ingredients (D-10, LOCK-10: the gap on the button, no empty sheet).
-	var strip := HBoxContainer.new()
-	strip.add_theme_constant_override(&"separation", 8)
+	# The filter chips, all six: All · Can cook · Common · Fine · Rare · Legendary (2318:125476).
 	var chips := _chips(P0KitchenLogic.COOKBOOK_CHIPS, func(i: int):
 		cookbook_chip = P0KitchenLogic.COOKBOOK_CHIPS[i]
 		_refresh_cookbook())
-	chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	strip.add_child(chips)
-	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
-	_cook_all.name = "CookAll"
-	_cook_all.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_cook_all.activated.connect(func(): cook_all_requested.emit())
-	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
-	strip.add_child(_cook_all)
-	v.add_child(strip)
+	_book_chips = chips.get_child(0)
+	_tighten(_book_chips)
+	v.add_child(chips)
 	v.add_child(_build_recipe())
 	_pages = UiInventoryGrid.new()
 	_pages.density = UiItemCell.Density.KITCHEN
@@ -423,9 +415,6 @@ static func _text(parent: Control, style: StringName, color: Color, r: Rect2) ->
 	return l
 
 func _refresh_cookbook() -> void:
-	var all := P0KitchenLogic.cook_all(view)
-	_cook_all.visible = not all.is_empty() and not queue_mode
-	if _cook_all.visible: _cook_all.reason = str(all.button)
 	var order := P0KitchenLogic.cookbook_order(view, cookbook_chip)
 	_pages.capacity = order.size()
 	_pages.items = order.map(func(p): return P0KitchenLogic.page_cell(view, p))
@@ -601,6 +590,30 @@ func _refresh_experiment() -> void:
 	_apply_double(_exp_double, _cook, P0KitchenLogic.double_state(view, {}, pot), pot)
 	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 	_tried.visible = P0KitchenLogic.tried(view, pot)
+
+## The Cookbook's six chips as 2318:125476 draws them, so all fit the 336 row (B7 ⑨): 4 apart, 7 each side of the
+## word, at least 40 wide (All · Fine · Rare 40, Can cook 61, Common 60, Legendary 69 here).
+const _BOOK_CHIP_GAP := 4
+const _BOOK_CHIP_PAD := 7.0
+const _BOOK_CHIP_MIN := 40.0
+
+func _tighten(row: Control) -> void:
+	row.add_theme_constant_override(&"separation", _BOOK_CHIP_GAP)
+	for c in row.get_children():
+		var chip := c as UiFilterChip
+		chip.custom_minimum_size.x = _BOOK_CHIP_MIN
+		# The theme's boxes reach the chip only in the tree: narrow their sides on every theme change there, from the
+		# theme's own boxes (overrides off first; adding them notifies again, hence the meta guard).
+		chip.theme_changed.connect(func():
+			if not chip.is_inside_tree() or chip.get_meta(&"tightening", false): return
+			chip.set_meta(&"tightening", true)
+			for st in [&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled", &"focus"]:
+				chip.remove_theme_stylebox_override(st)
+				var box := chip.get_theme_stylebox(st).duplicate() as StyleBox
+				box.content_margin_left = _BOOK_CHIP_PAD
+				box.content_margin_right = _BOOK_CHIP_PAD
+				chip.add_theme_stylebox_override(st, box)
+			chip.set_meta(&"tightening", false))
 
 func _chips(labels: Array, picked: Callable) -> Control:
 	var scroll := TouchScrollContainer.new()

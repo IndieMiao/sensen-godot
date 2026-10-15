@@ -175,7 +175,6 @@ func open(tab := "cookbook", page_id := "") -> void:
 	drawer.tab_changed.connect(_on_tab)
 	drawer.ingredient_tapped.connect(_on_ingredient)
 	drawer.cook_requested.connect(_on_cook)
-	drawer.cook_all_requested.connect(open_cook_all)
 	drawer.info_requested.connect(func(): rt.ui.toast("Mix 1–%d ingredients · unknown mixes may become a Mystery Dish" % P0KitchenLogic.slots(rt.session.current())))
 	_wrap.add_child(drawer)
 	_overlay = _build_overlay()
@@ -463,7 +462,7 @@ func _on_cook(cmd: Dictionary) -> void:
 	rt.session.send(cmd, P0Session.ui_key(cmd))
 
 # ---------------------------------------------------------------- Cook All (Cooking Lv8; COOK-P1-4 / COOK-EMPTY, q(124))
-## The Cookbook strip's Cook All opens its sheet over the drawer (P0CookAllSheet from the server's preview); ×, a drag
+## Cook All's sheet over the drawer (paused: no key opens it since 10-15, kept for 0.2.8's batch cook on the recipe card) (P0CookAllSheet from the server's preview); ×, a drag
 ## down, Back and `Kitchen` close it back to the Cookbook. `Cook All · N pots` sends cook_all and closes it
 ## at once: the reply's pots catch one stove after another, COOK_ALL_FIRE_S apart, the camera staying put, and what
 ## they took floats once over the pot card as one item group (`−3 Radish · −2 Pond Crucian`, two a line, q(124) ④).

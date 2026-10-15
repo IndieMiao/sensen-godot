@@ -146,32 +146,53 @@ func test_the_empty_sheet_shows_the_stoves_and_a_grey_all_stoves_busy() -> void:
 
 # ---------------------------------------------------------------- the strip and the firing
 
-func test_the_cookbook_strip_shows_cook_all_from_lv8_and_greys_it_with_the_gap() -> void:
-	var v := _view()
-	v.cooking.erase("cook_all")
-	_set_view(v)
+## Paused (user 10-15): the Cookbook has no Cook All key, at Cooking Lv8 with something to cook or not; the sheet still
+## refuses to open greyed (no empty sheet, LOCK-10) for 0.2.8's reuse.
+func test_the_cookbook_has_no_cook_all_key_while_it_is_paused() -> void:
+	_set_view(_view())
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
 	k.open("cookbook")
-	assert_bool((k.drawer.get("_cook_all") as Control).visible).is_false()
+	assert_object(k.drawer.find_child("CookAll", true, false)).is_null()
+	assert_bool(k.drawer.has_signal("cook_all_requested")).is_false()
 	rt.ui.close_modal()
 	await get_tree().process_frame
 	_set_view(_view(_plan("nothing_to_cook")))
 	k.open("cookbook")
-	var button: UiCommandButton = k.drawer.get("_cook_all")
-	assert_bool(button.visible).is_true()
-	assert_str(button.text).is_equal("Nothing to cook")
-	k.open_cook_all()   # greyed: no sheet (no empty sheet, LOCK-10)
+	k.open_cook_all()
 	assert_object(k.cook_all_sheet).is_null()
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+## B7 ⑨ (不知火舞 on 286 6e15f758): the Cookbook's filter row is all six chips — All · Can cook · Common · Fine · Rare ·
+## Legendary, each whole on screen (2318:125476) — Cook All no longer at its right end.
+func test_the_filter_row_keeps_all_six_chips_and_cook_all_is_off_it() -> void:
+	var d := await _drawer(_view())
+	var row := d.get("_book_chips") as Control
+	var chips := row.find_children("*", "UiFilterChip", true, false)
+	assert_array(chips.map(func(c): return (c as Button).text)).is_equal(["All", "Can cook", "Common", "Fine", "Rare", "Legendary"])
+	var shown := (row.get_parent() as Control).get_global_rect()   # the chips' scroll window
+	for c in chips:
+		var r := (c as Control).get_global_rect()
+		assert_bool(shown.grow(0.5).encloses(r)).override_failure_message("%s at %s outside %s" % [(c as Button).text, r, shown]).is_true()
+
+func _drawer(v: Dictionary) -> P0KitchenDrawer:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var d := P0KitchenDrawer.new(v)
+	d.animate = false
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	return d
 
 func test_cook_all_sends_closes_the_sheet_and_fires_the_pots_one_after_another() -> void:
 	_set_view(_view())
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
 	k.open("cookbook")
-	(k.drawer.get("_cook_all") as UiCommandButton).pressed.emit()
+	k.open_cook_all()
 	assert_object(k.cook_all_sheet).is_not_null()
 	k.cook_all_sheet.cook_button.pressed.emit()
 	assert_array(sent.map(func(c): return c.type)).is_equal(["cook_all"])

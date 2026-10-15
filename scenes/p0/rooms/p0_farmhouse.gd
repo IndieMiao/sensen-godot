@@ -523,13 +523,12 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"doubleon":   # the Double toggle on, as a tap on it (282 shots)
 			if kitchen.drawer: kitchen.drawer.dev_double(true)
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
-		"cookall":   # the Cookbook strip's Cook All, as a tap on it (282 shots)
-			if kitchen.drawer: (kitchen.drawer.get("_cook_all") as UiCommandButton).pressed.emit()
+		"cookall":   # Cook All's sheet (282 shots; no key opens it while it is paused)
+			kitchen.open_cook_all()
 		"cookallgo":   # the sheet's `Cook All · N pots`, as a tap on it (282 shots)
 			if is_instance_valid(kitchen.cook_all_sheet) and kitchen.cook_all_sheet.cook_button: kitchen.cook_all_sheet.cook_button.pressed.emit()
 		"cookallrects":   # Cook All's sheet, its ×, the strip button and the floats on screen (282 shots: layout by numbers)
 			var out := {}
-			if kitchen.drawer: out["strip button"] = (kitchen.drawer.get("_cook_all") as Control).get_global_rect()
 			if kitchen.drawer:
 				out["drawer top"] = kitchen.drawer.top_y()
 				out["drawer"] = kitchen.drawer.get_global_rect()
