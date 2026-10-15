@@ -1,0 +1,453 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"assets": {
+		"pot_big": {
+			"bounds": [
+				[
+					-0.140000000596046,
+					0.0,
+					-0.10700000077486
+				],
+				[
+					0.140000000596046,
+					0.241999998688698,
+					0.106999985873699
+				]
+			],
+			"size_xyz": [
+				0.280000001192093,
+				0.241999998688698,
+				0.21399998664856
+			],
+			"surfaces": 3,
+			"triangles": 684
+		},
+		"pot_normal": {
+			"bounds": [
+				[
+					-0.117990374565125,
+					0.0,
+					-0.105999998748302
+				],
+				[
+					0.117990374565125,
+					0.140000000596046,
+					0.106000013649464
+				]
+			],
+			"size_xyz": [
+				0.235980749130249,
+				0.140000000596046,
+				0.212000012397766
+			],
+			"surfaces": 1,
+			"triangles": 380
+		}
+	},
+	"captures": [
+		{
+			"camera_position": [
+				0.0,
+				0.119999997317791,
+				20.0
+			],
+			"camera_size": 0.419999986886978,
+			"height": 900,
+			"id": "pot_normal_front",
+			"pitch": 0.0,
+			"width": 900,
+			"yaw": 0.0
+		},
+		{
+			"camera_position": [
+				10.3967361450195,
+				8.57236576080322,
+				14.8480777740479
+			],
+			"camera_size": 0.419999986886978,
+			"height": 900,
+			"id": "pot_normal_three_quarter",
+			"pitch": 24.9999980926514,
+			"width": 900,
+			"yaw": 34.9999961853027
+		},
+		{
+			"camera_position": [
+				20.0,
+				0.119999997317791,
+				-0.000000874227794156468
+			],
+			"camera_size": 0.419999986886978,
+			"height": 900,
+			"id": "pot_normal_side",
+			"pitch": 0.0,
+			"width": 900,
+			"yaw": 90.0
+		},
+		{
+			"camera_position": [
+				0.0,
+				0.119999997317791,
+				20.0
+			],
+			"camera_size": 0.419999986886978,
+			"height": 900,
+			"id": "pot_big_front",
+			"pitch": 0.0,
+			"width": 900,
+			"yaw": 0.0
+		},
+		{
+			"camera_position": [
+				10.3967361450195,
+				8.57236576080322,
+				14.8480777740479
+			],
+			"camera_size": 0.419999986886978,
+			"height": 900,
+			"id": "pot_big_three_quarter",
+			"pitch": 24.9999980926514,
+			"width": 900,
+			"yaw": 34.9999961853027
+		},
+		{
+			"camera_position": [
+				20.0,
+				0.119999997317791,
+				-0.000000874227794156468
+			],
+			"camera_size": 0.419999986886978,
+			"height": 900,
+			"id": "pot_big_side",
+			"pitch": 0.0,
+			"width": 900,
+			"yaw": 90.0
+		},
+		{
+			"camera_position": [
+				9.93463516235352,
+				10.1599998474121,
+				14.1881294250488
+			],
+			"camera_size": 0.469999998807907,
+			"height": 900,
+			"id": "pot_big_open_lid",
+			"pitch": 30.0,
+			"width": 900,
+			"yaw": 34.9999961853027
+		},
+		{
+			"camera_position": [
+				8.76163291931152,
+				14.8399667739868,
+				10.4547662734985
+			],
+			"camera_size": 6.71999979019165,
+			"height": 800,
+			"id": "basic_room_43deg",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 40.3050842285156
+		},
+		{
+			"camera_position": [
+				7.4116325378418,
+				15.1169672012329,
+				8.79476642608643
+			],
+			"camera_size": 1.25,
+			"height": 800,
+			"id": "basic_room_detail",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 40.3050842285156
+		},
+		{
+			"camera_position": [
+				10.5796127319336,
+				14.9399671554565,
+				9.79385948181152
+			],
+			"camera_size": 6.71999979019165,
+			"height": 800,
+			"id": "standard_room_5_43deg",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 43.0212745666504
+		},
+		{
+			"camera_position": [
+				10.5796127319336,
+				14.9399671554565,
+				9.79385948181152
+			],
+			"camera_size": 6.71999979019165,
+			"height": 800,
+			"id": "standard_two_big_43deg",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 43.0212745666504
+		},
+		{
+			"camera_position": [
+				11.2596120834351,
+				15.196967124939,
+				8.14885902404785
+			],
+			"camera_size": 1.25,
+			"height": 800,
+			"id": "standard_room_5_detail",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 43.0212745666504
+		},
+		{
+			"camera_position": [
+				7.79800128936768,
+				15.2399673461914,
+				10.2766704559326
+			],
+			"camera_size": 6.71999979019165,
+			"height": 800,
+			"id": "deluxe_room_10_43deg",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 43.119873046875
+		},
+		{
+			"camera_position": [
+				6.08300113677979,
+				15.030966758728,
+				10.2956705093384
+			],
+			"camera_size": 1.25,
+			"height": 800,
+			"id": "deluxe_room_10_detail",
+			"pitch": 42.9999961853027,
+			"width": 360,
+			"yaw": 43.119873046875
+		}
+	],
+	"checks": [
+		{
+			"check": "exactly two imported variant nodes",
+			"passed": true
+		},
+		{
+			"check": "imported root scale 1 / identity",
+			"passed": true
+		},
+		{
+			"check": "pot_normal opaque textured material / no emission",
+			"passed": true
+		},
+		{
+			"check": "pot_normal imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "pot_normal width including handles",
+			"passed": true
+		},
+		{
+			"check": "pot_normal bottom on Y=0",
+			"passed": true
+		},
+		{
+			"check": "pot_normal mouth path and position",
+			"passed": true
+		},
+		{
+			"check": "pot_normal mouth is empty",
+			"passed": true
+		},
+		{
+			"check": "pot_big opaque textured material / no emission",
+			"passed": true
+		},
+		{
+			"check": "pot_big opaque textured material / no emission",
+			"passed": true
+		},
+		{
+			"check": "pot_big opaque textured material / no emission",
+			"passed": true
+		},
+		{
+			"check": "pot_big imported triangle count",
+			"passed": true
+		},
+		{
+			"check": "pot_big width including handles",
+			"passed": true
+		},
+		{
+			"check": "pot_big bottom on Y=0",
+			"passed": true
+		},
+		{
+			"check": "pot_big mouth path and position",
+			"passed": true
+		},
+		{
+			"check": "pot_big mouth is empty",
+			"passed": true
+		},
+		{
+			"check": "lid rear-edge local pivot",
+			"passed": true
+		},
+		{
+			"check": "direct child vent at outlet",
+			"passed": true
+		},
+		{
+			"check": "no light nodes",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_normal_front",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_normal_three_quarter",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_normal_side",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_big_front",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_big_three_quarter",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_big_side",
+			"passed": true
+		},
+		{
+			"check": "Saved pot_big_open_lid",
+			"passed": true
+		},
+		{
+			"check": "basic_room real avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Saved basic_room_43deg",
+			"passed": true
+		},
+		{
+			"check": "Saved basic_room_detail",
+			"passed": true
+		},
+		{
+			"check": "standard_room_5 real avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Saved standard_room_5_43deg",
+			"passed": true
+		},
+		{
+			"check": "Saved standard_two_big_43deg",
+			"passed": true
+		},
+		{
+			"check": "Saved standard_room_5_detail",
+			"passed": true
+		},
+		{
+			"check": "deluxe_room_10 real avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Saved deluxe_room_10_43deg",
+			"passed": true
+		},
+		{
+			"check": "Saved deluxe_room_10_detail",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"placements": {
+		"basic_room": {
+			"basic_kettle_hidden": true,
+			"deluxe_old_kettle_removed_in_fixture": false,
+			"xz": [
+				[
+					-2.05,
+					-2.36
+				],
+				[
+					-1.72,
+					-2.36
+				],
+				[
+					-1.885,
+					-2.84
+				]
+			],
+			"y": 1.377,
+			"yaw_degrees": [
+				0,
+				0,
+				0
+			]
+		},
+		"deluxe_room_10": {
+			"basic_kettle_hidden": false,
+			"deluxe_old_kettle_removed_in_fixture": true,
+			"xz": [
+				[
+					-3.915,
+					-0.381
+				],
+				[
+					-4.245,
+					-0.381
+				],
+				[
+					-3.915,
+					-0.859
+				]
+			],
+			"y": 1.291,
+			"yaw_degrees": [
+				0,
+				0,
+				0
+			]
+		},
+		"standard_room_5": {
+			"basic_kettle_hidden": false,
+			"deluxe_old_kettle_removed_in_fixture": false,
+			"xz": [
+				[
+					1.28,
+					-2.545
+				],
+				[
+					1.58,
+					-2.545
+				],
+				[
+					1.58,
+					-2.895
+				]
+			],
+			"y": 1.457,
+			"yaw_degrees": [
+				0,
+				0,
+				45
+			]
+		}
+	},
+	"renderer": "mobile"
+}
