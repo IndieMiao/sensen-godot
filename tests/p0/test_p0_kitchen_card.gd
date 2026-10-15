@@ -22,66 +22,71 @@ func _settle() -> void:
 
 func _card(d: P0KitchenDrawer) -> Rect2: return (d.get("_recipe") as Control).get_global_rect()
 
-func test_a_grey_button_keeps_to_the_card_and_takes_a_row_when_too_long() -> void:
+## row 99 (S1 2731:153980, grid 2733:158489; 不知火舞 on 286 20438543): one grid for every page — 336 × 110; the medallion
+## 44 at x 12; name and state at x 68; `+N Energy` right-aligned to x 324; the divider 1 × 34 at x 248; row 2 (touch 44
+## at y 59): Cook at x 256–324, a gap right-aligned there as wide as it says.
+func test_the_card_keeps_the_row_99_grid() -> void:
 	var d := _drawer()
-	d.view.names["crop_lettuce"] = "Moonlit Butterhead Lettuce"   # a gap too long for the corner
+	await _settle()
+	d.select_page("dish_grilled_crucian")
+	await _settle()
+	var at := func(n: String) -> Rect2: return Rect2((d.get(n) as Control).position, (d.get(n) as Control).size)
+	assert_vector(_card(d).size).is_equal(Vector2(336, 110))
+	assert_that(at.call("_medallion")).is_equal(Rect2(12, 12, 44, 44))
+	assert_that([at.call("_recipe_title").position.x, at.call("_recipe_state").position.x]).is_equal([68.0, 68.0])
+	assert_float(at.call("_recipe_effect").end.x).is_equal(324.0)
+	assert_int((d.get("_recipe_effect") as Label).horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+	assert_str((d.get("_recipe_effect") as Label).text).is_equal("+20 Energy")   # the time is on the pot card now
+	assert_that(at.call("_divider")).is_equal(Rect2(248, 17, 1, 34))
+	var b: UiCommandButton = d.get("_recipe_button")
+	assert_that(Rect2(b.position, b.size)).is_equal(Rect2(256, 59, 68, 44))
+	assert_str(b.text).is_equal("Cook")
+
+## A gap keeps Cook's corner: right-aligned at x 324, as wide as it says, inside the card; the card stays 110.
+func test_a_gap_is_right_aligned_where_cook_is() -> void:
+	var d := _drawer()
+	d.view.names["crop_lettuce"] = "Moonlit Butterhead Lettuce"
 	d.refresh()
 	await _settle()
 	var b: UiCommandButton = d.get("_recipe_button")
-	var effect: Label = d.get("_recipe_effect")
-	d.select_page("dish_grilled_crucian")   # Cook: the corner, 90 wide, right edge at 328
-	await _settle()
-	var short_h := _card(d).size.y
-	assert_float(b.size.x).is_equal(90.0)
-	assert_float(b.position.x + b.size.x).is_equal(328.0)
-	# Cooking Lv4 · 3rd slot (C3 cut it to "Cooking Lv4 · 3r"): right-aligned, as wide as its text, clear of the facts.
-	d.select_page("dish_fisher_stew")
+	d.select_page("dish_fisher_stew")   # the 3rd slot locked
 	await _settle()
 	assert_str(b.text).is_equal("Cooking Lv4 · 3rd slot")
+	assert_float(b.position.x + b.size.x).is_equal(324.0)
 	assert_float(b.size.x).is_greater_equal(b.get_combined_minimum_size().x)
-	assert_float(b.position.x + b.size.x).is_equal(328.0)
-	assert_bool(_card(d).encloses(b.get_global_rect())).override_failure_message("%s in %s" % [b.get_global_rect(), _card(d)]).is_true()
-	assert_float(b.position.x).is_greater(57.4 + P0KitchenDrawer._text_width(d.get("_recipe_state")))
-	assert_float(_card(d).size.y).is_equal(short_h)
-	# A gap that would run into the facts: a full row of its own under them, the whole text, inside the card.
 	d.select_page("dish_radish_salad")
 	await _settle()
 	assert_str(b.text).is_equal("Need Moonlit Butterhead Lettuce ×1")
-	assert_float(b.size.x).is_equal(320.0)   # 8 in from each side
-	assert_float(b.size.x).is_greater_equal(b.get_combined_minimum_size().x)
-	assert_float(b.position.y).is_greater_equal(effect.position.y + effect.size.y)
-	assert_float(_card(d).size.y).is_greater(short_h)
+	assert_float(b.position.x + b.size.x).is_equal(324.0)
+	assert_float(b.position.x).is_greater_equal(12.0)
+	assert_float(_card(d).size.y).is_equal(110.0)
 	assert_bool(_card(d).encloses(b.get_global_rect())).override_failure_message("%s in %s" % [b.get_global_rect(), _card(d)]).is_true()
-	d.select_page("dish_grilled_crucian")   # back to Cook: the card shrinks again
-	await _settle()
-	assert_float(_card(d).size.y).is_equal(short_h)
 
-func test_the_might_have_line_sits_under_the_facts() -> void:
+## An unknown page on the same grid (S14 2747:159713 / S14b): a light grey medallion, `Try in Experiment ›` right-aligned
+## at x 324; `You might have what it takes` is the extra line between the rows (x 68, 16 high, 4 above and below), the
+## card 130 and row 2 down 20.
+func test_an_unknown_page_and_its_might_have_line() -> void:
 	var d := _drawer()
 	await _settle()
 	d.select_page("dish_grilled_fish")
 	await _settle()
 	var maybe: Label = d.get("_recipe_maybe")
-	var state: Label = d.get("_recipe_state")
-	var effect: Label = d.get("_recipe_effect")
+	var nav: Control = d.get("_recipe_nav")
 	assert_bool(maybe.is_visible_in_tree()).is_true()
 	assert_str(maybe.text).is_equal("You might have what it takes")
 	assert_object(maybe.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_NEW_INK)
-	assert_float(maybe.position.y).is_greater_equal(state.position.y + 13.0)   # under the 13 px fact band
-	assert_float(effect.position.y).is_greater_equal(maybe.position.y + maybe.get_combined_minimum_size().y)
-	# Try in Experiment › moves down with the effect line: its centred text stays in the card, under the new line.
-	var nav: Control = d.get("_recipe_nav")
-	var mid := nav.get_global_rect().get_center().y
-	assert_float(mid).is_less(_card(d).end.y - 8.0)
-	assert_float(mid - 8.0).is_greater_equal(maybe.get_global_rect().position.y + maybe.get_combined_minimum_size().y)
-	d.select_page("dish_veggie_plate")   # clued, no maybe
+	assert_float(maybe.position.x).is_equal(68.0)
+	assert_float(maybe.position.y + maybe.get_combined_minimum_size().y * 0.5).is_equal_approx(68.0, 0.6)   # the 60–76 line's middle
+	assert_float(_card(d).size.y).is_equal(130.0)
+	assert_that([nav.position.x + nav.size.x, nav.position.y]).is_equal([324.0, 79.0])
+	assert_object(((d.get("_medallion") as Panel).get_theme_stylebox(&"panel") as UiStyleBox).bg_color).is_equal(Color("E9E7E0"))
+	d.select_page("dish_veggie_plate")   # clued, no maybe: back to 110
 	await _settle()
 	assert_bool(maybe.is_visible_in_tree()).is_false()
+	assert_float(_card(d).size.y).is_equal(110.0)
 
 func test_the_first_page_keeps_cook_in_the_corner_once_the_drawer_has_its_theme() -> void:
-	# 256 ⑨: the card is laid out in _init before the theme reaches it; measured in the default font size, the long fact
-	# line of a page not cooked yet (Common · First cook +10 XP) sent Cook to a row of its own until another page was
-	# picked. It is laid out again once the theme is there.
+	# 256 ⑨: the card is laid out in _init before the theme reaches it; it is laid out again once the theme is there.
 	var v: Dictionary = auto_free(KL.new())._s5_view()
 	var pages: Array = v.cooking.cookbook
 	pages[0].can_cook = false
@@ -96,32 +101,11 @@ func test_the_first_page_keeps_cook_in_the_corner_once_the_drawer_has_its_theme(
 	assert_str(d.selected_page).is_equal("dish_radish_salad")
 	assert_str((d.get("_recipe_state") as Label).text).is_equal("Common · First cook +10 XP")
 	var b: UiCommandButton = d.get("_recipe_button")
-	assert_float(b.size.x).is_equal(90.0)
-	assert_float(b.position.x + b.size.x).is_equal(328.0)
+	assert_that(Rect2(b.position, b.size)).is_equal(Rect2(256, 59, 68, 44))
 
-func test_the_effect_line_runs_up_to_the_button_and_drops_the_style_then_the_time() -> void:
-	# 不知火舞 (256 follow-up): `+N Energy · T s · Style` runs up to 8 px short of the corner button (about 172 beside
-	# Cook, not the text box's 142): the longest real line, +70 Energy · 30 s · Dessert (153), fits whole. Beside a wide
-	# grey button the style goes first, then the time; the energy stays. A button on a row of its own gives it the card.
-	var d := _drawer()
-	await _settle()
-	var effect: Label = d.get("_recipe_effect")
-	var b: UiCommandButton = d.get("_recipe_button")
-	d.select_page("dish_grilled_crucian")   # Cook in the corner
-	await _settle()
-	d.set("_effect_parts", ["+70 Energy", "30 s", "Dessert"])
-	d.call("_layout_recipe")
-	assert_str(effect.text).is_equal("+70 Energy · 30 s · Dessert")
-	assert_float(b.position.x + b.size.x).is_equal(328.0)
-	assert_float(effect.position.x + effect.size.x).is_less_equal(b.position.x - 8.0 + 0.01)
-	d.call("_fit_effect", 120.0)   # beside a wide grey button
-	assert_str(effect.text).is_equal("+70 Energy · 30 s")
-	d.call("_fit_effect", 70.0)
-	assert_str(effect.text).is_equal("+70 Energy")
-
-## SGODOT-282 (不知火舞 540d59df): a Legendary page shows the empty Buff slot as a capsule at the end of the state line,
-## inside the card and clear of the button; other pages do not.
-func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
+## SGODOT-282 (不知火舞 540d59df; S13 2747:159481): a Legendary page's `Buff · coming later` capsule is the extra line
+## between the rows — x 68, inside the card, the card 130; other pages have none.
+func test_a_legendary_page_shows_the_buff_capsule_on_the_extra_line() -> void:
 	var d := _drawer()
 	d.view.cooking.tiers["4"] = {"energy": 70, "ms": 60000, "first_xp": 80}
 	d.view.cooking.cookbook.append({"id": "dish_legend_sashimi", "name": "Legend Sashimi", "rarity": 4, "slots": 1, "state": "tasted",
@@ -129,8 +113,6 @@ func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
 	d.refresh()
 	await _settle()
 	var cap: Control = d.get("_recipe_buff")
-	var state: Label = d.get("_recipe_state")
-	var b: UiCommandButton = d.get("_recipe_button")
 	d.select_page("dish_grilled_crucian")
 	await _settle()
 	assert_bool(cap.visible).is_false()
@@ -139,17 +121,13 @@ func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
 	assert_bool(cap.visible).is_true()
 	assert_str((cap.find_child("buff_text", true, false) as Label).text).is_equal("Buff · coming later")
 	assert_int(cap.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_float(cap.position.x).is_equal(68.0)
+	assert_float(cap.position.y + cap.size.y * 0.5).is_equal_approx(68.0, 0.6)   # the 60–76 line's middle
+	assert_float(_card(d).size.y).is_equal(130.0)
 	assert_bool(_card(d).encloses(cap.get_global_rect())).is_true()
-	# The state line is never cut to make room: the capsule follows it on the line, or takes a row under it.
-	assert_float(state.size.x).is_greater_equal(P0KitchenDrawer._text_width(state) - 0.5)
-	var same_line := absf(cap.get_global_rect().get_center().y - state.get_global_rect().get_center().y) < 2.0
-	if same_line: assert_float(cap.position.x).is_greater_equal(state.position.x + state.size.x)
-	else: assert_float(cap.position.y).is_greater_equal(state.position.y + state.size.y - 1.0)
-	var effect: Label = d.get("_recipe_effect")
-	assert_bool(cap.get_global_rect().intersects(effect.get_global_rect())).is_false()
-	var nav: Control = d.get("_recipe_nav")
-	for other in [b, nav]:
-		if (other as Control).visible: assert_bool(cap.get_global_rect().intersects((other as Control).get_global_rect())).is_false()
+	var b: UiCommandButton = d.get("_recipe_button")
+	assert_float(b.position.y).is_equal(79.0)
+	assert_bool(cap.get_global_rect().intersects(b.get_global_rect())).is_false()
 
 ## 不知火舞 02ad95bc ①: stove buttons that crowd (< 44 px apart) go in a row 1 / 2 / 3, 44 apart, centred; with a strip
 ## open, the buttons before its stove step left of the strip and those after it right of it, all kept on screen.
@@ -217,7 +195,7 @@ func test_a_ready_stove_strip_shows_the_ready_badge() -> void:
 	assert_bool(empty.has("badge")).is_false()
 	assert_str(str(empty.fact)).is_equal("Empty")
 
-## ④: the pot card's corner tag (`×2` with Double on) shows in its top right and takes no layout room.
+## ④: the pot card's corner tag (q(201): `2 servings` on a Big Pot stove) shows in its top right and takes no layout room.
 func test_pot_card_tag_sits_in_the_corner() -> void:
 	var card := UiPotCard.new()
 	card.theme = UiKit.theme()
@@ -226,7 +204,7 @@ func test_pot_card_tag_sits_in_the_corner() -> void:
 	card.show_result("Grilled Crucian", 1, "4 s")
 	await _settle()
 	var before := card.get_combined_minimum_size()
-	card.tag = "×2"
+	card.tag = "12" + P0KitchenLogic.NBSP + "servings"   # the longest (q(201) ④)
 	await _settle()
 	assert_vector(card.get_combined_minimum_size()).is_equal(before)
 	var r := card.tag_rect()

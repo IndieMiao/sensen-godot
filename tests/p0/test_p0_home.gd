@@ -55,8 +55,9 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 	v.homestead.next.unlocks = ["big_pot", "bag_upgrade_2"]
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
-	assert_array(p.changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
-		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II · 400 coins · Bag 35 · after Upgrade I"])
+	assert_array(p.changes.slice(1).map(func(c): return [c.text, c.note])).is_equal(
+		[["Big Pot · 2 servings on any stove", ""], ["Bag Upgrade II · 400 coins", "Bag 35 · after Upgrade I"]])   # q(201)
+	assert_str(str(p.changes[1].icon)).is_equal("big_pot")
 	v.homestead.next.unlocks = ["second_stove", "long_haul_ticket"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return str(c.text))).is_equal(["Second Stove"])
 	v.homestead.next.level = 5

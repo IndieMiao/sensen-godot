@@ -5,6 +5,13 @@ extends Control
 ## the − / + ends grey out at the limits. Emits `changed(value)`.
 
 signal changed(value: int)
+## With `limits_say_why` on, a grey end still takes a tap and says so (`limit_pressed(-1 / 1)`): the recipe card's
+## Batch Cook stepper toasts what stops one more pot (q(200) ⑤). Off (the counter rows), a grey end is disabled.
+signal limit_pressed(dir: int)
+var limits_say_why := false:
+	set(v):
+		limits_say_why = v
+		_refresh()
 
 # Stepper surface: − at x 5 (20 wide), the value box at x 26 (24 wide), + at x 51 (20 wide); glyphs 16 XB.
 const _W := 76.0
@@ -28,9 +35,9 @@ func _init(max_ := 99) -> void:
 	surface.size = Vector2(_W, UiTokens.SIZE_COMMAND_COMPACT)
 	add_child(surface)
 	_minus = _end("−", 0.0)
-	_minus.pressed.connect(func(): _step(-1))
+	_minus.pressed.connect(func(): _press(-1))
 	_plus = _end("+", _W - _END_W)
-	_plus.pressed.connect(func(): _step(1))
+	_plus.pressed.connect(func(): _press(1))
 	_value = UiKit.label("1", UiTokens.STYLE_C12_XB)
 	_value.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -71,10 +78,20 @@ func set_max_value(v: int) -> void:
 
 func _step(d: int) -> void: set_value(value + d)
 
+func _press(d: int) -> void:
+	var at_limit := value <= 1 if d < 0 else value >= max_value
+	if at_limit:
+		limit_pressed.emit(d)
+		return
+	_step(d)
+
 func _refresh() -> void:
 	if _value == null: return
 	_value.text = str(value)
-	_minus.disabled = value <= 1
-	_plus.disabled = value >= max_value
+	var grey := {_minus: value <= 1, _plus: value >= max_value}
 	for b in [_minus, _plus]:
-		(b.get_child(0) as Label).add_theme_color_override(&"font_color", UiTokens.COLOR_DISABLED_INK if b.disabled else UiTokens.COLOR_SECONDARY)
+		(b as Button).disabled = grey[b] and not limits_say_why
+		(b.get_child(0) as Label).add_theme_color_override(&"font_color", UiTokens.COLOR_DISABLED_INK if grey[b] else UiTokens.COLOR_SECONDARY)
+
+## Whether an end is greyed (at its limit), whether or not it still takes a tap.
+func end_grey(dir: int) -> bool: return value <= 1 if dir < 0 else value >= max_value
