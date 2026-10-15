@@ -666,12 +666,13 @@ func _update_camera() -> void:
 ## Push-in preset (kitchen stage): ease the camera onto a cam_ anchor so that it sits at the centre of the
 ## screen band `opts.band` (Rect2 in 0..1 screen fractions; default the strip from the HUD's bottom to 40 %).
 ## opts.size: orthographic width in metres (default 45 % of the room view); opts.release_on_move (default true).
+var _focus_scale := 1.0   # review shots only (focusscale:k): every pushed-in shot k× as wide
 func focus(cam_anchor: String, opts := {}) -> void:
 	var m := anchor(cam_anchor)
 	if m == null: return
 	var view := _view()
 	var band: Rect2 = opts.get("band", band_below_hud(0.40))
-	var size := float(opts.get("size", _diorama_size * 0.45))
+	var size := float(opts.get("size", _diorama_size * 0.45)) * _focus_scale
 	var visible_h := size * view.y / maxf(view.x, 1.0)
 	var forward := -_cam_dir
 	var up := (Vector3.UP - forward * forward.dot(Vector3.UP)).normalized()
@@ -1255,6 +1256,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			print("P0_PROMPT_RECTS ", out)
 		"tap": walk_to(step[1])
 		"focus": focus(step[1])
+		"focusscale": _focus_scale = float(step[1])   # focusscale:0.4 — pushed-in shots closer (review close-ups)
 		"exit": leave()
 		_: return false
 	return true

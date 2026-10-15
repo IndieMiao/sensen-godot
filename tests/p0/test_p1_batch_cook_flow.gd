@@ -234,22 +234,31 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 	assert_vector(lid.position).override_failure_message("up with the ingredients in").is_equal_approx(Vector3(0, 0.241, -0.107), Vector3.ONE * 0.001)
 	assert_float(lid.rotation_degrees.x).is_equal_approx(-20.0, 0.01)
 	assert_object(r.call("steam_from", 0)).is_same(r.anchor("drop_pot_1"))
-	k.stage.clear_ghosts()   # nothing over the pot: shut
+	await _close()   # the drawer closed without Cook: the page's ingredients are gone, the lid goes back down
 	frame.call()
 	await get_tree().create_timer(0.25).timeout
-	assert_vector(lid.position).override_failure_message("shut while empty").is_equal_approx(Vector3(0, 0.181, -0.107), Vector3.ONE * 0.001)
-	await _close()
-	# the fire lit: shut, steam from the vent, finer
+	assert_vector(lid.position).override_failure_message("shut, the drawer closed").is_equal_approx(Vector3(0, 0.181, -0.107), Vector3.ONE * 0.001)
+	# the fire lit: shut, the steam waiting until it is down, then from the vent, finer
+	k.open("cookbook", "dish_grilled_crucian")
+	await get_tree().process_frame
+	frame.call()
+	await get_tree().create_timer(0.25).timeout
 	var v := _view()
 	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000, "heats": []}, {}, {}]
 	_set_view(v)
+	k.on_pot(v.cooking.stoves[0])
 	frame.call()
+	k.stage.call("_process", 0.0)
+	var steam: CPUParticles3D = k.stage.get("_steam")
+	assert_bool(k.stage.steam_hold).override_failure_message("the lid is still closing").is_true()
+	assert_bool(steam.emitting).override_failure_message("no steam before the lid is down").is_false()
 	await get_tree().create_timer(0.25).timeout
+	frame.call()
+	await get_tree().process_frame
+	assert_bool(steam.emitting).override_failure_message("steam once the lid is down").is_true()
 	assert_vector(lid.position).override_failure_message("shut while cooking").is_equal_approx(Vector3(0, 0.181, -0.107), Vector3.ONE * 0.001)
 	assert_float(lid.rotation_degrees.x).is_equal_approx(0.0, 0.01)
 	assert_object(k.stage.steam_point).is_same(vent)
-	await get_tree().process_frame
-	var steam: CPUParticles3D = k.stage.get("_steam")
 	assert_vector(steam.global_position).is_equal_approx(vent.global_position, Vector3.ONE * 0.001)
 	assert_float(steam.scale_amount_max).is_equal_approx(1.2 * 0.6, 0.001)
 	# ready: up again, the steam from the mouth

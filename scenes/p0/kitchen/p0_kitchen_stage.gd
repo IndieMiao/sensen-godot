@@ -45,6 +45,8 @@ const STEAM_LIFT := Vector3(0, 0.06, 0)
 const VENT_SCALE := 0.6
 const STEAM_SCALE := Vector2(0.6, 1.2)   # the mouth's puffs, scale_amount min / max
 const STEAM_RADIUS := 0.06
+## The steam waits while true (the Big Pot's lid still closing: it rises once the lid is down, 282 v1.1).
+var steam_hold := false
 
 func _ready() -> void:
 	_steam = _make_steam()
@@ -56,9 +58,12 @@ func _process(_dt: float) -> void:
 	if vent: _steam.global_position = steam_point.global_position
 	else: _steam.position = STEAM_LIFT
 	var k := VENT_SCALE if vent else 1.0
-	_steam.scale_amount_min = STEAM_SCALE.x * k
-	_steam.scale_amount_max = STEAM_SCALE.y * k
-	_steam.emission_sphere_radius = STEAM_RADIUS * k
+	if not is_equal_approx(_steam.scale_amount_max, STEAM_SCALE.y * k):
+		_steam.scale_amount_min = STEAM_SCALE.x * k
+		_steam.scale_amount_max = STEAM_SCALE.y * k
+		_steam.emission_sphere_radius = STEAM_RADIUS * k
+	var emit := _cooking and not steam_hold
+	if _steam.emitting != emit: _set_steam(emit)
 	if cam == null: return
 	var px := world_per_px()
 	for id in _cards:
@@ -221,18 +226,35 @@ func _screen_to_world(p: Vector2) -> Vector3:
 # ---------------------------------------------------------------- steam, fire, plate
 func set_cooking(on: bool) -> void:
 	_cooking = on
-	_steam.emitting = on
+	_set_steam(on and not steam_hold)
 	if fire_fx and "glow_boost" in fire_fx:
 		create_tween().tween_property(fire_fx, "glow_boost", COOKING_GLOW if on else 1.0, 0.5)
 	elif glow_light: create_tween().tween_property(glow_light, "light_energy", _base_glow * (COOKING_GLOW if on else 1.0), 0.5)
 
 func is_cooking() -> bool: return _cooking
 
+## The steam on or off. Godot's CPUParticles3D draws the particles not yet emitted as black quads at the emitter until
+## each has spawned once (a dark disc for the first 1.4 s, on farm-dev too): the steam starts pre-run (preprocess, set in
+## _make_steam) and fades in over STEAM_FADE_S instead, so it rises without the dark disc and without popping in whole.
+const STEAM_FADE_S := 0.4
+var _steam_fade: Tween
+func _set_steam(on: bool) -> void:
+	if _steam.emitting == on: return
+	_steam.emitting = on
+	if not on or not is_inside_tree(): return
+	var m := (_steam.mesh as QuadMesh).material as StandardMaterial3D
+	if _steam_fade and _steam_fade.is_valid(): _steam_fade.kill()
+	m.albedo_color.a = 0.0
+	_steam_fade = create_tween()
+	_steam_fade.tween_property(m, "albedo_color:a", 1.0, STEAM_FADE_S)
+
 ## Another stove's pot catches (Cook All, q(124)): a puff of steam at its mouth. The working stove's own pot uses
 ## set_cooking (the hearth and the steaming).
 func puff_at(mouth: Node3D, life := 0.7) -> void:
 	var p := _make_steam()
 	p.one_shot = true
+	p.explosiveness = 1.0   # all at once: none left unspawned (drawn black, see _set_steam)
+	p.preprocess = 0.0
 	p.amount = 10
 	p.lifetime = life
 	mouth.add_child(p)   # in the tree first: emitting reads its global transform
@@ -242,6 +264,8 @@ func puff_at(mouth: Node3D, life := 0.7) -> void:
 func _puff() -> void:
 	var p := _make_steam()
 	p.one_shot = true
+	p.explosiveness = 1.0   # all at once: none left unspawned (drawn black, see _set_steam)
+	p.preprocess = 0.0
 	p.amount = 10
 	p.lifetime = 0.7
 	p.emitting = true
@@ -253,6 +277,7 @@ func _make_steam() -> CPUParticles3D:
 	p.emitting = false
 	p.amount = 14
 	p.lifetime = 1.4
+	p.preprocess = p.lifetime   # starts with every particle spawned (see _set_steam); one-shot puffs explode instead
 	p.direction = Vector3.UP
 	p.spread = 12.0
 	p.gravity = Vector3(0, 0.25, 0)
@@ -281,6 +306,7 @@ func _make_steam() -> CPUParticles3D:
 	mesh.material = m
 	p.mesh = mesh
 	p.position = STEAM_LIFT
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return p
 
 ## The dish comes out: a plate slides towards the camera with the dish card and its rarity glow (none for Common).

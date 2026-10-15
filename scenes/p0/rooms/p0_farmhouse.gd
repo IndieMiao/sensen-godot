@@ -354,18 +354,32 @@ func _apply_pots(n: int, big: Array) -> void:
 const SWAP_S := 0.15
 const SWAP_PUFF_S := 0.4
 var _variants := {}   # stove → the variant shown, for the switch's bounce
+var _tweens := {}     # node → its running bounce / lid tween, stopped when the next one starts
 func _swap_bounce(pot: Node3D, variant: String) -> void:
 	if not is_inside_tree(): return
 	pot.scale = Vector3.ONE * 0.9
-	var t := create_tween()
+	var t := _restart_tween(pot)
 	t.tween_property(pot, "scale", Vector3.ONE * 1.05, SWAP_S * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	t.tween_property(pot, "scale", Vector3.ONE, SWAP_S * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	if variant == "pot_big" and kitchen: kitchen.stage.puff_at(pot.get_node("pot_big/vent"), SWAP_PUFF_S)
+
+func _restart_tween(n: Node) -> Tween:
+	var old = _tweens.get(n)
+	if old is Tween and (old as Tween).is_valid(): (old as Tween).kill()
+	var t := create_tween()
+	_tweens[n] = t
+	return t
 
 ## Where stove i's steam rises: the Big Pot's vent while its lid is on, else the pot's mouth (drop_pot).
 func steam_from(i: int) -> Node3D:
 	var vent := _vent(i)
 	return vent if vent else anchor("drop_pot_%d" % (i + 1))
+
+## Stove i's Big Pot lid still on its way up or down (its steam waits for it, as while the lid is up).
+func _lid_moving(i: int) -> bool:
+	var pot := _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
+	var t = _tweens.get(pot.get_node("pot_big/lid")) if pot else null
+	return t is Tween and (t as Tween).is_running()
 
 ## Stove i's Big Pot vent while its lid is on; null otherwise.
 func _vent(i: int) -> Node3D:
@@ -382,6 +396,7 @@ const LID_S := 0.15
 const LID_RISE := 0.06
 const LID_TILT := -20.0
 var _lids_up := {}   # stove → lid up
+var _lid_rest := {}  # lid → its resting position, read from the model before it first moves
 func _update_lids(v: Dictionary) -> void:
 	if _pots == null or kitchen == null: return
 	for i in _pots.get_child_count():
@@ -395,8 +410,9 @@ func _update_lids(v: Dictionary) -> void:
 		if bool(_lids_up.get(i, false)) == up: continue
 		_lids_up[i] = up
 		var lid := pot.get_node("pot_big/lid") as Node3D
-		var rest := Vector3(0, 0.181, -0.107)   # its resting place (stove_pot.glb: the lid's pivot on its rear edge)
-		var t := create_tween().set_parallel()
+		if not _lid_rest.has(lid): _lid_rest[lid] = lid.position   # stove_pot.glb: the pivot on its rear edge
+		var rest: Vector3 = _lid_rest[lid]
+		var t := _restart_tween(lid).set_parallel()
 		t.tween_property(lid, "position", rest + Vector3(0, LID_RISE if up else 0.0, 0), LID_S)
 		t.tween_property(lid, "rotation_degrees:x", LID_TILT if up else 0.0, LID_S)
 
@@ -528,6 +544,7 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	show_pots()   # a stove opened (Lv4 / Lv8) or switched to the Big Pot
 	_update_lids(v)
 	kitchen.stage.steam_point = _vent(kitchen.stove_index)   # null: just above the mouth, as before
+	kitchen.stage.steam_hold = _lid_moving(kitchen.stove_index) or bool(_lids_up.get(kitchen.stove_index, false))   # the steam waits until the lid is down
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
