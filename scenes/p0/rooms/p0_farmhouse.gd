@@ -219,7 +219,8 @@ func p0_space() -> String: return "home"
 
 ## The props show from the player's Homestead level (read before the walkable grid is built).
 func _dress_art() -> void:
-	if use_runtime: level = int(P0Runtime.ensure().session.current().get("homestead", {}).get("level", 1))
+	var view := P0Runtime.ensure().session.current() if use_runtime else {}
+	if use_runtime: level = int(view.get("homestead", {}).get("level", 1))
 	super()
 	# the light at the model's `glow` socket, inside the cabinet behind its open front (SGODOT-282 warming_cabinet.glb)
 	var socket := art.get_node("warming_cabinet").find_child("glow", true, false) as Node3D if art.has_node("warming_cabinet") else null
@@ -238,6 +239,18 @@ func _dress_art() -> void:
 		glow.position = t.origin
 		art.add_child(glow)
 		module_levels[glow.name] = module_levels.get("warming_cabinet", 3)
+	if use_runtime: show_cabinet_plates(P0KitchenLogic.cabinet_plates(view))   # before the first frame: no flash of six (刘邦 on #431)
+
+## The Warming Cabinet shows dish_1 … dish_N for the N dishes it holds (q(202)): at once, no animation; its warm light
+## stays on, empty or not.
+var _plates := -1
+func show_cabinet_plates(n: int) -> void:
+	if n == _plates or not art.has_node("warming_cabinet"): return
+	_plates = n
+	var cab := art.get_node("warming_cabinet")
+	for i in range(1, P0KitchenLogic.CABINET_PLATES + 1):
+		var dish := cab.find_child("dish_%d" % i, true, false) as Node3D
+		if dish: dish.visible = i <= n
 
 func _room_ready() -> void:
 	kitchen = P0Kitchen.new(self)
@@ -365,6 +378,7 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 func _room_frame(v: Dictionary, _dt: float) -> void:
 	if _sheet and rt and rt.session.view.get("seq", -1) != _sheet.view.get("seq", -2): _sheet.refresh(rt.session.current())
 	check_room(v)
+	show_cabinet_plates(P0KitchenLogic.cabinet_plates(v))
 	if kitchen == null: return
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)

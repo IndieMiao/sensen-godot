@@ -91,11 +91,30 @@ func test_the_warming_cabinet_is_the_model_with_its_own_materials() -> void:
 			assert_object(mi.material_override).is_null()
 			for i in mi.mesh.get_surface_count():
 				assert_float((mi.get_surface_override_material(i) as BaseMaterial3D).metallic_specular).is_equal_approx(0.28, 0.001)
+		r.call("show_cabinet_plates", 6)
 		for i in range(1, 7): assert_bool((cab.find_child("dish_%d" % i, true, false) as Node3D).visible).is_true()
 		var box := (cab.find_children("*", "CollisionShape3D", true, false)[0] as CollisionShape3D).shape as BoxShape3D
 		assert_vector(box.size).is_equal_approx(Vector3(0.56, 1.32, 0.5), Vector3.ONE * 0.001)
 		var top := (cab.find_child("top_center", true, false) as Node3D).global_position
 		assert_vector(r.anchor("use_warming_cabinet").global_position).is_equal_approx(top, Vector3.ONE * 0.002)
+
+## q(202): the cabinet shows a plate a dish it holds — dish_1 … dish_N — none when empty, six from six up; the warm
+## light stays on either way.
+func test_the_cabinet_shows_a_plate_a_dish() -> void:
+	var cab := {"have": 0, "cap": 12}
+	var plates := func(have: int) -> int:
+		cab.have = have
+		return P0KitchenLogic.cabinet_plates({"cooking": {"cabinet": cab}})
+	assert_array([0, 1, 4, 6, 9, 12].map(func(n): return plates.call(n))).is_equal([0, 1, 4, 6, 6, 6])
+	assert_int(P0KitchenLogic.cabinet_plates({"cooking": {}})).is_equal(0)
+	for lv in [3, 5]:
+		var r := _farmhouse(lv)
+		var cabinet := r.art.get_node("warming_cabinet")
+		for n in [0, 3, 6]:
+			r.call("show_cabinet_plates", n)
+			var shown := range(1, 7).filter(func(i): return (cabinet.find_child("dish_%d" % i, true, false) as Node3D).visible)
+			assert_array(shown).is_equal(range(1, n + 1))
+		assert_bool((r.art.get_node("warming_cabinet_glow") as Node3D).visible).is_true()
 
 ## The cabinet shows its door, not its back (不知火舞 on 282: by the Standard Room's east wall it faced away from the camera).
 func test_the_warming_cabinet_faces_the_camera() -> void:

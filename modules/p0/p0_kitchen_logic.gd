@@ -698,6 +698,13 @@ static func cabinet_sheet(view: Dictionary) -> Dictionary:
 	return {title = "Warming Cabinet %d/%d" % [int(cab.get("have", 0)), int(cab.get("cap", 6))], rows = rows,
 		empty = "No dishes yet"}
 
+## How many of the cabinet model's six plates show (q(202)): one a dish it holds, none when empty, all six from six up
+## (12 / 16 at Lv8 / Head Chef: the count is on its name strip and card). 0 before the cabinet (Lv3).
+const CABINET_PLATES := 6
+static func cabinet_plates(view: Dictionary) -> int:
+	var cab = cooking(view).get("cabinet", null)
+	return clampi(int(cab.get("have", 0)), 0, CABINET_PLATES) if cab is Dictionary else 0
+
 ## The world badge on the cabinet (appendix B.7): "4/6", or "Full".
 static func cabinet_badge(view: Dictionary) -> String:
 	var cab = cooking(view).get("cabinet", null)
