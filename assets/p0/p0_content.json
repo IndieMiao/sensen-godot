@@ -671,6 +671,7 @@
       "quick_fire": 6,
       "steady_hand_2": 7,
       "fast_mastery": 7,
+      "batch_cook": 8,
       "chefs_touch": 9,
       "title_chef": 10,
       "lucky_double": 10
@@ -684,7 +685,6 @@
     },
     "quick_fire": 0.8,
     "lucky_double": 0.1,
-    "cook_all_per_page": 2,
     "_cards": "Recipe cards §7.16.1 (SGODOT-282): from each recipe's card_price — Homestead Stall pages have no card_zone (card_zones = which home climates shelve it), Market pages have card_zone. 2 a day at the Stall, from pages not yet in the Cookbook.",
     "cards": {
       "prices": {

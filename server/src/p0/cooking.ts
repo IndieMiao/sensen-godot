@@ -88,7 +88,7 @@ export function tokenMatches(c: P0Content, token: string, id: string): boolean {
   return !!ing && ing.family === tag[1] && ing.rarity === Number(tag[2]);
 }
 
-function fits(c: P0Content, recipe: Recipe, items: string[]): boolean {
+export function fits(c: P0Content, recipe: Recipe, items: string[]): boolean {
   if (recipe.in.length !== items.length) return false;
   const used = new Array(items.length).fill(false);
   const place = (i: number): boolean => {
@@ -116,12 +116,12 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
  * is Grilled Crucian's). Without such a set, the cheapest set that fits still cooks this page (startPot cooks the
  * chosen page); null when nothing fits.
  */
-export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string[] | null {
-  const left = ingredientStock(c, s);
+export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe, stock?: Map<string, number>, keptFn?: (id: string) => boolean): string[] | null {
+  const left = new Map(stock ?? ingredientStock(c, s));
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
   // q(99): a tag slot takes last what another known page names (Pond Crucian for Grilled Crucian) or an accepted
   // request wants handed in (the tutorial included); with nothing else left it still takes them and cooks this page.
-  const kept = keptForLater(c, s, recipe);
+  const kept = keptFn ?? keptForLater(c, s, recipe);
   const later = (id: string) => (kept(id) ? 1 : 0);
   // Specific tokens first so a tag never eats the item a named slot needs.
   const order = [...recipe.in].sort((a, b) => Number(TAG.test(a)) - Number(TAG.test(b)));
@@ -153,11 +153,29 @@ export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string
  * residents' needs (a named item, else any of its kind and rarity). Sow requests want nothing from the bag.
  */
 function keptForLater(c: P0Content, s: P0State, recipe: Recipe): (id: string) => boolean {
-  const ids = new Set<string>();
+  const why = keptReason(c, s, recipe);
+  return id => why(id) !== null;
+}
+
+/**
+ * Why a tag slot of `recipe` would rather not take `id` (q(99) / q(200) ④): 'request' when an accepted request wants
+ * it, else the id of the first other known page that names it; null when it is free to take. The recipe card marks
+ * such a slot and its toast says `Uses Pond Crucian saved for a request` / `… saved for Herb Grilled Fish`.
+ */
+export function keptReason(c: P0Content, s: P0State, recipe: Recipe, index: KeptIndex = keptIndex(c, s)): (id: string) => string | null {
+  return id => (index.wanted(id) ? 'request' : index.named.get(id)?.find(page => page !== recipe.id) ?? null);
+}
+
+/** What keptReason reads, built once for a whole view (刘邦 on #432: per page and per pick it ran every page again):
+ * named = item id → the known pages naming it, Cookbook order; wanted = an accepted request wants it. */
+export type KeptIndex = { named: Map<string, string[]>; wanted: (id: string) => boolean };
+export function keptIndex(c: P0Content, s: P0State): KeptIndex {
+  const named = new Map<string, string[]>();
   for (const r of cookablePages(c)) {
-    if (r.id === recipe.id || !s.cookbook.includes(r.id)) continue;
-    for (const t of r.in) if (!TAG.test(t)) ids.add(t);
+    if (!s.cookbook.includes(r.id)) continue;
+    for (const t of r.in) if (!TAG.test(t) && !named.get(t)?.includes(r.id)) named.set(t, [...(named.get(t) ?? []), r.id]);
   }
+  const ids = new Set<string>();
   for (const slot of [...s.boards.stall, ...s.boards.market]) {
     if (slot.req?.status === 'accepted') for (const id of slot.req.items) ids.add(id);
   }
@@ -167,7 +185,32 @@ function keptForLater(c: P0Content, s: P0State, recipe: Recipe): (id: string) =>
     if (!q || q.need.kind === 'sow') continue;
     if (q.need.id) ids.add(q.need.id); else needs.push(q.need);
   }
-  return id => ids.has(id) || needs.some(n => itemKind(id) === n.kind && (n.rarity === undefined || (fishById(c, id)?.rarity ?? 0) === n.rarity));
+  const wanted = (id: string) => ids.has(id) || needs.some(n => itemKind(id) === n.kind && (n.rarity === undefined || (fishById(c, id)?.rarity ?? 0) === n.rarity));
+  return { named, wanted };
+}
+
+/**
+ * The servings a known page's ingredients make, one after another as the stove would pick them (q(200) / q(201)):
+ * each set is what ingredientsFor picks from what the sets before it left, so a tag slot may take another item for a
+ * later serving. At most `most` sets; empty when not even one fits. A Big Pot pot takes two of them in a row and a
+ * batch takes them pot after pot, so the recipe card can tell how many pots and servings the stock covers.
+ */
+export function servingPicks(c: P0Content, s: P0State, recipe: Recipe, most: number, index: KeptIndex = keptIndex(c, s)): string[][] {
+  const stock = ingredientStock(c, s);
+  const why = keptReason(c, s, recipe, index);
+  const kept = (id: string) => why(id) !== null;
+  const out: string[][] = [];
+  // While the last set is still all there the stove would pick it again (taking stock only removes options, so no
+  // earlier option can start fitting): reuse it and search again only once one of its items runs out.
+  const left = (set: string[]) => set.every(id => (stock.get(id) ?? 0) >= set.filter(x => x === id).length);
+  while (out.length < most) {
+    const last = out[out.length - 1];
+    const set = last && left(last) ? last : ingredientsFor(c, s, recipe, stock, kept);
+    if (!set || !fits(c, recipe, set)) break;
+    for (const id of set) stock.set(id, (stock.get(id) ?? 0) - 1);
+    out.push([...set]);
+  }
+  return out;
 }
 
 export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recipe?: unknown; stove?: unknown; double?: unknown }, now: number, events: P0Event[]): Refusal | null {
@@ -188,10 +231,11 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   if (b.stove && !queueing) {
     return { code: 'stove_busy', detail: { stove: at, ready_in: Math.max(0, b.stove.started_at + b.stove.ms - now), queued: !!b.queue, left: !!b.stove.left } };
   }
-  // Big Pot (Homestead Lv6, §7.7): Double takes every ingredient twice for two portions, one round of heat. Never for
-  // Legendary, and only for a mix that makes a page (a Mystery Dish has no Double).
-  const double = cmd.double === true;
-  if (double && !bigPot(c, s)) return { code: 'locked', detail: { unlock: 'big_pot' } };
+  // Big Pot (Homestead Lv6, §7.7, q(201)): a pot on a Big Pot stove makes two servings — a second set of ingredients,
+  // one round of heat — when the page is in the player's Cookbook, not Legendary, and a second set is there; otherwise
+  // it cooks one serving and says why (single: unknown / legendary / short), never a refusal.
+  const wantDouble = cmd.double === true;
+  if (wantDouble && !bigPot(c, s)) return { code: 'locked', detail: { unlock: 'big_pot' } };
   let items: string[];
   // A page the player chose (Cookbook Cook, Cook Again) cooks that page; only free slots go through matchRecipe (q(67)).
   let chosen: Recipe | null = null;
@@ -216,22 +260,36 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
     if (!ing) return { code: itemKind(id) === 'fish' && fishById(c, id) ? 'not_for_cooking' : 'not_cookable', detail: { item: id } };
     parts.push(ing);
   }
-  const times = double ? 2 : 1;
-  if (double) {
-    const page = chosen ?? matchRecipe(c, items);
-    if (!page) return { code: 'no_double', detail: { reason: 'unknown' } };
-    if (recipeRarity(c, page) >= 4) return { code: 'no_double', detail: { reason: 'legendary' } };
-  }
   for (const id of new Set(items)) {
-    const need = items.filter(x => x === id).length * times;
+    const need = items.filter(x => x === id).length;
     const have = haveIngredient(c, s, id);
     if (have < need) return { code: 'not_enough', detail: { item: id, need, have } };
   }
   if (parts.every(p => p.family === 'S')) return { code: 'needs_main' };
-  for (const id of new Set(items)) {
-    const need = items.filter(x => x === id).length * times;
-    takeIngredient(c, s, id, need, events);
+  // The second serving: a chosen page picks it again from what the first leaves (a tag slot may take another item,
+  // q(201) ②); laid-out items (Experiment) are the same items once more.
+  let second: string[] | null = null;
+  let single: 'unknown' | 'legendary' | 'short' | null = null;
+  if (wantDouble) {
+    const page = chosen ?? matchRecipe(c, items);
+    if (!page || !s.cookbook.includes(page.id)) single = 'unknown';
+    else if (recipeRarity(c, page) >= 4) single = 'legendary';
+    else {
+      const stock = ingredientStock(c, s);
+      for (const id of items) stock.set(id, (stock.get(id) ?? 0) - 1);
+      if (chosen) {
+        const again = ingredientsFor(c, s, chosen, stock);
+        second = again && fits(c, chosen, again) ? again : null;
+      } else {
+        second = [...new Set(items)].every(id => (stock.get(id) ?? 0) >= items.filter(x => x === id).length) ? [...items] : null;
+      }
+      if (!second) single = 'short';
+    }
   }
+  const double = second !== null;
+  const taken = new Map<string, number>();
+  for (const id of [...items, ...(second ?? [])]) taken.set(id, (taken.get(id) ?? 0) + 1);
+  for (const [id, need] of taken) takeIngredient(c, s, id, need, events);
   const recipe = chosen ?? matchRecipe(c, items);
   const rarity = deriveRarity(c, parts);
   const tier: CookTier = c.cooking.tiers[String(rarity)];
@@ -251,58 +309,56 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   if (queueing) put.queue = pot; else put.stove = pot;
   // tried is on every pot: true only for a combination already in Kitchen Mishaps, which the player has seen fail.
   events.push({ kind: 'pot', id: pot.id, dish: recipe && s.cookbook.includes(recipe.id) ? recipe.id : null, rarity, ms,
-    tried: triedBefore(s, items), stove: at, ...(queueing ? { queued: true } : {}), ...(double ? { double: true } : {}) });
+    tried: triedBefore(s, items), stove: at, ...(queueing ? { queued: true } : {}), ...(double ? { double: true } : {}),
+    ...(single ? { single } : {}) });
   return null;
 }
 
-/**
- * Cook All (Cooking Lv8, §4.6.3 / q(4)): every known page whose ingredients are there, rarest first (Cookbook order
- * within a rarity), fills the free stoves and then their queues; never Legendary, at most cook_all_per_page pots of a
- * page. Each pot is an ordinary cook (its own pot event); stops when no stove can take another.
- */
-export function cookAll(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
-  if (!hasConvenience(c, s, 'cook_all')) return { code: 'locked', detail: { convenience: 'cook_all' } };
-  const most = c.cooking.cook_all_per_page ?? 2;
-  const pages = cookablePages(c).filter(r => s.cookbook.includes(r.id) && recipeRarity(c, r) < 4)
-    .sort((a, b) => recipeRarity(c, b) - recipeRarity(c, a) || (a.n ?? 99) - (b.n ?? 99));
-  let placed = 0;
-  for (const page of pages) {
-    for (let k = 0; k < most; k++) {
-      if (!ingredientsFor(c, s, page)) break;
-      const scratch: P0Event[] = [];
-      const refusal = startPot(c, s, { recipe: page.id }, now, scratch);
-      if (refusal) {
-        if (refusal.code === 'stove_busy') return placed ? null : refusal;
-        break;
-      }
-      events.push(...scratch);
-      placed += 1;
-    }
-  }
-  return placed ? null : { code: 'nothing_to_cook' };
+/** Where the next pot of a batch goes (q(200) ③): the current stove when it is empty, then the empty stoves by number,
+ * then the queue slots by number (Queue ×2); -1 when every stove and queue is taken. Plates left on a stove block it. */
+export function nextSpot(c: P0Content, s: P0State, current: number): number {
+  const all = burners(c, s);
+  if (all[current] && !all[current].stove) return current;
+  const free = all.findIndex(b => !b.stove);
+  if (free >= 0) return free;
+  if (!hasConvenience(c, s, 'queue_two')) return -1;
+  return all.findIndex(b => !!b.stove && !b.stove.left && !b.queue);
+}
+
+/** How many pots a batch can place now (q(200) ③): the empty stoves and every stove's queue slot (a stove fired
+ * by the batch queues too), plates left on a stove blocking both. */
+export function batchRoom(c: P0Content, s: P0State): number {
+  const queue = hasConvenience(c, s, 'queue_two');
+  return burners(c, s).reduce((n, b) => n + (b.stove ? (queue && !b.stove.left && !b.queue ? 1 : 0) : (queue ? 2 : 1)), 0);
 }
 
 /**
- * Cook All's preview (COOK-P1-4, q(124); null before Cooking Lv8): what the button would do now, worked out by running
- * cookAll itself on a copy of the save, so the drawer and the cook never disagree. pots: in firing order, each
- * {dish, rarity, stove (0-based), when: now | next (Queue ×2)}; uses: the planned pages' slots summed by token (a dish
- * or a tag such as Any Common fish), with what the player holds for each (bag and Spice Rack); reason when nothing
- * would start: nothing_to_cook (no known page has its ingredients) or no_space (every stove and queue is taken).
+ * Batch Cook (Cooking Lv8, q(200)): `pots` pots of one known page, filling stoves in nextSpot's order; each pot is an
+ * ordinary cook on its stove (its own pot event, heat and XP), a Big Pot stove's pot doubled when it can (q(201):
+ * `big` = the stove numbers the player switched to Big Pot on this device). All or none: tried on a copy first, so a
+ * batch the stock or the stoves cannot take changes nothing and says how many pots would have gone (detail.pots).
  */
-export function cookAllPlan(c: P0Content, s: P0State, now: number) {
-  if (!hasConvenience(c, s, 'cook_all')) return null;
-  const copy = structuredClone(s);
-  const events: P0Event[] = [];
-  const refusal = cookAll(c, copy, now, events);
-  if (refusal) return { pots: [], uses: [], stoves: 0, reason: refusal.code === 'stove_busy' ? 'no_space' : refusal.code };
-  const pots = events.flatMap(e => e.kind === 'pot' && e.dish
-    ? [{ dish: e.dish, rarity: e.rarity, stove: e.stove ?? 0, when: e.queued ? 'next' : 'now' }] : []);
-  const need = new Map<string, number>();
-  for (const p of pots) for (const t of recipeById(c, p.dish)?.in ?? []) need.set(t, (need.get(t) ?? 0) + 1);
-  const stock = ingredientStock(c, s);
-  const have = (t: string) => [...stock].reduce((n, [id, q]) => n + (tokenMatches(c, t, id) ? q : 0), 0);
-  return { pots, uses: [...need].map(([token, n]) => ({ token, need: n, have: have(token) })),
-    stoves: new Set(pots.map(p => p.stove)).size, reason: null };
+export function batchCook(c: P0Content, s: P0State, cmd: { recipe?: unknown; pots?: unknown; stove?: unknown; big?: unknown }, now: number, events: P0Event[]): Refusal | null {
+  if (cmd.recipe === undefined) return { code: 'unknown_recipe' };
+  const n = Number(cmd.pots ?? 1);
+  if (!Number.isInteger(n) || n < 1) return { code: 'bad_pots' };
+  if (n > 1 && !hasConvenience(c, s, 'batch_cook')) return { code: 'locked', detail: { convenience: 'batch_cook' } };
+  const count = stoveCount(c, s);
+  const current = cmd.stove === undefined || cmd.stove === null ? 0 : Number(cmd.stove);
+  if (!Number.isInteger(current) || current < 0 || current >= count) return { code: 'bad_stove', detail: { stoves: count } };
+  const big = new Set(Array.isArray(cmd.big) ? cmd.big.map(Number) : []);
+  const run = (state: P0State, out: P0Event[]): Refusal | null => {
+    for (let k = 0; k < n; k++) {
+      const at = nextSpot(c, state, current);
+      if (at < 0) return { code: 'no_room', detail: { pots: k } };
+      const refusal = startPot(c, state, { recipe: cmd.recipe, stove: at, double: big.has(at) || undefined }, now, out);
+      if (refusal) return { ...refusal, detail: { ...(refusal.detail ?? {}), pots: k } };
+    }
+    return null;
+  };
+  const refusal = run(structuredClone(s), []);
+  if (refusal) return refusal;
+  return run(s, events);
 }
 
 /** First tap inside each ring's lifetime is judged; gold arc ± tolerance is a hit (§7.2.4). */

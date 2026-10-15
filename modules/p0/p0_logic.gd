@@ -1134,7 +1134,7 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 ## P1 adds Lv7–10's (the glossary, 李元芳 on 286: SKILL-1 showed their ids); Lv10's title Chef is in TITLE_NAMES.
 const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double Clue", "hearty_mishap": "Hearty Mishap",
 	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire",
-	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
+	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "batch_cook": "Batch Cook", "provisions_plus": "Bigger Provisions",
 	"chefs_touch": "Chef's Touch", "lucky_double": "Lucky Double"}   # Lv10's title Chef: TITLE_NAMES
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
 ## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)); the nine of them

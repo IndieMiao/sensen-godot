@@ -4,7 +4,7 @@ import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
 import { barter } from './barter.js';
 import { settleCards } from './cards.js';
-import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
+import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
@@ -51,7 +51,9 @@ type P0CommandBody =
   | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
   | { type: 'barter'; item: string; mineral: string; shop?: string }   // Market Square barter (§8.4.5)
-  | { type: 'cook_all' }   // Cook All (Cooking Lv8): fill every free stove and queue with known pages
+  // Batch Cook (Cooking Lv8, q(200)): pots of one known page in a row; stove = the current one (fills first); big = the
+  // stoves the player switched to Big Pot (q(201), kept on the device)
+  | { type: 'batch_cook'; recipe: string; pots: number; stove?: number; big?: number[] }
   | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
   // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
   // a different pot is refused as stale_pot instead of taking taps meant for another one.
@@ -381,8 +383,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
-    case 'cook_all': {
-      const refusal = cookAll(c, s, now, events);
+    case 'batch_cook': {
+      const refusal = batchCook(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

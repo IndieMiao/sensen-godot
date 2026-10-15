@@ -1,4 +1,4 @@
-/** SGODOT-282: Homestead Lv4–10 (§8.2–8.3) and the kitchen it grows (§7.7): stoves 2 and 3, Big Pot Double,
+/** SGODOT-282: Homestead Lv4–10 (§8.2–8.3) and the kitchen it grows (§7.7): stoves 2 and 3, the Big Pot (q(201)),
  * Warming Cabinet 12, Chef's Sign, Bag Upgrade II / III. */
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
@@ -6,6 +6,8 @@ import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reduc
 import { maxEnergy } from '../../src/p0/rules.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { cookable, fits, ingredientsFor, servingPicks } from '../../src/p0/cooking.js';
+import { ingredientStock } from '../../src/p0/kitchen_storage.js';
 
 const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 10, 2);
@@ -130,7 +132,7 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
     expect(s.stove!.taps ?? []).toEqual([]);
   });
 
-  it('Big Pot (Lv6): Double takes the ingredients twice for two portions and one round of heat', () => {
+  it('Big Pot (Lv6): a pot on a Big Pot stove takes two sets for two servings and one round of heat', () => {
     const below = at(5);
     below.bag.push({ id: 'fish_crucian', qty: 2 });
     expect(refusal(below, { type: 'cook', items: ['fish_crucian'], double: true })).toMatchObject({ code: 'locked', detail: { unlock: 'big_pot' } });
@@ -140,16 +142,39 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
     const started = step(s, { type: 'cook', items: ['fish_crucian'], double: true });
     expect(count(started.s.bag, 'fish_crucian')).toBe(0);
     expect(started.s.stove).toMatchObject({ double: true });
+    expect(started.ev.find(e => e.kind === 'pot')).toMatchObject({ double: true });
     expect(started.s.stove!.heats).toHaveLength(c.cooking.tiers['1'].heats.length);
     s = step(started.s, { type: 'collect' }, T0 + started.s.stove!.ms + S).s;
     expect(kept(s, 'dish_grilled_crucian')).toBe(2);
   });
 
-  it('Double needs the ingredients twice and a mix that makes a page', () => {
+  it('q(201) ②: a Big Pot stove cooks one serving, never a refusal, for a short stock, an unknown mix or Legendary', () => {
+    const one = (s: P0State, cmd: P0Command) => {
+      const r = step(s, cmd);
+      return { pot: r.ev.find(e => e.kind === 'pot') as { double?: boolean; single?: string }, s: r.s };
+    };
+    const short = at(6);
+    short.bag.push({ id: 'fish_crucian', qty: 1 });
+    const a = one(short, { type: 'cook', items: ['fish_crucian'], double: true });
+    expect([a.pot.double, a.pot.single, count(a.s.bag, 'fish_crucian'), a.s.stove!.double]).toEqual([undefined, 'short', 0, undefined]);
+    const mix = at(6);   // not a page in this player's Cookbook: one serving (a new page is found single)
+    mix.bag.push({ id: 'crop_radish', qty: 2 }, { id: 'crop_carrot', qty: 2 });
+    const b = one(mix, { type: 'cook', items: ['crop_radish', 'crop_carrot'], double: true });
+    expect([b.pot.single, count(b.s.bag, 'crop_radish')]).toEqual(['unknown', 1]);
+    const legend = at(6);
+    legend.cookbook.push('dish_herb_salmon');
+    legend.bag.push({ id: 'fish_salmon', qty: 2 }, { id: 'crop_herb', qty: 2 });
+    const d = one(legend, { type: 'cook', recipe: 'dish_herb_salmon', double: true });
+    expect([d.pot.single, count(d.s.bag, 'fish_salmon')]).toEqual(['legendary', 1]);
+  });
+
+  it("q(201) ②: a chosen page's second serving is picked again, so a tag slot can take another item", () => {
     const s = at(6);
-    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'crop_radish', qty: 1 }, { id: 'crop_carrot', qty: 1 });
-    expect(refusal(s, { type: 'cook', items: ['fish_crucian'], double: true })).toMatchObject({ code: 'not_enough', detail: { need: 2, have: 1 } });
-    expect(refusal(s, { type: 'cook', items: ['crop_radish', 'crop_carrot'], double: true })?.code).toBe('no_double');
+    s.cookbook.push('dish_grilled_fish');   // W1: Any Common fish
+    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'fish_carp', qty: 1 });
+    const r = step(s, { type: 'cook', recipe: 'dish_grilled_fish', double: true });
+    expect(r.s.stove).toMatchObject({ dish: 'dish_grilled_fish', double: true });
+    expect([count(r.s.bag, 'fish_crucian'), count(r.s.bag, 'fish_carp')]).toEqual([0, 0]);
   });
 
   it("Chef's Sign (Lv10) widens every dish's gold zone by 5 points", () => {
@@ -185,70 +210,84 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     expect(page(s).state).toBe('mastered');
   });
 
-  // Cook All is paused (user 10-15: 0.2.8 brings a batch cook of a page the player picks): the content no longer opens
-  // it at Cooking Lv8, so the command is locked and the view has no preview. Its code stays for 0.2.8; these tests
-  // run it on a copy of the content that opens it at Lv8 again (withCookAll).
-  const withCookAll = { ...c, cooking: { ...c.cooking, conveniences: { ...c.cooking.conveniences, cook_all: 8 } } };
-
-  it('Cook All is paused: locked at any Cooking level, no preview in the view, not among the conveniences', () => {
-    expect(c.cooking.conveniences.cook_all).toBeUndefined();
-    expect(c.cooking.conveniences.provisions_plus).toBeUndefined();   // Bigger Provisions waits for P2's Provisions: Lv8 opens nothing for now
-    expect(refusal(cook(10, 8), { type: 'cook_all' })).toMatchObject({ code: 'locked' });
-    expect(viewOf(c, cook(10, 8), T0).cooking.cook_all).toBeNull();
-    expect(viewOf(c, cook(10), T0).cooking.conveniences).not.toContain('cook_all');
-    expect(viewOf(c, cook(10), T0).cooking.conveniences).not.toContain('provisions_plus');
-  });
-
-  it('Cook All (Lv8) fills every free stove with known pages, rarest first, at most 2 pots a page', () => {
-    expect(refusal(cook(7, 8), { type: 'cook_all' }, T0, withCookAll)).toMatchObject({ code: 'locked' });
+  // Batch Cook (Cooking Lv8, q(200)) takes Cook All's place: pots of one known page, filling the current stove, the
+  // empty stoves, then the queue slots; all or none; each pot doubled on a Big Pot stove when it can (q(201)).
+  it('Batch Cook (Lv8): n pots of one page, the current stove first, then the empty stoves, then the queues', () => {
+    expect(c.cooking.conveniences.batch_cook).toBe(8);
     const s = cook(8, 8);
-    s.cookbook.push('dish_herb_grilled_fish');
-    s.bag.push({ id: 'fish_crucian', qty: 5 }, { id: 'wild_herb', qty: 3 });
-    const r = step(s, { type: 'cook_all' }, T0, withCookAll);
-    const pots = r.ev.filter(e => e.kind === 'pot');
-    expect(pots.map(e => [e.dish, (e as { stove?: number }).stove])).toEqual([
-      ['dish_herb_grilled_fish', 0], ['dish_herb_grilled_fish', 1], ['dish_grilled_crucian', 2],
-      ['dish_grilled_crucian', 0]]);   // Queue ×2 takes the fourth behind stove 1
-    expect(r.s.queue).toMatchObject({ dish: 'dish_grilled_crucian' });
-    const bare = cook(8, 8);
-    bare.bag = [];
-    expect(refusal(bare, { type: 'cook_all' }, T0, withCookAll)?.code).toBe('nothing_to_cook');
+    s.bag.push({ id: 'fish_crucian', qty: 5 });
+    expect(viewOf(c, s, T0).cooking.batch).toEqual({ room: 6 });
+    const r = step(s, { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 5, stove: 1 });
+    const pots = r.ev.filter(e => e.kind === 'pot') as { stove?: number; queued?: boolean }[];
+    expect(pots.map(p => [p.stove, !!p.queued])).toEqual([[1, false], [0, false], [2, false], [0, true], [1, true]]);
+    expect(count(r.s.bag, 'fish_crucian')).toBe(0);
+    expect(viewOf(c, r.s, T0).cooking.batch).toEqual({ room: 1 });
   });
 
-  it("Cook All's preview (COOK-P1-4) is what cook_all then does: the same pots on the same stoves, nothing taken", () => {
-    expect(viewOf(withCookAll, cook(7, 8), T0).cooking.cook_all).toBeNull();   // before Cooking Lv8
+  it('Batch Cook is all or none: too few ingredients or stove room changes nothing and says how many would go', () => {
+    expect(refusal(cook(7, 8), { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 2 })).toMatchObject({ code: 'locked' });
     const s = cook(8, 8);
-    s.cookbook.push('dish_herb_grilled_fish');
-    s.bag.push({ id: 'fish_crucian', qty: 5 }, { id: 'wild_herb', qty: 3 });
-    const bag = structuredClone(s.bag);
-    const plan = viewOf(withCookAll, s, T0).cooking.cook_all!;
-    expect(s.bag).toEqual(bag);   // the preview runs on a copy
-    expect(plan.reason).toBeNull();
-    expect(plan.stoves).toBe(3);
-    expect(plan.pots.map(p => [p.dish, p.stove, p.when])).toEqual([
-      ['dish_herb_grilled_fish', 0, 'now'], ['dish_herb_grilled_fish', 1, 'now'], ['dish_grilled_crucian', 2, 'now'],
-      ['dish_grilled_crucian', 0, 'next']]);
-    const done = step(s, { type: 'cook_all' }, T0, withCookAll).ev.filter(e => e.kind === 'pot');
-    expect(done.map(e => [e.dish, (e as { stove?: number }).stove, !!(e as { queued?: boolean }).queued]))
-      .toEqual(plan.pots.map(p => [p.dish, p.stove, p.when === 'next']));
-    // Uses: the planned pages' slots summed by token, against what the player holds
-    const uses = Object.fromEntries(plan.uses.map(u => [u.token, [u.need, u.have]]));
-    const slots = (id: string) => c.cooking.recipes.find(r => r.id === id)!.in;
-    const want = new Map<string, number>();
-    for (const p of plan.pots) for (const t of slots(p.dish)) want.set(t, (want.get(t) ?? 0) + 1);
-    expect(Object.fromEntries([...want].map(([t, n]) => [t, uses[t][0]]))).toEqual(Object.fromEntries(want));
-    for (const u of plan.uses) expect(u.have).toBeGreaterThanOrEqual(u.need);
+    s.bag.push({ id: 'fish_crucian', qty: 3 });
+    expect(refusal(s, { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 4 })).toMatchObject({ code: 'missing_ingredients', detail: { pots: 3 } });
+    expect(count(s.bag, 'fish_crucian')).toBe(3);
+    const small = cook(8, 1);   // one stove: a pot and its queue
+    small.bag.push({ id: 'fish_crucian', qty: 5 });
+    expect(viewOf(c, small, T0).cooking.batch).toEqual({ room: 2 });
+    expect(refusal(small, { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 3 })).toMatchObject({ code: 'no_room', detail: { pots: 2 } });
+    expect(step(small, { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 2 }).ev.filter(e => e.kind === 'pot')).toHaveLength(2);
   });
 
-  it("Cook All's preview says why nothing would start: nothing to cook, or no stove or queue free", () => {
-    const bare = cook(8, 8);
-    bare.bag = [];
-    expect(viewOf(withCookAll, bare, T0).cooking.cook_all).toMatchObject({ pots: [], reason: 'nothing_to_cook' });
-    let full = cook(8, 8);
-    full.bag.push({ id: 'fish_crucian', qty: 12 });
-    for (let k = 0; k < 3; k++) full = step(full, { type: 'cook_all' }, T0 + k * S, withCookAll).s;   // 2 pots a page each time: 6 = three stoves and their queues
-    expect([full.stove, ...full.burners.map(b => b.stove)].every(Boolean) && [full.queue, ...full.burners.map(b => b.queue)].every(Boolean)).toBe(true);
-    expect(viewOf(withCookAll, full, T0 + 3 * S).cooking.cook_all).toMatchObject({ pots: [], reason: 'no_space' });
+  it('q(201) ④: a batch doubles each pot that lands on a Big Pot stove while two sets are left, then cooks single', () => {
+    const s = cook(8, 8);
+    s.bag.push({ id: 'fish_crucian', qty: 5 });
+    const r = step(s, { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 3, stove: 0, big: [0, 2] });
+    const pots = r.ev.filter(e => e.kind === 'pot') as { stove?: number; double?: boolean; single?: string }[];
+    // stove 1 (big) 2 servings, stove 2 (normal) 1, stove 3 (big) 2: five crucians
+    expect(pots.map(p => [p.stove, !!p.double])).toEqual([[0, true], [1, false], [2, true]]);
+    expect(count(r.s.bag, 'fish_crucian')).toBe(0);
+    const four = cook(8, 8);
+    four.bag.push({ id: 'fish_crucian', qty: 4 });
+    const q = step(four, { type: 'batch_cook', recipe: 'dish_grilled_crucian', pots: 3, stove: 0, big: [0, 2] });
+    expect((q.ev.filter(e => e.kind === 'pot') as { double?: boolean; single?: string }[]).map(p => [!!p.double, p.single ?? null]))
+      .toEqual([[true, null], [false, null], [false, 'short']]);
+  });
+
+  it("q(200) / q(201): a known page's picks — one set a serving, in the order the stove takes them — and why one was kept", () => {
+    const s = cook(8, 8);
+    s.cookbook.push('dish_grilled_fish');
+    s.bag.push({ id: 'fish_crucian', qty: 2 }, { id: 'fish_carp', qty: 1 });
+    const page = (id: string) => viewOf(c, s, T0).cooking.cookbook.find(p => p.id === id) as { picks?: string[][]; saved?: Record<string, string> };
+    expect(page('dish_grilled_crucian').picks).toEqual([['fish_crucian'], ['fish_crucian']]);
+    const w1 = page('dish_grilled_fish');
+    expect(w1.picks).toHaveLength(3);
+    expect(w1.saved).toMatchObject({ fish_crucian: 'dish_grilled_crucian' });
+    expect(page('dish_carp_cakes').picks).toBeUndefined();   // cannot cook (one carp): no picks
+  });
+
+  it('picks reuse a set while it is all there: the same as picking every serving afresh, on a full Cookbook and stock', () => {
+    const s = cook(10, 10);
+    s.cookbook = c.cooking.recipes.map(r => r.id);
+    s.bag = [...c.fish.map(f => ({ id: f.id, qty: 7 })), ...c.crops.map(cr => ({ id: cr.id, qty: 5 })), { id: 'rock_salt', qty: 9 }];
+    s.bag_cap = 999;
+    for (const r of c.cooking.recipes.filter(r => cookable(c, r))) {
+      const stock = ingredientStock(c, s);
+      const fresh: string[][] = [];
+      while (fresh.length < 12) {
+        const set = ingredientsFor(c, s, r, stock);
+        if (!set || !fits(c, r, set)) break;
+        for (const id of set) stock.set(id, stock.get(id)! - 1);
+        fresh.push(set);
+      }
+      expect(servingPicks(c, s, r, 12)).toEqual(fresh);
+    }
+  });
+
+  it('the view lists the Lv7–10 conveniences once reached; Cook All is gone', () => {
+    expect(viewOf(c, cook(10), T0).cooking.conveniences).toEqual(expect.arrayContaining(
+      ['steady_hand_2', 'fast_mastery', 'batch_cook', 'chefs_touch', 'title_chef', 'lucky_double']));
+    expect(viewOf(c, cook(10), T0).cooking.conveniences).not.toContain('provisions_plus');   // waits for P2's Provisions
+    expect(refusal(cook(10, 8), { type: 'cook_all' } as unknown as P0Command)?.code).toBeTruthy();
+    expect(viewOf(c, cook(6), T0).cooking.conveniences).not.toContain('steady_hand_2');
   });
 
   it('Lucky Double (Lv10): sometimes one more Plain portion; never with Double', () => {
@@ -265,11 +304,6 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     expect(plain.ok && plain.events.find(e => e.kind === 'dish')).toMatchObject({ qty: 1 });
   });
 
-  it('the view lists the Lv7–10 conveniences once reached', () => {
-    expect(viewOf(c, cook(10), T0).cooking.conveniences).toEqual(expect.arrayContaining(
-      ['steady_hand_2', 'fast_mastery', 'chefs_touch', 'title_chef', 'lucky_double']));   // cook_all paused, provisions_plus P2
-    expect(viewOf(c, cook(6), T0).cooking.conveniences).not.toContain('steady_hand_2');
-  });
 });
 
 describe('Cookbook milestones (§7.6.1)', () => {
