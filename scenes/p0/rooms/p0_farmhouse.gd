@@ -239,6 +239,17 @@ func _dress_art() -> void:
 		art.add_child(glow)
 		module_levels[glow.name] = module_levels.get("warming_cabinet", 3)
 
+## The Warming Cabinet shows dish_1 … dish_N for the N dishes it holds (q(202)): at once, no animation; its warm light
+## stays on, empty or not.
+var _plates := -1
+func show_cabinet_plates(n: int) -> void:
+	if n == _plates or not art.has_node("warming_cabinet"): return
+	_plates = n
+	var cab := art.get_node("warming_cabinet")
+	for i in range(1, P0KitchenLogic.CABINET_PLATES + 1):
+		var dish := cab.find_child("dish_%d" % i, true, false) as Node3D
+		if dish: dish.visible = i <= n
+
 func _room_ready() -> void:
 	kitchen = P0Kitchen.new(self)
 	add_child(kitchen)
@@ -365,6 +376,7 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 func _room_frame(v: Dictionary, _dt: float) -> void:
 	if _sheet and rt and rt.session.view.get("seq", -1) != _sheet.view.get("seq", -2): _sheet.refresh(rt.session.current())
 	check_room(v)
+	show_cabinet_plates(P0KitchenLogic.cabinet_plates(v))
 	if kitchen == null: return
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
