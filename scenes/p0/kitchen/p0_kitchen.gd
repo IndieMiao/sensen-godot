@@ -70,6 +70,10 @@ var _taps: Array = []
 var _judged := {}
 var _judged_turn := {}   # ring index → the needle's turn (0–1) when it was judged: where its result dot sits (⑩)
 var _cook_sent := false
+## The stoves switched to the Big Pot on this device (q(201) ⑥): user://p0_ui.cfg, per player; read once a kitchen.
+var big_stoves: Array = []
+var persist_big := true   # off in tests: nothing written to user://
+var _big_loaded := false
 var _sheet: UiDrawer
 var _sheet_header: UiObjectHeader
 var _close: UiCloseButton
@@ -167,8 +171,10 @@ func open(tab := "cookbook", page_id := "") -> void:
 	drawer.queue_mode = _queue_mode
 	drawer.stove_index = stove_index
 	drawer.stove_cycle_requested.connect(_cycle_stove)
-	drawer.unavailable.connect(func(r: String): rt.ui.toast(r))   # a grey Double says why (b84a5e01 ③)
-	drawer.double_changed.connect(func(_on: bool): _refresh_overlay())   # ×2 on the slots and the card (02ad95bc ④)
+	drawer.unavailable.connect(func(r: String): rt.ui.toast(r))   # a grey key, the stepper's limits, the 2nd pot today
+	drawer.big_stoves = big()
+	drawer.big_pot_toggled.connect(_on_big_pot)
+	drawer.plan_changed.connect(_refresh_overlay)   # ×N on the slots, the servings tag
 	drawer.safe_bottom = rt.ui.safe_bottom()
 	drawer.close_requested.connect(func(): rt.ui.close_modal())
 	drawer.page_selected.connect(_on_page)
@@ -194,10 +200,9 @@ func open(tab := "cookbook", page_id := "") -> void:
 
 func _on_closed() -> void:
 	if phase != "compose": return
-	if rt.ui._modal_back == Callable(self, "close_cook_all"): rt.ui._modal_back = Callable()   # the sheet went with the drawer
-	cook_all_sheet = null
-	_cook_all_close = null
-	_cook_all_back = Callable()
+	if rt.ui._modal_back == Callable(self, "close_confirm"): rt.ui._modal_back = Callable()   # the sheet went with the drawer
+	confirm_sheet = null
+	_confirm_back = Callable()
 	phase = "idle"
 	drawer = null
 	_overlay = null
@@ -357,6 +362,7 @@ func _refresh_overlay() -> void:
 	var v := rt.session.current()
 	var slots: Array = []
 	var result := {title = "", rarity = 0, time = ""}
+	var tag := ""
 	if drawer.tab == "experiment":
 		var open := P0KitchenLogic.slots(v)
 		for i in maxi(open, 3):
@@ -364,7 +370,7 @@ func _refresh_overlay() -> void:
 			if i < pot.size():
 				s.state = UiPotSlot.State.FILLED
 				s.icon = P0Logic.icon(str(pot[i]))
-				s.quantity = "×2" if drawer.is_double() and drawer.big_pot_shown() else "×1"   # Double doubles each slot (b84a5e01 ③)
+				s.quantity = "×2" if drawer.is_big() and P0KitchenLogic.experiment_servings(v, pot) == P0KitchenLogic.count_of(2, "serving") else "×1"
 				s.removable = true
 				s.point_at_remove = _point_at_remove
 				var index := i
@@ -376,20 +382,37 @@ func _refresh_overlay() -> void:
 				s.locked_tapped.connect(func(): rt.ui.toast(P0KitchenLogic.locked_slot_toast(rt.session.current())))
 			slots.append(s)
 		result = P0KitchenLogic.preview(v, pot)
+		if drawer.is_big(): tag = P0KitchenLogic.experiment_servings(v, pot)
 	else:
 		var page := drawer.page(drawer.selected_page)
-		for ing in P0KitchenLogic.page_ingredients(v, page):
-			var s := UiPotSlot.new(UiPotSlot.State.FILLED)
-			# No names under the slots now (256 ⑤ A'): a family slot (W1, Any Common fish) shows its family icon,
-			# as a clue does on the Cookbook cell, not the `?` of a slot nobody knows yet.
-			var t := str(ing.id)
-			s.icon = UiItemCell.family_icon(t[0]) if t.length() == 2 and t[1].is_valid_int() else ing.icon
-			s.quantity = "×2" if drawer.is_double() and drawer.big_pot_shown() else "×1"   # Double doubles each slot (b84a5e01 ③)
-			slots.append(s)
+		var plan := drawer.batch_plan()
+		if not (plan.sets as Array).is_empty():
+			# q(200) ④: what the batch really takes, per slot — its first pick's icon, ×N the batch's count, a slot
+			# with a kept item outlined amber; a tap says what it picked (`Common Carp ×2 · Pond Crucian ×1`) or,
+			# for the amber one, what it is kept for.
+			for sl in P0KitchenLogic.batch_slots(v, page, plan.sets):
+				var s := UiPotSlot.new(UiPotSlot.State.FILLED)
+				s.icon = sl.icon
+				s.quantity = "×%d" % int(sl.total)
+				s.saved = bool(sl.saved)
+				var say := drawer.saved_line() if bool(sl.saved) else str(sl.detail)
+				s.informs = say != ""
+				s.tapped.connect(func(): rt.ui.toast(say))
+				slots.append(s)
+			tag = P0KitchenLogic.servings_tag(v, page, plan)
+		else:
+			for ing in P0KitchenLogic.page_ingredients(v, page):
+				var s := UiPotSlot.new(UiPotSlot.State.FILLED)
+				# No names under the slots now (256 ⑤ A'): a family slot (W1, Any Common fish) shows its family icon,
+				# as a clue does on the Cookbook cell, not the `?` of a slot nobody knows yet.
+				var t := str(ing.id)
+				s.icon = UiItemCell.family_icon(t[0]) if t.length() == 2 and t[1].is_valid_int() else ing.icon
+				s.quantity = "×1"
+				slots.append(s)
 		if not page.is_empty(): result = P0KitchenLogic.page_preview(v, page)
 	_pot_card.set_slots(slots)
 	_pot_card.show_result(result.title, result.rarity, result.time)
-	_pot_card.tag = "×2" if drawer.is_double() and drawer.big_pot_shown() else ""
+	_pot_card.tag = tag   # q(201): `2 servings` / `1 serving` / a batch's `4 servings` once a pot is on a Big Pot stove
 	_pot_card.visible = not slots.is_empty()
 	_place_overlay.call_deferred()
 
@@ -454,91 +477,118 @@ func _after_pot_change() -> void:
 	drawer.refresh()
 	_refresh_overlay()
 
-## One Cook per opening; a refusal or a failed send gives the buttons back (see on_event).
+## One Cook per opening; a refusal or a failed send gives the buttons back (see on_event). A pot or a batch that really
+## uses a Rare or Legendary ingredient asks first (P0CookConfirm, §7.2 / q(200) ⑦).
 func _on_cook(cmd: Dictionary) -> void:
+	if _cook_sent or is_instance_valid(confirm_sheet): return
+	var v := rt.session.current()
+	var batch := str(cmd.get("type", "")) == "batch_cook"
+	var plan := drawer.batch_plan() if drawer and cmd.has("recipe") else {}
+	var page := drawer.page(str(cmd.get("recipe", ""))) if drawer and cmd.has("recipe") else {}
+	var title := P0KitchenLogic.confirm_title(v, page, plan.get("sets", []), cmd.get("items", []))
+	if title == "":
+		_send_cook(cmd)
+		return
+	var line := P0KitchenLogic.batch_confirm_line(v, plan) if batch else ""
+	var key := ("Cook · " + P0KitchenLogic.count_of((plan.pots as Array).size(), "pot")) if batch else _confirm_verb()
+	open_confirm(title, line, key, _send_cook.bind(cmd))
+
+func _confirm_verb() -> String: return "Queue" if _queue_mode else "Cook"
+
+func _send_cook(cmd: Dictionary) -> void:
 	if _cook_sent: return
 	_cook_sent = true
+	close_confirm()
+	var v := rt.session.current()
+	if cmd.has("recipe") and drawer:
+		var page := drawer.page(str(cmd.recipe))
+		if P0KitchenLogic.short_of_two(v, page, drawer.batch_plan()): rt.ui.toast(P0KitchenLogic.ONLY_ONE)   # q(201) ②
+	elif cmd.has("items") and bool(cmd.get("double", false)) and P0KitchenLogic.experiment_servings(v, cmd.items) == P0KitchenLogic.count_of(1, "serving"):
+		rt.ui.toast(P0KitchenLogic.ONLY_ONE)
+	if str(cmd.get("type", "")) == "batch_cook":
+		batch_pending = true
+		_batch_pots.clear()
+		_batch_used.clear()
 	cmd = with_stove(cmd)
 	rt.session.send(cmd, P0Session.ui_key(cmd))
 
-# ---------------------------------------------------------------- Cook All (Cooking Lv8; COOK-P1-4 / COOK-EMPTY, q(124))
-## Cook All's sheet over the drawer (paused: no key opens it since 10-15, kept for 0.2.8's batch cook on the recipe card) (P0CookAllSheet from the server's preview); ×, a drag
-## down, Back and `Kitchen` close it back to the Cookbook. `Cook All · N pots` sends cook_all and closes it
-## at once: the reply's pots catch one stove after another, COOK_ALL_FIRE_S apart, the camera staying put, and what
-## they took floats once over the pot card as one item group (`−3 Radish · −2 Pond Crucian`, two a line, q(124) ④).
-## Each pot then cooks and comes out on its own stove as Queue does; no card here.
-const COOK_ALL_FIRE_S := 0.15
-var cook_all_pending := false   # cook_all sent: the reply's pots are Cook All's, not one Cook's watch
-var cook_all_sheet: P0CookAllSheet
-var _cook_all_close: UiCloseButton
-var _cook_all_back := Callable()   # the kitchen's own Back while the sheet is over it
-var _cook_all_pots: Array = []
-var _cook_all_used := {}           # ingredient → how many this cook_all took (its negative item events)
+## The Big Pot was switched on this stove (q(201)): kept on this device; the pot card and the stove's name strip follow.
+func _on_big_pot(i: int, on: bool) -> void:
+	if on and not big_stoves.has(i): big_stoves.append(i)
+	if not on: big_stoves.erase(i)
+	if persist_big and rt: P0KitchenLogic.save_big_stoves(rt.session.player_id, big_stoves)
+	if room.has_method("show_big_pots"): room.call("show_big_pots")   # the pot on that stove changes (q(201) ⑦)
 
-func open_cook_all() -> void:
-	if phase != "compose" or _wrap == null or is_instance_valid(cook_all_sheet): return
-	var model := P0KitchenLogic.cook_all(rt.session.current())
-	if model.is_empty() or str(model.button) != "": return
-	cook_all_sheet = P0CookAllSheet.new(model)
-	cook_all_sheet.theme = UiKit.theme()
-	cook_all_sheet.safe_bottom = rt.ui.safe_bottom()
-	cook_all_sheet.close_requested.connect(close_cook_all)
-	cook_all_sheet.back.connect(close_cook_all)
-	cook_all_sheet.unavailable.connect(func(r: String): rt.ui.toast(r))
-	cook_all_sheet.confirmed.connect(_send_cook_all)
-	_wrap.add_child(cook_all_sheet)
-	_cook_all_close = UiCloseButton.new()   # 6 above the sheet's top-right corner, 16 in (COOK-P1-4 Close · 44 px)
-	_cook_all_close.theme = UiKit.theme()
-	_cook_all_close.pressed.connect(close_cook_all)
-	_wrap.add_child(_cook_all_close)
-	var follow := func():
-		if is_instance_valid(_cook_all_close) and is_instance_valid(cook_all_sheet):
-			_cook_all_close.position = cook_all_sheet.position + Vector2(cook_all_sheet.size.x - UiTokens.SPACE_PAGE - UiTokens.SIZE_CLOSE, -6.0 - UiTokens.SIZE_CLOSE)
-	cook_all_sheet.item_rect_changed.connect(follow)
-	follow.call()
-	_cook_all_back = rt.ui._modal_back
-	rt.ui._modal_back = close_cook_all   # Back and a tap outside close this sheet first
+## The Big Pot stoves, read from this device the first time they are needed (the name strip, the drawer).
+func big() -> Array:
+	if not _big_loaded and rt and persist_big: big_stoves = P0KitchenLogic.load_big_stoves(rt.session.player_id)
+	_big_loaded = true
+	return big_stoves
 
-func close_cook_all() -> void:
-	if is_instance_valid(cook_all_sheet): cook_all_sheet.queue_free()
-	if is_instance_valid(_cook_all_close): _cook_all_close.queue_free()
-	cook_all_sheet = null
-	_cook_all_close = null
-	if rt: rt.ui._modal_back = _cook_all_back
-	_cook_all_back = Callable()
+# ---------------------------------------------------------------- the confirm and a batch's firing (q(200))
+## The Rare / Legendary confirm over the drawer (P0CookConfirm): `Not now`, a tap outside or Back go back to the card.
+var confirm_sheet: P0CookConfirm
+var _confirm_scrim: ColorRect     # S12: the drawer and the scene dimmed under it; a tap there is Not now
+var _confirm_back := Callable()   # the kitchen's own Back while the sheet is over it
+const CONFIRM_SCRIM := Color(0.18, 0.23, 0.2, 0.32)
 
-func _send_cook_all() -> void:
-	if cook_all_pending: return
-	cook_all_pending = true
-	_cook_all_pots.clear()
-	_cook_all_used.clear()
-	var cmd := {"type": "cook_all"}
-	rt.session.send(cmd, P0Session.ui_key(cmd))
-	close_cook_all()
+func open_confirm(title: String, line: String, key: String, go: Callable) -> void:
+	if _wrap == null or is_instance_valid(confirm_sheet): return
+	confirm_sheet = P0CookConfirm.new(title, line, key)
+	confirm_sheet.theme = UiKit.theme()
+	confirm_sheet.safe_bottom = rt.ui.safe_bottom()
+	confirm_sheet.back.connect(close_confirm)
+	confirm_sheet.confirmed.connect(go)
+	_confirm_scrim = ColorRect.new()
+	_confirm_scrim.color = CONFIRM_SCRIM
+	_confirm_scrim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_confirm_scrim.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): close_confirm())
+	_wrap.add_child(_confirm_scrim)
+	_wrap.add_child(confirm_sheet)
+	_confirm_back = rt.ui._modal_back
+	rt.ui._modal_back = close_confirm   # Back and a tap outside close this sheet first
 
-## A pot of the cook_all reply (P0Farmhouse.p0_event): kept for the firing once the whole reply is in.
-func on_cook_all_pot(ev: Dictionary) -> void:
-	if _cook_all_pots.is_empty(): _cook_all_fire.call_deferred()
-	_cook_all_pots.append(ev)
+func close_confirm() -> void:
+	if is_instance_valid(confirm_sheet): confirm_sheet.queue_free()
+	if is_instance_valid(_confirm_scrim): _confirm_scrim.queue_free()
+	confirm_sheet = null
+	_confirm_scrim = null
+	if rt and rt.ui._modal_back == Callable(self, "close_confirm"): rt.ui._modal_back = _confirm_back
+	_confirm_back = Callable()
 
-func _cook_all_fire() -> void:
-	cook_all_pending = false
-	var pots := _cook_all_pots.duplicate()
-	var used := _cook_all_used.duplicate()
-	_cook_all_pots.clear()
-	_cook_all_used.clear()
+## Batch Cook (q(200)): the reply's pots catch one stove after another, BATCH_FIRE_S apart (Cook All's way, q(124)); the
+## current stove's pot is then watched as one Cook's is, and what the batch took floats once as one item group
+## (`−3 Radish · −2 Pond Crucian`, two a line, q(124) ④).
+const BATCH_FIRE_S := 0.15
+var batch_pending := false   # batch_cook sent: the reply's pots are the batch's
+var _batch_pots: Array = []
+var _batch_used := {}        # ingredient → how many the batch took (its negative item events)
+
+## A pot of the batch_cook reply (P0Farmhouse.p0_event): kept for the firing once the whole reply is in.
+func on_batch_pot(ev: Dictionary) -> void:
+	if _batch_pots.is_empty(): _batch_fire.call_deferred()
+	_batch_pots.append(ev)
+
+func _batch_fire() -> void:
+	batch_pending = false
+	var pots := _batch_pots.duplicate()
+	var used := _batch_used.duplicate()
+	_batch_pots.clear()
+	_batch_used.clear()
 	var lit := 0
 	for ev in pots:
-		if bool(ev.get("queued", false)): continue   # waits behind its stove's pot (Stove 1 · next): nothing catches yet
-		var i := int(ev.get("stove", 0))
-		get_tree().create_timer(COOK_ALL_FIRE_S * lit).timeout.connect(_catch.bind(i))
+		if bool(ev.get("queued", false)) or int(ev.get("stove", 0)) == stove_index: continue   # queued: nothing catches yet
+		get_tree().create_timer(BATCH_FIRE_S * (lit + 1)).timeout.connect(_catch.bind(int(ev.get("stove", 0))))
 		lit += 1
 	var v := rt.session.current()
+	var at := batch_float_at()
+	var st = P0KitchenLogic.stove(v, stove_index)
+	if st is Dictionary: on_pot(st)   # the current stove's pot: closed drawer, watched as a Cook is
 	var parts: Array = []
 	for id in used:
-		parts.append({kind = "item", key = "cook_all:" + str(id), amount = -int(used[id]), fmt = "%s " + P0Logic.item_name(v, str(id)),
+		parts.append({kind = "item", key = "batch:" + str(id), amount = -int(used[id]), fmt = "%s " + P0Logic.item_name(v, str(id)),
 			tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(str(id))})
-	rt.ui.queue_floats(parts, cook_all_float_at())
+	rt.ui.queue_floats(parts, at)
 
 ## One stove's pot catches: the working stove's hearth and steam (set_cooking), another stove a puff at its pot.
 func _catch(i: int) -> void:
@@ -549,9 +599,8 @@ func _catch(i: int) -> void:
 	var mouth := room.anchor("drop_pot_%d" % (i + 1))
 	if mouth: stage.puff_at(mouth)
 
-## Where Cook All's ingredients float (q(124) ④): over the Cookbook, at the stove — just above the pot card (else the
-## drawer), centred on the screen.
-func cook_all_float_at() -> Vector2:
+## Where a batch's ingredients float (q(124) ④): just above the pot card (else the drawer), centred on the screen.
+func batch_float_at() -> Vector2:
 	var w := rt.ui.root.size.x if rt and rt.ui and rt.ui.root else 360.0
 	var top := drawer.top_y() if drawer else 400.0
 	if is_instance_valid(_pot_card) and _pot_card.is_visible_in_tree(): top = _pot_card.get_global_rect().position.y
@@ -848,7 +897,9 @@ func on_event(ev: Dictionary) -> bool:
 		"refused", "send_failed":   # a cook or collect that did not go through (the runtime toasts why)
 			match str(ev.get("cmd", {}).get("type", "")):
 				"cook": _cook_sent = false
-				"cook_all": cook_all_pending = false
+				"batch_cook":
+					_cook_sent = false
+					batch_pending = false
 				"collect":
 					_retrying = false
 					if phase == "serve": _recover()
@@ -870,7 +921,7 @@ func on_event(ev: Dictionary) -> bool:
 		"cabinet", "item", "plate", "first", "mishap":
 			# What a pot took: Cook All floats it once (q(124) ④); a single Cook's says nothing, as before.
 			if str(ev.kind) == "item" and int(ev.get("delta", 0)) < 0 and not str(ev.id).begins_with("dish_"):
-				if cook_all_pending: _cook_all_used[str(ev.id)] = int(_cook_all_used.get(str(ev.id), 0)) - int(ev.delta)
+				if batch_pending: _batch_used[str(ev.id)] = int(_batch_used.get(str(ev.id), 0)) - int(ev.delta)
 				return false
 			if _retrying and str(ev.kind) in ["cabinet", "item", "plate"]:
 				_retrying = false

@@ -35,16 +35,26 @@ const _TITLES_PAD := Vector2(11.0, 6.0)   # Figma 11 / 7 to 15-high lines; Nunit
 const _TITLES_ROW_GAP := 4.0              # line, rule, line
 const _TITLES_BELOW := 6.0                # to the filter chips
 const TITLE_GREY := Color("A9ACA6")       # Figma's unbound grey (P0CityRow.UNVISITED_INK)
-const _RECIPE := Vector2(336, 72)
-const _RECIPE_BUTTON := Vector2(90, 44)
-const _RECIPE_BUTTON_AT := Vector2(238, 28)   # Cook at (250, 470) in a card at (12, 442)
-const _RECIPE_PAD := 8.0          # the button's right edge at 328; also its gap to the text column (C3)
-const _RECIPE_ROW_GAP := 4.0      # a button too long for the corner: its own row under the facts (44 hit, 34 drawn)
-const _RECIPE_MAYBE_TOP := 43.4   # "You might have what it takes" under the fact line (226 33725b5e)
 const _COOK_W := 164.0
-const _FACTS_X := 57.4            # the title, state and effect lines start here
-const _MEDALLION := Rect2(9.4, 15.4, 38, 38)
-const _DISH_ICON := 27.0
+## The recipe card (row 99, S1 2731:153980 / grid 2733:158489; 不知火舞 on 286 20438543), one grid for every page and
+## level: 336 × 110, two rows. Row 1 (y 12–56): the dish medallion 44 at x 12 (a grey silhouette for an unknown page);
+## name 14 ExtraBold and state 11 Bold as one 34-high block at x 68; `+20 Energy` 12 ExtraBold right-aligned to Cook's
+## right edge (x 324); a 1 × 34 divider at x 248. Row 2 (surface y 64–98, touch 44): the stepper (Cooking Lv8) at x 68,
+## the Big Pot key (Homestead Lv6) at x 180–248, Cook at x 256–324 — always there, always `Cook`.
+const _CARD := Vector2(336, 110)
+const _CARD_MEDALLION := Rect2(12, 12, 44, 44)
+const _CARD_ICON := 30.0
+const _CARD_TITLE := Rect2(68, 15, 172, 19)
+const _CARD_STATE := Rect2(68, 36, 172, 15)
+const _CARD_EFFECT := Rect2(250, 24, 74, 20)
+const _CARD_DIVIDER := Rect2(248, 17, 1, 34)
+const _CARD_ROW1_END := 56.0
+const _CARD_ROW2 := 59.0           # the 44 touch row around the 34 surface at y 64
+const _CARD_STEPPER_X := 68.0
+const _CARD_KEY_X := 180.0
+const _CARD_COOK := Rect2(256, 59, 68, 44)
+const _EXTRA_ROW := 20.0           # the extra line: 16 high, 4 above and below
+const _UNKNOWN_MEDALLION := Color("E9E7E0")   # S14 2747:159713: an unknown page's silhouette sits on light grey
 
 var view := {}
 var tab := "cookbook": set = set_tab
@@ -63,18 +73,19 @@ const _PILL_H := 28.0                    # Stove n/N › pill (Figma 2152:33666)
 const _PILL_PAD := Vector2(10.0, 8.0)
 const _PILL_RADIUS := 12.0
 const _PILL_EDGE := Color("E1DAC8")
-## Big Pot Double (Homestead Lv6, b84a5e01 ③; COOK-DOUBLE-BOOK-ON 2149:136516): remembered per stove; the Cookbook card
-## has it under Cook (right-aligned, its own row), Experiment left of Cook on the cook row.
-var doubles := {}   # stove index → on
-var _book_double: _DoubleToggle
-var _exp_double: _DoubleToggle
-const _DOUBLE_ROW := 32.0
+## The Big Pot is a stove state (q(201), Homestead Lv6): `big_stoves` are the stoves switched to it on this device (the
+## kitchen keeps them in user://p0_ui.cfg); the key left of Cook switches the current stove and says so
+## (`big_pot_toggled`), the kitchen saving it and changing the pot. Cookbook and Experiment each have the key.
+var big_stoves: Array = []
+signal big_pot_toggled(stove: int, on: bool)
 signal unavailable(reason: String)
-## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
-signal double_changed(on: bool)
+## The batch or the Big Pot changed what the pot card shows (×N, servings): the kitchen redraws it.
+signal plan_changed
+## Batch Cook (Cooking Lv8, q(200)): how many pots of the selected page; back to 1 on another page or stove.
+var batch_n := 1
 ## Cook All has no key here: paused (user 10-15; 0.2.8 brings a cook-this-page-in-batches on the recipe card), and the
 ## filter row keeps all six chips where its key used to squeeze Rare / Legendary out (B7 ⑨). The kitchen's sheet and
-## firing (P0Kitchen.open_cook_all) stay for 0.2.8.
+## firing go with it (0.2.8: Batch Cook on the recipe card, q(200)).
 
 var _stove: Label
 var _level: Label
@@ -90,9 +101,17 @@ var _recipe_title: Label
 var _recipe_state: Label
 var _recipe_buff: PanelContainer   # Legendary pages: the empty Buff slot at the end of the state line (不知火舞 540d59df)
 var _recipe_effect: Label
-var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit the effect line (_fit_effect)
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
+var _medallion: Panel
+var _divider: ColorRect
+var _stepper: UiStepper          # q(200) B: `− n +`, Cooking Lv8
+var _book_key: UiBigPotKey       # q(201): the Big Pot key left of Cook, Homestead Lv6
+var _exp_key: UiBigPotKey
+var _exp_info_row: HBoxContainer
+var _exp_info: UiNavButton
+var _cook_box: MarginContainer
+var _saved_said := ""            # the kept-items toast said for this page and count (q(200) ④: once, then on a tap)
 var _pages: UiInventoryGrid
 var _book_chips: Control   # the Cookbook's filter chips (in their scroll window)
 var _bag: UiInventoryGrid
@@ -167,11 +186,10 @@ func refresh() -> void:
 	_refresh_cookbook()
 	_refresh_experiment()
 
-func _doubled(cmd: Dictionary, t: _DoubleToggle) -> Dictionary:
-	if t.visible and t.enabled and is_double(): cmd["double"] = true
-	return cmd
+func is_big(i := -1) -> bool: return big_stoves.has(stove_index if i < 0 else i)
 
 func set_stove_index(v: int) -> void:
+	if v != stove_index: batch_n = 1
 	stove_index = v
 	if _stove != null: refresh()
 
@@ -323,45 +341,47 @@ func title_texts() -> Array:
 
 func _build_recipe() -> Control:
 	var wrap := Control.new()
-	wrap.custom_minimum_size = _RECIPE
+	wrap.custom_minimum_size = _CARD
 	_recipe_wrap = wrap
 	_recipe = Panel.new()
-	_recipe.size = _RECIPE
+	_recipe.size = _CARD
 	_recipe.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_recipe.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CARD, UiTokens.COLOR_BORDER, UiTokens.STROKE_CELL_HAIRLINE))
 	wrap.add_child(_recipe)
-	var medallion := Panel.new()
-	medallion.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	medallion.position = _MEDALLION.position
-	medallion.size = _MEDALLION.size
-	medallion.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, _MEDALLION.size.x * 0.5))
-	_recipe.add_child(medallion)
-	_recipe_icon = UiKit.icon(null, _DISH_ICON)
-	_recipe_icon.position = (_MEDALLION.size - Vector2(_DISH_ICON, _DISH_ICON)) * 0.5
-	_recipe_icon.size = Vector2(_DISH_ICON, _DISH_ICON)
-	medallion.add_child(_recipe_icon)
-	_recipe_title = _text(_recipe, UiTokens.STYLE_C14_XB, UiTokens.COLOR_TEXT, Rect2(57.4, 8.4, 180, 18))
-	_recipe_state = _text(_recipe, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY, Rect2(57.4, 28.4, 150, 13))
-	_recipe_effect = _text(_recipe, UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT, Rect2(57.4, 48.4, 142, 15))
+	_medallion = Panel.new()
+	_medallion.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_recipe.add_child(_medallion)
+	_recipe_icon = UiKit.icon(null, _CARD_ICON)
+	_medallion.add_child(_recipe_icon)
+	_divider = ColorRect.new()   # row 99: 1 × 34 at x 248, y 17–51, color/border, over the Big Pot key's right edge
+	_divider.color = UiTokens.COLOR_BORDER
+	_divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_divider.position = _CARD_DIVIDER.position
+	_divider.size = _CARD_DIVIDER.size
+	_recipe.add_child(_divider)
+	_recipe_title = _text(_recipe, UiTokens.STYLE_C14_XB, UiTokens.COLOR_TEXT, _CARD_TITLE)
+	_recipe_state = _text(_recipe, UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY, _CARD_STATE)
+	_recipe_effect = _text(_recipe, UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT, _CARD_EFFECT)
 	_recipe_buff = _buff_capsule()
 	_recipe.add_child(_recipe_buff)
 	_recipe_maybe = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_NEW_INK)
-	_recipe_maybe.position = Vector2(57.4, _RECIPE_MAYBE_TOP)
 	_recipe_maybe.visible = false
 	_recipe.add_child(_recipe_maybe)
 	_recipe_button = UiCommandButton.new("Cook", UiCommandButton.Kind.PRIMARY, true)
 	_recipe_button.sends = true   # cook (§10.7.1 Offline)
-	_recipe_button.position = _RECIPE_BUTTON_AT
-	_recipe_button.size = _RECIPE_BUTTON
 	_recipe_button.activated.connect(func():
 		var p := page(selected_page)
-		if not p.is_empty(): cook_requested.emit(_doubled({"type": "cook", "recipe": str(p.id)}, _book_double)))
+		if not p.is_empty(): cook_requested.emit(card_command()))
 	wrap.add_child(_recipe_button)
-	_book_double = _make_double()
-	wrap.add_child(_book_double)
+	_stepper = UiStepper.new()
+	_stepper.limits_say_why = true
+	_stepper.changed.connect(_on_batch_n)
+	_stepper.limit_pressed.connect(func(dir: int): if dir > 0: unavailable.emit(P0KitchenLogic.batch_limit_toast(batch_plan())))
+	_stepper.visible = false
+	wrap.add_child(_stepper)
+	_book_key = _make_key()
+	wrap.add_child(_book_key)
 	_recipe_nav = UiNavButton.new("Try in Experiment", true)
-	_recipe_nav.position = Vector2(_RECIPE.x - 150, _RECIPE_BUTTON_AT.y)
-	_recipe_nav.size = Vector2(146, _RECIPE_BUTTON.y)
 	_recipe_nav.pressed.connect(func(): set_tab("experiment"))
 	wrap.add_child(_recipe_nav)
 	return wrap
@@ -424,6 +444,9 @@ func _refresh_cookbook() -> void:
 	if selected_page != "": _pages.selected_id = selected_page
 
 func _select_page(id: String) -> void:
+	if id != selected_page:
+		batch_n = 1
+		_saved_said = ""
 	selected_page = id
 	_show_page(id)
 	page_selected.emit(page(id))
@@ -431,6 +454,7 @@ func _select_page(id: String) -> void:
 ## Opens on a given Cookbook page (Cook Again's Choose recipe ›): select it in the grid and show its card.
 func select_page(id: String) -> void:
 	if page(id).is_empty(): return
+	if id != selected_page: batch_n = 1
 	selected_page = id
 	if _pages: _pages.selected_id = id
 	_show_page(id)
@@ -438,94 +462,125 @@ func select_page(id: String) -> void:
 func _show_page(id: String) -> void:
 	var p := page(id)
 	_recipe.visible = not p.is_empty()
-	_recipe_button.visible = false
-	_recipe_nav.visible = false
-	if p.is_empty(): return
+	if p.is_empty():
+		for n in [_recipe_button, _recipe_nav, _stepper, _book_key]: (n as Control).visible = false
+		return
 	var card := P0KitchenLogic.page_card(view, p)
+	var known := bool(p.get("known", false))
 	_recipe_icon.texture = card.icon if card.icon != null else UiItemCell.SILHOUETTE
 	_recipe_icon.self_modulate = Color.WHITE if card.icon != null else UiTokens.COLOR_DISABLED
 	_recipe_title.text = card.title
 	_recipe_state.text = card.state
+	_recipe_effect.text = str(card.effect_parts[0])   # `+N Energy` only: the time is on the pot card (row 99)
+	# The extra line between the rows (不知火舞 on 286): a Legendary page's `Buff · coming later`, an unknown page's
+	# `You might have what it takes`.
 	_recipe_buff.visible = str(card.get("buff", "")) != ""
-	_effect_parts = card.effect_parts
 	_recipe_maybe.text = card.maybe
-	_recipe_maybe.visible = card.maybe != ""
-	if card.nav != "":
-		_recipe_nav.visible = true
-	else:
-		_recipe_button.visible = true
-		_recipe_button.reason = card.reason
-		_recipe_button.label = _verb()
-	_apply_double(_book_double, _recipe_button, P0KitchenLogic.double_state(view, p) if card.nav == "" else {shown = false, enabled = false, toast = ""},
-		p.get("in", []))
+	_recipe_maybe.visible = card.maybe != "" and not _recipe_buff.visible
+	# Row 2: a known page's stepper (Cooking Lv8), Big Pot key (Homestead Lv6) and Cook or its gap; an unknown page's
+	# `Try in Experiment ›`, or the grey `Cooking Lv4 · 3rd slot` while its 3rd slot is locked.
+	_recipe_nav.visible = card.nav != ""
+	_recipe_button.visible = card.nav == ""
+	_recipe_button.reason = card.reason
+	_recipe_button.label = _verb()
+	var can := known and str(card.reason) == ""
+	_stepper.visible = can and not queue_mode and P0KitchenLogic.batch_on(view)
+	if _stepper.visible:
+		_stepper.max_value = maxi(1, int(batch_plan().max))
+		_stepper.value = clampi(batch_n, 1, _stepper.max_value)
+	if known: _apply_key(_book_key, P0KitchenLogic.big_pot_key(view, stove_index, is_big(), queue_mode, int(p.get("rarity", 1)) >= 4, can))
+	else: _book_key.visible = false
 	_layout_recipe()
 
-## The card grows with what it says (int6 C3 / C41, 不知火舞 on 226): the might-have line pushes the effect line
-## down; the button keeps the bottom-right corner, right-aligned at 328 and as wide as its text, and when that
-## text would run into the facts it takes a full-width row of its own under them. Text never shrinks or wraps.
+## One grid for every page (row 99 S1 2731:153980, grid 2733:158489; 不知火舞 on 286 20438543): 336 wide, row 1 at
+## y 12–56, row 2's 34 surface at y 64–98 (touch 44), 110 high; the extra line (16 high, 4 above and below) pushes
+## row 2 down 20 and the card to 130. Cook stays at the bottom right, a gap right-aligned there as wide as it says.
 func _layout_recipe() -> void:
-	var b := _recipe_button
-	var w := maxf(_RECIPE_BUTTON.x, b.get_combined_minimum_size().x)
-	var right := _RECIPE.x - _RECIPE_PAD
-	# The fact lines run up to 8 px short of what sits in the corner (不知火舞, 256 follow-up: not the 142 of the text box).
-	var beside := (right - w if b.visible else _RECIPE.x - 150.0) - _RECIPE_PAD - _FACTS_X
-	_fit_effect(beside)
-	var corner := not b.visible or (_text_width(_recipe_state) <= beside and _text_width(_recipe_effect) <= beside)
-	var room := beside if corner else right - _FACTS_X
-	# The Buff capsule (Legendary) ends the state line when both fit; otherwise it takes a row of its own under it.
-	var cap := _recipe_buff.get_combined_minimum_size() if _recipe_buff.visible else Vector2.ZERO
-	var inline := cap.x > 0.0 and _text_width(_recipe_state) + 4.0 + cap.x <= room
-	var buff_h := cap.y + 2.0 if cap.x > 0.0 and not inline else 0.0
-	_recipe_maybe.position.y = _RECIPE_MAYBE_TOP + buff_h
-	var extra := buff_h + (_recipe_maybe.get_combined_minimum_size().y + 2.0 if _recipe_maybe.visible else 0.0)
-	_recipe_effect.position.y = 48.4 + extra
-	var h := _RECIPE.y + extra
-	_recipe_nav.position = Vector2(_RECIPE.x - 150, _RECIPE_BUTTON_AT.y + extra)
-	_recipe_state.size.x = room
-	if cap.x > 0.0:
-		_recipe_buff.size = cap
-		if inline:
-			var text_w := _text_width(_recipe_state)
-			_recipe_state.size.x = text_w
-			_recipe_buff.position = Vector2(_FACTS_X + text_w + 4.0, _recipe_state.position.y + (_recipe_state.size.y - cap.y) * 0.5)
-		else:
-			_recipe_buff.position = Vector2(_FACTS_X, _RECIPE_MAYBE_TOP)
-	if corner:
-		b.position = Vector2(right - w, _RECIPE_BUTTON_AT.y + extra)
-		b.size = Vector2(w, _RECIPE_BUTTON.y)
-	else:   # a row of its own under the facts; the facts take the card's width
-		_fit_effect(right - _FACTS_X)
-		var top := _recipe_effect.position.y + _recipe_effect.size.y + _RECIPE_ROW_GAP
-		b.position = Vector2(_RECIPE_PAD, top)
-		b.size = Vector2(_RECIPE.x - _RECIPE_PAD * 2.0, _RECIPE_BUTTON.y)
-		h = top + _RECIPE_BUTTON.y + _RECIPE_ROW_GAP
-	if _book_double.visible:   # Double under Cook, right-aligned, a row of its own (COOK-DOUBLE-BOOK-ON)
-		var dw := _book_double.get_combined_minimum_size().x
-		_book_double.size = Vector2(dw, _DOUBLE_ROW)
-		_book_double.position = Vector2(right - dw, h)
-		h += _DOUBLE_ROW + _RECIPE_ROW_GAP
-	_recipe.size = Vector2(_RECIPE.x, h)
-	_recipe_wrap.custom_minimum_size = Vector2(_RECIPE.x, h)
+	var extra := _EXTRA_ROW if _recipe_buff.visible or _recipe_maybe.visible else 0.0
+	_medallion.position = _CARD_MEDALLION.position
+	_medallion.size = _CARD_MEDALLION.size
+	var known := bool(page(selected_page).get("known", false))   # an unknown page's medallion is light grey (S14)
+	_medallion.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT if known else _UNKNOWN_MEDALLION, _CARD_MEDALLION.size.x * 0.5))
+	_recipe_icon.position = (_CARD_MEDALLION.size - Vector2(_CARD_ICON, _CARD_ICON)) * 0.5
+	_recipe_icon.size = Vector2(_CARD_ICON, _CARD_ICON)
+	for pair in [[_recipe_title, _CARD_TITLE], [_recipe_state, _CARD_STATE], [_recipe_effect, _CARD_EFFECT]]:
+		(pair[0] as Label).position = (pair[1] as Rect2).position
+		(pair[0] as Label).size = (pair[1] as Rect2).size
+	_recipe_effect.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var line_y := _CARD_ROW1_END + 4.0
+	if _recipe_buff.visible:
+		_recipe_buff.size = _recipe_buff.get_combined_minimum_size()
+		_recipe_buff.position = Vector2(_CARD_TITLE.position.x, line_y + (16.0 - _recipe_buff.size.y) * 0.5)
+	if _recipe_maybe.visible:
+		_recipe_maybe.position = Vector2(_CARD_TITLE.position.x, line_y + (16.0 - _recipe_maybe.get_combined_minimum_size().y) * 0.5)
+	var row2 := _CARD_ROW2 + extra
+	_stepper.position = Vector2(_CARD_STEPPER_X, row2)
+	_stepper.size = _stepper.custom_minimum_size
+	_book_key.position = Vector2(_CARD_KEY_X, row2)
+	_book_key.size = _book_key.custom_minimum_size
+	for b in [_recipe_button, _recipe_nav]:
+		var w := maxf(_CARD_COOK.size.x, (b as Control).get_combined_minimum_size().x)
+		(b as Control).position = Vector2(_CARD_COOK.end.x - w, row2)
+		(b as Control).size = Vector2(w, _CARD_COOK.size.y)
+	var h := _CARD.y + extra
+	_recipe.size = Vector2(_CARD.x, h)
+	_recipe_wrap.custom_minimum_size = Vector2(_CARD.x, h)
+
+
+# ---------------------------------------------------------------- Batch Cook and the Big Pot (q(200) / q(201))
+## The selected page's batch as the server will cook it (P0KitchenLogic.batch_plan): from this stove, `batch_n` pots,
+## the Big Pot stoves.
+func batch_plan() -> Dictionary:
+	return P0KitchenLogic.batch_plan(view, page(selected_page), batch_n, stove_index, big_stoves)
+
+## What Cook sends: one pot is the plain cook, more is batch_cook (P0KitchenLogic.card_command).
+func card_command() -> Dictionary:
+	return P0KitchenLogic.card_command(page(selected_page), batch_n if _stepper.visible else 1, stove_index, big_stoves,
+		P0KitchenLogic.stove_count(view) > 1)
+
+func _on_batch_n(n: int) -> void:
+	var before := batch_n
+	batch_n = n
+	var p := page(selected_page)
+	if n > before:   # crossing into this page's 2nd / 3rd pot today (q(200) ⑥)
+		for k in range(before + 1, n + 1):
+			var t := P0KitchenLogic.nth_today_toast(P0KitchenLogic.page_pot_today(view, p, k))
+			if t != "": unavailable.emit(t)
+	_say_saved()
+	plan_changed.emit()
+
+## The kept-items toast (q(200) ④): the first time the batch uses an item saved for a request or another page.
+func _say_saved() -> void:
+	var t := P0KitchenLogic.saved_toast(view, page(selected_page), batch_plan().sets)
+	if t != "" and t != _saved_said: unavailable.emit(t)
+	_saved_said = t
+
+## The kept-items toast again, for a tap on an amber slot.
+func saved_line() -> String: return P0KitchenLogic.saved_toast(view, page(selected_page), batch_plan().sets)
+
+func _make_key() -> UiBigPotKey:
+	var k := UiBigPotKey.new()
+	k.visible = false
+	k.toggled.connect(func(on: bool):
+		if on and not big_stoves.has(stove_index): big_stoves.append(stove_index)
+		if not on: big_stoves.erase(stove_index)
+		big_pot_toggled.emit(stove_index, on)
+		refresh()
+		plan_changed.emit())
+	k.refused.connect(func(r: String): unavailable.emit(r))
+	return k
+
+func _apply_key(k: UiBigPotKey, st: Dictionary) -> void:
+	k.visible = bool(st.shown)
+	k.on = bool(st.on)
+	k.enabled = bool(st.enabled)
+	k.toast = str(st.toast)
 
 ## The card is first laid out in _init, before the drawer has its theme (the fact lines measured in the default font
 ## size read wider, and a long one, Fine · First cook +20 XP, sent Cook to a row of its own): lay it out again once the
 ## theme is there.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED and _recipe_wrap != null and _recipe.visible: _layout_recipe.call_deferred()
-
-## The effect line in `room` px (不知火舞, 256 follow-up): `+40 Energy · 15 s · Soup`, the dish style dropped first and
-## then the time when it does not fit; the energy always stays.
-func _fit_effect(room: float) -> void:
-	_recipe_effect.size.x = room
-	var parts := _effect_parts.duplicate()
-	_recipe_effect.text = " · ".join(PackedStringArray(parts))
-	while parts.size() > 1 and _text_width(_recipe_effect) > room:
-		parts.pop_back()
-		_recipe_effect.text = " · ".join(PackedStringArray(parts))
-
-## How wide a clipped label's text really is (clip_text makes its minimum width 0).
-static func _text_width(l: Label) -> float:
-	return l.get_theme_font(&"font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x
 
 # ---------------------------------------------------------------- Experiment
 func _build_experiment() -> VBoxContainer:
@@ -556,6 +611,12 @@ func _build_experiment() -> VBoxContainer:
 	_tried = UiKit.label("Tried before · not a recipe", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
 	_tried.visible = false
 	v.add_child(_tried)
+	# With the Big Pot (Homestead Lv6, S10 2732:178467) `+N Energy` and `Info ›` take a row of their own above, and the
+	# cook row is the Big Pot key (x 12–80) and Cook filling the rest; before it, one row as before.
+	_exp_info_row = HBoxContainer.new()
+	_exp_info_row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_ROW))
+	_exp_info_row.visible = false
+	v.add_child(_exp_info_row)
 	var foot := HBoxContainer.new()
 	_foot = foot
 	foot.alignment = BoxContainer.ALIGNMENT_END
@@ -564,19 +625,24 @@ func _build_experiment() -> VBoxContainer:
 	_pot_energy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_pot_energy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	foot.add_child(_pot_energy)
-	var info := UiNavButton.new("Info", true)
-	info.pressed.connect(func(): info_requested.emit())
-	foot.add_child(info)
-	_exp_double = _make_double()
-	foot.add_child(_exp_double)
+	_exp_info = UiNavButton.new("Info", true)
+	_exp_info.pressed.connect(func(): info_requested.emit())
+	foot.add_child(_exp_info)
+	_exp_key = _make_key()
+	foot.add_child(_exp_key)
 	_cook = UiCommandButton.new("Cook", UiCommandButton.Kind.PRIMARY, true)
 	_cook.sends = true   # cook (§10.7.1 Offline)
 	_cook.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_cook.activated.connect(func(): if not pot.is_empty(): cook_requested.emit(_doubled({"type": "cook", "items": pot.duplicate()}, _exp_double)))
-	var cook_box := MarginContainer.new()   # the button resets its own minimum size; the box holds the 164 width
-	cook_box.custom_minimum_size.x = _COOK_W
-	cook_box.add_child(_cook)
-	foot.add_child(cook_box)
+	_cook.activated.connect(func():
+		if pot.is_empty(): return
+		var cmd := {"type": "cook", "items": pot.duplicate()}
+		if is_big(): cmd["double"] = true
+		cook_requested.emit(cmd))
+	_cook_box = MarginContainer.new()   # the button resets its own minimum size; the box holds the 164 width
+	_cook_box.custom_minimum_size.x = _COOK_W
+	_cook_box.size_flags_horizontal = Control.SIZE_FILL
+	_cook_box.add_child(_cook)
+	foot.add_child(_cook_box)
 	v.add_child(foot)
 	return v
 
@@ -587,9 +653,33 @@ func _refresh_experiment() -> void:
 	_bag.items = items
 	_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
 	_cook.label = _verb()
-	_apply_double(_exp_double, _cook, P0KitchenLogic.double_state(view, {}, pot), pot)
+	var known := P0Logic.match_known(P0KitchenLogic.with_rack(view), pot)
+	_apply_key(_exp_key, P0KitchenLogic.big_pot_key(view, stove_index, is_big(), queue_mode,
+		not known.is_empty() and int(known.get("rarity", 1)) >= 4))
+	_lay_experiment_foot(_exp_key.visible)
 	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 	_tried.visible = P0KitchenLogic.tried(view, pot)
+
+## S10: with the key, `+N Energy` and `Info ›` move up to their own row (Info first, as the frame has it) and Cook fills
+## the cook row after the key; without it they come back to the one row.
+func _lay_experiment_foot(with_key: bool) -> void:
+	var up := _exp_info.get_parent() == _exp_info_row
+	if with_key != up:
+		for n in [_exp_info, _pot_energy]:
+			n.get_parent().remove_child(n)
+		if with_key:
+			_exp_info_row.add_child(_exp_info)
+			_exp_info_row.add_child(_pot_energy)
+			_pot_energy.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		else:
+			_foot.add_child(_pot_energy)
+			_foot.move_child(_pot_energy, 0)
+			_foot.add_child(_exp_info)
+			_foot.move_child(_exp_info, 1)
+			_pot_energy.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_exp_info_row.visible = with_key
+	_cook_box.custom_minimum_size.x = 0.0 if with_key else _COOK_W
+	_cook_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL if with_key else Control.SIZE_FILL
 
 ## The Cookbook's six chips as 2318:125476 draws them, so all fit the 336 row (B7 ⑨): 4 apart, 7 each side of the
 ## word, at least 40 wide (All · Fine · Rare 40, Can cook 61, Common 60, Legendary 69 here).
@@ -626,86 +716,34 @@ func _chips(labels: Array, picked: Callable) -> Control:
 func top_y() -> float:
 	return get_global_rect().position.y
 
-# ---------------------------------------------------------------- Big Pot Double (b84a5e01 ③)
-func is_double() -> bool: return bool(doubles.get(stove_index, false))
-## Whether the Double the player sees is on and usable for what is selected (the pot card's ×2 follows it).
-## Shots / tests: the Double toggle switched as a tap does (the pot card follows through double_changed).
-func dev_double(on: bool) -> void:
-	var t := _book_double if tab == "cookbook" else _exp_double
-	if t == null or not t.visible or not t.enabled: return
-	t.on = on
-	t.toggled.emit(on)
+# ---------------------------------------------------------------- Big Pot (q(201))
+## Shots / tests: the Big Pot key tapped as a finger does (Cookbook's or Experiment's, whichever shows).
+func dev_big_pot() -> void:
+	var k := _book_key if tab == "cookbook" else _exp_key
+	if k != null and k.visible: k.press()
 
-func big_pot_shown() -> bool:
-	var t := _book_double if tab == "cookbook" else _exp_double
-	return t != null and t.visible and t.enabled
+## The key the player sees on this tab, or null (shots, tests).
+func big_pot_key() -> UiBigPotKey:
+	var k := _book_key if tab == "cookbook" else _exp_key
+	return k if k != null and k.visible else null
 
-## `Double` + a switch (placeholder from kit parts until the Toggle main, 1236:107861, is in the kit). Grey: a tap says
-## why (`toast`), it never flips.
-class _DoubleToggle extends HBoxContainer:
-	signal toggled(on: bool)
-	signal refused(reason: String)
-	var on := false: set = set_on
-	var enabled := true: set = set_enabled
-	var toast := ""
-	var _track: Panel
-	var _knob: Panel
-	var _label: Label
-	func _init() -> void:
-		add_theme_constant_override(&"separation", 6)
-		mouse_filter = Control.MOUSE_FILTER_STOP
-		custom_minimum_size.y = 32.0
-		_label = UiKit.label("Double", UiTokens.STYLE_C12_B)
-		_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		add_child(_label)
-		_track = Panel.new()
-		_track.custom_minimum_size = Vector2(36, 20)
-		_track.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		_track.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(_track)
-		_knob = Panel.new()
-		_knob.size = Vector2(16, 16)
-		_knob.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_knob.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, 8.0))
-		_track.add_child(_knob)
-		gui_input.connect(func(e: InputEvent):
-			if not P0Ui.is_tap(e): return
-			if not enabled:
-				refused.emit(toast)
-				return
-			on = not on
-			toggled.emit(on))
-		_restyle()
-	func set_on(v: bool) -> void:
-		on = v
-		_restyle()
-	func set_enabled(v: bool) -> void:
-		enabled = v
-		_restyle()
-	func _restyle() -> void:
-		if _track == null: return
-		var lit := on and enabled
-		_track.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY if lit else UiTokens.COLOR_DISABLED, 10.0))
-		_knob.position = Vector2(18 if lit else 2, 2)
-		_label.add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT if enabled else UiTokens.COLOR_DISABLED)
+## Shots / tests: the stepper at `n` pots, as taps on + would be (each over its limit says why instead).
+func dev_batch(n: int) -> void:
+	if _stepper == null or not _stepper.visible: return
+	while _stepper.value < n and not _stepper.end_grey(1): _stepper._press(1)
+	if _stepper.value < n: _stepper._press(1)   # the grey + : its toast
 
-func _make_double() -> _DoubleToggle:
-	var t := _DoubleToggle.new()
-	t.visible = false
-	t.toggled.connect(func(on: bool):
-		doubles[stove_index] = on
-		refresh()
-		double_changed.emit(on))
-	t.refused.connect(func(r: String): unavailable.emit(r))
-	return t
+## Shots / tests: the recipe card's Cook (or Experiment's), as a tap.
+func dev_cook() -> void:
+	var b := _recipe_button if tab == "cookbook" else _cook
+	if b and b.visible and b.reason == "": b.activated.emit()
 
-## Show the toggle for what is selected and set the main key: `Cook ×2` / `Queue ×2`, or the gap for two portions.
-func _apply_double(t: _DoubleToggle, b: UiCommandButton, st: Dictionary, tokens: Array) -> void:
-	t.visible = bool(st.shown)
-	t.enabled = bool(st.enabled)
-	t.toast = str(st.toast)
-	t.on = is_double()
-	if not (st.shown and st.enabled and is_double()) or b.reason != "": return
-	var gap := P0KitchenLogic.double_gap(view, tokens)
-	if gap != "": b.reason = gap
-	else: b.label = P0KitchenLogic.double_label(queue_mode)
+## The recipe card's parts on screen (282 shots: the row 99 grid by numbers).
+func dev_card_rects() -> Dictionary:
+	var out := {"card": _recipe.get_global_rect()}
+	for pair in [["medallion", _medallion], ["title", _recipe_title], ["state", _recipe_state], ["effect", _recipe_effect],
+			["divider", _divider], ["stepper", _stepper], ["big pot", _book_key], ["cook", _recipe_button], ["nav", _recipe_nav],
+			["buff", _recipe_buff], ["maybe", _recipe_maybe], ["exp key", _exp_key], ["exp cook", _cook]]:
+		var n := pair[1] as Control
+		if n and n.is_visible_in_tree(): out[pair[0]] = n.get_global_rect()
+	return out

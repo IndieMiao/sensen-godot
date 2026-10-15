@@ -19,6 +19,7 @@ const SIZE := 44.0
 const _ICON := 32.0
 const _LOCK := 16.0
 const _STROKE := 1.5
+const _SAVED_STROKE := 2.0   # the kept-item slot's amber outline (q(200) ④; the Energy-short amber token)
 const _QTY := Rect2(26, 30, 24, 16)
 const _QTY_PAD := 4.0
 const _REMOVE := Rect2(29, -3, 18, 18)
@@ -34,6 +35,11 @@ var icon: Texture2D: set = set_icon
 var quantity := "": set = set_quantity
 var removable := false: set = set_removable
 var point_at_remove := false: set = set_point_at_remove
+## q(200) ④: this slot uses an item kept for a request or another page — a 2 px amber outline instead of the green.
+var saved := false: set = set_saved
+## A filled slot that cannot go back to the bag but says something on a tap (the recipe card's batch: what it picked,
+## the kept item): emits `tapped`.
+var informs := false: set = set_informs
 
 var _circle: Panel
 var _icon: TextureRect
@@ -95,6 +101,8 @@ func set_icon(v: Texture2D) -> void: icon = v; _refresh()
 func set_quantity(v: String) -> void: quantity = v; _refresh()
 func set_removable(v: bool) -> void: removable = v; _refresh()
 func set_point_at_remove(v: bool) -> void: point_at_remove = v; _refresh()
+func set_saved(v: bool) -> void: saved = v; _refresh()
+func set_informs(v: bool) -> void: informs = v; _refresh()
 
 ## Screen point where an ingredient leaves from / lands back on this slot (the circle's centre).
 func ring_center() -> Vector2:
@@ -108,7 +116,8 @@ func _refresh() -> void:
 	var filled := state == State.FILLED
 	var box: UiStyleBox
 	match state:
-		State.FILLED: box = UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, SIZE * 0.5, UiTokens.COLOR_PRIMARY, _STROKE)
+		State.FILLED: box = UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, SIZE * 0.5, UiTokens.COLOR_AMBER if saved else UiTokens.COLOR_PRIMARY,
+			_SAVED_STROKE if saved else _STROKE)
 		State.EMPTY:
 			box = UiStyleBox.make(Color.TRANSPARENT, SIZE * 0.5, UiTokens.COLOR_BORDER, _STROKE)
 			box.dashed = true
@@ -128,7 +137,7 @@ func _refresh() -> void:
 	_remove.visible = filled and removable
 	_remove_hit.visible = _remove.visible
 	_ring.visible = _remove.visible and point_at_remove
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if state == State.EMPTY or (filled and not removable) else Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if state == State.EMPTY or (filled and not removable and not informs) else Control.MOUSE_FILTER_STOP
 
 func _gui_input(e: InputEvent) -> void: _on_input(e)
 
@@ -136,7 +145,7 @@ func _gui_input(e: InputEvent) -> void: _on_input(e)
 func _on_input(e: InputEvent) -> void:
 	var up: bool = (e is InputEventScreenTouch and not e.pressed) or (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed)
 	if not up: return
-	if state == State.FILLED and removable:
+	if state == State.FILLED and (removable or informs):
 		accept_event()
 		tapped.emit()
 	elif state == State.LOCKED:

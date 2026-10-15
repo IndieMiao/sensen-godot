@@ -1,0 +1,10 @@
+<svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- i-big-pot v2 (Figma 2728:153408, 安其拉): a tall stock pot, a thick band, lid, knob and handles. White so the key
+     tints it (ink / green / grey, COMPACT/BigPotKey). -->
+<path d="M5.59961 8.79998C9.86628 5.53331 14.1329 5.53331 18.3996 8.79998" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11 4.5H13" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M6 8.79999V19.6C6 20.9333 6.66667 21.6 8 21.6H16C17.3333 21.6 18 20.9333 18 19.6V8.79999H6Z" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="M6 15.2H18" stroke="#FFFFFF" stroke-width="2.8"/>
+<path d="M6.00078 10.6H4.40078C3.66745 10.6 3.30078 10.9666 3.30078 11.7C3.30078 12.4333 3.66745 12.8 4.40078 12.8H6.00078" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 10.6H19.6C20.3333 10.6 20.7 10.9666 20.7 11.7C20.7 12.4333 20.3333 12.8 19.6 12.8H18" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

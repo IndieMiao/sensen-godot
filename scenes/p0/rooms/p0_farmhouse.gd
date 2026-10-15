@@ -255,6 +255,39 @@ func show_cabinet_plates(n: int) -> void:
 func _room_ready() -> void:
 	kitchen = P0Kitchen.new(self)
 	add_child(kitchen)
+	show_big_pots.call_deferred()
+
+## The Big Pot on a stove switched to it (q(201) ⑦): a placeholder stock pot on its hob until 刘备's pot_normal / pot_big
+## arrive (上官婉儿 on 282: the pot's floor per room, Basic 1.377 / Standard 1.457 / Deluxe 1.291; ≤ 0.28 across).
+const BIG_POT_FLOOR := {"basic": 1.377, "standard": 1.457, "deluxe": 1.291}
+const BIG_POT_SIZE := Vector2(0.13, 0.22)   # radius, height
+func show_big_pots() -> void:
+	if not is_inside_tree() or kitchen == null or art == null: return
+	var v := P0Runtime.ensure().session.current() if use_runtime else (rt.session.current() if rt else {})
+	for i in 3:
+		var n := "big_pot_placeholder_%d" % (i + 1)
+		var at := anchor("use_stove_%d" % (i + 1))
+		var on: bool = at != null and P0KitchenLogic.big_pot(v) and kitchen.big().has(i)
+		var pot := art.get_node_or_null(n) as MeshInstance3D
+		if not on:
+			if pot: pot.queue_free()
+			continue
+		if pot == null:
+			pot = MeshInstance3D.new()
+			pot.name = n
+			var mesh := CylinderMesh.new()
+			mesh.top_radius = BIG_POT_SIZE.x
+			mesh.bottom_radius = BIG_POT_SIZE.x * 0.92
+			mesh.height = BIG_POT_SIZE.y
+			var mat := StandardMaterial3D.new()
+			mat.albedo_color = Color("B8733A")   # copper, as the stock pot's band (placeholder)
+			mat.roughness = 0.6
+			mat.metallic_specular = 0.28
+			mesh.material = mat
+			pot.mesh = mesh
+			art.add_child(pot)
+		var g := at.global_position
+		pot.position = art.to_local(Vector3(g.x, float(BIG_POT_FLOOR.get(room_kind, g.y)) + BIG_POT_SIZE.y * 0.5, g.z))
 
 # ---------------------------------------------------------------- stove (COOK-1)
 ## Finger card and STATE-ICONS badge over the stove: Empty / countdown / Ready (plan §7.2.2 step 1).
@@ -268,17 +301,18 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 			count = P0KitchenLogic.cabinet_count(v)}
 	var i := stove_of(n)
 	if i < 0: return super(n, v)
-	return stove_marker(v, i)
+	return stove_marker(v, i, kitchen != null and kitchen.big().has(i))
 
 ## One stove's world prompt (pure, tested): i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the
 ## far button's badge and the fact (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708); Ready and
 ## Cooking put their badge in the strip too (02ad95bc ③; on #231: the clock folded and open), Empty keeps the pot. One per
-## stove: `Stove 2/3 · Empty` (b84a5e01 ②), over its pot.
-static func stove_marker(v: Dictionary, i: int) -> Dictionary:
+## stove: `Stove 2/3 · Empty` (b84a5e01 ②), over its pot; an empty Big Pot stove `Stove 2/3 · Big Pot` (q(201): cooking or
+## ready first, then Big Pot, then Empty).
+static func stove_marker(v: Dictionary, i: int, big := false) -> Dictionary:
 	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = P0KitchenLogic.stove_label(v, i), strip_badge = false}
 	if P0KitchenLogic.queued(v, i) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
 	var st = P0KitchenLogic.stove(v, i)
-	if st == null: return stove.merged({fact = "Empty"})
+	if st == null: return stove.merged({fact = "Big Pot" if big and P0KitchenLogic.big_pot(v) else "Empty"})
 	var left := float(st.get("ready_in", 0))
 	if left <= 0.0:   # the ready mark takes the icon's place; the strip names the dish
 		var dish = st.get("dish", null)
@@ -365,8 +399,8 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false
 	match str(ev.get("kind", "")):
 		"pot":
-			if kitchen.cook_all_pending:   # Cook All's pots catch one after another, the Cookbook stays (q(124))
-				kitchen.on_cook_all_pot(ev)
+			if kitchen.batch_pending:   # a batch's pots catch one after another (q(200), Cook All's way)
+				kitchen.on_batch_pot(ev)
 				return false
 			if ev.has("stove") and not kitchen.busy(): kitchen.select_stove(int(ev.stove))
 			var st = P0KitchenLogic.stove(v, kitchen.stove_index)
@@ -539,27 +573,24 @@ func p0_dev(step: PackedStringArray) -> bool:
 				elif c is Button and (c as Button).text != "": out.append("[" + (c as Button).text + "]")
 			print("P0_UI_TEXTS ", JSON.stringify(out))
 		"pickstove": if kitchen and not kitchen.busy(): kitchen.select_stove(int(step[1]))   # pickstove:<i> (282 shots)
-		"doubleon":   # the Double toggle on, as a tap on it (282 shots)
-			if kitchen.drawer: kitchen.drawer.dev_double(true)
+		"bigpot":   # the Big Pot key tapped, Cookbook's or Experiment's (282 shots, q(201))
+			if kitchen.drawer: kitchen.drawer.dev_big_pot()
+		"batch":   # batch:<n> — the stepper set to n pots, as taps on + would (282 shots, q(200))
+			if kitchen.drawer: kitchen.drawer.dev_batch(int(step[1]))
+		"cookgo":   # the recipe card's Cook, as a tap on it (282 shots)
+			if kitchen.drawer: kitchen.drawer.dev_cook()
+		"confirmgo":   # the Rare / Legendary confirm's key (282 shots)
+			if is_instance_valid(kitchen.confirm_sheet): kitchen.confirm_sheet.cook_button.pressed.emit()
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
 		"cabinetglowoff":   # the Warming Cabinet's warm light off (282 shots: with and without, 上官婉儿)
 			if art.has_node("warming_cabinet_glow"): (art.get_node("warming_cabinet_glow") as Node3D).visible = false
-		"cookall":   # Cook All's sheet (282 shots; no key opens it while it is paused)
-			kitchen.open_cook_all()
-		"cookallgo":   # the sheet's `Cook All · N pots`, as a tap on it (282 shots)
-			if is_instance_valid(kitchen.cook_all_sheet) and kitchen.cook_all_sheet.cook_button: kitchen.cook_all_sheet.cook_button.pressed.emit()
-		"cookallrects":   # Cook All's sheet, its ×, the strip button and the floats on screen (282 shots: layout by numbers)
+		"cardrects":   # the recipe card's parts and the pot card on screen (282 shots: layout by numbers)
 			var out := {}
-			if kitchen.drawer:
-				out["drawer top"] = kitchen.drawer.top_y()
-				out["drawer"] = kitchen.drawer.get_global_rect()
-				for n in ["_stove_pill", "_level", "_state"]: out[n] = (kitchen.drawer.get(n) as Control).get_global_rect()
-			if is_instance_valid(kitchen.cook_all_sheet): out["sheet"] = kitchen.cook_all_sheet.get_global_rect()
-			var x = kitchen.get("_cook_all_close")
-			if is_instance_valid(x): out["close"] = (x as Control).get_global_rect()
+			if kitchen.drawer: out.merge(kitchen.drawer.dev_card_rects())
+			if is_instance_valid(kitchen.confirm_sheet): out["confirm"] = kitchen.confirm_sheet.get_global_rect()
 			for f in rt.ui.root.find_children("*", "UiFloatText", true, false): out["float " + (f as UiFloatText).text] = (f as Control).get_global_rect()
 			out["screen"] = rt.ui.root.size
-			print("P0_COOKALL_RECTS ", out)
+			print("P0_CARD_RECTS ", out)
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
 		"heatband": kitchen.dev_band_press()   # a press on the queue drawer's pot band (shots)

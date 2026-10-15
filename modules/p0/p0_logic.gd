@@ -1794,7 +1794,7 @@ const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
 const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
 	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
-	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
+	"big_pot": {"icon": "big_pot", "text": "Big Pot · 2 servings on any stove", "note": ""},   # q(201): a stove switched to it
 	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II · 400 coins"},   # note: bag_tier_note
 	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
 	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III · 1,000 coins"},   # note: bag_tier_note

@@ -54,53 +54,9 @@ static func ring_soon(st: Dictionary, lead_ms: float, early_ms := 1000.0) -> int
 		if up > e and up - e <= lead_ms: return i
 	return -1
 
-## Big Pot (Homestead Lv6): the drawer offers Double.
+## Big Pot (Homestead Lv6): a stove can be switched to it (q(201)).
 static func big_pot(view: Dictionary) -> bool: return bool(cooking(view).get("big_pot", false))
 
-## The Double toggle (b84a5e01 ③) for the Cookbook's selected page (`page`) or Experiment's pot (`pot`):
-## {shown, enabled, toast}. Hidden before Homestead Lv6 (no locked look); grey for a Legendary dish, a mix that makes
-## no known page and seasonings alone, a tap on it saying why.
-static func double_state(view: Dictionary, page := {}, pot := []) -> Dictionary:
-	if not big_pot(view): return {shown = false, enabled = false, toast = ""}
-	var rarity := 0
-	var known := false
-	if not page.is_empty():
-		known = bool(page.get("known", false))
-		rarity = int(page.get("rarity", 1))
-	elif not pot.is_empty():
-		if not has_main(view, pot): return {shown = true, enabled = false, toast = DOUBLE_KNOWN_ONLY}
-		var pv := preview(view, pot)
-		known = str(pv.get("title", "")) != "Unknown dish" and str(pv.get("title", "")) != ""
-		rarity = int(pv.get("rarity", 1))
-	if not known: return {shown = true, enabled = false, toast = DOUBLE_KNOWN_ONLY}
-	if rarity >= 4: return {shown = true, enabled = false, toast = DOUBLE_NOT_LEGENDARY}
-	return {shown = true, enabled = true, toast = ""}
-
-const DOUBLE_NOT_LEGENDARY := "Double · not for Legendary dishes"
-const DOUBLE_KNOWN_ONLY := "Double · known recipes only"
-
-## Double's main key (b84a5e01 ③): `Cook ×2` / `Queue ×2`, or the first gap for two portions (LOCK-10, `Need 1 more
-## Pond Crucian`); "" when the stock covers two. `tokens`: the page's ingredients or the pot's items.
-static func double_gap(view_: Dictionary, tokens: Array) -> String:
-	var view := with_rack(view_)
-	var left := stock(view)
-	for round in 2:
-		for token in tokens:
-			var t := str(token)
-			var found := ""
-			for id in left:
-				if int(left[id]) > 0 and _matches(view, t, id):
-					found = id
-					break
-			if found == "":
-				var need := tokens.filter(func(x): return str(x) == t).size() * 2
-				var have := 0
-				for id in stock(view): if _matches(view, t, id): have += int(stock(view)[id])
-				return "Need %d more %s" % [maxi(1, need - have), need_label(view, t)]
-			left[found] = int(left[found]) - 1
-	return ""
-
-static func double_label(queue := false) -> String: return "Queue ×2" if queue else "Cook ×2"
 static func slots(view: Dictionary) -> int: return int(cooking(view).get("slots", 2))
 static func level(view: Dictionary) -> int: return int(view.get("skills", {}).get("cooking", {}).get("level", 1))
 
@@ -797,50 +753,246 @@ static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
 		reason = "" if short.is_empty() else "Need %d more %s" % [int(first.need) - int(first.have), str(first.gap)],
 		command = {"type": "cook", "recipe": page_id}}
 
-# ---------------------------------------------------------------- Cook All (Cooking Lv8, COOK-P1-4 / COOK-EMPTY)
-const COOK_ALL_RULE := "Rare → Fine → Common · up to 2 of a dish · no Legendary"
-const COOK_ALL_GAP := "Nothing to cook"
+# ---------------------------------------------------------------- Batch Cook and the Big Pot (q(200) / q(201))
+## A number and its noun joined by a no-break space, so a toast or tag never wraps between them (`2 pots`, `1 serving`).
+const NBSP := "\u00a0"
+static func count_of(n: int, noun: String) -> String: return "%d%s%s" % [n, NBSP, noun if n == 1 else P0Logic.plural(noun)]
+const SWAP_WHEN_EMPTY := "Swap pots when the stove is empty"
+const LEGENDARY_ONE := "Legendary dishes make 1" + NBSP + "serving"
+const ONLY_ONE := "Only enough for 1" + NBSP + "serving"
 
-## Cook All as the Cookbook strip and its sheet read it, from the server's preview (view.cooking.cook_all: the pots
-## cook_all would start, worked out by running it on a copy, so the sheet and the cook never disagree). {} before
-## Cooking Lv8. button: "" when it can go, else the gap greyed on the strip (`Nothing to cook`, D-10 / LOCK-10: no
-## empty sheet); empty: every stove and queue is taken (COOK-EMPTY: `No space`); rows: [{dish, icon, name, rarity,
-## rarity_word, where}] in firing order (`Stove 1 · now` / `Stove 1 · next`); uses: [{token, name, icon, have, need}]
-## (the planned pages' slots summed, a tag without its `Any`); body, label; stoves / facts for COOK-EMPTY.
-static func cook_all(view: Dictionary) -> Dictionary:
-	var plan = cooking(view).get("cook_all", null)
-	if not plan is Dictionary: return {}
-	var reason := str(plan.get("reason", "")) if plan.get("reason", null) != null else ""
-	var out := {"button": COOK_ALL_GAP if reason == "nothing_to_cook" else "", "empty": reason == "no_space",
-		"rows": [], "uses": [], "rule": COOK_ALL_RULE, "stoves": [], "facts": []}
-	for p in plan.get("pots", []):
-		var dish := str(p.get("dish", ""))
-		var r := int(p.get("rarity", 1))
-		out.rows.append({"dish": dish, "icon": P0Logic.icon(dish), "name": P0Logic.item_name(view, dish), "rarity": r,
-			"rarity_word": P0Logic.rarity_name(view, r),
-			"where": "Stove %d · %s" % [int(p.get("stove", 0)) + 1, "next" if str(p.get("when", "")) == "next" else "now"]})
-	for u in plan.get("uses", []):
-		var token := str(u.get("token", ""))
-		var family = UiItemCell.family_icon(token.left(1)) if token.length() == 1 or (token.length() == 2 and token[1].is_valid_int()) else null
-		var name := need_label(view, token)
-		out.uses.append({"token": token, "name": name.left(1).to_upper() + name.substr(1),
-			"icon": family if family != null else P0Logic.icon(token),
-			"have": int(u.get("have", 0)), "need": int(u.get("need", 0))})
-	var n: int = out.rows.size()
-	var on := int(plan.get("stoves", 0))
-	out.body = "%d pot%s on %d stove%s · ingredients come out of your Bag now" % [n, "" if n == 1 else "s", on, "" if on == 1 else "s"]
-	out.label = "Cook All · %d pot%s" % [n, "" if n == 1 else "s"]
-	# COOK-EMPTY: each stove Busy (Queue full when one waits behind it), Stoves n/n · Queues q/n
+## Batch Cook is open (Cooking Lv8): the view's batch {room}.
+static func batch_on(view: Dictionary) -> bool: return cooking(view).get("batch", null) is Dictionary
+
+## The stoves the player switched to Big Pot on this device (q(201) ⑥): user://p0_ui.cfg, one key a player.
+const PREFS := "user://p0_ui.cfg"
+static func load_big_stoves(player: String) -> Array:
+	var cfg := ConfigFile.new()
+	if cfg.load(PREFS) != OK: return []
+	var v = cfg.get_value("big_pot", player if player != "" else "_", [])
+	return (v as Array).map(func(i): return int(i)) if v is Array else []
+
+static func save_big_stoves(player: String, stoves: Array) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(PREFS)
+	var sorted := stoves.duplicate()
+	sorted.sort()
+	cfg.set_value("big_pot", player if player != "" else "_", sorted)
+	cfg.save(PREFS)
+
+## Where a batch's pots go (the server's nextSpot): the current stove when empty, then the empty stoves by number, then
+## the queue slots by number (Queue ×2); a stove fired by the batch can take a queued pot too. [{stove, queued}].
+static func batch_spots(view: Dictionary, current: int, n: int) -> Array:
 	var count := stove_count(view)
-	var queues := 0
+	var queue := bool(cooking(view).get("conveniences", []).has("queue_two"))
+	var busy: Array = []
+	var waiting: Array = []
+	var blocked: Array = []
 	for i in count:
-		var q = queued(view, i) != null
-		if q: queues += 1
-		out.stoves.append({"title": "Stove %d" % (i + 1), "state": "Busy" if stove(view, i) != null else "Free",
-			"detail": "Queue full" if q else ""})
-	out.facts = [["Stoves", "%d/%d" % [count - out.stoves.filter(func(s): return s.state == "Free").size(), count]],
-		["Queues", "%d/%d" % [queues, count]]]
+		var st = stove(view, i)
+		busy.append(st != null)
+		waiting.append(queued(view, i) != null)
+		blocked.append(st is Dictionary and st.get("left", null) != null)
+	var out: Array = []
+	while out.size() < n:
+		var at := -1
+		if current < count and not busy[current]: at = current
+		if at < 0: at = busy.find(false)
+		if at < 0 and queue:
+			for i in count:
+				if busy[i] and not waiting[i] and not blocked[i]:
+					at = i
+					break
+		if at < 0: break
+		out.append({stove = at, queued = busy[at]})
+		if busy[at]: waiting[at] = true
+		else: busy[at] = true
 	return out
+
+## Whether a page's pot on a Big Pot stove can make two servings: the Big Pot is there (Homestead Lv6), the page is in
+## the player's Cookbook and not Legendary (q(201) ②).
+static func doublable(view: Dictionary, p: Dictionary) -> bool:
+	return big_pot(view) and bool(p.get("known", false)) and int(p.get("rarity", 1)) < 4
+
+## A batch of `n` pots of page `p` from the current stove (q(200) ③ / q(201) ④): each pot where batch_spots puts it, two
+## servings on a Big Pot stove while the page's picks (view: one set a serving, as the stove takes them) still hold
+## two, else one. {pots [{stove, queued, servings, big}], servings, sets (the sets used, in order), max (the most pots
+## the stock and the stoves allow, ≥ 1 when it can cook at all), limit ("ingredients" / "room": what stops one more;
+## the ingredients when both)}.
+static func batch_plan(view: Dictionary, p: Dictionary, n: int, current: int, big: Array) -> Dictionary:
+	var picks: Array = p.get("picks", [])
+	var two := doublable(view, p)
+	var run := func(want: int) -> Dictionary:
+		var left := picks.size()
+		var pots: Array = []
+		var spots := batch_spots(view, current, want)
+		var limit := ""
+		for spot in spots:
+			if left < 1:
+				limit = "ingredients"
+				break
+			var on_big: bool = big.has(int(spot.stove))
+			var k := 2 if on_big and two and left >= 2 else 1
+			left -= k
+			pots.append({stove = int(spot.stove), queued = bool(spot.queued), servings = k, big = on_big})
+		if limit == "":
+			if pots.size() < want and spots.size() < want: limit = "ingredients" if left < 1 else "room"
+		return {pots = pots, limit = limit}
+	var all: Dictionary = run.call(99)
+	var plan: Dictionary = run.call(maxi(1, n))
+	var total := 0
+	for pot in plan.pots: total += int(pot.servings)
+	return {pots = plan.pots, servings = total, sets = picks.slice(0, total), max = (all.pots as Array).size(),
+		limit = all.limit}
+
+## The `+` at the stepper's limit (q(200) ⑤): `Ingredients for 2 pots` / `Room for 2 pots`.
+static func batch_limit_toast(plan: Dictionary) -> String:
+	return "%s for %s" % ["Room" if plan.limit == "room" else "Ingredients", count_of(int(plan.max), "pot")]
+
+## The pot card's servings tag (q(201) ②④): once a pot lands on a Big Pot stove, the batch's servings (`2 servings`,
+## `1 serving` when the stock holds one, `4 servings`); "" when none does, or for Legendary and pages not yet known.
+static func servings_tag(view: Dictionary, p: Dictionary, plan: Dictionary) -> String:
+	if not doublable(view, p) or not (plan.pots as Array).any(func(pot): return bool(pot.big)): return ""
+	return count_of(int(plan.servings), "serving")
+
+## A Big Pot pot that cooks one serving for want of a second set: `Only enough for 1 serving` on Cook (q(201) ②).
+static func short_of_two(view: Dictionary, p: Dictionary, plan: Dictionary) -> bool:
+	return doublable(view, p) and (plan.pots as Array).any(func(pot): return bool(pot.big) and int(pot.servings) == 1)
+
+## Which pot of this page today the batch's last pot would be (q(200) ⑥): today's pots out + this page's pots on the
+## stoves and queues + `n`. The stepper says so when `+` crosses into the 2nd and the 3rd.
+static func page_pot_today(view: Dictionary, p: Dictionary, n: int) -> int:
+	var on := 0
+	for i in stove_count(view):
+		var st = stove(view, i)
+		if st is Dictionary and str(st.get("dish", "")) == str(p.get("id", "")): on += 1
+		var q = queued(view, i)
+		if q is Dictionary and str(q.get("dish", "")) == str(p.get("id", "")): on += 1
+	return int(p.get("today", 0)) + on + n
+
+static func nth_today_toast(nth: int) -> String:
+	if nth == 2: return "2nd pot today · half XP"
+	if nth == 3: return "3rd pot today · no XP"
+	return ""
+
+## The pot card's slots for a page's batch (q(200) ④): per ingredient slot the first set's item (a tag slot shows what
+## it picked), ×N = that slot's count over the sets used, `detail` when the sets picked more than one item for it
+## (`Common Carp ×2 · Pond Crucian ×1`), `saved` when one of them is kept for a request or another page (amber outline).
+static func batch_slots(view: Dictionary, p: Dictionary, sets: Array) -> Array:
+	var tokens: Array = p.get("in", [])
+	var per := _slot_items(view, tokens, sets)
+	var saved: Dictionary = p.get("saved", {})
+	var out: Array = []
+	for j in tokens.size():
+		var t := str(tokens[j])
+		var got: Dictionary = per[j]
+		var first := str(got.keys()[0]) if not got.is_empty() else t
+		var total := 0
+		for id in got: total += int(got[id])
+		var detail := " · ".join(PackedStringArray(got.keys().map(func(id): return "%s ×%d" % [_stock_name(view, str(id)), int(got[id])]))) if got.size() > 1 else ""
+		out.append({token = t, item = first, icon = P0Logic.icon(first) if not got.is_empty() else P0Logic.icon(t), total = maxi(total, 1),
+			detail = detail, saved = got.keys().any(func(id): return saved.has(str(id)))})
+	return out
+
+static func _specific(t: String) -> bool: return not (t.length() == 2 and t[1].is_valid_int())
+
+## Per ingredient slot (the page's order), the items the sets put in it: [{item id: count}], a named slot first so a tag
+## never takes the item a named slot needs (as the server picks).
+static func _slot_items(view: Dictionary, tokens: Array, sets: Array) -> Array:
+	var per: Array = []
+	for t in tokens: per.append({})
+	var order := range(tokens.size())
+	order.sort_custom(func(a, b): return _specific(str(tokens[a])) and not _specific(str(tokens[b])))
+	for set in sets:
+		var items: Array = (set as Array).duplicate()
+		for j in order:
+			for k in items.size():
+				if _matches(view, str(tokens[j]), str(items[k])):
+					per[j][str(items[k])] = int(per[j].get(str(items[k]), 0)) + 1
+					items.remove_at(k)
+					break
+	return per
+
+## The Rare / Legendary confirm's title (§7.2, q(200) ⑦; 不知火舞 on 286): `Cook with Sea Bass?` when what really goes in
+## — the page's sets for a batch or a pot, or Experiment's items — holds a Rare or Legendary ingredient (seasonings
+## not counted): the rarest, the first slot's on a tie; "" when none asks.
+static func confirm_title(view_: Dictionary, p: Dictionary, sets: Array, pot := []) -> String:
+	var view := with_rack(view_)
+	var ordered: Array = []
+	if not pot.is_empty(): ordered = pot.duplicate()
+	else:
+		for got in _slot_items(view, p.get("in", []), sets):
+			for id in got: ordered.append(id)
+	var best := ""
+	var top := 2
+	for id in ordered:
+		var info := P0Logic.item(view, str(id))
+		if str(info.get("family", "")) == "S": continue
+		var r := int(info.get("rarity", 1))
+		if r > top:
+			top = r
+			best = str(id)
+	return "Cook with %s?" % _stock_name(view, best) if best != "" else ""
+
+## The toast for a batch that uses kept items (q(200) ④, S11): `Uses Pond Crucian saved for a request`, `Uses Common
+## Carp saved for Herb Grilled Fish`, the first such item and ` · +1 more` for the others; "" when none.
+static func saved_toast(view: Dictionary, p: Dictionary, sets: Array) -> String:
+	var saved: Dictionary = p.get("saved", {})
+	var ids: Array = []
+	for set in sets:
+		for id in set:
+			if saved.has(str(id)) and not ids.has(str(id)): ids.append(str(id))
+	if ids.is_empty(): return ""
+	var why := str(saved[ids[0]])
+	var page := _page(view, why)
+	var line := "Uses %s saved for %s" % [_stock_name(view, ids[0]), "a request" if why == "request" else str(page.get("name", P0Logic.item_name(view, why)))]
+	return line + (" · +%d more" % (ids.size() - 1) if ids.size() > 1 else "")
+
+## Experiment on a Big Pot stove (q(201) ②): `2 servings` when the pot makes a known page (not Legendary) and the stock
+## holds the same items once more, `1 serving` when it does not; "" for an unknown mix or Legendary.
+static func experiment_servings(view_: Dictionary, pot: Array) -> String:
+	var view := with_rack(view_)
+	if pot.is_empty() or not big_pot(view) or not has_main(view, pot): return ""
+	var known := P0Logic.match_known(view, pot)
+	if known.is_empty() or int(known.get("rarity", 1)) >= 4: return ""
+	var have := stock(view)
+	for id in pot:
+		if int(have.get(str(id), 0)) < pot.count(id) * 2: return count_of(1, "serving")
+	return count_of(2, "serving")
+
+## The Big Pot key (q(201) ①, COMPACT/BigPotKey): {shown, on, enabled, toast}. Hidden before Homestead Lv6 and when the
+## card can only say what it needs; greyed (showing on / off) while this stove is not empty or the drawer picks a pot to
+## queue (`Swap pots when the stove is empty`) and on a Legendary dish (`Legendary dishes make 1 serving`).
+static func big_pot_key(view: Dictionary, i: int, on: bool, queue: bool, legendary: bool, can_cook := true) -> Dictionary:
+	if not big_pot(view) or not can_cook: return {shown = false, on = on, enabled = false, toast = ""}
+	if queue or stove(view, i) != null: return {shown = true, on = on, enabled = false, toast = SWAP_WHEN_EMPTY}
+	if legendary: return {shown = true, on = on, enabled = false, toast = LEGENDARY_ONE}
+	return {shown = true, on = on, enabled = true, toast = ""}
+
+## The Rare / Legendary confirm's line for a batch (q(200) ⑦, S12): `Uses Silver Sturgeon ×3 and Rock Salt ×3 for
+## 3 pots.`, `… for 3 pots · 4 servings.` once a pot is a Big Pot's two; the first two items and `+1 more` past them.
+static func batch_confirm_line(view: Dictionary, plan: Dictionary) -> String:
+	var counts := {}
+	for set in plan.sets:
+		for id in set: counts[str(id)] = int(counts.get(str(id), 0)) + 1
+	var parts: Array = counts.keys().map(func(id): return "%s ×%d" % [_stock_name(view, str(id)), int(counts[id])])
+	var items := ""
+	if parts.size() <= 2: items = " and ".join(PackedStringArray(parts))
+	elif parts.size() == 3: items = "%s, %s and %s" % parts
+	else: items = "%s, %s +%d more" % [parts[0], parts[1], parts.size() - 2]
+	var pots := (plan.pots as Array).size()
+	var doubled := (plan.pots as Array).any(func(pot): return int(pot.servings) > 1)
+	return "Uses %s for %s%s." % [items, count_of(pots, "pot"), (" · " + count_of(int(plan.servings), "serving")) if doubled else ""]
+
+## A cook from the recipe card (q(200) / q(201)): one pot is the plain cook (its stove, double when that stove is a Big
+## Pot), more is batch_cook with every Big Pot stove; the server judges each pot's servings.
+static func card_command(p: Dictionary, n: int, current: int, big: Array, several_stoves: bool) -> Dictionary:
+	if n <= 1:
+		var cmd := {"type": "cook", "recipe": str(p.id)}
+		if several_stoves: cmd["stove"] = current
+		if big.has(current): cmd["double"] = true
+		return cmd
+	return {"type": "batch_cook", "recipe": str(p.id), "pots": n, "stove": current, "big": big.duplicate()}
 
 # ---------------------------------------------------------------- Cookbook titles (§7.6.1; 不知火舞 on 282)
 ## Home Cook comes with the P0 reward `cookbook_8` (its +50 Energy); Line Cook 20 / Head Chef 36 / Master Chef 48 count

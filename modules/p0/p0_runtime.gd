@@ -945,7 +945,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
-	if str(cmd.get("type", "")) in ["cook", "cook_all", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
+	if str(cmd.get("type", "")) in ["cook", "batch_cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
