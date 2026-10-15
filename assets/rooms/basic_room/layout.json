@@ -155,47 +155,36 @@
       "colliders": []
     },
     {
-      "name": "hearth",
-      "file": "hearth.glb",
+      "name": "kitchen_range_3",
+      "file": "kitchen_range_3.glb",
       "position": [
         -2.05,
         0.082,
-        -2.57
+        -2.53
       ],
       "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
             0,
-            0.77,
+            0.449,
             0
           ],
           "size": [
-            1.17,
-            1.54,
-            1.0
+            1.35,
+            0.898,
+            0.6
           ]
         }
       ]
     },
     {
-      "name": "kettle",
-      "file": "kettle.glb",
-      "position": [
-        -2.05,
-        1.405,
-        -2.36
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
       "name": "fire",
       "file": "fire.glb",
       "position": [
-        -2.05,
-        0.29,
-        -2.3
+        -2.4725,
+        0.232,
+        -2.535
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -204,7 +193,7 @@
       "name": "sink_cabinet",
       "file": "sink_cabinet.glb",
       "position": [
-        -0.47,
+        -0.33,
         0.082,
         -2.62
       ],
@@ -228,7 +217,7 @@
       "name": "utensil_crock",
       "file": "utensil_crock.glb",
       "position": [
-        -1.11,
+        -0.97,
         1.25,
         -2.7
       ],
@@ -239,7 +228,7 @@
       "name": "wall_shelf",
       "file": "wall_shelf.glb",
       "position": [
-        -0.48,
+        -0.34,
         2.29,
         -2.87
       ],
@@ -250,7 +239,7 @@
       "name": "shelf_plant",
       "file": "shelf_plant.glb",
       "position": [
-        0.17,
+        0.31,
         2.38,
         -2.73
       ],
@@ -372,6 +361,28 @@
       ],
       "yaw_degrees": 0,
       "colliders": []
+    },
+    {
+      "name": "spice_rack",
+      "file": "spice_rack.glb",
+      "position": [
+        -2.83,
+        1.72,
+        -1.575
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "cookbook_wall",
+      "file": "cookbook_wall.glb",
+      "position": [
+        -2.96,
+        2.32,
+        -1.38
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
     }
   ],
   "instances": [
@@ -410,8 +421,8 @@
     1.5
   ],
   "fire_position": [
-    -2.05,
-    0.53,
-    -2.11
+    -2.5,
+    0.48,
+    -2.34
   ]
 }
