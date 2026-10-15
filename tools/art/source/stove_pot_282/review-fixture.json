@@ -1,0 +1,84 @@
+{
+  "farm_dev_commit": "a53e7e0003b9bf70a3410a0928f954c574519592",
+  "anchors": {
+    "basic_room": {
+      "path": "assets/p0/rooms/farmhouse.anchors.json",
+      "sha256": "6db4768a6373798f060b5760b545c2526946d9e9ac849c0ec8ef2109916138a2",
+      "props": [
+        {
+          "name": "spice_rack",
+          "from": "wall_shelf",
+          "position": [
+            -2.83,
+            1.72,
+            -1.575
+          ],
+          "yaw_degrees": 90,
+          "scale": 0.47,
+          "level": 2
+        },
+        {
+          "name": "warming_cabinet",
+          "scene": "res://assets/props/warming_cabinet/warming_cabinet.glb",
+          "specular": 0.28,
+          "position": [
+            -2.85,
+            0.082,
+            -1.69
+          ],
+          "yaw_degrees": 90,
+          "scale": 1,
+          "level": 3,
+          "collider": {
+            "at": [
+              0,
+              0.66,
+              0.25
+            ],
+            "size": [
+              0.56,
+              1.32,
+              0.5
+            ]
+          }
+        }
+      ]
+    },
+    "standard_room_5": {
+      "path": "assets/p0/rooms/farmhouse_standard.anchors.json",
+      "sha256": "268fb2952d70f8a8c28fb2577679d369a58e285501239df68135227d5859e845",
+      "props": [
+        {
+          "name": "warming_cabinet",
+          "scene": "res://assets/props/warming_cabinet/warming_cabinet.glb",
+          "specular": 0.28,
+          "position": [
+            -2.916,
+            0.082,
+            -1.19
+          ],
+          "yaw_degrees": 90,
+          "scale": 1,
+          "level": 3,
+          "collider": {
+            "at": [
+              0,
+              0.66,
+              0.25
+            ],
+            "size": [
+              0.56,
+              1.32,
+              0.5
+            ]
+          }
+        }
+      ]
+    },
+    "deluxe_room_10": {
+      "path": "assets/p0/rooms/farmhouse_deluxe.anchors.json",
+      "sha256": "8cb09a2793df005f2383fce15aef594cacb3125e3c1669403f6eacaacabaca3f",
+      "props": []
+    }
+  }
+}
