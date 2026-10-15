@@ -531,7 +531,7 @@ func _layout_recipe() -> void:
 ## The selected page's batch as the server will cook it (P0KitchenLogic.batch_plan): from this stove, `batch_n` pots,
 ## the Big Pot stoves.
 func batch_plan() -> Dictionary:
-	return P0KitchenLogic.batch_plan(view, page(selected_page), batch_n, stove_index, big_stoves)
+	return P0KitchenLogic.batch_plan(view, page(selected_page), 1 if queue_mode else batch_n, stove_index, big_stoves, queue_mode)
 
 ## What Cook sends: one pot is the plain cook, more is batch_cook (P0KitchenLogic.card_command).
 func card_command() -> Dictionary:

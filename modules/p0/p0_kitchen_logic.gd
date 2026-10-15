@@ -760,6 +760,7 @@ static func count_of(n: int, noun: String) -> String: return "%d%s%s" % [n, NBSP
 const SWAP_WHEN_EMPTY := "Swap pots when the stove is empty"
 const LEGENDARY_ONE := "Legendary dishes make 1" + NBSP + "serving"
 const ONLY_ONE := "Only enough for 1" + NBSP + "serving"
+const BIG_POT_TAG := "Big Pot"   # the pot card's corner on a Big Pot stove that is cooking or holding its dish (S8)
 
 ## Batch Cook is open (Cooking Lv8): the view's batch {room}.
 static func batch_on(view: Dictionary) -> bool: return cooking(view).get("batch", null) is Dictionary
@@ -818,14 +819,15 @@ static func doublable(view: Dictionary, p: Dictionary) -> bool:
 ## servings on a Big Pot stove while the page's picks (view: one set a serving, as the stove takes them) still hold
 ## two, else one. {pots [{stove, queued, servings, big}], servings, sets (the sets used, in order), max (the most pots
 ## the stock and the stoves allow, ≥ 1 when it can cook at all), limit ("ingredients" / "room": what stops one more;
-## the ingredients when both)}.
-static func batch_plan(view: Dictionary, p: Dictionary, n: int, current: int, big: Array) -> Dictionary:
+## the ingredients when both)}. `queue`: picking what to queue (Queue next ›) — one pot, behind this stove's, as the
+## cook command sends it (刘邦 on #433: not wherever batch_spots would put a first pot).
+static func batch_plan(view: Dictionary, p: Dictionary, n: int, current: int, big: Array, queue := false) -> Dictionary:
 	var picks: Array = p.get("picks", [])
 	var two := doublable(view, p)
 	var run := func(want: int) -> Dictionary:
 		var left := picks.size()
 		var pots: Array = []
-		var spots := batch_spots(view, current, want)
+		var spots := [{stove = current, queued = true}] if queue else batch_spots(view, current, want)
 		var limit := ""
 		for spot in spots:
 			if left < 1:

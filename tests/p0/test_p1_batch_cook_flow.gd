@@ -162,6 +162,39 @@ func test_the_big_pot_key_switches_this_stove() -> void:
 	assert_array(sent).is_equal([{"type": "cook", "recipe": "dish_grilled_crucian", "stove": 0, "double": true}])
 	await _close()
 
+## S8: picking what to queue on a Big Pot stove that cooks, the pot card's corner reads `Big Pot`, not a count.
+func test_a_cooking_big_pot_stove_reads_big_pot_on_the_pot_card() -> void:
+	var v := _view()
+	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 5000, "elapsed": 0, "ready_in": 5000, "heats": []}, {}, {}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.big_stoves = [0]
+	k.set("_big_loaded", true)
+	k.open("cookbook", "dish_grilled_crucian")
+	await get_tree().process_frame
+	assert_str((k.get("_pot_card") as UiPotCard).tag).is_equal("Big Pot")
+	await _close()
+
+## Picking what to queue (Queue next ›) on a cooking stove: the grey key's toast is up on screen.
+func test_the_grey_key_toast_shows_while_picking_what_to_queue() -> void:
+	var v := _view()
+	var pot := {"id": 7, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000, "heats": []}
+	v.cooking.stoves = [pot, {}, {}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(pot)
+	await get_tree().process_frame
+	k.open_queue()
+	await get_tree().process_frame
+	assert_str(k.phase).is_equal("compose")
+	k.drawer.select_page("dish_grilled_crucian")
+	k.drawer.dev_big_pot()
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_equal("Swap pots when the stove is empty")
+	await _close()
+
 ## Greyed while this stove is cooking; a tap says so and never flips it.
 func test_the_key_greys_while_the_stove_cooks() -> void:
 	var v := _view()

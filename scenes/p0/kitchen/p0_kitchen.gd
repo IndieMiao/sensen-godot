@@ -412,7 +412,10 @@ func _refresh_overlay() -> void:
 		if not page.is_empty(): result = P0KitchenLogic.page_preview(v, page)
 	_pot_card.set_slots(slots)
 	_pot_card.show_result(result.title, result.rarity, result.time)
-	_pot_card.tag = tag   # q(201): `2 servings` / `1 serving` / a batch's `4 servings` once a pot is on a Big Pot stove
+	# q(201): `2 servings` / `1 serving` / a batch's `4 servings` once a pot is on a Big Pot stove; a Big Pot stove still
+	# cooking or holding its dish (S8 2732:155517: picking what to queue) reads `Big Pot`, not a count.
+	if drawer.is_big() and P0KitchenLogic.big_pot(v) and P0KitchenLogic.stove(v, stove_index) != null: tag = P0KitchenLogic.BIG_POT_TAG
+	_pot_card.tag = tag
 	_pot_card.visible = not slots.is_empty()
 	_place_overlay.call_deferred()
 

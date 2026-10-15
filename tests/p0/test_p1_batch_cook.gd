@@ -61,6 +61,18 @@ func test_a_big_pot_stove_takes_two_servings_while_two_are_left() -> void:
 	legend.rarity = 4
 	assert_array(P0KitchenLogic.batch_plan(_view(), legend, 2, 0, [0]).pots.map(func(p): return p.servings)).is_equal([1, 1])
 
+## Queue next › (刘邦 on #433): the pot goes behind this stove's, as the cook command sends it — not to an empty stove;
+## its servings follow this stove's Big Pot, not another's.
+func test_picking_what_to_queue_plans_one_pot_behind_this_stove() -> void:
+	var v := _view([{"ms": 5000, "ready_in": 3000, "dish": "dish_x"}, null, null])
+	var plan := P0KitchenLogic.batch_plan(v, _crucian(5), 1, 0, [1], true)
+	assert_array(plan.pots.map(func(p): return [p.stove, p.queued, p.servings])).is_equal([[0, true, 1]])
+	assert_str(P0KitchenLogic.servings_tag(v, _crucian(5), plan)).is_equal("")
+	assert_bool(P0KitchenLogic.short_of_two(v, _crucian(5), plan)).is_false()
+	plan = P0KitchenLogic.batch_plan(v, _crucian(5), 1, 0, [0], true)   # this stove is the Big Pot: two
+	assert_array(plan.pots.map(func(p): return p.servings)).is_equal([2])
+	assert_that(P0KitchenLogic.card_command(_crucian(5), 1, 0, [1], true)).is_equal({"type": "cook", "recipe": "dish_grilled_crucian", "stove": 0})
+
 func test_the_pot_card_slots_count_the_batch_and_name_a_mixed_tag_slot() -> void:
 	var page := {"id": "dish_grilled_fish", "known": true, "rarity": 1, "in": ["W1"],
 		"picks": [["fish_crucian"], ["fish_crucian"], ["fish_carp"]], "saved": {"fish_crucian": "dish_grilled_crucian"}}
