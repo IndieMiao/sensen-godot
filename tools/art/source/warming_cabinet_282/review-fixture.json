@@ -1,0 +1,78 @@
+{
+  "farm_dev_commit": "bd8a4802bd54d9ed45bfb02f4cac4a3e9f8933f0",
+  "anchors": {
+    "basic_room": {
+      "path": "assets/p0/rooms/farmhouse.anchors.json",
+      "sha256": "8e9289b1febafea4be0ce191401868bcfe867c223a35f441e986053319d1db2e",
+      "props": [
+        {
+          "name": "spice_rack",
+          "from": "wall_shelf",
+          "position": [
+            -2.83,
+            1.72,
+            -1.575
+          ],
+          "yaw_degrees": 90,
+          "scale": 0.47,
+          "level": 2
+        }
+      ],
+      "old_cabinet": {
+        "name": "warming_cabinet",
+        "scene": "res://assets/props/warming_cabinet_placeholder/kitchen_pantry.glb",
+        "atlas": "res://assets/props/warming_cabinet_placeholder/room_albedo_ao.png",
+        "position": [
+          -2.607,
+          0.082,
+          -1.69
+        ],
+        "yaw_degrees": 90,
+        "scale": 0.6,
+        "level": 3,
+        "collider": {
+          "at": [
+            0,
+            1.1125,
+            0.07
+          ],
+          "size": [
+            0.94,
+            2.225,
+            0.95
+          ]
+        }
+      }
+    },
+    "standard_room_5": {
+      "path": "assets/p0/rooms/farmhouse_standard.anchors.json",
+      "sha256": "c2577833a0143c41c3463a75e625367141e847c346732daff49441299921f2db",
+      "props": [],
+      "old_cabinet": {
+        "name": "warming_cabinet",
+        "scene": "res://assets/props/warming_cabinet_placeholder/kitchen_pantry.glb",
+        "atlas": "res://assets/props/warming_cabinet_placeholder/room_albedo_ao.png",
+        "position": [
+          -2.675,
+          0.082,
+          -1.19
+        ],
+        "yaw_degrees": 90,
+        "scale": 0.6,
+        "level": 3,
+        "collider": {
+          "at": [
+            0,
+            1.1125,
+            0.07
+          ],
+          "size": [
+            0.94,
+            2.225,
+            0.95
+          ]
+        }
+      }
+    }
+  }
+}
