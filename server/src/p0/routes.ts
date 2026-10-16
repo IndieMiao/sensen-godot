@@ -10,14 +10,18 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
+import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus } from './home_city.js';
 import type { IpNear } from './ip_city.js';
+import type { OutpostRooms } from './online/rooms.js';
+import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
-/** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
-export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number; log?: P0EventLog;
+/** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
+ * log: the observation log (S7). */
+export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean;
+  rooms?: Pick<OutpostRooms, 'presence' | 'occupant'>; log?: P0EventLog;
   /** The address → nearest open home city for the home pick's `Near you` (ip_city.ts); none: no guess. */
   ipNear?: IpNear }
 
@@ -37,7 +41,20 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   const stateOf = (player: string, headers: Record<string, unknown>) =>
     store.get(player, deps.now(), { pending: features(headers).includes('choose_home') });
   const clock = (offset: number) => deps.now() + offset;
-  const view = (st: P0State, at: number) => viewOf(c, st, at, { online: deps.presence ? deps.presence() : null });
+  /** q(206): the people in the outpost rooms of the town the player is in (its pins' counts summed, a Mine Hut's too); the
+   * player counts once they have walked into one of its outposts, though the room has not seen them yet (the state read
+   * comes before the WebSocket join). Null when the rooms are not known. */
+  const townOnline = (st: P0State): number | null => {
+    if (!deps.rooms) return null;
+    const here = st.travel.here;
+    let n = 0;
+    for (const [id, p] of Object.entries(deps.rooms.presence())) if (clusterOf(c, id) === here) n += p.online;
+    const entered = st.presence.entered;
+    // an outpost of this town, not a pond (presence.entered keeps either; 周瑜 on #448)
+    if (!deps.rooms.occupant(st.player) && entered && !placeOf(c, entered) && clusterOf(c, entered) === here) n += 1;
+    return n;
+  };
+  const view = (st: P0State, at: number) => viewOf(c, st, at, { online: townOnline(st) });
 
   app.get('/v1/p0/state', async (req, reply) => {
     const player = playerOf(req.headers);
