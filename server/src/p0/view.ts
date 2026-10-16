@@ -26,7 +26,7 @@ import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, hasConvenience, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
-import { cityRegion, homeView } from './home_city.js';
+import { cityRegion, homeView, residentPlace } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
 import { homeOf } from './travel.js';
@@ -466,6 +466,7 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     : i < stages.findIndex(([n]) => n === c.affinity.gift_meal_stage) ? 'none'
     : 'ready';
   return {
+    place: residentPlace(c, s, id),   // where this player finds them (home_city.residentPlace): the Today `Show on map`
     affinity: r.affinity, stage: stages[i][0], stage_from: stages[i][1],
     next_stage: stages[i + 1]?.[0] ?? null, next_at: stages[i + 1]?.[1] ?? null,
     chatted_today: r.chat_day === s.day.key, gift_today: r.gift_day === s.day.key,

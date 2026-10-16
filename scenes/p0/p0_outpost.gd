@@ -112,6 +112,32 @@ func p0_space() -> String: return "outpost"
 ## Which outpost, for the server (蒙恬's map markers, SGODOT-232 U6): entering it marks its ◆ new goods as seen.
 func p0_place() -> String: return str(outpost.get("id", ""))
 
+## Today's Show for a request handed in here (`outpost:<this id>`, q(204) ⑨: Ivo's in his Mine Hut): the camera goes to
+## the resident whose request is taken, else the room's first resident; other targets as any room's.
+func p0_has_spot(where: String) -> bool:
+	return resident_spot(where) != "" or super.p0_has_spot(where)
+
+func p0_show_spot(where: String) -> void:
+	var n := resident_spot(where)
+	if n == "":
+		super.p0_show_spot(where)
+		return
+	var m := anchor(n)
+	_focus = Vector3(m.global_position.x, floor_y, m.global_position.z)
+	_follow.hold()
+
+## The npc_ anchor Today's `outpost:<this id>` points at: the resident here with a taken request, else the first one.
+func resident_spot(where: String) -> String:
+	if where != "outpost:" + p0_place(): return ""
+	var view: Dictionary = rt.session.view if rt != null and rt.session != null else {}
+	var first := ""
+	for n in npcs:
+		if n == "npc_keeper" or anchor(n) == null: continue
+		if first == "": first = n
+		var rv = view.get("residents", {}).get(str(npcs[n].id), {})
+		if rv is Dictionary and str(rv.get("request_state", "")) == "accepted": return n
+	return first
+
 ## Other players stand on the floor, or on their seat (room metres; the crowd lives in the room node).
 func _crowd_height(id: int) -> float:
 	var s := online.seat_of(id) if online else ""
@@ -297,15 +323,20 @@ const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
 
 ## The opening shot shows the keeper whole, the name tag over their head included, and the counter (不知火舞 on 227,
 ## int12-pre: Ama stood off the tea house's opening shot). The tag counts at its highlighted height and a long name's
-## half width either side, so `Ama` / `Sigrid` stay whole on screen.
+## half width either side, so `Ama` / `Sigrid` stay whole on screen. A room with no keeper (the Mine Hut, q(204)) opens
+## on its resident the same way: the player and Ivo with his name tag, which keeps the shaft and the steps in view too
+## (不知火舞 / 上官婉儿 on 308: the opening shot on the player alone cut the shaft and put Ivo on the edge).
 const OPENING_TAG_HALF_PX := 40.0
 func opening_subjects() -> Array:
-	if not npcs.has("npc_keeper"): return []
+	var host := "npc_keeper" if npcs.has("npc_keeper") else ""
+	if host == "":
+		for n in npcs: if host == "": host = n   # no keeper: the room's first resident
+	if host == "": return []
 	var forward := -_cam_dir
 	var right := forward.cross(Vector3.UP).normalized()
 	var up := right.cross(forward).normalized()
 	var m := cam.size / maxf(_view().x, 1.0)
-	var root := npcs.npc_keeper.root as Node3D
+	var root := npcs[host].root as Node3D
 	var tag := root.to_global(NAME_OVER_HEAD) + up * COUNTER_TAG_PX * m
 	var keeper := [root.global_position, tag - right * OPENING_TAG_HALF_PX * m, tag + right * OPENING_TAG_HALF_PX * m]
 	var counter := []

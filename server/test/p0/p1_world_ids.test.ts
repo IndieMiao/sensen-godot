@@ -32,7 +32,8 @@ interface Snapshot { _note: string; revision: number; cities: number; places: nu
 function identity(cl: CityCluster): string[] {
   const d = generateCity(c, cl).detail;
   return [...d.ponds.map(p => `${p.id}|pond|${p.name}|${p.site}`),
-    ...d.outposts.map(o => `${o.id}|${o.cabin ? 'cabin' : o.role}|${o.name}|${o.nearest?.name ?? ''}`)].sort();
+    ...d.outposts.map(o => `${o.id}|${o.cabin ? 'cabin' : o.role}|${o.name}|${o.nearest?.name ?? ''}`),
+    ...d.huts.map(h => `${h.id}|${h.role}|${h.name}|`)].sort();   // q(204): the Mine Huts (Denver's Golden Mine Hut)
 }
 const hashOf = (lines: string[]) => createHash('sha256').update(lines.join('\n')).digest('hex').slice(0, 16);
 

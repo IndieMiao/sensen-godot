@@ -36,11 +36,17 @@ export interface GenOutpost {
   keeper: { role: string; name: string; look: string }; residents: string[];
   art: string; anchors: string; capacity: number; nearest?: { name: string; site: Site }; cabin?: true;
 }
+/** q(204): a Mine Hut — not an outpost (no keeper, no counter, outside outpost counts), sent as detail.huts so a
+ * client that does not know it never draws it as an outpost. Ivo lives there alone. */
+export interface GenHut {
+  id: string; role: 'mine_hut'; name: string; lat: number; lng: number; category: string;
+  keeper: null; residents: string[]; art: string; anchors: string; capacity: number;
+}
 export interface CityPlaces {
   cluster: string; tier: Tier; climate: Climate;
   ponds: string[]; outposts: string[]; residents: number;
   fish: { fish: string; level: number }[];
-  detail: { ponds: GenPond[]; outposts: GenOutpost[] };
+  detail: { ponds: GenPond[]; outposts: GenOutpost[]; huts: GenHut[] };
 }
 
 interface TierRow { tier: Tier; pop_max: number | null; tea?: number; tackle_max?: number; market?: number; travel?: number; trading_post?: number }
@@ -49,7 +55,7 @@ export interface WorldContent {
   tiers: TierRow[];
   placement: { market_1: { from_centre_km: [number, number]; beginner_pond_max_m: number }; travel_1: { from_centre_max_km: number };
     tea: { min_apart_km: number }; tackle: { shore_max_m: number }; market_n: { from_market_1_min_km: number };
-    same_kind_min_km: number; other_kind_min_m: number };
+    same_kind_min_km: number; other_kind_min_m: number; hut?: HutRule };
   rooms: { indoor_cap: number; market_cap: number };
   tea_words: Record<string, string[]>;
   keeper_names: Record<string, string[]>;
@@ -58,11 +64,17 @@ export interface WorldContent {
   coastal: Record<string, string[]>;
   /** q(114) ⑤: hand fixes by place id (`_note` aside), see applyOverrides. */
   overrides?: Record<string, PlaceFix | string>;
-  room: Record<Role | 'cabin', { art: string; anchors: string; category: string }>;
+  room: Record<Role | 'cabin', RoomDef> & { mine_hut?: RoomDef };
   keeper_roles: Record<Role, string>;
   keeper_looks?: Record<string, Record<string, string>>;
   residents?: ResidentRules;
 }
+
+export interface RoomDef { art: string; anchors: string; category: string; client_anchors?: string;
+  /** A room no hand-written outpost stands in for (the Mine Hut): its own walls and seats for the online room. */
+  bounds?: [number, number, number, number]; seats?: string[] }
+/** q(204) ①②: which cities have a Mine Hut (a city trait, a lowest tier) and its default ring. */
+export interface HutRule { needs: string; tier_min: Tier; ring_km: number }
 
 /** A hand fix to one generated place: a point on land for a pin that fell in the water, a rename before the freeze. */
 export interface PlaceFix { lat?: number; lng?: number; name?: string; why?: string }
@@ -316,6 +328,41 @@ export function genOutposts(w: WorldContent, cl: CityCluster, tier: Tier, ponds:
 }
 
 /**
+ * q(204) ②: the Mine Hut, placed after every other place so none of them moves — on the ring_km ring at the
+ * cluster's own bearing, turning round it (then widening it) until it stands ≥ 300 m from every outpost and pond
+ * (q(144)). Only a city with the rule's trait (highland) at its lowest tier or above has one, and only once
+ * world.room has the room. A city where no point on those rings fits gets none, rather than a hut that breaks the
+ * rules (周瑜 on #442). Named later, at its final point (nameHuts), so a hand fix moves its name with it.
+ */
+export function genHuts(w: WorldContent, cl: CityCluster, tier: Tier, ponds: GenPond[], outposts: GenOutpost[]): GenHut[] {
+  const rule = w.placement.hut, room = w.room.mine_hut;
+  if (!rule || !room || !(w.coastal[cl.id] ?? []).includes(rule.needs) || TIERS.indexOf(tier) < TIERS.indexOf(rule.tier_min)) return [];
+  const otherKm = w.placement.other_kind_min_m / 1000, deg = unit(w.seed, cl.id, 'hut0') * 360;
+  const fits = (p: { lat: number; lng: number }) => [...outposts, ...ponds].every(o => km(o, p) >= otherKm);
+  let at: { lat: number; lng: number } | null = null;
+  search: for (let r = rule.ring_km; r <= rule.ring_km + 6; r += 1.5) {
+    for (let k = 0; k < 24; k++) {
+      const p = offset(cl.lat, cl.lng, r, deg + k * 15);
+      if (fits(p)) { at = p; break search; }
+    }
+  }
+  if (!at) return [];
+  return [{ id: `${cl.id}~hut0`, role: 'mine_hut', name: '', ...at, category: room.category, keeper: null, residents: [],
+    art: room.art, anchors: room.anchors, capacity: w.rooms.indoor_cap }];
+}
+
+/** q(204) ③: `<place> Mine Hut` by the outposts' naming rule (q(32)), at the hut's final point, after every other
+ * place has its name (so it never takes one of theirs). */
+export function nameHuts(w: WorldContent, cl: CityCluster, outposts: GenOutpost[], huts: GenHut[]): void {
+  const used = new Set(outposts.map(o => o.name));
+  for (const h of huts) {
+    const fix = w.overrides?.[h.id];
+    if (fix && typeof fix === 'object' && fix.name) continue;   // a hand-given name stands (applyOverrides set it)
+    h.name = named(w, cl, used, 'Mine Hut', `hut-word:${h.id}`, h);
+  }
+}
+
+/**
  * Keeper name plates (§9.3.2): from the climate's pool, never twice in a city, never a resident's name. A city with
  * more counters than its pool borrows from the next climate band (the plan's pools hold 8; L2 / L3 need up to 17 —
  * flagged to 李白). Looks: `<role>_<climate>_<0..2>`, one of three per role and climate by the outpost's hash.
@@ -352,10 +399,12 @@ export const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldConten
  * (M and up); then the rank list in order — a resident whose city traits (world.coastal: coast / river / highland) or
  * tier the city lacks is skipped — each to the outpost of their trade, never more than per_outpost residents in one
  * outpost, never more fixed residents than outposts in the city. S tier: the trading post holds Pip and the first
- * eligible of s_order. Ivo's Mine Hut is not built yet (he waits for it); Lena takes the tea house nearest the sea
- * (the plan's M-tier rule) until a Lighthouse Room exists.
+ * eligible of s_order. A resident whose home is a room of its own (Ivo's Mine Hut, `at: mine_hut`) lives there alone,
+ * outside the outposts' slots and the fixed-resident cap (q(204) ④), and nowhere while world.room lacks the room
+ * (q(193)); Lena takes the tea house nearest the sea (the plan's M-tier rule) until a Lighthouse Room exists.
  */
-export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, ponds: GenPond[], outposts: GenOutpost[], known: Set<string>): void {
+export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, ponds: GenPond[], outposts: GenOutpost[], known: Set<string>,
+  huts: GenHut[] = []): void {
   const rules = w.residents;
   if (!rules) return;
   const traits = new Set(w.coastal[cl.id] ?? []);
@@ -396,6 +445,10 @@ export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, pon
     if (!ok(r) || placed().has(r.id) || !r.at) continue;
     put(where(r.at), r.id);
   }
+  for (const h of huts) {
+    const r = rules.rank.find(x => x.at === h.role && ok(x));
+    if (r && !placed().has(r.id)) h.residents = [r.id];
+  }
 }
 
 /** server/data/world_water.json (tools/world_water_batch.ts, q(126)): id → [lat, lng, generated lat, generated lng,
@@ -416,12 +469,12 @@ export function waterTable(): WaterTable | null {
  * is an error (its points are another world's), never quietly used. An entry whose generated point is not this
  * generator's point is skipped (p1_world_gen.test.ts fails on any such entry: rerun the batch after a placement change).
  */
-export function applyWater(w: WorldContent, ponds: GenPond[], outposts: GenOutpost[], table = waterTable()): void {
+export function applyWater(w: WorldContent, ponds: GenPond[], outposts: GenOutpost[], table = waterTable(), huts: GenHut[] = []): void {
   if (!table) return;
   if (table.seed !== w.seed || table.revision !== w.revision) {
     throw new Error(`server/data/world_water.json is for seed ${table.seed} revision ${table.revision}, the world is ${w.seed} revision ${w.revision}: rerun tools/world_water_batch.ts`);
   }
-  for (const p of [...ponds, ...outposts]) {
+  for (const p of [...ponds, ...outposts, ...huts]) {
     const f = table.fixes[p.id];
     if (!f || Math.abs(p.lat - f[2]) > 1e-6 || Math.abs(p.lng - f[3]) > 1e-6) continue;
     p.lat = f[0]; p.lng = f[1];
@@ -434,7 +487,7 @@ export function applyWater(w: WorldContent, ponds: GenPond[], outposts: GenOutpo
  * data offline: a pin seen standing in the sea or a lake on the acceptance cities is given a point on land by hand,
  * and the table is re-checked as a whole once water data arrives. A renamed pond keeps its tackle shop pointing at it.
  */
-export function applyOverrides(w: WorldContent, ponds: GenPond[], outposts: GenOutpost[]): void {
+export function applyOverrides(w: WorldContent, ponds: GenPond[], outposts: GenOutpost[], huts: GenHut[] = []): void {
   const fixes = w.overrides;
   if (!fixes) return;
   const fixOf = (id: string) => { const f = fixes[id]; return f && typeof f === 'object' ? f : null; };
@@ -450,7 +503,7 @@ export function applyOverrides(w: WorldContent, ponds: GenPond[], outposts: GenO
       p.name = f.name;
     }
   }
-  for (const o of outposts) {
+  for (const o of [...outposts, ...huts]) {
     const f = fixOf(o.id);
     if (!f) continue;
     move(o, f);
@@ -465,17 +518,30 @@ export function generateCity(c: P0Content, cl: CityCluster, opts: { water?: bool
   const tier = tierOf(w, cl);
   const ponds = genPonds(w, cl, new Set(Object.keys(c.fishing.sites)));
   const outposts = genOutposts(w, cl, tier, ponds);
+  const huts = genHuts(w, cl, tier, ponds, outposts);
   nameKeepers(w, cl, outposts);
-  placeResidents(w, cl, tier, ponds, outposts, new Set(Object.keys((c as P0Content & { residents?: Record<string, unknown> }).residents ?? {})));
-  if (opts.water !== false) applyWater(w, ponds, outposts);
-  applyOverrides(w, ponds, outposts);
+  placeResidents(w, cl, tier, ponds, outposts, new Set(Object.keys((c as P0Content & { residents?: Record<string, unknown> }).residents ?? {})), huts);
+  if (opts.water !== false) applyWater(w, ponds, outposts, undefined, huts);
+  applyOverrides(w, ponds, outposts, huts);
+  nameHuts(w, cl, outposts, huts);   // q(204) ③: at the final point, after the water table and the hand fixes
   return {
     cluster: cl.id, tier, climate: cl.climate,
     ponds: ponds.map(p => p.id), outposts: outposts.map(o => o.id),
-    residents: new Set(outposts.flatMap(o => o.residents)).size,
+    residents: new Set([...outposts, ...huts].flatMap(o => o.residents)).size,   // the city card counts Ivo; outposts do not count the hut
     fish: regionalFish(c, cl),
-    detail: { ponds, outposts },
+    detail: { ponds, outposts, huts },
   };
+}
+
+/** A generated outpost or Mine Hut by id, for its online room (p0_server, online/outposts.ts generatedOutpostSpec): a
+ * hut carries its room's own walls and seats (world.room.mine_hut), there being no hand-written room for its art. */
+export function roomPlace(c: P0Content, id: string): { role: string; art: string; capacity: number; bounds?: [number, number, number, number]; seats?: string[] } | undefined {
+  const cut = id.indexOf('~');
+  const city = cut > 0 ? cityPlaces(c, id.slice(0, cut)) : null;
+  const outpost = city?.detail.outposts.find(o => o.id === id);
+  if (outpost) return outpost;
+  const hut = city?.detail.huts.find(h => h.id === id), room = worldOf(c)?.room.mine_hut;
+  return hut && room?.bounds ? { ...hut, bounds: room.bounds, seats: room.seats ?? [] } : undefined;
 }
 
 /** The most recent CACHE_MAX cities, newest last: 12,490 clusters stay out of memory (256 MB container). */

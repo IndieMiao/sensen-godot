@@ -22,7 +22,7 @@ import { CityClusters } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
 import { writtenCluster } from '../src/p0/travel.js';
 import { generateCity, type WaterTable, type WorldContent } from '../src/p0/world.js';
-import { fixCity, ruleOk, stats, type Move, type Place } from './world_water_lib.js';
+import { fixCity, placesOf, ruleOk, stats, type Move, type Place } from './world_water_lib.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const args = process.argv.slice(2);
@@ -67,8 +67,7 @@ if (args[0] === 'run') {
     let line: Line;
     try {
       const city = generateCity(c, cl, { water: false });
-      const places: Place[] = [...city.detail.ponds.map(p => ({ ...p, kind: 'pond' as const, fixed: fixed.has(p.id) })),
-        ...city.detail.outposts.map(o => ({ ...o, kind: 'outpost' as const, fixed: fixed.has(o.id) }))];
+      const places: Place[] = placesOf(city, fixed);
       const r = await fixCity(cl, places, searchM);
       line = { ...r, name: cl.name, tier: city.tier };
     } catch (e) {
@@ -146,8 +145,7 @@ function keepRules(cluster: string, moves: Move[]): Move[] {
   const cl = clusters.byId.get(cluster)!;
   const fixed = new Set(Object.keys(w.overrides ?? {}).filter(k => !k.startsWith('_')));
   const city = generateCity(c, cl, { water: false });
-  const base: Place[] = [...city.detail.ponds.map(p => ({ ...p, kind: 'pond' as const, fixed: fixed.has(p.id) })),
-    ...city.detail.outposts.map(o => ({ ...o, kind: 'outpost' as const, fixed: fixed.has(o.id) }))];
+  const base: Place[] = placesOf(city, fixed);
   let kept = [...moves];
   for (let round = 0; round < 20; round++) {
     const places = base.map(p => { const m = kept.find(x => x.id === p.id); return m ? { ...p, lat: m.to[0], lng: m.to[1] } : { ...p }; });

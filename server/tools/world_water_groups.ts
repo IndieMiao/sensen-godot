@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs';
 import { CityClusters, type CityCluster } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
 import { generateCity, km } from '../src/p0/world.js';
-import { MIN_POND_M, around, dryM, need, ruleOk, waterMap, type Place, type WaterMap } from './world_water_lib.js';
+import { MIN_POND_M, around, dryM, need, placesOf, ruleOk, waterMap, type Place, type WaterMap } from './world_water_lib.js';
 
 const c = loadP0Content();
 const clusters = CityClusters.load();   // every cluster, a closed country's too (q(189))
@@ -50,7 +50,7 @@ function spotFor(cl: CityCluster, map: WaterMap, places: Place[], o: Place, from
 async function fixGroups(cl: CityCluster, searchM: number) {
   avoid = avoidAll[cl.id] ?? [];
   const city = generateCity(c, cl);   // as served: water table and hand fixes laid over
-  const places: Place[] = [...city.detail.ponds.map(p => ({ ...p, kind: 'pond' as const })), ...city.detail.outposts.map(o => ({ ...o, kind: 'outpost' as const }))];
+  const places: Place[] = placesOf(city);
   const lats = places.map(p => p.lat), lngs = places.map(p => p.lng), pad = (searchM + 1500) / 111_320;
   const padLng = pad / Math.cos((cl.lat * Math.PI) / 180);
   const map = await waterMap(Math.min(...lats) - pad, Math.min(...lngs) - padLng, Math.max(...lats) + pad, Math.max(...lngs) + padLng);

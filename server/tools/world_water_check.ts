@@ -8,7 +8,7 @@
 import { CityClusters, type CityCluster } from '../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../src/p0/content.js';
 import { generateCity } from '../src/p0/world.js';
-import { fixCity, type Place } from './world_water_lib.js';
+import { fixCity, placesOf, type Place } from './world_water_lib.js';
 
 const c = loadP0Content();
 const clusters = CityClusters.load();   // every cluster, a closed country's too (q(189))
@@ -19,7 +19,7 @@ for (const id of process.argv.slice(2).filter(a => !a.startsWith('--'))) {
   if (!cl) { out.push({ cluster: id, error: 'no such cluster' }); continue; }
   try {
     const city = generateCity(c, cl, { water: !raw });
-    const places: Place[] = [...city.detail.ponds.map(p => ({ ...p, kind: 'pond' as const })), ...city.detail.outposts.map(o => ({ ...o, kind: 'outpost' as const }))];
+    const places: Place[] = placesOf(city);
     out.push({ name: cl.name, tier: city.tier, ...(await fixCity(cl, places)) });
   } catch (e) { out.push({ cluster: id, error: String(e) }); }
 }

@@ -14,7 +14,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { GeoTIFF, type GeoTIFFImage } from 'geotiff';
 import type { CityCluster } from '../src/p0/clusters.js';
-import { km, offset, type GenOutpost, type GenPond } from '../src/p0/world.js';
+import { km, offset, type CityPlaces, type GenOutpost, type GenPond } from '../src/p0/world.js';
 
 const run = promisify(execFile);
 const BASE = 'https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/';
@@ -189,6 +189,15 @@ export const dryM = (m: WaterMap, p: { lat: number; lng: number }) => {
 
 export type Place = (GenPond & { kind: 'pond'; fixed?: boolean }) | (GenOutpost & { kind: 'outpost'; fixed?: boolean });
 export const need = (p: Place) => (p.kind === 'pond' ? MIN_POND_M : MIN_DRY_M);
+
+/** A generated city's places for the water tools: its ponds, outposts and Mine Huts (q(204): a hut keeps the outposts'
+ * rules — 60 m from water, 300 m from every other place — and has no kind of its own to keep 3 km from). `fixed`: ids
+ * with a hand fix (world.overrides), which the batch never moves. */
+export function placesOf(city: CityPlaces, fixed: Set<string> = new Set()): Place[] {
+  return [...city.detail.ponds.map(p => ({ ...p, kind: 'pond' as const, fixed: fixed.has(p.id) })),
+    ...city.detail.outposts.map(o => ({ ...o, kind: 'outpost' as const, fixed: fixed.has(o.id) })),
+    ...city.detail.huts.map(h => ({ ...(h as unknown as GenOutpost), kind: 'outpost' as const, fixed: fixed.has(h.id) }))];
+}
 
 /** The §9.3.2 / §6.3.3 rules (as p1_world_gen.test.ts checks them) for one place at `at`, against the others now. */
 export function ruleOk(cl: CityCluster, places: Place[], me: Place, at: { lat: number; lng: number }): boolean {

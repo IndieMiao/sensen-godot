@@ -4,7 +4,7 @@
  */
 
 /** Outpost roles, the same ids as the counter entries (open_keeper_greeting(role), SGODOT-224). */
-export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market';
+export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market' | 'mine_hut';
 export interface OutpostSpec {
   id: string;
   role: OutpostRole;

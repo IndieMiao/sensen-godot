@@ -5,7 +5,7 @@ extends RefCounted
 ## title, at} from then on). Here:
 ##   card       the arrival's RewardMoment Milestone: `Kindred · Pip`, the resident's stamp, `Postcard from Pip`, the
 ##              strip `New title · Pip's Best Friend` (a heart before it), no pills.
-##   postcards  the Passport's Postcards page: `Postcards · 3/10` and a cell per resident in the residents table's order
+##   postcards  the Passport's Postcards page: `Postcards · 3/11` and a cell per resident in the residents table's order
 ##              (not by when it came) — earned: the stamp, the name, the Kindred line in quotes; not yet: a grey
 ##              silhouette and `Kindred · ?`.
 ## Pure and static. Preloaded, no class_name (a new global class needs an editor import).
@@ -28,8 +28,8 @@ static func card(_view: Dictionary, ev: Dictionary) -> Dictionary:
 ## The residents this world has a home for (q(193) ④: open = a place in world_gen's placement rules, or a hand-written
 ## outpost), in the residents table's order, derived, never a written number. A resident's rank entry is where they
 ## live and counts once its room is built (its `at` a room of world.room: Ivo's mine_hut is not yet, q(193) ②); the
-## S-tier s_order counts for those without one (Granny Wu). Mira, whose weekly route is P2, is in none: 10 in P1 —
-## 11 once the Mine Hut is in, 12 with her.
+## S-tier s_order counts for those without one (Granny Wu). Mira, whose weekly route is P2, is in none: 11 with the
+## Mine Hut live (q(204)), 12 with her.
 static func open_residents() -> Array:
 	var world: Dictionary = P0Logic.content().get("world", {})
 	var rules: Dictionary = world.get("residents", {})
@@ -46,7 +46,7 @@ static func open_residents() -> Array:
 		for id in o.get("residents", []): homed[str(id)] = true
 	return P0Logic.content().get("residents", {}).keys().filter(func(id): return homed.has(str(id)))
 
-## The Postcards page: {count: `Postcards · 3/10`, cells: [{id, name, text, earned}]} — every open resident (q(193) ④)
+## The Postcards page: {count: `Postcards · 3/11`, cells: [{id, name, text, earned}]} — every open resident (q(193) ④)
 ## in the table's order, the denominator how many they are; the others are not on it, no gap left. A postcard the
 ## player holds is always on it, even one whose resident this list leaves out (周瑜 on #400: never hide a reward the
 ## server gave). An earned cell's text is its Kindred line (the view's, as the server gave it), uncut; an unearned one

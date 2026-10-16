@@ -108,6 +108,9 @@ var near_resident := Callable()
 ## Where the player is (the session's space: home = the farm and the farmhouse, pond, outpost, mine, map); set by
 ## the runtime on every attach. "" without a runtime (tests, the gallery): space_here() then goes by the surface.
 var space := ""
+## The place the player is in there (the session's place: a pond or an outpost id), so a target at that very place reads
+## Show (show_label); "" elsewhere.
+var place := ""
 var _hud_hash := 0       # last state given to hud.apply
 var _today_key = null    # the Today icon's focus row (P0Logic.today_chip_key); null before the first view
 var _dot_keys = null     # the Today rows' red-dot keys last seen (P0Logic.today_dots); null before the first view
@@ -2067,7 +2070,7 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
 		&"bag_room":   # BAG-5: Bag Upgrade I is a homestead matter; Show the house (or the homestead on the map)
 			close_modal()
-			if show_label("home", space_here(), spot_reachable()) == "Show": show_spot.emit("home")
+			if show_label("home", space_here(), spot_reachable(), place) == "Show": show_spot.emit("home")
 			else: show_on_map.emit("home")
 		&"eat":
 			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
@@ -2366,7 +2369,7 @@ func open_energy_card(need: int, verb: String) -> void:
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
-		elif show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+		elif show_label(go, space_here(), spot_reachable(), place) == "Show": show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))   # Tea's outpost, or home from the pond
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -2486,7 +2489,7 @@ func open_today(given: Array = []) -> void:
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
-		d.action = show_label(str(r.go), space_here(), spot_reachable())
+		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
 		d.tap = str(r.get("gate", "")) != ""   # a fish the player cannot land yet: the row opens its gate card (q(104))
 		return d)
 	var panel := UiTodayPanel.new(shown)
@@ -2495,7 +2498,7 @@ func open_today(given: Array = []) -> void:
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
 		var go := str(rows[i].go)
-		if show_label(go, space_here(), spot_reachable()) == "Show":
+		if show_label(go, space_here(), spot_reachable(), place) == "Show":
 			# Only a row that asks to cook a page (Cook it: …, Cook: … · new recipe) names one, and only while the stove is
 			# free: a pot cooking or a dish waiting there is watched or collected, the drawer does not open, and the page
 			# would wait for a later tap and skip its Cook Again (刘邦 / 奕星 on #170).
@@ -2513,11 +2516,14 @@ func open_today(given: Array = []) -> void:
 
 ## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
 ## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,
-## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button.
+## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
+## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
+## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
 const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
 
-static func show_label(go: String, here: String, camera_here: bool) -> String:
+static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
+	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
@@ -3421,7 +3427,7 @@ func _gate_guide(go: String, again := Callable()) -> void:
 			open_skills(again)
 		"plots", "stall", "stove", "board", "home", "bench":
 			close_modal()
-			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+			if show_label(go, space_here(), spot_reachable(), place) == "Show": show_spot.emit(go)
 			else: show_on_map.emit(map_target(go))
 		_: request_panel(go)
 

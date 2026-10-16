@@ -40,7 +40,7 @@ static func open(ui: P0Ui, role: String, id: String) -> void:
 		col.add_child(UiItemRow.new({icon = P0Logic.icon("clock"), title = "Next request", effect = str(d.next.slot)}))
 		col.add_child(UiFactRow.new("Available in", str(d.next.within)))
 	var go := str(d.go)
-	var show := P0Ui.show_label(go, ui.space_here(), ui.spot_reachable())
+	var show := P0Ui.show_label(go, ui.space_here(), ui.spot_reachable(), ui.place)
 	if show != "":
 		_nav(col, show, func():
 			ui.close_modal()

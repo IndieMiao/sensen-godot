@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
 import { generatedOutpostSpec, loadOutposts } from '../src/p0/online/outposts.js';
-import { cityPlaces } from '../src/p0/world.js';
+import { roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
@@ -55,10 +55,7 @@ const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
 // give the Tea Host's "N online" in the state view (SGODOT-228).
 // Generated outposts (SGODOT-280) get a room on first join, sized and walled like the room their art stands in for.
 const outpostTable = loadOutposts();
-const generatedRoom = generatedOutpostSpec(outpostTable, id => {
-  const cut = id.indexOf('~');
-  return cityPlaces(content, id.slice(0, cut))?.detail.outposts.find(o => o.id === id);
-});
+const generatedRoom = generatedOutpostSpec(outpostTable, id => roomPlace(content, id));
 const rooms = new OutpostRooms(outpostTable, Date.now, generatedRoom);
 // q(188) ① `Near you`: the address table made from DB-IP City Lite at image build (tools/ip_near_table.ts); none, no guess.
 let ipNear: IpNear | undefined;

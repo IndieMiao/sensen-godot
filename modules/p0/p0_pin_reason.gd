@@ -148,7 +148,7 @@ static func taken(view: Dictionary) -> Array:
 			if str(d.get("id", "")) == str(r.id): def = d
 		var need: Dictionary = def.get("need", {})
 		out.append(r.merged({"kind": str(q.get("kind", need.get("kind", ""))), "items": [str(r.item)] if str(r.item) != "" else [],
-			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + _resident_role(str(rid)),
+			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + resident_place(rv, str(rid)),
 			"accepted_at": accepted_at(q)}))
 	return out
 
@@ -157,6 +157,14 @@ static func taken(view: Dictionary) -> Array:
 static func accepted_at(r: Dictionary) -> float:
 	var at = r.get("accepted_at", null)
 	return float(at) if at != null else 0.0
+
+## Where a resident's request is handed in, for Show on map: the place id the server gives as the resident's `place`
+## (q(204), 后裔: home's outpost they live at, Pip's travel post, Ivo's Mine Hut in his own city — `gn-5419384~hut0`);
+## an older server without it, or none found, the role of the home set's outpost they live at, as before.
+static func resident_place(rv: Dictionary, rid: String) -> String:
+	var place = rv.get("place", null)
+	if place is String and place != "": return place
+	return _resident_role(rid)
 
 ## The role of the outpost a resident lives at (p0_outposts.json residents): Old Kai at the Tackle Shop, Pip at the post.
 static func _resident_role(rid: String) -> String:
