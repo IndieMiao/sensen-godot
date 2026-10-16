@@ -304,9 +304,11 @@ const row = (c: P0Content, id: string): HomeCityRow | null => {
 export function homeCities(c: P0Content, query = '', limit = 20): { open: HomeCityRow[]; matches: HomeCityRow[] } {
   const open = [writtenCluster(c), ...homeRules(c).cities.filter(id => id !== writtenCluster(c))]
     .map(id => row(c, id)).filter((r): r is HomeCityRow => !!r && r.status === 'open');
-  const q = query.trim().toLowerCase();
+  // a typed ' finds the directory's ’ (Ji’an, Xi’an): both read as one
+  const fold = (t: string) => t.toLowerCase().replace(/[’‘`]/g, "'");
+  const q = fold(query.trim());
   if (q.length < 2) return { open, matches: [] };
-  const all = [...(clustersOf(c)?.byId.values() ?? [])].filter(cl => cl.name.toLowerCase().startsWith(q))
+  const all = [...(clustersOf(c)?.byId.values() ?? [])].filter(cl => fold(cl.name).startsWith(q))
     .sort((a, b) => b.population - a.population).slice(0, limit);
   return { open, matches: all.map(cl => row(c, cl.id)).filter((r): r is HomeCityRow => !!r) };
 }

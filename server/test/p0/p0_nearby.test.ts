@@ -36,6 +36,8 @@ describe('MAP-8: the near10 cities\' states in the view (不知火舞 on 301 / M
     expect(cityRegion(c, 'gn-1819729')).toBe('');             // Hong Kong
     expect(cityRegion(c, 'gn-2036579')).toBe('Jilin');        // Ji'an, one of two in China
     expect(cityRegion(c, 'gn-1806445')).toBe('Jiangxi');
+    // typed with a plain apostrophe, the search finds both (the directory writes Ji’an)
+    expect(homeCities(c, "ji'an").matches.map(r => `${r.name} · ${r.region}`)).toEqual(expect.arrayContaining(['Ji’an · Jilin', 'Ji’an · Jiangxi']));
     expect(cityRegion(c, 'gn-nothing')).toBe('');
     // twins outside the US: q(208) counts 83 pairs (two Ji'ans, two Suzhous …), each now told apart by its province
     const seen = new Map<string, string[]>();
