@@ -97,7 +97,8 @@ export function homeStatus(c: P0Content, cluster: string): HomeStatus | null {
   return homeRules(c).cities.includes(cluster) && citySet(c, cluster) ? 'open' : 'not_open';
 }
 
-/** One offered farm spot: its point, the distance and direction to the beginner pond (`1.2 km to Fern Pond · northeast`). */
+/** One offered farm spot: its point, the distance to the beginner pond and the side of the pond it is on (`1.2 km to
+ * Fern Pond · northeast`: northeast of the pond, as the pick page's map draws it; 不知火舞 on 303). */
 /** pond: the beginner pond the spot is measured from, with its point (HOME-PICK-3's map draws it with the spots). */
 export interface HomeSpot { spot: number; lat: number; lng: number; km: number; toward: string; pond: { id: string; name: string; lat: number; lng: number }; hood: string | null }
 
@@ -163,7 +164,7 @@ export function homeSpots(c: P0Content, cluster: string, player: string): HomeSp
     const turn = hash32(w.seed, cluster, `home:spot:${player}:${k}`) % 360;
     const m = lo + (hash32(w.seed, cluster, `home:spot-m:${player}:${k}`) / 0x1_0000_0000) * (hi - lo);
     const p = offset(at.lat, at.lng, m / 1000, turn);
-    return { spot: k, lat: p.lat, lng: p.lng, km: Math.round(km(p, pond.at!) * 1000) / 1000, toward: toward(p, pond.at!),
+    return { spot: k, lat: p.lat, lng: p.lng, km: Math.round(km(p, pond.at!) * 1000) / 1000, toward: toward(pond.at!, p),
       pond: { id: pond.id, name: pond.name, lat: pond.at!.lat, lng: pond.at!.lng }, hood };
   });
 }

@@ -142,6 +142,7 @@ func _error(y: float) -> Control:
 	var retry := UiCommandButton.new("Retry", UiCommandButton.Kind.SECONDARY, true)
 	retry.name = "Retry"
 	retry.fit_text = true
+	retry.min_width = 68   # Compact/Command: hugs its label, at least 68
 	retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	retry.activated.connect(func():
 		box.visible = false
@@ -226,7 +227,10 @@ func _band(b: String, text: String) -> Control:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override(&"separation", 6)
 	var glyph := UiKit.icon(GameUi.icon("i-climate-" + b), 14)
-	glyph.modulate = (P0CityRow.BANDS.get(b, P0CityRow.BANDS.temperate) as Dictionary).ink
+	var tint: ShaderMaterial = P0CityRow._material()   # the glyph's own fill is dark: tinted, not multiplied
+	tint.set_shader_parameter(&"mode", 1)
+	tint.set_shader_parameter(&"tint", (P0CityRow.BANDS.get(b, P0CityRow.BANDS.temperate) as Dictionary).ink)
+	glyph.material = tint
 	glyph.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(glyph)
 	h.add_child(UiKit.label(text, UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))

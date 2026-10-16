@@ -1572,7 +1572,13 @@ func _dev_shot(dt: float) -> void:
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
-			# homespot:<1-3>, homebuild, homeforme, homeback
+			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]
+			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, picked)
+				if is_instance_valid(_home_flow):
+					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
+					if not near_row.is_empty():
+						_home_flow.cities._opened = false
+						_home_flow.cities.show_cities({"open": _home_flow.cities.open_rows, "near": near_row[0]}, "")
 			"homesearch":
 				if is_instance_valid(_home_flow):
 					_home_flow.cities.field.text = step[1]
@@ -1585,6 +1591,10 @@ func _dev_shot(dt: float) -> void:
 			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
 			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
 			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
+			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
+				if is_instance_valid(_home_flow):
+					if step.size() > 1 and _home_flow.spots != null: _home_flow.spots.show_failed()
+					else: _home_flow.cities.show_failed(_home_flow.cities.query)
 			"licenses": ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile()))
 			"mapdata": ui.open_map_data(func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))   # q(133) v3
 			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",

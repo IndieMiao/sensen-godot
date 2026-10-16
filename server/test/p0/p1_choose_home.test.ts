@@ -193,6 +193,15 @@ describe('farm spots (q(160) ②)', () => {
     const s = homeSpots(c, SF, 'player-spot-01')![0];
     expect(s.pond.name).toBe('Fern Pond');
     expect(['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest']).toContain(s.toward);
+    // the side of the pond the spot is on, as HOME-PICK-3's map draws it (north of the pond reads north): the bearing
+    // from the pond to the spot within half a compass step of the word's
+    const words = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
+    for (const t of [...homeSpots(c, SF, 'player-spot-01')!, ...homeSpots(c, OSAKA, 'player-spot-02')!]) {
+      const dn = t.lat - t.pond.lat, de = (t.lng - t.pond.lng) * Math.cos((t.pond.lat * Math.PI) / 180);
+      const bearing = ((Math.atan2(de, dn) * 180) / Math.PI + 360) % 360;
+      const off = Math.abs(((bearing - 45 * words.indexOf(t.toward) + 540) % 360) - 180);
+      expect(off, `${t.toward} at ${bearing.toFixed(0)}°`).toBeLessThanOrEqual(22.5 + 1e-9);
+    }
     expect(s.hood).toBe('Mission District');
     expect(homeSpots(c, OSAKA, 'player-spot-01')![0].hood).toBeNull();   // off the table: no district name
   });

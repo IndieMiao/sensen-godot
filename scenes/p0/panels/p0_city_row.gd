@@ -69,6 +69,7 @@ func _init(row_: Dictionary = {}, pick_note: Variant = null) -> void:
 	if pick:
 		custom_minimum_size.x = _PICK_W
 		disabled = note != ""
+		flat = false   # a flat button draws no ground: the picked one has one (set_picked)
 	var clear := StyleBoxEmpty.new()
 	for s in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]: add_theme_stylebox_override(s, clear)
 	var line := HBoxContainer.new()
@@ -216,7 +217,8 @@ func _text() -> VBoxContainer:
 	glyph.texture = GameUi.icon("i-climate-" + band(row))
 	var tint := _material()
 	tint.set_shader_parameter(&"mode", 1)
-	tint.set_shader_parameter(&"tint", (BANDS[band(row)] as Dictionary).ink)
+	# a city that cannot be picked: its line's glyph grey as its thumb's (CityRow · cannot pick)
+	tint.set_shader_parameter(&"tint", UNVISITED_INK if pick and note != "" else (BANDS[band(row)] as Dictionary).ink)
 	glyph.material = tint
 	climate.add_child(glyph)
 	climate.add_child(UiKit.label(str(row.get("climate", "")).capitalize(), UiTokens.STYLE_C12_B if pick else UiTokens.STYLE_C13_B,

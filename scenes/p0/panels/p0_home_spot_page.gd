@@ -112,6 +112,7 @@ func _error() -> Control:
 	var retry := UiCommandButton.new("Retry", UiCommandButton.Kind.SECONDARY, true)
 	retry.name = "Retry"
 	retry.fit_text = true
+	retry.min_width = 68   # Compact/Command: hugs its label, at least 68
 	retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	retry.activated.connect(func(): retry_pressed.emit())
 	box.add_child(retry)
