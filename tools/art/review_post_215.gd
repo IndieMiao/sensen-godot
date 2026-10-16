@@ -129,7 +129,9 @@ func physics_audit(room,layout):
 	check(wide_hit==null,"1.00 m wide entry corridor clear in actual physics")
 	if wide_hit:report.entry_corridor_blocker=str(wide_hit.get_collider().get_path())
 	body.position=Vector3(-2.91,.085,1.29)
-	var turn_hit=body.move_and_collide(vec(layout.review_clearance.entry_route.from)+Vector3(0,.005,0)-body.position)
+	var turn_delta=vec(layout.review_clearance.entry_route.from)+Vector3(0,.005,0)-body.position
+	body.rotation.y=atan2(-turn_delta.z,turn_delta.x)
+	var turn_hit=body.move_and_collide(turn_delta)
 	check(turn_hit==null,"1.00 m wide entry turn from door centre clear")
 	body.free()
 func post_review():
