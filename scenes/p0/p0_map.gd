@@ -39,6 +39,11 @@ var _marks_sig := ""
 func _initial_region_id() -> String:
 	return P0_REGION
 
+## The map opens over the home city (SGODOT-303): a generated home by its cluster's region, the written city by its
+## own (San Francisco's curated region).
+func _initial_region() -> Dictionary:
+	return P0Clusters.region(P0Travel.home(_view()))
+
 func _ready() -> void:
 	rt = P0Runtime.ensure()
 	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
@@ -50,13 +55,14 @@ func _ready() -> void:
 		if child.name == "AccountButton" or child is LanguageButton: child.hide()
 
 # ---------------------------------------------------------------- homestead and ponds
-## The homestead: sh_a's farm placed at the home city's farm point, in its region (SGODOT-270: San Francisco's Noe
-## Valley). Placing it moves only its map overlay — the pin and where the map lands; the farm scene is P0Garden's.
+## The homestead: sh_a's farm placed at the home's farm point (view.home.farm, the spot picked with the home; the
+## written city's content point for a save from before, SGODOT-270: San Francisco's Noe Valley), in the home city's
+## region. Placing it moves only its map overlay — the pin and where the map lands; the farm scene is P0Garden's.
 func _resolve_farm_choice() -> Dictionary:
-	var at := P0City.farm_at()
+	var at := P0Travel.home_farm(_view())
 	var choice := P0_FARM_CHOICE.duplicate(true)
 	if at != Vector2.ZERO: choice["location"] = {"lat": at.x, "lng": at.y}
-	choice["region_id"] = P0_REGION
+	choice["region_id"] = str(P0Clusters.region(P0Travel.home(_view())).get("id", P0_REGION))
 	return choice
 
 func _server_has_no_farm() -> bool:
@@ -90,7 +96,7 @@ func _fly_home() -> void:
 	var held := P0Travel.here(_view())
 	var home := Vector2(home_lat, home_lng)
 	var km := roundi(P0PlaceSheet.km_between(_origin(), home))
-	var hr := P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION))
+	var hr := P0Clusters.region(P0Travel.home(_view()))
 	var bearing := float(CityMapData.city(str(hr.get("id", ""))).get("overview", {}).get("bearing", city_bearing)) if not hr.is_empty() else city_bearing
 	if not hr.is_empty(): _switch_city(hr)
 	if rt.ui.has_modal(): rt.ui.close_modal()   # no card stays over the flight (周瑜 on #341)

@@ -58,3 +58,12 @@ func test_the_runtime_reads_the_home_city_once() -> void:
 	assert_int(asked.size()).is_equal(1)
 	rt._read_home_places({"travel": {"home": "gn-5391959"}})   # San Francisco's are the client's own
 	assert_int(asked.size()).is_equal(1)
+
+## PR-3: the map opens over the home city, the Homestead pin on the spot picked with it, and home is flown to there.
+func test_the_map_opens_over_the_home_city_with_the_farm_on_its_spot() -> void:
+	assert_str(str(map.region.get("id", ""))).is_equal(TOKYO)
+	var choice: Dictionary = map._resolve_farm_choice()
+	assert_str(str(choice.region_id)).is_equal(TOKYO)
+	assert_float(float(choice.location.lat)).is_equal_approx(35.6801, 1e-4)
+	assert_float(float(choice.location.lng)).is_equal_approx(139.7102, 1e-4)
+	assert_float(map.home_lat).is_equal_approx(35.6801, 0.01)   # where the map's home is

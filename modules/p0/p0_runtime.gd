@@ -1571,6 +1571,20 @@ func _dev_shot(dt: float) -> void:
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
+			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
+			# homespot:<1-3>, homebuild, homeforme, homeback
+			"homesearch":
+				if is_instance_valid(_home_flow):
+					_home_flow.cities.field.text = step[1]
+					_home_flow.cities._typed(step[1])
+			"homecity":
+				if is_instance_valid(_home_flow):
+					if step.size() > 1: _home_flow.cities.set_choice(step[1])
+					_home_flow.cities.key.pressed.emit()
+			"homespot": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.picked = int(step[1]) - 1
+			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
+			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
+			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
 			"licenses": ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile()))
 			"mapdata": ui.open_map_data(func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))   # q(133) v3
 			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",
