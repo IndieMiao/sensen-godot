@@ -91,17 +91,18 @@ func test_a_space_of_the_arrived_city_keeps_its_own_name() -> void:
 ## PASS-1 / PASS-2 (Figma 482:429 / 482:431, §11.9): the Passport's counts and rows, a city's three tiers.
 func test_the_passport_lists_home_and_the_cities_reached_newest_first() -> void:
 	var now := 1_000_000_000.0
+	var TIJUANA := "gn-3981609"   # no landmark: a climate stamp (Tokyo has Tokyo Tower since SGODOT-303)
 	var v := _view({home = SF, here = SF, today = "2026-10-10",
-		visits = {TOKYO: {n = 1, first_at = now - 2 * HOUR, deliveries = 0}, "gn-5368361": {n = 6, first_at = now - HOUR, deliveries = 3}},
-		stamps = [{cluster = TOKYO, kind = "climate", counted_on = "2026-10-10"}, {cluster = "gn-5368361", kind = "landmark", counted_on = "2026-10-09"}]}, now)
+		visits = {TIJUANA: {n = 1, first_at = now - 2 * HOUR, deliveries = 0}, "gn-5368361": {n = 6, first_at = now - HOUR, deliveries = 3}},
+		stamps = [{cluster = TIJUANA, kind = "climate", counted_on = "2026-10-10"}, {cluster = "gn-5368361", kind = "landmark", counted_on = "2026-10-09"}]}, now)
 	var p := P0Travel.passport(v)
 	assert_str(str(p.title)).is_equal("Passport")
 	assert_array(p.facts).is_equal([["Cities visited", "3"], ["First visits today", "1/2"]])
 	assert_array(p.rows.map(func(r): return [str(r.title), str(r.state)])).is_equal(
-		[["San Francisco", "Home"], ["Los Angeles", "Regular"], ["Tokyo", "Visited"]])
+		[["San Francisco", "Home"], ["Los Angeles", "Regular"], ["Tijuana", "Visited"]])
 	assert_str(str(p.rows[1].stamp)).is_equal("res://assets/p0/stamps/stamp_los_angeles.png")   # a landmark stamp (表 11-18)
 	assert_str(str(p.rows[2].stamp)).is_equal("")   # a climate stamp: the passport icon
-	var page := P0Travel.city_page(v, TOKYO)
+	var page := P0Travel.city_page(v, TIJUANA)
 	assert_array(page.facts).is_equal([["Visits", "1/5"], ["Local trades", "0/3"]])
 	assert_array(page.rows.map(func(r): return [str(r.title), str(r.state)])).is_equal([["Visited", "Complete"], ["Regular", ""], ["Local", ""]])
 	assert_array(page.rows[2].facts).is_equal([["Visits", "1/10"]])
