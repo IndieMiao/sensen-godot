@@ -29,6 +29,8 @@ describe("the Tea Host's count by town (q(206))", () => {
     const online = async (url: string) => (await app.inject({ method: 'GET', url, headers: hd })).json().state.keepers.tea.online;
 
     expect(await online('/v1/p0/state')).toBe(2);   // San Francisco's two, not Tokyo's
+    const pond = Object.keys(c.fishing.places)[0];
+    expect(await online(`/v1/p0/state?space=pond&place=${pond}`)).toBe(2);   // at one of its ponds: not in an outpost
     expect(await online('/v1/p0/state?space=outpost&place=sh_tea_1')).toBe(3);   // walked in: counted before the join
     rooms.join('player-tea-01', 'sh_tea_1');
     expect(await online('/v1/p0/state?space=outpost&place=sh_tea_1')).toBe(3);   // in the room: still once

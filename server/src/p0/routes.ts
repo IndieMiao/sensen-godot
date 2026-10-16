@@ -15,6 +15,7 @@ import { noteVisit } from './boards.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus } from './home_city.js';
 import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
+import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
 /** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
@@ -49,7 +50,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     let n = 0;
     for (const [id, p] of Object.entries(deps.rooms.presence())) if (clusterOf(c, id) === here) n += p.online;
     const entered = st.presence.entered;
-    if (!deps.rooms.occupant(st.player) && entered && clusterOf(c, entered) === here) n += 1;
+    // an outpost of this town, not a pond (presence.entered keeps either; 周瑜 on #448)
+    if (!deps.rooms.occupant(st.player) && entered && !placeOf(c, entered) && clusterOf(c, entered) === here) n += 1;
     return n;
   };
   const view = (st: P0State, at: number) => viewOf(c, st, at, { online: townOnline(st) });
