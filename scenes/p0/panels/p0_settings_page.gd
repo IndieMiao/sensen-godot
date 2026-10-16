@@ -8,7 +8,8 @@ extends Control
 ##             Privacy Policy join it once they have real addresses (奕星).
 ##   LICENSES  (SET-LICENSES 1254:88796) P0Legal's groups (Software, Map data), each row › to its text.
 ##   TEXT      no frame: the row's title in the header, its full text below — Regular 13 secondary, 16 in, paragraphs
-##             8 apart (不知火舞: long legal text is too heavy in bold), the hard-wrapped lines joined (P0Legal).
+##             8 apart (不知火舞: long legal text is too heavy in bold), the hard-wrapped lines joined (P0Legal). A credit
+##             with a link (DB-IP, q(205) ⑥) puts `db-ip.com ›` first, above the text: open_pressed("link").
 ##   MAP_DATA  (q(133) v3, Q133-V3-MAPDATA 2425:129113) from Licenses › Mapbox: `Credits` — `© Mapbox ›`,
 ##             `© OpenStreetMap contributors ›` — then an untitled group: `Improve this map ›` and the switch `Share
 ##             anonymous map usage` (`Helps Mapbox improve its maps`).
@@ -131,9 +132,14 @@ static func map_data(sharing: bool, safe_top := 0.0, safe_bottom := 0.0) -> P0Se
 	page._group("", [improve, share])
 	return page
 
-## TEXT: a credit's full text under its title.
-static func text(title: String, full_text: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+## TEXT: a credit's full text under its title; `link` ({label}: the credit's own site, q(205) ⑥) a row above it.
+static func text(title: String, full_text: String, safe_top := 0.0, safe_bottom := 0.0, link := {}) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.TEXT, title, safe_top, safe_bottom)
+	if str(link.get("label", "")) != "":
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, str(link.label))
+		row.name = "link"
+		row.pressed.connect(func(): page.open_pressed.emit("link"))
+		page._group("", [row])
 	page._to_add = P0Legal.paragraphs(full_text)
 	page._add_paragraphs(_FIRST_PARAGRAPHS)
 	return page

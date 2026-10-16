@@ -24,7 +24,7 @@ func test_the_credits_are_the_frame_and_q129_word_for_word() -> void:
 		["OpenStreetMap", "© OpenStreetMap contributors", "ODbL 1.0"],
 		["GeoNames", "Contains data from GeoNames (geonames.org)", "CC BY 4.0"],
 		["ESA WorldCover", WORLDCOVER, "CC BY 4.0"],
-		["DB-IP", "IP Geolocation by DB-IP (db-ip.com)", "CC BY 4.0"],   # the home pick's Near you (q(188) ①)
+		["DB-IP", "IP Geolocation by DB-IP", "CC BY 4.0"],   # the home pick's Near you (q(188) ①); its site on its text page (q(205) ⑥)
 		["Unicode CLDR", "Copyright © 2004-2026 Unicode, Inc.", "Unicode License v3"]])   # the city rows' country names (q(210) ④)
 	assert_str(str(P0Legal.row("mapbox_data").get("page", ""))).is_equal("map_data")
 	for grp in g:
@@ -107,6 +107,26 @@ func test_a_licence_text_is_regular_13_in_paragraphs() -> void:
 	assert_str(first.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
 	assert_int(page.body.get_theme_constant(&"separation")).is_equal(8)
 	assert_int(page.body.get_child_count()).is_greater(10)
+
+## q(205) ⑥: DB-IP's site is the first row of its text page (`db-ip.com ›`, to the browser), not in its Licenses row.
+func test_a_credit_with_a_link_puts_it_above_its_text() -> void:
+	var r := P0Legal.row("dbip")
+	assert_str(str(r.credit)).is_equal("IP Geolocation by DB-IP")
+	var page: P0SettingsPage = auto_free(P0SettingsPage.text("DB-IP", P0Legal.full_text(r), 0.0, 0.0, r.link))
+	add_child(page)
+	await await_idle_frame()
+	var row := page.body.find_child("link", true, false) as UiSettingRow
+	assert_object(row).is_not_null()
+	assert_int(row.get_index()).is_less(page.body.get_child_count() - 1)
+	var opened: Array = []
+	page.open_pressed.connect(func(what): opened.append(what))
+	row.pressed.emit()
+	assert_array(opened).is_equal(["link"])
+	assert_str(str(r.link.url)).is_equal("https://db-ip.com")
+	var plain: P0SettingsPage = auto_free(P0SettingsPage.text("Nunito", P0Legal.full_text(P0Legal.row("nunito"))))
+	add_child(plain)
+	await await_idle_frame()
+	assert_object(plain.body.find_child("link", true, false)).is_null()   # no link: the text alone, as before
 
 ## The profile's gear opens Settings; each page's ‹ goes back one page, to the profile in the end.
 func test_the_gear_opens_settings_and_back_goes_one_page_at_a_time() -> void:

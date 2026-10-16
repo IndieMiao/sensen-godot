@@ -3135,9 +3135,11 @@ func _open_map_data_row(what: String) -> void:
 ## A credit's full text under its title (no frame; 不知火舞 on the Licenses brief).
 func open_license_text(id: String, back := Callable()) -> void:
 	var r := P0Legal.row(id)
-	var page := P0SettingsPage.text(str(r.get("title", "")), P0Legal.full_text(r), safe_top(), safe_bottom())
+	var link: Dictionary = r.get("link", {}) if r.get("link") is Dictionary else {}
+	var page := P0SettingsPage.text(str(r.get("title", "")), P0Legal.full_text(r), safe_top(), safe_bottom(), link)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(what: String): if what == "link" and str(link.get("url", "")) != "": OS.shell_open(str(link.url)))   # q(205) ⑥
 	_open_modal(page, 0.0, true)
 	modal_kind = "license_text"
 	_modal_back = back
