@@ -28,10 +28,24 @@ static func find(id: String) -> Dictionary:
 	if id.find("~") > 0: return (load("res://modules/p0/p0_city_places.gd").outpost(id) as Dictionary)
 	return {}
 
+## The written city's outpost of a role (the hand-written table). The player's own home set is home(view, role).
 static func by_role(role: String) -> Dictionary:
 	for o in all():
 		if str(o.role) == role: return o
 	return {}
+
+## The id of the player's home-set outpost of a role (SGODOT-303 view.home.set: market / tea / tackle / post, and pond),
+## frozen when the home was picked; the written city's where the view has none (an older server) or lacks the role.
+static func home_id(view: Dictionary, role: String) -> String:
+	var h = view.get("home", null)
+	var set_ = (h as Dictionary).get("set", null) if h is Dictionary else null
+	if set_ is Dictionary and str((set_ as Dictionary).get(role, "")) != "": return str(set_[role])
+	return str(by_role(role).get("id", ""))
+
+## The player's home-set outpost of a role: the written city's from its table, a generated home's once its places are
+## in (P0CityPlaces, read when the view comes: P0Runtime); {} before then.
+static func home(view: Dictionary, role: String) -> Dictionary:
+	return find(home_id(view, role))
 
 ## A city-map place pin; `online` (all rooms together) is its pin's top-right count, none at 0 (q(137) ③).
 static func place_entry(o: Dictionary, online := 0) -> Dictionary:

@@ -1670,6 +1670,12 @@ const _KEEPER_COPY := {
 }
 const _CUPS_OUT := "That's three cups today. Come back tomorrow."
 
+## The city the player is in, by name (the Tea Host's `around San Francisco`): an arrived city's, else home's.
+static func _here_name(view: Dictionary) -> String:
+	var travel = load("res://modules/p0/p0_travel.gd")
+	var cl := P0Clusters.get_cluster(travel.here(view))
+	return str(cl.name) if not cl.is_empty() and travel.away(view) else travel.home_name(view)
+
 static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionary:
 	var copy: Dictionary = _KEEPER_COPY.get(role, {})
 	var k: Dictionary = view.get("keepers", {}).get(role, {})
@@ -1683,7 +1689,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				"full": greet = "You look rested. Tea's here when you need it."
 				_: greet = "Sit a minute. Hot tea, %d Energy a cup." % int(view.get("drinks", {}).get("energy", 30))
 			answer = "Quiet day."
-			if k.get("online", null) != null: answer += " %d %s around %s right now." % [int(k.online), "person" if int(k.online) == 1 else "people", P0City.city_name()]
+			if k.get("online", null) != null: answer += " %d %s around %s right now." % [int(k.online), "person" if int(k.online) == 1 else "people", _here_name(view)]
 		"post":
 			var pip := resident_name(str(k.get("request_by", ""))) if k.get("request_by", null) != null else ""
 			match str(k.get("greet", "")):

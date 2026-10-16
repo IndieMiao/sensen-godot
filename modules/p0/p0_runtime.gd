@@ -511,9 +511,19 @@ func release_travel() -> void:
 ## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
 const TREE_XP := "tree_xp"
 
+## A generated home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home
+## set (P0Outposts.home: names, Show on map, Today) has them; the written city's are the client's own tables.
+func _read_home_places(v: Dictionary) -> void:
+	var travel = load("res://modules/p0/p0_travel.gd")
+	var home := str(travel.home(v))
+	var places = load("res://modules/p0/p0_city_places.gd")
+	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
+	places.fetch(session, home)
+
 func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
 	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
 	# quick-bar slot once (UiQuickBar.flash: QuickSlot State=new, 600 ms). Not on the first view after starting.

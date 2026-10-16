@@ -145,6 +145,29 @@ func test_the_stepper_at_its_limit_says_why() -> void:
 
 # ---------------------------------------------------------------- the Big Pot (q(201))
 
+## Opened on an ordinary stove while another is on the Big Pot (0.2.8 retest, 李元芳 on 286 2389195c): three sets of
+## the page's ingredients make 2 pots — this stove 1 serving, the Big Pot stove 2 — so the stepper stops at 2, as the
+## server would, and Cook sends 2 pots, as the confirm says.
+func test_a_big_pot_on_another_stove_counts_in_the_steppers_limit() -> void:
+	var v := _view()
+	v.cooking.cookbook = [_page("dish_grilled_crucian", "Grilled Crucian", 1, ["fish_crucian"], [["fish_crucian"], ["fish_crucian"], ["fish_crucian"]])]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.big_stoves = [0]
+	k.set("_big_loaded", true)
+	k.select_stove(1)
+	k.open("cookbook")   # a tap on the stove: the drawer opens on its own page (the last cooked / the first)
+	await get_tree().process_frame
+	assert_str(k.drawer.selected_page).is_equal("dish_grilled_crucian")
+	k.drawer.dev_batch(3)
+	assert_int(k.drawer.batch_n).override_failure_message("the stepper stops at the 2 pots the stock makes").is_equal(2)
+	var plan := k.drawer.batch_plan()
+	assert_array((plan.pots as Array).map(func(p): return [p.stove, p.servings])).is_equal([[1, 1], [0, 2]])
+	k.drawer.dev_cook()
+	assert_array(sent).is_equal([{"type": "batch_cook", "recipe": "dish_grilled_crucian", "pots": 2, "stove": 1, "big": [0]}])
+	await _close()
+
 ## The key switches the current stove: kept by the kitchen, the next cook asks for double, the pot card says
 ## `2 servings` and its slot ×2, and the stove's name strip reads Big Pot while it is empty.
 func test_the_big_pot_key_switches_this_stove() -> void:

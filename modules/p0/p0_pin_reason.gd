@@ -84,7 +84,7 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 					else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
 				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
 				"tracked": str(r.get("status", "")) == "accepted",
-				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name("market")}
+				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name(view, "market")}
 	# The Stall Board as the older view has it (stall.board.requests), for a server without view.boards.
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if not (r is Dictionary) or str(r.get("id", "")) != id: continue
@@ -134,8 +134,8 @@ static func taken(view: Dictionary) -> Array:
 				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)),
 				"ready": bool(r.get("ready", int(r.get("have", 0)) >= int(r.get("qty", 1)))),
 				"accepted_at": accepted_at(r),   # q(143): when it was tracked (0 on an older server or save)
-				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name("market"),
-				"deliver_go": "stall" if board == "stall" else "outpost:market"})
+				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name(view, "market"),
+				"deliver_go": "stall" if board == "stall" else "outpost:" + P0Outposts.home_id(view, "market")})
 	var residents: Dictionary = P0Logic.content().get("residents", {})
 	for rid in view.get("residents", {}):
 		var rv: Dictionary = view.residents[rid] if view.residents[rid] is Dictionary else {}
@@ -189,5 +189,6 @@ static func _need_name(view: Dictionary, kind: String, items: Array, rarity) -> 
 	if rarity != null and int(rarity) > 0: return "%s %s" % [P0Logic.rarity_name(view, int(rarity)), noun]
 	return noun.left(1).to_upper() + noun.substr(1)
 
-static func _outpost_name(role: String) -> String:
-	return str(P0Outposts.by_role(role).get("name", "the market"))
+## The home set's outpost of a role by name (SGODOT-311: the player's, not the written city's).
+static func _outpost_name(view: Dictionary, role: String) -> String:
+	return str(P0Outposts.home(view, role).get("name", "the market"))

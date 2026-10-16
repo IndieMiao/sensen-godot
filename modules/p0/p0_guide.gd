@@ -7,7 +7,13 @@ extends RefCounted
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const TUTORIAL := "req_pond_catch"
-static var BEGINNER_POND := P0City.beginner_pond()   # q(32): the content's beginner pond (SGODOT-270)
+static var BEGINNER_POND := P0City.beginner_pond()   # q(32): the written city's beginner pond (SGODOT-270)
+
+## The player's beginner pond (q(162): the home set's, frozen with the home, SGODOT-303); the written city's where the
+## view has none.
+static func home_pond(view: Dictionary) -> String:
+	var id := P0Outposts.home_id(view, "pond")
+	return id if id != "" else BEGINNER_POND
 
 ## The TipCards of P0 (q(44), TUT-2): one sentence, no button, each shown once. TUT-2's eighth sentence, "Levels unlock
 ## gear, fish and seeds…", is the Tip line of the account's first level-up banner (P0Logic.LEVEL_TIP), never a card
@@ -120,8 +126,8 @@ static func lead_rows(view: Dictionary) -> Array:
 		var qty := int(t.get("qty", 2))
 		var fish := P0Logic.item_name(view, str(t.item))   # fish names take no plural s
 		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall", "deliver:" + TUTORIAL))
-		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, BEGINNER_POND)], str(t.item),
-			"pond:" + BEGINNER_POND, "catch:" + TUTORIAL))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
+		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, home_pond(view))], str(t.item),
+			"pond:" + home_pond(view), "catch:" + TUTORIAL))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
 	elif first:
 		var done := _row("Deliver 2 %s · Stall" % P0Logic.item_name(view, "fish_crucian"), "fish_crucian", "stall")
 		done.state = "done"
@@ -317,5 +323,7 @@ static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictio
 static func _place_name(view: Dictionary, place: String) -> String:
 	var p = view.get("fishing", {}).get("places", {}).get(place, null)
 	if p is Dictionary and p.has("name"): return str(p.name)
+	var g: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(place)   # a generated home's (SGODOT-303)
+	if not g.is_empty(): return str(g.get("name", "Pond"))
 	var c = P0Logic.content().get("fishing", {}).get("places", {}).get(place, {})
 	return str(c.get("name", "Pond")) if c is Dictionary else "Pond"
