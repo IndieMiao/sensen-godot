@@ -50,6 +50,33 @@ static func get_cluster(id: String) -> Dictionary:
 	_load()
 	return _by_id.get(id, {})
 
+## A city's country as the game writes it (q(210), the server's home.ts countryPart): Unicode CLDR's English name by its
+## code (content travel.country_names), "" for a place whose cities read their name alone (travel.city_only_countries:
+## Hong Kong, Macao, Taiwan, the Palestinian Territories, Kosovo, Western Sahara) and when the city's name already holds
+## the country's as a whole word (q(209) ②: `Mexico City`, `Singapore`).
+static func country_part(c: Dictionary) -> String:
+	var travel: Dictionary = P0Logic.content().get("travel", {})
+	var code := str(c.get("country_code", ""))
+	if code in travel.get("city_only_countries", []): return ""
+	var name := str((travel.get("country_names", {}) as Dictionary).get(code, c.get("country", "")))
+	return "" if names_country(str(c.get("name", "")), name) else name
+
+## Whether `city` holds `country` as a whole word: no letter right before or after it (`Iranshahr` does not hold Iran).
+static func names_country(city: String, country: String) -> bool:
+	if country == "": return false
+	var from := 0
+	while true:
+		var at := city.find(country, from)
+		if at < 0: return false
+		var before := city.substr(at - 1, 1) if at > 0 else ""
+		var after := city.substr(at + country.length(), 1)
+		if not _letter(before) and not _letter(after): return true
+		from = at + 1
+	return false
+
+static func _letter(ch: String) -> bool:
+	return ch != "" and ch.to_upper() != ch.to_lower()
+
 ## All clusters, most populous first (the order of the file).
 static func all() -> Array:
 	_load()

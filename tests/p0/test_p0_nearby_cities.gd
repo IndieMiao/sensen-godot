@@ -6,6 +6,7 @@ extends GdUnitTestSuite
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")
 const SF := "gn-5391959"
 const LA := "gn-5368361"
@@ -185,3 +186,16 @@ func test_a_long_name_hides_the_state_and_keeps_the_slot_in() -> void:
 	assert_bool(region.visible).is_true()
 	var sj: Label = short.find_child("Name", true, false)
 	assert_float(region.get_global_rect().position.x).is_equal_approx(sj.get_global_rect().end.x, 0.01)   # straight after the name
+
+## q(210): the travel card's title writes the country as the city rows do — CLDR's English name, and the city alone for
+## the places that read it alone and for a name that holds its country (q(209) ②).
+func test_the_travel_cards_title_writes_the_country_as_the_rows_do() -> void:
+	var title := func(id: String) -> String: return load("res://scenes/p0/p0_map.gd").travel_title(P0Clusters.get_cluster(id))
+	assert_str(title.call("gn-745044")).is_equal("Istanbul, Türkiye")
+	assert_str(title.call("gn-1668341")).is_equal("Taipei")   # q(210) ③ (b)
+	assert_str(title.call("gn-3530597")).is_equal("Mexico City")   # q(209) ②
+	assert_str(title.call("gn-1819729")).is_equal("Hong Kong")
+	assert_str(title.call("gn-2643743")).is_equal("London, United Kingdom")
+	assert_bool(P0Clusters.names_country("Iranshahr", "Iran")).is_false()
+	assert_bool(P0Clusters.names_country("Santiago de Cuba", "Cuba")).is_true()
+	assert_bool(P0Clusters.names_country("Kinshasa", "Congo (DRC)")).is_false()

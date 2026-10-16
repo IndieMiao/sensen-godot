@@ -189,7 +189,8 @@ export interface P0Content {
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   /** Travel line data (content/travel_p2.json, SGODOT-275): landmark stamps by cluster (plan §11.9.3 表 11-18) and the
    * display names of clusters whose seed city is not the one players look for (none at present: San Diego, once gn-3981609's, is a cluster of its own, SGODOT-280). */
-  travel?: { landmarks?: Record<string, { landmark: string; stamp: string }>; cluster_names?: Record<string, string>; closed_countries?: string[] };
+  travel?: { landmarks?: Record<string, { landmark: string; stamp: string }>; cluster_names?: Record<string, string>; closed_countries?: string[];
+    country_names?: Record<string, string>; city_only_countries?: string[] };   // q(210)
   homestead: {
     max_level: number;
     warming_cabinet: number;                  // portions once unlocked (Lv3, §7.7)

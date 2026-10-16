@@ -24,7 +24,8 @@ func test_the_credits_are_the_frame_and_q129_word_for_word() -> void:
 		["OpenStreetMap", "© OpenStreetMap contributors", "ODbL 1.0"],
 		["GeoNames", "Contains data from GeoNames (geonames.org)", "CC BY 4.0"],
 		["ESA WorldCover", WORLDCOVER, "CC BY 4.0"],
-		["DB-IP", "IP Geolocation by DB-IP (db-ip.com)", "CC BY 4.0"]])   # the home pick's Near you (q(188) ①)
+		["DB-IP", "IP Geolocation by DB-IP (db-ip.com)", "CC BY 4.0"],   # the home pick's Near you (q(188) ①)
+		["Unicode CLDR", "Copyright © 2004-2026 Unicode, Inc.", "Unicode License v3"]])   # the city rows' country names (q(210) ④)
 	assert_str(str(P0Legal.row("mapbox_data").get("page", ""))).is_equal("map_data")
 	for grp in g:
 		for r in grp.rows:   # every other › opens a text that ships with the package

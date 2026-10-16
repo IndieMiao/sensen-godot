@@ -848,6 +848,12 @@ static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Di
 		"primary": "", "dismiss": "Keep browsing",
 	}
 
+## The travel card's title: `Tokyo, Japan` — the country as the rows write it (q(210): CLDR's name; the city alone for
+## Hong Kong, Taipei, Mexico City …).
+static func travel_title(c: Dictionary) -> String:
+	var country := P0Clusters.country_part(c)
+	return "%s, %s" % [str(c.get("name", "")), country] if country != "" else str(c.get("name", ""))
+
 func open_travel(cluster: String, preview := {}) -> void:
 	var c := P0Clusters.get_cluster(cluster)
 	if c.is_empty() or rt == null: return
@@ -856,7 +862,7 @@ func open_travel(cluster: String, preview := {}) -> void:
 		name = str(preview.get("trip_name", trip.get("name", "")))}
 	var first := P0Travel.fog(_view(), cluster) == "unexplored"
 	var spec := {
-		"title": "%s, %s" % [str(c.name), str(c.country)] if str(c.country) != "" else str(c.name),
+		"title": travel_title(c),
 		"subtitle": "Unexplored" if first else "Visited ×%d" % P0Travel.visits(_view(), cluster),
 		"line": P0Travel.trip_line(trip),
 		"facts": [["Cost", "Free"], ["Visit", "First visit · stamp + 10 Energy" if first else "Return visit"]],

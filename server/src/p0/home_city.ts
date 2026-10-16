@@ -14,7 +14,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { P0Content } from './content.js';
-import { clusterById, clustersOf, homeFacts, homeOf, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
+import { clusterById, clustersOf, countryName, countryPart, homeFacts, homeOf, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
+export { countryName, countryPart, namesCountry } from './home.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { carryGiftParcels } from './parcels.js';
 import { dayKey, rolloverAfter } from './rules.js';
@@ -275,22 +276,19 @@ function twinNames(c: P0Content): Set<string> {
 
 /**
  * The second part of a city row (q(208) ①, every CityRow: the home pick, Near you, a search, MAP-8 Nearby): a US city
- * its state (`San Francisco · California`); elsewhere its country's English name (`Tokyo · Japan`), nothing when the
- * city's name already holds its own country's name as a whole word (q(209) ②: `Singapore`, `Hong Kong`, `Mexico City`,
- * `Santiago de Cuba`, `Port Sudan` — not `Iranshahr`, and another country's name does not count: `Benin City ·
- * Nigeria`), and its province for one of two same-named cities in a country (`Ji'an · Jilin`; two in one province
- * both read the province, q(209) ①). "" for none; the client leaves the part out.
+ * its state (`San Francisco · California`); elsewhere its country (countryPart: `Tokyo · Japan`, `Istanbul · Türkiye`;
+ * none for `Singapore`, `Mexico City`, `Taipei`), and its province for one of two same-named cities in a country
+ * (`Ji'an · Jilin`; two in one province both read the province, q(209) ①). "" for none; the client leaves it out.
  */
-export const namesCountry = (name: string, country: string): boolean =>
-  country !== '' && new RegExp(`(^|[^\\p{L}])${country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}])`, 'u').test(name);
 
 export function cityRegion(c: P0Content, id: string): string {
   const cl = clusterById(c, id);
   if (!cl) return '';
-  if (cl.country_code === 'US') return clusterAdmin(id) || cl.country;
-  if (namesCountry(cl.name, cl.country)) return '';
-  if (twinNames(c).has(`${cl.country_code}|${cl.name}`)) return clusterAdmin(id) || cl.country;
-  return cl.country;
+  if (cl.country_code === 'US') return clusterAdmin(id) || countryName(c, cl);
+  const part = countryPart(c, cl);
+  if (part === '') return '';
+  if (twinNames(c).has(`${cl.country_code}|${cl.name}`)) return clusterAdmin(id) || part;
+  return part;
 }
 
 /** A city row for the pick page: open ones only on the list; a search also returns the others, greyed with the reason. */
