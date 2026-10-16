@@ -17,6 +17,7 @@ var cities: Control
 var spots: Control
 var _safe := Vector2.ZERO    # top, bottom
 var _sending := false
+var _spot_read := 0
 
 func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0) -> void:
 	session = session_
@@ -53,10 +54,13 @@ func open_spots(row: Dictionary) -> void:
 	cities.visible = false
 	_read_spots(id)
 
+## One read counts at a time: an older one's late answer (a Retry pressed meanwhile, 周瑜 on #451) is dropped.
 func _read_spots(id: String) -> void:
 	var page := spots
-	P0HomePick.spots(session, id, func(d: Dictionary): if is_instance_valid(page): page.show_spots(d.spots),
-		func(): if is_instance_valid(page): page.show_failed())
+	_spot_read += 1
+	var n := _spot_read
+	P0HomePick.spots(session, id, func(d: Dictionary): if is_instance_valid(page) and n == _spot_read: page.show_spots(d.spots),
+		func(): if is_instance_valid(page) and n == _spot_read: page.show_failed())
 
 func back_to_cities() -> void:
 	if spots != null: spots.queue_free()

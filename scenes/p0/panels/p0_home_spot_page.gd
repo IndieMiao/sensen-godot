@@ -75,7 +75,7 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	_cards_box.name = "Cards"
 	_cards_box.add_theme_constant_override(&"separation", int(_CARD_GAP))
 	_at(_cards_box, _CARDS_Y + safe_top)
-	for i in 3: _cards_box.add_child(_placeholder(i + 1))
+	_blank_cards()
 	build = _key("Build here", UiCommandButton.Kind.PRIMARY, _BUILD_Y, safe_bottom)
 	build.name = "Build"
 	build.activated.connect(func(): if picked >= 0: chosen.emit(cluster, int(spots[picked].get("spot", picked))))
@@ -118,7 +118,9 @@ func _error() -> Control:
 	retry.fit_text = true
 	retry.min_width = 68   # Compact/Command: hugs its label, at least 68
 	retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	retry.activated.connect(func(): retry_pressed.emit())
+	retry.activated.connect(func():   # back to reading: one read at a time (周瑜 on #451)
+		show_loading()
+		retry_pressed.emit())
 	box.add_child(retry)
 	box.visible = false
 	add_child(box)
@@ -155,6 +157,21 @@ func show_spots(spots_: Array) -> void:
 		cards.append(card)
 	map_card.show_spots(spots)
 	_refresh()
+
+## Reading the spots (again, after Retry): the plain map, the blank cards, both keys grey and quiet.
+func show_loading() -> void:
+	failed = false
+	spots = []
+	_blank_cards()
+	map_card.clear()
+	picked = -1
+
+func _blank_cards() -> void:
+	for c in _cards_box.get_children():
+		_cards_box.remove_child(c)
+		c.queue_free()
+	cards.clear()
+	for i in 3: _cards_box.add_child(_placeholder(i + 1))
 
 ## PICK-ERR-SPOTS: they did not come.
 func show_failed() -> void:
@@ -334,11 +351,19 @@ class MapCard extends Control:
 		sb.set_corner_radius_all(16)
 		return sb
 
-	func show_spots(spots: Array) -> void:
-		_spots = spots
+	## No spots on it: the plain ground alone (reading them).
+	func clear() -> void:
+		_spots = []
 		for p in pins: p.queue_free()
 		pins.clear()
 		if pond != null: pond.queue_free()
+		pond = null
+		frame = {}
+		ground.texture = null
+
+	func show_spots(spots: Array) -> void:
+		clear()
+		_spots = spots
 		var baked := P0HomeSpotMaps.map(cluster)
 		var pts: Array = [_pond_point(spots)]
 		for s in spots: pts.append(Vector2(float(s.lat), float(s.lng)))

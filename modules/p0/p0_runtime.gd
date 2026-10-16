@@ -1598,6 +1598,7 @@ func _dev_shot(dt: float) -> void:
 			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
 			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
 			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
+			"homeloading": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()   # the reading frame
 			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
 				if is_instance_valid(_home_flow):
 					if step.size() > 1 and _home_flow.spots != null: _home_flow.spots.show_failed()

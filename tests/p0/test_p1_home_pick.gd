@@ -276,6 +276,29 @@ func test_a_failed_spot_read_is_the_error_and_retry_reads_again() -> void:
 	assert_bool(flow.spots.failed).is_true()
 	(flow.spots.empty.find_child("Retry", true, false) as UiCommandButton).activated.emit()
 	assert_int(asked.count("/p0/home/spots/" + SF.id)).is_equal(2)
+	# 周瑜 on #451: Retry goes back to reading — the error gone (no second Retry), the blank cards back
+	assert_bool(flow.spots.failed).is_false()
+	assert_bool(flow.spots.empty.visible).is_false()
+	assert_str(str(flow.spots._cards_box.get_child(0).name)).starts_with("Placeholder")
+	P0HomePick.answer("/p0/home/spots/" + SF.id, {"ok": true, "city": SF.id, "spots": spots()})
+	await await_idle_frame()
+	assert_int(flow.spots.cards.size()).is_equal(3)
+	session.free()
+
+func test_an_older_spot_reads_late_answer_is_dropped() -> void:
+	var session := P0Session.new()
+	session.transport = func(_m, _p, _b, _c): pass
+	var flow: Control = auto_free(HomeFlow.new(session))
+	add_child(flow)
+	var path := "/p0/home/spots/" + SF.id
+	flow.open_spots(SF)   # read 1
+	var first: Array = P0HomePick._waiting[path]
+	flow._read_spots(SF.id)   # read 2 (a Retry) before read 1 answers
+	P0HomePick.answer(path, {"ok": true, "city": SF.id, "spots": spots()})   # read 2 comes back
+	(first[1] as Callable).call()   # then read 1's late failure: dropped
+	await await_idle_frame()
+	assert_bool(flow.spots.failed).is_false()
+	assert_int(flow.spots.cards.size()).is_equal(3)
 	session.free()
 
 func test_a_pending_save_and_the_feature_header() -> void:
