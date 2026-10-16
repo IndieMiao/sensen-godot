@@ -259,6 +259,12 @@ func test_a_pending_save_and_the_feature_header() -> void:
 	assert_bool(P0Runtime.home_pending({"home": {"pending": true}})).is_true()
 	assert_bool(P0Runtime.home_pending({"home": {"pending": false}})).is_false()
 	assert_bool(P0Runtime.home_pending({})).is_false()
+	# 周瑜 on #451: the first reply lost, the second Build here is refused (home_chosen) with the home already picked —
+	# taken all the same; a refusal while still pending, or a lost reply with no view, is not
+	assert_bool(P0Runtime.home_taken(true, {"home": {"pending": true}})).is_true()
+	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": false, "city": "gn-1850147"}})).is_true()
+	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": true}})).is_false()
+	assert_bool(P0Runtime.home_taken(false, {})).is_false()
 	var session := P0Session.new()
 	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home"])
 	session.free()

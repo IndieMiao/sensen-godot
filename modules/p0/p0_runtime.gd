@@ -1206,11 +1206,18 @@ var _home_flow: Control
 var _home_done := Callable()
 var _home_key := ""
 
-## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken, the
-## pick goes and the first world comes under the launch cover.
+## Whether a choose_home answer leaves the home picked: taken, or refused because the save already has its home — the
+## first reply was lost on the way, so a second Build here is refused (home_chosen) with a view no longer pending
+## (周瑜 on #451: else the page would refuse every go until the app restarts).
+static func home_taken(ok: bool, view: Dictionary) -> bool:
+	return ok or (not view.is_empty() and not home_pending(view))
+
+## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken (see
+## home_taken), the pick goes and the first world comes under the launch cover.
 func _home_settled(key: String, ok: bool, _code: String) -> void:
 	if key != _home_key or _home_key == "": return
 	_home_key = ""
+	ok = home_taken(ok, session.view)
 	if is_instance_valid(_home_flow): _home_flow.sent(ok)
 	if not ok: return
 	session.command_settled.disconnect(_home_settled)
