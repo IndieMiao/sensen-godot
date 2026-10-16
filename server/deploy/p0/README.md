@@ -31,7 +31,7 @@
 | `Caddyfile.p0.snippet` | 要并入线上 Caddyfile 的一段：`/preview/p0/*` 去掉前缀后转给 `p0-demo:3110`（容器在 farm_default 上的别名） |
 | `deploy-hk.sh` | 香港部署的逐步脚本（preflight / build / transfer / backup-caddy / up / verify-internal / caddy / smoke / crontab / stats / rollback），每步单独运行 |
 | `smoke.sh` | 冒烟：healthz、无口令 401、带口令读状态、一条命令往返、dev 路由 404、UI 上报。用一次性玩家 id `smoke-<时间戳>`，不碰真实玩家 |
-| `backup-p0.sh` | 每晚把 `/data` 卷打包（排除写了一半的 `*.tmp`），校验包里的 `p0-state.json` 能解析，本机保留 14 份；有 `/opt/farm/p0/.env.backup` 时再用 age 公钥加密、以只写子账号传到备份桶的 `p0/` 前缀（SGODOT-304 ③）。按 compose 标签找卷（项目名 `P0_PROJECT`，默认 p0），不写死卷名 |
+| `backup-p0.sh` | 每晚把 `/data` 卷打包（排除写了一半的 `*.tmp`），先写成 `.part`，校验包里的 `p0-state.json` 能解析后才替换当天那份（校验不过的另存为 `p0-data-<日>-<时>.bad.tgz` 待查，不会覆盖好包，也不上传），本机保留 14 份；有 `/opt/farm/p0/.env.backup` 时再用 age 公钥加密、以只写子账号传到备份桶的 `p0/` 前缀（SGODOT-304 ③）。按 compose 标签找卷（项目名 `P0_PROJECT`，默认 p0），不写死卷名 |
 
 ## 目标 A：香港 ECS（首选）
 

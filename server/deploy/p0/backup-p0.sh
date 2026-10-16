@@ -16,7 +16,7 @@ OUT="${P0_BACKUP_DIR:-/opt/farm/p0/backups}"
 PROJECT="${P0_PROJECT:-p0}"
 OFFSITE_ENV="${P0_BACKUP_ENV:-/opt/farm/p0/.env.backup}"
 PREFIX="${P0_BACKUP_PREFIX:-p0/}"
-# age and the aws CLI for the offsite step, on a pinned base image
+# Pinned base image for packing and, with age and the aws CLI added, for the offsite step
 TOOLS_IMAGE=alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
 say() { echo "$(date -u +%FT%TZ) $*"; }
 
@@ -26,23 +26,31 @@ mkdir -p "$OUT"
 DAY=$(date -u +%Y%m%d)
 NAME="p0-data-$DAY.tgz"
 
-# 1. Pack. The store writes p0-state.json.tmp and renames it over p0-state.json (atomic), so the archive holds a whole
-#    save, old or new; a .tmp caught half-written is left out.
-docker run --rm -v "$VOL":/data:ro -v "$OUT":/out alpine tar -czf "/out/$NAME" --exclude='*.tmp' -C /data .
+# 1. Pack into a .part file, so a failed or bad run never replaces the night's good archive (a second run the same day
+#    only replaces it once its own archive has passed the check). The store writes p0-state.json.tmp and renames it
+#    over p0-state.json (atomic), so the archive holds a whole save, old or new; a .tmp caught half-written is left out.
+PART="$OUT/$NAME.part"
+rm -f "$PART"
+docker run --rm -v "$VOL":/data:ro -v "$OUT":/out "$TOOLS_IMAGE" tar -czf "/out/$NAME.part" --exclude='*.tmp' -C /data . \
+  || { rm -f "$PART"; say "pack FAILED; $OUT/$NAME left as it was"; exit 1; }
 
-# 2. The saves in the archive must parse; an archive that does not is kept for a look but never sent offsite.
-if ! PLAYERS=$(tar -xzOf "$OUT/$NAME" ./p0-state.json | python3 -c 'import json, sys; print(len(json.load(sys.stdin)))' 2>/dev/null); then
-  say "check FAILED: p0-state.json in $OUT/$NAME does not parse; not sent offsite"
+# 2. The saves in the archive must parse. One that does not is kept aside as .bad.tgz for a look, never sent offsite.
+if ! PLAYERS=$(tar -xzOf "$PART" ./p0-state.json | python3 -c 'import json, sys; print(len(json.load(sys.stdin)))' 2>/dev/null); then
+  BAD="$OUT/p0-data-$DAY-$(date -u +%H%M%S).bad.tgz"
+  mv "$PART" "$BAD"
+  say "check FAILED: p0-state.json in $BAD does not parse; $OUT/$NAME left as it was, nothing sent offsite"
   exit 1
 fi
+mv "$PART" "$OUT/$NAME"
 say "packed $OUT/$NAME ($(stat -c %s "$OUT/$NAME") bytes, $PLAYERS players)"
 
-# 3. Local rotation: 14 nights.
-ls -1t "$OUT"/p0-data-*.tgz | tail -n +15 | xargs -r rm -f
+# 3. Local rotation: 14 nights (the eight-digit day only, so .bad.tgz files are not counted or removed).
+ls -1t "$OUT"/p0-data-????????.tgz | tail -n +15 | xargs -r rm -f
 
 # 4. Offsite, last.
 if [ ! -s "$OFFSITE_ENV" ]; then say "offsite: skipped (no $OFFSITE_ENV)"; exit 0; fi
 docker run --rm --env-file "$OFFSITE_ENV" -e NAME="$NAME" -e PREFIX="$PREFIX" -v "$OUT":/out:ro "$TOOLS_IMAGE" sh -euc '
+  # Tools come from the network each night; when that fails only the upload fails, the local archive is already in place.
   apk add --no-cache age aws-cli >/dev/null
   : "${AGE_RECIPIENT:?}" "${OSS_BUCKET:?}" "${AWS_ACCESS_KEY_ID:?}" "${AWS_SECRET_ACCESS_KEY:?}"
   # OSS takes virtual-hosted addressing only, and none of the newer aws CLI streaming checksums (NotImplemented)
