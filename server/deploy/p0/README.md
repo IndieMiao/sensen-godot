@@ -52,6 +52,7 @@
      | ssh "$HOST" 'mkdir -p /opt/farm/p0/src && tar -C /opt/farm/p0/src -xzf -'
    # Near you（q(188) ①）：Dockerfile 里 ARG DBIP_MONTH 那个月份的 DB-IP City Lite，放进构建目录的 dbip/
    # （平时由 deploy-hk.sh build 从 devserver 的 ~/p0-cache/dbip 拷；DB-IP 网站只留最近两个月，过期从缓存或 OSS 备份取）
+   ssh "$HOST" 'mkdir -p /opt/farm/p0/src/dbip'
    scp dbip-city-lite-<YYYY-MM>.csv.gz "$HOST":/opt/farm/p0/src/dbip/
    ssh "$HOST" "cd /opt/farm/p0/src && DOCKER_BUILDKIT=1 docker build -f server/deploy/p0/Dockerfile -t p0-server:<sha> ."
    ```
