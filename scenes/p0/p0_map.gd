@@ -568,6 +568,7 @@ func frame_home_set() -> void:
 	else:
 		view = _part_pins(chosen, view, safe)
 		_look(view.at, float(view.z))
+	city_map.forget_shown()   # the pins pack at this view's own zoom, not by what the view before it showed
 	_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
 
 ## 不知火舞 on 269: space pins give way to the pins packed before them, so the opening view zooms in a tenth at a time,

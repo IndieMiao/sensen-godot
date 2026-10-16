@@ -78,12 +78,23 @@ func test_the_opening_view_keeps_pins_off_the_right_hand_keys() -> void:
 	var m: Node = (load(P0_MAP) as PackedScene).instantiate()
 	add_child(m)
 	for i in 5: await get_tree().process_frame
+	var city: CityMapView = m.city_map
+	city._shown_last = {"gn-1850147~tackle0": true}   # an earlier view showed the tackle shop: it would hold its place
 	m.frame_home_set()
+	assert_dict(city._shown_last).is_empty()   # 不知火舞 on #457: the opening view packs afresh at its own zoom
 	assert_array(m.frame_key_rects()).is_not_empty()
 	assert_bool(m.framed.any(func(it): return it.get("self_pin", false))).is_true()   # the Homestead (the avatar) is in
 	for it in m.framed:
 		var r = m._item_rect(it)
 		if r == null: continue
 		for k in m.frame_key_rects(): assert_bool((r as Rect2).intersects(k)).override_failure_message(str(it.get("id", "self"))).is_false()
+	# 不知火舞 on #457: the pins then pack at this zoom — no two discs shown nearer than 36 px (q(137) ⑤), whatever an
+	# earlier view had shown
+	m._sync_farm_markers()
+	city._update_markers()
+	var shown: Array = city._dest_centres
+	for i in shown.size():
+		for j in range(i + 1, shown.size()):
+			assert_float((shown[i] as Vector2).distance_to(shown[j])).override_failure_message("discs %d %d" % [i, j]).is_greater_equal(CityMapView.DEST_NEAR)
 	m.free()
 	rt.session.view = HomeSet._tokyo_home()
