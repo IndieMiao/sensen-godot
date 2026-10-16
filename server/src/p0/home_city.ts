@@ -275,15 +275,20 @@ function twinNames(c: P0Content): Set<string> {
 
 /**
  * The second part of a city row (q(208) ①, every CityRow: the home pick, Near you, a search, MAP-8 Nearby): a US city
- * its state (`San Francisco · California`); elsewhere its country's English name (`Tokyo · Japan`), nothing when that is
- * the city's own name (`Singapore`, `Hong Kong`), and its province for one of two same-named cities in a country
- * (`Ji'an · Jilin`). "" for none; the client leaves the part out.
+ * its state (`San Francisco · California`); elsewhere its country's English name (`Tokyo · Japan`), nothing when the
+ * city's name already holds its own country's name as a whole word (q(209) ②: `Singapore`, `Hong Kong`, `Mexico City`,
+ * `Santiago de Cuba`, `Port Sudan` — not `Iranshahr`, and another country's name does not count: `Benin City ·
+ * Nigeria`), and its province for one of two same-named cities in a country (`Ji'an · Jilin`; two in one province
+ * both read the province, q(209) ①). "" for none; the client leaves the part out.
  */
+export const namesCountry = (name: string, country: string): boolean =>
+  country !== '' && new RegExp(`(^|[^\\p{L}])${country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}])`, 'u').test(name);
+
 export function cityRegion(c: P0Content, id: string): string {
   const cl = clusterById(c, id);
   if (!cl) return '';
   if (cl.country_code === 'US') return clusterAdmin(id) || cl.country;
-  if (cl.name === cl.country) return '';
+  if (namesCountry(cl.name, cl.country)) return '';
   if (twinNames(c).has(`${cl.country_code}|${cl.name}`)) return clusterAdmin(id) || cl.country;
   return cl.country;
 }
