@@ -5,6 +5,8 @@ extends Control
 ## again.` (14, text), the day line — i-clock 16, 6, `Your day resets Thu 4 AM, Tokyo time.` (Bold 13, secondary;
 ## none without one) — then `Move farm` (primary) and `Cancel` (secondary), 48 each.
 ## A tap on the scrim cancels, as Cancel does. Emits move_pressed, cancelled.
+## It draws over the map card's pin names: a MapDestination lifts its name to NAME_Z so other discs never cover it, which
+## also put the pond's name over this card (0.2.9: `Fern` over the body, its disc under the scrim).
 
 signal move_pressed
 signal cancelled
@@ -23,6 +25,7 @@ var cancel: UiCommandButton
 
 func _init(city_name := "", day_line := "") -> void:
 	name = "MoveConfirm"
+	z_index = UiMapDestination.NAME_Z + 1
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var scrim := ColorRect.new()

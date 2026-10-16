@@ -91,6 +91,9 @@ func test_a_spot_asks_first_and_move_farm_is_the_change() -> void:
 	flow.spots.build.activated.emit()
 	assert_array(chose).is_empty()   # not yet: the card asks
 	assert_object(flow.confirm).is_not_null()
+	# 0.2.9 (李元芳's run): the pond's name rides above other pins (NAME_Z), and the card must draw over it too
+	var pond_name: Control = (flow.spots.map_card.pond as UiMapDestination)._label_box
+	assert_int(flow.confirm.z_index).is_greater(pond_name.z_index)
 	assert_array(_labels(flow.confirm)).contains(["Move your farm to Tokyo?",
 		"Everything on your farm moves with you. You can't change your home city again.", "Your day resets Thu 4 AM, Tokyo time."])
 	flow.confirm.cancel.activated.emit()
@@ -143,3 +146,19 @@ func test_a_change_refused_is_taken_only_when_home_is_already_the_new_city() -> 
 	assert_bool(P0Runtime.home_taken(false, moved, TOKYO.id)).is_true()
 	assert_bool(P0Runtime.home_taken(false, stayed, TOKYO.id)).is_false()
 	assert_bool(P0Runtime.home_taken(true, stayed, TOKYO.id)).is_true()
+
+## 周瑜 on #460: with the confirm card raised over the pin names, a toast or the system line said while it is up (Move
+## farm refused, `Didn't go through`) still draws over it — not dimmed under its scrim, the banner's Retry in reach.
+func test_toasts_and_the_system_line_stay_over_the_confirm_card() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = "user://test_p1_home_change_ui.json"
+	ui.tips_path = "user://test_p1_home_change_tips.json"
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	var card := load("res://scenes/p0/panels/p0_home_move_confirm.gd").new("Tokyo", "") as Control
+	ui.toast("Couldn't move your farm")
+	ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through")
+	assert_int(ui._toasts.z_index).is_greater(card.z_index)
+	assert_int(ui._sys.z_index).is_greater(card.z_index)
+	card.free()
+	for f in ["user://test_p1_home_change_ui.json", "user://test_p1_home_change_tips.json"]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))

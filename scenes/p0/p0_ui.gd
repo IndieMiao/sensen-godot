@@ -134,6 +134,10 @@ var _teach_left := 0.0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
 var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
+## The toasts and the system line draw over every card, the ones raised by z too: the move confirm card sits over the
+## map's pin names (UiMapDestination.NAME_Z + 1), and a refusal or `Didn't go through` said while it is up must not
+## fall under its scrim (周瑜 on #460). Their order among the rest still comes from move_child.
+const OVER_CARDS_Z := UiMapDestination.NAME_Z + 2
 
 # ---------------------------------------------------------------- build
 func _ready() -> void:
@@ -154,6 +158,7 @@ func _ready() -> void:
 	_build_fab()
 	_toasts = ToastLayer.new()
 	_toasts.theme = UiKit.theme()
+	_toasts.z_index = OVER_CARDS_Z
 	root.add_child(_toasts)
 	# Over the quick bar's top edge, left of the main action key; inside the bag the bar is docked at the drawer's
 	# fixed bottom row, so the toast sits above that (WP2 D-01, q(16)). With no bar on screen: the bar's spot.
@@ -1483,6 +1488,7 @@ func show_sys(kind: UiSysBanner.Kind, message: String, seconds := 0.0) -> void:
 		_sys.set_anchors_preset(Control.PRESET_CENTER_TOP)
 		_sys.grow_horizontal = Control.GROW_DIRECTION_BOTH
 		_sys.retry_pressed.connect(func(): sys_retry.emit())
+		_sys.z_index = OVER_CARDS_Z
 		root.add_child(_sys)
 	_sys.kind = kind
 	_sys.message = message
