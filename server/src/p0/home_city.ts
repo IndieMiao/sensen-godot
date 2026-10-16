@@ -257,15 +257,46 @@ export function nearestOpen(c: P0Content, at: { lat: number; lng: number }): Hom
   return best && best.d <= homeRules(c).near_max_km ? best.row : null;
 }
 
+/** Country + name of cities that share both in the city directory (q(208) ①: 83 pairs outside the US, two Ji'ans, two
+ * Suzhous), worked out once per content. */
+const twins = new WeakMap<object, Set<string>>();
+function twinNames(c: P0Content): Set<string> {
+  const all = clustersOf(c);
+  if (!all) return new Set();
+  let set = twins.get(all);
+  if (!set) {
+    const seen = new Map<string, number>();
+    for (const cl of all.byId.values()) seen.set(`${cl.country_code}|${cl.name}`, (seen.get(`${cl.country_code}|${cl.name}`) ?? 0) + 1);
+    set = new Set([...seen].filter(([, n]) => n > 1).map(([k]) => k));
+    twins.set(all, set);
+  }
+  return set;
+}
+
+/**
+ * The second part of a city row (q(208) ①, every CityRow: the home pick, Near you, a search, MAP-8 Nearby): a US city
+ * its state (`San Francisco · California`); elsewhere its country's English name (`Tokyo · Japan`), nothing when that is
+ * the city's own name (`Singapore`, `Hong Kong`), and its province for one of two same-named cities in a country
+ * (`Ji'an · Jilin`). "" for none; the client leaves the part out.
+ */
+export function cityRegion(c: P0Content, id: string): string {
+  const cl = clusterById(c, id);
+  if (!cl) return '';
+  if (cl.country_code === 'US') return clusterAdmin(id) || cl.country;
+  if (cl.name === cl.country) return '';
+  if (twinNames(c).has(`${cl.country_code}|${cl.name}`)) return clusterAdmin(id) || cl.country;
+  return cl.country;
+}
+
 /** A city row for the pick page: open ones only on the list; a search also returns the others, greyed with the reason. */
-/** region: the city's state or province (`San Francisco · California`, HOME-PICK-1), else its country. */
+/** region: cityRegion (q(208) ①). */
 export interface HomeCityRow { id: string; name: string; country: string; region: string; climate: string; status: HomeStatus }
 const row = (c: P0Content, id: string): HomeCityRow | null => {
   const cl = clusterById(c, id), status = homeStatus(c, id);
   if (!status) return null;
   const climate = cl?.climate ?? c.profile.climate.toLowerCase();
   const country = cl?.country ?? '';
-  return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country, region: clusterAdmin(id) || country, climate, status };
+  return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country, region: cityRegion(c, id), climate, status };
 };
 
 /** The open cities (the written city first, then the list), and with `query` (2+ letters) the cities whose name starts

@@ -26,7 +26,7 @@ import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, hasConvenience, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
-import { homeView } from './home_city.js';
+import { cityRegion, homeView } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
 import { homeOf } from './travel.js';
@@ -66,7 +66,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, ...travelShown(c, s.travel), today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
       // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
-      admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)) },
+      admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)),
+      // q(208) ①: the row's second part as shown (cityRegion: state in the US, else the country, none when it is the
+      // city's own name); `admins` stays for clients from before
+      regions: Object.fromEntries(s.travel.fallback.near10.map(id => [id, cityRegion(c, id)])) },
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({
