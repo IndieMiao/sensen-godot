@@ -2,7 +2,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { P0Content } from './content.js';
 import { applyP0, type P0Command } from './reducer.js';
-import { settleEnergy } from './rules.js';
+import { dayKey, settleEnergy } from './rules.js';
 import type { P0Store } from './store.js';
 import { viewOf } from './view.js';
 import type { P0State } from './state.js';
@@ -108,7 +108,10 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     // q(173) ④: the change confirm card says when today's limits reset if the home moves here (a first pick: none)
     const s = stateOf(player, req.headers), now = clock(s.clock_ms);
     const resets_at = !s.travel.pending && changeOpen(c, s, now).open ? dayHoldFor(c, s, cluster, now).until : null;
-    return reply.send({ ok: true, city: cluster, spots, resets_at });
+    // its weekday on the new home's calendar (`Your day resets Thu 4 AM, Tokyo time.`): the client has no time zones
+    const resets_day = resets_at === null ? null
+      : new Date(`${dayKey(c, { travel: { home: cluster } }, resets_at)}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+    return reply.send({ ok: true, city: cluster, spots, resets_at, resets_day });
   });
 
   app.post('/v1/p0/commands', async (req, reply) => {

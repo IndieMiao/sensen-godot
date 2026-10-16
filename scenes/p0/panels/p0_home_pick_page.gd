@@ -11,16 +11,24 @@ extends Control
 ##   q(207): the list fails — `Couldn't load cities` and Retry in its place (PICK-ERR-LIST 2773:182247; a failed search
 ##   too); a search finds nothing — `No matching cities` under the field (13 Bold secondary, PICK-SEARCH-EMPTY
 ##   2773:182352), no list. The key follows the city picked either way.
-## Emits picked(row), unavailable(text) and asks the host to read with read_cities(query) (the host answers with
+##   CHANGE (HOME-CHANGE-PICK 2647:135097, q(188) ④ / q(205) ④; SGODOT-303 PR-4), from Settings: BackPill
+##   `‹  Settings` 12 / 16; `Change home city` at 72 and `Your farm and everything on it move with you.` at 106; the
+##   field at 137 and the list from 193. Nothing picked when it opens; the home city reads grey, `Your home city`.
+## Emits picked(row), unavailable(text), back_pressed (CHANGE) and asks the host to read with read_cities(query) (the host answers with
 ## show_cities / show_failed).
 
 signal picked(row: Dictionary)
 signal unavailable(text: String)
 signal read_cities(query: String)
+signal back_pressed
 
 const P0HomePick := preload("res://modules/p0/p0_home_pick.gd")
 const P0CityRow := preload("res://scenes/p0/panels/p0_city_row.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
+const SpotPage := preload("res://scenes/p0/panels/p0_home_spot_page.gd")
+## CHANGE: the title and its line 32 lower (under the back pill), the field and the list 13 (the line is one line).
+const _CHANGE_HEAD_DY := 32.0
+const _CHANGE_DY := 13.0
 
 const _TITLE_Y := 40.0
 const _BODY_Y := 74.0
@@ -56,8 +64,15 @@ var _rows_data := {}         # city id → its row
 var _wait := -1.0
 var _opened := false         # the first answer has picked what the page opens with
 
-func _init(safe_top := 0.0, safe_bottom := 0.0) -> void:
+## change_from: the home city now — the change of home (CHANGE); "" for a new player's first pick.
+func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "") -> void:
 	name = "HomePickPage"
+	home = change_from
+	var dy_head := _CHANGE_HEAD_DY if home != "" else 0.0
+	var dy := _CHANGE_DY if home != "" else 0.0
+	if home != "":
+		heading = "Change home city"
+		line = "Your farm and everything on it move with you."
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var bg := ColorRect.new()
@@ -68,18 +83,18 @@ func _init(safe_top := 0.0, safe_bottom := 0.0) -> void:
 	var t := UiKit.label(heading, UiTokens.STYLE_TITLE_XB20)
 	t.name = "Title"
 	t.add_theme_font_size_override(&"font_size", _TITLE_SIZE)
-	_place(t, _TITLE_Y + safe_top)
+	_place(t, _TITLE_Y + dy_head + safe_top)
 	var b := UiKit.label(line, UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY)
 	b.name = "Line"
 	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_place(b, _BODY_Y + safe_top)
+	_place(b, _BODY_Y + dy_head + safe_top)
 	scroll = TouchScrollContainer.new()
 	scroll.name = "List"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_left = 8
 	scroll.offset_right = -8
-	scroll.offset_top = _LIST_Y + safe_top
+	scroll.offset_top = _LIST_Y + dy + safe_top
 	scroll.offset_bottom = _LIST_BOTTOM - 800.0 - safe_bottom
 	add_child(scroll)
 	list = VBoxContainer.new()
@@ -89,13 +104,18 @@ func _init(safe_top := 0.0, safe_bottom := 0.0) -> void:
 	scroll.add_child(list)
 	field = SearchField.new()
 	field.name = "Search"
-	_place(field, _FIELD_Y + safe_top)
+	_place(field, _FIELD_Y + dy + safe_top)
 	field.text_changed.connect(_typed)
 	none = UiKit.label("No matching cities", UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY)
 	none.name = "NoMatches"
 	none.visible = false
-	_place(none, _NONE_Y + safe_top)
-	error = _error(_ERROR_Y + safe_top)
+	_place(none, _NONE_Y + dy + safe_top)
+	error = _error(_ERROR_Y + dy + safe_top)
+	if home != "":
+		var back := SpotPage.BackPill.new("Settings")
+		back.position = Vector2(12, 16 + safe_top)
+		back.pressed.connect(func(): back_pressed.emit())
+		add_child(back)
 	var fade := TextureRect.new()
 	fade.name = "Fade"
 	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE

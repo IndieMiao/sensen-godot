@@ -17,6 +17,8 @@ const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postc
 const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
+const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -129,6 +131,7 @@ func _init() -> void:
 	ui.show_spot.connect(_show_spot)
 	ui.show_on_map.connect(_show_on_map)
 	ui.notice_board_opened.connect(_ask_presence)   # the Notice Board's online counts (q(164))
+	ui.change_home.connect(change_home)   # Settings › Home city (SGODOT-303 PR-4)
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
@@ -1193,10 +1196,27 @@ static func home_pending(view: Dictionary) -> bool:
 func pick_home(done: Callable) -> void:
 	_launch_s = -1.0
 	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
-	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom())
+	_open_home_flow("choose_home", "", done)
+
+## Settings › Home city (SGODOT-303 PR-4, HOME-CHANGE-PICK / -CONFIRM): the change of home over whatever world is up;
+## ‹ Settings goes `back`. Moved, every layer closes and the farm comes up in the new home under the launch cover,
+## then `Welcome home` (q(108)'s, 不知火舞 28883acf); the chip and the map read the new home from the view.
+func change_home(back: Callable) -> void:
+	_open_home_flow("change_home", P0Travel.home(session.view), func():
+		toast_on_arrival("Welcome home")
+		while AppRouter.instance_depth() > 0:
+			var depth := AppRouter.instance_depth()
+			AppRouter.pop_instance()
+			if AppRouter.instance_depth() >= depth: break   # a locked layer stays
+		get_tree().change_scene_to_file(FARM_SCENE), back)
+
+func _open_home_flow(type: String, change_from: String, done: Callable, back := Callable()) -> void:
+	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom(), change_from)
 	_home_done = done
+	if back.is_valid(): _home_flow.left.connect(back)
 	_home_flow.chose.connect(func(cluster: String, spot: int):
-		var cmd := {"type": "choose_home", "city": cluster, "spot": spot}
+		var cmd := {"type": type, "city": cluster, "spot": spot}
+		_home_change_to = cluster if type == "change_home" else ""
 		_home_key = P0Session.ui_key(cmd)
 		if not session.send(cmd, _home_key): _home_flow.sent(false))
 	if not session.command_settled.is_connected(_home_settled): session.command_settled.connect(_home_settled)
@@ -1205,19 +1225,24 @@ func pick_home(done: Callable) -> void:
 var _home_flow: Control
 var _home_done := Callable()
 var _home_key := ""
+var _home_change_to := ""
 
-## Whether a choose_home answer leaves the home picked: taken, or refused because the save already has its home — the
-## first reply was lost on the way, so a second Build here is refused (home_chosen) with a view no longer pending
-## (周瑜 on #451: else the page would refuse every go until the app restarts).
-static func home_taken(ok: bool, view: Dictionary) -> bool:
-	return ok or (not view.is_empty() and not home_pending(view))
+## Whether a choose_home / change_home answer leaves the home picked: taken, or refused because it already is — the
+## first reply was lost on the way, so a second press is refused with the view the server has (周瑜 on #451: else the
+## page would refuse every go until the app restarts). A first pick: the view no longer pending. A change (`change_to`,
+## the city asked for): the view's home is that city — the change is not pending before or after.
+static func home_taken(ok: bool, view: Dictionary, change_to := "") -> bool:
+	if ok: return true
+	if view.is_empty(): return false
+	if change_to != "": return P0Travel.home(view) == change_to
+	return not home_pending(view)
 
 ## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken (see
 ## home_taken), the pick goes and the first world comes under the launch cover.
 func _home_settled(key: String, ok: bool, _code: String) -> void:
 	if key != _home_key or _home_key == "": return
 	_home_key = ""
-	ok = home_taken(ok, session.view)
+	ok = home_taken(ok, session.view, _home_change_to)
 	if is_instance_valid(_home_flow): _home_flow.sent(ok)
 	if not ok: return
 	session.command_settled.disconnect(_home_settled)
@@ -1233,6 +1258,7 @@ func _end_launch() -> void:
 	if _launch_s < 0.0 or session.view.is_empty() or not is_instance_valid(world): return
 	_launch_s = -1.0
 	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+	_flush_arrival_toast()   # a changed home's `Welcome home`, once the cover is gone
 
 ## Every return to the foreground reads the state (§10.7.1); a slow read gets SYS-LOADING over the place.
 func _on_resumed() -> void:
@@ -1313,7 +1339,7 @@ func toast_on_arrival(text: String) -> void:
 	_flush_arrival_toast.call_deferred()   # after this frame's open_instance has set its cover (or not)
 
 func _flush_arrival_toast() -> void:
-	if _arrival_toast.is_empty() or not _arrive.is_empty(): return
+	if _arrival_toast.is_empty() or not _arrive.is_empty() or _launch_s >= 0.0: return
 	if Time.get_ticks_msec() - int(_arrival_toast.t0) <= int(ARRIVE_FAIL_S * 1000.0): ui.toast(str(_arrival_toast.text))
 	_arrival_toast = {}
 
@@ -1579,7 +1605,7 @@ func _dev_shot(dt: float) -> void:
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
-			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]
+			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
 			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, picked)
 				if is_instance_valid(_home_flow):
 					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
@@ -1598,6 +1624,8 @@ func _dev_shot(dt: float) -> void:
 			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
 			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
 			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
+			"homechange": change_home(func(): ui.open_settings())   # Settings › Home city (PR-4)
+			"homemove": if is_instance_valid(_home_flow) and _home_flow.confirm != null: _home_flow.confirm.move.pressed.emit()
 			"homeloading": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()   # the reading frame
 			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
 				if is_instance_valid(_home_flow):
