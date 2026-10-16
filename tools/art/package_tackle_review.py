@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Label inspected runtime media and retain auditable SGODOT-214 evidence."""
 from pathlib import Path
-import json,shutil,hashlib,math,colorsys,statistics
+import json,shutil,hashlib,math,colorsys,statistics,sys
 from PIL import Image,ImageDraw,ImageFont
 ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'output/tackle-214'
 DEST=ROOT/'docs/design/tackle-shop-214-2026-10-16'
@@ -83,4 +83,20 @@ def main():
     (DEST/'media-manifest.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
     print('REVIEW_PACKAGE',len(files),'files; max structural hue difference',max_delta)
 
-if __name__=='__main__':main()
+def package_spawn():
+    raw=OUT/'spawn-captures/game-spawn-follow-360.png'
+    path=save('13_spawn_follow_360',signature(Image.open(raw).convert('RGB'),
+        '进门跟随取景 · 43° / 6.72 m',
+        '360 × 800；玩家在 spawn，镜头跟随玩家\nFinn 为现有造型；Vulkan Mobile / RTX 2060'))
+    shutil.copy2(OUT/'spawn-captures/spawn-follow-validation.json',DEST/'spawn-follow-validation.json')
+    record={'path':str(path.relative_to(ROOT)),'name':path.name,'size':path.stat().st_size,
+            'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+    for file in [DEST/'media-manifest.json',OUT/'delivery-files.json']:
+        rows=json.loads(file.read_text())
+        rows=[r for r in rows if r['name']!=path.name]+[record]
+        file.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+    print('SPAWN_REVIEW_PACKAGED',path.name)
+
+if __name__=='__main__':
+    if '--spawn-only' in sys.argv:package_spawn()
+    else:main()

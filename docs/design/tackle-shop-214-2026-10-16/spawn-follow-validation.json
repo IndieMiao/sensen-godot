@@ -1,0 +1,122 @@
+{
+	"adapter": "NVIDIA GeForce RTX 2060",
+	"assets": {},
+	"captures": [
+		{
+			"name": "game-spawn-follow-360",
+			"orthographic_width": 6.71999979019165,
+			"pitch": 42.9999961853027,
+			"position": [
+				10.342903137207,
+				13.7199668884277,
+				11.1729030609131
+			],
+			"resolution": [
+				360,
+				800
+			],
+			"yaw": 45.0
+		}
+	],
+	"checks": [
+		{
+			"check": "Entry-view actor assembled",
+			"passed": true
+		},
+		{
+			"check": "Entry-view actor assembled",
+			"passed": true
+		},
+		{
+			"check": "Existing Finn part: hairhat51",
+			"passed": true
+		},
+		{
+			"check": "Existing Finn part: cloth12_npc_finn",
+			"passed": true
+		},
+		{
+			"check": "Existing Finn part: shoes4",
+			"passed": true
+		},
+		{
+			"check": "Camera follows player feet at spawn, centered at 180/400",
+			"passed": true
+		},
+		{
+			"check": "Capture game-spawn-follow-360",
+			"passed": true
+		}
+	],
+	"counter_screen_bounds": {
+		"max": [
+			290.996704101562,
+			379.234558105469
+		],
+		"min": [
+			182.312118530273,
+			261.818359375
+		]
+	},
+	"failures": [],
+	"finn": {
+		"name": "Finn",
+		"scale": 1.0,
+		"slots": {
+			"cloth": "cloth12_npc_finn",
+			"hairHat": "hairhat51",
+			"shoes": "shoes4"
+		}
+	},
+	"finn_resource_sha256": {
+		"assets/avatar/parts/cloth12_npc_finn.res": "770e1df6add96a94e07825d3d0ecfef092cece757902f222e293dabe418f775f",
+		"assets/avatar/parts/hairhat51.res": "1a087b15a3bb427c269a7b2949114bf72f82ce950cbc69f55465382a931e86a3",
+		"assets/avatar/parts/hairhat51_scene.tscn": "11c32e406e05fdad0eb0f3a58457be8397260c7dac1359b7a6cf6cfbca32b87b",
+		"assets/avatar/parts/shoes4.res": "6cfc8603d73df9d8442865ecef98f6b04a7cf28a9125ab926edf1816c0cec58a",
+		"assets/avatar/source/cloth12_npc_finn/T_skin12_cloth_D.png": "63710632b6293f644eb7c69450aa58537d04152656e2670930db4fd9b427a15d",
+		"assets/avatar/source/hairhat51/T_skin40_hairHat_D.png": "cf2acf9b46c7b3a74945ec0d9d556bd37c5672f0538c757d0d553cfc89acb39d",
+		"assets/avatar/source/shoes4/T_skin04_shoes_D.png": "9270e3bad9df0bf50ea1f3de2e569b6a41c2073b5b3371ccb7fd8cc2f702a77e"
+	},
+	"finn_screen_bounds": {
+		"max": [
+			320.916290283203,
+			331.013092041016
+		],
+		"min": [
+			252.730926513672,
+			224.492126464844
+		]
+	},
+	"finn_source_revision": "f8c3391c8c0606ae664fb8e06ad85068aa199f69",
+	"focus": [
+		0.0,
+		0.0799999982118607,
+		0.829999983310699
+	],
+	"keeper": [
+		-0.360000014305115,
+		0.0799999982118607,
+		-2.34999990463257
+	],
+	"player_screen": [
+		180.0,
+		400.0,
+		0.0
+	],
+	"player_screen_bounds": {
+		"max": [
+			214.092636108398,
+			422.467498779297
+		],
+		"min": [
+			145.907363891602,
+			315.766082763672
+		]
+	},
+	"renderer": "mobile",
+	"spawn": [
+		0.0,
+		0.0799999982118607,
+		0.829999983310699
+	]
+}

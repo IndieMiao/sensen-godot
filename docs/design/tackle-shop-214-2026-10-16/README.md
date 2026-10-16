@@ -39,6 +39,29 @@
 45°方位、6.72 m 正交宽的游戏取景；另交不裁切的 43°完整全景。
 游戏取景会裁掉房间边角，没有偷偷缩小房间或改变 6.72 m 参数。
 
+**2026-10-16 补图口径**：进门第一眼以
+[13_spawn_follow_360](SGODOT-214_TACKLE_v1_13_spawn_follow_360.png) 为准。
+玩家脚下位于 layout 的 `spawn = (0, 0.08, 0.83)`，镜头直接跟随此点；
+原始视口 360×800、俯角 43°、套件方位 45°、正交宽 6.72 m。
+已看图确认柜台与 Finn 在画面内。Finn 使用 `farm-dev` 固定提交
+`f8c3391c8c0606ae664fb8e06ad85068aa199f69` 的既有造型
+`hairhat51 / cloth12_npc_finn / shoes4`，只在隔离审阅工程中读入。
+玩家为现有默认尺规人偶；名字是审阅标记。本图用于按派活口径审视第一眼，
+不代表玩法房间的完整 HUD / 自动取景接入。原 `01_game_360` 是固定房间构图，
+保留作历史对照，不再作为进门画面的验收图；`02_whole_43deg` 仍为完整全景。
+
+补图命令（复用已搭好的隔离工程）：
+
+```sh
+python3 tools/art/prepare_tackle_spawn_review.py
+godot --headless --editor --path output/tackle-214/project --import --quit
+godot --path output/tackle-214/project --rendering-method mobile \
+  --rendering-driver vulkan res://spawn_review.tscn
+python3 tools/art/package_tackle_review.py --spawn-only
+```
+
+镜头、站位、Finn 部件来源及实际投影记录见 `spawn-follow-validation.json`。
+
 本目录的 `SGODOT-214_TACKLE_v1_*` 图均来自 Godot 4.7.2 实际渲染。
 正交图同样来自交付模型。图片署名为外部审阅标注，不烘入房间。
 站位图用同一现有 1.745 m 默认角色验证空间，不代表 Finn / Kai / Rafa 的角色美术。
