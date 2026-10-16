@@ -3,14 +3,14 @@ extends P0Room
 ## P0 kitchen, Lv5–9 in the Standard Room and Lv10 in the Deluxe Room (ROOMS); the place chip reads
 ## "San Francisco · Farmhouse" (LOCK-06 K-1). Entered from the farm (the door card's Kitchen row, or walking into the
 ## doorway); its door leaves back to the farm.
-## Placeholder period: the accepted Basic Room art with assets/p0/rooms/farmhouse.anchors.json; the final
-## farmhouse_lv1 (SGODOT-213) swaps the art and brings the anchors in its own layout.json.
+## The Basic Room's kitchen is SGODOT-213's three-burner range (kitchen_range_3), Spice Rack and cookbook, with
+## assets/p0/rooms/farmhouse.anchors.json; each stove has its pot (SGODOT-282 stove_pot.glb).
 ## Cooking is the 3D stove stage (P0Kitchen, LOCK-20 v5): tap the stove → walk there → the cooking drawer.
 ## The kitchen corner grows with the Homestead (§7.7): the Spice Rack from Lv2 and the Warming Cabinet from Lv3,
-## placeholder props from the anchors file until farmhouse_lv1; tapping either opens its sheet (COOK-P0-5 / 6).
+## the Basic Room's rack in its layout, the cabinet a model from the anchors file; tapping either opens its sheet (COOK-P0-5 / 6).
 
 const STOVE := "use_stove_1"
-## Stoves 2 and 3 (Homestead Lv4 / Lv8, SGODOT-282): their own pot spots on the hearth, each tapped and named alone.
+## Stoves 2 and 3 (Homestead Lv4 / Lv8, SGODOT-282): their own burners on the range, each tapped and named alone.
 const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
@@ -18,14 +18,14 @@ const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (the mo
 ## The room by Homestead level (§8.3.1, q(14); content homestead.rooms [[1, basic], [5, standard], [10, deluxe]]), only ever
 ## up. Each kit's kitchen corner keeps the P0 names — stoves 1–3 on its cooker, the Spice Rack, the Warming Cabinet — so the
 ## kitchen, the stage and the sheets work the same in all three; `hits` is hit_nodes (the art that takes each one's tap).
-## Basic: the P0 placeholder anchors on the hearth. Standard (282 c62a6ed9 ②; 上官婉儿 on 282): the stoves on the range
+## Basic: the three burners of kitchen_range_3 (SGODOT-213), 1 / 2 / 3 left to right. Standard (282 c62a6ed9 ②; 上官婉儿 on 282): the stoves on the range
 ## cooker's burners (1 front left, 2 front right, 3 back right), the Spice Rack is the shelf over the sink, the Warming
 ## Cabinet the Basic Room's placeholder on the west wall facing the camera, as there. Deluxe: its layout.json's kitchen hooks (the range cooker, the
 ## fittings along the west wall), the file adding badges, stands and shots; the rack and cabinet are inside the one
 ## kitchen_fittings model, so they take taps round their anchors.
 const ROOMS := {
 	"basic": {art = "basic_room", anchors = "res://assets/p0/rooms/farmhouse.anchors.json",
-		hits = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}},
+		hits = {STOVE: "kitchen_range_3", RACK: "spice_rack", CABINET: "warming_cabinet"}},
 	"standard": {art = "standard_room_5", anchors = "res://assets/p0/rooms/farmhouse_standard.anchors.json",
 		hits = {STOVE: "range_cooker", RACK: "wall_shelf", CABINET: "warming_cabinet"}},
 	"deluxe": {art = "deluxe_room_10", anchors = "res://assets/p0/rooms/farmhouse_deluxe.anchors.json",
@@ -56,9 +56,9 @@ func _init() -> void:
 	anchors_path = "res://assets/p0/rooms/farmhouse.anchors.json"
 	place_name = "Farmhouse"
 	exit_to = "Farm"   # the door's world prompt: i-door + Farm (SGODOT-250)
-	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
-	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
-	hit_nodes = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}
+	# The stove is the range only; the rack on the wall beside it and the cabinet under that are their own, and where
+	# they overlap the smaller takes the tap (int6 C8).
+	hit_nodes = (ROOMS.basic.hits as Dictionary).duplicate()
 
 ## The room for a Homestead level: the last of content homestead.rooms it has reached ("basic" below them all).
 static func room_for(lv: int) -> String:
@@ -88,8 +88,8 @@ func check_room(v: Dictionary) -> void:
 	if rt.ui.has_modal() or not rt.ui._card_queue.is_empty() or (kitchen != null and kitchen.busy()): return
 	_reopening = bool(reopen.call())
 
-## The fire that burns brighter while a pot cooks: the Basic Room's, whose stove is its hearth; the Standard and Deluxe
-## stoves are range cookers across the room from their fireplaces, so theirs stays as it is.
+## The fire that burns brighter while a pot cooks: the Basic Room's, under stove 1 on its range (fire_1, with the room's
+## one lamp); the Standard and Deluxe stoves are range cookers across the room from their fireplaces, so theirs stays as it is.
 func stove_fire() -> Node:
 	return art.get("fire") as Node if room_kind == "basic" and "fire" in art else null
 
@@ -240,6 +240,7 @@ func _dress_art() -> void:
 		art.add_child(glow)
 		module_levels[glow.name] = module_levels.get("warming_cabinet", 3)
 	if use_runtime: show_cabinet_plates(P0KitchenLogic.cabinet_plates(view))   # before the first frame: no flash of six (刘邦 on #431)
+	_build_pots()
 
 ## The Warming Cabinet shows dish_1 … dish_N for the N dishes it holds (q(202)): at once, no animation; its warm light
 ## stays on, empty or not.
@@ -255,39 +256,165 @@ func show_cabinet_plates(n: int) -> void:
 func _room_ready() -> void:
 	kitchen = P0Kitchen.new(self)
 	add_child(kitchen)
-	show_big_pots.call_deferred()
+	show_pots.call_deferred()
 
-## The Big Pot on a stove switched to it (q(201) ⑦): a placeholder stock pot on its hob until 刘备's pot_normal / pot_big
-## arrive (上官婉儿 on 282: the pot's floor per room, Basic 1.377 / Standard 1.457 / Deluxe 1.291; ≤ 0.28 across).
-const BIG_POT_FLOOR := {"basic": 1.377, "standard": 1.457, "deluxe": 1.291}
-const BIG_POT_SIZE := Vector2(0.13, 0.22)   # radius, height
-func show_big_pots() -> void:
-	if not is_inside_tree() or kitchen == null or art == null: return
+## Each stove's pot (SGODOT-282 stove_pot.glb, its manifest's placements): pot_normal, or pot_big while the stove is
+## switched to the Big Pot (q(201) ⑦); only the stoves the view has (Homestead Lv4 / Lv8). The stove's drop_pot anchor
+## follows the shown pot's mouth, so the ingredient cards, the steam and the plate sit on that pot. In the Basic Room the
+## range's iron lids close the burners not yet open (lid_2 / lid_3) and those burners light (fire_2 / fire_3) when they open.
+const POT_SCENE := "res://assets/props/stove_pot/stove_pot.glb"
+const POT_MANIFEST := "res://assets/props/stove_pot/manifest.json"
+const POT_ROOMS := {"basic": "basic_room", "standard": "standard_room_5", "deluxe": "deluxe_room_10"}
+const RANGE := "kitchen_range_3"
+var _pots: Node3D        # art/stove_pots: stove_pot_1 … _3
+var _fires: Array = []   # the Basic Room's fire_2 / fire_3 flames ([] elsewhere)
+var _pots_key := ""
+
+## The pots and the Basic Room's extra flames, all hidden until show_pots.
+func _build_pots() -> void:
+	var place: Dictionary = P0RoomAnchors.read_json(POT_MANIFEST).get("placements", {}).get(POT_ROOMS.get(room_kind, ""), {})
+	if place.is_empty() or not ResourceLoader.exists(POT_SCENE): return
+	_pots = Node3D.new()
+	_pots.name = "stove_pots"
+	art.add_child(_pots)
+	var scene := load(POT_SCENE) as PackedScene
+	var yaws: Array = place.get("yaw_degrees", [])
+	for i in (place.xz as Array).size():
+		var pot := scene.instantiate() as Node3D
+		pot.name = "stove_pot_%d" % (i + 1)
+		pot.position = Vector3(float(place.xz[i][0]), float(place.y), float(place.xz[i][1]))
+		pot.rotation.y = deg_to_rad(float(yaws[i]) if i < yaws.size() else 0.0)
+		pot.visible = false
+		_pots.add_child(pot)
+	var cooker := art.get_node_or_null(RANGE)
+	if cooker == null or not art.has_node("fire"): return
+	var flames := Node3D.new()   # a holder: the art's own children take module visibility, these follow the stoves
+	flames.name = "stove_fires"
+	art.add_child(flames)
+	for k in [2, 3]:   # the same flame as stove 1's (basic_room_art), without a lamp of its own: the room keeps one
+		var at := cooker.find_child("fire_%d" % k, true, false) as Node3D
+		if at == null: continue
+		var fire := preload("res://assets/rooms/_shared/fx/fx_hearth_fire.tscn").instantiate()
+		fire.name = "fire_%d" % k
+		fire.emission_box = Vector3(.18, .005, .035)
+		fire.flame_height = .42
+		fire.flame_count = 16
+		fire.spark_count = 4
+		fire.light_energy = 0.0
+		fire.position = _in_art(at)
+		fire.visible = false
+		flames.add_child(fire)
+		var lamp = fire.get("light")
+		if lamp is Node and (lamp as Node).get_parent() == fire:
+			(lamp as Node).free()
+			fire.set("light", null)
+		_fires.append(fire)
+
+## A node's position in the art's frame, in the tree or not.
+func _in_art(n: Node3D) -> Vector3:
+	var t := Transform3D()
+	var at: Node = n
+	while at != null and at != art:
+		t = (at as Node3D).transform * t
+		at = at.get_parent()
+	return t.origin
+
+func show_pots() -> void:
+	if _pots == null or kitchen == null or _pots_key == "review": return
 	var v := P0Runtime.ensure().session.current() if use_runtime else (rt.session.current() if rt else {})
-	for i in 3:
-		var n := "big_pot_placeholder_%d" % (i + 1)
-		var at := anchor("use_stove_%d" % (i + 1))
-		var on: bool = at != null and P0KitchenLogic.big_pot(v) and kitchen.big().has(i)
-		var pot := art.get_node_or_null(n) as MeshInstance3D
-		if not on:
-			if pot: pot.queue_free()
-			continue
-		if pot == null:
-			pot = MeshInstance3D.new()
-			pot.name = n
-			var mesh := CylinderMesh.new()
-			mesh.top_radius = BIG_POT_SIZE.x
-			mesh.bottom_radius = BIG_POT_SIZE.x * 0.92
-			mesh.height = BIG_POT_SIZE.y
-			var mat := StandardMaterial3D.new()
-			mat.albedo_color = Color("B8733A")   # copper, as the stock pot's band (placeholder)
-			mat.roughness = 0.6
-			mat.metallic_specular = 0.28
-			mesh.material = mat
-			pot.mesh = mesh
-			art.add_child(pot)
-		var g := at.global_position
-		pot.position = art.to_local(Vector3(g.x, float(BIG_POT_FLOOR.get(room_kind, g.y)) + BIG_POT_SIZE.y * 0.5, g.z))
+	var n := _stove_count()
+	var big: Array = kitchen.big() if P0KitchenLogic.big_pot(v) else []
+	var key := "%d:%s" % [n, big]
+	if key == _pots_key: return
+	_pots_key = key
+	_apply_pots(n, big)
+
+## n stoves' pots shown, `big` the stoves on the Big Pot.
+func _apply_pots(n: int, big: Array) -> void:
+	for i in _pots.get_child_count():
+		var pot := _pots.get_child(i) as Node3D
+		pot.visible = i < n
+		var variant := "pot_big" if big.has(i) else "pot_normal"
+		if pot.visible and _variants.get(i, variant) != variant: _swap_bounce(pot, variant)
+		_variants[i] = variant
+		(pot.get_node("pot_big") as Node3D).visible = variant == "pot_big"
+		(pot.get_node("pot_normal") as Node3D).visible = variant == "pot_normal"
+		var drop := anchor("drop_pot_%d" % (i + 1))
+		var mouth := pot.get_node_or_null(variant + "/mouth") as Node3D
+		if drop and mouth: drop.position = art.transform * _in_art(mouth)   # Anchors sits beside the art under Room
+	var cooker := art.get_node_or_null(RANGE)
+	if cooker:
+		for k in [2, 3]:
+			var lid := cooker.find_child("lid_%d" % k, true, false) as Node3D
+			if lid: lid.visible = n < k
+	for f in _fires: (f as Node3D).visible = int(str(f.name).trim_prefix("fire_")) <= n
+
+## The pot switched (282 v1.1, 不知火舞 5d6fcf56): a 0.15 s bounce 0.9 → 1.05 → 1, and on to the Big Pot a ~0.4 s puff
+## of steam from its vent.
+const SWAP_S := 0.15
+const SWAP_PUFF_S := 0.4
+var _variants := {}   # stove → the variant shown, for the switch's bounce
+var _tweens := {}     # node → its running bounce / lid tween, stopped when the next one starts
+func _swap_bounce(pot: Node3D, variant: String) -> void:
+	if not is_inside_tree(): return
+	pot.scale = Vector3.ONE * 0.9
+	var t := _restart_tween(pot)
+	t.tween_property(pot, "scale", Vector3.ONE * 1.05, SWAP_S * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(pot, "scale", Vector3.ONE, SWAP_S * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if variant == "pot_big" and kitchen: kitchen.stage.puff_at(pot.get_node("pot_big/vent"), SWAP_PUFF_S)
+
+func _restart_tween(n: Node) -> Tween:
+	var old = _tweens.get(n)
+	if old is Tween and (old as Tween).is_valid(): (old as Tween).kill()
+	var t := create_tween()
+	_tweens[n] = t
+	return t
+
+## Where stove i's steam rises: the Big Pot's vent while its lid is on, else the pot's mouth (drop_pot).
+func steam_from(i: int) -> Node3D:
+	var vent := _vent(i)
+	return vent if vent else anchor("drop_pot_%d" % (i + 1))
+
+## Stove i's Big Pot lid still on its way up or down (its steam waits for it, as while the lid is up).
+func _lid_moving(i: int) -> bool:
+	var pot := _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
+	var t = _tweens.get(pot.get_node("pot_big/lid")) if pot else null
+	return t is Tween and (t as Tween).is_running()
+
+## Stove i's Big Pot vent while its lid is on; null otherwise.
+func _vent(i: int) -> Node3D:
+	var pot := _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
+	if pot and pot.visible and (pot.get_node("pot_big") as Node3D).visible and not _lids_up.get(i, false): return pot.get_node("pot_big/vent")
+	return null
+
+## The Big Pot's lid (282 v1.1 / 5d6fcf56, LOCK-20: ingredients are seen landing in the pot): on while empty; up once
+## ingredients go in (the stove worked, composing, nothing cooking, with a page's ingredients over the pot — Cookbook
+## — or ingredients put in — Experiment); shut within 0.15 s once the fire is lit, the steam from its vent; up again
+## when the dish is ready, until it is collected (the steam and the dish come out of the mouth). Up: 0.06 higher, tilted
+## back 20° on its rear-edge pivot. The ordinary pot has none.
+const LID_S := 0.15
+const LID_RISE := 0.06
+const LID_TILT := -20.0
+var _lids_up := {}   # stove → lid up
+var _lid_rest := {}  # lid → its resting position, read from the model before it first moves
+func _update_lids(v: Dictionary) -> void:
+	if _pots == null or kitchen == null: return
+	for i in _pots.get_child_count():
+		var pot := _pots.get_child(i) as Node3D
+		var st = P0KitchenLogic.stove(v, i)
+		var worked := i == kitchen.stove_index
+		var up: bool = pot.visible and _variants.get(i, "") == "pot_big" and (
+			(worked and kitchen.phase == "compose" and st == null and (kitchen.stage.ghost_count() > 0 or not kitchen.stage.card_ids().is_empty()))   # ingredients on it
+			or (st != null and float(st.get("ready_in", 0)) <= 0.0)          # ready, waiting to be collected
+			or (worked and kitchen.phase == "serve"))                        # the dish coming out
+		if bool(_lids_up.get(i, false)) == up: continue
+		_lids_up[i] = up
+		var lid := pot.get_node("pot_big/lid") as Node3D
+		if not _lid_rest.has(lid): _lid_rest[lid] = lid.position   # stove_pot.glb: the pivot on its rear edge
+		var rest: Vector3 = _lid_rest[lid]
+		var t := _restart_tween(lid).set_parallel()
+		t.tween_property(lid, "position", rest + Vector3(0, LID_RISE if up else 0.0, 0), LID_S)
+		t.tween_property(lid, "rotation_degrees:x", LID_TILT if up else 0.0, LID_S)
 
 # ---------------------------------------------------------------- stove (COOK-1)
 ## Finger card and STATE-ICONS badge over the stove: Empty / countdown / Ready (plan §7.2.2 step 1).
@@ -414,6 +541,10 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	check_room(v)
 	show_cabinet_plates(P0KitchenLogic.cabinet_plates(v))
 	if kitchen == null: return
+	show_pots()   # a stove opened (Lv4 / Lv8) or switched to the Big Pot
+	_update_lids(v)
+	kitchen.stage.steam_point = _vent(kitchen.stove_index)   # null: just above the mouth, as before
+	kitchen.stage.steam_hold = _lid_moving(kitchen.stove_index) or bool(_lids_up.get(kitchen.stove_index, false))   # the steam waits until the lid is down
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
@@ -610,6 +741,12 @@ func p0_dev(step: PackedStringArray) -> bool:
 			kitchen._on_ingredient(step[1], Vector2.INF)
 		"keep": if kitchen.phase == "card": rt.ui.close_modal()
 		"roomkind": print("P0_ROOM_KIND ", room_kind, " Lv", level)   # which room this farmhouse built (282 shots)
+		"closeup":   # closeup:<cam anchor> — pushed in on that point, held (art review shots of the pots)
+			focus(step[1], {size = view_size() * 0.22, release_on_move = false, band = band_below_hud(0.5)})
+		"potreview":   # potreview[:i/j] — all three pots, stoves i, j on the Big Pot, every burner open (art review shots only)
+			if _pots:
+				_pots_key = "review"
+				_apply_pots(_pots.get_child_count(), Array(step[1].split("/")).map(func(x): return int(x)) if step.size() > 1 else [])
 		"rack": open_sheet("rack")
 		"cabinet": open_sheet("cabinet")
 		"level":
