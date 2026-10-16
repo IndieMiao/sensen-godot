@@ -3073,6 +3073,19 @@ func open_settings(back := Callable()) -> void:
 	modal_kind = "settings"
 	_modal_back = back
 
+## The home pick (SGODOT-303, P0HomeFlow) over no world: a new player's first pages. Back on the spot page goes to the
+## city page; on the city page it does nothing (there is nowhere before it).
+func open_home_flow(flow: Control) -> void:
+	flow.theme = UiKit.theme()
+	flow.say.connect(func(text: String): toast(text))
+	_open_modal(flow, 0.0, true)
+	modal_kind = "home_pick"
+	_modal_back = _home_flow_back.bind(flow)
+
+func _home_flow_back(flow: Control) -> void:
+	if is_instance_valid(flow) and flow.spots != null: flow.back_to_cities()
+	_modal_back = _home_flow_back.bind(flow)
+
 ## SET-LICENSES: the credits (P0Legal); a row opens its full text, whose ‹ comes back here.
 func open_licenses(back := Callable()) -> void:
 	var page := P0SettingsPage.licenses(P0Legal.groups(), safe_top(), safe_bottom())

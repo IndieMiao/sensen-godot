@@ -1174,6 +1174,53 @@ func _launch_failed() -> void:
 	_probe_left = PROBE_S
 	ui.show_screen(P0SysScreen.Kind.FAIL)
 
+## `then(view)` once the first state is in (now, when it already is): p0_boot waits on it to know whether a new player
+## picks a home first (SGODOT-303). The launch cover stays up meanwhile, Can't connect and its retries included.
+func when_first_view(then: Callable) -> void:
+	if not session.view.is_empty():
+		then.call(session.view)
+		return
+	session.state_changed.connect(func(v: Dictionary, _e: Array): then.call(v), CONNECT_ONE_SHOT)
+
+## Whether the save waits for its home to be picked (view.home.pending): it plays nothing else meanwhile (the server
+## refuses every other command with home_pending).
+static func home_pending(view: Dictionary) -> bool:
+	var h = view.get("home", null)
+	return h is Dictionary and bool((h as Dictionary).get("pending", false))
+
+## SGODOT-303: the home pick (P0HomeFlow) in place of the launch cover; `done` once choose_home is in — the caller
+## brings up the first world under a new launch cover.
+func pick_home(done: Callable) -> void:
+	_launch_s = -1.0
+	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom())
+	_home_done = done
+	_home_flow.chose.connect(func(cluster: String, spot: int):
+		var cmd := {"type": "choose_home", "city": cluster, "spot": spot}
+		_home_key = P0Session.ui_key(cmd)
+		if not session.send(cmd, _home_key): _home_flow.sent(false))
+	if not session.command_settled.is_connected(_home_settled): session.command_settled.connect(_home_settled)
+	ui.open_home_flow(_home_flow)
+
+var _home_flow: Control
+var _home_done := Callable()
+var _home_key := ""
+
+## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken, the
+## pick goes and the first world comes under the launch cover.
+func _home_settled(key: String, ok: bool, _code: String) -> void:
+	if key != _home_key or _home_key == "": return
+	_home_key = ""
+	if is_instance_valid(_home_flow): _home_flow.sent(ok)
+	if not ok: return
+	session.command_settled.disconnect(_home_settled)
+	_home_flow = null
+	ui.close_modal()
+	cover_launch()
+	var done := _home_done
+	_home_done = Callable()
+	if done.is_valid(): done.call()
+
 ## The launch is over once the first answer and a world are both in: the cover (or Can't connect) goes.
 func _end_launch() -> void:
 	if _launch_s < 0.0 or session.view.is_empty() or not is_instance_valid(world): return
