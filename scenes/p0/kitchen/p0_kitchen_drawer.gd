@@ -76,7 +76,7 @@ const _PILL_EDGE := Color("E1DAC8")
 ## The Big Pot is a stove state (q(201), Homestead Lv6): `big_stoves` are the stoves switched to it on this device (the
 ## kitchen keeps them in user://p0_ui.cfg); the key left of Cook switches the current stove and says so
 ## (`big_pot_toggled`), the kitchen saving it and changing the pot. Cookbook and Experiment each have the key.
-var big_stoves: Array = []
+var big_stoves: Array = []: set = set_big_stoves
 signal big_pot_toggled(stove: int, on: bool)
 signal unavailable(reason: String)
 ## The batch or the Big Pot changed what the pot card shows (×N, servings): the kitchen redraws it.
@@ -187,6 +187,13 @@ func refresh() -> void:
 	_refresh_experiment()
 
 func is_big(i := -1) -> bool: return big_stoves.has(stove_index if i < 0 else i)
+
+## The Big Pot stoves count in the batch's pots (a Big Pot stove takes two sets): set after the card is laid out (the
+## kitchen hands them over once the drawer exists), it is laid out again, so the stepper's limit counts them too (0.2.8
+## retest, 286 2389195c: opened on an ordinary stove, the stepper went to 3 pots where the stock made 2).
+func set_big_stoves(v: Array) -> void:
+	big_stoves = v
+	if _stove != null: refresh()
 
 func set_stove_index(v: int) -> void:
 	if v != stove_index: batch_n = 1
@@ -533,10 +540,11 @@ func _layout_recipe() -> void:
 func batch_plan() -> Dictionary:
 	return P0KitchenLogic.batch_plan(view, page(selected_page), 1 if queue_mode else batch_n, stove_index, big_stoves, queue_mode)
 
-## What Cook sends: one pot is the plain cook, more is batch_cook (P0KitchenLogic.card_command).
+## What Cook sends: one pot is the plain cook, more is batch_cook (P0KitchenLogic.card_command); never more pots than
+## the plan places, so the command is the batch the confirm and the pot card show.
 func card_command() -> Dictionary:
-	return P0KitchenLogic.card_command(page(selected_page), batch_n if _stepper.visible else 1, stove_index, big_stoves,
-		P0KitchenLogic.stove_count(view) > 1)
+	var n := mini(batch_n, maxi(1, (batch_plan().pots as Array).size())) if _stepper.visible else 1
+	return P0KitchenLogic.card_command(page(selected_page), n, stove_index, big_stoves, P0KitchenLogic.stove_count(view) > 1)
 
 func _on_batch_n(n: int) -> void:
 	var before := batch_n
