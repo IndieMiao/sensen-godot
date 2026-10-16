@@ -80,7 +80,7 @@ func audit():
 	check(surfaces <= 60 and surfaces == expected.static_draw_surfaces, "Placed room surface budget")
 	check(room.find_children("*","DirectionalLight3D",true,false).is_empty() and room.find_children("*","WorldEnvironment",true,false).is_empty(),
 		"Environment and sunlight belong to consumer")
-	check(room.find_children("*","OmniLight3D",true,false).size() == 3, "Three authored local lamp lights")
+	check(room.find_children("*","Light3D",true,false).size() == 3, "Three authored local lamp lights")
 	check(report.assets.rod_rack.triangles + report.assets.float_barrel.triangles <= 1200, "Rod rack plus float barrel <= 1200")
 	check(room.get_node("rod_rack").position.z - .50 > -1.37 + .64, "Rod tips beside porthole aperture")
 	for id in ["npc_keeper", "stand_counter", "npc_kai", "stand_kai", "npc_rafa", "stand_rafa", "use_fish_board", "stand_fish_board", "spawn", "exit", "badge_exit"]:
@@ -103,9 +103,9 @@ func run():
 	layout = JSON.parse_string(FileAccess.get_file_as_string(KIT + "layout.json"))
 	setup(); audit()
 	pose(Vector3(0,1.20,0),10.2); await capture("whole-43deg")
-	for light in room.find_children("*","OmniLight3D",true,false):light.visible=false
+	for light in room.find_children("*","Light3D",true,false):light.visible=false
 	await capture("whole-lamps-off")
-	for light in room.find_children("*","OmniLight3D",true,false):light.visible=true
+	for light in room.find_children("*","Light3D",true,false):light.visible=true
 	vp.size = Vector2i(360,800); pose(Vector3(-.05,1.1,-.10),6.72); await capture("game-360-6p72m")
 	report.game_anchor_projections = {}
 	for id in ["npc_keeper", "npc_kai", "npc_rafa", "spawn", "exit", "use_fish_board"]:

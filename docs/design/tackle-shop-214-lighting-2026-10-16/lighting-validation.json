@@ -1,0 +1,1801 @@
+{
+	"adapter": "NVIDIA GeForce RTX 2060",
+	"assets": {
+		"anchor_rug": {
+			"bounds": [
+				[
+					-1.39001739025116,
+					0.0,
+					-1.39001739025116
+				],
+				[
+					1.39001739025116,
+					0.0269475728273392,
+					1.39001762866974
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1468
+		},
+		"back_wall": {
+			"bounds": [
+				[
+					-3.375,
+					0.0,
+					-0.129999876022339
+				],
+				[
+					3.375,
+					3.29999995231628,
+					0.234999895095825
+				]
+			],
+			"surfaces": 1,
+			"triangles": 3888
+		},
+		"blue_map": {
+			"bounds": [
+				[
+					-0.682500004768372,
+					-0.597500085830688,
+					-0.0174999237060547
+				],
+				[
+					0.682500004768372,
+					0.597500085830688,
+					0.0550000667572021
+				]
+			],
+			"surfaces": 1,
+			"triangles": 810
+		},
+		"bunting": {
+			"bounds": [
+				[
+					-0.758912682533264,
+					-0.395347237586975,
+					-0.00799706112593412
+				],
+				[
+					0.759069085121155,
+					0.18404757976532,
+					0.0319954678416252
+				]
+			],
+			"surfaces": 1,
+			"triangles": 88
+		},
+		"corner_open_shelf": {
+			"bounds": [
+				[
+					-0.607500076293945,
+					0.000000044703483581543,
+					-0.355000019073486
+				],
+				[
+					0.607500076293945,
+					2.0074999332428,
+					0.355000019073486
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1404
+		},
+		"corner_shelf_stock": {
+			"bounds": [
+				[
+					-0.487499952316284,
+					0.159999996423721,
+					-0.259999990463257
+				],
+				[
+					0.49399995803833,
+					2.21700000762939,
+					0.263999938964844
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1928
+		},
+		"counter_lantern": {
+			"bounds": [
+				[
+					-0.102480053901672,
+					0.0,
+					-0.102480053901672
+				],
+				[
+					0.102479994297028,
+					0.29008674621582,
+					0.102480053901672
+				]
+			],
+			"surfaces": 1,
+			"triangles": 578
+		},
+		"counter_ship_wheel": {
+			"bounds": [
+				[
+					-0.343999981880188,
+					-0.34400001168251,
+					-0.0279999971389771
+				],
+				[
+					0.343999981880188,
+					0.344000071287155,
+					0.0455000400543213
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1726
+		},
+		"counter_square_tool": {
+			"bounds": [
+				[
+					-0.160000026226044,
+					0.0,
+					-0.134999990463257
+				],
+				[
+					0.160000026226044,
+					0.259999990463257,
+					0.152999997138977
+				]
+			],
+			"surfaces": 1,
+			"triangles": 336
+		},
+		"curved_counter": {
+			"bounds": [
+				[
+					-1.02016353607178,
+					0.0150000005960464,
+					-0.279999971389771
+				],
+				[
+					1.02016353607178,
+					1.12000000476837,
+					0.548799991607666
+				]
+			],
+			"surfaces": 1,
+			"triangles": 972
+		},
+		"fish_board": {
+			"bounds": [
+				[
+					-0.347499996423721,
+					-0.527500033378601,
+					-0.0225000381469727
+				],
+				[
+					0.347500056028366,
+					0.527499914169312,
+					0.062000036239624
+				]
+			],
+			"surfaces": 1,
+			"triangles": 840
+		},
+		"fish_sign": {
+			"bounds": [
+				[
+					-0.617499947547913,
+					-0.253499984741211,
+					-0.035000167787075
+				],
+				[
+					0.617499947547913,
+					0.262193918228149,
+					0.0840000510215759
+				]
+			],
+			"surfaces": 1,
+			"triangles": 416
+		},
+		"fishbowl_contents": {
+			"bounds": [
+				[
+					-0.25,
+					0.0,
+					-0.25
+				],
+				[
+					0.25,
+					0.399999976158142,
+					0.25
+				]
+			],
+			"surfaces": 1,
+			"triangles": 2580
+		},
+		"fishbowl_glass": {
+			"bounds": [
+				[
+					-0.28999999165535,
+					0.0149999856948853,
+					-0.289999961853027
+				],
+				[
+					0.28999999165535,
+					0.460000038146973,
+					0.289999961853027
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1148
+		},
+		"fishbowl_glints": {
+			"bounds": [
+				[
+					-0.259999990463257,
+					0.146779417991638,
+					-0.208999991416931
+				],
+				[
+					0.227802783250809,
+					0.467794179916382,
+					0.208999991416931
+				]
+			],
+			"surfaces": 1,
+			"triangles": 636
+		},
+		"float_barrel": {
+			"bounds": [
+				[
+					-0.240000009536743,
+					0.0,
+					-0.240000009536743
+				],
+				[
+					0.240000009536743,
+					0.628749966621399,
+					0.240000009536743
+				]
+			],
+			"surfaces": 1,
+			"triangles": 424
+		},
+		"hat_rail": {
+			"bounds": [
+				[
+					-0.680000066757202,
+					-0.250400066375732,
+					-0.0374999046325684
+				],
+				[
+					0.680000066757202,
+					0.29040002822876,
+					0.41919994354248
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1132
+		},
+		"kai_fishing_net": {
+			"bounds": [
+				[
+					-0.305819272994995,
+					-0.00599707663059235,
+					0.0538383722305298
+				],
+				[
+					0.301049709320068,
+					0.832990288734436,
+					0.637006044387817
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1712
+		},
+		"kai_oar_barrel": {
+			"bounds": [
+				[
+					-0.396339893341064,
+					0.0,
+					-0.272979855537415
+				],
+				[
+					0.396339893341064,
+					1.41511023044586,
+					0.272979736328125
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1000
+		},
+		"kai_stool": {
+			"bounds": [
+				[
+					-0.25,
+					0.00018899142742157,
+					-0.25
+				],
+				[
+					0.25,
+					0.620000004768372,
+					0.25
+				]
+			],
+			"surfaces": 1,
+			"triangles": 208
+		},
+		"left_rope_crate": {
+			"bounds": [
+				[
+					-0.247499942779541,
+					0.0,
+					-0.274999976158142
+				],
+				[
+					0.252172231674194,
+					0.560258328914642,
+					0.274999976158142
+				]
+			],
+			"surfaces": 1,
+			"triangles": 3748
+		},
+		"left_wall": {
+			"bounds": [
+				[
+					-3.16499996185303,
+					0.0,
+					-0.130000084638596
+				],
+				[
+					3.16499996185303,
+					3.29999995231628,
+					0.235000044107437
+				]
+			],
+			"surfaces": 1,
+			"triangles": 4552
+		},
+		"model_sailboat": {
+			"bounds": [
+				[
+					-0.331737041473389,
+					0.0249999761581421,
+					-0.130000114440918
+				],
+				[
+					0.377757787704468,
+					0.710000038146973,
+					0.155866146087646
+				]
+			],
+			"surfaces": 1,
+			"triangles": 260
+		},
+		"pendant_lamp": {
+			"bounds": [
+				[
+					-0.240000009536743,
+					-0.105000019073486,
+					-0.240000009536743
+				],
+				[
+					0.240000009536743,
+					0.730000019073486,
+					0.240000009536743
+				]
+			],
+			"surfaces": 1,
+			"triangles": 748
+		},
+		"porthole": {
+			"bounds": [
+				[
+					-0.730000019073486,
+					-0.730000019073486,
+					-0.100000061094761
+				],
+				[
+					0.729999899864197,
+					0.730000019073486,
+					0.111000142991543
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1624
+		},
+		"porthole_view": {
+			"bounds": [
+				[
+					-0.634999990463257,
+					-0.634999990463257,
+					-0.00399991637095809
+				],
+				[
+					0.635000109672546,
+					0.634999990463257,
+					0.030000040307641
+				]
+			],
+			"surfaces": 1,
+			"triangles": 708
+		},
+		"rafa_fish_creel": {
+			"bounds": [
+				[
+					-0.269000053405762,
+					0.00999999046325684,
+					-0.231000006198883
+				],
+				[
+					0.266899108886719,
+					0.685999989509583,
+					0.229472160339355
+				]
+			],
+			"surfaces": 1,
+			"triangles": 952
+		},
+		"rafa_fishing_net": {
+			"bounds": [
+				[
+					-0.23134183883667,
+					-0.00617682933807373,
+					0.0535948276519775
+				],
+				[
+					0.226397037506104,
+					0.742990374565125,
+					0.636617600917816
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1712
+		},
+		"rafa_plant": {
+			"bounds": [
+				[
+					-0.313909530639648,
+					0.0,
+					-0.273405492305756
+				],
+				[
+					0.318569183349609,
+					0.917600035667419,
+					0.265076398849487
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1468
+		},
+		"right_low_shelf": {
+			"bounds": [
+				[
+					-0.827499985694885,
+					0.0000000149011611938477,
+					-0.300000190734863
+				],
+				[
+					0.827499866485596,
+					0.947500050067902,
+					0.300000190734863
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1404
+		},
+		"right_shelf_stock": {
+			"bounds": [
+				[
+					-0.712499976158142,
+					0.15999998152256,
+					-0.224999904632568
+				],
+				[
+					0.712500095367432,
+					0.711499989032745,
+					0.224999904632568
+				]
+			],
+			"surfaces": 1,
+			"triangles": 2192
+		},
+		"rod_rack": {
+			"bounds": [
+				[
+					-0.450000017881393,
+					-0.0000000149011611938477,
+					-0.174999982118607
+				],
+				[
+					0.449999958276749,
+					1.63007414340973,
+					0.191000014543533
+				]
+			],
+			"surfaces": 1,
+			"triangles": 772
+		},
+		"room_shell": {
+			"bounds": [
+				[
+					-3.40000009536743,
+					-0.280000001192093,
+					-3.20000004768372
+				],
+				[
+					3.40000009536743,
+					0.0800000131130219,
+					3.79999995231628
+				]
+			],
+			"surfaces": 1,
+			"triangles": 13148
+		},
+		"shelf_pothos": {
+			"bounds": [
+				[
+					-0.218838691711426,
+					-0.578764677047729,
+					-0.157332420349121
+				],
+				[
+					0.232586145401001,
+					0.285518646240234,
+					0.245800018310547
+				]
+			],
+			"surfaces": 1,
+			"triangles": 5276
+		},
+		"shelf_small_plant": {
+			"bounds": [
+				[
+					-0.0935790538787842,
+					0.0,
+					-0.0817101001739502
+				],
+				[
+					0.0949690341949463,
+					0.272799968719482,
+					0.0789873600006104
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1468
+		},
+		"wall_hook_bar": {
+			"bounds": [
+				[
+					-0.620000004768372,
+					-0.0750000476837158,
+					-0.0800001621246338
+				],
+				[
+					0.620000004768372,
+					0.0449998378753662,
+					0.0350000858306885
+				]
+			],
+			"surfaces": 1,
+			"triangles": 260
+		},
+		"wall_lantern": {
+			"bounds": [
+				[
+					-0.202526077628136,
+					0.0,
+					-0.216999784111977
+				],
+				[
+					0.202526077628136,
+					0.573283910751343,
+					0.255855083465576
+				]
+			],
+			"surfaces": 1,
+			"triangles": 698
+		},
+		"yellow_boots": {
+			"bounds": [
+				[
+					-0.220000028610229,
+					0.0,
+					-0.0950000286102295
+				],
+				[
+					0.220000028610229,
+					0.370000004768372,
+					0.217000007629395
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1344
+		}
+	},
+	"captures": [
+		{
+			"name": "lamps-off",
+			"orthographic_width": 10.1999998092651,
+			"pitch": 42.9999961853027,
+			"position": [
+				10.342903137207,
+				14.8399667739868,
+				10.342903137207
+			],
+			"resolution": [
+				1440,
+				1440
+			],
+			"yaw": 45.0
+		},
+		{
+			"name": "wall-only",
+			"orthographic_width": 10.1999998092651,
+			"pitch": 42.9999961853027,
+			"position": [
+				10.342903137207,
+				14.8399667739868,
+				10.342903137207
+			],
+			"resolution": [
+				1440,
+				1440
+			],
+			"yaw": 45.0
+		},
+		{
+			"name": "pendant-only",
+			"orthographic_width": 10.1999998092651,
+			"pitch": 42.9999961853027,
+			"position": [
+				10.342903137207,
+				14.8399667739868,
+				10.342903137207
+			],
+			"resolution": [
+				1440,
+				1440
+			],
+			"yaw": 45.0
+		},
+		{
+			"name": "lamps-on",
+			"orthographic_width": 10.1999998092651,
+			"pitch": 42.9999961853027,
+			"position": [
+				10.342903137207,
+				14.8399667739868,
+				10.342903137207
+			],
+			"resolution": [
+				1440,
+				1440
+			],
+			"yaw": 45.0
+		},
+		{
+			"name": "lamps-off-repeat",
+			"orthographic_width": 10.1999998092651,
+			"pitch": 42.9999961853027,
+			"position": [
+				10.342903137207,
+				14.8399667739868,
+				10.342903137207
+			],
+			"resolution": [
+				1440,
+				1440
+			],
+			"yaw": 45.0
+		}
+	],
+	"checks": [
+		{
+			"check": "No node-wide material override: room_shell",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: room_shell",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: room_shell",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: room_shell",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: room_shell",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: room_shell",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: left_wall",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: left_wall",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: left_wall",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: left_wall",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: left_wall",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: left_wall",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: back_wall",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: back_wall",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: back_wall",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: back_wall",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: back_wall",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: back_wall",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: porthole",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: porthole",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: porthole",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: porthole",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: porthole",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: porthole",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: porthole_view",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: porthole_view",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: porthole_view",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: porthole_view",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: porthole_view",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: porthole_view",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: counter_ship_wheel",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: counter_ship_wheel",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: counter_ship_wheel",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: counter_ship_wheel",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: counter_ship_wheel",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: counter_ship_wheel",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: counter_lantern",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: counter_lantern",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: counter_lantern",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: counter_lantern",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: counter_lantern",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: counter_lantern",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: wall_lantern",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: wall_lantern",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: wall_lantern",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: wall_lantern",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: wall_lantern",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: wall_lantern",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: pendant_lamp",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: pendant_lamp",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: pendant_lamp",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: pendant_lamp",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: pendant_lamp",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: pendant_lamp",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: float_barrel",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: float_barrel",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: float_barrel",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: float_barrel",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: float_barrel",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: float_barrel",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: corner_open_shelf",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: corner_open_shelf",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: corner_open_shelf",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: corner_open_shelf",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: corner_open_shelf",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: corner_open_shelf",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: corner_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: corner_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: corner_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: corner_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: corner_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: corner_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: right_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: right_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: right_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: right_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: right_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: right_shelf_stock",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: model_sailboat",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: model_sailboat",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: model_sailboat",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: model_sailboat",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: model_sailboat",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: model_sailboat",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: yellow_boots",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: yellow_boots",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: yellow_boots",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: yellow_boots",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: yellow_boots",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: yellow_boots",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: blue_map",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: blue_map",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: blue_map",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: blue_map",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: blue_map",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: blue_map",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: fish_board",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: fish_board",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: fish_board",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: fish_board",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: fish_board",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: fish_board",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: hat_rail",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: hat_rail",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: hat_rail",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: hat_rail",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: hat_rail",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: hat_rail",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: wall_hook_bar",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: wall_hook_bar",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: wall_hook_bar",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: wall_hook_bar",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: wall_hook_bar",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: wall_hook_bar",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: fish_sign",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: fish_sign",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: fish_sign",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: fish_sign",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: fish_sign",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: fish_sign",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: bunting",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: bunting",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: bunting",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: bunting",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: bunting",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: bunting",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: counter_square_tool",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: counter_square_tool",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: counter_square_tool",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: counter_square_tool",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: counter_square_tool",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: counter_square_tool",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: fishbowl_contents",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: fishbowl_contents",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: fishbowl_contents",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: fishbowl_contents",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: fishbowl_contents",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: fishbowl_contents",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: fishbowl_glass",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: fishbowl_glass",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: fishbowl_glass",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: fishbowl_glass",
+			"passed": true
+		},
+		{
+			"check": "Imported glass alpha .075",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: fishbowl_glass",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: fishbowl_glints",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: fishbowl_glints",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: fishbowl_glints",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: fishbowl_glints",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: fishbowl_glints",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: fishbowl_glints",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: anchor_rug",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: anchor_rug",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: anchor_rug",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: anchor_rug",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: anchor_rug",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: anchor_rug",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: kai_oar_barrel",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: kai_oar_barrel",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: kai_oar_barrel",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: kai_oar_barrel",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: kai_oar_barrel",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: kai_oar_barrel",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: kai_stool",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: kai_stool",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: kai_stool",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: kai_stool",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: kai_stool",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: kai_stool",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: kai_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: kai_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: kai_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: kai_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: kai_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: kai_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: rafa_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: rafa_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: rafa_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: rafa_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: rafa_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: rafa_fishing_net",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: shelf_pothos",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: shelf_pothos",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: shelf_pothos",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: shelf_pothos",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: shelf_pothos",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: shelf_pothos",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: rafa_plant",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: rafa_plant",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: rafa_plant",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: rafa_plant",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: rafa_plant",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: rafa_plant",
+			"passed": true
+		},
+		{
+			"check": "No node-wide material override: shelf_small_plant",
+			"passed": true
+		},
+		{
+			"check": "Imported per-surface material retained: shelf_small_plant",
+			"passed": true
+		},
+		{
+			"check": "2048 atlas: shelf_small_plant",
+			"passed": true
+		},
+		{
+			"check": "Matte specular .28: shelf_small_plant",
+			"passed": true
+		},
+		{
+			"check": "Opaque surface: shelf_small_plant",
+			"passed": true
+		},
+		{
+			"check": "Imported count/surface: shelf_small_plant",
+			"passed": true
+		},
+		{
+			"check": "Placed room triangle budget",
+			"passed": true
+		},
+		{
+			"check": "Placed room surface budget",
+			"passed": true
+		},
+		{
+			"check": "Environment and sunlight belong to consumer",
+			"passed": true
+		},
+		{
+			"check": "Three authored local lamp lights",
+			"passed": true
+		},
+		{
+			"check": "Rod rack plus float barrel <= 1200",
+			"passed": true
+		},
+		{
+			"check": "Rod tips beside porthole aperture",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor npc_keeper",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor stand_counter",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor npc_kai",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor stand_kai",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor npc_rafa",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor stand_rafa",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor use_fish_board",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor stand_fish_board",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor spawn",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor exit",
+			"passed": true
+		},
+		{
+			"check": "Suggested anchor badge_exit",
+			"passed": true
+		},
+		{
+			"check": "Wall light directs its pool onto plaster",
+			"passed": true
+		},
+		{
+			"check": "Pendant directs its pool onto worktop",
+			"passed": true
+		},
+		{
+			"check": "Counter lantern retains its local omni",
+			"passed": true
+		},
+		{
+			"check": "No extra shadow pass: WallLanternWarmth",
+			"passed": true
+		},
+		{
+			"check": "No extra shadow pass: PendantWarmth",
+			"passed": true
+		},
+		{
+			"check": "No extra shadow pass: CounterLanternWarmth",
+			"passed": true
+		},
+		{
+			"check": "Capture lamps-off",
+			"passed": true
+		},
+		{
+			"check": "Capture wall-only",
+			"passed": true
+		},
+		{
+			"check": "Capture pendant-only",
+			"passed": true
+		},
+		{
+			"check": "Capture lamps-on",
+			"passed": true
+		},
+		{
+			"check": "Capture lamps-off-repeat",
+			"passed": true
+		},
+		{
+			"check": "Controls rendered by the actual Mobile renderer",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"local_lights": [
+		{
+			"angle_attenuation": 1.3,
+			"angle_degrees": 59.0,
+			"attenuation": 0.7,
+			"color": "FFB968",
+			"energy": 1.8,
+			"kind": "spot",
+			"name": "WallLanternWarmth",
+			"position": [
+				-2.65,
+				2.4,
+				0.24
+			],
+			"range": 1.35,
+			"specular": 0.25,
+			"target": [
+				-3.22,
+				2.4,
+				0.24
+			]
+		},
+		{
+			"angle_attenuation": 1.3,
+			"angle_degrees": 20.0,
+			"attenuation": 0.5,
+			"color": "FFC17A",
+			"energy": 7.0,
+			"kind": "spot",
+			"name": "PendantWarmth",
+			"position": [
+				-1.48,
+				2.25,
+				-2.06
+			],
+			"range": 1.95,
+			"specular": 0.25,
+			"target": [
+				-0.45,
+				1.2,
+				-1.38
+			]
+		},
+		{
+			"attenuation": 1.6,
+			"color": "FFD3AF",
+			"energy": 0.35,
+			"name": "CounterLanternWarmth",
+			"position": [
+				-1.1,
+				1.38,
+				-1.62
+			],
+			"range": 1.1
+		}
+	],
+	"renderer": "mobile",
+	"review_lighting": {
+		"ambient": 0.4,
+		"ambient_color": "FFF0DD",
+		"background": "EAD5C8",
+		"points": [],
+		"shadow_bias": 0.3,
+		"shadow_distance": 25.0,
+		"shadow_normal_bias": 2.0,
+		"sun": 0.9,
+		"sun_color": "FFF1E7",
+		"sun_position": [
+			-3.0,
+			8.0,
+			5.0
+		],
+		"sun_target": [
+			0.0,
+			0.0,
+			0.0
+		]
+	},
+	"scene_surfaces": 39,
+	"scene_triangles": 66052
+}

@@ -13,15 +13,7 @@ func _ready() -> void:
 	for placement in layout.instances:
 		_add_asset(assets[placement.asset], placement)
 	for spec in layout.get("local_lights", []):
-		var light := OmniLight3D.new()
-		light.name = spec.name
-		light.position = _vec(spec.position)
-		light.light_color = Color(spec.color)
-		light.light_energy = float(spec.energy)
-		light.omni_range = float(spec.range)
-		light.omni_attenuation = float(spec.get("attenuation", 1.6))
-		light.shadow_enabled = false
-		add_child(light)
+		_add_local_light(spec)
 	for anchor in layout.anchors:
 		var marker := Marker3D.new()
 		marker.name = anchor.name
@@ -30,6 +22,30 @@ func _ready() -> void:
 		marker.set_meta("module", anchor.module)
 		if anchor.has("size"): marker.set_meta("size", anchor.size)
 		add_child(marker)
+
+func _add_local_light(spec: Dictionary) -> void:
+	var light: Light3D
+	if spec.get("kind", "omni") == "spot":
+		var spot := SpotLight3D.new()
+		spot.spot_range = float(spec.range)
+		spot.spot_attenuation = float(spec.get("attenuation", 1.6))
+		spot.spot_angle = float(spec.angle_degrees)
+		spot.spot_angle_attenuation = float(spec.get("angle_attenuation", 1.0))
+		# Targets use room coordinates, so direction survives parent transforms.
+		spot.basis = Basis.looking_at(_vec(spec.target) - _vec(spec.position))
+		light = spot
+	else:
+		var omni := OmniLight3D.new()
+		omni.omni_range = float(spec.range)
+		omni.omni_attenuation = float(spec.get("attenuation", 1.6))
+		light = omni
+	light.name = spec.name
+	light.position = _vec(spec.position)
+	light.light_color = Color(spec.color)
+	light.light_energy = float(spec.energy)
+	light.light_specular = float(spec.get("specular", 1.0))
+	light.shadow_enabled = false
+	add_child(light)
 
 func _vec(a: Array) -> Vector3:
 	return Vector3(float(a[0]), float(a[1]), float(a[2]))

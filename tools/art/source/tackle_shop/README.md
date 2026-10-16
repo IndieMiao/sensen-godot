@@ -37,3 +37,9 @@ blender --background --factory-startup --threads 6 --python-exit-code 1 \
 `material_import.gd` 只校准每个 surface 的 specular=0.28。原始 GLB 不重复嵌入贴图。
 所有 GLB 的 `.import` 包含 `gltf/texture_map_mode=1`。
 最新审阅与验证记录见 [v1.1 交付目录](../../../../docs/design/tackle-shop-214-v1.1-2026-10-16/README.md)。
+
+2026-10-16 灯光补正：运行时壁灯、吊灯改用朝墙面 / 台面的软边 SpotLight3D，
+台上提灯仍用 OmniLight3D。参数在生成脚本的 `local_lights` 与导出的 layout 中；
+这些运行时灯由 Godot 装配创建，不属于 Blender 源几何，也未烘进图集。
+本轮 blend、GLB 和图集均与已通过 v1.1 字节一致，复现开关图见
+[灯光补正交付](../../../../docs/design/tackle-shop-214-lighting-2026-10-16/README.md)。

@@ -545,8 +545,13 @@ def build():
     shared_plant('shelf_small_plant','peace_lily',(2.97,1.04,-2.40),.22)
     anchors_and_bench()
     p.MANIFEST_EXTRA['local_lights']=[
-        {'name':'WallLanternWarmth','position':[-2.69,2.47,.24],'color':'FFD9C7','energy':.50,'range':1.50,'attenuation':1.6},
-        {'name':'PendantWarmth','position':[-1.5,2.32,-2.08],'color':'FFE0C9','energy':.80,'range':2.30,'attenuation':1.6},
+        # Soft, directed pools on the receiving surfaces; no atlas light bake.
+        {'name':'WallLanternWarmth','kind':'spot','position':[-2.65,2.40,.24],
+         'target':[-3.22,2.40,.24],'color':'FFB968','energy':1.8,'range':1.35,
+         'attenuation':.7,'angle_degrees':59,'angle_attenuation':1.3,'specular':.25},
+        {'name':'PendantWarmth','kind':'spot','position':[-1.48,2.25,-2.06],
+         'target':[-.45,1.20,-1.38],'color':'FFC17A','energy':7.0,'range':1.95,
+         'attenuation':.5,'angle_degrees':20,'angle_attenuation':1.3,'specular':.25},
         {'name':'CounterLanternWarmth','position':[-1.10,1.38,-1.62],'color':'FFD3AF','energy':.35,'range':1.10,'attenuation':1.6}]
     target=[0,1.15,0];distance=20;pitch=math.radians(43);yaw=math.pi/4
     camera={'position':[target[0]+distance*math.cos(pitch)*math.sin(yaw),target[1]+distance*math.sin(pitch),target[2]+distance*math.cos(pitch)*math.cos(yaw)],'target':target,'size':11.4}

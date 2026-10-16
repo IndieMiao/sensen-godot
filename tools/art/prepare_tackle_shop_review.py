@@ -38,4 +38,6 @@ project=DEST/'project.godot'
 project.write_text(project.read_text().replace('SensenSceneBench','SensenTackle214QA'))
 shutil.copy2(ROOT/'tools/art/review_tackle_shop.gd',DEST/'review.gd')
 (DEST/'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="TackleReview" type="Node"]\nscript = ExtResource("1")\n')
+shutil.copy2(ROOT/'tools/art/review_tackle_lighting.gd',DEST/'lighting_review.gd')
+(DEST/'lighting_review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://lighting_review.gd" id="1"]\n[node name="TackleLightingReview" type="Node"]\nscript = ExtResource("1")\n')
 print(DEST)

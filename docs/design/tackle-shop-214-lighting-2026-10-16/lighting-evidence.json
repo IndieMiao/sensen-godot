@@ -1,0 +1,487 @@
+{
+  "baseline_commit": "aace15a5e067fa447c9a82adf0b3d80f022f2d2b",
+  "off_repeat_pixel_identical": true,
+  "measurement": "Display RGB8/luma8, not scene-linear HDR or an art-acceptance score",
+  "receiving_surface_patches": {
+    "wall_plaster": {
+      "rectangle_xyxy": [
+        335,
+        377,
+        357,
+        409
+      ],
+      "states": {
+        "lamps-off": {
+          "mean_rgb8": [
+            184.946,
+            138.494,
+            109.365
+          ],
+          "mean_display_luma8_delta_from_off": 0.0,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "lamps-on": {
+          "mean_rgb8": [
+            254.155,
+            212.25,
+            156.655
+          ],
+          "mean_display_luma8_delta_from_off": 70.878,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "wall-only": {
+          "mean_rgb8": [
+            254.155,
+            212.25,
+            156.655
+          ],
+          "mean_display_luma8_delta_from_off": 70.878,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "pendant-only": {
+          "mean_rgb8": [
+            184.946,
+            138.494,
+            109.365
+          ],
+          "mean_display_luma8_delta_from_off": 0.0,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "lamps-off-repeat": {
+          "mean_rgb8": [
+            184.946,
+            138.494,
+            109.365
+          ],
+          "mean_display_luma8_delta_from_off": 0.0,
+          "white_pixels_all_channels_ge_250": 0
+        }
+      }
+    },
+    "counter_worktop": {
+      "rectangle_xyxy": [
+        810,
+        592,
+        833,
+        615
+      ],
+      "states": {
+        "lamps-off": {
+          "mean_rgb8": [
+            255.0,
+            181.631,
+            123.03
+          ],
+          "mean_display_luma8_delta_from_off": 0.0,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "lamps-on": {
+          "mean_rgb8": [
+            255.0,
+            207.015,
+            143.431
+          ],
+          "mean_display_luma8_delta_from_off": 19.627,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "wall-only": {
+          "mean_rgb8": [
+            255.0,
+            181.631,
+            123.03
+          ],
+          "mean_display_luma8_delta_from_off": 0.0,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "pendant-only": {
+          "mean_rgb8": [
+            255.0,
+            204.788,
+            140.607
+          ],
+          "mean_display_luma8_delta_from_off": 17.831,
+          "white_pixels_all_channels_ge_250": 0
+        },
+        "lamps-off-repeat": {
+          "mean_rgb8": [
+            255.0,
+            181.631,
+            123.03
+          ],
+          "mean_display_luma8_delta_from_off": 0.0,
+          "white_pixels_all_channels_ge_250": 0
+        }
+      }
+    }
+  },
+  "unchanged_runtime_and_source_files": [
+    {
+      "path": "assets/rooms/tackle_shop/anchor_rug.glb",
+      "sha256": "0b4e95bb6738701f1e781b3c6de2e9f07d82d3238485c57cf557d8b9101ddbc8"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/anchor_rug.glb.import",
+      "sha256": "e24b4a81f1fa6e7139442e5a7ab7eea13430b3845d3ee80ac1cbca705ed070dc"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/asset_stats.json",
+      "sha256": "afaa7a341888c0326471620e182ef499de64d65bec2acaca0183974fd98083fa"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/back_wall.glb",
+      "sha256": "bf52fe55fc5ad29ea1e96ef0ac1a3410b0425b09fda1b3245fe96c5ee1b1d719"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/back_wall.glb.import",
+      "sha256": "7e9b967aa23a78fd1a604979350cc8b1ccaed614516a8cf83d70aebbcf20a71f"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/blue_map.glb",
+      "sha256": "7ff319a6f1f6ca2ee4eaa7e3f3d7e3b7d566a7a227edc9b819f5bc2167ac0be5"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/blue_map.glb.import",
+      "sha256": "1df82bc5ddcef683e891a61c3eb8406f79a363ecd4640bc20fe7dd51e569e243"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/bunting.glb",
+      "sha256": "7cde6c77b5bbaf0c598b29358486812349fc3c7f65b89fe7236f74a7b1e8a286"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/bunting.glb.import",
+      "sha256": "03998174232566f948da10da1608cd1fa9185b0f16e67c9dd81481a427d91ee9"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/corner_open_shelf.glb",
+      "sha256": "bb2ffcb548babc37a2b51f8d9d3d51b9fe0d645d8ff1c17915dba5fea068c0f6"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/corner_open_shelf.glb.import",
+      "sha256": "20e91ebe9862eb1eadceb698651cef47ae2e4e2bfbcad2c72a15832bf7a35a98"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/corner_shelf_stock.glb",
+      "sha256": "5bdda1e493e0b4cf0e61c3e73505fc66be716504c31f093eaecd105fe66f0c3c"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/corner_shelf_stock.glb.import",
+      "sha256": "ce1d892ae96592c18972f637cc1491a9bceeeb34fa0bcdbe20973f5d081d369d"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/counter_lantern.glb",
+      "sha256": "08b415bfcf88d56a9f9a2a89e5b57727a1775d816794cfc209799a121ed100ba"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/counter_lantern.glb.import",
+      "sha256": "ebe4c88ea708746cbb158f47a077bd94e9106ac5c7f8c650dd9fe2064e2fa199"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/counter_ship_wheel.glb",
+      "sha256": "406158619be95cb4c9ae3737161d2734220a82cdae583d4037491128f4605652"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/counter_ship_wheel.glb.import",
+      "sha256": "19cda715353727e4e438baf2c76556e0a17ae9a980ff0795b9f0d2deb600d3c6"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/counter_square_tool.glb",
+      "sha256": "d4d44e50a74ff6a560c13670b5b53b6370df0802122ff9099563c0615ca12dc4"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/counter_square_tool.glb.import",
+      "sha256": "b836557aa5aea1566d30a0c6ac3f0137eba8c74b22bbeb5b13ca094f8d8d8917"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/curved_counter.glb",
+      "sha256": "8ed01df33951b5d1afc1c28bc441c9c57845c6f746796ec42399a0b5b4a99e33"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/curved_counter.glb.import",
+      "sha256": "5b5ea62d3f5023922320ab85811b57f18237b2401a5ba611028bffe4edf5db61"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fish_board.glb",
+      "sha256": "368c23db8254edc503c2f8951a8d116bdcf8444cf66c55b3e16cb55b6ef9adef"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fish_board.glb.import",
+      "sha256": "c4c9d648c3339a11166e5c4ad48244fd6bdd36dbdc5b8c789fe637c13c521efa"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fish_sign.glb",
+      "sha256": "755771b82f607d746aa4afc5c5364c8baf5ccb24ae0636d0e74d0becfbc2be64"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fish_sign.glb.import",
+      "sha256": "82ca3f5dbad27d181b52f3263b9deb2b66075d7c28bb493271d90165b730653a"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fishbowl_contents.glb",
+      "sha256": "f974b988db331750b7bba5d50f1422738748ed20e8e4036509b3f89242b01116"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fishbowl_contents.glb.import",
+      "sha256": "ebe1396f940af29efde5546d143daac58f90ac194eec30ae1867f32a6a3fcc88"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fishbowl_glass.glb",
+      "sha256": "53cb2e1bbd4cef00055d72ebcd5c6d2b99bd157f30b3fe22d76b68668a19108d"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fishbowl_glass.glb.import",
+      "sha256": "50390b09fe9ab34fbdf3fb4c953f1041f65f14049a926c1849fc8912477ccf4c"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fishbowl_glints.glb",
+      "sha256": "cfe1f46476948a83c071edbfcc005961ae9cbd5c31729794773522f6c419528e"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/fishbowl_glints.glb.import",
+      "sha256": "eda94d84d8f06e6451ae2fd1a70fa5d4c0386b272857e735264bc3224255815f"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/float_barrel.glb",
+      "sha256": "225acf1438c9b5d768e4e03c73c95675673851984f9f5dd00285ddad66a9a7a9"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/float_barrel.glb.import",
+      "sha256": "57251a9ddd74c00c536a27dc97c7628ff7b231fe2a8f288983251efbcaade1c8"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/hat_rail.glb",
+      "sha256": "85eecb5f39f48aaad6b31966b630ea9de7f126ff36c2f2ca29f70d86aab86ebb"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/hat_rail.glb.import",
+      "sha256": "93b014a1c32d0b2405fa9bf3e842c80723c16b3f4a476eb567363e43a99bceb1"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/kai_fishing_net.glb",
+      "sha256": "83d6cb9fed3ea30d9b0ced91d166351d20888ddf4e1b8cd721bffe03f1d58cbe"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/kai_fishing_net.glb.import",
+      "sha256": "248ccf4a2b74a474ea90415043c09b75a2eaf0ec2b1a612f71cfdbd079b11eb8"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/kai_oar_barrel.glb",
+      "sha256": "23311d3edf6e1384795a745b9381172eaaa887d23ef3c305fe112019b6667147"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/kai_oar_barrel.glb.import",
+      "sha256": "3453c2fbcc113414090cdb0030de76356c4c0233eb0c960332cf17952703090b"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/kai_stool.glb",
+      "sha256": "4da1994c6c18dd2a912d8d6fc110d7dcc02144c94b6eaaf1b4c1fff9ec8d2544"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/kai_stool.glb.import",
+      "sha256": "9b0a407a59712d2d7bab98c7edb691b1778cdc4c1a343894a782353422891cc7"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/left_rope_crate.glb",
+      "sha256": "519308d423b1495b3ecf1afa342cf3931f1d06f2d4392ef68d37f1291d2af6c2"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/left_rope_crate.glb.import",
+      "sha256": "cfdf5e4012f318bf753f2dc0b5c93f50ddf8d641dbf2d823dbca2d2d0da33efe"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/left_wall.glb",
+      "sha256": "b2dd2fbc61af2348b17ff4625717bb0f61ee8076979754e6709f0d29e7a03b0e"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/left_wall.glb.import",
+      "sha256": "3a574f4d1a2180545511abd69ed8f35b20a1e1d2374c0fe7d62923eff82e8fd6"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/material_import.gd",
+      "sha256": "6cd3b24ab74757217b94152060abb761d1195d6df03801a8cc65e11b5387d25f"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/material_import.gd.uid",
+      "sha256": "2257263cb91373478b5a996bfeeadbdab94ee2b5cb5f6a15a7166fdca29e2228"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/model_sailboat.glb",
+      "sha256": "f17628d8ecaa0b6478ee18a4ed5ab0f53861c3931874625a90d5199043305140"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/model_sailboat.glb.import",
+      "sha256": "4f1a11ada9bdf0a5ea676ba00b57ed41dfa9c874c09efda2c0ce698f3f805a29"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/pendant_lamp.glb",
+      "sha256": "0dd828e367384789d49a8f3448ac32bcb6c13e44609a5fdf9c5fb4cf1c3e95e0"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/pendant_lamp.glb.import",
+      "sha256": "c889c5ade329a58df3a2769e22658ea3e3b04b93d4a41a6cc25c27a54aaa7b98"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/porthole.glb",
+      "sha256": "4af517b82b0185e86b44ef1234c4d290ad7feb13db9055384b91d5a01cf0bf0c"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/porthole.glb.import",
+      "sha256": "fff816daae8167afd198699429ea86423b2efaf0034ded5d7ae1c4fa1c502d0a"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/porthole_view.glb",
+      "sha256": "d62a80cf155aaae4b569bd175bab5f0e1f112a72090bf4d52df329b80a77aeb1"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/porthole_view.glb.import",
+      "sha256": "56ce6e879ddac719570be843567092cdc898dd35f8bf2b984702ab9f98f97351"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rafa_fish_creel.glb",
+      "sha256": "ae02cc8ed7792af9f487d255e4c045ffeaa0e5495404b360714d230d2bd4a5c0"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rafa_fish_creel.glb.import",
+      "sha256": "778ffb6df065ba1e560b2b35528c7af5e3828be5a6b9c8108f8a3b9a4cb84040"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rafa_fishing_net.glb",
+      "sha256": "35edec1644a52f4890bd2274ed6f5656c859b27d15170b2f3a6288119bfb4ffa"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rafa_fishing_net.glb.import",
+      "sha256": "98924104a865424f0f0f67dfa15c89bd00d4ae17ad445c235d41813a6d9f8066"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rafa_plant.glb",
+      "sha256": "854ff126c760e798ca85908fc1501e57f7e6f15feee04b3a754c7d20b87337a3"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rafa_plant.glb.import",
+      "sha256": "bac086d3d645d9f654bbad4052121e360fba5fdcb8ae0adb96fad0791224da9a"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/right_low_shelf.glb",
+      "sha256": "593392d70947cd0d786709ae764b05a6dc0862c6317a171876329045173f0903"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/right_low_shelf.glb.import",
+      "sha256": "780e68f9c9ab4a936ad3038903ebb4af93329575960513954851de9e6776149c"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/right_shelf_stock.glb",
+      "sha256": "b2b07d599800ea32feaeee7504bc5b50725e5aa88d9fefd3d18dc4666dd87ecf"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/right_shelf_stock.glb.import",
+      "sha256": "f09773db081e49752311ea51e40d965543d86b12d74c1cfa375ce22afae23969"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rod_rack.glb",
+      "sha256": "598822296aaa590690f2be8685eb5ff06ad9927590da9f604d8423d929c55601"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/rod_rack.glb.import",
+      "sha256": "d2cf97d2ac599480d4d723b8ac0ec031d1cb229f0eaf8394d5e2677844222082"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/room_albedo_ao.png",
+      "sha256": "f3b9697eda4102762176fc675a6626a92f443c36596baf000b60fa444aa5bfcd"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/room_albedo_ao.png.import",
+      "sha256": "0d51e33d01a41a8a085c5a096a35b4d7690585338d88715a2acc1071ca7ead97"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/room_shell.glb",
+      "sha256": "27c1070a428e68d27f1fd05bfa31062a5af1b003642f7b27046e2d7137daf383"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/room_shell.glb.import",
+      "sha256": "42a9aada2cd3e727d125a0ba28a24b676aa1a7ea50f4495efe707051685c49db"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/shelf_pothos.glb",
+      "sha256": "2f6facaceace22f05fbf1720f4ad3ea44c5d06c4f13fc50dee6fb6edf301f16e"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/shelf_pothos.glb.import",
+      "sha256": "ec9e2a4ecfd8bbeddb8c7b99c750c649ee6e81339ca7e47304497b979133077b"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/shelf_small_plant.glb",
+      "sha256": "d915fba120190298f9a02290ce16b7c93c43396962f417e15dd1055493fd0f1e"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/shelf_small_plant.glb.import",
+      "sha256": "a05a241d6dd0d2060373ef3d9b5b9dfbe1bee7dad6812432c9b6509d30c8f107"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/wall_hook_bar.glb",
+      "sha256": "24c11293e23e717ace6f93a51ac36e674425fda5fc9dd7f1e7c398d5d9fbe5d8"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/wall_hook_bar.glb.import",
+      "sha256": "3fbeebc7c96c930a1e558d2d164806e0a6a828e13f4b50ed5dd8310a8144feb5"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/wall_lantern.glb",
+      "sha256": "1f33aa55ff08e9d10f16755042a7037a5e9eb1b18db806a45a03d0e22d96c3f4"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/wall_lantern.glb.import",
+      "sha256": "2dfd927f192c417ff52ce3d14de46238846e59e3851f39c7b26369762ada3c32"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/yellow_boots.glb",
+      "sha256": "8107a837d4dbea98db30634b9dcadd0710bc957fa8e5ffd1f17f43971226c9fe"
+    },
+    {
+      "path": "assets/rooms/tackle_shop/yellow_boots.glb.import",
+      "sha256": "dd0e6d94cb4b5baf2199f64e0da1a6082d305dc99504237fc71e7f0c04aa085f"
+    },
+    {
+      "path": "tools/art/source/tackle_shop/tackle_shop.blend",
+      "sha256": "d16746f1eb0ab46dc051ab082ac2d738db2f118f5d1d11cfc2c38cdbff8b91f3"
+    }
+  ],
+  "layout_only_local_lights_changed": true,
+  "generator_matches_layout": true,
+  "rendered_runtime_files": [
+    {
+      "path": "assets/rooms/tackle_shop/layout.json",
+      "sha256": "c446ec4d78b446b659153e9391304b363f33accad98d10d7c241347b44b74f4a"
+    },
+    {
+      "path": "scenes/tackle_shop/tackle_shop_art.gd",
+      "sha256": "212ff8f00c6f3de2f6d7bb3dd7eaf5be5c422fc34e4646282d5d432ef736d2a1"
+    }
+  ],
+  "raw_captures": [
+    {
+      "name": "lamps-off",
+      "sha256": "fa2dcec131553260d52f4492a43fb2284ae19cca00e28526e45c1d04abe26b12"
+    },
+    {
+      "name": "lamps-on",
+      "sha256": "8fe8b500058ba481146c31b3f8607e9b6234a898e53b529ea64123ab7a3d0640"
+    },
+    {
+      "name": "wall-only",
+      "sha256": "649b1c68e34b9604cca927ca1b71373086d972d85436d77fac72f1b9ca85158c"
+    },
+    {
+      "name": "pendant-only",
+      "sha256": "da795994f165f996bb67e2bf5b9c3f4990062e47eb0c02a8837412c05cbf8ff6"
+    },
+    {
+      "name": "lamps-off-repeat",
+      "sha256": "fa2dcec131553260d52f4492a43fb2284ae19cca00e28526e45c1d04abe26b12"
+    }
+  ],
+  "media": {
+    "path": "docs/design/tackle-shop-214-lighting-2026-10-16/SGODOT-214_TACKLE_v1_1_14_lamp_control.png",
+    "name": "SGODOT-214_TACKLE_v1_1_14_lamp_control.png",
+    "size": 992151,
+    "sha256": "ea3c516e4b7023b2d880b6e3a8952b13bf8ee7e31f00a971785f6fa2c9e9c718"
+  }
+}
