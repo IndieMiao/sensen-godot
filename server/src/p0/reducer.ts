@@ -93,6 +93,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (cmd.expect_seq !== undefined && cmd.expect_seq !== input.seq) {
     return fail('stale_state', { seq: input.seq, expected: cmd.expect_seq });
   }
+  // SGODOT-303: a new player still to pick a home plays nothing yet — the pick page comes first; the server holds the
+  // line too, not the client alone (奕星). Only the pick itself goes through.
+  if (input.travel?.pending && cmd.type !== 'choose_home') return fail('home_pending');
   const s = structuredClone(input);
   const events: P0Event[] = [];
   const counted = takenCounts(c, s);   // q(134): what each taken request counted before this command, settles included

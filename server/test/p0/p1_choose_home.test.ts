@@ -254,7 +254,7 @@ describe('change_home: once, within 7 days or before Homestead Lv2 (q(161))', ()
     const lv2 = structuredClone(s);
     lv2.homestead.level = 2;
     expect(run(opened, lv2, { type: 'change_home', city: NYC, spot: 0 }, T0 + DAY)).toMatchObject({ ok: false, code: 'home_set_for_good' });
-    expect(run(opened, pending(), { type: 'change_home', city: NYC, spot: 0 })).toMatchObject({ ok: false, code: 'home_set_for_good' });
+    expect(run(opened, pending(), { type: 'change_home', city: NYC, spot: 0 })).toMatchObject({ ok: false, code: 'home_pending' });   // nothing but the pick before it
     const open = viewOf(opened, s, T0 + DAY) as unknown as { home: { change: Record<string, unknown> } };
     expect(open.home.change).toEqual({ open: true, until: T0 + 7 * DAY, before_level: 2, used: 0 });
   });
@@ -311,5 +311,17 @@ describe('routes (SGODOT-303)', () => {
     const done = (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'choose_home', city: NYC, spot: 2 } })).json();
     expect(done.ok).toBe(true);
     expect(done.state.home).toMatchObject({ city: NYC, pending: false });
+  });
+});
+
+describe('a new player still to pick a home plays nothing yet (SGODOT-303, 奕星)', () => {
+  it('refuses every world command with home_pending until choose_home', () => {
+    const s = pending();
+    for (const cmd of [{ type: 'till', plot: 0 }, { type: 'travel', to: TOKYO }, { type: 'cast', space: 'pond', place: 'x' }, { type: 'eat', item: 'x' }])
+      expect(run(opened, s, cmd)).toMatchObject({ ok: false, code: 'home_pending' });
+    const r = run(opened, s, { type: 'choose_home', city: TOKYO, spot: 0 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(run(opened, r.state, { type: 'till', plot: 0 })).not.toMatchObject({ code: 'home_pending' });   // picked: plays on
   });
 });

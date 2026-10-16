@@ -21,7 +21,7 @@ import { dayKey, rolloverAfter } from './rules.js';
 import type { P0Event } from './progress.js';
 import { letGoAway, type P0State } from './state.js';
 import { clusterOf, fallbackOf } from './travel.js';
-import { cityPlaces, hash32, km, offset, tierOf, worldOf } from './world.js';
+import { cityPlaces, clusterAdmin, hash32, km, offset, tierOf, worldOf } from './world.js';
 
 type Point = { lat: number; lng: number };
 interface CityOutpost { id: string; role: string; residents: string[]; at: Point | null; nearest?: string }
@@ -98,7 +98,8 @@ export function homeStatus(c: P0Content, cluster: string): HomeStatus | null {
 }
 
 /** One offered farm spot: its point, the distance and direction to the beginner pond (`1.2 km to Fern Pond · northeast`). */
-export interface HomeSpot { spot: number; lat: number; lng: number; km: number; toward: string; pond: { id: string; name: string }; hood: string | null }
+/** pond: the beginner pond the spot is measured from, with its point (HOME-PICK-3's map draws it with the spots). */
+export interface HomeSpot { spot: number; lat: number; lng: number; km: number; toward: string; pond: { id: string; name: string; lat: number; lng: number }; hood: string | null }
 
 const COMPASS = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
 /** The compass word from a to b (flat, fine within a city). */
@@ -163,7 +164,7 @@ export function homeSpots(c: P0Content, cluster: string, player: string): HomeSp
     const m = lo + (hash32(w.seed, cluster, `home:spot-m:${player}:${k}`) / 0x1_0000_0000) * (hi - lo);
     const p = offset(at.lat, at.lng, m / 1000, turn);
     return { spot: k, lat: p.lat, lng: p.lng, km: Math.round(km(p, pond.at!) * 1000) / 1000, toward: toward(p, pond.at!),
-      pond: { id: pond.id, name: pond.name }, hood };
+      pond: { id: pond.id, name: pond.name, lat: pond.at!.lat, lng: pond.at!.lng }, hood };
   });
 }
 
@@ -256,12 +257,14 @@ export function nearestOpen(c: P0Content, at: { lat: number; lng: number }): Hom
 }
 
 /** A city row for the pick page: open ones only on the list; a search also returns the others, greyed with the reason. */
-export interface HomeCityRow { id: string; name: string; country: string; climate: string; status: HomeStatus }
+/** region: the city's state or province (`San Francisco · California`, HOME-PICK-1), else its country. */
+export interface HomeCityRow { id: string; name: string; country: string; region: string; climate: string; status: HomeStatus }
 const row = (c: P0Content, id: string): HomeCityRow | null => {
   const cl = clusterById(c, id), status = homeStatus(c, id);
   if (!status) return null;
   const climate = cl?.climate ?? c.profile.climate.toLowerCase();
-  return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country: cl?.country ?? '', climate, status };
+  const country = cl?.country ?? '';
+  return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country, region: clusterAdmin(id) || country, climate, status };
 };
 
 /** The open cities (the written city first, then the list), and with `query` (2+ letters) the cities whose name starts
