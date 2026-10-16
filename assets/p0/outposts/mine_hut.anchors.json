@@ -1,7 +1,7 @@
 {
-  "_note": "Mine Hut on the Mine Hut kit (SGODOT-308, 刘备 #438; q(193) / q(204)): Ivo's home in a highland city, no keeper and no counter. Room metres of assets/rooms/mine_hut/layout.json (its suggested_anchors; 上官婉儿 on 284), floor top y 0.082, ground 6.8 × 6.4. Ivo stands by the sealed old shaft, turned 45° to the room; the player talks to him from stand_ivo. Only Ivo and the door are tappable: the shaft and the grill are set dressing. Spawn a step inside the door, exit at the door, its prompt over the threshold (badge_exit). Where the player can walk comes from the kit's colliders (P0RoomNav), not this file.",
+  "_note": "Mine Hut on the Mine Hut kit (SGODOT-308, 刘备 #438; q(193) / q(204)): Ivo's home in a highland city, no keeper and no counter. Room metres of assets/rooms/mine_hut/layout.json (its suggested_anchors; 上官婉儿 on 284), floor top y 0.082, ground 6.8 × 6.4. Ivo stands by the sealed old shaft, turned to the room and the door (160°; the kit's suggested 45° had his back to the camera, checked in the room in the game); the player talks to him from stand_ivo. Only Ivo and the door are tappable: the shaft and the grill are set dressing. Spawn a step inside the door, exit at the door, its prompt over the threshold (badge_exit). Where the player can walk comes from the kit's colliders (P0RoomNav), not this file.",
   "anchors": [
-    {"name": "npc_ivo", "position": [1.4, 0.082, -0.84], "yaw_degrees": 45},
+    {"name": "npc_ivo", "position": [1.4, 0.082, -0.84], "yaw_degrees": 160},
     {"name": "stand_ivo", "position": [0.8, 0.082, 0.05], "yaw_degrees": -34},
     {"name": "spawn", "position": [0.0, 0.082, 2.55], "yaw_degrees": 0},
     {"name": "exit", "position": [0.0, 0.082, 3.08]},
