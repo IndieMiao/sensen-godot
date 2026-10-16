@@ -536,12 +536,12 @@
    }
   },
   "overrides": {
+   "_note": "q(114) ⑤: hand fixes by place id, laid over the generated city after everything else is placed, so nothing else in the city moves. A pin that landed in the sea or a lake gets a point on land at least 50 m from the water (a tackle shop within 300 m of its pond); before the freeze the same table takes a hand rename (`name`). `why`: what was wrong, who saw it, and the checks on the new point. Re-check the whole table once there is water data. Names in `why` are the ones the place had when it was found (q(125) later renamed generated ponds and their tackle shops; the id is what counts).",
    "gn-5419384~hut0": {
     "lat": 39.7512,
     "lng": -105.1592,
     "why": "q(204) ②: Denver's Mine Hut west toward the foothills and Golden, 15 km from the centre and 5.3 km from Golden (nearer Golden than Denver, so it is named after Golden); on land, 1.3 km from water (WorldCover 2021), every other Denver place within 5 km of the centre. The generated point was 8 km north."
    },
-   "_note": "q(114) ⑤: hand fixes by place id, laid over the generated city after everything else is placed, so nothing else in the city moves. A pin that landed in the sea or a lake gets a point on land at least 50 m from the water (a tackle shop within 300 m of its pond); before the freeze the same table takes a hand rename (`name`). `why`: what was wrong, who saw it, and the checks on the new point. Re-check the whole table once there is water data. Names in `why` are the ones the place had when it was found (q(125) later renamed generated ponds and their tackle shops; the id is what counts).",
    "gn-5368361~tackle2": {
     "lat": 34.040844,
     "lng": -118.219243,
@@ -1072,7 +1072,7 @@
    "post": "Post Clerk"
   },
   "residents": {
-   "_note": "§9.4.3: each outpost holds 0–2 residents beside its keeper; a city holds at most as many fixed residents as outposts. Fixed: Pip at every travel post and every trading post; Sam at Travel Post 1 (M and up); Nadia at Market Square 1 (M and up). The rest by rank, skipping one whose traits the city lacks or who is already placed; each goes to the outpost its trade fits, and is dropped when that outpost is full. Ivo's Mine Hut and Lena's Lighthouse Room are not built yet: Ivo stays out, Lena takes the tea house (the plan's M-tier rule) in every tier for now. Mira's weekly route is not part of placement. S tier: the trading post holds Pip + the first eligible of s_order.",
+   "_note": "§9.4.3: each outpost holds 0–2 residents beside its keeper; a city holds at most as many fixed residents as outposts. Fixed: Pip at every travel post and every trading post; Sam at Travel Post 1 (M and up); Nadia at Market Square 1 (M and up). The rest by rank, skipping one whose traits the city lacks or who is already placed; each goes to the outpost its trade fits, and is dropped when that outpost is full. Ivo lives in his city's Mine Hut (q(204): placement.hut, world.room.mine_hut), alone and outside the outposts' slots and the cap; a city without one has him nowhere, except an S-tier highland town, whose trading post takes him by s_order. Lena's Lighthouse Room is not built yet: Lena takes the tea house (the plan's M-tier rule) in every tier for now. Mira's weekly route is not part of placement. S tier: the trading post holds Pip + the first eligible of s_order.",
    "per_outpost": 2,
    "rank": [
     {

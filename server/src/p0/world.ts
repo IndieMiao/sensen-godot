@@ -331,20 +331,22 @@ export function genOutposts(w: WorldContent, cl: CityCluster, tier: Tier, ponds:
  * q(204) ②: the Mine Hut, placed after every other place so none of them moves — on the ring_km ring at the
  * cluster's own bearing, turning round it (then widening it) until it stands ≥ 300 m from every outpost and pond
  * (q(144)). Only a city with the rule's trait (highland) at its lowest tier or above has one, and only once
- * world.room has the room. Named later, at its final point (nameHuts), so a hand fix moves its name with it.
+ * world.room has the room. A city where no point on those rings fits gets none, rather than a hut that breaks the
+ * rules (周瑜 on #442). Named later, at its final point (nameHuts), so a hand fix moves its name with it.
  */
 export function genHuts(w: WorldContent, cl: CityCluster, tier: Tier, ponds: GenPond[], outposts: GenOutpost[]): GenHut[] {
   const rule = w.placement.hut, room = w.room.mine_hut;
   if (!rule || !room || !(w.coastal[cl.id] ?? []).includes(rule.needs) || TIERS.indexOf(tier) < TIERS.indexOf(rule.tier_min)) return [];
   const otherKm = w.placement.other_kind_min_m / 1000, deg = unit(w.seed, cl.id, 'hut0') * 360;
   const fits = (p: { lat: number; lng: number }) => [...outposts, ...ponds].every(o => km(o, p) >= otherKm);
-  let at = offset(cl.lat, cl.lng, rule.ring_km, deg);
+  let at: { lat: number; lng: number } | null = null;
   search: for (let r = rule.ring_km; r <= rule.ring_km + 6; r += 1.5) {
     for (let k = 0; k < 24; k++) {
       const p = offset(cl.lat, cl.lng, r, deg + k * 15);
       if (fits(p)) { at = p; break search; }
     }
   }
+  if (!at) return [];
   return [{ id: `${cl.id}~hut0`, role: 'mine_hut', name: '', ...at, category: room.category, keeper: null, residents: [],
     art: room.art, anchors: room.anchors, capacity: w.rooms.indoor_cap }];
 }
