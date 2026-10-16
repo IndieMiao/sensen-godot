@@ -29,13 +29,17 @@ for file in sorted(kit.glob('*.glb')):
  for m in d['materials']:m.setdefault('pbrMetallicRoughness',{})['baseColorTexture']={'index':0}
  data=json.dumps(d,separators=(',',':')).encode();data+=b' '*((-len(data))%4)
  file.write_bytes(struct.pack('<III',0x46546C67,2,20+len(data)+len(tail))+struct.pack('<II',len(data),0x4E4F534A)+data+tail)
- # Godot generates stable import metadata after staging; all knobs already constrained.
+ # Retain existing resource UIDs when regenerating/staging a revised GLB.
  rel='res://'+str(file.relative_to(ROOT));h=hashlib.md5(rel.encode()).hexdigest();scn='res://.godot/imported/'+file.name+'-'+h+'.scn'
- template=(ROOT/'assets/rooms/blacksmith_shop/forge_stool.glb.import').read_text()
- template=re.sub(r'uid="[^"]+"\n','',template)
- template=re.sub(r'res://.godot/imported/forge_stool.glb-[^"]+.scn',scn,template)
- template=template.replace('res://assets/rooms/blacksmith_shop/forge_stool.glb',rel)
- Path(str(file)+'.import').write_text(template)
+ import_path=Path(str(file)+'.import')
+ if import_path.exists():template=import_path.read_text()
+ else:
+  template=(ROOT/'assets/rooms/blacksmith_shop/forge_stool.glb.import').read_text()
+  template=re.sub(r'uid="[^"]+"\n','',template)
+  template=re.sub(r'res://.godot/imported/forge_stool.glb-[^"]+.scn',scn,template)
+  template=template.replace('res://assets/rooms/blacksmith_shop/forge_stool.glb',rel)
+ template=re.sub(r'gltf/texture_map_mode=\d+','gltf/texture_map_mode=1',template)
+ import_path.write_text(template)
 stats=json.loads((kit/'asset_stats.json').read_text())
 for asset in stats['assets']:asset['bytes']=(kit/(asset['name']+'.glb')).stat().st_size
 stats['materials']=1+len(json.loads((kit/'layout.json').read_text())['material_overrides'])

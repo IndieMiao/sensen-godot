@@ -48,6 +48,32 @@
             3.3,
             0.16
           ]
+        },
+        {
+          "name": "timber_post_1",
+          "at": [
+            -1.75,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
+        },
+        {
+          "name": "timber_post_2",
+          "at": [
+            1.82,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
         }
       ]
     },
@@ -71,6 +97,32 @@
             6.6,
             3.3,
             0.16
+          ]
+        },
+        {
+          "name": "timber_post_1",
+          "at": [
+            -2.04,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
+        },
+        {
+          "name": "timber_post_2",
+          "at": [
+            1.0,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
           ]
         }
       ]
@@ -98,6 +150,17 @@
           ]
         }
       ]
+    },
+    {
+      "name": "tunnel_lamp_glow",
+      "file": "tunnel_lamp_glow.glb",
+      "position": [
+        -0.3,
+        0.082,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
     },
     {
       "name": "mine_lantern_-1",
@@ -177,11 +240,35 @@
       "colliders": []
     },
     {
+      "name": "stove_stone_base",
+      "file": "stove_stone_base.glb",
+      "position": [
+        -2.78,
+        0.13812,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.105,
+            0
+          ],
+          "size": [
+            0.98,
+            0.21,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
       "name": "grilling_stove",
       "file": "grilling_stove.glb",
       "position": [
         -2.78,
-        0.138,
+        0.34812,
         -0.62
       ],
       "yaw_degrees": 90,
@@ -205,7 +292,7 @@
       "file": "stove_embers.glb",
       "position": [
         -2.78,
-        0.138,
+        0.34812,
         -0.62
       ],
       "yaw_degrees": 90,
@@ -747,17 +834,17 @@
   ],
   "review_lighting": {
     "background": "D8CBB8",
-    "ambient_color": "EEE4D3",
-    "ambient": 0.55,
-    "sun_color": "FFE5C9",
-    "sun": 0.65,
+    "ambient_color": "E8D3B5",
+    "ambient": 0.3,
+    "sun_color": "FFE2B0",
+    "sun": 0.4,
     "sun_position": [
       -2,
       7,
       5
     ]
   },
-  "revision": "SGODOT-308 v1",
+  "revision": "SGODOT-308 v1.1",
   "floor_y": 0.082,
   "footprint": [
     6.8,
@@ -771,9 +858,9 @@
         2.02,
         -1.8
       ],
-      "color": "FFD298",
-      "energy": 1.0,
-      "range": 2.0
+      "color": "FFBC6F",
+      "energy": 2.8,
+      "range": 2.7
     },
     {
       "name": "mine_right",
@@ -782,9 +869,9 @@
         2.02,
         -1.8
       ],
-      "color": "FFD298",
-      "energy": 1.0,
-      "range": 2.0
+      "color": "FFBC6F",
+      "energy": 2.8,
+      "range": 2.7
     },
     {
       "name": "shelf",
@@ -793,9 +880,9 @@
         2.22,
         0.51
       ],
-      "color": "FFD298",
-      "energy": 0.85,
-      "range": 1.8
+      "color": "FFBC6F",
+      "energy": 2.4,
+      "range": 2.7
     },
     {
       "name": "cabinet",
@@ -804,23 +891,39 @@
         1.05,
         -0.39
       ],
-      "color": "FFD298",
-      "energy": 0.85,
-      "range": 1.8
+      "color": "FFBC6F",
+      "energy": 1.8,
+      "range": 2.1
     },
     {
       "name": "stove",
       "position": [
-        -2.35,
-        0.9,
+        -2.22,
+        1.14,
         -0.62
       ],
-      "color": "FFD298",
-      "energy": 1.15,
-      "range": 1.7
+      "color": "FFBC6F",
+      "energy": 2.5,
+      "range": 2.4
+    },
+    {
+      "name": "tunnel",
+      "position": [
+        -0.864,
+        0.86,
+        -3.64
+      ],
+      "color": "FFBC6F",
+      "energy": 0.9,
+      "range": 2.8
     }
   ],
   "material_overrides": {
+    "tunnel_lamp_glow": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.2
+    },
     "mine_lantern_glow_-1": {
       "emission": "FFD095",
       "emission_use_atlas": true,
@@ -894,6 +997,13 @@
     "exit"
   ],
   "mine_enterable": false,
+  "tunnel_depth_behind_wall": 2.5,
+  "tunnel_floor_descent": 1.0,
+  "tunnel_far_section_scale": 0.4,
+  "rug_size": [
+    2.6,
+    2.0
+  ],
   "nameplate_clearance": {
     "center": [
       1.4,

@@ -1,82 +1,98 @@
 [
   {
-    "file": "SGODOT-308_MINEHUT_v1_full_room_43deg_360.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_control_local_lights_off.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "deb2740132abef728d70e2df7b8177860cbecb5cb181a66a2da7391fc322a532"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_1_full_room_43deg_360.png",
     "size": [
       360,
       800
     ],
-    "sha256": "5f05a877ebd5db808712423c227484bdc789e0626eca990684905d69ef971ef8"
+    "sha256": "112de0a18a6fa1a4334d47c0e3a286b8a2d1b497834fff8f0a5b8e49bf4810dd"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_full_room_panorama.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_full_room_panorama.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "ff0cab36d2654981a354cc60e365457ecfeec9d400177867a79d8f669c9605c2"
+    "sha256": "ee2ae9c08c46d539768261ad2547abe49082f867bfe54ebd19457724edb65687"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_gameplay_43deg_360.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_gameplay_43deg_360.png",
     "size": [
       360,
       800
     ],
-    "sha256": "a81cbe63d0b66df2d2ece1e83f1a96d2bf3b7587113234756547da8c2da1ca78"
+    "sha256": "dbefd4f97d5e55f69bda9760fdb4dfd9bda10b5011bb0e7878f1601f1e143c1e"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_ivo_character_detail.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_ivo_character_detail.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "f7868df706519d764147aea13897b6e115ebbae2570381e9fe6ebd1adf7e7a71"
+    "sha256": "86e2337065071a291d1c628df9906c934d4fd84e096aa3c4388663e9c5a0c055"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_ivo_position.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_ivo_position.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "bb540d5ecbf39889c386687e92dcff7e8943a2d5f61c925212f606b60f72318d"
+    "sha256": "bea1b2fdeb5dd9e4651e41a94b921b0d36c29858df32f3d32db5375e8103046e"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_mine_entrance_detail.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_mine_entrance_detail.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "48e9850e1f082fbcf168cfce9f43e72be6e956f8b59a1e0632bb87b5863525f4"
+    "sha256": "83e85f4186787dcb19429d0d0b99edfeaf9a0c54dddb60e292e26218edbfba64"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_reference_comparison.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_reference_comparison.png",
     "size": [
       2454,
       1354
     ],
-    "sha256": "5198b200099c8275cc0a0701a56c314da8884f66ac215f870824e9b139b95db7"
+    "sha256": "f42165eb0f0fef618f60ea68492c5d35c77a2ea5931f5deef1a3cd1b71f8ac3c"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_sorting_table_detail.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_sorting_table_detail.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "cfde3cebd5126429beeac68d72bb2102c274e1f47cabdd5415455a81f94c4b70"
+    "sha256": "67ff7aa93b4d9be9aada0d591070ab0d2535ecaae84ab043aae2c41966d1536a"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_stove_detail.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_stove_detail.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "58b7c88eaf1d8c8dadfa317fc644d0e43d89797388197d6b3b4d4c685a485ee9"
+    "sha256": "994d23bf44ec1db3b41f1e2cd2368bdcdeb7bf6e0e36631849e04a74c177898b"
   },
   {
-    "file": "SGODOT-308_MINEHUT_v1_top_view.png",
+    "file": "SGODOT-308_MINEHUT_v1_1_top_view.png",
     "size": [
       1200,
       1000
     ],
-    "sha256": "dfa42e63858abb0ff1f71f9ec0d6e1d9a6cc54e0c189426624bca20438c65462"
+    "sha256": "1efcff5529475fec87c3181f0325dc5ae0a5bd4f7fa049f50cd402d82c6757ac"
+  },
+  {
+    "file": "SGODOT-308_MINEHUT_v1_1_tunnel_depth_detail.png",
+    "size": [
+      1200,
+      1000
+    ],
+    "sha256": "41dc9aaa79c71c6efe52d13731d517e8248523c47ff3c917ef1bbf243b4f50b6"
   }
 ]

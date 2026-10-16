@@ -1,10 +1,11 @@
 """Validate actual exported GLB geometry, cross-module contacts and provenance."""
 from pathlib import Path
-import sys,json,math,hashlib
+import sys,json,math,hashlib,subprocess
 import bpy
 import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+from mathutils.kdtree import KDTree
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from verify_warming_cabinet import geometry,matrix,bounds
 from verify_chef_sign import load_glb,accessor
@@ -31,6 +32,40 @@ def main():
     colors=pixels[xy[:,1],xy[:,0],:3];dark_samples+=int((np.max(colors,axis=1)<.00001).sum());sample_count+=len(probes)
   check(dark_samples==0,name+' UV vertices and triangle centres never sample empty black atlas')
   report['assets'][name]={'world_bounds':bb.tolist(),'triangles':len(t),'sha256':hashlib.sha256(file.read_bytes()).hexdigest()}
+ # Revision contract: footprint unchanged, thick larger hide and real recess.
+ shell=rows['room_shell']['bb'];hide=rows['white_hide_rug']['bb'];mine=rows['mine_entrance']['bb']
+ check(np.allclose((shell[1]-shell[0])[[0,2]],[6.8,6.4],atol=1e-5),'original 6.8 x 6.4 m floor retained')
+ check(abs((hide[1]-hide[0])[0]-2.6)<.02 and abs((hide[1]-hide[0])[2]-2.0)<.06,'thick hide approx 2.6 x 2.0 m including edge tufts')
+ check((hide[1]-hide[0])[1]>=.08,'hide has at least 8 cm actual padded thickness')
+ depth=-3.09-mine[0][2];check(2.49<=depth<=2.55,'actual mine recess extends 2.50 m behind wall plus end cap')
+ report['revision_dimensions']={'hide_size_xyz':(hide[1]-hide[0]).tolist(),'tunnel_depth_including_end_cap':float(depth),'floor_xz':(shell[1]-shell[0])[[0,2]].tolist()}
+ # Cast outwards from the actual recess, including the former last-section gap.
+ # Every radial ray must encounter stone: a closed far card alone is insufficient.
+ misses=[];probe_count=0
+ for z in np.linspace(-2.66,-2.83,18):
+  t=(-z-.37)/2.5
+  origin=Vector((-.30,.082+(1-.6*t)-t,-2.72+z))
+  for a in np.linspace(0,math.tau,32,endpoint=False):
+   probe_count+=1
+   hit=rows['mine_entrance']['tree'].ray_cast(origin,Vector((math.cos(a),math.sin(a),0)),3)
+   if hit[0] is None:misses.append([float(z),float(a)])
+ check(not misses,'far tunnel lining is closed: radial mesh rays cannot escape to the background')
+ report['tunnel_closure']={'radial_probes':probe_count,'missing_hits':misses,'local_z_interval':[-2.83,-2.66]}
+ # Rebakings may change UV packing. Unrequested prop geometry must stay v1-exact.
+ changed={'left_wall','back_wall','mine_entrance','hearth_stones','white_hide_rug','stove_stone_base','tunnel_lamp_glow'}
+ report['retained_geometry']=[]
+ for row in layout['assets']:
+  name=row['name']
+  if name in changed:continue
+  baseline=OUT/'baseline.glb';baseline.write_bytes(subprocess.check_output(['git','show','4f345477:assets/rooms/mine_hut/'+row['file']],cwd=ROOT))
+  old=np.array(geometry(baseline)[2]);new=np.array(geometry(KIT/row['file'])[2])
+  errors=[]
+  for a,b in [(old,new),(new,old)]:
+   tree=KDTree(len(b))
+   for i,point in enumerate(b):tree.insert(Vector(point),i)
+   tree.balance();errors.append(max(tree.find(Vector(point))[2] for point in a))
+  check(max(errors)<1e-5,name+' local geometry retained from v1 within 0.01 mm')
+  report['retained_geometry'].append({'asset':name,'max_bidirectional_vertex_distance_m':max(errors)})
  # Structural joinery and designed assembly contacts, narrowly enumerated.
  legal={tuple(sorted(pair)):reason for pair,reason in [
   (('left_wall','back_wall'),'two-wall timber corner joint'),
@@ -38,6 +73,7 @@ def main():
   (('room_shell','back_wall'),'structural post foot seated into foundation'),
   (('room_shell','mine_entrance'),'rock surround base seated 0.030 m into foundation'),
   (('hearth_stones','square_stool'),'stool stands on hearth slab'),
+  (('mine_entrance','tunnel_lamp_glow'),'tunnel lantern glass contained in its cap and guard'),
   (('mine_entrance','back_wall'),'rock surround and timber bedded into true wall aperture'),
   (('sorting_bench','sorting_tray'),'tray rests on workbench'),
   (('sorting_bench','quartz_and_tools'),'minerals/tools rest on workbench'),
@@ -67,6 +103,10 @@ def main():
     floor=('room_shell' in [a,b] and min(v.y for v in others)>=.08199 and max(v.y for v in ps if v.y<.083)<.083) if any(v.y<.083 for v in ps) else False
     (support if floor else bad).append((ia,ib))
    reason=legal.get(tuple(sorted([a,b])))
+   if set([a,b]) in [set(['hearth_stones','stove_stone_base']),set(['stove_stone_base','grilling_stove'])]:
+    overlap_y=min(aa['bb'][1][1],bb['bb'][1][1])-max(aa['bb'][0][1],bb['bb'][0][1])
+    if abs(overlap_y)<1e-5:reason='masonry base support plane contact only, within 0.01 mm'
+
    if a=='back_wall' and b=='ivo_wall_helmet' and bad:
     peg_only=all(all(2.63<=bb['v'][k].x<=2.67 and 2.58<=bb['v'][k].y<=2.70 and -3.04<=bb['v'][k].z<=-2.78 for k in bb['t'][ib]) for ia,ib in bad)
     if peg_only:reason='only the named small helmet hanging peg enters wall; original helmet mesh is clear'
@@ -85,7 +125,7 @@ def main():
  report['helmet_reuse']={'original_triangles':len(ot),'original_vertices':len(old),'missing_original_positions':missing,'max_vertex_distance_m':float(distances.max()),'added_geometry':'rear mounting peg only'}
  # Actual mesh support rays, including the two lanterns and stool feet plane.
  report['support_gaps']=[]
- for asset,support in [('cabinet_lantern','low_cabinet'),('shelf_lantern','left_shelf'),('square_stool','hearth_stones'),('round_stool','room_shell'),('sorting_tray','sorting_bench')]:
+ for asset,support in [('cabinet_lantern','low_cabinet'),('shelf_lantern','left_shelf'),('square_stool','hearth_stones'),('round_stool','room_shell'),('sorting_tray','sorting_bench'),('stove_stone_base','hearth_stones'),('grilling_stove','stove_stone_base')]:
   row=next(x for x in layout['assets'] if x['name']==asset);bottom=float(rows[asset]['bb'][0][1]);start=Vector((row['position'][0],bottom+.001,row['position'][2]));hit=rows[support]['tree'].ray_cast(start,Vector((0,-1,0)),.04)
   gap=bottom-hit[0].y if hit[0] is not None else None
   check(gap is not None and -.00001<=gap<=.001,asset+' rests on '+support+' within 1 mm, no penetration')

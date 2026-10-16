@@ -18,7 +18,7 @@ FARM='ef70f8052cf547407eaa09fd881839bf2df929e3'
 PROVENANCE=[]
 PAL={'oak':'BB6C54','oak_light':'D18C6A','oak_edge':'96513E','oak_dark':'644136','oak_end':'C47C5D',
  'floor':'CC8968','floor_light':'D79774','floor_shade':'C18060','joint':'A96B52',
- 'plaster':'E9B9AA','plaster_light':'EFC8BD','stone':'92968C','iron':'41464A','iron_edge':'666B69',
+ 'plaster':'DFAF87','plaster_light':'EAC49C','stone':'92968C','iron':'41464A','iron_edge':'666B69',
  'linen':'EAE0D5','leaf':'63834C','leaf_light':'86A369','leaf_dark':'486F42','terra':'AE7651'}
 def collide(size,at=None):return [{'at':at or [0,size[1]/2,0],'size':size}]
 def current(name):p.b.CURRENT=p.KITS[name]
@@ -61,6 +61,19 @@ def polygon_slab(name,pts,y,thick,color):
  o=mesh(name,vs,fs,color);mod=o.modifiers.new('Soft stone or hide edge','BEVEL');mod.width=min(.04,thick*.45);mod.segments=2
  return o
 
+def timber_support(x):
+ # Wall-mounted joinery; never crosses the Ivo nameplate volume.
+ p.b.CURRENT['collision'].append({'name':'timber_post_'+str(len(p.b.CURRENT['collision'])),'at':[x,1.66,.14],'size':[.26,3.24,.28]})
+ cube('Additional wall timber post',(x,1.66,.115),(.18,3.24,.23),'oak_edge',.035)
+ cube('Timber post foot',(x,.20,.14),(.26,.24,.28),'oak',.025)
+ for side in [-1,1]:
+  pts=[(x,3.17),(x+side*.59,3.17),(x+side*.59,3.02)]
+  pts += [(x+side*(.11+.48*(1-math.cos(t))),2.56+.46*math.sin(t)) for t in [math.pi/2-i*math.pi/16 for i in range(1,9)]]
+  pts.append((x,2.56))
+  vs=[(xx,y,z) for z in [.11,.27] for xx,y in pts];n=len(pts)
+  fs=[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
+  o=mesh('Curved timber corbel',vs,fs,'oak');mod=o.modifiers.new('Rounded corbel edge','BEVEL');mod.width=.025;mod.segments=2
+
 def shell():
  begin('room_shell',(0,0,0),collision=collide([6.8,.34,6.4],[0,-.088,0]))
  cube('Honey timber foundation',(0,-.10,0),(6.8,.36,6.4),'oak',.09)
@@ -80,6 +93,7 @@ def shell():
   cube('Post square foot',(x,.20,.12),(.29,.24,.30),'oak_light',.025)
  cube('West upper beam',(0,3.27,.06),(6.39,.26,.28),'oak',.055)
  cube('West skirting',(0,.22,.11),(6.1,.20,.12),'oak_light',.02)
+ for x in [-1.75,1.82]:timber_support(x)
  begin('back_wall',(0,0,-3.09),collision=[{'at':[0,1.65,-.04],'size':[6.6,3.3,.16]}])
  # True opening cut in new wall, visually capped only deep inside the tunnel.
  wall=cube('Warm cream rear plaster',(0,1.69,0),(6.58,3.22,.16),'plaster',.02)
@@ -87,19 +101,54 @@ def shell():
  for x in [-3.19,3.19]:cube('Rear timber upright',(x,1.65,.10),(.20,3.3,.26),'oak',.045)
  cube('Rear upper beam',(0,3.27,.06),(6.75,.26,.28),'oak',.055)
  for x,w in [(-2.35,1.55),(2.0,2.35)]:cube('Rear skirting clear of mine',(x,.22,.11),(w,.20,.12),'oak_light',.02)
+ for x in [-2.04,1.0]:timber_support(x)
 
 
 def mine():
  begin('mine_entrance',(-.30,.082,-2.72),collision=[{'at':[0,1.18,.03],'size':[2.72,2.36,.55]}])
- # Closed rear cap, floor and irregular side stones make a short, deep-looking recess.
- p.arch_solid('Deep charcoal mine recess',2.18,0,1.70,.66,.035,-.42,'302C2A')
- cube('Dark mine floor',(0,.018,-.18),(2.18,.035,.51),'66594B',.008)
+ legacy_rng=random.getstate()
+ # Real 2.50 m recess behind the wall plane, while the front blocker is unchanged.
+ p.arch_solid('Far dark tunnel termination',2.18,0,1.70,.66,.06,-2.87,'4D4136')
+ cube('Old tunnel stone floor entry',(0,.018,.16),(2.18,.035,.60),'66594B',.008)
+ for depth in range(5):
+  # The final lining overlaps the preceding section and far end cap,
+  # closing the entire tunnel perimeter without coplanar end faces.
+  z=-2.52 if depth==4 else -.39-depth*.51
+  span=.70 if depth==4 else .51
+  col=['827461','756856','655B4D','5B5042','4D4439'][depth]
+  cube('Old tunnel stone floor',(0,.018,z),(2.18,.035,span),col,0)
+  for side in [-1,1]:cube('Receding tunnel continuous side',(side*1.17,.85,z),(.28,1.70,span),col,0)
+  # A closed vault lining behind the individual stones prevents sky leaks.
+  vs=[];fs=[];n=13
+  for zz in [z-span/2,z+span/2]:
+   for radius in [1.04,1.30]:
+    for j in range(n):
+     a=math.pi*j/(n-1);vs.append((radius*math.cos(a),1.65+radius*.54*math.sin(a),zz))
+  for j in range(n-1):
+   fs += [(j,j+1,2*n+j+1,2*n+j),(n+j,3*n+j,3*n+j+1,n+j+1),(j,n+j,n+j+1,j+1),(2*n+j,2*n+j+1,3*n+j+1,3*n+j)]
+  fs += [(0,2*n,3*n,n),(n-1,2*n-1,4*n-1,3*n-1)]
+  mesh('Receding tunnel continuous vault',vs,fs,col)
+
+  for side in [-1,1]:
+   for j in range(4):rock('Receding tunnel stone course',(side*1.06,.25+j*.45,z),(.30,.52,.60),col,1)
+  for j in range(9):
+   a=math.pi*j/8;rock('Receding tunnel arch stone',(1.07*math.cos(a),1.65+.57*math.sin(a),z),(.36,.40,.60),col,1)
+ for z in [-.80,-1.86]:
+  for x in [-.91,.91]:cube('Inner mine timber support',(x,.88,z),(.12,1.76,.15),'644937',.018)
+  cube('Inner mine cross beam',(0,1.82,z),(1.94,.14,.15),'644937',.02)
+ random.setstate(legacy_rng)
  for side in [-1,1]:
   for j in range(5):
    y=.23+j*.43;x=side*(1.15+random.uniform(-.04,.04))
    rock('Rock jamb %s %s'%(side,j),(x,y,.01),(.49,.52,.51),['92968C','A5A293','858B80'][j%3],2)
  for j in range(7):
   a=math.pi*j/6;rock('Crown stone %02d'%j,(1.14*math.cos(a),1.72+.62*math.sin(a),.0),(.50,.52,.50),['A5A293','92968C','B1AA98'][j%3],2)
+ legacy_rng=random.getstate()
+ # Dense second course and shoulder stones fill the surround above the lintel.
+ for j in range(8):rock('Upper filled mine surround',(-1.25+j*.33,2.48+random.uniform(-.02,.08),-.13),(.40,.53,.53),['948B78','ACA08A','8D8878'][j%3],2)
+ for side in [-1,1]:
+  for j in range(4):rock('Outer buttress stone',(side*(1.30 if side<0 else 1.14),.23+j*.50,-.18),(.48 if side<0 else .32,.58,.50),['948D7D','B1A38B'][j%2],2)
+ random.setstate(legacy_rng)
  for x in [-.99,.99]:cube('Rough mine timber jamb',(x,1.08,.20),(.21,2.16,.25),'oak_edge',.045)
  cube('Heavy lintel',(0,2.25,.20),(2.54,.25,.31),'oak',.05)
  # X boards occupy two depth planes with a nailed crossing, avoiding z-fighting.
@@ -109,9 +158,19 @@ def mine():
    v=Vector(a).lerp(Vector(b),t);ellipsoid('Iron brace bolt',(v.x,v.y,v.z+.09),(.062,.062,.024),'iron_edge',10,6)
  for i in range(8):
   x=-1.02+i*.29;ellipsoid('Sparse moss on lintel',(x,2.397,.21),(.22,.045,.24),'sage_dark' if i%2 else 'sage',10,6)
- for j in range(5):
-  z=.49-j*.22;cube('Old rail sleeper',(0,.034,z),(1.15,.068,.12),'oak_dark',.018)
- for x in [-.39,.39]:cube('Mine iron rail',(x,.092,-.02),(.045,.048,1.19),'iron_edge',.009)
+ for j in range(13):
+  z=.49-j*.265;cube('Old rail sleeper',(0,.034,z),(1.15,.068,.12),'oak_dark',.018)
+ for x in [-.39,.39]:
+  for j in range(13):cube('Mine iron rail',(x,.092,.43-j*.265),(.045,.048,.265),'iron_edge',.005)
+ # Small warm lantern inside the recess, distinct from the four room lanterns.
+ tube('Tunnel lamp hanging chain',[(-.65,1.86,-.92),(-.65,1.28,-.92)],.012,'iron',6)
+ cylinder('Tunnel lamp brass cap',(-.65,1.26,-.92),.09,.045,'brass',vertices=12)
+ cylinder('Tunnel lamp bottom',(-.65,1.04,-.92),.09,.035,'iron',vertices=12)
+ for x in [-.72,-.58]:tube('Tunnel lamp guard',[(x,1.06,-.92),(x,1.24,-.92)],.009,'iron',6)
+ # Shared atlas luminous inset is separately addressable without flattening materials.
+ begin('tunnel_lamp_glow',(-.30,.082,-2.72))
+ ellipsoid('Dim amber tunnel lantern glass',(-.65,1.15,-.92),(.12,.18,.12),'D89042',12,6)
+ current('mine_entrance')
  # Cart remains behind the crossed timbers. Open box and four visible wheels.
  for x in [-.29,.29]:
   for z in [-.27,.14]:
@@ -134,12 +193,18 @@ def mine():
 
 def stove():
  begin('hearth_stones',(-2.28,.083,-.62))
- pts=[(-.64,-.85),(.57,-.87),(.77,-.55),(.67,-.16),(.81,.17),(.56,.85),(.04,.91),(-.56,.75),(-.73,.32)]
+ pts=[(-.82,-.85),(.57,-.87),(.77,-.55),(.67,-.16),(.81,.17),(.56,.85),(.04,.91),(-.82,.75),(-.83,.32)]
  polygon_slab('Irregular grey hearth slab',pts,0,.055,'9A9B92')
  for a,b in [((-.5,-.18),(.67,-.27)),((-.18,-.84),(-.08,.85))]:
   dx=b[0]-a[0];dz=b[1]-a[1];l=math.hypot(dx,dz);ox=-dz/l*.003;oz=dx/l*.003
   mesh('Fine slab joint',[(a[0]-ox,.0551,a[1]-oz),(a[0]+ox,.0551,a[1]+oz),(b[0]+ox,.0551,b[1]+oz),(b[0]-ox,.0551,b[1]-oz)],[(0,1,2,3)],'777C76')
- begin('grilling_stove',(-2.78,.138,-.62),90,collide([.87,1.18,.59],[0,.59,0]))
+ begin('stove_stone_base',(-2.78,.13812,-.62),90,collide([.98,.21,.60]))
+ cube('Masonry plinth mortar core',(0,.09,0),(.95,.18,.57),'786F60',.018)
+ for row in range(2):
+  for i in range(3):
+   for z in [-.23,.23]:cube('Dressed stove foundation stone',(-.325+i*.325,.0525+row*.105,z),(.315,.101,.14),['AAA08B','9C9584','B6AA91'][(row+i)%3],.017)
+ cube('Solid masonry capstone',(0,.195,0),(.98,.03,.60),'A69E8B',.012)
+ begin('grilling_stove',(-2.78,.34812,-.62),90,collide([.87,1.18,.59],[0,.59,0]))
  for x in [-.33,.33]:
   for z in [-.21,.21]:cube('Stove square metal foot',(x,.18,z),(.09,.36,.09),'iron',.015)
  cube('Stove ash drawer',(0,.39,0),(.83,.23,.58),'iron',.025)
@@ -157,7 +222,7 @@ def stove():
   mesh('Fish tail '+str(j),[(-.26,.76,z),(-.43,.77,z-.12),(-.43,.77,z+.12),(-.26,.79,z)],[(0,1,2),(1,3,2),(0,3,1),(0,2,3)],'C29B63')
   ellipsoid('Fish eye '+str(j),(.23,.813,z+.037),(.024,.009,.024),'6D5944',8,6)
   for x in [-.15,-.03,.09]:tube('Fish grill mark',[(x,.815,z-.037),(x+.025,.824,z+.04)],.008,'9B7447',5)
- begin('stove_embers',(-2.78,.138,-.62),90)
+ begin('stove_embers',(-2.78,.34812,-.62),90)
  for i in range(16):rock('Warm ember',(random.uniform(-.33,.33),.60,random.uniform(-.22,.22)),(.10,.06,.10),['C75E2D','F1A04E','E0B776'][i%3])
  begin('firewood',(-2.53,.082,-1.85),collision=collide([.64,.53,.55]))
  for j in range(3):
@@ -275,16 +340,36 @@ def sacks_and_rug():
  for i in range(8):rock('Bag rounded stone',(random.uniform(-.10,.10),.52+random.uniform(-.02,.05),random.uniform(-.10,.10)),(.10,.12,.11),'B6B3A7')
  begin('white_hide_rug',(0,.084,.65))
  # Whole asymmetrical hide silhouette with neck, legs and soft scalloped edges.
- pts=[(-.16,-.76),(-.30,-.77),(-.36,-.55),(-.60,-.52),(-.83,-.70),(-1,-.65),(-.95,-.48),(-.73,-.27),(-.70,-.06),(-.76,.17),(-.96,.40),(-1,.59),(-.82,.71),(-.62,.58),(-.37,.51),(-.21,.67),(-.11,.8),(.08,.78),(.22,.63),(.34,.50),(.63,.58),(.84,.71),(.98,.56),(.95,.38),(.75,.17),(.70,-.08),(.76,-.29),(.98,-.5),(.95,-.69),(.77,-.74),(.55,-.54),(.33,-.53),(.2,-.72)]
- # One continuous softly pillowed skin, with shallow folds and a lobed hide perimeter.
- vs=[(0,.052,0)];fs=[];n=len(pts)
- for ring in range(1,6):
-  r=ring/5
-  for j,(x,z) in enumerate(pts):vs.append((x*r,.016+.036*(1-r*r)+.004*math.sin(j*1.9)*r,z*r))
+ pts=[(-.22,-.90),(.22,-.90),(.30,-.66),(.65,-.60),(.98,-.82),(1.14,-.76),(1.16,-.58),(.95,-.38),(.98,.35),(1.25,.54),(1.24,.76),(1.04,.90),(.78,.73),(.34,.78),(.22,.97),(-.08,1),(-.26,.82),(-.75,.74),(-1.05,.88),(-1.25,.72),(-1.25,.52),(-.99,.32),(-.96,-.35),(-1.13,-.58),(-1.12,-.78),(-.94,-.88),(-.62,-.62),(-.30,-.66)]
+ # Smooth the coarse hide outline, then set exact 2.60 x 2.00 m dimensions.
+ base=[Vector(q) for q in pts];smooth=[]
+ for i in range(len(base)):
+  a,b,c,d=[base[(i+j)%len(base)] for j in [-1,0,1,2]]
+  for j in range(4):
+   t=j/4;smooth.append(.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t))
+ lo=[min(q[k] for q in smooth) for k in [0,1]];hi=[max(q[k] for q in smooth) for k in [0,1]]
+ pts=[((q[0]-(lo[0]+hi[0])/2)*2.6/(hi[0]-lo[0]),(q[1]-(lo[1]+hi[1])/2)*2.0/(hi[1]-lo[1])) for q in smooth]
+ vs=[(0,.11,0)];fs=[];n=len(pts);rings=9
+ for ring in range(1,rings+1):
+  r=ring/rings
+  for j,(x,z) in enumerate(pts):vs.append((x*r,.035+.075*(1-r*r)+.009*math.sin(j*.9)*r,z*r))
  for j in range(n):fs.append((0,1+j,1+(j+1)%n))
- for ring in range(4):
+ for ring in range(rings-1):
   for j in range(n):fs.append((1+ring*n+j,1+ring*n+(j+1)%n,1+(ring+1)*n+(j+1)%n,1+(ring+1)*n+j))
- mesh('Single soft white hide with natural folds',vs,fs,'E8DCD2',smooth=True)
+ bottom=len(vs);vs += [(x,0,z) for x,z in pts]
+ for j in range(n):fs.append((1+(rings-1)*n+j,1+(rings-1)*n+(j+1)%n,bottom+(j+1)%n,bottom+j))
+ fs.append(tuple(reversed(range(bottom,bottom+n))))
+ hide=mesh('Thick white fur hide with light brown patches',vs,fs,'EFE6D6',smooth=True)
+ # Patches are baked procedural albedo, no extra runtime texture or material.
+ mat=hide.data.materials[0].copy();mat.name='Hide soft tan patches';hide.data.materials[0]=mat
+ nt=mat.node_tree;geo=nt.nodes.new('ShaderNodeNewGeometry');scale=nt.nodes.new('ShaderNodeVectorMath');scale.operation='MULTIPLY';scale.inputs[1].default_value=(1,1,0)
+ nt.links.new(geo.outputs['Position'],scale.inputs[0]);noise=nt.nodes.new('ShaderNodeTexNoise');noise.inputs['Scale'].default_value=3.1;noise.inputs['Detail'].default_value=1.2;noise.inputs['Roughness'].default_value=.5;nt.links.new(scale.outputs[0],noise.inputs['Vector'])
+ ramp=nt.nodes.new('ShaderNodeValToRGB');ramp.color_ramp.elements[0].position=.52;ramp.color_ramp.elements[0].color=(*p.rgb('EFE6D6'),1);ramp.color_ramp.elements[1].position=.60;ramp.color_ramp.elements[1].color=(*p.rgb('C3AA91'),1)
+ nt.links.new(noise.outputs['Fac'],ramp.inputs[0]);nt.links.new(ramp.outputs[0],nt.nodes.get('Principled BSDF').inputs['Base Color'])
+ # Low rounded overlapping tufts give the silhouette thickness, all baked/joined.
+ for i in range(0,n,2):
+  x,z=pts[i];o=ellipsoid('Soft edge fur tuft',(x*.98,.028,z*.98),(.06,.022,.09),'EFE6D6',10,6)
+  o.data.materials[0]=mat
  for side in [-1,1]:
   begin('entry_plant_'+str(side),(side*1.14,.082,2.54),collision=collide([.5,.58,.5]))
   plant(scale=1.1)
@@ -322,22 +407,36 @@ def pad_atlas():
  print('ATLAS_EMPTY_TEXELS_EXTENDED',count,flush=True)
 
 def build():
- p.start('mine_hut','SGODOT-308 / Stark approved v1.1');random.seed(308)
+ p.start('mine_hut','SGODOT-308 / art revision v1.1');random.seed(308)
  p.b.PALETTE.update(PAL)
  shell();mine();stove();sorting();wall_details();sacks_and_rug()
+ # A descending old mine stays below the rear wall silhouette. The 2.50 m
+ # horizontal recess has real rails, stone and a sealed end, not a black card.
+ bpy.context.view_layer.update()
+ prefixes=('Receding tunnel','Inner mine','Far dark tunnel','Old tunnel stone','Old rail sleeper','Mine iron rail','Tunnel lamp','Dim amber tunnel')
+ for name in ['mine_entrance','tunnel_lamp_glow']:
+  for o in p.KITS[name]['objects']:
+   if not o.name.startswith(prefixes):continue
+   mat=o.matrix_local.copy();inv=mat.inverted()
+   for vertex in o.data.vertices:
+    co=mat@vertex.co;t=min(1.0,max(0,co.y-.37)/2.5)
+    # Rock passage narrows towards the old collapse; keep rail gauge constant.
+    if not o.name.startswith(('Mine iron rail','Old rail sleeper','Old tunnel stone')):co.x*=1-.60*t
+    co.z=co.z*(1-.60*t)-1.0*t;vertex.co=inv@co
+
  p.BAKE_SETTINGS.update(ao_distance=.36,ao_strength=.32,floor_ao_strength=.24)
  # Default authored perspective matches other isometric room kits; gameplay width is explicit.
  yaw=45;pitch=43;target=Vector((0,1.25,0));off=Vector((math.sin(math.radians(yaw))*math.cos(math.radians(pitch)),math.sin(math.radians(pitch)),math.cos(math.radians(yaw))*math.cos(math.radians(pitch))))*15
- lamps=[{'name':n,'position':at,'color':'FFD298','energy':e,'range':r} for n,at,e,r in [('mine_left',[-1.50,2.02,-1.80],1.0,2.0),('mine_right',[.90,2.02,-1.80],1.0,2.0),('shelf',[-2.65,2.22,.51],.85,1.8),('cabinet',[2.64,1.05,-.39],.85,1.8),('stove',[-2.35,.90,-.62],1.15,1.7)]]
- p.MANIFEST_EXTRA.update({'revision':'SGODOT-308 v1','floor_y':.082,'footprint':[6.8,6.4],
-  'local_lights':lamps,'material_overrides':{n:{'emission':'FFD095','emission_use_atlas':True,'emission_energy':.7} for n in p.KITS if 'glow' in n or n=='stove_embers'},
+ lamps=[{'name':n,'position':at,'color':'FFBC6F','energy':e,'range':r} for n,at,e,r in [('mine_left',[-1.50,2.02,-1.80],2.8,2.7),('mine_right',[.90,2.02,-1.80],2.8,2.7),('shelf',[-2.65,2.22,.51],2.4,2.7),('cabinet',[2.64,1.05,-.39],1.8,2.1),('stove',[-2.22,1.14,-.62],2.5,2.4),('tunnel',[-.864,.86,-3.64],.9,2.8)]]
+ p.MANIFEST_EXTRA.update({'revision':'SGODOT-308 v1.1','floor_y':.082,'footprint':[6.8,6.4],
+  'local_lights':lamps,'material_overrides':{n:{'emission':'FFD095','emission_use_atlas':True,'emission_energy':.20 if n=='tunnel_lamp_glow' else .7} for n in p.KITS if 'glow' in n or n=='stove_embers'},
   'suggested_anchors':{n:{'position':at,'yaw_degrees':yaw if n=='npc_ivo' else 0} for n,at in [('npc_ivo',[1.40,.082,-.84]),('stand_ivo',[.80,.082,.05]),('spawn',[0,.082,2.55]),('exit',[0,.082,3.08]),('badge_exit',[0,.70,3.08])]},
-  'interactions':['npc_ivo','exit'],'mine_enterable':False,'nameplate_clearance':{'center':[1.4,2.18,-.84],'size':[1.0,.55,.65]},
+  'interactions':['npc_ivo','exit'],'mine_enterable':False,'tunnel_depth_behind_wall':2.5,'tunnel_floor_descent':1.0,'tunnel_far_section_scale':.4,'rug_size':[2.6,2.0],'nameplate_clearance':{'center':[1.4,2.18,-.84],'size':[1.0,.55,.65]},
   'gameplay_camera':{'pitch_degrees':43,'yaw_degrees':45,'size':6.72,'target':[0,1.15,0],'native_width':360},
   'spawn':[0,.082,2.55],'boundaries':[{'name':'front_left','at':[-1.99,1,3.22],'size':[2.48,2,.08]},{'name':'front_right','at':[1.99,1,3.22],'size':[2.48,2,.08]},{'name':'cut_right','at':[3.32,1,0],'size':[.08,2,6.4]}],
   'source_dependencies':{'art_base':'154ce6421448e26e42ee225ba7018638ae756394','avatar_commit':FARM},
   'reference':'SGODOT-308_stark-minehut.png + SGODOT-308_huowu-annot.png; checklist v1.1 authoritative'})
- lighting={'background':'D8CBB8','ambient_color':'EEE4D3','ambient':.55,'sun_color':'FFE5C9','sun':.65,'sun_position':[-2,7,5]}
+ lighting={'background':'D8CBB8','ambient_color':'E8D3B5','ambient':.30,'sun_color':'FFE2B0','sun':.40,'sun_position':[-2,7,5]}
  p.finalize({'position':list(target+off),'target':list(target),'size':12.4,'pitch_degrees':43,'yaw_degrees':45},lighting)
  (SOURCE/'reuse_provenance.json').write_text(json.dumps({'source_blend_sha256':hashlib.sha256((ROOT/'tools/art/source/blacksmith_shop/blacksmith_shop.blend').read_bytes()).hexdigest(),'reused':PROVENANCE},indent=2)+'\n')
  p.complete()

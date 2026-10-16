@@ -2,8 +2,9 @@
   "issue": "SGODOT-308",
   "artist": "Liu Bei / 刘备",
   "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "revision": "v1.1",
   "passed": true,
-  "checks": 1235,
+  "checks": 1400,
   "geometry": {
     "checks": [
       {
@@ -68,6 +69,22 @@
       },
       {
         "check": "mine_entrance UV vertices and triangle centres never sample empty black atlas",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow actual GLB triangle count",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow one shared external atlas",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow UV vertices and triangle centres never sample empty black atlas",
         "passed": true
       },
       {
@@ -180,6 +197,22 @@
       },
       {
         "check": "hearth_stones UV vertices and triangle centres never sample empty black atlas",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base actual GLB triangle count",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base one shared external atlas",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base UV vertices and triangle centres never sample empty black atlas",
         "passed": true
       },
       {
@@ -695,6 +728,178 @@
         "passed": true
       },
       {
+        "check": "original 6.8 x 6.4 m floor retained",
+        "passed": true
+      },
+      {
+        "check": "thick hide approx 2.6 x 2.0 m including edge tufts",
+        "passed": true
+      },
+      {
+        "check": "hide has at least 8 cm actual padded thickness",
+        "passed": true
+      },
+      {
+        "check": "actual mine recess extends 2.50 m behind wall plus end cap",
+        "passed": true
+      },
+      {
+        "check": "far tunnel lining is closed: radial mesh rays cannot escape to the background",
+        "passed": true
+      },
+      {
+        "check": "room_shell local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_-1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_glow_-1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_hanger_-1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_glow_1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_hanger_1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "grilling_stove local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "stove_embers local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "firewood local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "square_stool local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "sorting_bench local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "sorting_tray local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "quartz_and_tools local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "round_stool local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "rock_crate local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "salt_crate local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "rock_barrel local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "wood_stump local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "low_cabinet local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "cabinet_lantern local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "cabinet_lantern_glow local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "left_shelf local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "shelf_lantern local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "shelf_lantern_glow local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "hanging_pan local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "garlic_and_herbs local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_plan local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "wall_pickaxe local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "wall_short_axe local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "coiled_rope local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "ivo_wall_helmet local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "tied_sack local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "stone_sack local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "entry_plant_-1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "entry_plant_1 local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "exit_steps local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "exit_pickaxe_sign local geometry retained from v1 within 0.01 mm",
+        "passed": true
+      },
+      {
         "check": "room_shell / left_wall no unintended triangle intersection",
         "passed": true
       },
@@ -704,6 +909,10 @@
       },
       {
         "check": "room_shell / mine_entrance no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "room_shell / tunnel_lamp_glow no unintended triangle intersection",
         "passed": true
       },
       {
@@ -732,6 +941,10 @@
       },
       {
         "check": "room_shell / hearth_stones no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "room_shell / stove_stone_base no unintended triangle intersection",
         "passed": true
       },
       {
@@ -871,6 +1084,10 @@
         "passed": true
       },
       {
+        "check": "left_wall / tunnel_lamp_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "left_wall / mine_lantern_-1 no unintended triangle intersection",
         "passed": true
       },
@@ -896,6 +1113,10 @@
       },
       {
         "check": "left_wall / hearth_stones no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "left_wall / stove_stone_base no unintended triangle intersection",
         "passed": true
       },
       {
@@ -1031,6 +1252,10 @@
         "passed": true
       },
       {
+        "check": "back_wall / tunnel_lamp_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "back_wall / mine_lantern_-1 no unintended triangle intersection",
         "passed": true
       },
@@ -1056,6 +1281,10 @@
       },
       {
         "check": "back_wall / hearth_stones no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "back_wall / stove_stone_base no unintended triangle intersection",
         "passed": true
       },
       {
@@ -1187,6 +1416,10 @@
         "passed": true
       },
       {
+        "check": "mine_entrance / tunnel_lamp_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_entrance / mine_lantern_-1 no unintended triangle intersection",
         "passed": true
       },
@@ -1212,6 +1445,10 @@
       },
       {
         "check": "mine_entrance / hearth_stones no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "mine_entrance / stove_stone_base no unintended triangle intersection",
         "passed": true
       },
       {
@@ -1343,6 +1580,166 @@
         "passed": true
       },
       {
+        "check": "tunnel_lamp_glow / mine_lantern_-1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / mine_lantern_glow_-1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / mine_lantern_hanger_-1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / mine_lantern_1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / mine_lantern_glow_1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / mine_lantern_hanger_1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / hearth_stones no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / grilling_stove no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / stove_embers no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / firewood no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / square_stool no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / sorting_bench no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / sorting_tray no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / quartz_and_tools no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / round_stool no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / rock_crate no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / salt_crate no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / rock_barrel no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / wood_stump no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / low_cabinet no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / cabinet_lantern no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / cabinet_lantern_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / left_shelf no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / shelf_lantern no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / shelf_lantern_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / hanging_pan no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / garlic_and_herbs no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / mine_plan no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / wall_pickaxe no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / wall_short_axe no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / coiled_rope no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / ivo_wall_helmet no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / tied_sack no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / stone_sack no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / white_hide_rug no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / entry_plant_-1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / entry_plant_1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / exit_steps no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow / exit_pickaxe_sign no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_lantern_-1 / mine_lantern_glow_-1 no unintended triangle intersection",
         "passed": true
       },
@@ -1364,6 +1761,10 @@
       },
       {
         "check": "mine_lantern_-1 / hearth_stones no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "mine_lantern_-1 / stove_stone_base no unintended triangle intersection",
         "passed": true
       },
       {
@@ -1515,6 +1916,10 @@
         "passed": true
       },
       {
+        "check": "mine_lantern_glow_-1 / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_lantern_glow_-1 / grilling_stove no unintended triangle intersection",
         "passed": true
       },
@@ -1659,6 +2064,10 @@
         "passed": true
       },
       {
+        "check": "mine_lantern_hanger_-1 / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_lantern_hanger_-1 / grilling_stove no unintended triangle intersection",
         "passed": true
       },
@@ -1799,6 +2208,10 @@
         "passed": true
       },
       {
+        "check": "mine_lantern_1 / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_lantern_1 / grilling_stove no unintended triangle intersection",
         "passed": true
       },
@@ -1935,6 +2348,10 @@
         "passed": true
       },
       {
+        "check": "mine_lantern_glow_1 / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_lantern_glow_1 / grilling_stove no unintended triangle intersection",
         "passed": true
       },
@@ -2067,6 +2484,10 @@
         "passed": true
       },
       {
+        "check": "mine_lantern_hanger_1 / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "mine_lantern_hanger_1 / grilling_stove no unintended triangle intersection",
         "passed": true
       },
@@ -2195,6 +2616,10 @@
         "passed": true
       },
       {
+        "check": "hearth_stones / stove_stone_base no unintended triangle intersection",
+        "passed": true
+      },
+      {
         "check": "hearth_stones / grilling_stove no unintended triangle intersection",
         "passed": true
       },
@@ -2320,6 +2745,134 @@
       },
       {
         "check": "hearth_stones / exit_pickaxe_sign no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / grilling_stove no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / stove_embers no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / firewood no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / square_stool no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / sorting_bench no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / sorting_tray no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / quartz_and_tools no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / round_stool no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / rock_crate no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / salt_crate no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / rock_barrel no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / wood_stump no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / low_cabinet no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / cabinet_lantern no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / cabinet_lantern_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / left_shelf no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / shelf_lantern no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / shelf_lantern_glow no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / hanging_pan no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / garlic_and_herbs no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / mine_plan no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / wall_pickaxe no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / wall_short_axe no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / coiled_rope no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / ivo_wall_helmet no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / tied_sack no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / stone_sack no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / white_hide_rug no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / entry_plant_-1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / entry_plant_1 no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / exit_steps no unintended triangle intersection",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base / exit_pickaxe_sign no unintended triangle intersection",
         "passed": true
       },
       {
@@ -4331,6 +4884,14 @@
         "passed": true
       },
       {
+        "check": "stove_stone_base rests on hearth_stones within 1 mm, no penetration",
+        "passed": true
+      },
+      {
+        "check": "grilling_stove rests on stove_stone_base within 1 mm, no penetration",
+        "passed": true
+      },
+      {
         "check": "positive control detects stool through stove",
         "passed": true
       },
@@ -4343,11 +4904,11 @@
       {
         "a": "room_shell",
         "b": "left_wall",
-        "intersections": 647,
+        "intersections": 953,
         "floor_contact_pairs": 0,
         "reason": "structural post foot seated into foundation",
         "axis_separation": [
-          -0.38000059127807617,
+          -0.3900003433227539,
           -0.0820000022649765,
           -6.394999980926514
         ]
@@ -4355,24 +4916,24 @@
       {
         "a": "room_shell",
         "b": "back_wall",
-        "intersections": 381,
+        "intersections": 635,
         "floor_contact_pairs": 0,
         "reason": "structural post foot seated into foundation",
         "axis_separation": [
           -6.775000095367432,
           -0.0820000022649765,
-          -0.3399999141693115
+          -0.3900003433227539
         ]
       },
       {
         "a": "room_shell",
         "b": "mine_entrance",
-        "intersections": 117,
-        "floor_contact_pairs": 115,
+        "intersections": 533,
+        "floor_contact_pairs": 94,
         "reason": "rock surround base seated 0.030 m into foundation",
         "axis_separation": [
           -4.52505898475647,
-          -0.029800638556480408,
+          -0.9999999850988388,
           -1.1150002479553223
         ]
       },
@@ -4515,21 +5076,21 @@
         "floor_contact_pairs": 0,
         "reason": "two-wall timber corner joint",
         "axis_separation": [
-          -0.35500049591064453,
+          -0.36500024795532227,
           -3.4000000953674316,
-          -0.33499979972839355
+          -0.38500022888183594
         ]
       },
       {
         "a": "back_wall",
         "b": "mine_entrance",
-        "intersections": 266,
+        "intersections": 2849,
         "floor_contact_pairs": 0,
         "reason": "rock surround and timber bedded into true wall aperture",
         "axis_separation": [
           -4.500058889389038,
-          -2.674691915512085,
-          -0.47499990463256836
+          -2.897843360900879,
+          -1.0850002765655518
         ]
       },
       {
@@ -4541,7 +5102,19 @@
         "axis_separation": [
           -0.9829998016357422,
           -0.9343838691711426,
-          -0.1549997329711914
+          -0.2050001621246338
+        ]
+      },
+      {
+        "a": "mine_entrance",
+        "b": "tunnel_lamp_glow",
+        "intersections": 12,
+        "floor_contact_pairs": 0,
+        "reason": "tunnel lantern glass contained in its cap and guard",
+        "axis_separation": [
+          -1.0312416553497314,
+          -1.8666949272155762,
+          -1.6150002479553223
         ]
       },
       {
@@ -4551,8 +5124,8 @@
         "floor_contact_pairs": 0,
         "reason": "iron hanging bracket mounted to rock surround",
         "axis_separation": [
-          -0.2804769277572632,
-          -0.2446918487548828,
+          -0.39661991596221924,
+          -0.46784329414367676,
           -0.48000025749206543
         ]
       },
@@ -4564,7 +5137,7 @@
         "reason": "iron hanging bracket mounted to rock surround",
         "axis_separation": [
           -0.2783172130584717,
-          -0.2446918487548828,
+          -0.46784329414367676,
           -0.48000025749206543
         ]
       },
@@ -4576,7 +5149,7 @@
         "reason": "coals inside stove firebox",
         "axis_separation": [
           -0.5611958503723145,
-          -0.6294033527374268,
+          -0.629403293132782,
           -0.8295053839683533
         ]
       },
@@ -4608,7 +5181,7 @@
           ]
         ],
         "triangles": 9380,
-        "sha256": "d6afdde92fb36847811602cb51087e062eeef7a7c0e22446bc0cc953d7fa100e"
+        "sha256": "18a03e51e0a8809ca3de1df30a36f28bfe33ccdc53aafdd2ff3b7527ed38c012"
       },
       "left_wall": {
         "world_bounds": [
@@ -4618,13 +5191,13 @@
             -3.194999933242798
           ],
           [
-            -3.0199995040893555,
+            -3.0099997520446777,
             3.4000000953674316,
             3.194999933242798
           ]
         ],
-        "triangles": 756,
-        "sha256": "78f08b8e83f966676fc5b4fae087150246fda140d701ebb1b6c4a44c8b534e8d"
+        "triangles": 2068,
+        "sha256": "631b92e9d8590af8b7211ba5084172a72c5cf714e56aeb034e61958f3d827d54"
       },
       "back_wall": {
         "world_bounds": [
@@ -4636,27 +5209,43 @@
           [
             3.375,
             3.4000000953674316,
-            -2.8600001335144043
+            -2.809999704360962
           ]
         ],
-        "triangles": 956,
-        "sha256": "55be7fcfe5b0b4e8823a1ed8aff37b456079988b4b902e5965bac6493c0bf8aa"
+        "triangles": 2268,
+        "sha256": "a5919d44f9c87c26f47a0a156caf96ac5265ee216afe9b754c8c33a83ced1e92"
       },
       "mine_entrance": {
         "world_bounds": [
           [
-            -1.7272186279296875,
-            0.052199363708496094,
-            -3.3350000381469727
+            -1.8433616161346436,
+            -0.9179999828338623,
+            -5.619999885559082
           ],
           [
             1.125058889389038,
-            2.674691915512085,
+            2.897843360900879,
             -2.0849997997283936
           ]
         ],
-        "triangles": 8344,
-        "sha256": "5d432de5c3c49dc9bd4ecc6a26022695d78a54286de4778e801c848d77eb1468"
+        "triangles": 31016,
+        "sha256": "526962357fc639478065174b88ab204e837294c3a6bbc14606814c78b0d2e6c7"
+      },
+      "tunnel_lamp_glow": {
+        "world_bounds": [
+          [
+            -0.9162800312042236,
+            0.7728272080421448,
+            -3.700000047683716
+          ],
+          [
+            -0.8121199607849121,
+            0.9486949443817139,
+            -3.580000162124634
+          ]
+        ],
+        "triangles": 120,
+        "sha256": "3657d50515ddf261c3794d4bd9e8fc72cbe6da6528ea8fc4990ce48aae74f60d"
       },
       "mine_lantern_-1": {
         "world_bounds": [
@@ -4672,7 +5261,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "6a0b06f5d38e52032b79b46f954990c3901faee7959af1411380d9fa9d5e48e2"
+        "sha256": "d2d3d3ba3392ab773906ae965b28d186e734de818ebf614f5d598b5260702134"
       },
       "mine_lantern_glow_-1": {
         "world_bounds": [
@@ -4688,7 +5277,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "a9cbe28035e16fb40bdeda93cd2901c011357c66a173fc1e8282077696b7eacb"
+        "sha256": "078e134ea9df8e1289264455e72b9d12bee58fa2f12255da7136a074dbea8035"
       },
       "mine_lantern_hanger_-1": {
         "world_bounds": [
@@ -4704,7 +5293,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "b77eeff307790f8c4ec4036afbf8781863ff534db7ecc0a5ee4b6f3dbaba732b"
+        "sha256": "a7467e43fb3f03916eb3785c98f00ca93b31306e99f7ee7fc5d3cb255b5b5e63"
       },
       "mine_lantern_1": {
         "world_bounds": [
@@ -4720,7 +5309,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "5b81c187dcb0160630f2aff8ff34867dfec1365cf3c5be95989607dc9b9f230b"
+        "sha256": "74a17ea6ba666e78c465abc8fe7bf460560c63f4f8567796541a92d9423a2607"
       },
       "mine_lantern_glow_1": {
         "world_bounds": [
@@ -4736,7 +5325,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "9e2d09f023fdc9987d572a02450ebab997349aa2e2b9c554bfd1d1ca04f681ba"
+        "sha256": "56181415c26f6a09d5ec009b415cf412c63c1be368d9f9ed032dd4ffb7564860"
       },
       "mine_lantern_hanger_1": {
         "world_bounds": [
@@ -4752,14 +5341,14 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "07ca3edb383d8e83b305702be56382469f5996d38e2c53f5d60e4d5ebd9f2e0f"
+        "sha256": "f6406a5d2ab077c098e8222d73a60e1695af751647a4c40096001503ec4dffc4"
       },
       "hearth_stones": {
         "world_bounds": [
           [
-            -3.009999990463257,
+            -3.109999895095825,
             0.08299999684095383,
-            -1.4895910024642944
+            -1.489643931388855
           ],
           [
             -1.475332498550415,
@@ -4768,39 +5357,55 @@
           ]
         ],
         "triangles": 220,
-        "sha256": "fb90782a1f37fb36dda874772cb75da13a56f494b51a1484c82c5d4f5d78c52e"
+        "sha256": "7df13c34a0ae4045a45e211a173d1d5438f9e99f56ee7f39376689432039d768"
+      },
+      "stove_stone_base": {
+        "world_bounds": [
+          [
+            -3.0799999237060547,
+            0.13811999559402466,
+            -1.1100000143051147
+          ],
+          [
+            -2.4800000190734863,
+            0.34811997413635254,
+            -0.12999998033046722
+          ]
+        ],
+        "triangles": 1512,
+        "sha256": "75e2b15e70c9a1b1d4f6e4caed41d1127166685e6aed7cbfd7fe3489057a1212"
       },
       "grilling_stove": {
         "world_bounds": [
           [
             -3.0899999141693115,
-            0.1380000114440918,
+            0.3481200337409973,
             -1.090000033378601
           ],
           [
             -2.440999984741211,
-            2.92549991607666,
+            3.135619878768921,
             -0.1499999761581421
           ]
         ],
         "triangles": 2416,
-        "sha256": "f4f3b9cbe1557e259b7b00eb8baea09fa74e9cd20dfba3f791ce9d624510a9c1"
+        "sha256": "e87d97024c0a041b4872096c3db1300368b11c277b194d0ca009a82a60346975"
       },
       "stove_embers": {
         "world_bounds": [
           [
             -3.0021958351135254,
-            0.7085967063903809,
+            0.9187166690826416,
             -0.9795053601264954
           ],
           [
             -2.518477201461792,
-            0.7674033641815186,
+            0.9775233268737793,
             -0.25268274545669556
           ]
         ],
         "triangles": 4160,
-        "sha256": "c2c6073624a5eb2901e6b8ab1c5e55432bfb4b2d71f1adef31578b45500fb52d"
+        "sha256": "f9a0ffbc7755127144e1d20aff97a2834ca05b899277f567072b5d92c8f81bf1"
       },
       "firewood": {
         "world_bounds": [
@@ -4816,7 +5421,7 @@
           ]
         ],
         "triangles": 432,
-        "sha256": "f5a5abf99952772b749e0dfb3ece42f89f68d433f8ead0ba3dbcecdf597636c8"
+        "sha256": "a6648232a49966f1d8b4fc5cd96e9eb0f8e98fcfad35f8725d45b441680126b9"
       },
       "square_stool": {
         "world_bounds": [
@@ -4832,7 +5437,7 @@
           ]
         ],
         "triangles": 540,
-        "sha256": "61e56be00533dfd4c1250ad9e44721b6d17a0af19acc882eadbb7c735081c227"
+        "sha256": "b2730bdefef2a6a9768aa95676952ca33499d3c9acd58ca0fb6d6af699bb9fc3"
       },
       "sorting_bench": {
         "world_bounds": [
@@ -4848,7 +5453,7 @@
           ]
         ],
         "triangles": 1296,
-        "sha256": "9edb05eaf290b12ce452a62ca539cff6f55d913f7e9c19e6b63faec1ebdfcf98"
+        "sha256": "4606ac4524ebaeff07df86082a2d6735360d86d467c429f774f855bb9dd2b8df"
       },
       "sorting_tray": {
         "world_bounds": [
@@ -4864,7 +5469,7 @@
           ]
         ],
         "triangles": 3096,
-        "sha256": "0e89a0f6f53e4067e5f201d28801bf18dbb6a515b5a3c6bbff354b69a8d1614b"
+        "sha256": "9cab69afa58ebc01440a3e6021d5bb5aa94377f3d1e910e4cb48cc34c26b2e9f"
       },
       "quartz_and_tools": {
         "world_bounds": [
@@ -4880,7 +5485,7 @@
           ]
         ],
         "triangles": 796,
-        "sha256": "42057e39ce1f4e5a6eb651956614cb2cd5472b616e321b52a5278fb19dcf2ffd"
+        "sha256": "36a63e292bc54db626f5a9d586369efebc613f4b6c3c5168d889be2b5372ab52"
       },
       "round_stool": {
         "world_bounds": [
@@ -4896,7 +5501,7 @@
           ]
         ],
         "triangles": 176,
-        "sha256": "8baba3fd54c47a31ce18917d3ce4a6a2e54588f4a6c582c512218531274ec9d3"
+        "sha256": "98caa9b4a4f896d1ba44c367725d8eaa8c01c37de4ccc07b5e100e05af6af22b"
       },
       "rock_crate": {
         "world_bounds": [
@@ -4912,7 +5517,7 @@
           ]
         ],
         "triangles": 3916,
-        "sha256": "701292bc7ae5aa8e99e5d2ab0793226980b70770fad68b304b1b0d1a5f1b5db4"
+        "sha256": "d6ba0732903d6c501e6ebf4735781e09f76258499bfcac4b88fa52c128901c29"
       },
       "salt_crate": {
         "world_bounds": [
@@ -4928,7 +5533,7 @@
           ]
         ],
         "triangles": 4176,
-        "sha256": "132c132f8634aba8ee1fbfc3741255864c59bdef8d67de84e49aeee03021e1ea"
+        "sha256": "babd7530c140afeccf061e77854bf0030f3e640f01f3c0e3d8c0fe2d8584e6be"
       },
       "rock_barrel": {
         "world_bounds": [
@@ -4944,7 +5549,7 @@
           ]
         ],
         "triangles": 7744,
-        "sha256": "72fbc34996ee21ddd9eebfedaca13c396f6e841558e406da313d700472880d52"
+        "sha256": "e3b3ce25c3a54dd11e52755233f6874aa590469a72589f169dade018f3666060"
       },
       "wood_stump": {
         "world_bounds": [
@@ -4960,7 +5565,7 @@
           ]
         ],
         "triangles": 2622,
-        "sha256": "600bd08ab2a8b33b91681b006c863c292c1467a5c642e03179a5a40d7aa07ffb"
+        "sha256": "ae3cdd3c717fda5f7060a6b7beedb7c12ee35017c57e040bba3f2f42789e37ac"
       },
       "low_cabinet": {
         "world_bounds": [
@@ -4976,7 +5581,7 @@
           ]
         ],
         "triangles": 632,
-        "sha256": "a02a3d1d17346f93a2f9f60ff49f2fed0aa9bc6fefa944aeca6410a635ec29ee"
+        "sha256": "4579967b9c3c5dc90e4977e18464366d496a1bf52912aeaa94722882f1e2ba07"
       },
       "cabinet_lantern": {
         "world_bounds": [
@@ -4992,7 +5597,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "60ef6e21b8d491d47c3266cf6d31a3ce02a125b78eded549cf24ae1844b406b1"
+        "sha256": "b01342138736ba4ca997653e428dfeff03b7634a0a4a8e97210453b57ee08c3c"
       },
       "cabinet_lantern_glow": {
         "world_bounds": [
@@ -5008,7 +5613,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "b8e988dae30a5e068d542cecdbaea303973c9ad0bca1c0f06b83769b480213b4"
+        "sha256": "9fb2110c948ea2591d602885a4f389ec0776b3d0d18ba02e6ea3fdb5f2bfda32"
       },
       "left_shelf": {
         "world_bounds": [
@@ -5024,7 +5629,7 @@
           ]
         ],
         "triangles": 792,
-        "sha256": "cb481b4d25233384fcd69b66da1fc827dbb5c0054cd0116aac14f9e82ce29561"
+        "sha256": "2d34fe7303548e2369221e9215f7d4dfeac249507942b65c50b6600996156bf2"
       },
       "shelf_lantern": {
         "world_bounds": [
@@ -5040,7 +5645,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "30437069f8b6e1fee094b58dc62844088eeaa6817385b69a83a98002b9ff7e6d"
+        "sha256": "159742055a1addb4755048e7556bc6e476c4436d6e7642b623b704c4174e757b"
       },
       "shelf_lantern_glow": {
         "world_bounds": [
@@ -5056,7 +5661,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "34749c1ba11a531cc83d1d517ffcdae0e4cbc78dc1546aef8da3a94c097c156f"
+        "sha256": "f3dcaec29677e64034c0c50de3c33079f4c064bb4a06b335653fc22d884a6942"
       },
       "hanging_pan": {
         "world_bounds": [
@@ -5072,7 +5677,7 @@
           ]
         ],
         "triangles": 416,
-        "sha256": "5c705a7a479406d72952bc3a9ba7c3c17ba2b48b4f294786eac0c19b3cc104a5"
+        "sha256": "f9f7ea7a3a422258a4199119cd0a4cfedb2d157cb2397d6aaa01acdc7f68149a"
       },
       "garlic_and_herbs": {
         "world_bounds": [
@@ -5088,7 +5693,7 @@
           ]
         ],
         "triangles": 852,
-        "sha256": "0bca0d5f3ebf0b2905deb3693c42d895f89d0f3039ebea0bef10a6c49697d961"
+        "sha256": "fc0a19ca47a189c646eef4e47571cf6d6efed115caefb1c374fbb10f95f69dcb"
       },
       "mine_plan": {
         "world_bounds": [
@@ -5104,7 +5709,7 @@
           ]
         ],
         "triangles": 548,
-        "sha256": "66c74d8e1bc2618ad60fa6e8ef4d685f54e596f4888b0dba71ada2dbe71b8731"
+        "sha256": "4b27eb70b71ee871d4a77846956e8819e0b4632bb0a8ae72b2c07cfed958a808"
       },
       "wall_pickaxe": {
         "world_bounds": [
@@ -5120,7 +5725,7 @@
           ]
         ],
         "triangles": 104,
-        "sha256": "ecb4a927c6bf28f428ff20b0c62cb11634bffefc5195a72a20636122758590f9"
+        "sha256": "b58d8bdf526c4dcadf6976b5399cd237719b91cd437b6c0c2f3e4c5774ba4c29"
       },
       "wall_short_axe": {
         "world_bounds": [
@@ -5136,7 +5741,7 @@
           ]
         ],
         "triangles": 40,
-        "sha256": "0cce5716c0d6c9f768b426453b058f51dd4cdc04da8b23e8ba6abbdc10c0cea3"
+        "sha256": "8e762283340df83c865ad71c72d58feb70b101ba400d0989ed683421519cefa4"
       },
       "coiled_rope": {
         "world_bounds": [
@@ -5152,7 +5757,7 @@
           ]
         ],
         "triangles": 1600,
-        "sha256": "67ef257fe973ac6f8c48407150c52fec40ae95c91aace47b34d5c29d588da2cd"
+        "sha256": "51b72f0ffbe170591cd110e15e2a78ff42c0ff93692168b8215cb63944ad8fd2"
       },
       "ivo_wall_helmet": {
         "world_bounds": [
@@ -5168,7 +5773,7 @@
           ]
         ],
         "triangles": 1467,
-        "sha256": "341fd743bb5783449f06148d7fdc928100d0e0883e0b89750246754183e0a80e"
+        "sha256": "cbf89cae817ce8c911becbbc4fe407ac504e083a949cf5a35df02e8840c2be04"
       },
       "tied_sack": {
         "world_bounds": [
@@ -5184,7 +5789,7 @@
           ]
         ],
         "triangles": 684,
-        "sha256": "84cb639f750cee6f32245233b9aee0b1c6ba63e42a2c43a7a931d6cfaf41054e"
+        "sha256": "1cf54329d8452b443f3fb6c19e0f71c2a10ddd7bf66d6018617e1d3b3205da4a"
       },
       "stone_sack": {
         "world_bounds": [
@@ -5200,23 +5805,23 @@
           ]
         ],
         "triangles": 2356,
-        "sha256": "9090bf5a43ab69d8f22e1a8505b4c556f32f179429ae46d497a2f36bb94c0de6"
+        "sha256": "8ee5d767d5c65cb1224e42e3a86ac6563ec411ff557d35a1f5b50cbdf1e5264e"
       },
       "white_hide_rug": {
         "world_bounds": [
           [
-            -1.0,
-            0.09600160270929337,
-            -0.12000000476837158
+            -1.3025317192077637,
+            0.08399999886751175,
+            -0.37500011920928955
           ],
           [
-            0.9800000190734863,
-            0.13600000739097595,
-            1.4500000476837158
+            1.3025317192077637,
+            0.1940479278564453,
+            1.6720811128616333
           ]
         ],
-        "triangles": 297,
-        "sha256": "826ee1da10a41c5637cb3db4bfc7933afd7a7d4a029ab34ed23a38dd9c951cfb"
+        "triangles": 7838,
+        "sha256": "8d9828ae799e5b18d330e75d6b49206cad5ebc1bac8bd9d7a179a494a88ff85a"
       },
       "entry_plant_-1": {
         "world_bounds": [
@@ -5232,7 +5837,7 @@
           ]
         ],
         "triangles": 1078,
-        "sha256": "1e8456c3dc5963b90af4a9b8dd2463d23acffa054143dd3000416f45fa177b5c"
+        "sha256": "8cab8d208032382849f4f703ab900d0e04bc41505af72e47864f993a75956fc5"
       },
       "entry_plant_1": {
         "world_bounds": [
@@ -5248,7 +5853,7 @@
           ]
         ],
         "triangles": 1078,
-        "sha256": "f452a72cbffd360f09faf386da91a264a0c4fc90fa5fb79f1ab5b5ccfaee905f"
+        "sha256": "9e34d812a10b261ac2de81cae6b4d746e677a22ecca86017e0b80be7bbb0da02"
       },
       "exit_steps": {
         "world_bounds": [
@@ -5264,7 +5869,7 @@
           ]
         ],
         "triangles": 312,
-        "sha256": "818361c77d5e6020daccab08f8029e167cc71100c19bf49631ee76e76d529fa8"
+        "sha256": "b71cff5d6fefce35055d819f6bc295624f826f24d8c403f241a1c9c667178c51"
       },
       "exit_pickaxe_sign": {
         "world_bounds": [
@@ -5280,10 +5885,184 @@
           ]
         ],
         "triangles": 448,
-        "sha256": "b7e2651a82d95202536d2b1f64adea97ee7d97f5daace5fba681cf012ba04839"
+        "sha256": "aa496a10ca63d908bd8efbfa2da187e5f00e393ce47b8f458ccb086b84aa99ec"
       }
     },
     "method": "Actual GLB vertices; triangle BVH cross-module intersections, support-height filter; capsule blocking separately checked in Godot.",
+    "revision_dimensions": {
+      "hide_size_xyz": [
+        2.6050634384155273,
+        0.11004792898893356,
+        2.047081232070923
+      ],
+      "tunnel_depth_including_end_cap": 2.529999885559082,
+      "floor_xz": [
+        6.800000190734863,
+        6.400000095367432
+      ]
+    },
+    "tunnel_closure": {
+      "radial_probes": 576,
+      "missing_hits": [],
+      "local_z_interval": [
+        -2.83,
+        -2.66
+      ]
+    },
+    "retained_geometry": [
+      {
+        "asset": "room_shell",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_lantern_-1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_lantern_glow_-1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_lantern_hanger_-1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_lantern_1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_lantern_glow_1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_lantern_hanger_1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "grilling_stove",
+        "max_bidirectional_vertex_distance_m": 2.384185791015625e-07
+      },
+      {
+        "asset": "stove_embers",
+        "max_bidirectional_vertex_distance_m": 5.960464477539063e-08
+      },
+      {
+        "asset": "firewood",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "square_stool",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "sorting_bench",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "sorting_tray",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "quartz_and_tools",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "round_stool",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "rock_crate",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "salt_crate",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "rock_barrel",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "wood_stump",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "low_cabinet",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "cabinet_lantern",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "cabinet_lantern_glow",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "left_shelf",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "shelf_lantern",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "shelf_lantern_glow",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "hanging_pan",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "garlic_and_herbs",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_plan",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "wall_pickaxe",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "wall_short_axe",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "coiled_rope",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "ivo_wall_helmet",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "tied_sack",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "stone_sack",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "entry_plant_-1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "entry_plant_1",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "exit_steps",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "exit_pickaxe_sign",
+        "max_bidirectional_vertex_distance_m": 0.0
+      }
+    ],
     "helmet_reuse": {
       "original_triangles": 1423,
       "original_vertices": 799,
@@ -5316,12 +6095,26 @@
         "asset": "sorting_tray",
         "support": "sorting_bench",
         "gap_m": 0.0
+      },
+      {
+        "asset": "stove_stone_base",
+        "support": "hearth_stones",
+        "gap_m": 0.00011999905109405518
+      },
+      {
+        "asset": "grilling_stove",
+        "support": "stove_stone_base",
+        "gap_m": 5.960464477539063e-08
       }
     ],
     "failures": []
   },
   "godot": {
     "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "assembly_colliders": {
+      "actual": 27,
+      "expected": 27
+    },
     "assets": {
       "back_wall": {
         "bounds": [
@@ -5333,16 +6126,16 @@
           [
             3.375,
             3.40000009536743,
-            0.229999780654907
+            0.28000020980835
           ]
         ],
         "size": [
           6.75,
           3.40000009536743,
-          0.309999942779541
+          0.360000371932983
         ],
         "surfaces": 1,
-        "triangles": 956
+        "triangles": 2268
       },
       "cabinet_lantern": {
         "bounds": [
@@ -5537,7 +6330,7 @@
         "bounds": [
           [
             -0.469999998807907,
-            1.49011611938477e-08,
+            2.98023223876953e-08,
             -0.309999942779541
           ],
           [
@@ -5578,9 +6371,9 @@
       "hearth_stones": {
         "bounds": [
           [
-            -0.730000019073486,
+            -0.829999923706055,
             0.0,
-            -0.869590997695923
+            -0.869643926620483
           ],
           [
             0.804667472839355,
@@ -5589,9 +6382,9 @@
           ]
         ],
         "size": [
-          1.53466749191284,
+          1.63466739654541,
           0.0551000013947487,
-          1.77959108352661
+          1.77964401245117
         ],
         "surfaces": 1,
         "triangles": 220
@@ -5648,16 +6441,16 @@
           [
             3.1949999332428,
             3.40000009536743,
-            0.270000159740448
+            0.280000150203705
           ]
         ],
         "size": [
           6.3899998664856,
           3.40000009536743,
-          0.350000202655792
+          0.360000193119049
         ],
         "surfaces": 1,
-        "triangles": 756
+        "triangles": 2068
       },
       "low_cabinet": {
         "bounds": [
@@ -5683,23 +6476,23 @@
       "mine_entrance": {
         "bounds": [
           [
-            -1.4272186756134,
-            -0.0298006385564804,
-            -0.615000009536743
+            -1.54336166381836,
+            -1.0,
+            -2.89999985694885
           ],
           [
             1.42505884170532,
-            2.59269189834595,
+            2.81584334373474,
             0.635000228881836
           ]
         ],
         "size": [
-          2.85227751731873,
-          2.62249255180359,
-          1.25000023841858
+          2.96842050552368,
+          3.81584334373474,
+          3.53500008583069
         ],
         "surfaces": 1,
-        "triangles": 8344
+        "triangles": 31016
       },
       "mine_lantern_-1": {
         "bounds": [
@@ -6121,6 +6914,27 @@
         "surfaces": 1,
         "triangles": 4160
       },
+      "stove_stone_base": {
+        "bounds": [
+          [
+            -0.490000009536743,
+            0.0,
+            -0.299999952316284
+          ],
+          [
+            0.490000009536743,
+            0.209999978542328,
+            0.300000011920929
+          ]
+        ],
+        "size": [
+          0.980000019073486,
+          0.209999978542328,
+          0.599999964237213
+        ],
+        "surfaces": 1,
+        "triangles": 1512
+      },
       "tied_sack": {
         "bounds": [
           [
@@ -6141,6 +6955,27 @@
         ],
         "surfaces": 1,
         "triangles": 684
+      },
+      "tunnel_lamp_glow": {
+        "bounds": [
+          [
+            -0.616280019283295,
+            0.690827190876007,
+            -0.980000019073486
+          ],
+          [
+            -0.512119948863983,
+            0.866694927215576,
+            -0.860000133514404
+          ]
+        ],
+        "size": [
+          0.104160070419312,
+          0.175867736339569,
+          0.119999885559082
+        ],
+        "surfaces": 1,
+        "triangles": 120
       },
       "wall_pickaxe": {
         "bounds": [
@@ -6187,23 +7022,23 @@
       "white_hide_rug": {
         "bounds": [
           [
-            -1.0,
-            0.0120016038417816,
-            -0.769999980926514
+            -1.30253171920776,
+            0.0,
+            -1.02500009536743
           ],
           [
-            0.980000019073486,
-            0.0520000085234642,
-            0.800000071525574
+            1.30253171920776,
+            0.110047928988934,
+            1.02208113670349
           ]
         ],
         "size": [
-          1.98000001907349,
-          0.0399984046816826,
-          1.57000005245209
+          2.60506343841553,
+          0.110047928988934,
+          2.04708123207092
         ],
         "surfaces": 1,
-        "triangles": 297
+        "triangles": 7838
       },
       "wood_stump": {
         "bounds": [
@@ -6229,7 +7064,7 @@
     },
     "captures": [
       {
-        "draw_calls": 88,
+        "draw_calls": 100,
         "height": 800,
         "id": "gameplay_43deg_360",
         "pitch": 42.9999961853027,
@@ -6238,13 +7073,13 @@
           14.789966583252,
           10.342903137207
         ],
-        "rendered_primitives": 136894,
+        "rendered_primitives": 206068,
         "size": 6.71999979019165,
         "width": 360,
         "yaw": 45.0
       },
       {
-        "draw_calls": 92,
+        "draw_calls": 104,
         "height": 800,
         "id": "full_room_43deg_360",
         "pitch": 42.9999961853027,
@@ -6253,13 +7088,13 @@
           14.8899669647217,
           10.342903137207
         ],
-        "rendered_primitives": 139438,
+        "rendered_primitives": 208588,
         "size": 12.3999996185303,
         "width": 360,
         "yaw": 45.0
       },
       {
-        "draw_calls": 92,
+        "draw_calls": 104,
         "height": 1000,
         "id": "full_room_panorama",
         "pitch": 42.9999961853027,
@@ -6268,13 +7103,28 @@
           14.8899669647217,
           10.342903137207
         ],
-        "rendered_primitives": 140310,
+        "rendered_primitives": 209460,
         "size": 12.3999996185303,
         "width": 1200,
         "yaw": 45.0
       },
       {
-        "draw_calls": 38,
+        "draw_calls": 104,
+        "height": 1000,
+        "id": "control_local_lights_off",
+        "pitch": 42.9999961853027,
+        "position": [
+          10.342903137207,
+          14.8899669647217,
+          10.342903137207
+        ],
+        "rendered_primitives": 209460,
+        "size": 12.3999996185303,
+        "width": 1200,
+        "yaw": 45.0
+      },
+      {
+        "draw_calls": 44,
         "height": 1000,
         "id": "mine_entrance_detail",
         "pitch": 18.0,
@@ -6283,13 +7133,28 @@
           7.66033983230591,
           16.0054740905762
         ],
-        "rendered_primitives": 62226,
+        "rendered_primitives": 111928,
         "size": 3.75,
         "width": 1200,
         "yaw": 12.0
       },
       {
-        "draw_calls": 40,
+        "draw_calls": 46,
+        "height": 1000,
+        "id": "tunnel_depth_detail",
+        "pitch": 25.9999980926514,
+        "position": [
+          -0.300000011920929,
+          9.48742294311523,
+          14.9758815765381
+        ],
+        "rendered_primitives": 113028,
+        "size": 3.5,
+        "width": 1200,
+        "yaw": 0.0
+      },
+      {
+        "draw_calls": 46,
         "height": 1000,
         "id": "sorting_table_detail",
         "pitch": 34.9999961853027,
@@ -6298,13 +7163,13 @@
           12.6615295410156,
           12.4980773925781
         ],
-        "rendered_primitives": 59184,
+        "rendered_primitives": 111202,
         "size": 2.59999990463257,
         "width": 1200,
         "yaw": 24.9999980926514
       },
       {
-        "draw_calls": 67,
+        "draw_calls": 75,
         "height": 1000,
         "id": "ivo_position",
         "pitch": 42.9999961853027,
@@ -6313,13 +7178,13 @@
           14.8899669647217,
           9.54290294647217
         ],
-        "rendered_primitives": 113018,
+        "rendered_primitives": 180594,
         "size": 4.30000019073486,
         "width": 1200,
         "yaw": 45.0
       },
       {
-        "draw_calls": 60,
+        "draw_calls": 67,
         "height": 1000,
         "id": "ivo_character_detail",
         "pitch": 19.9999980926514,
@@ -6328,13 +7193,13 @@
           7.99040269851685,
           12.4492597579956
         ],
-        "rendered_primitives": 108902,
+        "rendered_primitives": 176482,
         "size": 3.29999995231628,
         "width": 1200,
         "yaw": 45.0
       },
       {
-        "draw_calls": 40,
+        "draw_calls": 46,
         "height": 1000,
         "id": "stove_detail",
         "pitch": 24.9999980926514,
@@ -6343,13 +7208,13 @@
           9.67236614227295,
           4.07139492034912
         ],
-        "rendered_primitives": 76344,
+        "rendered_primitives": 127520,
         "size": 3.5,
         "width": 1200,
         "yaw": 74.9999923706055
       },
       {
-        "draw_calls": 88,
+        "draw_calls": 96,
         "height": 1000,
         "id": "top_view",
         "pitch": 90.0,
@@ -6358,7 +7223,7 @@
           20.2000007629395,
           -8.74227794156468e-07
         ],
-        "rendered_primitives": 131600,
+        "rendered_primitives": 200694,
         "size": 9.39999961853027,
         "width": 1200,
         "yaw": 0.0
@@ -6411,6 +7276,18 @@
       },
       {
         "check": "mine_entrance atlas UV within [0,1]",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow one surface",
+        "passed": true
+      },
+      {
+        "check": "tunnel_lamp_glow atlas UV within [0,1]",
         "passed": true
       },
       {
@@ -6495,6 +7372,18 @@
       },
       {
         "check": "hearth_stones atlas UV within [0,1]",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base imported triangles match",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base one surface",
+        "passed": true
+      },
+      {
+        "check": "stove_stone_base atlas UV within [0,1]",
         "passed": true
       },
       {
@@ -6894,6 +7783,66 @@
         "passed": true
       },
       {
+        "check": "all asset colliders and boundaries instantiated",
+        "passed": true
+      },
+      {
+        "check": "all authored local lamps instantiated",
+        "passed": true
+      },
+      {
+        "check": "local light correct: mine_left",
+        "passed": true
+      },
+      {
+        "check": "local light correct: mine_right",
+        "passed": true
+      },
+      {
+        "check": "local light correct: shelf",
+        "passed": true
+      },
+      {
+        "check": "local light correct: cabinet",
+        "passed": true
+      },
+      {
+        "check": "local light correct: stove",
+        "passed": true
+      },
+      {
+        "check": "local light correct: tunnel",
+        "passed": true
+      },
+      {
+        "check": "atlas emission correct: tunnel_lamp_glow",
+        "passed": true
+      },
+      {
+        "check": "atlas emission correct: mine_lantern_glow_-1",
+        "passed": true
+      },
+      {
+        "check": "atlas emission correct: mine_lantern_glow_1",
+        "passed": true
+      },
+      {
+        "check": "atlas emission correct: stove_embers",
+        "passed": true
+      },
+      {
+        "check": "atlas emission correct: cabinet_lantern_glow",
+        "passed": true
+      },
+      {
+        "check": "atlas emission correct: shelf_lantern_glow",
+        "passed": true
+      },
+      {
+        "check": "art assembly leaves environment and sun to consumer",
+        "passed": true
+      },
+      {
         "check": "Ivo real NPC parts assembled",
         "passed": true
       },
@@ -6918,6 +7867,18 @@
         "passed": true
       },
       {
+        "check": "physical layout boundary blocks capsule: front_left",
+        "passed": true
+      },
+      {
+        "check": "physical layout boundary blocks capsule: front_right",
+        "passed": true
+      },
+      {
+        "check": "physical layout boundary blocks capsule: cut_right",
+        "passed": true
+      },
+      {
         "check": "Ivo nameplate volume clear of overhead geometry",
         "passed": true
       },
@@ -6934,7 +7895,15 @@
         "passed": true
       },
       {
+        "check": "Saved control_local_lights_off",
+        "passed": true
+      },
+      {
         "check": "Saved mine_entrance_detail",
+        "passed": true
+      },
+      {
+        "check": "Saved tunnel_depth_detail",
         "passed": true
       },
       {
@@ -6985,134 +7954,55 @@
     },
     "nameplate_intersections": [],
     "renderer": "mobile",
-    "scene_surfaces": 43,
-    "scene_triangles": 65722
+    "scene_surfaces": 45,
+    "scene_triangles": 100191
   },
-  "colour": {
-    "method": "Declared 11x11 median patches on corresponding wood, plaster and white-hide surfaces; circular HSV hue difference <= 10 degrees. Not a whole-image fidelity metric. Stone/metal use the supplied grey-green farm-mine reference and neutral-metal brief. Brightness/saturation differences remain for art review.",
-    "patches": [
+  "lighting": {
+    "method": "Identical full-room camera, sun, ambient and emission materials; only layout.local_lights toggled. Declared wall/floor patches must gain >4 RGB/255 mean and more red than blue. This proves local warm pools, not art acceptance or phone performance.",
+    "checks": [
       {
-        "surface": "floor",
-        "reference": {
-          "pixel": [
-            673,
-            605
-          ],
-          "median_rgb": [
-            243,
-            144,
-            89
-          ],
-          "hue_degrees": 21.42857142857143,
-          "saturation": 0.6337448559670782
-        },
-        "runtime": {
-          "pixel": [
-            609,
-            537
-          ],
-          "median_rgb": [
-            243,
-            179,
-            126
-          ],
-          "hue_degrees": 27.179487179487175,
-          "saturation": 0.48148148148148145
-        },
-        "hue_delta_degrees": 5.750915750915745,
+        "surface": "left_wall",
+        "roi_xyxy": [
+          243,
+          372,
+          282,
+          407
+        ],
+        "mean_rgb_gain_255": [
+          67.81391941391941,
+          41.6981684981685,
+          20.522344322344324
+        ],
         "passed": true
       },
       {
-        "surface": "upper timber",
-        "reference": {
-          "pixel": [
-            1020,
-            310
-          ],
-          "median_rgb": [
-            209,
-            104,
-            76
-          ],
-          "hue_degrees": 12.631578947368412,
-          "saturation": 0.6363636363636362
-        },
-        "runtime": {
-          "pixel": [
-            940,
-            299
-          ],
-          "median_rgb": [
-            231,
-            130,
-            84
-          ],
-          "hue_degrees": 18.775510204081627,
-          "saturation": 0.6363636363636364
-        },
-        "hue_delta_degrees": 6.1439312567132145,
+        "surface": "stove_floor",
+        "roi_xyxy": [
+          477,
+          449,
+          510,
+          478
+        ],
+        "mean_rgb_gain_255": [
+          148.04702194357367,
+          130.1703239289446,
+          93.93207941483803
+        ],
         "passed": true
       },
       {
-        "surface": "cream plaster",
-        "reference": {
-          "pixel": [
-            1010,
-            347
-          ],
-          "median_rgb": [
-            230,
-            156,
-            132
-          ],
-          "hue_degrees": 14.693877551020412,
-          "saturation": 0.4260869565217391
-        },
-        "runtime": {
-          "pixel": [
-            980,
-            370
-          ],
-          "median_rgb": [
-            234,
-            190,
-            163
-          ],
-          "hue_degrees": 22.81690140845072,
-          "saturation": 0.30341880341880345
-        },
-        "hue_delta_degrees": 8.123023857430306,
-        "passed": true
-      },
-      {
-        "surface": "white hide",
-        "reference": {
-          "pixel": [
-            650,
-            655
-          ],
-          "median_rgb": [
-            255,
-            223,
-            195
-          ],
-          "hue_degrees": 28.000000000000007,
-          "saturation": 0.23529411764705888
-        },
-        "runtime": {
-          "pixel": [
-            550,
-            598
-          ],
-          "median_rgb": [
-            246,
-            232,
-            216
-          ],
-          "hue_degrees": 31.999999999999993,
-          "saturation": 0.12195121951219515
-        },
-        "hue_delta_degrees": 3.999999999999986,
+        "surface": "right_floor",
+        "roi_xyxy": [
+          850,
+          697,
+          878,
+          722
+        ],
+        "mean_rgb_gain_255": [
+          53.87,
+          58.26,
+          33.09285714285714
+        ],
         "passed": true
       }
     ],
@@ -7133,28 +8023,35 @@
         "vertices": 4864,
         "triangles": 9380,
         "surfaces": 1,
-        "bytes": 324480
+        "bytes": 324448
       },
       {
         "name": "left_wall",
-        "vertices": 392,
-        "triangles": 756,
+        "vertices": 1064,
+        "triangles": 2068,
         "surfaces": 1,
-        "bytes": 27488
+        "bytes": 114348
       },
       {
         "name": "back_wall",
-        "vertices": 490,
-        "triangles": 956,
+        "vertices": 1162,
+        "triangles": 2268,
         "surfaces": 1,
-        "bytes": 38780
+        "bytes": 126016
       },
       {
         "name": "mine_entrance",
-        "vertices": 4320,
-        "triangles": 8344,
+        "vertices": 15984,
+        "triangles": 31016,
         "surfaces": 1,
-        "bytes": 502056
+        "bytes": 2628264
+      },
+      {
+        "name": "tunnel_lamp_glow",
+        "vertices": 62,
+        "triangles": 120,
+        "surfaces": 1,
+        "bytes": 5652
       },
       {
         "name": "mine_lantern_-1",
@@ -7175,7 +8072,7 @@
         "vertices": 134,
         "triangles": 260,
         "surfaces": 1,
-        "bytes": 14896
+        "bytes": 14960
       },
       {
         "name": "mine_lantern_1",
@@ -7196,7 +8093,7 @@
         "vertices": 134,
         "triangles": 260,
         "surfaces": 1,
-        "bytes": 14892
+        "bytes": 14956
       },
       {
         "name": "hearth_stones",
@@ -7206,18 +8103,25 @@
         "bytes": 21272
       },
       {
+        "name": "stove_stone_base",
+        "vertices": 784,
+        "triangles": 1512,
+        "surfaces": 1,
+        "bytes": 53552
+      },
+      {
         "name": "grilling_stove",
         "vertices": 1280,
         "triangles": 2416,
         "surfaces": 1,
-        "bytes": 90288
+        "bytes": 90416
       },
       {
         "name": "stove_embers",
         "vertices": 2112,
         "triangles": 4160,
         "surfaces": 1,
-        "bytes": 408464
+        "bytes": 407504
       },
       {
         "name": "firewood",
@@ -7238,7 +8142,7 @@
         "vertices": 672,
         "triangles": 1296,
         "surfaces": 1,
-        "bytes": 46124
+        "bytes": 46508
       },
       {
         "name": "sorting_tray",
@@ -7252,7 +8156,7 @@
         "vertices": 428,
         "triangles": 796,
         "surfaces": 1,
-        "bytes": 66040
+        "bytes": 65944
       },
       {
         "name": "round_stool",
@@ -7280,21 +8184,21 @@
         "vertices": 3972,
         "triangles": 7744,
         "surfaces": 1,
-        "bytes": 574276
+        "bytes": 575044
       },
       {
         "name": "wood_stump",
         "vertices": 1325,
         "triangles": 2622,
         "surfaces": 1,
-        "bytes": 99848
+        "bytes": 99784
       },
       {
         "name": "low_cabinet",
         "vertices": 328,
         "triangles": 632,
         "surfaces": 1,
-        "bytes": 23760
+        "bytes": 23824
       },
       {
         "name": "cabinet_lantern",
@@ -7315,7 +8219,7 @@
         "vertices": 410,
         "triangles": 792,
         "surfaces": 1,
-        "bytes": 32192
+        "bytes": 32032
       },
       {
         "name": "shelf_lantern",
@@ -7343,21 +8247,21 @@
         "vertices": 464,
         "triangles": 852,
         "surfaces": 1,
-        "bytes": 37896
+        "bytes": 37448
       },
       {
         "name": "mine_plan",
         "vertices": 294,
         "triangles": 548,
         "surfaces": 1,
-        "bytes": 24568
+        "bytes": 24600
       },
       {
         "name": "wall_pickaxe",
         "vertices": 56,
         "triangles": 104,
         "surfaces": 1,
-        "bytes": 6128
+        "bytes": 6160
       },
       {
         "name": "wall_short_axe",
@@ -7371,49 +8275,49 @@
         "vertices": 810,
         "triangles": 1600,
         "surfaces": 1,
-        "bytes": 60968
+        "bytes": 61512
       },
       {
         "name": "ivo_wall_helmet",
         "vertices": 823,
         "triangles": 1467,
         "surfaces": 1,
-        "bytes": 55736
+        "bytes": 55544
       },
       {
         "name": "tied_sack",
         "vertices": 348,
         "triangles": 684,
         "surfaces": 1,
-        "bytes": 26900
+        "bytes": 26612
       },
       {
         "name": "stone_sack",
         "vertices": 1196,
         "triangles": 2356,
         "surfaces": 1,
-        "bytes": 208656
+        "bytes": 208624
       },
       {
         "name": "white_hide_rug",
-        "vertices": 166,
-        "triangles": 297,
+        "vertices": 4033,
+        "triangles": 7838,
         "surfaces": 1,
-        "bytes": 9064
+        "bytes": 247284
       },
       {
         "name": "entry_plant_-1",
         "vertices": 571,
         "triangles": 1078,
         "surfaces": 1,
-        "bytes": 45792
+        "bytes": 45952
       },
       {
         "name": "entry_plant_1",
         "vertices": 571,
         "triangles": 1078,
         "surfaces": 1,
-        "bytes": 45788
+        "bytes": 45948
       },
       {
         "name": "exit_steps",
@@ -7427,16 +8331,16 @@
         "vertices": 238,
         "triangles": 448,
         "surfaces": 1,
-        "bytes": 18960
+        "bytes": 19248
       }
     ],
-    "unique_triangles": 65722,
-    "scene_triangles": 65722,
-    "static_draw_surfaces": 43,
-    "glb_bytes": 3794820,
-    "atlas_bytes": 1678169,
-    "placed_instances": 43,
-    "materials": 6
+    "unique_triangles": 100191,
+    "scene_triangles": 100191,
+    "static_draw_surfaces": 45,
+    "glb_bytes": 6392964,
+    "atlas_bytes": 1869091,
+    "placed_instances": 45,
+    "materials": 7
   },
   "suggested_anchors": {
     "npc_ivo": {

@@ -13,28 +13,35 @@
       "vertices": 4864,
       "triangles": 9380,
       "surfaces": 1,
-      "bytes": 324480
+      "bytes": 324448
     },
     {
       "name": "left_wall",
-      "vertices": 392,
-      "triangles": 756,
+      "vertices": 1064,
+      "triangles": 2068,
       "surfaces": 1,
-      "bytes": 27488
+      "bytes": 114348
     },
     {
       "name": "back_wall",
-      "vertices": 490,
-      "triangles": 956,
+      "vertices": 1162,
+      "triangles": 2268,
       "surfaces": 1,
-      "bytes": 38780
+      "bytes": 126016
     },
     {
       "name": "mine_entrance",
-      "vertices": 4320,
-      "triangles": 8344,
+      "vertices": 15984,
+      "triangles": 31016,
       "surfaces": 1,
-      "bytes": 502056
+      "bytes": 2628264
+    },
+    {
+      "name": "tunnel_lamp_glow",
+      "vertices": 62,
+      "triangles": 120,
+      "surfaces": 1,
+      "bytes": 5652
     },
     {
       "name": "mine_lantern_-1",
@@ -55,7 +62,7 @@
       "vertices": 134,
       "triangles": 260,
       "surfaces": 1,
-      "bytes": 14896
+      "bytes": 14960
     },
     {
       "name": "mine_lantern_1",
@@ -76,7 +83,7 @@
       "vertices": 134,
       "triangles": 260,
       "surfaces": 1,
-      "bytes": 14892
+      "bytes": 14956
     },
     {
       "name": "hearth_stones",
@@ -86,18 +93,25 @@
       "bytes": 21272
     },
     {
+      "name": "stove_stone_base",
+      "vertices": 784,
+      "triangles": 1512,
+      "surfaces": 1,
+      "bytes": 53552
+    },
+    {
       "name": "grilling_stove",
       "vertices": 1280,
       "triangles": 2416,
       "surfaces": 1,
-      "bytes": 90288
+      "bytes": 90416
     },
     {
       "name": "stove_embers",
       "vertices": 2112,
       "triangles": 4160,
       "surfaces": 1,
-      "bytes": 408464
+      "bytes": 407504
     },
     {
       "name": "firewood",
@@ -118,7 +132,7 @@
       "vertices": 672,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 46124
+      "bytes": 46508
     },
     {
       "name": "sorting_tray",
@@ -132,7 +146,7 @@
       "vertices": 428,
       "triangles": 796,
       "surfaces": 1,
-      "bytes": 66040
+      "bytes": 65944
     },
     {
       "name": "round_stool",
@@ -160,21 +174,21 @@
       "vertices": 3972,
       "triangles": 7744,
       "surfaces": 1,
-      "bytes": 574276
+      "bytes": 575044
     },
     {
       "name": "wood_stump",
       "vertices": 1325,
       "triangles": 2622,
       "surfaces": 1,
-      "bytes": 99848
+      "bytes": 99784
     },
     {
       "name": "low_cabinet",
       "vertices": 328,
       "triangles": 632,
       "surfaces": 1,
-      "bytes": 23760
+      "bytes": 23824
     },
     {
       "name": "cabinet_lantern",
@@ -195,7 +209,7 @@
       "vertices": 410,
       "triangles": 792,
       "surfaces": 1,
-      "bytes": 32192
+      "bytes": 32032
     },
     {
       "name": "shelf_lantern",
@@ -223,21 +237,21 @@
       "vertices": 464,
       "triangles": 852,
       "surfaces": 1,
-      "bytes": 37896
+      "bytes": 37448
     },
     {
       "name": "mine_plan",
       "vertices": 294,
       "triangles": 548,
       "surfaces": 1,
-      "bytes": 24568
+      "bytes": 24600
     },
     {
       "name": "wall_pickaxe",
       "vertices": 56,
       "triangles": 104,
       "surfaces": 1,
-      "bytes": 6128
+      "bytes": 6160
     },
     {
       "name": "wall_short_axe",
@@ -251,49 +265,49 @@
       "vertices": 810,
       "triangles": 1600,
       "surfaces": 1,
-      "bytes": 60968
+      "bytes": 61512
     },
     {
       "name": "ivo_wall_helmet",
       "vertices": 823,
       "triangles": 1467,
       "surfaces": 1,
-      "bytes": 55736
+      "bytes": 55544
     },
     {
       "name": "tied_sack",
       "vertices": 348,
       "triangles": 684,
       "surfaces": 1,
-      "bytes": 26900
+      "bytes": 26612
     },
     {
       "name": "stone_sack",
       "vertices": 1196,
       "triangles": 2356,
       "surfaces": 1,
-      "bytes": 208656
+      "bytes": 208624
     },
     {
       "name": "white_hide_rug",
-      "vertices": 166,
-      "triangles": 297,
+      "vertices": 4033,
+      "triangles": 7838,
       "surfaces": 1,
-      "bytes": 9064
+      "bytes": 247284
     },
     {
       "name": "entry_plant_-1",
       "vertices": 571,
       "triangles": 1078,
       "surfaces": 1,
-      "bytes": 45792
+      "bytes": 45952
     },
     {
       "name": "entry_plant_1",
       "vertices": 571,
       "triangles": 1078,
       "surfaces": 1,
-      "bytes": 45788
+      "bytes": 45948
     },
     {
       "name": "exit_steps",
@@ -307,14 +321,14 @@
       "vertices": 238,
       "triangles": 448,
       "surfaces": 1,
-      "bytes": 18960
+      "bytes": 19248
     }
   ],
-  "unique_triangles": 65722,
-  "scene_triangles": 65722,
-  "static_draw_surfaces": 43,
-  "glb_bytes": 3794820,
-  "atlas_bytes": 1678169,
-  "placed_instances": 43,
-  "materials": 6
+  "unique_triangles": 100191,
+  "scene_triangles": 100191,
+  "static_draw_surfaces": 45,
+  "glb_bytes": 6392964,
+  "atlas_bytes": 1869091,
+  "placed_instances": 45,
+  "materials": 7
 }
