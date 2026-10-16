@@ -1,0 +1,46 @@
+{
+  "camera": {
+    "band": [
+      0.1225,
+      0.29
+    ],
+    "cam_stove": [
+      -2.5,
+      1.24000000953674,
+      -2.43499994277954
+    ],
+    "cam_stove_screen": [
+      179.999923706055,
+      164.999969482422
+    ],
+    "diorama_size": 10.75,
+    "farm_commit": "f8c3391c8c0606ae664fb8e06ad85068aa199f69",
+    "focus_multiplier": 0.42,
+    "focus_size": 4.515,
+    "pot_bottom": [
+      -2.5,
+      0.980000019073486,
+      -2.49499988555908
+    ]
+  },
+  "renderer": "mobile",
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "check": "213 current stove 1 socket",
+      "passed": true
+    },
+    {
+      "check": "cam_stove at runtime band center",
+      "passed": true
+    },
+    {
+      "check": "Saved SGODOT-213_KITCHEN_v1_cam_stove_big_pot_360",
+      "passed": true
+    },
+    {
+      "check": "Saved SGODOT-213_KITCHEN_v1_cam_stove_big_pot_3x",
+      "passed": true
+    }
+  ]
+}
