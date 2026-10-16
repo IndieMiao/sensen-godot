@@ -520,7 +520,7 @@ func _on_big_pot(i: int, on: bool) -> void:
 	if on and not big_stoves.has(i): big_stoves.append(i)
 	if not on: big_stoves.erase(i)
 	if persist_big and rt: P0KitchenLogic.save_big_stoves(rt.session.player_id, big_stoves)
-	if room.has_method("show_big_pots"): room.call("show_big_pots")   # the pot on that stove changes (q(201) ⑦)
+	if room.has_method("show_pots"): room.call("show_pots")   # the pot on that stove changes (q(201) ⑦)
 
 ## The Big Pot stoves, read from this device the first time they are needed (the name strip, the drawer).
 func big() -> Array:
@@ -599,7 +599,7 @@ func _catch(i: int) -> void:
 	if i == stove_index:
 		stage.set_cooking(true)
 		return
-	var mouth := room.anchor("drop_pot_%d" % (i + 1))
+	var mouth: Node3D = room.call("steam_from", i) if room.has_method("steam_from") else room.anchor("drop_pot_%d" % (i + 1))
 	if mouth: stage.puff_at(mouth)
 
 ## Where a batch's ingredients float (q(124) ④): just above the pot card (else the drawer), centred on the screen.

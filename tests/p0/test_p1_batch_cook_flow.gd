@@ -176,6 +176,121 @@ func test_a_cooking_big_pot_stove_reads_big_pot_on_the_pot_card() -> void:
 	assert_str((k.get("_pot_card") as UiPotCard).tag).is_equal("Big Pot")
 	await _close()
 
+## Each stove has its pot on its burner (SGODOT-282 stove_pot.glb on SGODOT-213's range): pot_normal, pot_big once the
+## stove is switched to the Big Pot; the stove's drop_pot (cards, steam, plate) on the shown pot's mouth. The range's
+## lids close the burners the view does not have yet, whose flames are out.
+func test_each_stove_has_its_pot_and_the_big_pot_swaps_it() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var pots := r.art.get_node("stove_pots")
+	var cooker := r.art.get_node("kitchen_range_3")
+	for i in 3:
+		var pot := pots.get_node("stove_pot_%d" % (i + 1)) as Node3D
+		var top := r.anchor("use_stove_%d" % (i + 1)).global_position
+		assert_bool(pot.visible).override_failure_message("pot %d" % (i + 1)).is_true()
+		assert_vector(pot.global_position).override_failure_message("pot %d on its burner" % (i + 1)).is_equal_approx(top, Vector3.ONE * 0.001)
+		assert_vector(cooker.find_child("stove_%d_top" % (i + 1), true, false).global_position).is_equal_approx(top, Vector3.ONE * 0.001)
+		assert_bool(pot.get_node("pot_normal").visible and not pot.get_node("pot_big").visible).is_true()
+		assert_vector(r.anchor("drop_pot_%d" % (i + 1)).global_position).is_equal_approx(pot.get_node("pot_normal/mouth").global_position, Vector3.ONE * 0.001)
+	for n in ["lid_2", "lid_3"]: assert_bool(cooker.find_child(n, true, false).visible).override_failure_message(n).is_false()
+	for n in ["fire_2", "fire_3"]: assert_bool(r.art.get_node("stove_fires/" + n).visible).override_failure_message(n).is_true()
+	k.open("cookbook", "dish_grilled_crucian")
+	await get_tree().process_frame
+	k.drawer.dev_big_pot()
+	var first := pots.get_node("stove_pot_1")
+	assert_bool(first.get_node("pot_big").visible and not first.get_node("pot_normal").visible).is_true()
+	var mouth: Vector3 = first.get_node("pot_big/mouth").global_position
+	assert_vector(r.anchor("drop_pot_1").global_position).is_equal_approx(mouth, Vector3.ONE * 0.001)
+	assert_vector(k.stage.global_position).is_equal_approx(mouth, Vector3.ONE * 0.001)   # the cards go in the Big Pot
+	await _close()
+	# one stove (below Homestead Lv4): stoves 2 and 3 have no pot, their lids are on and their flames out
+	var v := _view()
+	v.cooking.stoves = [{}]
+	_set_view(v)
+	r.call("_room_frame", v, 0.0)
+	assert_array(pots.get_children().map(func(p): return (p as Node3D).visible)).is_equal([true, false, false])
+	for n in ["lid_2", "lid_3"]: assert_bool(cooker.find_child(n, true, false).visible).override_failure_message(n).is_true()
+	for n in ["fire_2", "fire_3"]: assert_bool(r.art.get_node("stove_fires/" + n).visible).override_failure_message(n).is_false()
+
+## The Big Pot's lid (282 v1.1 / 5d6fcf56, LOCK-20): up while ingredients go in, shut once the fire is lit (steam from its
+## vent, a finer wisp), up again when the dish is ready (steam from the mouth), shut once it is collected. Switching pots
+## bounces the pot, and on to the Big Pot puffs steam.
+func test_the_big_pots_lid_follows_the_cook() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var pot := r.art.get_node("stove_pots/stove_pot_1") as Node3D
+	var lid := pot.get_node("pot_big/lid") as Node3D
+	var vent := pot.get_node("pot_big/vent") as Node3D
+	k.open("cookbook", "dish_grilled_crucian")   # the page's ingredients over the pot
+	await get_tree().process_frame
+	k.drawer.dev_big_pot()
+	assert_vector(pot.scale).override_failure_message("the switch bounces from 0.9").is_equal_approx(Vector3.ONE * 0.9, Vector3.ONE * 0.001)
+	assert_int(vent.get_child_count()).override_failure_message("a puff from the vent").is_equal(1)
+	var frame := func(): r.call("_room_frame", rt.session.current(), 0.0)
+	frame.call()
+	await get_tree().create_timer(0.25).timeout
+	assert_vector(pot.scale).is_equal_approx(Vector3.ONE, Vector3.ONE * 0.001)
+	assert_int(k.stage.ghost_count()).is_greater(0)
+	assert_vector(lid.position).override_failure_message("up with the ingredients in").is_equal_approx(Vector3(0, 0.241, -0.107), Vector3.ONE * 0.001)
+	assert_float(lid.rotation_degrees.x).is_equal_approx(-20.0, 0.01)
+	assert_object(r.call("steam_from", 0)).is_same(r.anchor("drop_pot_1"))
+	await _close()   # the drawer closed without Cook: the page's ingredients are gone, the lid goes back down
+	frame.call()
+	await get_tree().create_timer(0.25).timeout
+	assert_vector(lid.position).override_failure_message("shut, the drawer closed").is_equal_approx(Vector3(0, 0.181, -0.107), Vector3.ONE * 0.001)
+	# the fire lit: shut, the steam waiting until it is down, then from the vent, finer
+	k.open("cookbook", "dish_grilled_crucian")
+	await get_tree().process_frame
+	frame.call()
+	await get_tree().create_timer(0.25).timeout
+	var v := _view()
+	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000, "heats": []}, {}, {}]
+	_set_view(v)
+	k.on_pot(v.cooking.stoves[0])
+	frame.call()
+	k.stage.call("_process", 0.0)
+	var steam: CPUParticles3D = k.stage.get("_steam")
+	assert_bool(k.stage.steam_hold).override_failure_message("the lid is still closing").is_true()
+	assert_bool(steam.emitting).override_failure_message("no steam before the lid is down").is_false()
+	await get_tree().create_timer(0.25).timeout
+	frame.call()
+	await get_tree().process_frame
+	assert_bool(steam.emitting).override_failure_message("steam once the lid is down").is_true()
+	assert_vector(lid.position).override_failure_message("shut while cooking").is_equal_approx(Vector3(0, 0.181, -0.107), Vector3.ONE * 0.001)
+	assert_float(lid.rotation_degrees.x).is_equal_approx(0.0, 0.01)
+	assert_object(k.stage.steam_point).is_same(vent)
+	assert_vector(steam.global_position).is_equal_approx(vent.global_position, Vector3.ONE * 0.001)
+	assert_float(steam.scale_amount_max).is_equal_approx(1.2 * 0.6, 0.001)
+	# ready: up again, the steam from the mouth
+	v.cooking.stoves[0].ready_in = 0
+	_set_view(v)
+	frame.call()
+	await get_tree().create_timer(0.25).timeout
+	assert_vector(lid.position).override_failure_message("up when ready").is_equal_approx(Vector3(0, 0.241, -0.107), Vector3.ONE * 0.001)
+	assert_object(k.stage.steam_point).is_null()   # the mouth's steam
+	assert_object(r.call("steam_from", 0)).is_same(r.anchor("drop_pot_1"))
+	# collected: shut
+	v.cooking.stoves = [{}, {}, {}]
+	_set_view(v)
+	frame.call()
+	await get_tree().create_timer(0.25).timeout
+	assert_vector(lid.position).override_failure_message("shut once collected").is_equal_approx(Vector3(0, 0.181, -0.107), Vector3.ONE * 0.001)
+
+## The pots stand where the art placed them in the Standard and Deluxe Rooms too: on each stove's burner, the Standard
+## Room's stove 3 turned 45° (clear of the door frame and the back wall).
+func test_the_pots_follow_each_rooms_burners() -> void:
+	for lv in [5, 10]:
+		var r: P0Room = FARMHOUSE.new()
+		r.use_runtime = false
+		r.level = lv
+		add_child(r)
+		auto_free(r)
+		for i in 3:
+			var pot := r.art.get_node("stove_pots/stove_pot_%d" % (i + 1)) as Node3D
+			assert_vector(pot.global_position).override_failure_message("Lv%d pot %d" % [lv, i + 1]).is_equal_approx(r.anchor("use_stove_%d" % (i + 1)).global_position, Vector3.ONE * 0.001)
+			assert_float(pot.rotation_degrees.y).is_equal_approx(45.0 if lv == 5 and i == 2 else 0.0, 0.01)
+		assert_bool(r.art.has_node("stove_fires")).is_false()
+
 ## Picking what to queue (Queue next ›) on a cooking stove: the grey key's toast is up on screen.
 func test_the_grey_key_toast_shows_while_picking_what_to_queue() -> void:
 	var v := _view()
