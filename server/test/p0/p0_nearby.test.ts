@@ -85,6 +85,9 @@ describe('MAP-8: the near10 cities\' states in the view (不知火舞 on 301 / M
     }
     // every country the directory has is in the table (no city falls back to GeoNames' own spelling)
     for (const code of new Set(all.map(cl => cl.country_code))) expect(c.travel?.country_names?.[code], code).toBeTruthy();
+    // the home pick's row carries the same country (q(210) ⑤: one function for every exit)
+    expect(homeCities(c, 'istanbul').matches.find(r => r.name === 'Istanbul')?.country).toBe('Türkiye');
+    expect(homeCities(c).open.find(r => r.name === 'Hong Kong')?.country).toBe('');
     // the silhouette card's preview writes the same country
     const s = freshState(c, 'nearby-player-03', now);
     expect(preview(c, s, by('Istanbul', 'TR').id, now).country).toBe('Türkiye');

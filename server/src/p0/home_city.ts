@@ -298,7 +298,7 @@ const row = (c: P0Content, id: string): HomeCityRow | null => {
   const cl = clusterById(c, id), status = homeStatus(c, id);
   if (!status) return null;
   const climate = cl?.climate ?? c.profile.climate.toLowerCase();
-  const country = cl?.country ?? '';
+  const country = cl ? countryPart(c, cl) : '';   // q(210) ⑤: every exit writes the country one way (countryPart)
   return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country, region: cityRegion(c, id), climate, status };
 };
 

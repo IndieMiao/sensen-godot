@@ -62,6 +62,16 @@ func test_the_servers_region_is_taken_as_it_is() -> void:
 	var rows: Array = P0Travel.nearby(view)
 	assert_array(rows.map(func(r): return str(r.region))).is_equal(["California", "California", ""])
 
+## q(210) ⑤: a server from before sends no regions — the row falls back to the country as P0Clusters writes it (CLDR's
+## name, none for a city-only place), not the directory's own spelling.
+func test_with_no_regions_the_row_writes_the_country_the_game_way() -> void:
+	var view := _travel({admins = {}, fallback = {near3 = [], near10 = ["gn-745044", "gn-1668341"]}})
+	var rows: Array = P0Travel.nearby(view)
+	var by := {}
+	for r in rows: by[str(r.cluster)] = str(r.region)
+	assert_str(str(by["gn-745044"])).is_equal("Türkiye")   # Istanbul
+	assert_str(str(by["gn-1668341"])).is_equal("")          # Taipei
+
 func _map() -> Node:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
