@@ -137,6 +137,7 @@
 | pin 卡按钮 ★ | 农场 `Go home`；据点与鱼塘 `Go`；玩家就在这里时改 `Back to Homestead` / `Back to Oak Tea House` / `Back to Fern Pond`，并且不显示 Distance 行（q(80)） |
 | 家的 pin 与卡 ★ | 名牌 `Homestead`（不再写 `My Farm`）；卡 `Homestead` / `Your farm` / `Distance 0.8 km`（q(80)）；挨近让位时离家和新手塘同一档，在家时是玩家所在地、连名牌始终显示（q(142)） |
 | 据点卡 ★ | `Oak Tea House` / `Tea house · Hot tea`（其他：`Tackle shop · Rods and bait` / `Market square · Requests` / `Travel post · Coffee`）/ `Distance 0.8 km` / `Online now 3`（0 人整行不显示）/ `Go`（q(80)） |
+| 矿口小屋卡与图钉（P1） | 卡：`Golden Mine Hut` / `Mine hut · Old miner` / `Distance 13 km` / `Online now 2`（0 人整行不显示）/ `Go`；在小屋时 `Back to Golden Mine Hut`、不显示 Distance；原因行 `Ivo · New request` / `Ivo · New chat` / `Stone Count · Ready to deliver`；图钉交叉双镐图标、短名 `Golden`；位置芯片 `Denver · Golden Mine Hut`；名字 `<地名> Mine Hut` ≤ 24 字符（q(204)） |
 | 据点 pin ★ | 标签只写短名 `Oak` / `Mission` / `Union Square`（去掉类型词），渔具铺不写标签；在线人数是圆盘右上角人形计数角标，0 人不显示；类型、距离、`Online now 2` 在点开的卡片里（q(137)，原 `Oak Tea House · 3 online` 作废）；P0 城市级不聚合（q(72)）；挨近时按固定优先级先让标签再让图钉，选中、带标记、玩家所在地的图钉始终显示（q(105)、q(137)）；同一屏上短名相同时只有优先级最高的那枚写标签（q(141)）；常驻图钉彼此挨近时圆盘照留、名字被更高优先级的压到就整个隐藏，不出现半截名字（q(146)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 | 外城到达与回家 ★ | 首访 `Welcome to Tokyo` + `+10 Energy`；再访只飘 `Welcome back`；回家落地 `Welcome home`（不盖章、不加体力）；首访盖章提示 `Welcome to Tokyo · Stamp collected` 与 `+10 Energy` 同时出，1.5 s 后收起再滑出到达卡（q(152)）；外城位置芯片 `Tokyo · Arrived` / `Tokyo · Sumida Pond`，免费版不写 `Day Pass`（q(108)） |
