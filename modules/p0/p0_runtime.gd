@@ -17,6 +17,8 @@ const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postc
 const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
+const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -129,6 +131,7 @@ func _init() -> void:
 	ui.show_spot.connect(_show_spot)
 	ui.show_on_map.connect(_show_on_map)
 	ui.notice_board_opened.connect(_ask_presence)   # the Notice Board's online counts (q(164))
+	ui.change_home.connect(change_home)   # Settings › Home city (SGODOT-303 PR-4)
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
@@ -509,9 +512,19 @@ func release_travel() -> void:
 ## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
 const TREE_XP := "tree_xp"
 
+## A generated home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home
+## set (P0Outposts.home: names, Show on map, Today) has them; the written city's are the client's own tables.
+func _read_home_places(v: Dictionary) -> void:
+	var travel = load("res://modules/p0/p0_travel.gd")
+	var home := str(travel.home(v))
+	var places = load("res://modules/p0/p0_city_places.gd")
+	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
+	places.fetch(session, home)
+
 func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
 	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
 	# quick-bar slot once (UiQuickBar.flash: QuickSlot State=new, 600 ms). Not on the first view after starting.
@@ -1164,11 +1177,88 @@ func _launch_failed() -> void:
 	_probe_left = PROBE_S
 	ui.show_screen(P0SysScreen.Kind.FAIL)
 
+## `then(view)` once the first state is in (now, when it already is): p0_boot waits on it to know whether a new player
+## picks a home first (SGODOT-303). The launch cover stays up meanwhile, Can't connect and its retries included.
+func when_first_view(then: Callable) -> void:
+	if not session.view.is_empty():
+		then.call(session.view)
+		return
+	session.state_changed.connect(func(v: Dictionary, _e: Array): then.call(v), CONNECT_ONE_SHOT)
+
+## Whether the save waits for its home to be picked (view.home.pending): it plays nothing else meanwhile (the server
+## refuses every other command with home_pending).
+static func home_pending(view: Dictionary) -> bool:
+	var h = view.get("home", null)
+	return h is Dictionary and bool((h as Dictionary).get("pending", false))
+
+## SGODOT-303: the home pick (P0HomeFlow) in place of the launch cover; `done` once choose_home is in — the caller
+## brings up the first world under a new launch cover.
+func pick_home(done: Callable) -> void:
+	_launch_s = -1.0
+	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+	_open_home_flow("choose_home", "", done)
+
+## Settings › Home city (SGODOT-303 PR-4, HOME-CHANGE-PICK / -CONFIRM): the change of home over whatever world is up;
+## ‹ Settings goes `back`. Moved, every layer closes and the farm comes up in the new home under the launch cover,
+## then `Welcome home` (q(108)'s, 不知火舞 28883acf); the chip and the map read the new home from the view.
+func change_home(back: Callable) -> void:
+	_open_home_flow("change_home", P0Travel.home(session.view), func():
+		toast_on_arrival("Welcome home")
+		while AppRouter.instance_depth() > 0:
+			var depth := AppRouter.instance_depth()
+			AppRouter.pop_instance()
+			if AppRouter.instance_depth() >= depth: break   # a locked layer stays
+		get_tree().change_scene_to_file(FARM_SCENE), back)
+
+func _open_home_flow(type: String, change_from: String, done: Callable, back := Callable()) -> void:
+	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom(), change_from)
+	_home_done = done
+	if back.is_valid(): _home_flow.left.connect(back)
+	_home_flow.chose.connect(func(cluster: String, spot: int):
+		var cmd := {"type": type, "city": cluster, "spot": spot}
+		_home_change_to = cluster if type == "change_home" else ""
+		_home_key = P0Session.ui_key(cmd)
+		if not session.send(cmd, _home_key): _home_flow.sent(false))
+	if not session.command_settled.is_connected(_home_settled): session.command_settled.connect(_home_settled)
+	ui.open_home_flow(_home_flow)
+
+var _home_flow: Control
+var _home_done := Callable()
+var _home_key := ""
+var _home_change_to := ""
+
+## Whether a choose_home / change_home answer leaves the home picked: taken, or refused because it already is — the
+## first reply was lost on the way, so a second press is refused with the view the server has (周瑜 on #451: else the
+## page would refuse every go until the app restarts). A first pick: the view no longer pending. A change (`change_to`,
+## the city asked for): the view's home is that city — the change is not pending before or after.
+static func home_taken(ok: bool, view: Dictionary, change_to := "") -> bool:
+	if ok: return true
+	if view.is_empty(): return false
+	if change_to != "": return P0Travel.home(view) == change_to
+	return not home_pending(view)
+
+## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken (see
+## home_taken), the pick goes and the first world comes under the launch cover.
+func _home_settled(key: String, ok: bool, _code: String) -> void:
+	if key != _home_key or _home_key == "": return
+	_home_key = ""
+	ok = home_taken(ok, session.view, _home_change_to)
+	if is_instance_valid(_home_flow): _home_flow.sent(ok)
+	if not ok: return
+	session.command_settled.disconnect(_home_settled)
+	_home_flow = null
+	ui.close_modal()
+	cover_launch()
+	var done := _home_done
+	_home_done = Callable()
+	if done.is_valid(): done.call()
+
 ## The launch is over once the first answer and a world are both in: the cover (or Can't connect) goes.
 func _end_launch() -> void:
 	if _launch_s < 0.0 or session.view.is_empty() or not is_instance_valid(world): return
 	_launch_s = -1.0
 	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+	_flush_arrival_toast()   # a changed home's `Welcome home`, once the cover is gone
 
 ## Every return to the foreground reads the state (§10.7.1); a slow read gets SYS-LOADING over the place.
 func _on_resumed() -> void:
@@ -1249,7 +1339,7 @@ func toast_on_arrival(text: String) -> void:
 	_flush_arrival_toast.call_deferred()   # after this frame's open_instance has set its cover (or not)
 
 func _flush_arrival_toast() -> void:
-	if _arrival_toast.is_empty() or not _arrive.is_empty(): return
+	if _arrival_toast.is_empty() or not _arrive.is_empty() or _launch_s >= 0.0: return
 	if Time.get_ticks_msec() - int(_arrival_toast.t0) <= int(ARRIVE_FAIL_S * 1000.0): ui.toast(str(_arrival_toast.text))
 	_arrival_toast = {}
 
@@ -1514,6 +1604,33 @@ func _dev_shot(dt: float) -> void:
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
+			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
+			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
+			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, picked)
+				if is_instance_valid(_home_flow):
+					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
+					if not near_row.is_empty():
+						_home_flow.cities._opened = false
+						_home_flow.cities.show_cities({"open": _home_flow.cities.open_rows, "near": near_row[0]}, "")
+			"homesearch":
+				if is_instance_valid(_home_flow):
+					_home_flow.cities.field.text = step[1]
+					_home_flow.cities._typed(step[1])
+			"homecity":
+				if is_instance_valid(_home_flow):
+					if step.size() > 1: _home_flow.cities.set_choice(step[1])
+					_home_flow.cities.key.pressed.emit()
+			"homespot": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.picked = int(step[1]) - 1
+			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
+			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
+			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
+			"homechange": change_home(func(): ui.open_settings())   # Settings › Home city (PR-4)
+			"homemove": if is_instance_valid(_home_flow) and _home_flow.confirm != null: _home_flow.confirm.move.pressed.emit()
+			"homeloading": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()   # the reading frame
+			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
+				if is_instance_valid(_home_flow):
+					if step.size() > 1 and _home_flow.spots != null: _home_flow.spots.show_failed()
+					else: _home_flow.cities.show_failed(_home_flow.cities.query)
 			"licenses": ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile()))
 			"mapdata": ui.open_map_data(func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))   # q(133) v3
 			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",

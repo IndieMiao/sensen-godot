@@ -7,6 +7,13 @@ import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { noteEntered, requirePass, tripOf, preview, utcOffsetMin } from '../../src/p0/travel.js';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { writtenCluster } from '../../src/p0/home.js';
+import { homeRules } from '../../src/p0/home_city.js';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 const SF = 'gn-5391959', LA = 'gn-5368361', TOKYO = 'gn-1850147', NYC = 'gn-5128581', LDN = 'gn-2643743';
 const HAYWARD_ETC = 3;   // San Francisco's nearest 3 (Hayward, Concord, Fairfield) are Trip 1
@@ -41,7 +48,7 @@ describe('travel (SGODOT-278)', () => {
     expect(s.travel.here).toBe(TOKYO);
     expect(s.travel.passes[TOKYO]).toEqual({ kind: 'day', from: T, until: T + DAY });
     expect(s.travel.visits[TOKYO]).toMatchObject({ n: 1, first_at: T });
-    expect(s.travel.stamps).toEqual([{ cluster: TOKYO, kind: 'climate', at: T, counted_on: '2026-10-10' }]);
+    expect(s.travel.stamps).toEqual([{ cluster: TOKYO, kind: 'landmark', at: T, counted_on: '2026-10-10' }]);   // Tokyo Tower (SGODOT-303)
     expect(s.energy.value).toBe(110);
     expect(s.coins).toBe(s0.coins);
     expect(r.events).toContainEqual(expect.objectContaining({ kind: 'arrival', cluster: TOKYO, first: true, energy: 10, pass_until: T + DAY }));
@@ -63,7 +70,16 @@ describe('travel (SGODOT-278)', () => {
     expect(table.get('gn-5391811')).toMatchObject({ name: 'San Diego', country_code: 'US' });
     expect(table.get('gn-3981609')).toMatchObject({ name: 'Tijuana', country_code: 'MX' });
     expect(c.travel?.landmarks?.['gn-5391811']).toEqual({ landmark: 'Balboa Park', stamp: 'stamp_san_diego' });
-    expect(Object.keys(c.travel?.landmarks ?? {})).toHaveLength(18);
+    expect(Object.keys(c.travel?.landmarks ?? {})).toHaveLength(27);
+    expect(c.travel?.landmarks?.['gn-1819729']).toEqual({ landmark: 'Victoria Harbour', stamp: 'stamp_hong_kong' });   // a place, not the junk (q(208) ②)
+    // every open home city has its landmark (the home pick's thumbs, SGODOT-303), each stamp's art in the package
+    for (const id of [writtenCluster(c), ...homeRules(c).cities]) {
+      const stamp = c.travel?.landmarks?.[id]?.stamp;
+      expect(stamp, id).toBeTruthy();
+      expect(existsSync(path.join(ROOT, `assets/p0/stamps/${stamp}.png`)), stamp).toBe(true);
+    }
+    // a city without one still gets a climate stamp
+    expect(step(fresh(), { type: 'travel', to: 'gn-3981609' }).state.travel.stamps[0]).toMatchObject({ kind: 'climate' });
   });
 
   it('travel again while there is a no-op; a return visit gets no stamp or Energy; return_home keeps the pass', () => {

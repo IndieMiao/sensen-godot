@@ -156,7 +156,7 @@ func test_city_bubbles_say_their_state() -> void:
 	var rt: P0Runtime = m.rt
 	var saved := _travel(rt, {home = SF, here = SF, visits = {TOKYO: {n = 1}}, second_homes = [LA], passes = {}, stamps = [],
 		fallback = {near3 = [], near10 = []}, explorer = 0})
-	m._online = {"sh_tea_1": 3, "sh_market_1": 2}
+	m._online = {"sh_tea_1": 3, "sh_market_1": 2, TOKYO + "~tea0": 4}   # Tokyo's 4 are not home's (SGODOT-312)
 	# what a bubble says (its face); its place in q(153)'s order (dot_stays / keeps) is checked in test_p0_map_bubbles
 	var state := func(id: String) -> Dictionary:
 		var d: Dictionary = m.city_map.bubble_state.call(id)

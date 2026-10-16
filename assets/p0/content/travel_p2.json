@@ -73,9 +73,45 @@
       "gn-4560349": {
         "landmark": "Independence Hall",
         "stamp": "stamp_philadelphia"
+      },
+      "gn-2643743": {
+        "landmark": "Big Ben",
+        "stamp": "stamp_london"
+      },
+      "gn-1850147": {
+        "landmark": "Tokyo Tower",
+        "stamp": "stamp_tokyo"
+      },
+      "gn-1796236": {
+        "landmark": "Oriental Pearl Tower",
+        "stamp": "stamp_shanghai"
+      },
+      "gn-1880252": {
+        "landmark": "Merlion",
+        "stamp": "stamp_singapore"
+      },
+      "gn-3530597": {
+        "landmark": "Angel of Independence",
+        "stamp": "stamp_mexico_city"
+      },
+      "gn-1819729": {
+        "landmark": "Victoria Harbour",
+        "stamp": "stamp_hong_kong"
+      },
+      "gn-2673730": {
+        "landmark": "Stockholm City Hall",
+        "stamp": "stamp_stockholm"
+      },
+      "gn-2618425": {
+        "landmark": "Nyhavn",
+        "stamp": "stamp_copenhagen"
+      },
+      "gn-658225": {
+        "landmark": "Helsinki Cathedral",
+        "stamp": "stamp_helsinki"
       }
     },
-    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp.",
+    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px; the nine open home cities outside the US drawn for the home pick, SGODOT-303). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp.",
     "closed_countries": [
       "KP"
     ],

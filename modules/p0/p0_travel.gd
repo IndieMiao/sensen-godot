@@ -10,13 +10,39 @@ const P0City := preload("res://modules/p0/p0_city.gd")
 static func home(view: Dictionary) -> String:
 	var t: Dictionary = view.get("travel", {})
 	var h := str(t.get("home", ""))
-	return h if h != "" else P0Clusters.cluster_of_region(P0City.region())
+	return h if h != "" else written()
 
 ## The cluster the player is in (arrived there or at home).
 static func here(view: Dictionary) -> String:
 	var t: Dictionary = view.get("travel", {})
 	var h := str(t.get("here", ""))
 	return h if h != "" else home(view)
+
+## The written city's cluster (San Francisco): its places are the client's hand-written tables, never read from the
+## server; any other home's are generated (P0CityPlaces).
+static func written() -> String:
+	return P0Clusters.cluster_of_region(P0City.region())
+
+static func home_is_written(view: Dictionary) -> bool:
+	return home(view) == written()
+
+## The home city's name (view.home.name, SGODOT-303), the written city's where the view has none.
+static func home_name(view: Dictionary) -> String:
+	var h = view.get("home", null)
+	var n := str((h as Dictionary).get("name", "")) if h is Dictionary else ""
+	if n != "": return n
+	if not home_is_written(view):
+		var cl := P0Clusters.get_cluster(home(view))
+		if not cl.is_empty(): return str(cl.name)
+	return P0City.city_name()
+
+## The farm's point on the map (view.home.farm, the spot picked with the home), the written city's content point
+## where the view has none.
+static func home_farm(view: Dictionary) -> Vector2:
+	var h = view.get("home", null)
+	var f = (h as Dictionary).get("farm", null) if h is Dictionary else null
+	if f is Dictionary and f.has("lat") and f.has("lng"): return Vector2(float(f.lat), float(f.lng))
+	return P0City.farm_at()
 
 static func away(view: Dictionary) -> bool:
 	return here(view) != home(view)
@@ -76,7 +102,7 @@ static func pass_text(view: Dictionary, cluster: String) -> String:
 const HOMESTEAD_SPACES := ["home", "mine"]
 
 static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary:
-	if not away(view) or space in HOMESTEAD_SPACES: return info
+	if not away(view) or space in HOMESTEAD_SPACES: return home_chip(view, info)
 	var c := P0Clusters.get_cluster(here(view))
 	var out := info.duplicate()
 	var city := str(c.name) if not c.is_empty() else str(info.get("city", ""))
@@ -84,6 +110,15 @@ static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary
 	out["city"] = city
 	out["kind"] = UiHud.PlaceKind.FOREIGN
 	out["day_pass"] = ""
+	return out
+
+## At home the scenes write the written city into their chip (P0City.chip: `San Francisco · Homestead`); a generated
+## home's chip names that home instead (SGODOT-311: `Tokyo · Homestead`). Another city's own place keeps its name.
+static func home_chip(view: Dictionary, info: Dictionary) -> Dictionary:
+	var city := str(info.get("city", ""))
+	if home_is_written(view) or not (city == P0City.city_name() or city == P0City.short_name()): return info
+	var out := info.duplicate()
+	out["city"] = home_name(view)
 	return out
 
 ## "1,758" (km on the travel card).
@@ -134,20 +169,22 @@ static func fares() -> Array:
 # ---------------------------------------------------------------- Nearby cities (MAP-8)
 ## MAP-8 Nearby cities (§11.8.1; the user on 10-13: this one page, the other three come with P2): the ten clusters
 ## nearest home that the save froze (travel.fallback.near10, §11.2.3), nearest first. Each row: {cluster, name,
-## region (its state or province as the server names it, travel.admins; else its country: `Salinas · California`,
-## 不知火舞 on MAP-8), km, trip, trip_name (the tier's name: Nearby, Regional …), climate ("Temperate"), visited,
+## region (the row's second part as the server writes it, travel.regions, q(208) ①: a US city's state `Salinas ·
+## California`, elsewhere the country `Tokyo · Japan`, none when it is the city's own name, a province for one of two
+## same-named cities; a server from before: travel.admins, else the country), km, trip, trip_name (the tier's name: Nearby, Regional …), climate ("Temperate"), visited,
 ## stamped, landmark (the city's landmark stamp art, "" for none: the row shows its climate band instead)}.
 static func nearby(view: Dictionary) -> Array:
 	var stamped := {}
 	for st in stamps(view): stamped[str(st.get("cluster", ""))] = true
 	var admins: Dictionary = view.get("travel", {}).get("admins", {})
+	var regions: Dictionary = view.get("travel", {}).get("regions", {})
 	var rows: Array = []
 	for id in view.get("travel", {}).get("fallback", {}).get("near10", []):
 		var c := str(id)
 		var cl := P0Clusters.get_cluster(c)
 		if cl.is_empty(): continue
 		var t := trip(view, c)
-		rows.append({cluster = c, name = str(cl.get("name", "")), region = str(admins.get(c, cl.get("country", ""))),
+		rows.append({cluster = c, name = str(cl.get("name", "")), region = str(regions[c] if regions.has(c) else admins.get(c, cl.get("country", ""))),
 			km = int(t.get("km", 0)), trip = int(t.get("trip", 0)), trip_name = str(t.get("name", "")),
 			climate = str(cl.get("climate", "")).capitalize(), visited = visits(view, c) > 0, stamped = stamped.has(c),
 			landmark = landmark_stamp(c)})

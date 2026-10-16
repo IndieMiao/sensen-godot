@@ -282,7 +282,7 @@ func test_p1_stamp_run_reads_visit_and_the_gap_is_the_check_in() -> void:
 	assert_array(row.needs.map(func(n): return [n.name, n.have, n.need])).is_equal([["Oak Tea House", 0, 1]])
 	var d := P0Board.detail(v, "market", "v1")
 	assert_str(str(d.effect)).is_equal("Visit Oak Tea House, then come back to any San Francisco market.")
-	assert_str(str(d.go)).is_equal("outpost:tea")
+	assert_str(str(d.go)).is_equal("outpost:sh_tea_1")   # by the outpost's id, not its role (SGODOT-311)
 	v.boards.market.slots[0].visit.done = true
 	v.boards.market.slots[0].ready = true
 	row = P0Board.cards(v, "market")[0]

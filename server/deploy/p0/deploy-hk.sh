@@ -70,10 +70,15 @@ JS
 }
 
 health() {   # $1 = label: Journey and farm healthz, saved for the before / after comparison
+  # The Journey server is being retired (SGODOT-304): its path answers 410 Gone once stopped (★3), which is fine;
+  # the old farm's /v1 must still answer 200.
   for u in "$SITE/preview/journey/v1/healthz" "$SITE/v1/healthz"; do
     code=$(curl_ -o "$out/hz.tmp" -w '%{http_code}' "$u" || echo 000)
     printf '%s %s %s %s\n' "$1" "$code" "$u" "$(head -c 200 "$out/hz.tmp")" | tee -a "$out/health.txt"
-    [ "$code" = 200 ] || { echo "FAIL: $u is $code"; return 1; }
+    case "$u:$code" in
+      */preview/journey/*:200|*/preview/journey/*:410|*:200) ;;
+      *) echo "FAIL: $u is $code"; return 1 ;;
+    esac
   done
 }
 
@@ -91,8 +96,14 @@ case "$step" in
     dir="p0-build-$sha"
     say "build context of $ref ($sha) → $DEV:~/$dir"
     git -C "$repo" archive --format=tar "$ref" package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server \
-      assets/p0/p0_content.json assets/p0/content assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json assets/farm/data/regions.json \
+      assets/p0/p0_content.json assets/p0/content assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json \
       assets/p0/city_clusters.json assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
+    # q(188) ① Near you: the pinned DB-IP City Lite month from the devserver's cache (DB-IP keeps only the last two
+    # months online; 周瑜 on #447) into the context's dbip/, read by the Dockerfile through a bind mount (no layer).
+    month=$(git -C "$repo" show "$ref:server/deploy/p0/Dockerfile" | sed -n 's/^ARG DBIP_MONTH=//p')
+    say "DB-IP City Lite $month from the devserver cache ~/p0-cache/dbip"
+    dev "test -s ~/p0-cache/dbip/dbip-city-lite-$month.csv.gz && mkdir -p ~/$dir/dbip && cp ~/p0-cache/dbip/dbip-city-lite-$month.csv.gz ~/$dir/dbip/" \
+      || { echo "no ~/p0-cache/dbip/dbip-city-lite-$month.csv.gz on the devserver: put the pinned file there (sha256 in the Dockerfile)" >&2; exit 1; }
     say "docker build p0-server:$sha on the devserver"
     dev "cd ~/$dir && docker build -f server/deploy/p0/Dockerfile -t p0-server:$sha ." 2>&1 | tail -5
     dev "docker images p0-server:$sha --format '{{.Repository}}:{{.Tag}} {{.Size}} {{.ID}}'" | tee "$out/image.txt"
@@ -149,14 +160,28 @@ case "$step" in
 import sys
 src, dst = sys.argv[1], sys.argv[2]
 lines = open(src).read().split('\n')
-start = next(i for i, l in enumerate(lines) if l.strip().startswith('handle_path /preview/journey/*'))
-depth, end = 0, None
-for i in range(start, len(lines)):
-    depth += lines[i].count('{') - lines[i].count('}')
-    if depth == 0: end = i; break
-indent = lines[start][:len(lines[start]) - len(lines[start].lstrip())]
+# After the Journey block while it is there — its proxy (handle_path /preview/journey/*) or, once SGODOT-304 retires
+# the Journey server, its 410 (handle /preview/journey* { respond … 410 }); without it, before the site's fallback
+# block (the first bare `handle {`), at its indent. Neither: stop, never guess (蒙恬 on #450: the live fallback proxies
+# farm-app-1:3000 inside that handle block, not the repo's reverse_proxy app:3000).
+import re
+def block_end(i):
+    depth = 0
+    for k in range(i, len(lines)):
+        depth += lines[k].count('{') - lines[k].count('}')
+        if depth == 0: return k + 1
+    sys.exit('Caddyfile: unbalanced braces after line %d' % (i + 1))
+journey = next((i for i, l in enumerate(lines) if re.match(r'^\s*handle(_path)?\s+/preview/journey', l)), None)
+fallback = next((i for i, l in enumerate(lines) if re.match(r'^\s*handle\s*\{\s*$', l)), None)
+if journey is not None:
+    at, ref = block_end(journey), lines[journey]
+elif fallback is not None:
+    at, ref = fallback, lines[fallback]
+else:
+    sys.exit('Caddyfile: neither a /preview/journey block nor a bare `handle {` fallback block to place /preview/p0 by')
+indent = ref[:len(ref) - len(ref.lstrip())]
 block = [f'{indent}handle_path /preview/p0/* {{', f'{indent}    reverse_proxy p0-demo:3110', f'{indent}}}']
-open(dst, 'w').write('\n'.join(lines[:end + 1] + block + lines[end + 1:]))
+open(dst, 'w').write('\n'.join(lines[:at] + block + lines[at:]))
 PY
     say "the change"
     diff -u "$out/Caddyfile.live" "$out/Caddyfile.new" || true

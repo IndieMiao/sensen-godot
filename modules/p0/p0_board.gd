@@ -123,7 +123,7 @@ static func place_line(name: String, city: String) -> String:
 static func _what(view: Dictionary, r: Dictionary) -> String:
 	if _visit_city(r) != "": return place_line(_visit_place(r), _visit_city(r))   # q(128): where, with a place icon
 	if _visit_place(r) != "": return "Visit %s" % _visit_place(r)
-	if _far_pond(r): return "%d fish not found in %s" % [int(r.get("qty", 1)), P0City.city_name()]
+	if _far_pond(r): return "%d fish not found in %s" % [int(r.get("qty", 1)), load("res://modules/p0/p0_travel.gd").home_name(view)]
 	var items: Array = r.get("items", [])
 	var qty := int(r.get("qty", 1))
 	var kind := str(r.get("kind", ""))
@@ -189,7 +189,7 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		var noun := _noun(view, r)
 		# 李白 q(68): the stall's own sentence from BOARD-1; the Market Board takes deliveries at any market of the home
 		# city (§9.6.5).
-		var where := "the Homestead Stall" if board == "stall" else "any %s market" % P0City.city_name()
+		var where := "the Homestead Stall" if board == "stall" else "any %s market" % load("res://modules/p0/p0_travel.gd").home_name(view)
 		var d := {title = c.title, state = c.status, needs = c.needs, delivery = c.reward, next = {}, item = item,
 			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, str(items[0]) if not items.is_empty() else ""), example = "",
 			effect = "Bring the required %s to %s." % [noun, where]}
@@ -198,7 +198,7 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		elif _visit_place(r) != "":   # Stamp Run: walk in once, then come back to this board
 			d.effect = "Visit %s, then come back to %s." % [_visit_place(r), where]
 		elif _far_pond(r):   # q(128): `Bring 3 fish that San Francisco's ponds don't have to any San Francisco market.`
-			d.effect = "Bring %d fish that %s's ponds don't have to %s." % [int(r.get("qty", 1)), P0City.city_name(), where]
+			d.effect = "Bring %d fish that %s's ponds don't have to %s." % [int(r.get("qty", 1)), load("res://modules/p0/p0_travel.gd").home_name(view), where]
 			d.example = far_tries(view, r)
 		for j in slots.size():
 			var other: Dictionary = slots[j]
@@ -211,13 +211,12 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 ## Where the items of a request come from: the beginner pond for fish (Reed Pond, q(32)), the plots for crops, the
 ## stove for dishes, a material's own spot.
 static func _go(view: Dictionary, r: Dictionary, item: String) -> String:
-	if r.get("visit", null) is Dictionary and str(r.visit.get("city", "")) != "":   # another city's: that pin (亚瑟's #279 loads it)
-		return "outpost:" + str(r.visit.get("place", ""))
-	if r.get("visit", null) is Dictionary:   # Stamp Run: the outpost's pin, by role as Today's deliver_go
-		return "outpost:" + str(P0Outposts.find(str(r.visit.get("place", ""))).get("role", ""))
+	# a visit's outpost by its id, the home city's (Stamp Run) as another city's (亚瑟's #279 loads it): a role would name
+	# the written city's (SGODOT-311)
+	if r.get("visit", null) is Dictionary: return "outpost:" + str(r.visit.get("place", ""))
 	if _far_pond(r): return ""   # no one place (不知火舞 on #285: no Show on map; the example line names the fish)
 	match str(r.get("kind", "")):
-		"fish": return "pond:" + P0Guide.BEGINNER_POND
+		"fish": return "pond:" + P0Guide.home_pond(view)
 		"crop": return "plots"
 		"dish": return "stove"
 	return str(P0Logic.need_source(view, item).get("go", "")) if item != "" else ""

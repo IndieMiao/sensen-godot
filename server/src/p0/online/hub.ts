@@ -9,7 +9,7 @@ import type { FastifyInstance } from 'fastify';
 import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
 import { WebSocket, WebSocketServer } from 'ws';
-import { defaultAppearance, type Appearance, type AppearanceCatalog } from '../../realtime/appearance.js';
+import { defaultAppearance, type Appearance, type AppearanceCatalog } from './appearance.js';
 import { upgradeRefusal, type P0Gate } from '../gate.js';
 import { P0_ACTIONS, snapshotFrame } from './frame.js';
 import { OutpostRooms, type Occupant } from './rooms.js';

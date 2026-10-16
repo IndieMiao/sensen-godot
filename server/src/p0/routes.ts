@@ -2,7 +2,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { P0Content } from './content.js';
 import { applyP0, type P0Command } from './reducer.js';
-import { settleEnergy } from './rules.js';
+import { dayKey, settleEnergy } from './rules.js';
 import type { P0Store } from './store.js';
 import { viewOf } from './view.js';
 import type { P0State } from './state.js';
@@ -10,13 +10,20 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
+import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus } from './home_city.js';
+import type { IpNear } from './ip_city.js';
+import type { OutpostRooms } from './online/rooms.js';
+import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
-/** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
-export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number; log?: P0EventLog }
+/** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
+ * log: the observation log (S7). */
+export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean;
+  rooms?: Pick<OutpostRooms, 'presence' | 'occupant'>; log?: P0EventLog;
+  /** The address → nearest open home city for the home pick's `Near you` (ip_city.ts); none: no guess. */
+  ipNear?: IpNear }
 
 const UI_BATCH = 20, UI_PER_MINUTE = 120, UI_ALL_PER_MINUTE = 3_000;
 
@@ -34,7 +41,20 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   const stateOf = (player: string, headers: Record<string, unknown>) =>
     store.get(player, deps.now(), { pending: features(headers).includes('choose_home') });
   const clock = (offset: number) => deps.now() + offset;
-  const view = (st: P0State, at: number) => viewOf(c, st, at, { online: deps.presence ? deps.presence() : null });
+  /** q(206): the people in the outpost rooms of the town the player is in (its pins' counts summed, a Mine Hut's too); the
+   * player counts once they have walked into one of its outposts, though the room has not seen them yet (the state read
+   * comes before the WebSocket join). Null when the rooms are not known. */
+  const townOnline = (st: P0State): number | null => {
+    if (!deps.rooms) return null;
+    const here = st.travel.here;
+    let n = 0;
+    for (const [id, p] of Object.entries(deps.rooms.presence())) if (clusterOf(c, id) === here) n += p.online;
+    const entered = st.presence.entered;
+    // an outpost of this town, not a pond (presence.entered keeps either; 周瑜 on #448)
+    if (!deps.rooms.occupant(st.player) && entered && !placeOf(c, entered) && clusterOf(c, entered) === here) n += 1;
+    return n;
+  };
+  const view = (st: P0State, at: number) => viewOf(c, st, at, { online: townOnline(st) });
 
   app.get('/v1/p0/state', async (req, reply) => {
     const player = playerOf(req.headers);
@@ -70,7 +90,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   app.get('/v1/p0/home/cities', async (req, reply) => {
     if (!playerOf(req.headers)) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const { q } = (req.query ?? {}) as { q?: unknown };
-    return reply.send({ ok: true, ...homeCities(c, typeof q === 'string' ? q.slice(0, 64) : '') });
+    // q(188) ①: `Near you` — the open city nearest the address, guessed once for the page and kept nowhere
+    const list = homeCities(c, typeof q === 'string' ? q.slice(0, 64) : ''), near = deps.ipNear?.(req.ip) ?? null;
+    return reply.send({ ok: true, ...list, near: list.open.find(r => r.id === near) ?? null });   // only a city open today
   });
 
   /** The 3 farm spots this player is offered in a city (q(160) ②), the same every time for the same player. */
@@ -86,7 +108,10 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     // q(173) ④: the change confirm card says when today's limits reset if the home moves here (a first pick: none)
     const s = stateOf(player, req.headers), now = clock(s.clock_ms);
     const resets_at = !s.travel.pending && changeOpen(c, s, now).open ? dayHoldFor(c, s, cluster, now).until : null;
-    return reply.send({ ok: true, city: cluster, spots, resets_at });
+    // its weekday on the new home's calendar (`Your day resets Thu 4 AM, Tokyo time.`): the client has no time zones
+    const resets_day = resets_at === null ? null
+      : new Date(`${dayKey(c, { travel: { home: cluster } }, resets_at)}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+    return reply.send({ ok: true, city: cluster, spots, resets_at, resets_day });
   });
 
   app.post('/v1/p0/commands', async (req, reply) => {

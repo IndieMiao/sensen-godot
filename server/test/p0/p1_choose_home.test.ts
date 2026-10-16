@@ -193,6 +193,15 @@ describe('farm spots (q(160) ②)', () => {
     const s = homeSpots(c, SF, 'player-spot-01')![0];
     expect(s.pond.name).toBe('Fern Pond');
     expect(['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest']).toContain(s.toward);
+    // the side of the pond the spot is on, as HOME-PICK-3's map draws it (north of the pond reads north): the bearing
+    // from the pond to the spot within half a compass step of the word's
+    const words = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
+    for (const t of [...homeSpots(c, SF, 'player-spot-01')!, ...homeSpots(c, OSAKA, 'player-spot-02')!]) {
+      const dn = t.lat - t.pond.lat, de = (t.lng - t.pond.lng) * Math.cos((t.pond.lat * Math.PI) / 180);
+      const bearing = ((Math.atan2(de, dn) * 180) / Math.PI + 360) % 360;
+      const off = Math.abs(((bearing - 45 * words.indexOf(t.toward) + 540) % 360) - 180);
+      expect(off, `${t.toward} at ${bearing.toFixed(0)}°`).toBeLessThanOrEqual(22.5 + 1e-9);
+    }
     expect(s.hood).toBe('Mission District');
     expect(homeSpots(c, OSAKA, 'player-spot-01')![0].hood).toBeNull();   // off the table: no district name
   });
@@ -254,7 +263,7 @@ describe('change_home: once, within 7 days or before Homestead Lv2 (q(161))', ()
     const lv2 = structuredClone(s);
     lv2.homestead.level = 2;
     expect(run(opened, lv2, { type: 'change_home', city: NYC, spot: 0 }, T0 + DAY)).toMatchObject({ ok: false, code: 'home_set_for_good' });
-    expect(run(opened, pending(), { type: 'change_home', city: NYC, spot: 0 })).toMatchObject({ ok: false, code: 'home_set_for_good' });
+    expect(run(opened, pending(), { type: 'change_home', city: NYC, spot: 0 })).toMatchObject({ ok: false, code: 'home_pending' });   // nothing but the pick before it
     const open = viewOf(opened, s, T0 + DAY) as unknown as { home: { change: Record<string, unknown> } };
     expect(open.home.change).toEqual({ open: true, until: T0 + 7 * DAY, before_level: 2, used: 0 });
   });
@@ -304,12 +313,24 @@ describe('routes (SGODOT-303)', () => {
     expect(list.open.map((r: { id: string }) => r.id)).toEqual([SF, TOKYO, NYC, LONDON]);
     expect(list.matches.some((r: { id: string; status: string }) => r.id === NYC && r.status === 'open')).toBe(true);
     const spots = (await app.inject({ method: 'GET', url: `/v1/p0/home/spots/${NYC}`, headers })).json();
-    expect(spots).toEqual({ ok: true, city: NYC, spots: homeSpots(opened, NYC, 'player-route-01'), resets_at: null });   // a first pick carries no day
+    expect(spots).toEqual({ ok: true, city: NYC, spots: homeSpots(opened, NYC, 'player-route-01'), resets_at: null, resets_day: null });   // a first pick carries no day
     const shut = (await app.inject({ method: 'GET', url: '/v1/p0/home/spots/gn-1796236', headers })).json();
     expect(shut).toMatchObject({ ok: false, code: 'home_not_open', detail: { status: 'not_open' } });
     expect((await app.inject({ method: 'GET', url: '/v1/p0/home/spots/gn-0', headers })).statusCode).toBe(404);
     const done = (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'choose_home', city: NYC, spot: 2 } })).json();
     expect(done.ok).toBe(true);
     expect(done.state.home).toMatchObject({ city: NYC, pending: false });
+  });
+});
+
+describe('a new player still to pick a home plays nothing yet (SGODOT-303, 奕星)', () => {
+  it('refuses every world command with home_pending until choose_home', () => {
+    const s = pending();
+    for (const cmd of [{ type: 'till', plot: 0 }, { type: 'travel', to: TOKYO }, { type: 'cast', space: 'pond', place: 'x' }, { type: 'eat', item: 'x' }])
+      expect(run(opened, s, cmd)).toMatchObject({ ok: false, code: 'home_pending' });
+    const r = run(opened, s, { type: 'choose_home', city: TOKYO, spot: 0 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(run(opened, r.state, { type: 'till', plot: 0 })).not.toMatchObject({ code: 'home_pending' });   // picked: plays on
   });
 });
