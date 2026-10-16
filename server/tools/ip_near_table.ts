@@ -40,7 +40,13 @@ for await (const line of createInterface({ input: createReadStream(input).pipe(c
   const city = cols[2] === 'ZZ' || (lat === 0 && lng === 0) ? NONE : near(lat, lng);
   if (cols[0].includes(':')) {
     const s = v6Top(cols[0]), e = v6Top(cols[1]);
-    if (v6End && s[0] === v6End[0] && s[1] <= v6End[1]) { v6End = e[0] > v6End[0] || e[1] > v6End[1] ? e : v6End; continue; }   // /64 already seen
+    if (v6End && s[0] === v6End[0] && s[1] <= v6End[1]) {   // /64 already seen: the rest of the range, from the next /64, is this one's
+      if (e[0] > v6End[0] || (e[0] === v6End[0] && e[1] > v6End[1])) {
+        if (v6[v6.length - 1].city !== city) v6.push({ start: after(v6End), city });
+        v6End = e;
+      }
+      continue;
+    }
     const contiguous = !!v6End && same(s, after(v6End));
     if (v6End && !contiguous) v6.push({ start: after(v6End), city: NONE });
     const last = v6[v6.length - 1];

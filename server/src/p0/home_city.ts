@@ -32,8 +32,11 @@ export interface HomeRules {
   cities: string[];
   spot: { pond_km: [number, number]; apart_km: number; scatter_m: [number, number] };
   change: { days: number; before_level: number };
+  /** q(205) ②: `Near you` names an open city only this close to the address's point; farther, no guess. */
+  near_max_km: number;
 }
-const DEFAULT_RULES: HomeRules = { cities: [], spot: { pond_km: [0.5, 3], apart_km: 1, scatter_m: [100, 200] }, change: { days: 7, before_level: 2 } };
+const DEFAULT_RULES: HomeRules = { cities: [], spot: { pond_km: [0.5, 3], apart_km: 1, scatter_m: [100, 200] }, change: { days: 7, before_level: 2 },
+  near_max_km: 1500 };
 export const homeRules = (c: P0Content): HomeRules => {
   const r = (worldOf(c) as { home?: Partial<HomeRules> } | undefined)?.home;
   return { ...DEFAULT_RULES, ...r, spot: { ...DEFAULT_RULES.spot, ...r?.spot }, change: { ...DEFAULT_RULES.change, ...r?.change } };
@@ -239,7 +242,8 @@ export function homeView(c: P0Content, s: P0State, now: number) {
     change: { open: ch.open, until: ch.until, before_level: r.before_level, used: s.travel.home_changes ?? 0 } };
 }
 
-/** q(188) ①: the open city nearest a point (the player's address, ip_city.ts) for the pick page's `Near you` row. */
+/** q(188) ① / q(205) ②: the open city nearest a point (the player's address, ip_city.ts) for the pick page's `Near you`
+ * row; none when the nearest is farther than home.near_max_km (Sydney is not near Singapore). */
 export function nearestOpen(c: P0Content, at: { lat: number; lng: number }): HomeCityRow | null {
   let best: { row: HomeCityRow; d: number } | null = null;
   for (const r of homeCities(c).open) {
@@ -248,7 +252,7 @@ export function nearestOpen(c: P0Content, at: { lat: number; lng: number }): Hom
     const d = km(at, cl);
     if (!best || d < best.d) best = { row: r, d };
   }
-  return best?.row ?? null;
+  return best && best.d <= homeRules(c).near_max_km ? best.row : null;
 }
 
 /** A city row for the pick page: open ones only on the list; a search also returns the others, greyed with the reason. */

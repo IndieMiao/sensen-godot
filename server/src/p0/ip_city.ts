@@ -3,8 +3,9 @@
  * guess that never asks for location permission. Made from DB-IP City Lite (CC BY 4.0, credited in Settings › Licenses
  * › Map data) at image build time (tools/ip_near_table.ts, server/deploy/p0/Dockerfile): each address range already
  * names its nearest open home city, so the server holds a small table (about 11 MB for 13 cities, under the 256 MB
- * container) instead of the 127 MB location database, and never calls out. The address and the guess are neither stored
- * nor logged. Without the table there is no guess.
+ * container) instead of the 127 MB location database, and never calls out. The game server neither stores nor logs the
+ * address or the guess (Caddy's access log in front of it keeps addresses as it always has). Farther than
+ * home.near_max_km from every open city (q(205) ②), or without the table, there is no guess.
  *
  * File (little-endian): `P0IPNEAR1\n`, a uint32 header length and the JSON header {cities: [cluster id …], v4, v6},
  * then v4 entries [start uint32, city uint16] and v6 entries [start's top 64 bits as hi uint32 + lo uint32, city uint16],

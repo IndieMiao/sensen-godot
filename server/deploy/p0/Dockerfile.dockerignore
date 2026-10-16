@@ -20,3 +20,5 @@ server/.env
 server/.env.*
 server/output
 packages/blueprint-core/node_modules
+# q(188) ① Near you: the pinned DB-IP City Lite month (deploy-hk.sh build copies it from the devserver cache)
+!dbip/dbip-city-lite-*.csv.gz
