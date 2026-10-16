@@ -2596,6 +2596,8 @@ func bite_board() -> UiDrawer:
 ## and hands them over (set_notice_online); until then no person badge shows.
 const NoticeBoardDrawer := preload("res://scenes/p0/panels/p0_notice_board_drawer.gd")
 signal notice_board_opened
+## Settings › Home city (SGODOT-303 PR-4): the host opens the change of home; `back` reopens Settings.
+signal change_home(back: Callable)
 var _notice_board: UiDrawer
 var notice_online := {}   # outpost id → who is in, the last counts asked for
 
@@ -3065,16 +3067,20 @@ func open_titles(back := Callable()) -> UiDrawer:
 func open_settings(back := Callable()) -> void:
 	var page := P0SettingsPage.settings(P0Legal.version_line(P0Session.demo_config(
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else "")),
-		safe_top(), safe_bottom())
+		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)))
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
-	page.open_pressed.connect(func(_what: String): open_licenses(func(): open_settings(back)))
+	page.open_pressed.connect(func(what: String):
+		# Home city › (SGODOT-303 PR-4): the change; its ‹ Settings comes back here
+		if what == "home": change_home.emit(func(): open_settings(back))
+		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
 
-## The home pick (SGODOT-303, P0HomeFlow) over no world: a new player's first pages. Back on the spot page goes to the
-## city page; on the city page it does nothing (there is nowhere before it).
+## The home pick (SGODOT-303, P0HomeFlow): a new player's first pages over no world, or the change of home from
+## Settings. Back closes a layer at a time (the confirm card, the spot page); on a first pick's city page it does
+## nothing (there is nowhere before it), on the change's it goes back to Settings.
 func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
 	flow.say.connect(func(text: String): toast(text))
@@ -3083,8 +3089,8 @@ func open_home_flow(flow: Control) -> void:
 	_modal_back = _home_flow_back.bind(flow)
 
 func _home_flow_back(flow: Control) -> void:
-	if is_instance_valid(flow) and flow.spots != null: flow.back_to_cities()
-	_modal_back = _home_flow_back.bind(flow)
+	_modal_back = _home_flow_back.bind(flow)   # first: Back to Settings opens another layer, which sets its own
+	if is_instance_valid(flow): flow.back()
 
 ## SET-LICENSES: the credits (P0Legal); a row opens its full text, whose ‹ comes back here.
 func open_licenses(back := Callable()) -> void:

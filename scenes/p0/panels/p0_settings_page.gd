@@ -75,9 +75,19 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 	header.back_pressed.connect(func(): back_pressed.emit())
 	add_child(header)
 
-## SETTINGS (P0): Legal · `Licenses ›` and `Version`.
-static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+## SETTINGS (P0): Home first (SET-HOME-1 / -2 2561:131673 / 2561:131708, SGODOT-303), then Legal · `Licenses ›` and
+## `Version`. `home` {name, line, open} (P0HomePick.settings_row): while the change is open, `Home city · Tokyo` ›
+## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
+## `Set for good`. No home (a view not in yet): no Home group.
+static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
+	if not home.is_empty():
+		var title := "Home city · " + str(home.get("name", ""))
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK if bool(home.get("open", false)) else UiSettingRow.Kind.VALUE, title,
+			str(home.get("line", "")))
+		row.name = "HomeCity"
+		row.pressed.connect(func(): page.open_pressed.emit("home"))
+		page._group("Home", [row])
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))

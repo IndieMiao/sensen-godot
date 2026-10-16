@@ -99,8 +99,13 @@ describe('q(173): a changed home carries its day to the new home\'s first fittin
     registerP0Routes(app, { content: c, store, now: () => T, dev: true });
     const old = (await app.inject({ method: 'GET', url: `/v1/p0/home/spots/${TOKYO}`, headers: { 'x-p0-player': 'player-rules-03' } })).json();
     expect(old.resets_at).toBe(dayHoldFor(c, store.peek('player-rules-03')!, TOKYO, T).until);
+    // the weekday on Tokyo's calendar at that 04:00 (the card's `Your day resets Thu 4 AM, Tokyo time.`)
+    const tokyo = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Tokyo', weekday: 'short', hour: 'numeric', hourCycle: 'h23' }).formatToParts(old.resets_at);
+    expect(old.resets_day).toBe(tokyo.find(p => p.type === 'weekday')!.value);
+    expect(Number(tokyo.find(p => p.type === 'hour')!.value)).toBe(4);
     const fresh = (await app.inject({ method: 'GET', url: `/v1/p0/home/spots/${TOKYO}`, headers: { 'x-p0-player': 'player-rules-04', 'x-p0-features': 'choose_home' } })).json();
     expect(fresh.resets_at).toBeNull();
+    expect(fresh.resets_day).toBeNull();
   });
 });
 

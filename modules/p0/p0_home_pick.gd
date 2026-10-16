@@ -110,3 +110,21 @@ static func spot_line(spot: Dictionary) -> String:
 static func spot_title(spot: Dictionary) -> String:
 	var hood := str(spot.get("hood", "")) if spot.get("hood") != null else ""
 	return hood if hood != "" else "Spot %d" % (int(spot.get("spot", 0)) + 1)
+
+## Settings' Home row (SET-HOME-1 / -2) from view.home: {name, line, open} — while the free change is open (q(161):
+## view.home.change.open, until its `until`), `Change once · 5 days left` (whole days, rounded up; `1 day left`);
+## after it, `Set for good`. {} with no home in the view.
+static func settings_row(view: Dictionary, now_ms: float) -> Dictionary:
+	var h = view.get("home", null)
+	if not h is Dictionary or str((h as Dictionary).get("city", "")) == "": return {}
+	var ch: Dictionary = h.get("change", {}) if h.get("change") is Dictionary else {}
+	var open := bool(ch.get("open", false)) and not bool(h.get("pending", false))
+	var days := maxi(1, ceili((float(ch.get("until", 0)) - now_ms) / 86400000.0))
+	return {name = str(h.get("name", "")), open = open,
+		line = ("Change once · %d %s left" % [days, "day" if days == 1 else "days"]) if open else "Set for good"}
+
+## The change confirm card's day line (HOME-CHANGE-CONFIRM, q(173)): `Your day resets Thu 4 AM, Tokyo time.` from the
+## spots read's resets_day (the new home's calendar); "" without one.
+static func resets_line(spots_read: Dictionary, city_name: String) -> String:
+	var day = spots_read.get("resets_day", null)
+	return "Your day resets %s 4 AM, %s time." % [str(day), city_name] if day != null and str(day) != "" else ""
