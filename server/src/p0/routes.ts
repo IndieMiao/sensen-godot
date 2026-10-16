@@ -13,10 +13,13 @@ import { notePresence } from './presence.js';
 import { cityInfo, clusterById, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus } from './home_city.js';
+import type { IpNear } from './ip_city.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
 /** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
-export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number; log?: P0EventLog }
+export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number; log?: P0EventLog;
+  /** The address → nearest open home city for the home pick's `Near you` (ip_city.ts); none: no guess. */
+  ipNear?: IpNear }
 
 const UI_BATCH = 20, UI_PER_MINUTE = 120, UI_ALL_PER_MINUTE = 3_000;
 
@@ -70,7 +73,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   app.get('/v1/p0/home/cities', async (req, reply) => {
     if (!playerOf(req.headers)) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const { q } = (req.query ?? {}) as { q?: unknown };
-    return reply.send({ ok: true, ...homeCities(c, typeof q === 'string' ? q.slice(0, 64) : '') });
+    // q(188) ①: `Near you` — the open city nearest the address, guessed once for the page and kept nowhere
+    const list = homeCities(c, typeof q === 'string' ? q.slice(0, 64) : ''), near = deps.ipNear?.(req.ip) ?? null;
+    return reply.send({ ok: true, ...list, near: list.open.find(r => r.id === near) ?? null });   // only a city open today
   });
 
   /** The 3 farm spots this player is offered in a city (q(160) ②), the same every time for the same player. */

@@ -239,6 +239,18 @@ export function homeView(c: P0Content, s: P0State, now: number) {
     change: { open: ch.open, until: ch.until, before_level: r.before_level, used: s.travel.home_changes ?? 0 } };
 }
 
+/** q(188) ①: the open city nearest a point (the player's address, ip_city.ts) for the pick page's `Near you` row. */
+export function nearestOpen(c: P0Content, at: { lat: number; lng: number }): HomeCityRow | null {
+  let best: { row: HomeCityRow; d: number } | null = null;
+  for (const r of homeCities(c).open) {
+    const cl = clusterById(c, r.id) ?? (r.id === writtenCluster(c) ? clustersOf(c)?.byId.get(r.id) : undefined);
+    if (!cl) continue;
+    const d = km(at, cl);
+    if (!best || d < best.d) best = { row: r, d };
+  }
+  return best?.row ?? null;
+}
+
 /** A city row for the pick page: open ones only on the list; a search also returns the others, greyed with the reason. */
 export interface HomeCityRow { id: string; name: string; country: string; climate: string; status: HomeStatus }
 const row = (c: P0Content, id: string): HomeCityRow | null => {

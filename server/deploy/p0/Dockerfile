@@ -30,9 +30,21 @@ COPY assets/p0/p0_ponds.json assets/p0/p0_ponds.json
 COPY assets/p0/city_clusters.json assets/p0/city_clusters.json
 COPY assets/ponds/catalog.json assets/ponds/catalog.json
 COPY assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json assets/avatar/
+# q(188) ① `Near you` (SGODOT-303): DB-IP City Lite (CC BY 4.0, credited in Settings › Licenses › Map data), one month
+# pinned by its digest, fetched at build time only and turned into the address → nearest open city table (about 11 MB;
+# tools/ip_near_table.ts, read by src/p0/ip_city.ts) — the 127 MB location database would not fit the 256 MB
+# container, and the server never calls out. Built after the content above, so it follows the open list. To update: a
+# new month and its sha256 (download.db-ip.com/free/dbip-city-lite-<YYYY-MM>.csv.gz).
+ARG DBIP_MONTH=2026-10
+ARG DBIP_SHA256=d0a4d9446c1e5b826b95f99ed3b3ce151b9844df0044fe223a636cde26c75f2a
+RUN wget -qO /tmp/ip-city.csv.gz "https://download.db-ip.com/free/dbip-city-lite-${DBIP_MONTH}.csv.gz" \
+  && echo "${DBIP_SHA256}  /tmp/ip-city.csv.gz" | sha256sum -c - \
+  && cd /repo/server && ./node_modules/.bin/tsx tools/ip_near_table.ts /tmp/ip-city.csv.gz data/ip-near.bin \
+  && rm /tmp/ip-city.csv.gz
 USER p0
 ENV NODE_ENV=production P0_DEV=0 P0_PORT=3110 P0_HOST=0.0.0.0 \
-    P0_STATE_FILE=/data/p0-state.json P0_SNAPSHOT_DIR=/data/snapshots P0_EVENT_DIR=/data/events
+    P0_STATE_FILE=/data/p0-state.json P0_SNAPSHOT_DIR=/data/snapshots P0_EVENT_DIR=/data/events \
+    P0_IP_NEAR_TABLE=/repo/server/data/ip-near.bin
 WORKDIR /repo/server
 EXPOSE 3110
 VOLUME ["/data"]
