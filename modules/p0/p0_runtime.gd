@@ -176,6 +176,7 @@ func attach(w: Node) -> void:
 	elif return_to == "farm": ui.set_place(HOME_PLACE)
 	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
+	ui.place = session.place
 	if session.space not in ["", "map"]: here = {"space": session.space, "place": session.place}
 	# Entering a space reads fresh state, with this space: the server settles where the player is from it (#233). A read
 	# still on the wire left before this space was set (the cold start's first one): read again once it is back.
@@ -224,6 +225,7 @@ func detach(w: Node) -> void:
 		session.space = "map"
 		ui.space = "map"
 		session.place = ""
+		ui.place = ""
 
 ## Back to the map (the place chip, LOCK-06): every P0 world stacked above it closes, the farm under the
 ## farmhouse included. Back locks still apply (a line in the water is reeled in first); a room's own Back

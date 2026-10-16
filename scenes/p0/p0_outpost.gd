@@ -112,6 +112,32 @@ func p0_space() -> String: return "outpost"
 ## Which outpost, for the server (蒙恬's map markers, SGODOT-232 U6): entering it marks its ◆ new goods as seen.
 func p0_place() -> String: return str(outpost.get("id", ""))
 
+## Today's Show for a request handed in here (`outpost:<this id>`, q(204) ⑨: Ivo's in his Mine Hut): the camera goes to
+## the resident whose request is taken, else the room's first resident; other targets as any room's.
+func p0_has_spot(where: String) -> bool:
+	return resident_spot(where) != "" or super.p0_has_spot(where)
+
+func p0_show_spot(where: String) -> void:
+	var n := resident_spot(where)
+	if n == "":
+		super.p0_show_spot(where)
+		return
+	var m := anchor(n)
+	_focus = Vector3(m.global_position.x, floor_y, m.global_position.z)
+	_follow.hold()
+
+## The npc_ anchor Today's `outpost:<this id>` points at: the resident here with a taken request, else the first one.
+func resident_spot(where: String) -> String:
+	if where != "outpost:" + p0_place(): return ""
+	var view: Dictionary = rt.session.view if rt != null and rt.session != null else {}
+	var first := ""
+	for n in npcs:
+		if n == "npc_keeper" or anchor(n) == null: continue
+		if first == "": first = n
+		var rv = view.get("residents", {}).get(str(npcs[n].id), {})
+		if rv is Dictionary and str(rv.get("request_state", "")) == "accepted": return n
+	return first
+
 ## Other players stand on the floor, or on their seat (room metres; the crowd lives in the room node).
 func _crowd_height(id: int) -> float:
 	var s := online.seat_of(id) if online else ""

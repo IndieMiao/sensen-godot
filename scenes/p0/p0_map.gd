@@ -238,7 +238,8 @@ func _prewarm_pond(id: String) -> void:
 func _set_outpost_places() -> void:
 	var places: Array = P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
 	for cluster in _shown_cities:   # other cities' outposts (SGODOT-280), once their places are in
-		for o in P0CityPlaces.city(cluster).get("outposts", []):
+		# its outposts and its Mine Hut (q(204): a place of its own, pinned and carded as an outpost is)
+		for o in P0CityPlaces.city(cluster).get("outposts", []) + P0CityPlaces.huts(cluster):
 			var e := P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 			e["cluster"] = cluster
 			places.append(e)
@@ -264,8 +265,9 @@ func _open_outpost(id: String) -> void:
 
 # ---------------------------------------------------------------- destination pins and place cards (SGODOT-234 A2)
 const HOME_PIN := "home"
-## The outposts' MapDestination icons by role (不知火舞 on 234): tea pot, tackle rod, market board, post travel.
-const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel"}
+## The outposts' MapDestination icons by role (不知火舞 on 234): tea pot, tackle rod, market board, post travel; the Mine
+## Hut its crossed picks, i-mine-hut (q(204) ⑦: not the pickaxe tool — nothing is mined there).
+const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel", "mine_hut": "mine_hut"}
 ## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
 const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
@@ -319,11 +321,12 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 	return style
 
 ## q(137) ⑤: the fixed packing order of the map's pins after the always-in ones (the selected, a marked one, where the
-## player is): beginner pond, other ponds, market, tea house, travel post and cabin, tackle shop, silhouette.
-const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "tackle": 6, "silhouette": 7}
+## player is): beginner pond, other ponds, market, tea house, travel post, cabin and Mine Hut (q(204) ⑦), tackle shop,
+## silhouette.
+const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "silhouette": 7}
 ## The type words a place's name ends with (q(137) ①): the generator's (server world.ts, Pond / Creek / Cove) and the
 ## hand-written ones. Longest first, so `Trading Post` is not read as `Post`.
-const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Creek", "Pond", "Cove"]
+const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Mine Hut", "Creek", "Pond", "Cove"]
 
 ## The map pin's short name (q(137) ①): the place's own word without its type — `Willow Pond` → `Willow`, `Maple Market
 ## Square` → `Maple`, `Union Square Travel Post` → `Union Square`. A name that is only a type word stays whole.
@@ -1454,7 +1457,9 @@ func place_for(target: String) -> Dictionary:
 	if target == "home": return {"lat": home_lat, "lng": home_lng}
 	if target.begins_with("outpost:"):
 		var key := target.trim_prefix("outpost:")
-		var o := P0Outposts.find(key) if key.find("~") > 0 else P0Outposts.by_role(key)   # another city's by id (SGODOT-280)
+		# by id (another city's, SGODOT-280; a resident's home by its `place`, a hand-written one too), else by role
+		var o := P0Outposts.find(key)
+		if o.is_empty() and key.find("~") < 0: o = P0Outposts.by_role(key)
 		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 	if target.begins_with("pond:"):
 		var id := target.trim_prefix("pond:")

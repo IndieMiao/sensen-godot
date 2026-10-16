@@ -74,7 +74,7 @@ static func accept(cluster: String, city_: Dictionary) -> void:
 	_pending.erase(cluster)
 	_failing.erase(cluster)
 	var detail: Dictionary = city_.get("detail", {}) if city_.get("detail") is Dictionary else {}
-	var out := {ponds = [], outposts = [], fish = city_.get("fish", []), residents = int(city_.get("residents", 0)),
+	var out := {ponds = [], outposts = [], huts = [], fish = city_.get("fish", []), residents = int(city_.get("residents", 0)),
 		tier = str(city_.get("tier", "")), climate = str(city_.get("climate", "")), preview = city_.get("preview", {})}
 	for p in detail.get("ponds", []):
 		var entry := pond_entry(cluster, p)
@@ -86,6 +86,11 @@ static func accept(cluster: String, city_: Dictionary) -> void:
 		if entry.is_empty(): continue
 		_outposts[entry.id] = entry
 		out.outposts.append(entry)
+	for h in detail.get("huts", []):   # q(204): the Mine Hut, a place of its own beside the outposts (an older client never sees it)
+		var entry := hut_entry(cluster, h)
+		if entry.is_empty(): continue
+		_outposts[entry.id] = entry   # found by id as an outpost is (P0Outposts.find): its room opens in the outpost scene
+		out.huts.append(entry)
 	_cities[cluster] = out
 	for done in waiting: if (done as Callable).is_valid(): (done as Callable).call(out)
 
@@ -123,6 +128,25 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 		entry["keeper"] = (entry.keeper as Dictionary).duplicate()
 		entry.keeper["look"] = keeper_look(str(entry.keeper.look), entry.get("residents", []))
 	return entry
+
+## A Mine Hut (q(204), SGODOT-308): the server's place (id `<cluster>~hut0`, name, point, capacity, residents
+## ["res_ivo"], no keeper) on its own room kind, world.room.mine_hut — art, anchors and category, and this client's
+## bounds and backdrop for the kit. Not an outpost: no keeper, no counter, outside the outposts' counts; {} without the
+## room kind in content (an older content has none) or without an id.
+static func hut_entry(cluster: String, h: Dictionary) -> Dictionary:
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get(str(h.get("role", "mine_hut")), {})
+	if room.is_empty() or str(h.get("id", "")) == "": return {}
+	var entry := {"role": "mine_hut", "keeper": {}, "residents": [], "seats": [], "capacity": 12,
+		"art": str(room.get("art", "")), "anchors": str(room.get("client_anchors", room.get("anchors", ""))),
+		"category": str(room.get("category", "")), "bounds": room.get("bounds", []), "backdrop": room.get("backdrop", {})}
+	for k in ["id", "role", "name", "category", "lat", "lng", "capacity", "residents"]:
+		if h.has(k) and h[k] != null: entry[k] = h[k]
+	entry["keeper"] = {}
+	entry["cluster"] = cluster
+	return entry
+
+## A city's Mine Huts as read ([] before the city is in, or for a city without one).
+static func huts(cluster: String) -> Array: return city(cluster).get("huts", [])
 
 ## A hair part's style: its NPC-only colour variants are the same style (Tomo's hairhat0_npc_tomo is hairhat0, darker).
 static func hair_style(part: String) -> String:
