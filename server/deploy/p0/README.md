@@ -31,7 +31,7 @@
 | `Caddyfile.p0.snippet` | 要并入线上 Caddyfile 的一段：`/preview/p0/*` 去掉前缀后转给 `p0-demo:3110`（容器在 farm_default 上的别名） |
 | `deploy-hk.sh` | 香港部署的逐步脚本（preflight / build / transfer / backup-caddy / up / verify-internal / caddy / smoke / crontab / stats / rollback），每步单独运行 |
 | `smoke.sh` | 冒烟：healthz、无口令 401、带口令读状态、一条命令往返、dev 路由 404、UI 上报。用一次性玩家 id `smoke-<时间戳>`，不碰真实玩家 |
-| `backup-p0.sh` | 每晚把 `/data` 卷打包，保留 14 份；按 compose 标签找卷（项目名 `P0_PROJECT`，默认 p0），不写死卷名 |
+| `backup-p0.sh` | 每晚把 `/data` 卷打包（排除写了一半的 `*.tmp`），先写成 `.part`，校验包里的 `p0-state.json` 能解析后才替换当天那份（校验不过的另存为 `p0-data-<日>-<时>.bad.tgz` 待查，不会覆盖好包，也不上传），本机保留 14 份；有 `/opt/farm/p0/.env.backup` 时再用 age 公钥加密、以只写子账号传到备份桶的 `p0/` 前缀（SGODOT-304 ③）。按 compose 标签找卷（项目名 `P0_PROJECT`，默认 p0），不写死卷名 |
 
 ## 目标 A：香港 ECS（首选）
 
@@ -63,7 +63,7 @@
 5. **Caddy**：线上配置已经和仓库里的 `server/deploy/Caddyfile` 不同：Journey 预览服 `/preview/journey/` 由 `/opt/farm/journey-preview` 的 compose 项目 `sensen-journey-preview` 提供，部署记录里有单独的 `Caddyfile.preview`（docs/qa/partner-connectivity-2026-09-08.md）。所以动手前先在服务器上看清两件事：Caddy 实际加载的是哪个配置文件，Journey 预览服是怎么接进 Caddy 所在网络的。P0 按同样的方式接：把 `Caddyfile.p0.snippet` 并进那个文件的 `farm.sensenjoy.cn` 块（放在兜底的 `reverse_proxy app:3000` 之前）；如果 Caddy 不在 `farm_default` 网络上，就把 `docker-compose.p0.yml` 的网络名改成 Caddy 所在的网络。**不要用仓库版本覆盖线上文件。** 改之前先备份；用 `docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile` 热加载，不重建 caddy 容器（证书在 caddy_data 卷里，重建会重新申请）。Journey 预览服的 compose 需要 root（`/opt/sensen-voice/private/` 只有 root 可读），P0 自己的 compose 用 farm 用户即可。
 6. **冒烟**：`P0_BASE=https://farm.sensenjoy.cn/preview/p0 P0_KEY=<口令> server/deploy/p0/smoke.sh`。
 7. **演示包**：`tools/p0/build_demo_apk.sh --server https://farm.sensenjoy.cn/preview/p0/v1 --key <口令>`。
-8. **备份**：把 `backup-p0.sh` 放到 `/opt/farm/p0/`，crontab 加 `40 3 * * * /opt/farm/p0/backup-p0.sh`。
+8. **备份**：把 `backup-p0.sh` 放到 `/opt/farm/p0/`，crontab 加 `40 3 * * * /opt/farm/p0/backup-p0.sh`。异地加密：在 `/opt/farm/p0/.env.backup`（600，不进仓库）写 `AGE_RECIPIENT`、`OSS_BUCKET`、只写子账号的 `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`；没有这个文件就只留本机那份。私钥不放在香港。
 
 回滚：`docker compose -p p0 -f docker-compose.p0.yml down`（不加 `-v`，数据卷保留），删掉 Caddy 里那一段再热加载。farm 和 Journey 不受影响。
 
