@@ -257,15 +257,51 @@ export function nearestOpen(c: P0Content, at: { lat: number; lng: number }): Hom
   return best && best.d <= homeRules(c).near_max_km ? best.row : null;
 }
 
+/** Country + name of cities that share both in the city directory (q(208) ①: 83 pairs outside the US, two Ji'ans, two
+ * Suzhous), worked out once per content. */
+const twins = new WeakMap<object, Set<string>>();
+function twinNames(c: P0Content): Set<string> {
+  const all = clustersOf(c);
+  if (!all) return new Set();
+  let set = twins.get(all);
+  if (!set) {
+    const seen = new Map<string, number>();
+    for (const cl of all.byId.values()) seen.set(`${cl.country_code}|${cl.name}`, (seen.get(`${cl.country_code}|${cl.name}`) ?? 0) + 1);
+    set = new Set([...seen].filter(([, n]) => n > 1).map(([k]) => k));
+    twins.set(all, set);
+  }
+  return set;
+}
+
+/**
+ * The second part of a city row (q(208) ①, every CityRow: the home pick, Near you, a search, MAP-8 Nearby): a US city
+ * its state (`San Francisco · California`); elsewhere its country's English name (`Tokyo · Japan`), nothing when the
+ * city's name already holds its own country's name as a whole word (q(209) ②: `Singapore`, `Hong Kong`, `Mexico City`,
+ * `Santiago de Cuba`, `Port Sudan` — not `Iranshahr`, and another country's name does not count: `Benin City ·
+ * Nigeria`), and its province for one of two same-named cities in a country (`Ji'an · Jilin`; two in one province
+ * both read the province, q(209) ①). "" for none; the client leaves the part out.
+ */
+export const namesCountry = (name: string, country: string): boolean =>
+  country !== '' && new RegExp(`(^|[^\\p{L}])${country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}])`, 'u').test(name);
+
+export function cityRegion(c: P0Content, id: string): string {
+  const cl = clusterById(c, id);
+  if (!cl) return '';
+  if (cl.country_code === 'US') return clusterAdmin(id) || cl.country;
+  if (namesCountry(cl.name, cl.country)) return '';
+  if (twinNames(c).has(`${cl.country_code}|${cl.name}`)) return clusterAdmin(id) || cl.country;
+  return cl.country;
+}
+
 /** A city row for the pick page: open ones only on the list; a search also returns the others, greyed with the reason. */
-/** region: the city's state or province (`San Francisco · California`, HOME-PICK-1), else its country. */
+/** region: cityRegion (q(208) ①). */
 export interface HomeCityRow { id: string; name: string; country: string; region: string; climate: string; status: HomeStatus }
 const row = (c: P0Content, id: string): HomeCityRow | null => {
   const cl = clusterById(c, id), status = homeStatus(c, id);
   if (!status) return null;
   const climate = cl?.climate ?? c.profile.climate.toLowerCase();
   const country = cl?.country ?? '';
-  return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country, region: clusterAdmin(id) || country, climate, status };
+  return { id, name: id === writtenCluster(c) ? c.profile.city : cl?.name ?? id, country, region: cityRegion(c, id), climate, status };
 };
 
 /** The open cities (the written city first, then the list), and with `query` (2+ letters) the cities whose name starts
@@ -273,9 +309,11 @@ const row = (c: P0Content, id: string): HomeCityRow | null => {
 export function homeCities(c: P0Content, query = '', limit = 20): { open: HomeCityRow[]; matches: HomeCityRow[] } {
   const open = [writtenCluster(c), ...homeRules(c).cities.filter(id => id !== writtenCluster(c))]
     .map(id => row(c, id)).filter((r): r is HomeCityRow => !!r && r.status === 'open');
-  const q = query.trim().toLowerCase();
+  // a typed ' finds the directory's ’ (Ji’an, Xi’an): both read as one
+  const fold = (t: string) => t.toLowerCase().replace(/[’‘`]/g, "'");
+  const q = fold(query.trim());
   if (q.length < 2) return { open, matches: [] };
-  const all = [...(clustersOf(c)?.byId.values() ?? [])].filter(cl => cl.name.toLowerCase().startsWith(q))
+  const all = [...(clustersOf(c)?.byId.values() ?? [])].filter(cl => fold(cl.name).startsWith(q))
     .sort((a, b) => b.population - a.population).slice(0, limit);
   return { open, matches: all.map(cl => row(c, cl.id)).filter((r): r is HomeCityRow => !!r) };
 }

@@ -54,6 +54,13 @@ func test_the_rows_come_nearest_first_with_what_the_sheet_shows() -> void:
 	assert_str(str(la.landmark)).is_not_empty()   # Hollywood Sign (travel.landmarks)
 	assert_array(P0Travel.nearby({})).is_empty()
 
+## q(208) ①: the server's travel.regions is the row's second part as shown — taken as it is, an empty one included
+## (`Singapore`, no second part); a city it does not list falls back as before.
+func test_the_servers_region_is_taken_as_it_is() -> void:
+	var view := _travel({regions = {CONCORD: "California", LA: ""}})
+	var rows: Array = P0Travel.nearby(view)
+	assert_array(rows.map(func(r): return str(r.region))).is_equal(["California", "California", ""])
+
 func _map() -> Node:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
