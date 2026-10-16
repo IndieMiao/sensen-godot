@@ -12,9 +12,9 @@ import scene_room_pipeline as p
 from mathutils import Matrix
 
 PALETTE = dict(
-    oak='DE8252', oak_light='F39C72', oak_edge='C16C47', oak_end='EB9260',
-    oak_dark='92583F', floor='EBA086', floor_light='F1AA90', floor_shade='E59A83',
-    joint='CC8E71', plaster='F4DCD2', panel='8E9DAF', panel_light='A4B0BD',
+    oak='DE8965', oak_light='E58A61', oak_edge='C16C47', oak_end='EB9260',
+    oak_dark='92583F', floor='E39A83', floor_light='E6A084', floor_shade='D99276',
+    joint='B77858', plaster='F0C4AF', panel='8E9DAF', panel_light='A4B0BD',
     panel_edge='7B899D', cream='F3DDD0', brass='D99E4D', brass_light='F4C577',
     metal='737880', metal_light='9DA1A6', dark='414E50', navy='344D72',
     ivory='F3E1C9', red='D95051', blue='467AA2', yellow='E9B84E',
@@ -55,6 +55,15 @@ def face_front(o):
     bmesh.ops.reverse_faces(bm,faces=[f for f in bm.faces if f.normal.y>0])
     bm.to_mesh(o.data);bm.free()
     return o
+
+def scale_module(name,scale):
+    """Apply proportions inside the source module, retaining a unit local pivot."""
+    transform=Matrix.Diagonal(Vector((scale[0],scale[2],scale[1],1)))
+    for obj in p.KITS[name]['objects']:obj.matrix_basis=transform@obj.matrix_basis
+
+def move_module(name,offset):
+    kit=p.KITS[name];kit['at']=[a+b for a,b in zip(kit['at'],offset)]
+    kit['root'].location=v(kit['at'])
 
 def barrel_low(name='Float barrel',radius=.24,height=.46,segments=10):
     # Continuous open low-poly coopered barrel. Colored staves, not grain photos.
@@ -338,7 +347,13 @@ def fish_bowl():
         ellipsoid('Fish ivory eye',(x-sign*.055,y+.019,z+.036),(.028,.028,.013),'ivory',10,6)
         ellipsoid('Fish dark pupil',(x-sign*.057,y+.020,z+.045),(.012,.012,.008),'dark',8,6)
     begin('fishbowl_glass',(.33,1.20,-1.03))
-    lathe('Open round aquarium glass',(0,0,0),[(.015,.16),(.06,.23),(.18,.29),(.32,.28),(.43,.21),(.46,.20),(.46,.19),(.43,.20),(.32,.27),(.18,.28),(.06,.22),(.027,.16)],'DDEBF0',48)
+    shell=lathe('Open round aquarium glass',(0,0,0),[(.015,.16),(.06,.23),(.18,.29),(.32,.28),(.43,.21),(.46,.20),(.46,.19),(.43,.20),(.32,.27),(.18,.28),(.06,.22),(.027,.16)],'DDEBF0',48)
+    glass=shell.data.materials[0].copy();glass.name='EditableFishbowlGlass'
+    glass.diffuse_color=(*glass.diffuse_color[:3],.075)
+    shader=glass.node_tree.nodes.get('Principled BSDF')
+    shader.inputs['Alpha'].default_value=.075;shader.inputs['Roughness'].default_value=.20
+    shader.inputs['Specular IOR Level'].default_value=.28
+    shell.data.materials[0]=glass
     begin('fishbowl_glints',(.33,1.20,-1.03))
     ring('Aquarium open rim',(0,.46,0),.20,.009,'ivory','xz',48)
     tube('Aquarium left soft glint',[(-.22,.15,.15),(-.25,.24,.13),(-.22,.33,.13)],.010,'EAF0E9',6)
@@ -411,6 +426,29 @@ def kai_rafa():
     begin('rafa_fishing_net',(2.95,.09,-.90),yaw=0)
     net_shape(.45,.73)
 
+def floor_dressing():
+    begin('left_rope_crate',(-2.83,.08,-1.70),collision=[{'at':[0,.29,0],'size':[.50,.58,.56]}])
+    cube('Crate solid bottom',(0,.035,0),(.48,.07,.54),'oak_edge',.012)
+    for x in (-.215,.215):
+        for z in (-.245,.245):cube('Crate corner upright',(x,.22,z),(.055,.44,.055),'oak',.012)
+    for y in (.11,.24,.37):
+        for z in (-.255,.255):cube('Crate side slat',(0,y,z),(.48,.10,.035),'oak_light',.014)
+        for x in (-.23,.23):cube('Crate end slat',(x,y,0),(.035,.10,.50),'oak',.012)
+    # A neatly coiled supply rope on a thin removable lid, not another barrel.
+    cube('Crate loose lid',(0,.44,0),(.49,.045,.55),'oak_light',.012)
+    for i in range(4):
+        ring('Coiled rope on crate',(0,.477+i*.024,0),.16-i*.018,.013,'rope','xz',36,6)
+    tube('Loose rope tail',[(.16,.48,0),(.20,.47,.15),(.24,.38,.19),(.23,.20,.23)],.013,'rope',6)
+    begin('rafa_fish_creel',(2.25,.08,-.65),collision=[{'at':[0,.29,0],'size':[.54,.58,.46]}])
+    cube('Woven creel inner body',(0,.24,0),(.50,.46,.42),'cork',.07)
+    for y in (.08,.17,.26,.35,.43):
+        for z in (-.218,.218):tube('Creel horizontal wicker',[(x,y,z) for x in (-.20,0,.20)],.011,'reed',5)
+        for x in (-.258,.258):tube('Creel side wicker',[(x,y,-.16),(x,y,.16)],.011,'reed',5)
+    for x in (-.18,-.09,0,.09,.18):
+        for z in (-.223,.223):tube('Creel vertical wicker',[(x,.05,z),(x,.43,z)],.008,'rope',5)
+    cube('Creel domed lid',(0,.49,0),(.53,.08,.45),'reed',.035)
+    tube('Creel carry loop',[(-.12,.53,0),(-.12,.62,0),(0,.67,0),(.12,.62,0),(.12,.53,0)],.016,'cork',8)
+
 def shared_plant(name,original,at,scale=1):
     path=p.ROOT/'assets/rooms/_shared/plants/source/plants.blend'
     with bpy.data.libraries.load(str(path),link=False) as (src,dst):dst.collections=['KIT_'+original]
@@ -436,11 +474,11 @@ def shared_plant(name,original,at,scale=1):
 
 def anchors_and_bench():
     entries=[
-        ('use_counter',[-.36,1.20,-.85],'curved_counter',0),
-        ('stand_counter',[-.36,.08,-.02],'curved_counter',0),
-        ('npc_keeper',[-.36,.08,-2.35],'curved_counter',180),
-        ('badge_keeper',[-.36,1.98,-2.35],'curved_counter',180),
-        ('stand_keeper',[-.36,.08,-.02],'curved_counter',0),
+        ('use_counter',[-.36,1.20,-1.31],'curved_counter',0),
+        ('stand_counter',[-.36,.08,-.48],'curved_counter',0),
+        ('npc_keeper',[-.36,.08,-2.50],'curved_counter',180),
+        ('badge_keeper',[-.36,1.98,-2.50],'curved_counter',180),
+        ('stand_keeper',[-.36,.08,-.48],'curved_counter',0),
         ('npc_kai',[-1.85,.08,1.55],'kai_stool',135),
         ('stand_kai',[-1.10,.08,1.10],'kai_stool',-90),
         ('npc_rafa',[1.85,.08,-1.55],'rafa_float_barrel',225),
@@ -450,7 +488,7 @@ def anchors_and_bench():
         ('spawn',[0,.08,.83],'room_shell',0),
         ('exit',[0,.08,3.40],'room_shell',180),
         ('badge_exit',[0,.30,3.20],'room_shell',180),
-        ('sign_name',[-3.02,2.07,1.29],'fish_sign',90),
+        ('sign_name',[-3.02,2.19,1.29],'fish_sign',90),
     ]
     anchors=[dict(name=n,position=at,module=mod,yaw_degrees=yaw) for n,at,mod,yaw in entries]
     anchors[-1]['size']=[.72,.12]
@@ -464,7 +502,7 @@ def anchors_and_bench():
         'floor_size':[6.8,6.4],'floor_y':.08,
         'bench':{'floor_y':.08,'route':[
           {'name':'central anchor rug','position':[0,.08,.83],'capture':'main'},
-          {'name':'counter approach','position':[-.36,.08,-.02]},
+          {'name':'counter approach','position':[-.36,.08,-.48]},
           {'name':'counter right aisle','position':[1.05,.08,-.40]},
           {'name':'fish board approach','position':[.96,.08,-2.07]},
           {'name':'return to public aisle','position':[1.30,.08,-.32]},
@@ -472,14 +510,16 @@ def anchors_and_bench():
           {'name':'Old Kai approach','position':[-1.10,.08,1.10]},
           {'name':'open front exit','position':[0,.08,2.83],'capture':'door'}],
           'blocked':[
-            {'name':'curved counter','from':[-.36,.09,-.02],'to':[-.36,.09,-1.16],'target':'curved_counter'},
+            {'name':'curved counter','from':[-.36,.09,-.48],'to':[-.36,.09,-1.62],'target':'curved_counter'},
             {'name':'right shelf','from':[2.25,.09,-1.65],'to':[2.25,.09,-2.50],'target':'right_low_shelf'},
             {'name':'rod rack','from':[-2.15,.09,.17],'to':[-2.92,.09,.17],'target':'rod_rack'},
-            {'name':'left wall','from':[-2.7,.09,-1.45],'to':[-3.8,.09,-1.45],'target':'room_shell'},
+            {'name':'left wall','from':[-2.45,.09,-1.20],'to':[-3.8,.09,-1.20],'target':'room_shell'},
+            {'name':'rope crate','from':[-2.0,.09,-1.70],'to':[-2.83,.09,-1.70],'target':'left_rope_crate'},
+            {'name':'fish creel','from':[1.45,.09,-.65],'to':[2.25,.09,-.65],'target':'rafa_fish_creel'},
             {'name':'right floor edge','from':[2.75,.09,.0],'to':[3.8,.09,0],'target':'room_shell'},
             {'name':'front floor edge','from':[1.5,.09,2.6],'to':[1.5,.09,3.7],'target':'room_shell'}],
-          'gaps':[{'name':'keeper clear aisle','from':[-.75,.09,-2.22],'to':[.75,.09,-2.22],
-                   'measure':[[-.36,.73,-2.96],[-.36,.73,-1.60]],'minimum':.70,'width':1.36}],
+          'gaps':[{'name':'keeper clear aisle','from':[-.75,.09,-2.51],'to':[.75,.09,-2.51],
+                   'measure':[[-.36,.73,-2.96],[-.36,.73,-2.06]],'minimum':.70,'width':.90}],
           'entrance':{'inside':[0,.09,2.7],'outside':[0,.09,3.47]},
           'slide':{'from':[2.90,.09,-.30],'direction':[1,0,.8],'tangent':[0,0,1],'seconds':.55},
           'input_start':[0,.09,1.7],
@@ -491,15 +531,26 @@ def anchors_and_bench():
 def build():
     start('tackle_shop','2681:135486');p.QA=p.ROOT/'output/tackle-214'
     p.b.PALETTE.update(PALETTE)
-    p.BAKE_SETTINGS.update(ao_distance=.35,ao_strength=.35,floor_ao_strength=.24)
+    p.BAKE_SETTINGS.update(ao_distance=.55,ao_strength=.60,floor_ao_strength=.44)
     architecture();porthole();counter();lamps();rod_rack();shelves();wall_decor();fish_bowl();anchor_rug();kai_rafa()
+    floor_dressing()
+    for name in ['curved_counter','counter_ship_wheel','counter_lantern','counter_square_tool',
+                 'fishbowl_contents','fishbowl_glass','fishbowl_glints']:move_module(name,(0,0,-.46))
+    scale_module('anchor_rug',(2.6/1.9,1,2.6/1.9))
+    scale_module('fish_sign',(1.30,1.30,1));move_module('fish_sign',(0,.12,0))
+    scale_module('bunting',(1.05,1.35,1));move_module('bunting',(0,-.04,0))
+    scale_module('wall_lantern',(1.55,1.55,1.55));move_module('wall_lantern',(.05,-.07,0))
     shared_plant('shelf_pothos','pothos',(-2.64,2.09,-2.40),.78)
     shared_plant('rafa_plant','peace_lily',(2.98,.08,.32),.74)
     shared_plant('shelf_small_plant','peace_lily',(2.97,1.04,-2.40),.22)
     anchors_and_bench()
+    p.MANIFEST_EXTRA['local_lights']=[
+        {'name':'WallLanternWarmth','position':[-2.69,2.47,.24],'color':'FFD9C7','energy':.50,'range':1.50,'attenuation':1.6},
+        {'name':'PendantWarmth','position':[-1.5,2.32,-2.08],'color':'FFE0C9','energy':.80,'range':2.30,'attenuation':1.6},
+        {'name':'CounterLanternWarmth','position':[-1.10,1.38,-1.62],'color':'FFD3AF','energy':.35,'range':1.10,'attenuation':1.6}]
     target=[0,1.15,0];distance=20;pitch=math.radians(43);yaw=math.pi/4
     camera={'position':[target[0]+distance*math.cos(pitch)*math.sin(yaw),target[1]+distance*math.sin(pitch),target[2]+distance*math.cos(pitch)*math.cos(yaw)],'target':target,'size':11.4}
-    lighting={'background':'EAD5C8','ambient_color':'FFF7F3','ambient':.52,'sun_color':'FFF3EA','sun':.72,
+    lighting={'background':'EAD5C8','ambient_color':'FFF0DD','ambient':.40,'sun_color':'FFF1E7','sun':.90,
               'sun_position':[-3,8,5],'sun_target':[0,0,0],'shadow_bias':.3,'shadow_normal_bias':2.0,'shadow_distance':25,'points':[]}
     finalize(camera,lighting)
     layout=json.loads((p.OUT/'layout.json').read_text())
@@ -515,10 +566,13 @@ def build():
     color_vertices={}
     bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
     for name,kit in p.KITS.items():
-        if name not in detail_modules and name!='anchor_rug':continue
+        partial_detail=name in ('anchor_rug','left_rope_crate','rafa_fish_creel')
+        if name not in detail_modules and not partial_detail:continue
         table={};inv=kit['root'].matrix_world.inverted()
         for obj in kit['objects']:
             if name=='anchor_rug' and not obj.name.startswith('Short rug fringe'):continue
+            if name=='left_rope_crate' and not obj.name.startswith(('Coiled rope','Loose rope')):continue
+            if name=='rafa_fish_creel' and not obj.name.startswith(('Creel horizontal','Creel side','Creel vertical','Creel carry')):continue
             rgb_linear=obj.data.materials[0].diffuse_color[:3]
             encoded=[round(255*(12.92*c if c<=.0031308 else 1.055*c**(1/2.4)-.055)) for c in rgb_linear]
             data=bpy.data.meshes.new_from_object(obj.evaluated_get(deps),depsgraph=deps)

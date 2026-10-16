@@ -1,0 +1,436 @@
+{
+  "atlas_size": [
+    2048,
+    2048
+  ],
+  "baked_region": [
+    2048,
+    1920
+  ],
+  "swatch_tile_px": 64,
+  "swatches": [
+    {
+      "rgb8": [
+        65,
+        78,
+        80
+      ],
+      "gltf_uv": [
+        0.015625,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        70,
+        122,
+        162
+      ],
+      "gltf_uv": [
+        0.046875,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        115,
+        120,
+        128
+      ],
+      "gltf_uv": [
+        0.078125,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        116,
+        149,
+        99
+      ],
+      "gltf_uv": [
+        0.109375,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        118,
+        147,
+        93
+      ],
+      "gltf_uv": [
+        0.140625,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        136,
+        166,
+        109
+      ],
+      "gltf_uv": [
+        0.171875,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        146,
+        88,
+        63
+      ],
+      "gltf_uv": [
+        0.203125,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        157,
+        161,
+        166
+      ],
+      "gltf_uv": [
+        0.234375,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        179,
+        125,
+        77
+      ],
+      "gltf_uv": [
+        0.265625,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        193,
+        108,
+        71
+      ],
+      "gltf_uv": [
+        0.296875,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        204,
+        119,
+        80
+      ],
+      "gltf_uv": [
+        0.328125,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        214,
+        172,
+        139
+      ],
+      "gltf_uv": [
+        0.359375,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        215,
+        183,
+        125
+      ],
+      "gltf_uv": [
+        0.390625,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        217,
+        80,
+        81
+      ],
+      "gltf_uv": [
+        0.421875,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        217,
+        158,
+        77
+      ],
+      "gltf_uv": [
+        0.453125,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        222,
+        137,
+        101
+      ],
+      "gltf_uv": [
+        0.484375,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        229,
+        138,
+        97
+      ],
+      "gltf_uv": [
+        0.515625,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        233,
+        184,
+        78
+      ],
+      "gltf_uv": [
+        0.546875,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        234,
+        240,
+        233
+      ],
+      "gltf_uv": [
+        0.578125,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        243,
+        225,
+        201
+      ],
+      "gltf_uv": [
+        0.609375,
+        0.953125
+      ]
+    },
+    {
+      "rgb8": [
+        244,
+        197,
+        119
+      ],
+      "gltf_uv": [
+        0.640625,
+        0.953125
+      ]
+    }
+  ],
+  "modules": {
+    "anchor_rug": {
+      "vertices": 2248,
+      "guarded_source_vertices": 1920,
+      "guarded_triangles": 1152
+    },
+    "back_wall": {
+      "vertices": 3456,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "blue_map": {
+      "vertices": 838,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "bunting": {
+      "vertices": 134,
+      "guarded_source_vertices": 134,
+      "guarded_triangles": 88
+    },
+    "corner_open_shelf": {
+      "vertices": 1248,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "corner_shelf_stock": {
+      "vertices": 1767,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "counter_lantern": {
+      "vertices": 635,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "counter_ship_wheel": {
+      "vertices": 1818,
+      "guarded_source_vertices": 1818,
+      "guarded_triangles": 1726
+    },
+    "counter_square_tool": {
+      "vertices": 312,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "curved_counter": {
+      "vertices": 1574,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "fish_board": {
+      "vertices": 1044,
+      "guarded_source_vertices": 1044,
+      "guarded_triangles": 840
+    },
+    "fish_sign": {
+      "vertices": 818,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "fishbowl_contents": {
+      "vertices": 2280,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "fishbowl_glass": {
+      "vertices": 824,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "fishbowl_glints": {
+      "vertices": 617,
+      "guarded_source_vertices": 617,
+      "guarded_triangles": 636
+    },
+    "float_barrel": {
+      "vertices": 604,
+      "guarded_source_vertices": 604,
+      "guarded_triangles": 424
+    },
+    "hat_rail": {
+      "vertices": 1016,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "kai_fishing_net": {
+      "vertices": 2028,
+      "guarded_source_vertices": 2028,
+      "guarded_triangles": 1712
+    },
+    "kai_oar_barrel": {
+      "vertices": 1048,
+      "guarded_source_vertices": 1048,
+      "guarded_triangles": 1000
+    },
+    "kai_stool": {
+      "vertices": 256,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "left_rope_crate": {
+      "vertices": 3421,
+      "guarded_source_vertices": 1693,
+      "guarded_triangles": 1804
+    },
+    "left_wall": {
+      "vertices": 3893,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "model_sailboat": {
+      "vertices": 598,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "pendant_lamp": {
+      "vertices": 651,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "porthole": {
+      "vertices": 1661,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "porthole_view": {
+      "vertices": 608,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "rafa_fish_creel": {
+      "vertices": 1290,
+      "guarded_source_vertices": 1043,
+      "guarded_triangles": 656
+    },
+    "rafa_fishing_net": {
+      "vertices": 2031,
+      "guarded_source_vertices": 2031,
+      "guarded_triangles": 1712
+    },
+    "rafa_plant": {
+      "vertices": 1943,
+      "guarded_source_vertices": 1943,
+      "guarded_triangles": 1468
+    },
+    "right_low_shelf": {
+      "vertices": 1248,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "right_shelf_stock": {
+      "vertices": 2149,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "rod_rack": {
+      "vertices": 1390,
+      "guarded_source_vertices": 1390,
+      "guarded_triangles": 772
+    },
+    "room_shell": {
+      "vertices": 11671,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "shelf_pothos": {
+      "vertices": 6900,
+      "guarded_source_vertices": 6900,
+      "guarded_triangles": 5276
+    },
+    "shelf_small_plant": {
+      "vertices": 1949,
+      "guarded_source_vertices": 1949,
+      "guarded_triangles": 1468
+    },
+    "wall_hook_bar": {
+      "vertices": 248,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "wall_lantern": {
+      "vertices": 791,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    },
+    "yellow_boots": {
+      "vertices": 1078,
+      "guarded_source_vertices": 0,
+      "guarded_triangles": 0
+    }
+  }
+}

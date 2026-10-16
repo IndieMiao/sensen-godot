@@ -8,10 +8,10 @@ DEST=ROOT/'docs/design/tackle-shop-214-2026-10-16'
 PREFIX='SGODOT-214_TACKLE_v1_'
 FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 def font(n):return ImageFont.truetype(FONT,n)
-def signature(im,title,note):
+def signature(im,title,note,version='v1'):
     w,h=im.size;small=w<=500;top=64 if small else 86;bottom=60 if small else 58
     result=Image.new('RGB',(w,h+top+bottom),'#fff8f1');result.paste(im,(0,top));d=ImageDraw.Draw(result)
-    d.text((12 if small else 26,10),'【赵云】SGODOT-214 · TACKLE v1',fill='#513f36',font=font(15 if small else 25))
+    d.text((12 if small else 26,10),'【赵云】SGODOT-214 · TACKLE '+version,fill='#513f36',font=font(15 if small else 25))
     d.text((12 if small else 26,35 if small else 45),title,fill='#654b3e',font=font(14 if small else 25))
     d.text((12 if small else 26,h+top+12),note,fill='#654b3e',font=font(11 if small else 18))
     return result

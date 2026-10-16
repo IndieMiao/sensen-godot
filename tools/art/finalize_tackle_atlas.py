@@ -24,6 +24,8 @@ def main():
         draw.rectangle((x,y,x+63,y+63),fill=color)
         swatches[color]=((x+32)/2048,(y+32)/2048)
     patched={}
+    layout=json.loads((KIT/'layout.json').read_text())
+    asset_modes={a['name']:a.get('material','plain') for a in layout['assets']}
     report={'atlas_size':[2048,2048],'baked_region':[2048,1920],'swatch_tile_px':64,
             'swatches':[{'rgb8':list(c),'gltf_uv':list(uv)} for c,uv in swatches.items()],'modules':{}}
     for path in sorted(KIT.glob('*.glb')):
@@ -78,6 +80,19 @@ def main():
             accessors.append(a)
         prim['attributes']={'POSITION':0,'NORMAL':1,'TEXCOORD_0':2};prim['indices']=3
         doc['bufferViews']=views;doc['accessors']=accessors;doc['buffers']=[{'byteLength':len(data)}]
+        # Each GLB surface owns its material, including shared atlas reference.
+        # The assembler must not flatten these into a node-wide material override.
+        glass=asset_modes[path.stem]=='glass'
+        doc['materials']=[{'name':'TackleFishbowlGlass' if glass else 'TackleRoomAtlas',
+            'pbrMetallicRoughness':{'baseColorFactor':[1,1,1,.075 if glass else 1],
+                'baseColorTexture':{'index':0},'metallicFactor':0,'roughnessFactor':.20 if glass else .80},
+            'alphaMode':'BLEND' if glass else 'OPAQUE','doubleSided':glass,
+            'extensions':{'KHR_materials_specular':{'specularFactor':.56}}}]
+        prim['material']=0
+        doc['images']=[{'uri':'room_albedo_ao.png'}]
+        doc['textures']=[{'source':0,'sampler':0}]
+        doc['samplers']=[{'magFilter':9729,'minFilter':9987,'wrapS':33071,'wrapT':33071}]
+        doc['extensionsUsed']=sorted(set(doc.get('extensionsUsed',[]))|{'KHR_materials_specular'})
         encoded=json.dumps(doc,separators=(',',':')).encode()
         encoded+=b' '*((-len(encoded))%4);data+=b'\0'*((-len(data))%4)
         patched[path]=struct.pack('<4sII',b'glTF',2,12+8+len(encoded)+8+len(data))+struct.pack('<I4s',len(encoded),b'JSON')+encoded+struct.pack('<I4s',len(data),b'BIN\0')+data

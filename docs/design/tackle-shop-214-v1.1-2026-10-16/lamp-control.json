@@ -1,0 +1,32 @@
+{
+  "same_camera_and_global_lighting": true,
+  "regions": {
+    "wall_lantern": {
+      "rectangle": [
+        335,
+        320,
+        480,
+        450
+      ],
+      "mean_absolute_rgb8_delta": 40.07186560565871
+    },
+    "pendant": {
+      "rectangle": [
+        650,
+        250,
+        835,
+        450
+      ],
+      "mean_absolute_rgb8_delta": 14.68663963963964
+    },
+    "counter": {
+      "rectangle": [
+        710,
+        470,
+        835,
+        600
+      ],
+      "mean_absolute_rgb8_delta": 11.925702564102565
+    }
+  }
+}

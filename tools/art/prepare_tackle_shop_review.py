@@ -5,6 +5,8 @@ import subprocess, sys, shutil, hashlib, re
 ROOT=Path(__file__).resolve().parents[2]
 DEST=ROOT/'output/tackle-214/project'
 KIT=ROOT/'assets/rooms/tackle_shop'
+old_importer=DEST/'assets/rooms/tackle_shop/material_import.gd'
+importer_changed=not old_importer.exists() or old_importer.read_bytes()!=(KIT/'material_import.gd').read_bytes()
 template=(ROOT/'assets/rooms/post_office/fare_board.glb.import').read_text()
 def keep_uid(path,text):
     if path.exists():
@@ -18,6 +20,7 @@ for glb in KIT.glob('*.glb'):
     text=re.sub(r'^path=.*$',f'path="{imported}"',text,flags=re.M)
     text=re.sub(r'^source_file=.*$',f'source_file="{relative}"',text,flags=re.M)
     text=re.sub(r'^dest_files=.*$',f'dest_files=["{imported}"]',text,flags=re.M)
+    text=text.replace('import_script/path=""','import_script/path="res://assets/rooms/tackle_shop/material_import.gd"')
     target=glb.with_suffix('.glb.import');target.write_text(keep_uid(target,text))
 tex_template=(ROOT/'assets/rooms/post_office/room_albedo_ao.png.import').read_text()
 relative='res://assets/rooms/tackle_shop/room_albedo_ao.png'
@@ -26,6 +29,11 @@ text=tex_template.replace(old_hash,hashlib.md5(relative.encode()).hexdigest()).r
 text=re.sub(r'^uid=.*\n','',text,flags=re.M)
 target=KIT/'room_albedo_ao.png.import';target.write_text(keep_uid(target,text))
 subprocess.run([sys.executable,str(ROOT/'tools/dev/scene_bench/prepare.py'),'tackle_shop','--output',str(DEST)],check=True)
+if importer_changed:
+    # Invalidate only this task's generated scene caches after importer changes.
+    # Godot can otherwise retain scenes from a previous failed post-import.
+    for glb in KIT.glob('*.glb'):
+        for cached in (DEST/'.godot/imported').glob(glb.name+'-*.scn'):cached.unlink()
 project=DEST/'project.godot'
 project.write_text(project.read_text().replace('SensenSceneBench','SensenTackle214QA'))
 shutil.copy2(ROOT/'tools/art/review_tackle_shop.gd',DEST/'review.gd')

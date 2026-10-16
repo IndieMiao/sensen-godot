@@ -1,0 +1,35 @@
+{
+  "programs": [],
+  "stream_groups": [],
+  "streams": [
+    {
+      "codec_name": "h264",
+      "width": 960,
+      "height": 720
+    }
+  ],
+  "format": {
+    "duration": "15.000000"
+  },
+  "frame_checks": [
+    {
+      "time_seconds": 0.5,
+      "luma_mean": 198.37890625,
+      "luma_std": 48.98464149025397,
+      "nonblack_nonuniform": true
+    },
+    {
+      "time_seconds": 7.5,
+      "luma_mean": 198.13020833333334,
+      "luma_std": 49.38710267239074,
+      "nonblack_nonuniform": true
+    },
+    {
+      "time_seconds": 14.0,
+      "luma_mean": 198.1279296875,
+      "luma_std": 49.401162384427316,
+      "nonblack_nonuniform": true
+    }
+  ],
+  "image_content_valid": true
+}

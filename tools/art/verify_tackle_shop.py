@@ -7,6 +7,7 @@ negative control deliberately places the fish board through the counter.
 from pathlib import Path
 import sys, json, math, hashlib, itertools
 import numpy as np
+import bpy
 from mathutils import Vector, Matrix
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[2]
@@ -47,7 +48,11 @@ def main():
         expected=next(a for a in stats['assets'] if a['name']==name)
         check(len(g['tris'])==expected['triangles'],name+' triangle count matches binary')
         check(len(doc['meshes'])==1 and len(doc['meshes'][0]['primitives'])==1,name+' one mesh/surface')
-        check(not doc.get('images') and not doc.get('textures'),name+' does not embed atlas')
+        check(doc.get('images')==[{'uri':'room_albedo_ao.png'}],name+' references the one external atlas; no embedded texture')
+        mat=doc['materials'][prim['material']]
+        glass=row.get('material')=='glass'
+        check(mat['name']==('TackleFishbowlGlass' if glass else 'TackleRoomAtlas'),name+' surface owns intended material')
+        check(mat['alphaMode']==('BLEND' if glass else 'OPAQUE') and mat['pbrMetallicRoughness']['baseColorFactor'][3]==(.075 if glass else 1),name+' authored alpha mode')
         check('gltf/texture_map_mode=1' in (KIT/(row['file']+'.import')).read_text(),name+' import texture map mode 1')
         uv=np.array(accessor(doc,g['data'],prim['attributes']['TEXCOORD_0']))
         check(np.isfinite(uv).all() and uv.min()>=0 and uv.max()<=1,name+' finite bounded atlas UV')
@@ -87,7 +92,7 @@ def main():
     report['unexpected_intersections']=unexpected
     check(not unexpected,'No unexpected module-to-module or module-to-wall mesh crossing')
     # Deliberate failure proves the checker actually catches a penetrated counter.
-    bad=get_mesh(rows['fish_board'],{'position':[-.36,.70,-1.16],'yaw_degrees':0})
+    bad=get_mesh(rows['fish_board'],{'position':[-.36,.70,-1.62],'yaw_degrees':0})
     hits=bad['bvh'].overlap(placed['curved_counter']['bvh'])
     check(len(hits)>0,'Negative control: fish board penetrating counter is detected')
     report['negative_control_triangle_pairs']=len(hits)
@@ -105,6 +110,20 @@ def main():
         clearances[anchor['name']]={'nearest_module_aabb':closest,'horizontal_clearance_m':worst}
         check(worst>=.21-.0001,anchor['name']+' clears .21m avatar radius (conservative bounds)')
     report['standing_clearances']=clearances
+    source=ROOT/'tools/art/source/tackle_shop/tackle_shop.blend'
+    bpy.ops.wm.open_mainfile(filepath=str(source))
+    bpy.context.view_layer.update()
+    collections={c.name for c in bpy.data.collections}
+    check(all('KIT_'+name in collections for name in rows),'Editable Blender source contains every named runtime module')
+    meshes=[o for o in bpy.data.objects if o.type=='MESH']
+    check(len(meshes)>len(rows)*5,'Editable source retains construction parts rather than flattened GLBs')
+    rug=next(o for o in meshes if o.name.startswith('Deep blue circular rug with baked woven anchor'))
+    check(abs(rug.dimensions.x-2.6)<.0001 and abs(rug.dimensions.y-2.6)<.0001,'Actual Blender rug body diameter is 2.60 m')
+    check(all((ROOT/p).is_file() for p in ['tools/art/build_tackle_shop.py','tools/art/finalize_tackle_atlas.py','tools/art/verify_tackle_shop.py',
+          'scenes/tackle_shop/tackle_shop_art.tscn','scenes/tackle_shop/tackle_shop_art.gd','assets/rooms/tackle_shop/material_import.gd']),
+          'Generator, validator, assembly scene and surface importer are delivered')
+    report['editable_source']={'file':str(source.relative_to(ROOT)),'sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+        'module_collections':len([c for c in collections if c.startswith('KIT_')]),'mesh_objects':len(meshes),'rug_diameter_m':float(rug.dimensions.x)}
     report['failures']=[r for r in report['checks'] if not r['passed']]
     (OUT/'glb-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('TACKLE_BINARY',len(report['checks']),'checks',len(report['failures']),'failures',flush=True)

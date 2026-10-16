@@ -59,8 +59,17 @@ func audit():
 			count += m.mesh.get_faces().size()/3; surface_count += m.mesh.get_surface_count()
 			var box = group.global_transform.affine_inverse() * m.global_transform * m.mesh.get_aabb()
 			bounds = box if first else bounds.merge(box); first = false
-			check(m.material_override.albedo_texture.get_size() == Vector2(2048,2048), "2048 atlas: " + a.name)
-			check(is_equal_approx(m.material_override.metallic_specular, .28), "Matte specular .28: " + a.name)
+			check(m.material_override == null, "No node-wide material override: " + a.name)
+			for index in m.mesh.get_surface_count():
+				var material = m.get_active_material(index)
+				check(material == m.mesh.surface_get_material(index) and m.get_surface_override_material(index) == null,
+					"Imported per-surface material retained: " + a.name)
+				check(material.albedo_texture != null and material.albedo_texture.get_size() == Vector2(2048,2048), "2048 atlas: " + a.name)
+				check(is_equal_approx(material.metallic_specular, .28), "Matte specular .28: " + a.name)
+				if a.name == "fishbowl_glass":
+					check(material.transparency in [BaseMaterial3D.TRANSPARENCY_ALPHA,BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS] and is_equal_approx(material.albedo_color.a,.075), "Imported glass alpha .075")
+				else:
+					check(material.transparency == BaseMaterial3D.TRANSPARENCY_DISABLED, "Opaque surface: " + a.name)
 		var row = expected.assets.filter(func(s): return s.name == a.name)[0]
 		check(count == row.triangles and surface_count == 1, "Imported count/surface: " + a.name)
 		report.assets[a.name] = {"triangles": count, "surfaces": surface_count, "bounds": [xyz(bounds.position), xyz(bounds.end)]}
@@ -69,6 +78,9 @@ func audit():
 		total += report.assets[i.asset].triangles; surfaces += report.assets[i.asset].surfaces
 	check(total <= 200000 and total == expected.scene_triangles, "Placed room triangle budget")
 	check(surfaces <= 60 and surfaces == expected.static_draw_surfaces, "Placed room surface budget")
+	check(room.find_children("*","DirectionalLight3D",true,false).is_empty() and room.find_children("*","WorldEnvironment",true,false).is_empty(),
+		"Environment and sunlight belong to consumer")
+	check(room.find_children("*","OmniLight3D",true,false).size() == 3, "Three authored local lamp lights")
 	check(report.assets.rod_rack.triangles + report.assets.float_barrel.triangles <= 1200, "Rod rack plus float barrel <= 1200")
 	check(room.get_node("rod_rack").position.z - .50 > -1.37 + .64, "Rod tips beside porthole aperture")
 	for id in ["npc_keeper", "stand_counter", "npc_kai", "stand_kai", "npc_rafa", "stand_rafa", "use_fish_board", "stand_fish_board", "spawn", "exit", "badge_exit"]:
@@ -91,14 +103,19 @@ func run():
 	layout = JSON.parse_string(FileAccess.get_file_as_string(KIT + "layout.json"))
 	setup(); audit()
 	pose(Vector3(0,1.20,0),10.2); await capture("whole-43deg")
+	for light in room.find_children("*","OmniLight3D",true,false):light.visible=false
+	await capture("whole-lamps-off")
+	for light in room.find_children("*","OmniLight3D",true,false):light.visible=true
 	vp.size = Vector2i(360,800); pose(Vector3(-.05,1.1,-.10),6.72); await capture("game-360-6p72m")
 	report.game_anchor_projections = {}
 	for id in ["npc_keeper", "npc_kai", "npc_rafa", "spawn", "exit", "use_fish_board"]:
 		var point = camera.unproject_position(room.get_node(id).global_position)
 		report.game_anchor_projections[id] = [point.x, point.y]
 	vp.size = Vector2i(1440,1080)
-	pose(Vector3(-.36,1.25,-1.10),3.8,28,12); await capture("counter")
+	pose(Vector3(-.36,1.25,-1.56),3.8,28,12); await capture("counter")
 	pose(Vector3(-2.88,1.0,-.10),2.7,18,80); await capture("rod-rack")
+	pose(Vector3(-2.80,2.20,.84),2.8,12,80); await capture("wall-decoration")
+	pose(Vector3(-2.70,.65,-1.65),2.1,30,65); await capture("rope-crate")
 	pose(Vector3(-2.43,.78,1.98),2.35,35,45); await capture("kai-corner")
 	pose(Vector3(2.75,.65,-1.0),2.45,35,38); await capture("rafa-corner")
 	vp.size = Vector2i(1440,1440)

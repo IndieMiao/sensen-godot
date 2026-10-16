@@ -4,29 +4,24 @@ extends Node3D
 const KIT := "res://assets/rooms/tackle_shop/"
 var layout: Dictionary
 var assets: Dictionary = {}
-var materials: Dictionary = {}
 
 func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string(KIT + "layout.json"))
-	var plain := StandardMaterial3D.new()
-	plain.resource_name = "TackleRoomSharedAtlas"
-	plain.albedo_texture = load(KIT + "room_albedo_ao.png")
-	plain.roughness = .80
-	plain.metallic_specular = .28
-	plain.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	materials.plain = plain
-	var glass := plain.duplicate() as StandardMaterial3D
-	glass.resource_name = "TackleFishbowlGlass"
-	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	glass.albedo_color = Color(1, 1, 1, .075)
-	glass.roughness = .20
-	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
-	materials.glass = glass
 	for asset in layout.assets:
 		assets[asset.name] = asset
 		_add_asset(asset, asset)
 	for placement in layout.instances:
 		_add_asset(assets[placement.asset], placement)
+	for spec in layout.get("local_lights", []):
+		var light := OmniLight3D.new()
+		light.name = spec.name
+		light.position = _vec(spec.position)
+		light.light_color = Color(spec.color)
+		light.light_energy = float(spec.energy)
+		light.omni_range = float(spec.range)
+		light.omni_attenuation = float(spec.get("attenuation", 1.6))
+		light.shadow_enabled = false
+		add_child(light)
 	for anchor in layout.anchors:
 		var marker := Marker3D.new()
 		marker.name = anchor.name
@@ -49,17 +44,28 @@ func _add_asset(asset: Dictionary, placement: Dictionary) -> void:
 	var model := (load(KIT + asset.file) as PackedScene).instantiate()
 	container.add_child(model)
 	for node in model.find_children("*", "MeshInstance3D", true, false):
-		node.material_override = materials[asset.get("material", "plain")]
+		# Imported surfaces retain their own opaque/glass materials and shared atlas.
 		node.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 		if not asset.get("cast_shadow", true):
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	for c in asset.colliders:
+	for index in asset.get("colliders", []).size():
+		var c: Dictionary = asset.colliders[index]
 		var body := StaticBody3D.new()
+		body.name = "Collider_%02d" % index
 		body.position = _vec(c.at)
 		body.rotation_degrees = _vec(c.get("rotation", [0, 0, 0]))
-		var box := BoxShape3D.new()
-		box.size = _vec(c.size)
+		var volume: Shape3D
+		if c.get("kind", "box") == "cylinder":
+			var cylinder := CylinderShape3D.new()
+			cylinder.radius = float(c.radius)
+			cylinder.height = float(c.height)
+			volume = cylinder
+		else:
+			var box := BoxShape3D.new()
+			box.size = _vec(c.size)
+			volume = box
 		var shape := CollisionShape3D.new()
-		shape.shape = box
+		shape.name = "Shape"
+		shape.shape = volume
 		body.add_child(shape)
 		container.add_child(body)
