@@ -50,6 +50,36 @@ export function cityOutposts(c: P0Content, cluster: string): CityOutpost[] {
     .map(o => ({ id: o.id, role: o.role, residents: o.residents, at: { lat: o.lat, lng: o.lng }, nearest: o.nearest?.name }));
 }
 
+/** q(204): a city's Mine Huts (generated cities only: the written city has none). Not outposts: no keeper or counter. */
+export function cityHuts(c: P0Content, cluster: string): CityOutpost[] {
+  return (cityPlaces(c, cluster)?.detail.huts ?? []).map(h => ({ id: h.id, role: h.role, residents: h.residents, at: { lat: h.lat, lng: h.lng } }));
+}
+
+/** The cities that have a Mine Hut (q(204) ①): those with the hut rule's trait in the hand table (world.coastal),
+ * once world.room has the room; the generator decides each (its tier). A short list: never the 12,000 clusters. */
+export function hutCities(c: P0Content): string[] {
+  const w = worldOf(c), rule = w?.placement.hut;
+  if (!w || !rule || !w.room.mine_hut) return [];
+  return Object.keys(w.coastal).filter(id => !id.startsWith('_') && (w.coastal[id] ?? []).includes(rule.needs) && cityHuts(c, id).length > 0);
+}
+
+/** The huts a resident lives in (Ivo, q(204) ④), in any city. */
+const hutsOf = (c: P0Content, resident: string) => hutCities(c).flatMap(cl => cityHuts(c, cl)).filter(h => h.residents.includes(resident));
+
+/**
+ * Where this player finds a resident (the map pin, the Today `Show on map`, view.residents[id].place): Pip at the home
+ * city's travel post (q(162) ③); anyone else at their outpost in the home city; a hut dweller (Ivo) in a hut, whatever
+ * the home city — the hut of the city last visited, else the first (P1 has one, Denver's). Null: not found.
+ */
+export function residentPlace(c: P0Content, s: P0State, resident: string): string | null {
+  if (resident === 'res_pip') return homeSetOf(c, s)?.post ?? null;
+  const own = cityOutposts(c, homeOf(c, s)).find(o => o.residents.includes(resident));
+  if (own) return own.id;
+  const huts = hutsOf(c, resident);
+  const last = (id: string) => s.travel.visits[clusterOf(c, id) ?? '']?.last_at ?? -1;
+  return huts.sort((a, b) => last(b.id) - last(a.id))[0]?.id ?? null;
+}
+
 /** A city's ponds: the written city's hand-written ones, another's generated. */
 export function cityPonds(c: P0Content, cluster: string): CityPond[] {
   if (cluster === writtenCluster(c)) {
@@ -211,7 +241,8 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   const oldEnd = hold ? rolloverAfter(c, s, hold.key) : 0;
   if (from !== city) {
     for (const [id, r] of Object.entries(s.residents)) {
-      if (r.req && !livesIn(c, city, id)) { dropped.push(r.req.id); r.req = null; }
+      // q(204): a hut dweller (Ivo) lives where his hut is, whatever the home: his request stays
+      if (r.req && !livesIn(c, city, id) && !hutsOf(c, id).length) { dropped.push(r.req.id); r.req = null; }
     }
     const v = t.visits[from];
     if (!v) t.visits[from] = { n: 1, first_at: t.home_chosen_at ?? s.created_at, last_at: now, deliveries: 0, delivered_day: '' };

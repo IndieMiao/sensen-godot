@@ -249,7 +249,7 @@ describe('global generation (SGODOT-280)', () => {
     const fixes = Object.entries(w.overrides ?? {}).filter(([k]) => !k.startsWith('_')) as [string, PlaceFix][];
     expect(fixes.length).toBeGreaterThan(0);
     const fixed = new Set(fixes.map(([id]) => id));
-    const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts];
+    const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts, ...x.detail.huts];
     const saved = w.overrides;
     for (const [id, fix] of fixes) {
       const cluster = id.slice(0, id.indexOf('~'));
@@ -261,8 +261,10 @@ describe('global generation (SGODOT-280)', () => {
       expect(was, `${id} is a place the generator makes`).toBeDefined();
       if (fix.lat !== undefined) expect(now).toMatchObject({ lat: fix.lat, lng: fix.lng });
       // to the nearest land that keeps the rules, a stuck group (pond, shop, square) up to 8 km as the batch's wide search;
-      // never across the country (a swapped lat / lng)
-      expect(km(was!, now!)).toBeLessThanOrEqual(8);
+      // never across the country (a swapped lat / lng); a Mine Hut is placed by hand where the city's high side is
+      // (q(204) ②: Denver's 12–16 km out toward Golden), not nudged off water
+      if (id.endsWith('~hut0')) expect(km(full.get(cluster)!, now!)).toBeLessThanOrEqual(16);
+      else expect(km(was!, now!)).toBeLessThanOrEqual(8);
       const tackle = city.detail.outposts.find(o => o.id === id && o.role === 'tackle');
       if (tackle) expect(km(tackle, city.detail.ponds.find(p => p.name === tackle.nearest!.name)!) * 1000).toBeLessThanOrEqual(300);
       expect(all(city).filter(p => !fixed.has(p.id))).toEqual(all(bare).filter(p => !fixed.has(p.id)));
@@ -295,7 +297,7 @@ describe('global generation (SGODOT-280)', () => {
     expect(Object.keys(table!.fixes).length).toBeGreaterThan(1000);
     for (const [cluster, ids] of byCity) {
       const bare = generateCity(c, full.get(cluster)!, { water: false }), city = cityPlaces(c, cluster) ?? generateCity(c, full.get(cluster)!);
-      const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts];
+      const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts, ...x.detail.huts];
       for (const id of ids) {
         const [lat, lng, fromLat, fromLng] = table!.fixes[id];
         expect(hand.has(id), `${id} has a hand fix`).toBe(false);
@@ -332,14 +334,17 @@ describe('residents wait for their rooms (q(193) ②, 周瑜 on #400)', () => {
     o.world = world;
     return o;
   };
-  const highland = { ...w, coastal: { ...w.coastal, [town.id]: ['highland'] } };
+  const { mine_hut: _hut, ...unbuilt } = w.room;
+  const highland = { ...w, coastal: { ...w.coastal, [town.id]: ['highland'] }, room: unbuilt } as WorldContent;
 
   it('Ivo stays out of a trading post until the mine hut is a room; the next in order takes the seat', () => {
     const cabin = generateCity(withWorld(highland), town, { water: false }).detail.outposts[0];
     expect(cabin.residents).not.toContain('res_ivo');
     expect(cabin.residents).toEqual([w.residents!.fixed.post, 'res_theo']);
-    const hut = { ...highland, room: { ...w.room, mine_hut: w.room.cabin } } as WorldContent;
-    expect(generateCity(withWorld(hut), town, { water: false }).detail.outposts[0].residents).toContain('res_ivo');
+    // q(204) ④: once the hut is live an S-tier highland town (too small for a hut of its own) has him by the order again
+    const live = generateCity(withWorld({ ...highland, room: w.room } as WorldContent), town, { water: false });
+    expect(live.detail.huts).toEqual([]);
+    expect(live.detail.outposts[0].residents).toContain('res_ivo');
   });
 });
 

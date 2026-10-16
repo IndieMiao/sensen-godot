@@ -23,7 +23,7 @@ import { BOARDS, handIn, slotCount } from './boards.js';
 import { pondFishIds } from './fishing_world.js';
 import type { EventVenue, Need, OutpostDef, P0Content, ShopId } from './content.js';
 import { homeFacts, homeOf, type Homed } from './home.js';
-import { cityOutposts, cityPonds, homeSetOf } from './home_city.js';
+import { cityHuts, cityOutposts, cityPonds, homeSetOf, hutCities, residentPlace } from './home_city.js';
 import { clusterOf } from './travel.js';
 import { matches } from './requests.js';
 import { progressOf, requestState, stageIndex } from './residents.js';
@@ -51,9 +51,14 @@ export function litEvents(c: P0Content, now: number): EventVenue[] {
 }
 const ACQUAINTED = 1;   // c.affinity.stages[1]: the second page of talk opens here
 
-/** Where a resident's pin goes: their outpost in the player's home city (Pip: home's travel post, q(162) ③). */
-const residentHome = (c: P0Content, s: P0State, id: string) =>
-  id === 'res_pip' ? homeSetOf(c, s)?.post ?? null : cityOutposts(c, homeOf(c, s)).find(o => o.residents.includes(id))?.id ?? null;
+/** Where a resident's pin goes (home_city.residentPlace): their outpost in the home city, Pip home's travel post
+ * (q(162) ③), Ivo his Mine Hut in any city — there only once that city has been visited (q(204) ⑦, §9.5.1). */
+const residentHome = (c: P0Content, s: P0State, id: string) => {
+  const place = residentPlace(c, s, id), city = place ? clusterOf(c, place) : null;
+  return place && city && (city === homeOf(c, s) || s.travel.visits[city]) ? place : null;
+};
+/** The huts of the cities the player has been to (q(204) ⑦: their ◆ like an outpost's). */
+const visitedHuts = (c: P0Content, s: P0State) => hutCities(c).filter(cl => s.travel.visits[cl]).flatMap(cl => cityHuts(c, cl));
 
 /** The ◆ keys an outpost holds right now: level-gated goods on its counter not yet owned, residents at Acquainted. */
 export function newKeysAt(c: P0Content, s: P0State, o: OutpostDef): { key: string; item?: string; resident?: string }[] {
@@ -74,7 +79,7 @@ export function newKeysAt(c: P0Content, s: P0State, o: OutpostDef): { key: strin
 
 /** Walking into an outpost looks at what is new there (q(48): seen once in the shop). */
 export function noteSeenAt(c: P0Content, s: P0State, place: string): void {
-  const city = clusterOf(c, place), o = city ? cityOutposts(c, city).find(x => x.id === place) : undefined;
+  const city = clusterOf(c, place), o = city ? [...cityOutposts(c, city), ...cityHuts(c, city)].find(x => x.id === place) : undefined;
   if (!o) return;
   s.seen ??= [];
   for (const { key } of newKeysAt(c, s, o)) if (!s.seen.includes(key)) s.seen.push(key);
@@ -145,7 +150,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
       all.push({ place, kind: 'request', why: { request: q.id, resident: id } });
     }
   }
-  for (const o of cityOutposts(c, homeOf(c, s))) {
+  for (const o of [...cityOutposts(c, homeOf(c, s)), ...visitedHuts(c, s)]) {
     for (const k of newKeysAt(c, s, o)) {
       if (s.seen?.includes(k.key)) continue;
       all.push({ place: o.id, kind: 'new', why: { ...(k.item ? { item: k.item } : {}), ...(k.resident ? { resident: k.resident } : {}) } });
