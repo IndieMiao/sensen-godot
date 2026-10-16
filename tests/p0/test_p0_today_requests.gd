@@ -63,7 +63,7 @@ func test_market_and_stall_requests_taken_and_untaken() -> void:
 	assert_array(_lines(v)).contains(["Dusk Haul · Fine fish 1/4"]).not_contains(["Crate of Radishes · Radish 2/10"])
 	v.boards.market.slots[0].merge({"have": 4, "ready": true}, true)
 	var rows := P0Logic.today_rows(v)
-	assert_that([rows[0].line, rows[0].go]).is_equal(["Dusk Haul · Deliver at %s" % P0Outposts.by_role("market").name, "outpost:market"])
+	assert_that([rows[0].line, rows[0].go]).is_equal(["Dusk Haul · Deliver at %s" % P0Outposts.by_role("market").name, "outpost:sh_market_1"])
 	v.boards.stall.slots[0].status = "accepted"
 	v.boards.stall.slots[0].merge({"have": 10, "ready": true}, true)
 	assert_array(_lines(v)).contains(["Crate of Radishes · Deliver at the Stall"])

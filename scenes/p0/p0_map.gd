@@ -45,6 +45,7 @@ func _ready() -> void:
 	CityMapData.set_region_provider(P0Clusters.region)   # every cluster is a city of the map (SGODOT-275)
 	super._ready()
 	rt.attach(self)
+	_load_city_places(P0Travel.home(_view()))   # a generated home's own places (SGODOT-303); the written city's are in the client
 	for child in $HUD/SafeArea/Root.get_children():
 		if child.name == "AccountButton" or child is LanguageButton: child.hide()
 
@@ -237,7 +238,10 @@ func _prewarm_pond(id: String) -> void:
 
 func _set_outpost_places() -> void:
 	var places: Array = P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
-	for cluster in _shown_cities:   # other cities' outposts (SGODOT-280), once their places are in
+	var cities: Array = _shown_cities.duplicate()
+	var home := P0Travel.home(_view())
+	if not P0Travel.home_is_written(_view()) and not cities.has(home): cities.push_front(home)   # a generated home's, always
+	for cluster in cities:   # other cities' outposts (SGODOT-280), once their places are in
 		for o in P0CityPlaces.city(cluster).get("outposts", []):
 			var e := P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 			e["cluster"] = cluster
@@ -629,15 +633,13 @@ func frame_must() -> Array:
 		if marked.has(str(e.get("id", ""))): out.append((e as Dictionary).merged({marker = marked[str(e.id)]}, true))
 	return out
 
-## The home set it adds while they fit, nearest the avatar first: each role's outpost nearest home, and away from home
-## the Homestead pin; pins already in frame_must are not repeated.
+## The home set it adds while they fit, nearest the avatar first: the player's home-set outpost of each role, and away
+## from home the Homestead pin; pins already in frame_must are not repeated.
 func frame_optional() -> Array:
-	var nearest := {}   # role -> outpost
-	for o in P0Outposts.all():
-		var e := P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
-		var r := str(o.role)
-		if not nearest.has(r) or city_map._home_distance(e) < city_map._home_distance(nearest[r]): nearest[r] = e
-	var out: Array = nearest.values()
+	var out: Array = []   # the player's home set (SGODOT-311: a generated home's, not the written city's), one a role
+	for r in ["tackle", "tea", "post", "market"]:
+		var o := P0Outposts.home(_view(), r)
+		if not o.is_empty(): out.append(P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
 	if away(): out.append(home_entry())
 	var must := frame_must().map(func(x): return str(x.get("id", "")))
 	out = out.filter(func(x): return not must.has(str(x.get("id", ""))))
@@ -1194,7 +1196,7 @@ var _shown_cities: Array = []
 const SHOWN_CITIES := 6   # the cities whose pins stay on the map, the latest last
 
 func _load_city_places(cluster: String) -> void:
-	if cluster == "" or rt == null or cluster == P0Travel.home(_view()): return
+	if cluster == "" or rt == null or cluster == P0Travel.written(): return   # hand-written: in the client already
 	P0CityPlaces.fetch(rt.session, cluster, _show_city_places.bind(cluster))
 
 func _show_city_places(_city: Dictionary, cluster: String) -> void:
@@ -1316,7 +1318,7 @@ func city_regions() -> Array:
 	if not _asked.is_empty(): add.call(_asked, BUBBLE_OPENED)
 	if opened != "": add.call(P0Clusters.region(opened), BUBBLE_OPENED)
 	if here != "": add.call(P0Clusters.region(here), BUBBLE_HERE)
-	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)), BUBBLE_HOME)
+	add.call(P0Clusters.region(P0Travel.home(_view())), BUBBLE_HOME)
 	# Visited cities at any zoom, whatever their size (不知火舞 on #216): the player's own map of where they have been —
 	# their dots always, their bubbles as they fit (q(153))
 	var visited: Array = P0Travel.explored(_view()).filter(func(cl): return at_screen.call(cl) != null)
@@ -1454,7 +1456,9 @@ func place_for(target: String) -> Dictionary:
 	if target == "home": return {"lat": home_lat, "lng": home_lng}
 	if target.begins_with("outpost:"):
 		var key := target.trim_prefix("outpost:")
-		var o := P0Outposts.find(key) if key.find("~") > 0 else P0Outposts.by_role(key)   # another city's by id (SGODOT-280)
+		# by id (a generated city's, SGODOT-280, or the written city's), else a role: the player's home-set outpost of it
+		var o := P0Outposts.find(key)
+		if o.is_empty(): o = P0Outposts.home(_view(), key)
 		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 	if target.begins_with("pond:"):
 		var id := target.trim_prefix("pond:")
