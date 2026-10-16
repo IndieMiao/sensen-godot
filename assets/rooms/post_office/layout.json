@@ -312,9 +312,9 @@
       "name": "packing_table",
       "file": "packing_table.glb",
       "position": [
-        -1.0,
+        -0.68,
         0.082,
-        2.2
+        2.3
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -338,9 +338,9 @@
       "name": "packing_stool",
       "file": "packing_stool.glb",
       "position": [
-        -1.0,
+        1.05,
         0.087,
-        1.15
+        2.6
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -546,9 +546,9 @@
       "name": "packing_dressing",
       "file": "packing_dressing_215.glb",
       "position": [
-        -1.31,
+        -0.99,
         0,
-        0.5600000000000003
+        0.6599999999999999
       ],
       "yaw_degrees": 0,
       "colliders": [],
@@ -572,9 +572,9 @@
       "name": "stamp_desk_set",
       "file": "stamp_desk_set.glb",
       "position": [
-        -1.21,
+        -0.89,
         1.122,
-        2.16
+        2.26
       ],
       "yaw_degrees": 0,
       "colliders": [],
@@ -613,7 +613,7 @@
       "position": [
         -2.75,
         0.084,
-        2.34
+        2.7
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -663,9 +663,9 @@
       "name": "mail_sack_left",
       "file": "mail_sack_reused.glb",
       "position": [
-        -2.75,
+        -2.25,
         0.082,
-        2.81
+        2.77
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -694,9 +694,9 @@
       "name": "compass_rug",
       "file": "compass_rug.glb",
       "position": [
-        1.4,
+        1.62,
         0.083,
-        1.15
+        1.0
       ],
       "yaw_degrees": 0,
       "colliders": [],
@@ -721,9 +721,9 @@
       "position": [
         -2.75,
         0.468,
-        2.34
+        2.75
       ],
-      "yaw_degrees": 90
+      "yaw_degrees": 0
     },
     {
       "name": "brown_parcel_door",
@@ -1297,6 +1297,23 @@
       }
     }
   },
+  "review_clearance": {
+    "entry_route": {
+      "from": [
+        -2.65,
+        0.08,
+        1.15
+      ],
+      "to": [
+        1.2,
+        0.08,
+        1.15
+      ],
+      "width": 1.0
+    },
+    "rug_diameter": 2.2,
+    "pip_outside_route": true
+  },
   "suggested_anchors": {
     "use_counter": {
       "name": "use_counter",
@@ -1345,27 +1362,27 @@
     "npc_pip": {
       "name": "npc_pip",
       "position": [
-        -2.1,
+        -2.48,
         0.08,
-        1.2
+        2.26
       ],
       "yaw_degrees": 180
     },
     "stand_pip": {
       "name": "stand_pip",
       "position": [
-        -1.65,
+        -2.48,
         0.08,
-        0.7
+        1.65
       ],
       "yaw_degrees": 90
     },
     "use_stamp_desk": {
       "name": "use_stamp_desk",
       "position": [
-        -1.0,
-        1.1,
-        2.2
+        -0.68,
+        1.097,
+        2.3
       ],
       "module": "packing_table"
     },
@@ -1381,7 +1398,7 @@
     "npc_sam": {
       "name": "npc_sam",
       "position": [
-        2.45,
+        2.3,
         0.08,
         0.85
       ],
@@ -1420,6 +1437,15 @@
         2.45,
         1.29
       ]
+    },
+    "stand_stamp_desk": {
+      "name": "stand_stamp_desk",
+      "position": [
+        -0.68,
+        0.08,
+        1.29
+      ],
+      "yaw_degrees": 0
     }
   },
   "revision_215": {

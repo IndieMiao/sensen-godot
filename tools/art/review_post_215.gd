@@ -115,13 +115,22 @@ func physics_audit(room,layout):
 	var body=CharacterBody3D.new();var capsule=CapsuleShape3D.new();capsule.radius=.21;capsule.height=1.745
 	var cs=CollisionShape3D.new();cs.shape=capsule;cs.position.y=.8725;body.add_child(cs);world.add_child(body)
 	await get_tree().physics_frame;await get_tree().physics_frame
-	var paths=[["door to counter",Vector3(-2.6,.085,1.29),Vector3(-1.65,.085,.40)],["Pip approach",Vector3(-1.65,.085,.70),Vector3(-2.10,.085,1.20)],["Sam approach",Vector3(1.75,.085,.85),Vector3(2.45,.085,.85)],["central aisle",Vector3(-1.65,.085,.4),Vector3(1.75,.085,.4)]]
+	var paths=[["door to counter",Vector3(-2.6,.085,1.29),Vector3(-1.65,.085,.40)],["Pip approach",vec(layout.suggested_anchors.stand_pip.position)+Vector3(0,.005,0),vec(layout.suggested_anchors.npc_pip.position)+Vector3(0,.005,0)],["Sam approach",Vector3(1.75,.085,.85),Vector3(2.45,.085,.85)],["central aisle",Vector3(-1.65,.085,.4),Vector3(1.75,.085,.4)]]
 	for path in paths:
 		body.position=path[1];var hit=body.move_and_collide(path[2]-path[1]);check(hit==null,path[0]+" actual player capsule clear")
 		if hit:report[path[0]+"_blocked"]=str(hit.get_collider().get_path())
-	for key in ["npc_pip","npc_sam","npc_keeper"]:
+	for key in ["npc_pip","npc_sam","npc_keeper","stand_stamp_desk"]:
 		var q=PhysicsShapeQueryParameters3D.new();q.shape=capsule;q.transform.origin=vec(layout.suggested_anchors[key].position)+Vector3(0,.878,0);q.exclude=[body.get_rid()]
 		var hits=world.get_world_3d().direct_space_state.intersect_shape(q);check(hits.is_empty(),key+" stationary capsule clear")
+	# A 1.00 m wide upright box sweeps the full entry route, including furniture.
+	cs.shape=BoxShape3D.new();cs.shape.size=Vector3(.04,1.745,1.0)
+	body.position=vec(layout.review_clearance.entry_route.from)+Vector3(0,.005,0)
+	var wide_hit=body.move_and_collide(vec(layout.review_clearance.entry_route.to)-vec(layout.review_clearance.entry_route.from))
+	check(wide_hit==null,"1.00 m wide entry corridor clear in actual physics")
+	if wide_hit:report.entry_corridor_blocker=str(wide_hit.get_collider().get_path())
+	body.position=Vector3(-2.91,.085,1.29)
+	var turn_hit=body.move_and_collide(vec(layout.review_clearance.entry_route.from)+Vector3(0,.005,0)-body.position)
+	check(turn_hit==null,"1.00 m wide entry turn from door centre clear")
 	body.free()
 func post_review():
 	var layout=JSON.parse_string(FileAccess.get_file_as_string(KIT+"layout.json"))
@@ -167,6 +176,10 @@ func post_review():
 		for j in range(i+1,keys.size()):
 			var a=keys[i];var b=keys[j];var dist=pts[a].distance_to(pts[b]);var tag_dist=tagpts[a].distance_to(tagpts[b])
 			check(dist>=44 and tag_dist>=44,a+" / "+b+" >=44px both feet and tags");report.npc_distances.append({"a":a,"b":b,"feet_px":dist,"tag_px":tag_dist})
+	var desk_screen=camera.unproject_position(vec(layout.suggested_anchors.use_stamp_desk.position))
+	var pip_desk=pts.npc_pip.distance_to(desk_screen)
+	check(pip_desk>=44,"Pip / stamp desk interaction >=44px")
+	report.pip_stamp_desk_px=pip_desk
 	for key in tagpts:
 		var label=Label.new();heading.get_parent().add_child(label);label.text={"npc_pip":"Pip","npc_sam":"Sam","npc_keeper":"Sigrid","exit":"Exit"}[key];label.position=tagpts[key]+Vector2(-15,-12);label.add_theme_font_size_override("font_size",12);label.add_theme_color_override("font_color",Color("253e4a"));label.add_theme_color_override("font_outline_color",Color("fffdf4"));label.add_theme_constant_override("outline_size",4)
 	await capture("post_npc_positions_360")

@@ -2362,6 +2362,34 @@
         "passed": true
       },
       {
+        "check": "rug actual diameter 2.20 m",
+        "passed": true
+      },
+      {
+        "check": "packing_table outside 1m entry strip",
+        "passed": true
+      },
+      {
+        "check": "packing_dressing outside 1m entry strip",
+        "passed": true
+      },
+      {
+        "check": "stamp_desk_set outside 1m entry strip",
+        "passed": true
+      },
+      {
+        "check": "packing_stool outside 1m entry strip",
+        "passed": true
+      },
+      {
+        "check": "Pip capsule outside entry route",
+        "passed": true
+      },
+      {
+        "check": "desk away from fee board wall interval",
+        "passed": true
+      },
+      {
         "check": "positive control detects tabletop penetration",
         "passed": true
       }
@@ -2370,24 +2398,24 @@
       "compass_rug": {
         "bounds": [
           [
-            -0.949999988079071,
+            -1.100000023841858,
             0.0,
-            -0.949999988079071
+            -1.100000023841858
           ],
           [
-            0.949999988079071,
+            1.100000023841858,
             0.012799999676644802,
-            0.949999988079071
+            1.100000023841858
           ]
         ],
         "size_xyz": [
-          1.899999976158142,
+          2.200000047683716,
           0.012799999676644802,
-          1.899999976158142
+          2.200000047683716
         ],
         "triangles": 784,
         "surfaces": 1,
-        "sha256": "180d8862a85d3bd7efca333da4d859756b8595ee501729663aaf23af86415a4d"
+        "sha256": "b9cde5ac5deb27ae7d193459ad7174931bacb0cf210303e09075527792928b91"
       },
       "stamp_desk_set": {
         "bounds": [
@@ -2549,31 +2577,31 @@
         "a": "room_shell",
         "b": "packing_table",
         "axis_separation_m": [
-          -3.890000104904175,
+          -4.210000097751617,
           -0.03800000995397568,
-          -1.6380800008773804
+          -1.538080096244812
         ],
         "intersections": 0,
-        "support_or_retained_assembly_pairs": 68
+        "support_or_retained_assembly_pairs": 112
       },
       {
         "a": "room_shell",
         "b": "packing_stool",
         "axis_separation_m": [
-          -2.7899999618530273,
+          -2.740000009536743,
           -0.037763237953186035,
-          -2.340000033378601
+          -0.8900001049041748
         ],
         "intersections": 0,
-        "support_or_retained_assembly_pairs": 20
+        "support_or_retained_assembly_pairs": 12
       },
       {
         "a": "room_shell",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -3.640000104904175,
+          -3.9600000381469727,
           0.18000001460313797,
-          -1.375
+          -1.2750000953674316
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2593,9 +2621,9 @@
         "a": "room_shell",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -3.690000057220459,
+          -4.010000109672546,
           0.977000005543232,
-          -1.5149999856948853
+          -1.415000081062317
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2628,7 +2656,7 @@
         "axis_separation_m": [
           -1.003000020980835,
           -0.03700002282857895,
-          -1.067500114440918
+          -0.7074999809265137
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2648,20 +2676,20 @@
         "a": "room_shell",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.8799946308135986,
+          -1.3799946308135986,
           -0.037999995052814484,
-          -0.5264999866485596
+          -0.5664999485015869
         ],
         "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
+        "support_or_retained_assembly_pairs": 18
       },
       {
         "a": "room_shell",
         "b": "compass_rug",
         "axis_separation_m": [
-          -3.050000011920929,
+          -2.9800000190734863,
           -0.03700000047683716,
-          -3.0000000596046448
+          -3.3000000715255737
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2681,9 +2709,9 @@
         "a": "room_shell",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.9890000820159912,
+          -1.0729999542236328,
           0.3479999974370003,
-          -1.183000087738037
+          -0.6889998912811279
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2714,9 +2742,9 @@
         "a": "window_wall",
         "b": "packing_table",
         "axis_separation_m": [
-          0.6349999904632568,
+          0.9549999237060547,
           -1.1719999313354492,
-          -1.5730799436569214
+          -1.473080039024353
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2725,9 +2753,9 @@
         "a": "window_wall",
         "b": "packing_stool",
         "axis_separation_m": [
-          1.7349998950958252,
+          3.7849998474121094,
           -0.7519999146461487,
-          -2.274999976158142
+          -0.8250000476837158
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2736,9 +2764,9 @@
         "a": "window_wall",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.9049999713897705,
+          1.2249997854232788,
           -1.3504999876022339,
-          -1.309999942779541
+          -1.2100000381469727
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2758,9 +2786,9 @@
         "a": "window_wall",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.8349997997283936,
+          1.1549997329711914,
           -1.5334999561309814,
-          -1.4499999284744263
+          -1.350000023841858
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2793,7 +2821,7 @@
         "axis_separation_m": [
           0.021999835968017578,
           -0.5401506721973419,
-          -1.002500057220459
+          -0.6424999237060547
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2813,9 +2841,9 @@
         "a": "window_wall",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.1450052261352539,
+          0.6450052261352539,
           -0.7473999261856079,
-          -0.4614999294281006
+          -0.5014998912811279
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2824,9 +2852,9 @@
         "a": "window_wall",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.4749998450279236,
+          3.544999837875366,
           -0.17079992592334747,
-          -2.935000002384186
+          -3.2350000143051147
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2846,9 +2874,9 @@
         "a": "window_wall",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.03599977493286133,
+          -0.04800009727478027,
           -0.8551506400108337,
-          -1.1180000305175781
+          -0.623999834060669
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2879,9 +2907,9 @@
         "a": "back_wall",
         "b": "packing_table",
         "axis_separation_m": [
-          -3.690000057220459,
+          -4.010000050067902,
           -1.1719999313354492,
-          4.286920189857483
+          4.386920094490051
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2890,9 +2918,9 @@
         "a": "back_wall",
         "b": "packing_stool",
         "axis_separation_m": [
-          -2.5899999141693115,
+          -2.674999952316284,
           -0.7519999146461487,
-          3.585000157356262
+          5.0350000858306885
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2901,9 +2929,9 @@
         "a": "back_wall",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -3.440000057220459,
+          -3.759999990463257,
           -1.3504999876022339,
-          4.550000190734863
+          4.650000095367432
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2923,9 +2951,9 @@
         "a": "back_wall",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -3.490000009536743,
+          -3.8100000619888306,
           -1.5334999561309814,
-          4.410000205039978
+          4.510000109672546
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2958,7 +2986,7 @@
         "axis_separation_m": [
           -0.8029999732971191,
           -0.5401506721973419,
-          4.857500076293945
+          5.21750020980835
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2978,9 +3006,9 @@
         "a": "back_wall",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.6799945831298828,
+          -1.1799945831298828,
           -0.7473999261856079,
-          5.398500204086304
+          5.358500242233276
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2989,9 +3017,9 @@
         "a": "back_wall",
         "b": "compass_rug",
         "axis_separation_m": [
-          -2.98499995470047,
+          -2.9149999618530273,
           -0.17079992592334747,
-          2.9250001311302185
+          2.6250001192092896
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3011,9 +3039,9 @@
         "a": "back_wall",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.7890000343322754,
+          -0.872999906539917,
           -0.8551506400108337,
-          4.742000102996826
+          5.236000299453735
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3044,9 +3072,9 @@
         "a": "postal_blue_door",
         "b": "packing_table",
         "axis_separation_m": [
-          0.5420002937316895,
+          0.8620002269744873,
           -1.0219999551773071,
-          -0.25808000564575195
+          -0.1580801010131836
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3055,9 +3083,9 @@
         "a": "postal_blue_door",
         "b": "packing_stool",
         "axis_separation_m": [
-          1.6420001983642578,
+          3.692000150680542,
           -0.6019999384880066,
-          -0.679999828338623
+          0.4899998903274536
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3066,9 +3094,9 @@
         "a": "postal_blue_door",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.8120002746582031,
+          1.1320000886917114,
           -1.2005000114440918,
-          0.004999995231628418
+          0.10499989986419678
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3088,9 +3116,9 @@
         "a": "postal_blue_door",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.7420001029968262,
+          1.062000036239624,
           -1.277999997138977,
-          -0.13499999046325684
+          -0.03500008583068848
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3123,7 +3151,7 @@
         "axis_separation_m": [
           -0.0709998607635498,
           -0.39015069603919983,
-          0.31249988079071045
+          0.6725000143051147
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3143,9 +3171,9 @@
         "a": "postal_blue_door",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.05200552940368652,
+          0.5520055294036865,
           -0.5973999500274658,
-          0.8535000085830688
+          0.8135000467300415
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3154,7 +3182,7 @@
         "a": "postal_blue_door",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.382000148296356,
+          3.452000141143799,
           -0.020799949765205383,
           -1.339999794960022
         ],
@@ -3176,9 +3204,9 @@
         "a": "postal_blue_door",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.056999921798706055,
+          -0.14099979400634766,
           -0.7051506638526917,
-          0.1969999074935913
+          0.6910001039505005
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3209,9 +3237,9 @@
         "a": "sorting_cabinet",
         "b": "packing_table",
         "axis_separation_m": [
-          -2.195000171661377,
+          -2.474999964237213,
           -1.0299999713897705,
-          3.814804434776306
+          3.9148043394088745
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3220,9 +3248,9 @@
         "a": "sorting_cabinet",
         "b": "packing_stool",
         "axis_separation_m": [
-          -1.0950000286102295,
+          0.35499995946884155,
           -0.60999995470047,
-          3.1128844022750854
+          4.562884330749512
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3231,9 +3259,9 @@
         "a": "sorting_cabinet",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -1.945000171661377,
+          -2.205000102519989,
           -1.2085000276565552,
-          4.0778844356536865
+          4.177884340286255
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3253,9 +3281,9 @@
         "a": "sorting_cabinet",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -1.9950001239776611,
+          -2.2750001549720764,
           -1.3000000715255737,
-          3.9378844499588013
+          4.03788435459137
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3288,7 +3316,7 @@
         "axis_separation_m": [
           0.6919999122619629,
           -0.3981507122516632,
-          4.3853843212127686
+          4.745384454727173
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3308,9 +3336,9 @@
         "a": "sorting_cabinet",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.8150053024291992,
+          0.3150053024291992,
           -0.6053999662399292,
-          4.926384449005127
+          4.8863844871521
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3319,9 +3347,9 @@
         "a": "sorting_cabinet",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.04499995708465576,
+          0.11499994993209839,
           -0.028799965977668762,
-          2.4528843760490417
+          2.152884364128113
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3341,9 +3369,9 @@
         "a": "sorting_cabinet",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.7059998512268066,
+          0.621999979019165,
           -0.713150680065155,
-          4.269884347915649
+          4.763884544372559
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3374,9 +3402,9 @@
         "a": "red_post_box",
         "b": "packing_table",
         "axis_separation_m": [
-          2.200000047683716,
+          1.8800000548362732,
           -1.0149999856948853,
-          1.1719200611114502
+          1.2719199657440186
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3385,9 +3413,9 @@
         "a": "red_post_box",
         "b": "packing_stool",
         "axis_separation_m": [
-          3.3000001907348633,
+          1.250000238418579,
           -0.5949999690055847,
-          0.4700000286102295
+          1.9199999570846558
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3396,9 +3424,9 @@
         "a": "red_post_box",
         "b": "packing_dressing",
         "axis_separation_m": [
-          2.450000047683716,
+          2.130000114440918,
           -1.19350004196167,
-          1.4350000619888306
+          1.534999966621399
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3418,9 +3446,9 @@
         "a": "red_post_box",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          2.4000000953674316,
+          2.0800000429153442,
           -0.7649999856948853,
-          1.2950000762939453
+          1.3949999809265137
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3453,7 +3481,7 @@
         "axis_separation_m": [
           5.087000131607056,
           -0.38315072655677795,
-          1.7424999475479126
+          2.102500081062317
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3473,9 +3501,9 @@
         "a": "red_post_box",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          5.210005521774292,
+          4.710005521774292,
           -0.590399980545044,
-          2.283500075340271
+          2.2435001134872437
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3484,9 +3512,9 @@
         "a": "red_post_box",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.24000024795532227,
+          -0.12999987602233887,
           -0.013799980282783508,
-          -0.1899999976158142
+          -0.49000000953674316
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3506,9 +3534,9 @@
         "a": "red_post_box",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          5.101000070571899,
+          5.017000198364258,
           -0.6981506943702698,
-          1.6269999742507935
+          2.1210001707077026
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3539,9 +3567,9 @@
         "a": "wall_clock",
         "b": "packing_table",
         "axis_separation_m": [
-          -1.3700000643730164,
+          -1.690000057220459,
           1.6029998064041138,
-          4.322919964790344
+          4.422919869422913
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3550,9 +3578,9 @@
         "a": "wall_clock",
         "b": "packing_stool",
         "axis_separation_m": [
-          -0.2699999213218689,
+          0.9599999785423279,
           2.0229998230934143,
-          3.6209999322891235
+          5.07099986076355
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3561,9 +3589,9 @@
         "a": "wall_clock",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -1.1200000643730164,
+          -1.4399999976158142,
           1.424499750137329,
-          4.585999965667725
+          4.685999870300293
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3583,9 +3611,9 @@
         "a": "wall_clock",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -1.1700000166893005,
+          -1.490000069141388,
           1.2414997816085815,
-          4.445999979972839
+          4.545999884605408
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3618,7 +3646,7 @@
         "axis_separation_m": [
           1.5170000195503235,
           2.234849065542221,
-          4.893499851226807
+          5.253499984741211
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3638,9 +3666,9 @@
         "a": "wall_clock",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          1.6400054097175598,
+          1.1400054097175598,
           2.027599811553955,
-          5.434499979019165
+          5.394500017166138
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3649,9 +3677,9 @@
         "a": "wall_clock",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.6499999761581421,
+          0.7199999690055847,
           2.6041998118162155,
-          2.96099990606308
+          2.660999894142151
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3671,9 +3699,9 @@
         "a": "wall_clock",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          1.5309999585151672,
+          1.4470000863075256,
           1.9198490977287292,
-          4.7779998779296875
+          5.272000074386597
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3704,9 +3732,9 @@
         "a": "postal_counter",
         "b": "packing_table",
         "axis_separation_m": [
-          -2.890000104904175,
+          -3.2100000977516174,
           -1.0149999856948853,
-          1.6219200789928436
+          1.721919983625412
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3715,9 +3743,9 @@
         "a": "postal_counter",
         "b": "packing_stool",
         "axis_separation_m": [
-          -1.7899999618530273,
+          -0.5799999237060547,
           -0.5949999690055847,
-          0.9200000464916229
+          2.369999974966049
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3726,9 +3754,9 @@
         "a": "postal_counter",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -2.640000104904175,
+          -2.9600000381469727,
           -1.0920000672340393,
-          1.885000079870224
+          1.9849999845027924
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3748,9 +3776,9 @@
         "a": "postal_counter",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -2.690000057220459,
+          -3.0100001096725464,
           -0.2950000762939453,
-          1.7450000941753387
+          1.844999998807907
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3783,7 +3811,7 @@
         "axis_separation_m": [
           -0.003000020980834961,
           -0.38315072655677795,
-          2.192499965429306
+          2.5525000989437103
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3803,9 +3831,9 @@
         "a": "postal_counter",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.12000536918640137,
+          -0.37999463081359863,
           -0.590399980545044,
-          2.7335000932216644
+          2.693500131368637
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3814,9 +3842,9 @@
         "a": "postal_counter",
         "b": "compass_rug",
         "axis_separation_m": [
-          -0.8899999260902405,
+          -0.8199999332427979,
           -0.013799980282783508,
-          0.2600000202655792
+          -0.03999999165534973
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3836,9 +3864,9 @@
         "a": "postal_counter",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.010999917984008789,
+          -0.07299995422363281,
           -0.6981506943702698,
-          2.076999992132187
+          2.571000188589096
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3869,9 +3897,9 @@
         "a": "parcel_shelves",
         "b": "packing_table",
         "axis_separation_m": [
-          1.0599998235702515,
+          0.7399998307228088,
           -0.8870000839233398,
-          3.778419852256775
+          3.8784197568893433
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3880,9 +3908,9 @@
         "a": "parcel_shelves",
         "b": "packing_stool",
         "axis_separation_m": [
-          2.159999966621399,
+          0.11000001430511475,
           -0.4670000672340393,
-          3.076499819755554
+          4.5264997482299805
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3891,9 +3919,9 @@
         "a": "parcel_shelves",
         "b": "packing_dressing",
         "axis_separation_m": [
-          1.3099998235702515,
+          0.9899998903274536,
           -1.0655001401901245,
-          4.041499853134155
+          4.141499757766724
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3913,9 +3941,9 @@
         "a": "parcel_shelves",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          1.2599998712539673,
+          0.9399998188018799,
           -1.248500108718872,
-          3.90149986743927
+          4.001499772071838
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3948,7 +3976,7 @@
         "axis_separation_m": [
           3.9469999074935913,
           -0.25515082478523254,
-          4.348999738693237
+          4.708999872207642
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3968,9 +3996,9 @@
         "a": "parcel_shelves",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          4.070005297660828,
+          3.5700052976608276,
           -0.46240007877349854,
-          4.889999866485596
+          4.849999904632568
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3979,9 +4007,9 @@
         "a": "parcel_shelves",
         "b": "compass_rug",
         "axis_separation_m": [
-          -0.8999999761581421,
+          -1.2700001001358032,
           0.1141999214887619,
-          2.4164997935295105
+          2.1164997816085815
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4001,9 +4029,9 @@
         "a": "parcel_shelves",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          3.960999846458435,
+          3.8769999742507935,
           -0.5701507925987244,
-          4.233499765396118
+          4.727499961853027
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4034,9 +4062,9 @@
         "a": "packing_table",
         "b": "packing_stool",
         "axis_separation_m": [
-          -1.679999828338623,
+          0.049999892711639404,
           -0.5949999988079071,
-          0.12192010879516602
+          -0.628079891204834
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4045,9 +4073,9 @@
         "a": "packing_table",
         "b": "postal_door_frame",
         "axis_separation_m": [
-          0.6350002288818359,
+          0.9550001621246338,
           -1.0519999265670776,
-          -0.43807995319366455
+          -0.3380800485610962
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4056,9 +4084,9 @@
         "a": "packing_table",
         "b": "postal_door_glass",
         "axis_separation_m": [
-          0.7100002765655518,
+          1.0300002098083496,
           -0.1419999599456787,
-          -0.06807994842529297
+          0.03191995620727539
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4067,9 +4095,9 @@
         "a": "packing_table",
         "b": "post_office_sign",
         "axis_separation_m": [
-          0.6390001773834229,
+          0.9590001106262207,
           1.3630000352859497,
-          2.0419200658798218
+          2.14191997051239
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4078,9 +4106,9 @@
         "a": "packing_table",
         "b": "sorted_letters",
         "axis_separation_m": [
-          -2.0382208824157715,
+          -2.285599038004875,
           -0.10994118452072144,
-          3.873275637626648
+          3.9732755422592163
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4089,9 +4117,9 @@
         "a": "packing_table",
         "b": "parcel_shelf_stock",
         "axis_separation_m": [
-          -1.8330001831054688,
+          -2.1530001759529114,
           -0.04400002956390381,
-          3.786420226097107
+          3.8864201307296753
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4100,9 +4128,9 @@
         "a": "packing_table",
         "b": "mail_sacks",
         "axis_separation_m": [
-          1.233342170715332,
+          0.9133421778678894,
           -0.9839999973773956,
-          3.4419199228286743
+          3.5419198274612427
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4111,9 +4139,9 @@
         "a": "packing_table",
         "b": "counter_bell",
         "axis_separation_m": [
-          -1.2100000977516174,
+          -1.53000009059906,
           0.2999999523162842,
-          1.8119200319051743
+          1.9119199365377426
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4122,9 +4150,9 @@
         "a": "packing_table",
         "b": "door_lamp_glow",
         "axis_separation_m": [
-          0.24000000953674316,
+          0.559999942779541,
           1.6030000448226929,
-          0.08192002773284912
+          0.18191993236541748
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4133,9 +4161,9 @@
         "a": "packing_table",
         "b": "blue_entry_mat",
         "axis_separation_m": [
-          0.03000020980834961,
+          0.35000014305114746,
           -0.04950001835823059,
-          -0.36307990550994873
+          -0.26308000087738037
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4144,9 +4172,9 @@
         "a": "packing_table",
         "b": "corner_letter_crate",
         "axis_separation_m": [
-          1.9524998664855957,
+          1.632499873638153,
           -0.5599999725818634,
-          -0.6405799388885498
+          -0.7405798435211182
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4155,9 +4183,9 @@
         "a": "packing_table",
         "b": "counter_dressing",
         "axis_separation_m": [
-          -0.5450001060962677,
+          -0.8650000989437103,
           0.3049999475479126,
-          1.8294200599193573
+          1.9294199645519257
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4166,9 +4194,9 @@
         "a": "packing_table",
         "b": "wall_dressing",
         "axis_separation_m": [
-          0.18000006675720215,
+          0.5,
           0.4819999933242798,
-          0.021919965744018555
+          0.12191987037658691
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4177,7 +4205,7 @@
         "a": "packing_table",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -2.509999990463257,
+          -2.510000169277191,
           -0.796999990940094,
           -1.0130798816680908
         ],
@@ -4188,9 +4216,9 @@
         "a": "packing_table",
         "b": "fare_board",
         "axis_separation_m": [
-          0.7480001449584961,
+          1.068000078201294,
           0.22800004482269287,
-          2.7619199752807617
+          2.86191987991333
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4199,7 +4227,7 @@
         "a": "packing_table",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -2.5799999237060547,
+          -2.5800000429153442,
           0.0,
           -1.153079867362976
         ],
@@ -4210,9 +4238,9 @@
         "a": "packing_table",
         "b": "post_table_lamp",
         "axis_separation_m": [
-          -1.0839998722076416,
+          -0.7639999389648438,
           0.2999999523162842,
-          1.89792001247406
+          1.9979199171066284
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4221,9 +4249,9 @@
         "a": "packing_table",
         "b": "post_wall_lantern",
         "axis_separation_m": [
-          0.15000033378601074,
+          0.4700002670288086,
           1.4429999589920044,
-          4.066920161247253
+          4.166920065879822
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4232,9 +4260,9 @@
         "a": "packing_table",
         "b": "brown_parcel_left",
         "axis_separation_m": [
-          0.10700011253356934,
+          0.4270000457763672,
           -0.38315075635910034,
-          -0.7055799961090088
+          -0.44557976722717285
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4243,9 +4271,9 @@
         "a": "packing_table",
         "b": "blue_parcel_door",
         "axis_separation_m": [
-          0.12100005149841309,
+          0.44099998474121094,
           -0.31415072083473206,
-          0.9889200329780579
+          1.0889199376106262
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4254,9 +4282,9 @@
         "a": "packing_table",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.23000550270080566,
+          0.050005435943603516,
           -0.5904000103473663,
-          -0.1645798683166504
+          -0.3045797348022461
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4265,9 +4293,9 @@
         "a": "packing_table",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.05999988317489624,
+          -0.19000011682510376,
           -0.013800010085105896,
-          -0.5380798578262329
+          -0.43807995319366455
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4276,9 +4304,9 @@
         "a": "packing_table",
         "b": "post_wall_lantern_right",
         "axis_separation_m": [
-          2.4800000190734863,
+          2.1600000262260437,
           1.6130000352859497,
-          4.066920161247253
+          4.166920065879822
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4287,9 +4315,9 @@
         "a": "packing_table",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.12100005149841309,
+          0.35700011253356934,
           -0.6290000081062317,
-          -0.8210799694061279
+          -0.4270796775817871
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4298,9 +4326,9 @@
         "a": "packing_table",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          0.131500244140625,
+          0.45150017738342285,
           -0.38315075635910034,
-          1.7289199829101562
+          1.8289198875427246
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4309,9 +4337,9 @@
         "a": "packing_table",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          1.3036034107208252,
+          0.9836034178733826,
           -1.0140000060200691,
-          -0.4935128688812256
+          -0.593512773513794
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4320,9 +4348,9 @@
         "a": "packing_table",
         "b": "counter_trailing",
         "axis_separation_m": [
-          -0.573096513748169,
+          -0.2530965805053711,
           -0.4761064052581787,
-          1.9352695941925049
+          2.0352694988250732
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4331,9 +4359,9 @@
         "a": "packing_table",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          -0.4988047108054161,
+          -0.8188047036528587,
           1.3079999685287476,
-          4.018673777580261
+          4.11867368221283
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4342,9 +4370,9 @@
         "a": "packing_table",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          1.6556293964385986,
+          1.335629403591156,
           0.5264517068862915,
-          3.7700997591018677
+          3.870099663734436
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4353,9 +4381,9 @@
         "a": "packing_table",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          2.35314679145813,
+          2.0331467986106873,
           -0.9433999359607697,
-          -0.6484984159469604
+          -0.5484985113143921
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4364,9 +4392,9 @@
         "a": "packing_table",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          0.3516044616699219,
+          0.6716043949127197,
           0.7367933988571167,
-          0.8833013772964478
+          0.9833012819290161
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4375,9 +4403,9 @@
         "a": "packing_stool",
         "b": "postal_door_frame",
         "axis_separation_m": [
-          1.7350001335144043,
+          3.7850000858306885,
           -0.6319999098777771,
-          -0.85999995470047
+          0.309999942779541
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4386,9 +4414,9 @@
         "a": "packing_stool",
         "b": "postal_door_glass",
         "axis_separation_m": [
-          1.8100001811981201,
+          3.8600001335144043,
           0.2780000567436218,
-          -0.48999977111816406
+          0.6799999475479126
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4397,9 +4425,9 @@
         "a": "packing_stool",
         "b": "post_office_sign",
         "axis_separation_m": [
-          1.7390000820159912,
+          3.7890000343322754,
           1.7830000519752502,
-          1.340000033378601
+          2.7899999618530273
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4408,9 +4436,9 @@
         "a": "packing_stool",
         "b": "sorted_letters",
         "axis_separation_m": [
-          -0.938220739364624,
+          0.5444008857011795,
           0.3100588321685791,
-          3.1713556051254272
+          4.6213555335998535
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4419,9 +4447,9 @@
         "a": "packing_stool",
         "b": "parcel_shelf_stock",
         "axis_separation_m": [
-          -0.7330000400543213,
+          -1.7929999828338623,
           0.37599998712539673,
-          3.0845001935958862
+          4.5345001220703125
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4430,9 +4458,9 @@
         "a": "packing_stool",
         "b": "mail_sacks",
         "axis_separation_m": [
-          2.3333423137664795,
+          0.2833423614501953,
           -0.5949999988079071,
-          2.7399998903274536
+          4.18999981880188
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4441,9 +4469,9 @@
         "a": "packing_stool",
         "b": "counter_bell",
         "axis_separation_m": [
-          -0.10999995470046997,
+          1.2399999499320984,
           0.7199999690055847,
-          1.1099999994039536
+          2.55999992787838
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4452,9 +4480,9 @@
         "a": "packing_stool",
         "b": "door_lamp_glow",
         "axis_separation_m": [
-          1.3399999141693115,
+          3.3899998664855957,
           2.0230000615119934,
-          -0.19999992847442627
+          0.8299999237060547
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4463,9 +4491,9 @@
         "a": "packing_stool",
         "b": "blue_entry_mat",
         "axis_separation_m": [
-          1.130000114440918,
+          3.180000066757202,
           -0.04926324635744095,
-          -0.7849999666213989
+          0.38499999046325684
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4474,9 +4502,9 @@
         "a": "packing_stool",
         "b": "corner_letter_crate",
         "axis_separation_m": [
-          3.052500009536743,
+          1.002500057220459,
           -0.5597632005810738,
-          0.7575000524520874
+          -0.3925001621246338
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4485,9 +4513,9 @@
         "a": "packing_stool",
         "b": "counter_dressing",
         "axis_separation_m": [
-          0.5550000369548798,
+          -0.2575000524520874,
           0.7249999642372131,
-          1.1275000274181366
+          2.577499955892563
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4496,9 +4524,9 @@
         "a": "packing_stool",
         "b": "wall_dressing",
         "axis_separation_m": [
-          1.2799999713897705,
+          3.3299999237060547,
           0.9020000100135803,
-          -0.6800000667572021
+          0.7699998617172241
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4507,9 +4535,9 @@
         "a": "packing_stool",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -1.4099998474121094,
+          0.2999999523162842,
           -0.37699997425079346,
-          0.3850001096725464
+          -0.39499998092651367
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4518,9 +4546,9 @@
         "a": "packing_stool",
         "b": "fare_board",
         "axis_separation_m": [
-          1.8480000495910645,
+          3.8980000019073486,
           0.6480000615119934,
-          2.059999942779541
+          3.5099998712539673
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4529,9 +4557,9 @@
         "a": "packing_stool",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -1.4800000190734863,
+          0.24999988079071045,
           0.42000001668930054,
-          0.24500012397766113
+          -0.505000114440918
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4540,9 +4568,9 @@
         "a": "packing_stool",
         "b": "post_table_lamp",
         "axis_separation_m": [
-          0.016000032424926758,
+          2.065999984741211,
           0.7199999690055847,
-          1.1959999799728394
+          2.6459999084472656
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4551,9 +4579,9 @@
         "a": "packing_stool",
         "b": "post_wall_lantern",
         "axis_separation_m": [
-          1.250000238418579,
+          3.3000001907348633,
           1.862999975681305,
-          3.3650001287460327
+          4.815000057220459
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4562,9 +4590,9 @@
         "a": "packing_stool",
         "b": "brown_parcel_left",
         "axis_separation_m": [
-          1.2070000171661377,
+          3.256999969482422,
           -0.3829139843583107,
-          0.6924999952316284
+          -0.39749979972839355
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4573,9 +4601,9 @@
         "a": "packing_stool",
         "b": "blue_parcel_door",
         "axis_separation_m": [
-          1.2209999561309814,
+          3.2709999084472656,
           -0.3139139488339424,
-          0.28700000047683716
+          1.7369999289512634
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4584,9 +4612,9 @@
         "a": "packing_stool",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          1.330005407333374,
+          2.880005359649658,
           -0.5901632383465767,
-          1.2335001230239868
+          -0.2564997673034668
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4595,9 +4623,9 @@
         "a": "packing_stool",
         "b": "compass_rug",
         "axis_separation_m": [
-          1.1600000262260437,
+          -0.8199999332427979,
           -0.013563238084316254,
-          -1.2399998903274536
+          0.21000003814697266
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4606,9 +4634,9 @@
         "a": "packing_stool",
         "b": "post_wall_lantern_right",
         "axis_separation_m": [
-          3.580000162124634,
+          1.5300002098083496,
           2.0330000519752502,
-          3.3650001287460327
+          4.815000057220459
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4617,9 +4645,9 @@
         "a": "packing_stool",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          1.2209999561309814,
+          3.187000036239624,
           -0.20899999141693115,
-          0.5770000219345093
+          -0.3789997100830078
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4628,9 +4656,9 @@
         "a": "packing_stool",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          1.2315001487731934,
+          3.2815001010894775,
           -0.3829139843583107,
-          1.0269999504089355
+          2.476999878883362
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4639,9 +4667,9 @@
         "a": "packing_stool",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          2.4036035537719727,
+          0.3536036014556885,
           -0.5939999893307686,
-          0.9045671224594116
+          -0.5454328060150146
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4650,9 +4678,9 @@
         "a": "packing_stool",
         "b": "counter_trailing",
         "axis_separation_m": [
-          0.5269033908843994,
+          2.5769033432006836,
           -0.056106388568878174,
-          1.2333495616912842
+          2.6833494901657104
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4661,9 +4689,9 @@
         "a": "packing_stool",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          0.6011954322457314,
+          0.40779998898506165,
           1.727999985218048,
-          3.3167537450790405
+          4.766753673553467
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4672,9 +4700,9 @@
         "a": "packing_stool",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          2.755629539489746,
+          0.7056295871734619,
           0.946451723575592,
-          3.068179726600647
+          4.518179655075073
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4683,9 +4711,9 @@
         "a": "packing_stool",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          3.4531469345092773,
+          1.4031469821929932,
           -0.5939999893307686,
-          0.1768118143081665
+          0.09958148002624512
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4694,9 +4722,9 @@
         "a": "packing_stool",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          1.4516043663024902,
+          3.5016043186187744,
           1.1567934155464172,
-          0.18138134479522705
+          1.6313812732696533
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4705,9 +4733,9 @@
         "a": "postal_door_frame",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.9050002098083496,
+          1.225000023841858,
           -1.2304999828338623,
-          -0.17499995231628418
+          -0.07500004768371582
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4727,9 +4755,9 @@
         "a": "postal_door_frame",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.8350000381469727,
+          1.1549999713897705,
           -1.4134999513626099,
-          -0.31499993801116943
+          -0.21500003337860107
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4762,7 +4790,7 @@
         "axis_separation_m": [
           0.02200007438659668,
           -0.42015066742897034,
-          0.13249993324279785
+          0.49250006675720215
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4782,9 +4810,9 @@
         "a": "postal_door_frame",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.145005464553833,
+          0.645005464553833,
           -0.6273999214172363,
-          0.6735000610351562
+          0.6335000991821289
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4793,7 +4821,7 @@
         "a": "postal_door_frame",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.4750000834465027,
+          3.5450000762939453,
           -0.05079992115497589,
           -1.519999921321869
         ],
@@ -4815,9 +4843,9 @@
         "a": "postal_door_frame",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.03600001335144043,
+          -0.04799985885620117,
           -0.7351506352424622,
-          0.01699995994567871
+          0.5110001564025879
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4848,9 +4876,9 @@
         "a": "postal_door_glass",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.9800002574920654,
+          1.3000000715255737,
           -0.3205000162124634,
-          0.1950000524520874
+          0.29499995708465576
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4870,9 +4898,9 @@
         "a": "postal_door_glass",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.9100000858306885,
+          1.2300000190734863,
           -0.5034999847412109,
-          0.05500006675720215
+          0.1549999713897705
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4905,7 +4933,7 @@
         "axis_separation_m": [
           0.0970001220703125,
           0.4898492991924286,
-          0.5024999380111694
+          0.8625000715255737
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4925,9 +4953,9 @@
         "a": "postal_door_glass",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.22000551223754883,
+          0.7200055122375488,
           0.2826000452041626,
-          1.0435000658035278
+          1.0035001039505005
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4936,7 +4964,7 @@
         "a": "postal_door_glass",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.5500001311302185,
+          3.620000123977661,
           0.859200045466423,
           -1.149999737739563
         ],
@@ -4958,9 +4986,9 @@
         "a": "postal_door_glass",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.11100006103515625,
+          0.02700018882751465,
           0.17484933137893677,
-          0.3869999647140503
+          0.8810001611709595
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4991,9 +5019,9 @@
         "a": "post_office_sign",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.9090001583099365,
+          1.2289999723434448,
           1.184499979019165,
-          2.305000066757202
+          2.4049999713897705
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5013,9 +5041,9 @@
         "a": "post_office_sign",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.8389999866485596,
+          1.1589999198913574,
           1.0015000104904175,
-          2.165000081062317
+          2.2649999856948853
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5048,7 +5076,7 @@
         "axis_separation_m": [
           0.026000022888183594,
           1.994849294424057,
-          2.612499952316284
+          2.9725000858306885
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5068,9 +5096,9 @@
         "a": "post_office_sign",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.14900541305541992,
+          0.6490054130554199,
           1.787600040435791,
-          3.1535000801086426
+          3.1135001182556152
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5079,9 +5107,9 @@
         "a": "post_office_sign",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.4790000319480896,
+          3.5490000247955322,
           2.3642000406980515,
-          0.6800000071525574
+          0.3799999952316284
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5101,9 +5129,9 @@
         "a": "post_office_sign",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.039999961853027344,
+          -0.04399991035461426,
           1.6798493266105652,
-          2.496999979019165
+          2.991000175476074
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5134,9 +5162,9 @@
         "a": "sorted_letters",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -1.7882208824157715,
+          -2.015599176287651,
           -0.2884412407875061,
-          4.136355638504028
+          4.236355543136597
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5156,9 +5184,9 @@
         "a": "sorted_letters",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -1.8382208347320557,
+          -2.0855992287397385,
           -0.47144120931625366,
-          3.996355652809143
+          4.096355557441711
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5191,7 +5219,7 @@
         "axis_separation_m": [
           0.8487792015075684,
           0.5219080746173859,
-          4.44385552406311
+          4.803855657577515
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5211,9 +5239,9 @@
         "a": "sorted_letters",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.9717845916748047,
+          0.4717845916748047,
           0.3146588206291199,
-          4.984855651855469
+          4.944855690002441
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5222,9 +5250,9 @@
         "a": "sorted_letters",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.2344008833169937,
+          0.30440087616443634,
           0.8912588208913803,
-          2.5113555788993835
+          2.2113555669784546
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5244,9 +5272,9 @@
         "a": "sorted_letters",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.8627791404724121,
+          0.7787792682647705,
           0.20690810680389404,
-          4.328355550765991
+          4.8223557472229
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5277,9 +5305,9 @@
         "a": "parcel_shelf_stock",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -1.5830001831054688,
+          -1.9030001163482666,
           -0.22250008583068848,
-          4.049500226974487
+          4.149500131607056
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5299,9 +5327,9 @@
         "a": "parcel_shelf_stock",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -1.633000135421753,
+          -1.9530001878738403,
           -0.40550005435943604,
-          3.909500241279602
+          4.00950014591217
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5334,7 +5362,7 @@
         "axis_separation_m": [
           1.053999900817871,
           0.5878492295742035,
-          4.357000112533569
+          4.717000246047974
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5354,9 +5382,9 @@
         "a": "parcel_shelf_stock",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          1.1770052909851074,
+          0.6770052909851074,
           0.3805999755859375,
-          4.898000240325928
+          4.8580002784729
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5365,9 +5393,9 @@
         "a": "parcel_shelf_stock",
         "b": "compass_rug",
         "axis_separation_m": [
-          -2.102999985218048,
+          -2.0329999923706055,
           0.9571999758481979,
-          2.4245001673698425
+          2.1245001554489136
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5387,9 +5415,9 @@
         "a": "parcel_shelf_stock",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          1.0679998397827148,
+          0.9839999675750732,
           0.27284926176071167,
-          4.24150013923645
+          4.735500335693359
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5420,9 +5448,9 @@
         "a": "mail_sacks",
         "b": "packing_dressing",
         "axis_separation_m": [
-          1.483342170715332,
+          1.1633422374725342,
           -0.765999972820282,
-          3.7049999237060547
+          3.804999828338623
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5442,9 +5470,9 @@
         "a": "mail_sacks",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          1.4333422183990479,
+          1.1133421659469604,
           0.03100001811981201,
-          3.5649999380111694
+          3.664999842643738
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5477,7 +5505,7 @@
         "axis_separation_m": [
           4.120342254638672,
           -0.38315075635910034,
-          4.012499809265137
+          4.372499942779541
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5497,9 +5525,9 @@
         "a": "mail_sacks",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          4.243347644805908,
+          3.743347644805908,
           -0.5904000103473663,
-          4.553499937057495
+          4.513499975204468
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5508,9 +5536,9 @@
         "a": "mail_sacks",
         "b": "compass_rug",
         "axis_separation_m": [
-          -0.7266576290130615,
+          -1.0966577529907227,
           -0.013800010085105896,
-          2.07999986410141
+          1.779999852180481
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5530,9 +5558,9 @@
         "a": "mail_sacks",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          4.134342193603516,
+          4.050342321395874,
           -0.5979999899864197,
-          3.8969998359680176
+          4.391000032424927
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5563,9 +5591,9 @@
         "a": "counter_bell",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -0.9600000977516174,
+          -1.2800000309944153,
           0.12149989604949951,
-          2.0750000327825546
+          2.174999937415123
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5585,9 +5613,9 @@
         "a": "counter_bell",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -1.0100000500679016,
+          -1.330000102519989,
           -0.06150007247924805,
-          1.9350000470876694
+          2.0349999517202377
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5620,7 +5648,7 @@
         "axis_separation_m": [
           1.6769999861717224,
           0.9318492114543915,
-          2.3824999183416367
+          2.742500051856041
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5640,9 +5668,9 @@
         "a": "counter_bell",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          1.8000053763389587,
+          1.3000053763389587,
           0.7245999574661255,
-          2.923500046133995
+          2.8835000842809677
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5651,9 +5679,9 @@
         "a": "counter_bell",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.9299999475479126,
+          0.9999999403953552,
           1.301199957728386,
-          0.44999997317790985
+          0.1499999612569809
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5673,9 +5701,9 @@
         "a": "counter_bell",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          1.6909999251365662,
+          1.6070000529289246,
           0.6168492436408997,
-          2.2669999450445175
+          2.7610001415014267
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5706,9 +5734,9 @@
         "a": "door_lamp_glow",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.5099999904632568,
+          0.8299998044967651,
           1.4244999885559082,
-          0.3450000286102295
+          0.44499993324279785
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5728,9 +5756,9 @@
         "a": "door_lamp_glow",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.4399998188018799,
+          0.7599997520446777,
           1.2415000200271606,
-          0.20500004291534424
+          0.3049999475479126
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5763,7 +5791,7 @@
         "axis_separation_m": [
           -0.372999906539917,
           2.2348493039608,
-          0.6524999141693115
+          1.0125000476837158
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5783,9 +5811,9 @@
         "a": "door_lamp_glow",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.24999451637268066,
+          0.25000524520874023,
           2.027600049972534,
-          1.19350004196167
+          1.1535000801086426
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5794,7 +5822,7 @@
         "a": "door_lamp_glow",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.07999986410141,
+          3.1499998569488525,
           2.6042000502347946,
           -0.8599998950958252
         ],
@@ -5816,9 +5844,9 @@
         "a": "door_lamp_glow",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.35899996757507324,
+          -0.44299983978271484,
           1.9198493361473083,
-          0.5369999408721924
+          1.0310001373291016
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5849,9 +5877,9 @@
         "a": "blue_entry_mat",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.3000001907348633,
+          0.6200000047683716,
           0.16850000619888306,
-          -0.09999990463256836
+          0.0
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5871,9 +5899,9 @@
         "a": "blue_entry_mat",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.23000001907348633,
+          0.5499999523162842,
           0.965499997138977,
-          -0.2399998903274536
+          -0.13999998569488525
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5906,7 +5934,7 @@
         "axis_separation_m": [
           -0.5829999446868896,
           -0.04850003123283386,
-          0.20749998092651367
+          0.567500114440918
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5926,9 +5954,9 @@
         "a": "blue_entry_mat",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.4599945545196533,
+          0.04000544548034668,
           -0.0495000034570694,
-          0.7485001087188721
+          0.7085001468658447
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5937,7 +5965,7 @@
         "a": "blue_entry_mat",
         "b": "compass_rug",
         "axis_separation_m": [
-          2.8700000643730164,
+          2.940000057220459,
           -0.011299997568130493,
           -1.4449999332427979
         ],
@@ -5959,9 +5987,9 @@
         "a": "blue_entry_mat",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.5690000057220459,
+          -0.6529998779296875,
           0.33649998903274536,
-          0.09200000762939453
+          0.5860002040863037
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5992,9 +6020,9 @@
         "a": "corner_letter_crate",
         "b": "packing_dressing",
         "axis_separation_m": [
-          2.2024998664855957,
+          1.8824999332427979,
           -0.34199994802474976,
-          -0.4074997901916504
+          -0.5074999332427979
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6014,9 +6042,9 @@
         "a": "corner_letter_crate",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          2.1524999141693115,
+          1.8324998617172241,
           0.45500004291534424,
-          -0.5175001621246338
+          -0.6175000667572021
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6049,7 +6077,7 @@
         "axis_separation_m": [
           4.8394999504089355,
           -0.38315074145793915,
-          -0.370999813079834
+          -0.21000003814697266
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6069,9 +6097,9 @@
         "a": "corner_letter_crate",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          4.962505340576172,
+          4.462505340576172,
           -0.5599999576807022,
-          -0.029000043869018555
+          -0.0690000057220459
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6080,7 +6108,7 @@
         "a": "corner_letter_crate",
         "b": "compass_rug",
         "axis_separation_m": [
-          -0.0074999332427978516,
+          -0.377500057220459,
           -0.013799995183944702,
           0.09750008583068848
         ],
@@ -6102,9 +6130,9 @@
         "a": "corner_letter_crate",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          4.853499889373779,
+          4.769500017166138,
           -0.17399996519088745,
-          -0.4654998779296875
+          -0.19149994850158691
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6135,9 +6163,9 @@
         "a": "counter_dressing",
         "b": "packing_dressing",
         "axis_separation_m": [
-          -0.2950001060962677,
+          -0.6150000393390656,
           0.12649989128112793,
-          2.0925000607967377
+          2.192499965429306
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6157,9 +6185,9 @@
         "a": "counter_dressing",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -0.3450000584125519,
+          -0.6650001108646393,
           -0.05650007724761963,
-          1.9525000751018524
+          2.0524999797344208
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6192,7 +6220,7 @@
         "axis_separation_m": [
           2.341999977827072,
           0.9368492066860199,
-          2.3999999463558197
+          2.760000079870224
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6212,9 +6240,9 @@
         "a": "counter_dressing",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          2.4650053679943085,
+          1.9650053679943085,
           0.7295999526977539,
-          2.941000074148178
+          2.9010001122951508
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6223,9 +6251,9 @@
         "a": "counter_dressing",
         "b": "compass_rug",
         "axis_separation_m": [
-          -0.5675000548362732,
+          -0.49750006198883057,
           1.3061999529600143,
-          0.4675000011920929
+          0.16749998927116394
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6245,9 +6273,9 @@
         "a": "counter_dressing",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          2.355999916791916,
+          2.2720000445842743,
           0.6218492388725281,
-          2.2844999730587006
+          2.7785001695156097
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6278,9 +6306,9 @@
         "a": "wall_dressing",
         "b": "packing_dressing",
         "axis_separation_m": [
-          0.4500000476837158,
+          0.7699998617172241,
           0.3034999370574951,
-          0.2849999666213989
+          0.3849998712539673
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6300,9 +6328,9 @@
         "a": "wall_dressing",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.37999987602233887,
+          0.6999998092651367,
           0.12049996852874756,
-          0.14499998092651367
+          0.24499988555908203
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6335,7 +6363,7 @@
         "axis_separation_m": [
           -0.4330000877380371,
           1.113849252462387,
-          0.592499852180481
+          0.9524999856948853
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6355,9 +6383,9 @@
         "a": "wall_dressing",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.3099946975708008,
+          0.19000530242919922,
           0.9065999984741211,
-          1.1334999799728394
+          1.093500018119812
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6366,9 +6394,9 @@
         "a": "wall_dressing",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.019999921321869,
+          3.0899999141693115,
           1.4831999987363815,
-          -1.3400000929832458
+          -1.6400001049041748
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6388,9 +6416,9 @@
         "a": "wall_dressing",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.41900014877319336,
+          -0.503000020980835,
           0.7988492846488953,
-          0.4769998788833618
+          0.971000075340271
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6421,9 +6449,9 @@
         "a": "packing_dressing",
         "b": "fare_board",
         "axis_separation_m": [
-          1.0180001258850098,
+          1.337999939918518,
           0.0494999885559082,
-          3.024999976158142
+          3.1249998807907104
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6432,7 +6460,7 @@
         "a": "packing_dressing",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          -2.309999942779541,
+          -2.31000018119812,
           -0.17850005626678467,
           -0.8900001049041748
         ],
@@ -6443,9 +6471,9 @@
         "a": "packing_dressing",
         "b": "post_table_lamp",
         "axis_separation_m": [
-          -0.8139998912811279,
+          -0.49400007724761963,
           0.12149989604949951,
-          2.1610000133514404
+          2.260999917984009
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6454,9 +6482,9 @@
         "a": "packing_dressing",
         "b": "post_wall_lantern",
         "axis_separation_m": [
-          0.4200003147125244,
+          0.7400001287460327,
           1.2644999027252197,
-          4.330000162124634
+          4.430000066757202
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6465,9 +6493,9 @@
         "a": "packing_dressing",
         "b": "brown_parcel_left",
         "axis_separation_m": [
-          0.377000093460083,
+          0.6969999074935913,
           -0.1651507318019867,
-          -0.4724998474121094
+          -0.21249985694885254
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6476,9 +6504,9 @@
         "a": "packing_dressing",
         "b": "blue_parcel_door",
         "axis_separation_m": [
-          0.39100003242492676,
+          0.7109998464584351,
           -0.09615069627761841,
-          1.2520000338554382
+          1.3519999384880066
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6487,9 +6515,9 @@
         "a": "packing_dressing",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.5000054836273193,
+          0.32000529766082764,
           -0.3723999857902527,
-          0.06850028038024902
+          -0.07149982452392578
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6498,9 +6526,9 @@
         "a": "packing_dressing",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.30999988317489624,
+          0.059999942779541016,
           0.20420001447200775,
-          -0.27499985694885254
+          -0.17499995231628418
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6509,9 +6537,9 @@
         "a": "packing_dressing",
         "b": "post_wall_lantern_right",
         "axis_separation_m": [
-          2.7300000190734863,
+          2.4100000858306885,
           1.434499979019165,
-          4.330000162124634
+          4.430000066757202
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6520,9 +6548,9 @@
         "a": "packing_dressing",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.39100003242492676,
+          0.6269999742507935,
           -0.4801506996154785,
-          -0.5879998207092285
+          -0.1939997673034668
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6531,9 +6559,9 @@
         "a": "packing_dressing",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          0.40150022506713867,
+          0.721500039100647,
           -0.1651507318019867,
-          1.9919999837875366
+          2.091999888420105
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6542,9 +6570,9 @@
         "a": "packing_dressing",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          1.5536034107208252,
+          1.2336034774780273,
           -0.9485999941825867,
-          -0.26043272018432617
+          -0.36043286323547363
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6553,9 +6581,9 @@
         "a": "packing_dressing",
         "b": "counter_trailing",
         "axis_separation_m": [
-          -0.3030965328216553,
+          0.016903281211853027,
           -0.6546064615249634,
-          2.1983495950698853
+          2.2983494997024536
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6564,9 +6592,9 @@
         "a": "packing_dressing",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          -0.2488047108054161,
+          -0.568804644048214,
           1.129499912261963,
-          4.281753778457642
+          4.38175368309021
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6575,9 +6603,9 @@
         "a": "packing_dressing",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          1.9056293964385986,
+          1.5856294631958008,
           0.34795165061950684,
-          4.033179759979248
+          4.133179664611816
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6586,9 +6614,9 @@
         "a": "packing_dressing",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          2.60314679145813,
+          2.283146858215332,
           -0.725399911403656,
-          -0.3854184150695801
+          -0.2854185104370117
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6597,9 +6625,9 @@
         "a": "packing_dressing",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          0.6216044425964355,
+          0.9416042566299438,
           0.558293342590332,
-          1.1463813781738281
+          1.2463812828063965
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6608,9 +6636,9 @@
         "a": "fare_board",
         "b": "stamp_desk_set",
         "axis_separation_m": [
-          0.9479999542236328,
+          1.2679998874664307,
           -0.13349997997283936,
-          2.884999990463257
+          2.984999895095825
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6643,7 +6671,7 @@
         "axis_separation_m": [
           0.13499999046325684,
           0.8598493039608002,
-          3.332499861717224
+          3.6924999952316284
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6663,9 +6691,9 @@
         "a": "fare_board",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.25800538063049316,
+          0.7580053806304932,
           0.6526000499725342,
-          3.8734999895095825
+          3.833500027656555
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6674,9 +6702,9 @@
         "a": "fare_board",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.587999999523163,
+          3.6579999923706055,
           1.2292000502347946,
-          1.3999999165534973
+          1.0999999046325684
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6696,9 +6724,9 @@
         "a": "fare_board",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.14899992942810059,
+          0.06500005722045898,
           0.5448493361473083,
-          3.216999888420105
+          3.711000084877014
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6784,9 +6812,9 @@
         "a": "stamp_desk_set",
         "b": "post_table_lamp",
         "axis_separation_m": [
-          -0.8840000629425049,
+          -0.564000129699707,
           -0.06150007247924805,
-          2.021000027656555
+          2.1209999322891235
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6795,9 +6823,9 @@
         "a": "stamp_desk_set",
         "b": "post_wall_lantern",
         "axis_separation_m": [
-          0.35000014305114746,
+          0.6700000762939453,
           1.0814999341964722,
-          4.1900001764297485
+          4.290000081062317
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6806,9 +6834,9 @@
         "a": "stamp_desk_set",
         "b": "brown_parcel_left",
         "axis_separation_m": [
-          0.30699992179870605,
+          0.6269998550415039,
           0.6318492591381073,
-          -0.5825002193450928
+          -0.32249999046325684
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6817,9 +6845,9 @@
         "a": "stamp_desk_set",
         "b": "blue_parcel_door",
         "axis_separation_m": [
-          0.3209998607635498,
+          0.6409997940063477,
           0.7008492946624756,
-          1.112000048160553
+          1.2119999527931213
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6828,9 +6856,9 @@
         "a": "stamp_desk_set",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.4300053119659424,
+          0.25000524520874023,
           0.4246000051498413,
-          -0.041500091552734375
+          -0.18149995803833008
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6839,9 +6867,9 @@
         "a": "stamp_desk_set",
         "b": "compass_rug",
         "axis_separation_m": [
-          0.25999993085861206,
+          0.009999871253967285,
           1.0012000054121017,
-          -0.4149998426437378
+          -0.31499993801116943
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6850,9 +6878,9 @@
         "a": "stamp_desk_set",
         "b": "post_wall_lantern_right",
         "axis_separation_m": [
-          2.680000066757202,
+          2.3600000143051147,
           1.2515000104904175,
-          4.1900001764297485
+          4.290000081062317
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6861,9 +6889,9 @@
         "a": "stamp_desk_set",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.3209998607635498,
+          0.556999921798706,
           0.3168492913246155,
-          -0.6980001926422119
+          -0.3039999008178711
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6872,9 +6900,9 @@
         "a": "stamp_desk_set",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          0.3315000534057617,
+          0.6514999866485596,
           0.6318492591381073,
-          1.8519999980926514
+          1.9519999027252197
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6883,9 +6911,9 @@
         "a": "stamp_desk_set",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          1.503603458404541,
+          1.1836034059524536,
           -0.15160000324249268,
-          -0.37043309211730957
+          -0.47043299674987793
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6894,9 +6922,9 @@
         "a": "stamp_desk_set",
         "b": "counter_trailing",
         "axis_separation_m": [
-          -0.3730967044830322,
+          -0.053096771240234375,
           -0.6873520612716675,
-          2.058349609375
+          2.1583495140075684
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6905,9 +6933,9 @@
         "a": "stamp_desk_set",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          -0.2988046631217003,
+          -0.6188047155737877,
           0.9464999437332153,
-          4.141753792762756
+          4.241753697395325
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6916,9 +6944,9 @@
         "a": "stamp_desk_set",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          1.8556294441223145,
+          1.535629391670227,
           0.16495168209075928,
-          3.893179774284363
+          3.993179678916931
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6927,9 +6955,9 @@
         "a": "stamp_desk_set",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          2.5531468391418457,
+          2.2331467866897583,
           0.07160007953643799,
-          -0.5254184007644653
+          -0.425418496131897
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6938,9 +6966,9 @@
         "a": "stamp_desk_set",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          0.5516042709350586,
+          0.8716042041778564,
           0.3752933740615845,
-          1.0063813924789429
+          1.1063812971115112
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6962,7 +6990,7 @@
         "axis_separation_m": [
           0.8229999542236328,
           0.9318492114543915,
-          2.4684998989105225
+          2.8285000324249268
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6982,9 +7010,9 @@
         "a": "post_table_lamp",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          0.9460053443908691,
+          0.44600534439086914,
           0.7245999574661255,
-          3.009500026702881
+          2.9695000648498535
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6993,9 +7021,9 @@
         "a": "post_table_lamp",
         "b": "compass_rug",
         "axis_separation_m": [
-          1.7559999823570251,
+          1.8259999752044678,
           1.301199957728386,
-          0.5359999537467957
+          0.2359999418258667
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7015,9 +7043,9 @@
         "a": "post_table_lamp",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          0.8369998931884766,
+          0.753000020980835,
           0.6168492436408997,
-          2.3529999256134033
+          2.8470001220703125
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7105,7 +7133,7 @@
         "axis_separation_m": [
           -0.2630000114440918,
           2.0748492181301117,
-          4.637500047683716
+          4.99750018119812
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7125,9 +7153,9 @@
         "a": "post_wall_lantern",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.13999462127685547,
+          0.1600055694580078,
           1.8675999641418457,
-          5.178500175476074
+          5.138500213623047
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7136,9 +7164,9 @@
         "a": "post_wall_lantern",
         "b": "compass_rug",
         "axis_separation_m": [
-          2.9900001883506775,
+          3.06000018119812,
           2.444199964404106,
-          2.705000102519989
+          2.40500009059906
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7158,9 +7186,9 @@
         "a": "post_wall_lantern",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.24900007247924805,
+          -0.33299994468688965,
           1.7598492503166199,
-          4.522000074386597
+          5.016000270843506
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7248,7 +7276,7 @@
         "axis_separation_m": [
           -0.49200010299682617,
           -0.3131507337093353,
-          1.5594999194145203
+          1.9195000529289246
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7257,9 +7285,9 @@
         "a": "brown_parcel_left",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.3829946517944336,
+          0.1170053482055664,
           -0.38315074145793915,
-          0.10500025749206543
+          -0.2949998378753662
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7268,9 +7296,9 @@
         "a": "brown_parcel_left",
         "b": "compass_rug",
         "axis_separation_m": [
-          2.946999967098236,
+          3.0169999599456787,
           -0.012800022959709167,
-          0.03250002861022949
+          0.3925001621246338
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7281,7 +7309,7 @@
         "axis_separation_m": [
           5.367000102996826,
           2.244849294424057,
-          4.637500047683716
+          4.99750018119812
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7290,9 +7318,9 @@
         "a": "brown_parcel_left",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.49200010299682617,
+          -0.5759999752044678,
           0.0028492510318756104,
-          -0.5304999351501465
+          -0.4174997806549072
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7303,7 +7331,7 @@
         "axis_separation_m": [
           -0.46050000190734863,
           -0.3821507692337036,
-          2.2994998693466187
+          2.659500002861023
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7314,7 +7342,7 @@
         "axis_separation_m": [
           4.190603494644165,
           -0.3821507468819618,
-          -0.22393274307250977
+          -0.5735232830047607
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7325,7 +7353,7 @@
         "axis_separation_m": [
           0.07240939140319824,
           0.1557428538799286,
-          2.5058494806289673
+          2.8658496141433716
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7336,7 +7364,7 @@
         "axis_separation_m": [
           2.3881953731179237,
           1.9398492276668549,
-          4.589253664016724
+          4.949253797531128
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7347,7 +7375,7 @@
         "axis_separation_m": [
           4.5426294803619385,
           1.1583009660243988,
-          4.34067964553833
+          4.700679779052734
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7358,7 +7386,7 @@
         "axis_separation_m": [
           5.24014687538147,
           -0.3821507468819618,
-          -0.07791852951049805
+          0.28208160400390625
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7369,7 +7397,7 @@
         "axis_separation_m": [
           -0.2613956928253174,
           1.368642657995224,
-          1.4538812637329102
+          1.8138813972473145
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7378,9 +7406,9 @@
         "a": "blue_parcel_door",
         "b": "mail_sack_left",
         "axis_separation_m": [
-          -0.36899471282958984,
+          0.13100528717041016,
           -0.31415070593357086,
-          2.1005000472068787
+          2.0605000853538513
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7389,9 +7417,9 @@
         "a": "blue_parcel_door",
         "b": "compass_rug",
         "axis_separation_m": [
-          2.96099990606308,
+          3.0309998989105225,
           -0.011799998581409454,
-          -0.37300002574920654
+          -0.6730000376701355
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7411,9 +7439,9 @@
         "a": "blue_parcel_door",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.4780001640319824,
+          -0.562000036239624,
           0.0718492865562439,
-          1.4439999461174011
+          1.9380001425743103
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7499,9 +7527,9 @@
         "a": "mail_sack_left",
         "b": "compass_rug",
         "axis_separation_m": [
-          3.0700053572654724,
+          2.640005350112915,
           -0.013799995183944702,
-          0.5735001564025879
+          0.5335001945495605
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7510,9 +7538,9 @@
         "a": "mail_sack_left",
         "b": "post_wall_lantern_right",
         "axis_separation_m": [
-          5.4900054931640625,
+          4.9900054931640625,
           2.037600040435791,
-          5.178500175476074
+          5.138500213623047
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7521,9 +7549,9 @@
         "a": "mail_sack_left",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          -0.36899471282958984,
+          0.047005414962768555,
           -0.20440000295639038,
-          0.010500192642211914
+          -0.3554997444152832
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7532,9 +7560,9 @@
         "a": "mail_sack_left",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          -0.3374946117401123,
+          0.14150547981262207,
           -0.38315074145793915,
-          2.840499997138977
+          2.8005000352859497
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7543,9 +7571,9 @@
         "a": "mail_sack_left",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          4.313608884811401,
+          3.8136088848114014,
           -0.5894000008702278,
-          -0.39252328872680664
+          -0.432523250579834
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7554,9 +7582,9 @@
         "a": "mail_sack_left",
         "b": "counter_trailing",
         "axis_separation_m": [
-          0.19541478157043457,
+          -0.30458521842956543,
           -0.0515064001083374,
-          3.0468496084213257
+          3.0068496465682983
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7565,9 +7593,9 @@
         "a": "mail_sack_left",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          2.51120076328516,
+          2.01120076328516,
           1.7325999736785889,
-          5.130253791809082
+          5.090253829956055
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7576,9 +7604,9 @@
         "a": "mail_sack_left",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          4.665634870529175,
+          4.165634870529175,
           0.9510517120361328,
-          4.8816797733306885
+          4.841679811477661
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7587,9 +7615,9 @@
         "a": "mail_sack_left",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          5.363152265548706,
+          4.863152265548706,
           -0.5894000008702278,
-          0.46308159828186035
+          0.423081636428833
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7598,9 +7626,9 @@
         "a": "mail_sack_left",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          -0.13839030265808105,
+          0.36160969734191895,
           1.161393404006958,
-          1.9948813915252686
+          1.9548814296722412
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7609,9 +7637,9 @@
         "a": "compass_rug",
         "b": "post_wall_lantern_right",
         "axis_separation_m": [
-          0.5200002193450928,
+          0.15000009536743164,
           2.6142000406980515,
-          2.705000102519989
+          2.40500009059906
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7620,9 +7648,9 @@
         "a": "compass_rug",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          2.96099990606308,
+          2.947000026702881,
           0.37219999730587006,
-          -0.08299994468688965
+          0.41100025177001953
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7631,9 +7659,9 @@
         "a": "compass_rug",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          2.9715000987052917,
+          3.0415000915527344,
           -0.012800022959709167,
-          0.36699992418289185
+          0.06699991226196289
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7642,7 +7670,7 @@
         "a": "compass_rug",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          -0.6563963890075684,
+          -1.0263965129852295,
           -0.012800000607967377,
           0.2445671558380127
         ],
@@ -7653,9 +7681,9 @@
         "a": "compass_rug",
         "b": "counter_trailing",
         "axis_separation_m": [
-          2.266903340816498,
+          2.3369033336639404,
           0.525093600153923,
-          0.5733495354652405
+          0.2733495235443115
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7664,9 +7692,9 @@
         "a": "compass_rug",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          0.09779998660087585,
+          0.16779997944831848,
           2.3091999739408493,
-          2.656753718852997
+          2.356753706932068
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7675,9 +7703,9 @@
         "a": "compass_rug",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          -0.3043704032897949,
+          -0.674370527267456,
           1.5276517122983932,
-          2.4081797003746033
+          2.1081796884536743
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7686,7 +7714,7 @@
         "a": "compass_rug",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          0.39314699172973633,
+          0.023146867752075195,
           -0.012800000607967377,
           -0.4831881523132324
         ],
@@ -7697,9 +7725,9 @@
         "a": "compass_rug",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          3.1916043162345886,
+          3.2616043090820312,
           1.7379934042692184,
-          -0.47861868143081665
+          -0.7786186933517456
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7708,9 +7736,9 @@
         "a": "post_wall_lantern_right",
         "b": "blue_parcel_left",
         "axis_separation_m": [
-          5.38100004196167,
+          5.297000169754028,
           1.9298493266105652,
-          4.522000074386597
+          5.016000270843506
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7796,9 +7824,9 @@
         "a": "blue_parcel_left",
         "b": "brown_parcel_door",
         "axis_separation_m": [
-          -0.4465000629425049,
+          -0.5304999351501465,
           0.0028492510318756104,
-          2.1839998960494995
+          2.6780000925064087
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7807,9 +7835,9 @@
         "a": "blue_parcel_left",
         "b": "door_floor_greenery",
         "axis_separation_m": [
-          4.204603433609009,
+          4.120603561401367,
           -0.6971507146954536,
-          -0.3184328079223633
+          -0.555023193359375
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7818,9 +7846,9 @@
         "a": "blue_parcel_left",
         "b": "counter_trailing",
         "axis_separation_m": [
-          0.08640933036804199,
+          0.0024094581604003906,
           -0.15925711393356323,
-          2.390349507331848
+          2.8843497037887573
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7829,9 +7857,9 @@
         "a": "blue_parcel_left",
         "b": "cabinet_greenery",
         "axis_separation_m": [
-          2.4021953120827675,
+          2.318195439875126,
           1.624849259853363,
-          4.4737536907196045
+          4.967753887176514
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7840,9 +7868,9 @@
         "a": "blue_parcel_left",
         "b": "shelf_trailing",
         "axis_separation_m": [
-          4.556629419326782,
+          4.472629547119141,
           0.843300998210907,
-          4.225179672241211
+          4.71917986869812
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7851,9 +7879,9 @@
         "a": "blue_parcel_left",
         "b": "corner_floor_greenery",
         "axis_separation_m": [
-          5.2541468143463135,
+          5.170146942138672,
           -0.5573999285697937,
-          -0.1934185028076172
+          0.300581693649292
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7862,9 +7890,9 @@
         "a": "blue_parcel_left",
         "b": "door_hanging_pothos",
         "axis_separation_m": [
-          -0.24739575386047363,
+          -0.33139562606811523,
           1.0536426901817322,
-          1.338381290435791
+          1.8323814868927002
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -8104,26 +8132,26 @@
       ],
       "packing_table": [
         [
-          -2.3899998664855957,
+          -2.069999933242798,
           0.08199998736381531,
-          1.5619200468063354
+          1.6619199514389038
         ],
         [
-          0.3900001049041748,
+          0.7100000977516174,
           1.097000002861023,
-          2.8380799293518066
+          2.938079833984375
         ]
       ],
       "packing_stool": [
         [
-          -1.2899999618530273,
+          0.7599999904632568,
           0.08223675936460495,
-          0.8600000143051147
+          2.309999942779541
         ],
         [
-          -0.7100000381469727,
+          1.3399999141693115,
           0.6769999861717224,
-          1.4399999380111694
+          2.8899998664855957
         ]
       ],
       "postal_door_frame": [
@@ -8272,14 +8300,14 @@
       ],
       "packing_dressing": [
         [
-          -2.119999885559082,
+          -1.8000000715255737,
           0.30000001192092896,
-          1.8250000476837158
+          1.9249999523162842
         ],
         [
-          0.1400001049041748,
+          0.46000003814697266,
           1.2755000591278076,
-          2.6049997806549072
+          2.7049999237060547
         ]
       ],
       "fare_board": [
@@ -8296,14 +8324,14 @@
       ],
       "stamp_desk_set": [
         [
-          -2.190000057220459,
+          -1.8700001239776611,
           1.097000002861023,
-          1.6850000619888306
+          1.784999966621399
         ],
         [
-          0.19000005722045898,
+          0.5100001096725464,
           1.4585000276565552,
-          2.7150001525878906
+          2.815000057220459
         ]
       ],
       "post_table_lamp": [
@@ -8334,12 +8362,12 @@
         [
           -3.003000020980835,
           0.08299997448921204,
-          2.132499933242798
+          2.492500066757202
         ],
         [
           -2.496999979019165,
           0.46515074372291565,
-          2.568499803543091
+          2.928499937057495
         ]
       ],
       "blue_parcel_door": [
@@ -8356,24 +8384,24 @@
       ],
       "mail_sack_left": [
         [
-          -2.8799946308135986,
+          -2.3799946308135986,
           0.0820000022649765,
-          2.6735000610351562
+          2.633500099182129
         ],
         [
-          -2.6200053691864014,
+          -2.1200053691864014,
           0.6723999977111816,
-          2.946499824523926
+          2.9064998626708984
         ]
       ],
       "compass_rug": [
         [
-          0.44999998807907104,
+          0.5199999809265137,
           0.08299999684095383,
-          0.19999998807907104
+          -0.10000002384185791
         ],
         [
-          2.3499999046325684,
+          2.7200000286102295,
           0.0957999974489212,
           2.0999999046325684
         ]
@@ -8392,14 +8420,14 @@
       ],
       "blue_parcel_left": [
         [
-          -2.989000082015991,
+          -3.072999954223633,
           0.46799999475479126,
-          2.0169999599456787
+          2.511000156402588
         ],
         [
-          -2.510999917984009,
+          -2.427000045776367,
           0.7801507115364075,
-          2.6629998683929443
+          2.988999843597412
         ]
       ],
       "brown_parcel_door": [
@@ -8486,6 +8514,20 @@
           0.6786186695098877
         ]
       ]
+    },
+    "entry_corridor": {
+      "xz_bounds": [
+        [
+          -2.65,
+          0.65
+        ],
+        [
+          1.2,
+          1.65
+        ]
+      ],
+      "minimum_clear_width_at_desk": 1.0238399028778078,
+      "pip_radius": 0.21
     },
     "positive_control_hits": 760,
     "atlas_changed_regions": [],
@@ -8581,20 +8623,20 @@
       "compass_rug": {
         "bounds": [
           [
-            -0.949999988079071,
+            -1.10000002384186,
             0.0,
-            -0.949999988079071
+            -1.10000002384186
           ],
           [
-            0.949999868869781,
+            1.10000026226044,
             0.0127999996766448,
-            0.949999988079071
+            1.10000002384186
           ]
         ],
         "size_xyz": [
-          1.89999985694885,
+          2.20000028610229,
           0.0127999996766448,
-          1.89999997615814
+          2.20000004768372
         ],
         "surfaces": 1,
         "triangles": 784
@@ -9209,9 +9251,9 @@
       },
       {
         "camera_position": [
-          9.4696102142334,
+          9.78960990905762,
           14.821967124939,
-          12.414623260498
+          12.5146236419678
         ],
         "camera_size": 3.59999990463257,
         "height": 1000,
@@ -9537,6 +9579,18 @@
         "passed": true
       },
       {
+        "check": "stand_stamp_desk stationary capsule clear",
+        "passed": true
+      },
+      {
+        "check": "1.00 m wide entry corridor clear in actual physics",
+        "passed": true
+      },
+      {
+        "check": "1.00 m wide entry turn from door centre clear",
+        "passed": true
+      },
+      {
         "check": "actual placed triangles including plants match stats",
         "passed": true
       },
@@ -9601,6 +9655,10 @@
         "passed": true
       },
       {
+        "check": "Pip / stamp desk interaction >=44px",
+        "passed": true
+      },
+      {
         "check": "Saved post_npc_positions_360",
         "passed": true
       },
@@ -9614,32 +9672,32 @@
       {
         "a": "npc_pip",
         "b": "npc_sam",
-        "feet_px": 214.094345092773,
-        "tag_px": 208.697006225586
+        "feet_px": 249.326461791992,
+        "tag_px": 245.64306640625
       },
       {
         "a": "npc_pip",
         "b": "npc_keeper",
-        "feet_px": 164.754318237305,
-        "tag_px": 166.554122924805
+        "feet_px": 221.613006591797,
+        "tag_px": 223.789688110352
       },
       {
         "a": "npc_pip",
         "b": "exit",
-        "feet_px": 56.418872833252,
-        "tag_px": 59.4709014892578
+        "feet_px": 46.6501808166504,
+        "tag_px": 57.3688163757324
       },
       {
         "a": "npc_sam",
         "b": "npc_keeper",
-        "feet_px": 133.496917724609,
-        "tag_px": 133.496917724609
+        "feet_px": 128.859878540039,
+        "tag_px": 128.859878540039
       },
       {
         "a": "npc_sam",
         "b": "exit",
-        "feet_px": 270.513153076172,
-        "tag_px": 266.970886230469
+        "feet_px": 263.683532714844,
+        "tag_px": 260.138885498047
       },
       {
         "a": "npc_keeper",
@@ -9671,25 +9729,26 @@
       },
       "npc_pip": {
         "feet": [
-          87.5495681762695,
-          429.603515625
+          32.6879730224609,
+          446.711181640625
         ],
         "tag": [
-          87.5495681762695,
-          349.614318847656
+          32.6879730224609,
+          366.721984863281
         ]
       },
       "npc_sam": {
         "feet": [
-          271.189788818359,
-          539.661010742188
+          265.578186035156,
+          535.738342285156
         ],
         "tag": [
-          271.189788818359,
-          448.764221191406
+          265.578186035156,
+          444.841552734375
         ]
       }
     },
+    "pip_stamp_desk_px": 66.3205261230469,
     "placed_scene": {
       "surfaces": 41,
       "triangles": 163904
@@ -9733,16 +9792,16 @@
       "npc_pip": {
         "name": "npc_pip",
         "position": [
-          -2.1,
+          -2.48,
           0.08,
-          1.2
+          2.26
         ],
         "yaw_degrees": 180.0
       },
       "npc_sam": {
         "name": "npc_sam",
         "position": [
-          2.45,
+          2.3,
           0.08,
           0.85
         ],
@@ -9778,9 +9837,9 @@
       "stand_pip": {
         "name": "stand_pip",
         "position": [
-          -1.65,
+          -2.48,
           0.08,
-          0.7
+          1.65
         ],
         "yaw_degrees": 90.0
       },
@@ -9792,6 +9851,15 @@
           0.85
         ],
         "yaw_degrees": -90.0
+      },
+      "stand_stamp_desk": {
+        "name": "stand_stamp_desk",
+        "position": [
+          -0.68,
+          0.08,
+          1.29
+        ],
+        "yaw_degrees": 0.0
       },
       "use_counter": {
         "module": "postal_counter",
@@ -9815,9 +9883,9 @@
         "module": "packing_table",
         "name": "use_stamp_desk",
         "position": [
-          -1.0,
-          1.1,
-          2.2
+          -0.68,
+          1.097,
+          2.3
         ]
       }
     }
@@ -9859,7 +9927,7 @@
       "assets/rooms/post_office/back_wall.glb": "f70680f864537e3a30f8fed056ba963781bbc05be31bdee834c5ca6a04eba3ef",
       "assets/rooms/post_office/parcel_shelf_stock.glb": "4d06953ecae1d751241170355585b13f74c5126440fca4b9726392c62f1e86c7",
       "assets/rooms/post_office/counter_bell.glb": "7aadef05000b7c1ccdf899ea2c31851a05c9d12b775e8fbc6878df1b43006307",
-      "assets/rooms/post_office/compass_rug.glb": "180d8862a85d3bd7efca333da4d859756b8595ee501729663aaf23af86415a4d",
+      "assets/rooms/post_office/compass_rug.glb": "b9cde5ac5deb27ae7d193459ad7174931bacb0cf210303e09075527792928b91",
       "assets/rooms/post_office/room_shell.glb": "7ddf63c77d1968ddb552c515c1fd5c19c295458af7de139aab352c6c5c4b7149",
       "assets/rooms/post_office/door_light.glb": "091ae13cf5362701f9bfda8a1224c1cf1f222b7e7321a5906209477808a98416",
       "assets/rooms/post_office/entry_rug.glb": "c95cd4b53322fe7ac3990645bab7a355d974e32ad49d65cf25656879a3ebcdbf",
@@ -9884,32 +9952,32 @@
       "assets/rooms/post_office/door_notice.glb": "8dc5ec12d7cde41c2ba794b667344e1afbeb535c3418b0810495a0f51ba092e0"
     }
   },
-  "total_checks": 681,
+  "total_checks": 692,
   "atlas_changed_regions": [],
   "media": {
     "SGODOT-215_POST_v1_post_full_room_360.png": {
-      "bytes": 136572,
-      "sha256": "0e7d61a1abc0d3661ea4f107dfda0dc46ac25d974d977edea8a9d5c409fbcab8"
+      "bytes": 136431,
+      "sha256": "7ace148116b235457eb816e5803d80693e9e4023a9fda9e4b306c02574e136b3"
     },
     "SGODOT-215_POST_v1_post_full_room_panorama.png": {
-      "bytes": 1061295,
-      "sha256": "5d8bbb334db7f38350cc7daaf4591cc52031544f52157be234de03693ddfe81a"
+      "bytes": 1058774,
+      "sha256": "ee0ca79b95d71facfe882c182267e2e8dfd32a314ec1a433f0464cff91e9935b"
     },
     "SGODOT-215_POST_v1_post_gameplay_43deg_360.png": {
-      "bytes": 271065,
-      "sha256": "6582aa63431d0a05fc9d097b0165c081ccd61eeacccb02072fcf878feac1494b"
+      "bytes": 270424,
+      "sha256": "ac1982b3b918b15282eca640a65424a87d372eec32b97e4e70ff087c933c690d"
     },
     "SGODOT-215_POST_v1_post_npc_positions_360.png": {
-      "bytes": 274220,
-      "sha256": "255a1ce19e507c43bf204afc77a2b14f698c5055f426ecd3d494db853b9e05df"
+      "bytes": 274824,
+      "sha256": "4c1182991a111c3a33ffba74e2827910965e08b1ac5897debf0f12fb2e6dff49"
     },
     "SGODOT-215_POST_v1_post_npc_positions_panorama.png": {
-      "bytes": 1064301,
-      "sha256": "10d7959741ec55ae9c656b9a6de6b4cb273556367fd03adf641c0b1a0a9acebf"
+      "bytes": 1066901,
+      "sha256": "dd6cd8595e1d6f09ca419853338564a95ffa793cf660b0c9f93f2123be722f8f"
     },
     "SGODOT-215_POST_v1_post_stamp_desk_detail.png": {
-      "bytes": 1500015,
-      "sha256": "a77993834d9a3a91c2e57d5639cfcaa43b1befc2e9323939b4b1cadca797a35e"
+      "bytes": 1512600,
+      "sha256": "8a1369be050731813b9bd6640d2ff7d37e51b6f5a2641615ac53eea17d67c6da"
     }
   }
 }

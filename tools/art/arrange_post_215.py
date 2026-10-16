@@ -31,25 +31,27 @@ inst('brown_parcel_door','brown_parcel_left',[-2.82,.084,-.10],90)
 for plant in layout['shared_plants']:
  if plant['name']=='door_floor_greenery':plant['position']=[2.08,.083,2.70]
 # Authorized by 上官婉儿: original desk moved left; its GLB stays exact.
-new=[-1.0,.082,2.20];delta=[new[0]-.31,0,new[2]-1.64]
+new=[-.68,.082,2.30];delta=[new[0]-.31,0,new[2]-1.64]
 by['packing_table']['position']=new
 by['packing_dressing']['position']=delta
 by['stamp_desk_set']['position']=[a+b for a,b in zip(by['stamp_desk_set']['position'],delta)]
-by['packing_stool']['position']=[-1.0,.087,1.15]
-by['brown_parcel_left']['position']=[-2.75,.084,2.34]
+by['packing_stool']['position']=[1.05,.087,2.60]
+by['brown_parcel_left']['position']=[-2.75,.084,2.70]
 by['blue_parcel_door']['position']=[-2.75,.084,.25]
 for row in layout['instances']:
- if row['name']=='blue_parcel_left':row['position']=[-2.75,.468,2.34];row['yaw_degrees']=90
+ if row['name']=='blue_parcel_left':row['position']=[-2.75,.468,2.75];row['yaw_degrees']=0
  elif row['name']=='brown_parcel_door':row['position']=[-2.75,.084,-.42]
-add('mail_sack_left','mail_sack_reused',[-2.75,.082,2.81],0,[{'at':[0,.49,0],'size':[.46,.984,.46]}],scale=[.60,.60,.60])
-add('compass_rug','compass_rug',[1.40,.083,1.15])
+add('mail_sack_left','mail_sack_reused',[-2.25,.082,2.77],0,[{'at':[0,.49,0],'size':[.46,.984,.46]}],scale=[.60,.60,.60])
+add('compass_rug','compass_rug',[1.62,.083,1.00])
 anchors=json.loads(subprocess.check_output(['git','show','f8c3391c:assets/p0/outposts/post.anchors.json'],cwd=ROOT))['anchors'];suggestions={a['name']:copy.deepcopy(a) for a in anchors}
 suggestions['npc_pip'].update(position=[-1.03,.08,2.80],yaw_degrees=180)
 suggestions['stand_pip'].update(position=[-.45,.08,2.70],yaw_degrees=90)
-suggestions['npc_sam'].update(position=[2.45,.08,.85],yaw_degrees=180)
+suggestions['npc_sam'].update(position=[2.30,.08,.85],yaw_degrees=180)
 suggestions['stand_sam'].update(position=[1.75,.08,.85],yaw_degrees=-90)
-suggestions['npc_pip']['position']=[-2.10,.08,1.20];suggestions['stand_pip']['position']=[-1.65,.08,.70]
-suggestions['use_stamp_desk']['position']=[-1.0,1.10,2.20]
+suggestions['npc_pip']['position']=[-2.48,.08,2.26];suggestions['stand_pip']['position']=[-2.48,.08,1.65]
+suggestions['use_stamp_desk']['position']=[-.68,1.097,2.30]
+suggestions['stand_stamp_desk']={'name':'stand_stamp_desk','position':[-.68,.08,1.29],'yaw_degrees':0}
+layout['review_clearance']={'entry_route':{'from':[-2.65,.08,1.15],'to':[1.2,.08,1.15],'width':1.0},'rug_diameter':2.2,'pip_outside_route':True}
 layout['suggested_anchors']=suggestions;layout['spawn']=suggestions['spawn']['position']
 layout['revision_215']={'base_commit':BASE,'runtime_reference':'f8c3391c8c0606ae664fb8e06ad85068aa199f69','atlas_changed_regions':[],'desk_option':'left','desk_relocation_authorized':True,'removed_from_layout':sorted(removed),'map_choice':'Omitted: left wall already contains fare board/postal sign, door and notices; existing packing table is not on that wall. Fare board preserved at exact approved runtime position.','lights':'Existing door sconce plus two new wall lanterns, plus counter table lamp; daylight remains dominant.','dressing':'Keep under-desk boxes and airmail; replace the mat with identical-size clean swatch geometry to remove baked ghosts from the removed parcel/scale/tools, without touching atlas pixels.','anchor_handoff':'Suggestions only. Remove duplicate fare_board from post.anchors.json props when adopting layout; preserve use_fee_board and exact board placement.'}
 # Stats are measured from the actual files rather than copied stale totals.

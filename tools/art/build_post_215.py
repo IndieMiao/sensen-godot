@@ -46,7 +46,10 @@ def rug():
   a=i*math.pi/2
   k.mesh('Compass / cardinal arrow %d'%i,[(.82*math.sin(a),.0128,.82*math.cos(a)),(.73*math.sin(a-.055),.0128,.73*math.cos(a-.055)),(.73*math.sin(a+.055),.0128,.73*math.cos(a+.055))],[(0,1,2)],'bluegray')
 
+ # Requested 2.20 m actual diameter; preserve the 12.8 mm sewn height.
  for obj in k.CURRENT.objects:
+  if obj.type=='MESH':
+   obj.scale.x*=2.2/1.9;obj.scale.y*=2.2/1.9
   if obj.type=='MESH' and 'hem' not in obj.name:
    for f in obj.data.polygons:
     if f.normal.z<0:f.flip()

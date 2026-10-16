@@ -61,6 +61,14 @@ for a,b in itertools.combinations(rows,2):
  check(not hits,a+' clear of '+b)
  report['pairs'].append({'a':a,'b':b,'axis_separation_m':sep.tolist(),'intersections':len(hits),'support_or_retained_assembly_pairs':len(contacts)})
 report['world_bounds']={n:r['bounds'].tolist() for n,r in rows.items()}
+# Follow-up: genuine 2.20 m rug and an unobstructed one-metre entry strip.
+rug_bounds=rows['compass_rug']['bounds'];check(abs(rug_bounds[1][0]-rug_bounds[0][0]-2.2)<1e-5,'rug actual diameter 2.20 m')
+strip_lo=np.array([-2.65,.14,.65]);strip_hi=np.array([1.20,1.90,1.65])
+for n in ['packing_table','packing_dressing','stamp_desk_set','packing_stool']:
+ lo,hi=rows[n]['bounds'];check(np.any(lo>=strip_hi) or np.any(hi<=strip_lo),n+' outside 1m entry strip')
+pip=np.array(layout['suggested_anchors']['npc_pip']['position']);check(pip[2]-.21>=strip_hi[2],'Pip capsule outside entry route')
+check(rows['packing_table']['bounds'][0][2]-rows['fare_board']['bounds'][1][2]>2.85,'desk away from fee board wall interval')
+report['entry_corridor']={'xz_bounds':[strip_lo[[0,2]].tolist(),strip_hi[[0,2]].tolist()],'minimum_clear_width_at_desk':2*(rows['packing_table']['bounds'][0][2]-1.15),'pip_radius':.21}
 # Positive control: intentionally put the new pot through the preserved table.
 q=rows['stamp_desk_set'];shift=[v+Vector((0,-.15,0)) for v in q['v']];bad=BVHTree.FromPolygons(shift,q['t'],all_triangles=True).overlap(rows['packing_table']['tree']);check(bool(bad),'positive control detects tabletop penetration')
 report['positive_control_hits']=len(bad);report['atlas_changed_regions']=[];report['failures']=[c for c in report['checks'] if not c['passed']];(OUT/('glb-validation-'+layout['revision_215']['desk_option']+'.json')).write_text(json.dumps(report,indent=2)+'\n');print('POST_215_BINARY_QA',len(report['checks']),len(report['failures']),flush=True)
