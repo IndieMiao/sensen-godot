@@ -8,6 +8,9 @@ extends Control
 ##   ground is the city's baked picture (MapCard) when the package has one, else the map's land colour; the pond is a
 ##   MapDestination Short, the spots SpotNumber pins (2775:162961). A pin and its card are one: tapping either picks it
 ##   and both show it (the pin 36, solid; the card on primaryTint with a 2 px primary edge).
+##   While the spots are read (不知火舞 on #451, q(207) ③): the map card's plain ground with no pond or pins, three blank
+##   cards where the cards go (their size, a 1 px border, no words), both keys grey and quiet, the back pill as ever;
+##   the real cards take their places, nothing moves.
 ##   PICK-ERR-SPOTS (2773:182296, q(207)): no spots — the map and the cards give way to `Couldn't load farm spots` and a
 ##   Retry; both keys grey and quiet (no toast); the back pill as ever.
 ## Emits back_pressed, chosen(cluster, spot), retry_pressed, unavailable(text).
@@ -72,6 +75,7 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	_cards_box.name = "Cards"
 	_cards_box.add_theme_constant_override(&"separation", int(_CARD_GAP))
 	_at(_cards_box, _CARDS_Y + safe_top)
+	for i in 3: _cards_box.add_child(_placeholder(i + 1))
 	build = _key("Build here", UiCommandButton.Kind.PRIMARY, _BUILD_Y, safe_bottom)
 	build.name = "Build"
 	build.activated.connect(func(): if picked >= 0: chosen.emit(cluster, int(spots[picked].get("spot", picked))))
@@ -120,12 +124,28 @@ func _error() -> Control:
 	add_child(box)
 	return box
 
+## A blank card where a spot's card will be: its size and border, nothing in it.
+static func _placeholder(n: int) -> Panel:
+	var p := Panel.new()
+	p.name = "Placeholder%d" % n
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.custom_minimum_size = Vector2(_MAP.x, _CARD_H)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(UiTokens.COLOR_SURFACE_RAISED, 0.0)
+	sb.border_color = UiTokens.COLOR_BORDER
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(16)
+	p.add_theme_stylebox_override(&"panel", sb)
+	return p
+
 ## The spots came (the route's spots, their order the cards' 1 2 3).
 func show_spots(spots_: Array) -> void:
 	spots = spots_
 	failed = false
 	picked = -1
-	for c in cards: c.queue_free()
+	for c in _cards_box.get_children():   # the placeholders, or the cards of a read before
+		_cards_box.remove_child(c)
+		c.queue_free()
 	cards.clear()
 	for i in spots.size():
 		var card := SpotCard.new(i + 1, P0HomePick.spot_title(spots[i]), P0HomePick.spot_line(spots[i]))

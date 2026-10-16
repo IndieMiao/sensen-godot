@@ -191,6 +191,29 @@ func test_the_map_is_north_up_and_clear_of_its_edges() -> void:
 		assert_bool(Rect2(Vector2.ONE * 24, card.size - Vector2.ONE * 48).encloses(r)).override_failure_message("pin %d %s" % [i, r]).is_true()
 	assert_bool(Rect2(Vector2.ONE * 24, card.size - Vector2.ONE * 48).encloses(Rect2(pond.position, Vector2(pond.size.x, 60)))).is_true()
 
+## 不知火舞 on #451 (q(207) ③): while the spots are read, the plain map, three blank cards and two quiet grey keys; the
+## real cards take the blanks' places.
+func test_while_the_spots_are_read_blank_cards_hold_their_places() -> void:
+	var page := _spot_page()
+	await await_idle_frame()
+	var blanks: Array = page._cards_box.get_children()
+	assert_array(blanks.map(func(c): return c.name)).is_equal(["Placeholder1", "Placeholder2", "Placeholder3"])
+	assert_array(page._cards_box.find_children("*", "Label", true, false)).is_empty()
+	var at: Array = blanks.map(func(c): return (c as Control).global_position)
+	assert_object(page.map_card.pond).is_null()
+	assert_array(page.map_card.pins).is_empty()
+	assert_str(page.build.reason).is_equal("Pick a spot")
+	assert_str(page.for_me.reason).is_equal("Pick for me")
+	var said := []
+	page.unavailable.connect(func(t): said.append(t))
+	page.build.pressed.emit()
+	page.for_me.pressed.emit()
+	assert_array(said).is_empty()
+	page.show_spots(spots())
+	await await_idle_frame()
+	assert_int(page._cards_box.get_child_count()).is_equal(3)
+	assert_array(page.cards.map(func(c): return (c as Control).global_position)).is_equal(at)   # nothing moves
+
 func test_spots_that_fail_leave_the_keys_grey_and_quiet() -> void:
 	var page := _spot_page()
 	page.show_failed()
