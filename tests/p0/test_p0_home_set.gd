@@ -38,7 +38,7 @@ const CITY := {
 }
 
 ## A save whose home is Tokyo (view.home, SGODOT-303).
-func _tokyo_home() -> Dictionary:
+static func _tokyo_home() -> Dictionary:
 	return {"travel": {"home": TOKYO, "here": TOKYO}, "home": {"city": TOKYO, "name": "Tokyo", "pending": false,
 		"farm": {"lat": 35.6801, "lng": 139.7102},
 		"set": {"market": "gn-1850147~market0", "tea": "gn-1850147~tea0", "tackle": "gn-1850147~tackle0",
