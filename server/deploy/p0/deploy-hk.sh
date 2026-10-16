@@ -160,18 +160,25 @@ case "$step" in
 import sys
 src, dst = sys.argv[1], sys.argv[2]
 lines = open(src).read().split('\n')
-# After the Journey preview's block while it is there; once it is gone (SGODOT-304 retires the Journey server), before
-# the site's fallback proxy to the old farm, at its indent.
-journey = next((i for i, l in enumerate(lines) if l.strip().startswith('handle_path /preview/journey/*')), None)
+# After the Journey block while it is there — its proxy (handle_path /preview/journey/*) or, once SGODOT-304 retires
+# the Journey server, its 410 (handle /preview/journey* { respond … 410 }); without it, before the site's fallback
+# block (the first bare `handle {`), at its indent. Neither: stop, never guess (蒙恬 on #450: the live fallback proxies
+# farm-app-1:3000 inside that handle block, not the repo's reverse_proxy app:3000).
+import re
+def block_end(i):
+    depth = 0
+    for k in range(i, len(lines)):
+        depth += lines[k].count('{') - lines[k].count('}')
+        if depth == 0: return k + 1
+    sys.exit('Caddyfile: unbalanced braces after line %d' % (i + 1))
+journey = next((i for i, l in enumerate(lines) if re.match(r'^\s*handle(_path)?\s+/preview/journey', l)), None)
+fallback = next((i for i, l in enumerate(lines) if re.match(r'^\s*handle\s*\{\s*$', l)), None)
 if journey is not None:
-    depth, at = 0, None
-    for i in range(journey, len(lines)):
-        depth += lines[i].count('{') - lines[i].count('}')
-        if depth == 0: at = i + 1; break
-    ref = lines[journey]
+    at, ref = block_end(journey), lines[journey]
+elif fallback is not None:
+    at, ref = fallback, lines[fallback]
 else:
-    at = next(i for i, l in enumerate(lines) if l.strip().startswith('reverse_proxy app:3000'))
-    ref = lines[at]
+    sys.exit('Caddyfile: neither a /preview/journey block nor a bare `handle {` fallback block to place /preview/p0 by')
 indent = ref[:len(ref) - len(ref.lstrip())]
 block = [f'{indent}handle_path /preview/p0/* {{', f'{indent}    reverse_proxy p0-demo:3110', f'{indent}}}']
 open(dst, 'w').write('\n'.join(lines[:at] + block + lines[at:]))
