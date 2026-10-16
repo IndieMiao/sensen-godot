@@ -60,6 +60,10 @@ describe('the Mine Hut (q(204))', () => {
       expect(hut.name.length).toBeLessThanOrEqual(24);
       expect(city.detail.outposts.map(o => o.name)).not.toContain(hut.name);
       expect(hut.residents).toEqual(['res_ivo']);
+      // nowhere that fits (every ring point within 300 m of a place): no hut rather than one breaking the rules
+      const placement = w.placement;
+      w.placement = { ...placement, other_kind_min_m: 50_000 };
+      try { expect(generateCity(c, cl).detail.huts).toEqual([]); } finally { w.placement = placement; }
       const room = w.room.mine_hut;
       delete w.room.mine_hut;
       try {
