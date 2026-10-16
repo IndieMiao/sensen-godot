@@ -22,7 +22,10 @@ for name in ['room_shell','window_wall','back_wall','postal_blue_door','postal_d
  p=KIT/old[name]['file'];check(p.read_bytes()==subprocess.check_output(['git','show',BASE+':'+str(p.relative_to(ROOT))],cwd=ROOT),name+' byte-identical GLB')
 check((KIT/'packing_table.glb').read_bytes()==subprocess.check_output(['git','show',BASE+':assets/rooms/post_office/packing_table.glb'],cwd=ROOT),'packing table original mesh unchanged')
 check(all(n not in by for n in ['counter_computer','magazine_rack','front_floor_runner']),'removed computer/rack/runner from scene')
-check(by['fare_board']['position']==[-3.208,1.65,-1.65] and by['fare_board']['yaw_degrees']==90,'fare board exact approved runtime position')
+runtime=json.loads(subprocess.check_output(['git','show','f8c3391c:assets/p0/outposts/post.anchors.json'],cwd=ROOT))
+fee=next(p for p in runtime['props'] if p['name']=='fare_board')
+check('fare_board' not in by and sum(p['name']=='fare_board' for p in runtime['props'])==1,'fare board once only: anchors prop, absent from layout')
+check(fee['position']==[-3.208,1.65,-1.65] and fee['yaw_degrees']==90,'fare board exact approved runtime position')
 check((KIT/'fare_board.glb').read_bytes()==subprocess.check_output(['git','show',BASE+':assets/rooms/post_office/fare_board.glb'],cwd=ROOT),'fare board byte-identical')
 check(hashlib.sha256((KIT/'room_albedo_ao.png').read_bytes()).hexdigest()==contract['atlas']['atlas_sha256'],'atlas byte-identical / zero changed regions')
 tex=bpy.data.images.load(str(KIT/'room_albedo_ao.png'));pixels=np.array(tex.pixels[:]).reshape(2048,2048,4)[::-1]
@@ -39,15 +42,32 @@ for name,meta in contract['assets'].items():
     allowed=np.array([s['gltf_uv'] for s in contract['atlas']['swatches'].values()]);check(all(np.linalg.norm(allowed-q,axis=1).min()<1e-6 for q in uv),name+' only approved swatch UVs')
  check(deg==0,name+' no degenerate triangles');check(bad==0,name+' normals agree with winding')
  report['assets'][name]={'bounds':[lo.tolist(),hi.tolist()],'size_xyz':(hi-lo).tolist(),'triangles':len(t),'surfaces':1,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+# The revised sign contains the original three non-letter pieces only.
+sign_doc,sign_blob=load_glb(KIT/'post_office_sign.glb')
+pr=sign_doc['meshes'][0]['primitives'][0]
+positions=accessor(sign_doc,sign_blob,pr['attributes']['POSITION'])
+indices=[x[0] for x in accessor(sign_doc,sign_blob,pr['indices'])]
+check(len(indices)//3==776,'sign retains plaque and envelope: 776 triangles')
+check(not any(y<.1 and z>.08 for x,y,z in positions),'no letter geometry in original text band')
+original_file=OUT/'original-sign-audit.glb';original_file.write_bytes(subprocess.check_output(['git','show',BASE+':assets/rooms/post_office/post_office_sign.glb'],cwd=ROOT))
+od,ob=load_glb(original_file);op=od['meshes'][0]['primitives'][0]
+for attr in ['POSITION','NORMAL']:
+ old_values=set(accessor(od,ob,op['attributes'][attr]))
+ check(set(accessor(sign_doc,sign_blob,pr['attributes'][attr])).issubset(old_values),'sign surviving '+attr+' retains exact original values')
+uv=accessor(sign_doc,sign_blob,pr['attributes']['TEXCOORD_0']);old_uv=set(accessor(od,ob,op['attributes']['TEXCOORD_0']))
+check(all(q in old_uv for p,q in zip(positions,uv) if p[2]>.075),'envelope original UV unchanged')
+check(all(abs(q[0]-690.5/2048)<1e-7 and abs(q[1]-1259.5/2048)<1e-7 for p,q in zip(positions,uv) if p[2]<.075),'red body samples its own clean existing atlas patch')
+report['sign_revision']=json.loads((SRC/'sign-revision.json').read_text())
 rows={}
 def entry(name,file,row):
  d,b,v,t,g=geometry(file,matrix(row['position'],row.get('yaw_degrees',0),row.get('scale',[1,1,1]),row.get('rotation_degrees')))
  rows[name]={'v':v,'t':t,'bounds':np.array(bounds(v)),'tree':BVHTree.FromPolygons(v,t,all_triangles=True),'row':row}
 for row in layout['assets']+layout['instances']:entry(row['name'],KIT/by[row.get('asset',row['name'])]['file'],row)
+entry('fare_board',KIT/'fare_board.glb',fee)
 for row in layout['shared_plants']:entry(row['name'],ROOT/'assets/rooms/_shared/plants'/row['file'],row)
 # Target all changed or introduced modules. Original kit assembly issues are not
 # silently called newly passing; checks record them separately below.
-targets=set(by)-set(old)|{r['name'] for r in layout['instances']}|{'packing_dressing','door_floor_greenery'}
+targets=set(by)-set(old)|{r['name'] for r in layout['instances']}|{'packing_dressing','door_floor_greenery','post_office_sign','fare_board'}
 if layout['revision_215']['desk_option']=='left':targets|={'packing_table','packing_stool'}
 for a,b in itertools.combinations(rows,2):
  if not (a in targets or b in targets):continue
@@ -58,6 +78,12 @@ for a,b in itertools.combinations(rows,2):
   old_assembly=set([a,b])=={'packing_table','packing_dressing'}
   desk_contact=set([a,b])=={'packing_table','stamp_desk_set'} and min(va[:,1].max(),vb[:,1].max())<=1.097002 and max(va[:,1].min(),vb[:,1].min())>=1.096998
   (contacts if floor or old_assembly or desk_contact else hits).append([ia,ib])
+ if {a,b}=={'window_wall','post_office_sign'} and hits:
+  _,_,ov,ot,_=geometry(original_file,matrix(by['post_office_sign']['position'],by['post_office_sign']['yaw_degrees']))
+  prior_hits=rows['window_wall']['tree'].overlap(BVHTree.FromPolygons(ov,ot,all_triangles=True))
+  check(len(hits)==len(prior_hits),'sign retains exactly the original wall mounting intersections')
+  report['preexisting_pairs'].append({'a':a,'b':b,'intersections':len(hits),'baseline_intersections':len(prior_hits),'reason':'Original plaque mounts into wall; surviving geometry and placement unchanged'})
+  contacts.extend(hits);hits=[]
  check(not hits,a+' clear of '+b)
  report['pairs'].append({'a':a,'b':b,'axis_separation_m':sep.tolist(),'intersections':len(hits),'support_or_retained_assembly_pairs':len(contacts)})
 report['world_bounds']={n:r['bounds'].tolist() for n,r in rows.items()}
@@ -66,7 +92,8 @@ rug_bounds=rows['compass_rug']['bounds'];check(abs(rug_bounds[1][0]-rug_bounds[0
 strip_lo=np.array([-2.65,.14,.65]);strip_hi=np.array([1.20,1.90,1.65])
 for n in ['packing_table','packing_dressing','stamp_desk_set','packing_stool']:
  lo,hi=rows[n]['bounds'];check(np.any(lo>=strip_hi) or np.any(hi<=strip_lo),n+' outside 1m entry strip')
-pip=np.array(layout['suggested_anchors']['npc_pip']['position']);check(pip[2]-.21>=strip_hi[2],'Pip capsule outside entry route')
+pip=np.array(layout['suggested_anchors']['npc_pip']['position']);check(any(pip[[0,2]]-.21>=strip_hi[[0,2]]) or any(pip[[0,2]]+.21<=strip_lo[[0,2]]),'Pip capsule outside entry route')
+check(layout['suggested_anchors']['npc_pip']['position']==[2.3,.08,.8] and layout['suggested_anchors']['stand_pip']['position']==[1.65,.08,.6],'Pip retained at live right-side NPC and approach positions')
 check(rows['packing_table']['bounds'][0][2]-rows['fare_board']['bounds'][1][2]>2.85,'desk away from fee board wall interval')
 report['entry_corridor']={'xz_bounds':[strip_lo[[0,2]].tolist(),strip_hi[[0,2]].tolist()],'minimum_clear_width_at_desk':2*(rows['packing_table']['bounds'][0][2]-1.15),'pip_radius':.21}
 # Positive control: intentionally put the new pot through the preserved table.

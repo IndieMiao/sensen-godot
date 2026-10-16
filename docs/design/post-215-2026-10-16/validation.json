@@ -1,4 +1,5 @@
 {
+  "revision": "v1.2",
   "glb": {
     "checks": [
       {
@@ -111,6 +112,10 @@
       },
       {
         "check": "removed computer/rack/runner from scene",
+        "passed": true
+      },
+      {
+        "check": "fare board once only: anchors prop, absent from layout",
         "passed": true
       },
       {
@@ -382,6 +387,30 @@
         "passed": true
       },
       {
+        "check": "sign retains plaque and envelope: 776 triangles",
+        "passed": true
+      },
+      {
+        "check": "no letter geometry in original text band",
+        "passed": true
+      },
+      {
+        "check": "sign surviving POSITION retains exact original values",
+        "passed": true
+      },
+      {
+        "check": "sign surviving NORMAL retains exact original values",
+        "passed": true
+      },
+      {
+        "check": "envelope original UV unchanged",
+        "passed": true
+      },
+      {
+        "check": "red body samples its own clean existing atlas patch",
+        "passed": true
+      },
+      {
         "check": "room_shell clear of packing_table",
         "passed": true
       },
@@ -390,11 +419,11 @@
         "passed": true
       },
       {
-        "check": "room_shell clear of packing_dressing",
+        "check": "room_shell clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "room_shell clear of fare_board",
+        "check": "room_shell clear of packing_dressing",
         "passed": true
       },
       {
@@ -438,6 +467,10 @@
         "passed": true
       },
       {
+        "check": "room_shell clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "room_shell clear of door_floor_greenery",
         "passed": true
       },
@@ -450,11 +483,15 @@
         "passed": true
       },
       {
-        "check": "window_wall clear of packing_dressing",
+        "check": "sign retains exactly the original wall mounting intersections",
         "passed": true
       },
       {
-        "check": "window_wall clear of fare_board",
+        "check": "window_wall clear of post_office_sign",
+        "passed": true
+      },
+      {
+        "check": "window_wall clear of packing_dressing",
         "passed": true
       },
       {
@@ -498,6 +535,10 @@
         "passed": true
       },
       {
+        "check": "window_wall clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "window_wall clear of door_floor_greenery",
         "passed": true
       },
@@ -510,11 +551,11 @@
         "passed": true
       },
       {
-        "check": "back_wall clear of packing_dressing",
+        "check": "back_wall clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "back_wall clear of fare_board",
+        "check": "back_wall clear of packing_dressing",
         "passed": true
       },
       {
@@ -558,6 +599,10 @@
         "passed": true
       },
       {
+        "check": "back_wall clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "back_wall clear of door_floor_greenery",
         "passed": true
       },
@@ -570,11 +615,11 @@
         "passed": true
       },
       {
-        "check": "postal_blue_door clear of packing_dressing",
+        "check": "postal_blue_door clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "postal_blue_door clear of fare_board",
+        "check": "postal_blue_door clear of packing_dressing",
         "passed": true
       },
       {
@@ -618,6 +663,10 @@
         "passed": true
       },
       {
+        "check": "postal_blue_door clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "postal_blue_door clear of door_floor_greenery",
         "passed": true
       },
@@ -630,11 +679,11 @@
         "passed": true
       },
       {
-        "check": "sorting_cabinet clear of packing_dressing",
+        "check": "sorting_cabinet clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "sorting_cabinet clear of fare_board",
+        "check": "sorting_cabinet clear of packing_dressing",
         "passed": true
       },
       {
@@ -678,6 +727,10 @@
         "passed": true
       },
       {
+        "check": "sorting_cabinet clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "sorting_cabinet clear of door_floor_greenery",
         "passed": true
       },
@@ -690,11 +743,11 @@
         "passed": true
       },
       {
-        "check": "red_post_box clear of packing_dressing",
+        "check": "red_post_box clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "red_post_box clear of fare_board",
+        "check": "red_post_box clear of packing_dressing",
         "passed": true
       },
       {
@@ -738,6 +791,10 @@
         "passed": true
       },
       {
+        "check": "red_post_box clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "red_post_box clear of door_floor_greenery",
         "passed": true
       },
@@ -750,11 +807,11 @@
         "passed": true
       },
       {
-        "check": "wall_clock clear of packing_dressing",
+        "check": "wall_clock clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "wall_clock clear of fare_board",
+        "check": "wall_clock clear of packing_dressing",
         "passed": true
       },
       {
@@ -798,6 +855,10 @@
         "passed": true
       },
       {
+        "check": "wall_clock clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "wall_clock clear of door_floor_greenery",
         "passed": true
       },
@@ -810,11 +871,11 @@
         "passed": true
       },
       {
-        "check": "postal_counter clear of packing_dressing",
+        "check": "postal_counter clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "postal_counter clear of fare_board",
+        "check": "postal_counter clear of packing_dressing",
         "passed": true
       },
       {
@@ -858,6 +919,10 @@
         "passed": true
       },
       {
+        "check": "postal_counter clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "postal_counter clear of door_floor_greenery",
         "passed": true
       },
@@ -870,11 +935,11 @@
         "passed": true
       },
       {
-        "check": "parcel_shelves clear of packing_dressing",
+        "check": "parcel_shelves clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "parcel_shelves clear of fare_board",
+        "check": "parcel_shelves clear of packing_dressing",
         "passed": true
       },
       {
@@ -915,6 +980,10 @@
       },
       {
         "check": "parcel_shelves clear of brown_parcel_door",
+        "passed": true
+      },
+      {
+        "check": "parcel_shelves clear of fare_board",
         "passed": true
       },
       {
@@ -978,10 +1047,6 @@
         "passed": true
       },
       {
-        "check": "packing_table clear of fare_board",
-        "passed": true
-      },
-      {
         "check": "packing_table clear of stamp_desk_set",
         "passed": true
       },
@@ -1019,6 +1084,10 @@
       },
       {
         "check": "packing_table clear of brown_parcel_door",
+        "passed": true
+      },
+      {
+        "check": "packing_table clear of fare_board",
         "passed": true
       },
       {
@@ -1098,10 +1167,6 @@
         "passed": true
       },
       {
-        "check": "packing_stool clear of fare_board",
-        "passed": true
-      },
-      {
         "check": "packing_stool clear of stamp_desk_set",
         "passed": true
       },
@@ -1142,6 +1207,10 @@
         "passed": true
       },
       {
+        "check": "packing_stool clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "packing_stool clear of door_floor_greenery",
         "passed": true
       },
@@ -1166,11 +1235,11 @@
         "passed": true
       },
       {
-        "check": "postal_door_frame clear of packing_dressing",
+        "check": "postal_door_frame clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "postal_door_frame clear of fare_board",
+        "check": "postal_door_frame clear of packing_dressing",
         "passed": true
       },
       {
@@ -1214,15 +1283,19 @@
         "passed": true
       },
       {
+        "check": "postal_door_frame clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "postal_door_frame clear of door_floor_greenery",
         "passed": true
       },
       {
-        "check": "postal_door_glass clear of packing_dressing",
+        "check": "postal_door_glass clear of post_office_sign",
         "passed": true
       },
       {
-        "check": "postal_door_glass clear of fare_board",
+        "check": "postal_door_glass clear of packing_dressing",
         "passed": true
       },
       {
@@ -1266,15 +1339,51 @@
         "passed": true
       },
       {
+        "check": "postal_door_glass clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "postal_door_glass clear of door_floor_greenery",
         "passed": true
       },
       {
-        "check": "post_office_sign clear of packing_dressing",
+        "check": "post_office_sign clear of sorted_letters",
         "passed": true
       },
       {
-        "check": "post_office_sign clear of fare_board",
+        "check": "post_office_sign clear of parcel_shelf_stock",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of mail_sacks",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of counter_bell",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of door_lamp_glow",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of blue_entry_mat",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of corner_letter_crate",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of counter_dressing",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of wall_dressing",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of packing_dressing",
         "passed": true
       },
       {
@@ -1318,15 +1427,35 @@
         "passed": true
       },
       {
+        "check": "post_office_sign clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "post_office_sign clear of door_floor_greenery",
         "passed": true
       },
       {
-        "check": "sorted_letters clear of packing_dressing",
+        "check": "post_office_sign clear of counter_trailing",
         "passed": true
       },
       {
-        "check": "sorted_letters clear of fare_board",
+        "check": "post_office_sign clear of cabinet_greenery",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of shelf_trailing",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of corner_floor_greenery",
+        "passed": true
+      },
+      {
+        "check": "post_office_sign clear of door_hanging_pothos",
+        "passed": true
+      },
+      {
+        "check": "sorted_letters clear of packing_dressing",
         "passed": true
       },
       {
@@ -1370,15 +1499,15 @@
         "passed": true
       },
       {
+        "check": "sorted_letters clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "sorted_letters clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "parcel_shelf_stock clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "parcel_shelf_stock clear of fare_board",
         "passed": true
       },
       {
@@ -1422,15 +1551,15 @@
         "passed": true
       },
       {
+        "check": "parcel_shelf_stock clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "parcel_shelf_stock clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "mail_sacks clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "mail_sacks clear of fare_board",
         "passed": true
       },
       {
@@ -1474,15 +1603,15 @@
         "passed": true
       },
       {
+        "check": "mail_sacks clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "mail_sacks clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "counter_bell clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "counter_bell clear of fare_board",
         "passed": true
       },
       {
@@ -1526,15 +1655,15 @@
         "passed": true
       },
       {
+        "check": "counter_bell clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "counter_bell clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "door_lamp_glow clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "door_lamp_glow clear of fare_board",
         "passed": true
       },
       {
@@ -1578,15 +1707,15 @@
         "passed": true
       },
       {
+        "check": "door_lamp_glow clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "door_lamp_glow clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "blue_entry_mat clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "blue_entry_mat clear of fare_board",
         "passed": true
       },
       {
@@ -1630,15 +1759,15 @@
         "passed": true
       },
       {
+        "check": "blue_entry_mat clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "blue_entry_mat clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "corner_letter_crate clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "corner_letter_crate clear of fare_board",
         "passed": true
       },
       {
@@ -1682,15 +1811,15 @@
         "passed": true
       },
       {
+        "check": "corner_letter_crate clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "corner_letter_crate clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "counter_dressing clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "counter_dressing clear of fare_board",
         "passed": true
       },
       {
@@ -1734,15 +1863,15 @@
         "passed": true
       },
       {
+        "check": "counter_dressing clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "counter_dressing clear of door_floor_greenery",
         "passed": true
       },
       {
         "check": "wall_dressing clear of packing_dressing",
-        "passed": true
-      },
-      {
-        "check": "wall_dressing clear of fare_board",
         "passed": true
       },
       {
@@ -1786,11 +1915,11 @@
         "passed": true
       },
       {
-        "check": "wall_dressing clear of door_floor_greenery",
+        "check": "wall_dressing clear of fare_board",
         "passed": true
       },
       {
-        "check": "packing_dressing clear of fare_board",
+        "check": "wall_dressing clear of door_floor_greenery",
         "passed": true
       },
       {
@@ -1834,6 +1963,10 @@
         "passed": true
       },
       {
+        "check": "packing_dressing clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "packing_dressing clear of door_floor_greenery",
         "passed": true
       },
@@ -1855,70 +1988,6 @@
       },
       {
         "check": "packing_dressing clear of door_hanging_pothos",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of stamp_desk_set",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of post_table_lamp",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of post_wall_lantern",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of brown_parcel_left",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of blue_parcel_door",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of mail_sack_left",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of compass_rug",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of post_wall_lantern_right",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of blue_parcel_left",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of brown_parcel_door",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of door_floor_greenery",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of counter_trailing",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of cabinet_greenery",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of shelf_trailing",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of corner_floor_greenery",
-        "passed": true
-      },
-      {
-        "check": "fare_board clear of door_hanging_pothos",
         "passed": true
       },
       {
@@ -1955,6 +2024,10 @@
       },
       {
         "check": "stamp_desk_set clear of brown_parcel_door",
+        "passed": true
+      },
+      {
+        "check": "stamp_desk_set clear of fare_board",
         "passed": true
       },
       {
@@ -2014,6 +2087,10 @@
         "passed": true
       },
       {
+        "check": "post_table_lamp clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "post_table_lamp clear of door_floor_greenery",
         "passed": true
       },
@@ -2066,6 +2143,10 @@
         "passed": true
       },
       {
+        "check": "post_wall_lantern clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "post_wall_lantern clear of door_floor_greenery",
         "passed": true
       },
@@ -2114,6 +2195,10 @@
         "passed": true
       },
       {
+        "check": "brown_parcel_left clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "brown_parcel_left clear of door_floor_greenery",
         "passed": true
       },
@@ -2158,6 +2243,10 @@
         "passed": true
       },
       {
+        "check": "blue_parcel_door clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "blue_parcel_door clear of door_floor_greenery",
         "passed": true
       },
@@ -2198,6 +2287,10 @@
         "passed": true
       },
       {
+        "check": "mail_sack_left clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "mail_sack_left clear of door_floor_greenery",
         "passed": true
       },
@@ -2234,6 +2327,10 @@
         "passed": true
       },
       {
+        "check": "compass_rug clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "compass_rug clear of door_floor_greenery",
         "passed": true
       },
@@ -2266,6 +2363,10 @@
         "passed": true
       },
       {
+        "check": "post_wall_lantern_right clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "post_wall_lantern_right clear of door_floor_greenery",
         "passed": true
       },
@@ -2294,6 +2395,10 @@
         "passed": true
       },
       {
+        "check": "blue_parcel_left clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "blue_parcel_left clear of door_floor_greenery",
         "passed": true
       },
@@ -2318,6 +2423,10 @@
         "passed": true
       },
       {
+        "check": "brown_parcel_door clear of fare_board",
+        "passed": true
+      },
+      {
         "check": "brown_parcel_door clear of door_floor_greenery",
         "passed": true
       },
@@ -2339,6 +2448,30 @@
       },
       {
         "check": "brown_parcel_door clear of door_hanging_pothos",
+        "passed": true
+      },
+      {
+        "check": "fare_board clear of door_floor_greenery",
+        "passed": true
+      },
+      {
+        "check": "fare_board clear of counter_trailing",
+        "passed": true
+      },
+      {
+        "check": "fare_board clear of cabinet_greenery",
+        "passed": true
+      },
+      {
+        "check": "fare_board clear of shelf_trailing",
+        "passed": true
+      },
+      {
+        "check": "fare_board clear of corner_floor_greenery",
+        "passed": true
+      },
+      {
+        "check": "fare_board clear of door_hanging_pothos",
         "passed": true
       },
       {
@@ -2383,6 +2516,10 @@
       },
       {
         "check": "Pip capsule outside entry route",
+        "passed": true
+      },
+      {
+        "check": "Pip retained at live right-side NPC and approach positions",
         "passed": true
       },
       {
@@ -2597,22 +2734,22 @@
       },
       {
         "a": "room_shell",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          -3.9600000381469727,
-          0.18000001460313797,
-          -1.2750000953674316
+          -0.47099995613098145,
+          2.3400000408291817,
+          -2.7200000286102295
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "room_shell",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          -0.3619999885559082,
-          1.2050000503659248,
-          -2.0000001192092896
+          -3.9600000381469727,
+          0.18000001460313797,
+          -1.2750000953674316
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2729,6 +2866,17 @@
       },
       {
         "a": "room_shell",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.3619999885559082,
+          1.2050000503659248,
+          -2.0000001192092896
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "room_shell",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           -1.806396484375,
@@ -2762,22 +2910,22 @@
       },
       {
         "a": "window_wall",
+        "b": "post_office_sign",
+        "axis_separation_m": [
+          -0.1400003433227539,
+          -1.3849999904632568,
+          -2.6549999713897705
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 85
+      },
+      {
+        "a": "window_wall",
         "b": "packing_dressing",
         "axis_separation_m": [
           1.2249997854232788,
           -1.3504999876022339,
           -1.2100000381469727
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "window_wall",
-        "b": "fare_board",
-        "axis_separation_m": [
-          -0.1830000877380371,
-          -2.049999952316284,
-          -1.9350000619888306
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -2894,6 +3042,17 @@
       },
       {
         "a": "window_wall",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.1830000877380371,
+          -2.049999952316284,
+          -1.9350000619888306
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "window_wall",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.7186033725738525,
@@ -2927,22 +3086,22 @@
       },
       {
         "a": "back_wall",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          -3.759999990463257,
-          -1.3504999876022339,
-          4.650000095367432
+          -0.2709999084472656,
+          -1.3849999904632568,
+          -0.07499980926513672
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "back_wall",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          -0.16199994087219238,
-          -2.049999952316284,
-          0.6250002384185791
+          -3.759999990463257,
+          -1.3504999876022339,
+          4.650000095367432
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3059,6 +3218,17 @@
       },
       {
         "a": "back_wall",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.16199994087219238,
+          -2.049999952316284,
+          0.6250002384185791
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "back_wall",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           -1.741396427154541,
@@ -3092,22 +3262,22 @@
       },
       {
         "a": "postal_blue_door",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          1.1320000886917114,
-          -1.2005000114440918,
-          0.10499989986419678
+          -0.22099995613098145,
+          0.08500003814697266,
+          1.2400001287460327
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "postal_blue_door",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          -0.1119999885559082,
-          -1.0499999523162842,
-          1.9600000381469727
+          1.1320000886917114,
+          -1.2005000114440918,
+          0.10499989986419678
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3224,6 +3394,17 @@
       },
       {
         "a": "postal_blue_door",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.1119999885559082,
+          -1.0499999523162842,
+          1.9600000381469727
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "postal_blue_door",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.625603675842285,
@@ -3257,22 +3438,22 @@
       },
       {
         "a": "sorting_cabinet",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          -2.205000102519989,
-          -1.2085000276565552,
-          4.177884340286255
+          1.2239999771118164,
+          0.06299996376037598,
+          -0.5471155643463135
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "sorting_cabinet",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          1.3329999446868896,
-          -1.0720000267028809,
-          0.15288448333740234
+          -2.205000102519989,
+          -1.2085000276565552,
+          4.177884340286255
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3389,6 +3570,17 @@
       },
       {
         "a": "sorting_cabinet",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.3329999446868896,
+          -1.0720000267028809,
+          0.15288448333740234
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "sorting_cabinet",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           1.2886034846305847,
@@ -3422,22 +3614,22 @@
       },
       {
         "a": "red_post_box",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          2.130000114440918,
-          -1.19350004196167,
-          1.534999966621399
+          5.619000196456909,
+          0.5980000495910645,
+          0.09000003337860107
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "red_post_box",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          5.728000164031982,
-          -0.5369999408721924,
-          0.809999942779541
+          2.130000114440918,
+          -1.19350004196167,
+          1.534999966621399
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3554,6 +3746,17 @@
       },
       {
         "a": "red_post_box",
+        "b": "fare_board",
+        "axis_separation_m": [
+          5.728000164031982,
+          -0.5369999408721924,
+          0.809999942779541
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "red_post_box",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           0.13113689422607422,
@@ -3587,22 +3790,22 @@
       },
       {
         "a": "wall_clock",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          -1.4399999976158142,
-          1.424499750137329,
-          4.685999870300293
+          2.049000084400177,
+          -0.7400002479553223,
+          -0.03900003433227539
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "wall_clock",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          2.1580000519752502,
-          0.7249997854232788,
-          0.6610000133514404
+          -1.4399999976158142,
+          1.424499750137329,
+          4.685999870300293
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3719,6 +3922,17 @@
       },
       {
         "a": "wall_clock",
+        "b": "fare_board",
+        "axis_separation_m": [
+          2.1580000519752502,
+          0.7249997854232788,
+          0.6610000133514404
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "wall_clock",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           1.893603503704071,
@@ -3752,22 +3966,22 @@
       },
       {
         "a": "postal_counter",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          -2.9600000381469727,
-          -1.0920000672340393,
-          1.9849999845027924
+          0.5290000438690186,
+          1.0679999589920044,
+          -0.5399999618530273
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "postal_counter",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          0.6380000114440918,
-          -0.06700003147125244,
-          0.1799999475479126
+          -2.9600000381469727,
+          -1.0920000672340393,
+          1.9849999845027924
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -3884,6 +4098,17 @@
       },
       {
         "a": "postal_counter",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.6380000114440918,
+          -0.06700003147125244,
+          0.1799999475479126
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "postal_counter",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           0.3536036014556885,
@@ -3917,22 +4142,22 @@
       },
       {
         "a": "parcel_shelves",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          0.9899998903274536,
-          -1.0655001401901245,
-          4.141499757766724
+          4.478999972343445,
+          -0.1399998664855957,
+          -0.5835001468658447
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "parcel_shelves",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          4.587999939918518,
-          -1.2749998569488525,
-          0.1164999008178711
+          0.9899998903274536,
+          -1.0655001401901245,
+          4.141499757766724
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4043,6 +4268,17 @@
           3.971500039100647,
           -0.25515082478523254,
           1.5434998273849487
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "parcel_shelves",
+        "b": "fare_board",
+        "axis_separation_m": [
+          4.587999939918518,
+          -1.2749998569488525,
+          0.1164999008178711
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4214,17 +4450,6 @@
       },
       {
         "a": "packing_table",
-        "b": "fare_board",
-        "axis_separation_m": [
-          1.068000078201294,
-          0.22800004482269287,
-          2.86191987991333
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "packing_table",
         "b": "stamp_desk_set",
         "axis_separation_m": [
           -2.5800000429153442,
@@ -4329,6 +4554,17 @@
           0.45150017738342285,
           -0.38315075635910034,
           1.8289198875427246
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "packing_table",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.068000078201294,
+          0.22800004482269287,
+          2.86191987991333
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4544,17 +4780,6 @@
       },
       {
         "a": "packing_stool",
-        "b": "fare_board",
-        "axis_separation_m": [
-          3.8980000019073486,
-          0.6480000615119934,
-          3.5099998712539673
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "packing_stool",
         "b": "stamp_desk_set",
         "axis_separation_m": [
           0.24999988079071045,
@@ -4665,6 +4890,17 @@
       },
       {
         "a": "packing_stool",
+        "b": "fare_board",
+        "axis_separation_m": [
+          3.8980000019073486,
+          0.6480000615119934,
+          3.5099998712539673
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "packing_stool",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           0.3536036014556885,
@@ -4731,22 +4967,22 @@
       },
       {
         "a": "postal_door_frame",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          1.225000023841858,
-          -1.2304999828338623,
-          -0.07500004768371582
+          -0.1400001049041748,
+          -0.17499995231628418,
+          1.0600000023841858
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "postal_door_frame",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          -0.07700037956237793,
-          -1.309999942779541,
-          1.7799999117851257
+          1.225000023841858,
+          -1.2304999828338623,
+          -0.07500004768371582
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -4863,6 +5099,17 @@
       },
       {
         "a": "postal_door_frame",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.07700037956237793,
+          -1.309999942779541,
+          1.7799999117851257
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "postal_door_frame",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.718603610992432,
@@ -4874,22 +5121,22 @@
       },
       {
         "a": "postal_door_glass",
-        "b": "packing_dressing",
+        "b": "post_office_sign",
         "axis_separation_m": [
-          1.3000000715255737,
-          -0.3205000162124634,
-          0.29499995708465576
+          -0.06500005722045898,
+          0.44499993324279785,
+          1.4300001859664917
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "postal_door_glass",
-        "b": "fare_board",
+        "b": "packing_dressing",
         "axis_separation_m": [
-          0.017999887466430664,
-          -0.690000057220459,
-          2.1500000953674316
+          1.3000000715255737,
+          -0.3205000162124634,
+          0.29499995708465576
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5006,6 +5253,17 @@
       },
       {
         "a": "postal_door_glass",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.017999887466430664,
+          -0.690000057220459,
+          2.1500000953674316
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "postal_door_glass",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.7936036586761475,
@@ -5017,22 +5275,110 @@
       },
       {
         "a": "post_office_sign",
-        "b": "packing_dressing",
+        "b": "sorted_letters",
         "axis_separation_m": [
-          1.2289999723434448,
-          1.184499979019165,
-          2.4049999713897705
+          1.3807792663574219,
+          0.5409756898880005,
+          -0.4886443614959717
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
         "a": "post_office_sign",
-        "b": "fare_board",
+        "b": "parcel_shelf_stock",
         "axis_separation_m": [
-          -0.02700018882751465,
-          0.48500001430511475,
-          -1.600000023841858
+          1.5859999656677246,
+          -0.5851507186889648,
+          -0.5754997730255127
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "mail_sacks",
+        "axis_separation_m": [
+          4.652342319488525,
+          1.3940000534057617,
+          -0.9200000762939453
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "counter_bell",
+        "axis_separation_m": [
+          2.209000051021576,
+          0.7725000381469727,
+          -0.10999995470046997
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "door_lamp_glow",
+        "axis_separation_m": [
+          0.15900015830993652,
+          -0.4199998378753662,
+          1.7200000286102295
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "blue_entry_mat",
+        "axis_separation_m": [
+          -0.2109999656677246,
+          2.3285000324249268,
+          1.1349999904632568
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "corner_letter_crate",
+        "axis_separation_m": [
+          5.371500015258789,
+          1.818000078201294,
+          2.677500009536743
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "counter_dressing",
+        "axis_separation_m": [
+          2.8740000426769257,
+          0.6650000810623169,
+          -0.24500000476837158
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "wall_dressing",
+        "axis_separation_m": [
+          -0.1335000991821289,
+          -0.7388176918029785,
+          0.14400002360343933
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "packing_dressing",
+        "axis_separation_m": [
+          1.2289999723434448,
+          1.184499979019165,
+          2.4049999713897705
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5149,11 +5495,77 @@
       },
       {
         "a": "post_office_sign",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.02700018882751465,
+          0.48500001430511475,
+          -1.600000023841858
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.7226035594940186,
           1.211400032043457,
           2.8245670795440674
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "counter_trailing",
+        "axis_separation_m": [
+          0.6044094562530518,
+          0.6756479740142822,
+          -0.3517935872077942
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "cabinet_greenery",
+        "axis_separation_m": [
+          2.9201954379677773,
+          -0.6145999431610107,
+          -0.3432462215423584
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "shelf_trailing",
+        "axis_separation_m": [
+          5.074629545211792,
+          -0.681488037109375,
+          -0.591820240020752
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "corner_floor_greenery",
+        "axis_separation_m": [
+          5.772146940231323,
+          1.4346001148223877,
+          2.0968117713928223
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_office_sign",
+        "b": "door_hanging_pothos",
+        "axis_separation_m": [
+          -0.19287896156311035,
+          -0.5926547050476074,
+          0.5219939313828945
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5165,17 +5577,6 @@
           -2.015599176287651,
           -0.2884412407875061,
           4.236355543136597
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "sorted_letters",
-        "b": "fare_board",
-        "axis_separation_m": [
-          1.4897792339324951,
-          -0.5940243005752563,
-          0.21135568618774414
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5292,6 +5693,17 @@
       },
       {
         "a": "sorted_letters",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.4897792339324951,
+          -0.5940243005752563,
+          0.21135568618774414
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "sorted_letters",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           1.4780044108629227,
@@ -5308,17 +5720,6 @@
           -1.9030001163482666,
           -0.22250008583068848,
           4.149500131607056
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "parcel_shelf_stock",
-        "b": "fare_board",
-        "axis_separation_m": [
-          1.6949999332427979,
-          -0.9220000505447388,
-          0.12450027465820312
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5435,6 +5836,17 @@
       },
       {
         "a": "parcel_shelf_stock",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.6949999332427979,
+          -0.9220000505447388,
+          0.12450027465820312
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "parcel_shelf_stock",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           -0.8593964576721191,
@@ -5451,17 +5863,6 @@
           1.1633422374725342,
           -0.765999972820282,
           3.804999828338623
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "mail_sacks",
-        "b": "fare_board",
-        "axis_separation_m": [
-          4.761342287063599,
-          0.2590000629425049,
-          -0.2200000286102295
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5578,6 +5979,17 @@
       },
       {
         "a": "mail_sacks",
+        "b": "fare_board",
+        "axis_separation_m": [
+          4.761342287063599,
+          0.2590000629425049,
+          -0.2200000286102295
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "mail_sacks",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           -0.8355209827423096,
@@ -5594,17 +6006,6 @@
           -1.2800000309944153,
           0.12149989604949951,
           2.174999937415123
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "counter_bell",
-        "b": "fare_board",
-        "axis_separation_m": [
-          2.318000018596649,
-          -0.3624999523162842,
-          0.60999995470047
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5721,6 +6122,17 @@
       },
       {
         "a": "counter_bell",
+        "b": "fare_board",
+        "axis_separation_m": [
+          2.318000018596649,
+          -0.3624999523162842,
+          0.60999995470047
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "counter_bell",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           2.1736034750938416,
@@ -5737,17 +6149,6 @@
           0.8299998044967651,
           1.4244999885559082,
           0.44499993324279785
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "door_lamp_glow",
-        "b": "fare_board",
-        "axis_separation_m": [
-          0.26800012588500977,
-          0.7250000238418579,
-          2.4399999380111694
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -5864,6 +6265,17 @@
       },
       {
         "a": "door_lamp_glow",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.26800012588500977,
+          0.7250000238418579,
+          2.4399999380111694
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "door_lamp_glow",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.323603391647339,
@@ -5880,17 +6292,6 @@
           0.6200000047683716,
           0.16850000619888306,
           0.0
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "blue_entry_mat",
-        "b": "fare_board",
-        "axis_separation_m": [
-          -0.10199999809265137,
-          1.19350004196167,
-          1.8549998998641968
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6007,6 +6408,17 @@
       },
       {
         "a": "blue_entry_mat",
+        "b": "fare_board",
+        "axis_separation_m": [
+          -0.10199999809265137,
+          1.19350004196167,
+          1.8549998998641968
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "blue_entry_mat",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.113603591918945,
@@ -6023,17 +6435,6 @@
           1.8824999332427979,
           -0.34199994802474976,
           -0.5074999332427979
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "corner_letter_crate",
-        "b": "fare_board",
-        "axis_separation_m": [
-          5.480499982833862,
-          0.6830000877380371,
-          3.397499918937683
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6150,6 +6551,17 @@
       },
       {
         "a": "corner_letter_crate",
+        "b": "fare_board",
+        "axis_separation_m": [
+          5.480499982833862,
+          0.6830000877380371,
+          3.397499918937683
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "corner_letter_crate",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           -0.1163632869720459,
@@ -6166,17 +6578,6 @@
           -0.6150000393390656,
           0.12649989128112793,
           2.192499965429306
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "counter_dressing",
-        "b": "fare_board",
-        "axis_separation_m": [
-          2.983000010251999,
-          -0.46999990940093994,
-          0.47499990463256836
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6293,6 +6694,17 @@
       },
       {
         "a": "counter_dressing",
+        "b": "fare_board",
+        "axis_separation_m": [
+          2.983000010251999,
+          -0.46999990940093994,
+          0.47499990463256836
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "counter_dressing",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           0.6761034727096558,
@@ -6309,17 +6721,6 @@
           0.7699998617172241,
           0.3034999370574951,
           0.3849998712539673
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "wall_dressing",
-        "b": "fare_board",
-        "axis_separation_m": [
-          -0.024500131607055664,
-          -0.3960000276565552,
-          0.8639999330043793
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6436,22 +6837,22 @@
       },
       {
         "a": "wall_dressing",
-        "b": "door_floor_greenery",
+        "b": "fare_board",
         "axis_separation_m": [
-          4.263603448867798,
-          0.3303999900817871,
-          0.8045669794082642
+          -0.024500131607055664,
+          -0.3960000276565552,
+          0.8639999330043793
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
       },
       {
-        "a": "packing_dressing",
-        "b": "fare_board",
+        "a": "wall_dressing",
+        "b": "door_floor_greenery",
         "axis_separation_m": [
-          1.337999939918518,
-          0.0494999885559082,
-          3.1249998807907104
+          4.263603448867798,
+          0.3303999900817871,
+          0.8045669794082642
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6568,6 +6969,17 @@
       },
       {
         "a": "packing_dressing",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.337999939918518,
+          0.0494999885559082,
+          3.1249998807907104
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "packing_dressing",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           1.2336034774780273,
@@ -6628,182 +7040,6 @@
           0.9416042566299438,
           0.558293342590332,
           1.2463812828063965
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "stamp_desk_set",
-        "axis_separation_m": [
-          1.2679998874664307,
-          -0.13349997997283936,
-          2.984999895095825
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "post_table_lamp",
-        "axis_separation_m": [
-          1.4639999866485596,
-          -0.5649999380111694,
-          0.49599993228912354
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "post_wall_lantern",
-        "axis_separation_m": [
-          0.37800002098083496,
-          0.5649999380111694,
-          0.4050002098083496
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "brown_parcel_left",
-        "axis_separation_m": [
-          0.13499999046325684,
-          0.8598493039608002,
-          3.6924999952316284
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "blue_parcel_door",
-        "axis_separation_m": [
-          0.14899992942810059,
-          0.9288493394851685,
-          1.1269999146461487
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "mail_sack_left",
-        "axis_separation_m": [
-          0.7580053806304932,
-          0.6526000499725342,
-          3.833500027656555
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "compass_rug",
-        "axis_separation_m": [
-          3.6579999923706055,
-          1.2292000502347946,
-          1.0999999046325684
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "post_wall_lantern_right",
-        "axis_separation_m": [
-          6.008000135421753,
-          0.7350000143051147,
-          0.4050002098083496
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "blue_parcel_left",
-        "axis_separation_m": [
-          0.06500005722045898,
-          0.5448493361473083,
-          3.711000084877014
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "brown_parcel_door",
-        "axis_separation_m": [
-          0.18050003051757812,
-          0.8598493039608002,
-          0.5269999504089355
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "door_floor_greenery",
-        "axis_separation_m": [
-          4.831603527069092,
-          0.0764000415802002,
-          3.5445669889450073
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "counter_trailing",
-        "axis_separation_m": [
-          0.713409423828125,
-          -0.4593520164489746,
-          0.36820632219314575
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "cabinet_greenery",
-        "axis_separation_m": [
-          3.0291954055428505,
-          0.4299999475479126,
-          0.3567538261413574
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "shelf_trailing",
-        "axis_separation_m": [
-          5.183629512786865,
-          -0.35154831409454346,
-          0.10817980766296387
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "corner_floor_greenery",
-        "axis_separation_m": [
-          5.8811469078063965,
-          0.29960012435913086,
-          2.816811680793762
-        ],
-        "intersections": 0,
-        "support_or_retained_assembly_pairs": 0
-      },
-      {
-        "a": "fare_board",
-        "b": "door_hanging_pothos",
-        "axis_separation_m": [
-          -0.08387899398803711,
-          -0.14120662212371826,
-          1.2419938407838345
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -6903,6 +7139,17 @@
           0.6514999866485596,
           0.6318492591381073,
           1.9519999027252197
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "stamp_desk_set",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.2679998874664307,
+          -0.13349997997283936,
+          2.984999895095825
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7063,6 +7310,17 @@
       },
       {
         "a": "post_table_lamp",
+        "b": "fare_board",
+        "axis_separation_m": [
+          1.4639999866485596,
+          -0.5649999380111694,
+          0.49599993228912354
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_table_lamp",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           2.999603509902954,
@@ -7206,6 +7464,17 @@
       },
       {
         "a": "post_wall_lantern",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.37800002098083496,
+          0.5649999380111694,
+          0.4050002098083496
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_wall_lantern",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.2336037158966064,
@@ -7338,6 +7607,17 @@
       },
       {
         "a": "brown_parcel_left",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.13499999046325684,
+          0.8598493039608002,
+          3.6924999952316284
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "brown_parcel_left",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.190603494644165,
@@ -7459,6 +7739,17 @@
       },
       {
         "a": "blue_parcel_door",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.14899992942810059,
+          0.9288493394851685,
+          1.1269999146461487
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "blue_parcel_door",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.204603433609009,
@@ -7569,6 +7860,17 @@
       },
       {
         "a": "mail_sack_left",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.7580053806304932,
+          0.6526000499725342,
+          3.833500027656555
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "mail_sack_left",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           3.8136088848114014,
@@ -7668,6 +7970,17 @@
       },
       {
         "a": "compass_rug",
+        "b": "fare_board",
+        "axis_separation_m": [
+          3.6579999923706055,
+          1.2292000502347946,
+          1.0999999046325684
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "compass_rug",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           -1.0263965129852295,
@@ -7756,6 +8069,17 @@
       },
       {
         "a": "post_wall_lantern_right",
+        "b": "fare_board",
+        "axis_separation_m": [
+          6.008000135421753,
+          0.7350000143051147,
+          0.4050002098083496
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "post_wall_lantern_right",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           0.4111368656158447,
@@ -7833,6 +8157,17 @@
       },
       {
         "a": "blue_parcel_left",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.06500005722045898,
+          0.5448493361473083,
+          3.711000084877014
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "blue_parcel_left",
         "b": "door_floor_greenery",
         "axis_separation_m": [
           4.120603561401367,
@@ -7893,6 +8228,17 @@
           -0.33139562606811523,
           1.0536426901817322,
           1.8323814868927002
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "brown_parcel_door",
+        "b": "fare_board",
+        "axis_separation_m": [
+          0.18050003051757812,
+          0.8598493039608002,
+          0.5269999504089355
         ],
         "intersections": 0,
         "support_or_retained_assembly_pairs": 0
@@ -7964,6 +8310,72 @@
         "support_or_retained_assembly_pairs": 0
       },
       {
+        "a": "fare_board",
+        "b": "door_floor_greenery",
+        "axis_separation_m": [
+          4.831603527069092,
+          0.0764000415802002,
+          3.5445669889450073
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "fare_board",
+        "b": "counter_trailing",
+        "axis_separation_m": [
+          0.713409423828125,
+          -0.4593520164489746,
+          0.36820632219314575
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "fare_board",
+        "b": "cabinet_greenery",
+        "axis_separation_m": [
+          3.0291954055428505,
+          0.4299999475479126,
+          0.3567538261413574
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "fare_board",
+        "b": "shelf_trailing",
+        "axis_separation_m": [
+          5.183629512786865,
+          -0.35154831409454346,
+          0.10817980766296387
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "fare_board",
+        "b": "corner_floor_greenery",
+        "axis_separation_m": [
+          5.8811469078063965,
+          0.29960012435913086,
+          2.816811680793762
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
+        "a": "fare_board",
+        "b": "door_hanging_pothos",
+        "axis_separation_m": [
+          -0.08387899398803711,
+          -0.14120662212371826,
+          1.2419938407838345
+        ],
+        "intersections": 0,
+        "support_or_retained_assembly_pairs": 0
+      },
+      {
         "a": "door_floor_greenery",
         "b": "counter_trailing",
         "axis_separation_m": [
@@ -8019,8 +8431,36 @@
         "support_or_retained_assembly_pairs": 0
       }
     ],
-    "preexisting_pairs": [],
+    "preexisting_pairs": [
+      {
+        "a": "window_wall",
+        "b": "post_office_sign",
+        "intersections": 85,
+        "baseline_intersections": 85,
+        "reason": "Original plaque mounts into wall; surviving geometry and placement unchanged"
+      }
+    ],
     "method": "Actual GLB triangle BVHs, imported transforms and exact atlas/old-asset preservation. Contacts are separated only at measured support planes; existing assembly contacts retained explicitly.",
+    "sign_revision": {
+      "baseline": "4c287f6d27bf399ee1661c86a6fee5f9ef0fa056",
+      "removed_object": "Bold sign POST OFFICE",
+      "removed_letter_components": 10,
+      "removed_triangles": 7460,
+      "remaining_triangles": 776,
+      "retained_vertex_attributes": "Original POSITION / NORMAL bytes; envelope UV unchanged, red plaque UV redirected to its own clean upper-left color patch to bypass baked lettering AO",
+      "clean_red_pixel_top_left": [
+        690,
+        1259
+      ],
+      "clean_red_gltf_uv": [
+        0.337158203125,
+        0.614990234375
+      ],
+      "atlas_changed_regions": [],
+      "atlas_changed_pixels": 0,
+      "atlas_sha256": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9",
+      "glb_sha256": "b5ae698b826b91c9debf07d6887ed61d61a72c8c128db1f15d1d51c224e0ef42"
+    },
     "world_bounds": {
       "room_shell": [
         [
@@ -8310,18 +8750,6 @@
           2.7049999237060547
         ]
       ],
-      "fare_board": [
-        [
-          -3.2079999446868896,
-          1.3250000476837158,
-          -2.0999999046325684
-        ],
-        [
-          -3.138000011444092,
-          1.975000023841858,
-          -1.1999999284744263
-        ]
-      ],
       "stamp_desk_set": [
         [
           -1.8700001239776611,
@@ -8440,6 +8868,18 @@
           -2.5215001106262207,
           0.46515074372291565,
           -0.1669999361038208
+        ]
+      ],
+      "fare_board": [
+        [
+          -3.2079999446868896,
+          1.3250000476837158,
+          -2.0999999046325684
+        ],
+        [
+          -3.138000011444092,
+          1.975000023841858,
+          -1.1999999284744263
         ]
       ],
       "door_floor_greenery": [
@@ -8725,27 +9165,6 @@
         "surfaces": 1,
         "triangles": 440
       },
-      "fare_board": {
-        "bounds": [
-          [
-            -0.449999988079071,
-            -0.324999988079071,
-            0.0
-          ],
-          [
-            0.449999988079071,
-            0.324999988079071,
-            0.0700000002980232
-          ]
-        ],
-        "size_xyz": [
-          0.899999976158142,
-          0.649999976158142,
-          0.0700000002980232
-        ],
-        "surfaces": 1,
-        "triangles": 674
-      },
       "mail_sack_reused": {
         "bounds": [
           [
@@ -8912,7 +9331,7 @@
           0.13600018620491
         ],
         "surfaces": 1,
-        "triangles": 8236
+        "triangles": 776
       },
       "post_table_lamp": {
         "bounds": [
@@ -9218,58 +9637,6 @@
         ],
         "camera_size": 6.71999979019165,
         "height": 800,
-        "id": "post_gameplay_43deg_360",
-        "pitch": 42.9999961853027,
-        "width": 360,
-        "yaw": 45.7062835693359
-      },
-      {
-        "camera_position": [
-          10.2196102142334,
-          15.289966583252,
-          10.3146238327026
-        ],
-        "camera_size": 11.3999996185303,
-        "height": 800,
-        "id": "post_full_room_360",
-        "pitch": 42.9999961853027,
-        "width": 360,
-        "yaw": 45.7062835693359
-      },
-      {
-        "camera_position": [
-          10.2196102142334,
-          15.289966583252,
-          10.3146238327026
-        ],
-        "camera_size": 11.3999996185303,
-        "height": 1000,
-        "id": "post_full_room_panorama",
-        "pitch": 42.9999961853027,
-        "width": 1200,
-        "yaw": 45.7062835693359
-      },
-      {
-        "camera_position": [
-          9.78960990905762,
-          14.821967124939,
-          12.5146236419678
-        ],
-        "camera_size": 3.59999990463257,
-        "height": 1000,
-        "id": "post_stamp_desk_detail",
-        "pitch": 42.9999961853027,
-        "width": 1200,
-        "yaw": 45.7062835693359
-      },
-      {
-        "camera_position": [
-          9.9696102142334,
-          14.9899673461914,
-          10.5646238327026
-        ],
-        "camera_size": 6.71999979019165,
-        "height": 800,
         "id": "post_npc_positions_360",
         "pitch": 42.9999961853027,
         "width": 360,
@@ -9277,16 +9644,16 @@
       },
       {
         "camera_position": [
-          10.2196102142334,
-          15.289966583252,
-          10.3146238327026
+          16.9099998474121,
+          2.95000004768372,
+          -1.64000082015991
         ],
-        "camera_size": 11.3999996185303,
+        "camera_size": 2.79999995231628,
         "height": 1000,
-        "id": "post_npc_positions_panorama",
-        "pitch": 42.9999961853027,
+        "id": "post_sign_detail",
+        "pitch": 0.0,
         "width": 1200,
-        "yaw": 45.7062835693359
+        "yaw": 90.0
       }
     ],
     "checks": [
@@ -9483,14 +9850,6 @@
         "passed": true
       },
       {
-        "check": "fare_board imported triangle count",
-        "passed": true
-      },
-      {
-        "check": "fare_board imported surface count",
-        "passed": true
-      },
-      {
         "check": "stamp_desk_set imported triangle count",
         "passed": true
       },
@@ -9567,6 +9926,10 @@
         "passed": true
       },
       {
+        "check": "Sam right aisle actual player capsule clear",
+        "passed": true
+      },
+      {
         "check": "npc_pip stationary capsule clear",
         "passed": true
       },
@@ -9576,6 +9939,14 @@
       },
       {
         "check": "npc_keeper stationary capsule clear",
+        "passed": true
+      },
+      {
+        "check": "stand_pip stationary capsule clear",
+        "passed": true
+      },
+      {
+        "check": "stand_sam stationary capsule clear",
         "passed": true
       },
       {
@@ -9599,23 +9970,7 @@
         "passed": true
       },
       {
-        "check": "real avatar assembled",
-        "passed": true
-      },
-      {
-        "check": "Saved post_gameplay_43deg_360",
-        "passed": true
-      },
-      {
-        "check": "Saved post_full_room_360",
-        "passed": true
-      },
-      {
-        "check": "Saved post_full_room_panorama",
-        "passed": true
-      },
-      {
-        "check": "Saved post_stamp_desk_detail",
+        "check": "exactly one fare board from unchanged runtime anchors prop",
         "passed": true
       },
       {
@@ -9663,7 +10018,7 @@
         "passed": true
       },
       {
-        "check": "Saved post_npc_positions_panorama",
+        "check": "Saved post_sign_detail",
         "passed": true
       }
     ],
@@ -9672,32 +10027,32 @@
       {
         "a": "npc_pip",
         "b": "npc_sam",
-        "feet_px": 249.326461791992,
-        "tag_px": 245.64306640625
+        "feet_px": 99.2983016967773,
+        "tag_px": 109.026794433594
       },
       {
         "a": "npc_pip",
         "b": "npc_keeper",
-        "feet_px": 221.613006591797,
-        "tag_px": 223.789688110352
+        "feet_px": 127.828216552734,
+        "tag_px": 138.650146484375
       },
       {
         "a": "npc_pip",
         "b": "exit",
-        "feet_px": 46.6501808166504,
-        "tag_px": 57.3688163757324
+        "feet_px": 264.683471679688,
+        "tag_px": 266.860595703125
       },
       {
         "a": "npc_sam",
         "b": "npc_keeper",
-        "feet_px": 128.859878540039,
-        "tag_px": 128.859878540039
+        "feet_px": 74.8357086181641,
+        "tag_px": 74.8357086181641
       },
       {
         "a": "npc_sam",
         "b": "exit",
-        "feet_px": 263.683532714844,
-        "tag_px": 260.138885498047
+        "feet_px": 279.229217529297,
+        "tag_px": 275.431121826172
       },
       {
         "a": "npc_keeper",
@@ -9729,31 +10084,44 @@
       },
       "npc_pip": {
         "feet": [
-          32.6879730224609,
-          446.711181640625
+          267.495422363281,
+          534.462646484375
         ],
         "tag": [
-          32.6879730224609,
-          366.721984863281
+          267.495422363281,
+          454.473449707031
         ]
       },
       "npc_sam": {
         "feet": [
-          265.578186035156,
-          535.738342285156
+          314.536437988281,
+          447.013824462891
         ],
         "tag": [
-          265.578186035156,
-          444.841552734375
+          314.536437988281,
+          356.117034912109
         ]
       }
     },
-    "pip_stamp_desk_px": 66.3205261230469,
+    "pip_stamp_desk_px": 186.76872253418,
     "placed_scene": {
-      "surfaces": 41,
-      "triangles": 163904
+      "surfaces": 40,
+      "triangles": 155770
     },
     "renderer": "mobile",
+    "runtime_fare_board": [
+      {
+        "atlas": "res://assets/rooms/post_office/room_albedo_ao.png",
+        "name": "fare_board",
+        "position": [
+          -3.208,
+          1.65,
+          -1.65
+        ],
+        "scene": "res://assets/rooms/post_office/fare_board.glb",
+        "yaw_degrees": 90.0
+      }
+    ],
     "sockets": {},
     "suggested_anchors": {
       "badge_exit": {
@@ -9792,18 +10160,18 @@
       "npc_pip": {
         "name": "npc_pip",
         "position": [
-          -2.48,
+          2.3,
           0.08,
-          2.26
+          0.8
         ],
-        "yaw_degrees": 180.0
+        "yaw_degrees": 90.0
       },
       "npc_sam": {
         "name": "npc_sam",
         "position": [
-          2.3,
+          1.2,
           0.08,
-          0.85
+          -1.5
         ],
         "yaw_degrees": 180.0
       },
@@ -9837,18 +10205,18 @@
       "stand_pip": {
         "name": "stand_pip",
         "position": [
-          -2.48,
+          1.65,
           0.08,
-          1.65
+          0.6
         ],
-        "yaw_degrees": 90.0
+        "yaw_degrees": -90.0
       },
       "stand_sam": {
         "name": "stand_sam",
         "position": [
-          1.75,
+          1.85,
           0.08,
-          0.85
+          -1.35
         ],
         "yaw_degrees": -90.0
       },
@@ -9891,93 +10259,23 @@
     }
   },
   "reproducibility": {
+    "command": "revise_post_sign_215.py -- --verify-repeat",
     "checked_glbs": 56,
-    "different_glbs": [],
-    "hashes": {
-      "assets/rooms/post_office/floor_plant.glb": "47779dbf5b35102c7f082ce44feb21f459bad1e7e2a086c0307ffb6bb87fed54",
-      "assets/rooms/post_office/front_floor_runner.glb": "46bcca591ae908ed2f4b1fa95507f0d4be13e5d48fc60e3ef528f326971c2f65",
-      "assets/rooms/post_office/door_lamp_glow.glb": "1d627b25e2a839335b63610992958050cb20bcc0ebadad01212afe43be7fdb1c",
-      "assets/rooms/post_office/blue_parcel.glb": "5ffb59ee51986ff8f5b3f605ac46f031e739d283055f7dccec0185b95d3f8c45",
-      "assets/rooms/post_office/mail_sacks.glb": "5bdf686f73b5fe15626992a59fbbd04f8268d923502255025b0226941cb3f435",
-      "assets/rooms/post_office/postal_door_glass.glb": "741a02506d661f39b069b348bcebfbc33bcaa3e882630f42d45681377722f642",
-      "assets/rooms/post_office/postal_counter.glb": "187ea9c7f1d58fd3cf48310919371a65b18ab6a8e8e84e875e973dffee9b8f60",
-      "assets/rooms/post_office/blue_entry_mat.glb": "abcfd0cea4ccdc5262926dd42fed46ce20be23070533ce74b32f7dc673035b32",
-      "assets/rooms/post_office/counter_computer.glb": "8deaa80a156f3cc67fec5d9fb0bc4766d39694fb238ecb6bc49bdad545467547",
-      "assets/rooms/post_office/magazine_rack.glb": "96fac20342e9c8bfc722da2dccfa4bfbc4f9c9c07c7ac7aa1c241da2b7a48f27",
-      "assets/rooms/post_office/parcel_shelves.glb": "9401605487eaa692f090b022bec968b8af4f547e13d28c69d34021df0e143100",
-      "assets/rooms/post_office/packing_dressing.glb": "e2a65ae92014f9b0ae0ac7efd700abe4a896cd5ed9388684f8833beecd94bd2c",
-      "assets/rooms/post_office/packing_mat.glb": "3eed2a897938476722602c6d6da29dd47e616e453abda27ccf42de594f68f612",
-      "assets/rooms/post_office/window_wall.glb": "c35c3761d2267922dd8bff3e09e89b671f58726f8eaa153e044f3bb522ef1fd0",
-      "assets/rooms/post_office/mail_stack.glb": "62ee7853b4ac969ca4abd46c46a5093680f2ca47944156e1281bdbcb47ad9f2b",
-      "assets/rooms/post_office/desk_airmail.glb": "ffed848b7bf70a3010dd782f092bdc5b1e5e304bbe11f51590c334869adf83b2",
-      "assets/rooms/post_office/post_wall_lantern.glb": "2c35743369b6db0bd4f9db79add4c0fb127fbce4ae68c45eb477f35fd4e716a1",
-      "assets/rooms/post_office/counter_stamps.glb": "47fbddd2a51c7b7ccefbf5e73b7556f8ee61244d7658beffc94d9a45b816c5cd",
-      "assets/rooms/post_office/wall_dressing.glb": "5ab2d546a1e6513f2a852448b104a9cf70adf679e8bbf2adc819e5c7de751aad",
-      "assets/rooms/post_office/postal_door_frame.glb": "9855bf5b9c551052e5ce7840719117175bfc26ca84b8c1819d1d3545b80245ed",
-      "assets/rooms/post_office/corner_letter_crate.glb": "86e5aa5a81ed5d31899d7adfa1381d5deb9e735af56dc01bed38e02f2604dd46",
-      "assets/rooms/post_office/brown_parcel.glb": "b84318f1cfc6445c4d163757a68cd6d401b20f63d5b949022303b46475d45bd5",
-      "assets/rooms/post_office/red_post_box.glb": "23a2cf6d2bfa4ee756c6ceafd87d15cee1eb7f2e409ed8237d578e54f4d1b73c",
-      "assets/rooms/post_office/brown_parcel_reused.glb": "b6a19ddd381e34ae4a4a226981612159b73ac72c74c220735b101798ef616c4a",
-      "assets/rooms/post_office/counter_mail_tray.glb": "b48c98db12cdc7eb7eb0fb6b567dc4322e0bc59530d2ddea3e100953a8e87c45",
-      "assets/rooms/post_office/counter_dressing.glb": "cd4834e92def454fa678adcedf7c6376ee4b834b7103586974f6e50695569956",
-      "assets/rooms/post_office/packing_table.glb": "6cd01c14257e7f67dedcf1076c7f7287c33931561bfe25e7980e8f2012cb57f3",
-      "assets/rooms/post_office/packing_parcel.glb": "250e33c43f43853182f83eaab0bd1a6b555fd4193b5e6779a932b54a4d673537",
-      "assets/rooms/post_office/packing_rug.glb": "07c70ee87822f29e99bc052170b1cf3af1bf7e10c3568e3a31e8a1d307cc385c",
-      "assets/rooms/post_office/packing_dressing_215.glb": "427c72e6721e9a0c024c6e7b77e281c584b6ac3d0b3f26eb4759bd7219ced029",
-      "assets/rooms/post_office/back_wall.glb": "f70680f864537e3a30f8fed056ba963781bbc05be31bdee834c5ca6a04eba3ef",
-      "assets/rooms/post_office/parcel_shelf_stock.glb": "4d06953ecae1d751241170355585b13f74c5126440fca4b9726392c62f1e86c7",
-      "assets/rooms/post_office/counter_bell.glb": "7aadef05000b7c1ccdf899ea2c31851a05c9d12b775e8fbc6878df1b43006307",
-      "assets/rooms/post_office/compass_rug.glb": "b9cde5ac5deb27ae7d193459ad7174931bacb0cf210303e09075527792928b91",
-      "assets/rooms/post_office/room_shell.glb": "7ddf63c77d1968ddb552c515c1fd5c19c295458af7de139aab352c6c5c4b7149",
-      "assets/rooms/post_office/door_light.glb": "091ae13cf5362701f9bfda8a1224c1cf1f222b7e7321a5906209477808a98416",
-      "assets/rooms/post_office/entry_rug.glb": "c95cd4b53322fe7ac3990645bab7a355d974e32ad49d65cf25656879a3ebcdbf",
-      "assets/rooms/post_office/wall_clock.glb": "9104951fd03bd18502665463f1a093f977368e039f5236273242db663fcab7dd",
-      "assets/rooms/post_office/sorted_letters.glb": "0b8ebff6bed6928c03d865acad04751af15d8d59689a42b04c99c328f43f7e1c",
-      "assets/rooms/post_office/packing_supplies.glb": "e1ec133e72d60aa018ff1561f1aa29378b1520f71b11a8c87a825cd641a197a9",
-      "assets/rooms/post_office/mail_sack_reused.glb": "7acf528c6b0986827ebadb0063011e2b9fdde4c45e74faba7fccc17c447215d0",
-      "assets/rooms/post_office/postal_scale.glb": "c4328a90730b8b265405d5a2694a841a1df4293da62757e903d8994e059779a0",
-      "assets/rooms/post_office/stamp_desk_set.glb": "f4efe65332de23dba8a90b5d2006ec2ac1cbb27d668d2e485ad1a4c5d7b792d7",
-      "assets/rooms/post_office/counter_plant.glb": "b8926ae25c002b7799df3f95f25ba61a5904eb650adc2f9a4d14fb4a0ec3eadc",
-      "assets/rooms/post_office/post_table_lamp.glb": "440ea0cacfe5596d9b0415c29a9ad588e20e0565c3ce3503516d68dce6a55aae",
-      "assets/rooms/post_office/cabinet_plant.glb": "f7ac26182d3a481919bff8729c9c25df9f39b3cfeb4b6ff978f93ab7877c5afe",
-      "assets/rooms/post_office/blue_parcel_reused.glb": "607765ae7b5a333bb7276db7226544524c088c058dbcde3b8aaf508d056affa7",
-      "assets/rooms/post_office/packing_stool.glb": "ce0ce5aee253ad43a2146e19b45635385bef713114417e4dca469881ec3978d8",
-      "assets/rooms/post_office/sorting_cabinet.glb": "e469c7c1f13834cdb18c12c7d4fb0f97d9d15ccfb232533f509df45221b1b1c5",
-      "assets/rooms/post_office/postal_blue_door.glb": "edef9197d2f9597363a075674146b40bc94c287f057b5729d8a8b41fcdf8bdf2",
-      "assets/rooms/post_office/parcel_shelf_plant.glb": "483f987b6d587370dac855518cc0f13ae02405297423aa130b37e6aa41755795",
-      "assets/rooms/post_office/underdesk_boxes.glb": "2779ad15627d2cc96ac8a19b972cf5b3c94b7370f5c14043dacd1fe94b08fb2c",
-      "assets/rooms/post_office/world_map.glb": "d69fed52c53acff5e8800b15bd17e80e6401f394ee563bf685b3c495693025a5",
-      "assets/rooms/post_office/post_office_sign.glb": "d1e2a1944761fc589988fa44f4ba44f1b2966a06c84799821cfc3a173e89bcfc",
-      "assets/rooms/post_office/fare_board.glb": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98",
-      "assets/rooms/post_office/door_notice.glb": "8dc5ec12d7cde41c2ba794b667344e1afbeb535c3418b0810495a0f51ba092e0"
-    }
+    "all_glbs_byte_identical_after_repeat": true,
+    "atlas_byte_identical": true,
+    "sign_sha256": "b5ae698b826b91c9debf07d6887ed61d61a72c8c128db1f15d1d51c224e0ef42",
+    "scope": "v1.2 sign revision repeated; previous eight-asset generation evidence retained in v1.1"
   },
-  "total_checks": 692,
+  "total_checks": 723,
   "atlas_changed_regions": [],
   "media": {
-    "SGODOT-215_POST_v1_post_full_room_360.png": {
-      "bytes": 136431,
-      "sha256": "7ace148116b235457eb816e5803d80693e9e4023a9fda9e4b306c02574e136b3"
+    "SGODOT-215_POST_v1_2_post_npc_positions_360.png": {
+      "bytes": 271377,
+      "sha256": "f950ce6d1591a305b51dcbc4f7ed009eae24ee68228c73f59a2024888d5c8103"
     },
-    "SGODOT-215_POST_v1_post_full_room_panorama.png": {
-      "bytes": 1058774,
-      "sha256": "ee0ca79b95d71facfe882c182267e2e8dfd32a314ec1a433f0464cff91e9935b"
-    },
-    "SGODOT-215_POST_v1_post_gameplay_43deg_360.png": {
-      "bytes": 270424,
-      "sha256": "ac1982b3b918b15282eca640a65424a87d372eec32b97e4e70ff087c933c690d"
-    },
-    "SGODOT-215_POST_v1_post_npc_positions_360.png": {
-      "bytes": 274824,
-      "sha256": "4c1182991a111c3a33ffba74e2827910965e08b1ac5897debf0f12fb2e6dff49"
-    },
-    "SGODOT-215_POST_v1_post_npc_positions_panorama.png": {
-      "bytes": 1066901,
-      "sha256": "dd6cd8595e1d6f09ca419853338564a95ffa793cf660b0c9f93f2123be722f8f"
-    },
-    "SGODOT-215_POST_v1_post_stamp_desk_detail.png": {
-      "bytes": 1512600,
-      "sha256": "8a1369be050731813b9bd6640d2ff7d37e51b6f5a2641615ac53eea17d67c6da"
+    "SGODOT-215_POST_v1_2_post_sign_detail.png": {
+      "bytes": 65137,
+      "sha256": "c1aa96960b0832c48398b74111d10c37bd52350d57c98380905e7477f16346f2"
     }
   }
 }

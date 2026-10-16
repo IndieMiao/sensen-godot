@@ -12,9 +12,7 @@ def add(name,file,at,yaw=0,colliders=[],scale=None,material='plain'):
  if scale is not None:row['scale']=scale
  layout['assets'].append(row);by[name]=row;return row
 def inst(name,asset,at,yaw=0):layout['instances'].append({'name':name,'asset':asset,'position':at,'yaw_degrees':yaw})
-# Keep approved runtime placement of the fee board. Program must remove the
-# duplicate anchors.props entry when adopting this self-contained layout.
-add('fare_board','fare_board',[-3.208,1.65,-1.65],90)
+# Fare board remains solely in post.anchors.json.props; never duplicate in layout.
 by['packing_dressing']['file']='packing_dressing_215.glb'
 add('stamp_desk_set','stamp_desk_set',[.10,1.122,1.60])
 add('post_table_lamp','post_table_lamp',[-1.49,1.397,-.52])
@@ -44,16 +42,13 @@ for row in layout['instances']:
 add('mail_sack_left','mail_sack_reused',[-2.25,.082,2.77],0,[{'at':[0,.49,0],'size':[.46,.984,.46]}],scale=[.60,.60,.60])
 add('compass_rug','compass_rug',[1.62,.083,1.00])
 anchors=json.loads(subprocess.check_output(['git','show','f8c3391c:assets/p0/outposts/post.anchors.json'],cwd=ROOT))['anchors'];suggestions={a['name']:copy.deepcopy(a) for a in anchors}
-suggestions['npc_pip'].update(position=[-1.03,.08,2.80],yaw_degrees=180)
-suggestions['stand_pip'].update(position=[-.45,.08,2.70],yaw_degrees=90)
-suggestions['npc_sam'].update(position=[2.30,.08,.85],yaw_degrees=180)
-suggestions['stand_sam'].update(position=[1.75,.08,.85],yaw_degrees=-90)
-suggestions['npc_pip']['position']=[-2.48,.08,2.26];suggestions['stand_pip']['position']=[-2.48,.08,1.65]
+# Retain live NPC positions; Sam approaches from the clear right-hand aisle.
+suggestions['stand_sam'].update(position=[1.85,.08,-1.35],yaw_degrees=-90)
 suggestions['use_stamp_desk']['position']=[-.68,1.097,2.30]
 suggestions['stand_stamp_desk']={'name':'stand_stamp_desk','position':[-.68,.08,1.29],'yaw_degrees':0}
 layout['review_clearance']={'entry_route':{'from':[-2.65,.08,1.15],'to':[1.2,.08,1.15],'width':1.0},'rug_diameter':2.2,'pip_outside_route':True}
 layout['suggested_anchors']=suggestions;layout['spawn']=suggestions['spawn']['position']
-layout['revision_215']={'base_commit':BASE,'runtime_reference':'f8c3391c8c0606ae664fb8e06ad85068aa199f69','atlas_changed_regions':[],'desk_option':'left','desk_relocation_authorized':True,'removed_from_layout':sorted(removed),'map_choice':'Omitted: left wall already contains fare board/postal sign, door and notices; existing packing table is not on that wall. Fare board preserved at exact approved runtime position.','lights':'Existing door sconce plus two new wall lanterns, plus counter table lamp; daylight remains dominant.','dressing':'Keep under-desk boxes and airmail; replace the mat with identical-size clean swatch geometry to remove baked ghosts from the removed parcel/scale/tools, without touching atlas pixels.','anchor_handoff':'Suggestions only. Remove duplicate fare_board from post.anchors.json props when adopting layout; preserve use_fee_board and exact board placement.'}
+layout['revision_215']={'base_commit':BASE,'runtime_reference':'f8c3391c8c0606ae664fb8e06ad85068aa199f69','atlas_changed_regions':[],'desk_option':'left','desk_relocation_authorized':True,'removed_from_layout':sorted(removed),'map_choice':'Omitted: left wall already contains fare board/postal sign, door and notices. Fare board remains solely in runtime anchors.props at its approved position.','lights':'Existing door sconce plus two new wall lanterns, plus counter table lamp; daylight remains dominant.','dressing':'Keep under-desk boxes and airmail; replace the mat with identical-size clean swatch geometry to remove baked ghosts from the removed parcel/scale/tools, without touching atlas pixels.','anchor_handoff':'Suggestions only. Retain existing fare_board in post.anchors.json.props; layout deliberately contains none. Preserve use_fee_board and exact board placement.'}
 # Stats are measured from the actual files rather than copied stale totals.
 import sys
 sys.path.insert(0,str(ROOT/'tools/art'));from verify_chef_sign import load_glb,accessor

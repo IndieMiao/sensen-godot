@@ -556,19 +556,6 @@
       "cast_shadow": true
     },
     {
-      "name": "fare_board",
-      "file": "fare_board.glb",
-      "position": [
-        -3.208,
-        1.65,
-        -1.65
-      ],
-      "yaw_degrees": 90,
-      "colliders": [],
-      "material": "plain",
-      "cast_shadow": true
-    },
-    {
       "name": "stamp_desk_set",
       "file": "stamp_desk_set.glb",
       "position": [
@@ -1362,20 +1349,20 @@
     "npc_pip": {
       "name": "npc_pip",
       "position": [
-        -2.48,
+        2.3,
         0.08,
-        2.26
+        0.8
       ],
-      "yaw_degrees": 180
+      "yaw_degrees": 90
     },
     "stand_pip": {
       "name": "stand_pip",
       "position": [
-        -2.48,
+        1.65,
         0.08,
-        1.65
+        0.6
       ],
-      "yaw_degrees": 90
+      "yaw_degrees": -90
     },
     "use_stamp_desk": {
       "name": "use_stamp_desk",
@@ -1398,18 +1385,18 @@
     "npc_sam": {
       "name": "npc_sam",
       "position": [
-        2.3,
+        1.2,
         0.08,
-        0.85
+        -1.5
       ],
       "yaw_degrees": 180
     },
     "stand_sam": {
       "name": "stand_sam",
       "position": [
-        1.75,
+        1.85,
         0.08,
-        0.85
+        -1.35
       ],
       "yaw_degrees": -90
     },
@@ -1460,9 +1447,9 @@
       "magazine_rack",
       "world_map"
     ],
-    "map_choice": "Omitted: left wall already contains fare board/postal sign, door and notices; existing packing table is not on that wall. Fare board preserved at exact approved runtime position.",
+    "map_choice": "Omitted: left wall already contains fare board/postal sign, door and notices. Fare board remains solely in runtime anchors.props at its approved position.",
     "lights": "Existing door sconce plus two new wall lanterns, plus counter table lamp; daylight remains dominant.",
     "dressing": "Keep under-desk boxes and airmail; replace the mat with identical-size clean swatch geometry to remove baked ghosts from the removed parcel/scale/tools, without touching atlas pixels.",
-    "anchor_handoff": "Suggestions only. Remove duplicate fare_board from post.anchors.json props when adopting layout; preserve use_fee_board and exact board placement."
+    "anchor_handoff": "Suggestions only. Retain existing fare_board in post.anchors.json.props; layout deliberately contains none. Preserve use_fee_board and exact board placement."
   }
 }

@@ -101,10 +101,10 @@
     },
     {
       "name": "post_office_sign",
-      "vertices": 19992,
-      "triangles": 8236,
+      "vertices": 1616,
+      "triangles": 776,
       "surfaces": 1,
-      "bytes": 690564
+      "bytes": 62356
     },
     {
       "name": "sorted_letters",
@@ -177,13 +177,6 @@
       "bytes": 375416
     },
     {
-      "name": "fare_board",
-      "vertices": 789,
-      "triangles": 674,
-      "surfaces": 1,
-      "bytes": 30792
-    },
-    {
       "name": "stamp_desk_set",
       "vertices": 1664,
       "triangles": 2568,
@@ -233,14 +226,14 @@
       "bytes": 26412
     }
   ],
-  "unique_triangles": 151630,
-  "scene_triangles": 163904,
-  "static_draw_surfaces": 41,
-  "glb_bytes": 5875304,
+  "unique_triangles": 143496,
+  "scene_triangles": 155770,
+  "static_draw_surfaces": 40,
+  "glb_bytes": 5216304,
   "atlas_bytes": 2155957,
-  "placed_instances": 41,
+  "placed_instances": 40,
   "materials": 5,
-  "local_scene_triangles": 154922,
+  "local_scene_triangles": 146788,
   "shared_scene_triangles": 8982,
   "shared_assets": [
     {

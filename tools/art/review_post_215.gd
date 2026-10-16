@@ -115,11 +115,11 @@ func physics_audit(room,layout):
 	var body=CharacterBody3D.new();var capsule=CapsuleShape3D.new();capsule.radius=.21;capsule.height=1.745
 	var cs=CollisionShape3D.new();cs.shape=capsule;cs.position.y=.8725;body.add_child(cs);world.add_child(body)
 	await get_tree().physics_frame;await get_tree().physics_frame
-	var paths=[["door to counter",Vector3(-2.6,.085,1.29),Vector3(-1.65,.085,.40)],["Pip approach",vec(layout.suggested_anchors.stand_pip.position)+Vector3(0,.005,0),vec(layout.suggested_anchors.npc_pip.position)+Vector3(0,.005,0)],["Sam approach",Vector3(1.75,.085,.85),Vector3(2.45,.085,.85)],["central aisle",Vector3(-1.65,.085,.4),Vector3(1.75,.085,.4)]]
+	var paths=[["door to counter",Vector3(-2.6,.085,1.29),Vector3(-1.65,.085,.40)],["Pip approach",vec(layout.suggested_anchors.stand_pip.position)+Vector3(0,.005,0),vec(layout.suggested_anchors.npc_pip.position)+Vector3(0,.005,0)],["Sam approach",vec(layout.suggested_anchors.stand_sam.position)+Vector3(0,.005,0),vec(layout.suggested_anchors.npc_sam.position)+Vector3(0,.005,0)],["central aisle",Vector3(-1.65,.085,.4),Vector3(1.75,.085,.4)],["Sam right aisle",Vector3(1.75,.085,.4),vec(layout.suggested_anchors.stand_sam.position)+Vector3(0,.005,0)]]
 	for path in paths:
 		body.position=path[1];var hit=body.move_and_collide(path[2]-path[1]);check(hit==null,path[0]+" actual player capsule clear")
 		if hit:report[path[0]+"_blocked"]=str(hit.get_collider().get_path())
-	for key in ["npc_pip","npc_sam","npc_keeper","stand_stamp_desk"]:
+	for key in ["npc_pip","npc_sam","npc_keeper","stand_pip","stand_sam","stand_stamp_desk"]:
 		var q=PhysicsShapeQueryParameters3D.new();q.shape=capsule;q.transform.origin=vec(layout.suggested_anchors[key].position)+Vector3(0,.878,0);q.exclude=[body.get_rid()]
 		var hits=world.get_world_3d().direct_space_state.intersect_shape(q);check(hits.is_empty(),key+" stationary capsule clear")
 	# A 1.00 m wide upright box sweeps the full entry route, including furniture.
@@ -134,7 +134,7 @@ func physics_audit(room,layout):
 	var turn_hit=body.move_and_collide(turn_delta)
 	check(turn_hit==null,"1.00 m wide entry turn from door centre clear")
 	body.free()
-func post_review():
+func post_review(revision_only=false):
 	var layout=JSON.parse_string(FileAccess.get_file_as_string(KIT+"layout.json"))
 	setup(layout,Vector2i(360,800));lights(layout)
 	var room=load("res://scenes/post_office/post_office_art.tscn").instantiate();world.add_child(room)
@@ -145,19 +145,28 @@ func post_review():
 	var stats=JSON.parse_string(FileAccess.get_file_as_string(KIT+"asset_stats.json"))
 	check(actual_tris==stats.scene_triangles,"actual placed triangles including plants match stats");check(actual_surfaces==stats.static_draw_surfaces,"actual placed surfaces including plants match stats")
 	report.placed_scene={"triangles":actual_tris,"surfaces":actual_surfaces}
-	var rig=await avatar(vec(layout.suggested_anchors.spawn.position))
+	# Runtime fee board is loaded once from the unchanged anchors prop.
+	var runtime=JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outposts/post.anchors.json"))
+	var fee_count=0
+	for prop in runtime.props:
+		if prop.name=="fare_board":
+			var fee=shared_model(prop.scene,vec(prop.position),prop.yaw_degrees);fee.name="runtime_fare_board";fee_count+=1
+	check(fee_count==1 and not room.has_node("fare_board"),"exactly one fare board from unchanged runtime anchors prop")
+	report.runtime_fare_board=runtime.props.filter(func(p):return p.name=="fare_board")
 	var off=vec(layout.camera.position)-vec(layout.camera.target);var yaw=rad_to_deg(atan2(off.x,off.z))
-	pose(Vector3(-.50,1.35,.35),6.72,43,yaw)
-	heading.text="POST / GAMEPLAY VIEW\n43 DEG / 6.72 M / 360 PX"
-	footer.text="SGODOT-215 / LIU BEI\nPlayer at spawn / existing kit\nDesk moved left / approved"
-	await capture("post_gameplay_43deg_360")
-	pose(Vector3(-.25,1.65,.1),11.4,43,yaw)
-	heading.text="POST / COMPLETE ROOM\n43 DEG / FULL DIORAMA";await capture("post_full_room_360")
-	vp.size=Vector2i(1200,1000);heading.add_theme_font_size_override("font_size",24);footer.add_theme_font_size_override("font_size",18);footer.position=Vector2(12,915)
-	await capture("post_full_room_panorama")
-	rig.hide()
-	var desk=room.get_node("packing_table");pose(desk.position+Vector3(0,1.10,0),3.6,43,yaw)
-	heading.text="POST / STAMP DESK";footer.text="SGODOT-215 / LIU BEI\nSilver-white coffee pot / white cup / stamp + ink pad / blank open passport / plant";await capture("post_stamp_desk_detail")
+	if not revision_only:
+		var rig=await avatar(vec(layout.suggested_anchors.spawn.position))
+		pose(Vector3(-.50,1.35,.35),6.72,43,yaw)
+		heading.text="POST / GAMEPLAY VIEW\n43 DEG / 6.72 M / 360 PX"
+		footer.text="SGODOT-215 / LIU BEI\nPlayer at spawn / existing kit\nDesk moved left / approved"
+		await capture("post_gameplay_43deg_360")
+		pose(Vector3(-.25,1.65,.1),11.4,43,yaw)
+		heading.text="POST / COMPLETE ROOM\n43 DEG / FULL DIORAMA";await capture("post_full_room_360")
+		vp.size=Vector2i(1200,1000);heading.add_theme_font_size_override("font_size",24);footer.add_theme_font_size_override("font_size",18);footer.position=Vector2(12,915)
+		await capture("post_full_room_panorama")
+		rig.hide()
+		var desk=room.get_node("packing_table");pose(desk.position+Vector3(0,1.10,0),3.6,43,yaw)
+		heading.text="POST / STAMP DESK";footer.text="SGODOT-215 / LIU BEI\nSilver-white coffee pot / white cup / stamp + ink pad / blank open passport / plant";await capture("post_stamp_desk_detail")
 	var npcs=JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outpost_npcs.json")).npcs
 	var actors={}
 	for pair in [["res_pip","npc_pip"],["res_sam","npc_sam"],["sigrid","npc_keeper"]]:
@@ -186,16 +195,29 @@ func post_review():
 		var label=Label.new();heading.get_parent().add_child(label);label.text={"npc_pip":"Pip","npc_sam":"Sam","npc_keeper":"Sigrid","exit":"Exit"}[key];label.position=tagpts[key]+Vector2(-15,-12);label.add_theme_font_size_override("font_size",12);label.add_theme_color_override("font_color",Color("253e4a"));label.add_theme_color_override("font_outline_color",Color("fffdf4"));label.add_theme_constant_override("outline_size",4)
 	await capture("post_npc_positions_360")
 	report.suggested_anchors=layout.suggested_anchors
-	# Separate annotated panorama keeps all four proposed positions visible.
+	# Two requested supplement images only: NPC positions and blank sign detail.
 	vp.size=Vector2i(1200,1000);heading.add_theme_font_size_override("font_size",24);footer.add_theme_font_size_override("font_size",18);footer.position=Vector2(12,915)
-	pose(Vector3(-.25,1.65,.1),11.4,43,yaw)
 	for child in heading.get_parent().get_children():
 		if child is Label and child!=heading and child!=footer:child.hide()
-	await capture("post_npc_positions_panorama")
+	if revision_only:
+		for actor in actors.values():actor.hide()
+		var sign=room.get_node("post_office_sign")
+		for child in room.get_children():
+			if child is Node3D and child!=sign:child.hide()
+		world.get_node("runtime_fare_board").hide()
+		pose(sign.position+Vector3(.05,.17,0),2.8,0,90)
+		heading.text="POST / ENVELOPE SIGN / NO LETTERING"
+		footer.text="SGODOT-215 / LIU BEI / v1.2\nRed plaque + envelope retained / original atlas unchanged"
+		await capture("post_sign_detail")
+	else:
+		pose(Vector3(-.25,1.65,.1),11.4,43,yaw)
+		await capture("post_npc_positions_panorama")
 	vp.free()
 func run():
-	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
-	if "--post" in OS.get_cmdline_user_args():
+	output=ProjectSettings.globalize_path("res://../captures-v1.2" if "--post-revision" in OS.get_cmdline_user_args() else "res://../captures");DirAccess.make_dir_recursive_absolute(output)
+	if "--post-revision" in OS.get_cmdline_user_args():
+		await post_review(true)
+	elif "--post" in OS.get_cmdline_user_args():
 		await post_review()
 	else:
 		await supplemental_213()
