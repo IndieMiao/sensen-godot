@@ -33,15 +33,15 @@ func test_the_arrival_cards_words() -> void:
 	assert_array([old.item_name, old.strip]).is_equal(["Postcard from Old Kai", "New title · Old Kai's Best Friend"])
 
 ## Every open resident in the table's order (q(193) ④: a place in world_gen's placement rules or a hand-written
-## outpost), the denominator how many they are; Mira (her weekly route is P2) and Ivo (until his Mine Hut is built,
-## q(193) ②) are not on the page, no gap left; an unearned cell names no one.
+## outpost), the denominator how many they are; Mira (her weekly route is P2) is not on the page, no gap left; Ivo is,
+## his Mine Hut live (q(204)); an unearned cell names no one.
 func test_the_postcards_page_lists_the_open_residents_in_the_tables_order() -> void:
 	var p: Dictionary = Kindred.postcards(_view())
 	var table: Array = P0Logic.content().get("residents", {}).keys()
-	var open: Array = table.filter(func(id): return not id in ["res_mira", "res_ivo"])
+	var open: Array = table.filter(func(id): return id != "res_mira")
 	assert_array(Kindred.open_residents()).is_equal(open)
 	assert_bool(Kindred.open_residents().has("res_granny_wu")).is_true()   # the S-tier trading post's
-	assert_str(str(p.count)).is_equal("Postcards · 1/10")
+	assert_str(str(p.count)).is_equal("Postcards · 1/11")
 	assert_array(p.cells.map(func(c): return c.id)).is_equal(open)
 	var pip: Dictionary = p.cells[table.find("res_pip")]
 	assert_array([pip.earned, pip.name, pip.text]).is_equal([true, "Pip", "Best friend on the whole route. Don't tell the pigeons."])
@@ -106,10 +106,11 @@ func test_the_passport_has_cities_and_postcards_pages() -> void:
 	for i in 3: await get_tree().process_frame
 	var page := d.find_child("Postcards", true, false) as Control
 	assert_bool(page.visible).is_true()
-	assert_str((page.find_child("Count", true, false) as Label).text).is_equal("Postcards · 1/10")
+	assert_str((page.find_child("Count", true, false) as Label).text).is_equal("Postcards · 1/11")
 	var cells: Array = page.find_child("Grid", true, false).get_children()
-	assert_int(cells.size()).is_equal(10)
-	for gone in ["Cell_res_mira", "Cell_res_ivo"]: assert_object(page.find_child(gone, true, false)).is_null()   # q(193)
+	assert_int(cells.size()).is_equal(11)
+	assert_object(page.find_child("Cell_res_mira", true, false)).is_null()   # q(193): her route is P2
+	assert_object(page.find_child("Cell_res_ivo", true, false)).is_not_null()   # q(204): his Mine Hut is live
 	var heights := cells.map(func(c): return (c as Control).custom_minimum_size.y)
 	assert_bool(heights.all(func(h): return is_equal_approx(h, heights[0]) and h > Stamp.PASSPORT.y)).is_true()
 	# as tall as the longest Kindred line of the page's residents needs at the cells' own width: three lines at most in P1
@@ -156,25 +157,27 @@ func test_a_whole_portrait_is_cropped_not_stretched() -> void:
 	assert_float(wide.size.y).is_equal(340.0)
 	assert_float(wide.position.x).is_equal_approx((340.0 - 340.0 * 26.0 / 34.0) * 0.5, 0.01)   # centred across
 
-## Ivo joins once his Mine Hut is a room of the world (q(193) ②): the count follows the data, no number written.
+## Ivo is on the page because his Mine Hut is a room of the world (q(193) ②, live since q(204)): the count follows the
+## data, no number written — without the room he is not.
 func test_the_mine_hut_brings_ivo_onto_the_page() -> void:
 	var rooms: Dictionary = P0Logic.content().world.room
-	rooms["mine_hut"] = {"art": "", "anchors": "", "category": "Mine hut"}
-	var with_hut := Kindred.open_residents()
+	assert_bool(Kindred.open_residents().has("res_ivo")).is_true()
+	assert_int(Kindred.open_residents().size()).is_equal(11)
+	var hut = rooms["mine_hut"]
 	rooms.erase("mine_hut")
-	assert_bool(with_hut.has("res_ivo")).is_true()
-	assert_int(with_hut.size()).is_equal(11)
-	assert_bool(Kindred.open_residents().has("res_ivo")).is_false()
+	var without := Kindred.open_residents()
+	rooms["mine_hut"] = hut
+	assert_bool(without.has("res_ivo")).is_false()
+	assert_int(without.size()).is_equal(10)
 
 ## A postcard the player holds is on the page even when its resident has no home here yet (周瑜 on #400): it joins in
 ## the table's order and the count.
 func test_a_held_postcard_is_never_hidden() -> void:
 	var p: Dictionary = Kindred.postcards(_view({"res_pip": "Best friend on the whole route. Don't tell the pigeons.",
-		"res_ivo": "Down here, a friend is worth more than ore."}))
+		"res_mira": "See you on the next road."}))
 	var ids: Array = p.cells.map(func(c): return c.id)
-	assert_str(str(p.count)).is_equal("Postcards · 2/11")
-	assert_bool(ids.has("res_ivo")).is_true()
-	assert_bool(ids.has("res_mira")).is_false()
+	assert_str(str(p.count)).is_equal("Postcards · 2/12")   # Mira's, held though her route is P2
+	assert_bool(ids.has("res_mira")).is_true()
 	var table: Array = P0Logic.content().get("residents", {}).keys()
 	assert_array(ids).is_equal(table.filter(func(id): return ids.has(id)))   # still the table's order
 

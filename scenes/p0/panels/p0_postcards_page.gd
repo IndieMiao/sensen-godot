@@ -1,5 +1,5 @@
 extends VBoxContainer
-## The Passport's Postcards page (PASS-POSTCARDS 2627:134311; q(171) ⑥, 不知火舞 on 284): `Postcards · 3/10`, then
+## The Passport's Postcards page (PASS-POSTCARDS 2627:134311; q(171) ⑥, 不知火舞 on 284): `Postcards · 3/11`, then
 ## a cell per resident, three to a row, in the residents table's order (P0Kindred.postcards):
 ##   earned    surfaceRaised, a 1 px border: the PostcardStamp (their face, or their initial), the name (C12 XB, line 16)
 ##             and their Kindred line in curly quotes (Bold Italic 10, line 13, secondary; the frame's values), uncut
