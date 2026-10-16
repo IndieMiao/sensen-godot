@@ -91,6 +91,9 @@ func test_a_spot_asks_first_and_move_farm_is_the_change() -> void:
 	flow.spots.build.activated.emit()
 	assert_array(chose).is_empty()   # not yet: the card asks
 	assert_object(flow.confirm).is_not_null()
+	# 0.2.9 (李元芳's run): the pond's name rides above other pins (NAME_Z), and the card must draw over it too
+	var pond_name: Control = (flow.spots.map_card.pond as UiMapDestination)._label_box
+	assert_int(flow.confirm.z_index).is_greater(pond_name.z_index)
 	assert_array(_labels(flow.confirm)).contains(["Move your farm to Tokyo?",
 		"Everything on your farm moves with you. You can't change your home city again.", "Your day resets Thu 4 AM, Tokyo time."])
 	flow.confirm.cancel.activated.emit()
