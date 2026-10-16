@@ -14,10 +14,10 @@ db=$(python3 -c "import urllib.parse,sys;print(urllib.parse.urlparse(sys.argv[1]
 [[ "$host" =~ ^192\.168\.124\.[0-9]+$ ]] || { echo "拒绝：恢复目标必须在 devserver 网段，收到 $host"; exit 1; }
 [[ "$db" == "sensen_farm_restore" ]] || { echo "拒绝：库名必须是 sensen_farm_restore，收到 $db"; exit 1; }
 
-latest=$(aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 ls "s3://${OSS_BUCKET:?}/" | sort | tail -1 | awk '{print $4}')
+latest=$(aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 ls "s3://${OSS_BUCKET:?}/farm/" | sort | tail -1 | awk '{print $4}')
 [ -n "$latest" ] || { echo "OSS 里没有备份"; exit 1; }
 tmp=$(mktemp -d)
-aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 cp "s3://${OSS_BUCKET}/${latest}" "$tmp/b.age"
+aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 cp "s3://${OSS_BUCKET}/farm/${latest}" "$tmp/b.age"
 age -d -i "$AGE_KEY" -o "$tmp/b.dump" "$tmp/b.age"
 
 psql "$RESTORE_DSN" -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' >/dev/null
