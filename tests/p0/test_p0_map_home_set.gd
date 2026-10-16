@@ -67,3 +67,23 @@ func test_the_map_opens_over_the_home_city_with_the_farm_on_its_spot() -> void:
 	assert_float(float(choice.location.lat)).is_equal_approx(35.6801, 1e-4)
 	assert_float(float(choice.location.lng)).is_equal_approx(139.7102, 1e-4)
 	assert_float(map.home_lat).is_equal_approx(35.6801, 0.01)   # where the map's home is
+
+## 李元芳 on #451: the opening view keeps every framed pin and name clear of the right-hand keys (⌂, ⊕) — a Tokyo
+## farm picked southeast of its home set opened with the Homestead under them.
+func test_the_opening_view_keeps_pins_off_the_right_hand_keys() -> void:
+	var market := P0Outposts.home(HomeSet._tokyo_home(), "market")
+	var v := HomeSet._tokyo_home()
+	v.home.farm = {"lat": float(market.lat) - 0.012, "lng": float(market.lng) + 0.016}   # ~2 km southeast
+	rt.session.view = v
+	var m: Node = (load(P0_MAP) as PackedScene).instantiate()
+	add_child(m)
+	for i in 5: await get_tree().process_frame
+	m.frame_home_set()
+	assert_array(m.frame_key_rects()).is_not_empty()
+	assert_bool(m.framed.any(func(it): return it.get("self_pin", false))).is_true()   # the Homestead (the avatar) is in
+	for it in m.framed:
+		var r = m._item_rect(it)
+		if r == null: continue
+		for k in m.frame_key_rects(): assert_bool((r as Rect2).intersects(k)).override_failure_message(str(it.get("id", "self"))).is_false()
+	m.free()
+	rt.session.view = HomeSet._tokyo_home()
