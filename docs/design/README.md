@@ -4,6 +4,7 @@
 
 ## 当前 UI 与 P0 美术
 
+- [刘备 · Ivo 矿口小屋 SGODOT-308](mine-hut-308-2026-10-16/README.md)：新 Mine Hut 套件、关闭矿道、盐烤鱼炉、原件复用与 Ivo 站位；共享图集、Godot 审阅图、实际交叠和通行验证，交 wp-3d-scene 双审。
 - [刘备 · Basic Room 三口灶角 SGODOT-213](kitchen-213-2026-10-16/README.md)：Stark 第二版三口砌筑灶、左墙四罐调味架和红封面菜谱书；0.98 m 锅位、六个世界挂点、真实房间审阅及交叠检查，附旧烟囱 AO 清理与程序接入说明。
 - [刘备 · 灶上普通锅 / Big Pot SGODOT-282](stove-pot-282-2026-10-15/README.md)：0.2.8 / q(201)，空心双变体、后缘掀盖、共享色板；三间真实房间的 43°/360 宽审阅与交叠检查，含 Deluxe 旧水壶和 Standard 后炉眼朝向接入提醒。
 - [刘备 · 生成城市掌柜发色变体 SGODOT-284](keeper-hair-284-2026-10-14/README.md)：hairhat41 红棕、hairhat43 软黑；保留饰件与原材质参数，含正面／3⁄4、全身卡／邮票及导入验证。两件 NPC 专用，苏烈后续接入 keeper_looks，不进 0.2.6。

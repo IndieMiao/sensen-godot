@@ -1,0 +1,130 @@
+{
+  "method": "Declared 11x11 median patches on corresponding wood, plaster and white-hide surfaces; circular HSV hue difference <= 10 degrees. Not a whole-image fidelity metric. Stone/metal use the supplied grey-green farm-mine reference and neutral-metal brief. Brightness/saturation differences remain for art review.",
+  "patches": [
+    {
+      "surface": "floor",
+      "reference": {
+        "pixel": [
+          673,
+          605
+        ],
+        "median_rgb": [
+          243,
+          144,
+          89
+        ],
+        "hue_degrees": 21.42857142857143,
+        "saturation": 0.6337448559670782
+      },
+      "runtime": {
+        "pixel": [
+          609,
+          537
+        ],
+        "median_rgb": [
+          243,
+          179,
+          126
+        ],
+        "hue_degrees": 27.179487179487175,
+        "saturation": 0.48148148148148145
+      },
+      "hue_delta_degrees": 5.750915750915745,
+      "passed": true
+    },
+    {
+      "surface": "upper timber",
+      "reference": {
+        "pixel": [
+          1020,
+          310
+        ],
+        "median_rgb": [
+          209,
+          104,
+          76
+        ],
+        "hue_degrees": 12.631578947368412,
+        "saturation": 0.6363636363636362
+      },
+      "runtime": {
+        "pixel": [
+          940,
+          299
+        ],
+        "median_rgb": [
+          231,
+          130,
+          84
+        ],
+        "hue_degrees": 18.775510204081627,
+        "saturation": 0.6363636363636364
+      },
+      "hue_delta_degrees": 6.1439312567132145,
+      "passed": true
+    },
+    {
+      "surface": "cream plaster",
+      "reference": {
+        "pixel": [
+          1010,
+          347
+        ],
+        "median_rgb": [
+          230,
+          156,
+          132
+        ],
+        "hue_degrees": 14.693877551020412,
+        "saturation": 0.4260869565217391
+      },
+      "runtime": {
+        "pixel": [
+          980,
+          370
+        ],
+        "median_rgb": [
+          234,
+          190,
+          163
+        ],
+        "hue_degrees": 22.81690140845072,
+        "saturation": 0.30341880341880345
+      },
+      "hue_delta_degrees": 8.123023857430306,
+      "passed": true
+    },
+    {
+      "surface": "white hide",
+      "reference": {
+        "pixel": [
+          650,
+          655
+        ],
+        "median_rgb": [
+          255,
+          223,
+          195
+        ],
+        "hue_degrees": 28.000000000000007,
+        "saturation": 0.23529411764705888
+      },
+      "runtime": {
+        "pixel": [
+          550,
+          598
+        ],
+        "median_rgb": [
+          246,
+          232,
+          216
+        ],
+        "hue_degrees": 31.999999999999993,
+        "saturation": 0.12195121951219515
+      },
+      "hue_delta_degrees": 3.999999999999986,
+      "passed": true
+    }
+  ],
+  "passed": true
+}
