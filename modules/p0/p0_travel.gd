@@ -102,7 +102,7 @@ static func pass_text(view: Dictionary, cluster: String) -> String:
 const HOMESTEAD_SPACES := ["home", "mine"]
 
 static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary:
-	if not away(view) or space in HOMESTEAD_SPACES: return info
+	if not away(view) or space in HOMESTEAD_SPACES: return home_chip(view, info)
 	var c := P0Clusters.get_cluster(here(view))
 	var out := info.duplicate()
 	var city := str(c.name) if not c.is_empty() else str(info.get("city", ""))
@@ -110,6 +110,15 @@ static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary
 	out["city"] = city
 	out["kind"] = UiHud.PlaceKind.FOREIGN
 	out["day_pass"] = ""
+	return out
+
+## At home the scenes write the written city into their chip (P0City.chip: `San Francisco · Homestead`); a generated
+## home's chip names that home instead (SGODOT-311: `Tokyo · Homestead`). Another city's own place keeps its name.
+static func home_chip(view: Dictionary, info: Dictionary) -> Dictionary:
+	var city := str(info.get("city", ""))
+	if home_is_written(view) or not (city == P0City.city_name() or city == P0City.short_name()): return info
+	var out := info.duplicate()
+	out["city"] = home_name(view)
 	return out
 
 ## "1,758" (km on the travel card).
