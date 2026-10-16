@@ -70,10 +70,15 @@ JS
 }
 
 health() {   # $1 = label: Journey and farm healthz, saved for the before / after comparison
+  # The Journey server is being retired (SGODOT-304): its path answers 410 Gone once stopped (★3), which is fine;
+  # the old farm's /v1 must still answer 200.
   for u in "$SITE/preview/journey/v1/healthz" "$SITE/v1/healthz"; do
     code=$(curl_ -o "$out/hz.tmp" -w '%{http_code}' "$u" || echo 000)
     printf '%s %s %s %s\n' "$1" "$code" "$u" "$(head -c 200 "$out/hz.tmp")" | tee -a "$out/health.txt"
-    [ "$code" = 200 ] || { echo "FAIL: $u is $code"; return 1; }
+    case "$u:$code" in
+      */preview/journey/*:200|*/preview/journey/*:410|*:200) ;;
+      *) echo "FAIL: $u is $code"; return 1 ;;
+    esac
   done
 }
 
@@ -155,14 +160,21 @@ case "$step" in
 import sys
 src, dst = sys.argv[1], sys.argv[2]
 lines = open(src).read().split('\n')
-start = next(i for i, l in enumerate(lines) if l.strip().startswith('handle_path /preview/journey/*'))
-depth, end = 0, None
-for i in range(start, len(lines)):
-    depth += lines[i].count('{') - lines[i].count('}')
-    if depth == 0: end = i; break
-indent = lines[start][:len(lines[start]) - len(lines[start].lstrip())]
+# After the Journey preview's block while it is there; once it is gone (SGODOT-304 retires the Journey server), before
+# the site's fallback proxy to the old farm, at its indent.
+journey = next((i for i, l in enumerate(lines) if l.strip().startswith('handle_path /preview/journey/*')), None)
+if journey is not None:
+    depth, at = 0, None
+    for i in range(journey, len(lines)):
+        depth += lines[i].count('{') - lines[i].count('}')
+        if depth == 0: at = i + 1; break
+    ref = lines[journey]
+else:
+    at = next(i for i, l in enumerate(lines) if l.strip().startswith('reverse_proxy app:3000'))
+    ref = lines[at]
+indent = ref[:len(ref) - len(ref.lstrip())]
 block = [f'{indent}handle_path /preview/p0/* {{', f'{indent}    reverse_proxy p0-demo:3110', f'{indent}}}']
-open(dst, 'w').write('\n'.join(lines[:end + 1] + block + lines[end + 1:]))
+open(dst, 'w').write('\n'.join(lines[:at] + block + lines[at:]))
 PY
     say "the change"
     diff -u "$out/Caddyfile.live" "$out/Caddyfile.new" || true
