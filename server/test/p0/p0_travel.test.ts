@@ -71,6 +71,7 @@ describe('travel (SGODOT-278)', () => {
     expect(table.get('gn-3981609')).toMatchObject({ name: 'Tijuana', country_code: 'MX' });
     expect(c.travel?.landmarks?.['gn-5391811']).toEqual({ landmark: 'Balboa Park', stamp: 'stamp_san_diego' });
     expect(Object.keys(c.travel?.landmarks ?? {})).toHaveLength(27);
+    expect(c.travel?.landmarks?.['gn-1819729']).toEqual({ landmark: 'Victoria Harbour', stamp: 'stamp_hong_kong' });   // a place, not the junk (q(208) ②)
     // every open home city has its landmark (the home pick's thumbs, SGODOT-303), each stamp's art in the package
     for (const id of [writtenCluster(c), ...homeRules(c).cities]) {
       const stamp = c.travel?.landmarks?.[id]?.stamp;
