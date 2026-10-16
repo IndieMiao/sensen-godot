@@ -323,15 +323,20 @@ const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
 
 ## The opening shot shows the keeper whole, the name tag over their head included, and the counter (不知火舞 on 227,
 ## int12-pre: Ama stood off the tea house's opening shot). The tag counts at its highlighted height and a long name's
-## half width either side, so `Ama` / `Sigrid` stay whole on screen.
+## half width either side, so `Ama` / `Sigrid` stay whole on screen. A room with no keeper (the Mine Hut, q(204)) opens
+## on its resident the same way: the player and Ivo with his name tag, which keeps the shaft and the steps in view too
+## (不知火舞 / 上官婉儿 on 308: the opening shot on the player alone cut the shaft and put Ivo on the edge).
 const OPENING_TAG_HALF_PX := 40.0
 func opening_subjects() -> Array:
-	if not npcs.has("npc_keeper"): return []
+	var host := "npc_keeper" if npcs.has("npc_keeper") else ""
+	if host == "":
+		for n in npcs: if host == "": host = n   # no keeper: the room's first resident
+	if host == "": return []
 	var forward := -_cam_dir
 	var right := forward.cross(Vector3.UP).normalized()
 	var up := right.cross(forward).normalized()
 	var m := cam.size / maxf(_view().x, 1.0)
-	var root := npcs.npc_keeper.root as Node3D
+	var root := npcs[host].root as Node3D
 	var tag := root.to_global(NAME_OVER_HEAD) + up * COUNTER_TAG_PX * m
 	var keeper := [root.global_position, tag - right * OPENING_TAG_HALF_PX * m, tag + right * OPENING_TAG_HALF_PX * m]
 	var counter := []
