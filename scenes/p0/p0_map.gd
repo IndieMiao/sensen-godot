@@ -39,6 +39,11 @@ var _marks_sig := ""
 func _initial_region_id() -> String:
 	return P0_REGION
 
+## The map opens over the home city (SGODOT-303): a generated home by its cluster's region, the written city by its
+## own (San Francisco's curated region).
+func _initial_region() -> Dictionary:
+	return P0Clusters.region(P0Travel.home(_view()))
+
 func _ready() -> void:
 	rt = P0Runtime.ensure()
 	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
@@ -50,13 +55,14 @@ func _ready() -> void:
 		if child.name == "AccountButton" or child is LanguageButton: child.hide()
 
 # ---------------------------------------------------------------- homestead and ponds
-## The homestead: sh_a's farm placed at the home city's farm point, in its region (SGODOT-270: San Francisco's Noe
-## Valley). Placing it moves only its map overlay — the pin and where the map lands; the farm scene is P0Garden's.
+## The homestead: sh_a's farm placed at the home's farm point (view.home.farm, the spot picked with the home; the
+## written city's content point for a save from before, SGODOT-270: San Francisco's Noe Valley), in the home city's
+## region. Placing it moves only its map overlay — the pin and where the map lands; the farm scene is P0Garden's.
 func _resolve_farm_choice() -> Dictionary:
-	var at := P0City.farm_at()
+	var at := P0Travel.home_farm(_view())
 	var choice := P0_FARM_CHOICE.duplicate(true)
 	if at != Vector2.ZERO: choice["location"] = {"lat": at.x, "lng": at.y}
-	choice["region_id"] = P0_REGION
+	choice["region_id"] = str(P0Clusters.region(P0Travel.home(_view())).get("id", P0_REGION))
 	return choice
 
 func _server_has_no_farm() -> bool:
@@ -90,7 +96,7 @@ func _fly_home() -> void:
 	var held := P0Travel.here(_view())
 	var home := Vector2(home_lat, home_lng)
 	var km := roundi(P0PlaceSheet.km_between(_origin(), home))
-	var hr := P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION))
+	var hr := P0Clusters.region(P0Travel.home(_view()))
 	var bearing := float(CityMapData.city(str(hr.get("id", ""))).get("overview", {}).get("bearing", city_bearing)) if not hr.is_empty() else city_bearing
 	if not hr.is_empty(): _switch_city(hr)
 	if rt.ui.has_modal(): rt.ui.close_modal()   # no card stays over the flight (周瑜 on #341)
@@ -533,7 +539,9 @@ func _on_city_visit_requested(farm_id: String) -> void:
 ## The avatar and every pin wearing a marker (the first session's Reed Pond) always go in; then the home set — each role's outpost nearest home, and away from
 ## home the Homestead pin — nearest the avatar first, each while the view still holds them all at z13.5: the first that
 ## would not stays offscreen, and so do the farther ones. At z13.5 outposts of different roles (300 m apart at least)
-## never cover each other whole. Not even the must-haves fit: z13.5 on the avatar. Recenter keeps the zoom; Show on
+## never cover each other whole. Not even the must-haves fit: z13.5 on the avatar. No pin or name sits under the
+## right-hand keys (⌂ home, ⊕ recenter): a view that would put one there is not taken, and the next tenth out is tried
+## (李元芳 on #451: a Tokyo home's Homestead opened under them, its name half covered). Recenter keeps the zoom; Show on
 ## map and the camera kept on return are unchanged.
 const FRAME_ZOOM_MAX := 16.0
 const FRAME_ZOOM_MIN := 13.5
@@ -563,6 +571,7 @@ func frame_home_set() -> void:
 	else:
 		view = _part_pins(chosen, view, safe)
 		_look(view.at, float(view.z))
+	city_map.forget_shown()   # the pins pack at this view's own zoom, not by what the view before it showed
 	_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
 
 ## 不知火舞 on 269: space pins give way to the pins packed before them, so the opening view zooms in a tenth at a time,
@@ -582,8 +591,8 @@ func _part_pins(items: Array, view: Dictionary, safe: Rect2) -> Dictionary:
 		_look(Vector2(center_lat, center_lng), z)
 		_centre_on(items, safe)
 		if not safe.encloses(_frame_box(must)): _centre_on(must, safe)
-		if not safe.encloses(_frame_box(must)): break   # closer would push the avatar or a marked pin out
-		if _pins_shown(items, safe) > base: return {"at": Vector2(center_lat, center_lng), "z": z}
+		if not safe.encloses(_frame_box(must)) or not _clear_of_keys(must): break   # closer would push the avatar or a marked pin out
+		if _pins_shown(items, safe) > base and _clear_of_keys(items): return {"at": Vector2(center_lat, center_lng), "z": z}
 	return view
 
 ## Pans the trial camera so `items` sit centred in `safe` (with the map's pitch their middle is not the screen's).
@@ -623,7 +632,7 @@ func _fit(items: Array, safe: Rect2) -> Dictionary:
 			var shift := safe.get_center() - box.get_center()
 			if shift.length() < 1.0: break
 			_pan_by(shift)
-		if safe.encloses(_frame_box(items)): return {"at": Vector2(center_lat, center_lng), "z": zoom}
+		if safe.encloses(_frame_box(items)) and _clear_of_keys(items): return {"at": Vector2(center_lat, center_lng), "z": zoom}
 		at = Vector2(center_lat, center_lng)   # the next tenth starts centred where this one ended
 	return {}
 
@@ -678,13 +687,34 @@ func _frame_box(items: Array) -> Rect2:
 	var box := Rect2()
 	var first := true
 	for it in items:
-		var p = geo_to_screen(float(it.lat), float(it.lng))
-		if p == null: continue
-		var fp: Rect2 = FarmMarkers.self_footprint(zoom) if it.get("self_pin", false) else _frame_footprint(it)
-		var r := Rect2((p as Vector2) + fp.position + (it.get("shift", Vector2.ZERO) as Vector2), fp.size)
+		var r = _item_rect(it)
+		if r == null: continue
 		box = r if first else box.merge(r)
 		first = false
 	return box
+
+## One pin's footprint on screen in the trial view (its disc and name row; the avatar's), null when off the map.
+func _item_rect(it: Dictionary) -> Variant:
+	var p = geo_to_screen(float(it.lat), float(it.lng))
+	if p == null: return null
+	var fp: Rect2 = FarmMarkers.self_footprint(zoom) if it.get("self_pin", false) else _frame_footprint(it)
+	return Rect2((p as Vector2) + fp.position + (it.get("shift", Vector2.ZERO) as Vector2), fp.size)
+
+## The right-hand keys over the map (⌂ home, ⊕ recenter) that a framed pin must keep clear of, on screen.
+func frame_key_rects() -> Array:
+	var out: Array = []
+	for key in [city_map.recenter, city_map.home_key] if city_map else []:
+		if key and (key as Control).is_visible_in_tree(): out.append((key as Control).get_global_rect())
+	return out
+
+## Whether no pin of `items` (disc or name) lies under a right-hand key in the trial view.
+func _clear_of_keys(items: Array) -> bool:
+	var keys := frame_key_rects()
+	for it in items:
+		var r = _item_rect(it)
+		if r == null: continue
+		for k in keys: if (r as Rect2).intersects(k): return false
+	return true
 
 ## What a pin needs in the opening view: a MapDestination its disc and a name row under it and over it (the name goes
 ## over when under touches another; 刘邦 on #111) — the name slides in from the screen edge (CityMapView.LABEL_EDGE),
@@ -1092,12 +1122,18 @@ func city_bubble(region_id: String) -> Dictionary:
 func _city_bubble_face(region_id: String) -> Dictionary:
 	var cluster := P0Clusters.cluster_of_region(region_id)
 	if cluster == P0Travel.home(_view()):
-		var online := 0
-		for n in _online.values(): online += int(n)
+		var online := 0   # the home city's outposts only (SGODOT-312: not every outpost of the world)
+		for id in _online: if _cluster_of_outpost(str(id)) == cluster: online += int(_online[id])
 		# nobody online: the house alone, like an outpost pin's bare name (q(72): 0 tells nothing, only looks empty)
 		return {text = "%d online" % online if online > 0 else "", icon = "house"}
 	if cluster == _first_in_air(): return {text = "Unexplored"}   # changes on landing (q(147) ⑤)
 	return {text = "Unexplored" if P0Travel.fog(_view(), cluster) == "unexplored" else "Visited"}
+
+## The city cluster an outpost id belongs to: a generated one's is its prefix (`gn-1850147~tea0`, as the server's
+## travel.clusterOf), the written city's hand-written ones (`sh_tea_1`) are the written city's.
+static func _cluster_of_outpost(id: String) -> String:
+	var cut := id.find("~")
+	return id.substr(0, cut) if cut > 0 else P0Travel.written()
 
 ## The city a first visit is flying to, still unexplored to the eye until it lands; "" otherwise.
 func _first_in_air() -> String:

@@ -1085,6 +1085,13 @@ func _layout_wanted() -> bool:
 	_layout_refs = refs
 	return wanted
 
+## A fresh packing from the next pass: no pin holds its place for having been shown (the DEST_HOLD and PACK_MARGIN
+## grace), so a view the host has just chosen — P0's opening view — packs as if first seen at its own zoom (不知火舞 on
+## #457: a tackle shop 35 px from its pond stayed only because the view before it had shown it).
+func forget_shown() -> void:
+	_shown_last.clear()
+	_layout_settling = true
+
 func _update_markers() -> void:
 	displayed.clear()
 	_place_labels.clear()

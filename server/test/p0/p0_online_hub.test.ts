@@ -198,7 +198,7 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     app = Fastify({ logger: false });
     const rooms = new OutpostRooms(loadOutposts());
     const content = loadP0Content();
-    registerP0Routes(app, { content, store: new P0Store(content), now: Date.now, dev: true, presence: () => rooms.total() });
+    registerP0Routes(app, { content, store: new P0Store(content), now: Date.now, dev: true, rooms });
     registerP0Online(app, { rooms });
     await app.listen({ port: 0, host: '127.0.0.1' });
     const address = app.server.address();

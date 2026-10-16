@@ -47,3 +47,6 @@ docs/design/**/*.response.json
 # Godot import caches of design images under docs/ (generated on each machine's import; never shared, or they block
 # every other worktree's checkout and merge). Already-tracked ones stay tracked.
 docs/**/*.import
+
+# q(188) Near you: the address table is made in the P0 image only (server/tools/ip_near_table.ts)
+server/data/ip-near.bin

@@ -4,7 +4,7 @@
  * u16 id · f32 x · f32 z · f32 yaw · u16 hp · u16 max_hp · u8 action · u8 floor · u32 seq · u16 serial.
  * Outposts have no health or floors: hp, max_hp, floor and serial are 0.
  */
-import { ACTIONS } from '../../realtime/model.js';
+import { ACTIONS } from './actions.js';
 import type { Occupant } from './rooms.js';
 
 /** The realtime action list plus sitting; indices match OnlineCrowd's, sit is appended. */
