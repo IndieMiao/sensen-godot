@@ -1089,12 +1089,18 @@ func city_bubble(region_id: String) -> Dictionary:
 func _city_bubble_face(region_id: String) -> Dictionary:
 	var cluster := P0Clusters.cluster_of_region(region_id)
 	if cluster == P0Travel.home(_view()):
-		var online := 0
-		for n in _online.values(): online += int(n)
+		var online := 0   # the home city's outposts only (SGODOT-312: not every outpost of the world)
+		for id in _online: if _cluster_of_outpost(str(id)) == cluster: online += int(_online[id])
 		# nobody online: the house alone, like an outpost pin's bare name (q(72): 0 tells nothing, only looks empty)
 		return {text = "%d online" % online if online > 0 else "", icon = "house"}
 	if cluster == _first_in_air(): return {text = "Unexplored"}   # changes on landing (q(147) ⑤)
 	return {text = "Unexplored" if P0Travel.fog(_view(), cluster) == "unexplored" else "Visited"}
+
+## The city cluster an outpost id belongs to: a generated one's is its prefix (`gn-1850147~tea0`, as the server's
+## travel.clusterOf), the written city's hand-written ones (`sh_tea_1`) are the written city's.
+static func _cluster_of_outpost(id: String) -> String:
+	var cut := id.find("~")
+	return id.substr(0, cut) if cut > 0 else P0Travel.written()
 
 ## The city a first visit is flying to, still unexplored to the eye until it lands; "" otherwise.
 func _first_in_air() -> String:
