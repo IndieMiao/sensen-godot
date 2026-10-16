@@ -10,7 +10,8 @@ LIVE_DSN="${LIVE_DSN:?需要 LIVE_DSN（只读比对用）}"
 AGE_KEY="${AGE_KEY:-$HOME/.config/sensen/farm-backup.key}"
 # 与 backup.sh 同一套 OSS 设置（虚拟主机式地址、只在必需时校验），不依赖演练机自己的 aws 配置。
 # 读权限的 key 照常从环境变量或 aws 凭据文件来。
-cfg=$(mktemp); trap 'rm -f "$cfg"' EXIT
+# 解密出的 dump 是玩家数据：任何一步失败退出时，连同解密目录一起删掉。
+cfg=$(mktemp); tmp=""; trap 'rm -f "$cfg"; [ -n "$tmp" ] && rm -rf "$tmp"' EXIT
 printf '[default]\nregion = oss-cn-hongkong\nrequest_checksum_calculation = when_required\nresponse_checksum_validation = when_required\ns3 =\n  addressing_style = virtual\n' > "$cfg"
 export AWS_CONFIG_FILE="$cfg" AWS_DEFAULT_REGION=oss-cn-hongkong
 
