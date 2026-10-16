@@ -198,7 +198,7 @@ func _lay_out() -> void:
 		c.queue_free()
 	rows.clear()
 	error.visible = false
-	var parts := P0HomePick.sections(open_rows, near, matches)
+	var parts := P0HomePick.sections(open_rows, near, matches, home)
 	var searching := matches is Array
 	none.visible = searching and (matches as Array).is_empty()
 	scroll.visible = not none.visible

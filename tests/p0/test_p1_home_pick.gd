@@ -42,6 +42,10 @@ func test_the_list_is_near_you_then_recommended_by_climate() -> void:
 	assert_str(P0HomePick.preselect(SF, true)).is_empty()   # a change of home never picks for the player
 	# a search: its rows only, no titles
 	assert_array(P0HomePick.sections(OPEN, SF, [SF, SAN_JOSE]).map(func(p): return p.kind)).is_equal(["row", "row"])
+	# the ones that can be picked first, each group in the server's order (不知火舞 on #451)
+	assert_array(P0HomePick.sections(OPEN, SF, [SAN_JOSE, SF, SANTA_CRUZ, LA]).map(func(p): return p.row.id)).is_equal(
+		[SF.id, LA.id, SAN_JOSE.id, SANTA_CRUZ.id])
+	assert_array(P0HomePick.sections(OPEN, SF, [SF, LA], SF.id).map(func(p): return p.row.id)).is_equal([LA.id, SF.id])   # a change: home is grey
 
 func test_why_a_city_cannot_be_picked_and_the_spot_lines() -> void:
 	assert_str(P0HomePick.note(SF)).is_empty()

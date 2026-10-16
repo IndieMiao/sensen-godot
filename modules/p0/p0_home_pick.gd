@@ -70,12 +70,13 @@ static func note(row: Dictionary, home := "") -> String:
 
 ## The list's parts in order (HOME-PICK-1, NOIP 2771:162818): with a city near, the `Near you` title and its row; then
 ## `Recommended` and each climate group's title and rows — the open cities in the server's order, the near one not
-## again. A search (`matches` given) is only its rows, no titles (HOME-PICK-2). Each part: {kind: "title" | "band" |
-## "row", text?, band?, row?}.
-static func sections(open: Array, near: Variant, matches: Variant = null) -> Array:
+## again. A search (`matches` given) is only its rows, no titles, the ones that can be picked first (HOME-PICK-2;
+## 不知火舞 on #451), each group in the server's order. Each part: {kind: "title" | "band" | "row", text?, band?, row?}.
+static func sections(open: Array, near: Variant, matches: Variant = null, home := "") -> Array:
 	var out: Array = []
 	if matches is Array:
-		for r in matches: out.append({kind = "row", row = r})
+		for r in matches: if note(r, home) == "": out.append({kind = "row", row = r})
+		for r in matches: if note(r, home) != "": out.append({kind = "row", row = r})
 		return out
 	var near_id := ""
 	if near is Dictionary and not (near as Dictionary).is_empty():
