@@ -245,10 +245,9 @@ func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
-	var choice := _initial_region_id()
-	var regions := FarmRegions.load_default()
-	if regions != null and not choice.is_empty() and not regions.region(choice).is_empty():
-		enter_street_mode(regions.region(choice))
+	var start := _initial_region()
+	if not start.is_empty():
+		enter_street_mode(start)
 	if not street_mode:
 		_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
@@ -313,6 +312,13 @@ func _ready() -> void:
 ## Which city the map opens in (the saved pick). Subclasses (P0) pin their own.
 func _initial_region_id() -> String:
 	return FarmRegions.load_choice()
+
+## The region the map opens in: _initial_region_id's in the curated regions. P0 opens over its home city, a generated
+## one too (SGODOT-303).
+func _initial_region() -> Dictionary:
+	var id := _initial_region_id()
+	var regions := FarmRegions.load_default()
+	return regions.region(id) if regions != null and not id.is_empty() else {}
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）；城市选择页共用同一工厂。
 func _make_bridge() -> MapBridge:

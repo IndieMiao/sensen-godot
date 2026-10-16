@@ -214,10 +214,15 @@ static func blocked_reply(result: int, code: int, raw: PackedByteArray) -> Dicti
 static func boot_wanted() -> bool:
 	return FileAccess.file_exists("user://p0_boot") or OS.get_environment("SENSEN_P0") == "1" or OS.has_feature("p0")
 
+## What this client can do that an older one could not (the server's `x-p0-features`): choose_home — a new save waits
+## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city.
+const FEATURES := "choose_home"
+
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
+	headers.append("x-p0-features: " + FEATURES)
 	return headers
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is
