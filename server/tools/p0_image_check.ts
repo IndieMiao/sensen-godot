@@ -16,7 +16,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 // it, so a city like Miami would silently drop to a lower tier (后裔 on #254).
 const files = ['assets/p0/p0_content.json', 'assets/p0/p0_outposts.json', 'assets/p0/p0_ponds.json', 'assets/p0/city_clusters.json',
   'server/data/city_cluster_members.tsv', 'server/data/cities.tsv', 'server/data/world_water.json', 'assets/ponds/catalog.json',
-  'assets/farm/data/regions.json'];
+  // the avatar catalog the outpost rooms check a look against (src/p0/online/appearance.ts; SGODOT-304: no longer found
+  // through Journey's regions.json)
+  'assets/avatar/parts_manifest.json', 'assets/avatar/demo_denylist.json'];
 const missing = files.filter(f => !existsSync(path.join(root, f)) || statSync(path.join(root, f)).size === 0);
 const fragments = existsSync(path.join(root, 'assets/p0/content')) ? readdirSync(path.join(root, 'assets/p0/content')).filter(f => f.endsWith('.json')) : [];
 if (!fragments.length) missing.push('assets/p0/content/*.json');

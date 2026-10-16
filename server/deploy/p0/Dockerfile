@@ -21,7 +21,7 @@ RUN corepack enable && addgroup -S p0 && adduser -S p0 -G p0 && mkdir -p /data &
 COPY --from=build /repo /repo
 # Data the P0 server reads at start: content (with the content/ fragments, SGODOT-275), the outpost table (rooms, SGODOT-227), P0's pond list (each pond's map
 # point, for the map markers, q(48); SGODOT-270), the frozen pond catalog and the cosmetic catalog the outpost hub
-# checks appearances against (regions.json locates ../../avatar). Keep in step with Dockerfile.dockerignore and
+# checks appearances against (assets/avatar, read by src/p0/online/appearance.ts). Keep in step with Dockerfile.dockerignore and
 # deploy-hk.sh build.
 COPY assets/p0/p0_content.json assets/p0/p0_content.json
 COPY assets/p0/content assets/p0/content
@@ -29,7 +29,6 @@ COPY assets/p0/p0_outposts.json assets/p0/p0_outposts.json
 COPY assets/p0/p0_ponds.json assets/p0/p0_ponds.json
 COPY assets/p0/city_clusters.json assets/p0/city_clusters.json
 COPY assets/ponds/catalog.json assets/ponds/catalog.json
-COPY assets/farm/data/regions.json assets/farm/data/regions.json
 COPY assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json assets/avatar/
 USER p0
 ENV NODE_ENV=production P0_DEV=0 P0_PORT=3110 P0_HOST=0.0.0.0 \
