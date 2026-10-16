@@ -34,7 +34,8 @@ import { homeFacts } from './home.js';
 import { decorView } from './decor.js';
 import { titlesView } from './titles.js';
 
-/** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
+/** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
+ * answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);

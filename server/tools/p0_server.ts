@@ -66,7 +66,7 @@ if (process.env.P0_IP_NEAR_TABLE) {
   try { ipNear = openIpNear(process.env.P0_IP_NEAR_TABLE); }
   catch (e) { console.error(JSON.stringify({ ip_near: 'unavailable', error: String((e as Error).message ?? e).slice(0, 200) })); }
 }
-registerP0Routes(app, { content, store, now: Date.now, dev, log, presence: () => rooms.total(), ipNear });
+registerP0Routes(app, { content, store, now: Date.now, dev, log, rooms, ipNear });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
 const pass = (player: string, outpost: string) => {
