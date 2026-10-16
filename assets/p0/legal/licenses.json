@@ -64,8 +64,9 @@
         {
           "id": "dbip",
           "title": "DB-IP",
-          "credit": "IP Geolocation by DB-IP (db-ip.com)",
+          "credit": "IP Geolocation by DB-IP",
           "license": "CC BY 4.0",
+          "link": {"label": "db-ip.com", "url": "https://db-ip.com"},
           "text": "res://assets/p0/legal/cc-by-4.0.txt"
         },
         {
