@@ -14,8 +14,8 @@ const files = (dir: string): string[] => readdirSync(dir).flatMap(f => {
   const p = path.join(dir, f);
   return statSync(p).isDirectory() ? files(p) : p.endsWith('.ts') ? [p] : [];
 });
-/** Relative imports (static and import('…') types) that leave src/p0. */
-const outside = (file: string) => [...readFileSync(file, 'utf8').matchAll(/(?:from|import\()\s*'(\.[^']+)'/g)]
+/** Relative imports that leave src/p0: `from '…'`, `import '…'` (for its effects) and `import('…')`, either quote. */
+const outside = (file: string) => [...readFileSync(file, 'utf8').matchAll(/(?:from|import)\s*\(?\s*['"](\.[^'"]+)['"]/g)]
   .map(m => path.resolve(path.dirname(file), m[1]))
   .filter(target => !target.startsWith(P0 + path.sep))
   .map(target => path.relative(SERVER, target));
