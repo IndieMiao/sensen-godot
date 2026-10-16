@@ -5,7 +5,7 @@
  */
 import type { CityClusters } from './clusters.js';
 import type { P0Content } from './content.js';
-import { clusterById, clustersOf as clusters, HOME_ALIAS, homeBase, homeFacts, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
+import { clusterById, clustersOf as clusters, countryPart, HOME_ALIAS, homeBase, homeFacts, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
 import { gainEnergy, grantOnce, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
@@ -129,7 +129,8 @@ export function preview(c: P0Content, s: P0State, cluster: string, now = Date.no
   const cl = clusterById(c, cluster);
   const { km: d, trip, name: tripName } = tripOf(c, s, cluster);
   const info = cityInfo(c, cluster);
-  return { cluster, name: cl?.name ?? '', country: cl?.country ?? '', km: d, trip, trip_name: tripName,
+  // q(210): the card's country as the rows write it (CLDR's name; none for a city-only place or `Mexico City`)
+  return { cluster, name: cl?.name ?? '', country: cl ? countryPart(c, cl) : '', km: d, trip, trip_name: tripName,
     cost: { energy: 0, coins: 0, item: null }, first_visit: !s.travel.visits[cluster],
     climate: cl?.climate ?? '', utc_offset_min: utcOffsetMin(cl?.timezone, now),   // the silhouette card (MAP-3-FREE, §11.8.3)
     fishing: info.fish, counts: { ponds: info.ponds.length, outposts: info.outposts.length, residents: info.residents } };

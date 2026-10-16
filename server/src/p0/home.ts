@@ -59,3 +59,22 @@ export function homeFacts(c: P0Content, s: Homed): HomeFacts {
   return { cluster, name: cl?.name ?? '', climate: z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate, timezone: cl?.timezone,
     farm: picked ? { lat: picked[0], lng: picked[1] } : cl ? { lat: cl.lat, lng: cl.lng } : null };
 }
+
+/** q(209) ②: whether a city's name holds a country's name as a whole word (`Mexico City`, `Santiago de Cuba`; not
+ * `Iranshahr`): letters around it end the match, and the name's own `( ) .` are taken as they are (`Congo (DRC)`). */
+export const namesCountry = (name: string, country: string): boolean =>
+  country !== '' && new RegExp(`(^|[^\\p{L}])${country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}])`, 'u').test(name);
+
+/** q(210) ①: a country's English name as the game writes it — Unicode CLDR's, by its code (content
+ * travel.country_names, tools/build_country_names.ts), the directory's own where the table has none. */
+export const countryName = (c: P0Content, cl: CityCluster): string => c.travel?.country_names?.[cl.country_code] ?? cl.country;
+
+/** A city's country as its row and its silhouette card write it, "" for none (q(209) ②, q(210) ② ③): none for a place
+ * whose cities read their name alone (Hong Kong, Macao, Taiwan, the Palestinian Territories, Kosovo, Western Sahara),
+ * nor when the name already holds its country's name as a whole word (`Mexico City`, `Singapore`). */
+export function countryPart(c: P0Content, cl: CityCluster): string {
+  if (c.travel?.city_only_countries?.includes(cl.country_code) || c.travel?.city_only_clusters?.includes(cl.id)) return '';   // q(210) ③, q(211)
+  const name = countryName(c, cl);
+  return namesCountry(cl.name, name) ? '' : name;
+}
+

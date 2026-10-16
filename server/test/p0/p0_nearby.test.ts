@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { freshState } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { preview } from '../../src/p0/travel.js';
 import { clusterAdmin } from '../../src/p0/world.js';
 import { cityRegion, homeCities, namesCountry } from '../../src/p0/home_city.js';
-import { clustersOf } from '../../src/p0/home.js';
+import { clusterById, clustersOf } from '../../src/p0/home.js';
 
 const c = loadP0Content();
 const now = Date.parse('2026-10-13T03:00:00Z');
@@ -67,5 +68,40 @@ describe('MAP-8: the near10 cities\' states in the view (不知火舞 on 301 / M
     const regions = viewOf(c, s, now).travel.regions as Record<string, string>;
     expect(Object.keys(regions).sort()).toEqual([...s.travel.fallback.near10].sort());   // every one, an empty one too
     for (const id of s.travel.fallback.near10) expect(regions[id]).toBe(cityRegion(c, id));
+  });
+
+  // q(210): the country is Unicode CLDR's English name; Hong Kong, Macao, Taiwan, the Palestinian Territories, Kosovo and
+  // Western Sahara read the city's name alone (q(210) ② ③)
+  it('writes the country as CLDR names it, and only the city in the six places that read it alone (q(210))', () => {
+    const all = [...clustersOf(c)!.byId.values()];
+    const by = (name: string, code: string) => all.find(cl => cl.name === name && cl.country_code === code)!;
+    for (const [name, code, region] of [['Istanbul', 'TR', 'Türkiye'], ['Abidjan', 'CI', 'Côte d’Ivoire'], ['Amsterdam', 'NL', 'Netherlands'],
+      ['Kinshasa', 'CD', 'Congo (DRC)'], ['Pointe-Noire', 'CG', 'Congo (Republic)'], ['Yangon', 'MM', 'Myanmar'], ['Praia', 'CV', 'Cabo Verde'],
+      ['Prague', 'CZ', 'Czechia'], ['Gros Islet', 'LC', 'St. Lucia'], ['Taipei', 'TW', ''], ['Gaza', 'PS', ''], ['Pristina', 'XK', ''],
+      ['Laayoune', 'EH', ''], ['Hong Kong', 'HK', '']]) {
+      const cl = by(name, code);
+      expect(cl, name).toBeDefined();
+      expect(cityRegion(c, cl.id), name).toBe(region);
+    }
+    // every country the directory has is in the table (no city falls back to GeoNames' own spelling)
+    for (const code of new Set(all.map(cl => cl.country_code))) expect(c.travel?.country_names?.[code], code).toBeTruthy();
+    // the home pick's row carries the same country (q(210) ⑤: one function for every exit)
+    expect(homeCities(c, 'istanbul').matches.find(r => r.name === 'Istanbul')?.country).toBe('Türkiye');
+    expect(homeCities(c).open.find(r => r.name === 'Hong Kong')?.country).toBe('');
+    // q(211): the 84 disputed cities by id read the city alone; Nicosia, looked at and left out, keeps its country
+    const listed = c.travel?.city_only_clusters ?? [];
+    expect(new Set(listed).size).toBe(84);
+    for (const id of listed) { expect(clusterById(c, id), id).toBeDefined(); expect(cityRegion(c, id), id).toBe(''); }
+    for (const [name, code] of [['Simferopol', 'UA'], ['Sevastopol', 'UA'], ['Kherson', 'UA'], ['Srinagar', 'IN'], ['Muzaffarābād', 'PK'],
+      ['Itanagar', 'IN'], ['Hargeysa', 'SO'], ['Tiraspol', 'MD'], ['Sokhumi', 'GE'], ['Famagusta', 'CY'], ['Jerusalem', 'IL'], ['Smara', 'MA'], ['Stanley', 'FK']])
+      expect(cityRegion(c, by(name, code).id), name).toBe('');
+    expect(cityRegion(c, by('Nicosia', 'CY').id)).toBe('Cyprus');
+    expect(cityRegion(c, by('Kyiv', 'UA').id)).toBe('Ukraine');
+    // the silhouette card's preview writes the same country
+    const s = freshState(c, 'nearby-player-03', now);
+    expect(preview(c, s, by('Istanbul', 'TR').id, now).country).toBe('Türkiye');
+    expect(preview(c, s, by('Taipei', 'TW').id, now).country).toBe('');
+    expect(preview(c, s, by('Simferopol', 'UA').id, now).country).toBe('');   // q(211)
+    expect(homeCities(c, 'srinagar').matches.find(r => r.name === 'Srinagar')?.country).toBe('');
   });
 });

@@ -1,5 +1,5 @@
 {
-  "_note": "Settings › Legal › Licenses (q(129); SET-LICENSES, Figma page 14 1254:88796, 不知火舞 280 4c8d286a). Groups in order, rows in order: title, license (the line under it), credit (a data credit's attribution, word for word, above its license 6 apart; Map data only), page (q(133) v3: a page the row opens instead of a text; map_data is Map data), text (the full text the row's › opens: a file in the package, or \"engine\" for Godot's own license and its third-party notices). Software lists what the package depends on; Map data is added by hand (it is not in any dependency list). License texts are the publishers' own files, unchanged (cc-by-4.0.txt: creativecommons.org legalcode.txt; odbl-1.0.txt: opendatacommons.org odbl-10.txt; mapbox-maps-android-LICENSE.md: the packed SDK version's LICENSE.md with the licenses it bundles, from tools/p0/update_mapbox_license.sh — 李白); the page joins their hard-wrapped lines.",
+  "_note": "Settings › Legal › Licenses (q(129); SET-LICENSES, Figma page 14 1254:88796, 不知火舞 280 4c8d286a). Groups in order, rows in order: title, license (the line under it), credit (a data credit's attribution, word for word, above its license 6 apart; Map data only), page (q(133) v3: a page the row opens instead of a text; map_data is Map data), text (the full text the row's › opens: a file in the package, or \"engine\" for Godot's own license and its third-party notices). Software lists what the package depends on; Map data is added by hand (it is not in any dependency list). License texts are the publishers' own files, unchanged (cc-by-4.0.txt: creativecommons.org legalcode.txt; odbl-1.0.txt: opendatacommons.org odbl-10.txt; unicode-license-v3.txt: cldr-json 48.2.0's LICENSE (q(210) ④, the country names); mapbox-maps-android-LICENSE.md: the packed SDK version's LICENSE.md with the licenses it bundles, from tools/p0/update_mapbox_license.sh — 李白); the page joins their hard-wrapped lines.",
   "groups": [
     {
       "title": "Software",
@@ -67,6 +67,13 @@
           "credit": "IP Geolocation by DB-IP (db-ip.com)",
           "license": "CC BY 4.0",
           "text": "res://assets/p0/legal/cc-by-4.0.txt"
+        },
+        {
+          "id": "cldr",
+          "title": "Unicode CLDR",
+          "credit": "Copyright © 2004-2026 Unicode, Inc.",
+          "license": "Unicode License v3",
+          "text": "res://assets/p0/legal/unicode-license-v3.txt"
         }
       ]
     }

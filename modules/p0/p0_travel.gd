@@ -171,7 +171,7 @@ static func fares() -> Array:
 ## nearest home that the save froze (travel.fallback.near10, §11.2.3), nearest first. Each row: {cluster, name,
 ## region (the row's second part as the server writes it, travel.regions, q(208) ①: a US city's state `Salinas ·
 ## California`, elsewhere the country `Tokyo · Japan`, none when it is the city's own name, a province for one of two
-## same-named cities; a server from before: travel.admins, else the country), km, trip, trip_name (the tier's name: Nearby, Regional …), climate ("Temperate"), visited,
+## same-named cities; a server from before: travel.admins, else the country as P0Clusters.country_part writes it), km, trip, trip_name (the tier's name: Nearby, Regional …), climate ("Temperate"), visited,
 ## stamped, landmark (the city's landmark stamp art, "" for none: the row shows its climate band instead)}.
 static func nearby(view: Dictionary) -> Array:
 	var stamped := {}
@@ -184,7 +184,7 @@ static func nearby(view: Dictionary) -> Array:
 		var cl := P0Clusters.get_cluster(c)
 		if cl.is_empty(): continue
 		var t := trip(view, c)
-		rows.append({cluster = c, name = str(cl.get("name", "")), region = str(regions[c] if regions.has(c) else admins.get(c, cl.get("country", ""))),
+		rows.append({cluster = c, name = str(cl.get("name", "")), region = str(regions[c] if regions.has(c) else admins.get(c, P0Clusters.country_part(cl))),
 			km = int(t.get("km", 0)), trip = int(t.get("trip", 0)), trip_name = str(t.get("name", "")),
 			climate = str(cl.get("climate", "")).capitalize(), visited = visits(view, c) > 0, stamped = stamped.has(c),
 			landmark = landmark_stamp(c)})

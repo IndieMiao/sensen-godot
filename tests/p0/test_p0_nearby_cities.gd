@@ -6,6 +6,7 @@ extends GdUnitTestSuite
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")
 const SF := "gn-5391959"
 const LA := "gn-5368361"
@@ -60,6 +61,16 @@ func test_the_servers_region_is_taken_as_it_is() -> void:
 	var view := _travel({regions = {CONCORD: "California", LA: ""}})
 	var rows: Array = P0Travel.nearby(view)
 	assert_array(rows.map(func(r): return str(r.region))).is_equal(["California", "California", ""])
+
+## q(210) ⑤: a server from before sends no regions — the row falls back to the country as P0Clusters writes it (CLDR's
+## name, none for a city-only place), not the directory's own spelling.
+func test_with_no_regions_the_row_writes_the_country_the_game_way() -> void:
+	var view := _travel({admins = {}, fallback = {near3 = [], near10 = ["gn-745044", "gn-1668341"]}})
+	var rows: Array = P0Travel.nearby(view)
+	var by := {}
+	for r in rows: by[str(r.cluster)] = str(r.region)
+	assert_str(str(by["gn-745044"])).is_equal("Türkiye")   # Istanbul
+	assert_str(str(by["gn-1668341"])).is_equal("")          # Taipei
 
 func _map() -> Node:
 	var viewport := SubViewport.new()
@@ -185,3 +196,17 @@ func test_a_long_name_hides_the_state_and_keeps_the_slot_in() -> void:
 	assert_bool(region.visible).is_true()
 	var sj: Label = short.find_child("Name", true, false)
 	assert_float(region.get_global_rect().position.x).is_equal_approx(sj.get_global_rect().end.x, 0.01)   # straight after the name
+
+## q(210): the travel card's title writes the country as the city rows do — CLDR's English name, and the city alone for
+## the places that read it alone and for a name that holds its country (q(209) ②).
+func test_the_travel_cards_title_writes_the_country_as_the_rows_do() -> void:
+	var title := func(id: String) -> String: return load("res://scenes/p0/p0_map.gd").travel_title(P0Clusters.get_cluster(id))
+	assert_str(title.call("gn-745044")).is_equal("Istanbul, Türkiye")
+	assert_str(title.call("gn-1668341")).is_equal("Taipei")   # q(210) ③ (b)
+	assert_str(title.call("gn-3530597")).is_equal("Mexico City")   # q(209) ②
+	assert_str(title.call("gn-1819729")).is_equal("Hong Kong")
+	assert_str(title.call("gn-2643743")).is_equal("London, United Kingdom")
+	assert_str(title.call("gn-693805")).is_equal("Simferopol")   # q(211), a disputed city by id
+	assert_bool(P0Clusters.names_country("Iranshahr", "Iran")).is_false()
+	assert_bool(P0Clusters.names_country("Santiago de Cuba", "Cuba")).is_true()
+	assert_bool(P0Clusters.names_country("Kinshasa", "Congo (DRC)")).is_false()
