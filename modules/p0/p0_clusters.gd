@@ -52,12 +52,13 @@ static func get_cluster(id: String) -> Dictionary:
 
 ## A city's country as the game writes it (q(210), the server's home.ts countryPart): Unicode CLDR's English name by its
 ## code (content travel.country_names), "" for a place whose cities read their name alone (travel.city_only_countries:
-## Hong Kong, Macao, Taiwan, the Palestinian Territories, Kosovo, Western Sahara) and when the city's name already holds
+## Hong Kong, Macao, Taiwan, the Palestinian Territories, Kosovo, Western Sahara; q(211)'s 84 disputed cities by id,
+## travel.city_only_clusters: Simferopol, Srinagar, Hargeysa …) and when the city's name already holds
 ## the country's as a whole word (q(209) ②: `Mexico City`, `Singapore`).
 static func country_part(c: Dictionary) -> String:
 	var travel: Dictionary = P0Logic.content().get("travel", {})
 	var code := str(c.get("country_code", ""))
-	if code in travel.get("city_only_countries", []): return ""
+	if code in travel.get("city_only_countries", []) or str(c.get("id", "")) in travel.get("city_only_clusters", []): return ""   # q(210) ③, q(211)
 	var name := str((travel.get("country_names", {}) as Dictionary).get(code, c.get("country", "")))
 	return "" if names_country(str(c.get("name", "")), name) else name
 

@@ -73,7 +73,7 @@ export const countryName = (c: P0Content, cl: CityCluster): string => c.travel?.
  * whose cities read their name alone (Hong Kong, Macao, Taiwan, the Palestinian Territories, Kosovo, Western Sahara),
  * nor when the name already holds its country's name as a whole word (`Mexico City`, `Singapore`). */
 export function countryPart(c: P0Content, cl: CityCluster): string {
-  if (c.travel?.city_only_countries?.includes(cl.country_code)) return '';
+  if (c.travel?.city_only_countries?.includes(cl.country_code) || c.travel?.city_only_clusters?.includes(cl.id)) return '';   // q(210) ③, q(211)
   const name = countryName(c, cl);
   return namesCountry(cl.name, name) ? '' : name;
 }

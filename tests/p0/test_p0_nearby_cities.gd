@@ -206,6 +206,7 @@ func test_the_travel_cards_title_writes_the_country_as_the_rows_do() -> void:
 	assert_str(title.call("gn-3530597")).is_equal("Mexico City")   # q(209) ②
 	assert_str(title.call("gn-1819729")).is_equal("Hong Kong")
 	assert_str(title.call("gn-2643743")).is_equal("London, United Kingdom")
+	assert_str(title.call("gn-693805")).is_equal("Simferopol")   # q(211), a disputed city by id
 	assert_bool(P0Clusters.names_country("Iranshahr", "Iran")).is_false()
 	assert_bool(P0Clusters.names_country("Santiago de Cuba", "Cuba")).is_true()
 	assert_bool(P0Clusters.names_country("Kinshasa", "Congo (DRC)")).is_false()
