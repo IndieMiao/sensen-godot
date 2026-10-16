@@ -1,10 +1,27 @@
 #!/usr/bin/env python3
 """Package inspected native Godot captures and measured review evidence. Requires Pillow/numpy."""
 from pathlib import Path
-import json,shutil,hashlib,colorsys
+import json,shutil,hashlib,colorsys,sys,subprocess
 from PIL import Image,ImageDraw,ImageFont
 import numpy as np
 ROOT=Path(__file__).resolve().parents[2];OUT=ROOT/'output/minehut-308';DOC=ROOT/'docs/design/mine-hut-308-2026-10-16';KIT=ROOT/'assets/rooms/mine_hut'
+if '--anchors' in sys.argv:
+ prefix='SGODOT-308_MINEHUT_v1_2_'
+ captures=OUT/'captures-v1.2'
+ geo=json.loads((OUT/'geometry-validation.json').read_text());godot=json.loads((captures/'godot-validation.json').read_text())
+ assert not geo['failures'] and not godot['failures']
+ layout=json.loads((KIT/'layout.json').read_text());old=json.loads(subprocess.check_output(['git','show','b848b384:assets/rooms/mine_hut/layout.json'],cwd=ROOT))
+ for key in ['local_lights','material_overrides','boundaries','nameplate_clearance','gameplay_camera','camera','review_lighting']:assert layout[key]==old[key],key
+ media=[]
+ for name in ['ivo_yaw160_43deg_360','standing_clearance_top']:
+  src=captures/(name+'.png');dest=DOC/(prefix+src.name);shutil.copy2(src,dest)
+  media.append({'file':dest.name,'size':list(Image.open(dest).size),'sha256':hashlib.sha256(dest.read_bytes()).hexdigest()})
+ for name,asset in geo['assets'].items():assert asset['sha256']==hashlib.sha256((KIT/(name+'.glb')).read_bytes()).hexdigest(),name
+ validation={'issue':'SGODOT-308','artist':'Liu Bei / 刘备','virtual_user_id':'0fb1de1f-ead5-443b-9537-54cbac113260','revision':'v1.2 orientation and standing clearance','passed':True,'checks':len(geo['checks'])+len(godot['checks']),'geometry':geo,'godot':godot,'budget':json.loads((KIT/'asset_stats.json').read_text()),'suggested_anchors':layout['suggested_anchors'],'preserved_from_v1_1':['all local lights and material overrides','boundaries and nameplate volume','review and gameplay camera parameters'],'lighting_evidence':'lighting-validation.json records the unchanged lighting parameters at v1.1; no new light-on/off capture in this orientation follow-up.','limits':['Desktop Vulkan Mobile review; no phone performance claim.','Formal runtime anchors and initial camera not edited.']}
+ (DOC/'validation.json').write_text(json.dumps(validation,indent=2,ensure_ascii=False)+'\n')
+ (DOC/'media-manifest-v1.2.json').write_text(json.dumps(media,indent=2)+'\n')
+ print('ANCHOR_PACKAGE',validation['checks'],'checks;',len(media),'images')
+ raise SystemExit(0)
 PREFIX='SGODOT-308_MINEHUT_v1_1_'
 DOC.mkdir(parents=True,exist_ok=True)
 for p in (OUT/'captures').glob('*.png'):shutil.copy2(p,DOC/(PREFIX+p.name))

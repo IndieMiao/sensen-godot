@@ -338,7 +338,7 @@ def sacks_and_rug():
  begin('stone_sack',(1.97,.082,.76),collision=collide([.48,.58,.48]))
  lathe('Open beige stone bag',(0,0,0),[(0,.16),(.08,.22),(.33,.23),(.52,.18),(.55,.18),(.55,.155),(.44,.15)],'D9C6A4',20)
  for i in range(8):rock('Bag rounded stone',(random.uniform(-.10,.10),.52+random.uniform(-.02,.05),random.uniform(-.10,.10)),(.10,.12,.11),'B6B3A7')
- begin('white_hide_rug',(0,.084,.65))
+ begin('white_hide_rug',(0,.084,1.22))
  # Whole asymmetrical hide silhouette with neck, legs and soft scalloped edges.
  pts=[(-.22,-.90),(.22,-.90),(.30,-.66),(.65,-.60),(.98,-.82),(1.14,-.76),(1.16,-.58),(.95,-.38),(.98,.35),(1.25,.54),(1.24,.76),(1.04,.90),(.78,.73),(.34,.78),(.22,.97),(-.08,1),(-.26,.82),(-.75,.74),(-1.05,.88),(-1.25,.72),(-1.25,.52),(-.99,.32),(-.96,-.35),(-1.13,-.58),(-1.12,-.78),(-.94,-.88),(-.62,-.62),(-.30,-.66)]
  # Smooth the coarse hide outline, then set exact 2.60 x 2.00 m dimensions.
@@ -430,7 +430,7 @@ def build():
  lamps=[{'name':n,'position':at,'color':'FFBC6F','energy':e,'range':r} for n,at,e,r in [('mine_left',[-1.50,2.02,-1.80],2.8,2.7),('mine_right',[.90,2.02,-1.80],2.8,2.7),('shelf',[-2.65,2.22,.51],2.4,2.7),('cabinet',[2.64,1.05,-.39],1.8,2.1),('stove',[-2.22,1.14,-.62],2.5,2.4),('tunnel',[-.864,.86,-3.64],.9,2.8)]]
  p.MANIFEST_EXTRA.update({'revision':'SGODOT-308 v1.1','floor_y':.082,'footprint':[6.8,6.4],
   'local_lights':lamps,'material_overrides':{n:{'emission':'FFD095','emission_use_atlas':True,'emission_energy':.20 if n=='tunnel_lamp_glow' else .7} for n in p.KITS if 'glow' in n or n=='stove_embers'},
-  'suggested_anchors':{n:{'position':at,'yaw_degrees':yaw if n=='npc_ivo' else 0} for n,at in [('npc_ivo',[1.40,.082,-.84]),('stand_ivo',[.80,.082,.05]),('spawn',[0,.082,2.55]),('exit',[0,.082,3.08]),('badge_exit',[0,.70,3.08])]},
+  'suggested_anchors':{n:{'position':at,'yaw_degrees':160 if n=='npc_ivo' else 0} for n,at in [('npc_ivo',[1.40,.082,-.84]),('stand_ivo',[.80,.082,.05]),('spawn',[0,.082,2.55]),('exit',[0,.082,3.08]),('badge_exit',[0,.70,3.08])]},
   'interactions':['npc_ivo','exit'],'mine_enterable':False,'tunnel_depth_behind_wall':2.5,'tunnel_floor_descent':1.0,'tunnel_far_section_scale':.4,'rug_size':[2.6,2.0],'nameplate_clearance':{'center':[1.4,2.18,-.84],'size':[1.0,.55,.65]},
   'gameplay_camera':{'pitch_degrees':43,'yaw_degrees':45,'size':6.72,'target':[0,1.15,0],'native_width':360},
   'spawn':[0,.082,2.55],'boundaries':[{'name':'front_left','at':[-1.99,1,3.22],'size':[2.48,2,.08]},{'name':'front_right','at':[1.99,1,3.22],'size':[2.48,2,.08]},{'name':'cut_right','at':[3.32,1,0],'size':[.08,2,6.4]}],

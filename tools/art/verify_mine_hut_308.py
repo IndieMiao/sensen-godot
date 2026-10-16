@@ -51,20 +51,47 @@ def main():
    if hit[0] is None:misses.append([float(z),float(a)])
  check(not misses,'far tunnel lining is closed: radial mesh rays cannot escape to the background')
  report['tunnel_closure']={'radial_probes':probe_count,'missing_hits':misses,'local_z_interval':[-2.83,-2.66]}
+ # Decorative fur has no collider, so check real projected triangles at each
+ # standing footprint as well as the separate Godot physical sweeps.
+ def footprint_distance(point,triangles):
+  a,b,c=triangles[:,0],triangles[:,1],triangles[:,2]
+  def cross2(x,y):return x[:,0]*y[:,1]-x[:,1]*y[:,0]
+  ab=b-a;ac=c-a;ap=point-a;den=cross2(ab,ac);valid=abs(den)>1e-10
+  u=np.divide(cross2(ap,ac),den,out=np.zeros_like(den),where=valid)
+  v=np.divide(cross2(ab,ap),den,out=np.zeros_like(den),where=valid)
+  if np.any(valid & (u>=0) & (v>=0) & (u+v<=1)):return 0.
+  result=float('inf')
+  for x,y in [(a,b),(b,c),(c,a)]:
+   delta=y-x;length=np.sum(delta*delta,axis=1)
+   t=np.divide(np.sum((point-x)*delta,axis=1),length,out=np.zeros_like(length),where=length>1e-20)
+   q=x+np.clip(t,0,1)[:,None]*delta
+   result=min(result,float(np.linalg.norm(q-point,axis=1).min()))
+  return result
+ report['anchor_clearances']=[]
+ for anchor,expected in [('npc_ivo',[1.4,.082,-.84]),('stand_ivo',[.8,.082,.05]),('spawn',[0,.082,2.55])]:
+  at=layout['suggested_anchors'][anchor]['position']
+  check(at==expected,anchor+' original standing position retained')
+  for name in ['white_hide_rug','left_wall','back_wall']:
+   row=rows[name];tri=np.asarray(row['v'])[np.asarray(row['t'])]
+   tri=tri[(tri[:,:,1].min(1)<=at[1]+1.745)&(tri[:,:,1].max(1)>=at[1]-.01)]
+   distance=footprint_distance(np.asarray(at)[[0,2]],tri[:,:,[0,2]])
+   check(distance>=.28,anchor+' / '+name+' actual mesh clear of 0.25m footprint with >=3cm margin')
+   report['anchor_clearances'].append({'anchor':anchor,'asset':name,'distance_to_projected_mesh_m':distance,'capsule_radius_m':.25,'edge_clearance_m':distance-.25})
+ check(layout['suggested_anchors']['npc_ivo']['yaw_degrees']==160,'Ivo yaw 160 into the room')
  # Rebakings may change UV packing. Unrequested prop geometry must stay v1-exact.
- changed={'left_wall','back_wall','mine_entrance','hearth_stones','white_hide_rug','stove_stone_base','tunnel_lamp_glow'}
+ changed=set()  # v1.2 changes placements/orientation; all 45 local meshes stay v1.1-exact.
  report['retained_geometry']=[]
  for row in layout['assets']:
   name=row['name']
   if name in changed:continue
-  baseline=OUT/'baseline.glb';baseline.write_bytes(subprocess.check_output(['git','show','4f345477:assets/rooms/mine_hut/'+row['file']],cwd=ROOT))
+  baseline=OUT/'baseline.glb';baseline.write_bytes(subprocess.check_output(['git','show','b848b384:assets/rooms/mine_hut/'+row['file']],cwd=ROOT))
   old=np.array(geometry(baseline)[2]);new=np.array(geometry(KIT/row['file'])[2])
   errors=[]
   for a,b in [(old,new),(new,old)]:
    tree=KDTree(len(b))
    for i,point in enumerate(b):tree.insert(Vector(point),i)
    tree.balance();errors.append(max(tree.find(Vector(point))[2] for point in a))
-  check(max(errors)<1e-5,name+' local geometry retained from v1 within 0.01 mm')
+  check(max(errors)<1e-5,name+' local geometry retained from v1.1 within 0.01 mm')
   report['retained_geometry'].append({'asset':name,'max_bidirectional_vertex_distance_m':max(errors)})
  # Structural joinery and designed assembly contacts, narrowly enumerated.
  legal={tuple(sorted(pair)):reason for pair,reason in [

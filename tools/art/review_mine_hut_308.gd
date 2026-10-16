@@ -76,13 +76,16 @@ func add_ivo():
  rig=Avatar.create_rig()
  for child in rig.get_children():
   if child is RigActivity:child.free()
- rig.assembler=AvatarAssemblerMerged.new();world.add_child(rig);rig.position=vec(layout.suggested_anchors.npc_ivo.position);rig.rotation_degrees.y=45
+ rig.assembler=AvatarAssemblerMerged.new();world.add_child(rig);rig.position=vec(layout.suggested_anchors.npc_ivo.position);rig.rotation_degrees.y=layout.suggested_anchors.npc_ivo.yaw_degrees
  var config=Avatar.slot_table.default_config()
  for k in {"hairHat":"hairhat_npc_ivo","mask":"mask16_npc_ivo","cloth":"cloth1_npc_ivo","shoes":"shoes3"}:config.slots[StringName(k)]={"hairHat":"hairhat_npc_ivo","mask":"mask16_npc_ivo","cloth":"cloth1_npc_ivo","shoes":"shoes3"}[k]
  rig.apply_config(config);var ticks=0
  while rig.is_busy() and ticks<900:await get_tree().process_frame;ticks+=1
  check(not rig.is_busy(),"Ivo real NPC parts assembled");rig.play_motion("idle");var ap=rig.get_node("AnimationPlayer");ap.seek(.3,true);ap.pause()
  report.ivo_look=config.slots
+ report.ivo_yaw=rig.rotation_degrees.y
+ check(is_equal_approx(rig.rotation_degrees.y,160),"actual Ivo yaw 160")
+ check(is_equal_approx(room.get_node("suggested_npc_ivo").rotation_degrees.y,160),"assembled Ivo marker yaw 160")
 func physics_audit():
  # Real engine sweep using a human-size capsule, not an AABB stand-in.
  var body=CharacterBody3D.new();body.name="QA_character_capsule";var shape=CapsuleShape3D.new();shape.radius=.25;shape.height=1.745
@@ -92,6 +95,10 @@ func physics_audit():
  var result=body.move_and_collide(Vector3(0,0,-2))
  check(result!=null,"closed mine stops actual capsule sweep")
  if result:report.mine_collision={"collider":str(result.get_collider().get_path()),"stop":xyz(body.position)};check("mine_entrance" in str(result.get_collider().get_path()),"mine entrance blocker hit before rear wall")
+ for key in ["npc_ivo","stand_ivo","spawn"]:
+  var q=PhysicsShapeQueryParameters3D.new();q.shape=shape;q.transform.origin=vec(layout.suggested_anchors[key].position)+Vector3(0,.874,0);q.exclude=[body.get_rid()]
+  var contacts=world.get_world_3d().direct_space_state.intersect_shape(q)
+  check(contacts.is_empty(),key+" actual stationary human capsule clear")
  # Open approach positive control and NPC stand area clearance.
  body.position=Vector3(0,.089,2.55);result=body.move_and_collide(Vector3(0,0,-1.9));check(result==null,"spawn to central rug passage clear")
  body.position=Vector3(.80,.089,.05);result=body.move_and_collide(Vector3(.60,0,-.89));check(result==null,"stand to Ivo location clear")
@@ -108,9 +115,22 @@ func physics_audit():
   if box.intersects(zone):hits.append(str(m.get_path()))
  check(hits.is_empty(),"Ivo nameplate volume clear of overhead geometry");report.nameplate_intersections=hits
 func run():
- output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
+ output=ProjectSettings.globalize_path("res://../captures-v1.2" if "--anchors" in OS.get_cmdline_user_args() else "res://../captures");DirAccess.make_dir_recursive_absolute(output)
  layout=JSON.parse_string(FileAccess.get_file_as_string(KIT+"layout.json"));audit()
  setup(Vector2i(360,800));assembly_audit();await add_ivo();await physics_audit()
+ if "--anchors" in OS.get_cmdline_user_args():
+  pose(Vector3(0,1.15,0),6.72);heading.text="MINE HUT / IVO YAW 160\n43 DEG / 6.72 M / 360 PX";footer.text="SGODOT-308 / LIU BEI / v1.2\nIvo faces into room; position unchanged\nRug shifted +Z 0.57 m for standing clearance";await capture("ivo_yaw160_43deg_360")
+  vp.size=Vector2i(1200,1000);heading.add_theme_font_size_override("font_size",22);footer.add_theme_font_size_override("font_size",17);footer.position=Vector2(12,900)
+  pose(Vector3(0,.2,0),9.4,90,0);heading.text="MINE HUT / STANDING CLEARANCE";footer.text="SGODOT-308 / LIU BEI / v1.2\nGreen rings: real 0.25 m radius / 1.745 m capsule footprints\nIvo, stand_ivo and spawn positions retained / headroom clear"
+  for key in ["npc_ivo","stand_ivo","spawn"]:
+   var at=vec(layout.suggested_anchors[key].position);var mesh=ImmediateMesh.new();mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+   for i in 48:
+    for j in [i,i+1]:
+     var a=j*TAU/48;mesh.surface_add_vertex(at+Vector3(.25*cos(a),.14,.25*sin(a)))
+   mesh.surface_end();var instance=MeshInstance3D.new();instance.mesh=mesh;var mat=StandardMaterial3D.new();mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;mat.albedo_color=Color("166B34");instance.material_override=mat;world.add_child(instance)
+   var label=Label.new();heading.get_parent().add_child(label);label.text=key;label.position=camera.unproject_position(at)+Vector2(24,-16);label.add_theme_font_size_override("font_size",18);label.add_theme_color_override("font_color",Color("124927"));label.add_theme_color_override("font_outline_color",Color("fffdf4"));label.add_theme_constant_override("outline_size",4)
+  await capture("standing_clearance_top")
+  finish();return
  pose(Vector3(0,1.15,0),6.72);heading.text="MINE HUT v1.1 / GAMEPLAY VIEW\n43 DEG / 6.72 M / 360 PX";footer.text="SGODOT-308 / LIU BEI\nIvo + exit only / mine is closed\nFull room shown in separate panorama";await capture("gameplay_43deg_360")
  pose(Vector3(0,1.25,0),12.4);heading.text="MINE HUT v1.1 / FULL ROOM\n43 DEG / PANORAMA";footer.text="SGODOT-308 / LIU BEI\n6.8 x 6.4 m floor / shared 2048 atlas\nWarm lamps + salt-fish stove";await capture("full_room_43deg_360")
  vp.size=Vector2i(1200,1000);heading.add_theme_font_size_override("font_size",22);footer.add_theme_font_size_override("font_size",17);footer.position=Vector2(12,900)
@@ -126,6 +146,8 @@ func run():
  pose(Vector3(1.4,1.15,-.84),3.3,20,45);heading.text="IVO / FRONT THREE-QUARTER";footer.text="SGODOT-308 / LIU BEI\nSame actual NPC look, extra eye-level review";await capture("ivo_character_detail")
  rig.hide();pose(Vector3(-2.6,1.22,-.62),3.5,25,75);heading.text="LEFT HEARTH / TWO SALT-GRILLED FISH";footer.text="SGODOT-308 / LIU BEI\nMetal stove, slab, firewood / reused shelf and lantern";await capture("stove_detail")
  pose(Vector3(0,.2,0),9.4,90,0);heading.text="MINE HUT / TOP VIEW";footer.text="SGODOT-308 / LIU BEI\nOpen central passage / Ivo on right / front-centre exit";await capture("top_view")
+ finish()
+func finish():
  report.renderer=RenderingServer.get_current_rendering_method();report.adapter=RenderingServer.get_video_adapter_name();report.failures=report.checks.filter(func(c):return not c.passed)
  FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
  print("MINE_HUT_QA ",report.checks.size()," checks, ",report.failures.size()," failures");get_tree().quit(0 if report.failures.is_empty() else 1)

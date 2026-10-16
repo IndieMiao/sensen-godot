@@ -2,9 +2,9 @@
   "issue": "SGODOT-308",
   "artist": "Liu Bei / 刘备",
   "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
-  "revision": "v1.1",
+  "revision": "v1.2 orientation and standing clearance",
   "passed": true,
-  "checks": 1400,
+  "checks": 1413,
   "geometry": {
     "checks": [
       {
@@ -748,155 +748,235 @@
         "passed": true
       },
       {
-        "check": "room_shell local geometry retained from v1 within 0.01 mm",
+        "check": "npc_ivo original standing position retained",
         "passed": true
       },
       {
-        "check": "mine_lantern_-1 local geometry retained from v1 within 0.01 mm",
+        "check": "npc_ivo / white_hide_rug actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "mine_lantern_glow_-1 local geometry retained from v1 within 0.01 mm",
+        "check": "npc_ivo / left_wall actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "mine_lantern_hanger_-1 local geometry retained from v1 within 0.01 mm",
+        "check": "npc_ivo / back_wall actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "mine_lantern_1 local geometry retained from v1 within 0.01 mm",
+        "check": "stand_ivo original standing position retained",
         "passed": true
       },
       {
-        "check": "mine_lantern_glow_1 local geometry retained from v1 within 0.01 mm",
+        "check": "stand_ivo / white_hide_rug actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "mine_lantern_hanger_1 local geometry retained from v1 within 0.01 mm",
+        "check": "stand_ivo / left_wall actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "grilling_stove local geometry retained from v1 within 0.01 mm",
+        "check": "stand_ivo / back_wall actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "stove_embers local geometry retained from v1 within 0.01 mm",
+        "check": "spawn original standing position retained",
         "passed": true
       },
       {
-        "check": "firewood local geometry retained from v1 within 0.01 mm",
+        "check": "spawn / white_hide_rug actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "square_stool local geometry retained from v1 within 0.01 mm",
+        "check": "spawn / left_wall actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "sorting_bench local geometry retained from v1 within 0.01 mm",
+        "check": "spawn / back_wall actual mesh clear of 0.25m footprint with >=3cm margin",
         "passed": true
       },
       {
-        "check": "sorting_tray local geometry retained from v1 within 0.01 mm",
+        "check": "Ivo yaw 160 into the room",
         "passed": true
       },
       {
-        "check": "quartz_and_tools local geometry retained from v1 within 0.01 mm",
+        "check": "room_shell local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "round_stool local geometry retained from v1 within 0.01 mm",
+        "check": "left_wall local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "rock_crate local geometry retained from v1 within 0.01 mm",
+        "check": "back_wall local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "salt_crate local geometry retained from v1 within 0.01 mm",
+        "check": "mine_entrance local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "rock_barrel local geometry retained from v1 within 0.01 mm",
+        "check": "tunnel_lamp_glow local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "wood_stump local geometry retained from v1 within 0.01 mm",
+        "check": "mine_lantern_-1 local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "low_cabinet local geometry retained from v1 within 0.01 mm",
+        "check": "mine_lantern_glow_-1 local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "cabinet_lantern local geometry retained from v1 within 0.01 mm",
+        "check": "mine_lantern_hanger_-1 local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "cabinet_lantern_glow local geometry retained from v1 within 0.01 mm",
+        "check": "mine_lantern_1 local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "left_shelf local geometry retained from v1 within 0.01 mm",
+        "check": "mine_lantern_glow_1 local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "shelf_lantern local geometry retained from v1 within 0.01 mm",
+        "check": "mine_lantern_hanger_1 local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "shelf_lantern_glow local geometry retained from v1 within 0.01 mm",
+        "check": "hearth_stones local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "hanging_pan local geometry retained from v1 within 0.01 mm",
+        "check": "stove_stone_base local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "garlic_and_herbs local geometry retained from v1 within 0.01 mm",
+        "check": "grilling_stove local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "mine_plan local geometry retained from v1 within 0.01 mm",
+        "check": "stove_embers local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "wall_pickaxe local geometry retained from v1 within 0.01 mm",
+        "check": "firewood local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "wall_short_axe local geometry retained from v1 within 0.01 mm",
+        "check": "square_stool local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "coiled_rope local geometry retained from v1 within 0.01 mm",
+        "check": "sorting_bench local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "ivo_wall_helmet local geometry retained from v1 within 0.01 mm",
+        "check": "sorting_tray local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "tied_sack local geometry retained from v1 within 0.01 mm",
+        "check": "quartz_and_tools local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "stone_sack local geometry retained from v1 within 0.01 mm",
+        "check": "round_stool local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "entry_plant_-1 local geometry retained from v1 within 0.01 mm",
+        "check": "rock_crate local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "entry_plant_1 local geometry retained from v1 within 0.01 mm",
+        "check": "salt_crate local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "exit_steps local geometry retained from v1 within 0.01 mm",
+        "check": "rock_barrel local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
-        "check": "exit_pickaxe_sign local geometry retained from v1 within 0.01 mm",
+        "check": "wood_stump local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "low_cabinet local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "cabinet_lantern local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "cabinet_lantern_glow local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "left_shelf local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "shelf_lantern local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "shelf_lantern_glow local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "hanging_pan local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "garlic_and_herbs local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "mine_plan local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "wall_pickaxe local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "wall_short_axe local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "coiled_rope local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "ivo_wall_helmet local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "tied_sack local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "stone_sack local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "white_hide_rug local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "entry_plant_-1 local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "entry_plant_1 local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "exit_steps local geometry retained from v1.1 within 0.01 mm",
+        "passed": true
+      },
+      {
+        "check": "exit_pickaxe_sign local geometry retained from v1.1 within 0.01 mm",
         "passed": true
       },
       {
@@ -5181,7 +5261,7 @@
           ]
         ],
         "triangles": 9380,
-        "sha256": "18a03e51e0a8809ca3de1df30a36f28bfe33ccdc53aafdd2ff3b7527ed38c012"
+        "sha256": "4320b59863e28370a50e189991c42571b994c9eb5fcecd8ad60827e3d929e1ce"
       },
       "left_wall": {
         "world_bounds": [
@@ -5197,7 +5277,7 @@
           ]
         ],
         "triangles": 2068,
-        "sha256": "631b92e9d8590af8b7211ba5084172a72c5cf714e56aeb034e61958f3d827d54"
+        "sha256": "7f7e312856ff9c56d5dcb52b5937db5a2d9c7ec0371fa819d237f03a0bbe2506"
       },
       "back_wall": {
         "world_bounds": [
@@ -5213,7 +5293,7 @@
           ]
         ],
         "triangles": 2268,
-        "sha256": "a5919d44f9c87c26f47a0a156caf96ac5265ee216afe9b754c8c33a83ced1e92"
+        "sha256": "385b564f9cd7ed5c68e911eb96253029f57401857e49f0140f4e152b2ef1d17d"
       },
       "mine_entrance": {
         "world_bounds": [
@@ -5229,7 +5309,7 @@
           ]
         ],
         "triangles": 31016,
-        "sha256": "526962357fc639478065174b88ab204e837294c3a6bbc14606814c78b0d2e6c7"
+        "sha256": "e59b1fbc59b14e4abddf4394fb2214ba91343afe62c19472820c823e7ebc6b6b"
       },
       "tunnel_lamp_glow": {
         "world_bounds": [
@@ -5245,7 +5325,7 @@
           ]
         ],
         "triangles": 120,
-        "sha256": "3657d50515ddf261c3794d4bd9e8fc72cbe6da6528ea8fc4990ce48aae74f60d"
+        "sha256": "4fec159a3588a106e0f05911c7b8168f30cd4432f9830251d277b9c3bad92519"
       },
       "mine_lantern_-1": {
         "world_bounds": [
@@ -5261,7 +5341,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "d2d3d3ba3392ab773906ae965b28d186e734de818ebf614f5d598b5260702134"
+        "sha256": "a542b88931f2d804063a75ecd3681fc789061d37d073599751178b0af2ec8597"
       },
       "mine_lantern_glow_-1": {
         "world_bounds": [
@@ -5277,7 +5357,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "078e134ea9df8e1289264455e72b9d12bee58fa2f12255da7136a074dbea8035"
+        "sha256": "42cc3d38c2c9065a4810c052710e55f466e5d913a2dcd75d60745626fe6dfc26"
       },
       "mine_lantern_hanger_-1": {
         "world_bounds": [
@@ -5293,7 +5373,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "a7467e43fb3f03916eb3785c98f00ca93b31306e99f7ee7fc5d3cb255b5b5e63"
+        "sha256": "cf6014635a3c0fbb3d44dd250cb825c9aee8f2cba58d3e06dc956fc65547670f"
       },
       "mine_lantern_1": {
         "world_bounds": [
@@ -5309,7 +5389,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "74a17ea6ba666e78c465abc8fe7bf460560c63f4f8567796541a92d9423a2607"
+        "sha256": "29d02c55f7185ec2824c249180865dc6cc6d2118b214182552d9143c616c3d99"
       },
       "mine_lantern_glow_1": {
         "world_bounds": [
@@ -5325,7 +5405,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "56181415c26f6a09d5ec009b415cf412c63c1be368d9f9ed032dd4ffb7564860"
+        "sha256": "4a258ea98378c968aba30e2b089020ee447a87dbd726d794d8275fdc502005ae"
       },
       "mine_lantern_hanger_1": {
         "world_bounds": [
@@ -5341,7 +5421,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "f6406a5d2ab077c098e8222d73a60e1695af751647a4c40096001503ec4dffc4"
+        "sha256": "b6c7dc3e19328261710ed8084291840d9ce28f4bfcf064fd974507579a2d538c"
       },
       "hearth_stones": {
         "world_bounds": [
@@ -5357,7 +5437,7 @@
           ]
         ],
         "triangles": 220,
-        "sha256": "7df13c34a0ae4045a45e211a173d1d5438f9e99f56ee7f39376689432039d768"
+        "sha256": "a23d360c30b9e9eccb097d21a0a0926b17056d72c8cb4e0d5de2658d5678830f"
       },
       "stove_stone_base": {
         "world_bounds": [
@@ -5373,7 +5453,7 @@
           ]
         ],
         "triangles": 1512,
-        "sha256": "75e2b15e70c9a1b1d4f6e4caed41d1127166685e6aed7cbfd7fe3489057a1212"
+        "sha256": "80fdd32b60a53c0e243de56ac87cc2fc1b30155dbcc81e2602d6e8227c18002e"
       },
       "grilling_stove": {
         "world_bounds": [
@@ -5389,7 +5469,7 @@
           ]
         ],
         "triangles": 2416,
-        "sha256": "e87d97024c0a041b4872096c3db1300368b11c277b194d0ca009a82a60346975"
+        "sha256": "bf1d88039c5fcd3596eecc1b9d348aeb847d60a9e4975379eeffc9124bb4b7b5"
       },
       "stove_embers": {
         "world_bounds": [
@@ -5405,7 +5485,7 @@
           ]
         ],
         "triangles": 4160,
-        "sha256": "f9a0ffbc7755127144e1d20aff97a2834ca05b899277f567072b5d92c8f81bf1"
+        "sha256": "e9d7456bf939dc0d00c1b5571a61eb4f412313a378b70faf3a8d4833f4b63388"
       },
       "firewood": {
         "world_bounds": [
@@ -5421,7 +5501,7 @@
           ]
         ],
         "triangles": 432,
-        "sha256": "a6648232a49966f1d8b4fc5cd96e9eb0f8e98fcfad35f8725d45b441680126b9"
+        "sha256": "955bc2d5821e5a327810a3cacd44358ba6070de641619fd28c7dc0e192364bae"
       },
       "square_stool": {
         "world_bounds": [
@@ -5437,7 +5517,7 @@
           ]
         ],
         "triangles": 540,
-        "sha256": "b2730bdefef2a6a9768aa95676952ca33499d3c9acd58ca0fb6d6af699bb9fc3"
+        "sha256": "a5d32d9bef117b05732c4e46275cf71b3863f88c80300c224fce028c73700b65"
       },
       "sorting_bench": {
         "world_bounds": [
@@ -5453,7 +5533,7 @@
           ]
         ],
         "triangles": 1296,
-        "sha256": "4606ac4524ebaeff07df86082a2d6735360d86d467c429f774f855bb9dd2b8df"
+        "sha256": "1479145fb8348afd7c4fbd0773005c60b05c1ca6fffa07bc8840d08e69487b1f"
       },
       "sorting_tray": {
         "world_bounds": [
@@ -5469,7 +5549,7 @@
           ]
         ],
         "triangles": 3096,
-        "sha256": "9cab69afa58ebc01440a3e6021d5bb5aa94377f3d1e910e4cb48cc34c26b2e9f"
+        "sha256": "3a6af83940fb62a188271c3f677f568d1cd53f3af924284dbfe5949211f64c52"
       },
       "quartz_and_tools": {
         "world_bounds": [
@@ -5485,7 +5565,7 @@
           ]
         ],
         "triangles": 796,
-        "sha256": "36a63e292bc54db626f5a9d586369efebc613f4b6c3c5168d889be2b5372ab52"
+        "sha256": "413f6c104808c49915b221c0ce4579dfbe54693f6a4a753dc045d2d1121ce4b8"
       },
       "round_stool": {
         "world_bounds": [
@@ -5501,7 +5581,7 @@
           ]
         ],
         "triangles": 176,
-        "sha256": "98caa9b4a4f896d1ba44c367725d8eaa8c01c37de4ccc07b5e100e05af6af22b"
+        "sha256": "a64164cb6f8679df3b9defa038f9438252d8d094b8c296a5661f5134cb69f2d8"
       },
       "rock_crate": {
         "world_bounds": [
@@ -5517,7 +5597,7 @@
           ]
         ],
         "triangles": 3916,
-        "sha256": "d6ba0732903d6c501e6ebf4735781e09f76258499bfcac4b88fa52c128901c29"
+        "sha256": "64aa49685a68e6ce0878d39046fde51cbdfe7e88a08539a114dac309a0229987"
       },
       "salt_crate": {
         "world_bounds": [
@@ -5533,7 +5613,7 @@
           ]
         ],
         "triangles": 4176,
-        "sha256": "babd7530c140afeccf061e77854bf0030f3e640f01f3c0e3d8c0fe2d8584e6be"
+        "sha256": "5628cf16c09fbaa8bbc1f90822822b3c074e405fbebf9b80163bdda8e52f3def"
       },
       "rock_barrel": {
         "world_bounds": [
@@ -5549,7 +5629,7 @@
           ]
         ],
         "triangles": 7744,
-        "sha256": "e3b3ce25c3a54dd11e52755233f6874aa590469a72589f169dade018f3666060"
+        "sha256": "aa2f093caf608fd79efb7d314f6fe7a9630967b0f0dd7d48e5be73b91801c6a3"
       },
       "wood_stump": {
         "world_bounds": [
@@ -5565,7 +5645,7 @@
           ]
         ],
         "triangles": 2622,
-        "sha256": "ae3cdd3c717fda5f7060a6b7beedb7c12ee35017c57e040bba3f2f42789e37ac"
+        "sha256": "ff06ac13b5035301fa031bafd1b1604ecb9086f764fccf77ef00fb7a111869a5"
       },
       "low_cabinet": {
         "world_bounds": [
@@ -5581,7 +5661,7 @@
           ]
         ],
         "triangles": 632,
-        "sha256": "4579967b9c3c5dc90e4977e18464366d496a1bf52912aeaa94722882f1e2ba07"
+        "sha256": "cad20873f140a73b1890bdb0a8a5dc6569783fa9721012835cafe41ef8bdbd20"
       },
       "cabinet_lantern": {
         "world_bounds": [
@@ -5597,7 +5677,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "b01342138736ba4ca997653e428dfeff03b7634a0a4a8e97210453b57ee08c3c"
+        "sha256": "f32fad39bd3bd0d8cb8ce6f07d406cc6af4305ceac4c36767fbdce96b21d62d0"
       },
       "cabinet_lantern_glow": {
         "world_bounds": [
@@ -5613,7 +5693,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "9fb2110c948ea2591d602885a4f389ec0776b3d0d18ba02e6ea3fdb5f2bfda32"
+        "sha256": "b4dc345e7489bf4d5aa2cf9499afd0b0cc3065a50fbcbb0a1170b5d3fc3451e6"
       },
       "left_shelf": {
         "world_bounds": [
@@ -5629,7 +5709,7 @@
           ]
         ],
         "triangles": 792,
-        "sha256": "2d34fe7303548e2369221e9215f7d4dfeac249507942b65c50b6600996156bf2"
+        "sha256": "ce2cd47c9f13717c53a9f84cd54d4ed0be06cdb226cba66ba4972419fc2ff572"
       },
       "shelf_lantern": {
         "world_bounds": [
@@ -5645,7 +5725,7 @@
           ]
         ],
         "triangles": 260,
-        "sha256": "159742055a1addb4755048e7556bc6e476c4436d6e7642b623b704c4174e757b"
+        "sha256": "3306cd0f63894290836db66e033f894844ab23710bd7993b9b880b1c7a0f49aa"
       },
       "shelf_lantern_glow": {
         "world_bounds": [
@@ -5661,7 +5741,7 @@
           ]
         ],
         "triangles": 108,
-        "sha256": "f3dcaec29677e64034c0c50de3c33079f4c064bb4a06b335653fc22d884a6942"
+        "sha256": "94d01a1646be405d2348110771f64877a73446b88e4db2f6e4019a679f5fef65"
       },
       "hanging_pan": {
         "world_bounds": [
@@ -5677,7 +5757,7 @@
           ]
         ],
         "triangles": 416,
-        "sha256": "f9f7ea7a3a422258a4199119cd0a4cfedb2d157cb2397d6aaa01acdc7f68149a"
+        "sha256": "5d3a788794b065e3619277dcb376d7987fba5119382fbf0f81b0480c1865399f"
       },
       "garlic_and_herbs": {
         "world_bounds": [
@@ -5693,7 +5773,7 @@
           ]
         ],
         "triangles": 852,
-        "sha256": "fc0a19ca47a189c646eef4e47571cf6d6efed115caefb1c374fbb10f95f69dcb"
+        "sha256": "ade225a8fabfdb18a430199500f53ebd32c0c4cbed079a5270dfe2e3bf615a16"
       },
       "mine_plan": {
         "world_bounds": [
@@ -5709,7 +5789,7 @@
           ]
         ],
         "triangles": 548,
-        "sha256": "4b27eb70b71ee871d4a77846956e8819e0b4632bb0a8ae72b2c07cfed958a808"
+        "sha256": "1d67011f02576f82f5605fa4a6032d47a95e324bcc9c5ae2f3fd36e1c26fabfc"
       },
       "wall_pickaxe": {
         "world_bounds": [
@@ -5725,7 +5805,7 @@
           ]
         ],
         "triangles": 104,
-        "sha256": "b58d8bdf526c4dcadf6976b5399cd237719b91cd437b6c0c2f3e4c5774ba4c29"
+        "sha256": "4be1c342cbe295b0c8166ed34d635ff543462e5d5d068173583d6d0cec743e3a"
       },
       "wall_short_axe": {
         "world_bounds": [
@@ -5741,7 +5821,7 @@
           ]
         ],
         "triangles": 40,
-        "sha256": "8e762283340df83c865ad71c72d58feb70b101ba400d0989ed683421519cefa4"
+        "sha256": "12bb3dc39847cf946f254ca884d9a9413802eb74832227f6993c65a703c55d72"
       },
       "coiled_rope": {
         "world_bounds": [
@@ -5757,7 +5837,7 @@
           ]
         ],
         "triangles": 1600,
-        "sha256": "51b72f0ffbe170591cd110e15e2a78ff42c0ff93692168b8215cb63944ad8fd2"
+        "sha256": "e5b22355133b381b5aa0d1f482be392731f01e647cee3be19907c77e78ecfcb8"
       },
       "ivo_wall_helmet": {
         "world_bounds": [
@@ -5773,7 +5853,7 @@
           ]
         ],
         "triangles": 1467,
-        "sha256": "cbf89cae817ce8c911becbbc4fe407ac504e083a949cf5a35df02e8840c2be04"
+        "sha256": "d1c4b751b0ff5517ee0a9bde3c507e2f09224e1708acc48a847e3c16db46c464"
       },
       "tied_sack": {
         "world_bounds": [
@@ -5789,7 +5869,7 @@
           ]
         ],
         "triangles": 684,
-        "sha256": "1cf54329d8452b443f3fb6c19e0f71c2a10ddd7bf66d6018617e1d3b3205da4a"
+        "sha256": "897d771384aaca067a380ddf4d4a4c66664d974e9508f6c365578bbe6c7a3ece"
       },
       "stone_sack": {
         "world_bounds": [
@@ -5805,23 +5885,23 @@
           ]
         ],
         "triangles": 2356,
-        "sha256": "8ee5d767d5c65cb1224e42e3a86ac6563ec411ff557d35a1f5b50cbdf1e5264e"
+        "sha256": "6cee1b511135de52c2f07165ee3caf114b2a8d7515d65378b5b1bb767941b902"
       },
       "white_hide_rug": {
         "world_bounds": [
           [
             -1.3025317192077637,
             0.08399999886751175,
-            -0.37500011920928955
+            0.1950000524520874
           ],
           [
             1.3025317192077637,
             0.1940479278564453,
-            1.6720811128616333
+            2.2420814037323
           ]
         ],
         "triangles": 7838,
-        "sha256": "8d9828ae799e5b18d330e75d6b49206cad5ebc1bac8bd9d7a179a494a88ff85a"
+        "sha256": "41f4cf8983c2c4628d65b95c62a12dbe76371ce7d2166a0c0c487f16c254478b"
       },
       "entry_plant_-1": {
         "world_bounds": [
@@ -5837,7 +5917,7 @@
           ]
         ],
         "triangles": 1078,
-        "sha256": "8cab8d208032382849f4f703ab900d0e04bc41505af72e47864f993a75956fc5"
+        "sha256": "45edff93787c8d889d3b6ecb1b18d4a4c18088cf95e99e19b0dd87ee87e13221"
       },
       "entry_plant_1": {
         "world_bounds": [
@@ -5853,7 +5933,7 @@
           ]
         ],
         "triangles": 1078,
-        "sha256": "9e34d812a10b261ac2de81cae6b4d746e677a22ecca86017e0b80be7bbb0da02"
+        "sha256": "bd7fa9be2676d4b27478c4396c9c530be1c7c8d6aad78193a29decf0658bc97b"
       },
       "exit_steps": {
         "world_bounds": [
@@ -5869,7 +5949,7 @@
           ]
         ],
         "triangles": 312,
-        "sha256": "b71cff5d6fefce35055d819f6bc295624f826f24d8c403f241a1c9c667178c51"
+        "sha256": "ebcdc9ef77ec33a27ebc30a486062a480d3755d3b34347828d2a6bc6894c6bca"
       },
       "exit_pickaxe_sign": {
         "world_bounds": [
@@ -5885,7 +5965,7 @@
           ]
         ],
         "triangles": 448,
-        "sha256": "aa496a10ca63d908bd8efbfa2da187e5f00e393ce47b8f458ccb086b84aa99ec"
+        "sha256": "2903537f3414ae35023e0208f8bd57b3e0e83cc0caa233931881aa3d130def6c"
       }
     },
     "method": "Actual GLB vertices; triangle BVH cross-module intersections, support-height filter; capsule blocking separately checked in Godot.",
@@ -5893,7 +5973,7 @@
       "hide_size_xyz": [
         2.6050634384155273,
         0.11004792898893356,
-        2.047081232070923
+        2.0470813512802124
       ],
       "tunnel_depth_including_end_cap": 2.529999885559082,
       "floor_xz": [
@@ -5909,9 +5989,90 @@
         -2.66
       ]
     },
+    "anchor_clearances": [
+      {
+        "anchor": "npc_ivo",
+        "asset": "white_hide_rug",
+        "distance_to_projected_mesh_m": 1.1949385795103349,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 0.9449385795103349
+      },
+      {
+        "anchor": "npc_ivo",
+        "asset": "left_wall",
+        "distance_to_projected_mesh_m": 4.495967401065834,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 4.245967401065834
+      },
+      {
+        "anchor": "npc_ivo",
+        "asset": "back_wall",
+        "distance_to_projected_mesh_m": 1.991964814932463,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 1.741964814932463
+      },
+      {
+        "anchor": "stand_ivo",
+        "asset": "white_hide_rug",
+        "distance_to_projected_mesh_m": 0.31061764044247303,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 0.06061764044247303
+      },
+      {
+        "anchor": "stand_ivo",
+        "asset": "left_wall",
+        "distance_to_projected_mesh_m": 3.920000123977671,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 3.670000123977671
+      },
+      {
+        "anchor": "stand_ivo",
+        "asset": "back_wall",
+        "distance_to_projected_mesh_m": 2.8615770661159603,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 2.6115770661159603
+      },
+      {
+        "anchor": "spawn",
+        "asset": "white_hide_rug",
+        "distance_to_projected_mesh_m": 0.3171075944217256,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 0.06710759442172559
+      },
+      {
+        "anchor": "spawn",
+        "asset": "left_wall",
+        "distance_to_projected_mesh_m": 3.03586889828515,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 2.78586889828515
+      },
+      {
+        "anchor": "spawn",
+        "asset": "back_wall",
+        "distance_to_projected_mesh_m": 5.434208479310309,
+        "capsule_radius_m": 0.25,
+        "edge_clearance_m": 5.184208479310309
+      }
+    ],
     "retained_geometry": [
       {
         "asset": "room_shell",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "left_wall",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "back_wall",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "mine_entrance",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "tunnel_lamp_glow",
         "max_bidirectional_vertex_distance_m": 0.0
       },
       {
@@ -5939,12 +6100,20 @@
         "max_bidirectional_vertex_distance_m": 0.0
       },
       {
+        "asset": "hearth_stones",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "stove_stone_base",
+        "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
         "asset": "grilling_stove",
-        "max_bidirectional_vertex_distance_m": 2.384185791015625e-07
+        "max_bidirectional_vertex_distance_m": 0.0
       },
       {
         "asset": "stove_embers",
-        "max_bidirectional_vertex_distance_m": 5.960464477539063e-08
+        "max_bidirectional_vertex_distance_m": 0.0
       },
       {
         "asset": "firewood",
@@ -6045,6 +6214,10 @@
       {
         "asset": "stone_sack",
         "max_bidirectional_vertex_distance_m": 0.0
+      },
+      {
+        "asset": "white_hide_rug",
+        "max_bidirectional_vertex_distance_m": 2.384185791015625e-07
       },
       {
         "asset": "entry_plant_-1",
@@ -7024,18 +7197,18 @@
           [
             -1.30253171920776,
             0.0,
-            -1.02500009536743
+            -1.02499997615814
           ],
           [
             1.30253171920776,
             0.110047928988934,
-            1.02208113670349
+            1.02208149433136
           ]
         ],
         "size": [
           2.60506343841553,
           0.110047928988934,
-          2.04708123207092
+          2.0470814704895
         ],
         "surfaces": 1,
         "triangles": 7838
@@ -7066,164 +7239,29 @@
       {
         "draw_calls": 100,
         "height": 800,
-        "id": "gameplay_43deg_360",
+        "id": "ivo_yaw160_43deg_360",
         "pitch": 42.9999961853027,
         "position": [
           10.342903137207,
           14.789966583252,
           10.342903137207
         ],
-        "rendered_primitives": 206068,
+        "rendered_primitives": 206120,
         "size": 6.71999979019165,
         "width": 360,
         "yaw": 45.0
       },
       {
-        "draw_calls": 104,
-        "height": 800,
-        "id": "full_room_43deg_360",
-        "pitch": 42.9999961853027,
-        "position": [
-          10.342903137207,
-          14.8899669647217,
-          10.342903137207
-        ],
-        "rendered_primitives": 208588,
-        "size": 12.3999996185303,
-        "width": 360,
-        "yaw": 45.0
-      },
-      {
-        "draw_calls": 104,
+        "draw_calls": 114,
         "height": 1000,
-        "id": "full_room_panorama",
-        "pitch": 42.9999961853027,
-        "position": [
-          10.342903137207,
-          14.8899669647217,
-          10.342903137207
-        ],
-        "rendered_primitives": 209460,
-        "size": 12.3999996185303,
-        "width": 1200,
-        "yaw": 45.0
-      },
-      {
-        "draw_calls": 104,
-        "height": 1000,
-        "id": "control_local_lights_off",
-        "pitch": 42.9999961853027,
-        "position": [
-          10.342903137207,
-          14.8899669647217,
-          10.342903137207
-        ],
-        "rendered_primitives": 209460,
-        "size": 12.3999996185303,
-        "width": 1200,
-        "yaw": 45.0
-      },
-      {
-        "draw_calls": 44,
-        "height": 1000,
-        "id": "mine_entrance_detail",
-        "pitch": 18.0,
-        "position": [
-          3.65471577644348,
-          7.66033983230591,
-          16.0054740905762
-        ],
-        "rendered_primitives": 111928,
-        "size": 3.75,
-        "width": 1200,
-        "yaw": 12.0
-      },
-      {
-        "draw_calls": 46,
-        "height": 1000,
-        "id": "tunnel_depth_detail",
-        "pitch": 25.9999980926514,
-        "position": [
-          -0.300000011920929,
-          9.48742294311523,
-          14.9758815765381
-        ],
-        "rendered_primitives": 113028,
-        "size": 3.5,
-        "width": 1200,
-        "yaw": 0.0
-      },
-      {
-        "draw_calls": 46,
-        "height": 1000,
-        "id": "sorting_table_detail",
-        "pitch": 34.9999961853027,
-        "position": [
-          8.92377281188965,
-          12.6615295410156,
-          12.4980773925781
-        ],
-        "rendered_primitives": 111202,
-        "size": 2.59999990463257,
-        "width": 1200,
-        "yaw": 24.9999980926514
-      },
-      {
-        "draw_calls": 75,
-        "height": 1000,
-        "id": "ivo_position",
-        "pitch": 42.9999961853027,
-        "position": [
-          11.6429033279419,
-          14.8899669647217,
-          9.54290294647217
-        ],
-        "rendered_primitives": 180594,
-        "size": 4.30000019073486,
-        "width": 1200,
-        "yaw": 45.0
-      },
-      {
-        "draw_calls": 67,
-        "height": 1000,
-        "id": "ivo_character_detail",
-        "pitch": 19.9999980926514,
-        "position": [
-          14.6892595291138,
-          7.99040269851685,
-          12.4492597579956
-        ],
-        "rendered_primitives": 176482,
-        "size": 3.29999995231628,
-        "width": 1200,
-        "yaw": 45.0
-      },
-      {
-        "draw_calls": 46,
-        "height": 1000,
-        "id": "stove_detail",
-        "pitch": 24.9999980926514,
-        "position": [
-          14.9085216522217,
-          9.67236614227295,
-          4.07139492034912
-        ],
-        "rendered_primitives": 127520,
-        "size": 3.5,
-        "width": 1200,
-        "yaw": 74.9999923706055
-      },
-      {
-        "draw_calls": 96,
-        "height": 1000,
-        "id": "top_view",
+        "id": "standing_clearance_top",
         "pitch": 90.0,
         "position": [
           0.0,
           20.2000007629395,
           -8.74227794156468e-07
         ],
-        "rendered_primitives": 200694,
+        "rendered_primitives": 210020,
         "size": 9.39999961853027,
         "width": 1200,
         "yaw": 0.0
@@ -7847,11 +7885,31 @@
         "passed": true
       },
       {
+        "check": "actual Ivo yaw 160",
+        "passed": true
+      },
+      {
+        "check": "assembled Ivo marker yaw 160",
+        "passed": true
+      },
+      {
         "check": "closed mine stops actual capsule sweep",
         "passed": true
       },
       {
         "check": "mine entrance blocker hit before rear wall",
+        "passed": true
+      },
+      {
+        "check": "npc_ivo actual stationary human capsule clear",
+        "passed": true
+      },
+      {
+        "check": "stand_ivo actual stationary human capsule clear",
+        "passed": true
+      },
+      {
+        "check": "spawn actual stationary human capsule clear",
         "passed": true
       },
       {
@@ -7883,47 +7941,11 @@
         "passed": true
       },
       {
-        "check": "Saved gameplay_43deg_360",
+        "check": "Saved ivo_yaw160_43deg_360",
         "passed": true
       },
       {
-        "check": "Saved full_room_43deg_360",
-        "passed": true
-      },
-      {
-        "check": "Saved full_room_panorama",
-        "passed": true
-      },
-      {
-        "check": "Saved control_local_lights_off",
-        "passed": true
-      },
-      {
-        "check": "Saved mine_entrance_detail",
-        "passed": true
-      },
-      {
-        "check": "Saved tunnel_depth_detail",
-        "passed": true
-      },
-      {
-        "check": "Saved sorting_table_detail",
-        "passed": true
-      },
-      {
-        "check": "Saved ivo_position",
-        "passed": true
-      },
-      {
-        "check": "Saved ivo_character_detail",
-        "passed": true
-      },
-      {
-        "check": "Saved stove_detail",
-        "passed": true
-      },
-      {
-        "check": "Saved top_view",
+        "check": "Saved standing_clearance_top",
         "passed": true
       }
     ],
@@ -7944,6 +7966,7 @@
       "shoes": "shoes3",
       "shoulderBag": ""
     },
+    "ivo_yaw": 159.999984741211,
     "mine_collision": {
       "collider": "/root/@SubViewport@2/@Node3D@3/MineHutArt/mine_entrance/Collider",
       "stop": [
@@ -7956,57 +7979,6 @@
     "renderer": "mobile",
     "scene_surfaces": 45,
     "scene_triangles": 100191
-  },
-  "lighting": {
-    "method": "Identical full-room camera, sun, ambient and emission materials; only layout.local_lights toggled. Declared wall/floor patches must gain >4 RGB/255 mean and more red than blue. This proves local warm pools, not art acceptance or phone performance.",
-    "checks": [
-      {
-        "surface": "left_wall",
-        "roi_xyxy": [
-          243,
-          372,
-          282,
-          407
-        ],
-        "mean_rgb_gain_255": [
-          67.81391941391941,
-          41.6981684981685,
-          20.522344322344324
-        ],
-        "passed": true
-      },
-      {
-        "surface": "stove_floor",
-        "roi_xyxy": [
-          477,
-          449,
-          510,
-          478
-        ],
-        "mean_rgb_gain_255": [
-          148.04702194357367,
-          130.1703239289446,
-          93.93207941483803
-        ],
-        "passed": true
-      },
-      {
-        "surface": "right_floor",
-        "roi_xyxy": [
-          850,
-          697,
-          878,
-          722
-        ],
-        "mean_rgb_gain_255": [
-          53.87,
-          58.26,
-          33.09285714285714
-        ],
-        "passed": true
-      }
-    ],
-    "passed": true
   },
   "budget": {
     "atlas": {
@@ -8338,7 +8310,7 @@
     "scene_triangles": 100191,
     "static_draw_surfaces": 45,
     "glb_bytes": 6392964,
-    "atlas_bytes": 1869091,
+    "atlas_bytes": 1867162,
     "placed_instances": 45,
     "materials": 7
   },
@@ -8349,7 +8321,7 @@
         0.082,
         -0.84
       ],
-      "yaw_degrees": 45
+      "yaw_degrees": 160
     },
     "stand_ivo": {
       "position": [
@@ -8384,10 +8356,14 @@
       "yaw_degrees": 0
     }
   },
+  "preserved_from_v1_1": [
+    "all local lights and material overrides",
+    "boundaries and nameplate volume",
+    "review and gameplay camera parameters"
+  ],
+  "lighting_evidence": "lighting-validation.json records the unchanged lighting parameters at v1.1; no new light-on/off capture in this orientation follow-up.",
   "limits": [
-    "Desktop Vulkan Mobile, AMD Custom GPU 0405 / RADV VANGOGH; no connected Android target for this handoff, no phone performance claim.",
-    "Only Ivo and exit are interactive integration suggestions; no runtime anchors or gameplay data edited.",
-    "6.72 m native gameplay view deliberately preserves scale and crops room edges; separate 12.4 m panorama includes the complete room.",
-    "Art acceptance remains with Huowu; technical review with Shangguan Waner; merge requires user approval."
+    "Desktop Vulkan Mobile review; no phone performance claim.",
+    "Formal runtime anchors and initial camera not edited."
   ]
 }

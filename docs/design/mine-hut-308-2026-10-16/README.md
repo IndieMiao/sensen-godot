@@ -2,6 +2,22 @@
 
 刘备制作；上官婉儿技术检查、不知火舞画面验收，用户批准后合并。目标分支 `wp-3d-scene`。本包依据 Stark 原图、不知火舞标注和《SGODOT-218 3D 制作清单 v1.1》的 308 节与共同要求制作。
 
+## 朝向与站位复核（v1.2）
+
+按不知火舞 `7383cee8` 和上官婉儿最终补充，`suggested_anchors.npc_ivo.yaw_degrees` 改为 **160°，朝屋里**。Ivo `(1.40,0.082,-0.84)`、stand_ivo `(0.80,0.082,0.05)`、spawn `(0,0.082,2.55)` 坐标均保留。正式 anchors 和初始镜头参数未改。
+
+实测发现 v1.1 厚毯盖住了 stand_ivo 脚下，因毯子无碰撞体，原物理测试不会报错。本轮补实际网格投影检查，并把同尺寸毛皮沿 +Z 移 0.57 m，轴心从 `(0,0.084,0.65)` 改为 `(0,0.084,1.22)`；同步重烘焙房间 AO。没有缩小毛皮、改变站位或增设通行阻挡。
+
+| 挂点 | 距毛皮实际外缘 | 扣除 0.25 m 脚圈后的净空 |
+|---|---:|---:|
+| npc_ivo | 1.195 m | 0.945 m |
+| stand_ivo | 0.311 m | 0.061 m |
+| spawn | 0.317 m | 0.067 m |
+
+两面墙新增木柱与托架对三个站位的实际网格投影均留足 0.25 m 脚圈加 0.03 m 余量；站位的真实角色胶囊无碰撞，Ivo 名字条预留盒仍为空。矿口 blocker、27 个碰撞体、6 盏局部灯、材质发光和所有相机参数沿用 v1.1。
+
+本轮 1,243 项几何检查与 170 项 Godot 检查，共 **1,413 项通过**。全部 45 件局部网格与 v1.1 对比保留，只有毯子摆位、Ivo 朝向及随摆位重烘焙的图集/UV 更新。最新补图为 `SGODOT-308_MINEHUT_v1_2_ivo_yaw160_43deg_360.png`、`SGODOT-308_MINEHUT_v1_2_standing_clearance_top.png`。俯视绿色圈表示真实 0.25 m 半径脚圈。`validation.json` 更新为本轮结果，`media-manifest-v1.2.json` 记录两图哈希；旧 v1.1 图片及暖光开关验证保留作该轮证据。
+
 ## 画面 v1.1（本次增量）
 
 按不知火舞 `abb59b28` 的五项反馈修订，房间 6.8 × 6.4 m 不变：
@@ -36,7 +52,7 @@
 
 | 建议挂点 | 世界坐标 X, Y, Z（米） | 朝向 |
 |---|---|---|
-| npc_ivo | 1.40, 0.082, −0.84 | yaw 45°，面向镜头 |
+| npc_ivo | 1.40, 0.082, −0.84 | yaw 160°，朝屋里 |
 | stand_ivo | 0.80, 0.082, 0.05 | 0° |
 | spawn | 0, 0.082, 2.55 | 0° |
 | exit | 0, 0.082, 3.08 | 0° |
@@ -46,7 +62,7 @@ Ivo 审阅造型：`hairhat_npc_ivo + mask16_npc_ivo + cloth1_npc_ivo + shoes3`�
 
 ## 验证与图
 
-本次 1,223 项几何、174 项 Godot、3 组暖光像素检查，共 1,400 项通过。`validation.json` 汇总实际 GLB、Godot 导入、物理碰撞及局部光开关结果；`media-manifest.json` 记录 12 张 v1.1 交付图尺寸和 SHA-256。
+v1.1 交付有 1,223 项几何、174 项 Godot、3 组暖光像素检查，共 1,400 项通过。`validation.json` 汇总实际 GLB、Godot 导入、物理碰撞及局部光开关结果；`media-manifest.json` 记录 12 张 v1.1 交付图尺寸和 SHA-256。
 
 - 实际导入面数、surface、尺寸、UV 范围和 2048² 图集；每个 GLB 的 `.import` 都为 `gltf/texture_map_mode=1`。
 - 全部道具两两实际三角面交叠检查，含主动制造穿插的阳性对照。墙柱与地基、岩石与墙洞、小挂钩等装配接触逐项记录；道具无未说明的穿插。提灯、凳子和料盒用实际网格向下射线量支撑间隙，≤1 mm 且不贯入。
@@ -55,7 +71,7 @@ Ivo 审阅造型：`hairhat_npc_ivo + mask16_npc_ivo + cloth1_npc_ivo + shoes3`�
 - Godot 使用半径 0.25 m、总高 1.745 m 的胶囊体实际扫掠，矿口先撞到独立阻挡；出生点至中央、Ivo 接近区和出口接近区通过。
 - Vulkan Mobile / AMD Custom GPU 0405（RADV VANGOGH）窗口渲染。当前没有连接的 Android 测试目标；此包不声称 Android 输入、实体手机性能或整合后的完整游戏验收。
 
-审阅图均带 `SGODOT-308 / LIU BEI` 署名，当前前缀 `SGODOT-308_MINEHUT_v1_1_`：游戏默认取景、完整全景、矿道口、分拣台、Ivo 站位；另附 360 宽全景、Ivo 低视角、烤炉近景、俯视、下行矿道细节、关灯对照和参考对照。
+审阅图均带 `SGODOT-308 / LIU BEI` 署名，v1.1 前缀 `SGODOT-308_MINEHUT_v1_1_`：游戏默认取景、完整全景、矿道口、分拣台、Ivo 站位；另附 360 宽全景、Ivo 低视角、烤炉近景、俯视、下行矿道细节、关灯对照和参考对照。
 
 ## 复现
 
@@ -67,8 +83,8 @@ blender -b --factory-startup --python tools/art/build_mine_hut_308.py
 python tools/art/prepare_mine_hut_308.py
 blender -b --factory-startup --python tools/art/verify_mine_hut_308.py
 godot --headless --path output/minehut-308/project --editor --import
-godot --path output/minehut-308/project
-python tools/art/package_mine_hut_308.py
+godot --path output/minehut-308/project -- --anchors
+python tools/art/package_mine_hut_308.py --anchors
 ```
 
-最后两步需要真实窗口环境、Pillow / NumPy。审阅脚本通过 SubViewport 生成准确分辨率，导入与碰撞验证保存在独立的 `output/minehut-308/`；不使用生产存档。
+最后两步需要真实窗口环境、Pillow / NumPy。省略 `--anchors` 可重拍完整 v1.1 视角集合（使用当前 yaw 和毯子位置）。审阅脚本通过 SubViewport 生成准确分辨率，导入与碰撞验证保存在独立的 `output/minehut-308/`；不使用生产存档。

@@ -709,7 +709,7 @@
       "position": [
         0,
         0.084,
-        0.65
+        1.22
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -957,7 +957,7 @@
         0.082,
         -0.84
       ],
-      "yaw_degrees": 45
+      "yaw_degrees": 160
     },
     "stand_ivo": {
       "position": [
