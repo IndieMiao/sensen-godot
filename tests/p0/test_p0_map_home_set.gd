@@ -22,6 +22,9 @@ func before() -> void:
 	add_child(map)
 	for i in 5: await get_tree().process_frame
 
+func after_test() -> void:
+	if rt != null and rt.session != null: rt.session.transport = Callable()
+
 func after() -> void:
 	if is_instance_valid(map): map.free()
 	P0Runtime.free_instance_for_tests()
@@ -41,7 +44,7 @@ func test_the_home_citys_pins_are_always_on_the_map() -> void:
 func test_the_map_frames_the_home_set() -> void:
 	var ids: Array = map.frame_optional().map(func(e): return str(e.get("id", "")))
 	assert_array(ids.filter(func(id): return str(id).begins_with("sh_"))).is_empty()
-	for id in ids: if str(id).begins_with(TOKYO): assert_array(TOKYO_SET).contains([id])
+	for id in TOKYO_SET: assert_array(ids).contains([id])   # all four (an empty frame would pass the line above alone, 周瑜)
 
 func test_the_runtime_reads_the_home_city_once() -> void:
 	var asked: Array = []
@@ -55,4 +58,3 @@ func test_the_runtime_reads_the_home_city_once() -> void:
 	assert_int(asked.size()).is_equal(1)
 	rt._read_home_places({"travel": {"home": "gn-5391959"}})   # San Francisco's are the client's own
 	assert_int(asked.size()).is_equal(1)
-	rt.session.transport = Callable()
