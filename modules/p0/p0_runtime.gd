@@ -1605,7 +1605,7 @@ func _dev_shot(dt: float) -> void:
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
-			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]
+			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
 			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, picked)
 				if is_instance_valid(_home_flow):
 					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
@@ -1624,6 +1624,8 @@ func _dev_shot(dt: float) -> void:
 			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
 			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
 			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
+			"homechange": change_home(func(): ui.open_settings())   # Settings › Home city (PR-4)
+			"homemove": if is_instance_valid(_home_flow) and _home_flow.confirm != null: _home_flow.confirm.move.pressed.emit()
 			"homeloading": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()   # the reading frame
 			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
 				if is_instance_valid(_home_flow):
