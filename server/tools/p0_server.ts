@@ -19,7 +19,7 @@ import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
 import { SAVE_VERSION } from '../src/p0/state.js';
 import { requirePass } from '../src/p0/travel.js';
-import { AppearanceCatalog } from '../src/realtime/appearance.js';
+import { AppearanceCatalog } from '../src/p0/online/appearance.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 import { registerP0Admin } from '../src/p0/admin.js';
 import { P0Gate } from '../src/p0/gate.js';
@@ -68,7 +68,7 @@ const pass = (player: string, outpost: string) => {
   const r = requirePass(content, s, 'outpost', outpost, Date.now() + s.clock_ms, s.presence.entered === outpost ? 'rejoin' : undefined);
   return r ? r.code.toUpperCase() : null;
 };
-registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
+registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')) });
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();

@@ -8,8 +8,7 @@ import { initialMineState } from '../domain/mining.js';
 
 export const CAPACITY = 300;
 export const STEP = 0.05;
-export const ACTIONS = ['idle', 'run', 'walk', 'labour_sow', 'labour_water', 'labour_harvest',
-  'labour_drain', 'labour_shelter', 'emote_wave', 'attack', 'mine', 'labour_till', 'labour_clear', 'fishing_wait', 'fishing_reel'] as const;
+export { ACTIONS } from '../p0/online/actions.js';   // P0 owns the list (SGODOT-304)
 export type Point = [number, number];
 export interface Navigation { cell: number; rows: string[]; spawn: Point }
 export interface Effect {
