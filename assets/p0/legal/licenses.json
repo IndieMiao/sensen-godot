@@ -60,6 +60,13 @@
           "credit": "© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium",
           "license": "CC BY 4.0",
           "text": "res://assets/p0/legal/cc-by-4.0.txt"
+        },
+        {
+          "id": "dbip",
+          "title": "DB-IP",
+          "credit": "IP Geolocation by DB-IP (db-ip.com)",
+          "license": "CC BY 4.0",
+          "text": "res://assets/p0/legal/cc-by-4.0.txt"
         }
       ]
     }

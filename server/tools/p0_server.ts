@@ -21,6 +21,7 @@ import { SAVE_VERSION } from '../src/p0/state.js';
 import { requirePass } from '../src/p0/travel.js';
 import { AppearanceCatalog } from '../src/p0/online/appearance.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
+import { openIpNear, type IpNear } from '../src/p0/ip_city.js';
 import { registerP0Admin } from '../src/p0/admin.js';
 import { P0Gate } from '../src/p0/gate.js';
 import { P0EventLog } from '../src/p0/telemetry.js';
@@ -59,7 +60,13 @@ const generatedRoom = generatedOutpostSpec(outpostTable, id => {
   return cityPlaces(content, id.slice(0, cut))?.detail.outposts.find(o => o.id === id);
 });
 const rooms = new OutpostRooms(outpostTable, Date.now, generatedRoom);
-registerP0Routes(app, { content, store, now: Date.now, dev, log, presence: () => rooms.total() });
+// q(188) ① `Near you`: the address table made from DB-IP City Lite at image build (tools/ip_near_table.ts); none, no guess.
+let ipNear: IpNear | undefined;
+if (process.env.P0_IP_NEAR_TABLE) {
+  try { ipNear = openIpNear(process.env.P0_IP_NEAR_TABLE); }
+  catch (e) { console.error(JSON.stringify({ ip_near: 'unavailable', error: String((e as Error).message ?? e).slice(0, 200) })); }
+}
+registerP0Routes(app, { content, store, now: Date.now, dev, log, presence: () => rooms.total(), ipNear });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
 const pass = (player: string, outpost: string) => {
@@ -79,7 +86,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0 }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;

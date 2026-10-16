@@ -50,8 +50,13 @@
      assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json \
      assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json \
      | ssh "$HOST" 'mkdir -p /opt/farm/p0/src && tar -C /opt/farm/p0/src -xzf -'
+   # Near you（q(188) ①）：Dockerfile 里 ARG DBIP_MONTH 那个月份的 DB-IP City Lite，放进构建目录的 dbip/
+   # （平时由 deploy-hk.sh build 从 devserver 的 ~/p0-cache/dbip 拷；DB-IP 网站只留最近两个月，过期从缓存或 OSS 备份取）
+   ssh "$HOST" 'mkdir -p /opt/farm/p0/src/dbip'
+   scp dbip-city-lite-<YYYY-MM>.csv.gz "$HOST":/opt/farm/p0/src/dbip/
    ssh "$HOST" "cd /opt/farm/p0/src && DOCKER_BUILDKIT=1 docker build -f server/deploy/p0/Dockerfile -t p0-server:<sha> ."
    ```
+   构建时校验这份文件的 sha256（Dockerfile 里的 `DBIP_SHA256`），对不上就停。
    服务器上 Docker 版本低于 23 时，要确认 BuildKit 打开，否则 `Dockerfile.dockerignore` 不生效、构建会缺 `assets/p0`。
 3. **口令文件** `/opt/farm/p0/.env.p0`（不入库，`chmod 600`）：`P0_ACCESS_KEYS=<每批演示一个>`。
 4. **启动**：`P0_IMAGE=p0-server:<sha> docker compose -p p0 -f docker-compose.p0.yml up -d`。固定用 `-p p0`：备份脚本按项目名 p0 的标签找数据卷（换了项目名就设 `P0_PROJECT`）。

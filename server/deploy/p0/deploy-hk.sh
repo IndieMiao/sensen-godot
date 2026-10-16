@@ -93,6 +93,12 @@ case "$step" in
     git -C "$repo" archive --format=tar "$ref" package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server \
       assets/p0/p0_content.json assets/p0/content assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json \
       assets/p0/city_clusters.json assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
+    # q(188) ① Near you: the pinned DB-IP City Lite month from the devserver's cache (DB-IP keeps only the last two
+    # months online; 周瑜 on #447) into the context's dbip/, read by the Dockerfile through a bind mount (no layer).
+    month=$(git -C "$repo" show "$ref:server/deploy/p0/Dockerfile" | sed -n 's/^ARG DBIP_MONTH=//p')
+    say "DB-IP City Lite $month from the devserver cache ~/p0-cache/dbip"
+    dev "test -s ~/p0-cache/dbip/dbip-city-lite-$month.csv.gz && mkdir -p ~/$dir/dbip && cp ~/p0-cache/dbip/dbip-city-lite-$month.csv.gz ~/$dir/dbip/" \
+      || { echo "no ~/p0-cache/dbip/dbip-city-lite-$month.csv.gz on the devserver: put the pinned file there (sha256 in the Dockerfile)" >&2; exit 1; }
     say "docker build p0-server:$sha on the devserver"
     dev "cd ~/$dir && docker build -f server/deploy/p0/Dockerfile -t p0-server:$sha ." 2>&1 | tail -5
     dev "docker images p0-server:$sha --format '{{.Repository}}:{{.Tag}} {{.Size}} {{.ID}}'" | tee "$out/image.txt"
