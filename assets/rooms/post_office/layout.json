@@ -244,19 +244,6 @@
       "cast_shadow": true
     },
     {
-      "name": "world_map",
-      "file": "world_map.glb",
-      "position": [
-        1.07,
-        2.68,
-        -2.85
-      ],
-      "yaw_degrees": 0,
-      "colliders": [],
-      "material": "plain",
-      "cast_shadow": true
-    },
-    {
       "name": "wall_clock",
       "file": "wall_clock.glb",
       "position": [
@@ -325,9 +312,9 @@
       "name": "packing_table",
       "file": "packing_table.glb",
       "position": [
-        0.31,
+        -0.68,
         0.082,
-        1.64
+        2.3
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -351,9 +338,9 @@
       "name": "packing_stool",
       "file": "packing_stool.glb",
       "position": [
-        -2.12,
-        0.082,
-        2.31
+        1.05,
+        0.087,
+        2.6
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -397,19 +384,6 @@
       "yaw_degrees": 90,
       "colliders": [],
       "material": "window_glass",
-      "cast_shadow": true
-    },
-    {
-      "name": "counter_computer",
-      "file": "counter_computer.glb",
-      "position": [
-        -1.49,
-        1.397,
-        -0.52
-      ],
-      "yaw_degrees": 0,
-      "colliders": [],
-      "material": "plain",
       "cast_shadow": true
     },
     {
@@ -491,32 +465,6 @@
       "cast_shadow": true
     },
     {
-      "name": "magazine_rack",
-      "file": "magazine_rack.glb",
-      "position": [
-        -2.82,
-        0.082,
-        0.05
-      ],
-      "yaw_degrees": 90,
-      "colliders": [
-        {
-          "at": [
-            0,
-            0.46,
-            0
-          ],
-          "size": [
-            0.65,
-            0.92,
-            0.4
-          ]
-        }
-      ],
-      "material": "plain",
-      "cast_shadow": true
-    },
-    {
       "name": "door_lamp_glow",
       "file": "door_lamp_glow.glb",
       "position": [
@@ -569,19 +517,6 @@
       "cast_shadow": true
     },
     {
-      "name": "front_floor_runner",
-      "file": "front_floor_runner.glb",
-      "position": [
-        0.26,
-        0.094,
-        2.74
-      ],
-      "yaw_degrees": 0,
-      "colliders": [],
-      "material": "plain",
-      "cast_shadow": true
-    },
-    {
       "name": "counter_dressing",
       "file": "counter_dressing.glb",
       "position": [
@@ -609,11 +544,146 @@
     },
     {
       "name": "packing_dressing",
-      "file": "packing_dressing.glb",
+      "file": "packing_dressing_215.glb",
       "position": [
+        -0.99,
         0,
-        0,
-        0
+        0.6599999999999999
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "stamp_desk_set",
+      "file": "stamp_desk_set.glb",
+      "position": [
+        -0.89,
+        1.122,
+        2.26
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "post_table_lamp",
+      "file": "post_table_lamp.glb",
+      "position": [
+        -1.49,
+        1.397,
+        -0.52
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "post_wall_lantern",
+      "file": "post_wall_lantern.glb",
+      "position": [
+        -2.65,
+        2.78,
+        -2.875
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "brown_parcel_left",
+      "file": "brown_parcel_reused.glb",
+      "position": [
+        -2.75,
+        0.084,
+        2.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.19,
+            0
+          ],
+          "size": [
+            0.51,
+            0.39,
+            0.44
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "blue_parcel_door",
+      "file": "blue_parcel_reused.glb",
+      "position": [
+        -2.75,
+        0.084,
+        0.25
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.156,
+            0
+          ],
+          "size": [
+            0.646,
+            0.313,
+            0.478
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "mail_sack_left",
+      "file": "mail_sack_reused.glb",
+      "position": [
+        -2.25,
+        0.082,
+        2.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.49,
+            0
+          ],
+          "size": [
+            0.46,
+            0.984,
+            0.46
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true,
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    {
+      "name": "compass_rug",
+      "file": "compass_rug.glb",
+      "position": [
+        1.62,
+        0.083,
+        1.0
       ],
       "yaw_degrees": 0,
       "colliders": [],
@@ -621,7 +691,38 @@
       "cast_shadow": true
     }
   ],
-  "instances": [],
+  "instances": [
+    {
+      "name": "post_wall_lantern_right",
+      "asset": "post_wall_lantern",
+      "position": [
+        2.98,
+        2.95,
+        -2.875
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "blue_parcel_left",
+      "asset": "blue_parcel_door",
+      "position": [
+        -2.75,
+        0.468,
+        2.75
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "brown_parcel_door",
+      "asset": "brown_parcel_left",
+      "position": [
+        -2.75,
+        0.084,
+        -0.42
+      ],
+      "yaw_degrees": 90
+    }
+  ],
   "camera": {
     "position": [
       10.73654100751163,
@@ -670,6 +771,36 @@
         "energy": 0.72,
         "color": "FFE1A2",
         "range": 2.5
+      },
+      {
+        "position": [
+          -2.65,
+          2.68,
+          -2.48
+        ],
+        "energy": 0.22,
+        "color": "FFE1A2",
+        "range": 1.35
+      },
+      {
+        "position": [
+          2.98,
+          2.85,
+          -2.48
+        ],
+        "energy": 0.22,
+        "color": "FFE1A2",
+        "range": 1.35
+      },
+      {
+        "position": [
+          -1.49,
+          1.71,
+          -0.52
+        ],
+        "energy": 0.12,
+        "color": "FFE1A2",
+        "range": 0.85
       }
     ]
   },
@@ -686,9 +817,9 @@
       "name": "door_floor_greenery",
       "file": "peace_lily.glb",
       "position": [
-        -2.95,
+        2.08,
         0.083,
-        2.59
+        2.7
       ],
       "rotation_degrees": [
         0,
@@ -874,8 +1005,8 @@
     }
   ],
   "spawn": [
-    -2.5,
-    0.09,
+    -2.6,
+    0.08,
     1.29
   ],
   "bench": {
@@ -1152,5 +1283,173 @@
         "source": "Green packing worktable top"
       }
     }
+  },
+  "review_clearance": {
+    "entry_route": {
+      "from": [
+        -2.65,
+        0.08,
+        1.15
+      ],
+      "to": [
+        1.2,
+        0.08,
+        1.15
+      ],
+      "width": 1.0
+    },
+    "rug_diameter": 2.2,
+    "pip_outside_route": true
+  },
+  "suggested_anchors": {
+    "use_counter": {
+      "name": "use_counter",
+      "position": [
+        -0.4,
+        1.39,
+        -0.55
+      ],
+      "module": "postal_counter"
+    },
+    "stand_counter": {
+      "name": "stand_counter",
+      "position": [
+        -0.4,
+        0.08,
+        0.35
+      ],
+      "yaw_degrees": 0
+    },
+    "npc_keeper": {
+      "name": "npc_keeper",
+      "position": [
+        -0.4,
+        0.08,
+        -1.4
+      ],
+      "yaw_degrees": 180
+    },
+    "badge_keeper": {
+      "name": "badge_keeper",
+      "position": [
+        -0.4,
+        2.4,
+        -1.4
+      ]
+    },
+    "stand_keeper": {
+      "name": "stand_keeper",
+      "position": [
+        -0.4,
+        0.08,
+        0.35
+      ],
+      "yaw_degrees": 0
+    },
+    "npc_pip": {
+      "name": "npc_pip",
+      "position": [
+        2.3,
+        0.08,
+        0.8
+      ],
+      "yaw_degrees": 90
+    },
+    "stand_pip": {
+      "name": "stand_pip",
+      "position": [
+        1.65,
+        0.08,
+        0.6
+      ],
+      "yaw_degrees": -90
+    },
+    "use_stamp_desk": {
+      "name": "use_stamp_desk",
+      "position": [
+        -0.68,
+        1.097,
+        2.3
+      ],
+      "module": "packing_table"
+    },
+    "use_fee_board": {
+      "name": "use_fee_board",
+      "position": [
+        -3.158,
+        1.65,
+        -1.65
+      ],
+      "module": "fare_board"
+    },
+    "npc_sam": {
+      "name": "npc_sam",
+      "position": [
+        1.2,
+        0.08,
+        -1.5
+      ],
+      "yaw_degrees": 180
+    },
+    "stand_sam": {
+      "name": "stand_sam",
+      "position": [
+        1.85,
+        0.08,
+        -1.35
+      ],
+      "yaw_degrees": -90
+    },
+    "spawn": {
+      "name": "spawn",
+      "position": [
+        -2.6,
+        0.08,
+        1.29
+      ],
+      "yaw_degrees": -90
+    },
+    "exit": {
+      "name": "exit",
+      "position": [
+        -3.3,
+        0.08,
+        1.29
+      ]
+    },
+    "badge_exit": {
+      "name": "badge_exit",
+      "position": [
+        -3.2,
+        2.45,
+        1.29
+      ]
+    },
+    "stand_stamp_desk": {
+      "name": "stand_stamp_desk",
+      "position": [
+        -0.68,
+        0.08,
+        1.29
+      ],
+      "yaw_degrees": 0
+    }
+  },
+  "revision_215": {
+    "base_commit": "4c287f6d27bf399ee1661c86a6fee5f9ef0fa056",
+    "runtime_reference": "f8c3391c8c0606ae664fb8e06ad85068aa199f69",
+    "atlas_changed_regions": [],
+    "desk_option": "left",
+    "desk_relocation_authorized": true,
+    "removed_from_layout": [
+      "counter_computer",
+      "front_floor_runner",
+      "magazine_rack",
+      "world_map"
+    ],
+    "map_choice": "Omitted: left wall already contains fare board/postal sign, door and notices. Fare board remains solely in runtime anchors.props at its approved position.",
+    "lights": "Existing door sconce plus two new wall lanterns, plus counter table lamp; daylight remains dominant.",
+    "dressing": "Keep under-desk boxes and airmail; replace the mat with identical-size clean swatch geometry to remove baked ghosts from the removed parcel/scale/tools, without touching atlas pixels.",
+    "anchor_handoff": "Suggestions only. Retain existing fare_board in post.anchors.json.props; layout deliberately contains none. Preserve use_fee_board and exact board placement."
   }
 }
