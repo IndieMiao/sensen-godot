@@ -11,6 +11,8 @@
  * - `changed`: a free change since (home_changes ≥ 1). A save that played San Francisco before SGODOT-303 and changed
  *   away gets the same first_at (no home_chosen_at either) but last_at = the change (= home_chosen_at, the change being
  *   the last pick); the first pick's record is older than the change. Listed apart, with which it looks like.
+ *   Not told apart: a first pick's record, then a real trip there (last_at moves on), then a change — it reads as
+ *   `played_san_francisco` (刘邦 on #469). Check those by hand if any come up (the 10-17 run had no change at all).
  */
 import type { P0Content } from './content.js';
 import { writtenCluster } from './home.js';
