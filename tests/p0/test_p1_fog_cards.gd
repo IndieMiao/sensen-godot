@@ -186,7 +186,7 @@ func test_7_the_pin_lets_go_when_its_card_closes() -> void:
 	m.city_map.select(_entry(POST))
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	rt.ui.back_modal()   # Android Back on a card with no layer under it closes it
-	if rt.ui.modal_kind != "": rt.ui.close_modal()
+	assert_str(rt.ui.modal_kind).is_equal("")
 	await _settle()
 	assert_dict(m.city_map.selected).is_empty()
 
@@ -214,6 +214,23 @@ func test_9_no_poi_in_a_city_not_visited() -> void:
 	_travel(m, SF, {DENVER: {n = 1}}, {})
 	assert_bool(m.poi_shown(denver_cafe)).is_true()   # visited: its POIs, their cards as ever
 	assert_bool(m.poi_shown(far)).is_false()
+	# what the map draws (周瑜 on #468): a Denver POI on screen in the fog is not drawn, visited it is
+	_travel(m)
+	var city: CityMapView = m.city_map
+	city.entries = []
+	city.live_pois = [{"id": "poi-d", "kind": "poi", "name": "Cafe", "lat": 39.74, "lng": -104.99, "art": "shop", "rank": 1}]
+	m.center_lat = 39.74
+	m.center_lng = -104.99
+	m.zoom = 15.0
+	m.bearing = 18.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	city._update_markers()
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).not_contains(["poi-d"])   # in the fog: none
+	_travel(m, SF, {DENVER: {n = 1}}, {})
+	city._shown_last.clear()
+	city._update_markers()
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains(["poi-d"])   # visited: drawn
 
 ## q(213): a landmark card in P0 is its name and kind alone — no Enter scene even for Griffith Observatory (Los
 ## Angeles' authored scene), and a request for it goes nowhere.
