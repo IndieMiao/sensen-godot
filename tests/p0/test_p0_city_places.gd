@@ -264,6 +264,19 @@ func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	assert_vector(pin._disc.position + pin._disc.size * 0.5).is_equal(Vector2.ONE * UiMapDestination.DISC * 0.5)   # same point
 	assert_bool(pin._label_box.visible).is_false()
 	assert_float(pin.modulate.a).is_equal_approx(0.55, 0.001)
+	# SGODOT-328: the disc is one pre-drawn image, not the style box (faded, its edge strips overlapped: a white seam)
+	assert_bool(pin._disc.visible).is_false()
+	assert_bool(pin._sil_disc.visible).is_true()
+	assert_that(Rect2(pin._sil_disc.position, pin._sil_disc.size)).is_equal(Rect2(pin._disc.position, pin._disc.size))
+	var img := UiMapDestination.silhouette_disc().get_image()
+	var side := img.get_width()
+	assert_int(side).is_equal(32 * UiMapDestination.SIL_DISC_SCALE)
+	assert_that(img.get_pixel(side / 2, side / 2)).is_equal(Color(UiTokens.COLOR_SURFACE.to_rgba32()))   # surface inside
+	var rim := img.get_pixel(side / 2, 1)   # the 1 px edge, in color/border
+	assert_float(rim.r).is_equal_approx(UiTokens.COLOR_BORDER.r, 0.01)
+	assert_float(img.get_pixel(0, 0).a).is_equal(0.0)   # round: the corners clear
+	for x in [side / 2 - 1, side / 2, side / 2 + 1]:   # nothing drawn twice down the middle
+		assert_that(img.get_pixel(x, side / 4)).is_equal(img.get_pixel(side / 4, side / 4))
 	await get_tree().process_frame
 	assert_vector(pin._icon.size).is_equal(Vector2(18, 18))
 	assert_object(pin._icon.material).is_not_null()
@@ -277,6 +290,8 @@ func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	assert_vector(pin._disc.size).is_equal(Vector2(40, 40))
 	assert_object(pin._icon.material).is_null()
 	assert_float(pin.modulate.a).is_equal(1.0)
+	assert_bool(pin._disc.visible).is_true()   # explored: the P0 disc, its primary edge
+	assert_bool(pin._sil_disc.visible).is_false()
 	# exploring the city drops its silhouettes (the style cache follows the visits)
 	rt.session.view.travel.visits = {TOKYO: {"n": 1}}
 	assert_bool(bool(m._destination_style(tokyo_market).get("silhouette", false))).is_false()
