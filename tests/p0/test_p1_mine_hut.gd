@@ -7,6 +7,7 @@ const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
 const P0City := preload("res://modules/p0/p0_city.gd")
+const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
 const DENVER := "gn-5419384"
 const HUT := "gn-5419384~hut0"
 const ROOM := {"art": "mine_hut", "anchors": "res://assets/p0/outposts/mine_hut.anchors.json", "category": "Mine hut · Old miner"}
@@ -28,6 +29,11 @@ const CITY := {
 }
 
 var _had_room := false
+
+class Hut extends "res://scenes/p0/p0_outpost.gd":
+	func setup(a: Dictionary) -> void:
+		super.setup(a)
+		use_runtime = false
 
 func before_test() -> void:
 	P0CityPlaces.clear()
@@ -132,3 +138,42 @@ func test_show_in_the_place_itself() -> void:
 	assert_str(P0Ui.show_label(go, "outpost", true, "sh_tea_1")).is_equal("Show on map")
 	assert_str(P0Ui.show_label(go, "home", true, "")).is_equal("Show on map")
 	assert_str(P0Ui.show_label(go, "map", true, "")).is_equal("Show")
+
+## The opening shot with no keeper (不知火舞 / 上官婉儿 on 308): the room's first resident takes the keeper's place — on
+## a phone the player, Ivo's feet and the whole name tag over his head are on screen, the tag's anchor inside the band
+## world marks show in (below the HUD, above the bottom controls).
+func test_the_opening_shot_frames_ivo_with_his_name_tag() -> void:
+	P0CityPlaces.accept(DENVER, CITY)
+	var r := Hut.new()
+	r.setup({"outpost_id": HUT})
+	var vp := SubViewport.new()
+	vp.size = Vector2i(360, 800)
+	add_child(auto_free(vp))
+	vp.add_child(r)
+	auto_free(r)
+	await get_tree().process_frame
+	r.p0_frame({}, 1.0 / 30.0)
+	assert_bool(r.npcs.has("npc_keeper")).is_false()
+	assert_array(r.npcs.keys()).is_equal(["npc_ivo"])
+	var ivo := r.npcs.npc_ivo.root as Node3D
+	var view := r._view()
+	var band := Rect2(0.0, P0Room.HUD_BOTTOM, view.x, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
+	for p in [r.actor.position, r.actor.position + Vector3(0, 1.75, 0)]:
+		assert_bool(band.has_point(r.cam.unproject_position(p))).override_failure_message("player %s" % r.cam.unproject_position(p)).is_true()
+	var feet := r.cam.unproject_position(ivo.global_position)
+	assert_bool(band.has_point(feet)).override_failure_message("ivo's feet %s" % feet).is_true()
+	var head := r.cam.unproject_position(ivo.to_global(OutpostScript.NAME_OVER_HEAD))
+	assert_bool(band.has_point(head)).override_failure_message("tag anchor %s" % head).is_true()
+	# the tag's two top corners at its highlighted height, a long name's half width either side: whole on screen (the
+	# opening on the player alone put Ivo at the screen's edge, his tag half off it)
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var m := r.cam.size / view.x
+	var tag := ivo.to_global(OutpostScript.NAME_OVER_HEAD) + up * OutpostScript.COUNTER_TAG_PX * m
+	for side in [-1.0, 1.0]:
+		var at := r.cam.unproject_position(tag + right * side * OutpostScript.OPENING_TAG_HALF_PX * m)
+		assert_bool(Rect2(Vector2.ZERO, view).has_point(at)).override_failure_message("tag corner %s" % at).is_true()
+	var groups: Array = r.opening_subjects()
+	assert_int(groups.size()).is_equal(1)   # Ivo; no counter in the hut
+	assert_vector(groups[0][0]).is_equal(ivo.global_position)
