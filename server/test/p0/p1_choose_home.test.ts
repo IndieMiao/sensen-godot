@@ -226,6 +226,18 @@ describe('choose_home (q(160), q(163))', () => {
     expect(run(opened, r.state, { type: 'choose_home', city: NYC, spot: 0 })).toMatchObject({ ok: false, code: 'home_chosen' });
   });
 
+  it('a first pick leaves San Francisco unvisited: the pending save only stood in there (李元芳 on 0.2.10, 286 ad0c1580)', () => {
+    const r = run(opened, pending(), { type: 'choose_home', city: TOKYO, spot: 0 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.travel.visits).toEqual({});
+    const v = viewOf(opened, r.state, T0) as unknown as { travel: { visits?: Record<string, unknown> } };
+    expect(Object.keys(v.travel.visits ?? {})).not.toContain(SF);
+    // the change that follows still makes Tokyo a city visited (④)
+    const ch = run(opened, r.state, { type: 'change_home', city: NYC, spot: 0 }, T0 + DAY);
+    expect(ch.ok && Object.keys(ch.state.travel.visits)).toEqual([TOKYO]);
+  });
+
   it('refuses a city that is not open, and a spot that is not 0–2', () => {
     expect(run(c, freshState(c, 'player-pick-02', T0, 7, { pending: true }), { type: 'choose_home', city: OSAKA, spot: 0 }))
       .toMatchObject({ ok: false, code: 'home_not_open', detail: { status: 'not_open' } });
