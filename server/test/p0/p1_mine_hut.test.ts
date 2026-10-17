@@ -130,4 +130,22 @@ describe('the Mine Hut (q(204))', () => {
     expect(rooms.presence()[HUT]).toEqual({ online: 1, rooms: 1 });
     expect(() => rooms.join('player-hut-06', `${DENVER}~hut1`)).toThrow('UNKNOWN_OUTPOST');
   });
+
+  it("is counted in its town: its pin's online count and the Tea Host's people around Denver (q(206)), gone when empty", async () => {
+    const table = loadOutposts();
+    const rooms = new OutpostRooms(table, Date.now, generatedOutpostSpec(table, id => roomPlace(c, id)));
+    rooms.join('player-hut-07', HUT);
+    const app = Fastify({ logger: false });
+    registerP0Routes(app, { content: c, store: new P0Store(c), now: () => Date.now(), dev: false, rooms });
+    expect(rooms.presence()[HUT]).toEqual({ online: 1, rooms: 1 });
+    const hd = { 'x-p0-player': 'player-hut-08' };
+    const online = async () => (await app.inject({ method: 'GET', url: '/v1/p0/state', headers: hd })).json().state.keepers.tea.online;
+    expect(await online()).toBe(0);   // in San Francisco: Denver's hut is not counted there
+    await app.inject({ method: 'POST', url: '/v1/p0/commands', headers: hd, payload: { type: 'travel', to: DENVER } });
+    expect(await online()).toBe(1);   // in Denver: the one in the hut
+    rooms.leave('player-hut-07');
+    expect(rooms.presence()[HUT]).toBeUndefined();   // a generated room is let go when empty
+    expect(await online()).toBe(0);
+    await app.close();
+  });
 });
