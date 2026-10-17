@@ -27,9 +27,21 @@ else
   digest="farm-server:$sha"
 fi
 
-scp "$here/docker-compose.yml" "$here/Caddyfile" "$here/crontab" "$here/backup.sh" "$HOST:/opt/farm/"
-# .env 从本机推上去并立刻收紧权限；它不入库（Codex 三审 N-I9）。
-scp "$here/../.env.production" "$HOST:/opt/farm/.env"
+scp "$here/docker-compose.yml" "$here/crontab" "$here/backup.sh" "$HOST:/opt/farm/"
+# .env 和 Caddyfile 以服务器上的为准，已有就不覆盖（SGODOT-304，2026-10-17）：线上 .env 里有换过的库密码和备份
+# 凭据，本机那份是旧的；线上 Caddyfile 并入了 P0 转发和 Journey 的 410，仓库版本没有。只有首次部署（服务器上
+# 还没有这个文件）才从本机推。要改线上的 .env / Caddyfile，在服务器上改，并先备份。
+keep_or_push() {   # <本机文件> <服务器上的文件名>
+  if ssh "$HOST" "test -e /opt/farm/$2"; then
+    echo "保留服务器上的 /opt/farm/$2（不覆盖）"
+  else
+    [ -s "$1" ] || { echo "服务器上没有 /opt/farm/$2，本机也没有 $1，中止"; exit 1; }
+    echo "首次部署：推本机 $1 到 /opt/farm/$2"
+    scp "$1" "$HOST:/opt/farm/$2"
+  fi
+}
+keep_or_push "$here/../.env.production" .env   # .env 不入库（Codex 三审 N-I9）
+keep_or_push "$here/Caddyfile" Caddyfile
 ssh "$HOST" "chmod 600 /opt/farm/.env && chmod +x /opt/farm/backup.sh"
 
 # postgres / caddy 的 digest 从镜像源解析一次并固定下来。
