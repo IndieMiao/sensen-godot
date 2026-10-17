@@ -241,7 +241,7 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   if (!Number.isInteger(spot) || spot < 0 || spot > 2) return { code: 'bad_spot' };
   const at = homeSpots(c, city, s.player)?.[spot], set = citySet(c, city);
   if (!at || !set) return { code: 'home_not_open', detail: { city, status: 'no_spot' } };
-  const from = t.home, dropped: string[] = [];
+  const from = t.home, first = !!t.pending, dropped: string[] = [];
   // q(173) ③: a first pick (a new player, nothing played) turns to the new home's day at once; a change carries its day.
   const hold = cmd.type === 'change_home' ? dayHoldFor(c, s, city, now) : null;
   const oldEnd = hold ? rolloverAfter(c, s, hold.key) : 0;
@@ -250,8 +250,11 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
       // q(204): a hut dweller (Ivo) lives where his hut is, whatever the home: his request stays
       if (r.req && !livesIn(c, city, id) && !hutsOf(c, id).length) { dropped.push(r.req.id); r.req = null; }
     }
+    // The old home becomes a city visited (④) — on a change only: a first pick leaves San Francisco, where a pending save
+    // stands in meanwhile and plays nothing (SGODOT-303), never visited (李元芳 on 0.2.10, 286 ad0c1580: a new Shanghai
+    // player read San Francisco as Visited ×1, Cities 1/3).
     const v = t.visits[from];
-    if (!v) t.visits[from] = { n: 1, first_at: t.home_chosen_at ?? s.created_at, last_at: now, deliveries: 0, delivered_day: '' };
+    if (!v && !first) t.visits[from] = { n: 1, first_at: t.home_chosen_at ?? s.created_at, last_at: now, deliveries: 0, delivered_day: '' };
     delete t.passes[city];   // home needs no pass
   }
   if (t.here === from) t.here = city;
