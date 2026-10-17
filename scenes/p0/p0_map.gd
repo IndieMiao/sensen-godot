@@ -136,6 +136,8 @@ func _install_city_map() -> void:
 		city_map.host_card = _own_card
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
+		city_map.poi_shown = poi_shown   # q(212) ⑤: no POI in the fog
+		city_map.landmark_scenes = false   # q(213): a landmark card is its name and kind alone, no Enter scene
 		city_map.bubble_state = city_bubble
 		city_map.bubble_clear_rects = bubble_clear_rects   # no half bubble under the HUD, the keys or the bar (不知火舞 on 279)
 		_style_locate(city_map.recenter)
@@ -324,7 +326,7 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 				style = {"icon": P0Logic.icon(str(PIN_ICONS.get(role, "travel"))), "label": "" if role == "tackle" else short_name(name),
 					"rank": int(PIN_RANK.get(role, PIN_RANK.post))}
 	# A place of a city the fog covers (MAP-2 2107:32861, 不知火舞 on #281): its silhouette until the city is explored
-	if not style.is_empty() and P0Travel.fog(_view(), cluster_of_entry(entry, P0Travel.home(_view()))) == "unexplored":
+	if not style.is_empty() and P0Travel.fog(_view(), cluster_of_entry(entry)) == "unexplored":
 		style["silhouette"] = true
 		style["label"] = ""
 		style["rank"] = PIN_RANK.silhouette
@@ -1146,22 +1148,77 @@ func _first_in_air() -> String:
 	return str(_trip.get("first_in_air", "")) if travelling() else ""
 
 ## The city a pin is in: its `cluster` (generated places, SGODOT-280: also the prefix of their id, `gn-1850147~pond0`),
-## else the home city (P0's hand-written places).
-static func cluster_of_entry(entry: Dictionary, home: String) -> String:
+## else the written city (San Francisco's hand-written places are San Francisco's, whatever the player's home: q(212)
+## ③, a home elsewhere took them for its own and showed them in full colour, named, unvisited).
+static func cluster_of_entry(entry: Dictionary) -> String:
 	var c := str(entry.get("cluster", ""))
 	if c != "": return c
 	var id := str(entry.get("id", ""))
-	return id.substr(0, id.find("~")) if id.find("~") > 0 else home
+	return id.substr(0, id.find("~")) if id.find("~") > 0 else P0Travel.written()
 
-## §11.7.2: a pond or outpost of a city the player holds no pass for is not entered — its tap opens that city's travel
-## card (the server would refuse with pass_required anyway). True when it did.
+## §11.7.2, q(212): a pond or place of a city not visited is its silhouette, and its tap, a Show on map landing on it
+## and its Go all open that city's silhouette card (MAP-3-FREE) — pass or none: the fog first (a pass without a visit
+## showed the place's card, its real name and Go). A visited city's without a pass opens its travel card (the server
+## would refuse with pass_required anyway). The pin keeps selected while the card is up and lets go when it closes
+## (q(212) ⑥). True when it opened one.
 func _travel_first(entry: Dictionary) -> bool:
 	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
-	var cluster := cluster_of_entry(entry, P0Travel.home(_view()))
-	if P0Travel.covers(_view(), cluster): return false
-	if city_map: city_map.clear_selection()
+	var cluster := cluster_of_entry(entry)
+	if P0Travel.fog(_view(), cluster) != "unexplored" and P0Travel.covers(_view(), cluster): return false
 	open_city_card(cluster)   # unexplored: the silhouette card first (MAP-3-FREE); visited: its travel card
+	_let_go_on_close(str(entry.get("id", "")))
 	return true
+
+## q(212) ⑥: the pin a card was opened from lets go when the card closes — ×, Keep browsing, a tap outside, Back —
+## and stays selected while Travel details › turns the silhouette card into the travel card (that one's close lets go).
+func _let_go_on_close(id: String) -> void:
+	if rt == null or rt.ui._modal == null or id == "" or not rt.ui.modal_kind in ["city_card", "travel_card"]: return
+	(rt.ui._modal as Node).tree_exiting.connect(func():
+		_let_go_after.call_deferred(id), CONNECT_ONE_SHOT)
+
+func _let_go_after(id: String) -> void:
+	if rt == null or city_map == null or str(city_map.selected.get("id", "")) != id: return
+	if rt.ui.modal_kind in ["city_card", "travel_card"]:   # Travel details ›: the next card holds it, and lets go after
+		_let_go_on_close(id)
+		return
+	city_map.clear_selection()
+
+## q(212) ⑤ (MAP-2 2107:32861): a POI is drawn only in a city explored — within one of the fog's holes, the city's
+## radius × 1.15 round its centre as fog_holes() opens it; none in the fog. Asked per POI each frame: the explored
+## list is read once a frame and the cities' centres kept until it changes, then a few multiplications per POI.
+var _poi_frame := -1
+var _poi_view: Dictionary   # the view the list was read from: a new one (a server answer) reads it again
+var _poi_key := 0
+var _poi_cities: Array = []   # [lat, lng, km², cos lat] per explored city
+
+func poi_shown(entry: Dictionary) -> bool:
+	var view := _view()
+	if Engine.get_process_frames() != _poi_frame or not is_same(view, _poi_view):
+		_poi_frame = Engine.get_process_frames()
+		_poi_view = view
+		var explored := P0Travel.explored(view)
+		if _first_in_air() != "": explored = explored.filter(func(c): return c != _first_in_air())
+		var key := explored.hash()
+		if key != _poi_key:
+			_poi_key = key
+			_poi_cities = []
+			for cluster in explored:
+				var c := P0Clusters.get_cluster(cluster)
+				if c.is_empty(): continue
+				var km := P0Clusters.radius_km(int(c.population)) * 1.15
+				_poi_cities.append([float(c.lat), float(c.lng), km * km, cos(deg_to_rad(float(c.lat)))])
+	var lat := float(entry.get("lat", 0.0))
+	var lng := float(entry.get("lng", 0.0))
+	for c in _poi_cities:
+		var dy: float = (lat - float(c[0])) * 111.32
+		var dx: float = wrapf(lng - float(c[1]), -180.0, 180.0) * 111.32 * float(c[3])
+		if dx * dx + dy * dy <= float(c[2]): return true
+	return false
+
+## Landmarks open no scene in P0 (q(213)): the card has no Enter scene, and a request that reaches here anyway does
+## nothing (the old map's handler went in without a pass, round the fog).
+func _on_city_landmark_requested(_entry: Dictionary) -> void:
+	pass
 
 ## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius on the
 ## ground, in the city view's pixels; the farthest at most MapFogLayer.MAX_HOLES. Asked each frame; projection only, no

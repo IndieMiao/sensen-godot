@@ -226,15 +226,20 @@ func test_a_pin_of_a_city_without_a_pass_opens_its_city_card() -> void:
 	var rt: P0Runtime = m.rt
 	rt.ui.close_modal()
 	var saved := _travel(rt, {home = SF, here = SF, visits = {}, passes = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
-	assert_str(P0Map.cluster_of_entry({"id": TOKYO + "~pond0"}, SF)).is_equal(TOKYO)
-	assert_str(P0Map.cluster_of_entry({"id": "pond_san_francisco_01"}, SF)).is_equal(SF)
+	assert_str(P0Map.cluster_of_entry({"id": TOKYO + "~pond0"})).is_equal(TOKYO)
+	assert_str(P0Map.cluster_of_entry({"id": "pond_san_francisco_01"})).is_equal(SF)
 	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
 	assert_str(rt.ui.modal_kind).is_equal("city_card")   # unexplored: its silhouette card (MAP-3-FREE), then Travel details
 	rt.ui.close_modal()
 	assert_bool(m._travel_first({"kind": "pond", "id": "pond_san_francisco_01"})).is_false()   # the home city's: as ever
 	assert_bool(m._travel_first({"kind": "place", "id": "home"})).is_false()
 	rt.session.view.travel.passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}}
-	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # a pass: go in
+	# q(212): a pass without a visit is still the fog — its silhouette card, never the place (it went in before)
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	rt.ui.close_modal()
+	rt.session.view.travel.visits = {TOKYO: {n = 1}}
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # visited, a pass: go in
 	rt.session.view = saved
 
 ## 不知火舞 on 279 (6c0377f7): the veil is the design's COLOR_SECONDARY at 40 % (the light blue-grey washed out on the

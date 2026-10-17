@@ -127,6 +127,11 @@ func _destination(entry: Dictionary) -> Dictionary:
 
 ## The pond card's action (Journey "Enter pond"; P0 "Go", §10.6.1 MAP-1).
 var pond_action := "Enter pond"
+## A landmark card's `Enter scene` for an authored scene (LandmarkScenes, Journey); P0 turns it off (q(213): no way
+## round the fog and the passes into the old scene).
+var landmark_scenes := true
+## (entry) -> bool: whether a POI is drawn (P0, q(212) ⑤: only in the cities explored, the fog's holes); unset = all.
+var poi_shown := Callable()
 var bottom_inset := 0.0: set = set_bottom_inset
 var list_panel: PanelContainer
 var list_rows: VBoxContainer
@@ -664,6 +669,8 @@ func select(entry: Dictionary) -> void:
 		_set_marker_front(str(selected.get("id", "")), false)
 	selected = entry
 	entry_selected.emit(entry)
+	# a host that answered by letting the pin go (or choosing another) keeps it so: not raised again (q(212) ⑥)
+	if str(selected.get("id", "")) != str(entry.get("id", "")): return
 	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
 	_set_marker_front(str(entry.get("id", "")), true)
 	if host_card.is_valid() and bool(host_card.call(entry)):
@@ -675,7 +682,7 @@ func select(entry: Dictionary) -> void:
 	info_category.text = _category_text(str(entry.get("category", "Place")), _place_city(entry))
 	info_address.text = str(entry.get("address", ""))
 	info_address.visible = not info_address.text.is_empty()
-	var landmark_scene := LandmarkScenes.path_for(str(host.region.get("id", "")), entry)
+	var landmark_scene := LandmarkScenes.path_for(str(host.region.get("id", "")), entry) if landmark_scenes else ""
 	info_action.visible = entry.kind in ["resident", "pond", "place"] or not landmark_scene.is_empty()
 	if entry.kind == "resident":
 		info_category.text = L10n.text("Resident") + " · " + L10n.text(str(entry.get("status", "Talk")))
@@ -1104,12 +1111,14 @@ func _update_markers() -> void:
 	var candidates: Array = []
 	# 国家/省级视野只剩城市气泡与自己的头像：细节标记全部让出（带消失动画）。
 	var detail: bool = host.city_detail_visible()
+	var poi_gate := poi_shown.is_valid()
 	for entry in all:
 		var id := str(entry.id)
 		keep[id] = true
 		if not detail or not _entry_visible(entry): continue
 		var art_key := CityMapData.art_key(entry)
 		if entry.kind == "poi":
+			if poi_gate and not bool(poi_shown.call(entry)): continue
 			# 只有高频 maki 才有图标；其余（含通用 marker）不上图，只留在搜索/列表。
 			if CityMapData.icon_key(entry).is_empty(): continue
 			var rank := float(entry.get("rank", 5))
