@@ -98,8 +98,8 @@ func test_the_placeholder_anchor_files_pass_validation() -> void:
 		assert_array(errors).override_failure_message(path + "\n" + "\n".join(errors)).is_empty()
 
 ## Each anchors file's room kit: an outpost's art (p0_outposts.json), a generated city's room (world_gen.json
-## world.room, SGODOT-280: the S-tier trading post's client_anchors, cabin.anchors.json, are on the tea house's kit),
-## the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
+## world.room, SGODOT-280: the S-tier trading post's client_anchors, cabin.anchors.json, are on the tea house's kit; a
+## room's client_art is the kit this client opens, SGODOT-214), the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
 func _kit_of() -> Dictionary:
 	var kit_of := {}
 	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
@@ -107,7 +107,7 @@ func _kit_of() -> Dictionary:
 	for kind in rooms:
 		if not rooms[kind] is Dictionary: continue
 		for key in ["anchors", "client_anchors"]:
-			if rooms[kind].has(key): kit_of[str(rooms[kind][key])] = str(rooms[kind].get("art", "basic_room"))
+			if rooms[kind].has(key): kit_of[str(rooms[kind][key])] = str(rooms[kind].get("client_art", rooms[kind].get("art", "basic_room")))
 	for kind in FARMHOUSE.ROOMS: kit_of[str(FARMHOUSE.ROOMS[kind].anchors)] = str(FARMHOUSE.ROOMS[kind].art)
 	return kit_of
 

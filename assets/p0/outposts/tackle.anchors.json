@@ -1,19 +1,19 @@
 {
-  "_note": "Xuhui Tackle Shop on the Farm Tools Store kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/farm_tools_store/layout.json, floor top y 0.08. Finn stands at the sales counter's left end, beside it (camera step 2, 43°: behind the counter his name tag sat on the FARM TOOLS sign wherever he stood, at the opening view and at zoom 0.8, and the counter dressing hid all but his hat; 不知火舞 / UI on 226: tags have no exceptions, move Finn). He is seen whole there, his tag clear of the sign and of the door's Map strip (the door prompt stays over the door frame, 不知火舞 on #91). Tapping the counter is tapping him. Old Kai stands on the open floor by the seed wall; Rafa (a generated city's river tackle shop, which may hold Old Kai too: §9.4.3) across the floor from him, facing the room the way Kai does, the player at his right (SGODOT-284). Exit at the green back door; its prompt (badge_exit) sits over the door frame. The player comes in a few steps inside it, 1.1 m screen-left of the threshold, clear of the entry monstera at the 43° camera (李元芳 int11: at the threshold the plant hid half the player on the first frame; UI rule: the whole player is in view on a room's first frame). The kit has no fish board: the Bite Board (SGODOT-283, a tap-triggered facility) stands in on the hand-tools pegboard on the back wall, right of the counter, until the room has its own board (上官婉儿 / 不知火舞 to place); the player reads it from in front of it.",
+  "_note": "Mission Tackle Shop on its own kit (SGODOT-214; was the Farm Tools Store until then, SGODOT-227). Room metres of assets/rooms/tackle_shop/layout.json, floor top y 0.08; the kit's suggested anchors (layout.json anchors, each walked to by 上官婉儿 on #462), with these changes: badge_keeper sits 2.4 up as in every room (the kit's 1.98 is under the door card's reach: test_the_outpost_table_and_anchor_files_agree), and the stand_ yaws face what they stand at (the kit's stand_kai / stand_rafa faced away; the room turns the player to the tapped anchor either way). Finn stands behind the curved counter, Old Kai by his stool front left, Rafa (a generated city's river tackle shop, which may hold Old Kai too: §9.4.3) on the right, by his fish creel: the kit's spot by the float barrel in the back right corner put him and Old Kai, front left, too far apart for the opening shot (不知火舞 on #465, 214 bda468ca: moved in 0.71 m across the screen, the three residents, the player, the keeper and the counter fit with room to spare). The Bite Board (SGODOT-283) is the kit's own fish_board on the back wall, right of the counter. The player comes in on the anchor rug at the room's middle, facing the counter (the opening view 不知火舞 passed on 214, 01_spawn_follow_360); the door is the open front, its prompt (badge_exit) low on the step, below the player.",
   "anchors": [
-    {"name": "use_counter", "position": [-1.4, 1.25, -1.6], "module": "sales_counter"},
-    {"name": "stand_counter", "position": [-1.4, 0.08, -1.05], "yaw_degrees": 0},
-    {"name": "npc_keeper", "position": [-2.1, 0.08, -1.7], "yaw_degrees": 180},
-    {"name": "badge_keeper", "position": [-2.1, 2.4, -1.7]},
-    {"name": "stand_keeper", "position": [-2.1, 0.08, -1.0], "yaw_degrees": 0},
-    {"name": "npc_kai", "position": [-2.3, 0.08, 0.2], "yaw_degrees": -90},
-    {"name": "stand_kai", "position": [-1.6, 0.08, 0.2], "yaw_degrees": 90},
-    {"name": "npc_rafa", "position": [0.8, 0.08, 0.5], "yaw_degrees": -90},
-    {"name": "stand_rafa", "position": [1.5, 0.08, 0.5], "yaw_degrees": 90},
-    {"name": "use_fish_board", "position": [1.18, 1.45, -2.55], "module": "hand_tools_board"},
-    {"name": "stand_fish_board", "position": [1.18, 0.08, -1.95], "yaw_degrees": 0},
-    {"name": "spawn", "position": [1.5, 0.08, -1.35], "yaw_degrees": 180},
-    {"name": "exit", "position": [2.29, 0.08, -2.85]},
-    {"name": "badge_exit", "position": [2.35, 2.45, -2.85]}
+    {"name": "use_counter", "position": [-0.36, 1.2, -1.31], "module": "curved_counter"},
+    {"name": "stand_counter", "position": [-0.36, 0.08, -0.48], "yaw_degrees": 0},
+    {"name": "npc_keeper", "position": [-0.36, 0.08, -2.5], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [-0.36, 2.4, -2.5]},
+    {"name": "stand_keeper", "position": [-0.36, 0.08, -0.48], "yaw_degrees": 0},
+    {"name": "npc_kai", "position": [-1.85, 0.08, 1.55], "yaw_degrees": 135},
+    {"name": "stand_kai", "position": [-1.1, 0.08, 1.1], "yaw_degrees": 120},
+    {"name": "npc_rafa", "position": [1.6, 0.08, -0.75], "yaw_degrees": 225},
+    {"name": "stand_rafa", "position": [1.1, 0.08, -0.2], "yaw_degrees": -40},
+    {"name": "use_fish_board", "position": [0.69, 1.99, -2.86], "module": "fish_board"},
+    {"name": "stand_fish_board", "position": [0.96, 0.08, -2.07], "yaw_degrees": 0},
+    {"name": "spawn", "position": [0.0, 0.08, 0.83], "yaw_degrees": 0},
+    {"name": "exit", "position": [0.0, 0.08, 3.4]},
+    {"name": "badge_exit", "position": [0.0, 0.3, 3.2]}
   ]
 }

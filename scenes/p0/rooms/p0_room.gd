@@ -563,11 +563,17 @@ func frame_all() -> void:
 func opening_subjects() -> Array:
 	return []
 
+## Points the opening shot also takes in when they fit with the player and every opening_subjects() group (an outpost's
+## other residents with their name tags, 不知火舞 on #465); left out otherwise.
+func opening_extras() -> Array:
+	return []
+
 ## The opening shot of a room that does not fit at the player's scale (不知火舞 on 227, int12-pre: the tea house opened
 ## with Ama off screen). Priority player > keeper and counter > the rest: the player with every opening_subjects()
-## group when they fit the free band together (the band _clamp_focus keeps: SIDE_MARGIN across, the HUD's bottom to
-## the bottom controls down), centred in it; otherwise the middle of the player and the first group (the keeper),
-## centred the same way. _update_camera then keeps it inside the art, as for any followed shot.
+## group and the opening_extras() when they fit the free band together (the band _clamp_focus keeps: SIDE_MARGIN
+## across, the HUD's bottom to the bottom controls down), centred in it; else the same without the extras; otherwise
+## the middle of the player and the first group (the keeper), centred the same way. _update_camera then keeps it
+## inside the art, as for any followed shot.
 func opening_focus(right: Vector3, up: Vector3, forward: Vector3) -> Vector3:
 	var groups := opening_subjects()
 	if groups.is_empty(): return actor.position
@@ -575,11 +581,15 @@ func opening_focus(right: Vector3, up: Vector3, forward: Vector3) -> Vector3:
 	var m := cam.size / maxf(view.x, 1.0)   # metres per px
 	var band_lo := Vector2(-(view.x * 0.5 - SIDE_MARGIN), -(view.y * 0.5 - _bottom_px().x)) * m
 	var band_hi := Vector2(view.x * 0.5 - SIDE_MARGIN, view.y * 0.5 - (_safe_top() + HUD_BOTTOM)) * m
+	var fits := func(box: Rect2) -> bool: return box.size.x <= band_hi.x - band_lo.x and box.size.y <= band_hi.y - band_lo.y
 	var player := _screen_box([actor.position, actor.position + Vector3(0, 1.75, 0)], right, up)
 	var all := player
 	for g in groups: all = all.merge(_screen_box(g, right, up))
+	var extras := opening_extras()
 	var mid := all.get_center()
-	if all.size.x > band_hi.x - band_lo.x or all.size.y > band_hi.y - band_lo.y:
+	if not extras.is_empty() and fits.call(all.merge(_screen_box(extras, right, up))):
+		mid = all.merge(_screen_box(extras, right, up)).get_center()
+	elif not fits.call(all):
 		mid = (player.get_center() + _screen_box(groups[0], right, up).get_center()) * 0.5
 	return _on_floor(right, up, forward, mid - (band_lo + band_hi) * 0.5)
 

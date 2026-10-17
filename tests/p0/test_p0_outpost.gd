@@ -403,6 +403,9 @@ func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 			assert_array(asked).override_failure_message("%s: a tap on %s's name" % [id, n]).is_equal([n])
 			tested += 1
 		for n in r.npcs: rt.ui.npc_tag("room:" + n, "", Vector2.ZERO, false)   # the next room's tags only
+		# … and prompts: the Travel Post's stamp desk icon, left up, sat on Old Kai's tag on the tackle shop's own kit
+		# (刘邦 on #465); a room's markers go when it does (P0Ui hides them all on leaving a surface)
+		for m in rt.ui._icons.values() + rt.ui._name_bars.values(): (m as Control).visible = false
 	assert_int(tested).is_equal(11)   # four keepers, Pip, Old Kai and the five P1 residents (SGODOT-284)
 	# A tag faded under an open strip takes no tap: the tap is the world's (tapped_card stays ""). No stand point in the
 	# four outposts puts a strip over a tag (probed for #122; the earlier check only saw the previous room's door strip,
@@ -587,7 +590,7 @@ func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
 ## down in the free band (用户 2026-10-09, 不知火舞 on 226; superseding 227's whole-art opening); the door's prompt is
 ## clear of the player who comes in.
 func test_every_outpost_opens_on_its_kit() -> void:
-	var kits := {"sh_tackle_1": "farm_tools_store", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
+	var kits := {"sh_tackle_1": "tackle_shop", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
 	for id in kits:
 		var o := P0Outposts.find(id)
 		var r := _room(id, true)
@@ -608,7 +611,10 @@ func test_every_outpost_opens_on_its_kit() -> void:
 
 ## The residents and the market's facilities stand where the player can walk up to them, and every door leads out.
 func test_residents_facilities_and_doors_are_walked_to() -> void:
-	for job in [["sh_tackle_1", "npc_kai"], ["sh_post_1", "npc_pip"], ["sh_market_1", "use_market_board"], ["sh_market_1", "use_specialty_shelf"]]:
+	# Sam's stand_ was inside the post counter's collision box until #462's walk-through (上官婉儿); the tackle shop's own
+	# kit (SGODOT-214) has its own Bite Board.
+	for job in [["sh_tackle_1", "npc_kai"], ["sh_tackle_1", "use_fish_board"], ["sh_post_1", "npc_pip"], ["sh_post_1", "npc_sam"],
+			["sh_market_1", "use_market_board"], ["sh_market_1", "use_specialty_shelf"]]:
 		var r := _room(str(job[0]))
 		_tap(r, str(job[1]))
 		_walk_until_idle(r, 10.0)
@@ -701,6 +707,51 @@ func test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_t
 			assert_bool(Rect2(Vector2.ZERO, view).has_point(at)).override_failure_message("%s keeper %s" % [o.id, at]).is_true()
 		var head := r.cam.unproject_position((r.npcs.npc_keeper.root as Node3D).to_global(OutpostScript.NAME_OVER_HEAD))
 		assert_bool(band.has_point(head)).override_failure_message("%s tag anchor %s" % [o.id, head]).is_true()
+
+## 不知火舞 on #465 (214 36bbf7b6): the opening shot takes in the room's other residents too, each with the name tag whole
+## and 18 px clear of the screen's sides, when they fit with the player, the keeper and the counter: in every San
+## Francisco outpost, and in a generated river tackle shop with Old Kai and Rafa (214 bda468ca: Rafa moved in from the
+## back right corner so the two fit, with some 25 px to spare; his tag 44 px or more from Ren's and from the Bite Board's
+## prompt). A room whose residents do not fit opens as before (on the player, the keeper and the counter).
+func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> void:
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("tackle", {})
+	P0CityPlaces.accept("gn-testrafa", {"detail": {"outposts": [{"id": "gn-testrafa~tackle0", "role": "tackle", "name": "Test Tackle Shop",
+		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 1.0, "lng": 1.0,
+		"capacity": 12, "keeper": {"role": "Tackle Keeper", "name": "Ren", "look": "tackle_temperate_0"}, "residents": ["res_old_kai", "res_rafa"]}]}})
+	for id in P0Outposts.all().map(func(o): return str(o.id)) + ["gn-testrafa~tackle0"]:
+		var r := _room(id, true)
+		await get_tree().process_frame
+		r.p0_frame({}, 1.0 / 30.0)
+		var view := r._view()
+		var extras: Array = r.opening_extras()
+		assert_int(extras.size()).override_failure_message(id).is_equal(3 * (r.npcs.size() - 1))
+		assert_bool(extras.is_empty()).override_failure_message(id).is_false()
+		# the band opening_focus fits them in (刘邦 on #465): SIDE_MARGIN across, the HUD's bottom to the bottom controls down
+		var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
+		for p in extras:
+			var at := r.cam.unproject_position(p)
+			assert_bool(band.grow(0.5).has_point(at)).override_failure_message("%s resident point %s, band %s" % [id, at, band]).is_true()
+		if id != "gn-testrafa~tackle0": continue
+		assert_array(r.npcs.keys()).contains(["npc_keeper", "npc_kai", "npc_rafa"])
+		var xs: Array = extras.map(func(p): return r.cam.unproject_position(p).x)
+		var spare: float = (float(xs.min()) - P0Room.SIDE_MARGIN) + (view.x - P0Room.SIDE_MARGIN - float(xs.max()))
+		assert_float(spare).override_failure_message("spare %s px" % spare).is_greater_equal(25.0)
+		var tag_of := func(n: String) -> Vector2: return r.cam.unproject_position((r.npcs[n].root as Node3D).to_global(OutpostScript.NAME_OVER_HEAD))
+		var rafa: Vector2 = tag_of.call("npc_rafa")
+		assert_float(rafa.distance_to(tag_of.call("npc_keeper"))).override_failure_message("Rafa to Ren").is_greater_equal(44.0)
+		assert_float(rafa.distance_to(r.cam.unproject_position(r.pick_point("use_fish_board")))).override_failure_message("Rafa to the board").is_greater_equal(44.0)
+	# a room whose residents do not fit opens as before: Rafa back in the kit's corner
+	var r := _room("gn-testrafa~tackle0", true)
+	await get_tree().process_frame
+	r.anchor("npc_rafa").position = Vector3(1.85, 0.08, -1.55)
+	(r.npcs.npc_rafa.root as Node3D).global_position = r.anchor("npc_rafa").global_position
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var before := r.opening_focus(right, up, forward)
+	r.npcs.erase("npc_kai")
+	r.npcs.erase("npc_rafa")
+	assert_vector(r.opening_focus(right, up, forward)).is_equal_approx(before, Vector3.ONE * 0.001)   # as with no residents
 
 ## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
 ## (world.keeper_looks, role × climate × 3), under their own name plate.
@@ -813,6 +864,31 @@ func test_the_cabin_shows_pip_and_its_second_resident() -> void:
 		"art": str(room.art), "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": ""}, "residents": []}]}})
 	assert_str(str(P0Outposts.find("gn-testtea~tea0").anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")
+
+## SGODOT-214: a generated tackle shop still named on the Farm Tools Store (what 0.2.9 and older can open) opens on the
+## tackle shop's own kit in this client (world.room.tackle.client_art), with Mission Tackle Shop's walls and backdrop, and
+## Old Kai and Rafa in their spots there.
+func test_a_generated_tackle_shop_opens_on_its_own_kit() -> void:
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("tackle", {})
+	assert_str(str(room.art)).is_equal("farm_tools_store")   # what every client can open
+	assert_str(str(room.client_art)).is_equal("tackle_shop")
+	var id := "gn-testtackle~tackle0"
+	P0CityPlaces.accept("gn-testtackle", {"detail": {"outposts": [{"id": id, "role": "tackle", "name": "Test Tackle Shop",
+		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 1.0, "lng": 1.0,
+		"capacity": 12, "keeper": {"role": "Tackle Keeper", "name": "Bea", "look": ""}, "residents": ["res_old_kai", "res_rafa"],
+		"nearest": {"name": "Test Pond", "site": "pond"}}]}})
+	var o := P0Outposts.find(id)
+	assert_str(str(o.art)).is_equal("tackle_shop")
+	assert_dict(o.backdrop).is_equal(P0Outposts.find("sh_tackle_1").backdrop)
+	var r := _room(id)
+	assert_str(r.layout_path).is_equal("res://assets/rooms/tackle_shop/layout.json")
+	assert_array(r.npcs.keys()).contains(["npc_kai", "npc_rafa"])
+	for n in ["npc_rafa", "use_fish_board", "use_counter"]:   # Rafa's spot by his creel leaves the way to the board and the counter
+		r.actor.teleport(r.anchor("spawn").global_position)
+		r.used.clear()
+		_tap(r, n)
+		_walk_until_idle(r, 10.0)
+		assert_array(r.used).override_failure_message(n).is_equal([n])
 
 ## Every resident world_gen places (world.residents: fixed, rank once its room is built, the S-tier s_order) wears a
 ## look in outpost_npcs.json and has its spot in every room kind it can be placed in — else the room shows nobody

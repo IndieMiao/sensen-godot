@@ -38,6 +38,18 @@ describe('generated outpost rooms (SGODOT-280)', () => {
     expect(rooms.join('player-gen-01', market.id).room).toBe(1);
   });
 
+  it('a Tokyo tackle shop still named on the Farm Tools Store (for 0.2.9) is walled like Mission Tackle Shop on its own kit (SGODOT-214)', () => {
+    const tackle = cityPlaces(c, TOKYO)!.detail.outposts.find(o => o.role === 'tackle')!;
+    expect(tackle.art).toBe('farm_tools_store');   // what every client can open
+    expect(table.some(o => o.art === tackle.art)).toBe(false);
+    const mission = table.find(o => o.id === 'sh_tackle_1')!;
+    expect(mission.art).toBe('tackle_shop');
+    const rooms = new OutpostRooms(table, Date.now, resolve);
+    rooms.join('player-gen-04', tackle.id);
+    expect(rooms.spec(tackle.id)).toMatchObject({ role: 'tackle', bounds: mission.bounds, seats: mission.seats });
+    rooms.leave('player-gen-04');
+  });
+
   it('ids the generator does not know stay unknown; the hand-written table is untouched', () => {
     const rooms = new OutpostRooms(table, Date.now, resolve);
     expect(() => rooms.join('player-gen-03', `${TOKYO}~market99`)).toThrow('UNKNOWN_OUTPOST');
