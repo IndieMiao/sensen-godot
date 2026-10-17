@@ -325,24 +325,39 @@ const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
 ## int12-pre: Ama stood off the tea house's opening shot). The tag counts at its highlighted height and a long name's
 ## half width either side, so `Ama` / `Sigrid` stay whole on screen. A room with no keeper (the Mine Hut, q(204)) opens
 ## on its resident the same way: the player and Ivo with his name tag, which keeps the shaft and the steps in view too
-## (不知火舞 / 上官婉儿 on 308: the opening shot on the player alone cut the shaft and put Ivo on the edge).
+## (不知火舞 / 上官婉儿 on 308: the opening shot on the player alone cut the shaft and put Ivo on the edge). The other
+## residents come in as opening_extras (不知火舞 on #465, 214 36bbf7b6: Finn at the back wall pulled the tackle shop's
+## shot right and cut Old Kai in half at the left edge).
 const OPENING_TAG_HALF_PX := 40.0
 func opening_subjects() -> Array:
 	var host := "npc_keeper" if npcs.has("npc_keeper") else ""
 	if host == "":
 		for n in npcs: if host == "": host = n   # no keeper: the room's first resident
 	if host == "": return []
-	var forward := -_cam_dir
-	var right := forward.cross(Vector3.UP).normalized()
-	var up := right.cross(forward).normalized()
-	var m := cam.size / maxf(_view().x, 1.0)
-	var root := npcs[host].root as Node3D
-	var tag := root.to_global(NAME_OVER_HEAD) + up * COUNTER_TAG_PX * m
-	var keeper := [root.global_position, tag - right * OPENING_TAG_HALF_PX * m, tag + right * OPENING_TAG_HALF_PX * m]
+	var keeper := _npc_points(host)
 	var counter := []
 	for n in COUNTERS:
 		if n != "npc_keeper" and anchor(n): counter.append(anchor(n).global_position)
 	return [keeper, counter] if not counter.is_empty() else [keeper]
+
+## The room's other residents, each with their name tag whole, when they fit too (不知火舞 on #465).
+func opening_extras() -> Array:
+	var host := "npc_keeper" if npcs.has("npc_keeper") else ""
+	var out := []
+	for n in npcs:
+		if host == "": host = n   # no keeper: the first resident is the host (opening_subjects)
+		elif n != host: out.append_array(_npc_points(n))
+	return out
+
+## An NPC as the opening shot counts them: the feet and the name tag's two top corners.
+func _npc_points(n: String) -> Array:
+	var forward := -_cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var m := cam.size / maxf(_view().x, 1.0)
+	var root := npcs[n].root as Node3D
+	var tag := root.to_global(NAME_OVER_HEAD) + up * COUNTER_TAG_PX * m
+	return [root.global_position, tag - right * OPENING_TAG_HALF_PX * m, tag + right * OPENING_TAG_HALF_PX * m]
 func _marker(n: String, view: Dictionary) -> Dictionary:
 	if _dev_no_marks: return {}
 	# World prompts (SGODOT-250, LOCK-07 / 16 / 30 v2, q(62)): names only, no "Tap to …"; the room opens one at a time.

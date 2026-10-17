@@ -705,6 +705,38 @@ func test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_t
 		var head := r.cam.unproject_position((r.npcs.npc_keeper.root as Node3D).to_global(OutpostScript.NAME_OVER_HEAD))
 		assert_bool(band.has_point(head)).override_failure_message("%s tag anchor %s" % [o.id, head]).is_true()
 
+## 不知火舞 on #465 (214 36bbf7b6): the opening shot takes in the room's other residents too, each with the name tag whole
+## and 18 px clear of the screen's sides, when they fit with the player, the keeper and the counter: in every San
+## Francisco outpost. A generated tackle shop with Old Kai and Rafa in opposite corners does not fit them (about 337 px
+## of 324) and opens as before, on the player, Finn and the counter.
+func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> void:
+	for o in P0Outposts.all():
+		var r := _room(str(o.id), true)
+		await get_tree().process_frame
+		r.p0_frame({}, 1.0 / 30.0)
+		var view := r._view()
+		var extras: Array = r.opening_extras()
+		assert_int(extras.size()).override_failure_message(str(o.id)).is_equal(3 * (r.npcs.size() - 1))
+		assert_bool(extras.is_empty()).override_failure_message(str(o.id)).is_false()
+		for p in extras:
+			var at := r.cam.unproject_position(p)
+			assert_bool(at.x >= P0Room.SIDE_MARGIN and at.x <= view.x - P0Room.SIDE_MARGIN and at.y >= 0.0 and at.y <= view.y) \
+				.override_failure_message("%s resident point %s" % [o.id, at]).is_true()
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("tackle", {})
+	P0CityPlaces.accept("gn-testrafa", {"detail": {"outposts": [{"id": "gn-testrafa~tackle0", "role": "tackle", "name": "Test Tackle Shop",
+		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 1.0, "lng": 1.0,
+		"capacity": 12, "keeper": {"role": "Tackle Keeper", "name": "Bea", "look": "tackle_temperate_0"}, "residents": ["res_old_kai", "res_rafa"]}]}})
+	var r := _room("gn-testrafa~tackle0", true)
+	await get_tree().process_frame
+	assert_array(r.npcs.keys()).contains(["npc_keeper", "npc_kai", "npc_rafa"])
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var before := r.opening_focus(right, up, forward)
+	r.npcs.erase("npc_kai")
+	r.npcs.erase("npc_rafa")
+	assert_vector(r.opening_focus(right, up, forward)).is_equal_approx(before, Vector3.ONE * 0.001)   # as with no residents
+
 ## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
 ## (world.keeper_looks, role × climate × 3), under their own name plate.
 func test_a_generated_keeper_wears_their_look_preset() -> void:
