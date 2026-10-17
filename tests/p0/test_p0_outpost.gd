@@ -403,6 +403,9 @@ func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 			assert_array(asked).override_failure_message("%s: a tap on %s's name" % [id, n]).is_equal([n])
 			tested += 1
 		for n in r.npcs: rt.ui.npc_tag("room:" + n, "", Vector2.ZERO, false)   # the next room's tags only
+		# … and prompts: the Travel Post's stamp desk icon, left up, sat on Old Kai's tag on the tackle shop's own kit
+		# (刘邦 on #465); a room's markers go when it does (P0Ui hides them all on leaving a surface)
+		for m in rt.ui._icons.values() + rt.ui._name_bars.values(): (m as Control).visible = false
 	assert_int(tested).is_equal(11)   # four keepers, Pip, Old Kai and the five P1 residents (SGODOT-284)
 	# A tag faded under an open strip takes no tap: the tap is the world's (tapped_card stays ""). No stand point in the
 	# four outposts puts a strip over a tag (probed for #122; the earlier check only saw the previous room's door strip,
