@@ -669,8 +669,11 @@ func select(entry: Dictionary) -> void:
 		_set_marker_front(str(selected.get("id", "")), false)
 	selected = entry
 	entry_selected.emit(entry)
-	# a host that answered by letting the pin go (or choosing another) keeps it so: not raised again (q(212) ⑥)
-	if str(selected.get("id", "")) != str(entry.get("id", "")): return
+	# a host that answered by letting the pin go (P0: a city's card, not the pin's) keeps it so — only the press, the pin
+	# back at its size, never raised and left raised (q(212) ⑥, 不知火舞 on 327)
+	if str(selected.get("id", "")) != str(entry.get("id", "")):
+		_press(str(entry.get("id", "")))
+		return
 	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
 	_set_marker_front(str(entry.get("id", "")), true)
 	if host_card.is_valid() and bool(host_card.call(entry)):
@@ -1575,6 +1578,21 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 	tween.tween_method(func(v: float):
 		marker.focus = v
 		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
+
+## A tap's press on a pin that is not selected after it: a quick grow and back to its size.
+const PRESS_SCALE := 1.12
+func _press(id: String) -> void:
+	if not markers.has(id): return
+	var marker: Dictionary = markers[id]
+	if marker.get("focus_tween") is Tween: (marker.focus_tween as Tween).kill()
+	var tween := create_tween()
+	marker.focus_tween = tween
+	marker.pulse = false
+	var scale_to := func(v: float):
+		marker.focus = v
+		_apply_marker_scale(marker)
+	tween.tween_method(scale_to, float(marker.get("focus", 1.0)), PRESS_SCALE, 0.07)
+	tween.tween_method(scale_to, PRESS_SCALE, 1.0, 0.14)
 
 const KIND_ORDER := {"place": -1, "landmark": 0, "resident": 1, "pond": 2, "poi": 3}
 

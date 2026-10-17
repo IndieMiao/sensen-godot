@@ -1,8 +1,8 @@
 extends GdUnitTestSuite
 ## q(212) (SGODOT-327): in a city not visited, every place pin is a silhouette and its tap — a Show on map landing on it,
 ## its Go — opens the city's silhouette card (MAP-3-FREE), pass or none: the fog first, the pass after. San Francisco's
-## hand-written places are San Francisco's whatever the home; no POI is drawn in the fog; a pin a card was opened from
-## lets go when the card closes. q(213): a landmark card in P0 has no Enter scene.
+## hand-written places are San Francisco's whatever the home; no POI is drawn in the fog; a city's card keeps no pin
+## selected. q(213): a landmark card in P0 has no Enter scene.
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
@@ -160,33 +160,52 @@ func test_6_san_franciscos_written_places_are_its_own_with_a_home_elsewhere() ->
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
 	rt.ui.close_modal()
 
-## (7) The pin lets go when the card closes (×, Keep browsing, a tap outside and Back all close it), and keeps
-## selected while Travel details › turns the silhouette card into the travel card, letting go when that one closes.
-func test_7_the_pin_lets_go_when_its_card_closes() -> void:
+## (7) A silhouette card and a travel card are the city's, not the pin's (不知火舞 on 327, 11ca174e): the pin is not
+## selected while one is up — a tap only presses it — so it is never left raised when the card closes (×, Keep browsing,
+## a tap outside, Back), through Travel details › too. A place card or pond card keeps its pin selected while it is up
+## and lets go when it closes, as before.
+func test_7_the_pin_is_not_kept_selected_by_a_citys_card() -> void:
 	var m: Node = await _map()
 	_travel(m)
 	var rt: P0Runtime = m.rt
-	m.city_map.select(_entry(HUT))
-	assert_str(str(m.city_map.selected.get("id", ""))).is_equal(HUT)   # selected while the card is up
+	var city: CityMapView = m.city_map
+	m.center_lat = 39.7555   # the hut on screen, its pin drawn
+	m.center_lng = -105.2211
+	m.zoom = 15.0
+	m._show_city_places(P0CityPlaces.city(DENVER), DENVER)
+	m._update_cameras()
+	m._sync_farm_markers()
+	city._update_markers()
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([HUT])
+	city.select(_entry(HUT))   # a tap on the silhouette
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	assert_dict(city.selected).is_empty()   # the card is up, the pin not selected
+	await get_tree().create_timer(0.4).timeout   # the press over
+	assert_float(float(city.markers[HUT].get("focus", 1.0))).is_equal_approx(1.0, 0.001)   # its size: not left raised
 	rt.ui.close_modal()
 	await _settle()
 	assert_dict(m.city_map.selected).is_empty()
-	# Travel details ›: the city card closes and the travel card opens in the same tap
-	m.city_map.select(_entry(HUT))
+	# Show on map landing on it, and Travel details › on to the travel card: still none
+	m.city_map.select(m.place_for("outpost:" + HUT))
 	rt.ui.close_modal()
 	m.open_travel(DENVER)
-	await _settle()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
-	assert_str(str(m.city_map.selected.get("id", ""))).is_equal(HUT)
-	rt.ui.close_modal()
-	await _settle()
 	assert_dict(m.city_map.selected).is_empty()
-	# a visited city's travel card (the pass run out) lets go the same way
+	rt.ui.close_modal()
+	# a visited city's travel card (the pass run out): the same, and Back closes it by itself
 	_travel(m, SF, {DENVER: {n = 1}}, {})
 	m.city_map.select(_entry(POST))
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
-	rt.ui.back_modal()   # Android Back on a card with no layer under it closes it
+	assert_dict(m.city_map.selected).is_empty()
+	rt.ui.back_modal()
 	assert_str(rt.ui.modal_kind).is_equal("")
+	assert_dict(m.city_map.selected).is_empty()
+	# visited with a pass: the place card holds its pin while it is up, and lets it go on closing
+	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS})
+	m.city_map.select(_entry(HUT))
+	assert_str(rt.ui.modal_kind).is_equal("place_card")
+	assert_str(str(m.city_map.selected.get("id", ""))).is_equal(HUT)
+	rt.ui.close_modal()
 	await _settle()
 	assert_dict(m.city_map.selected).is_empty()
 

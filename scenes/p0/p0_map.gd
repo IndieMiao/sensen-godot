@@ -1159,29 +1159,16 @@ static func cluster_of_entry(entry: Dictionary) -> String:
 ## §11.7.2, q(212): a pond or place of a city not visited is its silhouette, and its tap, a Show on map landing on it
 ## and its Go all open that city's silhouette card (MAP-3-FREE) — pass or none: the fog first (a pass without a visit
 ## showed the place's card, its real name and Go). A visited city's without a pass opens its travel card (the server
-## would refuse with pass_required anyway). The pin keeps selected while the card is up and lets go when it closes
-## (q(212) ⑥). True when it opened one.
+## would refuse with pass_required anyway). Those cards are the city's, not the pin's: the pin is not kept selected
+## while one is up — a tap gives it the press alone (CityMapView.select), as a city bubble opens the same card with no
+## pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
 func _travel_first(entry: Dictionary) -> bool:
 	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
 	var cluster := cluster_of_entry(entry)
 	if P0Travel.fog(_view(), cluster) != "unexplored" and P0Travel.covers(_view(), cluster): return false
+	if city_map: city_map.clear_selection()
 	open_city_card(cluster)   # unexplored: the silhouette card first (MAP-3-FREE); visited: its travel card
-	_let_go_on_close(str(entry.get("id", "")))
 	return true
-
-## q(212) ⑥: the pin a card was opened from lets go when the card closes — ×, Keep browsing, a tap outside, Back —
-## and stays selected while Travel details › turns the silhouette card into the travel card (that one's close lets go).
-func _let_go_on_close(id: String) -> void:
-	if rt == null or rt.ui._modal == null or id == "" or not rt.ui.modal_kind in ["city_card", "travel_card"]: return
-	(rt.ui._modal as Node).tree_exiting.connect(func():
-		_let_go_after.call_deferred(id), CONNECT_ONE_SHOT)
-
-func _let_go_after(id: String) -> void:
-	if rt == null or city_map == null or str(city_map.selected.get("id", "")) != id: return
-	if rt.ui.modal_kind in ["city_card", "travel_card"]:   # Travel details ›: the next card holds it, and lets go after
-		_let_go_on_close(id)
-		return
-	city_map.clear_selection()
 
 ## q(212) ⑤ (MAP-2 2107:32861): a POI is drawn only in a city explored — within one of the fog's holes, the city's
 ## radius × 1.15 round its centre as fog_holes() opens it; none in the fog. Asked per POI each frame: the explored
