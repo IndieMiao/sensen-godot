@@ -1,0 +1,1080 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": "SGODOT-308_stark-minehut.png + SGODOT-308_huowu-annot.png; checklist v1.1 authoritative",
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.088,
+            0
+          ],
+          "size": [
+            6.8,
+            0.34,
+            6.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_wall",
+      "file": "left_wall.glb",
+      "position": [
+        -3.29,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.65,
+            0
+          ],
+          "size": [
+            6.2,
+            3.3,
+            0.16
+          ]
+        },
+        {
+          "name": "timber_post_1",
+          "at": [
+            -1.75,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
+        },
+        {
+          "name": "timber_post_2",
+          "at": [
+            1.82,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.09
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.65,
+            -0.04
+          ],
+          "size": [
+            6.6,
+            3.3,
+            0.16
+          ]
+        },
+        {
+          "name": "timber_post_1",
+          "at": [
+            -2.04,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
+        },
+        {
+          "name": "timber_post_2",
+          "at": [
+            1.0,
+            1.66,
+            0.14
+          ],
+          "size": [
+            0.26,
+            3.24,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mine_entrance",
+      "file": "mine_entrance.glb",
+      "position": [
+        -0.3,
+        0.082,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.18,
+            0.03
+          ],
+          "size": [
+            2.72,
+            2.36,
+            0.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tunnel_lamp_glow",
+      "file": "tunnel_lamp_glow.glb",
+      "position": [
+        -0.3,
+        0.082,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mine_lantern_-1",
+      "file": "mine_lantern_-1.glb",
+      "position": [
+        -1.5,
+        2.0,
+        -1.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mine_lantern_glow_-1",
+      "file": "mine_lantern_glow_-1.glb",
+      "position": [
+        -1.5,
+        2.0,
+        -1.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mine_lantern_hanger_-1",
+      "file": "mine_lantern_hanger_-1.glb",
+      "position": [
+        -1.5,
+        2.0,
+        -1.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mine_lantern_1",
+      "file": "mine_lantern_1.glb",
+      "position": [
+        0.8999999999999999,
+        2.0,
+        -1.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mine_lantern_glow_1",
+      "file": "mine_lantern_glow_1.glb",
+      "position": [
+        0.8999999999999999,
+        2.0,
+        -1.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mine_lantern_hanger_1",
+      "file": "mine_lantern_hanger_1.glb",
+      "position": [
+        0.8999999999999999,
+        2.0,
+        -1.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hearth_stones",
+      "file": "hearth_stones.glb",
+      "position": [
+        -2.28,
+        0.083,
+        -0.62
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "stove_stone_base",
+      "file": "stove_stone_base.glb",
+      "position": [
+        -2.78,
+        0.13812,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.105,
+            0
+          ],
+          "size": [
+            0.98,
+            0.21,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "grilling_stove",
+      "file": "grilling_stove.glb",
+      "position": [
+        -2.78,
+        0.34812,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.59,
+            0
+          ],
+          "size": [
+            0.87,
+            1.18,
+            0.59
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stove_embers",
+      "file": "stove_embers.glb",
+      "position": [
+        -2.78,
+        0.34812,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "firewood",
+      "file": "firewood.glb",
+      "position": [
+        -2.53,
+        0.082,
+        -1.85
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.265,
+            0
+          ],
+          "size": [
+            0.64,
+            0.53,
+            0.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "square_stool",
+      "file": "square_stool.glb",
+      "position": [
+        -2.17,
+        0.139,
+        -0.05
+      ],
+      "yaw_degrees": 15,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.24,
+            0
+          ],
+          "size": [
+            0.42,
+            0.48,
+            0.42
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sorting_bench",
+      "file": "sorting_bench.glb",
+      "position": [
+        2.0,
+        0.082,
+        -2.44
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.4900999963283539,
+            0
+          ],
+          "size": [
+            1.67,
+            0.9801999926567078,
+            0.62
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sorting_tray",
+      "file": "sorting_tray.glb",
+      "position": [
+        2.0,
+        1.0621999926567078,
+        -2.44
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "quartz_and_tools",
+      "file": "quartz_and_tools.glb",
+      "position": [
+        2.0,
+        1.0621999926567078,
+        -2.44
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "round_stool",
+      "file": "round_stool.glb",
+      "position": [
+        2.36,
+        0.0878,
+        -1.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3305,
+            0
+          ],
+          "size": [
+            0.56,
+            0.661,
+            0.56
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rock_crate",
+      "file": "rock_crate.glb",
+      "position": [
+        -2.29,
+        0.082,
+        1.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "salt_crate",
+      "file": "salt_crate.glb",
+      "position": [
+        -2.64,
+        0.082,
+        -2.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.26,
+            0
+          ],
+          "size": [
+            0.64,
+            0.52,
+            0.49
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rock_barrel",
+      "file": "rock_barrel.glb",
+      "position": [
+        2.7,
+        0.082,
+        0.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.3312,
+            0.0
+          ],
+          "size": [
+            0.6486,
+            0.6624,
+            0.6486
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wood_stump",
+      "file": "wood_stump.glb",
+      "position": [
+        2.66,
+        0.082,
+        1.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.231,
+            0.0
+          ],
+          "size": [
+            0.5045999999999999,
+            0.462,
+            0.5045999999999999
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_cabinet",
+      "file": "low_cabinet.glb",
+      "position": [
+        2.64,
+        0.082,
+        -0.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.36,
+            0
+          ],
+          "size": [
+            0.62,
+            0.72,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cabinet_lantern",
+      "file": "cabinet_lantern.glb",
+      "position": [
+        2.64,
+        1.05201,
+        -0.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cabinet_lantern_glow",
+      "file": "cabinet_lantern_glow.glb",
+      "position": [
+        2.64,
+        1.05201,
+        -0.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_shelf",
+      "file": "left_shelf.glb",
+      "position": [
+        -2.97,
+        1.96,
+        0.78
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "shelf_lantern",
+      "file": "shelf_lantern.glb",
+      "position": [
+        -2.9,
+        2.22501,
+        0.51
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "shelf_lantern_glow",
+      "file": "shelf_lantern_glow.glb",
+      "position": [
+        -2.9,
+        2.22501,
+        0.51
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_pan",
+      "file": "hanging_pan.glb",
+      "position": [
+        -3.04,
+        1.26,
+        0.88
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "garlic_and_herbs",
+      "file": "garlic_and_herbs.glb",
+      "position": [
+        -3.03,
+        2.34,
+        -1.45
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "mine_plan",
+      "file": "mine_plan.glb",
+      "position": [
+        1.45,
+        2.09,
+        -2.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "wall_pickaxe",
+      "file": "wall_pickaxe.glb",
+      "position": [
+        2.12,
+        1.8,
+        -2.87
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "wall_short_axe",
+      "file": "wall_short_axe.glb",
+      "position": [
+        2.66,
+        1.94,
+        -2.87
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "coiled_rope",
+      "file": "coiled_rope.glb",
+      "position": [
+        2.79,
+        1.28,
+        -2.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "ivo_wall_helmet",
+      "file": "ivo_wall_helmet.glb",
+      "position": [
+        2.65,
+        2.65,
+        -2.57
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tied_sack",
+      "file": "tied_sack.glb",
+      "position": [
+        -1.94,
+        0.082,
+        -1.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            0.35,
+            0.58,
+            0.35
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stone_sack",
+      "file": "stone_sack.glb",
+      "position": [
+        1.97,
+        0.082,
+        0.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            0.48,
+            0.58,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "white_hide_rug",
+      "file": "white_hide_rug.glb",
+      "position": [
+        0,
+        0.084,
+        1.22
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entry_plant_-1",
+      "file": "entry_plant_-1.glb",
+      "position": [
+        -1.14,
+        0.082,
+        2.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            0.5,
+            0.58,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_plant_1",
+      "file": "entry_plant_1.glb",
+      "position": [
+        1.14,
+        0.082,
+        2.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            0.5,
+            0.58,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "exit_steps",
+      "file": "exit_steps.glb",
+      "position": [
+        0,
+        0,
+        3.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.06,
+            0
+          ],
+          "size": [
+            1.45,
+            0.28,
+            0.65
+          ]
+        }
+      ]
+    },
+    {
+      "name": "exit_pickaxe_sign",
+      "file": "exit_pickaxe_sign.glb",
+      "position": [
+        1.16,
+        0.082,
+        3.02
+      ],
+      "yaw_degrees": -5,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.555,
+            0
+          ],
+          "size": [
+            0.76,
+            1.11,
+            0.18
+          ]
+        }
+      ]
+    }
+  ],
+  "instances": [],
+  "camera": {
+    "position": [
+      7.757177352905273,
+      11.479975700378418,
+      7.757177352905273
+    ],
+    "target": [
+      0.0,
+      1.25,
+      0.0
+    ],
+    "size": 12.4,
+    "pitch_degrees": 43,
+    "yaw_degrees": 45
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "background": "D8CBB8",
+    "ambient_color": "E8D3B5",
+    "ambient": 0.3,
+    "sun_color": "FFE2B0",
+    "sun": 0.4,
+    "sun_position": [
+      -2,
+      7,
+      5
+    ]
+  },
+  "revision": "SGODOT-308 v1.1",
+  "floor_y": 0.082,
+  "footprint": [
+    6.8,
+    6.4
+  ],
+  "local_lights": [
+    {
+      "name": "mine_left",
+      "position": [
+        -1.5,
+        2.02,
+        -1.8
+      ],
+      "color": "FFBC6F",
+      "energy": 2.8,
+      "range": 2.7
+    },
+    {
+      "name": "mine_right",
+      "position": [
+        0.9,
+        2.02,
+        -1.8
+      ],
+      "color": "FFBC6F",
+      "energy": 2.8,
+      "range": 2.7
+    },
+    {
+      "name": "shelf",
+      "position": [
+        -2.65,
+        2.22,
+        0.51
+      ],
+      "color": "FFBC6F",
+      "energy": 2.4,
+      "range": 2.7
+    },
+    {
+      "name": "cabinet",
+      "position": [
+        2.64,
+        1.05,
+        -0.39
+      ],
+      "color": "FFBC6F",
+      "energy": 1.8,
+      "range": 2.1
+    },
+    {
+      "name": "stove",
+      "position": [
+        -2.22,
+        1.14,
+        -0.62
+      ],
+      "color": "FFBC6F",
+      "energy": 2.5,
+      "range": 2.4
+    },
+    {
+      "name": "tunnel",
+      "position": [
+        -0.864,
+        0.86,
+        -3.64
+      ],
+      "color": "FFBC6F",
+      "energy": 0.9,
+      "range": 2.8
+    }
+  ],
+  "material_overrides": {
+    "tunnel_lamp_glow": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.2
+    },
+    "mine_lantern_glow_-1": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.7
+    },
+    "mine_lantern_glow_1": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.7
+    },
+    "stove_embers": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.7
+    },
+    "cabinet_lantern_glow": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.7
+    },
+    "shelf_lantern_glow": {
+      "emission": "FFD095",
+      "emission_use_atlas": true,
+      "emission_energy": 0.7
+    }
+  },
+  "suggested_anchors": {
+    "npc_ivo": {
+      "position": [
+        1.4,
+        0.082,
+        -0.84
+      ],
+      "yaw_degrees": 160
+    },
+    "stand_ivo": {
+      "position": [
+        0.8,
+        0.082,
+        0.05
+      ],
+      "yaw_degrees": 0
+    },
+    "spawn": {
+      "position": [
+        0,
+        0.082,
+        2.55
+      ],
+      "yaw_degrees": 0
+    },
+    "exit": {
+      "position": [
+        0,
+        0.082,
+        3.08
+      ],
+      "yaw_degrees": 0
+    },
+    "badge_exit": {
+      "position": [
+        0,
+        0.7,
+        3.08
+      ],
+      "yaw_degrees": 0
+    }
+  },
+  "interactions": [
+    "npc_ivo",
+    "exit"
+  ],
+  "mine_enterable": false,
+  "tunnel_depth_behind_wall": 2.5,
+  "tunnel_floor_descent": 1.0,
+  "tunnel_far_section_scale": 0.4,
+  "rug_size": [
+    2.6,
+    2.0
+  ],
+  "nameplate_clearance": {
+    "center": [
+      1.4,
+      2.18,
+      -0.84
+    ],
+    "size": [
+      1.0,
+      0.55,
+      0.65
+    ]
+  },
+  "gameplay_camera": {
+    "pitch_degrees": 43,
+    "yaw_degrees": 45,
+    "size": 6.72,
+    "target": [
+      0,
+      1.15,
+      0
+    ],
+    "native_width": 360
+  },
+  "spawn": [
+    0,
+    0.082,
+    2.55
+  ],
+  "boundaries": [
+    {
+      "name": "front_left",
+      "at": [
+        -1.99,
+        1,
+        3.22
+      ],
+      "size": [
+        2.48,
+        2,
+        0.08
+      ]
+    },
+    {
+      "name": "front_right",
+      "at": [
+        1.99,
+        1,
+        3.22
+      ],
+      "size": [
+        2.48,
+        2,
+        0.08
+      ]
+    },
+    {
+      "name": "cut_right",
+      "at": [
+        3.32,
+        1,
+        0
+      ],
+      "size": [
+        0.08,
+        2,
+        6.4
+      ]
+    }
+  ],
+  "source_dependencies": {
+    "art_base": "154ce6421448e26e42ee225ba7018638ae756394",
+    "avatar_commit": "ef70f8052cf547407eaa09fd881839bf2df929e3"
+  }
+}

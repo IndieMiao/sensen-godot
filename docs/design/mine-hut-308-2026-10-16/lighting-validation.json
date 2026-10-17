@@ -1,0 +1,51 @@
+{
+  "method": "Identical full-room camera, sun, ambient and emission materials; only layout.local_lights toggled. Declared wall/floor patches must gain >4 RGB/255 mean and more red than blue. This proves local warm pools, not art acceptance or phone performance.",
+  "checks": [
+    {
+      "surface": "left_wall",
+      "roi_xyxy": [
+        243,
+        372,
+        282,
+        407
+      ],
+      "mean_rgb_gain_255": [
+        67.81391941391941,
+        41.6981684981685,
+        20.522344322344324
+      ],
+      "passed": true
+    },
+    {
+      "surface": "stove_floor",
+      "roi_xyxy": [
+        477,
+        449,
+        510,
+        478
+      ],
+      "mean_rgb_gain_255": [
+        148.04702194357367,
+        130.1703239289446,
+        93.93207941483803
+      ],
+      "passed": true
+    },
+    {
+      "surface": "right_floor",
+      "roi_xyxy": [
+        850,
+        697,
+        878,
+        722
+      ],
+      "mean_rgb_gain_255": [
+        53.87,
+        58.26,
+        33.09285714285714
+      ],
+      "passed": true
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,187 @@
+{
+  "source_blend_sha256": "41a9821e371d70b9c4332dc62790bfa5110214f7d7aa25fdeebe695097928562",
+  "reused": [
+    {
+      "asset": "mine_lantern_-1",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_forge_lantern",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "mine_lantern_glow_-1",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_lantern_glow",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "mine_lantern_1",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_forge_lantern",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "mine_lantern_glow_1",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_lantern_glow",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "sorting_bench",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_back_tool_bench",
+      "scale_xyz": [
+        1.16,
+        1,
+        1.07
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "round_stool",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_forge_stool",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "rock_crate",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_metal_ingot_crate",
+      "scale_xyz": [
+        0.7,
+        0.9,
+        0.85
+      ],
+      "removed_parts": [
+        "Stacked iron ingot"
+      ]
+    },
+    {
+      "asset": "salt_crate",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_left_floor_crate",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": [
+        "Crated spare steel"
+      ]
+    },
+    {
+      "asset": "rock_barrel",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_quench_barrel",
+      "scale_xyz": [
+        0.69,
+        0.72,
+        0.69
+      ],
+      "removed_parts": [
+        "Quenching water"
+      ]
+    },
+    {
+      "asset": "wood_stump",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_stump",
+      "scale_xyz": [
+        0.58,
+        0.55,
+        0.58
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "cabinet_lantern",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_forge_lantern",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "cabinet_lantern_glow",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_lantern_glow",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "left_shelf",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_right_wall_shelf",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": [
+        "Glazed ceramic mug",
+        "Tea surface",
+        "Mug handle",
+        "Small painted leaf"
+      ]
+    },
+    {
+      "asset": "shelf_lantern",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_forge_lantern",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "shelf_lantern_glow",
+      "source_kit": "blacksmith_shop",
+      "source_collection": "KIT_lantern_glow",
+      "scale_xyz": [
+        1,
+        1,
+        1
+      ],
+      "removed_parts": []
+    },
+    {
+      "asset": "ivo_wall_helmet",
+      "commit": "ef70f8052cf547407eaa09fd881839bf2df929e3",
+      "source": "assets/avatar/parts/hairhat_npc_ivo_scene.tscn",
+      "geometry": "exact mesh and UV, rigid transform only; texture baked into single room atlas"
+    }
+  ]
+}
