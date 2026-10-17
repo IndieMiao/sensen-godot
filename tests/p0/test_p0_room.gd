@@ -89,15 +89,15 @@ func test_validation_reports_each_naming_rule() -> void:
 
 func test_the_placeholder_anchor_files_pass_validation() -> void:
 	# Each file against its own room kit: an outpost's art (p0_outposts.json), a generated city's room (world_gen.json
-	# world.room, SGODOT-280: the S-tier trading post's client_anchors, cabin.anchors.json, are on the tea house's kit),
-	# the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
+	# world.room, SGODOT-280: the S-tier trading post's client_anchors, cabin.anchors.json, are on the tea house's kit; a
+	# room's client_art is the kit this client opens, SGODOT-214), the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
 	var kit_of := {}
 	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
 	var rooms: Dictionary = P0Logic.content().get("world", {}).get("room", {})
 	for kind in rooms:
 		if not rooms[kind] is Dictionary: continue
 		for key in ["anchors", "client_anchors"]:
-			if rooms[kind].has(key): kit_of[str(rooms[kind][key])] = str(rooms[kind].get("art", "basic_room"))
+			if rooms[kind].has(key): kit_of[str(rooms[kind][key])] = str(rooms[kind].get("client_art", rooms[kind].get("art", "basic_room")))
 	for kind in FARMHOUSE.ROOMS: kit_of[str(FARMHOUSE.ROOMS[kind].anchors)] = str(FARMHOUSE.ROOMS[kind].art)
 	for path in _anchor_files("res://assets/p0"):
 		var layout := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % kit_of.get(path, "basic_room"))

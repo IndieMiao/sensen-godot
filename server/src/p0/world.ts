@@ -70,7 +70,7 @@ export interface WorldContent {
   residents?: ResidentRules;
 }
 
-export interface RoomDef { art: string; anchors: string; category: string; client_anchors?: string;
+export interface RoomDef { art: string; anchors: string; category: string; client_anchors?: string; client_art?: string;
   /** A room no hand-written outpost stands in for (the Mine Hut): its own walls and seats for the online room. */
   bounds?: [number, number, number, number]; seats?: string[] }
 /** q(204) ①②: which cities have a Mine Hut (a city trait, a lowest tier) and its default ring. */

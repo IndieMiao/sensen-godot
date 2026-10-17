@@ -13,10 +13,10 @@
       "keeper": {"role": "Tackle Keeper", "name": "Finn"},
       "residents": ["res_old_kai"],
       "nearest": {"name": "Fern Pond", "site": "pond"},
-      "art": "farm_tools_store",
-      "backdrop": {"top": "EFF7F4", "bottom": "FDFCF4", "blend": [0.5, 0.95]},
+      "art": "tackle_shop",
+      "backdrop": {"top": "FEF1E5", "bottom": "FDEFE4", "blend": [0.5, 0.95]},
       "anchors": "res://assets/p0/outposts/tackle.anchors.json",
-      "bounds": [-3.35, 3.35, -3.05, 3.05],
+      "bounds": [-3.4, 3.4, -3.2, 3.4],
       "seats": []
     },
     {

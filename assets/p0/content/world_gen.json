@@ -1031,7 +1031,7 @@
    }
   },
   "room": {
-   "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's kit. `anchors` is what the server names to every client; `client_anchors` is the file this client reads instead (the trading post's cabin.anchors.json: Pip and its s_order resident in the tea house's two resident spots), kept apart because 0.2.5 and older have no such file — fold it into `anchors` once they are gone.",
+   "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's kit. `anchors` is what the server names to every client; `client_anchors` is the file this client reads instead (the trading post's cabin.anchors.json: Pip and its s_order resident in the tea house's two resident spots), kept apart because 0.2.5 and older have no such file — fold it into `anchors` once they are gone. `client_art` likewise is the kit this client opens instead of `art` (the tackle shop's own kit, SGODOT-214, which 0.2.9 and older do not have: they read tackle.anchors.json as the Farm Tools Store's) — fold it into `art` once they are gone.",
    "tea": {
     "art": "coffee_shop",
     "anchors": "res://assets/p0/outposts/tea.anchors.json",
@@ -1039,6 +1039,7 @@
    },
    "tackle": {
     "art": "farm_tools_store",
+    "client_art": "tackle_shop",
     "anchors": "res://assets/p0/outposts/tackle.anchors.json",
     "category": "Tackle shop · Rods and bait"
    },

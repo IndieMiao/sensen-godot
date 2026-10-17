@@ -109,9 +109,15 @@ static func pond_entry(cluster: String, p: Dictionary) -> Dictionary:
 ## A generated outpost shaped like a p0_outposts.json entry: walls, seats, anchors and backdrop from the hand-written
 ## room its art stands in for; its own name, role, keeper, point and capacity.
 static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
+	var kind := "cabin" if bool(o.get("cabin", false)) else str(o.get("role", ""))
+	var kit: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get(kind, {})
+	# This client's own kit for the room kind where it differs from the one the server names (world.room[kind]
+	# .client_art): the tackle shop's own kit (SGODOT-214), which 0.2.9 and older do not have — the server keeps naming
+	# the Farm Tools Store for them.
+	var art := str(kit.get("client_art", o.get("art", "")))
 	var room := {}
 	for h in P0Outposts.all():
-		if str(h.get("art", "")) == str(o.get("art", "")): room = h
+		if str(h.get("art", "")) == art: room = h
 	if room.is_empty() or str(o.get("id", "")) == "": return {}
 	var entry: Dictionary = room.duplicate(true)
 	for k in ["id", "role", "name", "category", "lat", "lng", "capacity", "keeper", "residents", "nearest"]:
@@ -121,8 +127,7 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 	# This client's own anchors for the room kind where they differ from the ones the server names (world.room[kind]
 	# .client_anchors): the S-tier trading post's cabin.anchors.json, which 0.2.5 and older do not have — the server
 	# keeps naming the tea house's for them, so it can go out before or after this client (周瑜 on #404).
-	var kind := "cabin" if bool(o.get("cabin", false)) else str(o.get("role", ""))
-	var own := str(P0Logic.content().get("world", {}).get("room", {}).get(kind, {}).get("client_anchors", ""))
+	var own := str(kit.get("client_anchors", ""))
 	if own != "": entry["anchors"] = own
 	if entry.get("keeper") is Dictionary and str(entry.keeper.get("look", "")) != "":
 		entry["keeper"] = (entry.keeper as Dictionary).duplicate()

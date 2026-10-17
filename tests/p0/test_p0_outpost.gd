@@ -587,7 +587,7 @@ func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
 ## down in the free band (用户 2026-10-09, 不知火舞 on 226; superseding 227's whole-art opening); the door's prompt is
 ## clear of the player who comes in.
 func test_every_outpost_opens_on_its_kit() -> void:
-	var kits := {"sh_tackle_1": "farm_tools_store", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
+	var kits := {"sh_tackle_1": "tackle_shop", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
 	for id in kits:
 		var o := P0Outposts.find(id)
 		var r := _room(id, true)
@@ -813,6 +813,28 @@ func test_the_cabin_shows_pip_and_its_second_resident() -> void:
 		"art": str(room.art), "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": ""}, "residents": []}]}})
 	assert_str(str(P0Outposts.find("gn-testtea~tea0").anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")
+
+## SGODOT-214: a generated tackle shop still named on the Farm Tools Store (what 0.2.9 and older can open) opens on the
+## tackle shop's own kit in this client (world.room.tackle.client_art), with Mission Tackle Shop's walls and backdrop, and
+## Old Kai and Rafa in their spots there.
+func test_a_generated_tackle_shop_opens_on_its_own_kit() -> void:
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("tackle", {})
+	assert_str(str(room.art)).is_equal("farm_tools_store")   # what every client can open
+	assert_str(str(room.client_art)).is_equal("tackle_shop")
+	var id := "gn-testtackle~tackle0"
+	P0CityPlaces.accept("gn-testtackle", {"detail": {"outposts": [{"id": id, "role": "tackle", "name": "Test Tackle Shop",
+		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 1.0, "lng": 1.0,
+		"capacity": 12, "keeper": {"role": "Tackle Keeper", "name": "Bea", "look": ""}, "residents": ["res_old_kai", "res_rafa"],
+		"nearest": {"name": "Test Pond", "site": "pond"}}]}})
+	var o := P0Outposts.find(id)
+	assert_str(str(o.art)).is_equal("tackle_shop")
+	assert_dict(o.backdrop).is_equal(P0Outposts.find("sh_tackle_1").backdrop)
+	var r := _room(id)
+	assert_str(r.layout_path).is_equal("res://assets/rooms/tackle_shop/layout.json")
+	assert_array(r.npcs.keys()).contains(["npc_kai", "npc_rafa"])
+	_tap(r, "npc_rafa")
+	_walk_until_idle(r, 10.0)
+	assert_array(r.used).is_equal(["npc_rafa"])
 
 ## Every resident world_gen places (world.residents: fixed, rank once its room is built, the S-tier s_order) wears a
 ## look in outpost_npcs.json and has its spot in every room kind it can be placed in — else the room shows nobody
