@@ -1,5 +1,5 @@
 {
-  "_note": "Huangpu Travel Post on the Post Office kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/post_office/layout.json, floor top y 0.08. Sigrid works the postal counter from the staff side (seen over it from the room camera); tapping the counter is tapping her. Pip waits by the red post box. Spawn and exit at the blue door in the left wall; its prompt (badge_exit) sits over the door frame, clear of the player who comes in. The Stamp Desk is the packing table (q(165): it opens the Passport). The Fare Board (q(165), Trip fares) is its own prop since SGODOT-275 (刘备's fare_board.glb, #396): on the left wall under the POST OFFICE sign, pivot at its back centre (-3.208, 1.65, -1.65) yaw 90 (2 mm off the wall), on the kit's shared atlas; its tap and name strip at the model's board_center (0, 0, 0.05), (-3.158, 1.65, -1.65) here. No coffee pot.",
+  "_note": "Huangpu Travel Post on the Post Office kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/post_office/layout.json, floor top y 0.08. Sigrid works the postal counter from the staff side (seen over it from the room camera); tapping the counter is tapping her. Pip waits by the red post box. Spawn and exit at the blue door in the left wall; its prompt (badge_exit) sits over the door frame, clear of the player who comes in. The Stamp Desk is the packing table (q(165): it opens the Passport). The Fare Board (q(165), Trip fares) is its own prop since SGODOT-275 (刘备's fare_board.glb, #396): on the left wall under the POST OFFICE sign, pivot at its back centre (-3.208, 1.65, -1.65) yaw 90 (2 mm off the wall), on the kit's shared atlas; its tap and name strip at the model's board_center (0, 0, 0.05), (-3.158, 1.65, -1.65) here. No coffee pot. Sam stands at the counter's open end to be talked to (stand_sam 1.85, −1.35): the old spot (1.2, −0.8) was inside the counter's collision box, so tapping Sam left the player short of him (上官婉儿 on #462, walked to on both kits).",
   "anchors": [
     {"name": "use_counter", "position": [-0.4, 1.39, -0.55], "module": "postal_counter"},
     {"name": "stand_counter", "position": [-0.4, 0.08, 0.35], "yaw_degrees": 0},
@@ -12,7 +12,7 @@
     {"name": "stand_stamp_desk", "position": [-0.68, 0.08, 1.29], "yaw_degrees": 180},
     {"name": "use_fee_board", "position": [-3.158, 1.65, -1.65], "module": "fare_board"},
     {"name": "npc_sam", "position": [1.2, 0.08, -1.5], "yaw_degrees": 180},
-    {"name": "stand_sam", "position": [1.2, 0.08, -0.8], "yaw_degrees": 0},
+    {"name": "stand_sam", "position": [1.85, 0.08, -1.35], "yaw_degrees": 75},
     {"name": "spawn", "position": [-2.6, 0.08, 1.29], "yaw_degrees": -90},
     {"name": "exit", "position": [-3.3, 0.08, 1.29]},
     {"name": "badge_exit", "position": [-3.2, 2.45, 1.29]}

@@ -608,7 +608,10 @@ func test_every_outpost_opens_on_its_kit() -> void:
 
 ## The residents and the market's facilities stand where the player can walk up to them, and every door leads out.
 func test_residents_facilities_and_doors_are_walked_to() -> void:
-	for job in [["sh_tackle_1", "npc_kai"], ["sh_post_1", "npc_pip"], ["sh_market_1", "use_market_board"], ["sh_market_1", "use_specialty_shelf"]]:
+	# Sam's stand_ was inside the post counter's collision box until #462's walk-through (上官婉儿); the tackle shop's own
+	# kit (SGODOT-214) has its own Bite Board.
+	for job in [["sh_tackle_1", "npc_kai"], ["sh_tackle_1", "use_fish_board"], ["sh_post_1", "npc_pip"], ["sh_post_1", "npc_sam"],
+			["sh_market_1", "use_market_board"], ["sh_market_1", "use_specialty_shelf"]]:
 		var r := _room(str(job[0]))
 		_tap(r, str(job[1]))
 		_walk_until_idle(r, 10.0)
