@@ -8,16 +8,22 @@ set -euo pipefail
 RESTORE_DSN="${RESTORE_DSN:?需要 RESTORE_DSN}"
 LIVE_DSN="${LIVE_DSN:?需要 LIVE_DSN（只读比对用）}"
 AGE_KEY="${AGE_KEY:-$HOME/.config/sensen/farm-backup.key}"
+# 与 backup.sh 同一套 OSS 设置（虚拟主机式地址、只在必需时校验），不依赖演练机自己的 aws 配置。
+# 读权限的 key 照常从环境变量或 aws 凭据文件来。
+# 解密出的 dump 是玩家数据：任何一步失败退出时，连同解密目录一起删掉。
+cfg=$(mktemp); tmp=""; trap 'rm -f "$cfg"; [ -n "$tmp" ] && rm -rf "$tmp"' EXIT
+printf '[default]\nregion = oss-cn-hongkong\nrequest_checksum_calculation = when_required\nresponse_checksum_validation = when_required\ns3 =\n  addressing_style = virtual\n' > "$cfg"
+export AWS_CONFIG_FILE="$cfg" AWS_DEFAULT_REGION=oss-cn-hongkong
 
 host=$(python3 -c "import urllib.parse,sys;print(urllib.parse.urlparse(sys.argv[1]).hostname)" "$RESTORE_DSN")
 db=$(python3 -c "import urllib.parse,sys;print(urllib.parse.urlparse(sys.argv[1]).path.lstrip('/'))" "$RESTORE_DSN")
 [[ "$host" =~ ^192\.168\.124\.[0-9]+$ ]] || { echo "拒绝：恢复目标必须在 devserver 网段，收到 $host"; exit 1; }
 [[ "$db" == "sensen_farm_restore" ]] || { echo "拒绝：库名必须是 sensen_farm_restore，收到 $db"; exit 1; }
 
-latest=$(aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 ls "s3://${OSS_BUCKET:?}/" | sort | tail -1 | awk '{print $4}')
+latest=$(aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 ls "s3://${OSS_BUCKET:?}/farm/" | sort | tail -1 | awk '{print $4}')
 [ -n "$latest" ] || { echo "OSS 里没有备份"; exit 1; }
 tmp=$(mktemp -d)
-aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 cp "s3://${OSS_BUCKET}/${latest}" "$tmp/b.age"
+aws --endpoint-url https://oss-cn-hongkong.aliyuncs.com s3 cp "s3://${OSS_BUCKET}/farm/${latest}" "$tmp/b.age"
 age -d -i "$AGE_KEY" -o "$tmp/b.dump" "$tmp/b.age"
 
 psql "$RESTORE_DSN" -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' >/dev/null
