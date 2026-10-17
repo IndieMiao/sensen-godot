@@ -88,9 +88,19 @@ func test_validation_reports_each_naming_rule() -> void:
 	assert_int(errors.size()).is_equal(7)
 
 func test_the_placeholder_anchor_files_pass_validation() -> void:
-	# Each file against its own room kit: an outpost's art (p0_outposts.json), a generated city's room (world_gen.json
-	# world.room, SGODOT-280: the S-tier trading post's client_anchors, cabin.anchors.json, are on the tea house's kit),
-	# the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
+	var kit_of := _kit_of()
+	for path in _anchor_files("res://assets/p0"):
+		var layout := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % kit_of.get(path, "basic_room"))
+		var modules: Array = layout.get("assets", []).map(func(a): return str(a.name)) + layout.get("instances", []).map(func(a): return str(a.name))
+		var external := P0RoomAnchors.read_json(path)
+		var known: Array = modules + P0RoomAnchors.props(external).map(func(p): return str(p.name))
+		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, external), known)
+		assert_array(errors).override_failure_message(path + "\n" + "\n".join(errors)).is_empty()
+
+## Each anchors file's room kit: an outpost's art (p0_outposts.json), a generated city's room (world_gen.json
+## world.room, SGODOT-280: the S-tier trading post's client_anchors, cabin.anchors.json, are on the tea house's kit),
+## the farmhouse's rooms (282), else the Basic Room (SGODOT-227).
+func _kit_of() -> Dictionary:
 	var kit_of := {}
 	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
 	var rooms: Dictionary = P0Logic.content().get("world", {}).get("room", {})
@@ -99,13 +109,70 @@ func test_the_placeholder_anchor_files_pass_validation() -> void:
 		for key in ["anchors", "client_anchors"]:
 			if rooms[kind].has(key): kit_of[str(rooms[kind][key])] = str(rooms[kind].get("art", "basic_room"))
 	for kind in FARMHOUSE.ROOMS: kit_of[str(FARMHOUSE.ROOMS[kind].anchors)] = str(FARMHOUSE.ROOMS[kind].art)
+	return kit_of
+
+## A use_ anchor tied to a module sits on that module (周瑜 on #462: the Travel Post's packing table moved left for 215
+## and its stamp desk tap stayed behind, off the table's front edge, 1.2 m from the stamp set; the checks above only
+## asked for the anchor). Across, inside the module's mesh footprint (USE_ON_MODULE_XZ for rounding); up, from its
+## bottom to no more than USE_ON_MODULE_TOP over its top: a counter, desk or table is tapped on its top, a wall board,
+## rack or range at its face. Every anchors file on its own kit, every module shown.
+const USE_ON_MODULE_XZ := 0.01
+const USE_ON_MODULE_TOP := 0.1
+func test_use_anchors_sit_on_their_modules() -> void:
+	var kit_of := _kit_of()
+	var checked := 0
 	for path in _anchor_files("res://assets/p0"):
-		var layout := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % kit_of.get(path, "basic_room"))
-		var modules: Array = layout.get("assets", []).map(func(a): return str(a.name)) + layout.get("instances", []).map(func(a): return str(a.name))
-		var external := P0RoomAnchors.read_json(path)
-		var known: Array = modules + P0RoomAnchors.props(external).map(func(p): return str(p.name))
-		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, external), known)
-		assert_array(errors).override_failure_message(path + "\n" + "\n".join(errors)).is_empty()
+		var r := Sample.new()
+		r.setup({})
+		r.level = 99
+		r.use_art(str(kit_of.get(path, "basic_room")))
+		r.anchors_path = path
+		add_child(r)
+		auto_free(r)
+		for n in r._data:
+			var mod := str(r._data[n].get("module", ""))
+			if P0RoomAnchors.prefix_of(str(n)) != "use" or mod == "": continue
+			var what := "%s %s on %s" % [path.get_file(), n, mod]
+			var box := _module_box(r, mod)
+			assert_bool(box.has_volume()).override_failure_message(what + ": no mesh").is_true()
+			var p := (r._anchors[n] as Marker3D).global_position
+			var out := Vector2(maxf(maxf(box.position.x - p.x, p.x - box.end.x), 0.0), maxf(maxf(box.position.z - p.z, p.z - box.end.z), 0.0))
+			assert_float(out.length()).override_failure_message("%s: %.3f m off its footprint" % [what, out.length()]).is_less_equal(USE_ON_MODULE_XZ)
+			assert_float(p.y).override_failure_message("%s: y %.3f, the module %.3f…%.3f" % [what, p.y, box.position.y, box.end.y]) \
+				.is_between(box.position.y - USE_ON_MODULE_XZ, box.end.y + USE_ON_MODULE_TOP)
+			checked += 1
+	assert_int(checked).is_greater(20)   # the outposts', the generated cabin's and the farmhouse rooms' counters
+
+## A module's meshes, in world space. A kit that merges a module into a render batch (the Fruit Shop's market sign)
+## keeps only its pivot: the module's own model is measured there instead.
+func _module_box(r: P0Room, mod: String) -> AABB:
+	var node := r.art.get_node_or_null(NodePath(mod)) as Node3D
+	if node == null: return AABB()
+	var box := _mesh_box(node)
+	if box.has_volume(): return box
+	var file := ""
+	var assets := {}
+	for a in r.layout.get("assets", []): assets[str(a.name)] = a
+	if assets.has(mod): file = str(assets[mod].get("file", ""))
+	for i in r.layout.get("instances", []):
+		if str(i.name) == mod and assets.has(str(i.get("asset", ""))): file = str(assets[str(i.asset)].get("file", ""))
+	var source := r.layout_path.get_base_dir() + "/" + file
+	if file == "" or not ResourceLoader.exists(source): return AABB()
+	var model := (load(source) as PackedScene).instantiate() as Node3D
+	node.add_child(model)
+	box = _mesh_box(model)
+	model.free()
+	return box
+
+func _mesh_box(node: Node3D) -> AABB:
+	var box := AABB()
+	var first := true
+	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
+		if mi.mesh == null: continue
+		var b := mi.global_transform * mi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return box
 
 func _anchor_files(dir: String) -> Array:
 	var out: Array = []
