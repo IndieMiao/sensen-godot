@@ -48,7 +48,10 @@ var label_above := false: set = set_label_above
 var above_gap := LABEL_GAP: set = set_above_gap
 ## A place of a city the fog still covers (MAP-2 2107:33077, 不知火舞 on #281; P1, the P0 pin is untouched): a 32 px
 ## surface disc with a 1 px border-colour edge, the 18 px type glyph in color/secondary, no name, the whole pin at 55 %.
-## Its point stays at the disc's centre and its tap area is the pin's as ever.
+## Its point stays at the disc's centre and its tap area is the pin's as ever. The disc is one pre-drawn image
+## (silhouette_disc): the style box's anti-aliased edge strips overlap, and faded to 55 % the overlaps showed twice as
+## bright — a white line down the middle, a dashed rim (SGODOT-328). One quad has no overlaps and needs no offscreen
+## layer per pin (the map's frame cost).
 var silhouette := false: set = set_silhouette
 const SILHOUETTE_DISC := 32.0
 const SILHOUETTE_ICON := 18.0
@@ -56,6 +59,7 @@ const SILHOUETTE_ALPHA := 0.55
 
 var _pin: Control
 var _disc: Panel
+var _sil_disc: TextureRect   # a silhouette's disc (made on first use)
 var _icon: TextureRect
 var _badge: UiStatusBadge
 var _count: PanelContainer
@@ -143,10 +147,43 @@ func set_silhouette(v: bool) -> void:
 	_icon.size = Vector2(side, side)
 	_icon.position = Vector2.ONE * (DISC - side) * 0.5
 	_icon.material = _ink() if v else null   # the glyph as a one-colour silhouette
+	if v and _sil_disc == null:
+		_sil_disc = TextureRect.new()
+		_sil_disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_sil_disc.texture = silhouette_disc()
+		_sil_disc.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_sil_disc.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		_pin.add_child(_sil_disc)
+		_pin.move_child(_sil_disc, _disc.get_index() + 1)
+	if _sil_disc:
+		_sil_disc.visible = v
+		_sil_disc.size = _disc.size
+		_sil_disc.position = _disc.position
+	_disc.visible = not v   # its style box stays the spec (surface, 1 px border edge); the image draws it
 	modulate.a = SILHOUETTE_ALPHA if v else 1.0   # the whole pin, its glyph and mark too (不知火舞 on #287)
 	if _badge: _badge.position = _mark_at()
 	_label_box.visible = text != "" and name_shown and not v
 	_layout()
+
+## The silhouette's disc, drawn once at SIL_DISC_SCALE × its 32 px (mipmapped, so it stays smooth on a 3× phone
+## screen): color/surface inside a STROKE_DEFAULT edge in color/border, each edge one sub-pixel soft.
+const SIL_DISC_SCALE := 4
+static var _sil_disc_tex: ImageTexture
+static func silhouette_disc() -> ImageTexture:
+	if _sil_disc_tex: return _sil_disc_tex
+	var side := int(SILHOUETTE_DISC) * SIL_DISC_SCALE
+	var r := side * 0.5
+	var edge := float(UiTokens.STROKE_DEFAULT * SIL_DISC_SCALE)
+	var img := Image.create(side, side, false, Image.FORMAT_RGBA8)
+	for y in side:
+		for x in side:
+			var d := Vector2(x + 0.5 - r, y + 0.5 - r).length()
+			var c := UiTokens.COLOR_BORDER.lerp(UiTokens.COLOR_SURFACE, clampf(r - edge - d, 0.0, 1.0))
+			c.a = clampf(r - d, 0.0, 1.0)
+			img.set_pixel(x, y, c)
+	img.generate_mipmaps()
+	_sil_disc_tex = ImageTexture.create_from_image(img)
+	return _sil_disc_tex
 
 ## A mark's badge over the disc's top-left corner: a silhouette's smaller disc moves the corner in (蒙恬 on #287).
 func _mark_at() -> Vector2:
