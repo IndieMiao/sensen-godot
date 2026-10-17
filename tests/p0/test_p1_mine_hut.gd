@@ -177,3 +177,28 @@ func test_the_opening_shot_frames_ivo_with_his_name_tag() -> void:
 	var groups: Array = r.opening_subjects()
 	assert_int(groups.size()).is_equal(1)   # Ivo; no counter in the hut
 	assert_vector(groups[0][0]).is_equal(ivo.global_position)
+
+## The server's presence carries the hut's id while someone is in it (#442): the hut's pin shows the count (q(137) ③)
+## and its card `Online now`, as an outpost's; empty again, the count goes (0 tells nothing, q(72)).
+func test_its_pin_and_card_say_who_is_in() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var v: Dictionary = rt.session.view.duplicate(true)
+	v["travel"] = {"home": "gn-5391959", "here": "gn-5391959", "passes": {}, "visits": {DENVER: 1}, "stamps": [],
+		"fallback": {"near3": [], "near10": []}, "explorer": 0}
+	rt.session.view = v
+	P0CityPlaces.accept(DENVER, CITY)
+	m._show_city_places(P0CityPlaces.city(DENVER), DENVER)
+	var body := JSON.stringify({"ok": true, "outposts": {"sh_tea_1": {"online": 0, "rooms": 0}, HUT: {"online": 2, "rooms": 1}}})
+	m._on_presence(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body.to_utf8_buffer())
+	var pin: Array = m.city_map.extra_places.filter(func(e): return str(e.id) == HUT)
+	assert_int(int(pin[0].online)).is_equal(2)
+	var entry := P0Outposts.place_entry(P0Outposts.find(HUT))
+	assert_array(m.place_card(entry).facts).contains([["Online now", "2"]])
+	body = JSON.stringify({"ok": true, "outposts": {"sh_tea_1": {"online": 0, "rooms": 0}}})   # empty: the room is let go
+	m._on_presence(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body.to_utf8_buffer())
+	pin = m.city_map.extra_places.filter(func(e): return str(e.id) == HUT)
+	assert_int(int(pin[0].online)).is_equal(0)
+	assert_array(m.place_card(entry).facts.map(func(f): return f[0])).is_equal(["Distance"])
