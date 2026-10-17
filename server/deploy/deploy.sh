@@ -7,6 +7,26 @@ here=$(dirname "$0")
 repo=$(cd "$here/../.." && pwd)
 sha=$(git -C "$repo" rev-parse --short HEAD)
 
+# .env 和 Caddyfile 以服务器上的为准，已有就不覆盖（SGODOT-304，2026-10-17）：线上 .env 里有换过的库密码和备份
+# 凭据，本机那份是旧的；线上 Caddyfile 并入了 P0 转发和 Journey 的 410，仓库版本没有。只有首次部署（服务器上
+# 还没有这个文件）才从本机推。要改线上的 .env / Caddyfile，在服务器上改，并先备份。
+# 放在任何写操作之前：中止时服务器上什么都还没动。ssh 的退出码分开看——0 有、1 没有、其他（连不上、超时 255）
+# 不知道，一律中止，不能当成“没有”去推本机的旧文件（后裔审 #467）。
+keep_or_push() {   # <本机文件> <服务器上的文件名>
+  local rc=0
+  ssh "$HOST" "test -e /opt/farm/$2" || rc=$?
+  case $rc in
+    0) echo "保留服务器上的 /opt/farm/$2（不覆盖）" ;;
+    1) [ -s "$1" ] || { echo "服务器上没有 /opt/farm/$2，本机也没有 $1，中止"; exit 1; }
+       echo "首次部署：推本机 $1 到 /opt/farm/$2"
+       ssh "$HOST" 'mkdir -p /opt/farm'
+       scp "$1" "$HOST:/opt/farm/$2" ;;
+    *) echo "查不了服务器上的 /opt/farm/$2（ssh 退出码 ${rc}），中止"; exit 1 ;;
+  esac
+}
+keep_or_push "$here/../.env.production" .env   # .env 不入库（Codex 三审 N-I9）
+keep_or_push "$here/Caddyfile" Caddyfile
+
 # 有 manifest 就用 CI 构建好的镜像；没有就**在服务器上构建**（本机没装 Docker）。
 # 无论哪条路，compose 最终都按 digest 引用——tag 可以被重新推送，digest 不能。
 if [ -n "${1:-}" ]; then
@@ -27,9 +47,7 @@ else
   digest="farm-server:$sha"
 fi
 
-scp "$here/docker-compose.yml" "$here/Caddyfile" "$here/crontab" "$here/backup.sh" "$HOST:/opt/farm/"
-# .env 从本机推上去并立刻收紧权限；它不入库（Codex 三审 N-I9）。
-scp "$here/../.env.production" "$HOST:/opt/farm/.env"
+scp "$here/docker-compose.yml" "$here/crontab" "$here/backup.sh" "$HOST:/opt/farm/"
 ssh "$HOST" "chmod 600 /opt/farm/.env && chmod +x /opt/farm/backup.sh"
 
 # postgres / caddy 的 digest 从镜像源解析一次并固定下来。
