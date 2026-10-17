@@ -1,0 +1,55 @@
+{
+  "issue": "SGODOT-214",
+  "project_id": "47d11337-c390-4b42-8b05-ef60fa2633f7",
+  "work_item_id": "1dbef512-6ca8-434c-9bbc-93aee410ee40",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "files": [
+    {
+      "path": "docs/design/tackle-shop-214-lighting-2026-10-16/SGODOT-214_TACKLE_v1_1_14_lamp_control.png",
+      "name": "SGODOT-214_TACKLE_v1_1_14_lamp_control.png",
+      "size": 992151,
+      "sha256": "ea3c516e4b7023b2d880b6e3a8952b13bf8ee7e31f00a971785f6fa2c9e9c718",
+      "attachment_id": "edd23cba-fee3-43f7-a021-a4270215e971",
+      "download_sha256": "ea3c516e4b7023b2d880b6e3a8952b13bf8ee7e31f00a971785f6fa2c9e9c718",
+      "download_verified": true,
+      "upload_metadata": {
+        "id": "edd23cba-fee3-43f7-a021-a4270215e971",
+        "created_at": "2026-10-16T02:12:55.024158Z",
+        "updated_at": "2026-10-16T02:12:56.258303Z",
+        "deleted_at": null,
+        "attributes": {
+          "name": "SGODOT-214_TACKLE_v1_1_14_lamp_control.png",
+          "size": 992151,
+          "type": "image/png"
+        },
+        "asset": "13c04473-7b22-4354-b31e-e9a4633bac55/f385c1fcd9864061ac42bb5e7b4a1ec7-SGODOT-214_TACKLE_v1_1_14_lamp_control.png",
+        "entity_type": "ISSUE_ATTACHMENT",
+        "entity_identifier": null,
+        "is_deleted": false,
+        "is_archived": false,
+        "external_id": null,
+        "external_source": null,
+        "size": 992151.0,
+        "is_uploaded": true,
+        "storage_metadata": {
+          "ETag": "\"2ee3c7e3e5014cd748a69fffb9de6f07\"",
+          "Metadata": {},
+          "ContentType": "image/png",
+          "LastModified": "2026-10-16T02:12:56+00:00",
+          "ContentLength": 992151
+        },
+        "created_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "updated_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "created_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "updated_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "user": null,
+        "workspace": "13c04473-7b22-4354-b31e-e9a4633bac55",
+        "draft_issue": null,
+        "project": "47d11337-c390-4b42-8b05-ef60fa2633f7",
+        "issue": "1dbef512-6ca8-434c-9bbc-93aee410ee40",
+        "comment": null,
+        "page": null
+      }
+    }
+  ]
+}

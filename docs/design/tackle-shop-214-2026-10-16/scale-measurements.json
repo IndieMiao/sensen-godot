@@ -1,0 +1,30 @@
+{
+	"avatar_top_H": 1.74545098096132,
+	"capsule_height": 1.25,
+	"capsule_radius": 0.21,
+	"measurements": {
+		"chair": {
+			"baseline_ratio": 0.392448718108789,
+			"difference": 0.0948905109489052,
+			"height": 0.62,
+			"ratio_to_H": 0.355209058726204,
+			"reason": ""
+		},
+		"counter": {
+			"baseline_ratio": 0.66028780674508,
+			"difference": 0.0281995661605206,
+			"height": 1.12,
+			"ratio_to_H": 0.641667977053787,
+			"reason": ""
+		},
+		"door": {
+			"applicable": false,
+			"reason": "Open front diorama exit; no door in approved Stark design."
+		},
+		"table": {
+			"applicable": false,
+			"reason": "Only retail shelves, no table in the approved room."
+		}
+	},
+	"speed": 3.75
+}

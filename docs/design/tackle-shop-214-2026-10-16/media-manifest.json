@@ -1,0 +1,80 @@
+[
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_01_game_360.png",
+    "name": "SGODOT-214_TACKLE_v1_01_game_360.png",
+    "size": 218810,
+    "sha256": "fcd08e575f952784ad411b43418a639baf5c341f0c6ac0a27730453dd26a601d"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_02_whole_43deg.png",
+    "name": "SGODOT-214_TACKLE_v1_02_whole_43deg.png",
+    "size": 1378798,
+    "sha256": "70871b067de949b258de8f62210e9687e7851dc34e7556fdac252e88366aa6b4"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_03_counter.png",
+    "name": "SGODOT-214_TACKLE_v1_03_counter.png",
+    "size": 1211983,
+    "sha256": "c35b214fbea6ff96512a45c04116cdcf99408ecfc366a5ac9eb33a1bc185e409"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_04_rod_rack.png",
+    "name": "SGODOT-214_TACKLE_v1_04_rod_rack.png",
+    "size": 711528,
+    "sha256": "eaab9ae09f0a2098436c7fdc0117778c37d45e21e550d89660b5a7a7b52cb0fb"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_05_kai_corner.png",
+    "name": "SGODOT-214_TACKLE_v1_05_kai_corner.png",
+    "size": 930708,
+    "sha256": "c5c0de4fb268136d816bf07dfcadf965ba6de746ac2d1d3d58d0d126491a5532"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_06_rafa_corner.png",
+    "name": "SGODOT-214_TACKLE_v1_06_rafa_corner.png",
+    "size": 1198277,
+    "sha256": "346941cac41cabb5e5fbcaf4f914d30cc23dfa3eb1141860d6ae27239a20527f"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_07_standing_clearance.png",
+    "name": "SGODOT-214_TACKLE_v1_07_standing_clearance.png",
+    "size": 1387176,
+    "sha256": "51c14bfd4337aca80437446b0d19b6c07b397ce0aa32efab9d9d0f60b0097a12"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_08_reference_comparison.png",
+    "name": "SGODOT-214_TACKLE_v1_08_reference_comparison.png",
+    "size": 2238035,
+    "sha256": "4ddaf3e7e8aded441194950f7c849950fdb81d0f666705daaacc61eafca9462a"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_09_orthographic.png",
+    "name": "SGODOT-214_TACKLE_v1_09_orthographic.png",
+    "size": 815220,
+    "sha256": "8101b2824fa16b09765af7a7cdc08425c592e320a4ff6c2bf89b755bbb8417b8"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_10_collisions.png",
+    "name": "SGODOT-214_TACKLE_v1_10_collisions.png",
+    "size": 704126,
+    "sha256": "196ffb8bffe028285908f1cf279b795fca47d598c2527e91c130a164b26deeb6"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_11_color_samples.png",
+    "name": "SGODOT-214_TACKLE_v1_11_color_samples.png",
+    "size": 2245454,
+    "sha256": "e9f86fa69c2607af90ca3d7e424f951c4045bdb18fe4643a25ff86fd289e8c2f"
+  },
+  {
+    "path": "output/tackle-214/SGODOT-214_TACKLE_v1_12_walkthrough.mp4",
+    "name": "SGODOT-214_TACKLE_v1_12_walkthrough.mp4",
+    "size": 318594,
+    "sha256": "b62fddef13ef01b84d981cf97f537b56d6a7709fbd09d257b68fa42dfed9dff7"
+  },
+  {
+    "path": "docs/design/tackle-shop-214-2026-10-16/SGODOT-214_TACKLE_v1_13_spawn_follow_360.png",
+    "name": "SGODOT-214_TACKLE_v1_13_spawn_follow_360.png",
+    "size": 215726,
+    "sha256": "e9420f67cedb3445c185e1147a9ed09710b2f1381a31b939b022060bef47168b"
+  }
+]

@@ -1,0 +1,738 @@
+{
+	"checks": [
+		{
+			"check": "Actual collider exists: room_shell/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/1",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/1",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/1",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/1",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/2",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/2",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/2",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/2",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/3",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/3",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/3",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/3",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/4",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/4",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/4",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/4",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/5",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/5",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/5",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/5",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/6",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/6",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/6",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/6",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/7",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/7",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/7",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/7",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/8",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/8",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/8",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/8",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: room_shell/9",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: room_shell/9",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: room_shell/9",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: room_shell/9",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: curved_counter/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: curved_counter/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: curved_counter/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: curved_counter/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: rod_rack/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: rod_rack/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: rod_rack/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: rod_rack/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: corner_open_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: corner_open_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: corner_open_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: corner_open_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: right_low_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: right_low_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: right_low_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: right_low_shelf/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: kai_oar_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: kai_oar_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: kai_oar_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: kai_oar_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: kai_stool/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: kai_stool/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: kai_stool/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: kai_stool/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: left_rope_crate/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: left_rope_crate/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: left_rope_crate/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: left_rope_crate/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: rafa_fish_creel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: rafa_fish_creel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: rafa_fish_creel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: rafa_fish_creel/0",
+			"passed": true
+		},
+		{
+			"check": "Actual collider exists: rafa_float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider placement/rotation/instance scale: rafa_float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider enabled and physical: rafa_float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Collider box dimensions: rafa_float_barrel/0",
+			"passed": true
+		},
+		{
+			"check": "Every asset/instance collider instantiated exactly once",
+			"passed": true
+		},
+		{
+			"check": "P0RoomNav reads all actual collision shapes",
+			"passed": true
+		},
+		{
+			"check": "P0RoomNav derives floor Y=.08 from collider",
+			"passed": true
+		},
+		{
+			"check": "P0RoomNav derives 6.8x6.4 bounds from largest floor collider",
+			"passed": true
+		},
+		{
+			"check": "Native navigation spawn is walkable",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: stand_counter",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: npc_keeper",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: stand_keeper",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: npc_kai",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: stand_kai",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: npc_rafa",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: stand_rafa",
+			"passed": true
+		},
+		{
+			"check": "Spawn reaches native navigation cell: stand_fish_board",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks furniture: curved_counter",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks furniture: right_low_shelf",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks furniture: rod_rack",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks furniture: left_rope_crate",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks furniture: rafa_fish_creel",
+			"passed": true
+		},
+		{
+			"check": "Native path reaches front exit trigger radius",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks authored wall/edge (-3.27, 0.0, 0.0)",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks authored wall/edge (0.0, 0.0, -3.07)",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks authored wall/edge (3.36, 0.0, 0.0)",
+			"passed": true
+		},
+		{
+			"check": "Native navigation blocks authored wall/edge (1.5, 0.0, 3.16)",
+			"passed": true
+		},
+		{
+			"check": "Negative control: removing counter collision opens its native navigation cell",
+			"passed": true
+		}
+	],
+	"colliders": [
+		{
+			"index": 0,
+			"module": "room_shell",
+			"world_position": [
+				0.0,
+				-0.0799999982118607,
+				0.0
+			]
+		},
+		{
+			"index": 1,
+			"module": "room_shell",
+			"world_position": [
+				-3.26999998092651,
+				1.64999997615814,
+				0.0
+			]
+		},
+		{
+			"index": 2,
+			"module": "room_shell",
+			"world_position": [
+				0.0,
+				1.64999997615814,
+				-3.0699999332428
+			]
+		},
+		{
+			"index": 3,
+			"module": "room_shell",
+			"world_position": [
+				3.35999989509583,
+				0.75,
+				0.0
+			]
+		},
+		{
+			"index": 4,
+			"module": "room_shell",
+			"world_position": [
+				-2.04999995231628,
+				0.75,
+				3.16000008583069
+			]
+		},
+		{
+			"index": 5,
+			"module": "room_shell",
+			"world_position": [
+				2.04999995231628,
+				0.75,
+				3.16000008583069
+			]
+		},
+		{
+			"index": 6,
+			"module": "room_shell",
+			"world_position": [
+				0.0,
+				-0.0799999982118607,
+				3.48000001907349
+			]
+		},
+		{
+			"index": 7,
+			"module": "room_shell",
+			"world_position": [
+				-0.740000009536743,
+				0.75,
+				3.48000001907349
+			]
+		},
+		{
+			"index": 8,
+			"module": "room_shell",
+			"world_position": [
+				0.740000009536743,
+				0.75,
+				3.48000001907349
+			]
+		},
+		{
+			"index": 9,
+			"module": "room_shell",
+			"world_position": [
+				0.0,
+				0.75,
+				3.83999991416931
+			]
+		},
+		{
+			"index": 0,
+			"module": "curved_counter",
+			"world_position": [
+				-0.360000014305115,
+				0.629999995231628,
+				-1.62000000476837
+			]
+		},
+		{
+			"index": 0,
+			"module": "rod_rack",
+			"world_position": [
+				-2.92000007629395,
+				0.629999995231628,
+				0.170000001788139
+			]
+		},
+		{
+			"index": 0,
+			"module": "float_barrel",
+			"world_position": [
+				-2.75,
+				0.319999992847443,
+				-0.680000007152557
+			]
+		},
+		{
+			"index": 0,
+			"module": "corner_open_shelf",
+			"world_position": [
+				-2.29999995231628,
+				1.06500005722046,
+				-2.55999994277954
+			]
+		},
+		{
+			"index": 0,
+			"module": "right_low_shelf",
+			"world_position": [
+				2.25,
+				0.535000026226044,
+				-2.5
+			]
+		},
+		{
+			"index": 0,
+			"module": "kai_oar_barrel",
+			"world_position": [
+				-2.65000009536743,
+				0.389999985694885,
+				2.19000005722046
+			]
+		},
+		{
+			"index": 0,
+			"module": "kai_stool",
+			"world_position": [
+				-1.99000000953674,
+				0.389999985694885,
+				2.23000001907349
+			]
+		},
+		{
+			"index": 0,
+			"module": "left_rope_crate",
+			"world_position": [
+				-2.82999992370605,
+				0.370000004768372,
+				-1.70000004768372
+			]
+		},
+		{
+			"index": 0,
+			"module": "rafa_fish_creel",
+			"world_position": [
+				2.25,
+				0.370000004768372,
+				-0.649999976158142
+			]
+		},
+		{
+			"index": 0,
+			"module": "rafa_float_barrel",
+			"world_position": [
+				3.0,
+				0.358399987220764,
+				-1.67999994754791
+			]
+		}
+	],
+	"failures": [],
+	"native_grid": {
+		"floor_y": 0.0799999982118607,
+		"reachable_cells": 1115,
+		"size": [
+			46,
+			43
+		],
+		"walkable_rows": [
+			"0000000000000000000111111100000000000000000000",
+			"0000000000000000000111111100000000000000000000",
+			"0001111111111111111111111111111111111111111000",
+			"0001111000011111111111111111111111111111111000",
+			"0000000000001111111111111111111111111111111000",
+			"0000000000001111111111111111111111111111111000",
+			"0000000000001111111111111111111111111111111000",
+			"0000000000001111111111111111111111111111111000",
+			"0000000000001111111111111111111111111111111000",
+			"0000000011111111111111111111111111111111111000",
+			"0001111111111111111111111111111111111111111000",
+			"0001111111111111111111111111111111111111111000",
+			"0001111111111111111111111111111111111111111000",
+			"0001111111111111111111111111111111111111111000",
+			"0001111111111111111111111111111111111111111000",
+			"0001111111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000001111111111111111111111111111111111111000",
+			"0000000111111111111111111111111111100000011000",
+			"0000000111111111111111111111111111000000011000",
+			"0000000111111111111111111111111111000000011000",
+			"0000000111111111111111111111111111000000011000",
+			"0000000111111111111111111111111111000000011000",
+			"0000000111111000000000000000111111100000111000",
+			"0000001111110000000000000000111111111111000000",
+			"0000000111110000000000000000111111111111000000",
+			"0000000111110000000000000000111111111110000000",
+			"0000000111110000000000000000111111111110000000",
+			"0000000111110000000000000000111111111110000000",
+			"0000000111110000000000000000111111111110000000",
+			"0000000000000000000000000000111000000000000000",
+			"0000000000000111111111111111111000000000000000",
+			"0000000000000111111111111111111000000000000000",
+			"0000000000000111111111111111111000000000000000",
+			"0000000000000111111111111111111000000000000000",
+			"0000000000000000000000000000000000000000000000",
+			"0000000000000000000000000000000000000000000000",
+			"0000000000000000000000000000000000000000000000"
+		]
+	},
+	"paths": {
+		"npc_kai": {
+			"cell": [
+				10,
+				11
+			],
+			"reachable": true
+		},
+		"npc_keeper": {
+			"cell": [
+				20,
+				37
+			],
+			"reachable": true
+		},
+		"npc_rafa": {
+			"cell": [
+				35,
+				31
+			],
+			"reachable": true
+		},
+		"stand_counter": {
+			"cell": [
+				20,
+				24
+			],
+			"reachable": true
+		},
+		"stand_fish_board": {
+			"cell": [
+				29,
+				35
+			],
+			"reachable": true
+		},
+		"stand_kai": {
+			"cell": [
+				15,
+				13
+			],
+			"reachable": true
+		},
+		"stand_keeper": {
+			"cell": [
+				20,
+				24
+			],
+			"reachable": true
+		},
+		"stand_rafa": {
+			"cell": [
+				31,
+				27
+			],
+			"reachable": true
+		}
+	},
+	"sources": {
+		"nav_path": "modules/p0/p0_room_nav.gd",
+		"nav_revision": "f8c3391c8c0606ae664fb8e06ad85068aa199f69",
+		"staged_source_sha256": {
+			"assets/farm/art/meadow.png": "3f0dc02952aa3a74c86619189616f31f0eac5d340d37dc9d63893ce434a7c832",
+			"assets/farm/art/water/bank_grass.png": "2059acb14773b79d64e5e7f5fdceb5dcef553bc7380803efcec086ebab86b460",
+			"assets/farm/art/water/caustic_light.png": "f3c0321de4dce0d79909b86b03b6082eafdbe4d6e8dbcadfa98b046fb91ec704",
+			"assets/farm/art/water/sediment.png": "13d396e11c6d281f27817242a2fb34bbcd8741d259e3f4dc7f9ac535e73d975f",
+			"assets/farm/art/water/surface_flow.png": "e29cdf4573dab94f7c9eaaf54ffd437050952f52ee564f13a1b0a78c2eb98548",
+			"assets/farm/data/farm_plot.json": "44ed7200dfc040af0bb70970e5a6a18ba90807f1b5f764bb1fb4287128c6f849",
+			"modules/blueprint/blueprint.gd": "697198a876b6655c2a586d5a342b007e833bcfba7cd2525092a88f078acf7eca",
+			"modules/blueprint/blueprint_grid.gd": "5ae77d6dccaec6b52e2e5e1589b8d4b5baa3156eb9282fd86b9fc6638b0776c3",
+			"modules/blueprint/farm_placement.gd": "a77b172ec1eb478061707d0f90e3cbedd73b77985e573b268884c2d62da11169",
+			"modules/farm/crop_field.gd": "ce91f01a668f0fa3825ad9f03479078ca2124a6defa969f9d34ccfa8209978dd",
+			"modules/farm/crop_plant_mesh.gd": "89eba86807820275c79de31de0b7ac93615a81fe895d2afedff2a1118f966b90",
+			"modules/farm/farm_plot.gd": "cc8dd9bc2e4958993fd4b3a9cb9d800572de5ee8403dbbff5e4d29ad4dbf1b16",
+			"modules/farm/farm_terrain_mask.gd": "2b007238e242bc78d1ada13d2057a4b40c2a060fd6fa9a2e643466cbffe37c19",
+			"modules/farm/player_mover.gd": "75c32e08925d83f14ce2a786fbddb6db163b95052aa3d25c27fa9192faebf032",
+			"modules/farm/plot_surface.gd": "a67ebcf7751fd8da219c2d987d4c24fb7d12f858c2a096c03c93b43b238a15e2",
+			"modules/farm/shaders/plot_ground.gdshader": "84977b1d0abb089be68a70bf1113226f28511fca7e41b7be4ba849b21090a92c",
+			"modules/fishing/water.gdshader": "82d2180c26ecc801fa28c195e9f11d2ba94f05bd47db87521f9f1f224152b372",
+			"modules/p0/p0_room_nav.gd": "844108afd814b994b26353313b3e124e053661ea9bca2ff4c1cbb302949ebf95"
+		}
+	}
+}
