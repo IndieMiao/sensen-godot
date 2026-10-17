@@ -710,28 +710,41 @@ func test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_t
 
 ## 不知火舞 on #465 (214 36bbf7b6): the opening shot takes in the room's other residents too, each with the name tag whole
 ## and 18 px clear of the screen's sides, when they fit with the player, the keeper and the counter: in every San
-## Francisco outpost. A generated tackle shop with Old Kai and Rafa in opposite corners does not fit them (about 337 px
-## of 324) and opens as before, on the player, Finn and the counter.
+## Francisco outpost, and in a generated river tackle shop with Old Kai and Rafa (214 bda468ca: Rafa moved in from the
+## back right corner so the two fit, with some 25 px to spare; his tag 44 px or more from Ren's and from the Bite Board's
+## prompt). A room whose residents do not fit opens as before (on the player, the keeper and the counter).
 func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> void:
-	for o in P0Outposts.all():
-		var r := _room(str(o.id), true)
+	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("tackle", {})
+	P0CityPlaces.accept("gn-testrafa", {"detail": {"outposts": [{"id": "gn-testrafa~tackle0", "role": "tackle", "name": "Test Tackle Shop",
+		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 1.0, "lng": 1.0,
+		"capacity": 12, "keeper": {"role": "Tackle Keeper", "name": "Ren", "look": "tackle_temperate_0"}, "residents": ["res_old_kai", "res_rafa"]}]}})
+	for id in P0Outposts.all().map(func(o): return str(o.id)) + ["gn-testrafa~tackle0"]:
+		var r := _room(id, true)
 		await get_tree().process_frame
 		r.p0_frame({}, 1.0 / 30.0)
 		var view := r._view()
 		var extras: Array = r.opening_extras()
-		assert_int(extras.size()).override_failure_message(str(o.id)).is_equal(3 * (r.npcs.size() - 1))
-		assert_bool(extras.is_empty()).override_failure_message(str(o.id)).is_false()
+		assert_int(extras.size()).override_failure_message(id).is_equal(3 * (r.npcs.size() - 1))
+		assert_bool(extras.is_empty()).override_failure_message(id).is_false()
+		# the band opening_focus fits them in (刘邦 on #465): SIDE_MARGIN across, the HUD's bottom to the bottom controls down
+		var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
 		for p in extras:
 			var at := r.cam.unproject_position(p)
-			assert_bool(at.x >= P0Room.SIDE_MARGIN and at.x <= view.x - P0Room.SIDE_MARGIN and at.y >= 0.0 and at.y <= view.y) \
-				.override_failure_message("%s resident point %s" % [o.id, at]).is_true()
-	var room: Dictionary = P0Logic.content().get("world", {}).get("room", {}).get("tackle", {})
-	P0CityPlaces.accept("gn-testrafa", {"detail": {"outposts": [{"id": "gn-testrafa~tackle0", "role": "tackle", "name": "Test Tackle Shop",
-		"art": str(room.art), "anchors": str(room.anchors), "category": str(room.category), "lat": 1.0, "lng": 1.0,
-		"capacity": 12, "keeper": {"role": "Tackle Keeper", "name": "Bea", "look": "tackle_temperate_0"}, "residents": ["res_old_kai", "res_rafa"]}]}})
+			assert_bool(band.grow(0.5).has_point(at)).override_failure_message("%s resident point %s, band %s" % [id, at, band]).is_true()
+		if id != "gn-testrafa~tackle0": continue
+		assert_array(r.npcs.keys()).contains(["npc_keeper", "npc_kai", "npc_rafa"])
+		var xs: Array = extras.map(func(p): return r.cam.unproject_position(p).x)
+		var spare: float = (float(xs.min()) - P0Room.SIDE_MARGIN) + (view.x - P0Room.SIDE_MARGIN - float(xs.max()))
+		assert_float(spare).override_failure_message("spare %s px" % spare).is_greater_equal(25.0)
+		var tag_of := func(n: String) -> Vector2: return r.cam.unproject_position((r.npcs[n].root as Node3D).to_global(OutpostScript.NAME_OVER_HEAD))
+		var rafa: Vector2 = tag_of.call("npc_rafa")
+		assert_float(rafa.distance_to(tag_of.call("npc_keeper"))).override_failure_message("Rafa to Ren").is_greater_equal(44.0)
+		assert_float(rafa.distance_to(r.cam.unproject_position(r.pick_point("use_fish_board")))).override_failure_message("Rafa to the board").is_greater_equal(44.0)
+	# a room whose residents do not fit opens as before: Rafa back in the kit's corner
 	var r := _room("gn-testrafa~tackle0", true)
 	await get_tree().process_frame
-	assert_array(r.npcs.keys()).contains(["npc_keeper", "npc_kai", "npc_rafa"])
+	r.anchor("npc_rafa").position = Vector3(1.85, 0.08, -1.55)
+	(r.npcs.npc_rafa.root as Node3D).global_position = r.anchor("npc_rafa").global_position
 	var forward := -r._cam_dir
 	var right := forward.cross(Vector3.UP).normalized()
 	var up := right.cross(forward).normalized()
@@ -870,9 +883,12 @@ func test_a_generated_tackle_shop_opens_on_its_own_kit() -> void:
 	var r := _room(id)
 	assert_str(r.layout_path).is_equal("res://assets/rooms/tackle_shop/layout.json")
 	assert_array(r.npcs.keys()).contains(["npc_kai", "npc_rafa"])
-	_tap(r, "npc_rafa")
-	_walk_until_idle(r, 10.0)
-	assert_array(r.used).is_equal(["npc_rafa"])
+	for n in ["npc_rafa", "use_fish_board", "use_counter"]:   # Rafa's spot by his creel leaves the way to the board and the counter
+		r.actor.teleport(r.anchor("spawn").global_position)
+		r.used.clear()
+		_tap(r, n)
+		_walk_until_idle(r, 10.0)
+		assert_array(r.used).override_failure_message(n).is_equal([n])
 
 ## Every resident world_gen places (world.residents: fixed, rank once its room is built, the S-tier s_order) wears a
 ## look in outpost_npcs.json and has its spot in every room kind it can be placed in — else the room shows nobody
