@@ -1,0 +1,20 @@
+{
+  "baseline": "4c287f6d27bf399ee1661c86a6fee5f9ef0fa056",
+  "removed_object": "Bold sign POST OFFICE",
+  "removed_letter_components": 10,
+  "removed_triangles": 7460,
+  "remaining_triangles": 776,
+  "retained_vertex_attributes": "Original POSITION / NORMAL bytes; envelope UV unchanged, red plaque UV redirected to its own clean upper-left color patch to bypass baked lettering AO",
+  "clean_red_pixel_top_left": [
+    690,
+    1259
+  ],
+  "clean_red_gltf_uv": [
+    0.337158203125,
+    0.614990234375
+  ],
+  "atlas_changed_regions": [],
+  "atlas_changed_pixels": 0,
+  "atlas_sha256": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9",
+  "glb_sha256": "b5ae698b826b91c9debf07d6887ed61d61a72c8c128db1f15d1d51c224e0ef42"
+}

@@ -1,0 +1,504 @@
+{
+  "assets": {
+    "compass_rug": {
+      "name": "compass_rug",
+      "vertices": 636,
+      "triangles": 784,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.100000023841858,
+          0.0,
+          -1.100000023841858
+        ],
+        [
+          1.100000023841858,
+          0.012799999676644802,
+          1.100000023841858
+        ]
+      ],
+      "bytes": 26412
+    },
+    "stamp_desk_set": {
+      "name": "stamp_desk_set",
+      "vertices": 1344,
+      "triangles": 2568,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.9800000786781311,
+          -0.02500000037252903,
+          -0.4749999940395355
+        ],
+        [
+          1.4000000953674316,
+          0.33650001883506775,
+          0.5550000071525574
+        ]
+      ],
+      "bytes": 70048
+    },
+    "post_wall_lantern": {
+      "name": "post_wall_lantern",
+      "vertices": 448,
+      "triangles": 848,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.10999999940395355,
+          -0.23999997973442078,
+          -0.0
+        ],
+        [
+          0.10999999940395355,
+          0.25999999046325684,
+          0.3700000047683716
+        ]
+      ],
+      "bytes": 32316
+    },
+    "post_table_lamp": {
+      "name": "post_table_lamp",
+      "vertices": 358,
+      "triangles": 696,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.18400000035762787,
+          0.0,
+          -0.18400000035762787
+        ],
+        [
+          0.18400000035762787,
+          0.49300000071525574,
+          0.18400000035762787
+        ]
+      ],
+      "bytes": 17016
+    },
+    "brown_parcel_reused": {
+      "name": "brown_parcel_reused",
+      "vertices": 1100,
+      "triangles": 1168,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.25300005078315735,
+          -0.0010000267066061497,
+          -0.20749996602535248
+        ],
+        [
+          0.2529999911785126,
+          0.3811507523059845,
+          0.2284999042749405
+        ]
+      ],
+      "bytes": 55204
+    },
+    "blue_parcel_reused": {
+      "name": "blue_parcel_reused",
+      "vertices": 1196,
+      "triangles": 1276,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3230000138282776,
+          0.0,
+          -0.23899996280670166
+        ],
+        [
+          0.3230000138282776,
+          0.3121507167816162,
+          0.23899996280670166
+        ]
+      ],
+      "bytes": 62744
+    },
+    "mail_sack_reused": {
+      "name": "mail_sack_reused",
+      "vertices": 2186,
+      "triangles": 2490,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.2166576385498047,
+          0.0,
+          -0.22749996185302734
+        ],
+        [
+          0.2166576385498047,
+          0.9839999675750732,
+          0.22749996185302734
+        ]
+      ],
+      "bytes": 123976
+    },
+    "packing_dressing_215": {
+      "name": "packing_dressing_215",
+      "vertices": 7281,
+      "triangles": 8066,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.8100000619888306,
+          0.30000001192092896,
+          1.2649999856948853
+        ],
+        [
+          1.4500000476837158,
+          1.2755000591278076,
+          2.044999837875366
+        ]
+      ],
+      "bytes": 375416
+    }
+  },
+  "atlas": {
+    "atlas": "assets/rooms/post_office/room_albedo_ao.png",
+    "atlas_sha256": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9",
+    "size": [
+      2048,
+      2048
+    ],
+    "swatches": {
+      "beige": {
+        "source_asset": "assets/rooms/post_office/compass_rug.glb",
+        "pixel_xy_top_left": [
+          1369,
+          426
+        ],
+        "gltf_uv": [
+          0.668701171875,
+          0.208251953125
+        ],
+        "rgb8": [
+          235,
+          220,
+          192
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          235,
+          220,
+          192
+        ],
+        "patch_rgb_max": [
+          235,
+          220,
+          192
+        ],
+        "source_sha256": "180d8862a85d3bd7efca333da4d859756b8595ee501729663aaf23af86415a4d"
+      },
+      "bluegray": {
+        "source_asset": "assets/rooms/post_office/underdesk_boxes.glb",
+        "pixel_xy_top_left": [
+          1063,
+          260
+        ],
+        "gltf_uv": [
+          0.519287109375,
+          0.127197265625
+        ],
+        "rgb8": [
+          70,
+          113,
+          136
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          70,
+          113,
+          136
+        ],
+        "patch_rgb_max": [
+          70,
+          113,
+          136
+        ],
+        "source_sha256": "2779ad15627d2cc96ac8a19b972cf5b3c94b7370f5c14043dacd1fe94b08fb2c"
+      },
+      "silver": {
+        "source_asset": "assets/rooms/post_office/sorted_letters.glb",
+        "pixel_xy_top_left": [
+          12,
+          336
+        ],
+        "gltf_uv": [
+          0.006103515625,
+          0.164306640625
+        ],
+        "rgb8": [
+          206,
+          220,
+          219
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          205,
+          220,
+          218
+        ],
+        "patch_rgb_max": [
+          208,
+          223,
+          221
+        ],
+        "source_sha256": "0b8ebff6bed6928c03d865acad04751af15d8d59689a42b04c99c328f43f7e1c"
+      },
+      "white": {
+        "source_asset": "assets/rooms/post_office/sorted_letters.glb",
+        "pixel_xy_top_left": [
+          1641,
+          336
+        ],
+        "gltf_uv": [
+          0.801513671875,
+          0.164306640625
+        ],
+        "rgb8": [
+          244,
+          236,
+          216
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          244,
+          236,
+          216
+        ],
+        "patch_rgb_max": [
+          244,
+          236,
+          216
+        ],
+        "source_sha256": "0b8ebff6bed6928c03d865acad04751af15d8d59689a42b04c99c328f43f7e1c"
+      },
+      "dark": {
+        "source_asset": "assets/rooms/post_office/counter_computer.glb",
+        "pixel_xy_top_left": [
+          1521,
+          1649
+        ],
+        "gltf_uv": [
+          0.742919921875,
+          0.805419921875
+        ],
+        "rgb8": [
+          48,
+          54,
+          52
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          48,
+          54,
+          52
+        ],
+        "patch_rgb_max": [
+          48,
+          54,
+          52
+        ],
+        "source_sha256": "8deaa80a156f3cc67fec5d9fb0bc4766d39694fb238ecb6bc49bdad545467547"
+      },
+      "wood": {
+        "source_asset": "assets/rooms/post_office/mail_stack.glb",
+        "pixel_xy_top_left": [
+          1288,
+          447
+        ],
+        "gltf_uv": [
+          0.629150390625,
+          0.218505859375
+        ],
+        "rgb8": [
+          129,
+          66,
+          40
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          128,
+          65,
+          39
+        ],
+        "patch_rgb_max": [
+          129,
+          66,
+          40
+        ],
+        "source_sha256": "62ee7853b4ac969ca4abd46c46a5093680f2ca47944156e1281bdbcb47ad9f2b"
+      },
+      "gold": {
+        "source_asset": "assets/rooms/post_office/compass_rug.glb",
+        "pixel_xy_top_left": [
+          1158,
+          1878
+        ],
+        "gltf_uv": [
+          0.565673828125,
+          0.917236328125
+        ],
+        "rgb8": [
+          183,
+          136,
+          85
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          178,
+          131,
+          82
+        ],
+        "patch_rgb_max": [
+          184,
+          136,
+          85
+        ],
+        "source_sha256": "180d8862a85d3bd7efca333da4d859756b8595ee501729663aaf23af86415a4d"
+      },
+      "red": {
+        "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+        "pixel_xy_top_left": [
+          685,
+          1236
+        ],
+        "gltf_uv": [
+          0.334716796875,
+          0.603759765625
+        ],
+        "rgb8": [
+          166,
+          56,
+          48
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          164,
+          55,
+          47
+        ],
+        "patch_rgb_max": [
+          166,
+          56,
+          48
+        ],
+        "source_sha256": "d1e2a1944761fc589988fa44f4ba44f1b2966a06c84799821cfc3a173e89bcfc"
+      },
+      "green": {
+        "source_asset": "assets/rooms/post_office/counter_mail_tray.glb",
+        "pixel_xy_top_left": [
+          235,
+          519
+        ],
+        "gltf_uv": [
+          0.114990234375,
+          0.253662109375
+        ],
+        "rgb8": [
+          105,
+          112,
+          79
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          105,
+          111,
+          79
+        ],
+        "patch_rgb_max": [
+          106,
+          112,
+          80
+        ],
+        "source_sha256": "b48c98db12cdc7eb7eb0fb6b567dc4322e0bc59530d2ddea3e100953a8e87c45"
+      },
+      "green_light": {
+        "source_asset": "assets/rooms/post_office/postal_door_glass.glb",
+        "pixel_xy_top_left": [
+          172,
+          325
+        ],
+        "gltf_uv": [
+          0.084228515625,
+          0.158935546875
+        ],
+        "rgb8": [
+          137,
+          146,
+          105
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          137,
+          146,
+          105
+        ],
+        "patch_rgb_max": [
+          142,
+          151,
+          109
+        ],
+        "source_sha256": "741a02506d661f39b069b348bcebfbc33bcaa3e882630f42d45681377722f642"
+      },
+      "amber": {
+        "source_asset": "assets/rooms/post_office/back_wall.glb",
+        "pixel_xy_top_left": [
+          616,
+          1875
+        ],
+        "gltf_uv": [
+          0.301025390625,
+          0.915771484375
+        ],
+        "rgb8": [
+          221,
+          191,
+          160
+        ],
+        "safe_patch_radius_px": 4,
+        "patch_rgb_min": [
+          217,
+          188,
+          158
+        ],
+        "patch_rgb_max": [
+          224,
+          194,
+          163
+        ],
+        "source_sha256": "f70680f864537e3a30f8fed056ba963781bbc05be31bdee834c5ca6a04eba3ef"
+      },
+      "board": {
+        "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+        "source_sha256": "edef9197d2f9597363a075674146b40bc94c287f057b5729d8a8b41fcdf8bdf2",
+        "pixel_xy_top_left": [
+          329,
+          455
+        ],
+        "gltf_uv": [
+          0.160888671875,
+          0.222412109375
+        ],
+        "rgb8": [
+          38,
+          71,
+          85
+        ],
+        "safe_patch_radius_px": 3,
+        "patch_rgb_min": [
+          37,
+          70,
+          84
+        ],
+        "patch_rgb_max": [
+          38,
+          72,
+          86
+        ]
+      }
+    },
+    "changed_regions": []
+  },
+  "base_commit": "4c287f6d27bf399ee1661c86a6fee5f9ef0fa056"
+}
