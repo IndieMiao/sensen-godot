@@ -49,6 +49,9 @@ func _ready() -> void:
 	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
 	CityMapData.set_region_provider(P0Clusters.region)   # every cluster is a city of the map (SGODOT-275)
 	super._ready()
+	# No real-time shadows on the map (perf plan 10-16 Q4): nothing here takes one — the avatars cast none (BlobShadow
+	# under their feet) and a POI's shadow is its artwork's silhouette — yet the sun drew four shadow cascades a frame.
+	$Sun.shadow_enabled = false
 	rt.attach(self)
 	_load_city_places(P0Travel.home(_view()))   # a generated home's own places (SGODOT-303); the written city's are in the client
 	for child in $HUD/SafeArea/Root.get_children():
