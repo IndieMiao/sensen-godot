@@ -37,7 +37,7 @@ const BackPill := preload("res://scenes/p0/panels/p0_back_pill.gd")
 const P0MapScript := preload("res://scenes/p0/p0_map.gd")
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
-const HOME_LINE := preload("res://assets/ui/kit_icons/home.svg")
+const HOME_LINE := preload("res://assets/ui/kit_icons/home_line.svg")   # i-home line · ink (67:161570)
 
 const _PANEL_H := 112.0
 const _BACK_Y := 7.0
@@ -221,25 +221,31 @@ func _make_card() -> void:
 	error_card.add_child(row)
 	add_child(error_card)
 
-## The back-to-start key (67:161569): MapLocateButton's 44 shell, a home line house in ink.
+## The back-to-start key (67:161569): MapLocateButton's shell — a 44 circle, surface, a 1 px border, a 0 3 4 shadow at
+## 16 % — and the i-home line house in ink, 24 at 10, 10.
 func _back_key() -> Button:
 	var b := Button.new()
 	b.name = "BackToStart"
 	b.focus_mode = Control.FOCUS_NONE
-	b.theme = UiKit.theme()
-	b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
-	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
-		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
-		if sb != null:
-			sb.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
-			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
-			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
-			b.add_theme_stylebox_override(state, sb)
-		b.add_theme_color_override(StringName("icon_%s_color" % state), UiTokens.COLOR_TEXT)
-	b.icon = HOME_LINE
-	b.expand_icon = true
-	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	b.add_theme_constant_override(&"icon_max_width", 24)
+	for state in [&"normal", &"hover", &"focus", &"pressed", &"hover_pressed"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = UiTokens.COLOR_SURFACE.darkened(0.04) if state == &"pressed" else UiTokens.COLOR_SURFACE
+		sb.border_color = UiTokens.COLOR_BORDER
+		sb.set_border_width_all(1)
+		sb.set_corner_radius_all(22)
+		sb.shadow_color = Color(0.18, 0.231, 0.2, 0.16)
+		sb.shadow_size = 4
+		sb.shadow_offset = Vector2(0, 3)
+		b.add_theme_stylebox_override(state, sb)
+	var glyph := TextureRect.new()
+	glyph.name = "Glyph"
+	glyph.texture = HOME_LINE
+	glyph.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	glyph.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glyph.position = Vector2(10, 10)
+	glyph.size = Vector2(24, 24)
+	b.add_child(glyph)
 	b.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	b.offset_right = -UiTokens.SPACE_PAGE
 	b.offset_left = b.offset_right - _KEY_SIDE
