@@ -20,8 +20,11 @@ import type { P0Content, Skill } from './content.js';
 import { cropById, dishParts, itemName } from './content.js';
 import { count } from './bag.js';
 import { skillLevel } from './rules.js';
+import { releaseFirstStallSlot } from './boards.js';
 import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
+
+const H = 3_600_000;
 
 /** A condition on the save. Every field given must hold (an object is an AND); counts are "at least". */
 export interface GuidePred {
@@ -52,6 +55,8 @@ export interface GuideRecover extends GuideShow { id: string; when?: GuidePred }
 export interface GuideContent {
   steps: GuideStep[]; recover?: GuideRecover[]; tips?: Record<string, string>;
   pond_catch?: boolean;   // false: a guided save starts without Pond Catch on the Stall Board (339 decides; default kept)
+  /** The key that refills that held first slot done_refill_h later (q(215) ④: `deliver:req_res_nadia_radish`). */
+  stall_refill_on?: string;
 }
 
 /** In the save (optional, no save version of its own). */
@@ -202,19 +207,21 @@ export function guideKeys(c: P0Content, before: P0State, s: P0State, cmd: { type
 /** Count what was done and pass every step now done. Runs after each command and on the state read of entering a place. */
 export function settleGuide(c: P0Content, s: P0State, keys: Map<string, number>, now: number): void {
   const g = s.guide;
+  const refill = c.guide?.stall_refill_on;
+  if (g && refill && keys.has(refill)) releaseFirstStallSlot(c, s, now + c.requests.done_refill_h * H);
   if (!g || g.step === null) return;
   const want = countedKeys(c);
   for (const [k, n] of keys) if (want.has(k)) g.n[k] = (g.n[k] ?? 0) + n;
   const steps = stepsOf(c);
   let i = steps.findIndex(st => st.id === g.step);
-  if (i < 0) { endGuide(g, now); return; }   // a step the table no longer has (content changed): never strand the player
+  if (i < 0) { endGuide(c, s, now); return; }   // a step the table no longer has (content changed): never strand the player
   for (;;) {
     // an optional step whose next step is done (counted from the optional one's start) passes with it: both go
     const pass = stepDone(c, s, steps[i], now) ? 1
       : steps[i].optional && i + 1 < steps.length && stepDone(c, s, steps[i + 1], now) ? 2 : 0;
     if (!pass) return;
     i += pass;
-    if (i >= steps.length) { endGuide(g, now); return; }
+    if (i >= steps.length) { endGuide(c, s, now); return; }
     enter(steps[i], g, now, steps[i + 1]);
   }
 }
@@ -222,12 +229,16 @@ export function settleGuide(c: P0Content, s: P0State, keys: Map<string, number>,
 /** At load (upgradeState): a guide on a step the table no longer has ends at once, not on the next command (苏烈 on #472). */
 export function checkGuideTable(c: P0Content, s: P0State, now: number): void {
   const g = s.guide;
-  if (g?.step && !stepsOf(c).some(st => st.id === g.step)) endGuide(g, now);
+  if (g?.step && !stepsOf(c).some(st => st.id === g.step)) endGuide(c, s, now);
 }
 
-function endGuide(g: GuideState, now: number): void {
+/** The guide's one way out. A Stall Board first slot still held (Nadia's first request not delivered) fills now
+ * (q(215) ⑦: the fallback end refills it at once; 341's fallback ends here too). */
+function endGuide(c: P0Content, s: P0State, now: number): void {
+  const g = s.guide!;
   g.step = null; g.end = 'done'; g.at = now;
   delete g.base;
+  releaseFirstStallSlot(c, s, now);
 }
 
 /** The current step's recover entry when its needs fail, else null. */
@@ -271,7 +282,7 @@ export function guideMarkers(c: P0Content, s: P0State, now: number): MapMarker[]
 /** dev/guide: put the save's guide on a step (`first`, `end` or an id), counts cleared; nothing else changes. */
 export function setGuide(c: P0Content, s: P0State, to: string, now: number): { code: string } | null {
   const steps = stepsOf(c);
-  if (to === 'end') { s.guide = { step: null, n: {}, end: 'done', at: now }; return null; }
+  if (to === 'end') { s.guide = { step: null, n: {}, end: 'done', at: now }; releaseFirstStallSlot(c, s, now); return null; }
   const st = to === 'first' ? steps[0] : steps.find(x => x.id === to);
   if (!st) return { code: 'bad_step' };
   s.guide = enter(st, { step: null, n: {}, at: now }, now, steps[steps.indexOf(st) + 1]);
@@ -305,6 +316,7 @@ export function validateGuide(c: P0Content): string[] {
       if (m.resident && !c.residents[m.resident]) out.push(`${where}: unknown resident ${m.resident}`);
     }
   };
+  if (c.guide?.stall_refill_on !== undefined) key('stall_refill_on', c.guide.stall_refill_on);
   steps.forEach((st, i) => {
     if (st.optional && (i + 1 >= steps.length || steps[i + 1].optional)) out.push(`step ${st.id}: an optional step needs a step after it that is not optional`);
   });
