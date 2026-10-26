@@ -359,6 +359,9 @@ func test_a_city_near_opens_on_the_welcome_card() -> void:
 	assert_str(flow.welcome.start.label).is_equal("Start here")
 	assert_str(flow.welcome.other.label).is_equal("Choose another city")
 	assert_object(flow.welcome.find_child("Close", true, false)).is_null()   # no ×, no later
+	# 不知火舞 on #476 (342 590be5c5): the line in the secondary ink, as the pick page's
+	var line := flow.welcome.find_child("Line", true, false) as Label
+	assert_object(line.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
 	# row 101 51:160752: the card 16 in from the side; its city row's thumb at the card's padding (20), not the list's 8 more
 	var card: Control = flow.welcome.card
 	var thumb := flow.welcome.find_child("Row", true, false).get_child(0) as Control

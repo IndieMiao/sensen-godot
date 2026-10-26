@@ -70,7 +70,7 @@ func _init(row_: Dictionary = {}, safe_bottom := 0.0) -> void:
 	inner.offset_right = 0
 	city.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(city)
-	var line := UiKit.label(LINE, UiTokens.STYLE_BODY_R14)
+	var line := UiKit.label(LINE, UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY)   # 不知火舞 on #476: secondary, as the pick page's line
 	line.name = "Line"
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(line)
