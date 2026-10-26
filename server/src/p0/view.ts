@@ -29,6 +29,7 @@ import { litEvents, mapMarkers } from './markers.js';
 import { cityRegion, homeView, residentPlace } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
+import { sureBite } from './fishing.js';
 import { homeOf } from './travel.js';
 import { homeFacts } from './home.js';
 import { decorView } from './decor.js';
@@ -140,7 +141,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       loss_mult: (rodById(c, s.gear.rod) ?? f.rods[0]).loss_mult ?? 1,   // Carbon Rod 0.9: the minigame's out-of-band loss
       cast_energy: f.cast_energy,
       cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
-        hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait } : null,
+        hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait,
+        sure: sureBite(s) && !s.cast.breaks } : null,   // q(219): one of the first two bites — the hook window stays open, the reel can't fail
       protection_left: fishingLevel <= f.protect_max_level ? Math.max(0, f.protect_fails - s.day.fails) : null,
       caught: s.fishing.caught, seen: s.fishing.seen,
       dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, where: fish.where, caught: s.fishing.caught[fish.id] ?? 0,

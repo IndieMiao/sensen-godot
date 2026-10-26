@@ -62,7 +62,8 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     expect(s.skills.fishing).toBe(10);
     expect(s.firsts).not.toContain('fishing_city:gn-5391959');
     s = step(s, { type: 'cast' }, T + 100);
-    s = step(s, { type: 'reel', outcome: 'escaped' }, T + 100 + s.cast!.bite_ms + 10);
+    // q(219): an `escaped` on the first two bites lands; a line in after the bite is how one of them gets away
+    s = step(s, { type: 'reel', outcome: 'cancel' }, T + 100 + s.cast!.bite_ms + 10);
     expect(s.skills.fishing).toBe(10);
     expect(s.firsts).not.toContain('landed');
     s = catchFish(s, FERN, T + 60_000);
