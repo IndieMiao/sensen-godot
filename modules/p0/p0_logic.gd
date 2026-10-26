@@ -1188,7 +1188,7 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 		subtitle = "Three-ingredient dishes now possible"
 	var detail := ("New recipe: " + ", ".join(recipes)) if not recipes.is_empty() else ""
 	# Tip: the next level, except the account's first (the teaching line) and a level that changes the day (q(69)).
-	var tip := LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv)))
+	var tip := keep_units(LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv))))
 	var first_fishing := skill == "fishing" and lv == 2
 	var use_bait := first_fishing and bait != "" and bag_count(view, bait) > 0
 	var action := "Use bait" if use_bait else ""
@@ -1202,6 +1202,16 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 		action_id = str(a[1])
 	return {kind = "level_up", level = str(lv), title = title, subtitle = subtitle, rewards = rewards, detail = detail,
 		tip = tip, action = action, action_id = action_id, seconds = 3.0 if first or day or first_fishing else 1.5}
+
+static var _unit_space: RegEx
+## A figure stays with the word after it when the banner's Tip wraps (不知火舞 on SGODOT-345, 8b936c42: `· 140 XP` never
+## leaves `XP` alone on the next line; every skill): the space after a number becomes a no-break space. The words are
+## unchanged; the toasts do the same in ToastLayer.keep_units (#485).
+static func keep_units(text: String) -> String:
+	if _unit_space == null:
+		_unit_space = RegEx.new()
+		_unit_space.compile("(\\d) (?=\\p{L})")
+	return _unit_space.sub(text, "$1\u00a0", true)
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.

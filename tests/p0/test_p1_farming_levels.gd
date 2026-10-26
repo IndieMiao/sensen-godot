@@ -13,7 +13,7 @@ func test_farming_lv5_names_its_crops_and_points_at_lv6() -> void:
 	var b := P0Logic.level_banner(_view(500), {"skill": "farming", "level": 5, "gifts": []})
 	assert_str(str(b.title)).is_equal("Farming Lv5")
 	assert_str(str(b.subtitle)).is_equal("New for you · Cabbage, Corn, Regional seeds")
-	assert_str(str(b.tip)).is_equal("Next Lv6 · Cucumber, Sprinkler · 250 XP")
+	assert_str(str(b.tip)).is_equal("Next Lv6 · Cucumber, Sprinkler · 250\u00a0XP")
 	assert_float(float(b.seconds)).is_equal(1.5)
 	assert_str(str(b.action)).is_empty()
 

@@ -40,9 +40,9 @@ func test_the_cooking_page_names_every_level() -> void:
 	assert_dict(by_level).is_equal({7: ["Steady Hand II", "Fast Mastery"], 8: ["Batch Cook"],
 		9: ["Chef's Touch"], 10: ["Lucky Double", "Chef title"]})
 	var v := {"skills": {"cooking": {"level": 7, "xp": 1000}}}
-	assert_str(str(P0Logic.level_banner(v, {"skill": "cooking", "level": 7}).tip)).is_equal("Next Lv8 · Batch Cook · 350 XP")
+	assert_str(str(P0Logic.level_banner(v, {"skill": "cooking", "level": 7}).tip)).is_equal("Next Lv8 · Batch Cook · 350\u00a0XP")
 	var eight := P0Logic.level_banner({"skills": {"cooking": {"level": 8, "xp": 1400}}}, {"skill": "cooking", "level": 8})
-	assert_that([eight.subtitle, eight.tip]).is_equal(["New for you · Batch Cook", "Next Lv9 · Chef's Touch · 300 XP"])
+	assert_that([eight.subtitle, eight.tip]).is_equal(["New for you · Batch Cook", "Next Lv9 · Chef's Touch · 300\u00a0XP"])
 	var cook: Dictionary = P0SkillsDrawer.skills_data({"skills": {"cooking": {"level": 7, "xp": 1000}}}).tracks[2]
 	assert_str(str(cook.next)).is_equal("Next: Batch Cook")
 	assert_array(cook.milestones.map(func(m): return str(m.line))).contains(["Lv8 · Batch Cook"])
