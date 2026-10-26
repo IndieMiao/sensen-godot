@@ -28,6 +28,12 @@ const TIPS := {
 	"map": "Browse the map for free. Travel costs Energy and coins.",
 }
 ## Doing what a tip teaches closes it (q(26)); the other tips wait out their time or a tap.
+
+## A tip's sentence: the seven above, or one of the new-player guide's own (guide_steps.json `tips`, SGODOT-341); "" for none.
+static func tip_text(key: String) -> String:
+	if TIPS.has(key): return str(TIPS[key])
+	var own = P0Logic.content().get("guide", {}).get("tips", {})
+	return str(own.get(key, "")) if own is Dictionary else ""
 const TAUGHT_BY := {"sow": "sow", "cast": "cast", "cook": "cook", "heat": "heat"}
 
 ## Toast timing (q(26)): 2 s plus 0.5 s per 20 characters, at most 5 s.
@@ -64,7 +70,7 @@ class TipQueue:
 
 	## Ask for a tip; false when it was shown before, is on screen or already waits.
 	func request(key: String) -> bool:
-		if key == "" or not P0Guide.TIPS.has(key) or seen.has(key) or showing == key or waiting.has(key): return false
+		if key == "" or P0Guide.tip_text(key) == "" or seen.has(key) or showing == key or waiting.has(key): return false
 		waiting.append(key)
 		return true
 
@@ -87,6 +93,59 @@ class TipQueue:
 
 	## Timed out or tapped.
 	func close() -> void: showing = ""
+
+# ---------------------------------------------------------------- new-player guide (SGODOT-341)
+# The server keeps the step (view.guide, server/src/p0/guide.ts): {step, phase, recover, at, progress {have, need}},
+# or {step: null, end} when there is none (every save from before the guide, and older clients' new saves). What a
+# step shows comes from the same table the server reads (assets/p0/content/guide_steps.json): Today's first row, a
+# TipCard, in-world marks. It never locks a control, never moves the player, never opens a panel by itself (LOCK-08);
+# a recover entry stands in for the step while the player is off its path (both radishes sold) and goes once healed.
+
+static func guide_on(view: Dictionary) -> bool:
+	var g = view.get("guide", null)
+	return g is Dictionary and g.get("step", null) != null and str(g.step) != ""
+
+## The id shown: the recover entry while the server names one, else the step; "" when the guide is off.
+static func guide_shown_id(view: Dictionary) -> String:
+	if not guide_on(view): return ""
+	var rec = view.guide.get("recover", null)
+	return str(rec) if rec != null and str(rec) != "" else str(view.guide.step)
+
+## The table's entry for what is shown (a step or a recover entry), or {}.
+static func guide_shown(view: Dictionary) -> Dictionary:
+	var id := guide_shown_id(view)
+	if id == "": return {}
+	var table = P0Logic.content().get("guide", {})
+	if not table is Dictionary: return {}
+	var list := "recover" if id != str(view.guide.step) else "steps"
+	for e in table.get(list, []):
+		if e is Dictionary and str(e.get("id", "")) == id: return e
+	return {}
+
+## Today's guide row: the entry's row, its count as the tail (`1/2`) while a step counts more than one. The dot
+## names the entry, so a new step lights the Today icon once (q(107)).
+static func guide_rows(view: Dictionary) -> Array:
+	var e := guide_shown(view)
+	var row = e.get("row", {})
+	if not row is Dictionary or str(row.get("line", "")) == "": return []
+	var r := _row(str(row.line), str(row.get("icon", "")), str(row.get("go", "")), "guide:" + guide_shown_id(view))
+	var p = view.guide.get("progress", null)
+	if guide_shown_id(view) == str(view.guide.step) and p is Dictionary and int(p.get("need", 1)) > 1:
+		r.tail = "%d/%d" % [int(p.get("have", 0)), int(p.need)]
+	return [r]
+
+## While the guide is on, a TipCard comes from the entry shown, plus the two safety tips (heat, meal); the worlds'
+## own first-time tips (sow at the farm, creel at the pond, cook in the kitchen, map) wait, so two voices never teach
+## the same minute. Off, every tip as before.
+static func tip_allowed(view: Dictionary, key: String) -> bool:
+	if not guide_on(view): return true
+	return key in ["heat", "meal"] or key == str(guide_shown(view).get("tip", ""))
+
+## The tip to ask for when what the guide shows changed between two views ("" when it did not, or it has none).
+static func guide_tip_on_change(before: Dictionary, after: Dictionary) -> String:
+	var id := guide_shown_id(after)
+	if id == "" or id == guide_shown_id(before): return ""
+	return str(guide_shown(after).get("tip", ""))
 
 # ---------------------------------------------------------------- first session state
 
@@ -115,6 +174,7 @@ static func page(view: Dictionary, id: String) -> Dictionary:
 ## A row is {line, icon, go, state, tail, focus} like P0Logic._row; go "pond:<id>" (and "outpost:<role>", "map") is a
 ## place on the map: Show on map there (the map's targets, SGODOT-225 #37).
 static func lead_rows(view: Dictionary) -> Array:
+	if guide_on(view): return focus_first(guide_rows(view))   # the new-player guide leads instead (SGODOT-341)
 	var rows: Array = []
 	var t := tutorial(view)
 	var grill := page(view, "dish_grilled_crucian")
