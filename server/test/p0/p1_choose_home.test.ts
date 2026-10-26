@@ -325,7 +325,8 @@ describe('routes (SGODOT-303)', () => {
     expect(list.open.map((r: { id: string }) => r.id)).toEqual([SF, TOKYO, NYC, LONDON]);
     expect(list.matches.some((r: { id: string; status: string }) => r.id === NYC && r.status === 'open')).toBe(true);
     const spots = (await app.inject({ method: 'GET', url: `/v1/p0/home/spots/${NYC}`, headers })).json();
-    expect(spots).toEqual({ ok: true, city: NYC, spots: homeSpots(opened, NYC, 'player-route-01'), resets_at: null, resets_day: null });   // a first pick carries no day
+    const { pin: _pin, ...three } = spots;   // the free pin's area (q(216)): p1_free_pin.test.ts
+    expect(three).toEqual({ ok: true, city: NYC, spots: homeSpots(opened, NYC, 'player-route-01'), resets_at: null, resets_day: null });   // a first pick carries no day
     const shut = (await app.inject({ method: 'GET', url: '/v1/p0/home/spots/gn-1796236', headers })).json();
     expect(shut).toMatchObject({ ok: false, code: 'home_not_open', detail: { status: 'not_open' } });
     expect((await app.inject({ method: 'GET', url: '/v1/p0/home/spots/gn-0', headers })).statusCode).toBe(404);

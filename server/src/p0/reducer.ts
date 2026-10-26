@@ -81,7 +81,7 @@ type P0CommandBody =
   | { type: 'wear_title'; id: string }   // q(180): put on a title the player has (titles.ts)
   | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
   | { type: 'return_home' }
-  | { type: 'choose_home' | 'change_home'; city: string; spot: number };   // SGODOT-303 (home_city.ts): pick a home, change it once
+  | { type: 'choose_home' | 'change_home'; city: string; spot?: number; at?: [number, number] };   // SGODOT-303 (home_city.ts): pick a home, change it once; at: a free pin (q(216))
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
