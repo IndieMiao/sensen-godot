@@ -35,7 +35,7 @@ try{
  await delay(2500);await adb(['shell','uiautomator','dump','/sdcard/map-qa-start.xml']);const xml=(await adb(['exec-out','cat','/sdcard/map-qa-start.xml'])).stdout.toString();await writeFile(out+'/system-start.xml',xml);
  const dialog=(xml.match(/<node\b[^>]+>/g)??[]).find(x=>/text="(?:Don't Show Again|OK|确定)"/.test(x)&&/clickable="true"/.test(x));if(dialog){const b=/bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/.exec(dialog);assert(b);await point([(+b[1]+ +b[3])/2,(+b[2]+ +b[4])/2],'system dialog')}
  let s=await until(s=>s.city&&s.city.markers.some(m=>m.kind==='landmark')&&s.city.players.length>2,'city loaded',90000);
- const before={farm_id:s.farm_id,wallet:s.wallet,cells:structuredClone(s.cells),bag:structuredClone(s.bag),relocation:structuredClone(s.relocation)};
+ const before={farm_id:s.farm_id,wallet:s.wallet,cells:structuredClone(s.cells),bag:structuredClone(s.bag)};
  noDrawer(s);assert.deepEqual(s.city.actors.map(a=>a.cohort),['self']);await shot('10-overview');
  let a=center(s.city.map_area);await swipe(a,[a[0]-65,a[1]+75],'overview drag');s=await state();assert.deepEqual(s.city.selected,{});assert.equal(s.city.selected_player,'');
  const overview=await trace('overview-motion');
@@ -73,7 +73,7 @@ try{
  const profiles=[];
  for(const [size,vw,vh] of [['720x1280',360,640],['960x1280',480,640]]){sizeChanged=true;await adb(['shell','wm','size',size]);await until(s=>s.viewport[0]===vw&&s.viewport[1]===vh,'viewport '+size);await tap('MapNav_map');s=await shot('size-'+size);noDrawer(s);assert(s.city.markers.every(m=>m.offset<0.01));profiles.push({physical:size,logical:[vw,vh],no_drawer:true,anchored:true})}
  await adb(['shell','wm','size',restoreSize]);sizeChanged=false;await until(s=>s.viewport[0]===360&&s.viewport[1]===780,'restored viewport');await tap('MapNav_map');s=await shot('19-final-overview');
- assert.equal(s.farm_id,before.farm_id);assert.equal(s.wallet,before.wallet);assert.deepEqual(s.cells,before.cells);assert.deepEqual(s.bag,before.bag);assert.deepEqual(s.relocation,before.relocation);
+ assert.equal(s.farm_id,before.farm_id);assert.equal(s.wallet,before.wallet);assert.deepEqual(s.cells,before.cells);assert.deepEqual(s.bag,before.bag);
  const pid=(await adb(['shell','pidof','-s',pkg])).stdout.toString().trim(),log=(await adb(['logcat','-d','--pid',pid,'-s','godot','GodotMapPlugin'])).stdout.toString();await writeFile(out+'/runtime.log',log);assert(!/SCRIPT ERROR|Parse Error|Compile Error/.test(log));
  const summaries=[overview,pop,drag,dining].map(({data,...result})=>result);
  const result={passed:true,touches,default_self_only:true,selected_matching_3d:true,jelly_popup:true,selection_does_not_move_camera:true,drag_does_not_select:true,no_nearby_list_or_visit_route:true,projection_traces:summaries,live_mapbox_pois:s.city.poi_count,npc_poi_farm_outfit_routes:true,isolated_assets_preserved:true,profiles};await writeFile(out+'/result.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));

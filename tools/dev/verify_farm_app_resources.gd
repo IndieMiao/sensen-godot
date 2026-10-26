@@ -21,7 +21,6 @@ func _verify() -> void:
 		assert(load("res://assets/farm/art/previews/" + str(style) + ".png") is Texture2D)
 	for region in ["shanghai", "los_angeles"]:
 		assert(PresetSnapshots.entries(region).size() == 6)
-	assert(load("res://scenes/select/select_panel.gd").CAPACITY_TEXT == "4 plots · unlock 6, then 9")
 	for resource in ["res://modules/farm/field_growth.gd", "res://modules/ui/loading_overlay.gd", "res://modules/ui/entry_confirmation.gd", "res://scenes/map/farm_miniature.gd"]:
 		assert(ResourceLoader.exists(resource))
 	var assets: Array = []

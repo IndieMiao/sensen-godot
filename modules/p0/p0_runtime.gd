@@ -282,7 +282,7 @@ func leave_to_map() -> void:
 	while AppRouter.instance_depth() > 0:
 		var depth := AppRouter.instance_depth()
 		AppRouter.pop_instance()
-		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+		if AppRouter.instance_depth() >= depth: return   # a layer that refuses to pop stays
 	var root := get_tree().current_scene
 	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
 

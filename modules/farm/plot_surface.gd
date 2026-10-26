@@ -60,12 +60,7 @@ func _ready() -> void:
 	_material.shader = preload("res://modules/farm/shaders/plot_ground.gdshader")
 	_material.set_shader_parameter("plot_state", _texture)
 	var source: Dictionary = FarmPlot.source_for(bp.layout_patch_id)
-	var terrain_texture: Texture2D
-	if source.has("ground_texture"):
-		terrain_texture = load(str(source.ground_texture))
-	else:
-		terrain_texture = FarmTerrainMask.texture_for(bp)
-	_material.set_shader_parameter("terrain_mask", terrain_texture)
+	if source.has("ground_texture"): _material.set_shader_parameter("terrain_mask", load(str(source.ground_texture)))
 	_material.set_shader_parameter("bank_grass", preload("res://assets/farm/art/water/bank_grass.png"))
 	_material.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
 	_material.set_shader_parameter("grid_size", Vector2(bp.grid.x, bp.grid.y))
@@ -73,28 +68,6 @@ func _ready() -> void:
 	_material.set_shader_parameter("woodland_start", -bp.cell_to_world(bp.anchor("house")).z + 3.75)
 	material_override = _material
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	if bp.layout_patch_id.begins_with("geo_"): _add_geographic_water(terrain_texture, plane.size)
-
-func _add_geographic_water(terrain_texture: Texture2D, extent: Vector2) -> void:
-	var water := MeshInstance3D.new()
-	water.name = "GeographicWater"
-	var plane := PlaneMesh.new()
-	plane.size = extent
-	water.mesh = plane
-	water.position.y = 0.051
-	water.layers = 2
-	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var material := ShaderMaterial.new()
-	material.shader = preload("res://modules/fishing/water.gdshader")
-	material.set_shader_parameter("geographic_water", true)
-	material.set_shader_parameter("geographic_mask", terrain_texture)
-	material.set_shader_parameter("geographic_extent", extent)
-	material.set_shader_parameter("exclude_farm_basin", false)
-	material.set_shader_parameter("pebble_bed", preload("res://assets/farm/art/water/sediment.png"))
-	material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
-	material.set_shader_parameter("caustics", preload("res://assets/farm/art/water/caustic_light.png"))
-	water.material_override = material
-	add_child(water)
 
 ## 按当前视图刷新全部格子状态。只写变化的像素，纹理一帧上传一次。
 func sync(cells: Dictionary, now_ms: int) -> void:

@@ -12,24 +12,10 @@ static func data() -> Dictionary:
 static func site(id: String, pond: Dictionary = {}) -> Dictionary:
 	return pond if not pond.is_empty() and (id == "farm_pond" or pond.get("space") == "pond") else data().sites.get(id, {})
 
-## Geometry belongs to the farm being visited, never a process-wide mutable setting.
-## Legacy farms retain the original fishing coordinates. Generated compact farms
-## derive the pond from the same cell geometry that supplies ground and navigation.
-static func site_for_plot(id: String, bp: FarmBlueprint) -> Dictionary:
-	var original := site(id)
-	if id != "farm_pond" or bp == null or not bp.layout_patch_id.begins_with("geo_"):
-		return original
-	if bp.grid != Vector2i(40, 40) or bp.cell_mm != 800: return original
-	for region in FarmPlot.source_for(bp.layout_patch_id).get("regions", []):
-		if region.get("kind") != "water" or not region.has("ellipse"): continue
-		var ellipse: Array = region.ellipse
-		var result := original.duplicate(true)
-		result.center = [float(ellipse[0]) * bp.cell_m, -float(ellipse[1]) * bp.cell_m]
-		result.radii = [float(ellipse[2]) * bp.cell_m, float(ellipse[3]) * bp.cell_m]
-		result.stand = [result.center[0] + (float(original.stand[0]) - float(original.center[0])) / 0.75 * bp.cell_m,
-			result.center[1] + (float(original.stand[1]) - float(original.center[1])) / 0.75 * bp.cell_m]
-		return result
-	return original
+## The fishing site of the farm being visited. Every farm keeps the original coordinates (the generated compact
+## farms that derived their pond from server terrain are retired, SGODOT-342).
+static func site_for_plot(id: String, _bp: FarmBlueprint) -> Dictionary:
+	return site(id)
 
 static func stand(id: String, pond: Dictionary = {}) -> Vector3:
 	var point: Array = site(id, pond).stand

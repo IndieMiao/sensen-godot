@@ -250,32 +250,3 @@ func test_remote_fishing_ends_on_roster_removal_and_pool_reuse() -> void:
 	assert_int(online.crowd.rigs.size()).is_equal(1)
 	assert_bool(is_instance_valid(entry.get("fishing_view"))).is_false()
 	assert_bool(entry.rig.get_node("AnimationPlayer").is_playing()).is_true()
-
-func test_relocated_farm_stops_once_clears_stale_join_and_cannot_restart_it() -> void:
-	for via_message in [false, true]:
-		var online := _online("farm")
-		online.set_process(false)
-		online.session = FarmSession.new(ApiClient.new())
-		online.session.client.token = "token"
-		online.active = true
-		online.joined = true
-		online.join_args = {"farm_id": "relocated", "travel_ticket": "stale-admission"}
-		online._prediction_history[1] = {"seq": 1}
-		online._pending[2] = null
-		var notifications := [0]
-		online.farm_relocated.connect(func(): notifications[0] += 1)
-		if via_message: online._message({"t": "error", "code": "FARM_RELOCATED"})
-		else: online._disconnected("FARM_RELOCATED")
-		online._handle_farm_relocated()
-		assert_int(notifications[0]).is_equal(1)
-		assert_bool(online.active).is_false()
-		assert_bool(online.joined).is_false()
-		assert_bool(online.join_args.has("travel_ticket")).is_false()
-		assert_bool(online._prediction_history.is_empty()).is_true()
-		assert_bool(online._pending.is_empty()).is_true()
-		assert_str(online.error).is_equal("FARM_RELOCATED")
-		online.suspend()
-		online.resume()
-		online.start()
-		assert_bool(online.active).is_false()
-		assert_object(online.socket).is_null()

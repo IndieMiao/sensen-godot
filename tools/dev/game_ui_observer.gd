@@ -41,20 +41,12 @@ func _process(dt: float) -> void:
 	var data := {"ticks": Time.get_ticks_msec(), "scene": scene.scene_file_path, "controls": controls,
 		"logged_in": Net.logged_in(), "has_farm": Net.session.has_farm(), "offline": Net.session.offline,
 		"error": Net.session.last_error_code, "version": Net.session.version, "farm_id": Net.session.farm_id,
-		"relocation": Net.session.relocation, "navigation_pending": AppRouter._navigation_pending, "wallet": Net.session.state.get("wallet", -1), "cells": Net.session.state.get("cells", {}),
+		"navigation_pending": AppRouter._navigation_pending, "wallet": Net.session.state.get("wallet", -1), "cells": Net.session.state.get("cells", {}),
 		"inventory": Net.session.state.get("inventory", {}), "bag": Net.session.state.get("bag", {}),
 		"fishing": Net.session.state.get("fishing", {}), "unconfirmed": Net.session.has_unconfirmed_command()}
 	if scene.scene_file_path.contains("map_poc"):
 		var actual_camera := get_viewport().get_camera_3d()
-		data.map_pose = {"lat": scene.center_lat, "lng": scene.center_lng, "zoom": scene.zoom, "anchor_lat": scene.anchor_lat, "anchor_lng": scene.anchor_lng, "native": scene.map.camera_info() if scene.map else "", "owns_camera": actual_camera == scene.cam, "placement": scene._placement_location, "touches": scene._touch_count, "drag": scene._drag_accum_px}
-		if scene.candidate_overlay and scene.candidate_overlay.get_child_count() > 0:
-			var outline := scene.candidate_overlay.get_child(0) as Node3D
-			data.map_pose.outline_center = _screen(actual_camera, outline.global_position)
-			data.map_pose.selection_center = _screen(scene.cam, scene.center_world)
-			data.map_pose.outline_corners = []
-			var box := (outline.get_child(0) as MeshInstance3D).mesh.get_aabb()
-			for local in [box.position, Vector3(box.end.x, box.position.y, box.position.z), box.end, Vector3(box.position.x, box.end.y, box.end.z)]:
-				data.map_pose.outline_corners.append(_screen(actual_camera, outline.to_global(local)))
+		data.map_pose = {"lat": scene.center_lat, "lng": scene.center_lng, "zoom": scene.zoom, "anchor_lat": scene.anchor_lat, "anchor_lng": scene.anchor_lng, "native": scene.map.camera_info() if scene.map else "", "owns_camera": actual_camera == scene.cam, "touches": scene._touch_count, "drag": scene._drag_accum_px}
 	data.ui_density = {"icon_logical": [GameUi.icon("backpack").get_width(), GameUi.icon("backpack").get_height()], "icon_pixels": GameUi.icon("backpack").get_image().get_width()}
 	data.character_previews = []
 	for preview in scene.find_children("*", "TextureRect", true, false):

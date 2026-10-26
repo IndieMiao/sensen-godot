@@ -18,8 +18,7 @@ func _farm(size: Vector2i) -> Node:
 	viewport.own_world_3d = true
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(viewport)
-	var terrain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/generated_shoreline_farm_terrain.json"))
-	var plot := FarmPlot.register_terrain(terrain)
+	var plot := FarmPlot.blueprint_for()
 	var available: Array[Vector2i] = []
 	for y in plot.grid.y:
 		for x in plot.grid.x:
@@ -28,8 +27,8 @@ func _farm(size: Vector2i) -> Node:
 	var cells := {"%d,%d" % [available[0].x, available[0].y]: {"state": "growing", "crop": "R", "ready_at": 1},
 		"%d,%d" % [available[1].x, available[1].y]: {"state": "tilled", "crop": null}}
 	var session := FarmSession.new(ApiClient.new("https://farm-ui-fixture.invalid/v1", FakeTransport.new([]).callable()))
-	session._adopt({"farm_id": "farm-ui-fixture", "region_id": "los_angeles", "layout_patch_id": terrain.layout_id,
-		"blueprint_revision": 1, "farm_terrain": terrain, "location": terrain.source.center, "version": 1,
+	session._adopt({"farm_id": "farm-ui-fixture", "region_id": "los_angeles", "layout_patch_id": "la_c",
+		"blueprint_revision": 2, "version": 1,
 		"state": {"wallet": 5432, "cells": cells, "clock": {"chapter_index": 0, "field_condition": "sunny"},
 			"inventory": {"seeds": {"R": {"bound": 6}, "L": {"bound": 3}, "C": {"bound": 2}, "H": {"bound": 1}}, "produce": {}},
 			"xp": {"total": 0, "first_harvest_crops": []}, "chapters": []}})

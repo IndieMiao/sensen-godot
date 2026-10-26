@@ -422,20 +422,3 @@ func _swipe_up(position: Vector2) -> void:
 	release.position = motion.position
 	get_viewport().push_input(release, true)
 	Input.emulate_touch_from_mouse = previous_emulation
-
-func test_compact_farm_places_owned_crate_inside_valid_ground_before_any_save() -> void:
-	var initial := _inventory_state()
-	var pair := _panel(initial)
-	var panel: DecorationPanel = pair[0]
-	var session: FarmSession = pair[1]
-	session.farm_terrain = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/generated_compact_farm_terrain.json"))
-	session.layout_patch_id = session.farm_terrain.layout_id
-	var bp := FarmPlot.register_terrain(session.farm_terrain)
-	await _frames()
-	panel.select_prop("crate")
-	assert_bool(panel.place_selected()).is_true()
-	var prop: Dictionary = panel.preview()[0]
-	assert_str(prop.prop_id).is_equal("crate")
-	assert_bool(DecorationLayout.cell_allowed(bp, {}, {}, "crate", Vector2i(prop.cell[0], prop.cell[1]))).is_true()
-	assert_that(session.state).is_equal(initial)
-	assert_int(pair[2].requests.size()).is_zero()
