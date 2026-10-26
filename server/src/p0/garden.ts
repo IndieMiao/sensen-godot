@@ -18,7 +18,7 @@ import { skillLevel, untilRollover } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
 import { add, count, room, take } from './bag.js';
 import { cellsOf, yardBlock } from './decor.js';
-import { cropById } from './content.js';
+import { cropById, quickCrop } from './content.js';
 import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
 /** [col, row] of a plot on the garden grid, or null for an id the grid does not have. */
@@ -93,7 +93,7 @@ export function cropGrowH(c: P0Content, s: P0State, crop: Crop, plot?: Plot): nu
  * so it shifts no fishing or cooking roll; the seed goes to the bag, or to Farm Storage when the bag has no room. */
 export function seedSaver(c: P0Content, s: P0State, crop: Crop, plot: Plot, events: P0Event[]): void {
   const at = c.farming?.conveniences?.seed_saver, chance = c.farming?.seed_saver_chance ?? 0;
-  if (at === undefined || skillLevel(c, s, 'farming') < at || crop.regional || (crop as { perennial?: unknown }).perennial) return;
+  if (at === undefined || skillLevel(c, s, 'farming') < at || crop.regional || crop.perennial || crop.quick) return;   // q(217): not a teaching seed
   const roll = createHash('sha256').update(`${s.player}:seed_saver:${plot.id}:${plot.ready_at}`).digest().readUInt32BE(0) / 0x1_0000_0000;
   if (roll >= chance) return;
   if (room(c, s, crop.seed) >= 1) add(c, s, crop.seed, 1);
@@ -111,6 +111,12 @@ export function growMs(c: P0Content, s: P0State, plot: Plot, grow_h: number): nu
   else if (coveredPlots(c, s).has(plot.id)) cut += c.facilities.kinds.sprinkler.grow_cut;
   if (plot.fert) cut += 1 - (c.goods.fert_compost.grow_mult ?? 1);
   return Math.round(grow_h * 3_600_000 * (1 - Math.min(cut, c.facilities.grow_cut_cap)));
+}
+
+/** Ripening time in ms for `crop` starting to grow now on `plot`: a teaching seed's fixed time (q(217): no sprinkler,
+ * greenhouse or Compost cut), else growMs at this farm's hours. */
+export function ripenMs(c: P0Content, s: P0State, plot: Plot, crop: Crop): number {
+  return crop.quick ? crop.quick.ms : growMs(c, s, plot, cropGrowH(c, s, crop, plot));
 }
 
 /** Plots the current Homestead level has (homestead.plots: Lv1 30, Lv3 40, q(59) §1.1), at most the garden grid's. */
@@ -265,7 +271,8 @@ function waterCovered(c: P0Content, s: P0State, now: number, grow: (id: string, 
   for (const p of s.plots) {
     if (p.state !== 'sown' || !p.crop || !cover.has(p.id)) continue;
     p.state = 'growing';
-    p.ready_at = now + growMs(c, s, p, grow(p.crop, p));
+    const quick = quickCrop(c, p.crop)?.quick;   // a teaching seed's fixed time (q(217))
+    p.ready_at = now + (quick ? quick.ms : growMs(c, s, p, grow(p.crop, p)));
     started.push(p.id);
   }
   return started;

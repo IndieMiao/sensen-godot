@@ -346,7 +346,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		sell_here = str(here) if here >= 0 else "",
 		sell_at_home = ("Sells for %d at home" % int(it.sell)) if it.get("sell", null) != null else "",
 		energy = str(int(crop.energy)) if crop.has("energy") else "",
-		grow = hours(float(crop.grow_h)) if crop.has("grow_h") else "",
+		grow = grow_time(crop),
 		stored = str(_stored(view, item_id)) if _stored(view, item_id) > 0 else "",
 		take_some = "Take %d" % _TAKE_SOME,
 		homestead_gate = ("Homestead Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
@@ -499,9 +499,15 @@ static func fert_use(item_id: String) -> String:
 	if g.has("grow_mult"): return "Crops ready %d%% sooner" % roundi((1.0 - float(g.grow_mult)) * 100.0)
 	return "Grows faster"
 
+## How long a seed takes, a fact that does not tick: `4h`, `7h 58m`; a teaching seed's seconds, `45s` (q(217) ④ — the
+## game's one static duration in seconds; m:ss would read as a countdown).
+static func grow_time(crop: Dictionary) -> String:
+	if crop.has("grow_s"): return "%ds" % int(crop.grow_s)
+	return hours(float(crop.grow_h)) if crop.has("grow_h") else ""
+
 static func _seed_use(crop: Dictionary) -> String:
-	if not crop.has("grow_h"): return ""
-	var line := "Ready in " + hours(float(crop.grow_h))
+	if grow_time(crop) == "": return ""
+	var line := "Ready in " + grow_time(crop)
 	return line + (SEP + "not native" if crop.has("native") and not bool(crop.native) else "")
 
 static func _stock_line(offer: Dictionary, count: int) -> String:

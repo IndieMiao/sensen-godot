@@ -65,6 +65,7 @@ const CROP_CODES := {
 	"crop_cabbage": "L", "crop_cucumber": "L", "crop_corn": "H", "crop_strawberry": "M", "crop_melon": "M",
 	"crop_pumpkin": "M", "crop_pineapple": "B", "crop_sweet_potato": "P", "crop_beet": "C",
 	"crop_apple": "T", "crop_citrus": "T", "crop_grape": "B",
+	"crop_quick_radish": "R",   # q(217): the teaching seed's Quick Radish grows as a radish
 }
 
 ## Plots the homestead has now: the view's garden.plots (30, 40 from Homestead Lv3); MAX_PLOTS with no view (the beds,
@@ -332,6 +333,7 @@ static func _in_footprint(c: Vector2i) -> bool:
 static func cells(view: Dictionary, now_ms: int) -> Dictionary:
 	var grow := {}
 	for c in view.get("crops", []): grow[str(c.get("id", ""))] = float(c.get("grow_h", 4)) * 3600000.0
+	for q in view.get("quick_seeds", []): grow[str(q.get("id", ""))] = float(q.get("grow_s", 45)) * 1000.0   # q(217)
 	var out := {}
 	for p in view.get("plots", []):
 		var id := int(p.get("id", -1))

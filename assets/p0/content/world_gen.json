@@ -1286,7 +1286,7 @@
     "shoes": "shoes0"
    },
    "market_tropical_1": {
-    "hairHat": "hairhat41_npc_auburn",
+    "hairHat": "hairhat51",
     "cloth": "cloth11",
     "shoes": "shoes2"
    },
@@ -1316,7 +1316,7 @@
     "shoes": "shoes2"
    },
    "market_temperate_1": {
-    "hairHat": "hairhat41_npc_auburn",
+    "hairHat": "hairhat51",
     "cloth": "cloth1",
     "shoes": "shoes4"
    },

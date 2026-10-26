@@ -317,6 +317,34 @@ static func quick_name_style(title: String) -> StringName:
 		if font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > UiTokens.SIZE_QUICK_SLOT_W: return UiTokens.STYLE_C9_B
 	return UiTokens.STYLE_C10_B
 
+## A quick slot's name as shown (q(217), 不知火舞 340 c4a3b888): a name that breaks into more than two lines at its
+## quick_name_style drops a last word `Seeds` / `Seed` (the seed-packet icon says it): `Quick Radish Seeds` →
+## `Quick Radish`. Still more than two lines, it is set as q(197) sets it; nothing else is cut. Quick slots only (and
+## the bag drawer's bar row, the same cell); the Bag's cells, the item card and Today keep the whole name.
+static func quick_name(title: String) -> String:
+	if quick_lines(title) <= 2: return title
+	for tail in [" Seeds", " Seed"]:
+		if title.ends_with(tail): return title.trim_suffix(tail)
+	return title
+
+## Lines a quick slot's name takes across the slot's full 52 at its style, breaking between words (and after a hyphen)
+## as the label's AUTOWRAP_WORD does.
+static func quick_lines(title: String) -> int:
+	var style := quick_name_style(title)
+	var th := UiKit.theme()
+	var font := th.get_font(&"font", style)
+	var fs := th.get_font_size(&"font_size", style)
+	var width := float(UiTokens.SIZE_QUICK_SLOT_W)
+	var lines := 0
+	var line := ""
+	for word in title.replace("-", "- ").split(" ", false):
+		var joined := word if line == "" else (line + word if line.ends_with("-") else line + " " + word)
+		if line != "" and font.get_string_size(joined, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > width:
+			lines += 1
+			line = word
+		else: line = joined
+	return lines + (1 if line != "" else 0)
+
 static func _band_label(parent: Control, style: StringName, y: float, h: float, align := HORIZONTAL_ALIGNMENT_CENTER) -> Label:
 	var l := UiKit.label("", style)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -660,8 +688,8 @@ func _refresh_quick(s: State) -> void:
 	_name.offset_bottom = name_top + _QUICK_NAME_H
 	_qty.offset_top = name_top + _QUICK_NAME_H
 	_qty.offset_bottom = name_top + _QUICK_NAME_H + _QUICK_QTY_H
-	_name.text = title
-	_name.theme_type_variation = quick_name_style(title)
+	_name.text = quick_name(title)
+	_name.theme_type_variation = quick_name_style(_name.text)
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
 	var ghost := s == State.GHOST

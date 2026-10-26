@@ -8,7 +8,7 @@
     "res_pip": {"name": "Pip", "scale": 0.88, "anchor": "npc_pip", "slots": {"hairHat": "hairhat36_npc_pip", "cloth": "cloth1", "shoes": "shoes1", "messengerBag": "messengerbag4"}},
     "res_old_kai": {"name": "Old Kai", "scale": 1.0, "anchor": "npc_kai", "slots": {"hairHat": "hairhat71_npc_kai", "mask": "mask16_npc_kai", "cloth": "cloth11_npc_mei", "shoes": "shoes3"}},
     "res_sam": {"name": "Sam", "scale": 1.0, "anchor": "npc_sam", "slots": {"hairHat": "hairhat41", "cloth": "cloth42", "shoes": "shoes3"}},
-    "res_nadia": {"name": "Nadia", "scale": 1.0, "anchor": "npc_nadia", "slots": {"hairHat": "hairhat70", "cloth": "cloth1_1", "shoes": "shoes2"}},
+    "res_nadia": {"name": "Nadia", "scale": 1.0, "anchor": "npc_nadia", "slots": {"hairHat": "hairhat41_npc_auburn", "cloth": "cloth1_1", "shoes": "shoes2"}},
     "res_theo": {"name": "Theo", "scale": 1.0, "anchor": "npc_theo", "slots": {"hairHat": "hairhat43", "cloth": "cloth1", "shoes": "shoes4"}},
     "res_hana": {"name": "Hana", "scale": 1.0, "anchor": "npc_hana", "slots": {"hairHat": "hairhat0", "cloth": "cloth11", "shoes": "shoes5"}},
     "res_lena": {"name": "Lena", "scale": 1.0, "anchor": "npc_lena", "slots": {"hairHat": "hairhat41", "glass": "glass1", "cloth": "cloth1_1", "shoes": "shoes1"}},

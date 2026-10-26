@@ -817,8 +817,10 @@ func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
 		if not groups.has(stem): groups[stem] = []
 		groups[stem].append(P0CityPlaces.hair_style(str(l.get("hairHat", ""))))   # by style: a colour variant is the same hair
 	assert_int(groups.size()).is_equal(16)
-	for colour in ["hairhat41_npc_auburn", "hairhat43_npc_black"]:   # 上官婉儿 284 df21e0ee
-		assert_int(looks.values().filter(func(l): return l is Dictionary and str(l.get("hairHat", "")) == colour).size()).is_equal(7)
+	# 上官婉儿 284 df21e0ee; two market sets left auburn for hairhat51 when Nadia took it (不知火舞 on 344, 691862a6)
+	for colour in {"hairhat41_npc_auburn": 5, "hairhat43_npc_black": 7}:
+		assert_int(looks.values().filter(func(l): return l is Dictionary and str(l.get("hairHat", "")) == colour).size()) \
+			.override_failure_message(colour).is_equal(int({"hairhat41_npc_auburn": 5, "hairhat43_npc_black": 7}[colour]))
 	for stem in groups:
 		var hairs: Array = groups[stem]
 		var distinct := {}

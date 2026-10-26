@@ -820,7 +820,9 @@ var _wave := {}   # the Harvest ×N sent last: {plots (near to far), crops: {plo
 
 func _record_wave(row: Array) -> void:
 	var crop_of := {}
-	for p in rt.session.view.get("plots", []): crop_of[int(p.get("id", -1))] = str(p.get("crop", "")) if p.get("crop", null) != null else ""
+	# what each plot is harvested as (a Quick Radish flies as the Radish the reply puts in the bag, q(217))
+	for p in rt.session.view.get("plots", []):
+		crop_of[int(p.get("id", -1))] = P0Logic.harvest_of(rt.session.view, str(p.get("crop", ""))) if p.get("crop", null) != null else ""
 	_wave = {"plots": row.map(func(x): return int(x)), "crops": crop_of, "at": Time.get_ticks_msec()}
 
 ## The reply to the Harvest ×N sent last: the wave over the plots it took (all, or up to where the bag filled,

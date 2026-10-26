@@ -450,12 +450,32 @@ static func key_ready(ms: float) -> String:
 static func crop(view: Dictionary, crop_id: String) -> Dictionary:
 	for c in view.get("crops", []):
 		if str(c.get("id", "")) == crop_id: return c
-	return {}
+	var q := quick_seed(view, crop_id)
+	return q if not q.is_empty() and str(q.get("id", "")) == crop_id else {}
 
 static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 	for c in view.get("crops", []):
 		if str(c.get("seed", "")) == seed_id: return c
+	var q := quick_seed(view, seed_id)
+	return q if not q.is_empty() and str(q.get("seed", "")) == seed_id else {}
+
+## A teaching seed (q(217): Quick Radish Seeds) by its plot crop or its seed — view.quick_seeds' {id, seed, energy, grow_s,
+## harvest}; {} for any other id. Never one of view.crops: lists of crops (unlocks, Next, requests) never show it.
+static func quick_seed(view: Dictionary, id: String) -> Dictionary:
+	if id == "": return {}
+	for q in view.get("quick_seeds", []):
+		if str(q.get("id", "")) == id or str(q.get("seed", "")) == id: return q
 	return {}
+
+## What a plot's crop is harvested as: a Quick Radish is a Radish (q(217)); any other crop itself.
+static func harvest_of(view: Dictionary, crop_id: String) -> String:
+	var q := quick_seed(view, crop_id)
+	return str(q.get("harvest", crop_id)) if not q.is_empty() and str(q.get("id", "")) == crop_id else crop_id
+
+## A crop's time to ripe in a sentence (`Radishes ready in 3h 58m`, q(97) ②), but a teaching seed's ticks in m:ss in
+## front of the player (`Quick Radishes ready in 0:45`, q(217) ④, under q(97) ①).
+static func ripe_in(view: Dictionary, crop_id: String, ms: float) -> String:
+	return duration(ms) if not quick_seed(view, crop_id).is_empty() else span(ms)
 
 ## Gift Clues (Fishing Lv7, q(167)): the residents met who like this dish, in content order — view.gift_clues
 ## {dish: [{resident, verdict}]}, null before Lv7. Names, [] when none.
@@ -567,7 +587,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		return _plant_action(view, plot_id, seed_id)
 	if seed_id.begins_with("fert_"):
 		var ripe := str(plot.get("state", "")) == "ready"
-		if str(plot.get("state", "")) in ["sown", "growing"] and not ripe and not plot.get("fert", false):
+		# a Quick Radish takes no Compost (q(217) ①): the key goes by the plot's state, no word about it
+		var quick := not quick_seed(view, str(plot.get("crop", ""))).is_empty()
+		if str(plot.get("state", "")) in ["sown", "growing"] and not ripe and not plot.get("fert", false) and not quick:
 			return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
 				"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
 		if str(plot.get("state", "")) == "tilled":
@@ -598,7 +620,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"sown":
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
-			return {"icon": "clock", "verb": "Growing", "sub": key_ready(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
+			var ms := float(plot.get("ready_in", 0))   # a Quick Radish's `Ready in 0:45`, ticking (q(217) ④)
+			var sub := "Ready in " + duration(ms) if not quick_seed(view, str(plot.get("crop", ""))).is_empty() else key_ready(ms)
+			return {"icon": "clock", "verb": "Growing", "sub": sub, "enabled": false, "amber": false, "cmd": {}, "need": 0}
 		"ready":
 			# Harvest All (Farming Lv9, q(118) ④): the ripe annuals of the garden row underfoot, this one first.
 			var whole := harvest_row(view, plot)
@@ -696,7 +720,11 @@ static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned:
 	# the free end fills with the first family, and on Fishing with the Fish Trap too (the pond's design shows it, §6.8)
 	var fill := func(id): return str(id).begins_with(prefix) or (mode == "fish" and str(id).begins_with("trap_"))
 	var rest: Array = counts.keys().filter(func(id): return fill.call(id) and not bar.has(id) and not removed.has(id))
-	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
+	# a teaching seed first (q(217) ②: Quick Radish Seeds ×2 on the first slot, then Radish ×20, Lettuce ×10)
+	var teach := func(id): return 0 if quick_seed(view, str(id)).is_empty() else 1
+	rest.sort_custom(func(a, b):
+		if teach.call(a) != teach.call(b): return teach.call(a) > teach.call(b)
+		return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)
 	while not bar.is_empty() and str(bar.back()) == "": bar.pop_back()   # a gap at the end is just the end
@@ -731,7 +759,7 @@ static func today_line(view: Dictionary) -> String:
 	for st in view.get("bag", {}).get("slots", []):
 		if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
 	if fish > 0: return "Cook with %d fish" % fish
-	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), span(best_ms)]
+	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), ripe_in(view, best_crop, best_ms)]
 	if any_sown: return "Water what you sowed"
 	return "Sow your first plot"
 
@@ -1417,23 +1445,38 @@ static func today_rows(view: Dictionary) -> Array:
 		now_rows = deliveries + now_rows
 	var ready := {}
 	var sown := 0
+	# A Quick Radish's countdown is one row, the soonest plot's, its seconds apart from the next one's; it says one left in
+	# the singular (q(217) ④: `Quick Radish ready in 0:45`).
+	var growing := {}   # crop → plots growing
+	var soonest := {}   # a teaching seed's crop → its soonest plot id
+	for p in view.get("plots", []):
+		if str(p.get("state", "")) != "growing": continue
+		var c := str(p.crop)
+		growing[c] = int(growing.get(c, 0)) + 1
+		if not quick_seed(view, c).is_empty() and (not soonest.has(c) or float(p.get("ready_in", 0)) < float(soonest[c][1])):
+			soonest[c] = [int(p.get("id", -1)), float(p.get("ready_in", 0))]
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
 		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
 		elif st == "sown": sown += 1
-		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), span(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
+		elif st == "growing":
+			var c := str(p.crop)
+			if soonest.has(c) and int(soonest[c][0]) != int(p.get("id", -1)): continue
+			var ms := float(p.get("ready_in", 0))
+			var name := item_name(view, c) if int(growing[c]) == 1 and not quick_seed(view, c).is_empty() else plural(item_name(view, c))
+			timed.append([ms, _row("%s ready in %s" % [name, ripe_in(view, c, ms)], harvest_of(view, c), "plots")])
 	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
 	# follows it as an info row (`Farming Lv2 with this harvest`, no button — §14.5's exception: it goes with its source).
 	var level := P0Guide.harvest_level(view)
 	if ready.size() == 1:
 		var c: String = ready.keys()[0]
-		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], c, "plots", "harvest:" + c))
+		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], harvest_of(view, c), "plots", "harvest:" + c))
 	elif ready.size() > 1:
 		var n := 0
 		for c in ready: n += int(ready[c])
 		var crops: Array = ready.keys()
 		crops.sort()
-		now_rows.append(_row("Harvest %d crops" % n, str(ready.keys()[0]), "plots", "harvest:" + "+".join(crops)))
+		now_rows.append(_row("Harvest %d crops" % n, harvest_of(view, str(ready.keys()[0])), "plots", "harvest:" + "+".join(crops)))
 	if not ready.is_empty() and bool(level.get("now", false)):
 		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
 	if sown > 0: now_rows.append(_row("Water %d sown plot%s" % [sown, "" if sown == 1 else "s"], "water", "plots"))
