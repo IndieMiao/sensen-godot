@@ -97,14 +97,18 @@ function countedKeys(c: P0Content): Set<string> {
 /** A new save's guide: on when the client can show it and the table has steps, else legacy. */
 export function freshGuide(c: P0Content, now: number, on: boolean): GuideState {
   const first = stepsOf(c)[0];
-  return on && first ? enter(first, { step: null, n: {}, at: now }, now) : legacyGuide(now);
+  return on && first ? enter(first, { step: null, n: {}, at: now }, now, stepsOf(c)[1]) : legacyGuide(now);
 }
 export const legacyGuide = (now: number): GuideState => ({ step: null, n: {}, end: 'legacy', at: now });
 export const guideOn = (s: P0State): boolean => !!s.guide && s.guide.step !== null;
 
-function enter(st: GuideStep, g: GuideState, now: number): GuideState {
+/** Begin a step. A from_step count starts here; so does the next step's when this one is optional, since the next
+ * one may pass it (苏烈 on #472: else the look-ahead read the next step's count from the very start). */
+function enter(st: GuideStep, g: GuideState, now: number, next?: GuideStep): GuideState {
   g.step = st.id; g.at = now;
-  if (st.done_on?.from_step) g.base = { [st.done_on.key]: g.n[st.done_on.key] ?? 0 };
+  const base: Record<string, number> = {};
+  for (const x of [st, ...(st.optional && next ? [next] : [])]) if (x.done_on?.from_step) base[x.done_on.key] = g.n[x.done_on.key] ?? 0;
+  if (Object.keys(base).length) g.base = base;
   else delete g.base;
   return g;
 }
@@ -200,11 +204,21 @@ export function settleGuide(c: P0Content, s: P0State, keys: Map<string, number>,
   const steps = stepsOf(c);
   let i = steps.findIndex(st => st.id === g.step);
   if (i < 0) { endGuide(g, now); return; }   // a step the table no longer has (content changed): never strand the player
-  while (stepDone(c, s, steps[i], now) || (steps[i].optional && i + 1 < steps.length && stepDone(c, s, steps[i + 1], now))) {
-    i += 1;
+  for (;;) {
+    // an optional step whose next step is done (counted from the optional one's start) passes with it: both go
+    const pass = stepDone(c, s, steps[i], now) ? 1
+      : steps[i].optional && i + 1 < steps.length && stepDone(c, s, steps[i + 1], now) ? 2 : 0;
+    if (!pass) return;
+    i += pass;
     if (i >= steps.length) { endGuide(g, now); return; }
-    enter(steps[i], g, now);
+    enter(steps[i], g, now, steps[i + 1]);
   }
+}
+
+/** At load (upgradeState): a guide on a step the table no longer has ends at once, not on the next command (苏烈 on #472). */
+export function checkGuideTable(c: P0Content, s: P0State, now: number): void {
+  const g = s.guide;
+  if (g?.step && !stepsOf(c).some(st => st.id === g.step)) endGuide(g, now);
 }
 
 function endGuide(g: GuideState, now: number): void {
@@ -236,7 +250,7 @@ export function guideAck(c: P0Content, s: P0State, step: unknown): { code: strin
 export function guideView(c: P0Content, s: P0State, now: number) {
   const g = s.guide;
   const st = currentStep(c, s);
-  if (!g || !st) return { step: null, end: g?.end ?? 'legacy' };
+  if (!g || !st) return { step: null, end: g?.end ?? (g?.step ? 'done' : 'legacy') };   // a step gone from the table: as ended
   return { step: st.id, phase: st.phase ?? null, recover: guideRecover(c, s, now), at: g.at, progress: progress(st, g) };
 }
 
@@ -256,7 +270,7 @@ export function setGuide(c: P0Content, s: P0State, to: string, now: number): { c
   if (to === 'end') { s.guide = { step: null, n: {}, end: 'done', at: now }; return null; }
   const st = to === 'first' ? steps[0] : steps.find(x => x.id === to);
   if (!st) return { code: 'bad_step' };
-  s.guide = enter(st, { step: null, n: {}, at: now }, now);
+  s.guide = enter(st, { step: null, n: {}, at: now }, now, steps[steps.indexOf(st) + 1]);
   return null;
 }
 
@@ -287,6 +301,9 @@ export function validateGuide(c: P0Content): string[] {
       if (m.resident && !c.residents[m.resident]) out.push(`${where}: unknown resident ${m.resident}`);
     }
   };
+  steps.forEach((st, i) => {
+    if (st.optional && (i + 1 >= steps.length || steps[i + 1].optional)) out.push(`step ${st.id}: an optional step needs a step after it that is not optional`);
+  });
   for (const st of steps) {
     const at = `step ${st.id}`;
     if (!st.done_on && !st.done_if) out.push(`${at}: neither done_on nor done_if`);

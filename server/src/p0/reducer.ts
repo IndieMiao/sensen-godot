@@ -97,7 +97,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   }
   // SGODOT-303: a new player still to pick a home plays nothing yet — the pick page comes first; the server holds the
   // line too, not the client alone (奕星). Only the pick itself goes through.
-  if (input.travel?.pending && cmd.type !== 'choose_home') return fail('home_pending');
+  // SGODOT-341: a guide step read before the pick (339's t_city, a client page) is acked then too.
+  if (input.travel?.pending && cmd.type !== 'choose_home' && cmd.type !== 'guide') return fail('home_pending');
   const s = structuredClone(input);
   const events: P0Event[] = [];
   const counted = takenCounts(c, s);   // q(134): what each taken request counted before this command, settles included
