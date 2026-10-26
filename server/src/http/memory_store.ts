@@ -69,7 +69,9 @@ export class MemoryStore implements Store {
   }
   private players = new Map<string, PlayerRow>();
   private tokens: TokenRow[] = [];
-  private farms = new Map<string, FarmRow & { content_version: string; domain_version: string; state_schema_version: number; created_at: number }>();
+  private farms = new Map<string, FarmRow & { content_version: string; domain_version: string; state_schema_version: number; created_at: number;
+    /** Only a farm saved before SGODOT-304 has it; such a farm takes no new commands. */
+    farm_terrain?: unknown }>();
   private creations = new Map<string, { key: string; hash: string; farmId: string }>();
   private commands = new Map<string, Map<string, CommandRecord>>();
   private snapshots = new Map<string, { revision: number; taken_at: number; body: object }>();
@@ -306,7 +308,8 @@ export class MemoryStore implements Store {
     // 2. 新命令才做版本门控。
     if (stored.content_version !== this.deps.contentVersion
       || stored.domain_version !== DOMAIN_VERSION
-      || stored.state_schema_version !== STATE_SCHEMA_VERSION)
+      || stored.state_schema_version !== STATE_SCHEMA_VERSION
+      || stored.farm_terrain)   // a map-generated farm's terrain is no longer read (SGODOT-304)
       return { kind: 'version_mismatch' };
 
     // 3. 锁后采样，单调 clamp。

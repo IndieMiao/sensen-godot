@@ -535,7 +535,9 @@ export class PgStore implements Store {
       // 3. 新命令才做版本门控（fail closed，不静默换规则去算老农场）。
       if (row.content_version !== this.d.contentVersion
         || row.domain_version !== DOMAIN_VERSION
-        || row.state_schema_version !== STATE_SCHEMA_VERSION) {
+        || row.state_schema_version !== STATE_SCHEMA_VERSION
+        // A map-generated farm's cells live on its own terrain, which this service no longer reads (SGODOT-304).
+        || row.farm_terrain) {
         await client.query('ROLLBACK');
         return { kind: 'version_mismatch' };
       }

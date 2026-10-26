@@ -9,8 +9,14 @@ import type { PlotLayout } from '../domain/plot.js';
 const FROM_DOMAIN_VERSION = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27';
 const TO_DOMAIN_VERSION = '28';
 const SCHEMA_VERSION = 1;
-const VERSION_ROWS = `SELECT id AS farm_id, content_version, domain_version, state_schema_version,
-  farm_terrain IS NOT NULL AS geographic FROM farms ORDER BY id`;
+/** A database whose service never ran the 2026-09-21 schema (the old root /v1 farm image) has no farm_terrain column. */
+const TERRAIN_COLUMN = `SELECT 1 FROM information_schema.columns
+  WHERE table_schema = current_schema() AND table_name = 'farms' AND column_name = 'farm_terrain'`;
+const versionRows = async (db: pg.Pool | pg.PoolClient) => {
+  const geographic = (await db.query(TERRAIN_COLUMN)).rowCount ? 'farm_terrain IS NOT NULL' : 'false';
+  return `SELECT id AS farm_id, content_version, domain_version, state_schema_version,
+    ${geographic} AS geographic FROM farms ORDER BY id`;
+};
 
 interface VersionRow {
   farm_id: string;
@@ -78,7 +84,7 @@ export async function migrateDomain(
   if (DOMAIN_VERSION !== TO_DOMAIN_VERSION || STATE_SCHEMA_VERSION !== SCHEMA_VERSION)
     throw new Error('This migration only supports domain 1..27 -> 28 with state schema 1');
   if (!options.apply) {
-    const rows = await pool.query<VersionRow>(VERSION_ROWS);
+    const rows = await pool.query<VersionRow>(await versionRows(pool));
     return inspect(rows.rows, options);
   }
 
@@ -88,7 +94,7 @@ export async function migrateDomain(
     await client.query("SET LOCAL lock_timeout = '5s'");
     // Block inserts as well as commands while inspecting the whole set; plain reads remain available.
     await client.query('LOCK TABLE farms IN EXCLUSIVE MODE');
-    const rows = await client.query<VersionRow>(`${VERSION_ROWS} FOR UPDATE`);
+    const rows = await client.query<VersionRow>(`${await versionRows(client)} FOR UPDATE`);
     const report = inspect(rows.rows, options);
     if (report.blocked.length) {
       await client.query('ROLLBACK');

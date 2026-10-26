@@ -192,6 +192,28 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     }
   });
 
+  it('runs on a database that never got the farm_terrain column (the old root /v1 farm image)', async () => {
+    const farm = await seed();
+    // A private schema keeps the shared test tables intact.
+    const schema = `no_terrain_${randomUUID().replaceAll('-', '')}`;
+    await pool.query(`CREATE SCHEMA ${schema}`);
+    const scoped = new pg.Pool({ connectionString: DSN, max: 2, options: `-c search_path=${schema}` });
+    try {
+      await pool.query(`CREATE TABLE ${schema}.farms (LIKE public.farms INCLUDING DEFAULTS INCLUDING CONSTRAINTS)`);
+      await pool.query(`CREATE TABLE ${schema}.farm_snapshots (LIKE public.farm_snapshots INCLUDING DEFAULTS)`);
+      await pool.query(`INSERT INTO ${schema}.farms SELECT * FROM public.farms`);
+      await pool.query(`ALTER TABLE ${schema}.farms DROP COLUMN farm_terrain`);
+      expect(await migrateDomain(scoped, { plot: sets, contentVersion: CV }))
+        .toMatchObject({ status: 'ready', eligible: [farm.id], blocked: [] });
+      expect(await migrateDomain(scoped, { plot: sets, contentVersion: CV, apply: true }))
+        .toMatchObject({ status: 'applied', migrated: 1 });
+      expect((await scoped.query('SELECT domain_version FROM farms')).rows).toEqual([{ domain_version: DOMAIN_VERSION }]);
+    } finally {
+      await scoped.end();
+      await pool.query(`DROP SCHEMA ${schema} CASCADE`);
+    }
+  });
+
   it('also refuses mismatched content on a current-domain farm', async () => {
     await seed();
     const other = await seed(DOMAIN_VERSION);
