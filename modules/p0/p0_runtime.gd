@@ -1621,8 +1621,11 @@ func _dev_shot(dt: float) -> void:
 					var open_rows: Array = _home_flow.cities.open_rows if _home_flow.cities != null else []
 					var near_row = open_rows.filter(func(r): return str(r.id) == step[1])
 					if not near_row.is_empty():
+						# a second homewelcome builds both again (刘邦 on #476: a card left standing kept the list unbuilt)
 						if _home_flow.cities != null: _home_flow.cities.queue_free()
+						if _home_flow.welcome != null: _home_flow.welcome.queue_free()
 						_home_flow.cities = null
+						_home_flow.welcome = null
 						_home_flow._cities_read({"open": open_rows, "near": near_row[0], "matches": []}, "")
 			"homestart": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.start.activated.emit()
 			"homeother": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.other.activated.emit()
