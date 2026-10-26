@@ -1608,11 +1608,10 @@ func _dev_shot(dt: float) -> void:
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
 			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
-			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, picked)
+			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, not picked)
 				if is_instance_valid(_home_flow):
 					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
 					if not near_row.is_empty():
-						_home_flow.cities._opened = false
 						_home_flow.cities.show_cities({"open": _home_flow.cities.open_rows, "near": near_row[0]}, "")
 			# HOME-WELCOME (SGODOT-340 §4): homewelcome:<cluster> opens the pick as if the address were near it; homestart /
 			# homeother press Start here / Choose another city

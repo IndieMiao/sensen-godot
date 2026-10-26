@@ -37,9 +37,6 @@ func test_the_list_is_near_you_then_recommended_by_climate() -> void:
 	parts = P0HomePick.sections(OPEN, null)
 	assert_array(parts.map(func(p): return str(p.get("text", p.get("row", {}).get("name", ""))))).is_equal(
 		["Recommended", "Temperate", "San Francisco", "Seattle", "Subtropical", "Los Angeles", "Tropical", "Singapore"])
-	assert_str(P0HomePick.preselect(null)).is_empty()
-	assert_str(P0HomePick.preselect(SF)).is_equal(SF.id)
-	assert_str(P0HomePick.preselect(SF, true)).is_empty()   # a change of home never picks for the player
 	# a search: its rows only, no titles
 	assert_array(P0HomePick.sections(OPEN, SF, [SF, SAN_JOSE]).map(func(p): return p.kind)).is_equal(["row", "row"])
 	# the ones that can be picked first, each group in the server's order (不知火舞 on #451)
@@ -64,13 +61,20 @@ func _pick_page() -> Control:
 	add_child(page)
 	return page
 
-func test_near_you_is_picked_and_continue_goes_with_it() -> void:
+## 340 6cb4d10e ② (q(216)): Near you is listed, never picked for the player — the key is `Pick a city` until a row is.
+func test_near_you_is_listed_not_picked_and_continue_goes_with_the_row_picked() -> void:
 	var page := _pick_page()
 	page.show_cities({"open": OPEN, "near": SF}, "")
 	await await_idle_frame()
 	assert_array(_texts(page.list)).contains_exactly(["Near you", "San Francisco", " · California", "Temperate", "Recommended", "Temperate",
 		"Seattle", " · Washington", "Temperate", "Subtropical", "Los Angeles", " · California", "Subtropical", "Tropical", "Singapore",
 		" · Singapore", "Tropical"])
+	assert_bool(page.rows.values().any(func(r): return r.picked)).is_false()
+	assert_str(page.key.reason).is_equal("Pick a city")
+	page.show_cities({"open": OPEN, "near": SF}, "")   # a second answer still picks nothing
+	assert_str(page.choice).is_empty()
+	page.rows[SF.id].pressed.emit()
+	await await_idle_frame()
 	assert_bool(page.rows[SF.id].picked).is_true()
 	assert_bool(page.rows[SF.id].check.visible).is_true()
 	assert_float(page.rows[SF.id].size.x).is_equal(344.0)   # the picked ground reaches 8 past the list's 328 each side
@@ -98,6 +102,8 @@ func test_no_city_near_opens_with_nothing_picked() -> void:
 func test_a_search_lists_its_matches_greyed_with_why() -> void:
 	var page := _pick_page()
 	page.show_cities({"open": OPEN, "near": SF}, "")
+	await await_idle_frame()
+	page.rows[SF.id].pressed.emit()   # the player picks Near you
 	var asked := []
 	page.read_cities.connect(func(q): asked.append(q))
 	page.field.text = "san"
@@ -349,7 +355,7 @@ func test_a_city_near_opens_on_the_welcome_card() -> void:
 	assert_bool(flow.welcome.visible).is_true()
 	assert_bool(flow.cities.visible).is_false()
 	var texts := _texts(flow.welcome)
-	assert_array(texts).contains(["Welcome to Gensen!", "San Francisco", "Looks like you're near San Francisco. Start your farm here?"])
+	assert_array(texts).contains(["Welcome to Gensen!", "San Francisco", "Start your farm here? It's the closest home city to you."])
 	assert_str(flow.welcome.start.label).is_equal("Start here")
 	assert_str(flow.welcome.other.label).is_equal("Choose another city")
 	assert_object(flow.welcome.find_child("Close", true, false)).is_null()   # no ×, no later

@@ -3,8 +3,9 @@ extends Control
 ## city (q(205) Near you). The card at the bottom — 16 from the sides, the safe area + 16 from the bottom, radius 20,
 ## 20 in: `Welcome to Gensen!` (ExtraBold 22), the city's row (as HOME-PICK's), one line (Body 14), then `Start here`
 ## (primary) and `Choose another city` (secondary), 48 each, 8 apart. No ×, no later. Modal: nothing under it moves.
-## Behind it the map's land colour for now (§4: the colour the card shows on while the map loads; the flight from the
-## globe to the city comes with the pick-a-spot map, PR-2). Copy is the draft until q(216).
+## Behind it the map's land colour for now (§4: #F6F4EA, the colour the card shows on while the map loads; the flight
+## from the globe to the city comes with the pick-a-spot map, PR-2). Frames: row 101 51:160750 / 51:160776 / 51:160801
+## (Figma 5SVgfevrLzZXqD83uyPgmV); copy per q(216) 7aa8ffad.
 ## Emits start_pressed, other_pressed.
 
 signal start_pressed
@@ -12,16 +13,15 @@ signal other_pressed
 
 const P0CityRow := preload("res://scenes/p0/panels/p0_city_row.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
-const LAND := Color("F4F1E7")   # the game map's land (GodotMapPlugin applyCityStyle), as the spot page's cards
+const LAND := Color("F6F4EA")   # HOME-WELCOME's map-loading ground (340 §4, row 101 51:160776)
 const _SIDE := 16
 const _BOTTOM := 16
 const _PAD := 20
 const _GAP := 12
 const _KEY_GAP := 8
 const _TITLE_SIZE := 22
-## The line under the city (李白's draft; 不知火舞 suggests `Start your farm here? It's the closest home city to you.`,
-## since Near you reaches 1,500 km: q(216) decides).
-const LINE := "Looks like you're near %s. Start your farm here?"
+## The line under the city (q(216); Near you reaches 1,500 km, so it does not say how near).
+const LINE := "Start your farm here? It's the closest home city to you."
 
 var row: Dictionary
 var card: PanelContainer
@@ -67,7 +67,7 @@ func _init(row_: Dictionary = {}, safe_bottom := 0.0) -> void:
 	city.custom_minimum_size.x = 0   # the card's column, not the list's 344
 	city.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(city)
-	var line := UiKit.label(LINE % str(row.get("name", "")), UiTokens.STYLE_BODY_R14)
+	var line := UiKit.label(LINE, UiTokens.STYLE_BODY_R14)
 	line.name = "Line"
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(line)
