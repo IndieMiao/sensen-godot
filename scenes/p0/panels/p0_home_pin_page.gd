@@ -56,6 +56,7 @@ const VEIL := Color(0.184, 0.227, 0.2, 0.30)            # COLOR_TEXT 30 %
 const EDGE := Color(1, 1, 1, 0.8)
 const RING := Color(0.184, 0.227, 0.2, 0.5)
 const DRAG_FADE := 0.5
+const OVER_NAMES_Z := 2
 
 var cluster := ""
 var city_name := ""
@@ -130,6 +131,8 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	add_child(build)
 	back_key = _back_key()
 	add_child(back_key)
+	# over the places' names (UiMapDestination.NAME_Z 1, drawn over every disc): the pin, the panel, the card and keys
+	for n in [pin, panel, card, loading_card, error_card, build, back_key]: (n as CanvasItem).z_index = OVER_NAMES_Z
 	resized.connect(_keep_pin)
 	show_loading()
 
@@ -414,7 +417,9 @@ func _place_places() -> void:
 		d.visible = s != null
 		if s != null: d.position = (s as Vector2) - d.anchor_offset()
 
-## The page's own map (the desktop, the tests): drags move it.
+## The page's own map (the desktop, the tests): drags move it. The mouse only: a touch comes as the mouse too
+## (emulate_mouse_from_touch), and a mouse as a touch where the touch is emulated (the shots' drag) — both read, a drag
+## moved the map twice its length.
 func _flat_input(e: InputEvent) -> void:
 	if not map is FlatMap: return
 	var f := map as FlatMap
@@ -423,11 +428,6 @@ func _flat_input(e: InputEvent) -> void:
 		if not f.dragging: _refresh()
 	elif e is InputEventMouseMotion and f.dragging:
 		f.pan((e as InputEventMouseMotion).relative)
-		_refresh()
-	elif e is InputEventScreenTouch:
-		f.dragging = (e as InputEventScreenTouch).pressed
-	elif e is InputEventScreenDrag:
-		f.pan((e as InputEventScreenDrag).relative)
 		_refresh()
 
 static func _veil_shader() -> Shader:

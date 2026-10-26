@@ -1559,7 +1559,7 @@ func _dev_shot(dt: float) -> void:
 		get_viewport().get_texture().get_image().save_png("%s/f%05d.png" % [frames, Engine.get_frames_drawn()])
 	var limit := OS.get_environment("P0_SHOT_LIMIT_MS")
 	if Time.get_ticks_msec() > int(limit if limit != "" else "30000"): get_tree().quit(2)
-	if world == null and _shot_t < 6.0: return
+	if world == null and _shot_t < 6.0 and not is_instance_valid(_home_flow): return   # the home pick has no world: its steps (a drag) keep time
 	if not _shot_script.is_empty() and _shot_t > 2.0:
 		var step := str(_shot_script[0]).split(":")
 		if _shot_script.size() != _shot_left:   # once per step: the frame a video of it starts at
