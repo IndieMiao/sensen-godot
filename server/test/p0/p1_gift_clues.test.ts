@@ -50,6 +50,7 @@ describe('Gift Clues (q(167))', () => {
   it('each resident\'s gift points: what giving each dish adds, the Mystery Dish −2', () => {
     const s = player(GIFT_CLUES_LEVEL);
     met(s, 'res_old_kai');
+    residentState(s, 'res_old_kai').gift_day = '2026-01-01';   // given before: q(220)'s first-gift +10 is spent (p1_first_gift)
     const pts = viewOf(c, s, T0).residents.res_old_kai.gift_points!;
     const kai = c.residents.res_old_kai;
     expect(pts[FINE_GRILLED]).toBe(giftPoints(c, s, kai, FINE_GRILLED).delta);

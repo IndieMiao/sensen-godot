@@ -17,7 +17,7 @@
  */
 import type { MapMarker, MarkerKind } from './markers.js';
 import type { P0Content, Skill } from './content.js';
-import { cropById, itemName } from './content.js';
+import { cropById, dishParts, itemName } from './content.js';
 import { count } from './bag.js';
 import { skillLevel } from './rules.js';
 import type { P0Event } from './progress.js';
@@ -190,7 +190,11 @@ export function guideKeys(c: P0Content, before: P0State, s: P0State, cmd: { type
     }
   }
   if (type === 'talk' || type === 'learn') add(`${type}:${String(cmd!.resident)}`);
-  if (type === 'gift') { add(`gift:${String(cmd!.resident)}`); add(`gift:${String(cmd!.resident)}:${String(cmd!.item)}`); }
+  if (type === 'gift') {
+    // `gift:<resident>` is an edible dish given (q(215) S10: the Mystery Dish's −2 does not count); the item key names any
+    if (dishParts(String(cmd!.item)).base !== c.cooking.mystery.id) add(`gift:${String(cmd!.resident)}`);
+    add(`gift:${String(cmd!.resident)}:${String(cmd!.item)}`);
+  }
   if (type === 'guide') add(`ack:${String(cmd!.step)}`);
   return keys;
 }

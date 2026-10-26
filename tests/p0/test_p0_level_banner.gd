@@ -12,7 +12,7 @@ func _view() -> Dictionary:
 		"energy": {"value": 150, "max": 200}, "coins": 40,
 		"skills": {"farming": {"level": 3, "xp": 150}, "fishing": {"level": 2, "xp": 70}, "cooking": {"level": 4, "xp": 220}},
 		"names": {"bait_worm": "Worm Bait", "wild_herb": "Wild Herb", "dish_herb_grilled_fish": "Herb Grilled Fish",
-			"dish_fish_soup": "Fresh Fish Soup", "fert_compost": "Compost", "tool_row_hoe": "Row Hoe", "seed_carrot": "Carrot Seeds",
+			"dish_fish_soup": "Fresh Fish Soup", "dish_grilled_fish": "Grilled Fish", "fert_compost": "Compost", "tool_row_hoe": "Row Hoe", "seed_carrot": "Carrot Seeds",
 			"seed_herb": "Herb Seeds", "seed_potato": "Potato Seeds", "seed_chamomile": "Chamomile Seeds", "seed_tomato": "Tomato Seeds",
 			"seed_chili": "Chili Seeds"},
 		"stall": {"buy": [{"id": "seed_potato", "skill": "farming", "gate": 3}, {"id": "fert_compost", "skill": "farming", "gate": 3},
@@ -38,13 +38,13 @@ func test_farming_lv2_reads_like_the_accepted_frame() -> void:
 	v.skills.farming = {"level": 2, "xp": 50}
 	var b := P0Logic.level_banner(v, {"skill": "farming", "level": 2, "energy": 0, "gifts": [["seed_carrot", 5]]})
 	assert_that([b.title, b.subtitle, b.detail, b.tip, b.seconds]).is_equal(["Farming Lv2",
-		"New for you · Carrot, Herb", "", "Next Lv3 · Potato, Chamomile, Compost · 100 XP", 1.5])
+		"New for you · Carrot, Herb", "", "Next Lv3 · Potato, Chamomile, Compost · 100\u00a0XP", 1.5])
 	assert_array(b.rewards.map(func(r): return r.text)).is_equal(["+5 Carrot Seeds"])   # q(101): no `+30 Energy`
 
 func test_a_later_level_says_what_opened_and_what_is_next() -> void:
 	var b := P0Logic.level_banner(_view(), {"skill": "farming", "level": 3, "energy": 0, "gifts": []})
 	assert_that([b.title, b.subtitle, b.detail, b.tip, b.action, b.seconds]).is_equal(["Farming Lv3",
-		"New for you · Potato, Chamomile, Compost", "", "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP", "", 1.5])
+		"New for you · Potato, Chamomile, Compost", "", "Next Lv4 · Tomato, Chili, Row Hoe · 150\u00a0XP", "", 1.5])
 	assert_bool(b.rewards.is_empty()).is_true()   # a level without a gift has no reward row (q(101))
 
 ## q(101) across versions: this client with a server from before it, which still pays the level-up Energy, says what was
@@ -83,9 +83,37 @@ func test_cooking_levels_name_their_slot_recipe_and_conveniences() -> void:
 	assert_bool(four.rewards.is_empty()).is_true()   # Cooking levels give no Energy (§3.4.8)
 	var v := _view()
 	v.skills.cooking = {"level": 2, "xp": 30}
-	var two := P0Logic.level_banner(v, {"skill": "cooking", "level": 2, "energy": 0, "gifts": [["recipe:dish_fish_soup", 1]]})
+	var two := P0Logic.level_banner(v, {"skill": "cooking", "level": 2, "energy": 0, "gifts": [["recipe:dish_grilled_fish", 1]]})
 	assert_that([two.title, two.subtitle, two.detail, two.tip]).is_equal(["Cooking Lv2", "New for you · Cook Again",
-		"New recipe: Fresh Fish Soup", "Next Lv3 · Double Clue, Hearty Mishap · 70 XP"])
+		"New recipe: Grilled Fish", "Next Lv3 · Double Clue, Hearty Mishap · 70\u00a0XP"])   # q(221): Grilled Fish, not the soup
+
+## q(215) A: a guided account's first level-up is Cooking Lv2 — it teaches (≤ 3 s, the teaching Tip, the Grilled Fish card,
+## no reward row, no action); Use bait stays with the first Fishing level-up, which is then a later one: still ≤ 3 s with
+## Use bait while its bait is in the bag, its Tip the next level instead of the teaching line.
+func test_a_guided_accounts_first_level_up_is_cooking_lv2_and_use_bait_stays_with_fishing_lv2() -> void:
+	var v := _view()
+	v.skills.cooking = {"level": 2, "xp": 45}
+	var cook := P0Logic.level_banner(v, {"skill": "cooking", "level": 2, "gifts": [["recipe:dish_grilled_fish", 1]]}, true)
+	assert_that([cook.title, cook.detail, cook.tip, cook.action, cook.seconds]).is_equal(["Cooking Lv2",
+		"New recipe: Grilled Fish", P0Logic.LEVEL_TIP, "", 3.0])
+	assert_bool(cook.rewards.is_empty()).is_true()
+	var gifts := [["bait_worm", 3], ["wild_herb", 3], ["recipe:dish_herb_grilled_fish", 1]]
+	var fish := P0Logic.level_banner(_view(), {"skill": "fishing", "level": 2, "gifts": gifts})   # not the account's first
+	assert_that([fish.title, fish.subtitle, fish.detail, fish.action, fish.action_id, fish.seconds]).is_equal(["Fishing Lv2",
+		"Fine fish now stay on the hook", "New recipe: Herb Grilled Fish", "Use bait", "use_bait", 3.0])
+	assert_str(fish.tip).starts_with("Next Lv3 · ")
+	assert_str(fish.tip).is_not_equal(P0Logic.LEVEL_TIP)
+	# 不知火舞 on 345 (8b936c42): the figure keeps its unit when the Tip wraps — `140\u00a0XP`, never `XP` alone
+	assert_str(fish.tip).ends_with("\u00a0XP")
+	assert_bool(fish.tip.contains(" XP")).is_false()
+	# the worms went to the Inbox (bag full): nothing to put on the hook, so no Use bait; still the full 3 s banner
+	var v2 := _view()
+	v2.bag.slots = []
+	var full := P0Logic.level_banner(v2, {"skill": "fishing", "level": 2, "gifts": gifts}, true)
+	assert_that([full.action, full.seconds]).is_equal(["", 3.0])
+	# other Fishing levels keep 1.5 s and no action
+	var three := P0Logic.level_banner(_view(), {"skill": "fishing", "level": 3, "gifts": [["bait_worm", 3]]})
+	assert_that([three.action, three.seconds]).is_equal(["", 1.5])
 
 func test_banners_queue_with_the_other_moments_and_use_bait_acts_in_place() -> void:
 	var ui := P0Ui.new()
@@ -204,7 +232,7 @@ func test_the_nine_day_changing_levels_say_so_and_the_trap_levels_are_named_ahea
 	var th: Array = P0Logic.content().get("skills", {}).get("fishing", [])
 	v.skills.fishing = {"level": 7, "xp": int(th[6])}
 	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 7, "energy": 0, "gifts": []}).tip) \
-		.is_equal("Next Lv8 · 2nd Fish Trap, Biting now · %d XP" % (int(th[7]) - int(th[6])))
+		.is_equal("Next Lv8 · 2nd Fish Trap, Biting now · %d\u00a0XP" % (int(th[7]) - int(th[6])))
 	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 3, "energy": 0, "gifts": []}).tip).starts_with("Next Lv4 · ")
 
 ## q(178) ⑥: Fishing's banner subtitle is `New for you · ` and the level's milestone row, as Farming and Cooking — Lv9

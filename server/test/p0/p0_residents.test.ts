@@ -3,6 +3,7 @@ import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { residentState } from '../../src/p0/residents.js';
 
 const content = loadP0Content();
 // The 04:00 instants in these tests are Shanghai's (UTC+8), whatever the home city is; p0_city_switch checks the city's zone.
@@ -33,6 +34,7 @@ describe('affinity (§9.4.4)', () => {
 
   it('gifts: liked style and ≥ Fine +3, liked +2, any dish +1, Perfect +1 (cap 4), once a day; crops are not gifts', () => {
     const s = fresh();
+    for (const id of ['res_pip', 'res_old_kai']) residentState(s, id).gift_day = '2026-01-01';   // given before: q(220)'s first-gift +10 is spent
     s.bag.push({ id: 'dish_carrot_cake', qty: 2 }, { id: 'dish_herb_grilled_fish@perfect', qty: 1 }, { id: 'dish_radish_salad', qty: 1 }, { id: 'crop_radish', qty: 3 });
     expect(refuse(s, { type: 'gift', resident: 'res_pip', item: 'crop_radish' })).toMatchObject({ ok: false, code: 'not_giftable' });
     const cake = step(s, { type: 'gift', resident: 'res_pip', item: 'dish_carrot_cake' });   // Dessert, Common: liked

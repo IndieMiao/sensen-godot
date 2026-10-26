@@ -4,7 +4,7 @@ import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reduc
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 import { pageState } from '../../src/p0/cookbook.js';
-import { likesDish } from '../../src/p0/residents.js';
+import { likesDish, residentState } from '../../src/p0/residents.js';
 
 // P1 residents (SGODOT-284): the other ten of §9.4.3, the 24 h request gap (§9.6.1), lessons (§7.5.3), story rewards.
 const content = loadP0Content();
@@ -123,6 +123,7 @@ describe('a P1 resident request line (§9.6.1)', () => {
 describe('likes by rarity (§7.16.3: Hana Fine+, Mira and Tomo Rare+)', () => {
   it('Hana loves a Fine dish of any style, and takes a Common one as a plain gift', () => {
     const s = fresh();
+    for (const id of ['res_hana', 'res_mira']) residentState(s, id).gift_day = '2026-01-01';   // given before: q(220)'s first-gift +10 is spent
     s.bag.push({ id: 'dish_fruit_tea', qty: 1 }, { id: 'dish_radish_salad', qty: 1 }, { id: 'dish_smoked_trout', qty: 1 });
     const aff = (ev: P0Event[]) => ev.find(e => e.kind === 'affinity');
     expect(aff(step(s, { type: 'gift', resident: 'res_hana', item: 'dish_fruit_tea' }).ev)).toMatchObject({ delta: 3, verdict: 'loved' });

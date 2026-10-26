@@ -42,7 +42,7 @@ export type P0Event =
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'barter'; item: string; give: number; mineral: string; left: number }   // q(166): 2 regional items for 1 mineral
-  | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
+  | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string; first?: boolean }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
   | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
   | { kind: 'visit'; id: string; place: string }   // an explore request checked in at its outpost (§9.6.3)
