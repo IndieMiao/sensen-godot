@@ -3008,9 +3008,13 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	if int(P0Logic.content().get("affinity", {}).get("request", 0)) > 0:
 		reward.append("+%d Friendship" % int(P0Logic.content().affinity.request))
 	if int(req.get("coins", 0)) > 0: reward.append("%d coins" % int(req.coins))
-	# q(224) ①: a request that teaches a recipe (Nadia's first, q(218)) ends on `New recipe`, no dish name; the
-	# delivery's float names it (`New recipe · Fresh Fish Soup`).
-	if str(q.get("reward", {}).get("recipe", "")) != "": reward.append("New recipe")
+	# q(224) ①: Nadia's teaching request that gives a recipe (A Fresh Radish, q(218)) ends on `New recipe`, no dish name
+	# (the delivery's float names it, `New recipe · Fresh Fish Soup`); not once the page is known, as the server then
+	# gives none. Only the teaching requests: the P1 line's recipe rewards keep their card as it was (奕星 on #497).
+	var recipe := str(q.get("reward", {}).get("recipe", ""))
+	if recipe != "" and P0Logic.is_intro_request(id, str(req.get("id", ""))) \
+			and not (view_.get("cooking", {}).get("cookbook", []) as Array).any(func(pg): return str(pg.get("id", "")) == recipe and bool(pg.get("known", false))):
+		reward.append("New recipe")
 	return {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
 		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
 		"line": text, "needs": [need] if kind != "" else [], "reward": " · ".join(reward),
