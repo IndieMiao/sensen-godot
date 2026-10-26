@@ -1,0 +1,9 @@
+{
+  "res_nadia": {"slots": {"hairHat": "hairhat70", "cloth": "cloth1_1", "shoes": "shoes2"}},
+  "cand_a": {"slots": {"hairHat": "hairhat41_npc_auburn", "cloth": "cloth11", "shoes": "shoes2"}},
+  "cand_b": {"slots": {"hairHat": "hairhat43_npc_black", "cloth": "cloth11", "shoes": "shoes1"}},
+  "cand_c": {"slots": {"hairHat": "hairhat41_npc_auburn", "cloth": "cloth1_1", "shoes": "shoes2"}},
+  "cand_d": {"slots": {"hairHat": "hairhat43_npc_black", "cloth": "cloth0", "shoes": "shoes2"}},
+  "mei": {"slots": {"hairHat": "hairhat12_npc_mei", "cloth": "cloth11_npc_mei", "shoes": "shoes2"}},
+  "res_theo": {"slots": {"hairHat": "hairhat43", "cloth": "cloth1", "shoes": "shoes4"}}
+}
