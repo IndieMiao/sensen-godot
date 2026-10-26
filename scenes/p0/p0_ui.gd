@@ -2849,9 +2849,7 @@ static func resident_ask(view_: Dictionary, id: String) -> String:
 	var r: Dictionary = view_.get("residents", {}).get(id, {})
 	var req = r.get("request", null)
 	if not (req is Dictionary) or str(r.get("request_state", "open")) != "open": return ""
-	for q in P0Logic.content().get("residents", {}).get(id, {}).get("requests", []):
-		if str(q.get("id", "")) == str(req.get("id", "")): return str(q.get("text", ""))
-	return ""
+	return str(P0Logic.resident_request(id, str(req.get("id", ""))).get("text", ""))
 
 ## RES-PIP data: face, name, role, stage, `Friendship have/need`, favourite style with a dish of that style.
 ## Details › has no page behind it in P0, so it stays hidden (TODO SGODOT-225 / 209: the resident's details page).
@@ -2947,10 +2945,10 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	var text := ""
 	var need_line := ""
 	var title := "%s's request" % str(def.get("name", ""))
-	for q in def.get("requests", []):
-		if str(q.get("id", "")) == str(req.get("id", "")):
-			text = str(q.get("text", ""))
-			need_line = str(q.get("need_line", ""))
+	var q := P0Logic.resident_request(id, str(req.get("id", "")))
+	if not q.is_empty():
+		text = str(q.get("text", ""))
+		need_line = str(q.get("need_line", ""))
 	var kind := str(req.get("kind", ""))
 	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	var style := str(req.get("style", "")) if req.get("style", null) != null else ""

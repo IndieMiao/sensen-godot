@@ -766,6 +766,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					"dropped": ui.board_dropped(str(ev.get("id", "")))   # BOARD-DROPPED says what dropping left
 					_:   # in the counter drawer the row itself turns Done (BOARD-DONE, no result card)
 						if ui.modal_kind != "counter": ui.toast_success("Request complete · +%d coins" % int(ev.coins))
+						# q(218) ①: a request with a thanks line has the resident say it on the open bar (Nadia's soup recipe)
+						var thanks := P0Logic.request_thanks(v, str(ev.get("id", "")))
+						if thanks != "": ui.resident_affinity({"resident": P0Logic.request_owner(str(ev.get("id", ""))), "delta": 0}, thanks)
 			"meal":
 				if int(ev.gain) <= 0:
 					ui.toast("Full belly · Meals reset in " + P0Logic.span(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
@@ -807,7 +810,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var page := P0Logic.item_name(v, str(ev.get("page", "")))
 				if str(ev.get("from", "")) == "taught":
 					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
-				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "Learned · %s") % page)
+				# q(218) ①: a teaching request's page is a `New recipe · Fresh Fish Soup` pill, never RESIDENT-TEACH (不知火舞)
+				var intro := str(ev.get("from", "")) == "request" and P0Logic.is_intro_request(str(ev.get("resident", "")), str(ev.get("request", "")))
+				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "New recipe · %s" if intro else "Learned · %s") % page)
 			"request_progress":   # q(134): a taken request's count grew — its line over the items, or the toast when full
 				var said := progress_said(v, ev)
 				if said.has("float"):

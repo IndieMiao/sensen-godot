@@ -21,7 +21,7 @@ export function rarityOf(c: P0Content, id: string): number {
 
 /** Does one bag id satisfy a need? items narrows to fixed ids chosen when the request was drawn. */
 export function matches(c: P0Content, need: Pick<Need, 'kind' | 'rarity' | 'style' | 'family'>, items: string[], id: string): boolean {
-  if (need.kind === 'sow' || itemKind(id) !== need.kind) return false;
+  if (need.kind === 'sow' || need.kind === 'harvest' || itemKind(id) !== need.kind) return false;
   if (items.length) return items.includes(id);
   if (need.kind === 'dish') {
     const r = rarityOf(c, id);

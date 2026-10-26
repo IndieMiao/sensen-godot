@@ -114,7 +114,7 @@ describe('a P1 resident request line (§9.6.1)', () => {
     s = step(s, { type: 'accept', request: 'req_res_rafa_3' }).s;
     s.bag.push({ id: 'dish_fish_soup', qty: 9 });
     const r = step(s, { type: 'deliver', request: 'req_res_rafa_3' });
-    expect(r.ev).toContainEqual({ kind: 'recipe', page: 'dish_catfish_stew', from: 'request', resident: 'res_rafa' });
+    expect(r.ev).toContainEqual({ kind: 'recipe', page: 'dish_catfish_stew', from: 'request', resident: 'res_rafa', request: 'req_res_rafa_3' });
     expect(pageState(c, r.s, 'dish_catfish_stew')).toBe('tasted');
     expect(count(r.s.bag, 'recipe:dish_catfish_stew')).toBe(0);
   });

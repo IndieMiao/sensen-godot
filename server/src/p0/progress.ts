@@ -44,7 +44,7 @@ export type P0Event =
   | { kind: 'barter'; item: string; give: number; mineral: string; left: number }   // q(166): 2 regional items for 1 mineral
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
-  | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
+  | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string; request?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
   | { kind: 'visit'; id: string; place: string }   // an explore request checked in at its outpost (§9.6.3)
   // q(134): a taken request's count grew (`Fresh Greens 3/5`; a basket's item, `Market Basket · Carrot 5/6`); done: full
   | { kind: 'request_progress'; id: string; have: number; qty: number; item?: string; done?: true }

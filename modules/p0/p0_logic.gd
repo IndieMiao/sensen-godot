@@ -1544,6 +1544,31 @@ static func _first_sow_row(view: Dictionary) -> Dictionary:
 		r.tail = "needs %d Energy" % cost + ("" if e.get("next_in", null) == null else " · +1 in %s" % duration(float(e.next_in)))
 	return r
 
+## A resident's request entry in the content table by id: their line (`requests`) or their teaching requests
+## (`intro_requests`, q(218): Nadia's A Fresh Radish / Six Radishes, kept outside the line); {} when neither has it.
+static func resident_request(id: String, req_id: String) -> Dictionary:
+	var def: Dictionary = content().get("residents", {}).get(id, {})
+	for q in def.get("requests", []) + def.get("intro_requests", []):
+		if str(q.get("id", "")) == req_id: return q
+	return {}
+
+## Who a resident request belongs to (its id in their `requests` or `intro_requests`); "" for none.
+static func request_owner(req_id: String) -> String:
+	for rid in content().get("residents", {}):
+		if not resident_request(str(rid), req_id).is_empty(): return str(rid)
+	return ""
+
+## A teaching request (q(218)), not one of the resident's line.
+static func is_intro_request(id: String, req_id: String) -> bool:
+	return (content().get("residents", {}).get(id, {}).get("intro_requests", []) as Array).any(func(q): return str(q.get("id", "")) == req_id)
+
+## What the resident says on the open bar once a request is handed in (q(218) ①: Nadia's soup line, `{pond}` the home
+## set's beginner pond); "" for requests without one.
+static func request_thanks(view: Dictionary, req_id: String) -> String:
+	var line := str(resident_request(request_owner(req_id), req_id).get("thanks", ""))
+	if line == "": return ""
+	return line.replace("{pond}", P0Guide.home_pond_name(view))
+
 ## Resident dialogue bar data (LOCK-18, SGODOT-225 UiResidentBar) from view.residents facts + the content table:
 ## {id, portrait, name, role, stage, have, need, next, line, gift_reason, request_label, request_reason, request_cmd,
 ##  meal, meal_note, lesson}. An empty reason means the button works; otherwise the button is grey with that reason.
@@ -1636,6 +1661,10 @@ static func _request_gap(view: Dictionary, req: Dictionary) -> String:
 	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	match str(req.get("kind", "")):
 		"sow": return "Plant %d more plot%s" % [left, "" if left == 1 else "s"]
+		# q(218) ②: Six Radishes counts what is harvested after accepting — `Harvest 4 more Radishes` / `Harvest 1 more Radish`
+		"harvest":
+			var crop := item_name(view, item) if item != "" else "crop"
+			return "Harvest %d more %s" % [left, plural(crop) if left > 1 else crop]
 		"dish":
 			if item != "": return "Need %d more %s" % [left, item_name(view, item)]
 			var style := str(req.get("style", "")) if req.get("style", null) != null else ""

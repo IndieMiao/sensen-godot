@@ -88,7 +88,8 @@ export interface ResidentState {
   chat_day: string;              // player day of the last first chat (+2 once a day)
   gift_day: string;              // player day of the last gift received (once a day)
   next: number;                  // index of the next request in the resident's list
-  req: { id: string; at: number; progress: number } | null;   // accepted request; progress counts sow for sow requests
+  req: { id: string; at: number; progress: number } | null;   // accepted request; progress counts sow / harvest requests
+  intro_done?: string[];         // q(218): teaching requests handed in (ResidentDef.intro_requests ids); absent = none
   done_day: string;              // player day the last request was completed (one a day)
   done_at?: number;              // when the last request was completed (P1: the next one opens next_request_h later)
   lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
