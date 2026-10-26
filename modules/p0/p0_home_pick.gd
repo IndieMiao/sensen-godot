@@ -76,7 +76,7 @@ static func can_pick(row: Dictionary) -> bool: return str(row.get("status", ""))
 ## `Recommended` and each climate group's title and rows — the open cities in the server's order, the near one not
 ## again. A search (`matches` given) is only its rows, no titles, the ones that can be picked first (HOME-PICK-2;
 ## 不知火舞 on #451), each group in the server's order. Each part: {kind: "title" | "band" | "row", text?, band?, row?}.
-static func sections(open: Array, near: Variant, matches: Variant = null, home := "") -> Array:
+static func sections(open: Array, near: Variant, matches: Variant = null) -> Array:
 	var out: Array = []
 	if matches is Array:
 		for r in matches: if can_pick(r): out.append({kind = "row", row = r})

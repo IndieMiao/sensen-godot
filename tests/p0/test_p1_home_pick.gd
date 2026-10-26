@@ -49,7 +49,7 @@ func test_the_list_is_near_you_then_recommended_by_climate() -> void:
 	assert_array(P0HomePick.sections(OPEN, SF, [SAN_JOSE, SF, SANTA_CRUZ, LA]).map(func(p): return p.row.id)).is_equal(
 		[SF.id, LA.id, SAN_JOSE.id, SANTA_CRUZ.id])
 	# a change: the home city can be picked as any other (q(216) ⑨), in the server's order
-	assert_array(P0HomePick.sections(OPEN, SF, [SF, LA], SF.id).map(func(p): return p.row.id)).is_equal([SF.id, LA.id])
+	assert_array(P0HomePick.sections(OPEN, SF, [SF, LA]).map(func(p): return p.row.id)).is_equal([SF.id, LA.id])
 
 func test_why_a_city_cannot_be_picked() -> void:
 	assert_str(P0HomePick.note(SF)).is_empty()

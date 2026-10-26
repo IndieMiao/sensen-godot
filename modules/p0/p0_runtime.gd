@@ -18,6 +18,7 @@ const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Bart
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
@@ -1249,8 +1250,9 @@ func _open_home_flow(type: String, change_from: String, done: Callable, back := 
 	_home_done = done
 	if back.is_valid(): _home_flow.left.connect(back)
 	_home_flow.chose.connect(func(cluster: String, lat: float, lng: float):
-		var cmd: Dictionary = load("res://modules/p0/p0_home_pin.gd").command(type, cluster, lat, lng)   # q(216): the pin
+		var cmd: Dictionary = P0HomePin.command(type, cluster, lat, lng)   # q(216): the pin
 		_home_change_to = cluster if type == "change_home" else ""
+		_home_at = [lat, lng]
 		_home_key = P0Session.ui_key(cmd)
 		if not session.send(cmd, _home_key): _home_flow.sent(false))
 	if not session.command_settled.is_connected(_home_settled): session.command_settled.connect(_home_settled)
@@ -1260,15 +1262,24 @@ var _home_flow: Control
 var _home_done := Callable()
 var _home_key := ""
 var _home_change_to := ""
+var _home_at: Array = []   # the pin sent, [lat, lng]: a same-city move is taken only once the farm stands there
 
 ## Whether a choose_home / change_home answer leaves the home picked: taken, or refused because it already is — the
 ## first reply was lost on the way, so a second press is refused with the view the server has (周瑜 on #451: else the
 ## page would refuse every go until the app restarts). A first pick: the view no longer pending. A change (`change_to`,
-## the city asked for): the view's home is that city — the change is not pending before or after.
-static func home_taken(ok: bool, view: Dictionary, change_to := "") -> bool:
+## the city asked for): the view's home is that city — the change is not pending before or after — and, the pin sent
+## given (`at`, [lat, lng]), view.home.farm stands within a metre of it: a same-city re-pin (q(216) ⑨) is already home
+## before, so a `home_set_for_good` or a request the server never had would else read as moved (周瑜 on #495). The
+## server keeps the pin as sent (farm_at = [at.lat, at.lng]).
+static func home_taken(ok: bool, view: Dictionary, change_to := "", at: Array = []) -> bool:
 	if ok: return true
 	if view.is_empty(): return false
-	if change_to != "": return P0Travel.home(view) == change_to
+	if change_to != "":
+		if P0Travel.home(view) != change_to: return false
+		if at.size() != 2: return true
+		var h = view.get("home", null)
+		var farm = P0HomePin.lat_lng((h as Dictionary).get("farm", null)) if h is Dictionary else null
+		return farm != null and P0HomePin.km_ll(farm, at) * 1000.0 < 1.0
 	return not home_pending(view)
 
 ## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken (see
@@ -1276,7 +1287,7 @@ static func home_taken(ok: bool, view: Dictionary, change_to := "") -> bool:
 func _home_settled(key: String, ok: bool, _code: String) -> void:
 	if key != _home_key or _home_key == "": return
 	_home_key = ""
-	ok = home_taken(ok, session.view, _home_change_to)
+	ok = home_taken(ok, session.view, _home_change_to, _home_at)
 	if is_instance_valid(_home_flow): _home_flow.sent(ok)
 	if not ok: return
 	session.command_settled.disconnect(_home_settled)

@@ -51,6 +51,22 @@ func test_the_pin_stands_a_little_inside_the_servers_circle() -> void:
 	assert_dict(P0HomePin.refusal(t, t.start)).is_empty()
 	assert_str(P0HomePin.refusal(t, Vector2(37.76268, -122.44)).code).is_equal("near")   # 3 m off it: judged again
 
+## 不知火舞 235af5d7: on the page's own start (the farm for a same-city re-pin) only the server's 10 km / 300 m judge;
+## a step off it, the margins again; a farm truly inside 300 m still says why.
+func test_the_pages_start_is_judged_without_the_margins() -> void:
+	var a := P0HomePin.area(_pin())
+	var farm := [37.76272, -122.44]   # 302 m from the pond: the server's 300 passes, the client's 305 not
+	assert_str(P0HomePin.refusal(a, Vector2(farm[0], farm[1])).get("code", "")).is_equal("near")   # no origin: margins
+	assert_dict(P0HomePin.refusal(a, Vector2(farm[0], farm[1]), farm)).is_empty()
+	assert_str(P0HomePin.refusal(a, Vector2(37.7627385, -122.44), farm).get("code", "")).is_equal("near")   # 304.5 m, 2.5 m off it: margins
+	var inside := [37.7615, -122.44]   # 167 m: within the server's 300 too
+	assert_str(P0HomePin.refusal(a, Vector2(inside[0], inside[1]), inside).get("code", "")).is_equal("near")
+	var edge := [37.76, -122.32672]   # 9.98 km east: inside the server's 10, outside the client's 9.95
+	var wide := P0HomePin.area(_pin(0.0))
+	assert_str(P0HomePin.refusal(wide, Vector2(edge[0], edge[1])).get("code", "")).is_equal("far")
+	assert_dict(P0HomePin.refusal(wide, Vector2(edge[0], edge[1]), edge)).is_empty()
+	assert_float(P0HomePin.km_ll([37.76, -122.44], [37.76, -122.44909])).is_equal_approx(0.7991, 0.0005)
+
 func test_a_pin_near_a_place_names_the_nearest() -> void:
 	var a := P0HomePin.area(_pin())
 	var no := P0HomePin.refusal(a, Vector2(37.7615, -122.44))   # 167 m north of the pond
@@ -72,6 +88,8 @@ func test_the_card_line_and_the_confirm_line() -> void:
 	assert_str(P0HomePin.confirm_line("San Francisco", W08, pond)).is_equal("San Francisco · 0.8 km to Fern Pond")
 	assert_str(P0HomePin.km_text(8269.4)).is_equal("8,269 km")   # q(132)
 	assert_str(P0HomePin.km_text(0.04)).is_equal("0.0 km")
+	assert_str(P0HomePin.km_text(9.96)).is_equal("10 km")   # rounds to 10: whole, not `10.0 km` (周瑜 on #495)
+	assert_str(P0HomePin.km_text(9.94)).is_equal("9.9 km")
 
 func test_the_grey_key_and_its_toast() -> void:
 	var far := P0HomePin.refusal_text({"code": "far", "km": 11.0}, {})

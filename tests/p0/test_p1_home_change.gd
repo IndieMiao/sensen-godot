@@ -185,6 +185,21 @@ func test_a_change_refused_is_taken_only_when_home_is_already_the_new_city() -> 
 	assert_bool(P0Runtime.home_taken(false, stayed, TOKYO.id)).is_false()
 	assert_bool(P0Runtime.home_taken(true, stayed, TOKYO.id)).is_true()
 
+## 周瑜 on #495: a same-city re-pin (q(216) ⑨) is home before as after — refused (`home_set_for_good`) or never had, it
+## is taken only when view.home.farm stands where the pin was sent (the server keeps it as sent).
+func test_a_same_city_repin_refused_is_taken_only_when_the_farm_is_at_the_pin() -> void:
+	var sent := [37.7712345678, -122.4312345678]
+	var stayed := {"travel": {"home": Pick.SF.id}, "home": {"city": Pick.SF.id, "pending": false, "farm": {"lat": 37.765, "lng": -122.43}}}
+	var moved := {"travel": {"home": Pick.SF.id}, "home": {"city": Pick.SF.id, "pending": false, "farm": {"lat": sent[0], "lng": sent[1]}}}
+	assert_bool(P0Runtime.home_taken(false, stayed, Pick.SF.id, sent)).is_false()
+	assert_bool(P0Runtime.home_taken(false, moved, Pick.SF.id, sent)).is_true()
+	assert_bool(P0Runtime.home_taken(false, {"travel": {"home": Pick.SF.id}, "home": {"city": Pick.SF.id}}, Pick.SF.id, sent)).is_false()
+	assert_bool(P0Runtime.home_taken(true, stayed, Pick.SF.id, sent)).is_true()
+	# another city: the farm must stand at the pin there too
+	var tokyo_moved := {"travel": {"home": TOKYO.id}, "home": {"city": TOKYO.id, "farm": {"lat": sent[0], "lng": sent[1]}}}
+	assert_bool(P0Runtime.home_taken(false, tokyo_moved, TOKYO.id, sent)).is_true()
+	assert_bool(P0Runtime.home_taken(false, stayed, TOKYO.id, sent)).is_false()
+
 ## 周瑜 on #460: with the confirm card raised over the pin names, a toast or the system line said while it is up (Move
 ## farm refused, `Didn't go through`) still draws over it — not dimmed under its scrim, the banner's Retry in reach.
 func test_toasts_and_the_system_line_stay_over_the_confirm_card() -> void:

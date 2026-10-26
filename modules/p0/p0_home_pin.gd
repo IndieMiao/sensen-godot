@@ -47,6 +47,13 @@ static func km(a: Vector2, b: Vector2) -> float:
 	var h := pow(sin(d_lat / 2.0), 2) + cos(deg_to_rad(a.x)) * cos(deg_to_rad(b.x)) * pow(sin(d_lng / 2.0), 2)
 	return 2.0 * 6371.0 * asin(minf(1.0, sqrt(h)))
 
+## km between two [lat, lng] in doubles: for the metre a Vector2 cannot hold (a same-city move taken, 周瑜 on #495).
+static func km_ll(a: Array, b: Array) -> float:
+	var d_lat := deg_to_rad(float(b[0]) - float(a[0]))
+	var d_lng := deg_to_rad(float(b[1]) - float(a[1]))
+	var h := pow(sin(d_lat / 2.0), 2) + cos(deg_to_rad(float(a[0]))) * cos(deg_to_rad(float(b[0]))) * pow(sin(d_lng / 2.0), 2)
+	return 2.0 * 6371.0 * asin(minf(1.0, sqrt(h)))
+
 ## The compass word from a to b (the server's toward: flat, fine within a city).
 static func toward(a: Vector2, b: Vector2) -> String:
 	var deg := rad_to_deg(atan2((b.y - a.y) * cos(deg_to_rad(a.x)), b.x - a.x))
@@ -54,17 +61,23 @@ static func toward(a: Vector2, b: Vector2) -> String:
 
 ## Why the pin may not stand at `at`, {} when it may: {code: "far", km} outside the circle (judged range − 50 m);
 ## {code: "near", id, m} the nearest place closer than clear + 5 m. The start itself always stands (340 §5: Build here
-## at once).
-static func refusal(a: Dictionary, at: Vector2) -> Dictionary:
+## at once). On the page's own start (`origin`, [lat, lng]: spot 1, or the farm for a same-city re-pin) the margins go
+## and only the server's 10 km / 300 m judge (不知火舞 235af5d7): a farm the server once took is not greyed for the
+## client's 5 m, yet one truly within 300 m of a place still says why.
+static func refusal(a: Dictionary, at: Vector2, origin: Variant = null) -> Dictionary:
 	if a.is_empty(): return {code = "far", km = INF}
 	if km(at, a.start) * 1000.0 < START_M: return {}   # the server's vetted start stands as it is, margins or not
+	var on_origin := origin is Array and (origin as Array).size() == 2 \
+		and km(at, Vector2(float(origin[0]), float(origin[1]))) * 1000.0 < START_M
+	var range_margin := 0.0 if on_origin else RANGE_MARGIN_KM
+	var clear_margin := 0.0 if on_origin else CLEAR_MARGIN_M
 	var d := km(at, a.base)
-	if d > float(a.range_km) - RANGE_MARGIN_KM: return {code = "far", km = d}
+	if d > float(a.range_km) - range_margin: return {code = "far", km = d}
 	if float(a.clear_m) > 0.0:
 		var near := {}
 		for b in a.blocks:
 			var m := km(at, b.at) * 1000.0
-			if m < float(a.clear_m) + CLEAR_MARGIN_M and (near.is_empty() or m < float(near.m)): near = {code = "near", id = b.id, m = m}
+			if m < float(a.clear_m) + clear_margin and (near.is_empty() or m < float(near.m)): near = {code = "near", id = b.id, m = m}
 		if not near.is_empty(): return near
 	return {}
 
@@ -77,7 +90,7 @@ static func shown_blocks(a: Dictionary, at: Vector2) -> Array:
 
 ## A distance as q(132) writes it: under 10 km one decimal (`0.8 km`), from 10 km whole with thousands (`11 km`).
 static func km_text(d: float) -> String:
-	if d < 10.0: return "%s km" % String.num(snappedf(d, 0.1), 1)
+	if snappedf(d, 0.1) < 10.0: return "%s km" % String.num(snappedf(d, 0.1), 1)   # 9.96 is `10 km`, not `10.0 km` (周瑜)
 	var n := str(int(round(d)))
 	var out := ""
 	while n.length() > 3:

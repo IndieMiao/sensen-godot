@@ -7,7 +7,7 @@ extends Control
 ##   the title (ExtraBold 22) at 52, the city (Bold 14, secondary) at 80.
 ##   The pin (54:160909): its tip at the middle of the map between the panel and the card (180, 378 in the frame); a 44
 ##   white head with the home pin's house (P0Logic.icon home, 26), a 2 × 12 stem, an 8 × 4 shadow; where it may stand a
-##   primary 30 % glow under it; where it may not, no glow and the house in the secondary ink (56:160930). Lifted 8 px
+##   primary 30 % glow under it; where it may not, no glow and the same house in one colour, the secondary ink (56:160935). Lifted 8 px
 ##   while the map is dragged, its shadow at 70 %, down again 120 ms after.
 ##   Over the map: outside the city's circle a 30 % text-colour veil, its edge a 2 px white 80 % dash; a place's 300 m
 ##   ring (ink 50 %, 1.5 px dash) while the pin is within 600 m of it; the city's ponds, outposts and huts as plain pins
@@ -205,8 +205,9 @@ func _make_card() -> void:
 	error_card.add_theme_stylebox_override(&"panel", sb.duplicate().with_margins(16, 6, 12, 6))
 	_bottom(error_card, _ERR_Y, _ERR_H)
 	var row := HBoxContainer.new()
-	var msg := UiKit.label("Couldn't load farm spots", UiTokens.STYLE_BODY_B14)
+	var msg := UiKit.label("Couldn't load farm spots", UiTokens.STYLE_TITLE_XB20)   # ExtraBold 15, ink, as the card's line (57:161044)
 	msg.name = "ErrorLine"
+	msg.add_theme_font_size_override(&"font_size", 15)
 	msg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	msg.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(msg)
@@ -306,6 +307,7 @@ func _make_places() -> void:
 		var label := "" if str(o.get("role", "")) == "tackle" else P0MapScript.short_name(str(n.get("name", "")))
 		var d := UiMapDestination.new(icon, label)
 		d.name = "Place_" + str(b.id).validate_node_name()
+		d.resized.connect(_place_places)   # its name laid out widens it: its anchor moves (the page no longer redoes each frame)
 		add_child(d)
 		move_child(d, pin.get_index())   # under the pin and the panels
 		_places[b.id] = d
@@ -341,17 +343,25 @@ func back_to_start() -> void:
 	map.pick_put(s[0], s[1], tip())
 	_refresh()
 
+## Each frame only asks the map where the tip is, where the circle's centre is on the screen, how near it is and
+## whether it is dragged; the page and the overlay (some 540 dash arcs on a 10 km circle) redo only when one of those or
+## the page's size moved (周瑜 on #495: 260 / 292 heat). The centre catches a map laid out again under a still tip.
 func _process(_dt: float) -> void:
 	if area.is_empty(): return
-	_refresh()
+	if _view_key() != _last_key: _refresh()
+
+var _last_key: Array = []
+func _view_key() -> Array:
+	return [map.pick_geo_at(tip()), map.pick_screen_of(area.base.x, area.base.y), map.pick_px_per_m(), map.pick_dragging(), size]
 
 func _refresh() -> void:
 	var ready := not area.is_empty()
+	_last_key = _view_key() if ready else []
 	var dragging := ready and bool(map.pick_dragging())
 	if ready:
 		var g: Array = map.pick_geo_at(tip())
 		at = [float(g[0]), float(g[1])]
-		refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]))
+		refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
 	else: refusal = {}
 	land.visible = not ready or bool(map.pick_has_ground())
 	veil.visible = ready
@@ -464,6 +474,7 @@ class Overlay extends Control:
 
 ## The farm pin (54:160909): 60 × 80, its tip at TIP.
 class Pin extends Control:
+	const TINT := preload("res://scenes/p0/panels/p0_city_row_tint.gdshader")
 	const TIP := Vector2(30, 68)
 	const LIFT := 8.0
 	var can := true
@@ -482,6 +493,10 @@ class Pin extends Control:
 		_house.size = Vector2(26, 26)
 		_house.position = Vector2(17, 21)
 		_house.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var m := ShaderMaterial.new()   # where the pin may not stand, the same house in one colour, secondary (56:160935)
+		m.shader = TINT
+		m.set_shader_parameter("tint", UiTokens.COLOR_SECONDARY)
+		_house.material = m
 		add_child(_house)
 
 	func set_state(can_: bool, lifted_: bool) -> void:
@@ -492,7 +507,7 @@ class Pin extends Control:
 			var t := create_tween()
 			t.tween_property(self, "_lift_t", 1.0 if lifted else 0.0, 0.12)
 			t.tween_callback(queue_redraw)
-		_house.self_modulate = Color.WHITE if can else UiTokens.COLOR_SECONDARY
+		(_house.material as ShaderMaterial).set_shader_parameter("mode", 0 if can else 1)
 		queue_redraw()
 
 	func _process(_dt: float) -> void:
