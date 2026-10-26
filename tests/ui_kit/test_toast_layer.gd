@@ -110,3 +110,14 @@ func test_long_text_grows_upward_from_the_same_edge() -> void:
 	await await_idle_frame()
 	assert_float(toasts._panel.size.y).is_greater(float(UiTokens.SIZE_TOAST_MIN_H))
 	assert_float(_bottom()).is_equal_approx(700.0, 0.5)
+
+## A figure stays with the word after it when the toast wraps (不知火舞 on SGODOT-344, 66948360): `Request complete ·` over
+## `+20 coins`. Only the shown label carries the no-break space; what the toast says keeps plain spaces.
+func test_a_number_never_wraps_away_from_its_unit() -> void:
+	assert_str(ToastLayer.keep_units("Request complete · +20 coins")).is_equal("Request complete · +20 coins")
+	assert_str(ToastLayer.keep_units("Harvest 3 of 5 · bag full")).is_equal("Harvest 3 of 5 · bag full")
+	assert_str(ToastLayer.keep_units("Next request in 9h 12m")).is_equal("Next request in 9h 12m")   # no figure before a space
+	assert_str(ToastLayer.keep_units("Bag full · free a slot first")).is_equal("Bag full · free a slot first")
+	toasts.show_toast("Request complete · +20 coins", ToastLayer.Severity.SUCCESS)
+	assert_str(toasts.current_text()).is_equal("Request complete · +20 coins")
+	assert_str(toasts.label().text).is_equal("Request complete · +20 coins")
