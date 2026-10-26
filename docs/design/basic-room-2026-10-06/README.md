@@ -4,7 +4,7 @@ The user accepted this asset iteration on **2026-10-06** and requested a commit/
 
 For a new machine, first follow [Art environment setup](../art-environment-setup.md) to install tools and verify Figma/Lark access before using the reproduction commands below.
 
-The requested reference is Figma `Scene_design → Basic Room-1 1`, node [545:2968](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2968). The [retained reference](reference.png) is a 2561 × 2561 node export. This work supplies room art and an offline movement benchmark; it does not implement online housing assignment, cooking settlement or a production release.
+The requested reference is Figma `Scene_design → Basic Room-1 1`, node [545:2968](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=545-2968). The [retained reference](reference.png) is a 2561 × 2561 node export. This work supplies room art and an offline movement benchmark; it does not implement online housing assignment, cooking settlement or a production release.
 
 ## Review evidence
 

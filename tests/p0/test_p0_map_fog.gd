@@ -86,7 +86,9 @@ func test_the_veil_holes_the_explored_cities_only_at_every_zoom() -> void:
 	assert_float(Vector2(packed[0].x, packed[0].y).distance_to(sf as Vector2)).is_less(40.0)
 	_look(m, 37.7558, -122.4345, 15.0)
 	m.city_map._update_fog()
-	assert_bool(fog.visible).is_true()   # street zoom too (不知火舞 on #227): the home city's hole covers the screen
+	# street zoom too (不知火舞 on #227): the home city's hole covers the screen — so the veil, drawing nothing, is hidden
+	# (perf plan Q5); it is still on, and back as soon as the screen leaves the hole (test_p0_map_power)
+	assert_bool(fog.visible).is_false()
 	var street: Array = m.fog_holes()
 	assert_int(street.size()).is_equal(1)
 	# the screen (its far corner included) lies inside the hole: the home city reads in full colour up close

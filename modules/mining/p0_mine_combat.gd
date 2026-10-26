@@ -264,6 +264,7 @@ func _band(spec: Dictionary, elite: bool) -> Node3D:
 	cap.material_override = m
 	cap.position.y = BAND_Y
 	band.add_child(cap)
+	_no_cast(band)   # flat on the ground, like the rest of the slime (perf Q6)
 	band.set_meta("reach", reach)
 	band.set_meta("width", width)
 	band.set_meta("alpha", m.albedo_color.a)

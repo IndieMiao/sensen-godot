@@ -232,6 +232,8 @@ export interface P0Content {
     mystery_line: string;
   };
   residents: Record<string, ResidentDef>;
+  /** SGODOT-341: the new-player guide's step table (content/guide_steps.json; empty until 339's §14 v3). */
+  guide?: import('./guide.js').GuideContent;
   /** P0 has no nickname or city choice yet: what the Profile page shows (SGODOT-225). */
   profile: { name: string; city: string; climate: string; farm_name: string; farm_at?: [number, number]; timezone?: string };   // timezone: IANA, for the 04:00 rollover (SGODOT-270)
   /** §9.6 / §9.13.2 request boards: the Stall Board (slot 1 starts with the tutorial) and the Market Board. */

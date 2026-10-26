@@ -320,7 +320,7 @@ func test_a_pending_save_and_the_feature_header() -> void:
 	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": true}})).is_false()
 	assert_bool(P0Runtime.home_taken(false, {})).is_false()
 	var session := P0Session.new()
-	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home"])
+	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide"])
 	session.free()
 
 func test_a_baked_map_is_used_only_while_the_points_fit_it() -> void:

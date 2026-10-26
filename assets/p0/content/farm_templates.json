@@ -1,0 +1,9 @@
+{
+  "_note": "The homestead's starting template by region (SGODOT-342, 338·L2; user 10-26: the farm goes only with the region, never with the point picked on the map). The region is the home city's climate band (temperate, subtropical, tropical, cool: content.profile.climate for the written city, the cluster's band elsewhere), the band regional crops, market cards and request templates already go by. A template only dresses the farm: style, the house, storage and well style the scenery and looks go with (FarmArt.STYLES). It never moves a plot or a facility (the plot grid is content.garden.plots, the server's). Every band wears the cottage until art brings its own. Read by the client (modules/p0/p0_farm_template.gd).",
+  "farm_templates": {
+    "temperate": { "style": "cottage" },
+    "subtropical": { "style": "cottage" },
+    "tropical": { "style": "cottage" },
+    "cool": { "style": "cottage" }
+  }
+}

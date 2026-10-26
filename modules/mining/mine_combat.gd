@@ -5,6 +5,14 @@ signal contact(monster_id: String)
 const Layout = preload("res://modules/mining/mine_layout.gd")
 const Meshes = preload("res://modules/mining/mine_mesh.gd")
 const SPAWNS := [Vector3(4.75, 0, -5.0), Vector3(2.0, 0, -4.5), Vector3(7.5, 0, -5.5)]
+## A chasing slime finds its path to the player again this often, and at most one slime a frame does it (perf Q6,
+## SGODOT-260): an A* and its smoothing over the floor's blocked cells each, so slimes due together wait a frame or two
+## instead of all landing in one frame (fights at floor 4 jerked about 4 times a second).
+const REPATH_S := 0.25
+## A slime's eyes, glints and cheeks (perf Q6, SGODOT-260): one mesh of 16 × 8 spheres in one vertex-colour material,
+## instead of six default 64 × 32 spheres (about 24k triangles a slime) with a material each.
+const FACE_SEGMENTS := Vector2i(16, 8)
+static var _face_material: StandardMaterial3D
 var enemies: Dictionary = {}
 var _actors: Dictionary = {}
 var cooldown := 0.0
@@ -136,6 +144,7 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 	grace = maxf(0, grace - dt)
 	fade(dt)
 	if grace > 0: return
+	var pathed := false   # a slime has found its path this frame
 	for id in enemies:
 		var enemy: Dictionary = enemies[id]
 		var spec: Dictionary = enemy.spec
@@ -154,8 +163,9 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 				elif distance <= float(spec.aggro_range):
 					enemy.phase = "chase"
 					enemy.repath -= dt
-					if enemy.repath <= 0:
-						enemy.repath = 0.25
+					if enemy.repath <= 0 and not pathed:
+						pathed = true
+						enemy.repath = REPATH_S
 						movement.set_target_position(mover.position)
 					movement.step(dt)
 				else:
@@ -259,21 +269,18 @@ func _slime(spec: Dictionary, elite: bool) -> Node3D:
 	jelly.rim_tint = 0.65
 	root.add_child(body)
 	BlobShadow.attach(root,radius*1.15)
+	var face := Meshes.surface()
 	for side in [-1, 1]:
-		var eye := SphereMesh.new()
-		eye.radius = radius * 0.09
-		eye.height = radius * 0.27
-		body.add_child(_mesh(eye, Color("333345"), Vector3(side * radius * 0.30, radius * 0.69, radius * 0.92)))
-		var glint := SphereMesh.new()
-		glint.radius = radius * 0.026
-		glint.height = radius * 0.058
-		body.add_child(_mesh(glint, Color("fff9e7"), Vector3(side * radius * 0.30 - radius * 0.02, radius * 0.76, radius * 1.002)))
-		var cheek := SphereMesh.new()
-		cheek.radius = radius * 0.10
-		cheek.height = radius * 0.10
-		var blush := _mesh(cheek, Color("e5a7ca") if elite else Color("b8e1cb"), Vector3(side * radius * 0.51, radius * 0.53, radius * 0.89))
-		blush.scale.z = 0.36
-		body.add_child(blush)
+		_face_sphere(face, radius * 0.09, radius * 0.27, Color("333345"), Vector3(side * radius * 0.30, radius * 0.69, radius * 0.92))   # eye
+		_face_sphere(face, radius * 0.026, radius * 0.058, Color("fff9e7"), Vector3(side * radius * 0.30 - radius * 0.02, radius * 0.76, radius * 1.002))   # glint
+		_face_sphere(face, radius * 0.10, radius * 0.10, Color("e5a7ca") if elite else Color("b8e1cb"),
+			Vector3(side * radius * 0.51, radius * 0.53, radius * 0.89), Vector3(1, 1, 0.36))   # cheek, flattened as before
+	face.index()
+	var face_mesh := MeshInstance3D.new()
+	face_mesh.name = "Face"
+	face_mesh.mesh = face.commit()
+	face_mesh.material_override = _face_jelly()
+	body.add_child(face_mesh)
 	var smile := Meshes.surface()
 	Meshes.ribbon(smile,[Vector3(-0.09,0.61,0.986)*radius,Vector3(0,0.57,1.015)*radius,Vector3(0.09,0.61,0.986)*radius],radius*0.033,Color("494056"),Vector3.FORWARD)
 	body.add_child(Meshes.finish(smile,"Smile"))
@@ -310,7 +317,31 @@ func _slime(spec: Dictionary, elite: bool) -> Node3D:
 		var health := _mesh(bar, Color("dd7384") if is_fill else Color("334e4a"), Vector3(0, radius * 2.2 + 0.06, 0.05 if is_fill else 0))
 		health.name = "HealthFill" if is_fill else "HealthTrack"
 		root.add_child(health)
+	_no_cast(root)
 	return root
+
+## One sphere of the face as the SphereMesh it was (that radius and height), at 16 × 8 segments, scaled, in its colour.
+func _face_sphere(s: SurfaceTool, sphere_radius: float, height: float, color: Color, point: Vector3, scale := Vector3.ONE) -> void:
+	var sphere := SphereMesh.new()
+	sphere.radius = sphere_radius
+	sphere.height = height
+	sphere.radial_segments = FACE_SEGMENTS.x
+	sphere.rings = FACE_SEGMENTS.y
+	PlaceScenery._append(s, sphere, Transform3D(Basis.from_scale(scale), point), color)
+
+## The face's material, shared by every slime: the parts' own look (roughness 0.3), its colour from the vertices.
+static func _face_jelly() -> StandardMaterial3D:
+	if _face_material == null:
+		_face_material = StandardMaterial3D.new()
+		_face_material.vertex_color_use_as_albedo = true
+		_face_material.vertex_color_is_srgb = true
+		_face_material.roughness = 0.3
+	return _face_material
+
+## A slime casts no real shadow (perf Q6): its blob shadow is the one on the ground, so the shadow pass skips it.
+static func _no_cast(root: Node) -> void:
+	for node in root.find_children("*", "GeometryInstance3D", true, false):
+		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func _slime_body(radius: float) -> ArrayMesh:
 	var surface := Meshes.surface()

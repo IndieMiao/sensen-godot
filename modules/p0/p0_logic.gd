@@ -1392,7 +1392,7 @@ static func today_rows(view: Dictionary) -> Array:
 	var guided_stove := lead.any(func(r): return str(r.go) == "stove" and str(r.state) != "done")
 	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
-	if not farmed:
+	if not farmed and not P0Guide.guide_on(view):   # the guide's own row says what to do first (SGODOT-341)
 		var first_sow := _first_sow_row(view)
 		first_sow.dot = "sow:first"   # the fallback row at the end (nothing else to say) lights nothing
 		now_rows.append(first_sow)

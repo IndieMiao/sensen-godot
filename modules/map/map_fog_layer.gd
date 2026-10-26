@@ -28,21 +28,28 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)   # the host may place it over the whole screen instead
 
 ## Holes in the host's pixels ({at, r}), shifted by `offset` into this layer's (the host draws inside the safe area, the
-## veil covers the whole screen); hidden when the host has no fog. The shader is only fed when something changed.
+## veil covers the whole screen); hidden when the host has no fog, or when the whole layer lies in one hole's clear core
+## (inside an explored city: a full-screen shader drawing nothing, every frame — perf plan 10-16 Q5). The shader is only
+## fed when something changed.
 var _applied: Array = []
 var _applied_k := -1.0
 var _applied_offset := Vector2.INF
+var _covered := false
 
 func apply(new_holes: Array, _zoom: float, enabled: bool, offset := Vector2.ZERO) -> void:
 	var k := 1.0 if enabled else 0.0
-	visible = k > 0.0
-	if not visible: return
+	if k == 0.0:
+		visible = false
+		return
 	if is_same(new_holes, _applied) and k == _applied_k and offset == _applied_offset and _mat.get_shader_parameter("size") == size:
+		visible = not _covered
 		return
 	_applied = new_holes
 	_applied_k = k
 	_applied_offset = offset
 	holes = new_holes.slice(0, MAX_HOLES)
+	_covered = covers(holes, Rect2(-offset, size))
+	visible = not _covered
 	var packed: Array = []
 	var shapes: Array = []
 	for h in holes:
@@ -57,6 +64,32 @@ func apply(new_holes: Array, _zoom: float, enabled: bool, offset := Vector2.ZERO
 	_mat.set_shader_parameter("count", holes.size())
 	_mat.set_shader_parameter("size", size)
 	_mat.set_shader_parameter("fog_color", Color(FOG, FOG.a * k))
+
+## The shader's feather (map_fog.gdshader `feather`), px: a hole is clear past this far inside its edge.
+const FEATHER := 24.0
+
+## Whether `rect` (the host's px) lies wholly in one hole's clear core, past the feather, where the shader draws nothing.
+## Sampled on a grid over the rect: a circle's core is a disc, a tilted ellipse's near one, and where a sample could miss
+## it the veil is a hair's alpha (the feather's smoothstep starts flat). Holes that tile the screen between them do not
+## count; inside an explored city one hole covers it.
+static func covers(holes: Array, rect: Rect2) -> bool:
+	for h in holes:
+		var at: Vector2 = h.at
+		var far := 0.0
+		for c in [rect.position, rect.end, Vector2(rect.position.x, rect.end.y), Vector2(rect.end.x, rect.position.y)]:
+			far = maxf(far, at.distance_to(c))
+		if float(h.r) < far: continue   # r bounds the hole: it cannot reach a corner
+		var edge := minf(FEATHER, maxf(1.0, float(h.get("r_min", h.r))))
+		var inside := true
+		for i in 7:
+			for j in 13:
+				var p := rect.position + rect.size * Vector2(i / 6.0, j / 12.0)
+				if edge_distance(h, p) > -edge:
+					inside = false
+					break
+			if not inside: break
+		if inside: return true
+	return false
 
 ## A hole's edge as a conic in the layer's pixels about its `at`: Q(x, y) = a x² + 2b xy + c y² + 2d x + 2e y − 1, below 0
 ## inside, as [a, b, c, d, e]. A plain circle ({at, r}) is a = c = 1/r².

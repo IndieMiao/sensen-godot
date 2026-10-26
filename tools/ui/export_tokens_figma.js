@@ -1,5 +1,5 @@
 // READ-ONLY Figma exporter for docs/design/tokens/tokens-v2.json (SGODOT-207 WP7-A, SGODOT-211).
-// Run through the Figma MCP `use_figma` tool on file OMLTC3yw3u2WDjOZhLnhaR. It never writes to Figma,
+// Run through the Figma MCP `use_figma` tool on file icmfLGHkiMBfMQApCiw13D. It never writes to Figma,
 // unlike the frozen generator bundle and patch scripts under docs/design/ui-refactor-2026-10-06/figma-plugin/
 // (SGODOT-197 LOCK-28). Pipe the returned object into tools/ui/save_tokens.py (pretty-prints `compact`, checks
 // `fnv1a` and `bytes`, writes the tokens file), then run tools/ui/gen_theme.gd.
@@ -294,7 +294,7 @@ const sorted = o => Object.fromEntries(Object.keys(o).sort().map(k => [k, o[k]])
 const tokens = {
   meta: {
     schema: 2, version: '2.1-draft', status: 'draft',
-    source: 'Figma OMLTC3yw3u2WDjOZhLnhaR page 481:53 (read-only export, tools/ui/export_tokens_figma.js)',
+    source: 'Figma icmfLGHkiMBfMQApCiw13D page 481:53 (read-only export, tools/ui/export_tokens_figma.js)',
     unit: '360-wide logical px = Godot UI unit',
     accepted: 'WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200; WP2 Toast R1 accepted 2026-10-07, SGODOT-202; WP6 EmptyState accepted 2026-10-07, SGODOT-206',
     pending: {

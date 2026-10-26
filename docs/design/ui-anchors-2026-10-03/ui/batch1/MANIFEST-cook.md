@@ -1,6 +1,6 @@
 # 批次 1 · 钓鱼、烹饪与背包操作设计
 
-更新：2026-10-05。规则以[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 4、6、7、10、16 章为准；视觉对照使用 [Figma 原型](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)。[返回设计索引](../../REPORT.md)。
+更新：2026-10-05。规则以[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 4、6、7、10、16 章为准；视觉对照使用 [Figma 原型](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)。[返回设计索引](../../REPORT.md)。
 
 ## 页面索引
 
