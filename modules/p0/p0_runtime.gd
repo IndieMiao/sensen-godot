@@ -472,6 +472,8 @@ static func progress_said(v: Dictionary, ev: Dictionary) -> Dictionary:
 ## A filled request's toast comes after the reply's cards (q(134) ⑤): a level-up's banner is deferred, so the toast
 ## waits this long, then for the cards to close. A landed fish's and a trap's wait for their own cards (_on_state).
 const REQUEST_TOAST_AFTER_S := 0.55
+## q(218): the resident's thanks line comes once the delivery's floats are up (不知火舞 on 344: floats first, then the line).
+const THANKS_AFTER_S := 0.4
 
 ## The filled request's toast a landed catch's reply held (catch_toast), handed over once: the world shows it after the
 ## catch's card.
@@ -549,6 +551,15 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		at = ui.inbox_float_at()
 		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
+	# q(218) A Fresh Radish (不知火舞 on 344, 812e77be): handed in on the resident's open bar, the reply floats one group over
+	# the bar — `+20 coins`, `+5 Friendship`, `New recipe · Fresh Fish Soup` — and the resident says the thanks line after.
+	var thanks := {}   # {resident, line}
+	for e in events:
+		if str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done":
+			var line := P0Logic.request_thanks(v, str(e.get("id", "")))
+			if line != "": thanks = {resident = P0Logic.request_owner(str(e.id)), line = line}
+	var over_bar := ui.resident_float_at(str(thanks.get("resident", ""))) if not thanks.is_empty() else Vector2.INF
+	if over_bar.is_finite(): at = over_bar
 	# Arriving by air (q(147) ⑥, 不知火舞 on 299): the arrival's Energy — its float and the HUD's value — waits for the
 	# flight to land (release_travel), with its welcome; so does any Energy that comes while it flies.
 	var by_air := world != null and world.has_method("on_arrival") \
@@ -766,9 +777,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					"dropped": ui.board_dropped(str(ev.get("id", "")))   # BOARD-DROPPED says what dropping left
 					_:   # in the counter drawer the row itself turns Done (BOARD-DONE, no result card)
 						if ui.modal_kind != "counter": ui.toast_success("Request complete · +%d coins" % int(ev.coins))
-						# q(218) ①: a request with a thanks line has the resident say it on the open bar (Nadia's soup recipe)
-						var thanks := P0Logic.request_thanks(v, str(ev.get("id", "")))
-						if thanks != "": ui.resident_affinity({"resident": P0Logic.request_owner(str(ev.get("id", ""))), "delta": 0}, thanks)
 			"meal":
 				if int(ev.gain) <= 0:
 					ui.toast("Full belly · Meals reset in " + P0Logic.span(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
@@ -789,8 +797,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.queue_card.call_deferred(func(): ui.show_title(card))
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
+				# A thanks delivery's +5 joins its float group over the bar, `+5 Friendship` (不知火舞 on 344)
+				if over_bar.is_finite() and str(ev.get("reason", "")) == "request" and str(ev.get("resident", "")) == str(thanks.resident):
+					floats.append({kind = "affinity", key = str(ev.resident), text = "%+d Friendship" % int(ev.get("delta", 0)), tone = UiFloatText.Tone.AFFINITY})
 				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
-				if not ui.resident_affinity(ev, reply):
+				elif not ui.resident_affinity(ev, reply):
 					if int(ev.get("delta", 0)) != 0:
 						floats.append({kind = "affinity", key = str(ev.get("resident", "")), text = P0Ui.affinity_text(ev),
 							tone = UiFloatText.Tone.AFFINITY})   # the tone draws the heart
@@ -810,9 +821,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var page := P0Logic.item_name(v, str(ev.get("page", "")))
 				if str(ev.get("from", "")) == "taught":
 					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
-				# q(218) ①: a teaching request's page is a `New recipe · Fresh Fish Soup` pill, never RESIDENT-TEACH (不知火舞)
-				var intro := str(ev.get("from", "")) == "request" and P0Logic.is_intro_request(str(ev.get("resident", "")), str(ev.get("request", "")))
-				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "New recipe · %s" if intro else "Learned · %s") % page)
+				# q(218) ①: a teaching request's page is the third line of its float group, `New recipe · Fresh Fish Soup` with
+				# the recipe-card icon — not a toast, which the delivery's own toast would replace (不知火舞 on 344), and never
+				# RESIDENT-TEACH
+				if str(ev.get("from", "")) == "request" and P0Logic.is_intro_request(str(ev.get("resident", "")), str(ev.get("request", ""))):
+					floats.append({kind = "result", key = "recipe:" + str(ev.page), text = "New recipe · %s" % page, tone = UiFloatText.Tone.ITEM,
+						icon = P0Logic.icon("recipe_card")})
+				else: ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "Learned · %s") % page)
 			"request_progress":   # q(134): a taken request's count grew — its line over the items, or the toast when full
 				var said := progress_said(v, ev)
 				if said.has("float"):
@@ -907,7 +922,18 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if wave_s > 0.0:
 		var lines := floats
 		get_tree().create_timer(wave_s).timeout.connect(func(): ui.queue_floats(lines, at))
+	elif over_bar.is_finite():
+		# a thanks delivery's group starts over the bar and over the reply's toast, read once that toast is laid out
+		var lines := floats
+		var who := str(thanks.resident)
+		get_tree().process_frame.connect(func():
+			var spot := ui.resident_float_at(who)
+			ui.queue_floats(lines, spot if spot.is_finite() else at), CONNECT_ONE_SHOT)
 	else: ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
+	if not thanks.is_empty():
+		var who := str(thanks.resident)
+		var said := str(thanks.line)
+		get_tree().create_timer(THANKS_AFTER_S).timeout.connect(func(): ui.resident_say(who, said))
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
 		ui.counter_events(events)
