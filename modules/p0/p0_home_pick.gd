@@ -96,7 +96,8 @@ static func band(row: Dictionary) -> String:
 	var b := str(row.get("climate", "")).to_lower()
 	return b if b in BANDS else "temperate"
 
-## The city the page opens with (q(205) ②): the first pick takes `Near you`; no city near, or a change of home, none.
+## The city the page opens with (q(205) ②): the first pick takes `Near you`; no city near, a change of home, or the list
+## opened from HOME-WELCOME (SGODOT-340 §4: its `Choose another city`), none.
 static func preselect(near: Variant, change := false) -> String:
 	if change or not near is Dictionary: return ""
 	return str((near as Dictionary).get("id", ""))

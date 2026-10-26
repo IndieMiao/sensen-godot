@@ -242,8 +242,10 @@ func test_the_flow_reads_the_cities_then_the_spots_and_comes_back_as_it_was() ->
 	add_child(flow)
 	await await_idle_frame()
 	assert_array(asked).is_equal(["/p0/home/cities"])
-	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": SF, "matches": []})
+	# no city near: the list (a city near opens HOME-WELCOME first, test_a_city_near_opens_on_the_welcome_card)
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": null, "matches": []})
 	await await_idle_frame()
+	assert_object(flow.welcome).is_null()
 	flow.cities.rows[SEATTLE.id].pressed.emit()
 	flow.cities.key.activated.emit()
 	assert_array(asked).is_equal(["/p0/home/cities", "/p0/home/spots/" + SEATTLE.id])
@@ -325,3 +327,95 @@ func test_a_baked_map_is_used_only_while_the_points_fit_it() -> void:
 	assert_bool(P0HomeSpotMaps.fits({"lat": centre.x, "lng": centre.y, "zoom": zoom - 1.0}, pts, Vector2(328, 268), 24.0)).is_true()
 	# baked for another table (a point far outside): the plain card
 	assert_bool(P0HomeSpotMaps.fits({"lat": centre.x + 0.05, "lng": centre.y, "zoom": zoom}, pts, Vector2(328, 268), 24.0)).is_false()
+
+# ---------------------------------------------------------------- HOME-WELCOME (SGODOT-340 §4, 338 S0; SGODOT-342)
+
+func _welcome_flow(near: Variant) -> Array:
+	var session := P0Session.new()   # not in the tree: no reads of its own
+	var asked := []
+	session.transport = func(_m, path: String, _b, _c): asked.append(path)
+	var flow: Control = auto_free(HomeFlow.new(session))
+	flow.size = Vector2(360, 800)
+	add_child(flow)
+	await await_idle_frame()
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": near, "matches": []})
+	await await_idle_frame()
+	return [flow, session, asked]
+
+## A city near: the first page is the card — the city, Start here, Choose another city; the list waits behind it.
+func test_a_city_near_opens_on_the_welcome_card() -> void:
+	var r: Array = await _welcome_flow(SF)
+	var flow: Control = r[0]
+	assert_bool(flow.welcome.visible).is_true()
+	assert_bool(flow.cities.visible).is_false()
+	var texts := _texts(flow.welcome)
+	assert_array(texts).contains(["Welcome to Gensen!", "San Francisco", "Looks like you're near San Francisco. Start your farm here?"])
+	assert_str(flow.welcome.start.label).is_equal("Start here")
+	assert_str(flow.welcome.other.label).is_equal("Choose another city")
+	assert_object(flow.welcome.find_child("Close", true, false)).is_null()   # no ×, no later
+	(r[1] as Node).free()
+
+## Start here: that city's spots at once; the spot page's back comes back to the card.
+func test_start_here_goes_to_the_city_spots_and_back_to_the_card() -> void:
+	var r: Array = await _welcome_flow(SF)
+	var flow: Control = r[0]
+	flow.welcome.start.activated.emit()
+	assert_array(r[2]).is_equal(["/p0/home/cities", "/p0/home/spots/" + SF.id])
+	assert_bool(flow.welcome.visible).is_false()
+	assert_bool(flow.cities.visible).is_false()
+	flow.spots.back_pressed.emit()
+	await await_idle_frame()
+	assert_bool(flow.welcome.visible).is_true()
+	assert_bool(flow.cities.visible).is_false()
+	(r[1] as Node).free()
+
+## Choose another city: the list with `‹ Back` and Near you shown but not picked (`Pick a city` grey); Back (the pill
+## or the system's) to the card; a city picked there goes on as ever, and its spot page comes back to the list.
+func test_choose_another_city_opens_the_list_unpicked_with_back() -> void:
+	var r: Array = await _welcome_flow(SF)
+	var flow: Control = r[0]
+	flow.welcome.other.activated.emit()
+	await await_idle_frame()
+	assert_bool(flow.cities.visible).is_true()
+	assert_bool(flow.welcome.visible).is_false()
+	assert_str(flow.cities.choice).is_equal("")
+	assert_str(flow.cities.key.reason).is_equal("Pick a city")
+	assert_bool(flow.cities.rows.has(SF.id)).is_true()   # Near you stays
+	var back := flow.cities.find_child("Back", true, false) as Button
+	assert_str(back.text).contains("Back")
+	back.pressed.emit()
+	assert_bool(flow.welcome.visible).is_true()
+	assert_bool(flow.cities.visible).is_false()
+	flow.welcome.other.activated.emit()
+	flow.back()   # Android Back
+	assert_bool(flow.welcome.visible).is_true()
+	flow.back()   # the card itself stays: a first pick has nowhere to go back to
+	assert_bool(flow.welcome.visible).is_true()
+	flow.welcome.other.activated.emit()
+	flow.cities.rows[SEATTLE.id].pressed.emit()
+	flow.cities.key.activated.emit()
+	assert_array(r[2]).is_equal(["/p0/home/cities", "/p0/home/spots/" + SEATTLE.id])
+	flow.spots.back_pressed.emit()
+	await await_idle_frame()
+	assert_bool(flow.cities.visible).is_true()
+	assert_bool(flow.welcome.visible).is_false()
+	(r[1] as Node).free()
+
+## No city near: no card, the list (HOME-PICK-1-NOIP) without a back; a first read that fails: the list's error.
+func test_no_city_near_or_a_failed_read_is_the_list() -> void:
+	var r: Array = await _welcome_flow(null)
+	var flow: Control = r[0]
+	assert_object(flow.welcome).is_null()
+	assert_bool(flow.cities.visible).is_true()
+	assert_object(flow.cities.find_child("Back", true, false)).is_null()
+	(r[1] as Node).free()
+	var session := P0Session.new()
+	session.transport = func(_m, _p, _b, _c): pass
+	var failed: Control = auto_free(HomeFlow.new(session))
+	add_child(failed)
+	await await_idle_frame()
+	P0HomePick.answer("/p0/home/cities", null)
+	await await_idle_frame()
+	assert_object(failed.welcome).is_null()
+	assert_bool(failed.cities.error.visible).is_true()
+	session.free()

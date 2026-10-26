@@ -52,6 +52,7 @@ var choice := ""             # the city picked
 var query := ""
 var open_rows: Array = []
 var near: Variant = null
+var _no_preselect := false   # CHANGE, or come from HOME-WELCOME: Near you is shown, not picked
 var matches: Variant = null  # the search's rows, null when not searching
 var field: SearchField
 var list: VBoxContainer
@@ -65,11 +66,16 @@ var _wait := -1.0
 var _opened := false         # the first answer has picked what the page opens with
 
 ## change_from: the home city now — the change of home (CHANGE); "" for a new player's first pick.
-func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "") -> void:
+## back_to: a first pick come from HOME-WELCOME (SGODOT-340 §4) — `‹ Back` to it, and `Near you` stays but is not
+## picked (`Pick a city` grey until a row is), as on the change of home.
+func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "", back_to := "") -> void:
 	name = "HomePickPage"
 	home = change_from
-	var dy_head := _CHANGE_HEAD_DY if home != "" else 0.0
-	var dy := _CHANGE_DY if home != "" else 0.0
+	_no_preselect = home != "" or back_to != ""
+	var back_text := "Settings" if home != "" else back_to
+	var dy_head := _CHANGE_HEAD_DY if back_text != "" else 0.0
+	# CHANGE's one-line body takes 19 of the pill's 32 back; the first pick's two lines keep all 32 (from HOME-WELCOME)
+	var dy := (_CHANGE_DY if home != "" else _CHANGE_HEAD_DY) if back_text != "" else 0.0
 	if home != "":
 		heading = "Change home city"
 		line = "Your farm and everything on it move with you."
@@ -111,8 +117,8 @@ func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "") -> void:
 	none.visible = false
 	_place(none, _NONE_Y + dy + safe_top)
 	error = _error(_ERROR_Y + dy + safe_top)
-	if home != "":
-		var back := SpotPage.BackPill.new("Settings")
+	if back_text != "":
+		var back := SpotPage.BackPill.new(back_text)
 		back.position = Vector2(12, 16 + safe_top)
 		back.pressed.connect(func(): back_pressed.emit())
 		add_child(back)
@@ -198,7 +204,7 @@ func show_cities(data: Dictionary, for_query := "") -> void:
 	for r in open_rows + ([near] if near is Dictionary else []): _rows_data[str(r.get("id", ""))] = r
 	if not _opened:
 		_opened = true
-		choice = P0HomePick.preselect(near, home != "")
+		choice = P0HomePick.preselect(near, _no_preselect)
 	matches = data.get("matches", []) if query.length() >= P0HomePick.SEARCH_MIN else null
 	error.visible = false
 	_lay_out()
