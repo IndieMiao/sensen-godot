@@ -17,6 +17,9 @@ var _bite_at := 0.0
 var _hook_until := 0.0
 var _rarity := 1
 var _breaks := false
+## q(219): one of the account's first two bites (the server's cast.sure) — the hook window stays open and the reel can't
+## fail; the player still hooks and reels. No words or marks: it looks like any other bite.
+var _sure := false
 var _play_ms := 0.0
 var _last: Dictionary = {}
 var _reported := false
@@ -134,6 +137,7 @@ func on_cast(ev: Dictionary) -> void:
 	_hook_until = _bite_at + hook_ms
 	_rarity = int(ev.get("rarity", 1))
 	_breaks = ev.get("breaks", null) != null
+	_sure = cast is Dictionary and bool(cast.get("sure", false)) and not _breaks
 	phase = "waiting"
 	_gauge.model = {}
 	_show_notice("Watch the float. Tap when a fish bites!")
@@ -151,6 +155,7 @@ func _p0_hook() -> void:
 	var fishing: Dictionary = rt.session.current().get("fishing", {})
 	tier["bar_size"] = minf(0.45, float(tier.bar_size) + float(fishing.get("band_bonus", 0.0)))   # Reed +3 / Carbon +5 points (§6.5.2)
 	tier["loss"] = maxf(0.04, float(tier.loss) * float(fishing.get("loss_mult", 1.0)))   # Carbon Rod −10%, floor 4 % / s
+	tier["sure"] = _sure   # q(219): progress never drops to zero, no 30 s timeout
 	set_meta("tier", tier)
 	model = FishingModel.initial(randi())
 	inputs = ""
@@ -166,7 +171,7 @@ func _process(dt: float) -> void:
 	if not visible or rt == null or busy: return
 	var now := Time.get_ticks_msec()
 	if phase in ["waiting", "hook"]:
-		if now > _hook_until:
+		if now > _hook_until and not _sure:   # q(219): a sure bite's float stays down until the player hooks
 			_report("escaped")
 			_show_notice("Missed the bite. Tap Hook when the float dips.", "Fish escaped", "failed")
 			phase = "settling"
@@ -180,7 +185,7 @@ func _process(dt: float) -> void:
 			_p0_hook()
 	elif phase == "playing":
 		if dt > 0.5:
-			_report("escaped")
+			if not _sure: _report("escaped")   # q(219): a sure bite just skips the stalled frame
 			return
 		_accumulator += dt
 		_play_ms += dt * 1000.0

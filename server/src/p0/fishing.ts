@@ -1,6 +1,6 @@
 /** Fishing at the homestead pond (plan §6): cast pre-pays energy, the fish is drawn server-side, gates run level → rod → reel. */
 import { fishById, rodById, type Fish, type FishSite, type P0Content } from './content.js';
-import { pondAt, poolAt, type Pond } from './fishing_world.js';
+import { pondAt, poolAt, type Pond, type PoolFish } from './fishing_world.js';
 import { add, count, freeSlots, room, take } from './bag.js';
 import { clusterById, clusterOf, writtenCluster } from './travel.js';
 import { placeOf } from './world.js';
@@ -13,10 +13,15 @@ export type FishCommand =
   | { type: 'cast'; bait?: string | null }   // the pond is where the player is (presence.place), never named by the cast
   | { type: 'reel'; outcome: 'cancel' | 'escaped' | 'landed' };
 
+/** q(219) ①: an account's first two bites always land (the client keeps the hook window open and the reel from failing). */
+export const SURE_BITES = 2;
+
 /**
  * Teaching pins (§14.2.2, the director's reading of §6.1.3): bites 1–3 are Pond Crucian (two of them fill
- * the Pond Catch request), bite 4 at Fishing Lv1 is a Fine fish that breaks free, and the first baited
- * bite after Lv2 is a Fine fish that stays on. They only touch the first few bites; weights never change.
+ * the Pond Catch request) — at a pond without it (a Coast pond) the pond's Common global fish, else any Common global
+ * fish (q(219) ③: all Lv1, so the Starter Rod holds the two sure bites anywhere) — bite 4 at Fishing Lv1 is a Fine
+ * fish that breaks free, and the first baited bite after Lv2 is a Fine fish that stays on. They only touch the first
+ * few bites; weights never change.
  * The pool itself (SGODOT-283, §6.2.6) is the pond's at this moment: habitat, the city's regional fish, time of day and
  * weather (fishing_world.ts poolAt). A rarity tier left empty gives its weight to the next tier down.
  */
@@ -25,8 +30,14 @@ export function pickFish(c: P0Content, s: P0State, bait: string | null, site: Fi
   const tiers = poolAt(c, site, pond, c.fishing.baits[bait ?? '']?.regional_mult ?? 1);
   const bites = s.fishing.bites;
   const has = (id: string) => tiers.flat().find(p => p.fish.id === id)?.fish;
-  const crucian = has('fish_crucian');
-  if (bites < 3 && crucian) return crucian;
+  if (bites < 3) {
+    const crucian = has('fish_crucian');
+    if (crucian) return crucian;
+    const common = (tiers[0] ?? []).filter(p => !p.fish.regional);
+    if (common.length) return weighted(s, common);
+    const any = c.fish.find(f => f.rarity === 1 && !f.regional) ?? c.fish.find(f => f.rarity === 1);
+    if (any) return any;
+  }
   const level = skillLevel(c, s, 'fishing');
   const fine = tiers[1] ?? [];
   // The pinned Fine fish: Perch where it swims (the Pond, the River), else the first global Fine fish
@@ -44,7 +55,10 @@ export function pickFish(c: P0Content, s: P0State, bait: string | null, site: Fi
   let roll = draw(s) * weights.reduce((a, b) => a + b, 0);
   let rarity = weights.findIndex(w => w > 0) + 1;
   for (let i = 0; i < weights.length; i++) { roll -= weights[i]; if (roll < 0) { rarity = i + 1; break; } }
-  const pool = tiers[rarity - 1];
+  return weighted(s, tiers[rarity - 1]);
+}
+
+function weighted(s: P0State, pool: PoolFish[]): Fish {
   let pick = draw(s) * pool.reduce((n, p) => n + p.weight, 0);
   for (const p of pool) { pick -= p.weight; if (pick < 0) return p.fish; }
   return pool[pool.length - 1].fish;
@@ -93,6 +107,10 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
   if (!cast) return { code: 'no_cast' };
   const bitten = now >= cast.at + cast.bite_ms;
   const outcome = String(cmd.outcome ?? '');
+  // q(219) ⑤: one of the first two bites lands even when the client reports `escaped` (an old client, a missed
+  // window, a hitch) — but not before the bite, and not when the bag can't take the fish: that `escaped` is how a
+  // client answers bag_full, so it settles as got away as before. `cancel` and a stale line stay got away (②).
+  const sure = outcome === 'escaped' && bitten && sureBite(s) && !cast.breaks && room(c, s, cast.fish) >= 1;
   if (outcome === 'cancel' && !bitten) {
     // Line in before the bite: full refund, bait kept, not a failure (§6.6.1); an unused teaching pin returns.
     if (cast.pin) s.firsts = s.firsts.filter(f => f !== cast.pin);
@@ -102,7 +120,7 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     return null;
   }
   if (outcome === 'landed' && !bitten) return { code: 'too_early', detail: { bite_in: cast.at + cast.bite_ms - now } };
-  if (outcome === 'landed' && !cast.breaks) {
+  if ((outcome === 'landed' || sure) && !cast.breaks) {
     const fish = fishById(c, cast.fish)!;
     if (room(c, s, fish.id) < 1) return { code: 'bag_full' };
     s.cast = null;
@@ -122,6 +140,11 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
   if (!['cancel', 'escaped', 'landed'].includes(outcome)) return { code: 'bad_outcome' };
   settleFailure(c, s, now, events, outcome === 'landed' ? 'broke_free' : 'escaped');
   return null;
+}
+
+/** The open line is one of the account's first two bites (q(219)): the bite count only moves when a line settles. */
+export function sureBite(s: P0State): boolean {
+  return s.fishing.bites < SURE_BITES;
 }
 
 /**
