@@ -14,10 +14,6 @@ const CLEAR_MARGIN_M := 5.0
 const SHOW_CLEAR_M := 600.0
 ## The start (spot 1, checked by the server, #473) stands even where it is within the client's margins: this near it.
 const START_M := 2.0
-## Same-city re-pin (q(216) ⑨): the back-to-start key goes to the farm as it stands. 不知火舞 340 78cbe60f; held till
-## 李白's q row is approved (奕星 10-27) — until then it goes to spot 1 as q(216) ③ reads.
-static var repin_starts_on_farm := false
-
 const COMPASS := ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"]
 
 ## The read's `pin` as an area {base, range_km, clear_m, start, blocks: [{id, at}]}; {} when it is missing or not whole
@@ -117,15 +113,10 @@ static func kind_of(id: String) -> String:
 	if id.contains("~hut") or id.contains("hut"): return "hut"
 	return "shop"
 
-## Where the pin starts and where the back-to-start key takes it (q(216) ② / ⑨; 340 78cbe60f): spot 1 for a first pick
-## or another city; the farm as it stands for the home city itself (`farm`, view.home.farm) — the start always, the
-## key's target only once repin_starts_on_farm is on.
+## Where the pin starts — and where the back-to-start key takes it back to (q(223), 340 78cbe60f): spot 1 for a first
+## pick or another city; the farm as it stands for the home city itself (q(216) ⑨; `farm`, view.home.farm).
 static func start(a: Dictionary, same_city: bool, farm: Variant) -> Vector2:
 	if same_city and farm is Vector2: return farm
-	return a.get("start", Vector2.ZERO)
-
-static func back_target(a: Dictionary, same_city: bool, farm: Variant) -> Vector2:
-	if same_city and farm is Vector2 and repin_starts_on_farm: return farm
 	return a.get("start", Vector2.ZERO)
 
 ## The command (q(216); 周瑜 on #473): {type, city, at: [lat, lng], spot: -1} — an older server answers bad_spot rather

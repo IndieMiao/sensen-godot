@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## SGODOT-342 PR-2, the free pin's rules on the client (q(216) ②③⑨; P0HomePin): the area from the spots read, where
 ## the pin may stand (a little inside the server's 10 km / 300 m), the card's line, the grey key and its toast, the
-## start and the back-to-start target, the command. Distances and sides checked against the server's world.km / toward.
+## start (and the back-to-start key's target, q(223)), the command. Distances and sides checked against the server's world.km / toward.
 
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")
 
@@ -17,9 +17,6 @@ const N11 := Vector2(37.858814, -122.44)       # 10.9876 km, north
 static func _pin(clear := 300.0) -> Dictionary:
 	return {"base": BASE, "range_km": 10, "clear_m": clear, "start": {"lat": 37.765, "lng": -122.43},
 		"blocks": [{"id": "pond_fern", "lat": 37.76, "lng": -122.44}, {"id": "outpost_mission_market", "lat": 37.78, "lng": -122.42}]}
-
-func after_test() -> void:
-	P0HomePin.repin_starts_on_farm = false
 
 func test_the_area_reads_the_pin_and_refuses_a_part_one() -> void:
 	var a := P0HomePin.area(_pin())
@@ -91,17 +88,12 @@ func test_the_grey_key_and_its_toast() -> void:
 	assert_str(P0HomePin.refusal_text({"code": "near", "id": "gn-1850147~tackle0", "m": 1.0}, {}).short).is_equal("Too close to a shop")
 	assert_dict(P0HomePin.refusal_text({}, names)).is_empty()
 
-func test_the_start_and_the_back_to_start_target() -> void:
+func test_the_start_is_spot_one_or_the_farm_for_the_home_city() -> void:
 	var a := P0HomePin.area(_pin())
 	var farm := Vector2(37.75, -122.45)
 	assert_object(P0HomePin.start(a, false, farm)).is_equal(a.start)   # a first pick, another city: spot 1
 	assert_object(P0HomePin.start(a, true, farm)).is_equal(farm)       # the home city again (⑨): the farm
-	assert_object(P0HomePin.start(a, true, null)).is_equal(a.start)
-	# the key's target: spot 1 till the q row is approved (q(216) ③), then the farm for the home city
-	assert_object(P0HomePin.back_target(a, true, farm)).is_equal(a.start)
-	P0HomePin.repin_starts_on_farm = true
-	assert_object(P0HomePin.back_target(a, true, farm)).is_equal(farm)
-	assert_object(P0HomePin.back_target(a, false, farm)).is_equal(a.start)
+	assert_object(P0HomePin.start(a, true, null)).is_equal(a.start)   # (the back-to-start key goes to the same, q(223))
 
 func test_the_command_sends_the_pin_and_spot_minus_one() -> void:
 	assert_dict(P0HomePin.command("choose_home", "gn-5391959", 37.76, -122.44909)).is_equal(
