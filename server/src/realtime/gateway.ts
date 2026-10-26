@@ -1,4 +1,3 @@
-import { terrainNavigation } from '../geography/farm_terrain.js';
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -16,7 +15,7 @@ import { PondCatalog, type PondRoom } from '../ponds/catalog.js';
 
 interface Connection { ws: WebSocket; player: string; hash: string; room?: Room; member?: Member; openedAt: number; resumeNonce: string;
   space?: Pick<SpacePresence, 'home' | 'channel' | 'region' | 'layout' | 'revision' | 'terrain'>;
-  lastSeen: number; lastAuth: number; tokens: number; tokenAt: number; busy: boolean; dressedAt?: number; pendingFarm?: string }
+  lastSeen: number; lastAuth: number; tokens: number; tokenAt: number; busy: boolean; dressedAt?: number }
 export const onlineGateways = new WeakMap<FastifyInstance, OnlineGateway>();
 
 export class OnlineGateway {
@@ -35,7 +34,6 @@ export class OnlineGateway {
   private timer?: ReturnType<typeof setInterval>;
   private wss: WebSocketServer;
   private revokedResumes = new Map<string, number>();
-  private relocationRefresh = new Map<string, Set<string>>();
 
   constructor(readonly app: FastifyInstance, readonly deps: AppDeps) {
     this.ponds = deps.pondCatalog ?? new PondCatalog();
@@ -123,82 +121,9 @@ export class OnlineGateway {
     this.transitions = result.catch(() => {});
     return result;
   }
-  /** Fishing and relocation share the admission queue, including the durable write and presence sync. */
+  /** Fishing commands share the admission queue, including the durable write and presence sync. */
   withFishingCommand<T>(fn: () => Promise<T>): Promise<T> { return this.serialize(fn); }
 
-  withFarmRelocation<T>(ownerId: string, farmId: string, commit: () => Promise<T>): Promise<T> {
-    return this.serialize(async () => {
-      const before = await this.deps.store.farmByOwner(ownerId);
-      if (!before || before.id !== farmId) throw new Error('NOT_FOUND');
-      const fingerprint = farmGeometry(before);
-      // A consumed one-time relocation can only replay or reject in the store; recovery
-      // must remain possible after the player has already continued into another activity.
-      if (!before.farm_terrain && !before.relocation_used) {
-        const owner = this.active(ownerId);
-        if (owner?.room?.kind === 'mine') throw new Error('RELOCATION_BUSY');
-        const players = new Set([ownerId]);
-        for (const c of this.connections) if (c.member && c.room?.kind === 'farm' && c.space?.home === farmId)
-          players.add(c.player);
-        const config = this.deps.content.fishing;
-        for (const player of players) {
-          const farm = player === ownerId ? before : await this.deps.store.farmByOwner(player);
-          const cast = farm?.state.fishing?.active;
-          // Match the domain's active-cast window; abandoned casts cannot lock relocation forever.
-          if (cast && this.deps.now() <= (cast.hooked_at ?? cast.hook_until) + config.max_steps * config.step_ms + config.settle_grace_ms)
-            throw new Error('RELOCATION_BUSY');
-        }
-      }
-      try {
-        const result = await commit();
-        const after = await this.deps.store.farmByOwner(ownerId);
-        if (!after || farmGeometry(after) !== fingerprint) this.farmRelocated(ownerId, farmId);
-        return result;
-      } catch (error) {
-        // A lost COMMIT response may still have saved the new geometry. Close stale
-        // actors even when the HTTP caller must recover the result by idempotency key.
-        try {
-          const after = await this.deps.store.farmByOwner(ownerId);
-          if (!after || farmGeometry(after) !== fingerprint) this.farmRelocated(ownerId, farmId);
-        } catch { this.farmRelocated(ownerId, farmId); }
-        throw error;
-      }
-    });
-  }
-
-  /** Only an actual new owner/visitor DTO clears the fence, never a prior cached response. */
-  acknowledgeFarmRead(player: string, view: Record<string, unknown>): Promise<void> {
-    return this.serialize(async () => {
-      const farmId = typeof view.farm_id === 'string' ? view.farm_id : '';
-      const pending = this.relocationRefresh.get(player);
-      if (!pending?.has(farmId)) return;
-      const farm = await this.deps.store.farmById(farmId);
-      if (!farm || view.layout_patch_id !== farm.layout_patch_id || view.blueprint_revision !== farm.blueprint_revision) return;
-      const terrain = view.farm_terrain as { plot?: { checksum?: unknown } } | undefined;
-      if (terrain?.plot?.checksum !== farm.farm_terrain?.plot.checksum) return;
-      pending.delete(farmId);
-      if (!pending.size) this.relocationRefresh.delete(player);
-    });
-  }
-
-  private farmRelocated(ownerId: string, farmId: string) {
-    for (const c of this.connections) {
-      if (c.player !== ownerId && c.pendingFarm !== farmId && !(c.room?.kind === 'farm' && c.space?.home === farmId)) continue;
-      const pending = this.relocationRefresh.get(c.player) ?? new Set<string>();
-      pending.add(farmId); this.relocationRefresh.set(c.player, pending);
-      this.revokedResumes.set(c.resumeNonce, Date.now() + 120000);
-      c.resumeNonce = randomUUID();
-      if (c.member) { c.member.epoch++; c.room?.leave(c.member); }
-      c.member = undefined; c.room = undefined; c.space = undefined;
-      if (c.ws.readyState === WebSocket.OPEN) {
-        c.ws.send(JSON.stringify({ t: 'error', code: 'FARM_RELOCATED', farm_id: farmId }));
-        c.ws.close(4005, 'FARM_RELOCATED');
-      }
-    }
-    // An empty channel also owns immutable navigation and must not survive this change.
-    for (const [key, room] of this.rooms) if (room.kind === 'farm' && key.startsWith('farm:' + farmId + ':')) {
-      room.failed = true; this.rooms.delete(key);
-    }
-  }
   private accept(ws: WebSocket) {
     const now = Date.now();
     const c: Connection = { ws, player: '', hash: '', openedAt: now, resumeNonce: randomUUID(), lastSeen: now, lastAuth: now, tokens: 60, tokenAt: now, busy: false };
@@ -230,18 +155,9 @@ export class OnlineGateway {
       if (c.busy) return;
       if (!c.player || b.t === 'join' || b.t === 'leave') {
         c.busy = true;
-        if (b.t === 'join') {
-          c.pendingFarm = b.kind !== 'mine' && typeof b.farm_id === 'string' ? b.farm_id : undefined;
-          if (b.travel_ticket && c.player) {
-            try {
-              const grant = this.travel.read(b.travel_ticket, c.player);
-              if (grant.destination.kind !== 'mine') c.pendingFarm = grant.destination.home;
-            } catch { /* The serialized admission returns the protocol error. */ }
-          }
-        }
         void this.serialize(() => this.control(c, b)).catch(error => {
           if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ t: 'error', code: safeCode(error) }));
-        }).finally(() => { c.busy = false; c.pendingFarm = undefined; });
+        }).finally(() => { c.busy = false; });
       } else {
         if (b.t === 'appearance') {
           try {
@@ -341,14 +257,7 @@ export class OnlineGateway {
         const permitted = kind === 'farm' ? await this.travel.canVisitFarm(c.player, host) : await this.travel.canVisitStreet(c.player, host);
         if (String(b.farm_id ?? farm.id) !== host.id || !permitted) throw new Error('NOT_FOUND');
       }
-      if (kind === 'farm' && this.relocationRefresh.get(c.player)?.has(host.id)) throw new Error('FARM_RELOCATED');
-      // Reading a new DTO on another device cannot authorize an old rendered scene.
-      // Bind this join's geometry only after relocation; original clients retain access
-      // to farms whose layout has never changed.
-      if (kind === 'farm' && host.relocation_used && (!host.farm_terrain || b.terrain_checksum !== host.farm_terrain.plot.checksum))
-        throw new Error('FARM_RELOCATED');
-      nav = kind === 'farm' && host.farm_terrain ? terrainNavigation(host.farm_terrain)
-        : this.maps[String(kind) + ':' + host.layout_patch_id + ':' + host.blueprint_revision];
+      nav = this.maps[String(kind) + ':' + host.layout_patch_id + ':' + host.blueprint_revision];
       if (!nav) throw new Error('MAP_UNAVAILABLE');
       key = kind === 'farm' ? 'farm:' + host.id + ':' + channel :
         'street:' + host.region_id + ':' + host.layout_patch_id + ':' + host.blueprint_revision + ':' + channel;
@@ -364,7 +273,7 @@ export class OnlineGateway {
     c.room = room;
     c.space = { home: pond?.location.id ?? host.id, channel: kind === 'mine' ? 0 : Number(b.channel ?? 1), region: pond?.location.region_id ?? host.region_id,
       layout: pond?.template.id ?? host.layout_patch_id, revision: pond?.template.revision ?? host.blueprint_revision,
-      terrain: pond?.revision ?? host.farm_terrain?.plot.checksum ?? '' };
+      terrain: pond?.revision ?? '' };
     c.member = await room.join(farm, wire, async () => {
       if (c.ws.readyState !== WebSocket.OPEN) throw new Error('CONNECTION_CLOSED');
       if (grant) await this.travel.validate(grant, c.player);
@@ -471,10 +380,6 @@ export class OnlineGateway {
   }
 }
 
-function farmGeometry(farm: FarmRow): string {
-  return JSON.stringify([farm.region_id, farm.layout_patch_id, farm.blueprint_revision, farm.farm_terrain?.plot.checksum ?? '']);
-}
-
 function safeCode(error: unknown): string {
   const code = error instanceof Error ? error.message : '';
   return /^[A-Z_]{3,40}$/.test(code) ? code : 'ONLINE_UNAVAILABLE';
@@ -568,18 +473,6 @@ export function registerOnline(app: FastifyInstance, deps: AppDeps,
       const player = await auth(req);
       if (player) await gateway.refresh(player.id);
     }
-  });
-  app.addHook('onSend', async (req, reply, payload) => {
-    const route = req.url.split('?')[0];
-    if (reply.statusCode >= 300 || typeof payload !== 'string' || !(
-      req.method === 'GET' && (route === '/v1/farms/me' || /^\/v1\/farms\/[0-9a-f-]{36}\/snapshot$/.test(route)) ||
-      req.method === 'POST' && (route === '/v1/online/travel' || route === '/v1/farms/me/relocation/confirm'))) return payload;
-    const player = await auth(req);
-    if (!player) return payload;
-    const body = JSON.parse(payload) as Record<string, unknown>;
-    const view = route === '/v1/online/travel' ? body.snapshot : body;
-    if (view && typeof view === 'object') await gateway.acknowledgeFarmRead(player.id, view as Record<string, unknown>);
-    return payload;
   });
   return gateway;
 }

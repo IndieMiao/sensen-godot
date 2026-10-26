@@ -1,6 +1,3 @@
-import { plotForFarm } from '../geography/farm_terrain.js';
-import { relocateFarmState, relocationAvailable, relocationBlocked, relocationCommandMatches, relocationConfirmError, relocationEnvelope,
-  RelocationError, type RelocationConfirm, type RelocationDraft, type RelocationOutcome } from '../domain/farm_relocation.js';
 import type { FishingPresenceReader } from '../domain/fishing.js';
 /**
  * 内存 Store：HTTP 层测试用。事务语义在单进程里天然满足，所以它只需要如实实现
@@ -226,52 +223,6 @@ export class MemoryStore implements Store {
     return this.farms.get(farmId) ?? null;
   }
 
-  async saveRelocationPreview(ownerId: string, draft: RelocationDraft) {
-    const farm = [...this.farms.values()].find(f => f.owner_id === ownerId);
-    if (!farm) return { code: 'NO_FARM' };
-    if (farm.domain_version !== DOMAIN_VERSION || farm.content_version !== this.deps.contentVersion
-      || farm.state_schema_version !== STATE_SCHEMA_VERSION) return { code: 'VERSION_MISMATCH' };
-    if (!relocationAvailable(farm)) return { code: 'RELOCATION_UNAVAILABLE' };
-    if (relocationBlocked(farm, this.deps.now(), this.deps.content)) return { code: 'RELOCATION_BUSY' };
-    if (farm.version !== draft.base_version || farm.region_id !== draft.region_id) return { code: 'RELOCATION_CONFLICT' };
-    farm.relocation_draft = structuredClone(draft);
-    return {};
-  }
-
-  async confirmFarmRelocation(ownerId: string, input: RelocationConfirm): Promise<RelocationOutcome> {
-    // No await between lookup and commit: mirrors PostgreSQL's single locked transaction.
-    const farm = [...this.farms.values()].find(f => f.owner_id === ownerId);
-    if (!farm) return { kind: 'rejected', code: 'NO_FARM' };
-    const log = this.commands.get(farm.id) ?? new Map<string, CommandRecord>();
-    const env = relocationEnvelope(input), hash = payloadHash(env), prior = log.get(input.idempotency_key);
-    if (prior) {
-      if (prior.payload_hash !== hash) return { kind: 'rejected', code: 'IDEMPOTENCY_MISMATCH' };
-      return prior.outcome === 'applied' ? { kind: 'replayed', farm: structuredClone(farm) }
-        : { kind: 'rejected', code: (prior.result as { code: string }).code };
-    }
-    if (farm.domain_version !== DOMAIN_VERSION || farm.content_version !== this.deps.contentVersion
-      || farm.state_schema_version !== STATE_SCHEMA_VERSION) return { kind: 'rejected', code: 'VERSION_MISMATCH' };
-    const reject = (code: string): RelocationOutcome => {
-      log.set(input.idempotency_key, { idempotency_key: input.idempotency_key, payload_hash: hash, outcome: 'rejected', result: { code } });
-      this.commands.set(farm.id, log);
-      return { kind: 'rejected', code };
-    };
-    const code = relocationConfirmError(farm, input, this.deps.now(), this.deps.content);
-    if (code) return reject(code);
-    const draft = farm.relocation_draft!;
-    try {
-      const moved = relocateFarmState(farm.state, plotForFarm({ farm_terrain: draft.farm_terrain }, this.deps.plot), this.deps.content);
-      Object.assign(farm, { state: moved.state, location: structuredClone(draft.location), farm_terrain: structuredClone(draft.farm_terrain),
-        layout_patch_id: draft.farm_terrain.layout_id, blueprint_revision: draft.farm_terrain.plot.revision,
-        version: farm.version + 1, relocation_available: false, relocation_used: true, relocation_draft: null });
-      this.snapshots.delete(farm.id);
-      log.set(input.idempotency_key, { idempotency_key: input.idempotency_key, payload_hash: hash, outcome: 'applied',
-        result: { version: farm.version, events: [{ type: 'farm_relocated' }] } });
-      this.commands.set(farm.id, log);
-      return { kind: 'applied', farm: structuredClone(farm) };
-    } catch (error) { if (error instanceof RelocationError) return reject(error.code); throw error; }
-  }
-
   async cityFarmCounts() {
     const counts = new Map<string, number>();
     for (const f of this.farms.values()) if (f.visit_access === 'anyone') counts.set(f.region_id, (counts.get(f.region_id) ?? 0) + 1);
@@ -358,13 +309,6 @@ export class MemoryStore implements Store {
       || stored.state_schema_version !== STATE_SCHEMA_VERSION)
       return { kind: 'version_mismatch' };
 
-    if (!relocationCommandMatches(stored, env)) {
-      log.set(env.idempotency_key, { idempotency_key: env.idempotency_key, payload_hash: hash,
-        outcome: 'rejected', result: commandRecordResult(env, { code: 'FARM_RELOCATED' }) });
-      this.commands.set(farm.id, log);
-      return { kind: 'rejected', code: 'FARM_RELOCATED' };
-    }
-
     // 3. 锁后采样，单调 clamp。
     // QA 时间变换必须和 PgStore 走同一条路。只改一处的话，内存实现（测试与本地
     // 开发用）会和线上表现不一致，而线上正是没人天天盯着的那个。
@@ -374,7 +318,7 @@ export class MemoryStore implements Store {
     if (env.base_version !== stored.version) return { kind: 'version_conflict', farm: stored };
 
     const ctx = makeCtx(stored.state, effectiveNow, this.deps.timezone, this.deps.content,
-      plotForFarm(stored, this.deps.plot), realNow, farm.id);
+      this.deps.plot, realNow, farm.id);
     ctx.fishingPresence = fishingPresence?.();
     const r = apply(stored.state, cmd, ctx);
     const record: CommandRecord = {
