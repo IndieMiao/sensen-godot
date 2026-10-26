@@ -1609,12 +1609,26 @@ func _dev_shot(dt: float) -> void:
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
 			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
-			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, picked)
+			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, not picked)
 				if is_instance_valid(_home_flow):
 					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
 					if not near_row.is_empty():
-						_home_flow.cities._opened = false
 						_home_flow.cities.show_cities({"open": _home_flow.cities.open_rows, "near": near_row[0]}, "")
+			# HOME-WELCOME (SGODOT-340 §4): homewelcome:<cluster> opens the pick as if the address were near it; homestart /
+			# homeother press Start here / Choose another city
+			"homewelcome":
+				if is_instance_valid(_home_flow) and _home_flow.change_from == "":
+					var open_rows: Array = _home_flow.cities.open_rows if _home_flow.cities != null else []
+					var near_row = open_rows.filter(func(r): return str(r.id) == step[1])
+					if not near_row.is_empty():
+						# a second homewelcome builds both again (刘邦 on #476: a card left standing kept the list unbuilt)
+						if _home_flow.cities != null: _home_flow.cities.queue_free()
+						if _home_flow.welcome != null: _home_flow.welcome.queue_free()
+						_home_flow.cities = null
+						_home_flow.welcome = null
+						_home_flow._cities_read({"open": open_rows, "near": near_row[0], "matches": []}, "")
+			"homestart": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.start.activated.emit()
+			"homeother": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.other.activated.emit()
 			"homesearch":
 				if is_instance_valid(_home_flow):
 					_home_flow.cities.field.text = step[1]

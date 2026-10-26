@@ -133,6 +133,10 @@ func test_a_first_pick_stays_on_its_city_page() -> void:
 	add_child(flow)
 	var left := []
 	flow.left.connect(func(): left.append(1))
+	flow.back()   # before the first read (SGODOT-342: the list, or HOME-WELCOME, comes with it)
+	assert_array(left).is_empty()
+	await await_idle_frame()
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": [], "near": null, "matches": []})
 	flow.back()
 	assert_array(left).is_empty()
 	assert_bool(flow.cities.visible).is_true()
