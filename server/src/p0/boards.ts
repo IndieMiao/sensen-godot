@@ -236,6 +236,17 @@ export function heldSlot(c: P0Content, s: P0State, board: BoardId, sl: BoardSlot
 }
 
 /**
+ * q(215) ④⑦: a guided save starts without Pond Catch (guide.pond_catch false), so the Stall Board's first slot is held
+ * like slot 2. Delivering Nadia's first request (guide.stall_refill_on) refills it done_refill_h later, as delivering
+ * Pond Catch would (`Next request 4h`, q(99)); the guide ending before that (the fallback, a changed table) refills it
+ * at once. Only a first slot still held moves: one already drawn or counting down keeps its time.
+ */
+export function releaseFirstStallSlot(c: P0Content, s: P0State, at: number): void {
+  const first = s.boards.stall?.[0];
+  if (first && heldSlot(c, s, 'stall', first)) first.refill_at = at;
+}
+
+/**
  * Entering an outpost checks in a tracked explore request that sends the player there (§9.6.3 Stamp Run). A check-in
  * in another city counts as that city's delivery for its card (q(128): Deliveries +1 there, once a day; the hand-in at
  * home adds none); getting in already took a pass there (requirePass runs first).
