@@ -2,6 +2,8 @@ class_name FishingModel
 extends RefCounted
 
 static var _data: Dictionary = {}
+## q(219): a sure bite's reel (tier.sure) keeps at least this much progress and has no step limit, so it can't escape.
+const SURE_FLOOR := 0.05
 
 static func data() -> Dictionary:
 	if _data.is_empty(): _data = JSON.parse_string(FileAccess.get_file_as_string("res://assets/farm/data/fishing.json"))
@@ -78,10 +80,11 @@ static func step(model: Dictionary, held: bool, tier: Dictionary) -> void:
 	model.bar = clampf(float(model.bar) + float(model.velocity) * dt, half, 1.0 - half)
 	if model.bar == half or model.bar == 1.0 - half: model.velocity = 0.0
 	var inside := absf(float(model.fish) - float(model.bar)) <= half
-	model.progress = clampf(float(model.progress) + (float(tier.gain) if inside else -float(tier.loss)) * dt, 0, 1)
+	var sure := bool(tier.get("sure", false))
+	model.progress = clampf(float(model.progress) + (float(tier.gain) if inside else -float(tier.loss)) * dt, SURE_FLOOR if sure else 0.0, 1)
 	model.step = int(model.step) + 1
 	if float(model.progress) >= 1: model.outcome = "caught"
-	elif float(model.progress) <= 0 or int(model.step) >= int(config.max_steps): model.outcome = "escaped"
+	elif not sure and (float(model.progress) <= 0 or int(model.step) >= int(config.max_steps)): model.outcome = "escaped"
 
 ## Closest water point; ellipse bisection matches the authoritative geometry.
 static func nearest_water(id: String, point: Vector3, pond: Dictionary = {}) -> Vector3:

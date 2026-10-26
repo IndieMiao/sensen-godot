@@ -5,6 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
+import { SURE_BITES } from '../../src/p0/fishing.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { notePresence } from '../../src/p0/presence.js';
@@ -53,6 +54,7 @@ describe('Quick Recast (Fishing Lv9, §4.6.2)', () => {
     const next = nextBite(landed.s, landed.end + S);
     expect(Math.abs(next.got - next.usual * 0.7)).toBeLessThanOrEqual(1);   // both rounded to the ms
     expect(next.after.fishing.quick).toBeUndefined();   // used up by that cast
+    next.after.fishing.bites = SURE_BITES;   // past q(219)'s two sure bites, so this one can get away
     const after = step(next.after, { type: 'reel', outcome: 'escaped' }, landed.end + S + next.got + 5 * S).s;
     const third = nextBite(after, landed.end + 60 * S);
     expect(third.got).toBe(third.usual);   // the cast after a lost fish waits as usual
@@ -72,7 +74,9 @@ describe('Quick Recast (Fishing Lv9, §4.6.2)', () => {
     const there = nextBite(moved, landed.end + S);
     expect(there.got).toBe(there.usual);
     for (const outcome of ['escaped', 'cancel'] as const) {
-      const lost = fishOnce(player(9), outcome);
+      const p = player(9);
+      p.fishing.bites = SURE_BITES;   // past q(219)'s two sure bites, so the escape is a lost fish
+      const lost = fishOnce(p, outcome);
       expect(lost.s.fishing.quick).toBeUndefined();
     }
   });
