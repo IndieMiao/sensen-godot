@@ -5,6 +5,7 @@ extends Node3D
 ## Ponds are on the map; the kitchen is inside the farmhouse (P0Room, SGODOT-226); nothing here is greybox.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0FarmTemplate := preload("res://modules/p0/p0_farm_template.gd")   # the starting template by region (SGODOT-342)
 const P0NoticeBoardLogic := preload("res://modules/p0/p0_notice_board.gd")   # the stall's Notice Board (q(164))
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
@@ -23,7 +24,7 @@ const FARMHOUSE := "res://scenes/p0/rooms/p0_farmhouse.tscn"
 const DOOR_HALF := Vector2(0.6, 0.4)
 const DOOR_ARM_M := 1.5
 
-const STYLE := "cottage"          # the orange-roof cottage of the polished farm
+var _style := "cottage"   # the home band's template style (P0FarmTemplate): every band wears the orange-roof cottage for now
 var PLACE := P0City.chip("Homestead")
 const BENCH_TAP_PX := 44.0   # a 44 px touch target around the bench seat (engineering default)
 const BENCH_NEAR_M := 2.6    # the bench's finger card shows within this distance (stall 3.2, house 4.2)
@@ -103,6 +104,8 @@ func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
 	bp = P0Garden.blueprint()
 	grid = BlueprintGrid.new(bp)
+	var first := P0Runtime.ensure().session
+	_style = P0FarmTemplate.style(first.view if first != null else null)
 	get_viewport().transparent_bg = false   # pushed above the map, whose tiles show through a transparent root
 	cam.make_current()
 	_build_world()
@@ -189,10 +192,10 @@ func _build_world() -> void:
 	var props := Node3D.new()
 	props.name = "Props"
 	add_child(props)
-	var house := FarmProps.build("house", _house, 1.0, STYLE)
+	var house := FarmProps.build("house", _house, 1.0, _style)
 	props.add_child(house)
-	props.add_child(FarmProps.build("storage", bp.cell_to_world(bp.anchor("storage")), 1.0, STYLE))
-	props.add_child(FarmProps.build("well", bp.cell_to_world(bp.anchor("well")), 1.0, STYLE))
+	props.add_child(FarmProps.build("storage", bp.cell_to_world(bp.anchor("storage")), 1.0, _style))
+	props.add_child(FarmProps.build("well", bp.cell_to_world(bp.anchor("well")), 1.0, _style))
 	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
 	_bench = bp.cell_to_world(bp.anchor("bench")) + Vector3(bp.cell_m * 0.5, 0, 0)
 	props.add_child(_bench_prop(_bench))
@@ -205,7 +208,7 @@ func _build_world() -> void:
 	add_child(_materials)
 	_scenery = GardenScenery.new()
 	add_child(_scenery)
-	_scenery.build(bp, STYLE)
+	_scenery.build(bp, _style)
 	P0Garden.block_points(bp, _scenery.rock_points)   # rocks collide; crops and bushes don't
 	_fence = Fence.new()
 	add_child(_fence)
@@ -213,7 +216,7 @@ func _build_world() -> void:
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence in front of the house collides
 	_looks = Looks.new()   # the Homestead looks beside and as the farmhouse (LOOK-PICK, SGODOT-282)
 	add_child(_looks)
-	_looks.build(bp, house, STYLE, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
+	_looks.build(bp, house, _style, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
