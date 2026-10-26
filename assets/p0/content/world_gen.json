@@ -535,7 +535,12 @@
     "before_level": 2
    },
    "_near_max_km": "q(205) ②: the pick page's Near you names the nearest open city only within this distance of the address's point (DB-IP City Lite, server/tools/ip_near_table.ts); farther, no guess, as for an address the data does not place.",
-   "near_max_km": 1500
+   "near_max_km": 1500,
+   "_pin": "q(216) (SGODOT-342, user 10-26: method D): a free pin stands within range_km of the city's base (homeBase: the written city's profile point, another city's centre) and, clear_m > 0, that far from every outpost, hut and pond centre of the city (placement.farm_exclusion_m); no land or water test (method B, an offline buildable mask, is the way up later). Read by server/src/p0/home_city.ts (pinRefusal, pinArea).",
+   "pin": {
+    "range_km": 10,
+    "clear_m": 300
+   }
   },
   "overrides": {
    "_note": "q(114) ⑤: hand fixes by place id, laid over the generated city after everything else is placed, so nothing else in the city moves. A pin that landed in the sea or a lake gets a point on land at least 50 m from the water (a tackle shop within 300 m of its pond); before the freeze the same table takes a hand rename (`name`). `why`: what was wrong, who saw it, and the checks on the new point. Re-check the whole table once there is water data. Names in `why` are the ones the place had when it was found (q(125) later renamed generated ponds and their tackle shops; the id is what counts).",

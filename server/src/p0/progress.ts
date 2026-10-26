@@ -35,7 +35,7 @@ export type P0Event =
   | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number; lucky?: true }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
-  | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts)
+  | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts); spot -1: a free pin (q(216))
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // look: the stage it opens

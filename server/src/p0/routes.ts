@@ -12,7 +12,7 @@ import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
 import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
-import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus } from './home_city.js';
+import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus, pinArea } from './home_city.js';
 import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
 import { placeOf } from './world.js';
@@ -115,7 +115,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     // its weekday on the new home's calendar (`Your day resets Thu 4 AM, Tokyo time.`): the client has no time zones
     const resets_day = resets_at === null ? null
       : new Date(`${dayKey(c, { travel: { home: cluster } }, resets_at)}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
-    return reply.send({ ok: true, city: cluster, spots, resets_at, resets_day });
+    // q(216): the free pin's circle, its start and the places it keeps clear of (SGODOT-342; an older client reads only spots)
+    return reply.send({ ok: true, city: cluster, spots, resets_at, resets_day, pin: pinArea(c, cluster, player) });
   });
 
   app.post('/v1/p0/commands', async (req, reply) => {

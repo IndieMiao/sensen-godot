@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { P0Content } from './content.js';
-import { clusterById, clustersOf, countryName, countryPart, homeFacts, homeOf, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
+import { clusterById, clustersOf, countryName, countryPart, homeBase, homeFacts, homeOf, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
 export { countryName, countryPart, namesCountry } from './home.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { carryGiftParcels } from './parcels.js';
@@ -35,12 +35,16 @@ export interface HomeRules {
   change: { days: number; before_level: number };
   /** q(205) ②: `Near you` names an open city only this close to the address's point; farther, no guess. */
   near_max_km: number;
+  /** q(216) (SGODOT-342, user 10-26: method D): a free pin stands within range_km of the city's base (homeBase) and,
+   * clear_m > 0, that far from every outpost, hut and pond centre of the city; no land or water test. */
+  pin: { range_km: number; clear_m: number };
 }
 const DEFAULT_RULES: HomeRules = { cities: [], spot: { pond_km: [0.5, 3], apart_km: 1, scatter_m: [100, 200] }, change: { days: 7, before_level: 2 },
-  near_max_km: 1500 };
+  near_max_km: 1500, pin: { range_km: 10, clear_m: 300 } };
 export const homeRules = (c: P0Content): HomeRules => {
   const r = (worldOf(c) as { home?: Partial<HomeRules> } | undefined)?.home;
-  return { ...DEFAULT_RULES, ...r, spot: { ...DEFAULT_RULES.spot, ...r?.spot }, change: { ...DEFAULT_RULES.change, ...r?.change } };
+  return { ...DEFAULT_RULES, ...r, spot: { ...DEFAULT_RULES.spot, ...r?.spot }, change: { ...DEFAULT_RULES.change, ...r?.change },
+    pin: { ...DEFAULT_RULES.pin, ...r?.pin } };
 };
 const exclusionKm = (c: P0Content) => ((worldOf(c)?.placement as { farm_exclusion_m?: number } | undefined)?.farm_exclusion_m ?? 300) / 1000;
 
@@ -140,6 +144,8 @@ function toward(a: Point, b: Point): string {
   return COMPASS[Math.round(((deg + 360) % 360) / 45) % 8];
 }
 
+type Refusal = { code: string; detail?: Record<string, unknown> };
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 /** server/data/home_spots.json (tools/home_spots.ts): per city, 3 base spots on built-up land at least 250 m from
  * water (so a scattered spot keeps q(160)'s 50 m), with district names, for the world seed and revision. */
@@ -200,6 +206,48 @@ export function homeSpots(c: P0Content, cluster: string, player: string): HomeSp
   });
 }
 
+/** A free pin's point ([lat, lng] on the earth), else null. */
+function pinPoint(at: unknown): Point | null {
+  if (!Array.isArray(at) || at.length !== 2) return null;
+  const [lat, lng] = at.map(Number);
+  return Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+}
+
+/** The places a free pin keeps clear of (q(216)): the city's outposts, huts and ponds, with their points. */
+export function pinBlocks(c: P0Content, cluster: string): { id: string; lat: number; lng: number }[] {
+  return [...cityOutposts(c, cluster), ...cityHuts(c, cluster), ...cityPonds(c, cluster)]
+    .flatMap(p => (p.at ? [{ id: p.id, lat: p.at.lat, lng: p.at.lng }] : []));
+}
+
+/**
+ * What the pick page needs to place a free pin in a city (q(216)): the circle (its base and range), how clear of the
+ * places it stays and those places, and where the pin starts (the player's first offered spot, one of the checked
+ * three). Null when the city cannot be a home.
+ */
+export function pinArea(c: P0Content, cluster: string, player: string) {
+  const r = homeRules(c).pin, base = homeBase(c, { travel: { home: cluster } }), first = homeSpots(c, cluster, player)?.[0];
+  if (!base || !first) return null;
+  return { base, range_km: r.range_km, clear_m: r.clear_m, start: { lat: first.lat, lng: first.lng },
+    blocks: r.clear_m > 0 ? pinBlocks(c, cluster) : [] };
+}
+
+/** Whether a free pin may stand at a point of an open city (q(216), method D): inside the circle, clear of the places. */
+export function pinRefusal(c: P0Content, cluster: string, at: Point): Refusal | null {
+  const r = homeRules(c).pin, base = homeBase(c, { travel: { home: cluster } });
+  if (!base) return { code: 'home_not_open', detail: { city: cluster, status: 'no_base' } };
+  const d = km(at, base);
+  if (d > r.range_km) return { code: 'home_out_of_range', detail: { km: Math.round(d * 1000) / 1000, range_km: r.range_km } };
+  if (r.clear_m > 0) {
+    let near: { id: string; m: number } | null = null;
+    for (const b of pinBlocks(c, cluster)) {
+      const m = km(at, b) * 1000;
+      if (m < r.clear_m && (!near || m < near.m)) near = { id: b.id, m };
+    }
+    if (near) return { code: 'home_too_close', detail: { place: near.id, m: Math.round(near.m), clear_m: r.clear_m } };
+  }
+  return null;
+}
+
 /**
  * q(173) ①: the day a change of home carries over. The key stays the old home's day until both its own end (the old
  * home's next 04:00) has come and the new home's calendar has turned past it, then the day turns at the first such
@@ -220,15 +268,16 @@ export function changeOpen(c: P0Content, s: P0State, now: number): { open: boole
   return { open: !s.travel.pending && (s.travel.home_changes ?? 0) < 1 && now < until && s.homestead.level < r.before_level, until };
 }
 
-type Refusal = { code: string; detail?: Record<string, unknown> };
-
 /**
- * choose_home {city, spot} (a new player's first pick) and change_home {city, spot} (the free change, q(161)).
+ * choose_home {city, spot} (a new player's first pick) and change_home {city, spot} (the free change, q(161); q(216) B,
+ * user 10-27: the home city itself too, to move the pin). With
+ * `at: [lat, lng]` (q(216), SGODOT-342: a free pin, 0.2.11 on) the farm stands at that point instead, checked by
+ * pinRefusal; `spot` is then not read (an older client sends only `spot`).
  * Everything on the farm goes along (q(161) ②); the old home becomes a city visited (④). Requests to hand in at home
  * follow the new home on their own (no hand-in checks the place); an accepted resident request whose resident does not
  * live in the new home is dropped, free (③). A pond or outpost in the old city is let go as when a home moved.
  */
-export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' | 'change_home'; city?: unknown; spot?: unknown },
+export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' | 'change_home'; city?: unknown; spot?: unknown; at?: unknown },
   now: number, events: P0Event[]): Refusal | null {
   const t = s.travel, city = String(cmd.city ?? ''), spot = Number(cmd.spot ?? 0);
   if (cmd.type === 'choose_home' && !t.pending) return { code: 'home_chosen' };
@@ -238,8 +287,17 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   }
   const status = homeStatus(c, city);
   if (status !== 'open') return { code: 'home_not_open', detail: { city, status } };
-  if (!Number.isInteger(spot) || spot < 0 || spot > 2) return { code: 'bad_spot' };
-  const at = homeSpots(c, city, s.player)?.[spot], set = citySet(c, city);
+  let at: Point | null | undefined;
+  const set = citySet(c, city);
+  if (cmd.at !== undefined) {
+    at = pinPoint(cmd.at);
+    if (!at) return { code: 'bad_pin' };
+    const no = pinRefusal(c, city, at);
+    if (no) return no;
+  } else {
+    if (!Number.isInteger(spot) || spot < 0 || spot > 2) return { code: 'bad_spot' };
+    at = homeSpots(c, city, s.player)?.[spot];
+  }
   if (!at || !set) return { code: 'home_not_open', detail: { city, status: 'no_spot' } };
   const from = t.home, first = !!t.pending, dropped: string[] = [];
   // q(173) ③: a first pick (a new player, nothing played) turns to the new home's day at once; a change carries its day.
@@ -268,7 +326,8 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   if (hold) { t.day_hold = hold; carryGiftParcels(s, oldEnd, hold.until); }
   letGoAway(c, s);
   recallAwayTraps(c, s, now, events);   // q(177) ③
-  events.push({ kind: 'home', action: cmd.type === 'choose_home' ? 'chosen' : 'changed', city, from, spot, dropped });
+  // spot -1: a free pin (q(216))
+  events.push({ kind: 'home', action: cmd.type === 'choose_home' ? 'chosen' : 'changed', city, from, spot: cmd.at !== undefined ? -1 : spot, dropped });
   return null;
 }
 
