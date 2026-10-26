@@ -4,7 +4,7 @@
   `docs/product/gameplay-plan-v2-2026-10-02.md` for all gameplay rules, numbers,
   interactions and P0/P1/P2/P3 scope, including its latest review amendments.
   Figma (current game UI): page "14 · UI semantic refactor"
-  https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53
+  https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=481-53
   （R1 修订中，锁定项以 SGODOT-197 为准）. The former Prototype page
   (node-id=310-2955) is Archive，截至 2026-10-06.
   Use `docs/README.md` and `docs/design/README.md` to find current documents.

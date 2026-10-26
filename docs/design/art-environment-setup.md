@@ -257,7 +257,7 @@ Look for the enabled Figma server with OAuth credentials, then confirm that the 
 For the known Basic Room reference, use the MCP tool inputs below (tool names may have a client-specific prefix):
 
 ```json
-{"fileKey":"OMLTC3yw3u2WDjOZhLnhaR","nodeId":"545:2968"}
+{"fileKey":"icmfLGHkiMBfMQApCiw13D","nodeId":"545:2968"}
 ```
 
 Call `get_metadata` on that node, then `download_assets` to retrieve its rendered export, or `get_screenshot` for a preview. Download the returned temporary URL promptly and **view the image**. Preserve the export with the stable design URL and node identity. Do not commit signed asset URLs. Original image fills can differ from a composed node export; choose the representation that matches the reference the user sees.
