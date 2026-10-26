@@ -38,6 +38,17 @@ func test_the_stall_is_homestead_stall_with_its_board_state() -> void:
 	v.stall.board.requests[0].have = 2
 	assert_int(P0WorldPrompts.stall(v).status).is_equal(UiStatusBadge.State.DELIVERABLE)
 
+func test_the_stall_shows_no_request_while_the_guide_is_on() -> void:   # q(215) ④
+	var v := _view()
+	v.stall.board.requests = [{"id": "r1", "qty": 2, "have": 0, "status": "open"}]
+	v["guide"] = {"step": "sow_two", "phase": "B", "recover": null, "at": 0, "progress": null}
+	var p := P0WorldPrompts.stall(v)
+	assert_int(p.status).is_equal(-1)
+	assert_int(P0WorldPrompts.show("stall", "", 30.0, p)).is_equal(P0WorldPrompts.Show.NONE)   # no ! from across the farm
+	assert_int(P0WorldPrompts.stall(v, true).status).is_equal(UiStatusBadge.State.NEW)        # New goods still say so
+	v.guide = {"step": null, "end": "done"}
+	assert_int(P0WorldPrompts.stall(v).status).is_equal(UiStatusBadge.State.REQUEST)
+
 func test_the_farmhouse_is_its_name_and_carries_the_guides_request() -> void:
 	var p := P0WorldPrompts.farmhouse(_view())
 	assert_str(p.text).is_equal("Farmhouse")
