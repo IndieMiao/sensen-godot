@@ -332,9 +332,10 @@ static func waiting_on_crops(view_: Dictionary) -> Dictionary:
 	var growing: Array = []   # [ms, crop]; a sown plot not watered yet counts, last
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
-		if st == "growing": growing.append([float(p.get("ready_in", 0)), str(p.crop)])
-		elif st == "sown": growing.append([INF, str(p.crop)])
-		elif st == "ready": pool[str(p.crop)] = int(pool.get(str(p.crop), 0)) + 1   # ripe: a Harvest away, not waited on
+		var crop := P0Logic.harvest_of(view, str(p.get("crop", "")))   # a Quick Radish is a Radish (q(217))
+		if st == "growing": growing.append([float(p.get("ready_in", 0)), crop])
+		elif st == "sown": growing.append([INF, crop])
+		elif st == "ready": pool[crop] = int(pool.get(crop, 0)) + 1   # ripe: a Harvest away, not waited on
 	if growing.is_empty(): return {}
 	growing.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
 	var best := {}

@@ -11,6 +11,10 @@ class Recorder extends P0Session:
 		return true
 
 const STEP := 0.05   # FishingModel's step_ms
+## The reel's fish swims by a seeded generator, and left alone the bar still overlaps it now and then: with randi()'s seed
+## a reel with the thumb off was landed by luck about 8% of the time (22% within 35 s on a sure bite), so these tests
+## seed it. With seed 1 a Common fish left alone escapes when not sure and is still on the line after 40 s when sure.
+const SEED := 1
 
 func _setup(sure: bool) -> P0FishingPanel:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
@@ -27,6 +31,11 @@ func _setup(sure: bool) -> P0FishingPanel:
 	panel.show()
 	panel.on_cast({"bite_in": 0, "rarity": 1, "breaks": null})
 	return panel
+
+## Hook, with the reel seeded (SEED) instead of randi().
+func _hook(panel: P0FishingPanel) -> void:
+	panel._p0_hook()
+	panel.model = FishingModel.initial(SEED)
 
 func _sent(panel: P0FishingPanel) -> Array:
 	return (panel.rt.session as Recorder).cmds
@@ -55,7 +64,7 @@ func test_any_other_bite_still_escapes_when_the_window_runs_out() -> void:
 func test_a_sure_reel_left_alone_never_fails_and_lands_once_reeled() -> void:
 	var panel := await _setup(true)
 	_miss_the_window(panel)
-	panel._p0_hook()
+	_hook(panel)
 	panel.held = false
 	for i in 700:   # 35 s with the thumb off: past the 30 s timeout, the bar sinks and the fish swims off
 		panel._process(STEP)
@@ -75,7 +84,7 @@ func test_any_other_reel_left_alone_escapes() -> void:
 	var panel := await _setup(false)
 	panel._bite_at = float(Time.get_ticks_msec()) - 100.0
 	panel._process(0.016)
-	panel._p0_hook()
+	_hook(panel)
 	panel.held = false
 	for i in 700:
 		panel._process(STEP)

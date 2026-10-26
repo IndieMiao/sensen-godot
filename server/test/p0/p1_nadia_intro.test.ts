@@ -112,6 +112,19 @@ describe('Nadia\'s teaching requests (q(218))', () => {
     expect(s.residents[NADIA].req?.progress).toBe(1);
   });
 
+  it('a Quick Radish harvested after accepting counts as a Radish (q(217) / q(218), 周瑜 on #488)', () => {
+    let s = save('on');
+    s.residents[NADIA] = { affinity: 20, chat_day: '', gift_day: '', next: 0, req: null, done_day: '', intro_done: [ONE] };
+    s = step(s, { type: 'accept', request: SIX }).s;
+    s.bag.push({ id: 'seed_quick_radish', qty: 1 });
+    const id = s.plots.find(p => p.state === 'tilled')!.id;
+    s = step(s, { type: 'sow', plot: id, seed: 'seed_quick_radish' }).s;
+    s = step(s, { type: 'water', plot: id }, T0 + 1_000).s;
+    const r = step(s, { type: 'harvest', plot: id }, T0 + 60_000);
+    expect(r.ev).toContainEqual({ kind: 'request_progress', id: SIX, have: 1, qty: 6 });
+    expect(r.s.residents[NADIA].req?.progress).toBe(1);
+  });
+
   it('an undone teaching request stays once the guide has ended', () => {
     const s = save('done');
     expect(nadia(s)).toMatchObject({ req: { id: ONE }, state: 'open' });

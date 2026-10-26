@@ -96,11 +96,6 @@ static func band(row: Dictionary) -> String:
 	var b := str(row.get("climate", "")).to_lower()
 	return b if b in BANDS else "temperate"
 
-## The city the page opens with (q(205) ②): the first pick takes `Near you`; no city near, or a change of home, none.
-static func preselect(near: Variant, change := false) -> String:
-	if change or not near is Dictionary: return ""
-	return str((near as Dictionary).get("id", ""))
-
 ## A spot card's line (HOME-PICK-3): `1.2 km to Fern Pond · northeast`.
 static func spot_line(spot: Dictionary) -> String:
 	var pond: Dictionary = spot.get("pond", {}) if spot.get("pond") is Dictionary else {}

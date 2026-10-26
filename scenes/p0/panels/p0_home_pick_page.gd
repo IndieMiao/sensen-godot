@@ -4,9 +4,10 @@ extends Control
 ##   `Choose your home city` (ExtraBold 22) at 40 and its line (Regular 14, secondary) at 74; the search field
 ##   (TextField 1236:107829, Empty / Focused) 328 × 48 at 124; the list 344 wide from 180 to 720, scrolling under the
 ##   bottom fade (108, surface from 30 %) and `Continue` (CommandButton, 736).
-##   The list (P0HomePick.sections): `Near you` and its row (the city the address is near, picked when the page opens),
-##   `Recommended` and the climate groups; with no city near (q(205), HOME-PICK-1-NOIP 2771:162818) no `Near you` and
-##   nothing picked: the key is the grey `Pick a city` (LOCK-10) until a row is picked. Typing two letters or more
+##   The list (P0HomePick.sections): `Near you` and its row (the city the address is near), `Recommended` and the
+##   climate groups; with no city near (q(205), HOME-PICK-1-NOIP 2771:162818) no `Near you`. Nothing is picked for the
+##   player, Near you included (340 6cb4d10e ②, q(216)): the key is the grey `Pick a city` (LOCK-10) until a row is
+##   picked. Typing two letters or more
 ##   searches (HOME-PICK-2): the matches only, no titles; one that cannot be picked reads grey with why (CityRow PICK).
 ##   q(207): the list fails — `Couldn't load cities` and Retry in its place (PICK-ERR-LIST 2773:182247; a failed search
 ##   too); a search finds nothing — `No matching cities` under the field (13 Bold secondary, PICK-SEARCH-EMPTY
@@ -62,14 +63,16 @@ var error: Control
 var rows := {}               # city id → its CityRow
 var _rows_data := {}         # city id → its row
 var _wait := -1.0
-var _opened := false         # the first answer has picked what the page opens with
 
 ## change_from: the home city now — the change of home (CHANGE); "" for a new player's first pick.
-func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "") -> void:
+## back_to: a first pick come from HOME-WELCOME (SGODOT-340 §4) — `‹ Back` to it.
+func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "", back_to := "") -> void:
 	name = "HomePickPage"
 	home = change_from
-	var dy_head := _CHANGE_HEAD_DY if home != "" else 0.0
-	var dy := _CHANGE_DY if home != "" else 0.0
+	var back_text := "Settings" if home != "" else back_to
+	var dy_head := _CHANGE_HEAD_DY if back_text != "" else 0.0
+	# CHANGE's one-line body takes 19 of the pill's 32 back; the first pick's two lines keep all 32 (from HOME-WELCOME)
+	var dy := (_CHANGE_DY if home != "" else _CHANGE_HEAD_DY) if back_text != "" else 0.0
 	if home != "":
 		heading = "Change home city"
 		line = "Your farm and everything on it move with you."
@@ -111,8 +114,8 @@ func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "") -> void:
 	none.visible = false
 	_place(none, _NONE_Y + dy + safe_top)
 	error = _error(_ERROR_Y + dy + safe_top)
-	if home != "":
-		var back := SpotPage.BackPill.new("Settings")
+	if back_text != "":
+		var back := SpotPage.BackPill.new(back_text)
 		back.position = Vector2(12, 16 + safe_top)
 		back.pressed.connect(func(): back_pressed.emit())
 		add_child(back)
@@ -196,9 +199,6 @@ func show_cities(data: Dictionary, for_query := "") -> void:
 	open_rows = data.get("open", [])
 	near = data.get("near", null)
 	for r in open_rows + ([near] if near is Dictionary else []): _rows_data[str(r.get("id", ""))] = r
-	if not _opened:
-		_opened = true
-		choice = P0HomePick.preselect(near, home != "")
 	matches = data.get("matches", []) if query.length() >= P0HomePick.SEARCH_MIN else null
 	error.visible = false
 	_lay_out()

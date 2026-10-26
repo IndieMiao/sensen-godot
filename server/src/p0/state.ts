@@ -218,7 +218,8 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
     plots,
-    bag: c.start.bag.map(([id, qty]) => ({ id, qty })),
+    // q(217): a guided save starts with the teaching seeds first (Quick Radish Seeds ×2, the bar's first slot); others as before
+    bag: [...(guide.step !== null ? c.start.guide_bag ?? [] : []), ...c.start.bag].map(([id, qty]) => ({ id, qty })),
     bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
     homestead: { level: 1, plaque: [] },
     residents: {},
