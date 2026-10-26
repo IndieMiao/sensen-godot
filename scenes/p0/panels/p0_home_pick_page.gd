@@ -27,7 +27,7 @@ signal back_pressed
 const P0HomePick := preload("res://modules/p0/p0_home_pick.gd")
 const P0CityRow := preload("res://scenes/p0/panels/p0_city_row.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
-const SpotPage := preload("res://scenes/p0/panels/p0_home_spot_page.gd")
+const BackPill := preload("res://scenes/p0/panels/p0_back_pill.gd")
 ## CHANGE: the title and its line 32 lower (under the back pill), the field and the list 13 (the line is one line).
 const _CHANGE_HEAD_DY := 32.0
 const _CHANGE_DY := 13.0
@@ -116,7 +116,7 @@ func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "", back_to := ""
 	_place(none, _NONE_Y + dy + safe_top)
 	error = _error(_ERROR_Y + dy + safe_top)
 	if back_text != "":
-		var back := SpotPage.BackPill.new(back_text)
+		var back := BackPill.new(back_text)
 		back.position = Vector2(12, 16 + safe_top)
 		back.pressed.connect(func(): back_pressed.emit())
 		add_child(back)

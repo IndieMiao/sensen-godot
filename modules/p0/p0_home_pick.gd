@@ -2,7 +2,7 @@ extends RefCounted
 ## The home pick's data (SGODOT-303, q(160) / q(188) / q(205) / q(207)): GET /v1/p0/home/cities[?q=] — the open cities,
 ## `Near you` (the open city nearest the address, or none), and a search's matches with why one cannot be picked — and
 ## GET /v1/p0/home/spots/:cluster — this player's three farm spots there. The pick and spot pages
-## (p0_home_pick_page.gd, p0_home_spot_page.gd) lay out what these say. Pure where it can be, tested headless.
+## (p0_home_pick_page.gd, p0_home_pin_page.gd) lay out what these say. Pure where it can be, tested headless.
 ## Preloaded, no class_name (a new global class needs an editor import).
 
 ## The climate groups of `Recommended`, in this order (HOME-PICK-1: Temperate, Subtropical, Tropical; then Cool).
@@ -99,16 +99,6 @@ static func sections(open: Array, near: Variant, matches: Variant = null, home :
 static func band(row: Dictionary) -> String:
 	var b := str(row.get("climate", "")).to_lower()
 	return b if b in BANDS else "temperate"
-
-## A spot card's line (HOME-PICK-3): `1.2 km to Fern Pond · northeast`.
-static func spot_line(spot: Dictionary) -> String:
-	var pond: Dictionary = spot.get("pond", {}) if spot.get("pond") is Dictionary else {}
-	return "%s km to %s · %s" % [String.num(snappedf(float(spot.get("km", 0.0)), 0.1), 1), str(pond.get("name", "")), str(spot.get("toward", ""))]
-
-## A spot card's title: its district, else `Spot N`.
-static func spot_title(spot: Dictionary) -> String:
-	var hood := str(spot.get("hood", "")) if spot.get("hood") != null else ""
-	return hood if hood != "" else "Spot %d" % (int(spot.get("spot", 0)) + 1)
 
 ## Settings' Home row (SET-HOME-1 / -2) from view.home: {name, line, open} — while the free change is open (q(161):
 ## view.home.change.open, until its `until`), `Change once · 5 days left` (whole days, rounded up; `1 day left`);

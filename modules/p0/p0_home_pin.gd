@@ -28,7 +28,9 @@ static func area(pin: Variant) -> Dictionary:
 	for b in (p.get("blocks", []) if p.get("blocks") is Array else []):
 		var at = point(b)
 		if at != null and b is Dictionary: blocks.append({id = str(b.get("id", "")), at = at})
-	return {base = base, range_km = float(p.range_km), clear_m = float(p.get("clear_m", 0.0)), start = start, blocks = blocks}
+	# start_ll: the start in doubles (a Vector2 is single precision, about a metre off): where the camera is put
+	return {base = base, range_km = float(p.range_km), clear_m = float(p.get("clear_m", 0.0)), start = start,
+		start_ll = [float(p.start.lat), float(p.start.lng)], blocks = blocks}
 
 ## {lat, lng} → Vector2(lat, lng), null when it is not one.
 static func point(v: Variant) -> Variant:
@@ -114,10 +116,16 @@ static func kind_of(id: String) -> String:
 	return "shop"
 
 ## Where the pin starts — and where the back-to-start key takes it back to (q(223), 340 78cbe60f): spot 1 for a first
-## pick or another city; the farm as it stands for the home city itself (q(216) ⑨; `farm`, view.home.farm).
-static func start(a: Dictionary, same_city: bool, farm: Variant) -> Vector2:
-	if same_city and farm is Vector2: return farm
-	return a.get("start", Vector2.ZERO)
+## pick or another city; the farm as it stands for the home city itself (q(216) ⑨; `farm`, view.home.farm as [lat,
+## lng]). [lat, lng] in doubles.
+static func start(a: Dictionary, same_city: bool, farm: Variant) -> Array:
+	if same_city and farm is Array and (farm as Array).size() == 2: return [float(farm[0]), float(farm[1])]
+	return a.get("start_ll", [0.0, 0.0])
+
+## {lat, lng} → [lat, lng] in doubles, null when it is not one.
+static func lat_lng(v: Variant) -> Variant:
+	var p = point(v)
+	return [float(v.lat), float(v.lng)] if p != null else null
 
 ## The command (q(216); 周瑜 on #473): {type, city, at: [lat, lng], spot: -1} — an older server answers bad_spot rather
 ## than building on spot 1; never at: null. lat / lng as the map's camera holds them (doubles; a Vector2 is single

@@ -90,10 +90,11 @@ func test_the_grey_key_and_its_toast() -> void:
 
 func test_the_start_is_spot_one_or_the_farm_for_the_home_city() -> void:
 	var a := P0HomePin.area(_pin())
-	var farm := Vector2(37.75, -122.45)
-	assert_object(P0HomePin.start(a, false, farm)).is_equal(a.start)   # a first pick, another city: spot 1
-	assert_object(P0HomePin.start(a, true, farm)).is_equal(farm)       # the home city again (⑨): the farm
-	assert_object(P0HomePin.start(a, true, null)).is_equal(a.start)   # (the back-to-start key goes to the same, q(223))
+	var farm := [37.75, -122.45]
+	assert_array(P0HomePin.start(a, false, farm)).is_equal([37.765, -122.43])   # a first pick, another city: spot 1 (doubles)
+	assert_array(P0HomePin.start(a, true, farm)).is_equal(farm)       # the home city again (⑨): the farm
+	assert_array(P0HomePin.start(a, true, null)).is_equal([37.765, -122.43])   # (the back-to-start key goes to the same, q(223))
+	assert_array(P0HomePin.lat_lng({"lat": 37.75, "lng": -122.45})).is_equal(farm)
 
 func test_the_command_sends_the_pin_and_spot_minus_one() -> void:
 	assert_dict(P0HomePin.command("choose_home", "gn-5391959", 37.76, -122.44909)).is_equal(

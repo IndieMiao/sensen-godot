@@ -4,6 +4,9 @@ extends Control
 ## `Move your farm to Tokyo?` (ExtraBold 20), `Everything on your farm moves with you. You can't change your home city
 ## again.` (14, text), the day line — i-clock 16, 6, `Your day resets Thu 4 AM, Tokyo time.` (Bold 13, secondary;
 ## none without one) — then `Move farm` (primary) and `Cancel` (secondary), 48 each.
+## HOME-PIN-CONFIRM (57:160928, q(216) ③, SGODOT-342): a first pick's card in the same frame — `Build your farm here?`,
+## the spot line (Bold 14, text: `San Francisco · 0.8 km to Fern Pond`), `You can move it once while your farm is new.`
+## (Regular 14, secondary; q(216) B), then `Build farm` and `Cancel`; no day line.
 ## A tap on the scrim cancels, as Cancel does. Emits move_pressed, cancelled.
 ## It draws over the map card's pin names: a MapDestination lifts its name to NAME_Z so other discs never cover it, which
 ## also put the pond's name over this card (0.2.9: `Fern` over the body, its disc under the scrim).
@@ -23,7 +26,9 @@ var card: PanelContainer
 var move: UiCommandButton
 var cancel: UiCommandButton
 
-func _init(city_name := "", day_line := "") -> void:
+## build_line: a first pick's spot line — the card is HOME-PIN-CONFIRM; "" for the change of home.
+func _init(city_name := "", day_line := "", build_line := "") -> void:
+	var build := build_line != ""
 	name = "MoveConfirm"
 	z_index = UiMapDestination.NAME_Z + 1
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -50,16 +55,22 @@ func _init(city_name := "", day_line := "") -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", _GAP)
 	card.add_child(col)
-	var title := UiKit.label("Move your farm to %s?" % city_name, UiTokens.STYLE_TITLE_XB20)
+	var title := UiKit.label("Build your farm here?" if build else "Move your farm to %s?" % city_name, UiTokens.STYLE_TITLE_XB20)
 	title.name = "Title"
 	title.add_theme_font_size_override(&"font_size", _TITLE_SIZE)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(title)
-	var body := UiKit.label("Everything on your farm moves with you. You can't change your home city again.", UiTokens.STYLE_BODY_B14)
+	if build:
+		var spot := UiKit.label(build_line, UiTokens.STYLE_BODY_B14)
+		spot.name = "SpotLine"
+		spot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(spot)
+	var body := UiKit.label("You can move it once while your farm is new.", UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY) if build \
+		else UiKit.label("Everything on your farm moves with you. You can't change your home city again.", UiTokens.STYLE_BODY_B14)
 	body.name = "Body"
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(body)
-	if day_line != "":
+	if day_line != "" and not build:
 		var day := HBoxContainer.new()
 		day.name = "Day"
 		day.add_theme_constant_override(&"separation", 6)
@@ -72,7 +83,7 @@ func _init(city_name := "", day_line := "") -> void:
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		day.add_child(l)
 		col.add_child(day)
-	move = UiCommandButton.new("Move farm")
+	move = UiCommandButton.new("Build farm" if build else "Move farm")
 	move.name = "Move"
 	move.custom_minimum_size.y = 48
 	move.activated.connect(func(): move_pressed.emit())

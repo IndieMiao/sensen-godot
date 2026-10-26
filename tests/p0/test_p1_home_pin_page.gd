@@ -61,8 +61,8 @@ func test_the_pin_starts_on_spot_one_and_may_build_at_once() -> void:
 	var p := _page()
 	p.show_area(_read())
 	await await_idle_frame()
-	assert_float(float(p.at[0])).is_equal_approx(START.lat, 1e-5)
-	assert_float(float(p.at[1])).is_equal_approx(START.lng, 1e-5)
+	assert_float(float(p.at[0])).is_equal_approx(START.lat, 1e-9)
+	assert_float(float(p.at[1])).is_equal_approx(START.lng, 1e-9)
 	assert_str(p.line.text).is_equal("0.8 km to Fern Pond · west")
 	assert_str(p.build.reason).is_equal("")
 	assert_bool(p.back_key.visible).is_false()   # on the start
@@ -72,7 +72,7 @@ func test_the_pin_starts_on_spot_one_and_may_build_at_once() -> void:
 	var built := []
 	p.chosen.connect(func(lat, lng): built.append([lat, lng]))
 	p.build.activated.emit()
-	assert_float(float(built[0][0])).is_equal_approx(START.lat, 1e-5)
+	assert_float(float(built[0][0])).is_equal_approx(START.lat, 1e-9)
 
 func test_out_of_the_circle_the_key_says_why_and_the_card_keeps_its_line() -> void:
 	var p := _page()
@@ -126,7 +126,7 @@ func test_dragging_lifts_the_pin_and_fades_the_card() -> void:
 	assert_bool(p.pin.lifted).is_false()
 
 func test_a_same_city_re_pin_starts_on_the_farm() -> void:
-	var farm := Vector2(37.75, -122.43)
+	var farm := [37.75, -122.43]
 	var p := _page(true, farm)
 	p.show_area(_read())
 	assert_float(float(p.at[0])).is_equal_approx(37.75, 1e-4)

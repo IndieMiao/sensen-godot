@@ -33,7 +33,7 @@ signal unavailable(text: String)
 
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")
 const P0HomeWelcome := preload("res://scenes/p0/panels/p0_home_welcome.gd")
-const SpotPage := preload("res://scenes/p0/panels/p0_home_spot_page.gd")
+const BackPill := preload("res://scenes/p0/panels/p0_back_pill.gd")
 const P0MapScript := preload("res://scenes/p0/p0_map.gd")
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
@@ -60,7 +60,7 @@ const DRAG_FADE := 0.5
 var cluster := ""
 var city_name := ""
 var same_city := false
-var farm: Variant = null      # Vector2(lat, lng): the farm as it stands, for a same-city re-pin
+var farm: Variant = null      # [lat, lng]: the farm as it stands, for a same-city re-pin
 var map: Object               # the map the pin reads (pick_*), or the page's own FlatMap
 var area: Dictionary = {}     # P0HomePin.area of the read; {} while reading or after a failure
 var pond: Dictionary = {}     # the beginner pond {name, at} the card measures from
@@ -130,7 +130,14 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	add_child(build)
 	back_key = _back_key()
 	add_child(back_key)
+	resized.connect(_keep_pin)
 	show_loading()
+
+## The page laid out again (a safe area, a rotation): the pin's tip moves on the screen, the point under it stays.
+func _keep_pin() -> void:
+	if area.is_empty(): return
+	map.pick_put(float(at[0]), float(at[1]), tip())
+	_refresh()
 
 func _make_panel(heading: String) -> void:
 	panel = PanelContainer.new()
@@ -148,7 +155,7 @@ func _make_panel(heading: String) -> void:
 	var box := Control.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(box)
-	var back := SpotPage.BackPill.new("Change city")
+	var back := BackPill.new("Change city")
 	back.position = Vector2(12, _safe.x + _BACK_Y)
 	back.pressed.connect(func(): back_pressed.emit())
 	box.add_child(back)
@@ -254,12 +261,13 @@ func show_area(read: Dictionary) -> void:
 	failed = false
 	names = place_names(area, pond, p)
 	var s := start_point()
-	map.pick_put(s.x, s.y, tip())
+	at = [s[0], s[1]]
+	map.pick_put(s[0], s[1], tip())
 	_make_places()
 	_refresh()
 
 ## Where the pin starts and the back-to-start key takes it (q(223)).
-func start_point() -> Vector2:
+func start_point() -> Array:
 	return P0HomePin.start(area, same_city, farm)
 
 ## The places' names for the grey key (Too close to Oak Tea House): the written city's tables, a generated city's read.
@@ -323,7 +331,8 @@ func _can_build() -> bool: return not area.is_empty() and refusal.is_empty()
 func back_to_start() -> void:
 	if area.is_empty(): return
 	var s := start_point()
-	map.pick_put(s.x, s.y, tip())
+	at = [s[0], s[1]]
+	map.pick_put(s[0], s[1], tip())
 	_refresh()
 
 func _process(_dt: float) -> void:
@@ -345,7 +354,8 @@ func _refresh() -> void:
 	card.visible = ready
 	loading_card.visible = not ready and not failed
 	error_card.visible = failed
-	back_key.visible = ready and P0HomePin.km(Vector2(at[0], at[1]) if ready else Vector2.ZERO, start_point()) * 1000.0 > P0HomePin.START_M
+	var s := start_point()
+	back_key.visible = ready and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
 	if not ready:
 		build.reason = "Build here"   # grey and quiet (6cb4d10e): no refusal, so no toast
 		return
@@ -519,7 +529,8 @@ class FlatMap extends RefCounted:
 
 	func pick_put(lat: float, lng: float, screen: Vector2) -> void:
 		var d := (screen - view * 0.5) / px_per_m
-		centre = [lat + d.y / 111320.0, lng - d.x / _m_per_deg_lng(lat)]
+		var c_lat := lat + d.y / 111320.0
+		centre = [c_lat, lng - d.x / _m_per_deg_lng(c_lat)]   # the centre's scale, as pick_geo_at reads it back
 
 	func pick_dragging() -> bool: return dragging
 	func pick_px_per_m() -> float: return px_per_m

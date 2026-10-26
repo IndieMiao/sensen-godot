@@ -1248,8 +1248,8 @@ func _open_home_flow(type: String, change_from: String, done: Callable, back := 
 	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom(), change_from)
 	_home_done = done
 	if back.is_valid(): _home_flow.left.connect(back)
-	_home_flow.chose.connect(func(cluster: String, spot: int):
-		var cmd := {"type": type, "city": cluster, "spot": spot}
+	_home_flow.chose.connect(func(cluster: String, lat: float, lng: float):
+		var cmd: Dictionary = load("res://modules/p0/p0_home_pin.gd").command(type, cluster, lat, lng)   # q(216): the pin
 		_home_change_to = cluster if type == "change_home" else ""
 		_home_key = P0Session.ui_key(cmd)
 		if not session.send(cmd, _home_key): _home_flow.sent(false))
@@ -1639,7 +1639,7 @@ func _dev_shot(dt: float) -> void:
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
-			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
+			# homepin / homedrag / homebuild (below), homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
 			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, not picked)
 				if is_instance_valid(_home_flow):
 					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
@@ -1658,12 +1658,6 @@ func _dev_shot(dt: float) -> void:
 						_home_flow.cities = null
 						_home_flow.welcome = null
 						_home_flow._cities_read({"open": open_rows, "near": near_row[0], "matches": []}, "")
-			# homeloading: the first read's outline again, as if the cities were still out (342 8c4168ab)
-			"homeloading":
-				if is_instance_valid(_home_flow) and _home_flow.change_from == "" and _home_flow.loading == null:
-					for page in [_home_flow.cities, _home_flow.welcome]: if page != null: page.visible = false
-					_home_flow.loading = load("res://scenes/p0/panels/p0_home_welcome.gd").placeholder(ui.safe_bottom())
-					_home_flow.add_child(_home_flow.loading)
 			"homestart": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.start.activated.emit()
 			"homeother": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.other.activated.emit()
 			"homesearch":
@@ -1674,13 +1668,32 @@ func _dev_shot(dt: float) -> void:
 				if is_instance_valid(_home_flow):
 					if step.size() > 1: _home_flow.cities.set_choice(step[1])
 					_home_flow.cities.key.pressed.emit()
-			"homespot": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.picked = int(step[1]) - 1
-			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
-			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
+			# the pin page (SGODOT-342 PR-2): homepin:<lat>:<lng> puts the pin there; homedrag on (lifted) / off; homebuild
+			# presses Build here (the confirm card over it), homestart2 the back-to-start key
+			"homepin":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null:
+					var page = _home_flow.spots
+					page.map.pick_put(float(step[1]), float(step[2]), page.tip())
+					page._refresh()
+			"homedrag":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null and _home_flow.spots.map.get("dragging") != null:
+					_home_flow.spots.map.dragging = step.size() < 2 or step[1] != "off"
+					_home_flow.spots._refresh()
+			"homebuild":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null:
+					var b: UiCommandButton = _home_flow.spots.build
+					if b.reason == "": b.activated.emit()
+					else: b.unavailable_pressed.emit(b.reason)
 			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
 			"homechange": change_home(func(): ui.open_settings())   # Settings › Home city (PR-4)
 			"homemove": if is_instance_valid(_home_flow) and _home_flow.confirm != null: _home_flow.confirm.move.pressed.emit()
-			"homeloading": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()   # the reading frame
+			# the reading frames: the pin page's, or before it a first pick's card outline (342 8c4168ab)
+			"homeloading":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()
+				elif is_instance_valid(_home_flow) and _home_flow.change_from == "" and _home_flow.loading == null:
+					for page in [_home_flow.cities, _home_flow.welcome]: if page != null: page.visible = false
+					_home_flow.loading = load("res://scenes/p0/panels/p0_home_welcome.gd").placeholder(ui.safe_bottom())
+					_home_flow.add_child(_home_flow.loading)
 			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
 				if is_instance_valid(_home_flow):
 					if step.size() > 1 and _home_flow.spots != null: _home_flow.spots.show_failed()

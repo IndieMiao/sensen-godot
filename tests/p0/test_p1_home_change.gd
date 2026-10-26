@@ -83,34 +83,61 @@ func _change_flow(asked: Array) -> Array:
 	add_child(flow)
 	return [session, flow]
 
-func test_a_spot_asks_first_and_move_farm_is_the_change() -> void:
+func test_a_pin_asks_first_and_move_farm_is_the_change() -> void:
 	var asked := []
 	var made := _change_flow(asked)
 	var flow: Control = made[1]
 	await await_idle_frame()
 	flow.open_spots(TOKYO)
 	assert_str(str(flow.spots.title.text)).is_equal("Change home city")
-	P0HomePick.answer("/p0/home/spots/" + TOKYO.id, {"ok": true, "city": TOKYO.id, "spots": Pick.spots(), "resets_at": NOW + DAY, "resets_day": "Thu"})
+	var read := Pick.spot_read(TOKYO.id)
+	read.resets_at = NOW + DAY
+	read.resets_day = "Thu"
+	P0HomePick.answer("/p0/home/spots/" + TOKYO.id, read)
 	await await_idle_frame()
 	var chose := []
-	flow.chose.connect(func(c, s): chose.append([c, s]))
-	flow.spots.cards[1].pressed.emit()
+	flow.chose.connect(func(c, lat, lng): chose.append([c, lat, lng]))
 	flow.spots.build.activated.emit()
 	assert_array(chose).is_empty()   # not yet: the card asks
 	assert_object(flow.confirm).is_not_null()
-	# 0.2.9 (李元芳's run): the pond's name rides above other pins (NAME_Z), and the card must draw over it too
-	var pond_name: Control = (flow.spots.map_card.pond as UiMapDestination)._label_box
-	assert_int(flow.confirm.z_index).is_greater(pond_name.z_index)
+	# 0.2.9 (李元芳's run): a place pin's name rides above other pins (NAME_Z), and the card must draw over it too
+	assert_int(flow.confirm.z_index).is_greater(UiMapDestination.NAME_Z)
 	assert_array(_labels(flow.confirm)).contains(["Move your farm to Tokyo?",
 		"Everything on your farm moves with you. You can't change your home city again.", "Your day resets Thu 4 AM, Tokyo time."])
 	flow.confirm.cancel.activated.emit()
 	await await_idle_frame()
 	assert_object(flow.confirm).is_null()
-	assert_bool(flow.spots.cards[1].picked).is_true()   # the spot page as it was
 	flow.spots.build.activated.emit()
 	flow.confirm.move.activated.emit()
 	flow.confirm.move.activated.emit()   # one change on the wire at a time
-	assert_array(chose).is_equal([[TOKYO.id, 1]])
+	assert_int(chose.size()).is_equal(1)
+	assert_str(chose[0][0]).is_equal(TOKYO.id)
+	assert_float(chose[0][1]).is_equal_approx(37.759, 1e-9)   # spot 1, as the server sent it (doubles)
+	assert_float(chose[0][2]).is_equal_approx(-122.449, 1e-9)
+	(made[0] as Node).free()
+
+## q(216) ⑨ / q(223) (HOME-PIN-REPIN 92:164194): the home city itself — the pin starts on the farm as it stands, the
+## back-to-start key takes it back there, and Build here asks the change card for the home city (one card, 78cbe60f).
+func test_the_home_city_re_pins_from_the_farm_with_the_change_card() -> void:
+	var made := _change_flow([])
+	var session: P0Session = made[0]
+	session.view = {"home": {"city": Pick.SF.id, "farm": {"lat": 37.751, "lng": -122.431}, "pending": false}}
+	var flow: Control = made[1]
+	await await_idle_frame()
+	flow.open_spots(Pick.SF)
+	assert_bool(flow.spots.same_city).is_true()
+	P0HomePick.answer("/p0/home/spots/" + Pick.SF.id, Pick.spot_read(Pick.SF.id))
+	await await_idle_frame()
+	assert_float(float(flow.spots.at[0])).is_equal_approx(37.751, 1e-9)
+	assert_float(float(flow.spots.at[1])).is_equal_approx(-122.431, 1e-9)
+	assert_bool(flow.spots.back_key.visible).is_false()
+	flow.spots.map.pan(Vector2(0, 60))
+	flow.spots._refresh()
+	assert_bool(flow.spots.back_key.visible).is_true()
+	flow.spots.back_key.pressed.emit()
+	assert_float(float(flow.spots.at[0])).is_equal_approx(37.751, 1e-9)
+	flow.spots.build.activated.emit()
+	assert_array(_labels(flow.confirm)).contains(["Move your farm to San Francisco?"])
 	(made[0] as Node).free()
 
 func test_back_closes_a_layer_at_a_time_then_leaves_for_settings() -> void:
@@ -119,8 +146,8 @@ func test_back_closes_a_layer_at_a_time_then_leaves_for_settings() -> void:
 	var left := []
 	flow.left.connect(func(): left.append(1))
 	flow.open_spots(TOKYO)
-	P0HomePick.answer("/p0/home/spots/" + TOKYO.id, {"ok": true, "city": TOKYO.id, "spots": Pick.spots()})
-	flow.spots.chosen.emit(TOKYO.id, 0)
+	P0HomePick.answer("/p0/home/spots/" + TOKYO.id, Pick.spot_read(TOKYO.id))
+	flow.spots.chosen.emit(35.68, 139.7)
 	assert_object(flow.confirm).is_not_null()
 	flow.back()
 	assert_object(flow.confirm).is_null()
