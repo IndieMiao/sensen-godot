@@ -9,6 +9,8 @@ extends Control
 ## WELCOME (SGODOT-340 §4, 338 S0): a first pick whose address is near an open city opens on HOME-WELCOME, not the list:
 ## `Start here` goes straight to that city's spot page (its `‹ Change city` back to the card), `Choose another city`
 ## to the list with `‹ Back` to the card and nothing picked. No city near (or the read failed): the list, as before.
+## Till that first read is in, the card's outline holds its place (不知火舞 342 8c4168ab); failed or timed out, the list's
+## PICK-ERR-LIST, not a failure on the outline.
 ## Emits chose(cluster, spot), say(text) for a toast, left (CHANGE).
 
 signal chose(cluster: String, spot: int)
@@ -32,6 +34,7 @@ var confirm: Control
 var _spots_read := {}        # the spot page's read (its resets_day for the confirm card)
 var welcome: Control         # HOME-WELCOME, a first pick near an open city
 var _under: Control          # the page the spot page covers: the list or HOME-WELCOME
+var loading: Control         # a first pick's card outline till its first read is in
 
 func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0, change_from_ := "") -> void:
 	session = session_
@@ -48,6 +51,8 @@ func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0, change_fr
 		land.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		land.set_anchors_preset(Control.PRESET_FULL_RECT)
 		add_child(land)
+		loading = Welcome.placeholder(_safe.y)
+		add_child(loading)
 
 ## The list (HOME-PICK-1): back_to "Back" when it opens from HOME-WELCOME.
 func _make_cities(back_to := "") -> void:
@@ -63,12 +68,14 @@ func _ready() -> void:
 
 func _read_cities(q: String) -> void:
 	P0HomePick.cities(session, q, func(d: Dictionary): _cities_read(d, q), func():
+		_end_loading()
 		if cities == null and welcome == null: _make_cities()
 		if is_instance_valid(cities): cities.show_failed(q))
 
 ## The first read of a first pick: a city near — HOME-WELCOME, the list made behind it for `Choose another city`;
 ## none — the list (HOME-PICK-1-NOIP). Later reads (a search, a retry) go to the list.
 func _cities_read(d: Dictionary, q: String) -> void:
+	_end_loading()
 	if cities == null and welcome == null:
 		var near = d.get("near", null)
 		if near is Dictionary:
@@ -80,6 +87,10 @@ func _cities_read(d: Dictionary, q: String) -> void:
 			cities.visible = false
 		else: _make_cities()
 	if is_instance_valid(cities): cities.show_cities(d, q)
+
+func _end_loading() -> void:
+	if loading != null: loading.queue_free()
+	loading = null
 
 ## HOME-WELCOME's `Choose another city`: the list, nothing picked.
 func _other_city() -> void:

@@ -433,3 +433,54 @@ func test_no_city_near_or_a_failed_read_is_the_list() -> void:
 	assert_object(failed.welcome).is_null()
 	assert_bool(failed.cities.error.visible).is_true()
 	session.free()
+
+## Till the first read is in (不知火舞 342 8c4168ab): the card's outline where the card goes, no words, nothing to tap;
+## the read in, the real card in its place (or the list); a read that fails, the list's error, the outline gone.
+func test_the_first_read_holds_the_cards_place_with_its_outline() -> void:
+	var session := P0Session.new()
+	session.transport = func(_m, _p, _b, _c): pass
+	var flow: Control = auto_free(HomeFlow.new(session, 0.0, 34.0))
+	flow.size = Vector2(360, 800)
+	add_child(flow)
+	await await_idle_frame()
+	await await_idle_frame()
+	var outline: Control = flow.loading
+	assert_object(outline).is_not_null()
+	assert_array(flow.find_children("*", "Label", true, false).filter(
+		func(l): return (l as Label).is_visible_in_tree() and _shown(l))).is_empty()   # no words
+	assert_array(outline.find_children("*", "BaseButton", true, false).filter(func(b): return not (b as BaseButton).disabled)).is_empty()
+	assert_object(flow.cities).is_null()
+	assert_object(flow.welcome).is_null()
+	var sb := (outline.card as PanelContainer).get_theme_stylebox(&"panel") as UiStyleBox
+	assert_float(sb.bg_color.a).is_equal(0.0)   # an edge only
+	assert_float(sb.border_width).is_greater(0.0)
+	assert_float(sb.corner_radius.x).is_equal(20.0)
+	assert_float(sb.shadow_size).is_equal(0.0)
+	var held := (outline.card as Control).get_global_rect()
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": SF, "matches": []})
+	await await_idle_frame()
+	assert_object(flow.loading).is_null()
+	assert_bool(is_instance_valid(outline) and outline.is_inside_tree() and not outline.is_queued_for_deletion()).is_false()
+	# the card stands where the outline stood, the same size (a one-line city), 16 above the safe area
+	await await_idle_frame()
+	var card := (flow.welcome.card as Control).get_global_rect()
+	assert_object(card).is_equal(held)
+	assert_float(flow.get_global_rect().end.y - card.end.y).is_equal(16.0 + 34.0)
+	flow.free()
+	var failed: Control = HomeFlow.new(session)
+	add_child(failed)
+	await await_idle_frame()
+	P0HomePick.answer("/p0/home/cities", null)
+	await await_idle_frame()
+	assert_object(failed.loading).is_null()
+	assert_bool(failed.cities.error.visible).is_true()
+	failed.free()
+	session.free()
+
+## A label that shows: in the tree, visible, not under a transparent parent.
+func _shown(l: Node) -> bool:
+	var n: Node = l
+	while n is CanvasItem:
+		if (n as CanvasItem).modulate.a == 0.0 or (n as CanvasItem).self_modulate.a == 0.0: return false
+		n = n.get_parent()
+	return true

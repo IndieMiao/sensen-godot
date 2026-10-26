@@ -1627,6 +1627,12 @@ func _dev_shot(dt: float) -> void:
 						_home_flow.cities = null
 						_home_flow.welcome = null
 						_home_flow._cities_read({"open": open_rows, "near": near_row[0], "matches": []}, "")
+			# homeloading: the first read's outline again, as if the cities were still out (342 8c4168ab)
+			"homeloading":
+				if is_instance_valid(_home_flow) and _home_flow.change_from == "" and _home_flow.loading == null:
+					for page in [_home_flow.cities, _home_flow.welcome]: if page != null: page.visible = false
+					_home_flow.loading = load("res://scenes/p0/panels/p0_home_welcome.gd").placeholder(ui.safe_bottom())
+					_home_flow.add_child(_home_flow.loading)
 			"homestart": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.start.activated.emit()
 			"homeother": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.other.activated.emit()
 			"homesearch":
