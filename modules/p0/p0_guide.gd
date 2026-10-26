@@ -328,14 +328,15 @@ static func door_badge(view: Dictionary) -> bool:
 
 ## The stall's badge (q(44)): "deliver" when a Stall Board request can be handed in now, "request" when one is open,
 ## else "". A badge from the board opens the drawer on the Stall Board page; the finger card still says Tap to shop.
-## While the new-player guide is on, an open request hangs no ! (q(215) ④: the first slot refilled before the guide
-## ends waits for it); a ✓ still shows.
+## While the new-player guide is on, none: the guide marks only its current step's targets and the stall is never one
+## (q(215) ④ ⑥, 不知火舞 on #496 — the first slot refilled before the guide ends waits for it, a ✓ too).
 static func stall_badge(view: Dictionary) -> String:
+	if guide_on(view): return ""
 	var open := false
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if int(r.get("have", 0)) >= int(r.get("qty", 1)): return "deliver"
 		if str(r.get("status", "")) == "open": open = true
-	return "request" if open and not guide_on(view) else ""
+	return "request" if open else ""
 
 # ---------------------------------------------------------------- Free to do now (§3.7.4)
 

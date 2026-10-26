@@ -181,12 +181,12 @@ func test_stall_badge_comes_from_the_board() -> void:
 	v.stall.board.requests[0].have = 2
 	assert_str(Guide.stall_badge(v)).is_equal("deliver")
 
-func test_stall_hangs_no_request_mark_while_the_guide_is_on() -> void:   # q(215) ④
+func test_stall_hangs_no_mark_while_the_guide_is_on() -> void:   # q(215) ④ ⑥
 	var v := _guided("sow_two")
 	v.stall = {"board": {"requests": [{"id": "req_stall_1", "title": "Fresh Greens", "item": "crop_lettuce", "qty": 2, "status": "open", "have": 0}]}}
 	assert_str(Guide.stall_badge(v)).is_equal("")                       # the refilled slot waits for the guide
 	v.stall.board.requests[0].have = 2
-	assert_str(Guide.stall_badge(v)).is_equal("deliver")                # a ✓ still shows
+	assert_str(Guide.stall_badge(v)).is_equal("")                       # nor a ✓ (q(215) ⑥)
 	v.stall.board.requests[0].have = 0
 	v.guide = {"step": null, "end": "done"}
 	assert_str(Guide.stall_badge(v)).is_equal("request")                # the guide over: the ! is back
