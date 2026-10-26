@@ -294,7 +294,7 @@ static func harvest_level(view: Dictionary) -> Dictionary:
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
 		if not st in ["growing", "ready"]: continue
-		var c: Dictionary = crops.get(str(p.get("crop", "")), {})
+		var c: Dictionary = crops.get(P0Logic.harvest_of(view, str(p.get("crop", ""))), {})   # a Quick Radish counts as a Radish (q(217))
 		if c.is_empty(): continue
 		var xp := floori(float(c.get("xp", 0)) * float(p.get("xp_pct", 100)) / 100.0)
 		if not firsts.has("harvest:" + str(c.id)) and not counted.has(c.id):

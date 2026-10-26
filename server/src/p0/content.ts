@@ -21,7 +21,13 @@ export interface Crop {
   sold_at?: 'stall' | 'market'; regional?: boolean; zone?: string; off_zone_grow_h?: number; seed_daily?: number;
   /** A tree (§5.2.4): grow_h is its first ripening; then regrow_h after each pick, picked for harvest_energy. */
   perennial?: { plant: string; plant_name: string; regrow_h: number; harvest_energy: number; harvest_xp: number; footprint: [number, number] };
+  /** A teaching seed's plot crop (quickCrop): it ripens a fixed time after it starts growing and is harvested as `harvest`. */
+  quick?: { ms: number; harvest: string };
 }
+
+/** A teaching seed (q(217), content/farm_quick_seeds.json): Quick Radish Seeds, sown for `energy`, ripe grow_s after it
+ * starts growing, harvested as `harvest` (a crop of crops[]). Kept out of crops[]: what walks the crops never sees it. */
+export interface QuickSeed { id: string; name: string; seed: string; seed_name: string; energy: number; grow_s: number; harvest: string }
 
 export interface Fish {
   id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[];
@@ -155,7 +161,7 @@ export interface P0Content {
   version: string;
   energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
   day: { utc_offset_hours: number; rollover_hour: number };   // the offset is the fallback when profile.timezone is absent
-  start: { coins: number; tilled_plots: number; wild_plots: number; bag: [string, number][] };
+  start: { coins: number; tilled_plots: number; wild_plots: number; bag: [string, number][]; guide_bag?: [string, number][] };   // guide_bag: q(217), a guided save's first stacks
   bag: { capacity: number; stack: Record<string, number> };
   skills: Record<Skill, number[]>;
   level_up_energy: { first: number; later: number };
@@ -163,6 +169,7 @@ export interface P0Content {
   xp_multiplier: [number, number][];
   skill_daily_cap: number;                    // §4.3.4: XP per skill per player day, an anti-script limit only
   crops: Crop[];
+  quick_seeds?: QuickSeed[];                  // q(217) teaching seeds (quickCrop), not crops
   stall: { keeper: { role: string; name: string }; buy: string[] };
   rarity_names: string[];
   fish: Fish[];
@@ -384,6 +391,20 @@ export function mergeContent(base: Record<string, unknown>, add: Record<string, 
 
 export function cropById(c: P0Content, id: string): Crop | undefined { return c.crops.find(crop => crop.id === id); }
 export function cropBySeed(c: P0Content, seed: string): Crop | undefined { return c.crops.find(crop => crop.seed === seed); }
+
+/** A teaching seed's plot crop as a Crop (q(217)): the harvest crop's yield, XP, first-harvest bonus, level and family,
+ * with its own id, names and Energy; `quick` says when it ripens and what it gives. By its plot crop id or its seed. */
+export function quickCrop(c: P0Content, id: string): Crop | undefined {
+  const q = c.quick_seeds?.find(x => x.id === id || x.seed === id);
+  const base = q && cropById(c, q.harvest);
+  if (!q || !base) return undefined;
+  return { ...base, id: q.id, name: q.name, seed: q.seed, seed_name: q.seed_name, energy: q.energy, seed_price: 0,
+    grow_h: q.grow_s / 3600, sold_at: undefined, regional: undefined, perennial: undefined,
+    quick: { ms: q.grow_s * 1000, harvest: base.id } };
+}
+
+/** What grows on a plot: a crop of crops[] or a teaching seed's (quickCrop). */
+export function plotCrop(c: P0Content, id: string): Crop | undefined { return cropById(c, id) ?? quickCrop(c, id); }
 export function fishById(c: P0Content, id: string): Fish | undefined { return c.fish.find(f => f.id === id); }
 export function rodById(c: P0Content, id: string): Rod | undefined { return c.fishing.rods.find(r => r.id === id); }
 export function recipeById(c: P0Content, id: string): Recipe | undefined { return c.cooking.recipes.find(r => r.id === id); }
@@ -435,7 +456,7 @@ export function ingredient(c: P0Content, id: string): { family: Family; rarity: 
 
 /** Display name for any bag id the P0 content knows. */
 export function itemName(c: P0Content, id: string): string {
-  const crop = cropById(c, id) ?? cropBySeed(c, id);
+  const crop = cropById(c, id) ?? cropBySeed(c, id) ?? quickCrop(c, id);
   if (crop) return crop.id === id ? crop.name : crop.seed_name;
   const fish = fishById(c, id);
   if (fish) return fish.name;
