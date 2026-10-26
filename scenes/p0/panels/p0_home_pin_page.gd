@@ -406,6 +406,7 @@ func _place_veil() -> void:
 	mat.set_shader_parameter(&"veil", VEIL)
 
 func _place_places() -> void:
+	if area.is_empty(): return   # a name freed after the area went still says resized (周瑜 on #495)
 	for b in area.blocks:
 		var d: UiMapDestination = _places.get(b.id)
 		if d == null: continue
