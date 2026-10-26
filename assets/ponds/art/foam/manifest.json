@@ -78,6 +78,45 @@
       "id": "pond_shanghai_06",
       "rock_mesh_sha256": "3eba103e77a0c9abb0f846387806a6d063615edae3a55d6bcba95bdb36dcfedd",
       "template_id": "gourd"
+    },
+    {
+      "decoration_seed": 1790896863.0,
+      "id": "pond_san_francisco_01",
+      "rock_mesh_sha256": "d2872c53e585cb30b9d8b0a3e4d56b838b6c0fa18520cd27a543825a2a910e19",
+      "template_id": "gourd"
+    },
+    {
+      "decoration_seed": 2578601018.0,
+      "id": "pond_san_francisco_02",
+      "rock_mesh_sha256": "4219729558ef8558b816ca974cc3cddaec58a337acb375b01a100ac50cd68a56",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 47338722.0,
+      "id": "pond_san_francisco_03",
+      "rock_mesh_sha256": "15293c8604422e3251b3415ac53598c9082c256d3985db274e007b95ad3a51c6",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 1556145448.0,
+      "id": "pond_san_francisco_04",
+      "rock_mesh_sha256": "1fcf63aedf442faf9d7337a077ba5938689c9bd50d1f82d268d14acf2a944880",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 4081270712.0,
+      "id": "pond_san_francisco_05",
+      "rock_mesh_sha256": "46daa3d0507ec1079afc5418946363df46d0a5e2a1d104cdf9d8a0fe38232915",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 405910200.0,
+      "id": "pond_san_francisco_06",
+      "rock_mesh_sha256": "2046aa22ce17b79764cd41bb007e55d005081d83374718647f4e9dabbfd2ee02",
+      "template_id": "gourd"
     }
-  ]
+  ],
+  "ponds": {
+    "res://assets/p0/p0_ponds.json": "2ddd16889a59cf54f9f427e66a0c548bbb48168ea18a13fdaea8cb504178b579"
+  }
 }
