@@ -198,7 +198,7 @@ func test_request_card_accepts_and_not_now_returns_to_the_bar() -> void:
 	ui.open_resident_request("res_pip")
 	var card: UiRequestCard = ui.find_children("*", "UiRequestCard", true, false)[0]
 	assert_str(str(card.data.title)).is_equal("Pip's First Fish")   # ResidentRequestCard: the request's own name
-	assert_str(str(card.data.deliver_to)).is_equal("Pip")            # no place in this view: the name alone
+	assert_str(str(card.data.deliver_to)).is_equal("Pip · any Travel Post")   # he is at every Travel Post (§9.4.3)
 	assert_str(str(card.data.line)).is_equal("Could you catch me a fish? Any kind is fine.")
 	assert_str(str(card.data.reward)).is_equal("+5 Friendship · 20 coins")
 	assert_str(str(card.data.needs[0].name)).is_equal("Common fish")
