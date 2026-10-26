@@ -1,0 +1,8 @@
+{
+  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts.",
+  "guide": {
+    "steps": [],
+    "recover": [],
+    "tips": {}
+  }
+}

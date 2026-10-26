@@ -183,7 +183,7 @@ func _process(dt: float) -> void:
 	# a second guard for result cards opened another way (the farmhouse's COOK-4 is one).
 	if tips and not modal_kind in ["card", "kitchen_card"]:
 		var key := tips.next()
-		if key != "": _show_tip(str(P0Guide.TIPS[key]), key)
+		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
 	if _notice and _notice.visible: _place_notice()
 
@@ -3208,6 +3208,7 @@ var tips_path := TIPS_PATH
 ## A TipCard (q(44): the eight P0 sentences in P0Guide.TIPS, each once; shown in order through P0Guide.TipQueue,
 ## timed like a Toast and closed by doing what it teaches, a tap, or time). `_text` is ignored: the copy is P0Guide's.
 func teach(key: String, _text := "") -> void:
+	if not P0Guide.tip_allowed(view, key): return   # the new-player guide picks the tips while it is on (SGODOT-341)
 	_load_tips()
 	if tips == null: tips = P0Guide.TipQueue.new(_taught)
 	tips.request(key)
@@ -3232,7 +3233,7 @@ const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "me
 ## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
 func _show_tip(text: String, key := "") -> void:
 	for k in tips.seen:
-		if P0Guide.TIPS.has(k): _taught[k] = true   # only the tips: the store also keeps stall_seen / dex_seen lists
+		if P0Guide.tip_text(k) != "": _taught[k] = true   # only the tips: the store also keeps stall_seen / dex_seen lists
 	_save_tips()
 	if _teach == null:
 		_teach = UiTipCard.new()

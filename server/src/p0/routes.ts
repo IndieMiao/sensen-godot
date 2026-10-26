@@ -17,6 +17,7 @@ import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
 import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
+import { guideKeys, settleGuide, setGuide } from './guide.js';
 
 /** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
  * log: the observation log (S7). */
@@ -37,9 +38,10 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   };
   // A new save asks to pick a home only when the client says it can offer the pick (SGODOT-303, q(163) ⑤): an older
   // client's new player is San Francisco's, as every save before.
+  // SGODOT-341 the same way: a new save starts the new-player guide only when the client says it can show it (`guide`).
   const features = (headers: Record<string, unknown>) => String(headers['x-p0-features'] ?? '').split(',').map(f => f.trim());
-  const stateOf = (player: string, headers: Record<string, unknown>) =>
-    store.get(player, deps.now(), { pending: features(headers).includes('choose_home') });
+  const newSave = (headers: Record<string, unknown>) => { const f = features(headers); return { pending: f.includes('choose_home'), guide: f.includes('guide') }; };
+  const stateOf = (player: string, headers: Record<string, unknown>) => store.get(player, deps.now(), newSave(headers));
   const clock = (offset: number) => deps.now() + offset;
   /** q(206): the people in the outpost rooms of the town the player is in (its pins' counts summed, a Mine Hut's too); the
    * player counts once they have walked into one of its outposts, though the room has not seen them yet (the state read
@@ -65,10 +67,12 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       // v5: entering a pond or outpost in a city without a pass is refused, with the confirm panel's preview.
       const refused = requirePass(c, s, space, place, clock(s.clock_ms));
       if (refused) return reply.send({ ok: false, code: refused.code, detail: refused.detail, state: view(s, clock(s.clock_ms)) });
+      const before = { ...s, presence: { ...s.presence } };   // guideKeys reads only presence off it (no plots changed, no command)
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
       noteVisit(c, s, space, place, clock(s.clock_ms), []);   // the entry read checks in an explore request too (as noteSeenAt marks)
       settleHere(c, s, space, place, clock(s.clock_ms));
+      settleGuide(c, s, guideKeys(c, before, s, null, []), clock(s.clock_ms));   // SGODOT-341: walking into a place is a guide step too
       store.put(s);
     } else if (settleHere(c, s, space, place, clock(s.clock_ms))) store.put(s);   // a Day Pass ran out on the map: home
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
@@ -205,7 +209,17 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   app.post('/v1/p0/dev/reset', async (req, reply) => {
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
-    const s = store.reset(player, deps.now(), { pending: features(req.headers).includes('choose_home') });
+    const s = store.reset(player, deps.now(), newSave(req.headers));
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+  });
+  /** Playtests only (SGODOT-341): put this save's guide on a step — `first`, `end` or a step id — counts cleared. */
+  app.post('/v1/p0/dev/guide', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const s = stateOf(player, req.headers);
+    const refusal = setGuide(c, s, String((req.body as { step?: string } | undefined)?.step ?? ''), clock(s.clock_ms));
+    if (refusal) return reply.code(400).send({ ok: false, code: refusal.code });
+    store.put(s);
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
   });
 }

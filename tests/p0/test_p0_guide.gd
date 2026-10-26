@@ -336,3 +336,73 @@ func test_the_today_chip_key_follows_the_focus_row_not_its_countdown() -> void:
 	assert_str(timer).is_not_equal(cook)
 	v.plots[0].ready_in = 9000000                                       # the countdown ticks: same row, same key
 	assert_str(P0Logic.today_chip_key(P0Logic.today_rows(v))).is_equal(timer)
+
+# ---------------------------------------------------------------- new-player guide (SGODOT-341)
+
+## A test-only step table in the content P0Guide reads (the shipped one is empty until 339's §14 v3).
+const GUIDE_TABLE := {
+	"steps": [
+		{"id": "sow_two", "done_on": {"key": "sow:crop_radish", "count": 2}, "tip": "sow", "row": {"line": "Sow 2 Radish", "icon": "seed_radish", "go": "plots"}},
+		{"id": "sell_one", "done_on": {"key": "sell:crop_radish"}, "tip": "sell_one", "row": {"line": "Sell 1 Radish · Nadia", "icon": "crop_radish", "go": "outpost:market"}},
+	],
+	"recover": [{"id": "rec_sow", "row": {"line": "Sow 1 Radish", "icon": "seed_radish", "go": "plots"}}],
+	"tips": {"sell_one": "Nadia buys one Radish. Keep the other."},
+}
+
+func _with_guide(body: Callable) -> void:
+	var c := P0Logic.content()
+	var had: Variant = c.get("guide", null)
+	c["guide"] = GUIDE_TABLE
+	body.call()
+	if had == null: c.erase("guide")
+	else: c["guide"] = had
+
+func _guided(step: String, recover: Variant = null, progress: Variant = null) -> Dictionary:
+	return _view({"guide": {"step": step, "phase": "B", "recover": recover, "at": 0, "progress": progress}})
+
+func test_a_view_without_a_guide_step_is_the_old_first_session() -> void:
+	assert_bool(Guide.guide_on(_view())).is_false()
+	assert_bool(Guide.guide_on(_view({"guide": {"step": null, "end": "legacy"}}))).is_false()
+	assert_array(_lines(Guide.lead_rows(_view({"guide": {"step": null, "end": "done"}})))).contains(["Catch 2 Pond Crucian · Fern Pond"])
+	assert_bool(Guide.tip_allowed(_view(), "creel")).is_true()
+
+func test_the_guide_step_leads_today_with_its_count_and_replaces_pond_catch() -> void:
+	_with_guide(func():
+		var v := _guided("sow_two", null, {"have": 1, "need": 2})
+		var rows := Guide.lead_rows(v)
+		assert_array(_lines(rows)).is_equal(["Sow 2 Radish"])
+		assert_str(str(rows[0].tail)).is_equal("1/2")
+		assert_bool(rows[0].focus).is_true()
+		assert_str(str(rows[0].dot)).is_equal("guide:sow_two")
+		var today := P0Logic.today_rows(v)
+		assert_str(str(today[0].line)).is_equal("Sow 2 Radish")                       # no second "first sow" row before it
+		assert_bool(today.any(func(r): return str(r.line).begins_with("Catch"))).is_false())
+
+func test_a_recover_entry_stands_in_for_the_step_while_the_server_names_it() -> void:
+	_with_guide(func():
+		var v := _guided("sell_one", "rec_sow", {"have": 0, "need": 1})
+		assert_str(Guide.guide_shown_id(v)).is_equal("rec_sow")
+		var rows := Guide.lead_rows(v)
+		assert_array(_lines(rows)).is_equal(["Sow 1 Radish"])
+		assert_str(str(rows[0].tail)).is_equal("")
+		assert_str(Guide.guide_shown_id(_guided("sell_one"))).is_equal("sell_one"))
+
+func test_while_the_guide_is_on_only_its_tip_and_the_safety_tips_show() -> void:
+	_with_guide(func():
+		var v := _guided("sell_one")
+		assert_bool(Guide.tip_allowed(v, "sell_one")).is_true()
+		assert_bool(Guide.tip_allowed(v, "heat")).is_true()
+		assert_bool(Guide.tip_allowed(v, "meal")).is_true()
+		assert_bool(Guide.tip_allowed(v, "creel")).is_false()
+		assert_bool(Guide.tip_allowed(v, "sow")).is_false()
+		assert_str(Guide.tip_text("sell_one")).is_equal("Nadia buys one Radish. Keep the other.")
+		var q := Guide.TipQueue.new()
+		assert_bool(q.request("sell_one")).is_true()                                # the table's own sentence queues like the seven
+		assert_bool(q.request("no_such_tip")).is_false())
+
+func test_a_new_step_asks_for_its_tip_once() -> void:
+	_with_guide(func():
+		assert_str(Guide.guide_tip_on_change(_guided("sow_two"), _guided("sell_one"))).is_equal("sell_one")
+		assert_str(Guide.guide_tip_on_change(_guided("sell_one"), _guided("sell_one"))).is_equal("")
+		assert_str(Guide.guide_tip_on_change(_view(), _guided("sow_two"))).is_equal("sow")
+		assert_str(Guide.guide_tip_on_change(_guided("sell_one"), _guided("sell_one", "rec_sow"))).is_equal(""))   # rec_sow has no tip
