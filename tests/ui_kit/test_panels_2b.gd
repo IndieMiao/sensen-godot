@@ -705,7 +705,7 @@ func test_farm_card_lines() -> void:
 	assert_float(f.size.y).is_equal(76.0)
 
 func _request(fields := {}) -> Dictionary:
-	var d := {portrait = PIP, title = "Pip's request", who = "Pip · Courier Kid · personal request",
+	var d := {portrait = PIP, title = "Pip's First Fish", who = "Pip · Courier Kid · personal request",
 		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1,
 		icon = load("res://assets/p0/icons/fish_crucian.svg")}], reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
 	d.merge(fields, true)
@@ -714,7 +714,7 @@ func _request(fields := {}) -> Dictionary:
 func test_request_card_reads_the_request_and_offers_accept_or_not_now() -> void:
 	var c: UiRequestCard = _host(UiRequestCard.new(_request()))
 	await _settle()
-	assert_array(_texts(c)).contains(["Pip's request", "Pip · Courier Kid · personal request", "Could you catch me a fish? Any kind is fine.",
+	assert_array(_texts(c)).contains(["Pip's First Fish", "Pip · Courier Kid · personal request", "Could you catch me a fish? Any kind is fine.",
 		"Bring", "Reward", "+5 Friendship · 20 coins", "Deliver to", "Pip · Travel Post"])
 	assert_int(c.find_children("*", "UiNeedTile", true, false).size()).is_equal(1)
 	var got := []

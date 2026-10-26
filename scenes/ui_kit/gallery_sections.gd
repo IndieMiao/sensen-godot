@@ -770,7 +770,7 @@ static func _farm_cards() -> Control:
 	return v
 
 static func _request_cards() -> Control:
-	var d := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), title = "Pip's request", who = "Pip · Courier Kid · personal request",
+	var d := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), title = "Pip's First Fish", who = "Pip · Courier Kid · personal request",
 		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1, icon = _tex("fish_crucian")}],
 		reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
 	return _captioned(_at_336(UiRequestCard.new(d)), "open · Accept")

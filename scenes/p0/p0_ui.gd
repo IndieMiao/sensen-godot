@@ -2973,11 +2973,12 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	var req: Dictionary = view_.get("residents", {}).get(id, {}).get("request", {}) if view_.get("residents", {}).get(id, {}).get("request", null) != null else {}
 	var text := ""
 	var need_line := ""
-	var title := "%s's request" % str(def.get("name", ""))
+	var title := "%s's request" % str(def.get("name", ""))   # only for a request the content table no longer has
 	var q := P0Logic.resident_request(id, str(req.get("id", "")))
 	if not q.is_empty():
 		text = str(q.get("text", ""))
 		need_line = str(q.get("need_line", ""))
+		if str(q.get("title", "")) != "": title = str(q.title)   # ResidentRequestCard: the request's own name (`A Fresh Radish`)
 	var kind := str(req.get("kind", ""))
 	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	var style := str(req.get("style", "")) if req.get("style", null) != null else ""
@@ -3018,8 +3019,15 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	return {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
 		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
 		"line": text, "needs": [need] if kind != "" else [], "reward": " · ".join(reward),
-		"deliver_to": str(def.get("name", "")), "action": "Accept",
+		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
 		"reason": str(bar.get("request_reason", ""))}
+
+## The request card's `Deliver to` (ResidentRequestCard): the resident and the outpost the player finds them in, from
+## the player's home set (view.residents[id].place, `Nadia · Mission Market Square`); the name alone without one.
+static func _deliver_to(view_: Dictionary, id: String, name: String) -> String:
+	var place := str(view_.get("residents", {}).get(id, {}).get("place", ""))
+	var where := str(P0Outposts.find(place).get("name", "")) if place != "" else ""
+	return "%s · %s" % [name, where] if where != "" else name
 
 ## Gift on the bar, or a dish card's `Gift to <Name>` (item: that dish, selected): the gift drawer (Bag side only,
 ## Dishes first); the card's Gift sends `gift`.
