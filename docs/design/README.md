@@ -1,6 +1,6 @@
 # 设计稿与素材索引
 
-玩法、数值、文案和分期以 [玩法方案 v2](../product/gameplay-plan-v2-2026-10-02.md) 为准。当前游戏 UI 设计稿为 [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53)，file key `OMLTC3yw3u2WDjOZhLnhaR`，page `481:53`（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)（page `310:2955`）为 Archive，截至 2026-10-06。
+玩法、数值、文案和分期以 [玩法方案 v2](../product/gameplay-plan-v2-2026-10-02.md) 为准。当前游戏 UI 设计稿为 [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=481-53)，file key `icmfLGHkiMBfMQApCiw13D`，page `481:53`（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)（page `310:2955`）为 Archive，截至 2026-10-06。
 
 ## 当前 UI 与 P0 美术
 
