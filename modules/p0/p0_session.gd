@@ -215,8 +215,9 @@ static func boot_wanted() -> bool:
 	return FileAccess.file_exists("user://p0_boot") or OS.get_environment("SENSEN_P0") == "1" or OS.has_feature("p0")
 
 ## What this client can do that an older one could not (the server's `x-p0-features`): choose_home — a new save waits
-## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city.
-const FEATURES := "choose_home"
+## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide — a new
+## save starts the new-player guide (SGODOT-341, P0Guide.guide_rows / tip_allowed) once the server's table has steps.
+const FEATURES := "choose_home,guide"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
