@@ -5,7 +5,7 @@ import { addPlots, clearNewBeds } from './garden.js';
 import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, writtenCluster, type TravelState } from './travel.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { placeOf } from './world.js';
-import { freshGuide, legacyGuide, type GuideState } from './guide.js';
+import { checkGuideTable, freshGuide, legacyGuide, type GuideState } from './guide.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -353,6 +353,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
   s.guide ??= legacyGuide(now);   // SGODOT-341: a save from before the guide never gets it (all of them, test players too)
+  checkGuideTable(c, s, now);   // its step gone from a changed table: the guide ends here
   // P1 (SGODOT-239, q(59) §1.1): facilities, and the 10 plots a save already at Homestead Lv3 has from this version on
   // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
   s.facilities ??= [];

@@ -245,6 +245,47 @@ describe('guide keys (SGODOT-341)', () => {
   });
 });
 
+describe('follow-ups from the review of #472 (SGODOT-341)', () => {
+  it('an optional step before a from_step step: the look-ahead counts from the optional step\'s start (苏烈\'s probe)', () => {
+    const c = content({ steps: [
+      { id: 'sow_one', done_on: { key: 'sow:crop_radish' } },
+      { id: 'rest', optional: true, done_on: { key: 'sow:crop_radish', count: 5 } },
+      { id: 'more', done_on: { key: 'sow:crop_radish', count: 1, from_step: true } },
+      { id: 'last', done_on: { key: 'ack:last' } },
+    ] });
+    let s = guided(c);
+    const [a, b] = tilled(s);
+    s = run(c, s, { type: 'sow', plot: a, seed: 'seed_radish', space: 'home' });
+    expect(at(s)).toBe('rest');   // the sow that passed sow_one does not also pass `more`: rest shows
+    s = run(c, s, { type: 'sow', plot: b, seed: 'seed_radish', space: 'home' });
+    expect(at(s)).toBe('last');   // one more sow is `more` done: rest and more pass together
+  });
+
+  it('a step gone from the table ends the guide at load, and the view says done meanwhile', () => {
+    const c = content();
+    const s = guided(c);
+    s.guide!.step = 'gone_step';
+    expect(viewOf(c, s, T0).guide).toEqual({ step: null, end: 'done' });
+    const up = upgradeState(c, JSON.parse(JSON.stringify(s)), T0 + H);
+    expect(up.guide).toMatchObject({ step: null, end: 'done', at: T0 + H });
+  });
+
+  it('a read-a-line step before the home pick is acked while the pick waits; nothing else goes through', () => {
+    const c = content({ steps: [{ id: 't_city', done_on: { key: 'ack:t_city' } }, { id: 't_pin', done_on: { key: 'home_pick' } }] });
+    let s = freshState(c, 'guide-pending-01', T0, 42, { guide: true, pending: true });
+    expect(applyP0(c, s, { type: 'read_inbox', keys: [] }, T0)).toMatchObject({ ok: false, code: 'home_pending' });
+    s = run(c, s, { type: 'guide', op: 'ack', step: 't_city' });
+    expect(at(s)).toBe('t_pin');
+    expect(s.travel.pending).toBe(true);
+  });
+
+  it('an optional step needs a non-optional step after it', () => {
+    const c = content({ steps: [{ id: 'a', optional: true, done_on: { key: 'cast' } }, { id: 'b', optional: true, done_on: { key: 'cast' } }] });
+    expect(validateGuide(c)).toEqual(['step a: an optional step needs a step after it that is not optional',
+      'step b: an optional step needs a step after it that is not optional']);
+  });
+});
+
 describe('the dev routes and the feature header (SGODOT-341)', () => {
   it('reset starts the guide for a client that says `guide`; dev/guide moves it; an older client\'s new save is legacy', async () => {
     const c = content();
