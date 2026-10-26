@@ -1,5 +1,5 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
-import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
+import { cropById, cropBySeed, plotCrop, quickCrop, rodById, type P0Content } from './content.js';
 import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
 import { barter } from './barter.js';
@@ -16,7 +16,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
-import { compost, cropGrowH, facilityAt, growMs, moveFacility, place, seedSaver, wateredPlots } from './garden.js';
+import { compost, cropGrowH, facilityAt, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
 import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
@@ -159,7 +159,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       }
       const wrong = plots.find(p => p!.state !== 'tilled');
       if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
-      const crop = cropBySeed(c, String(cmd.seed));
+      const crop = cropBySeed(c, String(cmd.seed)) ?? quickCrop(c, String(cmd.seed));   // q(217): or a teaching seed
       if (!crop) return fail('bad_item');
       const n = plots.length, seeds = count(s.bag, crop.seed);
       if (seeds < n) return fail('no_seed', { seed: crop.seed, need: n, have: seeds });
@@ -177,7 +177,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         plot.xp_pct = pct;
         delete plot.ready_at; delete plot.fert;
         // §5.7: under a sprinkler it grows as it is sown (−15%, locked now), no Water step.
-        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, s, crop, plot)); }
+        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + ripenMs(c, s, plot, crop); }
       }
       break;
     }
@@ -197,6 +197,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         break;
       }
       if (plot.fert) return fail('fertilized');
+      if (quickCrop(c, plot.crop)) return fail('wrong_state', { state: plot.state, quick: true });   // q(217): never fertilized
       if (!fert?.grow_mult) return fail(fert?.regrow_mult ? 'trees_only' : 'bad_item');
       if (count(s.bag, item) < 1) return fail('no_item', { item });
       take(s.bag, item, 1);
@@ -214,9 +215,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       // A covered plot was never waiting for water (q(59) §3): an older client's Water is refused as already growing.
       if (plot.state === 'growing' && wateredPlots(c, s).has(plot.id)) return fail('already_growing');
       if (plot.state !== 'sown' || !plot.crop) return fail('wrong_state', { state: plot.state });
-      const crop = cropById(c, plot.crop)!;
+      const crop = plotCrop(c, plot.crop)!;
       plot.state = 'growing';
-      plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, s, crop, plot));
+      plot.ready_at = now + ripenMs(c, s, plot, crop);
       break;
     }
     case 'harvest': {
@@ -238,7 +239,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         if (ids.length > 1 && cropById(c, plot.crop)?.perennial)
           return fail('not_ready', { plot: plot.id, tree: true });   // trees are picked one by one (Pick · 2 Energy)
       }
-      const one = cropById(c, plots[0]!.crop!)!;
+      const one = plotCrop(c, plots[0]!.crop!)!;
       if (ids.length === 1 && one.perennial) {   // P1: a tree is picked and grows again (q(118))
         const refusal = pickTree(c, s, plots[0]!, one, now, events);
         if (refusal) return fail(refusal.code, refusal.detail);
@@ -250,17 +251,18 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       // #269: a trial bag without it let add() drop a crop). Nothing fits → bag_full, as a single plot, nothing changed.
       let fits = 0;
       for (const plot of plots as Plot[]) {
-        const crop = cropById(c, plot.crop!)!;
-        if (room(c, s, crop.id) < crop.yield) {
+        const crop = plotCrop(c, plot.crop!)!;
+        const item = crop.quick?.harvest ?? crop.id;   // q(217): a Quick Radish is harvested as a Radish
+        if (room(c, s, item) < crop.yield) {
           if (fits === 0) return fail('bag_full', { need: crop.yield, plot: plot.id });
           break;
         }
         fits++;
-        add(c, s, crop.id, crop.yield);
-        events.push({ kind: 'item', id: crop.id, delta: crop.yield });
+        add(c, s, item, crop.yield);
+        events.push({ kind: 'item', id: item, delta: crop.yield });
         gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
         seedSaver(c, s, crop, plot, events);
-        const first = `harvest:${crop.id}`;
+        const first = `harvest:${item}`;
         if (!s.firsts.includes(first)) {
           s.firsts.push(first);
           firstXp(c, s, now, 'farming', first, crop.first_xp, events);
