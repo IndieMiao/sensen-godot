@@ -27,13 +27,14 @@ static func _p(icon: String, text: String, fact := "", status := -1, dimmed := f
 	return {icon = P0Logic.icon(icon), text = text, fact = fact, status = status, dimmed = dimmed, button = button, count = count}
 
 ## Homestead Stall: ✓ when a Stall Board request can be handed in, ! when one is open (P0Guide.stall_badge, q(44 / 48)),
-## else New while goods unlocked since the last visit wait (STALL-NEW, E-04; `fresh` = P0Ui.stall_has_new()).
+## else New while goods unlocked since the last visit wait (STALL-NEW, E-04; `fresh` = P0Ui.stall_has_new()). While the
+## new-player guide is on, no state at all, only the plain button (q(215) ⑥: marks are the current step's targets).
 static func stall(view: Dictionary, fresh := false) -> Dictionary:
 	var board := P0Guide.stall_badge(view)
 	var status := -1
 	if board == "deliver": status = UiStatusBadge.State.DELIVERABLE
 	elif board != "": status = UiStatusBadge.State.REQUEST
-	elif fresh: status = UiStatusBadge.State.NEW
+	elif fresh and not P0Guide.guide_on(view): status = UiStatusBadge.State.NEW
 	return _p("homestead_stall", "Homestead Stall", "", status)
 
 ## Farmhouse: the guide's ! while a cookable fish waits for the stove (A-03, P0Guide.door_badge; 不知火舞 on 232).
