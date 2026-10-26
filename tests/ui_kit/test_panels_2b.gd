@@ -582,6 +582,24 @@ func test_resident_bar_stacks_the_choices_when_one_carries_a_reason() -> void:
 	var deliver: UiResidentBar = _host(UiResidentBar.new(_pip({request_label = "Deliver"})))
 	assert_str(deliver.request_button().text).is_equal("Deliver")
 
+## q(222) ②: on the player's farm Request is left out; Gift takes the row alone, full width, still Primary, and
+## greys with its reason as anywhere (LOCK-10). A Request reason alone does not stack the row.
+func test_resident_bar_without_request_gives_gift_the_full_row() -> void:
+	var b: UiResidentBar = _host(UiResidentBar.new(_pip({request = false, request_reason = "No more requests"})))
+	await _settle()
+	assert_object(b.request_button()).is_null()
+	assert_bool(b.gift_button().get_parent() is HBoxContainer).is_true()
+	assert_int(b.gift_button().get_parent().get_child_count()).is_equal(1)
+	assert_int(b.gift_button().kind).is_equal(UiCommandButton.Kind.PRIMARY)
+	assert_float(b.gift_button().size.x).is_equal_approx(b.gift_button().get_parent().size.x, 0.5)
+	assert_array(_texts(b)).not_contains(["Request", "No more requests"])
+	var busy: UiResidentBar = _host(UiResidentBar.new(_pip({request = false, gift_reason = "No dishes in your bag"})))
+	await _settle()
+	assert_object(busy.request_button()).is_null()
+	assert_str(busy.gift_button().text).is_equal("No dishes in your bag")
+	assert_int(busy.gift_button().get_parent().get_child_count()).is_equal(1)
+	assert_float(busy.gift_button().size.x).is_equal_approx(busy.gift_button().get_parent().size.x, 0.5)
+
 # ---------------------------------------------------------------- UiBagHeader / UiGearRow
 
 func test_bag_header_count_sort_and_capacity_bar() -> void:

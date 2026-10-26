@@ -152,6 +152,7 @@ func _resident_view() -> Dictionary:
 
 func test_open_resident_talks_once_and_shows_the_bar() -> void:
 	var ui := _ui(true)
+	ui.surface = "room"   # residents stand in the outposts' rooms
 	ui.set_view(_resident_view())
 	await get_tree().process_frame
 	var sent := []
@@ -166,8 +167,29 @@ func test_open_resident_talks_once_and_shows_the_bar() -> void:
 	assert_int(sent.size()).is_equal(1)
 	assert_bool(ui.open_resident("res_nobody")).is_false()
 
+## q(222) ②: Pip on the player's farm (the new-player guide) — the bar leaves Request out and does not ask his open
+## request there (his newbie requests stay at the Travel Post); Gift takes the row. In a room the same view asks it.
+func test_resident_bar_on_the_farm_has_no_request() -> void:
+	var ui := _ui(true)
+	ui.surface = "farm"
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	assert_bool(ui.resident_asks_here()).is_false()
+	assert_bool(ui.open_resident("res_pip")).is_true()
+	var bar: UiResidentBar = ui.find_children("*", "UiResidentBar", true, false)[0]
+	assert_object(bar.request_button()).is_null()
+	assert_str(bar.gift_button().reason).is_equal("")
+	assert_str(str(bar.data.line)).is_not_equal("Could you catch me a fish? Any kind is fine.")
+	ui.surface = "room"
+	assert_bool(ui.resident_asks_here()).is_true()
+	ui.open_resident("res_pip")
+	bar = ui.find_children("*", "UiResidentBar", true, false).back()
+	assert_object(bar.request_button()).is_not_null()
+	assert_str(str(bar.data.line)).is_equal("Could you catch me a fish? Any kind is fine.")
+
 func test_request_card_accepts_and_not_now_returns_to_the_bar() -> void:
 	var ui := _ui(true)
+	ui.surface = "room"   # residents stand in the outposts' rooms
 	ui.set_view(_resident_view())
 	await get_tree().process_frame
 	var sent := []
@@ -338,6 +360,7 @@ func test_rest_tile_guides_to_the_bench_and_says_the_real_gain_near_full() -> vo
 
 func test_resident_profile_sheet_from_the_name_on_the_bar() -> void:
 	var ui := _ui(true)
+	ui.surface = "room"   # residents stand in the outposts' rooms
 	ui.set_view(_resident_view())
 	await get_tree().process_frame
 	var d := P0Ui.resident_profile_data(_resident_view(), "res_pip")
@@ -363,6 +386,7 @@ func test_affinity_on_the_open_bar_floats_a_pill_and_puts_the_answer_in_the_bubb
 	assert_str(P0Ui.affinity_text({"delta": 2, "reason": "chat"})).is_equal("+2 · first chat today")
 	assert_str(P0Ui.affinity_text({"delta": -2, "reason": "gift", "verdict": "not_a_fan"})).is_equal("−2 · not a fan")
 	var ui := _ui(true)
+	ui.surface = "room"   # residents stand in the outposts' rooms
 	ui.set_view(_resident_view())
 	await get_tree().process_frame
 	assert_bool(ui.resident_affinity({"resident": "res_pip", "delta": 2, "reason": "chat"})).is_false()   # bar not open

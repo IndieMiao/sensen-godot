@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    576
+    814
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        506
+        744
       ],
       "children": [
         {
@@ -654,6 +654,288 @@
               ],
               "variation": "C9B",
               "text": "Choices=Stacked · Gift unavailable with its reason (NPC-5 layout)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            596,
+            328,
+            218
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                596,
+                328,
+                198
+              ],
+              "children": [
+                {
+                  "type": "UiResidentBar",
+                  "rect": [
+                    0,
+                    596,
+                    328,
+                    197
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        12,
+                        608,
+                        305,
+                        174
+                      ],
+                      "children": [
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            12,
+                            608,
+                            90,
+                            174
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                12,
+                                608,
+                                90,
+                                174
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    12,
+                                    608,
+                                    90,
+                                    174
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            113,
+                            608,
+                            203,
+                            174
+                          ],
+                          "children": [
+                            {
+                              "type": "MarginContainer",
+                              "rect": [
+                                113,
+                                608,
+                                203,
+                                20
+                              ],
+                              "children": [
+                                {
+                                  "type": "VBoxContainer",
+                                  "rect": [
+                                    113,
+                                    608,
+                                    203,
+                                    20
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        113,
+                                        608,
+                                        203,
+                                        20
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            113,
+                                            608,
+                                            21,
+                                            20
+                                          ],
+                                          "variation": "C14XB",
+                                          "text": "Pip"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            139,
+                                            610,
+                                            62,
+                                            16
+                                          ],
+                                          "variation": "C11B",
+                                          "text": "· Courier Kid"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            204,
+                                            608,
+                                            5,
+                                            20
+                                          ],
+                                          "variation": "C14XB",
+                                          "text": "›"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                113,
+                                633,
+                                203,
+                                19
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    113,
+                                    633,
+                                    203,
+                                    19
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PanelContainer",
+                                      "rect": [
+                                        113,
+                                        633,
+                                        57,
+                                        19
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            121,
+                                            635,
+                                            41,
+                                            15
+                                          ],
+                                          "variation": "C10XB",
+                                          "text": "Stranger"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        174,
+                                        640,
+                                        35,
+                                        5
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        213,
+                                        635,
+                                        103,
+                                        15
+                                      ],
+                                      "variation": "C10B",
+                                      "text": "2/15 · next Acquainted"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                113,
+                                658,
+                                203,
+                                62
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    123,
+                                    663,
+                                    184,
+                                    51
+                                  ],
+                                  "variation": "C12B",
+                                  "text": "Hi, I'm Pip! These quick radishes are ready in no time. Plant them here!"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                113,
+                                726,
+                                203,
+                                47
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    113,
+                                    726,
+                                    203,
+                                    47
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        113,
+                                        726,
+                                        203,
+                                        47
+                                      ],
+                                      "variation": "CmdPrimary",
+                                      "text": "Gift"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                800,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "On your farm · no Request, Gift full width (q(222), PIP-TALK-S2)"
             }
           ]
         }

@@ -2713,6 +2713,11 @@ func open_resident(id: String) -> bool:
 	_show_resident(d)
 	return true
 
+## Whether the resident bar offers Request here: not on the player's own farm (q(222) ②, Pip as the new-player
+## guide there; his newbie requests stay at the Travel Post), so the bar does not ask an open request there either.
+func resident_asks_here() -> bool:
+	return surface != "farm"
+
 ## RES-KAI-TALK / RESIDENT-GIFT-MYSTERY: with the resident's bar open, an affinity change is a FloatText pill
 ## (Affinity tone) over the bar's top-left, `+2 · first chat today`, and their answer replaces the bubble line until
 ## another resident's bar opens. Returns false when the bar is not showing that resident (the caller floats it).
@@ -2744,7 +2749,8 @@ static func affinity_text(ev: Dictionary) -> String:
 func _show_resident(d: Dictionary) -> void:
 	var data := d.duplicate()
 	data.portrait = _portrait(str(d.portrait))
-	var ask := resident_ask(view, str(d.id))
+	data.request = resident_asks_here()
+	var ask := resident_ask(view, str(d.id)) if data.request else ""
 	if ask != "": data.line = ask   # NPC-5: with a request open the bar asks it, in the request card's words (李白 q(46))
 	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
 	var bar := UiResidentBar.new(data)
