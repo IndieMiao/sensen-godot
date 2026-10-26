@@ -536,6 +536,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted (the whole-pond shot)
 			p0_zoom(_pinch.value / float(step[1]))
 			p0_zoom_end()
+		"nofoam":   # SGODOT-272's before shots: the shore foam off
+			for w in find_children("*", "FishingWater", true, false): w.water_material.set_shader_parameter("has_foam_contact", false)
 		_: return false
 	return true
 

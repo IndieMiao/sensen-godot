@@ -3,6 +3,9 @@
 
 First run export_pond_foam_contacts.gd in the offline pond preview project.
 Only foam assets are written; bank geometry, pond polygons and bed art stay intact.
+--merge (SGODOT-272): contacts exported from another pond list (--ponds=res://assets/p0/p0_ponds.json) add their
+masks to the bundled ones: the pattern and the catalog's entries stay as they are; the manifest gains the entries and
+that list's path and sha256 (ponds_sha256), the catalog's own still checked by catalog_sha256.
 """
 import argparse
 import json
@@ -45,10 +48,17 @@ def bake_pattern():
     Image.fromarray(np.uint8(np.round(np.dstack([channels[0], froth, channels[1]]) * 255))).save(OUT / 'foam_pattern.png')
 
 
-def bake_contacts(data):
+def bake_contacts(data, merge=False):
     width, height = 384, 512
     xx, zz = np.meshgrid((np.arange(width) + .5) * 12 / width, -(np.arange(height) + .5) * 16 / height)
     manifest = {'water_y': data['water_y'], 'catalog_sha256': data['catalog_sha256'], 'size': [width, height], 'distance_metres_per_unit': 1.0, 'entries': []}
+    if merge:
+        manifest = json.loads((OUT / 'manifest.json').read_text())
+        assert manifest['water_y'] == data['water_y'] and manifest['catalog_sha256'] == data['catalog_sha256']
+        assert manifest['size'] == [width, height]
+        ids = {e['id'] for e in data['entries']}
+        manifest['entries'] = [e for e in manifest['entries'] if e['id'] not in ids]
+        manifest['ponds'] = {**manifest.get('ponds', {}), data['ponds_path']: data['ponds_sha256']}
     for entry in data['entries']:
         shore = Image.open(ROOT / 'assets/ponds' / (entry['template_id'] + '_shore.png')).getchannel('R')
         distance = np.minimum(np.asarray(shore.resize((width, height), Image.Resampling.BILINEAR), dtype=float) / 255 * 2, 1)
@@ -74,7 +84,9 @@ def bake_contacts(data):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('contacts', type=Path)
+    parser.add_argument('--merge', action='store_true', help='add these ponds to the bundled masks (another pond list)')
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
-    bake_pattern()
-    bake_contacts(json.loads(args.contacts.read_text()))
+    if not args.merge:
+        bake_pattern()
+    bake_contacts(json.loads(args.contacts.read_text()), args.merge)
