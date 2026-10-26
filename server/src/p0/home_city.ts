@@ -269,7 +269,8 @@ export function changeOpen(c: P0Content, s: P0State, now: number): { open: boole
 }
 
 /**
- * choose_home {city, spot} (a new player's first pick) and change_home {city, spot} (the free change, q(161)). With
+ * choose_home {city, spot} (a new player's first pick) and change_home {city, spot} (the free change, q(161); q(216) B,
+ * user 10-27: the home city itself too, to move the pin). With
  * `at: [lat, lng]` (q(216), SGODOT-342: a free pin, 0.2.11 on) the farm stands at that point instead, checked by
  * pinRefusal; `spot` is then not read (an older client sends only `spot`).
  * Everything on the farm goes along (q(161) ②); the old home becomes a city visited (④). Requests to hand in at home

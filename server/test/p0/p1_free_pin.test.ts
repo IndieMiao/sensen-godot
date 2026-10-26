@@ -9,6 +9,7 @@ import { citySet, homeRules, homeSpots, pinArea, pinBlocks, pinRefusal } from '.
 import type { P0Event } from '../../src/p0/progress.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
+import { dayKey, rolloverAfter } from '../../src/p0/rules.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -157,6 +158,25 @@ describe('choose_home and change_home with a free pin', () => {
     const tokyoPin = freePoint(TOKYO, 2);
     const again = run(opened, first.state, { type: 'change_home', city: NYC, at: [tokyoPin.lat, tokyoPin.lng] }, T0 + 3_600_000);
     expect(again.ok ? 'ok' : again.code).toBe('home_out_of_range');
+  });
+
+  it('q(216) B (user 10-27): the free change may move the pin within the home city; the day turns at its own 04:00', () => {
+    const p0 = freePoint(TOKYO, 6), p1 = freePoint(TOKYO, 2);
+    const first = run(opened, pending(), { type: 'choose_home', city: TOKYO, at: [p0.lat, p0.lng] });
+    if (!first.ok) throw new Error(first.code);
+    const now = T0 + 3_600_000, key = dayKey(opened, first.state, now);
+    const r = run(opened, first.state, { type: 'change_home', city: TOKYO, at: [p1.lat, p1.lng] }, now);
+    if (!r.ok) throw new Error(r.code);
+    expect(r.state.travel.home).toBe(TOKYO);
+    expect(r.state.travel.farm_at).toEqual([p1.lat, p1.lng]);
+    expect(r.state.travel.home_set).toEqual(citySet(opened, TOKYO));
+    expect(r.state.travel.home_changes).toBe(1);
+    expect(r.state.travel.visits[TOKYO]).toBeUndefined();   // the home is not a city visited
+    expect((r.events as P0Event[]).find(e => e.kind === 'home')).toEqual({ kind: 'home', action: 'changed', city: TOKYO, from: TOKYO, spot: -1, dropped: [] });
+    expect(dayKey(opened, r.state, now)).toBe(key);
+    expect(r.state.travel.day_hold?.until).toBe(rolloverAfter(opened, first.state, key));   // no longer than the day it was
+    const again = run(opened, r.state, { type: 'change_home', city: TOKYO, at: [p0.lat, p0.lng] }, now);
+    expect(again.ok ? 'ok' : again.code).toBe('home_set_for_good');   // still once
   });
 });
 
