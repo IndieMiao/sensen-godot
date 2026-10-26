@@ -33,6 +33,7 @@ import { homeOf } from './travel.js';
 import { homeFacts } from './home.js';
 import { decorView } from './decor.js';
 import { titlesView } from './titles.js';
+import { guideView } from './guide.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
@@ -62,6 +63,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     map_markers: mapMarkers(c, s, now),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
+    guide: guideView(c, s, now),   // SGODOT-341: the new-player guide's step (or the recover entry to show), {step: null, end} when off
     home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, ...travelShown(c, s.travel), today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)

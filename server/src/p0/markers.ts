@@ -14,6 +14,7 @@
  *   the outpost marks them seen (noteSeenAt, from presence). No locked pins in P0.
  * - event ★ (§9.3.3, SGODOT-275 P1 exit): a place the event venue table (content/map_events.json) lights, from 2 h before
  *   its event starts until it ends; after every other kind. The table ships empty: only the field is kept for now.
+ * New-player guide (SGODOT-341): while it is on, only the pins its current step names (guide.ts guideMarkers).
  * First session (q(48)): until Pond Catch is handed in, only tracked markers show (Reed Pond's !, then home's ✓), so
  * minutes 5–9 have one goal. `more` counts the other reasons at the same place behind the one shown, for the pin card's
  * ` · +N more` (q(103)); the Market Board's open slots are one reason (the card writes `Market Board · 2 requests`). A resident's open fish request lights their outpost only once the player can land such a
@@ -30,11 +31,12 @@ import { progressOf, requestState, stageIndex } from './residents.js';
 import { skillLevel } from './rules.js';
 import { catalog, offerOf, owns } from './shops.js';
 import type { P0State } from './state.js';
+import { guideMarkers, guideOn } from './guide.js';
 
 export type MarkerKind = 'deliver' | 'request' | 'new' | 'event';
 export interface MapMarker {
   place: string; kind: MarkerKind;
-  why: { request?: string; resident?: string; item?: string; event?: string; tracked?: true };
+  why: { request?: string; resident?: string; item?: string; event?: string; guide?: string; tracked?: true };   // guide: the guide step (or recover entry) lighting it (SGODOT-341)
   more?: number;   // other reasons at this place behind this one (q(103) ` · +N more`); absent when none
 }
 
@@ -116,7 +118,7 @@ function landable(c: P0Content, s: P0State, fish: string[]): string[] {
 const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
 
 export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
-  const all: MapMarker[] = [];
+  const all: MapMarker[] = guideMarkers(c, s, now);   // the guide's pins first (tracked), SGODOT-341
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   for (const board of BOARDS) {
     const place = board === 'stall' ? 'home' : homeSetOf(c, s)?.market ?? null;
@@ -160,7 +162,8 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
   // one marker per place, the strongest; then deliver > request > new > event, tracked first within a kind
   const order = (m: MapMarker) => RANK[m.kind] * 2 + (m.why.tracked ? 0 : 1);
   const best = new Map<string, MapMarker>(), reasons = new Map<string, Set<string>>();
-  const kept = firstSession(c, s) ? all.filter(m => m.why.tracked) : all;
+  // the new-player guide on (SGODOT-341, 339 §2): only its step's pins; else the first session: tracked ones only
+  const kept = guideOn(s) ? all.filter(m => m.why.guide) : firstSession(c, s) ? all.filter(m => m.why.tracked) : all;
   for (const m of kept.sort((a, b) => order(a) - order(b))) {
     if (!best.has(m.place)) best.set(m.place, m);
     if (!reasons.has(m.place)) reasons.set(m.place, new Set());

@@ -5,6 +5,7 @@ import { addPlots, clearNewBeds } from './garden.js';
 import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, writtenCluster, type TravelState } from './travel.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { placeOf } from './world.js';
+import { freshGuide, legacyGuide, type GuideState } from './guide.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -191,6 +192,7 @@ export interface P0State {
   facilities?: Facility[];       // P1 (SGODOT-239): facilities on plots
   facility_count?: number;       // facilities ever built (their ids)
   fires: number;                 // pots ever started (first fire is the tutorial ring)
+  guide?: GuideState;            // SGODOT-341 new-player guide: step and counts (guide.ts); older saves are legacy, no version of its own
   title?: string;                // q(180): the title worn, a stable id (titles.ts); absent until the player picks one, never filled in
   rng: number;
   seq: number;
@@ -200,8 +202,12 @@ export const emptyDay = (key = ''): P0Day => ({
   key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
 });
 
-/** opts.pending: the client creating the save can offer the home pick (SGODOT-303, routes' x-p0-features). */
-export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player), opts: { pending?: boolean } = {}): P0State {
+/** opts.pending: the client creating the save can offer the home pick (SGODOT-303, routes' x-p0-features);
+ * opts.guide: it can show the new-player guide (SGODOT-341), so the save starts on the guide's first step. */
+export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player), opts: { pending?: boolean; guide?: boolean } = {}): P0State {
+  const guide = freshGuide(c, now, !!opts.guide);
+  // 339 decides whether a guided save still gets Pond Catch (guide.pond_catch false: none); every other save does
+  const pondCatch = guide.step === null || c.guide?.pond_catch !== false;
   const plots: Plot[] = [];
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
@@ -215,14 +221,14 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
     homestead: { level: 1, plaque: [] },
     residents: {},
-    boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
+    boards: { stall: pondCatch ? [{ req: tutorialRequest(c, now), refill_at: 0 }] : [], market: [] }, req_done: [],
     presence: { left_at: null, last_at: 0, space: null, place: null },
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
     cast: null, stove: null, queue: null, burners: [], cabinet: [],
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
-    requests: [{ ...c.requests.tutorial, status: 'open' }],
+    requests: pondCatch ? [{ ...c.requests.tutorial, status: 'open' }] : [],
     gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
@@ -231,6 +237,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     seen: [],
     facilities: [], facility_count: 0,
     fires: 0,
+    guide,
     rng: seed, seq: 0,
   };
 }
@@ -345,6 +352,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   letGoAway(c, s);
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
+  s.guide ??= legacyGuide(now);   // SGODOT-341: a save from before the guide never gets it (all of them, test players too)
   // P1 (SGODOT-239, q(59) §1.1): facilities, and the 10 plots a save already at Homestead Lv3 has from this version on
   // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
   s.facilities ??= [];
