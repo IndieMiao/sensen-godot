@@ -3022,9 +3022,15 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
 		"reason": str(bar.get("request_reason", ""))}
 
+## Residents met at every outpost of a type (§9.4.3, q(222) ①: Pip at every Travel Post; his request counts wherever
+## he is met). The server places him at the home set's post only for the map (home_city.residentPlace).
+const ANY_OUTPOST := {"res_pip": "Travel Post"}
+
 ## The request card's `Deliver to` (ResidentRequestCard): the resident and the outpost the player finds them in, from
 ## the player's home set (view.residents[id].place, `Nadia · Mission Market Square`); the name alone without one.
+## One met at every outpost of a type says `any` it (`Pip · any Travel Post`, 不知火舞 344 6aeaa6a7).
 static func _deliver_to(view_: Dictionary, id: String, name: String) -> String:
+	if ANY_OUTPOST.has(id): return "%s · any %s" % [name, ANY_OUTPOST[id]]
 	var place := str(view_.get("residents", {}).get(id, {}).get("place", ""))
 	var where := str(P0Outposts.find(place).get("name", "")) if place != "" else ""
 	return "%s · %s" % [name, where] if where != "" else name
