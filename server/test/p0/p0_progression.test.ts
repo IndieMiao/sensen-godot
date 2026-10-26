@@ -70,14 +70,15 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     expect(s.skills.fishing).toBe(50);
   });
 
-  it('two first Good dishes give 15 + 30 Cooking XP and unlock the Lv2 soup recipe', () => {
+  it('two first Good dishes give 15 + 30 Cooking XP and Cooking Lv2 gives the Grilled Fish card (q(221))', () => {
     let s = fresh();
     s.bag.push({ id: 'fish_crucian', qty: 3 }, { id: 'crop_herb', qty: 2 });
     s = goodDish(s, ['fish_crucian']);
     expect(s.skills.cooking).toBe(15);
     s = goodDish(s, ['fish_crucian', 'crop_herb'], T + 20_000);
     expect(s.skills.cooking).toBe(45);
-    expect(s.cookbook).toContain('dish_fish_soup');
+    expect(s.cookbook).toContain('dish_grilled_fish');
+    expect(s.cookbook).not.toContain('dish_fish_soup');   // the soup card now comes from Nadia's first request (q(218))
     expect(s.inbox.granted.filter(k => k === 'level:cooking:2')).toHaveLength(1);
     expect(s.skills.farming).toBe(0);
     expect(s.skills.fishing).toBe(0);

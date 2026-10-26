@@ -1157,7 +1157,9 @@ const DAY_ACTIONS := {"farming:6": ["Show Workbench", "show_workbench"]}
 ##   detail    recipe cards only (`New recipe: Herb Grilled Fish`), else nothing
 ##   tip       the next level (`Next Lv4 · Tomato, Chili, Row Hoe · 150 XP`, its new things this season); the account's
 ##             first level-up teaches instead, a level that changes the day says `Today changes: …` (q(69))
-##   time      the account's first ≤ 3 s, later ones 1.5 s; `Use bait` when the first one gave bait
+##   time      the account's first ≤ 3 s, later ones 1.5 s; the first Fishing level-up (Lv2) ≤ 3 s too, with `Use bait`
+##             when its bait is in the bag, whichever level-up of the account it is (q(215) A: a guided account's first
+##             is Cooking Lv2, which teaches; its Fishing Lv2 keeps Use bait and Tips the next level)
 static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Dictionary:
 	var skill := str(ev.get("skill", "farming"))
 	var lv := int(ev.get("level", 2))
@@ -1187,8 +1189,10 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 	var detail := ("New recipe: " + ", ".join(recipes)) if not recipes.is_empty() else ""
 	# Tip: the next level, except the account's first (the teaching line) and a level that changes the day (q(69)).
 	var tip := LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv)))
-	var action := "Use bait" if first and bait != "" else ""
-	var action_id := "use_bait" if first and bait != "" else ""
+	var first_fishing := skill == "fishing" and lv == 2
+	var use_bait := first_fishing and bait != "" and bag_count(view, bait) > 0
+	var action := "Use bait" if use_bait else ""
+	var action_id := "use_bait" if use_bait else ""
 	# Farming Lv6 changes the day with an action (q(59) §1.6): the full banner up to 3 s and `Show Workbench` (the
 	# camera only, LOCK-08). Cooking Lv4's banner keeps its accepted 1.5 s (q(69)).
 	var day := DAY_ACTIONS.has("%s:%d" % [skill, lv])
@@ -1197,7 +1201,7 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 		action = str(a[0])
 		action_id = str(a[1])
 	return {kind = "level_up", level = str(lv), title = title, subtitle = subtitle, rewards = rewards, detail = detail,
-		tip = tip, action = action, action_id = action_id, seconds = 3.0 if first or day else 1.5}
+		tip = tip, action = action, action_id = action_id, seconds = 3.0 if first or day or first_fishing else 1.5}
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.

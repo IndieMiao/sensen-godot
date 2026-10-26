@@ -362,6 +362,9 @@ func test_resident_profile_sheet_from_the_name_on_the_bar() -> void:
 func test_affinity_on_the_open_bar_floats_a_pill_and_puts_the_answer_in_the_bubble() -> void:
 	assert_str(P0Ui.affinity_text({"delta": 2, "reason": "chat"})).is_equal("+2 · first chat today")
 	assert_str(P0Ui.affinity_text({"delta": -2, "reason": "gift", "verdict": "not_a_fan"})).is_equal("−2 · not a fan")
+	# q(220): a resident's first dish reads first gift, whatever the verdict (不知火舞: no `loved it` beside it)
+	assert_str(P0Ui.affinity_text({"delta": 10, "reason": "gift", "verdict": "loved", "first": true})).is_equal("+10 · first gift")
+	assert_str(P0Ui.affinity_text({"delta": 3, "reason": "gift", "verdict": "loved"})).is_equal("+3 · loved it")
 	var ui := _ui(true)
 	ui.set_view(_resident_view())
 	await get_tree().process_frame

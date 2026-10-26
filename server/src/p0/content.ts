@@ -228,7 +228,8 @@ export interface P0Content {
     /** q(171): what first reaching Kindred gives, `{name}` the resident's — `Postcard from Pip` into the Passport (its text
      * their Kindred line) and the title `Pip's Best Friend`. */
     kindred?: { postcard: string; title: string };
-    gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
+    gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number };
+      first: number };   // q(220): a resident's first dish from you
     mystery_line: string;
   };
   residents: Record<string, ResidentDef>;

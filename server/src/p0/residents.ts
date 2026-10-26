@@ -30,13 +30,14 @@ export function stageIndex(c: P0Content, points: number): number {
 const stageAt = (c: P0Content, name: string) => Math.max(0, c.affinity.stages.findIndex(([n]) => n === name));
 
 /** Points change, never below the floor of the current stage (q(33): a stage never goes back). */
-function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason: string, now: number, events: P0Event[], verdict?: string): void {
+function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason: string, now: number, events: P0Event[], verdict?: string,
+  first?: boolean): void {
   const r = residentState(s, id);
   const floor = c.affinity.stages[stageIndex(c, r.affinity)][1];
   const before = r.affinity;
   r.affinity = Math.max(floor, r.affinity + delta);
   events.push({ kind: 'affinity', resident: id, delta: r.affinity - before, total: r.affinity,
-    stage: c.affinity.stages[stageIndex(c, r.affinity)][0], reason, ...(verdict ? { verdict } : {}) });
+    stage: c.affinity.stages[stageIndex(c, r.affinity)][0], reason, ...(verdict ? { verdict } : {}), ...(first ? { first } : {}) });
   const kindred = c.affinity.stages.findIndex(([n]) => n === 'Kindred');
   if (kindred > 0 && stageIndex(c, r.affinity) >= kindred && r.kindred_at === undefined) grantKindred(c, s, id, now, events);
 }
@@ -183,12 +184,22 @@ export function giftClues(c: P0Content, s: P0State): Record<string, { resident: 
   return out;
 }
 
+/**
+ * q(220): the first edible dish a resident ever receives from you gives a flat +10 instead of giftPoints (no Perfect or
+ * Chef's Touch on top), once per resident; the Mystery Dish stays −2 and, being a gift, uses that first time up. An
+ * empty gift day = never given one (no save field). giftPoints and its verdict stay as they are: Gift Clues read them.
+ */
+function firstGift(c: P0Content, s: P0State, id: string, item: string): boolean {
+  return (s.residents?.[id]?.gift_day ?? '') === '' && dishParts(item).base !== c.cooking.mystery.id;
+}
+
 /** view.residents[id].gift_points: what giving each dish in the bag to this resident adds (giftPoints' delta, the
- * Mystery Dish's −2 too) — the gift drawer's `♥ +3` and `Gift · +3`. Null below Fishing Lv7. */
+ * Mystery Dish's −2 too, +10 for a resident's first gift) — the gift drawer's `♥ +3` and `Gift · +3`. Null below Fishing Lv7. */
 export function giftPointsView(c: P0Content, s: P0State, id: string): Record<string, number> | null {
   const def = residentDef(c, id);
   if (!def || skillLevel(c, s, 'fishing') < GIFT_CLUES_LEVEL) return null;
-  return Object.fromEntries(bagDishes(c, s).map(item => [item, giftPoints(c, s, def, item).delta]));
+  return Object.fromEntries(bagDishes(c, s).map(item =>
+    [item, firstGift(c, s, id, item) ? c.affinity.gift.first : giftPoints(c, s, def, item).delta]));
 }
 
 export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown; item?: unknown }, now: number, events: P0Event[]): Refusal | null {
@@ -203,9 +214,10 @@ export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown
   if (count(s.bag, item) < 1) return { code: 'not_enough', detail: { item, have: 0 } };
   take(s.bag, item, 1);   // a gift meal from another resident may be passed on (§12.4: Gifted dishes can go to residents)
   events.push({ kind: 'item', id: item, delta: -1 });
+  const first = firstGift(c, s, id, item);   // before the gift day below is written
   r.gift_day = s.day.key;
   const pts = giftPoints(c, s, def, item);
-  addAffinity(c, s, id, pts.delta, 'gift', now, events, pts.verdict);
+  addAffinity(c, s, id, first ? c.affinity.gift.first : pts.delta, 'gift', now, events, pts.verdict, first);
   return null;
 }
 
