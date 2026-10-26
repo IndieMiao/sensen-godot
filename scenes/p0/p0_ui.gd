@@ -3008,6 +3008,9 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	if int(P0Logic.content().get("affinity", {}).get("request", 0)) > 0:
 		reward.append("+%d Friendship" % int(P0Logic.content().affinity.request))
 	if int(req.get("coins", 0)) > 0: reward.append("%d coins" % int(req.coins))
+	# q(224) ①: a request that teaches a recipe (Nadia's first, q(218)) ends on `New recipe`, no dish name; the
+	# delivery's float names it (`New recipe · Fresh Fish Soup`).
+	if str(q.get("reward", {}).get("recipe", "")) != "": reward.append("New recipe")
 	return {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
 		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
 		"line": text, "needs": [need] if kind != "" else [], "reward": " · ".join(reward),

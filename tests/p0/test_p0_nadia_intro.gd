@@ -46,3 +46,13 @@ func test_the_thanks_line_names_the_homes_beginner_pond() -> void:
 		str(P0Logic.content().fishing.places.pond_san_francisco_06.name))
 	assert_str(P0Logic.request_thanks(v, "req_res_nadia_six_radishes")).is_equal("")
 	assert_str(P0Logic.request_thanks(v, "req_res_nadia_1")).is_equal("")
+
+## q(224) ①: A Fresh Radish's card ends its reward line on `New recipe` (no dish name); a request without a recipe does not.
+func test_a_recipe_request_card_says_new_recipe() -> void:
+	var req := {"id": "req_res_nadia_radish", "kind": "crop", "item": "crop_radish", "qty": 1, "coins": 20, "have": 0, "ready": false}
+	var v := _nadia({"request": req, "request_state": "open"})
+	var reward := "+%d Friendship · 20 coins" % int(P0Logic.content().affinity.request)
+	assert_str(str(P0Ui._request_card_data(v, "res_nadia", P0Logic.resident_bar(v, "res_nadia")).reward)).is_equal(reward + " · New recipe")
+	req = {"id": "req_res_nadia_six_radishes", "kind": "harvest", "item": "crop_radish", "qty": 6, "coins": 20, "have": 0, "ready": false}
+	v = _nadia({"request": req, "request_state": "open"})
+	assert_str(str(P0Ui._request_card_data(v, "res_nadia", P0Logic.resident_bar(v, "res_nadia")).reward)).is_equal(reward)
