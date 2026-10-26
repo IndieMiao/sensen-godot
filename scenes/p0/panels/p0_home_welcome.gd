@@ -65,6 +65,9 @@ func _init(row_: Dictionary = {}, safe_bottom := 0.0) -> void:
 		climate = str(row.get("climate", "")), landmark = P0Travel.landmark_stamp(id)}, "")   # as HOME-PICK's row, not picked
 	city.name = "City"
 	city.custom_minimum_size.x = 0   # the card's column, not the list's 344
+	var inner := city.get_node("Row") as Control   # the list's row sits 8 in for its picked ground; the card's starts at
+	inner.offset_left = 0                          # the padding (row 101 51:160754 at 21 = the card's 20 + its 1 px edge)
+	inner.offset_right = 0
 	city.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(city)
 	var line := UiKit.label(LINE, UiTokens.STYLE_BODY_R14)

@@ -359,6 +359,11 @@ func test_a_city_near_opens_on_the_welcome_card() -> void:
 	assert_str(flow.welcome.start.label).is_equal("Start here")
 	assert_str(flow.welcome.other.label).is_equal("Choose another city")
 	assert_object(flow.welcome.find_child("Close", true, false)).is_null()   # no ×, no later
+	# row 101 51:160752: the card 16 in from the side; its city row's thumb at the card's padding (20), not the list's 8 more
+	var card: Control = flow.welcome.card
+	var thumb := flow.welcome.find_child("Row", true, false).get_child(0) as Control
+	assert_float(card.global_position.x).is_equal(16.0)
+	assert_float(thumb.global_position.x - card.global_position.x).is_equal(20.0)
 	(r[1] as Node).free()
 
 ## Start here: that city's spots at once; the spot page's back comes back to the card.
