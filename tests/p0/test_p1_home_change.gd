@@ -48,16 +48,23 @@ func test_set_for_good_is_read_only() -> void:
 	assert_array(_labels(row).filter(func(t): return t != "")).is_equal(["Home city · San Francisco", "Set for good"])   # no ›
 	assert_object(row.find_child("Hit", true, false)).is_null()
 
-func test_the_change_page_greys_the_home_and_picks_nothing() -> void:
+## q(216) ⑨ (HOME-CHANGE-PICK 9:132751 / -SAME 92:164061): the home city reads and picks as any other, `Your home city`
+## its third line; nothing picked when the page opens.
+func test_the_change_page_lets_the_home_be_picked_and_picks_nothing() -> void:
 	var page: Control = auto_free(PickPage.new(0.0, 0.0, Pick.SF.id))
 	page.size = Vector2(360, 800)
 	add_child(page)
 	page.show_cities({"open": Pick.OPEN, "near": Pick.SF}, "")
 	await await_idle_frame()
 	assert_array(_labels(page)).contains(["Change home city", "Your farm and everything on it move with you.", "Your home city"])
-	assert_bool(page.rows[Pick.SF.id].disabled).is_true()
+	var home_row = page.rows[Pick.SF.id]
+	assert_bool(home_row.disabled).is_false()
+	assert_bool(home_row.grey).is_false()
 	assert_bool(page.rows.values().any(func(r): return r.picked)).is_false()
 	assert_str(page.key.reason).is_equal("Pick a city")
+	home_row.pressed.emit()   # -SAME: the home city picked, Continue on
+	assert_bool(home_row.picked).is_true()
+	assert_str(page.key.reason).is_equal("")
 	var back := page.find_child("Back", true, false) as Button
 	assert_str(back.text).is_equal("‹  Settings")
 	var left := []

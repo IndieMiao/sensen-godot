@@ -59,14 +59,18 @@ static func answer(path: String, data: Variant) -> void:
 static func waiting(path: String) -> bool: return _waiting.has(path)
 static func clear() -> void: _waiting.clear()
 
-## Why a row cannot be picked (its third line, HOME-PICK-2 / q(205) ④), "" when it can: the home it already is (the
-## change), a small town, a city not open yet.
+## A row's third line (HOME-PICK-2 / q(205) ④), "" for none: why it cannot be picked (a small town, a city not open
+## yet), or — in a change of home — `Your home city`, which can be picked (q(216) ⑨: re-pin the farm in the same city;
+## HOME-CHANGE-PICK 9:132751).
 static func note(row: Dictionary, home := "") -> String:
 	if home != "" and str(row.get("id", "")) == home: return "Your home city"
 	match str(row.get("status", "")):
 		"open": return ""
 		"small": return "Small town · pick a nearby city"
 		_: return "Not open yet · pick a nearby city"
+
+## Whether a row can be picked: an open city (the home city too, q(216) ⑨).
+static func can_pick(row: Dictionary) -> bool: return str(row.get("status", "")) == "open"
 
 ## The list's parts in order (HOME-PICK-1, NOIP 2771:162818): with a city near, the `Near you` title and its row; then
 ## `Recommended` and each climate group's title and rows — the open cities in the server's order, the near one not
@@ -75,8 +79,8 @@ static func note(row: Dictionary, home := "") -> String:
 static func sections(open: Array, near: Variant, matches: Variant = null, home := "") -> Array:
 	var out: Array = []
 	if matches is Array:
-		for r in matches: if note(r, home) == "": out.append({kind = "row", row = r})
-		for r in matches: if note(r, home) != "": out.append({kind = "row", row = r})
+		for r in matches: if can_pick(r): out.append({kind = "row", row = r})
+		for r in matches: if not can_pick(r): out.append({kind = "row", row = r})
 		return out
 	var near_id := ""
 	if near is Dictionary and not (near as Dictionary).is_empty():

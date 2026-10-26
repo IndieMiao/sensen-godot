@@ -14,7 +14,8 @@ extends Control
 ##   2773:182352), no list. The key follows the city picked either way.
 ##   CHANGE (HOME-CHANGE-PICK 2647:135097, q(188) ④ / q(205) ④; SGODOT-303 PR-4), from Settings: BackPill
 ##   `‹  Settings` 12 / 16; `Change home city` at 72 and `Your farm and everything on it move with you.` at 106; the
-##   field at 137 and the list from 193. Nothing picked when it opens; the home city reads grey, `Your home city`.
+##   field at 137 and the list from 193. Nothing picked when it opens; the home city reads and picks as any other, its
+##   third line `Your home city` (q(216) ⑨, HOME-CHANGE-PICK 9:132751 / -SAME 92:164061).
 ## Emits picked(row), unavailable(text), back_pressed (CHANGE) and asks the host to read with read_cities(query) (the host answers with
 ## show_cities / show_failed).
 
@@ -48,7 +49,7 @@ const SEARCH_WAIT_S := 0.3   # a search goes out once the typing stops this long
 
 var heading := "Choose your home city"
 var line := "Your farm, outposts and first pond will be here. You can change it once while your farm is new."
-var home := ""               # a change of home: the city it is now (grey, `Your home city`)
+var home := ""               # a change of home: the city it is now (`Your home city`, q(216) ⑨)
 var choice := ""             # the city picked
 var query := ""
 var open_rows: Array = []
@@ -268,7 +269,7 @@ func _row(r: Dictionary) -> Control:
 	var id := str(r.get("id", ""))
 	var shown := {cluster = id, name = str(r.get("name", "")), region = str(r.get("region", "")),
 		climate = str(r.get("climate", "")), landmark = P0Travel.landmark_stamp(id)}
-	var row = P0CityRow.new(shown, P0HomePick.note(r, home))
+	var row = P0CityRow.new(shown, P0HomePick.note(r, home), P0HomePick.can_pick(r))
 	row.picked = id == choice
 	row.pressed.connect(func(): set_choice(id))
 	rows[id] = row
