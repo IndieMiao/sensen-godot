@@ -2729,6 +2729,26 @@ func resident_affinity(ev: Dictionary, reply := "") -> bool:
 	ft.play(top_left + Vector2(_AFFINITY_INSET + ft.shown_size().x * 0.5, -_AFFINITY_ABOVE))
 	return true
 
+## Where a delivery's floats rise over the resident's open bar (不知火舞 on 344: the group over the bar, centred, 6 above
+## its top) — over the toast when one sits on the bar (the delivery's `Request complete`), so it never hides a line;
+## INF when the bar is not showing that resident.
+func resident_float_at(id: String) -> Vector2:
+	if modal_kind != "resident" or id != _resident or _modal == null or _modal.get_child_count() < 2: return Vector2.INF
+	var bar: Control = _modal.get_child(1)
+	var top := bar.global_position.y
+	var t: Control = _toasts._panel if _toasts else null   # laid out: the caller asks a frame after the toast showed
+	if t != null and t.is_visible_in_tree() and toast_text() != "": top = minf(top, t.get_global_rect().position.y)
+	return Vector2(bar.global_position.x + bar.size.x * 0.5, top - _AFFINITY_ABOVE) - root.global_position
+
+## The resident says `line` in the open bar's bubble (q(218): Nadia's soup recipe after A Fresh Radish), the bar redrawn
+## from the view; false when the bar is not showing that resident.
+func resident_say(id: String, line: String) -> bool:
+	if modal_kind != "resident" or id != _resident or _modal == null: return false
+	_reply = {"id": id, "line": line}
+	var d := P0Logic.resident_bar(view, id)
+	if not d.is_empty(): _show_resident(d)
+	return true
+
 ## `+2 · first chat today`, `−2 · not a fan` (RES-KAI-TALK, RESIDENT-GIFT-MYSTERY); the other reasons are 刘邦's
 ## wording pending 李白 (SGODOT-225).
 static func affinity_text(ev: Dictionary) -> String:
@@ -2850,9 +2870,7 @@ static func resident_ask(view_: Dictionary, id: String) -> String:
 	var r: Dictionary = view_.get("residents", {}).get(id, {})
 	var req = r.get("request", null)
 	if not (req is Dictionary) or str(r.get("request_state", "open")) != "open": return ""
-	for q in P0Logic.content().get("residents", {}).get(id, {}).get("requests", []):
-		if str(q.get("id", "")) == str(req.get("id", "")): return str(q.get("text", ""))
-	return ""
+	return str(P0Logic.resident_request(id, str(req.get("id", ""))).get("text", ""))
 
 ## RES-PIP data: face, name, role, stage, `Friendship have/need`, favourite style with a dish of that style.
 ## Details › has no page behind it in P0, so it stays hidden (TODO SGODOT-225 / 209: the resident's details page).
@@ -2921,7 +2939,9 @@ func open_resident_request(id: String) -> void:
 	if d.is_empty(): return
 	var cmd: Dictionary = d.get("request_cmd", {})
 	if str(cmd.get("type", "")) == "deliver":
-		close_modal()
+		# q(218) / 不知火舞 on 344: a request with a thanks line keeps the bar open — its floats rise over it, then the
+		# resident says the line (resident_say)
+		if P0Logic.request_thanks(view, str(cmd.get("request", ""))) == "": close_modal()
 		command.emit(cmd)
 		return
 	var data := _request_card_data(view, id, d)
@@ -2948,10 +2968,10 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	var text := ""
 	var need_line := ""
 	var title := "%s's request" % str(def.get("name", ""))
-	for q in def.get("requests", []):
-		if str(q.get("id", "")) == str(req.get("id", "")):
-			text = str(q.get("text", ""))
-			need_line = str(q.get("need_line", ""))
+	var q := P0Logic.resident_request(id, str(req.get("id", "")))
+	if not q.is_empty():
+		text = str(q.get("text", ""))
+		need_line = str(q.get("need_line", ""))
 	var kind := str(req.get("kind", ""))
 	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	var style := str(req.get("style", "")) if req.get("style", null) != null else ""

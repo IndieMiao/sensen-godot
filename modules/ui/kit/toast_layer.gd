@@ -99,10 +99,20 @@ static func card(severity: Severity, text: String, action := "") -> PanelContain
 static func fill(panel: PanelContainer, severity: Severity, text: String, action := "") -> void:
 	panel.add_theme_stylebox_override(&"panel", panel_style(severity))
 	(panel.find_child("Glyph", true, false) as TextureRect).texture = glyph(severity)
-	(panel.find_child("Text", true, false) as Label).text = text
+	(panel.find_child("Text", true, false) as Label).text = keep_units(text)
 	var a := panel.find_child("Action", true, false) as Label
 	a.text = (action + " ›") if action != "" and not action.ends_with("›") else action
 	a.get_parent().visible = action != ""
+
+static var _number_unit: RegEx
+## A number never wraps away from the word after it (不知火舞 on 344, 66948360: `Request complete ·` / `+20 coins`, not
+## `… +20` / `coins`): the space after a figure becomes a no-break space, in every toast. Only the label shows it;
+## what the toast says (current_text) keeps plain spaces.
+static func keep_units(text: String) -> String:
+	if _number_unit == null:
+		_number_unit = RegEx.new()
+		_number_unit.compile("(\\d) (?=\\p{L})")
+	return _number_unit.sub(text, "$1\u00a0", true)
 
 ## The panel's style for a severity (Toast R1): fill and edge per tone, the R1 padding, the soft float shadow.
 static func panel_style(severity: Severity) -> UiStyleBox:

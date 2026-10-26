@@ -60,10 +60,31 @@ function grantKindred(c: P0Content, s: P0State, id: string, now: number, events:
   events.push({ kind: 'kindred', resident: id, postcard: g.postcard, title: g.title });
 }
 
+/** A resident's request by id, from their line or their teaching requests (q(218)). */
+export function residentRequest(def: ResidentDef | null | undefined, id: string): ResidentRequest | undefined {
+  return def?.requests.find(q => q.id === id) ?? def?.intro_requests?.find(q => q.id === id);
+}
+const isIntro = (def: ResidentDef, id: string) => !!def.intro_requests?.some(q => q.id === id);
+
+/**
+ * q(218) ④⑤: the resident's next teaching request, or none. Only a save that went into the new-player guide (341's
+ * guide state, ended or not; never legacy) and has not started the resident's own line (`next` 0, none of it taken)
+ * has them; once both are handed in the line starts at `next` as before. One left undone stays after the guide ends.
+ */
+function nextIntro(c: P0Content, s: P0State, id: string): ResidentRequest | null {
+  const def = residentDef(c, id)!, r = residentState(s, id);
+  if (!def.intro_requests?.length || !s.guide || s.guide.end === 'legacy' || r.next !== 0) return null;
+  if (r.req && !isIntro(def, r.req.id)) return null;
+  return def.intro_requests.find(q => !r.intro_done?.includes(q.id)) ?? null;
+}
+
 /** The resident's next request, or why there is none: done for today, a stage away, or none left. */
 export function requestState(c: P0Content, s: P0State, id: string, now: number): { req: ResidentRequest | null; state: 'open' | 'accepted' | 'wait' | 'stage' | 'none'; need_stage?: string } {
   const def = residentDef(c, id)!, r = residentState(s, id);
-  if (r.req) return { req: def.requests.find(q => q.id === r.req!.id) ?? null, state: 'accepted' };
+  if (r.req) return { req: residentRequest(def, r.req.id) ?? null, state: 'accepted' };
+  // q(218) ②: a teaching request waits neither the 24 h after the last nor the day's one (§9.6.1 / §9.6.4 exception)
+  const intro = nextIntro(c, s, id);
+  if (intro) return stageIndex(c, r.affinity) < stageAt(c, intro.stage) ? { req: intro, state: 'stage', need_stage: intro.stage } : { req: intro, state: 'open' };
   const next = def.requests[r.next];
   if (!next) return { req: null, state: 'none' };
   if (def.one_per_day && r.done_day === s.day.key) return { req: next, state: 'wait' };
@@ -83,9 +104,10 @@ export function requestOpensIn(c: P0Content, s: P0State, id: string, now: number
   return Math.max(0, r.done_at + nextGap(c) - now);
 }
 
-/** Units the bag holds for a resident request (sow requests count plots sown since accepting). */
+/** Units the bag holds for a resident request (sow requests count plots sown since accepting, harvest requests the
+ * crop harvested since accepting, q(218)). */
 export function progressOf(c: P0Content, s: P0State, id: string, q: ResidentRequest): number {
-  if (q.need.kind === 'sow') return residentState(s, id).req?.progress ?? 0;
+  if (q.need.kind === 'sow' || q.need.kind === 'harvest') return residentState(s, id).req?.progress ?? 0;
   return haveFor(c, s, q.need, q.need.id ? [q.need.id] : []);
 }
 
@@ -224,7 +246,7 @@ export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown
 /** accept / deliver for a resident request (req_res_*): one line per resident, in order, one a day for Pip. */
 export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver' | 'drop', reqId: string, now: number,
   events: P0Event[], trackedCount: number): Refusal | null {
-  const owner = Object.keys(c.residents).find(id => c.residents[id].requests.some(q => q.id === reqId));
+  const owner = Object.keys(c.residents).find(id => residentRequest(c.residents[id], reqId));
   if (!owner) return { code: s.req_done.includes(reqId) ? 'request_done' : 'bad_request' };
   if (type === 'drop') return { code: 'cannot_drop' };
   const st = requestState(c, s, owner, now), r = residentState(s, owner);
@@ -241,7 +263,7 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
   if (st.state !== 'accepted') return { code: 'not_accepted' };
   const q = st.req!;
   let floor = 0;   // floor value of what is handed in: paid in full, like a system request (q(44))
-  if (q.need.kind === 'sow') {
+  if (q.need.kind === 'sow' || q.need.kind === 'harvest') {   // counted, nothing handed in (q(218) ②)
     if (r.req!.progress < q.qty) return { code: 'not_ready', detail: { progress: r.req!.progress, need: q.qty } };
   } else {
     const parts = pick(c, s, q.need, q.need.id ? [q.need.id] : [], q.qty);
@@ -257,7 +279,9 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
   const coins = floor + bonus;
   s.coins += coins;
   r.req = null;
-  r.next += 1;
+  const intro = isIntro(residentDef(c, owner)!, reqId);
+  if (intro) r.intro_done = [...(r.intro_done ?? []), reqId];   // q(218) ⑤: the line's `next` never moves for these
+  else r.next += 1;
   r.done_day = s.day.key;
   r.done_at = now;
   noteDone(s, reqId);
@@ -277,7 +301,7 @@ function grantReward(c: P0Content, s: P0State, owner: string, q: ResidentRequest
   if (rw.item) items.push(rw.item);
   if (rw.recipe && !s.cookbook.includes(rw.recipe)) {
     items.push([`recipe:${rw.recipe}`, 1]);
-    events.push({ kind: 'recipe', page: rw.recipe, from: 'request', resident: owner });
+    events.push({ kind: 'recipe', page: rw.recipe, from: 'request', resident: owner, request: q.id });
   }
   const bagged = grantItems(c, s, now, `req:${q.id}`, `${def.name}'s thanks`, items, events);
   if (bagged) for (const [id, n] of Object.entries(bagged)) events.push({ kind: 'item', id, delta: n });
@@ -317,8 +341,20 @@ export function learn(c: P0Content, s: P0State, cmd: { resident?: unknown }, now
 export function noteSown(c: P0Content, s: P0State, plots: number): void {
   for (const [id, def] of Object.entries(c.residents)) {
     const r = s.residents[id];
-    const q = r?.req && def.requests.find(x => x.id === r.req!.id);
+    const q = r?.req && residentRequest(def, r.req.id);
     if (q && q.need.kind === 'sow') r!.req!.progress = Math.min(q.qty, r!.req!.progress + plots);
+  }
+}
+
+/**
+ * q(218) ②: a crop harvested on the player's farm counts towards an accepted harvest request for it, up to its qty
+ * (only what comes in after accepting, like sow).
+ */
+export function noteHarvested(c: P0Content, s: P0State, crop: string, n: number): void {
+  for (const [id, def] of Object.entries(c.residents)) {
+    const r = s.residents[id];
+    const q = r?.req && residentRequest(def, r.req.id);
+    if (q && q.need.kind === 'harvest' && q.need.id === crop) r!.req!.progress = Math.min(q.qty, r!.req!.progress + n);
   }
 }
 

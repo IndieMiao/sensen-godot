@@ -86,7 +86,7 @@ export type BoardId = 'stall' | 'market';
  * distinct items.
  */
 export interface Need {
-  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow' | 'visit'; id?: string; rarity?: number; style?: string | string[];
+  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow' | 'harvest' | 'visit'; id?: string; rarity?: number; style?: string | string[];
   family?: Family; same?: boolean; distinct?: number;
   /** §9.6.3 regional templates: the home climate's regional items (zone), the home city's 2 regional fish (city), or
    * regional items of another climate (other_zone). One such item is drawn; max_rarity caps it (Local Flavor: Fine). */
@@ -115,6 +115,8 @@ export interface ResidentRequest {
   /** The request card's need line when the rule alone would mislead (q(46): the only P0 Rare fish is the Pond koi). */
   need_line?: string;
   reward?: ResidentReward;
+  /** q(218): what the resident says on the open bar once it is handed in (the client fills `{pond}`, the home's beginner pond). */
+  thanks?: string;
 }
 /** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
@@ -142,6 +144,9 @@ export interface FacilityDef {
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
   lines: Record<string, string>; requests: ResidentRequest[];
+  /** q(218): teaching requests before `requests`, only for a guided save that has not started the line (residents.ts
+   * introOn); kept out of `requests` so its indexes (ResidentState.next) never move. */
+  intro_requests?: ResidentRequest[];
   /** §7.5.3 / §7.16.3: the pages this resident teaches from Familiar, one a week; empty = none of their style yet. */
   teaches?: string[];
 }

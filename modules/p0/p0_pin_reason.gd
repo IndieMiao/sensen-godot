@@ -92,14 +92,11 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 			"need_name": P0Logic.item_name(view, str(r.get("item", ""))), "have": int(r.get("have", 0)),
 			"qty": int(r.get("qty", 1)), "ready": int(r.get("have", 0)) >= int(r.get("qty", 1)),
 			"tracked": str(r.get("status", "")) == "accepted", "deliver": "Deliver at the Stall"}
-	var residents: Dictionary = P0Logic.content().get("residents", {})
 	for rid in view.get("residents", {}):
 		var rv: Dictionary = view.residents[rid] if view.residents[rid] is Dictionary else {}
 		var q = rv.get("request", null)
 		if not (q is Dictionary) or str(q.get("id", "")) != id: continue
-		var def: Dictionary = {}
-		for d in residents.get(rid, {}).get("requests", []):
-			if str(d.get("id", "")) == id: def = d
+		var def := P0Logic.resident_request(str(rid), id)
 		var need: Dictionary = def.get("need", {})
 		var item := str(need.get("id", ""))
 		var style := str(need.get("style", ""))
@@ -136,16 +133,13 @@ static func taken(view: Dictionary) -> Array:
 				"accepted_at": accepted_at(r),   # q(143): when it was tracked (0 on an older server or save)
 				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name(view, "market"),
 				"deliver_go": "stall" if board == "stall" else "outpost:" + P0Outposts.home_id(view, "market")})
-	var residents: Dictionary = P0Logic.content().get("residents", {})
 	for rid in view.get("residents", {}):
 		var rv: Dictionary = view.residents[rid] if view.residents[rid] is Dictionary else {}
 		var q = rv.get("request", null)
 		if not (q is Dictionary) or str(rv.get("request_state", "")) != "accepted": continue
 		var r := request_of(view, str(q.get("id", "")))
 		if r.is_empty(): continue
-		var def: Dictionary = {}
-		for d in residents.get(rid, {}).get("requests", []):
-			if str(d.get("id", "")) == str(r.id): def = d
+		var def := P0Logic.resident_request(str(rid), str(r.id))
 		var need: Dictionary = def.get("need", {})
 		out.append(r.merged({"kind": str(q.get("kind", need.get("kind", ""))), "items": [str(r.item)] if str(r.item) != "" else [],
 			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + resident_place(rv, str(rid)),

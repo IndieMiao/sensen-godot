@@ -143,7 +143,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
     const st = requestState(c, s, id, now);
     if (!place || !st.req || (st.state !== 'open' && st.state !== 'accepted')) continue;
     const q = st.req, tracked = st.state === 'accepted';
-    const ready = q.need.kind !== 'sow' || tracked ? progressOf(c, s, id, q) >= q.qty : false;
+    const ready = (q.need.kind !== 'sow' && q.need.kind !== 'harvest') || tracked ? progressOf(c, s, id, q) >= q.qty : false;
     if (ready) all.push({ place, kind: 'deliver', why: { request: q.id, resident: id, ...(tracked ? { tracked: true as const } : {}) } });
     else if (tracked && q.need.kind === 'fish') {
       const pond = pondFor(c, s, landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)));

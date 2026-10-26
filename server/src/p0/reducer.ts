@@ -7,7 +7,7 @@ import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
-import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
+import { expireGiftMeals, giftResident, learn, noteHarvested, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { setLook, upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
@@ -260,6 +260,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         fits++;
         add(c, s, item, crop.yield);
         events.push({ kind: 'item', id: item, delta: crop.yield });
+        noteHarvested(c, s, item, crop.yield);   // q(218): Six Radishes counts what is harvested after accepting (a Quick Radish as a Radish)
         gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
         seedSaver(c, s, crop, plot, events);
         const first = `harvest:${item}`;

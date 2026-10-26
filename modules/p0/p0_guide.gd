@@ -15,6 +15,10 @@ static func home_pond(view: Dictionary) -> String:
 	var id := P0Outposts.home_id(view, "pond")
 	return id if id != "" else BEGINNER_POND
 
+## The home's beginner pond by name (`Fern Pond`, a generated home's own): Nadia's soup line (q(218) ①).
+static func home_pond_name(view: Dictionary) -> String:
+	return _place_name(view, home_pond(view))
+
 ## The TipCards of P0 (q(44), TUT-2): one sentence, no button, each shown once. TUT-2's eighth sentence, "Levels unlock
 ## gear, fish and seeds…", is the Tip line of the account's first level-up banner (P0Logic.LEVEL_TIP), never a card
 ## (q(86); TUT-2 frame note A-03 / TUT-3-10, 不知火舞 on 235-B2).

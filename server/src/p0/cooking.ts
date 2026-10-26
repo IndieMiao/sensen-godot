@@ -181,8 +181,8 @@ export function keptIndex(c: P0Content, s: P0State): KeptIndex {
   }
   const needs: { kind: string; rarity?: number }[] = [];
   for (const [rid, r] of Object.entries(s.residents)) {
-    const q = r.req ? c.residents[rid]?.requests.find(x => x.id === r.req!.id) : undefined;
-    if (!q || q.need.kind === 'sow') continue;
+    const def = c.residents[rid], q = r.req ? [...def?.requests ?? [], ...def?.intro_requests ?? []].find(x => x.id === r.req!.id) : undefined;
+    if (!q || q.need.kind === 'sow' || q.need.kind === 'harvest') continue;   // counted, nothing handed in
     if (q.need.id) ids.add(q.need.id); else needs.push(q.need);
   }
   const wanted = (id: string) => ids.has(id) || needs.some(n => itemKind(id) === n.kind && (n.rarity === undefined || (fishById(c, id)?.rarity ?? 0) === n.rarity));

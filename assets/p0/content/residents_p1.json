@@ -784,6 +784,36 @@
         "Kindred": "You're market family now!",
         "mystery": "HA! Well, it's food. Probably."
       },
+      "intro_requests": [
+        {
+          "id": "req_res_nadia_radish",
+          "title": "A Fresh Radish",
+          "text": "No fresh radishes anywhere this morning. Could you spare one?",
+          "stage": "Stranger",
+          "need": {
+            "kind": "crop",
+            "id": "crop_radish"
+          },
+          "qty": 1,
+          "coins": 20,
+          "reward": {
+            "recipe": "dish_fish_soup"
+          },
+          "thanks": "Here's my soup recipe. A fish from {pond} and a radish, that's all it takes."
+        },
+        {
+          "id": "req_res_nadia_six_radishes",
+          "title": "Six Radishes",
+          "text": "Radish buns for market day. Could you grow me six?",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "harvest",
+            "id": "crop_radish"
+          },
+          "qty": 6,
+          "coins": 20
+        }
+      ],
       "requests": [
         {
           "id": "req_res_nadia_1",

@@ -10,7 +10,7 @@ import type { P0Content } from './content.js';
 import { BOARDS, haveForRequest } from './boards.js';
 import type { P0Event } from './progress.js';
 import { haveFor } from './requests.js';
-import { progressOf, residentDef } from './residents.js';
+import { progressOf, residentDef, residentRequest } from './residents.js';
 import type { P0State } from './state.js';
 
 /** One taken request's count: `have` (the least of a basket's items), each item's for a basket, all capped at qty. */
@@ -29,7 +29,7 @@ export function takenCounts(c: P0Content, s: P0State): Map<string, TakenCount> {
     } else out.set(r.id, { qty: r.qty, have: Math.min(r.qty, haveForRequest(c, s, r)) });
   }
   for (const [id, rs] of Object.entries(s.residents ?? {})) {
-    const q = rs.req ? residentDef(c, id)?.requests.find(x => x.id === rs.req!.id) : undefined;
+    const q = rs.req ? residentRequest(residentDef(c, id), rs.req.id) : undefined;
     if (q) out.set(q.id, { qty: q.qty, have: Math.min(q.qty, progressOf(c, s, id, q)) });
   }
   return out;
