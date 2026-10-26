@@ -63,3 +63,13 @@ func test_the_teaching_recipe_request_card_says_new_recipe() -> void:
 	assert_str(card.call(_nadia({"request": req, "request_state": "open"}))).is_equal(reward)
 	req = {"id": "req_res_nadia_3", "kind": "crop", "item": "crop_radish", "qty": 6, "coins": 20, "have": 0, "ready": false}
 	assert_str(card.call(_nadia({"request": req, "request_state": "open"}))).is_equal(reward)   # the P1 line: unchanged
+
+## ResidentRequestCard: the card's title is the request's name and Deliver to names the outpost from the home set.
+func test_the_request_card_names_the_request_and_where_to_deliver() -> void:
+	var req := {"id": "req_res_nadia_radish", "kind": "crop", "item": "crop_radish", "qty": 1, "coins": 20, "have": 0, "ready": false}
+	var v := _nadia({"request": req, "request_state": "open", "place": "sh_market_1"})
+	var card := P0Ui._request_card_data(v, "res_nadia", P0Logic.resident_bar(v, "res_nadia"))
+	assert_str(str(card.title)).is_equal("A Fresh Radish")
+	assert_str(str(card.deliver_to)).is_equal("Nadia · %s" % str(P0Outposts.find("sh_market_1").name))
+	v.residents.res_nadia.place = "nowhere_1"
+	assert_str(str(P0Ui._request_card_data(v, "res_nadia", P0Logic.resident_bar(v, "res_nadia")).deliver_to)).is_equal("Nadia")
