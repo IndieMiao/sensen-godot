@@ -712,6 +712,10 @@ static func _resident_bars() -> Control:
 	var busy := pip.duplicate()
 	busy.merge({gift_reason = "Gift already given today", meal = false, lesson = false}, true)
 	v.add_child(_captioned(_at_336(UiResidentBar.new(busy)), "Choices=Stacked · Gift unavailable with its reason (NPC-5 layout)"))
+	var guide := pip.duplicate()
+	guide.merge({stage = "Stranger", stage_index = 0, have = 2, need = 15, next = "Acquainted", request = false, meal = false, lesson = false,
+		line = "Hi, I'm Pip! These quick radishes are ready in no time. Plant them here!"}, true)
+	v.add_child(_captioned(_at_336(UiResidentBar.new(guide)), "On your farm · no Request, Gift full width (q(222), PIP-TALK-S2)"))
 	return v
 
 static func _bag_headers() -> Control:

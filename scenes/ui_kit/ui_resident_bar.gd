@@ -7,8 +7,10 @@ extends UiDialogueCard
 ## A reason on Gift or Request turns the button unavailable with the reason as its label (LOCK-10, e.g.
 ## `Gift already given today`) and stacks both buttons on full-width rows
 ## (Choices=Stacked), so the reason fits.
-## data: {portrait, name, role, stage, stage_index, have, need, next, line, gift_reason, request_label, request_reason, meal, lesson,
-## meal_note}
+## `request: false` leaves Request out (Pip on the player's farm, q(222) ②): Gift alone on its row, full width, still
+## Primary; no empty slot and no placeholder key (不知火舞 on 340).
+## data: {portrait, name, role, stage, stage_index, have, need, next, line, gift_reason, request, request_label, request_reason,
+## meal, lesson, meal_note}
 ## (P0Logic.resident_bar builds it from the server view, SGODOT-228; `request_label` defaults to Request.)
 
 signal gift_pressed
@@ -24,7 +26,7 @@ const _CHOICE_GAP := 8.0             # Gift ↔ Request, Today’s meal ↔ Reci
 var data := {}
 
 var _gift: UiCommandButton
-var _request: UiCommandButton
+var _request: UiCommandButton   # null when data.request is false
 
 func _init(data_: Dictionary = {}) -> void:
 	super(data_.get("portrait", null), str(data_.get("name", "")), str(data_.get("role", "")), str(data_.get("line", "")))
@@ -32,16 +34,20 @@ func _init(data_: Dictionary = {}) -> void:
 	portrait_size = RESIDENT_PORTRAIT
 	profile_link = true
 	if str(data.get("stage", "")) != "": extra.add_child(_affinity())
-	var stacked := str(data.get("gift_reason", "")) != "" or str(data.get("request_reason", "")) != ""
+	var asks := bool(data.get("request", true))
+	var stacked := str(data.get("gift_reason", "")) != "" or (asks and str(data.get("request_reason", "")) != "")
 	var choices: BoxContainer = VBoxContainer.new() if stacked else HBoxContainer.new()
 	choices.add_theme_constant_override(&"separation", int(_CHOICE_GAP if not stacked else UiTokens.SPACE_WITHIN))
 	_gift = UiCommandButton.new("Gift", UiCommandButton.Kind.PRIMARY)
 	_gift.reason = str(data.get("gift_reason", ""))
 	_gift.activated.connect(func(): gift_pressed.emit())
-	_request = UiCommandButton.new(str(data.get("request_label", "Request")), UiCommandButton.Kind.SECONDARY)
-	_request.reason = str(data.get("request_reason", ""))
-	_request.activated.connect(func(): request_pressed.emit())
-	for b in [_gift, _request]:
+	var buttons := [_gift]
+	if asks:
+		_request = UiCommandButton.new(str(data.get("request_label", "Request")), UiCommandButton.Kind.SECONDARY)
+		_request.reason = str(data.get("request_reason", ""))
+		_request.activated.connect(func(): request_pressed.emit())
+		buttons.append(_request)
+	for b in buttons:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.fit_text = stacked   # a long reason fills the row, as on NPC-5
 		choices.add_child(b)
@@ -110,7 +116,7 @@ func progress() -> float:
 	return clampf(floorf(float(data.get("have", 0)) * 10.0 / float(need)) / 10.0, 0.0, 1.0)
 
 func gift_button() -> UiCommandButton: return _gift
-func request_button() -> UiCommandButton: return _request
+func request_button() -> UiCommandButton: return _request   # null without Request (q(222))
 
 class _Meter extends Control:
 	var progress := 0.0
