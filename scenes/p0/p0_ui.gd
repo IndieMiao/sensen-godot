@@ -154,6 +154,9 @@ func _ready() -> void:
 	# App copy is English-only (user rule 2026-09-04): keep the Localization autoload from translating P0 labels.
 	root.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	add_child(root)
+	voice_match = VoiceMatchLink.new()   # the profile's Voice Profile (SGODOT-349)
+	voice_match.name = "VoiceMatchLink"
+	add_child(voice_match)
 	pad = _TouchPad.new()
 	pad.set_anchors_preset(Control.PRESET_FULL_RECT)
 	pad.ui = self
@@ -1656,6 +1659,7 @@ func _notification(what: int) -> void:
 ## flies back into the grid, the drawer stays: int9 F2), the radial, then a card or drawer. True when it closed
 ## something; the world only leaves on false.
 func close_top_layer() -> bool:
+	if voice_blocks_back(): return true   # the voice-match page's own Back (SGODOT-349): the profile stays as it was
 	if _screen != null:   # SYS-LOADING / MAINT / UPDATE have no close: Back does nothing (q(74)) …
 		if _screen.kind == P0SysScreen.Kind.PLACE_FAIL: screen_back.emit(_screen.kind)   # … but Couldn't get there's is Go back (q(78))
 		return true
@@ -3100,6 +3104,14 @@ func open_gift(id: String, item := "") -> void:
 ## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
 ## details; Edit look opens the dressing room above the current world and comes back here.
 var _profile: P0ProfilePage
+## The voice-match H5 (VoiceMatchLink: the Android WebView over the whole screen, the system browser elsewhere), opened
+## from the profile's `Voice Profile ›` (SGODOT-349, 不知火舞 2ca37b44).
+var voice_match: VoiceMatchLink
+
+## Back belongs to the voice-match page while it is up and for the press that closed it (Godot 4.7 Android hands the
+## engine that press too): every P0 world asks this first, so neither the profile nor the world under it goes.
+func voice_blocks_back() -> bool:
+	return voice_match != null and voice_match.blocks_back_navigation()
 ## A panel opened from the profile (Skills, the Fish-dex and the cards it opens) keeps the profile behind its scrim,
 ## not the world (int10c 256 ⑧): the same page moves under each layer of that chain, so its figure isn't built again.
 ## Set by the profile's buttons; cleared when the chain goes back to the profile or out to the world.
@@ -3114,6 +3126,7 @@ func open_profile(look_saved := false) -> void:
 		_over_profile = true
 		open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
+	page.voice_pressed.connect(func(): voice_match.open("solo"))   # SGODOT-349: no transition of the game's own
 	page.collection_pressed.connect(func(key: String):
 		if key == "cities":
 			_over_profile = true

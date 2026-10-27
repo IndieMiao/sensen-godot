@@ -938,7 +938,8 @@ func p0_anchor() -> Vector2:
 	var at: Vector3 = _target.get("at", actor.position) if not _target.is_empty() else actor.position
 	return cam.unproject_position(at + Vector3(0, 1.0, 0))
 
-func is_back_navigation_locked() -> bool: return false
+## Back leaves the mine (AppRouter pops it), but not the press the voice-match page takes (SGODOT-349).
+func is_back_navigation_locked() -> bool: return rt != null and rt.ui.voice_blocks_back()
 
 func suspend() -> void:
 	close_card()
