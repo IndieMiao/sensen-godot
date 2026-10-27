@@ -46,10 +46,12 @@ class PermissionActivity : Activity() {
         answer(code == CODE && results.isNotEmpty() && results[0] == PackageManager.PERMISSION_GRANTED)
     }
 
-    // Gone without an answer (the system tore it down): a denial, so the next request can show its dialog.
+    // Gone without an answer: a denial, so the asker hears back and the next request can show its dialog. Home while
+    // the dialog is up, then the launcher icon, clears the task down to GodotActivity and finishes this one with the
+    // dialog (李元芳 #519 6436847433 ⑧: before, the page waited for an answer that never came).
     override fun onDestroy() {
         super.onDestroy()
-        if (isFinishing && !answered) answer(false)
+        if (!answered) answer(false)
     }
 
     private fun answer(granted: Boolean) {
@@ -58,7 +60,7 @@ class PermissionActivity : Activity() {
         val done = pending
         pending = null
         asking = null
-        if (!isFinishing) {
+        if (!isFinishing && !isDestroyed) {
             finish()
             overridePendingTransition(0, 0)
         }
