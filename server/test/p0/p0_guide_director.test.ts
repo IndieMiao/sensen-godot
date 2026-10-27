@@ -164,7 +164,13 @@ describe('off the path', () => {
       expect(r.qty('seed_quick_radish')).toBe(2);
       expect(r.s.guide!.n.resend).toBe(nth);
       const plots = r.sowQuick();
-      expect(r.view.recover).toBe('r_radish_wait');
+      // the resent quick ones growing: their own countdown, not a Radish's (苏烈 on #506)
+      expect(r.view).toMatchObject({ recover: 'r_quick_regrow', row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' } });
+      expect(r.view.row.ready_in).toBeGreaterThan(0);
+      r.now += 46 * S;
+      r.check();
+      expect(r.view).toMatchObject({ recover: 'r_quick_ripe', row: { line: 'Harvest 2 Quick Radishes' } });
+      r.now -= 46 * S;
       r.harvest(plots);
       expect(r.view.recover).toBeNull();
     }
@@ -177,6 +183,21 @@ describe('off the path', () => {
     r.do({ type: 'sow', plot, seed: 'seed_radish', space: 'home' }).do({ type: 'water', plot, space: 'home' });
     expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' } });
     expect(r.view.row.ready_in).toBeGreaterThan(3 * 3_600_000);
+  });
+  it('the soup still to make, no crop held, the resent quick ones growing: their countdown at S9 too (苏烈 on #506)', () => {
+    const r = new Run('director-soup-regrow').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1().fish(2);
+    r.s.energy.value = 100;
+    r.cook(['fish_crucian'], true);
+    expect(r.step).toBe('t_soup');
+    r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
+    r.check();
+    expect(r.view.pip.bang).toBe(true);
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    r.sowQuick();
+    expect(r.view).toMatchObject({ step: 't_soup', recover: 'r_quick_regrow', row: { countdown: 'crop_quick_radish', count: 2 } });
+    expect(r.view.row.ready_in).toBeGreaterThan(0);
   });
   it('a full bar at S8 skips the meal; the soup eaten before Nadia sends Today back to cooking, then to the pond', () => {
     const r = new Run('director-full-bar').pick();

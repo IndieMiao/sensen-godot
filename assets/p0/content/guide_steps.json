@@ -157,6 +157,8 @@
               }
             },
             "else": [
+              "r_quick_ripe",
+              "r_quick_regrow",
               "r_radish_wait",
               "r_radish_sow"
             ]
@@ -309,6 +311,8 @@
               ]
             },
             "else": [
+              "r_quick_ripe",
+              "r_quick_regrow",
               "r_radish_wait",
               "r_radish_sow"
             ]
@@ -427,20 +431,43 @@
         "pip": "While they grow, plant some lettuce. That one takes a few hours."
       },
       {
+        "id": "r_quick_ripe",
+        "when": {
+          "ripe": {
+            "crop_quick_radish": 1
+          }
+        },
+        "row": {
+          "line": "Harvest 2 Quick Radishes",
+          "icon": "crop_radish",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "plot": "teach"
+          }
+        ]
+      },
+      {
+        "id": "r_quick_regrow",
+        "when": {
+          "planted": {
+            "crop_quick_radish": 1
+          }
+        },
+        "row": {
+          "line": "Quick Radishes ready",
+          "icon": "seed_quick_radish",
+          "go": "home",
+          "countdown": "crop_quick_radish"
+        }
+      },
+      {
         "id": "r_radish_wait",
         "when": {
-          "any": [
-            {
-              "planted": {
-                "crop_quick_radish": 1
-              }
-            },
-            {
-              "planted": {
-                "crop_radish": 1
-              }
-            }
-          ]
+          "planted": {
+            "crop_radish": 1
+          }
         },
         "row": {
           "line": "Radish ready",
