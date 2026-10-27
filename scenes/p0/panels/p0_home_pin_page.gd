@@ -146,6 +146,8 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	credits.add_theme_constant_override(&"outline_size", 0)
 	credits.visible = false
 	add_child(credits)
+	# its size settles a frame after its font first changes: placed again then, or it stands a pixel off
+	credits.minimum_size_changed.connect(func(): if credits.visible: _place_credits(true))
 	# over the places' names (UiMapDestination.NAME_Z 1, drawn over every disc): the pin, the panel, the card and keys
 	for n in [pin, panel, card, loading_card, error_card, build, back_key, credits]: (n as CanvasItem).z_index = OVER_NAMES_Z
 	resized.connect(_keep_pin)
@@ -433,7 +435,7 @@ func _refresh() -> void:
 	# card, the key grey (不知火舞 342 3730603f)
 	loading_card.visible = not ready and not failed and land.visible
 	error_card.visible = failed
-	_place_credits(ready)
+	_place_credits(not failed)
 	var s := start_point()
 	back_key.visible = ready and not gliding and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
 	if not ready:
@@ -452,15 +454,18 @@ func _refresh() -> void:
 ## The map's credit line (q(133) ①; 不知火舞 342: as the map draws it, CityMapView's constants): over the real map only
 ## — not while reading or failed, not on the page's own flat map (the desktop, the tests) — 16 pt from the left, its
 ## bottom 6 pt over the card's top; a confirm card's scrim covers it.
-func _place_credits(ready: bool) -> void:
-	credits.visible = ready and not map is FlatMap and bool(map.pick_has_ground())
+## The credit line wherever the real map is in sight (not over the error card): 6 over the card's top, or over Build
+## here's while there is no card — reading, the glide (不知火舞 342 b68bc2c7).
+func _place_credits(on: bool) -> void:
+	credits.visible = on and not map is FlatMap and bool(map.pick_has_ground())
 	if not credits.visible: return
 	var k := float(map.pick_px_per_pt()) if map.has_method("pick_px_per_pt") else 1.0
 	var font := maxi(1, roundi(CityMapView.CREDITS_PT * k))
 	if credits.get_theme_font_size(&"font_size") != font: credits.add_theme_font_size_override(&"font_size", font)
 	var h := credits.get_combined_minimum_size().y
 	credits.size = Vector2(credits.get_combined_minimum_size().x, h)
-	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, card.position.y - CityMapView.CREDITS_GAP_PT * k - h)
+	var over: Control = card if card.visible else build
+	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, over.position.y - CityMapView.CREDITS_GAP_PT * k - h)
 
 ## The grey key's words: the place's own name while it fits the key, else its general word (q(216) ③).
 func _key_text() -> String:

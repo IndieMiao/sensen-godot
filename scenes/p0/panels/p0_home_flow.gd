@@ -150,7 +150,7 @@ func _welcome_map(fly: bool) -> void:
 	_pass_touches(false)
 	welcome.map = pick_map
 	if pick_map == null or not pick_map.has_method("pick_fly"):
-		_end_loading(true)
+		_end_loading()   # no flight: the card stands in its place the same frame (不知火舞 342 b68bc2c7)
 		if fly: welcome.slide_in(false)
 		else: welcome.slide_in(true, true)   # back to the card: it slides in again all the same (不知火舞 bce34a87)
 		return
