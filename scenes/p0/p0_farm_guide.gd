@@ -6,6 +6,7 @@ const NPCS := "res://assets/p0/outpost_npcs.json"
 const PIP := "res_pip"
 const TAG := "farm:guide_pip"
 const WATER_TAG := "farm:guide_water:"
+const GROWTH_TAG := "farm:guide_growth:"
 const STAND := Vector2i(5, 1)   # front/left of the first bed, between teaching plots 0/1; clear of Reed Bank's badge
 
 var farm: Node3D
@@ -15,6 +16,7 @@ var _waved := false
 var _wave_left := 0.0
 var _highlights := {}
 var _water_badges := {}
+var _growth_badges := {}
 
 func setup(host: Node3D) -> Node3D:
 	farm = host
@@ -43,6 +45,7 @@ func frame(view: Dictionary, dt: float) -> void:
 				_wave_left = player.get_animation("emote_wave").length
 	_highlight(view)
 	_water_marks(view)
+	_growth_marks(view)
 
 func _spawn() -> void:
 	var def: Dictionary = P0RoomAnchors.read_json(NPCS).get("npcs", {}).get(PIP, {})
@@ -97,10 +100,31 @@ func _water_marks(view: Dictionary) -> void:
 	for id in _water_badges:
 		if not wanted.has(id): farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE, Vector2.ZERO, false)
 
-## Pip stands beside the first teaching bed. Keep its droplet fully readable without moving his locked name tag;
+## S4 no longer marks the teaching plots: their growth is a crop fact, not an instruction to act. Rebuild from
+## the server's teaching-crop metadata on every visit. `view` already uses the ordinary session time projection.
+func _growth_marks(view: Dictionary) -> void:
+	var wanted := {}
+	if P0Guide.guide_on(view) and not farm.rt.ui.has_modal() and not farm.rt.ui.placing():
+		for plot in view.get("plots", []):
+			var id := int(plot.get("id", -1))
+			if id < 0 or id >= P0Garden.plot_count(view): continue
+			if P0Logic.quick_seed(view, str(plot.get("crop", ""))).is_empty(): continue
+			var state := str(plot.get("state", ""))
+			if state != "ready" and (state != "growing" or plot.get("ready_in") == null): continue
+			var at: Vector3 = farm.bp.cell_to_world(P0Garden.cell_of(id)) + Vector3(0, P0Garden.BED_H + 0.6, 0)
+			if farm.cam.is_position_behind(at): continue
+			wanted[id] = true
+			_growth_badges[id] = true
+			farm.rt.ui.badge(GROWTH_TAG + str(id), UiStatusBadge.State.READY if state == "ready" else UiStatusBadge.State.COUNTDOWN,
+				farm.cam.unproject_position(at), true, "" if state == "ready" else P0Logic.duration(float(plot.ready_in)))
+			_water_clear_of_pip(id, GROWTH_TAG)
+	for id in _growth_badges:
+		if not wanted.has(id): farm.rt.ui.badge(GROWTH_TAG + str(id), UiStatusBadge.State.COUNTDOWN, Vector2.ZERO, false)
+
+## Pip stands beside the first teaching bed. Keep its status and caption readable without moving his name tag;
 ## prefer just above the tag, or below it at the top edge of the world band. Neither mark takes the other's input.
-func _water_clear_of_pip(id: int) -> void:
-	var badge: UiStatusBadge = farm.rt.ui._badges.get(WATER_TAG + str(id))
+func _water_clear_of_pip(id: int, prefix := WATER_TAG) -> void:
+	var badge: UiStatusBadge = farm.rt.ui._badges.get(prefix + str(id))
 	var tag: Control = farm.rt.ui._npc_tags.get(TAG)
 	if badge == null or not badge.visible or tag == null or not tag.visible: return
 	var rect := badge.get_global_rect()
@@ -129,6 +153,7 @@ func hide_marks() -> void:
 	farm.rt.ui.npc_tag(TAG, "", Vector2.ZERO, false)
 	for outline in _highlights.values(): outline.visible = false
 	for id in _water_badges: farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE, Vector2.ZERO, false)
+	for id in _growth_badges: farm.rt.ui.badge(GROWTH_TAG + str(id), UiStatusBadge.State.COUNTDOWN, Vector2.ZERO, false)
 
 ## Farm suspension counts as leaving (including going inside): never disappear in front of the player.
 func leave() -> void:

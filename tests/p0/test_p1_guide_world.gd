@@ -333,3 +333,93 @@ func test_item_pulse_is_outside_the_grid_clip_and_follows_the_cell() -> void:
 	budget.follow()
 	assert_float(ring.global_position.x - before.x).is_equal_approx(12, 0.01)
 	budget.cancel()
+
+
+func _growing_view() -> Dictionary:
+	var v := _guide("t_sow_rest")
+	v.quick_seeds = [{id = "crop_quick_radish", seed = "seed_quick_radish", grow_s = 45}]
+	v.guide.marks = [{button = "quickbar:seed_lettuce", pulse = true}]
+	v.plots = [{id = 0, state = "growing", crop = "crop_quick_radish", ready_in = 45000},
+		{id = 1, state = "growing", crop = "crop_quick_radish", ready_in = 45000},
+		{id = 2, state = "growing", crop = "crop_lettuce", ready_in = 100000}]
+	return v
+
+func test_teaching_crop_countdowns_rebuild_without_plot_marks_tick_and_turn_ready() -> void:
+	var v := _growing_view()
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	guide._growth_marks(v)   # cold entry in S4: no earlier water-mark history and no plot marks
+	for id in [0, 1]:
+		var badge: UiStatusBadge = ui._badges[FarmGuide.GROWTH_TAG + str(id)]
+		assert_bool(badge.visible).is_true()
+		assert_int(badge.state).is_equal(UiStatusBadge.State.COUNTDOWN)
+		assert_str(badge.caption).is_equal("0:45")
+		assert_bool(badge._pill.visible).is_true()
+		assert_bool(badge._glyph.texture.resource_path.ends_with("status/countdown.svg")).is_true()
+		assert_int(badge.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_bool(ui._badges.has(FarmGuide.GROWTH_TAG + "2")).is_false()
+	guide._growth_marks(P0Logic.project(v, 1000))
+	assert_str(ui._badges[FarmGuide.GROWTH_TAG + "0"].caption).is_equal("0:44")
+	assert_int(v.plots[0].ready_in).is_equal(45000)   # no timer mutation / double subtraction
+	guide._growth_marks(P0Logic.project(v, 45000))
+	for id in [0, 1]:
+		var badge: UiStatusBadge = ui._badges[FarmGuide.GROWTH_TAG + str(id)]
+		assert_bool(badge.visible).is_true()
+		assert_int(badge.state).is_equal(UiStatusBadge.State.READY)
+		assert_str(badge.caption).is_empty()
+		assert_bool(badge._pill.visible).is_false()
+		assert_bool(badge._glyph.texture.resource_path.ends_with("status/ready.svg")).is_true()
+
+func test_growth_badges_need_real_crop_facts_and_clear_after_harvest_or_guide_end() -> void:
+	var v := _growing_view()
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	v.plots[0].ready_in = null
+	v.plots[1].state = "sown"
+	guide._growth_marks(v)
+	assert_dict(ui._badges).is_empty()   # missing timer is not an invented 0:45 / Ready
+	v = P0Logic.project(_growing_view(), 45000)
+	guide._growth_marks(v)
+	v.plots[0] = {id = 0, state = "tilled", crop = null}
+	guide._growth_marks(v)
+	assert_bool(ui._badges[FarmGuide.GROWTH_TAG + "0"].visible).is_false()
+	assert_bool(ui._badges[FarmGuide.GROWTH_TAG + "1"].visible).is_true()
+	v.guide.step = null
+	guide._growth_marks(v)
+	assert_bool(ui._badges[FarmGuide.GROWTH_TAG + "1"].visible).is_false()
+	v.guide.step = "t_harvest_quick"
+	v.quick_seeds = []
+	guide._growth_marks(v)
+	assert_bool(ui._badges[FarmGuide.GROWTH_TAG + "1"].visible).is_false()
+
+func test_countdown_caption_avoids_pip_and_hides_under_panels_offscreen_and_on_leave() -> void:
+	var v := _growing_view()
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	guide._growth_marks(v)
+	var badge: UiStatusBadge = ui._badges[FarmGuide.GROWTH_TAG + "0"]
+	ui.npc_tag(FarmGuide.TAG, "Pip", badge.get_global_rect().end, true)
+	var tag: UiNpcNameTag = ui._npc_tags[FarmGuide.TAG]
+	tag.position = badge.position + Vector2(0, badge.side())   # name covers the caption, not the clock
+	var name_rect := tag.get_global_rect()
+	guide._growth_marks(v)
+	assert_bool(badge.visible).is_true()
+	assert_bool(badge.get_global_rect().intersects(name_rect)).is_false()
+	assert_that(tag.get_global_rect()).is_equal(name_rect)
+	assert_bool(ui._marker_area().encloses(badge.get_global_rect())).is_true()
+	ui._open_modal(Control.new())
+	guide._growth_marks(v)
+	assert_bool(badge.visible).is_false()
+	ui.close_modal()
+	guide._growth_marks(v)
+	assert_bool(badge.visible).is_true()
+	guide.farm.cam.position.x += 100.0
+	guide._growth_marks(v)
+	assert_bool(badge.visible).is_false()
+	guide.farm.cam.position.x -= 100.0
+	guide._growth_marks(v)
+	guide.hide_marks()
+	assert_bool(badge.visible).is_false()
+	guide._growth_marks(v)
+	guide.leave()
+	assert_bool(badge.visible).is_false()
