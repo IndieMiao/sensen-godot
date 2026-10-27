@@ -57,6 +57,9 @@ const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
 signal test_account_requested(action: String)
 const TestAccounts := preload("res://modules/p0/p0_test_accounts.gd")
 var test_accounts = TestAccounts.new()
+const GuidePulses := preload("res://modules/p0/p0_guide_pulses.gd")
+var guide_pulses = GuidePulses.new()
+var _guide_pulse_wait := 0.0
 
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
@@ -177,6 +180,11 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
+	guide_pulses.follow()
+	_guide_pulse_wait -= dt
+	if _guide_pulse_wait <= 0.0:
+		_guide_pulse_wait = 0.1
+		_refresh_guide_pulses()
 	if _teach_left > 0.0:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
@@ -191,6 +199,66 @@ func _process(dt: float) -> void:
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
 	if _notice and _notice.visible: _place_notice()
+
+## Typed targets from the server; finding an existing control never opens a page or selects an item.
+func _refresh_guide_pulses() -> void:
+	var targets := {}
+	if screen_kind() == -1:
+		for mark in P0Guide.button_marks(view):
+			var key := str(mark.button)
+			if key in ["sow", "water", "harvest", "cast"] and _keys != null and not has_modal():
+				if str(fab_state().get("cmd", {}).get("type", "")) == key and bool(fab_state().get("enabled", false)):
+					if key != "cast" or space == "pond" and P0Guide.target_place(view, place):
+						targets[key] = {node = _keys.key(), shape = UiGuidePulse.Shape.CIRCLE}
+			elif key == "location" and hud != null and not has_modal():
+				var rect := hud.place_chip_rect()
+				targets[key] = {node = hud._place_chip, rect = Rect2(rect.position - hud._place_chip.global_position, rect.size)}
+			elif key.begins_with("quickbar:") and _bar != null and not has_modal():
+				targets[key] = {node = _bar.cell_for(key.trim_prefix("quickbar:")), flash = true}
+			elif key in ["gift", "request"] and modal_kind == "resident" and _modal != null and _resident == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
+				for bar in _modal.find_children("*", "UiResidentBar", true, false):
+					targets[key + ":" + _resident] = {node = bar._gift if key == "gift" else bar._request}
+			elif key == "cook" and modal_kind == "kitchen" and _modal != null:
+				var page := str(mark.get("page", ""))
+				for drawer in _modal.find_children("*", "P0KitchenDrawer", true, false):
+					targets["cook:" + page] = {node = drawer.guide_cook_target(page)}
+		for mark in P0Guide.guide_marks(view):
+			if not mark is Dictionary or not bool(mark.get("pulse", false)): continue
+			if str(mark.get("object", "")) == "stove" and space == "home" and not has_modal():
+				for id in _name_bars:
+					var bar: UiWorldNameBar = _name_bars[id]
+					if str(id).begins_with("room:use_stove_") and bar.visible and bar.is_expanded():
+						targets["object:stove"] = {node = bar}
+						break
+			var item := str(mark.get("item", ""))
+			if item != "" and modal_kind == "gift" and is_instance_valid(_bag) and str(_bag.gift_to.get("id", "")) == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
+				var cells := guide_gift_cells(_bag.grid, item)
+				for id in cells:
+					targets["item:" + id] = {node = cells[id], overlay = guide_item_overlay(_bag), shape = UiGuidePulse.Shape.CARD, radius = UiTokens.RADIUS_CELL}
+	guide_pulses.update(view, targets)
+
+## A server item mark names a base recipe; all visible qualities use their own cell, without selecting any.
+static func guide_gift_cells(grid: UiInventoryGrid, base: String) -> Dictionary:
+	var cells := {}
+	for item in grid.shown_items():
+		var id := str(item.get("id", ""))
+		if P0Logic.base_id(id) == base:
+			var cell := grid.cell_for(id)
+			if cell != null: cells[id] = cell
+	return cells
+
+## Outside the grid's clip, inside the drawer; a Node2D host avoids changing the PanelContainer's layout.
+static func guide_item_overlay(drawer: Control) -> Control:
+	var existing := drawer.get_node_or_null("GuidePulseHost/Overlay") as Control
+	if existing != null: return existing
+	var host := Node2D.new()
+	host.name = "GuidePulseHost"
+	drawer.add_child(host)
+	var overlay := Control.new()
+	overlay.name = "Overlay"
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	host.add_child(overlay)
+	return overlay
 
 func _build_hud() -> void:
 	hud = UiHud.new()
@@ -371,8 +439,8 @@ func hold_energy(energy: Dictionary) -> void:
 func _refresh_hud() -> void:
 	if hud == null: return
 	# No HUD before the first server view: an empty view would read as 0 Energy (red) and 0 coins, and its
-	# chips would still take taps.
-	hud.visible = not view.is_empty()
+	# chips would still take taps. None over the home pick either: its pages lie on the real map (PR-2b, HOME-WELCOME).
+	hud.visible = _hud_shown()
 	if view.is_empty(): return
 	if _hold_here != "" and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
 	var seen := view
@@ -486,7 +554,7 @@ func set_surface(name: String) -> void:
 	var world := name != "map"
 	# MAP-1 (§10.6.1): the map keeps the two-row HUD — avatar, Energy, coins, bell, Today, the place chip — but has no
 	# stick (drag and pinch browse it).
-	hud.visible = not view.is_empty()
+	hud.visible = _hud_shown()
 	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
 	_keys.visible = action and _modal == null
@@ -977,7 +1045,7 @@ func _name_bar_shift(r: Rect2) -> float:
 ## stays up and highlighted over that card while every other tag and icon button hides (NPC-G1, #57); under any other
 ## card or drawer all tags hide. A tag an open name strip covers fades out until the strip folds (#57). A tap on a
 ## shown tag is a tap on its NPC (tapped_card = id, as for icon buttons): the name is where players tap to talk.
-func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false, talking := false) -> void:
+func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false, talking := false, status := -1) -> void:
 	var t: UiNpcNameTag = _npc_tags.get(id)
 	if t == null:
 		t = UiNpcNameTag.new()
@@ -996,6 +1064,7 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 	t.visible = show and (_modal == null or over) and _marker_area().has_point(head_screen)
 	if not t.visible: return
 	t.text = text
+	t.status = status
 	t.highlight = highlight or talking
 	t.place_over(head_screen)
 	_keep_off_sides(t, Rect2(Vector2.ZERO, t.size))
@@ -2816,6 +2885,9 @@ func _show_resident(d: Dictionary) -> void:
 	data.request = resident_asks_here()
 	var ask := resident_ask(view, str(d.id)) if data.request else ""
 	if ask != "": data.line = ask   # NPC-5: with a request open the bar asks it, in the request card's words (李白 q(46))
+	if surface == "farm" and str(d.id) == "res_pip":
+		var line = P0Guide.pip(view).get("line")
+		if line is String and line != "": data.line = line
 	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
@@ -3219,8 +3291,19 @@ func _confirm_test_account(back: Callable) -> void:
 ## The home pick (SGODOT-303, P0HomeFlow): a new player's first pages over no world, or the change of home from
 ## Settings. Back closes a layer at a time (the confirm card, the spot page); on a first pick's city page it does
 ## nothing (there is nowhere before it), on the change's it goes back to Settings.
+## The two-row HUD is up: a view in, and no home pick open (its pages lie on the real map, PR-2b).
+func _hud_shown() -> bool:
+	return not view.is_empty() and not is_instance_valid(_home_flow_open)
+
+var _home_flow_open: Control
+
 func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
+	_home_flow_open = flow
+	if hud != null: hud.visible = false
+	flow.tree_exited.connect(func():
+		if _home_flow_open == flow: _home_flow_open = null
+		if hud != null: hud.visible = _hud_shown())
 	if test_accounts.is_test() and flow.change_from == "":
 		flow.return_main = func(): test_account_requested.emit("main")
 	flow.say.connect(func(text: String): toast(text))

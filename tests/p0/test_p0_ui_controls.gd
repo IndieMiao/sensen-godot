@@ -442,3 +442,21 @@ func test_the_today_chip_pulses_once_when_its_focus_row_changes() -> void:
 	assert_int(pulses.size()).is_equal(1)                                # GuidePulse Shape=Pill on the chip
 	await await_millis(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS + 120)
 	assert_int(ui.hud.find_children("*", "UiGuidePulse", true, false).size()).is_equal(0)   # once, then gone
+
+## PR-2b: no HUD over the home pick (its pages lie on the real map: HOME-WELCOME), back once it closes; a new view
+## while it is open does not bring it back.
+func test_the_home_pick_hides_the_hud_till_it_closes() -> void:
+	ui.set_view(_view())
+	ui.set_surface("map")
+	assert_bool(ui.hud.visible).is_true()
+	var session := P0Session.new()
+	session.transport = func(_m, _p, _b, _c): pass
+	var flow: Control = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, 0.0, 0.0, "gn-5391959")
+	ui.open_home_flow(flow)
+	assert_bool(ui.hud.visible).is_false()
+	ui.set_view(_view())
+	assert_bool(ui.hud.visible).is_false()
+	ui.close_modal()
+	await await_idle_frame()
+	assert_bool(ui.hud.visible).is_true()
+	session.free()

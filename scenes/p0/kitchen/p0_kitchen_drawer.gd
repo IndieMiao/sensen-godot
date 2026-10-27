@@ -117,6 +117,7 @@ var _book_chips: Control   # the Cookbook's filter chips (in their scroll window
 var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
+
 var _foot: HBoxContainer   # Experiment's Cook row
 var _titles: PanelContainer   # the Cookbook's title strip
 var _title_line: HFlowContainer
@@ -124,6 +125,10 @@ var _muscle_rule: ColorRect
 var _muscle: HBoxContainer
 var _pot_energy: Label
 var _tried: Label
+
+## Only the page the player has opened can pulse; the guide never changes the selection or filters.
+func guide_cook_target(page_id: String) -> Control:
+	return _recipe_button if tab == "cookbook" and selected_page == page_id else null
 
 
 ## q(16): the toast sits above the Cook row in Experiment, above the recipe's Cook on a Cookbook page.

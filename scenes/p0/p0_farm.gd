@@ -13,6 +13,7 @@ const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
+const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
 const Looks = preload("res://scenes/p0/p0_looks.gd")
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just above the board
@@ -39,6 +40,7 @@ const MAILBOX_TAP_PX := 40.0
 @onready var ground: MeshInstance3D = $Ground
 @onready var world_env: WorldEnvironment = $WorldEnvironment
 
+var _guide: Node3D
 var rt: P0Runtime
 var bp: FarmBlueprint
 var grid: BlueprintGrid
@@ -133,6 +135,7 @@ func is_back_navigation_locked() -> bool:
 var _held_layers: Array = []   # [CanvasLayer, its index], out of the tree while suspended
 
 func suspend() -> void:
+	if _guide != null: _guide.leave()
 	set_process(false)
 	visible = false
 	if world_env.environment: _saved_env = world_env.environment
@@ -361,6 +364,19 @@ func _fit_opening() -> void:
 	_place_camera()
 	_focus = opening_focus(cam, _focus, _house + home_mark(), actor.position, area)
 	_place_camera()
+	# 340 S2: only the initial guide framing includes Pip and the two teaching beds. No later step moves the camera.
+	if P0Guide.guide_on(rt.session.view) and bool(P0Guide.pip(rt.session.view).get("here", false)):
+		var points: Array[Vector3] = [actor.position, bp.cell_to_world(FarmGuide.STAND) + Vector3(0, 2.2, 0)]
+		for id in P0Guide.teaching_plots(rt.session.view): points.append(bp.cell_to_world(P0Garden.cell_of(id)))
+		_focus = guide_opening_focus(cam, _focus, points, area)
+		_place_camera()
+
+static func guide_opening_focus(camera: Camera3D, focus: Vector3, points: Array[Vector3], area: Rect2) -> Vector3:
+	var bounds := Rect2(camera.unproject_position(points[0]), Vector2.ZERO)
+	for point in points: bounds = bounds.expand(camera.unproject_position(point))
+	var old = ElasticZoom.ground_at(camera, bounds.get_center(), focus.y)
+	var centre = ElasticZoom.ground_at(camera, area.get_center(), focus.y)
+	return focus + old - centre if old != null and centre != null else focus
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
 ## top — at most what keeps `feet` FEET_ROOM above its bottom (opening_shift). `cam` is placed at `focus` already.
@@ -702,6 +718,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_decor.frame(v, dt)
 	if not _facilities.placing.is_empty() or not _decor.placing.is_empty():   # placement mode: no bed, key, card or prompt (q(23))
 		_hi.visible = false   # the preview's green / red square is the one outline on a bed meanwhile
+		if _guide != null: _guide.hide_marks()
 		return
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
@@ -713,6 +730,10 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_materials.frame(v, _card)
 	_hold_repeat()
 	_prompts(v)
+	if _guide == null:
+		_guide = FarmGuide.new().setup(self)
+		add_child(_guide)
+	_guide.frame(v, dt)
 	_teaching(v)
 
 func _sync_plots(v: Dictionary, dt: float) -> void:
@@ -950,6 +971,7 @@ func _hold_repeat() -> void:
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	var card := str(rt.ui.tapped_card)
+	if _guide != null and _guide.tap(screen, card): return
 	# The mine's EntryCard sits over the scene (passive, SGODOT-231): a tap on it is its button's; any other tap folds
 	# it and goes on (SGODOT-266).
 	if card == "" and _materials.tap_entry(screen): return
@@ -1012,6 +1034,10 @@ func _tap_card(id: String) -> bool:
 			if _facilities and _facilities.tap_card(id): return true   # P1: a greenhouse's strip or button
 			return _materials.tap_card(id)   # SGODOT-231: spot_* and workbench cards
 	return true
+
+## Existing nearby Gift entry may address the farm's guide, exactly as a resident in an outpost.
+func p0_near_resident() -> String:
+	return str(_guide.near_resident()) if _guide != null else ""
 
 ## The sign itself (its icon button and strip arrive by id, _tap_card); small, so the door beside it stays the house.
 ## Nothing above the board: with the button hidden (beyond 8 m) that spot is not the sign's (苏烈 on #59).

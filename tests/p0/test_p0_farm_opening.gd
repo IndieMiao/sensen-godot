@@ -52,6 +52,19 @@ func test_without_an_inset_the_opening_shot_is_unchanged() -> void:
 	FarmCamera.place(cam, (f.focus as Vector3) + Vector3.UP * 0.7)
 	assert_vector(P0Farm.opening_focus(cam, f.focus, f.mark, f.spawn, _area(0.0))).is_equal(f.focus)
 
+func test_guide_opening_frames_pip_teaching_beds_and_player_without_changing_zoom() -> void:
+	var cam := _camera()
+	var f := _farm()
+	var bp := P0Garden.blueprint()
+	var points: Array[Vector3] = [f.spawn, bp.cell_to_world(P0Farm.FarmGuide.STAND) + Vector3(0, 2.2, 0),
+		bp.cell_to_world(P0Garden.cell_of(0)), bp.cell_to_world(P0Garden.cell_of(1))]
+	var zoom := cam.size
+	FarmCamera.place(cam, (f.focus as Vector3) + Vector3.UP * 0.7)
+	var focus := P0Farm.guide_opening_focus(cam, f.focus, points, _area(0.0))
+	FarmCamera.place(cam, focus + Vector3.UP * 0.7)
+	for point in points: assert_bool(_area(0.0).has_point(cam.unproject_position(point))).is_true()
+	assert_float(cam.size).is_equal(zoom)
+
 ## The move is capped by the feet: never closer than FEET_ROOM to the quick bar, even when the mark can't clear.
 func test_the_shift_stops_before_the_feet_reach_the_quick_bar() -> void:
 	var area := Rect2(0, 136, 360, 572)   # 136 … 708
