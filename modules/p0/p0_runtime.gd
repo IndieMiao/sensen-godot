@@ -45,6 +45,8 @@ var last_first_catch_xp := 0
 ## A landed catch the world shows itself (the P0 pond's arc to the hand) keeps its reply's floats here until the fish is
 ## in the hand; the world lets them rise then (take_catch_floats; 不知火舞 on 231: `+25 XP` crossed the fish in flight).
 var catch_floats: Array = []
+const GuideFeedback := preload("res://modules/p0/p0_guide_feedback.gd")
+var _guide_feedback := GuideFeedback.new()
 ## …and the toast of a request that catch filled (q(134) ⑤; 周瑜 on #302): it waits for the same hand, then for the
 ## catch's Caught! card (take_catch_toast).
 var catch_toast := ""
@@ -171,6 +173,7 @@ func _init() -> void:
 	session.state_changed.connect(_on_state)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
 	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
+	session.sent.connect(func(cmd: Dictionary): _guide_feedback.sent(cmd, ui.view))
 	session.refused.connect(func(_c, _d, _cmd): _net_ok())
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
@@ -557,6 +560,7 @@ func _read_home_places(v: Dictionary) -> void:
 
 func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
+	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
 	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
@@ -580,6 +584,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		at = ui.inbox_float_at()
 		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
+	if not guide_feedback.fish.is_empty(): floats.append(guide_feedback.fish)
 	# q(218) A Fresh Radish (不知火舞 on 344, 812e77be): handed in on the resident's open bar, the reply floats one group over
 	# the bar — `+20 coins`, `+5 Friendship`, `New recipe · Fresh Fish Soup` — and the resident says the thanks line after.
 	var thanks := {}   # {resident, line}
@@ -768,6 +773,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
 			"parcel":
+				if not guide_feedback.fresh and str(ev.get("key", "")).begins_with("guide_resend:"): continue
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one InboxNotice card under the bell for the
 				# whole reply (BAG-5-2, q(87)).
 				if not parcels_said:
@@ -825,10 +831,16 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					var card := P0Logic.title_card(str(lv.skill), int(lv.level), str(t))
 					ui.queue_card.call_deferred(func(): ui.show_title(card))
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
+				if not guide_feedback.fresh and str(ev.get("resident", "")) == "res_pip" and events.any(func(e):
+					return str(e.get("kind", "")) == "guide" and str(e.get("action", "")) == "resend"): continue
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
 				# A thanks delivery's +5 joins its float group over the bar, `+5 Friendship` (不知火舞 on 344)
 				if over_bar.is_finite() and str(ev.get("reason", "")) == "request" and str(ev.get("resident", "")) == str(thanks.resident):
 					floats.append({kind = "affinity", key = str(ev.resident), text = "%+d Friendship" % int(ev.get("delta", 0)), tone = UiFloatText.Tone.AFFINITY})
+				elif not guide_feedback.resends.is_empty() and str(ev.get("resident", "")) == "res_pip":
+					# A first chat and a resend can share one reply. Group them over the same bar, not two overlapping pills.
+					if int(ev.get("delta", 0)) != 0:
+						guide_feedback.resends[0].affinity.append({kind = "affinity", key = "res_pip", text = P0Ui.affinity_text(ev), tone = UiFloatText.Tone.AFFINITY})
 				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
 				elif not ui.resident_affinity(ev, reply):
 					if int(ev.get("delta", 0)) != 0:
@@ -969,6 +981,30 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	elif ui.modal_kind == "resident" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_resident(ui._resident)   # affinity, gift and request states follow the reply
+	# After rebuilding the bar: the confirmed resend reply wins over the next step's Pip line (C2 e028023c).
+	for resend in guide_feedback.resends: _show_guide_resend.call_deferred(resend)
+
+## Seeds only fly/float for the portion actually put in the bag. Parcels use the one ordinary InboxNotice above
+## (q(229)); closing Pip before the reply never opens him again. His farm model/lifetime belongs to C2.
+func _show_guide_resend(resend: Dictionary) -> void:
+	if not is_inside_tree(): return
+	if ui.surface == "farm": ui.resident_say("res_pip", str(resend.line))
+	var n := int(resend.bagged)
+	var parts: Array = resend.get("affinity", []).duplicate()
+	var id := str(resend.item)
+	if n > 0:
+		parts.append({kind = "item", key = "guide_resend:" + id, amount = n, fmt = "%s " + P0Logic.item_name(ui.view, id),
+			tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(id)})
+	if parts.is_empty(): return
+	# Let the rebuilt bubble settle before measuring its top.
+	await get_tree().process_frame
+	if not is_inside_tree(): return
+	var at := ui.resident_float_at("res_pip") if ui.surface == "farm" else Vector2.INF
+	if not at.is_finite(): at = anchor()
+	ui.queue_floats(parts, at)
+	if n <= 0: return
+	var bag := ui.bag_target()
+	UiItemFly.launch(ui.root, at, bag, P0Logic.icon(id), n, 0.0, func(): UiItemFly.bump(bag))
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
