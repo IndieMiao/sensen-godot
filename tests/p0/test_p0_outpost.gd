@@ -7,6 +7,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 
 const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
+const ShopArt := preload("res://scenes/coffee_shop/coffee_shop_art.gd")
 
 class Sample extends "res://scenes/p0/p0_outpost.gd":
 	var used: Array = []
@@ -774,6 +775,42 @@ func test_the_card_room_opens_between_the_player_and_lou() -> void:
 		assert_bool(band.grow(0.5).has_point(at)).override_failure_message("Lou point %s, band %s" % [at, band]).is_true()
 	assert_bool(r.anchor("use_blackjack_table") != null).is_true()
 	assert_bool(band.has_point(r.cam.unproject_position(r.pick_point("use_blackjack_table")))).is_true()
+
+## The card room on the tavern kit hides its `TAVERN` sign (不知火舞 351 e38e8e85, 上官婉儿 on it): the sign is merged
+## into the back_dressing batch, so its own 2368 triangles are cut from it — none of them left, the rest of the batch
+## whole. All or none: asked again (none of it there now), the batch is left as it is. Another room
+## on the kit keeps its sign. A tavern rebatched since warns here first.
+func test_the_card_room_hides_the_tavern_sign() -> void:
+	var tris := func(n: Node) -> int:
+		var all := []
+		ShopArt._surfaces(n, Transform3D.IDENTITY, all)
+		return all.reduce(func(t, e): return t + (e.index as PackedInt32Array).size() / 3, 0)
+	var r := _room("sf_card_room_1", true)
+	await get_tree().process_frame
+	var batch: Node3D = r.art.get_node("back_dressing")
+	assert_int(tris.call(batch)).is_equal(32408 - 2368)
+	assert_bool((r.art.get_node("tavern_sign") as Node3D).visible).is_false()
+	var sign := (load("res://assets/rooms/tavern/tavern_sign.glb") as PackedScene).instantiate()
+	auto_free(sign)
+	var own := []
+	ShopArt._surfaces(sign, (r.art.get_node("tavern_sign") as Node3D).transform, own)
+	var keys := {}
+	for e in own:
+		for v in e.vertices: keys[ShopArt._mm(e.xf * v)] = true
+	# none of the sign left: no triangle with all its corners on the sign's (its box also holds halves of the two
+	# wall lanterns and a back-bar piece, which stay)
+	var left := []
+	ShopArt._surfaces(batch, batch.transform, left)
+	var on_sign := 0
+	for e in left:
+		for i in range(0, e.index.size(), 3):
+			if range(3).all(func(k): return keys.has(ShopArt._mm(e.xf * e.vertices[e.index[i + k]]))): on_sign += 1
+	assert_int(on_sign).is_equal(0)
+	assert_int(r.art.hide_module("tavern_sign")).is_equal(0)   # nothing of it left to cut: warned, the batch as it was
+	assert_int(tris.call(batch)).is_equal(32408 - 2368)
+	var bar: Node = (load("res://scenes/tavern/tavern_art.tscn") as PackedScene).instantiate()
+	add_child(auto_free(bar))
+	assert_int(tris.call(bar.get_node("back_dressing"))).is_equal(32408)   # the kit itself keeps it
 
 ## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
 ## (world.keeper_looks, role × climate × 3), under their own name plate.

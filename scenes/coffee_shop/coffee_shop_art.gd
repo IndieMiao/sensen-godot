@@ -5,7 +5,8 @@ extends Node3D
 var _assembled := false
 var module_count := 0
 var material_overrides: Dictionary = {}
-var merged_sources: Dictionary = {}
+var merged_sources: Dictionary = {}   # module name → the render batch it is merged into
+var _modules: Dictionary = {}   # module name → its asset (file, colliders)
 
 func _ready() -> void:
 	if _assembled: return
@@ -13,7 +14,7 @@ func _ready() -> void:
 	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(kit_path + "/layout.json"))
 	material_overrides = layout.get("material_overrides", {})
 	for batch: Dictionary in layout.get("render_batches", []):
-		for source_name: String in batch.sources: merged_sources[source_name] = true
+		for source_name: String in batch.sources: merged_sources[source_name] = str(batch.name)
 	var material := StandardMaterial3D.new()
 	material.resource_name = "SharedShopAtlas"
 	material.albedo_texture = load(kit_path + "/room_albedo_ao.png")
@@ -52,6 +53,7 @@ func _vec(a: Array) -> Vector3:
 	return Vector3(float(a[0]), float(a[1]), float(a[2]))
 
 func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMaterial3D) -> void:
+	_modules[str(placement.name)] = asset
 	var pivot := Node3D.new()
 	pivot.name = placement.name
 	pivot.position = _vec(placement.position)
@@ -93,6 +95,64 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	_set_material(model, applied, "glass" in str(asset.name))
 	for box: Dictionary in asset.colliders:
 		_add_box(pivot, box)
+
+## Takes a module out of the picture (SGODOT-351: the card room hides the tavern's `TAVERN` sign, 不知火舞 351 e38e8e85,
+## 上官婉儿 on it): its pivot is hidden, and when a render batch merged it, the batch's triangles that are the module's
+## own — every corner on one of its placed vertices, to the millimetre — are cut out, its shadow with them. All of them
+## or none: a count that is not the module's own triangle count (the batch rebuilt since) warns and leaves the batch
+## whole. Returns the triangles cut.
+func hide_module(module: String) -> int:
+	var pivot := get_node_or_null(NodePath(module)) as Node3D
+	if pivot == null or not _modules.has(module): return 0
+	pivot.visible = false
+	var batch := get_node_or_null(NodePath(str(merged_sources.get(module, "")))) as Node3D
+	if batch == null: return 0
+	var own := []
+	var model := (load(kit_path + "/" + str(_modules[module].file)) as PackedScene).instantiate()
+	_surfaces(model, pivot.transform, own)
+	model.free()
+	var keys := {}
+	var want := 0
+	for e in own:
+		for v in e.vertices: keys[_mm(e.xf * v)] = true
+		want += e.index.size() / 3
+	var cut := []
+	var hit := 0
+	_surfaces(batch, batch.transform, cut)
+	for e in cut:
+		var keep := PackedInt32Array()
+		for i in range(0, e.index.size(), 3):
+			if keys.has(_mm(e.xf * e.vertices[e.index[i]])) and keys.has(_mm(e.xf * e.vertices[e.index[i + 1]])) \
+					and keys.has(_mm(e.xf * e.vertices[e.index[i + 2]])): continue
+			keep.append_array([e.index[i], e.index[i + 1], e.index[i + 2]])
+		e["keep"] = keep
+		hit += (e.index.size() - keep.size()) / 3
+	if hit != want:
+		push_warning("%s: %d of %s's %d triangles found in %s, the batch left whole" % [kit_path, hit, module, want, batch.name])
+		return 0
+	var meshes := {}
+	for e in cut:
+		var mi: MeshInstance3D = e.node
+		if not meshes.has(mi): meshes[mi] = ArrayMesh.new()
+		var arrays: Array = mi.mesh.surface_get_arrays(e.surface)
+		arrays[Mesh.ARRAY_INDEX] = e.keep
+		(meshes[mi] as ArrayMesh).add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		(meshes[mi] as ArrayMesh).surface_set_material(e.surface, mi.mesh.surface_get_material(e.surface))
+	for mi in meshes: (mi as MeshInstance3D).mesh = meshes[mi]
+	return hit
+
+static func _mm(v: Vector3) -> Vector3i:
+	return Vector3i((v * 1000.0).round())
+
+## Every indexed triangle surface under node: {node, surface, xf (to this art's space), vertices, index}.
+static func _surfaces(node: Node, xf: Transform3D, out: Array) -> void:
+	if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
+		var mesh := (node as MeshInstance3D).mesh
+		for s in mesh.get_surface_count():
+			var a := mesh.surface_get_arrays(s)
+			out.append({"node": node, "surface": s, "xf": xf, "vertices": a[Mesh.ARRAY_VERTEX], "index": a[Mesh.ARRAY_INDEX]})
+	for c in node.get_children():
+		if c is Node3D: _surfaces(c, xf * (c as Node3D).transform, out)
 
 func _set_material(node: Node, material: Material, glass: bool) -> void:
 	if node is MeshInstance3D:

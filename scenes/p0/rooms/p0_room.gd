@@ -131,6 +131,7 @@ func _ready() -> void:
 	art = art_scene.instantiate()
 	room.add_child(art)
 	_dress_art()
+	_hide_art()
 	_apply_module_visibility()
 	var nav := P0RoomNav.build(P0RoomNav.shapes_from(art))
 	bp = nav.bp
@@ -237,7 +238,15 @@ func _marker(name: String, _view: Dictionary) -> Dictionary:
 	return {kind = "facility", icon = P0Logic.icon("door"), name = exit_to}
 
 func _module_visible(module: String) -> bool:
-	return level >= int(module_levels.get(module, 0))
+	return level >= int(module_levels.get(module, 0)) and not hidden_art.has(module)
+
+## Kit modules the room's anchors file takes out of the picture (`hide_art`; SGODOT-351: the card room on the tavern
+## kit has no `TAVERN` sign, 不知火舞 351 e38e8e85) — cut from their render batch too (coffee_shop_art.hide_module).
+var hidden_art: Array = []
+func _hide_art() -> void:
+	hidden_art = P0RoomAnchors.read_json(anchors_path).get("hide_art", [])
+	for n in hidden_art:
+		if art.has_method("hide_module"): art.call("hide_module", str(n))
 
 func _room_frame(_view: Dictionary, _dt: float) -> void: pass
 
