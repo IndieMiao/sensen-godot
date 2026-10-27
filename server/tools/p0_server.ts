@@ -25,6 +25,7 @@ import { openIpNear, type IpNear } from '../src/p0/ip_city.js';
 import { registerP0Admin } from '../src/p0/admin.js';
 import { P0Gate } from '../src/p0/gate.js';
 import { P0EventLog } from '../src/p0/telemetry.js';
+import { setBlackjackSecret } from '../src/p0/blackjack.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const stateFile = process.env.P0_STATE_FILE ?? path.join(root, 'output/p0/p0-state.json');
@@ -48,6 +49,9 @@ if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', e
 }
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
+// SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one does not start; dev keeps a fixed key.
+if (process.env.P0_BJ_SECRET) setBlackjackSecret(process.env.P0_BJ_SECRET);
+else if (!dev) { console.error(JSON.stringify({ error: 'P0_BJ_SECRET missing' })); process.exit(1); }
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
 const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
 const log = new P0EventLog(eventDir === '' ? undefined : eventDir);

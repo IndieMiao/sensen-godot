@@ -144,6 +144,7 @@ export interface P0Day {
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
   compost?: number;                     // crops turned into Compost at the Compost Bin today (q(118) ③, ≤ 5)
+  bj_net?: number;                      // SGODOT-351: the card room's net coins today, hands begun today only — the observation log's, no economy's
 }
 
 /** The save version this server writes. Older saves are brought up to it at load (upgradeState). */
@@ -194,6 +195,7 @@ export interface P0State {
   facility_count?: number;       // facilities ever built (their ids)
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   guide?: GuideState;            // SGODOT-341 new-player guide: step and counts (guide.ts); older saves are legacy, no version of its own
+  blackjack?: import('./blackjack.js').BjState;   // SGODOT-351 the card room: intro seen, hand count, the hand in play, a result not yet seen (no version of its own)
   title?: string;                // q(180): the title worn, a stable id (titles.ts); absent until the player picks one, never filled in
   rng: number;
   seq: number;

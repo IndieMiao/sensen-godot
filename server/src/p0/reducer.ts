@@ -28,6 +28,7 @@ import { noteProgress, takenCounts } from './request_progress.js';
 import { wearTitle } from './titles.js';
 
 import { guideAck, guideKeys, settleGuide } from './guide.js';
+import { blackjackCommand, settleBlackjack, type BjCommand } from './blackjack.js';
 export type { P0Event } from './progress.js';
 
 /** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
@@ -70,6 +71,7 @@ type P0CommandBody =
   | { type: 'gift'; resident: string; item: string }
   | { type: 'learn'; resident: string }   // Recipe lesson on the dialogue bar (§7.5.3)
   | MineCommand
+  | BjCommand   // SGODOT-351 the card room's blackjack (blackjack.ts)
   | { type: 'gather'; spot: string }
   | { type: 'craft'; recipe: string }
   | { type: 'place'; recipe: string; plot?: number; x?: number; y?: number }   // P1: build a facility in place (one step, q(22)); x, y: on a yard cell
@@ -114,6 +116,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleStove(c, s, now, events, aimed < 0 ? undefined : aimed);
   settleMine(c, s, now);
   settleParcels(c, s, now);
+  // SGODOT-351: a hand left past its day or 24 h is stood and paid on any command (its result waits for bj_open)
+  const bjSettled = settleBlackjack(c, s, now, events, cmd.type);
   // v5: a pond or outpost needs a pass for its city (home always); nothing changes when it is refused.
   // A cast without a place fishes the remembered pond: a new cast there is checked as well (the pass may have run out).
   const castAt = cmd.type === 'cast' && !cmd.place && s.presence.place ? ['pond', s.presence.place] as const : null;
@@ -434,6 +438,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'read_inbox': {
       if (!Array.isArray(cmd.keys) || cmd.keys.length > 100 || cmd.keys.some(k => typeof k !== 'string')) return fail('bad_parcel');
       for (const u of s.inbox.updates) if (cmd.keys.includes(u.key)) u.read = true;
+      break;
+    }
+    case 'bj_open': case 'bj_intro': case 'bj_deal': case 'bj_act': {
+      const refusal = blackjackCommand(c, s, cmd as BjCommand & { space?: unknown; place?: unknown }, now, events, bjSettled);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'guide': {

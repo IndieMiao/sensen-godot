@@ -58,6 +58,11 @@ export type P0Event =
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
+  // SGODOT-351 blackjack (blackjack.ts): a hand dealt (its view), each card drawn after (the hole card turned with
+  // hole), a hand paid (the dealer's cards, each hand's result, payout and net, the wallet after)
+  | { kind: 'bj_dealt'; n: number; bet: number; hand: ReturnType<typeof import('./blackjack.js').handView> }
+  | { kind: 'bj_card'; to: 'player' | 'dealer'; hand_index: number; card: string; hole?: true }
+  | ({ kind: 'bj_result' } & import('./blackjack.js').BjSettled)
   // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[];
       x?: number; y?: number; reason?: 'plots' }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then; reason plots: moved off Lv7's new beds (q(172))

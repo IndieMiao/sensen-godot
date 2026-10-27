@@ -157,7 +157,8 @@ export function cityInfo(c: P0Content, cluster: string): CityInfo {
   if (cluster !== writtenCluster(c) && gen) return gen(cluster);
   if (cluster !== writtenCluster(c)) return { ponds: [], outposts: [], residents: 0, fish: [] };
   const ponds = Object.keys(c.fishing.places).filter(id => clusterOf(c, id) === cluster);
-  const outposts = (c.outposts ?? []).filter(o => clusterOf(c, o.id) === cluster);
+  // the card room (SGODOT-351) is no outpost of the city's set: not in its counts, as a generated city has none
+  const outposts = (c.outposts ?? []).filter(o => clusterOf(c, o.id) === cluster && o.role !== 'casino');
   return { ponds, outposts: outposts.map(o => o.id), residents: new Set(outposts.flatMap(o => o.residents)).size, fish: [] };
 }
 
