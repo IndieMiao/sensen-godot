@@ -42,8 +42,8 @@ func set_enabled(on: bool) -> bool:
 
 ## The app's main identity is created by P0Session as before. Never replace an existing different file with a backup.
 func restore_missing_main() -> bool:
-	if FileAccess.file_exists(directory + MAIN):
-		return FileAccess.get_file_as_string(directory + MAIN).strip_edges() != "" or not FileAccess.file_exists(directory + BACKUP)
+	if FileAccess.file_exists(directory + MAIN) and FileAccess.get_file_as_string(directory + MAIN).strip_edges() != "":
+		return true
 	var backup := _backup_bytes()
 	if backup.is_empty(): return not FileAccess.file_exists(directory + BACKUP)
 	return _write_atomic(directory + MAIN, backup)

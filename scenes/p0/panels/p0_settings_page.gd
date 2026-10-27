@@ -130,6 +130,19 @@ static func test_options(on: bool, is_test: bool, safe_top := 0.0, safe_bottom :
 	page.body.add_child(note)
 	return page
 
+## 341 6d532fc2: the test account's escape from first city pick / failed launch, using the existing text button.
+static func return_main_link(action: Callable) -> UiDismissButton:
+	var button := UiDismissButton.new("Return to main account")
+	button.name = "ReturnMainAccount"
+	button.add_theme_font_override(&"font", UiKit.font(&"bold"))
+	button.add_theme_font_size_override(&"font_size", UiKit.theme().get_font_size(&"font_size", UiTokens.STYLE_CAPTION_B12))
+	for state in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_focus_color", &"font_hover_pressed_color"]:
+		button.add_theme_color_override(state, UiTokens.COLOR_PRIMARY)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.pressed.connect(action)
+	return button
+
 func _test_entry_input(event: InputEvent) -> void:
 	if _test_entry == null: return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:

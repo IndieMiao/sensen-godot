@@ -211,7 +211,7 @@ func test_open_guide_today_refreshes_copy_progress_and_show_target() -> void:
 	ui.set_view(changed)
 	ui._refresh_today()
 	assert_bool(is_instance_valid(pill)).is_true()   # text updates do not drop the held Show pill
-	assert_str(str(first.find_child("Line", true, false).get_meta("sentence"))).is_equal("Catch 2 fish · Willow Pond · 1/2")
+	assert_str(str(first.find_child("Line", true, false).get_meta("sentence"))).is_equal("Catch 2 fish · 1/2 · Willow Pond")
 	changed.guide = {"step": "t_nadia_1", "row": {"line": "Bring Nadia 1 Radish · Riverside Market", "icon": "crop_radish", "go": "gn-1850147~market0"}}
 	var shown := []
 	ui.show_on_map.connect(func(go): shown.append(go))

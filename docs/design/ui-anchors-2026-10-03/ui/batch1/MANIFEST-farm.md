@@ -1,6 +1,6 @@
 # 批次 1 · HUD、农场与操作设计
 
-更新：2026-10-05。规则基准为[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 3、5、10、14、16 章；视觉对照使用 [Figma 原型](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)。[返回设计索引](../../REPORT.md)。
+更新：2026-10-05。规则基准为[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 3、5、10、14、16 章；视觉对照使用 [Figma 原型](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3)。[返回设计索引](../../REPORT.md)。
 
 本清单描述当前设计源及适用范围。静态图中的存档数值和坐标为排版样例，不能用作新的玩法规则或实现完成证明。
 

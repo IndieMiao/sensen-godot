@@ -28,6 +28,7 @@ func _remove_tree(path: String) -> void:
 
 func after_test() -> void:
 	_remove_tree(dir)
+	preload("res://modules/p0/p0_home_pick.gd").clear()
 
 func _header(a: RefCounted) -> String:
 	var session := P0Session.new()
@@ -103,8 +104,20 @@ func test_verified_backup_can_restore_a_missing_main_without_replacing_an_existi
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(dir + "p0_player.txt"))
 	assert_bool(accounts.return_main()).is_true()
 	assert_str(FileAccess.get_file_as_string(dir + "p0_player.txt")).is_equal(MAIN_BYTES)
+	_write("p0_player.txt", "another-isolated-main\n")
+	assert_bool(accounts.restore_missing_main()).is_true()
+	assert_str(FileAccess.get_file_as_string(dir + "p0_player.txt")).is_equal("another-isolated-main\n")
+	assert_bool(accounts.return_main()).is_false()
+
+func test_empty_main_with_verified_backup_restores_original_bytes_and_returns_main() -> void:
+	assert_bool(accounts.start_test()).is_true()
 	_write("p0_player.txt", "")
-	assert_bool(accounts.restore_missing_main()).is_false()   # do not silently generate a new main on corruption
+	var relaunched = Accounts.new(dir)
+	assert_bool(relaunched.restore_missing_main()).is_true()
+	assert_str(FileAccess.get_file_as_string(dir + "p0_player.txt")).is_equal(MAIN_BYTES)
+	assert_str(FileAccess.get_file_as_string(dir + "p0_main_identity.backup")).is_equal(MAIN_BYTES)
+	assert_bool(relaunched.return_main()).is_true()
+	assert_bool(Accounts.new(dir).is_test()).is_false()
 
 func _seven(e: RefCounted, from_ms := 1000) -> void:
 	for i in 7:
@@ -156,6 +169,58 @@ func test_b_page_reuses_settings_layout_and_only_test_has_return_action() -> voi
 class RefusalUi extends P0Ui:
 	var errors: Array = []
 	func toast_error(message: String, _key := "") -> void: errors.append(message)
+
+func test_only_test_first_city_pick_can_return_directly_without_confirmation() -> void:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.test_accounts = accounts
+	ui.tips_path = dir + "p0_tips.json"
+	ui.quick_store = dir + "ui_quickbar.json"
+	add_child(ui)
+	var actions := []
+	ui.test_account_requested.connect(func(action): actions.append(action))
+	for test in [false, true]:
+		if test: assert_bool(accounts.start_test()).is_true()
+		var flow = preload("res://scenes/p0/panels/p0_home_flow.gd").new()
+		ui.open_home_flow(flow)
+		await await_idle_frame()
+		var button := flow.cities.find_child("ReturnMainAccount", true, false) as Button
+		assert_bool(button != null).is_equal(test)
+		if test:
+			assert_float(button.size.y).is_greater_equal(44.0)
+			assert_float(button.position.y).is_greater_equal(flow.cities.key.position.y + flow.cities.key.size.y)
+			button.pressed.emit()
+			assert_array(actions).is_equal(["main"])
+			assert_str(ui.modal_kind).is_equal("home_pick")   # no confirmation layer
+		ui.close_modal()
+		await await_idle_frame()
+	var changed = preload("res://scenes/p0/panels/p0_home_flow.gd").new(null, 0.0, 0.0, "gn-5391959")
+	ui.open_home_flow(changed)
+	assert_object(changed.cities.find_child("ReturnMainAccount", true, false)).is_null()
+
+func test_only_test_launch_failure_has_an_offline_local_return() -> void:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.test_accounts = accounts
+	ui.tips_path = dir + "p0_tips.json"
+	ui.quick_store = dir + "ui_quickbar.json"
+	add_child(ui)
+	ui.show_screen(P0SysScreen.Kind.FAIL)
+	assert_object(ui.screen().find_child("ReturnMainAccount", true, false)).is_null()
+	assert_bool(accounts.start_test()).is_true()
+	ui.set_offline(true)
+	ui.show_screen(P0SysScreen.Kind.FAIL)
+	await await_idle_frame()
+	var button := ui.screen().find_child("ReturnMainAccount", true, false) as Button
+	assert_bool(button.is_visible_in_tree()).is_true()
+	assert_float(button.size.y).is_greater_equal(44.0)
+	assert_bool(button.disabled).is_false()
+	var actions := []
+	ui.test_account_requested.connect(func(action): actions.append(action))
+	button.pressed.emit()
+	assert_array(actions).is_equal(["main"])
+	ui.show_screen(P0SysScreen.Kind.LAUNCH)
+	assert_bool(button.is_visible_in_tree()).is_false()
+	ui.show_screen(P0SysScreen.Kind.MAINT)
+	assert_bool(button.is_visible_in_tree()).is_false()
 
 func test_lost_ack_retry_is_silent_but_unrelated_errors_still_show() -> void:
 	var runtime: P0Runtime = auto_free(P0Runtime.new())
