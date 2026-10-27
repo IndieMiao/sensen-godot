@@ -2,6 +2,7 @@
 """Install tracked voice sources into Godot's ignored Android build template."""
 from pathlib import Path
 import shutil
+from permission_activity import install as install_permission_activity
 ROOT = Path(__file__).resolve().parents[2]
 build = ROOT / 'android/build'
 if not (build / 'build.gradle').exists():
@@ -26,4 +27,5 @@ for permission in ['RECORD_AUDIO', 'MODIFY_AUDIO_SETTINGS', 'BLUETOOTH_CONNECT']
 if 'org.godotengine.plugin.v2.GodotVoice' not in s:
     s = s.replace('        <!-- Godot v2', '        <meta-data android:name="org.godotengine.plugin.v2.GodotVoice"\n            android:value="com.sensen.voice.GodotVoicePlugin" />\n\n        <!-- Godot v2', 1)
 p.write_text(s)
+install_permission_activity(build)  # the microphone is asked for there, never through GodotActivity (SGODOT-349)
 print('GodotVoice Android sources and SDK prepared')
