@@ -65,7 +65,10 @@ export type P0Event =
   | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)
   | { kind: 'tree'; action: 'planted' | 'chopped'; plot: number; crop: string; used: number; cap: number }   // the orchard (q(118))
-  | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' };
+  | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' }
+  // SGODOT-341: the guide moved to another step or ended (the observation log reads the steps), or Pip gave seeds again
+  | { kind: 'guide'; action: 'step' | 'end'; from: string | null; to: string | null; end?: 'done' | 'timeout' }
+  | { kind: 'guide'; action: 'resend'; item: string; qty: number; bagged: number; left: number };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };
