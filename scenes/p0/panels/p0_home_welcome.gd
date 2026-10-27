@@ -3,9 +3,11 @@ extends Control
 ## city (q(205) Near you). The card at the bottom — 16 from the sides, the safe area + 16 from the bottom, radius 20,
 ## 20 in: `Welcome to Gensen!` (ExtraBold 22), the city's row (as HOME-PICK's), one line (Body 14), then `Start here`
 ## (primary) and `Choose another city` (secondary), 48 each, 8 apart. No ×, no later. Modal: nothing under it moves.
-## Behind it the map's land colour for now (§4: #F6F4EA, the colour the card shows on while the map loads; the flight
-## from the globe to the city comes with the pick-a-spot map, PR-2). Frames: row 101 51:160750 / 51:160776 / 51:160801
-## (Figma 5SVgfevrLzZXqD83uyPgmV); copy per q(216) 7aa8ffad.
+## Behind it the real map (PR-2b, the flow's `map`: the P0 map in its pick mode): the camera flies from the globe to the
+## city in about a second, then the card slides in from the bottom (slide_in); the land colour (§4: #F6F4EA) lies over
+## the map till it has drawn, and alone where there is none; the map's credit line 6 over the card's top (q(133) ①,
+## 不知火舞 342). Frames: row 101 51:160750 / 51:160776 / 51:160801 (Figma 5SVgfevrLzZXqD83uyPgmV); copy per q(216)
+## 7aa8ffad.
 ## placeholder(): while the first read is out (不知火舞 342 8c4168ab, as HOME-PIN-LOADING): the card's place and size
 ## (a one-line city name) as an edge only — no fill, no words, no spinner; the real card takes its place.
 ## Emits start_pressed, other_pressed.
@@ -26,17 +28,29 @@ const _TITLE_SIZE := 22
 const LINE := "Start your farm here? It's the closest home city to you."
 
 var row: Dictionary
+var map: Object               # the real map under it (pick_has_ground / pick_px_per_pt), null on the land alone
+var land: ColorRect
+var credits: Label
 var card: PanelContainer
 var start: UiCommandButton
 var other: UiCommandButton
 
 ## row_: the Near you city row ({id, name, region, climate, …}, P0HomePick.cities' `near`).
-func _init(row_: Dictionary = {}, safe_bottom := 0.0) -> void:
+var _waiting := false          # the card held back for the flight: laid out but not drawn, its keys quiet
+var _safe_top := 0.0
+var _safe_bottom := 0.0
+var _slide: Tween
+var _dissolve_s := 0.0         # the first read's outline going (dissolve): its length, 0 while it stays
+
+func _init(row_: Dictionary = {}, safe_bottom := 0.0, safe_top := 0.0) -> void:
 	row = row_
+	_safe_top = safe_top
+	_safe_bottom = safe_bottom
 	name = "HomeWelcome"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var bg := ColorRect.new()
+	land = bg
 	bg.name = "Land"
 	bg.color = LAND
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -82,13 +96,92 @@ func _init(row_: Dictionary = {}, safe_bottom := 0.0) -> void:
 	start = UiCommandButton.new("Start here")
 	start.name = "Start"
 	start.custom_minimum_size.y = 48
-	start.activated.connect(func(): start_pressed.emit())
+	start.activated.connect(func(): if not _waiting: start_pressed.emit())
 	keys.add_child(start)
 	other = UiCommandButton.new("Choose another city", UiCommandButton.Kind.SECONDARY)
 	other.name = "Other"
 	other.custom_minimum_size.y = 48
-	other.activated.connect(func(): other_pressed.emit())
+	other.activated.connect(func(): if not _waiting: other_pressed.emit())
 	keys.add_child(other)
+
+## Where the city's centre goes on the page (不知火舞 342 bce34a87): halfway between the status bar's bottom and the
+## card's top, so the card covers none of it.
+func city_point() -> Vector2:
+	var w := size.x if size.x > 0.0 else 360.0
+	var h := size.y if size.y > 0.0 else 800.0
+	var card_top := h - _BOTTOM - _safe_bottom - (card.size.y if card.size.y > 0.0 else card.get_combined_minimum_size().y)
+	return Vector2(w * 0.5, (_safe_top + card_top) * 0.5)
+
+## The card held back while the camera flies (slide_in brings it): still laid out (city_point reads its height), not
+## drawn, its keys quiet.
+func wait_for_map() -> void:
+	_waiting = true
+	card.modulate.a = 0.0
+
+func waiting() -> bool: return _waiting
+
+## The card in: sliding up from below the screen over motion.drawerMs, ease out (`animate`: after the flight, and back
+## to the card; 不知火舞 342 bce34a87), or there at once. `again`: slide in even while shown.
+func slide_in(animate: bool, again := false) -> void:
+	if not _waiting and not again: return
+	_waiting = false
+	card.modulate.a = 1.0
+	if not animate: return
+	if _slide != null and _slide.is_valid(): _slide.kill()
+	# from its laid-out place (the bottom anchors and grow-up keep it there), drawn lower by the card's height and margin
+	var drop := card.get_combined_minimum_size().y + _BOTTOM + _safe_bottom
+	_slide_y = drop
+	_slide = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_slide.tween_property(self, ^"_slide_y", 0.0, UiKit.secs(UiTokens.MOTION_DRAWER_MS))
+
+## How far below its place the card is drawn while it slides in (its layout untouched, so anchors never fight it).
+var _slide_y := 0.0:
+	set(v):
+		_slide_y = v
+		if card != null: card.position.y = _laid_y() + v
+
+func _laid_y() -> float:
+	return (size.y if size.y > 0.0 else 800.0) - _BOTTOM - _safe_bottom - card.size.y
+
+func _map_live() -> bool:
+	return map != null and (not map is Node or (is_instance_valid(map) and (map as Node).is_inside_tree()))
+
+func _process(_dt: float) -> void:
+	if _dissolve_s > 0.0:   # a frame's step at most 1/30 s: a stalled frame (the map coming up) cannot skip it
+		modulate.a -= minf(_dt, 1.0 / 30.0) / _dissolve_s
+		if modulate.a <= 0.0: queue_free()
+		return
+	var live := _map_live()
+	if not live and _waiting: slide_in(false)   # its map went mid-flight: the card all the same
+	var ground := live and bool(map.pick_has_ground())
+	if land != null and land.visible == ground: land.visible = not ground
+	_place_credits(ground and not _waiting)
+
+## The map's credit line over the real map (q(133) ①; CityMapView's constants): 16 pt from the left, 6 pt over the card.
+func _place_credits(on: bool) -> void:
+	if credits == null:
+		if not on: return
+		credits = UiKit.label("© Mapbox © OpenStreetMap", UiTokens.STYLE_BODY_R14)
+		credits.name = "MapCredits"
+		credits.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		credits.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		credits.add_theme_color_override(&"font_color", Color(UiTokens.COLOR_TEXT, CityMapView.CREDITS_ALPHA))
+		credits.add_theme_constant_override(&"outline_size", 0)
+		add_child(credits)
+		move_child(credits, card.get_index())
+	credits.visible = on
+	if not on: return
+	var k := float(map.pick_px_per_pt()) if map.has_method("pick_px_per_pt") else 1.0
+	var font := maxi(1, roundi(CityMapView.CREDITS_PT * k))
+	if credits.get_theme_font_size(&"font_size") != font: credits.add_theme_font_size_override(&"font_size", font)
+	var m := credits.get_combined_minimum_size()
+	credits.size = m
+	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, card.position.y - CityMapView.CREDITS_GAP_PT * k - m.y)
+
+## The outline (placeholder) goes over `seconds`, stepped per frame as above, then frees itself; it takes no taps.
+func dissolve(seconds: float) -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dissolve_s = maxf(seconds, 0.001)
 
 ## The card's outline alone, the size of a one-line city's card, where the card goes; nothing inside it reads or
 ## takes a tap (342 8c4168ab).
