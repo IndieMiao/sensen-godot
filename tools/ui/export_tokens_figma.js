@@ -1,9 +1,15 @@
 // READ-ONLY Figma exporter for docs/design/tokens/tokens-v2.json (SGODOT-207 WP7-A, SGODOT-211).
-// Run through the Figma MCP `use_figma` tool on file icmfLGHkiMBfMQApCiw13D. It never writes to Figma,
+// Run through the Figma MCP `use_figma` tool on file 5SVgfevrLzZXqD83uyPgmV. It never writes to Figma,
 // unlike the frozen generator bundle and patch scripts under docs/design/ui-refactor-2026-10-06/figma-plugin/
 // (SGODOT-197 LOCK-28). Pipe the returned object into tools/ui/save_tokens.py (pretty-prints `compact`, checks
 // `fnv1a` and `bytes`, writes the tokens file), then run tools/ui/gen_theme.gd.
 // Values Figma does not hold yet come from CONST below, each with its source.
+// 节点待重映射 (10-27): the file moved to 5SVgfevrLzZXqD83uyPgmV and every node id changed. Page 14 is 5:4 there; the
+// component and frame ids below (483:304, 517:11840, 633:41278/9 …) are still the old file's — look each up by name
+// in the new file before the next run (node() / variant() fetch them by id and throw on a missing one). Page 14 there
+// is still bound to the old file's remote variables, so getLocalVariableCollectionsAsync and the local text styles read
+// nothing until they are made local under the same names (不知火舞 340 d8e2d808): no re-export of tokens-v2.json
+// from the new file before that is done and accepted.
 const CONST = {
   // Fallback for gameplay plan v2 §16.1 rarity dots if the semantic rarity/* variables are missing.
   rarityRare: '#A98BD6',
@@ -21,7 +27,7 @@ const CONST = {
             toastBaseMs: 2000, toastPer20CharsMs: 500, toastMaxMs: 5000 },
   naturalLineHeight: 1.364,
 };
-const page = await figma.getNodeByIdAsync('481:53');
+const page = await figma.getNodeByIdAsync('5:4');
 await figma.setCurrentPageAsync(page);
 const hex = (c, a) => '#' + [c.r, c.g, c.b].map(v => Math.round(v * 255).toString(16).padStart(2, '0')).join('').toUpperCase()
   + (a !== undefined && a < 1 ? Math.round(a * 255).toString(16).padStart(2, '0').toUpperCase() : '');
@@ -294,7 +300,7 @@ const sorted = o => Object.fromEntries(Object.keys(o).sort().map(k => [k, o[k]])
 const tokens = {
   meta: {
     schema: 2, version: '2.1-draft', status: 'draft',
-    source: 'Figma icmfLGHkiMBfMQApCiw13D page 481:53 (read-only export, tools/ui/export_tokens_figma.js)',
+    source: 'Figma 5SVgfevrLzZXqD83uyPgmV page 5:4 (read-only export, tools/ui/export_tokens_figma.js)',
     unit: '360-wide logical px = Godot UI unit',
     accepted: 'WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200; WP2 Toast R1 accepted 2026-10-07, SGODOT-202; WP6 EmptyState accepted 2026-10-07, SGODOT-206',
     pending: {

@@ -2,8 +2,9 @@
   "units": "metres",
   "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
   "reference": {
-    "file_key": "icmfLGHkiMBfMQApCiw13D",
-    "node_id": "2681:135486"
+    "file_key": "5SVgfevrLzZXqD83uyPgmV",
+    "node_id": "",
+    "node_todo": "节点待重映射：旧文件 icmfLGHkiMBfMQApCiw13D 的 2681:135486，新文件里还没找到对应节点（10-27 换文件）"
   },
   "assets": [
     {

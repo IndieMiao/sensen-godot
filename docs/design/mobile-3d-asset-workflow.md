@@ -10,7 +10,7 @@ The working example is the [Basic Room implementation](basic-room-2026-10-06/REA
 
 Read the current design indexes and relevant gameplay sections before choosing scale, movement, camera or interaction behavior. Retrieve the **actual design image**, record its file/node identity, and save a local copy. A layer name, Figma tree screenshot or successful login does not establish that the artwork itself was inspected.
 
-For Basic Room, the source is Figma file `icmfLGHkiMBfMQApCiw13D`, node `545:2968`, `Scene_design → Basic Room-1 1`. The retained export is 2561 × 2561. Inspect the full image before subdividing the task into props.
+For Basic Room, the source is Figma file `5SVgfevrLzZXqD83uyPgmV`, node `3:4550`, `Scene_design → Basic Room-1 1`. The retained export is 2561 × 2561. Inspect the full image before subdividing the task into props.
 
 Inspect installed tools rather than assuming historical workstation notes still describe the machine. Record the Blender and Godot versions, matching export templates, SDK/JDK locations, available emulator images, display access and actual rendering backend. This round used Blender 5.2 and Godot 4.7.2. The SDK image mentioned in an older note was unavailable; the successful run used API 35. Confirm an installation command has finished successfully before using its outputs.
 
