@@ -270,3 +270,35 @@ func test_a_refusal_says_what_is_short() -> void:
 	_open(300)
 	page.refused("bj_no_coins", {"need": 15})
 	assert_array(toasts).is_equal(["Need 15 more coins"])
+
+## 0.2.13's client can go out before the card room's server (奕星 / 后裔 on 351): an older server sends no
+## view.blackjack and answers a bj_ command with unknown_command. Its pin keeps the table out of reach (#523); were the
+## page opened all the same (a dev step), it lays out on the defaults, says nothing and stays in the bet, no error.
+func test_an_older_server_without_the_table_breaks_nothing() -> void:
+	sent = []
+	toasts = []
+	page = auto_free(P0BlackjackPage.new({"coins": 300}))
+	page.theme = UiKit.theme()
+	page.animate = false
+	page.toast = func(t: String): toasts.append(t)
+	page.size = Vector2(360, 800)
+	page.command.connect(func(cmd: Dictionary): sent.append(cmd))
+	add_child(page)
+	page._layout()
+	page.opened()
+	assert_dict(sent[-1]).is_equal({"type": "bj_open"})
+	assert_bool(page.intro_layer.visible).is_false()   # nothing says it is unseen
+	page.refused("unknown_command", {})
+	page.refresh({"coins": 300, "seq": 2})
+	await _frames()
+	page.tap_chip(1)
+	assert_int(page.bet).is_equal(10)
+	page.deal(page.bet)
+	assert_dict(sent[-1]).is_equal({"type": "bj_deal", "bet": 10})
+	page.refused("unknown_command", {})
+	page.refresh({"coins": 300, "seq": 3})
+	await _frames()
+	assert_int(page.phase).is_equal(P0BlackjackPage.Phase.BET)
+	assert_int(page.bet).is_equal(10)
+	assert_bool(page._waiting).is_false()
+	assert_array(toasts).is_empty()
