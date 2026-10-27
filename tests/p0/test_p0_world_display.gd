@@ -389,6 +389,7 @@ func test_affinity_on_the_open_bar_floats_a_pill_and_puts_the_answer_in_the_bubb
 	# q(220): a resident's first dish reads first gift, whatever the verdict (不知火舞: no `loved it` beside it)
 	assert_str(P0Ui.affinity_text({"delta": 10, "reason": "gift", "verdict": "loved", "first": true})).is_equal("+10 · first gift")
 	assert_str(P0Ui.affinity_text({"delta": 3, "reason": "gift", "verdict": "loved"})).is_equal("+3 · loved it")
+	assert_str(P0Ui.affinity_text({"delta": 1, "reason": "gift", "verdict": "received"})).is_equal("+1 · gift received")   # q(18), not `thanks`
 	var ui := _ui(true)
 	ui.surface = "room"   # residents stand in the outposts' rooms
 	ui.set_view(_resident_view())
