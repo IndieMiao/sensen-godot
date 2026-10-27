@@ -201,6 +201,7 @@ func _process(dt: float) -> void:
 		var key := tips.next()
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
+	_tick_ask(dt)
 	if _notice and _notice.visible: _place_notice()
 
 ## Typed targets from the server; finding an existing control never opens a page or selects an item.
@@ -1734,6 +1735,9 @@ func _notification(what: int) -> void:
 ## something; the world only leaves on false.
 func close_top_layer() -> bool:
 	if voice_blocks_back(): return true   # the voice-match page's own Back (SGODOT-349): the profile stays as it was
+	if is_instance_valid(_ask):   # the soft prompt goes, not answered (不知火舞 350 7bffafd7)
+		_put_ask_away()
+		return true
 	if _screen != null:   # SYS-LOADING / MAINT / UPDATE have no close: Back does nothing (q(74)) …
 		if _screen.kind == P0SysScreen.Kind.PLACE_FAIL: screen_back.emit(_screen.kind)   # … but Couldn't get there's is Go back (q(78))
 		return true
@@ -1777,6 +1781,79 @@ func end_stick() -> void:
 	joystick.emit(Vector2.ZERO)
 
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
+
+## Nothing open over the world (q(235) ①): no page, drawer, card, dialogue or banner (all modal layers), no radial, no
+## TipCard, InboxNotice or SysBanner. A Toast or a float does not count.
+func calm() -> bool:
+	return not has_modal() and not (is_instance_valid(_teach) and _teach.visible) \
+		and not (is_instance_valid(_notice) and _notice.visible) and not (is_instance_valid(_sys) and _sys.visible)
+
+# ---------------------------------------------------------------- the notification soft prompt (q(235), q(236) ④)
+## It comes the first time all at once: the player on their own farm outdoors, the question's crops growing
+## (P0Notify.ask_question), every finger up (the action key and the stick let go, no sowing or watering run) and nothing
+## open (calm). Put away unanswered — and not asked — when the player leaves the farm outdoors (the farmhouse, the mine,
+## the map), something opens (a panel, or an InboxNotice, banner, TipCard, SYS card or resident bar coming up), Back,
+## or the app going to the background; a crop ripening or a held stick does not. Once put away it does not come again
+## this run: the next launch or return from the background looks again (q(237) ③). Allow / Not now answer it.
+const _ASK_EVERY_S := 0.5
+var _ask: UiSoftPrompt
+var _ask_left := 0.0
+var _ask_rested := false   # put away unanswered: not again this run (ask_again: back from the background)
+var _fingers := {}         # touch index (the mouse is -1) → down
+
+func _input(e: InputEvent) -> void:
+	if e is InputEventScreenTouch: _finger(e.index, e.pressed)
+	elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT: _finger(-1, e.pressed)
+
+func _finger(index: int, down: bool) -> void:
+	if down: _fingers[index] = true
+	else: _fingers.erase(index)
+
+func fingers_up() -> bool: return _fingers.is_empty()
+
+func _on_farm() -> bool: return space == "home" and surface == "farm"
+
+func _tick_ask(dt: float) -> void:
+	if notify == null: return
+	if is_instance_valid(_ask):
+		if not _on_farm() or not calm(): _put_ask_away()
+		return
+	if not _on_farm(): return
+	_ask_left -= dt
+	if _ask_left > 0.0 or _ask_rested: return
+	_ask_left = _ASK_EVERY_S
+	if not fingers_up() or not calm() or view.is_empty(): return
+	var question := P0Notify.ask_question(view)
+	if question == "" or not notify.may_ask(): return
+	show_ask(question)
+
+func show_ask(question: String) -> void:
+	if is_instance_valid(_ask): _ask.queue_free()
+	_ask = UiSoftPrompt.new(question)
+	_ask.name = "SoftPrompt"
+	_ask.theme = UiKit.theme()
+	_ask.answered.connect(func(allow: bool):
+		notify.answer(allow)
+		_ask.go_out()
+		_ask = null)
+	root.add_child(_ask)
+	root.move_child(_toasts, -1)
+	_ask.reset_size()
+	_ask.come_in(Vector2(UiTokens.SPACE_PAGE, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _BANNER_UNDER_HUD + safe_top()))
+
+## The app went to the background: the soft prompt goes, unanswered (q(237) ③).
+func ask_away() -> void: _put_ask_away()
+
+## Back from the background (or a fresh launch): it may come again under its four conditions.
+func ask_again() -> void:
+	_ask_rested = false
+	_ask_left = 0.0
+
+func _put_ask_away() -> void:
+	if not is_instance_valid(_ask): return
+	_ask.go_out()
+	_ask = null
+	_ask_rested = true
 
 ## The top (UI px) of the card open over the world, for what keeps above it (the map's credit line, q(133) v3): INF
 ## with none, 0 for a page that covers the world. Only what stands on the screen's bottom edge counts: a page, a drawer
@@ -3314,17 +3391,44 @@ func open_settings(back := Callable()) -> void:
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
 	if test_accounts.is_test(): version += " · Test"
 	var page := P0SettingsPage.settings(version,
-		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)))
+		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
+		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "")
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
 		# Home city › (SGODOT-303 PR-4): the change; its ‹ Settings comes back here
 		if what == "home": change_home.emit(func(): open_settings(back))
 		elif what == "test_options": open_test_options(func(): open_settings(back))
+		elif what == "notifications": open_notifications(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
+
+## The crop-ready notifications (SGODOT-350; P0Notify). Settings › Notifications: the switch, and when the system has
+## said no the notice whose link opens the system's page. The page is read again whenever the phone may have changed
+## (notify_changed: back from the system's page, the system dialog answered).
+var notify: P0Notify
+var _notif_back := Callable()
+
+func open_notifications(back: Callable) -> void:
+	_notif_back = back
+	var s := notify.system()
+	var page := P0SettingsPage.notifications(notify.switch_on(),
+		str(s.get("app", "")) if notify.system_refused() else "", safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.toggled.connect(func(_what, on: bool):
+		notify.set_switch(on)
+		notify_changed())
+	page.open_pressed.connect(func(what: String): if what == "system_settings": notify.open_settings())
+	_open_modal(page, 0.0, true)
+	modal_kind = "notifications"
+	_modal_back = back
+
+## The phone's notification state may have changed: the page on screen shows it again.
+func notify_changed() -> void:
+	if modal_kind == "notifications" and notify != null: open_notifications(_notif_back)
 
 func open_test_options(back: Callable) -> void:
 	var page := P0SettingsPage.test_options(test_accounts.enabled(), test_accounts.is_test(), safe_top(), safe_bottom())

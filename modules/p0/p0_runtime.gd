@@ -147,6 +147,11 @@ func _init() -> void:
 	ui.test_accounts = session.test_accounts
 	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
+	# Crop-ready notifications (SGODOT-350): Android's GodotNotify, per account on this phone; none elsewhere.
+	ui.notify = P0Notify.new(session.test_accounts.profile_file("p0_notify.json"), P0Notify.phone())
+	# a cold start is coming back too: what was set or shown while the app was gone goes (⑦; 李元芳 on #522)
+	ui.notify.came_back()
+	if ui.notify.available(): ui.notify.native.connect("permission", func(_granted): ui.notify_changed())
 	ui.test_account_requested.connect(_switch_test_account)
 	add_child(ui)
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
@@ -399,7 +404,17 @@ func _exit_tree() -> void:
 	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_RESUMED: _on_resumed()
+	if what == NOTIFICATION_APPLICATION_RESUMED:
+		_on_resumed()
+		if ui.notify != null:   # what was set for the background goes; the phone's settings may have changed meanwhile
+			ui.notify.came_back()
+			ui.notify_changed()
+			ui.ask_again()
+	elif what == NOTIFICATION_APPLICATION_PAUSED and ui.notify != null:
+		ui.ask_away()
+		if not session.view.is_empty():
+			ui.notify.went_away(session.current(), Time.get_unix_time_from_system() * 1000.0,
+				int(Time.get_time_zone_from_system().get("bias", 0)))
 
 func _process(dt: float) -> void:
 	_dev_shot(dt)
@@ -1764,6 +1779,15 @@ func _dev_shot(dt: float) -> void:
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
+			# Crop-ready notifications (SGODOT-350) on a desktop: notify:<never|allowed|refused|old> puts in a stand-in
+			# phone (tools/dev) with a fresh account file; notifications opens Settings › Notifications; ask:<crops|radishes>
+			# brings the soft prompt up as its conditions would.
+			"notify":
+				var shot_prefs := "user://p0_notify_shot.json"
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(shot_prefs))
+				ui.notify = P0Notify.new(shot_prefs, load("res://tools/dev/p0_notify_fake_phone.gd").new(step[1] if step.size() > 1 else "never"))
+			"notifications": ui.open_notifications(func(): ui.open_settings(func(): ui.open_profile()))
+			"ask": ui.show_ask(P0Notify.ASK_RADISHES if step.size() > 1 and step[1] == "radishes" else P0Notify.ASK_CROPS)
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
 			# homepin / homedrag / homebuild (below), homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
 			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, not picked)

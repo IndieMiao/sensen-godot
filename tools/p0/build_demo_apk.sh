@@ -25,8 +25,8 @@ done
 [[ "$SERVER" == http://* || "$SERVER" == https://* ]] || { echo "--server http(s)://…/v1 is required" >&2; exit 2; }
 # The native side the demo needs, as in the int test packages (SGODOT-261: an APK exported from a bare template had
 # no Mapbox and no LiveKit, so its map was black). android/ is not tracked: tools/android/setup_android_build.sh puts
-# the Mapbox overlay on the 4.7.2 template and the three prepare_*_plugin.py add voice (LiveKit), WebView and Sign in
-# with Google; mapbox_token.txt (ignored, never committed) goes in the repo root. Refuse to export without them.
+# the Mapbox overlay on the 4.7.2 template and the four prepare_*_plugin.py add voice (LiveKit), WebView, Sign in
+# with Google and the crop-ready notification; mapbox_token.txt (ignored, never committed) goes in the repo root. Refuse to export without them.
 missing=()
 [[ -s mapbox_token.txt ]] || missing+=("mapbox_token.txt in the repo root")
 B=android/build
@@ -44,9 +44,18 @@ same permission/android/PermissionActivity.kt permission/PermissionActivity.kt \
   || missing+=("PermissionActivity, current and in the manifest (either prepare_voice_plugin.py or prepare_webview_plugin.py)")
 same googleauth/android/GodotGoogleSignInPlugin.kt googleauth/GodotGoogleSignInPlugin.kt \
   || missing+=("GodotGoogleSignIn, current (python3 tools/android/prepare_google_signin_plugin.py)")
+# The crop-ready notification (SGODOT-350): the plugin, its receiver and the permission declared, and the small icon
+# per density (without it the notification shows Android's blank square).
+icons=true
+for f in native/notify/android/res/*/ic_notify.png; do cmp -s "$f" "$B/res/${f#native/notify/android/res/}" || icons=false; done
+same notify/android/GodotNotifyPlugin.kt notify/GodotNotifyPlugin.kt && $icons \
+  && grep -qs 'com.sensen.notify.NotifyReceiver' "$B/src/main/AndroidManifest.xml" \
+  && grep -qs 'org.godotengine.plugin.v2.GodotNotify' "$B/src/main/AndroidManifest.xml" \
+  && grep -qs 'android.permission.POST_NOTIFICATIONS' "$B/src/main/AndroidManifest.xml" \
+  || missing+=("GodotNotify, current, with its icons and in the manifest (python3 tools/android/prepare_notify_plugin.py)")
 if (( ${#missing[@]} )); then
   printf 'not building: the Android build is missing\n' >&2; printf '  - %s\n' "${missing[@]}" >&2
-  echo "run tools/android/setup_android_build.sh, then the three prepare_*_plugin.py, and put mapbox_token.txt in place" >&2
+  echo "run tools/android/setup_android_build.sh, then the four prepare_*_plugin.py, and put mapbox_token.txt in place" >&2
   exit 2
 fi
 CODE="${CODE:-$(date +%Y%m%d)01}"

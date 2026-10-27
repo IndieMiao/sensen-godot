@@ -13,14 +13,18 @@ extends Control
 ##   MAP_DATA  (q(133) v3, Q133-V3-MAPDATA 2425:129113) from Licenses › Mapbox: `Credits` — `© Mapbox ›`,
 ##             `© OpenStreetMap contributors ›` — then an untitled group: `Improve this map ›` and the switch `Share
 ##             anonymous map usage` (`Helps Mapbox improve its maps`).
+##   NOTIFICATIONS (SET-NOTIF 9:120045, q(236) ⑤, q(237); Android only) from Settings' `Notifications ›`: the one
+##             switch `Crops ready` (`When a plot is ready to harvest`); when the system has said no, above it the Info
+##             toast card `Notifications are off for <the app's name>` with `Open system settings ›` (不知火舞 350
+##             7bffafd7) — and the switch reads off whatever the frame drew (dbd8d596).
 ## Emits back_pressed, open_pressed(what): "licenses", a row id, or a Map data row ("mapbox_site", "osm_site",
-## "improve"); toggled(what, on): "telemetry".
+## "improve", "notifications", "system_settings"); toggled(what, on): "telemetry", "crops_ready".
 
 signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -76,11 +80,12 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 	header.back_pressed.connect(func(): back_pressed.emit())
 	add_child(header)
 
-## SETTINGS (P0): Home, an untitled `Test options ›` group, then the unchanged Legal group (Licenses and Version)
-## (341 d559585e, corrected by 0d94c10d). `home` {name, line, open}: while the change is open, `Home city · Tokyo` ›
+## SETTINGS (P0): Home, an untitled `Notifications ›` group, an untitled `Test options ›` group, then the unchanged
+## Legal group (Licenses and Version) (341 d559585e, corrected by 0d94c10d: Home → Notifications → Test options → Legal). `home` {name, line, open}: while the change is open, `Home city · Tokyo` ›
 ## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
-## `Set for good`. No home (a view not in yet): no Home group.
-static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}) -> P0SettingsPage:
+## `Set for good`. No home (a view not in yet): no Home group. `notifications` "On" / "Off": one row, `Notifications`
+## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group.
+static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -89,6 +94,11 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		row.name = "HomeCity"
 		row.pressed.connect(func(): page.open_pressed.emit("home"))
 		page._group("Home", [row])
+	if notifications != "":
+		var notif := UiSettingRow.new(UiSettingRow.Kind.LINK, "Notifications", "", notifications)
+		notif.name = "Notifications"
+		notif.pressed.connect(func(): page.open_pressed.emit("notifications"))
+		page._group("", [notif])
 	var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
@@ -140,6 +150,23 @@ static func return_main_link(action: Callable) -> UiDismissButton:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	button.pressed.connect(action)
 	return button
+
+## NOTIFICATIONS: see the head. `refused_for` is the app's name when the system has said no, else "".
+static func notifications(on: bool, refused_for: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.NOTIFICATIONS, "Notifications", safe_top, safe_bottom)
+	if refused_for != "":
+		var notice := ToastLayer.card(ToastLayer.Severity.INFO, "Notifications are off for %s" % refused_for, "Open system settings")
+		notice.name = "SystemOff"
+		var link := notice.find_child("Action", true, false) as Label
+		link.mouse_filter = Control.MOUSE_FILTER_STOP
+		link.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): page.open_pressed.emit("system_settings"))
+		page.body.add_child(notice)
+	var crops := UiSettingRow.new(UiSettingRow.Kind.TOGGLE, "Crops ready", "When a plot is ready to harvest")
+	crops.name = "CropsReady"
+	crops.on = on
+	crops.toggled.connect(func(value: bool): page.toggled.emit("crops_ready", value))
+	page._group("", [crops])
+	return page
 
 ## LICENSES: one group per P0Legal group, a row per credit (`MIT License` under it; a data credit's attribution, then
 ## its licence), each row › to its text.
