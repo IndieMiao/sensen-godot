@@ -119,6 +119,7 @@ func _shoe() -> Array:
 func _deal(bet: int) -> Array:
 	n += 1
 	last_bet = bet
+	last = null   # a new hand clears a result not seen (be266ee4)
 	delta -= bet
 	_hand = {"deck": _shoe(), "hands": [], "dealer": [], "active": 0, "expired": false}
 	var p := [_draw()]

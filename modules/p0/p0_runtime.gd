@@ -1947,6 +1947,28 @@ func _dev_shot(dt: float) -> void:
 				ui.close_modal()
 				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
+			"blackjack":   # SGODOT-351 table from anywhere; blackjack:here also sends as from the card room (until 后裔's room)
+				if step.size() > 1 and step[1] == "here":
+					session.space = "outpost"
+					session.place = "sf_card_room_1"
+				ui.open_blackjack({"place": "Barbary Card Room", "keeper": "Lou"})
+			"bjtap":   # bjtap:3 taps the tray's chip 3 (0 = 5 … 5 = 1K)
+				if ui.blackjack() != null: ui.blackjack().tap_chip(int(step[1]))
+			"bjdeal":
+				if ui.blackjack() != null: ui.blackjack().deal(ui.blackjack().bet)
+			"bjact":   # bjact:hit|stand|double|split|again|change|clear|rules
+				var bjp := ui.blackjack()
+				if bjp != null:
+					match step[1]:
+						"again": bjp.deal_again()
+						"change": bjp.change_bet()
+						"clear": bjp.clear_bet()
+						"rules": bjp.open_rules()
+						_: bjp.act(step[1])
+			"bjdeck":   # bjdeck:AS:7D:KH:9C — the mock's next shoe (P0_BJ_MOCK only)
+				if session.bj_mock != null: session.bj_mock.next_deck = Array(step.slice(1))
+			"bjexpire":
+				if session.bj_mock != null: session.bj_mock.expire()
 			"closemodal": ui.close_modal()   # the card or sheet on top, as its ✕ (shots: a LOOK-PICK after an upgrade, 282)
 			"kitchen", "put":   # the farmhouse owns the cooking drawer (P0Farmhouse.p0_dev); elsewhere there is no stove
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: %s works in the farmhouse only" % step[0])
