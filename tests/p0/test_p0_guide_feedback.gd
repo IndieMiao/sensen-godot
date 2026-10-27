@@ -181,7 +181,25 @@ func test_first_chat_and_resend_share_a_group_without_overlapping_pills() -> voi
 	var after := _view().merged({seq = 11}, true)
 	await _settle(rt, after, events)
 	assert_array(_texts(rt)).is_equal(["+2 Quick Radish Seeds", "+2 · first chat today"])
+
 	var pills := rt.ui.root.get_children().filter(func(n): return n is UiFloatText)
 	assert_float(absf(pills[0].position.y - pills[1].position.y)).is_greater(20.0)
 	await _settle(rt, after, events)
 	assert_array(_texts(rt)).is_equal(["+2 Quick Radish Seeds", "+2 · first chat today"])
+
+func test_c2_pip_keeps_the_resend_answer_until_closed_then_reads_the_current_step() -> void:
+	var rt := await _runtime(_view())
+	rt.ui.open_resident("res_pip")
+	var after := _view().merged({seq = 11}, true)
+	after.guide.pip.line = "Now water them. They grow fast!"
+	await _settle(rt, after, [RESEND])
+	var bars := rt.ui._modal.find_children("*", "UiResidentBar", true, false)
+	assert_str(bars[0].line).is_equal(Feedback.RESEND_LINE)
+	rt.ui.open_resident("res_pip")   # ordinary in-place reply rebuild keeps the explicit answer
+	bars = rt.ui._modal.find_children("*", "UiResidentBar", true, false)
+	assert_str(bars[0].line).is_equal(Feedback.RESEND_LINE)
+	rt.ui.close_modal()
+	rt.ui.open_resident("res_pip")   # a fresh talk uses C2's current server step, not the old resend
+	bars = rt.ui._modal.find_children("*", "UiResidentBar", true, false)
+	assert_str(bars[0].line).is_equal("Now water them. They grow fast!")
+	assert_object(bars[0]._request).is_null()

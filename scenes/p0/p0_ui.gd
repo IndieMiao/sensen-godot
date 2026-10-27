@@ -2818,6 +2818,9 @@ var _reply := {}   # {id, line}: the resident's answer shown in the bubble until
 func open_resident(id: String) -> bool:
 	var d := P0Logic.resident_bar(view, id)
 	if d.is_empty(): return false
+	# C2/C3: keep the confirmed resend answer through this conversation's rebuilds, then let a new talk read
+	# Pip's current server step. His old answer must not cover the next water/harvest instruction forever.
+	if surface == "farm" and id == "res_pip" and modal_kind != "resident": _reply = {}
 	if _resident != id or modal_kind != "resident": command.emit({"type": "talk", "resident": id})
 	if _resident != id: _reply = {}
 	_resident = id
