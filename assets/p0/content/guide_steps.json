@@ -117,7 +117,16 @@
           "icon": "crop_radish",
           "go": "home"
         },
-        "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one."
+        "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one.",
+        "marks": [
+          {
+            "plot": "teach"
+          },
+          {
+            "button": "harvest",
+            "pulse": true
+          }
+        ]
       },
       {
         "id": "t_nadia_1",
@@ -182,6 +191,10 @@
           {
             "button": "request",
             "pulse": true
+          },
+          {
+            "button": "location",
+            "pulse": true
           }
         ],
         "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one."
@@ -203,6 +216,10 @@
             "place": "home:pond",
             "kind": "request",
             "why": "Catch 2 fish · {have}/{need}"
+          },
+          {
+            "button": "cast",
+            "pulse": true
           }
         ],
         "pip": "Off you go! I'll keep an eye on your plots."
@@ -270,6 +287,10 @@
             "kind": "request"
           },
           {
+            "object": "stove",
+            "pulse": true
+          },
+          {
             "page": "dish_grilled_crucian",
             "button": "cook",
             "pulse": true
@@ -330,6 +351,10 @@
             "kind": "request"
           },
           {
+            "object": "stove",
+            "pulse": true
+          },
+          {
             "page": "dish_fish_soup",
             "button": "cook",
             "pulse": true
@@ -385,6 +410,10 @@
           },
           {
             "button": "gift",
+            "pulse": true
+          },
+          {
+            "item": "dish_fish_soup",
             "pulse": true
           }
         ],
@@ -556,6 +585,10 @@
             "kind": "request"
           },
           {
+            "object": "stove",
+            "pulse": true
+          },
+          {
             "page": "dish_fish_soup",
             "button": "cook",
             "pulse": true
@@ -577,6 +610,10 @@
             "place": "home",
             "object": "farmhouse",
             "kind": "request"
+          },
+          {
+            "object": "stove",
+            "pulse": true
           },
           {
             "page": "dish_grilled_crucian",

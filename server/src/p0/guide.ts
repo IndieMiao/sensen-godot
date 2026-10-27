@@ -58,9 +58,11 @@ export interface GuidePred {
 
 /** An in-world mark the client lights for the step (340). `place`: an id, `home` or `home:<role>` (the home set);
  * `plot: 'teach'`: the two teaching plots (view resolves both); the server also reads `place` for the map pins. */
-/** The client's keys (341 de0bbb81): button `sow` / `water` / `cook` / `gift` / `request` / `quickbar:<item>`; object
- * `farmhouse`; page: a Cookbook page (its Cook key); plot: `teach` (the two teaching plots) / `teach1` (the first; view: plot ids). */
-export interface GuideMark { place?: string; resident?: string; plot?: string; button?: string; object?: string; page?: string; kind?: MarkerKind | 'gift'; pulse?: boolean; why?: string }
+/** The client's keys (341 de0bbb81, 5422f7e2): button — a HUD / panel control: `sow` / `water` / `harvest` / `cast` / `cook` /
+ * `gift` / `request` / `location` (the location chip) / `quickbar:<item>`; object — a world object: `farmhouse` (its door's
+ * mark), `stove`; page: a Cookbook page (its Cook key); item: a bag item's cell in the open drawer (the Gift drawer's soup);
+ * plot: `teach` (the two teaching plots) / `teach1` (the first; view: plot ids). */
+export interface GuideMark { place?: string; resident?: string; plot?: string; button?: string; object?: string; page?: string; item?: string; kind?: MarkerKind | 'gift'; pulse?: boolean; why?: string }
 /** row.line / row.go, a mark's why and pip may name the home set: `{market}`, `{pond}`, … in a line, `home:<role>` in go;
  * `{have}` / `{need}`: the count shown (the step's, or the recover entry's own). row.countdown (a crop id): view adds
  * ready_in (ms to that crop's soonest ripening, null if none grows), count (its plots growing: one or more) and
