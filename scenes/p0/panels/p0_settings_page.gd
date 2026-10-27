@@ -4,7 +4,7 @@ extends Control
 ## surface: a fixed PageHeader (E-12) where the profile's top bar is — its back on the profile's back, safe area included
 ## (不知火舞 on #292: pages of one path, the back never jumps) — and the page scrolling under it, 16 in, 12 below it.
 ##   SETTINGS  (SETTINGS-1-2 1252:88686, P0 subset) only rows that do something (不知火舞: no greyed rows): the
-##             Legal group's `Licenses ›` and the read-only `Version` (`0.2.1 (2026101001)`). Terms of Service and
+##             `Licenses ›`, visible `Test options ›`, and read-only `Version` (`0.2.1 (2026101001)`). Terms of Service and
 ##             Privacy Policy join it once they have real addresses (奕星).
 ##   LICENSES  (SET-LICENSES 1254:88796) P0Legal's groups (Software, Map data), each row › to its text.
 ##   TEXT      no frame: the row's title in the header, its full text below — Regular 13 secondary, 16 in, paragraphs
@@ -21,8 +21,6 @@ signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
 enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS }
-const TestEntry := preload("res://modules/p0/p0_test_entry.gd")
-var _test_entry: RefCounted
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -78,8 +76,8 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 	header.back_pressed.connect(func(): back_pressed.emit())
 	add_child(header)
 
-## SETTINGS (P0): Home first (SET-HOME-1 / -2 2561:131673 / 2561:131708, SGODOT-303), then Legal · `Licenses ›` and
-## `Version`. `home` {name, line, open} (P0HomePick.settings_row): while the change is open, `Home city · Tokyo` ›
+## SETTINGS (P0): Home, an untitled `Test options ›` group, then the unchanged Legal group (Licenses and Version)
+## (341 d559585e, corrected by 0d94c10d). `home` {name, line, open}: while the change is open, `Home city · Tokyo` ›
 ## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
 ## `Set for good`. No home (a view not in yet): no Home group.
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}) -> P0SettingsPage:
@@ -91,19 +89,19 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		row.name = "HomeCity"
 		row.pressed.connect(func(): page.open_pressed.emit("home"))
 		page._group("Home", [row])
+	var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
+	tests.name = "TestOptions"
+	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
+	page._group("", [tests])
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
 	var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
 	ver.name = "Version"
 	page._group("Legal", [licenses, ver])
-	page._test_entry = TestEntry.new()
-	ver.mouse_filter = Control.MOUSE_FILTER_PASS
-	ver.gui_input.connect(func(event: InputEvent): page._test_entry_input(event))
-	page.scroll.scroll_started.connect(func(): page._test_entry.reset())
 	return page
 
-## Hidden test settings, approved B layout (341 aa0e971b). The same page, groups, rows and commands as Settings.
+## Visible test settings (341 d559585e), retaining the approved B page layout and copy (aa0e971b).
 static func test_options(on: bool, is_test: bool, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.TEST_OPTIONS, "Test options", safe_top, safe_bottom)
 	var toggle := UiSettingRow.new(UiSettingRow.Kind.TOGGLE, "New-player guide", "For new test accounts")
@@ -142,18 +140,6 @@ static func return_main_link(action: Callable) -> UiDismissButton:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	button.pressed.connect(action)
 	return button
-
-func _test_entry_input(event: InputEvent) -> void:
-	if _test_entry == null: return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
-			_test_entry.press(event.position, Time.get_ticks_msec())
-			set_process(true)
-		else: _test_entry.release(event.position, Time.get_ticks_msec())
-	elif event is InputEventMouseMotion: _test_entry.move(event.position)
-
-func _notification(what: int) -> void:
-	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED] and _test_entry != null: _test_entry.reset()
 
 ## LICENSES: one group per P0Legal group, a row per credit (`MIT License` under it; a data credit's attribution, then
 ## its licence), each row › to its text.
@@ -204,11 +190,8 @@ static func text(title: String, full_text: String, safe_top := 0.0, safe_bottom 
 
 ## TEXT: the paragraphs still to lay out, a batch a frame.
 func _process(_dt: float) -> void:
-	if _test_entry != null and _test_entry.tick(Time.get_ticks_msec()):
-		open_pressed.emit("test_options")
-		return
 	if _to_add.is_empty():
-		set_process(_test_entry != null and _test_entry.holding)
+		set_process(false)
 		return
 	_add_paragraphs(_PARAGRAPHS_PER_FRAME)
 
