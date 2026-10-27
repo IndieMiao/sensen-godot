@@ -120,3 +120,20 @@ func test_the_field_grows_it_over_45_seconds() -> void:
 	var cells := P0Garden.cells(_view([_growing(0, 15000.0)]), 1000000)
 	var slot: Dictionary = cells[P0Garden.cell_id(P0Garden.cell_of(0))]
 	assert_int(int(slot.ready_at) - int(slot.watered_at)).is_equal(45000)
+
+## q(227): one countdown per crop, its soonest plot's (①); singular for one plot left, plural for more (②); a crop with
+## ripe plots shows only its Harvest row (③); a Quick Radish and a Radish are two crops (④).
+func test_today_has_one_countdown_per_crop() -> void:
+	var lines := func(v: Dictionary) -> Array:   # the crop rows only (the level's info row still follows the first, q(69))
+		return P0Logic.today_rows(v).map(func(r): return str(r.line)).filter(func(l): return not str(l).begins_with("Farming"))
+	var plots: Array = []
+	for i in 6: plots.append(_growing(i, 14_280_000.0, "crop_radish"))        # sown first: 3h 58m
+	for i in 14: plots.append(_growing(6 + i, 14_100_000.0, "crop_radish"))   # a few minutes later: 3h 55m
+	assert_array(lines.call(_view(plots))).is_equal(["Radishes ready in 3h 55m"])
+	assert_array(lines.call(_view([_growing(0, 14_100_000.0, "crop_radish")]))).is_equal(["Radish ready in 3h 55m"])
+	var mixed := _view([{"id": 0, "state": "ready", "crop": "crop_lettuce"}, {"id": 1, "state": "ready", "crop": "crop_lettuce"},
+		_growing(2, 1_860_000.0, "crop_lettuce"), _growing(3, 1_860_000.0, "crop_lettuce"),
+		_growing(4, 38_000.0), _growing(5, 14_100_000.0, "crop_radish")])
+	assert_array(lines.call(mixed)).is_equal(["Harvest 2 Lettuce", "Quick Radish ready in 0:38", "Radish ready in 3h 55m"])
+	var ripe_quick := _view([{"id": 0, "state": "ready", "crop": "crop_quick_radish"}, _growing(1, 14_100_000.0, "crop_radish")])
+	assert_array(lines.call(ripe_quick)).contains(["Harvest 1 Quick Radish", "Radish ready in 3h 55m"])   # ④: not the same crop

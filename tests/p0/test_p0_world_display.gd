@@ -45,7 +45,7 @@ func test_today_rows_keep_the_lines_and_add_icons_and_show_targets() -> void:
 	var v := _view()
 	var rows := P0Logic.today_rows(v)
 	assert_that(rows.map(func(r): return r.line)).is_equal(P0Logic.today_lines(v))
-	assert_str(str(rows[0].line)).is_equal("Radishes ready in 1h 12m")
+	assert_str(str(rows[0].line)).is_equal("Radish ready in 1h 12m")   # one plot (q(227) ②)
 	assert_str(str(rows[0].icon)).is_equal("crop_radish")
 	assert_str(str(rows[0].go)).is_equal("plots")
 	assert_str(str(rows[1].icon)).is_equal("xp")

@@ -74,7 +74,7 @@ func test_a_short_request_follows_the_now_rows_and_precedes_the_countdowns() -> 
 	v.residents["res_pip"] = {"request": {"id": "req_res_pip_2", "kind": "sow", "have": 3, "qty": 5, "ready": false}, "request_state": "accepted"}
 	v.residents.erase("res_old_kai")
 	v["plots"] = [{"state": "sown", "crop": "crop_radish"}, {"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
-	assert_array(_lines(v)).is_equal(["Water 1 sown plot", "Five Little Plots · Plots 3/5", "Radishes ready in 1h"])
+	assert_array(_lines(v)).is_equal(["Water 1 sown plot", "Five Little Plots · Plots 3/5", "Radish ready in 1h"])   # one plot: singular (q(227) ②)
 
 ## The first session shows its tutorial request alone (the guide's own row).
 func test_the_first_session_keeps_its_tutorial_request_alone() -> void:
