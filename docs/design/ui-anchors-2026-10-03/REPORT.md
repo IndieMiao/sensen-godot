@@ -1,6 +1,6 @@
 # 当前 UI 设计索引
 
-整理日期：2026-10-05。玩法、规则、数值与分期以[玩法方案 v2](../../product/gameplay-plan-v2-2026-10-02.md)为基准；视觉对照进入 [Figma 原型](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)。文件 key 为 `icmfLGHkiMBfMQApCiw13D`，原型页为 `310:2955`。
+整理日期：2026-10-05。玩法、规则、数值与分期以[玩法方案 v2](../../product/gameplay-plan-v2-2026-10-02.md)为基准；视觉对照进入 [Figma 原型](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3)。文件 key 为 `5SVgfevrLzZXqD83uyPgmV`，原型页为 `5:3`。
 
 本目录保存 HTML 静态设计稿、场景底图、共享图标和截图。它们不是游戏实现或验收证据。最新产品修订与局部旧示意不一致时，先按玩法方案对应章及第 1.5 节最新修订判断；实现进度另见 [P0 核查](../../qa/p0-progress-audit-2026-10-05.md)。
 

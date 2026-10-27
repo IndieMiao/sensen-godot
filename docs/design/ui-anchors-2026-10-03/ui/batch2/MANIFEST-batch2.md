@@ -1,6 +1,6 @@
 # 批次 2 · 内容、成长与个人页设计
 
-更新：2026-10-05 下午审图口径。规则以[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)及第 1.5 节 p(6)–p(9) 为基准；视觉对照使用 [Figma 原型](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)。[返回设计索引](../../REPORT.md)。
+更新：2026-10-05 下午审图口径。规则以[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)及第 1.5 节 p(6)–p(9) 为基准；视觉对照使用 [Figma 原型](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3)。[返回设计索引](../../REPORT.md)。
 
 ## 页面索引
 

@@ -1,6 +1,6 @@
 {
  "format": 1,
- "source": "Figma icmfLGHkiMBfMQApCiw13D page Landmark_icons (299:2955): each node's original transparent 1024px image (not the node render, which adds a grey card), resized to 512px on 2026-09-29",
+ "source": "Figma 5SVgfevrLzZXqD83uyPgmV page Landmark_icons (5:5): each node's original transparent 1024px image (not the node render, which adds a grey card), resized to 512px on 2026-09-29",
  "note": "Landmark markers for cities beyond Los Angeles. LA's five live in assets/map/poi/ already. Coordinates are added per city map JSON when a city opens; none are invented here.",
  "landmarks": {
   "golden_gate_bridge": {

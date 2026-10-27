@@ -1,6 +1,6 @@
 # 批次 1 · 地图、据点与 NPC 设计
 
-更新：2026-10-05。规则基准为[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 9、11、12、16 章；视觉对照使用 [Figma 原型](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)。[返回设计索引](../../REPORT.md)。
+更新：2026-10-05。规则基准为[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 9、11、12、16 章；视觉对照使用 [Figma 原型](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3)。[返回设计索引](../../REPORT.md)。
 
 ## 当前结构
 
