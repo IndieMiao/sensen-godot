@@ -979,7 +979,7 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 	bar.anchor_at(screen + Vector2(_name_bar_shift(bar.rect_for(screen, bar.side)), 0.0))
 	var b: UiWorldIconButton = _icons.get(id)
 	if b: b.visible = false   # the strip stands in for its button
-	_raise_marker(bar)   # the open strip draws over every icon button and badge (哪吒: a stove badge sat on a card)
+	_raise_marker(bar)   # above ordinary markers; teaching-plot states stay above facility strips (341 c76fc1ea)
 	if not bar.visible or bar.get_meta("folding", false):
 		if not bar.visible: bar.set_openness(0.0)
 		bar.visible = true
@@ -992,6 +992,7 @@ func _raise_marker(m: Control) -> void:
 	var top := m.get_index()
 	for group in [_badges, _icons, _name_bars, _npc_tags]:
 		for other in group.values():
+			if not m.get_meta("above_name_bars", false) and other.get_meta("above_name_bars", false): continue
 			if (other as Node).get_parent() == _kit: top = maxi(top, (other as Node).get_index())
 	if top > m.get_index(): _kit.move_child(m, top)
 
@@ -1139,7 +1140,7 @@ func _tap_at(global_pos: Vector2, double: bool) -> bool:
 	else: tapped.emit(global_pos - root.global_position)
 	return false
 
-func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, caption := "", icon: Texture2D = null) -> void:
+func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, caption := "", icon: Texture2D = null, above_name_bars := false) -> void:
 	var b: UiStatusBadge = _badges.get(id)
 	if b == null:
 		b = UiStatusBadge.new()
@@ -1149,12 +1150,15 @@ func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, 
 		_badges[id] = b
 	b.visible = show and _modal == null
 	if not b.visible: return
+	b.set_meta("above_name_bars", above_name_bars)
 	b.state = state
 	b.caption = caption
 	b.icon = icon
 	_place_marker(b, screen, false)
+	if above_name_bars: _raise_marker(b)   # stays in the world group, below HUD/cards; never raise its CanvasItem z
 	# 228 293b4190, for every CaptionPill: an open name strip over a mark's caption folds it to the mark while it shows.
-	if caption != "" and b.visible and _strip_covers(Rect2(b.position, b.size)):
+	# 341 c76fc1ea: teaching-plot states and their countdown pills instead draw over the facility strip.
+	if not above_name_bars and caption != "" and b.visible and _strip_covers(Rect2(b.position, b.size)):
 		b.caption = ""
 		_place_marker(b, screen, false)
 

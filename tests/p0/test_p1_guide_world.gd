@@ -423,3 +423,40 @@ func test_countdown_caption_avoids_pip_and_hides_under_panels_offscreen_and_on_l
 	guide._growth_marks(v)
 	guide.leave()
 	assert_bool(badge.visible).is_false()
+
+func test_plot_states_and_countdown_pills_stay_above_a_reopened_facility_name() -> void:
+	var v := _growing_view()
+	v.guide.marks = [{plot = 0}, {plot = 1}]
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	for state in ["sown", "growing", "ready"]:
+		v.plots[0].state = state
+		guide._water_marks(v)
+		guide._growth_marks(v)
+		var id: String = (FarmGuide.WATER_TAG if state == "sown" else FarmGuide.GROWTH_TAG) + "0"
+		var badge: UiStatusBadge = ui._badges[id]
+		# Open/reopen the strip after the plot update, the ordering that used to cover the droplet's top.
+		for i in 3:
+			ui.name_bar("spot_reed", P0Logic.icon("fiber"), "Reed Bank", "", badge.get_global_rect().get_center(), true)
+			var bar: UiWorldNameBar = ui._name_bars.spot_reed
+			bar.set_openness(1.0)
+			bar.anchor_at(badge.get_global_rect().get_center())
+			assert_bool(bar.get_global_rect().intersects(badge.get_global_rect())).is_true()
+			assert_int(badge.get_index()).is_greater(bar.get_index())
+			guide._water_marks(v)
+			guide._growth_marks(v)
+			assert_bool(badge.visible).is_true()
+			assert_int(badge.get_index()).is_greater(bar.get_index())
+			assert_int(badge.z_index).is_equal(0)   # no jump over the HUD or a modal's canvas layer
+			assert_object(badge.get_parent()).is_same(ui._kit)
+			assert_int(badge.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+			if state == "growing":
+				assert_str(badge.caption).is_equal("0:45")
+				assert_bool(badge._pill.visible).is_true()
+	ui.badge("ordinary", UiStatusBadge.State.READY, Vector2(100, 260), true)
+	ui._raise_marker(ui._name_bars.spot_reed)
+	assert_int(ui._badges.ordinary.get_index()).is_less(ui._name_bars.spot_reed.get_index())
+	ui._open_modal(Control.new())
+	guide._water_marks(v)
+	guide._growth_marks(v)
+	assert_bool(ui._badges[FarmGuide.GROWTH_TAG + "0"].visible).is_false()

@@ -95,7 +95,7 @@ func _water_marks(view: Dictionary) -> void:
 			wanted[id] = true
 			_water_badges[id] = true
 			farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE,
-				farm.cam.unproject_position(at), true, "", P0Logic.icon("water"))
+				farm.cam.unproject_position(at), true, "", P0Logic.icon("water"), true)
 			_water_clear_of_pip(id)
 	for id in _water_badges:
 		if not wanted.has(id): farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE, Vector2.ZERO, false)
@@ -116,7 +116,7 @@ func _growth_marks(view: Dictionary) -> void:
 			wanted[id] = true
 			_growth_badges[id] = true
 			farm.rt.ui.badge(GROWTH_TAG + str(id), UiStatusBadge.State.READY if state == "ready" else UiStatusBadge.State.COUNTDOWN,
-				farm.cam.unproject_position(at), true, "" if state == "ready" else P0Logic.duration(float(plot.ready_in)))
+				farm.cam.unproject_position(at), true, "" if state == "ready" else P0Logic.duration(float(plot.ready_in)), null, true)
 			_water_clear_of_pip(id, GROWTH_TAG)
 	for id in _growth_badges:
 		if not wanted.has(id): farm.rt.ui.badge(GROWTH_TAG + str(id), UiStatusBadge.State.COUNTDOWN, Vector2.ZERO, false)
