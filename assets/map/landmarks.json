@@ -1,6 +1,6 @@
 {
  "format": 1,
- "note": "Landmarks outside the curated cities, drawn from the design team's Figma Landmark_icons page (file icmfLGHkiMBfMQApCiw13D, node 299:2955). Any city shows the ones within reach_km of its map centre. Coordinates cross-checked against OpenStreetMap on 2026-09-29. Horseshoe Bend and Antelope Canyon sit beside Page, AZ, which is too small for the city list, so they reach 200 km (Flagstaff, Cedar City, Hurricane).",
+ "note": "Landmarks outside the curated cities, drawn from the design team's Figma Landmark_icons page (file 5SVgfevrLzZXqD83uyPgmV, node 5:5). Any city shows the ones within reach_km of its map centre. Coordinates cross-checked against OpenStreetMap on 2026-09-29. Horseshoe Bend and Antelope Canyon sit beside Page, AZ, which is too small for the city list, so they reach 200 km (Flagstaff, Cedar City, Hurricane).",
  "landmarks": [
   {
    "id": "golden_gate_bridge",

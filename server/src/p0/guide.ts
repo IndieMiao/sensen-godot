@@ -58,8 +58,13 @@ export interface GuidePred {
 
 /** An in-world mark the client lights for the step (340). `place`: an id, `home` or `home:<role>` (the home set);
  * `plot: 'teach'`: the two teaching plots (view resolves both); the server also reads `place` for the map pins. */
-export interface GuideMark { place?: string; resident?: string; plot?: string; button?: string; kind?: MarkerKind | 'gift'; pulse?: boolean; why?: string }
-/** row.line / row.go and pip may name the home set: `{market}`, `{pond}`, … in a line, `home:<role>` in go. */
+/** The client's keys (341 de0bbb81): button `sow` / `water` / `cook` / `gift` / `request` / `quickbar:<item>`; object
+ * `farmhouse`; page: a Cookbook page (its Cook key); plot: `teach` (the two teaching plots) / `teach1` (the first; view: plot ids). */
+export interface GuideMark { place?: string; resident?: string; plot?: string; button?: string; object?: string; page?: string; kind?: MarkerKind | 'gift'; pulse?: boolean; why?: string }
+/** row.line / row.go, a mark's why and pip may name the home set: `{market}`, `{pond}`, … in a line, `home:<role>` in go;
+ * `{have}` / `{need}`: the count shown (the step's, or the recover entry's own). row.countdown (a crop id): view adds
+ * ready_in (ms to that crop's soonest ripening, null if none grows), count (its plots growing: one or more) and
+ * format (`mss` for a Quick Radish, q(217) ④; else `minutes`, q(97)); the client writes `<line> in <time>`. */
 export interface GuideShow { row?: Record<string, unknown>; tip?: string; marks?: GuideMark[]; pip?: string }
 export interface GuideStep extends GuideShow {
   id: string; phase?: string;
@@ -69,14 +74,15 @@ export interface GuideStep extends GuideShow {
   /** In order: the first whose `if` fails shows a recover entry — the first of `else` whose `when` holds (the last has none). */
   needs?: { if: GuidePred; else: string[] }[];
 }
-export interface GuideRecover extends GuideShow { id: string; when?: GuidePred }
+/** progress.fish: the entry's own count, cookable fish held against `fish` (339 2e08a1a1: `Catch 2 fish · 1/2`). */
+export interface GuideRecover extends GuideShow { id: string; when?: GuidePred; progress?: { fish: number } }
 export interface GuideContent {
   steps: GuideStep[]; recover?: GuideRecover[]; tips?: Record<string, string>;
   pond_catch?: boolean;   // false: a guided save starts without Pond Catch on the Stall Board (339 decides; default kept)
   /** The key that refills that held first slot done_refill_h later (q(215) ④: `deliver:req_res_nadia_radish`). */
   stall_refill_on?: string;
   /** q(217) ③ Pip's resend: `qty` of `item` when the player is out (see resendReady), at most `max` times a save. */
-  resend?: { item: string; qty: number; max: number; line: string; radish: string; deliver: string; dish: string };
+  resend?: { item: string; qty: number; max: number; line: string; radish: string; deliver: string; dish: string; source: string };   // source: the parcel's From line in the Inbox (苏烈 on #503)
   /** The home-day rollovers after the save was made at which an unfinished guide ends by itself (q(215): 2). */
   timeout_days?: number;
 }
@@ -314,7 +320,7 @@ function resend(c: P0Content, s: P0State, now: number, events: P0Event[]): void 
   const r = c.guide!.resend!, g = s.guide!;
   const nth = (g.n.resend ?? 0) + 1;
   // the bag first, else a parcel (grantItems, §10.4.8); the key keeps a retried command from giving twice
-  const bagged = grantItems(c, s, now, `guide_resend:${nth}`, 'res_pip', [[r.item, r.qty]], events);
+  const bagged = grantItems(c, s, now, `guide_resend:${nth}`, r.source, [[r.item, r.qty]], events);
   if (bagged === null) return;
   g.n.resend = nth;
   events.push({ kind: 'guide', action: 'resend', item: r.item, qty: r.qty, bagged: bagged[r.item] ?? 0, left: r.max - nth });
@@ -375,10 +381,11 @@ function placeName(c: P0Content, id: string): string {
   return gen?.name ?? id;
 }
 
-/** `{market}` / `{pond}` / … in a line: the home set's names (q(162): every home city its own). */
-function fill(c: P0Content, s: P0State, line: string): string {
+/** `{market}` / `{pond}` / … in a line: the home set's names (q(162): every home city its own); `{have}` / `{need}`: the count. */
+function fill(c: P0Content, s: P0State, line: string, count: { have: number; need: number } | null = null): string {
   const set: HomeSet | null = homeSetOf(c, s);
-  return line.replace(/\{(market|tea|tackle|post|pond)\}/g, (all, role: HomeRole) => (set?.[role] ? placeName(c, set[role]) : all));
+  return line.replace(/\{(market|tea|tackle|post|pond)\}/g, (all, role: HomeRole) => (set?.[role] ? placeName(c, set[role]) : all))
+    .replace(/\{(have|need)\}/g, (all, k: 'have' | 'need') => (count ? String(count[k]) : all));
 }
 
 /** The two teaching plots (q(222), 340 GUIDE-S2): plots holding a Quick Radish first, then the lowest empty tilled ones. */
@@ -391,15 +398,32 @@ function teachPlots(c: P0Content, s: P0State): number[] {
 }
 
 /** The marks resolved: real place ids (a home role the save lacks drops), `plot: 'teach'` as one mark per plot. */
-function resolveMarks(c: P0Content, s: P0State, marks: GuideMark[] = []) {
+function resolveMarks(c: P0Content, s: P0State, marks: GuideMark[] = [], count: { have: number; need: number } | null = null) {
   const out: (Omit<GuideMark, 'plot'> & { plot?: number | string })[] = [];
   for (const m of marks) {
     const place = m.place !== undefined ? guidePlace(c, s, m.place) : undefined;
     if (place === null) continue;
-    if (m.plot === 'teach') { for (const id of teachPlots(c, s)) out.push({ ...m, plot: id }); continue; }
-    out.push({ ...m, ...(place !== undefined ? { place } : {}) });
+    if (m.plot === 'teach' || m.plot === 'teach1') {   // teach1: the first only (q(229): `Sow 1 Radish`, one plot's halo)
+      for (const id of teachPlots(c, s).slice(0, m.plot === 'teach1' ? 1 : 2)) out.push({ ...m, plot: id });
+      continue;
+    }
+    out.push({ ...m, ...(place !== undefined ? { place } : {}), ...(m.why !== undefined ? { why: fill(c, s, m.why, count) } : {}) });
   }
   return out;
+}
+
+/** A countdown row's numbers (341 de0bbb81): the crop's plots growing and the soonest one's time left. */
+function countdown(c: P0Content, s: P0State, crop: string, now: number) {
+  const growing = s.plots.filter(p => p.crop === crop && p.state === 'growing' && p.ready_at !== undefined);
+  const soonest = growing.reduce((m, p) => Math.min(m, p.ready_at!), Infinity);
+  return { ready_in: growing.length ? Math.max(0, soonest - now) : null, count: growing.length, format: quickCrop(c, crop) ? 'mss' : 'minutes' };
+}
+
+/** The count shown: a recover entry's own (progress.fish), else the step's. */
+function shownProgress(c: P0Content, s: P0State, st: GuideStep, rec: string | null) {
+  const own = rec ? recoverOf(c, rec)?.progress : undefined;
+  if (own) return { have: Math.min(heldWhere(s, id => isCookFish(c, id)), own.fish), need: own.fish };
+  return progress(st, s.guide!);
 }
 
 /**
@@ -413,14 +437,16 @@ export function guideView(c: P0Content, s: P0State, now: number) {
   if (!g || !st) return { step: null, end: g?.end ?? (g?.step ? 'done' : 'legacy'), ended_at: g?.ended_at ?? null, pip: { here: false } };
   const rec = guideRecover(c, s, now);
   const shown: GuideShow = rec ? recoverOf(c, rec) ?? {} : st;
+  const count = shownProgress(c, s, st, rec);
   const row = shown.row ? { ...shown.row } : null;
-  if (row && typeof row.line === 'string') row.line = fill(c, s, row.line);
+  if (row && typeof row.line === 'string') row.line = fill(c, s, row.line, count);
   if (row && typeof row.go === 'string') row.go = guidePlace(c, s, row.go);
+  if (row && typeof row.countdown === 'string') Object.assign(row, countdown(c, s, row.countdown, now));
   const ready = resendReady(c, s), r = c.guide?.resend;
   const pipLine = ready && r ? r.line : shown.pip ?? st.pip;
   return {
-    step: st.id, phase: st.phase ?? null, recover: rec, at: g.at, progress: progress(st, g),
-    row, tip: shown.tip ?? null, marks: resolveMarks(c, s, shown.marks),
+    step: st.id, phase: st.phase ?? null, recover: rec, at: g.at, progress: count,
+    row, tip: shown.tip ?? null, marks: resolveMarks(c, s, shown.marks, count),
     pip: { here: true, bang: (g.n['talk:res_pip'] ?? 0) === 0 || ready, line: pipLine ? fill(c, s, pipLine) : null,
       resend_left: r ? Math.max(0, r.max - (g.n.resend ?? 0)) : 0 },
     end: null, ended_at: null,
@@ -433,7 +459,7 @@ export function guideMarkers(c: P0Content, s: P0State, now: number): MapMarker[]
   if (!st) return [];
   const rec = guideRecover(c, s, now);
   const shown: GuideShow = rec ? recoverOf(c, rec) ?? {} : st;
-  return resolveMarks(c, s, shown.marks).filter(m => m.place)
+  return resolveMarks(c, s, shown.marks, shownProgress(c, s, st, rec)).filter(m => m.place)
     .map(m => ({ place: m.place!, kind: (m.kind === 'gift' ? 'request' : m.kind ?? 'request') as MarkerKind,
       why: { guide: rec ?? st.id, tracked: true as const } }));
 }
@@ -472,7 +498,7 @@ export function validateGuide(c: P0Content): string[] {
     if (x.tip && !tips.has(x.tip)) out.push(`${where}: unknown tip ${x.tip}`);
     for (const m of x.marks ?? []) {
       if (m.place && !places.has(m.place)) out.push(`${where}: unknown place ${m.place}`);
-      if (m.plot !== undefined && m.plot !== 'teach') out.push(`${where}: unknown plot ${m.plot} (only "teach")`);
+      if (m.plot !== undefined && m.plot !== 'teach' && m.plot !== 'teach1') out.push(`${where}: unknown plot ${m.plot} (only "teach" / "teach1")`);
       if (m.resident && !c.residents[m.resident]) out.push(`${where}: unknown resident ${m.resident}`);
     }
   };

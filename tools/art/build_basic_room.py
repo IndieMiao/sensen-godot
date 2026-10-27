@@ -498,7 +498,7 @@ def geometry():
     for original in KITS["chair"]["objects"]:
         o=original.copy();o.data=original.data;bpy.context.scene.collection.objects.link(o);o.parent=inst
     inst["linked_asset"]="chair"
-    layout={"units":"metres", "reference":{"file_key":"icmfLGHkiMBfMQApCiw13D","node_id":"545:2968"},
+    layout={"units":"metres", "reference":{"file_key":"5SVgfevrLzZXqD83uyPgmV","node_id":"3:4550"},
         "assets":[{"name":k,"file":k+".glb","position":d["at"],"yaw_degrees":d["yaw"],"colliders":d["collision"]} for k,d in KITS.items()],
         "instances":[{"name":"chair_opposite","asset":"chair","position":[-1.39,.082,.62],"yaw_degrees":-90}],
         "spawn":[1.4,.085,1.65],"camera":{"position":[9.5,8.55,11.2],"target":[0,1.75,0],"size":10.75},

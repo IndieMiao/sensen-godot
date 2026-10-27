@@ -143,7 +143,7 @@ def build():
     modules=[('monstera',monstera),('monstera_woven',lambda:monstera('woven')),('peace_lily',peace_lily),('pothos',pothos),('ivy_short',lambda:vine(.65,11)),('ivy_medium',lambda:vine(1,12)),('ivy_long',lambda:vine(1.4,13)),('flower_shrub',shrub),('olive_tree',olive),('fruit_tree',fruit_tree),('pot_terracotta',lambda:pot(.30,.53,'terra')),('pot_woven',lambda:pot(.33,.57,'woven'))]
     for i,(name,fn) in enumerate(modules):
         k.begin(name,at=((i%4-1.5)*2.2,0,(i//4-1)*2.2));fn()
-    k.save('545:2956',{'position':[8,6,10],'target':[0,.7,0],'size':11})
+    k.save('3:4538',{'position':[8,6,10],'target':[0,.7,0],'size':11})
     sys.path.insert(0,str(Path(__file__).resolve().parent))
     from export_atlas import export
     export()

@@ -50,6 +50,7 @@ var _scrim: ColorRect
 var _mark: UiWordmark
 var _caption: Label
 var _place: Label
+var _return_main: UiDismissButton
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP   # a system state takes every touch
@@ -149,6 +150,14 @@ func show_kind(k: Kind, d := {}) -> void:
 	_caption.visible = false
 	card.visible = k in [Kind.FAIL, Kind.MAINT, Kind.UPDATE, Kind.PLACE_FAIL]
 	if card.visible: card.show_card(card_spec(k, d))
+	_layout()
+
+## 341: only a failed launch on a test account exposes a direct return; never shown over loading or normal play.
+func set_return_main(action: Callable) -> void:
+	if _return_main == null and action.is_valid():
+		_return_main = P0SettingsPage.return_main_link(action)
+		card.secondary.get_parent().add_child(_return_main)
+	if _return_main != null: _return_main.visible = action.is_valid() and kind == Kind.FAIL
 	_layout()
 
 ## The card each state draws (q(74) copy; the maintenance time is the player's local clock).

@@ -82,7 +82,7 @@ describe('the guide in the save (SGODOT-341)', () => {
     expect(freshState(c, 'guide-new-01', T0).guide).toMatchObject({ step: null, end: 'legacy' });
     expect(guided(c).guide).toEqual({ step: 'sow_two', n: {}, at: T0, start: T0 });
     expect(guided(content({ steps: [] })).guide).toMatchObject({ step: null, end: 'legacy' });
-    expect(guided(loadP0Content()).guide?.end).toBe('legacy');   // the shipped table is empty until 339
+    expect(guided(loadP0Content()).guide?.step).toBe('t_city');   // the shipped table: 339's v3 (PR-C-s2)
   });
 
   it('Pond Catch stays on a guided save unless the table says pond_catch false', () => {

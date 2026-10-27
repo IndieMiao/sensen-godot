@@ -54,6 +54,10 @@ const _FLOAT_HUG_CHARS := 32         # longer float copy wraps to two lines (Flo
 const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
 const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
 const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
+signal test_account_requested(action: String)
+const TestAccounts := preload("res://modules/p0/p0_test_accounts.gd")
+var test_accounts = TestAccounts.new()
+
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a card over a facility that also shows a badge sits this far above it (the mine's EntryCard)
@@ -127,6 +131,7 @@ var _hp: UiHpBar                # SGODOT-288 HPBar on mine floors 3–5, where t
 var _elite_hp: UiHpBar          # EnemyHP Kind=Elite under it while the elite fights (COMBAT-ELITE)
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
+var _modal_veil: ColorRect   # the open modal's scrim (the home pick's real map lets the drags through it)
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
 var _card_queue: Array = []
 var _teach: UiTipCard
@@ -336,7 +341,7 @@ func set_view(v: Dictionary) -> void:
 	if passport() != null: _passport.call("refresh", v)
 	_refresh_hud()
 	_refresh_bar()
-	_refresh_today()
+	_refresh_today(false)
 
 
 var _hold_here := ""
@@ -1461,6 +1466,9 @@ func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 		_screen.secondary_pressed.connect(func(k: P0SysScreen.Kind): screen_back.emit(k))
 		_screen_layer.add_child(_screen)
 	_screen.show_kind(kind, detail)
+	if test_accounts.is_test() and kind == P0SysScreen.Kind.FAIL:
+		_screen.set_return_main(func(): test_account_requested.emit("main"))
+	else: _screen.set_return_main(Callable())
 
 ## Takes the screen down when it is one of `kinds` (any when empty).
 func hide_screen(kinds: Array = []) -> void:
@@ -1868,6 +1876,7 @@ func _drop_modal() -> void:
 	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
 	_modal = null
+	_modal_veil = null
 	var was_kitchen := modal_kind == "kitchen"
 	modal_kind = ""
 	if was_kitchen: _refresh_hud()   # back out of the farmhouse
@@ -1902,6 +1911,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			(sb as StyleBoxFlat).bg_color.a = 1.0
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
+	_modal_veil = veil
 	if under != null: (under as P0ProfilePage).preview.set_active(true)   # moved: watch its new ancestors' visibility
 	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
 	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)   # the system line too (SYS-OFFLINE-3)
@@ -2494,6 +2504,7 @@ var _today_panel: UiTodayPanel
 var _today_rows: Array = []
 var _today_given: Array = []
 var _today_signature := ""
+var _today_refresh_ms := -1000
 
 func open_today(given: Array = []) -> void:
 	_today_given = given.duplicate(true)
@@ -2513,8 +2524,11 @@ func open_today(given: Array = []) -> void:
 
 ## Open Today follows authoritative step/recover changes and locally projected countdowns. The button reads the
 ## same current row the player sees, never the rows captured when the panel first opened (341).
-func _refresh_today() -> void:
+func _refresh_today(force := true) -> void:
 	if modal_kind != "today" or not is_instance_valid(_today_panel): return
+	var now := Time.get_ticks_msec()
+	if not force and now - _today_refresh_ms < 250: return
+	_today_refresh_ms = now
 	var rows := _today_given if not _today_given.is_empty() else P0Logic.today_rows(view)
 	var sig := JSON.stringify(rows) + space_here() + place + str(spot_reachable())
 	if sig == _today_signature: return
@@ -2527,7 +2541,11 @@ func _refresh_today() -> void:
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
 		d.tap = str(r.get("gate", "")) != ""
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
-			d.line = str(r.line) + " " + str(r.tail)
+			var line := str(r.line)
+			var at := line.find(" · ")
+			if at < 0: at = line.length()
+			d.line = line.insert(at, " · " + str(r.tail))
+			d.tail = ""
 		return d)
 	_today_panel.set_rows(shown)
 
@@ -3149,26 +3167,70 @@ func open_titles(back := Callable()) -> UiDrawer:
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
 func open_settings(back := Callable()) -> void:
-	var page := P0SettingsPage.settings(P0Legal.version_line(P0Session.demo_config(
-		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else "")),
+	var version := P0Legal.version_line(P0Session.demo_config(
+		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
+	if test_accounts.is_test(): version += " · Test"
+	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)))
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
 		# Home city › (SGODOT-303 PR-4): the change; its ‹ Settings comes back here
 		if what == "home": change_home.emit(func(): open_settings(back))
+		elif what == "test_options": open_test_options(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
+
+func open_test_options(back: Callable) -> void:
+	var page := P0SettingsPage.test_options(test_accounts.enabled(), test_accounts.is_test(), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.toggled.connect(func(_what, on: bool):
+		if not test_accounts.set_enabled(on):
+			var toggle := page.find_child("GuideTestToggle", true, false) as UiSettingRow
+			toggle.on = test_accounts.enabled()
+			show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again"))
+	page.open_pressed.connect(func(what: String):
+		if what == "test_new": _confirm_test_account(back)
+		elif what == "test_main": test_account_requested.emit("main"))
+	_open_modal(page, 0.0, true)
+	modal_kind = "test_options"
+	_modal_back = back
+
+func _confirm_test_account(back: Callable) -> void:
+	var confirm = load("res://scenes/p0/panels/p0_home_move_confirm.gd").new()
+	confirm.theme = UiKit.theme()
+	confirm.card.find_child("Title", true, false).text = "Start a new test account?"
+	confirm.card.find_child("Body", true, false).text = "Your main farm is kept."
+	confirm.move.label = "Start"
+	confirm.move.sends = false
+	var cancel := func():
+		confirm.queue_free()
+		modal_kind = "test_options"
+		_modal_back = back
+	confirm.cancelled.connect(cancel)
+	confirm.move_pressed.connect(func(): test_account_requested.emit("new"))
+	_modal.add_child(confirm)   # keep the settings page behind its confirmation, not the game HUD
+	modal_kind = "test_confirm"
+	_modal_back = cancel
 
 ## The home pick (SGODOT-303, P0HomeFlow): a new player's first pages over no world, or the change of home from
 ## Settings. Back closes a layer at a time (the confirm card, the spot page); on a first pick's city page it does
 ## nothing (there is nowhere before it), on the change's it goes back to Settings.
 func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
+	if test_accounts.is_test() and flow.change_from == "":
+		flow.return_main = func(): test_account_requested.emit("main")
 	flow.say.connect(func(text: String): toast(text))
 	_open_modal(flow, 0.0, true)
+	# the pin page over the real map (SGODOT-342 PR-2): its clear scrim lets the drags and pinches through to the map
+	var veil := _modal_veil
+	if flow.has_signal("map_shown"):
+		flow.map_shown.connect(func(on: bool):
+			if is_instance_valid(veil): veil.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_STOP
+			pad.visible = not on and surface != "map")   # no stick under the pin page: its map takes the drags
 	modal_kind = "home_pick"
 	_modal_back = _home_flow_back.bind(flow)
 

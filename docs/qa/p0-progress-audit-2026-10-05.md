@@ -1,7 +1,7 @@
 # P0 进度核查与 Plane 拆卡（2026-10-05）
 
 基线：`farm-dev@25b7a8a`，已合并 `feat/p0-core` 38 个提交。需求以 [玩法方案 v2](../product/gameplay-plan-v2-2026-10-02.md) §17.2 与 10-05 p(6)–p(9) 最新修订为准。
-Figma：[Gensen (US) · Prototype](https://www.figma.com/design/icmfLGHkiMBfMQApCiw13D/Gensen--US-?node-id=310-2955)，file key `icmfLGHkiMBfMQApCiw13D`，page `310:2955`。原型地址已补在玩法方案首页，供后续核查直接使用。
+Figma：[Gensen (US) · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3)，file key `5SVgfevrLzZXqD83uyPgmV`，page `5:3`。原型地址已补在玩法方案首页，供后续核查直接使用。
 
 ## 结论
 

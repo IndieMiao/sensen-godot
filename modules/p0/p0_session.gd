@@ -22,6 +22,8 @@ signal blocked(code: String, detail: Dictionary)
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const DEMO_CONFIG := "res://assets/p0/demo_server.json"
 const REFRESH_S := 30.0
+const TestAccounts := preload("res://modules/p0/p0_test_accounts.gd")
+var test_accounts = TestAccounts.new()
 
 var base_url := DEFAULT_URL
 var access_key := ""
@@ -59,12 +61,17 @@ func _ready() -> void:
 	if base_url == "": base_url = DEFAULT_URL
 	access_key = str(demo.get("key", ""))
 	version = int(demo.get("version", 0))
+	if not test_accounts.restore_missing_main():
+		push_error("P0 test-account main identity backup could not be verified")
+		return
 	player_id = _read_line("user://p0_player.txt", "")
 	if player_id == "":
 		var bytes := Crypto.new().generate_random_bytes(10)
 		player_id = "p0-" + bytes.hex_encode()
 		var f := FileAccess.open("user://p0_player.txt", FileAccess.WRITE)
 		if f: f.store_line(player_id)
+	if test_accounts.is_test(): player_id = test_accounts.active_id()
+	Avatar.user_id = test_accounts.avatar_id(Avatar.user_id)
 	report({"kind": "session_start"})
 	# Deferred: P0Runtime adds the session before P0Ui, and an immediate failure would toast on a UI not built yet.
 	refresh.call_deferred()
@@ -247,8 +254,8 @@ static func boot_wanted() -> bool:
 ## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide_v3 — a new
 ## save starts the v3 guide with server-resolved presentation (341 c6f3189a). The old `guide` feature advertised
 ## by 0.2.11 is intentionally absent: that package cannot show the complete v3 guide.
-# Keep partial clients on legacy. The final C-client-3 integration commit may enable this only after C1/C2,
-# whole-guide QA, code/design review and the user's visual review (341, partial-client safeguard).
+# Ordinary accounts stay legacy until complete integration. The hidden B test flow explicitly creates a separate
+# test identity whose first request may opt in (aa0e971b). The switch alone never changes the active main account.
 const GUIDE_V3_READY := false
 const FEATURES := "choose_home,guide_v3" if GUIDE_V3_READY else "choose_home"
 
@@ -256,7 +263,7 @@ func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
-	headers.append("x-p0-features: " + FEATURES)
+	headers.append("x-p0-features: " + ("choose_home,guide_v3" if GUIDE_V3_READY or test_accounts.guide_enabled() else "choose_home"))
 	return headers
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is

@@ -51,6 +51,7 @@ var row := {}
 var pick := false
 var picked := false: set = set_picked
 var note := ""
+var grey := false     # PICK: the row cannot be picked (it reads grey); a note alone does not make it so (q(216) ⑨)
 var check: TextureRect
 var thumb: Panel
 var thumb_art: TextureRect
@@ -58,17 +59,20 @@ var slot: Control
 
 ## row: P0Travel.nearby's {cluster, name, region, km, trip, trip_name, climate, visited, stamped, landmark}.
 ## PICK (pick_note given, "" for a city that can be picked): the pick page's {cluster, name, region, climate, landmark}.
-func _init(row_: Dictionary = {}, pick_note: Variant = null) -> void:
+## can_pick: whether it can be picked though it has a note (the home city in a change of home, q(216) ⑨: `Your home
+## city` under a row that reads and picks as any other); by default, only a row without a note.
+func _init(row_: Dictionary = {}, pick_note: Variant = null, can_pick: Variant = null) -> void:
 	row = row_
 	pick = pick_note != null
 	note = str(pick_note) if pick else ""
+	grey = pick and (not bool(can_pick) if can_pick != null else note != "")
 	name = "City_" + str(row.get("cluster", "")).validate_node_name()
 	flat = true
 	focus_mode = Control.FOCUS_NONE
 	custom_minimum_size.y = _H
 	if pick:
 		custom_minimum_size.x = _PICK_W
-		disabled = note != ""
+		disabled = grey
 		flat = false   # a flat button draws no ground: the picked one has one (set_picked)
 	var clear := StyleBoxEmpty.new()
 	for s in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]: add_theme_stylebox_override(s, clear)
@@ -103,7 +107,7 @@ func _init(row_: Dictionary = {}, pick_note: Variant = null) -> void:
 
 ## PICK: the picked row's ground and check (HOME-PICK-1's `Selected row highlight` and `Selected check`).
 func set_picked(v: bool) -> void:
-	picked = v and pick and note == ""
+	picked = v and pick and not grey
 	if not pick: return
 	var ground: StyleBox = StyleBoxEmpty.new()
 	if picked:
@@ -128,7 +132,7 @@ static func stamp_kind(r: Dictionary) -> String:
 	return "landmark" if str(r.get("landmark", "")) != "" else "seal"
 
 func _thumb() -> Panel:
-	var visited := note == "" if pick else bool(row.get("visited", false))   # PICK: grey only when it cannot be picked
+	var visited := not grey if pick else bool(row.get("visited", false))   # PICK: grey only when it cannot be picked
 	var b: Dictionary = BANDS[band(row)]
 	thumb = Panel.new()
 	thumb.name = "Thumb"
@@ -184,7 +188,7 @@ func _text() -> VBoxContainer:
 	city.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	first.add_child(city)
 	var region := str(row.get("region", ""))
-	if pick: first.modulate.a = 1.0 if note == "" else _GREY_LINES
+	if pick: first.modulate.a = _GREY_LINES if grey else 1.0
 	if region != "":
 		var r := UiKit.label(" · " + region, UiTokens.STYLE_C12_B if pick else UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY)
 		r.name = "Region"
@@ -206,7 +210,7 @@ func _text() -> VBoxContainer:
 	climate.name = "Climate"
 	climate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	climate.add_theme_constant_override(&"separation", 4 if pick else 6)
-	if pick: climate.modulate.a = 1.0 if note == "" else _GREY_LINES
+	if pick: climate.modulate.a = _GREY_LINES if grey else 1.0
 	var glyph := TextureRect.new()
 	glyph.name = "Glyph"
 	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -218,7 +222,7 @@ func _text() -> VBoxContainer:
 	var tint := _material()
 	tint.set_shader_parameter(&"mode", 1)
 	# a city that cannot be picked: its line's glyph grey as its thumb's (CityRow · cannot pick)
-	tint.set_shader_parameter(&"tint", UNVISITED_INK if pick and note != "" else (BANDS[band(row)] as Dictionary).ink)
+	tint.set_shader_parameter(&"tint", UNVISITED_INK if grey else (BANDS[band(row)] as Dictionary).ink)
 	glyph.material = tint
 	climate.add_child(glyph)
 	climate.add_child(UiKit.label(str(row.get("climate", "")).capitalize(), UiTokens.STYLE_C12_B if pick else UiTokens.STYLE_C13_B,

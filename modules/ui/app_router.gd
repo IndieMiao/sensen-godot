@@ -186,6 +186,13 @@ func push_instance(scene_path: String, args := {}) -> Node:
 	return _push_packed(packed, args)
 
 
+## A scene already loaded (a threaded preload, the home pick's map: 亚瑟 342 6418183a) pushed as push_instance does;
+## null while a navigation is under way.
+func push_packed(packed: PackedScene, args := {}) -> Node:
+	if _navigation_pending or packed == null: return null
+	return _push_packed(packed, args)
+
+
 func _push_packed(packed: PackedScene, args: Dictionary, suspend_previous := true) -> Node:
 	var inst := packed.instantiate()
 	if inst.has_method("setup"):
