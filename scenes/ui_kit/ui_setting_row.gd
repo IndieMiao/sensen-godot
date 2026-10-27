@@ -4,7 +4,8 @@ extends PanelContainer
 ## 16 / 10 padding, the whole row the touch target (the content never takes a touch).
 ##   LINK   title (ExtraBold 15), an optional line under it (Bold 12 secondary, `MIT License`), › on the right; a data
 ##          credit (SET-LICENSES) has its attribution under the title, word for word and wrapping, and its licence 6
-##          below it as its own line (q(129): so it never reads as the attribution's last line).
+##          below it as its own line (q(129): so it never reads as the attribution's last line). A value given shows
+##          before the › as VALUE's does (`Notifications` · `On ›`, SGODOT-350).
 ##   VALUE  title and its value on the right (Bold 14 secondary), read-only without › (`Version` · `0.2.1 (…)`).
 ##   TOGGLE title, an optional line, the 48 × 28 Toggle on the right (Gensen Refactor/Toggle 1236:107861: green track
 ##          on, neutral off); the whole row switches it (q(133) v3 `Share anonymous map usage`).
@@ -72,11 +73,7 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 	elif line != "":
 		texts.add_child(_text("Line", line, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY))
 	if kind == Kind.VALUE:
-		var v := UiKit.label(value, UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SECONDARY)
-		v.name = "Value"
-		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		v.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(v)
+		row.add_child(_value(value))
 		return
 	if kind == Kind.TOGGLE:
 		_switch = TextureRect.new()
@@ -89,6 +86,7 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 		row.add_child(_switch)
 		set_on(on)
 	else:
+		if value != "": row.add_child(_value(value))
 		var chevron := UiKit.label("›", UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_SECONDARY)
 		chevron.name = "Chevron"
 		chevron.add_theme_font_size_override(&"font_size", _CHEVRON_SIZE)
@@ -111,6 +109,13 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 func set_on(v: bool) -> void:
 	on = v
 	if _switch != null: _switch.texture = load(_TOGGLE_ON if v else _TOGGLE_OFF)
+
+static func _value(text: String) -> Label:
+	var v := UiKit.label(text, UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SECONDARY)
+	v.name = "Value"
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return v
 
 static func _text(name_: String, text: String, style: StringName, color: Color) -> Label:
 	var l := UiKit.label(text, style, color)
