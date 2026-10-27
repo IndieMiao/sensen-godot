@@ -177,6 +177,7 @@ describe('off the path', () => {
       r.now += 46 * S;
       r.check();
       expect(r.view).toMatchObject({ recover: 'r_quick_ripe', row: { line: 'Harvest 2 Quick Radishes' } });
+      expect(r.view.marks.at(-1)).toEqual({ button: 'harvest', pulse: true });   // as S5
       r.now -= 46 * S;
       r.harvest(plots);
       expect(r.view.recover).toBeNull();
@@ -185,7 +186,7 @@ describe('off the path', () => {
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.qty('seed_quick_radish')).toBe(0);
     expect(r.view).toMatchObject({ recover: 'r_radish_sow', row: { line: 'Sow 1 Radish · 2 Energy' }, pip: { bang: false, resend_left: 0 } });
-    expect(r.view.marks).toEqual([{ plot: r.tilled(1)[0] }]);   // one plot's halo (q(229))
+    expect(r.view.marks).toEqual([{ plot: r.tilled(1)[0] }, { button: 'sow', pulse: true }]);   // one plot's halo (q(229)); the Sow key as S2 (341 9826e069)
     const plot = r.tilled(1)[0];
     r.do({ type: 'sow', plot, seed: 'seed_radish', space: 'home' }).do({ type: 'water', plot, space: 'home' });
     expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' } });
@@ -224,6 +225,7 @@ describe('off the path', () => {
     r.s.bag = r.s.bag.filter(x => !x.id.startsWith('fish_'));
     r.check();
     expect(r.view).toMatchObject({ recover: 'r_fish_1', row: { line: 'Catch 1 fish · Fern Pond' } });
+    expect(r.view.marks[1]).toEqual({ button: 'cast', pulse: true });   // as S7
     expect(r.view.marks[0].why).toBe('Catch 1 fish · 0/1');
     r.fish(1);
     expect(r.view.recover).toBe('r_cook_grill');
@@ -240,6 +242,7 @@ describe('off the path', () => {
     r.s.bag = r.s.bag.filter(x => !x.id.startsWith('fish_'));
     r.check();
     expect(r.view).toMatchObject({ recover: 'r_fish_2', row: { line: 'Catch 2 fish · Fern Pond' }, progress: { have: 0, need: 2 } });
+    expect(r.view.marks[1]).toEqual({ button: 'cast', pulse: true });
     r.fish(1);   // bite 3: a Pond Crucian (teaching pin 1)
     expect(r.view).toMatchObject({ recover: 'r_fish_2', progress: { have: 1, need: 2 } });
     expect(r.view.marks[0].why).toBe('Catch 2 fish · 1/2');
