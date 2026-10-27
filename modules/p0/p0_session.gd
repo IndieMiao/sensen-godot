@@ -87,9 +87,15 @@ func current() -> Dictionary:
 ## a busy command finishes first, and failures fall back to the existing retry/periodic refresh (no frame storm).
 func _refresh_guide_maturity(elapsed_ms: float) -> void:
 	if _guide_maturity_checked or not P0Guide.guide_on(view): return
+	var row = view.guide.get("row", null)
+	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null and float(row.ready_in) > 0.0 and float(row.ready_in) <= elapsed_ms:
+		_guide_maturity_checked = true
+		if busy: refresh_after()
+		else: refresh()
+		return
 	for plot in view.get("plots", []):
 		if str(plot.get("state", "")) != "growing" or plot.get("ready_in", null) == null: continue
-		if float(plot.ready_in) > elapsed_ms: continue
+		if float(plot.ready_in) <= 0.0 or float(plot.ready_in) > elapsed_ms: continue
 		_guide_maturity_checked = true
 		if busy: refresh_after()
 		else: refresh()

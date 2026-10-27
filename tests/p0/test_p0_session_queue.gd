@@ -157,3 +157,19 @@ func test_ack_failure_discards_the_queued_build_until_an_explicit_retry() -> voi
 	assert_int(sent.size()).is_equal(1)
 	assert_bool(session.guide_ack("t_city")).is_true()
 	assert_int(sent.size()).is_equal(2)
+
+func test_a_resolved_row_deadline_also_queues_one_refresh() -> void:
+	session.view = {"guide": {"step": "t_harvest_quick", "row": {"countdown": "crop_quick_radish", "ready_in": 3000}}}
+	session._refresh_guide_maturity(2999)
+	assert_array(sent).is_empty()
+	session._refresh_guide_maturity(3000)
+	session._refresh_guide_maturity(4000)
+	assert_int(sent.size()).is_equal(1)
+	_fail()
+	session._refresh_guide_maturity(5000)
+	assert_int(sent.size()).is_equal(1)
+
+func test_an_authoritative_zero_countdown_waits_for_action_instead_of_reading_forever() -> void:
+	session.view = {"guide": {"step": "t_nadia_1", "recover": "r_radish_wait", "row": {"countdown": "crop_radish", "ready_in": 0}}}
+	for elapsed in [0.0, 1000.0, 10000.0]: session._refresh_guide_maturity(elapsed)
+	assert_array(sent).is_empty()
