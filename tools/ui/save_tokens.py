@@ -16,6 +16,7 @@ result = json.load(sys.stdin)
 pretty = json.dumps(json.loads(result['compact']), indent=2, ensure_ascii=False) + '\n'
 if fnv1a(pretty) != result['fnv1a'] or len(pretty) != int(result['bytes']):
     sys.exit(f"checksum mismatch: {fnv1a(pretty)} / {len(pretty)} vs {result['fnv1a']} / {result['bytes']}")
-out = pathlib.Path(__file__).resolve().parents[2] / 'docs/design/tokens/tokens-v2.json'
+# An optional path writes elsewhere (a re-export to compare before it replaces the tokens: 不知火舞 340 021fbb31).
+out = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else pathlib.Path(__file__).resolve().parents[2] / 'docs/design/tokens/tokens-v2.json'
 out.write_text(pretty)
 print(f"wrote {out} ({len(pretty)} bytes, fnv1a {result['fnv1a']})")
