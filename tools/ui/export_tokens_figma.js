@@ -4,16 +4,13 @@
 // (SGODOT-197 LOCK-28). Pipe the returned object into tools/ui/save_tokens.py (pretty-prints `compact`, checks
 // `fnv1a` and `bytes`, writes the tokens file), then run tools/ui/gen_theme.gd.
 // Values Figma does not hold yet come from CONST below, each with its source.
-// 节点待重映射 (10-27): the file moved to 5SVgfevrLzZXqD83uyPgmV and every node id changed. Page 14 is 5:4 there; the
-// component and frame ids below (483:304, 517:11840, 633:41278/9 …) are still the old file's — look each up by name
-// in the new file before the next run (node() / variant() fetch them by id and throw on a missing one). Page 14 there
-// is still bound to the old file's remote variables, so getLocalVariableCollectionsAsync and the local text styles read
-// nothing until they are made local under the same names (不知火舞 340 d8e2d808): no re-export of tokens-v2.json
-// from the new file before that is done and accepted.
+// 10-27: the file moved to 5SVgfevrLzZXqD83uyPgmV (page 14 = 5:4) and every node id changed; the ids below are the new
+// file's, matched by name (不知火舞 340 d7c11d35 / 047b9fd6). HUD and Compact/Command are component sets there, so node()
+// takes their variants' ids. sheetSurface reads InformationSheet (0.97), not the Sheet master (1).
 const CONST = {
   // Fallback for gameplay plan v2 §16.1 rarity dots if the semantic rarity/* variables are missing.
   rarityRare: '#A98BD6',
-  // HUD energy chip fills are hard-coded in HUD 483:304.
+  // HUD energy chip fills are hard-coded in HUD 9:100203.
   energyHudLight: '#F4D27A', energyHudDeep: '#C9962A',
   // Fallback only: page 14 now defines color/scrimDrawer and color/scrimModal (alpha = scrim opacity).
   scrimDrawer: 0.18, scrimModal: 0.32,
@@ -64,7 +61,7 @@ Object.assign(color, {
 if (!Object.keys(sem).some(k => k.startsWith('color/rarity/'))) Object.assign(color, {
   'rarity/common': hex(kit['kit/common']), 'rarity/fine': hex(kit['kit/blue']), 'rarity/rare': CONST.rarityRare, 'rarity/legendary': hex(kit['kit/amber']),
 });
-const joy = await variant('517:11840', 'State=idle');
+const joy = await variant('9:100420', 'State=idle');
 color.joystickRing = hex(child(joy, 'Joystick outer touch circle').fills[0].color, fillAlpha(child(joy, 'Joystick outer touch circle')));
 color.joystickThumb = hex(child(joy, 'Joystick thumb').fills[0].color, fillAlpha(child(joy, 'Joystick thumb')));
 const space = {}, radius = {};
@@ -72,18 +69,18 @@ for (const [k, v] of Object.entries(sem)) {
   if (k.startsWith('space/')) space[k.slice(6).replace(/-(\w)/g, (_, c) => c.toUpperCase())] = v;
   if (k.startsWith('radius/')) radius[k.slice(7)] = v;
 }
-const quickDefault = await variant('633:41279', 'State=default');
-const quickSelected = await variant('633:41279', 'State=selected');
-const invDefault = await variant('633:41278', 'State=default');
-const invEmpty = await variant('633:41278', 'State=empty');
-const quickEmpty = await variant('633:41279', 'State=empty');
-const quickLifted = await variant('633:41279', 'State=lifted');
-const quickDrop = await variant('633:41279', 'State=drop-target');
-const quickZero = await variant('633:41279', 'State=zero');
-const kitchenDefault = await variant('655:58506', 'State=default');
-const kitchenEmpty = await variant('655:58506', 'State=empty');
-const cmdPressed = await variant('483:216', 'Kind=primary-pressed');
-const cmdPending = await variant('483:216', 'Kind=primary-pending');
+const quickDefault = await variant('9:99874', 'State=default');
+const quickSelected = await variant('9:99874', 'State=selected');
+const invDefault = await variant('9:99839', 'State=default');
+const invEmpty = await variant('9:99839', 'State=empty');
+const quickEmpty = await variant('9:99874', 'State=empty');
+const quickLifted = await variant('9:99874', 'State=lifted');
+const quickDrop = await variant('9:99874', 'State=drop-target');
+const quickZero = await variant('9:99874', 'State=zero');
+const kitchenDefault = await variant('9:99354', 'State=default');
+const kitchenEmpty = await variant('9:99354', 'State=empty');
+const cmdPressed = await variant('9:99690', 'Kind=primary-pressed');
+const cmdPending = await variant('9:99690', 'Kind=primary-pending');
 const firstFill = n => n.fills.find(f => f.visible !== false);
 const shadowOf = n => n.effects.find(e => e.visible !== false && e.type === 'DROP_SHADOW');
 const liftShadow = shadowOf(child(quickLifted, 'Slot surface'));
@@ -91,13 +88,13 @@ color.pinAmber = hex(firstFill(child(quickDefault, 'Pinned amber strip')).color)
 color.pinWarm = hex(firstFill(child(quickDefault, 'Pinned warm fill')).color);
 color.primaryPressed = hex(firstFill(cmdPressed).color);
 color.liftShadow = hex(liftShadow.color, liftShadow.color.a);
-const cmdCompact = await node('633:41273');
-const filterDefault = await variant('633:41280', 'State=default');
-const modeDefault = await variant('655:58504', 'State=default');
-const hud = await node('483:304');
+const cmdCompact = await node('9:99711');
+const filterDefault = await variant('9:99723', 'State=default');
+const modeDefault = await variant('9:99496', 'State=default');
+const hud = await node('9:100203');
 const bagFrame = await node('482:10');
 const counterFrame = await node('482:46');
-const energyRef = await variant('517:11873', 'State=normal');
+const energyRef = await variant('9:100383', 'State=normal');
 Object.assign(radius, {
   inventoryCell: invDefault.cornerRadius, track: child(energyRef, 'Energy track').cornerRadius,
   chip: child(filterDefault, 'Filter pill').cornerRadius, hudChip: child(hud, 'Energy').cornerRadius,
@@ -105,19 +102,19 @@ Object.assign(radius, {
   bagDrawerTop: child(bagFrame, 'Bag drawer · source proportions').topLeftRadius,
   counterDrawerTop: child(counterFrame, 'Compact/Shop counter and Bag drawer').topLeftRadius,
 });
-const objectHeader = await node('483:196');
-const itemRow = await node('483:228');
+const objectHeader = await node('9:99657');
+const itemRow = await node('9:100063');
 // keyCompact: the Compact command keys' side padding (BARTER-2 2570:132291 Command surface; 不知火舞, 2026-10-13), no variable of its own
 Object.assign(space, { quickBarGap: 4, keyCompact: 14, hudRowGap: child(hud, 'HUD second row').itemSpacing, itemRowGap: itemRow.itemSpacing });
 const stroke = {
-  default: (await node('483:336')).strokeWeight,
+  default: (await node('9:99685')).strokeWeight,
   cellHairline: invDefault.strokeWeight,
-  selectedCell: (await variant('633:41278', 'State=selected')).strokeWeight,
+  selectedCell: (await variant('9:99839', 'State=selected')).strokeWeight,
   selected: child(quickSelected, 'Slot surface').strokeWeight,
   pinBadge: child(quickDefault, 'Pinned icon surface').strokeWeight,
 };
 const opacity = {
-  sheetSurface: r1(fillAlpha(await node('483:190')) * 100) / 100,
+  sheetSurface: r1(fillAlpha(await node('9:102395')) * 100) / 100,
   scrimCounter: Math.round(fillAlpha(child(counterFrame, 'Counter scene dim')) * 100) / 100,
   scrimDrawer: sem['color/scrimDrawer'] ? Math.round(sem['color/scrimDrawer'].a * 100) / 100 : CONST.scrimDrawer,
   scrimModal: sem['color/scrimModal'] ? Math.round(sem['color/scrimModal'].a * 100) / 100 : CONST.scrimModal,
@@ -126,11 +123,11 @@ const opacity = {
   emptyCell: Math.round(fillAlpha(invEmpty) * 100) / 100,
   kitchenEmpty: Math.round(child(kitchenEmpty, 'Cell surface').opacity * 100) / 100,
 };
-const info = await node('932:71686');
+const info = await node('9:102395');
 // Toast R1 (1178:82265, WP2 accepted 2026-10-07, SGODOT-202) replaced the old Toast main 483:302.
 const toast = await variant('1178:82265', 'Tone=Info');
 const badge = await variant('517:11951', 'State=Available');
-const close = await node('483:336');
+const close = await node('9:99685');
 const size = {
   touch: 44,
   quickSlotW: quickDefault.width, quickSlotH: quickDefault.height,
@@ -141,7 +138,7 @@ const size = {
   quickBarW: 336, quickBarH: quickDefault.height, quickBarX: 12, quickBarBottom: 24,
   hudW: hud.width, hudH: hud.height, hudX: 8, hudTop: 16,
   hudRow1H: child(hud, 'Status').height, hudRow2H: child(hud, 'HUD second row').height,
-  command: (await variant('483:216', 'Kind=primary')).height,
+  command: (await variant('9:99690', 'Kind=primary')).height,
   commandCompact: child(cmdCompact, 'Command surface').height,
   navigationRow: (await node('483:217')).height, dismiss: (await node('483:220')).height,
   close: close.width, closeIcon: close.children[0].width,
@@ -150,8 +147,8 @@ const size = {
   kitchenMode: child(modeDefault, 'Mode pill').height, kitchenModeTouch: modeDefault.height,
   inventoryCell: invDefault.width, inventoryIcon: invDefault.children.find(c => c.type === 'INSTANCE').width,
   gearSlotW: (await variant('663:61299', 'State=default')).width, gearSlotH: (await variant('663:61299', 'State=default')).height,
-  kitchenCellW: (await variant('655:58506', 'State=default')).width, kitchenCellH: (await variant('655:58506', 'State=default')).height,
-  itemRowIcon: (await node('483:228')).children.find(c => c.type === 'INSTANCE').width,
+  kitchenCellW: (await variant('9:99354', 'State=default')).width, kitchenCellH: (await variant('9:99354', 'State=default')).height,
+  itemRowIcon: (await node('9:100063')).children.find(c => c.type === 'INSTANCE').width,
   stateBadgeH: (await node('483:324')).height,
   statusBadge: badge.width, statusBadgeIcon: badge.children[0].width,
   toastW: toast.width, toastIcon: child(toast, 'Tone icon').width,
