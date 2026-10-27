@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { bjSalt, bjShoe, cardCode, refundHand, shuffleShoe } from '../../src/p0/blackjack.js';
+import { bjSalt, bjShoe, cardCode, refundHand, setBlackjackSecret, shuffleShoe } from '../../src/p0/blackjack.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
@@ -244,5 +244,19 @@ describe('a rollback (plan §7, q(238))', () => {
     expect(s.seq).toBe(seq + 1);
     expect(s.day.bj_net).toBeUndefined();
     expect(refundHand(s)).toBeNull();
+  });
+});
+
+describe('a release server without P0_BJ_SECRET (奕星 on #523)', () => {
+  it('keeps the card room alone closed: bj_unavailable, the view not open; a hand left open still settles', () => {
+    stack('TS', '7H', '9S', '9D', '2C');
+    const dealt = step(player(), { type: 'bj_deal', bet: 20 }).state;
+    setBlackjackSecret(null);
+    try {
+      expect(refused(player(), { type: 'bj_deal', bet: 10 }).code).toBe('bj_unavailable');
+      expect(viewOf(c, player(), T0).blackjack).toMatchObject({ open: false, unavailable: true });
+      const other = applyP0(c, dealt, { type: 'read_inbox', keys: [] }, T0 + 24 * H);   // the rest of the game plays on
+      expect(other.ok && other.state.blackjack!.last).toMatchObject({ why: 'expired', net: 20 });
+    } finally { setBlackjackSecret('p0-bj-dev-secret'); }
   });
 });

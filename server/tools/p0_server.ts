@@ -49,9 +49,10 @@ if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', e
 }
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
-// SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one does not start; dev keeps a fixed key.
+// SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one keeps the card room closed and says so
+// (奕星: a missing key must not take every player offline); dev keeps a fixed key.
 if (process.env.P0_BJ_SECRET) setBlackjackSecret(process.env.P0_BJ_SECRET);
-else if (!dev) { console.error(JSON.stringify({ error: 'P0_BJ_SECRET missing' })); process.exit(1); }
+else if (!dev) { setBlackjackSecret(null); console.error(JSON.stringify({ error: 'P0_BJ_SECRET missing: the card room is closed' })); }
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
 const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
 const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
