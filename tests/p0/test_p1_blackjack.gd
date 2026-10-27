@@ -138,3 +138,10 @@ func test_mock_split_makes_two_hands() -> void:
 	assert_array(h.hands[1].cards).is_equal(["8H", "2H"])
 	assert_int(r.state.coins).is_equal(400)
 	assert_str(h.blocked.get("split", "")).is_equal("one_split")
+
+func test_the_mock_never_runs_in_an_exported_package() -> void:
+	var exported := func(f: String) -> bool: return f in ["android", "template", "template_release"]
+	var editor := func(f: String) -> bool: return f == "editor"
+	assert_bool(P0BlackjackMock.allowed(exported, true)).is_false()
+	assert_bool(P0BlackjackMock.allowed(editor, true)).is_true()
+	assert_bool(P0BlackjackMock.allowed(editor, false)).is_false()

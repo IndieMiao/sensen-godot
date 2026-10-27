@@ -2,7 +2,8 @@ class_name P0BlackjackMock
 extends RefCounted
 ## Development stand-in for the server's Blackjack (SGODOT-351, contract 后裔 on 351 b610f98a), so the page, its
 ## gestures and its motion can be built before the server branch runs. Off unless P0_BJ_MOCK=1 or user://p0_bj_mock
-## exists (or a test turns it on). P0Session hands it the bj_* commands and every view it receives: it answers the
+## exists (or a test turns it on), and only in the editor binary: an exported package (debug or release template) has
+## no "editor" feature, so the mock can never answer there. P0Session hands it the bj_* commands and every view it receives: it answers the
 ## commands locally ({ok, state, events} or a refusal, the contract's shapes) and lays its own `blackjack` and the coins
 ## it moved over the real view. Rules as §3: 4 decks reshuffled each hand, S17, peek on A / 10, 3:2 rounded down,
 ## double on the first two, one split (split aces one card each). Never ships enabled: nothing here is persisted.
@@ -10,7 +11,11 @@ extends RefCounted
 const FILE := "user://p0_bj_mock"
 
 static func wanted() -> bool:
-	return OS.get_environment("P0_BJ_MOCK") == "1" or FileAccess.file_exists(FILE)
+	return allowed(OS.has_feature, OS.get_environment("P0_BJ_MOCK") == "1" or FileAccess.file_exists(FILE))
+
+## The switch counts only where `has_feature("editor")` (development runs); exported builds ignore it.
+static func allowed(has_feature: Callable, switched_on: bool) -> bool:
+	return switched_on and bool(has_feature.call("editor"))
 
 var floor_coins := 40
 var intro := false

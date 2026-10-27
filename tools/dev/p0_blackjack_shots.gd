@@ -3,6 +3,9 @@ extends SceneTree
 ## laid out as the frames name them (BJ-BET, BJ-BET-EMPTY, BJ-BET-CAP, BJ-DRAG, BJ-LOW, BJ-ACT…), saved as PNGs.
 ##   godot --path . --resolution 720x1600 -s tools/dev/p0_blackjack_shots.gd  (OUT=dir, ONLY=name,name, SCALE=2)
 ## MOVIE=1 keeps motion on (for frame strips); shots otherwise lay each state out at once.
+## VIDEO=dir records the gesture walkthrough instead (run with --fixed-fps 30): real mouse events through the viewport,
+## a finger marker, every frame saved — tap adds, drag in adds, drag out flies back, a grey chip takes neither, Clear,
+## Deal, Stand, Deal again. ffmpeg -framerate 30 -i dir/f_%05d.png makes the video.
 
 var out := OS.get_environment("OUT") if OS.has_environment("OUT") else "user://bj_shots"
 var only := OS.get_environment("ONLY").split(",", false) if OS.has_environment("ONLY") else PackedStringArray()
@@ -50,6 +53,10 @@ func _want(name: String) -> bool: return only.is_empty() or name in only
 
 func _run() -> void:
 	await process_frame
+	if OS.has_environment("VIDEO"):
+		await _video(OS.get_environment("VIDEO"))
+		quit()
+		return
 	var states := ["bj-bet", "bj-bet-empty", "bj-bet-cap", "bj-drag", "bj-low", "bj-act", "bj-act-grey", "bj-split",
 		"bj-result-blackjack", "bj-result-lose", "bj-result-bust", "bj-result-push", "bj-rules", "bj-intro", "bj-settled"]
 	for s in states:
@@ -154,3 +161,125 @@ func _state_bj_settled() -> Rig:
 	r.page.animate = true
 	r.page.show_settled(P0Blackjack.settled_line({"net": 20}))
 	return r
+
+# ---------------------------------------------------------------- the gesture video
+
+var _frames_dir := ""
+var _frame := 0
+var _finger: Control
+var _rec := false
+
+class Finger extends Control:
+	var down := false
+	func _draw() -> void:
+		draw_circle(Vector2.ZERO, 20.0 if down else 14.0, Color(1, 1, 1, 0.45 if down else 0.25))
+		draw_arc(Vector2.ZERO, 20.0 if down else 14.0, 0.0, TAU, 32, Color(0.18, 0.23, 0.2, 0.6), 2.0, true)
+
+func _record_loop() -> void:
+	while _rec:
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(_frames_dir.path_join("f_%05d.png" % _frame))
+		_frame += 1
+
+func _wait(sec: float) -> void:
+	var n := int(sec * 30.0)
+	for i in n: await process_frame
+
+## A logical (360-wide) point to the window's pixels for Input.parse_input_event.
+func _win(p: Vector2) -> Vector2:
+	var k := Vector2(DisplayServer.window_get_size()) / root.get_visible_rect().size
+	return p * k
+
+func _mouse(p: Vector2, pressed: bool) -> void:
+	var e := InputEventMouseButton.new()
+	e.button_index = MOUSE_BUTTON_LEFT
+	e.pressed = pressed
+	e.position = _win(p)
+	e.global_position = e.position
+	Input.parse_input_event(e)
+	_finger.down = pressed
+	_finger.position = p
+	_finger.queue_redraw()
+
+func _move(p: Vector2) -> void:
+	var e := InputEventMouseMotion.new()
+	e.position = _win(p)
+	e.global_position = e.position
+	e.button_mask = MOUSE_BUTTON_MASK_LEFT if _finger.down else 0
+	Input.parse_input_event(e)
+	_finger.position = p
+
+func _tap(p: Vector2) -> void:
+	_move(p)
+	await _wait(0.15)
+	_mouse(p, true)
+	await _wait(0.1)
+	_mouse(p, false)
+
+func _drag(from: Vector2, to: Vector2, sec := 0.7, hold := 0.35) -> void:
+	_move(from)
+	await _wait(0.15)
+	_mouse(from, true)
+	await _wait(0.12)
+	var n := int(sec * 30.0)
+	for i in n:
+		_move(from.lerp(to, ease(float(i + 1) / n, 0.6)))
+		await process_frame
+	await _wait(hold)
+	_mouse(to, false)
+
+func _chip(page: P0BlackjackPage, i: int) -> Vector2:
+	return page.tray.position + (page.chips[i] as Control).position + Vector2.ONE * UiChipToken.SIZE * 0.5
+
+func _centre(c: Control) -> Vector2: return c.get_global_rect().get_center()
+
+func _video(dir: String) -> void:
+	_frames_dir = dir
+	DirAccess.make_dir_recursive_absolute(dir)
+	var r := _rig(300)
+	r.page.animate = true
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	root.add_child(layer)
+	_finger = Finger.new()
+	_finger.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_finger.position = Vector2(180, 760)
+	layer.add_child(_finger)
+	await _settle()
+	_rec = true
+	_record_loop()
+	var p := r.page
+	await _wait(0.8)
+	await _tap(_chip(p, 3))            # tap: 100 flies in
+	await _wait(0.6)
+	await _tap(_chip(p, 1))            # 10
+	await _wait(0.4)
+	await _tap(_chip(p, 1))            # 10 → 120
+	await _wait(0.7)
+	await _drag(_chip(p, 2), p.circle_center() + Vector2(0, 30))   # drag 50 in: the ring lights, it adds → 170
+	await _wait(0.8)
+	await _drag(_chip(p, 1), Vector2(70, 330), 0.6, 0.3)          # drag 10 out: flies back, nothing added
+	await _wait(0.9)
+	await _tap(_chip(p, 4))            # 500 is grey (170 + 500 > 300 − 40): nothing
+	await _wait(0.5)
+	await _drag(_chip(p, 5), p.circle_center(), 0.5, 0.2)          # 1K grey: no drag either
+	await _wait(0.8)
+	await _tap(_centre(p.clear_key))   # Clear: 0
+	await _wait(0.7)
+	await _tap(_chip(p, 3))
+	await _wait(0.3)
+	await _tap(_chip(p, 1))
+	await _wait(0.3)
+	await _tap(_chip(p, 1))            # 120 again
+	await _wait(0.7)
+	r.mock.next_deck = ["9S", "6D", "8H", "TC", "4C"]
+	await _tap(_centre(p.deal_key))    # Deal · 120
+	await _wait(1.6)
+	await _tap(_centre(p.stand_key))   # Stand: the hole card turns over, the dealer draws, the result
+	await _wait(2.6)
+	r.mock.next_deck = ["TS", "7D", "QH", "9C"]
+	await _tap(_centre(p.again_key))   # Deal again · 120
+	await _wait(1.8)
+	_rec = false
+	await _settle()
+	print("video frames ", _frame)

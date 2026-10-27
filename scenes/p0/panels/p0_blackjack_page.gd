@@ -707,6 +707,7 @@ func _new_hand(stake: int) -> Dictionary:
 	outline.visible = false
 	hands_box.add_child(outline)
 	var tag := _badge()
+	tag.z_index = 2   # over the cards' top edge it sits on
 	var ts := tag.get_theme_stylebox(&"panel") as StyleBoxFlat
 	ts.bg_color = UiTokens.COLOR_SURFACE_RAISED
 	(tag.get_node("Text") as Label).add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT)
