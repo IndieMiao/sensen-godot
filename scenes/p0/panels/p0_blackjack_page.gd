@@ -528,6 +528,7 @@ func _step_dealt(e: Dictionary) -> float:
 	_clear_table()
 	_result = {}
 	phase = Phase.PLAY
+	_refresh_keys()   # Deal goes at once: the actions wait for the cards, the stale bet line never shows
 	var h: Dictionary = e.get("hand", {})
 	_set_stack(int(e.get("bet", 0)))
 	_active = 0
