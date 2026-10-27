@@ -23,6 +23,14 @@ const CONST = {
             quickBarRefillMs: 300, newUnlockFlashMs: 600, drawerMs: 250, joystickFadeInMs: 80, pendingDelayMs: 300,
             toastBaseMs: 2000, toastPer20CharsMs: 500, toastMaxMs: 5000 },
   naturalLineHeight: 1.364,
+  // The old State=Available badge main (517:11951) has no counterpart in Gensen_US_2026 (不知火舞 340 9d80f70a): its sizes.
+  statusBadge: 56, statusBadgeIcon: 28,
+  // Layers the new file's mains no longer have (不知火舞 340 9d80f70a: kept at tokens-v2.json's values, Figma untouched):
+  // RadialPetal State=Current has no Label (petals carry no text since q(62)); Compact/Kitchen/Cell State=default has
+  // no 'Selected or cooked mark'.
+  radialLabel: 12, kitchenCheck: 13, kitchenCheckIcon: 9,
+  // The radial's hit circle and ring radius (ui_action_radial), added by hand to tokens-v2.json before; no layer holds them.
+  radialHit: 72, radialRing: 88,
 };
 const page = await figma.getNodeByIdAsync('5:4');
 await figma.setCurrentPageAsync(page);
@@ -92,8 +100,8 @@ const cmdCompact = await node('9:99711');
 const filterDefault = await variant('9:99723', 'State=default');
 const modeDefault = await variant('9:99496', 'State=default');
 const hud = await node('9:100203');
-const bagFrame = await node('482:10');
-const counterFrame = await node('482:46');
+const bagFrame = await node('9:105329');
+const counterFrame = await node('9:105901');
 const energyRef = await variant('9:100383', 'State=normal');
 Object.assign(radius, {
   inventoryCell: invDefault.cornerRadius, track: child(energyRef, 'Energy track').cornerRadius,
@@ -125,8 +133,7 @@ const opacity = {
 };
 const info = await node('9:102395');
 // Toast R1 (1178:82265, WP2 accepted 2026-10-07, SGODOT-202) replaced the old Toast main 483:302.
-const toast = await variant('1178:82265', 'Tone=Info');
-const badge = await variant('517:11951', 'State=Available');
+const toast = await variant('9:104596', 'Tone=Info');
 const close = await node('9:99685');
 const size = {
   touch: 44,
@@ -134,23 +141,23 @@ const size = {
   quickSlotSurfaceH: child(quickDefault, 'Slot surface').height,
   quickSlotIcon: child(quickDefault, 'Slot surface').children.find(c => c.type === 'INSTANCE').width,
   quickSlotLift: child(quickDefault, 'Slot surface').y - child(quickSelected, 'Slot surface').y,
-  quickEndW: (await node('907:72112')).width,
+  quickEndW: (await node('9:102342')).width,
   quickBarW: 336, quickBarH: quickDefault.height, quickBarX: 12, quickBarBottom: 24,
   hudW: hud.width, hudH: hud.height, hudX: 8, hudTop: 16,
   hudRow1H: child(hud, 'Status').height, hudRow2H: child(hud, 'HUD second row').height,
   command: (await variant('9:99690', 'Kind=primary')).height,
   commandCompact: child(cmdCompact, 'Command surface').height,
-  navigationRow: (await node('483:217')).height, dismiss: (await node('483:220')).height,
+  navigationRow: (await node('9:99743')).height, dismiss: (await node('9:99738')).height,
   close: close.width, closeIcon: close.children[0].width,
   filterChip: child(filterDefault, 'Filter pill').height, filterTouch: filterDefault.height,
-  segmentTab: (await node('483:322')).height,
+  segmentTab: (await node('9:99813')).height,
   kitchenMode: child(modeDefault, 'Mode pill').height, kitchenModeTouch: modeDefault.height,
   inventoryCell: invDefault.width, inventoryIcon: invDefault.children.find(c => c.type === 'INSTANCE').width,
-  gearSlotW: (await variant('663:61299', 'State=default')).width, gearSlotH: (await variant('663:61299', 'State=default')).height,
+  gearSlotW: (await variant('9:99820', 'State=default')).width, gearSlotH: (await variant('9:99820', 'State=default')).height,
   kitchenCellW: (await variant('9:99354', 'State=default')).width, kitchenCellH: (await variant('9:99354', 'State=default')).height,
   itemRowIcon: (await node('9:100063')).children.find(c => c.type === 'INSTANCE').width,
-  stateBadgeH: (await node('483:324')).height,
-  statusBadge: badge.width, statusBadgeIcon: badge.children[0].width,
+  stateBadgeH: (await node('9:100448')).height,
+  statusBadge: CONST.statusBadge, statusBadgeIcon: CONST.statusBadgeIcon,
   toastW: toast.width, toastIcon: child(toast, 'Tone icon').width,
   toastPadTop: toast.paddingTop, toastPadRight: toast.paddingRight, toastPadBottom: toast.paddingBottom, toastPadLeft: toast.paddingLeft,
   // One-line toasts on page 14 are 232 × 40: padding + tone icon + the 1 px stroke top and bottom.
@@ -163,8 +170,7 @@ const size = {
   liftShadowRadius: liftShadow.radius, liftShadowOffsetY: liftShadow.offset.y,
   qtyPillW: child(invDefault, 'Quantity pill').width, qtyPillH: child(invDefault, 'Quantity pill').height,
   rarityDot: child(invDefault, 'Rarity dot').width,
-  kitchenCheck: child(kitchenDefault, 'Selected or cooked mark').width,
-  kitchenCheckIcon: child(kitchenDefault, 'Selected or cooked mark').children[0].width,
+  kitchenCheck: CONST.kitchenCheck, kitchenCheckIcon: CONST.kitchenCheckIcon,
   objectHeaderQtyW: child(objectHeader, 'Identity and quantity').children.find(c => c.name === 'Quantity').width,
   itemRowQtyW: itemRow.children.find(c => c.name === 'Quantity').width,
 };
@@ -176,39 +182,39 @@ const dash = {
 // WP1a mains, accepted 2026-10-07 (SGODOT-200): HUD 1143:103373, NeedTile 1090:78003, Energy 1094:77504,
 // TodayPanel 1145:81715 / TodayRow 1145:81714, ActionKey 1117:78924, SceneAction 1116:78934,
 // RadialPetal 1122:79385, TapCard 1135:101133, StatusBadge 1132:79554, PinMenu 1141:80291.
-const hudN = await variant('1143:103373', 'Energy=Normal');
-const hudBonus = await variant('1143:103373', 'Energy=Bonus');
+const hudN = await variant('9:100202', 'Energy=Normal');
+const hudBonus = await variant('9:100202', 'Energy=Bonus');
 const hudChip = hudN.findOne(c => c.name === 'Energy' && c.type === 'FRAME');
-const ntL = await variant('1090:78003', 'Size=L, State=met, Progress=100');
-const ntM = await variant('1090:78003', 'Size=M, State=met, Progress=100');
-const ntS = await variant('1090:78003', 'Size=S, State=met, Progress=100');
-const ntShort = await variant('1090:78003', 'Size=L, State=short, Progress=50');
+const ntL = await variant('9:102402', 'Size=L, State=met, Progress=100');
+const ntM = await variant('9:102402', 'Size=M, State=met, Progress=100');
+const ntS = await variant('9:102402', 'Size=S, State=met, Progress=100');
+const ntShort = await variant('9:102402', 'Size=L, State=short, Progress=50');
 const ringStroke = t => (child(t, 'Ring').width - child(t, 'Core').width) / 2;
-const energyCard = await variant('1094:77504', 'Kind=Card, State=Short');
-const energyPanel = await variant('1094:77504', 'Kind=Panel, State=Normal');
-const todayPanel = await node('1145:81715');
-const todayRow = await variant('1145:81714', 'State=Default');
-const actionKey = await node('1117:78924');
+const energyCard = await variant('9:103148', 'Kind=Card, State=Short');
+const energyPanel = await variant('9:103148', 'Kind=Panel, State=Normal');
+const todayPanel = await node('9:103854');
+const todayRow = await variant('9:103829', 'State=Default');
+const actionKey = await node('9:103215');
 const switchKey = child(actionKey, 'Switch key · LOCK-03');
 const toolBadge = child(actionKey, 'Tool badge · display only');
-const saDefault = await variant('1116:78934', 'State=Default');
-const saPressed = await variant('1116:78934', 'State=Pressed');
-const saPending = await variant('1116:78934', 'State=Pending');
+const saDefault = await variant('9:99789', 'State=Default');
+const saPressed = await variant('9:99789', 'State=Pressed');
+const saPending = await variant('9:99789', 'State=Pending');
 const arcWidth = (v, name) => (v.width / 2) * (1 - child(v, name).arcData.innerRadius);
-const petalSel = await variant('1122:79385', 'State=Selected');
-const petalOff = await variant('1122:79385', 'State=Unavailable');
-const tapCard = await variant('1135:101133', 'Pointer=Center');
-const sbWorld = await variant('1132:79554', 'Size=World, State=Ready');
-const sbNpc = await variant('1132:79554', 'Size=NPC, State=Request');
-const pinMenu = await variant('1141:80291', 'Pinned=yes');
-const todayDone = await variant('1145:81714', 'State=Done');
-const quickEnd = await node('907:72112');
+const petalSel = await variant('9:103224', 'State=Current');   // Selected is Current in the new file (不知火舞 340 9d80f70a)
+const petalOff = await variant('9:103224', 'State=Unavailable');
+const tapCard = await variant('9:103539', 'Pointer=Center');
+const sbWorld = await variant('9:103339', 'Size=World, State=Ready');
+const sbNpc = await variant('9:103339', 'Size=NPC, State=Request');
+const pinMenu = await variant('9:103778', 'Pinned=yes');
+const todayDone = await variant('9:103829', 'State=Done');
+const quickEnd = await node('9:102342');
 // Collapsed quick bar (LOCK-04 "未选行动时收起成把手"): page-14 frames, not a main yet.
-const handleTouch = await node('676:63515'), handle = await node('676:63516'), grip = await node('676:63517');
+const handleTouch = await node('9:105624'), handle = await node('9:105625'), grip = await node('9:105626');
 // EmptyState 1234:87237 (WP6 main, Kind=Panel / Row).
-const emptyPanel = await variant('1234:87237', 'Kind=Panel'), emptyRow = await variant('1234:87237', 'Kind=Row');
+const emptyPanel = await variant('9:104829', 'Kind=Panel'), emptyRow = await variant('9:104829', 'Kind=Row');
 // StatusBadge 1132:79554 state table: fill and ring colour per state (World size; NPC uses the same colours).
-for (const v of (await node('1132:79554')).children.filter(c => c.name.startsWith('Size=World'))) {
+for (const v of (await node('9:103339')).children.filter(c => c.name.startsWith('Size=World'))) {
   const key = v.name.replace('Size=World, State=', '').replace(/ (\w)/g, (_, c) => c.toUpperCase()).replace(/^\w/, c => c.toLowerCase());
   const b = child(v, 'Badge');
   color['status/' + key] = hex(firstFill(b).color);
@@ -234,7 +240,7 @@ Object.assign(color, {
   quickHandle: hex(firstFill(handle).color), quickHandleGrip: hex(firstFill(grip).color),
 });
 Object.assign(radius, {
-  radialLabel: child(petalSel, 'Label').cornerRadius, captionPill: child(sbWorld, 'CaptionPill').cornerRadius,
+  radialLabel: CONST.radialLabel, captionPill: child(sbWorld, 'CaptionPill').cornerRadius,
   pinMenu: pinMenu.cornerRadius, energyTile: child(energyCard, 'Guidance · Eat').cornerRadius,
   quickHandle: handle.cornerRadius,
 });
@@ -254,8 +260,10 @@ Object.assign(size, {
   sceneAction: saDefault.width, switchKey: switchKey.width, switchIcon: switchKey.children[0].width,
   toolBadge: toolBadge.width, toolBadgeIcon: child(toolBadge, 'Tool').width,
   actionKeyW: actionKey.width, actionKeyH: actionKey.height,
-  holdRing: arcWidth(await variant('1116:78934', 'State=Holding'), 'Hold progress'), pendingRing: arcWidth(saPending, 'Pending spinner'),
+  holdRing: arcWidth(await variant('9:99789', 'State=Holding'), 'Hold progress'), pendingRing: arcWidth(saPending, 'Pending spinner'),
   radialPetal: child(petalSel, 'Petal').width, radialIcon: child(child(petalSel, 'Petal'), 'Icon').width,
+  radialPetalCurrent: child(petalSel, 'Petal').width, radialIconCurrent: child(child(petalSel, 'Petal'), 'Icon').width,
+  radialHit: CONST.radialHit, radialRing: CONST.radialRing,
   radialLockBadge: child(petalOff, 'Lock badge').width, radialLockIcon: child(petalOff, 'Lock badge').children[0].width,
   tapCardH: tapCard.height, tapGlyph: child(tapCard, 'Tap glyph').width,
   pointerW: child(tapCard, 'Pointer').width, pointerH: child(tapCard, 'Pointer').height,
