@@ -487,7 +487,9 @@ func test_destination_pins_wear_their_icons() -> void:
 	assert_bool(bool(casino.get("plate", false))).is_false()
 
 ## The card room's pin is in only while view.blackjack says the table is open to this player (q(238): Homestead Lv2,
-## the guide over), no grey card before (不知火舞 351 8aa69403); it comes in as soon as the table opens.
+## the guide over), no grey card before (不知火舞 351 8aa69403); it comes in as soon as the table opens. A server
+## without the card room yet (no view.blackjack: the client ships first, 奕星 on 351) shows none of it either — no pin,
+## no place-list row (the list is the pins' entries), no error.
 func test_the_card_room_pin_shows_once_its_table_is_open() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -495,6 +497,13 @@ func test_the_card_room_pin_shows_once_its_table_is_open() -> void:
 	var rt: P0Runtime = m.rt
 	var ids := func() -> Array: return m.city_map.extra_places.map(func(e): return str(e.get("id", "")))
 	var v: Dictionary = rt.session.view.duplicate(true)
+	v.erase("blackjack")
+	rt.session.view = v
+	m.p0_frame(v, 1.0 / 30.0)
+	assert_array(ids.call()).not_contains(["sf_card_room_1"])
+	assert_array(m.city_map.entries.map(func(e): return str(e.get("id", "")))).not_contains(["sf_card_room_1"])
+	assert_array(ids.call()).contains(["sh_tea_1"])
+	v = v.duplicate(true)
 	v["blackjack"] = {"open": false}
 	rt.session.view = v
 	m.p0_frame(v, 1.0 / 30.0)

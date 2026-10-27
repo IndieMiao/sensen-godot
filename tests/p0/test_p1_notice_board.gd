@@ -34,6 +34,16 @@ func test_the_board_reads_as_q164() -> void:
 	assert_bool(P0NoticeBoard.unlocked(_view())).is_true()
 	assert_bool(P0NoticeBoard.unlocked({})).is_false()
 
+## The card room posts nothing on the board (SGODOT-351), with a home set as without one (above): open or not.
+func test_the_board_never_lists_the_card_room() -> void:
+	var v := _view()
+	v["home"] = {"city": "gn-5391959", "set": {"market": "sh_market_1", "tea": "sh_tea_1", "tackle": "sh_tackle_1", "post": "sh_post_1"}}
+	for bj in [null, {"open": true}]:
+		if bj != null: v["blackjack"] = bj
+		var ids: Array = P0NoticeBoard.model(v).outposts.map(func(o): return o.id)
+		assert_array(ids).contains(["sh_market_1", "sh_tea_1", "sh_tackle_1", "sh_post_1"])
+		assert_array(ids).not_contains(["sf_card_room_1"])
+
 ## A marked pin's reason replaces the outpost's kind (q(103)'s pin-card line).
 func test_a_marked_outpost_says_why() -> void:
 	var v := _view()
