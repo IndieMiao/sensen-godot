@@ -558,6 +558,7 @@ func _read_home_places(v: Dictionary) -> void:
 func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	ui.blackjack_events(events)   # the Blackjack table plays its deal / cards / result itself (SGODOT-351)
 	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
 	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
@@ -764,6 +765,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if not title.is_empty(): ui.queue_card.call_deferred(func(): ui.show_title(title))
 			"coins":
 				if card_coins.any(func(x): return is_same(x, ev)): continue
+				if ui.modal_kind == "blackjack": continue   # the table floats its own wins over the hand (q(240))
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
@@ -1018,6 +1020,9 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
+		ui.blackjack_refused(code, detail)
+		return
 	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.

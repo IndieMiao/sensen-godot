@@ -342,6 +342,7 @@ func set_view(v: Dictionary) -> void:
 	if bite_board() != null: _bite_board.refresh(v)
 	if notice_board() != null: _notice_board.refresh(v)
 	if passport() != null: _passport.call("refresh", v)
+	if blackjack() != null: _blackjack.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
 	_refresh_today(false)
@@ -3176,6 +3177,40 @@ func open_titles(back := Callable()) -> UiDrawer:
 	modal_kind = "titles"
 	_modal_back = back
 	return d
+
+## The card room's Blackjack table (SGODOT-351, q(240) §9.18.7), full screen over the room: Lou's `Play` opens it
+## (后裔's entry, 351 d6fae42c). ctx {place, keeper} is accepted for the log and otherwise unused. ‹ / Back go back to
+## the room with no confirm (a hand in play waits for the return); Back closes the Rules sheet first. The page reads
+## this view (set_view refreshes it) and sends bj_* through `command`; P0Runtime passes it the reply's events and its
+## refusals (blackjack_events / blackjack_refused).
+var _blackjack: P0BlackjackPage
+
+func blackjack() -> P0BlackjackPage:
+	return _blackjack if is_instance_valid(_blackjack) and modal_kind == "blackjack" else null
+
+func open_blackjack(_ctx := {}) -> P0BlackjackPage:
+	var page := P0BlackjackPage.new(view, safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.toast = func(t: String): toast_error(t)
+	page.back_pressed.connect(close_modal)
+	page.command.connect(func(cmd: Dictionary): command.emit(cmd))
+	_open_modal(page, 0.0, true)
+	_blackjack = page
+	modal_kind = "blackjack"
+	_arm_blackjack_back()
+	page.opened()
+	return page
+
+func _arm_blackjack_back() -> void:
+	_modal_back = func():
+		if blackjack() != null and _blackjack.back_inner(): _arm_blackjack_back()
+		else: close_modal()
+
+func blackjack_events(events: Array) -> void:
+	if blackjack() != null: _blackjack.on_events(events)
+
+func blackjack_refused(code: String, detail: Dictionary) -> void:
+	if blackjack() != null: _blackjack.refused(code, detail)
 
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.

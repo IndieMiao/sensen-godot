@@ -127,8 +127,10 @@ static func deal_key(view: Dictionary, bet: int) -> Dictionary:
 	if short > 0: return {"label": "Deal · " + comma(bet), "reason": need_text(short)}
 	return {"label": "Deal · " + comma(bet), "reason": ""}
 
+## The server's blocked reasons (351 b610f98a / 9cb4e561) in 不知火舞's words (b2482379): `One split per hand` only for
+## splitting again; a double after a split and anything after split aces (they stand on their own) say their own line.
 const BLOCK_WORDS := {"first_two": "First two cards only", "pairs_only": "Pairs only", "one_split": "One split per hand",
-	"split_aces": "One split per hand"}
+	"split_aces": "Split aces get one card", "after_split": "Not after a split"}
 
 ## The four action keys for the hand in play (§6 ③): Hit / Stand, and `Double · 120` / `Split · 120` always there,
 ## grey with the reason when the server blocks them (blocked.{double|split}, need.{…} for coins). An expired hand has
@@ -146,7 +148,7 @@ static func action_keys(view: Dictionary) -> Dictionary:
 	for a in ["hit", "stand", "double", "split"]:
 		var label: String = {"hit": "Hit", "stand": "Stand", "double": "Double · " + comma(bet), "split": "Split · " + comma(bet)}[a]
 		var reason := ""
-		var enabled := a in acts
+		var enabled: bool = a in acts
 		if not enabled:
 			var why := str(blocked.get(a, ""))
 			if why == "coins": reason = need_text(int(needs.get(a, need(coins_of(view), bet, floor_of(view)))))

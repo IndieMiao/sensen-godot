@@ -132,8 +132,8 @@ func _deal(bet: int) -> Array:
 ## Peek and naturals settle in the deal (§3).
 func _after_deal(coins: int) -> Array:
 	var up: String = _hand.dealer[0]
-	var dealer_bj := P0Blackjack.total(_hand.dealer).total == 21
-	var player_bj := P0Blackjack.total(_hand.hands[0].cards).total == 21
+	var dealer_bj: bool = int(P0Blackjack.total(_hand.dealer).total) == 21
+	var player_bj: bool = int(P0Blackjack.total(_hand.hands[0].cards).total) == 21
 	if P0Blackjack.rank_value(up) in [1, 10] and dealer_bj: return _settle("peek", coins)
 	if player_bj: return _settle("blackjack", coins)
 	return []
@@ -190,11 +190,12 @@ func _act(action: String, coins: int) -> Dictionary:
 	return {"events": events}
 
 func _blocked_double(h: Dictionary) -> String:
-	if bool(h.get("split", false)) or h.cards.size() != 2: return "first_two"
+	if bool(h.get("split", false)): return "after_split"
+	if h.cards.size() != 2: return "first_two"
 	return ""
 
 func _blocked_split(h: Dictionary) -> String:
-	if _hand.hands.size() > 1: return "one_split"
+	if _hand.hands.size() > 1: return "split_aces" if P0Blackjack.rank(h.cards[0]) == "A" else "one_split"
 	if h.cards.size() != 2: return "first_two"
 	if P0Blackjack.rank_value(h.cards[0]) != P0Blackjack.rank_value(h.cards[1]): return "pairs_only"
 	return ""
