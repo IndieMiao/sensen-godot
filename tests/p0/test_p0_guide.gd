@@ -216,7 +216,7 @@ func test_today_rows_lead_with_the_guide_and_drop_their_generic_twins() -> void:
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
 	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "Cook with 1 fish"), then the radishes' timer
-	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 54m"])
+	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian", "Radish ready in 3h 54m"])   # one plot (q(227) ②)
 	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false, false])
 
 func test_today_rows_before_the_first_sow_put_sowing_first() -> void:

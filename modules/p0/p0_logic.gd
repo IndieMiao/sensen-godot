@@ -1459,26 +1459,25 @@ static func today_rows(view: Dictionary) -> Array:
 		now_rows = deliveries + now_rows
 	var ready := {}
 	var sown := 0
-	# A Quick Radish's countdown is one row, the soonest plot's, its seconds apart from the next one's; it says one left in
-	# the singular (q(217) ④: `Quick Radish ready in 0:45`).
+	# One countdown per crop, its soonest plot's (q(227) ①, as the Quick Radish's since q(217) ④): batches sown minutes
+	# apart no longer take two of the three rows. The plot's crop is the kind, so a Quick Radish and a Radish are two
+	# (④). One plot left says it in the singular, `Radish ready in 3h 55m` (②); a crop with ripe plots shows only its
+	# Harvest row until they are picked (③).
 	var growing := {}   # crop → plots growing
-	var soonest := {}   # a teaching seed's crop → its soonest plot id
-	for p in view.get("plots", []):
-		if str(p.get("state", "")) != "growing": continue
-		var c := str(p.crop)
-		growing[c] = int(growing.get(c, 0)) + 1
-		if not quick_seed(view, c).is_empty() and (not soonest.has(c) or float(p.get("ready_in", 0)) < float(soonest[c][1])):
-			soonest[c] = [int(p.get("id", -1)), float(p.get("ready_in", 0))]
+	var soonest := {}   # crop → its soonest plot's ms
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
-		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
+		var c := str(p.get("crop", ""))
+		if st == "ready": ready[c] = int(ready.get(c, 0)) + 1
 		elif st == "sown": sown += 1
 		elif st == "growing":
-			var c := str(p.crop)
-			if soonest.has(c) and int(soonest[c][0]) != int(p.get("id", -1)): continue
-			var ms := float(p.get("ready_in", 0))
-			var name := item_name(view, c) if int(growing[c]) == 1 and not quick_seed(view, c).is_empty() else plural(item_name(view, c))
-			timed.append([ms, _row("%s ready in %s" % [name, ripe_in(view, c, ms)], harvest_of(view, c), "plots")])
+			growing[c] = int(growing.get(c, 0)) + 1
+			if not soonest.has(c) or float(p.get("ready_in", 0)) < float(soonest[c]): soonest[c] = float(p.get("ready_in", 0))
+	for c in soonest:
+		if ready.has(c): continue
+		var ms := float(soonest[c])
+		var name := item_name(view, c) if int(growing[c]) == 1 else plural(item_name(view, c))
+		timed.append([ms, _row("%s ready in %s" % [name, ripe_in(view, c, ms)], harvest_of(view, c), "plots")])
 	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
 	# follows it as an info row (`Farming Lv2 with this harvest`, no button — §14.5's exception: it goes with its source).
 	var level := P0Guide.harvest_level(view)

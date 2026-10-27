@@ -62,7 +62,7 @@ func test_progress_the_free_stove_countdowns_and_levels_do_not_light_it() -> voi
 	v.bag.slots = [{"id": "fish_crucian", "qty": 2}]
 	v["plots"] = [{"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
 	var lines := P0Logic.today_rows(v).map(func(r): return r.line)
-	assert_array(lines).contains(["Cook with 2 fish", "Radishes ready in 1h"])
+	assert_array(lines).contains(["Cook with 2 fish", "Radish ready in 1h"])   # one plot (q(227) ②)
 	assert_array(_dots(v)).is_empty()
 
 ## The first session: Catch the tutorial fish and `Sow your first plot` light it; short of Energy the sow row does not;
