@@ -474,6 +474,10 @@
         "marks": [
           {
             "plot": "teach"
+          },
+          {
+            "button": "harvest",
+            "pulse": true
           }
         ]
       },
@@ -515,6 +519,10 @@
         "marks": [
           {
             "plot": "teach1"
+          },
+          {
+            "button": "sow",
+            "pulse": true
           }
         ]
       },
@@ -540,6 +548,10 @@
             "place": "home:pond",
             "kind": "request",
             "why": "Catch 2 fish · {have}/{need}"
+          },
+          {
+            "button": "cast",
+            "pulse": true
           }
         ]
       },
@@ -558,6 +570,10 @@
             "place": "home:pond",
             "kind": "request",
             "why": "Catch 1 fish · {have}/{need}"
+          },
+          {
+            "button": "cast",
+            "pulse": true
           }
         ]
       },
