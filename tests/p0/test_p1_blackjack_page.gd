@@ -144,7 +144,7 @@ func test_a_double_shows_the_doubled_stake() -> void:
 	await _deal(["6S", "9D", "5H", "TC", "KD"], 50)   # 11 against 9: double → 21; dealer 19
 	page.act("double")
 	await _frames()
-	var tag := (page._hands[0].tag.get_node("Text") as Label).text
+	var tag := (page._hands[0].tag as UiBadge).text
 	assert_str(tag).is_equal("You win")
 	assert_int(page._hands[0].bet).is_equal(100)   # the stake as settled, doubled
 	assert_str(page.coins_label.text).is_equal("600")
@@ -172,7 +172,8 @@ func test_deal_stand_and_result() -> void:
 	page.act("stand")
 	await _frames()
 	assert_array(_codes(page._dealer_cards)).is_equal(["7D", "TC"])   # the cards stay until the next deal
-	assert_str((page._hands[0].tag.get_node("Text") as Label).text).is_equal("Push")
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("Push")
+	_assert_tone(page._hands[0].tag, UiTokens.COLOR_TILE_CORE, UiTokens.COLOR_SECONDARY)   # StateBadge Stranger, 192:170359
 	assert_str(page.coins_label.text).is_equal("500")
 	# then last hand's stake sets itself in the circle and Deal deals again
 	assert_int(page.phase).is_equal(P0BlackjackPage.Phase.BET)
@@ -184,7 +185,9 @@ func test_deal_stand_and_result() -> void:
 func test_blackjack_settles_in_the_deal() -> void:
 	_open(500)
 	await _deal(["AS", "7D", "KH", "9C"], 5)
-	assert_str((page._hands[0].tag.get_node("Text") as Label).text).is_equal("Blackjack")
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("Blackjack")
+	_assert_tone(page._hands[0].tag, UiTokens.COLOR_GOLD, UiTokens.COLOR_TEXT)   # StateBadge Kindred, 191:169997
+	_assert_tone(page._hands[0].badge, UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_PRIMARY)   # points: Default
 	assert_str(page.coins_label.text).is_equal("507")
 
 func test_the_rebet_steps_down_when_short() -> void:
@@ -194,6 +197,8 @@ func test_the_rebet_steps_down_when_short() -> void:
 	await _frames()
 	assert_str(page.coins_label.text).is_equal("80")
 	assert_int(page.bet).is_equal(40)   # 120 stepped down to keep 40, never back up on its own
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("You lose")
+	_assert_tone(page._hands[0].tag, UiTokens.COLOR_DANGER_TINT, UiTokens.COLOR_DANGER)   # StateBadge Danger, 183:166912
 
 func test_split_lays_two_hands_and_plays_left_first() -> void:
 	_open(600)
@@ -262,6 +267,16 @@ func test_rules_sheet_and_back() -> void:
 	_open(300)
 	page.open_rules()
 	assert_bool(page.rules_layer.visible).is_true()
+	# RULES-T 193:171390: a sheet over the table's lower half (454 there), never the whole screen (its rules were
+	# measured at width 0 while the layer was hidden); numbered, Close at the foot
+	assert_float(page.rules_sheet.height).is_between(300.0, 560.0)
+	var texts: Array = page.rules_sheet.body.get_children().filter(func(c): return c is Label).map(func(l): return l.text)
+	assert_str(str(texts[1])).starts_with("1. Get closer to 21")
+	var close := page.rules_sheet.body.get_children().filter(func(c): return c is UiDismissButton)[0] as UiDismissButton
+	assert_str(close.text).is_equal("Close")
+	close.pressed.emit()
+	assert_bool(page.rules_layer.visible).is_false()
+	page.open_rules()
 	assert_bool(page.back_inner()).is_true()
 	assert_bool(page.rules_layer.visible).is_false()
 	assert_bool(page.back_inner()).is_false()
@@ -302,3 +317,29 @@ func test_an_older_server_without_the_table_breaks_nothing() -> void:
 	assert_int(page.bet).is_equal(10)
 	assert_bool(page._waiting).is_false()
 	assert_array(toasts).is_empty()
+
+## A result plate / points badge is the StateBadge in its frame's tone (不知火舞 351 ed79b57c): fill and ink.
+func _assert_tone(b: UiBadge, fill: Color, ink: Color) -> void:
+	assert_bool(b.visible).is_true()
+	assert_object((b.get_theme_stylebox(&"panel") as UiStyleBox).bg_color).is_equal(fill)
+	var l := b.find_children("*", "Label", true, false)[0] as Label
+	assert_object(l.get_theme_color(&"font_color")).is_equal(ink)
+
+## 不知火舞 351 ed79b57c ①: back, coins and Rules are one row under the safe area, centred on one line (BJ-BET-T
+## 187:167298 at y 50), on a phone with a notch and on a wider screen whose table crops from the top.
+func test_back_coins_and_rules_share_a_row_under_the_safe_area() -> void:
+	for case in [[Vector2(360, 800), 0.0], [Vector2(360, 800), 40.0], [Vector2(412, 860), 32.0]]:
+		var bj2 := P0BlackjackMock.new(5)
+		var p: P0BlackjackPage = auto_free(P0BlackjackPage.new(bj2.decorate({"coins": 300}), case[1]))
+		p.theme = UiKit.theme()
+		p.animate = false
+		p.size = case[0]
+		add_child(p)
+		p._layout()
+		var row: float = case[1] + 50.0
+		var why := "%s safe %d" % [case[0], case[1]]
+		assert_float(p.back_key.get_global_rect().get_center().y).append_failure_message(why).is_equal_approx(row, 0.5)
+		assert_float(p.coins_pill.get_global_rect().get_center().y).append_failure_message(why).is_equal_approx(row, 0.5)
+		assert_float(p.rules_key.get_global_rect().get_center().y).append_failure_message(why).is_equal_approx(row, 0.5)
+		assert_float(p.rules_key.get_global_rect().get_center().x).append_failure_message(why) \
+			.is_equal_approx(p.on_page(Vector2(173, 0)).x, 0.5)

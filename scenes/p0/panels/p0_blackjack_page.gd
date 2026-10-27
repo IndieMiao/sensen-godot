@@ -39,6 +39,9 @@ const ICON_COIN := preload("res://assets/p0/icons/coin.svg")
 # BJ-BET-T 187:167298 (1d226acd): back 44 at (16, 28), Rules (Small) centred (173, 50), coins pill 225–276 at y 37
 # (left of the shoe), rail stacks from x 26 every 52 with their top chip's top at 687.
 const _RULES_AT := Vector2(173, 50)          # the top-left light takes no print
+## The top row's centre (BJ-BET-T 187:167298): back 28 + 44 / 2, coins 37 + 26 / 2, Rules 24.5 + 51 / 2 — all on one
+## line under the safe area (不知火舞 351 ed79b57c: Rules stayed at 50 on the table while the other two moved down).
+const _TOP_ROW_Y := 50.0
 const _LINES_Y := 284.0                      # the two lines' tops: 284 / 308, cream 62% / 50%
 const _DEALER_TOP := 140.0                   # cards 80 high in 110–250
 const _PLAYER_TOP := 372.0                   # ACT-T 189:168498
@@ -64,7 +67,6 @@ const _RAIL_Y := 693.0                       # stacks' bottom chip top (the top 
 const _STACK_DEPTH := 4                      # chips in a rail stack
 const _BACK_AT := Vector2(16, 28)
 const _COINS_RIGHT := 276.0                  # the coins pill's right edge, on the table (left of the shoe)
-const _COINS_TOP := 37.0
 const _SETTLED_S := 3.0
 
 var view: Dictionary = {}
@@ -101,7 +103,7 @@ var low_label: Label
 var low_need: Label
 var settled_pill: PanelContainer
 var settled_label: Label
-var dealer_badge: PanelContainer
+var dealer_badge: UiBadge
 var hands_box: Control
 var stacks: Array = []       # UiChipStack on the rail, one per value
 var deal_key: UiFeltAction
@@ -252,34 +254,30 @@ func _build_overlay() -> void:
 	settled_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(settled_pill)
 
-## A points badge / result plate (StateBadge on ACT-T / RESULT-T): a 32-high pill, primary tint with primary ink;
-## `Bust` in Tone=Danger.
-func _badge() -> PanelContainer:
-	var p := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = UiTokens.COLOR_PRIMARY_TINT
-	sb.set_corner_radius_all(16)
-	sb.content_margin_left = 14
-	sb.content_margin_right = 14
-	sb.content_margin_top = 6
-	sb.content_margin_bottom = 6
-	p.add_theme_stylebox_override(&"panel", sb)
-	var l := UiKit.label("", UiTokens.STYLE_C13_XB, UiTokens.COLOR_PRIMARY)
-	l.name = "Text"
-	p.add_child(l)
-	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.visible = false
-	return p
+## A points badge / result plate: the StateBadge (UiBadge, caption B12, 32 high) in the tone its frame wears —
+## points Default, `Bust` Danger (0c2082b7); result plates by result (不知火舞 351 ed79b57c: RESULT-T Blackjack
+## Kindred 191:169997, You lose / Bust Danger 183:166912, Push Stranger 192:170359, Dealer busts and wins Default).
+func _badge() -> UiBadge:
+	var b := UiBadge.new()
+	b.visible = false
+	return b
 
-## A badge's points; `Bust` in the danger tone (StateBadge Tone=Danger, 0c2082b7).
-static func _badge_set(p: PanelContainer, text: String) -> void:
-	var l := p.get_node("Text") as Label
-	l.text = text
-	var bust := text == "Bust"
-	(p.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_DANGER if bust else UiTokens.COLOR_PRIMARY_TINT
-	l.add_theme_color_override(&"font_color", UiTokens.COLOR_SURFACE if bust else UiTokens.COLOR_PRIMARY)
-	p.visible = text != ""
-	p.size = p.get_combined_minimum_size()
+const BADGE_TONES := {"default": [UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_PRIMARY],
+	"stranger": [UiTokens.COLOR_TILE_CORE, UiTokens.COLOR_SECONDARY], "kindred": [UiTokens.COLOR_GOLD, UiTokens.COLOR_TEXT],
+	"danger": [UiTokens.COLOR_DANGER_TINT, UiTokens.COLOR_DANGER]}
+const RESULT_TONES := {"blackjack": "kindred", "push": "stranger", "lose": "danger", "bust": "danger"}
+static func result_tone(result: String) -> String: return str(RESULT_TONES.get(result, "default"))
+
+## A badge's text in its tone (points: `Bust` Danger, else Default).
+static func _badge_set(b: UiBadge, text: String, tone := "") -> void:
+	if tone == "": tone = "danger" if text == "Bust" else "default"
+	if b.get_meta(&"tone", "") != tone:   # set_tone copies the style: only when it changes (laid out every move)
+		var t: Array = BADGE_TONES[tone]
+		b.set_tone(t[0], t[1])
+		b.set_meta(&"tone", tone)
+	b.text = text
+	b.visible = text != ""
+	b.size = b.get_combined_minimum_size()
 
 const RULES := ["Get closer to 21 than the dealer without going over.",
 	"2–10 count as shown. J, Q and K count 10. A counts 1 or 11.",
@@ -312,13 +310,16 @@ func _build_layers() -> void:
 	rules_sheet.close_requested.connect(close_rules)
 	rules_sheet.body.add_theme_constant_override(&"separation", 8)
 	rules_sheet.body.add_child(UiKit.label("Rules", UiTokens.STYLE_TITLE_XB20))
-	for t in RULES:
-		var l := UiKit.label(t, UiTokens.STYLE_BODY_R14)
+	for i in RULES.size():   # RULES-T 193:171416: numbered paragraphs, then the grey footer and Close (Dismiss)
+		var l := UiKit.label("%d. %s" % [i + 1, RULES[i]], UiTokens.STYLE_BODY_R14)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		rules_sheet.body.add_child(l)
 	var foot := UiKit.label("Bets are coins. You always keep at least 40 coins.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_MUTED)
 	foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rules_sheet.body.add_child(foot)
+	var close := UiDismissButton.new("Close")
+	close.pressed.connect(close_rules)
+	rules_sheet.body.add_child(close)
 	rules_sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	rules_sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	rules_layer.add_child(rules_sheet)
@@ -351,7 +352,8 @@ func _layout() -> void:
 	table.position = Vector2((size.x - DESIGN.x * k) * 0.5, size.y - DESIGN.y * k)
 	bg.position = table.position
 	bg.size = DESIGN * k
-	_place(rules_key, _RULES_AT)
+	# Rules prints on the table, which scales and crops from the top: on the page it sits in back's and coins' row
+	_place(rules_key, Vector2(_RULES_AT.x, (safe_top + _TOP_ROW_Y - table.position.y) / k))
 	for i in lines.size():
 		var l: Label = lines[i]
 		l.size = Vector2(DESIGN.x, 20)
@@ -372,7 +374,7 @@ func _layout() -> void:
 	_place(split_key, _SPLIT_AT)
 	for i in stacks.size():
 		(stacks[i] as Control).position = Vector2(_RAIL_X + i * (UiChipToken.SIZE + _RAIL_GAP), _RAIL_Y)
-	back_key.position = Vector2(_BACK_AT.x, safe_top + _BACK_AT.y)
+	back_key.position = Vector2(_BACK_AT.x, safe_top + _TOP_ROW_Y - back_key.get_combined_minimum_size().y * 0.5)
 	_fit_coins()
 	settled_pill.size = settled_pill.get_combined_minimum_size()
 	settled_pill.position = Vector2((size.x - settled_pill.size.x) * 0.5, coins_pill.position.y + coins_pill.size.y + 12.0)
@@ -384,7 +386,7 @@ func _place(c: Control, centre: Vector2) -> void:
 
 func _fit_coins() -> void:
 	coins_pill.size = coins_pill.get_combined_minimum_size()
-	coins_pill.position = Vector2(on_page(Vector2(_COINS_RIGHT, 0)).x - coins_pill.size.x, safe_top + _COINS_TOP)
+	coins_pill.position = Vector2(on_page(Vector2(_COINS_RIGHT, 0)).x - coins_pill.size.x, safe_top + _TOP_ROW_Y - coins_pill.size.y * 0.5)
 
 ## Where card i of a hand of n goes on the table: one hand centred stepping OVERLAP; split hands (BJ-SPEC-CARDS) 16
 ## in from each side and 24 apart, stepping SPLIT_OVERLAP, each from its left edge.
@@ -415,10 +417,10 @@ func _lay_cards(slide: bool) -> void:
 			_move(cards[i], card_pos(k, i, n, cards.size()), slide)
 		var first := card_pos(k, 0, n, maxi(1, cards.size()))
 		var width := hand_width(n, cards.size())
-		var badge: PanelContainer = hand.badge
+		var badge: UiBadge = hand.badge
 		_badge_set(badge, P0Blackjack.badge(_codes(cards)))
 		badge.position = Vector2(first.x + width + _BADGE_GAP, first.y + (UiPlayingCard.SIZE.y - badge.size.y) * 0.5)
-		var tag: PanelContainer = hand.tag
+		var tag: UiBadge = hand.tag
 		tag.size = tag.get_combined_minimum_size()
 		tag.position = Vector2(first.x + (width - tag.size.x) * 0.5, first.y - _PLATE_GAP - tag.size.y)   # above the cards
 		var stake: Label = hand.stake
@@ -619,9 +621,8 @@ func _step_result(e: Dictionary) -> float:
 	_result = e
 	var hands: Array = e.get("hands", [])
 	for k in mini(hands.size(), _hands.size()):
-		var tag: PanelContainer = _hands[k].tag
-		(tag.get_node("Text") as Label).text = P0Blackjack.result_word(str(hands[k].get("result", "")))
-		tag.visible = true
+		var result := str(hands[k].get("result", ""))
+		_badge_set(_hands[k].tag, P0Blackjack.result_word(result), result_tone(result))
 		_hands[k].bet = int(hands[k].get("bet", _hands[k].bet))
 	var staked := 0
 	for hh in hands: staked += int(hh.get("bet", 0))
@@ -702,8 +703,6 @@ func _new_hand(stake: int) -> Dictionary:
 	outline.visible = false
 	hands_box.add_child(outline)
 	var tag := _badge()
-	(tag.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_SURFACE_RAISED
-	(tag.get_node("Text") as Label).add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT)
 	tag.z_index = 2
 	hands_box.add_child(tag)
 	var badge := _badge()
@@ -832,6 +831,14 @@ func show_settled(text: String) -> void:
 
 func open_rules() -> void:
 	rules_layer.visible = true
+	# The layer was hidden, so its box has not laid the rules out yet: wrapped at width 0 they would ask for the whole
+	# screen. Wrap them at the sheet's width first, then fit the sheet to them.
+	var w := size.x - rules_sheet.pad * 2.0
+	if w > 0.0:
+		for c in rules_sheet.body.get_children():
+			if c is Label:
+				(c as Label).size.x = w
+				(c as Label).update_minimum_size()
 	rules_sheet.height = rules_sheet.body.get_combined_minimum_size().y + 24.0 + UiDrawer.HANDLE_H * 0.5
 func close_rules() -> void: rules_layer.visible = false
 

@@ -28,11 +28,11 @@ class Rig:
 		if bool(r.ok): page.on_events(r.events)
 		else: page.refused(str(r.code), r.get("detail", {}))
 
-func _rig(coins: int, intro := true, last_bet := 0) -> Rig:
+func _rig(coins: int, intro := true, last_bet := 0, safe_top := 0.0) -> Rig:
 	var m := P0BlackjackMock.new(11)
 	m.intro = intro
 	m.last_bet = last_bet
-	var page := P0BlackjackPage.new(m.decorate({"coins": coins}), 0.0, 0.0)
+	var page := P0BlackjackPage.new(m.decorate({"coins": coins}), safe_top, 0.0)
 	page.theme = UiKit.theme()
 	page.animate = OS.get_environment("MOVIE") == "1"
 	root.add_child(page)
@@ -59,7 +59,8 @@ func _run() -> void:
 		return
 	var states := ["bj-bet", "bj-bet-empty", "bj-bet-cap", "bj-drag", "bj-low", "bj-act", "bj-act-grey", "bj-split",
 		"bj-result-blackjack", "bj-result-lose", "bj-result-bust", "bj-result-push", "bj-rules", "bj-intro", "bj-settled",
-		"bj-tall", "bj-short"]
+		"bj-tall", "bj-short", "bj-result-win", "bj-result-dealer-busts", "bj-result-win-float", "bj-result-blackjack-float",
+		"bj-safe-top"]
 	for s in states:
 		if not _want(s): continue
 		var rig: Rig = await call("_state_" + s.replace("-", "_"))
@@ -147,8 +148,48 @@ func _state_bj_result_push() -> Rig:
 	await _settle()
 	return r
 
+func _state_bj_result_win() -> Rig:
+	var r := _rig(500)
+	await _deal(r, ["TS", "TD", "9H", "7C"], 120)   # 19 against 17
+	r.send({"type": "bj_act", "action": "stand"})
+	await _settle()
+	return r
+
+func _state_bj_result_dealer_busts() -> Rig:
+	var r := _rig(500)
+	await _deal(r, ["TS", "TD", "8H", "6C", "KH"], 120)   # 18 stands; the dealer's 16 draws a K
+	r.send({"type": "bj_act", "action": "stand"})
+	await _settle()
+	return r
+
+## Motion on, caught while the winnings slide in and `+120 coins` floats (RESULT-T 191:169661 / 192:171017).
+func _state_bj_result_win_float() -> Rig:
+	var r := _rig(500)
+	await _deal(r, ["TS", "TD", "9H", "7C"], 120)
+	r.page.animate = true
+	r.send({"type": "bj_act", "action": "stand"})
+	await create_timer(float(OS.get_environment("FLOAT_AT")) if OS.has_environment("FLOAT_AT") else 1.1).timeout
+	return r
+
+func _state_bj_result_blackjack_float() -> Rig:
+	var r := _rig(500)
+	r.page.animate = true
+	await _deal(r, ["AS", "7D", "KH", "9C"], 120)
+	await create_timer(float(OS.get_environment("FLOAT_AT")) if OS.has_environment("FLOAT_AT") else 1.6).timeout
+	return r
+
+## A phone's safe area (44 at the top): back, Rules and coins on one row under it (不知火舞 351 ed79b57c ①); a Push.
+func _state_bj_safe_top() -> Rig:
+	var r := _rig(500, true, 0, 44.0)
+	await _deal(r, ["TS", "TD", "QH", "QC"], 120)
+	r.send({"type": "bj_act", "action": "stand"})
+	await _settle()
+	return r
+
 func _state_bj_rules() -> Rig:
 	var r := _rig(300)
+	_bet(r, [100, 10, 10])
+	await _settle()   # a tap comes after the page is laid out: the rules wrap to its width
 	r.page.open_rules()
 	return r
 
