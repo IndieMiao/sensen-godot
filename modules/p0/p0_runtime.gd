@@ -111,6 +111,29 @@ static func free_instance_for_tests() -> void:
 	_instance = null
 	UiCommandButton.offline = false
 
+var _switching_test_account := false
+
+## The user confirmed Start or pressed Return. Finish pending commands before discarding the old session, so an
+## old reply cannot redraw the new account. Main credentials are backed up/read back before the active id changes.
+func _switch_test_account(action: String) -> void:
+	if _switching_test_account: return
+	_switching_test_account = true
+	while session.busy or not session._queue.is_empty():
+		await get_tree().process_frame
+	var ok: bool = session.test_accounts.start_test(Avatar.user_id) if action == "new" else session.test_accounts.return_main()
+	if not ok:
+		_switching_test_account = false
+		ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
+		return
+	var tree := get_tree()
+	set_process(false)
+	session.set_process(false)
+	while AppRouter.instance_depth() > 0: AppRouter._discard_top()
+	_instance = null
+	UiCommandButton.offline = false
+	tree.change_scene_to_file("res://scenes/p0/p0_boot.tscn")
+	queue_free()
+
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:
@@ -119,6 +142,10 @@ func _init() -> void:
 	session = P0Session.new()
 	add_child(session)
 	ui = P0Ui.new()
+	ui.test_accounts = session.test_accounts
+	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
+	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
+	ui.test_account_requested.connect(_switch_test_account)
 	add_child(ui)
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
@@ -533,7 +560,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
 	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
-	ui.teach(P0Guide.guide_tip_on_change(before, v))   # the new-player guide moved on: its step's TipCard (SGODOT-341)
 	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
 	# quick-bar slot once (UiQuickBar.flash: QuickSlot State=new, 600 ms). Not on the first view after starting.
 	if not before.is_empty():
@@ -1084,7 +1110,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("Limit reached · %s" % P0Logic.span(float(detail.get("resets_in", 0))))
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
-		"stale_state":
+		"stale_state", "guide_not_now":
 			pass   # a retry of something the server already applied; the returned state re-renders the screen
 		_:
 			ui.toast_error("Can't do that (%s)" % code)
@@ -1356,6 +1382,7 @@ func _on_resumed() -> void:
 	if session.view.is_empty() or _blocked != "" or _launch_s >= 0.0: return
 	_resume_ms = Time.get_ticks_msec()
 	if not session.busy: session.refresh()
+	else: session.refresh_after()
 
 func _end_resume() -> void:
 	if _resume_ms < 0: return

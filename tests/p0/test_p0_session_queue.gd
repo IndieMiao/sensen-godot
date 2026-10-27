@@ -102,3 +102,74 @@ func test_a_read_queued_behind_a_failed_one_is_dropped() -> void:
 	session.refresh_after()
 	_fail()
 	assert_int(sent.size()).is_equal(1)   # the runtime's retry reads again, not this
+
+# SGODOT-341: guide acknowledgement and passive maturity reads share the real command queue.
+func _guide_timer(ms: float) -> void:
+	session.view = {"seq": 7, "guide": {"step": "t_sow_rest"},
+		"plots": [{"id": 0, "crop": "crop_quick_radish", "state": "growing", "ready_in": ms}]}
+
+func test_expired_guide_crop_reads_once_without_changing_the_local_step() -> void:
+	_guide_timer(45000)
+	session._refresh_guide_maturity(44999)
+	assert_array(sent).is_empty()
+	session._refresh_guide_maturity(45000)
+	session._refresh_guide_maturity(46000)
+	assert_int(sent.size()).is_equal(1)
+	assert_str(str(sent[0].path)).is_equal("/p0/state")
+	assert_str(str(session.view.guide.step)).is_equal("t_sow_rest")
+
+func test_expired_crop_waits_for_the_command_and_does_not_storm_after_failure() -> void:
+	_guide_timer(45000)
+	session.send({"type": "sow", "plot": 2, "seed": "seed_lettuce"})
+	session._refresh_guide_maturity(45000)
+	session._refresh_guide_maturity(46000)
+	assert_int(sent.size()).is_equal(1)
+	_reply(8)
+	assert_int(sent.size()).is_equal(2)
+	assert_str(str(sent[1].path)).is_equal("/p0/state")
+	_fail()
+	session._refresh_guide_maturity(47000)
+	assert_int(sent.size()).is_equal(2)
+
+func test_an_expired_crop_on_a_legacy_save_does_not_add_a_read() -> void:
+	_guide_timer(45000)
+	session.view.guide = {"step": null, "end": "legacy"}
+	session._refresh_guide_maturity(50000)
+	assert_array(sent).is_empty()
+
+func test_guide_ack_is_deduped_and_build_uses_its_returned_seq() -> void:
+	session.view.guide = {"step": "t_city"}
+	assert_bool(session.guide_ack("t_city")).is_true()
+	assert_bool(session.guide_ack("t_city")).is_false()
+	session.send({"type": "choose_home", "city": "gn-1850147", "spot": 0}, "build")
+	assert_int(sent.size()).is_equal(1)
+	assert_str(str(sent[0].body.step)).is_equal("t_city")
+	_reply(8)
+	assert_str(str(sent[1].body.type)).is_equal("choose_home")
+	assert_int(int(sent[1].body.expect_seq)).is_equal(8)
+	assert_bool(session.guide_ack("t_city")).is_false()
+
+func test_ack_failure_discards_the_queued_build_until_an_explicit_retry() -> void:
+	session.view.guide = {"step": "t_city"}
+	session.guide_ack("t_city")
+	session.send({"type": "choose_home", "city": "gn-1850147", "spot": 0}, "build")
+	_fail()
+	assert_int(sent.size()).is_equal(1)
+	assert_bool(session.guide_ack("t_city")).is_true()
+	assert_int(sent.size()).is_equal(2)
+
+func test_a_resolved_row_deadline_also_queues_one_refresh() -> void:
+	session.view = {"guide": {"step": "t_harvest_quick", "row": {"countdown": "crop_quick_radish", "ready_in": 3000}}}
+	session._refresh_guide_maturity(2999)
+	assert_array(sent).is_empty()
+	session._refresh_guide_maturity(3000)
+	session._refresh_guide_maturity(4000)
+	assert_int(sent.size()).is_equal(1)
+	_fail()
+	session._refresh_guide_maturity(5000)
+	assert_int(sent.size()).is_equal(1)
+
+func test_an_authoritative_zero_countdown_waits_for_action_instead_of_reading_forever() -> void:
+	session.view = {"guide": {"step": "t_nadia_1", "recover": "r_radish_wait", "row": {"countdown": "crop_radish", "ready_in": 0}}}
+	for elapsed in [0.0, 1000.0, 10000.0]: session._refresh_guide_maturity(elapsed)
+	assert_array(sent).is_empty()

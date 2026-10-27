@@ -52,6 +52,7 @@ const WELCOME_FLY_S := 1.0
 var _glide := false         # the next pin page comes on HOME-WELCOME's map: its start glides in (motion.recenterMs)
 var open_map := Callable()
 var close_map := Callable()
+var return_main := Callable()   # only the host of a test account's first city pick supplies this
 
 func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0, change_from_ := "") -> void:
 	session = session_
@@ -75,6 +76,7 @@ func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0, change_fr
 ## The list (HOME-PICK-1): back_to "Back" when it opens from HOME-WELCOME.
 func _make_cities(back_to := "") -> void:
 	cities = PickPage.new(_safe.x, _safe.y, change_from, back_to)
+	if change_from == "" and return_main.is_valid(): cities.add_return_main(return_main)
 	cities.back_pressed.connect(func(): if welcome != null: back_to_welcome() else: left.emit())
 	cities.read_cities.connect(_read_cities)
 	cities.unavailable.connect(func(text: String): say.emit(text))
@@ -183,6 +185,7 @@ func _pass_touches(on: bool) -> void:
 ## Pick your farm spot for a city row (HOME-PIN): its pin area read for this player; the home city itself in a change
 ## starts the pin on the farm (q(216) ⑨).
 func open_spots(row: Dictionary) -> void:
+	_ack_city()
 	if spots != null: spots.queue_free()
 	var id := str(row.get("id", ""))
 	_glide = pick_map != null and _map_city == id and is_instance_valid(welcome) and welcome.visible
@@ -205,6 +208,10 @@ func open_spots(row: Dictionary) -> void:
 	if welcome != null: welcome.visible = false
 	_read_spots(id)
 
+## Start here / Continue confirms S0; merely selecting a row, opening the list or changing home does not.
+func _ack_city() -> void:
+	if change_from == "" and session != null: session.guide_ack("t_city")
+
 ## One read counts at a time: an older one's late answer (a Retry pressed meanwhile, 周瑜 on #451) is dropped.
 func _read_spots(id: String) -> void:
 	var page := spots
@@ -225,6 +232,7 @@ func _confirm(cluster: String, lat: float, lng: float, city_name: String) -> voi
 	confirm.cancelled.connect(close_confirm)
 	confirm.move_pressed.connect(func():
 		if _sending: return
+		_ack_city()   # explicit retry after a lost ack, before the queued choose_home
 		_sending = true
 		chose.emit(cluster, lat, lng))
 	add_child(confirm)

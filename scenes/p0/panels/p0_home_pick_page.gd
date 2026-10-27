@@ -150,6 +150,21 @@ func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "", back_to := ""
 	add_child(key)
 	_refresh_key()
 
+## Test accounts only: reserve one 44 px row below Continue, retaining the ordinary page's original layout.
+func add_return_main(action: Callable) -> void:
+	var button := P0SettingsPage.return_main_link(action)
+	var height := float(UiTokens.SIZE_TOUCH)
+	button.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	button.offset_left = UiTokens.SPACE_PAGE
+	button.offset_right = -UiTokens.SPACE_PAGE
+	button.offset_bottom = key.offset_bottom
+	button.offset_top = button.offset_bottom - height
+	key.offset_top -= height
+	key.offset_bottom -= height
+	scroll.offset_bottom -= height
+	get_node("Fade").offset_top -= height
+	add_child(button)
+
 func _place(c: Control, y: float) -> void:
 	c.position = Vector2(UiTokens.SPACE_PAGE, y)
 	c.size.x = 328

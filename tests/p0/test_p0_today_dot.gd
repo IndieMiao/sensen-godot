@@ -193,3 +193,46 @@ func test_a_new_account_sees_its_dot_even_on_the_same_keys() -> void:
 	fresh.profile.since_ms = 1_800_000_000_000
 	ui.set_view(fresh)
 	assert_bool(ui.hud.today_dot_shown()).is_true()
+
+## 341: a panel left open over a passive expiry switches to the new authoritative row; Show follows that row.
+func test_open_guide_today_refreshes_copy_progress_and_show_target() -> void:
+	var v := _view()
+	v.home = {"set": {"market": "gn-1850147~market0", "pond": "gn-1850147~pond0"}}
+	v.guide = {"step": "t_fish", "row": {"line": "Catch 2 fish · Willow Pond", "icon": "fish", "go": "gn-1850147~pond0"},
+		"progress": {"have": 0, "need": 2}}
+	var ui := await _ui(v)
+	ui.open_today()
+	await await_idle_frame()
+	var panel := ui._today_panel
+	var first := panel._list.get_child(0)
+	var pill := first.find_children("*", "UiShowPill", true, false)[0]
+	var changed := v.duplicate(true)
+	changed.guide.progress.have = 1
+	ui.set_view(changed)
+	ui._refresh_today()
+	assert_bool(is_instance_valid(pill)).is_true()   # text updates do not drop the held Show pill
+	assert_str(str(first.find_child("Line", true, false).get_meta("sentence"))).is_equal("Catch 2 fish · 1/2 · Willow Pond")
+	changed.guide = {"step": "t_nadia_1", "row": {"line": "Bring Nadia 1 Radish · Riverside Market", "icon": "crop_radish", "go": "gn-1850147~market0"}}
+	var shown := []
+	ui.show_on_map.connect(func(go): shown.append(go))
+	ui.set_view(changed)
+	ui._refresh_today()
+	assert_object(ui._today_panel).is_same(panel)
+	assert_str(str(ui._today_rows[0].line)).is_equal("Bring Nadia 1 Radish · Riverside Market")
+	panel.show_pressed.emit(0)
+	assert_array(shown).is_equal(["outpost:gn-1850147~market0"])
+	assert_str(ui.modal_kind).is_empty()
+
+func test_open_today_projects_at_most_four_times_a_second() -> void:
+	var v := _view()
+	v.guide = {"step": "t_fish", "row": {"line": "Catch 2 fish", "icon": "fish", "go": ""}, "progress": {"have": 0, "need": 2}}
+	var ui := await _ui(v)
+	ui.open_today()
+	var line: Label = ui._today_panel._list.get_child(0).find_child("Line", true, false)
+	var next := v.duplicate(true)
+	next.guide.progress.have = 1
+	ui.set_view(next)
+	assert_str(str(line.get_meta("sentence"))).is_equal("Catch 2 fish · 0/2")
+	ui._today_refresh_ms -= 250
+	ui.set_view(next)
+	assert_str(str(line.get_meta("sentence"))).is_equal("Catch 2 fish · 1/2")

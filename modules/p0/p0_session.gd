@@ -22,6 +22,8 @@ signal blocked(code: String, detail: Dictionary)
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const DEMO_CONFIG := "res://assets/p0/demo_server.json"
 const REFRESH_S := 30.0
+const TestAccounts := preload("res://modules/p0/p0_test_accounts.gd")
+var test_accounts = TestAccounts.new()
 
 var base_url := DEFAULT_URL
 var access_key := ""
@@ -45,6 +47,7 @@ var _inflight := {}           # the {cmd, key} on the wire; {} for state refresh
 var transport := Callable()
 var _received_ms := 0
 var _refresh_left := REFRESH_S
+var _guide_maturity_checked := false
 ## UI moments for the observation log (S7): batched, sent apart from commands, dropped when the server is away.
 const UI_BATCH := 20
 const UI_FLUSH_S := 10.0
@@ -58,12 +61,17 @@ func _ready() -> void:
 	if base_url == "": base_url = DEFAULT_URL
 	access_key = str(demo.get("key", ""))
 	version = int(demo.get("version", 0))
+	if not test_accounts.restore_missing_main():
+		push_error("P0 test-account main identity backup could not be verified")
+		return
 	player_id = _read_line("user://p0_player.txt", "")
 	if player_id == "":
 		var bytes := Crypto.new().generate_random_bytes(10)
 		player_id = "p0-" + bytes.hex_encode()
 		var f := FileAccess.open("user://p0_player.txt", FileAccess.WRITE)
 		if f: f.store_line(player_id)
+	if test_accounts.is_test(): player_id = test_accounts.active_id()
+	Avatar.user_id = test_accounts.avatar_id(Avatar.user_id)
 	report({"kind": "session_start"})
 	# Deferred: P0Runtime adds the session before P0Ui, and an immediate failure would toast on a UI not built yet.
 	refresh.call_deferred()
@@ -71,6 +79,7 @@ func _ready() -> void:
 func _process(dt: float) -> void:
 	_ui_flush_left -= dt
 	if _ui_flush_left <= 0.0 or _ui_events.size() >= UI_BATCH: _flush_ui()
+	_refresh_guide_maturity(float(Time.get_ticks_msec() - _received_ms))
 	_refresh_left -= dt
 	if _refresh_left <= 0.0 and not busy:
 		_refresh_left = REFRESH_S
@@ -81,6 +90,31 @@ func current() -> Dictionary:
 	if view.is_empty(): return view
 	return P0Logic.project(view, float(Time.get_ticks_msec() - _received_ms))
 
+## A locally expired crop may finish an optional guide step without any action. Ask the server once per view;
+## a busy command finishes first, and failures fall back to the existing retry/periodic refresh (no frame storm).
+func _refresh_guide_maturity(elapsed_ms: float) -> void:
+	if _guide_maturity_checked or not P0Guide.guide_on(view): return
+	var row = view.guide.get("row", null)
+	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null and float(row.ready_in) > 0.0 and float(row.ready_in) <= elapsed_ms:
+		_guide_maturity_checked = true
+		if busy: refresh_after()
+		else: refresh()
+		return
+	for plot in view.get("plots", []):
+		if str(plot.get("state", "")) != "growing" or plot.get("ready_in", null) == null: continue
+		if float(plot.ready_in) <= 0.0 or float(plot.ready_in) > elapsed_ms: continue
+		_guide_maturity_checked = true
+		if busy: refresh_after()
+		else: refresh()
+		return
+
+## Pure client-page acknowledgement, sent only on a player confirmation. Keyed like other UI commands, so the
+## home build queued behind it uses its reply's seq; revisiting a completed page never acknowledges another step.
+func guide_ack(step: String) -> bool:
+	if not P0Guide.guide_on(view) or str(view.guide.step) != step: return false
+	var cmd := {"type": "guide", "op": "ack", "step": step}
+	return send(cmd, ui_key(cmd))
+
 ## One more read once the request on the wire is settled (a space entered while it was out: its read must carry it).
 var _refresh_queued := false
 func refresh_after() -> void:
@@ -88,6 +122,7 @@ func refresh_after() -> void:
 
 ## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
+	_refresh_left = REFRESH_S
 	_refresh_queued = false
 	var query := ("?space=" + space.uri_encode() if space != "" else "") + ("&place=" + place.uri_encode() if space != "" and place != "" else "")
 	_request(HTTPClient.METHOD_GET, "/p0/state" + query, {}, {})
@@ -194,6 +229,7 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	if data.has("state"):
 		view = data.state
 		_received_ms = Time.get_ticks_msec()
+		_guide_maturity_checked = false
 	if bool(data.get("ok", false)):
 		state_changed.emit(view, data.get("events", []))
 		return {ok = true, code = "", network = false}
@@ -215,15 +251,19 @@ static func boot_wanted() -> bool:
 	return FileAccess.file_exists("user://p0_boot") or OS.get_environment("SENSEN_P0") == "1" or OS.has_feature("p0")
 
 ## What this client can do that an older one could not (the server's `x-p0-features`): choose_home — a new save waits
-## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide — a new
-## save starts the new-player guide (SGODOT-341, P0Guide.guide_rows / tip_allowed) once the server's table has steps.
-const FEATURES := "choose_home,guide"
+## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide_v3 — a new
+## save starts the v3 guide with server-resolved presentation (341 c6f3189a). The old `guide` feature advertised
+## by 0.2.11 is intentionally absent: that package cannot show the complete v3 guide.
+# Ordinary accounts stay legacy until complete integration. The hidden B test flow explicitly creates a separate
+# test identity whose first request may opt in (aa0e971b). The switch alone never changes the active main account.
+const GUIDE_V3_READY := false
+const FEATURES := "choose_home,guide_v3" if GUIDE_V3_READY else "choose_home"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
-	headers.append("x-p0-features: " + FEATURES)
+	headers.append("x-p0-features: " + ("choose_home,guide_v3" if GUIDE_V3_READY or test_accounts.guide_enabled() else "choose_home"))
 	return headers
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is

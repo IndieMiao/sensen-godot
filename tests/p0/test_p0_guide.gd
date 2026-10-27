@@ -349,70 +349,101 @@ func test_the_today_chip_key_follows_the_focus_row_not_its_countdown() -> void:
 
 # ---------------------------------------------------------------- new-player guide (SGODOT-341)
 
-## A test-only step table in the content P0Guide reads (the shipped one is empty until 339's §14 v3).
-const GUIDE_TABLE := {
-	"steps": [
-		{"id": "sow_two", "done_on": {"key": "sow:crop_radish", "count": 2}, "tip": "sow", "row": {"line": "Sow 2 Radish", "icon": "seed_radish", "go": "plots"}},
-		{"id": "sell_one", "done_on": {"key": "sell:crop_radish"}, "tip": "sell_one", "row": {"line": "Sell 1 Radish · Nadia", "icon": "crop_radish", "go": "outpost:market"}},
-	],
-	"recover": [{"id": "rec_sow", "row": {"line": "Sow 1 Radish", "icon": "seed_radish", "go": "plots"}}],
-	"tips": {"sell_one": "Nadia buys one Radish. Keep the other."},
-}
-
-func _with_guide(body: Callable) -> void:
-	var c := P0Logic.content()
-	var had: Variant = c.get("guide", null)
-	c["guide"] = GUIDE_TABLE
-	body.call()
-	if had == null: c.erase("guide")
-	else: c["guide"] = had
-
+## Server-resolved v3 fixtures: deliberately no matching bundled step table.
 func _guided(step: String, recover: Variant = null, progress: Variant = null) -> Dictionary:
-	return _view({"guide": {"step": step, "phase": "B", "recover": recover, "at": 0, "progress": progress}})
+	return _view({"guide": {"step": step, "recover": recover, "progress": progress,
+		"row": {"line": "Sow 2 Quick Radishes", "icon": "seed_quick_radish", "go": "plots"}, "marks": [],
+		"pip": {"here": true, "bang": true, "line": "Hi, I'm Pip!", "resend_left": 2}}})
 
 func test_a_view_without_a_guide_step_is_the_old_first_session() -> void:
-	assert_bool(Guide.guide_on(_view())).is_false()
-	assert_bool(Guide.guide_on(_view({"guide": {"step": null, "end": "legacy"}}))).is_false()
-	assert_array(_lines(Guide.lead_rows(_view({"guide": {"step": null, "end": "done"}})))).contains(["Catch 2 Pond Crucian · Fern Pond"])
-	assert_bool(Guide.tip_allowed(_view(), "creel")).is_true()
+	for g in [null, {}, {"step": null, "end": "legacy"}, {"step": null, "end": "done"}]:
+		var v := _view({"guide": g})
+		assert_bool(Guide.guide_on(v)).is_false()
+		assert_array(_lines(Guide.lead_rows(v))).contains(["Catch 2 Pond Crucian · Fern Pond"])
 
-func test_the_guide_step_leads_today_with_its_count_and_replaces_pond_catch() -> void:
-	_with_guide(func():
-		var v := _guided("sow_two", null, {"have": 1, "need": 2})
-		var rows := Guide.lead_rows(v)
-		assert_array(_lines(rows)).is_equal(["Sow 2 Radish"])
-		assert_str(str(rows[0].tail)).is_equal("1/2")
-		assert_bool(rows[0].focus).is_true()
-		assert_str(str(rows[0].dot)).is_equal("guide:sow_two")
-		var today := P0Logic.today_rows(v)
-		assert_str(str(today[0].line)).is_equal("Sow 2 Radish")                       # no second "first sow" row before it
-		assert_bool(today.any(func(r): return str(r.line).begins_with("Catch"))).is_false())
+func test_resolved_guide_row_stays_first_even_with_a_ready_ordinary_delivery() -> void:
+	var v := _guided("t_sow_quick", null, {"have": 1, "need": 2})
+	v.stall.board.requests = [{"id": "ordinary", "title": "Fresh Greens", "item": "crop_radish", "qty": 1, "have": 1, "status": "taken"}]
+	v.bag.slots = [{"id": "crop_radish", "qty": 1}]
+	var before := v.duplicate(true)
+	var rows := P0Logic.today_rows(v)
+	assert_str(str(rows[0].line)).is_equal("Sow 2 Quick Radishes")
+	assert_str(str(rows[0].tail)).is_equal("1/2")
+	assert_str(str(rows[0].dot)).is_equal("guide:t_sow_quick")
+	assert_bool(rows[0].focus).is_true()
+	assert_int(rows.size()).is_less_equal(3)
+	assert_that(v).is_equal(before)
 
-func test_a_recover_entry_stands_in_for_the_step_while_the_server_names_it() -> void:
-	_with_guide(func():
-		var v := _guided("sell_one", "rec_sow", {"have": 0, "need": 1})
-		assert_str(Guide.guide_shown_id(v)).is_equal("rec_sow")
-		var rows := Guide.lead_rows(v)
-		assert_array(_lines(rows)).is_equal(["Sow 1 Radish"])
-		assert_str(str(rows[0].tail)).is_equal("")
-		assert_str(Guide.guide_shown_id(_guided("sell_one"))).is_equal("sell_one"))
+func test_recover_row_and_its_progress_are_resolved_by_the_server() -> void:
+	var v := _guided("t_gift", "missing_fish", {"have": 0, "need": 1})
+	v.home = {"set": {"pond": "gn-1850147~pond0", "market": "gn-1850147~market0"}}
+	v.guide.row = {"line": "Catch 1 fish · Willow Pond", "icon": "fish", "go": "gn-1850147~pond0"}
+	var r: Dictionary = Guide.guide_rows(v)[0]
+	assert_str(str(r.line)).is_equal("Catch 1 fish · Willow Pond")
+	assert_str(str(r.go)).is_equal("pond:gn-1850147~pond0")
+	assert_str(str(r.tail)).is_equal("0/1")
+	assert_str(str(r.dot)).is_equal("guide:missing_fish")
+	v.guide.row = {"line": "Bring Nadia your soup · Riverside Market", "icon": "dish_fish_soup", "go": "gn-1850147~market0"}
+	v.guide.recover = null
+	v.guide.progress = null
+	r = Guide.guide_rows(v)[0]
+	assert_str(str(r.go)).is_equal("outpost:gn-1850147~market0")
+	assert_str(str(r.tail)).is_empty()
+	assert_str(str(r.dot)).is_equal("guide:t_gift")
 
-func test_while_the_guide_is_on_only_its_tip_and_the_safety_tips_show() -> void:
-	_with_guide(func():
-		var v := _guided("sell_one")
-		assert_bool(Guide.tip_allowed(v, "sell_one")).is_true()
-		assert_bool(Guide.tip_allowed(v, "heat")).is_true()
-		assert_bool(Guide.tip_allowed(v, "meal")).is_true()
-		assert_bool(Guide.tip_allowed(v, "creel")).is_false()
-		assert_bool(Guide.tip_allowed(v, "sow")).is_false()
-		assert_str(Guide.tip_text("sell_one")).is_equal("Nadia buys one Radish. Keep the other.")
-		var q := Guide.TipQueue.new()
-		assert_bool(q.request("sell_one")).is_true()                                # the table's own sentence queues like the seven
-		assert_bool(q.request("no_such_tip")).is_false())
+func test_absent_row_does_not_resurrect_a_bundled_step_or_the_previous_row() -> void:
+	var v := _guided("t_city")
+	for row in [null, {}, {"line": ""}]:
+		v.guide.row = row
+		assert_array(Guide.guide_rows(v)).is_empty()
+	v.guide.row = {"line": "A resolved line without a destination", "go": null}
+	assert_str(str(Guide.guide_rows(v)[0].go)).is_empty()
+	v.guide = {"step": null, "end": "timeout", "row": {"line": "Stale line"}}
+	assert_array(Guide.guide_rows(v)).is_empty()
 
-func test_a_new_step_asks_for_its_tip_once() -> void:
-	_with_guide(func():
-		assert_str(Guide.guide_tip_on_change(_guided("sow_two"), _guided("sell_one"))).is_equal("sell_one")
-		assert_str(Guide.guide_tip_on_change(_guided("sell_one"), _guided("sell_one"))).is_equal("")
-		assert_str(Guide.guide_tip_on_change(_view(), _guided("sow_two"))).is_equal("sow")
-		assert_str(Guide.guide_tip_on_change(_guided("sell_one"), _guided("sell_one", "rec_sow"))).is_equal(""))   # rec_sow has no tip
+func test_seven_scene_and_event_tips_survive_every_guide_step_and_recover() -> void:
+	var v := _guided("t_soup", "missing_fish")
+	for key in Guide.TIPS:
+		assert_bool(Guide.tip_allowed(v, key)).is_true()
+		assert_str(Guide.tip_text(key)).is_equal(str(Guide.TIPS[key]))
+	assert_bool(Guide.tip_allowed(v, "pip_dialogue")).is_false()
+	var q := Guide.TipQueue.new({"sow": true})
+	assert_bool(q.request("sow")).is_false()
+	q.moment_opened()
+	q.request("cast")
+	q.request("creel")
+	assert_str(q.next()).is_empty()
+	q.moment_closed()
+	assert_str(q.next()).is_equal("cast")
+	q.close()
+	assert_str(q.next()).is_equal("creel")
+	assert_bool(q.request("creel")).is_false()
+
+func test_resolved_countdown_ticks_without_parsing_copy_or_advancing_the_step() -> void:
+	var v := _guided("t_harvest_quick", "r_quick_wait", {"have": 0, "need": 1})
+	v.names.crop_quick_radish = "Quick Radish"
+	v.guide.row = {"line": "Quick Radishes ready", "icon": "seed_quick_radish", "go": "home",
+		"countdown": "crop_quick_radish", "ready_in": 43000, "count": 2, "format": "mss"}
+	var projected := P0Logic.project(v, 1100)
+	var r: Dictionary = Guide.guide_rows(projected)[0]
+	assert_str(str(r.line)).is_equal("Quick Radishes ready in 0:42")
+	assert_str(str(r.go)).is_equal("plots")
+	assert_str(str(r.tail)).is_empty()
+	assert_str(str(projected.guide.step)).is_equal("t_harvest_quick")
+	assert_int(int(v.guide.row.ready_in)).is_equal(43000)
+	v.guide.row.count = 1
+	assert_str(str(Guide.guide_rows(v)[0].line)).is_equal("Quick Radish ready in 0:43")
+	v.guide.row = {"line": "Radish ready", "icon": "crop_radish", "go": "home", "countdown": "crop_radish",
+		"ready_in": 3660000, "count": 2, "format": "minutes"}
+	assert_str(str(Guide.guide_rows(v)[0].line)).is_equal("Radishes ready in 1h 1m")
+	v.guide.row.ready_in = null
+	assert_str(str(Guide.guide_rows(v)[0].line)).is_equal("Radish ready")   # no invented timer
+
+func test_cook_marks_supply_the_local_show_target_and_page() -> void:
+	var v := _guided("t_soup", null, {"have": 0, "need": 1})
+	v.guide.row = {"line": "Cook: Fresh Fish Soup · new recipe", "icon": "dish_fish_soup", "go": "home"}
+	v.guide.marks = [{"place": "home", "object": "farmhouse", "kind": "request"}, {"page": "dish_fish_soup", "button": "cook", "pulse": true}]
+	var r: Dictionary = Guide.guide_rows(v)[0]
+	assert_str(str(r.go)).is_equal("stove")
+	assert_str(str(r.page)).is_equal("dish_fish_soup")
+	assert_str(str(r.tail)).is_empty()   # a once-only action is not an extra 0/1 label
