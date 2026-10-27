@@ -240,3 +240,21 @@ func test_the_dashed_circle_keeps_only_the_dashes_on_screen() -> void:
 	assert_int(edge.size()).is_greater(0)
 	assert_int(edge.size()).is_less(int(TAU * 1370.0 / 16.0) * 6 / 4)   # the arc across the screen only
 	for p in edge: assert_bool(view.grow(16).has_point(p)).is_true()
+
+## 不知火舞 342 6f9c70b3 (周瑜 on #495): a finger still on the map, Build here pressed with another does nothing.
+func test_build_here_waits_while_a_finger_is_on_the_map() -> void:
+	var p := _page()
+	p.show_area(_read())
+	await await_idle_frame()
+	var chose := []
+	var said := []
+	p.chosen.connect(func(lat, lng): chose.append([lat, lng]))
+	p.unavailable.connect(func(t): said.append(t))
+	(p.map as PinPage.FlatMap).dragging = true
+	p.build.activated.emit()
+	p.build.unavailable_pressed.emit("Too far from the city")
+	assert_array(chose).is_empty()
+	assert_array(said).is_empty()
+	(p.map as PinPage.FlatMap).dragging = false
+	p.build.activated.emit()
+	assert_int(chose.size()).is_equal(1)

@@ -127,10 +127,10 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	build.offset_top = _BUILD_Y - 800.0 - safe_bottom
 	build.offset_bottom = build.offset_top + _KEY_H
 	build.activated.connect(func():
-		if _stop_slide(): return
+		if _finger_on_map() or _stop_slide(): return
 		if _can_build(): chosen.emit(float(at[0]), float(at[1])))
 	build.unavailable_pressed.connect(func(_t: String):
-		if _stop_slide(): return
+		if _finger_on_map() or _stop_slide(): return
 		if not refusal.is_empty(): unavailable.emit(str(P0HomePin.refusal_text(refusal, names).toast)))
 	add_child(build)
 	back_key = _back_key()
@@ -380,6 +380,12 @@ var _last_key: Array = []
 func _view_key() -> Array:
 	return [geo_at(tip()), screen_of(area.base.x, area.base.y), map.pick_px_per_m(), map.pick_dragging(),
 		map.pick_has_ground(), size]   # the ground arriving lifts the page's land and shows the credit line
+
+## A finger still dragging the map (the pin up): Build here pressed with another does nothing — no card, no toast, the
+## camera left alone (不知火舞 342 6f9c70b3, 周瑜 on #495).
+func _finger_on_map() -> bool:
+	if area.is_empty() or not _map_live() or not bool(map.pick_dragging()): return false
+	return not (map.has_method("pick_settling") and bool(map.pick_settling()))
 
 ## Build here pressed while the map slides on (不知火舞 342 35e97397): the map stops there, the pin drops and the card
 ## and the key are read for that point — no confirm card, no toast, nothing built off the old values; a second press
