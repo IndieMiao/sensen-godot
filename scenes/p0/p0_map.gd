@@ -1805,7 +1805,8 @@ func pick_area(lat: float, lng: float, range_km: float) -> void:
 ## HOME-WELCOME behind its card (340 §4, PR-2b; 不知火舞 342 bce34a87): the city's centre held at the viewport point
 ## `at` (between the status bar and the card's top, so the card covers none of it) while the camera goes from the globe
 ## (PICK_GLOBE_ZOOM) to `to_zoom` over `seconds` (ease in and out), then `done`; 0 s puts it there at once and calls
-## `done`. Flat and north up as the pin page; the floor is lowered for the flight (pick_area sets the pin page's again).
+## `done`. Flat and north up as the pin page; the floor is lowered for the flight only and back at PICK_ZOOM_MIN after
+## it, so the pin page's start before its read cannot pinch out to the globe (亚瑟 on #512; pick_area sets its own).
 func pick_fly(to_zoom: float, seconds: float, at: Vector2, done := Callable()) -> void:
 	_end_pick_flight()
 	_reset_gesture()
@@ -1818,6 +1819,7 @@ func pick_fly(to_zoom: float, seconds: float, at: Vector2, done := Callable()) -
 	if seconds <= 0.0:
 		zoom = to_zoom
 		pick_put(lat, lng, at)
+		_pick_min_zoom = minf(PICK_ZOOM_MIN, to_zoom)
 		if done.is_valid(): done.call()
 		return
 	zoom = PICK_GLOBE_ZOOM
@@ -1826,6 +1828,7 @@ func pick_fly(to_zoom: float, seconds: float, at: Vector2, done := Callable()) -
 	_pick_flight.tween_method(func(z: float):
 		zoom = z
 		_teleport_keeping(lat, lng, at), PICK_GLOBE_ZOOM, to_zoom, seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	_pick_flight.tween_callback(func(): _pick_min_zoom = minf(PICK_ZOOM_MIN, to_zoom))
 	if done.is_valid(): _pick_flight.tween_callback(done)
 
 ## The pin page's start from wherever the camera is (HOME-WELCOME's city view, Start here; 不知火舞 342 bce34a87): over

@@ -157,6 +157,7 @@ func test_the_welcome_flight_holds_the_city_at_its_point() -> void:
 	var landed := []
 	pick.pick_fly(11.0, 0.2, at, func(): landed.append(1))
 	assert_float(pick.zoom).is_equal(pick.PICK_GLOBE_ZOOM)
+	assert_float(pick._minimum_zoom()).is_equal(pick.PICK_GLOBE_ZOOM)   # the floor lowered for the flight only
 	assert_bool(pick.pick_flying()).is_true()
 	assert_bool(pick.pick_settling()).is_true()
 	await get_tree().create_timer(0.1).timeout
@@ -166,8 +167,11 @@ func test_the_welcome_flight_holds_the_city_at_its_point() -> void:
 	assert_array(landed).is_equal([1])
 	assert_float(pick.zoom).is_equal_approx(11.0, 1e-6)
 	assert_bool(pick.pick_flying()).is_false()
+	# landed, back at the pick mode's floor: Start here before its read cannot pinch out to the globe (亚瑟 on #512)
+	assert_float(pick._minimum_zoom()).is_equal(pick.PICK_ZOOM_MIN)
 	pick.pick_fly(11.0, 0.0, at, func(): landed.append(2))
 	assert_array(landed).is_equal([1, 2])
+	assert_float(pick._minimum_zoom()).is_equal(pick.PICK_ZOOM_MIN)
 	assert_float((pick.pick_screen_of(float(c[0]), float(c[1])) as Vector2).distance_to(at)).is_less(0.5)
 
 ## Start here on the card's map: the pin page's start glides in to PICK_ZOOM under the tip; the pin stays up meanwhile.

@@ -374,6 +374,9 @@ func test_the_first_read_holds_the_cards_place_with_its_outline() -> void:
 	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": SF, "matches": []})
 	await await_idle_frame()
 	assert_object(flow.loading).is_null()
+	# HOME-WELCOME's flight starts under it: the outline dissolves over motion.dissolveMs (不知火舞 3730603f), taking no taps
+	assert_int(outline.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DISSOLVE_MS) + 0.1).timeout
 	assert_bool(is_instance_valid(outline) and outline.is_inside_tree() and not outline.is_queued_for_deletion()).is_false()
 	# the card stands where the outline stood, the same size (a one-line city), 16 above the safe area
 	await await_idle_frame()

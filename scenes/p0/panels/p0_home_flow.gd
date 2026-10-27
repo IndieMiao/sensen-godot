@@ -93,10 +93,10 @@ func _read_cities(q: String) -> void:
 ## The first read of a first pick: a city near — HOME-WELCOME, the list made behind it for `Choose another city`;
 ## none — the list (HOME-PICK-1-NOIP). Later reads (a search, a retry) go to the list.
 func _cities_read(d: Dictionary, q: String) -> void:
-	_end_loading()
 	d = dev_near(d, q)
 	if cities == null and welcome == null:
 		var near = d.get("near", null)
+		_end_loading(near is Dictionary)   # the flight starts under it: a dissolve, not a one-frame cut (不知火舞 3730603f)
 		if near is Dictionary:
 			welcome = Welcome.new(near, _safe.y, _safe.x)
 			welcome.start_pressed.connect(func(): open_spots(near))
@@ -106,6 +106,7 @@ func _cities_read(d: Dictionary, q: String) -> void:
 			_make_cities("Back")
 			cities.visible = false
 		else: _make_cities()
+	else: _end_loading()
 	if is_instance_valid(cities): cities.show_cities(d, q)
 
 ## A debug build with user://p0_near (one line: an open city's id) reads that city as Near you on the first read: an
@@ -118,8 +119,15 @@ static func dev_near(d: Dictionary, q: String) -> Dictionary:
 		if r is Dictionary and str(r.get("id", "")) == id: return d.merged({"near": r}, true)
 	return d
 
-func _end_loading() -> void:
-	if loading != null: loading.queue_free()
+## The first read's card outline goes: at once, or (`fade`, HOME-WELCOME's flight starting) over motion.dissolveMs.
+func _end_loading(fade := false) -> void:
+	if loading == null: return
+	if fade and loading.is_inside_tree():
+		loading.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var t := loading.create_tween()
+		t.tween_property(loading, "modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DISSOLVE_MS))
+		t.tween_callback(loading.queue_free)
+	else: loading.queue_free()
 	loading = null
 
 ## HOME-WELCOME's `Choose another city`: the list, nothing picked; the list covers the screen, so the map goes.
@@ -146,8 +154,11 @@ func _welcome_map(fly: bool) -> void:
 		else: welcome.slide_in(true, true)   # back to the card: it slides in again all the same (不知火舞 bce34a87)
 		return
 	welcome.wait_for_map()
-	var m := pick_map
-	await get_tree().process_frame   # the card laid out: where the city goes reads its height
+	# The card laid out first: where the city goes reads its height. A one-shot connection, not an await — it goes with
+	# the flow if the flow is freed this frame (an await would resume on a freed instance; 亚瑟 on #512).
+	get_tree().process_frame.connect(_welcome_fly.bind(fly, pick_map), CONNECT_ONE_SHOT)
+
+func _welcome_fly(fly: bool, m: Variant) -> void:
 	if not is_instance_valid(welcome) or pick_map != m: return
 	var at: Vector2 = welcome.get_global_transform_with_canvas() * welcome.city_point()
 	pick_map.pick_fly(WELCOME_ZOOM, WELCOME_FLY_S if fly else 0.0, at,
