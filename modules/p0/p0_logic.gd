@@ -1818,9 +1818,11 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
 			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % span(float(k.refill_in)))
 		"casino":   # q(240): no number when coins are short (the table's key says how many); Play opens the table all the same
+			# — said only while the table is open (不知火舞 351 66d46cf9: not on screen while it is not)
 			var bj: Dictionary = view.get("blackjack", {}) if view.get("blackjack") is Dictionary else {}
 			var least := int(bj.get("floor", 40)) + int(bj.get("min_bet", 5))
-			greet = "Keep those coins for seeds. Come back with a few more." if int(view.get("coins", 0)) < least else "Pull up a chair. Care for a hand?"
+			var short := bool(bj.get("open", false)) and int(view.get("coins", 0)) < least
+			greet = "Keep those coins for seeds. Come back with a few more." if short else "Pull up a chair. Care for a hand?"
 			answer = "Get closer to 21 than me without going over. You bet with your own coins."
 	var place := str(ctx.get("place", ""))
 	return {

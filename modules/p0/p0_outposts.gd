@@ -18,12 +18,16 @@ const CARDS_ICON := "res://assets/p0/icons/cards.svg"
 static func cards_icon() -> Texture2D:
 	return load(CARDS_ICON) if ResourceLoader.exists(CARDS_ICON) else P0Logic.icon("recipe_card")
 
-## The card room shows on the map once view.blackjack says it is open (Homestead Lv2, the guide over); its pin hidden
-## before, no grey card, no words (不知火舞 351 8aa69403).
+## The card room shows on the map once its gate is passed — Homestead Lv2 and the guide over (q(238), C11-3) — its pin
+## hidden before, no grey card, no words (不知火舞 351 8aa69403). The client reads the gate from the view itself, not
+## view.blackjack: 0.2.12 ships the room, Lou and his greeting to a server without the table (用户 via 奕星 on 351), so
+## a player past the gate walks in there too; only Play asks whether the table is open (P0Ui._play_blackjack).
 static func shown(o: Dictionary, view: Dictionary) -> bool:
 	if str(o.get("role", "")) != "casino": return true
-	var bj = view.get("blackjack", null)
-	return bj is Dictionary and bool(bj.get("open", false))
+	var h = view.get("homestead", {})
+	var g = view.get("guide", null)
+	var guided: bool = g is Dictionary and g.get("step", null) != null and str(g.step) != ""   # as P0Guide.guide_on
+	return h is Dictionary and int(h.get("level", 1)) >= 2 and not guided
 
 static var _list: Array = []
 

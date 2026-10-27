@@ -79,8 +79,17 @@ export function shuffleShoe(player: string, n: number, salt: string): number[] {
   return deck;
 }
 
-/** §2 / q(110): Homestead Lv2, and a player in the new-player guide only once it is over. */
-export const bjOpen = (s: P0State) => s.homestead.level >= 2 && (!s.guide || s.guide.step === null);
+/** The table itself (用户 via 奕星 on 351): P0_BJ_TABLE — on unless it is literally "0" (亚瑟 / 奕星: the deploy script
+ * writes .env.p0 whole with its own keys, so on is the default it needs no change for). Off, view.blackjack.open is
+ * false and every bj_* command is refused bj_locked (the client's Play says `Blackjack isn't open yet.`); a hand already
+ * in play still settles as it runs out. */
+let tableOn = true;
+export const bjTableFromEnv = (v: string | undefined) => v !== '0';
+export function setBlackjackTable(on: boolean): void { tableOn = on; }
+export const bjTableOn = () => tableOn;
+
+/** §2 / q(110): Homestead Lv2, and a player in the new-player guide only once it is over — and the table on. */
+export const bjOpen = (s: P0State) => tableOn && s.homestead.level >= 2 && (!s.guide || s.guide.step === null);
 const atTable = (c: P0Content, space: unknown, place: unknown) =>
   space === 'outpost' && typeof place === 'string' && c.outposts?.some(o => o.id === place && o.role === 'casino') === true;
 const expired = (c: P0Content, s: P0State, h: BjHand, now: number) => h.day !== dayKey(c, s, now) || now - h.last_at >= BJ_EXPIRE_MS;

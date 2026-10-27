@@ -1653,9 +1653,10 @@ func _dev_shot(dt: float) -> void:
 			"boardreq": ui.open_board_request(step[1], step[2])   # boardreq:<role>:<request id> — BOARD-1
 			"dropconfirm": P0BoardRequest.confirm_drop(ui, step[1], step[2])   # dropconfirm:<role>:<request id> — BOARD-3
 			"boardinfo": P0BoardRequest.info(ui, step[1])   # boardinfo:<item> — Details over the open request sheet
-			"presscmd":   # the open card's command button (BOARD-3 Drop request → BOARD-DROPPED)
+			"presscmd":   # the open card's command button (BOARD-3 Drop request → BOARD-DROPPED); presscmd:Play only that one
 				if ui._modal != null:
-					for b in ui._modal.find_children("*", "UiCommandButton", true, false): (b as UiCommandButton).activated.emit()
+					for b in ui._modal.find_children("*", "UiCommandButton", true, false):
+						if step.size() < 2 or (b as UiCommandButton).text == step[1]: (b as UiCommandButton).activated.emit()
 			"greet": ui.open_keeper_greeting(step[1], _dev_ctx(step[1]))
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
 			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)

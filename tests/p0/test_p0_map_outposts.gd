@@ -486,34 +486,32 @@ func test_destination_pins_wear_their_icons() -> void:
 	assert_int(int(casino.rank)).is_equal(int(m.PIN_RANK.tackle))
 	assert_bool(bool(casino.get("plate", false))).is_false()
 
-## The card room's pin is in only while view.blackjack says the table is open to this player (q(238): Homestead Lv2,
-## the guide over), no grey card before (不知火舞 351 8aa69403); it comes in as soon as the table opens. A server
-## without the card room yet (no view.blackjack: the client ships first, 奕星 on 351) shows none of it either — no pin,
-## no place-list row (the list is the pins' entries), no error.
-func test_the_card_room_pin_shows_once_its_table_is_open() -> void:
+## The card room's pin is in once its gate is passed — Homestead Lv2 and the guide over (q(238), C11-3) — no grey card
+## before (不知火舞 351 8aa69403), and it comes in as soon as the gate is passed. The client reads the gate itself, not
+## view.blackjack: a server without the table yet (0.2.12 ships ahead of it, 用户 via 奕星 on 351) shows the room too,
+## and one that has it shows it whether its table is open or not (Play says so). The place list is the pins' entries.
+func test_the_card_room_pin_shows_once_its_gate_is_passed() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
 	var ids := func() -> Array: return m.city_map.extra_places.map(func(e): return str(e.get("id", "")))
-	var v: Dictionary = rt.session.view.duplicate(true)
-	v.erase("blackjack")
-	rt.session.view = v
-	m.p0_frame(v, 1.0 / 30.0)
-	assert_array(ids.call()).not_contains(["sf_card_room_1"])
+	var at := func(level: int, guide, bj) -> Array:
+		var v: Dictionary = rt.session.view.duplicate(true)
+		v["homestead"] = (v.get("homestead", {}) as Dictionary).merged({"level": level}, true)
+		if guide == null: v.erase("guide")
+		else: v["guide"] = {"step": guide}
+		if bj == null: v.erase("blackjack")
+		else: v["blackjack"] = bj
+		rt.session.view = v
+		m.p0_frame(v, 1.0 / 30.0)
+		return ids.call()
+	assert_array(at.call(1, null, null)).not_contains(["sf_card_room_1"])
 	assert_array(m.city_map.entries.map(func(e): return str(e.get("id", "")))).not_contains(["sf_card_room_1"])
-	assert_array(ids.call()).contains(["sh_tea_1"])
-	v = v.duplicate(true)
-	v["blackjack"] = {"open": false}
-	rt.session.view = v
-	m.p0_frame(v, 1.0 / 30.0)
-	assert_array(ids.call()).not_contains(["sf_card_room_1"])
-	assert_array(ids.call()).contains(["sh_tea_1"])
-	v = v.duplicate(true)
-	v["blackjack"] = {"open": true}
-	rt.session.view = v
-	m.p0_frame(v, 1.0 / 30.0)
-	assert_array(ids.call()).contains(["sf_card_room_1"])
+	assert_array(at.call(2, "plant", null)).not_contains(["sf_card_room_1"])   # the guide still on
+	assert_array(at.call(2, null, null)).contains(["sf_card_room_1", "sh_tea_1"])   # an older server, past the gate
+	assert_array(at.call(1, null, {"open": false})).not_contains(["sf_card_room_1"])
+	assert_array(at.call(3, null, {"open": false})).contains(["sf_card_room_1"])   # the table closed: the room is in
 
 ## SGODOT-261 (用户 via 奕星): a selected MapDestination grows with the jelly every pin plays (it used to keep its size,
 ## Figma 1802:118612); Today's Show pulse still scales only its disc. test_p0_map_space_pins plays them frame by frame.

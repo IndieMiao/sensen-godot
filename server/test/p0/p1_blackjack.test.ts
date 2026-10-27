@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { bjSalt, bjShoe, cardCode, refundHand, setBlackjackSecret, shuffleShoe } from '../../src/p0/blackjack.js';
+import { bjSalt, bjShoe, bjTableFromEnv, cardCode, refundHand, setBlackjackSecret, setBlackjackTable, shuffleShoe } from '../../src/p0/blackjack.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
@@ -168,6 +168,28 @@ describe('the rules (plan §3)', () => {
     stack('7S', '7H', '7D', 'TD');
     const poor = step(player(55), { type: 'bj_deal', bet: 10 }).state;   // 45 left: a second 10 would leave 35
     expect(refused(poor, { type: 'bj_act', action: 'split' })).toMatchObject({ code: 'bj_no_coins', detail: { need: 5 } });
+  });
+});
+
+describe('the table switch (P0_BJ_TABLE; 用户 via 奕星 on 351)', () => {
+  afterEach(() => setBlackjackTable(true));
+  it('is on unless the variable is literally "0" (unset and empty are on)', () => {
+    expect([undefined, '', '1', 'true', 'off', '00', ' 0', '0'].map(bjTableFromEnv)).toEqual([true, true, true, true, true, true, true, false]);
+  });
+  it('off, the table is closed to everyone past the gate; a hand already in play still settles as it runs out', () => {
+    stack('TS', '7H', '9S', '9D', '2C');
+    const s = step(player(), { type: 'bj_deal', bet: 20 }).state;
+    setBlackjackTable(false);
+    expect(viewOf(c, player(), T0).blackjack.open).toBe(false);
+    for (const cmd of [{ type: 'bj_open' }, { type: 'bj_intro' }, { type: 'bj_deal', bet: 10 }, { type: 'bj_act', action: 'stand' }] as P0Command[])
+      expect(refused(s, cmd).code).toBe('bj_locked');
+    const later = applyP0(c, s, { type: 'read_inbox', keys: [] }, T0 + 24 * H);
+    if (!later.ok) throw new Error(later.code);
+    expect(later.state.blackjack!.hand).toBeUndefined();
+    expect(later.state.coins).toBe(520);
+    expect(later.state.blackjack!.last).toMatchObject({ why: 'expired', net: 20 });
+    setBlackjackTable(true);
+    expect(viewOf(c, player(), T0).blackjack.open).toBe(true);
   });
 });
 

@@ -57,7 +57,10 @@ func _room_ready() -> void:
 	crowd.show_health = false
 	crowd.height_of = _crowd_height
 	room.add_child(crowd)   # remote players arrive in room metres, like the anchors
-	if use_runtime and not outpost.is_empty(): _go_online(P0Runtime.ensure().session)
+	# a server without the card room (no view.blackjack, 0.2.12 ahead of it) has no room for it either: offline there
+	if use_runtime and not outpost.is_empty() and not (str(outpost.get("role", "")) == "casino"
+			and not P0Runtime.ensure().session.view.has("blackjack")):
+		_go_online(P0Runtime.ensure().session)
 
 func _exit_tree() -> void:
 	if online: online.stop()

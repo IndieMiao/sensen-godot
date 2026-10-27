@@ -26,7 +26,7 @@ import { openIpNear, type IpNear } from '../src/p0/ip_city.js';
 import { registerP0Admin } from '../src/p0/admin.js';
 import { P0Gate } from '../src/p0/gate.js';
 import { P0EventLog } from '../src/p0/telemetry.js';
-import { setBlackjackSecret } from '../src/p0/blackjack.js';
+import { bjTableFromEnv, bjTableOn, setBlackjackSecret, setBlackjackTable } from '../src/p0/blackjack.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const stateFile = process.env.P0_STATE_FILE ?? path.join(root, 'output/p0/p0-state.json');
@@ -54,6 +54,9 @@ const dev = process.env.P0_DEV !== '0';
 // warns (亚瑟 / 奕星 on #523: the card room stays open, a hand in play keeps its stored shoe); dev keeps a fixed key.
 if (process.env.P0_BJ_SECRET) setBlackjackSecret(process.env.P0_BJ_SECRET);
 else if (!dev) { setBlackjackSecret(randomBytes(32).toString('hex')); console.warn(JSON.stringify({ warn: 'P0_BJ_SECRET missing: a random key for this process' })); }
+// The table itself (用户 via 奕星 on 351): open unless P0_BJ_TABLE is "0". The deploy script writes .env.p0 whole each
+// time, so closing it goes through that script, never a hand edit (蒙恬).
+setBlackjackTable(bjTableFromEnv(process.env.P0_BJ_TABLE));
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
 const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
 const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
@@ -89,7 +92,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
