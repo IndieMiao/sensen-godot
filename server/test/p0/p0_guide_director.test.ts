@@ -101,22 +101,29 @@ describe('the main line (§14.2)', () => {
       row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' }, progress: { have: 0, need: 1 } });
     expect(r.view.row.ready_in).toBeGreaterThan(0);
     expect(r.view.row.ready_in).toBeLessThanOrEqual(45_000);
+    r.now += 46 * S; r.check();
+    expect(r.view.marks).toEqual([{ plot: quick[0] }, { plot: quick[1] }, { button: 'harvest', pulse: true }]);
+    r.now -= 46 * S;
     r.harvest(quick); note();
+    expect(r.view.marks.map((m: any) => m.button).filter(Boolean)).toEqual(['request', 'location']);
     expect(r.view.row).toEqual({ line: 'Bring Nadia 1 Radish · Mission Market Square', icon: 'crop_radish', go: 'sh_market_1' });
     r.nadia1(); note();
     const delivered = r.now;
     expect(r.s.boards.stall[0].refill_at).toBe(delivered + c.requests.done_refill_h * 3_600_000);
     expect(r.view.marks[0]).toMatchObject({ place: 'pond_san_francisco_03', why: 'Catch 2 fish · 0/2' });
+    expect(r.view.marks[1]).toEqual({ button: 'cast', pulse: true });
     r.fish(1);
     expect(r.view.marks[0].why).toBe('Catch 2 fish · 1/2');
     r.fish(1); note();
     expect(r.view.row.line).toBe('Cook it: Grilled Crucian');
     r.cook(['fish_crucian'], true); note();
     expect(r.view.row.line).toBe('Cook: Fresh Fish Soup · new recipe');
-    expect(r.view.marks).toEqual([{ place: 'home', object: 'farmhouse', kind: 'request' }, { page: 'dish_fish_soup', button: 'cook', pulse: true }]);
+    expect(r.view.marks).toEqual([{ place: 'home', object: 'farmhouse', kind: 'request' }, { object: 'stove', pulse: true },
+      { page: 'dish_fish_soup', button: 'cook', pulse: true }]);
     r.cook(['fish_crucian', 'crop_radish']); note();
     expect(r.view.marks.find((m: any) => m.resident)).toEqual({ resident: 'res_nadia', kind: 'gift' });
     expect(r.view.marks.find((m: any) => m.button === 'gift')).toEqual({ button: 'gift', pulse: true });
+    expect(r.view.marks.find((m: any) => m.item)).toEqual({ item: 'dish_fish_soup', pulse: true });   // the Gift drawer's soup cell
     r.gift('dish_fish_soup'); note();
     expect(r.view.row.line).toBe("See Nadia's new request");
     r.do({ type: 'accept', request: SIX, ...r.market() }); note();
