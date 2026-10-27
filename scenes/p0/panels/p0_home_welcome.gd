@@ -104,6 +104,15 @@ func _init(row_: Dictionary = {}, safe_bottom := 0.0, safe_top := 0.0) -> void:
 	other.activated.connect(func(): if not _waiting: other_pressed.emit())
 	keys.add_child(other)
 
+## Test accounts' first pick only (不知火舞 341 67682ff4): `Return to main account` in the card under `Choose another
+## city`, centred, 8 under it (the keys' gap); the card grows with it and slides in with it.
+func add_return_main(action: Callable) -> void:
+	# like Start here and Choose another city: quiet while the camera flies, the card not drawn (周瑜 on #514)
+	var button := P0SettingsPage.return_main_link(func(): if not _waiting: action.call())
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.custom_minimum_size.y = UiTokens.SIZE_TOUCH
+	other.get_parent().add_child(button)
+
 ## Where the city's centre goes on the page (不知火舞 342 bce34a87): halfway between the status bar's bottom and the
 ## card's top, so the card covers none of it.
 func city_point() -> Vector2:
