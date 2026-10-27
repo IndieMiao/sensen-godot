@@ -18,6 +18,8 @@ const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Bart
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
+const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
@@ -371,6 +373,7 @@ func _notification(what: int) -> void:
 
 func _process(dt: float) -> void:
 	_dev_shot(dt)
+	_dev_mem(dt)
 	_tick_screens(dt)
 	if ui.offline:
 		_probe_left -= dt
@@ -1246,29 +1249,81 @@ func change_home(back: Callable) -> void:
 
 func _open_home_flow(type: String, change_from: String, done: Callable, back := Callable()) -> void:
 	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom(), change_from)
+	_home_flow.open_map = _open_pick_map
+	_home_flow.close_map = close_pick_map
+	ResourceLoader.load_threaded_request(MAP_SCENE)   # the pin page's map, warm by the time a city is picked (亚瑟)
 	_home_done = done
 	if back.is_valid(): _home_flow.left.connect(back)
-	_home_flow.chose.connect(func(cluster: String, spot: int):
-		var cmd := {"type": type, "city": cluster, "spot": spot}
+	_home_flow.chose.connect(func(cluster: String, lat: float, lng: float):
+		var cmd: Dictionary = P0HomePin.command(type, cluster, lat, lng)   # q(216): the pin
 		_home_change_to = cluster if type == "change_home" else ""
+		_home_at = [lat, lng]
 		_home_key = P0Session.ui_key(cmd)
 		if not session.send(cmd, _home_key): _home_flow.sent(false))
 	if not session.command_settled.is_connected(_home_settled): session.command_settled.connect(_home_settled)
 	ui.open_home_flow(_home_flow)
 
 var _home_flow: Control
+var _pick_map: Node   # the P0 map in its pick mode, pushed for the pin page (SGODOT-342 PR-2)
+
+## The pin page's map (亚瑟 342 6418183a, plan A): the P0 map in its pick mode pushed over whatever is up; null while a
+## navigation is under way (the page keeps its flat map).
+func _open_pick_map(cluster: String) -> Object:
+	close_pick_map()
+	# a city the client's cluster table does not know (亚瑟 on #495 ①): no street mode, so the map would open as the
+	# old Journey map (a crowd, Shanghai, the location prompt) — the page keeps its flat map
+	if P0Clusters.region(cluster).is_empty(): return null
+	var packed: PackedScene = null
+	if ResourceLoader.load_threaded_get_status(MAP_SCENE) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+		packed = ResourceLoader.load_threaded_get(MAP_SCENE) as PackedScene   # waits for the preload if it is still on
+	if packed == null: packed = load(MAP_SCENE) as PackedScene
+	_pick_map = AppRouter.push_packed(packed, {"home_pick": {"cluster": cluster}})
+	return _pick_map
+
+## A debug build with user://p0_memlog prints the engine's memory every 2 s to the log (tag godot): the pick map's
+## measurements on an emulator (亚瑟 342 6418183a ⑤: MEMORY_STATIC and the video memory, beside dumpsys's PSS).
+var _mem_left := 0.0
+var _mem_on := -1
+func _dev_mem(dt: float) -> void:
+	if _mem_on < 0: _mem_on = 1 if OS.is_debug_build() and FileAccess.file_exists("user://p0_memlog") else 0
+	if _mem_on == 0: return
+	_mem_left -= dt
+	if _mem_left > 0.0: return
+	_mem_left = 2.0
+	print("P0_MEM static=%d video=%d nodes=%d stack=%d pick=%s fps=%d frame_ms=%.1f" % [Performance.get_monitor(Performance.MEMORY_STATIC),
+		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED), Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
+		AppRouter.instance_depth(), str(is_instance_valid(_pick_map)), Performance.get_monitor(Performance.TIME_FPS),
+		Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0])
+
+## Every way off the pin page pops its map (亚瑟 ②: a first pick's change_scene never touches AppRouter's stack), and
+## only it: something else on top stays, the map then left for the stack's own unwinding.
+func close_pick_map() -> void:
+	var m := _pick_map
+	_pick_map = null
+	if not is_instance_valid(m): return
+	if AppRouter.top_instance() == m: AppRouter.pop_instance()
+	else: push_warning("P0Runtime: the pick map is not on top; left to the stack")
 var _home_done := Callable()
 var _home_key := ""
 var _home_change_to := ""
+var _home_at: Array = []   # the pin sent, [lat, lng]: a same-city move is taken only once the farm stands there
 
 ## Whether a choose_home / change_home answer leaves the home picked: taken, or refused because it already is — the
 ## first reply was lost on the way, so a second press is refused with the view the server has (周瑜 on #451: else the
 ## page would refuse every go until the app restarts). A first pick: the view no longer pending. A change (`change_to`,
-## the city asked for): the view's home is that city — the change is not pending before or after.
-static func home_taken(ok: bool, view: Dictionary, change_to := "") -> bool:
+## the city asked for): the view's home is that city — the change is not pending before or after — and, the pin sent
+## given (`at`, [lat, lng]), view.home.farm stands within a metre of it: a same-city re-pin (q(216) ⑨) is already home
+## before, so a `home_set_for_good` or a request the server never had would else read as moved (周瑜 on #495). The
+## server keeps the pin as sent (farm_at = [at.lat, at.lng]).
+static func home_taken(ok: bool, view: Dictionary, change_to := "", at: Array = []) -> bool:
 	if ok: return true
 	if view.is_empty(): return false
-	if change_to != "": return P0Travel.home(view) == change_to
+	if change_to != "":
+		if P0Travel.home(view) != change_to: return false
+		if at.size() != 2: return true
+		var h = view.get("home", null)
+		var farm = P0HomePin.lat_lng((h as Dictionary).get("farm", null)) if h is Dictionary else null
+		return farm != null and P0HomePin.km_ll(farm, at) * 1000.0 < 1.0
 	return not home_pending(view)
 
 ## choose_home answered: refused or lost, the pick stays for another go (the refusal says why as any does); taken (see
@@ -1276,10 +1331,12 @@ static func home_taken(ok: bool, view: Dictionary, change_to := "") -> bool:
 func _home_settled(key: String, ok: bool, _code: String) -> void:
 	if key != _home_key or _home_key == "": return
 	_home_key = ""
-	ok = home_taken(ok, session.view, _home_change_to)
+	ok = home_taken(ok, session.view, _home_change_to, _home_at)
 	if is_instance_valid(_home_flow): _home_flow.sent(ok)
 	if not ok: return
 	session.command_settled.disconnect(_home_settled)
+	if is_instance_valid(_home_flow): _home_flow.pick_map = null   # popped here, before the farm comes (亚瑟 ②)
+	close_pick_map()
 	_home_flow = null
 	ui.close_modal()
 	cover_launch()
@@ -1548,7 +1605,7 @@ func _dev_shot(dt: float) -> void:
 		get_viewport().get_texture().get_image().save_png("%s/f%05d.png" % [frames, Engine.get_frames_drawn()])
 	var limit := OS.get_environment("P0_SHOT_LIMIT_MS")
 	if Time.get_ticks_msec() > int(limit if limit != "" else "30000"): get_tree().quit(2)
-	if world == null and _shot_t < 6.0: return
+	if world == null and _shot_t < 6.0 and not is_instance_valid(_home_flow): return   # the home pick has no world: its steps (a drag) keep time
 	if not _shot_script.is_empty() and _shot_t > 2.0:
 		var step := str(_shot_script[0]).split(":")
 		if _shot_script.size() != _shot_left:   # once per step: the frame a video of it starts at
@@ -1639,7 +1696,7 @@ func _dev_shot(dt: float) -> void:
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
 			# the home pick (SGODOT-303) on a new save: homesearch:<text>, homecity[:<cluster>] (pick it, Continue),
-			# homespot:<1-3>, homebuild, homeforme, homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
+			# homepin / homedrag / homebuild (below), homeback, homenear:<cluster>, homefail[:spots]; the change: homechange, homemove
 			"homenear":   # a desktop's address is near nothing: show the page as if near <cluster> (Near you, not picked)
 				if is_instance_valid(_home_flow):
 					var near_row = _home_flow.cities.open_rows.filter(func(r): return str(r.id) == step[1])
@@ -1658,12 +1715,6 @@ func _dev_shot(dt: float) -> void:
 						_home_flow.cities = null
 						_home_flow.welcome = null
 						_home_flow._cities_read({"open": open_rows, "near": near_row[0], "matches": []}, "")
-			# homeloading: the first read's outline again, as if the cities were still out (342 8c4168ab)
-			"homeloading":
-				if is_instance_valid(_home_flow) and _home_flow.change_from == "" and _home_flow.loading == null:
-					for page in [_home_flow.cities, _home_flow.welcome]: if page != null: page.visible = false
-					_home_flow.loading = load("res://scenes/p0/panels/p0_home_welcome.gd").placeholder(ui.safe_bottom())
-					_home_flow.add_child(_home_flow.loading)
 			"homestart": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.start.activated.emit()
 			"homeother": if is_instance_valid(_home_flow) and _home_flow.welcome != null: _home_flow.welcome.other.activated.emit()
 			"homesearch":
@@ -1674,13 +1725,32 @@ func _dev_shot(dt: float) -> void:
 				if is_instance_valid(_home_flow):
 					if step.size() > 1: _home_flow.cities.set_choice(step[1])
 					_home_flow.cities.key.pressed.emit()
-			"homespot": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.picked = int(step[1]) - 1
-			"homebuild": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.build.pressed.emit()
-			"homeforme": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.for_me.pressed.emit()
+			# the pin page (SGODOT-342 PR-2): homepin:<lat>:<lng> puts the pin there; homedrag on (lifted) / off; homebuild
+			# presses Build here (the confirm card over it), homestart2 the back-to-start key
+			"homepin":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null:
+					var page = _home_flow.spots
+					page.map.pick_put(float(step[1]), float(step[2]), page.tip())
+					page._refresh()
+			"homedrag":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null and _home_flow.spots.map.get("dragging") != null:
+					_home_flow.spots.map.dragging = step.size() < 2 or step[1] != "off"
+					_home_flow.spots._refresh()
+			"homebuild":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null:
+					var b: UiCommandButton = _home_flow.spots.build
+					if b.reason == "": b.activated.emit()
+					else: b.unavailable_pressed.emit(b.reason)
 			"homeback": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.back_to_cities()
 			"homechange": change_home(func(): ui.open_settings())   # Settings › Home city (PR-4)
 			"homemove": if is_instance_valid(_home_flow) and _home_flow.confirm != null: _home_flow.confirm.move.pressed.emit()
-			"homeloading": if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()   # the reading frame
+			# the reading frames: the pin page's, or before it a first pick's card outline (342 8c4168ab)
+			"homeloading":
+				if is_instance_valid(_home_flow) and _home_flow.spots != null: _home_flow.spots.show_loading()
+				elif is_instance_valid(_home_flow) and _home_flow.change_from == "" and _home_flow.loading == null:
+					for page in [_home_flow.cities, _home_flow.welcome]: if page != null: page.visible = false
+					_home_flow.loading = load("res://scenes/p0/panels/p0_home_welcome.gd").placeholder(ui.safe_bottom())
+					_home_flow.add_child(_home_flow.loading)
 			"homefail":   # the q(207) failures as their frames show them: homefail (the list), homefail:spots
 				if is_instance_valid(_home_flow):
 					if step.size() > 1 and _home_flow.spots != null: _home_flow.spots.show_failed()

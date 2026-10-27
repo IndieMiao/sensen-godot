@@ -14,7 +14,8 @@ extends Control
 ##   2773:182352), no list. The key follows the city picked either way.
 ##   CHANGE (HOME-CHANGE-PICK 2647:135097, q(188) ④ / q(205) ④; SGODOT-303 PR-4), from Settings: BackPill
 ##   `‹  Settings` 12 / 16; `Change home city` at 72 and `Your farm and everything on it move with you.` at 106; the
-##   field at 137 and the list from 193. Nothing picked when it opens; the home city reads grey, `Your home city`.
+##   field at 137 and the list from 193. Nothing picked when it opens; the home city reads and picks as any other, its
+##   third line `Your home city` (q(216) ⑨, HOME-CHANGE-PICK 9:132751 / -SAME 92:164061).
 ## Emits picked(row), unavailable(text), back_pressed (CHANGE) and asks the host to read with read_cities(query) (the host answers with
 ## show_cities / show_failed).
 
@@ -26,7 +27,7 @@ signal back_pressed
 const P0HomePick := preload("res://modules/p0/p0_home_pick.gd")
 const P0CityRow := preload("res://scenes/p0/panels/p0_city_row.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
-const SpotPage := preload("res://scenes/p0/panels/p0_home_spot_page.gd")
+const BackPill := preload("res://scenes/p0/panels/p0_back_pill.gd")
 ## CHANGE: the title and its line 32 lower (under the back pill), the field and the list 13 (the line is one line).
 const _CHANGE_HEAD_DY := 32.0
 const _CHANGE_DY := 13.0
@@ -48,7 +49,7 @@ const SEARCH_WAIT_S := 0.3   # a search goes out once the typing stops this long
 
 var heading := "Choose your home city"
 var line := "Your farm, outposts and first pond will be here. You can change it once while your farm is new."
-var home := ""               # a change of home: the city it is now (grey, `Your home city`)
+var home := ""               # a change of home: the city it is now (`Your home city`, q(216) ⑨)
 var choice := ""             # the city picked
 var query := ""
 var open_rows: Array = []
@@ -115,7 +116,7 @@ func _init(safe_top := 0.0, safe_bottom := 0.0, change_from := "", back_to := ""
 	_place(none, _NONE_Y + dy + safe_top)
 	error = _error(_ERROR_Y + dy + safe_top)
 	if back_text != "":
-		var back := SpotPage.BackPill.new(back_text)
+		var back := BackPill.new(back_text)
 		back.position = Vector2(12, 16 + safe_top)
 		back.pressed.connect(func(): back_pressed.emit())
 		add_child(back)
@@ -218,7 +219,7 @@ func _lay_out() -> void:
 		c.queue_free()
 	rows.clear()
 	error.visible = false
-	var parts := P0HomePick.sections(open_rows, near, matches, home)
+	var parts := P0HomePick.sections(open_rows, near, matches)
 	var searching := matches is Array
 	none.visible = searching and (matches as Array).is_empty()
 	scroll.visible = not none.visible
@@ -268,7 +269,7 @@ func _row(r: Dictionary) -> Control:
 	var id := str(r.get("id", ""))
 	var shown := {cluster = id, name = str(r.get("name", "")), region = str(r.get("region", "")),
 		climate = str(r.get("climate", "")), landmark = P0Travel.landmark_stamp(id)}
-	var row = P0CityRow.new(shown, P0HomePick.note(r, home))
+	var row = P0CityRow.new(shown, P0HomePick.note(r, home), P0HomePick.can_pick(r))
 	row.picked = id == choice
 	row.pressed.connect(func(): set_choice(id))
 	rows[id] = row

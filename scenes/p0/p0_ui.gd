@@ -127,6 +127,7 @@ var _hp: UiHpBar                # SGODOT-288 HPBar on mine floors 3–5, where t
 var _elite_hp: UiHpBar          # EnemyHP Kind=Elite under it while the elite fights (COMBAT-ELITE)
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
+var _modal_veil: ColorRect   # the open modal's scrim (the home pick's real map lets the drags through it)
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
 var _card_queue: Array = []
 var _teach: UiTipCard
@@ -1867,6 +1868,7 @@ func _drop_modal() -> void:
 	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
 	_modal = null
+	_modal_veil = null
 	var was_kitchen := modal_kind == "kitchen"
 	modal_kind = ""
 	if was_kitchen: _refresh_hud()   # back out of the farmhouse
@@ -1901,6 +1903,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			(sb as StyleBoxFlat).bg_color.a = 1.0
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
+	_modal_veil = veil
 	if under != null: (under as P0ProfilePage).preview.set_active(true)   # moved: watch its new ancestors' visibility
 	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
 	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)   # the system line too (SYS-OFFLINE-3)
@@ -3145,6 +3148,12 @@ func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
 	flow.say.connect(func(text: String): toast(text))
 	_open_modal(flow, 0.0, true)
+	# the pin page over the real map (SGODOT-342 PR-2): its clear scrim lets the drags and pinches through to the map
+	var veil := _modal_veil
+	if flow.has_signal("map_shown"):
+		flow.map_shown.connect(func(on: bool):
+			if is_instance_valid(veil): veil.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_STOP
+			pad.visible = not on and surface != "map")   # no stick under the pin page: its map takes the drags
 	modal_kind = "home_pick"
 	_modal_back = _home_flow_back.bind(flow)
 
