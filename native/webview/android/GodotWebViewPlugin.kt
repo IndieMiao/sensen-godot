@@ -19,6 +19,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.sensen.permission.PermissionActivity
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.SignalInfo
@@ -31,8 +32,6 @@ import org.godotengine.godot.plugin.UsedByGodot
  */
 class GodotWebViewPlugin(godot: Godot) : GodotPlugin(godot) {
     companion object {
-        private const val PERMISSION_CODE = 8617
-
         /** Only these hosts may load inside the overlay or receive microphone access. */
         internal fun hostAllowed(host: String?, allowed: Set<String>): Boolean =
             host != null && allowed.any { host == it || host.endsWith(".$it") }
@@ -129,17 +128,12 @@ class GodotWebViewPlugin(godot: Godot) : GodotPlugin(godot) {
         }
         pendingPermission?.deny()
         pendingPermission = request
-        activity.requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), PERMISSION_CODE)
-    }
-
-    override fun onMainRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
-        if (code != PERMISSION_CODE) return
-        val request = pendingPermission ?: return
-        pendingPermission = null
-        if (results.isNotEmpty() && results[0] == PackageManager.PERMISSION_GRANTED) {
-            request.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
-        } else {
-            request.deny()
+        // Not activity.requestPermissions: GodotActivity's result would start the engine's own microphone input,
+        // left open until the app quits (SGODOT-349; PermissionActivity).
+        PermissionActivity.request(activity, Manifest.permission.RECORD_AUDIO) { granted ->
+            if (pendingPermission != request) return@request // Closed or replaced meanwhile: already denied.
+            pendingPermission = null
+            if (granted) request.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) else request.deny()
         }
     }
 

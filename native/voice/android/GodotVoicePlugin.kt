@@ -13,6 +13,7 @@ import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.track.RemoteAudioTrack
 import io.livekit.android.util.LoggingLevel
 import com.twilio.audioswitch.AudioDevice
+import com.sensen.permission.PermissionActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -42,7 +43,6 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     private var listening = true
     private val decodedFrames = AtomicLong()
     private val decodedEnergy = AtomicLong()
-    private val permissionCode = 8616
     private val watchdog = object : Runnable {
         override fun run() {
             if (room != null && SystemClock.elapsedRealtime() >= expiresAt) finish("VOICE_EXPIRED")
@@ -64,13 +64,14 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
         } else {
             permissionRequest = id
             permissionResult = null
-            activity.requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), permissionCode)
+            // Not activity.requestPermissions: GodotActivity's result would start the engine's own microphone input,
+            // left open until the app quits (SGODOT-349; PermissionActivity).
+            PermissionActivity.request(activity, Manifest.permission.RECORD_AUDIO) { granted ->
+                if (permissionRequest != id) return@request
+                permissionResult = granted
+                flushPermission()
+            }
         }
-    }
-    override fun onMainRequestPermissionsResult(code: Int, permissions: Array<out String>, results: IntArray) {
-        if (code != permissionCode) return
-        permissionResult = results.isNotEmpty() && results[0] == PackageManager.PERMISSION_GRANTED
-        flushPermission()
     }
     private fun flushPermission() {
         val result = permissionResult ?: return
