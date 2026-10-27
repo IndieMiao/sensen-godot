@@ -209,3 +209,15 @@ func test_while_the_map_slides_on_the_card_and_key_wait_for_it_to_settle() -> vo
 	assert_str(p.build.reason).starts_with("Too close to")
 	assert_str(p.line.text).is_not_equal(line_before)
 	assert_float(p.card.modulate.a).is_equal(1.0)
+
+## The circle's dashes are one draw call, and only those on screen (the emulator's drag ran at 7 fps on 540 draw_arcs).
+func test_the_dashed_circle_keeps_only_the_dashes_on_screen() -> void:
+	var view := Rect2(0, 0, 360, 800)
+	var all := PinPage.Overlay.dashed_circle_points(Vector2(180, 400), 150.0, 10.0, 6.0, view)
+	assert_int(all.size()).is_equal(int(TAU * 150.0 / 16.0) * 6)   # every dash: 3 segments, 2 points each
+	var big := PinPage.Overlay.dashed_circle_points(Vector2(180, 400), 1370.0, 10.0, 6.0, view)
+	assert_int(big.size()).is_equal(0)   # the view inside the circle: nothing to draw
+	var edge := PinPage.Overlay.dashed_circle_points(Vector2(180, 1700), 1370.0, 10.0, 6.0, view)
+	assert_int(edge.size()).is_greater(0)
+	assert_int(edge.size()).is_less(int(TAU * 1370.0 / 16.0) * 6 / 4)   # the arc across the screen only
+	for p in edge: assert_bool(view.grow(16).has_point(p)).is_true()

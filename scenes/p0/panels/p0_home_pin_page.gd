@@ -511,12 +511,33 @@ class Overlay extends Control:
 			var s = page.screen_of(b.at.x, b.at.y)
 			if s != null: dashed_circle(self, s, r_m * float(page.map.pick_px_per_m()), page.RING, 1.5, 5.0, 4.0)
 
+	## One draw call for the whole circle (draw_multiline): a dash per (dash + gap) px, three segments each, and only the
+	## dashes on screen — the 10 km circle is some 540 dashes across at the start's scale; as many draw_arc calls ran the
+	## emulator's drag at 7 fps.
 	static func dashed_circle(ci: CanvasItem, centre: Vector2, r: float, color: Color, width: float, dash: float, gap: float) -> void:
-		if r <= 1.0: return
+		var pts := dashed_circle_points(centre, r, dash, gap, ci.get_viewport_rect().grow(width + dash))
+		if not pts.is_empty(): ci.draw_multiline(pts, color, width, true)
+
+	## The segments (pairs of points) of a dashed circle's dashes within `view`.
+	static func dashed_circle_points(centre: Vector2, r: float, dash: float, gap: float, view: Rect2) -> PackedVector2Array:
+		var pts := PackedVector2Array()
+		if r <= 1.0: return pts
+		var far := Vector2(maxf(absf(view.position.x - centre.x), absf(view.end.x - centre.x)),
+			maxf(absf(view.position.y - centre.y), absf(view.end.y - centre.y)))
+		if r > far.length(): return pts   # the whole view inside the circle
 		var steps := maxi(12, int(TAU * r / (dash + gap)))
 		var per := TAU / float(steps)
 		var on := per * dash / (dash + gap)
-		for i in steps: ci.draw_arc(centre, r, per * i, per * i + on, 4, color, width, true)
+		for i in steps:
+			var a0 := per * i
+			if not view.has_point(centre + Vector2.from_angle(a0 + on * 0.5) * r): continue
+			var prev := centre + Vector2.from_angle(a0) * r
+			for k in range(1, 4):
+				var next := centre + Vector2.from_angle(a0 + on * k / 3.0) * r
+				pts.append(prev)
+				pts.append(next)
+				prev = next
+		return pts
 
 ## The farm pin (54:160909): 60 × 80, its tip at TIP.
 class Pin extends Control:
