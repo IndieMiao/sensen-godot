@@ -113,6 +113,7 @@ var double_key: UiFeltAction
 var split_key: UiFeltAction
 var intro_layer: Control
 var intro_card: UiSystemCard
+var intro_floor: Label
 var rules_layer: Control
 var rules_sheet: UiDrawer
 
@@ -289,12 +290,21 @@ const RULES := ["Get closer to 21 than the dealer without going over.",
 	"4 decks, shuffled every hand."]
 const NBSP := " "
 ## The first-open card (d835ac7e BJ-INTRO-T): how to bet, then the floor; `least 40` kept together.
-const INTRO_BODY := "Tap or drag chips onto the circle, then tap Deal.\n\nYou bet coins here. You always keep at least" + NBSP + "40."
+const INTRO_TEACH := "Tap or drag chips onto the circle, then tap Deal."
+const INTRO_FLOOR := "You bet coins here. You always keep at least" + NBSP + "40."
 
 func _build_layers() -> void:
 	intro_layer = _scrim()
 	intro_card = UiSystemCard.new()
-	intro_card.show_card({"title": "Barbary Card Room", "body": INTRO_BODY, "primary": "Got it"})
+	intro_card.show_card({"title": "Barbary Card Room", "body": INTRO_TEACH, "primary": "Got it"})
+	# BJ-INTRO-T 193:171383 (不知火舞 351 8685a51c): title and the two paragraphs left-aligned, body Regular 14 in the
+	# secondary grey, the paragraphs the card's own gap apart; the kit's centred SystemCard stays as it is elsewhere
+	intro_card.title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	intro_card.body.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	intro_card.body.theme_type_variation = UiTokens.STYLE_BODY_R14
+	intro_floor = intro_card.body.duplicate() as Label
+	intro_floor.text = INTRO_FLOOR
+	intro_card.body.add_sibling(intro_floor)
 	intro_card.primary_pressed.connect(func():
 		intro_layer.visible = false
 		command.emit({"type": "bj_intro"}))

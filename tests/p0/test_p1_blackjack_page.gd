@@ -258,6 +258,13 @@ func test_first_open_shows_the_card_and_got_it_records_it() -> void:
 	page.opened()
 	assert_dict(sent[-1]).is_equal({"type": "bj_open"})
 	assert_bool(page.intro_layer.visible).is_true()
+	# BJ-INTRO-T 193:171383: title and two paragraphs left-aligned, the body Regular 14 grey; `least 40` kept together
+	assert_int(page.intro_card.title.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_LEFT)
+	assert_int(page.intro_card.body.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_LEFT)
+	assert_str(str(page.intro_card.body.theme_type_variation)).is_equal(str(UiTokens.STYLE_BODY_R14))
+	assert_str(page.intro_card.body.text).is_equal("Tap or drag chips onto the circle, then tap Deal.")
+	assert_str(page.intro_floor.text).ends_with("least" + P0BlackjackPage.NBSP + "40.")
+	assert_object(page.intro_floor.get_parent()).is_same(page.intro_card.body.get_parent())
 	page.intro_card.primary_pressed.emit()
 	assert_bool(page.intro_layer.visible).is_false()
 	assert_dict(sent[-1]).is_equal({"type": "bj_intro"})
