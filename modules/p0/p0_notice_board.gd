@@ -74,7 +74,7 @@ static func home(view: Dictionary) -> Dictionary:
 ## table, a generated city's once read); without a home set, the written city's table.
 static func _home_outposts(h: Dictionary) -> Array:
 	var set_: Dictionary = h.set
-	if set_.is_empty(): return P0Outposts.all()
+	if set_.is_empty(): return P0Outposts.all().filter(func(o): return str(o.get("role", "")) != "casino")   # the card room posts nothing
 	var out: Array = []
 	var ids := {}
 	for role in ROLE_ORDER:
@@ -83,6 +83,7 @@ static func _home_outposts(h: Dictionary) -> Array:
 		ids[str(o.id)] = true
 		out.append(o)
 	for o in P0Outposts.all():
+		if str(o.get("role", "")) == "casino": continue   # the card room posts nothing (SGODOT-351)
 		if not ids.has(str(o.get("id", ""))) and (h.city == "" or str(o.get("cluster", "")) == h.city): out.append(o)
 	return out
 

@@ -220,6 +220,20 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = store.reset(player, deps.now(), newSave(req.headers));
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
   });
+  /** Playtests only (SGODOT-351): the card room's table for a save — its Homestead level (the gate, Lv2) and coins. */
+  app.post('/v1/p0/dev/blackjack', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const body = (req.body ?? {}) as { homestead?: number; coins?: number };
+    const level = body.homestead, coins = body.coins;
+    if (level !== undefined && (!Number.isInteger(level) || level < 1 || level > c.homestead.levels.length)) return reply.code(400).send({ ok: false, code: 'bad_level' });
+    if (coins !== undefined && (!Number.isInteger(coins) || coins < 0 || coins > 1_000_000)) return reply.code(400).send({ ok: false, code: 'bad_qty' });
+    const s = stateOf(player, req.headers);
+    if (level !== undefined) s.homestead.level = level;
+    if (coins !== undefined) s.coins = coins;
+    store.put(s);
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+  });
   /** Playtests only (SGODOT-341): put this save's guide on a step — `first`, `end` or a step id — counts cleared. */
   app.post('/v1/p0/dev/guide', async (req, reply) => {
     const player = playerOf(req.headers);

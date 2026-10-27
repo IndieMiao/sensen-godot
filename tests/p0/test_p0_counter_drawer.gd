@@ -217,6 +217,44 @@ func test_keeper_greeting_passes_ctx_and_trade_opens_the_counter() -> void:
 	assert_str(ui.modal_kind).is_equal("counter")
 	assert_str(ui._counter.keeper_bar.place).is_equal("Mission Tackle Shop")
 
+## Lou's greeting at the card room (q(240), SGODOT-351): `Dealer · Lou`, Play and the question. Play opens the table
+## page only while view.blackjack says it is open; a server without the table (no view.blackjack, 0.2.12 ahead of it)
+## or with it closed keeps the card up and says `Blackjack isn't open yet.` in the Info toast, once however often it is
+## tapped (不知火舞 351 bc19606c / 66d46cf9). Short of coins, Lou says so only while the table is open.
+func test_lous_play_opens_the_table_only_while_it_is_open() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	var ctx := {"keeper": "Lou", "place": "Barbary Card Room"}
+	for bj in [null, {"open": false, "floor": 40, "min_bet": 5}]:
+		var v := _view()
+		v["coins"] = 20
+		if bj != null: v["blackjack"] = bj
+		ui.set_view(v)
+		ui.open_keeper_greeting("casino", ctx)
+		var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+		assert_str(card.title).is_equal("Dealer · Lou")
+		assert_str(card.place).is_equal("Deals the cards · Barbary Card Room")
+		assert_str(card.line).is_equal("Pull up a chair. Care for a hand?")   # not the short-of-coins line: no table
+		assert_array(card.content.get_children().map(func(b): return (b as Button).text)).is_equal(["Play", "How does it work?"])
+		var play := card.content.get_child(0) as UiCommandButton
+		play.activated.emit()
+		play.activated.emit()
+		assert_str(ui.modal_kind).override_failure_message(str(bj)).is_equal("greeting")   # the card stays
+		assert_str(ui.toast_text()).is_equal("Blackjack isn't open yet.")
+		assert_int(ui._toasts.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text == ui.toast_text()).size()).is_equal(1)
+		ui.close_modal()
+		ui.clear_toast()
+	var v := _view()
+	v["coins"] = 20
+	v["blackjack"] = {"open": true, "floor": 40, "min_bet": 5}
+	ui.set_view(v)
+	ui.open_keeper_greeting("casino", ctx)
+	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	assert_str(card.line).is_equal("Keep those coins for seeds. Come back with a few more.")
+	(card.content.get_child(0) as UiCommandButton).activated.emit()
+	assert_str(ui.modal_kind).is_not_equal("greeting")   # the card closed for the table page
+	assert_str(ui.toast_text()).is_empty()
+
 func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void:
 	var ui := _ui()
 	await await_idle_frame()
@@ -336,6 +374,10 @@ func test_keeper_portraits_fall_back_to_the_look() -> void:
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")).is_same(card)   # drawn once
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "")).is_null()   # no look, no art: as before
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "no_such_look")).is_null()
+	# Lou (SGODOT-351) has no painted card and no look preset: drawn in his outpost_npcs.json outfit
+	var lou := P0CounterDrawer.keeper_portrait("Lou", true)
+	assert_bool(lou is ImageTexture).is_true()
+	assert_object(P0CounterDrawer.keeper_portrait("Lou", true, "")).is_same(lou)
 
 func test_greeting_card_and_keeper_bar_take_the_keepers_look() -> void:
 	var ui := _ui()

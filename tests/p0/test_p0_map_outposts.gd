@@ -164,7 +164,7 @@ func test_an_outpost_pin_says_who_is_in() -> void:
 func test_a_short_name_is_the_place_without_its_type() -> void:
 	for pair in [["Willow Pond", "Willow"], ["Reed Creek", "Reed"], ["Elm Cove", "Elm"], ["Maple Market Square", "Maple"],
 			["Oak Tea House", "Oak"], ["Tundra Trading Post", "Tundra"], ["Union Square Travel Post", "Union Square"],
-			["Mission Tackle Shop", "Mission"], ["Homestead", "Homestead"], ["Pond", "Pond"]]:
+			["Mission Tackle Shop", "Mission"], ["Barbary Card Room", "Barbary"], ["Homestead", "Homestead"], ["Pond", "Pond"]]:
 		assert_str(P0Map.short_name(pair[0])).is_equal(pair[1])
 
 ## An outpost pin drawn over the player's avatar takes the tap (蒙恬 on C30): it is selected, not the avatar. Since 269
@@ -479,6 +479,39 @@ func test_destination_pins_wear_their_icons() -> void:
 	assert_bool(bool(home.plate)).is_true()
 	assert_dict(m._destination_style({"kind": "landmark", "id": "x"})).is_empty()
 	assert_dict(m._destination_style({"kind": "poi", "id": "x"})).is_empty()
+	# the card room (SGODOT-351): i-cards, its short name (不知火舞 351 0c2082b7: `Barbary`), packed with the tackle shop
+	var casino: Dictionary = m._destination_style(P0Outposts.place_entry(P0Outposts.by_role("casino")))
+	assert_object(casino.icon).is_same(P0Outposts.cards_icon())
+	assert_str(str(casino.label)).is_equal("Barbary")
+	assert_int(int(casino.rank)).is_equal(int(m.PIN_RANK.tackle))
+	assert_bool(bool(casino.get("plate", false))).is_false()
+
+## The card room's pin is in once its gate is passed — Homestead Lv2 and the guide over (q(238), C11-3) — no grey card
+## before (不知火舞 351 8aa69403), and it comes in as soon as the gate is passed. The client reads the gate itself, not
+## view.blackjack: a server without the table yet (0.2.12 ships ahead of it, 用户 via 奕星 on 351) shows the room too,
+## and one that has it shows it whether its table is open or not (Play says so). The place list is the pins' entries.
+func test_the_card_room_pin_shows_once_its_gate_is_passed() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var ids := func() -> Array: return m.city_map.extra_places.map(func(e): return str(e.get("id", "")))
+	var at := func(level: int, guide, bj) -> Array:
+		var v: Dictionary = rt.session.view.duplicate(true)
+		v["homestead"] = (v.get("homestead", {}) as Dictionary).merged({"level": level}, true)
+		if guide == null: v.erase("guide")
+		else: v["guide"] = {"step": guide}
+		if bj == null: v.erase("blackjack")
+		else: v["blackjack"] = bj
+		rt.session.view = v
+		m.p0_frame(v, 1.0 / 30.0)
+		return ids.call()
+	assert_array(at.call(1, null, null)).not_contains(["sf_card_room_1"])
+	assert_array(m.city_map.entries.map(func(e): return str(e.get("id", "")))).not_contains(["sf_card_room_1"])
+	assert_array(at.call(2, "plant", null)).not_contains(["sf_card_room_1"])   # the guide still on
+	assert_array(at.call(2, null, null)).contains(["sf_card_room_1", "sh_tea_1"])   # an older server, past the gate
+	assert_array(at.call(1, null, {"open": false})).not_contains(["sf_card_room_1"])
+	assert_array(at.call(3, null, {"open": false})).contains(["sf_card_room_1"])   # the table closed: the room is in
 
 ## SGODOT-261 (用户 via 奕星): a selected MapDestination grows with the jelly every pin plays (it used to keep its size,
 ## Figma 1802:118612); Today's Show pulse still scales only its disc. test_p0_map_space_pins plays them frame by frame.

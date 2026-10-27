@@ -61,7 +61,13 @@ static func kept(card: bool) -> int:
 	var suffix := "|card" if card else "|head"
 	return _cache.keys().filter(func(k): return str(k).ends_with(suffix)).size()
 
+## A look `npc:<id>` is a written keeper's outfit in outpost_npcs.json, for one with no painted art (Lou, SGODOT-351).
+const NPC := "npc:"
+const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 static func _slots(look: String) -> Dictionary:
+	if look.begins_with(NPC):
+		var npcs: Dictionary = P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {})
+		return npcs.get(look.trim_prefix(NPC), {}).get("slots", {})
 	return P0Logic.content().get("world", {}).get("keeper_looks", {}).get(look, {})
 
 ## One renderer under the tree root, made the first time a portrait is asked for.

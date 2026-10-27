@@ -252,7 +252,8 @@ func _prewarm_pond(id: String) -> void:
 	if not pond.is_empty(): WaterShore.prewarm(id, SystemPonds.site(pond))
 
 func _set_outpost_places() -> void:
-	var places: Array = P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
+	var places: Array = P0Outposts.all().filter(func(o): return P0Outposts.shown(o, _view())).map(
+		func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
 	var cities: Array = _shown_cities.duplicate()
 	var home := P0Travel.home(_view())
 	if not P0Travel.home_is_written(_view()) and not cities.has(home): cities.push_front(home)   # a generated home's, always
@@ -286,7 +287,7 @@ func _open_outpost(id: String) -> void:
 const HOME_PIN := "home"
 ## The outposts' MapDestination icons by role (不知火舞 on 234): tea pot, tackle rod, market board, post travel; the Mine
 ## Hut its crossed picks, i-mine-hut (q(204) ⑦: not the pickaxe tool — nothing is mined there).
-const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel", "mine_hut": "mine_hut"}
+const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel", "mine_hut": "mine_hut"}   # casino: P0Outposts.cards_icon()
 ## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
 const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
@@ -330,7 +331,8 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 			if not o.is_empty():
 				var role := str(o.role)
 				# A tackle shop has no name on the map: it is always its pond's (q(137) ②)
-				style = {"icon": P0Logic.icon(str(PIN_ICONS.get(role, "travel"))), "label": "" if role == "tackle" else short_name(name),
+				var icon := P0Outposts.cards_icon() if role == "casino" else P0Logic.icon(str(PIN_ICONS.get(role, "travel")))
+				style = {"icon": icon, "label": "" if role == "tackle" else short_name(name),
 					"rank": int(PIN_RANK.get(role, PIN_RANK.post))}
 	# A place of a city the fog covers (MAP-2 2107:32861, 不知火舞 on #281): its silhouette until the city is explored
 	if not style.is_empty() and P0Travel.fog(_view(), cluster_of_entry(entry)) == "unexplored":
@@ -340,15 +342,15 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 	return style
 
 ## q(137) ⑤: the fixed packing order of the map's pins after the always-in ones (the selected, a marked one, where the
-## player is): beginner pond, other ponds, market, tea house, travel post, cabin and Mine Hut (q(204) ⑦), tackle shop,
-## silhouette.
-const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "silhouette": 7}
+## player is): beginner pond, other ponds, market, tea house, travel post, cabin and Mine Hut (q(204) ⑦), tackle shop and
+## card room (an errand you choose, 不知火舞 on 351 0c2082b7), silhouette.
+const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "casino": 6, "silhouette": 7}
 ## The type words a place's name ends with (q(137) ①): the generator's (server world.ts, Pond / Creek / Cove) and the
 ## hand-written ones. Longest first, so `Trading Post` is not read as `Post`.
-const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Mine Hut", "Creek", "Pond", "Cove"]
+const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Card Room", "Mine Hut", "Creek", "Pond", "Cove"]
 
 ## The map pin's short name (q(137) ①): the place's own word without its type — `Willow Pond` → `Willow`, `Maple Market
-## Square` → `Maple`, `Union Square Travel Post` → `Union Square`. A name that is only a type word stays whole.
+## Square` → `Maple`, `Union Square Travel Post` → `Union Square`, `Barbary Card Room` → `Barbary`. A name that is only a type word stays whole.
 static func short_name(name: String) -> String:
 	for w in TYPE_WORDS:
 		if name.ends_with(" " + w): return name.substr(0, name.length() - w.length() - 1).strip_edges()
@@ -375,7 +377,9 @@ func home_entry() -> Dictionary:
 func _sync_here() -> void:
 	if rt == null or city_map == null or travelling(): return   # the avatar stays in the city left until it lands
 	var at := _origin()
-	var sig := "%s|%s|%s|%.7f|%.7f" % [rt.here.get("space", ""), rt.here.get("place", ""), P0Travel.here(_view()), home_lat, home_lng]
+	# the card room's pin comes in the moment its table opens (Homestead Lv2, SGODOT-351), wherever the player stands
+	var sig := "%s|%s|%s|%.7f|%.7f|%s" % [rt.here.get("space", ""), rt.here.get("place", ""), P0Travel.here(_view()), home_lat,
+		home_lng, P0Outposts.shown({"role": "casino"}, _view())]
 	if sig == _here_sig: return
 	_here_sig = sig
 	set_self_at(at.x, at.y)

@@ -57,7 +57,10 @@ func _room_ready() -> void:
 	crowd.show_health = false
 	crowd.height_of = _crowd_height
 	room.add_child(crowd)   # remote players arrive in room metres, like the anchors
-	if use_runtime and not outpost.is_empty(): _go_online(P0Runtime.ensure().session)
+	# a server without the card room (no view.blackjack, 0.2.12 ahead of it) has no room for it either: offline there
+	if use_runtime and not outpost.is_empty() and not (str(outpost.get("role", "")) == "casino"
+			and not P0Runtime.ensure().session.view.has("blackjack")):
+		_go_online(P0Runtime.ensure().session)
 
 func _exit_tree() -> void:
 	if online: online.stop()
@@ -224,6 +227,8 @@ func _on_facility(n: String) -> void:
 	# q(165): the Stamp Desk opens the Passport (PASS-1, as from the profile; Back returns here), the Fare Board Trip fares
 	elif n == "use_stamp_desk": _open_entry("open_passport", [], "Stamp Desk")
 	elif n == "use_fee_board": _open_entry("open_fare_board", [], "Fare Board")
+	# SGODOT-351: the card room's table opens the table page straight away (a facility, LOCK-07 v2; no greeting first)
+	elif n == "use_blackjack_table": _open_entry("_play_blackjack", [keeper_ctx()], "Blackjack table")
 
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
 func _open_keeper() -> void:
@@ -378,6 +383,7 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 	if n == "use_fish_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Bite Board"}
 	if n == "use_stamp_desk": return {kind = "facility", icon = P0Logic.icon("stamp"), name = "Stamp Desk"}   # q(62) / q(165)
 	if n == "use_fee_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Fare Board"}   # q(165)
+	if n == "use_blackjack_table": return {kind = "facility", icon = P0Outposts.cards_icon(), name = "Blackjack table"}   # q(238)
 	return super._marker(n, view)
 
 # ---------------------------------------------------------------- seats (茶桌 / 长椅, LOCK-30: the card says Sit)

@@ -2231,7 +2231,8 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	card.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
 	card.place = str(lines.line)
 	var trade := UiCommandButton.new(str(lines.trade))
-	trade.activated.connect(func(): open_counter(role))
+	if role == "casino": trade.activated.connect(func(): _play_blackjack(c))   # Play: the table page, no counter (q(240))
+	else: trade.activated.connect(func(): open_counter(role))
 	card.content.add_child(trade)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
@@ -2245,6 +2246,21 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	_open_modal(card, 0.0, true)
 	_close_above(card, _CLOSE_ABOVE_CARD)
 	modal_kind = "greeting"
+
+## Lou's Play and the blackjack table (SGODOT-351): the full-screen table page (哪吒's open_blackjack(ctx), 351 d6fae42c),
+## the greeting card closed first — only while view.blackjack says the table is open. A server without the table (no
+## view.blackjack: 0.2.12 ahead of the server, 用户 via 奕星) or with it closed (bj_locked, P0_BJ_TABLE off) keeps the
+## card up and says so in the Info toast, the same sentence however often it is tapped (不知火舞 351 bc19606c / 66d46cf9).
+const BJ_NOT_OPEN := "Blackjack isn't open yet."
+static func blackjack_open(v: Dictionary) -> bool:
+	var bj = v.get("blackjack", null)
+	return bj is Dictionary and bool(bj.get("open", false))
+func _play_blackjack(ctx := {}) -> void:
+	if not blackjack_open(view):
+		toast(BJ_NOT_OPEN)
+		return
+	close_modal()
+	if has_method("open_blackjack"): call("open_blackjack", ctx)
 
 ## The tackle shop before the outposts open it with their ctx (the map's tackle pin, P0_SHOT "kai").
 func open_kai_greeting() -> void:

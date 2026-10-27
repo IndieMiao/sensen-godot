@@ -7,6 +7,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 
 const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
+const ShopArt := preload("res://scenes/coffee_shop/coffee_shop_art.gd")
 
 class Sample extends "res://scenes/p0/p0_outpost.gd":
 	var used: Array = []
@@ -44,7 +45,7 @@ func _tap(r: P0Room, n: String) -> void:
 	r.p0_tap(r.cam.unproject_position(r.anchor(n).global_position + lift))
 
 func test_the_outpost_table_and_anchor_files_agree() -> void:
-	assert_int(P0Outposts.all().size()).is_equal(4)
+	assert_int(P0Outposts.all().size()).is_equal(5)   # the home set's four and the card room (SGODOT-351)
 	for o in P0Outposts.all():
 		var anchors: Array = P0RoomAnchors.read_json(str(o.anchors)).get("anchors", [])
 		var names := anchors.map(func(a): return str(a.name))
@@ -725,7 +726,8 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 		var view := r._view()
 		var extras: Array = r.opening_extras()
 		assert_int(extras.size()).override_failure_message(id).is_equal(3 * (r.npcs.size() - 1))
-		assert_bool(extras.is_empty()).override_failure_message(id).is_false()
+		# the card room has Lou alone (SGODOT-351, no residents): nothing more to fit; every other room has some
+		assert_bool(extras.is_empty()).override_failure_message(id).is_equal(P0Outposts.find(id).get("residents", []).is_empty())
 		# the band opening_focus fits them in (刘邦 on #465): SIDE_MARGIN across, the HUD's bottom to the bottom controls down
 		var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
 		for p in extras:
@@ -752,6 +754,76 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 	r.npcs.erase("npc_kai")
 	r.npcs.erase("npc_rafa")
 	assert_vector(r.opening_focus(right, up, forward)).is_equal_approx(before, Vector3.ONE * 0.001)   # as with no residents
+
+## SGODOT-351 (上官婉儿 cd04db80): the card room opens on the player and Lou — the shot's middle falls between the two
+## across, Lou behind the bar with his waist and whole name tag on screen, the player a step in from the door.
+func test_the_card_room_opens_between_the_player_and_lou() -> void:
+	var r := _room("sf_card_room_1", true)
+	await get_tree().process_frame
+	r.p0_frame({}, 1.0 / 30.0)
+	var view := r._view()
+	assert_array(r.npcs.keys()).is_equal(["npc_keeper"])
+	var lou := r.npcs.npc_keeper.root as Node3D
+	var player := r.cam.unproject_position(r.actor.position + Vector3(0, 0.9, 0))
+	var waist := r.cam.unproject_position(lou.to_global(Vector3(0, 1.0, 0)))
+	var xs := [player.x, waist.x]
+	assert_float(view.x * 0.5).override_failure_message("middle %s, player %s, Lou %s" % [view.x * 0.5, player, waist]) \
+		.is_between(float(xs.min()) - 1.0, float(xs.max()) + 1.0)
+	var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
+	for p in r.opening_subjects()[0] + [lou.to_global(Vector3(0, 1.0, 0))]:
+		var at := r.cam.unproject_position(p)
+		assert_bool(band.grow(0.5).has_point(at)).override_failure_message("Lou point %s, band %s" % [at, band]).is_true()
+	assert_bool(r.anchor("use_blackjack_table") != null).is_true()
+	assert_bool(band.has_point(r.cam.unproject_position(r.pick_point("use_blackjack_table")))).is_true()
+
+## The card room on the tavern kit hides its `TAVERN` sign (不知火舞 351 e38e8e85, 上官婉儿 on it): the sign is merged
+## into the back_dressing batch, so its own 2368 triangles are cut from it — none of them left — and so is the bracket
+## it hung from, the 188 triangles in its box (上官婉儿 on 351); the two wall lanterns beside it and the back bar under
+## it keep every triangle; it is cut once a session. All or none: asked again (nothing of it there now), the batch is left as it is. Another room
+## on the kit keeps them. A tavern rebatched since warns here first.
+func test_the_card_room_hides_the_tavern_sign() -> void:
+	var tris := func(n: Node) -> int:
+		var all := []
+		ShopArt._surfaces(n, Transform3D.IDENTITY, all)
+		return all.reduce(func(t, e): return t + (e.index as PackedInt32Array).size() / 3, 0)
+	# the batch's triangles with every corner on a placed module's vertices
+	var on := func(art: Node, module: String) -> int:
+		var pivot := art.get_node(module) as Node3D
+		var model := (load(art.kit_path + "/" + str(art._modules[module].file)) as PackedScene).instantiate()
+		var own := []
+		ShopArt._surfaces(model, pivot.transform, own)
+		model.free()
+		var keys := {}
+		for e in own:
+			for v in e.vertices: keys[ShopArt._mm(e.xf * v)] = true
+		var batch := art.get_node("back_dressing") as Node3D
+		var left := []
+		ShopArt._surfaces(batch, batch.transform, left)
+		var n := 0
+		for e in left:
+			for i in range(0, e.index.size(), 3):
+				if range(3).all(func(k): return keys.has(ShopArt._mm(e.xf * e.vertices[e.index[i + k]]))): n += 1
+		return n
+	var kit: Node = (load("res://scenes/tavern/tavern_art.tscn") as PackedScene).instantiate()
+	add_child(auto_free(kit))
+	var r := _room("sf_card_room_1", true)
+	await get_tree().process_frame
+	var batch: Node3D = r.art.get_node("back_dressing")
+	assert_int(tris.call(batch)).is_equal(32408 - 2368 - 188)
+	assert_int(tris.call(kit.get_node("back_dressing"))).is_equal(32408)   # the kit itself keeps them
+	assert_bool((r.art.get_node("tavern_sign") as Node3D).visible).is_false()
+	assert_int(on.call(kit, "tavern_sign")).is_equal(2368)
+	assert_int(on.call(r.art, "tavern_sign")).is_equal(0)
+	for m in ["bar_left_frame", "bar_right_frame", "back_bar"]:
+		assert_int(on.call(r.art, m)).override_failure_message(m).is_equal(on.call(kit, m))
+	# cut once a session: the card room opened again takes the same meshes (亚瑟 on #523)
+	var again := _room("sf_card_room_1", true)
+	await get_tree().process_frame
+	var mesh_of := func(n: Node) -> Mesh: return (n.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).mesh
+	assert_object(mesh_of.call(again.art.get_node("back_dressing"))).is_same(mesh_of.call(batch))
+	assert_int(r.art.hide_module("tavern_sign")).is_equal(0)   # nothing of it left to cut: warned, the batch as it was
+	assert_int(r.art.hide_box("back_dressing", AABB(Vector3(-0.102, 3.318, -3.362), Vector3(0.204, 0.324, 0.164)), 188)).is_equal(0)
+	assert_int(tris.call(batch)).is_equal(32408 - 2368 - 188)
 
 ## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
 ## (world.keeper_looks, role × climate × 3), under their own name plate.

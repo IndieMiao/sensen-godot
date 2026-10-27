@@ -12,6 +12,20 @@ const PIN_ART := {
 	"post": "res://assets/map/poi/icons/information_1.webp",
 	"market": "res://assets/map/poi/icons/grocery_1.webp",
 }
+## SGODOT-351: the card room, San Francisco's fifth outpost — its pin and table wear i-cards (安其拉, Figma 176:165934;
+## the recipe card if the file is missing), never the bar POI's; the pin only once the table is open to this player (q(238)).
+const CARDS_ICON := "res://assets/p0/icons/cards.svg"
+static func cards_icon() -> Texture2D:
+	return load(CARDS_ICON) if ResourceLoader.exists(CARDS_ICON) else P0Logic.icon("recipe_card")
+
+## The card room shows on the map once its gate is passed — Homestead Lv2 and the guide over (q(238), C11-3) — its pin
+## hidden before, no grey card, no words (不知火舞 351 8aa69403). The client reads the gate from the view itself, not
+## view.blackjack: 0.2.12 ships the room, Lou and his greeting to a server without the table (用户 via 奕星 on 351), so
+## a player past the gate walks in there too; only Play asks whether the table is open (P0Ui._play_blackjack).
+static func shown(o: Dictionary, view: Dictionary) -> bool:
+	if str(o.get("role", "")) != "casino": return true
+	var h = view.get("homestead", {})
+	return h is Dictionary and int(h.get("level", 1)) >= 2 and not P0Guide.guide_on(view)
 
 static var _list: Array = []
 

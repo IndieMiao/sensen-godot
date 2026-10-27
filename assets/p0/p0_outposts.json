@@ -66,6 +66,21 @@
       "anchors": "res://assets/p0/outposts/market.anchors.json",
       "bounds": [-3.05, 3.05, -2.8, 2.8],
       "seats": []
+    },
+    {
+      "id": "sf_card_room_1", "cluster": "gn-5391959",
+      "role": "casino",
+      "name": "Barbary Card Room",
+      "category": "Card room · Blackjack",
+      "lat": 37.7966,
+      "lng": -122.4026,
+      "capacity": 12,
+      "keeper": {"role": "Dealer", "name": "Lou"},
+      "residents": [],
+      "art": "tavern",
+      "anchors": "res://assets/p0/outposts/casino.anchors.json",
+      "bounds": [-3.5, 3.7, -3.3, 3.4],
+      "seats": []
     }
   ]
 }
