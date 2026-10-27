@@ -418,3 +418,32 @@ func test_seven_scene_and_event_tips_survive_every_guide_step_and_recover() -> v
 	q.close()
 	assert_str(q.next()).is_equal("creel")
 	assert_bool(q.request("creel")).is_false()
+
+func test_resolved_countdown_ticks_without_parsing_copy_or_advancing_the_step() -> void:
+	var v := _guided("t_harvest_quick", "r_quick_wait", {"have": 0, "need": 1})
+	v.names.crop_quick_radish = "Quick Radish"
+	v.guide.row = {"line": "Quick Radishes ready", "icon": "seed_quick_radish", "go": "home",
+		"countdown": "crop_quick_radish", "ready_in": 43000, "count": 2, "format": "mss"}
+	var projected := P0Logic.project(v, 1100)
+	var r: Dictionary = Guide.guide_rows(projected)[0]
+	assert_str(str(r.line)).is_equal("Quick Radishes ready in 0:42")
+	assert_str(str(r.go)).is_equal("plots")
+	assert_str(str(r.tail)).is_empty()
+	assert_str(str(projected.guide.step)).is_equal("t_harvest_quick")
+	assert_int(int(v.guide.row.ready_in)).is_equal(43000)
+	v.guide.row.count = 1
+	assert_str(str(Guide.guide_rows(v)[0].line)).is_equal("Quick Radish ready in 0:43")
+	v.guide.row = {"line": "Radish ready", "icon": "crop_radish", "go": "home", "countdown": "crop_radish",
+		"ready_in": 3660000, "count": 2, "format": "minutes"}
+	assert_str(str(Guide.guide_rows(v)[0].line)).is_equal("Radishes ready in 1h 1m")
+	v.guide.row.ready_in = null
+	assert_str(str(Guide.guide_rows(v)[0].line)).is_equal("Radish ready")   # no invented timer
+
+func test_cook_marks_supply_the_local_show_target_and_page() -> void:
+	var v := _guided("t_soup", null, {"have": 0, "need": 1})
+	v.guide.row = {"line": "Cook: Fresh Fish Soup · new recipe", "icon": "dish_fish_soup", "go": "home"}
+	v.guide.marks = [{"place": "home", "object": "farmhouse", "kind": "request"}, {"page": "dish_fish_soup", "button": "cook", "pulse": true}]
+	var r: Dictionary = Guide.guide_rows(v)[0]
+	assert_str(str(r.go)).is_equal("stove")
+	assert_str(str(r.page)).is_equal("dish_fish_soup")
+	assert_str(str(r.tail)).is_empty()   # a once-only action is not an extra 0/1 label

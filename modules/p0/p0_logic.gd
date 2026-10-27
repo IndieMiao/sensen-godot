@@ -951,6 +951,10 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		if str(p.get("state", "")) == "growing" and p.get("ready_in", null) != null:
 			p["ready_in"] = maxf(0.0, float(p["ready_in"]) - elapsed_ms)
 			if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
+	var guide = v.get("guide", null)
+	var row = guide.get("row", null) if guide is Dictionary else null
+	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:
+		row.ready_in = maxf(0.0, float(row.ready_in) - elapsed_ms)
 	var stove = v.get("cooking", {}).get("stove", null)
 	var pots: Array = [stove] if stove is Dictionary else []
 	# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,

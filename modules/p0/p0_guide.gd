@@ -132,9 +132,29 @@ static func guide_rows(view: Dictionary) -> Array:
 	var row = g.get("row", null)
 	if not row is Dictionary or str(row.get("line", "")) == "": return []
 	var r := _row(str(row.line), str(row.get("icon", "")), guide_go(view, str(row.go) if row.get("go") != null else ""), "guide:" + guide_shown_id(view))
-	var p = g.get("progress", null)
-	if p is Dictionary and int(p.get("need", 0)) > 0:
-		r.tail = "%d/%d" % [int(p.get("have", 0)), int(p.need)]
+	# s2 d17b83a4: page is resolved on a cook mark; home is its map destination, stove is its local Show target.
+	var marks = g.get("marks", [])
+	if marks is Array:
+		for mark in marks:
+			if mark is Dictionary and mark.get("page") is String and str(mark.page) != "":
+				r.page = str(mark.page)
+				if r.go == "home": r.go = "stove"
+	var countdown := str(row.get("countdown", ""))
+	if r.go == "home" and (countdown != "" or str(r.icon).begins_with("seed_") or str(r.icon).begins_with("crop_")):
+		r.go = "plots"
+	if countdown != "":
+		# The countdown's typed crop/count/time fields choose the copy; no parsing/replacing words in row.line.
+		if row.get("ready_in") != null:
+			var name := P0Logic.item_name(view, countdown)
+			if int(row.get("count", 0)) != 1: name = P0Logic.plural(name)
+			var ms := maxf(0.0, float(row.ready_in))
+			var time := P0Logic.duration(ms) if str(row.get("format", "")) == "mss" else P0Logic.span(ms)
+			r.line = "%s ready in %s" % [name, time]
+	else:
+		var p = g.get("progress", null)
+		var recover_fish := g.get("recover") != null and str(r.go).begins_with("pond:")
+		if p is Dictionary and (int(p.get("need", 0)) > 1 or recover_fish and int(p.get("need", 0)) > 0):
+			r.tail = "%d/%d" % [int(p.get("have", 0)), int(p.need)]
 	return [r]
 
 ## Keep all seven original scene/event triggers (q(215) ⑤). A step never introduces an eighth card or starts one
