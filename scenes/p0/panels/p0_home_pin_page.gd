@@ -83,6 +83,9 @@ var error_card: PanelContainer
 var build: UiCommandButton
 var back_key: Button
 var credits: Label            # the map's credit line over the real map (q(133) ①, 不知火舞 342)
+## Opened over HOME-WELCOME's map (Start here, the same city): the start glides in from the city view over
+## motion.recenterMs, the pin up till it lands and the card in as it drops (不知火舞 342 bce34a87).
+var glide_in := false
 var _places: Dictionary = {}  # id → UiMapDestination
 var _safe := Vector2.ZERO
 
@@ -285,7 +288,11 @@ func show_area(read: Dictionary) -> void:
 	if map.has_method("pick_area"): map.pick_area(area.base.x, area.base.y, float(area.range_km))
 	var s := start_point()
 	at = [s[0], s[1]]
-	put(s[0], s[1])
+	if map.has_method("pick_frame"):   # the start at the pin page's own scale; from HOME-WELCOME's city view it glides
+		map.pick_frame(s[0], s[1], get_global_transform_with_canvas() * tip(),
+			UiKit.secs(UiTokens.MOTION_RECENTER_MS) if glide_in else 0.0)
+		glide_in = false
+	else: put(s[0], s[1])
 	_make_places()
 	_refresh()
 
@@ -351,7 +358,7 @@ func screen_of(lat: float, lng: float) -> Variant:
 	var v = map.pick_screen_of(lat, lng)
 	return get_global_transform_with_canvas().affine_inverse() * (v as Vector2) if v != null else null
 
-## The map moved so (lat, lng) lies under the pin's tip.
+## The map moved so (lat, lng) lies under the pin's tip, its zoom as it is (the back-to-start key, a new layout).
 func put(lat: float, lng: float) -> void: map.pick_put(lat, lng, get_global_transform_with_canvas() * tip())
 
 ## The pin's tip on the screen: the middle of the map between the panel and the card.
@@ -418,7 +425,8 @@ func _refresh() -> void:
 	veil.visible = ready
 	overlay.visible = ready
 	pin.visible = ready
-	card.visible = ready
+	# gliding in from HOME-WELCOME's city view: the card comes as the pin drops (不知火舞 342 bce34a87)
+	card.visible = ready and not (map.has_method("pick_flying") and bool(map.pick_flying()))
 	loading_card.visible = not ready and not failed
 	error_card.visible = failed
 	_place_credits(ready)

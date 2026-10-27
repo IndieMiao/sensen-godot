@@ -398,3 +398,133 @@ func _shown(l: Node) -> bool:
 		if (n as CanvasItem).modulate.a == 0.0 or (n as CanvasItem).self_modulate.a == 0.0: return false
 		n = n.get_parent()
 	return true
+
+## The real map's stand-in for the flow (PR-2b): the flat map's geometry, recording the flight and the glide.
+class FakeMap extends RefCounted:
+	const PinPage := preload("res://scenes/p0/panels/p0_home_pin_page.gd")
+	var flat := PinPage.FlatMap.new()
+	var ground := false
+	var flies: Array = []      # [to_zoom, seconds, at]
+	var frames: Array = []     # [lat, lng, seconds]
+	var landing := Callable()  # the flight's done, held till the test lands it
+	var flying := false
+	func pick_fly(z: float, s: float, at: Vector2, done := Callable()) -> void:
+		flies.append([z, s, at])
+		if s <= 0.0:
+			if done.is_valid(): done.call()
+		else:
+			landing = done
+	func pick_frame(lat: float, lng: float, at: Vector2, s := 0.0) -> void:
+		frames.append([lat, lng, s])
+		flat.pick_put(lat, lng, at)
+		flying = s > 0.0
+	func pick_flying() -> bool: return flying
+	func pick_settling() -> bool: return flying
+	func pick_area(_lat: float, _lng: float, _km: float) -> void: pass
+	func pick_geo_at(s: Vector2) -> Array: return flat.pick_geo_at(s)
+	func pick_screen_of(lat: float, lng: float) -> Variant: return flat.pick_screen_of(lat, lng)
+	func pick_put(lat: float, lng: float, s: Vector2) -> void: flat.pick_put(lat, lng, s)
+	func pick_dragging() -> bool: return flying
+	func pick_px_per_m() -> float: return flat.px_per_m
+	func pick_has_ground() -> bool: return ground
+
+func _welcome_map_flow() -> Array:
+	var session := P0Session.new()
+	var asked := []
+	session.transport = func(_m, path: String, _b, _c): asked.append(path)
+	var flow: Control = auto_free(HomeFlow.new(session, 24.0, 0.0))
+	flow.size = Vector2(360, 800)
+	var maps := []
+	var closed := []
+	var m := FakeMap.new()
+	flow.open_map = func(c: String) -> Object:
+		maps.append(c)
+		return m
+	flow.close_map = func(): closed.append(1)
+	add_child(flow)
+	await await_idle_frame()
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": SF, "matches": []})
+	for i in 3: await get_tree().process_frame   # laid out, then the flight
+	return [flow, session, asked, m, maps, closed]
+
+## PR-2b (340 §4; 不知火舞 342 bce34a87): behind HOME-WELCOME the real map flies from the globe to the city view (z 11)
+## in a second with the city between the status bar and the card's top; the card slides in once it lands. Modal: no
+## touches to the map. The flow's land goes; the card's own lies over the map till it draws, then the credit line.
+func test_the_welcome_card_waits_for_the_flight_over_the_real_map() -> void:
+	var r: Array = await _welcome_map_flow()
+	var flow: Control = r[0]
+	var m: FakeMap = r[3]
+	assert_array(r[4]).is_equal([SF.id])
+	assert_int(m.flies.size()).is_equal(1)
+	assert_float(m.flies[0][0]).is_equal(HomeFlow.WELCOME_ZOOM)
+	assert_float(m.flies[0][1]).is_equal(HomeFlow.WELCOME_FLY_S)
+	var w: Control = flow.welcome
+	var card_top: float = w.size.y - 16.0 - w.card.size.y
+	assert_float((m.flies[0][2] as Vector2).y).is_equal_approx((24.0 + card_top) * 0.5, 0.5)   # between the bar and the card
+	assert_float((m.flies[0][2] as Vector2).x).is_equal(w.size.x * 0.5)
+	assert_bool(w.waiting()).is_true()   # in the air: not drawn, its keys quiet
+	assert_float(w.card.modulate.a).is_equal(0.0)
+	var started := []
+	w.start_pressed.connect(func(): started.append(1))
+	w.start.activated.emit()
+	assert_array(started).is_empty()
+	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)   # modal
+	assert_bool(flow._land.visible).is_false()
+	assert_bool(w.land.visible).is_true()   # the map has not drawn yet
+	m.landing.call()
+	assert_bool(w.waiting()).is_false()
+	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DRAWER_MS) + 0.1).timeout
+	assert_float(w.card.global_position.y).is_equal_approx(card_top, 1.0)   # slid up to its place
+	assert_bool(w.credits == null or not w.credits.visible).is_true()
+	m.ground = true
+	for i in 2: await get_tree().process_frame
+	assert_bool(w.land.visible).is_false()
+	assert_bool(w.credits.visible).is_true()
+	assert_float(w.credits.position.y + w.credits.size.y).is_equal_approx(w.card.position.y - CityMapView.CREDITS_GAP_PT, 0.5)
+	(r[1] as Node).free()
+
+## Start here on the same city: the pin page goes on on the card's map (no second one), its start gliding in over
+## motion.recenterMs with the card held back till it lands; ‹ Change city back to the card keeps the map, puts it at the
+## city view at once and slides the card in again. Choose another city lets the map go (the list covers it), ‹ Back
+## brings one back, straight at the city view.
+func test_start_here_glides_on_the_same_map_and_back_to_the_card_slides_it_in_again() -> void:
+	var r: Array = await _welcome_map_flow()
+	var flow: Control = r[0]
+	var m: FakeMap = r[3]
+	m.landing.call()
+	flow.welcome.start.activated.emit()
+	assert_array(r[4]).is_equal([SF.id])   # the same map
+	assert_array(r[5]).is_empty()
+	assert_object(flow.spots.map).is_same(m)
+	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # the pin page lets the drags through
+	P0HomePick.answer("/p0/home/spots/" + SF.id, spot_read(SF.id))
+	await await_idle_frame()
+	assert_int(m.frames.size()).is_equal(1)
+	assert_float(m.frames[0][2]).is_equal(UiKit.secs(UiTokens.MOTION_RECENTER_MS))
+	assert_bool(flow.spots.card.visible).is_false()   # gliding: the card comes as the pin drops
+	assert_bool(flow.spots.pin.lifted).is_true()
+	m.flying = false
+	flow.spots._refresh()
+	assert_bool(flow.spots.card.visible).is_true()
+	assert_bool(flow.spots.pin.lifted).is_false()
+	flow.spots.back_pressed.emit()
+	for i in 2: await get_tree().process_frame
+	assert_array(r[5]).is_empty()   # the card's map stays
+	assert_float(m.flies[-1][1]).is_equal(0.0)   # at the city view at once
+	assert_bool(flow.welcome.waiting()).is_false()   # and the card slides in again
+	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
+	flow.welcome.other.activated.emit()
+	assert_array(r[5]).is_equal([1])   # the list covers the screen: the map goes
+	flow.cities.find_child("Back", true, false).pressed.emit()
+	for i in 2: await get_tree().process_frame
+	assert_array(r[4]).is_equal([SF.id, SF.id])
+	assert_float(m.flies[-1][1]).is_equal(0.0)
+	assert_bool(flow.welcome.waiting()).is_false()
+	(r[1] as Node).free()
+
+## Without a map (the tests, a navigation under way) the card comes at once on the land, as before.
+func test_without_a_map_the_welcome_card_is_there_at_once() -> void:
+	var r: Array = await _welcome_flow(SF)
+	assert_bool(r[0].welcome.waiting()).is_false()
+	assert_float(r[0].welcome.card.modulate.a).is_equal(1.0)
+	(r[1] as Node).free()

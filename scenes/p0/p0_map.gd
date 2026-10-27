@@ -1760,6 +1760,9 @@ var _pick_ground := false
 ## HOME-PIN-1's scale (about 137 px a km at San Francisco), the start; a street's at most.
 const PICK_ZOOM := 13.05
 const PICK_ZOOM_MIN := 9.0
+## HOME-WELCOME's flight (340 §4): from the globe to the city in about a second.
+const PICK_GLOBE_ZOOM := 2.0
+var _pick_flight: Tween
 ## The whole circle across the screen's narrow side, less this much each side.
 const PICK_FIT_PAD := 16.0
 
@@ -1799,6 +1802,70 @@ func pick_area(lat: float, lng: float, range_km: float) -> void:
 	_pick_min_zoom = clampf(log(px_per_merc * _map_logical_height() / (vp.y * 512.0)) / log(2.0), PICK_ZOOM_MIN, PICK_ZOOM)
 	set_pan_bounds(lat, lng, range_km * 1000.0)
 
+## HOME-WELCOME behind its card (340 §4, PR-2b; 不知火舞 342 bce34a87): the city's centre held at the viewport point
+## `at` (between the status bar and the card's top, so the card covers none of it) while the camera goes from the globe
+## (PICK_GLOBE_ZOOM) to `to_zoom` over `seconds` (ease in and out), then `done`; 0 s puts it there at once and calls
+## `done`. Flat and north up as the pin page; the floor is lowered for the flight (pick_area sets the pin page's again).
+func pick_fly(to_zoom: float, seconds: float, at: Vector2, done := Callable()) -> void:
+	_end_pick_flight()
+	_reset_gesture()
+	var c: Array = region.get("center", [center_lat, center_lng])
+	var lat := float(c[0])
+	var lng := float(c[1])
+	_pick_min_zoom = minf(PICK_GLOBE_ZOOM, to_zoom)
+	pan_bounds = Rect2()
+	_zoom_elastic = 0.0
+	if seconds <= 0.0:
+		zoom = to_zoom
+		pick_put(lat, lng, at)
+		if done.is_valid(): done.call()
+		return
+	zoom = PICK_GLOBE_ZOOM
+	pick_put(lat, lng, at)
+	_pick_flight = create_tween()
+	_pick_flight.tween_method(func(z: float):
+		zoom = z
+		_teleport_keeping(lat, lng, at), PICK_GLOBE_ZOOM, to_zoom, seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	if done.is_valid(): _pick_flight.tween_callback(done)
+
+## The pin page's start from wherever the camera is (HOME-WELCOME's city view, Start here; 不知火舞 342 bce34a87): over
+## `seconds` (motion.recenterMs, ease in and out) the camera goes to PICK_ZOOM with (lat, lng) under the viewport point
+## `at` — the pin stays up meanwhile (pick_settling) and drops there; 0 s at once.
+func pick_frame(lat: float, lng: float, at: Vector2, seconds := 0.0) -> void:
+	_end_pick_flight()
+	_zoom_elastic = 0.0
+	if seconds <= 0.0:
+		zoom = PICK_ZOOM
+		pick_put(lat, lng, at)
+		return
+	_reset_gesture()
+	var from: Array = pick_geo_at(at)
+	var z0 := zoom
+	var x0 := MapGeoMath.mercator_x(float(from[1]))
+	var y0 := MapGeoMath.mercator_y(float(from[0]))
+	var x1 := MapGeoMath.mercator_x(lng)
+	var y1 := MapGeoMath.mercator_y(lat)
+	_pick_flight = create_tween()
+	_pick_flight.tween_method(func(k: float):
+		zoom = lerpf(z0, PICK_ZOOM, k)
+		var y := lerpf(y0, y1, k)
+		_teleport_keeping(rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * y)))), lerpf(x0, x1, k) * 360.0 - 180.0, at),
+		0.0, 1.0, seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+
+## (lat, lng) put under `at` without ending a flight that is moving it (pick_put resets the gestures).
+func _teleport_keeping(lat: float, lng: float, at: Vector2) -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var k := _pick_scale()
+	var x := MapGeoMath.mercator_x(lng) - (at.x - vp.x * 0.5) / k
+	var y := MapGeoMath.mercator_y(lat) - (at.y - vp.y * 0.5) / k
+	_teleport(rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * y)))), wrapf(x * 360.0 - 180.0, -180.0, 180.0))
+
+func pick_flying() -> bool: return _pick_flight != null and _pick_flight.is_valid() and _pick_flight.is_running()
+
+func _end_pick_flight() -> void:
+	if _pick_flight != null and _pick_flight.is_valid(): _pick_flight.kill()
+	_pick_flight = null
+
 ## Screen px per Web Mercator unit (the world's width = 1) at the zoom drawn: geo_to_screen's scale.
 func _pick_scale() -> float:
 	return get_viewport().get_visible_rect().size.y / _map_logical_height() * 512.0 * pow(2.0, zoom + _zoom_elastic)
@@ -1817,12 +1884,8 @@ func pick_screen_of(lat: float, lng: float) -> Variant:
 
 ## The camera moved so that (lat, lng) lies under the viewport point `at`.
 func pick_put(lat: float, lng: float, at: Vector2) -> void:
-	var vp := get_viewport().get_visible_rect().size
-	var k := _pick_scale()
-	var x := MapGeoMath.mercator_x(lng) - (at.x - vp.x * 0.5) / k
-	var y := MapGeoMath.mercator_y(lat) - (at.y - vp.y * 0.5) / k
 	_reset_gesture()
-	_teleport(rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * y)))), wrapf(x * 360.0 - 180.0, -180.0, 180.0))
+	_teleport_keeping(lat, lng, at)
 
 ## A finger on the map, or the map still sliding or zooming after it lifted (亚瑟 on #495 ②; 不知火舞 342, to be ruled
 ## on the recording: the pin stays lifted till the camera settles; a finger down mid-slide just carries on).
@@ -1831,6 +1894,7 @@ func pick_dragging() -> bool:
 
 ## Stopped where it is (Build here pressed mid-slide): the fling, its zoom and a zoom tween end.
 func pick_stop() -> void:
+	_end_pick_flight()
 	_reset_gesture()
 	_zoom_elastic = 0.0
 	_camera_dirty = true
@@ -1839,7 +1903,7 @@ func pick_stop() -> void:
 ## card's line and the key as they were till it settles (不知火舞 342).
 func pick_settling() -> bool:
 	return _touch_count == 0 and (_fling_vel != Vector3.ZERO or _zoom_vel != 0.0
-		or (_zoom_tween != null and _zoom_tween.is_running()))
+		or (_zoom_tween != null and _zoom_tween.is_running()) or pick_flying())
 
 func pick_px_per_m() -> float:
 	return _pick_scale() / (MapGeoMath.EARTH_CIRCUM * cos(deg_to_rad(center_lat)))

@@ -146,3 +146,45 @@ func test_pick_stop_ends_the_slide() -> void:
 	assert_bool(pick.pick_dragging()).is_false()
 	await _frames(2)
 	assert_float(pick.center_lat).is_equal(lat)
+
+## PR-2b (340 §4; 不知火舞 342 bce34a87): HOME-WELCOME's flight — the city's centre held at the given point while the
+## camera goes from the globe to the city view, then done; 0 s at once.
+func test_the_welcome_flight_holds_the_city_at_its_point() -> void:
+	var pick := _push_pick()
+	await _frames()
+	var c: Array = pick.region.center
+	var at := Vector2(180, 300)
+	var landed := []
+	pick.pick_fly(11.0, 0.2, at, func(): landed.append(1))
+	assert_float(pick.zoom).is_equal(pick.PICK_GLOBE_ZOOM)
+	assert_bool(pick.pick_flying()).is_true()
+	assert_bool(pick.pick_settling()).is_true()
+	await get_tree().create_timer(0.1).timeout
+	var mid: Vector2 = pick.pick_screen_of(float(c[0]), float(c[1]))
+	assert_float(mid.distance_to(at)).is_less(0.5)   # held at its point all the way
+	await get_tree().create_timer(0.25).timeout
+	assert_array(landed).is_equal([1])
+	assert_float(pick.zoom).is_equal_approx(11.0, 1e-6)
+	assert_bool(pick.pick_flying()).is_false()
+	pick.pick_fly(11.0, 0.0, at, func(): landed.append(2))
+	assert_array(landed).is_equal([1, 2])
+	assert_float((pick.pick_screen_of(float(c[0]), float(c[1])) as Vector2).distance_to(at)).is_less(0.5)
+
+## Start here on the card's map: the pin page's start glides in to PICK_ZOOM under the tip; the pin stays up meanwhile.
+func test_the_pin_page_start_glides_in_from_the_city_view() -> void:
+	var pick := _push_pick()
+	await _frames()
+	pick.pick_fly(11.0, 0.0, Vector2(180, 300))
+	var tip := Vector2(180, 378)
+	pick.pick_frame(37.7712, -122.4312, tip, 0.2)
+	assert_bool(pick.pick_settling()).is_true()
+	assert_bool(pick.pick_dragging()).is_true()
+	await get_tree().create_timer(0.35).timeout
+	assert_bool(pick.pick_settling()).is_false()
+	assert_float(pick.zoom).is_equal_approx(pick.PICK_ZOOM, 1e-6)
+	var g: Array = pick.pick_geo_at(tip)
+	assert_float(g[0]).is_equal_approx(37.7712, 1e-7)
+	assert_float(g[1]).is_equal_approx(-122.4312, 1e-7)
+	pick.pick_frame(37.76, -122.44, tip)   # 0 s: at once
+	assert_bool(pick.pick_settling()).is_false()
+	assert_float((pick.pick_geo_at(tip)[0] as float)).is_equal_approx(37.76, 1e-7)
