@@ -30,7 +30,11 @@ func update(view: Dictionary, targets: Dictionary) -> void:
 			node.flash()
 		else:
 			var shape: UiGuidePulse.Shape = target.get("shape", UiGuidePulse.Shape.PILL)
-			_rings.append(weakref(UiGuidePulse.play(node, Rect2(), shape)))
+			var rect := Rect2(Vector2.ZERO, node.size)
+			if node is UiCommandButton:
+				var style := node.get_theme_stylebox(&"normal")
+				if style is UiStyleBox: rect = style.visible_rect(rect)
+			_rings.append(weakref(UiGuidePulse.play(node, rect, shape)))
 	_present = now
 	_rings = _rings.filter(func(r): return is_instance_valid(r.get_ref()))
 

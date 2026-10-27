@@ -20,8 +20,8 @@ func _init(name_ := "") -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_label = UiKit.label("", UiTokens.STYLE_CAPTION_XB12, UiTokens.COLOR_TEXT)
 	add_child(_label)
-	# A non-Control host keeps PanelContainer from resizing the badge as another name label.
-	var mark_host := Node.new()
+	# A CanvasItem host inherits the name tag's transform without PanelContainer laying out another label.
+	var mark_host := Node2D.new()
 	add_child(mark_host)
 	_badge = UiStatusBadge.new()
 	_badge.size_kind = UiStatusBadge.Size.NPC

@@ -177,6 +177,7 @@ static func marked_resident(view: Dictionary) -> String:
 
 static func target_place(view: Dictionary, place: String) -> bool:
 	if not guide_on(view): return true
+	if place == "": return false
 	return guide_marks(view).any(func(m): return m is Dictionary and str(m.get("place", "")) == place)
 
 ## A semantic entry point: only its current target's state survives during the guide. The callers deliberately

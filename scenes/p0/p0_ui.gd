@@ -2844,10 +2844,10 @@ func _show_resident(d: Dictionary) -> void:
 	data.request = resident_asks_here()
 	var ask := resident_ask(view, str(d.id)) if data.request else ""
 	if ask != "": data.line = ask   # NPC-5: with a request open the bar asks it, in the request card's words (李白 q(46))
-	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
 	if surface == "farm" and str(d.id) == "res_pip":
 		var line = P0Guide.pip(view).get("line")
 		if line is String and line != "": data.line = line
+	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
 	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)

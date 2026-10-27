@@ -5,7 +5,7 @@ extends Node3D
 const NPCS := "res://assets/p0/outpost_npcs.json"
 const PIP := "res_pip"
 const TAG := "farm:guide_pip"
-const STAND := Vector2i(3, 2)   # left/front of plot 0, clear of the Reed Bank (2,4) and the bed (4,3)
+const STAND := Vector2i(5, 1)   # front/left of the first bed, between teaching plots 0/1; clear of Reed Bank's badge
 
 var farm: Node3D
 var pip_root: Node3D
@@ -24,7 +24,7 @@ func frame(view: Dictionary, dt: float) -> void:
 	if here and pip_root == null: _spawn()
 	if pip_root != null:
 		# If the guide ends while the player stands here, keep the model until leave(); all guidance stops now.
-		var head: Vector2 = farm.cam.unproject_position(pip_root.to_global(Vector3(0, 1.48, 0)))
+		var head: Vector2 = farm.cam.unproject_position(pip_root.to_global(Vector3(0, 2.0, 0)))
 		var visible_head: bool = not farm.cam.is_position_behind(pip_root.global_position) and farm.get_viewport().get_visible_rect().has_point(head)
 		var talking: bool = farm.rt.ui.speaker() == PIP
 		var near: bool = P0FarmMaterials.flat(farm.actor.position, pip_root.position) < 2.6
@@ -49,8 +49,10 @@ func _spawn() -> void:
 	pip_root.position = farm.bp.cell_to_world(STAND)
 	pip_root.scale = Vector3.ONE * float(def.get("scale", 0.88))
 	add_child(pip_root)
+	pip_root.look_at(Vector3(farm.actor.global_position.x, pip_root.global_position.y, farm.actor.global_position.z), Vector3.UP)
 	rig = Avatar.create_rig()
 	rig.assembler = AvatarAssemblerMerged.new()
+	rig.rotation.y = PI   # the reused rig faces +Z, while look_at points -Z at the player
 	for child in rig.get_children():
 		if child is RigActivity:
 			child.reduced_distance = 50

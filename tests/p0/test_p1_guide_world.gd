@@ -109,6 +109,8 @@ func test_npc_badge_keeps_name_and_tap_target_and_uses_existing_npc_size() -> vo
 	assert_float(tag._badge.side()).is_equal(36.0)
 	assert_bool(tag.hit_rect().has_point(tag._badge.get_global_rect().get_center())).is_true()
 	assert_float(tag._badge.get_global_rect().end.y).is_less_equal(tag.get_global_rect().position.y)
+	assert_float(tag._badge.get_global_rect().get_center().x).is_equal_approx(tag.get_global_rect().get_center().x, 0.01)
+	assert_float(tag._badge.get_global_rect().position.y).is_greater(100.0)   # inherits the pill's transform
 	tag.status = UiStatusBadge.State.GIFT
 	assert_int(tag._badge.state).is_equal(UiStatusBadge.State.GIFT)
 	tag.status = -1
@@ -121,3 +123,23 @@ func test_cook_target_never_selects_a_page_or_exposes_experiment_cook() -> void:
 	drawer.selected_page = "dish_grilled_crucian"
 	assert_object(drawer.guide_cook_target("dish_fish_soup")).is_null()
 	assert_str(drawer.selected_page).is_equal("dish_grilled_crucian")
+
+func test_explicit_pip_reply_wins_over_the_step_line_without_adding_request() -> void:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.quick_store = "user://test_c2_reply_bar_%d.json" % OS.get_process_id()
+	ui.tips_path = "user://test_c2_reply_tips_%d.json" % OS.get_process_id()
+	add_child(ui)
+	ui.set_surface("farm")
+	var v := _guide()
+	v.bag = {capacity = 25, slots = []}
+	v.residents = {res_pip = {affinity = 2, stage = "Stranger", stage_from = 0, next_stage = "Acquainted", next_at = 15,
+		gift_today = false, meal = "none", request = null, request_state = "none"}}
+	v.guide.pip = {here = true, bang = true, line = "Now water them. They grow fast!"}
+	ui.set_view(v)
+	assert_bool(ui.open_resident("res_pip")).is_true()
+	var reply := "Out of radishes? Here, two more quick ones."
+	assert_bool(ui.resident_say("res_pip", reply)).is_true()
+	var bars := ui._modal.find_children("*", "UiResidentBar", true, false)
+	assert_str(bars[0].line).is_equal(reply)
+	assert_object(bars[0]._request).is_null()
+	for file in [ui.quick_store, ui.tips_path]: DirAccess.remove_absolute(ProjectSettings.globalize_path(file))

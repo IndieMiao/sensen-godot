@@ -364,6 +364,19 @@ func _fit_opening() -> void:
 	_place_camera()
 	_focus = opening_focus(cam, _focus, _house + home_mark(), actor.position, area)
 	_place_camera()
+	# 340 S2: only the initial guide framing includes Pip and the two teaching beds. No later step moves the camera.
+	if P0Guide.guide_on(rt.session.view) and bool(P0Guide.pip(rt.session.view).get("here", false)):
+		var points: Array[Vector3] = [actor.position, bp.cell_to_world(FarmGuide.STAND) + Vector3(0, 2.2, 0)]
+		for id in P0Guide.teaching_plots(rt.session.view): points.append(bp.cell_to_world(P0Garden.cell_of(id)))
+		_focus = guide_opening_focus(cam, _focus, points, area)
+		_place_camera()
+
+static func guide_opening_focus(camera: Camera3D, focus: Vector3, points: Array[Vector3], area: Rect2) -> Vector3:
+	var bounds := Rect2(camera.unproject_position(points[0]), Vector2.ZERO)
+	for point in points: bounds = bounds.expand(camera.unproject_position(point))
+	var old = ElasticZoom.ground_at(camera, bounds.get_center(), focus.y)
+	var centre = ElasticZoom.ground_at(camera, area.get_center(), focus.y)
+	return focus + old - centre if old != null and centre != null else focus
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
 ## top — at most what keeps `feet` FEET_ROOM above its bottom (opening_shift). `cam` is placed at `focus` already.
