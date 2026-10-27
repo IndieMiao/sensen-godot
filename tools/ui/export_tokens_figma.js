@@ -266,9 +266,10 @@ Object.assign(size, {
   toolBadge: toolBadge.width, toolBadgeIcon: child(toolBadge, 'Tool').width,
   actionKeyW: actionKey.width, actionKeyH: actionKey.height,
   holdRing: arcWidth(await variant('9:99789', 'State=Holding'), 'Hold progress'), pendingRing: arcWidth(saPending, 'Pending spinner'),
-  radialPetal: child(petalAvail, 'Petal').width, radialIcon: child(child(petalAvail, 'Petal'), 'Icon').width,
-  radialPetalCurrent: child(petalSel, 'Petal').width, radialIconCurrent: child(child(petalSel, 'Petal'), 'Icon').width,
+  // In tokens-v2.json's order (the hand-added keys sat between these).
+  radialPetal: child(petalAvail, 'Petal').width, radialPetalCurrent: child(petalSel, 'Petal').width,
   radialHit: CONST.radialHit, radialRing: CONST.radialRing,
+  radialIcon: child(child(petalAvail, 'Petal'), 'Icon').width, radialIconCurrent: child(child(petalSel, 'Petal'), 'Icon').width,
   radialLockBadge: child(petalOff, 'Lock badge').width, radialLockIcon: child(petalOff, 'Lock badge').children[0].width,
   tapCardH: tapCard.height, tapGlyph: child(tapCard, 'Tap glyph').width,
   pointerW: child(tapCard, 'Pointer').width, pointerH: child(tapCard, 'Pointer').height,
