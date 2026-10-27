@@ -167,6 +167,18 @@ static func guide_marks(view: Dictionary) -> Array:
 	var marks = guide_shown(view).get("marks", [])
 	return marks if marks is Array else []
 
+static func button_marks(view: Dictionary) -> Array:
+	return guide_marks(view).filter(func(m): return m is Dictionary and m.get("button") is String and bool(m.get("pulse", false)))
+
+static func marked_resident(view: Dictionary) -> String:
+	for mark in guide_marks(view):
+		if mark is Dictionary and mark.get("resident") is String: return str(mark.resident)
+	return ""
+
+static func target_place(view: Dictionary, place: String) -> bool:
+	if not guide_on(view): return true
+	return guide_marks(view).any(func(m): return m is Dictionary and str(m.get("place", "")) == place)
+
 ## A semantic entry point: only its current target's state survives during the guide. The callers deliberately
 ## exclude ordinary crop/resource facts, HUD dots and the Mailbox's Parcel count (341 ec56d336).
 static func target_badge(view: Dictionary, field: String, id: String, ordinary := "") -> String:
@@ -175,7 +187,8 @@ static func target_badge(view: Dictionary, field: String, id: String, ordinary :
 		if mark is Dictionary and str(mark.get(field, "")) == id: return str(mark.get("kind", ""))
 	return ""
 
-static func resident_badge(view: Dictionary, id: String) -> String:
+static func resident_badge(view: Dictionary, id: String, place := "") -> String:
+	if place != "" and not target_place(view, place): return ""
 	var r: Dictionary = view.get("residents", {}).get(id, {})
 	var req = r.get("request", null)
 	var ordinary := "request" if str(r.get("request_state", "")) == "open" else ""

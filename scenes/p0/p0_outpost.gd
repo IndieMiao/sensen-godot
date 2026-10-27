@@ -367,7 +367,7 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 		var who := rt.ui.speaker() if rt != null else ""
 		var talking := who != "" and who == ("keeper" if n == "npc_keeper" else str(npcs[n].id))
 		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking,
-			badge = P0Guide.resident_badge(view, str(npcs[n].id))}
+			badge = P0Guide.resident_badge(view, str(npcs[n].id), str(outpost.get("id", "")))}
 	if SEAT_GROUPS.has(n):
 		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
 	if n == "use_market_board":

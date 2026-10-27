@@ -57,6 +57,9 @@ const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
 signal test_account_requested(action: String)
 const TestAccounts := preload("res://modules/p0/p0_test_accounts.gd")
 var test_accounts = TestAccounts.new()
+const GuidePulses := preload("res://modules/p0/p0_guide_pulses.gd")
+var guide_pulses = GuidePulses.new()
+var _guide_pulse_wait := 0.0
 
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
@@ -177,6 +180,10 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
+	_guide_pulse_wait -= dt
+	if _guide_pulse_wait <= 0.0:
+		_guide_pulse_wait = 0.1
+		_refresh_guide_pulses()
 	if _teach_left > 0.0:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
@@ -191,6 +198,26 @@ func _process(dt: float) -> void:
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
 	if _notice and _notice.visible: _place_notice()
+
+## Typed targets from the server; finding an existing control never opens a page or selects an item.
+func _refresh_guide_pulses() -> void:
+	var targets := {}
+	if screen_kind() == -1:
+		for mark in P0Guide.button_marks(view):
+			var key := str(mark.button)
+			if key in ["sow", "water"] and _keys != null and not has_modal():
+				if str(fab_state().get("cmd", {}).get("type", "")) == key and bool(fab_state().get("enabled", false)):
+					targets[key] = {node = _keys.key(), shape = UiGuidePulse.Shape.CIRCLE}
+			elif key.begins_with("quickbar:") and _bar != null and not has_modal():
+				targets[key] = {node = _bar.cell_for(key.trim_prefix("quickbar:")), flash = true}
+			elif key in ["gift", "request"] and modal_kind == "resident" and _modal != null and _resident == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
+				for bar in _modal.find_children("*", "UiResidentBar", true, false):
+					targets[key + ":" + _resident] = {node = bar._gift if key == "gift" else bar._request}
+			elif key == "cook" and modal_kind == "kitchen" and _modal != null:
+				var page := str(mark.get("page", ""))
+				for drawer in _modal.find_children("*", "P0KitchenDrawer", true, false):
+					targets["cook:" + page] = {node = drawer.guide_cook_target(page)}
+	guide_pulses.update(view, targets)
 
 func _build_hud() -> void:
 	hud = UiHud.new()

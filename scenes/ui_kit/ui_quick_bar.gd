@@ -270,6 +270,13 @@ func flash(id: String) -> void:
 			_cells[i].flash()
 			return
 
+## The guide may highlight a visible slot, never select or insert it for the player.
+func cell_for(id: String) -> UiItemCell:
+	if collapsed or bag_only or id == "": return null
+	for i in mini(slots.size(), SLOTS):
+		if str(slot(i).get("id", "")) == id: return _cells[i]
+	return null
+
 ## The drop zones while a slot is lifted: [Pin / Unpin, Remove], or [] otherwise.
 func drop_zones() -> Array[UiBarDropZone]:
 	var out: Array[UiBarDropZone] = []

@@ -705,6 +705,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_decor.frame(v, dt)
 	if not _facilities.placing.is_empty() or not _decor.placing.is_empty():   # placement mode: no bed, key, card or prompt (q(23))
 		_hi.visible = false   # the preview's green / red square is the one outline on a bed meanwhile
+		if _guide != null: _guide.hide_marks()
 		return
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).

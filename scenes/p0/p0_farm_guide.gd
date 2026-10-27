@@ -24,8 +24,8 @@ func frame(view: Dictionary, dt: float) -> void:
 	if here and pip_root == null: _spawn()
 	if pip_root != null:
 		# If the guide ends while the player stands here, keep the model until leave(); all guidance stops now.
-		var head := farm.cam.unproject_position(pip_root.to_global(Vector3(0, 1.48, 0)))
-		var visible_head := not farm.cam.is_position_behind(pip_root.global_position) and farm.get_viewport().get_visible_rect().has_point(head)
+		var head: Vector2 = farm.cam.unproject_position(pip_root.to_global(Vector3(0, 1.48, 0)))
+		var visible_head: bool = not farm.cam.is_position_behind(pip_root.global_position) and farm.get_viewport().get_visible_rect().has_point(head)
 		var talking: bool = farm.rt.ui.speaker() == PIP
 		var near: bool = P0FarmMaterials.flat(farm.actor.position, pip_root.position) < 2.6
 		farm.rt.ui.npc_tag(TAG, "Pip", head, visible_head, near, talking,
@@ -75,11 +75,16 @@ func _highlight(view: Dictionary) -> void:
 
 func tap(screen: Vector2, card: String) -> bool:
 	if pip_root == null or farm.rt.ui.has_modal(): return false
-	var at := farm.cam.unproject_position(pip_root.to_global(Vector3(0, 0.8, 0)))
+	if farm.cam.is_position_behind(pip_root.global_position): return false
+	var at: Vector2 = farm.cam.unproject_position(pip_root.to_global(Vector3(0, 0.8, 0)))
 	if card != TAG and at.distance_to(screen) > UiTokens.SIZE_TOUCH * 0.5: return false
 	farm.actor.face(pip_root.position)
 	farm.rt.ui.open_resident(PIP)
 	return true
+
+func hide_marks() -> void:
+	farm.rt.ui.npc_tag(TAG, "", Vector2.ZERO, false)
+	for outline in _highlights.values(): outline.visible = false
 
 ## Farm suspension counts as leaving (including going inside): never disappear in front of the player.
 func leave() -> void:
@@ -88,8 +93,7 @@ func leave() -> void:
 		pip_root = null
 		rig = null
 		_wave_left = 0.0
-	farm.rt.ui.npc_tag(TAG, "", Vector2.ZERO, false)
-	for outline in _highlights.values(): outline.visible = false
+	hide_marks()
 
 func near_resident() -> String:
 	return PIP if pip_root != null and P0FarmMaterials.flat(farm.actor.position, pip_root.position) < 2.6 else ""
