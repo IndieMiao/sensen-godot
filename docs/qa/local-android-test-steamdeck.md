@@ -35,6 +35,7 @@ mv /tmp/gdtpl/templates ~/.local/share/godot/export_templates/4.7.2.stable
 python3 tools/android/prepare_voice_plugin.py
 python3 tools/android/prepare_webview_plugin.py
 python3 tools/android/prepare_google_signin_plugin.py
+python3 tools/android/prepare_notify_plugin.py
 ```
 
 首次 `godot --headless --path . --import` 会生成编辑器设置。随后确认或追加：
