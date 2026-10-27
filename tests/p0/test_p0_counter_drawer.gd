@@ -252,7 +252,7 @@ func test_lous_play_opens_the_table_only_while_it_is_open() -> void:
 	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
 	assert_str(card.line).is_equal("Keep those coins for seeds. Come back with a few more.")
 	(card.content.get_child(0) as UiCommandButton).activated.emit()
-	assert_str(ui.modal_kind).is_not_equal("greeting")   # the card closed for the table page
+	assert_str(ui.modal_kind).is_equal("blackjack")   # the card closed for the table page (哪吒's P0BlackjackPage)
 	assert_str(ui.toast_text()).is_empty()
 
 func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void:

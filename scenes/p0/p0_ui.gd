@@ -2260,7 +2260,7 @@ func _play_blackjack(ctx := {}) -> void:
 		toast(BJ_NOT_OPEN)
 		return
 	close_modal()
-	if has_method("open_blackjack"): call("open_blackjack", ctx)
+	open_blackjack(ctx)
 
 ## The tackle shop before the outposts open it with their ctx (the map's tackle pin, P0_SHOT "kai").
 func open_kai_greeting() -> void:
