@@ -1,7 +1,7 @@
 # P0 UI kit
 
 Phase 0 of the P0 UI rebuild (SGODOT-211 foundation, SGODOT-212 atomic components). Design authority is
-Figma page "14 · UI semantic refactor" (481:53); locked components are listed in Plane SGODOT-197 and
+Figma page "14 · UI semantic refactor" (5:4); locked components are listed in Plane SGODOT-197 and
 must not change structure, role, entry point or key copy. Engineering specs: SGODOT-207 WP7-A / B / C.
 
 ## Tokens and theme

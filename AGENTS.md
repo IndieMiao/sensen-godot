@@ -6,7 +6,7 @@
   Figma (current game UI): page "14 · UI semantic refactor"
   https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4
   （R1 修订中，锁定项以 SGODOT-197 为准）. The former Prototype page
-  (node-id=310-2955) is Archive，截至 2026-10-06.
+  (node-id=5-3) is Archive，截至 2026-10-06.
   Use `docs/README.md` and `docs/design/README.md` to find current documents.
   Older entries below are dated implementation/release evidence, not competing
   design authority. Obsolete design files removed from the working tree can be
