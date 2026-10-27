@@ -535,7 +535,8 @@ static func quota_text(view: Dictionary, role: String, selected := "") -> String
 static func keeper_portrait(name: String, card := false, look := "") -> Texture2D:
 	var path := "res://assets/p0/art/keepers/%s_%s.jpg" % [name.to_lower(), "card" if card else "head"]
 	if ResourceLoader.exists(path): return load(path)
-	return P0KeeperPortraits.texture(look, card)
+	# no painted art and no look preset: a written keeper is drawn in their outpost_npcs.json outfit (Lou, SGODOT-351)
+	return P0KeeperPortraits.texture(look if look != "" else P0KeeperPortraits.NPC + name.to_lower(), card)
 
 static func _gap(parent: Control, h: float) -> Control:
 	var c := Control.new()

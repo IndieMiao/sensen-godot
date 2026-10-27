@@ -336,6 +336,10 @@ func test_keeper_portraits_fall_back_to_the_look() -> void:
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")).is_same(card)   # drawn once
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "")).is_null()   # no look, no art: as before
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "no_such_look")).is_null()
+	# Lou (SGODOT-351) has no painted card and no look preset: drawn in his outpost_npcs.json outfit
+	var lou := P0CounterDrawer.keeper_portrait("Lou", true)
+	assert_bool(lou is ImageTexture).is_true()
+	assert_object(P0CounterDrawer.keeper_portrait("Lou", true, "")).is_same(lou)
 
 func test_greeting_card_and_keeper_bar_take_the_keepers_look() -> void:
 	var ui := _ui()

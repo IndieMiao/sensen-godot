@@ -342,15 +342,15 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 	return style
 
 ## q(137) ⑤: the fixed packing order of the map's pins after the always-in ones (the selected, a marked one, where the
-## player is): beginner pond, other ponds, market, tea house, travel post, cabin and Mine Hut (q(204) ⑦), tackle shop,
-## silhouette.
-const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "casino": 5, "tackle": 6, "silhouette": 7}
+## player is): beginner pond, other ponds, market, tea house, travel post, cabin and Mine Hut (q(204) ⑦), tackle shop and
+## card room (an errand you choose, 不知火舞 on 351 0c2082b7), silhouette.
+const PIN_RANK := {"beginner": 1, "pond": 2, "market": 3, "tea": 4, "post": 5, "mine_hut": 5, "tackle": 6, "casino": 6, "silhouette": 7}
 ## The type words a place's name ends with (q(137) ①): the generator's (server world.ts, Pond / Creek / Cove) and the
 ## hand-written ones. Longest first, so `Trading Post` is not read as `Post`.
-const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Mine Hut", "Creek", "Pond", "Cove"]
+const TYPE_WORDS := ["Market Square", "Tackle Shop", "Trading Post", "Travel Post", "Tea House", "Card Room", "Mine Hut", "Creek", "Pond", "Cove"]
 
 ## The map pin's short name (q(137) ①): the place's own word without its type — `Willow Pond` → `Willow`, `Maple Market
-## Square` → `Maple`, `Union Square Travel Post` → `Union Square`. A name that is only a type word stays whole.
+## Square` → `Maple`, `Union Square Travel Post` → `Union Square`, `Barbary Card Room` → `Barbary`. A name that is only a type word stays whole.
 static func short_name(name: String) -> String:
 	for w in TYPE_WORDS:
 		if name.ends_with(" " + w): return name.substr(0, name.length() - w.length() - 1).strip_edges()
@@ -377,7 +377,9 @@ func home_entry() -> Dictionary:
 func _sync_here() -> void:
 	if rt == null or city_map == null or travelling(): return   # the avatar stays in the city left until it lands
 	var at := _origin()
-	var sig := "%s|%s|%s|%.7f|%.7f" % [rt.here.get("space", ""), rt.here.get("place", ""), P0Travel.here(_view()), home_lat, home_lng]
+	# the card room's pin comes in the moment its table opens (Homestead Lv2, SGODOT-351), wherever the player stands
+	var sig := "%s|%s|%s|%.7f|%.7f|%s" % [rt.here.get("space", ""), rt.here.get("place", ""), P0Travel.here(_view()), home_lat,
+		home_lng, P0Outposts.shown({"role": "casino"}, _view())]
 	if sig == _here_sig: return
 	_here_sig = sig
 	set_self_at(at.x, at.y)

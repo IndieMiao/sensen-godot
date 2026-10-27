@@ -725,7 +725,8 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 		var view := r._view()
 		var extras: Array = r.opening_extras()
 		assert_int(extras.size()).override_failure_message(id).is_equal(3 * (r.npcs.size() - 1))
-		assert_bool(extras.is_empty()).override_failure_message(id).is_false()
+		# the card room has Lou alone (SGODOT-351, no residents): nothing more to fit; every other room has some
+		assert_bool(extras.is_empty()).override_failure_message(id).is_equal(P0Outposts.find(id).get("residents", []).is_empty())
 		# the band opening_focus fits them in (刘邦 on #465): SIDE_MARGIN across, the HUD's bottom to the bottom controls down
 		var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
 		for p in extras:
@@ -752,6 +753,27 @@ func test_the_opening_shot_shows_every_resident_with_the_whole_name_tag() -> voi
 	r.npcs.erase("npc_kai")
 	r.npcs.erase("npc_rafa")
 	assert_vector(r.opening_focus(right, up, forward)).is_equal_approx(before, Vector3.ONE * 0.001)   # as with no residents
+
+## SGODOT-351 (上官婉儿 cd04db80): the card room opens on the player and Lou — the shot's middle falls between the two
+## across, Lou behind the bar with his waist and whole name tag on screen, the player a step in from the door.
+func test_the_card_room_opens_between_the_player_and_lou() -> void:
+	var r := _room("sf_card_room_1", true)
+	await get_tree().process_frame
+	r.p0_frame({}, 1.0 / 30.0)
+	var view := r._view()
+	assert_array(r.npcs.keys()).is_equal(["npc_keeper"])
+	var lou := r.npcs.npc_keeper.root as Node3D
+	var player := r.cam.unproject_position(r.actor.position + Vector3(0, 0.9, 0))
+	var waist := r.cam.unproject_position(lou.to_global(Vector3(0, 1.0, 0)))
+	var xs := [player.x, waist.x]
+	assert_float(view.x * 0.5).override_failure_message("middle %s, player %s, Lou %s" % [view.x * 0.5, player, waist]) \
+		.is_between(float(xs.min()) - 1.0, float(xs.max()) + 1.0)
+	var band := Rect2(P0Room.SIDE_MARGIN, P0Room.HUD_BOTTOM, view.x - 2.0 * P0Room.SIDE_MARGIN, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
+	for p in r.opening_subjects()[0] + [lou.to_global(Vector3(0, 1.0, 0))]:
+		var at := r.cam.unproject_position(p)
+		assert_bool(band.grow(0.5).has_point(at)).override_failure_message("Lou point %s, band %s" % [at, band]).is_true()
+	assert_bool(r.anchor("use_blackjack_table") != null).is_true()
+	assert_bool(band.has_point(r.cam.unproject_position(r.pick_point("use_blackjack_table")))).is_true()
 
 ## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
 ## (world.keeper_looks, role × climate × 3), under their own name plate.
