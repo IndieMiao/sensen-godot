@@ -303,7 +303,7 @@ function grantReward(c: P0Content, s: P0State, owner: string, q: ResidentRequest
     items.push([`recipe:${rw.recipe}`, 1]);
     events.push({ kind: 'recipe', page: rw.recipe, from: 'request', resident: owner, request: q.id });
   }
-  const bagged = grantItems(c, s, now, `req:${q.id}`, `${def.name}'s thanks`, items, events);
+  const bagged = grantItems(c, s, now, `req:${q.id}`, `Request reward · ${def.name}`, items, events);
   if (bagged) for (const [id, n] of Object.entries(bagged)) events.push({ kind: 'item', id, delta: n });
   if (rw.title && !s.rewards.includes(`title:${rw.title}`)) {
     s.rewards.push(`title:${rw.title}`);
