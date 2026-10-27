@@ -172,6 +172,7 @@ describe('off the path', () => {
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.qty('seed_quick_radish')).toBe(0);
     expect(r.view).toMatchObject({ recover: 'r_radish_sow', row: { line: 'Sow 1 Radish · 2 Energy' }, pip: { bang: false, resend_left: 0 } });
+    expect(r.view.marks).toEqual([{ plot: r.tilled(1)[0] }]);   // one plot's halo (q(229))
     const plot = r.tilled(1)[0];
     r.do({ type: 'sow', plot, seed: 'seed_radish', space: 'home' }).do({ type: 'water', plot, space: 'home' });
     expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' } });

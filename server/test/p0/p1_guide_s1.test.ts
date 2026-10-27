@@ -264,6 +264,6 @@ describe('step changes in the command\'s events (§14.8.1) and the table check',
     c.guide!.steps[0].marks = [{ place: 'home:mine' }, { plot: '3' }];
     c.guide!.steps[1].done_on = { key: 'speedup:crop_radish' };
     expect(validateGuide(c)).toEqual([
-      'step t_sow_quick: unknown place home:mine', 'step t_sow_quick: unknown plot 3 (only "teach")', 'step t_water: unknown key speedup:crop_radish']);
+      'step t_sow_quick: unknown place home:mine', 'step t_sow_quick: unknown plot 3 (only "teach" / "teach1")', 'step t_water: unknown key speedup:crop_radish']);
   });
 });

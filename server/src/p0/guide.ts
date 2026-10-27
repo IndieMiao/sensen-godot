@@ -59,7 +59,7 @@ export interface GuidePred {
 /** An in-world mark the client lights for the step (340). `place`: an id, `home` or `home:<role>` (the home set);
  * `plot: 'teach'`: the two teaching plots (view resolves both); the server also reads `place` for the map pins. */
 /** The client's keys (341 de0bbb81): button `sow` / `water` / `cook` / `gift` / `request` / `quickbar:<item>`; object
- * `farmhouse`; page: a Cookbook page (its Cook key); plot: `teach` (view: the plot id). */
+ * `farmhouse`; page: a Cookbook page (its Cook key); plot: `teach` (the two teaching plots) / `teach1` (the first; view: plot ids). */
 export interface GuideMark { place?: string; resident?: string; plot?: string; button?: string; object?: string; page?: string; kind?: MarkerKind | 'gift'; pulse?: boolean; why?: string }
 /** row.line / row.go, a mark's why and pip may name the home set: `{market}`, `{pond}`, … in a line, `home:<role>` in go;
  * `{have}` / `{need}`: the count shown (the step's, or the recover entry's own). row.countdown (a crop id): view adds
@@ -403,7 +403,10 @@ function resolveMarks(c: P0Content, s: P0State, marks: GuideMark[] = [], count: 
   for (const m of marks) {
     const place = m.place !== undefined ? guidePlace(c, s, m.place) : undefined;
     if (place === null) continue;
-    if (m.plot === 'teach') { for (const id of teachPlots(c, s)) out.push({ ...m, plot: id }); continue; }
+    if (m.plot === 'teach' || m.plot === 'teach1') {   // teach1: the first only (q(229): `Sow 1 Radish`, one plot's halo)
+      for (const id of teachPlots(c, s).slice(0, m.plot === 'teach1' ? 1 : 2)) out.push({ ...m, plot: id });
+      continue;
+    }
     out.push({ ...m, ...(place !== undefined ? { place } : {}), ...(m.why !== undefined ? { why: fill(c, s, m.why, count) } : {}) });
   }
   return out;
@@ -495,7 +498,7 @@ export function validateGuide(c: P0Content): string[] {
     if (x.tip && !tips.has(x.tip)) out.push(`${where}: unknown tip ${x.tip}`);
     for (const m of x.marks ?? []) {
       if (m.place && !places.has(m.place)) out.push(`${where}: unknown place ${m.place}`);
-      if (m.plot !== undefined && m.plot !== 'teach') out.push(`${where}: unknown plot ${m.plot} (only "teach")`);
+      if (m.plot !== undefined && m.plot !== 'teach' && m.plot !== 'teach1') out.push(`${where}: unknown plot ${m.plot} (only "teach" / "teach1")`);
       if (m.resident && !c.residents[m.resident]) out.push(`${where}: unknown resident ${m.resident}`);
     }
   };
