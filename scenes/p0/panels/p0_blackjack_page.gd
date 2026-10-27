@@ -111,6 +111,7 @@ var _dealer_cards: Array = []      # UiPlayingCard
 var _hands: Array = []             # [{cards: [UiPlayingCard], bet, badge, tag, stake, outline}]
 var _active := 0
 
+var _acted := ""                   # the last bj_act sent (a double's card doubles the stake shown)
 var _press := {}                   # a stack under the finger
 var _ghost: UiChipToken
 
@@ -489,7 +490,10 @@ func _run() -> void:
 	while not _steps.is_empty():
 		var step: Callable = _steps.pop_front()
 		var wait := float(step.call())
-		if animate and wait > 0.0 and is_inside_tree(): await get_tree().create_timer(wait).timeout
+		if animate and wait > 0.0 and is_inside_tree():
+			var pause := create_tween()   # bound to the page: closed mid-play, the wait ends with it, nothing resumes
+			pause.tween_interval(wait)
+			await pause.finished
 		if animate and not is_inside_tree(): return
 	_running = false
 	_refresh_keys()
@@ -576,6 +580,9 @@ func _step_card(e: Dictionary, target_hands: int) -> float:
 	(_hands[k].cards as Array).append(card)
 	var ev_hands: Array = P0Blackjack.hand(view).get("hands", [])
 	if k < ev_hands.size(): _hands[k].bet = int(ev_hands[k].get("bet", _hands[k].bet))
+	elif _acted == "double" and _hands.size() == 1:   # doubled and settled in one reply: the view's hand is gone
+		_hands[k].bet = int(_hands[k].bet) * 2
+		_acted = ""
 	var total := 0
 	for hd in _hands: total += int(hd.bet)
 	_set_stack(total)   # a split's or a double's second stake shows in the circle
@@ -604,6 +611,9 @@ func _step_result(e: Dictionary) -> float:
 		(tag.get_node("Text") as Label).text = P0Blackjack.result_word(str(hands[k].get("result", "")))
 		tag.visible = true
 		_hands[k].bet = int(hands[k].get("bet", _hands[k].bet))
+	var staked := 0
+	for hh in hands: staked += int(hh.get("bet", 0))
+	if staked > 0: _set_stack(staked)   # the stake as settled (a double's included)
 	_lay_cards(false)
 	for k in mini(hands.size(), _hands.size()):
 		var f := P0Blackjack.float_text(int(hands[k].get("net", 0)))
@@ -756,6 +766,7 @@ func deal(amount: int) -> void:
 
 func act(action: String) -> void:
 	if _busy() or phase != Phase.PLAY: return
+	_acted = action
 	_waiting = true
 	command.emit({"type": "bj_act", "action": action})
 
@@ -804,13 +815,16 @@ func _chip_input(event: InputEvent, i: int) -> void:
 	var s: UiChipStack = stacks[i]
 	if phase != Phase.BET or _busy() or s.state == UiChipToken.State.DISABLED: return
 	accept_event()
-	_press = {"index": i, "start": _page_pos(event), "t0": Time.get_ticks_msec(), "touch": event is InputEventScreenTouch,
+	# gui_input hands the stack's own local position (0–48): into page coordinates through the stack's transform, the
+	# same space _input measures the finger in (周瑜 on #525: a window-space reading put the start hundreds of px off,
+	# so the first 1 px ScreenDrag of a real tap began a drag).
+	var start: Vector2 = get_global_transform_with_canvas().affine_inverse() * (s.get_global_transform_with_canvas() * (event as InputEventFromWindow).position)
+	_press = {"index": i, "start": start, "t0": Time.get_ticks_msec(), "touch": event is InputEventScreenTouch,
 		"id": event.index if event is InputEventScreenTouch else -1}
 
-## A window event's position in this page's coordinates.
+## A window (viewport) event's position in this page's coordinates.
 func _page_pos(event: InputEvent) -> Vector2:
-	var p: Vector2 = get_viewport().get_canvas_transform().affine_inverse() * (event as InputEventFromWindow).position
-	return get_global_transform().affine_inverse() * p
+	return get_global_transform_with_canvas().affine_inverse() * (event as InputEventFromWindow).position
 
 func _input(event: InputEvent) -> void:
 	if _press.is_empty(): return

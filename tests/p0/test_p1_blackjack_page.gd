@@ -85,32 +85,69 @@ func _chip_centre(i: int) -> Vector2:
 func test_drag_into_the_circle_adds_and_outside_returns() -> void:
 	_open(300)
 	var from := _chip_centre(2)   # 50
-	page._chip_input(_mouse(from, true), 2)
-	page._input(_motion(from + Vector2(0, -30)))   # past the tap slop: a drag
+	_push(_mouse(from, true))
+	_push(_motion(from + Vector2(0, -30)))   # past the tap slop: a drag
 	assert_object(page._ghost).is_not_null()
 	assert_int(page.stacks[2].state).is_equal(UiChipToken.State.DEFAULT)   # the rail's stack stays
 	var over := page.circle_center() + Vector2(0, UiChipToken.SIZE * 0.6 * page.table.scale.x)   # the ghost rides above the finger
-	page._input(_motion(over))
+	_push(_motion(over))
 	assert_bool(page.circle.lit).is_true()
-	page._input(_mouse(over, false))
+	_push(_mouse(over, false))
 	assert_int(page.bet).is_equal(50)
 	assert_bool(page.circle.lit).is_false()
 	# outside: back to the rail, nothing added
-	page._chip_input(_mouse(from, true), 2)
-	page._input(_motion(from + Vector2(0, -30)))
-	page._input(_motion(Vector2(40, 200)))
+	_push(_mouse(from, true))
+	_push(_motion(from + Vector2(0, -30)))
+	_push(_motion(Vector2(40, 200)))
 	assert_bool(page.circle.lit).is_false()
-	page._input(_mouse(Vector2(40, 200), false))
+	_push(_mouse(Vector2(40, 200), false))
 	assert_int(page.bet).is_equal(50)
 	assert_object(page._ghost).is_null()
 
 func test_a_quick_press_without_moving_is_a_tap() -> void:
 	_open(300)
 	var at := _chip_centre(0)
-	page._chip_input(_mouse(at, true), 0)
-	page._input(_motion(at + Vector2(4, 0)))   # within the slop
-	page._input(_mouse(at + Vector2(4, 0), false))
+	_push(_mouse(at, true))
+	_push(_motion(at + Vector2(4, 0)))   # within the slop
+	_push(_mouse(at + Vector2(4, 0), false))
 	assert_int(page.bet).is_equal(5)
+
+## Through the real dispatch (Viewport.push_input): the stack's gui_input gets its own local position, the finger's
+## moves reach _input in window space. A press, a 4 px wobble inside the slop and a release is a tap (周瑜 on #525).
+func _push(e: InputEvent) -> void:
+	page.get_viewport().push_input(e, true)   # viewport coordinates (the runner window may be stretched)
+
+func test_a_real_tap_with_a_small_wobble_still_adds() -> void:
+	_open(300)
+	var at := _chip_centre(3)   # 100
+	_push(_mouse(at, true))
+	assert_bool(page._press.is_empty()).is_false()
+	_push(_motion(at + Vector2(4, 0)))
+	assert_object(page._ghost).is_null()   # not a drag
+	_push(_mouse(at + Vector2(4, 0), false))
+	assert_int(page.bet).is_equal(100)
+
+func test_a_real_drag_into_the_circle_adds() -> void:
+	_open(300)
+	var from := _chip_centre(2)   # 50
+	_push(_mouse(from, true))
+	_push(_motion(from + Vector2(0, -30)))
+	assert_object(page._ghost).is_not_null()
+	var over := page.circle_center() + Vector2(0, UiChipToken.SIZE * 0.6 * page.table.scale.x)
+	_push(_motion(over))
+	assert_bool(page.circle.lit).is_true()
+	_push(_mouse(over, false))
+	assert_int(page.bet).is_equal(50)
+
+func test_a_double_shows_the_doubled_stake() -> void:
+	_open(500)
+	await _deal(["6S", "9D", "5H", "TC", "KD"], 50)   # 11 against 9: double → 21; dealer 19
+	page.act("double")
+	await _frames()
+	var tag := (page._hands[0].tag.get_node("Text") as Label).text
+	assert_str(tag).is_equal("You win")
+	assert_int(page._hands[0].bet).is_equal(100)   # the stake as settled, doubled
+	assert_str(page.coins_label.text).is_equal("600")
 
 func test_a_grey_chip_takes_neither_tap_nor_drag() -> void:
 	_open(300)
@@ -118,7 +155,7 @@ func test_a_grey_chip_takes_neither_tap_nor_drag() -> void:
 	page.tap_chip(3)   # 200 on: 50 is the most that keeps 40 (300 − 260 = 40)
 	assert_int(page.stacks[3].state).is_equal(UiChipToken.State.DISABLED)
 	var at := _chip_centre(3)
-	page._chip_input(_mouse(at, true), 3)
+	_push(_mouse(at, true))
 	assert_bool(page._press.is_empty()).is_true()
 
 func test_deal_stand_and_result() -> void:
