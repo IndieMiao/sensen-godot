@@ -127,12 +127,13 @@ func hide_box(batch: String, box: AABB, want: int) -> int:
 ## in this art's space: each vertex is placed and asked once, each triangle only reads the three answers.
 ## Each cut is made once per session: the batch's meshes it made are kept by the mesh they were cut from and what was
 ## cut, so the room opened again takes them as they are (亚瑟 on #523: the pass costs some 30 ms on a desktop).
-static var _cut_cache: Dictionary = {}   # "<batch file>|<cuts so far>|<what>" → {meshes: {mesh path: ArrayMesh}, hit}
+static var _cut_cache: Dictionary = {}   # "<kit>|<batch>|<batch file>|<cuts so far>|<what>" → {meshes: {mesh path: ArrayMesh}, hit}
 
 func _cut(batch_name: String, keys: Dictionary, box: AABB, want: int, what: String) -> int:
 	var batch := get_node_or_null(NodePath(batch_name)) as Node3D
 	if batch == null: return 0
-	var key := "%s|%s" % [str(batch.get_meta("cuts", batch.scene_file_path)), what]
+	# the kit and batch first (亚瑟 on #523: a batch node not made from a scene has no scene_file_path)
+	var key := "%s|%s" % [str(batch.get_meta("cuts", "%s|%s|%s" % [kit_path, batch_name, batch.scene_file_path])), what]
 	if _cut_cache.has(key):
 		var done: Dictionary = _cut_cache[key]
 		for path in done.meshes: (batch.get_node(NodePath(path)) as MeshInstance3D).mesh = done.meshes[path]
