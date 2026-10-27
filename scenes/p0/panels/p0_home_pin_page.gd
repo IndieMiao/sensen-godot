@@ -420,18 +420,20 @@ func _refresh() -> void:
 		at = [float(g[0]), float(g[1])]
 		if not settling: refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
 	else: refusal = {}
-	# the page's own land: the flat map's ground; under the real map only while reading / failed or before it draws
-	land.visible = map is FlatMap or not ready or not bool(map.pick_has_ground())
+	# the page's own land: the flat map's ground, and the real map's till it draws — reading or failed over a map that
+	# has drawn (HOME-WELCOME's, going on under its pin page) it stays in sight, no pin on it (PR-2b)
+	land.visible = map is FlatMap or not bool(map.pick_has_ground())
 	veil.visible = ready
 	overlay.visible = ready
 	pin.visible = ready
 	# gliding in from HOME-WELCOME's city view: the card comes as the pin drops (不知火舞 342 bce34a87)
-	card.visible = ready and not (map.has_method("pick_flying") and bool(map.pick_flying()))
+	var gliding := map.has_method("pick_flying") and bool(map.pick_flying())
+	card.visible = ready and not gliding
 	loading_card.visible = not ready and not failed
 	error_card.visible = failed
 	_place_credits(ready)
 	var s := start_point()
-	back_key.visible = ready and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
+	back_key.visible = ready and not gliding and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
 	if not ready:
 		build.reason = "Build here"   # grey and quiet (6cb4d10e): no refusal, so no toast
 		return

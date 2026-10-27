@@ -495,6 +495,10 @@ func test_start_here_glides_on_the_same_map_and_back_to_the_card_slides_it_in_ag
 	flow.welcome.start.activated.emit()
 	assert_array(r[4]).is_equal([SF.id])   # the same map
 	assert_array(r[5]).is_empty()
+	m.ground = true   # drawn: reading the spots, the map stays in sight (no land over it), no pin yet
+	flow.spots._refresh()
+	assert_bool(flow.spots.land.visible).is_false()
+	assert_bool(flow.spots.pin.visible).is_false()
 	assert_object(flow.spots.map).is_same(m)
 	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # the pin page lets the drags through
 	P0HomePick.answer("/p0/home/spots/" + SF.id, spot_read(SF.id))
@@ -502,6 +506,7 @@ func test_start_here_glides_on_the_same_map_and_back_to_the_card_slides_it_in_ag
 	assert_int(m.frames.size()).is_equal(1)
 	assert_float(m.frames[0][2]).is_equal(UiKit.secs(UiTokens.MOTION_RECENTER_MS))
 	assert_bool(flow.spots.card.visible).is_false()   # gliding: the card comes as the pin drops
+	assert_bool(flow.spots.back_key.visible).is_false()   # and no back-to-start key on the way
 	assert_bool(flow.spots.pin.lifted).is_true()
 	m.flying = false
 	flow.spots._refresh()

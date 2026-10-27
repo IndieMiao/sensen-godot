@@ -169,6 +169,7 @@ func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
 	p.size = Vector2(360, 800)
 	await await_idle_frame()
 	assert_bool(p.credits.visible).is_false()   # reading
+	assert_bool(p.land.visible).is_false()      # over a drawn map: the map in sight, no pin (PR-2b)
 	p.show_area(_read())
 	await await_idle_frame()
 	assert_bool(p.credits.visible).is_true()
@@ -184,6 +185,7 @@ func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
 	m.ground = true
 	p.show_failed()
 	assert_bool(p.credits.visible).is_false()
+	assert_bool(p.land.visible).is_false()
 
 ## 不知火舞 342 (亚瑟 on #495 ②): the map sliding on after the finger lifted keeps the pin up, the card at 50 % with its
 ## line as it was and the key unchanged; settled, both are read again. Build here does nothing till then.
