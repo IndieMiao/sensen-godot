@@ -20,6 +20,7 @@ const CONST = {
   todayPanelX: 10, todayPanelY: 96,
   // Motion: Figma only has the 150 ms dissolve; others from plan §16 / §10 or engineering defaults (WP7-B).
   motion: { floatTextRise: 40, floatTextMs: 800, recenterMs: 600, doubleTapRecenterMs: 400, radialFadeMs: 200,
+            radialScrimMs: 120, radialPetalInMs: 180, radialStaggerMs: 40, radialRetractMs: 120, radialTapMs: 150, radialShakeMs: 200, radialReasonMs: 1500,   // the radial's timings (SGODOT-247), added by hand before
             quickBarRefillMs: 300, newUnlockFlashMs: 600, drawerMs: 250, joystickFadeInMs: 80, pendingDelayMs: 300,
             toastBaseMs: 2000, toastPer20CharsMs: 500, toastMaxMs: 5000 },
   naturalLineHeight: 1.364,
@@ -323,7 +324,9 @@ const tokens = {
       family: 'color/family/* (1726:32854–32857), color/newInk (1398:92869) and color/goldDeep (1755:33005, the Mastered star, C28) were added by hand under the names the exporter gives (SGODOT-226, 2026-10-08); the next full export replaces this note',
       guidePulse: 'GuidePulse 1407:113987 (SGODOT-232 U6, A-03): ring stroke 2, growth to +10 and frame inset 4 are constants in UiGuidePulse until the next token export adds them; color/primary and MOTION_NEW_UNLOCK_FLASH_MS (600 ms, ease-out) are tokens',
       systemCard: 'SystemCard 1237:87229, Wordmark (placeholder) 1187:82582, Spinner 1237:87185 and the SYS-LOADING screens (SGODOT-233): card padding 28 / 21 / 20 / 21, gap 10, icon disc 64 with a 32 icon, 6 above the button, the 0 10 28 card shadow; the wordmark\'s sprout 30, gap 6 and name 32 ExtraBold; the spinner\'s 28 ring with a 3 stroke; the scene loading\'s destination 18 ExtraBold are constants in UiSystemCard / UiWordmark / UiSpinner / P0SysScreen until the next token export adds them',
+      elevatorPanel: 'ElevatorPanel 1230:107860 / ElevatorRow 1230:107859 (SGODOT-231 / 235 B3): width 280, radius 16, padding 10 / 8 / 8, gaps 2, shadow 0 4 8 at 16 %, rows 44 with radius 10 and 12 side padding are constants in UiElevatorPanel until the next token export adds them',
       tipCard: 'TipCard 1243:87540 (TUT-2, SGODOT-232 U6 / 235-B2): width 296, padding 14 / 12, gap 10, radius 16, one line 48, 22 px icon and the shadow (#2E3A33 at 8 %, size 28, offset 0 / 6: lighter than the main\'s 20 % / 0 / 10 / blur 28 so Godot reads as the same faint halo, 不知火舞 on 235-B2) are constants in UiTipCard until the next token export adds them; surface, border, text and BodyB14 are tokens',
+      keyCompact: 'space.keyCompact (14): the Compact command keys\' side padding (Primary / Secondary / Blocked / Destructive), measured by 不知火舞 on BARTER-2 2570:132291, BARTER-LIST 2569:132290 and NPC-2 482:116 (Command surface: 14 each side, visible 34, narrowest 68); added by hand (2026-10-13) and kept by the exporter\'s fixed spaces; the full-size command keys keep space.page until they are checked against Figma',
     },
   },
   font: { file: 'res://assets/ui/fonts/Nunito.ttf', naturalLineHeight: CONST.naturalLineHeight,
