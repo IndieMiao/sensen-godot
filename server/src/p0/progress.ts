@@ -132,7 +132,7 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
     }
     const gifts = c.level_gifts[`${skill}:${level}`] ?? [];
     events.push({ kind: 'level', skill, level, energy: granted, gifts });
-    grantItems(c, s, now, `level:${skill}:${level}`, `${skill[0].toUpperCase()}${skill.slice(1)} Lv${level} reward`, gifts, events);
+    grantItems(c, s, now, `level:${skill}:${level}`, 'Level-up gift', gifts, events);
   }
 }
 
