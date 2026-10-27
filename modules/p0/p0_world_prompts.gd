@@ -46,7 +46,7 @@ static func farmhouse(view: Dictionary) -> Dictionary:
 static func sign(view: Dictionary) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var nxt = h.get("next", null)
-	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false))
+	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false)) and not P0Guide.guide_on(view)
 	return _p("level_up", "Homestead Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
 
 ## Upgrade Plaque: no mark; only the strip when it is the nearest (PLAQUE-READ).
