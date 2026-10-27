@@ -170,6 +170,7 @@ func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
 	await await_idle_frame()
 	assert_bool(p.credits.visible).is_false()   # reading
 	assert_bool(p.land.visible).is_false()      # over a drawn map: the map in sight, no pin (PR-2b)
+	assert_bool(p.loading_card.visible).is_false()   # and no card (不知火舞 342 3730603f)
 	p.show_area(_read())
 	await await_idle_frame()
 	assert_bool(p.credits.visible).is_true()

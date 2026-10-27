@@ -504,6 +504,7 @@ func test_start_here_glides_on_the_same_map_and_back_to_the_card_slides_it_in_ag
 	flow.spots._refresh()
 	assert_bool(flow.spots.land.visible).is_false()
 	assert_bool(flow.spots.pin.visible).is_false()
+	assert_bool(flow.spots.loading_card.visible).is_false()   # no card: the outline is the land's (3730603f)
 	assert_object(flow.spots.map).is_same(m)
 	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # the pin page lets the drags through
 	P0HomePick.answer("/p0/home/spots/" + SF.id, spot_read(SF.id))

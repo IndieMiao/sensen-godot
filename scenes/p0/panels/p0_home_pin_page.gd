@@ -429,7 +429,9 @@ func _refresh() -> void:
 	# gliding in from HOME-WELCOME's city view: the card comes as the pin drops (不知火舞 342 bce34a87)
 	var gliding := map.has_method("pick_flying") and bool(map.pick_flying())
 	card.visible = ready and not gliding
-	loading_card.visible = not ready and not failed
+	# HOME-PIN-LOADING's outline on the land only: over a map that has drawn, reading is the glide's state — no pin, no
+	# card, the key grey (不知火舞 342 3730603f)
+	loading_card.visible = not ready and not failed and land.visible
 	error_card.visible = failed
 	_place_credits(ready)
 	var s := start_point()
