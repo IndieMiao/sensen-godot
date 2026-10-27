@@ -24,6 +24,13 @@ const COLORS := {
 	1000: [Color("2F3A33"), Color("F0D75E"), Color("2F3A33")],
 }
 
+## Look=Table (C13, d835ac7e): a real chip on the felt — about 3 of side thickness under the face, a soft shadow and
+## a light rim highlight; colours and number unchanged. Look=Flat (false) stays for elsewhere.
+var table_look := false: set = set_table_look
+const _SIDE := 3.0
+## Only a stack's bottom chip casts its shadow (185:167356).
+var shadow := true
+
 var value := 5: set = set_value
 var state: State = State.DEFAULT: set = set_state
 
@@ -57,6 +64,10 @@ func set_state(v: State) -> void:
 		_label.add_theme_color_override(&"font_color", UiTokens.COLOR_DISABLED_INK if v == State.DISABLED else _pair()[2])
 	queue_redraw()
 
+func set_table_look(v: bool) -> void:
+	table_look = v
+	queue_redraw()
+
 func _pair() -> Array: return COLORS.get(value, COLORS[5])
 
 func fill_color() -> Color:
@@ -70,6 +81,9 @@ func _draw() -> void:
 	var notch: Color = _pair()[1]
 	if state == State.DISABLED: notch = notch.lerp(UiTokens.COLOR_DISABLED, 0.5)
 	if state == State.DRAGGING: draw_circle(c + Vector2(0, 4), r, UiTokens.COLOR_LIFT_SHADOW)
+	if table_look:
+		if shadow: draw_circle(c + Vector2(0, 3.0 + _SIDE), r + 1.0, UiKit.alpha(UiTokens.COLOR_TEXT, 0.30))   # y3, soft
+		draw_circle(c + Vector2(0, _SIDE), r, rim * Color(0.68, 0.68, 0.68, 1.0))   # the side: the value colour ×0.68
 	draw_circle(c, r, rim)
 	for i in _NOTCHES:
 		var a := TAU * i / _NOTCHES
@@ -80,3 +94,4 @@ func _draw() -> void:
 		draw_colored_polygon(PackedVector2Array([mid - side - along, mid + side - along, mid + side + along, mid - side + along]), notch)
 	draw_circle(c, _CORE, Color.WHITE if state != State.DISABLED else UiTokens.COLOR_SURFACE)
 	draw_arc(c, _CORE_RING, 0.0, TAU, 48, rim, 1.0, true)
+	if table_look: draw_arc(c, r - 0.75, PI * 1.1, PI * 1.9, 24, Color(1, 1, 1, 0.35), 1.5, true)   # rim light, top

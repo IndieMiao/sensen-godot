@@ -1,58 +1,64 @@
 class_name P0BlackjackPage
 extends Control
-## The Barbary Card Room's Blackjack table (SGODOT-351; q(240), §9.18.7; 不知火舞 on 351 7cdf40a9; server 后裔 on 351
-## b610f98a), full screen over the room, opened by Lou's `Play` (P0Ui.open_blackjack). On the cream page: PageHeader
-## `‹` `Blackjack` with the text key `Rules`, the coins pill under it (the HUD's number), the felt with the dealer on top,
-## the two printed lines, the player's hand(s) and the bet circle; under the felt the keys of the phase:
-##   BET     the tray of six ChipTokens, `Clear` and `Deal · 120` (`Place a bet` at 0). Tap a chip: it flies into the
-##           circle (MOTION_RADIAL_PETAL_IN_MS). Drag it: a Dragging chip follows the finger, the tray's stays; over the
-##           circle the ring lights, let go there and it adds, anywhere else it flies back and adds nothing. Tap and drag
-##           part as GestureArbiter does (TAP_SLOP, TAP_MAX_MS); no double tap anywhere. A chip that would take the
-##           wallet under the floor greys and ignores both. Not even 5 fits: `Low on coins` instead of the circle and
-##           `Need N more coins` on the key (the only closed state).
-##   PLAY    `Hit` / `Stand` equal (both primary), `Double · 120` / `Split · 120` always there, grey with the server's
-##           reason. Split hands side by side, the one in play outlined, the other dimmed. An expired hand shows no keys.
-##   RESULT  a tag over each hand, `+N coins` floats for wins, the pill rolls; `Deal again · 120` / `Change bet`.
+## The Barbary Card Room's Blackjack table (SGODOT-351; q(238)–(240), C13 by 不知火舞 on 351 37022a3c / d835ac7e; server
+## 后裔 on 351 b610f98a + 9cb4e561), full screen over the room, opened by Lou's `Play` (P0Ui.open_blackjack).
+## A photoreal table (background ①, table_bg.jpg) fills the screen, bottom-aligned and cropped from the top; everything on
+## it lives in `table`, a 360 × 800 layer in the design's own coordinates scaled with the picture: the dealer's cards
+## (zone 110–250), the two printed rule lines, the player's hand(s) (360–500), the bet circle (centre 570, 96 across),
+## the printed actions (620–680) and six ChipStacks in the rail's groove (690–800). Floating over the felt: the round
+## back `‹` top-left and the coins pill top-right; `Rules` is printed on the felt left of the shoe. No panel, no buttons:
+## every action is a FeltAction printed on the felt, faded with its reason printed under it when it cannot be done.
+##   BET    tap a stack: one chip flies into the circle (MOTION_RADIAL_PETAL_IN_MS); drag from a stack: a Dragging chip
+##          follows the finger and the circle's ring brightens over it; let go there to add, anywhere else it flies back.
+##          Tap and drag part as GestureArbiter does (TAP_SLOP, TAP_MAX_MS); no double tap anywhere. A stack the wallet
+##          cannot put down (it would leave under the floor) greys and takes neither. The stake sits in the circle with
+##          its amount printed once to its right; tapping the stake takes it all back (no Clear). Empty, the circle
+##          reads `Place a bet` and `Deal` fades with no reason. Not even 5 fits: `Low on coins` / `Need N more coins`
+##          where the circle is, every stack grey, `Deal` faded.
+##   PLAY   `Hit` / `Stand` Large, side by side, equal; `Double` / `Split` Small beside the circle, faded with the
+##          server's reason; no amounts on any action. Split hands side by side (24 apart), the one in play outlined, the
+##          other dimmed. An expired hand shows no actions.
+##   after  a result tag over each hand, `+N coins` floats for wins, the pill rolls; then last hand's stake sets itself
+##          in the circle again (stepped down to keep the floor, never climbing back) and `Deal` deals again — no Deal
+##          again / Change bet. The cards stay until the next deal.
 ## The page sends intents only (bj_open on opening, bj_intro, bj_deal {bet}, bj_act {action}); the server deals and
-## settles. A reply's bj_dealt / bj_card / bj_result events play in order (cards fly from the shoe, the hole card turns
-## over, the dealer draws), then the page matches the view; a view with no events (opening mid-hand, a refusal) is
-## laid out at once. First open: the centred card `Barbary Card Room` / `You bet coins here. You always keep at least
-## 40.` / `Got it` (bj_intro). A hand the server settled away: `Last hand settled · You win +20 coins` for 3 s.
-## Card, chip and felt drawings stand in until 安其拉's frames (351 bd0fced2) land.
+## settles. A reply's bj_dealt / bj_card (hole: true turns the hole card over) / bj_result play in order, then the page
+## matches the view; a view with no events (opening mid-hand, a refusal) is laid out at once. First open: the centred card
+## (bj_intro on Got it). A hand the server settled away: `Last hand settled · …` for 3 s under the coins pill.
 
 signal back_pressed
 signal command(cmd: Dictionary)
 
 enum Phase { BET, PLAY, RESULT }
 
-const FELT := Color("2F6A3A")          # color/table/felt (VariableID:172:165539) until the token export adds it
-const FELT_INK := Color("FBF8F1")
-const _HEADER_H := 48.0
-const _HEADER_Y := P0ProfilePage._TOP - (_HEADER_H - UiTokens.SIZE_CLOSE) * 0.5
-const _PILL_H := 26.0
-const _KEY_H := 48.0
-const _ROW_GAP := 8.0
-const _CHIP_GAP := 8.0
-# BJ-BET 172:198798 at 360 × 800: header band to 76 (8 under the PageHeader), coins pill 12 under it at the right, the
-# felt's print arc (520 across, centre 410) and lines at 236 / 260, the bet circle 104 across at (180, 430) with the
-# amount 12 right of it, the tray sheet from 616 (184 high, top corners 24) with the chips 20 in and the keys 84 in.
-const _BAND_BELOW_HEADER := 8.0
-const _PILL_BELOW_BAND := 12.0
-const _LINES_BELOW_BAND := 160.0
-const _ARC_BELOW_BAND := 334.0         # the print arc's centre
-const _ARC_R := 260.0
-const _TRAY_H := 184.0
-const _TRAY_CHIPS := 20.0
-const _TRAY_KEYS := 84.0
-const _CLEAR_W := 88.0
-const _CIRCLE_R := 52.0
-const _CIRCLE_ABOVE_TRAY := 186.0      # the circle's centre above the tray's top
-const _CIRCLE_HIT := 12.0              # the circle takes a drop this far outside its ring
-const _CARDS_BELOW_BAND := 40.0        # the dealer's cards
-const _HAND_GAP := 8.0                 # the player's cards end this far above the circle
-const _SPLIT_GAP := 24.0               # between split hands (BJ-SPEC-CARDS)
-const _SETTLED_S := 3.0
+const BG := preload("res://assets/p0/art/casino/table_bg.jpg")
+const DESIGN := Vector2(360, 800)
+const INK := Color("FBF8F1")
 const ICON_COIN := preload("res://assets/p0/icons/coin.svg")
+# C13 zones in the table's 1× coordinates (d835ac7e; background ①: shoe top-right to y≈90, rail groove x 28–332).
+# BJ-BET-T 187:167298 (1d226acd): back 44 at (16, 28), Rules (Small) centred (173, 50), coins pill 225–276 at y 37
+# (left of the shoe), rail stacks from x 26 every 52 with their top chip's top at 687.
+const _RULES_AT := Vector2(173, 50)          # the top-left light takes no print
+const _LINES_Y := 284.0                      # the two lines' tops: 284 / 308, cream 62% / 50%
+const _DEALER_TOP := 140.0                   # cards 80 high in 110–250
+const _PLAYER_TOP := 390.0                   # in 360–500
+const _CIRCLE := Vector2(180, 570)
+const _CIRCLE_R := 48.0
+const _CIRCLE_HIT := 12.0                    # a drop counts this far outside the ring
+const _ACTIONS_Y := 650.0                    # the printed actions' row (620–680)
+const _HIT_X := 116.0
+const _STAND_X := 244.0
+const _DOUBLE_AT := Vector2(54, 570)
+const _SPLIT_AT := Vector2(310, 570)
+const _RAIL_X := 26.0
+const _RAIL_GAP := 4.0                       # 6 × 48 + 5 × 4 = 308 in the groove's 304 + rims
+const _RAIL_Y := 693.0                       # stacks' bottom chip top (the top chip's top 6 higher, at 687)
+const _STACK_DEPTH := 4                      # chips in a rail stack
+const _SPLIT_GAP := 24.0
+const _BACK_AT := Vector2(16, 28)
+const _COINS_RIGHT := 276.0                  # the coins pill's right edge, on the table (left of the shoe)
+const _COINS_TOP := 37.0
+const _SETTLED_S := 3.0
 
 var view: Dictionary = {}
 var phase := Phase.BET
@@ -65,8 +71,8 @@ var toast := Callable()
 
 var bet := 0                 # the stake being stacked (BET), or on the table
 var stack: Array = []        # the chips drawn in the circle, in the order they landed
-var _result := {}            # the bj_result on show (RESULT)
-var _waiting := false        # a command is out: keys and chips wait for its answer
+var _result := {}            # the last bj_result shown (its tags stay until the next deal)
+var _waiting := false        # a command is out: actions and chips wait for its answer
 var _steps: Array = []       # queued motion: Callables returning seconds to wait
 var _running := false
 var _pending: Array = []     # bj events of the reply whose view just came
@@ -74,45 +80,38 @@ var _seen := 0               # hash of what the last refresh laid out
 var _coins_shown := 0
 var _coins_tween: Tween
 
-var header: UiPageHeader
-var rules_key: Button
+var bg: TextureRect
+var table: Control
+var back_key: Button
 var coins_pill: PanelContainer
 var coins_label: Label
-var felt: Panel
-var arc: Control
-var band: ColorRect
-var tray_sheet: Panel
-var lines: VBoxContainer
+var rules_key: UiFeltAction
+var lines: Array = []
 var circle: _Circle
 var bet_label: Label
+var empty_label: Label
 var low_label: Label
+var low_need: Label
 var settled_pill: PanelContainer
 var settled_label: Label
-var dealer_box: Control
 var dealer_badge: PanelContainer
 var hands_box: Control
-var tray: Control
-var chips: Array = []        # UiChipToken in the tray
-var clear_key: UiDismissButton
-var deal_key: UiCommandButton
-var hit_key: UiCommandButton
-var stand_key: UiCommandButton
-var double_key: UiCommandButton
-var split_key: UiCommandButton
-var again_key: UiCommandButton
-var change_key: UiCommandButton
+var stacks: Array = []       # UiChipStack on the rail, one per value
+var deal_key: UiFeltAction
+var hit_key: UiFeltAction
+var stand_key: UiFeltAction
+var double_key: UiFeltAction
+var split_key: UiFeltAction
 var intro_layer: Control
 var intro_card: UiSystemCard
 var rules_layer: Control
 var rules_sheet: UiDrawer
 
-# the table as drawn
 var _dealer_cards: Array = []      # UiPlayingCard
-var _hands: Array = []             # [{cards: [UiPlayingCard], node: Control, badge, bet, tag}]
+var _hands: Array = []             # [{cards: [UiPlayingCard], bet, badge, tag, stake, outline}]
 var _active := 0
 
-# a chip under the finger
-var _press := {}
+var _press := {}                   # a stack under the finger
 var _ghost: UiChipToken
 
 func _init(view_: Dictionary = {}, safe_top_ := 0.0, safe_bottom_ := 0.0) -> void:
@@ -120,15 +119,25 @@ func _init(view_: Dictionary = {}, safe_top_ := 0.0, safe_bottom_ := 0.0) -> voi
 	safe_bottom = safe_bottom_
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var bg := ColorRect.new()
-	bg.color = UiTokens.COLOR_SURFACE
+	var under := ColorRect.new()   # what a picture cropped narrower than the screen would leave
+	under.color = Color("2F6A3A")
+	under.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	under.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(under)
+	bg = TextureRect.new()
+	bg.texture = BG
+	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg.stretch_mode = TextureRect.STRETCH_SCALE
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
-	_build_header()
-	_build_felt()
-	_build_keys()
-	_build_overlays()
+	table = Control.new()
+	table.name = "Table"
+	table.size = DESIGN
+	table.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(table)
+	_build_table()
+	_build_overlay()
+	_build_layers()
 	resized.connect(_layout)
 	view = view_
 	_coins_shown = P0Blackjack.coins_of(view)
@@ -138,40 +147,75 @@ func _init(view_: Dictionary = {}, safe_top_ := 0.0, safe_bottom_ := 0.0) -> voi
 
 # ---------------------------------------------------------------- build
 
-func _build_header() -> void:
-	band = ColorRect.new()
-	band.color = UiTokens.COLOR_SURFACE
-	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(band)
-	header = UiPageHeader.new("Blackjack")
-	header.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	header.offset_left = UiTokens.SIZE_QUICK_BAR_X
-	header.offset_right = -UiTokens.SIZE_QUICK_BAR_X
-	header.offset_top = _HEADER_Y + safe_top
-	header.offset_bottom = header.offset_top + _HEADER_H
-	header.back_pressed.connect(func(): back_pressed.emit())
-	# PageHeader Kind=Back + Action (q(240) ②): the text key `Rules`, no ⓘ.
-	rules_key = Button.new()
+func _print_label(text: String, font_size: int, alpha := 0.7) -> Label:
+	var l := UiKit.label(text, UiTokens.STYLE_BODY_XB14, UiKit.alpha(INK, alpha))
+	l.add_theme_font_size_override(&"font_size", font_size)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
+
+func _build_table() -> void:
+	rules_key = UiFeltAction.new("Rules", UiFeltAction.Size.SMALL)
 	rules_key.name = "Rules"
-	rules_key.text = "Rules"
-	rules_key.focus_mode = Control.FOCUS_NONE
-	rules_key.theme_type_variation = UiTokens.BUTTON_DISMISS
-	rules_key.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY)
-	rules_key.add_theme_color_override(&"font_pressed_color", UiTokens.COLOR_PRIMARY_PRESSED)
-	rules_key.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_TOUCH)
-	rules_key.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	rules_key.pressed.connect(open_rules)
-	header.add_child(rules_key)
-	add_child(header)
+	rules_key.activated.connect(open_rules)
+	table.add_child(rules_key)
+	for t in ["Blackjack pays 3 to 2", "Dealer stands on all 17s"]:
+		var l := _print_label(t, 15 if t.begins_with("Blackjack") else 12, 0.62 if t.begins_with("Blackjack") else 0.5)
+		table.add_child(l)
+		lines.append(l)
+	hands_box = Control.new()
+	hands_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	table.add_child(hands_box)
+	dealer_badge = _badge()
+	table.add_child(dealer_badge)
+	circle = _Circle.new()
+	circle.tapped.connect(take_back)
+	table.add_child(circle)
+	empty_label = _print_label("Place a bet", 13, 0.75)
+	table.add_child(empty_label)
+	bet_label = _print_label("", 20, 1.0)
+	bet_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	table.add_child(bet_label)
+	low_label = _print_label("Low on coins", 20, 1.0)
+	table.add_child(low_label)
+	low_need = _print_label("", 12, 0.75)
+	table.add_child(low_need)
+	deal_key = _action("Deal", UiFeltAction.Size.LARGE, func(): deal(bet))
+	hit_key = _action("Hit", UiFeltAction.Size.LARGE, func(): act("hit"))
+	stand_key = _action("Stand", UiFeltAction.Size.LARGE, func(): act("stand"))
+	double_key = _action("Double", UiFeltAction.Size.SMALL, func(): act("double"))
+	split_key = _action("Split", UiFeltAction.Size.SMALL, func(): act("split"))
+	double_key.reason_align = HORIZONTAL_ALIGNMENT_LEFT    # near the table's edges: captions stay on the felt
+	split_key.reason_align = HORIZONTAL_ALIGNMENT_RIGHT
+	for v in P0Blackjack.CHIPS:
+		var vals: Array = []
+		for i in _STACK_DEPTH: vals.append(v)
+		var s := UiChipStack.new(vals)
+		s.mouse_filter = Control.MOUSE_FILTER_STOP
+		s.gui_input.connect(_chip_input.bind(stacks.size()))
+		table.add_child(s)
+		stacks.append(s)
+
+func _action(text: String, size_: UiFeltAction.Size, on: Callable) -> UiFeltAction:
+	var a := UiFeltAction.new(text, size_)
+	a.activated.connect(on)
+	table.add_child(a)
+	return a
+
+func _build_overlay() -> void:
+	back_key = UiProfileTopBar._Round.new(UiProfileTopBar._Round.Glyph.BACK)
+	back_key.name = "Back"
+	back_key.pressed.connect(func(): back_pressed.emit())
+	add_child(back_key)
 	coins_pill = PanelContainer.new()
 	coins_pill.name = "Coins"
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = UiTokens.COLOR_SURFACE_RAISED
-	sb.border_color = UiTokens.COLOR_BORDER
-	sb.set_border_width_all(1)
-	sb.set_corner_radius_all(int(_PILL_H * 0.5))
+	sb.set_corner_radius_all(13)
 	sb.content_margin_left = 9
 	sb.content_margin_right = 7
+	sb.shadow_color = UiTokens.COLOR_SHADOW_KEY
+	sb.shadow_size = 3
 	coins_pill.add_theme_stylebox_override(&"panel", sb)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 4)
@@ -182,47 +226,13 @@ func _build_header() -> void:
 	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(coin)
 	coins_pill.add_child(row)
-	coins_pill.custom_minimum_size.y = _PILL_H
-
-func _build_felt() -> void:
-	felt = Panel.new()
-	felt.name = "Felt"
-	felt.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	felt.clip_contents = true
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = FELT
-	felt.add_theme_stylebox_override(&"panel", sb)
-	add_child(felt)
-	arc = _Arc.new()
-	felt.add_child(arc)
-	lines = VBoxContainer.new()
-	lines.add_theme_constant_override(&"separation", 2)
-	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for t in ["Blackjack pays 3 to 2", "Dealer stands on all 17s"]:
-		var l := UiKit.label(t, UiTokens.STYLE_BODY_XB14 if t.begins_with("Blackjack") else UiTokens.STYLE_C13_B, UiKit.alpha(FELT_INK, 0.6 if t.begins_with("Blackjack") else 0.5))
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lines.add_child(l)
-	felt.add_child(lines)
-	dealer_box = Control.new()
-	dealer_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	felt.add_child(dealer_box)
-	dealer_badge = _badge()
-	felt.add_child(dealer_badge)
-	hands_box = Control.new()
-	hands_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	felt.add_child(hands_box)
-	circle = _Circle.new()
-	felt.add_child(circle)
-	bet_label = UiKit.label("", UiTokens.STYLE_TITLE_XB20, FELT_INK)
-	felt.add_child(bet_label)
-	low_label = UiKit.label("Low on coins", UiTokens.STYLE_TITLE_XB20, FELT_INK)
-	low_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	felt.add_child(low_label)
-
+	coins_pill.custom_minimum_size.y = 26
+	coins_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(coins_pill)
 	settled_pill = PanelContainer.new()
 	var ps := StyleBoxFlat.new()
 	ps.bg_color = UiTokens.COLOR_SURFACE_RAISED
-	ps.set_corner_radius_all(UiTokens.RADIUS_CAPTION_PILL + 6)
+	ps.set_corner_radius_all(14)
 	ps.content_margin_left = 12
 	ps.content_margin_right = 12
 	ps.content_margin_top = 6
@@ -232,8 +242,7 @@ func _build_felt() -> void:
 	settled_pill.add_child(settled_label)
 	settled_pill.visible = false
 	settled_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	felt.add_child(settled_pill)
-	add_child(coins_pill)   # on the felt's top-right, over it
+	add_child(settled_pill)
 
 func _badge() -> PanelContainer:
 	var p := PanelContainer.new()
@@ -245,65 +254,36 @@ func _badge() -> PanelContainer:
 	sb.content_margin_top = 1
 	sb.content_margin_bottom = 1
 	p.add_theme_stylebox_override(&"panel", sb)
-	var l := UiKit.label("", UiTokens.STYLE_C13_XB, FELT_INK)
+	var l := UiKit.label("", UiTokens.STYLE_C13_XB, INK)
 	l.name = "Text"
 	p.add_child(l)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p.visible = false
 	return p
 
+## A badge's points; `Bust` in the danger tone (StateBadge Tone=Danger, 0c2082b7).
 static func _badge_set(p: PanelContainer, text: String) -> void:
-	var l := p.get_node("Text") as Label
-	l.text = text
+	(p.get_node("Text") as Label).text = text
 	(p.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_DANGER if text == "Bust" else UiKit.alpha(Color.BLACK, 0.35)
 	p.visible = text != ""
-	p.reset_size()
+	p.size = p.get_combined_minimum_size()
 
-func _build_keys() -> void:
-	tray_sheet = Panel.new()
-	tray_sheet.name = "TraySheet"
-	tray_sheet.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var ts := StyleBoxFlat.new()
-	ts.bg_color = UiTokens.COLOR_SURFACE
-	ts.corner_radius_top_left = UiTokens.RADIUS_SHEET
-	ts.corner_radius_top_right = UiTokens.RADIUS_SHEET
-	tray_sheet.add_theme_stylebox_override(&"panel", ts)
-	add_child(tray_sheet)
-	tray = Control.new()
-	tray.name = "Tray"
-	tray.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(tray)
-	for v in P0Blackjack.CHIPS:
-		var c := UiChipToken.new(v)
-		c.mouse_filter = Control.MOUSE_FILTER_STOP
-		c.gui_input.connect(_chip_input.bind(chips.size()))
-		tray.add_child(c)
-		chips.append(c)
-	clear_key = UiDismissButton.new("Clear")
-	clear_key.size_flags_horizontal = Control.SIZE_FILL
-	clear_key.pressed.connect(clear_bet)
-	add_child(clear_key)
-	deal_key = _key("Deal", UiCommandButton.Kind.PRIMARY, func(): deal(bet))
-	hit_key = _key("Hit", UiCommandButton.Kind.PRIMARY, func(): act("hit"))
-	stand_key = _key("Stand", UiCommandButton.Kind.PRIMARY, func(): act("stand"))
-	double_key = _key("Double", UiCommandButton.Kind.SECONDARY, func(): act("double"))
-	split_key = _key("Split", UiCommandButton.Kind.SECONDARY, func(): act("split"))
-	again_key = _key("Deal again", UiCommandButton.Kind.PRIMARY, deal_again)
-	change_key = _key("Change bet", UiCommandButton.Kind.SECONDARY, change_bet)
-	change_key.sends = false
+const RULES := ["Get closer to 21 than the dealer without going over.",
+	"2–10 count as shown. J, Q and K count 10. A counts 1 or 11.",
+	"Blackjack (an A and a 10-value card) pays 3 to 2, rounded down to whole coins.",
+	"The dealer draws to 16 and stands on all 17s.",
+	"Double: your bet doubles and you get one more card. First two cards only.",
+	"Split: a pair becomes two hands, once per hand. Split aces get one card each.",
+	"Wins pay 1 to 1. A tie returns your bet.",
+	"4 decks, shuffled every hand."]
+const NBSP := " "
+## The first-open card (d835ac7e BJ-INTRO-T): how to bet, then the floor; `least 40` kept together.
+const INTRO_BODY := "Tap or drag chips onto the circle, then tap Deal.\n\nYou bet coins here. You always keep at least" + NBSP + "40."
 
-func _key(text: String, kind: UiCommandButton.Kind, on: Callable) -> UiCommandButton:
-	var k := UiCommandButton.new(text, kind)
-	k.sends = true
-	k.activated.connect(on)
-	add_child(k)
-	return k
-
-func _build_overlays() -> void:
+func _build_layers() -> void:
 	intro_layer = _scrim()
 	intro_card = UiSystemCard.new()
-	intro_card.show_card({"title": "Barbary Card Room", "body": "You bet coins here. You always keep at least 40.",
-		"primary": "Got it"})
+	intro_card.show_card({"title": "Barbary Card Room", "body": INTRO_BODY, "primary": "Got it"})
 	intro_card.primary_pressed.connect(func():
 		intro_layer.visible = false
 		command.emit({"type": "bj_intro"}))
@@ -318,8 +298,7 @@ func _build_overlays() -> void:
 	rules_sheet.safe_bottom = safe_bottom
 	rules_sheet.close_requested.connect(close_rules)
 	rules_sheet.body.add_theme_constant_override(&"separation", 8)
-	var title := UiKit.label("Rules", UiTokens.STYLE_TITLE_XB20)
-	rules_sheet.body.add_child(title)
+	rules_sheet.body.add_child(UiKit.label("Rules", UiTokens.STYLE_TITLE_XB20))
 	for t in RULES:
 		var l := UiKit.label(t, UiTokens.STYLE_BODY_R14)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -330,15 +309,6 @@ func _build_overlays() -> void:
 	rules_sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	rules_sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	rules_layer.add_child(rules_sheet)
-
-const RULES := ["Get closer to 21 than the dealer without going over.",
-	"2–10 count as shown. J, Q and K count 10. A counts 1 or 11.",
-	"Blackjack (an A and a 10-value card) pays 3 to 2, rounded down to whole coins.",
-	"The dealer draws to 16 and stands on all 17s.",
-	"Double: your bet doubles and you get one more card. First two cards only.",
-	"Split: a pair becomes two hands, once per hand. Split aces get one card each.",
-	"Wins pay 1 to 1. A tie returns your bet.",
-	"4 decks, shuffled every hand."]
 
 func _scrim() -> ColorRect:
 	var s := ColorRect.new()
@@ -351,91 +321,77 @@ func _scrim() -> ColorRect:
 
 # ---------------------------------------------------------------- layout
 
-## Sizes follow the theme's fonts: lay out again once it applies (the first layout runs before the page is in the tree).
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED or what == NOTIFICATION_ENTER_TREE: _layout.call_deferred()
 
-func felt_rect() -> Rect2: return Rect2(felt.position, felt.size)
-func circle_center() -> Vector2: return felt.position + circle.position + circle.size * 0.5
+## The picture covers the screen, bottom-aligned (the rail always on the bottom edge), cropped from the top or evenly
+## from the sides; the table layer scales and sits with it.
+func table_scale() -> float: return maxf(size.x / DESIGN.x, size.y / DESIGN.y) if size.x > 0.0 else 1.0
+## A point on the table (1× design coordinates) in this page's coordinates.
+func on_page(p: Vector2) -> Vector2: return table.position + p * table.scale
+func circle_center() -> Vector2: return on_page(_CIRCLE)
 
 func _layout() -> void:
-	var w := size.x
-	var h := size.y
-	if w <= 0.0: return
-	var pad := float(UiTokens.SPACE_PAGE)
-	var band_h := header.offset_bottom + _BAND_BELOW_HEADER
-	band.position = Vector2.ZERO
-	band.size = Vector2(w, band_h)
-	var tray_top := h - safe_bottom - _TRAY_H
-	tray_sheet.position = Vector2(0, tray_top)
-	tray_sheet.size = Vector2(w, h - tray_top)
-	felt.position = Vector2(0, band_h)
-	felt.size = Vector2(w, tray_top - band_h + UiTokens.RADIUS_SHEET)   # under the tray's round corners too
-	coins_pill.size = coins_pill.get_combined_minimum_size()
-	coins_pill.position = Vector2(w - pad - coins_pill.size.x, band_h + _PILL_BELOW_BAND)
-	var fw := felt.size.x
-	arc.position = Vector2(fw * 0.5 - _ARC_R, _ARC_BELOW_BAND - _ARC_R)
-	arc.size = Vector2(_ARC_R * 2.0, _ARC_R * 2.0)
-	lines.position = Vector2(0, _LINES_BELOW_BAND)
-	lines.size = Vector2(fw, 0)
+	if size.x <= 0.0: return
+	var k := table_scale()
+	table.scale = Vector2(k, k)
+	table.position = Vector2((size.x - DESIGN.x * k) * 0.5, size.y - DESIGN.y * k)
+	bg.position = table.position
+	bg.size = DESIGN * k
+	_place(rules_key, _RULES_AT)
+	for i in lines.size():
+		var l: Label = lines[i]
+		l.size = Vector2(DESIGN.x, 20)
+		l.position = Vector2(0, _LINES_Y + i * 24.0)
 	circle.size = Vector2(_CIRCLE_R * 2.0, _CIRCLE_R * 2.0)
-	circle.position = Vector2(fw * 0.5 - _CIRCLE_R, tray_top - _CIRCLE_ABOVE_TRAY - band_h - _CIRCLE_R)
-	bet_label.reset_size()
-	bet_label.position = Vector2(circle.position.x + _CIRCLE_R * 2.0 + 12.0, circle.position.y + _CIRCLE_R - bet_label.size.y * 0.5)
-	low_label.size = Vector2(fw, 28)
-	low_label.position = Vector2(0, circle.position.y + _CIRCLE_R - 14.0)
-	settled_pill.reset_size()
-	settled_pill.position = Vector2((fw - settled_pill.size.x) * 0.5, 12.0)
-	# the tray: six 48 chips 8 apart, 16 in at 360
-	var tray_w := P0Blackjack.CHIPS.size() * UiChipToken.SIZE + (P0Blackjack.CHIPS.size() - 1) * _CHIP_GAP
-	tray.position = Vector2((w - tray_w) * 0.5, tray_top + _TRAY_CHIPS)
-	tray.size = Vector2(tray_w, UiChipToken.SIZE)
-	for i in chips.size():
-		(chips[i] as Control).position = Vector2(i * (UiChipToken.SIZE + _CHIP_GAP), 0)
-	var full := w - pad * 2.0
-	var half := (full - _ROW_GAP) * 0.5
-	var row1 := tray_top + _TRAY_CHIPS
-	var row2 := tray_top + _TRAY_KEYS
-	_place(clear_key, pad, row2, _CLEAR_W)
-	clear_key.size.y = UiTokens.SIZE_TOUCH
-	clear_key.position.y = row2 + (_KEY_H - UiTokens.SIZE_TOUCH) * 0.5
-	_place(deal_key, pad + _CLEAR_W + _ROW_GAP, row2, full - _CLEAR_W - _ROW_GAP)
-	_place(hit_key, pad, row1, half)
-	_place(stand_key, pad + half + _ROW_GAP, row1, half)
-	_place(double_key, pad, row2, half)
-	_place(split_key, pad + half + _ROW_GAP, row2, half)
-	_place(change_key, pad, row2, half)
-	_place(again_key, pad + half + _ROW_GAP, row2, half)
+	circle.position = _CIRCLE - circle.size * 0.5
+	empty_label.size = Vector2(_CIRCLE_R * 2.0, 18)
+	empty_label.position = _CIRCLE - empty_label.size * 0.5
+	_layout_bet_label()
+	low_label.size = Vector2(DESIGN.x, 28)
+	low_label.position = Vector2(0, _CIRCLE.y - 22.0)
+	low_need.size = Vector2(DESIGN.x, 18)
+	low_need.position = Vector2(0, _CIRCLE.y + 8.0)
+	_place(deal_key, Vector2(DESIGN.x * 0.5, _ACTIONS_Y))
+	_place(hit_key, Vector2(_HIT_X, _ACTIONS_Y))
+	_place(stand_key, Vector2(_STAND_X, _ACTIONS_Y))
+	_place(double_key, _DOUBLE_AT)
+	_place(split_key, _SPLIT_AT)
+	for i in stacks.size():
+		(stacks[i] as Control).position = Vector2(_RAIL_X + i * (UiChipToken.SIZE + _RAIL_GAP), _RAIL_Y)
+	back_key.position = Vector2(_BACK_AT.x, safe_top + _BACK_AT.y)
+	_fit_coins()
+	settled_pill.size = settled_pill.get_combined_minimum_size()
+	settled_pill.position = Vector2((size.x - settled_pill.size.x) * 0.5, coins_pill.position.y + coins_pill.size.y + 12.0)
 	_lay_cards(false)
 
-func _place(c: Control, x: float, y: float, width: float) -> void:
-	c.position = Vector2(x, y)
-	c.size = Vector2(width, _KEY_H)
-	if c is UiCommandButton: (c as UiCommandButton).min_width = width
+## Centre a printed action on a table point (its touch area may be wider than its frame).
+func _place(c: Control, centre: Vector2) -> void:
+	c.position = centre - c.size * 0.5
 
-## Where card i of a hand of n goes, in felt coordinates, the cards' bottom _HAND_GAP above the bet circle: one hand
-## centred stepping OVERLAP; split hands (BJ-SPEC-CARDS) 16 in from each side and 24 apart, stepping SPLIT_OVERLAP,
-## each laid out from its left edge.
+func _fit_coins() -> void:
+	coins_pill.size = coins_pill.get_combined_minimum_size()
+	coins_pill.position = Vector2(on_page(Vector2(_COINS_RIGHT, 0)).x - coins_pill.size.x, safe_top + _COINS_TOP)
+
+## Where card i of a hand of n goes on the table: one hand centred stepping OVERLAP; split hands (BJ-SPEC-CARDS) 16
+## in from each side and 24 apart, stepping SPLIT_OVERLAP, each from its left edge.
 func card_pos(hand_index: int, i: int, hand_count: int, n: int) -> Vector2:
-	var fw := felt.size.x
-	var y := circle.position.y - _HAND_GAP - UiPlayingCard.SIZE.y
 	if hand_count <= 1:
-		var width := UiPlayingCard.SIZE.x + (n - 1) * UiPlayingCard.OVERLAP
-		return Vector2(fw * 0.5 - width * 0.5 + i * UiPlayingCard.OVERLAP, y)
-	var lane := (fw - float(UiTokens.SPACE_PAGE) * 2.0 - _SPLIT_GAP) * 0.5
-	var x0 := float(UiTokens.SPACE_PAGE) + hand_index * (lane + _SPLIT_GAP)
-	return Vector2(x0 + i * UiPlayingCard.SPLIT_OVERLAP, y)
+		var width := hand_width(1, n)
+		return Vector2(DESIGN.x * 0.5 - width * 0.5 + i * UiPlayingCard.OVERLAP, _PLAYER_TOP)
+	var lane := (DESIGN.x - float(UiTokens.SPACE_PAGE) * 2.0 - _SPLIT_GAP) * 0.5
+	return Vector2(float(UiTokens.SPACE_PAGE) + hand_index * (lane + _SPLIT_GAP) + i * UiPlayingCard.SPLIT_OVERLAP, _PLAYER_TOP)
 
 func hand_width(hand_count: int, n: int) -> float:
 	return UiPlayingCard.SIZE.x + (n - 1) * (UiPlayingCard.OVERLAP if hand_count <= 1 else UiPlayingCard.SPLIT_OVERLAP)
 
 func dealer_pos(i: int, n: int) -> Vector2:
-	var width := UiPlayingCard.SIZE.x + (n - 1) * UiPlayingCard.OVERLAP
-	return Vector2(felt.size.x * 0.5 - width * 0.5 + i * UiPlayingCard.OVERLAP, _CARDS_BELOW_BAND)
+	var width := hand_width(1, n)
+	return Vector2(DESIGN.x * 0.5 - width * 0.5 + i * UiPlayingCard.OVERLAP, _DEALER_TOP)
 
-func shoe_pos() -> Vector2: return Vector2(felt.size.x - UiPlayingCard.SIZE.x - 12.0, -UiPlayingCard.SIZE.y * 0.6)
+## The shoe's mouth on the background, where dealt cards come from.
+func shoe_pos() -> Vector2: return Vector2(296, 30)
 
-## Every card to its place (instantly, or sliding when `slide`), with the badges, tags and highlight.
 func _lay_cards(slide: bool) -> void:
 	for i in _dealer_cards.size():
 		_move(_dealer_cards[i], dealer_pos(i, _dealer_cards.size()), slide)
@@ -452,26 +408,25 @@ func _lay_cards(slide: bool) -> void:
 		if n > 1: badge.position = Vector2(first.x + (width - badge.size.x) * 0.5, first.y + UiPlayingCard.SIZE.y + 4.0)
 		else: badge.position = Vector2(first.x + width + 8.0, first.y + (UiPlayingCard.SIZE.y - badge.size.y) * 0.5)
 		var tag: PanelContainer = hand.tag
-		tag.reset_size()
-		tag.position = Vector2(first.x + (width - tag.size.x) * 0.5, first.y - tag.size.y * 0.5)   # over the cards' top edge
+		tag.size = tag.get_combined_minimum_size()
+		tag.position = Vector2(first.x + (width - tag.size.x) * 0.5, first.y - tag.size.y * 0.5)   # over the top edge
 		var stake: Label = hand.stake
 		stake.visible = n > 1
 		stake.text = P0Blackjack.comma(int(hand.bet))
-		stake.reset_size()
+		stake.size = stake.get_combined_minimum_size()
 		stake.position = Vector2(first.x + (width - stake.size.x) * 0.5, badge.position.y + badge.size.y + 2.0)
 		var outline: Panel = hand.outline
 		outline.visible = n > 1 and k == _active and phase == Phase.PLAY
 		outline.position = first - Vector2(6, 6)
 		outline.size = Vector2(width + 12, UiPlayingCard.SIZE.y + 12)
 		for c in cards: (c as Control).modulate.a = 0.55 if n > 1 and k != _active and phase == Phase.PLAY else 1.0
-	var dw := UiPlayingCard.SIZE.x + (_dealer_cards.size() - 1) * UiPlayingCard.OVERLAP
 	var d0 := dealer_pos(0, maxi(1, _dealer_cards.size()))
 	_badge_set(dealer_badge, P0Blackjack.badge(_codes(_dealer_cards)) if not _dealer_cards.is_empty() else "")
-	dealer_badge.position = Vector2(d0.x + dw + 8.0, d0.y + (UiPlayingCard.SIZE.y - dealer_badge.size.y) * 0.5)
+	dealer_badge.position = Vector2(d0.x + hand_width(1, _dealer_cards.size()) + 8.0, d0.y + (UiPlayingCard.SIZE.y - dealer_badge.size.y) * 0.5)
 
 func _move(c: Control, to: Vector2, slide: bool) -> void:
 	if slide and animate and c.position != to:
-		create_tween().tween_property(c, "position", to, UiKit.secs(UiTokens.MOTION_RADIAL_PETAL_IN_MS)).set_ease(Tween.EASE_OUT)
+		create_tween().tween_property(c, "position", to, _fly()).set_ease(Tween.EASE_OUT)
 	else:
 		c.position = to
 
@@ -508,19 +463,17 @@ func _sync() -> void:
 	_waiting = false
 	var events := _pending
 	_pending = []
-	var paid := 0
-	for e in events:
-		if str(e.kind) == "bj_result":
-			for hh in e.get("hands", []): paid += int(hh.get("payout", 0))
 	if events.is_empty():
 		if _running: _steps.append(func(): _reconcile(); return 0.0)
 		else: _reconcile()
 		return
-	_roll_coins(P0Blackjack.coins_of(view) - paid)   # the stake leaves now; a payout comes with its result
+	var paid := 0
 	var target := maxi(1, (P0Blackjack.hand(view).get("hands", []) as Array).size())
 	for e in events:
-		for hh in [e]:
-			if str(hh.kind) == "bj_result": target = maxi(target, (hh.get("hands", []) as Array).size())
+		if str(e.kind) == "bj_result":
+			for hh in e.get("hands", []): paid += int(hh.get("payout", 0))
+			target = maxi(target, (e.get("hands", []) as Array).size())
+	_roll_coins(P0Blackjack.coins_of(view) - paid)   # the stake leaves now; a payout comes with its result
 	for e in events:
 		match str(e.kind):
 			"bj_dealt": _steps.append(_step_dealt.bind(e))
@@ -537,7 +490,7 @@ func _run() -> void:
 		var step: Callable = _steps.pop_front()
 		var wait := float(step.call())
 		if animate and wait > 0.0 and is_inside_tree(): await get_tree().create_timer(wait).timeout
-		if not is_inside_tree() and animate: break
+		if animate and not is_inside_tree(): return
 	_running = false
 	_refresh_keys()
 
@@ -559,10 +512,10 @@ func _reconcile() -> void:
 		var total := 0
 		for x in h.get("hands", []): total += int(x.get("bet", 0))
 		_set_stack(total)
-	elif phase == Phase.PLAY:   # the hand went without a result shown (refused, settled elsewhere)
-		_clear_table()
-		_enter_bet(P0Blackjack.deal_again_bet(view, int(P0Blackjack.info(view).get("last_bet", 0))))
-	if phase == Phase.BET and bet > 0 and not P0Blackjack.can_add(view, bet, 0): _enter_bet(0)
+	elif phase != Phase.BET:   # the hand went (settled, refused, elsewhere): last stake back in the circle
+		if _result.is_empty(): _clear_table()
+		_rebet()
+	if phase == Phase.BET and bet > 0 and not P0Blackjack.can_add(view, bet, 0): _rebet()
 	if not _running: _roll_coins(P0Blackjack.coins_of(view))
 	_lay_cards(false)
 	_refresh_keys()
@@ -581,21 +534,18 @@ func _step_dealt(e: Dictionary) -> float:
 	var p: Array = (h.get("hands", [{}])[0] as Dictionary).get("cards", [])
 	var d: Array = h.get("dealer", [])
 	var hand := _new_hand(int(e.get("bet", 0)))
-	_lay_cards(false)
 	var order := [[hand, p[0] if p.size() > 0 else ""], [null, d[0] if d.size() > 0 else ""],
 		[hand, p[1] if p.size() > 1 else ""], [null, d[1] if d.size() > 1 else ""]]
 	var t := 0.0
 	for k in order.size():
-		var code := str(order[k][1])
-		var card := _new_card(code, shoe_pos())
+		var card := _new_card(str(order[k][1]), shoe_pos())
 		if order[k][0] == null: _dealer_cards.append(card)
 		else: (hand.cards as Array).append(card)
 		card.visible = not animate
 		if animate:
-			var delay := t
-			get_tree().create_timer(delay).timeout.connect(func():
+			get_tree().create_timer(t).timeout.connect(func():
 				if is_instance_valid(card): card.visible = true
-				_lay_cards(true))
+				if is_inside_tree(): _lay_cards(true))
 		t += _fly()
 	if not animate: _lay_cards(false)
 	return t + 0.05
@@ -616,16 +566,18 @@ func _step_card(e: Dictionary, target_hands: int) -> float:
 		return _fly() + UiKit.secs(UiTokens.MOTION_PENDING_DELAY_MS)
 	var k := int(e.get("hand_index", 0))
 	if _hands.size() < target_hands and _hands.size() == 1 and (_hands[0].cards as Array).size() == 2:
-		# Split: the pair's second card moves over to become the second hand.
+		# Split: the pair's second card moves over to become the second hand; a second stake joins the circle.
 		var moved: UiPlayingCard = (_hands[0].cards as Array).pop_back()
 		var second := _new_hand(int(_hands[0].bet))
 		(second.cards as Array).append(moved)
-		_set_stack(int(_hands[0].bet) * 2)
 	while _hands.size() <= k: _new_hand(int(_hands[0].bet) if not _hands.is_empty() else bet)
 	var card := _new_card(str(e.get("card", "")), shoe_pos())
 	(_hands[k].cards as Array).append(card)
 	var ev_hands: Array = P0Blackjack.hand(view).get("hands", [])
 	if k < ev_hands.size(): _hands[k].bet = int(ev_hands[k].get("bet", _hands[k].bet))
+	var total := 0
+	for hd in _hands: total += int(hd.bet)
+	_set_stack(total)   # a split's or a double's second stake shows in the circle
 	_lay_cards(true)
 	return _fly() + 0.08
 
@@ -634,9 +586,10 @@ func _step_result(e: Dictionary) -> float:
 		_clear_table()
 		show_settled(P0Blackjack.settled_line(e))
 		_roll_coins(P0Blackjack.coins_of(view))
-		_enter_bet(P0Blackjack.deal_again_bet(view, int(P0Blackjack.info(view).get("last_bet", 0))))
+		phase = Phase.RESULT
+		_result = {}
+		_rebet()
 		return 0.0
-	# the dealer's cards as settled (when the reply left some unplayed: a peek)
 	var dealer: Array = e.get("dealer", [])
 	for i in dealer.size():
 		if i < _dealer_cards.size():
@@ -655,13 +608,14 @@ func _step_result(e: Dictionary) -> float:
 		var f := P0Blackjack.float_text(int(hands[k].get("net", 0)))
 		if f != "": _float(f, _hand_top(k))
 	_roll_coins(P0Blackjack.coins_of(view))
-	return UiKit.secs(UiTokens.MOTION_FLOAT_TEXT_MS) * 0.5
+	# then last hand's stake sets itself in the circle again and `Deal` deals again (C13)
+	_steps.push_front(func(): _rebet(); _lay_cards(false); return 0.0)
+	return UiKit.secs(UiTokens.MOTION_FLOAT_TEXT_MS)
 
 func _hand_top(k: int) -> Vector2:
 	var cards: Array = _hands[k].cards
 	var first := card_pos(k, 0, _hands.size(), maxi(1, cards.size()))
-	var width := hand_width(_hands.size(), cards.size())
-	return felt.position + first + Vector2(width * 0.5, -30.0)
+	return on_page(first + Vector2(hand_width(_hands.size(), cards.size()) * 0.5, -30.0))
 
 func _float(text: String, at: Vector2) -> void:
 	var f := UiFloatText.new(text, UiFloatText.Tone.COINS, ICON_COIN)
@@ -671,9 +625,7 @@ func _float(text: String, at: Vector2) -> void:
 
 func _set_coins_text(t: String) -> void:
 	coins_label.text = t
-	if coins_pill.is_inside_tree():
-		coins_pill.size = coins_pill.get_combined_minimum_size()
-		coins_pill.position.x = size.x - UiTokens.SPACE_PAGE - coins_pill.size.x
+	if coins_pill.is_inside_tree(): _fit_coins()
 
 func _roll_coins(to: int) -> void:
 	if _coins_tween != null and _coins_tween.is_valid(): _coins_tween.kill()
@@ -691,7 +643,8 @@ func _roll_coins(to: int) -> void:
 
 func _new_card(code: String, at := Vector2.INF) -> UiPlayingCard:
 	var c := UiPlayingCard.new(code)
-	felt.add_child(c)
+	table.add_child(c)
+	table.move_child(c, hands_box.get_index())   # under the badges and tags
 	if at.is_finite(): c.position = at
 	return c
 
@@ -707,14 +660,12 @@ func _new_hand(stake: int) -> Dictionary:
 	outline.visible = false
 	hands_box.add_child(outline)
 	var tag := _badge()
-	tag.z_index = 2   # over the cards' top edge it sits on
-	var ts := tag.get_theme_stylebox(&"panel") as StyleBoxFlat
-	ts.bg_color = UiTokens.COLOR_SURFACE_RAISED
+	(tag.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_SURFACE_RAISED
 	(tag.get_node("Text") as Label).add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT)
 	hands_box.add_child(tag)
 	var badge := _badge()
 	hands_box.add_child(badge)
-	var stake_l := UiKit.label("", UiTokens.STYLE_C12_B, UiKit.alpha(FELT_INK, 0.8))
+	var stake_l := UiKit.label("", UiTokens.STYLE_C12_B, UiKit.alpha(INK, 0.8))
 	stake_l.visible = false
 	hands_box.add_child(stake_l)
 	var hand := {"cards": [], "bet": stake, "badge": badge, "tag": tag, "stake": stake_l, "outline": outline}
@@ -733,55 +684,56 @@ func _clear_table() -> void:
 ## The chips drawn in the circle: the player's own stack while betting, else the stake in its largest chips.
 func _set_stack(total: int) -> void:
 	bet = total
-	if P0Blackjack.chips_for(total) != stack and stack.reduce(func(a, b): return a + b, 0) != total:
-		stack = P0Blackjack.chips_for(total)
+	if stack.reduce(func(a, b): return a + b, 0) != total: stack = P0Blackjack.chips_for(total)
 	circle.set_stack(stack)
 	bet_label.text = P0Blackjack.comma(total) if total > 0 else ""
+	_layout_bet_label()
+
+func _layout_bet_label() -> void:
+	bet_label.size = bet_label.get_combined_minimum_size()
+	bet_label.position = Vector2(_CIRCLE.x + _CIRCLE_R + 12.0, _CIRCLE.y - bet_label.size.y * 0.5)   # x 240
 
 func _enter_bet(preset: int) -> void:
 	phase = Phase.BET
-	_result = {}
 	stack = P0Blackjack.chips_for(preset)
 	_set_stack(preset)
+
+## After a result (or a hand gone): last hand's stake back in the circle, stepped down to keep the floor (§3, C13).
+func _rebet() -> void:
+	_enter_bet(P0Blackjack.deal_again_bet(view, _last_bet()))
 
 # ---------------------------------------------------------------- keys
 
 func _busy() -> bool: return _waiting or _running
 
 func _refresh_keys() -> void:
-	var low := phase == Phase.BET and P0Blackjack.low_on_coins(view) and bet == 0
+	var betting := phase == Phase.BET
+	var low := betting and P0Blackjack.low_on_coins(view) and bet == 0
 	var expired := bool(P0Blackjack.hand(view).get("expired", false))
-	tray.visible = phase == Phase.BET
-	clear_key.visible = phase == Phase.BET
-	deal_key.visible = phase == Phase.BET
-	for k in [hit_key, stand_key, double_key, split_key]: (k as Control).visible = phase == Phase.PLAY and not expired and not _running
-	again_key.visible = phase == Phase.RESULT and not _running
-	change_key.visible = phase == Phase.RESULT and not _running
+	var playing := phase == Phase.PLAY and not expired and not _running
+	deal_key.visible = betting
+	for k in [hit_key, stand_key, double_key, split_key]: (k as Control).visible = playing
 	circle.visible = not low
+	empty_label.visible = betting and not low and bet == 0
 	low_label.visible = low
+	low_need.visible = low
+	low_need.text = P0Blackjack.need_text(P0Blackjack.need(P0Blackjack.coins_of(view), P0Blackjack.min_bet_of(view), P0Blackjack.floor_of(view)))
 	bet_label.visible = not low and bet > 0
-	lines.visible = true
-	if phase == Phase.BET:
-		for i in chips.size():
-			var c: UiChipToken = chips[i]
-			if not (_press.get("index", -1) == i and _ghost != null):
-				c.state = UiChipToken.State.DEFAULT if P0Blackjack.can_add(view, bet, c.value) else UiChipToken.State.DISABLED
+	for s in stacks:
+		var st: UiChipStack = s
+		var v := int(st.values[0])
+		st.state = UiChipToken.State.DEFAULT if betting and not _busy() and P0Blackjack.can_add(view, bet, v) else UiChipToken.State.DISABLED
+	if betting:
 		var dk := P0Blackjack.deal_key(view, bet)
-		deal_key.label = str(dk.label)
-		deal_key.reason = str(dk.reason)
-		clear_key.disabled = bet == 0
-	elif phase == Phase.PLAY:
+		deal_key.enabled = bet > 0 and str(dk.reason) == "" and not _busy()
+		deal_key.reason = str(dk.reason) if bet > 0 else ""   # empty: the circle's `Place a bet` says it; low: printed there
+	elif playing:
 		var keys := P0Blackjack.action_keys(view)
 		for pair in [[hit_key, "hit"], [stand_key, "stand"], [double_key, "double"], [split_key, "split"]]:
-			var k: UiCommandButton = pair[0]
+			var k: UiFeltAction = pair[0]
 			var spec: Dictionary = keys[pair[1]]
-			k.label = str(spec.label)
+			k.enabled = bool(spec.enabled)
 			k.reason = str(spec.reason)
-			k.disabled = not bool(spec.enabled) and str(spec.reason) == ""
-	elif phase == Phase.RESULT:
-		var again := P0Blackjack.deal_again_bet(view, _last_bet())
-		again_key.label = "Deal again · " + P0Blackjack.comma(again) if again > 0 else "Deal again"
-		again_key.reason = "" if again > 0 else P0Blackjack.need_text(P0Blackjack.need(P0Blackjack.coins_of(view), P0Blackjack.min_bet_of(view), P0Blackjack.floor_of(view)))
 
 func _last_bet() -> int:
 	var lb := int(P0Blackjack.info(view).get("last_bet", 0))
@@ -795,9 +747,10 @@ func opened() -> void:
 	command.emit({"type": "bj_open"})
 
 func deal(amount: int) -> void:
-	if _busy() or amount <= 0: return
+	if _busy() or phase != Phase.BET or amount <= 0: return
 	if P0Blackjack.need(P0Blackjack.coins_of(view), amount, P0Blackjack.floor_of(view)) > 0: return
 	_waiting = true
+	_refresh_keys()
 	command.emit({"type": "bj_deal", "bet": amount})
 
 func act(action: String) -> void:
@@ -805,23 +758,9 @@ func act(action: String) -> void:
 	_waiting = true
 	command.emit({"type": "bj_act", "action": action})
 
-func deal_again() -> void:
-	var b := P0Blackjack.deal_again_bet(view, _last_bet())
-	if b <= 0:
-		change_bet()
-		return
-	stack = P0Blackjack.chips_for(b)
-	deal(b)
-
-func change_bet() -> void:
-	if _busy(): return
-	_clear_table()
-	_enter_bet(P0Blackjack.deal_again_bet(view, _last_bet()))
-	_lay_cards(false)
-	_refresh_keys()
-
-func clear_bet() -> void:
-	if phase != Phase.BET: return
+## Tap the stake in the circle: it all goes back to the rail (C13, in place of Clear).
+func take_back() -> void:
+	if phase != Phase.BET or _busy() or bet == 0: return
 	stack = []
 	_set_stack(0)
 	_refresh_keys()
@@ -861,15 +800,16 @@ func _chip_input(event: InputEvent, i: int) -> void:
 	var down: bool = (event is InputEventScreenTouch and event.pressed) or \
 		(event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not DisplayServer.is_touchscreen_available())
 	if not down or not _press.is_empty(): return
-	var c: UiChipToken = chips[i]
-	if phase != Phase.BET or _busy() or c.state == UiChipToken.State.DISABLED: return
+	var s: UiChipStack = stacks[i]
+	if phase != Phase.BET or _busy() or s.state == UiChipToken.State.DISABLED: return
 	accept_event()
-	_press = {"index": i, "start": _local(event), "t0": Time.get_ticks_msec(), "touch": event is InputEventScreenTouch,
+	_press = {"index": i, "start": _page_pos(event), "t0": Time.get_ticks_msec(), "touch": event is InputEventScreenTouch,
 		"id": event.index if event is InputEventScreenTouch else -1}
 
-func _local(event: InputEvent) -> Vector2:
-	return get_global_transform_with_canvas().affine_inverse() * (event as InputEventFromWindow).position \
-		if event is InputEventFromWindow else Vector2.ZERO
+## A window event's position in this page's coordinates.
+func _page_pos(event: InputEvent) -> Vector2:
+	var p: Vector2 = get_viewport().get_canvas_transform().affine_inverse() * (event as InputEventFromWindow).position
+	return get_global_transform().affine_inverse() * p
 
 func _input(event: InputEvent) -> void:
 	if _press.is_empty(): return
@@ -877,14 +817,13 @@ func _input(event: InputEvent) -> void:
 	if touch and not (event is InputEventScreenTouch or event is InputEventScreenDrag): return
 	if not touch and not (event is InputEventMouseButton or event is InputEventMouseMotion): return
 	if touch and int(event.get("index")) != int(_press.id): return
-	var pos: Vector2 = get_viewport().get_canvas_transform().affine_inverse() * (event as InputEventFromWindow).position
-	pos = get_global_transform().affine_inverse() * pos
+	var pos := _page_pos(event)
 	var moving: bool = event is InputEventScreenDrag or event is InputEventMouseMotion
 	var up: bool = (event is InputEventScreenTouch and not event.pressed) or (event is InputEventMouseButton and not event.pressed)
 	if moving:
 		if _ghost == null and pos.distance_to(_press.start) > GestureArbiter.TAP_SLOP: _begin_drag()
 		if _ghost != null:
-			_ghost.position = pos - _ghost.size * 0.5 + Vector2(0, -UiChipToken.SIZE * 0.6)   # under the finger, still seen
+			_ghost.position = pos - _ghost.size * 0.5 + Vector2(0, -UiChipToken.SIZE * 0.6)   # above the finger, still seen
 			circle.lit = over_circle(_ghost.position + _ghost.size * 0.5)
 		get_viewport().set_input_as_handled()
 	elif up:
@@ -895,20 +834,31 @@ func _input(event: InputEvent) -> void:
 		if _ghost != null: _drop(i)
 		elif quick: tap_chip(i)
 
-func over_circle(p: Vector2) -> bool: return p.distance_to(circle_center()) <= _CIRCLE_R + _CIRCLE_HIT
+func over_circle(p: Vector2) -> bool: return p.distance_to(circle_center()) <= (_CIRCLE_R + _CIRCLE_HIT) * table.scale.x
+
+## Where a chip lifted from stack i starts, on the page.
+func stack_top(i: int) -> Vector2:
+	var s: UiChipStack = stacks[i]
+	return on_page(s.position + s.top_centre())
+
+func _chip_token(value: int, state := UiChipToken.State.DEFAULT) -> UiChipToken:
+	var t := UiChipToken.new(value, state)
+	t.table_look = true
+	t.scale *= table.scale.x
+	add_child(t)
+	return t
 
 func _begin_drag() -> void:
-	var c: UiChipToken = chips[int(_press.index)]
-	_ghost = UiChipToken.new(c.value, UiChipToken.State.DRAGGING)
-	_ghost.position = tray.position + c.position
-	add_child(_ghost)
+	var s: UiChipStack = stacks[int(_press.index)]
+	_ghost = _chip_token(int(s.values[0]), UiChipToken.State.DRAGGING)
+	_ghost.position = stack_top(int(_press.index)) - _ghost.size * 0.5
 
 func _drop(i: int) -> void:
 	var g := _ghost
 	_ghost = null
 	var landed := circle.lit and P0Blackjack.can_add(view, bet, g.value)
 	circle.lit = false
-	var to := circle_center() - g.size * 0.5 if landed else tray.position + (chips[i] as Control).position
+	var to := (circle_center() if landed else stack_top(i)) - g.size * 0.5
 	var v := g.value
 	if not animate:
 		g.free()
@@ -920,62 +870,58 @@ func _drop(i: int) -> void:
 		g.queue_free()
 		if landed: add_chip(v))
 
-## A tap on chip i: it flies from the tray into the circle and the bet grows by its value.
+## A tap on stack i: one chip flies from it into the circle and the bet grows by its value.
 func tap_chip(i: int) -> void:
-	var c: UiChipToken = chips[i]
-	if phase != Phase.BET or _busy() or not P0Blackjack.can_add(view, bet, c.value): return
+	var s: UiChipStack = stacks[i]
+	var v := int(s.values[0])
+	if phase != Phase.BET or _busy() or not P0Blackjack.can_add(view, bet, v): return
 	if not animate:
-		add_chip(c.value)
+		add_chip(v)
 		return
-	var f := UiChipToken.new(c.value)
-	f.position = tray.position + c.position
-	add_child(f)
-	bet += c.value   # counted at once so a quick second tap sees it; drawn when it lands
+	var f := _chip_token(v)
+	f.position = stack_top(i) - f.size * 0.5
+	bet += v   # counted at once so a quick second tap sees it; drawn when it lands
 	_refresh_keys()
 	var t := create_tween()
 	t.tween_property(f, "position", circle_center() - f.size * 0.5, _fly()).set_ease(Tween.EASE_OUT)
 	t.tween_callback(func():
 		f.queue_free()
-		bet -= c.value
-		add_chip(c.value))
+		bet -= v
+		add_chip(v))
 
-## The felt's print arc: a faint line, the table's edge (BJ-BET "Table print arc").
-class _Arc extends Control:
-	func _init() -> void:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-	func _draw() -> void:
-		draw_arc(size * 0.5, size.x * 0.5, 0.0, TAU, 160, UiKit.alpha(Color("FBF8F1"), 0.22), 1.0, true)
-
-## The bet circle: a ring on the felt (lit while a dragged chip is over it) and the stack, at most CIRCLE_MAX drawn.
+## The bet circle printed on the felt: a thin ring (brighter while a dragged chip is over it), the stake stacked in it
+## (at most CIRCLE_MAX drawn). A tap on it takes the stake back.
 class _Circle extends Control:
+	signal tapped
 	var lit := false: set = set_lit
-	var _chips: Array = []
+	var _stack: UiChipStack
 
 	func _init() -> void:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		mouse_filter = Control.MOUSE_FILTER_STOP
+		_stack = UiChipStack.new()
+		add_child(_stack)
 
 	func set_lit(v: bool) -> void:
 		lit = v
 		queue_redraw()
 
 	func set_stack(values: Array) -> void:
-		for c in _chips: (c as Node).free()
-		_chips = []
-		var shown := values.slice(maxi(0, values.size() - P0Blackjack.CIRCLE_MAX))
-		for i in shown.size():
-			var t := UiChipToken.new(int(shown[i]))
-			t.position = size * 0.5 - t.size * 0.5 + Vector2(0, (shown.size() - 1) * 2.5 - i * 5.0)   # 5 up each (BJ-BET stack)
-			add_child(t)
-			_chips.append(t)
+		_stack.values = values.slice(maxi(0, values.size() - P0Blackjack.CIRCLE_MAX))
+		_stack.position = (size - _stack.size) * 0.5 + Vector2(0, (_stack.values.size() - 1) * UiChipStack.STEP * 0.5)
 
-	## BJ-BET: a 2 px light ring on a faint fill; BJ-DRAG: a white 3 px ring with a soft glow.
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED: set_stack(_stack.values)
+
+	func _gui_input(event: InputEvent) -> void:
+		var up: bool = (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed) \
+			or (event is InputEventScreenTouch and not event.pressed)
+		if up: tapped.emit()
+
 	func _draw() -> void:
 		var r := size.x * 0.5
 		var c := size * 0.5
 		if lit:
 			draw_circle(c, r + 6.0, UiKit.alpha(Color.WHITE, 0.10))
-			draw_circle(c, r, UiKit.alpha(Color.WHITE, 0.30))
 			draw_arc(c, r - 1.5, 0.0, TAU, 64, Color.WHITE, 3.0, true)
 		else:
-			draw_circle(c, r, UiKit.alpha(Color.BLACK, 0.06))
-			draw_arc(c, r - 1.0, 0.0, TAU, 64, UiKit.alpha(Color("FBF8F1"), 0.55), 2.0, true)
+			draw_arc(c, r - 1.0, 0.0, TAU, 64, UiKit.alpha(Color("FBF8F1"), 0.6), 1.5, true)

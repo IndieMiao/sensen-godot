@@ -42,24 +42,27 @@ func _codes(cards: Array) -> Array: return cards.map(func(c): return (c as UiPla
 
 func test_tapping_chips_builds_the_bet_and_greys_what_would_break_the_floor() -> void:
 	_open(300)
-	assert_str(page.deal_key.reason).is_equal("Place a bet")
+	assert_bool(page.deal_key.enabled).is_false()   # empty: the circle says Place a bet
+	assert_str(page.deal_key.reason).is_equal("")
+	assert_bool(page.empty_label.visible).is_true()
 	page.tap_chip(3)   # 100
 	page.tap_chip(1)
 	page.tap_chip(1)
 	assert_int(page.bet).is_equal(120)
-	assert_str(page.deal_key.label).is_equal("Deal · 120")
-	assert_str(page.deal_key.reason).is_equal("")
-	assert_int(page.chips[4].state).is_equal(UiChipToken.State.DISABLED)   # 500: 300 − 620 < 40
-	assert_int(page.chips[5].state).is_equal(UiChipToken.State.DISABLED)
-	assert_int(page.chips[3].state).is_equal(UiChipToken.State.DEFAULT)
+	assert_str(page.deal_key.text).is_equal("Deal")   # no amount on the action (C13)
+	assert_bool(page.deal_key.enabled).is_true()
+	assert_str(page.bet_label.text).is_equal("120")
+	assert_int(page.stacks[4].state).is_equal(UiChipToken.State.DISABLED)   # 500: 300 − 620 < 40
+	assert_int(page.stacks[5].state).is_equal(UiChipToken.State.DISABLED)
+	assert_int(page.stacks[3].state).is_equal(UiChipToken.State.DEFAULT)
 	page.tap_chip(4)   # grey: nothing
 	assert_int(page.bet).is_equal(120)
 	page.tap_chip(3)   # 220 on: 100 more would leave 0, so 100 greys too
-	assert_int(page.chips[3].state).is_equal(UiChipToken.State.DISABLED)
-	page.clear_bet()
+	assert_int(page.stacks[3].state).is_equal(UiChipToken.State.DISABLED)
+	page.circle.tapped.emit()   # tapping the stake takes it all back (no Clear)
 	assert_int(page.bet).is_equal(0)
-	assert_int(page.chips[3].state).is_equal(UiChipToken.State.DEFAULT)   # back at once
-	assert_int(page.chips[4].state).is_equal(UiChipToken.State.DISABLED)   # 500 never fits a 300 wallet
+	assert_int(page.stacks[3].state).is_equal(UiChipToken.State.DEFAULT)   # back at once
+	assert_int(page.stacks[4].state).is_equal(UiChipToken.State.DISABLED)   # 500 never fits a 300 wallet
 
 func _vp(local: Vector2) -> Vector2:
 	return page.get_viewport().get_canvas_transform() * page.get_global_transform() * local
@@ -77,7 +80,7 @@ func _motion(pos: Vector2) -> InputEventMouseMotion:
 	return e
 
 func _chip_centre(i: int) -> Vector2:
-	return page.tray.position + (page.chips[i] as Control).position + Vector2.ONE * UiChipToken.SIZE * 0.5
+	return page.stack_top(i)
 
 func test_drag_into_the_circle_adds_and_outside_returns() -> void:
 	_open(300)
@@ -85,14 +88,14 @@ func test_drag_into_the_circle_adds_and_outside_returns() -> void:
 	page._chip_input(_mouse(from, true), 2)
 	page._input(_motion(from + Vector2(0, -30)))   # past the tap slop: a drag
 	assert_object(page._ghost).is_not_null()
-	assert_int(page.chips[2].state).is_equal(UiChipToken.State.DEFAULT)   # the tray's chip stays
-	var over := page.circle_center() + Vector2(0, UiChipToken.SIZE * 0.6)   # the ghost rides above the finger
+	assert_int(page.stacks[2].state).is_equal(UiChipToken.State.DEFAULT)   # the rail's stack stays
+	var over := page.circle_center() + Vector2(0, UiChipToken.SIZE * 0.6 * page.table.scale.x)   # the ghost rides above the finger
 	page._input(_motion(over))
 	assert_bool(page.circle.lit).is_true()
 	page._input(_mouse(over, false))
 	assert_int(page.bet).is_equal(50)
 	assert_bool(page.circle.lit).is_false()
-	# outside: back to the tray, nothing added
+	# outside: back to the rail, nothing added
 	page._chip_input(_mouse(from, true), 2)
 	page._input(_motion(from + Vector2(0, -30)))
 	page._input(_motion(Vector2(40, 200)))
@@ -113,7 +116,7 @@ func test_a_grey_chip_takes_neither_tap_nor_drag() -> void:
 	_open(300)
 	page.tap_chip(3)
 	page.tap_chip(3)   # 200 on: 50 is the most that keeps 40 (300 − 260 = 40)
-	assert_int(page.chips[3].state).is_equal(UiChipToken.State.DISABLED)
+	assert_int(page.stacks[3].state).is_equal(UiChipToken.State.DISABLED)
 	var at := _chip_centre(3)
 	page._chip_input(_mouse(at, true), 3)
 	assert_bool(page._press.is_empty()).is_true()
@@ -126,34 +129,34 @@ func test_deal_stand_and_result() -> void:
 	assert_array(_codes(page._hands[0].cards)).is_equal(["9S", "8H"])
 	assert_array(_codes(page._dealer_cards)).is_equal(["7D", ""])
 	assert_str(page.coins_label.text).is_equal("380")
-	assert_str(page.double_key.label).is_equal("Double · 120")
+	assert_str(page.double_key.text).is_equal("Double")
+	assert_bool(page.split_key.enabled).is_false()
 	assert_str(page.split_key.reason).is_equal("Pairs only")
 	page.act("stand")
 	await _frames()
-	assert_int(page.phase).is_equal(P0BlackjackPage.Phase.RESULT)
-	assert_array(_codes(page._dealer_cards)).is_equal(["7D", "TC"])
+	assert_array(_codes(page._dealer_cards)).is_equal(["7D", "TC"])   # the cards stay until the next deal
 	assert_str((page._hands[0].tag.get_node("Text") as Label).text).is_equal("Push")
 	assert_str(page.coins_label.text).is_equal("500")
-	assert_str(page.again_key.label).is_equal("Deal again · 120")
+	# then last hand's stake sets itself in the circle and Deal deals again
+	assert_int(page.phase).is_equal(P0BlackjackPage.Phase.BET)
+	assert_int(page.bet).is_equal(120)
+	assert_bool(page.deal_key.visible and page.deal_key.enabled).is_true()
+	page.deal_key.press()
+	assert_dict(sent[-1]).is_equal({"type": "bj_deal", "bet": 120})
 
 func test_blackjack_settles_in_the_deal() -> void:
 	_open(500)
 	await _deal(["AS", "7D", "KH", "9C"], 5)
-	assert_int(page.phase).is_equal(P0BlackjackPage.Phase.RESULT)
 	assert_str((page._hands[0].tag.get_node("Text") as Label).text).is_equal("Blackjack")
 	assert_str(page.coins_label.text).is_equal("507")
 
-func test_deal_again_steps_down_when_short() -> void:
+func test_the_rebet_steps_down_when_short() -> void:
 	_open(200)
-	await _deal(["9S", "7D", "8H", "TC", "2C"], 120)   # 17 v 17: push, wallet back to 200
-	page.act("hit")   # 19
-	await _frames()
+	await _deal(["9S", "KD", "8H", "TC"], 120)   # 17 against 20: lose, 80 left
 	page.act("stand")
 	await _frames()
-	var coins := P0Blackjack.coins_of(page.view)
-	var want := P0Blackjack.deal_again_bet(page.view, 120)
-	assert_int(want).is_equal(mini(120, (coins - 40) / 5 * 5))
-	assert_str(page.again_key.label).is_equal("Deal again · " + P0Blackjack.comma(want))
+	assert_str(page.coins_label.text).is_equal("80")
+	assert_int(page.bet).is_equal(40)   # 120 stepped down to keep 40, never back up on its own
 
 func test_split_lays_two_hands_and_plays_left_first() -> void:
 	_open(600)
@@ -175,8 +178,10 @@ func test_low_on_coins_is_the_closed_table() -> void:
 	_open(43)
 	assert_bool(page.low_label.visible).is_true()
 	assert_bool(page.circle.visible).is_false()
-	assert_str(page.deal_key.reason).is_equal("Need 2 more coins")
-	for c in page.chips: assert_int((c as UiChipToken).state).is_equal(UiChipToken.State.DISABLED)
+	assert_bool(page.low_need.visible).is_true()
+	assert_str(page.low_need.text).is_equal("Need 2 more coins")
+	assert_bool(page.deal_key.enabled).is_false()
+	for c in page.stacks: assert_int((c as UiChipStack).state).is_equal(UiChipToken.State.DISABLED)
 
 func test_a_hand_in_play_comes_back_as_it_was() -> void:
 	bj = P0BlackjackMock.new(5)

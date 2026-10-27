@@ -58,7 +58,8 @@ func _run() -> void:
 		quit()
 		return
 	var states := ["bj-bet", "bj-bet-empty", "bj-bet-cap", "bj-drag", "bj-low", "bj-act", "bj-act-grey", "bj-split",
-		"bj-result-blackjack", "bj-result-lose", "bj-result-bust", "bj-result-push", "bj-rules", "bj-intro", "bj-settled"]
+		"bj-result-blackjack", "bj-result-lose", "bj-result-bust", "bj-result-push", "bj-rules", "bj-intro", "bj-settled",
+		"bj-tall", "bj-short"]
 	for s in states:
 		if not _want(s): continue
 		var rig: Rig = await call("_state_" + s.replace("-", "_"))
@@ -90,7 +91,7 @@ func _state_bj_drag() -> Rig:
 	var p := r.page
 	p._press = {"index": 2, "start": Vector2.ZERO, "t0": 0, "touch": false, "id": -1}
 	p._begin_drag()
-	p._ghost.position = p.circle_center() - p._ghost.size * 0.5 + Vector2(22, 18)
+	p._ghost.position = p.circle_center() - p._ghost.size * 0.5 + Vector2(22, -18)
 	p.circle.lit = true
 	return r
 
@@ -156,6 +157,23 @@ func _state_bj_intro() -> Rig:
 	r.page.opened()
 	return r
 
+## Other screen proportions: the picture stays on the bottom edge (cropped from the top / sides).
+func _state_bj_tall() -> Rig:
+	var r := _rig(300)
+	_bet(r, [100, 10, 10])
+	r.page.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	r.page.size = Vector2(360, 860)
+	r.page.position = Vector2(0, -60)
+	return r
+
+func _state_bj_short() -> Rig:
+	var r := _rig(300)
+	_bet(r, [100, 10, 10])
+	r.page.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	r.page.size = Vector2(360, 720)
+	r.page.position = Vector2(0, 80)
+	return r
+
 func _state_bj_settled() -> Rig:
 	var r := _rig(320)
 	r.page.animate = true
@@ -209,12 +227,18 @@ func _move(p: Vector2) -> void:
 	Input.parse_input_event(e)
 	_finger.position = p
 
+## Press and release in one frame: frames saved to disk run far slower than real time, so a press held across frames
+## would outlast GestureArbiter.TAP_MAX_MS in wall-clock time and not count as a tap. The marker stays down a moment.
 func _tap(p: Vector2) -> void:
 	_move(p)
 	await _wait(0.15)
 	_mouse(p, true)
-	await _wait(0.1)
 	_mouse(p, false)
+	_finger.down = true
+	_finger.queue_redraw()
+	await _wait(0.1)
+	_finger.down = false
+	_finger.queue_redraw()
 
 func _drag(from: Vector2, to: Vector2, sec := 0.7, hold := 0.35) -> void:
 	_move(from)
@@ -229,7 +253,7 @@ func _drag(from: Vector2, to: Vector2, sec := 0.7, hold := 0.35) -> void:
 	_mouse(to, false)
 
 func _chip(page: P0BlackjackPage, i: int) -> Vector2:
-	return page.tray.position + (page.chips[i] as Control).position + Vector2.ONE * UiChipToken.SIZE * 0.5
+	return page.stack_top(i)
 
 func _centre(c: Control) -> Vector2: return c.get_global_rect().get_center()
 
@@ -264,7 +288,7 @@ func _video(dir: String) -> void:
 	await _wait(0.5)
 	await _drag(_chip(p, 5), p.circle_center(), 0.5, 0.2)          # 1K grey: no drag either
 	await _wait(0.8)
-	await _tap(_centre(p.clear_key))   # Clear: 0
+	await _tap(p.circle_center())      # tap the stake: it all goes back (no Clear)
 	await _wait(0.7)
 	await _tap(_chip(p, 3))
 	await _wait(0.3)
@@ -273,12 +297,12 @@ func _video(dir: String) -> void:
 	await _tap(_chip(p, 1))            # 120 again
 	await _wait(0.7)
 	r.mock.next_deck = ["9S", "6D", "8H", "TC", "4C"]
-	await _tap(_centre(p.deal_key))    # Deal · 120
+	await _tap(_centre(p.deal_key))    # Deal
 	await _wait(1.6)
 	await _tap(_centre(p.stand_key))   # Stand: the hole card turns over, the dealer draws, the result
 	await _wait(2.6)
 	r.mock.next_deck = ["TS", "7D", "QH", "9C"]
-	await _tap(_centre(p.again_key))   # Deal again · 120
+	await _tap(_centre(p.deal_key))    # the stake set itself again: Deal
 	await _wait(1.8)
 	_rec = false
 	await _settle()

@@ -1952,17 +1952,15 @@ func _dev_shot(dt: float) -> void:
 					session.space = "outpost"
 					session.place = "sf_card_room_1"
 				ui.open_blackjack({"place": "Barbary Card Room", "keeper": "Lou"})
-			"bjtap":   # bjtap:3 taps the tray's chip 3 (0 = 5 … 5 = 1K)
+			"bjtap":   # bjtap:3 taps the rail's stack 3 (0 = 5 … 5 = 1K)
 				if ui.blackjack() != null: ui.blackjack().tap_chip(int(step[1]))
 			"bjdeal":
 				if ui.blackjack() != null: ui.blackjack().deal(ui.blackjack().bet)
-			"bjact":   # bjact:hit|stand|double|split|again|change|clear|rules
+			"bjact":   # bjact:hit|stand|double|split|takeback|rules
 				var bjp := ui.blackjack()
 				if bjp != null:
 					match step[1]:
-						"again": bjp.deal_again()
-						"change": bjp.change_bet()
-						"clear": bjp.clear_bet()
+						"takeback": bjp.take_back()
 						"rules": bjp.open_rules()
 						_: bjp.act(step[1])
 			"bjdeck":   # bjdeck:AS:7D:KH:9C — the mock's next shoe (P0_BJ_MOCK only)
