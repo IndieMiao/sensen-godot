@@ -1,29 +1,45 @@
-# SGODOT-341 C-client-3 independent feedback draft
+# SGODOT-341 · C3 feedback and C2 integration
 
-Su Lie, 2026-10-27. Base: `origin/farm-dev c7ee6bb6` (includes C1). This is the independent C3 feedback slice, not full C2/C3 integration or release acceptance. The PR stays Draft.
+The final integration is **based on C2 c27deb33cd9e729b8e9f906dbe3b16ad63e96b44**, explicitly confirmed by the director after the initial 12a44f67 assignment. Merge commit and final tested code: `5b52ab9a`; the Pip dialogue fix is `9a720c9b`. The local server uses the complete #518 source **fef95d49af5663694f6a5ebe4c1d02b3b6c6dda6**, including the typed marks. No server changes are included in C3.
 
-## Scope and decisions
+## Result
 
-- q(215), gameplay plan §14.3 and 341 plan `7e740ad2`: fishing progress uses the goal before settlement. The last landed fish still says `Catch 2 fish 2/2` or `Catch 1 fish 1/1` when the returned view has already advanced or cleared recovery. It joins the existing catch floats after the fish reaches the hand; no new completion toast.
-- q(217) / q(229): `guide/action=resend` supplies the actual `bagged` amount. Only that portion floats/flies; a full bag uses the existing ordinary InboxNotice, with no seed pill. A first chat's affinity and the seeds share a group so they do not overlap. The explicit Pip reply survives the next-step line. Closing the conversation before a reply never reopens it. ItemFly keeps its existing visible-destination guard: no flight toward a Bag hidden under a dialogue; the confirmed quantity still floats above it.
-- Replayed seq does not repeat guide feedback. A pending reel retains its original goal across an empty refresh after a lost response; a new cast clears that snapshot. Only confirmed landed catches count, not escapes, trap collection or ordinary reads.
-- Scope corrected by the director on 2026-10-27: C3 contains only catch completion feedback, seed resend feedback and C2 integration. The entire q(235) notification work, including the early-sowing fallback and q(215) clause 10, belongs to Arthur on SGODOT-350. The notification helper, switch and three notification tests have been removed from this PR; C3 has no dependency on q(235) approval.
-
-## C2 interface boundary
-
-Alignment requested on 341 `dd496d10`; Liu Bang confirmed `e028023c`. C2 retains `guide_shown`, `guide_marks`, `pip`, `target_badge`; `resident_badge(view,id,place="")` adds a compatible optional argument. `P0Ui.resident_say(id,line)` and `resident_float_at(id)` stay. C2 candidate PR #516 at `d0c08ff6` already puts explicit `_reply` after the Pip step line; its Draft was still open during this scope correction. C2 owns FarmGuide frame/leave, farm suspend, NPC tags, ordinary marker restoration and Pip lifetime. C3 does not duplicate them.
-
-This branch consumes the existing C1 guide view and resident APIs, and exercises synthetic snapshots plus an isolated real local server. C2's final head must be integrated after it merges, then verify the actual farm Pip, reopen/step-change dialogue priority and the complete sequence. The current screenshots do not claim C2's farm Pip model is present. Ordinary-account `GUIDE_V3_READY` remains false.
+- The existing C3 feedback keeps the pre-settlement goal for `Catch 2 fish 2/2` and `Catch 1 fish 1/1`, including a lost reel reply followed by an empty refresh. Progress joins the existing landing float group; no new completion toast. Sequence replay does not duplicate guide feedback.
+- Pip's seed resend uses the confirmed `bagged` quantity. A full bag uses the ordinary InboxNotice; first-chat affinity and seeds share separate lines. Closing the dialogue before a reply does not reopen it. ItemFly retains its existing visible-Bag guard.
+- C2 owns the actual Pip, markers, pulse budgets and model lifetime. The integration found one dialogue boundary bug: the explicit resend reply remained after closing and reopening Pip, covering the current step sentence. The fix clears the old reply only for a new farm-Pip conversation. In-place rebuilds keep the confirmed answer. A regression failed at the reopened-line assertion before the fix (`report_468`), then passed with the fix.
+- C3 contains only feedback and C2 integration. All q(235) notification work, including early-sowing fallback, switches, asked-state, Settings Notifications and q(215) clause 10, belongs to SGODOT-350. None is implemented here. Ordinary accounts still do not send `guide_v3`.
 
 ## Verification
 
-- After the notification scope removal: `tests/p0 + tests/ui_kit` **1805/1805 passed**, 182 suites, 0 gdUnit errors/failures/skips/orphans, exit 0 (`report_467`, 3m 8.094s). The retained feedback suite has 13 cases. The prior 1808-case report included the three notification tests that have now been removed.
-- Covered: main 1/2 and terminal 2/2, recover 1/1 and 2/2 across target changes, stale earlier progress plus server step event, lost-reply refresh, new-cast reset, empty refresh, duplicate/out-of-order seq, timeout/legacy, non-landed catches, bagged 0/1/2, late response after closing dialogue, ordinary full-bag notice, first-chat/seed layout.
-- Capture fixtures are isolated `player-sulie-c3` saves produced by the existing server's freshState/viewOf. Main last catch enters t_meal with catch=2; recover catch leaves t_soup active with its fish requirement healed. Pip talk really emits resend and writes the two seeds or the parcel. No real account is used.
-- Media: four 360×800 screenshots and two 6-second / 30fps / 720×800 comparison videos. Fish video: main terminal left, recovery terminal right. Resend video: bag left, Inbox right; independent scenarios aligned to their feedback, not a single session.
-- Exported MP4s were probed and decoded to frame strips for inspection. Local source frames / capture logs / seed files are under `output/sulie-c3-341/`. Capture-only fixture scripts remain outside the repository at `/Volumes/ACASIS/tmp/sulie-badge/seed_c3.ts` and `c3_capture.py`.
-- Scripts used normal game mode and `--script` tests only. No `--import`, `--editor`, adb, emulator, phone, server deployment or save migration. Capture processes exited; the 3146 server, temporary override.cfg and dedicated capture user directory were cleaned. Existing capture shutdown logs report 5 ObjectDB instances, separate from gdUnit orphan results; no claim of a leak-free full game session.
+- Initial 12a44f67 integration: **1826/1826 passed** (`report_470`). Final c27deb33 integration at code head `5b52ab9a`: **1829/1829 passed**, 183 suites, 0 gdUnit errors/failures/skips/orphans, exit 0 (`report_471`, 3m 23.050s). Targeted guide feedback / world / catch-moment suites: **36 passed**. C3 has 14 feedback tests including the new integration regression.
+- On the unmodified #518 server snapshot, guide framework / s1 / director suites: **45 passed**. This exercises the server's main line and deviations; it is not a claim that every S0–S11 UI input was replayed on a physical device.
+- Isolated real HTTP and actual game scenes produced **56 passing functional checks** across six cases. Pip was opened with viewport mouse input; S11 used the existing request card action. The records retain actual guide views and command events.
 
-Review evidence and final counts: [SGODOT-341](https://plane.sensenjoy.cn/zili/browse/SGODOT-341/). Code review: Zhou Yu. Visual/video review: Bu Zhi Huo Wu. Merge and eventual release belong to the director after approvals and integration.
+| Case | Checks | Result |
+|---|---:|---|
+| Pip resend into bag, close/reopen, timeout, enter farmhouse and return | 10 | Model present, reply wins, exactly two seeds, new conversation uses current step; guidance ends immediately, model stays until leave, does not respawn. |
+| Full-bag resend and the same lifecycle | 11 | No seed-in-bag pill; ordinary InboxNotice appears after dialogue closes. |
+| Main final fish | 7 | #518 Cast mark pulses once; confirmed final catch shows 2/2, old target/pulse clears, no completion toast. |
+| Recovery final fish | 6 | No invented Cast mark; confirmed catch shows 1/1 and clears the healed recovery target. |
+| S11 normal completion | 6 | Real Six Radishes card accepts; server says done; ordinary Today/pulses restored; returning home has no Pip. See exit limitation below. |
+| c27deb33 water badges after a Pip resend | 16 | Confirmed resent seeds are sown into two plots, advancing to t_water. Two droplets and one Water pulse appear; Pip reads the water sentence, hides badges while speaking, and badges return after close without exceeding the pulse budget. Actual Water actions remove one badge per reply, then advance to t_sow_rest. |
 
-Test-log note: the full run also contains 39 existing freed-lambda engine diagnostics and one kitchen `_puff` backtrace. Counts match the preceding q(230) baseline run exactly; no GDScript parse/runtime errors or gdUnit failures. These existing diagnostics are not described as fixed by C3.
+## Visual review point
+
+The c27 water-badge capture at plot 0 shows the left droplet partly behind the expanded Reed Bank name strip. This is a concrete review point in the attached `341-c2c3-two-water-badges.png`; the C3 increment does not change badge placement. It is recorded for the C2/design walkthrough rather than claimed visually accepted.
+
+## Known process-exit limitation
+
+The normal-completion case passes all six functional checks and captures the returned farm, then the macOS Godot 4.7.2 process crashes during application termination (signal 11, process result -6). It reproduced on an isolated checkout of **original C2 12a44f67 without C3**, with the same six functional checks passing and the same termination stack shape. Two integration attempts and one C2 control reproduced it. C3 does not claim to fix the engine-exit failure or a clean exit for that case. The other five final captures exit 0. The exit control is against the assigned 12a44f67 C2 baseline; the subsequent c27deb33 change is limited to teaching-water badge drawing, hiding and tests.
+
+The QA driver originally checked pulse cleanup before C2's 100 ms refresh, and the dev-clock change originally lacked the following normal GET that settles the guide. These probe timing issues were corrected before final functional reports. Failed captures are kept local and not presented as passing materials. The existing capture shutdown ObjectDB warnings and full-suite engine diagnostics are not claimed fixed by C3.
+
+## Review media and environment
+
+Review files are in `output/sulie-c3-integration-341/`: real Pip resend and reopened dialogue, ordinary Inbox, timeout model retention/removal, main/recovery terminal fish, and normal S11 completion. Videos use wall-clock timestamps per captured frame, then encode at 30 fps; elapsed time is not inferred from sampled frame count. MP4s are decoded to strips for inspection. `341-c2c3-integration-report.json` explicitly separates functional checks and process exits, including the C2 control.
+
+The first five cases capture the 12a44f67 integration; the added water-badge conversation/action case captures final c27deb33. The final full suite covers their combined code. No production source changed after that suite except this report.
+
+All saves use isolated `player-sulie-c3` fixtures and a dedicated user directory. Server port 3146 and capture PIDs are owned by this run; override/user files are cleaned after each run. No Godot `--import` / `--editor`, adb, emulator, phone, production deployment or save migration. Temporary QA worktrees are disposable; no other agent's workspace is changed.
+
+Prior independent-feedback media remains on [SGODOT-341](https://plane.sensenjoy.cn/zili/browse/SGODOT-341/) `589739d2`; its code/design approvals applied to `fbc5891a`. This integration increment requires Zhou Yu's re-review and Bu Zhi Huo Wu's visual review. The director handles combined user review and merging.
