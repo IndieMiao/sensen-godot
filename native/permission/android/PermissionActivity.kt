@@ -46,12 +46,13 @@ class PermissionActivity : Activity() {
         answer(code == CODE && results.isNotEmpty() && results[0] == PackageManager.PERMISSION_GRANTED)
     }
 
-    // Gone without an answer: a denial, so the asker hears back and the next request can show its dialog. Home while
+    // Gone without an answer, not to be recreated: a denial, so the asker hears back and the next request can show its
+    // dialog (a config change outside configChanges — language, font size — recreates it, and the new one answers). Home while
     // the dialog is up, then the launcher icon, clears the task down to GodotActivity and finishes this one with the
     // dialog (李元芳 #519 6436847433 ⑧: before, the page waited for an answer that never came).
     override fun onDestroy() {
         super.onDestroy()
-        if (!answered) answer(false)
+        if (!answered && !isChangingConfigurations) answer(false)   // recreated for a config change: the new one answers
     }
 
     private fun answer(granted: Boolean) {
