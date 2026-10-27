@@ -82,6 +82,7 @@ var loading_card: Panel
 var error_card: PanelContainer
 var build: UiCommandButton
 var back_key: Button
+var credits: Label            # the map's credit line over the real map (q(133) ①, 不知火舞 342)
 var _places: Dictionary = {}  # id → UiMapDestination
 var _safe := Vector2.ZERO
 
@@ -131,15 +132,23 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	add_child(build)
 	back_key = _back_key()
 	add_child(back_key)
+	credits = UiKit.label("© Mapbox © OpenStreetMap", UiTokens.STYLE_BODY_R14)
+	credits.name = "MapCredits"
+	credits.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	credits.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	credits.add_theme_color_override(&"font_color", Color(UiTokens.COLOR_TEXT, CityMapView.CREDITS_ALPHA))
+	credits.add_theme_constant_override(&"outline_size", 0)
+	credits.visible = false
+	add_child(credits)
 	# over the places' names (UiMapDestination.NAME_Z 1, drawn over every disc): the pin, the panel, the card and keys
-	for n in [pin, panel, card, loading_card, error_card, build, back_key]: (n as CanvasItem).z_index = OVER_NAMES_Z
+	for n in [pin, panel, card, loading_card, error_card, build, back_key, credits]: (n as CanvasItem).z_index = OVER_NAMES_Z
 	resized.connect(_keep_pin)
 	show_loading()
 
 ## The page laid out again (a safe area, a rotation): the pin's tip moves on the screen, the point under it stays.
 func _keep_pin() -> void:
-	if area.is_empty(): return
-	map.pick_put(float(at[0]), float(at[1]), tip())
+	if area.is_empty() or not _map_live(): return
+	put(float(at[0]), float(at[1]))
 	_refresh()
 
 func _make_panel(heading: String) -> void:
@@ -270,9 +279,10 @@ func show_area(read: Dictionary) -> void:
 		return
 	failed = false
 	names = place_names(area, pond, p)
+	if map.has_method("pick_area"): map.pick_area(area.base.x, area.base.y, float(area.range_km))
 	var s := start_point()
 	at = [s[0], s[1]]
-	map.pick_put(s[0], s[1], tip())
+	put(s[0], s[1])
 	_make_places()
 	_refresh()
 
@@ -331,6 +341,16 @@ func show_failed() -> void:
 	_places.clear()
 	_refresh()
 
+## The map speaks the viewport's points; the page's own may sit elsewhere on it (a canvas layer, a parent's offset).
+func geo_at(p: Vector2) -> Array: return map.pick_geo_at(get_global_transform_with_canvas() * p)
+
+func screen_of(lat: float, lng: float) -> Variant:
+	var v = map.pick_screen_of(lat, lng)
+	return get_global_transform_with_canvas().affine_inverse() * (v as Vector2) if v != null else null
+
+## The map moved so (lat, lng) lies under the pin's tip.
+func put(lat: float, lng: float) -> void: map.pick_put(lat, lng, get_global_transform_with_canvas() * tip())
+
 ## The pin's tip on the screen: the middle of the map between the panel and the card.
 func tip() -> Vector2:
 	var top := _safe.x + _PANEL_H
@@ -343,26 +363,31 @@ func back_to_start() -> void:
 	if area.is_empty(): return
 	var s := start_point()
 	at = [s[0], s[1]]
-	map.pick_put(s[0], s[1], tip())
+	put(s[0], s[1])
 	_refresh()
 
 ## Each frame only asks the map where the tip is, where the circle's centre is on the screen, how near it is and
 ## whether it is dragged; the page and the overlay (some 540 dash arcs on a 10 km circle) redo only when one of those or
 ## the page's size moved (周瑜 on #495: 260 / 292 heat). The centre catches a map laid out again under a still tip.
 func _process(_dt: float) -> void:
-	if area.is_empty(): return
+	if area.is_empty() or not _map_live(): return
 	if _view_key() != _last_key: _refresh()
 
 var _last_key: Array = []
 func _view_key() -> Array:
-	return [map.pick_geo_at(tip()), map.pick_screen_of(area.base.x, area.base.y), map.pick_px_per_m(), map.pick_dragging(), size]
+	return [geo_at(tip()), screen_of(area.base.x, area.base.y), map.pick_px_per_m(), map.pick_dragging(), size]
+
+## The map is still there to read: the real one is popped before the page goes (a pick built, ‹ Change city).
+func _map_live() -> bool:
+	return map != null and (not map is Node or (is_instance_valid(map) and (map as Node).is_inside_tree()))
 
 func _refresh() -> void:
+	if not _map_live(): return
 	var ready := not area.is_empty()
 	_last_key = _view_key() if ready else []
 	var dragging := ready and bool(map.pick_dragging())
 	if ready:
-		var g: Array = map.pick_geo_at(tip())
+		var g: Array = geo_at(tip())
 		at = [float(g[0]), float(g[1])]
 		refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
 	else: refusal = {}
@@ -373,6 +398,7 @@ func _refresh() -> void:
 	card.visible = ready
 	loading_card.visible = not ready and not failed
 	error_card.visible = failed
+	_place_credits(ready)
 	var s := start_point()
 	back_key.visible = ready and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
 	if not ready:
@@ -387,6 +413,19 @@ func _refresh() -> void:
 	_place_places()
 	overlay.queue_redraw()
 
+## The map's credit line (q(133) ①; 不知火舞 342: as the map draws it, CityMapView's constants): over the real map only
+## — not while reading or failed, not on the page's own flat map (the desktop, the tests) — 16 pt from the left, its
+## bottom 6 pt over the card's top; a confirm card's scrim covers it.
+func _place_credits(ready: bool) -> void:
+	credits.visible = ready and not map is FlatMap and bool(map.pick_has_ground())
+	if not credits.visible: return
+	var k := float(map.pick_px_per_pt()) if map.has_method("pick_px_per_pt") else 1.0
+	var font := maxi(1, roundi(CityMapView.CREDITS_PT * k))
+	if credits.get_theme_font_size(&"font_size") != font: credits.add_theme_font_size_override(&"font_size", font)
+	var h := credits.get_combined_minimum_size().y
+	credits.size = Vector2(credits.get_combined_minimum_size().x, h)
+	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, card.position.y - CityMapView.CREDITS_GAP_PT * k - h)
+
 ## The grey key's words: the place's own name while it fits the key, else its general word (q(216) ③).
 func _key_text() -> String:
 	if refusal.is_empty(): return ""
@@ -397,7 +436,7 @@ func _key_text() -> String:
 	return str(t.key)
 
 func circle() -> Dictionary:
-	var c = map.pick_screen_of(area.base.x, area.base.y)
+	var c = screen_of(area.base.x, area.base.y)
 	if c == null: return {}
 	return {at = c, r = float(area.range_km) * 1000.0 * float(map.pick_px_per_m())}
 
@@ -409,11 +448,11 @@ func _place_veil() -> void:
 	mat.set_shader_parameter(&"veil", VEIL)
 
 func _place_places() -> void:
-	if area.is_empty(): return   # a name freed after the area went still says resized (周瑜 on #495)
+	if area.is_empty() or not _map_live(): return   # a name freed after the area went still says resized (周瑜 on #495)
 	for b in area.blocks:
 		var d: UiMapDestination = _places.get(b.id)
 		if d == null: continue
-		var s = map.pick_screen_of(b.at.x, b.at.y)
+		var s = screen_of(b.at.x, b.at.y)
 		d.visible = s != null
 		if s != null: d.position = (s as Vector2) - d.anchor_offset()
 
@@ -463,7 +502,7 @@ class Overlay extends Control:
 		var here := Vector2(page.at[0], page.at[1])
 		var r_m := float(page.area.clear_m)
 		for b in P0HomePin.shown_blocks(page.area, here):
-			var s = page.map.pick_screen_of(b.at.x, b.at.y)
+			var s = page.screen_of(b.at.x, b.at.y)
 			if s != null: dashed_circle(self, s, r_m * float(page.map.pick_px_per_m()), page.RING, 1.5, 5.0, 4.0)
 
 	static func dashed_circle(ci: CanvasItem, centre: Vector2, r: float, color: Color, width: float, dash: float, gap: float) -> void:

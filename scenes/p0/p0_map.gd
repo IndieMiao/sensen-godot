@@ -42,10 +42,14 @@ func _initial_region_id() -> String:
 ## The map opens over the home city (SGODOT-303): a generated home by its cluster's region, the written city by its
 ## own (San Francisco's curated region).
 func _initial_region() -> Dictionary:
+	if picking(): return P0Clusters.region(str(home_pick.get("cluster", "")))
 	return P0Clusters.region(P0Travel.home(_view()))
 
 func _ready() -> void:
 	rt = P0Runtime.ensure()
+	if picking():
+		_ready_pick()
+		return
 	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
 	CityMapData.set_region_provider(P0Clusters.region)   # every cluster is a city of the map (SGODOT-275)
 	super._ready()
@@ -766,6 +770,9 @@ func _map_logical_height() -> float:
 	return super._map_logical_height()
 
 func _exit_tree() -> void:
+	if picking():   # the map under it keeps its region provider (亚瑟 342 6418183a ①)
+		super._exit_tree()
+		return
 	CityMapData.set_region_provider(Callable())
 	if travelling():   # left mid-flight: nothing more to show here, but the chip and Energy must not stay held
 		_trip = {}
@@ -1032,6 +1039,7 @@ const SAFE_SIDE := 32.0
 
 ## In the air the map may go out past the city map's floor (z 2) to fit a long trip's two ends (q(152) ③, z 0.8).
 func _minimum_zoom() -> float:
+	if picking(): return _pick_min_zoom
 	var floor_z := super._minimum_zoom()
 	return minf(P0TravelFlight.TOP_MIN_ZOOM, floor_z) if travelling() else floor_z
 
@@ -1481,6 +1489,9 @@ func _open_account() -> void: pass
 # ---------------------------------------------------------------- stacking
 func resume() -> void:
 	super.resume()
+	if picking():   # the pin page's map is never the world (rt.attach) and draws no HUD of its own
+		$HUD.visible = false
+		return
 	rt.attach(self)
 	_poll_presence.call_deferred()   # back from a room: refresh the outpost online counts
 	_take_after_leave()
@@ -1568,6 +1579,9 @@ func p0_surface() -> String: return "map"
 ## (its city card, relocation, a farm selection). #92 brought P0's HUD and Bag to the map without this, so Bag, Today,
 ## the Inbox and the place cards could not be closed with Back there.
 func is_back_navigation_locked() -> bool:
+	if picking():   # Back is the home pick's, a layer at a time (亚瑟 342 6418183a ③): the map never pops itself
+		if rt != null: rt.ui.close_top_layer()
+		return true
 	if travelling():   # q(147): Back lands a flight (after its first 0.5 s); it never leaves the map mid-air
 		_skip_travel()
 		return true
@@ -1729,3 +1743,101 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_camera_dirty = true
 		_: return false
 	return true
+
+# ---------------------------------------------------------------- the home pick's map (SGODOT-342 PR-2)
+## The pin page's map (HOME-PIN, q(216) ②; 亚瑟 342 6418183a, plan A): a second P0 map pushed over whatever is up
+## (AppRouter.push_instance(MAP_SCENE, {home_pick: {cluster}}), popped by P0Runtime.close_pick_map on every way out).
+## The native map is one (Android / iOS reuse their MapView), so this is the camera and the gestures alone: no city map,
+## fog, pins, presence or avatar (_spawn_home_cohort), no HUD, never the runtime's world (rt.attach), and the region
+## provider the map under it set is left alone. North up and flat (pitch 0, bearing 0), so a screen point and the earth
+## convert both ways exactly (Web Mercator, doubles). The camera's centre stays in the 10 km circle's bounding box
+## (q(216) ②: its corners show beyond the circle) and zooms out no further than the whole circle across the screen.
+## The page reads it through pick_geo_at / pick_screen_of / pick_put / pick_dragging / pick_px_per_m / pick_has_ground,
+## and gives it the circle with pick_area; points are the viewport's.
+var home_pick: Dictionary = {}   # {cluster}: this map is the pin page's
+var _pick_min_zoom := PICK_ZOOM_MIN
+var _pick_ground := false
+## HOME-PIN-1's scale (about 137 px a km at San Francisco), the start; a street's at most.
+const PICK_ZOOM := 13.05
+const PICK_ZOOM_MIN := 9.0
+const PICK_ZOOM_MAX := 17.0
+## The whole circle across the screen's narrow side, less this much each side.
+const PICK_FIT_PAD := 16.0
+
+## AppRouter.push_instance's args (before _ready).
+func setup(args: Dictionary) -> void:
+	home_pick = args.get("home_pick", {}) if args.get("home_pick") is Dictionary else {}
+
+func picking() -> bool: return not home_pick.is_empty()
+
+func _ready_pick() -> void:
+	super._ready()   # street mode over the city (_initial_region); _build_region_ui and the cohort are skipped below
+	$Sun.shadow_enabled = false
+	$HUD.visible = false
+	pitch = 0.0
+	bearing = 0.0
+	zoom = PICK_ZOOM
+	_camera_dirty = true
+
+func _build_region_ui(r: Dictionary) -> void:
+	if picking(): return   # no city map, fog, pins or taps: the camera alone (亚瑟 342 6418183a ④)
+	super._build_region_ui(r)
+
+func _spawn_home_cohort() -> void:
+	if picking(): return   # no avatar queued at all, not one hidden (亚瑟 342 6418183a ④)
+	super._spawn_home_cohort()
+
+func _on_map_ready() -> void:
+	super._on_map_ready()
+	if picking(): _pick_ground = true
+
+## The circle the pin must stay in (the read's base and range): the camera's centre kept in its bounding box, and out
+## no further than the whole circle across the screen.
+func pick_area(lat: float, lng: float, range_km: float) -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var across := maxf(minf(vp.x, vp.y) - 2.0 * PICK_FIT_PAD, 1.0)
+	var px_per_merc := across / (2.0 * range_km * 1000.0 / (MapGeoMath.EARTH_CIRCUM * cos(deg_to_rad(lat))))
+	_pick_min_zoom = clampf(log(px_per_merc * _map_logical_height() / (vp.y * 512.0)) / log(2.0), PICK_ZOOM_MIN, PICK_ZOOM)
+	set_pan_bounds(lat, lng, range_km * 1000.0)
+
+## Screen px per Web Mercator unit (the world's width = 1) at the zoom drawn: geo_to_screen's scale.
+func _pick_scale() -> float:
+	return get_viewport().get_visible_rect().size.y / _map_logical_height() * 512.0 * pow(2.0, zoom + _zoom_elastic)
+
+## The earth under a viewport point, [lat, lng] in doubles.
+func pick_geo_at(at: Vector2) -> Array:
+	var vp := get_viewport().get_visible_rect().size
+	var k := _pick_scale()
+	var x := MapGeoMath.mercator_x(center_lng) + (at.x - vp.x * 0.5) / k
+	var y := MapGeoMath.mercator_y(center_lat) + (at.y - vp.y * 0.5) / k
+	return [rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * y)))), wrapf(x * 360.0 - 180.0, -180.0, 180.0)]
+
+## Where a point of the earth is on the viewport (pitch 0: always on it, maybe off its edges).
+func pick_screen_of(lat: float, lng: float) -> Variant:
+	return geo_to_screen(lat, lng)
+
+## The camera moved so that (lat, lng) lies under the viewport point `at`.
+func pick_put(lat: float, lng: float, at: Vector2) -> void:
+	var vp := get_viewport().get_visible_rect().size
+	var k := _pick_scale()
+	var x := MapGeoMath.mercator_x(lng) - (at.x - vp.x * 0.5) / k
+	var y := MapGeoMath.mercator_y(lat) - (at.y - vp.y * 0.5) / k
+	_reset_gesture()
+	_teleport(rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * y)))), wrapf(x * 360.0 - 180.0, -180.0, 180.0))
+
+## A finger on the map (the pin is lifted while one is).
+func pick_dragging() -> bool: return _touch_count > 0
+
+func pick_px_per_m() -> float:
+	return _pick_scale() / (MapGeoMath.EARTH_CIRCUM * cos(deg_to_rad(center_lat)))
+
+## Godot px per pt / dp on this screen (the credit line's sizes, CityMapView._px_per_pt): the view's width over the
+## screen's in pt.
+func pick_px_per_pt() -> float:
+	var ratio := map.get_pixel_ratio() if map != null else 1.0
+	var screen_px := float(DisplayServer.window_get_size().x)
+	if screen_px <= 0.0 or ratio <= 0.0: return 1.0
+	return get_viewport().get_visible_rect().size.x / (screen_px / ratio)
+
+## The native map has drawn (no token, the desktop: the page lays its own land).
+func pick_has_ground() -> bool: return _pick_ground

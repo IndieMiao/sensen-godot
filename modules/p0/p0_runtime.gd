@@ -1247,6 +1247,9 @@ func change_home(back: Callable) -> void:
 
 func _open_home_flow(type: String, change_from: String, done: Callable, back := Callable()) -> void:
 	_home_flow = load("res://scenes/p0/panels/p0_home_flow.gd").new(session, ui.safe_top(), ui.safe_bottom(), change_from)
+	_home_flow.open_map = _open_pick_map
+	_home_flow.close_map = close_pick_map
+	ResourceLoader.load_threaded_request(MAP_SCENE)   # the pin page's map, warm by the time a city is picked (亚瑟)
 	_home_done = done
 	if back.is_valid(): _home_flow.left.connect(back)
 	_home_flow.chose.connect(func(cluster: String, lat: float, lng: float):
@@ -1259,6 +1262,27 @@ func _open_home_flow(type: String, change_from: String, done: Callable, back := 
 	ui.open_home_flow(_home_flow)
 
 var _home_flow: Control
+var _pick_map: Node   # the P0 map in its pick mode, pushed for the pin page (SGODOT-342 PR-2)
+
+## The pin page's map (亚瑟 342 6418183a, plan A): the P0 map in its pick mode pushed over whatever is up; null while a
+## navigation is under way (the page keeps its flat map).
+func _open_pick_map(cluster: String) -> Object:
+	close_pick_map()
+	var packed: PackedScene = null
+	if ResourceLoader.load_threaded_get_status(MAP_SCENE) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+		packed = ResourceLoader.load_threaded_get(MAP_SCENE) as PackedScene   # waits for the preload if it is still on
+	if packed == null: packed = load(MAP_SCENE) as PackedScene
+	_pick_map = AppRouter.push_packed(packed, {"home_pick": {"cluster": cluster}})
+	return _pick_map
+
+## Every way off the pin page pops its map (亚瑟 ②: a first pick's change_scene never touches AppRouter's stack), and
+## only it: something else on top stays, the map then left for the stack's own unwinding.
+func close_pick_map() -> void:
+	var m := _pick_map
+	_pick_map = null
+	if not is_instance_valid(m): return
+	if AppRouter.top_instance() == m: AppRouter.pop_instance()
+	else: push_warning("P0Runtime: the pick map is not on top; left to the stack")
 var _home_done := Callable()
 var _home_key := ""
 var _home_change_to := ""
@@ -1291,6 +1315,8 @@ func _home_settled(key: String, ok: bool, _code: String) -> void:
 	if is_instance_valid(_home_flow): _home_flow.sent(ok)
 	if not ok: return
 	session.command_settled.disconnect(_home_settled)
+	if is_instance_valid(_home_flow): _home_flow.pick_map = null   # popped here, before the farm comes (亚瑟 ②)
+	close_pick_map()
 	_home_flow = null
 	ui.close_modal()
 	cover_launch()

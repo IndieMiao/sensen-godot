@@ -3124,6 +3124,12 @@ func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
 	flow.say.connect(func(text: String): toast(text))
 	_open_modal(flow, 0.0, true)
+	# the pin page over the real map (SGODOT-342 PR-2): its clear scrim lets the drags and pinches through to the map
+	var veil := flow.get_parent().get_child(flow.get_index() - 1) as Control
+	if flow.has_signal("map_shown"):
+		flow.map_shown.connect(func(on: bool):
+			if is_instance_valid(veil): veil.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_STOP
+			pad.visible = not on and surface != "map")   # no stick under the pin page: its map takes the drags
 	modal_kind = "home_pick"
 	_modal_back = _home_flow_back.bind(flow)
 

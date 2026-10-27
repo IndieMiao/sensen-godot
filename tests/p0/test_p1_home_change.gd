@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 const P0HomePick := preload("res://modules/p0/p0_home_pick.gd")
 const PickPage := preload("res://scenes/p0/panels/p0_home_pick_page.gd")
 const HomeFlow := preload("res://scenes/p0/panels/p0_home_flow.gd")
+const PinPage := preload("res://scenes/p0/panels/p0_home_pin_page.gd")
 const Pick := preload("res://tests/p0/test_p1_home_pick.gd")
 
 const DAY := 86400000.0
@@ -215,3 +216,34 @@ func test_toasts_and_the_system_line_stay_over_the_confirm_card() -> void:
 	assert_int(ui._sys.z_index).is_greater(card.z_index)
 	card.free()
 	for f in ["user://test_p1_home_change_ui.json", "user://test_p1_home_change_tips.json"]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
+
+## SGODOT-342 PR-2 (亚瑟 342 6418183a ②): the pin page asks its host for the real map on opening and gives it back on
+## every way off — ‹ Change city, another city, the flow closed — while it is up the flow lets the drags through.
+func test_the_pin_page_opens_and_gives_back_its_map() -> void:
+	var made := _change_flow([])
+	var flow: Control = made[1]
+	var opened := []
+	var closed := []
+	var shown := []
+	flow.open_map = func(cluster: String) -> Object:
+		opened.append(cluster)
+		return PinPage.FlatMap.new()
+	flow.close_map = func(): closed.append(1)
+	flow.map_shown.connect(func(on: bool): shown.append(on))
+	await await_idle_frame()
+	flow.open_spots(TOKYO)
+	assert_array(opened).is_equal([TOKYO.id])
+	assert_object(flow.spots.map).is_same(flow.pick_map)
+	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	flow.open_spots(Pick.SF)   # another city: the first map goes before the next comes
+	assert_array(closed).is_equal([1])
+	assert_array(opened).is_equal([TOKYO.id, Pick.SF.id])
+	flow.back_to_cities()   # ‹ Change city
+	assert_array(closed).is_equal([1, 1])
+	assert_int(flow.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
+	assert_array(shown).is_equal([true, false, true, false])
+	flow.open_spots(TOKYO)
+	remove_child(flow)   # the flow closed with its map up (built, ‹ Settings): given back after the frame
+	await await_idle_frame()
+	assert_array(closed).is_equal([1, 1, 1])
+	(made[0] as Node).free()

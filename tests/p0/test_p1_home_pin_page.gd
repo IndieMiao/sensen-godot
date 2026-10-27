@@ -137,3 +137,42 @@ func test_a_same_city_re_pin_starts_on_the_farm() -> void:
 	assert_bool(p.back_key.visible).is_true()
 	p.back_key.pressed.emit()   # q(223): back to the farm, not spot 1
 	assert_float(float(p.at[0])).is_equal_approx(37.75, 1e-4)
+
+## A real map stand-in: the flat map's geometry, not a FlatMap (so the page treats it as the native one), with ground.
+class GroundMap extends RefCounted:
+	var flat := PinPage.FlatMap.new()
+	var ground := true
+	func pick_geo_at(s: Vector2) -> Array: return flat.pick_geo_at(s)
+	func pick_screen_of(lat: float, lng: float) -> Variant: return flat.pick_screen_of(lat, lng)
+	func pick_put(lat: float, lng: float, s: Vector2) -> void: flat.pick_put(lat, lng, s)
+	func pick_dragging() -> bool: return false
+	func pick_px_per_m() -> float: return flat.px_per_m
+	func pick_has_ground() -> bool: return ground
+
+## 不知火舞 342 (q(133) ①): over the real map the page draws the map's credit line, 16 pt from the left, 6 pt over the
+## card; not while reading or failed, not without ground, not on the page's own flat map.
+func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
+	var flat := _page()
+	flat.show_area(_read())
+	await await_idle_frame()
+	assert_bool(flat.credits.visible).is_false()   # the flat map (the desktop) has no Mapbox to credit
+	var m := GroundMap.new()
+	var p: Control = auto_free(PinPage.new("gn-5391959", "San Francisco", "Pick your farm spot", 0.0, 0.0, false, null, m))
+	add_child(p)
+	p.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	p.size = Vector2(360, 800)
+	await await_idle_frame()
+	assert_bool(p.credits.visible).is_false()   # reading
+	p.show_area(_read())
+	await await_idle_frame()
+	assert_bool(p.credits.visible).is_true()
+	assert_str(p.credits.text).is_equal("© Mapbox © OpenStreetMap")
+	assert_float(p.credits.position.x).is_equal(CityMapView.CREDITS_LEFT_PT)
+	assert_float(p.credits.position.y + p.credits.size.y).is_equal_approx(p.card.position.y - CityMapView.CREDITS_GAP_PT, 0.5)
+	assert_float(p.credits.get_theme_color(&"font_color").a).is_equal_approx(CityMapView.CREDITS_ALPHA, 0.01)
+	m.ground = false   # the native map not drawn yet
+	p._refresh()
+	assert_bool(p.credits.visible).is_false()
+	m.ground = true
+	p.show_failed()
+	assert_bool(p.credits.visible).is_false()

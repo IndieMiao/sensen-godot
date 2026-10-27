@@ -19,6 +19,7 @@ extends Control
 signal chose(cluster: String, lat: float, lng: float)
 signal say(text: String)
 signal left
+signal map_shown(on: bool)   # the pin page's real map is under it: the flow and its scrim let the drags through
 
 const P0HomePick := preload("res://modules/p0/p0_home_pick.gd")
 const PickPage := preload("res://scenes/p0/panels/p0_home_pick_page.gd")
@@ -40,6 +41,10 @@ var welcome: Control         # HOME-WELCOME, a first pick near an open city
 var _under: Control          # the page the spot page covers: the list or HOME-WELCOME
 var loading: Control         # a first pick's card outline till its first read is in
 var pick_map: Object         # the map in its pick mode the pin page reads (null: the page's own flat map)
+## The host's (P0Runtime): open_map(cluster) pushes the P0 map in its pick mode and returns it (null: none, the page's
+## own flat map); close_map() pops it. Unset (the tests), the pin page keeps its flat map.
+var open_map := Callable()
+var close_map := Callable()
 
 func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0, change_from_ := "") -> void:
 	session = session_
@@ -111,7 +116,12 @@ func back_to_welcome() -> void:
 ## starts the pin on the farm (q(216) ⑨).
 func open_spots(row: Dictionary) -> void:
 	if spots != null: spots.queue_free()
+	_drop_map()
 	var id := str(row.get("id", ""))
+	if open_map.is_valid(): pick_map = open_map.call(id)
+	if pick_map != null:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		map_shown.emit(true)
 	var city_name := str(row.get("name", ""))
 	var same := change_from != "" and id == change_from
 	spots = PinPage.new(id, city_name, "Change home city" if change_from != "" else "Pick your farm spot", _safe.x, _safe.y,
@@ -175,8 +185,23 @@ func back_to_cities() -> void:
 	close_confirm()
 	if spots != null: spots.queue_free()
 	spots = null
+	_drop_map()
 	if is_instance_valid(_under): _under.visible = true
 	elif cities != null: cities.visible = true
+
+## The pin page's map goes (‹ Change city, another city, the flow closed for any reason: built, ‹ Settings, a layer
+## over it): popped by the host, the flow taking the touches again.
+func _drop_map(later := false) -> void:
+	if pick_map == null: return
+	pick_map = null
+	if close_map.is_valid():
+		if later: close_map.call_deferred()   # leaving the tree, maybe with the root busy (the app quitting)
+		else: close_map.call()
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	map_shown.emit(false)
+
+func _exit_tree() -> void:
+	_drop_map(true)
 
 ## The host's answer to `chose`: refused or lost, the page stays for another go.
 func sent(_ok: bool) -> void:
