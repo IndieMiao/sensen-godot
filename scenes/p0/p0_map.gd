@@ -1829,6 +1829,12 @@ func pick_put(lat: float, lng: float, at: Vector2) -> void:
 func pick_dragging() -> bool:
 	return _touch_count > 0 or pick_settling()
 
+## Stopped where it is (Build here pressed mid-slide): the fling, its zoom and a zoom tween end.
+func pick_stop() -> void:
+	_reset_gesture()
+	_zoom_elastic = 0.0
+	_camera_dirty = true
+
 ## The finger gone, the map still sliding (the fling) or zooming (its fling, a double tap's tween): the page keeps the
 ## card's line and the key as they were till it settles (不知火舞 342).
 func pick_settling() -> bool:

@@ -143,7 +143,11 @@ class GroundMap extends RefCounted:
 	var flat := PinPage.FlatMap.new()
 	var ground := true
 	var settling := false
+	var stopped := 0
 	func pick_settling() -> bool: return settling
+	func pick_stop() -> void:
+		settling = false
+		stopped += 1
 	func pick_geo_at(s: Vector2) -> Array: return flat.pick_geo_at(s)
 	func pick_screen_of(lat: float, lng: float) -> Variant: return flat.pick_screen_of(lat, lng)
 	func pick_put(lat: float, lng: float, s: Vector2) -> void: flat.pick_put(lat, lng, s)
@@ -201,14 +205,29 @@ func test_while_the_map_slides_on_the_card_and_key_wait_for_it_to_settle() -> vo
 	assert_float(p.card.modulate.a).is_equal(PinPage.DRAG_FADE)
 	assert_bool(p.pin.lifted).is_true()
 	var chose := []
+	var said := []
 	p.chosen.connect(func(lat, lng): chose.append([lat, lng]))
+	p.unavailable.connect(func(t): said.append(t))
+	# 不知火舞 342 35e97397: Build here mid-slide stops the map there, drops the pin and reads the point — no confirm, no
+	# toast, nothing built off the old values
 	p.build.activated.emit()
 	assert_array(chose).is_empty()
-	m.settling = false
-	p._refresh()
+	assert_int(m.stopped).is_equal(1)
 	assert_str(p.build.reason).starts_with("Too close to")
 	assert_str(p.line.text).is_not_equal(line_before)
 	assert_float(p.card.modulate.a).is_equal(1.0)
+	assert_bool(p.pin.lifted).is_false()
+	p.build.unavailable_pressed.emit(p.build.reason)   # a second press: as any (the grey key's toast)
+	assert_int(said.size()).is_equal(1)
+	assert_int(m.stopped).is_equal(1)
+	# a grey key pressed mid-slide: stopped too, no toast for the old reason
+	m.settling = true
+	m.flat.pick_put(37.76, -122.44909, p.tip())   # slid back to the start
+	p._refresh()
+	p.build.unavailable_pressed.emit(p.build.reason)
+	assert_int(said.size()).is_equal(1)
+	assert_int(m.stopped).is_equal(2)
+	assert_str(p.build.reason).is_equal("")
 
 ## The circle's dashes are one draw call, and only those on screen (the emulator's drag ran at 7 fps on 540 draw_arcs).
 func test_the_dashed_circle_keeps_only_the_dashes_on_screen() -> void:

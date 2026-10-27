@@ -132,3 +132,17 @@ func test_an_unknown_city_gets_no_pick_map() -> void:
 	assert_int(AppRouter.instance_depth()).is_equal(depth + 1)
 	rt.close_pick_map()
 	assert_int(AppRouter.instance_depth()).is_equal(depth)
+
+## Build here mid-slide (不知火舞 342 35e97397): pick_stop ends the slide where it is.
+func test_pick_stop_ends_the_slide() -> void:
+	var pick := _push_pick()
+	await _frames()
+	pick._fling_vel = Vector3(80, 0, 0)
+	pick._zoom_vel = 0.5
+	assert_bool(pick.pick_settling()).is_true()
+	var lat: float = pick.center_lat
+	pick.pick_stop()
+	assert_bool(pick.pick_settling()).is_false()
+	assert_bool(pick.pick_dragging()).is_false()
+	await _frames(2)
+	assert_float(pick.center_lat).is_equal(lat)
