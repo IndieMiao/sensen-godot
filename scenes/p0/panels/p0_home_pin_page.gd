@@ -395,7 +395,8 @@ func _refresh() -> void:
 		at = [float(g[0]), float(g[1])]
 		if not settling: refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
 	else: refusal = {}
-	land.visible = not ready or bool(map.pick_has_ground())
+	# the page's own land: the flat map's ground; under the real map only while reading / failed or before it draws
+	land.visible = map is FlatMap or not ready or not bool(map.pick_has_ground())
 	veil.visible = ready
 	overlay.visible = ready
 	pin.visible = ready

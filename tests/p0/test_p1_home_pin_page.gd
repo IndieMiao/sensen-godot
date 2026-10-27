@@ -168,6 +168,7 @@ func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
 	p.show_area(_read())
 	await await_idle_frame()
 	assert_bool(p.credits.visible).is_true()
+	assert_bool(p.land.visible).is_false()   # the real map shows through (the emulator: the land hid it)
 	assert_str(p.credits.text).is_equal("© Mapbox © OpenStreetMap")
 	assert_float(p.credits.position.x).is_equal(CityMapView.CREDITS_LEFT_PT)
 	assert_float(p.credits.position.y + p.credits.size.y).is_equal_approx(p.card.position.y - CityMapView.CREDITS_GAP_PT, 0.5)
@@ -175,6 +176,7 @@ func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
 	m.ground = false   # the native map not drawn yet
 	p._refresh()
 	assert_bool(p.credits.visible).is_false()
+	assert_bool(p.land.visible).is_true()
 	m.ground = true
 	p.show_failed()
 	assert_bool(p.credits.visible).is_false()
