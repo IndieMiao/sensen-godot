@@ -40,7 +40,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   // client's new player is San Francisco's, as every save before.
   // SGODOT-341 the same way: a new save starts the new-player guide only when the client says it can show it (`guide`).
   const features = (headers: Record<string, unknown>) => String(headers['x-p0-features'] ?? '').split(',').map(f => f.trim());
-  const newSave = (headers: Record<string, unknown>) => { const f = features(headers); return { pending: f.includes('choose_home'), guide: f.includes('guide') }; };
+  // guide_v3: the client draws PR-C's guide (Pip, marks, Today). 0.2.11 sends `guide` without that layer, so its new saves
+  // stay legacy (341 c6f3189a): `guide` alone no longer starts it.
+  const newSave = (headers: Record<string, unknown>) => { const f = features(headers); return { pending: f.includes('choose_home'), guide: f.includes('guide_v3') }; };
   const stateOf = (player: string, headers: Record<string, unknown>) => store.get(player, deps.now(), newSave(headers));
   const clock = (offset: number) => deps.now() + offset;
   /** q(206): the people in the outpost rooms of the town the player is in (its pins' counts summed, a Mine Hut's too); the
@@ -74,7 +76,13 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       settleHere(c, s, space, place, clock(s.clock_ms));
       settleGuide(c, s, guideKeys(c, before, s, null, []), clock(s.clock_ms));   // SGODOT-341: walking into a place is a guide step too
       store.put(s);
-    } else if (settleHere(c, s, space, place, clock(s.clock_ms))) store.put(s);   // a Day Pass ran out on the map: home
+    } else {
+      const moved = settleHere(c, s, space, place, clock(s.clock_ms));   // a Day Pass ran out on the map: home
+      // SGODOT-341: a plain read settles the guide too — a step passed by time alone (Quick Radishes ripe), the fallback end
+      const was = s.guide ? JSON.stringify(s.guide) : null;
+      settleGuide(c, s, new Map(), clock(s.clock_ms));
+      if (moved || (s.guide ? JSON.stringify(s.guide) : null) !== was) store.put(s);
+    }
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
   });
 

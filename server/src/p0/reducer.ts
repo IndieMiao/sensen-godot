@@ -450,7 +450,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   }
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
   noteProgress(c, s, counted, events);   // q(134): `Fresh Greens 3/5`, the one that fills it `done`
-  settleGuide(c, s, guideKeys(c, input, s, cmd, events), now);   // SGODOT-341: what this command did, against the guide's steps
+  settleGuide(c, s, guideKeys(c, input, s, cmd, events), now, events);   // SGODOT-341: what this command did, against the guide's steps
   s.seq += 1;
   return { ok: true, state: s, events };
 }
