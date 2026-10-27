@@ -247,7 +247,10 @@ static func boot_wanted() -> bool:
 ## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide_v3 — a new
 ## save starts the v3 guide with server-resolved presentation (341 c6f3189a). The old `guide` feature advertised
 ## by 0.2.11 is intentionally absent: that package cannot show the complete v3 guide.
-const FEATURES := "choose_home,guide_v3"
+# Keep partial clients on legacy. The final C-client-3 integration commit may enable this only after C1/C2,
+# whole-guide QA, code/design review and the user's visual review (341, partial-client safeguard).
+const GUIDE_V3_READY := false
+const FEATURES := "choose_home,guide_v3" if GUIDE_V3_READY else "choose_home"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
