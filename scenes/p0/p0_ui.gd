@@ -2761,9 +2761,10 @@ static func affinity_text(ev: Dictionary) -> String:
 	match str(ev.get("reason", "")):
 		"chat": why = "first chat today"
 		"request": why = "request done"
-		"gift":   # q(220): a resident's first dish from you reads `+10 · first gift`, whatever its verdict
+		"gift":   # q(220): a resident's first dish from you reads `+10 · first gift`, whatever its verdict; a plain one
+			# `+1 · gift received` (q(18), B.9, NPC-5 — not `thanks`, which reads as the social `Say thanks`, 不知火舞)
 			why = "first gift" if bool(ev.get("first", false)) else \
-				{"loved": "loved it", "liked": "liked it", "received": "thanks", "not_a_fan": "not a fan"}.get(str(ev.get("verdict", "")), "")
+				{"loved": "loved it", "liked": "liked it", "received": "gift received", "not_a_fan": "not a fan"}.get(str(ev.get("verdict", "")), "")
 	var n := ("%+d" % int(ev.get("delta", 0))).replace("-", "−")
 	return n if why == "" else "%s · %s" % [n, why]
 
