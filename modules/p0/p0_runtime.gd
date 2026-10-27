@@ -18,6 +18,7 @@ const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Bart
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
@@ -372,6 +373,7 @@ func _notification(what: int) -> void:
 
 func _process(dt: float) -> void:
 	_dev_shot(dt)
+	_dev_mem(dt)
 	_tick_screens(dt)
 	if ui.offline:
 		_probe_left -= dt
@@ -1268,12 +1270,29 @@ var _pick_map: Node   # the P0 map in its pick mode, pushed for the pin page (SG
 ## navigation is under way (the page keeps its flat map).
 func _open_pick_map(cluster: String) -> Object:
 	close_pick_map()
+	# a city the client's cluster table does not know (亚瑟 on #495 ①): no street mode, so the map would open as the
+	# old Journey map (a crowd, Shanghai, the location prompt) — the page keeps its flat map
+	if P0Clusters.region(cluster).is_empty(): return null
 	var packed: PackedScene = null
 	if ResourceLoader.load_threaded_get_status(MAP_SCENE) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
 		packed = ResourceLoader.load_threaded_get(MAP_SCENE) as PackedScene   # waits for the preload if it is still on
 	if packed == null: packed = load(MAP_SCENE) as PackedScene
 	_pick_map = AppRouter.push_packed(packed, {"home_pick": {"cluster": cluster}})
 	return _pick_map
+
+## A debug build with user://p0_memlog prints the engine's memory every 2 s to the log (tag godot): the pick map's
+## measurements on an emulator (亚瑟 342 6418183a ⑤: MEMORY_STATIC and the video memory, beside dumpsys's PSS).
+var _mem_left := 0.0
+var _mem_on := -1
+func _dev_mem(dt: float) -> void:
+	if _mem_on < 0: _mem_on = 1 if OS.is_debug_build() and FileAccess.file_exists("user://p0_memlog") else 0
+	if _mem_on == 0: return
+	_mem_left -= dt
+	if _mem_left > 0.0: return
+	_mem_left = 2.0
+	print("P0_MEM static=%d video=%d nodes=%d stack=%d pick=%s" % [Performance.get_monitor(Performance.MEMORY_STATIC),
+		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED), Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
+		AppRouter.instance_depth(), str(is_instance_valid(_pick_map))])
 
 ## Every way off the pin page pops its map (亚瑟 ②: a first pick's change_scene never touches AppRouter's stack), and
 ## only it: something else on top stays, the map then left for the stack's own unwinding.

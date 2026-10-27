@@ -1760,7 +1760,6 @@ var _pick_ground := false
 ## HOME-PIN-1's scale (about 137 px a km at San Francisco), the start; a street's at most.
 const PICK_ZOOM := 13.05
 const PICK_ZOOM_MIN := 9.0
-const PICK_ZOOM_MAX := 17.0
 ## The whole circle across the screen's narrow side, less this much each side.
 const PICK_FIT_PAD := 16.0
 
@@ -1825,8 +1824,16 @@ func pick_put(lat: float, lng: float, at: Vector2) -> void:
 	_reset_gesture()
 	_teleport(rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * y)))), wrapf(x * 360.0 - 180.0, -180.0, 180.0))
 
-## A finger on the map (the pin is lifted while one is).
-func pick_dragging() -> bool: return _touch_count > 0
+## A finger on the map, or the map still sliding or zooming after it lifted (亚瑟 on #495 ②; 不知火舞 342, to be ruled
+## on the recording: the pin stays lifted till the camera settles; a finger down mid-slide just carries on).
+func pick_dragging() -> bool:
+	return _touch_count > 0 or pick_settling()
+
+## The finger gone, the map still sliding (the fling) or zooming (its fling, a double tap's tween): the page keeps the
+## card's line and the key as they were till it settles (不知火舞 342).
+func pick_settling() -> bool:
+	return _touch_count == 0 and (_fling_vel != Vector3.ZERO or _zoom_vel != 0.0
+		or (_zoom_tween != null and _zoom_tween.is_running()))
 
 func pick_px_per_m() -> float:
 	return _pick_scale() / (MapGeoMath.EARTH_CIRCUM * cos(deg_to_rad(center_lat)))

@@ -106,3 +106,29 @@ func test_the_camera_stays_in_the_circles_box_and_zooms_out_to_the_whole_circle(
 	var vp: Vector2 = pick.get_viewport().get_visible_rect().size
 	assert_float(across).is_less_equal(minf(vp.x, vp.y) - 2.0 * pick.PICK_FIT_PAD + 1.0)   # the whole circle fits
 	assert_float(across).is_greater(minf(vp.x, vp.y) - 2.0 * pick.PICK_FIT_PAD - 20.0)
+
+## 亚瑟 on #495 ②: the pin stays lifted while the map slides or zooms on after the finger lifts.
+func test_a_slide_after_the_finger_counts_as_dragging() -> void:
+	var pick := _push_pick()
+	await _frames()
+	assert_bool(pick.pick_dragging()).is_false()
+	pick._fling_vel = Vector3(50, 0, 0)
+	assert_bool(pick.pick_settling()).is_true()
+	assert_bool(pick.pick_dragging()).is_true()
+	pick._fling_vel = Vector3.ZERO
+	pick._touch_count = 1
+	assert_bool(pick.pick_settling()).is_false()   # a finger on it: dragging, not settling
+	assert_bool(pick.pick_dragging()).is_true()
+	pick._touch_count = 0
+
+## 亚瑟 on #495 ①: a city the client's cluster table does not know gets no map (the page keeps its flat one).
+func test_an_unknown_city_gets_no_pick_map() -> void:
+	var rt := P0Runtime.ensure()
+	var depth := AppRouter.instance_depth()
+	assert_object(rt._open_pick_map("gn-0000000-nowhere")).is_null()
+	assert_int(AppRouter.instance_depth()).is_equal(depth)
+	var m = rt._open_pick_map(SF)
+	assert_object(m).is_not_null()
+	assert_int(AppRouter.instance_depth()).is_equal(depth + 1)
+	rt.close_pick_map()
+	assert_int(AppRouter.instance_depth()).is_equal(depth)

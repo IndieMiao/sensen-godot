@@ -142,10 +142,12 @@ func test_a_same_city_re_pin_starts_on_the_farm() -> void:
 class GroundMap extends RefCounted:
 	var flat := PinPage.FlatMap.new()
 	var ground := true
+	var settling := false
+	func pick_settling() -> bool: return settling
 	func pick_geo_at(s: Vector2) -> Array: return flat.pick_geo_at(s)
 	func pick_screen_of(lat: float, lng: float) -> Variant: return flat.pick_screen_of(lat, lng)
 	func pick_put(lat: float, lng: float, s: Vector2) -> void: flat.pick_put(lat, lng, s)
-	func pick_dragging() -> bool: return false
+	func pick_dragging() -> bool: return settling
 	func pick_px_per_m() -> float: return flat.px_per_m
 	func pick_has_ground() -> bool: return ground
 
@@ -176,3 +178,32 @@ func test_the_credit_line_rides_over_the_card_on_the_real_map_only() -> void:
 	m.ground = true
 	p.show_failed()
 	assert_bool(p.credits.visible).is_false()
+
+## 不知火舞 342 (亚瑟 on #495 ②): the map sliding on after the finger lifted keeps the pin up, the card at 50 % with its
+## line as it was and the key unchanged; settled, both are read again. Build here does nothing till then.
+func test_while_the_map_slides_on_the_card_and_key_wait_for_it_to_settle() -> void:
+	var m := GroundMap.new()
+	var p: Control = auto_free(PinPage.new("gn-5391959", "San Francisco", "Pick your farm spot", 0.0, 0.0, false, null, m))
+	add_child(p)
+	p.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	p.size = Vector2(360, 800)
+	p.show_area(_read())
+	await await_idle_frame()
+	var line_before: String = p.line.text
+	assert_str(p.build.reason).is_equal("")
+	m.settling = true
+	m.flat.pick_put(37.7655, -122.45, p.tip())   # slid next to the tea house
+	p._refresh()
+	assert_str(p.line.text).is_equal(line_before)
+	assert_str(p.build.reason).is_equal("")
+	assert_float(p.card.modulate.a).is_equal(PinPage.DRAG_FADE)
+	assert_bool(p.pin.lifted).is_true()
+	var chose := []
+	p.chosen.connect(func(lat, lng): chose.append([lat, lng]))
+	p.build.activated.emit()
+	assert_array(chose).is_empty()
+	m.settling = false
+	p._refresh()
+	assert_str(p.build.reason).starts_with("Too close to")
+	assert_str(p.line.text).is_not_equal(line_before)
+	assert_float(p.card.modulate.a).is_equal(1.0)

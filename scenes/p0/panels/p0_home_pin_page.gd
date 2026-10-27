@@ -126,7 +126,7 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	build.offset_right = -UiTokens.SPACE_PAGE
 	build.offset_top = _BUILD_Y - 800.0 - safe_bottom
 	build.offset_bottom = build.offset_top + _KEY_H
-	build.activated.connect(func(): if _can_build(): chosen.emit(float(at[0]), float(at[1])))
+	build.activated.connect(func(): if _can_build() and not bool(map.pick_dragging()): chosen.emit(float(at[0]), float(at[1])))
 	build.unavailable_pressed.connect(func(_t: String):
 		if not refusal.is_empty(): unavailable.emit(str(P0HomePin.refusal_text(refusal, names).toast)))
 	add_child(build)
@@ -386,10 +386,13 @@ func _refresh() -> void:
 	var ready := not area.is_empty()
 	_last_key = _view_key() if ready else []
 	var dragging := ready and bool(map.pick_dragging())
+	# sliding on after the finger lifted: the card's line, the key and the pin's look stay as they were till the camera
+	# settles (不知火舞 342, to be ruled on the recording); a finger on it reads live
+	var settling := dragging and map.has_method("pick_settling") and bool(map.pick_settling())
 	if ready:
 		var g: Array = geo_at(tip())
 		at = [float(g[0]), float(g[1])]
-		refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
+		if not settling: refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
 	else: refusal = {}
 	land.visible = not ready or bool(map.pick_has_ground())
 	veil.visible = ready
@@ -404,9 +407,10 @@ func _refresh() -> void:
 	if not ready:
 		build.reason = "Build here"   # grey and quiet (6cb4d10e): no refusal, so no toast
 		return
-	line.text = P0HomePin.card_line(Vector2(at[0], at[1]), pond)
+	if not settling:
+		line.text = P0HomePin.card_line(Vector2(at[0], at[1]), pond)
+		build.reason = _key_text()
 	card.modulate.a = DRAG_FADE if dragging else 1.0
-	build.reason = _key_text()
 	pin.set_state(refusal.is_empty(), dragging)
 	pin.position = tip() - Pin.TIP
 	_place_veil()
