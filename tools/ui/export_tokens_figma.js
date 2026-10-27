@@ -31,6 +31,8 @@ const CONST = {
   radialLabel: 12, kitchenCheck: 13, kitchenCheckIcon: 9,
   // The radial's hit circle and ring radius (ui_action_radial), added by hand to tokens-v2.json before; no layer holds them.
   radialHit: 72, radialRing: 88,
+  // The unavailable icon's opacity: 0.35 in the new file's RadialPetal Unavailable, 0.45 till now — kept, under review (340 826e261e).
+  unavailableIcon: 0.45,
 };
 const page = await figma.getNodeByIdAsync('5:4');
 await figma.setCurrentPageAsync(page);
@@ -201,7 +203,10 @@ const saDefault = await variant('9:99789', 'State=Default');
 const saPressed = await variant('9:99789', 'State=Pressed');
 const saPending = await variant('9:99789', 'State=Pending');
 const arcWidth = (v, name) => (v.width / 2) * (1 - child(v, name).arcData.innerRadius);
-const petalSel = await variant('9:103224', 'State=Current');   // Selected is Current in the new file (不知火舞 340 9d80f70a)
+// The old State=Selected was the plain petal's size and shadow (Available here) with the current petal's 3 px ring
+// (Current here); Current's 72 / 38 are radialPetalCurrent / radialIconCurrent (不知火舞 340 826e261e).
+const petalSel = await variant('9:103224', 'State=Current');
+const petalAvail = await variant('9:103224', 'State=Available');
 const petalOff = await variant('9:103224', 'State=Unavailable');
 const tapCard = await variant('9:103539', 'Pointer=Center');
 const sbWorld = await variant('9:103339', 'Size=World, State=Ready');
@@ -221,7 +226,7 @@ for (const v of (await node('9:103339')).children.filter(c => c.name.startsWith(
   color['status/' + key + 'Ring'] = hex(b.strokes.find(p => p.visible !== false).color);
 }
 const shadow = {
-  card: shadowOf(energyCard), float: shadowOf(tapCard), petal: shadowOf(child(petalSel, 'Petal')),
+  card: shadowOf(energyCard), float: shadowOf(tapCard), petal: shadowOf(child(petalAvail, 'Petal')),
   menu: shadowOf(pinMenu), key: shadowOf(switchKey),
 };
 for (const [k, e] of Object.entries(shadow)) {
@@ -252,7 +257,7 @@ Object.assign(stroke, {
 Object.assign(opacity, {
   sceneActionPending: Math.round(saPending.opacity * 100) / 100,
   // Shared by the radial petal icon (1122:79385) and the EnergyTile unavailable icon disc (1093:77292).
-  unavailableIcon: Math.round(child(child(petalOff, 'Petal'), 'Icon').opacity * 100) / 100,
+  unavailableIcon: CONST.unavailableIcon,
   todayDone: Math.round(todayDone.opacity * 100) / 100,
   emptyIcon: Math.round(child(emptyPanel, 'Icon').opacity * 100) / 100,
 });
@@ -261,7 +266,7 @@ Object.assign(size, {
   toolBadge: toolBadge.width, toolBadgeIcon: child(toolBadge, 'Tool').width,
   actionKeyW: actionKey.width, actionKeyH: actionKey.height,
   holdRing: arcWidth(await variant('9:99789', 'State=Holding'), 'Hold progress'), pendingRing: arcWidth(saPending, 'Pending spinner'),
-  radialPetal: child(petalSel, 'Petal').width, radialIcon: child(child(petalSel, 'Petal'), 'Icon').width,
+  radialPetal: child(petalAvail, 'Petal').width, radialIcon: child(child(petalAvail, 'Petal'), 'Icon').width,
   radialPetalCurrent: child(petalSel, 'Petal').width, radialIconCurrent: child(child(petalSel, 'Petal'), 'Icon').width,
   radialHit: CONST.radialHit, radialRing: CONST.radialRing,
   radialLockBadge: child(petalOff, 'Lock badge').width, radialLockIcon: child(petalOff, 'Lock badge').children[0].width,
