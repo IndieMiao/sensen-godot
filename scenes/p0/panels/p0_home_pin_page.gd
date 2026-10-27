@@ -515,7 +515,8 @@ class Overlay extends Control:
 	## dashes on screen — the 10 km circle is some 540 dashes across at the start's scale; as many draw_arc calls ran the
 	## emulator's drag at 7 fps.
 	static func dashed_circle(ci: CanvasItem, centre: Vector2, r: float, color: Color, width: float, dash: float, gap: float) -> void:
-		var pts := dashed_circle_points(centre, r, dash, gap, ci.get_viewport_rect().grow(width + dash))
+		var view := Rect2(Vector2.ZERO, (ci as Control).size) if ci is Control else ci.get_viewport_rect()   # its own space (周瑜)
+		var pts := dashed_circle_points(centre, r, dash, gap, view.grow(width + dash))
 		if not pts.is_empty(): ci.draw_multiline(pts, color, width, true)
 
 	## The segments (pairs of points) of a dashed circle's dashes within `view`.
