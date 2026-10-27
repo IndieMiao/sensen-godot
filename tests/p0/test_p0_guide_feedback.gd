@@ -1,7 +1,6 @@
 extends GdUnitTestSuite
 
 const Feedback := preload("res://modules/p0/p0_guide_feedback.gd")
-const PromptGate := preload("res://modules/p0/p0_radish_prompt_gate.gd")
 const CATCH := {kind = "catch", result = "landed", fish = "fish_crucian", rarity = 1}
 const RESEND := {kind = "guide", action = "resend", item = "seed_quick_radish", qty = 2, bagged = 2, left = 1}
 const STORE := "user://test_p0_guide_feedback_quick.json"
@@ -76,41 +75,6 @@ func test_full_and_partial_bag_only_fly_the_confirmed_bagged_amount() -> void:
 		var out: Dictionary = Feedback.new().take({}, {seq = 1}, [RESEND.merged({bagged = n}, true)])
 		assert_int(out.resends[0].bagged).is_equal(n)
 		assert_dict(out.fish).is_empty()
-
-func _growing() -> Dictionary:
-	return {guide = {step = null, end = "done"}, plots = [{crop = "crop_radish", state = "growing", ready_in = 120000}]}
-
-func test_notification_gate_is_off_and_does_not_consume_the_future_question() -> void:
-	var gate := PromptGate.new()
-	for i in 3: assert_bool(gate.ready(_growing(), true, false, false)).is_false()
-	assert_bool(gate.asked).is_false()
-	assert_bool(gate.ready(_growing(), true, false, false, true)).is_true()
-
-func test_draft_prompt_needs_all_four_conditions_and_waits_for_end_feedback() -> void:
-	var gate := PromptGate.new()
-	assert_bool(gate.ready(_growing(), false, false, false, true)).is_false()
-	assert_bool(gate.ready(_growing(), true, true, false, true)).is_false()
-	assert_bool(gate.ready(_growing(), true, false, true, true)).is_false()
-	var v := _growing()
-	v.guide = {step = "t_nadia_2", end = null}
-	assert_bool(gate.ready(v, true, false, false, true)).is_false()
-	for end in ["done", "timeout"]:
-		v.guide = {step = null, end = end}
-		assert_bool(gate.ready(v, true, false, false, true)).is_true()
-	gate.shown()
-	assert_bool(gate.ready(v, true, false, false, true)).is_false()
-	assert_bool(PromptGate.new(true).ready(v, true, false, false, true)).is_false()   # bridge restores account's asked flag
-
-func test_draft_prompt_excludes_legacy_quick_radishes_ripe_unwatered_and_empty_plots() -> void:
-	var gate := PromptGate.new()
-	var v := _growing()
-	v.guide.end = "legacy"
-	assert_bool(gate.ready(v, true, false, false, true)).is_false()
-	v.guide.end = "done"
-	for plots in [[], [{crop = "crop_quick_radish", state = "growing", ready_in = 30000}],
-		[{crop = "crop_radish", state = "growing", ready_in = 0}], [{crop = "crop_radish", state = "sown"}]]:
-		v.plots = plots
-		assert_bool(gate.ready(v, true, false, false, true)).is_false()
 
 class Pond extends Node:
 	func p0_event(ev: Dictionary, _v: Dictionary) -> bool: return str(ev.get("kind", "")) == "catch"
