@@ -78,6 +78,10 @@ func _make_cities(back_to := "") -> void:
 	add_child(cities)
 
 func _ready() -> void:
+	# a test account's card is the taller (Return to main account): the first read's outline holds that place too
+	if loading != null and return_main.is_valid():
+		loading.add_return_main(func(): pass)   # never pressed: quieted below
+		Welcome._quiet(loading.card)
 	_read_cities("")
 
 func _read_cities(q: String) -> void:
@@ -94,6 +98,7 @@ func _cities_read(d: Dictionary, q: String) -> void:
 		var near = d.get("near", null)
 		if near is Dictionary:
 			welcome = Welcome.new(near, _safe.y)
+			if return_main.is_valid(): welcome.add_return_main(return_main)
 			welcome.start_pressed.connect(func(): open_spots(near))
 			welcome.other_pressed.connect(_other_city)
 			add_child(welcome)
@@ -132,6 +137,7 @@ func open_spots(row: Dictionary) -> void:
 	var same := change_from != "" and id == change_from
 	spots = PinPage.new(id, city_name, "Change home city" if change_from != "" else "Pick your farm spot", _safe.x, _safe.y,
 		same, farm_now() if same else null, pick_map)
+	if change_from == "" and return_main.is_valid(): spots.add_return_main(return_main)   # a change has Settings
 	spots.back_pressed.connect(back_to_cities)
 	spots.retry_pressed.connect(func(): _read_spots(id))
 	spots.unavailable.connect(func(text: String): say.emit(text))

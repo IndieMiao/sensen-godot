@@ -457,3 +457,65 @@ func test_pin_confirm_retries_a_lost_city_ack_before_build_and_uses_returned_seq
 	assert_int(posts[-1].body.expect_seq).is_equal(5)
 	assert_float(posts[-1].body.lat).is_equal_approx(37.759, 1e-9)
 	assert_float(posts[-1].body.lng).is_equal_approx(-122.449, 1e-9)
+
+## A test account escapes in one tap from every page before it has a home (不知火舞 341 67682ff4, q(231)):
+## HOME-WELCOME's card under `Choose another city` (centred, 8 under, the card taller — the first read's outline holds
+## that place too); HOME-PIN's top panel at the right, on `‹ Change city`'s row, 16 in. Main accounts see neither; a
+## change of home (Settings is there) has none on its pin page.
+func test_a_test_accounts_first_pick_can_go_back_to_main_from_the_card_and_the_pin_page() -> void:
+	for test in [false, true]:
+		var session := P0Session.new()
+		session.transport = func(_m, _p, _b, _c): pass
+		var pressed := []
+		var flow: Control = auto_free(HomeFlow.new(session, 0.0, 34.0))
+		flow.size = Vector2(360, 800)
+		if test: flow.return_main = func(): pressed.append(1)
+		add_child(flow)
+		await await_idle_frame()
+		await await_idle_frame()
+		var held := (flow.loading.card as Control).get_global_rect()
+		var quiet = flow.loading.find_child("ReturnMainAccount", true, false)
+		assert_bool(quiet != null).is_equal(test)
+		if test: assert_bool((quiet as BaseButton).disabled).is_true()   # the outline takes no taps
+		P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": SF, "matches": []})
+		await await_idle_frame()
+		await await_idle_frame()
+		var card := flow.welcome.card as Control
+		var b = card.find_child("ReturnMainAccount", true, false)
+		assert_bool(b != null).is_equal(test)
+		assert_object(card.get_global_rect()).is_equal(held)   # the outline stood where the card stands, its size
+		if test:
+			var other: Control = flow.welcome.other
+			var r := (b as Control).get_global_rect()
+			assert_float(r.position.y - other.get_global_rect().end.y).is_equal_approx(8.0, 0.5)
+			assert_float(r.get_center().x).is_equal_approx(card.get_global_rect().get_center().x, 1.0)
+			assert_float(r.size.y).is_greater_equal(44.0)
+			(b as BaseButton).pressed.emit()
+			assert_array(pressed).is_equal([1])
+		flow.welcome.start.activated.emit()
+		await await_idle_frame()
+		await await_idle_frame()
+		var pin_b = flow.spots.find_child("ReturnMainAccount", true, false)
+		assert_bool(pin_b != null).is_equal(test)
+		if test:
+			var r := (pin_b as Control).get_global_rect()
+			var back := flow.spots.find_child("Back", true, false) as Control
+			assert_float(flow.spots.get_global_rect().end.x - r.end.x).is_equal_approx(16.0, 0.5)
+			assert_float(r.get_center().y).is_equal_approx(back.get_global_rect().get_center().y, 0.5)
+			assert_float(r.size.y).is_greater_equal(44.0)
+			assert_float(r.position.x).is_greater(back.get_global_rect().end.x)
+			(pin_b as BaseButton).pressed.emit()
+			assert_array(pressed).is_equal([1, 1])
+		flow.free()
+		session.free()
+	var s := P0Session.new()
+	s.transport = func(_m, _p, _b, _c): pass
+	var changed: Control = auto_free(HomeFlow.new(s, 0.0, 0.0, "gn-5391959"))
+	changed.return_main = func(): pass
+	add_child(changed)
+	await await_idle_frame()
+	changed.open_spots(SF)
+	await await_idle_frame()
+	assert_object(changed.spots.find_child("ReturnMainAccount", true, false)).is_null()
+	changed.free()
+	s.free()

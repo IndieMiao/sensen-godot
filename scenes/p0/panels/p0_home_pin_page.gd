@@ -79,6 +79,7 @@ var pin: Pin
 var card: PanelContainer
 var line: Label
 var loading_card: Panel
+var _back_pill: Control
 var error_card: PanelContainer
 var build: UiCommandButton
 var back_key: Button
@@ -174,6 +175,7 @@ func _make_panel(heading: String) -> void:
 	back.position = Vector2(12, _safe.x + _BACK_Y)
 	back.pressed.connect(func(): back_pressed.emit())
 	box.add_child(back)
+	_back_pill = back
 	title = UiKit.label(heading, UiTokens.STYLE_TITLE_XB20)
 	title.name = "Title"
 	title.add_theme_font_size_override(&"font_size", _TITLE_SIZE)
@@ -183,6 +185,22 @@ func _make_panel(heading: String) -> void:
 	city.name = "City"
 	city.position = Vector2(UiTokens.SPACE_PAGE, _safe.x + _CITY_Y)
 	box.add_child(city)
+
+## Test accounts' first pick only (不知火舞 341 67682ff4): `Return to main account` at the top panel's right, on the
+## `‹ Change city` row, centred on it, 16 in — not at the bottom, so the card, the key and the map under the pin stay.
+func add_return_main(action: Callable) -> void:
+	var button := P0SettingsPage.return_main_link(action)
+	button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	button.offset_left = -UiTokens.SPACE_PAGE
+	button.offset_right = -UiTokens.SPACE_PAGE
+	_back_pill.get_parent().add_child(button)
+	var centre := func():   # on the pill's middle once its theme has sized it
+		var h := float(UiTokens.SIZE_TOUCH)
+		button.offset_top = _back_pill.position.y + (_back_pill.size.y - h) * 0.5
+		button.offset_bottom = button.offset_top + h
+	centre.call()
+	_back_pill.resized.connect(centre)
 
 func _bottom(c: Control, y: float, h: float) -> void:
 	c.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)

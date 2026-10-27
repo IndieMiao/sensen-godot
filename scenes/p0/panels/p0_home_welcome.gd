@@ -90,6 +90,14 @@ func _init(row_: Dictionary = {}, safe_bottom := 0.0) -> void:
 	other.activated.connect(func(): other_pressed.emit())
 	keys.add_child(other)
 
+## Test accounts' first pick only (不知火舞 341 67682ff4): `Return to main account` in the card under `Choose another
+## city`, centred, 8 under it (the keys' gap); the card grows with it and slides in with it.
+func add_return_main(action: Callable) -> void:
+	var button := P0SettingsPage.return_main_link(action)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.custom_minimum_size.y = UiTokens.SIZE_TOUCH
+	other.get_parent().add_child(button)
+
 ## The card's outline alone, the size of a one-line city's card, where the card goes; nothing inside it reads or
 ## takes a tap (342 8c4168ab).
 static func placeholder(safe_bottom := 0.0) -> Control:
