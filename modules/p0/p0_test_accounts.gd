@@ -17,7 +17,8 @@ func _init(dir := "user://") -> void:
 		var value = JSON.parse_string(FileAccess.get_file_as_string(file))
 		if value is Dictionary: _options = value
 
-func enabled() -> bool: return bool(_options.get("enabled", false))
+## 341 d559585e: guide testing starts On on an unconfigured device; an explicitly saved choice still wins.
+func enabled() -> bool: return bool(_options.get("enabled", true))
 
 static func valid_test_id(id: String) -> bool:
 	if not id.begins_with(PREFIX) or id.length() != PREFIX.length() + 32: return false

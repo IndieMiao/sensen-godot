@@ -65,7 +65,7 @@ func test_settings_holds_only_rows_that_work() -> void:
 	add_child(page)
 	await await_idle_frame()
 	assert_str(page.header.title).is_equal("Settings")
-	assert_array(_labels(page.body)).is_equal(["Legal", "Licenses", "›", "Version", "0.2.1 (2026101001)"])
+	assert_array(_labels(page.body)).is_equal(["Test options", "›", "Legal", "Licenses", "›", "Version", "0.2.1 (2026101001)"])
 	var said := []
 	page.open_pressed.connect(func(w): said.append(w))
 	var licenses := page.body.find_child("Licenses", true, false) as UiSettingRow
@@ -75,6 +75,28 @@ func test_settings_holds_only_rows_that_work() -> void:
 	hit.pressed.emit()
 	assert_array(said).is_equal(["licenses"])
 	assert_object(page.body.find_child("Version", true, false).find_child("Hit", true, false)).is_null()   # read-only
+	var entry: UiSettingRow = page.body.find_child("TestOptions", true, false)
+	var version: UiSettingRow = page.body.find_child("Version", true, false)
+	assert_int(entry.kind).is_equal(UiSettingRow.Kind.LINK)
+	assert_array(_labels(entry)).is_equal(["Test options", "›"])
+	assert_int(entry.get_parent().get_child_count()).is_equal(1)   # its own untitled group
+	assert_object(entry.get_parent()).is_not_same(licenses.get_parent())
+	assert_object(entry.get_parent()).is_not_same(version.get_parent())
+	assert_object(licenses.get_parent()).is_same(version.get_parent())
+	assert_float(entry.get_global_rect().end.y).is_less(licenses.get_global_rect().position.y)
+	assert_float(version.get_global_rect().position.y).is_greater(licenses.get_global_rect().end.y)
+	(entry.find_child("Hit", true, false) as Button).pressed.emit()
+	assert_array(said).is_equal(["licenses", "test_options"])
+	# The old seven-tap/hold path has no listener or timer; Version remains a plain VALUE row.
+	assert_array(version.get_signal_connection_list("gui_input")).is_empty()
+	for i in 8:
+		for down in [true, false]:
+			var event := InputEventMouseButton.new()
+			event.button_index = MOUSE_BUTTON_LEFT
+			event.pressed = down
+			version.gui_input.emit(event)
+	page._process(3.0)
+	assert_array(said).is_equal(["licenses", "test_options"])
 
 func test_licenses_lists_the_groups_and_a_credit_reads_as_three_parts() -> void:
 	var page: P0SettingsPage = auto_free(P0SettingsPage.licenses(P0Legal.groups()))

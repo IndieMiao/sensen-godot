@@ -1,7 +1,6 @@
 extends GdUnitTestSuite
-## Hidden B flow: isolated main/test identities, first-request feature flags, persistence and invisible gesture.
+## Visible B flow: isolated main/test identities, first-request feature flags and device preferences.
 const Accounts := preload("res://modules/p0/p0_test_accounts.gd")
-const Entry := preload("res://modules/p0/p0_test_entry.gd")
 var dir: String
 var accounts: RefCounted
 const MAIN_BYTES := "isolated-main-341\n"
@@ -40,7 +39,7 @@ func _header(a: RefCounted) -> String:
 	return result
 
 func test_toggle_only_affects_new_test_id_and_main_stays_legacy() -> void:
-	assert_bool(accounts.enabled()).is_false()
+	assert_bool(accounts.enabled()).is_true()
 	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home")
 	assert_bool(accounts.set_enabled(true)).is_true()
 	assert_bool(accounts.is_test()).is_false()
@@ -119,40 +118,53 @@ func test_empty_main_with_verified_backup_restores_original_bytes_and_returns_ma
 	assert_bool(relaunched.return_main()).is_true()
 	assert_bool(Accounts.new(dir).is_test()).is_false()
 
-func _seven(e: RefCounted, from_ms := 1000) -> void:
-	for i in 7:
-		e.press(Vector2(10, 10), from_ms + i * 300)
-		e.release(Vector2(10, 10), from_ms + i * 300 + 50)
+func test_saved_off_survives_upgrade_and_return_to_main() -> void:
+	# Existing devices explicitly stored Off; changing the fallback must not overwrite it.
+	_write("p0_test_options.json", '{"enabled":false}')
+	var upgraded = Accounts.new(dir)
+	assert_bool(upgraded.enabled()).is_false()
+	assert_bool(upgraded.start_test("main-avatar")).is_true()
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
+	assert_bool(upgraded.set_enabled(true)).is_true()
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")   # existing test stays as created
+	assert_bool(Accounts.new(dir).guide_enabled()).is_false()
+	assert_bool(upgraded.return_main()).is_true()
+	assert_str(FileAccess.get_file_as_string(dir + "p0_player.txt")).is_equal(MAIN_BYTES)
+	assert_bool(upgraded.start_test("main-avatar")).is_true()
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,guide_v3")
 
-func test_hidden_entry_requires_all_seven_taps_then_a_full_hold() -> void:
-	var e = Entry.new()
-	_seven(e)
-	assert_bool(e.tick(2900)).is_false()
-	e.press(Vector2(10, 10), 3000)
-	assert_bool(e.tick(4999)).is_false()
-	assert_bool(e.tick(5000)).is_true()
-	assert_bool(e.tick(6000)).is_false()
+func test_absent_option_defaults_on_without_rewriting_old_active_test() -> void:
+	assert_bool(accounts.start_test("main-avatar")).is_true()   # no toggle needed on an unconfigured device
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
+	var test_id := str(accounts.active_id())
+	_write("p0_test_options.json", JSON.stringify({active = test_id, active_guide = false, main_avatar = "main-avatar"}))
+	var upgraded = Accounts.new(dir)
+	assert_bool(upgraded.enabled()).is_true()
+	assert_str(upgraded.active_id()).is_equal(test_id)
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
+	assert_bool(upgraded.return_main()).is_true()
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
 
-func test_hidden_entry_cancels_on_scroll_slow_taps_short_hold_or_lost_focus() -> void:
-	var e = Entry.new()
-	for i in 7:
-		e.press(Vector2.ZERO, i * 700)
-		e.release(Vector2.ZERO, i * 700 + 50)
-	e.press(Vector2.ZERO, 5000)
-	assert_bool(e.tick(8000)).is_false()
-	e.reset()
-	_seven(e)
-	e.press(Vector2.ZERO, 3000)
-	e.move(Vector2(0, 30))
-	assert_bool(e.tick(6000)).is_false()
-	_seven(e, 10000)
-	e.press(Vector2.ZERO, 12000)
-	e.release(Vector2.ZERO, 12500)
-	assert_bool(e.tick(16000)).is_false()
-	_seven(e, 20000)
-	e.press(Vector2.ZERO, 22000)
-	e.reset()   # background, return or scroll_started
-	assert_bool(e.tick(26000)).is_false()
+func test_visible_entry_opens_existing_page_with_default_on_and_returns_to_settings() -> void:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.test_accounts = accounts
+	ui.quick_store = dir + "ui_quickbar.json"
+	ui.tips_path = dir + "p0_tips.json"
+	add_child(ui)
+	ui.open_settings()
+	await await_idle_frame()
+	var entry: UiSettingRow = ui._modal.find_child("TestOptions", true, false)
+	assert_bool(entry.is_visible_in_tree()).is_true()
+	(entry.find_child("Hit", true, false) as Button).pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("test_options")
+	assert_bool(ui._modal.find_child("GuideTestToggle", true, false).on).is_true()
+	assert_object(ui._modal.find_child("ReturnMainAccount", true, false)).is_null()
+	assert_bool(accounts.is_test()).is_false()   # opening the page does not create a test or change Main's features
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home")
+	(ui._modal.find_children("*", "P0SettingsPage", true, false)[0] as P0SettingsPage).back_pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("settings")
 
 func test_b_page_reuses_settings_layout_and_only_test_has_return_action() -> void:
 	for is_test in [false, true]:
