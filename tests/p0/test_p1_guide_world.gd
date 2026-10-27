@@ -158,6 +158,110 @@ func _marked_ui(v: Dictionary) -> P0Ui:
 	for file in [ui.quick_store, ui.tips_path]: DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 	return ui
 
+class WaterFarm extends Node3D:
+	var rt := {}
+	var bp: FarmBlueprint
+	var cam: Camera3D
+
+func _water_farm(ui: P0Ui) -> Node3D:
+	var farm: WaterFarm = auto_free(WaterFarm.new())
+	farm.rt = {ui = ui}
+	farm.bp = P0Garden.blueprint()
+	add_child(farm)
+	farm.cam = Camera3D.new()
+	farm.add_child(farm.cam)
+	farm.cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	farm.cam.size = 8.0
+	farm.cam.position = farm.bp.cell_to_world(P0Garden.cell_of(0)) + Vector3(0, 10, 0)
+	farm.cam.rotation_degrees.x = -90.0
+	var guide := FarmGuide.new().setup(farm)
+	farm.add_child(guide)
+	return guide
+
+func test_two_sown_teaching_beds_show_water_badges_and_water_pulses_once() -> void:
+	var v := _guide("t_water")
+	v.guide.marks = [{plot = 0}, {plot = 1}, {button = "water", pulse = true}]
+	v.plots = [{id = 0, state = "sown"}, {id = 1, state = "sown"}, {id = 2, state = "sown"}]
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	ui.set_action({verb = "Water", enabled = true, cmd = {type = "water", plot = 0}})
+	for i in 20:
+		guide._water_marks(v)
+		ui._refresh_guide_pulses()
+	for id in [0, 1]:
+		var badge: UiStatusBadge = ui._badges[FarmGuide.WATER_TAG + str(id)]
+		assert_bool(badge.visible).is_true()
+		assert_int(badge.state).is_equal(UiStatusBadge.State.AVAILABLE)
+		assert_object(badge.icon).is_same(P0Logic.icon("water"))
+		assert_int(badge.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_bool(ui._badges.has(FarmGuide.WATER_TAG + "2")).is_false()
+	assert_int(ui.guide_pulses._counts.water).is_equal(1)
+	# Only the server-confirmed growing bed loses its water badge; the other remains actionable.
+	v.plots[0].state = "growing"
+	guide._water_marks(v)
+	assert_bool(ui._badges[FarmGuide.WATER_TAG + "0"].visible).is_false()
+	assert_bool(ui._badges[FarmGuide.WATER_TAG + "1"].visible).is_true()
+	v.plots[1].state = "ready"
+	guide._water_marks(v)
+	assert_bool(ui._badges[FarmGuide.WATER_TAG + "1"].visible).is_false()
+
+func test_water_badges_follow_server_targets_and_hide_under_panels_offscreen_and_on_leave() -> void:
+	var v := _guide("t_water")
+	v.plots[0].state = "sown"
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	guide._water_marks(v)
+	assert_dict(ui._badges).is_empty()   # the step alone does not invent a target
+	v.guide.marks = [{plot = 0}]
+	guide._water_marks(v)
+	var badge: UiStatusBadge = ui._badges[FarmGuide.WATER_TAG + "0"]
+	assert_bool(badge.visible).is_true()
+	ui._open_modal(Control.new())
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_false()
+	ui.close_modal()
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_true()
+	guide.farm.cam.position.x += 100.0
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_false()
+	guide.farm.cam.position.x -= 100.0
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_true()
+	guide.hide_marks()   # farm placement mode
+	assert_bool(badge.visible).is_false()
+	guide._water_marks(v)
+	guide.leave()        # farm suspension, including entering the farmhouse
+	assert_bool(badge.visible).is_false()
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_true()
+	v.guide.marks = []
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_false()
+	v.guide.marks = [{plot = 0}]
+	v.guide.step = null
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_false()   # ordinary accounts / ended guide get no new marks
+
+func test_water_badge_stays_readable_when_pip_name_overlaps_its_plot() -> void:
+	var v := _guide("t_water")
+	v.guide.marks = [{plot = 0}]
+	v.plots[0].state = "sown"
+	var ui := await _marked_ui(v)
+	var guide := _water_farm(ui)
+	guide._water_marks(v)
+	var badge: UiStatusBadge = ui._badges[FarmGuide.WATER_TAG + "0"]
+	ui.npc_tag(FarmGuide.TAG, "Pip", badge.get_global_rect().end, true)
+	var tag: UiNpcNameTag = ui._npc_tags[FarmGuide.TAG]
+	tag.position = badge.position   # the opening camera can project the first bed under Pip's name
+	var original_name_rect := tag.get_global_rect()
+	assert_bool(badge.get_global_rect().intersects(original_name_rect)).is_true()
+	guide._water_marks(v)
+	assert_bool(badge.visible).is_true()
+	assert_bool(badge.get_global_rect().intersects(tag.get_global_rect())).is_false()
+	assert_that(tag.get_global_rect()).is_equal(original_name_rect)
+	assert_bool(ui._marker_area().encloses(badge.get_global_rect())).is_true()
+
 func test_harvest_and_location_need_server_marks_not_step_fallbacks() -> void:
 	var v := _guide("t_harvest_quick")
 	var ui := await _marked_ui(v)

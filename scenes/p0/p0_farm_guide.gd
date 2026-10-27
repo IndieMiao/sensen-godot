@@ -5,6 +5,7 @@ extends Node3D
 const NPCS := "res://assets/p0/outpost_npcs.json"
 const PIP := "res_pip"
 const TAG := "farm:guide_pip"
+const WATER_TAG := "farm:guide_water:"
 const STAND := Vector2i(5, 1)   # front/left of the first bed, between teaching plots 0/1; clear of Reed Bank's badge
 
 var farm: Node3D
@@ -13,6 +14,7 @@ var rig: AvatarRig
 var _waved := false
 var _wave_left := 0.0
 var _highlights := {}
+var _water_badges := {}
 
 func setup(host: Node3D) -> Node3D:
 	farm = host
@@ -40,6 +42,7 @@ func frame(view: Dictionary, dt: float) -> void:
 				rig.play_motion("emote_wave")
 				_wave_left = player.get_animation("emote_wave").length
 	_highlight(view)
+	_water_marks(view)
 
 func _spawn() -> void:
 	var def: Dictionary = P0RoomAnchors.read_json(NPCS).get("npcs", {}).get(PIP, {})
@@ -75,6 +78,44 @@ func _highlight(view: Dictionary) -> void:
 	# The ordinary near-bed outline must not introduce a third teaching highlight; actions stay enabled everywhere.
 	if not ids.is_empty() and str(view.get("guide", {}).get("step", "")) == "t_sow_quick": farm._hi.visible = false
 
+## Sown teaching beds need water, not another sow outline (340 S3). Read the actual plot state and server targets;
+## never infer a target from the step name or keep a drop after a confirmed watering. Display-only kit badges.
+func _water_marks(view: Dictionary) -> void:
+	var wanted := {}
+	if not farm.rt.ui.has_modal() and not farm.rt.ui.placing():
+		var ids := P0Guide.teaching_plots(view)
+		for plot in view.get("plots", []):
+			var id := int(plot.get("id", -1))
+			if not ids.has(id) or str(plot.get("state", "")) != "sown": continue
+			var at: Vector3 = farm.bp.cell_to_world(P0Garden.cell_of(id)) + Vector3(0, P0Garden.BED_H + 0.6, 0)
+			if farm.cam.is_position_behind(at): continue
+			wanted[id] = true
+			_water_badges[id] = true
+			farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE,
+				farm.cam.unproject_position(at), true, "", P0Logic.icon("water"))
+			_water_clear_of_pip(id)
+	for id in _water_badges:
+		if not wanted.has(id): farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE, Vector2.ZERO, false)
+
+## Pip stands beside the first teaching bed. Keep its droplet fully readable without moving his locked name tag;
+## prefer just above the tag, or below it at the top edge of the world band. Neither mark takes the other's input.
+func _water_clear_of_pip(id: int) -> void:
+	var badge: UiStatusBadge = farm.rt.ui._badges.get(WATER_TAG + str(id))
+	var tag: Control = farm.rt.ui._npc_tags.get(TAG)
+	if badge == null or not badge.visible or tag == null or not tag.visible: return
+	var rect := badge.get_global_rect()
+	var name_rect := tag.get_global_rect()
+	if not rect.intersects(name_rect): return
+	var area: Rect2 = farm.rt.ui._marker_area()
+	var above := name_rect.position.y - rect.size.y - UiTokens.SPACE_WITHIN
+	var below := name_rect.end.y + UiTokens.SPACE_WITHIN
+	if above >= area.position.y:
+		badge.global_position.y = above
+	elif below + rect.size.y <= area.end.y:
+		badge.global_position.y = below
+	else:
+		badge.hide()   # no clear world space, as for an anchor outside the viewport
+
 func tap(screen: Vector2, card: String) -> bool:
 	if pip_root == null or farm.rt.ui.has_modal(): return false
 	if farm.cam.is_position_behind(pip_root.global_position): return false
@@ -87,6 +128,7 @@ func tap(screen: Vector2, card: String) -> bool:
 func hide_marks() -> void:
 	farm.rt.ui.npc_tag(TAG, "", Vector2.ZERO, false)
 	for outline in _highlights.values(): outline.visible = false
+	for id in _water_badges: farm.rt.ui.badge(WATER_TAG + str(id), UiStatusBadge.State.AVAILABLE, Vector2.ZERO, false)
 
 ## Farm suspension counts as leaving (including going inside): never disappear in front of the player.
 func leave() -> void:
