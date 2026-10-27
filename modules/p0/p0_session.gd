@@ -45,6 +45,10 @@ var _queue: Array = []        # {cmd, key} sent while a request was in flight (r
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
 ## Tests replace the HTTP call: transport.call(method, path, body, cmd), then answer with _finish().
 var transport := Callable()
+## Development only (SGODOT-351): the Blackjack's bj_* commands answered locally until the server has them, its table
+## laid over every view (P0BlackjackMock; P0_BJ_MOCK=1 or user://p0_bj_mock). null in every build that ships.
+var bj_mock: P0BlackjackMock = P0BlackjackMock.new() if P0BlackjackMock.wanted() else null
+const _BJ_MOCK_MS := 120   # the reply's round trip, so the page's in-flight states show
 var _received_ms := 0
 var _refresh_left := REFRESH_S
 var _guide_maturity_checked := false
@@ -182,6 +186,11 @@ func dev_skip(minutes: int) -> void:
 
 func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> void:
 	busy = true
+	if bj_mock != null and method == HTTPClient.METHOD_POST and str(cmd.get("type", "")).begins_with("bj_"):
+		var raw := JSON.stringify(bj_mock.command(cmd, view)).to_utf8_buffer()
+		if is_inside_tree(): get_tree().create_timer(_BJ_MOCK_MS / 1000.0).timeout.connect(_finish.bind(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd))
+		else: _finish.call_deferred(HTTPRequest.RESULT_SUCCESS, 200, raw, cmd)
+		return
 	if transport.is_valid():
 		transport.call(method, path, body, cmd)
 		return
@@ -228,6 +237,7 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 		return {ok = false, code = "network", network = true}
 	if data.has("state"):
 		view = data.state
+		if bj_mock != null: bj_mock.decorate(view)
 		_received_ms = Time.get_ticks_msec()
 		_guide_maturity_checked = false
 	if bool(data.get("ok", false)):

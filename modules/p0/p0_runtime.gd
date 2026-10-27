@@ -562,6 +562,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	ui.blackjack_events(events)   # the Blackjack table plays its deal / cards / result itself (SGODOT-351)
 	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
 	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
@@ -769,6 +770,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if not title.is_empty(): ui.queue_card.call_deferred(func(): ui.show_title(title))
 			"coins":
 				if card_coins.any(func(x): return is_same(x, ev)): continue
+				if ui.modal_kind == "blackjack": continue   # the table floats its own wins over the hand (q(240))
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
@@ -1054,6 +1056,9 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
+		ui.blackjack_refused(code, detail)
+		return
 	if str(cmd.get("type", "")) == "wear_title": ui.title_not_worn(str(cmd.get("id", "")))   # q(180): back to the server's
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
@@ -1978,6 +1983,26 @@ func _dev_shot(dt: float) -> void:
 				ui.close_modal()
 				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
+			"blackjack":   # SGODOT-351 table from anywhere; blackjack:here also sends as from the card room (until 后裔's room)
+				if step.size() > 1 and step[1] == "here":
+					session.space = "outpost"
+					session.place = "sf_card_room_1"
+				ui.open_blackjack({"place": "Barbary Card Room", "keeper": "Lou"})
+			"bjtap":   # bjtap:3 taps the rail's stack 3 (0 = 5 … 5 = 1K)
+				if ui.blackjack() != null: ui.blackjack().tap_chip(int(step[1]))
+			"bjdeal":
+				if ui.blackjack() != null: ui.blackjack().deal(ui.blackjack().bet)
+			"bjact":   # bjact:hit|stand|double|split|takeback|rules
+				var bjp := ui.blackjack()
+				if bjp != null:
+					match step[1]:
+						"takeback": bjp.take_back()
+						"rules": bjp.open_rules()
+						_: bjp.act(step[1])
+			"bjdeck":   # bjdeck:AS:7D:KH:9C — the mock's next shoe (P0_BJ_MOCK only)
+				if session.bj_mock != null: session.bj_mock.next_deck = Array(step.slice(1))
+			"bjexpire":
+				if session.bj_mock != null: session.bj_mock.expire()
 			"closemodal": ui.close_modal()   # the card or sheet on top, as its ✕ (shots: a LOOK-PICK after an upgrade, 282)
 			"kitchen", "put":   # the farmhouse owns the cooking drawer (P0Farmhouse.p0_dev); elsewhere there is no stove
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: %s works in the farmhouse only" % step[0])
