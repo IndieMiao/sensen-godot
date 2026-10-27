@@ -530,7 +530,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
 	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
-	ui.teach(P0Guide.guide_tip_on_change(before, v))   # the new-player guide moved on: its step's TipCard (SGODOT-341)
 	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
 	# quick-bar slot once (UiQuickBar.flash: QuickSlot State=new, 600 ms). Not on the first view after starting.
 	if not before.is_empty():
@@ -1299,6 +1298,7 @@ func _on_resumed() -> void:
 	if session.view.is_empty() or _blocked != "" or _launch_s >= 0.0: return
 	_resume_ms = Time.get_ticks_msec()
 	if not session.busy: session.refresh()
+	else: session.refresh_after()
 
 func _end_resume() -> void:
 	if _resume_ms < 0: return

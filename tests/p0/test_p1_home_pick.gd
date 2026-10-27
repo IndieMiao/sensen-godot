@@ -320,7 +320,7 @@ func test_a_pending_save_and_the_feature_header() -> void:
 	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": true}})).is_false()
 	assert_bool(P0Runtime.home_taken(false, {})).is_false()
 	var session := P0Session.new()
-	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide"])
+	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide_v3"])
 	session.free()
 
 func test_a_baked_map_is_used_only_while_the_points_fit_it() -> void:
@@ -484,3 +484,25 @@ func _shown(l: Node) -> bool:
 		if (n as CanvasItem).modulate.a == 0.0 or (n as CanvasItem).self_modulate.a == 0.0: return false
 		n = n.get_parent()
 	return true
+
+# 341 S0: only Start here / Continue confirms the city, not opening or selecting a row.
+func test_city_continue_acks_the_current_guide_step_and_change_home_does_not() -> void:
+	var session: P0Session = auto_free(P0Session.new())
+	var commands := []
+	session.view = {"seq": 4, "guide": {"step": "t_city"}}
+	session.transport = func(_m, _p, _b, cmd):
+		if str(cmd.get("type", "")) == "guide": commands.append(cmd)
+	var flow: Control = auto_free(HomeFlow.new(session))
+	add_child(flow)
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": null, "matches": []})
+	flow.cities.rows[SEATTLE.id].pressed.emit()
+	assert_array(commands).is_empty()
+	flow.cities.key.activated.emit()
+	assert_int(commands.size()).is_equal(1)
+	assert_str(str(commands[0].step)).is_equal("t_city")
+	flow.back_to_cities()
+	flow.cities.key.activated.emit()
+	assert_int(commands.size()).is_equal(1)
+	var changed: Control = auto_free(HomeFlow.new(session, 0.0, 0.0, SF.id))
+	changed._ack_city()
+	assert_int(commands.size()).is_equal(1)

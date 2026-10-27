@@ -45,6 +45,7 @@ var _inflight := {}           # the {cmd, key} on the wire; {} for state refresh
 var transport := Callable()
 var _received_ms := 0
 var _refresh_left := REFRESH_S
+var _guide_maturity_checked := false
 ## UI moments for the observation log (S7): batched, sent apart from commands, dropped when the server is away.
 const UI_BATCH := 20
 const UI_FLUSH_S := 10.0
@@ -71,6 +72,7 @@ func _ready() -> void:
 func _process(dt: float) -> void:
 	_ui_flush_left -= dt
 	if _ui_flush_left <= 0.0 or _ui_events.size() >= UI_BATCH: _flush_ui()
+	_refresh_guide_maturity(float(Time.get_ticks_msec() - _received_ms))
 	_refresh_left -= dt
 	if _refresh_left <= 0.0 and not busy:
 		_refresh_left = REFRESH_S
@@ -81,6 +83,25 @@ func current() -> Dictionary:
 	if view.is_empty(): return view
 	return P0Logic.project(view, float(Time.get_ticks_msec() - _received_ms))
 
+## A locally expired crop may finish an optional guide step without any action. Ask the server once per view;
+## a busy command finishes first, and failures fall back to the existing retry/periodic refresh (no frame storm).
+func _refresh_guide_maturity(elapsed_ms: float) -> void:
+	if _guide_maturity_checked or not P0Guide.guide_on(view): return
+	for plot in view.get("plots", []):
+		if str(plot.get("state", "")) != "growing" or plot.get("ready_in", null) == null: continue
+		if float(plot.ready_in) > elapsed_ms: continue
+		_guide_maturity_checked = true
+		if busy: refresh_after()
+		else: refresh()
+		return
+
+## Pure client-page acknowledgement, sent only on a player confirmation. Keyed like other UI commands, so the
+## home build queued behind it uses its reply's seq; revisiting a completed page never acknowledges another step.
+func guide_ack(step: String) -> bool:
+	if not P0Guide.guide_on(view) or str(view.guide.step) != step: return false
+	var cmd := {"type": "guide", "op": "ack", "step": step}
+	return send(cmd, ui_key(cmd))
+
 ## One more read once the request on the wire is settled (a space entered while it was out: its read must carry it).
 var _refresh_queued := false
 func refresh_after() -> void:
@@ -88,6 +109,7 @@ func refresh_after() -> void:
 
 ## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
+	_refresh_left = REFRESH_S
 	_refresh_queued = false
 	var query := ("?space=" + space.uri_encode() if space != "" else "") + ("&place=" + place.uri_encode() if space != "" and place != "" else "")
 	_request(HTTPClient.METHOD_GET, "/p0/state" + query, {}, {})
@@ -194,6 +216,7 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	if data.has("state"):
 		view = data.state
 		_received_ms = Time.get_ticks_msec()
+		_guide_maturity_checked = false
 	if bool(data.get("ok", false)):
 		state_changed.emit(view, data.get("events", []))
 		return {ok = true, code = "", network = false}
@@ -215,9 +238,10 @@ static func boot_wanted() -> bool:
 	return FileAccess.file_exists("user://p0_boot") or OS.get_environment("SENSEN_P0") == "1" or OS.has_feature("p0")
 
 ## What this client can do that an older one could not (the server's `x-p0-features`): choose_home — a new save waits
-## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide — a new
-## save starts the new-player guide (SGODOT-341, P0Guide.guide_rows / tip_allowed) once the server's table has steps.
-const FEATURES := "choose_home,guide"
+## for the player to pick a home (SGODOT-303, the pick pages) instead of starting in the written city; guide_v3 — a new
+## save starts the v3 guide with server-resolved presentation (341 c6f3189a). The old `guide` feature advertised
+## by 0.2.11 is intentionally absent: that package cannot show the complete v3 guide.
+const FEATURES := "choose_home,guide_v3"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])

@@ -20,6 +20,7 @@ const _DONE_CHECK := 18            # Done row tick disc
 const _ROW_SEP := 2                # rows and dividers
 
 var _list: VBoxContainer
+var _structure: Array = []
 
 func _init(rows: Array = []) -> void:
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CARD, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
@@ -34,6 +35,18 @@ func _init(rows: Array = []) -> void:
 	set_rows(rows)
 
 func set_rows(rows: Array) -> void:
+	# A clock tick changes only text. Keep Show pills alive so it cannot cancel a press begun just before the tick.
+	var visible_rows := rows.slice(0, MAX_ROWS)
+	var structure := visible_rows.map(func(r): return [r.get("icon"), r.get("state", "default"), r.get("action", ""),
+		bool(r.get("tap", false)), str(r.get("state", "")) == "short" and str(r.get("tail", "")) != ""])
+	if structure == _structure and _list.get_child_count() > 0:
+		for i in visible_rows.size():
+			var row := _list.get_child(i * 2)
+			_set_line(row.find_child("Line", true, false), str(visible_rows[i].get("line", "")))
+			var tail := row.find_child("Tail", true, false) as Label
+			if tail != null: tail.text = str(visible_rows[i].get("tail", ""))
+		return
+	_structure = structure
 	for c in _list.get_children(): c.free()
 	var n := mini(rows.size(), MAX_ROWS)
 	for i in n:
@@ -71,14 +84,14 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 	line.max_lines_visible = 2
 	line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	# Two lines break at a " · " (不知火舞 on #201): `Catch 2 Pond Crucian` / `Fern Pond`, not `… Crucian ·` / `Fern Pond`.
-	var said := str(r.get("line", ""))
-	line.resized.connect(func():
-		var shown := UiKit.break_at_dot(said, line.get_theme_font(&"font"), line.get_theme_font_size(&"font_size"), line.size.x)
-		if line.text != shown: line.text = shown)
+	line.name = "Line"
+	line.set_meta("sentence", str(r.get("line", "")))
+	line.resized.connect(func(): _set_line(line, str(line.get_meta("sentence", ""))))
 	text.add_child(line)
 	if state == "short" and str(r.get("tail", "")) != "":
 		var tail := UiKit.label(str(r.tail), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 		tail.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		tail.name = "Tail"
 		text.add_child(tail)
 	row.add_child(text)
 	if done:
@@ -108,3 +121,8 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 				down[0] = Vector2.INF
 				row_pressed.emit(index))
 	return row
+
+static func _set_line(line: Label, sentence: String) -> void:
+	line.set_meta("sentence", sentence)
+	var shown := UiKit.break_at_dot(sentence, line.get_theme_font(&"font"), line.get_theme_font_size(&"font_size"), line.size.x)
+	if line.text != shown: line.text = shown

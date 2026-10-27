@@ -336,6 +336,7 @@ func set_view(v: Dictionary) -> void:
 	if passport() != null: _passport.call("refresh", v)
 	_refresh_hud()
 	_refresh_bar()
+	_refresh_today()
 
 
 var _hold_here := ""
@@ -2489,36 +2490,59 @@ var cook_page_from_today := ""
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
+var _today_panel: UiTodayPanel
+var _today_rows: Array = []
+var _today_given: Array = []
+var _today_signature := ""
+
 func open_today(given: Array = []) -> void:
-	var rows := given if not given.is_empty() else P0Logic.today_rows(view)
-	if given.is_empty(): _see_today(P0Logic.today_dots(rows))
+	_today_given = given.duplicate(true)
+	_today_signature = ""
+	var panel := UiTodayPanel.new()
+	panel.theme = UiKit.theme()
+	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
+	panel.show_pressed.connect(_show_today_row)
+	panel.row_pressed.connect(func(i: int):
+		if i < 0 or i >= _today_rows.size(): return
+		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
+		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given)))
+	_open_modal(panel, 0.0)
+	_today_panel = panel
+	modal_kind = "today"
+	_refresh_today()
+
+## Open Today follows authoritative step/recover changes and locally projected countdowns. The button reads the
+## same current row the player sees, never the rows captured when the panel first opened (341).
+func _refresh_today() -> void:
+	if modal_kind != "today" or not is_instance_valid(_today_panel): return
+	var rows := _today_given if not _today_given.is_empty() else P0Logic.today_rows(view)
+	var sig := JSON.stringify(rows) + space_here() + place + str(spot_reachable())
+	if sig == _today_signature: return
+	_today_signature = sig
+	_today_rows = rows
+	if _today_given.is_empty(): _see_today(P0Logic.today_dots(rows))
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != ""   # a fish the player cannot land yet: the row opens its gate card (q(104))
+		d.tap = str(r.get("gate", "")) != ""
+		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
+			d.line = str(r.line) + " " + str(r.tail)
 		return d)
-	var panel := UiTodayPanel.new(shown)
-	panel.theme = UiKit.theme()
-	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
-	panel.show_pressed.connect(func(i: int):
-		close_modal()
-		var go := str(rows[i].go)
-		if show_label(go, space_here(), spot_reachable(), place) == "Show":
-			# Only a row that asks to cook a page (Cook it: …, Cook: … · new recipe) names one, and only while the stove is
-			# free: a pot cooking or a dish waiting there is watched or collected, the drawer does not open, and the page
-			# would wait for a later tap and skip its Cook Again (刘邦 / 奕星 on #170).
-			var page := str(rows[i].get("page", ""))
-			var stove_free := P0KitchenLogic.stove(view) == null and P0KitchenLogic.stove_left(view).is_empty()
-			if go == "stove" and page != "" and stove_free and str(rows[i].get("state", "")) != "done": cook_page_from_today = page
-			show_spot.emit(go)
-		else: show_on_map.emit(map_target(go)))
-	# q(104): the fish's gate card, the Fish-dex silhouette's own (李白 A); the camera stays, Back returns to Today.
-	panel.row_pressed.connect(func(i: int):
-		var gate := P0Logic.fish_gate(view, str(rows[i].get("gate", "")))
-		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given)))
-	_open_modal(panel, 0.0)
-	modal_kind = "today"
+	_today_panel.set_rows(shown)
+
+func _show_today_row(i: int) -> void:
+	if i < 0 or i >= _today_rows.size(): return
+	var row: Dictionary = _today_rows[i]
+	close_modal()
+	var go := str(row.go)
+	if show_label(go, space_here(), spot_reachable(), place) == "Show":
+		# q(99): only remember a named recipe while the stove is free. This still only moves the camera.
+		var page := str(row.get("page", ""))
+		var stove_free := P0KitchenLogic.stove(view) == null and P0KitchenLogic.stove_left(view).is_empty()
+		if go == "stove" and page != "" and stove_free and str(row.get("state", "")) != "done": cook_page_from_today = page
+		show_spot.emit(go)
+	else: show_on_map.emit(map_target(go))
 
 ## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
 ## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,

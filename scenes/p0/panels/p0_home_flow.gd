@@ -104,6 +104,7 @@ func back_to_welcome() -> void:
 
 ## Pick your farm spot for a city row: its three spots read for this player.
 func open_spots(row: Dictionary) -> void:
+	_ack_city()
 	if spots != null: spots.queue_free()
 	var id := str(row.get("id", ""))
 	var city_name := str(row.get("name", ""))
@@ -116,6 +117,7 @@ func open_spots(row: Dictionary) -> void:
 		if change_from != "":
 			_confirm(cluster, spot, city_name)
 			return
+		_ack_city()   # explicit retry after a lost ack, before the queued choose_home
 		_sending = true
 		chose.emit(cluster, spot))
 	add_child(spots)
@@ -123,6 +125,10 @@ func open_spots(row: Dictionary) -> void:
 	if cities != null: cities.visible = false
 	if welcome != null: welcome.visible = false
 	_read_spots(id)
+
+## Start here / Continue confirms S0; merely selecting a row, opening the list or changing home does not.
+func _ack_city() -> void:
+	if change_from == "" and session != null: session.guide_ack("t_city")
 
 ## One read counts at a time: an older one's late answer (a Retry pressed meanwhile, 周瑜 on #451) is dropped.
 func _read_spots(id: String) -> void:

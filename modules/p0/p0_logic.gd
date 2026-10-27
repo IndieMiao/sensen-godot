@@ -1556,6 +1556,9 @@ static func today_rows(view: Dictionary) -> Array:
 	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
 			and not str(rows[2].get("dot", "")).begins_with("deliver:"):
 		rows[2] = latest
+	# q(215): even a ready ordinary delivery cannot displace the current guide goal. Other rows keep their order.
+	if P0Guide.guide_on(view) and not lead.is_empty():
+		rows = lead + rows.filter(func(r): return str(r.get("dot", "")) != str(lead[0].dot) and str(r.line) != str(lead[0].line))
 	return P0Guide.focus_first(rows.slice(0, 3))
 
 ## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.

@@ -33,11 +33,9 @@ const TIPS := {
 }
 ## Doing what a tip teaches closes it (q(26)); the other tips wait out their time or a tap.
 
-## A tip's sentence: the seven above, or one of the new-player guide's own (guide_steps.json `tips`, SGODOT-341); "" for none.
+## The seven built-in TipCards (q(215) §14.3). NPC dialogue never becomes a TipCard.
 static func tip_text(key: String) -> String:
-	if TIPS.has(key): return str(TIPS[key])
-	var own = P0Logic.content().get("guide", {}).get("tips", {})
-	return str(own.get(key, "")) if own is Dictionary else ""
+	return str(TIPS.get(key, ""))
 const TAUGHT_BY := {"sow": "sow", "cast": "cast", "cook": "cook", "heat": "heat"}
 
 ## Toast timing (q(26)): 2 s plus 0.5 s per 20 characters, at most 5 s.
@@ -99,57 +97,50 @@ class TipQueue:
 	func close() -> void: showing = ""
 
 # ---------------------------------------------------------------- new-player guide (SGODOT-341)
-# The server keeps the step (view.guide, server/src/p0/guide.ts): {step, phase, recover, at, progress {have, need}},
-# or {step: null, end} when there is none (every save from before the guide, and older clients' new saves). What a
-# step shows comes from the same table the server reads (assets/p0/content/guide_steps.json): Today's first row, a
-# TipCard, in-world marks. It never locks a control, never moves the player, never opens a panel by itself (LOCK-08);
-# a recover entry stands in for the step while the player is off its path (both radishes sold) and goes once healed.
+# The v3 server resolves the current step/recover into view.guide.row / marks / progress / pip (341 c6f3189a).
+# Never read the bundled step table: its ids, places and copy can differ from the server's current content.
+# Old servers and legacy saves have no active step; their existing first-session presentation stays intact.
 
 static func guide_on(view: Dictionary) -> bool:
 	var g = view.get("guide", null)
 	return g is Dictionary and g.get("step", null) != null and str(g.step) != ""
 
-## The id shown: the recover entry while the server names one, else the step; "" when the guide is off.
 static func guide_shown_id(view: Dictionary) -> String:
 	if not guide_on(view): return ""
 	var rec = view.guide.get("recover", null)
 	return str(rec) if rec != null and str(rec) != "" else str(view.guide.step)
 
-## The table's entry for what is shown (a step or a recover entry), or {}.
+## Resolved presentation, including a recover row when needed. Never change the server's step or counters.
 static func guide_shown(view: Dictionary) -> Dictionary:
-	var id := guide_shown_id(view)
-	if id == "": return {}
-	var table = P0Logic.content().get("guide", {})
-	if not table is Dictionary: return {}
-	var list := "recover" if id != str(view.guide.step) else "steps"
-	for e in table.get(list, []):
-		if e is Dictionary and str(e.get("id", "")) == id: return e
-	return {}
+	return view.guide if guide_on(view) else {}
 
-## Today's guide row: the entry's row, its count as the tail (`1/2`) while a step counts more than one. The dot
-## names the entry, so a new step lights the Today icon once (q(107)).
+## Adapt an actual place id to the existing camera-only Show route. Names always come from the server row.
+static func guide_go(view: Dictionary, go: String) -> String:
+	if go == "" or go in ["home", "plots", "stove", "stall", "bench", "board"] or go.contains(":"): return go
+	var home = view.get("home", {}).get("set", {})
+	if go == str(home.get("pond", "")) or go == home_pond(view): return "pond:" + go
+	for role in ["market", "tea", "tackle", "post"]:
+		if go == str(home.get(role, "")): return "outpost:" + go
+	if not P0Outposts.find(go).is_empty(): return "outpost:" + go
+	if not SystemPonds.location(go).is_empty(): return "pond:" + go
+	return go
+
+## Today uses the server's already-resolved line and progress, including recover progress. Red-dot identity stays
+## stable as a counter changes; a different step/recover is a new goal. The server row is never mutated.
 static func guide_rows(view: Dictionary) -> Array:
-	var e := guide_shown(view)
-	var row = e.get("row", {})
+	var g := guide_shown(view)
+	var row = g.get("row", null)
 	if not row is Dictionary or str(row.get("line", "")) == "": return []
-	var r := _row(str(row.line), str(row.get("icon", "")), str(row.get("go", "")), "guide:" + guide_shown_id(view))
-	var p = view.guide.get("progress", null)
-	if guide_shown_id(view) == str(view.guide.step) and p is Dictionary and int(p.get("need", 1)) > 1:
+	var r := _row(str(row.line), str(row.get("icon", "")), guide_go(view, str(row.go) if row.get("go") != null else ""), "guide:" + guide_shown_id(view))
+	var p = g.get("progress", null)
+	if p is Dictionary and int(p.get("need", 0)) > 0:
 		r.tail = "%d/%d" % [int(p.get("have", 0)), int(p.need)]
 	return [r]
 
-## While the guide is on, a TipCard comes from the entry shown, plus the two safety tips (heat, meal); the worlds'
-## own first-time tips (sow at the farm, creel at the pond, cook in the kitchen, map) wait, so two voices never teach
-## the same minute. Off, every tip as before.
-static func tip_allowed(view: Dictionary, key: String) -> bool:
-	if not guide_on(view): return true
-	return key in ["heat", "meal"] or key == str(guide_shown(view).get("tip", ""))
-
-## The tip to ask for when what the guide shows changed between two views ("" when it did not, or it has none).
-static func guide_tip_on_change(before: Dictionary, after: Dictionary) -> String:
-	var id := guide_shown_id(after)
-	if id == "" or id == guide_shown_id(before): return ""
-	return str(guide_shown(after).get("tip", ""))
+## Keep all seven original scene/event triggers (q(215) ⑤). A step never introduces an eighth card or starts one
+## early. TipQueue still handles seen state, the action closing a card, and RewardMoment ordering.
+static func tip_allowed(_view: Dictionary, key: String) -> bool:
+	return TIPS.has(key)
 
 # ---------------------------------------------------------------- first session state
 
