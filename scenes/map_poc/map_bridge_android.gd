@@ -88,6 +88,9 @@ func start_location() -> void:
 	if _has_location_permission():
 		_plugin.startLocation()
 		return
+	# Asks for every dangerous permission in the manifest, RECORD_AUDIO too, through GodotActivity: a microphone grant here
+	# starts the engine's own audio input and nothing stops it (SGODOT-349). The P0 map never comes here; native/permission's
+	# PermissionActivity is the way to ask for the microphone (周瑜 on #519).
 	OS.request_permissions()
 	_awaiting_permission = true
 	_poll_frames = 0

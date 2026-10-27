@@ -32,10 +32,18 @@ missing=()
 B=android/build
 grep -qs 'com.mapbox.maps:android' "$B/build.gradle" && [[ -f "$B/src/main/java/com/sensen/map/GodotMapPlugin.kt" ]] \
   || missing+=("the Mapbox overlay (tools/android/setup_android_build.sh)")
-grep -qs 'io.livekit:livekit-android' "$B/build.gradle" && [[ -f "$B/src/main/java/com/sensen/voice/GodotVoicePlugin.kt" ]] \
-  || missing+=("GodotVoice / LiveKit (python3 tools/android/prepare_voice_plugin.py)")
-[[ -f "$B/src/main/java/com/sensen/webview/GodotWebViewPlugin.kt" ]] || missing+=("GodotWebView (python3 tools/android/prepare_webview_plugin.py)")
-[[ -f "$B/src/main/java/com/sensen/googleauth/GodotGoogleSignInPlugin.kt" ]] || missing+=("GodotGoogleSignIn (python3 tools/android/prepare_google_signin_plugin.py)")
+# A plugin source in the build must be the tracked one, not only there: a build machine whose android/build was
+# prepared before a plugin changed would export the old code without a word (周瑜 on #519).
+same() { cmp -s "native/$1" "$B/src/main/java/com/sensen/$2"; }
+grep -qs 'io.livekit:livekit-android' "$B/build.gradle" && same voice/android/GodotVoicePlugin.kt voice/GodotVoicePlugin.kt \
+  || missing+=("GodotVoice / LiveKit, current (python3 tools/android/prepare_voice_plugin.py)")
+same webview/android/GodotWebViewPlugin.kt webview/GodotWebViewPlugin.kt || missing+=("GodotWebView, current (python3 tools/android/prepare_webview_plugin.py)")
+# Both ask for the microphone through PermissionActivity, never GodotActivity (SGODOT-349): it must be in and declared.
+same permission/android/PermissionActivity.kt permission/PermissionActivity.kt \
+  && grep -qs 'com.sensen.permission.PermissionActivity' "$B/src/main/AndroidManifest.xml" \
+  || missing+=("PermissionActivity, current and in the manifest (either prepare_voice_plugin.py or prepare_webview_plugin.py)")
+same googleauth/android/GodotGoogleSignInPlugin.kt googleauth/GodotGoogleSignInPlugin.kt \
+  || missing+=("GodotGoogleSignIn, current (python3 tools/android/prepare_google_signin_plugin.py)")
 if (( ${#missing[@]} )); then
   printf 'not building: the Android build is missing\n' >&2; printf '  - %s\n' "${missing[@]}" >&2
   echo "run tools/android/setup_android_build.sh, then the three prepare_*_plugin.py, and put mapbox_token.txt in place" >&2
