@@ -1,8 +1,577 @@
 {
-  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts.",
+  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts. v3 (SGODOT-341 PR-C-s2): S0–S11 of §14.3 (q(215)); Pip's lines q(222) ④; the resend q(217) ③; S12 waits for SGODOT-346 and is not in the table. Rows, marks' why and Pip's lines may name the home set ({market}, {pond}) and the count ({have}/{need}); row.countdown: the client writes `<line> in m:ss` from that crop's soonest ripening.",
   "guide": {
-    "steps": [],
-    "recover": [],
-    "tips": {}
+    "steps": [
+      {
+        "id": "t_city",
+        "phase": "S0",
+        "optional": true,
+        "done_on": {
+          "key": "ack:t_city"
+        }
+      },
+      {
+        "id": "t_pin",
+        "phase": "S1",
+        "done_on": {
+          "key": "home_pick"
+        }
+      },
+      {
+        "id": "t_sow_quick",
+        "phase": "S2",
+        "done_on": {
+          "key": "sow:crop_quick_radish",
+          "count": 2
+        },
+        "done_if": {
+          "planted": {
+            "crop_quick_radish": 2
+          }
+        },
+        "row": {
+          "line": "Sow 2 Quick Radishes",
+          "icon": "seed_quick_radish",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "plot": "teach"
+          },
+          {
+            "button": "sow",
+            "pulse": true
+          }
+        ],
+        "pip": "Hi, I'm Pip! These quick radishes are ready in no time. Plant them here!"
+      },
+      {
+        "id": "t_water",
+        "phase": "S3",
+        "done_on": {
+          "key": "water:crop_quick_radish",
+          "count": 2
+        },
+        "row": {
+          "line": "Water your Quick Radishes",
+          "icon": "seed_quick_radish",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "plot": "teach"
+          },
+          {
+            "button": "water",
+            "pulse": true
+          }
+        ],
+        "pip": "Now water them. They grow fast!"
+      },
+      {
+        "id": "t_sow_rest",
+        "phase": "S4",
+        "optional": true,
+        "done_on": {
+          "key": "sow:crop_lettuce",
+          "count": 10
+        },
+        "done_if": {
+          "ripe": {
+            "crop_quick_radish": 1
+          }
+        },
+        "row": {
+          "line": "Sow 10 Lettuce · 20 Energy",
+          "icon": "seed_lettuce",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "button": "quickbar:seed_lettuce",
+            "pulse": true
+          }
+        ],
+        "pip": "While they grow, plant some lettuce. That one takes a few hours."
+      },
+      {
+        "id": "t_harvest_quick",
+        "phase": "S5",
+        "done_on": {
+          "key": "harvest:crop_radish"
+        },
+        "needs": [
+          {
+            "if": {
+              "ripe": {
+                "crop_quick_radish": 1
+              }
+            },
+            "else": [
+              "r_quick_wait"
+            ]
+          }
+        ],
+        "row": {
+          "line": "Harvest 2 Quick Radishes",
+          "icon": "crop_radish",
+          "go": "home"
+        },
+        "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one."
+      },
+      {
+        "id": "t_nadia_1",
+        "phase": "S6",
+        "done_on": {
+          "key": "deliver:req_res_nadia_radish"
+        },
+        "needs": [
+          {
+            "if": {
+              "any": [
+                {
+                  "have": {
+                    "crop_radish": 1
+                  }
+                },
+                {
+                  "planted": {
+                    "crop_quick_radish": 1
+                  }
+                },
+                {
+                  "planted": {
+                    "crop_radish": 1
+                  }
+                }
+              ]
+            },
+            "else": [
+              "r_radish_sow"
+            ]
+          },
+          {
+            "if": {
+              "have": {
+                "crop_radish": 1
+              }
+            },
+            "else": [
+              "r_radish_wait",
+              "r_radish_sow"
+            ]
+          }
+        ],
+        "row": {
+          "line": "Bring Nadia 1 Radish · {market}",
+          "icon": "crop_radish",
+          "go": "home:market"
+        },
+        "marks": [
+          {
+            "place": "home:market",
+            "kind": "request",
+            "why": "Nadia · A Fresh Radish"
+          },
+          {
+            "resident": "res_nadia",
+            "kind": "request"
+          },
+          {
+            "button": "request",
+            "pulse": true
+          }
+        ],
+        "pip": "They're ready! Nadia at the market loves fresh radishes. Take her one."
+      },
+      {
+        "id": "t_fish",
+        "phase": "S7",
+        "done_on": {
+          "key": "catch",
+          "count": 2
+        },
+        "row": {
+          "line": "Catch 2 fish · {pond}",
+          "icon": "fish_crucian",
+          "go": "home:pond"
+        },
+        "marks": [
+          {
+            "place": "home:pond",
+            "kind": "request",
+            "why": "Catch 2 fish · {have}/{need}"
+          }
+        ],
+        "pip": "Off you go! I'll keep an eye on your plots."
+      },
+      {
+        "id": "t_meal",
+        "phase": "S8",
+        "done_if": {
+          "any": [
+            {
+              "keys": {
+                "eat": 1
+              }
+            },
+            {
+              "energy_full": true
+            }
+          ]
+        },
+        "needs": [
+          {
+            "if": {
+              "any": [
+                {
+                  "dish": 1
+                },
+                {
+                  "pot": "dish_grilled_crucian"
+                },
+                {
+                  "pot": "dish_fish_soup"
+                },
+                {
+                  "fish": 2
+                },
+                {
+                  "all": [
+                    {
+                      "fish": 1
+                    },
+                    {
+                      "keys": {
+                        "dish:dish_fish_soup": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "else": [
+              "r_fish_2",
+              "r_fish_1"
+            ]
+          }
+        ],
+        "row": {
+          "line": "Cook it: Grilled Crucian",
+          "icon": "dish_grilled_crucian",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "farmhouse",
+            "kind": "request"
+          },
+          {
+            "page": "dish_grilled_crucian",
+            "button": "cook",
+            "pulse": true
+          }
+        ],
+        "pip": "Off you go! I'll keep an eye on your plots."
+      },
+      {
+        "id": "t_soup",
+        "phase": "S9",
+        "done_on": {
+          "key": "dish:dish_fish_soup"
+        },
+        "needs": [
+          {
+            "if": {
+              "any": [
+                {
+                  "pot": "dish_fish_soup"
+                },
+                {
+                  "fish": 1
+                }
+              ]
+            },
+            "else": [
+              "r_fish_1"
+            ]
+          },
+          {
+            "if": {
+              "any": [
+                {
+                  "pot": "dish_fish_soup"
+                },
+                {
+                  "common_crop": 1
+                }
+              ]
+            },
+            "else": [
+              "r_radish_wait",
+              "r_radish_sow"
+            ]
+          }
+        ],
+        "row": {
+          "line": "Cook: Fresh Fish Soup · new recipe",
+          "icon": "dish_fish_soup",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "farmhouse",
+            "kind": "request"
+          },
+          {
+            "page": "dish_fish_soup",
+            "button": "cook",
+            "pulse": true
+          }
+        ],
+        "pip": "Off you go! I'll keep an eye on your plots."
+      },
+      {
+        "id": "t_gift",
+        "phase": "S10",
+        "done_on": {
+          "key": "gift:res_nadia"
+        },
+        "needs": [
+          {
+            "if": {
+              "any": [
+                {
+                  "dish": 1
+                },
+                {
+                  "pot": "dish_fish_soup"
+                },
+                {
+                  "pot": "dish_grilled_crucian"
+                },
+                {
+                  "pot": "dish_grilled_fish"
+                }
+              ]
+            },
+            "else": [
+              "r_cook_soup",
+              "r_cook_grill",
+              "r_fish_1"
+            ]
+          }
+        ],
+        "row": {
+          "line": "Bring Nadia your soup · {market}",
+          "icon": "dish_fish_soup",
+          "go": "home:market"
+        },
+        "marks": [
+          {
+            "place": "home:market",
+            "kind": "request",
+            "why": "Nadia · Bring your soup"
+          },
+          {
+            "resident": "res_nadia",
+            "kind": "gift"
+          },
+          {
+            "button": "gift",
+            "pulse": true
+          }
+        ],
+        "pip": "Off you go! I'll keep an eye on your plots."
+      },
+      {
+        "id": "t_nadia_2",
+        "phase": "S11",
+        "done_on": {
+          "key": "accept:req_res_nadia_six_radishes"
+        },
+        "row": {
+          "line": "See Nadia's new request",
+          "icon": "res_nadia",
+          "go": "home:market"
+        },
+        "marks": [
+          {
+            "place": "home:market",
+            "kind": "request",
+            "why": "Nadia · New request"
+          },
+          {
+            "resident": "res_nadia",
+            "kind": "request"
+          },
+          {
+            "button": "request",
+            "pulse": true
+          }
+        ],
+        "pip": "Off you go! I'll keep an eye on your plots."
+      }
+    ],
+    "recover": [
+      {
+        "id": "r_quick_wait",
+        "row": {
+          "line": "Quick Radishes ready",
+          "icon": "seed_quick_radish",
+          "go": "home",
+          "countdown": "crop_quick_radish"
+        },
+        "pip": "While they grow, plant some lettuce. That one takes a few hours."
+      },
+      {
+        "id": "r_radish_wait",
+        "when": {
+          "any": [
+            {
+              "planted": {
+                "crop_quick_radish": 1
+              }
+            },
+            {
+              "planted": {
+                "crop_radish": 1
+              }
+            }
+          ]
+        },
+        "row": {
+          "line": "Radish ready",
+          "icon": "crop_radish",
+          "go": "home",
+          "countdown": "crop_radish"
+        }
+      },
+      {
+        "id": "r_radish_sow",
+        "row": {
+          "line": "Sow 1 Radish · 2 Energy",
+          "icon": "seed_radish",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "plot": "teach1"
+          }
+        ]
+      },
+      {
+        "id": "r_fish_2",
+        "when": {
+          "not": {
+            "keys": {
+              "dish:dish_fish_soup": 1
+            }
+          }
+        },
+        "progress": {
+          "fish": 2
+        },
+        "row": {
+          "line": "Catch 2 fish · {pond}",
+          "icon": "fish_crucian",
+          "go": "home:pond"
+        },
+        "marks": [
+          {
+            "place": "home:pond",
+            "kind": "request",
+            "why": "Catch 2 fish · {have}/{need}"
+          }
+        ]
+      },
+      {
+        "id": "r_fish_1",
+        "progress": {
+          "fish": 1
+        },
+        "row": {
+          "line": "Catch 1 fish · {pond}",
+          "icon": "fish_crucian",
+          "go": "home:pond"
+        },
+        "marks": [
+          {
+            "place": "home:pond",
+            "kind": "request",
+            "why": "Catch 1 fish · {have}/{need}"
+          }
+        ]
+      },
+      {
+        "id": "r_cook_soup",
+        "when": {
+          "all": [
+            {
+              "fish": 1
+            },
+            {
+              "common_crop": 1
+            }
+          ]
+        },
+        "row": {
+          "line": "Cook: Fresh Fish Soup · new recipe",
+          "icon": "dish_fish_soup",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "farmhouse",
+            "kind": "request"
+          },
+          {
+            "page": "dish_fish_soup",
+            "button": "cook",
+            "pulse": true
+          }
+        ]
+      },
+      {
+        "id": "r_cook_grill",
+        "when": {
+          "fish": 1
+        },
+        "row": {
+          "line": "Cook it: Grilled Crucian",
+          "icon": "dish_grilled_crucian",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "farmhouse",
+            "kind": "request"
+          },
+          {
+            "page": "dish_grilled_crucian",
+            "button": "cook",
+            "pulse": true
+          }
+        ]
+      }
+    ],
+    "tips": {},
+    "pond_catch": false,
+    "stall_refill_on": "deliver:req_res_nadia_radish",
+    "resend": {
+      "item": "seed_quick_radish",
+      "qty": 2,
+      "max": 2,
+      "line": "Out of radishes? Here, two more quick ones.",
+      "radish": "crop_radish",
+      "deliver": "deliver:req_res_nadia_radish",
+      "dish": "dish:dish_fish_soup",
+      "source": "Pip's seeds"
+    },
+    "timeout_days": 2
   }
 }
