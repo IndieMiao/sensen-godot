@@ -43,7 +43,13 @@ var loading: Control         # a first pick's card outline till its first read i
 var pick_map: Object         # the map in its pick mode the pin page reads (null: the page's own flat map)
 ## The host's (P0Runtime): open_map(cluster) pushes the P0 map in its pick mode and returns it (null: none, the page's
 ## own flat map); close_map() pops it. Unset (the tests), the pin page keeps its flat map.
-var _land: ColorRect        # a first pick's ground under its pages: off while the real map is under the pin page
+var _land: ColorRect        # a first pick's ground under its pages: off while the real map is under them
+var _map_city := ""         # the city pick_map is over: HOME-WELCOME's map goes on under its pin page
+## HOME-WELCOME's map (340 §4, PR-2b; 不知火舞 342 bce34a87): the city view it flies to from the globe (every city
+## alike), and how long the flight takes.
+const WELCOME_ZOOM := 11.0
+const WELCOME_FLY_S := 1.0
+var _glide := false         # the next pin page comes on HOME-WELCOME's map: its start glides in (motion.recenterMs)
 var open_map := Callable()
 var close_map := Callable()
 var return_main := Callable()   # only the host of a test account's first city pick supplies this
@@ -93,50 +99,108 @@ func _read_cities(q: String) -> void:
 ## The first read of a first pick: a city near — HOME-WELCOME, the list made behind it for `Choose another city`;
 ## none — the list (HOME-PICK-1-NOIP). Later reads (a search, a retry) go to the list.
 func _cities_read(d: Dictionary, q: String) -> void:
-	_end_loading()
+	d = dev_near(d, q)
 	if cities == null and welcome == null:
 		var near = d.get("near", null)
+		if not near is Dictionary: _end_loading()   # HOME-WELCOME's: it dissolves as the flight starts (_welcome_map)
 		if near is Dictionary:
-			welcome = Welcome.new(near, _safe.y)
+			welcome = Welcome.new(near, _safe.y, _safe.x)
 			if return_main.is_valid(): welcome.add_return_main(return_main)
 			welcome.start_pressed.connect(func(): open_spots(near))
 			welcome.other_pressed.connect(_other_city)
 			add_child(welcome)
+			if loading != null: move_child(loading, -1)   # over the card's own land till it dissolves (_welcome_map)
+			_welcome_map(true)
 			_make_cities("Back")
 			cities.visible = false
 		else: _make_cities()
+	else: _end_loading()
 	if is_instance_valid(cities): cities.show_cities(d, q)
 
-func _end_loading() -> void:
-	if loading != null: loading.queue_free()
+## A debug build with user://p0_near (one line: an open city's id) reads that city as Near you on the first read: an
+## emulator's address is the host's, so HOME-WELCOME can be filmed there (PR-2b). Never in a release build.
+static func dev_near(d: Dictionary, q: String) -> Dictionary:
+	if q != "" or d.get("near") is Dictionary or not OS.is_debug_build() or not FileAccess.file_exists("user://p0_near"):
+		return d
+	var id := FileAccess.get_file_as_string("user://p0_near").strip_edges()
+	for r in (d.get("open", []) if d.get("open") is Array else []):
+		if r is Dictionary and str(r.get("id", "")) == id: return d.merged({"near": r}, true)
+	return d
+
+## The first read's card outline goes: at once, or (`fade`, HOME-WELCOME's flight starting) over motion.dissolveMs.
+func _end_loading(fade := false) -> void:
+	if loading == null: return
+	if fade and loading.is_inside_tree() and loading.has_method("dissolve"):
+		loading.dissolve(UiKit.secs(UiTokens.MOTION_DISSOLVE_MS))
+	else: loading.queue_free()
 	loading = null
 
-## HOME-WELCOME's `Choose another city`: the list, nothing picked.
+## HOME-WELCOME's `Choose another city`: the list, nothing picked; the list covers the screen, so the map goes.
 func _other_city() -> void:
 	cities.visible = true
 	welcome.visible = false
+	_drop_map()
 
-## The list's `‹ Back` (and Back) to HOME-WELCOME.
+## The list's `‹ Back` (and Back) to HOME-WELCOME: its map again, straight at the city view (no second flight).
 func back_to_welcome() -> void:
 	cities.visible = false
 	welcome.visible = true
+	_welcome_map(false)
+
+## HOME-WELCOME over the real map (340 §4, PR-2b): the P0 map in its pick mode over the near city — the camera flies
+## from the globe to the city view, then the card slides in; `fly` false (back to the card) puts it there at once.
+## Modal: the map takes no touches. No map (the tests, a navigation under way): the card at once, on the land.
+func _welcome_map(fly: bool) -> void:
+	_take_map(str(welcome.row.get("id", "")))
+	_pass_touches(false)
+	welcome.map = pick_map
+	if pick_map == null or not pick_map.has_method("pick_fly"):
+		_end_loading()   # no flight: the card stands in its place the same frame (不知火舞 342 b68bc2c7)
+		if fly: welcome.slide_in(false)
+		else: welcome.slide_in(true, true)   # back to the card: it slides in again all the same (不知火舞 bce34a87)
+		return
+	welcome.wait_for_map()
+	# The card laid out first: where the city goes reads its height. A one-shot connection, not an await — it goes with
+	# the flow if the flow is freed this frame (an await would resume on a freed instance; 亚瑟 on #512).
+	get_tree().process_frame.connect(_welcome_fly.bind(fly, pick_map), CONNECT_ONE_SHOT)
+
+func _welcome_fly(fly: bool, m: Variant) -> void:
+	# The first read's outline dissolves as the flight starts (不知火舞 3730603f) — from here, not the frame the map is
+	# made in: that frame's stall (the native MapView) would take the whole dissolve in one tween step.
+	_end_loading(true)
+	if not is_instance_valid(welcome) or pick_map != m: return
+	var at: Vector2 = welcome.get_global_transform_with_canvas() * welcome.city_point()
+	pick_map.pick_fly(WELCOME_ZOOM, WELCOME_FLY_S if fly else 0.0, at,
+		func(): if is_instance_valid(welcome): welcome.slide_in(true))
+
+## The map over `cluster`, the one up kept when it is already over it (HOME-WELCOME → its pin page: one map).
+func _take_map(cluster: String) -> void:
+	if pick_map != null and _map_city == cluster: return
+	_drop_map()
+	if open_map.is_valid(): pick_map = open_map.call(cluster)
+	if pick_map == null: return
+	_map_city = cluster
+	if _land != null: _land.visible = false
+
+## The pin page lets the drags and pinches through to the map; HOME-WELCOME (modal) does not.
+func _pass_touches(on: bool) -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_STOP
+	map_shown.emit(on)
 
 ## Pick your farm spot for a city row (HOME-PIN): its pin area read for this player; the home city itself in a change
 ## starts the pin on the farm (q(216) ⑨).
 func open_spots(row: Dictionary) -> void:
 	_ack_city()
 	if spots != null: spots.queue_free()
-	_drop_map()
 	var id := str(row.get("id", ""))
-	if open_map.is_valid(): pick_map = open_map.call(id)
-	if pick_map != null:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		if _land != null: _land.visible = false
-		map_shown.emit(true)
+	_glide = pick_map != null and _map_city == id and is_instance_valid(welcome) and welcome.visible
+	_take_map(id)
+	if pick_map != null: _pass_touches(true)
 	var city_name := str(row.get("name", ""))
 	var same := change_from != "" and id == change_from
 	spots = PinPage.new(id, city_name, "Change home city" if change_from != "" else "Pick your farm spot", _safe.x, _safe.y,
 		same, farm_now() if same else null, pick_map)
+	spots.glide_in = _glide
 	if change_from == "" and return_main.is_valid(): spots.add_return_main(return_main)   # a change has Settings
 	spots.back_pressed.connect(back_to_cities)
 	spots.retry_pressed.connect(func(): _read_spots(id))
@@ -202,6 +266,10 @@ func back_to_cities() -> void:
 	close_confirm()
 	if spots != null: spots.queue_free()
 	spots = null
+	if is_instance_valid(_under) and _under == welcome:   # back to the card: its map stays, at the city view
+		welcome.visible = true
+		_welcome_map(false)
+		return
 	_drop_map()
 	if is_instance_valid(_under): _under.visible = true
 	elif cities != null: cities.visible = true
@@ -211,6 +279,8 @@ func back_to_cities() -> void:
 func _drop_map(later := false) -> void:
 	if pick_map == null: return
 	pick_map = null
+	_map_city = ""
+	if is_instance_valid(welcome): welcome.map = null
 	if close_map.is_valid():
 		if later: close_map.call_deferred()   # leaving the tree, maybe with the root busy (the app quitting)
 		else: close_map.call()
