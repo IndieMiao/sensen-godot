@@ -148,7 +148,7 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	credits.visible = false
 	add_child(credits)
 	# its size settles a frame after its font first changes: placed again then, or it stands a pixel off
-	credits.minimum_size_changed.connect(func(): if credits.visible: _place_credits(true))
+	credits.minimum_size_changed.connect(func(): if credits.visible and _map_live(): _place_credits(true))   # the map may be gone (周瑜 on #512)
 	# over the places' names (UiMapDestination.NAME_Z 1, drawn over every disc): the pin, the panel, the card and keys
 	for n in [pin, panel, card, loading_card, error_card, build, back_key, credits]: (n as CanvasItem).z_index = OVER_NAMES_Z
 	resized.connect(_keep_pin)

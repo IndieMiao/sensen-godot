@@ -262,3 +262,30 @@ func test_build_here_waits_while_a_finger_is_on_the_map() -> void:
 	(p.map as PinPage.FlatMap).dragging = false
 	p.build.activated.emit()
 	assert_int(chose.size()).is_equal(1)
+
+## The real map as a node (p0_map is one): popped and freed while the page still stands.
+class NodeGroundMap extends Node:
+	var flat := PinPage.FlatMap.new()
+	func pick_geo_at(s: Vector2) -> Array: return flat.pick_geo_at(s)
+	func pick_screen_of(lat: float, lng: float) -> Variant: return flat.pick_screen_of(lat, lng)
+	func pick_put(lat: float, lng: float, s: Vector2) -> void: flat.pick_put(lat, lng, s)
+	func pick_dragging() -> bool: return false
+	func pick_px_per_m() -> float: return flat.px_per_m
+	func pick_has_ground() -> bool: return true
+
+## The credit line's size settling again after the map was popped (周瑜 on #512): it reads no freed map, stays put.
+func test_the_credit_line_reads_no_map_once_it_is_gone() -> void:
+	var m := NodeGroundMap.new()
+	add_child(m)
+	var p: Control = auto_free(PinPage.new("gn-5391959", "San Francisco", "Pick your farm spot", 0.0, 0.0, false, null, m))
+	add_child(p)
+	p.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	p.size = Vector2(360, 800)
+	p.show_area(_read())
+	await await_idle_frame()
+	assert_bool(p.credits.visible).is_true()
+	var at: Vector2 = p.credits.position
+	m.free()
+	p.credits.add_theme_font_size_override(&"font_size", 30)   # its minimum size changes: the callback runs
+	await await_idle_frame()
+	assert_object(p.credits.position).is_equal(at)
