@@ -18,9 +18,6 @@ extends Node3D
 const TAP_SLOP := 12.0
 
 var rig: AvatarRig
-## 次要入口：声音画像 H5（应用内 WebView）。浮在角色区右侧、抽屉上方，顶栏已满。
-var voice_profile_button: Button
-var voice_match: VoiceMatchLink
 var _dragging := false
 var _drag_distance := 0.0
 var _reframe_queued := false
@@ -73,7 +70,6 @@ func _ready() -> void:
 	restore_button.pressed.connect(_on_restore)
 	done_button.pressed.connect(_on_done)
 	safe_area.margins_applied.connect(_on_safe_margins_applied)
-	_build_voice_profile_entry()
 	get_viewport().size_changed.connect(_reframe)
 	drawer.resized.connect(_reframe)
 
@@ -119,36 +115,6 @@ func _on_safe_margins_applied(margins: Vector4) -> void:
 	_reframe()
 
 
-func _build_voice_profile_entry() -> void:
-	voice_match = VoiceMatchLink.new()
-	voice_match.name = "VoiceMatchLink"
-	add_child(voice_match)
-	voice_profile_button = GameUi.button("mic", L10n.text("Voice Profile"), L10n.text("Voice Profile"))
-	voice_profile_button.name = "VoiceProfileButton"
-	voice_profile_button.theme = GameUi.theme()
-	voice_profile_button.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	voice_profile_button.pressed.connect(_on_voice_profile)
-	$UI.add_child(voice_profile_button)
-
-
-func _on_voice_profile() -> void:
-	if _committing:
-		return
-	# 从个人换装页进入默认单人画像；H5 内仍可切到双人比较。
-	voice_match.open("solo")
-
-
-func _place_voice_profile_entry() -> void:
-	if voice_profile_button == null:
-		return
-	var view := get_viewport().get_visible_rect().size
-	var button_size := voice_profile_button.get_combined_minimum_size()
-	voice_profile_button.size = button_size
-	voice_profile_button.position = Vector2(
-		view.x - _safe_margins.z - button_size.x,
-		drawer.get_global_rect().position.y - 12.0 - button_size.y)
-
-
 func _on_back() -> void:
 	if _committing:
 		return
@@ -157,8 +123,7 @@ func _on_back() -> void:
 
 
 func is_back_navigation_locked() -> bool:
-	# H5 盖在上面时，系统返回键归 WebView（先回退网页历史，再关闭）。
-	return _committing or (voice_match != null and voice_match.blocks_back_navigation())
+	return _committing
 
 
 func _on_restore() -> void:
@@ -200,8 +165,6 @@ func _refresh_completion_state() -> void:
 	done_button.disabled = _committing or busy
 	back_button.disabled = _committing
 	restore_button.disabled = _committing
-	if voice_profile_button:
-		voice_profile_button.disabled = _committing
 	parts_panel.set_interaction_enabled(not _committing)
 	if _committing:
 		done_button.text = L10n.text("Saving...")
@@ -273,7 +236,6 @@ func _reframe(animate := false) -> void:
 	# Canvas background stays fixed when category focus moves the 3D camera.
 	room_background.size = get_viewport().get_visible_rect().size
 	$UI/FooterPaper.offset_top = drawer.get_global_rect().position.y
-	_place_voice_profile_entry()
 	var header_height := maxf(top_bar.size.y, top_bar.get_combined_minimum_size().y)
 	$UI/HeaderPaper.size.y = _safe_margins.y + header_height + 8.0
 	cam.safe_margin_top = _safe_margins.y + header_height + 8.0

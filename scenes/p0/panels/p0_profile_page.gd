@@ -10,7 +10,8 @@ extends Control
 ##   skills      three UiSkillCards; tapping one opens the skill details
 ##   farm        UiFarmCard: farm name, Level N, the farm's status line, › to HOME-1
 ##   Collections Fish-dex and Cookbook pages as M count NEED-TILEs
-## Emits back_pressed, edit_look_pressed, skill_pressed(skill), settings_pressed, title_pressed.
+##   voice       `Voice Profile ›`: a NavigationRow on a farm-card surface, 16 under Collections (SGODOT-349)
+## Emits back_pressed, edit_look_pressed, skill_pressed(skill), settings_pressed, title_pressed, voice_pressed.
 
 signal back_pressed
 signal edit_look_pressed
@@ -22,6 +23,8 @@ signal collection_pressed(key: String)
 signal farm_pressed
 ## The title beside the name was tapped: the Titles drawer (q(180) ⑤).
 signal title_pressed
+## `Voice Profile ›` was tapped: the voice-match H5 (SGODOT-349; the host opens it, no transition of its own).
+signal voice_pressed
 
 const P0Titles := preload("res://modules/p0/p0_titles.gd")
 const SKILLS := ["farming", "fishing", "cooking"]
@@ -138,6 +141,30 @@ func refresh(view_: Dictionary) -> void:
 		tile.pressed.connect(func(): collection_pressed.emit(key))
 		tiles.append(tile)
 	col.add_child(UiNeedTile.group(tiles))
+	col.add_child(_voice_row())
+
+## `Voice Profile ›` under Collections (SGODOT-349, 不知火舞 2ca37b44): the NavigationRow main (9:99743, 49 high,
+## label and ›, no icon) on a full-width card that looks like the farm card (radius 12, the raised surface, no stroke);
+## the whole row is the button. 16 under Collections: the column's gap and _VOICE_GAP more.
+func _voice_row() -> Control:
+	var wrap := MarginContainer.new()
+	wrap.name = "VoiceProfile"
+	wrap.add_theme_constant_override(&"margin_top", int(_VOICE_GAP))
+	var card := PanelContainer.new()
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, _VOICE_RADIUS)
+	box.content_margin_left = _VOICE_PAD   # the NavigationRow main has no side padding of its own
+	box.content_margin_right = _VOICE_PAD
+	card.add_theme_stylebox_override(&"panel", box)
+	wrap.add_child(card)
+	var row := UiNavButton.new("Voice Profile")
+	row.name = "VoiceProfileRow"
+	row.pressed.connect(func(): voice_pressed.emit())
+	card.add_child(row)
+	return wrap
+
+const _VOICE_GAP := 8.0      # + _CONTENT_GAP = 16 under Collections
+const _VOICE_RADIUS := 12.0  # UiFarmCard's
+const _VOICE_PAD := 16.0     # the row's text and › in from the card's sides, as SettingRow's (不知火舞 on 349)
 
 ## The Fish-dex badge on the Fish tile (283 PROFILE-1-DEX, Figma 9c93e46e): 22 at (51, −2) of the NeedTile M frame, its
 ## ring 15 in — (36, −2) from the ring, so a wider label line does not move it.
