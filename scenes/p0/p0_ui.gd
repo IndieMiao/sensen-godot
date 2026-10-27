@@ -54,6 +54,10 @@ const _FLOAT_HUG_CHARS := 32         # longer float copy wraps to two lines (Flo
 const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
 const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
 const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
+signal test_account_requested(action: String)
+const TestAccounts := preload("res://modules/p0/p0_test_accounts.gd")
+var test_accounts = TestAccounts.new()
+
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a card over a facility that also shows a badge sits this far above it (the mine's EntryCard)
@@ -337,6 +341,7 @@ func set_view(v: Dictionary) -> void:
 	if passport() != null: _passport.call("refresh", v)
 	_refresh_hud()
 	_refresh_bar()
+	_refresh_today(false)
 
 
 var _hold_here := ""
@@ -1461,6 +1466,9 @@ func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 		_screen.secondary_pressed.connect(func(k: P0SysScreen.Kind): screen_back.emit(k))
 		_screen_layer.add_child(_screen)
 	_screen.show_kind(kind, detail)
+	if test_accounts.is_test() and kind == P0SysScreen.Kind.FAIL:
+		_screen.set_return_main(func(): test_account_requested.emit("main"))
+	else: _screen.set_return_main(Callable())
 
 ## Takes the screen down when it is one of `kinds` (any when empty).
 func hide_screen(kinds: Array = []) -> void:
@@ -2492,36 +2500,67 @@ var cook_page_from_today := ""
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
+var _today_panel: UiTodayPanel
+var _today_rows: Array = []
+var _today_given: Array = []
+var _today_signature := ""
+var _today_refresh_ms := -1000
+
 func open_today(given: Array = []) -> void:
-	var rows := given if not given.is_empty() else P0Logic.today_rows(view)
-	if given.is_empty(): _see_today(P0Logic.today_dots(rows))
+	_today_given = given.duplicate(true)
+	_today_signature = ""
+	var panel := UiTodayPanel.new()
+	panel.theme = UiKit.theme()
+	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
+	panel.show_pressed.connect(_show_today_row)
+	panel.row_pressed.connect(func(i: int):
+		if i < 0 or i >= _today_rows.size(): return
+		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
+		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given)))
+	_open_modal(panel, 0.0)
+	_today_panel = panel
+	modal_kind = "today"
+	_refresh_today()
+
+## Open Today follows authoritative step/recover changes and locally projected countdowns. The button reads the
+## same current row the player sees, never the rows captured when the panel first opened (341).
+func _refresh_today(force := true) -> void:
+	if modal_kind != "today" or not is_instance_valid(_today_panel): return
+	var now := Time.get_ticks_msec()
+	if not force and now - _today_refresh_ms < 250: return
+	_today_refresh_ms = now
+	var rows := _today_given if not _today_given.is_empty() else P0Logic.today_rows(view)
+	var sig := JSON.stringify(rows) + space_here() + place + str(spot_reachable())
+	if sig == _today_signature: return
+	_today_signature = sig
+	_today_rows = rows
+	if _today_given.is_empty(): _see_today(P0Logic.today_dots(rows))
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != ""   # a fish the player cannot land yet: the row opens its gate card (q(104))
+		d.tap = str(r.get("gate", "")) != ""
+		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
+			var line := str(r.line)
+			var at := line.find(" · ")
+			if at < 0: at = line.length()
+			d.line = line.insert(at, " · " + str(r.tail))
+			d.tail = ""
 		return d)
-	var panel := UiTodayPanel.new(shown)
-	panel.theme = UiKit.theme()
-	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
-	panel.show_pressed.connect(func(i: int):
-		close_modal()
-		var go := str(rows[i].go)
-		if show_label(go, space_here(), spot_reachable(), place) == "Show":
-			# Only a row that asks to cook a page (Cook it: …, Cook: … · new recipe) names one, and only while the stove is
-			# free: a pot cooking or a dish waiting there is watched or collected, the drawer does not open, and the page
-			# would wait for a later tap and skip its Cook Again (刘邦 / 奕星 on #170).
-			var page := str(rows[i].get("page", ""))
-			var stove_free := P0KitchenLogic.stove(view) == null and P0KitchenLogic.stove_left(view).is_empty()
-			if go == "stove" and page != "" and stove_free and str(rows[i].get("state", "")) != "done": cook_page_from_today = page
-			show_spot.emit(go)
-		else: show_on_map.emit(map_target(go)))
-	# q(104): the fish's gate card, the Fish-dex silhouette's own (李白 A); the camera stays, Back returns to Today.
-	panel.row_pressed.connect(func(i: int):
-		var gate := P0Logic.fish_gate(view, str(rows[i].get("gate", "")))
-		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given)))
-	_open_modal(panel, 0.0)
-	modal_kind = "today"
+	_today_panel.set_rows(shown)
+
+func _show_today_row(i: int) -> void:
+	if i < 0 or i >= _today_rows.size(): return
+	var row: Dictionary = _today_rows[i]
+	close_modal()
+	var go := str(row.go)
+	if show_label(go, space_here(), spot_reachable(), place) == "Show":
+		# q(99): only remember a named recipe while the stove is free. This still only moves the camera.
+		var page := str(row.get("page", ""))
+		var stove_free := P0KitchenLogic.stove(view) == null and P0KitchenLogic.stove_left(view).is_empty()
+		if go == "stove" and page != "" and stove_free and str(row.get("state", "")) != "done": cook_page_from_today = page
+		show_spot.emit(go)
+	else: show_on_map.emit(map_target(go))
 
 ## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
 ## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,
@@ -3128,24 +3167,62 @@ func open_titles(back := Callable()) -> UiDrawer:
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
 func open_settings(back := Callable()) -> void:
-	var page := P0SettingsPage.settings(P0Legal.version_line(P0Session.demo_config(
-		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else "")),
+	var version := P0Legal.version_line(P0Session.demo_config(
+		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
+	if test_accounts.is_test(): version += " · Test"
+	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)))
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
 		# Home city › (SGODOT-303 PR-4): the change; its ‹ Settings comes back here
 		if what == "home": change_home.emit(func(): open_settings(back))
+		elif what == "test_options": open_test_options(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
+
+func open_test_options(back: Callable) -> void:
+	var page := P0SettingsPage.test_options(test_accounts.enabled(), test_accounts.is_test(), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.toggled.connect(func(_what, on: bool):
+		if not test_accounts.set_enabled(on):
+			var toggle := page.find_child("GuideTestToggle", true, false) as UiSettingRow
+			toggle.on = test_accounts.enabled()
+			show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again"))
+	page.open_pressed.connect(func(what: String):
+		if what == "test_new": _confirm_test_account(back)
+		elif what == "test_main": test_account_requested.emit("main"))
+	_open_modal(page, 0.0, true)
+	modal_kind = "test_options"
+	_modal_back = back
+
+func _confirm_test_account(back: Callable) -> void:
+	var confirm = load("res://scenes/p0/panels/p0_home_move_confirm.gd").new()
+	confirm.theme = UiKit.theme()
+	confirm.card.find_child("Title", true, false).text = "Start a new test account?"
+	confirm.card.find_child("Body", true, false).text = "Your main farm is kept."
+	confirm.move.label = "Start"
+	confirm.move.sends = false
+	var cancel := func():
+		confirm.queue_free()
+		modal_kind = "test_options"
+		_modal_back = back
+	confirm.cancelled.connect(cancel)
+	confirm.move_pressed.connect(func(): test_account_requested.emit("new"))
+	_modal.add_child(confirm)   # keep the settings page behind its confirmation, not the game HUD
+	modal_kind = "test_confirm"
+	_modal_back = cancel
 
 ## The home pick (SGODOT-303, P0HomeFlow): a new player's first pages over no world, or the change of home from
 ## Settings. Back closes a layer at a time (the confirm card, the spot page); on a first pick's city page it does
 ## nothing (there is nowhere before it), on the change's it goes back to Settings.
 func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
+	if test_accounts.is_test() and flow.change_from == "":
+		flow.return_main = func(): test_account_requested.emit("main")
 	flow.say.connect(func(text: String): toast(text))
 	_open_modal(flow, 0.0, true)
 	# the pin page over the real map (SGODOT-342 PR-2): its clear scrim lets the drags and pinches through to the map

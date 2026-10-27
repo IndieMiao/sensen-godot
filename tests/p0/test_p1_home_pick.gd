@@ -247,7 +247,8 @@ func test_a_pending_save_and_the_feature_header() -> void:
 	assert_bool(P0Runtime.home_taken(false, {"home": {"pending": true}})).is_false()
 	assert_bool(P0Runtime.home_taken(false, {})).is_false()
 	var session := P0Session.new()
-	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home,guide"])
+	assert_array(Array(session._headers())).contains(["x-p0-features: choose_home"])
+	assert_array(Array(session._headers())).not_contains(["x-p0-features: choose_home,guide_v3"])   # partial client must stay legacy
 	session.free()
 
 func _welcome_flow(near: Variant) -> Array:
@@ -398,3 +399,61 @@ func _shown(l: Node) -> bool:
 		if (n as CanvasItem).modulate.a == 0.0 or (n as CanvasItem).self_modulate.a == 0.0: return false
 		n = n.get_parent()
 	return true
+
+# 341 S0: only Start here / Continue confirms the city, not opening or selecting a row.
+func test_city_continue_acks_the_current_guide_step_and_change_home_does_not() -> void:
+	var session: P0Session = auto_free(P0Session.new())
+	var commands := []
+	session.view = {"seq": 4, "guide": {"step": "t_city"}}
+	session.transport = func(_m, _p, _b, cmd):
+		if str(cmd.get("type", "")) == "guide": commands.append(cmd)
+	var flow: Control = auto_free(HomeFlow.new(session))
+	add_child(flow)
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": null, "matches": []})
+	flow.cities.rows[SEATTLE.id].pressed.emit()
+	assert_array(commands).is_empty()
+	flow.cities.key.activated.emit()
+	assert_int(commands.size()).is_equal(1)
+	assert_str(str(commands[0].step)).is_equal("t_city")
+	flow.back_to_cities()
+	flow.cities.key.activated.emit()
+	assert_int(commands.size()).is_equal(1)
+	var changed: Control = auto_free(HomeFlow.new(session, 0.0, 0.0, SF.id))
+	changed._ack_city()
+	assert_int(commands.size()).is_equal(1)
+
+func test_pin_confirm_retries_a_lost_city_ack_before_build_and_uses_returned_seq() -> void:
+	var session: P0Session = auto_free(P0Session.new())
+	session.view = {"seq": 4, "guide": {"step": "t_city"}}
+	var posts := []
+	session.transport = func(_m, path, body, cmd):
+		if path == "/p0/commands": posts.append({"body": body, "cmd": cmd})
+	var flow: Control = auto_free(HomeFlow.new(session))
+	flow.chose.connect(func(city, lat, lng):
+		var cmd := {"type": "choose_home", "city": city, "lat": lat, "lng": lng}
+		session.send(cmd, P0Session.ui_key(cmd)))
+	session.command_settled.connect(func(_key, ok, _code): flow.sent(ok))
+	add_child(flow)
+	P0HomePick.answer("/p0/home/cities", {"ok": true, "open": OPEN, "near": null})
+	flow.cities.set_choice(SF.id)
+	flow.cities.key.activated.emit()
+	P0HomePick.answer("/p0/home/spots/" + SF.id, spot_read(SF.id))
+	assert_int(posts.size()).is_equal(1)
+	session._finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), posts[-1].cmd)
+	flow.spots.build.activated.emit()
+	assert_int(posts.size()).is_equal(1)   # opening the confirm is not an acknowledgement
+	flow.confirm.move.activated.emit()
+	flow.confirm.move.activated.emit()
+	assert_int(posts.size()).is_equal(2)
+	assert_str(posts[-1].body.type).is_equal("guide")
+	assert_int(session._queue.size()).is_equal(1)
+	session._finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), posts[-1].cmd)
+	assert_bool(flow._sending).is_false()
+	assert_array(session._queue).is_empty()
+	flow.confirm.move.activated.emit()
+	assert_str(posts[-1].body.type).is_equal("guide")
+	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": {"seq": 5}}).to_utf8_buffer(), posts[-1].cmd)
+	assert_str(posts[-1].body.type).is_equal("choose_home")
+	assert_int(posts[-1].body.expect_seq).is_equal(5)
+	assert_float(posts[-1].body.lat).is_equal_approx(37.759, 1e-9)
+	assert_float(posts[-1].body.lng).is_equal_approx(-122.449, 1e-9)

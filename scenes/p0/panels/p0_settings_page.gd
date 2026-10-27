@@ -20,7 +20,9 @@ signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS }
+const TestEntry := preload("res://modules/p0/p0_test_entry.gd")
+var _test_entry: RefCounted
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -95,7 +97,63 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 	var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
 	ver.name = "Version"
 	page._group("Legal", [licenses, ver])
+	page._test_entry = TestEntry.new()
+	ver.mouse_filter = Control.MOUSE_FILTER_PASS
+	ver.gui_input.connect(func(event: InputEvent): page._test_entry_input(event))
+	page.scroll.scroll_started.connect(func(): page._test_entry.reset())
 	return page
+
+## Hidden test settings, approved B layout (341 aa0e971b). The same page, groups, rows and commands as Settings.
+static func test_options(on: bool, is_test: bool, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.TEST_OPTIONS, "Test options", safe_top, safe_bottom)
+	var toggle := UiSettingRow.new(UiSettingRow.Kind.TOGGLE, "New-player guide", "For new test accounts")
+	toggle.name = "GuideTestToggle"
+	toggle.on = on
+	toggle.toggled.connect(func(value): page.toggled.emit("guide_test", value))
+	page._group("", [toggle])
+	var current := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Current account", "", "Test" if is_test else "Main")
+	current.name = "CurrentAccount"
+	page._group("", [current])
+	var start := UiCommandButton.new("Start new test account", UiCommandButton.Kind.SECONDARY)
+	start.name = "StartTestAccount"
+	start.sends = false
+	start.activated.connect(func(): page.open_pressed.emit("test_new"))
+	page.body.add_child(start)
+	if is_test:
+		var back := UiCommandButton.new("Return to main account", UiCommandButton.Kind.SECONDARY)
+		back.name = "ReturnMainAccount"
+		back.sends = false
+		back.activated.connect(func(): page.open_pressed.emit("test_main"))
+		page.body.add_child(back)
+	var note := UiKit.label("Test accounts are separate. Your main farm is kept.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	page.body.add_child(note)
+	return page
+
+## 341 6d532fc2: the test account's escape from first city pick / failed launch, using the existing text button.
+static func return_main_link(action: Callable) -> UiDismissButton:
+	var button := UiDismissButton.new("Return to main account")
+	button.name = "ReturnMainAccount"
+	button.add_theme_font_override(&"font", UiKit.font(&"bold"))
+	button.add_theme_font_size_override(&"font_size", UiKit.theme().get_font_size(&"font_size", UiTokens.STYLE_CAPTION_B12))
+	for state in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_focus_color", &"font_hover_pressed_color"]:
+		button.add_theme_color_override(state, UiTokens.COLOR_PRIMARY)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.pressed.connect(action)
+	return button
+
+func _test_entry_input(event: InputEvent) -> void:
+	if _test_entry == null: return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			_test_entry.press(event.position, Time.get_ticks_msec())
+			set_process(true)
+		else: _test_entry.release(event.position, Time.get_ticks_msec())
+	elif event is InputEventMouseMotion: _test_entry.move(event.position)
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED] and _test_entry != null: _test_entry.reset()
 
 ## LICENSES: one group per P0Legal group, a row per credit (`MIT License` under it; a data credit's attribution, then
 ## its licence), each row › to its text.
@@ -146,8 +204,11 @@ static func text(title: String, full_text: String, safe_top := 0.0, safe_bottom 
 
 ## TEXT: the paragraphs still to lay out, a batch a frame.
 func _process(_dt: float) -> void:
+	if _test_entry != null and _test_entry.tick(Time.get_ticks_msec()):
+		open_pressed.emit("test_options")
+		return
 	if _to_add.is_empty():
-		set_process(false)
+		set_process(_test_entry != null and _test_entry.holding)
 		return
 	_add_paragraphs(_PARAGRAPHS_PER_FRAME)
 
