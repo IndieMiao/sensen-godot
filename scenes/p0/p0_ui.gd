@@ -366,8 +366,8 @@ func hold_energy(energy: Dictionary) -> void:
 func _refresh_hud() -> void:
 	if hud == null: return
 	# No HUD before the first server view: an empty view would read as 0 Energy (red) and 0 coins, and its
-	# chips would still take taps.
-	hud.visible = not view.is_empty()
+	# chips would still take taps. None over the home pick either: its pages lie on the real map (PR-2b, HOME-WELCOME).
+	hud.visible = _hud_shown()
 	if view.is_empty(): return
 	if _hold_here != "" and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
 	var seen := view
@@ -481,7 +481,7 @@ func set_surface(name: String) -> void:
 	var world := name != "map"
 	# MAP-1 (§10.6.1): the map keeps the two-row HUD — avatar, Energy, coins, bell, Today, the place chip — but has no
 	# stick (drag and pinch browse it).
-	hud.visible = not view.is_empty()
+	hud.visible = _hud_shown()
 	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
 	_keys.visible = action and _modal == null
@@ -3144,8 +3144,19 @@ func open_settings(back := Callable()) -> void:
 ## The home pick (SGODOT-303, P0HomeFlow): a new player's first pages over no world, or the change of home from
 ## Settings. Back closes a layer at a time (the confirm card, the spot page); on a first pick's city page it does
 ## nothing (there is nowhere before it), on the change's it goes back to Settings.
+## The two-row HUD is up: a view in, and no home pick open (its pages lie on the real map, PR-2b).
+func _hud_shown() -> bool:
+	return not view.is_empty() and not is_instance_valid(_home_flow_open)
+
+var _home_flow_open: Control
+
 func open_home_flow(flow: Control) -> void:
 	flow.theme = UiKit.theme()
+	_home_flow_open = flow
+	if hud != null: hud.visible = false
+	flow.tree_exited.connect(func():
+		if _home_flow_open == flow: _home_flow_open = null
+		if hud != null: hud.visible = _hud_shown())
 	flow.say.connect(func(text: String): toast(text))
 	_open_modal(flow, 0.0, true)
 	# the pin page over the real map (SGODOT-342 PR-2): its clear scrim lets the drags and pinches through to the map
