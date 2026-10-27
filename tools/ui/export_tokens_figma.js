@@ -6,8 +6,10 @@
 // Values Figma does not hold yet come from CONST below, each with its source.
 // 节点待重映射 (10-27): the file moved to 5SVgfevrLzZXqD83uyPgmV and every node id changed. Page 14 is 5:4 there; the
 // component and frame ids below (483:304, 517:11840, 633:41278/9 …) are still the old file's — look each up by name
-// in the new file before the next run. Its local variables were found empty on 10-26: a run now would export no
-// colours, so do not regenerate tokens-v2.json from it until they are back.
+// in the new file before the next run (node() / variant() fetch them by id and throw on a missing one). Page 14 there
+// is still bound to the old file's remote variables, so getLocalVariableCollectionsAsync and the local text styles read
+// nothing until they are made local under the same names (不知火舞 340 d8e2d808): no re-export of tokens-v2.json
+// from the new file before that is done and accepted.
 const CONST = {
   // Fallback for gameplay plan v2 §16.1 rarity dots if the semantic rarity/* variables are missing.
   rarityRare: '#A98BD6',
