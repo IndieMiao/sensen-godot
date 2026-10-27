@@ -38,7 +38,7 @@ const TABLE: GuideContent = {
   tips: {},
   pond_catch: false,
   resend: { item: 'seed_quick_radish', qty: 2, max: 2, line: 'Out of radishes? Here, two more quick ones.', radish: 'crop_radish',
-    deliver: 'deliver:req_res_nadia_radish', dish: 'dish:dish_fish_soup' },
+    deliver: 'deliver:req_res_nadia_radish', dish: 'dish:dish_fish_soup', source: "Pip's seeds" },
   timeout_days: 2,
 };
 

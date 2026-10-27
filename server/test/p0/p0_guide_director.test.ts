@@ -1,0 +1,253 @@
+/** SGODOT-341 PR-C-s2: the director's run of 339's v3 table (§14.3, q(215)) with the real content — the main line and
+ * the ways off it; at every point the guide shows a row to do (never "nothing to do"), and it always reaches its end. */
+import { describe, expect, it } from 'vitest';
+import { loadP0Content, type P0Content } from '../../src/p0/content.js';
+import { resendReady, validateGuide } from '../../src/p0/guide.js';
+import { homeSetOf } from '../../src/p0/home_city.js';
+import { applyP0, type P0Command } from '../../src/p0/reducer.js';
+import { maxEnergy } from '../../src/p0/rules.js';
+import { freshState, type P0State } from '../../src/p0/state.js';
+import { viewOf } from '../../src/p0/view.js';
+import type { P0Event } from '../../src/p0/progress.js';
+
+const c: P0Content = loadP0Content();
+const T0 = Date.UTC(2026, 9, 26, 17);   // San Francisco 10-26 10:00 PDT
+const S = 1000;
+const SF = 'gn-5391959', SHANGHAI = 'gn-1796236';
+const ONE = 'req_res_nadia_radish', SIX = 'req_res_nadia_six_radishes';
+
+/** One player through the guide: a clock that moves on, the state, every event, and the check after each command. */
+class Run {
+  s: P0State; now = T0; events: P0Event[] = [];
+  constructor(player: string, opts: { pending?: boolean } = { pending: true }) {
+    this.s = freshState(c, player, T0, 42, { guide: true, ...opts });
+  }
+  get step() { return this.s.guide!.step; }
+  get view() { return viewOf(c, this.s, this.now).guide as Record<string, any>; }
+  get set() { return homeSetOf(c, this.s)!; }
+  do(cmd: P0Command, wait = S): this {
+    this.now += wait;
+    const r = applyP0(c, this.s, cmd, this.now);
+    if (!r.ok) throw new Error(`${cmd.type} at ${this.step}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
+    this.s = r.state; this.events.push(...r.events);
+    this.check();
+    return this;
+  }
+  /** While the guide is on, past the two pick pages, Today always has a row to do and Pip is on the farm. */
+  check() {
+    const v = this.view;
+    if (v.step === null || v.step === 't_city' || v.step === 't_pin') return;
+    expect(v.row?.line, `${v.step}/${v.recover}`).toMatch(/\S/);
+    expect(v.row.line, v.step).not.toMatch(/\{/);   // every name filled
+    expect(v.pip.here).toBe(true);
+  }
+  tilled(n: number) { return this.s.plots.filter(p => p.state === 'tilled' && !p.crop).slice(0, n).map(p => p.id); }
+  qty(prefix: string) { return this.s.bag.filter(x => x.id.startsWith(prefix)).reduce((n, x) => n + x.qty, 0); }
+  pick(city = SF) { return this.do({ type: 'guide', op: 'ack', step: 't_city', space: 'home' }).do({ type: 'choose_home', city, spot: 0, space: 'home' }); }
+  sowQuick() {
+    const plots = this.tilled(2);
+    for (const plot of plots) this.do({ type: 'sow', plot, seed: 'seed_quick_radish', space: 'home' });
+    for (const plot of plots) this.do({ type: 'water', plot, space: 'home' });
+    return plots;
+  }
+  lettuce() { for (const plot of this.tilled(10)) this.do({ type: 'sow', plot, seed: 'seed_lettuce', space: 'home' }); return this; }
+  harvest(plots: number[]) { this.now += 46 * S; for (const plot of plots) this.do({ type: 'harvest', plot, space: 'home' }); return this; }
+  market() { return { space: 'outpost', place: this.set.market }; }
+  nadia1() { return this.do({ type: 'talk', resident: 'res_nadia', ...this.market() }).do({ type: 'accept', request: ONE, ...this.market() })
+    .do({ type: 'deliver', request: ONE, ...this.market() }); }
+  fish(n: number) {
+    const at = { space: 'pond', place: this.set.pond };
+    for (let i = 0; i < n; i++) {
+      this.do({ type: 'cast', ...at }, 60 * S);
+      this.do({ type: 'reel', outcome: 'landed', ...at }, this.s.cast!.bite_ms + S);
+    }
+    return this;
+  }
+  cook(items: string[], eat = false) {
+    this.do({ type: 'cook', items, space: 'home' });
+    return this.do({ type: 'collect', ...(eat ? { eat: true } : {}), space: 'home' }, this.s.stove!.ms + S);
+  }
+  gift(prefix: string) {
+    const item = this.s.bag.find(x => x.id.startsWith(prefix))!.id;
+    return this.do({ type: 'gift', resident: 'res_nadia', item, ...this.market() });
+  }
+}
+
+describe('the v3 table (339 §14.3)', () => {
+  it('is valid, has S0–S11 and no S12, and keeps Pond Catch off a guided save', () => {
+    expect(validateGuide(c)).toEqual([]);
+    expect(c.guide!.steps.map(s => s.id)).toEqual(['t_city', 't_pin', 't_sow_quick', 't_water', 't_sow_rest', 't_harvest_quick',
+      't_nadia_1', 't_fish', 't_meal', 't_soup', 't_gift', 't_nadia_2']);
+    const r = new Run('director-pond-catch');
+    expect(r.s.requests).toEqual([]);
+    expect(r.qty('seed_quick_radish')).toBe(2);
+  });
+});
+
+describe('the main line (§14.2)', () => {
+  it('S0 → S11 in order, every row on the way, and the end: Pip gone, the first stall slot 4 h after Nadia\'s radish', () => {
+    const r = new Run('director-main-01');
+    const seen: string[] = [];
+    const note = () => { if (seen[seen.length - 1] !== r.step) seen.push(r.step ?? 'end'); };
+    note();
+    r.pick(); note();
+    expect(r.view).toMatchObject({ row: { line: 'Sow 2 Quick Radishes' }, pip: { bang: true } });
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect(r.view.pip.bang).toBe(false);
+    const quick = r.sowQuick(); note();
+    expect(r.view.row.line).toBe('Sow 10 Lettuce · 20 Energy');
+    r.lettuce(); note();
+    expect(r.view).toMatchObject({ step: 't_harvest_quick', recover: 'r_quick_wait',
+      row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' }, progress: { have: 0, need: 1 } });
+    expect(r.view.row.ready_in).toBeGreaterThan(0);
+    expect(r.view.row.ready_in).toBeLessThanOrEqual(45_000);
+    r.harvest(quick); note();
+    expect(r.view.row).toEqual({ line: 'Bring Nadia 1 Radish · Mission Market Square', icon: 'crop_radish', go: 'sh_market_1' });
+    r.nadia1(); note();
+    const delivered = r.now;
+    expect(r.s.boards.stall[0].refill_at).toBe(delivered + c.requests.done_refill_h * 3_600_000);
+    expect(r.view.marks[0]).toMatchObject({ place: 'pond_san_francisco_03', why: 'Catch 2 fish · 0/2' });
+    r.fish(1);
+    expect(r.view.marks[0].why).toBe('Catch 2 fish · 1/2');
+    r.fish(1); note();
+    expect(r.view.row.line).toBe('Cook it: Grilled Crucian');
+    r.cook(['fish_crucian'], true); note();
+    expect(r.view.row.line).toBe('Cook: Fresh Fish Soup · new recipe');
+    expect(r.view.marks).toEqual([{ place: 'home', object: 'farmhouse', kind: 'request' }, { page: 'dish_fish_soup', button: 'cook', pulse: true }]);
+    r.cook(['fish_crucian', 'crop_radish']); note();
+    expect(r.view.marks.find((m: any) => m.resident)).toEqual({ resident: 'res_nadia', kind: 'gift' });
+    expect(r.view.marks.find((m: any) => m.button === 'gift')).toEqual({ button: 'gift', pulse: true });
+    r.gift('dish_fish_soup'); note();
+    expect(r.view.row.line).toBe("See Nadia's new request");
+    r.do({ type: 'accept', request: SIX, ...r.market() }); note();
+    expect(seen).toEqual(['t_city', 't_sow_quick', 't_sow_rest', 't_harvest_quick', 't_nadia_1', 't_fish', 't_meal',
+      't_soup', 't_gift', 't_nadia_2', 'end']);
+    // the observation log's view (§14.8.1): every step change, in order, from the commands' events
+    const moves = r.events.filter(e => e.kind === 'guide' && e.action !== 'resend').map(e => (e as { to: string | null }).to ?? 'end');
+    expect(moves).toEqual(['t_pin', 't_sow_quick', 't_water', 't_sow_rest', 't_harvest_quick', 't_nadia_1', 't_fish', 't_meal', 't_soup',
+      't_gift', 't_nadia_2', 'end']);
+    expect(r.s.guide).toMatchObject({ step: null, end: 'done' });
+    expect(r.view).toMatchObject({ step: null, end: 'done', pip: { here: false } });
+    expect(r.events.filter(e => e.kind === 'guide' && e.action === 'end')).toHaveLength(1);
+  });
+});
+
+describe('off the path', () => {
+  it('no lettuce: S4 passes once the Quick Radishes are ripe (it never holds the player up)', () => {
+    const r = new Run('director-skip-lettuce').pick();
+    const quick = r.sowQuick();
+    expect(r.step).toBe('t_sow_rest');
+    r.now += 46 * S;
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' }, 0);
+    expect(r.step).toBe('t_harvest_quick');
+    expect(r.view.recover).toBeNull();
+    r.harvest(quick);
+    expect(r.step).toBe('t_nadia_1');
+  });
+  it('fishing first: the two fish count, so S7 passes the moment Nadia has her radish', () => {
+    const r = new Run('director-fish-first').pick();
+    r.harvest(r.sowQuick());
+    r.fish(2);
+    expect(r.step).toBe('t_nadia_1');
+    r.nadia1();
+    expect(r.step).toBe('t_meal');
+  });
+  it('both radishes gone twice: Pip gives two seeds each time; the third time Today says sow a Radish', () => {
+    const r = new Run('director-resend').pick();
+    r.harvest(r.sowQuick());
+    for (const nth of [1, 2]) {
+      r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');   // sold, eaten — gone
+      r.check();
+      expect(r.view).toMatchObject({ recover: 'r_radish_sow', pip: { bang: true } });
+      expect(resendReady(c, r.s)).toBe(true);
+      r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+      expect(r.qty('seed_quick_radish')).toBe(2);
+      expect(r.s.guide!.n.resend).toBe(nth);
+      const plots = r.sowQuick();
+      expect(r.view.recover).toBe('r_radish_wait');
+      r.harvest(plots);
+      expect(r.view.recover).toBeNull();
+    }
+    r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect(r.qty('seed_quick_radish')).toBe(0);
+    expect(r.view).toMatchObject({ recover: 'r_radish_sow', row: { line: 'Sow 1 Radish · 2 Energy' }, pip: { bang: false, resend_left: 0 } });
+    const plot = r.tilled(1)[0];
+    r.do({ type: 'sow', plot, seed: 'seed_radish', space: 'home' }).do({ type: 'water', plot, space: 'home' });
+    expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' } });
+    expect(r.view.row.ready_in).toBeGreaterThan(3 * 3_600_000);
+  });
+  it('a full bar at S8 skips the meal; the soup eaten before Nadia sends Today back to cooking, then to the pond', () => {
+    const r = new Run('director-full-bar').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1().fish(2);
+    expect(r.step).toBe('t_meal');
+    r.s.energy.value = maxEnergy(c, r.s);
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect(r.step).toBe('t_soup');
+    r.cook(['fish_crucian', 'crop_radish']);
+    expect(r.step).toBe('t_gift');
+    r.s.energy.value = 100;
+    const soup = r.s.bag.find(x => x.id.startsWith('dish_fish_soup'))!.id;
+    r.do({ type: 'eat', item: soup, space: 'home' });
+    expect(r.view.recover).toBe('r_cook_grill');   // one crucian left, no crop: grill it
+    expect(r.view.row.line).toBe('Cook it: Grilled Crucian');
+    r.s.bag = r.s.bag.filter(x => !x.id.startsWith('fish_'));
+    r.check();
+    expect(r.view).toMatchObject({ recover: 'r_fish_1', row: { line: 'Catch 1 fish · Fern Pond' } });
+    expect(r.view.marks[0].why).toBe('Catch 1 fish · 0/1');
+    r.fish(1);
+    expect(r.view.recover).toBe('r_cook_grill');
+    r.cook(['fish_crucian']);
+    expect(r.view.recover).toBeNull();
+    r.gift('dish_grilled_crucian');   // any edible dish will do (S10)
+    expect(r.step).toBe('t_nadia_2');
+  });
+  it('no fish at S8 before the soup: Catch 2 fish, counted 1/2, 2/2', () => {
+    const r = new Run('director-two-fish').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1().fish(2);
+    r.s.energy.value = 100;
+    r.s.bag = r.s.bag.filter(x => !x.id.startsWith('fish_'));
+    r.check();
+    expect(r.view).toMatchObject({ recover: 'r_fish_2', row: { line: 'Catch 2 fish · Fern Pond' }, progress: { have: 0, need: 2 } });
+    r.fish(1);   // bite 3: a Pond Crucian (teaching pin 1)
+    expect(r.view).toMatchObject({ recover: 'r_fish_2', progress: { have: 1, need: 2 } });
+    expect(r.view.marks[0].why).toBe('Catch 2 fish · 1/2');
+    r.s.bag.push({ id: 'fish_carp', qty: 1 });   // bite 4 would break free at Fishing Lv1 (pin 2): the second fish from the bag
+    r.check();
+    expect(r.view.recover).toBeNull();
+    expect(r.step).toBe('t_meal');
+  });
+  it('a Mystery Dish given to Nadia does not count (S10)', () => {
+    const r = new Run('director-mystery').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1().fish(2);
+    r.s.guide!.step = 't_gift';
+    r.s.bag.push({ id: 'dish_mystery', qty: 1 });
+    r.check();
+    r.gift('dish_mystery');
+    expect(r.step).toBe('t_gift');
+  });
+  it('another home city: the marks, names and places are Shanghai\'s, and the line runs the same', () => {
+    const r = new Run('director-shanghai').pick(SHANGHAI);
+    const set = r.set;
+    expect(set.market).not.toBe('sh_market_1');
+    r.harvest(r.sowQuick());
+    expect(r.view.row.go).toBe(set.market);
+    expect(r.view.row.line).not.toContain('Mission');
+    r.nadia1();
+    expect(r.view.row.go).toBe(set.pond);
+    r.fish(2);
+    expect(r.step).toBe('t_meal');
+  });
+  it('left alone: the guide ends at the second home-day rollover, the first stall slot filled, Pip gone', () => {
+    const r = new Run('director-left-alone').pick();
+    r.sowQuick();
+    r.now = Date.UTC(2026, 9, 28, 11, 1);   // 10-28 04:01 PDT: the second rollover after 10-26
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' }, 0);
+    expect(r.s.guide).toMatchObject({ step: null, end: 'timeout' });
+    expect(r.view.pip.here).toBe(false);
+    expect(r.s.boards.stall[0].refill_at).toBeLessThanOrEqual(r.now);
+  });
+});
