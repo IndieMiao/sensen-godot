@@ -83,6 +83,9 @@ var error_card: PanelContainer
 var build: UiCommandButton
 var back_key: Button
 var credits: Label            # the map's credit line over the real map (q(133) ①, 不知火舞 342)
+## Opened over HOME-WELCOME's map (Start here, the same city): the start glides in from the city view over
+## motion.recenterMs, the pin up till it lands and the card in as it drops (不知火舞 342 bce34a87).
+var glide_in := false
 var _places: Dictionary = {}  # id → UiMapDestination
 var _safe := Vector2.ZERO
 
@@ -143,6 +146,8 @@ func _init(cluster_ := "", city_name_ := "", heading := "Pick your farm spot", s
 	credits.add_theme_constant_override(&"outline_size", 0)
 	credits.visible = false
 	add_child(credits)
+	# its size settles a frame after its font first changes: placed again then, or it stands a pixel off
+	credits.minimum_size_changed.connect(func(): if credits.visible: _place_credits(true))
 	# over the places' names (UiMapDestination.NAME_Z 1, drawn over every disc): the pin, the panel, the card and keys
 	for n in [pin, panel, card, loading_card, error_card, build, back_key, credits]: (n as CanvasItem).z_index = OVER_NAMES_Z
 	resized.connect(_keep_pin)
@@ -285,7 +290,11 @@ func show_area(read: Dictionary) -> void:
 	if map.has_method("pick_area"): map.pick_area(area.base.x, area.base.y, float(area.range_km))
 	var s := start_point()
 	at = [s[0], s[1]]
-	put(s[0], s[1])
+	if map.has_method("pick_frame"):   # the start at the pin page's own scale; from HOME-WELCOME's city view it glides
+		map.pick_frame(s[0], s[1], get_global_transform_with_canvas() * tip(),
+			UiKit.secs(UiTokens.MOTION_RECENTER_MS) if glide_in else 0.0)
+		glide_in = false
+	else: put(s[0], s[1])
 	_make_places()
 	_refresh()
 
@@ -351,7 +360,7 @@ func screen_of(lat: float, lng: float) -> Variant:
 	var v = map.pick_screen_of(lat, lng)
 	return get_global_transform_with_canvas().affine_inverse() * (v as Vector2) if v != null else null
 
-## The map moved so (lat, lng) lies under the pin's tip.
+## The map moved so (lat, lng) lies under the pin's tip, its zoom as it is (the back-to-start key, a new layout).
 func put(lat: float, lng: float) -> void: map.pick_put(lat, lng, get_global_transform_with_canvas() * tip())
 
 ## The pin's tip on the screen: the middle of the map between the panel and the card.
@@ -413,17 +422,22 @@ func _refresh() -> void:
 		at = [float(g[0]), float(g[1])]
 		if not settling: refusal = P0HomePin.refusal(area, Vector2(at[0], at[1]), start_point())
 	else: refusal = {}
-	# the page's own land: the flat map's ground; under the real map only while reading / failed or before it draws
-	land.visible = map is FlatMap or not ready or not bool(map.pick_has_ground())
+	# the page's own land: the flat map's ground, and the real map's till it draws — reading or failed over a map that
+	# has drawn (HOME-WELCOME's, going on under its pin page) it stays in sight, no pin on it (PR-2b)
+	land.visible = map is FlatMap or not bool(map.pick_has_ground())
 	veil.visible = ready
 	overlay.visible = ready
 	pin.visible = ready
-	card.visible = ready
-	loading_card.visible = not ready and not failed
+	# gliding in from HOME-WELCOME's city view: the card comes as the pin drops (不知火舞 342 bce34a87)
+	var gliding := map.has_method("pick_flying") and bool(map.pick_flying())
+	card.visible = ready and not gliding
+	# HOME-PIN-LOADING's outline on the land only: over a map that has drawn, reading is the glide's state — no pin, no
+	# card, the key grey (不知火舞 342 3730603f)
+	loading_card.visible = not ready and not failed and land.visible
 	error_card.visible = failed
-	_place_credits(ready)
+	_place_credits(not failed)
 	var s := start_point()
-	back_key.visible = ready and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
+	back_key.visible = ready and not gliding and P0HomePin.km(Vector2(at[0], at[1]), Vector2(s[0], s[1])) * 1000.0 > P0HomePin.START_M
 	if not ready:
 		build.reason = "Build here"   # grey and quiet (6cb4d10e): no refusal, so no toast
 		return
@@ -440,15 +454,18 @@ func _refresh() -> void:
 ## The map's credit line (q(133) ①; 不知火舞 342: as the map draws it, CityMapView's constants): over the real map only
 ## — not while reading or failed, not on the page's own flat map (the desktop, the tests) — 16 pt from the left, its
 ## bottom 6 pt over the card's top; a confirm card's scrim covers it.
-func _place_credits(ready: bool) -> void:
-	credits.visible = ready and not map is FlatMap and bool(map.pick_has_ground())
+## The credit line wherever the real map is in sight (not over the error card): 6 over the card's top, or over Build
+## here's while there is no card — reading, the glide (不知火舞 342 b68bc2c7).
+func _place_credits(on: bool) -> void:
+	credits.visible = on and not map is FlatMap and bool(map.pick_has_ground())
 	if not credits.visible: return
 	var k := float(map.pick_px_per_pt()) if map.has_method("pick_px_per_pt") else 1.0
 	var font := maxi(1, roundi(CityMapView.CREDITS_PT * k))
 	if credits.get_theme_font_size(&"font_size") != font: credits.add_theme_font_size_override(&"font_size", font)
 	var h := credits.get_combined_minimum_size().y
 	credits.size = Vector2(credits.get_combined_minimum_size().x, h)
-	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, card.position.y - CityMapView.CREDITS_GAP_PT * k - h)
+	var over: Control = card if card.visible else build
+	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, over.position.y - CityMapView.CREDITS_GAP_PT * k - h)
 
 ## The grey key's words: the place's own name while it fits the key, else its general word (q(216) ③).
 func _key_text() -> String:
