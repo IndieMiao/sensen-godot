@@ -41,20 +41,27 @@ const ICON_COIN := preload("res://assets/p0/icons/coin.svg")
 const _RULES_AT := Vector2(173, 50)          # the top-left light takes no print
 const _LINES_Y := 284.0                      # the two lines' tops: 284 / 308, cream 62% / 50%
 const _DEALER_TOP := 140.0                   # cards 80 high in 110–250
-const _PLAYER_TOP := 390.0                   # in 360–500
+const _PLAYER_TOP := 372.0                   # ACT-T 189:168498
 const _CIRCLE := Vector2(180, 570)
 const _CIRCLE_R := 48.0
 const _CIRCLE_HIT := 12.0                    # a drop counts this far outside the ring
 const _ACTIONS_Y := 650.0                    # the printed actions' row (620–680)
-const _HIT_X := 116.0
-const _STAND_X := 244.0
-const _DOUBLE_AT := Vector2(54, 570)
-const _SPLIT_AT := Vector2(310, 570)
+# ACT-T: Hit / Stand Large 140 wide under the circle; Double / Split Small between the hand and the circle (y 486).
+const _HIT_X := 102.0
+const _STAND_X := 258.0
+const _HIT_W := 140.0
+const _DOUBLE_AT := Vector2(100, 486)
+const _SPLIT_AT := Vector2(260, 486)
+const _BADGE_GAP := 12.0                     # a points badge sits this far right of its cards
+const _SPLIT_X := [24.0, 196.0]              # SPLIT-T 190:169341: each hand's first card
+const _SPLIT_STACK_DX := 16.0                # each hand's stake, either side of the circle's centre
+const _PLATE_GAP := 8.0                      # RESULT-T: the result plate this far above the cards
+const _FLOAT_AT := Vector2(122, 516)         # RESULT-T: `+180 coins` left of the circle
+const _WINNINGS_FROM := Vector2(250, 236)    # the dealer's side, where winnings slide in from
 const _RAIL_X := 26.0
 const _RAIL_GAP := 4.0                       # 6 × 48 + 5 × 4 = 308 in the groove's 304 + rims
 const _RAIL_Y := 693.0                       # stacks' bottom chip top (the top chip's top 6 higher, at 687)
 const _STACK_DEPTH := 4                      # chips in a rail stack
-const _SPLIT_GAP := 24.0
 const _BACK_AT := Vector2(16, 28)
 const _COINS_RIGHT := 276.0                  # the coins pill's right edge, on the table (left of the shoe)
 const _COINS_TOP := 37.0
@@ -186,8 +193,8 @@ func _build_table() -> void:
 	stand_key = _action("Stand", UiFeltAction.Size.LARGE, func(): act("stand"))
 	double_key = _action("Double", UiFeltAction.Size.SMALL, func(): act("double"))
 	split_key = _action("Split", UiFeltAction.Size.SMALL, func(): act("split"))
-	double_key.reason_align = HORIZONTAL_ALIGNMENT_LEFT    # near the table's edges: captions stay on the felt
-	split_key.reason_align = HORIZONTAL_ALIGNMENT_RIGHT
+	hit_key.min_frame = _HIT_W
+	stand_key.min_frame = _HIT_W
 	for v in P0Blackjack.CHIPS:
 		var vals: Array = []
 		for i in _STACK_DEPTH: vals.append(v)
@@ -245,17 +252,19 @@ func _build_overlay() -> void:
 	settled_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(settled_pill)
 
+## A points badge / result plate (StateBadge on ACT-T / RESULT-T): a 32-high pill, primary tint with primary ink;
+## `Bust` in Tone=Danger.
 func _badge() -> PanelContainer:
 	var p := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = UiKit.alpha(Color.BLACK, 0.35)
-	sb.set_corner_radius_all(10)
-	sb.content_margin_left = 8
-	sb.content_margin_right = 8
-	sb.content_margin_top = 1
-	sb.content_margin_bottom = 1
+	sb.bg_color = UiTokens.COLOR_PRIMARY_TINT
+	sb.set_corner_radius_all(16)
+	sb.content_margin_left = 14
+	sb.content_margin_right = 14
+	sb.content_margin_top = 6
+	sb.content_margin_bottom = 6
 	p.add_theme_stylebox_override(&"panel", sb)
-	var l := UiKit.label("", UiTokens.STYLE_C13_XB, INK)
+	var l := UiKit.label("", UiTokens.STYLE_C13_XB, UiTokens.COLOR_PRIMARY)
 	l.name = "Text"
 	p.add_child(l)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -264,8 +273,11 @@ func _badge() -> PanelContainer:
 
 ## A badge's points; `Bust` in the danger tone (StateBadge Tone=Danger, 0c2082b7).
 static func _badge_set(p: PanelContainer, text: String) -> void:
-	(p.get_node("Text") as Label).text = text
-	(p.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_DANGER if text == "Bust" else UiKit.alpha(Color.BLACK, 0.35)
+	var l := p.get_node("Text") as Label
+	l.text = text
+	var bust := text == "Bust"
+	(p.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_DANGER if bust else UiTokens.COLOR_PRIMARY_TINT
+	l.add_theme_color_override(&"font_color", UiTokens.COLOR_SURFACE if bust else UiTokens.COLOR_PRIMARY)
 	p.visible = text != ""
 	p.size = p.get_combined_minimum_size()
 
@@ -380,8 +392,7 @@ func card_pos(hand_index: int, i: int, hand_count: int, n: int) -> Vector2:
 	if hand_count <= 1:
 		var width := hand_width(1, n)
 		return Vector2(DESIGN.x * 0.5 - width * 0.5 + i * UiPlayingCard.OVERLAP, _PLAYER_TOP)
-	var lane := (DESIGN.x - float(UiTokens.SPACE_PAGE) * 2.0 - _SPLIT_GAP) * 0.5
-	return Vector2(float(UiTokens.SPACE_PAGE) + hand_index * (lane + _SPLIT_GAP) + i * UiPlayingCard.SPLIT_OVERLAP, _PLAYER_TOP)
+	return Vector2(float(_SPLIT_X[mini(hand_index, 1)]) + i * UiPlayingCard.SPLIT_OVERLAP, _PLAYER_TOP)
 
 func hand_width(hand_count: int, n: int) -> float:
 	return UiPlayingCard.SIZE.x + (n - 1) * (UiPlayingCard.OVERLAP if hand_count <= 1 else UiPlayingCard.SPLIT_OVERLAP)
@@ -406,24 +417,25 @@ func _lay_cards(slide: bool) -> void:
 		var width := hand_width(n, cards.size())
 		var badge: PanelContainer = hand.badge
 		_badge_set(badge, P0Blackjack.badge(_codes(cards)))
-		if n > 1: badge.position = Vector2(first.x + (width - badge.size.x) * 0.5, first.y + UiPlayingCard.SIZE.y + 4.0)
-		else: badge.position = Vector2(first.x + width + 8.0, first.y + (UiPlayingCard.SIZE.y - badge.size.y) * 0.5)
+		badge.position = Vector2(first.x + width + _BADGE_GAP, first.y + (UiPlayingCard.SIZE.y - badge.size.y) * 0.5)
 		var tag: PanelContainer = hand.tag
 		tag.size = tag.get_combined_minimum_size()
-		tag.position = Vector2(first.x + (width - tag.size.x) * 0.5, first.y - tag.size.y * 0.5)   # over the top edge
+		tag.position = Vector2(first.x + (width - tag.size.x) * 0.5, first.y - _PLATE_GAP - tag.size.y)   # above the cards
 		var stake: Label = hand.stake
-		stake.visible = n > 1
+		stake.visible = false   # SPLIT-T: each hand's stake shows as its own stack in the circle
 		stake.text = P0Blackjack.comma(int(hand.bet))
 		stake.size = stake.get_combined_minimum_size()
 		stake.position = Vector2(first.x + (width - stake.size.x) * 0.5, badge.position.y + badge.size.y + 2.0)
 		var outline: Panel = hand.outline
 		outline.visible = n > 1 and k == _active and phase == Phase.PLAY
-		outline.position = first - Vector2(6, 6)
-		outline.size = Vector2(width + 12, UiPlayingCard.SIZE.y + 12)
-		for c in cards: (c as Control).modulate.a = 0.55 if n > 1 and k != _active and phase == Phase.PLAY else 1.0
+		outline.position = first - Vector2(12, 14)
+		outline.size = Vector2(width + _BADGE_GAP + badge.size.x + 22.0, UiPlayingCard.SIZE.y + 28.0)
+		var dim := 0.55 if n > 1 and k != _active and phase == Phase.PLAY else 1.0
+		for c in cards: (c as Control).modulate.a = dim
+		badge.modulate.a = dim
 	var d0 := dealer_pos(0, maxi(1, _dealer_cards.size()))
 	_badge_set(dealer_badge, P0Blackjack.badge(_codes(_dealer_cards)) if not _dealer_cards.is_empty() else "")
-	dealer_badge.position = Vector2(d0.x + hand_width(1, _dealer_cards.size()) + 8.0, d0.y + (UiPlayingCard.SIZE.y - dealer_badge.size.y) * 0.5)
+	dealer_badge.position = Vector2(d0.x + hand_width(1, _dealer_cards.size()) + _BADGE_GAP, d0.y + (UiPlayingCard.SIZE.y - dealer_badge.size.y) * 0.5)
 
 func _move(c: Control, to: Vector2, slide: bool) -> void:
 	if slide and animate and c.position != to:
@@ -615,18 +627,37 @@ func _step_result(e: Dictionary) -> float:
 	for hh in hands: staked += int(hh.get("bet", 0))
 	if staked > 0: _set_stack(staked)   # the stake as settled (a double's included)
 	_lay_cards(false)
-	for k in mini(hands.size(), _hands.size()):
-		var f := P0Blackjack.float_text(int(hands[k].get("net", 0)))
-		if f != "": _float(f, _hand_top(k))
+	var won := 0
+	for hh in hands: won += maxi(0, int(hh.get("net", 0)))
+	if won > 0:   # RESULT-T: winnings slide in from the dealer's side to the stake; one float left of the circle
+		_float(P0Blackjack.float_text(won), on_page(_FLOAT_AT))
+		_slide_winnings(won)
 	_roll_coins(P0Blackjack.coins_of(view))
 	# then last hand's stake sets itself in the circle again and `Deal` deals again (C13)
 	_steps.push_front(func(): _rebet(); _lay_cards(false); return 0.0)
 	return UiKit.secs(UiTokens.MOTION_FLOAT_TEXT_MS)
 
-func _hand_top(k: int) -> Vector2:
-	var cards: Array = _hands[k].cards
-	var first := card_pos(k, 0, _hands.size(), maxi(1, cards.size()))
-	return on_page(first + Vector2(hand_width(_hands.size(), cards.size()) * 0.5, -30.0))
+## The winnings, as chips, slide from the dealer's side to the stake, then leave with it for the rail (37022a3c D;
+## RESULT-T's dashed path is a motion note, not drawn).
+func _slide_winnings(amount: int) -> void:
+	var w := UiChipStack.new(P0Blackjack.chips_for(amount).slice(0, 5))
+	table.add_child(w)
+	w.position = _WINNINGS_FROM - w.size * 0.5
+	_winnings = w
+	var to := _CIRCLE + Vector2(_SPLIT_STACK_DX * 2.0, -8.0) - w.size * 0.5
+	if not animate:
+		w.free()
+		_winnings = null
+		return
+	var t := create_tween()
+	t.tween_property(w, "position", to, UiKit.secs(UiTokens.MOTION_DRAWER_MS * 2)).set_ease(Tween.EASE_OUT)
+	t.tween_interval(UiKit.secs(UiTokens.MOTION_PENDING_DELAY_MS))
+	t.tween_property(w, "position", Vector2(to.x, _RAIL_Y), UiKit.secs(UiTokens.MOTION_DRAWER_MS)).set_ease(Tween.EASE_IN)
+	t.parallel().tween_property(w, "modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DRAWER_MS))
+	t.tween_callback(func():
+		if is_instance_valid(w): w.queue_free())
+
+var _winnings: Control
 
 func _float(text: String, at: Vector2) -> void:
 	var f := UiFloatText.new(text, UiFloatText.Tone.COINS, ICON_COIN)
@@ -662,10 +693,10 @@ func _new_card(code: String, at := Vector2.INF) -> UiPlayingCard:
 func _new_hand(stake: int) -> Dictionary:
 	var outline := Panel.new()
 	var os := StyleBoxFlat.new()
-	os.bg_color = Color(0, 0, 0, 0)
-	os.border_color = UiTokens.COLOR_GOLD
+	os.bg_color = UiKit.alpha(Color.WHITE, 0.10)   # SPLIT-T: the hand in play boxed white, cards and badge
+	os.border_color = Color.WHITE
 	os.set_border_width_all(2)
-	os.set_corner_radius_all(10)
+	os.set_corner_radius_all(12)
 	outline.add_theme_stylebox_override(&"panel", os)
 	outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	outline.visible = false
@@ -673,6 +704,7 @@ func _new_hand(stake: int) -> Dictionary:
 	var tag := _badge()
 	(tag.get_theme_stylebox(&"panel") as StyleBoxFlat).bg_color = UiTokens.COLOR_SURFACE_RAISED
 	(tag.get_node("Text") as Label).add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT)
+	tag.z_index = 2
 	hands_box.add_child(tag)
 	var badge := _badge()
 	hands_box.add_child(badge)
@@ -684,6 +716,8 @@ func _new_hand(stake: int) -> Dictionary:
 	return hand
 
 func _clear_table() -> void:
+	if is_instance_valid(_winnings): _winnings.free()
+	_winnings = null
 	for c in _dealer_cards: (c as Node).free()
 	_dealer_cards = []
 	for hd in _hands:
@@ -696,7 +730,8 @@ func _clear_table() -> void:
 func _set_stack(total: int) -> void:
 	bet = total
 	if stack.reduce(func(a, b): return a + b, 0) != total: stack = P0Blackjack.chips_for(total)
-	circle.set_stack(stack)
+	if phase != Phase.BET and _hands.size() > 1: circle.set_split([P0Blackjack.chips_for(int(_hands[0].bet)), P0Blackjack.chips_for(int(_hands[1].bet))])
+	else: circle.set_stack(stack)
 	bet_label.text = P0Blackjack.comma(total) if total > 0 else ""
 	_layout_bet_label()
 
@@ -733,7 +768,8 @@ func _refresh_keys() -> void:
 	for s in stacks:
 		var st: UiChipStack = s
 		var v := int(st.values[0])
-		st.state = UiChipToken.State.DEFAULT if betting and not _busy() and P0Blackjack.can_add(view, bet, v) else UiChipToken.State.DISABLED
+		# grey marks a stack the wallet cannot put down while betting; in play they stay as they are (ACT-T), inert
+		st.state = UiChipToken.State.DISABLED if betting and not P0Blackjack.can_add(view, bet, v) else UiChipToken.State.DEFAULT
 	if betting:
 		var dk := P0Blackjack.deal_key(view, bet)
 		deal_key.enabled = bet > 0 and str(dk.reason) == "" and not _busy()
@@ -813,7 +849,7 @@ func _chip_input(event: InputEvent, i: int) -> void:
 		(event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and not DisplayServer.is_touchscreen_available())
 	if not down or not _press.is_empty(): return
 	var s: UiChipStack = stacks[i]
-	if phase != Phase.BET or _busy() or s.state == UiChipToken.State.DISABLED: return
+	if phase != Phase.BET or _busy() or s.state == UiChipToken.State.DISABLED: return   # in play: inert
 	accept_event()
 	# gui_input hands the stack's own local position (0–48): into page coordinates through the stack's transform, the
 	# same space _input measures the finger in (周瑜 on #525: a window-space reading put the start hundreds of px off,
@@ -920,9 +956,24 @@ class _Circle extends Control:
 		lit = v
 		queue_redraw()
 
+	var _second: UiChipStack
+
 	func set_stack(values: Array) -> void:
+		if _second != null: _second.visible = false
 		_stack.values = values.slice(maxi(0, values.size() - P0Blackjack.CIRCLE_MAX))
 		_stack.position = (size - _stack.size) * 0.5 + Vector2(0, (_stack.values.size() - 1) * UiChipStack.STEP * 0.5)
+
+	## Two hands' stakes side by side, 16 either side of the centre (SPLIT-T).
+	func set_split(two: Array) -> void:
+		if _second == null:
+			_second = UiChipStack.new()
+			add_child(_second)
+		_second.visible = true
+		for k in 2:
+			var st: UiChipStack = _stack if k == 0 else _second
+			var v: Array = two[k]
+			st.values = v.slice(maxi(0, v.size() - P0Blackjack.CIRCLE_MAX))
+			st.position = (size - st.size) * 0.5 + Vector2((-16.0 if k == 0 else 16.0), (st.values.size() - 1) * UiChipStack.STEP * 0.5)
 
 	func _notification(what: int) -> void:
 		if what == NOTIFICATION_RESIZED: set_stack(_stack.values)

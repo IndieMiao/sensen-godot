@@ -21,6 +21,8 @@ const _SPACING := {Size.LARGE: 1, Size.SMALL: 1}   # 6% tracking at 20 / 14 (186
 const _MIN_HIT := 51.0                             # the master's touch height
 
 var text := "": set = set_text
+## The frame never narrower than this (ACT-T: Hit / Stand both 140, so they read equal).
+var min_frame := 0.0: set = set_min_frame
 var reason := "": set = set_reason
 var enabled := true: set = set_enabled
 var size_kind: Size = Size.LARGE
@@ -60,7 +62,7 @@ func set_text(v: String) -> void:
 	var w := _text_w(v)
 	_apply_spacing(spacing)
 	var pad: Vector2 = _PAD[size_kind]
-	var frame := Vector2(w + pad.x * 2.0, _FONT[size_kind] + 8.0 + pad.y * 2.0)
+	var frame := Vector2(maxf(w + pad.x * 2.0, min_frame), _FONT[size_kind] + 8.0 + pad.y * 2.0)
 	custom_minimum_size = Vector2(maxf(frame.x, _MIN_HIT), maxf(frame.y, _MIN_HIT))
 	size = custom_minimum_size
 	pivot_offset = size * 0.5
@@ -84,6 +86,10 @@ func _apply_spacing(spacing: int) -> void:
 
 func _text_w(t: String) -> float:
 	return UiKit.font(&"extrabold").get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, _FONT[size_kind]).x + _SPACING[size_kind] * t.length()
+
+func set_min_frame(v: float) -> void:
+	min_frame = v
+	set_text(text)
 
 func set_reason(v: String) -> void:
 	reason = v
@@ -115,7 +121,7 @@ func _lay_reason() -> void:
 ## The frame's rect in this control (the touch area may be bigger).
 func frame_rect() -> Rect2:
 	var pad: Vector2 = _PAD[size_kind]
-	var w := _text_w(text) + pad.x * 2.0
+	var w := maxf(_text_w(text) + pad.x * 2.0, min_frame)
 	var h := float(_FONT[size_kind]) + 8.0 + pad.y * 2.0
 	return Rect2((size - Vector2(w, h)) * 0.5, Vector2(w, h))
 
