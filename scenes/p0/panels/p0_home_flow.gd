@@ -96,12 +96,13 @@ func _cities_read(d: Dictionary, q: String) -> void:
 	d = dev_near(d, q)
 	if cities == null and welcome == null:
 		var near = d.get("near", null)
-		_end_loading(near is Dictionary)   # the flight starts under it: a dissolve, not a one-frame cut (不知火舞 3730603f)
+		if not near is Dictionary: _end_loading()   # HOME-WELCOME's: it dissolves as the flight starts (_welcome_map)
 		if near is Dictionary:
 			welcome = Welcome.new(near, _safe.y, _safe.x)
 			welcome.start_pressed.connect(func(): open_spots(near))
 			welcome.other_pressed.connect(_other_city)
 			add_child(welcome)
+			if loading != null: move_child(loading, -1)   # over the card's own land till it dissolves (_welcome_map)
 			_welcome_map(true)
 			_make_cities("Back")
 			cities.visible = false
@@ -122,11 +123,8 @@ static func dev_near(d: Dictionary, q: String) -> Dictionary:
 ## The first read's card outline goes: at once, or (`fade`, HOME-WELCOME's flight starting) over motion.dissolveMs.
 func _end_loading(fade := false) -> void:
 	if loading == null: return
-	if fade and loading.is_inside_tree():
-		loading.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var t := loading.create_tween()
-		t.tween_property(loading, "modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DISSOLVE_MS))
-		t.tween_callback(loading.queue_free)
+	if fade and loading.is_inside_tree() and loading.has_method("dissolve"):
+		loading.dissolve(UiKit.secs(UiTokens.MOTION_DISSOLVE_MS))
 	else: loading.queue_free()
 	loading = null
 
@@ -150,6 +148,7 @@ func _welcome_map(fly: bool) -> void:
 	_pass_touches(false)
 	welcome.map = pick_map
 	if pick_map == null or not pick_map.has_method("pick_fly"):
+		_end_loading(true)
 		if fly: welcome.slide_in(false)
 		else: welcome.slide_in(true, true)   # back to the card: it slides in again all the same (不知火舞 bce34a87)
 		return
@@ -159,6 +158,9 @@ func _welcome_map(fly: bool) -> void:
 	get_tree().process_frame.connect(_welcome_fly.bind(fly, pick_map), CONNECT_ONE_SHOT)
 
 func _welcome_fly(fly: bool, m: Variant) -> void:
+	# The first read's outline dissolves as the flight starts (不知火舞 3730603f) — from here, not the frame the map is
+	# made in: that frame's stall (the native MapView) would take the whole dissolve in one tween step.
+	_end_loading(true)
 	if not is_instance_valid(welcome) or pick_map != m: return
 	var at: Vector2 = welcome.get_global_transform_with_canvas() * welcome.city_point()
 	pick_map.pick_fly(WELCOME_ZOOM, WELCOME_FLY_S if fly else 0.0, at,

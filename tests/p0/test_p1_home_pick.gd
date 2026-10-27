@@ -376,6 +376,7 @@ func test_the_first_read_holds_the_cards_place_with_its_outline() -> void:
 	assert_object(flow.loading).is_null()
 	# HOME-WELCOME's flight starts under it: the outline dissolves over motion.dissolveMs (不知火舞 3730603f), taking no taps
 	assert_int(outline.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(outline.get_index()).is_greater(flow.welcome.get_index())   # over the card's own land, not hidden by it
 	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DISSOLVE_MS) + 0.1).timeout
 	assert_bool(is_instance_valid(outline) and outline.is_inside_tree() and not outline.is_queued_for_deletion()).is_false()
 	# the card stands where the outline stood, the same size (a one-line city), 16 above the safe area
@@ -461,6 +462,7 @@ func test_the_welcome_card_waits_for_the_flight_over_the_real_map() -> void:
 	assert_int(m.flies.size()).is_equal(1)
 	assert_float(m.flies[0][0]).is_equal(HomeFlow.WELCOME_ZOOM)
 	assert_float(m.flies[0][1]).is_equal(HomeFlow.WELCOME_FLY_S)
+	assert_object(flow.loading).is_null()   # the first read's outline dissolving from the flight's start
 	var w: Control = flow.welcome
 	var card_top: float = w.size.y - 16.0 - w.card.size.y
 	assert_float((m.flies[0][2] as Vector2).y).is_equal_approx((24.0 + card_top) * 0.5, 0.5)   # between the bar and the card

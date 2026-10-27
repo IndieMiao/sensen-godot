@@ -40,6 +40,7 @@ var _waiting := false          # the card held back for the flight: laid out but
 var _safe_top := 0.0
 var _safe_bottom := 0.0
 var _slide: Tween
+var _dissolve_s := 0.0         # the first read's outline going (dissolve): its length, 0 while it stays
 
 func _init(row_: Dictionary = {}, safe_bottom := 0.0, safe_top := 0.0) -> void:
 	row = row_
@@ -146,6 +147,10 @@ func _map_live() -> bool:
 	return map != null and (not map is Node or (is_instance_valid(map) and (map as Node).is_inside_tree()))
 
 func _process(_dt: float) -> void:
+	if _dissolve_s > 0.0:   # a frame's step at most 1/30 s: a stalled frame (the map coming up) cannot skip it
+		modulate.a -= minf(_dt, 1.0 / 30.0) / _dissolve_s
+		if modulate.a <= 0.0: queue_free()
+		return
 	var live := _map_live()
 	if not live and _waiting: slide_in(false)   # its map went mid-flight: the card all the same
 	var ground := live and bool(map.pick_has_ground())
@@ -172,6 +177,11 @@ func _place_credits(on: bool) -> void:
 	var m := credits.get_combined_minimum_size()
 	credits.size = m
 	credits.position = Vector2(CityMapView.CREDITS_LEFT_PT * k, card.position.y - CityMapView.CREDITS_GAP_PT * k - m.y)
+
+## The outline (placeholder) goes over `seconds`, stepped per frame as above, then frees itself; it takes no taps.
+func dissolve(seconds: float) -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dissolve_s = maxf(seconds, 0.001)
 
 ## The card's outline alone, the size of a one-line city's card, where the card goes; nothing inside it reads or
 ## takes a tap (342 8c4168ab).
