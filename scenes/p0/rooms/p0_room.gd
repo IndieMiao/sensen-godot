@@ -939,10 +939,10 @@ func _markers(v: Dictionary) -> void:
 				state if bool(m.get("strip_badge", true)) else -1)
 			else: rt.ui.world_icon(id, m.icon, screen, true, false, state, Vector2.INF, str(m.get("count", "")))
 			continue
-		if state >= 0 and rt.ui.has_method("badge"):
+		if kind != "npc" and state >= 0 and rt.ui.has_method("badge"):
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 		if kind == "npc":
-			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card, bool(m.get("talking", false)))
+			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card, bool(m.get("talking", false)), state)
 	for id in _shown.keys():
 		if now.has(id): continue
 		match str(_shown[id]):
