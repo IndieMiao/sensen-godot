@@ -44,7 +44,7 @@ func _tap(r: P0Room, n: String) -> void:
 	r.p0_tap(r.cam.unproject_position(r.anchor(n).global_position + lift))
 
 func test_the_outpost_table_and_anchor_files_agree() -> void:
-	assert_int(P0Outposts.all().size()).is_equal(4)
+	assert_int(P0Outposts.all().size()).is_equal(5)   # the home set's four and the card room (SGODOT-351)
 	for o in P0Outposts.all():
 		var anchors: Array = P0RoomAnchors.read_json(str(o.anchors)).get("anchors", [])
 		var names := anchors.map(func(a): return str(a.name))

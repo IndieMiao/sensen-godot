@@ -1,0 +1,13 @@
+{
+  "_note": "Barbary Card Room on the Tavern kit, temporary (SGODOT-351 plan v4.3 §5; 上官婉儿 measured on the walk grid and camera rays, 351 cd04db80). Room metres of assets/rooms/tavern/layout.json, floor top y 0.082. Lou deals from behind the long bar (x within ±1.2, never past the bar's turn at x 1.66); the player greets him from between the two middle bar stools. The blackjack table is the left square table with the green runner: tapping it opens the table page (a facility, LOCK-07 v2), the player standing at its open side. No counter: Lou's greeting has Play, not Trade. The player comes in a step past the door (the tavern's front entrance), the door at the layout's entrance; the left wall's door is scenery.",
+  "anchors": [
+    {"name": "npc_keeper", "position": [0.0, 0.082, -2.5], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [0.0, 2.45, -2.5]},
+    {"name": "stand_keeper", "position": [0.03, 0.082, -0.35], "yaw_degrees": 0},
+    {"name": "use_blackjack_table", "position": [-2.14, 1.2, 0.91], "module": "square_table"},
+    {"name": "stand_blackjack_table", "position": [-0.95, 0.082, 0.91], "yaw_degrees": 90},
+    {"name": "spawn", "position": [-1.15, 0.082, 1.9], "yaw_degrees": 0},
+    {"name": "exit", "position": [-1.15, 0.082, 3.12]},
+    {"name": "badge_exit", "position": [-1.15, 0.0, 3.6]}
+  ]
+}

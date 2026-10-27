@@ -12,6 +12,18 @@ const PIN_ART := {
 	"post": "res://assets/map/poi/icons/information_1.webp",
 	"market": "res://assets/map/poi/icons/grocery_1.webp",
 }
+## SGODOT-351: the card room, San Francisco's fifth outpost — its pin and table wear i-cards (安其拉; the recipe card's
+## art stands in until it lands), never the bar POI's; the pin only once the table is open to this player (q(238)).
+const CARDS_ICON := "res://assets/p0/icons/cards.svg"
+static func cards_icon() -> Texture2D:
+	return load(CARDS_ICON) if ResourceLoader.exists(CARDS_ICON) else P0Logic.icon("recipe_card")
+
+## The card room shows on the map once view.blackjack says it is open (Homestead Lv2, the guide over); its pin hidden
+## before, no grey card, no words (不知火舞 351 8aa69403).
+static func shown(o: Dictionary, view: Dictionary) -> bool:
+	if str(o.get("role", "")) != "casino": return true
+	var bj = view.get("blackjack", null)
+	return bj is Dictionary and bool(bj.get("open", false))
 
 static var _list: Array = []
 

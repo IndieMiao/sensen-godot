@@ -56,7 +56,7 @@ const _DRINK_GAP := 6.0         # keeper bar (with its note) to `Cups used`
 const SHOP_NOUN := {"tackle": "Tackle", "market": "Stall", "tea": "Tea", "post": "Desk"}
 ## Keeper role and P0 name when the opener passes no ctx (assets/p0/p0_outposts.json keeper, SGODOT-227).
 const KEEPERS := {"tackle": ["Tackle Keeper", "Finn"], "market": ["Market Keeper", "Mei"], "tea": ["Tea Host", "Ama"],
-	"post": ["Post Clerk", "Sigrid"]}
+	"post": ["Post Clerk", "Sigrid"], "casino": ["Dealer", "Lou"]}   # casino: no counter, the greeting's Play (SGODOT-351)
 ## Page tabs: the stall's board and the market's board (FARM-6 / NPC-2); one page shows no tab row. The stall's Decor
 ## page (P1, SGODOT-284; FARM-6-DECOR, Figma 2187:33369, q(111)): the yard pieces, into Farm Storage.
 const SECTIONS := {"homestead": [["buy", "Buy"], ["decor", "Decor"], ["board", "Stall Board"]], "market": [["buy", "Buy"], ["board", "Market Board"]]}
