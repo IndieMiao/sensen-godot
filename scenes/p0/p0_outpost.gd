@@ -366,12 +366,13 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 		# stays lit over those two; P0Ui decides what shows under which modal). The keeper is this room's only keeper.
 		var who := rt.ui.speaker() if rt != null else ""
 		var talking := who != "" and who == ("keeper" if n == "npc_keeper" else str(npcs[n].id))
-		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking}
+		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking,
+			badge = P0Guide.resident_badge(view, str(npcs[n].id))}
 	if SEAT_GROUPS.has(n):
 		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
 	if n == "use_market_board":
 		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
-		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = "request" if open > 0 else ""}
+		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = P0Guide.target_badge(view, "button", n, "request" if open > 0 else "")}
 	if n == "use_specialty_shelf":
 		return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"} if P0CounterDrawer.has_specialty(view) else {}
 	if n == "use_fish_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Bite Board"}

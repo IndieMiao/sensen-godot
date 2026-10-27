@@ -13,6 +13,7 @@ const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
+const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
 const Looks = preload("res://scenes/p0/p0_looks.gd")
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just above the board
@@ -39,6 +40,7 @@ const MAILBOX_TAP_PX := 40.0
 @onready var ground: MeshInstance3D = $Ground
 @onready var world_env: WorldEnvironment = $WorldEnvironment
 
+var _guide: Node3D
 var rt: P0Runtime
 var bp: FarmBlueprint
 var grid: BlueprintGrid
@@ -133,6 +135,7 @@ func is_back_navigation_locked() -> bool:
 var _held_layers: Array = []   # [CanvasLayer, its index], out of the tree while suspended
 
 func suspend() -> void:
+	if _guide != null: _guide.leave()
 	set_process(false)
 	visible = false
 	if world_env.environment: _saved_env = world_env.environment
@@ -713,6 +716,10 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_materials.frame(v, _card)
 	_hold_repeat()
 	_prompts(v)
+	if _guide == null:
+		_guide = FarmGuide.new().setup(self)
+		add_child(_guide)
+	_guide.frame(v, dt)
 	_teaching(v)
 
 func _sync_plots(v: Dictionary, dt: float) -> void:
@@ -950,6 +957,7 @@ func _hold_repeat() -> void:
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	var card := str(rt.ui.tapped_card)
+	if _guide != null and _guide.tap(screen, card): return
 	# The mine's EntryCard sits over the scene (passive, SGODOT-231): a tap on it is its button's; any other tap folds
 	# it and goes on (SGODOT-266).
 	if card == "" and _materials.tap_entry(screen): return
@@ -1012,6 +1020,10 @@ func _tap_card(id: String) -> bool:
 			if _facilities and _facilities.tap_card(id): return true   # P1: a greenhouse's strip or button
 			return _materials.tap_card(id)   # SGODOT-231: spot_* and workbench cards
 	return true
+
+## Existing nearby Gift entry may address the farm's guide, exactly as a resident in an outpost.
+func p0_near_resident() -> String:
+	return str(_guide.near_resident()) if _guide != null else ""
 
 ## The sign itself (its icon button and strip arrive by id, _tap_card); small, so the door beside it stays the house.
 ## Nothing above the board: with the button hidden (beyond 8 m) that spot is not the sign's (苏烈 on #59).

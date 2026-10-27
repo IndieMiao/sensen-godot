@@ -977,7 +977,7 @@ func _name_bar_shift(r: Rect2) -> float:
 ## stays up and highlighted over that card while every other tag and icon button hides (NPC-G1, #57); under any other
 ## card or drawer all tags hide. A tag an open name strip covers fades out until the strip folds (#57). A tap on a
 ## shown tag is a tap on its NPC (tapped_card = id, as for icon buttons): the name is where players tap to talk.
-func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false, talking := false) -> void:
+func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false, talking := false, status := -1) -> void:
 	var t: UiNpcNameTag = _npc_tags.get(id)
 	if t == null:
 		t = UiNpcNameTag.new()
@@ -996,6 +996,7 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 	t.visible = show and (_modal == null or over) and _marker_area().has_point(head_screen)
 	if not t.visible: return
 	t.text = text
+	t.status = status
 	t.highlight = highlight or talking
 	t.place_over(head_screen)
 	_keep_off_sides(t, Rect2(Vector2.ZERO, t.size))
@@ -2817,6 +2818,9 @@ func _show_resident(d: Dictionary) -> void:
 	var ask := resident_ask(view, str(d.id)) if data.request else ""
 	if ask != "": data.line = ask   # NPC-5: with a request open the bar asks it, in the request card's words (李白 q(46))
 	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
+	if surface == "farm" and str(d.id) == "res_pip":
+		var line = P0Guide.pip(view).get("line")
+		if line is String and line != "": data.line = line
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
 	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)

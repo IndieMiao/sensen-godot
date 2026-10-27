@@ -162,6 +162,41 @@ static func guide_rows(view: Dictionary) -> Array:
 static func tip_allowed(_view: Dictionary, key: String) -> bool:
 	return TIPS.has(key)
 
+## The server's actual targets (plot numbers, place ids, resident ids and button keys), never bundled aliases.
+static func guide_marks(view: Dictionary) -> Array:
+	var marks = guide_shown(view).get("marks", [])
+	return marks if marks is Array else []
+
+## A semantic entry point: only its current target's state survives during the guide. The callers deliberately
+## exclude ordinary crop/resource facts, HUD dots and the Mailbox's Parcel count (341 ec56d336).
+static func target_badge(view: Dictionary, field: String, id: String, ordinary := "") -> String:
+	if not guide_on(view): return ordinary
+	for mark in guide_marks(view):
+		if mark is Dictionary and str(mark.get(field, "")) == id: return str(mark.get("kind", ""))
+	return ""
+
+static func resident_badge(view: Dictionary, id: String) -> String:
+	var r: Dictionary = view.get("residents", {}).get(id, {})
+	var req = r.get("request", null)
+	var ordinary := "request" if str(r.get("request_state", "")) == "open" else ""
+	if str(r.get("request_state", "")) == "accepted" and req is Dictionary and bool(req.get("ready", false)): ordinary = "deliverable"
+	var kind := target_badge(view, "resident", id, ordinary)
+	# S6's one target progresses from a new request to a real hand-in; S10's gift heart is never replaced by a tick.
+	if kind == "request" and ordinary == "deliverable": return ordinary
+	return "deliverable" if kind == "deliver" else kind
+
+static func teaching_plots(view: Dictionary) -> Array:
+	var ids := []
+	for mark in guide_marks(view):
+		if not mark is Dictionary or not mark.get("plot") is float and not mark.get("plot") is int: continue
+		var id := int(mark.plot)
+		if id >= 0 and id < P0Garden.plot_count(view) and not ids.has(id): ids.append(id)
+	return ids
+
+static func pip(view: Dictionary) -> Dictionary:
+	var data = guide_shown(view).get("pip", {})
+	return data if data is Dictionary else {}
+
 # ---------------------------------------------------------------- first session state
 
 ## The Stall Board's tutorial request, or {} once it is handed in (the first session's one goal, §14.2).
@@ -328,6 +363,7 @@ static func harvest_level(view: Dictionary) -> Dictionary:
 ## The farmhouse marker's REQUEST state, the guide's "!" (§14.3; #59, 250 v2: one mark per facility): a cookable
 ## fish in the bag while Today has a Cook row still to do.
 static func door_badge(view: Dictionary) -> bool:
+	if guide_on(view): return target_badge(view, "place", "home") == "request"
 	var fish := false
 	for s in view.get("bag", {}).get("slots", []):
 		var id := str(s.get("id", ""))
