@@ -25,9 +25,7 @@ static func cards_icon() -> Texture2D:
 static func shown(o: Dictionary, view: Dictionary) -> bool:
 	if str(o.get("role", "")) != "casino": return true
 	var h = view.get("homestead", {})
-	var g = view.get("guide", null)
-	var guided: bool = g is Dictionary and g.get("step", null) != null and str(g.step) != ""   # as P0Guide.guide_on
-	return h is Dictionary and int(h.get("level", 1)) >= 2 and not guided
+	return h is Dictionary and int(h.get("level", 1)) >= 2 and not P0Guide.guide_on(view)
 
 static var _list: Array = []
 
