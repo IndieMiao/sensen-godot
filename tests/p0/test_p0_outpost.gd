@@ -777,40 +777,53 @@ func test_the_card_room_opens_between_the_player_and_lou() -> void:
 	assert_bool(band.has_point(r.cam.unproject_position(r.pick_point("use_blackjack_table")))).is_true()
 
 ## The card room on the tavern kit hides its `TAVERN` sign (不知火舞 351 e38e8e85, 上官婉儿 on it): the sign is merged
-## into the back_dressing batch, so its own 2368 triangles are cut from it — none of them left, the rest of the batch
-## whole. All or none: asked again (none of it there now), the batch is left as it is. Another room
-## on the kit keeps its sign. A tavern rebatched since warns here first.
+## into the back_dressing batch, so its own 2368 triangles are cut from it — none of them left — and so is the bracket
+## it hung from, the 188 triangles in its box (上官婉儿 on 351); the two wall lanterns beside it and the back bar under
+## it keep every triangle; it is cut once a session. All or none: asked again (nothing of it there now), the batch is left as it is. Another room
+## on the kit keeps them. A tavern rebatched since warns here first.
 func test_the_card_room_hides_the_tavern_sign() -> void:
 	var tris := func(n: Node) -> int:
 		var all := []
 		ShopArt._surfaces(n, Transform3D.IDENTITY, all)
 		return all.reduce(func(t, e): return t + (e.index as PackedInt32Array).size() / 3, 0)
+	# the batch's triangles with every corner on a placed module's vertices
+	var on := func(art: Node, module: String) -> int:
+		var pivot := art.get_node(module) as Node3D
+		var model := (load(art.kit_path + "/" + str(art._modules[module].file)) as PackedScene).instantiate()
+		var own := []
+		ShopArt._surfaces(model, pivot.transform, own)
+		model.free()
+		var keys := {}
+		for e in own:
+			for v in e.vertices: keys[ShopArt._mm(e.xf * v)] = true
+		var batch := art.get_node("back_dressing") as Node3D
+		var left := []
+		ShopArt._surfaces(batch, batch.transform, left)
+		var n := 0
+		for e in left:
+			for i in range(0, e.index.size(), 3):
+				if range(3).all(func(k): return keys.has(ShopArt._mm(e.xf * e.vertices[e.index[i + k]]))): n += 1
+		return n
+	var kit: Node = (load("res://scenes/tavern/tavern_art.tscn") as PackedScene).instantiate()
+	add_child(auto_free(kit))
 	var r := _room("sf_card_room_1", true)
 	await get_tree().process_frame
 	var batch: Node3D = r.art.get_node("back_dressing")
-	assert_int(tris.call(batch)).is_equal(32408 - 2368)
+	assert_int(tris.call(batch)).is_equal(32408 - 2368 - 188)
+	assert_int(tris.call(kit.get_node("back_dressing"))).is_equal(32408)   # the kit itself keeps them
 	assert_bool((r.art.get_node("tavern_sign") as Node3D).visible).is_false()
-	var sign := (load("res://assets/rooms/tavern/tavern_sign.glb") as PackedScene).instantiate()
-	auto_free(sign)
-	var own := []
-	ShopArt._surfaces(sign, (r.art.get_node("tavern_sign") as Node3D).transform, own)
-	var keys := {}
-	for e in own:
-		for v in e.vertices: keys[ShopArt._mm(e.xf * v)] = true
-	# none of the sign left: no triangle with all its corners on the sign's (its box also holds halves of the two
-	# wall lanterns and a back-bar piece, which stay)
-	var left := []
-	ShopArt._surfaces(batch, batch.transform, left)
-	var on_sign := 0
-	for e in left:
-		for i in range(0, e.index.size(), 3):
-			if range(3).all(func(k): return keys.has(ShopArt._mm(e.xf * e.vertices[e.index[i + k]]))): on_sign += 1
-	assert_int(on_sign).is_equal(0)
+	assert_int(on.call(kit, "tavern_sign")).is_equal(2368)
+	assert_int(on.call(r.art, "tavern_sign")).is_equal(0)
+	for m in ["bar_left_frame", "bar_right_frame", "back_bar"]:
+		assert_int(on.call(r.art, m)).override_failure_message(m).is_equal(on.call(kit, m))
+	# cut once a session: the card room opened again takes the same meshes (亚瑟 on #523)
+	var again := _room("sf_card_room_1", true)
+	await get_tree().process_frame
+	var mesh_of := func(n: Node) -> Mesh: return (n.find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D).mesh
+	assert_object(mesh_of.call(again.art.get_node("back_dressing"))).is_same(mesh_of.call(batch))
 	assert_int(r.art.hide_module("tavern_sign")).is_equal(0)   # nothing of it left to cut: warned, the batch as it was
-	assert_int(tris.call(batch)).is_equal(32408 - 2368)
-	var bar: Node = (load("res://scenes/tavern/tavern_art.tscn") as PackedScene).instantiate()
-	add_child(auto_free(bar))
-	assert_int(tris.call(bar.get_node("back_dressing"))).is_equal(32408)   # the kit itself keeps it
+	assert_int(r.art.hide_box("back_dressing", AABB(Vector3(-0.102, 3.318, -3.362), Vector3(0.204, 0.324, 0.164)), 188)).is_equal(0)
+	assert_int(tris.call(batch)).is_equal(32408 - 2368 - 188)
 
 ## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
 ## (world.keeper_looks, role × climate × 3), under their own name plate.
