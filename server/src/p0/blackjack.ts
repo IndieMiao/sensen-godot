@@ -38,11 +38,11 @@ export interface BjSettled {
 }
 export interface BjState { intro?: true; n: number; last_bet?: number; hand?: BjHand; last?: BjSettled }
 
-/** The shuffle's key (P0_BJ_SECRET). The server sets it at start; dev and tests keep this fixed one. A release server
- * without one passes null: the card room alone is closed (bj_unavailable, the view's open false), the rest plays on. */
-let secret: string | null = 'p0-bj-dev-secret';
-export function setBlackjackSecret(key: string | null): void { secret = key; }
-export const blackjackAvailable = () => secret !== null;
+/** The shuffle's key (P0_BJ_SECRET). The server sets it at start (a release server without one makes a random key of
+ * its own: the shoe of a hand in play is in the save and its salt is random, so a key that changes on restart costs
+ * nothing; 亚瑟 on #523); dev and tests keep this fixed one. */
+let secret = 'p0-bj-dev-secret';
+export function setBlackjackSecret(key: string): void { secret = key; }
 /** Each hand's salt (a restored save or a counter going back never replays a shoe); tests swap it for a fixed one. */
 export const bjSalt = { next: (): string => randomBytes(8).toString('hex') };
 /** The shoe for a hand, in dealing order; tests stack it. */
@@ -66,7 +66,7 @@ export function shuffleShoe(player: string, n: number, salt: string): number[] {
   const deck = Array.from({ length: 52 * BJ_DECKS }, (_, i) => i);
   let block = 0, buf = Buffer.alloc(0), at = 0;
   const u32 = () => {
-    if (at + 4 > buf.length) { buf = createHmac('sha256', secret!).update(`${player}:${n}:${salt}:${block++}`).digest(); at = 0; }
+    if (at + 4 > buf.length) { buf = createHmac('sha256', secret).update(`${player}:${n}:${salt}:${block++}`).digest(); at = 0; }
     const v = buf.readUInt32BE(at); at += 4; return v;
   };
   for (let i = deck.length - 1; i > 0; i--) {
@@ -170,7 +170,6 @@ export type BjCommand =
 /** The four blackjack commands; `settled`: the settle chain stood an expired hand on this very command. */
 export function blackjackCommand(c: P0Content, s: P0State, cmd: BjCommand & { space?: unknown; place?: unknown }, now: number,
   events: P0Event[], settled: boolean): Refusal | null {
-  if (secret === null) return refuse('bj_unavailable');   // no shuffle key on this server: the card room is closed
   if (!atTable(c, cmd.space, cmd.place)) return refuse('bj_not_here');
   if (!bjOpen(s)) return refuse('bj_locked');
   const bj = (s.blackjack ??= { n: 0 });
@@ -192,6 +191,7 @@ export function blackjackCommand(c: P0Content, s: P0State, cmd: BjCommand & { sp
       // the deck is reversed so pop() deals from its front: player, dealer up, player, dealer hole
       h.seats[0].cards.push(h.deck.pop()!); h.dealer.push(h.deck.pop()!); h.seats[0].cards.push(h.deck.pop()!); h.dealer.push(h.deck.pop()!);
       bj.n = n; bj.last_bet = bet; bj.hand = h;
+      delete bj.last;   // a new hand: an older result not seen is stale now (亚瑟 on #523)
       s.coins -= bet;
       events.push({ kind: 'coins', delta: -bet });
       events.push({ kind: 'bj_dealt', n, bet, hand: handView(c, s, h, now) });
@@ -265,7 +265,7 @@ export function handView(c: P0Content, s: P0State, h: BjHand, now: number) {
 export function blackjackView(c: P0Content, s: P0State, now: number) {
   const bj = s.blackjack;
   return {
-    open: bjOpen(s) && secret !== null, ...(secret === null ? { unavailable: true } : {}), intro: !!bj?.intro, floor: c.wallet_floor, min_bet: BJ_MIN_BET, step: BJ_STEP, chips: BJ_CHIPS,
+    open: bjOpen(s), intro: !!bj?.intro, floor: c.wallet_floor, min_bet: BJ_MIN_BET, step: BJ_STEP, chips: BJ_CHIPS,
     last_bet: bj?.last_bet ?? 0,
     hand: bj?.hand ? handView(c, s, bj.hand, now) : null,
     last: bj?.last ?? null,

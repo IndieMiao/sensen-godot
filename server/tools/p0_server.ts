@@ -8,6 +8,7 @@
  */
 import Fastify from 'fastify';
 import { mkdirSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
@@ -49,10 +50,10 @@ if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', e
 }
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
-// SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one keeps the card room closed and says so
-// (奕星: a missing key must not take every player offline); dev keeps a fixed key.
+// SGODOT-351: the blackjack shoe's key. A release server (P0_DEV=0) without one makes a random key for this process and
+// warns (亚瑟 / 奕星 on #523: the card room stays open, a hand in play keeps its stored shoe); dev keeps a fixed key.
 if (process.env.P0_BJ_SECRET) setBlackjackSecret(process.env.P0_BJ_SECRET);
-else if (!dev) { setBlackjackSecret(null); console.error(JSON.stringify({ error: 'P0_BJ_SECRET missing: the card room is closed' })); }
+else if (!dev) { setBlackjackSecret(randomBytes(32).toString('hex')); console.warn(JSON.stringify({ warn: 'P0_BJ_SECRET missing: a random key for this process' })); }
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
 const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
 const log = new P0EventLog(eventDir === '' ? undefined : eventDir);

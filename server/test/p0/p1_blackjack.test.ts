@@ -187,6 +187,8 @@ describe('a hand left behind (expiry, the unseen result, the day)', () => {
     expect(result(open.events)).toMatchObject({ why: 'expired', net: 20 });
     expect(open.state.blackjack!.last).toBeUndefined();
     expect(step(open.state, { type: 'bj_open' }, T0 + 24 * H).events.filter(e => e.kind === 'bj_result')).toEqual([]);
+    stack('TS', '7H', '9S', '9D');
+    expect(step(other.state, { type: 'bj_deal', bet: 10 }, T0 + 24 * H).state.blackjack!.last).toBeUndefined();   // a new hand clears it
   });
 
   it('an action on a hand that has run out is not played: ok, with its result (not a refusal, which saves nothing)', () => {
@@ -247,16 +249,18 @@ describe('a rollback (plan §7, q(238))', () => {
   });
 });
 
-describe('a release server without P0_BJ_SECRET (奕星 on #523)', () => {
-  it('keeps the card room alone closed: bj_unavailable, the view not open; a hand left open still settles', () => {
+describe('the shuffle key (亚瑟 / 奕星 on #523)', () => {
+  it('another key deals another shoe; a hand in play keeps its stored shoe when the key changes', () => {
+    const a = shuffleShoe('p', 1, 'salt');
+    setBlackjackSecret('another-key');
+    try {
+      expect(shuffleShoe('p', 1, 'salt')).not.toEqual(a);
+    } finally { setBlackjackSecret('p0-bj-dev-secret'); }
     stack('TS', '7H', '9S', '9D', '2C');
     const dealt = step(player(), { type: 'bj_deal', bet: 20 }).state;
-    setBlackjackSecret(null);
+    setBlackjackSecret('restarted-key');
     try {
-      expect(refused(player(), { type: 'bj_deal', bet: 10 }).code).toBe('bj_unavailable');
-      expect(viewOf(c, player(), T0).blackjack).toMatchObject({ open: false, unavailable: true });
-      const other = applyP0(c, dealt, { type: 'read_inbox', keys: [] }, T0 + 24 * H);   // the rest of the game plays on
-      expect(other.ok && other.state.blackjack!.last).toMatchObject({ why: 'expired', net: 20 });
+      expect(result(step(dealt, { type: 'bj_act', action: 'stand' }).events)).toMatchObject({ dealer: ['7H', '9D', '2C'], net: 20 });
     } finally { setBlackjackSecret('p0-bj-dev-secret'); }
   });
 });
