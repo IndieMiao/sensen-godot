@@ -60,6 +60,21 @@ func test_the_version_row_reads_name_and_code() -> void:
 	var cfg := P0Session.demo_config('{"url": "https://x.example/v1", "key": "k", "version": 2026101001, "name": "0.2.1"}')
 	assert_str(P0Legal.version_line(cfg)).is_equal("0.2.1 (2026101001)")
 
+## With a home and the phone side, the groups run Home → Notifications → Test options → Legal (不知火舞 341 0d94c10d,
+## SGODOT-350), Notifications and Test options each an untitled group of one row.
+func test_settings_groups_run_home_notifications_test_options_legal() -> void:
+	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("0.2.1 (2026101001)", 0.0, 0.0,
+		{"name": "Tokyo", "line": "Set for good", "open": false}, "On"))
+	add_child(page)
+	await await_idle_frame()
+	# "": the read-only Home row's empty value (a VALUE row always has one)
+	assert_array(_labels(page.body)).is_equal(["Home", "Home city · Tokyo", "Set for good", "", "Notifications", "On", "›",
+		"Test options", "›", "Legal", "Licenses", "›", "Version", "0.2.1 (2026101001)"])
+	var notif: UiSettingRow = page.body.find_child("Notifications", true, false)
+	var tests: UiSettingRow = page.body.find_child("TestOptions", true, false)
+	assert_int(notif.get_parent().get_child_count()).is_equal(1)
+	assert_object(notif.get_parent()).is_not_same(tests.get_parent())
+
 func test_settings_holds_only_rows_that_work() -> void:
 	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("0.2.1 (2026101001)"))
 	add_child(page)

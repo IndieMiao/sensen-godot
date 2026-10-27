@@ -149,6 +149,8 @@ func _init() -> void:
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
 	# Crop-ready notifications (SGODOT-350): Android's GodotNotify, per account on this phone; none elsewhere.
 	ui.notify = P0Notify.new(session.test_accounts.profile_file("p0_notify.json"), P0Notify.phone())
+	# a cold start is coming back too: what was set or shown while the app was gone goes (⑦; 李元芳 on #522)
+	ui.notify.came_back()
 	if ui.notify.available(): ui.notify.native.connect("permission", func(_granted): ui.notify_changed())
 	ui.test_account_requested.connect(_switch_test_account)
 	add_child(ui)
