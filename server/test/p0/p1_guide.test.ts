@@ -74,13 +74,13 @@ describe('the guide in the save (SGODOT-341)', () => {
     expect(JSON.parse(JSON.stringify(rest))).toEqual(before);
     const again = upgradeState(c, JSON.parse(JSON.stringify(up)), T0 + H);
     expect(again).toEqual(up);
-    expect(viewOf(c, up, T0).guide).toEqual({ step: null, end: 'legacy' });
+    expect(viewOf(c, up, T0).guide).toEqual({ step: null, end: 'legacy', ended_at: null, pip: { here: false } });
   });
 
   it('a new save starts the guide only for a client that can show it, and only once the table has steps', () => {
     const c = content();
     expect(freshState(c, 'guide-new-01', T0).guide).toMatchObject({ step: null, end: 'legacy' });
-    expect(guided(c).guide).toEqual({ step: 'sow_two', n: {}, at: T0 });
+    expect(guided(c).guide).toEqual({ step: 'sow_two', n: {}, at: T0, start: T0 });
     expect(guided(content({ steps: [] })).guide).toMatchObject({ step: null, end: 'legacy' });
     expect(guided(loadP0Content()).guide?.end).toBe('legacy');   // the shipped table is empty until 339
   });
@@ -123,7 +123,7 @@ describe('passing steps (SGODOT-341)', () => {
     const store = new P0Store(c);
     const app = Fastify();
     registerP0Routes(app, { content: c, store, now: () => T0, dev: true });
-    const headers = { 'x-p0-player': 'guide-route-01', 'x-p0-features': 'guide' };
+    const headers = { 'x-p0-player': 'guide-route-01', 'x-p0-features': 'guide_v3' };
     await app.inject({ method: 'GET', url: '/v1/p0/state', headers });
     const r = (await app.inject({ method: 'GET', url: '/v1/p0/state?space=outpost&place=sh_market_1', headers })).json();
     expect(r.state.guide.step).toBe('sow_two');
@@ -151,7 +151,7 @@ describe('passing steps (SGODOT-341)', () => {
     expect(at(s)).toBe('sow_more');
     s = run(c, s, { type: 'sow', plot: e, seed: 'seed_radish', space: 'home' });
     expect(s.guide).toMatchObject({ step: null, end: 'done' });
-    expect(viewOf(c, s, T0).guide).toEqual({ step: null, end: 'done' });
+    expect(viewOf(c, s, T0).guide).toMatchObject({ step: null, end: 'done', pip: { here: false } });
   });
 
   it('an optional step passes once the step after it is done, and never holds the player up', () => {
@@ -235,13 +235,15 @@ describe('guide keys (SGODOT-341)', () => {
   it('enter counts a new space or place only, not every command made there', () => {
     const s = guided(c);
     const moved = { ...s, presence: { ...s.presence, space: 'outpost', entered: 'sh_market_1' } };
-    expect(Object.fromEntries(guideKeys(c, s, moved, null, []))).toEqual({ 'enter:outpost': 1, 'enter:sh_market_1': 1 });
+    expect(Object.fromEntries(guideKeys(c, s, moved, null, []))).toEqual({ 'enter:outpost': 1, 'enter:sh_market_1': 1, 'enter:home:market': 1 });
     expect(Object.fromEntries(guideKeys(c, moved, moved, null, []))).toEqual({});
   });
-  it('keys no step counts on are not kept in the save', () => {
+  it('keys no step counts on are not kept in the save; talking to Pip always is (his `!`, q(222) ③)', () => {
     let s = guided(c);
-    s = run(c, s, { type: 'talk', resident: 'res_pip', space: 'outpost', place: 'sh_post_1' });
+    s = run(c, s, { type: 'talk', resident: 'res_old_kai', space: 'outpost', place: 'sh_tackle_1' });
     expect(Object.keys(s.guide!.n)).toEqual([]);
+    s = run(c, s, { type: 'talk', resident: 'res_pip', space: 'outpost', place: 'sh_post_1' });
+    expect(s.guide!.n).toEqual({ 'talk:res_pip': 1 });
   });
 });
 
@@ -265,7 +267,7 @@ describe('follow-ups from the review of #472 (SGODOT-341)', () => {
     const c = content();
     const s = guided(c);
     s.guide!.step = 'gone_step';
-    expect(viewOf(c, s, T0).guide).toEqual({ step: null, end: 'done' });
+    expect(viewOf(c, s, T0).guide).toMatchObject({ step: null, end: 'done', pip: { here: false } });
     const up = upgradeState(c, JSON.parse(JSON.stringify(s)), T0 + H);
     expect(up.guide).toMatchObject({ step: null, end: 'done', at: T0 + H });
   });
@@ -287,14 +289,14 @@ describe('follow-ups from the review of #472 (SGODOT-341)', () => {
 });
 
 describe('the dev routes and the feature header (SGODOT-341)', () => {
-  it('reset starts the guide for a client that says `guide`; dev/guide moves it; an older client\'s new save is legacy', async () => {
+  it('reset starts the guide for a client that says `guide_v3`; dev/guide moves it; an older client\'s new save is legacy', async () => {
     const c = content();
     const app = Fastify();
     registerP0Routes(app, { content: c, store: new P0Store(c), now: () => T0, dev: true });
     const player = 'guide-route-02';
     const old = (await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': player } })).json();
-    expect(old.state.guide).toEqual({ step: null, end: 'legacy' });
-    const headers = { 'x-p0-player': player, 'x-p0-features': 'choose_home,guide' };
+    expect(old.state.guide).toEqual({ step: null, end: 'legacy', ended_at: null, pip: { here: false } });
+    const headers = { 'x-p0-player': player, 'x-p0-features': 'choose_home,guide_v3' };
     const reset = (await app.inject({ method: 'POST', url: '/v1/p0/dev/reset', headers })).json();
     expect(reset.state.guide).toMatchObject({ step: 'sow_two' });
     expect(reset.state.home.pending).toBe(true);
@@ -302,7 +304,7 @@ describe('the dev routes and the feature header (SGODOT-341)', () => {
     expect(moved.state.guide).toMatchObject({ step: 'make_soup', recover: 'rec_fish' });
     expect((await app.inject({ method: 'POST', url: '/v1/p0/dev/guide', headers, payload: { step: 'nope' } })).statusCode).toBe(400);
     const ended = (await app.inject({ method: 'POST', url: '/v1/p0/dev/guide', headers, payload: { step: 'end' } })).json();
-    expect(ended.state.guide).toEqual({ step: null, end: 'done' });
+    expect(ended.state.guide).toMatchObject({ step: null, end: 'done', ended_at: T0, pip: { here: false } });
     await app.close();
   });
   it('without dev mode there is no dev/guide', async () => {
