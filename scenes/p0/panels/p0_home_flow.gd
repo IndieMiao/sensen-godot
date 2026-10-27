@@ -43,6 +43,7 @@ var loading: Control         # a first pick's card outline till its first read i
 var pick_map: Object         # the map in its pick mode the pin page reads (null: the page's own flat map)
 ## The host's (P0Runtime): open_map(cluster) pushes the P0 map in its pick mode and returns it (null: none, the page's
 ## own flat map); close_map() pops it. Unset (the tests), the pin page keeps its flat map.
+var _land: ColorRect        # a first pick's ground under its pages: off while the real map is under the pin page
 var open_map := Callable()
 var close_map := Callable()
 
@@ -56,6 +57,7 @@ func _init(session_: Node = null, safe_top := 0.0, safe_bottom := 0.0, change_fr
 	if change_from != "": _make_cities()
 	else:   # the first read decides: HOME-WELCOME or the list; the map's land meanwhile (HOME-WELCOME's ground)
 		var land := ColorRect.new()
+		_land = land
 		land.name = "Land"
 		land.color = Welcome.LAND
 		land.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -121,6 +123,7 @@ func open_spots(row: Dictionary) -> void:
 	if open_map.is_valid(): pick_map = open_map.call(id)
 	if pick_map != null:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if _land != null: _land.visible = false
 		map_shown.emit(true)
 	var city_name := str(row.get("name", ""))
 	var same := change_from != "" and id == change_from
@@ -198,6 +201,7 @@ func _drop_map(later := false) -> void:
 		if later: close_map.call_deferred()   # leaving the tree, maybe with the root busy (the app quitting)
 		else: close_map.call()
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	if _land != null: _land.visible = true
 	map_shown.emit(false)
 
 func _exit_tree() -> void:

@@ -375,7 +375,8 @@ func _process(_dt: float) -> void:
 
 var _last_key: Array = []
 func _view_key() -> Array:
-	return [geo_at(tip()), screen_of(area.base.x, area.base.y), map.pick_px_per_m(), map.pick_dragging(), size]
+	return [geo_at(tip()), screen_of(area.base.x, area.base.y), map.pick_px_per_m(), map.pick_dragging(),
+		map.pick_has_ground(), size]   # the ground arriving lifts the page's land and shows the credit line
 
 ## The map is still there to read: the real one is popped before the page goes (a pick built, ‹ Change city).
 func _map_live() -> bool:

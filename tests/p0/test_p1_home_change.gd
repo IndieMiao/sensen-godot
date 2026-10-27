@@ -247,3 +247,20 @@ func test_the_pin_page_opens_and_gives_back_its_map() -> void:
 	await await_idle_frame()
 	assert_array(closed).is_equal([1, 1, 1])
 	(made[0] as Node).free()
+
+## A first pick's own ground (the land under its pages) goes while the real map is under the pin page, and comes back
+## with ‹ Change city (the emulator: it hid the Mapbox map).
+func test_a_first_picks_land_gives_way_to_the_real_map() -> void:
+	var session := P0Session.new()
+	session.transport = func(_m, _p, _b, _c): pass
+	var flow: Control = auto_free(HomeFlow.new(session))
+	add_child(flow)
+	flow.open_map = func(_c: String) -> Object: return PinPage.FlatMap.new()
+	flow.close_map = func(): pass
+	await await_idle_frame()
+	assert_bool(flow._land.visible).is_true()
+	flow.open_spots(Pick.SF)
+	assert_bool(flow._land.visible).is_false()
+	flow.back_to_cities()
+	assert_bool(flow._land.visible).is_true()
+	session.free()
