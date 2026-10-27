@@ -70,8 +70,8 @@ func _highlight(view: Dictionary) -> void:
 			add_child(outline)
 			_highlights[id] = outline
 	for id in _highlights:
-		var tilled: bool = view.get("plots", []).any(func(p): return int(p.get("id", -1)) == int(id) and str(p.get("state", "")) == "tilled")
-		_highlights[id].visible = ids.has(id) and tilled and not farm.rt.ui.has_modal() and not farm.rt.ui.placing()
+		var highlighted: bool = view.get("plots", []).any(func(p): return int(p.get("id", -1)) == int(id) and str(p.get("state", "")) in ["tilled", "ready"])
+		_highlights[id].visible = ids.has(id) and highlighted and not farm.rt.ui.has_modal() and not farm.rt.ui.placing()
 	# The ordinary near-bed outline must not introduce a third teaching highlight; actions stay enabled everywhere.
 	if not ids.is_empty() and str(view.get("guide", {}).get("step", "")) == "t_sow_quick": farm._hi.visible = false
 

@@ -143,3 +143,89 @@ func test_explicit_pip_reply_wins_over_the_step_line_without_adding_request() ->
 	assert_str(bars[0].line).is_equal(reply)
 	assert_object(bars[0]._request).is_null()
 	for file in [ui.quick_store, ui.tips_path]: DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+
+func _marked_ui(v: Dictionary) -> P0Ui:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.quick_store = "user://test_typed_marks_bar_%d.json" % OS.get_process_id()
+	ui.tips_path = "user://test_typed_marks_tips_%d.json" % OS.get_process_id()
+	v.bag = {capacity = 25, slots = []}
+	v.energy = {value = 200, max = 200}
+	add_child(ui)
+	ui.set_process(false)
+	ui.set_surface("farm")
+	ui.set_view(v)
+	await await_idle_frame()
+	for file in [ui.quick_store, ui.tips_path]: DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
+	return ui
+
+func test_harvest_and_location_need_server_marks_not_step_fallbacks() -> void:
+	var v := _guide("t_harvest_quick")
+	var ui := await _marked_ui(v)
+	ui.set_action({verb = "Harvest", enabled = true, cmd = {type = "harvest"}})
+	ui._refresh_guide_pulses()
+	assert_dict(ui.guide_pulses._counts).is_empty()
+	v.guide.marks = [{button = "harvest", pulse = true}, {button = "location", pulse = true}]
+	ui._refresh_guide_pulses()
+	assert_int(ui.guide_pulses._counts.harvest).is_equal(1)
+	assert_int(ui.guide_pulses._counts.location).is_equal(1)
+
+func test_cast_only_pulses_at_the_marked_pond() -> void:
+	var v := _guide("t_fish")
+	v.guide.marks = [{button = "cast", pulse = true}, {place = "pond-target", kind = "request"}]
+	var ui := await _marked_ui(v)
+	ui.set_surface("pond")
+	ui.space = "pond"
+	ui.set_action({verb = "Cast", enabled = true, cmd = {type = "cast"}})
+	ui.place = "other-pond"
+	ui._refresh_guide_pulses()
+	assert_dict(ui.guide_pulses._counts).is_empty()
+	ui.place = "pond-target"
+	ui._refresh_guide_pulses()
+	assert_int(ui.guide_pulses._counts.cast).is_equal(1)
+
+func test_stove_mark_pulses_only_the_open_world_name_strip() -> void:
+	var v := _guide("t_soup")
+	v.guide.marks = [{object = "stove", pulse = true}]
+	var ui := await _marked_ui(v)
+	ui.space = "home"
+	ui._refresh_guide_pulses()
+	assert_dict(ui.guide_pulses._counts).is_empty()
+	ui.name_bar("room:use_stove_1", P0Logic.icon("pot"), "Stove 1/1", "Empty", Vector2(100, 250), true)
+	await get_tree().create_timer(0.25).timeout
+	ui._refresh_guide_pulses()
+	assert_int(ui.guide_pulses._counts["object:stove"]).is_equal(1)
+
+func test_soup_item_mark_matches_all_qualities_without_selecting_or_inserting() -> void:
+	var grid: UiInventoryGrid = auto_free(UiInventoryGrid.new())
+	add_child(grid)
+	grid.items = [{id = "dish_fish_soup@plain", qty = 1}, {id = "dish_fish_soup@good", qty = 1},
+		{id = "dish_fish_soup@perfect", qty = 1}, {id = "dish_grilled_crucian@good", qty = 1}]
+	assert_int(P0Ui.guide_gift_cells(grid, "dish_fish_soup").size()).is_equal(3)
+	assert_str(grid.selected_id).is_empty()
+	grid.items = [{id = "dish_grilled_crucian@good", qty = 1}]
+	assert_dict(P0Ui.guide_gift_cells(grid, "dish_fish_soup")).is_empty()
+	assert_int(grid.shown_items().size()).is_equal(1)
+
+func test_item_pulse_is_outside_the_grid_clip_and_follows_the_cell() -> void:
+	var drawer: Control = auto_free(Control.new())
+	drawer.size = Vector2(300, 400)
+	add_child(drawer)
+	var grid := Control.new()
+	grid.clip_contents = true
+	grid.position = Vector2(20, 100)
+	grid.size = Vector2(200, 100)
+	drawer.add_child(grid)
+	var cell := UiItemCell.new(UiItemCell.Density.INVENTORY)
+	cell.size = Vector2(52, 52)
+	grid.add_child(cell)
+	var overlay := P0Ui.guide_item_overlay(drawer)
+	var budget = Pulses.new()
+	budget.update(_guide("t_gift"), {soup = {node = cell, overlay = overlay, shape = UiGuidePulse.Shape.CARD}})
+	var ring: UiGuidePulse = budget._rings[0].get_ref()
+	assert_bool(grid.is_ancestor_of(ring)).is_false()
+	assert_int(overlay.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	var before := ring.global_position
+	cell.position.x += 12
+	budget.follow()
+	assert_float(ring.global_position.x - before.x).is_equal_approx(12, 0.01)
+	budget.cancel()

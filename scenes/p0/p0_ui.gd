@@ -180,6 +180,7 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
+	guide_pulses.follow()
 	_guide_pulse_wait -= dt
 	if _guide_pulse_wait <= 0.0:
 		_guide_pulse_wait = 0.1
@@ -205,9 +206,13 @@ func _refresh_guide_pulses() -> void:
 	if screen_kind() == -1:
 		for mark in P0Guide.button_marks(view):
 			var key := str(mark.button)
-			if key in ["sow", "water"] and _keys != null and not has_modal():
+			if key in ["sow", "water", "harvest", "cast"] and _keys != null and not has_modal():
 				if str(fab_state().get("cmd", {}).get("type", "")) == key and bool(fab_state().get("enabled", false)):
-					targets[key] = {node = _keys.key(), shape = UiGuidePulse.Shape.CIRCLE}
+					if key != "cast" or space == "pond" and P0Guide.target_place(view, place):
+						targets[key] = {node = _keys.key(), shape = UiGuidePulse.Shape.CIRCLE}
+			elif key == "location" and hud != null and not has_modal():
+				var rect := hud.place_chip_rect()
+				targets[key] = {node = hud._place_chip, rect = Rect2(rect.position - hud._place_chip.global_position, rect.size)}
 			elif key.begins_with("quickbar:") and _bar != null and not has_modal():
 				targets[key] = {node = _bar.cell_for(key.trim_prefix("quickbar:")), flash = true}
 			elif key in ["gift", "request"] and modal_kind == "resident" and _modal != null and _resident == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
@@ -217,7 +222,43 @@ func _refresh_guide_pulses() -> void:
 				var page := str(mark.get("page", ""))
 				for drawer in _modal.find_children("*", "P0KitchenDrawer", true, false):
 					targets["cook:" + page] = {node = drawer.guide_cook_target(page)}
+		for mark in P0Guide.guide_marks(view):
+			if not mark is Dictionary or not bool(mark.get("pulse", false)): continue
+			if str(mark.get("object", "")) == "stove" and space == "home" and not has_modal():
+				for id in _name_bars:
+					var bar: UiWorldNameBar = _name_bars[id]
+					if str(id).begins_with("room:use_stove_") and bar.visible and bar.is_expanded():
+						targets["object:stove"] = {node = bar}
+						break
+			var item := str(mark.get("item", ""))
+			if item != "" and modal_kind == "gift" and is_instance_valid(_bag) and str(_bag.gift_to.get("id", "")) == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
+				var cells := guide_gift_cells(_bag.grid, item)
+				for id in cells:
+					targets["item:" + id] = {node = cells[id], overlay = guide_item_overlay(_bag), shape = UiGuidePulse.Shape.CARD, radius = UiTokens.RADIUS_CELL}
 	guide_pulses.update(view, targets)
+
+## A server item mark names a base recipe; all visible qualities use their own cell, without selecting any.
+static func guide_gift_cells(grid: UiInventoryGrid, base: String) -> Dictionary:
+	var cells := {}
+	for item in grid.shown_items():
+		var id := str(item.get("id", ""))
+		if P0Logic.base_id(id) == base:
+			var cell := grid.cell_for(id)
+			if cell != null: cells[id] = cell
+	return cells
+
+## Outside the grid's clip, inside the drawer; a Node2D host avoids changing the PanelContainer's layout.
+static func guide_item_overlay(drawer: Control) -> Control:
+	var existing := drawer.get_node_or_null("GuidePulseHost/Overlay") as Control
+	if existing != null: return existing
+	var host := Node2D.new()
+	host.name = "GuidePulseHost"
+	drawer.add_child(host)
+	var overlay := Control.new()
+	overlay.name = "Overlay"
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	host.add_child(overlay)
+	return overlay
 
 func _build_hud() -> void:
 	hud = UiHud.new()
