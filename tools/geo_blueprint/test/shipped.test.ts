@@ -34,8 +34,11 @@ describe('shipped blueprints', () => {
   it('regions.json points to existing, valid, checksum-matching blueprints', () => {
     expect(existsSync(config.REGIONS_OUT)).toBe(true);
     const data = JSON.parse(readFileSync(config.REGIONS_OUT, 'utf8'));
-    expect(new Set(data.regions.map((r: { id: string }) => r.id))).toEqual(new Set(['shanghai', 'los_angeles']));
+    // San Francisco (SGODOT-270, 804be8a7) is a region for the map and placement only: P0 lays its farms out from its
+    // own templates, so it ships no blueprint candidates; the blueprint regions keep their three.
+    expect(new Set(data.regions.map((r: { id: string }) => r.id))).toEqual(new Set(['shanghai', 'los_angeles', 'san_francisco']));
     for (const r of data.regions) {
+      if (r.id === 'san_francisco') { expect(r.candidates ?? []).toEqual([]); continue; }
       expect(r.candidates).toHaveLength(3);
       for (const c of r.candidates) {
         const file = path.join(config.BLUEPRINTS_DIR, c.layout_patch_id, `r${c.revision}`, 'farm_blueprint.json');
