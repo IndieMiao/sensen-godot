@@ -2741,14 +2741,17 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "mine"]
+
+## A target on the homestead: the fixed ones, the Homestead sign and the mine mouth (q(255)), and the gathering spots.
+static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.begins_with("spot_")
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
-	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
+	if home_target(go) and here in ["home", "farm"]: return "Show" if camera_here else ""
 	# On the map every target is a pin: Show flies there (p0_map.p0_show_spot); Browse the map has nothing to do
 	# (蒙恬 on #44: Show on map used to close Today and do nothing there).
 	if here == "map": return "" if go == "map" else "Show"
@@ -2762,7 +2765,7 @@ func space_here() -> String:
 
 ## The map pin for a target elsewhere: the homestead for farm targets, else the target itself.
 static func map_target(go: String) -> String:
-	return "home" if go in HOME_TARGETS else go
+	return "home" if home_target(go) else go
 
 ## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
 func spot_reachable() -> bool:

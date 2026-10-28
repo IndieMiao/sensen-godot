@@ -1464,6 +1464,7 @@ static func today_rows(view: Dictionary) -> Array:
 	var progress: Array = []
 	var latest = null   # q(143): the short request tracked last keeps a row (Tracking · it shows in Today)
 	var latest_at := -1.0
+	var handed := 0   # the rows that hand something in, at the top
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		for r in PinReason.taken(view):
@@ -1476,6 +1477,12 @@ static func today_rows(view: Dictionary) -> Array:
 					latest_at = float(r.accepted_at)
 					latest = row
 		now_rows = deliveries + now_rows
+		handed = deliveries.size()
+	# q(255) (order: 不知火舞 on 341 bbdef20e): after the guide and below Homestead Lv3, the first gap for the next level,
+	# one row. Upgrade follows the hand-ins; a material its Show can gather now follows the other things to do now,
+	# before the short requests; coins, or a material cooling down, goes with `still to go for the next level`.
+	var home_row := homestead_row(view)
+	if not home_row.is_empty() and str(home_row.row.go) == "sign": now_rows.insert(handed, home_row.row)
 	var ready := {}
 	var sown := 0
 	# One countdown per crop, its soonest plot's (q(227) ①, as the Quick Radish's since q(217) ④): batches sown minutes
@@ -1533,6 +1540,7 @@ static func today_rows(view: Dictionary) -> Array:
 		if fish > 0 and not guided_stove: now_rows.append(_row("Cook with %d fish" % fish, "pot", "stove"))
 	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
 	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
+	if not home_row.is_empty() and bool(home_row.now) and str(home_row.row.go) != "sign": now_rows.append(home_row.row)
 	now_rows.append_array(progress)
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
 	var rows: Array = now_rows.duplicate()
@@ -1569,6 +1577,8 @@ static func today_rows(view: Dictionary) -> Array:
 		if gap < best_gap:
 			best_gap = gap
 			best = "%s Lv%d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
+	# q(255) ⑥: a coins gap, or a material whose sources are all cooling down, is `still to go for the next level`
+	if not home_row.is_empty() and not bool(home_row.now) and rows.size() < 3: rows.append(home_row.row)
 	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
 	if rows.is_empty(): rows.append(_first_sow_row(view))
 	# q(143) ①②: on the final three, the latest tracked short request takes the 3rd row when it is not there — over an
@@ -1580,6 +1590,63 @@ static func today_rows(view: Dictionary) -> Array:
 	if P0Guide.guide_on(view) and not lead.is_empty():
 		rows = lead + rows.filter(func(r): return str(r.get("dot", "")) != str(lead[0].dot) and str(r.line) != str(lead[0].line))
 	return P0Guide.focus_first(rows.slice(0, 3))
+
+## The order q(255) ① takes a Homestead level's materials in: Timber, Stone, Reeds, Copper Ore, Clay, Rock Salt.
+const HOME_MATERIAL_ORDER := ["wood", "stone", "fiber", "copper_ore", "clay", "rock_salt"]
+
+## Today's Homestead row (q(255)): after the guide (or with none) and until Lv3, the next level's first gap, skills
+## skipped — `Homestead Lv2 · Timber 6 to go` (Show: the spot it comes from that can be gathered now, else the mine
+## with a run left today, else the nearest cooling down), `Homestead Lv2 · 40 coins to go` (HOME-1's coin tile, the
+## 40-coin floor in; Show: the Homestead Stall), nothing when only skills are short (Today's skill row says it), and
+## `Upgrade to Homestead Lv2` once all are met (Show: the sign, the only one of the three that lights the red dot).
+## {row, now}: `now` puts it with the rows to do now — a material its Show can gather at once, or Upgrade. {} for none.
+static func homestead_row(view: Dictionary) -> Dictionary:
+	if P0Guide.guide_on(view): return {}
+	var h: Dictionary = view.get("homestead", {})
+	var next = h.get("next", null)
+	if int(h.get("level", 1)) >= 3 or not next is Dictionary: return {}
+	var lv := int(next.get("level", int(h.get("level", 1)) + 1))
+	var mats := {}
+	for m in next.get("materials", []): mats[str(m.get("id", ""))] = m
+	var ids: Array = HOME_MATERIAL_ORDER.filter(func(id): return mats.has(id))
+	ids.append_array(mats.keys().filter(func(id): return not ids.has(id)))   # any other in the server's order
+	for id in ids:
+		var m: Dictionary = mats[id]
+		var short := int(m.get("need", 0)) - int(m.get("have", 0))
+		if short <= 0: continue
+		var src := _home_material_go(view, str(id))
+		return {"row": _row("Homestead Lv%d · %s %d to go" % [lv, str(m.get("name", item_name(view, str(id)))), short], "level_up", str(src.go)),
+			"now": bool(src.now)}
+	var coins: Dictionary = next.get("coins", {})
+	var short_coins := int(coins.get("need", 0)) - int(coins.get("have", 0))
+	if short_coins > 0:
+		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
+	var skills: Dictionary = next.get("skills", {})
+	if int(skills.get("have", 0)) < int(skills.get("need", 0)): return {}
+	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
+
+## Where a Homestead material's Show goes (q(255) ②): the spot yielding it that is open and ready; else the mine when it
+## yields it and a run is left today (every rock gives Stone; Copper Ore, Clay, Rock Salt come from floors); else the
+## open spot cooling down; else the mine. {go, now}: now = it can be gathered there at once.
+static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
+	var c := content()
+	var spots: Array = []
+	for sp in view.get("gather", {}).get("spots", []):
+		var y: Array = c.get("gather", {}).get("spots", {}).get(str(sp.get("id", "")), {}).get("yield", sp.get("yield", []))
+		if not y.is_empty() and str(y[0][0]) == id and bool(sp.get("open", false)): spots.append(sp)
+	for sp in spots:
+		if bool(sp.get("ready", false)): return {"go": str(sp.id), "now": true}
+	var mine_yields := id == "stone"
+	for f in c.get("mine", {}).get("floors", []):
+		for d in f.get("drops", []):
+			if d[0] != null and str(d[0]) == id: mine_yields = true
+	var runs: Dictionary = view.get("mine", {}).get("runs", {})
+	var runs_left := int(runs.get("used", 0)) < int(runs.get("limit", 2))
+	if mine_yields and runs_left: return {"go": "mine", "now": true}
+	if not spots.is_empty():
+		spots.sort_custom(func(a, b): return float(a.get("ready_in", 0)) < float(b.get("ready_in", 0)))
+		return {"go": str(spots[0].id), "now": false}
+	return {"go": "mine" if mine_yields else "", "now": false}
 
 ## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.
 static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:
