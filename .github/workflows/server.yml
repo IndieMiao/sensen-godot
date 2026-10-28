@@ -3,9 +3,57 @@ name: server
 on:
   push:
     branches: [main]
-    paths: ['server/**', 'packages/**', 'tools/geo_blueprint/**', 'assets/farm/data/**', 'assets/ponds/catalog.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/server.yml']
+    paths:
+      # the workspace (pnpm -r runs every package's tests) and its install
+      - 'server/**'
+      - 'packages/**'
+      - 'tools/geo_blueprint/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/server.yml'
+      # the assets the servers read: as the COPY lists of server/Dockerfile and server/deploy/p0/Dockerfile — a new
+      # asset a server reads goes into its Dockerfile and here together
+      - 'assets/farm/data/**'
+      - 'assets/blueprints/**'
+      - 'assets/ponds/catalog.json'
+      - 'assets/avatar/parts_manifest.json'
+      - 'assets/avatar/demo_denylist.json'
+      - 'assets/avatar/npc_only.json'
+      - 'assets/p0/p0_content.json'
+      - 'assets/p0/content/**'
+      - 'assets/p0/p0_outposts.json'
+      - 'assets/p0/p0_ponds.json'
+      - 'assets/p0/city_clusters.json'
+      # and what only the server's tests read (p0_travel: the stamps; landmark_reach: the landmarks)
+      - 'assets/p0/stamps/**'
+      - 'assets/map/landmarks.json'
   pull_request:
-    paths: ['server/**', 'packages/**', 'tools/geo_blueprint/**', 'assets/farm/data/**', 'assets/ponds/catalog.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', '.github/workflows/server.yml']
+    paths:
+      # the workspace (pnpm -r runs every package's tests) and its install
+      - 'server/**'
+      - 'packages/**'
+      - 'tools/geo_blueprint/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/server.yml'
+      # the assets the servers read: as the COPY lists of server/Dockerfile and server/deploy/p0/Dockerfile — a new
+      # asset a server reads goes into its Dockerfile and here together
+      - 'assets/farm/data/**'
+      - 'assets/blueprints/**'
+      - 'assets/ponds/catalog.json'
+      - 'assets/avatar/parts_manifest.json'
+      - 'assets/avatar/demo_denylist.json'
+      - 'assets/avatar/npc_only.json'
+      - 'assets/p0/p0_content.json'
+      - 'assets/p0/content/**'
+      - 'assets/p0/p0_outposts.json'
+      - 'assets/p0/p0_ponds.json'
+      - 'assets/p0/city_clusters.json'
+      # and what only the server's tests read (p0_travel: the stamps; landmark_reach: the landmarks)
+      - 'assets/p0/stamps/**'
+      - 'assets/map/landmarks.json'
 
 jobs:
   test:
