@@ -813,3 +813,58 @@ class _FakeWorld extends Node:
 	var _surface := ""
 	func _init(surface: String) -> void: _surface = surface
 	func p0_surface() -> String: return _surface
+
+## The heat hint under the ring is §7.9's sentence, the first fire's TipCard's own (P0Guide.TIPS.heat), and it waits out
+## of sight (its place kept) while that TipCard is on screen: one copy at a time (不知火舞 on 341).
+func test_the_heat_hint_reads_the_tip_and_waits_while_the_tip_shows() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var v := _view()
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	_set_view(v)
+	k.watch(rt.session.view.cooking.stove)
+	await get_tree().process_frame
+	var hint: Label = k.get("_hint")
+	assert_str(hint.text).is_equal(P0Guide.TIPS.heat)
+	assert_float(hint.modulate.a).is_equal(1.0)
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	rt.ui.tips.showing = "heat"
+	rt.ui._show_tip(P0Guide.TIPS.heat, "heat")
+	await get_tree().process_frame
+	assert_float(hint.modulate.a).is_equal(0.0)
+	assert_bool(hint.visible).is_true()   # its place kept: Queue next does not move
+	rt.ui._hide_tip()
+	await get_tree().process_frame
+	assert_float(hint.modulate.a).is_equal(1.0)
+	k.stop_watching()
+
+## In the kitchen the TipCard sits where q(16)'s toast does (不知火舞 on 341 a143f140): 8 over the stove drawer's top at
+## x 16 — S8: it used to take the full-screen wrap's top and land off the screen — and, watching, 8 over the sheet's ×.
+func test_the_kitchen_tip_sits_over_the_drawer_and_over_the_watch_sheet() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	k.open("cookbook")
+	await await_millis(600)   # the drawer has slid in
+	rt.ui._show_tip(P0Guide.TIPS.cook, "cook")
+	await get_tree().process_frame
+	var tip: Control = rt.ui._teach
+	var drawer: Control = rt.ui._modal.find_children("*", "P0KitchenDrawer", true, false)[0]
+	var root_y := rt.ui.root.global_position.y
+	assert_float(tip.position.y).is_greater_equal(0.0)   # on the screen
+	assert_float(tip.position.y + tip.size.y).is_equal_approx(drawer.get_global_rect().position.y - root_y - 8.0, 0.5)
+	assert_float(tip.position.x).is_equal(16.0)
+	rt.ui._hide_tip()
+	rt.ui.close_modal()
+	var v := _view()
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	_set_view(v)
+	k.watch(rt.session.view.cooking.stove)
+	await await_millis(600)   # the sheet has slid in
+	rt.ui._show_tip(P0Guide.TIPS.heat, "heat")
+	await get_tree().process_frame
+	var close: Control = k.get("_close")
+	assert_float(tip.position.y + tip.size.y).is_equal_approx(close.get_global_rect().position.y - root_y - 8.0, 0.5)
+	assert_float(tip.position.x).is_equal(16.0)
+	rt.ui._hide_tip()
+	k.stop_watching()
