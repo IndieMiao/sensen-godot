@@ -83,6 +83,8 @@ var _box: UiStyleBox
 var _effect: Label
 var _last_fact := ""      # goes beside the buttons when it fits there, otherwise on its own fact line
 var _overflow: Label      # that own line (last in _facts, hidden while the fact fits beside the buttons)
+var _effect_note: Label   # spec.fact_note under that fact, secondary (q(252) ③ `6 each` over `8 at home`)
+var _overflow_note: Label # the note's own line under _overflow when the fact does not fit beside the buttons
 var _buttons: HBoxContainer
 
 func _init() -> void:
@@ -140,11 +142,21 @@ func _init() -> void:
 	bottom.custom_minimum_size.y = UiTokens.SIZE_TOUCH
 	bottom.add_theme_constant_override(&"separation", int(_GAP))
 	lift.add_child(bottom)
+	var effect_box := VBoxContainer.new()
+	effect_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	effect_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	effect_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	effect_box.add_theme_constant_override(&"separation", 0)
+	bottom.add_child(effect_box)
 	_effect = UiKit.label("", UiTokens.STYLE_C12_XB)
 	_effect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_effect.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_effect.clip_text = true   # a fact too long for this slot moves to the fact lines (_place_last_fact)
-	bottom.add_child(_effect)
+	effect_box.add_child(_effect)
+	_effect_note = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+	_effect_note.clip_text = true
+	_effect_note.visible = false
+	effect_box.add_child(_effect_note)
 	bottom.resized.connect(_place_last_fact)
 	_buttons = HBoxContainer.new()
 	_buttons.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -249,6 +261,8 @@ func refresh() -> void:
 		c.queue_free()
 	for i in maxi(0, facts.size() - 1): _add_fact_line(str(facts[i]))
 	_overflow = _add_fact_line("")
+	_overflow_note = _add_fact_line("")
+	_overflow_note.theme_type_variation = UiTokens.STYLE_C11_B   # as beside the buttons
 	_last_fact = str(facts[-1]) if not facts.is_empty() else ""
 	for c in _buttons.get_children():
 		c.hide()
@@ -270,14 +284,21 @@ func refresh() -> void:
 ## lines; under fact lines only its padding above the visible 34 px command overlaps. Runs again on every resize.
 func _place_last_fact() -> void:
 	if _overflow == null: return
-	var row: Control = _effect.get_parent()
+	var row: Control = _buttons.get_parent()
 	var room := row.size.x - _buttons.get_combined_minimum_size().x - _GAP
 	var font := _effect.get_theme_font(&"font")
 	var w := font.get_string_size(_last_fact, HORIZONTAL_ALIGNMENT_LEFT, -1, _effect.get_theme_font_size(&"font_size")).x
+	var note := str(_spec.get("fact_note", "")) if _last_fact != "" else ""
+	if note != "":
+		w = maxf(w, _effect_note.get_theme_font(&"font").get_string_size(note, HORIZONTAL_ALIGNMENT_LEFT, -1, _effect_note.get_theme_font_size(&"font_size")).x)
 	var beside := _last_fact != "" and row.size.x > 0.0 and w <= room
 	_effect.text = _last_fact if beside else ""
+	_effect_note.text = note if beside else ""
+	_effect_note.visible = _effect_note.text != ""
 	_overflow.text = "" if beside else _last_fact
 	_overflow.visible = _overflow.text != ""
+	_overflow_note.text = "" if beside else note
+	_overflow_note.visible = _overflow_note.text != ""
 	var lines := _facts.get_children().filter(func(c): return (c as Control).visible).size() + _blocks.get_child_count()
 	var text_h: float = (_title.get_parent() as Control).get_combined_minimum_size().y + (_state.get_combined_minimum_size().y if _state.visible else 0.0) \
 		+ (_liked.get_combined_minimum_size().y if _liked.visible else 0.0)

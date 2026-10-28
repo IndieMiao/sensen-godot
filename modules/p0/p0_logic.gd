@@ -1829,6 +1829,8 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 					int(hoe.get("gate", 4))]
 			else:
 				greet = _board_count(int(k.get("board_open", 0)))
+			var selling := market_sell_line(view)   # q(252) ④: what in the bag she takes, said over the counter
+			if selling != "": counter = selling
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
 			titles = titles.filter(func(t): return t != "")
 			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
@@ -1847,6 +1849,35 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 		"greet": greet, "counter": counter if counter != "" else greet, "trade": "Play" if role == "casino" else "Trade",
 		"question": str(copy.get("question", "")), "answer": answer,   # no `Just passing by`: the card's ✕ closes it (q(154))
 	}
+
+## Words that keep their capital inside a sentence (不知火舞 on q(252) ④): the proper adjectives that begin a fish's
+## name today — `Arctic char`, `Atlantic salmon`; `rainbow trout`, `northern pike` read lower case.
+const PROPER_WORDS := ["Arctic", "Atlantic"]
+
+## An item as a keeper names it in speech (q(252) ④): crops in the lower-case plural (`pumpkins`, `lettuce`), fish
+## as one lower-case catch (`rainbow trout`, `Arctic char`).
+static func speech_name(view: Dictionary, id: String) -> String:
+	var name := item_name(view, id)
+	if id.begins_with("crop_"): return plural(name).to_lower()
+	return " ".join(PackedStringArray(Array(name.split(" ")).map(func(w): return w if w in PROPER_WORDS else w.to_lower())))
+
+## Mei's selling line (q(252) ④; 不知火舞 on q(252)): the first two things in bag order that the Market takes here (no
+## Gifted, nothing locked), `I'll take your Arctic char and pumpkins. Same price as your stall.` at home,
+## `Arctic char and pumpkins? I'll take them, though home pays better.` away; "" when she takes nothing in the bag or
+## the server does not price by distance yet (an older server keeps her greeting).
+static func market_sell_line(view: Dictionary) -> String:
+	var d := P0ItemInfo.distance(view, "market")
+	if d.is_empty(): return ""
+	var ids: Array = []
+	for st in view.get("bag", {}).get("slots", []):
+		var id := str(st.get("id", ""))
+		if id == "" or ids.has(id) or bool(st.get("gifted", false)) or bool(st.get("locked", false)): continue
+		if P0ItemInfo.flags(view, id, &"counter_sell", {counter = "market"}).sold_here: ids.append(id)
+		if ids.size() == 2: break
+	if ids.is_empty(): return ""
+	var things := and_list(ids.map(func(id): return speech_name(view, str(id))))
+	if bool(d.get("home", true)): return "I'll take your %s. Same price as your stall." % things
+	return "%s? I'll take them, though home pays better." % (things.left(1).to_upper() + things.substr(1))
 
 ## Small counts in keeper speech ("sows three plots"), digits from ten up.
 static func _count_word(n: int) -> String:

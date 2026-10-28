@@ -217,15 +217,26 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     58,
-                                    121,
+                                    108,
                                     80,
-                                    18
+                                    44
                                   ],
-                                  "variation": "C12XB",
-                                  "text": "+20 Energy"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        58,
+                                        121,
+                                        80,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "+20 Energy"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "HBoxContainer",
@@ -475,15 +486,26 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     58,
-                                    263,
+                                    250,
                                     77,
-                                    18
+                                    44
                                   ],
-                                  "variation": "C12XB",
-                                  "text": "4 each"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        58,
+                                        263,
+                                        77,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "4 each"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "HBoxContainer",
@@ -709,15 +731,26 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     58,
-                                    377,
+                                    364,
                                     109,
-                                    18
+                                    44
                                   ],
-                                  "variation": "C12XB",
-                                  "text": "5 each"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        58,
+                                        377,
+                                        109,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "5 each"
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "HBoxContainer",
@@ -965,15 +998,26 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     58,
-                                    504,
+                                    491,
                                     79,
-                                    18
+                                    44
                                   ],
-                                  "variation": "C12XB",
-                                  "text": ""
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        58,
+                                        504,
+                                        79,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": ""
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "HBoxContainer",
