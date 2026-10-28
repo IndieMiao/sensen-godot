@@ -4,7 +4,7 @@
  * TODO(P1): the P0 server has no position; `shop` only says which counter's rules apply. Check room membership via
  * /v1/p0/online later (SGODOT-227).
  */
-import { cityPostcardCluster, cityPostcardId, cropBySeed, dishParts, itemKind, rodById, sellPriceOf, SHOPS, type P0Content, type QuotaId, type ShopId, type Skill } from './content.js';
+import { cityPostcardCluster, cityPostcardId, cropBySeed, fastCrop, dishParts, itemKind, rodById, sellPriceOf, SHOPS, type P0Content, type QuotaId, type ShopId, type Skill } from './content.js';
 import { cityPlaces } from './world.js';
 import { add, count, room, take } from './bag.js';
 import { buyCard, isCard } from './cards.js';
@@ -28,7 +28,7 @@ export function shopOf(raw: unknown): ShopId | null {
  * the regional seed of its city's climate (§5.2.3: Pumpkin in San Francisco), between its goods and the City Specialty
  * shelf: the place's city, else the one the player is in, else home. */
 export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown): string[] {
-  if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id),
+  if (shop === 'homestead') return [...c.stall.buy, ...(c.fast_crops ?? []).map(x => x.seed), ...c.bag_upgrades.map(u => u.id),
     ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
   if (shop === 'tackle') return c.tackle.buy;
   if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...specialtyAt(c, s, place)];
@@ -88,7 +88,7 @@ export interface Offer {
 }
 
 export function offerOf(c: P0Content, id: string): Offer | null {
-  const crop = cropBySeed(c, id);
+  const crop = cropBySeed(c, id) ?? (id.startsWith('seed_') ? fastCrop(c, id) : undefined);
   if (crop) return { price: crop.seed_price, skill: 'farming', gate: crop.gate, daily: crop.seed_daily ?? 0, to: 'bag', once: false, floor: false };
   const rod = rodById(c, id);
   if (rod) return { price: rod.price, skill: 'fishing', gate: rod.level, daily: 0, to: 'gear', once: true, floor: true };
@@ -178,6 +178,8 @@ export function drink(c: P0Content, s: P0State, cmd: { item?: unknown; shop?: un
 
 /** Buyback for one id at one counter: per-unit coins and the quota it counts against, or why it can't be sold here. */
 export function buyback(c: P0Content, shop: ShopId, id: string, zone = c.profile.climate): { unit: number; quota: QuotaId | null } | { code: 'not_sellable' | 'not_sellable_here' } {
+  const fast = c.fast_crops?.find(x => x.id === id);
+  if (fast) return shop === 'homestead' ? { unit: fast.price, quota: null } : { code: 'not_sellable_here' };
   const kind = itemKind(id), base = sellPriceOf(c, id);
   const anywhere = base !== null && base > 0 && SHOPS.some(sh => c.shops[sh].buys[kind]);
   if (!anywhere || (kind === 'dish' && dishParts(id).base === c.cooking.mystery.id)) return { code: 'not_sellable' };

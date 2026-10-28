@@ -35,17 +35,17 @@ function readyFor(s: P0State): P0State {
 }
 
 describe('Homestead Lv4–10 (§8.2.1)', () => {
-  it('nine upgrades cost 11,300 coins and the §8.2.1 materials; skills total 2N − 1', () => {
+  it('nine upgrades cost 10,520 coins with q(246) early gates; Lv6–10 stay unchanged', () => {
     expect(c.homestead.max_level).toBe(10);
     expect(c.homestead.levels.map(l => l.level)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(11_300);
-    for (const l of c.homestead.levels) expect(l.skills).toBe(2 * l.level - 1);
+    expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(10_520);
+    expect(c.homestead.levels.map(l => l.skills)).toEqual([3, 4, 6, 8, 11, 13, 15, 17, 19]);
     const total: Record<string, number> = {};
     for (const l of c.homestead.levels) for (const [id, n] of l.materials) total[id] = (total[id] ?? 0) + n;
-    expect(total).toEqual({ wood: 150, stone: 140, fiber: 80, copper_ore: 75, clay: 50, quartz: 22, hardwood: 28, rock_salt: 15 });
+    expect(total).toEqual({ wood: 120, stone: 126, fiber: 63, copper_ore: 75, clay: 46, quartz: 22, hardwood: 28, rock_salt: 7 });
   });
 
-  it('climbs from Lv3 to Lv10 one level at a time, Energy refilled each time, then stops', () => {
+  it('climbs from Lv3 to Lv10 one level at a time, Energy follows each level reward, then stops', () => {
     let s = at(3);
     for (let lv = 4; lv <= 10; lv++) {
       const r = step(readyFor(s), { type: 'homestead_upgrade' });
@@ -58,10 +58,10 @@ describe('Homestead Lv4–10 (§8.2.1)', () => {
     expect(refusal(s, { type: 'homestead_upgrade' })?.code).toBe('max_level');
   });
 
-  it('Lv4 needs skills total 7 before materials or coins', () => {
+  it('Lv4 needs skills total 6 before materials or coins', () => {
     const s = readyFor(at(3));
     s.skills = { farming: 0, fishing: 0, cooking: 0 };
-    expect(refusal(s, { type: 'homestead_upgrade' })).toMatchObject({ code: 'skills_short', detail: { need: 7 } });
+    expect(refusal(s, { type: 'homestead_upgrade' })).toMatchObject({ code: 'skills_short', detail: { need: 6 } });
   });
 });
 

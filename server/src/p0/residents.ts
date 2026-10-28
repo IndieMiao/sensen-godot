@@ -338,7 +338,8 @@ export function learn(c: P0Content, s: P0State, cmd: { resident?: unknown }, now
 }
 
 /** Plots sown count towards an accepted sow request (Pip ②: "plant five plots for me"). */
-export function noteSown(c: P0Content, s: P0State, plots: number): void {
+export function noteSown(c: P0Content, s: P0State, plots: number, crop: string): void {
+  if (c.fast_crops?.some(x => x.id === crop)) return;   // q(245): no sow-request progress from fast fields
   for (const [id, def] of Object.entries(c.residents)) {
     const r = s.residents[id];
     const q = r?.req && residentRequest(def, r.req.id);
@@ -351,6 +352,7 @@ export function noteSown(c: P0Content, s: P0State, plots: number): void {
  * (only what comes in after accepting, like sow).
  */
 export function noteHarvested(c: P0Content, s: P0State, crop: string, n: number): void {
+  if (c.fast_crops?.some(x => x.id === crop)) return;
   for (const [id, def] of Object.entries(c.residents)) {
     const r = s.residents[id];
     const q = r?.req && residentRequest(def, r.req.id);

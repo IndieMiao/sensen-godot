@@ -38,7 +38,7 @@ export type P0Event =
   | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts); spot -1: a free pin (q(216))
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
-  | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // look: the stage it opens
+  | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // energy: actual gain after the new cap (q247); look: the stage it opens
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'barter'; item: string; give: number; mineral: string; left: number }   // q(166): 2 regional items for 1 mineral

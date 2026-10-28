@@ -2222,55 +2222,44 @@
     "levels": [
       {
         "level": 2,
-        "coins": 250,
+        "coins": 40,
         "skills": 3,
         "materials": [
           [
             "wood",
-            12
-          ],
-          [
-            "stone",
-            8
-          ],
-          [
-            "fiber",
             6
           ],
           [
-            "rock_salt",
+            "stone",
+            4
+          ],
+          [
+            "fiber",
             3
           ]
         ],
         "unlocks": [
           "spice_rack",
           "clay_bank"
-        ]
+        ],
+        "energy": 40
       },
       {
         "level": 3,
-        "coins": 400,
-        "skills": 5,
+        "coins": 80,
+        "skills": 4,
         "materials": [
           [
-            "wood",
-            16
-          ],
-          [
             "stone",
-            12
+            8
           ],
           [
-            "fiber",
-            10
+            "copper_ore",
+            2
           ],
           [
             "clay",
-            4
-          ],
-          [
-            "rock_salt",
-            4
+            2
           ]
         ],
         "unlocks": [
@@ -2280,47 +2269,49 @@
           "fence",
           "old_tree",
           "plots_40"
-        ]
+        ],
+        "energy": 40
       },
       {
         "level": 4,
-        "coins": 550,
-        "skills": 7,
+        "coins": 300,
+        "skills": 6,
         "materials": [
           [
             "wood",
-            20
+            12
           ],
           [
             "stone",
-            16
-          ],
-          [
-            "fiber",
             10
           ],
           [
-            "copper_ore",
+            "fiber",
             6
+          ],
+          [
+            "copper_ore",
+            4
           ],
           [
             "clay",
-            6
+            4
           ],
           [
             "rock_salt",
-            4
+            3
           ]
         ],
         "unlocks": [
           "second_stove",
           "long_haul_ticket"
-        ]
+        ],
+        "energy": 40
       },
       {
         "level": 5,
         "coins": 750,
-        "skills": 9,
+        "skills": 8,
         "materials": [
           [
             "wood",
@@ -2356,7 +2347,8 @@
           "trip_7",
           "porch",
           "standard_room"
-        ]
+        ],
+        "energy": "full"
       },
       {
         "level": 6,
@@ -2395,7 +2387,8 @@
         "unlocks": [
           "big_pot",
           "bag_upgrade_2"
-        ]
+        ],
+        "energy": "full"
       },
       {
         "level": 7,
@@ -2435,7 +2428,8 @@
           "orchard_8",
           "sprinklers_10",
           "plots_48"
-        ]
+        ],
+        "energy": "full"
       },
       {
         "level": 8,
@@ -2476,7 +2470,8 @@
           "warming_cabinet_12",
           "stall_upgrade",
           "kitchen_extension"
-        ]
+        ],
+        "energy": "full"
       },
       {
         "level": 9,
@@ -2514,7 +2509,8 @@
         ],
         "unlocks": [
           "bag_upgrade_3"
-        ]
+        ],
+        "energy": "full"
       },
       {
         "level": 10,
@@ -2555,7 +2551,8 @@
           "master_farmhouse",
           "deluxe_room",
           "title_homestead_master"
-        ]
+        ],
+        "energy": "full"
       }
     ],
     "_p2_only": {

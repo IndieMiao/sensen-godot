@@ -1,4 +1,4 @@
-/** Homestead Lv1–3 (plan §8.1–8.3): materials + coins + Farming + Fishing levels; upgrading refills Energy to the new max. */
+/** Homestead progression (plan §8.1–8.3, q(246)): gates and Energy rewards are content-driven. */
 import type { HomesteadLook, P0Content } from './content.js';
 import { gainEnergy, type P0Event } from './progress.js';
 import { maxEnergy, skillLevel } from './rules.js';
@@ -78,9 +78,10 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   s.homestead.level = next.level;
   s.homestead.bartered = {};   // the barter share counts toward one level at a time (§8.4.5)
   s.homestead.plaque.push({ level: next.level, at: now });
-  // §8.1.1: Energy refills to the new max (200/200 → 210/210); a bonus-zone value above it is kept.
+  // q(246): each level chooses a fixed reward or full refill; never reduce a bonus-zone value.
   const max = maxEnergy(c, s);
-  const gain = gainEnergy(c, s, now, max - s.energy.value, events, 'homestead');
+  const room = Math.max(0, max - s.energy.value);
+  const gain = gainEnergy(c, s, now, next.energy === undefined || next.energy === 'full' ? room : Math.min(next.energy, room), events, 'homestead');
   // look: the stage this level opens (LOOK-PICK, SGODOT-282) — the client offers its two looks after HOME-2's banner.
   const look = lookStageAt(c, next.level);
   events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks, ...(look ? { look: look.id } : {}) });

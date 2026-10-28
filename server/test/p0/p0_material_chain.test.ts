@@ -456,8 +456,8 @@ describe('coming home (q(40)) and Timber Run from storage', () => {
   it('the Homestead Lv2 upgrade puts the bag\'s seasonings away (Spice Rack · seasonings off your bag), nothing else', () => {
     const s = fresh();
     s.skills = { farming: 50, fishing: 0, cooking: 0 };
-    s.storage = { wood: 12, stone: 8, fiber: 6, rock_salt: 3 };
-    s.coins = 290;
+    s.storage = { wood: 6, stone: 4, fiber: 3 };
+    s.coins = 80;
     add(c, s, 'rock_salt', 2); add(c, s, 'wild_herb', 3); add(c, s, 'bait_worm', 2);
     const { s: after, ev } = step(s, { type: 'homestead_upgrade' });
     expect(after.homestead.level).toBe(2);

@@ -63,6 +63,8 @@ describe('P0 content fragments (SGODOT-275)', () => {
     const c = loadP0Content();
     const ids = [
       ...c.crops.flatMap(x => [x.id, x.seed]),
+      ...(c.fast_crops ?? []).flatMap(x => [x.id, x.seed]),
+      ...(c.quick_seeds ?? []).flatMap(x => [x.id, x.seed]),
       ...c.fish.map(x => x.id),
       ...c.cooking.recipes.map(x => x.id),
       ...Object.keys(c.goods), ...Object.keys(c.materials), ...Object.keys(c.drinks.items), ...Object.keys(c.specialty),

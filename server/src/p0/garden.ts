@@ -18,7 +18,7 @@ import { skillLevel, untilRollover } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
 import { add, count, room, take } from './bag.js';
 import { cellsOf, yardBlock } from './decor.js';
-import { cropById, quickCrop } from './content.js';
+import { cropById, quickCrop, fastCrop } from './content.js';
 import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
 /** [col, row] of a plot on the garden grid, or null for an id the grid does not have. */
@@ -271,7 +271,7 @@ function waterCovered(c: P0Content, s: P0State, now: number, grow: (id: string, 
   for (const p of s.plots) {
     if (p.state !== 'sown' || !p.crop || !cover.has(p.id)) continue;
     p.state = 'growing';
-    const quick = quickCrop(c, p.crop)?.quick;   // a teaching seed's fixed time (q(217))
+    const quick = (quickCrop(c, p.crop) ?? fastCrop(c, p.crop))?.quick;   // q(217)/q(245): fixed time, no cut
     p.ready_at = now + (quick ? quick.ms : growMs(c, s, p, grow(p.crop, p)));
     started.push(p.id);
   }
