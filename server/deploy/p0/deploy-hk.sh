@@ -29,7 +29,28 @@
 #
 # The access key: P0_KEY=… in the environment, else output/p0-deploy/key; the admin key likewise P0_ADMIN_KEY or
 # output/p0-deploy/admin-key (both created once with openssl, never committed).
+#
+# --target us (first word, before the step): the US West P0 the 10-29 migration moved to (43.110.146.219, run by the
+# migration side; contract in pm/migration/p0-migration-decision-2026-10-27.md, E answer 8). Without it every step is
+# the Hong Kong one, unchanged. On us:
+#   login       ssh -F $P0_US_SSH_CONFIG $P0_US_HOST (default the migration side's ssh_config, host tgt-us-p0)
+#   compose     $REMOTE/compose.production.json, project liusen-p0-staging; the container is p0-p0-1 again
+#   settings    in that compose file (mode 600), kept by the migration side: `up` changes only the p0-server image
+#               string in it (a dated copy first) and writes no .env / .env.p0 and no key
+#   transfer    an archive on this Mac → sha256 → $P0_US_STAGING → sha256 again → docker load; the archive's config
+#               digest must equal the image ID US docker reports (both IDs go to image.txt)
+#   verify-internal  the host's loopback Caddy (127.0.0.1:18090), with the X-P0-* response headers
+#   report      p0-report.sh streamed over ssh (nothing copied)
+#   preflight / build / smoke / stats / players / energy / maint-on / maint-off / min-version / gate / clean-devserver
+#               as on Hong Kong
+#   backup-caddy / caddy / crontab / rollback   not here: the US Caddy, backups and route are the migration side's
 set -euo pipefail
+
+TARGET=hk
+if [ "${1:-}" = --target ]; then
+  TARGET="${2:?--target hk|us}"; shift 2
+  case "$TARGET" in hk|us) ;; *) echo "unknown target: $TARGET (hk or us)"; exit 2 ;; esac
+fi
 
 HK="${P0_HK:-farm@47.76.226.41}"
 DEV="${P0_DEV_HOST:-zhangshaojie@192.168.124.53}"
@@ -39,9 +60,20 @@ CADDY=farm-caddy-1
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/../../.." && pwd)
 out="$repo/output/p0-deploy/$(date +%Y-%m-%d)"
-mkdir -p "$out"
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=15)
-hk() { ssh "${SSH_OPTS[@]}" "$HK" "$@"; }
+HOST_OPTS=("${SSH_OPTS[@]}")   # the target host's; the devserver keeps SSH_OPTS
+if [ "$TARGET" = us ]; then
+  HK="${P0_US_HOST:-tgt-us-p0}"
+  REMOTE=/srv/migration-data/services/p0
+  US_COMPOSE=compose.production.json
+  US_PROJECT=liusen-p0-staging
+  US_DATA=/srv/migration-data/services/p0/production/20261029/data
+  US_STAGING="${P0_US_STAGING:-/srv/migration-data/services/p0/staging}"
+  HOST_OPTS=(-F "${P0_US_SSH_CONFIG:-$HOME/.local/share/aliyun-migrations/liusen-20261026/private/ssh_config}" "${SSH_OPTS[@]}")
+  out="$out/us"
+fi
+mkdir -p "$out"
+hk() { ssh "${HOST_OPTS[@]}" "$HK" "$@"; }
 dev() { ssh "${SSH_OPTS[@]}" "$DEV" "$@"; }
 say() { printf '\n== %s\n' "$*"; }
 curl_() { command curl --noproxy '*' -s --max-time 20 "$@"; }   # direct: a local HTTPS_PROXY breaks TLS to the site
@@ -83,6 +115,86 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 }
 
 step="${1:-}"; shift || true
+if [ "$TARGET" = us ]; then
+  case "$step" in
+    backup-caddy|caddy|crontab|rollback)
+      echo "$step is Hong Kong only: on us the Caddy, the backups and the route are the migration side's"; exit 2 ;;
+    transfer)
+      sha="${1:?transfer <sha>}"
+      arc="$out/p0-server-$sha.tar.gz"
+      say "docker save p0-server:$sha | gzip  →  $arc (this Mac)"
+      dev "docker save p0-server:$sha | gzip -1" > "$arc"
+      sum=$(shasum -a 256 "$arc" | cut -d' ' -f1)
+      # The config digest inside the archive: what US docker must report as the image ID after the load, whatever
+      # ID the devserver shows (an OCI index ID there is not the same string; 迁移方 E answer 8).
+      cfg=$(python3 - "$arc" <<'PY'
+import json, sys, tarfile
+with tarfile.open(sys.argv[1], 'r:gz') as t:
+    m = json.load(t.extractfile('manifest.json'))
+print('sha256:' + m[0]['Config'].split('/')[-1].removesuffix('.json'))
+PY
+)
+      { echo "source p0-server:$sha $(dev "docker images --no-trunc p0-server:$sha --format '{{.ID}}'")"
+        echo "archive $(basename "$arc") sha256 $sum config $cfg"; } | tee -a "$out/image.txt"
+      say "→ $HK:$US_STAGING, sha256 there, docker load"
+      hk "mkdir -p $US_STAGING"
+      scp "${HOST_OPTS[@]}" -q "$arc" "$HK:$US_STAGING/"
+      hk "cd $US_STAGING && echo '$sum  $(basename "$arc")' | sha256sum -c - && gunzip -c $(basename "$arc") | docker load"
+      id=$(hk "docker image inspect p0-server:$sha --format '{{.Id}}'")
+      echo "us p0-server:$sha $id" | tee -a "$out/image.txt"
+      [ "$id" = "$cfg" ] || { echo "FAIL: US image ID $id is not the archive's config $cfg" >&2; exit 1; }
+      exit 0 ;;
+    up)
+      sha="${1:?up <sha>}"
+      ts=$(date +%Y%m%dT%H%M%S)
+      say "image p0-server:$sha into $HK:$REMOTE/$US_COMPOSE (only the image string; a copy first)"
+      # The settings in the file stay byte for byte: the one JSON string "p0-server:<old>" of the one service that
+      # runs p0-server is replaced, so no key is read, written or printed here.
+      hk "cd $REMOTE && cp -p $US_COMPOSE $US_COMPOSE.before-$sha-$ts && python3 - $US_COMPOSE $sha" <<'PY' | tee -a "$out/up.txt"
+import json, os, sys
+path, sha = sys.argv[1], sys.argv[2]
+raw = open(path).read()
+hits = [(k, v['image']) for k, v in json.loads(raw).get('services', {}).items()
+        if str(v.get('image', '')).startswith('p0-server:')]
+if len(hits) != 1: sys.exit(f'expected one p0-server service, found {len(hits)}')
+name, old = hits[0]
+lit = json.dumps(old)
+if raw.count(lit) != 1: sys.exit(f'{lit} is not in the file exactly once')
+tmp = path + '.tmp'
+with open(tmp, 'w') as f: f.write(raw.replace(lit, json.dumps('p0-server:' + sha)))
+os.chmod(tmp, os.stat(path).st_mode & 0o777)
+os.replace(tmp, path)
+print(f'service {name}: {old} -> p0-server:{sha}')
+PY
+      svc=$(sed -n 's/^service \([^:]*\):.*/\1/p' "$out/up.txt" | tail -1)
+      say "compose up $svc only (project $US_PROJECT)"
+      hk "cd $REMOTE && docker compose -p $US_PROJECT -f $US_COMPOSE up -d --no-deps $svc"
+      say "wait for healthy"
+      for _ in $(seq 1 40); do
+        st=$(hk "docker inspect --format '{{.State.Health.Status}}' p0-p0-1" 2>/dev/null || echo starting)
+        [ "$st" = healthy ] && break
+        [ "$st" = unhealthy ] && { hk "cd $REMOTE && docker compose -p $US_PROJECT -f $US_COMPOSE logs --tail 40 $svc"; exit 1; }
+        sleep 3
+      done
+      [ "$st" = healthy ] || { echo "still $st after 2 minutes"; exit 1; }
+      # Never a rehearsal copy under production's name: /data must be the production directory.
+      src=$(hk "docker inspect --format '{{range .Mounts}}{{if eq .Destination \"/data\"}}{{.Source}}{{end}}{{end}}' p0-p0-1")
+      [ "$src" = "$US_DATA" ] || { echo "FAIL: /data is $src, not $US_DATA" >&2; exit 1; }
+      echo "p0-p0-1 healthy, /data = $src"
+      exit 0 ;;
+    verify-internal)
+      say "on $HK: http://127.0.0.1:18090/preview/p0/v1/healthz (the loopback Caddy), with headers"
+      hk "curl -sS -D - http://127.0.0.1:18090/preview/p0/v1/healthz" | tee "$out/internal.txt"
+      echo
+      exit 0 ;;
+    report)
+      player="${1:?report <player id> [YYYY-MM-DD]}"; day="${2:-$(date -u +%Y-%m-%d)}"
+      [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ && "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad player id or day"; exit 2; }
+      say "F2: $player on $day (UTC) — session report, then the day's command and refusal counts"
+      hk "bash -s -- '$player' '$day'" < "$here/p0-report.sh" | tee "$out/report-$player-$day.txt"
+      exit 0 ;;
+  esac
+fi
 case "$step" in
   preflight)
     say "containers / memory / disk on $HK (read-only)"
@@ -130,7 +242,7 @@ case "$step" in
     sha="${1:?up <sha>}"
     say "files → $HK:$REMOTE"
     hk "mkdir -p $REMOTE/backups"
-    scp "${SSH_OPTS[@]}" -q "$here/docker-compose.p0.yml" "$here/backup-p0.sh" "$here/p0-report.sh" "$HK:$REMOTE/"
+    scp "${HOST_OPTS[@]}" -q "$here/docker-compose.p0.yml" "$here/backup-p0.sh" "$here/p0-report.sh" "$HK:$REMOTE/"
     # .env.p0: the container's settings (the demo key, the admin key), written from stdin so neither key is on a
     # command line; .env: what compose itself interpolates (the image), so `docker compose -p p0 ps / logs` work later
     printf 'P0_ACCESS_KEYS=%s\nP0_ADMIN_KEY=%s\n' "$(key)" "$(admin_key)" | hk "umask 077 && cat > $REMOTE/.env.p0"
@@ -186,7 +298,7 @@ PY
     say "the change"
     diff -u "$out/Caddyfile.live" "$out/Caddyfile.new" || true
     say "validate a copy inside $CADDY"
-    scp "${SSH_OPTS[@]}" -q "$out/Caddyfile.new" "$HK:$REMOTE/Caddyfile.candidate"
+    scp "${HOST_OPTS[@]}" -q "$out/Caddyfile.new" "$HK:$REMOTE/Caddyfile.candidate"
     hk "docker cp $REMOTE/Caddyfile.candidate $CADDY:/tmp/Caddyfile.p0 && docker exec $CADDY caddy validate --config /tmp/Caddyfile.p0 --adapter caddyfile"
     say "write in place (same inode: the file is bind-mounted alone) and reload"
     hk "cat $REMOTE/Caddyfile.candidate > /opt/farm/Caddyfile && docker exec $CADDY caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile && echo reloaded"
@@ -257,5 +369,7 @@ PY
     dev "docker rmi p0-server:$sha >/dev/null 2>&1 || true; rm -rf ~/p0-build-$sha; docker images p0-server --format '{{.Tag}}'"
     ;;
   *)
-    sed -n '2,20p' "$0"; exit 2 ;;
+    sed -n '2,20p' "$0"
+    [ "$TARGET" = us ] && sed -n '/^# --target us/,/^#   backup-caddy/p' "$0"
+    exit 2 ;;
 esac

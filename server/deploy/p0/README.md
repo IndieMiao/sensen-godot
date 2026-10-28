@@ -73,6 +73,18 @@
 
 批准后：同样传上下文并构建，然后 `P0_IMAGE=p0-server:<sha> docker compose -p p0 -f docker-compose.devserver.yml up -d`，冒烟用 `P0_BASE=http://192.168.124.53:3150`。HTTP 明文在演示包上可用（D2 模拟器用 `http://10.0.2.2` 连通过）。
 
+## 目标 C：美西（10-29 迁移之后，`--target us`）
+
+10-29 起 P0 的权威服务在美西 `43.110.146.219`（由迁移方运维；约定见 pm/migration/p0-migration-decision-2026-10-27.md 的「E 答复」第 8 项）。客户端地址不变，仍是 `https://farm.sensenjoy.cn/preview/p0/v1`，由 farm 的入口转发到美西。
+
+- 每个步骤前加 `--target us`，例如 `server/deploy/p0/deploy-hk.sh --target us up <sha>`。不加就是香港，行为和原来逐字一致。
+- 登录用迁移方的 ssh_config（`P0_US_SSH_CONFIG`，主机 `P0_US_HOST`，默认 `tgt-us-p0`）。镜像压缩包的暂存目录用 `P0_US_STAGING`。
+- 美西的设置写在迁移方维护的 `compose.production.json`（权限 600）里。`up` 只改其中 p0-server 那一处镜像字符串，改前先留一份带日期的副本；不写 .env / .env.p0，也不生成密钥。
+- `transfer` 先在本机做压缩包并记 SHA-256，传到美西后再核一次；美西 docker 报出的镜像 ID 必须等于压缩包里的 config 摘要。两个 ID 都记进 image.txt。
+- `up` 之后会核对 `/data` 挂的是正式数据目录，不是就报错。
+- `backup-caddy`、`caddy`、`crontab`、`rollback` 只有香港有。美西的 Caddy、备份和转发归迁移方。
+- 离线自检：`server/deploy/p0/check-deploy-target.sh`。它用桩代替 ssh / scp / curl，不连任何机器；先比对旧脚本和新脚本在香港各步骤的输出和远端命令（逐字相同），再打印美西各步骤会发出的命令。
+
 ## 两个目标的差异
 
 | | 香港 ECS | 局域网 devserver |
