@@ -1,5 +1,5 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
-import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId, recipeById } from './content.js';
+import { cropBySeed, fastCrop, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId, recipeById } from './content.js';
 import { count, freeSlots } from './bag.js';
 import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
@@ -117,10 +117,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     stall: {
       keeper: c.stall.keeper,
       board: legacyBoard(c, s, now),   // the current Homestead Stall panel; SGODOT-224 reads boards.stall
-      buy: c.stall.buy.map(id => {
+      buy: [...c.stall.buy, ...(c.fast_crops ?? []).map(f => f.seed)].map(id => {
         const offer = stallOffer(c, id);
         const level = skillLevel(c, s, offer.skill);
-        return { id, name: itemName(c, id), price: offer.price, energy: cropBySeed(c, id)?.energy ?? 0, gate: offer.gate, skill: offer.skill,
+        return { id, name: itemName(c, id), price: offer.price, energy: (cropBySeed(c, id) ?? fastCrop(c, id))?.energy ?? 0, gate: offer.gate, skill: offer.skill,
           unlocked: level >= offer.gate, xp_to_go: Math.max(0, c.skills[offer.skill][offer.gate - 1] - s.skills[offer.skill]),
           left: offer.daily ? Math.max(0, offer.daily - (s.day.bought[id] ?? 0)) : null };
       }),
@@ -223,8 +223,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, s, now), eaten: s.day.eaten },
     items: Object.fromEntries(bagIds(c, s).map(id => [id, itemInfo(c, s, id)])),
     rarity_names: c.rarity_names,
-    prices: Object.fromEntries(c.crops.map(crop => [crop.id, crop.price])),
-    names: Object.fromEntries([...[...c.crops, ...(c.quick_seeds ?? [])].flatMap(crop => [[crop.id, crop.name], [crop.seed, crop.seed_name]]),
+    prices: Object.fromEntries([...c.crops, ...(c.fast_crops ?? [])].map(crop => [crop.id, crop.price])),
+    names: Object.fromEntries([...[...c.crops, ...(c.quick_seeds ?? []), ...(c.fast_crops ?? [])].flatMap(crop => [[crop.id, crop.name], [crop.seed, crop.seed_name]]),
       ...c.fish.map(fish => [fish.id, fish.name]), ...c.cooking.recipes.map(r => [r.id, r.name]),
       ...Object.entries(c.goods).map(([id, g]) => [id, g.name]), ...c.fishing.rods.map(r => [r.id, r.name]),
       ...Object.entries(c.tools.names), [c.cooking.mystery.id, c.cooking.mystery.name],
@@ -240,6 +240,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...(crop.perennial ? { perennial: true, regrow_h: crop.perennial.regrow_h, pick_energy: crop.perennial.harvest_energy } : {}) })),
     // q(217) teaching seeds, by their plot crop: `teach` (never in a list of crops), a fixed grow_s, harvested as `harvest`
     quick_seeds: (c.quick_seeds ?? []).map(q => ({ id: q.id, seed: q.seed, energy: q.energy, grow_s: q.grow_s, harvest: q.harvest })),
+    fast_crops: (c.fast_crops ?? []).map(f => ({ ...f })),   // q(245): separate from ordinary crops/ingredients
     firsts: s.firsts,
     req_done: s.req_done,   // requests handed in (newest last, ≤ 20): the first session's Deliver row ticks on Pond Catch (q(58))
   };

@@ -1,0 +1,70 @@
+{
+  "_note": "q(245), SGODOT-354, plan 5.2.7: fast crops stay outside crops[]. Only plot growth, bag stacks and Homestead Stall buy/sell see them. Fixed duration from watering; no growth cuts, fertilizer, Seed Saver, recipes, gifts, requests, barter or local notifications. Existing q(217) teaching Quick Radish is unchanged.",
+  "fast_crops": [
+    {
+      "id": "crop_cress",
+      "name": "Cress",
+      "seed": "seed_cress",
+      "seed_name": "Cress Seeds",
+      "farming": 1,
+      "grow_s": 10,
+      "seed_price": 1,
+      "price": 1,
+      "energy": 2,
+      "xp": 2,
+      "first_xp": 10
+    },
+    {
+      "id": "crop_pea_shoots",
+      "name": "Pea Shoots",
+      "seed": "seed_pea_shoots",
+      "seed_name": "Pea Shoots Seeds",
+      "farming": 1,
+      "grow_s": 60,
+      "seed_price": 2,
+      "price": 3,
+      "energy": 2,
+      "xp": 2,
+      "first_xp": 10
+    },
+    {
+      "id": "crop_spinach",
+      "name": "Baby Spinach",
+      "seed": "seed_spinach",
+      "seed_name": "Baby Spinach Seeds",
+      "farming": 2,
+      "grow_s": 300,
+      "seed_price": 2,
+      "price": 3,
+      "energy": 2,
+      "xp": 2,
+      "first_xp": 10
+    },
+    {
+      "id": "crop_scallion",
+      "name": "Scallion",
+      "seed": "seed_scallion",
+      "seed_name": "Scallion Seeds",
+      "farming": 2,
+      "grow_s": 1200,
+      "seed_price": 3,
+      "price": 4,
+      "energy": 2,
+      "xp": 2,
+      "first_xp": 10
+    },
+    {
+      "id": "crop_bok_choy",
+      "name": "Bok Choy",
+      "seed": "seed_bok_choy",
+      "seed_name": "Bok Choy Seeds",
+      "farming": 3,
+      "grow_s": 3600,
+      "seed_price": 3,
+      "price": 4,
+      "energy": 2,
+      "xp": 2,
+      "first_xp": 10
+    }
+  ]
+}

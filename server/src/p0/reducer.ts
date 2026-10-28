@@ -1,5 +1,5 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
-import { cropById, cropBySeed, plotCrop, quickCrop, rodById, type P0Content } from './content.js';
+import { cropById, cropBySeed, plotCrop, quickCrop, fastCrop, rodById, type P0Content } from './content.js';
 import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
 import { barter } from './barter.js';
@@ -163,8 +163,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       }
       const wrong = plots.find(p => p!.state !== 'tilled');
       if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
-      const crop = cropBySeed(c, String(cmd.seed)) ?? quickCrop(c, String(cmd.seed));   // q(217): or a teaching seed
+      const crop = cropBySeed(c, String(cmd.seed)) ?? quickCrop(c, String(cmd.seed)) ?? fastCrop(c, String(cmd.seed));
       if (!crop) return fail('bad_item');
+      if (crop.fast && crop.seed !== cmd.seed) return fail('bad_item');
+      if (crop.fast && skillLevel(c, s, 'farming') < crop.gate)
+        return fail('skill_level_required', { skill: 'farming', level: crop.gate, xp_to_go: c.skills.farming[crop.gate - 1] - s.skills.farming });
       const n = plots.length, seeds = count(s.bag, crop.seed);
       if (seeds < n) return fail('no_seed', { seed: crop.seed, need: n, have: seeds });
       if (s.energy.value < crop.energy * n) return fail('need_energy', energyDetail(c, s, now, crop.energy * n));
@@ -173,7 +176,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       events.push({ kind: 'item', id: crop.seed, delta: -n });
       // §4.2.1: the level difference is locked at the moment the player pays.
       const pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
-      noteSown(c, s, n);
+      noteSown(c, s, n, crop.id);
       const watered = wateredPlots(c, s);   // a sprinkler's ring or a greenhouse
       for (const plot of plots as Plot[]) {
         plot.state = 'sown';
@@ -201,7 +204,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         break;
       }
       if (plot.fert) return fail('fertilized');
-      if (quickCrop(c, plot.crop)) return fail('wrong_state', { state: plot.state, quick: true });   // q(217): never fertilized
+      if (quickCrop(c, plot.crop) || fastCrop(c, plot.crop)) return fail('wrong_state', { state: plot.state, quick: true });   // q(217)/q(245): before cropById, never fertilized
       if (!fert?.grow_mult) return fail(fert?.regrow_mult ? 'trees_only' : 'bad_item');
       if (count(s.bag, item) < 1) return fail('no_item', { item });
       take(s.bag, item, 1);

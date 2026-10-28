@@ -53,8 +53,8 @@ describe('the garden grid and 40 plots (q(59) §1.1)', () => {
     expect(plotCount(c, s)).toBe(30);
     s.homestead.level = 2;
     s.skills = { farming: 150, fishing: 70, cooking: 0 };
-    s.storage = { wood: 16, stone: 12, fiber: 10, clay: 4, rock_salt: 4 };
-    s.coins = 440;
+    s.storage = { stone: 8, copper_ore: 2, clay: 2 };
+    s.coins = 120;
     s.plots[3] = { id: 3, state: 'growing', crop: 'crop_radish', ready_at: T0 + H, xp_pct: 100 };
     const { s: after, ev } = step(s, { type: 'homestead_upgrade' });
     expect(after.plots).toHaveLength(40);

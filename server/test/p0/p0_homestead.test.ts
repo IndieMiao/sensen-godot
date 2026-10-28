@@ -17,17 +17,17 @@ function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[]
 }
 /** Past the Newcomer Blessing so meals and regen are the base numbers. */
 const fresh = () => ({ ...freshState(c, 'player-home-01', T0, 7), created_at: T0 - 8 * 24 * H });
-/** Farming Lv2 + Fishing Lv1 = 3 (Lv2 gate); Farming Lv3 + Fishing Lv2 = 5 (Lv3 gate). */
+/** Farming Lv2 + Fishing Lv1 = 3 (Lv2 gate); Farming Lv2 + Fishing Lv2 = 4 (Lv3 gate). */
 const LV2_SKILLS = { farming: 50, fishing: 0, cooking: 0 };
-const LV3_SKILLS = { farming: 150, fishing: 70, cooking: 0 };
-const LV2_MATS: Record<string, number> = { wood: 12, stone: 8, fiber: 6, rock_salt: 3 };
-const LV3_MATS: Record<string, number> = { wood: 16, stone: 12, fiber: 10, clay: 4, rock_salt: 4 };
+const LV3_SKILLS = { farming: 50, fishing: 70, cooking: 0 };
+const LV2_MATS: Record<string, number> = { wood: 6, stone: 4, fiber: 3 };
+const LV3_MATS: Record<string, number> = { stone: 8, copper_ore: 2, clay: 2 };
 
 function ready(level: 2 | 3): P0State {
   const s = fresh();
   s.skills = { ...(level === 2 ? LV2_SKILLS : LV3_SKILLS) };
   s.storage = { ...(level === 2 ? LV2_MATS : LV3_MATS) };
-  s.coins = (level === 2 ? 250 : 400) + 40;
+  s.coins = (level === 2 ? 40 : 80) + 40;
   if (level === 3) s.homestead.level = 2;
   return s;
 }
@@ -41,19 +41,19 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(v.bag.capacity).toBe(25);
   });
 
-  it('Lv2 takes 250 coins and the four materials, refills Energy to 210 and unlocks the Spice Rack', () => {
+  it('Lv2 takes 40 coins and three materials, gives 40 Energy and unlocks the Spice Rack', () => {
     const s = ready(2);
     s.energy = { value: 120, tick_ms: T0 };
     const { s: after, ev } = step(s, { type: 'homestead_upgrade' });
     expect(after.homestead.level).toBe(2);
     expect(after.coins).toBe(40);
     expect(after.storage).toEqual({});
-    expect(after.energy.value).toBe(210);
+    expect(after.energy.value).toBe(160);
     expect(maxEnergy(c, after)).toBe(210);
     expect(foodCap(c, after, T0)).toBe(210);
     expect(after.homestead.plaque).toEqual([{ level: 2, at: T0 }]);
-    expect(ev).toContainEqual({ kind: 'homestead', level: 2, energy: 90, unlocks: ['spice_rack', 'clay_bank'] });
-    expect(ev).toContainEqual({ kind: 'item', id: 'wood', delta: -12 });
+    expect(ev).toContainEqual({ kind: 'homestead', level: 2, energy: 40, unlocks: ['spice_rack', 'clay_bank'] });
+    expect(ev).toContainEqual({ kind: 'item', id: 'wood', delta: -6 });
     const v = viewOf(c, after, T0);
     expect(v.homestead.unlocks).toMatchObject({ spice_rack: true, warming_cabinet: false, bag_upgrade_1: 'locked', board_slots: 2 });
   });
@@ -73,16 +73,16 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     s.skills = { farming: 0, fishing: 0, cooking: 900 }; // Cooking is not counted (§8.1.1)
     expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'skills_short', detail: { need: 3, have: 2 } });
     s = ready(2);
-    s.storage.stone = 5;
-    expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'need_material', detail: { item: 'stone', need: 8, have: 5 } });
+    s.storage.stone = 3;
+    expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'need_material', detail: { item: 'stone', need: 4, have: 3 } });
     s = ready(2);
-    s.coins = 270; // 250 + 40 floor = 290
+    s.coins = 60; // 40 + 40 floor = 80
     expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'no_coins', detail: { need: 20 } });
   });
 
   it('a refused upgrade changes nothing (atomic)', () => {
     const s = ready(2);
-    s.coins = 100;
+    s.coins = 79;
     const r = applyP0(c, s, { type: 'homestead_upgrade' }, T0);
     expect(r.ok).toBe(false);
     expect(s.storage).toEqual(LV2_MATS);
@@ -109,7 +109,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(haveTotal(s, 'wood')).toBe(14);
     const { s: after } = step(s, { type: 'homestead_upgrade' });
     expect(after.storage.wood).toBeUndefined();
-    expect(count(after.bag, 'wood')).toBe(2);
+    expect(count(after.bag, 'wood')).toBe(8);
     const t = fresh();
     t.storage.wood = 3;
     t.bag.push({ id: 'wood', qty: 4 });
@@ -130,9 +130,9 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     s.bag.push({ id: 'wood', qty: 1 });
     const next = viewOf(c, s, T0).homestead.next!;
     expect(next.level).toBe(2);
-    expect(next.coins).toEqual({ need: 290, have: 180 });
+    expect(next.coins).toEqual({ need: 80, have: 180 });
     expect(next.skills).toEqual({ need: 3, have: 2, farming: 1, fishing: 1 });
-    expect(next.materials[0]).toEqual({ id: 'wood', name: 'Timber', need: 12, have: 11, storage: 10, bag: 1 });
+    expect(next.materials[0]).toEqual({ id: 'wood', name: 'Timber', need: 6, have: 11, storage: 10, bag: 1 });
     expect(next.can_upgrade).toBe(false);
     expect(next.block).toMatchObject({ code: 'skills_short' });
   });

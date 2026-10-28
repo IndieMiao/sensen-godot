@@ -23,11 +23,19 @@ export interface Crop {
   perennial?: { plant: string; plant_name: string; regrow_h: number; harvest_energy: number; harvest_xp: number; footprint: [number, number] };
   /** A teaching seed's plot crop (quickCrop): it ripens a fixed time after it starts growing and is harvested as `harvest`. */
   quick?: { ms: number; harvest: string };
+  /** q(245): plot-only adapter for fast_crops[], never a cooking/request crop. */
+  fast?: true;
 }
 
 /** A teaching seed (q(217), content/farm_quick_seeds.json): Quick Radish Seeds, sown for `energy`, ripe grow_s after it
  * starts growing, harvested as `harvest` (a crop of crops[]). Kept out of crops[]: what walks the crops never sees it. */
 export interface QuickSeed { id: string; name: string; seed: string; seed_name: string; energy: number; grow_s: number; harvest: string }
+
+/** q(245), §5.2.7: own harvest, fixed duration, outside crops[]. */
+export interface FastCrop {
+  id: string; name: string; seed: string; seed_name: string; farming: number; grow_s: number;
+  seed_price: number; price: number; energy: number; xp: number; first_xp: number;
+}
 
 export interface Fish {
   id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[];
@@ -175,6 +183,7 @@ export interface P0Content {
   skill_daily_cap: number;                    // §4.3.4: XP per skill per player day, an anti-script limit only
   crops: Crop[];
   quick_seeds?: QuickSeed[];                  // q(217) teaching seeds (quickCrop), not crops
+  fast_crops?: FastCrop[];                    // q(245), merged from farm_fast_crops.json, never crops[]
   stall: { keeper: { role: string; name: string }; buy: string[] };
   rarity_names: string[];
   fish: Fish[];
@@ -218,7 +227,7 @@ export interface P0Content {
     barter?: { give: number; minerals: string[]; level_share: number; daily: number };   // items: the market's climate's regional crops and fish (barter.ts)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
-    levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
+    levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[]; energy?: number | 'full' }[];
     /** Looks (content/homestead_looks.json, §8.3.1, q(112)): a stage per look level, its id the level's unlock id. */
     looks?: HomesteadLook[];
   };
@@ -409,8 +418,16 @@ export function quickCrop(c: P0Content, id: string): Crop | undefined {
     quick: { ms: q.grow_s * 1000, harvest: base.id } };
 }
 
-/** What grows on a plot: a crop of crops[] or a teaching seed's (quickCrop). */
-export function plotCrop(c: P0Content, id: string): Crop | undefined { return cropById(c, id) ?? quickCrop(c, id); }
+/** By harvest id or seed. Only plot consumers use this adapter; ingredient()/cropById() cannot see it. */
+export function fastCrop(c: P0Content, id: string): Crop | undefined {
+  const f = c.fast_crops?.find(x => x.id === id || x.seed === id);
+  if (!f) return undefined;
+  return { ...f, tier: 1, level: f.farming, gate: f.farming, grow_h: f.grow_s / 3600, yield: 1,
+    ingr: ['F', 1], sold_at: 'stall', fast: true, quick: { ms: f.grow_s * 1000, harvest: f.id } };
+}
+
+/** What grows on a plot, including both separately authored short-duration series. */
+export function plotCrop(c: P0Content, id: string): Crop | undefined { return cropById(c, id) ?? quickCrop(c, id) ?? fastCrop(c, id); }
 export function fishById(c: P0Content, id: string): Fish | undefined { return c.fish.find(f => f.id === id); }
 export function rodById(c: P0Content, id: string): Rod | undefined { return c.fishing.rods.find(r => r.id === id); }
 export function recipeById(c: P0Content, id: string): Recipe | undefined { return c.cooking.recipes.find(r => r.id === id); }
@@ -462,7 +479,7 @@ export function ingredient(c: P0Content, id: string): { family: Family; rarity: 
 
 /** Display name for any bag id the P0 content knows. */
 export function itemName(c: P0Content, id: string): string {
-  const crop = cropById(c, id) ?? cropBySeed(c, id) ?? quickCrop(c, id);
+  const crop = cropById(c, id) ?? cropBySeed(c, id) ?? quickCrop(c, id) ?? fastCrop(c, id);
   if (crop) return crop.id === id ? crop.name : crop.seed_name;
   const fish = fishById(c, id);
   if (fish) return fish.name;
