@@ -46,6 +46,19 @@ const WEED_SIZE := Vector3(0.48, 0.68, 0.48)
 const PER_CELL := 1
 const JITTER := 0.0
 
+## Keep the submitted colors on the CPU too: the headless dummy renderer cannot read MultiMesh colors back.
+## Field layers and harvest copies share this path, and resizing clears colors for removed instances.
+class ColorBatch extends MultiMeshInstance3D:
+	var instance_colors := PackedColorArray()
+
+	func resize_instances(count: int) -> void:
+		instance_colors.resize(count)
+		multimesh.instance_count = count
+
+	func set_instance_color(index: int, color: Color) -> void:
+		instance_colors[index] = color
+		multimesh.set_instance_color(index, instance_colors[index])
+
 var bp: FarmBlueprint
 var world_scale := 1.0
 ## 作物从地面往上长。田畦盒子随自由格子种田退役，这里通常是 0。
@@ -69,8 +82,8 @@ func _ready() -> void:
 	for crop in DETAIL_STAGE:
 		_detail_mm[crop] = _make_layer(PlantMesh.build(crop + "_detail", CROP_COLOR[crop]))
 
-func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
-	var mmi := MultiMeshInstance3D.new()
+func _make_layer(mesh: Mesh) -> ColorBatch:
+	var mmi := ColorBatch.new()
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.use_colors = true
@@ -157,16 +170,16 @@ func _sync_buckets(buckets: Dictionary) -> void:
 static func per_cell(layer: String) -> int:
 	return 1 if layer == "soil" else PER_CELL
 
-func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
+func _fill(mmi: ColorBatch, items: Array, layer: String) -> void:
 	var mm := mmi.multimesh
 	var per := per_cell(layer)
-	mm.instance_count = items.size() * per
+	mmi.resize_instances(items.size() * per)
 	var n := 0
 	for item in items:
 		var color := _stage_color(layer, item.stage) * (item.get("tint", Color.WHITE) as Color)
 		for t in _cell_instances(item.cell, layer, item.stage, bp.cell_to_world(item.cell, world_scale)):
 			mm.set_instance_transform(n, t)
-			mm.set_instance_color(n, color)
+			mmi.set_instance_color(n, color)
 			n += 1
 
 ## One cell's instance transforms around `base` (the cell's world point; zero for a copy standing at the cell).
@@ -199,16 +212,16 @@ func ghost(cell: Vector2i, layer: String, stage := STAGES - 1, tint := Color.WHI
 	if _detail_mm.has(layer) and stage >= int(DETAIL_STAGE[layer]): srcs.append(_detail_mm[layer])
 	var ts := _cell_instances(cell, layer, stage, Vector3.ZERO)
 	for src in srcs:
-		var m := MultiMeshInstance3D.new()
+		var m := ColorBatch.new()
 		var mm := MultiMesh.new()
 		mm.transform_format = MultiMesh.TRANSFORM_3D
 		mm.use_colors = true
 		mm.mesh = (src as MultiMeshInstance3D).multimesh.mesh
-		mm.instance_count = ts.size()
+		m.multimesh = mm
+		m.resize_instances(ts.size())
 		for i in ts.size():
 			mm.set_instance_transform(i, ts[i])
-			mm.set_instance_color(i, _stage_color(layer, stage) * tint)
-		m.multimesh = mm
+			m.set_instance_color(i, _stage_color(layer, stage) * tint)
 		m.material_override = (src as MultiMeshInstance3D).material_override
 		root.add_child(m)
 	add_child(root)

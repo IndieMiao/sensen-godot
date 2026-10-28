@@ -203,13 +203,17 @@ func test_reused_plant_batches_keep_each_fast_crop_tint_and_the_harvest_copy() -
 	assert_int(field.cell_counts().L).is_equal(2)
 	assert_int(field.cell_counts().H).is_equal(0)
 	assert_int(field.cell_counts().C).is_equal(0)   # Scallion must not expose the mature carrot's orange detail
-	assert_bool(field._mm.B.multimesh.get_instance_color(0) != field._mm.B.multimesh.get_instance_color(1)).is_true()
+	# Read the actual submitted colors, not the dummy RenderingServer's all-zero headless readback.
+	assert_bool(field._mm.B.instance_colors[0] != field._mm.B.instance_colors[1]).is_true()
 	var tint: Color = P0Garden.FAST_TINTS.crop_cress
 	var ghost := field.ghost(P0Garden.cell_of(0), "B", CropField.STAGES - 1, tint)
 	auto_free(ghost)
-	var shown: Color = ghost.get_child(0).multimesh.get_instance_color(0)
-	assert_float(absf(shown.r - tint.r)).is_less_equal(1.0 / 255.0)
-	assert_float(absf(shown.b - tint.b)).is_less_equal(1.0 / 255.0)
+	var batch: CropField.ColorBatch = ghost.get_child(0)
+	assert_that(batch.instance_colors[0]).is_equal(tint)   # CPU values retain all RGBA channels without GPU quantization
+	field.sync({}, 1000)
+	assert_int(field._mm.B.instance_colors.size()).is_equal(0)
+	assert_int(field._mm.L.instance_colors.size()).is_equal(0)
+	assert_that(batch.instance_colors[0]).is_equal(tint)   # harvest copy outlives the field's cleared batch
 
 func test_homestead_reward_updates_hud_without_an_extra_energy_float() -> void:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
