@@ -60,16 +60,17 @@ describe('Hot Tea and Coffee (§3.4.4, §9.12)', () => {
 });
 
 describe('selling by counter (§9.11, §9.13.1)', () => {
-  it('the Tackle Shop pays ⌊price × 0.8⌋ for fish, up to 80 coins a day, and sells only what fits', () => {
+  it('a home Tackle Shop pays full price for fish with no daily limit (q(251): its 80-coin quota is gone)', () => {
     const s = fresh();
-    s.bag.push({ id: 'fish_koi', qty: 10 }); // price 13 → 10 each
+    s.bag.push({ id: 'fish_koi', qty: 10 }); // price 13, as at the Homestead Stall
     const r = step(s, { type: 'sell', item: 'fish_koi', qty: 9, shop: 'tackle' });
-    expect(sale(r.ev)).toMatchObject({ qty: 8, asked: 9, coins: 80, quota: 'fish_tackle' });
-    expect(count(r.s.bag, 'fish_koi')).toBe(2);
-    expect(refuse(r.s, { type: 'sell', item: 'fish_koi', qty: 1, shop: 'tackle' })).toMatchObject({ ok: false, code: 'limit_reached' });
-    expect(viewOf(c, r.s, T0).quotas.fish_tackle).toMatchObject({ used: 80, cap: 80, scope: 'any Tackle Shop' });
-    // at home the same fish sells at full price, no quota
-    expect(sale(step(r.s, { type: 'sell', item: 'fish_koi', qty: 2 }).ev)).toMatchObject({ coins: 26, quota: null });
+    expect(sale(r.ev)).toMatchObject({ qty: 9, asked: 9, coins: 117, quota: null });
+    expect(count(r.s.bag, 'fish_koi')).toBe(1);
+    expect(sale(step(r.s, { type: 'sell', item: 'fish_koi', qty: 1, shop: 'tackle' }).ev)).toMatchObject({ coins: 13, quota: null });
+    const v = viewOf(c, r.s, T0);
+    expect(v.quotas).not.toHaveProperty('fish_tackle');
+    expect(v.shops.tackle.sell).toEqual([{ kind: 'fish', rate: 1, quota: null }]);
+    expect(v.shops.tackle.distance).toEqual({ home: true, factor: 1 });
   });
   it('crops are sellable only at home; seeds nowhere', () => {
     const s = fresh();

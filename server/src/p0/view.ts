@@ -7,7 +7,7 @@ import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipe
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
+import { catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
@@ -350,7 +350,11 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
 function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
+  // q(251): the counters of the city the player is in (the Homestead Stall always home): `distance` says how far from
+  // home and the share it pays, and each sell rate already carries that share, so an older client shows what it pays
+  const distance = sellDistance(c, s, shop, s.travel?.here ?? homeOf(c, s));
   return {
+    distance,
     buy: catalog(c, shop, s).map(id => {
       const o = offerOf(c, id)!;
       const unlocked = !o.skill || skillLevel(c, s, o.skill) >= o.gate;
@@ -367,7 +371,7 @@ function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
       };
     }),
     // regional: only this climate's regional items (`items` lists them), as the Market Square takes them (§9.13.1)
-    sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota,
+    sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate * distance.factor, quota: r.quota,
       ...(r.regional ? { regional: true, items: regionalItems(c, kind, climateAt(c, s)) } : {}) })),
     // Barter at the Market Square keeper (§8.4.5): give n regional items of this city's climate for 1 mineral; have
     // counts no Gifted stack; spare = what the pick may take (0 when locked, less what a tracked request needs, as Sell
