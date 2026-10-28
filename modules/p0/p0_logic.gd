@@ -634,7 +634,7 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
 			var ms := float(plot.get("ready_in", 0))   # a Quick Radish's `Ready in 0:45`, ticking (q(217) ④)
-			var fixed := not quick_seed(view, str(plot.get("crop", ""))).is_empty() or not fast_crop(view, str(plot.get("crop", ""))).is_empty()
+			var fixed := not quick_seed(view, str(plot.get("crop", ""))).is_empty()   # q(217) alone; q(247) changes Today, not this key
 			var sub := "Ready in " + duration(ms) if fixed else key_ready(ms)
 			return {"icon": "clock", "verb": "Growing", "sub": sub, "enabled": false, "amber": false, "cmd": {}, "need": 0}
 		"ready":
@@ -752,6 +752,7 @@ static func today_line(view: Dictionary) -> String:
 	var any_sown := false
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
+		if st != "growing" and not fast_crop(view, str(p.get("crop", ""))).is_empty(): continue
 		if st == "ready": ready = str(p.get("crop", ""))
 		if st == "growing":
 			any_sown = true
@@ -2106,7 +2107,7 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): lines.append(str(line.text))
 	var energy := " · Energy full"
-	if level >= 2 and level <= 4:
+	if level >= 2 and level <= 4 and ev.has("energy"):
 		var gain := maxi(0, int(ev.get("energy", 0)))   # actual server reward, including a cap / bonus-zone zero
 		energy = " · +%d Energy" % gain if gain > 0 else ""
 	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d" % max_e + energy,

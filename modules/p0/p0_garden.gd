@@ -66,10 +66,10 @@ const CROP_CODES := {
 	"crop_pumpkin": "M", "crop_pineapple": "B", "crop_sweet_potato": "P", "crop_beet": "C",
 	"crop_apple": "T", "crop_citrus": "T", "crop_grape": "B",
 	"crop_quick_radish": "R",   # q(217): the teaching seed's Quick Radish grows as a radish
-	"crop_cress": "B", "crop_pea_shoots": "B", "crop_spinach": "L", "crop_scallion": "H", "crop_bok_choy": "L",
+	"crop_cress": "B", "crop_pea_shoots": "B", "crop_spinach": "L", "crop_scallion": "B", "crop_bok_choy": "L",
 }
 
-## q(245) approved stand-ins (354 b7e795cd): tint existing herb / leaf / stalk geometry, no new plant meshes.
+## q(245) stand-ins (354 f31fe553): Scallion uses B because mature C exposes an orange root; no new meshes.
 const FAST_TINTS := {"crop_cress": Color(0.82, 1.0, 0.62), "crop_pea_shoots": Color(0.68, 1.0, 0.90),
 	"crop_spinach": Color(0.63, 0.82, 0.70), "crop_scallion": Color(0.92, 1.0, 0.76), "crop_bok_choy": Color(0.93, 1.0, 0.94)}
 

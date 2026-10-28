@@ -42,6 +42,21 @@ func test_five_crops_have_names_seed_costs_icons_and_static_duration_without_joi
 	assert_str(P0ItemInfo.grow_time({grow_h = 10.0 / 3600.0})).is_equal("10s")
 	assert_str(P0ItemInfo.grow_time({grow_s = 59})).is_equal("59s")
 
+func test_new_icon_imports_have_distinct_native_uids_and_resolve_to_the_expected_texture() -> void:
+	var seen := {}
+	for c in FAST:
+		for id in [c.id, c.seed]:
+			var path: String = "res://assets/p0/icons/" + str(id) + ".svg"
+			var config := ConfigFile.new()
+			assert_int(config.load(path + ".import")).is_equal(OK)
+			var encoded := str(config.get_value("remap", "uid", ""))
+			var uid := ResourceUID.text_to_id(encoded)
+			assert_int(uid).is_not_equal(ResourceUID.INVALID_ID)
+			assert_bool(seen.has(uid)).is_false()
+			seen[uid] = true
+			assert_str(ResourceUID.id_to_text(uid)).is_equal(encoded)   # importer metadata, independent of an editor UID cache
+			assert_str(P0Logic.icon(str(id)).resource_path).is_equal(path)
+
 func test_fast_crops_stay_in_produce_and_only_homestead_buys_them() -> void:
 	var v := view()
 	v.shops = {homestead = {sell = [{kind = "crop", rate = 1.0}]}, market = {sell = [{kind = "crop", rate = 0.8}]},
@@ -75,6 +90,30 @@ func test_today_last_five_minutes_tick_for_every_crop_and_fast_crops_have_no_act
 		v.plots[0].state = "sown"
 		assert_bool(P0Logic.today_rows(v).any(func(r): return str(r.line).begins_with("Water "))).is_false()
 
+func test_growing_key_keeps_normal_duration_for_fast_crops_and_seconds_only_for_quick_radish() -> void:
+	var v := view()
+	var expected := ["Ready in 1m", "Ready in 1m", "Ready in 5m", "Ready in 20m", "Ready in 1h"]
+	for i in FAST.size():
+		var p := {id = 0, state = "growing", crop = FAST[i].id, ready_in = FAST[i].grow_s * 1000}
+		assert_str(P0Logic.main_action(v, p, "").sub).is_equal(expected[i])
+	assert_str(P0Logic.main_action(v, {id = 0, state = "growing", crop = "crop_scallion", ready_in = 1199000}, "").sub).is_equal("Ready in 20m")
+	v.quick_seeds = [{id = "crop_quick_radish", seed = "seed_quick_radish", grow_s = 45}]
+	assert_str(P0Logic.main_action(v, {id = 0, state = "growing", crop = "crop_quick_radish", ready_in = 45000}, "").sub).is_equal("Ready in 0:45")
+
+func test_legacy_today_line_keeps_fast_countdowns_but_never_targets_fast_ready_or_sown_plots() -> void:
+	var v := view()
+	for c in FAST:
+		v.plots = [{id = 0, state = "growing", crop = c.id, ready_in = 8000}]
+		assert_str(P0Logic.today_line(v)).is_equal(("Scallions" if c.name == "Scallion" else str(c.name)) + " ready in 0:08")
+		for state in ["ready", "sown"]:
+			v.plots[0].state = state
+			assert_str(P0Logic.today_line(v)).is_equal("Sow your first plot")
+	v.names.crop_lettuce = "Lettuce"
+	v.plots.append({id = 1, state = "ready", crop = "crop_lettuce"})
+	assert_str(P0Logic.today_line(v)).is_equal("Lettuce ready to harvest")
+	v.plots[1].state = "sown"
+	assert_str(P0Logic.today_line(v)).is_equal("Water what you sowed")
+
 func test_fast_crops_never_schedule_or_trigger_a_crop_notification() -> void:
 	var v := view()
 	for i in FAST.size(): v.plots.append({id = i, state = "growing", crop = FAST[i].id, ready_in = FAST[i].grow_s * 1000})
@@ -91,7 +130,7 @@ func test_fast_crops_render_at_their_fixed_duration_with_distinct_tints_and_cann
 	var v := view()
 	for i in FAST.size(): v.plots.append({id = i, state = "growing", crop = FAST[i].id, ready_in = FAST[i].grow_s * 500})
 	var cells := P0Garden.cells(v, 1000000)
-	var codes := ["B", "B", "L", "H", "L"]
+	var codes := ["B", "B", "L", "B", "L"]
 	for i in FAST.size():
 		var slot: Dictionary = cells[P0Garden.cell_id(P0Garden.cell_of(i))]
 		assert_str(slot.crop).is_equal(codes[i])
@@ -99,11 +138,12 @@ func test_fast_crops_render_at_their_fixed_duration_with_distinct_tints_and_cann
 		assert_int(CropField.stage_of(slot, 1000000)).is_equal(1)
 		assert_bool(slot.tint != Color.WHITE).is_true()
 		assert_str(P0Logic.main_action(v, v.plots[i], "fert_compost").verb).is_equal("Growing")
-		assert_str(P0Logic.main_action(v, v.plots[i], "fert_compost").sub).is_equal("Ready in " + P0Logic.duration(FAST[i].grow_s * 500))
+		assert_str(P0Logic.main_action(v, v.plots[i], "fert_compost").sub).is_equal(P0Logic.key_ready(FAST[i].grow_s * 500))
 	assert_bool(cells[P0Garden.cell_id(P0Garden.cell_of(0))].tint != cells[P0Garden.cell_id(P0Garden.cell_of(1))].tint).is_true()
 
 func test_home_banner_shows_actual_energy_and_keeps_full_for_level_five_onward() -> void:
 	for level in [2, 3, 4]:
+		assert_str(P0Logic.home_moment({energy = {max = 220}}, {level = level}).subtitle).is_equal("Max Energy 220 · Energy full")   # legacy field absent, not a reported zero
 		for gain in [40, 15, 0]:
 			var banner := P0Logic.home_moment({energy = {max = 220}}, {level = level, energy = gain})
 			assert_str(banner.subtitle).is_equal("Max Energy 220" + (" · +%d Energy" % gain if gain > 0 else ""))
@@ -129,9 +169,10 @@ func test_reused_plant_batches_keep_each_fast_crop_tint_and_the_harvest_copy() -
 	var field: CropField = auto_free(CropField.new(P0Garden.blueprint()))
 	add_child(field)
 	field.sync(P0Garden.cells(v, 1000), 1000)
-	assert_int(field.cell_counts().B).is_equal(2)
+	assert_int(field.cell_counts().B).is_equal(3)
 	assert_int(field.cell_counts().L).is_equal(2)
-	assert_int(field.cell_counts().H).is_equal(1)
+	assert_int(field.cell_counts().H).is_equal(0)
+	assert_int(field.cell_counts().C).is_equal(0)   # Scallion must not expose the mature carrot's orange detail
 	assert_bool(field._mm.B.multimesh.get_instance_color(0) != field._mm.B.multimesh.get_instance_color(1)).is_true()
 	var tint: Color = P0Garden.FAST_TINTS.crop_cress
 	var ghost := field.ghost(P0Garden.cell_of(0), "B", CropField.STAGES - 1, tint)
