@@ -391,15 +391,26 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     58,
-                                    264,
+                                    251,
                                     170,
-                                    18
+                                    44
                                   ],
-                                  "variation": "C12XB",
-                                  "text": ""
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        58,
+                                        264,
+                                        170,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": ""
+                                    }
+                                  ]
                                 },
                                 {
                                   "type": "HBoxContainer",

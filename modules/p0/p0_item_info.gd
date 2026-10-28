@@ -129,6 +129,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	# STALL-NEW-2 (E-04): a buy row unlocked since the stall was last opened reads `◆ New for you` in newInk.
 	if context == &"counter_buy" and _new_offer(item_id, opts) and out.facts.has(NEW_FOR_YOU): out.gate_tone = &"new"
 	if rule.get("quota", false): out.quota = _quota(view, item_id, kind, opts)
+	if rule.has("fact_note"): out.fact_note = fill(str(rule.fact_note), t)   # muted, under the fact beside the buttons
 	return out
 
 ## Fills {tokens}. Segments are " · "-separated: a segment whose token is empty drops out, and a line with no
@@ -256,7 +257,7 @@ static func _sell_here(view: Dictionary, item_id: String, opts: Dictionary) -> i
 	var base = P0Logic.item(view, item_id).get("sell", null)
 	var e := _buyback(view, item_id, opts)
 	if e.is_empty() or base == null: return -1
-	return int(floor(float(base) * float(e.get("rate", 1.0))))
+	return maxi(1, int(floor(float(base) * float(e.get("rate", 1.0)))))   # q(251) ②: at least 1, as the server rounds
 
 ## The quota this counter counts the kind against (view.quotas[id]: {used, cap, resets_in, scope}), {} for none.
 static func _quota_of(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
@@ -346,6 +347,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		count_source = "",
 		sell_here = str(here) if here >= 0 else "",
 		sell_at_home = ("Sells for %d at home" % int(it.sell)) if it.get("sell", null) != null else "",
+		# q(252) ③: an away counter's sell card says the home price under its own (`6 each` over `8 at home`)
+		home_note = ("%d at home" % int(it.sell)) if here >= 0 and it.get("sell", null) != null and away(view, _counter(opts)) else "",
 		energy = str(int(crop.energy)) if crop.has("energy") else "",
 		grow = grow_time(crop),
 		stored = str(_stored(view, item_id)) if _stored(view, item_id) > 0 else "",
@@ -526,26 +529,46 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 		line = ("%d × %s coins" % [qty, _P0Travel.grouped(each)]) if qty > 1 else ""}
 
 static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
-	return _quota_line(_quota_of(view, item_id, opts), "" if _regional(view, item_id, opts) else kind, _counter(opts))
+	return _quota_line(_quota_of(view, item_id, opts), "" if _regional(view, item_id, opts) else kind, _counter(opts), view)
 
 ## Whether this counter buys the item back as one of the city's regional goods (the Market Square).
 static func _regional(view: Dictionary, item_id: String, opts: Dictionary) -> bool:
 	return bool(_buyback(view, item_id, opts).get("regional", false))
 
-## The counter's own allowance line with nothing selected (the counter drawer's scope row): the first kind it counts
-## against a quota, or "Crops & fish · no daily limit" at the Homestead Stall (FARM-6).
+## The counter's own line with nothing selected (the counter drawer's scope row): the first kind it counts against a
+## quota (an older server's Tackle Shop and Market, q(9)), else its price line (q(252) ①).
 static func counter_quota(view: Dictionary, role: String) -> Dictionary:
 	if role != "homestead":
 		for e in view.get("shops", {}).get(role, {}).get("sell", []):
 			if e.get("quota", null) != null:   # the market (NPC-3 482:120): "Buy-back today 30/60" over "all San Francisco markets · resets in 9h 12m"
-				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "" if e.get("regional", false) else str(e.get("kind", "")), role)
-	return _quota_line({}, "", role)
+				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "" if e.get("regional", false) else str(e.get("kind", "")), role, view)
+	return _quota_line({}, "", role, view)
 
-static func _quota_line(quota: Dictionary, kind: String, role: String) -> Dictionary:
+## How far this counter's city is from home (q(251) ②, view.shops[role].distance: {home, factor, km, trip, band});
+## {} from an older server, which still counts the Tackle Shop's and Market's quotas.
+static func distance(view: Dictionary, role: String) -> Dictionary:
+	var d = view.get("shops", {}).get(role, {}).get("distance", null)
+	return d if d is Dictionary else {}
+
+## A counter away from home pays less than home (q(251) ②).
+static func away(view: Dictionary, role: String) -> bool:
+	var d := distance(view, role)
+	return not d.is_empty() and not bool(d.get("home", true))
+
+## The price line where no quota counts (q(252) ①): `Home price` at home, else `80% of home price` over the city row's
+## `1,093 km · Trip 4 · Long Haul`; {} from an older server at a counter with no quota (it said nothing there).
+static func price_line(view: Dictionary, role: String) -> Dictionary:
+	var d := distance(view, role)
+	if d.is_empty():
+		return {text = "Crops & fish · no daily limit", note = "", have = 0, total = 0} if role == "homestead" else {}
+	if bool(d.get("home", true)): return {text = "Home price", note = "", have = 0, total = 0}
+	return {text = "%d%% of home price" % roundi(float(d.get("factor", 1.0)) * 100.0), have = 0, total = 0,
+		note = "%s km · Trip %d · %s" % [_P0Travel.grouped(int(d.get("km", 0))), int(d.get("trip", 0)), str(d.get("band", ""))]}
+
+static func _quota_line(quota: Dictionary, kind: String, role: String, view := {}) -> Dictionary:
 	var q := quota
 	if not q.is_empty() and not q.has("label"): q = q.merged({label = kind.capitalize()})   # "Fish buy-back today 30/80"
-	if q.is_empty():
-		return {text = "Crops & fish · no daily limit", note = "", have = 0, total = 0} if role == "homestead" else {}
+	if q.is_empty(): return price_line(view, role)
 	# "Buy-back today 30/60" at a market, "Fish buy-back today 30/80" at the tackle shop (F-07): label = category.
 	var text := ("%s buy-back today %d/%d" % [str(q.get("label", "")), int(q.get("used", 0)), int(q.get("cap", 0))]).strip_edges()
 	text = text.left(1).to_upper() + text.substr(1)

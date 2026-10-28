@@ -13,7 +13,8 @@
     "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social).",
     "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts.",
     "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\").",
-    "{count_source} is \"12 · Harvested at home\"; without a known source the line drops (the title already shows ×N)."
+    "{count_source} is \"12 · Harvested at home\"; without a known source the line drops (the title already shows ×N).",
+    "fact_note: a secondary line under the fact beside the buttons (q(252) ③: an away counter's `8 at home` under `6 each`); empty drops it."
   ],
   "seed/bag": {
     "facts": [
@@ -92,6 +93,7 @@
       "{region_line}",
       "{sell_here} each"
     ],
+    "fact_note": "{home_note}",
     "quota": true,
     "buttons": [
       {
@@ -176,6 +178,7 @@
       "{region_line}",
       "{sell_here} each"
     ],
+    "fact_note": "{home_note}",
     "quota": true,
     "buttons": [
       {
