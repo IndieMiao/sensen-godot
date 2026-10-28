@@ -134,3 +134,9 @@ func test_the_sell_card_lays_the_home_price_under_its_unit_price() -> void:
 	assert_str(sheet._effect_note.text).is_equal("8 at home")
 	assert_bool(sheet._effect_note.visible).is_true()
 	assert_float(sheet._effect_note.global_position.y).is_greater(sheet._effect.global_position.y)   # under it
+
+func test_the_unit_price_rounds_as_the_server_does() -> void:
+	var chicago := {"home": false, "factor": 0.7, "km": 2986.0, "trip": 5, "band": "Continental"}
+	var v := _view(chicago)
+	v.items.fish_rainbow_trout.sell = 90   # 90 × 0.7 = 62.99999… in floats: the server's floor(+1e-9) says 63
+	assert_str(str(P0ItemInfo.spec(v, "fish_rainbow_trout", &"counter_sell", {counter = "tackle"}).facts[-1])).is_equal("63 each")

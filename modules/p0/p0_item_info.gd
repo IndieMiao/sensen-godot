@@ -257,7 +257,8 @@ static func _sell_here(view: Dictionary, item_id: String, opts: Dictionary) -> i
 	var base = P0Logic.item(view, item_id).get("sell", null)
 	var e := _buyback(view, item_id, opts)
 	if e.is_empty() or base == null: return -1
-	return maxi(1, int(floor(float(base) * float(e.get("rate", 1.0)))))   # q(251) ②: at least 1, as the server rounds
+	# q(251) ②: at least 1, and the server's epsilon — 90 × 0.7 is 62.99999… in floats and must read 63
+	return maxi(1, int(floor(float(base) * float(e.get("rate", 1.0)) + 1e-9)))
 
 ## The quota this counter counts the kind against (view.quotas[id]: {used, cap, resets_in, scope}), {} for none.
 static func _quota_of(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:

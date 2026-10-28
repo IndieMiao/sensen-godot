@@ -262,6 +262,7 @@ func refresh() -> void:
 	for i in maxi(0, facts.size() - 1): _add_fact_line(str(facts[i]))
 	_overflow = _add_fact_line("")
 	_overflow_note = _add_fact_line("")
+	_overflow_note.theme_type_variation = UiTokens.STYLE_C11_B   # as beside the buttons
 	_last_fact = str(facts[-1]) if not facts.is_empty() else ""
 	for c in _buttons.get_children():
 		c.hide()
