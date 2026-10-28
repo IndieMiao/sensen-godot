@@ -2429,7 +2429,9 @@ func _mark_stall_seen() -> void:
 func _counter_action(role: String, action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
 		&"buy": command.emit({"type": "buy", "item": id, "qty": int(payload.get("qty", 1)), "shop": role})
-		&"sell": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
+		# the sell card's Sell (payload qty 1) and Sell All (qty "all"): one `sell` command, its own button ids
+		# (item_info_rules.json; SGODOT-358: Sell All went unanswered)
+		&"sell", &"sell_all": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
 		&"drink": command.emit({"type": "drink", "item": id, "shop": role})
 		# q(166): 2 regional items for 1 mineral; the server reads the climate where the player stands
 		&"barter": command.emit({"type": "barter", "item": str(payload.get("item", "")), "mineral": id, "shop": role})

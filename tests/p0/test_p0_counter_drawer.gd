@@ -272,6 +272,48 @@ func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void
 	ui.counter_events([{"kind": "drink", "item": "drink_hot_tea", "gain": 30, "price": 40, "left": 2}])
 	assert_str(ui._counter.keeper_bar.line).is_equal("Enjoy. Next cup's 50 coins.")   # TEA-DONE
 
+## SGODOT-358: the sell card's own buttons, pressed as a finger would, send `sell` — Sell one and Sell All (qty
+## "all"), at the Homestead Stall and at the tackle shop; nothing falls through to "no command".
+func test_the_sell_cards_buttons_send_sell() -> void:
+	for at in [["homestead", "crop_radish"], ["tackle", "fish_crucian"]]:
+		var ui := _ui()
+		await await_idle_frame()
+		ui.set_view(_view())
+		var sent := []
+		ui.command.connect(func(c): sent.append(c))
+		ui.open_counter(at[0], {"ctx": TACKLE_CTX if at[0] == "tackle" else {}})
+		await _settle()
+		ui._counter.grid.select(at[1])
+		await _settle()
+		var buttons: Array = ui._counter.sheet.find_children("*", "UiCommandButton", true, false) \
+			.filter(func(b): return (b as UiCommandButton).is_visible_in_tree())
+		var labels: Array = buttons.map(func(b): return (b as UiCommandButton).label)
+		assert_array(labels).override_failure_message(str(at, labels)).has_size(2)
+		assert_str(str(labels[0])).is_equal("Sell")
+		assert_str(str(labels[1])).starts_with("Sell All")
+		for b in buttons: (b as UiCommandButton).pressed.emit()
+		assert_array(sent).override_failure_message(str(at, sent)).is_equal([
+			{"type": "sell", "item": at[1], "qty": 1, "shop": at[0]},
+			{"type": "sell", "item": at[1], "qty": "all", "shop": at[0]}])
+		ui.queue_free()
+		await await_idle_frame()
+
+## Every button a counter's item card can show answers with a command: none of the rules' ids at a counter is
+## missing from _counter_action (SGODOT-358 was `sell_all`).
+func test_every_counter_card_button_has_a_command() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	var sent := []
+	ui.command.connect(func(c): sent.append(c))
+	var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://modules/p0/item_info_rules.json"))
+	for key: String in rules:
+		if not key.contains("/counter_"): continue
+		for b: Dictionary in rules[key].get("buttons", []):
+			if str(b.get("kind", "")) == "unavailable": continue
+			sent.clear()
+			ui._counter_action("market", StringName(b.id), "crop_radish", b.get("payload", {}))
+			assert_int(sent.size()).override_failure_message("%s: %s sends nothing" % [key, b.id]).is_equal(1)
+
 ## counter_drawer(): the open counter drawer, its board sheets over it included; null once it closes (#128 review).
 func test_counter_drawer_is_the_open_counter_only() -> void:
 	var ui := _ui()
