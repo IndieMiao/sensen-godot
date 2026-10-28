@@ -887,3 +887,32 @@ func test_a_tip_card_made_before_the_kitchen_shows_over_its_drawer() -> void:
 	assert_int(rt.ui._toasts.get_index()).is_greater(tip.get_index())
 	rt.ui._hide_tip()
 	rt.ui.close_modal()
+
+## A dialog is always over the TipCard, whichever opened first (不知火舞 on 341): a tip coming due while a dialog is open
+## (a confirm, the gate card, a result card) waits for it to close; over a drawer — the stove's — it comes up at once.
+func test_a_tip_waits_for_a_dialog_but_not_for_a_drawer() -> void:
+	var path := "user://test_tip_dialog_%d.json" % OS.get_process_id()   # user:// is shared by every worktree
+	rt.ui.tips_path = path
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	var card := UiSystemCard.new()
+	card.show_card({"title": "Start a new test account?", "body": "", "primary": "Start"})
+	rt.ui._open_modal(card, UiTokens.OPACITY_SCRIM_MODAL)
+	rt.ui.modal_kind = "test_confirm"
+	assert_bool(rt.ui.dialog_open()).is_true()
+	rt.ui.teach("map")
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.tips.showing).is_empty()   # waits under the dialog
+	rt.ui.close_modal()
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.tips.showing).is_equal("map")
+	assert_bool(rt.ui._teach.visible).is_true()
+	rt.ui._hide_tip()
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("cookbook")   # asks for `cook` (U6) with the stove drawer open
+	assert_bool(rt.ui.dialog_open()).is_false()
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.tips.showing).is_equal("cook")
+	rt.ui._hide_tip()
+	rt.ui.close_modal()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

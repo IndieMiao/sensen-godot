@@ -195,9 +195,10 @@ func _process(dt: float) -> void:
 		_notice_left -= dt
 		if _notice_left <= 0.0: _hide_notice()
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
-	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed); the modal kinds stay as
-	# a second guard for result cards opened another way (the farmhouse's COOK-4 is one).
-	if tips and not modal_kind in ["card", "kitchen_card"]:
+	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed). A dialog is always over
+	# the TipCard, whichever opened first (不知火舞 on 341): while one is open — a result card (the farmhouse's COOK-4
+	# too), the gate card, a confirm, a page — the tip waits; over a drawer (the stove's, the bag) it comes up.
+	if tips and not dialog_open():
 		var key := tips.next()
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
@@ -2023,6 +2024,11 @@ func _flush_held_cards() -> void:
 func _next_card() -> void:
 	if _modal == null and not _card_queue.is_empty(): (_card_queue.pop_front() as Callable).call_deferred()
 
+## A modal that is not a drawer is open (a card, a sheet, a page): TipCards wait under it (_process). A drawer is content
+## that is, or holds, a UiDrawer — the kitchen's wrap holds the stove drawer, the Fish-dex its own.
+var _modal_drawer := false
+func dialog_open() -> bool: return _modal != null and is_instance_valid(_modal) and not _modal_drawer
+
 func _drop_modal() -> void:
 	_modal_back = Callable()   # each layer sets its own way back after it opens
 	if _moment_open:   # a result moment went: a waiting TipCard may come up now (q(49) ⑥)
@@ -2057,8 +2063,10 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	holder.add_child(veil)
 	holder.add_child(content)
 	# A drawer dragged down fades its scrim with it (SGODOT-265); a drawer may sit inside the content (the Fish-dex).
+	_modal_drawer = false
 	for d in ([content] if content is UiDrawer else []) + content.find_children("*", "UiDrawer", true, false):
 		(d as UiDrawer).scrim = veil
+		_modal_drawer = true
 	if surface == "map" and content is PanelContainer:
 		# Over the map, translucent paper lets the map's own buttons ghost through the card.
 		var sb := (content as PanelContainer).get_theme_stylebox("panel")
