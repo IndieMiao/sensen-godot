@@ -3612,6 +3612,10 @@ func teach(key: String, _text := "") -> void:
 func tip_pending() -> bool:
 	return tips != null and (tips.showing != "" or not tips.waiting.is_empty())
 
+## Whether the TipCard on screen is this tip (the kitchen keeps its own copy of `heat` out of sight meanwhile).
+func tip_showing(key: String) -> bool:
+	return tips != null and tips.showing == key and _teach != null and _teach.visible
+
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
 	if tips and tips.did(action): _hide_tip(false)

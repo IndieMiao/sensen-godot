@@ -813,3 +813,27 @@ class _FakeWorld extends Node:
 	var _surface := ""
 	func _init(surface: String) -> void: _surface = surface
 	func p0_surface() -> String: return _surface
+
+## The heat hint under the ring is §7.9's sentence, the first fire's TipCard's own (P0Guide.TIPS.heat), and it waits out
+## of sight (its place kept) while that TipCard is on screen: one copy at a time (不知火舞 on 341).
+func test_the_heat_hint_reads_the_tip_and_waits_while_the_tip_shows() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var v := _view()
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	_set_view(v)
+	k.watch(rt.session.view.cooking.stove)
+	await get_tree().process_frame
+	var hint: Label = k.get("_hint")
+	assert_str(hint.text).is_equal(P0Guide.TIPS.heat)
+	assert_float(hint.modulate.a).is_equal(1.0)
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	rt.ui.tips.showing = "heat"
+	rt.ui._show_tip(P0Guide.TIPS.heat, "heat")
+	await get_tree().process_frame
+	assert_float(hint.modulate.a).is_equal(0.0)
+	assert_bool(hint.visible).is_true()   # its place kept: Queue next does not move
+	rt.ui._hide_tip()
+	await get_tree().process_frame
+	assert_float(hint.modulate.a).is_equal(1.0)
+	k.stop_watching()
