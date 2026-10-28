@@ -421,11 +421,14 @@ func test_a_doubled_push_goes_to_the_rail_and_last_bet_comes_back() -> void:
 	assert_int(page.bet).is_equal(50)   # the bet dealt, not the doubled stake
 	assert_array(_pile_values()).is_equal([P0Blackjack.chips_for(50)])
 
-func test_a_loss_that_leaves_too_little_goes_straight_to_low_on_coins() -> void:
+func test_a_loss_that_leaves_too_little_ends_on_low_on_coins_after_the_beat() -> void:
 	_open(90)
 	await _deal(["9S", "KD", "8H", "TC"], 50)   # 17 against 20: 40 left, not even 5 above the floor
 	page.animate = true
 	page.act("stand")
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.RESULT and page.circle.piles().is_empty())).is_true()
+	await await_millis(900)   # the stake has gone (800 ms); the empty beat runs to ~1.4 s: nothing printed yet
+	assert_bool(page.low_label.visible).is_false()
 	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.BET)).is_true()
 	assert_int(page.bet).is_equal(0)
 	assert_bool(page.low_label.visible).is_true()
@@ -442,3 +445,12 @@ func test_opening_on_last_bet_draws_the_stake_in_the_circle() -> void:
 	add_child(page)
 	var at: Vector2 = page.circle.piles()[0].at
 	assert_vector(at).is_equal((page.circle.size - Vector2(UiChipToken.SIZE, UiChipToken.SIZE)) * 0.5)
+
+func test_a_big_stake_flies_in_as_the_chips_the_circle_draws() -> void:
+	_open(5000)
+	page.animate = true
+	page.phase = P0BlackjackPage.Phase.RESULT
+	page._step_rebet(1785)   # 1K 500 100 100 100 50 10 10 10 5: more than the circle draws
+	var flown: Array = page._leaving.filter(func(n): return is_instance_valid(n) and n is UiChipToken).map(func(n): return (n as UiChipToken).value)
+	var chips := P0Blackjack.chips_for(1785)
+	assert_array(flown).is_equal(chips.slice(chips.size() - P0Blackjack.CIRCLE_MAX))

@@ -654,8 +654,7 @@ func _step_result(e: Dictionary) -> float:
 	var cleared := _clear_circle(hands, won > 0)
 	var next := _next_bet()
 	_steps.push_front(_step_rebet.bind(next))
-	if next <= 0: return cleared   # not even the smallest bet fits: straight to Low on coins
-	return cleared + UiKit.secs(UiTokens.MOTION_PENDING_DELAY_MS * 2)
+	return cleared + UiKit.secs(UiTokens.MOTION_PENDING_DELAY_MS * 2)   # the empty beat, Low on coins included (2aecfdcd)
 
 ## The stake the circle gets back after a result: last hand's, stepped down to keep the floor (9.18.4).
 func _next_bet() -> int: return P0Blackjack.deal_again_bet(view, _last_bet())
@@ -703,11 +702,12 @@ func _clear_circle(hands: Array, winnings: bool) -> float:
 
 ## After the empty beat: the stake splits into chips that fly in from their rail stacks together (PETAL_IN, as a tap's
 ## chip flies), then it is laid as the bet with its amount and `Deal`. 0: nothing flies, Low on coins (or the empty
-## circle) at once.
+## circle) is printed after the beat.
 func _step_rebet(amount: int) -> float:
 	_steps.push_front(func(): _enter_bet(amount); _lay_cards(false); return 0.0)
 	if amount <= 0 or not animate: return 0.0
-	for v in P0Blackjack.chips_for(amount).slice(0, P0Blackjack.CIRCLE_MAX):
+	var chips := P0Blackjack.chips_for(amount)
+	for v in chips.slice(maxi(0, chips.size() - P0Blackjack.CIRCLE_MAX)):   # the ones the circle draws (set_stack)
 		var i := P0Blackjack.CHIPS.find(v)
 		if i < 0: continue
 		var f := _chip_token(int(v))

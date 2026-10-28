@@ -55,6 +55,7 @@ func _run() -> void:
 	await process_frame
 	if OS.has_environment("VIDEO"):
 		if OS.get_environment("VIDEO_KIND") == "settle": await _video_settle(OS.get_environment("VIDEO"))
+		elif OS.get_environment("VIDEO_KIND") == "settle-low": await _video_settle(OS.get_environment("VIDEO"), true)
 		else: await _video(OS.get_environment("VIDEO"))
 		quit()
 		return
@@ -371,10 +372,10 @@ func _hand(r: Rig, name: String, deck: Array, moves: Array, after := 3.2) -> voi
 		await _wait(1.4)
 	await _wait(after)
 
-func _video_settle(dir: String) -> void:
+func _video_settle(dir: String, low := false) -> void:
 	_frames_dir = dir
 	DirAccess.make_dir_recursive_absolute(dir)
-	var r := _rig(500, true, 50)
+	var r := _rig(90 if low else 500, true, 50)
 	r.page.animate = true
 	var layer := CanvasLayer.new()
 	layer.layer = 100
@@ -398,6 +399,12 @@ func _video_settle(dir: String) -> void:
 	var p := r.page
 	print("mark open ", _frame)
 	await _wait(1.6)
+	if low:   # 90 coins, bet 50, lose: 40 left, not even 5 above the floor
+		await _hand(r, "7 Bet 50 of 90, lose: Low on coins", ["9S", "KD", "8H", "TC"], ["stand"])
+		_rec = false
+		await _settle()
+		print("video frames ", _frame)
+		return
 	await _hand(r, "1 Win (20 vs 17)", ["TS", "7D", "KH", "TC"], ["stand"])
 	await _hand(r, "2 Lose (17 vs 20)", ["9S", "KD", "8H", "TC"], ["stand"])
 	await _hand(r, "3 Push, one hand (17 vs 17)", ["9S", "7D", "8H", "TC"], ["stand"], 2.0)
