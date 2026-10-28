@@ -28,6 +28,8 @@ on:
       # and what only the server's tests read (p0_travel: the stamps; landmark_reach: the landmarks)
       - 'assets/p0/stamps/**'
       - 'assets/map/landmarks.json'
+      # the online frame both sides keep to (p0_online_rooms compares the server's bytes with it)
+      - 'tests/fixtures/p0/frame_v1.hex'
   pull_request:
     paths:
       # the workspace (pnpm -r runs every package's tests) and its install
@@ -54,6 +56,8 @@ on:
       # and what only the server's tests read (p0_travel: the stamps; landmark_reach: the landmarks)
       - 'assets/p0/stamps/**'
       - 'assets/map/landmarks.json'
+      # the online frame both sides keep to (p0_online_rooms compares the server's bytes with it)
+      - 'tests/fixtures/p0/frame_v1.hex'
 
 jobs:
   test:
