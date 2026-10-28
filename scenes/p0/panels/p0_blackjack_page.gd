@@ -370,6 +370,7 @@ func _layout() -> void:
 		l.position = Vector2(0, _LINES_Y + i * 24.0)
 	circle.size = Vector2(_CIRCLE_R * 2.0, _CIRCLE_R * 2.0)
 	circle.position = _CIRCLE - circle.size * 0.5
+	circle.relayout()   # a stake set before the circle had its size (opening on last hand's bet) was drawn off its top-left
 	empty_label.size = Vector2(_CIRCLE_R * 2.0, 18)
 	empty_label.position = _CIRCLE - empty_label.size * 0.5
 	_layout_bet_label()
@@ -644,9 +645,80 @@ func _step_result(e: Dictionary) -> float:
 		_float(P0Blackjack.float_text(won), on_page(_FLOAT_AT))
 		_slide_winnings(won)
 	_roll_coins(P0Blackjack.coins_of(view))
-	# then last hand's stake sets itself in the circle again and `Deal` deals again (C13)
-	_steps.push_front(func(): _rebet(); _lay_cards(false); return 0.0)
-	return UiKit.secs(UiTokens.MOTION_FLOAT_TEXT_MS)
+	# 9.18.7 ④ (不知火舞 351 d1969a60, a): a push on one undoubled hand stays in the circle as the next stake, no motion.
+	# Otherwise the circle is cleared (wins to the rail, losses to the dealer), stays empty a beat, and last hand's stake
+	# flies in from the rail; then `Deal` deals again (C13). Chips and the circle take nothing meanwhile (_running).
+	if hands.size() == 1 and str(hands[0].get("result", "")) == "push" and _next_bet() == staked:
+		_steps.push_front(func(): _rebet(); _lay_cards(false); return 0.0)
+		return 0.0
+	var cleared := _clear_circle(hands, won > 0)
+	var next := _next_bet()
+	_steps.push_front(_step_rebet.bind(next))
+	return cleared + UiKit.secs(UiTokens.MOTION_PENDING_DELAY_MS * 2)   # the empty beat, Low on coins included (2aecfdcd)
+
+## The stake the circle gets back after a result: last hand's, stepped down to keep the floor (9.18.4).
+func _next_bet() -> int: return P0Blackjack.deal_again_bet(view, _last_bet())
+
+## The settled stakes leave the circle, each as its hand came out (d1969a60): a win (with the winnings that slid in,
+## after their beat) slides down to the rail, DRAWER, ease in; a loss waits PENDING_DELAY and slides off toward the
+## dealer, DRAWER × 2; a push (doubled or split) waits PENDING_DELAY and goes to the rail like a win. Split hands play at
+## once. The amount by the circle fades with the first to go. Seconds until the circle is empty.
+func _clear_circle(hands: Array, winnings: bool) -> float:
+	var piles := circle.piles()
+	circle.set_stack([])
+	_leaving = _leaving.filter(is_instance_valid)
+	if not animate:
+		bet_label.text = ""
+		return 0.0
+	var pause := UiKit.secs(UiTokens.MOTION_PENDING_DELAY_MS)
+	var drawer := UiKit.secs(UiTokens.MOTION_DRAWER_MS)
+	var end := 0.0
+	var first := [INF, 0.0]   # [delay, duration] of the first to go
+	for k in piles.size():
+		var net := int((hands[k] as Dictionary).get("net", 0)) if k < hands.size() else 0
+		var pile := UiChipStack.new(piles[k].values)
+		table.add_child(pile)
+		pile.position = circle.position + (piles[k].at as Vector2)
+		_leaving.append(pile)
+		var delay := pause
+		var dur := drawer
+		var to := Vector2(pile.position.x, _RAIL_Y)
+		if net > 0 and winnings: delay = drawer * 2.0 + pause   # with the winnings once they have come in
+		elif net < 0:
+			dur = drawer * 2.0
+			to = _WINNINGS_FROM - pile.size * 0.5
+		var t := create_tween()
+		t.tween_interval(delay)
+		t.tween_property(pile, "position", to, dur).set_ease(Tween.EASE_IN)
+		t.parallel().tween_property(pile, "modulate:a", 0.0, dur)
+		t.tween_callback(pile.queue_free)
+		end = maxf(end, delay + dur)
+		if delay < first[0]: first = [delay, dur]
+	if is_finite(first[0]):
+		var f := create_tween()
+		f.tween_interval(first[0])
+		f.tween_property(bet_label, "modulate:a", 0.0, first[1])
+	return end
+
+## After the empty beat: the stake splits into chips that fly in from their rail stacks together (PETAL_IN, as a tap's
+## chip flies), then it is laid as the bet with its amount and `Deal`. 0: nothing flies, Low on coins (or the empty
+## circle) is printed after the beat.
+func _step_rebet(amount: int) -> float:
+	_steps.push_front(func(): _enter_bet(amount); _lay_cards(false); return 0.0)
+	if amount <= 0 or not animate: return 0.0
+	var chips := P0Blackjack.chips_for(amount)
+	for v in chips.slice(maxi(0, chips.size() - P0Blackjack.CIRCLE_MAX)):   # the ones the circle draws (set_stack)
+		var i := P0Blackjack.CHIPS.find(v)
+		if i < 0: continue
+		var f := _chip_token(int(v))
+		f.position = stack_top(i) - f.size * 0.5
+		_leaving.append(f)
+		var t := create_tween()
+		t.tween_property(f, "position", circle_center() - f.size * 0.5, _fly()).set_ease(Tween.EASE_OUT)
+		t.tween_callback(f.queue_free)
+	return _fly()
+
+var _leaving: Array = []   # chips in flight between the circle and the rail or the dealer, freed with the table
 
 ## The winnings, as chips, slide from the dealer's side to the stake, then leave with it for the rail (37022a3c D;
 ## RESULT-T's dashed path is a motion note, not drawn).
@@ -727,6 +799,9 @@ func _new_hand(stake: int) -> Dictionary:
 func _clear_table() -> void:
 	if is_instance_valid(_winnings): _winnings.free()
 	_winnings = null
+	for n in _leaving:
+		if is_instance_valid(n): (n as Node).free()
+	_leaving = []
 	for c in _dealer_cards: (c as Node).free()
 	_dealer_cards = []
 	for hd in _hands:
@@ -742,6 +817,7 @@ func _set_stack(total: int) -> void:
 	if phase != Phase.BET and _hands.size() > 1: circle.set_split([P0Blackjack.chips_for(int(_hands[0].bet)), P0Blackjack.chips_for(int(_hands[1].bet))])
 	else: circle.set_stack(stack)
 	bet_label.text = P0Blackjack.comma(total) if total > 0 else ""
+	bet_label.modulate.a = 1.0   # faded out with a cleared stake
 	_layout_bet_label()
 
 func _layout_bet_label() -> void:
@@ -978,7 +1054,7 @@ class _Circle extends Control:
 	func set_stack(values: Array) -> void:
 		if _second != null: _second.visible = false
 		_stack.values = values.slice(maxi(0, values.size() - P0Blackjack.CIRCLE_MAX))
-		_stack.position = (size - _stack.size) * 0.5 + Vector2(0, (_stack.values.size() - 1) * UiChipStack.STEP * 0.5)
+		relayout()
 
 	## Two hands' stakes side by side, 16 either side of the centre (SPLIT-T).
 	func set_split(two: Array) -> void:
@@ -990,10 +1066,26 @@ class _Circle extends Control:
 			var st: UiChipStack = _stack if k == 0 else _second
 			var v: Array = two[k]
 			st.values = v.slice(maxi(0, v.size() - P0Blackjack.CIRCLE_MAX))
-			st.position = (size - st.size) * 0.5 + Vector2((-16.0 if k == 0 else 16.0), (st.values.size() - 1) * UiChipStack.STEP * 0.5)
+		relayout()
+
+	## Centre the stake (or the two hands' stakes) on the circle as it is now sized.
+	func relayout() -> void:
+		var split := _second != null and _second.visible
+		for k in (2 if split else 1):
+			var st: UiChipStack = _stack if k == 0 else _second
+			var dx := 0.0 if not split else (-16.0 if k == 0 else 16.0)
+			st.position = (size - st.size) * 0.5 + Vector2(dx, (st.values.size() - 1) * UiChipStack.STEP * 0.5)
+
+	## The stakes as drawn, one per hand (split: two): their chips and where they sit in the circle.
+	func piles() -> Array:
+		var out: Array = []
+		for st in [_stack, _second]:
+			if st != null and (st as UiChipStack).visible and not (st as UiChipStack).values.is_empty():
+				out.append({"values": (st as UiChipStack).values.duplicate(), "at": (st as UiChipStack).position})
+		return out
 
 	func _notification(what: int) -> void:
-		if what == NOTIFICATION_RESIZED: set_stack(_stack.values)
+		if what == NOTIFICATION_RESIZED: relayout()
 
 	func _gui_input(event: InputEvent) -> void:
 		var up: bool = (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed) \

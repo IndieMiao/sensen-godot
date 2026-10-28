@@ -54,7 +54,9 @@ func _want(name: String) -> bool: return only.is_empty() or name in only
 func _run() -> void:
 	await process_frame
 	if OS.has_environment("VIDEO"):
-		await _video(OS.get_environment("VIDEO"))
+		if OS.get_environment("VIDEO_KIND") == "settle": await _video_settle(OS.get_environment("VIDEO"))
+		elif OS.get_environment("VIDEO_KIND") == "settle-low": await _video_settle(OS.get_environment("VIDEO"), true)
+		else: await _video(OS.get_environment("VIDEO"))
 		quit()
 		return
 	var states := ["bj-bet", "bj-bet-empty", "bj-bet-cap", "bj-drag", "bj-low", "bj-act", "bj-act-grey", "bj-split",
@@ -345,6 +347,77 @@ func _video(dir: String) -> void:
 	r.mock.next_deck = ["TS", "7D", "QH", "9C"]
 	await _tap(_centre(p.deal_key))    # the stake set itself again: Deal
 	await _wait(1.8)
+	_rec = false
+	await _settle()
+	print("video frames ", _frame)
+
+## VIDEO_KIND=settle (不知火舞 351 d1969a60): each hand's settling as it plays — opening on last hand's bet, a win, a loss,
+## a push on one hand, a doubled push, a split won and lost, and a loss the wallet steps the next bet down for. A caption
+## names each hand; "mark <name> <frame>" lines in the log say where each result begins.
+var _caption: Label
+
+func _say(text: String) -> void:
+	_caption.text = text
+	_caption.size = Vector2(360, 24)
+
+func _hand(r: Rig, name: String, deck: Array, moves: Array, after := 3.2) -> void:
+	_say(name)
+	r.mock.next_deck = deck
+	await _tap(_centre(r.page.deal_key))
+	await _wait(1.6)
+	for m in moves:
+		print("mark ", name, " ", _frame)
+		var key: UiFeltAction = r.page.get(m + "_key")
+		await _tap(_centre(key))
+		await _wait(1.4)
+	await _wait(after)
+
+func _video_settle(dir: String, low := false) -> void:
+	_frames_dir = dir
+	DirAccess.make_dir_recursive_absolute(dir)
+	var r := _rig(90 if low else 500, true, 50)
+	r.page.animate = true
+	var layer := CanvasLayer.new()
+	layer.layer = 100
+	root.add_child(layer)
+	_caption = Label.new()
+	_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_caption.position = Vector2(0, 92)
+	_caption.add_theme_font_size_override(&"font_size", 13)
+	_caption.add_theme_color_override(&"font_color", Color(1, 1, 1, 0.9))
+	_caption.add_theme_color_override(&"font_outline_color", Color(0, 0, 0, 0.7))
+	_caption.add_theme_constant_override(&"outline_size", 4)
+	layer.add_child(_caption)
+	_finger = Finger.new()
+	_finger.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_finger.position = Vector2(180, 760)
+	layer.add_child(_finger)
+	_say("Open with last bet 50")
+	await _settle()
+	_rec = true
+	_record_loop()
+	var p := r.page
+	print("mark open ", _frame)
+	await _wait(1.6)
+	if low:   # 90 coins, bet 50, lose: 40 left, not even 5 above the floor
+		await _hand(r, "7 Bet 50 of 90, lose: Low on coins", ["9S", "KD", "8H", "TC"], ["stand"])
+		_rec = false
+		await _settle()
+		print("video frames ", _frame)
+		return
+	await _hand(r, "1 Win (20 vs 17)", ["TS", "7D", "KH", "TC"], ["stand"])
+	await _hand(r, "2 Lose (17 vs 20)", ["9S", "KD", "8H", "TC"], ["stand"])
+	await _hand(r, "3 Push, one hand (17 vs 17)", ["9S", "7D", "8H", "TC"], ["stand"], 2.0)
+	await _hand(r, "4 Push after Double (17 vs 17)", ["6S", "7D", "5H", "TC", "6C"], ["double"])
+	await _hand(r, "5 Split: win 18 / lose 15 vs 17", ["8S", "9D", "8H", "8C", "TS", "7H"], ["split", "stand", "stand"])
+	_say("6 Bet 300, lose: 200 left, next bet 160")
+	await _tap(p.circle_center())      # take the 50 back
+	await _wait(0.5)
+	for i in 3:
+		await _tap(_chip(p, 3))
+		await _wait(0.35)
+	await _wait(0.4)
+	await _hand(r, "6 Bet 300, lose: 200 left, next bet 160", ["9S", "KD", "8H", "TC"], ["stand"])
 	_rec = false
 	await _settle()
 	print("video frames ", _frame)

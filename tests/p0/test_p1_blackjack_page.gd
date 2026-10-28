@@ -350,3 +350,107 @@ func test_back_coins_and_rules_share_a_row_under_the_safe_area() -> void:
 		assert_float(p.rules_key.get_global_rect().get_center().y).append_failure_message(why).is_equal_approx(row, 0.5)
 		assert_float(p.rules_key.get_global_rect().get_center().x).append_failure_message(why) \
 			.is_equal_approx(p.on_page(Vector2(173, 0)).x, 0.5)
+
+# ---- settling the circle (不知火舞 351 d1969a60, a): motion on, polled in real time
+
+func _until(cond: Callable, ms := 4000) -> bool:
+	var t0 := Time.get_ticks_msec()
+	while not cond.call():
+		if Time.get_ticks_msec() - t0 > ms: return false
+		await await_millis(16)
+	return true
+
+func _pile_values() -> Array: return page.circle.piles().map(func(p): return p.values)
+
+func test_a_win_clears_the_circle_to_the_rail_then_the_stake_flies_back() -> void:
+	_open(500)
+	await _deal(["TS", "7D", "KH", "TC"], 100)   # 20 against 17: stand wins
+	page.animate = true
+	page.act("stand")
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.RESULT)).is_true()
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("You win")
+	assert_array(_pile_values()).is_empty()   # the stake left the circle, with the winnings beside it
+	assert_bool(page._leaving.any(func(n): return is_instance_valid(n) and n is UiChipStack and (n as UiChipStack).values == P0Blackjack.chips_for(100))).is_true()
+	assert_bool(is_instance_valid(page._winnings)).is_true()
+	# nothing is printed or takes a tap until the stake is back
+	assert_bool(page.deal_key.visible or page.empty_label.visible).is_false()
+	page.tap_chip(1)
+	page.circle.tapped.emit()
+	assert_int(page.bet).is_equal(100)
+	assert_bool(await _until(func(): return page.bet_label.modulate.a < 0.05, 2000)).is_true()   # the amount fades
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.BET)).is_true()
+	assert_array(_pile_values()).is_equal([P0Blackjack.chips_for(100)])
+	assert_str(page.bet_label.text).is_equal("100")
+	assert_float(page.bet_label.modulate.a).is_equal(1.0)
+	assert_bool(page.deal_key.visible and page.deal_key.enabled).is_true()
+
+func test_a_loss_slides_to_the_dealer_and_a_win_waits_for_its_winnings() -> void:
+	_open(500)
+	page.animate = true
+	page._set_stack(50)
+	assert_float(page._clear_circle([{"net": -50}], false)).is_equal_approx(0.8, 0.001)   # PENDING 300 + DRAWER × 2
+	var lost: UiChipStack = page._leaving[-1]
+	assert_array(_pile_values()).is_empty()
+	page._set_stack(50)
+	assert_float(page._clear_circle([{"net": 50}], true)).is_equal_approx(1.05, 0.001)   # winnings in 500 + 300, DRAWER
+	page.circle.set_split([[50], [50]])
+	assert_float(page._clear_circle([{"net": 50}, {"net": -50}], true)).is_equal_approx(1.05, 0.001)   # both at once
+	assert_int(page._leaving.size()).is_equal(4)
+	await await_millis(1000)
+	assert_bool(is_instance_valid(lost)).is_false()   # gone toward the dealer, faded
+
+func test_a_push_on_one_hand_stays_in_the_circle() -> void:
+	_open(500)
+	await _deal(["9S", "7D", "8H", "TC"], 120)   # 17 against 17
+	page.animate = true
+	page.act("stand")
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.BET)).is_true()
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("Push")
+	assert_array(page._leaving).is_empty()   # no clearing, no flight back
+	assert_array(_pile_values()).is_equal([P0Blackjack.chips_for(120)])
+
+func test_a_doubled_push_goes_to_the_rail_and_last_bet_comes_back() -> void:
+	_open(500)
+	await _deal(["6S", "7D", "5H", "TC", "6C"], 50)   # 11 doubles to 17 against 17
+	page.animate = true
+	page.act("double")
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.RESULT)).is_true()
+	assert_str((page._hands[0].tag as UiBadge).text).is_equal("Push")
+	assert_array(_pile_values()).is_empty()
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.BET)).is_true()
+	assert_int(page.bet).is_equal(50)   # the bet dealt, not the doubled stake
+	assert_array(_pile_values()).is_equal([P0Blackjack.chips_for(50)])
+
+func test_a_loss_that_leaves_too_little_ends_on_low_on_coins_after_the_beat() -> void:
+	_open(90)
+	await _deal(["9S", "KD", "8H", "TC"], 50)   # 17 against 20: 40 left, not even 5 above the floor
+	page.animate = true
+	page.act("stand")
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.RESULT and page.circle.piles().is_empty())).is_true()
+	await await_millis(900)   # the stake has gone (800 ms); the empty beat runs to ~1.4 s: nothing printed yet
+	assert_bool(page.low_label.visible).is_false()
+	assert_bool(await _until(func(): return page.phase == P0BlackjackPage.Phase.BET)).is_true()
+	assert_int(page.bet).is_equal(0)
+	assert_bool(page.low_label.visible).is_true()
+	assert_bool(page._leaving.any(func(n): return is_instance_valid(n) and n is UiChipToken)).is_false()   # nothing flew in
+
+func test_opening_on_last_bet_draws_the_stake_in_the_circle() -> void:
+	bj = P0BlackjackMock.new(5)
+	bj.last_bet = 50
+	page = auto_free(P0BlackjackPage.new(bj.decorate({"coins": 500})))
+	page.theme = UiKit.theme()
+	page.animate = false
+	page.size = Vector2(360, 800)
+	page._layout()   # laid out before it is in the tree, as P0Ui sizes it
+	add_child(page)
+	var at: Vector2 = page.circle.piles()[0].at
+	assert_vector(at).is_equal((page.circle.size - Vector2(UiChipToken.SIZE, UiChipToken.SIZE)) * 0.5)
+
+func test_a_big_stake_flies_in_as_the_chips_the_circle_draws() -> void:
+	_open(5000)
+	page.animate = true
+	page.phase = P0BlackjackPage.Phase.RESULT
+	page._step_rebet(1785)   # 1K 500 100 100 100 50 10 10 10 5: more than the circle draws
+	var flown: Array = page._leaving.filter(func(n): return is_instance_valid(n) and n is UiChipToken).map(func(n): return (n as UiChipToken).value)
+	var chips := P0Blackjack.chips_for(1785)
+	assert_array(flown).is_equal(chips.slice(chips.size() - P0Blackjack.CIRCLE_MAX))
