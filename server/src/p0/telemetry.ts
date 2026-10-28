@@ -3,9 +3,13 @@
  * command — what was asked, from where and how (hold / tap), the result or refusal, every Energy change with its
  * reason, XP, levels and first-time moments — plus the few UI moments only the client sees (teaching cards, the
  * four-line cards, Today rows done). It pays nothing out and records no real-world position or account details.
+ * Since C25-4 (user, 10-28) every line also carries `ip`: the address P0 takes for the request (req.ip — behind Caddy
+ * with P0_TRUST_PROXY=1 the one Caddy appended, never what a client wrote into X-Forwarded-For).
  * Files: <dir>/p0-events-YYYY-MM-DD.jsonl (UTC wall-clock day); no dir = nothing written (tests pass a sink).
+ * Kept: P0_EVENT_KEEP_DAYS=N removes day files older than N days when a new day's first line is written; unset keeps
+ * every file, as before.
  */
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import type { P0Event } from './progress.js';
 
@@ -35,10 +39,10 @@ function flat(v: unknown): string | number | boolean | undefined {
 }
 
 export interface CommandRecord {
-  kind: 'command'; t: number; clock: number; player: string; seq: number; cmd: Record<string, unknown>;
+  kind: 'command'; t: number; clock: number; player: string; ip?: string; seq: number; cmd: Record<string, unknown>;
   ok: boolean; code?: string; detail?: unknown; energy: [number, number]; events: P0Event[];
 }
-export interface UiRecord { kind: 'ui'; t: number; player: string; event: Record<string, unknown> }
+export interface UiRecord { kind: 'ui'; t: number; player: string; ip?: string; event: Record<string, unknown> }   // ip: C25-4; absent in lines written before it
 export type LogRecord = CommandRecord | UiRecord;
 
 /**
@@ -47,7 +51,9 @@ export type LogRecord = CommandRecord | UiRecord;
  */
 export class P0EventLog {
   private broken = false;
-  constructor(private dir?: string, private sink?: (r: LogRecord) => void, private warn: (msg: string) => void = m => console.warn(m)) {
+  private day = '';
+  constructor(private dir?: string, private sink?: (r: LogRecord) => void, private warn: (msg: string) => void = m => console.warn(m),
+    private keepDays?: number) {
     if (dir) {
       try { mkdirSync(dir, { recursive: true }); } catch (err) { this.stop(err); }
     }
@@ -55,12 +61,24 @@ export class P0EventLog {
   write(record: LogRecord): void {
     try { this.sink?.(record); } catch { /* a test sink never breaks a command either */ }
     if (!this.dir || this.broken) return;
-    const file = path.join(this.dir, `p0-events-${new Date(record.t).toISOString().slice(0, 10)}.jsonl`);
+    const day = new Date(record.t).toISOString().slice(0, 10);
+    if (day !== this.day) { this.day = day; if (this.keepDays) this.prune(day); }
+    const file = path.join(this.dir, `p0-events-${day}.jsonl`);
     const line = JSON.stringify(record) + '\n';
     try { appendFileSync(file, line); return; } catch { /* the folder may be gone: recreate it once */ }
     try { mkdirSync(this.dir, { recursive: true }); appendFileSync(file, line); } catch (err) { this.stop(err); }
   }
   get stopped(): boolean { return this.broken; }
+  /** Day files older than keepDays before `today`; never this log's other files. A failure here never stops the log. */
+  private prune(today: string): void {
+    const oldest = new Date(Date.parse(today + 'T00:00:00Z') - this.keepDays! * 86_400_000).toISOString().slice(0, 10);
+    try {
+      for (const f of readdirSync(this.dir!)) {
+        const m = /^p0-events-(\d{4}-\d{2}-\d{2})\.jsonl$/.exec(f);
+        if (m && m[1] < oldest) rmSync(path.join(this.dir!, f), { force: true });
+      }
+    } catch { /* the folder may be gone: write() recreates it */ }
+  }
   private stop(err: unknown): void {
     this.broken = true;
     this.warn(`[p0] observation log stopped (${this.dir}): ${err instanceof Error ? err.message : String(err)}`);

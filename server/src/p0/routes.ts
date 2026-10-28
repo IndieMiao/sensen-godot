@@ -137,7 +137,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     // Energy before = the stored value with natural recovery up to now, as the command saw it (a refusal: both the same).
     const before = { ...s, energy: { ...s.energy } };
     settleEnergy(c, before, now);
-    deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
+    deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, ip: req.ip, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
       ...(result.ok ? {} : { code: result.code, detail: result.detail ?? {} }),
       energy: [before.energy.value, result.ok ? result.state.energy.value : before.energy.value], events: result.ok ? result.events : [] });
     if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now) });
@@ -161,7 +161,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       const n = uiSeen.get(player) ?? 0;
       if (!event || n >= UI_PER_MINUTE || uiTotal >= UI_ALL_PER_MINUTE) continue;
       uiSeen.set(player, n + 1); uiTotal += 1; accepted += 1;
-      deps.log?.write({ kind: 'ui', t, player, event });
+      deps.log?.write({ kind: 'ui', t, player, ip: req.ip, event });
     }
     return reply.send({ ok: true, accepted });
   });

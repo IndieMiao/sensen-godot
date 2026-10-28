@@ -1,6 +1,6 @@
 /** SGODOT-232 S7: the observation log (one line per command, plus reported UI moments) and the session report. */
 import Fastify from 'fastify';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -9,6 +9,7 @@ import { registerP0Routes } from '../../src/p0/routes.js';
 import { P0Store } from '../../src/p0/store.js';
 import { settleEnergy } from '../../src/p0/rules.js';
 import { commandFields, P0EventLog, uiEvent, type LogRecord } from '../../src/p0/telemetry.js';
+import { trustProxyFromEnv } from '../../src/p0/guard.js';
 import { parseRecords, sessionReport } from '../../tools/p0_session_report.js';
 
 const c = loadP0Content();
@@ -47,8 +48,8 @@ describe('observation log (§14.8.1, §17.2.2; SGODOT-232 S7)', () => {
       expect(r.json()).toEqual({ ok: true, accepted: 2 });
       // only the kind's own fields, strings cut to 64; nested values and anything like a position dropped
       expect(records).toEqual([
-        { kind: 'ui', t: T0, player: 'telemetry-player', event: { kind: 'tip_shown', key: 's'.repeat(64) } },
-        { kind: 'ui', t: T0, player: 'telemetry-player', event: { kind: 'card_shown' } }]);
+        { kind: 'ui', t: T0, player: 'telemetry-player', ip: '127.0.0.1', event: { kind: 'tip_shown', key: 's'.repeat(64) } },
+        { kind: 'ui', t: T0, player: 'telemetry-player', ip: '127.0.0.1', event: { kind: 'card_shown' } }]);
       for (let i = 0; i < 7; i++) await app.inject({ method: 'POST', url: '/v1/p0/telemetry', headers, payload: { events: Array(20).fill({ kind: 'screen' }) } });
       expect(records.length).toBe(120);   // 2 + 118 more this minute
       tick(60_000);
@@ -183,5 +184,47 @@ describe('reading the log (PR #23 review)', () => {
     expect(records).toHaveLength(2);
     expect(skipped).toBe(2);
     expect(sessionReport(records)[0]).toMatchObject({ player: 'p-reader-01', first: { commands: 1 } });
+  });
+
+  // C25-4 (user, 10-28): every line carries the player's address — the one P0 takes, never what a client wrote.
+  it('records ip: behind Caddy the address Caddy appended, a forged X-Forwarded-For in front ignored', async () => {
+    const records: LogRecord[] = [];
+    const app = Fastify({ ...trustProxyFromEnv({ P0_TRUST_PROXY: '1' }) });
+    registerP0Routes(app, { content: c, store: new P0Store(c), now: () => T0, dev: false, log: new P0EventLog(undefined, r => records.push(r)) });
+    try {
+      const xff = { ...headers, 'x-forwarded-for': '6.6.6.6, 203.0.113.9' };
+      await app.inject({ method: 'POST', url: '/v1/p0/commands', remoteAddress: '127.0.0.1', headers: xff, payload: { type: 'rest' } });
+      await app.inject({ method: 'POST', url: '/v1/p0/telemetry', remoteAddress: '127.0.0.1', headers: xff, payload: { events: [{ kind: 'screen', name: 'farm' }] } });
+      expect(records.map(r => [r.kind, r.ip])).toEqual([['command', '203.0.113.9'], ['ui', '203.0.113.9']]);
+      expect(JSON.stringify(records)).not.toContain('6.6.6.6');
+    } finally { await app.close(); }
+  });
+
+  it('records ip: on a directly published port (no P0_TRUST_PROXY) the socket address, the header ignored', async () => {
+    await withServer(async (app, records) => {
+      await app.inject({ method: 'POST', url: '/v1/p0/commands', remoteAddress: '192.0.2.4', headers: { ...headers, 'x-forwarded-for': '6.6.6.6' }, payload: { type: 'rest' } });
+      expect(records[0]).toMatchObject({ kind: 'command', ip: '192.0.2.4' });
+    });
+  });
+
+  it('the session report reads lines with and without ip (old days stay readable)', () => {
+    const base = { kind: 'command', t: T0, clock: T0, player: 'p-ip-compat', seq: 0, cmd: { type: 'rest' }, ok: true, energy: [200, 200], events: [] };
+    const { records, skipped } = parseRecords([JSON.stringify(base), JSON.stringify({ ...base, seq: 1, ip: '203.0.113.9' })].join('\n'));
+    expect(skipped).toBe(0);
+    expect(records).toHaveLength(2);
+  });
+
+  it('P0_EVENT_KEEP_DAYS: a new day removes day files older than N days; unset keeps them all', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'p0-events-'));
+    try {
+      const events = path.join(dir, 'events');
+      mkdirSync(events);
+      for (const f of ['p0-events-2026-09-01.jsonl', 'p0-events-2026-09-07.jsonl', 'p0-events-2026-09-08.jsonl', 'notes.txt']) writeFileSync(path.join(events, f), '');
+      new P0EventLog(events).write({ kind: 'ui', t: T0, player: 'p', event: { kind: 'screen' } });
+      expect(readdirSync(events)).toHaveLength(5);   // unset: nothing removed
+      new P0EventLog(events, undefined, undefined, 30).write({ kind: 'ui', t: T0, player: 'p', event: { kind: 'screen' } });   // T0 is 2026-10-08
+      expect(readdirSync(events).sort()).toEqual(['notes.txt', 'p0-events-2026-09-08.jsonl', 'p0-events-2026-10-08.jsonl']);
+      expect(existsSync(path.join(events, 'p0-events-2026-09-07.jsonl'))).toBe(false);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 });

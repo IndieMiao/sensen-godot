@@ -59,7 +59,10 @@ else if (!dev) { setBlackjackSecret(randomBytes(32).toString('hex')); console.wa
 setBlackjackTable(bjTableFromEnv(process.env.P0_BJ_TABLE));
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
 const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
-const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
+// P0_EVENT_KEEP_DAYS: how many days of day files to keep (the lines carry players' IPs since C25-4); unset = all, as before.
+const keepRaw = Number(process.env.P0_EVENT_KEEP_DAYS ?? ''), eventKeepDays = Number.isInteger(keepRaw) && keepRaw >= 1 && keepRaw <= 3650 ? keepRaw : undefined;
+if (process.env.P0_EVENT_KEEP_DAYS && !eventKeepDays) console.warn(JSON.stringify({ warn: 'P0_EVENT_KEEP_DAYS is not a whole number of days 1–3650: every file kept' }));
+const log = new P0EventLog(eventDir === '' ? undefined : eventDir, undefined, undefined, eventKeepDays);
 // Outpost rooms (SGODOT-227): WebSocket /v1/p0/online and GET /v1/p0/presence, in memory only. The same rooms
 // give the Tea Host's "N online" in the state view (SGODOT-228).
 // Generated outposts (SGODOT-280) get a room on first join, sized and walled like the room their art stands in for.
@@ -92,7 +95,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
