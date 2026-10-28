@@ -3645,19 +3645,32 @@ func _show_tip(text: String, key := "") -> void:
 	_teach_left = P0Guide.tip_seconds(text)
 
 ## Where the TipCard sits (不知火舞 on 232, TUT-1-2 / TUT-3-04B / TUT-3-07B): centred; its top 120 under HUD row 2,
-## clear of the joystick's centre, the main action key and the quick bar; with the kitchen open, just above its drawer
-## (the stage stays visible). The Toast (bottom left) and the TipCard can show together and never move for each other.
+## clear of the joystick's centre, the main action key and the quick bar. In the kitchen it sits where q(16)'s toast
+## does (不知火舞 on 341 a143f140): 8 over the top of the stove drawer, or of the watch sheet's × above the sheet, at
+## x 16 — clear of the stove, the heat ring and the plate. The Toast and the TipCard can show together.
 const TIP_BELOW_HUD := 120.0
 func _place_tip() -> void:
 	if _teach == null: return
 	var h := _teach.get_combined_minimum_size().y
 	var x := (root.size.x - UiTipCard.WIDTH) * 0.5
 	var y := hud.today_chip_rect().end.y - root.global_position.y + TIP_BELOW_HUD
-	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
-	if modal_kind == "kitchen" and content != null and content.is_visible_in_tree():
-		y = content.get_global_rect().position.y - root.global_position.y - UiTokens.SPACE_OVERLAY_BODY - h
+	var dock := _tip_dock()
+	if is_finite(dock):
+		x = UiTokens.SPACE_PAGE
+		y = dock - UiTokens.SPACE_OVERLAY_BODY - h
 	_teach.position = Vector2(x, y)
 	_teach.size = Vector2(UiTipCard.WIDTH, h)
+
+## The top edge (in root's space) a kitchen TipCard sits over: the stove drawer itself — not the full-screen wrap the
+## kitchen opens as the modal, whose top is the screen's (S8, 蒙恬: `Tap Cook to grill your first fish` went off the top
+## and timed out unseen) — or, watching a pot with no modal, the sheet's × (the toast's dock, set_toast_over). INF: none.
+func _tip_dock() -> float:
+	if modal_kind == "kitchen" and _modal != null:
+		for d in _modal.find_children("*", "P0KitchenDrawer", true, false):
+			if (d as Control).is_visible_in_tree(): return (d as Control).get_global_rect().position.y - root.global_position.y
+	if _modal == null and _toast_over != null and is_instance_valid(_toast_over) and _toast_over.is_visible_in_tree():
+		return _toast_over.get_global_rect().position.y - root.global_position.y
+	return INF
 
 # ---------------------------------------------------------------- result moments (SGODOT-233, q(49) / §4.8.6)
 ## A RewardMoment (哪吒's kit card) on its own: one at a time through queue_card (q(49) ④). Without buttons it folds
