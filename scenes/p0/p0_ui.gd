@@ -3641,36 +3641,39 @@ func _show_tip(text: String, key := "") -> void:
 		root.add_child(_teach)
 	_teach.show_tip(text, P0Logic.icon(str(TIP_ICONS[key])) if TIP_ICONS.has(key) else null)
 	_teach.show()
+	# The card is made once and kept: one made on the farm sat under a drawer opened since (the kitchen's preview card
+	# covered `Tap Cook to grill your first fish`, S8, 蒙恬). Each tip comes to the front of every card, drawer and sheet
+	# (不知火舞 on 341); only a dialog opened after it covers it; toasts and the system line stay over it.
+	root.move_child(_teach, -1)
+	if _toasts != null and _toasts.get_parent() == root: root.move_child(_toasts, -1)
+	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)
 	_place_tip()
 	_teach_left = P0Guide.tip_seconds(text)
 
 ## Where the TipCard sits (不知火舞 on 232, TUT-1-2 / TUT-3-04B / TUT-3-07B): centred; its top 120 under HUD row 2,
-## clear of the joystick's centre, the main action key and the quick bar. In the kitchen it sits where q(16)'s toast
-## does (不知火舞 on 341 a143f140): 8 over the top of the stove drawer, or of the watch sheet's × above the sheet, at
-## x 16 — clear of the stove, the heat ring and the plate. The Toast and the TipCard can show together.
+## clear of the joystick's centre, the main action key and the quick bar. In the kitchen (不知火舞 on 341), at x 16:
+## with the stove drawer open, 8 under HUD row 2 — not on the drawer, whose preview card stands above it; watching a
+## pot, 8 over the watch sheet's × (q(16)'s toast dock) — clear of the stove, the heat ring and the plate.
 const TIP_BELOW_HUD := 120.0
 func _place_tip() -> void:
 	if _teach == null: return
 	var h := _teach.get_combined_minimum_size().y
+	var under_hud := hud.today_chip_rect().end.y - root.global_position.y
 	var x := (root.size.x - UiTipCard.WIDTH) * 0.5
-	var y := hud.today_chip_rect().end.y - root.global_position.y + TIP_BELOW_HUD
-	var dock := _tip_dock()
-	if is_finite(dock):
+	var y := under_hud + TIP_BELOW_HUD
+	if _kitchen_drawer_open():
 		x = UiTokens.SPACE_PAGE
-		y = dock - UiTokens.SPACE_OVERLAY_BODY - h
+		y = under_hud + UiTokens.SPACE_OVERLAY_BODY
+	elif _modal == null and _toast_over != null and is_instance_valid(_toast_over) and _toast_over.is_visible_in_tree():
+		x = UiTokens.SPACE_PAGE
+		y = _toast_over.get_global_rect().position.y - root.global_position.y - UiTokens.SPACE_OVERLAY_BODY - h
 	_teach.position = Vector2(x, y)
 	_teach.size = Vector2(UiTipCard.WIDTH, h)
 
-## The top edge (in root's space) a kitchen TipCard sits over: the stove drawer itself — not the full-screen wrap the
-## kitchen opens as the modal, whose top is the screen's (S8, 蒙恬: `Tap Cook to grill your first fish` went off the top
-## and timed out unseen) — or, watching a pot with no modal, the sheet's × (the toast's dock, set_toast_over). INF: none.
-func _tip_dock() -> float:
-	if modal_kind == "kitchen" and _modal != null:
-		for d in _modal.find_children("*", "P0KitchenDrawer", true, false):
-			if (d as Control).is_visible_in_tree(): return (d as Control).get_global_rect().position.y - root.global_position.y
-	if _modal == null and _toast_over != null and is_instance_valid(_toast_over) and _toast_over.is_visible_in_tree():
-		return _toast_over.get_global_rect().position.y - root.global_position.y
-	return INF
+## The stove drawer is on screen (the kitchen opens it inside a full-screen wrap: the drawer itself, not the wrap).
+func _kitchen_drawer_open() -> bool:
+	if modal_kind != "kitchen" or _modal == null: return false
+	return _modal.find_children("*", "P0KitchenDrawer", true, false).any(func(d): return (d as Control).is_visible_in_tree())
 
 # ---------------------------------------------------------------- result moments (SGODOT-233, q(49) / §4.8.6)
 ## A RewardMoment (哪吒's kit card) on its own: one at a time through queue_card (q(49) ④). Without buttons it folds

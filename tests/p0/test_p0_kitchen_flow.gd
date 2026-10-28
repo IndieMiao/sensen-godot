@@ -838,8 +838,9 @@ func test_the_heat_hint_reads_the_tip_and_waits_while_the_tip_shows() -> void:
 	assert_float(hint.modulate.a).is_equal(1.0)
 	k.stop_watching()
 
-## In the kitchen the TipCard sits where q(16)'s toast does (不知火舞 on 341 a143f140): 8 over the stove drawer's top at
-## x 16 — S8: it used to take the full-screen wrap's top and land off the screen — and, watching, 8 over the sheet's ×.
+## In the kitchen the TipCard sits at x 16 (不知火舞 on 341): with the drawer open, 8 under HUD row 2 — S8: it used to
+## take the full-screen wrap's top and land off the screen, then sat on the drawer under its preview card — and,
+## watching, 8 over the sheet's ×.
 func test_the_kitchen_tip_sits_over_the_drawer_and_over_the_watch_sheet() -> void:
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
@@ -849,10 +850,10 @@ func test_the_kitchen_tip_sits_over_the_drawer_and_over_the_watch_sheet() -> voi
 	rt.ui._show_tip(P0Guide.TIPS.cook, "cook")
 	await get_tree().process_frame
 	var tip: Control = rt.ui._teach
-	var drawer: Control = rt.ui._modal.find_children("*", "P0KitchenDrawer", true, false)[0]
 	var root_y := rt.ui.root.global_position.y
 	assert_float(tip.position.y).is_greater_equal(0.0)   # on the screen
-	assert_float(tip.position.y + tip.size.y).is_equal_approx(drawer.get_global_rect().position.y - root_y - 8.0, 0.5)
+	# 8 under HUD row 2, not on the drawer (its preview card stands over the drawer; 不知火舞 on 341)
+	assert_float(tip.position.y).is_equal_approx(rt.ui.hud.today_chip_rect().end.y - root_y + 8.0, 0.5)
 	assert_float(tip.position.x).is_equal(16.0)
 	rt.ui._hide_tip()
 	rt.ui.close_modal()
@@ -868,3 +869,21 @@ func test_the_kitchen_tip_sits_over_the_drawer_and_over_the_watch_sheet() -> voi
 	assert_float(tip.position.x).is_equal(16.0)
 	rt.ui._hide_tip()
 	k.stop_watching()
+
+## S8 (蒙恬 on 341 598b13cb): a TipCard made earlier on the farm was kept under the kitchen drawer opened since, and the
+## drawer's preview card covered `Tap Cook to grill your first fish`. Each tip comes to the front, under the toasts.
+func test_a_tip_card_made_before_the_kitchen_shows_over_its_drawer() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	rt.ui._show_tip(P0Guide.TIPS.sow, "sow")   # the farm's tip: the card is made now
+	rt.ui._hide_tip()
+	k.open("cookbook")
+	await await_millis(600)
+	rt.ui._show_tip(P0Guide.TIPS.cook, "cook")
+	await get_tree().process_frame
+	var tip: Control = rt.ui._teach
+	assert_int(tip.get_index()).is_greater(rt.ui._modal.get_index())
+	assert_int(rt.ui._toasts.get_index()).is_greater(tip.get_index())
+	rt.ui._hide_tip()
+	rt.ui.close_modal()
