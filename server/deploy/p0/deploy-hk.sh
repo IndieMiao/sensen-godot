@@ -34,11 +34,15 @@
 # migration side; contract in pm/migration/p0-migration-decision-2026-10-27.md, E answer 8). Without it every step is
 # the Hong Kong one, unchanged. On us:
 #   login       ssh -F $P0_US_SSH_CONFIG $P0_US_HOST (default the migration side's ssh_config, host tgt-us-p0)
-#   compose     $REMOTE/compose.production.json, project liusen-p0-staging; the container is p0-p0-1 again
-#   settings    in that compose file (mode 600), kept by the migration side: `up` changes only the p0-server image
-#               string in it (a dated copy first) and writes no .env / .env.p0 and no key
-#   transfer    an archive on this Mac → sha256 → $P0_US_STAGING → sha256 again → docker load; the archive's config
-#               digest must equal the image ID US docker reports (both IDs go to image.txt)
+#   compose     $REMOTE/compose.production.json; the service and the container are both p0-p0-1
+#   settings    in that compose file (mode 600), kept by the migration side: `up` changes only
+#               services["p0-p0-1"].image in it (a dated copy first; the rest must parse the same) and writes no
+#               .env / .env.p0 and no key; then it reminds you to send the new tag / config to the migration side,
+#               whose Caddy answers the X-P0-Release / X-P0-Image-Config headers
+#   transfer    an archive on this Mac → sha256 → $P0_US_STAGING (default …/p0/staging, made 0700, archive 0600;
+#               never under the production data) → sha256 again → docker load; the archive's config digest must
+#               equal the image ID US docker reports (both IDs go to image.txt), and `up` takes only a tag a
+#               transfer checked this way
 #   verify-internal  the host's loopback Caddy (127.0.0.1:18090), with the X-P0-* response headers
 #   report      p0-report.sh streamed over ssh (nothing copied)
 #   preflight / build / smoke / stats / players / energy / maint-on / maint-off / min-version / gate / clean-devserver
@@ -66,9 +70,15 @@ if [ "$TARGET" = us ]; then
   HK="${P0_US_HOST:-tgt-us-p0}"
   REMOTE=/srv/migration-data/services/p0
   US_COMPOSE=compose.production.json
-  US_PROJECT=liusen-p0-staging
+  US_SERVICE=p0-p0-1   # the service key and the container name (迁移方, D2 point 4)
   US_DATA=/srv/migration-data/services/p0/production/20261029/data
   US_STAGING="${P0_US_STAGING:-/srv/migration-data/services/p0/staging}"
+  case "$US_STAGING" in
+    /*) ;; *) echo "P0_US_STAGING must be an absolute path: $US_STAGING"; exit 2 ;;
+  esac
+  case "$US_STAGING/" in
+    */../*|*/./*|"$US_DATA"/*|/srv/migration-data/services/p0/production/*|/) echo "P0_US_STAGING may not be $US_STAGING"; exit 2 ;;
+  esac
   HOST_OPTS=(-F "${P0_US_SSH_CONFIG:-$HOME/.local/share/aliyun-migrations/liusen-20261026/private/ssh_config}" "${SSH_OPTS[@]}")
   out="$out/us"
 fi
@@ -136,51 +146,62 @@ PY
 )
       { echo "source p0-server:$sha $(dev "docker images --no-trunc p0-server:$sha --format '{{.ID}}'")"
         echo "archive $(basename "$arc") sha256 $sum config $cfg"; } | tee -a "$out/image.txt"
-      say "→ $HK:$US_STAGING, sha256 there, docker load"
-      hk "mkdir -p $US_STAGING"
+      say "→ $HK:$US_STAGING (0700, the archive 0600), sha256 there, docker load"
+      hk "install -d -m 700 $US_STAGING"
       scp "${HOST_OPTS[@]}" -q "$arc" "$HK:$US_STAGING/"
-      hk "cd $US_STAGING && echo '$sum  $(basename "$arc")' | sha256sum -c - && gunzip -c $(basename "$arc") | docker load"
+      hk "cd $US_STAGING && chmod 600 $(basename "$arc") && echo '$sum  $(basename "$arc")' | sha256sum -c - && gunzip -c $(basename "$arc") | docker load"
       id=$(hk "docker image inspect p0-server:$sha --format '{{.Id}}'")
-      echo "us p0-server:$sha $id" | tee -a "$out/image.txt"
       [ "$id" = "$cfg" ] || { echo "FAIL: US image ID $id is not the archive's config $cfg" >&2; exit 1; }
+      echo "us p0-server:$sha $id" | tee -a "$out/image.txt"   # written only once checked: up looks for this line
       exit 0 ;;
     up)
       sha="${1:?up <sha>}"
+      [[ "$sha" =~ ^[0-9a-f]{7,40}$ ]] || { echo "bad sha: $sha"; exit 2; }
+      # Only a tag a transfer here checked: its line in some day's us/image.txt, and US docker still reports that ID.
+      want=$({ cat "$repo"/output/p0-deploy/*/us/image.txt 2>/dev/null || true; } | sed -n "s/^us p0-server:$sha //p" | tail -1)
+      [ -n "$want" ] || { echo "no checked transfer of p0-server:$sha in output/p0-deploy/*/us/image.txt: run transfer first" >&2; exit 1; }
+      id=$(hk "docker image inspect p0-server:$sha --format '{{.Id}}'")
+      [ "$id" = "$want" ] || { echo "FAIL: US p0-server:$sha is $id, the transfer checked $want" >&2; exit 1; }
       ts=$(date +%Y%m%dT%H%M%S)
-      say "image p0-server:$sha into $HK:$REMOTE/$US_COMPOSE (only the image string; a copy first)"
-      # The settings in the file stay byte for byte: the one JSON string "p0-server:<old>" of the one service that
-      # runs p0-server is replaced, so no key is read, written or printed here.
-      hk "cd $REMOTE && cp -p $US_COMPOSE $US_COMPOSE.before-$sha-$ts && python3 - $US_COMPOSE $sha" <<'PY' | tee -a "$out/up.txt"
-import json, os, sys
-path, sha = sys.argv[1], sys.argv[2]
+      say "services[\"$US_SERVICE\"].image → p0-server:$sha in $HK:$REMOTE/$US_COMPOSE (a copy first)"
+      # The settings in the file stay byte for byte: only the one JSON string that is services["p0-p0-1"].image is
+      # replaced, it must be in the file once, and the result must parse to the same document but for that field.
+      # No key is read, written or printed here.
+      hk "cd $REMOTE && cp -p $US_COMPOSE $US_COMPOSE.before-$sha-$ts && python3 - $US_COMPOSE $US_SERVICE $sha" <<'PY' | tee -a "$out/up.txt"
+import copy, json, os, sys
+path, name, sha = sys.argv[1], sys.argv[2], sys.argv[3]
 raw = open(path).read()
-hits = [(k, v['image']) for k, v in json.loads(raw).get('services', {}).items()
-        if str(v.get('image', '')).startswith('p0-server:')]
-if len(hits) != 1: sys.exit(f'expected one p0-server service, found {len(hits)}')
-name, old = hits[0]
+doc = json.loads(raw)
+svc = doc.get('services', {}).get(name)
+if not isinstance(svc, dict): sys.exit(f'no services["{name}"] in {path}')
+old = svc.get('image')
+if not isinstance(old, str) or not old or '$' in old: sys.exit(f'services["{name}"].image is not a plain string: {old!r}')
 lit = json.dumps(old)
-if raw.count(lit) != 1: sys.exit(f'{lit} is not in the file exactly once')
+if raw.count(lit) != 1: sys.exit(f'{lit} is in the file {raw.count(lit)} times, not once')
+new_raw = raw.replace(lit, json.dumps('p0-server:' + sha))
+want = copy.deepcopy(doc); want['services'][name]['image'] = 'p0-server:' + sha
+if json.loads(new_raw) != want: sys.exit('the edit changed more than services["%s"].image' % name)
 tmp = path + '.tmp'
-with open(tmp, 'w') as f: f.write(raw.replace(lit, json.dumps('p0-server:' + sha)))
+with open(tmp, 'w') as f: f.write(new_raw)
 os.chmod(tmp, os.stat(path).st_mode & 0o777)
 os.replace(tmp, path)
-print(f'service {name}: {old} -> p0-server:{sha}')
+print(f'services["{name}"].image: {old} -> p0-server:{sha}')
 PY
-      svc=$(sed -n 's/^service \([^:]*\):.*/\1/p' "$out/up.txt" | tail -1)
-      say "compose up $svc only (project $US_PROJECT)"
-      hk "cd $REMOTE && docker compose -p $US_PROJECT -f $US_COMPOSE up -d --no-deps $svc"
+      say "compose up $US_SERVICE only"
+      hk "docker compose -f $REMOTE/$US_COMPOSE up -d --no-deps $US_SERVICE"
       say "wait for healthy"
       for _ in $(seq 1 40); do
-        st=$(hk "docker inspect --format '{{.State.Health.Status}}' p0-p0-1" 2>/dev/null || echo starting)
+        st=$(hk "docker inspect --format '{{.State.Health.Status}}' $US_SERVICE" 2>/dev/null || echo starting)
         [ "$st" = healthy ] && break
-        [ "$st" = unhealthy ] && { hk "cd $REMOTE && docker compose -p $US_PROJECT -f $US_COMPOSE logs --tail 40 $svc"; exit 1; }
+        [ "$st" = unhealthy ] && { hk "docker compose -f $REMOTE/$US_COMPOSE logs --tail 40 $US_SERVICE"; exit 1; }
         sleep 3
       done
       [ "$st" = healthy ] || { echo "still $st after 2 minutes"; exit 1; }
       # Never a rehearsal copy under production's name: /data must be the production directory.
-      src=$(hk "docker inspect --format '{{range .Mounts}}{{if eq .Destination \"/data\"}}{{.Source}}{{end}}{{end}}' p0-p0-1")
+      src=$(hk "docker inspect --format '{{range .Mounts}}{{if eq .Destination \"/data\"}}{{.Source}}{{end}}{{end}}' $US_SERVICE")
       [ "$src" = "$US_DATA" ] || { echo "FAIL: /data is $src, not $US_DATA" >&2; exit 1; }
-      echo "p0-p0-1 healthy, /data = $src"
+      echo "$US_SERVICE healthy, /data = $src"
+      echo "NEXT: send p0-server:$sha / $id to the migration side: their Caddy answers X-P0-Release / X-P0-Image-Config"
       exit 0 ;;
     verify-internal)
       say "on $HK: http://127.0.0.1:18090/preview/p0/v1/healthz (the loopback Caddy), with headers"

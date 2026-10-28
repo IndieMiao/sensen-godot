@@ -78,8 +78,9 @@
 10-29 起 P0 的权威服务在美西 `43.110.146.219`（由迁移方运维；约定见 pm/migration/p0-migration-decision-2026-10-27.md 的「E 答复」第 8 项）。客户端地址不变，仍是 `https://farm.sensenjoy.cn/preview/p0/v1`，由 farm 的入口转发到美西。
 
 - 每个步骤前加 `--target us`，例如 `server/deploy/p0/deploy-hk.sh --target us up <sha>`。不加就是香港，行为和原来逐字一致。
-- 登录用迁移方的 ssh_config（`P0_US_SSH_CONFIG`，主机 `P0_US_HOST`，默认 `tgt-us-p0`）。镜像压缩包的暂存目录用 `P0_US_STAGING`。
-- 美西的设置写在迁移方维护的 `compose.production.json`（权限 600）里。`up` 只改其中 p0-server 那一处镜像字符串，改前先留一份带日期的副本；不写 .env / .env.p0，也不生成密钥。
+- 登录用迁移方的 ssh_config（`P0_US_SSH_CONFIG`，主机 `P0_US_HOST`，默认 `tgt-us-p0`）。镜像压缩包的暂存目录默认 `/srv/migration-data/services/p0/staging`（首次 transfer 建成 0700，压缩包 0600），用 `P0_US_STAGING` 改，必须是绝对路径，不能在正式数据目录下。
+- 美西的设置写在迁移方维护的 `compose.production.json`（权限 600）里，服务名和容器名都是 `p0-p0-1`，镜像是写死的字符串。`up` 只改 `services["p0-p0-1"].image` 这一处：改前留一份带日期的副本；这个字符串在文件里必须只出现一次；改完重新解析，除这个字段外必须和原来完全一样；保留权限，原子替换。然后只执行 `docker compose -f …/compose.production.json up -d --no-deps p0-p0-1`。不写 .env / .env.p0，也不生成密钥。`up` 只接受 transfer 核过的 tag。
+- 美西的 X-P0-Release / X-P0-Image-Config 响应头是迁移方的 Caddy 给的。`up` 完会提示把新 tag 和 config ID 报给迁移方，由他们同步。
 - `transfer` 先在本机做压缩包并记 SHA-256，传到美西后再核一次；美西 docker 报出的镜像 ID 必须等于压缩包里的 config 摘要。两个 ID 都记进 image.txt。
 - `up` 之后会核对 `/data` 挂的是正式数据目录，不是就报错。
 - `backup-caddy`、`caddy`、`crontab`、`rollback` 只有香港有。美西的 Caddy、备份和转发归迁移方。
