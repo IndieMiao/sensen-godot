@@ -407,6 +407,7 @@ static func experiment_items(view_: Dictionary, pot: Array, chip := "All") -> Ar
 		racked[r.id] = true
 	for raw in order:
 		var id := str(raw)
+		if not P0Logic.fast_crop(view, id).is_empty(): continue
 		var info := P0Logic.item(view, id)
 		if racked.has(id) and info.is_empty(): info = {cook = true, family = "S", rarity = 1}   # stored only: a Common seasoning
 		var cookable := bool(info.get("cook", false))
@@ -422,6 +423,7 @@ static func experiment_items(view_: Dictionary, pot: Array, chip := "All") -> Ar
 
 ## Whether one more `id` can go in the pot: a free slot and one left in the bag.
 static func can_add(view_: Dictionary, pot: Array, id: String) -> bool:
+	if not P0Logic.fast_crop(view_, id).is_empty(): return false
 	var view := with_rack(view_)
 	if pot.size() >= slots(view): return false
 	var on_rack := int(stock(view).get(id, 0)) - P0Logic.bag_count(view, id)

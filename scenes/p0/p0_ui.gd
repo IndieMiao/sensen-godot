@@ -1483,7 +1483,8 @@ static func _float_line_text(parts: Dictionary) -> String:
 	return " · ".join(parts.values().map(func(p: Dictionary) -> String:
 		if not p.has("fmt"): return str(p.get("text", ""))
 		var a := int(p.get("amount", 0))
-		var line := str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))
+		var fmt := str(p.get("fmt_plural", p.fmt)) if absi(a) > 1 else str(p.fmt)   # fast crops, including held/merged harvests
+		var line := fmt % (("+%d" % a) if a >= 0 else ("−%d" % -a))
 		# A held harvest's XP counts its plants once more than one went into it: `+40 XP · 20 plants`.
 		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
 		if str(p.get("tail", "")) != "": line += " · " + str(p.tail)   # Harvest ×N's `· First harvest` (q(124) ②)

@@ -2,7 +2,7 @@ class_name P0Notify
 extends RefCounted
 ## The crop-ready local notification (q(236), SGODOT-350; Android first): when the app goes to the background, one
 ## notification at the soonest growing plot's time; none when nothing is growing; back in front, all cancelled. The
-## phone's own, never the server's. A teaching seed (the Quick Radish, q(217)) takes no part (⑥).
+## phone's own, never the server's. Teaching seeds and sale-only fast crops take no part (q(236) ⑥ / q(245)).
 
 const BODY := "Your farm is waiting."
 const CHANNEL := "Crops ready"   # the Android channel, the same name as the Settings switch (⑤)
@@ -20,7 +20,7 @@ static func plan(view: Dictionary, now_ms: float, bias_min: int) -> Dictionary:
 	for p in view.get("plots", []):
 		var c := str(p.get("crop", ""))
 		if str(p.get("state", "")) != "growing" or p.get("ready_in", null) == null: continue
-		if not P0Logic.quick_seed(view, c).is_empty(): continue
+		if not P0Logic.quick_seed(view, c).is_empty() or not P0Logic.fast_crop(view, c).is_empty(): continue
 		growing[c] = int(growing.get(c, 0)) + 1
 		if not ripe.has(c) or float(p.ready_in) < float(ripe[c]): ripe[c] = float(p.ready_in)
 	if ripe.is_empty(): return {}
@@ -159,5 +159,5 @@ static func ask_question(view: Dictionary) -> String:
 		var c := str(p.get("crop", ""))
 		if str(p.get("state", "")) != "growing": continue
 		if guided and c == "crop_radish": return ASK_RADISHES
-		if not guided and P0Logic.quick_seed(view, c).is_empty(): return ASK_CROPS
+		if not guided and P0Logic.quick_seed(view, c).is_empty() and P0Logic.fast_crop(view, c).is_empty(): return ASK_CROPS
 	return ""

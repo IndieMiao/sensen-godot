@@ -66,7 +66,12 @@ const CROP_CODES := {
 	"crop_pumpkin": "M", "crop_pineapple": "B", "crop_sweet_potato": "P", "crop_beet": "C",
 	"crop_apple": "T", "crop_citrus": "T", "crop_grape": "B",
 	"crop_quick_radish": "R",   # q(217): the teaching seed's Quick Radish grows as a radish
+	"crop_cress": "B", "crop_pea_shoots": "B", "crop_spinach": "L", "crop_scallion": "B", "crop_bok_choy": "L",
 }
+
+## q(245) stand-ins (354 f31fe553): Scallion uses B because mature C exposes an orange root; no new meshes.
+const FAST_TINTS := {"crop_cress": Color(0.82, 1.0, 0.62), "crop_pea_shoots": Color(0.68, 1.0, 0.90),
+	"crop_spinach": Color(0.63, 0.82, 0.70), "crop_scallion": Color(0.92, 1.0, 0.76), "crop_bok_choy": Color(0.93, 1.0, 0.94)}
 
 ## Plots the homestead has now: the view's garden.plots (30, 40 from Homestead Lv3); MAX_PLOTS with no view (the beds,
 ## the walk mask and the scenery are laid out for all 40, and the farm shows only the ones the view has).
@@ -334,6 +339,7 @@ static func cells(view: Dictionary, now_ms: int) -> Dictionary:
 	var grow := {}
 	for c in view.get("crops", []): grow[str(c.get("id", ""))] = float(c.get("grow_h", 4)) * 3600000.0
 	for q in view.get("quick_seeds", []): grow[str(q.get("id", ""))] = float(q.get("grow_s", 45)) * 1000.0   # q(217)
+	for c in view.get("fast_crops", []): grow[str(c.get("id", ""))] = float(c.get("grow_s", 0)) * 1000.0
 	var out := {}
 	for p in view.get("plots", []):
 		var id := int(p.get("id", -1))
@@ -353,6 +359,7 @@ static func cells(view: Dictionary, now_ms: int) -> Dictionary:
 					slot.watered_at = ready_at - int(maxf(1.0, float(p.get("ready_in", 0))) / 0.3)
 			"ready":
 				slot = {"state": "growing", "crop": code, "ready_at": now_ms, "watered_at": now_ms - int(grow.get(crop, 3600000.0))}
+		if FAST_TINTS.has(crop): slot.tint = FAST_TINTS[crop]
 		out[cell_id(cell_of(id))] = slot
 	return out
 
