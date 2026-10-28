@@ -240,6 +240,7 @@ static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 ## view.shops[role].sell (SGODOT-228); without it the Homestead Stall takes crops and fish at full price.
 ## A regional entry (the Market Square, §9.13.1) takes only the ids it lists: this city's climate's regional items.
 static func _buyback(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
+	if not P0Logic.fast_crop(view, item_id).is_empty() and _counter(opts) != "homestead": return {}
 	var kind := kind_of(view, item_id)
 	var shop: Dictionary = view.get("shops", {}).get(_counter(opts), {})
 	if shop.has("sell"):
@@ -499,11 +500,11 @@ static func fert_use(item_id: String) -> String:
 	if g.has("grow_mult"): return "Crops ready %d%% sooner" % roundi((1.0 - float(g.grow_mult)) * 100.0)
 	return "Grows faster"
 
-## How long a seed takes, a fact that does not tick: `4h`, `7h 58m`; a teaching seed's seconds, `45s` (q(217) ④ — the
-## game's one static duration in seconds; m:ss would read as a countdown).
+## q(247): a seed's static duration is seconds below one minute, then the usual minute/hour format, never m:ss.
 static func grow_time(crop: Dictionary) -> String:
-	if crop.has("grow_s"): return "%ds" % int(crop.grow_s)
-	return hours(float(crop.grow_h)) if crop.has("grow_h") else ""
+	if not crop.has("grow_s") and not crop.has("grow_h"): return ""
+	var seconds := float(crop.grow_s) if crop.has("grow_s") else float(crop.grow_h) * 3600.0
+	return "%ds" % ceili(seconds) if seconds < 60.0 else hours(seconds / 3600.0)
 
 static func _seed_use(crop: Dictionary) -> String:
 	if grow_time(crop) == "": return ""

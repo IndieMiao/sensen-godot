@@ -143,7 +143,7 @@ func sync(cells: Dictionary, now_ms: int) -> void:
 			continue
 		var cell := _parse_cell(str(id))
 		var stage := 0 if layer in ["weed", "soil"] else stage_of(slot, now_ms)
-		buckets[layer].append({"cell": cell, "stage": stage})
+		buckets[layer].append({"cell": cell, "stage": stage, "tint": slot.get("tint", Color.WHITE)})
 	_sync_buckets(buckets)
 
 func _sync_buckets(buckets: Dictionary) -> void:
@@ -163,7 +163,7 @@ func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 	mm.instance_count = items.size() * per
 	var n := 0
 	for item in items:
-		var color := _stage_color(layer, item.stage)
+		var color := _stage_color(layer, item.stage) * (item.get("tint", Color.WHITE) as Color)
 		for t in _cell_instances(item.cell, layer, item.stage, bp.cell_to_world(item.cell, world_scale)):
 			mm.set_instance_transform(n, t)
 			mm.set_instance_color(n, color)
@@ -191,7 +191,7 @@ func _cell_instances(cell: Vector2i, layer: String, stage: int, base: Vector3) -
 ## A stand-alone copy of one cell's crop as the field draws it, standing at the cell (a child of this field): a
 ## harvest's pop plays on the copy while the field has already dropped the crop (SGODOT-289, Harvest ×N's wave).
 ## Its detail layer comes along at the stages that have one; same meshes and materials.
-func ghost(cell: Vector2i, layer: String, stage := STAGES - 1) -> Node3D:
+func ghost(cell: Vector2i, layer: String, stage := STAGES - 1, tint := Color.WHITE) -> Node3D:
 	var root := Node3D.new()
 	root.position = bp.cell_to_world(cell, world_scale)
 	if not _mm.has(layer): return root
@@ -207,7 +207,7 @@ func ghost(cell: Vector2i, layer: String, stage := STAGES - 1) -> Node3D:
 		mm.instance_count = ts.size()
 		for i in ts.size():
 			mm.set_instance_transform(i, ts[i])
-			mm.set_instance_color(i, _stage_color(layer, stage))
+			mm.set_instance_color(i, _stage_color(layer, stage) * tint)
 		m.multimesh = mm
 		m.material_override = (src as MultiMeshInstance3D).material_override
 		root.add_child(m)

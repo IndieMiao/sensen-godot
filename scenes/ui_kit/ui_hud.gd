@@ -68,6 +68,8 @@ var _frame: Control
 var _ring: _SkillRing
 var _energy_chip: _Chip
 var _energy_value: Label
+var _energy_tween: Tween
+var _energy_shown := -1.0
 var _energy_track: _Track
 var _energy_regen: Label
 var _buff: PanelContainer
@@ -109,6 +111,9 @@ func set_safe_top(v: float) -> void:
 		offset_bottom = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + v
 
 func apply(state: Dictionary) -> void:
+	if state.has("energy") and int(state.energy) != int(data.energy) and _energy_shown >= 0.0:
+		if _energy_tween != null and _energy_tween.is_valid(): _energy_tween.kill()
+		_energy_shown = -1.0   # a newer authoritative value supersedes an unfinished count
 	for k in state:
 		if k == "place" or k == "skills":
 			var merged: Dictionary = (data[k] as Dictionary).duplicate()
@@ -117,6 +122,22 @@ func apply(state: Dictionary) -> void:
 		else:
 			data[k] = state[k]
 	_refresh()
+
+## q(247): the upgrade's confirmed gain rolls in the existing number, never in a second floating reward.
+## State and action availability remain authoritative; only the displayed number interpolates.
+func roll_energy_from(from: int) -> void:
+	if from >= int(data.energy) or not is_inside_tree(): return
+	if _energy_tween != null and _energy_tween.is_valid(): _energy_tween.kill()
+	_energy_shown = float(from)
+	_refresh()
+	_energy_tween = create_tween()
+	_energy_tween.tween_method(func(value: float):
+		_energy_shown = value
+		_energy_value.text = "%d/%d" % [roundi(value), int(data.energy_max)], float(from), float(data.energy),
+		UiKit.secs(UiTokens.MOTION_QUICK_BAR_REFILL_MS))   # existing number-roll duration (also used by the table coins)
+	_energy_tween.tween_callback(func():
+		_energy_shown = -1.0
+		_refresh())
 
 func energy_state() -> Energy:
 	return energy_state_for(int(data.energy), int(data.energy_max), int(data.next_cost))
@@ -369,7 +390,7 @@ static func _capsule() -> PanelContainer:
 func _refresh() -> void:
 	if _place_suffix == null: return
 	var e := energy_state()
-	_energy_value.text = "%d/%d" % [int(data.energy), int(data.energy_max)]
+	_energy_value.text = "%d/%d" % [roundi(_energy_shown) if _energy_shown >= 0.0 else int(data.energy), int(data.energy_max)]
 	var ink := UiTokens.COLOR_TEXT
 	if e == Energy.LOW: ink = UiTokens.COLOR_WARNING
 	elif e == Energy.EMPTY: ink = UiTokens.COLOR_DANGER

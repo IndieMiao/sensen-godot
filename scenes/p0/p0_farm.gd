@@ -860,7 +860,9 @@ func p0_harvest_wave(events: Array) -> float:
 	_wave = {}
 	for i in plots.size():
 		var code := str(P0Garden.CROP_CODES.get(str(crop_of.get(int(plots[i]), "")), ""))
-		if code != "": _pop(crops.ghost(P0Garden.cell_of(int(plots[i])), code), i * WAVE_STEP_S)
+		if code != "":
+			var tint: Color = P0Garden.FAST_TINTS.get(str(crop_of.get(int(plots[i]), "")), Color.WHITE)
+			_pop(crops.ghost(P0Garden.cell_of(int(plots[i])), code, CropField.STAGES - 1, tint), i * WAVE_STEP_S)
 	var wave := (plots.size() - 1) * WAVE_STEP_S + WAVE_POP_S + WAVE_OUT_S
 	_harvest_flights(plots, crop_of, events, wave)
 	return wave

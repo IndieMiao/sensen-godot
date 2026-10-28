@@ -129,7 +129,8 @@ const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 ## Crop names that read the same in the plural ("harvest 30 corn").
 ## q(58): crop names that keep their form in the plural, or take another; every plural reads it (Today, the chip, the
 ## waiting line, harvest amounts; 李白 q(98): `Lettuces ready in` was written where Lettuce stays Lettuce).
-const PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies"}
+const PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies",
+	"Cress": "Cress", "Pea Shoots": "Pea Shoots", "Baby Spinach": "Baby Spinach", "Bok Choy": "Bok Choy"}
 
 ## The four things on the gate card (§4.8.7): what is locked, which level, how far, what crossing it does. One sheet
 ## spec for UiInfoSheet (SKILL-2 482:169): the title with the lock, `Locked` (or the rarity), the lead line
@@ -450,12 +451,16 @@ static func key_ready(ms: float) -> String:
 static func crop(view: Dictionary, crop_id: String) -> Dictionary:
 	for c in view.get("crops", []):
 		if str(c.get("id", "")) == crop_id: return c
+	var fast := fast_crop(view, crop_id)
+	if str(fast.get("id", "")) == crop_id and not fast.is_empty(): return fast
 	var q := quick_seed(view, crop_id)
 	return q if not q.is_empty() and str(q.get("id", "")) == crop_id else {}
 
 static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 	for c in view.get("crops", []):
 		if str(c.get("seed", "")) == seed_id: return c
+	var fast := fast_crop(view, seed_id)
+	if str(fast.get("seed", "")) == seed_id and not fast.is_empty(): return fast
 	var q := quick_seed(view, seed_id)
 	return q if not q.is_empty() and str(q.get("seed", "")) == seed_id else {}
 
@@ -467,15 +472,21 @@ static func quick_seed(view: Dictionary, id: String) -> Dictionary:
 		if str(q.get("id", "")) == id or str(q.get("seed", "")) == id: return q
 	return {}
 
+## Separate from normal crops and the guide-only Quick Radish: no recipe / request / notification membership.
+static func fast_crop(view: Dictionary, id: String) -> Dictionary:
+	if id == "": return {}
+	for c in view.get("fast_crops", []):
+		if str(c.get("id", "")) == id or str(c.get("seed", "")) == id: return c
+	return {}
+
 ## What a plot's crop is harvested as: a Quick Radish is a Radish (q(217)); any other crop itself.
 static func harvest_of(view: Dictionary, crop_id: String) -> String:
 	var q := quick_seed(view, crop_id)
 	return str(q.get("harvest", crop_id)) if not q.is_empty() and str(q.get("id", "")) == crop_id else crop_id
 
-## A crop's time to ripe in a sentence (`Radishes ready in 3h 58m`, q(97) ②), but a teaching seed's ticks in m:ss in
-## front of the player (`Quick Radishes ready in 0:45`, q(217) ④, under q(97) ①).
-static func ripe_in(view: Dictionary, crop_id: String, ms: float) -> String:
-	return duration(ms) if not quick_seed(view, crop_id).is_empty() else span(ms)
+## q(247): every crop's Today countdown uses m:ss through 5:00; above it use q(97)'s rounded sentence duration.
+static func ripe_in(_view: Dictionary, _crop_id: String, ms: float) -> String:
+	return duration(ms) if ms <= 300_000.0 else span(ms)   # q(247): every crop's last five minutes, once per second
 
 ## Gift Clues (Fishing Lv7, q(167)): the residents met who like this dish, in content order — view.gift_clues
 ## {dish: [{resident, verdict}]}, null before Lv7. Names, [] when none.
@@ -513,6 +524,8 @@ static func liked_by_line(view: Dictionary, item_id: String) -> String:
 
 static func item_name(view: Dictionary, id: String) -> String:
 	var names: Dictionary = view.get("names", {})
+	var fast := fast_crop(view, id)
+	if not names.has(id) and not fast.is_empty(): return str(fast.get("seed_name" if id == str(fast.get("seed")) else "name", id))
 	if not names.has(id) and P0Decor.is_decor(id): return P0Decor.name_of(id)   # Decorate's pieces (SGODOT-284)
 	if not names.has(id) and id.begins_with("postcard_gn-"):   # a city's postcard the view has not named (SGODOT-296)
 		var cl := P0Clusters.get_cluster(id.trim_prefix("postcard_"))
@@ -588,7 +601,7 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 	if seed_id.begins_with("fert_"):
 		var ripe := str(plot.get("state", "")) == "ready"
 		# a Quick Radish takes no Compost (q(217) ①): the key goes by the plot's state, no word about it
-		var quick := not quick_seed(view, str(plot.get("crop", ""))).is_empty()
+		var quick := not quick_seed(view, str(plot.get("crop", ""))).is_empty() or not fast_crop(view, str(plot.get("crop", ""))).is_empty()
 		if str(plot.get("state", "")) in ["sown", "growing"] and not ripe and not plot.get("fert", false) and not quick:
 			return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
 				"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
@@ -621,7 +634,8 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
 			var ms := float(plot.get("ready_in", 0))   # a Quick Radish's `Ready in 0:45`, ticking (q(217) ④)
-			var sub := "Ready in " + duration(ms) if not quick_seed(view, str(plot.get("crop", ""))).is_empty() else key_ready(ms)
+			var fixed := not quick_seed(view, str(plot.get("crop", ""))).is_empty() or not fast_crop(view, str(plot.get("crop", ""))).is_empty()
+			var sub := "Ready in " + duration(ms) if fixed else key_ready(ms)
 			return {"icon": "clock", "verb": "Growing", "sub": sub, "enabled": false, "amber": false, "cmd": {}, "need": 0}
 		"ready":
 			# Harvest All (Farming Lv9, q(118) ④): the ripe annuals of the garden row underfoot, this one first.
@@ -1472,6 +1486,7 @@ static func today_rows(view: Dictionary) -> Array:
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
 		var c := str(p.get("crop", ""))
+		if not fast_crop(view, c).is_empty() and st != "growing": continue   # q(245): countdowns only, no target rows
 		if st == "ready": ready[c] = int(ready.get(c, 0)) + 1
 		elif st == "sown": sown += 1
 		elif st == "growing":
@@ -2004,6 +2019,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 			out.reason = "Highest level for now"
 		return out
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
+	if int(next.level) >= 2 and int(next.level) <= 4: out.footer = "Upgrading is free of Energy"   # q(246): no false refill promise
 	var unlocks: Array = next.get("unlocks", [])
 	for u in unlocks:   # §8.3.1 looks at Lv3 / 5 / 8 / 10 (q(115): `Lv5 look · Porch`, never Look A / B)
 		var stage := look_stage(str(u))
@@ -2075,7 +2091,7 @@ static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
 	return out
 
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
-## what changed (Energy refilled to the new max) and one line of consequences.
+## what changed (actual Energy gained at Lv2–4, full from Lv5) and one line of consequences.
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	var level := int(ev.get("level", 1))
 	var max_e := int(view.get("energy", {}).get("max", 0))
@@ -2089,5 +2105,9 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 			_:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): lines.append(str(line.text))
-	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
+	var energy := " · Energy full"
+	if level >= 2 and level <= 4:
+		var gain := maxi(0, int(ev.get("energy", 0)))   # actual server reward, including a cap / bonus-zone zero
+		energy = " · +%d Energy" % gain if gain > 0 else ""
+	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d" % max_e + energy,
 		"detail": "\n".join(lines)}

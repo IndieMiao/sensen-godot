@@ -577,6 +577,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	if before.get("energy", {}).has("value") and events.any(func(e): return str(e.get("kind", "")) == "homestead" and int(e.get("energy", 0)) > 0):
+		ui.hud.roll_energy_from(int(before.energy.value))
 	ui.blackjack_events(events)   # the Blackjack table plays its deal / cards / result itself (SGODOT-351)
 	_read_home_places(v)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal (TUT-2; a level-up teaches in its banner)
@@ -728,6 +730,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"arrival": _call("on_arrival", [ev])   # SGODOT-275: the map flies there and welcomes (q(108))
 			"energy":
 				if card_energy.any(func(x): return is_same(x, ev)): continue
+				if str(ev.get("reason", "")) == "homestead": continue   # q(247): the HOME-2 banner already says the gain
 				var dlt := int(ev.delta)
 				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
@@ -772,8 +775,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# where a collected dish went (the kitchen's Keep toast); what a pot took (Cook All floats it, q(124))
 				if iid.begins_with("dish_") or int(ev.delta) < 0: _call("p0_event", [ev, v])
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
-					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
-						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
+					var part := {kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
+						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)}
+					if not P0Logic.fast_crop(v, iid).is_empty(): part.fmt_plural = "%s " + P0Logic.plural(P0Logic.item_name(v, iid))
+					floats.append(part)
 			"reward", "milestone":
 				# Cookbook titles (§7.6.1): a card after the dish card, as a level-up's banner (deferred: COOK-4 first);
 				# a Fish-dex milestone is 周瑜's (SGODOT-283).
