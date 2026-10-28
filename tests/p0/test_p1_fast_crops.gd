@@ -90,15 +90,45 @@ func test_today_last_five_minutes_tick_for_every_crop_and_fast_crops_have_no_act
 		v.plots[0].state = "sown"
 		assert_bool(P0Logic.today_rows(v).any(func(r): return str(r.line).begins_with("Water "))).is_false()
 
-func test_growing_key_keeps_normal_duration_for_fast_crops_and_seconds_only_for_quick_radish() -> void:
+func test_growing_key_uses_seconds_for_fast_crops_last_five_minutes_and_keeps_quick_radish() -> void:
 	var v := view()
-	var expected := ["Ready in 1m", "Ready in 1m", "Ready in 5m", "Ready in 20m", "Ready in 1h"]
+	var expected := ["Ready in 0:10", "Ready in 1:00", "Ready in 5:00", "Ready in 20m", "Ready in 1h"]
 	for i in FAST.size():
 		var p := {id = 0, state = "growing", crop = FAST[i].id, ready_in = FAST[i].grow_s * 1000}
 		assert_str(P0Logic.main_action(v, p, "").sub).is_equal(expected[i])
 	assert_str(P0Logic.main_action(v, {id = 0, state = "growing", crop = "crop_scallion", ready_in = 1199000}, "").sub).is_equal("Ready in 20m")
 	v.quick_seeds = [{id = "crop_quick_radish", seed = "seed_quick_radish", grow_s = 45}]
 	assert_str(P0Logic.main_action(v, {id = 0, state = "growing", crop = "crop_quick_radish", ready_in = 45000}, "").sub).is_equal("Ready in 0:45")
+
+func test_growing_key_and_today_share_five_minute_boundary_for_all_crop_kinds() -> void:
+	var v := view()
+	var ids := ["crop_lettuce", "crop_apple", "crop_quick_radish"]
+	for c in FAST: ids.append(c.id)
+	for id in ids:
+		for sample in [[300001, "6m"], [300000, "5:00"], [299001, "5:00"], [299000, "4:59"],
+			[60000, "1:00"], [59000, "0:59"], [10000, "0:10"], [1500, "0:02"], [1, "0:01"],
+			[1200000, "20m"], [7200000, "2h"], [71880000, "19h 58m"]]:
+			var p := {id = 0, crop = id, state = "growing", ready_in = sample[0], tree = id == "crop_apple"}
+			var a := P0Logic.main_action(v, p, "")
+			var time: String = sample[1]
+			assert_str(a.sub).is_equal(time if time.contains(" ") else "Ready in " + time)
+			assert_str(P0Logic.ripe_in(v, id, sample[0])).is_equal(time)
+			assert_str(a.verb).is_equal("Growing")
+			assert_bool(a.enabled).is_false()
+			assert_dict(a.cmd).is_empty()
+
+func test_growing_key_ticks_with_today_on_client_projection_and_yields_to_harvest() -> void:
+	for id in ["crop_cress", "crop_lettuce", "crop_apple", "crop_quick_radish"]:
+		var v := view([{id = 0, crop = id, state = "growing", ready_in = 10000, tree = id == "crop_apple"}])
+		v.names[id] = "Test Crop"
+		for second in range(10):
+			var now := P0Logic.project(v, second * 1000)
+			var a := P0Logic.main_action(now, now.plots[0], "")
+			var time := "0:%02d" % (10 - second)
+			assert_str(a.sub).is_equal("Ready in " + time)
+			assert_array(P0Logic.today_rows(now).map(func(r): return r.line)).contains(["Test Crop ready in " + time])
+		var ripe := P0Logic.project(v, 10000)
+		assert_str(P0Logic.main_action(ripe, ripe.plots[0], "").verb).is_equal("Pick" if id == "crop_apple" else "Harvest")
 
 func test_legacy_today_line_keeps_fast_countdowns_but_never_targets_fast_ready_or_sown_plots() -> void:
 	var v := view()
