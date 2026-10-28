@@ -85,7 +85,8 @@ export interface SilhouettePage { n: number; id: string; name: string; rarity: n
 
 export type ShopId = 'homestead' | 'tackle' | 'market' | 'tea' | 'post';
 export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea', 'post'];
-export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 'sys_requests' | 'regional_market';
+// q(251): the Tackle Shop's fish_tackle (80) and the Market's regional_market (60) are gone: those two take only crops and fish
+export type QuotaId = 'dish' | 'material' | 'request_bonus' | 'sys_requests';
 export type BoardId = 'stall' | 'market';
 
 /**
@@ -236,8 +237,12 @@ export interface P0Content {
   specialty: Record<string, { name: string; price: number; shop: ShopId; to: 'storage'; cluster?: string }>;
   city_postcard?: { price: number };   // SGODOT-296: every M-tier-and-up city's postcard (cityPostcard)
   /** A counter's buy-back by item kind; regional: only the regional items of the counter's own climate (§9.13.1: the
-   * Market Square takes its climate's regional crops and fish), their quota counted per city (per_city, §11.7.3). */
+   * Market Square takes its climate's regional crops and fish). The rate is the counter's at home; away from home it is
+   * times sell_distance's (q(251)). */
   shops: Record<ShopId, { sells: string; buys: Record<string, { rate: number; quota: QuotaId | null; regional?: boolean }> }>;
+  /** q(251): what a counter pays by how far it is from home — 1 at home (the home cluster), else by the Trip band of
+   * the counter's city (tripOf: Trip 1–7, index trip − 1). Unit = max(1, ⌊full price × rate × this⌋). */
+  sell_distance: { home: number; trip: number[] };
   market: { buy: string[]; specialty: string[] };
   quotas: Record<QuotaId, { cap: number; scope: string; per_city?: boolean }>;   // per_city: one count per account × city cluster (§11.7.3)
   affinity: {

@@ -16,7 +16,7 @@ import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
 import { clusterById, clusterOf, homeOf, writtenCluster } from './travel.js';
 import { decorOf, isDecor } from './decor.js';
-import { climateAt } from './travel.js';
+import { climateAt, tripOf } from './travel.js';
 
 /** The counter a command talks to; older clients send 'stall' or nothing for the Homestead Stall. */
 export function shopOf(raw: unknown): ShopId | null {
@@ -176,8 +176,22 @@ export function drink(c: P0Content, s: P0State, cmd: { item?: unknown; shop?: un
   return null;
 }
 
-/** Buyback for one id at one counter: per-unit coins and the quota it counts against, or why it can't be sold here. */
-export function buyback(c: P0Content, shop: ShopId, id: string, zone = c.profile.climate): { unit: number; quota: QuotaId | null } | { code: 'not_sellable' | 'not_sellable_here' } {
+/** q(251): how far a counter is from home, and what that does to its buy-back. The Homestead Stall is the farm's, always
+ * home; a Tackle Shop or Market in the home cluster pays its full rate; one elsewhere pays sell_distance's share for the
+ * Trip band of its city (tripOf: by distance from the home's base point, the fallback's nearest cities banded as travel
+ * bands them, never as home). */
+export type SellDistance = { home: true; factor: number } | { home: false; factor: number; km: number; trip: number; band: string };
+export function sellDistance(c: P0Content, s: P0State, shop: ShopId, cluster: string): SellDistance {
+  if (shop === 'homestead' || cluster === homeOf(c, s)) return { home: true, factor: c.sell_distance.home };
+  const t = tripOf(c, s, cluster);
+  const bands = c.sell_distance.trip;
+  return { home: false, factor: bands[Math.min(Math.max(t.trip, 1), bands.length) - 1], km: t.km, trip: t.trip, band: t.name };
+}
+
+/** Buyback for one id at one counter: per-unit coins and the quota it counts against, or why it can't be sold here.
+ * `at` is the save and the counter's city cluster: away from home the unit is q(251)'s share (none: the home price). */
+export function buyback(c: P0Content, shop: ShopId, id: string, zone = c.profile.climate,
+  at?: { s: P0State; cluster: string }): { unit: number; quota: QuotaId | null } | { code: 'not_sellable' | 'not_sellable_here' } {
   const fast = c.fast_crops?.find(x => x.id === id);
   if (fast) return shop === 'homestead' ? { unit: fast.price, quota: null } : { code: 'not_sellable_here' };
   const kind = itemKind(id), base = sellPriceOf(c, id);
@@ -187,7 +201,8 @@ export function buyback(c: P0Content, shop: ShopId, id: string, zone = c.profile
   if (!rule) return { code: 'not_sellable_here' };
   // §9.13.1: a Market Square takes only its own climate's regional crops and fish
   if (rule.regional && !regionalOf(c, id, zone)) return { code: 'not_sellable_here' };
-  return { unit: Math.max(1, Math.floor(base! * rule.rate + 1e-9)), quota: rule.quota };
+  const factor = at ? sellDistance(c, at.s, shop, at.cluster).factor : 1;
+  return { unit: Math.max(1, Math.floor(base! * rule.rate * factor + 1e-9)), quota: rule.quota };
 }
 
 /** A regional crop or fish of this climate (crop.zone, fish.zones). */
@@ -198,7 +213,8 @@ export function regionalOf(c: P0Content, id: string, zone: string): boolean {
   return !!fish?.regional && !!fish.zones?.includes(zone);
 }
 
-/** The day's count key of a quota: per_city ones (§11.7.3) count per account × city cluster, `regional_market@gn-…`. */
+/** The day's count key of a quota: per_city ones (§11.7.3) count per account × city cluster, `<quota>@gn-…` (none now:
+ * q(251) retired the Market's). */
 export function quotaKey(c: P0Content, q: QuotaId, cluster: string): string {
   return c.quotas[q].per_city ? `${q}@${cluster}` : q;
 }
@@ -234,7 +250,7 @@ export function sellItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: 
   const qty = all ? 0 : Number(cmd.qty);
   if (!all && (!Number.isInteger(qty) || qty < 1)) return { code: 'bad_qty' };
   const city = counterCity(c, s, cmd.place);
-  const price = buyback(c, shop, id, climateAt(c, s, cmd.place));
+  const price = buyback(c, shop, id, climateAt(c, s, cmd.place), { s, cluster: city });
   if ('code' in price) return { code: price.code };
   if (all && s.locked.includes(id)) return { code: 'locked_item' };
   const have = count(s.bag, id, 'skip');
