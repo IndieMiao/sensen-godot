@@ -3,7 +3,7 @@
 内部演示包 `com.sensen.p0demo`（显示名 P0 Demo）的版本、内容和发布证据，最新的在最上面。每发一版就在这里加一节。构建方法见 [P0 演示包构建](../qa/p0-demo-apk-2026-10-08.md)。
 
 - 服务端：2026-10-28 20:33 起在美西（迁移方运维的正式实例），客户端地址不变，仍经 `farm.sensenjoy.cn` 的入口转发；10-29 起用 `server/deploy/p0/deploy-hk.sh --target us` 部署（香港目标默认拒绝写入，作回退到 11-01 16:00）。之前在香港。运维记录在各次部署的 Plane 评论。
-- 下载：OSS 不可变目录 `https://oss.sensenjoy.cn/p0/demo/releases/<目录>/`，同目录有 `release.json` 和 `SHA256SUMS`。
+- 下载：OSS 不可变目录，同目录有 `release.json` 和 `SHA256SUMS`。0.2.15 起放 `https://oss2.sensenjoy.cn/p0/demo/releases/<目录>/`（美西的桶，用户 10-29 同意）；0.2.14 及以前的都在 `https://oss.sensenjoy.cn/p0/demo/releases/<目录>/`，原样保留，已发的链接照常能下。下次提最低版本时，`min-version` 带的下载地址用 oss2 的（现在线上 gate 里的地址还是 oss 上 0.1.1 的，提之前不用动）。
 - 证书：所有正式包都用同一张证书（CN=Android Debug，SHA-256 `38771d94…5673`），可以直接覆盖安装。
 - 只做内部演示。
 - 每一版打包后，lib/arm64-v8a 必须有 5 个 .so（含 libmapbox-maps、libmapbox-common、liblkjingle_peerconnection_so）以及 `assets/mapbox_token.txt`，缺了地图会全黑。打包脚本从 #178 起会拦截这种情况。
