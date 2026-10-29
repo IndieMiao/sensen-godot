@@ -1144,7 +1144,12 @@ func test_the_fares_floats_come_with_the_landing_in_order() -> void:
 	var arrival := {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559, paid = {energy = 30, coins = 120}, renewed = true}
 	_fly(m, arrival, [{kind = "energy", delta = -30, reason = "travel"}, {kind = "coins", delta = -120, reason = "travel"},
 		{kind = "energy", delta = 10, reason = "first_visit"}, arrival])
-	assert_array(rt.travel_floats.map(func(p): return [str(p.kind), int(p.amount)])).is_equal([["energy", -30], ["coins", -120], ["energy", 10]])
+	assert_array(rt.travel_floats.map(func(p): return [str(p.kind), int(p.amount)])).is_equal([["energy", -30], ["coins", -120], ["energy_bonus", 10]])
+	# three lines, from the bottom: −30 Energy, −120 coins, +10 Energy (never one `−20 Energy`)
+	var lines: Array = rt.ui.float_lines(rt.travel_floats, Vector2(180, 400))
+	assert_int(lines.size()).is_equal(3)
+	assert_array(lines.map(func(f): return str((f as UiFloatText).text))).is_equal(["−30 Energy", "−120 coins", "+10 Energy"])
+	for f in lines: (f as Node).queue_free()
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))
 	assert_array(rt.travel_floats).is_empty()   # let go with the landing

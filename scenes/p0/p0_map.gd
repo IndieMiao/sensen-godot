@@ -916,15 +916,24 @@ func open_travel(cluster: String, preview := {}) -> void:
 	var online := 0   # the city's outposts' players online, as its bubble counts them (q(72))
 	for id in _online: if _cluster_of_outpost(str(id)) == cluster: online += int(_online[id])
 	if preview.is_empty(): preview = P0CityPlaces.city(cluster).get("preview", {})
+	if not preview.has("utc_offset_min"):   # its local time comes with the city's read: the subtitle fills in where it is
+		P0CityPlaces.fetch(rt.session, cluster, func(city):
+			if rt.ui.modal_kind != "travel_card" or _travel_card == null or not is_instance_valid(_travel_card): return
+			var head := _travel_card.find_children("*", "UiObjectHeader", true, false)
+			var pv: Dictionary = city.get("preview", {}) if city is Dictionary else {}
+			if not head.is_empty() and str((head[0] as UiObjectHeader).title) == str(c.get("name", "")):
+				(head[0] as UiObjectHeader).state = str(travel_card(rt.session.current(), cluster, pv, online).subtitle))
 	var spec := travel_card(rt.session.current(), cluster, preview, online)
 	var gap: Dictionary = spec.gap
 	# q(257) ③: short of coins a tap says the floor; short of Energy it opens the Energy card (never Fly)
 	spec["on_blocked"] = func():
 		if str(gap.get("short", "")) == "coins": rt.ui.toast_error("Wallet floor · keep %d coins" % P0Travel.WALLET_FLOOR)
 		else: rt.ui.open_energy_card(int(gap.get("need", 0)), "Fly")
-	P0PlaceSheet.open(rt.ui, spec, func():
+	_travel_card = P0PlaceSheet.open(rt.ui, spec, func():
 		rt.ui.close_modal()
 		_take_off(cluster, int(P0Travel.trip(_view(), cluster).get("km", 0)) if not preview.has("km") else int(preview.km)), Callable(), Callable(), "travel_card")
+
+var _travel_card: Control   # the travel card open now (its holder)
 
 ## Fly (SGODOT-361, 不知火舞 on 361 9146d012; 299 v1 ⑤ and q(75) changed for this one place): the flight takes off as Fly
 ## is pressed and `travel` goes with it. q(147)'s fixed 3 s (SGODOT-299): up from where the camera is until the city left
@@ -1891,6 +1900,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"net":   # net:slow:5 / net:fail:2 before fly — its reply that many game seconds late, or failed then (361 videos)
 			_shot_net(step[1] == "fail", float(step[2]))
 		"nearby": open_nearby_cities()   # the Nearby cities drawer (MAP-8), as a tap on its pill
+		"travelcard":   # travelcard:gn-5368361 — that city's travel card (MAP-5), as its bubble's or Travel details › (367 shots)
+			open_travel(step[1])
+		"fareboard": rt.ui.open_fare_board()   # the Travel Post's Fare Board (q(257) ① shots)
 		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
 			open_city_card(step[1])
 		"arrivalcard":   # arrivalcard:gn-1850147 — the first visit's card (MAP-7-FREE) for that city

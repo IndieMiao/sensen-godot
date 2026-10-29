@@ -757,6 +757,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				var part := {kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"}
 				if by_air:
+					# a fare's `−30 Energy` and a first visit's `+10 Energy` are lines of their own, the +10 over the fare's
+					# coins: `−30 Energy` · `−120 coins` · `+10 Energy` from the bottom (q(261) ④, 不知火舞 on 367 ec5f2daa ⑤)
+					if str(ev.get("reason", "")) == "first_visit": part.merge({kind = "energy_bonus", key = "energy_bonus"}, true)
 					travel_floats.append(part)
 					continue
 				# Row Hoe's Sow ×3 says its beds: `−6 Energy · 3 plots` (q(124) ③); the seeds it took count them
