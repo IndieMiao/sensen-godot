@@ -71,3 +71,46 @@ describe('selling by distance from home (q(251))', () => {
     expect(Object.keys(viewOf(c, fresh(), T0).quotas).sort()).toEqual(['dish', 'material', 'request_bonus', 'sys_requests']);
   });
 });
+
+// q(259): away, the full creel's toast says what its fish fetch here and at home — the view gives both sums
+// (bag.creel_value), unit by unit as a sale pays; Gifted fish, crops and dishes left out; null at home, with no fish or
+// equal sums (the toast keeps `Sell or cook first`).
+describe('the creel\'s worth here and at home (q(259))', () => {
+  it('at home: none, whatever the creel holds', () => {
+    const s = fresh();
+    s.bag.push({ id: 'fish_trout', qty: 30 });
+    expect(viewOf(c, s, T0).bag.creel_value).toBeNull();
+  });
+
+  it('in Los Angeles (Trip 4, 80%): 30 Rainbow Trout 8 → 6 and 2 Salmon 32 → 25 — 230 here, 304 at home', () => {
+    const s = step(fresh(), { type: 'travel', to: LA }).s;
+    s.bag.push({ id: 'fish_trout', qty: 30 }, { id: 'fish_salmon', qty: 2 });
+    expect(viewOf(c, s, T0).bag.creel_value).toEqual({ here: 230, home: 304 });
+    // the same sums a sale pays, unit by unit
+    expect(buyback(c, 'tackle', 'fish_trout', undefined, { s, cluster: LA })).toEqual({ unit: 6, quota: null });
+  });
+
+  it('Gifted fish, crops and dishes are left out', () => {
+    const s = step(fresh(), { type: 'travel', to: LA }).s;
+    s.bag.push({ id: 'fish_salmon', qty: 2 }, { id: 'fish_salmon', qty: 5, gift: { from: 'res_pip', day: s.day.key } },
+      { id: 'crop_radish', qty: 10 });
+    expect(viewOf(c, s, T0).bag.creel_value).toEqual({ here: 50, home: 64 });
+  });
+
+  it('away with no fish to sell: none', () => {
+    const s = step(fresh(), { type: 'travel', to: LA }).s;
+    s.bag = s.bag.filter(b => b.id !== 'fish_trout' && !b.id.startsWith('fish_'));
+    s.bag.push({ id: 'crop_radish', qty: 10 });
+    expect(viewOf(c, s, T0).bag.creel_value).toBeNull();
+  });
+
+  it('equal sums (every unit at the 1-coin floor both ways): none', () => {
+    const cheap = structuredClone(c);
+    Object.defineProperty(cheap, 'clusters', { value: (c as unknown as { clusters: unknown }).clusters });
+    cheap.fish.find(f => f.id === 'fish_salmon')!.price = 1;
+    const s = step(fresh(), { type: 'travel', to: LA }).s;
+    s.bag = s.bag.filter(b => !b.id.startsWith('fish_'));
+    s.bag.push({ id: 'fish_salmon', qty: 3 });
+    expect(viewOf(cheap, s, T0).bag.creel_value).toBeNull();
+  });
+});
