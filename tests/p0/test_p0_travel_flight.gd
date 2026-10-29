@@ -959,6 +959,7 @@ func test_no_reply_8_s_from_fly_calls_it_back_and_a_late_reply_flies_nowhere() -
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # the chip follows the server again
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
 
 ## stale_state goes again once, quietly (the flight flies on); a second one is a failure: called back with SYS-CMD-FAIL.
 func test_stale_state_sends_travel_again_once_then_calls_it_back() -> void:
@@ -981,6 +982,7 @@ func test_stale_state_sends_travel_again_once_then_calls_it_back() -> void:
 	assert_str(rt.ui.sys_text()).is_equal("Didn't go through · try again")
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
 
 ## A refusal (the client's city table not the server's): called back, the runtime's toast as for any refusal.
 func test_a_refused_travel_calls_it_back_with_the_runtimes_toast() -> void:
@@ -997,6 +999,7 @@ func test_a_refused_travel_calls_it_back_with_the_runtimes_toast() -> void:
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
 
 ## ③ (9146d012): taken with no arrival (already there with a pass): it lands as a return — Welcome back only.
 func test_taken_without_an_arrival_it_lands_as_a_return() -> void:
@@ -1081,3 +1084,46 @@ func test_maintenance_in_the_air_calls_it_back() -> void:
 	rt._unblock()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
+
+## 周瑜 on #560: called back after 8 s, then off to another city at once — the first travel's late arrival comes in the
+## new flight's air and leaves what it holds alone (the chip, Energy and coins); the new one lands with its own reply.
+func test_a_late_arrival_leaves_another_flights_hold_alone() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	rt.session.view["energy"] = {value = 142, max = 210}
+	rt.ui.set_view(rt.session.view)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	m._trip.start_us = Time.get_ticks_usec() - 8_100_000
+	m._travel_watch(0.0)   # called back, Los Angeles' travel still out
+	assert_bool(m.travelling()).is_false()
+	var la_travel: Dictionary = _wire.pop_front()
+	m._take_off(TOKYO, 8271)   # off to Tokyo at once: its travel queues behind Los Angeles'
+	assert_bool(m.travelling()).is_true()
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	var late := _moved(rt.session.view, LA)
+	late["energy"] = {value = 152, max = 210}
+	var body := JSON.stringify({ok = true, state = late,
+		events = [{kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}]}).to_utf8_buffer()
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, la_travel)   # Los Angeles' late reply, Tokyo in the air
+	assert_bool(m.travelling()).is_true()
+	assert_str(str(rt.ui.get("_hold_here"))).is_equal(SF)   # still held
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	assert_bool(rt.ui.energy_held()).is_true()
+	assert_int(int(rt.ui.hud.data.energy)).is_equal(142)   # the HUD as when Tokyo's flight took off
+	assert_array(_wire.map(func(c): return str(c.to))).is_equal([TOKYO])   # Tokyo's travel now on the wire
+	_answer(rt, _moved(rt.session.view, TOKYO), [{kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271}])
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_bool(m.travelling()).is_false()
+	assert_str(_chip_city(rt)).is_equal("Tokyo")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome to Tokyo · Stamp collected")
+	await get_tree().create_timer(P0Map.STAMP_S + 0.3).timeout
+	rt.ui.close_modal()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame

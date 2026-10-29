@@ -93,6 +93,7 @@ func test_another_citys_bubble_opens_its_silhouette_card_then_its_free_travel_ca
 	assert_str(rt.ui.modal_kind).is_empty()
 	assert_bool(m.travelling()).is_true()   # up at once, before any reply (q(261))
 	m._call_back()
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
 
 func test_the_home_citys_bubble_opens_no_card() -> void:
 	var m := _map()

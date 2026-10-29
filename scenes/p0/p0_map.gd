@@ -938,13 +938,14 @@ const SLOW_REPLY_S := 1.5
 
 ## The server's arrival (events {kind: "arrival"}, q(108)): the flight in the air for it lands with its welcome — at once
 ## when it is already down waiting. One nothing waits for (called back: a reply later than REPLY_WAIT_S) flies nowhere:
-## the view says where the player is (9146d012 ②).
+## the view says where the player is (9146d012 ②); nor does it free what another flight in the air holds (周瑜 on #560:
+## called back, then off to another city at once, the first one's late arrival came mid-flight).
 func on_arrival(ev: Dictionary) -> void:
 	if travelling() and str(_trip.get("awaiting", "")) == str(ev.get("cluster", "")):
 		(_trip.reply as Dictionary).merge(ev, true)
 		_reply_in()
 		return
-	if rt != null: rt.release_travel()   # nothing held waits for it
+	if rt != null and not travelling(): rt.release_travel()   # nothing held waits for it
 
 ## The travel command settled. Its arrival came first (on_arrival); taken without one, it is a return (③); stale_state
 ## goes again once, quietly; refused (any other code: the client's city table not the server's) or failed — maintenance
@@ -987,6 +988,15 @@ func _call_back() -> void:
 	_sync_here()
 	_sync_farm_markers()
 	_show_self(true)
+	_draw_now()
+
+## The camera, the avatar and the pins drawn where they now are, this frame: a reply lands or calls back the flight
+## from the network's callback, after this frame's _process, and they came a frame after the chip (不知火舞 on #560).
+func _draw_now() -> void:
+	if not _camera_dirty or not is_inside_tree(): return
+	_camera_dirty = false
+	_update_cameras()
+	if city_map: city_map.tick(0.0)
 
 ## The stamp's beat of the arrival (§11.8.4 ≤ 1.5 s, q(152) ②): its toast's time, after which the arrival card comes.
 const STAMP_S := 1.5
@@ -1198,6 +1208,7 @@ func _travel_down() -> void:
 	_sync_here()
 	_sync_farm_markers()   # where it stands now, laid out before it shows: no frame of it at the city left (不知火舞 on 299)
 	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
+	_draw_now()
 	# ⑦: a toast held under a Fly's cover comes once the welcome has said itself (a first visit's card, then, as
 	# toast_when_clear waits for it)
 	if rt != null and trip.has("key"):
