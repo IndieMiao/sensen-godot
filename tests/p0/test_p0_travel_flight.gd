@@ -1206,7 +1206,7 @@ func test_the_pass_of_the_city_the_player_is_in_ending_says_so_once() -> void:
 	v.now = float(v.now) + 61_000.0   # ran out
 	rt._watch_day_pass(v)
 	var f := load("res://modules/p0/p0_travel.gd").fare(v, LA) as Dictionary
-	assert_str(rt.ui.toast_text().replace("\n", " · ")).is_equal("Day Pass ended · Re-entry %d Energy · %d coins" % [int(f.energy), int(f.coins)])
+	assert_str(rt.ui.toast_text()).is_equal("Day Pass ended · Re-entry\n%d Energy · %d coins" % [int(f.energy), int(f.coins)])
 	rt.ui.clear_toast()
 	rt._watch_day_pass(v)
 	assert_str(rt.ui.toast_text()).is_empty()   # once

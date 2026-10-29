@@ -895,9 +895,8 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	var facts: Array = [["Distance", "%s · Trip %d" % [P0PlaceSheet.distance_text(float(trip.get("km", 0))), int(trip.get("trip", 1))]]]
 	if bool(f.free): facts.append(["Cost", "Free"])
 	else:
-		var energy := int(view.get("energy", {}).get("value", 0))
-		facts.append(["Energy", "%d → %d left" % [int(f.energy), energy - int(f.energy)]])
-		facts.append(["Coins", "%d → %d left" % [int(f.coins), int(view.get("coins", 0)) - int(f.coins)]])
+		facts.append(["Energy", _fare_left(int(f.energy), int(view.get("energy", {}).get("value", 0)))])
+		facts.append(["Coins", _fare_left(int(f.coins), int(view.get("coins", 0)))])
 	var regional := P0FishWorld.regional_fish(cluster).size()
 	var crucian := P0Logic.item_name(view, "fish_crucian")
 	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
@@ -909,6 +908,10 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 		"facts": facts, "primary": "Fly", "blocked": str(gap.get("text", "")), "gap": gap, "blocked_energy": str(gap.get("short", "")) == "energy",
 		"footer": "Return home is always free",
 	}
+
+## `30 → 112 left`; the fare alone (`30`) when what is left would be under 0 (q(264), 不知火舞 on 367, Figma 266:178479).
+static func _fare_left(fare: int, have: int) -> String:
+	return "%d → %d left" % [fare, have - fare] if have >= fare else str(fare)
 
 func open_travel(cluster: String, preview := {}) -> void:
 	var c := P0Clusters.get_cluster(cluster)

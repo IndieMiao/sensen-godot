@@ -1757,9 +1757,9 @@ func hold_toasts(on: bool, after_s := 0.0) -> void:
 ## if the player is still in that city (q(261) ⑦: they may have flown on).
 func toast_in_city(text: String, cluster: String) -> void:
 	if _cover_up:
-		_cover_toast = {kind = "info", text = text, city = cluster, brk = true}
+		_cover_toast = {kind = "info", text = text, city = cluster}
 		return
-	toast(text, 0.0, true)   # two lines at a " · " in the toast's 232 (MAP-7-PASS-ENDED 243:176843)
+	toast(text)
 
 func _say_held(held: Dictionary) -> void:
 	if held.has("city") and P0Travel.here(view) != str(held.city): return

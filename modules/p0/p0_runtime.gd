@@ -444,7 +444,8 @@ func _watch_day_pass(v: Dictionary) -> void:
 		return
 	if str(_pass_seen.get("city", "")) != here or float(_pass_seen.get("until", -1.0)) != until: return
 	_pass_seen = {}
-	ui.toast_in_city("Day Pass ended · Re-entry %s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
+	# two lines as MAP-7-PASS-ENDED (243:176843) breaks them; a first line too wide for the toast's 232 wraps to three
+	ui.toast_in_city("Day Pass ended · Re-entry\n%s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
 
 func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":

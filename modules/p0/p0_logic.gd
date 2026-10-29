@@ -964,6 +964,8 @@ static func freeze(x) -> void:
 static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	if elapsed_ms <= 0: return view
 	var v := view.duplicate(false)
+	# the server's clock moves on too: a Day Pass's countdown on the chip and its running out (q(257) ⑤, SGODOT-367)
+	if v.has("now"): v["now"] = float(v.now) + elapsed_ms
 	var owned: Array = []   # the dictionaries this projection copied (each copied once, then written in place)
 	# d[key] as a shallow copy of its own, the server view's dictionary left as it was
 	var own := func(d: Dictionary, key: String) -> Dictionary:

@@ -88,6 +88,8 @@ func test_map_5_trip_1_is_one_cost_free_row() -> void:
 
 func test_map_5_short_of_coins_fly_reads_the_gap() -> void:
 	var spec := P0Map.travel_card(_view({}, {}, SF, 50), LA, {}, 0)
+	var trip := int(P0Travel.trip(_view(), LA).trip)
+	assert_str(str(spec.facts[2][1])).is_equal(str(FARES.coins[trip - 1]))   # nothing left to write: the fare alone (q(264))
 	assert_str(str(spec.blocked)).starts_with("Need ")
 	assert_str(str(spec.blocked)).ends_with(" more coins")
 	assert_str(str(spec.gap.short)).is_equal("coins")
