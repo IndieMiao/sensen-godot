@@ -1,5 +1,7 @@
 # P0 演示服务端上线准备（SGODOT-232 D1，2026-10-08）
 
+> **⚠ 香港已冻结（10-29 起）。** 10-28 晚 P0 已迁到美西，香港只作回退：P0 停着、数据冻结，保障期到 **11-01 16:00 (+08:00)**，机器 11-05 到期。`deploy-hk.sh` 对香港所有会写入的步骤（transfer、backup-caddy、up、caddy、crontab、rollback、energy、maint-on、maint-off、min-version）默认拒绝执行；只有项目经理已经宣布回退时，才加 `--target hk --confirm-hk-frozen-override` 执行。只读和观察类步骤照旧。部署美西用 `--target us`，见下文「目标 C」。
+
 **状态：只准备，未部署。** 部署、改线上 Caddy、在任何服务器上构建镜像，都要先经用户批准。香港 ECS 原定 10-04 到期；团队记录里 9-29 开了按月自动续费（10-04 起从余额扣），但扣费是否成功没有确认。准备过程中没有登录任何服务器。
 
 ## 服务端加了什么
@@ -72,6 +74,30 @@
 `192.168.124.53`（Ubuntu 24.04 + Docker，SSH 免密）。地址 `http://192.168.124.53:3150/v1`，只有同一 Wi-Fi 下的设备能连。
 
 批准后：同样传上下文并构建，然后 `P0_IMAGE=p0-server:<sha> docker compose -p p0 -f docker-compose.devserver.yml up -d`，冒烟用 `P0_BASE=http://192.168.124.53:3150`。HTTP 明文在演示包上可用（D2 模拟器用 `http://10.0.2.2` 连通过）。
+
+## 目标 C：美西（10-28 晚迁移之后，`--target us`）
+
+10-28 20:33 切流起 P0 的权威服务在美西 `43.110.146.219`（由迁移方运维；约定见 pm/migration/p0-migration-decision-2026-10-27.md 的「E 答复」第 8 项）。客户端地址不变，仍是 `https://farm.sensenjoy.cn/preview/p0/v1`，由 farm 的入口转发到美西。
+
+- 每个步骤前加 `--target us`，例如 `server/deploy/p0/deploy-hk.sh --target us up <sha>`。不加就是香港：写入类步骤默认拒绝（见文首警告）；加了 `--confirm-hk-frozen-override` 后，行为和原来逐字一致。`--target`、`--confirm-hk-frozen-override`、`--expect-config` 都要写在步骤名前面，写在后面会报错退出（不然 `up --target us <sha>` 会被当成香港的 up）。
+- 登录用迁移方的 ssh_config（`P0_US_SSH_CONFIG`，主机 `P0_US_HOST`，默认 `tgt-us-p0`）。镜像压缩包的暂存目录默认 `/srv/migration-data/services/p0/staging`（首次 transfer 建成 0700，压缩包 0600），用 `P0_US_STAGING` 改，必须是绝对路径，不能在正式数据目录下。
+- 美西的设置写在迁移方维护的 `compose.production.json`（权限 600）里，服务名和容器名都是 `p0-p0-1`，镜像是写死的字符串。`up` 只改 `services["p0-p0-1"].image` 这一处：改前留一份带日期的副本；这个字符串在文件里必须只出现一次；改完重新解析，除这个字段外必须和原来完全一样；保留权限，原子替换。然后只执行 `docker compose -f …/compose.production.json up -d --no-deps p0-p0-1`。不写 .env / .env.p0，也不生成密钥。`up` 只接受 transfer 核过的 tag。
+- 美西的 X-P0-Release / X-P0-Image-Config 响应头是迁移方的 Caddy 给的。`up` 完会提示把新 tag 和 config ID 报给迁移方，由他们同步。
+- `transfer` 先在本机做压缩包并记 SHA-256，传到美西后再核一次；美西 docker 报出的镜像 ID 必须等于压缩包里的 config 摘要。两个 ID 都记进 image.txt。
+- `up` 之后会核对 `/data` 挂的是正式数据目录，不是就报错。
+- **`--expect-config sha256:<64 位>`**（可选，只用于美西）：transfer 在发送之前、up 在改任何东西之前，核对压缩包的 config（或 transfer 记下的 ID）必须正好是这一个，不是就拒绝。脚本自己只能核「压缩包和美西 load 后的镜像一致」，核不了「和线上正在跑的一致」：devserver 上的 `p0-server:<sha>` 如果被清理后又重新 build 过，摘要可能变。所以部署 e64d4b33（也就是线上这份）时一律带上 `--expect-config sha256:5603ce0b896caaacdd5715e0e4dfc30970caecdd35164af4d70920f83905ef59`；对不上就停，不要 up。
+- **`up` 会重建 p0-p0-1**：compose 里的镜像字符串变了（哪怕镜像相同，例如从 `liusen-migration/image:61da…` 改成 `p0-server:e64d4b33`），容器就会重建，断线几秒，客户端会自己重连。所以要在约好的时间做，必要时先 `maint-on`。
+
+### 美西：第一次联合验证和退回做法（奕星 10-29 定）
+
+1. 第一次联合验证用线上这份镜像，让脚本认得现在线上这份，不改变线上行为。约好时间，和迁移方一起做：
+   `deploy-hk.sh --target us --expect-config sha256:5603ce0b896caaacdd5715e0e4dfc30970caecdd35164af4d70920f83905ef59 transfer e64d4b33`
+   → 人工核对 image.txt 的 `us p0-server:e64d4b33 sha256:5603ce0b…905ef59` 这一行 →
+   `deploy-hk.sh --target us --expect-config sha256:5603ce0b…905ef59 up e64d4b33`（写完整摘要）→ `verify-internal` → `smoke`（走正式域名）→ 把 tag 和 config 报给迁移方。
+2. 以后部署新镜像出了问题，就用脚本退回：`deploy-hk.sh --target us --expect-config sha256:5603ce0b…905ef59 up e64d4b33`（写完整摘要；前提是 e64d4b33 的 transfer 已经记录在案，镜像还留在美西）。要退回的如果是更新的一版，就换成那一版的 sha 和 config。devserver 上的 p0-server:e64d4b33 不要清。
+3. 脚本不可用时，由迁移方把 `up` 留下的带日期副本 `compose.production.json.before-<sha>-<时间>` 换回去，再执行 `docker compose -f …/compose.production.json up -d --no-deps p0-p0-1`。
+- `backup-caddy`、`caddy`、`crontab`、`rollback` 只有香港有。美西的 Caddy、备份和转发归迁移方。
+- 离线自检：`server/deploy/p0/check-deploy-target.sh`。它用桩代替 ssh / scp / curl，不连任何机器。香港部分：写入类步骤不带开关时拒绝，而且不连任何机器；带了 `--confirm-hk-frozen-override` 后，每个步骤的输出和远端命令都和旧脚本逐字相同；只读步骤不带开关也逐字相同。美西部分：改 compose 的 python 在桩文件上真跑，核 `--expect-config`、选项位置、临时文件从建出来起就是 0600，再打印各步骤会发出的命令。
 
 ## 两个目标的差异
 
