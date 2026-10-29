@@ -1600,6 +1600,8 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 	var items: Array = r.get("items", [])
 	var kind := str(r.get("kind", ""))
 	var icon_id := str(items[0]) if items.size() == 1 else str({"fish": "fish", "sow": "seed_radish", "crop": "seed_radish", "dish": "pot"}.get(kind, "board"))
+	var sow := request_sow(view, r)
+	if sow != "": return _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
 	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
 	if kind != "fish": return row
 	var gate := fish_level_gate(view, items, r.get("rarity", null))
@@ -1613,6 +1615,19 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 			row.go = "pond:" + str(m.place)
 			break
 	return row
+
+## A taken harvest request short of its crop in the ground (q(218), §14.3 after the guide): fewer plots sown, growing
+## or ripe with it than it still needs (a Quick Radish grows a Radish) — `Sow 6 Radishes`, `Sow 2 more Radishes` with
+## some already in; "" once enough are in (the row is its count again, `Radish 0/6`) and for any other request.
+static func request_sow(view: Dictionary, r: Dictionary) -> String:
+	var items: Array = r.get("items", [])
+	if str(r.get("kind", "")) != "harvest" or items.size() != 1: return ""
+	var crop := str(items[0])
+	var planted := (view.get("plots", []) as Array).filter(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"] \
+		and harvest_of(view, str(p.get("crop", ""))) == crop).size()
+	var n := int(r.get("qty", 1)) - int(r.get("have", 0)) - planted
+	if n <= 0: return ""
+	return "Sow %d %s%s" % [n, "more " if planted > 0 else "", P0Guide.crop_count_name(view, crop, n)]
 
 ## "Sow your first plot", short of Energy when sowing a radish costs more than the player has (TodayRow Short).
 static func _first_sow_row(view: Dictionary) -> Dictionary:

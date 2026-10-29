@@ -2736,6 +2736,9 @@ func _show_today_row(i: int) -> void:
 	var row: Dictionary = _today_rows[i]
 	close_modal()
 	var go := str(row.go)
+	if go == "inbox":
+		open_inbox("parcels")
+		return
 	if show_label(go, space_here(), spot_reachable(), place) == "Show":
 		# q(99): only remember a named recipe while the stove is free. This still only moves the camera.
 		var page := str(row.get("page", ""))
@@ -2753,6 +2756,7 @@ const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
+	if go == "inbox": return "Show"   # the Inbox opens anywhere: its Parcels page (q(254) ①, Pip's seeds)
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).

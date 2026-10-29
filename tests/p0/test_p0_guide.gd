@@ -447,3 +447,54 @@ func test_cook_marks_supply_the_local_show_target_and_page() -> void:
 	assert_str(str(r.go)).is_equal("stove")
 	assert_str(str(r.page)).is_equal("dish_fish_soup")
 	assert_str(str(r.tail)).is_empty()   # a once-only action is not an extra 0/1 label
+
+## q(254) ①: Pip's seeds waiting in the Inbox — the server's row goes to the Inbox; Today's Show opens it on Parcels,
+## wherever the player is.
+func test_pips_seeds_in_the_inbox_row_shows_the_inbox() -> void:
+	var v := _guided("t_nadia_1", "r_seeds_inbox")
+	v.guide.row = {"line": "Claim Pip's seeds · Inbox", "icon": "seed_quick_radish", "go": "inbox"}
+	var r: Dictionary = Guide.guide_rows(v)[0]
+	assert_str(str(r.line)).is_equal("Claim Pip's seeds · Inbox")
+	assert_str(str(r.go)).is_equal("inbox")
+	assert_str(str(r.dot)).is_equal("guide:r_seeds_inbox")
+	for here in ["home", "farm", "map", "pond", "outpost"]:
+		assert_str(P0Ui.show_label("inbox", here, false, "sh_market_1")).is_equal("Show")
+
+## q(218) / q(258) ①: after the guide, Six Radishes says to sow while too few Radishes are in the ground (a Quick Radish
+## grows one), and Today's generic Sow row leaves the Radish to it — another seed in the bag still gets that row; once
+## enough are in, the request is its count again and the generic row comes back.
+func _six(have: int, plots: Array, seeds: Array) -> Dictionary:
+	var v := _view({"plots": plots, "firsts": ["harvest:crop_radish"]})
+	v.stall.board.requests = []
+	v.cooking.cookbook[0].cooked = true   # S8 cooked it
+	v.names["seed_radish"] = "Radish Seeds"
+	v.bag.slots = seeds
+	v["residents"] = {"res_nadia": {"request": {"id": "req_res_nadia_six_radishes", "kind": "harvest", "item": "crop_radish",
+		"qty": 6, "coins": 20, "have": have, "ready": false}, "request_state": "accepted", "place": "sh_market_1"}}
+	return v
+
+func test_six_radishes_says_sow_and_the_generic_sow_row_gives_way() -> void:
+	var wild := ["wild", "wild", "wild", "wild", "wild", "wild", "wild", "wild"]
+	var v := _six(0, _plots(wild), [{"id": "seed_radish", "qty": 20}])
+	var rows := P0Logic.today_rows(v)
+	assert_str(str(rows[0].line)).is_equal("Six Radishes · Sow 6 Radishes")
+	assert_str(str(rows[0].go)).is_equal("plots")
+	assert_str(str(rows[0].icon)).is_equal("crop_radish")
+	assert_bool(_lines(rows).any(func(l): return str(l).begins_with("Sow "))).is_false()
+	# lettuce seeds too: the generic row sows the lettuce
+	v.bag.slots.append({"id": "seed_lettuce", "qty": 10})
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Sow 6 Radishes", "Sow 8 Lettuce · 16 Energy"])
+	# three in the ground (one a Quick Radish, one ripe) and one harvested: 2 more, then 1
+	var plots := _plots(["growing", "growing", "ready", "wild", "wild", "wild", "wild", "wild"])
+	plots[1].crop = "crop_quick_radish"
+	v = _six(1, plots, [{"id": "seed_radish", "qty": 20}])
+	v["quick_seeds"] = [{"id": "crop_quick_radish", "seed": "seed_quick_radish", "energy": 2, "grow_s": 45, "harvest": "crop_radish"}]
+	assert_str(P0Logic.request_sow(v, P0Logic.PinReason.taken(v)[0])).is_equal("Sow 2 more Radishes")
+	v.plots[3] = {"id": 3, "state": "sown", "crop": "crop_radish"}
+	assert_str(P0Logic.request_sow(v, P0Logic.PinReason.taken(v)[0])).is_equal("Sow 1 more Radish")
+	# enough in: the count, and the generic row again
+	v.plots[4] = {"id": 4, "state": "sown", "crop": "crop_radish"}
+	assert_str(P0Logic.request_sow(v, P0Logic.PinReason.taken(v)[0])).is_empty()
+	var lines := _lines(P0Logic.today_rows(v))
+	assert_array(lines).contains(["Six Radishes · Radish 1/6"])
+	assert_bool(lines.any(func(l): return str(l).begins_with("Sow 3 Radishes"))).is_true()

@@ -192,6 +192,59 @@ describe('off the path', () => {
     expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' } });
     expect(r.view.row.ready_in).toBeGreaterThan(3 * 3_600_000);
   });
+  it('q(254): the resent seeds in the Inbox — Claim Pip\'s seeds, Pip says so; in hand — Sow 2 / Sow 1 Quick Radish', () => {
+    const r = new Run('director-resend-inbox').pick();
+    r.harvest(r.sowQuick());
+    r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
+    // a full bag of things that are neither a Radish nor a Common crop (they would stop the resend)
+    const kept = r.s.bag.map(x => ({ ...x }));
+    for (const id of [...c.fish.map(f => f.id), ...Object.keys(c.goods)]) if (r.s.bag.length < r.s.bag_cap) r.s.bag.push({ id, qty: 1 });
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    const parcel = r.s.inbox.parcels.find(p => p.id === 'seed_quick_radish')!;
+    expect(parcel.source).toBe("Pip's seeds");
+    expect(r.view).toMatchObject({ step: 't_nadia_1', recover: 'r_seeds_inbox', row: { line: "Claim Pip's seeds · Inbox", icon: 'seed_quick_radish', go: 'inbox' },
+      marks: [], pip: { bang: false, line: 'Your bag was full, so I left two quick ones in your Inbox.', resend_left: 1 } });
+    r.s.bag = kept;   // room made (Parcels' Make room)
+    r.do({ type: 'claim_parcel', key: parcel.key });
+    expect(r.qty('seed_quick_radish')).toBe(2);
+    const sow = { recover: 'r_quick_sow', row: { line: 'Sow 2 Quick Radishes', icon: 'seed_quick_radish', go: 'home' } };
+    expect(r.view).toMatchObject({ ...sow, pip: { bang: false, line: "They're ready! Nadia at the market loves fresh radishes. Take her one." } });
+    expect(r.view.marks).toEqual([...r.tilled(2).map(plot => ({ plot })), { button: 'sow', pulse: true }]);   // as S2
+    // a Radish sown meanwhile (4 h) does not hide the quick ones still in hand
+    const slow = r.tilled(1)[0];
+    r.do({ type: 'sow', plot: slow, seed: 'seed_radish', space: 'home' }).do({ type: 'water', plot: slow, space: 'home' });
+    expect(r.view).toMatchObject(sow);
+    // one of the two sown and harvested: the one left
+    const one = r.tilled(1)[0];
+    r.do({ type: 'sow', plot: one, seed: 'seed_quick_radish', space: 'home' }).do({ type: 'water', plot: one, space: 'home' });
+    expect(r.view.recover).toBe('r_quick_regrow');
+    r.harvest([one]);
+    r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
+    r.check();
+    expect(r.view).toMatchObject({ recover: 'r_quick_sow_1', row: { line: 'Sow 1 Quick Radish' } });
+    expect(r.view.marks).toEqual([{ plot: r.tilled(1)[0] }, { button: 'sow', pulse: true }]);
+    // none left, one resend left: back to Pip's ! (Radish ready: the slow one still growing)
+    r.s.bag = r.s.bag.filter(x => x.id !== 'seed_quick_radish');
+    r.check();
+    expect(r.view).toMatchObject({ recover: 'r_radish_wait', pip: { bang: true } });
+  });
+  it('q(254) at S9: the soup still to make, the resent seeds in the Inbox, then in hand', () => {
+    const r = new Run('director-soup-inbox').pick();
+    r.harvest(r.sowQuick());
+    r.nadia1().fish(2);
+    r.s.energy.value = 100;
+    r.cook(['fish_crucian'], true);
+    expect(r.step).toBe('t_soup');
+    r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
+    const kept = r.s.bag.map(x => ({ ...x }));
+    for (const id of [...c.fish.map(f => f.id), ...Object.keys(c.goods)]) if (r.s.bag.length < r.s.bag_cap) r.s.bag.push({ id, qty: 1 });
+    expect(r.s.bag.length).toBe(r.s.bag_cap);
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect(r.view).toMatchObject({ step: 't_soup', recover: 'r_seeds_inbox', pip: { bang: false } });
+    r.s.bag = kept;
+    r.do({ type: 'claim_parcel', key: r.s.inbox.parcels.find(p => p.id === 'seed_quick_radish')!.key });
+    expect(r.view).toMatchObject({ step: 't_soup', recover: 'r_quick_sow', row: { line: 'Sow 2 Quick Radishes' } });
+  });
   it('the soup still to make, no crop held, the resent quick ones growing: their countdown at S9 too (苏烈 on #506)', () => {
     const r = new Run('director-soup-regrow').pick();
     r.harvest(r.sowQuick());
