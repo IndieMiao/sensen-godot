@@ -415,6 +415,7 @@ func set_view(v: Dictionary) -> void:
 	if blackjack() != null: _blackjack.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
+	_refresh_request_reward()
 	_refresh_today(false)
 
 
@@ -3178,6 +3179,8 @@ static func resident_face(key: String) -> Texture2D: return resident_crop(key, "
 
 ## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
 ## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).
+var _request_card: UiRequestCard
+
 func open_resident_request(id: String) -> void:
 	var d := P0Logic.resident_bar(view, id)
 	if d.is_empty(): return
@@ -3203,7 +3206,19 @@ func open_resident_request(id: String) -> void:
 	card.dismissed.connect(func(): open_resident(id))
 	_open_modal(card, 0.0, true)
 	modal_kind = "resident_request"
+	_request_card = card
+	card.set_meta("resident", id)
+	var req: Variant = view.get("residents", {}).get(id, {}).get("request", null)
+	card.set_meta("request", str(req.get("id", "")) if req is Dictionary else "")
 	_modal_back = func(): open_resident(id)
+
+func _refresh_request_reward() -> void:
+	if modal_kind != "resident_request" or not is_instance_valid(_request_card): return
+	var id := str(_request_card.get_meta("resident", ""))
+	var req: Variant = view.get("residents", {}).get(id, {}).get("request", null)
+	if not req is Dictionary or str(req.get("id", "")) != str(_request_card.get_meta("request", "")): return
+	var reward := _request_rewards(view, req, P0Logic.resident_request(id, str(req.get("id", ""))))
+	_request_card.update_reward(str(reward.reward), str(reward.bonus_note))
 
 ## ResidentRequestCard data from the resident's open request (content table + view facts).
 static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -> Dictionary:
@@ -3243,21 +3258,38 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		need.icon = P0Logic.icon(item)
 	# Li Bai q(46): a request's own need line wins (`1 Rare fish · Golden Koi · Pond`); the tile shows the count itself.
 	if need_line != "": need.name = need_line.trim_prefix("%d " % int(need.need))
+	var data := {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
+		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
+		"line": text, "needs": [need] if kind != "" else [],
+		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
+		"reason": str(bar.get("request_reason", ""))}
+	data.merge(_request_rewards(view_, req, q))
+	return data
+
+static func _request_rewards(view_: Dictionary, req: Dictionary, q: Dictionary) -> Dictionary:
 	var reward := []
 	if int(P0Logic.content().get("affinity", {}).get("request", 0)) > 0:
 		reward.append("+%d Friendship" % int(P0Logic.content().affinity.request))
-	if int(req.get("coins", 0)) > 0: reward.append("%d coins" % int(req.coins))
+	var coins := int(req.get("coins", 0))
+	var bonus_note := ""
+	# q(262): bonus is an optional display-only difference; older servers retain the listed reward.
+	var bonus := int(req.get("bonus", 0))
+	var quota: Dictionary = view_.get("quotas", {}).get("request_bonus", {})
+	if bonus < 0: coins -= bonus   # q(44): a hand-in floor above the listed price is still paid in full
+	elif not quota.is_empty():
+		var left := maxi(0, int(quota.get("cap", 0)) - int(quota.get("used", 0)))
+		if left < bonus:
+			coins -= bonus - left
+			bonus_note = "Bonus resets in %s" % P0Logic.span(float(quota.get("resets_in", 0)))
+	if int(req.get("coins", 0)) > 0 or coins > 0: reward.append("%d coins" % coins)
 	# q(224) ① / q(225) ①: a request whose reward gives a recipe card ends on `New recipe`, no dish name (the delivery's
 	# float names it, `New recipe · Fresh Fish Soup`); not once the page is known, as the server then gives none.
 	var recipe := str(q.get("reward", {}).get("recipe", ""))
 	if recipe != "" \
 			and not (view_.get("cooking", {}).get("cookbook", []) as Array).any(func(pg): return str(pg.get("id", "")) == recipe and bool(pg.get("known", false))):
 		reward.append("New recipe")
-	return {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
-		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
-		"line": text, "needs": [need] if kind != "" else [], "reward": " · ".join(reward),
-		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
-		"reason": str(bar.get("request_reason", ""))}
+	if str(q.get("reward", {}).get("title", "")) != "": reward.append("New title")
+	return {"reward": " · ".join(reward), "bonus_note": bonus_note}
 
 ## Residents met at every outpost of a type (§9.4.3, q(222) ①: Pip at every Travel Post; his request counts wherever
 ## he is met). The server places him at the home set's post only for the map (home_city.residentPlace).

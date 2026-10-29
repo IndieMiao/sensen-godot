@@ -5,7 +5,7 @@ extends PanelContainer
 ## personal request`) + the request in their own words + `Bring` NEED-TILE(s) + Reward + Deliver to + one
 ## primary (Accept, or Deliver when ready; a reason makes it unavailable, LOCK-10) + `Not now`.
 ## The full lifecycle (Track, Drop, statuses) is WP4. data: {portrait (Texture2D), title, who, line, needs:
-## [{name, have, need, icon}], reward, deliver_to, action, reason}. Emits `action_pressed` / `dismissed`.
+## [{name, have, need, icon}], reward, bonus_note (optional), deliver_to, action, reason}. Emits `action_pressed` / `dismissed`.
 
 signal action_pressed
 signal dismissed
@@ -21,6 +21,8 @@ const _BUBBLE_PAD := Vector2(10, 6)
 
 var data := {}
 var _action: UiCommandButton
+var _reward: Label
+var _bonus_note: Label
 
 func _init(data_: Dictionary = {}) -> void:
 	data = data_
@@ -77,7 +79,21 @@ func _init(data_: Dictionary = {}) -> void:
 		var v := UiKit.label(str(data[row[1]]), UiTokens.STYLE_C12_XB)
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		h.add_child(v)
+		if row[1] == "reward":
+			var values := VBoxContainer.new()
+			values.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			values.add_theme_constant_override(&"separation", 0)
+			_reward = v
+			v.clip_text = true   # keep the value column inside the card; wrap whole rewards after it receives its width
+			values.add_child(v)
+			_bonus_note = UiKit.label(str(data.get("bonus_note", "")), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+			_bonus_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			_bonus_note.visible = _bonus_note.text != ""
+			values.add_child(_bonus_note)
+			values.resized.connect(_fit_reward)
+			h.add_child(values)
+		else:
+			h.add_child(v)
 		col.add_child(h)
 	_action = UiCommandButton.new(str(data.get("action", "Accept")))
 	_action.reason = str(data.get("reason", ""))
@@ -88,5 +104,30 @@ func _init(data_: Dictionary = {}) -> void:
 	var later := UiDismissButton.new("Not now")
 	later.pressed.connect(func(): dismissed.emit())
 	col.add_child(later)
+	minimum_size_changed.connect(func(): _fit_height.call_deferred())
 
 func action_button() -> UiCommandButton: return _action
+
+func update_reward(reward: String, bonus_note: String) -> void:
+	if str(data.get("reward", "")) == reward and str(data.get("bonus_note", "")) == bonus_note: return
+	data.reward = reward
+	data.bonus_note = bonus_note
+	if is_instance_valid(_bonus_note):
+		_bonus_note.text = bonus_note
+		_bonus_note.visible = bonus_note != ""
+	_fit_reward()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED: _fit_reward.call_deferred()
+
+func _fit_reward() -> void:
+	if not is_instance_valid(_reward): return
+	_reward.text = UiKit.break_at_dot(str(data.get("reward", "")), _reward.get_theme_font(&"font"),
+		_reward.get_theme_font_size(&"font_size"), _reward.get_parent().size.x)
+
+func _fit_height() -> void:
+	var height := get_combined_minimum_size().y
+	if grow_vertical == Control.GROW_DIRECTION_BEGIN and is_equal_approx(anchor_top, anchor_bottom):
+		offset_top = offset_bottom - height
+	else:
+		size.y = height

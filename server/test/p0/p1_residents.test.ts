@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { itemKind, loadP0Content, recipeById } from '../../src/p0/content.js';
+import { dishId, itemKind, loadP0Content, recipeById } from '../../src/p0/content.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 import { pageState } from '../../src/p0/cookbook.js';
 import { likesDish, residentState } from '../../src/p0/residents.js';
+import { floorPrice } from '../../src/p0/requests.js';
 
 // P1 residents (SGODOT-284): the other ten of §9.4.3, the 24 h request gap (§9.6.1), lessons (§7.5.3), story rewards.
 const content = loadP0Content();
@@ -65,6 +66,72 @@ describe('the twelve residents (§9.4.3)', () => {
         if ((q.need.rarity ?? 0) >= 3 && q.need.kind === 'fish') expect(['res_old_kai', 'res_lena', 'res_tomo', 'res_mira']).toContain(rid);
       }
     }
+  });
+});
+
+describe('resident reward previews (q262)', () => {
+  it.each([0, 70, 100])('matches mixed-quality hand-ins with %i bonus already used, without changing the save', used => {
+    let s = at(fresh(), 'res_sam', 95);
+    s.residents.res_sam.next = 2;
+    s = step(s, { type: 'accept', request: 'req_res_sam_3' }).s;
+    s.bag = [{ id: dishId('dish_grilled_fish', 2), qty: 2 }, { id: 'dish_pan_fried_fish', qty: 1 },
+      { id: 'dish_grilled_fish', qty: 2, gift: { from: 'res_sam', day: s.day.key } }];
+    s.day.bonus = used;
+    const before = structuredClone(s), v = viewOf(c, s, T0), q = v.residents.res_sam.request!;
+    const floor = floorPrice(c, 'dish_pan_fried_fish') + floorPrice(c, dishId('dish_grilled_fish', 2));
+    expect(q.bonus).toBe(q.coins - floor);
+    expect(s).toEqual(before);
+    const actual = q.coins - q.bonus + Math.min(Math.max(0, q.bonus), v.quotas.request_bonus.cap - used);
+    expect(step(s, { type: 'deliver', request: q.id }).ev).toContainEqual({
+      kind: 'request', id: q.id, status: 'done', coins: actual, bonus: actual - floor,
+    });
+  });
+
+  it('estimates an incomplete style request from the cheapest eligible dish, ignoring gifts and unrelated dishes', () => {
+    const s = at(fresh(), 'res_sam', 95);
+    s.residents.res_sam.next = 2;
+    s.bag = [{ id: dishId('dish_grilled_fish', 2), qty: 1 }, { id: 'dish_grilled_fish', qty: 2, gift: { from: 'res_sam', day: s.day.key } },
+      { id: 'dish_fish_soup', qty: 2 }];
+    const q = viewOf(c, s, T0).residents.res_sam.request!;
+    const cheapest = Math.min(...c.cooking.recipes.filter(r => r.style === 'Grilled').map(r => floorPrice(c, r.id)));
+    expect(q).toMatchObject({ have: 1, bonus: q.coins - cheapest * q.qty });
+  });
+
+  it('covers storage materials and counted sow/harvest requests without persisting bonus', () => {
+    const s = fresh();
+    s.storage.wood = 6;
+    expect(viewOf(c, s, T0).residents.res_granny_wu.request).toMatchObject({ bonus: 30 - 6 * floorPrice(c, 'wood') });
+    at(s, 'res_pip', 95);
+    s.residents.res_pip.next = 1;
+    const sow = viewOf(c, s, T0).residents.res_pip.request!;
+    expect(sow.kind).toBe('sow');
+    expect(sow.bonus).toBe(sow.coins);
+    at(s, 'res_nadia', 95);
+    s.residents.res_nadia.intro_done = ['req_res_nadia_radish'];
+    s.residents.res_nadia.req = { id: 'req_res_nadia_six_radishes', at: T0, progress: 0 };
+    const harvest = viewOf(c, s, T0).residents.res_nadia.request!;
+    expect(harvest.kind).toBe('harvest');
+    expect(harvest.bonus).toBe(harvest.coins);
+    expect(JSON.stringify(s.residents)).not.toContain('bonus');
+  });
+
+  it('retains a hand-in floor above the listed coins instead of reporting less than settlement', () => {
+    let s = at(fresh(), 'res_rafa', 95);
+    s.residents.res_rafa.next = 2;
+    s = step(s, { type: 'accept', request: 'req_res_rafa_3' }).s;
+    const id = dishId('dish_fish_soup', 2);
+    s.bag = [{ id, qty: 9 }];
+    s.day.bonus = 100;
+    const lowPrice = structuredClone(c);
+    lowPrice.residents.res_rafa.requests[2].coins = 1;
+    const q = viewOf(lowPrice, s, T0).residents.res_rafa.request!;
+    expect(q.bonus).toBeLessThan(0);
+    const delivered = applyP0(lowPrice, s, { type: 'deliver', request: q.id }, T0);
+    expect(delivered.ok).toBe(true);
+    if (!delivered.ok) return;
+    expect(delivered.events).toContainEqual({
+      kind: 'request', id: q.id, status: 'done', coins: q.coins - q.bonus, bonus: 0,
+    });
   });
 });
 

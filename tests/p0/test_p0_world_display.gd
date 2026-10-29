@@ -205,6 +205,34 @@ func test_request_card_accepts_and_not_now_returns_to_the_bar() -> void:
 	card.action_pressed.emit()
 	assert_that(sent.back()).is_equal({"type": "accept", "request": "req_res_pip_1"})
 
+func test_open_request_reward_follows_the_countdown_and_bonus_reset_without_reopening() -> void:
+	var ui := _ui(true)
+	var v := _resident_view()
+	v.residents.res_pip.request["bonus"] = 18
+	v["quotas"] = {"request_bonus": {"used": 100, "cap": 100, "resets_in": 2 * 60000}}
+	ui.set_view(v)
+	ui.open_resident_request("res_pip")
+	for i in 8: await get_tree().process_frame
+	var card := ui._request_card
+	var bottom := card.get_global_rect().end.y
+	var height := card.size.y
+	assert_str(str(card.data.reward)).is_equal("+5 Friendship · 2 coins")
+	assert_str(card._bonus_note.text).is_equal("Bonus resets in 2m")
+	v.quotas.request_bonus.resets_in = 60000
+	ui.set_view(v)
+	assert_str(card._bonus_note.text).is_equal("Bonus resets in 1m")
+	v.quotas.request_bonus.used = 0
+	ui.set_view(v)
+	for i in 8: await get_tree().process_frame
+	assert_object(ui._request_card).is_same(card)
+	assert_str(str(card.data.reward)).is_equal("+5 Friendship · 20 coins")
+	assert_bool(card._bonus_note.visible).is_false()
+	assert_float(card.get_global_rect().end.y).is_equal(bottom)
+	assert_float(card.size.y).is_less(height)
+	ui.close_modal()
+	await get_tree().process_frame
+	ui.set_view(v)   # no access to the freed card after closing
+
 func test_request_card_uses_the_requests_own_need_line() -> void:
 	var v := _view()
 	v["residents"] = {"res_old_kai": {"request": {"id": "req_res_kai_1", "kind": "fish", "rarity": 3, "qty": 1, "coins": 50, "have": 0}}}

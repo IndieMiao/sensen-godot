@@ -1,5 +1,5 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
-import { cropBySeed, fastCrop, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId, recipeById } from './content.js';
+import { cropBySeed, fastCrop, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ResidentRequest, type ShopId, recipeById } from './content.js';
 import { count, freeSlots } from './bag.js';
 import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
@@ -10,7 +10,7 @@ import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
-import { floorPrice, haveFor, matches } from './requests.js';
+import { floorPrice, haveFor, matches, pick } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
@@ -396,10 +396,11 @@ function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
 }
 
 /** Ids a request could take, cheapest floor first: the fixed items, or every crop / fish / dish that fits its kind and rarity. */
-function candidates(c: P0Content, s: P0State, r: BoardRequest): string[] {
+function candidates(c: P0Content, s: P0State, r: Pick<BoardRequest, 'items' | 'kind' | 'where' | 'rarity' | 'style' | 'family'>): string[] {
   if (r.items.length || r.kind === 'visit') return r.items;
   if (r.where === 'not_home') return [...farFish(c, s)].sort((a, b) => floorPrice(c, a) - floorPrice(c, b));   // Far Pond: q(128) estimates at the cheapest
-  const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
+  const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id)
+    : r.kind === 'material' ? Object.keys(c.materials) : c.crops.map(x => x.id);
   return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
 
@@ -470,6 +471,17 @@ function legacyBoard(c: P0Content, s: P0State, now: number) {
   };
 }
 
+/** q(262): display-only listed coins minus the hand-in floor. A negative difference retains a floor above the price. */
+function residentRequestBonus(c: P0Content, s: P0State, q: ResidentRequest): number {
+  if (q.need.kind === 'sow' || q.need.kind === 'harvest') return q.coins;
+  const items = q.need.id ? [q.need.id] : [];
+  const parts = pick(c, s, q.need, items, q.qty);
+  const cheapest = candidates(c, s, { ...q.need, kind: q.need.kind, items })[0];
+  const floor = parts ? parts.reduce((sum, [id, n]) => sum + floorPrice(c, id) * n, 0)
+    : (cheapest ? floorPrice(c, cheapest) : 0) * q.qty;
+  return q.coins - floor;
+}
+
 /** A resident as facts (§9.4.4, LOCK-18): names, lines and request copy stay in the content table the client reads. */
 function residentView(c: P0Content, s: P0State, id: string, now: number) {
   const r = structuredClone(residentState(s, id)), stages = c.affinity.stages;
@@ -486,6 +498,7 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     meal,   // ready = the next talk gives today's gift meal (into the Inbox when the bag is full)
     request: st.req && {
       id: st.req.id, kind: st.req.need.kind, rarity: st.req.need.rarity ?? null, qty: st.req.qty, coins: st.req.coins,
+      bonus: residentRequestBonus(c, s, st.req),   // optional to clients predating q(262); never stored or used to settle
       item: st.req.need.id ?? null, style: st.req.need.style ?? null,   // P1: one named item, or dishes of one style
       have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),
       ready: st.state === 'accepted' && progressOf(c, s, id, st.req) >= st.req.qty,
