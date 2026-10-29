@@ -443,9 +443,9 @@ static func span(ms: float) -> String:
 	return "%dh %dm" % [minutes / 60, minutes % 60]
 
 ## The main key's second line for a growing plot (≤ 80 px, q(44); 不知火舞 on 241): `Ready in 48h` with one unit, just
-## `19h 58m` with two (`Ready in 19h 58m` is about 101 px and ran off the round key).
+## `19h 58m` with two (`Ready in 19h 58m` is about 101 px and ran off the round key). q(249): last 5:00 ticks as Today.
 static func key_ready(ms: float) -> String:
-	var t := span(ms)
+	var t := _crop_countdown(ms)
 	return t if t.contains(" ") else "Ready in " + t
 
 static func crop(view: Dictionary, crop_id: String) -> Dictionary:
@@ -484,9 +484,12 @@ static func harvest_of(view: Dictionary, crop_id: String) -> String:
 	var q := quick_seed(view, crop_id)
 	return str(q.get("harvest", crop_id)) if not q.is_empty() and str(q.get("id", "")) == crop_id else crop_id
 
-## q(247): every crop's Today countdown uses m:ss through 5:00; above it use q(97)'s rounded sentence duration.
+## q(247)/q(249): Today and the Growing key share this rule for every crop, including orchard trees.
 static func ripe_in(_view: Dictionary, _crop_id: String, ms: float) -> String:
-	return duration(ms) if ms <= 300_000.0 else span(ms)   # q(247): every crop's last five minutes, once per second
+	return _crop_countdown(ms)
+
+static func _crop_countdown(ms: float) -> String:
+	return duration(ms) if ms <= 300_000.0 else span(ms)
 
 ## Gift Clues (Fishing Lv7, q(167)): the residents met who like this dish, in content order — view.gift_clues
 ## {dish: [{resident, verdict}]}, null before Lv7. Names, [] when none.
@@ -633,9 +636,7 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"sown":
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
-			var ms := float(plot.get("ready_in", 0))   # a Quick Radish's `Ready in 0:45`, ticking (q(217) ④)
-			var fixed := not quick_seed(view, str(plot.get("crop", ""))).is_empty()   # q(217) alone; q(247) changes Today, not this key
-			var sub := "Ready in " + duration(ms) if fixed else key_ready(ms)
+			var sub := key_ready(float(plot.get("ready_in", 0)))
 			return {"icon": "clock", "verb": "Growing", "sub": sub, "enabled": false, "amber": false, "cmd": {}, "need": 0}
 		"ready":
 			# Harvest All (Farming Lv9, q(118) ④): the ripe annuals of the garden row underfoot, this one first.
