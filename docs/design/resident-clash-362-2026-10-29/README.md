@@ -26,7 +26,7 @@ the UI director (362 27ea8b86):
 
 - `assets/p0/art/residents/hana_card.jpg`, rebaked with look A on the shared portrait stage
   (`tools/art/bake_resident_portraits.gd`, farm-dev 26416a20; avatar parts unchanged since).
-- `portrait_crops.json` `hana`: stamp [100,46,162,203], face [103,50,157,157]. The side tuft
+- `portrait_crops.json` `hana`: stamp [100,46,162,203], face [112,56,162,162] (eyes centred, chin inside the circle; options in `hana-face-crop-options.png`, 不知火舞 362 77a4c2b7). The side tuft
   of the 43 style falls outside the stamp and face, as on Theo's card.
 - `hana-rebake-check.png`: before / after, Ama · Hana · Lena of the tea house, stamp at
   32×40 and ×3, profile face at 80.
