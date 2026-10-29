@@ -30,7 +30,7 @@
 # The access key: P0_KEY=… in the environment, else output/p0-deploy/key; the admin key likewise P0_ADMIN_KEY or
 # output/p0-deploy/admin-key (both created once with openssl, never committed).
 #
-# --target us (first word, before the step): the US West P0 the 10-29 migration moved to (43.110.146.219, run by the
+# --target us (first word, before the step): the US West P0 the 10-28 migration moved to (43.110.146.219, run by the
 # migration side; contract in pm/migration/p0-migration-decision-2026-10-27.md, E answer 8). Without it every step is
 # the Hong Kong one, unchanged. On us:
 #   login       ssh -F $P0_US_SSH_CONFIG $P0_US_HOST (default the migration side's ssh_config, host tgt-us-p0)

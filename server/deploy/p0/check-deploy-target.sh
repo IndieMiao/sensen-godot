@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Offline check of deploy-hk.sh's --target (SGODOT-232; the US West target after the 10-29 migration). Connects to
+# Offline check of deploy-hk.sh's --target (SGODOT-232; the US West target after the 10-28 migration). Connects to
 # nothing: ssh, scp, curl and date are stubs that log what they were asked and answer canned lines.
 #   server/deploy/p0/check-deploy-target.sh [<git ref of the old script>]   # default origin/farm-dev
 # 1. Hong Kong unchanged: every step run by the old script and by this one (with no --target and with --target hk)

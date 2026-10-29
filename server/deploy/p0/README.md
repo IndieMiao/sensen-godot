@@ -73,9 +73,9 @@
 
 批准后：同样传上下文并构建，然后 `P0_IMAGE=p0-server:<sha> docker compose -p p0 -f docker-compose.devserver.yml up -d`，冒烟用 `P0_BASE=http://192.168.124.53:3150`。HTTP 明文在演示包上可用（D2 模拟器用 `http://10.0.2.2` 连通过）。
 
-## 目标 C：美西（10-29 迁移之后，`--target us`）
+## 目标 C：美西（10-28 晚迁移之后，`--target us`）
 
-10-29 起 P0 的权威服务在美西 `43.110.146.219`（由迁移方运维；约定见 pm/migration/p0-migration-decision-2026-10-27.md 的「E 答复」第 8 项）。客户端地址不变，仍是 `https://farm.sensenjoy.cn/preview/p0/v1`，由 farm 的入口转发到美西。
+10-28 20:33 切流起 P0 的权威服务在美西 `43.110.146.219`（由迁移方运维；约定见 pm/migration/p0-migration-decision-2026-10-27.md 的「E 答复」第 8 项）。客户端地址不变，仍是 `https://farm.sensenjoy.cn/preview/p0/v1`，由 farm 的入口转发到美西。
 
 - 每个步骤前加 `--target us`，例如 `server/deploy/p0/deploy-hk.sh --target us up <sha>`。不加就是香港，行为和原来逐字一致。
 - 登录用迁移方的 ssh_config（`P0_US_SSH_CONFIG`，主机 `P0_US_HOST`，默认 `tgt-us-p0`）。镜像压缩包的暂存目录默认 `/srv/migration-data/services/p0/staging`（首次 transfer 建成 0700，压缩包 0600），用 `P0_US_STAGING` 改，必须是绝对路径，不能在正式数据目录下。
