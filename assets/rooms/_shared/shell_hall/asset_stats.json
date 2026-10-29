@@ -57,7 +57,7 @@
         1.3263769149780273,
         0.8900000154972076
       ],
-      "sha256": "2ce26f73718daca904dfd1ea738669e4db16e3a666c157cbe21d8db03fa8b00a",
+      "sha256": "349930f297c891111ef23110c58b046df3a2c056755c9bdd31ce86dea9527ba6",
       "file": "sofa_three_seat.glb",
       "provenance": "provenance/sofa_three_seat/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",
@@ -197,7 +197,7 @@
         1.3263769149780273,
         0.8900000154972076
       ],
-      "sha256": "e2c5c3470ac05568db527bb19343704fd34fc16d5e11882ee50bb6123ef9d223",
+      "sha256": "22b329539f0d85af367849719caaef67870e0a6923bb8790adc52f4fea84e2dc",
       "file": "armchair.glb",
       "provenance": "provenance/armchair/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",
@@ -327,7 +327,7 @@
         0.715399980545044,
         0.550000011920929
       ],
-      "sha256": "bab8d4361cf5d986bdf1f449d4e7aa2d0c757ce40ffa1ab6d0df261818df3172",
+      "sha256": "ddb0151743a9e5682db3fef2afaefc0992390fd254a193c474ccca3d46587cfb",
       "file": "bench_three_seat.glb",
       "provenance": "provenance/bench_three_seat/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",
@@ -850,7 +850,7 @@
         1.1342500448226929,
         1.100000023841858
       ],
-      "sha256": "f25ff0f9c31b5b256423d08f88ff6242332d9db3ac63f7ffd075cff601d21461",
+      "sha256": "b029d9e19b0bc08c4466f97d991fdde8dd2aefc6beaf59503e27c1c43a0e675b",
       "file": "round_side_table.glb",
       "provenance": "provenance/round_side_table/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",
@@ -922,7 +922,7 @@
         0.714999973308295,
         0.5600000023841858
       ],
-      "sha256": "d9bd3353ce6f150b0f50d430d9dd05f33631836e49ae317b1b9b100d4571cd4d",
+      "sha256": "ed28942fc59fdb030f76fd0867cee138828fce7cb8f4285e33887e4c07407450",
       "file": "round_stool.glb",
       "provenance": "provenance/round_stool/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",
@@ -993,7 +993,7 @@
         0.5600000023841858,
         0.15949998795986176
       ],
-      "sha256": "e3882c8f7b51c59b2fdc143cfd97bebe7f844da3043754fb4dfa3265eae627e3",
+      "sha256": "ea46eaa935f609a8e4177c9f2be27c5e620b1031cd88d5dfdeeec39b8efaa7a1",
       "file": "wall_sconce.glb",
       "provenance": "provenance/wall_sconce/reuse_provenance.json",
       "pivot": "back mounting plane Z=0, centre Y=0",
@@ -1062,7 +1062,7 @@
         0.6620000004768372,
         0.07500000298023224
       ],
-      "sha256": "5db0badaa3abf9da5afdccf592abba08f687c255e614a27b70650544144a00a9",
+      "sha256": "e3a38641e331388e6ae70f7479eca9deeb2ab1f655399dff8fb1dbb219122fd8",
       "file": "frame_portrait.glb",
       "provenance": "provenance/frame_portrait/reuse_provenance.json",
       "pivot": "back mounting plane Z=0, centre Y=0",
@@ -1149,7 +1149,7 @@
         0.4819999933242798,
         0.07500000298023224
       ],
-      "sha256": "a69a104a8fa542ed15f2f3952c0c18d3ea047a758431c074aad63664482cf2f2",
+      "sha256": "b7405a867b8624ce38616390138db1e52f6cbe572b06934a5238a3e470866d0f",
       "file": "frame_landscape.glb",
       "provenance": "provenance/frame_landscape/reuse_provenance.json",
       "pivot": "back mounting plane Z=0, centre Y=0",
@@ -1229,7 +1229,7 @@
         1.760699987411499,
         1.1740000247955322
       ],
-      "sha256": "da922c67ddb81bc0e1aba6ad6f33c88ccfaccb92ddc11a58160aa22664169308",
+      "sha256": "2c78d031503f0a9c57686fb39ae0b32967c907c029174cc7e7f3721f00fe5cea",
       "file": "display_cabinet.glb",
       "provenance": "provenance/display_cabinet/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",
@@ -1471,7 +1471,7 @@
         1.760699987411499,
         2.3399999141693115
       ],
-      "sha256": "e5f92a68e76bc499c2fbb456f26ec97a35e2cffef39e3df895e430e680909ca5",
+      "sha256": "ce0af3d751975e120245f4e0f886fb5bed5cf356aaa53a1c5242afc047bd2fc6",
       "file": "display_island.glb",
       "provenance": "provenance/display_island/reuse_provenance.json",
       "pivot": "floor Y=0, horizontal source centre",

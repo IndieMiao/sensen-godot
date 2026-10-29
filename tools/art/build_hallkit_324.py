@@ -423,7 +423,10 @@ def patch_glb(path):
         if 'mesh' not in node: continue
         group = node['name'].removeprefix('EXPORT_').split('.')[0]
         node['name'] = group
-        for prim in doc['meshes'][node['mesh']]['primitives']:
+        mesh = doc['meshes'][node['mesh']]
+        suffix = '' if group == 'Body' else '_' + group.lower()
+        mesh['name'] = path.stem + suffix + '_mobile'
+        for prim in mesh['primitives']:
             prim['material'] = 1 if group == 'Glass' else 0
     for mat in doc['materials']:
         glass = mat['name'] == 'HallGlass'

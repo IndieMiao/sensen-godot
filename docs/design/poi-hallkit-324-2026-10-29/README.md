@@ -2,6 +2,8 @@
 
 黄忠制作，2026-10-29。按上官婉儿本次派活，只交设计稿无关的 8 类复用件。上官婉儿技术检查；半成品随 N2 一起画面验收，进主线前须用户批准。本 PR 目标仅 `wp-3d-scene`。
 
+命名增量（上官婉儿 `cfd38d5c`）：14 个导出 mesh 统一为 `<件名>_mobile`，玻璃与画心分别加 `_glass`、`_artwork`；节点 `Body / Glass / Artwork` 保留。此次 verify 的 212 项检查通过，GLB 二进制块和除 mesh 名外的 JSON 均与 `b56e9952` 一致，沿用原审阅图。见 [命名验证](SGODOT-324_HALLKIT_v1_mesh_naming_validation.json)。圆岛方形玻璃罩留待 N3 判断。
+
 ## 内容与状态
 
 - `assets/rooms/_shared/shell_hall/`：8 类 / 10 个 GLB 变体，共 10,740 三角形、14 surface。画框有竖/横两款，展柜有长柜/圆岛两款，其余各一款。

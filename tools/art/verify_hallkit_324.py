@@ -60,6 +60,9 @@ for asset in stats['assets']:
     for node in doc['nodes']:
         if 'mesh' not in node: continue
         check(not any(key in node for key in ['matrix', 'translation', 'rotation', 'scale']), name+'/'+node['name']+' identity local transform')
+        suffix = '' if node['name'] == 'Body' else '_' + node['name'].lower()
+        check(doc['meshes'][node['mesh']].get('name') == name+suffix+'_mobile',
+              name+'/'+node['name']+' consistent exported mesh name')
         arrays = []
         for prim in doc['meshes'][node['mesh']]['primitives']:
             vertices = np.array(accessor(doc, blob, prim['attributes']['POSITION']))

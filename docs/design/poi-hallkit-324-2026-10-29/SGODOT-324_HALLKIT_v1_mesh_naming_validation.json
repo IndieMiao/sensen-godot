@@ -1,0 +1,200 @@
+{
+  "baseline_commit": "b56e99526b10d5a17b7af7437954b78dc8c653c5",
+  "author": "黄忠",
+  "assets": [
+    {
+      "file": "sofa_three_seat.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cube.081",
+          "after": "sofa_three_seat_mobile"
+        }
+      ],
+      "sha256": "349930f297c891111ef23110c58b046df3a2c056755c9bdd31ce86dea9527ba6",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "armchair.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cube.096",
+          "after": "armchair_mobile"
+        }
+      ],
+      "sha256": "22b329539f0d85af367849719caaef67870e0a6923bb8790adc52f4fea84e2dc",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "bench_three_seat.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cube.109",
+          "after": "bench_three_seat_mobile"
+        }
+      ],
+      "sha256": "ddb0151743a9e5682db3fef2afaefc0992390fd254a193c474ccca3d46587cfb",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "round_side_table.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Splayed wood table leg.006",
+          "after": "round_side_table_mobile"
+        }
+      ],
+      "sha256": "b029d9e19b0bc08c4466f97d991fdde8dd2aefc6beaf59503e27c1c43a0e675b",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "round_stool.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cone.013",
+          "after": "round_stool_mobile"
+        }
+      ],
+      "sha256": "ed28942fc59fdb030f76fd0867cee138828fce7cb8f4285e33887e4c07407450",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "wall_sconce.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cube.117",
+          "after": "wall_sconce_mobile"
+        }
+      ],
+      "sha256": "ea46eaa935f609a8e4177c9f2be27c5e620b1031cd88d5dfdeeec39b8efaa7a1",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "frame_portrait.glb",
+      "names": [
+        {
+          "node": "Artwork",
+          "before": "Artwork.002",
+          "after": "frame_portrait_artwork_mobile"
+        },
+        {
+          "node": "Body",
+          "before": "Cube.118",
+          "after": "frame_portrait_mobile"
+        }
+      ],
+      "sha256": "e3a38641e331388e6ae70f7479eca9deeb2ab1f655399dff8fb1dbb219122fd8",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "frame_landscape.glb",
+      "names": [
+        {
+          "node": "Artwork",
+          "before": "Artwork.003",
+          "after": "frame_landscape_artwork_mobile"
+        },
+        {
+          "node": "Body",
+          "before": "Cube.123",
+          "after": "frame_landscape_mobile"
+        }
+      ],
+      "sha256": "b7405a867b8624ce38616390138db1e52f6cbe572b06934a5238a3e470866d0f",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "display_cabinet.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cube.128",
+          "after": "display_cabinet_mobile"
+        },
+        {
+          "node": "Glass",
+          "before": "Continuous curved display glazing.004",
+          "after": "display_cabinet_glass_mobile"
+        }
+      ],
+      "sha256": "2c78d031503f0a9c57686fb39ae0b32967c907c029174cc7e7f3721f00fe5cea",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    },
+    {
+      "file": "display_island.glb",
+      "names": [
+        {
+          "node": "Body",
+          "before": "Cone.015",
+          "after": "display_island_mobile"
+        },
+        {
+          "node": "Glass",
+          "before": "Continuous curved display glazing.005",
+          "after": "display_island_glass_mobile"
+        }
+      ],
+      "sha256": "ce0af3d751975e120245f4e0f886fb5bed5cf356aaa53a1c5242afc047bd2fc6",
+      "only_mesh_names_changed": true,
+      "binary_chunk_unchanged": true,
+      "nodes_unchanged": true
+    }
+  ],
+  "retained_files": [
+    {
+      "file": "docs/design/poi-hallkit-324-2026-10-29/SGODOT-324_HALLKIT_v1_details.png",
+      "sha256": "81dad084375955581a97f54e7cc09cec814c477bad72a909e50a289047305a3f",
+      "unchanged": true
+    },
+    {
+      "file": "docs/design/poi-hallkit-324-2026-10-29/SGODOT-324_HALLKIT_v1_dimensions.png",
+      "sha256": "c475b01082538556fbb4788cf4051d351152cd144d6447c23e685c35a9288b5f",
+      "unchanged": true
+    },
+    {
+      "file": "docs/design/poi-hallkit-324-2026-10-29/SGODOT-324_HALLKIT_v1_lineup.png",
+      "sha256": "0bf60b870c1efb454788271a1f9f53a50556b506b2af423358db1116f0fb43de",
+      "unchanged": true
+    },
+    {
+      "file": "assets/rooms/_shared/shell_hall/hallkit_palette.png",
+      "sha256": "cf680867ad12bee9954f9574a7e40ecbf6c6b3b4a8f72fe186feca06e3321926",
+      "unchanged": true
+    },
+    {
+      "file": "tools/art/source/hallkit_324/hallkit_324.blend",
+      "sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+      "unchanged": true
+    }
+  ],
+  "verification": {
+    "script": "tools/art/verify_hallkit_324.py",
+    "passed": true,
+    "checks": 212,
+    "failures": []
+  },
+  "scope": "GLB mesh names only; original nodes, binary chunks, materials, images and editable model retained. No new rendering."
+}
