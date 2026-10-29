@@ -38,12 +38,14 @@ func _header(a: RefCounted) -> String:
 	session.free()
 	return result
 
-func test_toggle_only_affects_new_test_id_and_main_stays_legacy() -> void:
+# 0.2.14 (341, the user on 10-29): Main's new save starts the guide; the toggle only latches into new test accounts.
+func test_toggle_only_affects_new_test_id_and_main_always_asks_for_the_guide() -> void:
 	assert_bool(accounts.enabled()).is_true()
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home")
-	assert_bool(accounts.set_enabled(true)).is_true()
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_bool(accounts.set_enabled(false)).is_true()
 	assert_bool(accounts.is_test()).is_false()
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")   # Off is for test accounts only
+	assert_bool(accounts.set_enabled(true)).is_true()
 	assert_bool(accounts.start_test("main-avatar")).is_true()
 	assert_bool(Accounts.valid_test_id(accounts.active_id())).is_true()
 	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
@@ -75,7 +77,7 @@ func test_new_test_and_process_restart_preserve_main_and_isolate_preferences() -
 	assert_str(FileAccess.get_file_as_string(dir + "p0_main_identity.backup")).is_equal(MAIN_BYTES)
 	assert_str(FileAccess.get_file_as_string(dir + "p0_tips.json")).is_equal('{"main_seen":true}')
 	assert_str(FileAccess.get_file_as_string(dir + "p0_quickbar.json")).is_equal('{"main_pin":"seed_radish"}')
-	assert_str(_header(returned)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(returned)).is_equal("x-p0-features: choose_home,guide_v3")
 
 func test_each_explicit_start_uses_a_new_recognizable_id_and_keeps_first_main_backup() -> void:
 	accounts.start_test("main-avatar")
@@ -143,7 +145,7 @@ func test_absent_option_defaults_on_without_rewriting_old_active_test() -> void:
 	assert_str(upgraded.active_id()).is_equal(test_id)
 	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
 	assert_bool(upgraded.return_main()).is_true()
-	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,guide_v3")
 
 func test_visible_entry_opens_existing_page_with_default_on_and_returns_to_settings() -> void:
 	var ui: P0Ui = auto_free(P0Ui.new())
@@ -161,7 +163,7 @@ func test_visible_entry_opens_existing_page_with_default_on_and_returns_to_setti
 	assert_bool(ui._modal.find_child("GuideTestToggle", true, false).on).is_true()
 	assert_object(ui._modal.find_child("ReturnMainAccount", true, false)).is_null()
 	assert_bool(accounts.is_test()).is_false()   # opening the page does not create a test or change Main's features
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
 	(ui._modal.find_children("*", "P0SettingsPage", true, false)[0] as P0SettingsPage).back_pressed.emit()
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("settings")
