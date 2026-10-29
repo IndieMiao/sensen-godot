@@ -1,0 +1,136 @@
+"""Package actual Godot frames, measurements and readback-ready review media."""
+import csv
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT=Path(__file__).resolve().parents[2]
+OUT=ROOT/'output/sprinkler-244'
+DOC=ROOT/'docs/design/sprinkler-244-2026-10-30'
+SOURCE=ROOT/'tools/art/source/sprinkler_244'
+PREFIX='SGODOT-244_SPRINKLER_v1_'
+FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+DOC.mkdir(parents=True,exist_ok=True)
+geometry=json.loads((OUT/'geometry-validation.json').read_text())
+runtime=json.loads((OUT/'captures/godot-validation.json').read_text())
+source=json.loads((OUT/'source-validation.json').read_text())
+rebuild=json.loads((OUT/'reproducibility.json').read_text())
+assert geometry['passed'] and runtime['passed'] and source['passed'] and rebuild['byte_identical']
+entry=json.loads((ROOT/'assets/farm/art/manifest.json').read_text())['assets']['sprinkler']
+
+
+def font(size): return ImageFont.truetype(FONT,size)
+
+
+def text(draw,xy,label,size=24,colour='#263d42'):
+    draw.text(xy,label,font=font(size),fill=colour)
+
+
+def raw(name): return Image.open(OUT/('captures/'+name+'.png')).convert('RGB')
+
+
+def save(image,name): image.save(DOC/(PREFIX+name+'.png'))
+
+
+def portrait(name,title,note):
+    image=raw(name)
+    draw=ImageDraw.Draw(image)
+    factor=image.width//360
+    draw.rectangle((0,0,image.width,73*factor),fill='#f5f7f3')
+    text(draw,(12*factor,10*factor),'SGODOT-244 / 洒水器 v1',16*factor)
+    text(draw,(12*factor,39*factor),title,13*factor)
+    draw.rectangle((0,image.height-68*factor,image.width,image.height),fill='#f5f7f3')
+    text(draw,(12*factor,image.height-57*factor),'黄忠 · 682 tris · 0.647 m · 人物 1.745 m',12*factor)
+    text(draw,(12*factor,image.height-32*factor),note,11*factor)
+    save(image,name)
+
+
+portrait('default_43deg_360','默认 43° / 14.5° · 正交宽 6.72 m','真实 plot.glb / 8 株中期作物 / Godot Mobile')
+portrait('default_43deg_hd','默认 43° / 14.5° · 同构图高清渲染','真实 plot.glb / 8 株中期作物 / Godot Mobile')
+portrait('minimum_zoom_360','最远缩放 0.8 · 正交宽 8.40 m','完整 360 × 800 游戏取景；未放大模型')
+
+top=Image.new('RGB',(1000,1200),'#f5f7f3'); top.paste(raw('top'),(0,100)); draw=ImageDraw.Draw(top)
+text(draw,(28,17),'SGODOT-244 / 正俯视投影',29)
+text(draw,(28,57),'黄忠 · 真实田块 0.94 m · 中心距 1.30 m',22)
+half=.47/4.2*1000
+draw.rectangle((500-half,600-half,500+half,600+half),outline='#31777c',width=3)
+draw.line((500-half,750,500+half,750),fill='#31777c',width=3)
+for x in [500-half,500+half]:draw.line((x,740,x,760),fill='#31777c',width=3)
+text(draw,(437,765),'0.940 m',23)
+text(draw,(28,1115),'喷头旋转外径 0.38445 m；距本田外边至少 0.27778 m',24)
+text(draw,(28,1157),'框线为真实 plot.glb 的 XZ 包围盒；没有伸入走道或邻田。',21)
+save(top,'top')
+
+rotation=Image.new('RGB',(1800,735),'#f5f7f3'); draw=ImageDraw.Draw(rotation)
+text(draw,(30,16),'SGODOT-244 / 喷头旋转轴心检查 · 黄忠',29)
+for i,angle in enumerate([0,45,90]):
+    rotation.paste(raw('head_%03d'%angle),(i*600,65))
+    text(draw,(i*600+25,675),'head Y = %d° / 轴心 (0, 0.55, 0)'%angle,23)
+text(draw,(30,711),'同一真实田块、材质、光照和镜头；仅 head 旋转，base 与 spray_origin 固定。',17)
+save(rotation,'head_rotation')
+
+colour=raw('brass_wood'); draw=ImageDraw.Draw(colour)
+draw.rectangle((0,0,1000,108),fill='#f5f7f3')
+text(draw,(25,12),'SGODOT-244 / 黄铜与实际农场颜色 · 黄忠',29)
+text(draw,(25,58),'同一 FarmArt.material() 和农场光照；上方为真实 plot.glb',22)
+for x,title,code in [(99,'黄铜喷头','E8CE5B'),(382,'农场木色 / storage.glb','CBA067'),(663,'真实田沿土色 / plot.glb','96764F')]:
+    text(draw,(x,842),title,20)
+    text(draw,(x,875),'源色 #'+code,20)
+draw.rectangle((0,925,1000,1000),fill='#f5f7f3')
+text(draw,(25,939),'实物更正：plot.glb 是土畦，没有木框；另取现有木件作木色参照。',22)
+text(draw,(25,972),'黄铜 H=48.94° / 木色 H=34.20°；色相差 14.74°，避免偏橙混色。',20)
+save(colour,'colour_comparison')
+
+# These full-resolution controls isolate the real rear crop and the occluder.
+without=np.array(raw('rear_crop_without_sprinkler_mask'))
+with_model=np.array(raw('rear_crop_with_sprinkler_mask'))
+visible=np.min(without,axis=2)>200
+occluded=visible & (np.max(with_model,axis=2)<50)
+assert visible.sum()>200
+fraction=float(occluded.sum()/visible.sum())
+assert fraction<.5
+pixel={'check':'sprinkler occludes less than half the actual rear mid-stage crop at default camera',
+       'passed':True,'baseline_crop_pixels':int(visible.sum()),'occluded_pixels':int(occluded.sum()),
+       'occluded_fraction':fraction,'crop':'L / stage 1 at x=0,z=-1.30 m',
+       'method':'Same camera/mesh, white crop against black; compare with/without black sprinkler, no shadows.'}
+validation={'author':'黄忠','task':'SGODOT-244','geometry':geometry,'godot':runtime,'source':source,
+            'reproducibility':rebuild,'occlusion':pixel,
+            'evidence':json.loads((OUT/'source-evidence.json').read_text()),
+            'reference':{'spec':'SGODOT-244_sprinkler-spec-v1.1.md','sheet':'SGODOT-244_sprinkler-sheet-v1.png',
+                         'dimension_authority':'specification, not measured from image'},
+            'scope':'Offline desktop art verification; tech and visual review pending, no gameplay integration or phone performance claim.'}
+(DOC/(PREFIX+'validation.json')).write_text(json.dumps(validation,indent=2,ensure_ascii=False)+'\n')
+measure=geometry['measurements']
+rows=[['总三角形',entry['triangles'],'<= 800'],['base 三角形',168,'1 surface'],['head 三角形',514,'1 surface'],
+      ['总高 / 床面以上 m',measure['size_xyz_m'][1],'0.60-0.65'],['宽 X m',measure['size_xyz_m'][0],'实际顶点'],
+      ['深 Z m',measure['size_xyz_m'][2],'实际顶点'],['喷头旋转外径 m',measure['head_swept_diameter_m'],'<= 0.40'],
+      ['石垫直径 m',measure['stone_diameter_m'],'<= 0.30'],['喷臂截面直径 m',.036,'>= 0.03'],
+      ['蓝色顶帽直径 m',measure['cap_diameter_m'],'0.08-0.10'],['喷头轴心 / spray_origin','(0, 0.55, 0)','本地米制'],
+      ['角色高 m',1.745,'按实际姿态顶点等比校准'],['后方作物遮挡比例',fraction,'< 0.5']]
+with (DOC/(PREFIX+'measurements.csv')).open('w',newline='') as f:
+    writer=csv.writer(f,lineterminator='\n'); writer.writerow(['项目','实测值','要求/说明']);writer.writerows(rows)
+table=['# SGODOT-244 实测尺寸','', '黄忠 · 2026-10-30。GLB 解码顶点和 Godot 实际导入结果。','',
+       '| 项目 | 实测值 | 要求/说明 |','| --- | --- | --- |']
+table += ['| '+' | '.join(str(x) for x in row)+' |' for row in rows]
+table += ['', '实际 plot.glb 为圆角土畦，不含木框。黄铜对比图使用真实田沿土色，并另取 storage.glb 木色；未修改田块。','']
+(DOC/(PREFIX+'measurements.md')).write_text('\n'.join(table))
+for suffix in ['sprinkler.glb.import']:
+    shutil.copy2(OUT/'project/assets/farm/art'/suffix,ROOT/'assets/farm/art'/suffix)
+uid=OUT/'project/tools/art/review_sprinkler.gd.uid'
+if uid.exists():shutil.copy2(uid,ROOT/'tools/art/review_sprinkler.gd.uid')
+incoming=Path.home()/'incoming/sprinkler-244'
+for filename in ['SGODOT-244_sprinkler-spec-v1.1.md','SGODOT-244_sprinkler-sheet-v1.png']:
+    if (incoming/filename).exists(): shutil.copy2(incoming/filename,SOURCE/filename)
+    assert (SOURCE/filename).exists()
+media=[]
+for path in sorted(DOC.glob(PREFIX+'*')):
+    if path.name.endswith('media-manifest.json'):continue
+    row={'file':path.name,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'bytes':path.stat().st_size}
+    if path.suffix=='.png':row['size']=list(Image.open(path).size)
+    media.append(row)
+(DOC/(PREFIX+'media-manifest.json')).write_text(json.dumps(media,indent=2)+'\n')
+print('SPRINKLER_PACKAGED',len(media),'files; occlusion',fraction)

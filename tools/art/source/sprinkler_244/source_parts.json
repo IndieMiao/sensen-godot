@@ -1,0 +1,38 @@
+{
+  "base": [
+    {
+      "name": "Shallow bevelled stone mounting pad",
+      "triangles": 92
+    },
+    {
+      "name": "Stout sage green riser",
+      "triangles": 76
+    }
+  ],
+  "head": [
+    {
+      "name": "Rounded yellow brass rotating hub",
+      "triangles": 92
+    },
+    {
+      "name": "Left short down then up curved arm",
+      "triangles": 76
+    },
+    {
+      "name": "Left round nozzle with painted centre",
+      "triangles": 96
+    },
+    {
+      "name": "Right short down then up curved arm",
+      "triangles": 76
+    },
+    {
+      "name": "Right round nozzle with painted centre",
+      "triangles": 96
+    },
+    {
+      "name": "Blue water droplet cap",
+      "triangles": 78
+    }
+  ]
+}

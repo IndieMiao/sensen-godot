@@ -1407,6 +1407,106 @@
         7,
         -4
       ]
+    },
+    "sprinkler": {
+      "triangles": 682,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -0.19206766784191132,
+          0.0,
+          -0.14000000059604645
+        ],
+        [
+          0.19206766784191132,
+          0.6470000147819519,
+          0.14000000059604645
+        ]
+      ],
+      "parts": {
+        "base": {
+          "triangles": 168,
+          "surfaces": 1,
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        "head": {
+          "triangles": 514,
+          "surfaces": 1,
+          "pivot": [
+            0,
+            0.550000011920929,
+            0
+          ]
+        }
+      },
+      "bytes": 26752,
+      "sha256": "b5a0b7dffafdefbf72e90a662c9095ed0b85b37f25d2bae3d0bf6d0385f5cf73",
+      "generator": "tools/art/build_sprinkler.py",
+      "triangle_limit": 800,
+      "head_pivot": [
+        0,
+        0.55,
+        0
+      ],
+      "spray_origin": [
+        0,
+        0.55,
+        0
+      ],
+      "front": "+Z",
+      "pivot": "plot bed centre; place root at BED_H=0.15 m; unit scale",
+      "material": "FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()",
+      "arm_diameter_m": 0.036,
+      "stone_diameter_m": 0.28,
+      "cap_diameter_m": 0.09,
+      "palette_srgb": {
+        "stone": "b4b8b1",
+        "stone_light": "c5c9c1",
+        "stone_shade": "a0a69d",
+        "sage": "a6b397",
+        "sage_light": "b4c1a5",
+        "sage_shade": "8d9c80",
+        "brass": "e8ce5b",
+        "brass_light": "f5dd7c",
+        "brass_shade": "c4ac46",
+        "water": "8cc7f2",
+        "water_light": "a8d5f5",
+        "water_shade": "74b4e3",
+        "nozzle_dot": "665d36"
+      },
+      "arm_centreline_right_m": [
+        [
+          0.047,
+          0.54,
+          0
+        ],
+        [
+          0.078,
+          0.52,
+          0
+        ],
+        [
+          0.108,
+          0.519,
+          0
+        ],
+        [
+          0.137,
+          0.538,
+          0
+        ],
+        [
+          0.155,
+          0.557,
+          0
+        ]
+      ],
+      "nozzle_dot": "one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh",
+      "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap"
     }
   }
 }
