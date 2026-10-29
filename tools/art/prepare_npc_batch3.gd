@@ -4,6 +4,8 @@ const PAIRS = [
 	["hairhat51", "hairhat51_npc_lena", "SM_hairHat51.fbx", "T_lena_hairHat51_D.png"],
 	["hairhat36_npc_pip", "hairhat36_npc_rafa", "SM_hairHat36.fbx", "T_rafa_hairHat36_D.png"],
 	["cloth1_1", "cloth1_1_npc_rafa", "SK_dt_skin01.fbx", "T_rafa_cloth01_D.png"],
+	["hairhat41_npc_auburn", "hairhat41_npc_nadia_baker", "SM_hairHat41.fbx", "T_nadia_baker_hairHat41_D.png"],
+	["cloth1_1", "cloth1_1_npc_nadia", "SK_dt_skin01.fbx", "T_nadia_apron_cloth01_D.png"],
 ]
 func _initialize():
 	run.call_deferred()
@@ -12,6 +14,7 @@ func run():
 	var recipe = JSON.parse_string(FileAccess.get_file_as_string("res://assets/avatar/source/recipes_284b.json"))
 	recipe.parts = []
 	for row in PAIRS:
+		if not FileAccess.file_exists("res://assets/avatar/source/" + row[1] + "/" + row[2]): continue
 		var original = load("res://assets/avatar/parts/" + row[0] + ".res")
 		var mesh: Mesh = original.mesh
 		var instance: Node
@@ -35,8 +38,8 @@ func run():
 	var text = FileAccess.get_file_as_string(npc_path)
 	var data = JSON.parse_string(text)
 	var entries = []
-	for row in PAIRS:
-		if not data.npc_only.has(row[1]): entries.append(row[1])
+	for part in recipe.parts:
+		if not data.npc_only.has(part.id): entries.append(part.id)
 	if not entries.is_empty():
 		var end = text.find("\n\t]")
 		assert(end >= 0)

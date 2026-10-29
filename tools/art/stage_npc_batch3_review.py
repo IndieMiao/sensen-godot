@@ -15,7 +15,7 @@ out = runtime / 'output/npc-batch3'
 out.mkdir(parents=True, exist_ok=True)
 (runtime / 'output/.gdignore').touch()
 (runtime / 'tools/art').mkdir(parents=True, exist_ok=True)
-scripts = ['prepare_npc_batch3.gd', 'verify_npc_batch3.gd', 'review_npc_batch3.gd', 'bake_resident_portraits.gd']
+scripts = ['prepare_npc_batch3.gd', 'verify_npc_batch3.gd', 'verify_nadia_batch3.gd', 'review_npc_batch3.gd', 'review_nadia_motion.gd', 'bake_resident_portraits.gd']
 hashes = {}
 for name in scripts:
     source = ROOT / 'tools/art' / name
@@ -33,5 +33,8 @@ npcs = json.loads((runtime / 'assets/p0/outpost_npcs.json').read_text())['npcs']
 looks['ama'] = {'slots': npcs['ama']['slots']}
 looks['pip'] = {'slots': npcs['res_pip']['slots']}
 (out / 'looks-phase1.json').write_text(json.dumps(looks, indent=2) + '\n')
+looks['nadia_hat_only'] = {'slots': {**looks['nadia_now']['slots'], 'hairHat': 'hairhat41_npc_nadia_baker'}}
+looks['nadia_new'] = {'slots': {**looks['nadia_hat_only']['slots'], 'cloth': 'cloth1_1_npc_nadia'}}
+(out / 'looks-phase2.json').write_text(json.dumps(looks, indent=2) + '\n')
 (out / 'script-provenance.json').write_text(json.dumps(hashes, indent=2) + '\n')
 print('BATCH3_REVIEW_STAGED', out)

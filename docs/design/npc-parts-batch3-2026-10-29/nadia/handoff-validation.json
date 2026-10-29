@@ -1,0 +1,100 @@
+{
+  "runtime_previous_head": "109789661e51cd165fb043caddb0f48004952636",
+  "manifest_before": 48,
+  "manifest_after": 50,
+  "previous_manifest_prefix_exact": true,
+  "first_phase_files_unchanged": [
+    {
+      "path": "assets/avatar/parts/cloth1_1_npc_rafa.res",
+      "sha256": "ebfcd5a8fa830155409ed6d36b456aa9ecebbb5ecf942d7cc6266cdd47ccfffd"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat36_npc_rafa.res",
+      "sha256": "05d44899073c8fb629287ef271ab8802c26d94f395d96f37516b19dee6144530"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat36_npc_rafa_scene.tscn",
+      "sha256": "3f3562f45478cdff1af27db4c2a573fbbd53f8623160f889cf265d1fad95780e"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat51_npc_lena.res",
+      "sha256": "b78ff2c65ce4b298486a497157f3b7b7ec9b215f3c29c51162ed1a74eacd9bfc"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat51_npc_lena_scene.tscn",
+      "sha256": "54520d90580e6bce56692130ca73c6af17a7399a6303fb1a4e2a7848c298ad5a"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/SK_dt_skin01.fbx",
+      "sha256": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/SK_dt_skin01.fbx.import",
+      "sha256": "413028e6a3d1a681daa7b8b7bcc2ce74989467a60174fea4724f29b1cbc2bd76"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/T_rafa_cloth01_D.png",
+      "sha256": "9967f7926335aaf8b68c6e1ca102fe94d6ef3fa916295918276db714be14aad5"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/T_rafa_cloth01_D.png.import",
+      "sha256": "7b380677291b7957a515134fde0bd96d1ef6ff7642540e8b2d42aef131509173"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/SM_hairHat36.fbx",
+      "sha256": "4d9f753eefbd69c80060b0b2d4fd352d9e7dccfd8d4308afc20f315e069fce4a"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/SM_hairHat36.fbx.import",
+      "sha256": "bc4569eead63e5345a6c18d7fe3eb5bb0158f585cee03d0fb1e12587c583bfc3"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/T_rafa_hairHat36_D.png",
+      "sha256": "78e7feea9b1c42970d341924a352f61e74cfbfdf88d40e9f3735dad4d1abcbe5"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/T_rafa_hairHat36_D.png.import",
+      "sha256": "d4e2402a67b07bf4d47900d9008d61167d038d62070648734ca634499c68d1b7"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/SM_hairHat51.fbx",
+      "sha256": "8119356d6c891b6ab295051ed7f9f9a62d380103da0020459d3a57b9352afb64"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/SM_hairHat51.fbx.import",
+      "sha256": "06b6017ceddbff4dc28973815e69495d0eb0fb591496722e2b562c4ae26f9a93"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/T_lena_hairHat51_D.png",
+      "sha256": "6604d2b9b9c301397d9c43f6b27d72cc3f4a2b25fb6cc93362ec4024d3096fc4"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/T_lena_hairHat51_D.png.import",
+      "sha256": "c1abb4008f21a1f9c5441ba49ac38fb1072bc28357251fcc01cbdd04412ee6b8"
+    },
+    {
+      "path": "assets/avatar/thumbs/cloth1_1_npc_rafa.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/cloth1_1_npc_rafa.png.import",
+      "sha256": "55c4d450ef485caf8242f005262d34360a849202472f5612a5033f662b74266e"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat36_npc_rafa.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat36_npc_rafa.png.import",
+      "sha256": "896de03f38148992ed04a1434cec3c514933454a135f068c20749d5b9f05e62a"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat51_npc_lena.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat51_npc_lena.png.import",
+      "sha256": "acdfd19e9113e194f28a114fb4f0c00dd174200b7c6840f7b68ef1868a189f20"
+    }
+  ]
+}

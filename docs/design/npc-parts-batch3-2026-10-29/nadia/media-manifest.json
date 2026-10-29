@@ -1,0 +1,51 @@
+[
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1_01_before_after.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_01_before_after.png",
+    "size": 450130,
+    "sha256": "6e6ee0a2b7bdb0a96e5e6a76aaecdf452d794cfed25bab4b323524e1aa0ce6d7"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1_02_nadia_hat.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_02_nadia_hat.png",
+    "size": 594867,
+    "sha256": "bd378c927e24e8edc3dea8fe5373a844882c05d15b9d6d680f8acf53d957ee37"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1_03_nadia_apron.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_03_nadia_apron.png",
+    "size": 474673,
+    "sha256": "0616c99ed6bce99b34a66200b934e7eef84408d6e66c1bf489b1c7c51fa69a02"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1_04_market_lineup.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_04_market_lineup.png",
+    "size": 387248,
+    "sha256": "574fecfe9fd98dd989da72833b01fefed673a0defa3e9d09ad74aed0614668d1"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1_05_motion.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_05_motion.png",
+    "size": 232368,
+    "sha256": "2067907d0e739293fa81a7a58f6a0887a4fe498c085585ced2a04230f43d793b"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1_06_native_badge_72px.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_06_native_badge_72px.png",
+    "size": 137794,
+    "sha256": "37844926b2e48f46faf1b74ddaff5fd71c4523f2b3ff5a5e814021d5905589e5"
+  },
+  {
+    "issue": 362,
+    "name": "SGODOT-362_PARTS_v1_07_lena_rafa_nadia.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-362_PARTS_v1_07_lena_rafa_nadia.png",
+    "size": 382031,
+    "sha256": "32c520d3dc34f9f2925bd7107ce7f6a6dfb8cfc4b92c1e529e4cb5dc0b9544e8"
+  }
+]

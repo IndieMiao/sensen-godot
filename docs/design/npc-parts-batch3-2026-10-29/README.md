@@ -1,4 +1,7 @@
-# NPC Batch 3 · 第一段换色
+# NPC Batch 3 · 部件审阅
+
+第二段 Nadia 的帽子、围裙及三人新造型并排已补到 [Nadia 审阅](nadia/README.md)。
+下方保留第一段换色的完整证据。
 
 赵云，2026-10-29。规格：SGODOT-362 `ba1dcbd1` / `27ea8b86` 和上官婉儿 10-29 派工。
 参考 `362_before_after_v1.png` 仅是 2D 颜色方向；本目录六张审阅图全部来自游戏实渲。

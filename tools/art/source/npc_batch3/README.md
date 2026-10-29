@@ -14,8 +14,18 @@
 
 Lou 预检：cloth36_npc_sigrid 的 cloth 共 3,192 三角面。外套袖子与衬衫 / 马甲
 主体连在同一 1,698 面连通块（component 9），无法独立摘掉外套、留下完整内搭。
-领带、纽扣等是小块，长裤是另一块。已向上官婉儿回报并请求改用 cloth1 加马甲、
-领结和长裤；底件选择收到回复前不动 Lou。
+领带、纽扣等是小块，长裤是另一块。已回报；本会话已确认改用 cloth1 加酒红马甲、
+黑领结和深色长裤，部件名 cloth1_npc_lou。
 
 完整复现和验收入口见
 [审阅 README](../../../../docs/design/npc-parts-batch3-2026-10-29/README.md)。
+
+347 第二段的两个源场景为 nadia-baker-hat.blend、nadia-apron.blend，纹理打包在 blend
+中，保留原骨架和 EDIT_ 命名编辑组。build_nadia_batch3.py 生成局部几何，沿用
+284 的二进制 FBX 容器编码方法；对 SK 衣服仅额外扩展已有 skin clusters 的权重数组，
+并校验原数组前缀和所有 bind transforms。没有节点层级重导出或 recipe 补偿偏移。
+prepare_nadia_textures.py 生成新 PNG；nadia-geometry-validation.json 记录几何与容器检查。
+
+帽子保留原长发的 303 个顶点 / 592 面，去掉花冠后增加低冠白软帽；共 1,296 面。
+围裙共 1,869 面，原 862 个衣服顶点和权重保留，新增 183 顶点 / 240 面。
+底件中所有其他源网格不变；提取仅选择 cloth，所以运行时仍一个 mesh / surface。
