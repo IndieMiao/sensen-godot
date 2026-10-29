@@ -1131,3 +1131,53 @@ func test_a_late_arrival_leaves_another_flights_hold_alone() -> void:
 	rt.session.view = saved
 	rt.ui.set_view(saved)
 	await get_tree().process_frame
+
+## q(261) ④ / q(256) (SGODOT-367, 不知火舞 on 367 ec5f2daa ⑤): the fare's floats wait for the cover too and come in
+## the reply's order with the first visit's +10 — `−30 Energy`, `−120 coins`, `+10 Energy` — as one group on landing.
+func test_the_fares_floats_come_with_the_landing_in_order() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	rt.session.view.travel.visits = {}
+	var arrival := {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559, paid = {energy = 30, coins = 120}, renewed = true}
+	_fly(m, arrival, [{kind = "energy", delta = -30, reason = "travel"}, {kind = "coins", delta = -120, reason = "travel"},
+		{kind = "energy", delta = 10, reason = "first_visit"}, arrival])
+	assert_array(rt.travel_floats.map(func(p): return [str(p.kind), int(p.amount)])).is_equal([["energy", -30], ["coins", -120], ["energy", 10]])
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_array(rt.travel_floats).is_empty()   # let go with the landing
+	await get_tree().create_timer(P0Map.STAMP_S + 0.3).timeout
+	rt.ui.close_modal()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame
+
+## q(261) ⑤: a fare the server would not take (another device spent the coins) calls the flight back and says the gap
+## in the button's own words (q(257) ③), not the runtime's fallback, and opens no Energy card.
+func test_a_refused_fare_calls_it_back_and_says_the_gap() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var was := _camera(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	var body := JSON.stringify({ok = false, code = "not_enough_coins", detail = {need = 10, have = 150, cost = 120, floor = 40},
+		state = rt.session.view}).to_utf8_buffer()
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
+	_assert_called_back(m, was)
+	assert_str(rt.ui.toast_text()).is_equal("Need 10 more coins")
+	assert_str(rt.ui.modal_kind).is_not_equal("energy_card")
+	rt.ui.clear_toast()
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	body = JSON.stringify({ok = false, code = "not_enough_energy", detail = {need = 11, have = 19, cost = 30}, state = rt.session.view}).to_utf8_buffer()
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
+	assert_bool(m.travelling()).is_false()
+	assert_str(rt.ui.toast_text()).is_equal("Need 11 more Energy")
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame

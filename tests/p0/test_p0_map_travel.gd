@@ -82,8 +82,9 @@ func test_another_citys_bubble_opens_its_silhouette_card_then_its_free_travel_ca
 	(rt.ui.root.find_child("Link_Travel_details", true, false) as Button).pressed.emit()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	var texts := _texts(rt.ui.root)
-	assert_array(texts).contains(["Tokyo, Japan", "Unexplored", "Free", "First visit · stamp + 10 Energy"])
-	assert_bool(texts.any(func(t): return str(t).ends_with(" km · Trip 6 · Intercontinental"))).is_true()
+	# MAP-5 (q(257) ②): the city, its country, the trip and the first visit (no fares from this view: Cost · Free)
+	assert_array(texts).contains(["Tokyo", "Japan", "Cost", "Free", "First visit · stamp + 10 Energy", "Return home is always free"])
+	assert_bool(texts.any(func(t): return str(t).ends_with(" km · Trip 6"))).is_true()
 	assert_dict(rt.here).is_equal({"space": "home", "place": ""})   # the card is not a trip: nothing sent yet
 	assert_array(sent.filter(func(c): return str(c.get("type", "")) == "travel")).is_empty()
 	var fly: Node = rt.ui.root.find_children("Primary", "", true, false)[0]
@@ -153,9 +154,13 @@ func test_a_place_refused_without_a_pass_opens_that_citys_travel_card() -> void:
 	rt._on_refused("pass_required", {"message": "Pass required", "preview": {"cluster": TOKYO, "name": "Tokyo", "km": 8815,
 		"trip": 6, "trip_name": "Intercontinental", "first_visit": true}}, {"type": "cast", "space": "pond", "place": TOKYO + "~pond0"})
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
-	assert_array(_texts(rt.ui.root)).contains(["8,815 km · Trip 6 · Intercontinental"])
+	assert_array(_texts(rt.ui.root)).contains(["8,815 km · Trip 6"])   # the server's preview: its km and trip
 	rt.ui.close_modal()
 	rt._on_refused("trip_expired", {"preview": {"cluster": TOKYO}}, {})
+	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	rt.ui.close_modal()
+	# q(256) ④: a pass, but the player is not in that city — the same card (MAP-5-RETURN), at the return fare
+	rt._on_refused("travel_required", {"message": "Travel first", "preview": {"cluster": TOKYO}}, {"type": "enter"})
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	rt.ui.close_modal()
 

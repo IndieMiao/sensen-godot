@@ -9,6 +9,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
+const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a city's 2 regional fish (MAP-5's Fish here)
 const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")   # the fog's holes as the map draws the ground (SGODOT-298)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
@@ -850,11 +851,8 @@ static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Di
 	if pv.has("trip"): trip = {km = int(pv.get("km", trip.get("km", 0))), trip = int(pv.trip), name = str(pv.get("trip_name", trip.get("name", "")))}
 	var counts: Dictionary = pv.get("counts", {})
 	var count := func(key: String) -> String: return str(int(counts[key])) if counts.has(key) else "–"
-	var offset = pv.get("utc_offset_min", null)
-	var local := "–"
-	if offset != null:
-		var t := Time.get_datetime_dict_from_unix_time(int(P0Travel.now_ms(view) / 1000.0) + int(offset) * 60)
-		local = "%02d:%02d" % [int(t.hour), int(t.minute)]
+	var local := local_time(view, pv.get("utc_offset_min", null))
+	if local == "": local = "–"
 	return {
 		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before traveling.",
 		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]],
@@ -874,23 +872,59 @@ static func travel_title(c: Dictionary) -> String:
 	var country := P0Clusters.country_part(c)
 	return "%s, %s" % [str(c.get("name", "")), country] if country != "" else str(c.get("name", ""))
 
+## A city's local time now, `08:12`, from its UTC offset in minutes (the server's preview); "" unknown.
+static func local_time(view: Dictionary, offset) -> String:
+	if offset == null: return ""
+	var t := Time.get_datetime_dict_from_unix_time(int(P0Travel.now_ms(view) / 1000.0) + int(offset) * 60)
+	return "%02d:%02d" % [int(t.hour), int(t.minute)]
+
+## MAP-5 (q(257) ②, Figma 9:125580 / MAP-5-RETURN 243:176049 / MAP-5-SHORT 243:176287; 不知火舞 on 367 ec5f2daa), pure:
+## the city, `United States · 08:12 local · 14 online` (the local time once its preview is in, the online part only when
+## some are), then Distance, Energy and Coins (`30 → 112 left`: what is left once paid) — or `Cost · Free` for a free
+## trip (Trip 1, the 3 nearest cities) — Fish here, Visit, and on a return with a running pass `Day Pass · 7h left` (it
+## is not renewed). Short of the fare, Fly reads the gap (coins first, LOCK-10). `view` is the projected view (its
+## Energy now); `preview` the server's (its km and trip win), {} before it is in; `online` the city's players online.
+static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, online: int) -> Dictionary:
+	var c := P0Clusters.get_cluster(cluster)
+	var trip := P0Travel.trip(view, cluster)
+	if preview.has("trip"): trip = {km = int(preview.get("km", trip.get("km", 0))), trip = int(preview.trip), name = str(preview.get("trip_name", trip.get("name", "")))}
+	var f := P0Travel.fare(view, cluster)
+	var parts: Array = [P0Clusters.country_part(c)]
+	parts.append(local_time(view, preview.get("utc_offset_min", null)) + " local" if preview.get("utc_offset_min", null) != null else "")
+	parts.append("%d online" % online if online > 0 else "")
+	var facts: Array = [["Distance", "%s · Trip %d" % [P0PlaceSheet.distance_text(float(trip.get("km", 0))), int(trip.get("trip", 1))]]]
+	if bool(f.free): facts.append(["Cost", "Free"])
+	else:
+		var energy := int(view.get("energy", {}).get("value", 0))
+		facts.append(["Energy", "%d → %d left" % [int(f.energy), energy - int(f.energy)]])
+		facts.append(["Coins", "%d → %d left" % [int(f.coins), int(view.get("coins", 0)) - int(f.coins)]])
+	var regional := P0FishWorld.regional_fish(cluster).size()
+	var crucian := P0Logic.item_name(view, "fish_crucian")
+	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
+	facts.append(["Visit", "Return visit · half price" if bool(f.revisit) else "First visit · stamp + 10 Energy"])
+	if bool(f.revisit) and float(f.pass_ms) > 0.0: facts.append(["Day Pass", "%s left" % P0Travel.pass_text(view, cluster)])
+	var gap := P0Travel.fare_gap(view, f)
+	return {
+		"title": str(c.get("name", "")), "subtitle": " · ".join(parts.filter(func(p): return str(p) != "")),
+		"facts": facts, "primary": "Fly", "blocked": str(gap.get("text", "")), "gap": gap,
+		"footer": "Return home is always free",
+	}
+
 func open_travel(cluster: String, preview := {}) -> void:
 	var c := P0Clusters.get_cluster(cluster)
 	if c.is_empty() or rt == null: return
-	var trip := P0Travel.trip(_view(), cluster)
-	if not preview.is_empty(): trip = {km = int(preview.get("km", trip.get("km", 0))), trip = int(preview.get("trip", trip.get("trip", 1))),
-		name = str(preview.get("trip_name", trip.get("name", "")))}
-	var first := P0Travel.fog(_view(), cluster) == "unexplored"
-	var spec := {
-		"title": travel_title(c),
-		"subtitle": "Unexplored" if first else "Visited ×%d" % P0Travel.visits(_view(), cluster),
-		"line": P0Travel.trip_line(trip),
-		"facts": [["Cost", "Free"], ["Visit", "First visit · stamp + 10 Energy" if first else "Return visit"]],
-		"primary": "Fly",
-	}
+	var online := 0   # the city's outposts' players online, as its bubble counts them (q(72))
+	for id in _online: if _cluster_of_outpost(str(id)) == cluster: online += int(_online[id])
+	if preview.is_empty(): preview = P0CityPlaces.city(cluster).get("preview", {})
+	var spec := travel_card(rt.session.current(), cluster, preview, online)
+	var gap: Dictionary = spec.gap
+	# q(257) ③: short of coins a tap says the floor; short of Energy it opens the Energy card (never Fly)
+	spec["on_blocked"] = func():
+		if str(gap.get("short", "")) == "coins": rt.ui.toast_error("Wallet floor · keep %d coins" % P0Travel.WALLET_FLOOR)
+		else: rt.ui.open_energy_card(int(gap.get("need", 0)), "Fly")
 	P0PlaceSheet.open(rt.ui, spec, func():
 		rt.ui.close_modal()
-		_take_off(cluster, int(trip.get("km", 0))), Callable(), Callable(), "travel_card")
+		_take_off(cluster, int(P0Travel.trip(_view(), cluster).get("km", 0)) if not preview.has("km") else int(preview.km)), Callable(), Callable(), "travel_card")
 
 ## Fly (SGODOT-361, 不知火舞 on 361 9146d012; 299 v1 ⑤ and q(75) changed for this one place): the flight takes off as Fly
 ## is pressed and `travel` goes with it. q(147)'s fixed 3 s (SGODOT-299): up from where the camera is until the city left

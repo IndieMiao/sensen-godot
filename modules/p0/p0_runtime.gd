@@ -793,7 +793,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "blackjack": continue   # the table floats its own wins over the hand (q(240))
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
-				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
+				var coin_part := {kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS}
+				if by_air:   # a fare's `−120 coins` (q(256)): with the landing, after `−30 Energy`, before `+10 Energy` (q(261) ④)
+					travel_floats.append(coin_part)
+					continue
+				floats.append(coin_part)
 			"parcel":
 				if not guide_feedback.fresh and str(ev.get("key", "")).begins_with("guide_resend:"): continue
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one InboxNotice card under the bell for the
@@ -1108,7 +1112,13 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if str(said) != "": ui.toast_error(str(said))
 		return
 	match code:
-		"pass_required", "trip_expired":   # SGODOT-275: a place in a city without a pass — its free travel card (q(108))
+		"not_enough_coins", "not_enough_energy":   # a fare the server would not take (q(261) ⑤): the gap, once called back
+			if str(cmd.get("type", "")) == "travel":
+				ui.toast_error(("Need %d more coins" if code == "not_enough_coins" else "Need %d more Energy") % int(detail.get("need", 0)))
+			else: ui.toast_error("Can't do that (%s)" % code)
+		# SGODOT-275: a place in a city without a pass — its travel card (q(108)); travel_required (q(256) ④): a pass,
+		# but the player is not in that city — the same card, at the return fare
+		"pass_required", "trip_expired", "travel_required":
 			var preview: Dictionary = detail.get("preview", {})
 			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
 			else: ui.toast_error("Travel to %s first · free" % str(preview.get("name", "that city")))

@@ -151,6 +151,48 @@ static func home_base(view: Dictionary) -> Vector2:
 static func trip(view: Dictionary, cluster: String) -> Dictionary:
 	return P0Clusters.trip(cluster, home(view), home_base(view), view.get("travel", {}).get("fallback", {}))
 
+# ---------------------------------------------------------------- fares (q(256) / q(257), SGODOT-367)
+## Every coin spend but seeds keeps this much in the wallet (§8.1.1, the server's content.wallet_floor).
+const WALLET_FLOOR := 40
+
+## q(256) ①: the seven tiers' first-visit fares, Trip 1 first — view.travel.fares, the server's content table
+## ({energy: [0, 10, …], coins: [0, 20, …]}); a server from before sends none: every trip is free there.
+static func fare_table(view: Dictionary) -> Dictionary:
+	var t = view.get("travel", {}).get("fares", {})
+	return t if t is Dictionary and t.get("energy") is Array and t.get("coins") is Array else {}
+
+## What going to a cluster costs now (q(256), the server's fareOf: its preview and the travel reply settle it): the
+## trip tier's fare (the frozen fallback in the tier: the 3 nearest cities are Trip 1, free), each half rounded up on a
+## return (visited before); nothing home or where the player already is with a running pass. {energy, coins, revisit,
+## free (nothing to pay), pass_ms (ms left on a running pass: no new pass, no visit counted, q(256) ②)}.
+static func fare(view: Dictionary, cluster: String) -> Dictionary:
+	var revisit := visits(view, cluster) > 0
+	var out := {energy = 0, coins = 0, revisit = revisit, free = true, pass_ms = pass_left_ms(view, cluster)}
+	var table := fare_table(view)
+	if table.is_empty() or cluster == home(view) or (cluster == here(view) and covers(view, cluster)): return out
+	var i := clampi(int(trip(view, cluster).get("trip", 1)) - 1, 0, (table.energy as Array).size() - 1)
+	var e := int(table.energy[i])
+	var c := int(table.coins[mini(i, (table.coins as Array).size() - 1)])
+	if revisit:
+		e = ceili(e / 2.0)
+		c = ceili(c / 2.0)
+	out.merge({energy = e, coins = c, free = e == 0 and c == 0}, true)
+	return out
+
+## q(257) ③ (LOCK-10): what Fly says when the fare cannot be paid — the coins first (`Need 10 more coins`: fare + the
+## 40 floor − the wallet), else the Energy (`Need 11 more Energy`); {} when it can. {text, short ("coins" / "energy"),
+## need}.
+static func fare_gap(view: Dictionary, f: Dictionary) -> Dictionary:
+	var coins := int(view.get("coins", 0))
+	if int(f.coins) > 0 and coins < int(f.coins) + WALLET_FLOOR:
+		var need := int(f.coins) + WALLET_FLOOR - coins
+		return {text = "Need %d more coins" % need, short = "coins", need = need}
+	var energy := int(view.get("energy", {}).get("value", 0))
+	if int(f.energy) > energy:
+		var need := int(f.energy) - energy
+		return {text = "Need %d more Energy" % need, short = "energy", need = need}
+	return {}
+
 # ---------------------------------------------------------------- the Travel Post's Fare Board (q(165))
 ## q(165) Trip fares (§9.11.4 / §17.3.1, read only): the seven tiers in order, each {title `Trip 1 · Local`, line its
 ## bounds (§11.1 — `Up to 30 km, or the 3 nearest cities`, `Up to 100 km, or the 10 nearest cities` with the frozen
