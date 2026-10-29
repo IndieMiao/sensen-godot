@@ -813,3 +813,106 @@ class _FakeWorld extends Node:
 	var _surface := ""
 	func _init(surface: String) -> void: _surface = surface
 	func p0_surface() -> String: return _surface
+
+## The heat hint under the ring is §7.9's sentence, the first fire's TipCard's own (P0Guide.TIPS.heat), and it waits out
+## of sight (its place kept) while that TipCard is on screen: one copy at a time (不知火舞 on 341).
+func test_the_heat_hint_reads_the_tip_and_waits_while_the_tip_shows() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var v := _view()
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	_set_view(v)
+	k.watch(rt.session.view.cooking.stove)
+	await get_tree().process_frame
+	var hint: Label = k.get("_hint")
+	assert_str(hint.text).is_equal(P0Guide.TIPS.heat)
+	assert_float(hint.modulate.a).is_equal(1.0)
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	rt.ui.tips.showing = "heat"
+	rt.ui._show_tip(P0Guide.TIPS.heat, "heat")
+	await get_tree().process_frame
+	assert_float(hint.modulate.a).is_equal(0.0)
+	assert_bool(hint.visible).is_true()   # its place kept: Queue next does not move
+	rt.ui._hide_tip()
+	await get_tree().process_frame
+	assert_float(hint.modulate.a).is_equal(1.0)
+	k.stop_watching()
+
+## In the kitchen the TipCard sits at x 16 (不知火舞 on 341): with the drawer open, 8 under HUD row 2 — S8: it used to
+## take the full-screen wrap's top and land off the screen, then sat on the drawer under its preview card — and,
+## watching, 8 over the sheet's ×.
+func test_the_kitchen_tip_sits_over_the_drawer_and_over_the_watch_sheet() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	k.open("cookbook")
+	await await_millis(600)   # the drawer has slid in
+	rt.ui._show_tip(P0Guide.TIPS.cook, "cook")
+	await get_tree().process_frame
+	var tip: Control = rt.ui._teach
+	var root_y := rt.ui.root.global_position.y
+	assert_float(tip.position.y).is_greater_equal(0.0)   # on the screen
+	# 8 under HUD row 2, not on the drawer (its preview card stands over the drawer; 不知火舞 on 341)
+	assert_float(tip.position.y).is_equal_approx(rt.ui.hud.today_chip_rect().end.y - root_y + 8.0, 0.5)
+	assert_float(tip.position.x).is_equal(16.0)
+	rt.ui._hide_tip()
+	rt.ui.close_modal()
+	var v := _view()
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	_set_view(v)
+	k.watch(rt.session.view.cooking.stove)
+	await await_millis(600)   # the sheet has slid in
+	rt.ui._show_tip(P0Guide.TIPS.heat, "heat")
+	await get_tree().process_frame
+	var close: Control = k.get("_close")
+	assert_float(tip.position.y + tip.size.y).is_equal_approx(close.get_global_rect().position.y - root_y - 8.0, 0.5)
+	assert_float(tip.position.x).is_equal(16.0)
+	rt.ui._hide_tip()
+	k.stop_watching()
+
+## S8 (蒙恬 on 341 598b13cb): a TipCard made earlier on the farm was kept under the kitchen drawer opened since, and the
+## drawer's preview card covered `Tap Cook to grill your first fish`. Each tip comes to the front, under the toasts.
+func test_a_tip_card_made_before_the_kitchen_shows_over_its_drawer() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	rt.ui._show_tip(P0Guide.TIPS.sow, "sow")   # the farm's tip: the card is made now
+	rt.ui._hide_tip()
+	k.open("cookbook")
+	await await_millis(600)
+	rt.ui._show_tip(P0Guide.TIPS.cook, "cook")
+	await get_tree().process_frame
+	var tip: Control = rt.ui._teach
+	assert_int(tip.get_index()).is_greater(rt.ui._modal.get_index())
+	assert_int(rt.ui._toasts.get_index()).is_greater(tip.get_index())
+	rt.ui._hide_tip()
+	rt.ui.close_modal()
+
+## A dialog is always over the TipCard, whichever opened first (不知火舞 on 341): a tip coming due while a dialog is open
+## (a confirm, the gate card, a result card) waits for it to close; over a drawer — the stove's — it comes up at once.
+func test_a_tip_waits_for_a_dialog_but_not_for_a_drawer() -> void:
+	var path := "user://test_tip_dialog_%d.json" % OS.get_process_id()   # user:// is shared by every worktree
+	rt.ui.tips_path = path
+	rt.ui.tips = P0Guide.TipQueue.new({})
+	var card := UiSystemCard.new()
+	card.show_card({"title": "Start a new test account?", "body": "", "primary": "Start"})
+	rt.ui._open_modal(card, UiTokens.OPACITY_SCRIM_MODAL)
+	rt.ui.modal_kind = "test_confirm"
+	assert_bool(rt.ui.dialog_open()).is_true()
+	rt.ui.teach("map")
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.tips.showing).is_empty()   # waits under the dialog
+	rt.ui.close_modal()
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.tips.showing).is_equal("map")
+	assert_bool(rt.ui._teach.visible).is_true()
+	rt.ui._hide_tip()
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("cookbook")   # asks for `cook` (U6) with the stove drawer open
+	assert_bool(rt.ui.dialog_open()).is_false()
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.tips.showing).is_equal("cook")
+	rt.ui._hide_tip()
+	rt.ui.close_modal()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

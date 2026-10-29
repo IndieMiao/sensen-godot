@@ -670,6 +670,10 @@ func watch(stove: Dictionary) -> void:
 		rt.ui.root.add_child(_queue_badge)
 	_show_sheet(stove)
 
+## The heat hint under the ring (§7.9 step 6, COOK frames): the TipCard's own sentence.
+const HEAT_HINT := "Tap when the needle hits gold!"
+var _hint: Label
+
 ## COOK-3 bottom sheet: ObjectHeader (dish · Cooking · m:ss remaining) and the heat hint, × above it. Not modal:
 ## taps on the scene above stay heat taps.
 func _show_sheet(stove: Dictionary) -> void:
@@ -680,9 +684,9 @@ func _show_sheet(stove: Dictionary) -> void:
 		_sheet.close_requested.connect(stop_watching)
 		_sheet_header = UiObjectHeader.new()
 		_sheet.body.add_child(_sheet_header)
-		var hint := UiKit.label("Tap when the needle reaches gold.", UiTokens.STYLE_EFFECT_B15)
-		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_sheet.body.add_child(hint)
+		_hint = UiKit.label(HEAT_HINT, UiTokens.STYLE_EFFECT_B15)
+		_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_sheet.body.add_child(_hint)
 		_queue_next = UiNavButton.new("Queue next", true)   # COOK-QUEUE-1a 1758:103013: centred under the hint
 		_queue_next.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		_queue_next.pressed.connect(open_queue)
@@ -713,6 +717,9 @@ func _refresh_watch(v: Dictionary) -> void:
 			_queue_badge.icon = P0Logic.icon(str(dish)) if dish != null else UiItemCell.SILHOUETTE
 func _update_sheet() -> void:
 	if _sheet == null: return
+	# The first fire's TipCard says the same sentence (P0Guide.TIPS.heat): one on screen at a time, the hint's place kept
+	# so Queue next does not move (不知火舞 on 341)
+	if is_instance_valid(_hint): _hint.modulate.a = 0.0 if rt.ui.tip_showing("heat") else 1.0
 	var left := maxf(0.0, float(_stove.get("ms", 0)) - elapsed())
 	_sheet_header.quantity = "%d:%02d" % [int(left / 60000.0), int(left / 1000.0) % 60]
 	var top := rt.ui.root.size.y - WATCH_SHEET_H - _sheet.safe_bottom

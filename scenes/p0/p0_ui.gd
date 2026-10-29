@@ -195,9 +195,10 @@ func _process(dt: float) -> void:
 		_notice_left -= dt
 		if _notice_left <= 0.0: _hide_notice()
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
-	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed); the modal kinds stay as
-	# a second guard for result cards opened another way (the farmhouse's COOK-4 is one).
-	if tips and not modal_kind in ["card", "kitchen_card"]:
+	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed). A dialog is always over
+	# the TipCard, whichever opened first (不知火舞 on 341): while one is open — a result card (the farmhouse's COOK-4
+	# too), the gate card, a confirm, a page — the tip waits; over a drawer (the stove's, the bag) it comes up.
+	if tips and not dialog_open():
 		var key := tips.next()
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
@@ -2023,6 +2024,11 @@ func _flush_held_cards() -> void:
 func _next_card() -> void:
 	if _modal == null and not _card_queue.is_empty(): (_card_queue.pop_front() as Callable).call_deferred()
 
+## A modal that is not a drawer is open (a card, a sheet, a page): TipCards wait under it (_process). A drawer is content
+## that is, or holds, a UiDrawer — the kitchen's wrap holds the stove drawer, the Fish-dex its own.
+var _modal_drawer := false
+func dialog_open() -> bool: return _modal != null and is_instance_valid(_modal) and not _modal_drawer
+
 func _drop_modal() -> void:
 	_modal_back = Callable()   # each layer sets its own way back after it opens
 	if _moment_open:   # a result moment went: a waiting TipCard may come up now (q(49) ⑥)
@@ -2057,8 +2063,10 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	holder.add_child(veil)
 	holder.add_child(content)
 	# A drawer dragged down fades its scrim with it (SGODOT-265); a drawer may sit inside the content (the Fish-dex).
+	_modal_drawer = false
 	for d in ([content] if content is UiDrawer else []) + content.find_children("*", "UiDrawer", true, false):
 		(d as UiDrawer).scrim = veil
+		_modal_drawer = true
 	if surface == "map" and content is PanelContainer:
 		# Over the map, translucent paper lets the map's own buttons ghost through the card.
 		var sb := (content as PanelContainer).get_theme_stylebox("panel")
@@ -3615,6 +3623,10 @@ func teach(key: String, _text := "") -> void:
 func tip_pending() -> bool:
 	return tips != null and (tips.showing != "" or not tips.waiting.is_empty())
 
+## Whether the TipCard on screen is this tip (the kitchen keeps its own copy of `heat` out of sight meanwhile).
+func tip_showing(key: String) -> bool:
+	return tips != null and tips.showing == key and _teach != null and _teach.visible
+
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
 	if tips and tips.did(action): _hide_tip(false)
@@ -3640,23 +3652,39 @@ func _show_tip(text: String, key := "") -> void:
 		root.add_child(_teach)
 	_teach.show_tip(text, P0Logic.icon(str(TIP_ICONS[key])) if TIP_ICONS.has(key) else null)
 	_teach.show()
+	# The card is made once and kept: one made on the farm sat under a drawer opened since (the kitchen's preview card
+	# covered `Tap Cook to grill your first fish`, S8, 蒙恬). Each tip comes to the front of every card, drawer and sheet
+	# (不知火舞 on 341); only a dialog opened after it covers it; toasts and the system line stay over it.
+	root.move_child(_teach, -1)
+	if _toasts != null and _toasts.get_parent() == root: root.move_child(_toasts, -1)
+	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)
 	_place_tip()
 	_teach_left = P0Guide.tip_seconds(text)
 
 ## Where the TipCard sits (不知火舞 on 232, TUT-1-2 / TUT-3-04B / TUT-3-07B): centred; its top 120 under HUD row 2,
-## clear of the joystick's centre, the main action key and the quick bar; with the kitchen open, just above its drawer
-## (the stage stays visible). The Toast (bottom left) and the TipCard can show together and never move for each other.
+## clear of the joystick's centre, the main action key and the quick bar. In the kitchen (不知火舞 on 341), at x 16:
+## with the stove drawer open, 8 under HUD row 2 — not on the drawer, whose preview card stands above it; watching a
+## pot, 8 over the watch sheet's × (q(16)'s toast dock) — clear of the stove, the heat ring and the plate.
 const TIP_BELOW_HUD := 120.0
 func _place_tip() -> void:
 	if _teach == null: return
 	var h := _teach.get_combined_minimum_size().y
+	var under_hud := hud.today_chip_rect().end.y - root.global_position.y
 	var x := (root.size.x - UiTipCard.WIDTH) * 0.5
-	var y := hud.today_chip_rect().end.y - root.global_position.y + TIP_BELOW_HUD
-	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
-	if modal_kind == "kitchen" and content != null and content.is_visible_in_tree():
-		y = content.get_global_rect().position.y - root.global_position.y - UiTokens.SPACE_OVERLAY_BODY - h
+	var y := under_hud + TIP_BELOW_HUD
+	if _kitchen_drawer_open():
+		x = UiTokens.SPACE_PAGE
+		y = under_hud + UiTokens.SPACE_OVERLAY_BODY
+	elif _modal == null and _toast_over != null and is_instance_valid(_toast_over) and _toast_over.is_visible_in_tree():
+		x = UiTokens.SPACE_PAGE
+		y = _toast_over.get_global_rect().position.y - root.global_position.y - UiTokens.SPACE_OVERLAY_BODY - h
 	_teach.position = Vector2(x, y)
 	_teach.size = Vector2(UiTipCard.WIDTH, h)
+
+## The stove drawer is on screen (the kitchen opens it inside a full-screen wrap: the drawer itself, not the wrap).
+func _kitchen_drawer_open() -> bool:
+	if modal_kind != "kitchen" or _modal == null: return false
+	return _modal.find_children("*", "P0KitchenDrawer", true, false).any(func(d): return (d as Control).is_visible_in_tree())
 
 # ---------------------------------------------------------------- result moments (SGODOT-233, q(49) / §4.8.6)
 ## A RewardMoment (哪吒's kit card) on its own: one at a time through queue_card (q(49) ④). Without buttons it folds
