@@ -6,8 +6,8 @@ extends RefCounted
 ## (周瑜, P0Pond), so both read it here. Preloaded, no class_name (a new global class needs an editor import).
 ##
 ## The marks are the server's view.map_markers (q(48): {place, kind: deliver|request|new, why: {request?, resident?,
-## item?, tracked?}, more?}, one per place, strongest first) whenever it sends them. Without them the client knows only
-## the first session's (q(103) ④, the server's rule): while Pond Catch is on the Stall Board and taken, Reed Pond wears
+## item?, guide?, tracked?}, more?}, one per place, strongest first) whenever it sends them. Without them the client
+## knows only the first session's (q(103) ④, the server's rule): while Pond Catch is on the Stall Board and taken, Reed Pond wears
 ## the ! until the bag holds the fish, then the homestead the ✓; untaken it hangs nowhere (its ! is the stall's own).
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
@@ -51,6 +51,7 @@ static func line(view: Dictionary, m: Dictionary) -> String:
 	var why: Dictionary = m.get("why", {}) if m.get("why", {}) is Dictionary else {}
 	var r := request_of(view, str(why.get("request", "")))
 	var resident := str(why.get("resident", ""))
+	if str(why.get("guide", "")) != "": return guide_line(view, str(m.get("place", "")))
 	match str(m.get("kind", "")):
 		"deliver":
 			return "%s · Ready to deliver" % str(r.title) if not r.is_empty() else "Ready to deliver"
@@ -64,6 +65,17 @@ static func line(view: Dictionary, m: Dictionary) -> String:
 			if resident != "": return "%s · New chat" % resident_name(resident)
 			return "New for you"
 	return ""
+
+## A guide pin's reason (SGODOT-341, 不知火舞 694e8da8): the server's own line for the mark at that place in
+## view.guide.marks (`Catch 2 fish · 0/2`, `Nadia · A Fresh Radish`), else the step's Today row (the Homestead's
+## `Cook it: Grilled Crucian`, with its count); "" when the guide shows neither, never the Market Board's count.
+static func guide_line(view: Dictionary, place: String) -> String:
+	for mark in P0Guide.guide_marks(view):
+		if mark is Dictionary and str(mark.get("place", "")) == place and str(mark.get("why", "")) != "": return str(mark.why)
+	var rows := P0Guide.guide_rows(view)
+	if rows.is_empty(): return ""
+	var tail := str(rows[0].get("tail", ""))
+	return str(rows[0].line) + (" · " + tail if tail != "" else "")
 
 ## `Pond Catch · Pond Crucian 0/2`: the request, what it takes and how many the bag holds (the Today row's wording).
 static func progress_text(r: Dictionary) -> String:
