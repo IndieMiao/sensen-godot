@@ -56,4 +56,26 @@ catalog、pipeline、socket 共 38 项原测试通过。渲染在此 farm-dev ch
 `art/npc-parts-batch3-review` 的 `tools/art/`、`tools/art/source/npc_batch3/` 和
 `docs/design/npc-parts-batch3-2026-10-29/`。审阅使用未修改的
 `bake_resident_portraits.gd`，只复制到运行时工位，不进入此分支提交。
-347 的 Nadia 两件、357 的 Lou 和后墙 AO 为后续增量。
+347 的 Nadia 两件见下方；357 的 Lou 和后墙 AO 为后续增量。
+
+## 第二段：SGODOT-347 Nadia
+
+| ID | 底件 | 几何改动 | 三角形 | 增量 |
+| --- | --- | --- | ---: | ---: |
+| hairhat41_npc_nadia_baker | hairhat41_npc_auburn | 保留 592 面长发，移除花冠，新增矮软帽 / 帽带 | 1,296 | -1,016 |
+| cloth1_1_npc_nadia | cloth1_1 | 保留原衬衫短裤，增加围裙、肩带、空胸袋和腰带系带 | 1,869 | +240 |
+
+帽子仍是 Head_M socket；衣服仍使用原来的 59 个 skin binds。没有整场景重导出：
+在原二进制 FBX 内仅替换对应 Geometry，衣服的新增顶点向原 skin clusters 追加权重；
+原节点名、层级、transform、轴向、单位、骨骼和绑定矩阵、原顶点权重全部保留。
+其他 Geometry 和对象不变；编码器仅另外规范化 FileId / CreationTime。
+
+每件一个 mesh / surface。材质照底件：帽子 emission .7，衣服 .3；其他参数同底件。
+一张 1024² PNG，runtime 512²；原纹理压入上方 1024×896 区域并对应变换 UV，
+下方 128 px 为原创白 / 米白布料色块。发色保留赤褐，衬衫蓝纹改暖粉，围裙不放蔬菜。
+源 blend 在美术分支 tools/art/source/npc_batch3/，包含原骨架和命名编辑组。
+
+第二段验证：91 项实际导入 / 绑定 / 材质 / NPC 隔离检查，38 项原 catalog /
+pipeline / socket 测试通过；实际权重数组为每顶点 8 项，全部归一化。
+七个站立 / 行走 / 侧背姿态已实渲检查，补有原生名字条和 72 屏幕像素徽标（36 逻辑
+px × 2），采用游戏 2.0 m 名字锚点。manifest 48→50、npc_only 19→21 仅追加。
