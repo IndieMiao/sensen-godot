@@ -1447,10 +1447,20 @@ static func today_lines(view: Dictionary) -> Array:
 ## the nearest skill level; at most 3. `go` is a camera-only Show target ("" hides Show, LOCK-08).
 ## The first-session guide's rows lead (P0Guide.lead_rows, §14.2 / q(58)): the tutorial request and the first dish replace
 ## their generic rows; only the first row still to do has the focus.
+## The generic Sow row leaves a crop to a request's Sow row only when Today really shows that row (q(258) ①, 不知火舞
+## on 341 a658c638): one pushed off the three says nothing, so the generic row comes back for its crop.
 static func today_rows(view: Dictionary) -> Array:
+	var rows := _today_rows(view, null)
+	var asked := request_sow_crops(view)
+	if asked.is_empty(): return rows
+	var shown: Array = rows.filter(func(r): return r.has("sow_crop")).map(func(r): return str(r.sow_crop))
+	return rows if shown.size() == asked.size() else _today_rows(view, shown)
+
+## `leave`: the crops the generic Sow row leaves to a request's row (null: every crop a request says to sow).
+static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	var now_rows: Array = []
 	var timed: Array = []    # [ms, row]
-	var lead := P0Guide.lead_rows(view)
+	var lead := P0Guide.lead_rows(view, leave)
 	var guided_stove := lead.any(func(r): return str(r.go) == "stove" and str(r.state) != "done")
 	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
@@ -1601,7 +1611,10 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 	var kind := str(r.get("kind", ""))
 	var icon_id := str(items[0]) if items.size() == 1 else str({"fish": "fish", "sow": "seed_radish", "crop": "seed_radish", "dish": "pot"}.get(kind, "board"))
 	var sow := request_sow(view, r)
-	if sow != "": return _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
+	if sow != "":
+		var sowing := _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
+		sowing.sow_crop = str(items[0])   # the generic Sow row leaves this crop to it while Today shows it (today_rows)
+		return sowing
 	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
 	if kind != "fish": return row
 	var gate := fish_level_gate(view, items, r.get("rarity", null))
@@ -1618,16 +1631,26 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 
 ## A taken harvest request short of its crop in the ground (q(218), §14.3 after the guide): fewer plots sown, growing
 ## or ripe with it than it still needs (a Quick Radish grows a Radish) — `Sow 6 Radishes`, `Sow 2 more Radishes` with
-## some already in; "" once enough are in (the row is its count again, `Radish 0/6`) and for any other request.
+## some already in; "" once enough are in (the row is its count again, `Radish 0/6`) and for any other request. Only
+## while it can be sown: a free bed and seeds for it in the bag; else its count too (不知火舞 on 341).
 static func request_sow(view: Dictionary, r: Dictionary) -> String:
 	var items: Array = r.get("items", [])
 	if str(r.get("kind", "")) != "harvest" or items.size() != 1: return ""
 	var crop := str(items[0])
-	var planted := (view.get("plots", []) as Array).filter(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"] \
+	var plots: Array = view.get("plots", [])
+	if not plots.any(func(p): return str(p.get("state", "")) in ["tilled", "wild"]): return ""
+	if not (view.get("bag", {}).get("slots", []) as Array).any(func(s): return str(s.get("id", "")).begins_with("seed_") \
+			and int(s.get("qty", 0)) > 0 and harvest_of(view, str(crop_for_seed(view, str(s.id)).get("id", ""))) == crop):
+		return ""
+	var planted := plots.filter(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"] \
 		and harvest_of(view, str(p.get("crop", ""))) == crop).size()
 	var n := int(r.get("qty", 1)) - int(r.get("have", 0)) - planted
 	if n <= 0: return ""
 	return "Sow %d %s%s" % [n, "more " if planted > 0 else "", P0Guide.crop_count_name(view, crop, n)]
+
+## The crops taken requests' rows say to sow now (request_sow).
+static func request_sow_crops(view: Dictionary) -> Array:
+	return PinReason.taken(view).filter(func(r): return request_sow(view, r) != "").map(func(r): return str(r.items[0]))
 
 ## "Sow your first plot", short of Energy when sowing a radish costs more than the player has (TodayRow Short).
 static func _first_sow_row(view: Dictionary) -> Dictionary:
