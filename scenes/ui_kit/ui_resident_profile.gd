@@ -2,7 +2,7 @@ class_name UiResidentProfile
 extends VBoxContainer
 ## A resident's profile sheet content (SGODOT-225; RES-PIP 482:586 / RES-KAI 482:592, opened from the name on the
 ## dialogue bar, LOCK-18). Scrollable column: ProfileIdentity (80 round face centred, name, role) · StateBadge (stage) ·
-## Fact `Friendship 52/90` · ItemRow `Favourite dishes` / style · NavigationRow `Details` (hidden when the host has
+## Fact `Friendship 52/90` · ItemRow `Favorite dishes` / style · NavigationRow `Details` (hidden when the host has
 ## no page behind it: nothing dead-ends) — then the fixed decision area with the Dismiss `Back`.
 ## data: {face (Texture2D), name, role, stage, stage_index, friendship, likes, likes_icon (Texture2D), details (bool)}.
 ## Put it in a UiDrawer (pad 16, height 443) with a Close above it. Emits details_pressed / back_pressed.
@@ -63,7 +63,7 @@ func _init(data_: Dictionary = {}) -> void:
 	var fact := UiFactRow.new("Friendship", str(data.get("friendship", "")))
 	fact.visible = str(data.get("friendship", "")) != ""
 	col.add_child(fact)
-	var likes := UiItemRow.new({icon = data.get("likes_icon", null), title = "Favourite dishes", effect = str(data.get("likes", ""))})
+	var likes := UiItemRow.new({icon = data.get("likes_icon", null), title = "Favorite dishes", effect = str(data.get("likes", ""))})
 	likes.visible = str(data.get("likes", "")) != ""
 	col.add_child(likes)
 	_details = UiNavButton.new("Details")

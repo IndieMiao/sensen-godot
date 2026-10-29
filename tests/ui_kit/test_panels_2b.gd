@@ -758,7 +758,7 @@ func test_resident_profile_lists_identity_stage_friendship_and_likes() -> void:
 	p.size = Vector2(328, 411)
 	await _settle()
 	var texts := p.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree()).map(func(l): return l.text)
-	for t in ["Pip", "Courier Kid", "Familiar", "Friendship", "52/90", "Favourite dishes", "Dessert"]:
+	for t in ["Pip", "Courier Kid", "Familiar", "Friendship", "52/90", "Favorite dishes", "Dessert"]:
 		assert_bool(t in texts).override_failure_message("missing %s in %s" % [t, texts]).is_true()
 	assert_bool(p.details_button().visible).is_false()   # no page behind Details in P0: never a dead end
 	var back := [false]
