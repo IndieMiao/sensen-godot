@@ -1,0 +1,156 @@
+{
+  "status": "provisional_until_SGODOT_319",
+  "source": "tools/art/build_basic_room.py:PALETTE",
+  "source_sha256": "c9703df349cf7a3849902edf1f950c066253075f476c64181d6ee07f63d1b6bb",
+  "size": [
+    2048,
+    2048
+  ],
+  "ao": "None in temporary swatches. Room-contact AO must be baked after placement in N1/N2.",
+  "slots": {
+    "oak": {
+      "hex_srgb": "BE8747",
+      "uv_rect_gltf": [
+        0.015625,
+        0.765625,
+        0.234375,
+        0.984375
+      ]
+    },
+    "oak_light": {
+      "hex_srgb": "D59A53",
+      "uv_rect_gltf": [
+        0.265625,
+        0.765625,
+        0.484375,
+        0.984375
+      ]
+    },
+    "oak_edge": {
+      "hex_srgb": "AF7338",
+      "uv_rect_gltf": [
+        0.515625,
+        0.765625,
+        0.734375,
+        0.984375
+      ]
+    },
+    "brass": {
+      "hex_srgb": "A8864C",
+      "uv_rect_gltf": [
+        0.765625,
+        0.765625,
+        0.984375,
+        0.984375
+      ]
+    },
+    "linen": {
+      "hex_srgb": "EFE4CB",
+      "uv_rect_gltf": [
+        0.015625,
+        0.515625,
+        0.234375,
+        0.734375
+      ]
+    },
+    "sky": {
+      "hex_srgb": "A3D7DD",
+      "uv_rect_gltf": [
+        0.265625,
+        0.515625,
+        0.484375,
+        0.734375
+      ]
+    },
+    "sage": {
+      "hex_srgb": "7E8A65",
+      "uv_rect_gltf": [
+        0.515625,
+        0.515625,
+        0.734375,
+        0.734375
+      ]
+    },
+    "iron": {
+      "hex_srgb": "494137",
+      "uv_rect_gltf": [
+        0.765625,
+        0.515625,
+        0.984375,
+        0.734375
+      ]
+    },
+    "porcelain": {
+      "hex_srgb": "F2E7D4",
+      "uv_rect_gltf": [
+        0.015625,
+        0.265625,
+        0.234375,
+        0.484375
+      ]
+    },
+    "sage_dark": {
+      "hex_srgb": "606C4D",
+      "uv_rect_gltf": [
+        0.265625,
+        0.265625,
+        0.484375,
+        0.484375
+      ]
+    },
+    "linen_green": {
+      "hex_srgb": "9FAB78",
+      "uv_rect_gltf": [
+        0.515625,
+        0.265625,
+        0.734375,
+        0.484375
+      ]
+    },
+    "petal": {
+      "hex_srgb": "FFF2D4",
+      "uv_rect_gltf": [
+        0.765625,
+        0.265625,
+        0.984375,
+        0.484375
+      ]
+    },
+    "print_portrait": {
+      "hex_srgb": "EFE4CB",
+      "uv_rect_gltf": [
+        0.015625,
+        0.015625,
+        0.234375,
+        0.234375
+      ]
+    },
+    "print_landscape": {
+      "hex_srgb": "EFE4CB",
+      "uv_rect_gltf": [
+        0.265625,
+        0.015625,
+        0.484375,
+        0.234375
+      ]
+    },
+    "glass": {
+      "hex_srgb": "A3D7DD",
+      "uv_rect_gltf": [
+        0.515625,
+        0.015625,
+        0.734375,
+        0.234375
+      ]
+    },
+    "stone": {
+      "hex_srgb": "D4C4AD",
+      "uv_rect_gltf": [
+        0.765625,
+        0.015625,
+        0.984375,
+        0.234375
+      ]
+    }
+  }
+}

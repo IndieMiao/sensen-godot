@@ -1,0 +1,244 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "display_island",
+    "family": "display",
+    "modules": [
+      "N3 M13"
+    ],
+    "changes": [
+      "Original named cabinet / island base retained, top at 0.66H = 1.1517 m.",
+      "Bakery curved glass profile reused, resized to 0.60 m canopy height.",
+      "Added closed side/rear panes and thin brass canopy edging; Glass is the only transparent surface. No merchandise."
+    ],
+    "sources": [
+      "clothing_store_b/round_display_island",
+      "bakery/display_glass"
+    ],
+    "anchors": {},
+    "vertical_scale": 1.1505493968379412,
+    "tabletop_height_m": 1.1517000000000002,
+    "triangles": 1414,
+    "surfaces": 2,
+    "bounds": [
+      [
+        -1.1699999570846558,
+        0.0,
+        -1.1699999570846558
+      ],
+      [
+        1.1699999570846558,
+        1.760699987411499,
+        1.1699999570846558
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.3399999141693115,
+      1.760699987411499,
+      2.3399999141693115
+    ],
+    "sha256": "e5f92a68e76bc499c2fbb456f26ec97a35e2cffef39e3df895e430e680909ca5",
+    "file": "display_island.glb",
+    "provenance": "provenance/display_island/reuse_provenance.json",
+    "pivot": "floor Y=0, horizontal source centre",
+    "parts": [
+      {
+        "name": "Island brass plinth.001",
+        "source_part": "Island brass plinth",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Lower ivory display tier.001",
+        "source_part": "Lower ivory display tier",
+        "palette_slot": "porcelain",
+        "export_group": "Body"
+      },
+      {
+        "name": "Upper tier brass edge.001",
+        "source_part": "Upper tier brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Upper ivory display.001",
+        "source_part": "Upper ivory display",
+        "palette_slot": "porcelain",
+        "export_group": "Body"
+      },
+      {
+        "name": "Continuous curved display glazing.002",
+        "source_part": "Continuous curved display glazing",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Glass side pane.002",
+        "source_part": "New Glass side pane",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Glass side pane.003",
+        "source_part": "New Glass side pane",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Glass rear pane.001",
+        "source_part": "New Glass rear pane",
+        "palette_slot": "glass",
+        "export_group": "Glass"
+      },
+      {
+        "name": "Canopy brass edge.015",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.016",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.017",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.018",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.019",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.020",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.021",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.022",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.023",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.024",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.025",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.026",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.027",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.028",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      },
+      {
+        "name": "Canopy brass edge.029",
+        "source_part": "New 9 mm radius canopy brass edge",
+        "palette_slot": "brass",
+        "export_group": "Body"
+      }
+    ]
+  },
+  "sources": {
+    "clothing_store_b/round_display_island": {
+      "glb": "assets/rooms/clothing_store_b/round_display_island.glb",
+      "triangles": 976,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.1699999570846558,
+          0.0,
+          -1.1699999570846558
+        ],
+        [
+          1.1699999570846558,
+          1.0010000467300415,
+          1.1699999570846558
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.3399999141693115,
+        1.0010000467300415,
+        2.3399999141693115
+      ],
+      "sha256": "5edae552513f5016ad709e38ddc15f3a565e99bc773efe2fa1983cff8bd1c85a",
+      "blend": "tools/art/source/clothing_store_b/clothing_store_b.blend",
+      "blend_sha256": "53870c7e0c1108983ae66a6c0f00e8c97f0e58481e687a2e19404f6620c7b140",
+      "collection": "KIT_round_display_island"
+    },
+    "bakery/display_glass": {
+      "glb": "assets/rooms/bakery/display_glass.glb",
+      "triangles": 8,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.0800000429153442,
+          0.019999980926513672,
+          -0.4000000059604645
+        ],
+        [
+          1.0799999237060547,
+          1.2100000381469727,
+          0.5799999833106995
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.159999966621399,
+        1.190000057220459,
+        0.9799999892711639
+      ],
+      "sha256": "2cce52c984fd63d051766885d8707dfee9ad555102221e0fb901fa10a90695c1",
+      "blend": "tools/art/source/bakery/bakery.blend",
+      "blend_sha256": "98fbc59fde6f4b467090a0d6465e548b2a57131b56ac3c46dd960147227edfe8",
+      "collection": "KIT_display_glass"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}

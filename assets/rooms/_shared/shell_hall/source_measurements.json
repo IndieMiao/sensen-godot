@@ -1,0 +1,262 @@
+{
+  "deluxe_room_10/sofa": {
+    "glb": "assets/rooms/deluxe_room_10/sofa.glb",
+    "triangles": 2152,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.402999997138977,
+        0.0,
+        -0.45000001788139343
+      ],
+      [
+        1.4029998779296875,
+        1.2799999713897705,
+        0.4399999976158142
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.8059998750686646,
+      1.2799999713897705,
+      0.8900000154972076
+    ],
+    "sha256": "5641868c1ae646ee0e66130f174859f3f4a5df9c84d8b73f61dc6b3d38e3b77a",
+    "blend": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+    "blend_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+    "collection": "KIT_sofa"
+  },
+  "clothing_store_a/black_tufted_bench": {
+    "glb": "assets/rooms/clothing_store_a/black_tufted_bench.glb",
+    "triangles": 1468,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.1449999809265137,
+        -7.450580596923828e-09,
+        -0.27500009536743164
+      ],
+      [
+        1.1449999809265137,
+        0.6779999732971191,
+        0.27500009536743164
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.2899999618530273,
+      0.6779999807476997,
+      0.5500001907348633
+    ],
+    "sha256": "c33c9c298e736f2bbcf1cbc095702b28eb4bf511b7a8156197f7a63115124c20",
+    "blend": "tools/art/source/clothing_store_a/clothing_store_a.blend",
+    "blend_sha256": "ffc65e5f782d83a09e89f7751b53d415e1210cdbbf64e2c67f616dc31a1b1ef0",
+    "collection": "KIT_black_tufted_bench"
+  },
+  "coffee_shop_0/round_table": {
+    "glb": "assets/rooms/coffee_shop_0/round_table.glb",
+    "triangles": 240,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.5499999523162842,
+        0.0032453425228595734,
+        -0.550000011920929
+      ],
+      [
+        0.550000011920929,
+        1.0278500318527222,
+        0.5500000715255737
+      ]
+    ],
+    "dimensions_xyz_m": [
+      1.0999999642372131,
+      1.0246046893298626,
+      1.1000000834465027
+    ],
+    "sha256": "335f7304c706ba8b86bb1828d3075cfcc8bcdc5c5172459f655bb64832c82a4a",
+    "blend": "tools/art/source/coffee_shop_0/coffee_shop_0.blend",
+    "blend_sha256": "d3616abcdfb14efb08f4c180403195c2c12981e5ff689136fd7630b1372c21ff",
+    "collection": "KIT_round_table"
+  },
+  "mine_hut/round_stool": {
+    "glb": "assets/rooms/mine_hut/round_stool.glb",
+    "triangles": 176,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.2799999713897705,
+        -0.005771756172180176,
+        -0.2799999713897705
+      ],
+      [
+        0.2807600498199463,
+        0.6607999801635742,
+        0.2799999713897705
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.5607600212097168,
+      0.6665717363357544,
+      0.559999942779541
+    ],
+    "sha256": "a64164cb6f8679df3b9defa038f9438252d8d094b8c296a5661f5134cb69f2d8",
+    "blend": "tools/art/source/mine_hut/mine_hut.blend",
+    "blend_sha256": "da501ebc507794dac073afb0f333e53a14579a5be020fa895a6a87231720d9f8",
+    "collection": "KIT_round_stool"
+  },
+  "clothing_store_b/wall_sconce": {
+    "glb": "assets/rooms/clothing_store_b/wall_sconce.glb",
+    "triangles": 292,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.06999999284744263,
+        -0.2799999713897705,
+        -0.017499923706054688
+      ],
+      [
+        0.06999999284744263,
+        0.2799999713897705,
+        0.1419999599456787
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.13999998569488525,
+      0.559999942779541,
+      0.1594998836517334
+    ],
+    "sha256": "07bc12f98a06d0140cb7d54f16be538e4dd464bc3e7b30bfecea4713799159df",
+    "blend": "tools/art/source/clothing_store_b/clothing_store_b.blend",
+    "blend_sha256": "53870c7e0c1108983ae66a6c0f00e8c97f0e58481e687a2e19404f6620c7b140",
+    "collection": "KIT_wall_sconce"
+  },
+  "standard_room_5/botanical_picture": {
+    "glb": "assets/rooms/standard_room_5/botanical_picture.glb",
+    "triangles": 1040,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.24100004136562347,
+        -0.3309999704360962,
+        -0.02250012196600437
+      ],
+      [
+        0.24100007116794586,
+        0.3309999704360962,
+        0.059999868273735046
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.48200011253356934,
+      0.6619999408721924,
+      0.08249999023973942
+    ],
+    "sha256": "49963d81f8f4e9127dbf5723cd41df42175385451ff623a1b8662a908102e760",
+    "blend": "tools/art/source/standard_room_5/standard_room_5.blend",
+    "blend_sha256": "3f5a09ffe9ee87497330babb6462efa0cdea612cee3d833fbd181821aec464e5",
+    "collection": "KIT_botanical_picture"
+  },
+  "tavern/landscape_frame": {
+    "glb": "assets/rooms/tavern/landscape_frame.glb",
+    "triangles": 659,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.35600003600120544,
+        -0.24100005626678467,
+        -0.022500110790133476
+      ],
+      [
+        0.3560000956058502,
+        0.24100005626678467,
+        0.05249996483325958
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.7120001316070557,
+      0.48200011253356934,
+      0.07500007562339306
+    ],
+    "sha256": "1c7b9018ceefef8c0e3efcb84927a24c439a44b0952a24c8a89f575842bf54a6",
+    "blend": "tools/art/source/tavern/tavern.blend",
+    "blend_sha256": "f806b4e5da376349d630968f1da858114e597290c581ff9e5d0fed61bf3890fd",
+    "collection": "KIT_landscape_frame"
+  },
+  "bakery/pastry_display": {
+    "glb": "assets/rooms/bakery/pastry_display.glb",
+    "triangles": 1512,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.2000000476837158,
+        -1.4901161193847656e-08,
+        -0.5849999785423279
+      ],
+      [
+        1.2000000476837158,
+        0.8100000023841858,
+        0.5849999785423279
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.4000000953674316,
+      0.810000017285347,
+      1.1699999570846558
+    ],
+    "sha256": "a9711b04e265128c2d2c12305e43b33645a3c08163e54dfb14b41b8ce952a1b4",
+    "blend": "tools/art/source/bakery/bakery.blend",
+    "blend_sha256": "98fbc59fde6f4b467090a0d6465e548b2a57131b56ac3c46dd960147227edfe8",
+    "collection": "KIT_pastry_display"
+  },
+  "bakery/display_glass": {
+    "glb": "assets/rooms/bakery/display_glass.glb",
+    "triangles": 8,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.0800000429153442,
+        0.019999980926513672,
+        -0.4000000059604645
+      ],
+      [
+        1.0799999237060547,
+        1.2100000381469727,
+        0.5799999833106995
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.159999966621399,
+      1.190000057220459,
+      0.9799999892711639
+    ],
+    "sha256": "2cce52c984fd63d051766885d8707dfee9ad555102221e0fb901fa10a90695c1",
+    "blend": "tools/art/source/bakery/bakery.blend",
+    "blend_sha256": "98fbc59fde6f4b467090a0d6465e548b2a57131b56ac3c46dd960147227edfe8",
+    "collection": "KIT_display_glass"
+  },
+  "clothing_store_b/round_display_island": {
+    "glb": "assets/rooms/clothing_store_b/round_display_island.glb",
+    "triangles": 976,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.1699999570846558,
+        0.0,
+        -1.1699999570846558
+      ],
+      [
+        1.1699999570846558,
+        1.0010000467300415,
+        1.1699999570846558
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.3399999141693115,
+      1.0010000467300415,
+      2.3399999141693115
+    ],
+    "sha256": "5edae552513f5016ad709e38ddc15f3a565e99bc773efe2fa1983cff8bd1c85a",
+    "blend": "tools/art/source/clothing_store_b/clothing_store_b.blend",
+    "blend_sha256": "53870c7e0c1108983ae66a6c0f00e8c97f0e58481e687a2e19404f6620c7b140",
+    "collection": "KIT_round_display_island"
+  }
+}

@@ -1,0 +1,574 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "bench_three_seat",
+    "family": "bench",
+    "modules": [
+      "N3 M15"
+    ],
+    "changes": [
+      "Black leather changed to provisional sage; steel to Basic Room iron.",
+      "Width/depth retained; actual cushion surface lifted to 0.715 m."
+    ],
+    "sources": [
+      "clothing_store_a/black_tufted_bench"
+    ],
+    "anchors": {
+      "seat_1": [
+        -0.72,
+        0.715,
+        0
+      ],
+      "seat_2": [
+        0,
+        0.715,
+        0
+      ],
+      "seat_3": [
+        0.72,
+        0.715,
+        0
+      ]
+    },
+    "seat_height_m": 0.715,
+    "vertical_scale": 1.0671641525220548,
+    "triangles": 1468,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.1449999809265137,
+        0.0,
+        -0.2750000059604645
+      ],
+      [
+        1.1449999809265137,
+        0.715399980545044,
+        0.2750000059604645
+      ]
+    ],
+    "dimensions_xyz_m": [
+      2.2899999618530273,
+      0.715399980545044,
+      0.550000011920929
+    ],
+    "sha256": "bab8d4361cf5d986bdf1f449d4e7aa2d0c757ce40ffa1ab6d0df261818df3172",
+    "file": "bench_three_seat.glb",
+    "provenance": "provenance/bench_three_seat/reuse_provenance.json",
+    "pivot": "floor Y=0, horizontal source centre",
+    "parts": [
+      {
+        "name": "Black steel bench leg.004",
+        "source_part": "Black steel bench leg",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Black steel bench leg.005",
+        "source_part": "Black steel bench leg.001",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Bench steel end foot.002",
+        "source_part": "Bench steel end foot",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Black steel bench leg.006",
+        "source_part": "Black steel bench leg.002",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Black steel bench leg.007",
+        "source_part": "Black steel bench leg.003",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Bench steel end foot.003",
+        "source_part": "Bench steel end foot.001",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Bench black steel frame.001",
+        "source_part": "Bench black steel frame",
+        "palette_slot": "iron",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather continuous cushion.001",
+        "source_part": "Leather continuous cushion",
+        "palette_slot": "sage",
+        "export_group": "Body"
+      },
+      {
+        "name": "Recessed leather cross seam.005",
+        "source_part": "Recessed leather cross seam",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.065",
+        "source_part": "Leather double stitch",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.066",
+        "source_part": "Leather double stitch.001",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.067",
+        "source_part": "Leather double stitch.002",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.068",
+        "source_part": "Leather double stitch.003",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.069",
+        "source_part": "Leather double stitch.004",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.070",
+        "source_part": "Leather double stitch.005",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.071",
+        "source_part": "Leather double stitch.006",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.072",
+        "source_part": "Leather double stitch.007",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.073",
+        "source_part": "Leather double stitch.008",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.074",
+        "source_part": "Leather double stitch.009",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.075",
+        "source_part": "Leather double stitch.010",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.076",
+        "source_part": "Leather double stitch.011",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.077",
+        "source_part": "Leather double stitch.012",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Recessed leather cross seam.006",
+        "source_part": "Recessed leather cross seam.001",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.078",
+        "source_part": "Leather double stitch.013",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.079",
+        "source_part": "Leather double stitch.014",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.080",
+        "source_part": "Leather double stitch.015",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.081",
+        "source_part": "Leather double stitch.016",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.082",
+        "source_part": "Leather double stitch.017",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.083",
+        "source_part": "Leather double stitch.018",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.084",
+        "source_part": "Leather double stitch.019",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.085",
+        "source_part": "Leather double stitch.020",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.086",
+        "source_part": "Leather double stitch.021",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.087",
+        "source_part": "Leather double stitch.022",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.088",
+        "source_part": "Leather double stitch.023",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.089",
+        "source_part": "Leather double stitch.024",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.090",
+        "source_part": "Leather double stitch.025",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Recessed leather cross seam.007",
+        "source_part": "Recessed leather cross seam.002",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.091",
+        "source_part": "Leather double stitch.026",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.092",
+        "source_part": "Leather double stitch.027",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.093",
+        "source_part": "Leather double stitch.028",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.094",
+        "source_part": "Leather double stitch.029",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.095",
+        "source_part": "Leather double stitch.030",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.096",
+        "source_part": "Leather double stitch.031",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.097",
+        "source_part": "Leather double stitch.032",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.098",
+        "source_part": "Leather double stitch.033",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.099",
+        "source_part": "Leather double stitch.034",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.100",
+        "source_part": "Leather double stitch.035",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.101",
+        "source_part": "Leather double stitch.036",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.102",
+        "source_part": "Leather double stitch.037",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.103",
+        "source_part": "Leather double stitch.038",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Recessed leather cross seam.008",
+        "source_part": "Recessed leather cross seam.003",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.104",
+        "source_part": "Leather double stitch.039",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.105",
+        "source_part": "Leather double stitch.040",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.106",
+        "source_part": "Leather double stitch.041",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.107",
+        "source_part": "Leather double stitch.042",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.108",
+        "source_part": "Leather double stitch.043",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.109",
+        "source_part": "Leather double stitch.044",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.110",
+        "source_part": "Leather double stitch.045",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.111",
+        "source_part": "Leather double stitch.046",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.112",
+        "source_part": "Leather double stitch.047",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.113",
+        "source_part": "Leather double stitch.048",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.114",
+        "source_part": "Leather double stitch.049",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.115",
+        "source_part": "Leather double stitch.050",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.116",
+        "source_part": "Leather double stitch.051",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Recessed leather cross seam.009",
+        "source_part": "Recessed leather cross seam.004",
+        "palette_slot": "sage_dark",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.117",
+        "source_part": "Leather double stitch.052",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.118",
+        "source_part": "Leather double stitch.053",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.119",
+        "source_part": "Leather double stitch.054",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.120",
+        "source_part": "Leather double stitch.055",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.121",
+        "source_part": "Leather double stitch.056",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.122",
+        "source_part": "Leather double stitch.057",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.123",
+        "source_part": "Leather double stitch.058",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.124",
+        "source_part": "Leather double stitch.059",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.125",
+        "source_part": "Leather double stitch.060",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.126",
+        "source_part": "Leather double stitch.061",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.127",
+        "source_part": "Leather double stitch.062",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.128",
+        "source_part": "Leather double stitch.063",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather double stitch.129",
+        "source_part": "Leather double stitch.064",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather edge stitching.002",
+        "source_part": "Leather edge stitching",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Leather edge stitching.003",
+        "source_part": "Leather edge stitching.001",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      }
+    ]
+  },
+  "sources": {
+    "clothing_store_a/black_tufted_bench": {
+      "glb": "assets/rooms/clothing_store_a/black_tufted_bench.glb",
+      "triangles": 1468,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.1449999809265137,
+          -7.450580596923828e-09,
+          -0.27500009536743164
+        ],
+        [
+          1.1449999809265137,
+          0.6779999732971191,
+          0.27500009536743164
+        ]
+      ],
+      "dimensions_xyz_m": [
+        2.2899999618530273,
+        0.6779999807476997,
+        0.5500001907348633
+      ],
+      "sha256": "c33c9c298e736f2bbcf1cbc095702b28eb4bf511b7a8156197f7a63115124c20",
+      "blend": "tools/art/source/clothing_store_a/clothing_store_a.blend",
+      "blend_sha256": "ffc65e5f782d83a09e89f7751b53d415e1210cdbbf64e2c67f616dc31a1b1ef0",
+      "collection": "KIT_black_tufted_bench"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}

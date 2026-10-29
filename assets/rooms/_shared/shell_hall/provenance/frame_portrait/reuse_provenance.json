@@ -1,0 +1,123 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-324",
+  "baseline_commit": "fadcaa195f5bb34229fba3995b27c5808ff34089",
+  "asset": {
+    "name": "frame_portrait",
+    "family": "frames",
+    "modules": [
+      "N1 M22",
+      "N3 M06"
+    ],
+    "changes": [
+      "Named backing and four frame rails retained at original dimensions.",
+      "Old botanical / landscape relief removed; independent two-triangle Artwork node with its own atlas rectangle.",
+      "Mounting back at Z=0; placeholder abstract print, pending N1/N3 artwork."
+    ],
+    "sources": [
+      "standard_room_5/botanical_picture"
+    ],
+    "anchors": {},
+    "artwork": {
+      "node": "Artwork",
+      "size_m": [
+        0.3760000071525574,
+        0.5560000143051147
+      ],
+      "palette_slot": "print_portrait",
+      "replacement": "Replace this mesh or remap only its UV rectangle; Body unchanged."
+    },
+    "triangles": 542,
+    "surfaces": 2,
+    "bounds": [
+      [
+        -0.2409999966621399,
+        -0.3310000002384186,
+        -0.0
+      ],
+      [
+        0.2409999966621399,
+        0.3310000002384186,
+        0.07500000298023224
+      ]
+    ],
+    "dimensions_xyz_m": [
+      0.4819999933242798,
+      0.6620000004768372,
+      0.07500000298023224
+    ],
+    "sha256": "5db0badaa3abf9da5afdccf592abba08f687c255e614a27b70650544144a00a9",
+    "file": "frame_portrait.glb",
+    "provenance": "provenance/frame_portrait/reuse_provenance.json",
+    "pivot": "back mounting plane Z=0, centre Y=0",
+    "parts": [
+      {
+        "name": "Picture backing.001",
+        "source_part": "Picture backing",
+        "palette_slot": "linen",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture vertical frame.002",
+        "source_part": "Picture vertical frame",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture vertical frame.003",
+        "source_part": "Picture vertical frame.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture horizontal frame.002",
+        "source_part": "Picture horizontal frame",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Picture horizontal frame.003",
+        "source_part": "Picture horizontal frame.001",
+        "palette_slot": "oak",
+        "export_group": "Body"
+      },
+      {
+        "name": "Artwork",
+        "source_part": "New Artwork",
+        "palette_slot": "print_portrait",
+        "export_group": "Artwork"
+      }
+    ]
+  },
+  "sources": {
+    "standard_room_5/botanical_picture": {
+      "glb": "assets/rooms/standard_room_5/botanical_picture.glb",
+      "triangles": 1040,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.24100004136562347,
+          -0.3309999704360962,
+          -0.02250012196600437
+        ],
+        [
+          0.24100007116794586,
+          0.3309999704360962,
+          0.059999868273735046
+        ]
+      ],
+      "dimensions_xyz_m": [
+        0.48200011253356934,
+        0.6619999408721924,
+        0.08249999023973942
+      ],
+      "sha256": "49963d81f8f4e9127dbf5723cd41df42175385451ff623a1b8662a908102e760",
+      "blend": "tools/art/source/standard_room_5/standard_room_5.blend",
+      "blend_sha256": "3f5a09ffe9ee87497330babb6462efa0cdea612cee3d833fbd181821aec464e5",
+      "collection": "KIT_botanical_picture"
+    }
+  },
+  "texture_change": "All runtime UVs remapped to one provisional Basic Room swatch atlas; no source atlas retained.",
+  "source_mesh_rule": "Evaluated named Blender geometry checked against source GLB dimensions and triangle count before editing."
+}
