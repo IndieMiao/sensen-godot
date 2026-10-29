@@ -246,6 +246,19 @@ func test_npc_outfits_name_real_parts_and_stay_distinct() -> void:
 		assert_bool(pairs.has(pair)).override_failure_message("%s shares %s with %s" % [id, pair, pairs.get(pair, "")]).is_false()
 		pairs[pair] = id
 
+## SGODOT-362: unlike the global hair/cloth pair rule, a resident must not share their own room keeper's cloth.
+func test_handwritten_room_residents_wear_different_clothes_from_their_keeper() -> void:
+	var npcs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outpost_npcs.json")).npcs
+	for room in P0Outposts.all():
+		var keeper := str(room.keeper.name).to_lower()   # the same keeper lookup as P0Outpost._spawn_npcs
+		var keeper_cloth := str(npcs.get(keeper, {}).get("slots", {}).get("cloth", ""))
+		assert_str(keeper_cloth).override_failure_message("%s: keeper %s has no cloth" % [room.id, keeper]).is_not_empty()
+		for resident in room.residents:
+			var cloth := str(npcs.get(resident, {}).get("slots", {}).get("cloth", ""))
+			assert_str(cloth).override_failure_message("%s: resident %s has no cloth" % [room.id, resident]).is_not_empty()
+			assert_str(cloth).override_failure_message("%s: %s shares %s with keeper %s" % [room.id, resident, cloth, keeper]) \
+				.is_not_equal(keeper_cloth)
+
 ## 227 second batch (#125): Sigrid wears her postal cap and uniform, Finn his overalls, Pip the cap without the ponytail
 ## — NPC-only parts, never in the players' pools.
 func test_the_second_batch_npcs_wear_their_npc_only_parts() -> void:
