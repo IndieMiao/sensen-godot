@@ -1,0 +1,45 @@
+{
+  "runtime_base": "f0cde4aa9d9bc56d2b35aa6634c568862f482173",
+  "manifest_before": 45,
+  "manifest_after": 48,
+  "existing_manifest_text_prefix_exact": true,
+  "existing_part_resources_and_thumbs_exact": true,
+  "media": [
+    {
+      "name": "SGODOT-362_PARTS_v1_01_before_after.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/SGODOT-362_PARTS_v1_01_before_after.png",
+      "size": 522673,
+      "sha256": "1272f45a08446fd504882064418ed9b5905212bca34a065b805b3d161b7c4939"
+    },
+    {
+      "name": "SGODOT-362_PARTS_v1_02_lena_hat.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/SGODOT-362_PARTS_v1_02_lena_hat.png",
+      "size": 357960,
+      "sha256": "766fc9ecf92f6ccb29b0f8d98b4018f459f42acade76ae3f058610ffd0e87e7b"
+    },
+    {
+      "name": "SGODOT-362_PARTS_v1_03_rafa_hat.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/SGODOT-362_PARTS_v1_03_rafa_hat.png",
+      "size": 328985,
+      "sha256": "5834712f80b417386927b207ef8867e6ae82da8725657f86d9a7bdcf39e5e758"
+    },
+    {
+      "name": "SGODOT-362_PARTS_v1_04_rafa_cloth.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/SGODOT-362_PARTS_v1_04_rafa_cloth.png",
+      "size": 391988,
+      "sha256": "8daf2c91e3c21061c76dc46d46d319d77050319cd299d78a3929673e4e55807c"
+    },
+    {
+      "name": "SGODOT-362_PARTS_v1_05_room_lineups.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/SGODOT-362_PARTS_v1_05_room_lineups.png",
+      "size": 625265,
+      "sha256": "5f88ac24a2acfd6fcfa940058bca40271ce0f7e7f491f7c721ac17a4ec0e4c8f"
+    },
+    {
+      "name": "SGODOT-362_PARTS_v1_06_portrait_crops.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/SGODOT-362_PARTS_v1_06_portrait_crops.png",
+      "size": 285350,
+      "sha256": "7cd680ceab3267b6ffcd0838e01f2321ce8dc0ba66af75c43be1228ef91e6d1d"
+    }
+  ]
+}

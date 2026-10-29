@@ -1,0 +1,521 @@
+{
+	"checks": [
+		{
+			"check": "hairhat51_npc_lena: exact original FBX bytes",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: imported nodes, hierarchy, transforms and bone rests exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original slot and attachment",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original offsets and tier",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: extracted nodes/transforms exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: one mesh",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: one surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: geometry/normals/UVs/weights/indices exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original bounds exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original shader",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: new PNG actually bound",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: original runtime texture size",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: available to NPC catalog",
+			"passed": true
+		},
+		{
+			"check": "hairhat51_npc_lena: excluded from player catalog",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: exact original FBX bytes",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: imported nodes, hierarchy, transforms and bone rests exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original slot and attachment",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original offsets and tier",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: extracted nodes/transforms exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: one mesh",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: one surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: geometry/normals/UVs/weights/indices exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original bounds exact",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original shader",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: new PNG actually bound",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: original runtime texture size",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: available to NPC catalog",
+			"passed": true
+		},
+		{
+			"check": "hairhat36_npc_rafa: excluded from player catalog",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: exact original FBX bytes",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: imported nodes, hierarchy, transforms and bone rests exact",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original slot and attachment",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original offsets and tier",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind count",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 0",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 1",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 2",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 3",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 4",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 5",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 6",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 7",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 8",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 9",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 10",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 11",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 12",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 13",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 14",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 15",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 16",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 17",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 18",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 19",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 20",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 21",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 22",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 23",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 24",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 25",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 26",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 27",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 28",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 29",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 30",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 31",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 32",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 33",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 34",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 35",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 36",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 37",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 38",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 39",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 40",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 41",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 42",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 43",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 44",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 45",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 46",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 47",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 48",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 49",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 50",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 51",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 52",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 53",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 54",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 55",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 56",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 57",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original skin bind 58",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: one surface",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: geometry/normals/UVs/weights/indices exact",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original bounds exact",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original shader",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: new PNG actually bound",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: original runtime texture size",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: available to NPC catalog",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_rafa: excluded from player catalog",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"parts": {
+		"cloth1_1_npc_rafa": {
+			"base": "cloth1_1",
+			"bounds": "[P: (-0.280469, 0.545456, -0.116736), S: (0.562752, 0.694843, 0.261729)]",
+			"floats": {
+				"ao_strength": 0.3,
+				"diffuse_strength": 1.0,
+				"emission_strength": 0.3,
+				"rim_strength": 0.0,
+				"smoothness": 0.1
+			},
+			"surfaces": 1,
+			"texture_pixels": [
+				512,
+				512
+			],
+			"triangle_delta": 0,
+			"triangles": 1629
+		},
+		"hairhat36_npc_rafa": {
+			"base": "hairhat36_npc_pip",
+			"bounds": "[P: (-0.032976, -0.334745, -0.276886), S: (0.51022, 0.604972, 0.553771)]",
+			"floats": {
+				"ao_strength": 0.3,
+				"diffuse_strength": 1.0,
+				"emission_strength": 0.6,
+				"rim_strength": 0.0,
+				"smoothness": 0.1
+			},
+			"surfaces": 1,
+			"texture_pixels": [
+				512,
+				512
+			],
+			"triangle_delta": 0,
+			"triangles": 1214
+		},
+		"hairhat51_npc_lena": {
+			"base": "hairhat51",
+			"bounds": "[P: (-0.035104, -0.322096, -0.313405), S: (0.479677, 0.619782, 0.62681)]",
+			"floats": {
+				"ao_strength": 0.1,
+				"diffuse_strength": 1.0,
+				"emission_strength": 0.3,
+				"rim_strength": 0.0,
+				"smoothness": 0.1
+			},
+			"surfaces": 1,
+			"texture_pixels": [
+				512,
+				512
+			],
+			"triangle_delta": 0,
+			"triangles": 1103
+		}
+	}
+}
