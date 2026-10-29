@@ -116,7 +116,7 @@ static func guide_shown(view: Dictionary) -> Dictionary:
 
 ## Adapt an actual place id to the existing camera-only Show route. Names always come from the server row.
 static func guide_go(view: Dictionary, go: String) -> String:
-	if go == "" or go in ["home", "plots", "stove", "stall", "bench", "board"] or go.contains(":"): return go
+	if go == "" or go in ["home", "plots", "stove", "stall", "bench", "board", "inbox"] or go.contains(":"): return go
 	var home = view.get("home", {}).get("set", {})
 	if go == str(home.get("pond", "")) or go == home_pond(view): return "pond:" + go
 	for role in ["market", "tea", "tackle", "post"]:
@@ -300,6 +300,8 @@ static func third_slot_row(view: Dictionary) -> Dictionary:
 
 ## `Sow 10 Lettuce · 20 Energy` (§14.2 minute 16): seeds in the bag and free beds (wild ones till for free). Short of
 ## Energy the row stays, with `needs 20 Energy · +8 in 21m` (§14.5). Before the first sow P0Logic has its own row.
+## A crop a taken request's row already says to sow (`Six Radishes · Sow 6 Radishes`) is left to that row: the next
+## seed in the bag gets this one (q(258) ①).
 static func sow_row(view: Dictionary) -> Dictionary:
 	var plots: Array = view.get("plots", [])
 	if not plots.any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"]) \
@@ -307,11 +309,12 @@ static func sow_row(view: Dictionary) -> Dictionary:
 		return {}
 	var free := plots.filter(func(p): return str(p.get("state", "")) in ["tilled", "wild"]).size()
 	if free == 0: return {}
+	var asked: Array = P0Logic.PinReason.taken(view).filter(func(r): return P0Logic.request_sow(view, r) != "").map(func(r): return str(r.items[0]))
 	for s in view.get("bag", {}).get("slots", []):
 		var seed := str(s.get("id", ""))
 		if not seed.begins_with("seed_"): continue
 		var crop := P0Logic.crop_for_seed(view, seed)
-		if crop.is_empty(): continue
+		if crop.is_empty() or asked.has(P0Logic.harvest_of(view, str(crop.id))): continue
 		var n := mini(int(s.get("qty", 0)), free)
 		if n <= 0: continue
 		var cost := n * int(crop.get("energy", 2))

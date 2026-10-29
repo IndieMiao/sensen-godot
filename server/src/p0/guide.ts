@@ -53,6 +53,7 @@ export interface GuidePred {
   fish?: number;                      // cookable fish held, any kind (S8–S10: enough fish to cook)
   dish?: number;                      // edible dishes held, any recipe (the Mystery Dish is not one; S10's ♥)
   common_crop?: number;               // Common crops held, any kind (q(217) ③: soup needs one)
+  parcel?: string;                    // an Inbox parcel of this item not yet claimed, queued ones too (q(254) ①: Pip's seeds)
   all?: GuidePred[]; any?: GuidePred[]; not?: GuidePred;
 }
 
@@ -63,10 +64,11 @@ export interface GuidePred {
  * mark), `stove`; page: a Cookbook page (its Cook key); item: a bag item's cell in the open drawer (the Gift drawer's soup);
  * plot: `teach` (the two teaching plots) / `teach1` (the first; view: plot ids). */
 export interface GuideMark { place?: string; resident?: string; plot?: string; button?: string; object?: string; page?: string; item?: string; kind?: MarkerKind | 'gift'; pulse?: boolean; why?: string }
-/** row.line / row.go, a mark's why and pip may name the home set: `{market}`, `{pond}`, … in a line, `home:<role>` in go;
- * `{have}` / `{need}`: the count shown (the step's, or the recover entry's own). row.countdown (a crop id): view adds
- * ready_in (ms to that crop's soonest ripening, null if none grows), count (its plots growing: one or more) and
- * format (`mss` for a Quick Radish, q(217) ④; else `minutes`, q(97)); the client writes `<line> in <time>`. */
+/** row.line / row.go, a mark's why and pip may name the home set: `{market}`, `{pond}`, … in a line, `home:<role>` in go
+ * (`inbox`: the Inbox's Parcels page, q(254) ①); `{have}` / `{need}`: the count shown (the step's, or the recover
+ * entry's own). row.countdown (a crop id): view adds ready_in (ms to that crop's soonest ripening, null if none grows),
+ * count (its plots growing: one or more) and format (`mss` for a Quick Radish, q(217) ④; else `minutes`, q(97)); the
+ * client writes `<line> in <time>`. */
 export interface GuideShow { row?: Record<string, unknown>; tip?: string; marks?: GuideMark[]; pip?: string }
 export interface GuideStep extends GuideShow {
   id: string; phase?: string;
@@ -173,6 +175,8 @@ function isEdibleDish(c: P0Content, id: string): boolean {
   const base = dishParts(id).base;
   return base !== c.cooking.mystery.id && !!recipeById(c, base);
 }
+/** An Inbox parcel of this item not yet claimed, those queued behind a full Inbox too. */
+const inboxHolds = (s: P0State, id: string) => [...s.inbox.parcels, ...s.inbox.waiting].some(p => p.id === id);
 const pots = (s: P0State) => [s.stove, s.queue, ...(s.burners ?? []).flatMap(b => [b.stove, b.queue])].filter(p => p !== null);
 
 export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, now: number): boolean {
@@ -193,6 +197,7 @@ export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, no
   if (p.fish !== undefined && heldWhere(s, id => isCookFish(c, id)) < p.fish) return false;
   if (p.dish !== undefined && heldWhere(s, id => isEdibleDish(c, id)) < p.dish) return false;
   if (p.common_crop !== undefined && heldWhere(s, id => isCommonCrop(c, id)) < p.common_crop) return false;
+  if (p.parcel !== undefined && !inboxHolds(s, p.parcel)) return false;
   if (p.all && !p.all.every(q => guidePred(c, s, q, now))) return false;
   if (p.any && !p.any.some(q => guidePred(c, s, q, now))) return false;
   if (p.not && guidePred(c, s, p.not, now)) return false;
@@ -311,7 +316,7 @@ export function resendReady(c: P0Content, s: P0State): boolean {
   if (!r || !g || g.step === null || (g.n.resend ?? 0) >= r.max) return false;
   const quick = quickCrop(c, r.item)?.id;
   if (held(s, r.item) > 0) return false;
-  if ([...s.inbox.parcels, ...s.inbox.waiting].some(p => p.id === r.item)) return false;
+  if (inboxHolds(s, r.item)) return false;
   if (quick && s.plots.some(p => p.crop === quick && (p.state === 'sown' || p.state === 'growing'))) return false;
   const radishFor1 = (g.n[r.deliver] ?? 0) === 0 && held(s, r.radish) === 0;
   const cropForSoup = (g.n[r.dish] ?? 0) === 0 && heldWhere(s, id => isCommonCrop(c, id)) === 0;
@@ -492,7 +497,7 @@ export function validateGuide(c: P0Content): string[] {
   const pred = (where: string, p?: GuidePred) => {
     if (!p) return;
     for (const id of [...Object.keys(p.have ?? {}), ...Object.keys(p.planted ?? {}), ...Object.keys(p.ripe ?? {}),
-      ...(p.pot ? [p.pot] : []), ...(p.known ? [p.known] : [])]) if (!known(id)) out.push(`${where}: unknown item ${id}`);
+      ...(p.pot ? [p.pot] : []), ...(p.known ? [p.known] : []), ...(p.parcel ? [p.parcel] : [])]) if (!known(id)) out.push(`${where}: unknown item ${id}`);
     for (const k of Object.keys(p.keys ?? {})) key(where, k);
     p.all?.forEach(q => pred(where, q)); p.any?.forEach(q => pred(where, q)); pred(where, p.not);
   };
