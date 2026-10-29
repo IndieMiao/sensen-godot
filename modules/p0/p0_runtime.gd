@@ -613,10 +613,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var over_bar := ui.resident_float_at(str(thanks.get("resident", ""))) if not thanks.is_empty() else Vector2.INF
 	if over_bar.is_finite(): at = over_bar
 	# Arriving by air (q(147) ⑥, 不知火舞 on 299): the arrival's Energy — its float and the HUD's value — waits for the
-	# flight to land (release_travel), with its welcome; so does any Energy that comes while it flies.
+	# flight to land (release_travel), with its welcome; so does any Energy that comes while it flies, and the HUD's
+	# coins stay what they were too (q(261) ④).
 	var by_air := world != null and world.has_method("on_arrival") \
 		and (events.any(func(e): return str(e.get("kind", "")) == "arrival") or bool(_call("travelling", [])))
-	if by_air and not before.is_empty() and not ui.energy_held(): ui.hold_energy(before.get("energy", {}))
+	if by_air and not before.is_empty() and not ui.energy_held(): ui.hold_energy(before.get("energy", {}), int(before.get("coins", -1)))
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	last_catch_extras = {}
