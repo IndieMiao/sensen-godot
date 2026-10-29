@@ -341,11 +341,15 @@ function drinksView(c: P0Content, s: P0State, now: number) {
 }
 
 /** q(259): what the creel's sellable fish fetch at this city's Tackle Shop and at home, unit by unit as a sale pays
- * (q(251): max(1, ⌊full × the city's share⌋)); Gifted fish, crops and dishes left out. Away only: null at home, with no
- * fish to sell, or when the two sums are equal — the toast then keeps `Sell or cook first`. */
+ * (q(251): max(1, ⌊full × the city's share⌋)); Gifted fish, crops and dishes left out. Away only: null at home, in a
+ * city without a Tackle Shop (an S-tier town has only its Trading Post, whose counter buys nothing; the hand-written
+ * city has Mission's), with no fish to sell, or when the two sums are equal — the toast then keeps `Sell or cook first`
+ * (周瑜 on #567). */
 function creelValue(c: P0Content, s: P0State): { here: number; home: number } | null {
   const city = s.travel?.here ?? homeOf(c, s);
   if (sellDistance(c, s, 'tackle', city).home) return null;
+  const places = cityPlaces(c, city);   // null: the hand-written city
+  if (places && !places.detail.outposts.some(o => o.role === 'tackle')) return null;
   let here = 0, home = 0;
   for (const b of s.bag) {
     if (b.gift || itemKind(b.id) !== 'fish') continue;

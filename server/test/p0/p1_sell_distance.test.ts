@@ -4,6 +4,7 @@ import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 import { buyback, sellDistance } from '../../src/p0/shops.js';
+import { cityPlaces } from '../../src/p0/world.js';
 
 // q(251): home counters pay full price; away the Tackle Shop and the Market pay sell_distance's share for the Trip band of
 // their city (Trip 1–2 90%, 3–4 80%, 5 70%, 6–7 60%), unit = max(1, ⌊full × share⌋); no daily limit at either. The real
@@ -11,6 +12,7 @@ import { buyback, sellDistance } from '../../src/p0/shops.js';
 const c = loadP0Content();   // not a structuredClone: the loader's clusters (non-enumerable) give the Trip bands
 const T0 = Date.UTC(2026, 9, 10, 2, 0, 0);
 const DAY = 86_400_000;
+const NYC = 'gn-5128581';
 const SF = 'gn-5391959', SAN_JOSE = 'gn-5392171', LA = 'gn-5368361', CHICAGO = 'gn-4887398', TOKYO = 'gn-1850147';
 const fresh = () => ({ ...freshState(c, 'player-sell-distance', T0, 7), created_at: T0 - 8 * DAY });
 function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[] } {
@@ -102,6 +104,27 @@ describe('the creel\'s worth here and at home (q(259))', () => {
     s.bag = s.bag.filter(b => b.id !== 'fish_trout' && !b.id.startsWith('fish_'));
     s.bag.push({ id: 'crop_radish', qty: 10 });
     expect(viewOf(c, s, T0).bag.creel_value).toBeNull();
+  });
+
+  it('a town without a Tackle Shop (S tier: only the Trading Post): none — nowhere there to sell them (周瑜 on #567)', () => {
+    const LOUDI = 'gn-1802238';
+    expect(cityPlaces(c, LOUDI)!.detail.outposts.map(o => o.role)).toEqual(['post']);
+    const s = step(fresh(), { type: 'travel', to: LOUDI }).s;
+    s.bag.push({ id: 'fish_trout', qty: 30 });
+    expect(viewOf(c, s, T0).bag.creel_value).toBeNull();
+  });
+
+  it('a home in a generated city, away in San Francisco (the hand-written city, Mission\'s Tackle Shop): the two sums', () => {
+    let s: P0State = freshState(c, 'player-sell-distance-nyc', T0, 7, { pending: true });
+    s.created_at = T0 - 8 * DAY;
+    s = step(s, { type: 'choose_home', city: NYC, spot: 0 } as P0Command).s;
+    s = step(s, { type: 'travel', to: SF }).s;
+    s.bag = s.bag.filter(b => !b.id.startsWith('fish_'));
+    s.bag.push({ id: 'fish_salmon', qty: 2 });
+    const share = sellDistance(c, s, 'tackle', SF);
+    expect(share.home).toBe(false);
+    const unit = Math.max(1, Math.floor(32 * share.factor + 1e-9));
+    expect(viewOf(c, s, T0).bag.creel_value).toEqual({ here: 2 * unit, home: 64 });
   });
 
   it('equal sums (every unit at the 1-coin floor both ways): none', () => {
