@@ -237,7 +237,7 @@ static func page(view: Dictionary, id: String) -> Dictionary:
 ## Rows that lead Today (§14.2, §14.3, q(46)); P0Logic.today_rows puts them first and fills up to 3 from its own.
 ## A row is {line, icon, go, state, tail, focus} like P0Logic._row; go "pond:<id>" (and "outpost:<role>", "map") is a
 ## place on the map: Show on map there (the map's targets, SGODOT-225 #37).
-static func lead_rows(view: Dictionary) -> Array:
+static func lead_rows(view: Dictionary, leave: Variant = null) -> Array:
 	if guide_on(view): return focus_first(guide_rows(view))   # the new-player guide leads instead (SGODOT-341)
 	var rows: Array = []
 	var t := tutorial(view)
@@ -269,7 +269,7 @@ static func lead_rows(view: Dictionary) -> Array:
 	if not third.is_empty(): rows.append(third)
 	var fresh := new_recipe_row(view)
 	if not fresh.is_empty(): rows.append(fresh)
-	var sow := sow_row(view)
+	var sow := sow_row(view, leave)
 	if not sow.is_empty(): rows.append(sow)
 	return focus_first(rows)
 
@@ -301,15 +301,16 @@ static func third_slot_row(view: Dictionary) -> Dictionary:
 ## `Sow 10 Lettuce · 20 Energy` (§14.2 minute 16): seeds in the bag and free beds (wild ones till for free). Short of
 ## Energy the row stays, with `needs 20 Energy · +8 in 21m` (§14.5). Before the first sow P0Logic has its own row.
 ## A crop a taken request's row already says to sow (`Six Radishes · Sow 6 Radishes`) is left to that row: the next
-## seed in the bag gets this one (q(258) ①).
-static func sow_row(view: Dictionary) -> Dictionary:
+## seed in the bag gets this one (q(258) ①). `leave`: those crops (null: every one a request says to sow; Today passes
+## only the ones its three rows show, P0Logic.today_rows).
+static func sow_row(view: Dictionary, leave: Variant = null) -> Dictionary:
 	var plots: Array = view.get("plots", [])
 	if not plots.any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"]) \
 			and not (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")):
 		return {}
 	var free := plots.filter(func(p): return str(p.get("state", "")) in ["tilled", "wild"]).size()
 	if free == 0: return {}
-	var asked: Array = P0Logic.PinReason.taken(view).filter(func(r): return P0Logic.request_sow(view, r) != "").map(func(r): return str(r.items[0]))
+	var asked: Array = leave if leave is Array else P0Logic.request_sow_crops(view)
 	for s in view.get("bag", {}).get("slots", []):
 		var seed := str(s.get("id", ""))
 		if not seed.begins_with("seed_"): continue

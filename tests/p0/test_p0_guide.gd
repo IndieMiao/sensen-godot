@@ -498,3 +498,33 @@ func test_six_radishes_says_sow_and_the_generic_sow_row_gives_way() -> void:
 	var lines := _lines(P0Logic.today_rows(v))
 	assert_array(lines).contains(["Six Radishes · Radish 1/6"])
 	assert_bool(lines.any(func(l): return str(l).begins_with("Sow 3 Radishes"))).is_true()
+
+## 不知火舞 on 341 a658c638: the generic Sow row gives way only while Today shows the request's Sow row. Three things to
+## do now and a later request keeping the 3rd row (q(143)) push Six Radishes off: the generic Radish row comes back.
+func test_the_generic_sow_row_comes_back_when_the_request_row_is_not_shown() -> void:
+	var plots := _plots(["ready", "sown", "wild", "wild", "wild", "wild", "wild", "wild"])
+	plots[0].crop = "crop_lettuce"
+	plots[1].crop = "crop_lettuce"
+	var v := _six(0, plots, [{"id": "seed_radish", "qty": 20}, {"id": "fish_crucian", "qty": 1}])
+	v.residents.res_nadia.request["accepted_at"] = 1000
+	v["boards"] = {"stall": {"slots": [{"id": "req_stall_1", "title": "Pond Catch", "kind": "fish", "items": ["fish_crucian"],
+		"qty": 3, "have": 1, "status": "accepted", "accepted_at": 2000}]}}
+	var lines := _lines(P0Logic.today_rows(v))
+	assert_array(lines).is_equal(["Sow 6 Radishes · 12 Energy", "Harvest 1 Lettuce", "Pond Catch · Pond Crucian 1/3"])
+	# Six Radishes the latest: it keeps the 3rd row, and the generic row leaves the Radish to it
+	v.residents.res_nadia.request.accepted_at = 3000
+	lines = _lines(P0Logic.today_rows(v))
+	assert_array(lines).is_equal(["Harvest 1 Lettuce", "Water 1 sown plot", "Six Radishes · Sow 6 Radishes"])
+
+## 不知火舞 on 341: no free bed, or no seed that grows the crop — it cannot be sown, so the row is its count.
+func test_a_request_that_cannot_be_sown_now_shows_its_count() -> void:
+	var v := _six(0, _plots(["growing", "growing", "sown", "sown"]), [{"id": "seed_radish", "qty": 20}])
+	for p in v.plots: p.crop = "crop_lettuce"
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Radish 0/6"])   # beds full
+	v.plots.append({"id": 4, "state": "tilled"})
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Sow 6 Radishes"])
+	v.bag.slots = [{"id": "seed_lettuce", "qty": 10}]                                     # no Radish Seeds
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Radish 0/6", "Sow 1 Lettuce · 2 Energy"])
+	v["quick_seeds"] = [{"id": "crop_quick_radish", "seed": "seed_quick_radish", "energy": 2, "grow_s": 45, "harvest": "crop_radish"}]
+	v.bag.slots = [{"id": "seed_quick_radish", "qty": 2}]                                 # quick ones grow a Radish too
+	assert_array(_lines(P0Logic.today_rows(v))).contains(["Six Radishes · Sow 6 Radishes"])
