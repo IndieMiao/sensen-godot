@@ -1,0 +1,20 @@
+{
+  "opening": {
+    "changed_pixels": 1131,
+    "rectangle_xyxy": [
+      561,
+      478,
+      610,
+      540
+    ]
+  },
+  "bracket": {
+    "changed_pixels": 50673,
+    "rectangle_xyxy": [
+      488,
+      229,
+      796,
+      487
+    ]
+  }
+}

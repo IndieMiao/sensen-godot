@@ -36,5 +36,8 @@ looks['pip'] = {'slots': npcs['res_pip']['slots']}
 looks['nadia_hat_only'] = {'slots': {**looks['nadia_now']['slots'], 'hairHat': 'hairhat41_npc_nadia_baker'}}
 looks['nadia_new'] = {'slots': {**looks['nadia_hat_only']['slots'], 'cloth': 'cloth1_1_npc_nadia'}}
 (out / 'looks-phase2.json').write_text(json.dumps(looks, indent=2) + '\n')
+looks['lou_now'] = {'slots': npcs['lou']['slots']}
+looks['lou_new'] = {'slots': {**npcs['lou']['slots'], 'cloth': 'cloth1_npc_lou'}}
+(out / 'looks-phase3.json').write_text(json.dumps(looks, indent=2) + '\n')
 (out / 'script-provenance.json').write_text(json.dumps(hashes, indent=2) + '\n')
 print('BATCH3_REVIEW_STAGED', out)

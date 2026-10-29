@@ -1,7 +1,24 @@
 # NPC Batch 3 · 部件审阅
 
 第二段 Nadia 的帽子、围裙及三人新造型并排已补到 [Nadia 审阅](nadia/README.md)。
-下方保留第一段换色的完整证据。
+第三段 Lou 荷官装与后墙 AO 见 [Lou / 牌室审阅](lou-tavern/README.md)。
+全批六件已追加为 NPC 专用部件；下方保留第一段换色的完整证据。
+
+最终运行时头：ad751863b42770d4e8f70dd3889a4bca230b4b2f，分支 art/npc-parts-batch3。
+只推分支，未开运行时 PR；美术审阅为 #561 → wp-3d-scene。
+全批 50 个运行时文件均在允许范围内（assets/avatar/** + 已确认的 tavern PNG），
+3 个可编辑 blend，18 张署名审阅图上传三张卡并下载核对。详见 [final-handoff.json](final-handoff.json)。
+
+| 部件 | 三角形 | 对底件增量 |
+| --- | ---: | ---: |
+| hairhat51_npc_lena | 1,103 | 0 |
+| hairhat36_npc_rafa | 1,214 | 0 |
+| cloth1_1_npc_rafa | 1,629 | 0 |
+| hairhat41_npc_nadia_baker | 1,296 | -1,016 |
+| cloth1_1_npc_nadia | 1,869 | +240 |
+| cloth1_npc_lou | 2,811 | +1,182 |
+
+后墙只修 297 个独占像素，全部 GLB 不变。仍待上官婉儿技术检查、不知火舞画面验收及用户批准。
 
 赵云，2026-10-29。规格：SGODOT-362 `ba1dcbd1` / `27ea8b86` 和上官婉儿 10-29 派工。
 参考 `362_before_after_v1.png` 仅是 2D 颜色方向；本目录六张审阅图全部来自游戏实渲。

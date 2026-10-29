@@ -1,8 +1,11 @@
 extends "verify_npc_batch3.gd"
 func run():
 	var avatar = root.get_node("Avatar")
-	for pair in [["hairhat41_npc_auburn", "hairhat41_npc_nadia_baker", "SM_hairHat41.fbx", 1296],
-		["cloth1_1", "cloth1_1_npc_nadia", "SK_dt_skin01.fbx", 1869]]:
+	var lou = OS.get_cmdline_user_args().has("--lou")
+	var pairs = [["hairhat41_npc_auburn", "hairhat41_npc_nadia_baker", "SM_hairHat41.fbx", 1296],
+		["cloth1_1", "cloth1_1_npc_nadia", "SK_dt_skin01.fbx", 1869]]
+	if lou: pairs = [["cloth1", "cloth1_npc_lou", "SK_dt_skin01.fbx", 2811]]
+	for pair in pairs:
 		var id = pair[1]
 		var before = load("res://assets/avatar/source/" + pair[0] + "/" + pair[2]).instantiate()
 		var after = load("res://assets/avatar/source/" + id + "/" + pair[2]).instantiate()
@@ -27,7 +30,7 @@ func run():
 			var weights = arrays[Mesh.ARRAY_WEIGHTS]
 			var stride = weights.size() / arrays[Mesh.ARRAY_VERTEX].size()
 			var valid = true
-			print("NADIA_WEIGHT_STRIDE ", stride, " original ", old_mesh.surface_get_arrays(0)[Mesh.ARRAY_WEIGHTS].size() / old_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size())
+			print("NPC_WEIGHT_STRIDE ", stride, " original ", old_mesh.surface_get_arrays(0)[Mesh.ARRAY_WEIGHTS].size() / old_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size())
 			for i in range(0, weights.size(), stride):
 				var total = 0.0
 				for j in stride: total += weights[i+j]
@@ -48,6 +51,7 @@ func run():
 		before.free(); after.free()
 		if scene: scene.free(); old_scene.free()
 	report.failures = report.checks.filter(func(c): return not c.passed)
-	FileAccess.open("res://output/npc-batch3/nadia-validation.json", FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
-	print("NADIA_BATCH3_QA ", report.checks.size(), " checks / ", report.failures.size(), " failures")
+	var output = "res://output/npc-batch3/lou-validation.json" if lou else "res://output/npc-batch3/nadia-validation.json"
+	FileAccess.open(output, FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+	print("LOU_BATCH3_QA " if lou else "NADIA_BATCH3_QA ", report.checks.size(), " checks / ", report.failures.size(), " failures")
 	quit(0 if report.failures.is_empty() else 1)

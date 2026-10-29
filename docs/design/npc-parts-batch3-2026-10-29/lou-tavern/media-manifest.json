@@ -1,0 +1,32 @@
+[
+  {
+    "name": "SGODOT-357_LOU_v1_01_lou_sigrid.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/lou-tavern/SGODOT-357_LOU_v1_01_lou_sigrid.png",
+    "size": 295999,
+    "sha256": "e41e6935e74723a3c6be9618296128fc42d021b35a8303df548e133eb9ef6742"
+  },
+  {
+    "name": "SGODOT-357_LOU_v1_02_cloth_closeups.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/lou-tavern/SGODOT-357_LOU_v1_02_cloth_closeups.png",
+    "size": 354398,
+    "sha256": "78c5f2279941ad8f446844f110f78b5f736101cf43707bebb3cf5e4659e9cc74"
+  },
+  {
+    "name": "SGODOT-357_LOU_v1_03_motion.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/lou-tavern/SGODOT-357_LOU_v1_03_motion.png",
+    "size": 204103,
+    "sha256": "b9fa7789293216521b5a3e8eb5410905e8f8aa6c5560019779bff9ed96d6e040"
+  },
+  {
+    "name": "SGODOT-357_LOU_v1_04_wall_opening.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/lou-tavern/SGODOT-357_LOU_v1_04_wall_opening.png",
+    "size": 651529,
+    "sha256": "fd28e6f1605e0de98ef3ffbcc25df853fec779a128b0ec7c762d02dc0666ef2e"
+  },
+  {
+    "name": "SGODOT-357_LOU_v1_05_wall_closeup.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/lou-tavern/SGODOT-357_LOU_v1_05_wall_closeup.png",
+    "size": 383156,
+    "sha256": "1249fa879176b82f6415c731d1ddbde15af91b6a300da2a78afba36b323365ae"
+  }
+]

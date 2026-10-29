@@ -99,7 +99,7 @@ class Geometry:
         return mesh
 
 
-def write_fbx(source, dest, builder):
+def write_fbx(source, dest, builder, rebuild_skin=False):
     tree, version = parse_fbx.parse(str(source))
     old = copy.deepcopy(tree)
     objects = child(tree, b'Objects').elems
@@ -127,10 +127,18 @@ def write_fbx(source, dest, builder):
         for cluster in clusters:
             bone = next(by_id[c[1]] for c in connections if c[2] == cluster.props[0] and by_id.get(c[1]) and by_id[c[1]].id == b'Model')
             name = bone.props[1].split(b'\x00')[0].decode()
-            extra = [(i, weights[name]) for i, weights in enumerate(builder.weights) if i >= builder.original_vertices and name in weights]
-            if not extra: continue
-            child(cluster, b'Indexes').props[0].extend(i for i, _ in extra)
-            child(cluster, b'Weights').props[0].extend(w for _, w in extra)
+            extra = [(i, weights[name]) for i, weights in enumerate(builder.weights) if (rebuild_skin or i >= builder.original_vertices) and name in weights]
+            if not extra and not rebuild_skin: continue
+            if rebuild_skin:
+                if not extra and not any(e.id == b'Indexes' for e in cluster.elems): continue
+                for key, kind, values in [(b'Indexes','i',(i for i, _ in extra)), (b'Weights','d',(w for _, w in extra))]:
+                    existing = next((e for e in cluster.elems if e.id == key), None)
+                    values = array(kind, values)
+                    if existing is None: cluster.elems.append(element(key, kind, [values]))
+                    else: existing.props[0] = values
+            else:
+                child(cluster, b'Indexes').props[0].extend(i for i, _ in extra)
+                child(cluster, b'Weights').props[0].extend(w for _, w in extra)
             changed_clusters.add(cluster.props[0])
     encode_bin.write(str(dest), encoded(tree), version)
     after, after_version = parse_fbx.parse(str(dest))
@@ -144,15 +152,18 @@ def write_fbx(source, dest, builder):
                 assert x.props == y.props
             elif x.props[0] in changed_clusters:
                 assert x.props == y.props
-                for u, v in zip(x.elems, y.elems):
+                assert {e.id for e in y.elems} - {e.id for e in x.elems} <= {b'Indexes', b'Weights'}
+                for u in x.elems:
+                    v = child(y, u.id)
                     if u.id in [b'Indexes', b'Weights']:
-                        assert list(v.props[0][:len(u.props[0])]) == list(u.props[0])
+                        if not rebuild_skin: assert list(v.props[0][:len(u.props[0])]) == list(u.props[0])
                     else: assert same(u, v)
             else: assert same(x, y), (x.id, x.props[:2])
     mesh.calc_loop_triangles()
     return {'triangles': len(mesh.loop_triangles), 'vertices': len(mesh.vertices), 'original_vertices_retained': builder.original_vertices,
             'original_node_names_hierarchy_transforms_axes_units_exact': True, 'connections_exact': True,
-            'original_skin_weights_and_bind_matrices_exact': True, 'clusters_extended_for_new_geometry': len(changed_clusters),
+            'original_skin_weights_and_bind_matrices_exact': not rebuild_skin, 'original_bind_matrices_exact': True,
+            'skin_weight_arrays_rebuilt': rebuild_skin, 'clusters_extended_for_new_geometry': len(changed_clusters),
             'other_objects_and_geometry_exact': True, 'sha256': hashlib.sha256(dest.read_bytes()).hexdigest()}
 
 

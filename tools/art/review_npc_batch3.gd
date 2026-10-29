@@ -12,13 +12,17 @@ func run():
 	var kp = kp_script.new(); root.add_child(kp)
 	var avatar = root.get_node("Avatar")
 	var nadia = OS.get_cmdline_user_args().has("--nadia")
-	var looks = JSON.parse_string(FileAccess.get_file_as_string("res://output/npc-batch3/looks-phase2.json" if nadia else "res://output/npc-batch3/looks-phase1.json"))
+	var lou = OS.get_cmdline_user_args().has("--lou")
+	var looks_path = "res://output/npc-batch3/looks-phase3.json" if lou else ("res://output/npc-batch3/looks-phase2.json" if nadia else "res://output/npc-batch3/looks-phase1.json")
+	var looks = JSON.parse_string(FileAccess.get_file_as_string(looks_path))
 	var output = "res://output/npc-batch3/nadia-closeups" if nadia else "res://output/npc-batch3/closeups"
+	if lou: output = "res://output/npc-batch3/lou-closeups"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	var report = {"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "captures": []}
 	var pairs = [["lena_a", "lena_new", "lena_hat"], ["rafa_r1", "rafa_hat_only", "rafa_hat"], ["rafa_hat_only", "rafa_new", "rafa_cloth"]]
 	if nadia: pairs = [["nadia_now", "nadia_hat_only", "nadia_hat"], ["nadia_hat_only", "nadia_new", "nadia_apron"]]
+	if lou: pairs = [["lou_now", "lou_new", "lou_cloth"]]
 	for pair in pairs:
 		for index in 2:
 			var id = pair[index]
@@ -35,7 +39,7 @@ func run():
 			var animation = rig.get_node("AnimationPlayer"); animation.seek(.3, true); animation.pause()
 			for side in ["front", "back"]:
 				rig.rotation.y = kp_script.TURN + (PI if side == "back" else 0)
-				var cloth = pair[2] in ["rafa_cloth", "nadia_apron"]
+				var cloth = pair[2] in ["rafa_cloth", "nadia_apron", "lou_cloth"]
 				kp._aim(Vector3(0, 1.0 if cloth else 1.46, 0), 1.0 if cloth else .91, .05)
 				for i in 3: await process_frame
 				var image: Image = await kp._render()

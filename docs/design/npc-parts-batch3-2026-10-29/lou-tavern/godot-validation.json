@@ -1,0 +1,317 @@
+{
+	"checks": [
+		{
+			"check": "cloth1_npc_lou: original imported nodes/hierarchy/transforms/bone rests",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original attachment and slot",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: no compensating offsets",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original skin bind count",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 0",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 1",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 2",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 3",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 4",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 5",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 6",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 7",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 8",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 9",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 10",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 11",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 12",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 13",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 14",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 15",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 16",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 17",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 18",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 19",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 20",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 21",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 22",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 23",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 24",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 25",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 26",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 27",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 28",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 29",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 30",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 31",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 32",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 33",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 34",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 35",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 36",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 37",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 38",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 39",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 40",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 41",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 42",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 43",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 44",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 45",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 46",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 47",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 48",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 49",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 50",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 51",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 52",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 53",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 54",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 55",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 56",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 57",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original bind 58",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: all original/new vertex skin weights normalized",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: one surface",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: authored triangle count",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original shared shader",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: own new atlas bound",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: 512px runtime texture",
+			"passed": true
+		},
+		{
+			"check": "cloth1_npc_lou: NPC only",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"parts": {
+		"cloth1_npc_lou": {
+			"base": "cloth1",
+			"delta": 1182,
+			"runtime_texture_size": [
+				512,
+				512
+			],
+			"surface_count": 1,
+			"triangles": 2811
+		}
+	}
+}

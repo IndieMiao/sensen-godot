@@ -29,3 +29,15 @@ prepare_nadia_textures.py 生成新 PNG；nadia-geometry-validation.json 记录�
 帽子保留原长发的 303 个顶点 / 592 面，去掉花冠后增加低冠白软帽；共 1,296 面。
 围裙共 1,869 面，原 862 个衣服顶点和权重保留，新增 183 顶点 / 240 面。
 底件中所有其他源网格不变；提取仅选择 cloth，所以运行时仍一个 mesh / surface。
+
+357 的 Lou 源文件为 lou-dealer.blend。build_lou_batch3.py 使用 cloth1 的衬衫、
+cloth36 独立裤身和原创马甲 / 领结，写回 cloth1 原 FBX 容器；只重建 cloth Geometry
+及其 skin 索引 / 权重，不改变原骨骼、节点、绑定矩阵和其他 Geometry。
+裤子按同名骨骼映射，衬衫下摆内收，颜色由 prepare_lou_texture.py 打成一张图集。
+lou-geometry-validation.json 记录 2,811 面、原 59 个绑定矩阵和重建权重的区别。
+
+后墙 source blend 沿用 tools/art/source/tavern/tavern.blend，保持原字节。
+inspect_tavern_ao_357.py 核对全部独立模块和实际房间合批中的 UV；
+repair_tavern_ao_357.py 仅对原托架后方 297 个独占像素修正亮度，保存
+tavern-ao-357-mask.png 与 tavern-ao-357-validation.json。不重烘整张图，不重导任何 GLB。
+运行时额外带修正图集的范围已在本会话获确认。

@@ -6,6 +6,7 @@ const PAIRS = [
 	["cloth1_1", "cloth1_1_npc_rafa", "SK_dt_skin01.fbx", "T_rafa_cloth01_D.png"],
 	["hairhat41_npc_auburn", "hairhat41_npc_nadia_baker", "SM_hairHat41.fbx", "T_nadia_baker_hairHat41_D.png"],
 	["cloth1_1", "cloth1_1_npc_nadia", "SK_dt_skin01.fbx", "T_nadia_apron_cloth01_D.png"],
+	["cloth1", "cloth1_npc_lou", "SK_dt_skin01.fbx", "T_lou_cloth01_D.png"],
 ]
 func _initialize():
 	run.call_deferred()

@@ -1,0 +1,163 @@
+{
+  "runtime_previous_head": "85ac1b1efb10e9f073b995454e9e4f6d9b6b5a3b",
+  "manifest_before": 50,
+  "manifest_after": 51,
+  "previous_manifest_text_prefix_exact": true,
+  "previous_five_parts_unchanged": [
+    {
+      "path": "assets/avatar/parts/cloth1_1_npc_nadia.res",
+      "sha256": "fe2353378052215ff7fe9049786eeb929b07afa8709a845b0da99b1d34453c71"
+    },
+    {
+      "path": "assets/avatar/parts/cloth1_1_npc_rafa.res",
+      "sha256": "ebfcd5a8fa830155409ed6d36b456aa9ecebbb5ecf942d7cc6266cdd47ccfffd"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat36_npc_rafa.res",
+      "sha256": "05d44899073c8fb629287ef271ab8802c26d94f395d96f37516b19dee6144530"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat36_npc_rafa_scene.tscn",
+      "sha256": "3f3562f45478cdff1af27db4c2a573fbbd53f8623160f889cf265d1fad95780e"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat41_npc_nadia_baker.res",
+      "sha256": "cf23102e1d011404ae6cd3a663f68dd4bd1d7e4e69e515ff28e33f24932010c8"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat41_npc_nadia_baker_scene.tscn",
+      "sha256": "1e88de982de5f750658de51c848e936efe6ca16ef84b40286b342dd8315f94c4"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat51_npc_lena.res",
+      "sha256": "b78ff2c65ce4b298486a497157f3b7b7ec9b215f3c29c51162ed1a74eacd9bfc"
+    },
+    {
+      "path": "assets/avatar/parts/hairhat51_npc_lena_scene.tscn",
+      "sha256": "54520d90580e6bce56692130ca73c6af17a7399a6303fb1a4e2a7848c298ad5a"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_nadia/SK_dt_skin01.fbx",
+      "sha256": "7b6b4c414eeddd4cb048f17facfc01f060fe3fb018ac5acafa97854fef85539d"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_nadia/SK_dt_skin01.fbx.import",
+      "sha256": "a602a5945c04c4adaba610ff82eb61979bc3062ffac7e6ce47f9912ab6be782f"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_nadia/T_nadia_apron_cloth01_D.png",
+      "sha256": "34a5ca1a75264f331b3fff0d6fb4407108016eff3f26b67a8a46a6d1cdc2934f"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_nadia/T_nadia_apron_cloth01_D.png.import",
+      "sha256": "2886e6eac7feb3181efaf0a4678c4ad47f8ae0e0928da1b80dda3438e698a286"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/SK_dt_skin01.fbx",
+      "sha256": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/SK_dt_skin01.fbx.import",
+      "sha256": "413028e6a3d1a681daa7b8b7bcc2ce74989467a60174fea4724f29b1cbc2bd76"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/T_rafa_cloth01_D.png",
+      "sha256": "9967f7926335aaf8b68c6e1ca102fe94d6ef3fa916295918276db714be14aad5"
+    },
+    {
+      "path": "assets/avatar/source/cloth1_1_npc_rafa/T_rafa_cloth01_D.png.import",
+      "sha256": "7b380677291b7957a515134fde0bd96d1ef6ff7642540e8b2d42aef131509173"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/SM_hairHat36.fbx",
+      "sha256": "4d9f753eefbd69c80060b0b2d4fd352d9e7dccfd8d4308afc20f315e069fce4a"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/SM_hairHat36.fbx.import",
+      "sha256": "bc4569eead63e5345a6c18d7fe3eb5bb0158f585cee03d0fb1e12587c583bfc3"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/T_rafa_hairHat36_D.png",
+      "sha256": "78e7feea9b1c42970d341924a352f61e74cfbfdf88d40e9f3735dad4d1abcbe5"
+    },
+    {
+      "path": "assets/avatar/source/hairhat36_npc_rafa/T_rafa_hairHat36_D.png.import",
+      "sha256": "d4e2402a67b07bf4d47900d9008d61167d038d62070648734ca634499c68d1b7"
+    },
+    {
+      "path": "assets/avatar/source/hairhat41_npc_nadia_baker/SM_hairHat41.fbx",
+      "sha256": "a719f9458e656f6250d4278fde8c8cfaa8219fd916c9b9f909cc9f4dacb4405f"
+    },
+    {
+      "path": "assets/avatar/source/hairhat41_npc_nadia_baker/SM_hairHat41.fbx.import",
+      "sha256": "63ea1403862583b5c62f64a4df8c60d1871939360c12cfa0ec320c0436200f4c"
+    },
+    {
+      "path": "assets/avatar/source/hairhat41_npc_nadia_baker/T_nadia_baker_hairHat41_D.png",
+      "sha256": "1e39844d0751d6b981cf7156887ca63d8b792f1155845285051520339e25782c"
+    },
+    {
+      "path": "assets/avatar/source/hairhat41_npc_nadia_baker/T_nadia_baker_hairHat41_D.png.import",
+      "sha256": "5eeed23c725913568adfc0bd433677a884c40d855dbbcac0bd64b1445f03aab3"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/SM_hairHat51.fbx",
+      "sha256": "8119356d6c891b6ab295051ed7f9f9a62d380103da0020459d3a57b9352afb64"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/SM_hairHat51.fbx.import",
+      "sha256": "06b6017ceddbff4dc28973815e69495d0eb0fb591496722e2b562c4ae26f9a93"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/T_lena_hairHat51_D.png",
+      "sha256": "6604d2b9b9c301397d9c43f6b27d72cc3f4a2b25fb6cc93362ec4024d3096fc4"
+    },
+    {
+      "path": "assets/avatar/source/hairhat51_npc_lena/T_lena_hairHat51_D.png.import",
+      "sha256": "c1abb4008f21a1f9c5441ba49ac38fb1072bc28357251fcc01cbdd04412ee6b8"
+    },
+    {
+      "path": "assets/avatar/thumbs/cloth1_1_npc_nadia.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/cloth1_1_npc_nadia.png.import",
+      "sha256": "6addf6ae81c3b170a1b9f7bd78334760aa27461c5989e4ef9b1b2fd19ef1bdb8"
+    },
+    {
+      "path": "assets/avatar/thumbs/cloth1_1_npc_rafa.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/cloth1_1_npc_rafa.png.import",
+      "sha256": "55c4d450ef485caf8242f005262d34360a849202472f5612a5033f662b74266e"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat36_npc_rafa.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat36_npc_rafa.png.import",
+      "sha256": "896de03f38148992ed04a1434cec3c514933454a135f068c20749d5b9f05e62a"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat41_npc_nadia_baker.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat41_npc_nadia_baker.png.import",
+      "sha256": "fc52d74200584ab502576c3d12ace579d770b0a3846d9b696e3898726b594ba1"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat51_npc_lena.png",
+      "sha256": "31011b5b332417fa74bbba17d4a114ab0ebd8f26cbfcd9cfd753e27bc2bf72c6"
+    },
+    {
+      "path": "assets/avatar/thumbs/hairhat51_npc_lena.png.import",
+      "sha256": "acdfd19e9113e194f28a114fb4f0c00dd174200b7c6840f7b68ef1868a189f20"
+    }
+  ],
+  "art_runtime_atlas_exact": true,
+  "back_wall_glb_original_bytes": true,
+  "npc_slots_original_bytes": true
+}
