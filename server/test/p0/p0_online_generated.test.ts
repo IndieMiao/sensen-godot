@@ -76,6 +76,7 @@ describe('generated outpost rooms (SGODOT-280)', () => {
     const player = 'player-gen-ws1';
     const H = { 'x-p0-player': player };
     await app.inject({ method: 'GET', url: '/v1/p0/state', headers: H });
+    const rich = store.get(player, Date.now()); rich.coins = 5000; store.put(rich);   // Tokyo's fare (q(256))
     const outpost = cityPlaces(c, TOKYO)!.detail.outposts.find(o => o.role === 'tea')!.id;
     const ws = new WebSocket(`ws://127.0.0.1:${port}${PATH}`, { headers: H });
     const got: Record<string, any>[] = [];

@@ -1,12 +1,13 @@
 /**
- * Cross-city travel (P1, SGODOT-275 / 278; gameplay plan v2 §11, the P2 first version: travel is free and instant).
+ * Cross-city travel (P1, SGODOT-275 / 278; gameplay plan v2 §11): instant; since q(256) (SGODOT-367) it costs the Trip
+ * band's Energy and coins (fareOf), and a Day Pass means free movement inside its city, never a free way back to it.
  * Save v5 adds the travel block; the shape and the error codes follow 亚瑟's technical note (275, comment 0fc0bc5e):
  * every key is a city cluster id (`gn-<GeoNames id>` of the cluster's seed city, San Francisco gn-5391959).
  */
 import type { CityClusters } from './clusters.js';
 import type { P0Content } from './content.js';
 import { clusterById, clustersOf as clusters, countryPart, HOME_ALIAS, homeBase, homeFacts, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
-import { gainEnergy, grantOnce, type P0Event } from './progress.js';
+import { gainEnergy, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
 
@@ -124,14 +125,32 @@ export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number;
 export const covers = (s: P0State, cluster: string, now: number): boolean =>
   cluster === s.travel.home || (s.travel.passes[cluster]?.until ?? 0) > now;
 
-/** What the confirm panel needs (§11.8.2). Costs stay 0 in the first version; the fields are there for the paid one. */
+/** q(256) §11.2.1 / §11.2.2 (SGODOT-367, 亚瑟's contract 043c0bc8 B): what going to `cluster` costs now. The Trip band's
+ * Energy and coins (content.travel.fares, Trip 1–7; tripOf already folds in the fallback lists: the nearest 3 cities
+ * Trip 1, free, the nearest 10 at most Trip 2); a city visited before at half, rounded up. Home, and the city the player
+ * is already in with a pass, cost nothing. renews: whether the trip signs a new Day Pass and counts a visit — no pass
+ * or an expired one; a pass still running (going back from home or another city, option B) only takes the fare. */
+export interface Fare { energy: number; coins: number; revisit: boolean; renews: boolean }
+export function fareOf(c: P0Content, s: P0State, cluster: string, now: number): Fare {
+  const t = s.travel, revisit = !!t.visits[cluster], renews = !covers(s, cluster, now);
+  if (cluster === t.home || (cluster === t.here && !renews)) return { energy: 0, coins: 0, revisit, renews: false };
+  const band = Math.max(tripOf(c, s, cluster).trip, 1) - 1;
+  const at = (xs: number[] | undefined) => (xs?.length ? xs[Math.min(band, xs.length - 1)] : 0);
+  const half = (n: number) => (revisit ? Math.ceil(n / 2) : n);
+  return { energy: half(at(c.travel?.fares?.energy)), coins: half(at(c.travel?.fares?.coins)), revisit, renews };
+}
+
+/** What the confirm panel needs (§11.8.2): the fare as travel takes it (fareOf), whether it is a revisit, and until when
+ * the city's Day Pass runs (null without one: home needs none). */
 export function preview(c: P0Content, s: P0State, cluster: string, now = Date.now()) {
   const cl = clusterById(c, cluster);
   const { km: d, trip, name: tripName } = tripOf(c, s, cluster);
   const info = cityInfo(c, cluster);
+  const fare = fareOf(c, s, cluster, now);
+  const pass = cluster !== s.travel.home && covers(s, cluster, now) ? s.travel.passes[cluster].until : null;
   // q(210): the card's country as the rows write it (CLDR's name; none for a city-only place or `Mexico City`)
   return { cluster, name: cl?.name ?? '', country: cl ? countryPart(c, cl) : '', km: d, trip, trip_name: tripName,
-    cost: { energy: 0, coins: 0, item: null }, first_visit: !s.travel.visits[cluster],
+    cost: { energy: fare.energy, coins: fare.coins, item: null }, revisit: fare.revisit, pass_until: pass, first_visit: !s.travel.visits[cluster],
     climate: cl?.climate ?? '', utc_offset_min: utcOffsetMin(cl?.timezone, now),   // the silhouette card (MAP-3-FREE, §11.8.3)
     fishing: info.fish, counts: { ponds: info.ponds.length, outposts: info.outposts.length, residents: info.residents } };
 }
@@ -162,18 +181,23 @@ export function cityInfo(c: P0Content, cluster: string): CityInfo {
   return { ponds, outposts: outposts.map(o => o.id), residents: new Set(outposts.flatMap(o => o.residents)).size, fish: [] };
 }
 
-export type PassRefusal = { code: 'pass_required' | 'trip_expired'; detail: { message: string; preview: ReturnType<typeof preview> } };
+export type PassRefusal = { code: 'pass_required' | 'trip_expired' | 'travel_required'; detail: { message: string; preview: ReturnType<typeof preview> } };
 
-/** requirePass (note §3): entering a pond or an outpost space, or a command there, needs a pass for that place's city.
- * What is already under way is never cut off (§11.5.1): a command at the place the player already entered, and a reel
- * of a line already out, pass; a new cast and a new entry are checked. */
+/** requirePass (note §3): entering a pond or an outpost space, or a command there, needs a pass for that place's city
+ * and, since q(256) ④ (option B), being in that city: with a pass still running but `here` another city (home, or a
+ * city flown to since), the way back is a travel at the revisit fare — `travel_required`, with that preview — never a
+ * walk in. Home's places need neither. What is already under way is never cut off (§11.5.1): a command at the place the
+ * player already entered, and a reel of a line already out, pass; a new cast and a new entry are checked. */
 export function requirePass(c: P0Content, s: P0State, space: unknown, place: unknown, now: number, kind?: string): PassRefusal | null {
   if ((space !== 'pond' && space !== 'outpost') || typeof place !== 'string' || place === '') return null;
   const cluster = clusterOf(c, place);
-  if (!cluster || covers(s, cluster, now)) return null;
+  if (!cluster || cluster === s.travel.home) return null;
+  const pass = covers(s, cluster, now);
+  if (pass && s.travel.here === cluster) return null;
   if (kind === 'reel' && s.cast) return null;
   // Already in that place (entered with a pass): its commands and the client's refresh reads pass; a new cast does not.
   if (kind !== 'cast' && s.presence.entered === place) return null;
+  if (pass) return { code: 'travel_required', detail: { message: 'Travel first', preview: preview(c, s, cluster, now) } };
   const expired = !!s.travel.passes[cluster];
   return { code: expired ? 'trip_expired' : 'pass_required',
     detail: { message: expired ? 'Trip expired' : 'Pass required', preview: preview(c, s, cluster, now) } };
@@ -185,17 +209,37 @@ export function noteEntered(s: P0State, space: unknown, place: unknown): void {
   s.presence.entered = (space === 'pond' || space === 'outpost') && typeof place === 'string' && place !== '' ? place : null;
 }
 
-export interface Arrival { cluster: string; first: boolean; stamp: TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
+export interface Arrival { cluster: string; first: boolean; stamp: TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
+  paid: { energy: number; coins: number }; renewed: boolean }
 
-/** travel {to}: free in the first version; a 24 h Day Pass from arrival; a first visit stamps the passport and, for the
- * first 2 counted first visits of the day, gives +10 Energy through the achievement channel (over the food cap). */
-export function travel(c: P0Content, s: P0State, to: unknown, now: number, events: P0Event[]): { code: string } | null {
+/** travel {to}: takes fareOf's Energy and coins (q(256); the wallet keeps content.wallet_floor), then — without a pass
+ * running there — a 24 h Day Pass from arrival and a visit; a first visit stamps the passport and, for the first 2
+ * counted first visits of the day, gives +10 Energy through the achievement channel (over the food cap). With a pass
+ * still running (option B) it takes the revisit fare only: the pass is not re-signed, no visit, no stamp, no +10.
+ * Refused whole (nothing taken): coins short first, then Energy, so with both short only the coins are named (q(257) ③).
+ * Events in this order, for the client's floats (contract 043c0bc8 E): energy −, coins −, the first visit's +10, arrival. */
+export function travel(c: P0Content, s: P0State, to: unknown, now: number, events: P0Event[]): { code: string; detail?: Record<string, unknown> } | null {
   if (typeof to !== 'string' || to === '') return { code: 'bad_city' };
   const t = s.travel;
   if (to === t.home) { t.here = t.home; return null; }
   if (!clusterById(c, to)) return { code: 'unknown_city' };
   if (to === t.here && covers(s, to, now)) return null;   // already there: unchanged, not an error
+  const fare = fareOf(c, s, to, now), floor = c.wallet_floor;
+  if (fare.coins > 0 && s.coins < fare.coins + floor) {
+    return { code: 'not_enough_coins', detail: { need: fare.coins + floor - s.coins, have: s.coins, cost: fare.coins, floor } };
+  }
+  if (s.energy.value < fare.energy) {
+    return { code: 'not_enough_energy', detail: { need: fare.energy - s.energy.value, have: s.energy.value, cost: fare.energy } };
+  }
+  if (fare.energy > 0) spendEnergy(c, s, now, fare.energy, events, 'travel');
+  if (fare.coins > 0) { s.coins -= fare.coins; events.push({ kind: 'coins', delta: -fare.coins, reason: 'travel' }); }
   const { km: d, trip } = tripOf(c, s, to);
+  const paid = { energy: fare.energy, coins: fare.coins };
+  if (!fare.renews) {   // option B: back to a city whose pass still runs — the fare only
+    t.here = to;
+    events.push({ kind: 'arrival', cluster: to, first: false, stamp: null, energy: 0, pass_until: t.passes[to].until, km: d, trip, paid, renewed: false });
+    return null;
+  }
   const first = !t.visits[to];
   const v = t.visits[to] ??= { n: 0, first_at: now, last_at: now, deliveries: 0, delivered_day: '' };
   v.n += 1; v.last_at = now;
@@ -216,7 +260,7 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
     if (on === today) energy = gainEnergy(c, s, now, FIRST_VISIT_ENERGY, events, 'first_visit', maxEnergy(c, s) + c.rewards.max_over);
     settleExplorer(c, s, now, events);
   }
-  events.push({ kind: 'arrival', cluster: to, first, stamp, energy, pass_until: t.passes[to].until, km: d, trip });
+  events.push({ kind: 'arrival', cluster: to, first, stamp, energy, pass_until: t.passes[to].until, km: d, trip, paid, renewed: true });
   return null;
 }
 

@@ -64,7 +64,8 @@ describe('Barter (§8.4.5)', () => {
     expect(barterView(at(4)).items).toEqual(expect.arrayContaining([{ id: 'crop_pumpkin', name: 'Pumpkin', have: 40, spare: 40 }]));
     expect(run(at(4), trade('stone', 'market', 'crop_radish'))).toMatchObject({ ok: false, code: 'not_barterable' });
     // at a market in Singapore (tropical) Singapore's go and the pumpkin does not (as its buyback, §9.13.1)
-    const flown = run(at(4), { type: 'travel', to: SINGAPORE });   // a Day Pass there (free in the first version)
+    const rich = at(4); rich.coins += 5000;   // Singapore's fare (q(256))
+    const flown = run(rich, { type: 'travel', to: SINGAPORE });   // a Day Pass there
     if (!flown.ok) throw new Error(flown.code);
     const away = flown.state;
     away.bag.push({ id: 'crop_pineapple', qty: 4 });

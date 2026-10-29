@@ -70,6 +70,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, ...travelShown(c, s.travel), today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
+      // q(256) (contract 043c0bc8 D): the fare table as content has it, for the confirm card, the Fare Board and the
+      // silhouette card to price locally; travel charges fareOf's
+      fares: c.travel?.fares ?? null,
       // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
       admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)),
       // q(208) ①: the row's second part as shown (cityRegion: state in the US, else the country, none when it is the
