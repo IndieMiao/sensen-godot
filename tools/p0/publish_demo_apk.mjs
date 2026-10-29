@@ -9,6 +9,8 @@
 //        --check-only     builds the release directory under output/p0-demo/release/ and checks the live server; no upload
 //        --publish        uploads it to OSS, then downloads it back: full SHA-256, Range 206, manifest and checksum bytes
 //        --dry-run        (with --check-only only) accepts a …00 dry-run versionCode
+//   P0_OSS_PREFIX=p0/demo/test[/…]   puts the directory there instead of p0/demo/releases: an end-to-end try of a new
+//                    bucket or domain with a real APK, never a release (only a test prefix is accepted)
 //
 // Inputs: output/p0-demo/build.json, written by tools/p0/build_demo_apk.sh for this exact APK (the script checks the
 // hash), and an evidence.json {sha256, emulator_validation, physical_installation_verified, notes?} saying what was
@@ -16,7 +18,9 @@
 // Publishing needs the user's approval each time (AGENTS.md: the demo is internal only). The Update button a player
 // sees opens the URL the server sends with 426 (deploy-hk.sh min-version <code> <url>), so the URL printed here is
 // what a later min-version uses; the APK itself carries no update address.
-// Needs the aliyun CLI with ossutil 2.x (`aliyun ossutil version`; 2.4.0 on 2026-10-09), logged in for bucket sensenjoy.
+// Needs the aliyun CLI with ossutil 2.x (`aliyun ossutil version`; 2.4.1 on 2026-10-29) and the profile farm-oss2: a RAM
+// user limited to the release bucket, kept by the migration side (nothing here reads or prints its keys). The old
+// bucket is only listed, with the default profile.
 import {execFile} from 'node:child_process';
 import {promisify, isDeepStrictEqual} from 'node:util';
 import {readFile, writeFile, mkdir, copyFile} from 'node:fs/promises';
@@ -35,6 +39,14 @@ const API = 'https://farm.sensenjoy.cn/preview/p0/v1';
 const PACKAGE = 'com.sensen.p0demo';
 const CERTIFICATE = '38771d94b8fbfa11651cc440e3746c9182114461a90cc0ab7188d7b708515673';   // this Mac's debug keystore
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
+// Where a release goes (the user's "oss2 ok", 10-29): the liusen account's US bucket behind oss2.sensenjoy.cn. The old
+// bucket behind oss.sensenjoy.cn stays as it is — every link sent so far and the live gate's update url point there —
+// and is still read for the same-day versionCode check, so the day of the switch misses nothing.
+const OSS = {host: 'https://oss2.sensenjoy.cn', bucket: 'liusen-gensen-cdn-us-775292',
+  ossutil: ['--profile', 'farm-oss2', '--region', 'us-west-1']};
+const OLD_OSS = {host: 'https://oss.sensenjoy.cn', bucket: 'sensenjoy', ossutil: []};
+const CONTENT_TYPES = {'.apk': 'application/vnd.android.package-archive', '.json': 'application/json', SHA256SUMS: 'text/plain; charset=utf-8'};
+const contentType = (file) => CONTENT_TYPES[file] ?? CONTENT_TYPES[file.slice(file.lastIndexOf('.'))];
 
 const apk = await readFile(apkPath), hash = digest(apk);
 const build = JSON.parse(await readFile('output/p0-demo/build.json', 'utf8'));
@@ -72,27 +84,32 @@ const health = await (await fetch(API + '/healthz', {signal: AbortSignal.timeout
 assert.equal(health.ok, true);
 assert.equal(health.maintenance?.on, false, 'the P0 server is in maintenance');
 
+const PREFIX = process.env.P0_OSS_PREFIX ?? 'p0/demo/releases';
+assert.match(PREFIX, /^p0\/demo\/(releases|test(\/[a-z0-9-]+)*)$/, 'P0_OSS_PREFIX is p0/demo/releases or under p0/demo/test');
 const releaseId = 'p0-demo-' + code.slice(0, 8);
-const name = releaseId + '-' + hash.slice(0, 12), path = 'p0/demo/releases/' + name;
+const name = releaseId + '-' + hash.slice(0, 12), path = `${PREFIX}/${name}`;
 const filename = `sensen-p0-demo-${build.version_name}.apk`;
-const url = `https://oss.sensenjoy.cn/${path}/${filename}`;
+const url = `${OSS.host}/${path}/${filename}`;
 const manifest = {package: PACKAGE, version: build.version_name, versionCode: build.version_code, bytes: apk.length,
   sha256: hash, certificate_sha256: CERTIFICATE, api: API, backend_image: 'p0-server:' + backend, client_release: releaseId,
   source_commit: build.source_commit, url, internal_only: true, server_min_version_at_publish: health.min_version ?? 0,
   emulator_validation: evidence.emulator_validation, physical_installation_verified: evidence.physical_installation_verified};
 // One versionCode, one APK: a second build the same day with an unchanged code would be indistinguishable to
-// min-version (周瑜 on #163). Other releases of this day are listed (read-only) and their manifests compared.
-const dayPrefix = `oss://sensenjoy/p0/demo/releases/${releaseId}-`;
-const listed = (await run('aliyun', ['ossutil', 'ls', dayPrefix, '-d'], {timeout: 60000})).stdout;
-for (const other of new Set(listed.match(/oss:\/\/sensenjoy\/p0\/demo\/releases\/[^/\s]+\//g) ?? [])) {
-  if (other.endsWith(`/${name}/`)) continue;
-  const res = await fetch(`https://oss.sensenjoy.cn/${other.slice('oss://sensenjoy/'.length)}release.json`, {signal: AbortSignal.timeout(30000), cache: 'no-store'});
-  if (res.status === 404) continue;
-  assert.equal(res.status, 200, `cannot read ${other}release.json`);
-  const theirs = await res.json();
-  assert.notEqual(theirs.versionCode, build.version_code, `versionCode ${code} is already ${other} (sha ${theirs.sha256}): build again with --code …${String(Number(code.slice(8)) + 1).padStart(2, '0')}`);
+// min-version (周瑜 on #163). Other releases of this day are listed (read-only) and their manifests compared, in the
+// release bucket and in the old one.
+for (const where of [OSS, OLD_OSS]) {
+  const root = `oss://${where.bucket}/`;
+  const listed = (await run('aliyun', ['ossutil', 'ls', `${root}${PREFIX}/${releaseId}-`, '-d', ...where.ossutil], {timeout: 60000})).stdout;
+  for (const other of new Set(listed.split(/\s+/).filter((w) => w.startsWith(`${root}${PREFIX}/`) && w.endsWith('/')))) {
+    if (where === OSS && other.endsWith(`/${name}/`)) continue;
+    const res = await fetch(`${where.host}/${other.slice(root.length)}release.json`, {signal: AbortSignal.timeout(30000), cache: 'no-store'});
+    if (res.status === 404) continue;
+    assert.equal(res.status, 200, `cannot read ${other}release.json`);
+    const theirs = await res.json();
+    assert.notEqual(theirs.versionCode, build.version_code, `versionCode ${code} is already ${other} (sha ${theirs.sha256}): build again with --code …${String(Number(code.slice(8)) + 1).padStart(2, '0')}`);
+  }
 }
-const dir = `output/p0-demo/release/${has('--dry-run') ? 'dryrun-' : ''}${name}`;
+const dir = `output/p0-demo/release/${has('--dry-run') ? 'dryrun-' : ''}${PREFIX === 'p0/demo/releases' ? '' : 'test-'}${name}`;
 await mkdir(dir, {recursive: true});
 const manifestBytes = Buffer.from(JSON.stringify(manifest, null, 2) + '\n');
 const checksumBytes = Buffer.from(`${hash}  ${filename}\n`);
@@ -103,18 +120,18 @@ await writeFile(`${dir}/server-health.json`, JSON.stringify(health, null, 2) + '
 assert.equal(digest(await readFile(`${dir}/${filename}`)), hash);
 if (has('--check-only')) {
   console.log(JSON.stringify({preflight_passed: true, publishing: false, dry_run: has('--dry-run'), dir, url,
-    oss: `oss://sensenjoy/${path}/`}, null, 2));
+    oss: `oss://${OSS.bucket}/${path}/`}, null, 2));
   process.exit(0);
 }
 
 // The path is immutable: an object already there must be byte-identical (a re-run after a failed read-back), never
 // replaced. ossutil's --ignore-existing skips silently, so look first (周瑜 on #163) and stop on any difference.
-const base = `https://oss.sensenjoy.cn/${path}/`;
+const base = `${OSS.host}/${path}/`;
 for (const file of [filename, 'release.json', 'SHA256SUMS']) {
   const head = await fetch(base + file, {method: 'HEAD', signal: AbortSignal.timeout(30000), cache: 'no-store'});
   if (head.status === 404) {
-    await run('aliyun', ['ossutil', 'cp', `${dir}/${file}`, `oss://sensenjoy/${path}/${file}`,
-      '--acl', 'public-read', '--ignore-existing', '--quiet'], {timeout: 600000});
+    await run('aliyun', ['ossutil', 'cp', `${dir}/${file}`, `oss://${OSS.bucket}/${path}/${file}`,
+      '--acl', 'public-read', '--content-type', contentType(file), '--ignore-existing', '--quiet', ...OSS.ossutil], {timeout: 600000});
     continue;
   }
   assert.equal(head.status, 200, `${file}: unexpected HEAD ${head.status}`);
