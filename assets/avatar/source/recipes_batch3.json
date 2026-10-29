@@ -213,6 +213,47 @@
 					}
 				}
 			]
+		},
+		{
+			"id": "cloth1_npc_lou",
+			"slot": "cloth",
+			"attach": "mesh",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/cloth1_npc_lou/SK_dt_skin01.fbx",
+			"mesh_name": "cloth",
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/cloth1_npc_lou/T_lou_cloth01_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.3,
+						"smoothness": 0.1,
+						"ao_strength": 0.3,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
 		}
 	]
 }
