@@ -119,3 +119,49 @@ func test_the_sign_spots_and_the_mine_are_shown_on_the_farm() -> void:
 		assert_str(P0Ui.show_label(go, "home", true)).is_equal("Show")
 		assert_str(P0Ui.show_label(go, "pond", true)).is_equal("Show on map")
 		assert_str(P0Ui.map_target(go)).is_equal("home")
+
+## An account the new guide never ran, its first-session Pond Catch ready to hand in (P0Guide's lead row): Upgrade
+## follows that hand-in too (刘邦 on #542 [P2]; bbdef20e: hand-ins never give way).
+func test_upgrade_follows_the_first_sessions_hand_in_too() -> void:
+	var v := _view()
+	v.homestead.next.materials = []
+	v.homestead.next.can_upgrade = true
+	v.firsts = []
+	v.bag.slots = [{"id": "fish_crucian", "qty": 2}]
+	v["stall"] = {"board": {"requests": [{"id": P0Guide.TUTORIAL, "title": "Pond Catch", "item": "fish_crucian", "qty": 2,
+		"have": 2, "coins": 14, "where": "any pond", "status": "accepted"}]}}
+	var rows := P0Logic.today_rows(v)
+	var at_deliver := -1
+	var at_upgrade := -1
+	for i in rows.size():
+		if str(rows[i].dot).begins_with("deliver:"): at_deliver = i
+		if str(rows[i].line) == "Upgrade to Homestead Lv2": at_upgrade = i
+	assert_int(at_deliver).is_greater_equal(0)
+	assert_int(at_upgrade).is_greater(at_deliver)
+
+## q(143)'s tracked short request takes the 3rd row, but never Upgrade, as it never takes a hand-in (不知火舞 on 341, A′;
+## 刘邦 on #542 [P1]); a material row gives way as other rows do.
+func _tracked(v: Dictionary) -> Dictionary:
+	v.residents = (v.get("residents", {}) as Dictionary).merged({"res_old_kai": {"request": {"id": "req_res_kai_2", "kind": "fish",
+		"rarity": 3, "have": 0, "qty": 1, "ready": false, "accepted_at": 9000}, "request_state": "accepted"}}, true)
+	return v
+
+func test_the_tracked_request_never_takes_upgrades_row() -> void:
+	var v := _tracked(_view())
+	v.homestead.next.materials = []
+	v.homestead.next.can_upgrade = true
+	v.boards = {"stall": {"slots": [
+		{"id": "a", "title": "Crate A", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 1},
+		{"id": "b", "title": "Crate B", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 2}]}}
+	var lines := _lines(v)
+	assert_str(str(lines[0])).is_equal("Crate A · Deliver at the Stall")
+	assert_str(str(lines[1])).is_equal("Crate B · Deliver at the Stall")
+	assert_str(str(lines[2])).is_equal("Upgrade to Homestead Lv2")
+
+func test_a_material_row_gives_way_to_the_tracked_request() -> void:
+	var v := _tracked(_view())
+	v.plots = [{"state": "ready", "crop": "crop_radish"}, {"state": "sown", "crop": "crop_radish"}]
+	var lines := _lines(v)
+	assert_array(lines.slice(0, 2)).is_equal(["Harvest 1 Radish", "Water 1 sown plot"])
+	assert_str(str(lines[2])).ends_with("0/1")   # Old Kai's tracked request, as q(143) had it; the material row comes back later
+	assert_bool(lines.has("Homestead Lv2 · Timber 6 to go")).is_false()

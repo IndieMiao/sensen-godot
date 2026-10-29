@@ -1464,7 +1464,6 @@ static func today_rows(view: Dictionary) -> Array:
 	var progress: Array = []
 	var latest = null   # q(143): the short request tracked last keeps a row (Tracking · it shows in Today)
 	var latest_at := -1.0
-	var handed := 0   # the rows that hand something in, at the top
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		for r in PinReason.taken(view):
@@ -1477,12 +1476,17 @@ static func today_rows(view: Dictionary) -> Array:
 					latest_at = float(r.accepted_at)
 					latest = row
 		now_rows = deliveries + now_rows
-		handed = deliveries.size()
 	# q(255) (order: 不知火舞 on 341 bbdef20e): after the guide and below Homestead Lv3, the first gap for the next level,
 	# one row. Upgrade follows the hand-ins; a material its Show can gather now follows the other things to do now,
 	# before the short requests; coins, or a material cooling down, goes with `still to go for the next level`.
 	var home_row := homestead_row(view)
-	if not home_row.is_empty() and str(home_row.row.go) == "sign": now_rows.insert(handed, home_row.row)
+	if not home_row.is_empty() and str(home_row.row.go) == "sign":
+		# after every row handing something in — a taken request's and the first session's own (Pond Catch, P0Guide
+		# lead rows on an account the new guide never ran; 刘邦 on #542)
+		var handed := 0
+		for i in now_rows.size():
+			if str(now_rows[i].get("dot", "")).begins_with("deliver:"): handed = i + 1
+		now_rows.insert(handed, home_row.row)
 	var ready := {}
 	var sown := 0
 	# One countdown per crop, its soonest plot's (q(227) ①, as the Quick Radish's since q(217) ④): batches sown minutes
@@ -1582,9 +1586,13 @@ static func today_rows(view: Dictionary) -> Array:
 	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
 	if rows.is_empty(): rows.append(_first_sow_row(view))
 	# q(143) ①②: on the final three, the latest tracked short request takes the 3rd row when it is not there — over an
-	# info or waiting-recipe row too — unless that row hands something in (three deliveries: one handed in frees a row).
+	# info or waiting-recipe row too — unless that row hands something in (three deliveries: one handed in frees a row)
+	# or is Upgrade to Homestead (不知火舞 on 341, A′: a moment, as a hand-in is pay; a material row still gives way).
+	var keeps := func(r: Dictionary) -> bool:
+		var dot := str(r.get("dot", ""))
+		return dot.begins_with("deliver:") or dot.begins_with("homestead:")
 	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
-			and not str(rows[2].get("dot", "")).begins_with("deliver:"):
+			and not keeps.call(rows[2]):
 		rows[2] = latest
 	# q(215): even a ready ordinary delivery cannot displace the current guide goal. Other rows keep their order.
 	if P0Guide.guide_on(view) and not lead.is_empty():
