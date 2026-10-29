@@ -35,14 +35,14 @@ function readyFor(s: P0State): P0State {
 }
 
 describe('Homestead Lv4–10 (§8.2.1)', () => {
-  it('nine upgrades cost 10,520 coins with q(246) early gates; Lv6–10 stay unchanged', () => {
+  it('nine upgrades cost 10,070 coins with q(246) early gates and the q(263) Lv5–10 ladder', () => {
     expect(c.homestead.max_level).toBe(10);
     expect(c.homestead.levels.map(l => l.level)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(10_520);
-    expect(c.homestead.levels.map(l => l.skills)).toEqual([3, 4, 6, 8, 11, 13, 15, 17, 19]);
+    expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(10_070);
+    expect(c.homestead.levels.map(l => l.skills)).toEqual([3, 4, 6, 8, 10, 12, 14, 16, 19]);
     const total: Record<string, number> = {};
     for (const l of c.homestead.levels) for (const [id, n] of l.materials) total[id] = (total[id] ?? 0) + n;
-    expect(total).toEqual({ wood: 120, stone: 126, fiber: 63, copper_ore: 75, clay: 46, quartz: 22, hardwood: 28, rock_salt: 7 });
+    expect(total).toEqual({ wood: 108, stone: 116, fiber: 56, copper_ore: 69, clay: 41, quartz: 20, hardwood: 27, rock_salt: 5 });
   });
 
   it('climbs from Lv3 to Lv10 one level at a time, Energy follows each level reward, then stops', () => {

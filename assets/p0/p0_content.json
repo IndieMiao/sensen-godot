@@ -2310,36 +2310,36 @@
       },
       {
         "level": 5,
-        "coins": 750,
+        "coins": 450,
         "skills": 8,
         "materials": [
           [
             "wood",
-            20
-          ],
-          [
-            "stone",
-            16
-          ],
-          [
-            "fiber",
             12
           ],
           [
-            "copper_ore",
+            "stone",
             10
           ],
           [
+            "fiber",
+            7
+          ],
+          [
+            "copper_ore",
+            6
+          ],
+          [
             "clay",
-            8
+            5
           ],
           [
             "quartz",
-            2
+            1
           ],
           [
             "rock_salt",
-            4
+            2
           ]
         ],
         "unlocks": [
@@ -2352,36 +2352,36 @@
       },
       {
         "level": 6,
-        "coins": 1000,
-        "skills": 11,
+        "coins": 800,
+        "skills": 10,
         "materials": [
           [
             "wood",
-            20
+            16
           ],
           [
             "stone",
-            18
+            14
           ],
           [
             "fiber",
-            12
-          ],
-          [
-            "copper_ore",
             10
           ],
           [
-            "clay",
+            "copper_ore",
             8
           ],
           [
+            "clay",
+            6
+          ],
+          [
             "quartz",
-            3
+            2
           ],
           [
             "hardwood",
-            3
+            2
           ]
         ],
         "unlocks": [
@@ -2392,8 +2392,8 @@
       },
       {
         "level": 7,
-        "coins": 1450,
-        "skills": 13,
+        "coins": 1300,
+        "skills": 12,
         "materials": [
           [
             "wood",
@@ -2434,7 +2434,7 @@
       {
         "level": 8,
         "coins": 1800,
-        "skills": 15,
+        "skills": 14,
         "materials": [
           [
             "wood",
@@ -2475,8 +2475,8 @@
       },
       {
         "level": 9,
-        "coins": 2250,
-        "skills": 17,
+        "coins": 2300,
+        "skills": 16,
         "materials": [
           [
             "wood",
@@ -2514,7 +2514,7 @@
       },
       {
         "level": 10,
-        "coins": 2850,
+        "coins": 3000,
         "skills": 19,
         "materials": [
           [
