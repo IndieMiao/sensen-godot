@@ -78,3 +78,39 @@ func test_the_request_card_names_the_request_and_where_to_deliver() -> void:
 	assert_str(str(card.deliver_to)).is_equal("Nadia · %s" % str(P0Outposts.find("sh_market_1").name))
 	v.residents.res_nadia.place = "nowhere_1"
 	assert_str(str(P0Ui._request_card_data(v, "res_nadia", P0Logic.resident_bar(v, "res_nadia")).deliver_to)).is_equal("Nadia")
+
+func test_story_rewards_name_the_reward_types_without_revealing_the_title() -> void:
+	for resident in P0Logic.content().residents:
+		for req in P0Logic.content().residents[resident].requests:
+			var v := {"residents": {resident: {"request": req}}}
+			var card := P0Ui._request_card_data(v, resident, {})
+			var title := str(req.get("reward", {}).get("title", ""))
+			assert_bool(str(card.reward).ends_with("New title")).is_equal(title != "")
+			if title != "": assert_str(str(card.reward)).not_contains(title)
+			if title != "" and str(req.get("reward", {}).get("recipe", "")) != "":
+				assert_str(str(card.reward)).ends_with("New recipe · New title")
+
+func test_request_card_shows_actual_coins_and_a_separate_reset_line_only_when_short() -> void:
+	var req := {"id": "req_res_nadia_4", "coins": 90, "bonus": 80}
+	var v := _nadia({"request": req})
+	v["quotas"] = {"request_bonus": {"used": 100, "cap": 100, "resets_in": (9 * 60 + 12) * 60000}}
+	var card := P0Ui._request_card_data(v, "res_nadia", {})
+	assert_str(str(card.reward)).is_equal("+5 Friendship · 10 coins · New recipe · New title")
+	assert_str(str(card.bonus_note)).is_equal("Bonus resets in 9h 12m")
+	v.quotas.request_bonus.used = 75
+	assert_str(str(P0Ui._request_card_data(v, "res_nadia", {}).reward)).contains("35 coins")
+	v.quotas.request_bonus.used = 20
+	card = P0Ui._request_card_data(v, "res_nadia", {})
+	assert_str(str(card.reward)).contains("90 coins")
+	assert_str(str(card.bonus_note)).is_empty()
+	v.quotas.request_bonus.used = 100
+	req.bonus = 90
+	assert_str(str(P0Ui._request_card_data(v, "res_nadia", {}).reward)).contains("0 coins")
+	req.bonus = -10
+	card = P0Ui._request_card_data(v, "res_nadia", {})
+	assert_str(str(card.reward)).contains("100 coins")
+	assert_str(str(card.bonus_note)).is_empty()
+	req.erase("bonus")   # old server: no guessed floor or reset note
+	card = P0Ui._request_card_data(v, "res_nadia", {})
+	assert_str(str(card.reward)).contains("90 coins")
+	assert_str(str(card.bonus_note)).is_empty()

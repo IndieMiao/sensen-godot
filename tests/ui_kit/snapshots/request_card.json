@@ -302,15 +302,26 @@
                           "text": "Reward"
                         },
                         {
-                          "type": "Label",
+                          "type": "VBoxContainer",
                           "rect": [
                             61,
                             227,
                             254,
                             18
                           ],
-                          "variation": "C12XB",
-                          "text": "+5 Friendship · 20 coins"
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                61,
+                                227,
+                                254,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "+5 Friendship · 20 coins"
+                            }
+                          ]
                         }
                       ]
                     },

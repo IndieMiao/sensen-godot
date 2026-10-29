@@ -731,6 +731,48 @@ func test_request_card_short_of_items_puts_the_gap_on_the_button() -> void:
 	assert_str(c.action_button().text).is_equal("Need 1 more Common fish")
 	assert_bool(c.action_button().is_unavailable()).is_true()
 
+func test_request_rewards_wrap_at_a_dot_and_keep_the_reset_note_below_and_the_bottom_fixed() -> void:
+	var short := "+5 Friendship · 80 coins · New title"
+	var long := "+5 Friendship · 90 coins · New recipe · New title"
+	var bottom := 0.0
+	var single_height := 0.0
+	for i in 3:
+		var c: UiRequestCard = _host(UiRequestCard.new(_request({"reward": short if i == 0 else long,
+			"bonus_note": "Bonus resets in 23h 59m" if i == 2 else ""})))
+		c.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		c.offset_left = 12
+		c.offset_right = -12
+		c.offset_top = -20
+		c.offset_bottom = -20
+		c.grow_vertical = Control.GROW_DIRECTION_BEGIN
+		for frame in 8: await get_tree().process_frame
+		assert_float(c.size.x).is_equal(336.0)
+		assert_str(c._reward.text).is_equal(short if i == 0 else "+5 Friendship · 90 coins · New recipe\nNew title")
+		assert_int(c._reward.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+		assert_str(str(c._reward.theme_type_variation)).is_equal(str(UiTokens.STYLE_C12_XB))
+		var label := c.find_children("*", "Label", true, false).filter(func(l): return l.text == "Reward")[0] as Label
+		var values := c._reward.get_parent() as Control
+		assert_float(label.get_global_rect().get_center().y).is_equal_approx(values.get_global_rect().get_center().y, 1.0)
+		for line in c._reward.text.split("\n"):
+			var width := c._reward.get_theme_font(&"font").get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
+			assert_float(width).is_less_equal(c._reward.size.x)
+		if i == 0:
+			bottom = c.get_global_rect().end.y
+			single_height = c.size.y
+		else:
+			assert_float(c.get_global_rect().end.y).is_equal(bottom)
+			assert_float(c.size.y).is_greater(single_height)
+		if i == 2:
+			var note := c.find_children("*", "Label", true, false).filter(func(l): return l.text.begins_with("Bonus resets"))[0] as Label
+			assert_str(str(note.theme_type_variation)).is_equal(str(UiTokens.STYLE_C11_B))
+			assert_that(note.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+			assert_int(note.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+			assert_float(note.get_global_rect().position.y).is_greater_equal(c._reward.get_global_rect().end.y)
+		# A wider host must unwrap the reward instead of retaining the old two-line height.
+		c.get_parent().size.x = 440
+		for frame in 8: await get_tree().process_frame
+		assert_str(c._reward.text).is_equal(short if i == 0 else long)
+
 func test_stored_stack_shows_the_house_badge() -> void:
 	var g := UiInventoryGrid.new()
 	g.custom_minimum_size = Vector2(336, 240)
