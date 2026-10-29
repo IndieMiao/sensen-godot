@@ -2,8 +2,9 @@
 # Offline check of deploy-hk.sh's --target (SGODOT-232; the US West target after the 10-28 migration). Connects to
 # nothing: ssh, scp, curl and date are stubs that log what they were asked and answer canned lines.
 #   server/deploy/p0/check-deploy-target.sh [<git ref of the old script>]   # default origin/farm-dev
-# 1. Hong Kong unchanged: every step run by the old script and by this one (with no --target and with --target hk)
-#    gives the same stdout, exit code and stub log — the same remote commands, the same stdin, byte for byte.
+# 1. Hong Kong frozen (奕星 on #547): the steps that write there refuse, with no --target and with --target hk, and
+#    contact nothing; with --confirm-hk-frozen-override every step gives the old script's stdout, exit code and stub
+#    log — the same remote commands, the same stdin, byte for byte — and the read-only steps do so without it too.
 # 2. us: the Hong Kong-only steps refuse; transfer checks the archive and records it; up edits a stub
 #    compose.production.json for real (the remote python runs here, on a copy under a temp dir) — only
 #    services["p0-p0-1"].image changes, a dated copy is kept, the mode stays — and refuses a tag no transfer
@@ -71,15 +72,28 @@ steps=(
   "min-version 2026100903 https://oss.example/p0/a.apk" "gate" "report p0-check-player 2026-10-28"
   "clean-devserver abc1234" "no-such-step" ""
 )
+nolog=$'\n--- stdout ---'   # what a run that contacted nothing starts with: an empty stub log, then stdout
+writes=" transfer backup-caddy up caddy crontab rollback energy maint-on maint-off min-version "
 fail=0
-echo "== 1. Hong Kong: old ($ref) vs new, with no --target and with --target hk"
+echo "== 1. Hong Kong: old ($ref) vs new — writes refused without --confirm-hk-frozen-override, the same with it"
 for s in "${steps[@]}"; do
   read -r -a a <<< "$s"
   o=$(run old "$old" ${a[@]+"${a[@]}"})
   n=$(run new "$here/deploy-hk.sh" ${a[@]+"${a[@]}"})
   t=$(run hk "$here/deploy-hk.sh" --target hk ${a[@]+"${a[@]}"})
-  if [ "$o" = "$n" ] && [ "$o" = "$t" ]; then echo "same  ${s:-<no step>}"
-  else echo "DIFF  ${s:-<no step>}"; diff <(echo "$o") <(echo "$n"); diff <(echo "$o") <(echo "$t"); fail=1; fi
+  f=$(run hkf "$here/deploy-hk.sh" --confirm-hk-frozen-override ${a[@]+"${a[@]}"})
+  g=$(run hkf "$here/deploy-hk.sh" --target hk --confirm-hk-frozen-override ${a[@]+"${a[@]}"})
+  if [[ "$writes" == *" ${a[0]:-} "* ]]; then
+    # refused: the message, exit 2, and an empty stub log (the run prints the log first, so the output starts with it)
+    case "$n|$t" in
+      "$nolog"*"frozen fallback"*"--confirm-hk-frozen-override ${a[0]}"*"--- exit 2|$nolog"*"frozen fallback"*"--- exit 2") w=refused ;;
+      *) w=; echo "$n"; echo "$t" ;;
+    esac
+  else
+    w=; [ "$o" = "$n" ] && [ "$o" = "$t" ] && w=same || { diff <(echo "$o") <(echo "$n"); diff <(echo "$o") <(echo "$t"); }
+  fi
+  if [ -n "$w" ] && [ "$o" = "$f" ] && [ "$o" = "$g" ]; then printf '%-8s %s\n' "$w" "${s:-<no step>}"
+  else echo "DIFF     ${s:-<no step>}"; diff <(echo "$o") <(echo "$f"); diff <(echo "$o") <(echo "$g"); fail=1; fi
 done
 
 echo; echo "== 2. us"
@@ -112,6 +126,16 @@ for s in backup-caddy caddy crontab rollback; do
   expect "refuses $s" "*Hong Kong only*exit 2" "$(run us "$here/deploy-hk.sh" --target us "$s")"
 done
 expect "refuses --target nowhere" "*unknown target*exit 2" "$(run us "$here/deploy-hk.sh" --target nowhere preflight)"
+for a in "up --target us abc1234" "up abc1234 --target=us" "up abc1234 --confirm-hk-frozen-override" "--target us up abc1234 --expect-config sha256:0"; do
+  read -r -a v <<< "$a"
+  expect "refuses an option after the step: $a" "$nolog*goes before the step*exit 2" "$(run us "$here/deploy-hk.sh" "${v[@]}")"
+done
+expect "refuses --confirm-hk-frozen-override on us" "$nolog*for Hong Kong only*exit 2" \
+  "$(run us "$here/deploy-hk.sh" --target us --confirm-hk-frozen-override up abc1234)"
+expect "refuses --expect-config on Hong Kong" "$nolog*for --target us only*exit 2" \
+  "$(run us "$here/deploy-hk.sh" --confirm-hk-frozen-override --expect-config "sha256:$(printf '0%.0s' {1..64})" up abc1234)"
+expect "refuses an --expect-config that is not sha256:<64 hex>" "$nolog*takes sha256:<64 hex>*exit 2" \
+  "$(run us "$here/deploy-hk.sh" --target us --expect-config 5603ce0b up abc1234)"
 expect "refuses a staging path under production" "*P0_US_STAGING may not be*exit 2" \
   "$(P0_US_STAGING=/srv/migration-data/services/p0/production/20261029/data/x run us "$here/deploy-hk.sh" --target us transfer abc1234)"
 expect "refuses a relative staging path" "*must be an absolute path*exit 2" \
@@ -121,15 +145,39 @@ compose '"liusen-migration/image:61da79e6f537e1e0"'
 r=$(run us "$here/deploy-hk.sh" --target us up abc1234)
 expect "up refuses a tag no transfer checked" "*no checked transfer*exit 1" "$r"; unchanged "up without transfer"
 
-r=$(run us "$here/deploy-hk.sh" --target us transfer abc1234)
+cfg=sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef   # the stub archive's config
+other=sha256:5603ce0b896caaacdd5715e0e4dfc30970caecdd35164af4d70920f83905ef59
+r=$(run us "$here/deploy-hk.sh" --target us --expect-config "$other" transfer abc1234)
+expect "transfer --expect-config another: stops before sending" "*config is $cfg, not the expected $other: nothing sent*exit 1" "$r"
+case "$r" in *scp*|*"docker load"*) echo "FAIL  transfer --expect-config another sent something"; fail=1 ;; *) echo "ok    transfer --expect-config another: no scp, no load" ;; esac
+
+r=$(run us "$here/deploy-hk.sh" --target us --expect-config "$cfg" transfer abc1234)
 expect "transfer: staging 0700, archive 0600, sha256 there, ID = archive config, recorded" \
   "*install -d -m 700 /srv/migration-data/services/p0/staging*chmod 600 p0-server-abc1234.tar.gz*sha256sum -c*us p0-server:abc1234 sha256:0123*exit 0" "$r"
 echo "$r" | sed -n '/--- stdout ---/,$p'
 
+r=$(KEEP=1 run us "$here/deploy-hk.sh" --target us --expect-config "$other" up abc1234)
+expect "up --expect-config another: refuses" "*is $cfg, not the expected $other: nothing changed*exit 1" "$r"; unchanged "up --expect-config another"
+case "$r" in *"docker compose"*|*python3*) echo "FAIL  up --expect-config another ran something"; fail=1 ;; *) echo "ok    up --expect-config another: no edit, no compose" ;; esac
+
 r=$(STUB_IMAGE_ID=sha256:ffff KEEP=1 run us "$here/deploy-hk.sh" --target us up abc1234)
 expect "up refuses when US docker's ID is not the checked one" "*the transfer checked*exit 1" "$r"; unchanged "up with another ID"
 
-r=$(KEEP=1 run us "$here/deploy-hk.sh" --target us up abc1234)
+# The .tmp's mode when it is made, before the chmod: a sitecustomize records it; umask 022 as a usual shell has
+mkdir -p "$work/py"; cat > "$work/py/sitecustomize.py" <<'PY'
+import os
+_chmod = os.chmod
+def chmod(path, mode, *a, **k):
+    if os.fspath(path).endswith('.tmp'):
+        with open(os.environ['STUB_DIR'] + '/tmp-mode', 'w') as f: f.write('%o' % (os.stat(path).st_mode & 0o777))
+    return _chmod(path, mode, *a, **k)
+os.chmod = chmod
+PY
+touch "$work/remote/compose.production.json.tmp"; chmod 644 "$work/remote/compose.production.json.tmp"   # a stale one
+r=$(umask 022; PYTHONPATH="$work/py" KEEP=1 run us "$here/deploy-hk.sh" --target us --expect-config "$cfg" up abc1234)
+t=$(cat "$work/tmp-mode" 2>/dev/null)
+[ "$t" = 600 ] && echo "ok    up: the .tmp is 600 from the start (umask 022 outside, a stale 644 one there)" || { echo "FAIL  up: the .tmp was ${t:-not seen}"; fail=1; }
+[ ! -e "$work/remote/compose.production.json.tmp" ] && echo "ok    up: no .tmp left" || { echo "FAIL  up: .tmp left"; fail=1; }
 expect "up: one service, compose -f … up -d --no-deps p0-p0-1, production /data, NEXT reminder" \
   "*docker compose -f /srv/migration-data/services/p0/compose.production.json up -d --no-deps p0-p0-1*liusen-migration/image:61da79e6f537e1e0 -> p0-server:abc1234*/data = /srv/migration-data/services/p0/production/20261029/data*NEXT: send p0-server:abc1234*exit 0" "$r"
 echo "$r" | sed -n '/--- stdout ---/,$p'

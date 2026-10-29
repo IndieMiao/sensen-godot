@@ -32,7 +32,7 @@
 #
 # --target us (first word, before the step): the US West P0 the 10-28 migration moved to (43.110.146.219, run by the
 # migration side; contract in pm/migration/p0-migration-decision-2026-10-27.md, E answer 8). Without it every step is
-# the Hong Kong one, unchanged. On us:
+# the Hong Kong one (frozen, below). On us:
 #   login       ssh -F $P0_US_SSH_CONFIG $P0_US_HOST (default the migration side's ssh_config, host tgt-us-p0)
 #   compose     $REMOTE/compose.production.json; the service and the container are both p0-p0-1
 #   settings    in that compose file (mode 600), kept by the migration side: `up` changes only
@@ -48,13 +48,47 @@
 #   preflight / build / smoke / stats / players / energy / maint-on / maint-off / min-version / gate / clean-devserver
 #               as on Hong Kong
 #   backup-caddy / caddy / crontab / rollback   not here: the US Caddy, backups and route are the migration side's
+#   --expect-config sha256:<64 hex> (before the step, us only): transfer stops before sending and up before touching
+#               anything unless the archive's config / the checked transfer's ID is exactly this one. The script checks
+#               the archive against US docker, not against what runs there now: a rebuilt p0-server:<sha> on the
+#               devserver can have another digest. For e64d4b33 = live that is sha256:5603ce0b…905ef59 (周瑜 on #547).
+#   up recreates p0-p0-1 (the compose's image string changes even for the same image): a few seconds offline, the
+#               clients reconnect. At an agreed time, with maint-on first when needed.
+#   back to the last version: `--target us up <its sha>` (e64d4b33 before the first new one; the transfer of that sha
+#               must be on record and the image still on the US host). Without this script the migration side puts the
+#               dated compose copy back and runs `docker compose -f … up -d --no-deps p0-p0-1`.
+#
+# Hong Kong is frozen (奕星, 10-29): since the 10-28 move it is the fallback — P0 stopped, data frozen — until 11-01
+# 16:00 +08:00, and the machine goes on 11-05. Every step that writes there (transfer backup-caddy up caddy crontab
+# rollback energy maint-on maint-off min-version) refuses unless --confirm-hk-frozen-override comes first as well,
+# e.g. `--target hk --confirm-hk-frozen-override up <sha>`, which only a fallback the PM has called justifies. The
+# read-only and observer steps run as before. --target and that flag go before the step; after it they are refused.
 set -euo pipefail
 
 TARGET=hk
-if [ "${1:-}" = --target ]; then
-  TARGET="${2:?--target hk|us}"; shift 2
-  case "$TARGET" in hk|us) ;; *) echo "unknown target: $TARGET (hk or us)"; exit 2 ;; esac
-fi
+HK_OVERRIDE=
+EXPECT_CONFIG=
+while :; do
+  case "${1:-}" in
+    --target)
+      TARGET="${2:?--target hk|us}"; shift 2
+      case "$TARGET" in hk|us) ;; *) echo "unknown target: $TARGET (hk or us)"; exit 2 ;; esac ;;
+    --confirm-hk-frozen-override) HK_OVERRIDE=1; shift ;;
+    --expect-config)
+      EXPECT_CONFIG="${2:?--expect-config sha256:<64 hex>}"; shift 2
+      [[ "$EXPECT_CONFIG" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "--expect-config takes sha256:<64 hex>: $EXPECT_CONFIG"; exit 2; } ;;
+    *) break ;;
+  esac
+done
+# `up --target us abc` would otherwise be Hong Kong's up of a sha "--target" (周瑜 on #547)
+for a in "$@"; do
+  case "$a" in
+    --target|--target=*|--confirm-hk-frozen-override|--expect-config|--expect-config=*)
+      echo "$a goes before the step: deploy-hk.sh [--target hk|us] [--confirm-hk-frozen-override] [--expect-config sha256:…] <step> …"; exit 2 ;;
+  esac
+done
+if [ -n "$HK_OVERRIDE" ] && [ "$TARGET" != hk ]; then echo "--confirm-hk-frozen-override is for Hong Kong only"; exit 2; fi
+if [ -n "$EXPECT_CONFIG" ] && [ "$TARGET" != us ]; then echo "--expect-config is for --target us only"; exit 2; fi
 
 HK="${P0_HK:-farm@47.76.226.41}"
 DEV="${P0_DEV_HOST:-zhangshaojie@192.168.124.53}"
@@ -125,6 +159,15 @@ health() {   # $1 = label: Journey and farm healthz, saved for the before / afte
 }
 
 step="${1:-}"; shift || true
+if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
+  case "$step" in
+    transfer|backup-caddy|up|caddy|crontab|rollback|energy|maint-on|maint-off|min-version)
+      echo "$step writes to Hong Kong, the frozen fallback (P0 stopped, data frozen) until 2026-11-01 16:00 +08:00: refused."
+      echo "The live P0 is US West: deploy-hk.sh --target us $step …"
+      echo "Only for a fallback the PM has called: deploy-hk.sh --target hk --confirm-hk-frozen-override $step …"
+      exit 2 ;;
+  esac
+fi
 if [ "$TARGET" = us ]; then
   case "$step" in
     backup-caddy|caddy|crontab|rollback)
@@ -146,6 +189,7 @@ PY
 )
       { echo "source p0-server:$sha $(dev "docker images --no-trunc p0-server:$sha --format '{{.ID}}'")"
         echo "archive $(basename "$arc") sha256 $sum config $cfg"; } | tee -a "$out/image.txt"
+      [ -z "$EXPECT_CONFIG" ] || [ "$cfg" = "$EXPECT_CONFIG" ] || { echo "FAIL: the archive's config is $cfg, not the expected $EXPECT_CONFIG: nothing sent" >&2; exit 1; }
       say "→ $HK:$US_STAGING (0700, the archive 0600), sha256 there, docker load"
       hk "install -d -m 700 $US_STAGING"
       scp "${HOST_OPTS[@]}" -q "$arc" "$HK:$US_STAGING/"
@@ -160,6 +204,7 @@ PY
       # Only a tag a transfer here checked: its line in some day's us/image.txt, and US docker still reports that ID.
       want=$({ cat "$repo"/output/p0-deploy/*/us/image.txt 2>/dev/null || true; } | sed -n "s/^us p0-server:$sha //p" | tail -1)
       [ -n "$want" ] || { echo "no checked transfer of p0-server:$sha in output/p0-deploy/*/us/image.txt: run transfer first" >&2; exit 1; }
+      [ -z "$EXPECT_CONFIG" ] || [ "$want" = "$EXPECT_CONFIG" ] || { echo "FAIL: the checked transfer of p0-server:$sha is $want, not the expected $EXPECT_CONFIG: nothing changed" >&2; exit 1; }
       id=$(hk "docker image inspect p0-server:$sha --format '{{.Id}}'")
       [ "$id" = "$want" ] || { echo "FAIL: US p0-server:$sha is $id, the transfer checked $want" >&2; exit 1; }
       ts=$(date +%Y%m%dT%H%M%S)
@@ -169,6 +214,7 @@ PY
       # No key is read, written or printed here.
       hk "cd $REMOTE && cp -p $US_COMPOSE $US_COMPOSE.before-$sha-$ts && python3 - $US_COMPOSE $US_SERVICE $sha" <<'PY' | tee -a "$out/up.txt"
 import copy, json, os, sys
+os.umask(0o077)   # the .tmp holds the keys in the environment: 0600 from the start, not 0644 until the chmod (周瑜 on #547)
 path, name, sha = sys.argv[1], sys.argv[2], sys.argv[3]
 raw = open(path).read()
 doc = json.loads(raw)
@@ -182,6 +228,7 @@ new_raw = raw.replace(lit, json.dumps('p0-server:' + sha))
 want = copy.deepcopy(doc); want['services'][name]['image'] = 'p0-server:' + sha
 if json.loads(new_raw) != want: sys.exit('the edit changed more than services["%s"].image' % name)
 tmp = path + '.tmp'
+if os.path.lexists(tmp): os.unlink(tmp)   # a stale one would keep its own mode
 with open(tmp, 'w') as f: f.write(new_raw)
 os.chmod(tmp, os.stat(path).st_mode & 0o777)
 os.replace(tmp, path)
@@ -391,6 +438,6 @@ PY
     ;;
   *)
     sed -n '2,20p' "$0"
-    [ "$TARGET" = us ] && sed -n '/^# --target us/,/^#   backup-caddy/p' "$0"
+    [ "$TARGET" = us ] && sed -n '/^# --target us/,/^#$/p' "$0"
     exit 2 ;;
 esac
