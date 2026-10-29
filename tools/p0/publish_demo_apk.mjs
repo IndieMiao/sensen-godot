@@ -42,9 +42,12 @@ const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 // Where a release goes (the user's "oss2 ok", 10-29): the liusen account's US bucket behind oss2.sensenjoy.cn. The old
 // bucket behind oss.sensenjoy.cn stays as it is — every link sent so far and the live gate's update url point there —
 // and is still read for the same-day versionCode check, so the day of the switch misses nothing.
+// The profile is the aliyun CLI's, so it goes before `ossutil`: after it, ossutil reads it as a section of its own
+// ~/.ossutilconfig and falls back to the default account without a word (迁移方 on #554). Not ALIBABA_CLOUD_PROFILE either,
+// which would take the old bucket's listing to the new account too.
 const OSS = {host: 'https://oss2.sensenjoy.cn', bucket: 'liusen-gensen-cdn-us-775292',
-  ossutil: ['--profile', 'farm-oss2', '--region', 'us-west-1']};
-const OLD_OSS = {host: 'https://oss.sensenjoy.cn', bucket: 'sensenjoy', ossutil: []};
+  cli: ['--profile', 'farm-oss2'], ossutil: ['--region', 'us-west-1']};
+const OLD_OSS = {host: 'https://oss.sensenjoy.cn', bucket: 'sensenjoy', cli: [], ossutil: []};
 const CONTENT_TYPES = {'.apk': 'application/vnd.android.package-archive', '.json': 'application/json', SHA256SUMS: 'text/plain; charset=utf-8'};
 const contentType = (file) => CONTENT_TYPES[file] ?? CONTENT_TYPES[file.slice(file.lastIndexOf('.'))];
 
@@ -99,7 +102,7 @@ const manifest = {package: PACKAGE, version: build.version_name, versionCode: bu
 // release bucket and in the old one.
 for (const where of [OSS, OLD_OSS]) {
   const root = `oss://${where.bucket}/`;
-  const listed = (await run('aliyun', ['ossutil', 'ls', `${root}${PREFIX}/${releaseId}-`, '-d', ...where.ossutil], {timeout: 60000})).stdout;
+  const listed = (await run('aliyun', [...where.cli, 'ossutil', 'ls', `${root}${PREFIX}/${releaseId}-`, '-d', ...where.ossutil], {timeout: 60000})).stdout;
   for (const other of new Set(listed.split(/\s+/).filter((w) => w.startsWith(`${root}${PREFIX}/`) && w.endsWith('/')))) {
     if (where === OSS && other.endsWith(`/${name}/`)) continue;
     const res = await fetch(`${where.host}/${other.slice(root.length)}release.json`, {signal: AbortSignal.timeout(30000), cache: 'no-store'});
@@ -130,7 +133,7 @@ const base = `${OSS.host}/${path}/`;
 for (const file of [filename, 'release.json', 'SHA256SUMS']) {
   const head = await fetch(base + file, {method: 'HEAD', signal: AbortSignal.timeout(30000), cache: 'no-store'});
   if (head.status === 404) {
-    await run('aliyun', ['ossutil', 'cp', `${dir}/${file}`, `oss://${OSS.bucket}/${path}/${file}`,
+    await run('aliyun', [...OSS.cli, 'ossutil', 'cp', `${dir}/${file}`, `oss://${OSS.bucket}/${path}/${file}`,
       '--acl', 'public-read', '--content-type', contentType(file), '--ignore-existing', '--quiet', ...OSS.ossutil], {timeout: 600000});
     continue;
   }
