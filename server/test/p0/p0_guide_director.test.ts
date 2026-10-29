@@ -172,11 +172,13 @@ describe('off the path', () => {
       expect(r.s.guide!.n.resend).toBe(nth);
       const plots = r.sowQuick();
       // the resent quick ones growing: their own countdown, not a Radish's (苏烈 on #506)
-      expect(r.view).toMatchObject({ recover: 'r_quick_regrow', row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' } });
+      expect(r.view).toMatchObject({ recover: 'r_quick_regrow', row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' },
+        pip: { line: 'They grow fast!' } });   // Pip says what the recover row says (q(260))
       expect(r.view.row.ready_in).toBeGreaterThan(0);
       r.now += 46 * S;
       r.check();
-      expect(r.view).toMatchObject({ recover: 'r_quick_ripe', row: { line: 'Harvest 2 Quick Radishes' } });
+      expect(r.view).toMatchObject({ recover: 'r_quick_ripe', row: { line: 'Harvest 2 Quick Radishes' },
+        pip: { line: "They're ready! Nadia at the market loves fresh radishes. Take her one." } });   // S6's own (q(260))
       expect(r.view.marks.at(-1)).toEqual({ button: 'harvest', pulse: true });   // as S5
       r.now -= 46 * S;
       r.harvest(plots);
@@ -185,11 +187,13 @@ describe('off the path', () => {
     r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.qty('seed_quick_radish')).toBe(0);
-    expect(r.view).toMatchObject({ recover: 'r_radish_sow', row: { line: 'Sow 1 Radish · 2 Energy' }, pip: { bang: false, resend_left: 0 } });
+    expect(r.view).toMatchObject({ recover: 'r_radish_sow', row: { line: 'Sow 1 Radish · 2 Energy' },
+      pip: { bang: false, resend_left: 0, line: 'No quick ones left. Plant a regular radish. That one takes a few hours.' } });
     expect(r.view.marks).toEqual([{ plot: r.tilled(1)[0] }, { button: 'sow', pulse: true }]);   // one plot's halo (q(229)); the Sow key as S2 (341 9826e069)
     const plot = r.tilled(1)[0];
     r.do({ type: 'sow', plot, seed: 'seed_radish', space: 'home' }).do({ type: 'water', plot, space: 'home' });
-    expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' } });
+    expect(r.view).toMatchObject({ recover: 'r_radish_wait', row: { line: 'Radish ready', countdown: 'crop_radish', count: 1, format: 'minutes' },
+      pip: { line: "Off you go! I'll keep an eye on your plots." } });
     expect(r.view.row.ready_in).toBeGreaterThan(3 * 3_600_000);
   });
   it('q(254): the resent seeds in the Inbox — Claim Pip\'s seeds, Pip says so; in hand — Sow 2 / Sow 1 Quick Radish', () => {
@@ -208,7 +212,7 @@ describe('off the path', () => {
     r.do({ type: 'claim_parcel', key: parcel.key });
     expect(r.qty('seed_quick_radish')).toBe(2);
     const sow = { recover: 'r_quick_sow', row: { line: 'Sow 2 Quick Radishes', icon: 'seed_quick_radish', go: 'home' } };
-    expect(r.view).toMatchObject({ ...sow, pip: { bang: false, line: "They're ready! Nadia at the market loves fresh radishes. Take her one." } });
+    expect(r.view).toMatchObject({ ...sow, pip: { bang: false, line: 'These quick radishes are ready in no time. Plant them here!' } });   // q(260)
     expect(r.view.marks).toEqual([...r.tilled(2).map(plot => ({ plot })), { button: 'sow', pulse: true }]);   // as S2
     // a Radish sown meanwhile (4 h) does not hide the quick ones still in hand
     const slow = r.tilled(1)[0];
@@ -221,7 +225,7 @@ describe('off the path', () => {
     r.harvest([one]);
     r.s.bag = r.s.bag.filter(x => x.id !== 'crop_radish');
     r.check();
-    expect(r.view).toMatchObject({ recover: 'r_quick_sow_1', row: { line: 'Sow 1 Quick Radish' } });
+    expect(r.view).toMatchObject({ recover: 'r_quick_sow_1', row: { line: 'Sow 1 Quick Radish' }, pip: { line: 'This quick radish is ready in no time. Plant it here!' } });
     expect(r.view.marks).toEqual([{ plot: r.tilled(1)[0] }, { button: 'sow', pulse: true }]);
     // none left, one resend left: back to Pip's ! (Radish ready: the slow one still growing)
     r.s.bag = r.s.bag.filter(x => x.id !== 'seed_quick_radish');
@@ -257,8 +261,14 @@ describe('off the path', () => {
     expect(r.view.pip.bang).toBe(true);
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     r.sowQuick();
-    expect(r.view).toMatchObject({ step: 't_soup', recover: 'r_quick_regrow', row: { countdown: 'crop_quick_radish', count: 2 } });
+    expect(r.view).toMatchObject({ step: 't_soup', recover: 'r_quick_regrow', row: { countdown: 'crop_quick_radish', count: 2 }, pip: { line: 'They grow fast!' } });
     expect(r.view.row.ready_in).toBeGreaterThan(0);
+    // ripe at S9: the soup's own line (q(260)), S6's harvest row and marks
+    r.now += 46 * S;
+    r.check();
+    expect(r.view).toMatchObject({ step: 't_soup', recover: 'r_quick_ripe_soup', row: { line: 'Harvest 2 Quick Radishes' },
+      pip: { line: "They're ready! Pick them for the soup." } });
+    expect(r.view.marks.at(-1)).toEqual({ button: 'harvest', pulse: true });
   });
   it('a full bar at S8 skips the meal; the soup eaten before Nadia sends Today back to cooking, then to the pond', () => {
     const r = new Run('director-full-bar').pick();

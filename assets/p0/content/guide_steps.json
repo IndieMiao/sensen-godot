@@ -1,5 +1,5 @@
 {
-  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts. v3 (SGODOT-341 PR-C-s2): S0–S11 of §14.3 (q(215)); Pip's lines q(222) ④; the resend q(217) ③, its seeds in the Inbox or in hand q(254); S12 waits for SGODOT-346 and is not in the table. Rows, marks' why and Pip's lines may name the home set ({market}, {pond}) and the count ({have}/{need}); row.countdown: the client writes `<line> in m:ss` from that crop's soonest ripening.",
+  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts. v3 (SGODOT-341 PR-C-s2): S0–S11 of §14.3 (q(215)); Pip's lines q(222) ④; the resend q(217) ③, its seeds in the Inbox or in hand q(254); Pip's line in a recover state is that entry's own q(260) (S9's ripe Quick Radishes their own entry, r_quick_ripe_soup); S12 waits for SGODOT-346 and is not in the table. Rows, marks' why and Pip's lines may name the home set ({market}, {pond}) and the count ({have}/{need}); row.countdown: the client writes `<line> in m:ss` from that crop's soonest ripening.",
   "guide": {
     "steps": [
       {
@@ -338,7 +338,7 @@
               ]
             },
             "else": [
-              "r_quick_ripe",
+              "r_quick_ripe_soup",
               "r_quick_regrow",
               "r_seeds_inbox",
               "r_quick_sow",
@@ -491,6 +491,29 @@
         ]
       },
       {
+        "id": "r_quick_ripe_soup",
+        "when": {
+          "ripe": {
+            "crop_quick_radish": 1
+          }
+        },
+        "row": {
+          "line": "Harvest 2 Quick Radishes",
+          "icon": "crop_radish",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "plot": "teach"
+          },
+          {
+            "button": "harvest",
+            "pulse": true
+          }
+        ],
+        "pip": "They're ready! Pick them for the soup."
+      },
+      {
         "id": "r_quick_regrow",
         "when": {
           "planted": {
@@ -502,7 +525,8 @@
           "icon": "seed_quick_radish",
           "go": "home",
           "countdown": "crop_quick_radish"
-        }
+        },
+        "pip": "They grow fast!"
       },
       {
         "id": "r_seeds_inbox",
@@ -536,7 +560,8 @@
             "button": "sow",
             "pulse": true
           }
-        ]
+        ],
+        "pip": "These quick radishes are ready in no time. Plant them here!"
       },
       {
         "id": "r_quick_sow_1",
@@ -558,7 +583,8 @@
             "button": "sow",
             "pulse": true
           }
-        ]
+        ],
+        "pip": "This quick radish is ready in no time. Plant it here!"
       },
       {
         "id": "r_radish_wait",
@@ -572,7 +598,8 @@
           "icon": "crop_radish",
           "go": "home",
           "countdown": "crop_radish"
-        }
+        },
+        "pip": "Off you go! I'll keep an eye on your plots."
       },
       {
         "id": "r_radish_sow",
@@ -589,7 +616,8 @@
             "button": "sow",
             "pulse": true
           }
-        ]
+        ],
+        "pip": "No quick ones left. Plant a regular radish. That one takes a few hours."
       },
       {
         "id": "r_fish_2",
