@@ -109,6 +109,34 @@ func test_more_marks_at_a_place_add_plus_n_more() -> void:
 	var none := _server([{"place": REED, "kind": "request", "why": {"request": P0Guide.TUTORIAL, "tracked": true}, "more": 0}])
 	assert_str(str(PinReason.reason(none, REED).text)).is_equal("Pond Catch · Pond Crucian 0/2")
 
+## While the new-player guide is on, the server's pins carry why.guide (SGODOT-341, 不知火舞 694e8da8): the pond says the
+## mark's own line from view.guide.marks, the Homestead the step's Today row, never `Market Board · 0 requests`.
+func _guided(step: String, row: Dictionary, marks: Array, progress := {"have": 0, "need": 1}) -> Dictionary:
+	var v := _server([])
+	v.map_markers = marks.filter(func(m): return m.has("place")).map(func(m): return {"place": m.place,
+		"kind": "request", "why": {"guide": step, "tracked": true}})
+	v["guide"] = {"step": step, "recover": null, "progress": progress, "row": row, "marks": marks}
+	return v
+
+func test_a_guide_pin_says_the_guide_step_not_the_market_board() -> void:
+	var fish := _guided("t_fish", {"line": "Catch 2 fish · Fern Pond", "icon": "fish_crucian", "go": REED},
+		[{"place": REED, "kind": "request", "why": "Catch 2 fish · 0/2"}], {"have": 0, "need": 2})
+	assert_str(str(PinReason.reason(fish, REED).text)).is_equal("Catch 2 fish · 0/2")
+	assert_str(str(PinReason.reason(fish, REED).state)).is_equal("request")
+	fish.guide.marks[0].why = "Catch 2 fish · 1/2"   # the server fills the count
+	assert_str(str(PinReason.reason(fish, REED).text)).is_equal("Catch 2 fish · 1/2")
+	var meal := _guided("t_meal", {"line": "Cook it: Grilled Crucian", "icon": "dish_grilled_crucian", "go": "home"},
+		[{"place": "home", "object": "farmhouse", "kind": "request"}])
+	assert_str(str(PinReason.reason(meal, "home").text)).is_equal("Cook it: Grilled Crucian")
+	# A count over one rides on the row as Today shows it.
+	var two := _guided("t_x", {"line": "Bring 2 Radishes", "icon": "crop_radish", "go": "home"},
+		[{"place": "home", "kind": "request"}], {"have": 1, "need": 2})
+	assert_str(str(PinReason.reason(two, "home").text)).is_equal("Bring 2 Radishes · 1/2")
+	# Neither a line at the place nor a row: nothing said, not the Market Board's count.
+	var bare := _guided("t_y", {}, [{"place": "home", "kind": "request"}])
+	bare.guide.row = null
+	assert_str(str(PinReason.reason(bare, "home").text)).is_empty()
+
 ## One lookup for every request the marks name, with where it is handed in (周瑜's pond toasts read the same).
 func test_requests_say_how_far_along_they_are_and_where_they_go() -> void:
 	var v := _server([])
