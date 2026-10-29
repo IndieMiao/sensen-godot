@@ -856,7 +856,7 @@ static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Di
 	return {
 		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before traveling.",
 		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]],
-			["Local time", local]],
+			["Fare", P0Travel.fare_text(P0Travel.fare(view, cluster))], ["Local time", local]],   # q(257) ⑥: the first-visit fare
 		"rows": [
 			{"icon": P0Logic.icon("pond"), "title": "Ponds", "effect": "Basic and regional fishing", "quantity": count.call("ponds"), "unit": "ponds"},
 			{"icon": P0Logic.icon("home"), "title": "Outposts", "effect": "Local shops and requests", "quantity": count.call("outposts"), "unit": "outposts"},
@@ -906,7 +906,7 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	var gap := P0Travel.fare_gap(view, f)
 	return {
 		"title": str(c.get("name", "")), "subtitle": " · ".join(parts.filter(func(p): return str(p) != "")),
-		"facts": facts, "primary": "Fly", "blocked": str(gap.get("text", "")), "gap": gap,
+		"facts": facts, "primary": "Fly", "blocked": str(gap.get("text", "")), "gap": gap, "blocked_energy": str(gap.get("short", "")) == "energy",
 		"footer": "Return home is always free",
 	}
 
@@ -956,13 +956,18 @@ func _take_off(cluster: String, km: int) -> void:
 
 ## §11.8.4 steps 5 then 7 (q(152) ②): a first visit's stamp says itself for 1.5 s with its +10 Energy, then goes, and
 ## only then the card slides up, so the toast never lies over it; a return (no arrival in the reply too: already there
-## with a pass, 9146d012 ③) only floats Welcome back.
+## with a pass, 9146d012 ③) only floats Welcome back, with what its pass has left (q(257) ⑤: `Welcome back · Day Pass
+## 24h`; a pass still running, from home, its real time left, `Day Pass 7h`).
 func _welcome(cluster: String, ev: Dictionary) -> void:
 	if not bool(ev.get("first", false)):
-		rt.ui.toast("Welcome back")
+		rt.ui.toast(welcome_back(_view(), cluster))
 		return
 	rt.ui.toast("Welcome to %s · Stamp collected" % str(P0Clusters.get_cluster(cluster).get("name", "")), STAMP_S)
 	_arrival_card_after_stamp(cluster)
+
+static func welcome_back(view: Dictionary, cluster: String) -> String:
+	var left := P0Travel.pass_text(view, cluster)
+	return "Welcome back · Day Pass %s" % left if left != "" else "Welcome back"
 
 ## How long a flight waits for its reply, from Fly (the session's own timeout), and how long it stands landed without
 ## one before the cover says so (9146d012 ①).
@@ -1245,7 +1250,8 @@ func _travel_down() -> void:
 	# ⑦: a toast held under a Fly's cover comes once the welcome has said itself (a first visit's card, then, as
 	# toast_when_clear waits for it)
 	if rt != null and trip.has("key"):
-		rt.ui.hold_toasts(false, STAMP_S if bool((trip.reply as Dictionary).get("first", false)) else ToastLayer.duration_ms("Welcome back") / 1000.0)
+		rt.ui.hold_toasts(false, STAMP_S if bool((trip.reply as Dictionary).get("first", false)) \
+			else ToastLayer.duration_ms(welcome_back(_view(), str(trip.to_city))) / 1000.0)
 	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()
 
 ## MAP-7-FREE (§11.8.4 step 7, Figma 482:412): a first visit lands on "3 things to do here" — the local pond, an

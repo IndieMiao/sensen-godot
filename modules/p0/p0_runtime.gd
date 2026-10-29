@@ -425,7 +425,26 @@ func _process(dt: float) -> void:
 	var v := session.current()
 	if v.is_empty(): return
 	if ui.view_wanted(session.view, Time.get_ticks_msec()): ui.set_view(v)   # SGODOT-260 Q3: not every frame
+	_watch_day_pass(v)   # every frame: a pass runs out on the clock, not on a refresh
 	_call("p0_frame", [v, dt])
+
+## q(257) ⑤ / q(261) ⑦ (SGODOT-367): the Day Pass of the city the player is in running out says so once, an Info toast
+## with the city's return fare (`Day Pass ended · Re-entry 15 Energy · 60 coins`); elsewhere it ends quietly. Said
+## under a flight's cover it waits, and is said only if the player is still in that city then (P0Ui.toast_in_city).
+var _pass_seen := {}   # {city, until}: the running pass of the city the player is in, last seen
+
+func _watch_day_pass(v: Dictionary) -> void:
+	if not P0Travel.away(v):
+		_pass_seen = {}
+		return
+	var here := P0Travel.here(v)
+	var until := float(v.get("travel", {}).get("passes", {}).get(here, {}).get("until", 0))
+	if P0Travel.pass_left_ms(v, here) > 0.0:
+		_pass_seen = {city = here, until = until}
+		return
+	if str(_pass_seen.get("city", "")) != here or float(_pass_seen.get("until", -1.0)) != until: return
+	_pass_seen = {}
+	ui.toast_in_city("Day Pass ended · Re-entry %s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
 
 func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
@@ -1114,14 +1133,16 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	match code:
 		"not_enough_coins", "not_enough_energy":   # a fare the server would not take (q(261) ⑤): the gap, once called back
 			if str(cmd.get("type", "")) == "travel":
-				ui.toast_error(("Need %d more coins" if code == "not_enough_coins" else "Need %d more Energy") % int(detail.get("need", 0)))
+				# coins: the gap (fare + floor − wallet); Energy: the fare, as Fly's amber key says it (不知火舞 on 367 e0efcc15)
+				if code == "not_enough_coins": ui.toast_error("Need %d more coins" % int(detail.get("need", 0)))
+				else: ui.toast_error("Need %d Energy" % int(detail.get("cost", detail.get("need", 0))))
 			else: ui.toast_error("Can't do that (%s)" % code)
 		# SGODOT-275: a place in a city without a pass — its travel card (q(108)); travel_required (q(256) ④): a pass,
 		# but the player is not in that city — the same card, at the return fare
 		"pass_required", "trip_expired", "travel_required":
 			var preview: Dictionary = detail.get("preview", {})
 			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
-			else: ui.toast_error("Travel to %s first · free" % str(preview.get("name", "that city")))
+			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})

@@ -48,7 +48,9 @@ func test_the_gap_says_coins_first_with_the_40_floor() -> void:
 	var f := {energy = 30, coins = 120}
 	assert_dict(P0Travel.fare_gap(_view({}, {}, SF, 160, 142), f)).is_empty()   # 160 − 120 = 40: the floor kept
 	assert_str(str(P0Travel.fare_gap(_view({}, {}, SF, 150, 142), f).text)).is_equal("Need 10 more coins")
-	assert_str(str(P0Travel.fare_gap(_view({}, {}, SF, 230, 19), f).text)).is_equal("Need 11 more Energy")
+	var short := P0Travel.fare_gap(_view({}, {}, SF, 230, 19), f)
+	assert_str(str(short.text)).is_equal("Fly · Need 30 Energy")   # the fare, in amber (不知火舞 on 367 e0efcc15)
+	assert_int(int(short.need)).is_equal(11)   # the Energy card's gap
 	assert_str(str(P0Travel.fare_gap(_view({}, {}, SF, 150, 19), f).text)).is_equal("Need 10 more coins")   # both: coins
 
 func test_map_5_first_visit_rows() -> void:
@@ -89,3 +91,34 @@ func test_map_5_short_of_coins_fly_reads_the_gap() -> void:
 	assert_str(str(spec.blocked)).starts_with("Need ")
 	assert_str(str(spec.blocked)).ends_with(" more coins")
 	assert_str(str(spec.gap.short)).is_equal("coins")
+
+## q(257) ① (FARE-BOARD 9:133836): the board's rows say each tier's first-visit fare on two lines, Trip 1 `Free`.
+func test_the_fare_board_says_the_real_fares() -> void:
+	var rows := P0Travel.fares(_view())
+	assert_int(rows.size()).is_equal(7)
+	assert_str(str(rows[0].fare)).is_equal("Free")
+	assert_bool(rows[0].free).is_true()
+	assert_str(str(rows[3].fare)).is_equal("30 Energy\n120 coins")
+	assert_str(str(rows[6].fare)).is_equal("60 Energy\n500 coins")
+	assert_bool(rows[3].free).is_false()
+	assert_str(str(P0Travel.fares()[3].fare)).is_equal("Free")   # a server without fares
+	var d: UiDrawer = load("res://scenes/p0/panels/p0_fare_board_drawer.gd").new(rows)
+	add_child(auto_free(d))
+	assert_str((d.find_child("Footnote", true, false) as Label).text).is_equal("Return trips are half price · Going home is always free")
+	assert_str((d.find_child("Trip4", true, false).find_child("Fare", true, false) as Label).text).is_equal("30 Energy\n120 coins")
+
+## q(257) ⑥: the silhouette card's Fare row under Trip: the first-visit fare, Trip 1 `Free`.
+func test_the_silhouette_card_says_the_fare() -> void:
+	var spec := P0Map.city_card(_view(), LA, {})
+	var trip := int(P0Travel.trip(_view(), LA).trip)
+	assert_str(str(spec.facts[2][0])).is_equal("Fare")
+	assert_str(str(spec.facts[2][1])).is_equal("%d Energy · %d coins" % [int(FARES.energy[trip - 1]), int(FARES.coins[trip - 1])])
+	assert_str(str(P0Map.city_card(_view(), SALINAS, {}).facts[2][1])).is_equal("Free")
+
+## q(257) ⑤: a return's welcome says what its pass has left.
+func test_welcome_back_says_the_pass_left() -> void:
+	var v := _view({LA: {n = 2}}, {LA: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 24 * 3_600_000.0}}, LA)
+	assert_str(P0Map.welcome_back(v, LA)).is_equal("Welcome back · Day Pass 24h")
+	v.travel.passes[LA].until = 1_000_000_000.0 + 7 * 3_600_000.0
+	assert_str(P0Map.welcome_back(v, LA)).is_equal("Welcome back · Day Pass 7h")
+	assert_str(P0Map.welcome_back(_view(), LA)).is_equal("Welcome back")

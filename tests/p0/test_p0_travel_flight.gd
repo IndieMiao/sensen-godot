@@ -83,7 +83,7 @@ static func _moved(v: Dictionary, cluster: String) -> Dictionary:
 	t["here"] = cluster
 	var visits: Dictionary = t.get_or_add("visits", {})
 	visits[cluster] = {n = int((visits.get(cluster, {}) as Dictionary).get("n", 0)) + 1}
-	(t.get_or_add("passes", {}) as Dictionary)[cluster] = {kind = "day", from = 1.0, until = 2_000_000_000.0}
+	(t.get_or_add("passes", {}) as Dictionary)[cluster] = {kind = "day", from = 1.0, until = float(w.get("now", 0.0)) + 24 * 3_600_000.0}
 	return w
 
 ## The held travel's reply, through the session as from the server: taken with `events`, or refused with `code`.
@@ -163,7 +163,7 @@ func test_an_arrival_rises_from_where_the_camera_is_and_lands_in_3_s() -> void:
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")
 	assert_bool(m.hide_self).is_false()   # it stands in the city ahead, as the chip changes
 	assert_bool(m.farm_markers.visible).is_true()
-	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back · Day Pass 24h")
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
@@ -200,7 +200,7 @@ func test_a_tap_after_the_first_half_second_lands_at_once_one_before_does_not() 
 	assert_bool(m.travelling()).is_false()
 	assert_float(m.zoom).is_equal_approx(float(_overview().zoom), 1e-6)
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")
-	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back · Day Pass 24h")
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
@@ -851,7 +851,7 @@ func test_fly_takes_off_before_any_reply_and_the_reply_in_the_air_lands_with_it(
 	await get_tree().create_timer(2.3).timeout
 	assert_bool(m.travelling()).is_false()
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")
-	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back · Day Pass 24h")
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
@@ -1017,7 +1017,7 @@ func test_taken_without_an_arrival_it_lands_as_a_return() -> void:
 	_answer(rt, _moved(rt.session.view, LA), [])
 	assert_bool(m.travelling()).is_false()
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")
-	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back · Day Pass 24h")
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
@@ -1064,8 +1064,8 @@ func test_a_toast_under_the_cover_waits_for_the_welcome() -> void:
 	assert_str(rt.ui.sys_text()).is_equal("A line")   # not held
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))
-	assert_str(rt.ui.toast_text()).is_equal("Welcome back")   # the welcome first
-	await get_tree().create_timer(ToastLayer.duration_ms("Welcome back") / 1000.0 + 0.2).timeout
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back · Day Pass 24h")   # the welcome first
+	await get_tree().create_timer(ToastLayer.duration_ms("Welcome back · Day Pass 24h") / 1000.0 + 0.2).timeout
 	assert_str(rt.ui.toast_text()).is_equal("Somewhere else")   # then what waited
 	rt.ui.clear_toast()
 	rt.session.view = saved
@@ -1176,7 +1176,55 @@ func test_a_refused_fare_calls_it_back_and_says_the_gap() -> void:
 	body = JSON.stringify({ok = false, code = "not_enough_energy", detail = {need = 11, have = 19, cost = 30}, state = rt.session.view}).to_utf8_buffer()
 	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
 	assert_bool(m.travelling()).is_false()
-	assert_str(rt.ui.toast_text()).is_equal("Need 11 more Energy")
+	assert_str(rt.ui.toast_text()).is_equal("Need 30 Energy")   # the fare, as Fly's amber key says it
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame
+
+const FARES := {energy = [0, 10, 20, 30, 40, 50, 60], coins = [0, 20, 60, 120, 200, 300, 500]}
+
+## q(257) ⑤ (SGODOT-367): in Los Angeles, its pass running out says so once with its return fare; at home, or once
+## said, nothing.
+func test_the_pass_of_the_city_the_player_is_in_ending_says_so_once() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m, LA)
+	var v: Dictionary = rt.session.view.duplicate(true)
+	v.travel.fares = FARES
+	v.travel.passes = {LA: {kind = "day", from = 1.0, until = float(v.now) + 60_000.0}}
+	rt.ui.clear_toast()
+	rt._watch_day_pass(v)
+	assert_str(rt.ui.toast_text()).is_empty()
+	v.now = float(v.now) + 61_000.0   # ran out
+	rt._watch_day_pass(v)
+	var f := load("res://modules/p0/p0_travel.gd").fare(v, LA) as Dictionary
+	assert_str(rt.ui.toast_text().replace("\n", " · ")).is_equal("Day Pass ended · Re-entry %d Energy · %d coins" % [int(f.energy), int(f.coins)])
+	rt.ui.clear_toast()
+	rt._watch_day_pass(v)
+	assert_str(rt.ui.toast_text()).is_empty()   # once
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## q(261) ⑦: said under a flight's cover, it waits — and once landed in another city, it is not said.
+func test_a_pass_ended_under_the_cover_is_not_said_in_another_city() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m, LA)
+	rt.ui.clear_toast()
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8800}, [], {}, false)
+	rt.ui.toast_in_city("Day Pass ended · Re-entry 15 Energy · 60 coins", LA)
+	assert_str(rt.ui.toast_text()).is_empty()   # held
+	_answer(rt, _moved(rt.session.view, TOKYO), [{kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8800}])
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	await get_tree().create_timer(ToastLayer.duration_ms("Welcome back · Day Pass 24h") / 1000.0 + 0.3).timeout
+	assert_str(rt.ui.toast_text()).is_not_equal("Day Pass ended · Re-entry 15 Energy · 60 coins")
+	assert_bool(rt.ui.toast_text().begins_with("Day Pass ended")).is_false()
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)

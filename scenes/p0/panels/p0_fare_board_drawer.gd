@@ -3,10 +3,11 @@ extends UiDrawer
 ## Board, read only. A drawer 476 high (the sheet's top at y 324 of 800), the MAP-8 shell, 16 at the sides: `Trip fares`
 ## (TitleXB20, a 27 row) and straight under it the seven tiers (P0Travel.fares), 58 a row, not tappable and no ›: the
 ## tier `Trip 1 · Local` (RowTitleXB15, 20) over its bounds (CaptionB12, secondary, 16), 2 apart, the pair 10 from the
-## row's top; `Free` (RowTitleB15, primary: all free reads as the good news it is, where grey would read "not
-## available") right, centred on the whole row.
+## row's top; on the right the tier's fare on two lines (`30 Energy` / `120 coins`, 14 ExtraBold, ink; q(257) ①, FARE-BOARD
+## 9:133836), Trip 1's `Free` in primary (the good news it is, where grey would read "not available"), centred on the
+## row; 8 under the seven `Return trips are half price · Going home is always free` (CaptionB12, secondary).
 
-const HEIGHT := 476.0
+const HEIGHT := 496.0
 const ROW_H := 58.0
 const _TITLE_H := 27.0
 const _LINE_GAP := 2
@@ -33,6 +34,13 @@ func _init(rows_: Array = []) -> void:
 	body.add_child(list)
 	rows = rows_
 	for i in rows.size(): list.add_child(_row(rows[i], i + 1))
+	var gap := Control.new()
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gap.custom_minimum_size.y = 8
+	body.add_child(gap)
+	var foot := UiKit.label("Return trips are half price · Going home is always free", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	foot.name = "Footnote"
+	body.add_child(foot)
 
 func _row(r: Dictionary, n: int) -> Control:
 	var row := HBoxContainer.new()
@@ -52,7 +60,8 @@ func _row(r: Dictionary, n: int) -> Control:
 	bounds.name = "Bounds"
 	text.add_child(bounds)
 	row.add_child(text)
-	var fare := UiKit.label(str(r.get("fare", "")), UiTokens.STYLE_ROW_TITLE_B15, UiTokens.COLOR_PRIMARY)
+	var free := bool(r.get("free", true))
+	var fare := UiKit.label(str(r.get("fare", "")), UiTokens.STYLE_BODY_XB14, UiTokens.COLOR_PRIMARY if free else UiTokens.COLOR_TEXT)
 	fare.name = "Fare"
 	fare.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	fare.size_flags_vertical = Control.SIZE_SHRINK_CENTER
