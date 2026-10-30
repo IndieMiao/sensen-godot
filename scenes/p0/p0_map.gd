@@ -1698,7 +1698,7 @@ func p0_surface() -> String: return "map"
 
 ## Android Back on the map (李元芳 int10): P0's own layers first, one per press — a dragged or lifted slot flies back,
 ## then the radial, then a card, then a drawer (P0Ui.close_top_layer, LOCK-06) — and only with none left the map's own
-## (its city card, relocation, a farm selection). #92 brought P0's HUD and Bag to the map without this, so Bag, Today,
+## (its city card, a farm selection). #92 brought P0's HUD and Bag to the map without this, so Bag, Today,
 ## the Inbox and the place cards could not be closed with Back there.
 func is_back_navigation_locked() -> bool:
 	if picking():   # Back is the home pick's, a layer at a time (亚瑟 342 6418183a ③): the map never pops itself

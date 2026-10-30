@@ -7,13 +7,9 @@ extends Node3D
 const Y_LIFT := 0.3 # 贴地抬高，避开与 y=0 地面/角色底面的 z-fighting
 const OUTLINE_WIDTH_M := 3.0
 const IDLE_OUTLINE := Color("b7c8bc")
-const PLACEMENT_OUTLINE := Color("2458b8")
-const PLACEMENT_BORDER := Color("fffdf5")
-const PLACEMENT_BORDER_WIDTH_M := 5.0
 
 var selected_id := ""
 var outline_only := false
-var placement_outline := false
 var _items: Dictionary = {} # id -> {node, mats: Array[StandardMaterial3D], center: Vector2(lat,lng)}
 var _anchor_lat := 0.0
 var _anchor_lng := 0.0
@@ -82,13 +78,7 @@ func set_candidates(bps: Array, anchor_lat: float, anchor_lng: float) -> void:
 				local.remove_at(local.size() - 1)
 			if not local.is_empty():
 				local.append(local[0])
-				if placement_outline:
-					var border := _add_mesh(node, path_mesh(local, PLACEMENT_BORDER_WIDTH_M), PLACEMENT_BORDER)
-					_placement_material(border, 0)
-				var color := PLACEMENT_OUTLINE if placement_outline else (GameUi.GOLD if outline_only else IDLE_OUTLINE)
-				var outline := _add_mesh(node, path_mesh(local, OUTLINE_WIDTH_M), color)
-				if placement_outline: _placement_material(outline, 1)
-				mats.append(outline)
+				mats.append(_add_mesh(node, path_mesh(local, OUTLINE_WIDTH_M), GameUi.GOLD if outline_only else IDLE_OUTLINE))
 		_items[bp.layout_patch_id] = {"node": node, "mats": mats, "center": center}
 	reanchor(anchor_lat, anchor_lng)
 
@@ -99,23 +89,11 @@ func _add_mesh(parent: Node3D, mesh: ArrayMesh, color: Color) -> StandardMateria
 	parent.add_child(mi)
 	return mi.material_override
 
-static func _placement_material(material: StandardMaterial3D, priority: int) -> void:
-	# Draw the blue stroke above its border without coplanar depth flicker.
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.no_depth_test = true
-	material.render_priority = priority
-
 func select(id: String) -> void:
 	selected_id = id
 	for key in _items:
 		for m in _items[key].mats:
-			m.albedo_color = PLACEMENT_OUTLINE if placement_outline else (GameUi.GOLD if outline_only or key == id else IDLE_OUTLINE)
-
-func move_candidate(id: String, center: Vector2) -> void:
-	if not _items.has(id): return
-	_items[id].center = center
-	var local := geo_to_local(center.x, center.y, _anchor_lat, _anchor_lng)
-	(_items[id].node as Node3D).position = Vector3(local.x, 0, local.y)
+			m.albedo_color = GameUi.GOLD if outline_only or key == id else IDLE_OUTLINE
 
 func reanchor(anchor_lat: float, anchor_lng: float) -> void:
 	_anchor_lat = anchor_lat

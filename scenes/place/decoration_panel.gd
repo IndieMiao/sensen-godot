@@ -207,9 +207,7 @@ func pick_at(world: Vector3) -> bool:
 	return true
 
 func _new_prop_position(id: String) -> Variant:
-	var plot: FarmBlueprint = null
-	if session != null and not session.farm_terrain.is_empty(): plot = FarmPlot.register_terrain(session.farm_terrain)
-	return DecorationLayout.first_position(id, _draft, plot, state().get("cells", {}))
+	return DecorationLayout.first_position(id, _draft, null, state().get("cells", {}))
 
 func place_selected() -> bool:
 	if busy or _uncertain() or _confirm_leave or not _can_place(selected_prop): return false

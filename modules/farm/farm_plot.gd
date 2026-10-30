@@ -5,7 +5,6 @@ extends RefCounted
 ## 读 `assets/farm/data/farm_plot.json`，把矩形、椭圆和曲线路径光栅化成一份 `FarmBlueprint`。
 ## 这是农场空间的唯一权威：哪些格能开垦、能放道具、能站人。
 ##
-## 旧农场保留本地布局；新农场使用服务器冻结的真实地理布局，导航与地面共用这份数据。
 ## 过去 `FarmInterior` 把服务端的 12 个格重排进一张 20×20 的合成网格、并在会话边界翻译
 ## 格 ID；现在农场格 ID **就是**服务端格 ID，那层翻译连同它的整类 bug 一起消失。
 ##
@@ -32,146 +31,9 @@ static var _document: Dictionary = {}
 ## building、rock 的可开垦/可通行/可放置全是 false，从 mask 反推分不开它们，
 ## 而摆景物必须分得开（花草不能撒进池塘或墙里）。光栅化时本来就算出来了，留住即可。
 static var _kinds: Dictionary = {}
-static var _terrain_order: Array[String] = []
-static var _terrain_fingerprints: Dictionary = {}
-
-## Register the server's immutable layout before constructing a scene. Never substitute a
-## template after corrupt or incomplete geographic data: it would disagree with the server.
-static func register_terrain(terrain: Dictionary) -> FarmBlueprint:
-	if int(terrain.get("format", 0)) != 1: return null
-	var id := str(terrain.get("layout_id", ""))
-	if RegEx.create_from_string("^geo_[a-f0-9]{20}$").search(id) == null: return null
-	var src = terrain.get("plot")
-	if not src is Dictionary or not _valid_source(src): return null
-	var checksum := str(src.get("checksum", ""))
-	if RegEx.create_from_string("^[a-f0-9]{64}$").search(checksum) == null: return null
-	var fingerprint := _source_fingerprint(src)
-	if _cache.has(id):
-		return _cache[id] if _cache[id].checksum == checksum and _terrain_fingerprints.get(id, "") == fingerprint else null
-	var doc := document()
-	doc.layouts[id] = src.duplicate(true)
-	var bp := blueprint_for(id)
-	if not verify_checksum(bp):
-		_cache.erase(id)
-		_kinds.erase(id)
-		doc.layouts.erase(id)
-		return null
-	_terrain_fingerprints[id] = fingerprint
-	_terrain_order.append(id)
-	# Keep layouts still referenced by stacked farm scenes; discard old visit caches.
-	for old_id in _terrain_order.duplicate():
-		if _terrain_order.size() <= 24: break
-		if old_id != id and _cache[old_id].get_reference_count() <= 1:
-			_cache.erase(old_id)
-			_kinds.erase(old_id)
-			_terrain_fingerprints.erase(old_id)
-			doc.layouts.erase(old_id)
-			_terrain_order.erase(old_id)
-	return bp
-
-static func _source_fingerprint(src: Dictionary) -> String:
-	var normalized := src.duplicate(true)
-	# Public snapshots sanitize provider-specific region IDs. Those labels do not
-	# change terrain, while geometry/order/anchors and every rendering field do.
-	for region in normalized.regions: region.erase("id")
-	return JSON.stringify(_normalized_numbers(normalized), "", true, true).sha256_text()
-
-static func _normalized_numbers(value: Variant) -> Variant:
-	if value is int or value is float: return float(value)
-	if value is Array:
-		var result: Array = []
-		for item in value: result.append(_normalized_numbers(item))
-		return result
-	if value is Dictionary:
-		var result := {}
-		for key in value: result[key] = _normalized_numbers(value[key])
-		return result
-	return value
-
-static func _valid_point(value: Variant) -> bool:
-	return value is Array and value.size() == 2 and value.all(func(n): return (n is int or n is float) and is_finite(float(n)) and absf(float(n)) <= 4096.0)
-
-static func _valid_source(src: Dictionary) -> bool:
-	if not _valid_point(src.get("grid")) or float(src.grid[0]) not in [40.0, 64.0] or src.grid[0] != src.grid[1]: return false
-	var edge := int(src.grid[0])
-	if src.get("cell_mm") != (800 if edge == 40 else 750) or src.get("revision") != 1: return false
-	if str(src.get("default_kind", "")) not in KIND_ORDER: return false
-	var anchors = src.get("anchors")
-	if not anchors is Dictionary: return false
-	for key in ["spawn", "exit", "house", "storage", "well", "mine", "stall"]:
-		if not anchors.has(key): return false
-	for cell in anchors.values():
-		if not _valid_point(cell): return false
-		for n in cell:
-			if n != floor(float(n)) or n < 0 or n >= edge: return false
-	var regions = src.get("regions")
-	if not regions is Array or regions.size() > 1024: return false
-	for region in regions:
-		if not region is Dictionary or str(region.get("kind", "")) not in KIND_ORDER: return false
-		var shapes := 0
-		for key in ["rect", "ellipse", "path", "polygon"]:
-			if not region.has(key): continue
-			shapes += 1
-			var value = region[key]
-			if not value is Array: return false
-			if key in ["rect", "ellipse"]:
-				if value.size() != 4 or not _valid_point(value.slice(0, 2)) or not _valid_point(value.slice(2, 4)): return false
-				if float(value[2]) <= 0 or float(value[3]) <= 0: return false
-			else:
-				if value.size() < (3 if key == "polygon" else 2) or value.size() > 8192: return false
-				for point in value:
-					if not _valid_point(point): return false
-				if key == "path":
-					var width = region.get("width")
-					if not (width is int or width is float) or not is_finite(float(width)) or float(width) <= 0: return false
-		if shapes != 1: return false
-		var holes = region.get("holes", [])
-		if not holes is Array or holes.size() > 256: return false
-		for ring in holes:
-			if not ring is Array or ring.size() < 3 or ring.size() > 8192: return false
-			for point in ring:
-				if not _valid_point(point): return false
-	return true
 
 static func source_for(layout_id: String) -> Dictionary:
 	return document().get("layouts", {}).get(layout_id, {})
-
-## A generated farm uses the same descriptor type as saved farms, but its map overlay
-## comes from the selected location. No old street template is translated onto it.
-static func geography_for(terrain: Dictionary, region_id := "") -> FarmBlueprint:
-	var plot := register_terrain(terrain)
-	if plot == null: return null
-	var source: Dictionary = terrain.get("source", {})
-	var center: Dictionary = source.get("center", {})
-	# Private visitor snapshots intentionally omit provenance and the real location.
-	if not source.is_empty() and not FarmPlacement.is_valid(center): return null
-	var extent := float(source.get("extent_m", plot.play_area_m * 5.0))
-	if not is_finite(extent) or extent <= 0 or extent > 10000: return null
-	var bp := FarmBlueprint.new()
-	for field in ["layout_patch_id", "revision", "display_name", "checksum", "cell_mm", "play_area_mm", "play_area_m", "cell_m", "grid"]:
-		bp.set(field, plot.get(field))
-	bp.region_id = region_id
-	bp.masks = plot.masks.duplicate(true)
-	bp.anchors = plot.anchors.duplicate(true)
-	var origin := Vector2(float(center.get("lat", 0.0)), float(center.get("lng", 0.0)))
-	bp.overlay = {"center": origin, "paths": [], "blocks": []}
-	if source.is_empty(): return bp
-	for region in source_for(plot.layout_patch_id).regions:
-		if region.get("kind") != "path" or not region.has("path") or not str(region.get("id", "")).begins_with("geo_"): continue
-		var points := PackedVector2Array()
-		for point in region.path: points.append(_geographic_point(Vector2(point[0], point[1]), origin, extent, plot.grid.x))
-		bp.overlay.paths.append(points)
-	var boundary := PackedVector2Array()
-	var edge := float(plot.grid.x) - 0.5
-	for point in [Vector2(-0.5, -0.5), Vector2(edge, -0.5), Vector2(edge, edge), Vector2(-0.5, edge), Vector2(-0.5, -0.5)]:
-		boundary.append(_geographic_point(point, origin, extent, plot.grid.x))
-	bp.overlay.blocks.append(boundary)
-	return bp
-
-static func _geographic_point(cell: Vector2, center: Vector2, extent: float, grid_edge: int) -> Vector2:
-	var meters := ((cell + Vector2.ONE * 0.5) / float(grid_edge) - Vector2.ONE * 0.5) * extent
-	return center + Vector2(meters.y / FarmPlacement.METERS_PER_DEGREE,
-		meters.x / (FarmPlacement.METERS_PER_DEGREE * cos(deg_to_rad(center.x))))
 
 static func document() -> Dictionary:
 	if _document.is_empty():
@@ -213,12 +75,10 @@ static func blueprint_for(layout_id := "") -> FarmBlueprint:
 		if k < 0:
 			continue
 		var curve := path_points(region.get("path", []))
-		var precise_curve := precise_path_points(region.get("path", [])) if id.begins_with("geo_") else []
 		var bounds := region_bounds(region, curve)
 		for j in range(maxi(0, floori(bounds.position.y)), mini(gy, ceili(bounds.end.y) + 1)):
 			for i in range(maxi(0, floori(bounds.position.x)), mini(gx, ceili(bounds.end.x) + 1)):
-				var contains := precise_region_contains(region, i, j, precise_curve) if id.begins_with("geo_") else region_contains(region, Vector2(i, j), curve)
-				if contains: kinds[j * gx + i] = k
+				if region_contains(region, Vector2(i, j), curve): kinds[j * gx + i] = k
 
 	# 2. kind → 三张 mask。visual 恒为 1：地面外观由 shader 按 kind 决定。
 	var bp := FarmBlueprint.new()
@@ -272,54 +132,6 @@ static func path_points(points: Array) -> PackedVector2Array:
 			result.append(0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t))
 	if not points.is_empty(): result.append(Vector2(points[-1][0], points[-1][1]))
 	return result
-
-## Godot Vector2 uses float32; JavaScript and scalar GDScript floats use float64.
-## Preserve original geographic coordinates throughout authoritative rasterization,
-## including curve interpolation and stroke distances close to a cell boundary.
-static func precise_path_points(points: Array) -> Array:
-	var result: Array = []
-	for i in range(points.size() - 1):
-		var p0: Array = points[maxi(0, i - 1)]
-		var p1: Array = points[i]
-		var p2: Array = points[i + 1]
-		var p3: Array = points[mini(points.size() - 1, i + 2)]
-		for step in 8:
-			var t := float(step) / 8.0
-			var point: Array = []
-			for axis in 2:
-				point.append(0.5 * (2 * p1[axis] + (-p0[axis] + p2[axis]) * t
-					+ (2 * p0[axis] - 5 * p1[axis] + 4 * p2[axis] - p3[axis]) * t * t
-					+ (-p0[axis] + 3 * p1[axis] - 3 * p2[axis] + p3[axis]) * t * t * t))
-			result.append(point)
-	if not points.is_empty(): result.append(points[-1])
-	return result
-
-static func precise_region_contains(region: Dictionary, i: int, j: int, curve: Array) -> bool:
-	if region.has("polygon"):
-		if not ring_contains(region.polygon, Vector2(i, j)): return false
-		for hole in region.get("holes", []):
-			if ring_contains(hole, Vector2(i, j)): return false
-		return true
-	if region.has("rect"):
-		var r: Array = region.rect
-		return i >= r[0] and i < r[0] + r[2] and j >= r[1] and j < r[1] + r[3]
-	if region.has("ellipse"):
-		var e: Array = region.ellipse
-		var x := (float(i) - float(e[0])) / float(e[2])
-		var y := (float(j) - float(e[1])) / float(e[3])
-		return x * x + y * y <= 1.00001
-	if region.has("path"):
-		var radius := float(region.width) * 0.5
-		for n in range(1, curve.size()):
-			var a: Array = curve[n - 1]
-			var b: Array = curve[n]
-			var dx := float(b[0]) - float(a[0])
-			var dy := float(b[1]) - float(a[1])
-			var t := clampf(((float(i) - float(a[0])) * dx + (float(j) - float(a[1])) * dy) / maxf(dx * dx + dy * dy, 0.000000000001), 0, 1)
-			var x := float(i) - float(a[0]) - t * dx
-			var y := float(j) - float(a[1]) - t * dy
-			if x * x + y * y <= radius * radius + 0.00001: return true
-	return false
 
 static func region_contains(region: Dictionary, point: Vector2, curve: PackedVector2Array) -> bool:
 	if region.has("rect"):
@@ -394,16 +206,6 @@ static func canonical(bp: FarmBlueprint) -> String:
 		"%d,%d" % [bp.grid.x, bp.grid.y], str(bp.cell_mm),
 		"".join(bp.masks.walkable), "".join(bp.masks.cultivable), "".join(bp.masks.buildable),
 	]))
-	if bp.layout_patch_id.begins_with("geo_"):
-		var kinds := ""
-		for kind in _kinds.get(bp.layout_patch_id, PackedByteArray()): kinds += str(kind)
-		var anchors := PackedStringArray()
-		var names: Array = source_for(bp.layout_patch_id).get("anchors", {}).keys()
-		names.sort()
-		for name in names:
-			var cell := bp.anchor(name)
-			anchors.append("%s:%d,%d" % [name, cell.x, cell.y])
-		result += "|kinds:" + kinds + "|anchors:" + ";".join(anchors)
 	return result
 
 static func compute_checksum(bp: FarmBlueprint) -> String:

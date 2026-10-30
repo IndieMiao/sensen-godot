@@ -87,10 +87,6 @@ static func make_http_transport(host: Node) -> Callable:
 		req.timeout = TIMEOUT_S
 		# Sign-in runs right after a system sheet closes and often over a slow VPN; give it longer (vivo 2026-09-29).
 		if "/auth/" in url: req.timeout = AUTH_TIMEOUT_S
-		if method == "POST" and url.ends_with("/relocation/preview"): req.timeout = 45.0
-		if method == "POST" and url.ends_with("/farms"):
-			var payload = JSON.parse_string(body)
-			if payload is Dictionary and payload.has("generation_version"): req.timeout = 45.0
 		host.add_child(req)
 		var verb := HTTPClient.METHOD_GET
 		match method:

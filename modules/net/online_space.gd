@@ -7,7 +7,6 @@ signal enemies_changed(monsters: Array)
 signal rescued
 signal connection_changed
 signal travel_confirmed(accepted: bool)
-signal farm_relocated
 
 const ACTIONS := ["idle", "run", "walk", "labour_sow", "labour_water", "labour_harvest", "labour_drain", "labour_shelter", "emote_wave", "attack", "mine", "labour_till", "labour_clear", "fishing_wait", "fishing_reel"]
 var session: FarmSession
@@ -72,7 +71,6 @@ var _resume_ticket := ""
 var _appearance_supported := false
 var _appearance_dirty := false
 var _appearance_at := 0.0
-var _relocation_notified := false
 
 static func attach(host: Node3D, farm_session: FarmSession, space_kind: String, args: Dictionary,
 		get_mover: Callable, get_animation: Callable, can_input := Callable()) -> OnlineSpace:
@@ -188,7 +186,7 @@ func _layout_party() -> void:
 	panel.size = Vector2(width, height)
 
 func start() -> void:
-	if _relocation_notified or active or session == null or not session.logged_in(): return
+	if active or session == null or not session.logged_in(): return
 	active = true
 	_attempt = 0
 	_connect()
@@ -258,9 +256,6 @@ func _process(delta: float) -> void:
 	socket.poll()
 	if socket.get_ready_state() == WebSocketPeer.STATE_CLOSED:
 		var reason := socket.get_close_reason()
-		if reason == "FARM_RELOCATED":
-			_handle_farm_relocated()
-			return
 		if reason in ["SESSION_REPLACED", "UNAUTHENTICATED", "ACCESS_REVOKED"]:
 			error = reason
 			if reason in ["SESSION_REPLACED", "UNAUTHENTICATED"]: Voice.leave()
@@ -303,9 +298,6 @@ func _process(delta: float) -> void:
 		crowd.step(delta, mover.position if mover else Vector3.ZERO)
 
 func _disconnected(reason: String) -> void:
-	if reason == "FARM_RELOCATED":
-		_handle_farm_relocated()
-		return
 	_generation += 1
 	if socket: socket.close()
 	socket = null
@@ -318,16 +310,6 @@ func _disconnected(reason: String) -> void:
 	_retry_at = _seconds() + minf(10, pow(2, mini(_attempt - 1, 4))) + randf() * .25
 	_update_badge()
 	connection_changed.emit()
-
-func _handle_farm_relocated() -> void:
-	if _relocation_notified: return
-	_relocation_notified = true
-	stop()
-	error = "FARM_RELOCATED"
-	_prediction_history.clear()
-	join_args.erase("travel_ticket")
-	_update_badge()
-	farm_relocated.emit()
 
 func _send(data: Dictionary) -> void:
 	if socket and socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
@@ -455,9 +437,6 @@ func _message(message: Dictionary) -> void:
 			floor_number = 0
 			rescued.emit()
 		"error":
-			if str(message.get("code", "")) == "FARM_RELOCATED":
-				_handle_farm_relocated()
-				return
 			var travel_failed := join_args.has("travel_ticket")
 			error = str(message.get("code", "ONLINE_UNAVAILABLE"))
 			# A full/private room is a decision, not an unbounded automatic retry loop.
@@ -990,7 +969,6 @@ static func error_text(code: String) -> String:
 	messages["POND_UPDATE_REQUIRED"] = "This pond needs an app update."
 	messages["POND_NOT_FOUND"] = "This pond is unavailable. Return to the map."
 	messages.merge({"PARTY_CHANGED": "The party changed. Choose your destination again.",
-		"FARM_RELOCATED": "This farm has moved. Reloading its new ground…",
 		"FARM_UPDATE_REQUIRED": "This server needs the farm update before you can join that teammate.",
 		"TARGET_OFFLINE": "This teammate is offline or outside an online space.",
 		"DESTINATION_CHANGED": "Your teammate moved. Choose the destination again.",
