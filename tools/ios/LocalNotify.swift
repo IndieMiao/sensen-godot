@@ -26,6 +26,7 @@ final class LocalNotify: NSObject, UNUserNotificationCenterDelegate {
     /// Godot's socket, the last one heard from: where NOTIFY_STATE goes when the app comes back.
     private var client: NWConnection?
     private var retryScheduled = false
+    private var awayTask = UIBackgroundTaskIdentifier.invalid
 
     @objc class func setup() {
         UNUserNotificationCenter.current().delegate = shared
@@ -42,13 +43,15 @@ final class LocalNotify: NSObject, UNUserNotificationCenterDelegate {
 
     /// Godot sends NOTIFY_AT from its own PAUSED notification, on the way out: keep the app up a moment so it arrives.
     @objc private func wentAway() {
-        var task = UIBackgroundTaskIdentifier.invalid
-        task = UIApplication.shared.beginBackgroundTask(withName: "LocalNotify") {
-            UIApplication.shared.endBackgroundTask(task)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            UIApplication.shared.endBackgroundTask(task)
-        }
+        guard awayTask == .invalid else { return }
+        awayTask = UIApplication.shared.beginBackgroundTask(withName: "LocalNotify") { [weak self] in self?.endAway() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.endAway() }
+    }
+
+    private func endAway() {
+        guard awayTask != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(awayTask)
+        awayTask = .invalid
     }
 
     private func startListener() {
