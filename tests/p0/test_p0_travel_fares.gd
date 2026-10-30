@@ -124,3 +124,31 @@ func test_welcome_back_says_the_pass_left() -> void:
 	v.travel.passes[LA].until = 1_000_000_000.0 + 7 * 3_600_000.0
 	assert_str(P0Map.welcome_back(v, LA)).is_equal("Welcome back · Day Pass 7h")
 	assert_str(P0Map.welcome_back(_view(), LA)).is_equal("Welcome back")
+
+## 周瑜 on #569: Trip 1 checks no wallet floor (the server's fareOf: only a fare over 0 does) — a wallet of 30 flies free.
+func test_trip_1_flies_with_a_wallet_under_the_floor() -> void:
+	var v := _view({}, {}, SF, 30, 0)
+	assert_dict(P0Travel.fare_gap(v, P0Travel.fare(v, SALINAS))).is_empty()
+	assert_str(str(P0Map.travel_card(v, SALINAS, {}, 0).blocked)).is_empty()
+
+## 周瑜 on #569: the view's clock moves on between reads — a Day Pass's time left runs down with it.
+func test_projecting_the_view_moves_its_clock_on() -> void:
+	var v := _view({LA: {n = 1}}, {LA: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 90_000.0}}, LA)
+	var later: Dictionary = P0Logic.project(v, 1000.0)
+	assert_float(float(later.now)).is_equal(1_000_001_000.0)
+	assert_float(P0Travel.pass_left_ms(later, LA)).is_equal(89_000.0)
+
+## Kind=need-energy keeps a fitted button's own padding and inset under its amber (周瑜 on #569).
+func test_need_energy_keeps_fit_and_inset() -> void:
+	var b := UiCommandButton.new("Fly")
+	b.fit_text = true
+	b.visual_inset_x = 6.0
+	add_child(auto_free(b))
+	b.reason = "Fly · Need 30 Energy"
+	b.need_energy = true
+	var box := b.get_theme_stylebox(&"normal")
+	assert_float(box.content_margin_left).is_less_equal(4.0)
+	if box is UiStyleBox:
+		assert_float((box as UiStyleBox).inset.x).is_equal(6.0)
+		assert_that((box as UiStyleBox).bg_color).is_equal(UiTokens.COLOR_WARNING_TINT)
+	assert_that(b.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)

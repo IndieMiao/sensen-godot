@@ -119,22 +119,8 @@ func _fit() -> void:
 	_fitting = true
 	for st in _STYLES: remove_theme_stylebox_override(st)
 	for c in _INKS: remove_theme_color_override(c)
-	if need_energy and is_unavailable() and not is_offline():
-		for st in _STYLES:
-			var sb := get_theme_stylebox(st)
-			if sb == null: continue
-			var t := sb.duplicate() as StyleBox
-			if t is UiStyleBox:
-				(t as UiStyleBox).bg_color = UiTokens.COLOR_WARNING_TINT
-				(t as UiStyleBox).border_width = 0.0
-			elif t is StyleBoxFlat:
-				(t as StyleBoxFlat).bg_color = UiTokens.COLOR_WARNING_TINT
-				(t as StyleBoxFlat).set_border_width_all(0)
-			add_theme_stylebox_override(st, t)
-		for c in _INKS: add_theme_color_override(c, UiTokens.COLOR_WARNING)
-		_fitting = false
-		return
-	if fit_text or visual_inset_x > 0.0:
+	var amber := need_energy and is_unavailable() and not is_offline()
+	if fit_text or visual_inset_x > 0.0 or amber:
 		for st in _STYLES:
 			var sb := get_theme_stylebox(st)
 			if sb == null: continue
@@ -145,7 +131,15 @@ func _fit() -> void:
 			if visual_inset_x > 0.0 and t is UiStyleBox:
 				var u := t as UiStyleBox
 				u.inset = Vector4(visual_inset_x, u.inset.y, visual_inset_x, u.inset.w)
+			if amber and t is UiStyleBox:   # Kind=need-energy over whatever fit and inset the button has (周瑜 on #569)
+				(t as UiStyleBox).bg_color = UiTokens.COLOR_WARNING_TINT
+				(t as UiStyleBox).border_width = 0.0
+			elif amber and t is StyleBoxFlat:
+				(t as StyleBoxFlat).bg_color = UiTokens.COLOR_WARNING_TINT
+				(t as StyleBoxFlat).set_border_width_all(0)
 			add_theme_stylebox_override(st, t)
+	if amber:
+		for c in _INKS: add_theme_color_override(c, UiTokens.COLOR_WARNING)
 	_fitting = false
 
 func is_unavailable() -> bool: return reason != ""
