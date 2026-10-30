@@ -104,6 +104,7 @@ func current() -> Dictionary:
 	var ms := Time.get_ticks_msec() - _received_ms
 	if ms != _projected_ms or not is_same(_projected_of, view):
 		_projected = P0Logic.project(view, float(ms))
+		if OS.has_feature("editor"): P0Logic.freeze(_projected)   # shared by every caller this millisecond (哪吒 on #573)
 		_projected_of = view
 		_projected_ms = ms
 	return _projected

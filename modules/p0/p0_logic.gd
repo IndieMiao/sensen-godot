@@ -1004,16 +1004,16 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		var cooking: Dictionary = own.call(v, "cooking")
 		# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,
 		# which may be the same dictionary in the server view, so each pot is copied and aged once and stays shared).
-		var copies := {}   # the view's pot → its aged copy
+		var copies: Array = []   # [the view's pot, its aged copy], by reference (a dictionary key would match by content)
 		var age := func(st) -> Variant:
 			if not (st is Dictionary): return st
-			for q in copies:
-				if is_same(q, st): return copies[q]
+			for pair in copies:
+				if is_same(pair[0], st): return pair[1]
 			var c: Dictionary = st.duplicate()
 			if c.has("ms") or c.has("ready_in"):
 				c["elapsed"] = float(c.get("elapsed", 0)) + elapsed_ms
 				c["ready_in"] = maxf(0.0, float(c.get("ready_in", 0)) - elapsed_ms)
-			copies[st] = c
+			copies.append([st, c])
 			return c
 		if cooking.get("stove") is Dictionary: cooking["stove"] = age.call(cooking.stove)
 		if cooking.get("stoves") is Array: cooking["stoves"] = (cooking.stoves as Array).map(age)

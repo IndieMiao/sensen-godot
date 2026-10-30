@@ -101,8 +101,21 @@ func test_the_sessions_view_is_read_only_in_the_editor_and_tests() -> void:
 	assert_bool((session.view.bag as Dictionary).is_read_only()).is_true()
 	assert_bool((session.view.bag.slots as Array).is_read_only()).is_true()
 	assert_bool((session.view.cooking.stoves[1] as Dictionary).is_read_only()).is_true()
-	# the projection's aged copies are its own and writable; the server's stay as they were
+	# the projection is shared by every caller in its millisecond: read-only too, aged copies and all (哪吒 on #573)
+	session.set("_received_ms", Time.get_ticks_msec() - 2000)
 	var p := session.current()
-	assert_float(float(session.view.energy.next_in)).is_equal(1000.0)
+	assert_bool(p.is_read_only()).is_true()
+	assert_bool((p.energy as Dictionary).is_read_only()).is_true()
+	assert_bool((p.cooking.stoves[1] as Dictionary).is_read_only()).is_true()
+	assert_float(float(session.view.energy.next_in)).is_equal(1000.0)   # the server's as it was
 	assert_bool(is_same(p.bag, session.view.bag)).is_true()
 	session.free()
+
+## Two pots alike but not the same dictionary stay two (a dictionary key would have matched them by content).
+func test_two_alike_pots_are_two_copies() -> void:
+	var view := _view()
+	view.cooking.stoves = [view.cooking.stove, view.cooking.stove.duplicate()]
+	var p := P0Logic.project(view, 1000.0)
+	assert_bool(is_same(p.cooking.stove, p.cooking.stoves[0])).is_true()
+	assert_bool(is_same(p.cooking.stoves[0], p.cooking.stoves[1])).is_false()
+	assert_float(float(p.cooking.stoves[1].ready_in)).is_equal(3000.0)
