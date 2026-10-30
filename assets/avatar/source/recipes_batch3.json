@@ -1,0 +1,259 @@
+{
+	"version": 1.0,
+	"base": {
+		"fbx": "res://assets/avatar/source/base/SK_DtBase.fbx",
+		"anim_fbx": {
+			"idle": "res://assets/avatar/source/base/dt@idle02.fbx",
+			"walk": "res://assets/avatar/source/base/dt@walk01.fbx",
+			"run": "res://assets/avatar/source/base/dt@run01.fbx"
+		}
+	},
+	"parts": [
+		{
+			"id": "hairhat51_npc_lena",
+			"slot": "hairHat",
+			"attach": "socket",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/hairhat51_npc_lena/SM_hairHat51.fbx",
+			"mesh_name": null,
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat51_npc_lena/T_lena_hairHat51_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.3,
+						"smoothness": 0.1,
+						"ao_strength": 0.1,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
+		},
+		{
+			"id": "hairhat36_npc_rafa",
+			"slot": "hairHat",
+			"attach": "socket",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/hairhat36_npc_rafa/SM_hairHat36.fbx",
+			"mesh_name": null,
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat36_npc_rafa/T_rafa_hairHat36_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.6,
+						"smoothness": 0.1,
+						"ao_strength": 0.3,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
+		},
+		{
+			"id": "cloth1_1_npc_rafa",
+			"slot": "cloth",
+			"attach": "mesh",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/cloth1_1_npc_rafa/SK_dt_skin01.fbx",
+			"mesh_name": "cloth",
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/cloth1_1_npc_rafa/T_rafa_cloth01_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.3,
+						"smoothness": 0.1,
+						"ao_strength": 0.3,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
+		},
+		{
+			"id": "hairhat41_npc_nadia_baker",
+			"slot": "hairHat",
+			"attach": "socket",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/hairhat41_npc_nadia_baker/SM_hairHat41.fbx",
+			"mesh_name": null,
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/hairhat41_npc_nadia_baker/T_nadia_baker_hairHat41_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.7,
+						"smoothness": 0.1,
+						"ao_strength": 0.1,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
+		},
+		{
+			"id": "cloth1_1_npc_nadia",
+			"slot": "cloth",
+			"attach": "mesh",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/cloth1_1_npc_nadia/SK_dt_skin01.fbx",
+			"mesh_name": "cloth",
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/cloth1_1_npc_nadia/T_nadia_apron_cloth01_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.3,
+						"smoothness": 0.1,
+						"ao_strength": 0.3,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
+		},
+		{
+			"id": "cloth1_npc_lou",
+			"slot": "cloth",
+			"attach": "mesh",
+			"tier": 0,
+			"unity_guid": "",
+			"fbx": "res://assets/avatar/source/cloth1_npc_lou/SK_dt_skin01.fbx",
+			"mesh_name": "cloth",
+			"thumb_src": null,
+			"src_files": [],
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"materials": [
+				{
+					"albedo": "res://assets/avatar/source/cloth1_npc_lou/T_lou_cloth01_D.png",
+					"ao": null,
+					"floats": {
+						"emission_strength": 0.3,
+						"smoothness": 0.1,
+						"ao_strength": 0.3,
+						"diffuse_strength": 1.0,
+						"rim_strength": 0.0
+					}
+				}
+			]
+		}
+	]
+}
