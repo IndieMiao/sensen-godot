@@ -86,8 +86,8 @@ stone_diameter=2*np.linalg.norm(stone[:,[0,2]],axis=1).max()
 water = head['v'][np.array([any(np.allclose(c[:3],palette_linear[k],atol=2/65535) for k in ['water','water_light','water_shade']) for c in head['c']])]
 cap_diameter=2*np.linalg.norm(water[:,[0,2]],axis=1).max()
 check(head_diameter<=.400001,'head swept radial diameter <=0.40m')
-check(stone_diameter<=.300001,'stone pad diameter <=0.30m')
-check(.08<=cap_diameter<=.100001,'actual blue cap diameter 0.08-0.10m')
+check(.239999<=stone_diameter<=.260001,'v1.1 stone pad diameter 0.24-0.26m')
+check(abs(cap_diameter-.10)<1e-6,'v1.1 actual blue cap diameter 0.10m')
 for angle in [0,45,90,135,180,225,270,315]:
     r=math.radians(angle); rotation=np.array([[math.cos(r),0,math.sin(r)],[0,1,0],[-math.sin(r),0,math.cos(r)]])
     rotated=(head['v']-[0,.55,0])@rotation.T+[0,.55,0]
@@ -98,8 +98,8 @@ for angle in [0,45,90,135,180,225,270,315]:
 arm_centres=np.array(entry['arm_centreline_right_m'])
 for i in [1,2,3]:
     distances=np.linalg.norm(head['v']-arm_centres[i],axis=1)
-    ring=head['v'][np.abs(distances-.018)<1e-6]
-    check(len(ring)>=8,'actual curved arm ring '+str(i)+' radius 0.018m')
+    ring=head['v'][np.abs(distances-.020)<1e-6]
+    check(len(ring)>=8,'v1.1 actual curved arm ring '+str(i)+' radius 0.020m')
 check(arm_centres[2,1]<arm_centres[0,1]-.015 and arm_centres[-1,1]>arm_centres[2,1]+.03,'arm centreline descends then rises')
 plot_doc,plot_data=load_glb(KIT/'plot.glb'); p=plot_doc['meshes'][0]['primitives'][0]
 pv=np.array(accessor(plot_doc,plot_data,p['attributes']['POSITION'])); pc=np.array(accessor(plot_doc,plot_data,p['attributes']['COLOR_0']))
@@ -124,7 +124,7 @@ check(subprocess.check_output(['git','show',BASELINE+':assets/farm/art/plot.glb'
 check(hashlib.sha256((KIT/'sprinkler.glb').read_bytes()).hexdigest()==entry['sha256'],'manifest SHA-256 correct')
 report['measurements']={'triangles':total,'bounds':[lo.tolist(),hi.tolist()], 'size_xyz_m':(hi-lo).tolist(),
     'head_swept_diameter_m':float(head_diameter),'stone_diameter_m':float(stone_diameter),'cap_diameter_m':float(cap_diameter),
-    'arm_section_diameter_m':.036,'plot_min_edge_clearance_m':float(.47-head_diameter/2)}
+    'arm_section_diameter_m':.040,'plot_min_edge_clearance_m':float(.47-head_diameter/2)}
 report['colour_comparison']={'plot_rim_linear':list(common),'plot_rim_srgb':rim.tolist(),
     'wood_source':'assets/farm/art/storage.glb: most frequent vertex colour',
     'source_correction':'plot.glb is an earthen bed without a wood frame; compare its real soil rim and a separate real farm wood sample.',

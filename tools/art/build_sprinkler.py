@@ -28,9 +28,9 @@ PALETTE = {
     'water': '8cc7f2', 'water_light': 'a8d5f5', 'water_shade': '74b4e3',
     'nozzle_dot': '665d36',
 }
-ARM = [(.047, .540, 0), (.078, .520, 0), (.108, .519, 0),
-       (.137, .538, 0), (.155, .557, 0)]
-ARM_RADIUS = .018
+ARM = [(.059, .540, 0), (.089, .520, 0), (.116, .519, 0),
+       (.145, .538, 0), (.160, .557, 0)]
+ARM_RADIUS = .020
 
 
 def colour_faces(obj, base, light, shade):
@@ -45,20 +45,18 @@ def capped_profile(name, profile, colour, segments=12, at=(0, 0, 0)):
 
 
 def build_base():
-    obj = capped_profile('Shallow bevelled stone mounting pad',
-                         [(.124, 0), (.14, .011), (.14, .034), (.121, .047)], 'stone', 12)
+    obj = capped_profile('Round edged stone mounting pad',
+                         [(.110, 0), (.121, .004), (.125, .012),
+                          (.125, .028), (.121, .039), (.110, .047)], 'stone', 16)
     colour_faces(obj, 'stone', 'stone_light', 'stone_shade')
-    # Four broad colour sectors suggest paving without joints or extra small parts.
-    for face in obj.data.polygons:
-        if face.normal.z > .2 and face.index%6 in [0, 1]: face.material_index = 0
     obj = capped_profile('Stout sage green riser',
-                         [(.038, .036), (.046, .048), (.046, .491), (.038, .508)], 'sage', 10)
+                         [(.048, .036), (.055, .050), (.050, .492), (.044, .512)], 'sage', 10)
     colour_faces(obj, 'sage', 'sage_light', 'sage_shade')
 
 
 def build_head():
     obj = capped_profile('Rounded yellow brass rotating hub',
-                         [(.047, .505), (.057, .516), (.057, .559), (.047, .570)], 'brass', 12)
+                         [(.060, .502), (.070, .514), (.070, .562), (.060, .572)], 'brass', 12)
     colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
     for sign, label in [(-1, 'Left'), (1, 'Right')]:
         points = [(sign*x, y, z) for x, y, z in ARM]
@@ -66,19 +64,19 @@ def build_head():
         colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
         # A rounded axial profile; the small centre disk is coplanar paint, no hole.
         obj = capped_profile(label+' round nozzle with painted centre',
-                             [(.021, 0), (.031, .007), (.032, .023),
-                              (.025, .034), (.006, .034)], 'brass', 10)
+                             [(.020, 0), (.025, .007), (.026, .023),
+                              (.021, .034), (.006, .034)], 'brass', 10)
         colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
         obj.data.materials.append(g.MATS['nozzle_dot'])
         for face in obj.data.polygons:
             if all(abs(obj.data.vertices[v].co.z-.034)<1e-6 and
                    obj.data.vertices[v].co.xy.length<.00601 for v in face.vertices):
                 face.material_index = 3
-        obj.location = g.v((sign*.154, .557, 0))
+        obj.location = g.v((sign*.158, .557, 0))
         axis = g.v((sign*.98, .20, 0)).normalized()
         obj.rotation_euler = axis.to_track_quat('Z', 'Y').to_euler()
     # Eight-sided teardrop; a single top vertex avoids a collapsed ring.
-    rings = [(.018, .563), (.039, .571), (.045, .587), (.030, .608), (.012, .629)]
+    rings = [(.020, .563), (.043, .571), (.050, .587), (.033, .608), (.013, .629)]
     vertices = [(r*math.cos(i*math.tau/8), y, r*math.sin(i*math.tau/8))
                 for r, y in rings for i in range(8)]
     vertices.append((0, .647, 0))
@@ -210,7 +208,10 @@ def main():
              'head_pivot': list(HEAD), 'spray_origin': list(HEAD), 'front': '+Z',
              'pivot': 'plot bed centre; place root at BED_H=0.15 m; unit scale',
              'material': 'FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()',
-             'arm_diameter_m': ARM_RADIUS*2, 'stone_diameter_m': .28, 'cap_diameter_m': .09,
+             'art_revision': 'v1.1',
+             'arm_diameter_m': ARM_RADIUS*2, 'stone_diameter_m': .25, 'cap_diameter_m': .10,
+             'riser_diameter_base_m': .11, 'riser_diameter_top_m': .10,
+             'hub_diameter_m': .14, 'hub_height_m': .07, 'nozzle_diameter_m': .052,
              'palette_srgb': PALETTE, 'arm_centreline_right_m': ARM,
              'nozzle_dot': 'one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh',
              'runtime_note': 'head static by default; consumer may rotate around Y for 2-3 s on watering / tap'}

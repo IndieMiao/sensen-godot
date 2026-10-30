@@ -204,9 +204,23 @@ func run():
 	await capture("default_43deg_360")
 	game_camera(.8); check(is_equal_approx(cam.size,8.4),"actual minimum zoom 0.8 width 8.4m")
 	await capture("minimum_zoom_360")
-	vp.size=Vector2i(1080,2400); game_camera(); await capture("default_43deg_hd")
+	var revision_only = "--proportion-revision" in OS.get_cmdline_user_args()
+	if not revision_only:
+		vp.size=Vector2i(1080,2400); game_camera(); await capture("default_43deg_hd")
 	rig.visible=false; vp.size=Vector2i(1000,1000)
 	pose(Vector3.ZERO,4.2,90,0); await capture("top")
+	if not revision_only:
+		await supplemental_views()
+	await occlusion_controls()
+	report.renderer={"method":RenderingServer.get_current_rendering_method(),"adapter":RenderingServer.get_video_adapter_name()}
+	check(report.renderer.method=="mobile","actual Mobile renderer")
+	report.passed=report.checks.all(func(c): return c.passed)
+	report.failures=report.checks.filter(func(c): return not c.passed)
+	FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+	print("SPRINKLER_GODOT ",report.passed," checks=",report.checks.size())
+	get_tree().quit(0 if report.passed else 1)
+
+func supplemental_views():
 	for crop in crops: crop.visible=false
 	for bed in beds: bed.visible=bed.position.length()<.01
 	vp.size=Vector2i(600,600); pose(Vector3(0,.46,0),1.08,43,14.5)
@@ -222,11 +236,3 @@ func run():
 	vp.size=Vector2i(1000,1000); pose(Vector3(0,.28,.25),2.10,62,0)
 	await capture("brass_wood")
 	plate_a.free(); plate_b.free(); plate_c.free()
-	await occlusion_controls()
-	report.renderer={"method":RenderingServer.get_current_rendering_method(),"adapter":RenderingServer.get_video_adapter_name()}
-	check(report.renderer.method=="mobile","actual Mobile renderer")
-	report.passed=report.checks.all(func(c): return c.passed)
-	report.failures=report.checks.filter(func(c): return not c.passed)
-	FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
-	print("SPRINKLER_GODOT ",report.passed," checks=",report.checks.size())
-	get_tree().quit(0 if report.passed else 1)
