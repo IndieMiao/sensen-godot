@@ -322,17 +322,16 @@ func _show_spot(where: String) -> void:
 
 ## The outposts' online counts for the Notice Board (q(164)): one GET /p0/presence, as the map polls it; a failure
 ## leaves the board without person badges (nobody shown is never wrong for a moment).
-var _presence: HTTPRequest
+var _presence: P0HttpRequest
 func _ask_presence() -> void:
 	if not is_instance_valid(_presence):
-		_presence = HTTPRequest.new()
-		_presence.timeout = 8.0
+		_presence = P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
 	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
 	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.request(session.base_url + "/p0/presence", headers)
+	_presence.send(session.base_url + "/p0/presence", headers)
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return

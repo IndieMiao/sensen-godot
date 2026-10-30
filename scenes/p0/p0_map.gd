@@ -32,7 +32,7 @@ const SHOW_ZOOM := 15.5
 const LOCATE_ZOOM := 14.0
 
 var rt: P0Runtime
-var _presence: HTTPRequest
+var _presence: P0HttpRequest
 var _online := {}   # outpost id → players online across its rooms
 var _marks_sig := ""
 
@@ -431,8 +431,7 @@ func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
 # ---------------------------------------------------------------- outpost online counts
 func _start_presence() -> void:
 	if is_instance_valid(_presence): return
-	_presence = HTTPRequest.new()
-	_presence.timeout = 8.0
+	_presence = P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 	add_child(_presence)
 	_presence.request_completed.connect(_on_presence)
 	var timer := Timer.new()
@@ -447,7 +446,7 @@ func _poll_presence() -> void:
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
 	var headers := PackedStringArray(["x-p0-player: " + rt.session.player_id])
 	if rt.session.access_key != "": headers.append("x-p0-key: " + rt.session.access_key)   # the demo server's key
-	_presence.request(rt.session.base_url + "/p0/presence", headers)
+	_presence.send(rt.session.base_url + "/p0/presence", headers)
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200 or city_map == null: return
