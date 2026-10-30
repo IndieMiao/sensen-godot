@@ -146,7 +146,7 @@
       },
       {
         "passed": true,
-        "check": "head swept radial diameter <=0.40m"
+        "check": "amended v1.2 head uses full 0.40m swept diameter"
       },
       {
         "passed": true,
@@ -155,6 +155,14 @@
       {
         "passed": true,
         "check": "v1.1 actual blue cap diameter 0.10m"
+      },
+      {
+        "passed": true,
+        "check": "fuller blue cap actual height 0.092m"
+      },
+      {
+        "passed": true,
+        "check": "fuller cap upper belly is 0.088m across at y=0.489m"
       },
       {
         "passed": true,
@@ -254,6 +262,10 @@
       },
       {
         "passed": true,
+        "check": "sage saturation increases moderately from the prior grey-green"
+      },
+      {
+        "passed": true,
         "check": "brass brighter than riser"
       },
       {
@@ -270,53 +282,47 @@
       },
       {
         "passed": true,
-        "check": "v1.1 head local POSITION retained; only its node lowered"
+        "check": "first v1.2 base geometry unchanged; only riser colours updated"
       },
       {
         "passed": true,
-        "check": "v1.1 head normals retained within 0.02 degrees"
+        "check": "first v1.2 nodes and pivots unchanged"
       },
       {
         "passed": true,
-        "check": "v1.1 head local COLOR_0 retained; only its node lowered"
+        "check": "stone pad geometry retained"
       },
       {
         "passed": true,
-        "check": "v1.1 head topology retained"
-      },
-      {
-        "passed": true,
-        "check": "v1.1 stone pad geometry retained"
-      },
-      {
-        "passed": true,
-        "check": "v1.1 material retained"
+        "check": "shared material retained"
       }
     ],
     "measurements": {
-      "triangles": 778,
+      "triangles": 798,
       "bounds": [
         [
-          -0.19530698657035828,
+          -0.199889674782753,
           0.0,
           -0.125
         ],
         [
-          0.19530698657035828,
-          0.5170000195503235,
+          0.199889674782753,
+          0.5249999761581421,
           0.125
         ]
       ],
       "size_xyz_m": [
-        0.39061397314071655,
-        0.5170000195503235,
+        0.399779349565506,
+        0.5249999761581421,
         0.25
       ],
-      "head_swept_diameter_m": 0.3908295321776692,
+      "head_swept_diameter_m": 0.3999899693098045,
       "stone_diameter_m": 0.25,
-      "cap_diameter_m": 0.10000000461060017,
+      "cap_diameter_m": 0.10000000149011612,
       "arm_section_diameter_m": 0.04,
-      "plot_min_edge_clearance_m": 0.2745852339111654
+      "cap_height_m": 0.09199997782707214,
+      "cap_upper_belly_diameter_m": 0.08800000196902406,
+      "plot_min_edge_clearance_m": 0.2700050153450977
     },
     "nodes": {
       "base": {
@@ -341,7 +347,7 @@
         ]
       },
       "head": {
-        "triangles": 514,
+        "triangles": 534,
         "surfaces": 1,
         "pivot": [
           0.0,
@@ -350,23 +356,17 @@
         ],
         "world_bounds": [
           [
-            -0.19530698657035828,
-            0.36995941400527954,
+            -0.199889674782753,
+            0.3698972761631012,
             -0.07000000029802322
           ],
           [
-            0.19530698657035828,
-            0.5170000195503235,
+            0.199889674782753,
+            0.5249999761581421,
             0.07000000029802322
           ]
         ]
       }
-    },
-    "v1_1_head_preservation": {
-      "POSITION_maximum_component_error": 5.960464477539063e-08,
-      "NORMAL_maximum_component_error": 9.071826934814453e-05,
-      "maximum_normal_angle_degrees": 0.005457843618410564,
-      "COLOR_0_maximum_component_error": 0.0
     },
     "colour_comparison": {
       "plot_rim_linear": [
@@ -407,17 +407,20 @@
         0.22
       ],
       "riser_srgb": [
-        0.6509803921568628,
-        0.7019607843137254,
-        0.592156862745098
-      ]
+        0.6274509803921569,
+        0.7294117647058823,
+        0.5333333333333333
+      ],
+      "prior_riser_saturation": 0.1564245810055865,
+      "riser_saturation": 0.26881720430107525,
+      "crop_leaf_saturation": 0.6615384615384616
     },
     "passed": true,
     "failures": []
   },
   "godot": {
     "art_revision": "v1.2",
-    "asset_sha256": "951efaf08e2f51b59dc4a40e9b554110f86840565263fec5246c497fe91809f0",
+    "asset_sha256": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
     "avatar": {
       "height_m": 1.745,
       "measured_source_height_m": 1.71833898495782,
@@ -435,11 +438,11 @@
         ],
         "sprinkler_bounds_px": [
           [
-            169.721618652344,
-            401.292938232422
+            169.483932495117,
+            400.731109619141
           ],
           [
-            190.278381347656,
+            190.516067504883,
             425.769866943359
           ]
         ],
@@ -456,11 +459,11 @@
         ],
         "sprinkler_bounds_px": [
           [
-            171.777297973633,
-            401.034332275391
+            171.587158203125,
+            400.584899902344
           ],
           [
-            188.222702026367,
+            188.412841796875,
             420.615905761719
           ]
         ],
@@ -477,75 +480,96 @@
         ],
         "sprinkler_bounds_px": [
           [
-            453.498321533203,
+            452.4072265625,
             470.238098144531
           ],
           [
-            546.501647949219,
+            547.5927734375,
             529.761901855469
           ]
         ],
         "yaw": 0.0
       },
       {
-        "camera_width_m": 1.08000004291534,
+        "camera_width_m": 6.71999979019165,
         "head_angle": 0.0,
-        "id": "comparison_v1",
+        "id": "comparison_default_v1_1",
         "pitch": 43.0,
         "size": [
-          600,
-          600
+          360,
+          800
         ],
         "sprinkler_bounds_px": [
           [
-            194.855422973633,
-            138.695251464844
+            169.72135925293,
+            396.199523925781
           ],
           [
-            405.1416015625,
-            448.462707519531
+            190.278366088867,
+            425.77001953125
           ]
         ],
         "yaw": 14.4999990463257
       },
       {
-        "camera_width_m": 1.08000004291534,
+        "camera_width_m": 8.39999961853027,
         "head_angle": 0.0,
-        "id": "comparison_v1_1",
+        "id": "comparison_minimum_v1_1",
         "pitch": 43.0,
         "size": [
-          600,
-          600
+          360,
+          800
         ],
         "sprinkler_bounds_px": [
           [
-            193.406631469727,
-            138.695251464844
+            171.777084350586,
+            396.959594726562
           ],
           [
-            406.590454101562,
-            445.352416992188
+            188.222686767578,
+            420.615966796875
           ]
         ],
         "yaw": 14.4999990463257
       },
       {
-        "camera_width_m": 1.08000004291534,
+        "camera_width_m": 6.71999979019165,
         "head_angle": 0.0,
-        "id": "comparison_v1_2",
+        "id": "comparison_default_v1_2",
         "pitch": 43.0,
         "size": [
-          600,
-          600
+          360,
+          800
         ],
         "sprinkler_bounds_px": [
           [
-            193.409408569336,
-            191.515838623047
+            169.483932495117,
+            400.731109619141
           ],
           [
-            406.590576171875,
-            445.350830078125
+            190.516067504883,
+            425.769866943359
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 8.39999961853027,
+        "head_angle": 0.0,
+        "id": "comparison_minimum_v1_2",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            171.587158203125,
+            400.584899902344
+          ],
+          [
+            188.412841796875,
+            420.615905761719
           ]
         ],
         "yaw": 14.4999990463257
@@ -561,11 +585,11 @@
         ],
         "sprinkler_bounds_px": [
           [
-            509.164855957031,
-            1203.87878417969
+            508.451812744141,
+            1202.193359375
           ],
           [
-            570.835144042969,
+            571.548156738281,
             1277.3095703125
           ]
         ],
@@ -582,11 +606,11 @@
         ],
         "sprinkler_bounds_px": [
           [
-            509.164855957031,
-            1203.87878417969
+            508.451812744141,
+            1202.193359375
           ],
           [
-            570.835144042969,
+            571.548156738281,
             1277.3095703125
           ]
         ],
@@ -771,19 +795,15 @@
         "passed": true
       },
       {
-        "check": "comparison v1 unit scale",
-        "passed": true
-      },
-      {
-        "check": "saved comparison_v1",
-        "passed": true
-      },
-      {
         "check": "comparison v1_1 unit scale",
         "passed": true
       },
       {
-        "check": "saved comparison_v1_1",
+        "check": "saved comparison_default_v1_1",
+        "passed": true
+      },
+      {
+        "check": "saved comparison_minimum_v1_1",
         "passed": true
       },
       {
@@ -791,7 +811,11 @@
         "passed": true
       },
       {
-        "check": "saved comparison_v1_2",
+        "check": "saved comparison_default_v1_2",
+        "passed": true
+      },
+      {
+        "check": "saved comparison_minimum_v1_2",
         "passed": true
       },
       {
@@ -808,16 +832,12 @@
       }
     ],
     "comparison_sources": {
-      "v1": {
-        "commit": "a9f7d142",
-        "sha256": "b5a0b7dffafdefbf72e90a662c9095ed0b85b37f25d2bae3d0bf6d0385f5cf73"
-      },
       "v1_1": {
         "commit": "cf97f40b",
         "sha256": "9359d5cc430b3693d6ed58c17ad6833d46d128c961368fa4f8f6f60f10f1453c"
       },
       "v1_2": {
-        "sha256": "951efaf08e2f51b59dc4a40e9b554110f86840565263fec5246c497fe91809f0",
+        "sha256": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
         "source": "assets/farm/art/sprinkler.glb"
       }
     },
@@ -957,7 +977,7 @@
           0.569999992847443,
           0.0
         ],
-        "max_radius_m": 0.195414766669273
+        "max_radius_m": 0.19999498128891
       },
       {
         "angle": 45,
@@ -966,7 +986,7 @@
           0.569999992847443,
           0.0
         ],
-        "max_radius_m": 0.195414766669273
+        "max_radius_m": 0.19999498128891
       },
       {
         "angle": 90,
@@ -975,7 +995,7 @@
           0.569999992847443,
           0.0
         ],
-        "max_radius_m": 0.195414766669273
+        "max_radius_m": 0.19999498128891
       }
     ]
   },
@@ -1032,9 +1052,17 @@
       {
         "passed": true,
         "check": "v1.1 cap actual diameter 0.10m"
+      },
+      {
+        "passed": true,
+        "check": "amended v1.2 cap height 0.092m"
+      },
+      {
+        "passed": true,
+        "check": "amended v1.2 cap ten radial segments at upper belly"
       }
     ],
-    "source_sha256": "6ad31c374badadfc2ba8a6fa87ae75ac00166822311756bc016d26482a9d5ba9",
+    "source_sha256": "fb963cff814fee339fa2dbeab4f979a9169f184d63bdc378fe216119cc2884d6",
     "parts": {
       "base": {
         "source_objects": 2,
@@ -1064,7 +1092,7 @@
       "Blue water droplet cap": {
         "diameter_m": 0.10000000353902572,
         "bottom_m": 0.43299999833106995,
-        "top_m": 0.5170000195503235
+        "top_m": 0.5249999761581421
       },
       "riser_at_0.05m": {
         "diameter_m": 0.13000000196795622
@@ -1082,8 +1110,8 @@
     "passed": true
   },
   "reproducibility": {
-    "before": "951efaf08e2f51b59dc4a40e9b554110f86840565263fec5246c497fe91809f0",
-    "after": "951efaf08e2f51b59dc4a40e9b554110f86840565263fec5246c497fe91809f0",
+    "before": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
+    "after": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
     "byte_identical": true
   },
   "occlusion": {

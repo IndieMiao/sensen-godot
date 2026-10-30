@@ -74,18 +74,23 @@ text(draw,(28,1157),'框线为真实 plot.glb 的 XZ 包围盒；没有伸入走
 save(top,'top')
 
 if VERSION=='v1.2':
-    comparison=Image.new('RGB',(1800,760),'#f5f7f3'); draw=ImageDraw.Draw(comparison)
-    text(draw,(30,14),'SGODOT-244 / v1 → v1.1 → v1.2 / 43° 局部对比 · 黄忠',29)
     ids={c['id'] for c in runtime['captures']}
-    for i,(revision,title) in enumerate([
-        ('v1','v1 / H 0.647 m / 立杆 Ø0.092 m'),
-        ('v1_1','v1.1 / H 0.647 m / 立杆 Ø0.11 → 0.10 m'),
-        ('v1_2','v1.2 / H 0.517 m / 立杆 Ø0.13 → 0.11 m')]):
-        assert 'comparison_'+revision in ids
-        comparison.paste(raw('comparison_'+revision),(i*600,65))
-        text(draw,(i*600+18,681),title,21)
-    text(draw,(30,721),'同一 43° / 14.5°、同光同材质、单位比例；视宽 1.08 m 的局部观察图，未分别缩放模型。',22)
-    save(comparison,'comparison_43deg')
+    for mode,title,width in [('default','43° 默认镜头',6.72),('minimum','43° 最远缩放 0.8',8.40)]:
+        comparison=Image.new('RGB',(744,936),'#f5f7f3'); draw=ImageDraw.Draw(comparison)
+        text(draw,(16,10),'SGODOT-244 / v1.1 与 v1.2 / '+title,23)
+        for i,(revision,label) in enumerate([
+            ('v1_1','v1.1 / 778 tris / H 0.647 m'),
+            ('v1_2','v1.2 / %d tris / H %.3f m'%(entry['triangles'],measure['size_xyz_m'][1]))]):
+            capture_id='comparison_'+mode+'_'+revision
+            assert capture_id in ids
+            frame=raw(capture_id)
+            assert frame.size==(360,800)
+            x=12+i*372
+            comparison.paste(frame,(x,70))
+            text(draw,(x+6,45),label,16)
+        text(draw,(16,881),'黄忠 · 每侧原生 360 × 800 · 视宽 %.2f m · 人物 1.745 m'%width,19)
+        text(draw,(16,910),'同光同机位同摆放；未裁切、未分别放大模型或画面。',18)
+        save(comparison,'comparison_'+mode+'_360')
 
 if not REVISION:
     rotation=Image.new('RGB',(1800,735),'#f5f7f3'); draw=ImageDraw.Draw(rotation)
@@ -141,7 +146,9 @@ if REVISION:
              ['立杆上段直径 m',measurements['riser_at_0.362m']['diameter_m'],'0.11'],
              ['轮毂直径 m',hub['diameter_m'],'0.13-0.14'],
              ['轮毂高度 m',hub['top_m']-hub['bottom_m'],'约 0.07'],
-             ['喷嘴直径 m',measurements['Left nozzle']['diameter_m'],'约 0.05']]
+             ['喷嘴直径 m',measurements['Left nozzle']['diameter_m'],'约 0.05'],
+             ['蓝帽高度 m',measure['cap_height_m'],'圆鼓加高'],
+             ['蓝帽上腹直径 m',measure['cap_upper_belly_diameter_m'],'y=0.489 m 处 Ø0.088']]
 with (DOC/(PREFIX+'measurements.csv')).open('w',newline='') as f:
     writer=csv.writer(f,lineterminator='\n'); writer.writerow(['项目','实测值','要求/说明']);writer.writerows(rows)
 table=['# SGODOT-244 实测尺寸','', '黄忠 · 2026-10-30。GLB 解码顶点和 Godot 实际导入结果。','',

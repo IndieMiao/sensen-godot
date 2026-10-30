@@ -2,7 +2,7 @@
 
 Author: 黄忠. Dimensions follow the supplied v1.1 specification; the reference image only guides silhouette and palette.
 
-Current model revision v1.2 follows `revision-v1.2.md`: head lowered to 0.42 m, total height 0.517 m, riser taper 0.13 to 0.11 m. The v1.1 head/pad dimensions and 778 triangles are retained. Previous reference, specification and revision notes remain archived unchanged.
+Current model revision v1.2 follows `revision-v1.2.md` including Plane comment `217ba43a`: head lowered to 0.42 m, total height 0.525 m, riser taper 0.13 to 0.11 m with a greener palette. The head fills the 0.40 m envelope; its 0.10 m cap is rounder/taller. There are 798 triangles. Previous reference, specification and revision notes remain archived unchanged.
 
 `sprinkler_244.blend` retains eight named parts in `Sprinkler_base` and `Sprinkler_head`. The base empty is at the bed origin, and the head empty and spray marker are at Godot `(0, 0.42, 0)` (Blender Z up). The source uses Godot `(x, y, z)` mapped to Blender `(x, -z, y)`.
 

@@ -228,13 +228,12 @@ func run():
 func revision_comparison():
 	var current=sprinkler
 	current.visible=false
-	for crop in crops: crop.visible=false
-	for bed in beds: bed.visible=bed.position.length()<.01
-	rig.visible=false
-	vp.size=Vector2i(600,600)
-	pose(Vector3(0,.40,0),1.08,43,14.5)
+	for crop in crops: crop.visible=true
+	for bed in beds: bed.visible=true
+	rig.visible=true
+	vp.size=Vector2i(360,800)
 	report.comparison_sources=JSON.parse_string(FileAccess.get_file_as_string("res://references/manifest.json"))
-	for version in ["v1","v1_1","v1_2"]:
+	for version in ["v1_1","v1_2"]:
 		if version=="v1_2":
 			sprinkler=current
 		else:
@@ -246,7 +245,10 @@ func revision_comparison():
 		sprinkler.visible=true
 		head=sprinkler.find_child("head",true,false)
 		check(sprinkler.scale==Vector3.ONE,"comparison "+version+" unit scale")
-		await capture("comparison_"+version)
+		game_camera()
+		await capture("comparison_default_"+version)
+		game_camera(.8)
+		await capture("comparison_minimum_"+version)
 		if version!="v1_2": sprinkler.free()
 	sprinkler=current
 	head=current.find_child("head",true,false)

@@ -85,9 +85,13 @@ stone = base['v'][base['v'][:,1]<.048]
 stone_diameter=2*np.linalg.norm(stone[:,[0,2]],axis=1).max()
 water = head['v'][np.array([any(np.allclose(c[:3],palette_linear[k],atol=2/65535) for k in ['water','water_light','water_shade']) for c in head['c']])]
 cap_diameter=2*np.linalg.norm(water[:,[0,2]],axis=1).max()
-check(head_diameter<=.400001,'head swept radial diameter <=0.40m')
+check(.3999<=head_diameter<=.400001,'amended v1.2 head uses full 0.40m swept diameter')
 check(.239999<=stone_diameter<=.260001,'v1.1 stone pad diameter 0.24-0.26m')
 check(abs(cap_diameter-.10)<1e-6,'v1.1 actual blue cap diameter 0.10m')
+check(abs(water[:,1].max()-water[:,1].min()-.092)<1e-6,'fuller blue cap actual height 0.092m')
+cap_upper=water[np.abs(water[:,1]-.489)<1e-6]
+check(len(cap_upper)>=10 and abs(2*np.linalg.norm(cap_upper[:,[0,2]],axis=1).max()-.088)<1e-6,
+      'fuller cap upper belly is 0.088m across at y=0.489m')
 for angle in [0,45,90,135,180,225,270,315]:
     r=math.radians(angle); rotation=np.array([[math.cos(r),0,math.sin(r)],[0,1,0],[-math.sin(r),0,math.cos(r)]])
     rotated=(head['v']-[0,.42,0])@rotation.T+[0,.42,0]
@@ -116,54 +120,45 @@ check(hue_gap>=12 and 43<=hue(brass)<=60,'yellow brass hue separates from actual
 check(abs(hue(blue)-hue([.55,.78,.95]))<1,'blue hue matches COVER_TINT within 1 degree')
 leaf=np.array([.34,.65,.22])
 check(colorsys.rgb_to_hsv(*sage)[1]<colorsys.rgb_to_hsv(*leaf)[1] and np.dot(linear(sage),[.2126,.7152,.0722])>np.dot(linear(leaf),[.2126,.7152,.0722]), 'sage riser is greyer and lighter than actual crop leaf')
+old_sage=np.array([166,179,151])/255
+old_saturation=colorsys.rgb_to_hsv(*old_sage)[1]
+new_saturation=colorsys.rgb_to_hsv(*sage)[1]
+check(.08<new_saturation-old_saturation<.15,'sage saturation increases moderately from the prior grey-green')
 check(np.dot(linear(brass),[.2126,.7152,.0722])>np.dot(linear(sage),[.2126,.7152,.0722]),'brass brighter than riser')
 baseline_manifest=json.loads(subprocess.check_output(['git','show',BASELINE+':assets/farm/art/manifest.json'],cwd=ROOT))
 current=json.loads((KIT/'manifest.json').read_text()); current['assets'].pop('sprinkler')
 check(current==baseline_manifest,'all pre-existing manifest entries unchanged')
 check(subprocess.check_output(['git','show',BASELINE+':assets/farm/art/plot.glb'],cwd=ROOT)==(KIT/'plot.glb').read_bytes(),'original plot bytes unchanged')
 check(hashlib.sha256((KIT/'sprinkler.glb').read_bytes()).hexdigest()==entry['sha256'],'manifest SHA-256 correct')
-prior_path=OUT/'v1.1-baseline.glb'
-prior_path.write_bytes(subprocess.check_output(['git','show','cf97f40b:assets/farm/art/sprinkler.glb'],cwd=ROOT))
+prior_path=OUT/'v1.2-first-pass.glb'
+prior_path.write_bytes(subprocess.check_output(['git','show','f081e082:assets/farm/art/sprinkler.glb'],cwd=ROOT))
 prior_doc,prior_data=load_glb(prior_path)
-prior_head=next(n for n in prior_doc['nodes'] if n['name']=='head')
-current_head=next(n for n in doc['nodes'] if n['name']=='head')
-old_prim=prior_doc['meshes'][prior_head['mesh']]['primitives'][0]
-new_prim=doc['meshes'][current_head['mesh']]['primitives'][0]
-report['v1_1_head_preservation']={}
-for attribute in ['POSITION','NORMAL','COLOR_0']:
-    before=np.array(accessor(prior_doc,prior_data,old_prim['attributes'][attribute]))
-    after=np.array(accessor(doc,data,new_prim['attributes'][attribute]))
-    report['v1_1_head_preservation'][attribute+'_maximum_component_error']=float(np.abs(before-after).max())
-    if attribute=='NORMAL':
-        # Moving the authored coordinates changes float32 normal recomputation slightly.
-        angles=np.degrees(np.arctan2(np.linalg.norm(np.cross(before,after),axis=1),np.sum(before*after,axis=1)))
-        report['v1_1_head_preservation']['maximum_normal_angle_degrees']=float(angles.max())
-        check(angles.max()<.02,'v1.1 head normals retained within 0.02 degrees')
-    else:
-        check(before.shape==after.shape and np.allclose(before,after,atol=1e-6,rtol=0),
-              'v1.1 head local '+attribute+' retained; only its node lowered')
-check(accessor(prior_doc,prior_data,old_prim['indices'])==accessor(doc,data,new_prim['indices']),
-      'v1.1 head topology retained')
 prior_base=next(n for n in prior_doc['nodes'] if n['name']=='base')
 old_prim=prior_doc['meshes'][prior_base['mesh']]['primitives'][0]
 old_v=np.array(accessor(prior_doc,prior_data,old_prim['attributes']['POSITION']))
 old_c=np.array(accessor(prior_doc,prior_data,old_prim['attributes']['COLOR_0']))
+check(np.array_equal(old_v,base['v']),'first v1.2 base geometry unchanged; only riser colours updated')
+check(prior_doc['nodes']==doc['nodes'],'first v1.2 nodes and pivots unchanged')
 # Filter the green riser foot, which also extends into the pad's height range.
 def stone_points(vertices, colours):
     return sorted(tuple(np.round(v,6)) for v,c in zip(vertices,colours)
                   if any(np.allclose(c[:3],palette_linear[k],atol=2/65535)
                          for k in ['stone','stone_light','stone_shade']))
-check(stone_points(old_v,old_c)==stone_points(base['v'],base['c']),'v1.1 stone pad geometry retained')
-check(prior_doc['materials']==doc['materials'],'v1.1 material retained')
+check(stone_points(old_v,old_c)==stone_points(base['v'],base['c']),'stone pad geometry retained')
+check(prior_doc['materials']==doc['materials'],'shared material retained')
 report['measurements']={'triangles':total,'bounds':[lo.tolist(),hi.tolist()], 'size_xyz_m':(hi-lo).tolist(),
     'head_swept_diameter_m':float(head_diameter),'stone_diameter_m':float(stone_diameter),'cap_diameter_m':float(cap_diameter),
-    'arm_section_diameter_m':.040,'plot_min_edge_clearance_m':float(.47-head_diameter/2)}
+    'arm_section_diameter_m':.040,'cap_height_m':float(water[:,1].max()-water[:,1].min()),
+    'cap_upper_belly_diameter_m':float(2*np.linalg.norm(cap_upper[:,[0,2]],axis=1).max()),
+    'plot_min_edge_clearance_m':float(.47-head_diameter/2)}
 report['colour_comparison']={'plot_rim_linear':list(common),'plot_rim_srgb':rim.tolist(),
     'wood_source':'assets/farm/art/storage.glb: most frequent vertex colour',
     'source_correction':'plot.glb is an earthen bed without a wood frame; compare its real soil rim and a separate real farm wood sample.',
     'wood_linear':list(wood_linear),'wood_srgb':wood.tolist(),'brass_srgb':brass.tolist(),
     'wood_hue_degrees':hue(wood),'brass_hue_degrees':hue(brass),'hue_gap_degrees':hue_gap,
-    'blue_hue_degrees':hue(blue),'coverage_hue_degrees':hue([.55,.78,.95]),'crop_leaf_srgb':leaf.tolist(),'riser_srgb':sage.tolist()}
+    'blue_hue_degrees':hue(blue),'coverage_hue_degrees':hue([.55,.78,.95]),'crop_leaf_srgb':leaf.tolist(),'riser_srgb':sage.tolist(),
+    'prior_riser_saturation':old_saturation,'riser_saturation':new_saturation,
+    'crop_leaf_saturation':colorsys.rgb_to_hsv(*leaf)[1]}
 report['passed']=all(c['passed'] for c in report['checks'])
 report['failures']=[c['check'] for c in report['checks'] if not c['passed']]
 (OUT/'geometry-validation.json').write_text(json.dumps(report,indent=2)+'\n')

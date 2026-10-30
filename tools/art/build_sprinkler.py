@@ -23,14 +23,15 @@ SOURCE = ROOT/'tools/art/source/sprinkler_244'
 HEAD = (0, .42, 0)
 PALETTE = {
     'stone': 'b4b8b1', 'stone_light': 'c5c9c1', 'stone_shade': 'a0a69d',
-    'sage': 'a6b397', 'sage_light': 'b4c1a5', 'sage_shade': '8d9c80',
+    'sage': 'a0ba88', 'sage_light': 'b0c99a', 'sage_shade': '879f70',
     'brass': 'e8ce5b', 'brass_light': 'f5dd7c', 'brass_shade': 'c4ac46',
     'water': '8cc7f2', 'water_light': 'a8d5f5', 'water_shade': '74b4e3',
     'nozzle_dot': '665d36',
 }
-ARM = [(.059, .410, 0), (.089, .390, 0), (.116, .389, 0),
-       (.145, .408, 0), (.160, .427, 0)]
+ARM = [(.059, .410, 0), (.090, .390, 0), (.1183, .389, 0),
+       (.14805, .408, 0), (.1645827, .427, 0)]
 ARM_RADIUS = .020
+NOZZLE_X = .1625827  # Leaves 0.01 mm clearance under the 0.40 m swept diameter limit.
 
 
 def colour_faces(obj, base, light, shade):
@@ -72,21 +73,22 @@ def build_head():
             if all(abs(obj.data.vertices[v].co.z-.034)<1e-6 and
                    obj.data.vertices[v].co.xy.length<.00601 for v in face.vertices):
                 face.material_index = 3
-        obj.location = g.v((sign*.158, .427, 0))
+        obj.location = g.v((sign*NOZZLE_X, .427, 0))
         axis = g.v((sign*.98, .20, 0)).normalized()
         obj.rotation_euler = axis.to_track_quat('Z', 'Y').to_euler()
-    # Eight-sided teardrop; a single top vertex avoids a collapsed ring.
-    rings = [(.020, .433), (.043, .441), (.050, .457), (.033, .478), (.013, .499)]
-    vertices = [(r*math.cos(i*math.tau/8), y, r*math.sin(i*math.tau/8))
-                for r, y in rings for i in range(8)]
-    vertices.append((0, .517, 0))
-    faces = [tuple(reversed(range(8)))]
+    # Fuller ten-sided droplet; retain a short tip and a 0.10 m maximum diameter.
+    sides = 10
+    rings = [(.020, .433), (.043, .443), (.050, .463), (.044, .489), (.024, .509)]
+    vertices = [(r*math.cos(i*math.tau/sides), y, r*math.sin(i*math.tau/sides))
+                for r, y in rings for i in range(sides)]
+    vertices.append((0, .525, 0))
+    faces = [tuple(reversed(range(sides)))]
     for j in range(len(rings)-1):
-        for i in range(8):
-            a, b = j*8+i, j*8+(i+1)%8
-            faces.append((a, b, b+8, a+8))
-    last = (len(rings)-1)*8
-    faces += [(last+i, last+(i+1)%8, len(vertices)-1) for i in range(8)]
+        for i in range(sides):
+            a, b = j*sides+i, j*sides+(i+1)%sides
+            faces.append((a, b, b+sides, a+sides))
+    last = (len(rings)-1)*sides
+    faces += [(last+i, last+(i+1)%sides, len(vertices)-1) for i in range(sides)]
     obj = g.mesh('Blue water droplet cap', vertices, faces, 'water', True)
     colour_faces(obj, 'water', 'water_light', 'water_shade')
 
@@ -209,9 +211,11 @@ def main():
              'pivot': 'plot bed centre; place root at BED_H=0.15 m; unit scale',
              'material': 'FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()',
              'art_revision': 'v1.2',
+             'revision_amendment': 'Plane 217ba43a: full 0.40m head envelope, fuller cap and greener riser',
              'arm_diameter_m': ARM_RADIUS*2, 'stone_diameter_m': .25, 'cap_diameter_m': .10,
              'riser_diameter_base_m': .13, 'riser_diameter_top_m': .11,
              'hub_diameter_m': .14, 'hub_height_m': .07, 'nozzle_diameter_m': .052,
+             'cap_height_m': .092, 'cap_radial_segments': 10,
              'palette_srgb': PALETTE, 'arm_centreline_right_m': ARM,
              'nozzle_dot': 'one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh',
              'runtime_note': 'head static by default; consumer may rotate around Y for 2-3 s on watering / tap',

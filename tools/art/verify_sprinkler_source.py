@@ -79,6 +79,11 @@ for side in ['Left','Right']:
     check(abs(diameter-.052)<1e-6,side+' nozzle actual diameter 0.052m')
 check(abs(report['measurements']['Blue water droplet cap']['diameter_m']-.10)<1e-6,
       'v1.1 cap actual diameter 0.10m')
+cap=report['measurements']['Blue water droplet cap']
+check(abs(cap['top_m']-cap['bottom_m']-.092)<1e-6,'amended v1.2 cap height 0.092m')
+cap_object=bpy.data.objects['Blue water droplet cap']
+check(len([v for v in cap_object.data.vertices if abs(v.co.z-.489)<1e-6])==10,
+      'amended v1.2 cap ten radial segments at upper belly')
 report['passed'] = all(c['passed'] for c in report['checks'])
 (ROOT/'output/sprinkler-244/source-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print('SPRINKLER_SOURCE', report['passed'])

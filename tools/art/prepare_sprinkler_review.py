@@ -60,7 +60,7 @@ for relative in ['assets/farm/art/plot.glb', 'modules/farm/farm_art.gd', 'module
 references=PROJECT/'references'
 references.mkdir(exist_ok=True)
 reference_manifest={}
-for revision,commit in [('v1','a9f7d142'),('v1_1','cf97f40b')]:
+for revision,commit in [('v1_1','cf97f40b')]:
     data=subprocess.check_output(['git','show',commit+':assets/farm/art/sprinkler.glb'],cwd=ROOT)
     (references/('sprinkler_'+revision+'.glb')).write_bytes(data)
     reference_manifest[revision]={'commit':commit,'sha256':hashlib.sha256(data).hexdigest()}

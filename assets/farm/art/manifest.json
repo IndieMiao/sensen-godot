@@ -1409,17 +1409,17 @@
       ]
     },
     "sprinkler": {
-      "triangles": 778,
+      "triangles": 798,
       "surfaces": 2,
       "bounds": [
         [
-          -0.19530698657035828,
+          -0.199889674782753,
           0.0,
           -0.125
         ],
         [
-          0.19530698657035828,
-          0.5170000195503235,
+          0.199889674782753,
+          0.5249999761581421,
           0.125
         ]
       ],
@@ -1434,7 +1434,7 @@
           ]
         },
         "head": {
-          "triangles": 514,
+          "triangles": 534,
           "surfaces": 1,
           "pivot": [
             0,
@@ -1443,8 +1443,8 @@
           ]
         }
       },
-      "bytes": 29008,
-      "sha256": "951efaf08e2f51b59dc4a40e9b554110f86840565263fec5246c497fe91809f0",
+      "bytes": 29628,
+      "sha256": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
       "generator": "tools/art/build_sprinkler.py",
       "triangle_limit": 800,
       "head_pivot": [
@@ -1461,6 +1461,7 @@
       "pivot": "plot bed centre; place root at BED_H=0.15 m; unit scale",
       "material": "FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()",
       "art_revision": "v1.2",
+      "revision_amendment": "Plane 217ba43a: full 0.40m head envelope, fuller cap and greener riser",
       "arm_diameter_m": 0.04,
       "stone_diameter_m": 0.25,
       "cap_diameter_m": 0.1,
@@ -1469,13 +1470,15 @@
       "hub_diameter_m": 0.14,
       "hub_height_m": 0.07,
       "nozzle_diameter_m": 0.052,
+      "cap_height_m": 0.092,
+      "cap_radial_segments": 10,
       "palette_srgb": {
         "stone": "b4b8b1",
         "stone_light": "c5c9c1",
         "stone_shade": "a0a69d",
-        "sage": "a6b397",
-        "sage_light": "b4c1a5",
-        "sage_shade": "8d9c80",
+        "sage": "a0ba88",
+        "sage_light": "b0c99a",
+        "sage_shade": "879f70",
         "brass": "e8ce5b",
         "brass_light": "f5dd7c",
         "brass_shade": "c4ac46",
@@ -1491,22 +1494,22 @@
           0
         ],
         [
-          0.089,
+          0.09,
           0.39,
           0
         ],
         [
-          0.116,
+          0.1183,
           0.389,
           0
         ],
         [
-          0.145,
+          0.14805,
           0.408,
           0
         ],
         [
-          0.16,
+          0.1645827,
           0.427,
           0
         ]
