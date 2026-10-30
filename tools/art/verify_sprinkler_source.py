@@ -44,11 +44,11 @@ for name in ['base', 'head']:
         maximum = max(maximum,max(tree.find(p)[2] for p in a))
     check(maximum < .000001, name+' source/export bidirectional vertex error <1 micrometre')
     root = bpy.data.objects[name]
-    check(root.location.length<1e-7 if name=='base' else (root.location-Vector((0,0,.55))).length<1e-7,
+    check(root.location.length<1e-7 if name=='base' else (root.location-Vector((0,0,.42))).length<1e-7,
           name+' editable pivot matches export')
     report['parts'][name] = {'source_objects': len([o for o in collection.objects if o.type=='MESH']),
                             'maximum_vertex_error_m': maximum}
-check((bpy.data.objects['spray_origin'].location-Vector((0,0,.55))).length<1e-7,'editable spray_origin correct')
+check((bpy.data.objects['spray_origin'].location-Vector((0,0,.42))).length<1e-7,'editable spray_origin correct')
 for label in ['Round edged stone mounting pad', 'Stout sage green riser',
               'Rounded yellow brass rotating hub', 'Blue water droplet cap']:
     obj = bpy.data.objects[label]
@@ -59,12 +59,12 @@ for label in ['Round edged stone mounting pad', 'Stout sage green riser',
 pad = report['measurements']['Round edged stone mounting pad']
 hub = report['measurements']['Rounded yellow brass rotating hub']
 riser = bpy.data.objects['Stout sage green riser']
-for height, diameter in [(.050,.110),(.492,.100)]:
+for height, diameter in [(.050,.130),(.362,.110)]:
     ring = [riser.matrix_world@v.co for v in riser.data.vertices
             if abs((riser.matrix_world@v.co).z-height)<1e-6]
     measured = 2*max(Vector((p.x,p.y)).length for p in ring)
     report['measurements']['riser_at_'+str(height)+'m'] = {'diameter_m': measured}
-    check(abs(measured-diameter)<1e-6,'v1.1 tapered riser diameter at '+str(height))
+    check(abs(measured-diameter)<1e-6,'v1.2 tapered riser diameter at '+str(height))
 check(abs(hub['diameter_m']-.14)<1e-6 and abs(hub['top_m']-hub['bottom_m']-.07)<1e-6,
       'v1.1 hub actual diameter 0.14m and height 0.07m')
 check(abs(pad['diameter_m']-.25)<1e-6,'v1.1 stone diameter 0.25m')

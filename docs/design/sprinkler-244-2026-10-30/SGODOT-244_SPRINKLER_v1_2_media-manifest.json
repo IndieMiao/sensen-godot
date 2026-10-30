@@ -1,0 +1,53 @@
+[
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_comparison_43deg.png",
+    "sha256": "36ca99d3733665644cfd14a861574774f7e0b9e3af4cd1cd90b14938b1e0a6ce",
+    "bytes": 257831,
+    "size": [
+      1800,
+      760
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_default_43deg_360.png",
+    "sha256": "9310bc7bb026dd029cbed262c420b38d89ecb230dc4826c84456c245098c3a48",
+    "bytes": 61301,
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_measurements.csv",
+    "sha256": "16106486303a89f0223ae934600b28fe4fecb4fd6144a614f37588bff5aa52e7",
+    "bytes": 776
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_measurements.md",
+    "sha256": "165b75ad435216ae149bc3bb15b1721c99ad157208cb6dd8045324f30f6ca731",
+    "bytes": 1187
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_minimum_zoom_360.png",
+    "sha256": "f7e50ae38dc5f3944b5faa41ca6fd919f4d0c05eee4a14f200ecaaf2ff414bc7",
+    "bytes": 49946,
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_top.png",
+    "sha256": "9f798323a953fcd6f26e8851e70e8d5731e4a5bcefc45b47a79a211e404a1cea",
+    "bytes": 420510,
+    "size": [
+      1000,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_2_validation.json",
+    "sha256": "c4f1f1fbc15f98bf80ada9f5f34b7c9e3a0ed774ec349606439445422e2badf8",
+    "bytes": 26721
+  }
+]

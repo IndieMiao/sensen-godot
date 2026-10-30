@@ -14,8 +14,9 @@ OUT=ROOT/'output/sprinkler-244'
 DOC=ROOT/'docs/design/sprinkler-244-2026-10-30'
 SOURCE=ROOT/'tools/art/source/sprinkler_244'
 REVISION='--proportion-revision' in sys.argv
-VERSION='v1.1' if REVISION else 'v1'
-PREFIX='SGODOT-244_SPRINKLER_v1_1_' if REVISION else 'SGODOT-244_SPRINKLER_v1_'
+entry=json.loads((ROOT/'assets/farm/art/manifest.json').read_text())['assets']['sprinkler']
+VERSION=entry.get('art_revision','v1')
+PREFIX='SGODOT-244_SPRINKLER_'+VERSION.replace('.','_')+'_'
 FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 DOC.mkdir(parents=True,exist_ok=True)
 geometry=json.loads((OUT/'geometry-validation.json').read_text())
@@ -23,7 +24,7 @@ runtime=json.loads((OUT/'captures/godot-validation.json').read_text())
 source=json.loads((OUT/'source-validation.json').read_text())
 rebuild=json.loads((OUT/'reproducibility.json').read_text())
 assert geometry['passed'] and runtime['passed'] and source['passed'] and rebuild['byte_identical']
-entry=json.loads((ROOT/'assets/farm/art/manifest.json').read_text())['assets']['sprinkler']
+assert runtime['asset_sha256']==entry['sha256'] and runtime['art_revision']==VERSION
 measure=geometry['measurements']
 
 
@@ -48,7 +49,8 @@ def portrait(name,title,note):
     text(draw,(12*factor,10*factor),'SGODOT-244 / 洒水器 '+VERSION,16*factor)
     text(draw,(12*factor,39*factor),title,13*factor)
     draw.rectangle((0,image.height-68*factor,image.width,image.height),fill='#f5f7f3')
-    text(draw,(12*factor,image.height-57*factor),'黄忠 · %d tris · 0.647 m · 人物 1.745 m'%entry['triangles'],12*factor)
+    text(draw,(12*factor,image.height-57*factor),'黄忠 · %d tris · %.3f m · 人物 1.745 m'%
+         (entry['triangles'],measure['size_xyz_m'][1]),12*factor)
     text(draw,(12*factor,image.height-32*factor),note,11*factor)
     save(image,name)
 
@@ -71,12 +73,26 @@ text(draw,(28,1115),'喷头旋转外径 %.5f m；距本田外边至少 %.5f m'%
 text(draw,(28,1157),'框线为真实 plot.glb 的 XZ 包围盒；没有伸入走道或邻田。',21)
 save(top,'top')
 
+if VERSION=='v1.2':
+    comparison=Image.new('RGB',(1800,760),'#f5f7f3'); draw=ImageDraw.Draw(comparison)
+    text(draw,(30,14),'SGODOT-244 / v1 → v1.1 → v1.2 / 43° 局部对比 · 黄忠',29)
+    ids={c['id'] for c in runtime['captures']}
+    for i,(revision,title) in enumerate([
+        ('v1','v1 / H 0.647 m / 立杆 Ø0.092 m'),
+        ('v1_1','v1.1 / H 0.647 m / 立杆 Ø0.11 → 0.10 m'),
+        ('v1_2','v1.2 / H 0.517 m / 立杆 Ø0.13 → 0.11 m')]):
+        assert 'comparison_'+revision in ids
+        comparison.paste(raw('comparison_'+revision),(i*600,65))
+        text(draw,(i*600+18,681),title,21)
+    text(draw,(30,721),'同一 43° / 14.5°、同光同材质、单位比例；视宽 1.08 m 的局部观察图，未分别缩放模型。',22)
+    save(comparison,'comparison_43deg')
+
 if not REVISION:
     rotation=Image.new('RGB',(1800,735),'#f5f7f3'); draw=ImageDraw.Draw(rotation)
     text(draw,(30,16),'SGODOT-244 / 喷头旋转轴心检查 · 黄忠',29)
     for i,angle in enumerate([0,45,90]):
         rotation.paste(raw('head_%03d'%angle),(i*600,65))
-        text(draw,(i*600+25,675),'head Y = %d° / 轴心 (0, 0.55, 0)'%angle,23)
+        text(draw,(i*600+25,675),'head Y = %d° / 轴心 (0, %.2f, 0)'%(angle,entry['head_pivot'][1]),23)
     text(draw,(30,711),'同一真实田块、材质、光照和镜头；仅 head 旋转，base 与 spray_origin 固定。',17)
     save(rotation,'head_rotation')
 
@@ -108,20 +124,21 @@ validation={'author':'黄忠','task':'SGODOT-244','art_revision':VERSION,'geomet
             'reproducibility':rebuild,'occlusion':pixel,
             'evidence':json.loads((OUT/'source-evidence.json').read_text()),
             'reference':{'spec':'SGODOT-244_sprinkler-spec-v1.1.md','sheet':'SGODOT-244_sprinkler-sheet-v1.png',
+                         'amendment':'tools/art/source/sprinkler_244/revision-'+VERSION+'.md',
                          'dimension_authority':'specification, not measured from image'},
             'scope':'Offline desktop art verification; tech and visual review pending, no gameplay integration or phone performance claim.'}
 (DOC/(PREFIX+'validation.json')).write_text(json.dumps(validation,indent=2,ensure_ascii=False)+'\n')
 rows=[['总三角形',entry['triangles'],'<= 800'],['base 三角形',entry['parts']['base']['triangles'],'1 surface'],['head 三角形',entry['parts']['head']['triangles'],'1 surface'],
-      ['总高 / 床面以上 m',measure['size_xyz_m'][1],'0.60-0.65'],['宽 X m',measure['size_xyz_m'][0],'实际顶点'],
+      ['总高 / 床面以上 m',measure['size_xyz_m'][1],'约 0.52 (v1.2)'],['宽 X m',measure['size_xyz_m'][0],'实际顶点'],
       ['深 Z m',measure['size_xyz_m'][2],'实际顶点'],['喷头旋转外径 m',measure['head_swept_diameter_m'],'<= 0.40'],
       ['石垫直径 m',measure['stone_diameter_m'],'0.24-0.26 (v1.1)'],['喷臂截面直径 m',measure['arm_section_diameter_m'],'0.04 (v1.1)'],
-      ['蓝色顶帽直径 m',measure['cap_diameter_m'],'0.08-0.10'],['喷头轴心 / spray_origin','(0, 0.55, 0)','本地米制'],
+      ['蓝色顶帽直径 m',measure['cap_diameter_m'],'0.10'],['喷头轴心 / spray_origin',str(entry['head_pivot']),'本地米制'],
       ['角色高 m',1.745,'按实际姿态顶点等比校准'],['后方作物遮挡比例',fraction,'< 0.5']]
 if REVISION:
     measurements=source['measurements']
     hub=measurements['Rounded yellow brass rotating hub']
-    rows += [['立杆下段直径 m',measurements['riser_at_0.05m']['diameter_m'],'约 0.10，下粗上细'],
-             ['立杆上段直径 m',measurements['riser_at_0.492m']['diameter_m'],'约 0.10'],
+    rows += [['立杆下段直径 m',measurements['riser_at_0.05m']['diameter_m'],'0.13'],
+             ['立杆上段直径 m',measurements['riser_at_0.362m']['diameter_m'],'0.11'],
              ['轮毂直径 m',hub['diameter_m'],'0.13-0.14'],
              ['轮毂高度 m',hub['top_m']-hub['bottom_m'],'约 0.07'],
              ['喷嘴直径 m',measurements['Left nozzle']['diameter_m'],'约 0.05']]
@@ -133,7 +150,8 @@ table += ['| '+' | '.join(str(x) for x in row)+' |' for row in rows]
 table += ['', '实际 plot.glb 为圆角土畦，不含木框。黄铜对比图使用真实田沿土色，并另取 storage.glb 木色；未修改田块。','']
 (DOC/(PREFIX+'measurements.md')).write_text('\n'.join(table))
 for suffix in ['sprinkler.glb.import']:
-    shutil.copy2(OUT/'project/assets/farm/art'/suffix,ROOT/'assets/farm/art'/suffix)
+    if not (ROOT/'assets/farm/art'/suffix).exists():
+        shutil.copy2(OUT/'project/assets/farm/art'/suffix,ROOT/'assets/farm/art'/suffix)
 uid=OUT/'project/tools/art/review_sprinkler.gd.uid'
 if uid.exists():shutil.copy2(uid,ROOT/'tools/art/review_sprinkler.gd.uid')
 incoming=Path.home()/'incoming/sprinkler-244'

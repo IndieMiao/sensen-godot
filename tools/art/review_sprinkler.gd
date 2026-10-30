@@ -5,6 +5,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const Plant = preload("res://modules/farm/crop_plant_mesh.gd")
 const BED_H = .15
 const PITCH = 1.30
+const HEAD_POSITION = Vector3(0,.42,0)
 var report = {"checks": [], "captures": [], "crops": [], "rotations": []}
 var vp: SubViewport
 var world: Node3D
@@ -116,16 +117,16 @@ func make_fixture():
 		check(data[Mesh.ARRAY_TEX_UV]==null,str(node.name)+" no UV")
 	check(actual_triangles==entry.triangles and actual_triangles<=800,"actual imported triangle budget")
 	check(Art.material().vertex_color_use_as_albedo and not Art.material().vertex_color_is_srgb,"unmodified shared linear FarmArt material")
-	check(head.position.distance_to(Vector3(0,.55,0))<.00001,"head pivot at local 0,.55,0")
+	check(head.position.distance_to(HEAD_POSITION)<.00001,"head pivot at local 0,.42,0")
 	var marker = sprinkler.find_child("spray_origin",true,false)
-	check(marker.position.distance_to(Vector3(0,.55,0))<.00001,"spray_origin at head centre")
+	check(marker.position.distance_to(HEAD_POSITION)<.00001,"spray_origin at head centre")
 	for angle in [0,45,90]:
 		head.rotation_degrees.y = angle
 		var points = inspect_mesh(sprinkler)
 		var maximum = 0.0
 		for p in points: maximum = maxf(maximum,Vector2(p.x,p.z).length())
 		check(maximum<=.20001,"actual imported radial extent at %d degrees"%angle)
-		check(head.global_position.distance_to(Vector3(0,.70,0))<.00001,"head pivot stays fixed at %d degrees"%angle)
+		check(head.global_position.distance_to(HEAD_POSITION+Vector3.UP*BED_H)<.00001,"head pivot stays fixed at %d degrees"%angle)
 		check(marker.global_position.distance_to(head.global_position)<.00001,"spray origin fixed at %d degrees"%angle)
 		report.rotations.append({"angle":angle,"head_world_pivot":xyz(head.global_position),"max_radius_m":maximum})
 	head.rotation_degrees.y = 0
@@ -199,6 +200,8 @@ func occlusion_controls():
 func run():
 	output=ProjectSettings.globalize_path("res://../captures"); DirAccess.make_dir_recursive_absolute(output)
 	entry=JSON.parse_string(FileAccess.get_file_as_string("res://assets/farm/art/manifest.json")).assets.sprinkler
+	report.asset_sha256=entry.sha256
+	report.art_revision=entry.art_revision
 	create_world(); make_fixture(); await avatar()
 	game_camera(); check(is_equal_approx(cam.size,6.72),"default game camera width 6.72m")
 	await capture("default_43deg_360")
@@ -211,6 +214,8 @@ func run():
 	pose(Vector3.ZERO,4.2,90,0); await capture("top")
 	if not revision_only:
 		await supplemental_views()
+	if "--compare-revisions" in OS.get_cmdline_user_args():
+		await revision_comparison()
 	await occlusion_controls()
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"adapter":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","actual Mobile renderer")
@@ -219,6 +224,32 @@ func run():
 	FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
 	print("SPRINKLER_GODOT ",report.passed," checks=",report.checks.size())
 	get_tree().quit(0 if report.passed else 1)
+
+func revision_comparison():
+	var current=sprinkler
+	current.visible=false
+	for crop in crops: crop.visible=false
+	for bed in beds: bed.visible=bed.position.length()<.01
+	rig.visible=false
+	vp.size=Vector2i(600,600)
+	pose(Vector3(0,.40,0),1.08,43,14.5)
+	report.comparison_sources=JSON.parse_string(FileAccess.get_file_as_string("res://references/manifest.json"))
+	for version in ["v1","v1_1","v1_2"]:
+		if version=="v1_2":
+			sprinkler=current
+		else:
+			sprinkler=load("res://references/sprinkler_"+version+".glb").instantiate()
+			world.add_child(sprinkler)
+			sprinkler.position=Vector3(0,BED_H,0)
+			for mesh in sprinkler.find_children("*","MeshInstance3D",true,false):
+				mesh.material_override=Art.material()
+		sprinkler.visible=true
+		head=sprinkler.find_child("head",true,false)
+		check(sprinkler.scale==Vector3.ONE,"comparison "+version+" unit scale")
+		await capture("comparison_"+version)
+		if version!="v1_2": sprinkler.free()
+	sprinkler=current
+	head=current.find_child("head",true,false)
 
 func supplemental_views():
 	for crop in crops: crop.visible=false

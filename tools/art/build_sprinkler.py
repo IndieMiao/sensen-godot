@@ -1,7 +1,7 @@
 """SGODOT-244 sprinkler; Blender 5.2, metres, Godot Y up and +Z front.
 
 Reuses the greenhouse's vertex-paint helpers. Only sprinkler.glb and its manifest
-entry are exported. Head geometry is local to (0, .55, 0); no runtime integration.
+entry are exported. Head geometry is local to (0, .42, 0); no runtime integration.
 """
 import hashlib
 import json
@@ -20,7 +20,7 @@ from verify_chef_sign import load_glb, accessor
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT/'assets/farm/art'
 SOURCE = ROOT/'tools/art/source/sprinkler_244'
-HEAD = (0, .55, 0)
+HEAD = (0, .42, 0)
 PALETTE = {
     'stone': 'b4b8b1', 'stone_light': 'c5c9c1', 'stone_shade': 'a0a69d',
     'sage': 'a6b397', 'sage_light': 'b4c1a5', 'sage_shade': '8d9c80',
@@ -28,8 +28,8 @@ PALETTE = {
     'water': '8cc7f2', 'water_light': 'a8d5f5', 'water_shade': '74b4e3',
     'nozzle_dot': '665d36',
 }
-ARM = [(.059, .540, 0), (.089, .520, 0), (.116, .519, 0),
-       (.145, .538, 0), (.160, .557, 0)]
+ARM = [(.059, .410, 0), (.089, .390, 0), (.116, .389, 0),
+       (.145, .408, 0), (.160, .427, 0)]
 ARM_RADIUS = .020
 
 
@@ -50,13 +50,13 @@ def build_base():
                           (.125, .028), (.121, .039), (.110, .047)], 'stone', 16)
     colour_faces(obj, 'stone', 'stone_light', 'stone_shade')
     obj = capped_profile('Stout sage green riser',
-                         [(.048, .036), (.055, .050), (.050, .492), (.044, .512)], 'sage', 10)
+                         [(.058, .036), (.065, .050), (.055, .362), (.049, .382)], 'sage', 10)
     colour_faces(obj, 'sage', 'sage_light', 'sage_shade')
 
 
 def build_head():
     obj = capped_profile('Rounded yellow brass rotating hub',
-                         [(.060, .502), (.070, .514), (.070, .562), (.060, .572)], 'brass', 12)
+                         [(.060, .372), (.070, .384), (.070, .432), (.060, .442)], 'brass', 12)
     colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
     for sign, label in [(-1, 'Left'), (1, 'Right')]:
         points = [(sign*x, y, z) for x, y, z in ARM]
@@ -72,14 +72,14 @@ def build_head():
             if all(abs(obj.data.vertices[v].co.z-.034)<1e-6 and
                    obj.data.vertices[v].co.xy.length<.00601 for v in face.vertices):
                 face.material_index = 3
-        obj.location = g.v((sign*.158, .557, 0))
+        obj.location = g.v((sign*.158, .427, 0))
         axis = g.v((sign*.98, .20, 0)).normalized()
         obj.rotation_euler = axis.to_track_quat('Z', 'Y').to_euler()
     # Eight-sided teardrop; a single top vertex avoids a collapsed ring.
-    rings = [(.020, .563), (.043, .571), (.050, .587), (.033, .608), (.013, .629)]
+    rings = [(.020, .433), (.043, .441), (.050, .457), (.033, .478), (.013, .499)]
     vertices = [(r*math.cos(i*math.tau/8), y, r*math.sin(i*math.tau/8))
                 for r, y in rings for i in range(8)]
-    vertices.append((0, .647, 0))
+    vertices.append((0, .517, 0))
     faces = [tuple(reversed(range(8)))]
     for j in range(len(rings)-1):
         for i in range(8):
@@ -160,7 +160,7 @@ def actual_stats(path):
     bounds = [[min(v[i] for v in vertices) for i in range(3)],
               [max(v[i] for v in vertices) for i in range(3)]]
     assert triangles <= 800, triangles
-    assert .60 <= bounds[1][1] <= .65
+    assert .51 <= bounds[1][1] <= .53
     assert max(math.hypot(p[0], p[2]) for p in vertices) <= .20
     return {'triangles': triangles, 'surfaces': 2, 'bounds': bounds, 'parts': parts,
             'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
@@ -208,13 +208,14 @@ def main():
              'head_pivot': list(HEAD), 'spray_origin': list(HEAD), 'front': '+Z',
              'pivot': 'plot bed centre; place root at BED_H=0.15 m; unit scale',
              'material': 'FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()',
-             'art_revision': 'v1.1',
+             'art_revision': 'v1.2',
              'arm_diameter_m': ARM_RADIUS*2, 'stone_diameter_m': .25, 'cap_diameter_m': .10,
-             'riser_diameter_base_m': .11, 'riser_diameter_top_m': .10,
+             'riser_diameter_base_m': .13, 'riser_diameter_top_m': .11,
              'hub_diameter_m': .14, 'hub_height_m': .07, 'nozzle_diameter_m': .052,
              'palette_srgb': PALETTE, 'arm_centreline_right_m': ARM,
              'nozzle_dot': 'one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh',
-             'runtime_note': 'head static by default; consumer may rotate around Y for 2-3 s on watering / tap'}
+             'runtime_note': 'head static by default; consumer may rotate around Y for 2-3 s on watering / tap',
+             'integration_note': 'On integration change P0FarmFacilities.HEAD from (0, 0.55, 0) to (0, 0.42, 0); no gameplay edit in this art branch.'}
     manifest = json.loads((OUT/'manifest.json').read_text())
     manifest['assets']['sprinkler'] = entry
     (OUT/'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')

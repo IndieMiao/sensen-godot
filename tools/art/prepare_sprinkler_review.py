@@ -57,6 +57,16 @@ for relative in ['assets/farm/art/plot.glb', 'modules/farm/farm_art.gd', 'module
     original = subprocess.check_output(['git', 'show', FARM+':'+relative], cwd=ROOT)
     assert original == (ROOT/relative).read_bytes(), relative
     dependencies[relative] = hashlib.sha256(original).hexdigest()
+references=PROJECT/'references'
+references.mkdir(exist_ok=True)
+reference_manifest={}
+for revision,commit in [('v1','a9f7d142'),('v1_1','cf97f40b')]:
+    data=subprocess.check_output(['git','show',commit+':assets/farm/art/sprinkler.glb'],cwd=ROOT)
+    (references/('sprinkler_'+revision+'.glb')).write_bytes(data)
+    reference_manifest[revision]={'commit':commit,'sha256':hashlib.sha256(data).hexdigest()}
+reference_manifest['v1_2']={'source':'assets/farm/art/sprinkler.glb',
+                           'sha256':hashlib.sha256((ROOT/'assets/farm/art/sprinkler.glb').read_bytes()).hexdigest()}
+(references/'manifest.json').write_text(json.dumps(reference_manifest,indent=2)+'\n')
 manifest = json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text())
 manifest['parts'] = [p for p in manifest['parts'] if p['id'] in ['body00','eyes00','hairhat0','cloth0','shoes0']]
 (PROJECT/'assets/avatar/parts_manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')

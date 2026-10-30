@@ -1419,7 +1419,7 @@
         ],
         [
           0.19530698657035828,
-          0.6470000147819519,
+          0.5170000195503235,
           0.125
         ]
       ],
@@ -1438,34 +1438,34 @@
           "surfaces": 1,
           "pivot": [
             0,
-            0.550000011920929,
+            0.41999998688697815,
             0
           ]
         }
       },
-      "bytes": 29004,
-      "sha256": "9359d5cc430b3693d6ed58c17ad6833d46d128c961368fa4f8f6f60f10f1453c",
+      "bytes": 29008,
+      "sha256": "951efaf08e2f51b59dc4a40e9b554110f86840565263fec5246c497fe91809f0",
       "generator": "tools/art/build_sprinkler.py",
       "triangle_limit": 800,
       "head_pivot": [
         0,
-        0.55,
+        0.42,
         0
       ],
       "spray_origin": [
         0,
-        0.55,
+        0.42,
         0
       ],
       "front": "+Z",
       "pivot": "plot bed centre; place root at BED_H=0.15 m; unit scale",
       "material": "FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()",
-      "art_revision": "v1.1",
+      "art_revision": "v1.2",
       "arm_diameter_m": 0.04,
       "stone_diameter_m": 0.25,
       "cap_diameter_m": 0.1,
-      "riser_diameter_base_m": 0.11,
-      "riser_diameter_top_m": 0.1,
+      "riser_diameter_base_m": 0.13,
+      "riser_diameter_top_m": 0.11,
       "hub_diameter_m": 0.14,
       "hub_height_m": 0.07,
       "nozzle_diameter_m": 0.052,
@@ -1487,32 +1487,33 @@
       "arm_centreline_right_m": [
         [
           0.059,
-          0.54,
+          0.41,
           0
         ],
         [
           0.089,
-          0.52,
+          0.39,
           0
         ],
         [
           0.116,
-          0.519,
+          0.389,
           0
         ],
         [
           0.145,
-          0.538,
+          0.408,
           0
         ],
         [
           0.16,
-          0.557,
+          0.427,
           0
         ]
       ],
       "nozzle_dot": "one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh",
-      "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap"
+      "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap",
+      "integration_note": "On integration change P0FarmFacilities.HEAD from (0, 0.55, 0) to (0, 0.42, 0); no gameplay edit in this art branch."
     }
   }
 }

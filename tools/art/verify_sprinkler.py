@@ -50,7 +50,7 @@ for node in doc['nodes']:
     pivot = np.array(node.get('translation', [0,0,0]))
     check(np.allclose(node.get('scale', [1,1,1]), [1,1,1]), name+' unit scale')
     check(np.allclose(node.get('rotation', [0,0,0,1]), [0,0,0,1]), name+' identity rotation')
-    check(np.allclose(pivot, [0,.55,0] if name != 'base' else [0,0,0]), name+' correct axis/pivot')
+    check(np.allclose(pivot, [0,.42,0] if name != 'base' else [0,0,0]), name+' correct axis/pivot')
     if 'mesh' not in node:
         check(name == 'spray_origin', 'spray_origin is an empty node')
         continue
@@ -77,8 +77,8 @@ points = np.array(all_points); lo,hi=points.min(0),points.max(0)
 check(total==entry['triangles'] and total<=800, 'actual total triangles <=800 and matches manifest')
 check(entry['surfaces']==2, 'manifest two surfaces')
 check(np.allclose([lo,hi],entry['bounds']), 'actual metre bounds match manifest')
-check(np.allclose(entry['head_pivot'],[0,.55,0]) and np.allclose(entry['spray_origin'],[0,.55,0]), 'manifest head and spray positions')
-check(abs(lo[1])<1e-7 and .60<=hi[1]<=.65, 'bed-centred root and 0.60-0.65m height')
+check(np.allclose(entry['head_pivot'],[0,.42,0]) and np.allclose(entry['spray_origin'],[0,.42,0]), 'v1.2 manifest head and spray positions')
+check(abs(lo[1])<1e-7 and .51<=hi[1]<=.53, 'bed-centred root and approximately 0.52m height')
 head = arrays['head']; base = arrays['base']
 head_diameter = 2*np.linalg.norm(head['v'][:,[0,2]],axis=1).max()
 stone = base['v'][base['v'][:,1]<.048]
@@ -90,7 +90,7 @@ check(.239999<=stone_diameter<=.260001,'v1.1 stone pad diameter 0.24-0.26m')
 check(abs(cap_diameter-.10)<1e-6,'v1.1 actual blue cap diameter 0.10m')
 for angle in [0,45,90,135,180,225,270,315]:
     r=math.radians(angle); rotation=np.array([[math.cos(r),0,math.sin(r)],[0,1,0],[-math.sin(r),0,math.cos(r)]])
-    rotated=(head['v']-[0,.55,0])@rotation.T+[0,.55,0]
+    rotated=(head['v']-[0,.42,0])@rotation.T+[0,.42,0]
     check(np.max(np.abs(rotated[:,[0,2]]))<=.47,'head '+str(angle)+'deg remains inside real plot')
     check(abs(rotated[:,1].min()-head['v'][:,1].min())<1e-7 and abs(rotated[:,1].max()-head['v'][:,1].max())<1e-7,'head '+str(angle)+'deg no vertical wobble')
 # At inner/middle/end cross-sections, verify the actual tube has the prescribed
@@ -122,6 +122,39 @@ current=json.loads((KIT/'manifest.json').read_text()); current['assets'].pop('sp
 check(current==baseline_manifest,'all pre-existing manifest entries unchanged')
 check(subprocess.check_output(['git','show',BASELINE+':assets/farm/art/plot.glb'],cwd=ROOT)==(KIT/'plot.glb').read_bytes(),'original plot bytes unchanged')
 check(hashlib.sha256((KIT/'sprinkler.glb').read_bytes()).hexdigest()==entry['sha256'],'manifest SHA-256 correct')
+prior_path=OUT/'v1.1-baseline.glb'
+prior_path.write_bytes(subprocess.check_output(['git','show','cf97f40b:assets/farm/art/sprinkler.glb'],cwd=ROOT))
+prior_doc,prior_data=load_glb(prior_path)
+prior_head=next(n for n in prior_doc['nodes'] if n['name']=='head')
+current_head=next(n for n in doc['nodes'] if n['name']=='head')
+old_prim=prior_doc['meshes'][prior_head['mesh']]['primitives'][0]
+new_prim=doc['meshes'][current_head['mesh']]['primitives'][0]
+report['v1_1_head_preservation']={}
+for attribute in ['POSITION','NORMAL','COLOR_0']:
+    before=np.array(accessor(prior_doc,prior_data,old_prim['attributes'][attribute]))
+    after=np.array(accessor(doc,data,new_prim['attributes'][attribute]))
+    report['v1_1_head_preservation'][attribute+'_maximum_component_error']=float(np.abs(before-after).max())
+    if attribute=='NORMAL':
+        # Moving the authored coordinates changes float32 normal recomputation slightly.
+        angles=np.degrees(np.arctan2(np.linalg.norm(np.cross(before,after),axis=1),np.sum(before*after,axis=1)))
+        report['v1_1_head_preservation']['maximum_normal_angle_degrees']=float(angles.max())
+        check(angles.max()<.02,'v1.1 head normals retained within 0.02 degrees')
+    else:
+        check(before.shape==after.shape and np.allclose(before,after,atol=1e-6,rtol=0),
+              'v1.1 head local '+attribute+' retained; only its node lowered')
+check(accessor(prior_doc,prior_data,old_prim['indices'])==accessor(doc,data,new_prim['indices']),
+      'v1.1 head topology retained')
+prior_base=next(n for n in prior_doc['nodes'] if n['name']=='base')
+old_prim=prior_doc['meshes'][prior_base['mesh']]['primitives'][0]
+old_v=np.array(accessor(prior_doc,prior_data,old_prim['attributes']['POSITION']))
+old_c=np.array(accessor(prior_doc,prior_data,old_prim['attributes']['COLOR_0']))
+# Filter the green riser foot, which also extends into the pad's height range.
+def stone_points(vertices, colours):
+    return sorted(tuple(np.round(v,6)) for v,c in zip(vertices,colours)
+                  if any(np.allclose(c[:3],palette_linear[k],atol=2/65535)
+                         for k in ['stone','stone_light','stone_shade']))
+check(stone_points(old_v,old_c)==stone_points(base['v'],base['c']),'v1.1 stone pad geometry retained')
+check(prior_doc['materials']==doc['materials'],'v1.1 material retained')
 report['measurements']={'triangles':total,'bounds':[lo.tolist(),hi.tolist()], 'size_xyz_m':(hi-lo).tolist(),
     'head_swept_diameter_m':float(head_diameter),'stone_diameter_m':float(stone_diameter),'cap_diameter_m':float(cap_diameter),
     'arm_section_diameter_m':.040,'plot_min_edge_clearance_m':float(.47-head_diameter/2)}
