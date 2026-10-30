@@ -40,8 +40,9 @@
 - **第一个放 oss2 的包**：`https://oss2.sensenjoy.cn/p0/demo/releases/p0-demo-20261030-17b4f07f640f/sensen-p0-demo-0.2.15.apk`。全量下载 SHA、content-type、Range（206）、`SHA256SUMS` 和 `release.json`（backend `p0-server:563bd2d5`）回读都一致；新旧两个桶都查过，这个 versionCode 没用过。
 - 源码 farm-dev `563bd2d5`（冻结头，最后合入的是 #565）。客户端和服务端同一个头；包先上 OSS，服务端后部署。
 - 证书 `38771d94…`，和 0.2.14 一致，可以覆盖安装。
-- 测试：TESTS_PLACEHOLDER
-- 冒烟（模拟器，连 `563bd2d5` 本地服）：居民委托卡的奖励行（New title、实付金币、Bonus resets in）和卡上写的一致；Hana 新造型，详情页写 `Favorite dishes`；Homestead Lv4→Lv5 的需求和 q(263) 一致（木 12、石 10、芦苇 7、铜 6、黏土 5、石英 1、岩盐 2、技能和 8，金币格显示 490 = 450 + 40 保底）；冷启动、农场、地图正常。没测 #555 的补救台词（要走到引导的补救状态才出现），没装真机（SGODOT-232 评论 8c7ff257）。ONLINE_PLACEHOLDER
+- 测试：tests/p0 1,628 例、ui_kit 336 例全过（出包后在冻结头上补跑）。
+- 冒烟（模拟器，连 `563bd2d5` 本地服）：居民委托卡的奖励行（New title、实付金币、Bonus resets in）和卡上写的一致；Hana 新造型，详情页写 `Favorite dishes`；Homestead Lv4→Lv5 的需求和 q(263) 一致（木 12、石 10、芦苇 7、铜 6、黏土 5、石英 1、岩盐 2、技能和 8，金币格显示 490 = 450 + 40 保底）；冷启动、农场、地图正常。没测 #555 的补救台词（要走到引导的补救状态才出现），没装真机（SGODOT-232 评论 8c7ff257）。
+- 部署后连线上（`563bd2d5`）复核：新号的居民委托都带 `bonus`（如 Pip 20 金币 / 差额 18），0.2.15 包里 Pip 的委托卡奖励行显示 `+5 Friendship · 20 coins`；额度用满后的 `Bonus resets in`、故事委托的 New title 和 Lv5 面板线上新号到不了，在同一镜像的本地服上看过。线上为此多了一个没有任何操作的检查号。
 
 服务端（2026-10-30 10:36 部署到美西，`p0-server:563bd2d5`）：
 
