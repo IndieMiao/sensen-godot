@@ -2,8 +2,8 @@ extends Node
 ## Keeper portraits drawn from their look (SGODOT-300): a generated city's keeper (Ezra, Hugo …) has no hand-painted
 ## art, so the greeting card and the counter's keeper bar draw them from the same look preset their 3D figure wears
 ## (world.keeper_looks). texture() answers at once with a blank picture that the renderer fills in a few frames later;
-## the card and the bar show it as soon as it is drawn (a TextureRect redraws when its texture changes). The four
-## hand-painted keepers (Ama, Finn, Mei, Sigrid) keep their art: P0CounterDrawer.keeper_portrait asks here only when no
+## the card and the bar show it as soon as it is drawn (a TextureRect redraws when its texture changes). The five
+## hand-painted keepers (Ama, Finn, Mei, Sigrid, Lou) keep their art: P0CounterDrawer.keeper_portrait asks here only when no
 ## file exists. Drawn once per look and use; the most recent CARD_LIMIT cards and HEAD_LIMIT heads are kept (a card is
 ## ~770 KB, a head ~270 KB: about 12 MB at most, 上官婉儿 on #339), an older one is drawn again when asked for.
 ##
@@ -61,7 +61,7 @@ static func kept(card: bool) -> int:
 	var suffix := "|card" if card else "|head"
 	return _cache.keys().filter(func(k): return str(k).ends_with(suffix)).size()
 
-## A look `npc:<id>` is a written keeper's outfit in outpost_npcs.json, for one with no painted art (Lou, SGODOT-351).
+## A look `npc:<id>` is a written keeper's outfit in outpost_npcs.json, used only when no painted art is available.
 const NPC := "npc:"
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 static func _slots(look: String) -> Dictionary:
