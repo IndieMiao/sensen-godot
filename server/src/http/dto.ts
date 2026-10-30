@@ -1,4 +1,3 @@
-import { plotForFarm, visitorTerrain, type FarmTerrain } from '../geography/farm_terrain.js';
 /**
  * 三个显式 DTO（Codex 二审 Critical 4）。原设计只有一个 `publicView(state)` 且计划被 G2
  * 访客接口复用，那会把 owner_id、钱包、库存、关系、剧情全发给访客。
@@ -20,10 +19,6 @@ export interface FarmRow {
   layout_patch_id: string;
   blueprint_revision: number;
   location?: FarmLocation;
-  farm_terrain?: FarmTerrain;
-  relocation_available?: boolean;
-  relocation_used?: boolean;
-  relocation_draft?: import('../domain/farm_relocation.js').RelocationDraft | null;
   version: number;
   location_visible: boolean;
   visit_access: 'only_me' | 'anyone';
@@ -37,13 +32,10 @@ export function ownerFarmView(f: FarmRow, d: Derived, serverTime: number) {
     region_id: f.region_id,
     layout_patch_id: f.layout_patch_id,
     blueprint_revision: f.blueprint_revision,
-    ...(f.farm_terrain ? { farm_terrain: f.farm_terrain } : {}),
     ...(f.location ? { location: f.location } : {}),
     version: f.version,
     location_visible: f.location_visible,
     visit_access: f.visit_access,
-    relocation: { available: f.relocation_available === true && !f.relocation_used && !f.farm_terrain,
-      used: f.relocation_used === true },
     state: f.state,
     derived: {
       player_day_id: d.player_day_id,
@@ -60,7 +52,7 @@ export function ownerFarmView(f: FarmRow, d: Derived, serverTime: number) {
 export function currentOwnerFarmView(
   f: FarmRow, serverTime: number, timezone: string, content: Content, plot: PlotLayout,
 ) {
-  const state = projectFarmState(f.state, serverTime, timezone, content, plotForFarm(f, plot));
+  const state = projectFarmState(f.state, serverTime, timezone, content, plot);
   return ownerFarmView({ ...f, state }, derive(state, serverTime, timezone, content), serverTime);
 }
 
@@ -89,7 +81,6 @@ export function visitorSnapshot(
     avatar_ref: avatarRef,
     layout_patch_id: f.layout_patch_id,
     blueprint_revision: f.blueprint_revision,
-    ...(f.farm_terrain ? { farm_terrain: visitorTerrain(f.farm_terrain) } : {}),
     snapshot_revision: snapshotRevision,
     snapshot_taken_at: takenAt,
     beds_unlocked: f.state.beds_unlocked,

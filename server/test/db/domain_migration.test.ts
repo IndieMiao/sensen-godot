@@ -133,7 +133,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     expect(first).toMatchObject({ status: 'applied', migrated: 1, eligible: [farm.id] });
     const after = await snapshot();
     expect(after).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), domain_version: DOMAIN_VERSION })) });
     expect((await store.farmById(farm.id))!.state.chapters[0].step_flags).toEqual({ farm_created: true });
     for (const outcome of ['applied', 'rejected']) {
       const env = envelope(`legacy-${outcome}`, outcome === 'applied' ? 'till_cells' : 'till_cells');
@@ -177,6 +177,43 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     }
   });
 
+  it('refuses to upgrade a map-generated farm because its generator is retired (SGODOT-304)', async () => {
+    const eligible = await seed();
+    const geographic = await seed('27');
+    const current = await seed(DOMAIN_VERSION);
+    const terrain = JSON.stringify({ format: 1, layout_id: 'geo', plot: {}, source: {} });
+    await pool.query('UPDATE farms SET farm_terrain = $1 WHERE id = ANY($2::uuid[])', [terrain, [geographic.id, current.id]]);
+    const before = await snapshot();
+    for (const apply of [false, true]) {
+      const report = await migrateDomain(pool, { plot: sets, contentVersion: CV, apply });
+      expect(report).toMatchObject({ status: 'refused', migrated: 0, eligible: [eligible.id], already_current: [current.id],
+        blocked: [{ farm_id: geographic.id, reasons: ['geographic_farm_retired'] }] });
+      expect(await snapshot()).toEqual(before);
+    }
+  });
+
+  it('runs on a database that never got the farm_terrain column (the old root /v1 farm image)', async () => {
+    const farm = await seed();
+    // A private schema keeps the shared test tables intact.
+    const schema = `no_terrain_${randomUUID().replaceAll('-', '')}`;
+    await pool.query(`CREATE SCHEMA ${schema}`);
+    const scoped = new pg.Pool({ connectionString: DSN, max: 2, options: `-c search_path=${schema}` });
+    try {
+      await pool.query(`CREATE TABLE ${schema}.farms (LIKE public.farms INCLUDING DEFAULTS INCLUDING CONSTRAINTS)`);
+      await pool.query(`CREATE TABLE ${schema}.farm_snapshots (LIKE public.farm_snapshots INCLUDING DEFAULTS)`);
+      await pool.query(`INSERT INTO ${schema}.farms SELECT * FROM public.farms`);
+      await pool.query(`ALTER TABLE ${schema}.farms DROP COLUMN farm_terrain`);
+      expect(await migrateDomain(scoped, { plot: sets, contentVersion: CV }))
+        .toMatchObject({ status: 'ready', eligible: [farm.id], blocked: [] });
+      expect(await migrateDomain(scoped, { plot: sets, contentVersion: CV, apply: true }))
+        .toMatchObject({ status: 'applied', migrated: 1 });
+      expect((await scoped.query('SELECT domain_version FROM farms')).rows).toEqual([{ domain_version: DOMAIN_VERSION }]);
+    } finally {
+      await scoped.end();
+      await pool.query(`DROP SCHEMA ${schema} CASCADE`);
+    }
+  });
+
   it('also refuses mismatched content on a current-domain farm', async () => {
     await seed();
     const other = await seed(DOMAIN_VERSION);
@@ -194,7 +231,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     const report = await migrateDomain(pool, { plot: sets, contentVersion: CV, previousContentVersion: 'previous-bundle-content', apply: true });
     expect(report).toMatchObject({ status: 'applied', migrated: 1, to_domain_version: DOMAIN_VERSION });
     expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION, content_version: CV })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), domain_version: DOMAIN_VERSION, content_version: CV })) });
   });
 
   it('continues a migrated farm through a saved display plan and replays each command without duplicate costs', async () => {
@@ -210,7 +247,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     const before = await snapshot();
     expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
     expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), domain_version: DOMAIN_VERSION })) });
 
     const plan = { idempotency_key: 'plan-fountain', base_version: 0, type: 'plan_journey_display' as const,
       payload: { project: 'terrace', slot: 2, item: 'fountain', sequence: 0 } };
@@ -264,7 +301,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     const before = await snapshot();
     expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
     expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), domain_version: DOMAIN_VERSION })) });
 
     const pin = { idempotency_key: 'track-leaves', base_version: 0, type: 'track_journey_opportunity' as const,
       payload: { slot: 'nursery', sequence: 0, tracking: true } };
@@ -383,6 +420,6 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, previousContentVersion: previous, apply: true }))
       .toMatchObject({ status: 'applied', migrated: 1 });
     expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, content_version: CV, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), content_version: CV, domain_version: DOMAIN_VERSION })) });
   });
 });

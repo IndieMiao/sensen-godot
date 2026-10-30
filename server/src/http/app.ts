@@ -1,9 +1,4 @@
-import { createOsmProvider } from '../geography/osm.js';
 import { PondCatalog, POND_CELL_DEG } from '../ponds/catalog.js';
-import { createLandCoverProvider } from '../geography/land_cover.js';
-import { relocateFarmState, relocationAvailable, relocationBlocked, RELOCATION_PREVIEW_TTL, RelocationError,
-  type RelocationConfirm } from '../domain/farm_relocation.js';
-import { farmStyleForRegion, generateFarmTerrain, retireFarmPond, supplementGeography, FARM_GENERATIONS, LATEST_FARM_GENERATION, GeographyError, plotForFarm, type GeographyProvider, type LandCoverProvider, type FarmGenerationVersion, type LandCoverSupplement } from '../geography/farm_terrain.js';
 /**
  * Fastify 应用。测试用 `app.inject`，不起真实端口。
  *
@@ -63,8 +58,6 @@ export interface AppDeps {
   voiceMedia?: VoiceMedia;
   /** 覆写农场地面布局；默认读 content.farm_plot 的 default_layout。 */
   plot?: PlotLayout;
-  geographyProvider?: GeographyProvider;
-  landCoverProvider?: LandCoverProvider;
   /** Global city directory; defaults to data/cities.tsv plus the curated regions file. */
   cities?: CityCatalog;
   /** Coarse IP geolocation for the city picker's default. Absent means no suggestion. */
@@ -99,30 +92,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
   const cities = deps.cities ?? CityCatalog.fromRegionsFile(deps.regionsFile);
   const seenBlueprints = new Set<string>();
-  const geographyProvider = deps.geographyProvider ?? createOsmProvider();
-  const landCoverProvider = deps.landCoverProvider ?? createLandCoverProvider();
-  const terrainForLocation = async (location: FarmLocation, regionId: string, generation: FarmGenerationVersion) => {
-    const extent = FARM_GENERATIONS[generation].geography_extent_m;
-    // A failed OSM request must remain a failed request; land cover supplements missing classifications only.
-    const geography = await geographyProvider(location, extent);
-    const build = (data: typeof geography) => retireFarmPond(generateFarmTerrain(location, data,
-      deps.content.farm_plot.layouts[deps.content.farm_plot.default_layout], farmStyleForRegion(regionId, cities.get(regionId)?.country_code), generation));
-    try { return build(geography); }
-    catch (error) {
-      if (generation < 2 || !(error instanceof GeographyError) || error.code !== 'GEOGRAPHY_INCOMPLETE') throw error;
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      try {
-        const supplement = await Promise.race([landCoverProvider(location, extent), new Promise<LandCoverSupplement>((_resolve, reject) => {
-          timer = setTimeout(() => reject(new GeographyError('GEOGRAPHY_UNAVAILABLE')), 10000);
-        })]);
-        return build(supplementGeography(geography, supplement));
-      } finally { if (timer !== undefined) clearTimeout(timer); }
-    }
-  };
   const ownerView = (farm: FarmRow, now: number, timezone: string) => {
     // 地理蓝图仍须存在（它决定街道与地图叠加），但农场地面属性来自 farm_plot，与它无关。
     const key = `${farm.layout_patch_id}@${farm.blueprint_revision}`;
-    if (!farm.farm_terrain && !seenBlueprints.has(key)) {
+    if (!seenBlueprints.has(key)) {
       if (!loadBlueprint(deps.blueprintDir, farm.layout_patch_id, farm.blueprint_revision))
         throw Object.assign(new Error('Farm blueprint is unavailable'), {
           statusCode: 422, code: 'BLUEPRINT_MISMATCH',
@@ -226,9 +199,6 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   /** 只给 id / timezone / candidates——名字、中心点由客户端从本地 regions.json 取（决策②）。 */
   app.get('/v1/regions', async (_req, reply) => reply.send({
     farm_placement_version: 1,
-    farm_generation_version: LATEST_FARM_GENERATION,
-    farm_geography_extent_m: FARM_GENERATIONS[LATEST_FARM_GENERATION].geography_extent_m,
-    farm_generations: Object.values(FARM_GENERATIONS),
     regions: regions.regions.map(r => ({
       id: r.id, timezone: r.timezone,
       placement_bounds: r.placement_bounds,
@@ -240,39 +210,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.post('/v1/farms', async (req, reply) => {
     const p = await writer(req, reply);
     if (!p) return;
-    const generated = req.body as { generation_version?: unknown; idempotency_key?: unknown; region_id?: unknown; location?: unknown };
-    if (generated?.generation_version !== undefined) {
-      if ((generated.generation_version !== 1 && generated.generation_version !== 2 && generated.generation_version !== 3)
-        || typeof generated.idempotency_key !== 'string' || !generated.idempotency_key
-        || generated.idempotency_key.length > 128 || typeof generated.region_id !== 'string')
-        return reply.code(400).send({ code: 'SCHEMA' });
-      if (!isFarmLocation(generated.location)) return reply.code(400).send({ code: 'INVALID_LOCATION' });
-      const location = { lat: generated.location.lat, lng: generated.location.lng };
-      const generation = FARM_GENERATIONS[generated.generation_version];
-      // The server decides the city from the coordinates; the requested id only keeps border picks in the chosen city.
-      const region = cities.forPlacement(location, generated.region_id);
-      if (!region || (region.placement_bounds && !withinPlacementBounds(location, region.placement_bounds, generation.geography_extent_m / 2)))
-        return reply.code(422).send({ code: 'LOCATION_OUTSIDE_REGION' });
-      const hash = payloadHash({ idempotency_key: generated.idempotency_key, base_version: 0, type: 'create_farm',
-        payload: { generation_version: generation.generation_version, region_id: region.id, location } });
-      try {
-        const result = await deps.store.createFarm({ ownerId: p.id, idempotencyKey: generated.idempotency_key, payloadHash: hash,
-          regionId: region.id, layoutPatchId: '', blueprintRevision: 1, build: async () => {
-            const terrain = await terrainForLocation(location, region.id, generation.generation_version);
-            const now = deps.now();
-            let state = initialFarmState(deps.content, plotForFarm({ farm_terrain: terrain }, deps.plot ?? plotFor(deps.content)), region.timezone, now);
-            if (!deps.legacyGameplay && !deps.qaPlayerIds?.has(p.id)) { state = startJourney(state, deps.content); ensureBag(state, deps.content); }
-            return { id: cryptoRandomId(), owner_id: p.id, region_id: region.id, layout_patch_id: terrain.layout_id,
-              blueprint_revision: 1, location, farm_terrain: terrain, version: 0, location_visible: true, visit_access: 'only_me', state };
-          } });
-        if (result.kind === 'idempotency_mismatch') return reply.code(409).send({ code: 'IDEMPOTENCY_MISMATCH' });
-        const now = Math.max(qaNow(result.farm.state.qa, deps.now()), result.farm.state.clock.last_effective_now);
-        return reply.code(result.kind === 'created' ? 201 : 200).send(ownerView(result.farm, now, region.timezone));
-      } catch (error) {
-        if (error instanceof GeographyError) return reply.code(error.code === 'GEOGRAPHY_UNAVAILABLE' ? 503 : 422).send({ code: error.code });
-        throw error;
-      }
-    }
+    // Geographic farms (generated from map data at the picked point) are retired (SGODOT-304 / 342).
+    if ((req.body as { generation_version?: unknown } | undefined)?.generation_version !== undefined)
+      return reply.code(410).send({ code: 'FARM_GENERATION_RETIRED' });
     const b = req.body as { idempotency_key?: string; region_id?: string; layout_patch_id?: string;
       blueprint_revision?: number; location?: unknown };
     if (!b?.idempotency_key || !b.region_id || !b.layout_patch_id || !Number.isInteger(b.blueprint_revision))
@@ -321,64 +261,6 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // 读路径也要过 QA 变换，否则加速后的农场在 GET 里看到的是没加速的时间。
     const now = Math.max(qaNow(farm.state.qa, deps.now()), farm.state.clock.last_effective_now);
     return reply.send(ownerView(farm, now, tz));
-  });
-
-  const relocationStatus = (code: string) => code === 'NO_FARM' ? 404 : code === 'VERSION_MISMATCH' ? 503
-    : code === 'RELOCATION_NO_SPACE' ? 422 : 409;
-  app.post('/v1/farms/me/relocation/preview', {
-    config: { rateLimit: { max: 30, timeWindow: '1 hour' } },
-  }, async (req, reply) => {
-    const player = await writer(req, reply);
-    if (!player) return;
-    const body = req.body as { region_id?: unknown; location?: unknown; generation_version?: unknown };
-    if (!body || typeof body.region_id !== 'string') return reply.code(400).send({ code: 'SCHEMA' });
-    const generationVersion = body.generation_version === undefined ? 1 : body.generation_version;
-    if (generationVersion !== 1 && generationVersion !== 2 && generationVersion !== 3) return reply.code(400).send({ code: 'SCHEMA' });
-    const generation = FARM_GENERATIONS[generationVersion];
-    if (!isFarmLocation(body.location)) return reply.code(400).send({ code: 'INVALID_LOCATION' });
-    const farm = await deps.store.farmByOwner(player.id);
-    if (!farm) return reply.code(404).send({ code: 'NO_FARM' });
-    if (!relocationAvailable(farm)) return reply.code(409).send({ code: 'RELOCATION_UNAVAILABLE' });
-    if (relocationBlocked(farm, deps.now(), deps.content)) return reply.code(409).send({ code: 'RELOCATION_BUSY' });
-    const location = { lat: body.location.lat, lng: body.location.lng }, baseVersion = farm.version;
-    // Relocation stays inside the farm's own city.
-    const region = cities.get(body.region_id)?.id === farm.region_id ? cities.forPlacement(location, farm.region_id) : null;
-    if (!region || region.id !== farm.region_id
-      || (region.placement_bounds && !withinPlacementBounds(location, region.placement_bounds, generation.geography_extent_m / 2)))
-      return reply.code(422).send({ code: 'LOCATION_OUTSIDE_REGION' });
-    try {
-      const terrain = await terrainForLocation(location, region.id, generationVersion);
-      const moved = relocateFarmState(farm.state, plotForFarm({ farm_terrain: terrain }, deps.plot ?? plotFor(deps.content)), deps.content);
-      const draft = { preview_id: randomUUID(), base_version: baseVersion, expires_at: deps.now() + RELOCATION_PREVIEW_TTL, generation_version: generation.generation_version,
-        region_id: region.id, location, farm_terrain: terrain, moved_cells: moved.moved_cells, moved_decorations: moved.moved_decorations };
-      const saved = await deps.store.saveRelocationPreview(player.id, draft);
-      if (saved.code) return reply.code(relocationStatus(saved.code)).send({ code: saved.code, server_time: deps.now() });
-      return reply.send({ ...draft, server_time: deps.now() });
-    } catch (error) {
-      if (error instanceof GeographyError) return reply.code(error.code === 'GEOGRAPHY_UNAVAILABLE' ? 503 : 422).send({ code: error.code });
-      if (error instanceof RelocationError) return reply.code(relocationStatus(error.code)).send({ code: error.code });
-      throw error;
-    }
-  });
-  app.post('/v1/farms/me/relocation/confirm', async (req, reply) => {
-    const player = await writer(req, reply);
-    if (!player) return;
-    const input = req.body as RelocationConfirm;
-    if (!input || typeof input.preview_id !== 'string' || !input.preview_id || input.preview_id.length > 128
-      || typeof input.idempotency_key !== 'string' || !input.idempotency_key || input.idempotency_key.length > 128
-      || !Number.isSafeInteger(input.base_version) || input.base_version < 0) return reply.code(400).send({ code: 'SCHEMA' });
-    const farm = await deps.store.farmByOwner(player.id);
-    if (!farm) return reply.code(404).send({ code: 'NO_FARM' });
-    try {
-      const commit = () => deps.store.confirmFarmRelocation(player.id, input);
-      const result = online ? await online.withFarmRelocation(player.id, farm.id, commit) : await commit();
-      if (result.kind === 'rejected') return reply.code(relocationStatus(result.code)).send({ code: result.code, server_time: deps.now() });
-      const now = Math.max(qaNow(result.farm.state.qa, deps.now()), result.farm.state.clock.last_effective_now);
-      return reply.send(ownerView(result.farm, now, cities.timezone(result.farm.region_id)));
-    } catch (error) {
-      if (error instanceof Error && error.message === 'RELOCATION_BUSY') return reply.code(409).send({ code: 'RELOCATION_BUSY' });
-      throw error;
-    }
   });
 
   app.post('/v1/farms/me/commands', async (req, reply) => {

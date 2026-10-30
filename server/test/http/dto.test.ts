@@ -41,7 +41,7 @@ describe('OwnerFarmView', () => {
     const f = farm();
     expect(Object.keys(ownerFarmView(f, d(f), NOW)).sort()).toEqual([
       'blueprint_revision', 'derived', 'farm_id', 'layout_patch_id', 'location_visible',
-      'region_id', 'relocation', 'server_time', 'state', 'version', 'visit_access',
+      'region_id', 'server_time', 'state', 'version', 'visit_access',
     ]);
   });
 });
