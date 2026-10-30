@@ -82,3 +82,14 @@ func test_no_answer_is_given_up_after_the_wait() -> void:
 	var got := await _until_done(http)
 	assert_int(int(got[0])).is_equal(HTTPRequest.RESULT_TIMEOUT)
 	assert_int(Time.get_ticks_msec() - t0).is_between(450, 2000)
+
+## A second send while one is on the wire is refused (ERR_BUSY) and leaves that one's wait running (周瑜 on #582).
+func test_a_refused_send_leaves_the_wait_running() -> void:
+	_serve(false)
+	var http: P0HttpRequest = auto_free(P0HttpRequest.new(0.5))
+	add_child(http)
+	await get_tree().process_frame
+	http.send("http://127.0.0.1:%d/p0/state" % _port)
+	assert_int(http.send("http://127.0.0.1:%d/p0/state" % _port)).is_equal(ERR_BUSY)
+	var got := await _until_done(http)
+	assert_int(int(got[0])).is_equal(HTTPRequest.RESULT_TIMEOUT)
