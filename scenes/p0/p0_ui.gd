@@ -420,24 +420,30 @@ func set_view(v: Dictionary) -> void:
 
 
 var _hold_here := ""
+var _hold_until_server := false
 var _hold_energy := {}
+var _hold_coins := -1
 
 ## While the map flies the player to another city (q(147) ⑤, SGODOT-299) the place chip reads the city they left
-## (`cluster`); "" lets it follow the view again, as on landing.
-func hold_here(cluster: String) -> void:
-	if cluster == _hold_here: return
+## (`cluster`) — from Fly, while the view still says it too (SGODOT-361); "" lets it follow the view again, as on
+## landing. until_server: only until the server's view says it (home's flight, landed before return_home).
+func hold_here(cluster: String, until_server := false) -> void:
+	if cluster == _hold_here and until_server == _hold_until_server: return
 	_hold_here = cluster
+	_hold_until_server = until_server
 	_hud_hash = 0
 	_refresh_hud()
 
 func energy_held() -> bool:
 	return not _hold_energy.is_empty()
 
-## ...and the HUD's Energy reads what it was before the arrival (q(147) ⑥: a first visit's +10 comes with the landing);
-## {} lets it follow the view again.
-func hold_energy(energy: Dictionary) -> void:
-	if energy == _hold_energy: return
+## ...and the HUD's Energy reads what it was before the arrival (q(147) ⑥: a first visit's +10 comes with the landing),
+## the coins too (q(261) ④: the HUD does not move under the cover); {} lets both follow the view again.
+func hold_energy(energy: Dictionary, coins := -1) -> void:
+	if energy.is_empty(): coins = -1
+	if energy == _hold_energy and coins == _hold_coins: return
 	_hold_energy = energy.duplicate()
+	_hold_coins = coins
 	_hud_hash = 0
 	_refresh_hud()
 
@@ -449,15 +455,16 @@ func _refresh_hud() -> void:
 	# chips would still take taps. None over the home pick either: its pages lie on the real map (PR-2b, HOME-WELCOME).
 	hud.visible = _hud_shown()
 	if view.is_empty(): return
-	if _hold_here != "" and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
+	if _hold_until_server and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
 	var seen := view
-	if _hold_here != "" or not _hold_energy.is_empty():   # flying to another city (q(147) ⑤ ⑥): until it lands
+	if _hold_here != "" or not _hold_energy.is_empty():   # flying to another city (q(147) ⑤ ⑥, q(261) ④): until it lands
 		seen = view.duplicate()
 		if _hold_here != "":   # the chip keeps the city left
 			var travel: Dictionary = (view.get("travel", {}) as Dictionary).duplicate()
 			travel["here"] = _hold_here
 			seen["travel"] = travel
 		if not _hold_energy.is_empty(): seen["energy"] = _hold_energy   # and Energy what it was
+		if _hold_coins >= 0: seen["coins"] = _hold_coins   # and the coins
 	var place := P0Travel.place(seen, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""), space)   # arrived in another city: Tokyo · Arrived (q(108))
 	var state := P0Logic.hud_state(seen, {"next_cost": int(fab_state().get("need", 0)), "place": place})
 	var dots: Array = state.get("today_dots", [])
@@ -1618,6 +1625,9 @@ func sys_text() -> String: return _sys.message if _sys != null and is_instance_v
 ## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
 func toast(text: String, seconds := 0.0, break_at_dot := false) -> void:
 	if not _toasts: return
+	if _cover_up:
+		_cover_toast = {kind = "info", text = text, brk = break_at_dot}
+		return
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.INFO, "", seconds)
 
@@ -1683,6 +1693,9 @@ func _aim_toast() -> void:
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
 func toast_error(text: String, action := "") -> void:
 	if not _toasts: return
+	if _cover_up:
+		_cover_toast = {kind = "error", text = text, action = action}
+		return
 	_toast_bag_tab = ""
 	_aim_toast()
 	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
@@ -1713,6 +1726,9 @@ static func creel_full_text(v: Dictionary) -> String:
 ## (`Place now ›` after a decor purchase).
 func toast_success(text: String, break_at_dot := false, action := "") -> void:
 	if not _toasts: return
+	if _cover_up:
+		_cover_toast = {kind = "success", text = text, brk = break_at_dot, action = action}
+		return
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS, action)
 
@@ -1722,6 +1738,26 @@ var _toast_decor := ""
 func toast_decor_bought(id: String) -> void:
 	_toast_decor = id
 	toast_success("%s · in Farm Storage" % P0Decor.name_of(id), true, "Place now")
+
+## q(261) ⑦ (SGODOT-361): a toast said while a cross-city flight's cover is up waits until it is down and its welcome
+## — and a first visit's card — has been said (`after_s`, then as toast_when_clear does); the latest one wins, as a
+## toast replaces a shown one. SYS lines (show_sys) are not held.
+var _cover_up := false
+var _cover_toast := {}
+
+func hold_toasts(on: bool, after_s := 0.0) -> void:
+	_cover_up = on
+	if on or _cover_toast.is_empty(): return
+	var held := _cover_toast
+	_cover_toast = {}
+	if after_s <= 0.0 or not is_inside_tree(): _say_held(held)
+	else: get_tree().create_timer(after_s).timeout.connect(func(): if not _cover_up: _say_held(held))
+
+func _say_held(held: Dictionary) -> void:
+	match str(held.kind):
+		"error": toast_error(str(held.text), str(held.get("action", "")))
+		"success": toast_success_when_clear(str(held.text), bool(held.get("brk", false)))
+		_: toast_when_clear(str(held.text))
 
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""

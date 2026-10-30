@@ -112,7 +112,7 @@ func _fly_home() -> void:
 		# landed with another scene over the map (it was suspended) or another way out under way: not home yet — the
 		# player is where they were, and goes home again from there (周瑜 on #341)
 		if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
-		rt.ui.hold_here(P0Travel.home(_view()))   # Homestead from the landing; the server's here follows with return_home
+		rt.ui.hold_here(P0Travel.home(_view()), true)   # Homestead from the landing; the server's here follows with return_home
 		_enter_farm())
 
 func _on_city_pond_requested(entry: Dictionary) -> void:
@@ -781,7 +781,9 @@ func _exit_tree() -> void:
 	if travelling():   # left mid-flight: nothing more to show here, but the chip and Energy must not stay held
 		_trip = {}
 		_show_self(true)
-		if rt != null: rt.release_travel()
+		if rt != null:
+			rt.release_travel()
+			rt.ui.hold_toasts(false)
 	super._exit_tree()
 
 # ---------------------------------------------------------------- travel (SGODOT-275, §11.8; the free first version)
@@ -889,44 +891,112 @@ func open_travel(cluster: String, preview := {}) -> void:
 	}
 	P0PlaceSheet.open(rt.ui, spec, func():
 		rt.ui.close_modal()
-		_origin_before = _origin()
-		_here_before = P0Travel.here(_view())
-		rt.session.send({"type": "travel", "to": cluster}), Callable(), Callable(), "travel_card")
+		_take_off(cluster, int(trip.get("km", 0))), Callable(), Callable(), "travel_card")
 
-var _origin_before := Vector2.ZERO   # where the player stood when Fly was pressed: the flight frames it with the city ahead
-var _here_before := ""   # the city they stood in then: the place chip keeps it until the flight lands (q(147) ⑤)
-
-## The server's arrival (events {kind: "arrival"}): the camera flies to the city's overview and lands with the welcome
-## (q(108): a first visit is stamped, its +10 Energy floats as Energy does; a return only floats Welcome back). The
-## flight is q(147)'s fixed 3 s (SGODOT-299): up from where the camera is — no jump back to the city left first — until
-## the city left and the one ahead are both in view, along, down to the overview; a cover takes every touch meanwhile,
-## a tap after its first 0.5 s or Back lands it. The place chip and the avatar keep the city left until it lands.
-func on_arrival(ev: Dictionary) -> void:
-	var cluster := str(ev.get("cluster", ""))
+## Fly (SGODOT-361, 不知火舞 on 361 9146d012; 299 v1 ⑤ and q(75) changed for this one place): the flight takes off as Fly
+## is pressed and `travel` goes with it. q(147)'s fixed 3 s (SGODOT-299): up from where the camera is until the city left
+## and the one ahead are both in view, along, down to the overview; a cover takes every touch meanwhile, a tap after its
+## first 0.5 s or Back lands it. The place chip and the avatar keep the city left until it lands. The pill and the
+## take-off read what the client knows (the card's trip, the fog for a first visit); whether it is a first visit, its
+## stamp and its +10 Energy are the reply's (the server gives the +10 to the first 2 of a day only).
+func _take_off(cluster: String, km: int) -> void:
 	var c := P0Clusters.get_cluster(cluster)
-	if c.is_empty():
-		if rt != null: rt.release_travel()   # no flight: nothing held waits for one
-		return
+	if c.is_empty() or rt == null: return
+	var back := {lat = center_lat, lng = center_lng, zoom = zoom + _zoom_elastic, bearing = city_bearing, region = region}
+	var held := P0Travel.here(_view())
+	var left := _origin()
+	var first := P0Travel.fog(_view(), cluster) == "unexplored"
 	var r := P0Clusters.region(cluster)
 	var overview: Dictionary = CityMapData.city(str(r.get("id", ""))).get("overview", {})
-	var left := _origin_before if _origin_before != Vector2.ZERO else Vector2(center_lat, center_lng)
-	_origin_before = Vector2.ZERO   # one arrival per Fly: a later arrival (another device) starts from where it lands
-	var held := _here_before
-	_here_before = ""
-	var first := bool(ev.get("first", false))
-	var welcome := ("Welcome to %s · Stamp collected" % str(c.name)) if first else "Welcome back"
+	var reply := {}   # the arrival, once its reply is in
 	_switch_city(r)
 	_load_city_places(cluster)   # its ponds and outposts, read while the camera flies
 	_travel_fly({lat = float(overview.get("lat", c.lat)), lng = float(overview.get("lng", c.lng)),
 		zoom = float(overview.get("zoom", 11.0)), bearing = float(overview.get("bearing", 0.0))}, left, held, cluster,
-		str(c.name), int(ev.get("km", 0)), func():
-			# §11.8.4 steps 5 then 7 (q(152) ②): a first visit's stamp says itself for 1.5 s with its +10 Energy, then
-			# goes, and only then the card slides up, so the toast never lies over it; a return only floats Welcome back.
-			if not first:
-				rt.ui.toast(welcome)
-				return
-			rt.ui.toast(welcome, STAMP_S)
-			_arrival_card_after_stamp(cluster), cluster if first else "")
+		str(c.name), km, func(): _welcome(cluster, reply), cluster if first else "")
+	var cmd := {"type": "travel", "to": cluster}
+	_trip.merge({awaiting = cluster, reply = reply, back = back, cmd = cmd, key = P0Session.ui_key(cmd), retried = false,
+		age_frames = 0.0})
+	if not rt.session.command_settled.is_connected(_travel_settled): rt.session.command_settled.connect(_travel_settled)
+	rt.ui.hold_toasts(true)   # ⑦: other toasts wait for the cover to go, and the welcome
+	rt.session.send(cmd, str(_trip.key))
+
+## §11.8.4 steps 5 then 7 (q(152) ②): a first visit's stamp says itself for 1.5 s with its +10 Energy, then goes, and
+## only then the card slides up, so the toast never lies over it; a return (no arrival in the reply too: already there
+## with a pass, 9146d012 ③) only floats Welcome back.
+func _welcome(cluster: String, ev: Dictionary) -> void:
+	if not bool(ev.get("first", false)):
+		rt.ui.toast("Welcome back")
+		return
+	rt.ui.toast("Welcome to %s · Stamp collected" % str(P0Clusters.get_cluster(cluster).get("name", "")), STAMP_S)
+	_arrival_card_after_stamp(cluster)
+
+## How long a flight waits for its reply, from Fly (the session's own timeout), and how long it stands landed without
+## one before the cover says so (9146d012 ①).
+const REPLY_WAIT_S := 8.0
+const SLOW_REPLY_S := 1.5
+
+## The server's arrival (events {kind: "arrival"}, q(108)): the flight in the air for it lands with its welcome — at once
+## when it is already down waiting. One nothing waits for (called back: a reply later than REPLY_WAIT_S) flies nowhere:
+## the view says where the player is (9146d012 ②); nor does it free what another flight in the air holds (周瑜 on #560:
+## called back, then off to another city at once, the first one's late arrival came mid-flight).
+func on_arrival(ev: Dictionary) -> void:
+	if travelling() and str(_trip.get("awaiting", "")) == str(ev.get("cluster", "")):
+		(_trip.reply as Dictionary).merge(ev, true)
+		_reply_in()
+		return
+	if rt != null and not travelling(): rt.release_travel()   # nothing held waits for it
+
+## The travel command settled. Its arrival came first (on_arrival); taken without one, it is a return (③); stale_state
+## goes again once, quietly; refused (any other code: the client's city table not the server's) or failed — maintenance
+## and update_required too, their whole-screen cards over it — the flight is called back. A failure says itself in
+## SYS-CMD-FAIL as any command's (q(75)), a refusal in the runtime's toast. (Fares' own codes come with q(256).)
+func _travel_settled(key: String, ok: bool, code: String) -> void:
+	if _trip.is_empty() or key != str(_trip.get("key", "")) or str(_trip.get("awaiting", "")) == "": return
+	if ok:
+		_reply_in()
+		return
+	if code == "stale_state" and not bool(_trip.retried):
+		_trip.retried = true
+		rt.session.send(_trip.cmd, key)
+		return
+	if code == "stale_state": rt.ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", P0Runtime.CMD_FAIL_S)
+	_call_back()
+
+func _reply_in() -> void:
+	_trip.awaiting = ""
+	if bool(_trip.get("waiting", false)): _travel_down()
+
+## ② (9146d012): in the air or landed waiting, the camera is back where Fly was pressed in the same frame — its place,
+## zoom and bearing, the city left the camera's city again — the cover, the pill, the route and the plane gone and the
+## avatar back. No stamp, no Energy, no card: nothing moved on the server. No flight back (it would look like a trip).
+func _call_back() -> void:
+	var trip := _trip
+	_trip = {}
+	_drop_cover(trip)
+	if rt != null: rt.ui.hold_toasts(false)   # a refusal's toast, said under the cover, now
+	var back: Dictionary = trip.back
+	_switch_city(back.region)
+	center_lat = float(back.lat)
+	center_lng = float(back.lng)
+	city_bearing = float(back.bearing)
+	_set_zoom(float(back.zoom))
+	_camera_dirty = true
+	_regions_key = ""
+	if rt != null: rt.release_travel()
+	_here_sig = ""
+	_sync_here()
+	_sync_farm_markers()
+	_show_self(true)
+	_draw_now()
+
+## The camera, the avatar and the pins drawn where they now are, this frame: a reply lands or calls back the flight
+## from the network's callback, after this frame's _process, and they came a frame after the chip (不知火舞 on #560).
+func _draw_now() -> void:
+	if not _camera_dirty or not is_inside_tree(): return
+	_camera_dirty = false
+	_update_cameras()
+	if city_map: city_map.tick(0.0)
 
 ## The stamp's beat of the arrival (§11.8.4 ≤ 1.5 s, q(152) ②): its toast's time, after which the arrival card comes.
 const STAMP_S := 1.5
@@ -1053,8 +1123,20 @@ func travelling() -> bool:
 
 ## A flight whose tween anything else stopped (MapPoc's gesture reset, another flight) lands at once: the cover never
 ## outlives its flight (asked each frame).
-func _travel_watch() -> void:
+## Waiting for the reply (9146d012): REPLY_WAIT_S from Fly calls the flight back; landed SLOW_REPLY_S without one, the
+## cover says so. Real time, or the frames' own on a recording (as the flight's clock, _travel_at).
+func _travel_watch(dt := 0.0) -> void:
 	if _trip.is_empty(): return
+	if str(_trip.get("awaiting", "")) != "":
+		_trip.age_frames = float(_trip.get("age_frames", 0.0)) + dt
+		if _trip_seconds("start_us", "age_frames") >= REPLY_WAIT_S:
+			_call_back()
+			return
+		if bool(_trip.get("waiting", false)):
+			_trip.wait_frames = float(_trip.wait_frames) + dt
+			if _trip_seconds("wait_us", "wait_frames") >= SLOW_REPLY_S and is_instance_valid(_trip.cover): (_trip.cover as P0TravelCover).slow()
+			return
+	elif bool(_trip.get("waiting", false)): return
 	var tween = _trip.get("tween")
 	if not (tween is Tween) or not (tween as Tween).is_valid() or not (tween as Tween).is_running(): _travel_land()
 
@@ -1075,26 +1157,62 @@ func _skip_travel() -> void:
 ## Down: the camera at the overview, the cover gone, the chip and the avatar in the new city, then the welcome. Also
 ## how every other way out ends a flight (skipped, the map suspended or left, the app sent to the background, the
 ## tween stopped by anything else), so the cover never stays up.
+## With the reply still out it lands waiting for it (_travel_wait).
 func _travel_land() -> void:
 	if _trip.is_empty(): return
-	var trip := _trip
-	_trip = {}
+	if str(_trip.get("awaiting", "")) != "":
+		_travel_wait()
+		return
+	_travel_down()
+
+## ① (9146d012): down at the overview with the reply still out — the cover stays and takes every touch (Back too), the
+## pill at the trip's km, no Tap to skip; the chip, the avatar and the Energy as in the air. The reply lands it.
+func _travel_wait() -> void:
+	if bool(_trip.get("waiting", false)): return
+	_trip.waiting = true
+	_trip.wait_us = Time.get_ticks_usec()
+	_trip.wait_frames = 0.0
+	_trip.t = P0TravelFlight.TOTAL_S
 	if _focus_tween != null and _focus_tween.is_valid(): _focus_tween.kill()
-	var to: Dictionary = trip.to
+	_camera_at(_trip.to)
+	if is_instance_valid(_trip.cover): (_trip.cover as P0TravelCover).wait()
+
+## Seconds since `us` (Time.get_ticks_usec), or the frames counted in `frames` on a recording (P0_SHOT_FRAMES).
+func _trip_seconds(us: String, frames: String) -> float:
+	if OS.has_environment("P0_SHOT_FRAMES"): return float(_trip.get(frames, 0.0))
+	return (Time.get_ticks_usec() - int(_trip.get(us, Time.get_ticks_usec()))) / 1e6
+
+func _camera_at(to: Dictionary) -> void:
 	center_lat = float(to.lat)
 	center_lng = float(to.lng)
 	city_bearing = float(to.bearing)
 	_set_zoom(float(to.zoom))
 	_camera_dirty = true
-	if is_instance_valid(trip.cover):   # off at once: the map takes touches again this frame
+
+## The flight's tween stopped and its cover off at once: the map takes touches again this frame.
+func _drop_cover(trip: Dictionary) -> void:
+	if _focus_tween != null and _focus_tween.is_valid(): _focus_tween.kill()
+	if is_instance_valid(trip.get("cover")):
 		var cover := trip.cover as Node
 		if cover.get_parent() != null: cover.get_parent().remove_child(cover)
 		cover.queue_free()
+
+func _travel_down() -> void:
+	if _trip.is_empty(): return
+	var trip := _trip
+	_trip = {}
+	_drop_cover(trip)
+	_camera_at(trip.to)
 	if rt != null: rt.release_travel()   # the chip and Energy follow the view, the held +10 floats, with the welcome
 	_here_sig = ""
 	_sync_here()
 	_sync_farm_markers()   # where it stands now, laid out before it shows: no frame of it at the city left (不知火舞 on 299)
 	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
+	_draw_now()
+	# ⑦: a toast held under a Fly's cover comes once the welcome has said itself (a first visit's card, then, as
+	# toast_when_clear waits for it)
+	if rt != null and trip.has("key"):
+		rt.ui.hold_toasts(false, STAMP_S if bool((trip.reply as Dictionary).get("first", false)) else ToastLayer.duration_ms("Welcome back") / 1000.0)
 	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()
 
 ## MAP-7-FREE (§11.8.4 step 7, Figma 482:412): a first visit lands on "3 things to do here" — the local pond, an
@@ -1597,7 +1715,7 @@ func is_back_navigation_locked() -> bool:
 ## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
 func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
-	_travel_watch()
+	_travel_watch(_dt)
 	MapUsage.last_view = Vector3(center_lat, center_lng, zoom)   # Licenses › Mapbox › Improve this map (q(133) v3)
 	_sync_here()
 	# The recenter key gives way to an open sheet (不知火舞 on 234 A2: it showed under the card's ×).
@@ -1729,10 +1847,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 					_unhandled_input(touch)
 			if step.size() > 3: get_tree().create_timer(float(step[3])).timeout.connect(tap)
 			else: tap.call()
-		"fly":   # fly:gn-1850147 — the travel card's Fly for that city (review shots, SGODOT-280): travel, then the arrival
-			_origin_before = _origin()
-			_here_before = P0Travel.here(_view())
-			rt.session.send({"type": "travel", "to": step[1]})
+		"fly":   # fly:gn-1850147 — the travel card's Fly for that city (review shots, SGODOT-280 / 361)
+			_take_off(step[1], int(P0Travel.trip(_view(), step[1]).get("km", 0)))
+		"net":   # net:slow:5 / net:fail:2 before fly — its reply that many game seconds late, or failed then (361 videos)
+			_shot_net(step[1] == "fail", float(step[2]))
 		"nearby": open_nearby_cities()   # the Nearby cities drawer (MAP-8), as a tap on its pill
 		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
 			open_city_card(step[1])
@@ -1747,6 +1865,39 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_camera_dirty = true
 		_: return false
 	return true
+
+## Shots (361 videos): the next travel command's reply held `hold` seconds of game time — a recording's frames, unlike a
+## proxy's real time — or a network failure then. The request itself goes out as ever; other requests pass (the log's
+## reports are dropped meanwhile).
+func _shot_net(fail: bool, hold: float) -> void:
+	var s := rt.session
+	s.transport = func(method: int, path: String, body: Dictionary, cmd: Dictionary) -> void:
+		var travel := str(cmd.get("type", "")) == "travel"
+		if str(cmd.get("type", "")) == "telemetry": return
+		if str(cmd.get("type", "")) == "city":   # a city's places, read apart from the session's queue
+			var read := HTTPRequest.new()
+			add_child(read)
+			read.request_completed.connect(func(r, c, _h, raw):
+				read.queue_free()
+				var data = JSON.parse_string(raw.get_string_from_utf8()) if r == HTTPRequest.RESULT_SUCCESS and c == 200 else null
+				if data is Dictionary and data.get("city") is Dictionary: P0CityPlaces.accept(str(cmd.cluster), data.city)
+				else: P0CityPlaces.fail(str(cmd.cluster)))
+			read.request(s.base_url + path, s._headers())
+			return
+		if travel: s.transport = Callable()
+		var timer := get_tree().create_timer(hold if travel else 0.0)
+		if fail and travel:
+			timer.timeout.connect(func(): s._finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd))
+			return
+		var http := HTTPRequest.new()
+		add_child(http)
+		var got := []
+		http.request_completed.connect(func(r, c, _h, raw):
+			http.queue_free()
+			got.append_array([r, c, raw])
+			if timer.time_left <= 0.0: s._finish(r, c, raw, cmd))
+		timer.timeout.connect(func(): if not got.is_empty(): s._finish(got[0], got[1], got[2], cmd))
+		http.request(s.base_url + path, s._headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
 
 # ---------------------------------------------------------------- the home pick's map (SGODOT-342 PR-2)
 ## The pin page's map (HOME-PIN, q(216) ②; 亚瑟 342 6418183a, plan A): a second P0 map pushed over whatever is up

@@ -1,10 +1,11 @@
 extends GdUnitTestSuite
-## q(147), SGODOT-299 (不知火舞 on 299 31c4ceb5 / 62931cdb): every cross-city arrival flies a fixed 3 s — up 0.5 s from
+## q(147), SGODOT-299 (不知火舞 on 299 31c4ceb5 / 62931cdb): every cross-city trip flies a fixed 3 s — up 0.5 s from
 ## where the camera is (no jump back to the city left) until both cities are in view, along 2 s, down 0.5 s to the
 ## overview. A cover takes every touch meanwhile and shows the city ahead and its km rolling; a tap after its first
 ## 0.5 s or Back lands it. The place chip and the avatar keep the city left until it lands. Every way out (landing,
 ## skip, Back, the background, the map left, the flight stopped by anything else) takes the cover down and frees the
-## chip.
+## chip. SGODOT-361 (q(261), 不知火舞 on 361 9146d012): it takes off as Fly is pressed; landed before the reply it waits
+## under the cover, and a failure, a refusal or no reply in 8 s calls it back to where Fly was pressed.
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Map := preload("res://scenes/p0/p0_map.gd")
@@ -19,6 +20,11 @@ func before_test() -> void:
 	P0Runtime.ensure().here = {"space": "home", "place": ""}
 
 func after_test() -> void:
+	var s := P0Runtime.ensure().session
+	s.transport = Callable()   # the wire as it was: nothing held for the next test
+	s.busy = false
+	s._inflight = {}
+	s._queue = []
 	for key in WaterShore._pending.keys(): WorkerThreadPool.wait_for_task_completion(WaterShore._pending[key])
 	WaterShore._pending.clear()
 
@@ -33,26 +39,66 @@ func _map() -> Node:
 	viewport.add_child(map)
 	return map
 
-## The map in Los Angeles' server view (here = LA, a return visit), the camera over LA's streets as a bubble's browse
-## leaves it, and Fly pressed from San Francisco: the arrival flight about to start.
-func _ready_to_arrive(m: Node) -> Dictionary:
+## The map in San Francisco's server view (here = SF; Los Angeles visited before, so a return), the camera over Los
+## Angeles' streets as a bubble's browse leaves it: Fly about to be pressed. here = LA: the player in Los Angeles.
+func _ready_to_arrive(m: Node, here := SF) -> Dictionary:
 	var rt: P0Runtime = m.rt
 	var saved: Dictionary = rt.session.view
 	var v := saved.duplicate(true)
 	v["now"] = 1_000_000_000.0
-	v["travel"] = {home = SF, here = LA, passes = {}, visits = {LA: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	v["travel"] = {home = SF, here = here, passes = {}, visits = {LA: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
 	rt.session.view = v
 	rt.ui.set_view(v)
 	var la := P0Clusters.get_cluster(LA)
 	m.center_lat = float(la.lat) + 0.01
 	m.center_lng = float(la.lng) + 0.01
 	m._set_zoom(13.0)
-	m._origin_before = Vector2(37.77, -122.42)
-	m._here_before = SF
 	return saved
 
+## Fly for Los Angeles, its reply in at once (the reply before the landing, as on a phone).
 func _arrive(m: Node) -> void:
-	m.on_arrival({kind = "arrival", cluster = LA, first = false, trip = 4, km = 559})
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559})
+
+var _wire: Array = []   # the travel commands sent and not answered yet: the test answers them
+
+## Requests held on the wire: travel waits for _answer / _drop; a city's places read fails (none in these tests).
+func _hold_wire(rt: P0Runtime) -> void:
+	_wire.clear()
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, cmd: Dictionary) -> void:
+		if str(cmd.get("type", "")) == "travel": _wire.append(cmd)
+		elif str(cmd.get("type", "")) == "city": P0CityPlaces.fail.call_deferred(str(cmd.cluster))
+
+## Fly pressed for ev.cluster from where the view says, its `travel` held; with `answer` the server's reply at once —
+## `view` (else the view moved there, the city visited) and `events` (else the arrival alone).
+func _fly(m: Node, ev: Dictionary, events := [], view := {}, answer := true) -> void:
+	var rt: P0Runtime = m.rt
+	_hold_wire(rt)
+	m._take_off(str(ev.cluster), int(ev.get("km", 0)))
+	if answer: _answer(rt, view if not view.is_empty() else _moved(rt.session.view, str(ev.cluster)), [ev] if events.is_empty() else events)
+
+## The server's view after a travel there: here = it, visited once more, its Day Pass.
+static func _moved(v: Dictionary, cluster: String) -> Dictionary:
+	var w := v.duplicate(true)
+	var t: Dictionary = w.get_or_add("travel", {})
+	t["here"] = cluster
+	var visits: Dictionary = t.get_or_add("visits", {})
+	visits[cluster] = {n = int((visits.get(cluster, {}) as Dictionary).get("n", 0)) + 1}
+	(t.get_or_add("passes", {}) as Dictionary)[cluster] = {kind = "day", from = 1.0, until = 2_000_000_000.0}
+	return w
+
+## The held travel's reply, through the session as from the server: taken with `events`, or refused with `code`.
+func _answer(rt: P0Runtime, view: Dictionary, events := [], code := "") -> void:
+	var body := {"ok": code == "", "state": view}
+	if code == "": body["events"] = events
+	else: body["code"] = code
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify(body).to_utf8_buffer(), _wire.pop_front())
+
+## The held travel never got an answer (the network).
+func _drop(rt: P0Runtime) -> void:
+	rt._net_fails = 0   # one failure, not the suite's background reads' too (they count toward Offline)
+	rt.ui.offline = false
+	if is_instance_valid(rt.ui._sys): rt.ui._sys.visible = false
+	rt.session._finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), _wire.pop_front())
 
 func _chip_city(rt: P0Runtime) -> String:
 	rt.ui.set_view(rt.session.view)
@@ -188,8 +234,6 @@ func test_the_background_or_a_stopped_tween_lands_it() -> void:
 	assert_bool(rt.ui.get("_hold_here") == "").is_true()
 	rt.ui.clear_toast()
 	# anything else stopping the flight's tween: the next frame lands it
-	m._origin_before = Vector2(37.77, -122.42)
-	m._here_before = SF
 	_arrive(m)
 	(m._trip.tween as Tween).kill()
 	m.p0_frame(rt.session.view, 0.016)
@@ -245,14 +289,12 @@ func test_the_arrivals_energy_waits_for_the_landing() -> void:
 	var saved := _ready_to_arrive(m)
 	var before: Dictionary = rt.session.view.duplicate(true)
 	before["energy"] = {value = 200, max = 200}
-	before["travel"]["here"] = SF
+	rt.session.view = before
 	rt.ui.set_view(before)
-	var after := before.duplicate(true)
+	var after := _moved(before, LA)
 	after["energy"] = {value = 210, max = 200}
-	after["travel"]["here"] = LA
-	rt.session.view = after
-	rt._on_state(after, [{kind = "energy", delta = 10, reason = "first_visit"},
-		{kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}])
+	var arrival := {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}
+	_fly(m, arrival, [{kind = "energy", delta = 10, reason = "first_visit"}, arrival], after)
 	assert_bool(m.travelling()).is_true()
 	rt.ui.set_view(after)
 	assert_int(int(rt.ui.hud.data.energy)).is_equal(200)   # still what it was in the air
@@ -278,12 +320,12 @@ func test_leaving_mid_flight_lets_the_held_energy_go() -> void:
 	var saved := _ready_to_arrive(m)
 	var before: Dictionary = rt.session.view.duplicate(true)
 	before["energy"] = {value = 200, max = 200}
+	rt.session.view = before
 	rt.ui.set_view(before)
-	var after := before.duplicate(true)
+	var after := _moved(before, LA)
 	after["energy"] = {value = 210, max = 200}
-	rt.session.view = after
-	rt._on_state(after, [{kind = "energy", delta = 10, reason = "first_visit"},
-		{kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}])
+	var arrival := {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}
+	_fly(m, arrival, [{kind = "energy", delta = 10, reason = "first_visit"}, arrival], after)
 	assert_bool(rt.ui.energy_held()).is_true()
 	m.get_parent().remove_child(m)
 	assert_bool(rt.ui.energy_held()).is_false()
@@ -325,7 +367,7 @@ func test_a_first_visit_stamps_first_and_its_card_comes_after() -> void:
 	var rt: P0Runtime = m.rt
 	var saved := _ready_to_arrive(m)
 	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)   # its places read, as on a phone
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))   # down at once
 	assert_str(rt.ui.toast_text()).is_equal("Welcome to Tokyo · Stamp collected")
@@ -348,10 +390,10 @@ func test_another_flight_during_the_stamp_takes_its_card_away() -> void:
 	var rt: P0Runtime = m.rt
 	var saved := _ready_to_arrive(m)
 	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))   # Tokyo: its stamp's 1.5 s begin
-	m.on_arrival({kind = "arrival", cluster = LA, first = false, trip = 6, km = 8800})
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 6, km = 8800})
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))   # down in Los Angeles inside Tokyo's beat
 	assert_bool(m.travelling()).is_false()
@@ -370,7 +412,7 @@ func test_leaving_during_the_stamp_brings_no_card() -> void:
 	var rt: P0Runtime = m.rt
 	var saved := _ready_to_arrive(m)
 	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))
 	m.get_parent().remove_child(m)
@@ -415,7 +457,7 @@ func test_the_map_goes_out_past_its_floor_only_in_the_air() -> void:
 	m.center_lng = -122.42
 	m._set_zoom(9.0)
 	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8271})
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8271})
 	assert_float(m._minimum_zoom()).is_less(2.0)
 	await get_tree().create_timer(1.0).timeout   # at the top
 	assert_float(m.zoom).is_less(2.0)
@@ -435,7 +477,7 @@ func test_going_home_from_another_city_flies_first() -> void:
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
-	var saved := _ready_to_arrive(m)   # in Los Angeles
+	var saved := _ready_to_arrive(m, LA)   # in Los Angeles
 	var sent: Array = []
 	rt.session.sent.connect(func(cmd): sent.append(str(cmd.get("type", ""))))
 	m.p0_return("farm")   # the place chip's way home
@@ -500,7 +542,7 @@ func test_a_home_flight_landing_mid_navigation_goes_nowhere() -> void:
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
-	var saved := _ready_to_arrive(m)   # in Los Angeles
+	var saved := _ready_to_arrive(m, LA)   # in Los Angeles
 	var sent: Array = []
 	rt.session.sent.connect(func(cmd): sent.append(str(cmd.get("type", ""))))
 	var opened := [0]
@@ -527,10 +569,11 @@ func test_a_first_visits_city_reads_unexplored_until_it_lands() -> void:
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
-	var saved := _ready_to_arrive(m)   # the server's view: here = LA, LA visited (the arrival's own reply)
+	var saved := _ready_to_arrive(m)
+	rt.session.view.travel.visits = {}   # Los Angeles a first visit
 	var region := str(P0Clusters.region(LA).id)
-	assert_str(str(m.city_bubble(region).text)).is_equal("Visited")
-	m.on_arrival({kind = "arrival", cluster = LA, first = true, trip = 4, km = 559})
+	_fly(m, {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559})   # the reply's view counts the visit
+	assert_bool(rt.session.view.travel.visits.has(LA)).is_true()
 	assert_str(str(m.city_bubble(region).text)).is_equal("Unexplored")   # in the air
 	m._fog_key = ""
 	var la := P0Clusters.get_cluster(LA)
@@ -654,15 +697,13 @@ func test_a_trip_south_frames_both_ends_and_their_bubbles_over_the_keys() -> voi
 	var saved: Dictionary = rt.session.view
 	var v := saved.duplicate(true)
 	v["now"] = 1_000_000_000.0
-	v["travel"] = {home = SF, here = SALINAS, passes = {}, visits = {SALINAS: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	v["travel"] = {home = SF, here = SF, passes = {}, visits = {SALINAS: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
 	rt.session.view = v
 	rt.ui.set_view(v)
 	m.center_lat = 37.77
 	m.center_lng = -122.42
 	m._set_zoom(11.0)
-	m._origin_before = Vector2(37.77, -122.42)
-	m._here_before = SF
-	m.on_arrival({kind = "arrival", cluster = SALINAS, first = false, trip = 2, km = 138})
+	_fly(m, {kind = "arrival", cluster = SALINAS, first = false, trip = 2, km = 138})
 	var home_key: Rect2 = m.city_map.home_key.get_global_rect()
 	var keys := home_key.merge(m.city_map.recenter.get_global_rect())
 	assert_float(m.safe_bottom()).is_less_equal(home_key.position.y - 8.0)
@@ -699,12 +740,10 @@ func test_in_the_air_neither_ends_bubble_gives_way() -> void:
 	var saved: Dictionary = rt.session.view
 	var v := saved.duplicate(true)
 	v["now"] = 1_000_000_000.0
-	v["travel"] = {home = SF, here = TOKYO, passes = {}, visits = {LA: {n = 1}, TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	v["travel"] = {home = SF, here = LA, passes = {}, visits = {LA: {n = 1}, TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
 	rt.session.view = v
 	rt.ui.set_view(v)
-	m._origin_before = Vector2(34.05, -118.24)
-	m._here_before = LA
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 4, km = 8800})
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = false, trip = 4, km = 8800})
 	var keeps := func(cluster: String) -> bool:
 		m.city_regions()
 		return bool(m.city_bubble(str(P0Clusters.region(cluster).id)).keeps)
@@ -732,15 +771,13 @@ func test_a_first_visits_city_ahead_is_measured_as_it_shows_unexplored() -> void
 	var saved: Dictionary = rt.session.view
 	var v := saved.duplicate(true)
 	v["now"] = 1_000_000_000.0
-	v["travel"] = {home = SF, here = RENO, passes = {}, visits = {RENO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	v["travel"] = {home = SF, here = SF, passes = {}, visits = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
 	rt.session.view = v
 	rt.ui.set_view(v)
 	m.center_lat = 37.77
 	m.center_lng = -122.42
 	m._set_zoom(11.0)
-	m._origin_before = Vector2(37.77, -122.42)
-	m._here_before = SF
-	m.on_arrival({kind = "arrival", cluster = RENO, first = true, trip = 2, km = 300})
+	_fly(m, {kind = "arrival", cluster = RENO, first = true, trip = 2, km = 300})
 	var b: Dictionary = m.city_map.bubbles[str(P0Clusters.region(RENO).id)]
 	assert_str(b.count.text).is_equal("Unexplored")   # as the flight measured it, before any frame
 	var measured: Vector2 = (b.node as Control).size
@@ -763,11 +800,330 @@ func test_a_first_visits_city_ahead_is_measured_as_it_shows_unexplored() -> void
 	rt.ui.set_view(saved)
 
 func test_an_arrival_in_a_city_the_table_does_not_have_lets_go() -> void:
-	# q(189) / 亚瑟 on #387: a closed country's city (Pyongyang) is not in the client's table; an arrival there (only from
-	# another device) holds no flight and draws no cover
+	# q(189) / 亚瑟 on #387: a closed country's city (Pyongyang) is not in the client's table; an arrival there holds no
+	# flight and draws no cover (an arrival never takes off by itself now: Fly does, SGODOT-361)
 	var m := _map()
 	await get_tree().process_frame
 	m.on_arrival({kind = "arrival", cluster = "gn-1871859", first = true, trip = 6, km = 9000})
 	assert_object(_cover(m)).is_null()
 	assert_bool(m.travelling()).is_false()
 
+
+# ---------------------------------------------------------------- SGODOT-361: Fly takes off, the reply lands it (q(261))
+## Where the camera was as Fly was pressed, to compare a call-back with.
+func _camera(m: Node) -> Array:
+	return [m.center_lat, m.center_lng, m.zoom, m.city_bearing, str(m.region.get("id", ""))]
+
+func _assert_camera(m: Node, was: Array) -> void:
+	assert_float(m.center_lat).is_equal_approx(float(was[0]), 1e-9)
+	assert_float(m.center_lng).is_equal_approx(float(was[1]), 1e-9)
+	assert_float(m.zoom).is_equal_approx(float(was[2]), 1e-6)
+	assert_float(m.city_bearing).is_equal_approx(float(was[3]), 1e-6)
+	assert_str(str(m.region.get("id", ""))).is_equal(str(was[4]))
+
+## Called back (9146d012 ②): in the same frame the cover is gone and the avatar back, the chip and Energy free.
+func _assert_called_back(m: Node, was: Array) -> void:
+	assert_bool(m.travelling()).is_false()
+	assert_object(_cover(m)).is_null()
+	_assert_camera(m, was)
+	assert_bool(m.hide_self).is_false()
+	assert_bool(m.farm_markers.visible).is_true()
+	assert_str(str(m.rt.ui.get("_hold_here"))).is_empty()
+	assert_bool(m.rt.ui.energy_held()).is_false()
+
+func test_fly_takes_off_before_any_reply_and_the_reply_in_the_air_lands_with_it() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	assert_bool(m.travelling()).is_true()   # up at once: nothing waits for the server
+	assert_object(_cover(m)).is_not_null()
+	assert_array(_wire.map(func(c): return [str(c.type), str(c.to)])).is_equal([["travel", LA]])
+	assert_str(_cover(m).distance.text).is_equal("0 km")   # the card's trip: rolls to 559 km
+	await get_tree().create_timer(1.0).timeout
+	_answer(rt, _moved(rt.session.view, LA), [{kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}])
+	assert_bool(m.travelling()).is_true()   # in the air still: it lands on time
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	await get_tree().create_timer(2.3).timeout
+	assert_bool(m.travelling()).is_false()
+	assert_str(_chip_city(rt)).is_equal("Los Angeles")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## ① (9146d012): down with the reply still out it waits under the cover — no Tap to skip, Back and taps do nothing, the
+## chip, avatar and Energy as in the air; 1.5 s down the hint line says Taking longer than usual…; the reply lands it.
+## 不知火舞 60a1508e ①: while the cover is up the chip never follows the server, a read that brings here = LA first too.
+func test_landed_before_the_reply_it_waits_under_the_cover_until_it_comes() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}, [], {}, false)
+	var cover := _cover(m)
+	await get_tree().create_timer(0.7).timeout
+	_tap(cover)   # skipped: down, and waiting
+	assert_bool(m.travelling()).is_true()
+	assert_bool(is_instance_valid(cover) and cover.is_inside_tree()).is_true()
+	assert_float(m.zoom).is_equal_approx(float(_overview().zoom), 1e-6)   # the camera at the overview
+	assert_str(cover.distance.text).is_equal("559 km")
+	assert_float(cover.hint.modulate.a).is_equal(0.0)   # no Tap to skip
+	assert_bool(cover.skippable()).is_false()
+	_tap(cover)
+	assert_bool(m.is_back_navigation_locked()).is_true()   # Back is held and does nothing
+	assert_bool(m.travelling()).is_true()
+	assert_bool(m.hide_self).is_true()
+	# a read before the travel's reply already says Los Angeles: the chip keeps San Francisco while the cover is up
+	var there := _moved(rt.session.view, LA)
+	rt.session.view = there
+	rt.ui.set_view(there)
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	m._trip.wait_us = Time.get_ticks_usec() - 1_400_000
+	m._travel_watch(0.0)
+	assert_float(cover.hint.modulate.a).is_equal(0.0)   # not yet 1.5 s
+	m._trip.wait_us = Time.get_ticks_usec() - 1_600_000
+	m._travel_watch(0.0)
+	assert_str(cover.hint.text).is_equal("Taking longer than usual…")
+	assert_float(cover.hint.modulate.a).is_equal(1.0)
+	assert_bool(m.travelling()).is_true()
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	_answer(rt, there, [{kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}])
+	assert_bool(m.travelling()).is_false()   # down in the same frame, with the welcome
+	assert_str(_chip_city(rt)).is_equal("Los Angeles")
+	assert_bool(m.hide_self).is_false()
+	assert_str(rt.ui.toast_text()).is_equal("Welcome to Los Angeles · Stamp collected")
+	await get_tree().create_timer(P0Map.STAMP_S + 0.3).timeout
+	rt.ui.close_modal()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## ② (9146d012): a network failure, in the air or landed waiting, calls it back in the same frame to where Fly was
+## pressed — place, zoom, bearing and the city — with the cover, avatar, chip and Energy as before it; SYS-CMD-FAIL says
+## so (q(75)), no toast, no stamp, no card.
+func test_a_failed_travel_calls_the_flight_back_in_the_same_frame() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var was := _camera(m)
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271}, [], {}, false)
+	await get_tree().create_timer(1.0).timeout   # in the air
+	_drop(rt)
+	_assert_called_back(m, was)
+	assert_str(rt.ui.sys_text()).is_equal("Didn't go through · try again")
+	assert_str(rt.ui.toast_text()).is_empty()
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	await get_tree().process_frame
+	# landed waiting, the same
+	_fly(m, {kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271}, [], {}, false)
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_bool(m.travelling()).is_true()
+	_drop(rt)
+	_assert_called_back(m, was)
+	await get_tree().create_timer(P0Map.STAMP_S + 0.3).timeout
+	assert_str(rt.ui.modal_kind).is_not_equal("arrival_card")
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## 奕星 on q(261) ①: 8 s counted from Fly by the map itself, not the session's timeout (a travel queued behind another
+## command has its 8 s on the wire start later). ② a success that comes after the call-back flies nowhere; 不知火舞
+## 60a1508e ②: with the cover gone the chip follows the server — the server did move the player, so it says Los Angeles.
+func test_no_reply_8_s_from_fly_calls_it_back_and_a_late_reply_flies_nowhere() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var was := _camera(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	m._trip.start_us = Time.get_ticks_usec() - 7_900_000
+	m._travel_watch(0.0)
+	assert_bool(m.travelling()).is_true()
+	m._trip.start_us = Time.get_ticks_usec() - 8_100_000   # 8 s since Fly, in the air or down: called back
+	m._travel_watch(0.0)
+	_assert_called_back(m, was)
+	assert_bool(rt.session.busy).is_true()   # the request is still out: the map did not wait for its timeout
+	_answer(rt, _moved(rt.session.view, LA), [{kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}])
+	assert_bool(m.travelling()).is_false()   # no take-off now
+	assert_object(_cover(m)).is_null()
+	_assert_camera(m, was)
+	assert_str(rt.ui.toast_text()).is_empty()   # no welcome either
+	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # the chip follows the server again
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
+
+## stale_state goes again once, quietly (the flight flies on); a second one is a failure: called back with SYS-CMD-FAIL.
+func test_stale_state_sends_travel_again_once_then_calls_it_back() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var was := _camera(m)
+	if is_instance_valid(rt.ui._sys): rt.ui._sys.visible = false   # an earlier test's line still up
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	_answer(rt, rt.session.view, [], "stale_state")
+	assert_bool(m.travelling()).is_true()
+	assert_array(_wire.map(func(c): return str(c.to))).is_equal([LA])   # sent again
+	assert_str(rt.ui.sys_text()).is_not_equal("Didn't go through · try again")   # quietly
+	rt.ui.offline = false   # the suite's background reads may have put Offline up: the line below is this one's
+	_answer(rt, rt.session.view, [], "stale_state")
+	_assert_called_back(m, was)
+	assert_array(_wire).is_empty()   # not a third time
+	assert_str(rt.ui.sys_text()).is_equal("Didn't go through · try again")
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
+
+## A refusal (the client's city table not the server's): called back, the runtime's toast as for any refusal.
+func test_a_refused_travel_calls_it_back_with_the_runtimes_toast() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var was := _camera(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	_answer(rt, rt.session.view, [], "unknown_city")
+	_assert_called_back(m, was)
+	assert_str(rt.ui.toast_text()).is_equal("Can't do that (unknown_city)")
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
+
+## ③ (9146d012): taken with no arrival (already there with a pass): it lands as a return — Welcome back only.
+func test_taken_without_an_arrival_it_lands_as_a_return() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_bool(m.travelling()).is_true()
+	_answer(rt, _moved(rt.session.view, LA), [])
+	assert_bool(m.travelling()).is_false()
+	assert_str(_chip_city(rt)).is_equal("Los Angeles")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## ④ (q(261)): under the cover the HUD's coins stay what they were too, and follow the view once it is down.
+func test_under_the_cover_the_huds_coins_hold_too() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var before: Dictionary = rt.session.view.duplicate(true)
+	before["coins"] = 230
+	before["energy"] = {value = 142, max = 210}
+	rt.session.view = before
+	rt.ui.set_view(before)
+	var after := _moved(before, LA)
+	after["coins"] = 110   # what a fare would take (q(256) / (257) bring it): the HUD waits for the landing
+	after["energy"] = {value = 112, max = 210}
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], after)
+	rt.ui.set_view(after)
+	assert_int(int(rt.ui.hud.data.coins)).is_equal(230)
+	assert_int(int(rt.ui.hud.data.energy)).is_equal(142)
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	rt.ui.set_view(after)
+	assert_int(int(rt.ui.hud.data.coins)).is_equal(110)
+	assert_int(int(rt.ui.hud.data.energy)).is_equal(112)
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## ⑦ (q(261)): a toast said under the cover waits until it is down and the welcome has said itself; SYS lines do not.
+func test_a_toast_under_the_cover_waits_for_the_welcome() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559})
+	rt.ui.toast("Somewhere else")
+	assert_str(rt.ui.toast_text()).is_empty()   # held
+	rt.ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "A line", 3.0)
+	assert_str(rt.ui.sys_text()).is_equal("A line")   # not held
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_str(rt.ui.toast_text()).is_equal("Welcome back")   # the welcome first
+	await get_tree().create_timer(ToastLayer.duration_ms("Welcome back") / 1000.0 + 0.2).timeout
+	assert_str(rt.ui.toast_text()).is_equal("Somewhere else")   # then what waited
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## ⑤ (q(261)): maintenance (503) or update_required (426) in the air calls it back too, their whole-screen card over it.
+func test_maintenance_in_the_air_calls_it_back() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var was := _camera(m)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	var body := JSON.stringify({code = "maintenance", back_at = 0}).to_utf8_buffer()
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 503, body, _wire.pop_front())
+	_assert_called_back(m, was)
+	rt._unblock()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
+
+## 周瑜 on #560: called back after 8 s, then off to another city at once — the first travel's late arrival comes in the
+## new flight's air and leaves what it holds alone (the chip, Energy and coins); the new one lands with its own reply.
+func test_a_late_arrival_leaves_another_flights_hold_alone() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	rt.session.view["energy"] = {value = 142, max = 210}
+	rt.ui.set_view(rt.session.view)
+	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
+	m._trip.start_us = Time.get_ticks_usec() - 8_100_000
+	m._travel_watch(0.0)   # called back, Los Angeles' travel still out
+	assert_bool(m.travelling()).is_false()
+	var la_travel: Dictionary = _wire.pop_front()
+	m._take_off(TOKYO, 8271)   # off to Tokyo at once: its travel queues behind Los Angeles'
+	assert_bool(m.travelling()).is_true()
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	var late := _moved(rt.session.view, LA)
+	late["energy"] = {value = 152, max = 210}
+	var body := JSON.stringify({ok = true, state = late,
+		events = [{kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}]}).to_utf8_buffer()
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, la_travel)   # Los Angeles' late reply, Tokyo in the air
+	assert_bool(m.travelling()).is_true()
+	assert_str(str(rt.ui.get("_hold_here"))).is_equal(SF)   # still held
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	assert_bool(rt.ui.energy_held()).is_true()
+	assert_int(int(rt.ui.hud.data.energy)).is_equal(142)   # the HUD as when Tokyo's flight took off
+	assert_array(_wire.map(func(c): return str(c.to))).is_equal([TOKYO])   # Tokyo's travel now on the wire
+	_answer(rt, _moved(rt.session.view, TOKYO), [{kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271}])
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_bool(m.travelling()).is_false()
+	assert_str(_chip_city(rt)).is_equal("Tokyo")
+	assert_str(rt.ui.toast_text()).is_equal("Welcome to Tokyo · Stamp collected")
+	await get_tree().create_timer(P0Map.STAMP_S + 0.3).timeout
+	rt.ui.close_modal()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame
