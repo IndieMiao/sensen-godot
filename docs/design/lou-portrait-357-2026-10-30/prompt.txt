@@ -1,0 +1,11 @@
+Character portrait illustration for a cozy mobile game's shopkeeper greeting card. Match the exact art style of the first reference image (the two shopkeeper cards): soft 3D clay / vinyl-toy chibi characters, big round head, simple dot eyes, rosy cheeks, warm golden interior light, detailed but soft miniature props, shallow depth of field, gentle and friendly mood. No text, no UI, no frame.
+
+Character: Lou, the card dealer of an old San Francisco card room (the "Barbary Card Room").
+Match the outfit and hair of the second reference image (the 3D model) exactly:
+- black chin-length bob hair with one thin strand curling up from the left side of the head, held by a small pink hair tie;
+- white short-sleeved shirt, a wine-red / burgundy buttoned waistcoat, a small black bow tie, dark charcoal trousers.
+Lou stands behind a card table covered in green felt, upper body visible, smiling calmly, holding a fanned hand of playing cards in one hand and dealing one card with the other; a neat stack of round poker chips and a deck on the felt.
+
+Setting (see third reference, the room in game): warm wooden saloon interior, wood plank wall, a ship's-wheel chandelier glow, a brass lantern, a back bar shelf with a few bottles, a small barrel. Keep the background soft and slightly blurred.
+
+Composition (important): a wide, zoomed-out shot. The image will be cropped to a tall narrow strip (the middle 45% of the width), so Lou must be SMALL and centred: the whole figure from the head to the table edge fits inside the middle 40% of the width, including the curled hair strand and the hand of cards. Lou's head is only about one sixth of the image width. Head top at about 25% of the image height; the felt table edge at about 60%; lots of room and ceiling glow above, and the green felt table with chips and cards filling the lower part. Background props fill the sides.
