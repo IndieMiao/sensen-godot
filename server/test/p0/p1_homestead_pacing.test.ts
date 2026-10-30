@@ -25,15 +25,16 @@ function upgrade(level: number, energy: number, cc = c) {
 }
 
 describe('q(246) gates for every account, not just new saves', () => {
-  it('matches the approved Lv2–5 gates including Lv4 300, leaves later gates intact', () => {
-    expect(c.homestead.levels.slice(0, 4).map(l => [l.level, l.coins, l.skills, l.materials, l.energy])).toEqual([
+  it('matches the approved Lv2–4 gates including Lv4 300 and the SGODOT-355 option A Lv5–10 ladder', () => {
+    expect(c.homestead.levels.slice(0, 5).map(l => [l.level, l.coins, l.skills, l.materials, l.energy])).toEqual([
       [2, 40, 3, [['wood', 6], ['stone', 4], ['fiber', 3]], 40],
       [3, 80, 4, [['stone', 8], ['copper_ore', 2], ['clay', 2]], 40],
       [4, 300, 6, [['wood', 12], ['stone', 10], ['fiber', 6], ['copper_ore', 4], ['clay', 4], ['rock_salt', 3]], 40],
-      [5, 750, 8, [['wood', 20], ['stone', 16], ['fiber', 12], ['copper_ore', 10], ['clay', 8], ['quartz', 2], ['rock_salt', 4]], 'full'],
+      [5, 450, 8, [['wood', 12], ['stone', 10], ['fiber', 7], ['copper_ore', 6], ['clay', 5], ['quartz', 1], ['rock_salt', 2]], 'full'],
+      [6, 800, 10, [['wood', 16], ['stone', 14], ['fiber', 10], ['copper_ore', 8], ['clay', 6], ['quartz', 2], ['hardwood', 2]], 'full'],
     ]);
-    expect(c.homestead.levels.slice(4).map(l => [l.coins, l.skills, l.energy])).toEqual([
-      [1000, 11, 'full'], [1450, 13, 'full'], [1800, 15, 'full'], [2250, 17, 'full'], [2850, 19, 'full'],
+    expect(c.homestead.levels.slice(5).map(l => [l.coins, l.skills, l.energy])).toEqual([
+      [1300, 12, 'full'], [1800, 14, 'full'], [2300, 16, 'full'], [3000, 19, 'full'],
     ]);
   });
 
