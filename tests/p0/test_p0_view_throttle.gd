@@ -103,3 +103,21 @@ func test_the_first_tap_after_opening_a_board_is_not_lost() -> void:
 	_click(at, false)
 	await await_idle_frame()
 	assert_array(sent.map(func(c): return [str(c.get("type", "")), str(c.get("request", ""))])).contains([["deliver", "m1"]])
+
+## Today's own gate lets the runtime's quarter-second view through even when its clock read came a millisecond short
+## (哪吒 on #576: two 250 ms gates on two clock reads left Today up to half a second late).
+func test_todays_rows_follow_the_quarter_second_view() -> void:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.quick_store = STORE
+	add_child(ui)
+	var v := _view()
+	v.guide = {"step": "t_fish", "row": {"line": "Catch 2 fish", "icon": "fish", "go": ""}, "progress": {"have": 0, "need": 2}}
+	ui.set_view(v)
+	await await_idle_frame()
+	ui.open_today()
+	var line: Label = ui._today_panel._list.get_child(0).find_child("Line", true, false)
+	var next := v.duplicate(true)
+	next.guide.progress.have = 1
+	ui._today_refresh_ms = Time.get_ticks_msec() - (P0Ui.VIEW_FLOOR_MS - 1)   # the view's quarter second, its clock a ms apart
+	ui.set_view(next)
+	assert_str(str(line.get_meta("sentence"))).is_equal("Catch 2 fish · 1/2")

@@ -2748,7 +2748,9 @@ func open_today(given: Array = []) -> void:
 func _refresh_today(force := true) -> void:
 	if modal_kind != "today" or not is_instance_valid(_today_panel): return
 	var now := Time.get_ticks_msec()
-	if not force and now - _today_refresh_ms < 250: return
+	# at most four times a second; 10 ms short of it so the runtime's quarter-second view (view_wanted, its own clock read
+	# in the same frame) always gets through, one gate and not two (哪吒 on #576)
+	if not force and now - _today_refresh_ms < VIEW_FLOOR_MS - 10: return
 	_today_refresh_ms = now
 	var rows := _today_given if not _today_given.is_empty() else P0Logic.today_rows(view)
 	var sig := JSON.stringify(rows) + space_here() + place + str(spot_reachable())
