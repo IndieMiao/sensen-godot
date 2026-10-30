@@ -1,5 +1,5 @@
 {
-  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts. v3 (SGODOT-341 PR-C-s2): S0–S11 of §14.3 (q(215)); Pip's lines q(222) ④; the resend q(217) ③, its seeds in the Inbox or in hand q(254); Pip's line in a recover state is that entry's own q(260) (S9's ripe Quick Radishes their own entry, r_quick_ripe_soup); S12 waits for SGODOT-346 and is not in the table. Rows, marks' why and Pip's lines may name the home set ({market}, {pond}) and the count ({have}/{need}); row.countdown: the client writes `<line> in m:ss` from that crop's soonest ripening.",
+  "_note": "New-player guide steps (SGODOT-341, the 338·L1 framework; plan in 341's comment f09e3203). The steps come from SGODOT-339's §14 v3 once its q rows are approved: until then the table is empty and no save starts the guide. A step: {id, phase, done_on: {key, count, from_step}, done_if: <condition>, needs: [{if: <condition>, else: [recover ids]}], row: {line, icon, go} (Today's first row, English), tip (a TipCard key: tips below or the client's built-in seven), marks: [{place | resident | plot | button, kind, pulse}] (in-world marks, SGODOT-340)}. A recover entry: {id, when: <condition>, row, tip, marks}, shown instead of the step while a need fails. Keys and conditions: server/src/p0/guide.ts. v3 (SGODOT-341 PR-C-s2): S0–S11 of §14.3 (q(215)); Pip's lines q(222) ④; the resend q(217) ③, its seeds in the Inbox or in hand q(254); Pip's line in a recover state is that entry's own q(260) (S9's ripe Quick Radishes their own entry, r_quick_ripe_soup); S12 waits for SGODOT-346 and is not in the table. Rows, marks' why and Pip's lines may name the home set ({market}, {pond}) and the count ({have}/{need}); row.countdown: the client writes `<line> in m:ss` from that crop's soonest ripening. S8 (SGODOT-368, 不知火舞's spec): with a dish to eat, t_meal shows an eat entry instead — r_eat_bag / r_eat_pot / r_eat_cabinet by where guide.meal's pick lies; {dish} in a row, icon, mark item or Pip line is that dish (alone: its id).",
   "guide": {
     "steps": [
       {
@@ -246,6 +246,18 @@
           ]
         },
         "needs": [
+          {
+            "if": {
+              "not": {
+                "meal": true
+              }
+            },
+            "else": [
+              "r_eat_bag",
+              "r_eat_pot",
+              "r_eat_cabinet"
+            ]
+          },
           {
             "if": {
               "any": [
@@ -730,6 +742,86 @@
             "pulse": true
           }
         ]
+      },
+      {
+        "id": "r_eat_bag",
+        "when": {
+          "meal": "bag"
+        },
+        "row": {
+          "line": "Eat it: {dish}",
+          "icon": "{dish}",
+          "go": "bag"
+        },
+        "marks": [
+          {
+            "item": "{dish}",
+            "pulse": true
+          },
+          {
+            "button": "eat",
+            "item": "{dish}",
+            "pulse": true
+          }
+        ],
+        "pip": "Eat it while it's warm. A meal brings your Energy back."
+      },
+      {
+        "id": "r_eat_pot",
+        "when": {
+          "meal": "pot"
+        },
+        "row": {
+          "line": "Eat it: {dish}",
+          "icon": "{dish}",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "farmhouse",
+            "kind": "request"
+          },
+          {
+            "object": "stove",
+            "pulse": true
+          },
+          {
+            "button": "eat",
+            "item": "{dish}",
+            "pulse": true
+          }
+        ],
+        "pip": "Eat it while it's warm. A meal brings your Energy back."
+      },
+      {
+        "id": "r_eat_cabinet",
+        "row": {
+          "line": "Eat it: {dish}",
+          "icon": "{dish}",
+          "go": "home"
+        },
+        "marks": [
+          {
+            "place": "home",
+            "object": "farmhouse",
+            "kind": "request"
+          },
+          {
+            "object": "cabinet",
+            "pulse": true
+          },
+          {
+            "item": "{dish}",
+            "pulse": true
+          },
+          {
+            "button": "eat",
+            "item": "{dish}",
+            "pulse": true
+          }
+        ],
+        "pip": "Eat it while it's warm. A meal brings your Energy back."
       }
     ],
     "tips": {},
@@ -745,6 +837,10 @@
       "dish": "dish:dish_fish_soup",
       "source": "Pip's seeds"
     },
-    "timeout_days": 2
+    "timeout_days": 2,
+    "meal": {
+      "prefer": "dish_grilled_crucian",
+      "keep": "dish_fish_soup"
+    }
   }
 }

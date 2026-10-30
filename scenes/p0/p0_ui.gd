@@ -227,20 +227,48 @@ func _refresh_guide_pulses() -> void:
 				var page := str(mark.get("page", ""))
 				for drawer in _modal.find_children("*", "P0KitchenDrawer", true, false):
 					targets["cook:" + page] = {node = drawer.guide_cook_target(page)}
+			elif key == "eat":   # S8 (SGODOT-368): that dish's Eat — the cook card's, the bag card's, the cabinet row's
+				var dish := str(mark.get("item", ""))
+				var node := _guide_eat_target(dish)
+				if node != null: targets["eat:" + dish] = {node = node}
 		for mark in P0Guide.guide_marks(view):
 			if not mark is Dictionary or not bool(mark.get("pulse", false)): continue
-			if str(mark.get("object", "")) == "stove" and space == "home" and not has_modal():
+			var object := str(mark.get("object", ""))
+			if object in ["stove", "cabinet"] and space == "home" and not has_modal():
+				var anchor := "room:use_stove_" if object == "stove" else "room:use_warming_cabinet"   # cabinet: S8's dish (SGODOT-368)
 				for id in _name_bars:
 					var bar: UiWorldNameBar = _name_bars[id]
-					if str(id).begins_with("room:use_stove_") and bar.visible and bar.is_expanded():
-						targets["object:stove"] = {node = bar}
+					if str(id).begins_with(anchor) and bar.visible and bar.is_expanded():
+						targets["object:" + object] = {node = bar}
 						break
 			var item := str(mark.get("item", ""))
 			if item != "" and modal_kind == "gift" and is_instance_valid(_bag) and str(_bag.gift_to.get("id", "")) == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
 				var cells := guide_gift_cells(_bag.grid, item)
 				for id in cells:
 					targets["item:" + id] = {node = cells[id], overlay = guide_item_overlay(_bag), shape = UiGuidePulse.Shape.CARD, radius = UiTokens.RADIUS_CELL}
+			elif item != "" and modal_kind == "bag" and is_instance_valid(_bag) and not _bag.sheet.is_open():
+				# S8's dish in the bag (SGODOT-368): its cells, as the Gift drawer's soup; none once its card is open
+				var cells := guide_gift_cells(_bag.grid, item)
+				for id in cells:
+					targets["item:" + id] = {node = cells[id], overlay = guide_item_overlay(_bag), shape = UiGuidePulse.Shape.CARD, radius = UiTokens.RADIUS_CELL}
+			elif item != "" and modal_kind == "storage" and _modal != null:
+				for sheet in _modal.find_children("*", "P0StorageSheet", true, false):   # the cabinet's row of that dish
+					var row: Control = sheet.guide_row(item)
+					if row != null: targets["row:" + item] = {node = row}
 	guide_pulses.update(view, targets)
+
+## S8's Eat for a dish's base recipe (SGODOT-368), on whichever is open: the cook card showing that dish, the bag's
+## card for it, the cabinet with that row selected; null otherwise (finding never opens or selects anything).
+func _guide_eat_target(dish: String) -> Control:
+	if _modal == null: return null
+	if modal_kind == "kitchen_card":
+		for card in _modal.find_children("*", "UiRewardMoment", true, false):
+			if P0Logic.base_id(str(card.get_meta(&"dish", ""))) == dish: return card.primary_button()
+	elif modal_kind == "bag" and is_instance_valid(_bag) and _bag.sheet.is_open() and P0Logic.base_id(_bag.sheet.item_id()) == dish:
+		return _bag.sheet.button_for(&"eat")
+	elif modal_kind == "storage":
+		for sheet in _modal.find_children("*", "P0StorageSheet", true, false): return sheet.guide_eat(dish)
+	return null
 
 ## A server item mark names a base recipe; all visible qualities use their own cell, without selecting any.
 static func guide_gift_cells(grid: UiInventoryGrid, base: String) -> Dictionary:
@@ -2789,6 +2817,9 @@ func _show_today_row(i: int) -> void:
 	if go == "inbox":
 		open_inbox("parcels")
 		return
+	if go == "bag":   # S8's dish to eat in the bag (SGODOT-368): the bag on its Dishes page, wherever the player is
+		open_bag("", "bag", "Dishes")
+		return
 	if show_label(go, space_here(), spot_reachable(), place) == "Show":
 		# q(99): only remember a named recipe while the stove is free. This still only moves the camera.
 		var page := str(row.get("page", ""))
@@ -2810,6 +2841,7 @@ static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.beg
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
 	if go == "inbox": return "Show"   # the Inbox opens anywhere: its Parcels page (q(254) ①, Pip's seeds)
+	if go == "bag": return "Show"     # and the bag: S8's dish to eat (SGODOT-368)
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
