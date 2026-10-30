@@ -16,7 +16,7 @@
     },
     {
       "name": "Left short down then up curved arm",
-      "triangles": 76
+      "triangles": 108
     },
     {
       "name": "Left round nozzle with painted centre",
@@ -24,7 +24,7 @@
     },
     {
       "name": "Right short down then up curved arm",
-      "triangles": 76
+      "triangles": 108
     },
     {
       "name": "Right round nozzle with painted centre",
@@ -32,7 +32,7 @@
     },
     {
       "name": "Blue water droplet cap",
-      "triangles": 98
+      "triangles": 118
     }
   ]
 }

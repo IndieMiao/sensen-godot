@@ -38,7 +38,10 @@ def text(draw,xy,label,size=24,colour='#263d42'):
 def raw(name): return Image.open(OUT/('captures/'+name+'.png')).convert('RGB')
 
 
-def save(image,name): image.save(DOC/(PREFIX+name+'.png'))
+def save(image,name):
+    if VERSION=='v1.3' and name not in ['comparison_default_360','comparison_minimum_360','head_detail']:
+        return
+    image.save(DOC/(PREFIX+name+'.png'))
 
 
 def portrait(name,title,note):
@@ -73,14 +76,14 @@ text(draw,(28,1115),'喷头旋转外径 %.5f m；距本田外边至少 %.5f m'%
 text(draw,(28,1157),'框线为真实 plot.glb 的 XZ 包围盒；没有伸入走道或邻田。',21)
 save(top,'top')
 
-if VERSION=='v1.2':
+if VERSION=='v1.3':
     ids={c['id'] for c in runtime['captures']}
     for mode,title,width in [('default','43° 默认镜头',6.72),('minimum','43° 最远缩放 0.8',8.40)]:
         comparison=Image.new('RGB',(744,936),'#f5f7f3'); draw=ImageDraw.Draw(comparison)
-        text(draw,(16,10),'SGODOT-244 / v1.1 与 v1.2 / '+title,23)
+        text(draw,(16,10),'SGODOT-244 / v1.2 与 v1.3 / '+title,23)
         for i,(revision,label) in enumerate([
-            ('v1_1','v1.1 / 778 tris / H 0.647 m'),
-            ('v1_2','v1.2 / %d tris / H %.3f m'%(entry['triangles'],measure['size_xyz_m'][1]))]):
+            ('v1_2','v1.2 / 798 tris / H 0.525 m'),
+            ('v1_3','v1.3 / %d tris / H %.3f m'%(entry['triangles'],measure['size_xyz_m'][1]))]):
             capture_id='comparison_'+mode+'_'+revision
             assert capture_id in ids
             frame=raw(capture_id)
@@ -91,6 +94,12 @@ if VERSION=='v1.2':
         text(draw,(16,881),'黄忠 · 每侧原生 360 × 800 · 视宽 %.2f m · 人物 1.745 m'%width,19)
         text(draw,(16,910),'同光同机位同摆放；未裁切、未分别放大模型或画面。',18)
         save(comparison,'comparison_'+mode+'_360')
+    detail=Image.new('RGB',(900,960),'#f5f7f3'); detail.paste(raw('head_detail'),(0,70))
+    draw=ImageDraw.Draw(detail)
+    text(draw,(24,18),'SGODOT-244 / v1.3 喷头放大图 · 黄忠',28)
+    text(draw,(24,887),'轮毂 Ø0.18 × 高0.09 / 喷臂 Ø0.06 / 喷嘴 Ø0.07 / 蓝帽 Ø0.13 m',22)
+    text(draw,(24,925),'实际 Godot Mobile · 43° / 14.5° · 局部视宽 0.80 m · %d tris'%entry['triangles'],22)
+    save(detail,'head_detail')
 
 if not REVISION:
     rotation=Image.new('RGB',(1800,735),'#f5f7f3'); draw=ImageDraw.Draw(rotation)
@@ -133,22 +142,22 @@ validation={'author':'黄忠','task':'SGODOT-244','art_revision':VERSION,'geomet
                          'dimension_authority':'specification, not measured from image'},
             'scope':'Offline desktop art verification; tech and visual review pending, no gameplay integration or phone performance claim.'}
 (DOC/(PREFIX+'validation.json')).write_text(json.dumps(validation,indent=2,ensure_ascii=False)+'\n')
-rows=[['总三角形',entry['triangles'],'<= 800'],['base 三角形',entry['parts']['base']['triangles'],'1 surface'],['head 三角形',entry['parts']['head']['triangles'],'1 surface'],
-      ['总高 / 床面以上 m',measure['size_xyz_m'][1],'约 0.52 (v1.2)'],['宽 X m',measure['size_xyz_m'][0],'实际顶点'],
+rows=[['总三角形',entry['triangles'],'<= 900'],['base 三角形',entry['parts']['base']['triangles'],'1 surface'],['head 三角形',entry['parts']['head']['triangles'],'1 surface'],
+      ['总高 / 床面以上 m',measure['size_xyz_m'][1],'<= 0.58 (v1.3)'],['宽 X m',measure['size_xyz_m'][0],'实际顶点'],
       ['深 Z m',measure['size_xyz_m'][2],'实际顶点'],['喷头旋转外径 m',measure['head_swept_diameter_m'],'<= 0.40'],
-      ['石垫直径 m',measure['stone_diameter_m'],'0.24-0.26 (v1.1)'],['喷臂截面直径 m',measure['arm_section_diameter_m'],'0.04 (v1.1)'],
-      ['蓝色顶帽直径 m',measure['cap_diameter_m'],'0.10'],['喷头轴心 / spray_origin',str(entry['head_pivot']),'本地米制'],
+      ['石垫直径 m',measure['stone_diameter_m'],'保留 v1.2'],['喷臂截面直径 m',measure['arm_section_diameter_m'],'约 0.06'],
+      ['蓝色顶帽直径 m',measure['cap_diameter_m'],'约 0.13'],['喷头轴心 / spray_origin',str(entry['head_pivot']),'本地米制，保持'],
       ['角色高 m',1.745,'按实际姿态顶点等比校准'],['后方作物遮挡比例',fraction,'< 0.5']]
 if REVISION:
     measurements=source['measurements']
     hub=measurements['Rounded yellow brass rotating hub']
     rows += [['立杆下段直径 m',measurements['riser_at_0.05m']['diameter_m'],'0.13'],
              ['立杆上段直径 m',measurements['riser_at_0.362m']['diameter_m'],'0.11'],
-             ['轮毂直径 m',hub['diameter_m'],'0.13-0.14'],
-             ['轮毂高度 m',hub['top_m']-hub['bottom_m'],'约 0.07'],
-             ['喷嘴直径 m',measurements['Left nozzle']['diameter_m'],'约 0.05'],
+             ['轮毂直径 m',hub['diameter_m'],'约 0.18'],
+             ['轮毂高度 m',hub['top_m']-hub['bottom_m'],'约 0.09，以0.42为中心'],
+             ['喷嘴直径 m',measurements['Left nozzle']['diameter_m'],'约 0.07'],
              ['蓝帽高度 m',measure['cap_height_m'],'圆鼓加高'],
-             ['蓝帽上腹直径 m',measure['cap_upper_belly_diameter_m'],'y=0.489 m 处 Ø0.088']]
+             ['蓝帽上腹直径 m',measure['cap_upper_belly_diameter_m'],'y=0.520 m 处 Ø0.108']]
 with (DOC/(PREFIX+'measurements.csv')).open('w',newline='') as f:
     writer=csv.writer(f,lineterminator='\n'); writer.writerow(['项目','实测值','要求/说明']);writer.writerows(rows)
 table=['# SGODOT-244 实测尺寸','', '黄忠 · 2026-10-30。GLB 解码顶点和 Godot 实际导入结果。','',

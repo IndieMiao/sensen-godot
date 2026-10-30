@@ -28,10 +28,11 @@ PALETTE = {
     'water': '8cc7f2', 'water_light': 'a8d5f5', 'water_shade': '74b4e3',
     'nozzle_dot': '665d36',
 }
-ARM = [(.059, .410, 0), (.090, .390, 0), (.1183, .389, 0),
-       (.14805, .408, 0), (.1645827, .427, 0)]
-ARM_RADIUS = .020
-NOZZLE_X = .1625827  # Leaves 0.01 mm clearance under the 0.40 m swept diameter limit.
+# Bend radius exceeds the tube radius so the thick inner wall cannot fold over.
+ARM = [(.108+.043*math.cos(math.radians(a)), .437+.043*math.sin(math.radians(a)), 0)
+       for a in [-145+i*145/6 for i in range(7)]]
+ARM_RADIUS = .030
+NOZZLE_X = .154
 
 
 def colour_faces(obj, base, light, shade):
@@ -57,7 +58,7 @@ def build_base():
 
 def build_head():
     obj = capped_profile('Rounded yellow brass rotating hub',
-                         [(.060, .372), (.070, .384), (.070, .432), (.060, .442)], 'brass', 12)
+                         [(.077, .375), (.090, .389), (.090, .451), (.077, .465)], 'brass', 12)
     colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
     for sign, label in [(-1, 'Left'), (1, 'Right')]:
         points = [(sign*x, y, z) for x, y, z in ARM]
@@ -65,23 +66,23 @@ def build_head():
         colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
         # A rounded axial profile; the small centre disk is coplanar paint, no hole.
         obj = capped_profile(label+' round nozzle with painted centre',
-                             [(.020, 0), (.025, .007), (.026, .023),
-                              (.021, .034), (.006, .034)], 'brass', 10)
+                             [(.025, 0), (.034, .008), (.035, .027),
+                              (.029, .040), (.008, .040)], 'brass', 10)
         colour_faces(obj, 'brass', 'brass_light', 'brass_shade')
         obj.data.materials.append(g.MATS['nozzle_dot'])
         for face in obj.data.polygons:
-            if all(abs(obj.data.vertices[v].co.z-.034)<1e-6 and
-                   obj.data.vertices[v].co.xy.length<.00601 for v in face.vertices):
+            if all(abs(obj.data.vertices[v].co.z-.040)<1e-6 and
+                   obj.data.vertices[v].co.xy.length<.00801 for v in face.vertices):
                 face.material_index = 3
-        obj.location = g.v((sign*NOZZLE_X, .427, 0))
+        obj.location = g.v((sign*NOZZLE_X, .437, 0))
         axis = g.v((sign*.98, .20, 0)).normalized()
         obj.rotation_euler = axis.to_track_quat('Z', 'Y').to_euler()
-    # Fuller ten-sided droplet; retain a short tip and a 0.10 m maximum diameter.
-    sides = 10
-    rings = [(.020, .433), (.043, .443), (.050, .463), (.044, .489), (.024, .509)]
+    # The enlarged droplet embeds its lower section in the hub's top surface.
+    sides = 12
+    rings = [(.025, .452), (.052, .464), (.065, .486), (.054, .520), (.028, .549)]
     vertices = [(r*math.cos(i*math.tau/sides), y, r*math.sin(i*math.tau/sides))
                 for r, y in rings for i in range(sides)]
-    vertices.append((0, .525, 0))
+    vertices.append((0, .575, 0))
     faces = [tuple(reversed(range(sides)))]
     for j in range(len(rings)-1):
         for i in range(sides):
@@ -161,8 +162,8 @@ def actual_stats(path):
         triangles += count
     bounds = [[min(v[i] for v in vertices) for i in range(3)],
               [max(v[i] for v in vertices) for i in range(3)]]
-    assert triangles <= 800, triangles
-    assert .51 <= bounds[1][1] <= .53
+    assert triangles <= 900, triangles
+    assert .56 <= bounds[1][1] <= .58
     assert max(math.hypot(p[0], p[2]) for p in vertices) <= .20
     return {'triangles': triangles, 'surfaces': 2, 'bounds': bounds, 'parts': parts,
             'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
@@ -206,16 +207,16 @@ def main():
         export_yup=True, export_materials='EXPORT', export_texcoords=False, export_tangents=False,
         export_attributes=False, export_cameras=False, export_lights=False, export_animations=False)
     canonicalize(path)
-    entry = {**actual_stats(path), 'generator': 'tools/art/build_sprinkler.py', 'triangle_limit': 800,
+    entry = {**actual_stats(path), 'generator': 'tools/art/build_sprinkler.py', 'triangle_limit': 900,
              'head_pivot': list(HEAD), 'spray_origin': list(HEAD), 'front': '+Z',
              'pivot': 'plot bed centre; place root at BED_H=0.15 m; unit scale',
              'material': 'FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()',
-             'art_revision': 'v1.2',
-             'revision_amendment': 'Plane 217ba43a: full 0.40m head envelope, fuller cap and greener riser',
-             'arm_diameter_m': ARM_RADIUS*2, 'stone_diameter_m': .25, 'cap_diameter_m': .10,
+             'art_revision': 'v1.3',
+             'revision_amendment': 'Plane 8d57e50f and art-director authorization: head only, height <=0.58m and <=900 triangles',
+             'arm_diameter_m': ARM_RADIUS*2, 'stone_diameter_m': .25, 'cap_diameter_m': .13,
              'riser_diameter_base_m': .13, 'riser_diameter_top_m': .11,
-             'hub_diameter_m': .14, 'hub_height_m': .07, 'nozzle_diameter_m': .052,
-             'cap_height_m': .092, 'cap_radial_segments': 10,
+             'hub_diameter_m': .18, 'hub_height_m': .09, 'nozzle_diameter_m': .07,
+             'cap_height_m': .123, 'cap_radial_segments': 12,
              'palette_srgb': PALETTE, 'arm_centreline_right_m': ARM,
              'nozzle_dot': 'one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh',
              'runtime_note': 'head static by default; consumer may rotate around Y for 2-3 s on watering / tap',

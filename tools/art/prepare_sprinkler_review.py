@@ -60,11 +60,11 @@ for relative in ['assets/farm/art/plot.glb', 'modules/farm/farm_art.gd', 'module
 references=PROJECT/'references'
 references.mkdir(exist_ok=True)
 reference_manifest={}
-for revision,commit in [('v1_1','cf97f40b')]:
+for revision,commit in [('v1_2','0867b463')]:
     data=subprocess.check_output(['git','show',commit+':assets/farm/art/sprinkler.glb'],cwd=ROOT)
     (references/('sprinkler_'+revision+'.glb')).write_bytes(data)
     reference_manifest[revision]={'commit':commit,'sha256':hashlib.sha256(data).hexdigest()}
-reference_manifest['v1_2']={'source':'assets/farm/art/sprinkler.glb',
+reference_manifest['v1_3']={'source':'assets/farm/art/sprinkler.glb',
                            'sha256':hashlib.sha256((ROOT/'assets/farm/art/sprinkler.glb').read_bytes()).hexdigest()}
 (references/'manifest.json').write_text(json.dumps(reference_manifest,indent=2)+'\n')
 manifest = json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text())

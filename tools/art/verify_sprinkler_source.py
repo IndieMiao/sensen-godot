@@ -65,8 +65,11 @@ for height, diameter in [(.050,.130),(.362,.110)]:
     measured = 2*max(Vector((p.x,p.y)).length for p in ring)
     report['measurements']['riser_at_'+str(height)+'m'] = {'diameter_m': measured}
     check(abs(measured-diameter)<1e-6,'v1.2 tapered riser diameter at '+str(height))
-check(abs(hub['diameter_m']-.14)<1e-6 and abs(hub['top_m']-hub['bottom_m']-.07)<1e-6,
-      'v1.1 hub actual diameter 0.14m and height 0.07m')
+check(abs(hub['diameter_m']-.18)<1e-6 and abs(hub['top_m']-hub['bottom_m']-.09)<1e-6,
+      'v1.3 hub actual diameter 0.18m and height 0.09m')
+check(abs((hub['top_m']+hub['bottom_m'])/2-.42)<1e-6,'v1.3 hub centred at y=0.42m')
+check(report['measurements']['Stout sage green riser']['top_m']-hub['bottom_m']>.005,
+      'hub retains at least 5mm overlap with unchanged riser')
 check(abs(pad['diameter_m']-.25)<1e-6,'v1.1 stone diameter 0.25m')
 pad_mesh = bpy.data.objects['Round edged stone mounting pad'].data
 check(len({round(v.co.z,6) for v in pad_mesh.vertices})==6 and
@@ -76,14 +79,15 @@ for side in ['Left','Right']:
     nozzle = bpy.data.objects[side+' round nozzle with painted centre']
     diameter = 2*max(v.co.xy.length for v in nozzle.data.vertices)
     report['measurements'][side+' nozzle'] = {'diameter_m': diameter}
-    check(abs(diameter-.052)<1e-6,side+' nozzle actual diameter 0.052m')
-check(abs(report['measurements']['Blue water droplet cap']['diameter_m']-.10)<1e-6,
-      'v1.1 cap actual diameter 0.10m')
+    check(abs(diameter-.070)<1e-6,side+' nozzle actual diameter 0.070m')
+check(abs(report['measurements']['Blue water droplet cap']['diameter_m']-.13)<1e-6,
+      'v1.3 cap actual diameter 0.13m')
 cap=report['measurements']['Blue water droplet cap']
-check(abs(cap['top_m']-cap['bottom_m']-.092)<1e-6,'amended v1.2 cap height 0.092m')
+check(abs(cap['top_m']-cap['bottom_m']-.123)<1e-6,'v1.3 cap height 0.123m')
+check(cap['bottom_m']<hub['top_m'] and cap['top_m']<=.580001,'cap embeds in hub and total height <=0.58m')
 cap_object=bpy.data.objects['Blue water droplet cap']
-check(len([v for v in cap_object.data.vertices if abs(v.co.z-.489)<1e-6])==10,
-      'amended v1.2 cap ten radial segments at upper belly')
+check(len([v for v in cap_object.data.vertices if abs(v.co.z-.520)<1e-6])==12,
+      'v1.3 cap twelve radial segments at upper belly')
 report['passed'] = all(c['passed'] for c in report['checks'])
 (ROOT/'output/sprinkler-244/source-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print('SPRINKLER_SOURCE', report['passed'])

@@ -115,7 +115,7 @@ func make_fixture():
 		var data = node.mesh.surface_get_arrays(0)
 		actual_triangles += data[Mesh.ARRAY_INDEX].size()/3
 		check(data[Mesh.ARRAY_TEX_UV]==null,str(node.name)+" no UV")
-	check(actual_triangles==entry.triangles and actual_triangles<=800,"actual imported triangle budget")
+	check(actual_triangles==entry.triangles and actual_triangles<=900,"actual imported triangle budget")
 	check(Art.material().vertex_color_use_as_albedo and not Art.material().vertex_color_is_srgb,"unmodified shared linear FarmArt material")
 	check(head.position.distance_to(HEAD_POSITION)<.00001,"head pivot at local 0,.42,0")
 	var marker = sprinkler.find_child("spray_origin",true,false)
@@ -216,6 +216,8 @@ func run():
 		await supplemental_views()
 	if "--compare-revisions" in OS.get_cmdline_user_args():
 		await revision_comparison()
+	if entry.art_revision=="v1.3":
+		await head_closeup()
 	await occlusion_controls()
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"adapter":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","actual Mobile renderer")
@@ -233,8 +235,8 @@ func revision_comparison():
 	rig.visible=true
 	vp.size=Vector2i(360,800)
 	report.comparison_sources=JSON.parse_string(FileAccess.get_file_as_string("res://references/manifest.json"))
-	for version in ["v1_1","v1_2"]:
-		if version=="v1_2":
+	for version in ["v1_2","v1_3"]:
+		if version=="v1_3":
 			sprinkler=current
 		else:
 			sprinkler=load("res://references/sprinkler_"+version+".glb").instantiate()
@@ -249,9 +251,17 @@ func revision_comparison():
 		await capture("comparison_default_"+version)
 		game_camera(.8)
 		await capture("comparison_minimum_"+version)
-		if version!="v1_2": sprinkler.free()
+		if version!="v1_3": sprinkler.free()
 	sprinkler=current
 	head=current.find_child("head",true,false)
+
+func head_closeup():
+	for crop in crops: crop.visible=false
+	for bed in beds: bed.visible=bed.position.length()<.01
+	rig.visible=false
+	vp.size=Vector2i(900,800)
+	pose(Vector3(0,.50,0),.80,43,14.5)
+	await capture("head_detail")
 
 func supplemental_views():
 	for crop in crops: crop.visible=false
