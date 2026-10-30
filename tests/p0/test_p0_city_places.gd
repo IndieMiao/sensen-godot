@@ -293,7 +293,9 @@ func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	assert_bool(pin._disc.visible).is_true()   # explored: the P0 disc, its primary edge
 	assert_bool(pin._sil_disc.visible).is_false()
 	# exploring the city drops its silhouettes (the style cache follows the visits)
-	rt.session.view.travel.visits = {TOKYO: {"n": 1}}
+	var explored: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	explored.travel.visits = {TOKYO: {"n": 1}}
+	rt.session.view = explored
 	assert_bool(bool(m._destination_style(tokyo_market).get("silhouette", false))).is_false()
 	assert_bool(m._travel_first(tokyo_market)).is_true()   # still no pass here: a tap opens its card
 	rt.ui.close_modal()
