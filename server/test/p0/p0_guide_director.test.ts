@@ -338,6 +338,18 @@ describe('off the path', () => {
     r.do({ type: 'eat', item: r.s.bag.find(x => x.id.startsWith('dish_grilled_crucian'))!.id, space: 'home' });
     expect(r.step).toBe('t_soup');
   });
+  it('S8 eats a dish where it is quickest: the bag before a done pot before the Warming Cabinet', () => {
+    const r = s8('director-s8-where');
+    r.s.homestead.level = 3;
+    r.s.bag.push({ id: 'dish_grilled_crucian', qty: 1 });
+    r.s.cabinet.push({ id: 'dish_grilled_crucian', qty: 1 } as never); r.check();
+    expect(r.view.recover).toBe('r_eat_bag');   // the bag and the cabinet: the bag (eaten anywhere)
+    r.do({ type: 'cook', items: ['fish_crucian'], space: 'home' });
+    r.now += r.s.stove!.ms + S; r.check();
+    expect(r.view.recover).toBe('r_eat_bag');   // the bag and a done pot: the bag
+    r.s.bag = r.s.bag.filter(x => !x.id.startsWith('dish_')); r.check();
+    expect(r.view.recover).toBe('r_eat_pot');   // a done pot and the cabinet: the pot
+  });
   it('S8 picks the dish: Grilled Crucian first, else another dish, the soup only with no fish left; a full bar still passes', () => {
     const r = s8('director-s8-pick');
     r.s.bag.push({ id: 'dish_veggie_plate', qty: 1 }); r.check();

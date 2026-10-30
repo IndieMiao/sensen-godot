@@ -95,3 +95,25 @@ func test_the_cabinet_object_pulses_its_open_name_strip_at_home() -> void:
 	await get_tree().create_timer(0.25).timeout
 	ui._refresh_guide_pulses()
 	assert_int(int(ui.guide_pulses._counts.get("object:cabinet", 0))).is_equal(1)
+
+## The cabinet's path through P0Ui (周瑜 on #580): the real sheet opened as the farmhouse opens it — the dish's row pulses
+## while another row is selected; selected, its Eat.
+func test_the_open_cabinet_sheet_pulses_the_dishs_row_then_its_eat() -> void:
+	var v := _view([{item = DISH, pulse = true}, {button = "eat", item = DISH, pulse = true}])
+	v.guide.recover = "r_eat_cabinet"
+	v.cooking = {cabinet = {have = 2, cap = 6, items = [{id = "dish_veggie_plate", qty = 1, energy = 15, name = "Veggie Plate"},
+		{id = DISH + "@good", qty = 1, energy = 20, name = "Grilled Crucian"}]}}
+	var ui := await _ui(v)
+	var sheet := P0StorageSheet.new("cabinet", ui.view)
+	ui._open_modal(sheet, 0.0, true)
+	ui.modal_kind = "storage"
+	await get_tree().create_timer(0.6).timeout   # the sheet settled where it stays
+	assert_str(sheet.selected).is_equal("dish_veggie_plate")   # the first row, as it opens
+	ui._refresh_guide_pulses()
+	assert_int(int(ui.guide_pulses._counts.get("row:" + DISH, 0))).is_equal(1)
+	assert_bool(ui.guide_pulses._counts.has("eat:" + DISH)).is_false()
+	(sheet._rows[DISH + "@good"] as Button).pressed.emit()   # a tap on the dish's row
+	await get_tree().create_timer(0.3).timeout
+	assert_str(sheet.selected).is_equal(DISH + "@good")
+	ui._refresh_guide_pulses()
+	assert_int(int(ui.guide_pulses._counts.get("eat:" + DISH, 0))).is_equal(1)
