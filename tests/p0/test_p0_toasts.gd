@@ -273,3 +273,39 @@ func test_a_refused_compost_at_its_limit_says_when_it_resets() -> void:
 	for c in rt.session.connection_failed.get_connections(): rt.session.connection_failed.disconnect(c.callable)   # no server here
 	rt._on_refused("limit_reached", {"used": 5, "cap": 5, "resets_in": 9 * 3600000 + 12 * 60000}, {"type": "compost", "item": "crop_radish", "qty": 1})
 	assert_str(rt.ui.toast_text()).is_equal("Limit reached · 9h 12m")
+
+## q(259): away from home the full creel's second part says what its fish fetch here and at home (bag.creel_value from
+## the server's view); at home, with no sums or equal ones, the old sentence. Breaks only after a ` · `, three lines at most.
+func test_away_the_full_creel_says_what_it_fetches_here_and_at_home() -> void:
+	var v := _view()
+	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)   # home: no creel_value
+	v.bag["creel_value"] = null
+	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)
+	v.bag["creel_value"] = {"here": 304, "home": 304}
+	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)   # equal sums: never half a line
+	v.bag["creel_value"] = {"here": 230, "home": 304}
+	var said := P0Ui.creel_full_text(v)
+	assert_str(said.replace(" ", " ")).is_equal("Creel full · 0 free slots · 230 coins here · 304 at home")
+	# the only breakable spaces are the ones after a dot (the first part's own spaces stay as the approved toast has them)
+	assert_str(said.get_slice("slots · ", 1)).is_equal("230 coins here · 304 at home")
+	v.bag["creel_value"] = {"here": 1250, "home": 2080}
+	assert_str(P0Ui.creel_full_text(v).replace(" ", " ")).is_equal("Creel full · 0 free slots · 1,250 coins here · 2,080 at home")
+
+func test_the_away_creel_toast_fits_three_lines_and_opens_the_bag_on_its_fish_page() -> void:
+	for worth in [{"here": 230, "home": 304}, {"here": 1250, "home": 2080}, {"here": 12500, "home": 20800}]:
+		var v := _view()
+		v.bag["free"] = 0
+		v.bag["creel_value"] = worth
+		ui.set_view(v)
+		ui.toast_creel_full()
+		await await_idle_frame()
+		var label: Label = ui._toasts.label()
+		assert_int(label.get_line_count()).is_less_equal(3)
+		assert_float(_panel().size.x).is_equal(float(UiTokens.SIZE_TOAST_W))
+		assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
+		assert_str(ui._toasts.current_action()).is_equal("Open bag")
+		ui.clear_toast()
+	ui.toast_creel_full()
+	ui._on_toast_action("Open bag")
+	assert_str(ui.modal_kind).is_equal("bag")
+	assert_str(ui._bag.category).is_equal("Fish")

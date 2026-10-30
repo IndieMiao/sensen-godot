@@ -7,7 +7,7 @@ import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipe
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
+import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches, pick } from './requests.js';
@@ -94,6 +94,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       // Every slot says locked / gifted (the item-info rules gate Lock and Gift on these fields, SGODOT-224).
       slots: s.bag.map(b => ({ id: b.id, qty: b.qty, locked: s.locked.includes(b.id), gifted: !!b.gift,
         ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, s, now) } : {}) })),
+      creel_value: creelValue(c, s),   // q(259): away, the full creel's toast says what its fish fetch here and at home
     },
     drinks: drinksView(c, s, now),
     shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop, now)])),
@@ -337,6 +338,28 @@ function drinksView(c: P0Content, s: P0State, now: number) {
     gain: Math.max(0, Math.min(c.drinks.energy, max - s.energy.value)), full: s.energy.value >= max,
     items: Object.entries(c.drinks.items).map(([id, d]) => ({ id, name: d.name, shop: d.shop })),
   };
+}
+
+/** q(259): what the creel's sellable fish fetch at this city's Tackle Shop and at home, unit by unit as a sale pays
+ * (q(251): max(1, ⌊full × the city's share⌋)); Gifted fish, crops and dishes left out. Away only: null at home, in a
+ * city without a Tackle Shop (an S-tier town has only its Trading Post, whose counter buys nothing; the hand-written
+ * city has Mission's), with no fish to sell, or when the two sums are equal — the toast then keeps `Sell or cook first`
+ * (周瑜 on #567). */
+function creelValue(c: P0Content, s: P0State): { here: number; home: number } | null {
+  const city = s.travel?.here ?? homeOf(c, s);
+  if (sellDistance(c, s, 'tackle', city).home) return null;
+  const places = cityPlaces(c, city);   // null: the hand-written city
+  if (places && !places.detail.outposts.some(o => o.role === 'tackle')) return null;
+  let here = 0, home = 0;
+  for (const b of s.bag) {
+    if (b.gift || itemKind(b.id) !== 'fish') continue;
+    const away = buyback(c, 'tackle', b.id, undefined, { s, cluster: city });
+    const full = buyback(c, 'tackle', b.id, undefined, { s, cluster: homeOf(c, s) });
+    if (!('unit' in away) || !('unit' in full)) continue;
+    here += away.unit * b.qty;
+    home += full.unit * b.qty;
+  }
+  return here > 0 && here !== home ? { here, home } : null;
 }
 
 function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
