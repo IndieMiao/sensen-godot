@@ -41,3 +41,8 @@ inspect_tavern_ao_357.py 核对全部独立模块和实际房间合批中的 UV�
 repair_tavern_ao_357.py 仅对原托架后方 297 个独占像素修正亮度，保存
 tavern-ao-357-mask.png 与 tavern-ao-357-validation.json。不重烘整张图，不重导任何 GLB。
 运行时额外带修正图集的范围已在本会话获确认。
+
+2026-10-30 Nadia v1.1：仅帽子下压 2 cm，并收紧下部帽口 / 滚边的半径参数 2 cm。
+头发顶点与法线、UV、拓扑、节点和 socket 保留；帽冠原形不变。
+build_nadia_batch3.py --cap-only 只更新帽子源文件，不重建围裙；
+verify_nadia_hat_revision_347.py 与已交 v1 直接比较，结果见 Nadia v1.1 交付目录。

@@ -1,10 +1,14 @@
 # NPC Batch 3 · 部件审阅
 
+2026-10-30：v1 技术检查通过；Lena / Rafa、Lou 和后墙画面通过。
+Nadia 帽子按返修下压并收口，最新图和验证见 [Nadia v1.1](nadia-v1.1/README.md)，待复核。
+最新运行时返修头 17cd10d56e62530d4bf6b7bec35386b255559d4b，仅帽子 FBX / 场景变化。
+
 第二段 Nadia 的帽子、围裙及三人新造型并排已补到 [Nadia 审阅](nadia/README.md)。
 第三段 Lou 荷官装与后墙 AO 见 [Lou / 牌室审阅](lou-tavern/README.md)。
 全批六件已追加为 NPC 专用部件；下方保留第一段换色的完整证据。
 
-最终运行时头：ad751863b42770d4e8f70dd3889a4bca230b4b2f，分支 art/npc-parts-batch3。
+v1 运行时头：ad751863b42770d4e8f70dd3889a4bca230b4b2f，分支 art/npc-parts-batch3。
 只推分支，未开运行时 PR；美术审阅为 #561 → wp-3d-scene。
 全批 50 个运行时文件均在允许范围内（assets/avatar/** + 已确认的 tavern PNG），
 3 个可编辑 blend，18 张署名审阅图上传三张卡并下载核对。详见 [final-handoff.json](final-handoff.json)。

@@ -1,0 +1,42 @@
+{
+	"adapter": "NVIDIA GeForce RTX 2060",
+	"captures": [
+		{
+			"camera_size": 0.910000026226044,
+			"look": "nadia_now",
+			"name": "nadia_hat_before_front.png",
+			"resolution": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_size": 0.910000026226044,
+			"look": "nadia_now",
+			"name": "nadia_hat_before_back.png",
+			"resolution": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_size": 0.910000026226044,
+			"look": "nadia_hat_only",
+			"name": "nadia_hat_after_front.png",
+			"resolution": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_size": 0.910000026226044,
+			"look": "nadia_hat_only",
+			"name": "nadia_hat_after_back.png",
+			"resolution": [
+				640,
+				640
+			]
+		}
+	],
+	"renderer": "mobile"
+}

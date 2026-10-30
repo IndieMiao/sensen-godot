@@ -11,17 +11,20 @@ func run():
 	var appearance = load("res://modules/net/online_appearance.gd")
 	var kp = kp_script.new(); root.add_child(kp)
 	var avatar = root.get_node("Avatar")
-	var nadia = OS.get_cmdline_user_args().has("--nadia")
+	var hat_revision = OS.get_cmdline_user_args().has("--nadia-hat-v11")
+	var nadia = OS.get_cmdline_user_args().has("--nadia") or hat_revision
 	var lou = OS.get_cmdline_user_args().has("--lou")
 	var looks_path = "res://output/npc-batch3/looks-phase3.json" if lou else ("res://output/npc-batch3/looks-phase2.json" if nadia else "res://output/npc-batch3/looks-phase1.json")
 	var looks = JSON.parse_string(FileAccess.get_file_as_string(looks_path))
 	var output = "res://output/npc-batch3/nadia-closeups" if nadia else "res://output/npc-batch3/closeups"
 	if lou: output = "res://output/npc-batch3/lou-closeups"
+	if hat_revision: output = "res://output/npc-batch3/nadia-v11-closeups"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	var report = {"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "captures": []}
 	var pairs = [["lena_a", "lena_new", "lena_hat"], ["rafa_r1", "rafa_hat_only", "rafa_hat"], ["rafa_hat_only", "rafa_new", "rafa_cloth"]]
 	if nadia: pairs = [["nadia_now", "nadia_hat_only", "nadia_hat"], ["nadia_hat_only", "nadia_new", "nadia_apron"]]
+	if hat_revision: pairs = [["nadia_now", "nadia_hat_only", "nadia_hat"]]
 	if lou: pairs = [["lou_now", "lou_new", "lou_cloth"]]
 	for pair in pairs:
 		for index in 2:

@@ -18,6 +18,8 @@ from build_resident_parts_284 import child, element, scalar, encoded, same, comp
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'tools/art/source/npc_batch3'
+CAP_DROP_CM = 2.0
+CAP_MOUTH_INSET_CM = 2.0
 
 
 def tile(index): return ((index + .5) / 16, .0625)
@@ -99,7 +101,7 @@ class Geometry:
         return mesh
 
 
-def write_fbx(source, dest, builder, rebuild_skin=False):
+def write_fbx(source, dest, builder, rebuild_skin=False, corner_normals=None):
     tree, version = parse_fbx.parse(str(source))
     old = copy.deepcopy(tree)
     objects = child(tree, b'Objects').elems
@@ -113,7 +115,7 @@ def write_fbx(source, dest, builder, rebuild_skin=False):
         for j, li in enumerate(face.loop_indices):
             index = mesh.loops[li].vertex_index
             indices.append(index if j < len(face.loop_indices) - 1 else -index - 1)
-            normals.extend(mesh.corner_normals[li].vector)
+            normals.extend(corner_normals[li] if corner_normals is not None else mesh.corner_normals[li].vector)
             uvs.extend(mesh.uv_layers.active.data[li].uv)
     normal_node = element(b'LayerElementNormal', 'I', [0], [element(b'Version', 'I', [101]), scalar(b'Name', b''), scalar(b'MappingInformationType', b'ByPolygonVertex'), scalar(b'ReferenceInformationType', b'Direct'), element(b'Normals', 'd', [normals])])
     uv_node = element(b'LayerElementUV', 'I', [0], [element(b'Version', 'I', [101]), scalar(b'Name', b'map1'), scalar(b'MappingInformationType', b'ByPolygonVertex'), scalar(b'ReferenceInformationType', b'Direct'), element(b'UV', 'd', [uvs])])
@@ -194,12 +196,19 @@ def cap(runtime):
                 j = (i + 1) % n
                 faces.append((k*n+i, k*n+j, (k+1)*n+j, (k+1)*n+i))
         builder.add(label, verts, faces, color, weights=False)
-    ring('Low linen band', [(31.8, 26.3), (32.1, 27.2), (37.8, 27.5), (38.3, 26.5)], 1)
+    ring('Low linen band', [(31.8, 26.3 - CAP_MOUTH_INSET_CM), (32.1, 27.2 - CAP_MOUTH_INSET_CM), (37.8, 27.5), (38.3, 26.5)], 1)
     ring('Soft pleated baker crown', [(37.7, 27.1), (41.0, 30.0), (46.0, 30.8), (50.2, 26.8), (52.2, 18), (52.5, 8), (52.3, .01)], 0)
-    ring('Lower stitched piping', [(32.0, 27.2), (32.5, 27.6), (33.0, 27.2)], 2)
+    ring('Lower stitched piping', [(32.0, 27.2 - CAP_MOUTH_INSET_CM), (32.5, 27.6 - CAP_MOUTH_INSET_CM), (33.0, 27.2 - CAP_MOUTH_INSET_CM)], 2)
     builder.finish(dest / 'T_nadia_baker_hairHat41_D.png')
-    report = write_fbx(src, dest / src.name, builder)
+    unchanged_normals = [tuple(n.vector) for n in obj.data.corner_normals]
+    # Translate only the cap after mesh creation, preserving v1 float precision.
+    for vertex in obj.data.vertices[builder.original_vertices:]:
+        vertex.co.x -= CAP_DROP_CM
+    obj.data.update()
+    report = write_fbx(src, dest / src.name, builder, corner_normals=unchanged_normals)
     report.update(base='hairhat41_npc_auburn', base_triangles=2312, triangle_delta=report['triangles'] - 2312)
+    report['cap_drop_from_v1_cm'] = CAP_DROP_CM
+    report['cap_mouth_radius_inset_cm'] = CAP_MOUTH_INSET_CM
     bpy.ops.wm.save_as_mainfile(filepath=str(OUT / 'nadia-baker-hat.blend'))
     return report
 
@@ -260,10 +269,15 @@ def apron(runtime):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--runtime-root', type=Path, required=True)
+    parser.add_argument('--cap-only', action='store_true')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     OUT.mkdir(parents=True, exist_ok=True)
     bpy.context.preferences.filepaths.save_version = 0
-    report = {'cap': cap(args.runtime_root), 'apron': apron(args.runtime_root)}
+    if args.cap_only:
+        report = json.loads((OUT / 'nadia-geometry-validation.json').read_text())
+        report['cap'] = cap(args.runtime_root)
+    else:
+        report = {'cap': cap(args.runtime_root), 'apron': apron(args.runtime_root)}
     (OUT / 'nadia-geometry-validation.json').write_text(json.dumps(report, indent=2) + '\n')
     print('NADIA_GEOMETRY', json.dumps(report), flush=True)
 

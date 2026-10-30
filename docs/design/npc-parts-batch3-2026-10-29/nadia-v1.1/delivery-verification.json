@@ -1,0 +1,150 @@
+{
+  "issue": "SGODOT-347",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "files": [
+    {
+      "issue": 347,
+      "name": "SGODOT-347_NADIA_v1.1_01_hat_front.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/nadia-v1.1/SGODOT-347_NADIA_v1.1_01_hat_front.png",
+      "size": 203561,
+      "sha256": "41c93fa556bf048cfb0096e1471074dae99472d69ae37b1d1ab908b21bdd78d8",
+      "attachment_id": "ff78eb13-bbc8-4545-aad8-2dd9281222b1",
+      "download_sha256": "41c93fa556bf048cfb0096e1471074dae99472d69ae37b1d1ab908b21bdd78d8",
+      "download_verified": true,
+      "upload_metadata": {
+        "id": "ff78eb13-bbc8-4545-aad8-2dd9281222b1",
+        "created_at": "2026-10-30T03:06:28.046095Z",
+        "updated_at": "2026-10-30T03:06:28.357304Z",
+        "deleted_at": null,
+        "attributes": {
+          "name": "SGODOT-347_NADIA_v1.1_01_hat_front.png",
+          "size": 203561,
+          "type": "image/png"
+        },
+        "asset": "13c04473-7b22-4354-b31e-e9a4633bac55/03812fc7b9914effb7a3da24983df1b3-SGODOT-347_NADIA_v1.1_01_hat_front.png",
+        "entity_type": "ISSUE_ATTACHMENT",
+        "entity_identifier": null,
+        "is_deleted": false,
+        "is_archived": false,
+        "external_id": null,
+        "external_source": null,
+        "size": 203561.0,
+        "is_uploaded": true,
+        "storage_metadata": {
+          "ETag": "\"3d05fcbfdeb46cacc205d866b9f37c67\"",
+          "Metadata": {},
+          "ContentType": "image/png",
+          "LastModified": "2026-10-30T03:06:28+00:00",
+          "ContentLength": 203561
+        },
+        "created_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "updated_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "created_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "updated_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "user": null,
+        "workspace": "13c04473-7b22-4354-b31e-e9a4633bac55",
+        "draft_issue": null,
+        "project": "47d11337-c390-4b42-8b05-ef60fa2633f7",
+        "issue": "c3f619c3-9c80-403f-9688-8f8c595c0977",
+        "comment": null,
+        "page": null
+      }
+    },
+    {
+      "issue": 347,
+      "name": "SGODOT-347_NADIA_v1.1_02_hat_back.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/nadia-v1.1/SGODOT-347_NADIA_v1.1_02_hat_back.png",
+      "size": 181097,
+      "sha256": "425699ef7c9612eb0edaf2ae8af646e2b569c1aa85f0572fe7c83f7bd61ba04c",
+      "attachment_id": "1f77ce61-046d-47ea-acad-5b90109044c6",
+      "download_sha256": "425699ef7c9612eb0edaf2ae8af646e2b569c1aa85f0572fe7c83f7bd61ba04c",
+      "download_verified": true,
+      "upload_metadata": {
+        "id": "1f77ce61-046d-47ea-acad-5b90109044c6",
+        "created_at": "2026-10-30T03:06:28.798824Z",
+        "updated_at": "2026-10-30T03:06:29.079079Z",
+        "deleted_at": null,
+        "attributes": {
+          "name": "SGODOT-347_NADIA_v1.1_02_hat_back.png",
+          "size": 181097,
+          "type": "image/png"
+        },
+        "asset": "13c04473-7b22-4354-b31e-e9a4633bac55/2cd9082b6a9c4089a9074881925f1b1c-SGODOT-347_NADIA_v1.1_02_hat_back.png",
+        "entity_type": "ISSUE_ATTACHMENT",
+        "entity_identifier": null,
+        "is_deleted": false,
+        "is_archived": false,
+        "external_id": null,
+        "external_source": null,
+        "size": 181097.0,
+        "is_uploaded": true,
+        "storage_metadata": {
+          "ETag": "\"d90b3fc8ce4a15bf4a3af24143026594\"",
+          "Metadata": {},
+          "ContentType": "image/png",
+          "LastModified": "2026-10-30T03:06:28+00:00",
+          "ContentLength": 181097
+        },
+        "created_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "updated_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "created_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "updated_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "user": null,
+        "workspace": "13c04473-7b22-4354-b31e-e9a4633bac55",
+        "draft_issue": null,
+        "project": "47d11337-c390-4b42-8b05-ef60fa2633f7",
+        "issue": "c3f619c3-9c80-403f-9688-8f8c595c0977",
+        "comment": null,
+        "page": null
+      }
+    },
+    {
+      "issue": 347,
+      "name": "SGODOT-347_NADIA_v1.1_03_market_lineup.png",
+      "path": "docs/design/npc-parts-batch3-2026-10-29/nadia-v1.1/SGODOT-347_NADIA_v1.1_03_market_lineup.png",
+      "size": 384675,
+      "sha256": "6b73abccf1fdb2ee39bbf5185066dd15619dd22ecbbad88802cb359c8bcae71c",
+      "attachment_id": "9dd60eed-f29a-4409-93e1-b84695907078",
+      "download_sha256": "6b73abccf1fdb2ee39bbf5185066dd15619dd22ecbbad88802cb359c8bcae71c",
+      "download_verified": true,
+      "upload_metadata": {
+        "id": "9dd60eed-f29a-4409-93e1-b84695907078",
+        "created_at": "2026-10-30T03:06:29.511372Z",
+        "updated_at": "2026-10-30T03:06:29.820404Z",
+        "deleted_at": null,
+        "attributes": {
+          "name": "SGODOT-347_NADIA_v1.1_03_market_lineup.png",
+          "size": 384675,
+          "type": "image/png"
+        },
+        "asset": "13c04473-7b22-4354-b31e-e9a4633bac55/fada6da6c91d4fb9acbd23230c491d38-SGODOT-347_NADIA_v1.1_03_market_lineup.png",
+        "entity_type": "ISSUE_ATTACHMENT",
+        "entity_identifier": null,
+        "is_deleted": false,
+        "is_archived": false,
+        "external_id": null,
+        "external_source": null,
+        "size": 384675.0,
+        "is_uploaded": true,
+        "storage_metadata": {
+          "ETag": "\"3c49318714164283b75217859a85480c\"",
+          "Metadata": {},
+          "ContentType": "image/png",
+          "LastModified": "2026-10-30T03:06:29+00:00",
+          "ContentLength": 384675
+        },
+        "created_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "updated_by": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+        "created_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "updated_by_actor": "189283c6-88b9-4e73-8641-d13456001320",
+        "user": null,
+        "workspace": "13c04473-7b22-4354-b31e-e9a4633bac55",
+        "draft_issue": null,
+        "project": "47d11337-c390-4b42-8b05-ef60fa2633f7",
+        "issue": "c3f619c3-9c80-403f-9688-8f8c595c0977",
+        "comment": null,
+        "page": null
+      }
+    }
+  ]
+}

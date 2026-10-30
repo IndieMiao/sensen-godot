@@ -6,12 +6,16 @@
     "original_node_names_hierarchy_transforms_axes_units_exact": true,
     "connections_exact": true,
     "original_skin_weights_and_bind_matrices_exact": true,
+    "original_bind_matrices_exact": true,
+    "skin_weight_arrays_rebuilt": false,
     "clusters_extended_for_new_geometry": 0,
     "other_objects_and_geometry_exact": true,
-    "sha256": "a719f9458e656f6250d4278fde8c8cfaa8219fd916c9b9f909cc9f4dacb4405f",
+    "sha256": "48794143777e278174b09e056d92f22873b167c23320bf7ecf0d4eaba0fab580",
     "base": "hairhat41_npc_auburn",
     "base_triangles": 2312,
-    "triangle_delta": -1016
+    "triangle_delta": -1016,
+    "cap_drop_from_v1_cm": 2.0,
+    "cap_mouth_radius_inset_cm": 2.0
   },
   "apron": {
     "triangles": 1869,

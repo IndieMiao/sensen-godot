@@ -1,0 +1,391 @@
+{
+	"checks": [
+		{
+			"check": "hairhat41_npc_nadia_baker: original imported nodes/hierarchy/transforms/bone rests",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original attachment and slot",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: no compensating offsets",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original extracted transforms",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: one mesh",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: one surface",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: authored triangle count",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original shared shader",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: own new atlas bound",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: 512px runtime texture",
+			"passed": true
+		},
+		{
+			"check": "hairhat41_npc_nadia_baker: NPC only",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original imported nodes/hierarchy/transforms/bone rests",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original attachment and slot",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: no compensating offsets",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original skin bind count",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 0",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 1",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 2",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 3",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 4",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 5",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 6",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 7",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 8",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 9",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 10",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 11",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 12",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 13",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 14",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 15",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 16",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 17",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 18",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 19",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 20",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 21",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 22",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 23",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 24",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 25",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 26",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 27",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 28",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 29",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 30",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 31",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 32",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 33",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 34",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 35",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 36",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 37",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 38",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 39",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 40",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 41",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 42",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 43",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 44",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 45",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 46",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 47",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 48",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 49",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 50",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 51",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 52",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 53",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 54",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 55",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 56",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 57",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original bind 58",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: all original/new vertex skin weights normalized",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: one surface",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: authored triangle count",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original shared shader",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original material emission_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original material smoothness",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original material ao_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original material diffuse_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: original material rim_strength",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: own new atlas bound",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: 512px runtime texture",
+			"passed": true
+		},
+		{
+			"check": "cloth1_1_npc_nadia: NPC only",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"parts": {
+		"cloth1_1_npc_nadia": {
+			"base": "cloth1_1",
+			"delta": 240,
+			"runtime_texture_size": [
+				512,
+				512
+			],
+			"surface_count": 1,
+			"triangles": 1869
+		},
+		"hairhat41_npc_nadia_baker": {
+			"base": "hairhat41_npc_auburn",
+			"delta": -1016,
+			"runtime_texture_size": [
+				512,
+				512
+			],
+			"surface_count": 1,
+			"triangles": 1296
+		}
+	}
+}
