@@ -36,15 +36,14 @@ static func _read(session: Node, path: String, done: Callable, failed: Callable)
 		_waiting[path] = [done, failed]
 		(t as Callable).call(HTTPClient.METHOD_GET, path, {}, {"type": "home_pick"})
 		return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 	session.add_child(http)
 	http.request_completed.connect(func(result: int, code: int, _h: PackedStringArray, body: PackedByteArray):
 		http.queue_free()
 		var data = JSON.parse_string(body.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code == 200 else null
 		if data is Dictionary and bool(data.get("ok", false)): done.call(data)
 		else: failed.call())
-	if http.request(str(session.get("base_url")) + path, session.call("_headers")) != OK:
+	if http.send(str(session.get("base_url")) + path, session.call("_headers")) != OK:
 		http.queue_free()
 		failed.call()
 

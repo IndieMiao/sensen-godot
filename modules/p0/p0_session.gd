@@ -174,12 +174,11 @@ func _flush_ui() -> void:
 		transport.call(HTTPClient.METHOD_POST, "/p0/telemetry", body, {"type": "telemetry"})
 		return
 	if not is_inside_tree(): return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 	add_child(http)
 	http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
 	# _headers(): the demo key too, or a deployed server (P0_ACCESS_KEYS) would refuse every report with 401
-	if http.request(base_url + "/p0/telemetry", _headers(), HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
+	if http.send(base_url + "/p0/telemetry", _headers(), HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
 
 func dev_skip(minutes: int) -> void:
 	_request(HTTPClient.METHOD_POST, "/p0/dev/skip", {"minutes": minutes}, {})
@@ -194,11 +193,10 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	if transport.is_valid():
 		transport.call(method, path, body, cmd)
 		return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # SGODOT-370: 8 s of live time, a world loading is not the server being slow
 	add_child(http)
 	http.request_completed.connect(_on_done.bind(http, cmd))
-	var err := http.request(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
+	var err := http.send(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
 	if err != OK:
 		http.queue_free()
 		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
