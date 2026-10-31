@@ -1,0 +1,27 @@
+{
+  "task": "SGODOT-321",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "asset": "sofa_narrow",
+  "phase": "neutral blockout",
+  "measured_or_proposed_bounds": [
+    [
+      -1.15,
+      0.0,
+      -0.45000001788139343
+    ],
+    [
+      1.15,
+      1.3263769149780273,
+      0.4399999976158142
+    ]
+  ],
+  "source_asset": "sofa_three_seat",
+  "source_sha256": "349930f297c891111ef23110c58b046df3a2c056755c9bdd31ce86dea9527ba6",
+  "changes": "Approved X-only node scale, Y/Z unchanged; detailed source remodelling deferred",
+  "scale": [
+    0.8196721328190312,
+    1,
+    1
+  ]
+}
