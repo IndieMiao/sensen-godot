@@ -1,0 +1,51 @@
+{
+  "water_y": 0.055,
+  "catalog_sha256": "2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187",
+  "size": [
+    384,
+    512
+  ],
+  "distance_metres_per_unit": 1.0,
+  "entries": [
+    {
+      "decoration_seed": 1790896863.0,
+      "id": "pond_san_francisco_01",
+      "rock_mesh_sha256": "b6d2d9b8f3d14af9a97243789a28971679e3f2acf795b9ac2d345a1cfa0f20ea",
+      "template_id": "gourd"
+    },
+    {
+      "decoration_seed": 2578601018.0,
+      "id": "pond_san_francisco_02",
+      "rock_mesh_sha256": "969af1cb05301e69d3d6050531c3a688d2b81f11967feb841b1ff73969ae5848",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 47338722.0,
+      "id": "pond_san_francisco_03",
+      "rock_mesh_sha256": "ce04104437cb3642e42d12c9ab5a49ae7aa9d3c915cdb5f4f9d667d4c1d468d8",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 1556145448.0,
+      "id": "pond_san_francisco_04",
+      "rock_mesh_sha256": "0d602fbcc97717cce5db6eb76d054ebc4d17b411d4fafa9303c4f7c51b6e8d35",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 4081270712.0,
+      "id": "pond_san_francisco_05",
+      "rock_mesh_sha256": "29f4848cd29ee64fda1b67e52011a37836b7fafe9909bb03ee05211ccad4fae2",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 405910200.0,
+      "id": "pond_san_francisco_06",
+      "rock_mesh_sha256": "b3bd20a20984a381e61084a42baac0e90dc209543a09ff86782b5acc1250aefd",
+      "template_id": "gourd"
+    }
+  ],
+  "ponds_path": "res://assets/p0/p0_ponds.json",
+  "ponds_sha256": "2ddd16889a59cf54f9f427e66a0c548bbb48168ea18a13fdaea8cb504178b579",
+  "templates_path": "res://assets/p0/p0_pond_templates.json",
+  "templates_sha256": "9e679164502df2f8d9e01d6ea953b03a8cdac2f8c53aa9bd77c345ba292bf9de"
+}
