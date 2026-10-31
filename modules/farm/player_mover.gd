@@ -12,6 +12,10 @@ var facing := Vector3(0, 0, 1)
 var joystick := Vector2.ZERO
 var _path: Array[Vector3] = []
 var _path_idx := 0
+## SGODOT-306: whether the last joystick step went nowhere (blocked both ways, or square against a wall) — under
+## STUCK_RATIO of the step the stick asked for, so a sliver of jitter along a wall is not a walk. Paths never block.
+var stuck := false
+const STUCK_RATIO := 0.05
 
 const JOYSTICK_STEP_CELL_RATIO := 0.2
 
@@ -55,10 +59,14 @@ func is_moving() -> bool:
 
 func step(dt: float) -> void:
 	var stride := speed * world_scale * maxf(dt, 0.0)
+	stuck = false
 	if joystick != Vector2.ZERO:
 		var dir := Vector3(joystick.x, 0.0, joystick.y).limit_length(1.0)
+		var was := position
 		_move_joystick(dir * stride)
 		facing = dir.normalized()
+		var asked := (dir * stride).length()
+		stuck = asked > 0.0 and (position - was).length() < asked * STUCK_RATIO
 		return
 	# Carry unused distance across turns so frame rate does not change travel speed.
 	while _path_idx < _path.size():
