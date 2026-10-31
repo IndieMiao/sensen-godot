@@ -1,0 +1,1468 @@
+{
+  "geometry": {
+    "checks": [
+      {
+        "check": "One 2048-square shared atlas",
+        "passed": true
+      },
+      {
+        "check": "All semantic atlas regions are disjoint",
+        "passed": true
+      },
+      {
+        "check": "Mapping covers all 16 SGODOT-324 provisional roles",
+        "passed": true
+      },
+      {
+        "check": "hall_floor one mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "hall_floor finite vertices and UV",
+        "passed": true
+      },
+      {
+        "check": "hall_floor unit shading normals",
+        "passed": true
+      },
+      {
+        "check": "hall_floor UVs inside atlas",
+        "passed": true
+      },
+      {
+        "check": "Parquet top face actually points upward",
+        "passed": true
+      },
+      {
+        "check": "hall_floor no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "hall_floor every UV retains 16-pixel gutter",
+        "passed": true
+      },
+      {
+        "check": "hall_floor triangles never interpolate between color regions",
+        "passed": true
+      },
+      {
+        "check": "hall_floor external shared atlas, no embedded duplicate",
+        "passed": true
+      },
+      {
+        "check": "hall_floor own correct surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_floor import map mode 1",
+        "passed": true
+      },
+      {
+        "check": "hall_floor exported counts match statistics",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall one mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall finite vertices and UV",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall unit shading normals",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall UVs inside atlas",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall every UV retains 16-pixel gutter",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall triangles never interpolate between color regions",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall external shared atlas, no embedded duplicate",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall own correct surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall import map mode 1",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall exported counts match statistics",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall one mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall finite vertices and UV",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall unit shading normals",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall UVs inside atlas",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall every UV retains 16-pixel gutter",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall triangles never interpolate between color regions",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall external shared atlas, no embedded duplicate",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall own correct surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall import map mode 1",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall exported counts match statistics",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame one mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame finite vertices and UV",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame unit shading normals",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame UVs inside atlas",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame every UV retains 16-pixel gutter",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame triangles never interpolate between color regions",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame external shared atlas, no embedded duplicate",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame own correct surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame import map mode 1",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame exported counts match statistics",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid one mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid finite vertices and UV",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid unit shading normals",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid UVs inside atlas",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid every UV retains 16-pixel gutter",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid triangles never interpolate between color regions",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid external shared atlas, no embedded duplicate",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid own correct surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid import map mode 1",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid exported counts match statistics",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass one mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass finite vertices and UV",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass unit shading normals",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass UVs inside atlas",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass every UV retains 16-pixel gutter",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass triangles never interpolate between color regions",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass external shared atlas, no embedded duplicate",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass own correct surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass import map mode 1",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass exported counts match statistics",
+        "passed": true
+      },
+      {
+        "check": "Actual foundation footprint is 6.8 x 6.4 m",
+        "passed": true
+      },
+      {
+        "check": "Actual visual floor top is y=.08 m",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall 3.7 m from floor to top",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall 3.7 m from floor to top",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at -1.78 / 0.15",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at -1.78 / 0.65",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at -1.78 / 1.20",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at -1.78 / 1.85",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at 1.78 / 0.15",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at 1.78 / 0.65",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at 1.78 / 1.20",
+        "passed": true
+      },
+      {
+        "check": "Actual left-wall mesh has unobstructed window aperture at 1.78 / 1.85",
+        "passed": true
+      },
+      {
+        "check": "Positive control: wall between apertures is solid",
+        "passed": true
+      },
+      {
+        "check": "No unclassified crossings between delivered modules",
+        "passed": true
+      },
+      {
+        "check": "Shared shell reserves at least 130k triangles for furniture and plants",
+        "passed": true
+      },
+      {
+        "check": "Shared shell uses 8 placed surfaces including one glazing surface",
+        "passed": true
+      },
+      {
+        "check": "Both windows use one combined glass module",
+        "passed": true
+      },
+      {
+        "check": "Editable source retains all module collections",
+        "passed": true
+      },
+      {
+        "check": "Editable named construction parts retained",
+        "passed": true
+      },
+      {
+        "check": "Editable Mine Hut foundation actually retained",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "hall_floor": {
+        "triangles": 634,
+        "local_bounds": [
+          [
+            -3.4000000953674316,
+            -0.2800000011920929,
+            -3.200000047683716
+          ],
+          [
+            3.4000000953674316,
+            0.07999999821186066,
+            3.200000047683716
+          ]
+        ],
+        "sha256": "66c20670acc1c1f3ed51526513f834186aa6339e5d9b0214a3c793c8ddc96135"
+      },
+      "hall_left_wall": {
+        "triangles": 4552,
+        "local_bounds": [
+          [
+            -3.200000047683716,
+            -1.4901161193847656e-08,
+            -0.10000009089708328
+          ],
+          [
+            3.200000047683716,
+            3.700000286102295,
+            0.2359999567270279
+          ]
+        ],
+        "sha256": "9e47404a0bcd94764409957705f0b834a6f4faae6303433df3b56bc38defb2ca"
+      },
+      "hall_back_wall": {
+        "triangles": 4752,
+        "local_bounds": [
+          [
+            -3.299999952316284,
+            -1.4901161193847656e-08,
+            -0.09999990463256836
+          ],
+          [
+            3.299999952316284,
+            3.700000286102295,
+            0.23600006103515625
+          ]
+        ],
+        "sha256": "f1b58d7db45106701e73aa83056342011ac99ccc6fd970a0c8b0e36533fa07c2"
+      },
+      "hall_window_frame": {
+        "triangles": 864,
+        "local_bounds": [
+          [
+            -0.7599999904632568,
+            -1.2074999809265137,
+            -0.17000003159046173
+          ],
+          [
+            0.7599999904632568,
+            1.0899999141693115,
+            0.20500026643276215
+          ]
+        ],
+        "sha256": "9784b2957f00b6dc21be8d31eb639e26f0d7c36c7f7daa0222dbd11e2f73caaa"
+      },
+      "hall_window_grid": {
+        "triangles": 648,
+        "local_bounds": [
+          [
+            -0.5499999523162842,
+            -0.9500000476837158,
+            -0.010499885305762291
+          ],
+          [
+            0.5499999523162842,
+            0.9500000476837158,
+            0.06350003182888031
+          ]
+        ],
+        "sha256": "21e87250a88eb9362a548eeb1720b86ecd85d8ce3002b7db8c4d3ee1574a832c"
+      },
+      "hall_window_glass": {
+        "triangles": 4,
+        "local_bounds": [
+          [
+            -3.2179999351501465,
+            1.2599999904632568,
+            -2.3399999141693115
+          ],
+          [
+            -3.2179999351501465,
+            3.180000066757202,
+            2.3399999141693115
+          ]
+        ],
+        "sha256": "ecdea492182dadb3ee5469d7915ba0ea8db103f41880a5b19f2d5e1426ca184d"
+      }
+    },
+    "intersections": [
+      {
+        "modules": [
+          "hall_floor",
+          "hall_left_wall"
+        ],
+        "contact_pairs": 55,
+        "crossing_pairs": 5,
+        "classification": "Flush wall-to-foundation support"
+      },
+      {
+        "modules": [
+          "hall_floor",
+          "hall_back_wall"
+        ],
+        "contact_pairs": 45,
+        "crossing_pairs": 2,
+        "classification": "Flush wall-to-foundation support"
+      },
+      {
+        "modules": [
+          "hall_left_wall",
+          "hall_back_wall"
+        ],
+        "contact_pairs": 1848,
+        "crossing_pairs": 1346,
+        "classification": "Intentional cornice / wainscot corner construction join"
+      },
+      {
+        "modules": [
+          "hall_left_wall",
+          "hall_window_frame"
+        ],
+        "contact_pairs": 656,
+        "crossing_pairs": 549,
+        "classification": "Window casing mounts around the real opening"
+      },
+      {
+        "modules": [
+          "hall_left_wall",
+          "hall_window_frame_front"
+        ],
+        "contact_pairs": 653,
+        "crossing_pairs": 555,
+        "classification": "Window casing mounts around the real opening"
+      },
+      {
+        "modules": [
+          "hall_window_frame",
+          "hall_window_glass"
+        ],
+        "contact_pairs": 4,
+        "crossing_pairs": 0,
+        "classification": "Flush/tangent contact"
+      },
+      {
+        "modules": [
+          "hall_window_glass",
+          "hall_window_frame_front"
+        ],
+        "contact_pairs": 6,
+        "crossing_pairs": 0,
+        "classification": "Flush/tangent contact"
+      }
+    ],
+    "atlas_region_pairs_checked": 703,
+    "atlas_region_overlaps": [],
+    "unexpected_intersections": [],
+    "failures": [],
+    "passed": true
+  },
+  "godot": {
+    "adapter": "NVIDIA GeForce RTX 2060",
+    "captures": [
+      {
+        "camera_transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (9.308613, 14.27597, 9.308613)]",
+        "camera_width": 11.0,
+        "name": "shell_full",
+        "pitch": 43.0,
+        "resolution": [
+          1200,
+          1100
+        ],
+        "yaw": 45.0
+      },
+      {
+        "camera_transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 1.75, 18.0)]",
+        "camera_width": 8.0,
+        "name": "shell_front",
+        "pitch": 0.0,
+        "resolution": [
+          1000,
+          650
+        ],
+        "yaw": 0.0
+      },
+      {
+        "camera_transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (18.0, 1.75, 0.0)]",
+        "camera_width": 8.0,
+        "name": "shell_right",
+        "pitch": 0.0,
+        "resolution": [
+          1000,
+          650
+        ],
+        "yaw": 90.0
+      },
+      {
+        "camera_transform": "[X: (-1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (-0.0, 0.0, -1.0), O: (0.0, 1.75, -18.0)]",
+        "camera_width": 8.0,
+        "name": "shell_back",
+        "pitch": 0.0,
+        "resolution": [
+          1000,
+          650
+        ],
+        "yaw": 180.0
+      },
+      {
+        "camera_transform": "[X: (-0.0, 0.0, 1.0), Y: (0.0, 1.0, 0.0), Z: (-1.0, 0.0, -0.0), O: (-18.0, 1.75, -0.0)]",
+        "camera_width": 8.0,
+        "name": "shell_left",
+        "pitch": 0.0,
+        "resolution": [
+          1000,
+          650
+        ],
+        "yaw": 270.0
+      },
+      {
+        "camera_transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (0.0, 18.0, 0.003142)]",
+        "camera_width": 7.5,
+        "name": "shell_top",
+        "pitch": 89.99,
+        "resolution": [
+          1100,
+          1100
+        ],
+        "yaw": 0.0
+      },
+      {
+        "camera_transform": "[X: (-0.34202, 0.0, -0.939693), Y: (-0.195373, 0.978148, 0.07111), Z: (0.919158, 0.207912, -0.334546), O: (13.44485, 5.992411, -4.241831)]",
+        "camera_width": 3.2,
+        "name": "window_detail",
+        "pitch": 12.0,
+        "resolution": [
+          900,
+          900
+        ],
+        "yaw": 110.0
+      },
+      {
+        "camera_transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (9.308613, 14.27597, 9.308613)]",
+        "camera_width": 11.0,
+        "name": "sun_on",
+        "pitch": 43.0,
+        "resolution": [
+          1200,
+          1100
+        ],
+        "yaw": 45.0
+      },
+      {
+        "camera_transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (9.308613, 14.27597, 9.308613)]",
+        "camera_width": 11.0,
+        "name": "sun_off",
+        "pitch": 43.0,
+        "resolution": [
+          1200,
+          1100
+        ],
+        "yaw": 45.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "hall_floor_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "glazing does not block sun",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 retains per-surface material",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 2048 atlas bound",
+        "passed": true
+      },
+      {
+        "check": "imported triangle count matches exported scene",
+        "passed": true
+      },
+      {
+        "check": "imported surface count matches scene",
+        "passed": true
+      },
+      {
+        "check": "exactly one separate glass surface for both windows",
+        "passed": true
+      },
+      {
+        "check": "reusable shell contains no lights",
+        "passed": true
+      },
+      {
+        "check": "reusable shell contains no cameras",
+        "passed": true
+      },
+      {
+        "check": "floor, two walls and two open-edge colliders generated",
+        "passed": true
+      },
+      {
+        "check": "floor collision top matches visual .08 m",
+        "passed": true
+      },
+      {
+        "check": "floor collision top matches visual .08 m",
+        "passed": true
+      },
+      {
+        "check": "floor collision top matches visual .08 m",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep spawn_to_center",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep center_to_left_window",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep center_to_back",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep center_to_exit",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep right_containment",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep front_containment",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep left_wall_blocks",
+        "passed": true
+      },
+      {
+        "check": "capsule sweep back_wall_blocks",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_floor_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_left_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_back_wall_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_glass_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_frame_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "hall_window_grid_001 full-view corner framed",
+        "passed": true
+      },
+      {
+        "check": "shell_full requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "shell_full image saved",
+        "passed": true
+      },
+      {
+        "check": "shell_front requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "shell_front image saved",
+        "passed": true
+      },
+      {
+        "check": "shell_right requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "shell_right image saved",
+        "passed": true
+      },
+      {
+        "check": "shell_back requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "shell_back image saved",
+        "passed": true
+      },
+      {
+        "check": "shell_left requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "shell_left image saved",
+        "passed": true
+      },
+      {
+        "check": "shell_top requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "shell_top image saved",
+        "passed": true
+      },
+      {
+        "check": "window_detail requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "window_detail image saved",
+        "passed": true
+      },
+      {
+        "check": "sun_on requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "sun_on image saved",
+        "passed": true
+      },
+      {
+        "check": "sun_off requested pixel dimensions",
+        "passed": true
+      },
+      {
+        "check": "sun_off image saved",
+        "passed": true
+      },
+      {
+        "check": "rear_window direct window light visible in actual rendered pixels",
+        "passed": true
+      },
+      {
+        "check": "front_window direct window light visible in actual rendered pixels",
+        "passed": true
+      }
+    ],
+    "collision_bodies": 5,
+    "light_samples": {
+      "sun_off": {
+        "front_window": [
+          0.623529434204102,
+          0.376470595598221,
+          0.18823529779911
+        ],
+        "rear_window": [
+          0.647058844566345,
+          0.39215686917305,
+          0.200000002980232
+        ]
+      },
+      "sun_on": {
+        "front_window": [
+          0.882352948188782,
+          0.631372570991516,
+          0.384313732385635
+        ],
+        "rear_window": [
+          0.898039221763611,
+          0.647058844566345,
+          0.388235300779343
+        ]
+      }
+    },
+    "passed": true,
+    "physics_complete": true,
+    "renderer": "mobile",
+    "surfaces": 8,
+    "triangles": 12966,
+    "scope": "Desktop Vulkan Mobile art assembly and capsule sweeps; no Android or multiplayer claims."
+  },
+  "atlas_swatch_readback": [
+    {
+      "role": "wood_dark",
+      "hex": "551B0A",
+      "rgb8": [
+        85,
+        27,
+        10
+      ],
+      "exact": true
+    },
+    {
+      "role": "wood_mid",
+      "hex": "7B4023",
+      "rgb8": [
+        123,
+        64,
+        35
+      ],
+      "exact": true
+    },
+    {
+      "role": "oak",
+      "hex": "BE8747",
+      "rgb8": [
+        190,
+        135,
+        71
+      ],
+      "exact": true
+    },
+    {
+      "role": "oak_light",
+      "hex": "D59A53",
+      "rgb8": [
+        213,
+        154,
+        83
+      ],
+      "exact": true
+    },
+    {
+      "role": "oak_edge",
+      "hex": "AF7338",
+      "rgb8": [
+        175,
+        115,
+        56
+      ],
+      "exact": true
+    },
+    {
+      "role": "brass",
+      "hex": "C0924A",
+      "rgb8": [
+        192,
+        146,
+        74
+      ],
+      "exact": true
+    },
+    {
+      "role": "linen",
+      "hex": "EFE4CB",
+      "rgb8": [
+        239,
+        228,
+        203
+      ],
+      "exact": true
+    },
+    {
+      "role": "sky",
+      "hex": "D8E7E4",
+      "rgb8": [
+        216,
+        231,
+        228
+      ],
+      "exact": true
+    },
+    {
+      "role": "sage",
+      "hex": "567247",
+      "rgb8": [
+        86,
+        114,
+        71
+      ],
+      "exact": true
+    },
+    {
+      "role": "iron",
+      "hex": "494137",
+      "rgb8": [
+        73,
+        65,
+        55
+      ],
+      "exact": true
+    },
+    {
+      "role": "porcelain",
+      "hex": "F2E7D4",
+      "rgb8": [
+        242,
+        231,
+        212
+      ],
+      "exact": true
+    },
+    {
+      "role": "sage_dark",
+      "hex": "2B4726",
+      "rgb8": [
+        43,
+        71,
+        38
+      ],
+      "exact": true
+    },
+    {
+      "role": "linen_green",
+      "hex": "9FAB78",
+      "rgb8": [
+        159,
+        171,
+        120
+      ],
+      "exact": true
+    },
+    {
+      "role": "petal",
+      "hex": "FFF2D4",
+      "rgb8": [
+        255,
+        242,
+        212
+      ],
+      "exact": true
+    },
+    {
+      "role": "print_portrait",
+      "hex": "EFE4CB",
+      "rgb8": [
+        239,
+        228,
+        203
+      ],
+      "exact": true
+    },
+    {
+      "role": "print_landscape",
+      "hex": "EFE4CB",
+      "rgb8": [
+        239,
+        228,
+        203
+      ],
+      "exact": true
+    },
+    {
+      "role": "glass",
+      "hex": "EEF4EB",
+      "rgb8": [
+        238,
+        244,
+        235
+      ],
+      "exact": true
+    },
+    {
+      "role": "stone",
+      "hex": "C6B6A1",
+      "rgb8": [
+        198,
+        182,
+        161
+      ],
+      "exact": true
+    },
+    {
+      "role": "plaster_solid",
+      "hex": "E7CBB0",
+      "rgb8": [
+        231,
+        203,
+        176
+      ],
+      "exact": true
+    },
+    {
+      "role": "wainscot_solid",
+      "hex": "652E18",
+      "rgb8": [
+        101,
+        46,
+        24
+      ],
+      "exact": true
+    },
+    {
+      "role": "cornice_solid",
+      "hex": "672F1A",
+      "rgb8": [
+        103,
+        47,
+        26
+      ],
+      "exact": true
+    },
+    {
+      "role": "window_solid",
+      "hex": "BE7839",
+      "rgb8": [
+        190,
+        120,
+        57
+      ],
+      "exact": true
+    },
+    {
+      "role": "floor_solid",
+      "hex": "CB8655",
+      "rgb8": [
+        203,
+        134,
+        85
+      ],
+      "exact": true
+    },
+    {
+      "role": "soil",
+      "hex": "51402C",
+      "rgb8": [
+        81,
+        64,
+        44
+      ],
+      "exact": true
+    },
+    {
+      "role": "leaf",
+      "hex": "56873D",
+      "rgb8": [
+        86,
+        135,
+        61
+      ],
+      "exact": true
+    },
+    {
+      "role": "leaf_light",
+      "hex": "82AA4F",
+      "rgb8": [
+        130,
+        170,
+        79
+      ],
+      "exact": true
+    },
+    {
+      "role": "leaf_dark",
+      "hex": "365B2A",
+      "rgb8": [
+        54,
+        91,
+        42
+      ],
+      "exact": true
+    },
+    {
+      "role": "terra",
+      "hex": "BE754D",
+      "rgb8": [
+        190,
+        117,
+        77
+      ],
+      "exact": true
+    },
+    {
+      "role": "terra_light",
+      "hex": "D9905D",
+      "rgb8": [
+        217,
+        144,
+        93
+      ],
+      "exact": true
+    },
+    {
+      "role": "leather",
+      "hex": "964B25",
+      "rgb8": [
+        150,
+        75,
+        37
+      ],
+      "exact": true
+    },
+    {
+      "role": "cloth_green",
+      "hex": "2B4726",
+      "rgb8": [
+        43,
+        71,
+        38
+      ],
+      "exact": true
+    },
+    {
+      "role": "accent_gold",
+      "hex": "CFAB66",
+      "rgb8": [
+        207,
+        171,
+        102
+      ],
+      "exact": true
+    }
+  ],
+  "reference_sha256": "e41532cca40e6ff702107ed09362d6ee3fce9099e5082067268c8401a2a52389"
+}

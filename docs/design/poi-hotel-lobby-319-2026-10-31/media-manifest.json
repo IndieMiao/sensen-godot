@@ -1,0 +1,72 @@
+[
+  {
+    "name": "SGODOT-319_N1_v1_shell_full.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_full.png",
+    "size": [
+      1248,
+      1200
+    ],
+    "bytes": 801276,
+    "sha256": "d80903e5f49d9df920bd1fbdb12e453873788f17df6ed0c690830634a3915e65"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_shell_top.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_top.png",
+    "size": [
+      1148,
+      1200
+    ],
+    "bytes": 1205447,
+    "sha256": "6a034819882ef91df80107bf5906dfae673131c9b2f0b0d21f5e26d9daf2da38"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_shell_window.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_window.png",
+    "size": [
+      948,
+      1000
+    ],
+    "bytes": 362729,
+    "sha256": "2e3bf718a478e1d7adc40a516f01a93d75f67faa7fa6f6f9c6309527402049c9"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_shell_four_sides.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_four_sides.png",
+    "size": [
+      2048,
+      1460
+    ],
+    "bytes": 961862,
+    "sha256": "603f4f0d3e34d6db4b98d06c70c72984b1e273fc3d9bb2095430d8b3ce6d0e21"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_shell_palette.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_palette.png",
+    "size": [
+      1680,
+      1200
+    ],
+    "bytes": 418990,
+    "sha256": "d287d5985299ffdb27fa029c7564daaa3641b583a90918e4874b6ef145e6c0b3"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_shell_reference.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_reference.png",
+    "size": [
+      2048,
+      1110
+    ],
+    "bytes": 1819706,
+    "sha256": "8a302fd8f3f07997c03da0a865afbdf43bab5020abc771c8dda21a198ab9f322"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_shell_daylight.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_shell_daylight.png",
+    "size": [
+      2048,
+      1050
+    ],
+    "bytes": 809714,
+    "sha256": "b3ce802e0317fc01b4d0440bc5ac1d66e967d79d447c5e80f81fbfa72c1fa1ff"
+  }
+]
