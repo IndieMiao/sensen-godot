@@ -1,0 +1,1016 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "passed": true,
+  "geometry": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "sculpture_base: one surface",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: one surface",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: one surface",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: one surface",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: one surface",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: one surface",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "call_screen: one surface",
+        "passed": true
+      },
+      {
+        "check": "call_screen: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "call_screen: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "call_screen: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "call_screen: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "call_screen: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "call_screen: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "notice_board: one surface",
+        "passed": true
+      },
+      {
+        "check": "notice_board: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "notice_board: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "notice_board: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "notice_board: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "notice_board: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "notice_board: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: one surface",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: one surface",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: measured triangle count and <=8k",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: no embedded atlas duplication",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: all UVs within shared hall swatch safety margins",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "Measured planted base diameter 1.86m and height .40m",
+        "passed": true
+      },
+      {
+        "check": "Sculpture body <=.60m wide; total sculpture height 1.60m",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: approved applied niche envelope",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: approved applied niche envelope",
+        "passed": true
+      },
+      {
+        "check": "Brochure rack .71 x 1.10 x .48m",
+        "passed": true
+      },
+      {
+        "check": "Water dispenser .44 x 1.30 x .54m",
+        "passed": true
+      },
+      {
+        "check": "call_screen: approved board width and height",
+        "passed": true
+      },
+      {
+        "check": "notice_board: approved board width and height",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: approved board width and height",
+        "passed": true
+      },
+      {
+        "check": "Window flowerbox within 1.00 x .20 x .22m",
+        "passed": true
+      },
+      {
+        "check": "One same-layout 2048x2048 prop atlas",
+        "passed": true
+      },
+      {
+        "check": "Pinned hall source atlas unchanged",
+        "passed": true
+      },
+      {
+        "check": "Independent props including two flowerboxes fit reserved budget",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "sculpture_base": {
+        "bounds": [
+          [
+            -0.9300000071525574,
+            0.0,
+            -0.9300000071525574
+          ],
+          [
+            0.9300000071525574,
+            0.4000000059604645,
+            0.9300000071525574
+          ]
+        ],
+        "dimensions_m": [
+          1.8600000143051147,
+          0.4000000059604645,
+          1.8600000143051147
+        ],
+        "triangles": 7956,
+        "surfaces": 1,
+        "sha256": "6313edb7bb5c240b1905ad35828275375d79ac618b6a80e3181d4d8de0ee335f",
+        "mesh_names": [
+          "sculpture_base_mobile"
+        ]
+      },
+      "sculpture_body": {
+        "bounds": [
+          [
+            -0.2769845426082611,
+            0.0,
+            -0.06698445975780487
+          ],
+          [
+            0.30150508880615234,
+            1.1999999284744263,
+            0.1300000250339508
+          ]
+        ],
+        "dimensions_m": [
+          0.5784896612167358,
+          1.1999999284744263,
+          0.19698448479175568
+        ],
+        "triangles": 2072,
+        "surfaces": 1,
+        "sha256": "67966adee834c94ad233cd6ab2cd535f481608543cdfff15803f8c60ef38c083",
+        "mesh_names": [
+          "sculpture_body_mobile"
+        ]
+      },
+      "display_niche_1": {
+        "bounds": [
+          [
+            -0.5500001907348633,
+            0.0,
+            -0.0
+          ],
+          [
+            0.5500001907348633,
+            2.4000000953674316,
+            0.3499999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.1000003814697266,
+          2.4000000953674316,
+          0.3499999940395355
+        ],
+        "triangles": 3321,
+        "surfaces": 1,
+        "sha256": "10481fe5f32b4de6bdffacba55b16eb1c6777861bb0b318684c3932a5e8a700c",
+        "mesh_names": [
+          "display_niche_1_mobile"
+        ]
+      },
+      "display_niche_2": {
+        "bounds": [
+          [
+            -0.5500001907348633,
+            0.0,
+            -0.0
+          ],
+          [
+            0.5500001907348633,
+            2.4000000953674316,
+            0.3499999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.1000003814697266,
+          2.4000000953674316,
+          0.3499999940395355
+        ],
+        "triangles": 3153,
+        "surfaces": 1,
+        "sha256": "e1cc32345dedd99eabb1737bd5d0027cb8530b82a58cca53f7ff5f164a43e8ce",
+        "mesh_names": [
+          "display_niche_2_mobile"
+        ]
+      },
+      "brochure_rack": {
+        "bounds": [
+          [
+            -0.35500001907348633,
+            0.0,
+            -0.23999999463558197
+          ],
+          [
+            0.35500001907348633,
+            1.100000023841858,
+            0.23999999463558197
+          ]
+        ],
+        "dimensions_m": [
+          0.7100000381469727,
+          1.100000023841858,
+          0.47999998927116394
+        ],
+        "triangles": 2056,
+        "surfaces": 1,
+        "sha256": "9b3a64fe45663d8e9b44f123458af90bbe1c44e934e9e598d77c01989d14956e",
+        "mesh_names": [
+          "brochure_rack_mobile"
+        ]
+      },
+      "water_dispenser": {
+        "bounds": [
+          [
+            -0.2199999988079071,
+            0.0,
+            -0.23999999463558197
+          ],
+          [
+            0.2199999988079071,
+            1.2999999523162842,
+            0.29999998211860657
+          ]
+        ],
+        "dimensions_m": [
+          0.4399999976158142,
+          1.2999999523162842,
+          0.5399999618530273
+        ],
+        "triangles": 2176,
+        "surfaces": 1,
+        "sha256": "aab22e288f374d63a920da8f24f512881cdabf18c3a3f9ccf68461f14482a943",
+        "mesh_names": [
+          "water_dispenser_mobile"
+        ]
+      },
+      "call_screen": {
+        "bounds": [
+          [
+            -0.4000000059604645,
+            -0.25,
+            -0.02500000037252903
+          ],
+          [
+            0.4000000059604645,
+            0.25,
+            0.04200011119246483
+          ]
+        ],
+        "dimensions_m": [
+          0.800000011920929,
+          0.5,
+          0.06700011342763901
+        ],
+        "triangles": 588,
+        "surfaces": 1,
+        "sha256": "9031d92d11c6cb3cf71d3521b0478000d10af9f4c65d504590e2b8db464961b0",
+        "mesh_names": [
+          "call_screen_mobile"
+        ]
+      },
+      "notice_board": {
+        "bounds": [
+          [
+            -0.3500000834465027,
+            -0.44999998807907104,
+            -0.019999999552965164
+          ],
+          [
+            0.3500000834465027,
+            0.44999998807907104,
+            0.04549988731741905
+          ]
+        ],
+        "dimensions_m": [
+          0.7000001668930054,
+          0.8999999761581421,
+          0.06549988687038422
+        ],
+        "triangles": 972,
+        "surfaces": 1,
+        "sha256": "f14bc50a6fd3a6f413b3ee47720c645ae96b636e75b3c842d506351be59b7cb0",
+        "mesh_names": [
+          "notice_board_mobile"
+        ]
+      },
+      "name_plaque": {
+        "bounds": [
+          [
+            -0.5,
+            -0.17500001192092896,
+            -0.017500000074505806
+          ],
+          [
+            0.5,
+            0.17500001192092896,
+            0.03249998018145561
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          0.3500000238418579,
+          0.04999998211860657
+        ],
+        "triangles": 540,
+        "surfaces": 1,
+        "sha256": "8c6bfd711337cf1dea25fc6e4abaffe55a1c00fe013c9c7fc29eda8170166796",
+        "mesh_names": [
+          "name_plaque_mobile"
+        ]
+      },
+      "window_flowerbox": {
+        "bounds": [
+          [
+            -0.5,
+            0.0,
+            -0.10999999940395355
+          ],
+          [
+            0.5,
+            0.2004999965429306,
+            0.10999999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          0.2004999965429306,
+          0.2199999988079071
+        ],
+        "triangles": 1944,
+        "surfaces": 1,
+        "sha256": "9cf2ad81515caf8eeace29edc7ba8f86655bcf8fb366c61010cf80a908e884f8",
+        "mesh_names": [
+          "window_flowerbox_mobile"
+        ]
+      }
+    },
+    "placed_prop_triangles": 26722,
+    "placed_prop_surfaces": 11,
+    "note": "Independent props only. Final room budget and navigation will be checked after B approval."
+  },
+  "source": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "display_niche_1: actual display shelf top .75m",
+        "passed": true,
+        "top_m": 0.75
+      },
+      {
+        "check": "display_niche_1: editable distinct display objects",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: actual display shelf top .75m",
+        "passed": true,
+        "top_m": 0.75
+      },
+      {
+        "check": "display_niche_2: editable distinct display objects",
+        "passed": true
+      },
+      {
+        "check": "Call screen has exactly three coloured dots",
+        "passed": true
+      },
+      {
+        "check": "Notice board has exactly four blank papers",
+        "passed": true
+      },
+      {
+        "check": "No text or number objects in detailed kit",
+        "passed": true
+      },
+      {
+        "check": "Sculpture retains separate editable open ribbons and pearl",
+        "passed": true
+      }
+    ]
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "root_offset_y": 6.24171036633925e-07
+    },
+    "captures": [
+      {
+        "id": "props_overview",
+        "pitch": 30.0,
+        "pixels": [
+          1400,
+          1000
+        ],
+        "width_m": 9.0,
+        "yaw": 15.0
+      },
+      {
+        "id": "sculpture_detail",
+        "pitch": 22.9999980926514,
+        "pixels": [
+          1000,
+          1000
+        ],
+        "width_m": 2.59999990463257,
+        "yaw": 15.0
+      },
+      {
+        "id": "niche_displays",
+        "pitch": 12.0,
+        "pixels": [
+          1000,
+          1000
+        ],
+        "width_m": 3.20000004768372,
+        "yaw": 9.99999904632568
+      },
+      {
+        "id": "boards_and_service_props",
+        "pitch": 12.0,
+        "pixels": [
+          1000,
+          1000
+        ],
+        "width_m": 4.30000019073486,
+        "yaw": 15.0
+      },
+      {
+        "id": "fixed_props_default_43deg_360",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165,
+        "yaw": 45.0
+      },
+      {
+        "id": "fixed_props_overview",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          1200,
+          1000
+        ],
+        "width_m": 12.0,
+        "yaw": 45.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "One 2048x2048 same-layout hall atlas",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: import config loads",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: import UID",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: import config loads",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: import UID",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: import config loads",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: import UID",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: import config loads",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: import UID",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: import config loads",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: import UID",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: import config loads",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: import UID",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "call_screen: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "call_screen: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "call_screen: import config loads",
+        "passed": true
+      },
+      {
+        "check": "call_screen: import UID",
+        "passed": true
+      },
+      {
+        "check": "call_screen: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "notice_board: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "notice_board: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "notice_board: import config loads",
+        "passed": true
+      },
+      {
+        "check": "notice_board: import UID",
+        "passed": true
+      },
+      {
+        "check": "notice_board: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: import config loads",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: import UID",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: imported triangles and one surface",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: actual Godot vertices match GLB metre bounds",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: import config loads",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: import UID",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "Independent props fit reserved scene budget",
+        "passed": true
+      },
+      {
+        "check": "Reference character assembled",
+        "passed": true
+      },
+      {
+        "check": "Saved props_overview",
+        "passed": true
+      },
+      {
+        "check": "Saved sculpture_detail",
+        "passed": true
+      },
+      {
+        "check": "Saved niche_displays",
+        "passed": true
+      },
+      {
+        "check": "Saved boards_and_service_props",
+        "passed": true
+      },
+      {
+        "check": "Saved fixed_props_default_43deg_360",
+        "passed": true
+      },
+      {
+        "check": "Actual sculpture triangles do not occlude notice_board at default 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "Actual sculpture triangles do not occlude brochure_rack at default 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "Actual sculpture triangles do not occlude call_screen at default 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "Saved fixed_props_overview",
+        "passed": true
+      }
+    ],
+    "imported": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "placed_prop_surfaces": 11,
+      "placed_prop_triangles": 26722,
+      "renderer": "mobile"
+    },
+    "occlusion": {
+      "brochure_rack": {
+        "blocked_by_sculpture": 0,
+        "tested": 81
+      },
+      "call_screen": {
+        "blocked_by_sculpture": 0,
+        "tested": 81
+      },
+      "notice_board": {
+        "blocked_by_sculpture": 0,
+        "tested": 81
+      }
+    },
+    "passed": true
+  },
+  "pixels": [
+    {
+      "image": "props_overview",
+      "std": 40.032290510597655,
+      "passed": true
+    },
+    {
+      "image": "sculpture_detail",
+      "std": 46.99302859043595,
+      "passed": true
+    },
+    {
+      "image": "niche_displays",
+      "std": 63.3466866421689,
+      "passed": true
+    },
+    {
+      "image": "boards_and_service_props",
+      "std": 36.69871433781964,
+      "passed": true
+    },
+    {
+      "image": "fixed_props_default_43deg_360",
+      "std": 31.410546533932017,
+      "passed": true
+    },
+    {
+      "image": "fixed_props_overview",
+      "std": 32.04066545365399,
+      "passed": true
+    }
+  ],
+  "scope": "Independent detailed props and fixed-object occlusion fixture. B room assembly awaits user approval. Desktop Vulkan Mobile only.",
+  "mount_adjustments": {
+    "brochure_rack_z_m": -2.55,
+    "brochure_rack_forward_delta_m": 0.14,
+    "notice_board_z_m": -2.83,
+    "window_flowerbox_x_m": -2.91,
+    "window_flowerbox_bottom_y_m": 1.06,
+    "reason": "Shared shell has protruding wainscot and window sill; avoid visible intersections without shell edits"
+  }
+}

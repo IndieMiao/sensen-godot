@@ -1,0 +1,14 @@
+{
+  "asset": "notice_board",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "new authored geometry",
+  "reference": "SGODOT-316 R3 main; dimensions from director dispatch, sculpture amendment 64efe200",
+  "source_script": "tools/art/source/poi_service_hall/build_details.py",
+  "source_blend": "tools/art/source/poi_service_hall/service_hall_details.blend",
+  "atlas": "Same fixed hall_palette layout; no shared shell edits",
+  "changes": [
+    "Four blank paper sheets; centre mounting at 1.55m"
+  ],
+  "reference_sha256": "7e02e176ef11ba50c2c09225b541cda5da3164e074505bee73f90331a6ce30ec"
+}
