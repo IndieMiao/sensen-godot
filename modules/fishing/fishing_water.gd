@@ -72,13 +72,17 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 	if spec.has("polygon"):
 		material.shader = preload("res://modules/ponds/pond_water.gdshader")
 		material.set_shader_parameter("polygon_water", true)
-		material.set_shader_parameter("pond_shore", load("res://assets/ponds/%s_shore.png" % str(spec.template_id)))
+		# A P0 outline (SGODOT-374) brings its own baked shore / bed / foam under spec.art; the catalog's art otherwise.
+		var art := str(spec.get("art", ""))
+		material.set_shader_parameter("pond_shore", load((art if art != "" else "res://assets/ponds/") + "%s_shore.png" % str(spec.template_id)))
 		material.set_shader_parameter("pond_extent", Vector2(spec.extent[0], spec.extent[1]))
-		material.set_shader_parameter("basin_bed", load("res://assets/ponds/art/%s_bed.png" % str(spec.template_id)))
+		var bed := (art if art != "" else "res://assets/ponds/art/") + "%s_bed.png" % str(spec.template_id)
+		if not ResourceLoader.exists(bed): bed = "res://assets/ponds/art/%s_bed.png" % str(spec.template_id)
+		material.set_shader_parameter("basin_bed", load(bed))
 		material.set_shader_parameter("caustics", preload("res://assets/ponds/art/caustic_web.png"))
 		material.set_shader_parameter("ripple_field", preload("res://assets/ponds/art/pond_ripple_field.png"))
 		material.set_shader_parameter("foam_pattern", preload("res://assets/ponds/art/foam/foam_pattern.png"))
-		var foam_contact_path := "res://assets/ponds/art/foam/%s.png" % site_id
+		var foam_contact_path := (art + "foam/" if art != "" else "res://assets/ponds/art/foam/") + "%s.png" % site_id
 		if ResourceLoader.exists(foam_contact_path):
 			material.set_shader_parameter("foam_contact", load(foam_contact_path))
 			material.set_shader_parameter("has_foam_contact", true)

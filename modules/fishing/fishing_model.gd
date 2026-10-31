@@ -111,9 +111,25 @@ static func _nearest_polygon(p: Vector2, polygon: PackedVector2Array) -> Vector2
 		if p.distance_squared_to(q) < p.distance_squared_to(nearest): nearest = q
 	return nearest
 
+## The Cast key's landing: past the nearest bank, POND_REACH into a pond (q(267) ③: open water in front of the rod),
+## backing off in steps until the whole run from the bank stays wet; 0.55 m (half a river's width) elsewhere.
+const POND_REACH := 2.5
+const SHORE_REACH := 0.55
 static func default_target(id: String, origin: Vector3, pond: Dictionary = {}) -> Vector3:
 	var edge := nearest_water(id, origin, pond)
-	return edge + (edge - origin).normalized() * minf(0.55, float(site(id, pond).get("width", 1.1)) * 0.5)
+	var dir := (edge - origin).normalized()
+	var spec := site(id, pond)
+	if spec.has("polygon"):
+		var reach := POND_REACH
+		while reach > SHORE_REACH:
+			var wet := true
+			for i in range(1, ceili(reach / 0.1) + 1):
+				if not contains(id, edge + dir * minf(i * 0.1, reach), 0.0, pond):
+					wet = false
+					break
+			if wet: return edge + dir * reach
+			reach -= 0.25
+	return edge + dir * minf(SHORE_REACH, float(spec.get("width", 1.1)) * 0.5)
 
 static func dry_walkable(grid: BlueprintGrid, point: Vector3) -> bool:
 	var cell := grid.bp.world_to_cell(point)
