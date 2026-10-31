@@ -1140,7 +1140,9 @@ func test_the_fares_floats_come_with_the_landing_in_order() -> void:
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
 	var saved := _ready_to_arrive(m)
-	rt.session.view.travel.visits = {}
+	var first: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	first.travel.visits = {}
+	rt.session.view = first
 	var arrival := {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559, paid = {energy = 30, coins = 120}, renewed = true}
 	_fly(m, arrival, [{kind = "energy", delta = -30, reason = "travel"}, {kind = "coins", delta = -120, reason = "travel"},
 		{kind = "energy", delta = 10, reason = "first_visit"}, arrival])
