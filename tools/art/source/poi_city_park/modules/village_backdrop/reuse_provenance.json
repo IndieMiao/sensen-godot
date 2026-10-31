@@ -1,0 +1,17 @@
+{
+  "asset": "village_backdrop",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "SGODOT-314_City_Park_Main_2026-10-31.png",
+      "sha256": "fe2133e33dd442b31862afc334f8e236dc286d64c085eece1608c8ceb9639834"
+    }
+  ],
+  "changes": [
+    "Approved main distant village/sky crop only; single noncolliding card, folded into same N5 atlas"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "village_backdrop_mobile"
+}

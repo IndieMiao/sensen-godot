@@ -1,0 +1,718 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "park_ground",
+      "vertices": 64,
+      "triangles": 120,
+      "surfaces": 1,
+      "bytes": 5844,
+      "file": "assets/rooms/_shared/shell_park/park_ground.glb",
+      "bounds": [
+        [
+          -4.0,
+          -0.18000000715255737,
+          -4.0
+        ],
+        [
+          4.0,
+          0.0,
+          4.0
+        ]
+      ],
+      "dimensions_m": [
+        8.0,
+        0.18000000715255737,
+        8.0
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "park_ground_mobile"
+      ],
+      "has_images": false,
+      "sha256": "921a4728fadfaa96160c853e6117c5146ab474e693f91b78a41117f240d97344"
+    },
+    {
+      "name": "brick_paths",
+      "vertices": 5376,
+      "triangles": 8040,
+      "surfaces": 1,
+      "bytes": 565728,
+      "file": "assets/rooms/poi_city_park/brick_paths.glb",
+      "bounds": [
+        [
+          -3.200000047683716,
+          0.0010000000474974513,
+          -3.200000047683716
+        ],
+        [
+          3.200000047683716,
+          0.03500000014901161,
+          3.7960000038146973
+        ]
+      ],
+      "dimensions_m": [
+        6.400000095367432,
+        0.03400000184774399,
+        6.996000289916992
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "brick_paths_mobile"
+      ],
+      "has_images": false,
+      "sha256": "341aa2c48a7a56800ac37281f54a74f72ca9de29d1399a5e3cd8d38326c3a61c"
+    },
+    {
+      "name": "white_fence_segment",
+      "vertices": 162,
+      "triangles": 296,
+      "surfaces": 1,
+      "bytes": 24332,
+      "file": "assets/rooms/poi_city_park/white_fence_segment.glb",
+      "bounds": [
+        [
+          -0.3250007629394531,
+          0.0,
+          -0.04500000178813934
+        ],
+        [
+          0.3250007629394531,
+          0.5899999737739563,
+          0.04500000178813934
+        ]
+      ],
+      "dimensions_m": [
+        0.6500015258789062,
+        0.5899999737739563,
+        0.09000000357627869
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "white_fence_segment_mobile"
+      ],
+      "has_images": false,
+      "sha256": "832fe83eb0cc4edca3847fd48f63c0d106b98b41cbc6205b54215b7cbafb4d43"
+    },
+    {
+      "name": "front_fence",
+      "vertices": 1296,
+      "triangles": 2368,
+      "surfaces": 1,
+      "bytes": 182996,
+      "file": "assets/rooms/_shared/shell_park/front_fence.glb",
+      "bounds": [
+        [
+          -3.509999990463257,
+          0.0,
+          3.8550000190734863
+        ],
+        [
+          3.509999990463257,
+          0.5899999737739563,
+          3.945000171661377
+        ]
+      ],
+      "dimensions_m": [
+        7.019999980926514,
+        0.5899999737739563,
+        0.09000015258789062
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "front_fence_mobile"
+      ],
+      "has_images": false,
+      "sha256": "7356d7d60b44c7df60167abf8645d8452973e6df81405a616da896358e1bb813"
+    },
+    {
+      "name": "green_bench",
+      "vertices": 432,
+      "triangles": 792,
+      "surfaces": 1,
+      "bytes": 62180,
+      "file": "assets/rooms/poi_city_park/green_bench.glb",
+      "bounds": [
+        [
+          -0.47999995946884155,
+          0.0,
+          -0.2895270586013794
+        ],
+        [
+          0.4799998998641968,
+          1.1186034679412842,
+          0.2750000059604645
+        ]
+      ],
+      "dimensions_m": [
+        0.9599998593330383,
+        1.1186034679412842,
+        0.5645270347595215
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "green_bench_mobile"
+      ],
+      "has_images": false,
+      "sha256": "be1fd13f7fb61ed092a12d76aac433f1b77e3a4bef92b69e3b61e2e0bd074a7c"
+    },
+    {
+      "name": "white_bench",
+      "vertices": 432,
+      "triangles": 792,
+      "surfaces": 1,
+      "bytes": 61668,
+      "file": "assets/rooms/poi_city_park/white_bench.glb",
+      "bounds": [
+        [
+          -0.5199997425079346,
+          0.0,
+          -0.2888505458831787
+        ],
+        [
+          0.5199997425079346,
+          1.0483440160751343,
+          0.27500009536743164
+        ]
+      ],
+      "dimensions_m": [
+        1.0399994850158691,
+        1.0483440160751343,
+        0.5638506412506104
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "white_bench_mobile"
+      ],
+      "has_images": false,
+      "sha256": "71482f770791b58e5b7518aa8b322f58eeebd088f5e28ebe78eea59afd1943ba"
+    },
+    {
+      "name": "bench_farm_control",
+      "vertices": 432,
+      "triangles": 792,
+      "surfaces": 1,
+      "bytes": 61808,
+      "file": "assets/rooms/poi_city_park/bench_farm_control.glb",
+      "bounds": [
+        [
+          -0.5550003051757812,
+          0.0,
+          -0.2888505458831787
+        ],
+        [
+          0.5550003051757812,
+          1.0483440160751343,
+          0.27500009536743164
+        ]
+      ],
+      "dimensions_m": [
+        1.1100006103515625,
+        1.0483440160751343,
+        0.5638506412506104
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "bench_farm_control_mobile"
+      ],
+      "has_images": false,
+      "sha256": "c626ecbcfc672e5000867ee09838bbe02437510d58a270111a920889da7cf72a"
+    },
+    {
+      "name": "fountain",
+      "vertices": 950,
+      "triangles": 1876,
+      "surfaces": 1,
+      "bytes": 61252,
+      "file": "assets/rooms/poi_city_park/fountain.glb",
+      "bounds": [
+        [
+          -0.6029999852180481,
+          0.0,
+          -0.6029999852180481
+        ],
+        [
+          0.6029999852180481,
+          0.9940000176429749,
+          0.6030000448226929
+        ]
+      ],
+      "dimensions_m": [
+        1.2059999704360962,
+        0.9940000176429749,
+        1.2060000896453857
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "fountain_mobile"
+      ],
+      "has_images": false,
+      "sha256": "951d7fd30530db67a976db7108d465eb4f253441d7a425eab54b475e4e550f24"
+    },
+    {
+      "name": "fountain_water",
+      "vertices": 458,
+      "triangles": 784,
+      "surfaces": 1,
+      "bytes": 33540,
+      "file": "assets/rooms/poi_city_park/fountain_water.glb",
+      "bounds": [
+        [
+          -0.5109999775886536,
+          0.2549999952316284,
+          -0.5109999775886536
+        ],
+        [
+          0.5109999775886536,
+          0.7560223937034607,
+          0.5110000371932983
+        ]
+      ],
+      "dimensions_m": [
+        1.0219999551773071,
+        0.5010223984718323,
+        1.0220000743865967
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "fountain_water_mobile"
+      ],
+      "has_images": false,
+      "sha256": "f449589f9a22a3ec97ea9be149719b064ee8baab63d2462a3f58c246cace0508"
+    },
+    {
+      "name": "parterre_hedge",
+      "vertices": 2794,
+      "triangles": 5256,
+      "surfaces": 1,
+      "bytes": 211680,
+      "file": "assets/rooms/poi_city_park/parterre_hedge.glb",
+      "bounds": [
+        [
+          0.8086816072463989,
+          0.009999999776482582,
+          0.7042769193649292
+        ],
+        [
+          2.5845680236816406,
+          0.3474999964237213,
+          2.5795681476593018
+        ]
+      ],
+      "dimensions_m": [
+        1.7758864164352417,
+        0.3375000059604645,
+        1.8752912282943726
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "parterre_hedge_mobile"
+      ],
+      "has_images": false,
+      "sha256": "da6931f29f309a5b0c60100172a55efd2835c3aa7aeb6910f85abefd694ef80b"
+    },
+    {
+      "name": "parterre_flowers",
+      "vertices": 3738,
+      "triangles": 5460,
+      "surfaces": 1,
+      "bytes": 247848,
+      "file": "assets/rooms/poi_city_park/parterre_flowers.glb",
+      "bounds": [
+        [
+          0.9952425360679626,
+          0.1149909645318985,
+          1.0042048692703247
+        ],
+        [
+          2.3107059001922607,
+          0.2744974195957184,
+          2.2883920669555664
+        ]
+      ],
+      "dimensions_m": [
+        1.3154633045196533,
+        0.15950645506381989,
+        1.2841871976852417
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "parterre_flowers_mobile"
+      ],
+      "has_images": false,
+      "sha256": "78f181aa62359e89e1503194ed2423abfaad88a70986178a9ece01f23e6ee496"
+    },
+    {
+      "name": "rose_arch",
+      "vertices": 2352,
+      "triangles": 4420,
+      "surfaces": 1,
+      "bytes": 181356,
+      "file": "assets/rooms/poi_city_park/rose_arch.glb",
+      "bounds": [
+        [
+          -0.8268046379089355,
+          0.0,
+          -0.3299999237060547
+        ],
+        [
+          0.8285792469978333,
+          2.538618564605713,
+          0.4275529384613037
+        ]
+      ],
+      "dimensions_m": [
+        1.655383825302124,
+        2.538618564605713,
+        0.7575528621673584
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "rose_arch_mobile"
+      ],
+      "has_images": false,
+      "sha256": "50938ba5b49698d9a0cdfdbafbab80840dac392797c08fa8c2c132a9fea449c7"
+    },
+    {
+      "name": "park_lamp",
+      "vertices": 318,
+      "triangles": 584,
+      "surfaces": 1,
+      "bytes": 26428,
+      "file": "assets/rooms/poi_city_park/park_lamp.glb",
+      "bounds": [
+        [
+          -0.16000008583068848,
+          0.0,
+          -0.15999996662139893
+        ],
+        [
+          0.16000008583068848,
+          2.200000047683716,
+          0.15999996662139893
+        ]
+      ],
+      "dimensions_m": [
+        0.32000017166137695,
+        2.200000047683716,
+        0.31999993324279785
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "park_lamp_mobile"
+      ],
+      "has_images": false,
+      "sha256": "fb3584ba0a840e4737cadc4fca13053dbbb656929a2aa58a856cc3a2fc1f547d"
+    },
+    {
+      "name": "birdbath",
+      "vertices": 731,
+      "triangles": 1402,
+      "surfaces": 1,
+      "bytes": 51368,
+      "file": "assets/rooms/poi_city_park/birdbath.glb",
+      "bounds": [
+        [
+          -0.2890000343322754,
+          0.0,
+          -0.28899991512298584
+        ],
+        [
+          0.2890000343322754,
+          0.8399999737739563,
+          0.2890000343322754
+        ]
+      ],
+      "dimensions_m": [
+        0.5780000686645508,
+        0.8399999737739563,
+        0.5779999494552612
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "birdbath_mobile"
+      ],
+      "has_images": false,
+      "sha256": "b6bf5dd383411444c40ad771aac601a9a791529542fb8186f919383c7ed5af68"
+    },
+    {
+      "name": "green_bin",
+      "vertices": 340,
+      "triangles": 592,
+      "surfaces": 1,
+      "bytes": 31016,
+      "file": "assets/rooms/poi_city_park/green_bin.glb",
+      "bounds": [
+        [
+          -0.2049999237060547,
+          0.0,
+          -0.20499998331069946
+        ],
+        [
+          0.2049999237060547,
+          0.6399999856948853,
+          0.20500004291534424
+        ]
+      ],
+      "dimensions_m": [
+        0.4099998474121094,
+        0.6399999856948853,
+        0.4100000262260437
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "green_bin_mobile"
+      ],
+      "has_images": false,
+      "sha256": "bd148a10bc6853383041d6acc847a9fe9598dda9242d46245cbb680878a90a83"
+    },
+    {
+      "name": "entry_gate",
+      "vertices": 1700,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 157964,
+      "file": "assets/rooms/_shared/shell_park/entry_gate.glb",
+      "bounds": [
+        [
+          -1.0750000476837158,
+          0.0,
+          -0.24000000953674316
+        ],
+        [
+          1.0750000476837158,
+          2.605588436126709,
+          0.24000000953674316
+        ]
+      ],
+      "dimensions_m": [
+        2.1500000953674316,
+        2.605588436126709,
+        0.48000001907348633
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "entry_gate_mobile"
+      ],
+      "has_images": false,
+      "sha256": "e4ba6cee0e8494f644bf396a2c3d49a07dbc9660d3607a89155bbc5df813320c"
+    },
+    {
+      "name": "park_tree",
+      "vertices": 1545,
+      "triangles": 1624,
+      "surfaces": 1,
+      "bytes": 72176,
+      "file": "assets/rooms/poi_city_park/park_tree.glb",
+      "bounds": [
+        [
+          -0.8999998569488525,
+          -0.02499997615814209,
+          -0.6800000667572021
+        ],
+        [
+          0.9249999523162842,
+          2.679999828338623,
+          0.6649999618530273
+        ]
+      ],
+      "dimensions_m": [
+        1.8249998092651367,
+        2.7049999237060547,
+        1.3450000286102295
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "park_tree_mobile"
+      ],
+      "has_images": false,
+      "sha256": "4eb68b5b6da441d91c859229ab9a6d8897c0c241f0d2cfa4ff93dc46d47b44ef"
+    },
+    {
+      "name": "bush_control",
+      "vertices": 575,
+      "triangles": 840,
+      "surfaces": 1,
+      "bytes": 32180,
+      "file": "assets/rooms/poi_city_park/bush_control.glb",
+      "bounds": [
+        [
+          -0.43193817138671875,
+          -0.019999995827674866,
+          -0.3893861770629883
+        ],
+        [
+          0.4349994659423828,
+          0.5799999833106995,
+          0.35698699951171875
+        ]
+      ],
+      "dimensions_m": [
+        0.8669376373291016,
+        0.5999999642372131,
+        0.746373176574707
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "bush_control_mobile"
+      ],
+      "has_images": false,
+      "sha256": "94ef2f63c5eedd2fb825150e06e95d745db805175b814b751e01d50a47d521da"
+    },
+    {
+      "name": "shrub_layer",
+      "vertices": 11500,
+      "triangles": 16800,
+      "surfaces": 1,
+      "bytes": 614196,
+      "file": "assets/rooms/poi_city_park/shrub_layer.glb",
+      "bounds": [
+        [
+          -3.9458816051483154,
+          -0.0015999963507056236,
+          -3.8803582191467285
+        ],
+        [
+          3.9757020473480225,
+          0.49639996886253357,
+          3.5766241550445557
+        ]
+      ],
+      "dimensions_m": [
+        7.921583652496338,
+        0.49799996614456177,
+        7.456982612609863
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "shrub_layer_mobile"
+      ],
+      "has_images": false,
+      "sha256": "c46660d1c153253f8a43f19ab1ad3effbdca12342109dadc2baa296038ff4b02"
+    },
+    {
+      "name": "boundary_hedge",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 19956,
+      "file": "assets/rooms/_shared/shell_park/boundary_hedge.glb",
+      "bounds": [
+        [
+          -3.950000047683716,
+          0.0,
+          -3.9800000190734863
+        ],
+        [
+          3.950000047683716,
+          0.699999988079071,
+          3.884999990463257
+        ]
+      ],
+      "dimensions_m": [
+        7.900000095367432,
+        0.699999988079071,
+        7.864999771118164
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "boundary_hedge_mobile"
+      ],
+      "has_images": false,
+      "sha256": "8326b2fa1c311f203d49cf214e773001f9e4bee937aaf429218d5a6911219fb8"
+    },
+    {
+      "name": "rear_topiary",
+      "vertices": 252,
+      "triangles": 480,
+      "surfaces": 1,
+      "bytes": 19360,
+      "file": "assets/rooms/poi_city_park/rear_topiary.glb",
+      "bounds": [
+        [
+          -0.3075329065322876,
+          -0.10999999940395355,
+          -0.32335925102233887
+        ],
+        [
+          0.3075329065322876,
+          2.059999942779541,
+          0.32335925102233887
+        ]
+      ],
+      "dimensions_m": [
+        0.6150658130645752,
+        2.169999837875366,
+        0.6467185020446777
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "rear_topiary_mobile"
+      ],
+      "has_images": false,
+      "sha256": "0fff0d831d694aafe01237ef7037acfab3756a6dc11274098659b9b24f425428"
+    },
+    {
+      "name": "village_backdrop",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1500,
+      "file": "assets/rooms/poi_city_park/village_backdrop.glb",
+      "bounds": [
+        [
+          -7.000000476837158,
+          -0.699999988079071,
+          -2.980232238769531e-07
+        ],
+        [
+          7.000000476837158,
+          3.319999933242798,
+          -2.980232238769531e-07
+        ]
+      ],
+      "dimensions_m": [
+        14.000000953674316,
+        4.019999980926514,
+        0.0
+      ],
+      "degenerate_triangles": 0,
+      "mesh_names": [
+        "village_backdrop_mobile"
+      ],
+      "has_images": false,
+      "sha256": "6aa53c183a84bb124028d1799b96f253e377627af614b5510c80abd507aa4502"
+    }
+  ],
+  "unique_triangles": 56728,
+  "scene_triangles": 101078,
+  "static_draw_surfaces": 38,
+  "glb_bytes": 2726376,
+  "atlas_bytes": 1659225,
+  "placed_instances": 38,
+  "materials": 3,
+  "plant_triangles": 70908,
+  "review_only_assets": [
+    "bench_farm_control",
+    "bush_control",
+    "white_fence_segment"
+  ],
+  "limits": {
+    "triangles": 150000,
+    "surfaces": 50,
+    "plant_triangles": 100000
+  },
+  "existing_water_textures": [
+    "assets/ponds/art/pond_ripple_field.png",
+    "assets/ponds/art/caustic_web.png",
+    "assets/farm/art/water/surface_flow.png"
+  ],
+  "water_note": "Existing animated pond shader and textures are separate shared water resources, not additional N5 albedo atlases."
+}

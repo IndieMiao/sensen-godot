@@ -1,0 +1,23 @@
+{
+  "asset": "green_bench",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/deco_bench.glb",
+      "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599"
+    },
+    {
+      "file": "tools/art/source/decor_290/decor_290.blend",
+      "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+    }
+  ],
+  "changes": [
+    "Editable deco_bench source parts; scale XYZ (0.8648648648648648, 1.0671641791044775, 1)",
+    "Palette replacement: {'wood': '3F7256', 'wood_light': '638D65', 'wood_dark': '345744'}",
+    "Removed: none"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "green_bench_mobile"
+}

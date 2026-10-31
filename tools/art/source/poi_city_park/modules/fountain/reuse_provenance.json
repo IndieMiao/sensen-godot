@@ -1,0 +1,23 @@
+{
+  "asset": "fountain",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/deco_fountain.glb",
+      "sha256": "38357c007890ac81b39587bac073d43d441cc05e13d92ea0f42fa6d5484561be"
+    },
+    {
+      "file": "tools/art/source/decor_290/decor_290.blend",
+      "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+    }
+  ],
+  "changes": [
+    "Editable deco_fountain source parts; scale XYZ (1, 1, 1)",
+    "Palette replacement: none",
+    "Removed: ('still water',)"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "fountain_mobile"
+}

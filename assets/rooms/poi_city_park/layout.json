@@ -1,0 +1,1249 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "SGODOT-314 R3 approved 4fa670a7"
+  },
+  "assets": [
+    {
+      "name": "park_ground",
+      "file": "../_shared/shell_park/park_ground.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            8,
+            0.18,
+            8
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/park_ground/reuse_provenance.json"
+    },
+    {
+      "name": "brick_paths",
+      "file": "brick_paths.glb",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/brick_paths/reuse_provenance.json"
+    },
+    {
+      "name": "white_fence_segment",
+      "file": "white_fence_segment.glb",
+      "position": [
+        20,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": true,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/white_fence_segment/reuse_provenance.json"
+    },
+    {
+      "name": "front_fence",
+      "file": "../_shared/shell_park/front_fence.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            -2.21,
+            0.35,
+            3.9
+          ],
+          "size": [
+            2.62,
+            0.7,
+            0.12
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            2.21,
+            0.35,
+            3.9
+          ],
+          "size": [
+            2.62,
+            0.7,
+            0.12
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/front_fence/reuse_provenance.json"
+    },
+    {
+      "name": "green_bench",
+      "file": "green_bench.glb",
+      "position": [
+        -1.12,
+        0,
+        -0.9600000000000001
+      ],
+      "yaw_degrees": 45,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.56,
+            0
+          ],
+          "size": [
+            0.96,
+            1.12,
+            0.57
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/green_bench/reuse_provenance.json"
+    },
+    {
+      "name": "white_bench",
+      "file": "white_bench.glb",
+      "position": [
+        0,
+        0,
+        -3.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.525,
+            0
+          ],
+          "size": [
+            1.04,
+            1.05,
+            0.57
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/white_bench/reuse_provenance.json"
+    },
+    {
+      "name": "bench_farm_control",
+      "file": "bench_farm_control.glb",
+      "position": [
+        20,
+        0,
+        3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": true,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/bench_farm_control/reuse_provenance.json"
+    },
+    {
+      "name": "fountain",
+      "file": "fountain.glb",
+      "position": [
+        0,
+        0.035,
+        0.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.4975,
+            0
+          ],
+          "size": [
+            0.86,
+            0.995,
+            0.86
+          ],
+          "yaw_degrees": 45
+        },
+        {
+          "at": [
+            0,
+            0.4975,
+            0
+          ],
+          "size": [
+            1.12,
+            0.995,
+            0.42
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            0,
+            0.4975,
+            0
+          ],
+          "size": [
+            0.42,
+            0.995,
+            1.12
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/fountain/reuse_provenance.json"
+    },
+    {
+      "name": "fountain_water",
+      "file": "fountain_water.glb",
+      "position": [
+        0,
+        0.035,
+        0.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": false,
+      "material": "pond_water",
+      "provenance": "tools/art/source/poi_city_park/modules/fountain_water/reuse_provenance.json"
+    },
+    {
+      "name": "parterre_hedge",
+      "file": "parterre_hedge.glb",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            2.0481500799501977,
+            0.19,
+            1.1824999999999999
+          ],
+          "size": [
+            0.83,
+            0.38,
+            0.72
+          ],
+          "yaw_degrees": -30
+        },
+        {
+          "at": [
+            1.6369521984468576,
+            0.19,
+            1.6369521984468574
+          ],
+          "size": [
+            0.93,
+            0.38,
+            0.72
+          ],
+          "yaw_degrees": -45
+        },
+        {
+          "at": [
+            1.1825000000000003,
+            0.19,
+            2.0481500799501973
+          ],
+          "size": [
+            0.83,
+            0.38,
+            0.72
+          ],
+          "yaw_degrees": -60
+        }
+      ],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/parterre_hedge/reuse_provenance.json"
+    },
+    {
+      "name": "parterre_flowers",
+      "file": "parterre_flowers.glb",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": false,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/parterre_flowers/reuse_provenance.json"
+    },
+    {
+      "name": "rose_arch",
+      "file": "rose_arch.glb",
+      "position": [
+        0,
+        0,
+        -3.48
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            -0.695,
+            0.9,
+            -0.27
+          ],
+          "size": [
+            0.15,
+            1.8,
+            0.15
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            -0.695,
+            0.9,
+            0.27
+          ],
+          "size": [
+            0.15,
+            1.8,
+            0.15
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            0.695,
+            0.9,
+            -0.27
+          ],
+          "size": [
+            0.15,
+            1.8,
+            0.15
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            0.695,
+            0.9,
+            0.27
+          ],
+          "size": [
+            0.15,
+            1.8,
+            0.15
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/rose_arch/reuse_provenance.json"
+    },
+    {
+      "name": "park_lamp",
+      "file": "park_lamp.glb",
+      "position": [
+        -2.8,
+        0,
+        1.86
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.1,
+            0
+          ],
+          "size": [
+            0.28,
+            2.2,
+            0.28
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/park_lamp/reuse_provenance.json"
+    },
+    {
+      "name": "birdbath",
+      "file": "birdbath.glb",
+      "position": [
+        -2.62,
+        0,
+        -1.91
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.42,
+            0
+          ],
+          "size": [
+            0.58,
+            0.84,
+            0.58
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/birdbath/reuse_provenance.json"
+    },
+    {
+      "name": "green_bin",
+      "file": "green_bin.glb",
+      "position": [
+        -3.25,
+        0,
+        1.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.34,
+            0
+          ],
+          "size": [
+            0.42,
+            0.68,
+            0.42
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/green_bin/reuse_provenance.json"
+    },
+    {
+      "name": "entry_gate",
+      "file": "../_shared/shell_park/entry_gate.glb",
+      "position": [
+        0,
+        0,
+        3.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            -0.85,
+            0.91,
+            0
+          ],
+          "size": [
+            0.45,
+            1.82,
+            0.48
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            0.85,
+            0.91,
+            0
+          ],
+          "size": [
+            0.45,
+            1.82,
+            0.48
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/entry_gate/reuse_provenance.json"
+    },
+    {
+      "name": "park_tree",
+      "file": "park_tree.glb",
+      "position": [
+        -3.18,
+        0.025,
+        -2.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.4,
+            0
+          ],
+          "size": [
+            0.3,
+            2.8,
+            0.3
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/park_tree/reuse_provenance.json"
+    },
+    {
+      "name": "bush_control",
+      "file": "bush_control.glb",
+      "position": [
+        20,
+        0.02,
+        6
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": true,
+      "vegetation": false,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/bush_control/reuse_provenance.json"
+    },
+    {
+      "name": "shrub_layer",
+      "file": "shrub_layer.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/shrub_layer/reuse_provenance.json"
+    },
+    {
+      "name": "boundary_hedge",
+      "file": "../_shared/shell_park/boundary_hedge.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            -3.8,
+            0.4,
+            -0.18
+          ],
+          "size": [
+            0.3,
+            0.8,
+            7.47
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            3.8,
+            0.4,
+            -0.18
+          ],
+          "size": [
+            0.3,
+            0.8,
+            7.47
+          ],
+          "yaw_degrees": 0
+        },
+        {
+          "at": [
+            0,
+            0.4,
+            -3.83
+          ],
+          "size": [
+            7.5,
+            0.8,
+            0.3
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/boundary_hedge/reuse_provenance.json"
+    },
+    {
+      "name": "rear_topiary",
+      "file": "rear_topiary.glb",
+      "position": [
+        -1.03,
+        0,
+        -3.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.025,
+            0
+          ],
+          "size": [
+            0.55,
+            2.05,
+            0.55
+          ],
+          "yaw_degrees": 0
+        }
+      ],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/rear_topiary/reuse_provenance.json"
+    },
+    {
+      "name": "village_backdrop",
+      "file": "village_backdrop.glb",
+      "position": [
+        -4.313,
+        0,
+        -4.313
+      ],
+      "yaw_degrees": 45,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": false,
+      "material": "backdrop",
+      "provenance": "tools/art/source/poi_city_park/modules/village_backdrop/reuse_provenance.json"
+    }
+  ],
+  "instances": [
+    {
+      "name": "green_bench_2",
+      "asset": "green_bench",
+      "position": [
+        1.12,
+        0,
+        -0.9600000000000001
+      ],
+      "yaw_degrees": -45
+    },
+    {
+      "name": "green_bench_3",
+      "asset": "green_bench",
+      "position": [
+        -1.12,
+        0,
+        1.28
+      ],
+      "yaw_degrees": 135
+    },
+    {
+      "name": "green_bench_4",
+      "asset": "green_bench",
+      "position": [
+        1.12,
+        0,
+        1.28
+      ],
+      "yaw_degrees": -135
+    },
+    {
+      "name": "parterre_hedge_2",
+      "asset": "parterre_hedge",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "parterre_hedge_3",
+      "asset": "parterre_hedge",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "parterre_hedge_4",
+      "asset": "parterre_hedge",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 270
+    },
+    {
+      "name": "parterre_flowers_2",
+      "asset": "parterre_flowers",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "parterre_flowers_3",
+      "asset": "parterre_flowers",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "parterre_flowers_4",
+      "asset": "parterre_flowers",
+      "position": [
+        0,
+        0,
+        0.16
+      ],
+      "yaw_degrees": 270
+    },
+    {
+      "name": "park_lamp_2",
+      "asset": "park_lamp",
+      "position": [
+        2.8,
+        0,
+        1.86
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "park_lamp_3",
+      "asset": "park_lamp",
+      "position": [
+        -1.6,
+        0,
+        -3.02
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "park_lamp_4",
+      "asset": "park_lamp",
+      "position": [
+        1.6,
+        0,
+        -3.02
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "birdbath_2",
+      "asset": "birdbath",
+      "position": [
+        2.62,
+        0,
+        -1.91
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "park_tree_2",
+      "asset": "park_tree",
+      "position": [
+        3.18,
+        0.026250000000000002,
+        -2.9
+      ],
+      "yaw_degrees": 0,
+      "scale": [
+        1.05,
+        1.05,
+        1.05
+      ]
+    },
+    {
+      "name": "park_tree_3",
+      "asset": "park_tree",
+      "position": [
+        -3.46,
+        0.02375,
+        -0.5
+      ],
+      "yaw_degrees": 73,
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "name": "park_tree_4",
+      "asset": "park_tree",
+      "position": [
+        3.46,
+        0.02375,
+        -0.5
+      ],
+      "yaw_degrees": 146,
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ]
+    },
+    {
+      "name": "park_tree_5",
+      "asset": "park_tree",
+      "position": [
+        -3.5,
+        0.022000000000000002,
+        2.75
+      ],
+      "yaw_degrees": 219,
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ]
+    },
+    {
+      "name": "park_tree_6",
+      "asset": "park_tree",
+      "position": [
+        3.5,
+        0.022000000000000002,
+        2.75
+      ],
+      "yaw_degrees": 292,
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ]
+    },
+    {
+      "name": "rear_topiary_2",
+      "asset": "rear_topiary",
+      "position": [
+        1.03,
+        0,
+        -3.45
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      10,
+      12
+    ],
+    "target": [
+      0,
+      0.7,
+      0
+    ],
+    "size": 12
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "sun_color": "FFF3DA",
+    "sun_energy": 1.05,
+    "ambient_color": "E6EADA",
+    "ambient_energy": 0.5,
+    "shadow": "single orthographic cascade"
+  },
+  "anchors": [
+    {
+      "name": "spawn",
+      "position": [
+        0,
+        0.04,
+        2.65
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "exit",
+      "position": [
+        0,
+        0.04,
+        3.92
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "badge_exit",
+      "position": [
+        0,
+        1.1,
+        3.92
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "sign_name",
+      "position": [
+        0,
+        2.4,
+        3.77
+      ],
+      "yaw_degrees": 0,
+      "size": [
+        1.45,
+        0.22
+      ],
+      "module": "entry_gate"
+    },
+    {
+      "name": "cam_default",
+      "position": [
+        0,
+        0.9,
+        1.1
+      ],
+      "yaw_degrees": 45,
+      "pitch_degrees": 43,
+      "width_m": 6.72
+    },
+    {
+      "name": "seat_bench_1",
+      "position": [
+        -1.282634559672906,
+        0.715,
+        -0.7973654403270942
+      ],
+      "yaw_degrees": 45,
+      "module": "green_bench",
+      "approach": [
+        -0.6957359312880717,
+        0.04,
+        -0.5357359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_2",
+      "position": [
+        -0.9573654403270941,
+        0.715,
+        -1.122634559672906
+      ],
+      "yaw_degrees": 45,
+      "module": "green_bench",
+      "approach": [
+        -0.6957359312880717,
+        0.04,
+        -0.5357359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_3",
+      "position": [
+        0.9573654403270941,
+        0.715,
+        -1.122634559672906
+      ],
+      "yaw_degrees": -45,
+      "module": "green_bench_2",
+      "approach": [
+        0.6957359312880717,
+        0.04,
+        -0.5357359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_4",
+      "position": [
+        1.282634559672906,
+        0.715,
+        -0.7973654403270942
+      ],
+      "yaw_degrees": -45,
+      "module": "green_bench_2",
+      "approach": [
+        0.6957359312880717,
+        0.04,
+        -0.5357359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_5",
+      "position": [
+        -0.9573654403270941,
+        0.715,
+        1.442634559672906
+      ],
+      "yaw_degrees": 135,
+      "module": "green_bench_3",
+      "approach": [
+        -0.6957359312880715,
+        0.04,
+        0.8557359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_6",
+      "position": [
+        -1.282634559672906,
+        0.715,
+        1.117365440327094
+      ],
+      "yaw_degrees": 135,
+      "module": "green_bench_3",
+      "approach": [
+        -0.6957359312880715,
+        0.04,
+        0.8557359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_7",
+      "position": [
+        1.282634559672906,
+        0.715,
+        1.117365440327094
+      ],
+      "yaw_degrees": -135,
+      "module": "green_bench_4",
+      "approach": [
+        0.6957359312880715,
+        0.04,
+        0.8557359312880716
+      ]
+    },
+    {
+      "name": "seat_bench_8",
+      "position": [
+        0.9573654403270941,
+        0.715,
+        1.442634559672906
+      ],
+      "yaw_degrees": -135,
+      "module": "green_bench_4",
+      "approach": [
+        0.6957359312880715,
+        0.04,
+        0.8557359312880716
+      ]
+    }
+  ],
+  "floor_size_m": [
+    8,
+    8
+  ],
+  "reference_svg": {
+    "scale_px_per_m": 93.75,
+    "park_rect_px": [
+      80,
+      175,
+      750,
+      750
+    ],
+    "ring_center_px": [
+      455,
+      565
+    ]
+  },
+  "layout_adjustments": [
+    "Benches moved outward to radius 1.584m so a 0.5m capsule fits between seat fronts and the unchanged fountain; SVG furniture rectangles are schematic.",
+    "Parterres follow main-image three-lobed silhouette, not the 1.28x0.96m SVG placeholders."
+  ],
+  "boundaries": [
+    {
+      "at": [
+        -4.06,
+        1.5,
+        0
+      ],
+      "size": [
+        0.12,
+        3,
+        8
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "at": [
+        4.06,
+        1.5,
+        0
+      ],
+      "size": [
+        0.12,
+        3,
+        8
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "at": [
+        0,
+        1.5,
+        -4.06
+      ],
+      "size": [
+        8,
+        3,
+        0.12
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "at": [
+        -2.4,
+        1.5,
+        4.06
+      ],
+      "size": [
+        3.2,
+        3,
+        0.12
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "at": [
+        2.4,
+        1.5,
+        4.06
+      ],
+      "size": [
+        3.2,
+        3,
+        0.12
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "local_lights": [
+    {
+      "position": [
+        -2.8,
+        1.86,
+        1.86
+      ],
+      "color": "FFE7B3",
+      "energy": 0.35,
+      "range": 1.4
+    },
+    {
+      "position": [
+        2.8,
+        1.86,
+        1.86
+      ],
+      "color": "FFE7B3",
+      "energy": 0.35,
+      "range": 1.4
+    },
+    {
+      "position": [
+        -1.6,
+        1.86,
+        -3.02
+      ],
+      "color": "FFE7B3",
+      "energy": 0.35,
+      "range": 1.4
+    },
+    {
+      "position": [
+        1.6,
+        1.86,
+        -3.02
+      ],
+      "color": "FFE7B3",
+      "energy": 0.35,
+      "range": 1.4
+    }
+  ],
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+}

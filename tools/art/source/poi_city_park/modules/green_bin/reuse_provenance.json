@@ -1,0 +1,13 @@
+{
+  "asset": "green_bin",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [],
+  "changes": [
+    "New reference-matched green bin; no farm bin asset found in wp-3d-scene or farm-dev inventory"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "source_decision": "Shangguan confirmed New in Plane SGODOT-320 comment 77a66827-4aaa-4e0d-8dd5-c34bec3dead3",
+  "mesh_name": "green_bin_mobile"
+}

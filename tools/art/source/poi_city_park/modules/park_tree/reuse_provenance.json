@@ -1,0 +1,17 @@
+{
+  "asset": "park_tree",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/tree_0.glb",
+      "sha256": "3bfffa86739891eb564a621c9a91cccd36626efd5794a49030ce7ed78a4a511c"
+    }
+  ],
+  "changes": [
+    "Actual GLB geometry and linear vertex colour retained, then atlas baked"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "park_tree_mobile"
+}

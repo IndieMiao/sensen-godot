@@ -1,0 +1,12 @@
+{
+  "asset": "boundary_hedge",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [],
+  "changes": [
+    "Main-reference clipped boundary; #406D35; corners stay inside 8m footprint"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "boundary_hedge_mobile"
+}

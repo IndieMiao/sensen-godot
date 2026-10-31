@@ -1,0 +1,23 @@
+{
+  "asset": "birdbath",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/deco_birdbath.glb",
+      "sha256": "2372a9eeccd20c6304513978934698b51167119b6909aa4bb1a8272461c93010"
+    },
+    {
+      "file": "tools/art/source/decor_290/decor_290.blend",
+      "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+    }
+  ],
+  "changes": [
+    "Editable deco_birdbath source parts; scale XYZ (1, 1, 1)",
+    "Palette replacement: none",
+    "Removed: none"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "birdbath_mobile"
+}

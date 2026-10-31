@@ -1,0 +1,17 @@
+{
+  "asset": "parterre_flowers",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/rooms/_shared/plants/source/build_plants.py",
+      "sha256": "5aff279cb6b41ce800ef61a54ea4ff5fef982ffa6dea44ce3439e86c65383ff9"
+    }
+  ],
+  "changes": [
+    "Shared small five-petal botanical vocabulary; red/yellow/ivory palette and compact planting"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "parterre_flowers_mobile"
+}
