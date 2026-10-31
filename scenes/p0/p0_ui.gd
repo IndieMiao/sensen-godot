@@ -1711,16 +1711,16 @@ func toast_creel_full() -> void:
 
 ## q(259) (不知火舞's spec, huowu-q259-spec.md): away from home the second part says what the creel's fish fetch at this
 ## city's Tackle Shop and at home, `230 coins here · 304 at home` (the sums from the view's bag.creel_value, the same
-## shape as the away sell card's `{a} each · {b} at home`); at home or without the two sums, `Sell or cook first`. It
-## breaks only after a ` · `: inside each sum and before its dot the spaces are no-break ones, so `230 coins here ·` and
-## `304 at home` stay whole (three lines at most at the toast's 232).
+## shape as the away sell card's `{a} each · {b} at home`); at home or without the two sums, `Sell or cook first`. Three
+## lines, broken by the text itself — `Creel full · 0 free slots ·` / `230 coins here ·` / `304 at home`, each of which
+## fits the toast's 232 — not left to the line breaker: no-break spaces held on the desktop but an Android build broke at
+## one (`690 at` / `home`, 李元芳 on 366 c4560e68; without the text server's data the fallback breaker counts U+00A0 as
+## a space).
 static func creel_full_text(v: Dictionary) -> String:
 	var worth = (v.get("bag", {}) as Dictionary).get("creel_value", null)
 	if not (worth is Dictionary) or int(worth.get("here", 0)) <= 0 or int(worth.get("here", 0)) == int(worth.get("home", 0)):
 		return CREEL_FULL
-	var whole := func(s: String) -> String: return s.replace(" ", "\u00a0")
-	return "Creel full · 0 free slots · %s\u00a0· %s" % [
-		whole.call("%s coins here" % P0Travel.grouped(int(worth.here))), whole.call("%s at home" % P0Travel.grouped(int(worth.home)))]
+	return "Creel full · 0 free slots ·\n%s coins here ·\n%s at home" % [P0Travel.grouped(int(worth.here)), P0Travel.grouped(int(worth.home))]
 
 ## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success). `action` adds its line
 ## (`Place now ›` after a decor purchase).
