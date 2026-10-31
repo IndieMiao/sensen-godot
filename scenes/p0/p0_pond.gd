@@ -145,7 +145,8 @@ func p0_joystick(v: Vector2) -> void:
 	if actor: actor.set_input(v)
 	if v != Vector2.ZERO: _plan = {}
 
-## Old pond taps: water → walk to the nearest bank spot and cast there; grass → walk there.
+## A tap on the ground walks there; the water takes no taps (LOCK-02, q(45): Cast is the main key's only, at the water
+## in front — a tap meant to walk that landed on the water used to cast and spend 5 Energy, SGODOT-375).
 func p0_tap(screen: Vector2) -> void:
 	if panel.visible: return
 	if _trap_tap(screen): return
@@ -153,14 +154,9 @@ func p0_tap(screen: Vector2) -> void:
 	var dir := cam.project_ray_normal(screen)
 	if absf(dir.y) < 0.001: return
 	var point := origin + dir * (-origin.y / dir.y)
-	if FishingModel.contains(str(entry.id), point, 0, site_spec):
-		var a := _action_state(rt.session.current())
-		if a.get("enabled", false) and str(a.cmd.get("type", "")) == "cast": _go_cast(point)
-		elif str(a.cmd.get("type", "")) == "energy_card": rt._on_action(a.cmd)
-		else: rt.ui.toast(str(a.get("sub", "")))
-	else:
-		_plan = {}
-		actor.mover.set_target_position(point)
+	if FishingModel.contains(str(entry.id), point, 0, site_spec): return
+	_plan = {}
+	actor.mover.set_target_position(point)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	_trap_hidden_s = maxf(0.0, _trap_hidden_s - dt)
@@ -523,7 +519,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"cast": _go_cast(Vector3.INF)
 		"castat": _go_cast(Vector3(float(step[1]), 0, float(step[2])))   # castat:x:z — a cast at that water point
 		"stick": p0_joystick(Vector2(float(step[1]), float(step[2])))   # stick:x:y — held until stick:0:0 (Cast on the move)
-		"tapwater": p0_tap(cam.unproject_position(FishingModel.default_target(str(entry.id), actor.position, site_spec)))   # a tap on the water in front
+		"tapwater": p0_tap(cam.unproject_position(FishingModel.default_target(str(entry.id), actor.position, site_spec)))   # a tap on the water in front: nothing (q(45))
 		# Fish Trap shots (SGODOT-283): picktrap selects it on the bar; settrap sets it; traptap walks to it and opens
 		# its card; trapcard opens the card where the player stands
 		"picktrap": rt.ui.selected_bait = TRAP_ID
