@@ -21,6 +21,10 @@ func _process(_delta):
 	toward_camera = toward_camera.normalized()
 	card.position = -toward_camera*6.1
 	card.rotation.y = atan2(toward_camera.x, toward_camera.z)
+	var shrubs = get_node_or_null("backdrop_shrubs")
+	if shrubs != null:
+		shrubs.position = -toward_camera*5.9
+		shrubs.rotation.y = card.rotation.y
 
 func _ready():
 	if assembled: return

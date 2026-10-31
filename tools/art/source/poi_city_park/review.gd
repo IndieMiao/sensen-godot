@@ -87,6 +87,12 @@ func imported_geometry():
 	var limits=park.layout.walkable_bounds_xz
 	check(Vector2(limits[0][0],limits[0][1]).is_equal_approx(Vector2(-4,-4)) and Vector2(limits[1][0],limits[1][1]).is_equal_approx(Vector2(4,4)),"Walkable park remains 8x8m")
 	check(park.get_node("front_shrub").position.z==2.75 and not park.has_node("park_tree_5"),"Both entrance-side trees replaced by low shrubs")
+	for shrub_name in ["front_shrub", "front_shrub_2"]:
+		var shrub = park.get_node(shrub_name)
+		var shapes = shrub.find_children("*", "CollisionShape3D", true, false)
+		check(shapes.size()==1 and shapes[0].shape is BoxShape3D,"Entrance shrub instance has box collider: "+shrub_name)
+	var backdrop_shrubs = park.get_node("backdrop_shrubs")
+	check(backdrop_shrubs.find_children("*","StaticBody3D",true,false).is_empty(),"Backdrop shrubs are noncolliding decoration")
 	for i in range(1,9,2):
 		check(absf(park.get_node("seat_bench_"+str(i)).position.distance_to(park.get_node("seat_bench_"+str(i+1)).position)-.70)<.0001,"Paired seats separated .70m: "+str(i))
 
@@ -125,6 +131,11 @@ func capture(id):
 	check(image.save_png(output+"/"+id+".png") == OK, "Capture saved: "+id)
 	report.captures.append({"id":id,"pixels":[vp.size.x,vp.size.y],"camera_width_m":cam.size,"pitch":-cam.rotation_degrees.x,"yaw":cam.rotation_degrees.y,"position":xyz(cam.position)})
 	print("N5_CAPTURE ",id)
+	if id in ["default_43deg_360", "panorama"]:
+		var card = park.get_node("village_backdrop")
+		var shrubs = park.get_node("backdrop_shrubs")
+		check(absf(card.position.distance_to(shrubs.position)-.2)<.0001 and absf(card.rotation.y-shrubs.rotation.y)<.0001,
+			"Low shrubs follow backdrop .2m ahead at "+id)
 	if id in ["default_43deg_360","minimum_zoom_360"]:
 		var corners=[]
 		for pixel in [Vector2.ZERO,Vector2(vp.size.x,0),Vector2(0,vp.size.y),Vector2(vp.size)]:
@@ -165,6 +176,10 @@ func capsule_query(point, radius=.25):
 func physics_routes():
 	await get_tree().physics_frame
 	var space = world.get_world_3d().direct_space_state
+	for shrub_name in ["front_shrub", "front_shrub_2"]:
+		var shrub = park.get_node(shrub_name)
+		var hits = space.intersect_shape(capsule_query(shrub.global_position+Vector3(0,.045,0)))
+		check(hits.any(func(hit): return hit.collider.get_parent()==shrub),"Actual capsule blocked by shrub: "+shrub_name)
 	var cells = {}
 	for z in range(81):
 		for x in range(73):

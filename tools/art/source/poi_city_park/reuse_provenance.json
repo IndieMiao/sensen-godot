@@ -351,11 +351,30 @@
       }
     ],
     "changes": [
-      "v1.1: replace the two entrance-side trees with rounded bushes; measured top .93m; other four trees unchanged"
+      "v1.1: replace the two entrance-side trees with rounded bushes; measured top .90m; other four trees unchanged",
+      "v1.2: one simple box collider from actual transformed source vertices; shared by both entrance instances"
     ],
     "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
     "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
     "mesh_name": "front_shrub_mobile"
+  },
+  "backdrop_shrubs": {
+    "asset": "backdrop_shrubs",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/bush.glb",
+        "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+      }
+    ],
+    "changes": [
+      "v1.2: 21 low overlapping farm bushes, merged into one surface in the same N5 atlas",
+      "Decorative noncolliding row follows village card yaw at radius 5.9m, .2m in front of card; no shadows"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "backdrop_shrubs_mobile"
   },
   "shrub_layer": {
     "asset": "shrub_layer",

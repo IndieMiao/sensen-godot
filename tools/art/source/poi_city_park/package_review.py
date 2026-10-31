@@ -12,7 +12,7 @@ OUT=ROOT/'output/poi-city-park-320'
 CAP=OUT/'captures'
 DOC=ROOT/'docs/design/poi-city-park-320-2026-10-31'
 DOC.mkdir(parents=True,exist_ok=True)
-REVISION='v1.1'
+REVISION='v1.2'
 PREFIX='SGODOT-320_N5_'+REVISION+'_'
 FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 FONTS={s:ImageFont.truetype(FONT,s) for s in [13,17,21,25,30]}
@@ -85,21 +85,17 @@ def main():
     source=json.loads((OUT/'source-validation.json').read_text())
     godot=json.loads((CAP/'godot-validation.json').read_text())
     assert geometry['passed'] and source['passed'] and godot['passed']
+    assert godot['imported']['triangles']==geometry['placed_triangles']
+    assert godot['imported']['surfaces']==geometry['placed_surfaces']
+    assert all((CAP/'godot-validation.json').stat().st_mtime >= path.stat().st_mtime
+               for path in CAP.glob('*.png')), 'Wait for the current capture run to finish'
     for directory in ['assets/rooms/poi_city_park','assets/rooms/_shared/shell_park','scenes/poi_city_park']:
         for extension in ['*.import','*.gd.uid']:
             for imported in (OUT/'project'/directory).glob(extension):
                 shutil.copy2(imported,ROOT/directory/imported.name)
     default=Image.open(CAP/'default_43deg_360.png').convert('RGB')
     save(label(default,'N5 / 默认进门镜头','43° / yaw 45° / 6.72m / 360px',17),'default_43deg_360')
-    safe=default.copy();draw=ImageDraw.Draw(safe,'RGBA')
-    draw.rectangle((0,0,359,99),fill=(30,50,60,45))
-    draw.rectangle((0,710,359,799),fill=(30,50,60,45))
-    draw.text((10,9),'HUD 100px',font=FONTS[13],fill='#244333')
-    draw.text((10,720),'Bag 90px',font=FONTS[13],fill='#244333')
-    save(label(safe,'N5 / 安全区核对','人物高 1.745m；未缩小默认人物比例',17),'default_safe_bands')
-    for name,title,subtitle in [('panorama','N5 城市绿地 / 整园全景','43° / 全景另行缩远，非默认 6.72m 镜头'),
-                                  ('minimum_zoom_360','N5 / 最远镜头','43° / 8.40m / 360px；外围草地无可见边界'),
-                                  ('bench_seated_detail','N5 / 双人长椅坐姿近景','宽 1.40m / 顶高 0.95m / 座面 0.715m；现有 sit_idle')]:
+    for name,title,subtitle in [('panorama','N5 城市绿地 / 整园全景','43° / 远景低灌木遮住接地线；全景非默认 6.72m 镜头')]:
         save(label(Image.open(CAP/(name+'.png')).convert('RGB'),title,subtitle),name)
     colours=colour_controls()
     # The world and camera are unchanged; only the existing water shader advances.
@@ -126,7 +122,8 @@ def main():
             'white_fence_segment、bench_farm_control、bush_control 为保色/源件控制，不计入实际摆放。',
             '喷泉石材 1,876 面（原 2,076 面扣除两片静态水）；独立动态水体 784 面。原喷泉 bounds 与尺寸保持不变。',
             '绿椅现宽 1.400m、顶高 0.950m、座面 0.715m，两座中心距 0.700m。白椅宽 1.040m，仅装饰。',
-            '入口侧两棵树改为顶高 0.930m 的圆灌木。白石 16 个短尖角，外半径 1.00m。外围草地为一个四边形，layout 放大为 60×60m，非可走区域。',
+            '入口侧圆灌木实测顶高 0.900m，v1.2 给两实例补上顶点 bounds 盒体碰撞。白石 16 个短尖角，外半径 1.00m。外围草地为 60×60m，非可走区域。',
+            '远景前沿 21 株低灌木合成一个 surface，使用同一图集、无碰撞、不投影，随远景卡朝向移动；原 v1.1 所有网格几何保持不变。',
             '玫瑰拱保留农场 pergola 立柱，改弧顶与玫瑰；路灯与空白入口牌新制。绿桶新制已获上官婉儿 77a66827 确认。']
     path=DOC/(PREFIX+'asset_table.md');path.write_text('\n'.join(table)+'\n');MEDIA.append(path)
     media=[]

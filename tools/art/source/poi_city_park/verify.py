@@ -86,6 +86,14 @@ def main():
     check(abs(measured['green_bench']['dimensions_m'][0]-1.40)<.0001,'Measured green bench width 1.40m')
     check(abs(measured['green_bench']['dimensions_m'][1]-.95)<.0001,'Measured green bench top .95m')
     check(measured['front_shrub']['bounds'][1][1]<=1.0,'Entrance shrubs below 1.0m')
+    shrubs=next(a for a in layout['assets'] if a['name']=='front_shrub')
+    check(len(shrubs['colliders'])==1,'Entrance shrub has one simple box collider')
+    box=shrubs['colliders'][0]
+    check(np.allclose(np.array(box['at'])-np.array(box['size'])/2,measured['front_shrub']['bounds'][0],atol=1e-5)
+          and np.allclose(np.array(box['at'])+np.array(box['size'])/2,measured['front_shrub']['bounds'][1],atol=1e-5),
+          'Entrance shrub collision matches actual exported vertex bounds')
+    check(measured['backdrop_shrubs']['surfaces']==1 and measured['backdrop_shrubs']['bounds'][1][1]<.65,
+          'Backdrop shrub row is one surface below .65m')
     check(abs(measured['white_bench']['dimensions_m'][0]-1.04)<.0001,'Measured decorative white bench width 1.04m')
     source_fountain=glb(ROOT/'assets/farm/art/deco_fountain.glb')
     check(np.allclose(measured['fountain']['bounds'],source_fountain['bounds'],atol=2e-6),'Fountain bounds match real unscaled farm asset')
@@ -98,6 +106,11 @@ def main():
         raw=subprocess.check_output(['git','show','f40ee359:'+str(path.relative_to(ROOT))],cwd=ROOT)
         old=glb(path,raw)
         check(measured[name]['geometry_signature_10um']==old['geometry_signature_10um'],name+': accepted v1 geometry preserved to 10 micrometres')
+    for name,info in measured.items():
+        if name=='backdrop_shrubs':continue
+        path=ROOT/info['file']
+        raw=subprocess.check_output(['git','show','9248c5d6:'+str(path.relative_to(ROOT))],cwd=ROOT)
+        check(info['geometry_signature_10um']==glb(path,raw)['geometry_signature_10um'],name+': v1.1 geometry preserved')
     for entry in stats['assets']:
         entry.update(measured[entry['name']])
     (KIT/'asset_stats.json').write_text(json.dumps(stats,indent=2)+'\n')

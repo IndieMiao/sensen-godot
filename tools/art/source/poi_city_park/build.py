@@ -419,9 +419,22 @@ def vegetation():
     farm_glb('bush_control','bush',(20,.02,6))
     begin('front_shrub',(-3.50,0,2.75))
     clone_into('bush_control',(0,.03,0),1.5)
+    points=np.array([(v.x,v.z,-v.y) for obj in p.b.CURRENT['objects']
+                     for vertex in obj.data.vertices for v in [obj.matrix_basis @ vertex.co]])
+    low=points.min(axis=0);high=points.max(axis=0)
+    p.b.CURRENT['collision']=[box_collision((high-low).tolist(),((high+low)/2).tolist())]
     PLANTS.add('front_shrub')
     p.instance('front_shrub','front_shrub_2',(3.50,0,2.75))
-    provenance('front_shrub',[ROOT/'assets/farm/art/bush.glb'],['v1.1: replace the two entrance-side trees with rounded bushes; measured top .93m; other four trees unchanged'])
+    provenance('front_shrub',[ROOT/'assets/farm/art/bush.glb'],['v1.1: replace the two entrance-side trees with rounded bushes; measured top .90m; other four trees unchanged',
+        'v1.2: one simple box collider from actual transformed source vertices; shared by both entrance instances'])
+    begin('backdrop_shrubs',(-4.172,0,-4.172),45)
+    for i in range(21):
+        clone_into('bush_control',((i-10)*.68,.02,0),.90+(i%3)*.06,(i%5)*17)
+    provenance('backdrop_shrubs',[ROOT/'assets/farm/art/bush.glb'],[
+        'v1.2: 21 low overlapping farm bushes, merged into one surface in the same N5 atlas',
+        'Decorative noncolliding row follows village card yaw at radius 5.9m, .2m in front of card; no shadows'])
+    PLANTS.add('backdrop_shrubs')
+    NO_SHADOW.add('backdrop_shrubs')
     begin('shrub_layer',(0,0,0))
     for side in [-1,1]:
         for j,z in enumerate([-3.46,-2.55,-1.63,-.65,.43,1.50,2.54,3.29]):
@@ -505,7 +518,7 @@ def finish():
         'boundaries':[box_collision([.12,3,8],[-4.06,1.5,0]),box_collision([.12,3,8],[4.06,1.5,0]),box_collision([8,3,.12],[0,1.5,-4.06]),
                       box_collision([3.2,3,.12],[-2.4,1.5,4.06]),box_collision([3.2,3,.12],[2.4,1.5,4.06])],
         'local_lights':[{'position':[x,1.86,z],'color':'FFE7B3','energy':.35,'range':1.4} for x,z in [(-2.8,1.86),(2.8,1.86),(-1.6,-3.02),(1.6,-3.02)]],
-        'revision':'v1.1','white_stone_rays':{'count':16,'tip_radius_m':1.0,'grass_limit_radius_m':1.04},
+        'revision':'v1.2','white_stone_rays':{'count':16,'tip_radius_m':1.0,'grass_limit_radius_m':1.04},
         'walkable_bounds_xz':[[-4,-4],[4,4]],
         'author':'Huangzhong','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80'})
     for image in bpy.data.images:

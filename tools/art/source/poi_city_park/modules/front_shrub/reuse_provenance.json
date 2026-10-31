@@ -9,7 +9,8 @@
     }
   ],
   "changes": [
-    "v1.1: replace the two entrance-side trees with rounded bushes; measured top .93m; other four trees unchanged"
+    "v1.1: replace the two entrance-side trees with rounded bushes; measured top .90m; other four trees unchanged",
+    "v1.2: one simple box collider from actual transformed source vertices; shared by both entrance instances"
   ],
   "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
   "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",

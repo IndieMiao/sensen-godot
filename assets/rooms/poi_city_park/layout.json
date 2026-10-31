@@ -610,12 +610,42 @@
         2.75
       ],
       "yaw_degrees": 0,
-      "colliders": [],
+      "colliders": [
+        {
+          "at": [
+            0.00229683518409729,
+            0.44999999087303877,
+            -0.024299651384353638
+          ],
+          "size": [
+            1.3004063963890076,
+            0.8999999705702066,
+            1.1195599436759949
+          ],
+          "yaw_degrees": 0
+        }
+      ],
       "review_only": false,
       "vegetation": true,
       "cast_shadow": true,
       "material": "atlas",
       "provenance": "tools/art/source/poi_city_park/modules/front_shrub/reuse_provenance.json"
+    },
+    {
+      "name": "backdrop_shrubs",
+      "file": "backdrop_shrubs.glb",
+      "position": [
+        -4.172,
+        0,
+        -4.172
+      ],
+      "yaw_degrees": 45,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": false,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/backdrop_shrubs/reuse_provenance.json"
     },
     {
       "name": "shrub_layer",
@@ -1262,7 +1292,7 @@
       "range": 1.4
     }
   ],
-  "revision": "v1.1",
+  "revision": "v1.2",
   "white_stone_rays": {
     "count": 16,
     "tip_radius_m": 1.0,
