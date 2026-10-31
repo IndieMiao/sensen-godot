@@ -3,6 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
+uid="uid://bng4ykkholhpm"
 path="res://.godot/imported/sprinkler.glb-35bff70f5052dd61d66a45f1f0f8f94f.scn"
 
 [deps]
@@ -27,7 +28,7 @@ meshes/generate_lods=false
 meshes/create_shadow_meshes=true
 meshes/light_baking=1
 meshes/lightmap_texel_size=0.2
-meshes/force_disable_compression=true
+meshes/force_disable_compression=false
 skins/use_named_skins=true
 animation/import=true
 animation/fps=30
