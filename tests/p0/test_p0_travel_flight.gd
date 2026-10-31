@@ -570,7 +570,9 @@ func test_a_first_visits_city_reads_unexplored_until_it_lands() -> void:
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
 	var saved := _ready_to_arrive(m)
-	rt.session.view.travel.visits = {}   # Los Angeles a first visit
+	var first: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	first.travel.visits = {}   # Los Angeles a first visit
+	rt.session.view = first
 	var region := str(P0Clusters.region(LA).id)
 	_fly(m, {kind = "arrival", cluster = LA, first = true, trip = 4, km = 559})   # the reply's view counts the visit
 	assert_bool(rt.session.view.travel.visits.has(LA)).is_true()
@@ -1094,8 +1096,10 @@ func test_a_late_arrival_leaves_another_flights_hold_alone() -> void:
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
 	var saved := _ready_to_arrive(m)
-	rt.session.view["energy"] = {value = 142, max = 210}
-	rt.ui.set_view(rt.session.view)
+	var held: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	held["energy"] = {value = 142, max = 210}
+	rt.session.view = held
+	rt.ui.set_view(held)
 	_fly(m, {kind = "arrival", cluster = LA, first = false, trip = 4, km = 559}, [], {}, false)
 	m._trip.start_us = Time.get_ticks_usec() - 8_100_000
 	m._travel_watch(0.0)   # called back, Los Angeles' travel still out
