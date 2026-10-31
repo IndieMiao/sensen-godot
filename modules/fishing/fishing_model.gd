@@ -112,9 +112,11 @@ static func _nearest_polygon(p: Vector2, polygon: PackedVector2Array) -> Vector2
 	return nearest
 
 ## The Cast key's landing: past the nearest bank, POND_REACH into a pond (q(267) ③: open water in front of the rod),
-## backing off in steps until the whole run from the bank stays wet; 0.55 m (half a river's width) elsewhere.
+## backing off in steps until the whole run from the bank, and FAR_CLEAR past the float, stays wet; 0.55 m (half a
+## river's width) elsewhere.
 const POND_REACH := 2.5
 const SHORE_REACH := 0.55
+const FAR_CLEAR := 0.25
 static func default_target(id: String, origin: Vector3, pond: Dictionary = {}) -> Vector3:
 	var edge := nearest_water(id, origin, pond)
 	var dir := (edge - origin).normalized()
@@ -123,8 +125,8 @@ static func default_target(id: String, origin: Vector3, pond: Dictionary = {}) -
 		var reach := POND_REACH
 		while reach > SHORE_REACH:
 			var wet := true
-			for i in range(1, ceili(reach / 0.1) + 1):
-				if not contains(id, edge + dir * minf(i * 0.1, reach), 0.0, pond):
+			for i in range(1, ceili((reach + FAR_CLEAR) / 0.1) + 1):
+				if not contains(id, edge + dir * minf(i * 0.1, reach + FAR_CLEAR), 0.0, pond):
 					wet = false
 					break
 			if wet: return edge + dir * reach
