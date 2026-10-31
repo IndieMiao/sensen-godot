@@ -12,7 +12,8 @@ OUT=ROOT/'output/poi-city-park-320'
 CAP=OUT/'captures'
 DOC=ROOT/'docs/design/poi-city-park-320-2026-10-31'
 DOC.mkdir(parents=True,exist_ok=True)
-PREFIX='SGODOT-320_N5_v1_'
+REVISION='v1.1'
+PREFIX='SGODOT-320_N5_'+REVISION+'_'
 FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 FONTS={s:ImageFont.truetype(FONT,s) for s in [13,17,21,25,30]}
 MEDIA=[]
@@ -36,7 +37,7 @@ def label(image,title,subtitle='',font_size=21):
     draw=ImageDraw.Draw(canvas)
     draw.text((18,6),title,font=FONTS[font_size],fill='#244333')
     for i,line in enumerate(lines):draw.text((18,36+i*18),line,font=FONTS[13],fill='#53675c')
-    draw.text((18,canvas.height-29),'【黄忠】 SGODOT-320 / N5 v1 / Godot Mobile',font=FONTS[13],fill='#354b40')
+    draw.text((18,canvas.height-29),'【黄忠】 SGODOT-320 / N5 '+REVISION+' / Godot Mobile',font=FONTS[13],fill='#354b40')
     return canvas
 
 
@@ -76,7 +77,6 @@ def colour_controls():
     image=Image.new('RGB',(1120,sum(r.height for r in rows)),'#f3f5f2')
     y=0
     for row in rows:image.paste(row,(0,y));y+=row.height
-    save(label(image,'A 方案烘焙对照','木色椅是保色控制件；场景绿椅按 314 主图单独改色。'), 'farm_atlas_comparison')
     return results
 
 
@@ -98,13 +98,9 @@ def main():
     draw.text((10,720),'Bag 90px',font=FONTS[13],fill='#244333')
     save(label(safe,'N5 / 安全区核对','人物高 1.745m；未缩小默认人物比例',17),'default_safe_bands')
     for name,title,subtitle in [('panorama','N5 城市绿地 / 整园全景','43° / 全景另行缩远，非默认 6.72m 镜头'),
-                                  ('topdown','N5 / 正俯视','8 × 8m；四组花坛、四椅八座、环道外径 6.40m / 内径 5.50m'),
-                                  ('fountain_detail','N5 / 喷泉与白石铺装','农场喷泉原尺寸 Ø1.206m；原有鱼塘水体着色器'),
-                                  ('parterre_detail','N5 / 三叶花坛近景','每组实测约 1.90 × 1.89m；四组，绿篱高约 0.35m')]:
+                                  ('minimum_zoom_360','N5 / 最远镜头','43° / 8.40m / 360px；外围草地无可见边界'),
+                                  ('bench_seated_detail','N5 / 双人长椅坐姿近景','宽 1.40m / 顶高 0.95m / 座面 0.715m；现有 sit_idle')]:
         save(label(Image.open(CAP/(name+'.png')).convert('RGB'),title,subtitle),name)
-    reference=Path(__file__).parent/'reference/SGODOT-314_City_Park_Main_2026-10-31.png'
-    comparison=panel([reference,CAP/'panorama.png'],['Stark / 314 R3 批准主图','黄忠 / N5 v1 游戏实渲'],850)
-    save(label(comparison,'314 R3 → N5 v1','尺寸按 SVG 与实际资产；喷泉按指示保留 Ø1.206m，未按主图视觉比例放大。'),'reference_comparison')
     colours=colour_controls()
     # The world and camera are unchanged; only the existing water shader advances.
     a=np.asarray(Image.open(CAP/'water_t0.png').convert('RGB')).astype(float)
@@ -113,7 +109,7 @@ def main():
     water={'different_pixels_gt_2':int((delta>2).sum()),'max_channel_delta_255':float(delta.max()),
            'mean_abs_rgb_delta_255':float(np.abs(a-b).mean()),'passed':int((delta>2).sum())>50}
     pixels=[]
-    for name in ['default_43deg_360','panorama','topdown','fountain_detail','parterre_detail']:
+    for name in ['default_43deg_360','panorama','minimum_zoom_360','bench_seated_detail']:
         image=np.asarray(Image.open(CAP/(name+'.png')).convert('RGB'))
         pixels.append({'capture':name,'rgb_std':float(image.std()),'passed':bool(image.std()>20)})
     validation={'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
@@ -122,14 +118,15 @@ def main():
     validation['passed']=all(c['passed'] for c in colours) and water['passed'] and all(p['passed'] for p in pixels)
     assert validation['passed'],(colours,water,pixels)
     path=DOC/(PREFIX+'validation.json');path.write_text(json.dumps(validation,ensure_ascii=False,indent=2)+'\n');MEDIA.append(path)
-    table=['# N5 v1 实测模块表','', '尺寸从最终 GLB 顶点读取，单位 m。轴顺序为 X 宽 / Y 高 / Z 深。', '',
+    table=['# N5 '+REVISION+' 实测模块表','', '尺寸从最终 GLB 顶点读取，单位 m。轴顺序为 X 宽 / Y 高 / Z 深。', '',
            '| 模块 | 三角形 | surface | X × Y × Z |','|---|---:|---:|---|']
     for name,data in geometry['assets'].items():
         table.append(f'| {name} | {data["triangles"]} | {data["surfaces"]} | '+ ' × '.join(f'{v:.3f}' for v in data['dimensions_m'])+' |')
     table+=['',f'摆放后：{geometry["placed_triangles"]:,} 三角形 / {geometry["placed_surfaces"]} surface；植物 {geometry["plant_triangles"]:,} 三角形。',
             'white_fence_segment、bench_farm_control、bush_control 为保色/源件控制，不计入实际摆放。',
             '喷泉石材 1,876 面（原 2,076 面扣除两片静态水）；独立动态水体 784 面。原喷泉 bounds 与尺寸保持不变。',
-            '绿椅源宽 1.110m、座面 0.670m；现宽 0.960m、座面 0.715m，按主图改绿色。白椅宽 1.040m，仅装饰。',
+            '绿椅现宽 1.400m、顶高 0.950m、座面 0.715m，两座中心距 0.700m。白椅宽 1.040m，仅装饰。',
+            '入口侧两棵树改为顶高 0.930m 的圆灌木。白石 16 个短尖角，外半径 1.00m。外围草地为一个四边形，layout 放大为 60×60m，非可走区域。',
             '玫瑰拱保留农场 pergola 立柱，改弧顶与玫瑰；路灯与空白入口牌新制。绿桶新制已获上官婉儿 77a66827 确认。']
     path=DOC/(PREFIX+'asset_table.md');path.write_text('\n'.join(table)+'\n');MEDIA.append(path)
     media=[]

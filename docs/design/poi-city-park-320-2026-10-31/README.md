@@ -1,4 +1,21 @@
-# SGODOT-320 N5 城市绿地 v1
+# SGODOT-320 N5 城市绿地
+
+## v1.1 画面返修
+
+按不知火舞 `a7e0e48d` 和上官婉儿派活返修四处，PR #596 保持草稿：
+
+- 绿长椅宽 1.40m、靠背顶 0.95m，三个座板顶面保持 0.715m；八个座位按每椅 0.70m 中心距分开，更新碰撞与接近点。
+- 入口侧两棵树换成顶高 0.93m 的圆灌木，其余四棵树保留。
+- 白石改成 16 个短尖角，外半径 1.00m，收在 1.04m 草圈界线内。
+- 新增单四边形草地延伸，layout 伸展至 60×60m，没有外围地面碰撞，仍只开放原 8×8m 可走范围。远景下沿落入草地，原画面上方扩展天空色，村屋图像比例保持不变。
+
+摆放后 **99,448 三角形 / 39 surface**，植物 **69,340 三角形**。花坛、花、喷泉及保留树的三角形坐标与 v1 对照通过（10 微米精度）；因共用图集重新打包，其他件 UV 随烘焙更新。原有 22 个导入 UID 保留，两个新增件由 Godot 生成 UID。
+
+[默认 43°](SGODOT-320_N5_v1.1_default_43deg_360.png)、[安全区](SGODOT-320_N5_v1.1_default_safe_bands.png)、[全景](SGODOT-320_N5_v1.1_panorama.png)、[坐姿长椅近景](SGODOT-320_N5_v1.1_bench_seated_detail.png)、[最远镜头](SGODOT-320_N5_v1.1_minimum_zoom_360.png)、[实测表](SGODOT-320_N5_v1.1_asset_table.md)、[validation](SGODOT-320_N5_v1.1_validation.json)。
+
+坐姿使用 farm-dev `f4bb293bb8800ca96624912815bc8acae2943285` 的现有 `sit_idle`，只加载到隔离审阅工程；人物站立高度校为 1.745m，沿用生产坐姿的 0.34m 根节点偏移并相应按人物比例修正。没有改共享动画或游戏接入。
+
+## v1 归档
 
 作者：黄忠。Plane virtual_user_id：`5281cd25-6a49-4df8-9802-f3e534956e80`。
 
@@ -52,6 +69,7 @@ blender --background --factory-startup --python tools/art/source/poi_city_park/v
 
 ```bash
 godot --headless --path output/poi-city-park-320/project --editor --import
+godot --headless --path output/poi-city-park-320/project --script res://configure_imports.gd -- "$PWD"
 godot --path output/poi-city-park-320/project --rendering-method mobile --rendering-driver vulkan
 python tools/art/source/poi_city_park/package_review.py
 ```

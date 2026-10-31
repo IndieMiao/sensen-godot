@@ -180,6 +180,10 @@ def shell():
     nt.links.new(tex.outputs['Fac'], ramp.inputs[0])
     nt.links.new(ramp.outputs[0], nt.nodes['Principled BSDF'].inputs['Base Color'])
     provenance('park_ground', [ROOT/'assets/farm/art/grass_clump.glb'], ['8x8m lawn; farm grass palette, fine colour-only grain'])
+    begin('grass_extension',(0,-.02,0))
+    mesh('Nonwalkable exterior grass plane',[(-.5,0,-.5),(-.5,0,.5),(.5,0,.5),(.5,0,-.5)],[(0,1,2,3)],'A4C267')
+    NO_SHADOW.add('grass_extension')
+    provenance('grass_extension',[],['One quad, scaled to 60x60m by layout; no floor collider or walkable area outside the original 8x8m park'])
 
     begin('brick_paths', (0, 0, CENTER_Z))
     # Ring is a single connected annulus with distinct brick courses.
@@ -210,10 +214,10 @@ def shell():
                 cube('Staggered cross axis brick',at,size,['DE9174','D58C71','E5A084'][(row+col)%3],0)
     for j in range(48):
         a0, a1 = j*7.5, (j+1)*7.5
-        pts = [polar(.63,a0+.2), polar(1.06,a0+.2), polar(1.06,a1-.2), polar(.63,a1-.2)]
+        pts = [polar(.63,a0+.2), polar(.90,a0+.2), polar(.90,a1-.2), polar(.63,a1-.2)]
         slab('Radiating pale stone',pts,.022,.035,['E9DDC9','F0E6D5','DDCEB8'][j%3])
-        if j%2 == 0:
-            slab('White stone pointed ray',[polar(1.055,a0),polar(1.25,a0+3.75),polar(1.055,a1)],.022,.035,'F0E6D5')
+        if j%3 == 0:
+            slab('White stone pointed ray',[polar(.895,a0),polar(1.00,a0+11.25),polar(.895,a0+22.5)],.022,.035,'F0E6D5')
     provenance('brick_paths', [], ['Outer ring diameter 6.40m; inner 5.50m; .72m cross and entry path', 'Radial white stone centre; SVG ring centre z=0.16m'])
 
     farm_parts('white_fence_segment','deco_fence',at=(20,0,0))
@@ -228,8 +232,25 @@ def shell():
 def benches():
     green = {'wood':'3F7256','wood_light':'638D65','wood_dark':'345744'}
     k = farm_parts('green_bench','deco_bench',(-1.12,0,CENTER_Z-1.12),45,
-                   (.96/1.11,.715/.67,1),green)
-    k['collision']=[box_collision([.96,1.12,.57],[0,.56,0])]
+                   (1.40/1.11,.715/.67,1),green)
+    # Remap only geometry above the measured seat. Named parts remain editable.
+    bpy.context.view_layer.update()
+    deps=bpy.context.evaluated_depsgraph_get()
+    data=[]
+    for obj in k['objects']:
+        evaluated=bpy.data.meshes.new_from_object(obj.evaluated_get(deps),depsgraph=deps)
+        evaluated.transform(obj.matrix_basis)
+        data.append((obj,evaluated))
+    top=max(v.co.z for _,part in data for v in part.vertices)
+    factor=(.95-.715)/(top-.715)
+    for obj,part in data:
+        for vertex in part.vertices:
+            if vertex.co.z>.715:vertex.co.z=.715+(vertex.co.z-.715)*factor
+        part.update()
+        part.normals_split_custom_set([(0,0,0)]*len(part.loops))
+        obj.modifiers.clear();obj.data=part;obj.matrix_basis=Matrix.Identity(4)
+    k['collision']=[box_collision([1.40,.95,.57],[0,.475,0])]
+    PROVENANCE['green_bench']['changes'].append('v1.1: width 1.40m; top remapped to .95m above unchanged .715m seat; 0.70m seat-centre spacing')
     for name,x,z,yaw in [('green_bench_2',1.12,-1.12,-45),('green_bench_3',-1.12,1.12,135),('green_bench_4',1.12,1.12,-135)]:
         p.instance('green_bench',name,(x,0,CENTER_Z+z),yaw)
     farm_parts('white_bench','deco_bench',(0,0,-3.45),0,(1.04/1.11,1,1),
@@ -393,9 +414,14 @@ def vegetation():
     farm_glb('park_tree','tree_0',(-3.18,.025,-2.90))
     PLANTS.add('park_tree')
     p.KITS['park_tree']['collision']=[box_collision([.30,2.8,.30],[0,1.4,0])]
-    for i,(x,z,s) in enumerate([(3.18,-2.90,1.05),(-3.46,-.50,.95),(3.46,-.50,.95),(-3.50,2.75,.88),(3.50,2.75,.88)]):
+    for i,(x,z,s) in enumerate([(3.18,-2.90,1.05),(-3.46,-.50,.95),(3.46,-.50,.95)]):
         p.instance('park_tree',f'park_tree_{i+2}',(x,.025*s,z),i*73,scale=s)
     farm_glb('bush_control','bush',(20,.02,6))
+    begin('front_shrub',(-3.50,0,2.75))
+    clone_into('bush_control',(0,.03,0),1.5)
+    PLANTS.add('front_shrub')
+    p.instance('front_shrub','front_shrub_2',(3.50,0,2.75))
+    provenance('front_shrub',[ROOT/'assets/farm/art/bush.glb'],['v1.1: replace the two entrance-side trees with rounded bushes; measured top .93m; other four trees unchanged'])
     begin('shrub_layer',(0,0,0))
     for side in [-1,1]:
         for j,z in enumerate([-3.46,-2.55,-1.63,-.65,.43,1.50,2.54,3.29]):
@@ -432,9 +458,10 @@ def backdrop():
         crop=bpy.data.images.new('Approved distant village crop',width=w,height=210,alpha=False)
         crop.pixels.foreach_set(pixels.ravel());crop.filepath_raw=str(target);crop.file_format='PNG';crop.save()
     begin('village_backdrop',(-4.313,0,-4.313),45)
-    obj=mesh('Single distant village card',[(-7,-.7,0),(7,-.7,0),(7,3.32,0),(-7,3.32,0)],[(0,1,2,3)],'FFFFFF')
+    obj=mesh('Single distant village card',[(-7,-.7,0),(7,-.7,0),(7,8,0),(-7,8,0)],[(0,1,2,3)],'FFFFFF')
     uv=obj.data.uv_layers.new(name='SourceBackdropUV')
-    for loop,xy in zip(uv.data,[(0,0),(1,0),(1,1),(0,1)]):loop.uv=xy
+    # UV above the image becomes the same baked sky colour, without stretching houses.
+    for loop,xy in zip(uv.data,[(0,0),(1,0),(1,8.7/4.02),(0,8.7/4.02)]):loop.uv=xy
     mat=obj.data.materials[0].copy();obj.data.materials[0]=mat
     node=mat.node_tree.nodes.new('ShaderNodeTexImage');node.image=bpy.data.images.load(str(target),check_existing=True)
     coords=mat.node_tree.nodes.new('ShaderNodeUVMap');coords.uv_map='SourceBackdropUV'
@@ -468,9 +495,9 @@ def finish():
     placements=[('green_bench',-1.12,-1.12,45),('green_bench_2',1.12,-1.12,-45),('green_bench_3',-1.12,1.12,135),('green_bench_4',1.12,1.12,-135)]
     for i,(name,x,z,yaw) in enumerate(placements):
         angle=math.radians(yaw)
-        for j,offset in enumerate([-.23,.23]):
+        for j,offset in enumerate([-.35,.35]):
             anchors.append({'name':f'seat_bench_{i*2+j+1}','position':[x+math.cos(angle)*offset,.715,CENTER_Z+z-math.sin(angle)*offset],
-                'yaw_degrees':yaw,'module':name,'approach':[x+math.sin(angle)*.60,.04,CENTER_Z+z+math.cos(angle)*.60]})
+                'yaw_degrees':yaw,'module':name,'approach':[x+math.cos(angle)*offset+math.sin(angle)*.60,.04,CENTER_Z+z-math.sin(angle)*offset+math.cos(angle)*.60]})
     p.MANIFEST_EXTRA.update({'anchors':anchors,'floor_size_m':[8,8],
         'reference_svg':{'scale_px_per_m':93.75,'park_rect_px':[80,175,750,750],'ring_center_px':[455,565]},
         'layout_adjustments':['Benches moved outward to radius 1.584m so a 0.5m capsule fits between seat fronts and the unchanged fountain; SVG furniture rectangles are schematic.',
@@ -478,6 +505,8 @@ def finish():
         'boundaries':[box_collision([.12,3,8],[-4.06,1.5,0]),box_collision([.12,3,8],[4.06,1.5,0]),box_collision([8,3,.12],[0,1.5,-4.06]),
                       box_collision([3.2,3,.12],[-2.4,1.5,4.06]),box_collision([3.2,3,.12],[2.4,1.5,4.06])],
         'local_lights':[{'position':[x,1.86,z],'color':'FFE7B3','energy':.35,'range':1.4} for x,z in [(-2.8,1.86),(2.8,1.86),(-1.6,-3.02),(1.6,-3.02)]],
+        'revision':'v1.1','white_stone_rays':{'count':16,'tip_radius_m':1.0,'grass_limit_radius_m':1.04},
+        'walkable_bounds_xz':[[-4,-4],[4,4]],
         'author':'Huangzhong','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80'})
     for image in bpy.data.images:
         if image.source=='FILE' and image.packed_file is None:
@@ -497,6 +526,9 @@ def finish():
         a['cast_shadow']=a['name'] not in NO_SHADOW
         a['material']='pond_water' if a['name']=='fountain_water' else 'backdrop' if a['name']=='village_backdrop' else 'atlas'
         a['provenance']=f'tools/art/source/poi_city_park/modules/{a["name"]}/reuse_provenance.json'
+        if a['name']=='grass_extension':
+            a['scale']=[60,1,60]
+            a['walkable']=False
         if a['name'] in shell_names:
             a['file']='../_shared/shell_park/'+a['file']
     save_json(OUT/'layout.json',layout)

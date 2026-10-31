@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import json
 import shutil
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[4]
 DEST = ROOT / 'output/poi-city-park-320/project'
@@ -20,6 +21,7 @@ def copy(path):
 
 
 def scene_import(path):
+    if path.with_suffix(path.suffix+'.import').exists():return
     resource = 'res://' + str(path.relative_to(ROOT))
     dest = f'res://.godot/imported/{path.name}-{hashlib.md5(resource.encode()).hexdigest()}.scn'
     path.with_suffix(path.suffix+'.import').write_text(f'''[remap]
@@ -53,7 +55,7 @@ for directory in ['assets/rooms/poi_city_park', 'assets/rooms/_shared/shell_park
         scene_import(path)
 atlas = ROOT/'assets/rooms/poi_city_park/room_albedo_ao.png'
 resource = 'res://' + str(atlas.relative_to(ROOT))
-atlas.with_suffix('.png.import').write_text(f'''[remap]
+if not atlas.with_suffix('.png.import').exists():atlas.with_suffix('.png.import').write_text(f'''[remap]
 importer="texture"
 type="CompressedTexture2D"
 [deps]
@@ -76,6 +78,11 @@ for path in ['modules/avatar', 'assets/avatar/demo_denylist.json', 'modules/farm
 for name in ['deco_bench','deco_fence','tree_0','bush','deco_fountain','deco_birdbath']:
     copy(f'assets/farm/art/{name}.glb')
     copy(f'assets/farm/art/{name}.glb.import')
+animation_commit='f4bb293bb8800ca96624912815bc8acae2943285'
+animation_bytes=subprocess.check_output(['git','show',animation_commit+':assets/avatar/base/animations.res'],cwd=ROOT)
+(DEST/'assets/avatar/base/animations.res').write_bytes(animation_bytes)
+(DEST/'animation-provenance.json').write_text(json.dumps({'commit':animation_commit,'file':'assets/avatar/base/animations.res',
+    'sha256':hashlib.sha256(animation_bytes).hexdigest(),'seat_root_below_surface_m':.34,'use':'isolated seated review only'},indent=2)+'\n')
 manifest=json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text())
 manifest['parts']=[p for p in manifest['parts'] if p['id'] in ['body00','eyes00','hairhat0','cloth0','shoes0']]
 (DEST/'assets/avatar/parts_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
@@ -100,4 +107,5 @@ lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
 ''')
 (DEST/'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="CityParkReview" type="Node"]\nscript = ExtResource("1")\n')
 shutil.copy2(Path(__file__).with_name('review.gd'),DEST/'review.gd')
+shutil.copy2(Path(__file__).with_name('configure_imports.gd'),DEST/'configure_imports.gd')
 print(DEST)

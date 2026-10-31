@@ -37,6 +37,28 @@
       "provenance": "tools/art/source/poi_city_park/modules/park_ground/reuse_provenance.json"
     },
     {
+      "name": "grass_extension",
+      "file": "grass_extension.glb",
+      "position": [
+        0,
+        -0.02,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": false,
+      "cast_shadow": false,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/grass_extension/reuse_provenance.json",
+      "scale": [
+        60,
+        1,
+        60
+      ],
+      "walkable": false
+    },
+    {
       "name": "brick_paths",
       "file": "brick_paths.glb",
       "position": [
@@ -124,12 +146,12 @@
         {
           "at": [
             0,
-            0.56,
+            0.475,
             0
           ],
           "size": [
-            0.96,
-            1.12,
+            1.4,
+            0.95,
             0.57
           ],
           "yaw_degrees": 0
@@ -580,6 +602,22 @@
       "provenance": "tools/art/source/poi_city_park/modules/bush_control/reuse_provenance.json"
     },
     {
+      "name": "front_shrub",
+      "file": "front_shrub.glb",
+      "position": [
+        -3.5,
+        0,
+        2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "review_only": false,
+      "vegetation": true,
+      "cast_shadow": true,
+      "material": "atlas",
+      "provenance": "tools/art/source/poi_city_park/modules/front_shrub/reuse_provenance.json"
+    },
+    {
       "name": "shrub_layer",
       "file": "shrub_layer.glb",
       "position": [
@@ -875,34 +913,14 @@
       ]
     },
     {
-      "name": "park_tree_5",
-      "asset": "park_tree",
-      "position": [
-        -3.5,
-        0.022000000000000002,
-        2.75
-      ],
-      "yaw_degrees": 219,
-      "scale": [
-        0.88,
-        0.88,
-        0.88
-      ]
-    },
-    {
-      "name": "park_tree_6",
-      "asset": "park_tree",
+      "name": "front_shrub_2",
+      "asset": "front_shrub",
       "position": [
         3.5,
-        0.022000000000000002,
+        0,
         2.75
       ],
-      "yaw_degrees": 292,
-      "scale": [
-        0.88,
-        0.88,
-        0.88
-      ]
+      "yaw_degrees": 0
     },
     {
       "name": "rear_topiary_2",
@@ -996,121 +1014,121 @@
     {
       "name": "seat_bench_1",
       "position": [
-        -1.282634559672906,
+        -1.3674873734152917,
         0.715,
-        -0.7973654403270942
+        -0.7125126265847085
       ],
       "yaw_degrees": 45,
       "module": "green_bench",
       "approach": [
-        -0.6957359312880717,
+        -0.9432233047033632,
         0.04,
-        -0.5357359312880716
+        -0.28824855787278
       ]
     },
     {
       "name": "seat_bench_2",
       "position": [
-        -0.9573654403270941,
+        -0.8725126265847085,
         0.715,
-        -1.122634559672906
+        -1.2074873734152916
       ],
       "yaw_degrees": 45,
       "module": "green_bench",
       "approach": [
-        -0.6957359312880717,
+        -0.44824855787278006,
         0.04,
-        -0.5357359312880716
+        -0.783223304703363
       ]
     },
     {
       "name": "seat_bench_3",
       "position": [
-        0.9573654403270941,
+        0.8725126265847085,
         0.715,
-        -1.122634559672906
+        -1.2074873734152916
       ],
       "yaw_degrees": -45,
       "module": "green_bench_2",
       "approach": [
-        0.6957359312880717,
+        0.44824855787278006,
         0.04,
-        -0.5357359312880716
+        -0.783223304703363
       ]
     },
     {
       "name": "seat_bench_4",
       "position": [
-        1.282634559672906,
+        1.3674873734152917,
         0.715,
-        -0.7973654403270942
+        -0.7125126265847085
       ],
       "yaw_degrees": -45,
       "module": "green_bench_2",
       "approach": [
-        0.6957359312880717,
+        0.9432233047033632,
         0.04,
-        -0.5357359312880716
+        -0.28824855787278
       ]
     },
     {
       "name": "seat_bench_5",
       "position": [
-        -0.9573654403270941,
+        -0.8725126265847085,
         0.715,
-        1.442634559672906
+        1.5274873734152916
       ],
       "yaw_degrees": 135,
       "module": "green_bench_3",
       "approach": [
-        -0.6957359312880715,
+        -0.44824855787278,
         0.04,
-        0.8557359312880716
+        1.1032233047033633
       ]
     },
     {
       "name": "seat_bench_6",
       "position": [
-        -1.282634559672906,
+        -1.3674873734152917,
         0.715,
-        1.117365440327094
+        1.0325126265847084
       ],
       "yaw_degrees": 135,
       "module": "green_bench_3",
       "approach": [
-        -0.6957359312880715,
+        -0.9432233047033631,
         0.04,
-        0.8557359312880716
+        0.60824855787278
       ]
     },
     {
       "name": "seat_bench_7",
       "position": [
-        1.282634559672906,
+        1.3674873734152917,
         0.715,
-        1.117365440327094
+        1.0325126265847084
       ],
       "yaw_degrees": -135,
       "module": "green_bench_4",
       "approach": [
-        0.6957359312880715,
+        0.9432233047033631,
         0.04,
-        0.8557359312880716
+        0.60824855787278
       ]
     },
     {
       "name": "seat_bench_8",
       "position": [
-        0.9573654403270941,
+        0.8725126265847085,
         0.715,
-        1.442634559672906
+        1.5274873734152916
       ],
       "yaw_degrees": -135,
       "module": "green_bench_4",
       "approach": [
-        0.6957359312880715,
+        0.44824855787278,
         0.04,
-        0.8557359312880716
+        1.1032233047033633
       ]
     }
   ],
@@ -1243,6 +1261,22 @@
       "energy": 0.35,
       "range": 1.4
     }
+  ],
+  "revision": "v1.1",
+  "white_stone_rays": {
+    "count": 16,
+    "tip_radius_m": 1.0,
+    "grass_limit_radius_m": 1.04
+  },
+  "walkable_bounds_xz": [
+    [
+      -4,
+      -4
+    ],
+    [
+      4,
+      4
+    ]
   ],
   "author": "Huangzhong",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"

@@ -1,0 +1,17 @@
+{
+  "asset": "front_shrub",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/bush.glb",
+      "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+    }
+  ],
+  "changes": [
+    "v1.1: replace the two entrance-side trees with rounded bushes; measured top .93m; other four trees unchanged"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "front_shrub_mobile"
+}

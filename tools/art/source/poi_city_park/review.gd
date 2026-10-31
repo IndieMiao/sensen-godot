@@ -8,6 +8,7 @@ var cam: Camera3D
 var park: Node3D
 var rig
 var output: String
+var standing_transform: Transform3D
 var report = {"checks": [], "captures": [], "capsule_routes": [], "recolour_controls": []}
 
 func _ready(): run.call_deferred()
@@ -67,6 +68,10 @@ func imported_geometry():
 	check(stats.plant_triangles <= 100000, "Vegetation <= 100k triangles")
 	check(park.atlas.albedo_texture.get_size() == Vector2(2048,2048), "One 2048x2048 N5 atlas")
 	check(park.water.shader.resource_path == "res://modules/ponds/pond_water.gdshader", "Unchanged existing pond water shader")
+	for spec in park.layout.assets:
+		var config=ConfigFile.new()
+		check(config.load(KIT+spec.file+".import")==OK and str(config.get_value("remap","uid","")).begins_with("uid://"),"Actual import UID exists: "+spec.name)
+		check(config.get_value("params","gltf/texture_map_mode",0)==1,"Actual texture_map_mode=1: "+spec.name)
 	var seats = park.layout.anchors.filter(func(a): return str(a.name).begins_with("seat_bench_"))
 	check(seats.size() == 8, "Exactly eight seats on four green benches")
 	for seat in seats:
@@ -78,6 +83,12 @@ func imported_geometry():
 		check(marker.basis.z.dot(target) > .99, "Seat faces fountain: "+seat.name)
 	check(park.get_node("sign_name").get_meta("size") == [1.45,.22], "Blank runtime sign carries usable size")
 	report.imported = {"triangles":tris,"surfaces":surfaces,"plant_triangles":stats.plant_triangles,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
+	check(park.get_node("grass_extension").find_children("*","StaticBody3D",true,false).is_empty(),"Exterior grass is decorative, with no walkable floor collider")
+	var limits=park.layout.walkable_bounds_xz
+	check(Vector2(limits[0][0],limits[0][1]).is_equal_approx(Vector2(-4,-4)) and Vector2(limits[1][0],limits[1][1]).is_equal_approx(Vector2(4,4)),"Walkable park remains 8x8m")
+	check(park.get_node("front_shrub").position.z==2.75 and not park.has_node("park_tree_5"),"Both entrance-side trees replaced by low shrubs")
+	for i in range(1,9,2):
+		check(absf(park.get_node("seat_bench_"+str(i)).position.distance_to(park.get_node("seat_bench_"+str(i+1)).position)-.70)<.0001,"Paired seats separated .70m: "+str(i))
 
 func avatar():
 	rig = Avatar.create_rig()
@@ -105,6 +116,7 @@ func avatar():
 	rig.scale = Vector3.ONE*scale_factor
 	rig.position = Vector3(0,.04-low*scale_factor,2.65)
 	rig.rotation_degrees.y = 180
+	standing_transform = rig.transform
 	report.avatar = {"source_height_m":high-low,"scale":scale_factor,"actual_height_m":1.745,"foot_position":[0,.04,2.65]}
 
 func capture(id):
@@ -113,6 +125,33 @@ func capture(id):
 	check(image.save_png(output+"/"+id+".png") == OK, "Capture saved: "+id)
 	report.captures.append({"id":id,"pixels":[vp.size.x,vp.size.y],"camera_width_m":cam.size,"pitch":-cam.rotation_degrees.x,"yaw":cam.rotation_degrees.y,"position":xyz(cam.position)})
 	print("N5_CAPTURE ",id)
+	if id in ["default_43deg_360","minimum_zoom_360"]:
+		var corners=[]
+		for pixel in [Vector2.ZERO,Vector2(vp.size.x,0),Vector2(0,vp.size.y),Vector2(vp.size)]:
+			var origin=cam.project_ray_origin(pixel);var direction=cam.project_ray_normal(pixel)
+			var point=origin+direction*((-.02-origin.y)/direction.y)
+			corners.append(xyz(point))
+			check(absf(point.x)<30 and absf(point.z)<30,"Grass extension covers viewport ray at "+id+" "+str(pixel))
+		report[id+"_ground_corners"]=corners
+
+func bench_closeup():
+	var seat=park.get_node("seat_bench_1")
+	var animation=rig.get_node("AnimationPlayer")
+	check(animation.has_animation("sit_idle"),"Existing production sit_idle clip available")
+	rig.play_motion("sit_idle");animation.seek(.35,true);animation.pause()
+	rig.position=seat.position-Vector3.UP*.34*rig.scale.y
+	rig.rotation_degrees.y=seat.rotation_degrees.y
+	rig.visible=true
+	var bench=park.get_node("green_bench")
+	pose(bench.position+Vector3(0,.85,0),2.9,43,70)
+	vp.size=Vector2i(1100,850)
+	await capture("bench_seated_detail")
+	report.seated={"clip":"sit_idle","seat":"seat_bench_1","seat_surface_y_m":seat.position.y,
+		"root_position":xyz(rig.position),"standing_calibrated_height_m":1.745,
+		"production_root_offset_m":.34,"scale":rig.scale.y,
+		"animation_source":JSON.parse_string(FileAccess.get_file_as_string("res://animation-provenance.json"))}
+	rig.transform=standing_transform
+	rig.play_motion("idle");animation.seek(.3,true);animation.pause()
 
 func capsule_query(point, radius=.25):
 	var capsule = CapsuleShape3D.new()
@@ -209,9 +248,12 @@ func run():
 	create_world(); imported_geometry(); await avatar(); await physics_routes()
 	pose(Vector3(0,.9,1.1),6.72)
 	await capture("default_43deg_360")
+	pose(Vector3(0,.9,1.1),8.4);await capture("minimum_zoom_360")
+	pose(Vector3(0,.9,1.1),6.72)
 	vp.size = Vector2i(1080,2400); await capture("default_43deg_hd")
 	vp.size = Vector2i(1400,1100); pose(Vector3(0,.8,.1),12.2,43,0)
 	await capture("panorama")
+	await bench_closeup()
 	vp.size = Vector2i(1100,1100); pose(Vector3(0,0,0),9.2,90,0)
 	park.get_node("village_backdrop").visible = false; rig.visible = false
 	await capture("topdown")

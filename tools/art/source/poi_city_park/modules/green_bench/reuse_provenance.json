@@ -13,9 +13,10 @@
     }
   ],
   "changes": [
-    "Editable deco_bench source parts; scale XYZ (0.8648648648648648, 1.0671641791044775, 1)",
+    "Editable deco_bench source parts; scale XYZ (1.261261261261261, 1.0671641791044775, 1)",
     "Palette replacement: {'wood': '3F7256', 'wood_light': '638D65', 'wood_dark': '345744'}",
-    "Removed: none"
+    "Removed: none",
+    "v1.1: width 1.40m; top remapped to .95m above unchanged .715m seat; 0.70m seat-centre spacing"
   ],
   "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
   "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",

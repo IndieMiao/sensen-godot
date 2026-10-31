@@ -1,0 +1,12 @@
+{
+  "asset": "grass_extension",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [],
+  "changes": [
+    "One quad, scaled to 60x60m by layout; no floor collider or walkable area outside the original 8x8m park"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "grass_extension_mobile"
+}
