@@ -62,7 +62,17 @@ func _arrive(m: Node) -> void:
 var _wire: Array = []   # the travel commands sent and not answered yet: the test answers them
 
 ## Requests held on the wire: travel waits for _answer / _drop; a city's places read fails (none in these tests).
+## A read the session sent over the real wire before (its 30 s refresh, between tests the wire is the real one) is
+## dropped first: failing later it would take the travel queued behind it down with it, as a network failure does.
 func _hold_wire(rt: P0Runtime) -> void:
+	var s := rt.session
+	for h in s.get_children():
+		if h is HTTPRequest and h.request_completed.get_connections().any(func(c): return c.callable.get_method() == "_on_done"):
+			h.cancel_request()
+			h.queue_free()
+	s.busy = false
+	s._inflight = {}
+	s._queue = []
 	_wire.clear()
 	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, cmd: Dictionary) -> void:
 		if str(cmd.get("type", "")) == "travel": _wire.append(cmd)
