@@ -99,9 +99,18 @@ static func nearest_water(id: String, point: Vector3, pond: Dictionary = {}) -> 
 	nearest += (p - nearest).normalized() * float(spec.width) * 0.5
 	return Vector3(nearest.x, 0, nearest.y)
 
+static var _polygons := {}   # spec.polygon → its PackedVector2Array: contains() runs hundreds of times per plan (周瑜 on #593)
+static var _polygons_lock := Mutex.new()   # WaterShore builds banks on worker threads
 static func _polygon(spec: Dictionary) -> PackedVector2Array:
+	_polygons_lock.lock()
+	var hit = _polygons.get(spec.polygon)
+	_polygons_lock.unlock()
+	if hit != null: return hit
 	var polygon := PackedVector2Array()
 	for p in spec.polygon: polygon.append(Vector2(p[0], p[1]))
+	_polygons_lock.lock()
+	_polygons[spec.polygon] = polygon
+	_polygons_lock.unlock()
 	return polygon
 
 static func _nearest_polygon(p: Vector2, polygon: PackedVector2Array) -> Vector2:

@@ -91,12 +91,14 @@ static func validated_region(payload: Dictionary, region: String) -> Array:
 ## still name them and catalog_revision does not move.
 const P0_TEMPLATES := "res://assets/p0/p0_pond_templates.json"
 static var _p0: Dictionary = {}
+static var _p0_read := false
 
 static func template(id: String) -> Dictionary:
 	var spec: Dictionary = data().templates.get(id, {}).duplicate(true)
 	if spec.is_empty(): return spec
-	if _p0.is_empty() and FileAccess.file_exists(P0_TEMPLATES):
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(P0_TEMPLATES))
+	if not _p0_read:
+		_p0_read = true
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(P0_TEMPLATES)) if FileAccess.file_exists(P0_TEMPLATES) else null
 		_p0 = parsed.get("templates", {}) if parsed is Dictionary else {}
 	spec.merge((_p0.get(id, {}) as Dictionary).duplicate(true), true)
 	return spec
