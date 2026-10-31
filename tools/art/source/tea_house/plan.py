@@ -60,7 +60,7 @@ def main():
     anchor('spawn',[.30,FLOOR,2.55],0)
     anchor('exit',[.30,FLOOR,3.80],180)
     anchor('badge_exit',[.30,1.05,3.80],180)
-    anchor('sign_name',[2.48,2.92,-2.96],180,'name_sign',size=[1.04,.26])
+    anchor('sign_name',[-2.3925,3.20,-2.812],180,'name_sign',size=[1.04,.26])
     anchor('cam_default',[.10,1.1,.4],45,width_m=6.72,pitch_degrees=43)
     room=box(-3.2,-3.0,3.2,3.0)
     domain=unary_union([room,box(-.35,2.9,.95,4.20)])

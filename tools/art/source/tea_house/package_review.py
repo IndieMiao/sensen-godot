@@ -19,7 +19,7 @@ FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 FILES=[]
 
 
-def label(image,title,subtitle=''):
+def label(image,title,subtitle='',revision='v1'):
     text=ImageFont.truetype(FONT,13);heading=ImageFont.truetype(FONT,17 if image.width<500 else 25)
     probe=ImageDraw.Draw(image);lines=['']
     for char in subtitle:
@@ -29,7 +29,7 @@ def label(image,title,subtitle=''):
     output=Image.new('RGB',(image.width,image.height+header+36),'#f1f4f2');output.paste(image,(0,header))
     draw=ImageDraw.Draw(output);draw.text((16,8),title,font=heading,fill='#31463c')
     for i,line in enumerate(lines):draw.text((16,42+19*i),line,font=text,fill='#53655c')
-    draw.text((16,output.height-27),'【黄忠】 SGODOT-216 / v1 / Godot Mobile',font=text,fill='#53655c')
+    draw.text((16,output.height-27),'【黄忠】 SGODOT-216 / '+revision+' / Godot Mobile',font=text,fill='#53655c')
     return output
 
 

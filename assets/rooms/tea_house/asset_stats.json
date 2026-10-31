@@ -23,7 +23,7 @@
         6.400000095367432
       ],
       "bytes": 327228,
-      "sha256": "09cbf2c40c1982a21a28854e26be47775d3c24cbf0dff39b1d4056f8ce3cd1df"
+      "sha256": "01c89b38cbaaa442e0e7efeef9b8b5dfdaae6113e396b36e3160880dc27d2ae8"
     },
     {
       "name": "entry_deck",
@@ -48,7 +48,7 @@
         1.1999998092651367
       ],
       "bytes": 5204,
-      "sha256": "062c0c77d3ae42429c8e091fcb91bca3dbb51939e560252c50b383a699ddc2fe"
+      "sha256": "8d60ac6b5e1d6358dad03b5ca2d9fe9c756cf3190a351cb4a59643b169500490"
     },
     {
       "name": "left_wall",
@@ -73,7 +73,7 @@
         0.385000117123127
       ],
       "bytes": 93252,
-      "sha256": "566cd0fc71362ce00be8f569dcd6af2a8f1c26b6b8e543caf49561a6d41b3545"
+      "sha256": "4e6c640558c4bfe36b7cb611e06a587e399da673f45f9c067e47ddb8ae46d39c"
     },
     {
       "name": "back_wall",
@@ -98,7 +98,7 @@
         0.38499975204467773
       ],
       "bytes": 44072,
-      "sha256": "f182eae6120cb32a974bfe5eadc140b2864a9d1e8b69b0bf72fbbddb17dab28c"
+      "sha256": "8ffb4f208c42c8323e0bf1cc6a59ed85985b351ea06ee22bab08a13c93c2986a"
     },
     {
       "name": "round_window",
@@ -123,7 +123,7 @@
         0.11000020802021027
       ],
       "bytes": 69856,
-      "sha256": "d8a2688ff70420b97296c2401cd2caebbadb6b6cf9d631317766ef67b01581b6"
+      "sha256": "c7be8c0243c3143a2be058b8e74446f36b626989f49e4c7b86eb98d623635c77"
     },
     {
       "name": "window_backdrop",
@@ -148,7 +148,7 @@
         6.818976316935732e-08
       ],
       "bytes": 1624,
-      "sha256": "e6bbc7461f2b7ce277435068c1114afcbfd8b43d25c22668a3a58c064f1460e4"
+      "sha256": "cb4cc3169b76e7f6c4c1fafe2d4a1fc0c7b5c68a3be5986e03028c1f089fab22"
     },
     {
       "name": "tea_table_1",
@@ -173,7 +173,7 @@
         0.9340000450611115
       ],
       "bytes": 117344,
-      "sha256": "a9bc191773fd565d776d8500d5e3f3221c4815b274286ceb92839d373238205e"
+      "sha256": "4f472b6492e4bf19f8acd7ea20c1de096708cd5e03ec8812370e9c3fd2203d89"
     },
     {
       "name": "tea_table_1_flowers",
@@ -198,7 +198,7 @@
         0.19439344108104706
       ],
       "bytes": 26620,
-      "sha256": "5eca536be93da6086d662bd5e94ba3fa5d93e6e126d9e04efe40752b9af7d26c"
+      "sha256": "ced35067f9040288b9add7c3d062aded57d5139942b8c6d52af0cde73615d3cb"
     },
     {
       "name": "tea_table_2",
@@ -223,7 +223,7 @@
         0.9340000152587891
       ],
       "bytes": 117344,
-      "sha256": "a902c20b6ed322503c943ad0ef90f0d2f0b8f237b1749968a5694766937ed15d"
+      "sha256": "3d6edbeacfe36709e1d21cbc76c117f14b45985d0f60a37330ef3ade4d1171ef"
     },
     {
       "name": "tea_table_2_flowers",
@@ -248,7 +248,7 @@
         0.19439339637756348
       ],
       "bytes": 26620,
-      "sha256": "8d67a96319fe9eebfc97dcae357e4b76b8992e5b7c85bbf0f4fbf113947afeb9"
+      "sha256": "82869e1b69d1863c9dba4c3bd443202f53bc8410c0045dfe1542ce3c18c0e232"
     },
     {
       "name": "tea_table_3",
@@ -273,7 +273,7 @@
         0.9340000152587891
       ],
       "bytes": 117344,
-      "sha256": "a1bc5127defa0e67caefc062b7679b142eb3f38ce84ec40ad99c3ef2074b8c1a"
+      "sha256": "faca844f8b63dd4a83e5a4aca0cefa4ba595e4b8568f01f3c07515819460a428"
     },
     {
       "name": "tea_table_3_flowers",
@@ -298,7 +298,7 @@
         0.19439344108104706
       ],
       "bytes": 26620,
-      "sha256": "ae534a5d7801491b40206d3016710c8085cffee3c669d45a799495499b72ea71"
+      "sha256": "6097a0903009eb38363bb0fbf1a2957ab6137d6e7f4039e5ae8878dc96915ae7"
     },
     {
       "name": "round_stool_sage",
@@ -323,7 +323,7 @@
         0.5600000023841858
       ],
       "bytes": 26916,
-      "sha256": "92ff0e9e26cfcc2266f64c146c760e9acba2ad43d9a667b707a66d8b9ce82c15"
+      "sha256": "aa576253eec5905eab1d813d6999fb5105ee5e754ca11d26e795d83f0f3177ea"
     },
     {
       "name": "round_stool_linen",
@@ -348,7 +348,7 @@
         0.5600000023841858
       ],
       "bytes": 26920,
-      "sha256": "b5a052be36ef3b4cb9c4ffbc33c89fb7b61a1f991a5c7dfbe0204255979f1a83"
+      "sha256": "c0b591904265043f398a7ab644ce81e1b67fd6b97bdcc6047efd639918c2c0ff"
     },
     {
       "name": "window_bench",
@@ -373,7 +373,7 @@
         0.5000000894069672
       ],
       "bytes": 31260,
-      "sha256": "6896b0424f4586d8f19b0102bf6226405cc59eb1dbe64589fcb815e6f8860b10"
+      "sha256": "aa9f6f3d673ed2568450977f2d13b545998b1a7d047a4a291f2aea2c0f643cb7"
     },
     {
       "name": "counter",
@@ -398,7 +398,7 @@
         0.6749999523162842
       ],
       "bytes": 208772,
-      "sha256": "ced473c8bc247e7a6e3da02611b1deda90043571388774f1ced189f93ab92d3d"
+      "sha256": "62805454164b9d4bd70d30d1a0f0a1d1af4c2403bea403ac2c0a8f0149775714"
     },
     {
       "name": "counter_flowers",
@@ -423,7 +423,7 @@
         0.32003796100616455
       ],
       "bytes": 26612,
-      "sha256": "69d8308d79dc618886cbb4cbdd9e5462da4fc7a4ba38ce295232998b11c6e27c"
+      "sha256": "cb9e58a8146a17679f83a24751a776b2cf668044eddc904804a7f84857066756"
     },
     {
       "name": "coffee_console",
@@ -448,7 +448,7 @@
         0.5
       ],
       "bytes": 76316,
-      "sha256": "126bc92dbb2980c36581b589e0ac2adee5d9f4552df48cfdb310952c4f4afff9"
+      "sha256": "f2bf75b17b10b3972b99207abe68f0f517ec3a6b821322b8bc65666f23c1da96"
     },
     {
       "name": "wall_shelves",
@@ -473,7 +473,7 @@
         0.3600001335144043
       ],
       "bytes": 182936,
-      "sha256": "608af686a34a910ac74922f86ade3f096c98f041bbbb6a235708be440f4798f8"
+      "sha256": "ab9fa5b2737c2e354cb6026f45b35b541acbeb64daa598d95c67b65349ed49f8"
     },
     {
       "name": "decorative_door",
@@ -498,7 +498,7 @@
         0.2049999237060547
       ],
       "bytes": 48816,
-      "sha256": "9facf51bb7eedd62ce054c3a79e86d83d14be11b1687265b7fd6e576e5fe5915"
+      "sha256": "2852b50d7d56634c2c0af6e374d50e807709644bd367fdb8e17371c0f7ab0401"
     },
     {
       "name": "name_sign",
@@ -507,12 +507,12 @@
       "surfaces": 1,
       "bounds": [
         [
-          -0.6000000238418579,
+          -0.5999999046325684,
           -0.19000005722045898,
           -0.027499914169311523
         ],
         [
-          0.5999999046325684,
+          0.6000000238418579,
           0.19000005722045898,
           0.053999900817871094
         ]
@@ -523,7 +523,7 @@
         0.08149981498718262
       ],
       "bytes": 20096,
-      "sha256": "9b105ea53757080d37cb08355b7364ef6d8229c2e945f65a3cc03f1a97646873"
+      "sha256": "15227f115e0090765cb28872e9935f773531561271bdacd8c29675ce53fe8aa5"
     },
     {
       "name": "wall_lantern",
@@ -548,7 +548,7 @@
         0.5399999991059303
       ],
       "bytes": 32704,
-      "sha256": "c385f2fd98e22a477d0db9f3f49ecf9f4b6c282143cccb5afebcdae027dec83d"
+      "sha256": "ba6bc0ee612c9343ce91dfb9c26c80f1b862bd7ef0c1049ae6b3172014f01dd1"
     },
     {
       "name": "lantern_glow",
@@ -573,7 +573,7 @@
         0.20999997854232788
       ],
       "bytes": 5244,
-      "sha256": "c172cdccb37e0e67c1b2303a3043612c281fc80caa83434c64fffaf5a796ed9f"
+      "sha256": "820a5b14638862aa29a8f3d43de5203706ae7e199ecb4c3f3a6eaf4bf3020c5e"
     },
     {
       "name": "corner_tree",

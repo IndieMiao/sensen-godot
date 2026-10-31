@@ -6,7 +6,7 @@
   "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
   "source_script": "tools/art/build_tea_house.py",
   "changes": [
-    "Blank separate sign above the decorative door, clear of Ama nameplate"
+    "v1.1: move unchanged blank sign to the rear-left wall bay below the beam; keep 1.04 x .26m writable area"
   ],
   "units": "metres; Y up; +Z front",
   "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"

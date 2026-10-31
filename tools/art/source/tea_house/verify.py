@@ -75,7 +75,9 @@ def main():
     for seat in seats:
         check(abs(seat['position'][1]-.795)<1e-6 and seat.get('module') in modules,seat['name']+': world seat height and owning module')
     check(not any(name.startswith('stand_seat') or name.startswith('stand_table') for name in names),'No redundant stand anchors for seats')
-    check(anchors['sign_name']['size']==[1.04,.26] and anchors['sign_name']['position'][0]>2.0,'Blank sign has usable size above rear door')
+    sign=anchors['sign_name']
+    check(sign['size']==[1.04,.26] and np.allclose(sign['position'],[-2.3925,3.20,-2.812])
+          and sign['module']=='name_sign' and sign['yaw_degrees']==180,'Blank sign and outward anchor in rear-left wall bay')
     check(np.linalg.norm(np.array(anchors['spawn']['position'])-np.array(anchors['exit']['position']))>=1.2,'Spawn at least 1.2m from exit')
     report.update({'placed_triangles':tris,'placed_surfaces':surfaces,'plant_triangles':plant_tris,
                    'passed':all(c['passed'] for c in report['checks'])})

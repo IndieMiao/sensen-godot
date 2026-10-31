@@ -480,9 +480,9 @@
       "name": "name_sign",
       "file": "name_sign.glb",
       "position": [
-        2.48,
-        2.92,
-        -2.87
+        -2.3925,
+        3.2,
+        -2.8699999999999997
       ],
       "yaw_degrees": 0,
       "colliders": [],
@@ -1112,8 +1112,8 @@
     {
       "name": "sign_name",
       "position": [
-        2.48,
-        2.92,
+        -2.3925,
+        3.2,
         -2.812
       ],
       "yaw_degrees": 180,
@@ -11646,6 +11646,7 @@
     ],
     "note": "Analytic preflight from authored metre envelopes; verify raw exported bounds and Godot physics next."
   },
+  "revision": "v1.1",
   "author": "Huangzhong",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "source_dimensions": {

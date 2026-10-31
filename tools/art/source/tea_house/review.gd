@@ -70,7 +70,7 @@ func geometry():
 			var number=str(seat.name).trim_prefix("seat_table").split("_")[0]
 			var table=room.get_node("tea_table_"+number);var delta=table.position-vec(seat.position);delta.y=0
 			check((-room.get_node(seat.name).basis.z).dot(delta.normalized())>.999,seat.name+": yaw faces the tea table")
-	check(room.get_node("sign_name").get_meta("size")==[1.04,.26],"Blank door sign carries runtime text size")
+	check(room.get_node("sign_name").get_meta("size")==[1.04,.26],"Blank wall sign carries runtime text size")
 	check(room.find_children("*","OmniLight3D",true,false).size()==3,"Exactly three local lantern lights")
 	report.imported={"triangles":tris,"surfaces":surfaces,"plant_triangles":stats.plant_triangles,
 		"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
@@ -148,7 +148,24 @@ func plant_controls():
 
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
-	setup();geometry();await avatar();await routes()
+	setup();geometry();await avatar()
+	if "--sign-only" in OS.get_cmdline_user_args():
+		pose(6.72);await capture("v1.1_default_43deg_360")
+		var sign=room.get_node("name_sign");var low=Vector2(INF,INF);var high=-Vector2(INF,INF)
+		for node in sign.find_children("*","MeshInstance3D",true,false):
+			for vertex in node.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+				var point=camera.unproject_position(node.global_transform*vertex);low=low.min(point);high=high.max(point)
+		check(low.x>=0 and high.x<=360 and low.y>=100 and high.y<=710,"Complete sign lies inside default viewport and clear of HUD bands")
+		var sign_rect=Rect2(low,high-low).grow(4)
+		for name in ["npc_keeper","npc_hana","npc_lena"]:
+			var point=camera.unproject_position(room.get_node(name).position+Vector3.UP*2.05)
+			check(not sign_rect.intersects(Rect2(point-Vector2(36,9),Vector2(72,18))),"Sign clear of projected nameplate allowance: "+name)
+		report.sign={"module_position":xyz(sign.position),"anchor":xyz(room.get_node("sign_name").position),
+			"screen_min":[low.x,low.y],"screen_max":[high.x,high.y],"writable_size":[1.04,.26]}
+		report.passed=report.checks.all(func(c):return c.passed)
+		var record=FileAccess.open(output+"/sign-v1.1-godot.json",FileAccess.WRITE);record.store_string(JSON.stringify(report,"\t")+"\n");record.close()
+		print("TEA_SIGN_VALIDATION ",report.passed);get_tree().quit(0 if report.passed else 1);return
+	await routes()
 	pose(6.72);await capture("default_43deg_360")
 	vp.size=Vector2i(1200,1000);pose(11.8,43,45,Vector3(0,1.7,.3));await capture("overview")
 	for sample in [["wall",Vector3(-3.19,2.50,1.50)],["beam",Vector3(-3.23,3.782,.90)],["floor",Vector3(2.50,.082,2.55)]]:

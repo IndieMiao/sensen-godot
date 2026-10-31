@@ -236,7 +236,9 @@ def shelves_and_door():
     cube('Door lintel',(0,2.375,.05),(1.22,.10,.15),'oak_light',.018,'wood')
     cylinder_obj=cylinder('Round wooden door knob',(-.36,1.08,.135),.052,.065,'oak_dark',vertices=16)
     cylinder_obj.rotation_euler.x=math.pi/2
-    begin('name_sign',[2.48,2.92,-2.87],changes=['Blank separate sign above the decorative door, clear of Ama nameplate'])
+    sign=next(anchor['position'] for anchor in PLAN['anchors'] if anchor['name']=='sign_name')
+    begin('name_sign',[sign[0],sign[1],sign[2]-.058],changes=[
+        'v1.1: move unchanged blank sign to the rear-left wall bay below the beam; keep 1.04 x .26m writable area'])
     cube('Blank warm ivory sign',(0,0,0),(1.20,.38,.055),'linen',.024)
     for y in [-.173,.173]:cube('Sign honey horizontal trim',(0,y,.034),(1.18,.028,.04),'oak',.008,'wood')
     for x in [-.583,.583]:cube('Sign honey vertical trim',(x,0,.034),(.028,.32,.04),'oak',.008,'wood','Y')
@@ -277,7 +279,6 @@ def shared_plant(name,source,at,scale=1.):
 def finish():
     anchors=PLAN['anchors']
     for anchor in anchors:
-        if anchor['name']=='sign_name':anchor['position']=[2.48,2.92,-2.812]
         obj=bpy.data.objects.new(anchor['name'],None);bpy.context.scene.collection.objects.link(obj)
         obj.location=p.v(anchor['position']);obj.rotation_euler.z=math.radians(anchor.get('yaw_degrees',0))
         obj.empty_display_type='ARROWS';obj.empty_display_size=.14
@@ -290,7 +291,7 @@ def finish():
             {'position':[1.02,2.55,-2.64],'color':'FFDC9C','energy':1.1,'range':1.9}]
     p.MANIFEST_EXTRA.update({'anchors':anchors,'spawn':[.30,.08,2.55],'floor_y':.08,'footprint_m':[6.8,6.4],
         'boundaries':boundaries,'local_lights':points,'preflight':PLAN['preflight'],
-        'author':'Huangzhong','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
+        'revision':'v1.1','author':'Huangzhong','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
         'source_dimensions':{'counter_height_m':1.15,'tabletop_height_m':1.0,'seat_height_m':.715,'door_height_m':2.33},
         'anchor_yaw_convention':'0 faces -Z; 180 faces +Z; seats are absolute world surface positions'})
     for image in bpy.data.images:
