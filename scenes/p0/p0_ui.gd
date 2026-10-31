@@ -1856,6 +1856,31 @@ var _fingers := {}         # touch index (the mouse is -1) → down
 func _input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch: _finger(e.index, e.pressed)
 	elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT: _finger(-1, e.pressed)
+	# SGODOT-260 Q3: a touch, a drag, a click or a key — the runtime sets the view on its next frame (view_wanted)
+	if e is InputEventScreenTouch or e is InputEventScreenDrag or e is InputEventMouseButton or e is InputEventKey \
+			or (e is InputEventMouseMotion and (e as InputEventMouseMotion).button_mask != 0):
+		_touched = true
+
+var _touched := false
+var _shown_of: Dictionary = {}   # the session view the HUD and panels last showed (by reference)
+var _shown_sig := []
+var _shown_ms := -1_000_000
+
+## SGODOT-260 Q3: whether the runtime's frame should set the view (set_view rebuilds nothing unchanged, but working that
+## out every frame was most of a frame's view cost). Due when the server's view is new, when what this UI is showing
+## changed under it (a drawer opened or closed, the world, the bar's action or its pick, offline), after any input,
+## and otherwise at least every VIEW_FLOOR_MS — every countdown's second, and whatever moves without saying so, catch
+## up within a quarter second, as Today's rows always have (_refresh_today). `server_view` is the session's own view
+## (current() projects it); `now_ms` the clock.
+const VIEW_FLOOR_MS := 250
+func view_wanted(server_view: Dictionary, now_ms: int) -> bool:
+	var sig := [modal_kind, _modal, surface, bar_mode, space, selected_seed, selected_bait, offline]
+	if not _touched and is_same(server_view, _shown_of) and sig == _shown_sig and now_ms - _shown_ms < VIEW_FLOOR_MS: return false
+	_touched = false
+	_shown_of = server_view
+	_shown_sig = sig
+	_shown_ms = now_ms
+	return true
 
 func _finger(index: int, down: bool) -> void:
 	if down: _fingers[index] = true
@@ -2759,7 +2784,9 @@ func open_today(given: Array = []) -> void:
 func _refresh_today(force := true) -> void:
 	if modal_kind != "today" or not is_instance_valid(_today_panel): return
 	var now := Time.get_ticks_msec()
-	if not force and now - _today_refresh_ms < 250: return
+	# at most four times a second; 10 ms short of it so the runtime's quarter-second view (view_wanted, its own clock read
+	# in the same frame) always gets through, one gate and not two (哪吒 on #576)
+	if not force and now - _today_refresh_ms < VIEW_FLOOR_MS - 10: return
 	_today_refresh_ms = now
 	var rows := _today_given if not _today_given.is_empty() else P0Logic.today_rows(view)
 	var sig := JSON.stringify(rows) + space_here() + place + str(spot_reachable())

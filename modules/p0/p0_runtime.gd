@@ -424,7 +424,7 @@ func _process(dt: float) -> void:
 		if _probe_left <= 0.0: _probe()
 	var v := session.current()
 	if v.is_empty(): return
-	ui.set_view(v)
+	if ui.view_wanted(session.view, Time.get_ticks_msec()): ui.set_view(v)   # SGODOT-260 Q3: not every frame
 	_call("p0_frame", [v, dt])
 
 func _on_action(cmd: Dictionary) -> void:
