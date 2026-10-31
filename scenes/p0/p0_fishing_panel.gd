@@ -48,6 +48,24 @@ func _ready() -> void:
 func last_result() -> Dictionary:
 	return _last
 
+## q(49) (SGODOT-376): one card at a time. This panel is canvas layer 30, over the P0 UI and its TipCard (layer 10), so
+## the first cast's `Casting uses 5 Energy` came up under `Watch the float…` / `A bite!…`, half hidden. While a TipCard
+## is on screen the status card waits; when the tip closes (its time, a tap, or doing what it teaches) the card comes
+## back with its latest line. Every writer of the card's visibility runs this after it.
+var _held_for_tip := false
+
+func _hold_for_tip() -> void:
+	if rt != null and rt.ui != null and rt.ui.tip_on_screen():
+		_held_for_tip = true
+		_message_card.visible = false
+	elif _held_for_tip:
+		_held_for_tip = false
+		_message_card.visible = visible and phase != "result" and (phase != "playing" or int(model.get("step", 0)) < 40)
+
+func _refresh_button() -> void:
+	super._refresh_button()
+	_hold_for_tip()
+
 ## +1: the gauge goes right of the float, -1 left (the pond frames the float with room on that side). A float beside
 ## the player's box points away from it; one above or below it takes the side with more room.
 static func gauge_side(float_x: float, player: Rect2, width: float) -> int:
@@ -101,6 +119,7 @@ func open_p0(runtime: P0Runtime, water_id: String, spec: Dictionary, target: Vec
 	_last = {}
 	_gauge.model = {}
 	for n in [_message_card, _primary, _guide, _gauge]: n.visible = true
+	_hold_for_tip()
 	_title.text = title
 	show()
 	_fit.call_deferred()
@@ -168,6 +187,7 @@ func _p0_hook() -> void:
 	_refresh_button()
 
 func _process(dt: float) -> void:
+	_hold_for_tip()
 	if not visible or rt == null or busy: return
 	var now := Time.get_ticks_msec()
 	if phase in ["waiting", "hook"]:
@@ -198,7 +218,7 @@ func _process(dt: float) -> void:
 			FishingModel.step(model, held, tier)
 		_gauge.model = model
 		_gauge.queue_redraw()
-		_message_card.visible = int(model.get("step", 0)) < 40
+		_message_card.visible = int(model.get("step", 0)) < 40 and not _held_for_tip
 		_primary.set("progress", float(model.progress))
 		_primary.set("pulling", held)
 		_primary.queue_redraw()

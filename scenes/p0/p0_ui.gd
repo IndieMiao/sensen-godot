@@ -3739,6 +3739,10 @@ func tip_pending() -> bool:
 func tip_showing(key: String) -> bool:
 	return tips != null and tips.showing == key and _teach != null and _teach.visible
 
+## Any TipCard is on screen: the pond's fishing status card waits under it (q(49), SGODOT-376).
+func tip_on_screen() -> bool:
+	return _teach != null and _teach.visible
+
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
 	if tips and tips.did(action): _hide_tip(false)
