@@ -2,6 +2,7 @@ extends GdUnitTestSuite
 
 const FARM := preload("res://scenes/farm/farm.tscn")
 var _locale := ""
+var _posted := false
 
 func before_test() -> void:
 	_locale = TranslationServer.get_locale()
@@ -43,10 +44,21 @@ func _farm(size: Vector2i) -> Node:
 	farm._update_camera()
 	return farm
 
+func _drawn() -> void:
+	_posted = true
+
+## The screenshot is only a review aid: a window that does not draw (headless, the runner's minimized window on macOS,
+## an occluded one) never posts a draw, so it waits at most 2 s for one and skips the picture without it.
 func _capture(farm: Node, file: String) -> void:
-	if DisplayServer.get_name() == "headless": return
+	if DisplayServer.get_name() == "headless" or not DisplayServer.window_can_draw(): return
 	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	_posted = false
+	RenderingServer.frame_post_draw.connect(_drawn, CONNECT_ONE_SHOT)
+	var start := Time.get_ticks_msec()
+	while not _posted and Time.get_ticks_msec() - start < 2000: await get_tree().process_frame
+	if not _posted:
+		RenderingServer.frame_post_draw.disconnect(_drawn)
+		return
 	var directory := "res://output/ui-redesign-2026-09-21/farm"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(directory))
 	assert_int(farm.get_viewport().get_texture().get_image().save_png(directory.path_join(file))).is_equal(OK)
