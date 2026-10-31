@@ -41,3 +41,26 @@ func test_pushing_against_the_pond_stands_after_a_tenth_of_a_second_and_runs_aga
 	a.step(1.0 / 60.0)
 	assert_str(a._clip).is_equal("idle")
 	assert_str(a.state).is_equal("idle")
+
+## 周瑜 on #585: a labour beat in the middle of a push does not count toward the 0.1 s — mover.stuck keeps its last
+## value while the mover is not stepped, so without the actor's `stepped` guard the beat would fill the debounce and
+## the body would stand the moment it pushed again.
+func test_a_labour_beat_mid_push_does_not_count_toward_standing() -> void:
+	var a := _actor()
+	a.set_input(Vector2(1, 0))   # east, into the pond at (6,7)
+	var walked := 0
+	while not a.mover.stuck and walked < 120:
+		a.step(1.0 / 60.0)
+		walked += 1
+	assert_bool(a.mover.stuck).is_true()
+	a.labour("till", a.position + Vector3(1, 0, 0))   # under 0.1 s against it, then one beat with the stick held
+	var beat := 0
+	while a.state == "labour" and beat < 120:   # the frame the beat ends steps the push again
+		a.step(1.0 / 60.0)
+		beat += 1
+	assert_str(a.state).is_equal("move")
+	assert_bool(a.mover.stuck).is_true()
+	_frames(a, 2)                # 0.05 s of pushing since the beat: still the run
+	assert_str(a._clip).is_equal("run")
+	_frames(a, 5)                # past 0.1 s: stands
+	assert_str(a._clip).is_equal("idle")
