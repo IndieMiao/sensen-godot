@@ -1,0 +1,71 @@
+{
+  "base": "assets/rooms/_shared/shell_hall/hall_albedo_ao.png",
+  "base_sha256": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab",
+  "same_uv_layout": true,
+  "changed_regions": [
+    {
+      "role": "wood_dark",
+      "rect_px": [
+        0,
+        1024,
+        256,
+        256
+      ],
+      "override_hex": "783B22"
+    },
+    {
+      "role": "stone",
+      "rect_px": [
+        256,
+        1536,
+        256,
+        256
+      ],
+      "override_hex": "C8C3B9"
+    },
+    {
+      "role": "cloth_green",
+      "rect_px": [
+        1536,
+        1792,
+        256,
+        256
+      ]
+    },
+    {
+      "role": "print_portrait",
+      "rect_px": [
+        1536,
+        1280,
+        256,
+        256
+      ]
+    },
+    {
+      "role": "print_landscape",
+      "rect_px": [
+        1792,
+        1280,
+        256,
+        256
+      ]
+    },
+    {
+      "role": "sky",
+      "rect_px": [
+        1792,
+        1024,
+        256,
+        256
+      ]
+    }
+  ],
+  "palette_overrides": {
+    "wood_dark": "783B22",
+    "cloth_green": "42683A",
+    "stone": "C8C3B9"
+  },
+  "shell_regions_unchanged": true,
+  "override_reason": "Keep source hue families while matching shaded furniture readability under native P0 ACES lighting; cloth tile center alone is the sofa swatch.",
+  "purpose": "Original miniature landscape, rug weave, hide markings and static mirror impression; no extra room texture."
+}

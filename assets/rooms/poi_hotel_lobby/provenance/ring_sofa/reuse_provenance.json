@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "New 2.43 m outside diameter, six equal 60-degree cushions; seat top .715 m above floor."
+  ],
+  "triangles": 6768,
+  "surfaces": 1,
+  "exported_sha256": "740d7426bd5094596e91203fda582c3d2e5a10b6b49bc4cb84e5565bd8d3c86a"
+}

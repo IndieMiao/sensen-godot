@@ -1,0 +1,135 @@
+{
+  "assets": [
+    {
+      "name": "ring_sofa",
+      "triangles": 6768,
+      "surfaces": 1,
+      "bytes": 178476
+    },
+    {
+      "name": "central_planter",
+      "triangles": 2068,
+      "surfaces": 1,
+      "bytes": 55540
+    },
+    {
+      "name": "central_foliage",
+      "triangles": 4992,
+      "surfaces": 1,
+      "bytes": 136644
+    },
+    {
+      "name": "cream_armchair",
+      "triangles": 1776,
+      "surfaces": 1,
+      "bytes": 48680
+    },
+    {
+      "name": "round_side_table",
+      "triangles": 240,
+      "surfaces": 1,
+      "bytes": 8092
+    },
+    {
+      "name": "frame_landscape",
+      "triangles": 542,
+      "surfaces": 2,
+      "bytes": 17104
+    },
+    {
+      "name": "green_table_lamp",
+      "triangles": 696,
+      "surfaces": 1,
+      "bytes": 20044
+    },
+    {
+      "name": "hearth",
+      "triangles": 5208,
+      "surfaces": 1,
+      "bytes": 151596
+    },
+    {
+      "name": "hearth_mantel",
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 4432
+    },
+    {
+      "name": "mantel_decor",
+      "triangles": 1622,
+      "surfaces": 1,
+      "bytes": 45852
+    },
+    {
+      "name": "elevator",
+      "triangles": 672,
+      "surfaces": 1,
+      "bytes": 19668
+    },
+    {
+      "name": "key_rack",
+      "triangles": 4524,
+      "surfaces": 1,
+      "bytes": 124052
+    },
+    {
+      "name": "wall_clock",
+      "triangles": 592,
+      "surfaces": 1,
+      "bytes": 18232
+    },
+    {
+      "name": "blank_name_plaque",
+      "triangles": 284,
+      "surfaces": 1,
+      "bytes": 9344
+    },
+    {
+      "name": "luggage_cart",
+      "triangles": 2712,
+      "surfaces": 1,
+      "bytes": 74700
+    },
+    {
+      "name": "low_bookshelf",
+      "triangles": 2372,
+      "surfaces": 1,
+      "bytes": 110824
+    },
+    {
+      "name": "floor_lamp",
+      "triangles": 1392,
+      "surfaces": 1,
+      "bytes": 37972
+    },
+    {
+      "name": "green_rug",
+      "triangles": 220,
+      "surfaces": 1,
+      "bytes": 7668
+    },
+    {
+      "name": "cowhide_rug",
+      "triangles": 316,
+      "surfaces": 1,
+      "bytes": 22636
+    }
+  ],
+  "unique_triangles": 37104,
+  "furniture_scene_triangles": 42176,
+  "furniture_surfaces": 28,
+  "scene_triangles": 60878,
+  "static_draw_surfaces": 38,
+  "shared_fire_draws": 2,
+  "atlas": {
+    "file": "room_albedo_ao.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "shared_plant_and_fx_textures": "unchanged existing library assets"
+  },
+  "dynamic_particle_triangles_max": 40,
+  "scene_triangles_with_particles_max": 60918,
+  "draw_surfaces_with_fx": 40
+}

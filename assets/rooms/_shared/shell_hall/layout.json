@@ -200,7 +200,7 @@
   "palette": "hall_palette.json",
   "revision": "SGODOT-319 shell v1",
   "dimensions": {
-    "source": "Unspecified heights inferred from approved main; pending shell review",
+    "source": "Formal shell dimensions approved by art director, SGODOT-319 5fe1b06c",
     "window_aperture_width": 1.24,
     "window_aperture_height": 2.04,
     "window_sill_y": 1.2,

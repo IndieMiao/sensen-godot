@@ -5,7 +5,7 @@
     2048,
     2048
   ],
-  "status": "SGODOT-319 shell v1 pending art-director review",
+  "status": "SGODOT-319 shell dimensions approved: 5fe1b06c / PR 594",
   "uv_origin_gltf": "top-left",
   "gutter_px": 16,
   "slots": {
@@ -1131,6 +1131,16 @@
     "stone": "stone"
   },
   "skin_contract": "Same geometry and UVs across N1-N4. Recolor semantic regions; room-specific contact AO is not baked into this shared shell.",
+  "pattern_replacement": {
+    "parquet": {
+      "allowed": true,
+      "world_size_m": [6.6, 6.2],
+      "rotation_degrees": 90,
+      "world_x_to_uv": "-V",
+      "world_z_to_uv": "-U",
+      "example": "N2 stone tiles, DFD1B4; no shell geometry change"
+    }
+  },
   "reserved_for_furniture": [
     "wood_dark",
     "wood_mid",

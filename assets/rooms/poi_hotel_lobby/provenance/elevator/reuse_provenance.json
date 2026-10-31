@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "Closed decorative brass double door, no digits, service or opening."
+  ],
+  "triangles": 672,
+  "surfaces": 1,
+  "exported_sha256": "d5771ee146c755573c67c919fa30655594cf032ae1326f68ef43f2c012d810c8"
+}

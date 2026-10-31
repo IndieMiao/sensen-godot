@@ -233,11 +233,13 @@ def contract():
             "kind": "shell_baked" if name in list(COLORS)[:6] else "solid_reuse_swatch",
             "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."}
     write_json(KIT / "hall_palette.json", {"schema_version": 1, "atlas": "hall_albedo_ao.png", "size": [2048, 2048],
-        "status": "SGODOT-319 shell v1 pending art-director review", "uv_origin_gltf": "top-left",
+        "status": "SGODOT-319 shell dimensions approved: 5fe1b06c / PR 594", "uv_origin_gltf": "top-left",
         "gutter_px": 16, "slots": entries,
         "hallkit_324_mapping": {name: name for name in ["oak", "oak_light", "oak_edge", "brass", "linen", "sky",
             "sage", "iron", "porcelain", "sage_dark", "linen_green", "petal", "print_portrait", "print_landscape", "glass", "stone"]},
         "skin_contract": "Same geometry and UVs across N1-N4. Recolor semantic regions; room-specific contact AO is not baked into this shared shell.",
+        "pattern_replacement": {"parquet": {"allowed": True, "world_size_m": [6.6, 6.2], "rotation_degrees": 90,
+            "world_x_to_uv": "-V", "world_z_to_uv": "-U", "example": "N2 stone tiles, DFD1B4; no shell geometry change"}},
         "reserved_for_furniture": SWATCHES})
 
 
@@ -357,7 +359,7 @@ def bake_export():
         rot = inv.to_3x3()
         ids = sorted({vi for f in faces for vi in f.vertices})
         mapping = {old: new for new, old in enumerate(ids)}
-        out = bpy.data.meshes.new(name + "_mesh")
+        out = bpy.data.meshes.new(name + "_mobile")
         out.from_pydata([inv @ data.vertices[i].co for i in ids], [], [[mapping[i] for i in f.vertices] for f in faces])
         out.update()
         layer = out.uv_layers.new(name="HallAtlas")
@@ -438,7 +440,7 @@ def main():
     windows()
     p.MANIFEST_EXTRA.update(floor_y=FLOOR_Y, footprint=[6.8, 6.4], wall_height=WALL_H,
         texture="hall_albedo_ao.png", palette="hall_palette.json", revision="SGODOT-319 shell v1",
-        dimensions={"source": "Unspecified heights inferred from approved main; pending shell review",
+        dimensions={"source": "Formal shell dimensions approved by art director, SGODOT-319 5fe1b06c",
             "window_aperture_width": HOLE_W, "window_aperture_height": HOLE_H, "window_sill_y": SILL_Y,
             "window_centers_z": WINDOW_Z, "window_panes": [3, 4], "wainscot_top_y": 1.1525,
             "cornice_bottom_y": 3.4625, "cornice_top_y": 3.746, "plank_size": [.64, .16],

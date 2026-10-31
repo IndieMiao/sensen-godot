@@ -1,68 +1,101 @@
-# SGODOT-319 公共大厅壳 v1
+# SGODOT-319 公共大厅壳 + N1 酒店大堂 v1
 
-赵云 · 2026-10-31。当前交付是 **公共壳先行检查稿**，供 315 / 316 / 317 / 318 四间室内共用。上官婉儿检查壳后再继续 N1 酒店家具包；本轮不代表 N1 完成或用户批准合并。
+赵云 · 2026-10-31。壳已获上官婉儿技术通过（319 `5fe1b06c`，PR #594 `3aa23466`）。本次增量交 N1 首版技术检查和画面验收，PR 保持草稿，未合并，尚待不知火舞验收与用户批准。
 
-## 依据与范围
+## 依据与交付
 
-- 315 R3 主图：`reference/SGODOT-315_Hotel_Lobby_Main_2026-10-31.png`；用户批准记录 `315 9704634d`，不知火舞复核 `3a4547e9`，上官婉儿拆分 `d231c310`。
-- 两面墙、无前墙和门、无墙端方柱；暖米色墙、深木护墙板与顶线、厚踢脚、两扇三列四行方格窗、蜂蜜色人字地面。窗洞真实贯通，窗框、窗格单独导出。
-- 保留 `mine_hut.blend / KIT_room_shell / Honey timber foundation` 的可编辑地台和圆角，降低基底顶面；重新制作地面和墙体。墙体构造沿用 Basic Room 的米制与具名部件工具。逐件来源与改动见 `shell_reuse_provenance.json`。
-- 参考配套的旧地面色 `#482D1E` 已被 315 复核意见否定。本壳以主图蜂蜜木方向 `#CB8655` 为基础，护墙板用 `#652E18`，深木保留色块 `#551B0A`；不是对旧色板深棕地面的复现。
+Stark 的 315 R3 主图、SVG 俯视图和清单保留在 `reference/`；批准记录 `315 9704634d`，不知火舞复核 `3a4547e9`，上官婉儿拆分 `d231c310`。SVG 按 120 px = 1 m 读取，未标高度采用 H=1.745 m 的比例基线。
 
-## 尺寸与待核高度
+- 公共壳：`assets/rooms/_shared/shell_hall/`、`scenes/shell_hall/`。
+- N1：`assets/rooms/poi_hotel_lobby/`、`scenes/poi_hotel_lobby/`。含 19 个 GLB、逐件 provenance、layout、asset_stats、一张 2048² 图集。
+- 源：`tools/art/source/poi_hotel_lobby/poi_hotel_lobby.blend`，19 个 KIT 集合和 389 个具名编辑部件。重复家具用实例，壳及共享植物保留各自源文件，完整装配由 Godot 场景和 layout 复现。
 
-H=1.745 m；原图未写明的高度按主图比例暂定，**以下窗、护墙板与顶线高度是建模取值，尚不是 Stark 补交的测量值**。所有坐标为 Godot 米制，Y 向上，+Z 为开放前沿。地面中心为原点。
+## 正式尺寸
 
-| 项目 | 本版取值 |
+Godot 米制，Y 向上，+Z 为开放前沿；地面中心为原点。以下窗、护墙板、顶线取值已由上官婉儿正式核定。
+
+| 项目 | 取值 |
 |---|---|
-| 地台 | 6.8 x 6.4 m；底面 -0.28，顶面 0.08 |
-| 墙高 / 厚度 | 从地面起 3.70 m，顶面 Y=3.78；厚 0.20 m |
-| 左墙 / 后墙轴心 | (-3.30, 0.08, 0)，yaw 90° / (0.10, 0.08, -3.10)，yaw 0° |
-| 护墙板顶 | Y=1.1525，即离地约 1.073 m（约 0.615H） |
-| 踢脚主条 | 从地面起 0.19 m，向内厚 0.105 m，另有 0.035 m 上缘条 |
-| 顶线 | Y=3.4625 至 3.746，含主板、上阶与下沿 |
-| 共用窗洞 | 宽 1.24 x 高 2.04 m；窗台 Y=1.20，即离地 1.12 m |
-| 两窗中心 | 左墙 Z=-1.78、+1.78，洞口中心 Y=2.22 |
-| 窗框与窗格 | 同洞口的独立件，三列四行；两窗共用一个透明玻璃 surface |
-| 人字拼单块 | 0.64 x 0.16 m；原创程序化色纹，缝宽约 5 mm，无木纹照片 |
-| spawn / exit | (0, 0.08, 2.50) / (0, 0.08, 2.88) |
+| 地台 | 6.8 × 6.4 m，底面 Y=-0.28，顶面 Y=0.08 |
+| 墙 | 两面，离地高 3.70 m，顶面 Y=3.78，厚 0.20 m；无前墙、门、墙端方柱 |
+| 护墙板顶 / 顶线 | Y=1.1525 / Y=3.4625–3.746 |
+| 共用窗洞 / 窗台 | 1.24 × 2.04 m / Y=1.20 |
+| 两窗中心 | 左墙 Z=-1.78、+1.78，Y=2.22；窗框、三列四行窗格独立 |
+| 环形沙发 / 中央花池 | 外径 2.43 m / 1.09 m；六块坐垫 |
+| 坐面 | 离地 0.715 m，挂点 Y=0.795；扶手椅及环形沙发一致 |
+| 扶手椅 ×2 | 原 324 尺寸 1.50 × 0.89 × 1.326 m，未缩放 |
+| 圆边桌 ×4 | 原 324 直径 1.10 m，桌面离地 1.13425 m（0.65H） |
+| 新矮书架 / 白罩落地灯 | 约 0.90 × 0.42 × 1.10 m / 高约 1.90 m |
+| 关门电梯 / 行李车 | 约 1.40 × 0.16 × 2.60 m / 0.95 × 0.77 × 1.75 m |
+| 钥匙格墙 / 三只挂钟 | 宽 2.21、高 1.30 m，挂装 Y=0.88 / 原直径 0.78 m |
+| 空白匾文字区域 | sign_name=(0.62,3.20,-2.92)，size=[2.28,0.145] m |
+| spawn / exit | (0,0.08,2.50) / (0,0.08,2.88) |
 
-前沿与右沿只有不可见碰撞边界。出口放在前沿挡边以内，0.25 m 半径、1.745 m 高胶囊可抵达；后续程序按出口挂点触发离开。没有 `use_*` 或 `npc_*`。酒店专用 `sign_name`、8 个座位及家具在壳检查后制作。
+完整实测包围盒见 `n1-measurements.md`。本版不设前台或收银台，0.66H 台面基线无对应新增设施。装配不带 NPC、文字、UI、环境光、太阳或相机；局部灯和共享炉火随资产提供。
 
-## 图集与 324 交接
+## 原尺寸家具与通道
 
-`assets/rooms/_shared/shell_hall/hall_albedo_ao.png` 为唯一 2048² 图集，6 个壳烘焙区 + 32 个固定复用色块。`hall_palette.json` 给出色号、PNG 像素区、glTF 与 Blender UV 区、安全边、全部 16 个 324 旧语义色的目标映射；人读表在 `atlas-regions.md`。32 色 PNG 中心像素均与 JSON RGB8 逐项相等。
+324 比 SVG 家具大。本版保留原尺寸、数量和 8 座，把环形沙发移到 (1.10,0.08,0.58)，两扶手椅沿左墙分列，第四圆桌摆在后排扶手椅旁，其余三桌围绕沙发。最终位置见 `tools/art/source/poi_hotel_lobby/layout_plan.json`。
 
-glTF / PNG 以左上为原点，Blender V 轴反向，表内同时给出两种坐标。色块至少保留 16 px 安全边。细件可用色块中心 UV；需保留局部纹理的件映射到安全区内。四间可沿用同一 UV 区替换颜色，并保留 AO 明暗调制。两块画心色块留给替换图案。
+- 主通道用半径 0.35 m、高 1.745 m 胶囊从 spawn 到电梯前验证，对应净宽至少 0.70 m。
+- 8 个座位接近区和 16 个站位用半径 0.25 m 的角色胶囊验证。部分座位侧边小于 0.70 m，最小接近区净空半径约 0.289 m；这些支路不算双人主通道。
+- 16 个站位中心距离至少 0.55 m，均在同一可达区域。这是静态几何容量验证，未模拟 16 人同时移动。
+- seat_sofa_1..6、seat_armchair_1..2 均带坐面 Y、module、yaw、stand；yaw 按角色默认朝 -Z 的约定，朝向可走区。
+- 家具与重复实例按 layout 生成碰撞；壳生成地面、两面墙及开放边沿的不可见边界；植物使用半径 0.31 m 的简化碰撞。
+- 没有未分类几何穿插。线脚安装搭接、贴墙固定、地毯薄层与家具脚接触单列；花池开口有到达土面的射线验证。
 
-壳只烘自身接缝 AO，没有家具压痕或直射光；N1 摆件后的接触阴影应随家具包验证。324 的旧文件与临时图集不在本次改动内，未宣称已完成其重映射。采用 `hall_palette.json`、`shell_asset_stats.json` 等独立文件名以避免覆盖 #563 的数据。
+## 复用与图集
+
+324 来源固定为 PR #563 的 `104446a2a995c8a0269d12d27308b3d547b29f6e`。准备脚本从 git 取回具名 Blender 源。扶手椅、圆边桌、风景画逐三角形与原件比对，尺寸、面数不变；N1 副本仅改 UV、配色及局部标量 AO，不改黄忠原文件。
+
+邮局提供三盏台灯、三只钟及改成浅挂柜的钥匙格主体；Deluxe 10 提供壁炉、壁炉台、烛台，新增浅石饰面、椭圆镜和小相框。火焰复用 178 的 fx_hearth_fire.tscn。两盆落地植物直接引用共享 olive_tree.glb，中央花池植物另建。牛皮毯为新 316 三角形平面件。
+
+公共 hall_albedo_ao.png 字节不变。hall_palette.json 包含 6 个壳区域、32 个色块、像素及 glTF/Blender UV、16 px 安全边和 324 语义色映射。N1 的 room_albedo_ao.png 沿用同一 UV 布局，壳和家具共用这一张 2048² 房间图集；植物、炉火继续使用既有共享库贴图。
+
+**parquet 区允许换花纹**，N2 可换石砖。地板 UV 已转 90°：世界 X 对应 -V，Z 对应 -U；范围 6.6 × 6.2 m，见 hall_palette.json.pattern_replacement.parquet，无需改变几何。
+
+N1 家具 AO 存在顶点标量颜色，导入和装配启用 vertex color；保留玻璃、画心及植物的 surface 材质。N1 调色为 wood_dark 783B22、cloth_green 中心色 42683A、stone C8C3B9，相对同语义公共色板色相变化均 ≤10°，记录见 atlas_skin.json。无照片木纹、黑描边、文字或家具移动后留下的地面压痕。
 
 ## 预算与验证
 
-- 6 个 GLB、8 个摆放 surface，摆放后 **12,966 三角形**，其中玻璃为单独 1 个 surface；两种材质共用一个图集。为 N1 的 150k / 50 surface 目标留出余量。
-- GLB 独立检查：真实尺寸、朝向、有限 UV、逐三角形不跨色区、16 px 边界、无退化面、图集引用、每件来源、模块间交叠、窗洞射线与实体墙阳性对照。正常的墙角线脚搭接、窗框安装接触单列；无未分类穿插。
-- Godot 4.7.2 / Vulkan Mobile / RTX 2060 实渲：导入面数与 surface 核对、透明材质保留、地面/墙/边界共 5 个碰撞体、floor Y=.08、出生至中央/窗边/后墙/出口胶囊扫掠，以及四边阻挡对照。完整结果在 `validation.json`。
-- 每个 GLB 的 `.import` 为 `gltf/texture_map_mode=1`，PNG 开启 mipmaps 与 VRAM 压缩。可编辑 Blender 源保留 100 余个具名施工部件、局部根轴心及人字纹源图。
-- 审阅只有一盏带单级阴影的太阳与暖环境光。两处窗格光斑来自真实洞口与窗格遮挡，未烘进图集。审阅正交相机 near=.1 / far=40 m；过大的远裁面会降低单级阴影精度。复用场景不携带太阳或环境光。
-- 当前仅桌面资产与物理检查，无 Android 输入、真机性能、16 人并发或 P2 接入结论。按派活不做工程接入与发包。
+- 完整装配 **60,878 三角形、38 个静态 surface**；共享炉火最多增加 40 个三角形、2 个粒子绘制，总计最多 60,918 / 40，低于 150k / 50。窗玻璃为独立 1 个 surface。
+- 全部 GLB 设置 gltf/texture_map_mode=1，图集启用 mipmaps 与 VRAM 压缩。装配保留各 surface 材质。
+- 几何、图集、局部轴心、324 尺寸和穿插记录见 n1-validation.json.geometry。52 项预布置 Godot 检查通过，最终装配另测胶囊路径、面数、材质、挂点和截图。
+- 白天窗光来自太阳穿过真实窗洞。三盏桌灯、落地灯、炉火共五处局部灯；附同相机开关对比，两个时刻火焰像素变化验证共享粒子运行。
+- 公共壳六个网格名改为 <件名>_mobile，只改 GLB JSON，二进制几何载荷哈希不变，记录见 n1-validation.json.shared_shell_naming。
+- 仅 gs66 RTX 2060 / Godot 4.7.2 Mobile Vulkan 桌面艺术与碰撞验证，无 Android 输入、手机性能、联机或发布结论。
 
-## 审阅图
+## 默认镜头与媒体
 
-所有图片署名 `SGODOT-319 / ZHAOYUN / 赵云`，前缀 `SGODOT-319_N1_v1_`。包含空壳 43° 全景、四面正交一张、正俯视、窗框近景、图集色块表、Stark 主图与空壳阶段对照、日光开关对照。N1 的进门默认 6.72 m 取景及家具近景待壳检查后交，不把这张 11 m 空壳全景当作游戏默认镜头。
+entry_360 为 360×800，entry_720 为 720×1600，使用原生 P0Room 在 spawn 进门后的 **43° / 6.72 m / 跟随玩家**构图。原生导航吸附约 3.54 cm，证据见 native-camera-n1-v1.json。图片不画人或 UI，PNG 元数据署赵云，其余审阅板署可见姓名。
+
+原生 P0 的 near=.05 / far=4000 会降低单级阴影精度。本组保持原生位置、方向和宽度，裁面使用 .1 / 40 m；layout.camera 记录推荐裁面与全景相机，程序接入需采用合适裁面。未改 P0Room 或运行时分支，探针临时复制内容已还原，记录在 n1-validation.json.runtime_restoration。
+
+`cam_default` 是位于 spawn 的跟随目标基准，不是相机眼点；role=camera_follow_target，携带 43°、45°、6.72 m 与推荐裁面元数据。原生相机实际眼点和 basis 以探针记录为准。横匾按最新派活使用 sign_name，替代旧卡模板的 sign_door。
+
+6.72 m 视宽自然裁掉侧边，另交 43° / 11 m 不裁切整间全景。10 张 N1 图见 media-manifest-n1-v1.json：全景、俯视、壁炉、钥匙墙、环形沙发、进门 360/720、Stark 并排、灯开关、通道图；前缀 SGODOT-319_N1_v1_。原空壳四面等图及 validation.json 保留为已通过的壳阶段证据。
 
 ## 复现
 
-Blender 5.2.2 LTS、Godot 4.7.2；打包脚本需要 Pillow 和 NumPy。渲染前检查共用显卡占用，Godot 使用私有 ADB 5099。`output/.gdignore` 与 Blender 源目录的 `.gdignore` 保留。
+Blender 5.2.2 LTS、Godot 4.7.2，Python 需 NumPy、Pillow、Shapely。用私有 ADB 5099，渲染前检查 GPU，脚本完成自退，只停自己的 PID。保留 output/.gdignore 与源目录 .gdignore。
 
 ```bash
 source ~/.codex-zhaoyun/env.sh
-blender --background --factory-startup --python "$PWD/tools/art/build_shell_hall_319.py"
-blender --background --factory-startup --python "$PWD/tools/art/verify_shell_hall_319.py"
-python3 tools/art/prepare_shell_hall_319.py
-godot --headless --path output/poi-hall-319/project --editor --import
+python3 tools/art/prepare_hotel_lobby_319.py
+output/art-setup/venv/bin/python tools/art/make_hotel_atlas_319.py
+output/art-setup/venv/bin/python tools/art/check_hotel_lobby_plan_319.py
+# 没有壳隔离工程时，先运行 prepare_shell_hall_319.py。
+godot --headless --path output/poi-hall-319/project --script "$PWD/tools/art/check_hotel_lobby_navigation_319.gd" -- "$PWD/output/hotel-lobby-319/plan/physics-fixture.json"
+blender --background --factory-startup --threads 2 --python "$PWD/tools/art/build_hotel_lobby_319.py"
+blender --background --factory-startup --threads 2 --python "$PWD/tools/art/verify_hotel_lobby_319.py"
+python3 tools/art/prepare_hotel_lobby_319.py --project
+godot --headless --path output/hotel-lobby-319/project --editor --import
+# 同一 layout 可用已提交的原生镜头记录；改 spawn 或镜头后重跑：
+# python3 tools/art/capture_hotel_native_camera_319.py --runtime <干净私有 farm-dev checkout>
+# python3 tools/art/prepare_hotel_lobby_319.py --project
 nvidia-smi
-godot --path output/poi-hall-319/project --display-driver wayland --rendering-method mobile --rendering-driver vulkan
-output/art-setup/venv/bin/python tools/art/package_shell_hall_319.py
+godot --path output/hotel-lobby-319/project --display-driver wayland --rendering-method mobile --rendering-driver vulkan --max-fps 30
+output/art-setup/venv/bin/python tools/art/package_hotel_lobby_319.py
 ```
 
-验证工程隔离在 `output/poi-hall-319/project`，不读取生产账号或存档。审阅脚本完成后自行退出；如需中止，只停止本次记录的 PID。
+生成器会重建源和导出件，手工改源需同步生成逻辑或保存独立版本。无 P2 接入、联机容量验证、APK、生产数据或发布操作。

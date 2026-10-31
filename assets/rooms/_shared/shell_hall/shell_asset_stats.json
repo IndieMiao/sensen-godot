@@ -20,7 +20,7 @@
       "triangles": 4552,
       "surfaces": 1,
       "vertices": 2352,
-      "bytes": 161452
+      "bytes": 161456
     },
     {
       "name": "hall_back_wall",
@@ -34,7 +34,7 @@
       "triangles": 864,
       "surfaces": 1,
       "vertices": 448,
-      "bytes": 31288
+      "bytes": 31292
     },
     {
       "name": "hall_window_grid",
