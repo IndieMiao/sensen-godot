@@ -275,7 +275,8 @@ func test_a_refused_compost_at_its_limit_says_when_it_resets() -> void:
 	assert_str(rt.ui.toast_text()).is_equal("Limit reached · 9h 12m")
 
 ## q(259): away from home the full creel's second part says what its fish fetch here and at home (bag.creel_value from
-## the server's view); at home, with no sums or equal ones, the old sentence. Breaks only after a ` · `, three lines at most.
+## the server's view); at home, with no sums or equal ones, the old sentence. Three lines broken by the text itself, no
+## no-break spaces for a line breaker to honour or not (366 c4560e68: an Android build broke `690 at` / `home`).
 func test_away_the_full_creel_says_what_it_fetches_here_and_at_home() -> void:
 	var v := _view()
 	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)   # home: no creel_value
@@ -284,15 +285,16 @@ func test_away_the_full_creel_says_what_it_fetches_here_and_at_home() -> void:
 	v.bag["creel_value"] = {"here": 304, "home": 304}
 	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)   # equal sums: never half a line
 	v.bag["creel_value"] = {"here": 230, "home": 304}
+	assert_str(P0Ui.creel_full_text(v)).is_equal("Creel full · 0 free slots ·\n230 coins here ·\n304 at home")
+	v.bag["creel_value"] = {"here": 460, "home": 690}
 	var said := P0Ui.creel_full_text(v)
-	assert_str(said.replace(" ", " ")).is_equal("Creel full · 0 free slots · 230 coins here · 304 at home")
-	# the only breakable spaces are the ones after a dot (the first part's own spaces stay as the approved toast has them)
-	assert_str(said.get_slice("slots · ", 1)).is_equal("230 coins here · 304 at home")
+	assert_str(said).is_equal("Creel full · 0 free slots ·\n460 coins here ·\n690 at home")
+	assert_bool(said.contains("\u00a0")).is_false()
 	v.bag["creel_value"] = {"here": 1250, "home": 2080}
-	assert_str(P0Ui.creel_full_text(v).replace(" ", " ")).is_equal("Creel full · 0 free slots · 1,250 coins here · 2,080 at home")
+	assert_str(P0Ui.creel_full_text(v)).is_equal("Creel full · 0 free slots ·\n1,250 coins here ·\n2,080 at home")
 
 func test_the_away_creel_toast_fits_three_lines_and_opens_the_bag_on_its_fish_page() -> void:
-	for worth in [{"here": 230, "home": 304}, {"here": 1250, "home": 2080}, {"here": 12500, "home": 20800}]:
+	for worth in [{"here": 230, "home": 304}, {"here": 460, "home": 690}, {"here": 1250, "home": 2080}, {"here": 12500, "home": 20800}]:
 		var v := _view()
 		v.bag["free"] = 0
 		v.bag["creel_value"] = worth
@@ -300,7 +302,7 @@ func test_the_away_creel_toast_fits_three_lines_and_opens_the_bag_on_its_fish_pa
 		ui.toast_creel_full()
 		await await_idle_frame()
 		var label: Label = ui._toasts.label()
-		assert_int(label.get_line_count()).is_less_equal(3)
+		assert_int(label.get_line_count()).is_equal(3)   # its own three lines, none of them wrapped again at 232
 		assert_float(_panel().size.x).is_equal(float(UiTokens.SIZE_TOAST_W))
 		assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 		assert_str(ui._toasts.current_action()).is_equal("Open bag")
