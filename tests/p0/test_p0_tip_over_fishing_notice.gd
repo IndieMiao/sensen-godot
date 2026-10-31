@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
 ## q(49) (SGODOT-376): one card at a time at the pond. The fishing panel (canvas layer 30) draws over the P0 UI's
 ## TipCard (layer 10); the first cast's `Casting uses 5 Energy` came up with `Watch the float…` over it, half hidden.
-## While a TipCard is on screen the status card waits, and comes back with its latest line once the tip closes.
+## While a TipCard is on screen (or about to come up) the status card waits, and comes back with its latest line once
+## the tip closes; a bite closes the tip at once and `A bite!` shows the same frame; the tip's time is wall-clock.
 
 class Recorder extends P0Session:
 	var cmds: Array = []
@@ -50,18 +51,51 @@ func test_the_status_card_waits_while_a_tip_is_up() -> void:
 
 func test_it_comes_back_with_its_latest_line_when_the_tip_closes() -> void:
 	var panel := await _setup()
-	panel.on_cast({"bite_in": 5000, "rarity": 1, "breaks": null})
+	panel.on_cast({"bite_in": 60000, "rarity": 1, "breaks": null})
+	_tip_up(panel)
+	panel._process(0.016)
+	assert_bool(panel._message_card.visible).is_false()
+	panel.rt.ui._hide_tip()                                      # its time ran out (or a tap)
+	panel._process(0.016)
+	assert_bool(panel._message_card.visible).is_true()
+	assert_str(panel._status.text).is_equal("Watch the float. Tap when a fish bites!")
+
+func test_a_bite_closes_the_tip_and_shows_the_same_frame() -> void:
+	var panel := await _setup()
+	panel.on_cast({"bite_in": 60000, "rarity": 1, "breaks": null})
 	_tip_up(panel)
 	panel._process(0.016)
 	assert_bool(panel._message_card.visible).is_false()
 	panel._bite_at = float(Time.get_ticks_msec()) - 10.0       # the bite comes while the tip is still up
 	panel._process(0.016)
 	assert_str(panel.phase).is_equal("hook")
-	assert_bool(panel._message_card.visible).is_false()
-	panel.rt.ui._hide_tip()                                      # its time ran out (or a tap)
-	panel._process(0.016)
+	assert_bool(panel.rt.ui.tip_on_screen()).is_false()         # the bite takes the screen
 	assert_bool(panel._message_card.visible).is_true()
 	assert_str(panel._status.text).is_equal("A bite! Tap to hook the fish!")
+	var ui := panel.rt.ui
+	ui.tips.request("meal")                                      # a tip asked for while the bite waits stays back
+	ui._process(0.016)
+	panel._process(0.016)
+	assert_bool(ui.tip_on_screen()).is_false()
+	assert_bool(panel._message_card.visible).is_true()
+
+func test_a_tip_asked_for_in_the_cast_reply_holds_the_card_from_that_frame() -> void:
+	var panel := await _setup()
+	var ui := panel.rt.ui
+	ui.tips = P0Guide.TipQueue.new()
+	ui.tips.request("cast")                                      # runtime: ui.teach before the pond's on_cast
+	panel.on_cast({"bite_in": 60000, "rarity": 1, "breaks": null})
+	assert_bool(panel._message_card.visible).is_false()         # no flash of `Watch the float…` before the tip
+
+func test_the_tip_closes_by_the_clock_not_by_summed_frames() -> void:
+	var panel := await _setup()
+	var ui := panel.rt.ui
+	_tip_up(panel)
+	ui._process(0.001)                                           # a tiny frame delta: still up
+	assert_bool(ui.tip_on_screen()).is_true()
+	ui._teach_until_ms = Time.get_ticks_msec() - 1               # its 2.5 s have passed on the clock
+	ui._process(0.001)                                           # however small the frames' deltas summed
+	assert_bool(ui.tip_on_screen()).is_false()
 
 func test_a_closed_panel_stays_hidden_after_the_tip() -> void:
 	var panel := await _setup()

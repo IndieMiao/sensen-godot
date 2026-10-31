@@ -50,12 +50,13 @@ func last_result() -> Dictionary:
 
 ## q(49) (SGODOT-376): one card at a time. This panel is canvas layer 30, over the P0 UI and its TipCard (layer 10), so
 ## the first cast's `Casting uses 5 Energy` came up under `Watch the float…` / `A bite!…`, half hidden. While a TipCard
-## is on screen the status card waits; when the tip closes (its time, a tap, or doing what it teaches) the card comes
-## back with its latest line. Every writer of the card's visibility runs this after it.
+## is on screen or about to come up the status card waits; when the tip closes (its time, a tap, or doing what it
+## teaches) the card comes back with its latest line. A bite closes the tip at once (不知火舞 on 376): `A bite!` shows
+## the same frame. Every writer of the card's visibility runs this after it.
 var _held_for_tip := false
 
 func _hold_for_tip() -> void:
-	if rt != null and rt.ui != null and rt.ui.tip_on_screen():
+	if rt != null and rt.ui != null and rt.ui.tip_up_or_coming():
 		_held_for_tip = true
 		_message_card.visible = false
 	elif _held_for_tip:
@@ -187,6 +188,7 @@ func _p0_hook() -> void:
 	_refresh_button()
 
 func _process(dt: float) -> void:
+	if visible and rt != null and rt.ui != null and phase == "hook": rt.ui.hold_tips(1500)   # a bite takes the screen
 	_hold_for_tip()
 	if not visible or rt == null or busy: return
 	var now := Time.get_ticks_msec()
@@ -199,6 +201,9 @@ func _process(dt: float) -> void:
 		elif now >= _bite_at and phase != "hook":
 			phase = "hook"
 			_show_notice("A bite! Tap to hook the fish!")
+			rt.ui.hold_tips(1500)   # the bite takes the screen (SGODOT-376 ②): the tip on screen closes, none comes up
+			rt.ui.close_tip()
+			_hold_for_tip()
 			Input.vibrate_handheld(80)
 			_refresh_button()
 		elif phase == "hook" and auto_play and now > _bite_at + 400:

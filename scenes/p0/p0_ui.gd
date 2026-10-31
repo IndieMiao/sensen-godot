@@ -138,7 +138,9 @@ var _modal_veil: ColorRect   # the open modal's scrim (the home pick's real map 
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
 var _card_queue: Array = []
 var _teach: UiTipCard
-var _teach_left := 0.0
+## When the TipCard on screen closes by time, in Time.get_ticks_msec(); 0: none. Wall-clock, not summed frame deltas: on
+## slow frames the summed deltas ran far behind the clock, and a 2.5 s tip stayed ~11 s on the emulator (不知火舞 on 376).
+var _teach_until_ms := 0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
 var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
@@ -188,9 +190,7 @@ func _process(dt: float) -> void:
 	if _guide_pulse_wait <= 0.0:
 		_guide_pulse_wait = 0.1
 		_refresh_guide_pulses()
-	if _teach_left > 0.0:
-		_teach_left -= dt
-		if _teach_left <= 0.0: _hide_tip()
+	if _teach_until_ms > 0 and Time.get_ticks_msec() >= _teach_until_ms: _hide_tip()
 	if _notice_left > 0.0:
 		_notice_left -= dt
 		if _notice_left <= 0.0: _hide_notice()
@@ -198,7 +198,7 @@ func _process(dt: float) -> void:
 	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed). A dialog is always over
 	# the TipCard, whichever opened first (不知火舞 on 341): while one is open — a result card (the farmhouse's COOK-4
 	# too), the gate card, a confirm, a page — the tip waits; over a drawer (the stove's, the bag) it comes up.
-	if tips and not dialog_open():
+	if tips and not dialog_open() and not _tips_held():
 		var key := tips.next()
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
@@ -3743,12 +3743,31 @@ func tip_showing(key: String) -> bool:
 func tip_on_screen() -> bool:
 	return _teach != null and _teach.visible
 
+## A TipCard is on screen, or waits and comes up on the next frame (no dialog, no Moment): the first cast's tip is asked
+## for in the same response that puts `Watch the float…` up, so the status card holds from that frame (SGODOT-376 ③).
+func tip_up_or_coming() -> bool:
+	if tip_on_screen(): return true
+	return tips != null and not tips.waiting.is_empty() and tips.moments == 0 and not dialog_open() and not _tips_held()
+
+## Keep new TipCards back for `ms` (the fishing panel renews it every frame while a bite waits for Hook: the bite takes
+## the screen, SGODOT-376 ②). Self-expiring, so a panel that goes away never keeps the tips back.
+var _tips_held_until_ms := 0
+func hold_tips(ms: int) -> void:
+	_tips_held_until_ms = Time.get_ticks_msec() + ms
+
+func _tips_held() -> bool:
+	return Time.get_ticks_msec() < _tips_held_until_ms
+
+## Close the TipCard on screen now (a bite takes the screen, SGODOT-376 ②).
+func close_tip() -> void:
+	if tip_on_screen(): _hide_tip()
+
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
 	if tips and tips.did(action): _hide_tip(false)
 
 func _hide_tip(close_queue := true) -> void:
-	_teach_left = 0.0
+	_teach_until_ms = 0
 	if _teach: _teach.hide()
 	if close_queue and tips: tips.close()
 	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
@@ -3775,7 +3794,7 @@ func _show_tip(text: String, key := "") -> void:
 	if _toasts != null and _toasts.get_parent() == root: root.move_child(_toasts, -1)
 	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)
 	_place_tip()
-	_teach_left = P0Guide.tip_seconds(text)
+	_teach_until_ms = Time.get_ticks_msec() + int(P0Guide.tip_seconds(text) * 1000.0)
 
 ## Where the TipCard sits (不知火舞 on 232, TUT-1-2 / TUT-3-04B / TUT-3-07B): centred; its top 120 under HUD row 2,
 ## clear of the joystick's centre, the main action key and the quick bar. In the kitchen (不知火舞 on 341), at x 16:
