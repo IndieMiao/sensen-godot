@@ -106,3 +106,16 @@ func test_a_closed_panel_stays_hidden_after_the_tip() -> void:
 	panel.rt.ui._hide_tip()
 	panel._process(0.016)
 	assert_bool(panel._message_card.visible).is_false()
+
+func test_a_lost_reel_report_still_says_so_after_the_tip() -> void:
+	var panel := await _setup()
+	panel.on_cast({"bite_in": 60000, "rarity": 1, "breaks": null})
+	_tip_up(panel)
+	panel._reel_retries = 3                                      # the reel report was lost three times (周瑜 on #595)
+	panel.on_send_failed({"type": "reel", "outcome": "landed"})
+	assert_str(panel.phase).is_equal("result")
+	assert_bool(panel._message_card.visible).is_false()         # held under the tip
+	panel.rt.ui._hide_tip()
+	panel._process(0.016)
+	assert_bool(panel._message_card.visible).is_true()
+	assert_str(panel._status.text).is_equal("Couldn't reach the server · the line will clear in a moment")
