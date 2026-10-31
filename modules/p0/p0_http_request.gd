@@ -3,8 +3,10 @@ class_name P0HttpRequest extends HTTPRequest
 ## frame, and its timeout is a Timer that counts every frame's time: while a world loads (an outpost took 5–7 s on a
 ## slow emulator) the request does not move at all, and the first frame after it adds the whole stall to the timer —
 ## the reply that came 17 ms after the request reached the server was too late for an 8 s that began before the load
-## (蒙恬 X6 / X15, 10-30: "Couldn't get there", Retry fine). So the wait is counted here in live time: a frame counts at
-## most FRAME_CAP_S, and a stall of the whole app is not the server being slow; after it the request goes on stepping.
+## (蒙恬 X6 / X15, 10-30: "Couldn't get there", Retry fine). So the wait is counted here, in _process's own delta, which
+## the engine already holds down after a stall (周瑜 on #582 measured ~0.14 s for the frame after 2.5 s): a stall of the
+## whole app is not the server being slow, and after it the request goes on stepping. FRAME_CAP_S is a guard should
+## that change. The other side: below some 7 frames a second the 8 s wait stretches; the arrival's 20 s still holds.
 ## Not use_threads: a threaded request blocks on a server that says nothing, and its cancel (the timeout's) then waits
 ## on that thread with the main thread — the app froze in the test of exactly that. Start one with send().
 
@@ -20,7 +22,7 @@ func _init(wait := 8.0) -> void:
 ## HTTPRequest.request, with the live-time wait started.
 func send(url: String, headers: PackedStringArray = PackedStringArray(), method := HTTPClient.METHOD_GET, body := "") -> Error:
 	var err := request(url, headers, method, body)
-	_waited = 0.0 if err == OK else -1.0
+	if err == OK: _waited = 0.0   # a refused one (ERR_BUSY) leaves the wait of the request already on the wire running
 	return err
 
 func _process(dt: float) -> void:
