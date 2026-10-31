@@ -58,3 +58,17 @@ func test_the_cast_key_lands_two_and_a_half_metres_out_and_backs_off_where_the_w
 	assert_float(-short.z).is_less_equal(1.0 - FishingModel.FAR_CLEAR + 0.001)   # the float clear of the far bank
 	assert_float(-short.z).is_greater_equal(FishingModel.SHORE_REACH - 0.001)
 	assert_bool(FishingModel.contains("sliver", short, 0.0, sliver)).is_true()
+
+## The open-water foam (上官婉儿, 5c6c085c): one mask per San Francisco pond, baked from this very outline file, so
+## changing assets/p0/p0_pond_templates.json without a rebake fails here.
+func test_every_san_francisco_pond_has_foam_baked_from_these_outlines() -> void:
+	var manifest = JSON.parse_string(FileAccess.get_file_as_string("res://assets/ponds/p0/foam/manifest.json"))
+	assert_str(str(manifest.templates_sha256)).is_equal(FileAccess.get_sha256(SystemPonds.P0_TEMPLATES))
+	assert_str(str(manifest.catalog_sha256)).is_equal(SystemPonds.revision())
+	var baked := {}
+	for e in manifest.entries: baked[str(e.id)] = e
+	for entry in P0Ponds.all():
+		assert_bool(baked.has(str(entry.id))).is_true()
+		assert_str(str(baked[entry.id].template_id)).is_equal(str(entry.template_id))
+		assert_int(int(baked[entry.id].decoration_seed)).is_equal(int(entry.decoration_seed))
+		assert_bool(ResourceLoader.exists("res://assets/ponds/p0/foam/%s.png" % entry.id)).is_true()
