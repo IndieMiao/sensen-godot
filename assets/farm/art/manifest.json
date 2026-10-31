@@ -1407,6 +1407,126 @@
         7,
         -4
       ]
+    },
+    "sprinkler": {
+      "triangles": 882,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -0.19870717823505402,
+          0.0,
+          -0.125
+        ],
+        [
+          0.19870717823505402,
+          0.574999988079071,
+          0.125
+        ]
+      ],
+      "parts": {
+        "base": {
+          "triangles": 264,
+          "surfaces": 1,
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        "head": {
+          "triangles": 618,
+          "surfaces": 1,
+          "pivot": [
+            0,
+            0.41999998688697815,
+            0
+          ]
+        }
+      },
+      "bytes": 32440,
+      "sha256": "057789e501890896fc8e587574ac9fa7586c880bd72fc04670d8057908f11478",
+      "generator": "tools/art/build_sprinkler.py",
+      "triangle_limit": 900,
+      "head_pivot": [
+        0,
+        0.42,
+        0
+      ],
+      "spray_origin": [
+        0,
+        0.42,
+        0
+      ],
+      "front": "+Z",
+      "pivot": "plot bed centre; place root at BED_H=0.15 m; unit scale",
+      "material": "FarmArt.material() on base and head; two meshes, do not use FarmArt.mesh_for()",
+      "art_revision": "v1.3",
+      "revision_amendment": "Plane 8d57e50f and art-director authorization: head only, height <=0.58m and <=900 triangles",
+      "arm_diameter_m": 0.06,
+      "stone_diameter_m": 0.25,
+      "cap_diameter_m": 0.13,
+      "riser_diameter_base_m": 0.13,
+      "riser_diameter_top_m": 0.11,
+      "hub_diameter_m": 0.18,
+      "hub_height_m": 0.09,
+      "nozzle_diameter_m": 0.07,
+      "cap_height_m": 0.123,
+      "cap_radial_segments": 12,
+      "palette_srgb": {
+        "stone": "b4b8b1",
+        "stone_light": "c5c9c1",
+        "stone_shade": "a0a69d",
+        "sage": "a0ba88",
+        "sage_light": "b0c99a",
+        "sage_shade": "879f70",
+        "brass": "e8ce5b",
+        "brass_light": "f5dd7c",
+        "brass_shade": "c4ac46",
+        "water": "8cc7f2",
+        "water_light": "a8d5f5",
+        "water_shade": "74b4e3",
+        "nozzle_dot": "665d36"
+      },
+      "arm_centreline_right_m": [
+        [
+          0.07277646209557334,
+          0.412336213236905,
+          0
+        ],
+        [
+          0.08596067246560579,
+          0.40007754014381364,
+          0
+        ],
+        [
+          0.10300800469261512,
+          0.39429075061709645,
+          0
+        ],
+        [
+          0.12093034937868374,
+          0.39599017111782625,
+          0
+        ],
+        [
+          0.13658622222139932,
+          0.4048779219366372,
+          0
+        ],
+        [
+          0.1472314131501796,
+          0.419396130475378,
+          0
+        ],
+        [
+          0.151,
+          0.437,
+          0
+        ]
+      ],
+      "nozzle_dot": "one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh",
+      "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap",
+      "integration_note": "On integration change P0FarmFacilities.HEAD from (0, 0.55, 0) to (0, 0.42, 0); no gameplay edit in this art branch."
     }
   }
 }
