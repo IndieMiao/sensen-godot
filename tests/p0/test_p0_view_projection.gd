@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 func _view() -> Dictionary:
 	var pot := {"id": 1, "ms": 5000, "elapsed": 1000, "ready_in": 4000}
 	return {
-		"seq": 7, "coins": 120,
+		"seq": 7, "coins": 120, "now": 1793102400000.0,
 		"energy": {"value": 198, "max": 200, "next_in": 1000, "regen_ms": 240000},
 		"plots": [{"id": 0, "state": "growing", "crop": "crop_radish", "ready_in": 500}, {"id": 1, "state": "growing", "crop": "crop_carrot", "ready_in": 90000},
 			{"id": 2, "state": "tilled", "crop": null}],
@@ -22,6 +22,7 @@ func _view() -> Dictionary:
 ## What project() returned before Q3 (the whole view deep-copied, then the same timers aged): the values must not change.
 func _reference(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	var v := view.duplicate(true)
+	v.now = float(v.now) + elapsed_ms   # the server's clock (SGODOT-367: a Day Pass's countdown)
 	var e: Dictionary = v.energy
 	var remaining := float(e.next_in) - elapsed_ms
 	var value := int(e.value)
