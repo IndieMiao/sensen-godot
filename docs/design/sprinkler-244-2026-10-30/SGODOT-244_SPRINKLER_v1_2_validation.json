@@ -1,0 +1,1146 @@
+{
+  "author": "黄忠",
+  "task": "SGODOT-244",
+  "art_revision": "v1.2",
+  "geometry": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "untextured vertex-painted model"
+      },
+      {
+        "passed": true,
+        "check": "one opaque shared material"
+      },
+      {
+        "passed": true,
+        "check": "exactly two meshes"
+      },
+      {
+        "passed": true,
+        "check": "exact node names; no extra parts"
+      },
+      {
+        "passed": true,
+        "check": "base unit scale"
+      },
+      {
+        "passed": true,
+        "check": "base identity rotation"
+      },
+      {
+        "passed": true,
+        "check": "base correct axis/pivot"
+      },
+      {
+        "passed": true,
+        "check": "base stable mobile mesh name"
+      },
+      {
+        "passed": true,
+        "check": "base exactly one surface"
+      },
+      {
+        "passed": true,
+        "check": "base positions normals colours only"
+      },
+      {
+        "passed": true,
+        "check": "base finite data"
+      },
+      {
+        "passed": true,
+        "check": "base no degenerate faces"
+      },
+      {
+        "passed": true,
+        "check": "base winding and normals agree"
+      },
+      {
+        "passed": true,
+        "check": "base opaque vertex colours"
+      },
+      {
+        "passed": true,
+        "check": "base flat authored palette only"
+      },
+      {
+        "passed": true,
+        "check": "head unit scale"
+      },
+      {
+        "passed": true,
+        "check": "head identity rotation"
+      },
+      {
+        "passed": true,
+        "check": "head correct axis/pivot"
+      },
+      {
+        "passed": true,
+        "check": "head stable mobile mesh name"
+      },
+      {
+        "passed": true,
+        "check": "head exactly one surface"
+      },
+      {
+        "passed": true,
+        "check": "head positions normals colours only"
+      },
+      {
+        "passed": true,
+        "check": "head finite data"
+      },
+      {
+        "passed": true,
+        "check": "head no degenerate faces"
+      },
+      {
+        "passed": true,
+        "check": "head winding and normals agree"
+      },
+      {
+        "passed": true,
+        "check": "head opaque vertex colours"
+      },
+      {
+        "passed": true,
+        "check": "head flat authored palette only"
+      },
+      {
+        "passed": true,
+        "check": "spray_origin unit scale"
+      },
+      {
+        "passed": true,
+        "check": "spray_origin identity rotation"
+      },
+      {
+        "passed": true,
+        "check": "spray_origin correct axis/pivot"
+      },
+      {
+        "passed": true,
+        "check": "spray_origin is an empty node"
+      },
+      {
+        "passed": true,
+        "check": "actual total triangles <=800 and matches manifest"
+      },
+      {
+        "passed": true,
+        "check": "manifest two surfaces"
+      },
+      {
+        "passed": true,
+        "check": "actual metre bounds match manifest"
+      },
+      {
+        "passed": true,
+        "check": "v1.2 manifest head and spray positions"
+      },
+      {
+        "passed": true,
+        "check": "bed-centred root and approximately 0.52m height"
+      },
+      {
+        "passed": true,
+        "check": "amended v1.2 head uses full 0.40m swept diameter"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 stone pad diameter 0.24-0.26m"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 actual blue cap diameter 0.10m"
+      },
+      {
+        "passed": true,
+        "check": "fuller blue cap actual height 0.092m"
+      },
+      {
+        "passed": true,
+        "check": "fuller cap upper belly is 0.088m across at y=0.489m"
+      },
+      {
+        "passed": true,
+        "check": "head 0deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 0deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 45deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 45deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 90deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 90deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 135deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 135deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 180deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 180deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 225deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 225deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 270deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 270deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "head 315deg remains inside real plot"
+      },
+      {
+        "passed": true,
+        "check": "head 315deg no vertical wobble"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 actual curved arm ring 1 radius 0.020m"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 actual curved arm ring 2 radius 0.020m"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 actual curved arm ring 3 radius 0.020m"
+      },
+      {
+        "passed": true,
+        "check": "arm centreline descends then rises"
+      },
+      {
+        "passed": true,
+        "check": "unscaled plot is actually 0.94m square"
+      },
+      {
+        "passed": true,
+        "check": "yellow brass hue separates from actual storage wood"
+      },
+      {
+        "passed": true,
+        "check": "blue hue matches COVER_TINT within 1 degree"
+      },
+      {
+        "passed": true,
+        "check": "sage riser is greyer and lighter than actual crop leaf"
+      },
+      {
+        "passed": true,
+        "check": "sage saturation increases moderately from the prior grey-green"
+      },
+      {
+        "passed": true,
+        "check": "brass brighter than riser"
+      },
+      {
+        "passed": true,
+        "check": "all pre-existing manifest entries unchanged"
+      },
+      {
+        "passed": true,
+        "check": "original plot bytes unchanged"
+      },
+      {
+        "passed": true,
+        "check": "manifest SHA-256 correct"
+      },
+      {
+        "passed": true,
+        "check": "first v1.2 base geometry unchanged; only riser colours updated"
+      },
+      {
+        "passed": true,
+        "check": "first v1.2 nodes and pivots unchanged"
+      },
+      {
+        "passed": true,
+        "check": "stone pad geometry retained"
+      },
+      {
+        "passed": true,
+        "check": "shared material retained"
+      }
+    ],
+    "measurements": {
+      "triangles": 798,
+      "bounds": [
+        [
+          -0.199889674782753,
+          0.0,
+          -0.125
+        ],
+        [
+          0.199889674782753,
+          0.5249999761581421,
+          0.125
+        ]
+      ],
+      "size_xyz_m": [
+        0.399779349565506,
+        0.5249999761581421,
+        0.25
+      ],
+      "head_swept_diameter_m": 0.3999899693098045,
+      "stone_diameter_m": 0.25,
+      "cap_diameter_m": 0.10000000149011612,
+      "arm_section_diameter_m": 0.04,
+      "cap_height_m": 0.09199997782707214,
+      "cap_upper_belly_diameter_m": 0.08800000196902406,
+      "plot_min_edge_clearance_m": 0.2700050153450977
+    },
+    "nodes": {
+      "base": {
+        "triangles": 264,
+        "surfaces": 1,
+        "pivot": [
+          0,
+          0,
+          0
+        ],
+        "world_bounds": [
+          [
+            -0.125,
+            0.0,
+            -0.125
+          ],
+          [
+            0.125,
+            0.38199999928474426,
+            0.125
+          ]
+        ]
+      },
+      "head": {
+        "triangles": 534,
+        "surfaces": 1,
+        "pivot": [
+          0.0,
+          0.41999998688697815,
+          0.0
+        ],
+        "world_bounds": [
+          [
+            -0.199889674782753,
+            0.3698972761631012,
+            -0.07000000029802322
+          ],
+          [
+            0.199889674782753,
+            0.5249999761581421,
+            0.07000000029802322
+          ]
+        ]
+      }
+    },
+    "colour_comparison": {
+      "plot_rim_linear": [
+        0.304987,
+        0.181164,
+        0.078187
+      ],
+      "plot_rim_srgb": [
+        0.5882350181213365,
+        0.4627448071907601,
+        0.30980310154953805
+      ],
+      "wood_source": "assets/farm/art/storage.glb: most frequent vertex colour",
+      "source_correction": "plot.glb is an earthen bed without a wood frame; compare its real soil rim and a separate real farm wood sample.",
+      "wood_linear": [
+        0.597202,
+        0.351533,
+        0.135633
+      ],
+      "wood_srgb": [
+        0.7960785570412797,
+        0.6274513043559791,
+        0.4039211038756832
+      ],
+      "brass_srgb": [
+        0.9098039215686274,
+        0.807843137254902,
+        0.3568627450980392
+      ],
+      "wood_hue_degrees": 34.20006918280943,
+      "brass_hue_degrees": 48.93617021276596,
+      "hue_gap_degrees": 14.73610102995653,
+      "blue_hue_degrees": 205.29411764705884,
+      "coverage_hue_degrees": 205.5,
+      "crop_leaf_srgb": [
+        0.34,
+        0.65,
+        0.22
+      ],
+      "riser_srgb": [
+        0.6274509803921569,
+        0.7294117647058823,
+        0.5333333333333333
+      ],
+      "prior_riser_saturation": 0.1564245810055865,
+      "riser_saturation": 0.26881720430107525,
+      "crop_leaf_saturation": 0.6615384615384616
+    },
+    "passed": true,
+    "failures": []
+  },
+  "godot": {
+    "art_revision": "v1.2",
+    "asset_sha256": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
+    "avatar": {
+      "height_m": 1.745,
+      "measured_source_height_m": 1.71833898495782,
+      "uniform_scale": 1.01551557362986
+    },
+    "captures": [
+      {
+        "camera_width_m": 6.71999979019165,
+        "head_angle": 0.0,
+        "id": "default_43deg_360",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            169.483932495117,
+            400.731109619141
+          ],
+          [
+            190.516067504883,
+            425.769866943359
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 8.39999961853027,
+        "head_angle": 0.0,
+        "id": "minimum_zoom_360",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            171.587158203125,
+            400.584899902344
+          ],
+          [
+            188.412841796875,
+            420.615905761719
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 4.19999980926514,
+        "head_angle": 0.0,
+        "id": "top",
+        "pitch": 90.0,
+        "size": [
+          1000,
+          1000
+        ],
+        "sprinkler_bounds_px": [
+          [
+            452.4072265625,
+            470.238098144531
+          ],
+          [
+            547.5927734375,
+            529.761901855469
+          ]
+        ],
+        "yaw": 0.0
+      },
+      {
+        "camera_width_m": 6.71999979019165,
+        "head_angle": 0.0,
+        "id": "comparison_default_v1_1",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            169.72135925293,
+            396.199523925781
+          ],
+          [
+            190.278366088867,
+            425.77001953125
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 8.39999961853027,
+        "head_angle": 0.0,
+        "id": "comparison_minimum_v1_1",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            171.777084350586,
+            396.959594726562
+          ],
+          [
+            188.222686767578,
+            420.615966796875
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 6.71999979019165,
+        "head_angle": 0.0,
+        "id": "comparison_default_v1_2",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            169.483932495117,
+            400.731109619141
+          ],
+          [
+            190.516067504883,
+            425.769866943359
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 8.39999961853027,
+        "head_angle": 0.0,
+        "id": "comparison_minimum_v1_2",
+        "pitch": 43.0,
+        "size": [
+          360,
+          800
+        ],
+        "sprinkler_bounds_px": [
+          [
+            171.587158203125,
+            400.584899902344
+          ],
+          [
+            188.412841796875,
+            420.615905761719
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 6.71999979019165,
+        "head_angle": 0.0,
+        "id": "rear_crop_without_sprinkler_mask",
+        "pitch": 43.0,
+        "size": [
+          1080,
+          2400
+        ],
+        "sprinkler_bounds_px": [
+          [
+            508.451812744141,
+            1202.193359375
+          ],
+          [
+            571.548156738281,
+            1277.3095703125
+          ]
+        ],
+        "yaw": 14.4999990463257
+      },
+      {
+        "camera_width_m": 6.71999979019165,
+        "head_angle": 0.0,
+        "id": "rear_crop_with_sprinkler_mask",
+        "pitch": 43.0,
+        "size": [
+          1080,
+          2400
+        ],
+        "sprinkler_bounds_px": [
+          [
+            508.451812744141,
+            1202.193359375
+          ],
+          [
+            571.548156738281,
+            1277.3095703125
+          ]
+        ],
+        "yaw": 14.4999990463257
+      }
+    ],
+    "checks": [
+      {
+        "check": "actual plot 0.94m wide",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at -1,-1",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m R",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at 0,-1",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m L",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at 1,-1",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m C",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at -1,0",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m B",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at 0,0",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at 1,0",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m R",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at -1,1",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m L",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at 0,1",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m C",
+        "passed": true
+      },
+      {
+        "check": "real unscaled plot at 1,1",
+        "passed": true
+      },
+      {
+        "check": "mid-stage crop height 0.3-0.5m B",
+        "passed": true
+      },
+      {
+        "check": "two actual mesh nodes",
+        "passed": true
+      },
+      {
+        "check": "base one surface",
+        "passed": true
+      },
+      {
+        "check": "base imported mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "base no UV",
+        "passed": true
+      },
+      {
+        "check": "head one surface",
+        "passed": true
+      },
+      {
+        "check": "head imported mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "head no UV",
+        "passed": true
+      },
+      {
+        "check": "actual imported triangle budget",
+        "passed": true
+      },
+      {
+        "check": "unmodified shared linear FarmArt material",
+        "passed": true
+      },
+      {
+        "check": "head pivot at local 0,.42,0",
+        "passed": true
+      },
+      {
+        "check": "spray_origin at head centre",
+        "passed": true
+      },
+      {
+        "check": "actual imported radial extent at 0 degrees",
+        "passed": true
+      },
+      {
+        "check": "head pivot stays fixed at 0 degrees",
+        "passed": true
+      },
+      {
+        "check": "spray origin fixed at 0 degrees",
+        "passed": true
+      },
+      {
+        "check": "actual imported radial extent at 45 degrees",
+        "passed": true
+      },
+      {
+        "check": "head pivot stays fixed at 45 degrees",
+        "passed": true
+      },
+      {
+        "check": "spray origin fixed at 45 degrees",
+        "passed": true
+      },
+      {
+        "check": "actual imported radial extent at 90 degrees",
+        "passed": true
+      },
+      {
+        "check": "head pivot stays fixed at 90 degrees",
+        "passed": true
+      },
+      {
+        "check": "spray origin fixed at 90 degrees",
+        "passed": true
+      },
+      {
+        "check": "fixture avatar assembled",
+        "passed": true
+      },
+      {
+        "check": "default game camera width 6.72m",
+        "passed": true
+      },
+      {
+        "check": "saved default_43deg_360",
+        "passed": true
+      },
+      {
+        "check": "actual minimum zoom 0.8 width 8.4m",
+        "passed": true
+      },
+      {
+        "check": "saved minimum_zoom_360",
+        "passed": true
+      },
+      {
+        "check": "saved top",
+        "passed": true
+      },
+      {
+        "check": "comparison v1_1 unit scale",
+        "passed": true
+      },
+      {
+        "check": "saved comparison_default_v1_1",
+        "passed": true
+      },
+      {
+        "check": "saved comparison_minimum_v1_1",
+        "passed": true
+      },
+      {
+        "check": "comparison v1_2 unit scale",
+        "passed": true
+      },
+      {
+        "check": "saved comparison_default_v1_2",
+        "passed": true
+      },
+      {
+        "check": "saved comparison_minimum_v1_2",
+        "passed": true
+      },
+      {
+        "check": "saved rear_crop_without_sprinkler_mask",
+        "passed": true
+      },
+      {
+        "check": "saved rear_crop_with_sprinkler_mask",
+        "passed": true
+      },
+      {
+        "check": "actual Mobile renderer",
+        "passed": true
+      }
+    ],
+    "comparison_sources": {
+      "v1_1": {
+        "commit": "cf97f40b",
+        "sha256": "9359d5cc430b3693d6ed58c17ad6833d46d128c961368fa4f8f6f60f10f1453c"
+      },
+      "v1_2": {
+        "sha256": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
+        "source": "assets/farm/art/sprinkler.glb"
+      }
+    },
+    "crops": [
+      {
+        "height_above_bed_m": 0.411114490032196,
+        "kind": "R",
+        "plot_xz": [
+          -1,
+          -1
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.435407972335815,
+        "kind": "L",
+        "plot_xz": [
+          0,
+          -1
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.42114315032959,
+        "kind": "C",
+        "plot_xz": [
+          1,
+          -1
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.405660486221313,
+        "kind": "B",
+        "plot_xz": [
+          -1,
+          0
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.411114490032196,
+        "kind": "R",
+        "plot_xz": [
+          1,
+          0
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.435407972335815,
+        "kind": "L",
+        "plot_xz": [
+          -1,
+          1
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.42114315032959,
+        "kind": "C",
+        "plot_xz": [
+          0,
+          1
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      },
+      {
+        "height_above_bed_m": 0.405660486221313,
+        "kind": "B",
+        "plot_xz": [
+          1,
+          1
+        ],
+        "scale": [
+          0.507600009441376,
+          0.451199978590012,
+          0.507600009441376
+        ],
+        "source": "modules/farm/crop_plant_mesh.gd",
+        "stage": 1
+      }
+    ],
+    "failures": [],
+    "passed": true,
+    "renderer": {
+      "adapter": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "rotations": [
+      {
+        "angle": 0,
+        "head_world_pivot": [
+          0.0,
+          0.569999992847443,
+          0.0
+        ],
+        "max_radius_m": 0.19999498128891
+      },
+      {
+        "angle": 45,
+        "head_world_pivot": [
+          0.0,
+          0.569999992847443,
+          0.0
+        ],
+        "max_radius_m": 0.19999498128891
+      },
+      {
+        "angle": 90,
+        "head_world_pivot": [
+          0.0,
+          0.569999992847443,
+          0.0
+        ],
+        "max_radius_m": 0.19999498128891
+      }
+    ]
+  },
+  "source": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "base source/export bidirectional vertex error <1 micrometre"
+      },
+      {
+        "passed": true,
+        "check": "base editable pivot matches export"
+      },
+      {
+        "passed": true,
+        "check": "head source/export bidirectional vertex error <1 micrometre"
+      },
+      {
+        "passed": true,
+        "check": "head editable pivot matches export"
+      },
+      {
+        "passed": true,
+        "check": "editable spray_origin correct"
+      },
+      {
+        "passed": true,
+        "check": "v1.2 tapered riser diameter at 0.05"
+      },
+      {
+        "passed": true,
+        "check": "v1.2 tapered riser diameter at 0.362"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 hub actual diameter 0.14m and height 0.07m"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 stone diameter 0.25m"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 rounded pad has 16 radial segments and six profile levels"
+      },
+      {
+        "passed": true,
+        "check": "Left nozzle actual diameter 0.052m"
+      },
+      {
+        "passed": true,
+        "check": "Right nozzle actual diameter 0.052m"
+      },
+      {
+        "passed": true,
+        "check": "v1.1 cap actual diameter 0.10m"
+      },
+      {
+        "passed": true,
+        "check": "amended v1.2 cap height 0.092m"
+      },
+      {
+        "passed": true,
+        "check": "amended v1.2 cap ten radial segments at upper belly"
+      }
+    ],
+    "source_sha256": "fb963cff814fee339fa2dbeab4f979a9169f184d63bdc378fe216119cc2884d6",
+    "parts": {
+      "base": {
+        "source_objects": 2,
+        "maximum_vertex_error_m": 0
+      },
+      "head": {
+        "source_objects": 6,
+        "maximum_vertex_error_m": 2.9802322387695312e-08
+      }
+    },
+    "measurements": {
+      "Round edged stone mounting pad": {
+        "diameter_m": 0.25,
+        "bottom_m": 0.0,
+        "top_m": 0.04699999839067459
+      },
+      "Stout sage green riser": {
+        "diameter_m": 0.13000000196795622,
+        "bottom_m": 0.035999998450279236,
+        "top_m": 0.38199999928474426
+      },
+      "Rounded yellow brass rotating hub": {
+        "diameter_m": 0.14000000083020755,
+        "bottom_m": 0.3720000088214874,
+        "top_m": 0.44200000166893005
+      },
+      "Blue water droplet cap": {
+        "diameter_m": 0.10000000353902572,
+        "bottom_m": 0.43299999833106995,
+        "top_m": 0.5249999761581421
+      },
+      "riser_at_0.05m": {
+        "diameter_m": 0.13000000196795622
+      },
+      "riser_at_0.362m": {
+        "diameter_m": 0.11000000393526113
+      },
+      "Left nozzle": {
+        "diameter_m": 0.05200000096628298
+      },
+      "Right nozzle": {
+        "diameter_m": 0.05200000096628298
+      }
+    },
+    "passed": true
+  },
+  "reproducibility": {
+    "before": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
+    "after": "44684549722d13705600c7835e827e7f7df2d78c0e6185bc0582e526a3a4ae5c",
+    "byte_identical": true
+  },
+  "occlusion": {
+    "check": "sprinkler occludes less than half the actual rear mid-stage crop at default camera",
+    "passed": true,
+    "baseline_crop_pixels": 3672,
+    "occluded_pixels": 0,
+    "occluded_fraction": 0.0,
+    "crop": "L / stage 1 at x=0,z=-1.30 m",
+    "method": "Same camera/mesh, white crop against black; compare with/without black sprinkler, no shadows."
+  },
+  "evidence": {
+    "farm_commit": "f4bb293bb8800ca96624912815bc8acae2943285",
+    "files": {
+      "modules/farm/farm_camera.gd": "e00de7afbda6bbfd490a0e434f0987eb0a06b8176d97efbd986b3204f447de24",
+      "scenes/p0/p0_farm.tscn": "7b0976f4d3d0a1c1c40531d781d765faf5d5de5402860896f23bd298d3e6b1cb",
+      "scenes/p0/p0_farm.gd": "5087d96aab5d46780a12a9d3837d28290db040f4b6c6f992824153fe810dee44",
+      "scenes/p0/p0_farm_facilities.gd": "33e428983c8c6fbb5b1f9f8e746b879ab1818ffe9f24cae184126c4033a00536",
+      "modules/p0/p0_garden.gd": "50443b7a0a1018287435b489d93f056f60ecf1306cbefd87c3e88d420a9f6cde",
+      "assets/farm/art/plot.glb": "e0b50452a57b18bd09f7ceae796bdea9b3ed5cf5536323e11fea9a47a3d5a609",
+      "modules/farm/farm_art.gd": "c389f99b08eca2702126783716fcba626121dc62c72fa01eb4b920045f53b6f4",
+      "modules/farm/crop_plant_mesh.gd": "89eba86807820275c79de31de0b7ac93615a81fe895d2afedff2a1118f966b90"
+    }
+  },
+  "reference": {
+    "spec": "SGODOT-244_sprinkler-spec-v1.1.md",
+    "sheet": "SGODOT-244_sprinkler-sheet-v1.png",
+    "amendment": "tools/art/source/sprinkler_244/revision-v1.2.md",
+    "dimension_authority": "specification, not measured from image"
+  },
+  "scope": "Offline desktop art verification; tech and visual review pending, no gameplay integration or phone performance claim."
+}

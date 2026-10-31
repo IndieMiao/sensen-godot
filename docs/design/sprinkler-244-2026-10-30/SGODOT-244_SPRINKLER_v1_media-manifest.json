@@ -1,0 +1,71 @@
+[
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_colour_comparison.png",
+    "sha256": "3c8c1047db85e001364214b311930a9417f387ed5d888ba006d9446f6b5b1f79",
+    "bytes": 189678,
+    "size": [
+      1000,
+      1000
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_default_43deg_360.png",
+    "sha256": "ba7ce92bbbadde593a65446eddbbf2e3bdf66352028deeb63709bb70a8ad0344",
+    "bytes": 61760,
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_default_43deg_hd.png",
+    "sha256": "42dd646497dc2e7f1b4045f73f832cdab39200b58cea012d4bea0f111c4dccb1",
+    "bytes": 319397,
+    "size": [
+      1080,
+      2400
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_head_rotation.png",
+    "sha256": "be659bc9f1b53ae3bb694fe2e52c9823222b61626ad6fa46816c4cb63780be16",
+    "bytes": 210454,
+    "size": [
+      1800,
+      735
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_measurements.csv",
+    "sha256": "ec416d0bc7406606b6c93e2ee2f4810c2b540b60b5236cc289fb72ea197df32f",
+    "bytes": 566
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_measurements.md",
+    "sha256": "a56dbdc549aceb1658568809de94a1d23fb3a340eaf32ef6803c69198385ea12",
+    "bytes": 937
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_minimum_zoom_360.png",
+    "sha256": "857adb4c33f196bad402ff5164c294e229ef4930ae12e60941e3b37fcca9639a",
+    "bytes": 50285,
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_top.png",
+    "sha256": "ebfc6c9385db0be489dc8ced1317489ce9135c906a8c7fa677ef27856186efc2",
+    "bytes": 419566,
+    "size": [
+      1000,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-244_SPRINKLER_v1_validation.json",
+    "sha256": "e58adee2cf087b17e42fa2f55c8d855b424a1503a8b40f82835fbbec7795bde2",
+    "bytes": 24223
+  }
+]
