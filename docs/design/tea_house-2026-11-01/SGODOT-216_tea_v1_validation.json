@@ -1,0 +1,4184 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "checks": [
+      {
+        "check": "room_shell: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "room_shell: one material slot",
+        "passed": true
+      },
+      {
+        "check": "room_shell: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "room_shell: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "room_shell: one surface",
+        "passed": true
+      },
+      {
+        "check": "room_shell: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "room_shell: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "room_shell: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "room_shell: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "room_shell: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "room_shell: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: one material slot",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: one surface",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "left_wall: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "left_wall: one material slot",
+        "passed": true
+      },
+      {
+        "check": "left_wall: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "left_wall: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "left_wall: one surface",
+        "passed": true
+      },
+      {
+        "check": "left_wall: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "left_wall: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "left_wall: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "left_wall: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "left_wall: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "left_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "back_wall: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "back_wall: one material slot",
+        "passed": true
+      },
+      {
+        "check": "back_wall: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "back_wall: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "back_wall: one surface",
+        "passed": true
+      },
+      {
+        "check": "back_wall: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "back_wall: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "back_wall: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "back_wall: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "back_wall: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "back_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_window: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_window: one material slot",
+        "passed": true
+      },
+      {
+        "check": "round_window: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "round_window: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_window: one surface",
+        "passed": true
+      },
+      {
+        "check": "round_window: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "round_window: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_window: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "round_window: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "round_window: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "round_window: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: one material slot",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: one surface",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: one material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: one surface",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: one material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: one surface",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_bench: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "window_bench: one material slot",
+        "passed": true
+      },
+      {
+        "check": "window_bench: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "window_bench: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "window_bench: one surface",
+        "passed": true
+      },
+      {
+        "check": "window_bench: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "window_bench: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "window_bench: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "window_bench: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "window_bench: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "window_bench: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "counter: one material slot",
+        "passed": true
+      },
+      {
+        "check": "counter: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "counter: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "counter: one surface",
+        "passed": true
+      },
+      {
+        "check": "counter: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "counter: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "counter: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "counter: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "counter: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "counter: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: one material slot",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: one surface",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: one material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: one surface",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: one material slot",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: one surface",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one material slot",
+        "passed": true
+      },
+      {
+        "check": "name_sign: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "name_sign: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one surface",
+        "passed": true
+      },
+      {
+        "check": "name_sign: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "name_sign: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "name_sign: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "name_sign: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "name_sign: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "name_sign: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: one material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: one surface",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: one material slot",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: one surface",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: one material slot",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: one surface",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: original shared plant positions retained exactly",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: one material slot",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: one surface",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: original shared plant positions retained exactly",
+        "passed": true
+      },
+      {
+        "check": "Actual placed triangles <=200000",
+        "passed": true
+      },
+      {
+        "check": "Actual placed surfaces <=60",
+        "passed": true
+      },
+      {
+        "check": "Actual placed plant triangles <=100000",
+        "passed": true
+      },
+      {
+        "check": "Exactly one 2048x2048 atlas",
+        "passed": true
+      },
+      {
+        "check": "Actual tree canopy clears the left wall and its projecting timber",
+        "passed": true
+      },
+      {
+        "check": "Full immutable gameplay anchor contract including four legacy seats",
+        "passed": true
+      },
+      {
+        "check": "Exactly twelve seats",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "No redundant stand anchors for seats",
+        "passed": true
+      },
+      {
+        "check": "Blank sign has usable size above rear door",
+        "passed": true
+      },
+      {
+        "check": "Spawn at least 1.2m from exit",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "room_shell": {
+        "triangles": 9476,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -3.4000000953674316,
+            -0.18000000715255737,
+            -3.200000047683716
+          ],
+          [
+            3.4000000953674316,
+            0.07999999821186066,
+            3.200000047683716
+          ]
+        ],
+        "dimensions_m": [
+          6.800000190734863,
+          0.26000000536441803,
+          6.400000095367432
+        ],
+        "sha256": "09cbf2c40c1982a21a28854e26be47775d3c24cbf0dff39b1d4056f8ce3cd1df"
+      },
+      "entry_deck": {
+        "triangles": 108,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            -0.14000000059604645,
+            -0.5999999046325684
+          ],
+          [
+            0.6499999761581421,
+            0.07999999821186066,
+            0.5999999046325684
+          ]
+        ],
+        "dimensions_m": [
+          1.2999999523162842,
+          0.2199999988079071,
+          1.1999998092651367
+        ],
+        "sha256": "062c0c77d3ae42429c8e091fcb91bca3dbb51939e560252c50b383a699ddc2fe"
+      },
+      "left_wall": {
+        "triangles": 1756,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -3.240000009536743,
+            -7.450580596923828e-09,
+            -0.10000012069940567
+          ],
+          [
+            3.240000009536743,
+            3.700000286102295,
+            0.2849999964237213
+          ]
+        ],
+        "dimensions_m": [
+          6.480000019073486,
+          3.7000002935528755,
+          0.385000117123127
+        ],
+        "sha256": "566cd0fc71362ce00be8f569dcd6af2a8f1c26b6b8e543caf49561a6d41b3545"
+      },
+      "back_wall": {
+        "triangles": 1080,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -3.440000057220459,
+            -7.450580596923828e-09,
+            -0.09999990463256836
+          ],
+          [
+            3.440000057220459,
+            3.700000286102295,
+            0.2849998474121094
+          ]
+        ],
+        "dimensions_m": [
+          6.880000114440918,
+          3.7000002935528755,
+          0.38499975204467773
+        ],
+        "sha256": "f182eae6120cb32a974bfe5eadc140b2864a9d1e8b69b0bf72fbbddb17dab28c"
+      },
+      "round_window": {
+        "triangles": 1536,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.8799999952316284,
+            -0.8799999952316284,
+            -0.05500008538365364
+          ],
+          [
+            0.8799999356269836,
+            0.880000114440918,
+            0.055000122636556625
+          ]
+        ],
+        "dimensions_m": [
+          1.759999930858612,
+          1.7600001096725464,
+          0.11000020802021027
+        ],
+        "sha256": "d8a2688ff70420b97296c2401cd2caebbadb6b6cf9d631317766ef67b01581b6"
+      },
+      "window_backdrop": {
+        "triangles": 2,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.7799999713897705,
+            -0.7799999713897705,
+            -1.6610325559440753e-08
+          ],
+          [
+            0.7799999713897705,
+            0.7799999713897705,
+            5.157943760991657e-08
+          ]
+        ],
+        "dimensions_m": [
+          1.559999942779541,
+          1.559999942779541,
+          6.818976316935732e-08
+        ],
+        "sha256": "e6bbc7461f2b7ce277435068c1114afcbfd8b43d25c22668a3a58c064f1460e4"
+      },
+      "tea_table_1": {
+        "triangles": 3210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999998807907104,
+            1.4901161193847656e-08,
+            -0.4670000374317169
+          ],
+          [
+            0.44999998807907104,
+            1.2172499895095825,
+            0.46700000762939453
+          ]
+        ],
+        "dimensions_m": [
+          0.8999999761581421,
+          1.2172499746084213,
+          0.9340000450611115
+        ],
+        "sha256": "a9bc191773fd565d776d8500d5e3f3221c4815b274286ceb92839d373238205e"
+      },
+      "tea_table_1_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.10656380653381348,
+            -0.03437185287475586,
+            -0.09785965085029602
+          ],
+          [
+            0.1119300127029419,
+            0.21391749382019043,
+            0.09653379023075104
+          ]
+        ],
+        "dimensions_m": [
+          0.21849381923675537,
+          0.2482893466949463,
+          0.19439344108104706
+        ],
+        "sha256": "5eca536be93da6086d662bd5e94ba3fa5d93e6e126d9e04efe40752b9af7d26c"
+      },
+      "tea_table_2": {
+        "triangles": 3210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999998807907104,
+            1.4901161193847656e-08,
+            -0.46700000762939453
+          ],
+          [
+            0.44999995827674866,
+            1.2172499895095825,
+            0.46700000762939453
+          ]
+        ],
+        "dimensions_m": [
+          0.8999999463558197,
+          1.2172499746084213,
+          0.9340000152587891
+        ],
+        "sha256": "a902c20b6ed322503c943ad0ef90f0d2f0b8f237b1749968a5694766937ed15d"
+      },
+      "tea_table_2_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.10656383633613586,
+            -0.03437185287475586,
+            -0.09785962104797363
+          ],
+          [
+            0.1119299829006195,
+            0.21391749382019043,
+            0.09653377532958984
+          ]
+        ],
+        "dimensions_m": [
+          0.21849381923675537,
+          0.2482893466949463,
+          0.19439339637756348
+        ],
+        "sha256": "8d67a96319fe9eebfc97dcae357e4b76b8992e5b7c85bbf0f4fbf113947afeb9"
+      },
+      "tea_table_3": {
+        "triangles": 3210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999992847442627,
+            1.4901161193847656e-08,
+            -0.46700000762939453
+          ],
+          [
+            0.44999992847442627,
+            1.2172499895095825,
+            0.46700000762939453
+          ]
+        ],
+        "dimensions_m": [
+          0.8999998569488525,
+          1.2172499746084213,
+          0.9340000152587891
+        ],
+        "sha256": "a1bc5127defa0e67caefc062b7679b142eb3f38ce84ec40ad99c3ef2074b8c1a"
+      },
+      "tea_table_3_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.10656380653381348,
+            -0.03437185287475586,
+            -0.09785965085029602
+          ],
+          [
+            0.11192989349365234,
+            0.21391749382019043,
+            0.09653379023075104
+          ]
+        ],
+        "dimensions_m": [
+          0.21849370002746582,
+          0.2482893466949463,
+          0.19439344108104706
+        ],
+        "sha256": "ae534a5d7801491b40206d3016710c8085cffee3c669d45a799495499b72ea71"
+      },
+      "round_stool_sage": {
+        "triangles": 836,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2800006866455078,
+            0.0,
+            -0.2800000011920929
+          ],
+          [
+            0.2800006866455078,
+            0.7149999737739563,
+            0.2800000011920929
+          ]
+        ],
+        "dimensions_m": [
+          0.5600013732910156,
+          0.7149999737739563,
+          0.5600000023841858
+        ],
+        "sha256": "92ff0e9e26cfcc2266f64c146c760e9acba2ad43d9a667b707a66d8b9ce82c15"
+      },
+      "round_stool_linen": {
+        "triangles": 836,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2800006866455078,
+            0.0,
+            -0.2800000011920929
+          ],
+          [
+            0.2800006866455078,
+            0.7149999737739563,
+            0.2800000011920929
+          ]
+        ],
+        "dimensions_m": [
+          0.5600013732910156,
+          0.7149999737739563,
+          0.5600000023841858
+        ],
+        "sha256": "b5a052be36ef3b4cb9c4ffbc33c89fb7b61a1f991a5c7dfbe0204255979f1a83"
+      },
+      "window_bench": {
+        "triangles": 864,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.0499999523162842,
+            -1.4901161193847656e-08,
+            -0.2500000298023224
+          ],
+          [
+            1.0499999523162842,
+            0.7150000333786011,
+            0.2500000596046448
+          ]
+        ],
+        "dimensions_m": [
+          2.0999999046325684,
+          0.7150000482797623,
+          0.5000000894069672
+        ],
+        "sha256": "6896b0424f4586d8f19b0102bf6226405cc59eb1dbe64589fcb815e6f8860b10"
+      },
+      "counter": {
+        "triangles": 5628,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.100000023841858,
+            -1.4901161193847656e-08,
+            -0.3250000476837158
+          ],
+          [
+            1.100000023841858,
+            1.4960123300552368,
+            0.34999990463256836
+          ]
+        ],
+        "dimensions_m": [
+          2.200000047683716,
+          1.496012344956398,
+          0.6749999523162842
+        ],
+        "sha256": "ced473c8bc247e7a6e3da02611b1deda90043571388774f1ced189f93ab92d3d"
+      },
+      "counter_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.17544043064117432,
+            -0.05658769607543945,
+            -0.16111040115356445
+          ],
+          [
+            0.18427503108978271,
+            0.3521813154220581,
+            0.1589275598526001
+          ]
+        ],
+        "dimensions_m": [
+          0.35971546173095703,
+          0.40876901149749756,
+          0.32003796100616455
+        ],
+        "sha256": "69d8308d79dc618886cbb4cbdd9e5462da4fc7a4ba38ce295232998b11c6e27c"
+      },
+      "coffee_console": {
+        "triangles": 1976,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.5,
+            -1.4901161193847656e-08,
+            -0.25
+          ],
+          [
+            0.5,
+            1.1050000190734863,
+            0.25
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          1.1050000339746475,
+          0.5
+        ],
+        "sha256": "126bc92dbb2980c36581b589e0ac2adee5d9f4552df48cfdb310952c4f4afff9"
+      },
+      "wall_shelves": {
+        "triangles": 4876,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.9500000476837158,
+            1.959999918937683,
+            -0.0
+          ],
+          [
+            0.949999988079071,
+            3.1726748943328857,
+            0.3600001335144043
+          ]
+        ],
+        "dimensions_m": [
+          1.9000000357627869,
+          1.2126749753952026,
+          0.3600001335144043
+        ],
+        "sha256": "608af686a34a910ac74922f86ade3f096c98f041bbbb6a235708be440f4798f8"
+      },
+      "decorative_door": {
+        "triangles": 1356,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6100000143051147,
+            4.470348358154297e-08,
+            -0.03749990463256836
+          ],
+          [
+            0.6100001335144043,
+            2.424999952316284,
+            0.16750001907348633
+          ]
+        ],
+        "dimensions_m": [
+          1.220000147819519,
+          2.4249999076128006,
+          0.2049999237060547
+        ],
+        "sha256": "9facf51bb7eedd62ce054c3a79e86d83d14be11b1687265b7fd6e576e5fe5915"
+      },
+      "name_sign": {
+        "triangles": 540,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6000000238418579,
+            -0.19000005722045898,
+            -0.027499914169311523
+          ],
+          [
+            0.5999999046325684,
+            0.19000005722045898,
+            0.053999900817871094
+          ]
+        ],
+        "dimensions_m": [
+          1.1999999284744263,
+          0.38000011444091797,
+          0.08149981498718262
+        ],
+        "sha256": "9b105ea53757080d37cb08355b7364ef6d8229c2e945f65a3cc03f1a97646873"
+      },
+      "wall_lantern": {
+        "triangles": 892,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.1700000762939453,
+            -0.4025000035762787,
+            -0.10000000149011612
+          ],
+          [
+            0.1700000762939453,
+            0.4025000035762787,
+            0.4399999976158142
+          ]
+        ],
+        "dimensions_m": [
+          0.3400001525878906,
+          0.8050000071525574,
+          0.5399999991059303
+        ],
+        "sha256": "c385f2fd98e22a477d0db9f3f49ecf9f4b6c282143cccb5afebcdae027dec83d"
+      },
+      "lantern_glow": {
+        "triangles": 108,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.125,
+            -0.3400000035762787,
+            0.1850000023841858
+          ],
+          [
+            0.125,
+            0.10000000149011612,
+            0.39499998092651367
+          ]
+        ],
+        "dimensions_m": [
+          0.25,
+          0.4400000050663948,
+          0.20999997854232788
+        ],
+        "sha256": "c172cdccb37e0e67c1b2303a3043612c281fc80caa83434c64fffaf5a796ed9f"
+      },
+      "corner_tree": {
+        "triangles": 2868,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.5467196702957153,
+            0.0,
+            -0.548795759677887
+          ],
+          [
+            0.550000011920929,
+            2.003474712371826,
+            0.5465248823165894
+          ]
+        ],
+        "dimensions_m": [
+          1.0967196822166443,
+          2.003474712371826,
+          1.0953206419944763
+        ],
+        "sha256": "b2d2675a5f170c8666ff858d284f7aed7c56052fdf928e9e2bab6308cc864e55"
+      },
+      "shelf_pothos": {
+        "triangles": 2048,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2805624008178711,
+            -0.7420061230659485,
+            -0.20170821249485016
+          ],
+          [
+            0.29818734526634216,
+            0.366049587726593,
+            0.23490522801876068
+          ]
+        ],
+        "dimensions_m": [
+          0.5787497460842133,
+          1.1080557107925415,
+          0.43661344051361084
+        ],
+        "sha256": "4f00f474f4603a3f7d1f161b91a34068d186615ebba2ebfcfd77baec3abe24e9"
+      }
+    },
+    "author": "Huangzhong",
+    "placed_triangles": 55948,
+    "placed_surfaces": 36,
+    "plant_triangles": 6596,
+    "passed": true
+  },
+  "source": {
+    "checks": [
+      {
+        "check": "counter: actual named contact height",
+        "passed": true,
+        "measured": 1.149999976158142
+      },
+      {
+        "check": "window_bench: actual named contact height",
+        "passed": true,
+        "measured": 0.7150000333786011
+      },
+      {
+        "check": "round_stool_sage: actual named contact height",
+        "passed": true,
+        "measured": 0.7149999737739563
+      },
+      {
+        "check": "round_stool_linen: actual named contact height",
+        "passed": true,
+        "measured": 0.7149999737739563
+      },
+      {
+        "check": "tea_table_1: actual named contact height",
+        "passed": true,
+        "measured": 1.0
+      },
+      {
+        "check": "tea_table_1: actual tabletop diameter .90m",
+        "passed": true,
+        "measured": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.07999998331069946
+        ]
+      },
+      {
+        "check": "tea_table_2: actual named contact height",
+        "passed": true,
+        "measured": 1.0
+      },
+      {
+        "check": "tea_table_2: actual tabletop diameter .90m",
+        "passed": true,
+        "measured": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.07999998331069946
+        ]
+      },
+      {
+        "check": "tea_table_3: actual named contact height",
+        "passed": true,
+        "measured": 1.0
+      },
+      {
+        "check": "tea_table_3: actual tabletop diameter .90m",
+        "passed": true,
+        "measured": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.07999998331069946
+        ]
+      },
+      {
+        "check": "decorative_door: actual named contact height",
+        "passed": true,
+        "measured": 2.3299999237060547
+      },
+      {
+        "check": "No baked name lettering",
+        "passed": true,
+        "measured": 0
+      }
+    ],
+    "passed": true
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "scale": 1.01551556587219,
+      "source_height_m": 1.71833898495782
+    },
+    "captures": [
+      {
+        "id": "default_43deg_360",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165,
+        "yaw": 45.0
+      },
+      {
+        "id": "overview",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          1200,
+          1000
+        ],
+        "width_m": 11.8000001907349,
+        "yaw": 45.0
+      },
+      {
+        "id": "topdown_capsules",
+        "pitch": 90.0,
+        "pixels": [
+          1200,
+          1200
+        ],
+        "width_m": 8.5,
+        "yaw": 0.0
+      },
+      {
+        "id": "seated_stool",
+        "pitch": 24.9999980926514,
+        "pixels": [
+          1100,
+          1000
+        ],
+        "width_m": 2.79999995231628,
+        "yaw": 99.9999923706055
+      },
+      {
+        "id": "counter_coffee_corner",
+        "pitch": 24.0,
+        "pixels": [
+          1400,
+          1000
+        ],
+        "width_m": 6.09999990463257,
+        "yaw": 12.0
+      },
+      {
+        "id": "window_shadow_on",
+        "pitch": 30.0,
+        "pixels": [
+          1400,
+          1000
+        ],
+        "width_m": 3.40000009536743,
+        "yaw": 69.9999923706055
+      },
+      {
+        "id": "window_shadow_off",
+        "pitch": 30.0,
+        "pixels": [
+          1400,
+          1000
+        ],
+        "width_m": 3.40000009536743,
+        "yaw": 69.9999923706055
+      },
+      {
+        "id": "lanterns_on",
+        "pitch": 30.0,
+        "pixels": [
+          1400,
+          1000
+        ],
+        "width_m": 4.19999980926514,
+        "yaw": 45.0
+      },
+      {
+        "id": "lanterns_off",
+        "pitch": 30.0,
+        "pixels": [
+          1400,
+          1000
+        ],
+        "width_m": 4.19999980926514,
+        "yaw": 45.0
+      },
+      {
+        "id": "plant_original_olive_tree",
+        "pitch": 24.9999980926514,
+        "pixels": [
+          900,
+          1000
+        ],
+        "width_m": 2.59999990463257,
+        "yaw": 34.9999961853027
+      },
+      {
+        "id": "plant_remapped_olive_tree",
+        "pitch": 24.9999980926514,
+        "pixels": [
+          900,
+          1000
+        ],
+        "width_m": 2.59999990463257,
+        "yaw": 34.9999961853027
+      },
+      {
+        "id": "plant_original_pothos",
+        "pitch": 24.9999980926514,
+        "pixels": [
+          900,
+          1000
+        ],
+        "width_m": 1.70000004768372,
+        "yaw": 34.9999961853027
+      },
+      {
+        "id": "plant_remapped_pothos",
+        "pitch": 24.9999980926514,
+        "pixels": [
+          900,
+          1000
+        ],
+        "width_m": 1.70000004768372,
+        "yaw": 34.9999961853027
+      }
+    ],
+    "checks": [
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/room_shell/room_shell/room_shell_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/entry_deck/entry_deck/entry_deck_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/left_wall/left_wall/left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/back_wall/back_wall/back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/round_window/round_window/round_window_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/window_backdrop/window_backdrop/window_backdrop_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_1/tea_table_1/tea_table_1_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_1_flowers/tea_table_1_flowers/tea_table_1_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_2/tea_table_2/tea_table_2_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_2_flowers/tea_table_2_flowers/tea_table_2_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_3/tea_table_3/tea_table_3_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_3_flowers/tea_table_3_flowers/tea_table_3_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/window_bench/window_bench/window_bench_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/counter/counter/counter_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/counter_flowers/counter_flowers/counter_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/coffee_console/coffee_console/coffee_console_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_shelves/wall_shelves/wall_shelves_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/decorative_door/decorative_door/decorative_door_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/name_sign/name_sign/name_sign_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/corner_tree/corner_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/shelf_pothos/shelf_pothos/pothos_export",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_1_1/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_1_2/round_stool_linen/round_stool_linen_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_1_3/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_2_1/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_2_2/round_stool_linen/round_stool_linen_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_2_3/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_3_1/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_3_2/round_stool_linen/round_stool_linen_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_3_3/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_lantern_1/wall_lantern/wall_lantern_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/lantern_glow_1/lantern_glow/lantern_glow_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_lantern_2/wall_lantern/wall_lantern_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/lantern_glow_2/lantern_glow/lantern_glow_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_lantern_3/wall_lantern/wall_lantern_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/lantern_glow_3/lantern_glow/lantern_glow_001",
+        "passed": true
+      },
+      {
+        "check": "Actual placed imported triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "Actual placed imported surfaces and budget",
+        "passed": true
+      },
+      {
+        "check": "Plant budget <=100k triangles",
+        "passed": true
+      },
+      {
+        "check": "One 2048x2048 atlas",
+        "passed": true
+      },
+      {
+        "check": "room_shell: actual import config",
+        "passed": true
+      },
+      {
+        "check": "room_shell: import UID",
+        "passed": true
+      },
+      {
+        "check": "room_shell: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: actual import config",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: import UID",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "left_wall: actual import config",
+        "passed": true
+      },
+      {
+        "check": "left_wall: import UID",
+        "passed": true
+      },
+      {
+        "check": "left_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "back_wall: actual import config",
+        "passed": true
+      },
+      {
+        "check": "back_wall: import UID",
+        "passed": true
+      },
+      {
+        "check": "back_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_window: actual import config",
+        "passed": true
+      },
+      {
+        "check": "round_window: import UID",
+        "passed": true
+      },
+      {
+        "check": "round_window: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: actual import config",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: import UID",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: actual import config",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: import UID",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: actual import config",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: import UID",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_bench: actual import config",
+        "passed": true
+      },
+      {
+        "check": "window_bench: import UID",
+        "passed": true
+      },
+      {
+        "check": "window_bench: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter: actual import config",
+        "passed": true
+      },
+      {
+        "check": "counter: import UID",
+        "passed": true
+      },
+      {
+        "check": "counter: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: actual import config",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: import UID",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: actual import config",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: import UID",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: actual import config",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: import UID",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: actual import config",
+        "passed": true
+      },
+      {
+        "check": "name_sign: import UID",
+        "passed": true
+      },
+      {
+        "check": "name_sign: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: actual import config",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: import UID",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: actual import config",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: import UID",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: actual import config",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: import UID",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: actual import config",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: import UID",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "Twelve delivered seating anchors",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "Blank door sign carries runtime text size",
+        "passed": true
+      },
+      {
+        "check": "Exactly three local lantern lights",
+        "passed": true
+      },
+      {
+        "check": "Reference avatar assembled",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "stand_counter: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "stand_keeper: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "npc_keeper: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "npc_hana: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "stand_hana: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "npc_lena: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "stand_lena: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "exit: final art capsule radius 0.25 route",
+        "passed": true
+      },
+      {
+        "check": "stand_counter: final art capsule radius 0.35 route",
+        "passed": true
+      },
+      {
+        "check": "stand_hana: final art capsule radius 0.35 route",
+        "passed": true
+      },
+      {
+        "check": "exit: final art capsule radius 0.35 route",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [0.275, 2.525]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-2.925, -2.725]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [2.925, -2.725]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [0.025, -1.025]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [2.925, 0.575]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-2.925, 1.825]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-2.275, -0.425]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [2.475, 2.725]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [0.975, 0.675]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [1.975, -1.075]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-1.125, 1.275]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [0.675, -2.725]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-1.225, -2.575]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-1.675, 2.725]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-0.275, 0.275]",
+        "passed": true
+      },
+      {
+        "check": "Standing point clear in final art [-1.275, -1.275]",
+        "passed": true
+      },
+      {
+        "check": "Capture default_43deg_360",
+        "passed": true
+      },
+      {
+        "check": "Capture overview",
+        "passed": true
+      },
+      {
+        "check": "Capture topdown_capsules",
+        "passed": true
+      },
+      {
+        "check": "Existing production sit_idle clip",
+        "passed": true
+      },
+      {
+        "check": "Capture seated_stool",
+        "passed": true
+      },
+      {
+        "check": "Capture counter_coffee_corner",
+        "passed": true
+      },
+      {
+        "check": "Capture window_shadow_on",
+        "passed": true
+      },
+      {
+        "check": "Capture window_shadow_off",
+        "passed": true
+      },
+      {
+        "check": "Capture lanterns_on",
+        "passed": true
+      },
+      {
+        "check": "Capture lanterns_off",
+        "passed": true
+      },
+      {
+        "check": "Capture plant_original_olive_tree",
+        "passed": true
+      },
+      {
+        "check": "Capture plant_remapped_olive_tree",
+        "passed": true
+      },
+      {
+        "check": "Capture plant_original_pothos",
+        "passed": true
+      },
+      {
+        "check": "Capture plant_remapped_pothos",
+        "passed": true
+      }
+    ],
+    "colour_points": {
+      "beam": [
+        324.587921142578,
+        216.171081542969
+      ],
+      "floor": [
+        617.977294921875,
+        853.287841796875
+      ],
+      "wall": [
+        284.318725585938,
+        342.906616210938
+      ]
+    },
+    "imported": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "plant_triangles": 6596.0,
+      "renderer": "mobile",
+      "surfaces": 36,
+      "triangles": 55948
+    },
+    "passed": true,
+    "plant_controls": [
+      {
+        "module": "corner_tree",
+        "same_camera_light_geometry": true,
+        "source": "olive_tree"
+      },
+      {
+        "module": "shelf_pothos",
+        "same_camera_light_geometry": true,
+        "source": "pothos"
+      }
+    ],
+    "routes": [
+      {
+        "failed_segments": [],
+        "name": "seat_table1_1",
+        "radius": 0.25,
+        "segments": 49
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table1_2",
+        "radius": 0.25,
+        "segments": 117
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table1_3",
+        "radius": 0.25,
+        "segments": 118
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table2_1",
+        "radius": 0.25,
+        "segments": 32
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table2_2",
+        "radius": 0.25,
+        "segments": 98
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table2_3",
+        "radius": 0.25,
+        "segments": 29
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table3_1",
+        "radius": 0.25,
+        "segments": 52
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table3_2",
+        "radius": 0.25,
+        "segments": 161
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_table3_3",
+        "radius": 0.25,
+        "segments": 113
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_bench_1",
+        "radius": 0.25,
+        "segments": 125
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_bench_2",
+        "radius": 0.25,
+        "segments": 111
+      },
+      {
+        "failed_segments": [],
+        "name": "seat_bench_3",
+        "radius": 0.25,
+        "segments": 97
+      },
+      {
+        "failed_segments": [],
+        "name": "stand_counter",
+        "radius": 0.25,
+        "segments": 141
+      },
+      {
+        "failed_segments": [],
+        "name": "stand_keeper",
+        "radius": 0.25,
+        "segments": 141
+      },
+      {
+        "failed_segments": [],
+        "name": "npc_keeper",
+        "radius": 0.25,
+        "segments": 187
+      },
+      {
+        "failed_segments": [],
+        "name": "npc_hana",
+        "radius": 0.25,
+        "segments": 176
+      },
+      {
+        "failed_segments": [],
+        "name": "stand_hana",
+        "radius": 0.25,
+        "segments": 160
+      },
+      {
+        "failed_segments": [],
+        "name": "npc_lena",
+        "radius": 0.25,
+        "segments": 86
+      },
+      {
+        "failed_segments": [],
+        "name": "stand_lena",
+        "radius": 0.25,
+        "segments": 68
+      },
+      {
+        "failed_segments": [],
+        "name": "exit",
+        "radius": 0.25,
+        "segments": 25
+      },
+      {
+        "failed_segments": [],
+        "name": "stand_counter",
+        "radius": 0.35,
+        "segments": 165
+      },
+      {
+        "failed_segments": [],
+        "name": "stand_hana",
+        "radius": 0.35,
+        "segments": 224
+      },
+      {
+        "failed_segments": [],
+        "name": "exit",
+        "radius": 0.35,
+        "segments": 25
+      }
+    ],
+    "seated": {
+      "anchor": "seat_table1_1",
+      "animation_provenance": {
+        "commit": "f4bb293bb8800ca96624912815bc8acae2943285",
+        "sha256": "f5c0c26371928aa080110e44413074b294a6e419b2c846166ca06a0f7b28e02d",
+        "use": "Existing production sit_idle in isolated desktop art review only"
+      },
+      "clip": "sit_idle",
+      "production_root_offset": 0.34,
+      "root": [
+        -0.949999988079071,
+        0.449724733829498,
+        0.740000009536743
+      ],
+      "seat_above_floor_m": 0.715,
+      "seat_world_y": 0.795000016689301
+    }
+  },
+  "scene_bench": {
+    "adapter": "NVIDIA GeForce RTX 2060",
+    "checks": [
+      {
+        "details": null,
+        "name": "Default Avatar fixture assembles",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Bench route/probe schema",
+        "passed": true
+      },
+      {
+        "details": 0.0799999982118607,
+        "name": "Spawn stands on authored floor",
+        "passed": true
+      },
+      {
+        "details": "(0.3, 0.08, 2.55)",
+        "name": "Spawn capsule clear",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.54999995231628
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.54999995231628
+          ],
+          "name": "spawn",
+          "reached": true,
+          "remaining_m": 0.0,
+          "seconds": 0.0,
+          "target": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.54999995231628
+          ]
+        },
+        "name": "Route: spawn",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            0.300000011920929,
+            0.0899274051189423,
+            2.72382807731628
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.54999995231628
+          ],
+          "name": "entry_inside",
+          "reached": true,
+          "remaining_m": 0.0768160670995712,
+          "seconds": 0.001,
+          "target": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.79999995231628
+          ]
+        },
+        "name": "Route: entry_inside",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.23371553421021,
+            0.0899305865168571,
+            2.55720114707947
+          ],
+          "from": [
+            0.300000011920929,
+            0.0899274051189423,
+            2.72382807731628
+          ],
+          "name": "left_entry",
+          "reached": true,
+          "remaining_m": 0.0674099251627922,
+          "seconds": 0.3,
+          "target": [
+            -1.29999995231628,
+            0.0799999982118607,
+            2.54999995231628
+          ]
+        },
+        "name": "Route: left_entry",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -1.80367136001587,
+            0.0899301469326019,
+            1.25992667675018
+          ],
+          "from": [
+            -1.23371553421021,
+            0.0899305865168571,
+            2.55720114707947
+          ],
+          "name": "lena_corner",
+          "reached": true,
+          "remaining_m": 0.0662042871117592,
+          "seconds": 0.4,
+          "target": [
+            -1.83000004291534,
+            0.0799999982118607,
+            1.20000004768372
+          ]
+        },
+        "name": "Route: lena_corner",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -2.27175974845886,
+            0.0899352356791496,
+            -0.0226240810006857
+          ],
+          "from": [
+            -1.80367136001587,
+            0.0899301469326019,
+            1.25992667675018
+          ],
+          "name": "window_bench",
+          "reached": true,
+          "remaining_m": 0.0829653590917587,
+          "seconds": 0.383,
+          "target": [
+            -2.29999995231628,
+            0.0799999982118607,
+            -0.100000001490116
+          ]
+        },
+        "name": "Route: window_bench",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -2.15759468078613,
+            0.0899329259991646,
+            -1.12656283378601
+          ],
+          "from": [
+            -2.27175974845886,
+            0.0899352356791496,
+            -0.0226240810006857
+          ],
+          "name": "counter_left",
+          "reached": true,
+          "remaining_m": 0.0744940638542175,
+          "seconds": 0.317,
+          "target": [
+            -2.15000009536743,
+            0.0799999982118607,
+            -1.20000004768372
+          ]
+        },
+        "name": "Route: counter_left",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -0.598127782344818,
+            0.0899386927485466,
+            -1.22387671470642
+          ],
+          "from": [
+            -2.15759468078613,
+            0.0899329259991646,
+            -1.12656283378601
+          ],
+          "name": "counter_front",
+          "reached": true,
+          "remaining_m": 0.0988197103142738,
+          "seconds": 0.433,
+          "target": [
+            -0.5,
+            0.0799999982118607,
+            -1.23000001907349
+          ]
+        },
+        "name": "Route: counter_front",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            1.13247764110565,
+            0.0899351090192795,
+            -1.249018907547
+          ],
+          "from": [
+            -0.598127782344818,
+            0.0899386927485466,
+            -1.22387671470642
+          ],
+          "name": "coffee_corner",
+          "reached": true,
+          "remaining_m": 0.0682564601302147,
+          "seconds": 0.35,
+          "target": [
+            1.20000004768372,
+            0.0799999982118607,
+            -1.25
+          ]
+        },
+        "name": "Route: coffee_corner",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            2.42677617073059,
+            0.0899331048130989,
+            -1.1647664308548
+          ],
+          "from": [
+            1.13247764110565,
+            0.0899351090192795,
+            -1.249018907547
+          ],
+          "name": "hana_front",
+          "reached": true,
+          "remaining_m": 0.0740480571985245,
+          "seconds": 0.366,
+          "target": [
+            2.5,
+            0.0799999982118607,
+            -1.1599999666214
+          ]
+        },
+        "name": "Route: hana_front",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            2.67214632034302,
+            0.0899269878864288,
+            -2.00465869903564
+          ],
+          "from": [
+            2.42677617073059,
+            0.0899331048130989,
+            -1.1647664308548
+          ],
+          "name": "rear_door",
+          "reached": true,
+          "remaining_m": 0.0998214483261108,
+          "seconds": 0.249,
+          "target": [
+            2.70000004768372,
+            0.0799999982118607,
+            -2.09999990463257
+          ]
+        },
+        "name": "Route: rear_door",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/counter/ArtCollider"
+          ],
+          "final": [
+            -0.5,
+            0.0800977647304535,
+            -1.39338934421539
+          ],
+          "from": [
+            -0.5,
+            0.0799999982118607,
+            -1.23000001907349
+          ],
+          "reached": false,
+          "remaining_m": 0.706610560417175,
+          "seconds": 0.867,
+          "target": [
+            -0.5,
+            0.0799999982118607,
+            -2.09999990463257
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/counter/ArtCollider"
+        },
+        "name": "Blocked: counter",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/tea_table_2/ArtCollider"
+          ],
+          "final": [
+            0.349999994039536,
+            0.0800789371132851,
+            2.20000004768372
+          ],
+          "from": [
+            0.349999994039536,
+            0.0799999982118607,
+            2.45000004768372
+          ],
+          "reached": false,
+          "remaining_m": 0.700000047683716,
+          "seconds": 0.883,
+          "target": [
+            0.349999994039536,
+            0.0799999982118607,
+            1.5
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/tea_table_2/ArtCollider"
+        },
+        "name": "Blocked: tea_table",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/stool_2_1/ArtCollider"
+          ],
+          "final": [
+            1.08000004291534,
+            0.0771448016166687,
+            2.42394590377808
+          ],
+          "from": [
+            1.08000004291534,
+            0.0799999982118607,
+            2.65000009536743
+          ],
+          "reached": false,
+          "remaining_m": 0.50395405292511,
+          "seconds": 0.883,
+          "target": [
+            1.08000004291534,
+            0.0799999982118607,
+            1.91999995708466
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/stool_2_1/ArtCollider"
+        },
+        "name": "Blocked: round_stool",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            -2.44521951675415,
+            0.0800789371132851,
+            -0.400000005960464
+          ],
+          "from": [
+            -2.29999995231628,
+            0.0799999982118607,
+            -0.400000005960464
+          ],
+          "reached": false,
+          "remaining_m": 0.484780550003052,
+          "seconds": 0.883,
+          "target": [
+            -2.9300000667572,
+            0.0799999982118607,
+            -0.400000005960464
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/window_bench/ArtCollider"
+        },
+        "name": "Blocked: window_bench",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/left_wall/@StaticBody3D@5"
+          ],
+          "final": [
+            -2.97499966621399,
+            0.0760891139507294,
+            -2.34999990463257
+          ],
+          "from": [
+            -2.59999990463257,
+            0.0799999982118607,
+            -2.34999990463257
+          ],
+          "reached": false,
+          "remaining_m": 0.625012457370758,
+          "seconds": 0.883,
+          "target": [
+            -3.59999990463257,
+            0.0799999982118607,
+            -2.34999990463257
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/left_wall/@StaticBody3D@5"
+        },
+        "name": "Blocked: left_wall",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/back_wall/@StaticBody3D@7"
+          ],
+          "final": [
+            -2.5,
+            0.0804676041007042,
+            -2.78749990463257
+          ],
+          "from": [
+            -2.5,
+            0.0799999982118607,
+            -2.59999990463257
+          ],
+          "reached": false,
+          "remaining_m": 0.81250011920929,
+          "seconds": 0.882,
+          "target": [
+            -2.5,
+            0.0799999982118607,
+            -3.59999990463257
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/back_wall/@StaticBody3D@7"
+        },
+        "name": "Blocked: back_wall",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/RightBoundary"
+          ],
+          "final": [
+            2.9787495136261,
+            0.0800103545188904,
+            2.54999995231628
+          ],
+          "from": [
+            2.79999995231628,
+            0.0799999982118607,
+            2.54999995231628
+          ],
+          "reached": false,
+          "remaining_m": 0.62125039100647,
+          "seconds": 0.867,
+          "target": [
+            3.59999990463257,
+            0.0799999982118607,
+            2.54999995231628
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/RightBoundary"
+        },
+        "name": "Blocked: right_boundary",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/FrontLeftBoundary"
+          ],
+          "final": [
+            -1.5,
+            0.0760858431458473,
+            2.77500009536743
+          ],
+          "from": [
+            -1.5,
+            0.0799999982118607,
+            2.65000009536743
+          ],
+          "reached": false,
+          "remaining_m": 1.02500736713409,
+          "seconds": 0.883,
+          "target": [
+            -1.5,
+            0.0799999982118607,
+            3.79999995231628
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/FrontLeftBoundary"
+        },
+        "name": "Blocked: front_left",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/FrontRightBoundary"
+          ],
+          "final": [
+            2.5,
+            0.0760889798402786,
+            2.77500009536743
+          ],
+          "from": [
+            2.5,
+            0.0799999982118607,
+            2.65000009536743
+          ],
+          "reached": false,
+          "remaining_m": 1.02500736713409,
+          "seconds": 0.883,
+          "target": [
+            2.5,
+            0.0799999982118607,
+            3.79999995231628
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/FrontRightBoundary"
+        },
+        "name": "Blocked: front_right",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/LandingLeft"
+          ],
+          "final": [
+            -0.128749489784241,
+            0.0800044611096382,
+            3.59999990463257
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            3.59999990463257
+          ],
+          "reached": false,
+          "remaining_m": 0.771250486373901,
+          "seconds": 0.883,
+          "target": [
+            -0.899999976158142,
+            0.0799999982118607,
+            3.59999990463257
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/LandingLeft"
+        },
+        "name": "Blocked: landing_left",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [
+            "/root/SceneBenchmark/TeaHouseArt/LandingRight"
+          ],
+          "final": [
+            0.737500011920929,
+            0.0804684162139893,
+            3.59999990463257
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            3.59999990463257
+          ],
+          "reached": false,
+          "remaining_m": 0.762500166893005,
+          "seconds": 0.883,
+          "target": [
+            1.5,
+            0.0799999982118607,
+            3.59999990463257
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/LandingRight"
+        },
+        "name": "Blocked: landing_right",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            0.300000011920929,
+            0.0726169124245644,
+            3.96249985694885
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            3.65000009536743
+          ],
+          "reached": false,
+          "remaining_m": 0.837532937526703,
+          "seconds": 0.883,
+          "target": [
+            0.300000011920929,
+            0.0799999982118607,
+            4.80000019073486
+          ],
+          "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/LandingEnd"
+        },
+        "name": "Blocked: landing_end",
+        "passed": true
+      },
+      {
+        "details": {
+          "authored_width": 1.3,
+          "measured_m": 1.29999995231628,
+          "minimum_m": 0.7
+        },
+        "name": "Gap width: entry",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            0.299999982118607,
+            0.0899027138948441,
+            3.50899744033813
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.70000004768372
+          ],
+          "reached": true,
+          "remaining_m": 0.0915396735072136,
+          "seconds": 0.25,
+          "target": [
+            0.300000011920929,
+            0.0799999982118607,
+            3.59999990463257
+          ]
+        },
+        "name": "Traverse: entry",
+        "passed": true
+      },
+      {
+        "details": {
+          "authored_width": 0.825,
+          "measured_m": 0.825000047683716,
+          "minimum_m": 0.7
+        },
+        "name": "Gap width: counter_aisle",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "final": [
+            0.266210943460464,
+            0.0899358838796616,
+            -1.20000004768372
+          ],
+          "from": [
+            -1.10000002384186,
+            0.0799999982118607,
+            -1.20000004768372
+          ],
+          "reached": true,
+          "remaining_m": 0.0843761041760445,
+          "seconds": 0.4,
+          "target": [
+            0.349999994039536,
+            0.0799999982118607,
+            -1.20000004768372
+          ]
+        },
+        "name": "Traverse: counter_aisle",
+        "passed": true
+      },
+      {
+        "details": {
+          "entry": {
+            "collisions": [],
+            "final": [
+              0.299999982118607,
+              0.0899282246828079,
+              2.87627625465393
+            ],
+            "from": [
+              0.299999982118607,
+              0.0899207666516304,
+              3.5496678352356
+            ],
+            "reached": true,
+            "remaining_m": 0.0769197270274162,
+            "seconds": 0.2,
+            "target": [
+              0.300000011920929,
+              0.0799999982118607,
+              2.79999995231628
+            ]
+          },
+          "exit": {
+            "collisions": [],
+            "final": [
+              0.299999982118607,
+              0.0899207666516304,
+              3.5496678352356
+            ],
+            "from": [
+              0.300000011920929,
+              0.0799999982118607,
+              2.79999995231628
+            ],
+            "reached": true,
+            "remaining_m": 0.100821539759636,
+            "seconds": 0.233,
+            "target": [
+              0.300000011920929,
+              0.0799999982118607,
+              3.65000009536743
+            ]
+          }
+        },
+        "name": "Entrance gap allows exit and reentry",
+        "passed": true
+      },
+      {
+        "details": {
+          "collisions": [],
+          "delta": [
+            0.0217766761779785,
+            0.00979804247617722,
+            1.59099149703979
+          ],
+          "wall_torso_ray": {}
+        },
+        "name": "Diagonal collision preserves wall sliding",
+        "passed": true
+      },
+      {
+        "details": [
+          "run",
+          0.15,
+          0.316666666666667
+        ],
+        "name": "Run animation advances in rendered viewport",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Input release stops horizontal motion",
+        "passed": true
+      },
+      {
+        "details": "idle",
+        "name": "Release returns to idle",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Focus loss cancels movement",
+        "passed": true
+      },
+      {
+        "details": 1.74399703741074,
+        "name": "Fixture head-top height measurable",
+        "passed": true
+      },
+      {
+        "details": {
+          "baseline_ratio": 1.33601144383782,
+          "difference": 0.0,
+          "height": 2.33,
+          "ratio_to_H": 1.33601144383782,
+          "reason": ""
+        },
+        "name": "Scale ±15%: door",
+        "passed": true
+      },
+      {
+        "details": {
+          "baseline_ratio": 0.660838278550682,
+          "difference": 0.00216919739696331,
+          "height": 1.15,
+          "ratio_to_H": 0.659404789877036,
+          "reason": ""
+        },
+        "name": "Scale ±15%: counter",
+        "passed": true
+      },
+      {
+        "details": {
+          "baseline_ratio": 0.39277589657893,
+          "difference": 0.0437956204379562,
+          "height": 0.715,
+          "ratio_to_H": 0.409977760662679,
+          "reason": ""
+        },
+        "name": "Scale ±15%: chair",
+        "passed": true
+      },
+      {
+        "details": {
+          "baseline_ratio": 0.650803857835162,
+          "difference": 0.118942731277533,
+          "height": 1.0,
+          "ratio_to_H": 0.573395469458292,
+          "reason": ""
+        },
+        "name": "Scale ±15%: table",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "pid": 2520304,
+    "renderer": "mobile",
+    "route": [
+      {
+        "collisions": [],
+        "final": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "name": "spawn",
+        "reached": true,
+        "remaining_m": 0.0,
+        "seconds": 0.0,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          0.300000011920929,
+          0.0899274051189423,
+          2.72382807731628
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "name": "entry_inside",
+        "reached": true,
+        "remaining_m": 0.0768160670995712,
+        "seconds": 0.001,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.79999995231628
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -1.23371553421021,
+          0.0899305865168571,
+          2.55720114707947
+        ],
+        "from": [
+          0.300000011920929,
+          0.0899274051189423,
+          2.72382807731628
+        ],
+        "name": "left_entry",
+        "reached": true,
+        "remaining_m": 0.0674099251627922,
+        "seconds": 0.3,
+        "target": [
+          -1.29999995231628,
+          0.0799999982118607,
+          2.54999995231628
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -1.80367136001587,
+          0.0899301469326019,
+          1.25992667675018
+        ],
+        "from": [
+          -1.23371553421021,
+          0.0899305865168571,
+          2.55720114707947
+        ],
+        "name": "lena_corner",
+        "reached": true,
+        "remaining_m": 0.0662042871117592,
+        "seconds": 0.4,
+        "target": [
+          -1.83000004291534,
+          0.0799999982118607,
+          1.20000004768372
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -2.27175974845886,
+          0.0899352356791496,
+          -0.0226240810006857
+        ],
+        "from": [
+          -1.80367136001587,
+          0.0899301469326019,
+          1.25992667675018
+        ],
+        "name": "window_bench",
+        "reached": true,
+        "remaining_m": 0.0829653590917587,
+        "seconds": 0.383,
+        "target": [
+          -2.29999995231628,
+          0.0799999982118607,
+          -0.100000001490116
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -2.15759468078613,
+          0.0899329259991646,
+          -1.12656283378601
+        ],
+        "from": [
+          -2.27175974845886,
+          0.0899352356791496,
+          -0.0226240810006857
+        ],
+        "name": "counter_left",
+        "reached": true,
+        "remaining_m": 0.0744940638542175,
+        "seconds": 0.317,
+        "target": [
+          -2.15000009536743,
+          0.0799999982118607,
+          -1.20000004768372
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          -0.598127782344818,
+          0.0899386927485466,
+          -1.22387671470642
+        ],
+        "from": [
+          -2.15759468078613,
+          0.0899329259991646,
+          -1.12656283378601
+        ],
+        "name": "counter_front",
+        "reached": true,
+        "remaining_m": 0.0988197103142738,
+        "seconds": 0.433,
+        "target": [
+          -0.5,
+          0.0799999982118607,
+          -1.23000001907349
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          1.13247764110565,
+          0.0899351090192795,
+          -1.249018907547
+        ],
+        "from": [
+          -0.598127782344818,
+          0.0899386927485466,
+          -1.22387671470642
+        ],
+        "name": "coffee_corner",
+        "reached": true,
+        "remaining_m": 0.0682564601302147,
+        "seconds": 0.35,
+        "target": [
+          1.20000004768372,
+          0.0799999982118607,
+          -1.25
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          2.42677617073059,
+          0.0899331048130989,
+          -1.1647664308548
+        ],
+        "from": [
+          1.13247764110565,
+          0.0899351090192795,
+          -1.249018907547
+        ],
+        "name": "hana_front",
+        "reached": true,
+        "remaining_m": 0.0740480571985245,
+        "seconds": 0.366,
+        "target": [
+          2.5,
+          0.0799999982118607,
+          -1.1599999666214
+        ]
+      },
+      {
+        "collisions": [],
+        "final": [
+          2.67214632034302,
+          0.0899269878864288,
+          -2.00465869903564
+        ],
+        "from": [
+          2.42677617073059,
+          0.0899331048130989,
+          -1.1647664308548
+        ],
+        "name": "rear_door",
+        "reached": true,
+        "remaining_m": 0.0998214483261108,
+        "seconds": 0.249,
+        "target": [
+          2.70000004768372,
+          0.0799999982118607,
+          -2.09999990463257
+        ]
+      }
+    ],
+    "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+    "slug": "tea_house"
+  },
+  "video": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 960,
+        "height": 720
+      }
+    ],
+    "format": {
+      "duration": "15.000000"
+    },
+    "frame_checks": [
+      {
+        "time_seconds": 0.5,
+        "luma_mean": 223.2099609375,
+        "luma_std": 36.31355588322205,
+        "nonblack_nonuniform": true
+      },
+      {
+        "time_seconds": 7.5,
+        "luma_mean": 223.15885416666666,
+        "luma_std": 36.37199514707342,
+        "nonblack_nonuniform": true
+      },
+      {
+        "time_seconds": 14.0,
+        "luma_mean": 223.15104166666666,
+        "luma_std": 36.39029029949606,
+        "nonblack_nonuniform": true
+      }
+    ],
+    "image_content_valid": true,
+    "capture": "Existing rendered viewport recorder; original monotonic wall-clock frame intervals",
+    "accelerated": false,
+    "captured_frames": 288,
+    "camera": "Overview 43 degrees, 12.8m width; default art camera remains 6.72m",
+    "recorder_source": "tools/art/source/coffee_shop/record_r1.gd",
+    "recorder_sha256": "48ed18015f3520f731b9defd9dc429ac950a09377cfbb78c148891d06d47efd7",
+    "max_capture_interval_seconds": 0.06786899999999996
+  },
+  "colour_samples": [
+    {
+      "role": "beam",
+      "runtime_xy": [
+        325,
+        216
+      ],
+      "reference_xy": [
+        342,
+        242
+      ],
+      "sample_px": 11,
+      "runtime_rgb": [
+        255.0,
+        238.0,
+        202.0
+      ],
+      "reference_rgb": [
+        234.0,
+        189.0,
+        138.0
+      ],
+      "hue_delta_degrees": 8.87971698113207,
+      "passed": true
+    },
+    {
+      "role": "floor",
+      "runtime_xy": [
+        618,
+        853
+      ],
+      "reference_xy": [
+        627,
+        1017
+      ],
+      "sample_px": 11,
+      "runtime_rgb": [
+        242.0,
+        199.0,
+        145.0
+      ],
+      "reference_rgb": [
+        242.0,
+        204.0,
+        161.0
+      ],
+      "hue_delta_degrees": 1.5502100038182376,
+      "passed": true
+    },
+    {
+      "role": "wall",
+      "runtime_xy": [
+        284,
+        343
+      ],
+      "reference_xy": [
+        396,
+        420
+      ],
+      "sample_px": 11,
+      "runtime_rgb": [
+        233.0,
+        205.0,
+        162.0
+      ],
+      "reference_rgb": [
+        240.0,
+        217.0,
+        191.0
+      ],
+      "hue_delta_degrees": 4.501293475136548,
+      "passed": true
+    }
+  ],
+  "plant_controls": [
+    {
+      "source": "olive_tree",
+      "same_camera_light_geometry": true,
+      "interior_pixels": 100447,
+      "hue_delta_degrees": 0.0,
+      "rgb_mae_255": 1.526390368386645,
+      "passed": true
+    },
+    {
+      "source": "pothos",
+      "same_camera_light_geometry": true,
+      "interior_pixels": 84858,
+      "hue_delta_degrees": 1.1538461538461497,
+      "rgb_mae_255": 1.8845915136659674,
+      "passed": true
+    }
+  ],
+  "local_lighting": {
+    "different_pixels_gt_3": 497779,
+    "mean_rgb_difference": 9.861260238095237,
+    "passed": true,
+    "lights": 3,
+    "test": "Same fixed camera, only three local light nodes toggled"
+  },
+  "scope": "Desktop Vulkan Mobile art and movement checks, not device performance or gameplay integration.",
+  "desktop_presentation": "Private QA project disables VSync and caps at 60 FPS to avoid observed desktop presentation stalls; shared benchmark thresholds unchanged.",
+  "passed": true
+}

@@ -1,0 +1,1046 @@
+{
+  "adapter": "NVIDIA GeForce RTX 2060",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0799999982118607,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(0.3, 0.08, 2.55)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "name": "spawn",
+        "reached": true,
+        "remaining_m": 0.0,
+        "seconds": 0.0,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ]
+      },
+      "name": "Route: spawn",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.300000011920929,
+          0.0899274051189423,
+          2.72382807731628
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "name": "entry_inside",
+        "reached": true,
+        "remaining_m": 0.0768160670995712,
+        "seconds": 0.001,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.79999995231628
+        ]
+      },
+      "name": "Route: entry_inside",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.23371553421021,
+          0.0899305865168571,
+          2.55720114707947
+        ],
+        "from": [
+          0.300000011920929,
+          0.0899274051189423,
+          2.72382807731628
+        ],
+        "name": "left_entry",
+        "reached": true,
+        "remaining_m": 0.0674099251627922,
+        "seconds": 0.3,
+        "target": [
+          -1.29999995231628,
+          0.0799999982118607,
+          2.54999995231628
+        ]
+      },
+      "name": "Route: left_entry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.80367136001587,
+          0.0899301469326019,
+          1.25992667675018
+        ],
+        "from": [
+          -1.23371553421021,
+          0.0899305865168571,
+          2.55720114707947
+        ],
+        "name": "lena_corner",
+        "reached": true,
+        "remaining_m": 0.0662042871117592,
+        "seconds": 0.4,
+        "target": [
+          -1.83000004291534,
+          0.0799999982118607,
+          1.20000004768372
+        ]
+      },
+      "name": "Route: lena_corner",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.27175974845886,
+          0.0899352356791496,
+          -0.0226240810006857
+        ],
+        "from": [
+          -1.80367136001587,
+          0.0899301469326019,
+          1.25992667675018
+        ],
+        "name": "window_bench",
+        "reached": true,
+        "remaining_m": 0.0829653590917587,
+        "seconds": 0.383,
+        "target": [
+          -2.29999995231628,
+          0.0799999982118607,
+          -0.100000001490116
+        ]
+      },
+      "name": "Route: window_bench",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.15759468078613,
+          0.0899329259991646,
+          -1.12656283378601
+        ],
+        "from": [
+          -2.27175974845886,
+          0.0899352356791496,
+          -0.0226240810006857
+        ],
+        "name": "counter_left",
+        "reached": true,
+        "remaining_m": 0.0744940638542175,
+        "seconds": 0.317,
+        "target": [
+          -2.15000009536743,
+          0.0799999982118607,
+          -1.20000004768372
+        ]
+      },
+      "name": "Route: counter_left",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.598127782344818,
+          0.0899386927485466,
+          -1.22387671470642
+        ],
+        "from": [
+          -2.15759468078613,
+          0.0899329259991646,
+          -1.12656283378601
+        ],
+        "name": "counter_front",
+        "reached": true,
+        "remaining_m": 0.0988197103142738,
+        "seconds": 0.433,
+        "target": [
+          -0.5,
+          0.0799999982118607,
+          -1.23000001907349
+        ]
+      },
+      "name": "Route: counter_front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.13247764110565,
+          0.0899351090192795,
+          -1.249018907547
+        ],
+        "from": [
+          -0.598127782344818,
+          0.0899386927485466,
+          -1.22387671470642
+        ],
+        "name": "coffee_corner",
+        "reached": true,
+        "remaining_m": 0.0682564601302147,
+        "seconds": 0.35,
+        "target": [
+          1.20000004768372,
+          0.0799999982118607,
+          -1.25
+        ]
+      },
+      "name": "Route: coffee_corner",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.42677617073059,
+          0.0899331048130989,
+          -1.1647664308548
+        ],
+        "from": [
+          1.13247764110565,
+          0.0899351090192795,
+          -1.249018907547
+        ],
+        "name": "hana_front",
+        "reached": true,
+        "remaining_m": 0.0740480571985245,
+        "seconds": 0.366,
+        "target": [
+          2.5,
+          0.0799999982118607,
+          -1.1599999666214
+        ]
+      },
+      "name": "Route: hana_front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.67214632034302,
+          0.0899269878864288,
+          -2.00465869903564
+        ],
+        "from": [
+          2.42677617073059,
+          0.0899331048130989,
+          -1.1647664308548
+        ],
+        "name": "rear_door",
+        "reached": true,
+        "remaining_m": 0.0998214483261108,
+        "seconds": 0.249,
+        "target": [
+          2.70000004768372,
+          0.0799999982118607,
+          -2.09999990463257
+        ]
+      },
+      "name": "Route: rear_door",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/counter/ArtCollider"
+        ],
+        "final": [
+          -0.5,
+          0.0800977647304535,
+          -1.39338934421539
+        ],
+        "from": [
+          -0.5,
+          0.0799999982118607,
+          -1.23000001907349
+        ],
+        "reached": false,
+        "remaining_m": 0.706610560417175,
+        "seconds": 0.867,
+        "target": [
+          -0.5,
+          0.0799999982118607,
+          -2.09999990463257
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/counter/ArtCollider"
+      },
+      "name": "Blocked: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/tea_table_2/ArtCollider"
+        ],
+        "final": [
+          0.349999994039536,
+          0.0800789371132851,
+          2.20000004768372
+        ],
+        "from": [
+          0.349999994039536,
+          0.0799999982118607,
+          2.45000004768372
+        ],
+        "reached": false,
+        "remaining_m": 0.700000047683716,
+        "seconds": 0.883,
+        "target": [
+          0.349999994039536,
+          0.0799999982118607,
+          1.5
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/tea_table_2/ArtCollider"
+      },
+      "name": "Blocked: tea_table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/stool_2_1/ArtCollider"
+        ],
+        "final": [
+          1.08000004291534,
+          0.0771448016166687,
+          2.42394590377808
+        ],
+        "from": [
+          1.08000004291534,
+          0.0799999982118607,
+          2.65000009536743
+        ],
+        "reached": false,
+        "remaining_m": 0.50395405292511,
+        "seconds": 0.883,
+        "target": [
+          1.08000004291534,
+          0.0799999982118607,
+          1.91999995708466
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/stool_2_1/ArtCollider"
+      },
+      "name": "Blocked: round_stool",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.44521951675415,
+          0.0800789371132851,
+          -0.400000005960464
+        ],
+        "from": [
+          -2.29999995231628,
+          0.0799999982118607,
+          -0.400000005960464
+        ],
+        "reached": false,
+        "remaining_m": 0.484780550003052,
+        "seconds": 0.883,
+        "target": [
+          -2.9300000667572,
+          0.0799999982118607,
+          -0.400000005960464
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/window_bench/ArtCollider"
+      },
+      "name": "Blocked: window_bench",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/left_wall/@StaticBody3D@5"
+        ],
+        "final": [
+          -2.97499966621399,
+          0.0760891139507294,
+          -2.34999990463257
+        ],
+        "from": [
+          -2.59999990463257,
+          0.0799999982118607,
+          -2.34999990463257
+        ],
+        "reached": false,
+        "remaining_m": 0.625012457370758,
+        "seconds": 0.883,
+        "target": [
+          -3.59999990463257,
+          0.0799999982118607,
+          -2.34999990463257
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/left_wall/@StaticBody3D@5"
+      },
+      "name": "Blocked: left_wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/back_wall/@StaticBody3D@7"
+        ],
+        "final": [
+          -2.5,
+          0.0804676041007042,
+          -2.78749990463257
+        ],
+        "from": [
+          -2.5,
+          0.0799999982118607,
+          -2.59999990463257
+        ],
+        "reached": false,
+        "remaining_m": 0.81250011920929,
+        "seconds": 0.882,
+        "target": [
+          -2.5,
+          0.0799999982118607,
+          -3.59999990463257
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/back_wall/@StaticBody3D@7"
+      },
+      "name": "Blocked: back_wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/RightBoundary"
+        ],
+        "final": [
+          2.9787495136261,
+          0.0800103545188904,
+          2.54999995231628
+        ],
+        "from": [
+          2.79999995231628,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "reached": false,
+        "remaining_m": 0.62125039100647,
+        "seconds": 0.867,
+        "target": [
+          3.59999990463257,
+          0.0799999982118607,
+          2.54999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/RightBoundary"
+      },
+      "name": "Blocked: right_boundary",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/FrontLeftBoundary"
+        ],
+        "final": [
+          -1.5,
+          0.0760858431458473,
+          2.77500009536743
+        ],
+        "from": [
+          -1.5,
+          0.0799999982118607,
+          2.65000009536743
+        ],
+        "reached": false,
+        "remaining_m": 1.02500736713409,
+        "seconds": 0.883,
+        "target": [
+          -1.5,
+          0.0799999982118607,
+          3.79999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/FrontLeftBoundary"
+      },
+      "name": "Blocked: front_left",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/FrontRightBoundary"
+        ],
+        "final": [
+          2.5,
+          0.0760889798402786,
+          2.77500009536743
+        ],
+        "from": [
+          2.5,
+          0.0799999982118607,
+          2.65000009536743
+        ],
+        "reached": false,
+        "remaining_m": 1.02500736713409,
+        "seconds": 0.883,
+        "target": [
+          2.5,
+          0.0799999982118607,
+          3.79999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/FrontRightBoundary"
+      },
+      "name": "Blocked: front_right",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/LandingLeft"
+        ],
+        "final": [
+          -0.128749489784241,
+          0.0800044611096382,
+          3.59999990463257
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          3.59999990463257
+        ],
+        "reached": false,
+        "remaining_m": 0.771250486373901,
+        "seconds": 0.883,
+        "target": [
+          -0.899999976158142,
+          0.0799999982118607,
+          3.59999990463257
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/LandingLeft"
+      },
+      "name": "Blocked: landing_left",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/TeaHouseArt/LandingRight"
+        ],
+        "final": [
+          0.737500011920929,
+          0.0804684162139893,
+          3.59999990463257
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          3.59999990463257
+        ],
+        "reached": false,
+        "remaining_m": 0.762500166893005,
+        "seconds": 0.883,
+        "target": [
+          1.5,
+          0.0799999982118607,
+          3.59999990463257
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/LandingRight"
+      },
+      "name": "Blocked: landing_right",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.300000011920929,
+          0.0726169124245644,
+          3.96249985694885
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          3.65000009536743
+        ],
+        "reached": false,
+        "remaining_m": 0.837532937526703,
+        "seconds": 0.883,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          4.80000019073486
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/TeaHouseArt/LandingEnd"
+      },
+      "name": "Blocked: landing_end",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 1.3,
+        "measured_m": 1.29999995231628,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: entry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.299999982118607,
+          0.0899027138948441,
+          3.50899744033813
+        ],
+        "from": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.70000004768372
+        ],
+        "reached": true,
+        "remaining_m": 0.0915396735072136,
+        "seconds": 0.25,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          3.59999990463257
+        ]
+      },
+      "name": "Traverse: entry",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 0.825,
+        "measured_m": 0.825000047683716,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: counter_aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.266210943460464,
+          0.0899358838796616,
+          -1.20000004768372
+        ],
+        "from": [
+          -1.10000002384186,
+          0.0799999982118607,
+          -1.20000004768372
+        ],
+        "reached": true,
+        "remaining_m": 0.0843761041760445,
+        "seconds": 0.4,
+        "target": [
+          0.349999994039536,
+          0.0799999982118607,
+          -1.20000004768372
+        ]
+      },
+      "name": "Traverse: counter_aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "entry": {
+          "collisions": [],
+          "final": [
+            0.299999982118607,
+            0.0899282246828079,
+            2.87627625465393
+          ],
+          "from": [
+            0.299999982118607,
+            0.0899207666516304,
+            3.5496678352356
+          ],
+          "reached": true,
+          "remaining_m": 0.0769197270274162,
+          "seconds": 0.2,
+          "target": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.79999995231628
+          ]
+        },
+        "exit": {
+          "collisions": [],
+          "final": [
+            0.299999982118607,
+            0.0899207666516304,
+            3.5496678352356
+          ],
+          "from": [
+            0.300000011920929,
+            0.0799999982118607,
+            2.79999995231628
+          ],
+          "reached": true,
+          "remaining_m": 0.100821539759636,
+          "seconds": 0.233,
+          "target": [
+            0.300000011920929,
+            0.0799999982118607,
+            3.65000009536743
+          ]
+        }
+      },
+      "name": "Entrance gap allows exit and reentry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          0.0217766761779785,
+          0.00979804247617722,
+          1.59099149703979
+        ],
+        "wall_torso_ray": {}
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.15,
+        0.316666666666667
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74399703741074,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 1.33601144383782,
+        "difference": 0.0,
+        "height": 2.33,
+        "ratio_to_H": 1.33601144383782,
+        "reason": ""
+      },
+      "name": "Scale ±15%: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660838278550682,
+        "difference": 0.00216919739696331,
+        "height": 1.15,
+        "ratio_to_H": 0.659404789877036,
+        "reason": ""
+      },
+      "name": "Scale ±15%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.39277589657893,
+        "difference": 0.0437956204379562,
+        "height": 0.715,
+        "ratio_to_H": 0.409977760662679,
+        "reason": ""
+      },
+      "name": "Scale ±15%: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650803857835162,
+        "difference": 0.118942731277533,
+        "height": 1.0,
+        "ratio_to_H": 0.573395469458292,
+        "reason": ""
+      },
+      "name": "Scale ±15%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "pid": 2520304,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [],
+      "final": [
+        0.300000011920929,
+        0.0799999982118607,
+        2.54999995231628
+      ],
+      "from": [
+        0.300000011920929,
+        0.0799999982118607,
+        2.54999995231628
+      ],
+      "name": "spawn",
+      "reached": true,
+      "remaining_m": 0.0,
+      "seconds": 0.0,
+      "target": [
+        0.300000011920929,
+        0.0799999982118607,
+        2.54999995231628
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.300000011920929,
+        0.0899274051189423,
+        2.72382807731628
+      ],
+      "from": [
+        0.300000011920929,
+        0.0799999982118607,
+        2.54999995231628
+      ],
+      "name": "entry_inside",
+      "reached": true,
+      "remaining_m": 0.0768160670995712,
+      "seconds": 0.001,
+      "target": [
+        0.300000011920929,
+        0.0799999982118607,
+        2.79999995231628
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.23371553421021,
+        0.0899305865168571,
+        2.55720114707947
+      ],
+      "from": [
+        0.300000011920929,
+        0.0899274051189423,
+        2.72382807731628
+      ],
+      "name": "left_entry",
+      "reached": true,
+      "remaining_m": 0.0674099251627922,
+      "seconds": 0.3,
+      "target": [
+        -1.29999995231628,
+        0.0799999982118607,
+        2.54999995231628
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.80367136001587,
+        0.0899301469326019,
+        1.25992667675018
+      ],
+      "from": [
+        -1.23371553421021,
+        0.0899305865168571,
+        2.55720114707947
+      ],
+      "name": "lena_corner",
+      "reached": true,
+      "remaining_m": 0.0662042871117592,
+      "seconds": 0.4,
+      "target": [
+        -1.83000004291534,
+        0.0799999982118607,
+        1.20000004768372
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.27175974845886,
+        0.0899352356791496,
+        -0.0226240810006857
+      ],
+      "from": [
+        -1.80367136001587,
+        0.0899301469326019,
+        1.25992667675018
+      ],
+      "name": "window_bench",
+      "reached": true,
+      "remaining_m": 0.0829653590917587,
+      "seconds": 0.383,
+      "target": [
+        -2.29999995231628,
+        0.0799999982118607,
+        -0.100000001490116
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.15759468078613,
+        0.0899329259991646,
+        -1.12656283378601
+      ],
+      "from": [
+        -2.27175974845886,
+        0.0899352356791496,
+        -0.0226240810006857
+      ],
+      "name": "counter_left",
+      "reached": true,
+      "remaining_m": 0.0744940638542175,
+      "seconds": 0.317,
+      "target": [
+        -2.15000009536743,
+        0.0799999982118607,
+        -1.20000004768372
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.598127782344818,
+        0.0899386927485466,
+        -1.22387671470642
+      ],
+      "from": [
+        -2.15759468078613,
+        0.0899329259991646,
+        -1.12656283378601
+      ],
+      "name": "counter_front",
+      "reached": true,
+      "remaining_m": 0.0988197103142738,
+      "seconds": 0.433,
+      "target": [
+        -0.5,
+        0.0799999982118607,
+        -1.23000001907349
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        1.13247764110565,
+        0.0899351090192795,
+        -1.249018907547
+      ],
+      "from": [
+        -0.598127782344818,
+        0.0899386927485466,
+        -1.22387671470642
+      ],
+      "name": "coffee_corner",
+      "reached": true,
+      "remaining_m": 0.0682564601302147,
+      "seconds": 0.35,
+      "target": [
+        1.20000004768372,
+        0.0799999982118607,
+        -1.25
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.42677617073059,
+        0.0899331048130989,
+        -1.1647664308548
+      ],
+      "from": [
+        1.13247764110565,
+        0.0899351090192795,
+        -1.249018907547
+      ],
+      "name": "hana_front",
+      "reached": true,
+      "remaining_m": 0.0740480571985245,
+      "seconds": 0.366,
+      "target": [
+        2.5,
+        0.0799999982118607,
+        -1.1599999666214
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.67214632034302,
+        0.0899269878864288,
+        -2.00465869903564
+      ],
+      "from": [
+        2.42677617073059,
+        0.0899331048130989,
+        -1.1647664308548
+      ],
+      "name": "rear_door",
+      "reached": true,
+      "remaining_m": 0.0998214483261108,
+      "seconds": 0.249,
+      "target": [
+        2.70000004768372,
+        0.0799999982118607,
+        -2.09999990463257
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "tea_house"
+}

@@ -1,0 +1,321 @@
+{
+  "room_shell": {
+    "asset": "room_shell",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "entry_deck": {
+    "asset": "entry_deck",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Level front landing keeps exit/reentry on continuous supporting floor"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "left_wall": {
+    "asset": "left_wall",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "back_wall": {
+    "asset": "back_wall",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "round_window": {
+    "asset": "round_window",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "window_backdrop": {
+    "asset": "window_backdrop",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Separate replaceable window-view module, no shadows"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "tea_table_1": {
+    "asset": "tea_table_1",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Approved .90m tabletop, 1.00m top, no floor cushions"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "tea_table_1_flowers": {
+    "asset": "tea_table_1_flowers",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "derived shared botanical geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Cut flowers reuse shared botanical blade and flower generators, six triangles per petal"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d",
+    "source": "assets/rooms/_shared/plants/source/build_plants.py"
+  },
+  "tea_table_2": {
+    "asset": "tea_table_2",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Approved .90m tabletop, 1.00m top, no floor cushions"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "tea_table_2_flowers": {
+    "asset": "tea_table_2_flowers",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "derived shared botanical geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Cut flowers reuse shared botanical blade and flower generators, six triangles per petal"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d",
+    "source": "assets/rooms/_shared/plants/source/build_plants.py"
+  },
+  "tea_table_3": {
+    "asset": "tea_table_3",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Approved .90m tabletop, 1.00m top, no floor cushions"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "tea_table_3_flowers": {
+    "asset": "tea_table_3_flowers",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "derived shared botanical geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Cut flowers reuse shared botanical blade and flower generators, six triangles per petal"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d",
+    "source": "assets/rooms/_shared/plants/source/build_plants.py"
+  },
+  "round_stool_sage": {
+    "asset": "round_stool_sage",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "New .56m round drum with upholstered pad; actual seat top .715m"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "round_stool_linen": {
+    "asset": "round_stool_linen",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "New .56m round drum with upholstered pad; actual seat top .715m"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "window_bench": {
+    "asset": "window_bench",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Three .70m bench seats; top .715m"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "counter": {
+    "asset": "counter",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "counter_flowers": {
+    "asset": "counter_flowers",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "derived shared botanical geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Cut flowers reuse shared botanical blade and flower generators, six triangles per petal"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d",
+    "source": "assets/rooms/_shared/plants/source/build_plants.py"
+  },
+  "coffee_console": {
+    "asset": "coffee_console",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Hana coffee corner with one coffee pot and two cups"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "wall_shelves": {
+    "asset": "wall_shelves",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Two wall shelves above Ama, with jars, cups and a small shared plant"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "decorative_door": {
+    "asset": "decorative_door",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Closed decorative rear door; usable entrance remains at the open front"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "name_sign": {
+    "asset": "name_sign",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Blank separate sign above the decorative door, clear of Ama nameplate"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "wall_lantern": {
+    "asset": "wall_lantern",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Reusable square wood lantern frame and hanging bracket"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "lantern_glow": {
+    "asset": "lantern_glow",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "new authored geometry",
+    "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+    "source_script": "tools/art/build_tea_house.py",
+    "changes": [
+      "Separate warm light panels using the same atlas"
+    ],
+    "units": "metres; Y up; +Z front",
+    "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+  },
+  "corner_tree": {
+    "asset": "corner_tree",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "shared plant mesh reuse",
+    "source": "assets/rooms/_shared/plants/olive_tree.glb",
+    "source_sha256": "f2aa7fd237588d9fa720182977bf8ee7b13fd07f9765fa06d50ccfb376c77870",
+    "changes": [
+      "Retain geometry and shared leaf detail; remap source atlas into Tea House atlas quadrant",
+      "Uniform scale 1.0"
+    ],
+    "source_blend": "assets/rooms/_shared/plants/source/plants.blend"
+  },
+  "shelf_pothos": {
+    "asset": "shelf_pothos",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "kind": "shared plant mesh reuse",
+    "source": "assets/rooms/_shared/plants/pothos.glb",
+    "source_sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+    "changes": [
+      "Retain geometry and shared leaf detail; remap source atlas into Tea House atlas quadrant",
+      "Uniform scale 0.62"
+    ],
+    "source_blend": "assets/rooms/_shared/plants/source/plants.blend"
+  }
+}

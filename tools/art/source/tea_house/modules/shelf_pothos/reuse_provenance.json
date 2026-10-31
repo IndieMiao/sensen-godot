@@ -1,0 +1,13 @@
+{
+  "asset": "shelf_pothos",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "shared plant mesh reuse",
+  "source": "assets/rooms/_shared/plants/pothos.glb",
+  "source_sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+  "changes": [
+    "Retain geometry and shared leaf detail; remap source atlas into Tea House atlas quadrant",
+    "Uniform scale 0.62"
+  ],
+  "source_blend": "assets/rooms/_shared/plants/source/plants.blend"
+}

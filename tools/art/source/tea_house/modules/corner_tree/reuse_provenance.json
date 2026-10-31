@@ -1,0 +1,13 @@
+{
+  "asset": "corner_tree",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "shared plant mesh reuse",
+  "source": "assets/rooms/_shared/plants/olive_tree.glb",
+  "source_sha256": "f2aa7fd237588d9fa720182977bf8ee7b13fd07f9765fa06d50ccfb376c77870",
+  "changes": [
+    "Retain geometry and shared leaf detail; remap source atlas into Tea House atlas quadrant",
+    "Uniform scale 1.0"
+  ],
+  "source_blend": "assets/rooms/_shared/plants/source/plants.blend"
+}

@@ -1,0 +1,10 @@
+{
+  "source": "216-tea.png",
+  "crop_xyxy": [
+    245,
+    370,
+    310,
+    460
+  ],
+  "purpose": "Separate replaceable window-only scenery; crop is illustrative, not a dimension reference"
+}
