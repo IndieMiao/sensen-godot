@@ -2,6 +2,8 @@
 
 本轮是开发草稿，PR 只面向 `feat/355-b1`，由亚瑟审；**不是 farm-dev 发版变更**。按哪吒 11-02 的 `355-b1-A-view-contract.md` 和 `355-b1-A-client-checklist-liubang.md` 实现，v4q(1) 初稿 `28d1c01b` 尚待批准/校准。A1/A2 帧及缺口/满级/解锁正式文案未到，使用清单占位文案与现有组件。
 
+从farm-dev `ade61b9b`开工，集成分支建立后rebase到 `bc558130`；range-diff确认功能补丁 `dd68b0ee` 与 `b640f3ca` 等价。新基线包含怪物接口，不由本PR实现F/G。
+
 ## 已实现
 
 - HOME-1 按 `next.skills[]` 显示 Farming/Fishing/Cooking 各自需求，只有表中出现的项才显示；`next.travel` 非空时增加 Stamps/Other climates。顺序保持材料、金币、技能、出门。现有 NEED-TILE HFlow 自动换行，不提前制作新面板样式。
@@ -23,6 +25,8 @@
 本地已有类缓存缺最新ExternalLink/P0NotifyIOS，只用 --script 补对应本地索引；未用 --editor/--import，也没有启动ADB。首次新导航测试误用Close而非Back，已按既有返回导航语义修正。新测试带原生ResourceUID生成的.uid。
 
 最终 `tests/p0 + tests/ui_kit` **2080/2080，206组，0 errors/failures/flaky/skipped/orphans，exit0（report_904）**；新增契约测试9条，含Home原始返回目标的保留。日志 `output/liubang-355-a/full-delivery.log`。首轮全量的导航测试失败已由最终全量覆盖，不将首轮记为通过；report_903的2079是补返回链回归前的阶段结果。
+
+rebase后的集成基线再跑全量：**2087/2087、207组、0 errors/failures/flaky/skipped/orphans、exit0（report_905）**，包含上游新增7条怪物接口回归，日志 `output/liubang-355-a/rebased-full.log`。之后仅更新说明与过时注释，没有修改执行逻辑。
 
 ## 截图说明
 

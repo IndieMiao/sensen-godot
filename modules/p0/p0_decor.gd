@@ -129,8 +129,7 @@ static func line(id: String) -> String:
 static func header_line(view: Dictionary) -> String:
 	return "Decor %d/%d · Goes to Farm Storage" % [used(view), cap(view)]
 
-## The cap reached, said where Decorate is entered (q(113) ①): `Decor 24/24 · Homestead Lv3 adds 4`, at Lv10
-## `Decor 56/56 · Store one to place this`.
+## At the decor capacity: name the next level, or offer storage once the content's Homestead cap is reached.
 static func cap_line(view: Dictionary) -> String:
 	var level := int(view.get("homestead", {}).get("level", 1))
 	var head := "Decor %d/%d" % [used(view), cap(view)]
