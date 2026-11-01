@@ -70,7 +70,7 @@ describe('Homestead batch 1 (v4q(1)): Lv1–3', () => {
     const v = viewOf(c, s, T0);
     expect(v.homestead.unlocks).toMatchObject({ spice_rack: true, warming_cabinet: true, bag_upgrade_1: 'for_sale', board_slots: 3, fence: true,
       stoves: 1, big_pot: false, notice_board: false, chefs_sign: false, cabinet: 6, bag_upgrade_2: 'locked', bag_upgrade_3: 'locked', bag_upgrade_4: 'locked' });
-    expect(v.homestead.next).toMatchObject({ level: 4, unlocks: ['second_stove', 'healing_potion'], plots: 14, energy_gain: 50 });
+    expect(v.homestead.next).toMatchObject({ level: 4, unlocks: ['second_stove', 'potion_heal'], plots: 14, energy_gain: 50 });
   });
 
   it('refuses with the first gap in button order: each skill (Farming → Fishing → Cooking), then materials, then coins', () => {

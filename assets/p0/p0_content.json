@@ -2099,7 +2099,7 @@
   },
   "wallet_floor": 40,
   "homestead": {
-    "_p1": "v4q(1) (SGODOT-355 b1, pending approval): Lv1–17 at r9's design values (v4 §2.3, the batch-1 bridge rows for Lv16–17), to be calibrated. skills: each skill's own gate (Cooking from Lv6); travel (Lv16 on): city stamps and other climate bands; energy: what a level gives back, always a number (Lv2–15 50, Lv16 on 0). Ladders are [from level, value]. Pending the user: Lv3's gate 2 / 1 or 1 / 1 (丁1), Lv8's vein_mines / iron_sword (丁12, not listed yet), Lv13–14's decor sets (丁4: not in batch 1), Lv4's healing_potion id (v4q(7)).",
+    "_p1": "v4q(1) (SGODOT-355 b1, pending approval): Lv1–17 at r9's design values (v4 §2.3, the batch-1 bridge rows for Lv16–17), to be calibrated. skills: each skill's own gate (Cooking from Lv6); travel (Lv16 on): city stamps and other climate bands; energy: what a level gives back, always a number (Lv2–15 50, Lv16 on 0). Ladders are [from level, value]. Pending the user: Lv3's gate 2 / 1 or 1 / 1 (丁1), Lv8's vein_mines / iron_sword (丁12, not listed yet), Lv13–14's decor sets (丁4: not in batch 1). Lv4's potion_heal is v4q(7)'s Healing Potion.",
     "max_level": 17,
     "warming_cabinet": 6,
     "energy_steps": [
@@ -2376,7 +2376,7 @@
         ],
         "unlocks": [
           "second_stove",
-          "healing_potion"
+          "potion_heal"
         ],
         "energy": 50
       },
@@ -3036,7 +3036,7 @@
       "kitchen_extension": "阶段 3 外观",
       "master_farmhouse": "阶段 4 外观（v4q(1)：Lv10 → Lv15）",
       "pip_first_dive": "G（v4q(7)）的 Pip 委托，无界面行",
-      "healing_potion": "驿站上架回血药（v4q(7)），id 待 G 定",
+      "potion_heal": "驿站上架回血药（v4q(7)：itemKind 认 potion_*）",
       "travel_gates": "出门门槛开始，无界面行",
       "stall_upgrade": "仍无界面行（不知火舞 282）"
     }
