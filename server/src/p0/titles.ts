@@ -23,9 +23,10 @@ import type { P0Content } from './content.js';
 import type { P0State } from './state.js';
 
 const SKILLS = ['farming', 'fishing', 'cooking'] as const;
-const SKILL_TITLE_LEVEL = 10;   // the skills' titles come with a skill's Lv10 (see above)
-/** Homestead Master comes with the level whose unlocks hold title_homestead_master: Lv15 since v4q(1) ⑧ (Lv10 before). */
-const masterLevel = (c: P0Content) => c.homestead.levels.find(l => l.unlocks.includes('title_homestead_master'))?.level ?? Infinity;
+// The levels the titles came with, fixed here so that content raising a threshold never takes one back (q(180) ①):
+// the skills' titles with a skill's Lv10, Homestead Master with Homestead Lv15 since v4q(1) ⑧ (Lv10 before).
+const SKILL_TITLE_LEVEL = 10;
+const MASTER_LEVEL = 15;
 const EXPLORER_TITLES = [100, 3];   // Globetrotter (Explorer Platinum), Wanderer (Explorer Bronze), §11.9.2
 const HOME_COOK = 'home_cook';
 const COOKBOOK_REWARD = /^cookbook_\d+$/;   // the Cookbook reward Home Cook came with (cookbook_8), whatever count it is at
@@ -33,7 +34,7 @@ const COOKBOOK_REWARD = /^cookbook_\d+$/;   // the Cookbook reward Home Cook cam
 /** The titles given, in the order q(180) ③ fixes (also the Titles drawer's rows). */
 export function ownedTitles(c: P0Content, s: P0State): string[] {
   const out: string[] = [];
-  if (s.homestead.plaque.some(p => p.level === masterLevel(c))) out.push('homestead');
+  if (s.homestead.plaque.some(p => p.level === MASTER_LEVEL)) out.push('homestead');
   for (const skill of SKILLS) if (s.inbox.granted.includes(`level:${skill}:${SKILL_TITLE_LEVEL}`)) out.push(`level:${skill}`);
   // Cookbook: the Discovered titles from the most pages down (Master Chef 48 … Home Cook 8), then Mastered ones. The
   // counts only order them (a given milestone is kept by its id); Home Cook sits last of the Discovered ones.

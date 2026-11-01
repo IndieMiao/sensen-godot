@@ -28,56 +28,60 @@ const at = (level: number): P0State => { const s = veteran(); s.homestead.level 
 /** Everything the next level asks for: skills, materials in storage, coins + the 40 floor. */
 function readyFor(s: P0State): P0State {
   const next = c.homestead.levels.find(l => l.level === s.homestead.level + 1)!;
-  s.skills = { farming: 99_999, fishing: 99_999, cooking: s.skills.cooking };
+  s.skills = { farming: 99_999, fishing: 99_999, cooking: 99_999 };
   for (const [id, n] of next.materials) s.storage[id] = (s.storage[id] ?? 0) + n;
   s.coins = next.coins + 40;
+  if (next.travel) {   // v4q(1) ④: city stamps and other climate bands (Guangzhou, Moscow)
+    s.travel.stamps = Array.from({ length: next.travel.stamps }, (_, k) => ({ cluster: `gn-${k}`, kind: 'climate' as const, at: T0, counted_on: '2026-10-10' }));
+    const visit = { n: 1, first_at: T0, last_at: T0, deliveries: 0, delivered_day: '' };
+    s.travel.visits = { 'gn-1809858': visit, 'gn-524901': visit };
+  }
   return s;
 }
 
-describe('Homestead Lv4–10 (§8.2.1)', () => {
-  it('nine upgrades cost 10,070 coins with q(246) early gates and the q(263) Lv5–10 ladder', () => {
-    expect(c.homestead.max_level).toBe(10);
-    expect(c.homestead.levels.map(l => l.level)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(10_070);
-    expect(c.homestead.levels.map(l => l.skills)).toEqual([3, 4, 6, 8, 10, 12, 14, 16, 19]);
+describe('Homestead Lv4–17 (v4q(1))', () => {
+  it('sixteen upgrades cost 2,125 coins and v4q(1) ②\'s materials (T2 from Lv8, the bridge rows at Lv16–17)', () => {
+    expect(c.homestead.max_level).toBe(17);
+    expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(2125);
     const total: Record<string, number> = {};
     for (const l of c.homestead.levels) for (const [id, n] of l.materials) total[id] = (total[id] ?? 0) + n;
-    expect(total).toEqual({ wood: 108, stone: 116, fiber: 56, copper_ore: 69, clay: 41, quartz: 20, hardwood: 27, rock_salt: 5 });
+    expect(total).toEqual({ wood: 70, stone: 56, fiber: 37, clay: 31, copper_ore: 21, rock_salt: 4, coal: 16, hardwood: 57, flax: 40, iron_ore: 23, quartz: 13 });
   });
 
-  it('climbs from Lv3 to Lv10 one level at a time, Energy follows each level reward, then stops', () => {
+  it('climbs from Lv3 to Lv17 one level at a time, 50 back each level to Lv15 and none after, then stops', () => {
     let s = at(3);
-    for (let lv = 4; lv <= 10; lv++) {
+    for (let lv = 4; lv <= 17; lv++) {
+      const before = s.energy.value;
       const r = step(readyFor(s), { type: 'homestead_upgrade' });
       s = r.s;
       expect(s.homestead.level).toBe(lv);
-      expect(s.energy.value).toBe(maxEnergy(c, s));
+      expect(s.energy.value).toBe(lv <= 15 ? Math.min(maxEnergy(c, s), before + 50) : before);
     }
-    expect(maxEnergy(c, s)).toBe(290);
+    expect(maxEnergy(c, s)).toBe(325);
     expect(viewOf(c, s, T0).homestead.next).toBeNull();
     expect(refusal(s, { type: 'homestead_upgrade' })?.code).toBe('max_level');
   });
 
-  it('Lv4 needs skills total 6 before materials or coins', () => {
+  it('Lv4 needs Farming 2 and Fishing 2 before materials or coins', () => {
     const s = readyFor(at(3));
     s.skills = { farming: 0, fishing: 0, cooking: 0 };
-    expect(refusal(s, { type: 'homestead_upgrade' })).toMatchObject({ code: 'skills_short', detail: { need: 6 } });
+    expect(refusal(s, { type: 'homestead_upgrade' })).toMatchObject({ code: 'skills_short', detail: { skill: 'farming', need: 2, have: 1 } });
   });
 });
 
 describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
-  it('stoves 1 / 2 / 3 at Lv1 / Lv4 / Lv8; Warming Cabinet 6 then 12 at Lv8', () => {
-    const facts = [1, 3, 4, 7, 8, 10].map(lv => {
+  it('stoves 1 / 2 / 3 / 4 at Lv1 / Lv4 / Lv8 / Lv17; Warming Cabinet 6 at Lv3, 12 at Lv9 (v4q(1) ⑧)', () => {
+    const facts = [1, 3, 4, 7, 8, 9, 16, 17].map(lv => {
       const v = viewOf(c, at(lv), T0);
       return [lv, v.cooking.stoves.length, v.cooking.cabinet?.cap ?? 0];
     });
-    expect(facts).toEqual([[1, 1, 0], [3, 1, 6], [4, 2, 6], [7, 2, 6], [8, 3, 12], [10, 3, 12]]);
+    expect(facts).toEqual([[1, 1, 0], [3, 1, 6], [4, 2, 6], [7, 2, 6], [8, 3, 6], [9, 3, 12], [16, 3, 12], [17, 4, 12]]);
   });
 
-  it('never more than three stoves, whatever the content says (亚瑟 on #209)', () => {
+  it('never more than four stoves, whatever the content says (亚瑟 on #209; the Fourth Stove since v4q(1))', () => {
     const many = { ...c, homestead: { ...c.homestead, stoves: [[1, 1], [4, 9]] as [number, number][] } };
-    expect(viewOf(many, at(10), T0).cooking.stoves).toHaveLength(3);
-    expect(refusal(at(10), { type: 'cook', items: ['fish_crucian'], stove: 3 })).toMatchObject({ code: 'bad_stove', detail: { stoves: 3 } });
+    expect(viewOf(many, at(10), T0).cooking.stoves).toHaveLength(4);
+    expect(refusal(at(10), { type: 'cook', items: ['fish_crucian'], stove: 4 })).toMatchObject({ code: 'bad_stove', detail: { stoves: 3 } });
   });
 
   it('an old save with stove 1 only reads as empty stoves 2 and 3', () => {
@@ -352,10 +356,10 @@ describe('Cookbook milestones (§7.6.1)', () => {
   });
 });
 
-describe('Bag Upgrade II / III (§9.11, §8.3.2)', () => {
+describe('Bag Upgrade II / III / IV (§9.11; v4q(1) ⑧)', () => {
   const stall = (id: string): P0Command => ({ type: 'buy', item: id, qty: 1, shop: 'homestead' });
-  it('II goes on sale at Lv6 and needs Upgrade I first; III at Lv9 after II', () => {
-    let s = at(6);
+  it('II goes on sale at Lv7 and needs Upgrade I first; III at Lv11 after II; IV at Lv16 after III, to 45', () => {
+    let s = at(7);
     s.coins = 5_000;
     s.storage = { hardwood: 20, clay: 20, copper_ore: 20, quartz: 10, fiber: 20, wood: 20 };
     expect(viewOf(c, s, T0).homestead.unlocks).toMatchObject({ bag_upgrade_1: 'for_sale', bag_upgrade_2: 'for_sale', bag_upgrade_3: 'locked' });
@@ -364,9 +368,14 @@ describe('Bag Upgrade II / III (§9.11, §8.3.2)', () => {
     s = step(s, stall('bag_upgrade_2')).s;
     expect(s.bag_cap).toBe(35);
     expect(s.storage).toMatchObject({ hardwood: 16, clay: 14, copper_ore: 16 });
-    expect(refusal(s, stall('bag_upgrade_3'))).toMatchObject({ code: 'homestead_level', detail: { need: 9 } });
-    s.homestead.level = 9;
+    expect(refusal(s, stall('bag_upgrade_3'))).toMatchObject({ code: 'homestead_level', detail: { need: 11 } });
+    s.homestead.level = 11;
     s = step(s, stall('bag_upgrade_3')).s;
     expect(s.bag_cap).toBe(40);
+    s.storage = { ...s.storage, hardwood: 10, flax: 8, iron_ore: 4 };
+    expect(refusal(s, stall('bag_upgrade_4'))).toMatchObject({ code: 'homestead_level', detail: { need: 16 } });
+    s.homestead.level = 16;
+    s = step(s, stall('bag_upgrade_4')).s;
+    expect(s.bag_cap).toBe(45);
   });
 });
