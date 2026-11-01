@@ -18,7 +18,7 @@ func _view() -> Dictionary:
 			{"id": "spot_grove", "name": "Timber Grove", "open": true, "ready": true, "ready_in": 0, "yield": [["wood", 6]]},
 			{"id": "spot_rock_pile", "name": "Rock Pile", "open": true, "ready": true, "ready_in": 0, "yield": [["stone", 4]]},
 			{"id": "spot_reed_bank", "name": "Reed Bank", "open": true, "ready": true, "ready_in": 0, "yield": [["fiber", 3], ["bait_worm", 2]]}]},
-		"mine": {"runs": {"used": 0, "limit": 2, "resets_in": 3600000}},
+		"mine": {"at": null, "records": {}},
 	}
 
 static func _spot(v: Dictionary, id: String) -> Dictionary:
@@ -57,15 +57,14 @@ func test_a_material_cooling_down_goes_to_still_to_go() -> void:
 	assert_str(str(lines[1])).is_equal("Homestead Lv2 · Timber 6 to go")
 	assert_str(str(_home(v).go)).is_equal("spot_grove")   # the only place Timber comes from, cooling down
 
-func test_stone_goes_to_the_mine_while_the_rock_pile_cools_and_a_run_is_left() -> void:
+## 355 b1: no runs a day — while the Rock Pile cools, Stone goes to the mine, always open.
+func test_stone_goes_to_the_mine_while_the_rock_pile_cools() -> void:
 	var v := _view()
 	v.homestead.next.materials = [{"id": "stone", "name": "Stone", "need": 4, "have": 0}]
 	_cool(v, "spot_rock_pile")
 	assert_str(str(_home(v).go)).is_equal("mine")
 	assert_str(str(_lines(v)[0])).is_equal("Homestead Lv2 · Stone 4 to go")   # the mine is open: doable now
-	v.mine.runs.used = 2
-	assert_str(str(_home(v).go)).is_equal("spot_rock_pile")   # neither: the Rock Pile, cooling down
-	assert_bool(P0Logic.homestead_row(v).now).is_false()
+	assert_bool(P0Logic.homestead_row(v).now).is_true()
 
 func test_coins_short_points_at_the_stall_and_lights_nothing() -> void:
 	var v := _view()

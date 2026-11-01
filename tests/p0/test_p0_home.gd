@@ -200,7 +200,7 @@ func test_the_sign_stands_beside_the_door_off_its_path_and_is_solid() -> void:
 	assert_bool(bp.is_walkable(c)).is_false()
 	assert_bool(bp.is_walkable(Vector2i(P0Garden.ANCHORS.house.x, c.y))).is_true()   # the door path stays open
 
-## The source label only breaks before ` · or ` (不知火舞 on 228): no-break spaces inside each part, U+2060 after a range's dash.
+## The source label only breaks before ` · or ` (不知火舞 on 228): no-break spaces inside each part.
 func _plain(src: Dictionary) -> Dictionary:
 	return {"text": str(src.get("text", "")).replace("\u00a0", " ").replace("\u2060", ""), "go": src.get("go", "")}
 
@@ -210,8 +210,8 @@ func test_material_source_breaks_only_before_or() -> void:
 	v["names"] = {"clay": "Clay", "rock_salt": "Rock Salt"}
 	v["homestead"] = {"level": 1}
 	var gated := str(P0MaterialLogic.material_source(v, "clay").text)
-	assert_array(Array(gated.split(" "))).is_equal(["Clay\u00a0·\u00a0Mine\u00a0floor\u00a01", "·\u00a0or\u00a0Clay\u00a0Bank\u00a0from\u00a0Homestead\u00a0Lv2"])
-	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt\u00a0·\u00a0Mine\u00a0floors\u00a01–\u20604")
+	assert_array(Array(gated.split(" "))).is_equal(["Clay\u00a0·\u00a0Quarry", "·\u00a0or\u00a0Clay\u00a0Bank\u00a0from\u00a0Homestead\u00a0Lv2"])
+	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt\u00a0·\u00a0Quarry")
 
 func test_material_sources_name_the_spots_and_the_mine() -> void:
 	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): ` · or `, open sources first,
@@ -226,12 +226,12 @@ func test_material_sources_name_the_spots_and_the_mine() -> void:
 	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
 	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Rock Pile · or the mine", "go": "spot_rock_pile"})
 	assert_that(_plain(P0Logic.home_source(v, "fiber"))).is_equal({"text": "Reeds · Reed Bank", "go": "spot_reed_bank"})
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Mine floor 1 · or Clay Bank from Homestead Lv2", "go": "mine"})
-	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Mine floors 1–4", "go": "mine"})
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank from Homestead Lv2", "go": "mine"})
+	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarry", "go": "mine"})   # 355 b1: a quarry's mains
 	assert_that(_plain(P0Logic.home_source(v, "bait_worm"))).is_equal({"text": "Worm Bait", "go": ""})   # a side yield, not a material
 	# Lv2 opens the Clay Bank: the gate goes, the order stays (Li Bai's example).
 	v.gather.spots[3].open = true
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Mine floor 1 · or Clay Bank", "go": "mine"})
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank", "go": "mine"})
 	# Coins and skills keep their own lines.
 	assert_str(str(P0Logic.home_source(v, "coins").go)).is_equal("stall")
 	assert_str(str(P0Logic.home_source(v, "skills").go)).is_equal("")
@@ -241,9 +241,9 @@ func test_material_source_without_spot_states_reads_the_homestead_level() -> voi
 	v.erase("gather")
 	v["names"] = {"clay": "Clay"}
 	v["homestead"] = {"level": 1}
-	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Mine floor 1 · or Clay Bank from Homestead Lv2")
+	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Quarry · or Clay Bank from Homestead Lv2")
 	v.homestead.level = 2
-	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Mine floor 1 · or Clay Bank")
+	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Quarry · or Clay Bank")
 
 func test_plaque_lines_date_each_upgrade() -> void:
 	var v := _view(3)

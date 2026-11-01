@@ -131,7 +131,6 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.exit), 0.1)).override_failure_message("the map exit").is_true()
 	assert_bool(reach.call(cell.call(Vector2i(9, 14)), 0.1)).override_failure_message("the farmhouse door").is_true()
 	assert_bool(reach.call(cell.call(Vector2i(14, 14)), 0.1)).override_failure_message("the stall").is_true()
-	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.mine) + Vector3(-0.3, 0, 0.3), P0FarmMaterials.MOUTH_REACH)).override_failure_message("the mine mouth").is_true()
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.workbench), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message("the workbench").is_true()
 
 ## FARM-6-DECOR (Figma 2187:33369): the stall's Decor page — its tab, its fact line, the rows' four states.

@@ -17,6 +17,7 @@ const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postc
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const MINE_SCENE := "res://scenes/p0/p0_mine.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
@@ -176,6 +177,7 @@ func _init() -> void:
 	ui.go_pond.connect(func(id: String): _leave_then("go:pond:" + id))   # the Bite Board's pond card: Go (SGODOT-283)
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
+	session.command_settled.connect(_mine_enter_settled)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
 	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
 	session.sent.connect(func(cmd: Dictionary): _guide_feedback.sent(cmd, ui.view))
@@ -592,7 +594,31 @@ func _read_home_places(v: Dictionary) -> void:
 	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
+## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
+## 亚瑟's P0Map.open_wild_card) or the dev step mine:<id>[:<floor>] — onto Floor 1 or one of its stops. The mine opens
+## over this world on the reply's mine_floor event, on the floor the server landed the player on; a refusal says why
+## (P0MaterialLogic.refusal_text) and nothing opens.
+var _entering_mine := ""
+func enter_mine(id: String, floor := 1) -> void:
+	if id == "" or _entering_mine != "": return
+	_entering_mine = id
+	if not session.send({"type": "mine_enter", "mine": id, "floor": floor}, "mine_enter"): _entering_mine = ""
+
+## A refused or failed mine_enter opens nothing; the next try may go.
+func _mine_enter_settled(key: String, ok: bool, _code: String) -> void:
+	if key == "mine_enter" and not ok: _entering_mine = ""
+
+func _mine_opened(events: Array) -> void:
+	if _entering_mine == "": return
+	for e in events:
+		if str(e.get("kind", "")) == "mine_floor" and str(e.get("mine", "")) == _entering_mine:
+			var id := _entering_mine
+			_entering_mine = ""
+			AppRouter.open_instance(MINE_SCENE, {"mine": id, "floor": int(e.get("floor", 1))})
+			return
+
 func _on_state(v: Dictionary, events: Array) -> void:
+	_mine_opened(events)
 	var before: Dictionary = ui.view
 	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
@@ -2049,7 +2075,8 @@ func _dev_shot(dt: float) -> void:
 			"showmap":   # showmap:pond:pond_san_francisco_03 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
-			"newrun": P0MaterialCards.open_new_run(ui, session.current(), func(c: Dictionary): session.send(c))   # MINE-P0-7
+			"mine":   # mine:wd-dev-quarry[:20] — into that mine (355 b1, contract-efg §11: the development mines need no Day Pass)
+				enter_mine(step[1], int(step[2]) if step.size() > 2 else 1)
 			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()

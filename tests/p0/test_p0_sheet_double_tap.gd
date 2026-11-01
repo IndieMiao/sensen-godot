@@ -37,8 +37,7 @@ func test_a_sheet_reopened_before_layout_still_fits_its_content() -> void:
 	assert_float(d.size.y).is_equal_approx(d.height, 1.0)
 
 func test_every_material_sheet_fits_after_layout() -> void:
-	for open in [func(): return P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank"),
-			func(): return P0MaterialCards.open_new_run(ui, ui.view, func(_c): pass)]:
+	for open in [func(): return P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank")]:
 		var d: UiDrawer = open.call()
 		await await_idle_frame()
 		await await_idle_frame()
