@@ -10,7 +10,7 @@ import { clusterById, clustersOf as clusters, countryPart, HOME_ALIAS, homeBase,
 import { gainEnergy, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
-import { isWild, wildById, wildNear3, wildPriced } from './wild.js';
+import { isWild, wildById, wildNear3, wildNearOf, wildPriced, wildPricedOf } from './wild.js';
 import { worldOf } from './world.js';
 
 export interface TravelPass { kind: 'day'; from: number; until: number }
@@ -24,6 +24,7 @@ export interface TravelState {
   stamps: TravelStamp[];                         // first-visit order
   fallback: { near3: string[]; near10: string[] };   // frozen when the block is made (§11.2.3); empty until clusters load
   wild_near3?: string[];                         // v7 (355 C, plan §1.5): the three wild sites nearest home's base (q(184), as fallback.near3), free forever; frozen when the home is picked or changed; absent until then, and wild.ts works them out from home (wildNear3)
+  wild_priced?: string[];                        // v4q(3) ③a: the nearest iron and quartz veins and 2 quarries from home's base (the priced guarantee, wild.fares); frozen with wild_near3
   explorer: number;                              // the highest Explorer medal granted: 0 / 3 / 10 / 30 / 100
   // Choosing a home (q(160)–q(163), SGODOT-303): optional, no save version. A save without them chose San Francisco
   // and farms at content.profile.farm_at (q(163) ③).
@@ -95,11 +96,19 @@ export function fallbackOf(c: P0Content, home: string): { near3: string[]; near1
   return at && cl ? cl.fallback(home, at) : { near3: [], near10: [] };
 }
 
+/** v4q(3): the wild sites a home's save freezes with its city fallback — the free 3 and the priced guarantee's 4 (none
+ * without the catalogue: wild.ts then works them out when asked). */
+export function wildFrozen(c: P0Content, home: string): { wild_near3?: string[]; wild_priced?: string[] } {
+  const near3 = wildNearOf(c, home), priced = wildPricedOf(c, home);
+  return { ...(near3.length ? { wild_near3: near3 } : {}), ...(priced.length ? { wild_priced: priced } : {}) };
+}
+
 /** A new save's travel block: home is the written city until the player picks one; `pending` asks the client to offer
  * the pick (SGODOT-303: only a client that can show it, so an older one's new player is San Francisco's, q(163) ⑤). */
 export const freshTravel = (c: P0Content, pending = false): TravelState => {
   const home = writtenCluster(c);
-  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), explorer: 0, ...(pending ? { pending: true as const } : {}) };
+  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), ...wildFrozen(c, home), explorer: 0,
+    ...(pending ? { pending: true as const } : {}) };
 };
 
 /** The climate zone (`Temperate`, as profile.climate) of a place's city, or of the city the player is in; home's when
