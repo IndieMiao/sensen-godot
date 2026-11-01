@@ -73,6 +73,36 @@ func test_the_place_chip_leaves_by_the_entrance() -> void:
 	rt._on_place_pressed()
 	assert_bool(mine._leaving).is_true()
 
+## Android Back in the mine (亚瑟 on #629, ⑥): an open panel closes first; with nothing open it leaves as the Entrance
+## does — the map's mouth card opens and only the mine's layer goes (AppRouter pops nothing more). In a knock-out's
+## moment it does nothing: that way out is under way.
+func test_back_closes_a_panel_then_leaves_by_the_entrance() -> void:
+	var rt := await _runtime([])
+	var map := _map_probe()
+	var mine_layer := AppRouter.push_instance(PROBE)
+	rt.world = mine_layer
+	var mine = auto_free(P0Mine.new())   # not in the tree: only its way out
+	mine.rt = rt
+	mine.mine_id = Fx.MINE
+	mine._mine_name = "Ironvale Vein"
+	mine.actor = auto_free(P0Actor.new())
+	P0MaterialCards.open_elevator(rt.ui, Fx.view(1), 1, func(_c): pass)
+	assert_str(rt.ui.modal_kind).is_equal("elevator")
+	assert_bool(mine.is_back_navigation_locked()).is_true()
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_bool(mine._leaving).is_false()
+	mine._ko = true
+	assert_bool(mine.is_back_navigation_locked()).is_true()
+	assert_bool(mine._leaving).is_false()
+	mine._ko = false
+	assert_bool(mine.is_back_navigation_locked()).is_true()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(AppRouter.instance_depth()).is_equal(1)
+	assert_bool(AppRouter.top_instance() == map).is_true()
+	assert_array(map.wild_cards).is_equal([Fx.MINE])
+	assert_str(rt.ui._place_text).is_equal("Ironvale Vein")
+
 ## A knock-out's way out (E6): back on the map the knock-out card first; its Close opens the mouth card (328:182498).
 func test_the_knock_out_card_then_the_mouth_card() -> void:
 	var rt := await _runtime([])

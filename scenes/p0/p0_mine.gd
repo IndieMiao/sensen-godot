@@ -997,8 +997,15 @@ func p0_anchor() -> Vector2:
 	var at: Vector3 = _target.get("at", actor.position) if not _target.is_empty() else actor.position
 	return cam.unproject_position(at + Vector3(0, 1.0, 0))
 
-## Back leaves the mine (AppRouter pops it), but not the press the voice-match page takes (SGODOT-349).
-func is_back_navigation_locked() -> bool: return rt != null and rt.ui.voice_blocks_back()
+## Android Back: the UI's top layer (the voice-match page's own Back, SGODOT-349; the elevator panel, the radial, a
+## dragged slot) goes first, one per press; with nothing open, out as by the Entrance — back on the map at this mine's
+## mouth, its card open (亚瑟 on #629, ⑥). The mine handles Back itself every time (a knock-out's moment and a way out
+## under way swallow it), so AppRouter never pops a second layer: _leave has popped the mine already.
+func is_back_navigation_locked() -> bool:
+	if rt == null: return false
+	if rt.ui.close_top_layer(): return true
+	if not _ko: _leave()
+	return true
 
 func suspend() -> void:
 	close_card()
