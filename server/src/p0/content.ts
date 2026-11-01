@@ -173,7 +173,7 @@ export interface P0Content {
   outposts?: OutpostDef[];   // loaded from p0_outposts.json beside the table (loadP0Content)
   event_venues?: EventVenue[];   // §9.3.3, content/map_events.json: empty in the prototype (only the field is kept)
   version: string;
-  energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
+  energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number };
   day: { utc_offset_hours: number; rollover_hour: number };   // the offset is the fallback when profile.timezone is absent
   start: { coins: number; tilled_plots: number; wild_plots: number; bag: [string, number][]; guide_bag?: [string, number][] };   // guide_bag: q(217), a guided save's first stacks
   bag: { capacity: number; stack: Record<string, number> };

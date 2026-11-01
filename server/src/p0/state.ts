@@ -120,7 +120,7 @@ export interface MineState {
   completed?: { run: number; at: number } | null;   // the last run its elite ended (Run complete, shown once)
 }
 
-/** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
+/** Where the player's commands come from (q(41)). left_at was Rest's 2 h away (q(269) retired it): old saves keep it, unread. */
 /** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
 export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null;
   entered?: string | null;   // the pond / outpost entered with a valid pass (v5): commands there are not re-checked

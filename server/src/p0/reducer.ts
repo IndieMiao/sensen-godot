@@ -12,7 +12,7 @@ import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { setLook, upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
-import { notePresence, restReadyIn } from './presence.js';
+import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
@@ -292,12 +292,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'rest': {
       if (s.day.rest >= 1) return fail('rest_used');
-      // q(41): at home, 2 h after last leaving it. Older clients send no space; they keep the old rule.
-      if (cmd.space !== undefined) {
-        if (cmd.space !== 'home') return fail('not_home');
-        const wait = restReadyIn(c, s, now);
-        if (wait === null || wait > 0) return fail('away_short', { ready_in: wait, away_h: c.energy.rest_away_h });
-      }
+      // q(269) (SGODOT-377, the user's ③): once a player day, at home; no 2 h away first (q(41) / q(70) retired: a
+      // trip out restarted those 2 h, so a player who kept going out never rested). Older clients send no space.
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
       const max = maxEnergy(c, s);
       if (s.energy.value >= max) return fail('energy_full');
       const gain = Math.min(c.energy.rest_amount, max - s.energy.value);

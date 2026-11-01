@@ -17,8 +17,8 @@ func _view() -> Dictionary:
 		"inbox": {"badge": 1, "parcels": [{"key": "k1", "id": "bait_worm", "qty": 3, "left": 60000}]},
 		"bag": {"capacity": 25, "slots": [{"id": "seed_radish", "qty": 20}]},
 		"travel": {"home": "gn-5391959", "visits": {}},
-		# SGODOT-377: Rest's 2 h away and day reset, a resident's next request, the keepers' and boards' refills
-		"rest": {"used": 0, "limit": 1, "resets_in": 36000000, "amount": 60, "away_h": 2, "away_ready_in": 7020000},
+		# SGODOT-377: Rest's day reset, a resident's next request, the keepers' and boards' refills
+		"rest": {"used": 1, "limit": 1, "resets_in": 36000000, "amount": 60},
 		"residents": {"res_pip": {"request_state": "wait", "next_in": 600000}, "res_kai": {"request_state": "open", "next_in": null}},
 		"keepers": {"post": {"board_open": 1, "refill_in": 900000}, "market": {"board_open": 3, "refill_in": null}, "tea": {"cups_left": 2}},
 		"boards": {"stall": {"slots": [{"id": "req_1"}, {"empty": true, "refill_in": 300000}, {"empty": true, "held": true}]},
@@ -49,7 +49,6 @@ func _reference(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	v.fishing.cast.bite_in = maxf(0.0, float(v.fishing.cast.bite_in) - elapsed_ms)
 	v.fishing.trap.traps[0].next_in = maxf(0.0, float(v.fishing.trap.traps[0].next_in) - elapsed_ms)
 	v.inbox.parcels[0].left = maxf(0.0, float(v.inbox.parcels[0].left) - elapsed_ms)
-	v.rest.away_ready_in = maxf(0.0, float(v.rest.away_ready_in) - elapsed_ms)
 	v.rest.resets_in = maxf(0.0, float(v.rest.resets_in) - elapsed_ms)
 	v.residents.res_pip.next_in = maxf(0.0, float(v.residents.res_pip.next_in) - elapsed_ms)
 	v.keepers.post.refill_in = maxf(0.0, float(v.keepers.post.refill_in) - elapsed_ms)
@@ -78,7 +77,7 @@ func test_the_server_view_is_left_as_it_was_and_untouched_parts_are_shared() -> 
 	assert_bool(is_same(p.keepers.market, view.keepers.market)).is_true()
 	assert_bool(is_same(p.boards.market, view.boards.market)).is_true()
 	assert_bool(is_same(p.boards.stall.slots[0], view.boards.stall.slots[0])).is_true()
-	assert_float(float(p.rest.away_ready_in)).is_equal(7018000.0)
+	assert_float(float(p.rest.resets_in)).is_equal(35998000.0)
 	assert_float(float(p.residents.res_pip.next_in)).is_equal(598000.0)
 	assert_float(float(p.keepers.post.refill_in)).is_equal(898000.0)
 	assert_float(float(p.boards.stall.slots[1].refill_in)).is_equal(298000.0)
@@ -143,26 +142,24 @@ func test_two_alike_pots_are_two_copies() -> void:
 	assert_bool(is_same(p.cooking.stoves[0], p.cooking.stoves[1])).is_false()
 	assert_float(float(p.cooking.stoves[1].ready_in)).is_equal(3000.0)
 
-## SGODOT-377: an account that never left home (away_ready_in null) stays without a countdown; one used up stops at 0.
-func test_rest_counts_down_and_a_never_left_home_stays_null() -> void:
-	var p := P0Logic.project({"rest": {"used": 0, "limit": 1, "resets_in": 1000, "away_ready_in": null}}, 5000.0)
-	assert_that(p.rest.away_ready_in).is_null()
+## SGODOT-377: Rest's day reset counts down and stops at 0; a view without it (or without rest) gains nothing.
+func test_rest_reset_counts_down() -> void:
+	var p := P0Logic.project({"rest": {"used": 1, "limit": 1, "resets_in": 1000}}, 5000.0)
 	assert_float(float(p.rest.resets_in)).is_equal(0.0)
-	# the bench's sheet follows the projection: back home 3 min after leaving, a minute later it says a minute less
-	var back := {"rest": {"used": 0, "limit": 1, "resets_in": 36000000, "amount": 60, "away_h": 2, "away_ready_in": 7020000},
-		"energy": {"value": 50, "max": 200}}
-	assert_str(P0Logic.rest_state(back).sheet_state).is_equal("Rest · back after 2h away · 1h 57m to go")
-	assert_str(P0Logic.rest_state(P0Logic.project(back, 60000.0)).sheet_state).is_equal("Rest · back after 2h away · 1h 56m to go")
-	assert_str(P0Logic.rest_state(P0Logic.project(back, 7020000.0)).state).is_equal("ready")   # the 2 h came round
+	var used := {"rest": {"used": 1, "limit": 1, "resets_in": 2_520_000, "amount": 60}, "energy": {"value": 50, "max": 200}}
+	assert_str(P0Logic.rest_state(P0Logic.project(used, 60000.0)).note).is_equal("Available again in 41m")
+	var bare := {"rest": {"used": 0, "limit": 1}}
+	assert_bool(is_same(P0Logic.project(bare, 5000.0).rest, bare.rest)).is_true()   # nothing to age: shared
 
-## SGODOT-377: the first countdown a read changes — a resident's next request, a keeper's or board slot's refill; Rest
-## and ones already at 0 are not among them.
+## SGODOT-377: the first countdown a read changes — a resident's next request, a keeper's or board slot's refill, the
+## day reset; ones already at 0 are not among them.
 func test_next_expiry_is_the_first_countdown_a_read_fills() -> void:
 	assert_float(P0Logic.next_expiry(_view())).is_equal(300000.0)   # the stall's empty slot, before Pip (600000)
+	assert_float(P0Logic.next_expiry({"rest": {"used": 1, "resets_in": 5000}})).is_equal(5000.0)   # the 04:00 reset (周瑜 on #602)
 	var v := _view()
 	v.boards.stall.slots[1].refill_in = 0
 	assert_float(P0Logic.next_expiry(v)).is_equal(600000.0)   # at 0 already: the read that brought it said so
-	assert_float(P0Logic.next_expiry({"rest": {"away_ready_in": 5000}, "residents": null})).is_equal(-1.0)
+	assert_float(P0Logic.next_expiry({"rest": {"resets_in": 0}, "residents": null})).is_equal(-1.0)
 	assert_float(P0Logic.next_expiry({})).is_equal(-1.0)
 
 class ReadCounter extends P0Session:

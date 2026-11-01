@@ -26,28 +26,17 @@ func test_near_full_says_the_real_gain_and_full_greys() -> void:
 	assert_str(s.reason).is_equal("Energy full")
 	assert_bool(s.can_rest).is_false()
 
-func test_two_hours_away_first() -> void:
-	var s := P0Logic.rest_state(_view({"away_ready_in": 4320000}))
-	assert_str(s.state).is_equal("away")
-	assert_str(s.badge).is_equal("countdown")
-	assert_str(s.caption).is_equal("1h 12m")
-	assert_str(s.sheet_state).is_equal("Rest · back after 2h away · 1h 12m to go")   # q(70), FARM-7 cooling card
-	assert_str(s.wait).is_equal("in 1h 12m")
-	# Under an hour the sentences say `42m`; the capsule under the bench's badge keeps ticking `42:00` (SGODOT-224).
-	var soon := P0Logic.rest_state(_view({"away_ready_in": 2520000}))
-	assert_str(soon.caption).is_equal("42:00")
-	assert_str(soon.sheet_state).is_equal("Rest · back after 2h away · 42m to go")
-	assert_str(soon.wait).is_equal("in 42m")
-	assert_str(s.reason).is_equal("Not yet")
-	assert_bool(s.can_rest).is_false()
-	assert_str(s.close).is_equal("Close")
-	# q(70): a new account that never left the farm (server away_ready_in null) shows no countdown at all.
-	s = P0Logic.rest_state(_view({"away_ready_in": null}))
-	assert_str(s.state).is_equal("away")
-	assert_str(s.caption).is_empty()
-	assert_str(s.sheet_state).is_equal("Rest · back after 2h away")
-	assert_str(s.wait).is_equal("after 2h away")
-	assert_bool(s.can_rest).is_false()
+## q(269) (SGODOT-377, the user's ③): no 2 h away first. A server before it still sends away_ready_in — a countdown, or
+## null for "never left" — and neither stops Rest any more: no away state, no `Not yet` (不知火舞 on 377 3d9f426f).
+func test_no_away_state_whatever_an_older_server_sends() -> void:
+	for away in [4320000, null, 0]:
+		var s := P0Logic.rest_state(_view({"away_ready_in": away}))
+		assert_str(s.state).is_equal("ready")
+		assert_str(s.sheet_state).is_equal("Available")
+		assert_str(s.button).is_equal("Rest")
+		assert_bool(s.can_rest).is_true()
+	var now := {"rest": {"used": 0, "limit": 1, "resets_in": 33120000, "amount": 60}, "energy": {"value": 120, "max": 210}}
+	assert_str(P0Logic.rest_state(now).state).is_equal("ready")   # the view since q(269): no away fields at all
 
 func test_used_today() -> void:
 	var s := P0Logic.rest_state(_view({"used": 1, "away_ready_in": null}))
@@ -67,26 +56,48 @@ func after_test() -> void:
 func _sheet_texts(ui: P0Ui) -> Array:
 	return ui.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
 
-## SGODOT-377: the open bench card follows the view — its countdown ticks in place, and when the 2 h come round its
-## button turns from Not yet to Rest without closing it.
+## SGODOT-377: the open bench card follows the view — used today, `Available again in …` ticks in place; the new
+## day's read (used 0) turns it into the Rest card without closing it.
 func test_the_open_card_counts_down_and_opens() -> void:
 	var ui := P0Ui.new()
 	ui.quick_store = _store()
 	ui.tips_path = _tips()
 	add_child(auto_free(ui))
 	await await_idle_frame()
-	ui.set_view(_view({"away_ready_in": 7020000}, 50))
+	var used := _view({"used": 1, "resets_in": 2_520_000}, 50)
+	ui.set_view(used)
 	ui.open_rest_card()
 	await await_idle_frame()
-	assert_array(_sheet_texts(ui)).contains(["Rest · back after 2h away · 1h 57m to go"])
-	ui.set_view(P0Logic.project(_view({"away_ready_in": 7020000}, 50), 60000.0))
+	assert_array(_sheet_texts(ui)).contains(["Available again in 42m"])
+	ui.set_view(P0Logic.project(used, 60000.0))
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("rest")
-	assert_array(_sheet_texts(ui)).contains(["Rest · back after 2h away · 1h 56m to go"])
-	assert_array(_sheet_texts(ui)).not_contains(["Rest · back after 2h away · 1h 57m to go"])
-	ui.set_view(_view({"away_ready_in": 0}, 50))
+	assert_array(_sheet_texts(ui)).contains(["Available again in 41m"])
+	assert_array(_sheet_texts(ui)).not_contains(["Available again in 42m"])
+	ui.set_view(_view({}, 50))   # the 04:00 rollover's read
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("rest")
 	var buttons := ui.find_children("*", "", true, false).filter(func(n): return n is UiCommandButton)
 	assert_int(buttons.size()).is_equal(1)
-	assert_bool((buttons[0] as UiCommandButton).reason == "").is_true()   # the Rest button, not the grey Not yet
+	assert_bool((buttons[0] as UiCommandButton).reason == "").is_true()   # the Rest button
+
+## 周瑜 on #602: near full, Energy ticking up changes the button's gain in place — the same button, not a rebuilt card
+## (a tap pressed on one would be released on its replacement).
+func test_the_open_cards_gain_changes_in_place() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = _store()
+	ui.tips_path = _tips()
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view({}, 185))
+	ui.open_rest_card()
+	await await_idle_frame()
+	var before: Array = ui.find_children("*", "", true, false).filter(func(n): return n is UiCommandButton)
+	assert_str((before[0] as UiCommandButton).text).is_equal("Rest · +25 Energy")
+	ui.set_view(_view({}, 186))
+	await await_idle_frame()
+	var after: Array = ui.find_children("*", "", true, false).filter(func(n): return n is UiCommandButton)
+	assert_int(after.size()).is_equal(1)
+	assert_bool(is_same(after[0], before[0])).is_true()
+	assert_str((after[0] as UiCommandButton).label).is_equal("Rest · +24 Energy")
+	assert_str((after[0] as UiCommandButton).text).is_equal("Rest · +24 Energy")

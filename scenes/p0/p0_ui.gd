@@ -2717,6 +2717,7 @@ func open_rest_card() -> void:
 	_rest_shown = st
 	_rest_header = UiObjectHeader.new({title = "Rest bench", state = str(st.sheet_state), effect = str(st.effect)})
 	_rest_note = null
+	_rest_button = null
 	v.add_child(_rest_header)
 	v.add_child(UiFactRow.new(str(st.fact), str(st.fact_value)))
 	if str(st.state) != "used":
@@ -2725,6 +2726,7 @@ func open_rest_card() -> void:
 		b.sends = true   # rest (§10.7.1 Offline)
 		b.activated.connect(func(): close_modal(); command.emit({"type": "rest"}))
 		v.add_child(b)
+		_rest_button = b
 	var bye := UiDismissButton.new(str(st.close))
 	bye.pressed.connect(close_modal)
 	v.add_child(bye)
@@ -2734,17 +2736,20 @@ func open_rest_card() -> void:
 		v.add_child(note)
 		_rest_note = note
 
-## SGODOT-377: the open bench card follows the view — its countdowns tick in place (`1h 56m to go`, `Available again in
-## 9h 12m`); a change of state (the 2 h came round: Not yet → Rest) builds the card again.
+## SGODOT-377: the open bench card follows the view — `Available again in 9h 12m` and the button's `+25 Energy` change
+## in place (Energy ticking up near full rebuilt nothing; 周瑜 on #602); a change of state (the new day's read: Used
+## today → Rest; Energy topped up: Rest → Energy full) builds the card again.
 var _rest_shown := {}
 var _rest_header: UiObjectHeader = null
 var _rest_note: Label = null
+var _rest_button: UiCommandButton = null
 func _refresh_rest_card(v: Dictionary) -> void:
 	if modal_kind != "rest" or not is_instance_valid(_rest_header): return
 	var st := P0Logic.rest_state(v)
-	if st.state != _rest_shown.get("state") or st.button != _rest_shown.get("button"):
+	if st.state != _rest_shown.get("state"):
 		open_rest_card()
 		return
+	if st.button != _rest_shown.get("button") and is_instance_valid(_rest_button) and st.can_rest: _rest_button.label = str(st.button)
 	if st.sheet_state != _rest_shown.get("sheet_state"): _rest_header.state = str(st.sheet_state)
 	if st.note != _rest_shown.get("note") and is_instance_valid(_rest_note): _rest_note.text = str(st.note)
 	_rest_shown = st
