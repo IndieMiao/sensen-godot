@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { maxEnergy, foodCap } from '../../src/p0/rules.js';
-import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { haveTotal, takeStorageFirst } from '../../src/p0/storage.js';
 import { viewOf } from '../../src/p0/view.js';
 
@@ -151,7 +151,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     (old.requests as { status: string }[])[0].status = 'accepted';
     (old.gear as Record<string, unknown>).hoes = undefined;
     const s = upgradeState(c, old as unknown as P0State, T0);
-    expect(s.v).toBe(6);
+    expect(s.v).toBe(SAVE_VERSION);
     expect(s.homestead.level).toBe(1);
     expect(s.bag_cap).toBe(25);
     expect(s.boards.stall[0].req).toMatchObject({ id: 'req_pond_catch', status: 'accepted', qty: 2, drawn_at: old.created_at });

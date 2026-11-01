@@ -2,7 +2,6 @@
 import { cropById, cropBySeed, plotCrop, quickCrop, fastCrop, rodById, type P0Content } from './content.js';
 import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
-import { barter } from './barter.js';
 import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
@@ -16,7 +15,7 @@ import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
-import { compost, cropGrowH, facilityAt, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
+import { addPlots, compost, cropGrowH, facilityAt, fieldCap, fieldsUsed, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
 import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
@@ -52,7 +51,6 @@ type P0CommandBody =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
-  | { type: 'barter'; item: string; mineral: string; shop?: string }   // Market Square barter (§8.4.5)
   // Batch Cook (Cooking Lv8, q(200)): pots of one known page in a row; stove = the current one (fills first); big = the
   // stoves the player switched to Big Pot (q(201), kept on the device)
   | { type: 'batch_cook'; recipe: string; pots: number; stove?: number; big?: number[] }
@@ -102,6 +100,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   // SGODOT-341: a guide step read before the pick (339's t_city, a client page) is acked then too.
   if (input.travel?.pending && cmd.type !== 'choose_home' && cmd.type !== 'guide') return fail('home_pending');
   const s = structuredClone(input);
+  /** Beds a tree or a sprinkler opened (SGODOT-355 b1: open beds = Plots + trees + sprinklers), told as plots_added. */
+  const openBeds = (events: P0Event[]) => {
+    const added = addPlots(c, s);
+    if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'facility' });
+  };
   const events: P0Event[] = [];
   const counted = takenCounts(c, s);   // q(134): what each taken request counted before this command, settles included
   settleEnergy(c, s, now);
@@ -159,6 +162,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (tree?.perennial) {
         const refusal = plantTree(c, s, ids, tree, now, events);
         if (refusal) return fail(refusal.code, refusal.detail);
+        openBeds(events);   // the tree takes its bed off the Plots: the next one opens (SGODOT-355 b1)
         break;
       }
       const wrong = plots.find(p => p!.state !== 'tilled');
@@ -169,6 +173,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (crop.fast && skillLevel(c, s, 'farming') < crop.gate)
         return fail('skill_level_required', { skill: 'farming', level: crop.gate, xp_to_go: c.skills.farming[crop.gate - 1] - s.skills.farming });
       const n = plots.length, seeds = count(s.bag, crop.seed);
+      // SGODOT-355 b1 (v4 2.5): annuals stand on at most the level's Plots (`Plots 41/41`); trees and sprinklers never count
+      const cap = fieldCap(c, s), used = fieldsUsed(c, s);
+      if (used + n > cap) return fail('plots_full', { used, cap });
       if (seeds < n) return fail('no_seed', { seed: crop.seed, need: n, have: seeds });
       if (s.energy.value < crop.energy * n) return fail('need_energy', energyDetail(c, s, now, crop.energy * n));
       spendEnergy(c, s, now, crop.energy * n, events, 'sow');
@@ -359,6 +366,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'place': case 'move_facility': {
       const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
       if (refusal) return fail(refusal.code, refusal.detail);
+      openBeds(events);   // a sprinkler on a bed opens the next one (SGODOT-355 b1); a greenhouse or a yard bin opens none
       break;
     }
     case 'compost': {
@@ -388,11 +396,6 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
-      if (refusal) return fail(refusal.code, refusal.detail);
-      break;
-    }
-    case 'barter': {
-      const refusal = barter(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

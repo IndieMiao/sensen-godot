@@ -1,0 +1,10 @@
+{
+  "_note": "Placeholder Elite Slime (355 b1, contract-efg §10): as mob_slime.json; the old mine table's elite_slime.",
+  "radius": 0.65,
+  "hit_point": [0.0, 0.5, 0.0],
+  "durations": { "windup": 0.7, "attack": 0.42, "recover": 0.9, "hit": 0.18 },
+  "move": { "speed": 2.8, "aggro": 8.0, "reach": 2.4, "dash_speed": 6.2 },
+  "stun_resistant": true,
+  "knockback_resistance": 0.55,
+  "elite": true
+}

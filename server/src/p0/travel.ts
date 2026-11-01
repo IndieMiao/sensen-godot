@@ -4,12 +4,14 @@
  * Save v5 adds the travel block; the shape and the error codes follow 亚瑟's technical note (275, comment 0fc0bc5e):
  * every key is a city cluster id (`gn-<GeoNames id>` of the cluster's seed city, San Francisco gn-5391959).
  */
-import type { CityClusters } from './clusters.js';
+import { distanceKm, tripByKm, TRIP_NAMES, type CityClusters } from './clusters.js';
 import type { P0Content } from './content.js';
 import { clusterById, clustersOf as clusters, countryPart, HOME_ALIAS, homeBase, homeFacts, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
 import { gainEnergy, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
+import { isWild, wildById, wildNear3, wildPriced } from './wild.js';
+import { worldOf } from './world.js';
 
 export interface TravelPass { kind: 'day'; from: number; until: number }
 export interface TravelVisit { n: number; first_at: number; last_at: number; deliveries: number; delivered_day: string }
@@ -21,6 +23,7 @@ export interface TravelState {
   visits: Record<string, TravelVisit>;           // per cluster reached by travel (home not included)
   stamps: TravelStamp[];                         // first-visit order
   fallback: { near3: string[]; near10: string[] };   // frozen when the block is made (§11.2.3); empty until clusters load
+  wild_near3?: string[];                         // v7 (355 C, plan §1.5): the three wild sites nearest home's base (q(184), as fallback.near3), free forever; frozen when the home is picked or changed; absent until then, and wild.ts works them out from home (wildNear3)
   explorer: number;                              // the highest Explorer medal granted: 0 / 3 / 10 / 30 / 100
   // Choosing a home (q(160)–q(163), SGODOT-303): optional, no save version. A save without them chose San Francisco
   // and farms at content.profile.farm_at (q(163) ③).
@@ -51,6 +54,7 @@ export const clusterOfCityName = (c: P0Content, city: string): string | null => 
 /** Which cluster a place is in (§4 of the note): generated ids carry it (`gn-1850147~pond0`), the hand-written San
  * Francisco places have a `cluster` field, or (until that lands) their old city name. Null: not a place we know. */
 export function clusterOf(c: P0Content, place: string): string | null {
+  if (isWild(place)) return wildById(c, place) ? place : null;   // v4q(3): a wild site is a place of its own, no city's
   const cut = place.indexOf('~');
   if (cut > 0) return place.slice(0, cut);
   const pond = c.fishing.places[place] as { cluster?: string; city?: string } | undefined;
@@ -110,13 +114,19 @@ export function climateAt(c: P0Content, s: P0State, place?: unknown): string {
 export const homeClimate = (c: P0Content, s?: Homed): string => homeFacts(c, s).climate;
 
 function climateOfCluster(c: P0Content, cluster: string | null | undefined): string {
-  const z = cluster ? clusterById(c, cluster)?.climate : undefined;
+  const z = cluster ? (isWild(cluster) ? wildById(c, cluster)?.climate : clusterById(c, cluster)?.climate) : undefined;
   return z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate;
 }
 
 /** Distance from the home's base point (q(184)) and the Trip band, by CityClusters.trip (the client's P0Clusters rule). */
 export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number; name: string } {
   const at = homeBase(c, s), cl = clusters(c);
+  const site = wildById(c, cluster);
+  if (site) {   // v4q(3): a wild site's Trip by its distance from the home's base point (no fallback list: wild has its own)
+    if (!at) return { km: 0, trip: 1, name: 'Local' };
+    const km = distanceKm(at, site), trip = tripByKm(km);
+    return { km: Math.round(km * 10) / 10, trip, name: TRIP_NAMES[trip - 1] };
+  }
   if (!at || !cl?.get(cluster)) return { km: 0, trip: 1, name: 'Local' };
   return cl.trip(cluster, s.travel.home, at, s.travel.fallback);
 }
@@ -131,10 +141,22 @@ export const covers = (s: P0State, cluster: string, now: number): boolean =>
  * is already in with a pass, cost nothing. renews: whether the trip signs a new Day Pass and counts a visit — no pass
  * or an expired one; a pass still running (going back from home or another city, option B) only takes the fare. */
 export interface Fare { energy: number; coins: number; revisit: boolean; renews: boolean }
+/** world_gen.json wild.fares (v4q(3) ③a): the priced guarantee, off until the user settles it. */
+export const wildFares = (c: P0Content): { guarantee: boolean; max_trip: number; min_trip: number } =>
+  (worldOf(c) as unknown as { wild?: { fares?: { guarantee: boolean; max_trip: number; min_trip: number } } } | undefined)?.wild?.fares
+  ?? { guarantee: false, max_trip: 2, min_trip: 2 };
 export function fareOf(c: P0Content, s: P0State, cluster: string, now: number): Fare {
   const t = s.travel, revisit = !!t.visits[cluster], renews = !covers(s, cluster, now);
   if (cluster === t.home || (cluster === t.here && !renews)) return { energy: 0, coins: 0, revisit, renews: false };
-  const band = Math.max(tripOf(c, s, cluster).trip, 1) - 1;
+  let trip = tripOf(c, s, cluster).trip;
+  if (isWild(cluster)) {
+    // v4q(3): the nearest 3 wild sites are free for good; with the priced guarantee (③a, pending the user: wild.fares)
+    // the nearest iron and quartz veins and 2 quarries cost at most its max_trip, every other wild site at least min_trip
+    if (wildNear3(c, s).includes(cluster)) return { energy: 0, coins: 0, revisit, renews };
+    const g = wildFares(c);
+    if (g.guarantee) trip = wildPriced(c, s).includes(cluster) ? Math.min(trip, g.max_trip) : Math.max(trip, g.min_trip);
+  }
+  const band = Math.max(trip, 1) - 1;
   const at = (xs: number[] | undefined) => (xs?.length ? xs[Math.min(band, xs.length - 1)] : 0);
   const half = (n: number) => (revisit ? Math.ceil(n / 2) : n);
   return { energy: half(at(c.travel?.fares?.energy)), coins: half(at(c.travel?.fares?.coins)), revisit, renews };
@@ -143,6 +165,8 @@ export function fareOf(c: P0Content, s: P0State, cluster: string, now: number): 
 /** What the confirm panel needs (§11.8.2): the fare as travel takes it (fareOf), whether it is a revisit, and until when
  * the city's Day Pass runs (null without one: home needs none). */
 export function preview(c: P0Content, s: P0State, cluster: string, now = Date.now()) {
+  const site = wildById(c, cluster);
+  if (site) return wildPreview(c, s, site.id, now);
   const cl = clusterById(c, cluster);
   const { km: d, trip, name: tripName } = tripOf(c, s, cluster);
   const info = cityInfo(c, cluster);
@@ -153,6 +177,18 @@ export function preview(c: P0Content, s: P0State, cluster: string, now = Date.no
     cost: { energy: fare.energy, coins: fare.coins, item: null }, revisit: fare.revisit, pass_until: pass, first_visit: !s.travel.visits[cluster],
     climate: cl?.climate ?? '', utc_offset_min: utcOffsetMin(cl?.timezone, now),   // the silhouette card (MAP-3-FREE, §11.8.3)
     fishing: info.fish, counts: { ponds: info.ponds.length, outposts: info.outposts.length, residents: info.residents } };
+}
+
+/** A wild site's travel card (contract-c §6): the city card's fields that make sense there, and `wild`, `type`, `free`.
+ * No country, fish or counts: a wild site is no city. */
+function wildPreview(c: P0Content, s: P0State, id: string, now: number) {
+  const site = wildById(c, id)!;
+  const { km: d, trip, name: tripName } = tripOf(c, s, id), fare = fareOf(c, s, id, now);
+  const pass = covers(s, id, now) ? s.travel.passes[id].until : null;
+  return { cluster: id, name: site.name, country: '', km: d, trip, trip_name: tripName,
+    cost: { energy: fare.energy, coins: fare.coins, item: null }, revisit: fare.revisit, pass_until: pass, first_visit: !s.travel.visits[id],
+    climate: site.climate, utc_offset_min: null, fishing: [], counts: { ponds: 0, outposts: 0, residents: 0 },
+    wild: true as const, type: site.type, open: site.open, free: wildNear3(c, s).includes(id) };
 }
 
 /** A city's UTC offset in minutes now (the clients carry no tz database: they add it to their own clock for the card's
@@ -189,7 +225,10 @@ export type PassRefusal = { code: 'pass_required' | 'trip_expired' | 'travel_req
  * walk in. Home's places need neither. What is already under way is never cut off (§11.5.1): a command at the place the
  * player already entered, and a reel of a line already out, pass; a new cast and a new entry are checked. */
 export function requirePass(c: P0Content, s: P0State, space: unknown, place: unknown, now: number, kind?: string): PassRefusal | null {
-  if ((space !== 'pond' && space !== 'outpost') || typeof place !== 'string' || place === '') return null;
+  // v4q(3): a wild site's mine is checked the same way (its pass, and being there); a mine read without its place is E's
+  // to judge (mine_enter checks here === the mine)
+  const wildMine = space === 'mine' && isWild(place);
+  if ((space !== 'pond' && space !== 'outpost' && !wildMine) || typeof place !== 'string' || place === '') return null;
   const cluster = clusterOf(c, place);
   if (!cluster || cluster === s.travel.home) return null;
   const pass = covers(s, cluster, now);
@@ -206,7 +245,7 @@ export function requirePass(c: P0Content, s: P0State, space: unknown, place: unk
 /** Remember the place the player is in, once its pass has been checked (so a pass running out never kicks them). */
 export function noteEntered(s: P0State, space: unknown, place: unknown): void {
   if (typeof space !== 'string' || space === '') return;
-  s.presence.entered = (space === 'pond' || space === 'outpost') && typeof place === 'string' && place !== '' ? place : null;
+  s.presence.entered = (space === 'pond' || space === 'outpost' || (space === 'mine' && isWild(place))) && typeof place === 'string' && place !== '' ? place : null;
 }
 
 export interface Arrival { cluster: string; first: boolean; stamp: TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
@@ -222,7 +261,10 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
   if (typeof to !== 'string' || to === '') return { code: 'bad_city' };
   const t = s.travel;
   if (to === t.home) { t.here = t.home; return null; }
-  if (!clusterById(c, to)) return { code: 'unknown_city' };
+  const site = isWild(to) ? wildById(c, to) : undefined;
+  if (isWild(to) && !site) return { code: 'unknown_place' };
+  if (site && !site.open) return { code: 'not_open', detail: { type: site.type } };   // a grey pin: no Go (v4q(3) ⑤)
+  if (!site && !clusterById(c, to)) return { code: 'unknown_city' };
   if (to === t.here && covers(s, to, now)) return null;   // already there: unchanged, not an error
   const fare = fareOf(c, s, to, now), floor = c.wallet_floor;
   if (fare.coins > 0 && s.coins < fare.coins + floor) {
@@ -237,7 +279,7 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
   const paid = { energy: fare.energy, coins: fare.coins };
   if (!fare.renews) {   // option B: back to a city whose pass still runs — the fare only
     t.here = to;
-    events.push({ kind: 'arrival', cluster: to, first: false, stamp: null, energy: 0, pass_until: t.passes[to].until, km: d, trip, paid, renewed: false });
+    events.push({ kind: 'arrival', cluster: to, first: false, stamp: null, energy: 0, pass_until: t.passes[to].until, km: d, trip, paid, renewed: false, ...(site ? { wild: true } : {}) });
     return null;
   }
   const first = !t.visits[to];
@@ -246,6 +288,12 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
   t.passes[to] = { kind: 'day', from: now, until: now + DAY_PASS_MS };
   t.here = to;
   let stamp: TravelStamp | null = null, energy = 0;
+  // v4q(3) ④: a wild site is visited (it counts as having been in its climate band) but stamps nothing — no first visit's
+  // +10, no Explorer medal (第 34 条: no wild stamps)
+  if (site) {
+    events.push({ kind: 'arrival', cluster: to, first, stamp: null, energy: 0, pass_until: t.passes[to].until, km: d, trip, paid, renewed: true, wild: true });
+    return null;
+  }
   if (first && !t.stamps.some(x => x.cluster === to)) {
     const today = dayKey(c, s, now);
     const countedToday = t.stamps.filter(x => x.counted_on === today).length;
@@ -265,7 +313,8 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
 }
 
 /** Whether a cluster is one the game has: the written city, or a row of the table (a closed country's is not, q(189)). */
-export const openCity = (c: P0Content, cluster: string): boolean => cluster === writtenCluster(c) || !!clusterById(c, cluster);
+export const openCity = (c: P0Content, cluster: string): boolean =>
+  cluster === writtenCluster(c) || !!clusterById(c, cluster) || !!wildById(c, cluster);   // a wild site is kept as an open place (v4q(3))
 
 /** view.travel (q(189) ③): visits, stamps and passes of a city the table no longer has are kept in the save, never shown. */
 export function travelShown(c: P0Content, t: TravelState): Pick<TravelState, 'visits' | 'stamps' | 'passes'> {
@@ -289,16 +338,20 @@ export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0
 /**
  * Where the player is follows what they do (李元芳's cold start, 2026-10-10): the city they stand in is the one their
  * scene is in, not only the last `travel` / `return_home`. Called with every command and state read, after requirePass:
- * - the homestead's spaces (home: the farm and its kitchen; mine) are the home city;
+ * - the homestead's space (home: the farm and its kitchen) is the home city; a mine is its wild site (v4q(5) ①);
  * - entering a pond or an outpost (its pass already checked) puts the player in that place's city;
  * - otherwise (the map, a read without a space) a city whose Day Pass ran out lets go: back home, unless the player is
  *   still in a place there they entered with the pass (never cut off, §11.5.1).
  * Quiet: no event, no welcome (the client's own Go home says Welcome home). True when `here` changed.
  */
-const HOMESTEAD_SPACES = new Set(['home', 'mine']);
+const HOMESTEAD_SPACES = new Set(['home']);
 export function settleHere(c: P0Content, s: P0State, space: unknown, place: unknown, now: number): boolean {
   const t = s.travel, was = t.here;
-  if (typeof space === 'string' && HOMESTEAD_SPACES.has(space)) t.here = t.home;
+  // v4q(3) / v4q(5) ①: the mines are out of the home city — a wild site's mine is that site, not home (Rest and the rest
+  // judged by "away" read it so); a mine read without its place leaves `here` as it is (周瑜's contract #625: mine reads
+  // and commands carry place = the mine's id)
+  if (space === 'mine') { if (isWild(place) && covers(s, place, now)) t.here = place; }
+  else if (typeof space === 'string' && HOMESTEAD_SPACES.has(space)) t.here = t.home;
   else if ((space === 'pond' || space === 'outpost') && typeof place === 'string' && place !== '') {
     const cluster = clusterOf(c, place);
     if (cluster && covers(s, cluster, now)) t.here = cluster;
@@ -316,7 +369,7 @@ export function returnHome(s: P0State): void { s.travel.here = s.travel.home; }
  * current one, or a cross-city check-in's outpost city (q(128)). */
 export function noteDelivery(c: P0Content, s: P0State, now: number, city: string = s.travel.here): void {
   const v = s.travel.visits[city];
-  if (city === s.travel.home || !v || !covers(s, city, now)) return;
+  if (city === s.travel.home || isWild(city) || !v || !covers(s, city, now)) return;   // a wild site is never a Regular's (v4q(3))
   const today = dayKey(c, s, now);
   if (v.delivered_day === today) return;
   v.delivered_day = today; v.deliveries += 1;

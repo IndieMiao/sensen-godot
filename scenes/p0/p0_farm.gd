@@ -254,7 +254,7 @@ func _build_world() -> void:
 		xfs.append(Transform3D(Basis.IDENTITY, bp.cell_to_world(P0Garden.cell_of(id))))
 		tints.append(Color.WHITE)
 	beds = FarmArt.batch("plot", xfs, true, tints)
-	beds.multimesh.visible_instance_count = P0Garden.P0_PLOTS   # all 40 laid out; the view's garden.plots shows them
+	beds.multimesh.visible_instance_count = P0Garden.max_plots()   # all laid out; the view's garden.plots shows them
 	beds.name = "Beds"
 	add_child(beds)
 	crops = CropField.new(bp)
@@ -364,12 +364,45 @@ func _fit_opening() -> void:
 	_place_camera()
 	_focus = opening_focus(cam, _focus, _house + home_mark(), actor.position, area)
 	_place_camera()
-	# 340 S2: only the initial guide framing includes Pip and the two teaching beds. No later step moves the camera.
-	if P0Guide.guide_on(rt.session.view) and bool(P0Guide.pip(rt.session.view).get("here", false)):
-		var points: Array[Vector3] = [actor.position, bp.cell_to_world(FarmGuide.STAND) + Vector3(0, 2.2, 0)]
-		for id in P0Guide.teaching_plots(rt.session.view): points.append(bp.cell_to_world(P0Garden.cell_of(id)))
-		_focus = guide_opening_focus(cam, _focus, points, area)
+	# SGODOT-355 b1 (不知火舞 on the grid shots, 11-02): every open bed, the farmhouse door and the player — Pip too while the
+	# guide has him here (340 S2) — 16 px clear at the left and right, zoomed out as far as that needs, at most the whole
+	# island and a margin (CTRL-1). No later step moves the camera; walking brings the follow camera's own scale back.
+	var guided := P0Guide.guide_on(rt.session.view) and bool(P0Guide.pip(rt.session.view).get("here", false))
+	# a guided player lands by the starting beds and Pip (q(215) 「落地在首畦旁」), not at the yard's way in: here, where
+	# the view is surely in (on _ready it may not be yet)
+	if guided: actor.teleport(bp.cell_to_world(landing_cell(grid, FarmGuide.LAND)))
+	# the farmhouse's prompt too, so the picture sits with the whole farm in the middle of the area between the HUD and
+	# the quick bar, not just the beds (不知火舞 on the Lv17 shot: the field alone framed the farm high)
+	var points: Array[Vector3] = [actor.position, actor.position + Vector3.UP * 1.8, _door, _house + home_mark()]
+	if guided: points.append(bp.cell_to_world(FarmGuide.STAND) + Vector3(0, 2.2, 0))
+	for id in P0Garden.plot_count(rt.session.view):
+		var bed := bp.cell_to_world(P0Garden.cell_of(id))
+		for d in [Vector3(-0.47, 0, -0.47), Vector3(0.47, 0, -0.47), Vector3(-0.47, 0, 0.47), Vector3(0.47, 0, 0.47)]: points.append(bed + d)
+	_frame_opening(points, Rect2(area.position + Vector2(OPEN_SIDE_PX, 0), area.size - Vector2(OPEN_SIDE_PX * 2, 0)))
+
+const OPEN_SIDE_PX := 16.0
+const ISLAND_RECT := Rect2i(0, -3, 21, 23)   # the yard (WALK_RECT) and a cell's margin round it: the farthest the opening zooms out
+var _opening_zoom := false   # the opening zoomed out; walking eases the follow camera back to zoom 1
+
+## Zoom out (never in) until every point fits `inner`, at most to the island and its margin, then centre them in it.
+func _frame_opening(points: Array[Vector3], inner: Rect2) -> void:
+	var span := _screen_bounds(points)
+	var need := maxf(span.size.x / maxf(inner.size.x, 1.0), span.size.y / maxf(inner.size.y, 1.0))
+	var island: Array[Vector3] = []
+	for c in [ISLAND_RECT.position, Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]: island.append(bp.cell_to_world(c))
+	var most := maxf(1.0, _screen_bounds(island).size.x / maxf(inner.size.x, 1.0))
+	var k := clampf(need, 1.0, most)
+	if k > 1.0:
+		_zoom = _zoom / k
+		_opening_zoom = true
 		_place_camera()
+	_focus = guide_opening_focus(cam, _focus, points, inner)
+	_place_camera()
+
+func _screen_bounds(points: Array[Vector3]) -> Rect2:
+	var r := Rect2(cam.unproject_position(points[0]), Vector2.ZERO)
+	for p in points: r = r.expand(cam.unproject_position(p))
+	return r
 
 static func guide_opening_focus(camera: Camera3D, focus: Vector3, points: Array[Vector3], area: Rect2) -> Vector3:
 	var bounds := Rect2(camera.unproject_position(points[0]), Vector2.ZERO)
@@ -403,6 +436,9 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
+	if _opening_zoom and not _cam_follow.held:   # walking: back to the follow camera's own scale (SGODOT-355 b1)
+		_zoom = move_toward(_zoom, 1.0, dt * 1.5)
+		_opening_zoom = _zoom < 1.0
 	_step_actor_fade(dt)
 	if _top_left > 0.0:   # turning into / out of the top-down view
 		_top_left = maxf(0.0, _top_left - dt)
@@ -750,9 +786,9 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
-	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
+	# the beds open now (the view's garden.plots, in the order they open: SGODOT-355 b1); the rest stay grass
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
-	_scenery.show_front_row(P0Garden.plot_count(v) > P0Garden.GRID_PLOTS)   # Lv7's row gets the field's sand (q(172) A)
+	_scenery.fit_sand(bp, P0Garden.plot_count(v))   # the field's sand under the open beds only
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
@@ -808,7 +844,7 @@ func _pick_front(v: Dictionary) -> void:
 		for p in v.get("plots", []):
 			if int(p.get("id", -1)) == best: _front = p
 	# Row Hoe: the bed in front and its tilled neighbours in the row, the way the player faces first (plot ids grow along +x).
-	_row = P0Logic.row_plots(v, _front, P0Garden.COLUMNS, 1 if f.x >= 0.0 else -1)
+	_row = P0Logic.row_plots(v, _front, 0, 1 if f.x >= 0.0 else -1)
 	_hi.visible = not _front.is_empty() and not rt.ui.has_modal()
 	if _hi.visible:
 		_front_cell = P0Garden.cell_of(best)
@@ -1256,7 +1292,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var now := Time.get_ticks_msec()
 			for i in codes.size():
 				for stage in 3:
-					var id := stage * P0Garden.COLUMNS + i if i < P0Garden.COLUMNS else (stage + 3) * P0Garden.COLUMNS + i - P0Garden.COLUMNS
+					var id := stage * codes.size() + i
 					if id >= P0Garden.plot_count(): continue
 					var span := 3600000
 					var started := now - int(span * [0.2, 0.55, 1.2][stage])
@@ -1283,6 +1319,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
 			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
+			var corners: Array[Vector3] = []
+			for c in [ISLAND_RECT.position, ISLAND_RECT.end, Vector2i(ISLAND_RECT.position.x, ISLAND_RECT.end.y), Vector2i(ISLAND_RECT.end.x, ISLAND_RECT.position.y)]:
+				corners.append(bp.cell_to_world(c))
+			_frame_opening(corners, rt.ui.open_marker_area())
 		"actorhide": _actor_fade_to = 1.0   # the yard's pieces alone, the player faded out (上官婉儿 on #276's shots)
 		# LOOK-PICK (SGODOT-282): lookpick:<stage>[:home] opens the card as after the level-up (or from HOME-1);
 		# lookpick-b / lookpick-a tap a card; lookuse presses Use; lookclose ✕; lookparts prints the stages' parts.

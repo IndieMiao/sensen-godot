@@ -76,7 +76,6 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   s.coins -= next.coins;
   events.push({ kind: 'coins', delta: -next.coins });
   s.homestead.level = next.level;
-  s.homestead.bartered = {};   // the barter share counts toward one level at a time (§8.4.5)
   s.homestead.plaque.push({ level: next.level, at: now });
   // q(246): each level chooses a fixed reward or full refill; never reduce a bonus-zone value.
   const max = maxEnergy(c, s);
@@ -85,7 +84,7 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   // look: the stage this level opens (LOOK-PICK, SGODOT-282) — the client offers its two looks after HOME-2's banner.
   const look = lookStageAt(c, next.level);
   events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks, ...(look ? { look: look.id } : {}) });
-  // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39, homestead.plots), dropped in with the fence (HOME-2's plots_40 line).
+  // the level's beds (homestead.plots: Lv1 8 … Lv17 41, tilled, SGODOT-355 b1), dropped in with the level's look.
   const added = addPlots(c, s);
   if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
   clearNewBeds(c, s, added, events);   // Lv7's beds on the field's edge: pieces standing there go back to storage (q(172))

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- geode (355 v4, mine type not open yet): a split rock with crystals inside; reads as a silhouette on a grey disc -->
+  <path d="M6 40C6 24 18 12 32 12s26 12 26 28c0 9-11 14-26 14S6 49 6 40z" fill="#8A918C"/>
+  <path d="M12 40c0-12 9-21 20-21s20 9 20 21c0 6-9 9-20 9s-20-3-20-9z" fill="#5E5470"/>
+  <path d="M20 44l3-14 5 14z" fill="#B7A6E8"/>
+  <path d="M27 45l5-20 5 20z" fill="#D8CCF6"/>
+  <path d="M36 44l5-12 4 12z" fill="#A08ED8"/>
+  <path d="M16 46l2-7 4 7z" fill="#8F7CC8"/>
+  <path d="M43 46l3-7 3 7z" fill="#8F7CC8"/>
+  <path d="M6 40c0 9 11 14 26 14s26-5 26-14c-2 6-12 9-26 9S8 46 6 40z" fill="#6E7B74"/>
+</svg>

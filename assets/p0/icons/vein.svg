@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- vein (355 v4, wild ore vein): a grey rock face split by a glowing golden seam (no particular ore) -->
+  <path d="M8 52L4 34l8-16 16-8 18 4 12 14 2 20-8 6z" fill="#8A918C"/>
+  <path d="M12 18l16-8 18 4-10 6-14 2z" fill="#A9B0AC"/>
+  <path d="M46 14l12 14-6 4-8-10z" fill="#A9B0AC"/>
+  <path d="M8 45l11-7 8 4 9-9 10 2 11-9 3 5-13 10-10-2-8 8-9-4-10 6z" fill="#F2B83A"/>
+  <path d="M15 41l4-2.5 8 4 9-9 10 2 9-7-1 2.5-8 6-10-2-8 8-8-4-4 2.5z" fill="#FFE59A"/>
+  <path d="M8 52l8-2 20 4 18-2 4 2-4 4H12z" fill="#6E7B74"/>
+</svg>

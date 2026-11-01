@@ -76,8 +76,11 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 9, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the house: Space taken
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 12, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' }); // the mailbox
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 6, y: 13, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the front fence
-    // q(120): Keep the path clear — two cells wide to the map exit, the door, the stall, the mine mouth, the workbench
-    for (const [x, y, where] of [[9, -1, 'spawn'], [10, -2, 'exit'], [8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
+    // q(120): Keep the path clear — two cells wide to the door, the stall, the mine mouth, the workbench; the path to
+    // the map exit now runs through the field (355 grid), so it is the field that keeps it clear
+    for (const [x, y] of [[9, -1], [10, -2]] as const)
+      expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });
+    for (const [x, y, where] of [[8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
       expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME }), where).toMatchObject({ ok: false, code: 'decor_path' });
     expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 15, ...HOME })).toMatchObject({ ok: true });   // just off the mine path
     expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 3, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_path' });   // on it (4, 14 would reach the Chef's Sign's cell)
@@ -93,9 +96,12 @@ describe('placing in the yard', () => {
     expect(spotBlock(c, s, 'deco_fountain', 5, 18, 0)).toMatchObject({ code: 'decor_outside' });   // on the back wall
     expect(spotBlock(c, s, 'deco_planter', 19, 14, 0)).toMatchObject({ code: 'decor_outside' });   // on the east wall
     expect(spotBlock(c, s, 'deco_pergola', 4, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the tree at (6, 17)
-    // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate (two rows nearer from q(172) A), a bush, a tree, a rock
-    for (const [x, y, what] of [[7, -1, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
+    // the garden's own dressing is taken (不知火舞 on 290): a tree, a rock; the sign by the gate and the bush now stand
+    // inside the field (355 grid), which keeps them clear first
+    for (const [x, y, what] of [[12, 18, 'tree'], [16, 18, 'rock']] as const)
       expect(spotBlock(c, s, 'deco_planter', x, y, 0), what).toMatchObject({ code: 'decor_overlap' });
+    for (const [x, y, what] of [[7, -1, 'sign'], [1, 0, 'bush']] as const)
+      expect(spotBlock(c, s, 'deco_planter', x, y, 0), what).toMatchObject({ code: 'decor_outside' });
   });
 
   it('the cap is 20 + 4 per Homestead level above 1 (§8.3.2)', () => {
@@ -106,5 +112,18 @@ describe('placing in the yard', () => {
     s.homestead.level = 1;
     s.decor = { placed: Array.from({ length: 20 }, (_, i) => ({ uid: i + 1, id: 'deco_planter', x: 99, y: i, rot: 0 as const })), count: 20 };
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 2, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_cap', detail: { cap: 20, used: 20 } });
+  });
+
+  it('stops at decor_max.max when the content sets one (SGODOT-355 b1: 52 proposed, the yard has 53 free cells)', () => {
+    const capped = structuredClone(c);
+    (capped.homestead as { decor_max?: object }).decor_max = { base: 20, per_level: 4, max: 52 };
+    const s = stocked();
+    s.homestead.level = 8;
+    expect(decorCap(capped, s)).toBe(48);
+    s.homestead.level = 9;
+    expect(decorCap(capped, s)).toBe(52);
+    s.homestead.level = 17;
+    expect(decorCap(capped, s)).toBe(52);
+    expect(decorCap(c, s)).toBe(84);   // no max in the content yet: the formula alone
   });
 });
