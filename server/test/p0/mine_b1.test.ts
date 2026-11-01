@@ -142,6 +142,18 @@ describe('355 E progression, fees and exits (cases 4,6-9,12a,15,18-19)', () => {
     x.send({ type: 'mine_floor', to: 19 });
     expect(x.fail({ type: 'mine_floor', to: 10, via: 'elevator' })).toMatchObject({ code: 'bad_floor' });
   });
+  it('previews upward fees after an elevator jump, then reflects payment and the next day', () => {
+    const x = scenario(); x.c.mine.floor_energy = 7;
+    x.s.mine.records[Q] = { deepest: 20, guards: [10, 20], first_at: T };
+    x.start(); expect(viewOf(x.c, x.s, x.now).mine.at!.prev).toBeNull();
+    x.send({ type: 'mine_floor', to: 20, via: 'elevator' });
+    expect(viewOf(x.c, x.s, x.now).mine.at!.prev).toEqual({ floor: 19, paid: false, fee: 7 });
+    expect(x.send({ type: 'mine_floor', to: 19 }).events).toContainEqual({ kind: 'energy', delta: -7, reason: 'mine_floor' });
+    for (let i = 0; i < x.state().mobs.length; i++) x.kill(i);
+    x.send({ type: 'mine_floor', to: 20 });
+    expect(viewOf(x.c, x.s, x.now).mine.at!.prev).toEqual({ floor: 19, paid: true, fee: 0 });
+    expect(viewOf(x.c, x.s, x.now + DAY).mine.at!.prev).toEqual({ floor: 19, paid: false, fee: 7 });
+  });
   it('departing heals living elites, retains ordinary damage/deaths; failed travel does not heal', () => {
     const x = scenario(); x.start(Q, 10);
     for (const to of [9, 8, 7, 6, 5]) x.send({ type: 'mine_floor', to });

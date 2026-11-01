@@ -216,7 +216,7 @@ export type MineNotice = { kind: 'reset'; at: number; floor: number } | { kind: 
 //   day.mine_runs 删掉
 ```
 - freshState 直接是这个形状（亚瑟的 v7 骨架会合进同一处）。不写迁移，v<7 按没有存档处理（亚瑟的方案 4.2）。
-- `once_a_day` 掉落的计数（数据里有才用）放 `day`：`s.day.once: Record<kind, number>`。
+- `once_a_day` 掉落的计数（数据里有才用）放 `day`：`s.day.once: Record<kind, number>`。第一批内容没有这种掉落，字段保留为空，不用于已作废的精英每日石英奖励（奕星97372fea）。
 - `guard_firsts[kind].home` 只在首次打倒该种守关时记下，不随玩家换家城、重复击杀或重启改写；不拿当前家城回填此前缺失的历史首杀。
 
 ## 4. 层生成（服务端，确定性）
@@ -335,6 +335,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 }
 ```
 - `at` 只在人在矿里时有；`floor_state` 只给当前层。换层以后看命令返回的 view。
+- 按周瑜355评论a5b58542补 `at.prev: null | {floor, paid, fee}`：F1为null；其余为上一层，paid读当天该矿该层记录，已付fee=0，否则为floor_energy。用于电梯到深层后向上进入未付费层的名字条和收费卡；不含next的清怪限制。
 - `mobs` 的顺序就是 targets / hurt_by 的下标。`tier` 只有守关有，其余是 0。
 - `deck`：点了火把以后才有，是本层牌堆按物品的合计，敲掉的牌不算；没点火把是 null。`bag_ok`：下一张牌整份放得下，只影响岩石是否置灰。
 - `ground`：本层地上的掉落，`from` 是掉它的怪的下标，客户端据此摆位置。

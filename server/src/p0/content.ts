@@ -351,6 +351,7 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
   const dir = path.dirname(file);
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
+  if (c.mine.fee_per_day !== true) throw new Error('p0 content: mine.fee_per_day must be true for batch 1');
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number }[])

@@ -314,7 +314,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
   if (day && at && site) {
     const state = floorState(c, s, site, at.floor), spec = currentSpec(c, s, site, at.floor);
     const stops = stations(s.mine.records[site.id]).filter(n => n <= cap(site));
-    const cleared = state.mobs.every(hp => hp <= 0), next = at.floor + 1;
+    const cleared = state.mobs.every(hp => hp <= 0), next = at.floor + 1, prev = at.floor - 1;
     here = {
       mine: site.id, type: site.type, name: site.name, max: cap(site), floor: at.floor, hp: day.hp, day: day.key,
       stations: stops.map(floor => ({ floor, paid: day.floors[floorKey(site.id, floor)]?.paid ?? false })),
@@ -325,6 +325,8 @@ export function mineView(c: P0Content, s: P0State, now: number) {
         bag_ok: bagFitsFloor(c, s, site, at.floor, day.key), station: stops.includes(at.floor), guard: spec.guard,
         mobs: spec.mobs.map((kind, i) => ({ kind, hp: state.mobs[i], max: maxHp(c, kind, spec.hpMult), elite: !!c.mine.monsters[kind].elite,
           guard: !!c.mine.monsters[kind].guard, tier: c.mine.monsters[kind].tier ?? 0 })) },
+      prev: prev < 1 ? null : { floor: prev, paid: day.floors[floorKey(site.id, prev)]?.paid ?? false,
+        fee: day.floors[floorKey(site.id, prev)]?.paid ? 0 : c.mine.floor_energy },
       next: next > site.mine.floors ? null : { floor: next, paid: day.floors[floorKey(site.id, next)]?.paid ?? false,
         fee: day.floors[floorKey(site.id, next)]?.paid ? 0 : c.mine.floor_energy, open: cleared, locked: next > cap(site) ? 'not_open' : null },
     };

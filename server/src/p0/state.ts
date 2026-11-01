@@ -130,7 +130,7 @@ export interface MineB1PlayerFields {
   guard_firsts: Record<string, { at: number; mine: string; floor: number; home: string }>;
 }
 export interface MineB1WeaponState { weapons: string[]; weapon: string }
-/** Merged into P0Day by the v7 skeleton; keyed by monster kind, only used by content with once_a_day. */
+/** Reserved for content with once_a_day, keyed by monster kind. Batch 1 has no such drops and leaves it empty. */
 export interface MineB1DailyFields { once: Record<string, number> }
 
 export function freshMineB1Fields(): MineB1PlayerFields {
@@ -164,7 +164,7 @@ export interface P0Day {
   bonus: number;                        // request completion bonus paid today (§9.13.2)
   sys_done: number;                     // system requests completed today (§9.6.4)
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
-  once: Record<string, number>;          // content-limited monster drops for this home day
+  once: Record<string, number>;          // reserved once_a_day counts; unused by batch 1 content
   cards?: string[];                     // today's recipe cards on the Homestead Stall shelf, drawn once a day (§7.16.1, SGODOT-282)
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)

@@ -1,7 +1,7 @@
 /** SGODOT-275 (亚瑟's cross-city plan §6): from P1 on, each line adds its content in its own file under
  * assets/p0/content/, merged into the main table in name order. A fragment only adds: an id, a key or a scalar that
  * is already there fails loudly, naming the file and the path, so two lines can never change the same entry. */
-import { mkdtempSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -15,6 +15,18 @@ const base = () => ({
 });
 
 describe('P0 content fragments (SGODOT-275)', () => {
+  it('rejects unsupported mine fee periods while loading content', () => {
+    const c = loadP0Content(), dir = mkdtempSync(path.join(tmpdir(), 'p0-mine-fee-'));
+    const file = path.join(dir, 'p0_content.json');
+    try {
+      writeFileSync(file, JSON.stringify(c));
+      expect(loadP0Content(file).mine.fee_per_day).toBe(true);
+      c.mine.fee_per_day = false;
+      writeFileSync(file, JSON.stringify(c));
+      expect(() => loadP0Content(file)).toThrow('mine.fee_per_day must be true');
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
   it('a fragment adds new ids, new keys and new entries without touching what is there', () => {
     const c = base();
     mergeContent(c, {
