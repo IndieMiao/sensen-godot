@@ -49,7 +49,9 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(0, 18))).is_equal("Outside your yard")   # off the yard
 	for at in [Vector2i(9, 16), Vector2i(12, 16), Vector2i(6, 13)]:   # the house, the mailbox, the front fence
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Space taken")
-	for at in [Vector2i(9, -1), Vector2i(10, -2), Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
+	for at in [Vector2i(9, -1), Vector2i(10, -2)]:   # the way to the map exit runs through the field now (SGODOT-355 b1)
+		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Outside your yard")
+	for at in [Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Keep the path clear")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 15))).is_equal("")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(3, 14))).is_equal("Keep the path clear")   # (4, 14) would reach the Chef's Sign's cell
@@ -77,6 +79,19 @@ func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
 	v.homestead.level = 10
 	v.decor.cap = 24
 	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Store one to place this")
+	# decor_max.max (SGODOT-355 b1, the user decides 52): the level it is reached at adds nothing more
+	var m := {"base": 20, "per_level": 4, "max": 52}
+	assert_int(P0Decor.cap_at(9, m)).is_equal(52)
+	assert_int(P0Decor.cap_at(8, m)).is_equal(48)
+	v.homestead.level = 8
+	v.decor.cap = 48
+	v.decor.placed.resize(0)
+	for i in 48: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
+	assert_str(P0Decor.cap_line(v, m)).is_equal("Decor 48/48 · Homestead Lv9 adds 4")
+	v.homestead.level = 9
+	v.decor.cap = 52
+	for i in 4: v.decor.placed.append({"uid": i + 49, "id": "deco_planter", "x": 98, "y": i, "rot": 0})
+	assert_str(P0Decor.cap_line(v, m)).is_equal("Decor 52/52 · Store one to place this")
 
 func test_today_offers_a_free_row_while_decor_waits_in_storage() -> void:
 	var v := {"decor": {"placed": [], "cap": 20, "stored": {}}}
@@ -103,7 +118,7 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 			n += 1
 			v.decor.placed.append({"uid": n, "id": "deco_planter", "x": x, "y": y, "rot": 0})
 			grid.set_solid(Vector2i(x, y), true)
-	assert_int(n).is_greater(60)   # plenty of yard is left to decorate
+	assert_int(n).is_greater(50)   # plenty of yard is left to decorate (53 since the field took the whole grid, SGODOT-355 b1)
 	var from: Vector2i = P0Garden.ANCHORS.spawn
 	var reach := func(target: Vector3, within: float) -> bool:
 		for y in range(o.y, o.y + bp.grid.y):
@@ -117,8 +132,7 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_bool(reach.call(cell.call(Vector2i(9, 14)), 0.1)).override_failure_message("the farmhouse door").is_true()
 	assert_bool(reach.call(cell.call(Vector2i(14, 14)), 0.1)).override_failure_message("the stall").is_true()
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.mine) + Vector3(-0.3, 0, 0.3), P0FarmMaterials.MOUTH_REACH)).override_failure_message("the mine mouth").is_true()
-	for id in ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch", "workbench"]:
-		assert_bool(reach.call(cell.call(P0Garden.ANCHORS[id]), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message(id).is_true()
+	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.workbench), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message("the workbench").is_true()
 
 ## FARM-6-DECOR (Figma 2187:33369): the stall's Decor page — its tab, its fact line, the rows' four states.
 func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
@@ -172,15 +186,15 @@ func test_the_yard_edge_is_dashed_round_the_walk_rect() -> void:
 ## The grid round a picked piece is the yard's (不知火舞 on 284): where a piece could stand and the paths, never the field.
 func test_the_grid_round_a_piece_is_the_yard_only() -> void:
 	var v := {"decor": {"placed": [], "cap": 20, "stored": {}}}
-	var halo := P0FarmDecor.halo_cells(v, [Vector2i(12, 1), Vector2i(13, 1)])
+	var halo := P0FarmDecor.halo_cells(v, [Vector2i(4, 15), Vector2i(5, 15)])   # a bench by the mine path
 	assert_int(halo.size()).is_greater(10)
 	for h in halo:
 		var c: Vector2i = h[0]
 		assert_str(P0Decor.reason(v, "deco_planter", c)).override_failure_message(str(c)).is_not_equal("Outside your yard")
 		assert_str(P0Decor.reason(v, "deco_planter", c)).override_failure_message(str(c)).is_not_equal("Space taken")
-		assert_int(maxi(absi(c.x - 12), absi(c.y - 1))).is_less_equal(4)
-	assert_bool(halo.any(func(h): return (h[0] as Vector2i).y >= 2)).is_false()   # rows 2+ are the field there
-	assert_bool(halo.any(func(h): return bool(h[2]))).is_true()                   # the exit path at x 9–10 is in reach
+		assert_int(maxi(absi(c.x - 4), absi(c.y - 15))).is_less_equal(4)
+	assert_bool(halo.any(func(h): return (h[0] as Vector2i).y <= 12)).is_false()   # rows up to 12 are the field (SGODOT-355 b1)
+	assert_bool(halo.any(func(h): return bool(h[2]))).is_true()                    # the mine path at x 3–4 is in reach
 
 ## The stall's ten pieces have their own icons (安其拉, 284 2ab958d8), not the sprout stand-in.
 func test_every_sold_piece_has_its_icon() -> void:
@@ -205,10 +219,10 @@ func test_a_sent_piece_stays_pending_until_the_view_places_it() -> void:
 ## A pending piece is negative and "ignore no piece" is 0 (#265): the first piece sent of a multi-piece one counts as taken
 ## for the next spot and the preview, it is never mistaken for the piece being moved.
 func test_the_first_pending_piece_is_taken_for_the_next_spot() -> void:
-	var v := {"decor": {"placed": [{"uid": -1, "id": "deco_path", "x": 8, "y": 1, "rot": 0}], "cap": 20, "stored": {}}}
-	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1))).is_equal("Space taken")
-	assert_that(P0Decor.nearest_spot(v, "deco_path", 0, Vector2i(9, 1))).is_not_equal(Vector2i(8, 1))
-	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1), 0, -1)).is_equal("")   # moving that very piece
+	var v := {"decor": {"placed": [{"uid": -1, "id": "deco_path", "x": 4, "y": 15, "rot": 0}], "cap": 20, "stored": {}}}
+	assert_str(P0Decor.reason(v, "deco_path", Vector2i(4, 15))).is_equal("Space taken")
+	assert_that(P0Decor.nearest_spot(v, "deco_path", 0, Vector2i(5, 15))).is_not_equal(Vector2i(4, 15))
+	assert_str(P0Decor.reason(v, "deco_path", Vector2i(4, 15), 0, -1)).is_equal("")   # moving that very piece
 
 ## SGODOT-290: every piece sold has 刘备's model (the Recipe Stand, a reward, keeps its shape). Each stands on its
 ## footprint's middle, feet on the ground, inside its cells (the kit's two exceptions: the Fence's half posts meet at
@@ -416,11 +430,11 @@ func test_the_player_walks_inside_the_fence_ring() -> void:
 	assert_int(maxi(19 - corner.x, 19 - corner.y)).is_less_equal(2)   # just inside the corner
 	assert_that(P0Farm.landing_cell(grid, P0Garden.ANCHORS.spawn)).is_equal(P0Garden.ANCHORS.spawn)   # where one may stand: there
 
-## q(172): Homestead Lv7's beds on the field's edge (40–47) are off Decorate from Lv7, as the field is; before it their
-## cells are yard (the server sends what stood there back to storage at the upgrade); the walkways between stay open.
-func test_lv7_beds_on_the_edge_are_off_the_yard_from_lv7() -> void:
-	var bed := P0Garden.cell_of(41)   # (6,1), in the field's new front row
-	assert_str(P0Decor.reason_cells({"garden": {"plots": 40}}, [bed], {})).is_equal("")
-	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed], {})).is_equal(P0Decor.REASONS.decor_outside)
-	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [P0Garden.cell_of(47)], {})).is_equal(P0Decor.REASONS.decor_outside)
-	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed + Vector2i(1, 0)], {})).is_equal("")   # the walkway beside
+## SGODOT-355 b1: Decorate keeps off the whole grid at every level — the beds still to open and the walkways between
+## too (the field rect covers them; it replaced q(172)'s Lv7 edge row).
+func test_the_whole_grid_is_off_the_yard_at_every_level() -> void:
+	var lv1 := {"garden": {"plots": 8}}
+	for id in [0, 8, 40, P0Garden.max_plots() - 1]:
+		assert_str(P0Decor.reason_cells(lv1, [P0Garden.cell_of(id)], {})).override_failure_message("bed %d" % id).is_equal(P0Decor.REASONS.decor_outside)
+	assert_str(P0Decor.reason_cells(lv1, [P0Garden.cell_of(0) + Vector2i(1, 0)], {})).is_equal(P0Decor.REASONS.decor_outside)   # a walkway
+	assert_str(P0Decor.reason_cells(lv1, [Vector2i(4, 15)], {})).is_equal("")   # the yard in front of the house

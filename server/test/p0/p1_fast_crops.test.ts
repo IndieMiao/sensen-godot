@@ -132,17 +132,18 @@ describe('fast crops, isolated content and real buy → sow → water → harves
 });
 
 describe('fast crops cannot escape their three allowed paths', () => {
+  // SGODOT-355 b1: on the new grid bed 6 [4, 3] is beside bed 7 [5, 3], both in a new homestead's 8
   it('sprinklers/greenhouses auto-water but never shorten fixed seconds, including when newly placed', () => {
     for (const kind of ['sprinkler', 'greenhouse']) {
-      const plot = kind === 'sprinkler' ? 8 : coverOf(c, 'greenhouse', 4, 30).find(id => fresh().plots[id].state === 'tilled')!;
+      const plot = kind === 'sprinkler' ? 6 : coverOf(c, 'greenhouse', 4, 30).find(id => fresh().plots[id].state === 'tilled')!;
       let s = ready('crop_bok_choy'); s.facilities = [{ id: 1, kind, plot: kind === 'sprinkler' ? 7 : 4 }];
       s = run(s, { type: 'sow', plot, seed: 'seed_bok_choy' }).state;
       expect(s.plots[plot]).toMatchObject({ state: 'growing', ready_at: T + H });
     }
     let s = ready('crop_cress'); s.skills.farming = c.skills.farming[5]; s.storage = { wood: 20, stone: 20, copper_ore: 7 };
-    s = run(s, { type: 'sow', plot: 8, seed: 'seed_cress' }).state;
+    s = run(s, { type: 'sow', plot: 6, seed: 'seed_cress' }).state;
     s = run(s, { type: 'place', recipe: 'craft_sprinkler', plot: 7 }, T + 5000).state;
-    expect(s.plots[8].ready_at).toBe(T + 15000);
+    expect(s.plots[6].ready_at).toBe(T + 15000);
   });
 
   it('rejects Compost before cropById dereference, in sown and growing states without spending it', () => {

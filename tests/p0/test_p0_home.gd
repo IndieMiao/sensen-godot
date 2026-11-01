@@ -286,6 +286,17 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
+## SGODOT-355 b1 (亚瑟 on #624): a sow the server turns down with plots_full says what the grey Sow key says, never the code.
+func test_a_refused_sow_on_a_full_field_says_the_plots() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var v := _view()
+	v["homestead"] = {"level": 1}
+	rt.session.view = v
+	rt._on_refused("plots_full", {"used": 8, "cap": 8}, {"type": "sow", "plot": 8, "seed": "seed_lettuce"})
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8 · Homestead Lv2 adds 2")
+
 ## A refused upgrade (后裔 on #150): away from home it says what HOME-1's grey button says; when the fresh view shows no gap
 ## any more (it changed under the tap) the server's detail names it instead of an empty toast.
 func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:

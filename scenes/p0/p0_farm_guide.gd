@@ -7,7 +7,10 @@ const PIP := "res_pip"
 const TAG := "farm:guide_pip"
 const WATER_TAG := "farm:guide_water:"
 const GROWTH_TAG := "farm:guide_growth:"
-const STAND := Vector2i(5, 1)   # front/left of the first bed, between teaching plots 0/1; clear of Reed Bank's badge
+## Pip by the starting beds (SGODOT-355 b1: the 2 × 4 at x 8–14, y 9–11): the walkway on the block's left, between its
+## two rows. LAND: where a guided player lands on the farm, the walkway in front of the block (q(215) 「落地在首畦旁」).
+const STAND := Vector2i(7, 10)
+const LAND := Vector2i(9, 8)
 
 var farm: Node3D
 var pip_root: Node3D

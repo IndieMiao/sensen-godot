@@ -50,7 +50,7 @@ class Run {
     for (const plot of plots) this.do({ type: 'water', plot, space: 'home' });
     return plots;
   }
-  lettuce() { for (const plot of this.tilled(10)) this.do({ type: 'sow', plot, seed: 'seed_lettuce', space: 'home' }); return this; }
+  lettuce() { for (const plot of this.tilled(6)) this.do({ type: 'sow', plot, seed: 'seed_lettuce', space: 'home' }); return this; }
   harvest(plots: number[]) { this.now += 46 * S; for (const plot of plots) this.do({ type: 'harvest', plot, space: 'home' }); return this; }
   market() { return { space: 'outpost', place: this.set.market }; }
   nadia1() { return this.do({ type: 'talk', resident: 'res_nadia', ...this.market() }).do({ type: 'accept', request: ONE, ...this.market() })
@@ -95,7 +95,7 @@ describe('the main line (§14.2)', () => {
     r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
     expect(r.view.pip.bang).toBe(false);
     const quick = r.sowQuick(); note();
-    expect(r.view.row.line).toBe('Sow 10 Lettuce · 20 Energy');
+    expect(r.view.row.line).toBe('Sow 6 Lettuce · 12 Energy');   // SGODOT-355 b1 (v4q(4), 不知火舞 f6b4bdb3): the rest of the 8 starting Plots, 2 being radishes
     r.lettuce(); note();
     expect(r.view).toMatchObject({ step: 't_harvest_quick', recover: 'r_quick_wait',
       row: { line: 'Quick Radishes ready', countdown: 'crop_quick_radish', count: 2, format: 'mss' }, progress: { have: 0, need: 1 } });

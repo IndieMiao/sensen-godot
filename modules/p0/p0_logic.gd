@@ -564,8 +564,8 @@ static func row_plots(view: Dictionary, front: Dictionary, columns: int, dir: in
 	var most := sow_count(view)
 	var by_id := {}
 	for p in view.get("plots", []): by_id[int(p.get("id", -1))] = p
-	# Along the row on the garden grid (P1: plots 30–39 continue P0's rows on the right, so plot 5's neighbour is 30, not
-	# 6 — T15, a Row Hoe sow across the old and new plots). `columns` is P0's row length, kept for callers.
+	# Along the row on the garden grid (content.garden.plots: ids go in opening order, not along the rows — SGODOT-355
+	# b1), up to a bed the view does not have. `columns` is P0's row length, kept for callers.
 	var at := P0Garden.grid_of(int(front.get("id", -1)))
 	for side in [dir if dir != 0 else 1, -(dir if dir != 0 else 1)]:
 		var g := at + Vector2i(side, 0)
@@ -622,9 +622,14 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 				return a
 			var cost := int(crop_for_seed(view, seed_id).get("energy", 2))
 			var have := int(view.get("energy", {}).get("value", 0))
-			# Row Hoe: as many of the row's plots as the seeds allow, then trimmed to what Energy covers (§5.3).
+			# SGODOT-355 b1 (v4 2.5): annuals stand on at most the level's Plots; a full field greys the key with the count
+			var room := fields_room(view)
+			if room == 0: return fields_full_action(view)
+			# Row Hoe: as many of the row's plots as the seeds allow, then trimmed to what Energy covers (§5.3) and to the
+			# Plots left.
 			var plots: Array = row if row.size() > 1 and int(row[0].get("id", -1)) == plot_id else [plot]
 			var n := clampi(mini(plots.size(), bag_count(view, seed_id)), 1, plots.size())
+			if room > 0: n = mini(n, room)
 			if have < cost:
 				return {"icon": "sow", "verb": "Sow ×%d" % n, "sub": "Need %d Energy" % (cost * n), "enabled": true, "amber": true,
 					"cmd": {"type": "energy_card"}, "need": cost * n}
@@ -646,6 +651,30 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 					"cmd": {"type": "harvest", "plot": plot_id, "plots": whole}, "need": 0}
 			return {"icon": "hoe", "verb": "Harvest", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "harvest", "plot": plot_id}, "need": 0}
 	return a
+
+## Plots an annual may still take (view.garden.fields: the level's Plots less the annuals standing, SGODOT-355 b1); -1
+## when the view does not say.
+static func fields_room(view: Dictionary) -> int:
+	var f = view.get("garden", {}).get("fields", null)
+	if not (f is Dictionary): return -1
+	return maxi(0, int(f.get("cap", 0)) - int(f.get("used", 0)))
+
+## The Sow key on a full field (不知火舞 on the grid, as q(130)'s capped facilities): the grey key only counts, `Plots 8/8`;
+## the tap's Info toast says what the next Homestead level adds, `Plots 8/8 · Homestead Lv2 adds 2`; at the top both
+## only count, `Plots 41/41`.
+static func fields_full_action(view: Dictionary) -> Dictionary:
+	var f: Dictionary = view.get("garden", {}).get("fields", {})
+	var label := "Plots %d/%d" % [int(f.get("used", 0)), int(f.get("cap", 0))]
+	var toast := label
+	var level := int(view.get("homestead", {}).get("level", 1))
+	var ladder: Array = content().get("homestead", {}).get("plots", [])
+	var now := -1
+	var next := -1
+	for step in ladder:
+		if int(step[0]) <= level: now = int(step[1])
+		elif int(step[0]) == level + 1: next = int(step[1])
+	if now >= 0 and next > now: toast += " · Homestead Lv%d adds %d" % [level + 1, next - now]
+	return {"icon": "sow", "verb": "Sow", "sub": label, "enabled": false, "amber": false, "cmd": {}, "need": 0, "toast": toast}
 
 ## Harvest All's row (q(118) ④): from Farming Lv9 (content farming.conveniences), the plot in front and every other ripe
 ## annual on its garden row (trees are picked one by one); [] below that level.

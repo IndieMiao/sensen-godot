@@ -159,17 +159,16 @@ func test_entry_card_waits_for_the_ui_root() -> void:
 	m.free()
 	runtime.free()
 
-## LOCK-07: the mine mouth is one of the farm's card candidates, so standing at it no spot's finger card shows next
-## to its EntryCard (the Herb Patch sits 2.6 m behind it).
+## LOCK-07: the mine mouth is one of the farm's card candidates, so standing at it no other finger card shows next to
+## its EntryCard; the farm has no gathering spots since SGODOT-355 b1, so the workbench is the only other.
 func test_the_mouth_takes_the_card_when_nearest() -> void:
 	var m := P0FarmMaterials.new()
 	m.mouth = Vector3(1.3, 0, -9.1)
-	for id in P0FarmMaterials.SPOTS: m._spots[id] = Vector3(50, 0, 50)
-	m._spots["spot_herb_patch"] = Vector3(2.3, 0, -11.4)
+	m._bench = Vector3(4.3, 0, -11.4)
 	var cands := m.card_candidates()
-	assert_bool(cands.any(func(c): return str(c[0]) == "mine")).is_true()
+	assert_array(cands.map(func(c): return str(c[0]))).contains_exactly_in_any_order(["workbench", "mine"])
 	assert_str(P0Garden.pick_card(cands, Vector3(2.3, 0, -8.8), "")).is_equal("mine")
-	assert_str(P0Garden.pick_card(cands, Vector3(2.3, 0, -11.0), "")).is_equal("spot_herb_patch")
+	assert_str(P0Garden.pick_card(cands, Vector3(4.3, 0, -11.0), "")).is_equal("workbench")
 	m.free()
 
 ## COMBAT-ELITE (不知火舞 on 288): the HP card has its coral heart (HPBar 1124:79402); the status line sits clear of the

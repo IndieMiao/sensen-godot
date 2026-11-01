@@ -31,13 +31,22 @@ func test_spot_reasons_follow_the_place_command() -> void:
 	assert_str(P0FarmFacilities.spot_reason(v, -1)).is_equal("Outside your fields")
 	assert_str(P0FarmFacilities.spot_reason(_view(30), 33)).is_equal("Outside your fields")
 
-## Coverage is the ring of 8 on the garden grid, over the plots the homestead has, written as a count.
+## A plot by its [col, row] on the garden grid (content.garden.plots; the server tests' at()).
+static func _at(col: int, row: int) -> int: return P0Garden.id_of(P0Garden.PLOT_ORIGIN + Vector2i(col, row) * 2)
+
+## Coverage is the ring of 8 on the garden grid, over the plots the homestead has, written as a count. With 40 open
+## (SGODOT-355 b1 order) rows 4…1 are whole and row 0 has its middle four, cols 2–5.
 func test_cover_and_caption_count_the_ring_of_eight() -> void:
-	assert_array(P0FarmFacilities.cover_of(_view(), 7)).contains_exactly_in_any_order([0, 1, 2, 6, 8, 12, 13, 14])
-	assert_array(P0FarmFacilities.cover_of(_view(), 5)).contains_exactly_in_any_order([4, 10, 11, 30, 32])
-	assert_array(P0FarmFacilities.cover_of(_view(30), 5)).contains_exactly_in_any_order([4, 10, 11])
-	assert_str(P0FarmFacilities.caption(_view(), 7)).is_equal("Coverage preview · 8 plots")
-	assert_str(P0FarmFacilities.caption(_view(), 0)).is_equal("Coverage preview · 3 plots")
+	var ring := []
+	for col in range(2, 5): for row in range(2, 5): if Vector2i(col, row) != Vector2i(3, 3): ring.append(_at(col, row))
+	assert_array(P0FarmFacilities.cover_of(_view(), _at(3, 3))).contains_exactly_in_any_order(ring)
+	# at the open edge: row 0 has only col 5 of 5–7
+	assert_array(P0FarmFacilities.cover_of(_view(), _at(6, 1))).contains_exactly_in_any_order(
+		[_at(5, 0), _at(5, 1), _at(7, 1), _at(5, 2), _at(6, 2), _at(7, 2)])
+	assert_array(P0FarmFacilities.cover_of(_view(36), _at(6, 1))).contains_exactly_in_any_order(
+		[_at(5, 1), _at(7, 1), _at(5, 2), _at(6, 2), _at(7, 2)])
+	assert_str(P0FarmFacilities.caption(_view(), _at(3, 3))).is_equal("Coverage preview · 8 plots")
+	assert_str(P0FarmFacilities.caption(_view(), _at(-1, 4))).is_equal("Coverage preview · 3 plots")   # the grid's corner
 
 # ---------------------------------------------------------------- the Facilities card
 func _recipe(block = null, extra := {}) -> Dictionary:
