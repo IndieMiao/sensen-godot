@@ -620,6 +620,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		at = ui.inbox_float_at()
 		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
+	var dig_reward := P0Logic.GearLogic.first_dig_reward(v, events)
+	if dig_reward != "": floats.append({kind = "first_dig", key = "first_dig", text = dig_reward})
 	if not guide_feedback.fish.is_empty(): floats.append(guide_feedback.fish)
 	# q(218) A Fresh Radish (不知火舞 on 344, 812e77be): handed in on the resident's open bar, the reply floats one group over
 	# the bar — `+20 coins`, `+5 Friendship`, `New recipe · Fresh Fish Soup` — and the resident says the thanks line after.

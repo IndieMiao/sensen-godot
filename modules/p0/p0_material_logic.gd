@@ -561,6 +561,7 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 			"cost": r.get("cost", []).map(func(c): return {"id": str(c.id), "name": str(c.name), "have": int(c.have), "need": int(c.need)}),
 			"yield": "", "have": "", "button": {},
 		}
+		if str(r.get("to", "")) == "weapon": card.effect = P0Logic.GearLogic.weapon_effect(item)
 		if str(r.get("to", "")) == "bag":
 			card.yield = "You get %d" % int(r.get("qty", 1))
 			card.have = "You have %d" % int(r.get("have", 0))   # bag + Farm Storage (server, B2-06)
@@ -584,7 +585,7 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 
 static func _craft_button(r: Dictionary) -> Dictionary:
 	if r.get("owned", false):
-		if str(r.get("to", "")) == "gear":
+		if str(r.get("to", "")) in ["gear", "weapon"]:
 			if r.get("equipped", false): return {"label": "Equipped", "kind": "done", "cmd": {}}
 			return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
 		return {"label": "Owned · always on", "kind": "done", "cmd": {}}   # Gather Gloves (B2-06 GLOVES-DONE)
@@ -597,6 +598,8 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 		return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 	var d: Dictionary = block.get("detail", {})
 	match str(block.get("code", "")):
+		"homestead_level":
+			return {"label": "Homestead Lv%d needed" % int(d.get("level", 1)), "kind": "unavailable", "cmd": {}}
 		"locked":
 			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
 		"skill_level_required":   # q(59) §5: `Farming Lv6 needed`

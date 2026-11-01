@@ -41,7 +41,7 @@ extends RefCounted
 
 const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage", &"workbench"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
-const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool", "trap"]
+const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool", "trap", "weapon", "potion"]
 const SEP := " · "
 const _P0Travel := preload("res://modules/p0/p0_travel.gd")   # grouped(): a panel's coin price from 1,000 has its commas (不知火舞 on #409)
 const _MYSTERY := "dish_mystery"
@@ -58,6 +58,8 @@ static func rules() -> Dictionary:
 	return _rules
 
 static func kind_of(view: Dictionary, item_id: String) -> String:
+	if item_id.begins_with("potion_"): return "potion"   # server may label it consumable; never material rules.
+	if item_id.begins_with("weapon_"): return "weapon"
 	if P0Decor.is_decor(item_id): return "decor"   # Decorate (SGODOT-284): yard pieces live in Farm Storage
 	if is_card(item_id): return "card"   # a Recipe Card on a counter (§9.11.1 / §9.11.2): it turns its page Tasted
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
@@ -75,6 +77,7 @@ static func tab_of(view: Dictionary, item_id: String) -> StringName:
 	if k == "": k = item_id.split("_")[0]
 	var tab = {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
 		"trap": &"tackle", "rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
+	if item_id.begins_with("potion_"): return &"materials"
 	if tab != null: return tab
 	return &"materials" if P0Logic.content().get("materials", {}).has(item_id) else &""
 
@@ -89,7 +92,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	# The generic buy row (postcards, Bag Upgrade I) only stands for goods this counter actually sells.
 	if context == &"counter_buy" and not rules().has("%s/%s" % [kind, context]) and _offer(view, item_id, opts).is_empty(): rule = {}
 	# The workbench card stands only for what the workbench makes.
-	if context == &"workbench" and not P0MaterialLogic.EFFECTS.has(item_id): rule = {}
+	if context == &"workbench" and not P0MaterialLogic.EFFECTS.has(item_id) and P0Logic.GearLogic.weapon(item_id).is_empty(): rule = {}
 	var badge: StringName = &"locked" if f.locked else (&"pinned" if f.pinned else &"")
 	var out := {
 		card = not rule.is_empty(),
@@ -395,6 +398,9 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# A workbench item (SGODOT-231 B2-06): its effect line, then In Gear for an owned pickaxe or the gloves' passive note.
 		craft_effect = str(P0MaterialLogic.EFFECTS.get(item_id, "")),
 		craft_note = _craft_note(view, item_id),
+		weapon_effect = P0Logic.GearLogic.weapon_effect(item_id),
+		weapon_tier = "T%d" % int(rod.tier) if rod.has("tier") else "",
+		potion_effect = P0Logic.GearLogic.potion_effect(item_id),
 		# Decorate (SGODOT-284, q(111) / q(113)): a piece's footprint, its row line (`1×1 · Classic lamp` /
 		# `5 pieces`) and the row's third line — the levels still to go while it is locked, else `In storage ×2`.
 		footprint = P0Decor.footprint(item_id) if kind == "decor" else "",
@@ -404,6 +410,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# Market's regional cards — beside a grey `Need 240 more coins` the row stays one line each (不知火舞 on 282).
 		card_line = _card_line(view, offer, opts) if kind == "card" else "",
 	}
+	if kind == "potion": t.use = t.potion_effect
+	if kind == "weapon": t.craft_effect = t.weapon_effect
 	var src := str(t.source)
 	t.count_source = ("%s · %s" % [t.count, src]) if src != "" and t.count != "" else ""
 	return t
@@ -440,6 +448,10 @@ static func _dex(view: Dictionary) -> String:
 
 ## A tool's Gear row: view.gear.rods / picks / hoes ({id, name, owned, equipped, ...}).
 static func _rod(view: Dictionary, item_id: String) -> Dictionary:
+	if item_id.begins_with("weapon_"):
+		for r in P0Logic.GearLogic.weapon_rows(view):
+			if str(r.id) == item_id: return r
+		return P0Logic.GearLogic.weapon(item_id)
 	for list in ["rods", "picks", "hoes"]:
 		for r in view.get("gear", {}).get(list, []):
 			if str(r.get("id", "")) == item_id: return r

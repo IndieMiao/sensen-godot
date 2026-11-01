@@ -10,6 +10,7 @@ const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a pond's f
 const P0Trap := preload("res://modules/p0/p0_trap.gd")   # Fish Trap (SGODOT-283)
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
+const GearLogic := preload("res://modules/p0/p0_gear_logic.gd")
 
 static var _content: Dictionary = {}
 ## Problems found merging the content fragments (tests read it; the server refuses to start on the same ones).
@@ -417,6 +418,8 @@ const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
+	if id.begins_with("weapon_"): id = "sword_wooden" if id == "weapon_wooden_sword" else "sword"
+	if id.begins_with("potion_"): id = "heart"   # G artwork pending; retain an existing HP glyph.
 	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	if ResourceLoader.exists(path): return load(path)
@@ -527,6 +530,8 @@ static func liked_by_line(view: Dictionary, item_id: String) -> String:
 
 static func item_name(view: Dictionary, id: String) -> String:
 	var names: Dictionary = view.get("names", {})
+	if not names.has(id) and id.begins_with("weapon_"): return str(GearLogic.weapon(id).get("name", id))
+	if not names.has(id) and id.begins_with("potion_"): return str(GearLogic.potion(id).get("name", id))
 	var fast := fast_crop(view, id)
 	if not names.has(id) and not fast.is_empty(): return str(fast.get("seed_name" if id == str(fast.get("seed")) else "name", id))
 	if not names.has(id) and P0Decor.is_decor(id): return P0Decor.name_of(id)   # Decorate's pieces (SGODOT-284)
@@ -735,7 +740,7 @@ static func _tree_action(view: Dictionary, plot: Dictionary) -> Dictionary:
 ## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
 ## What each action's quick bar holds (§10.3.2): Farming seeds and fertiliser, Fishing bait. Anything in the pool
 ## stays where it was put or pinned; the bar fills its free end only with the first family (seeds / bait).
-const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_", "trap_"]}   # trap_fish: P1's Fish Trap (SGODOT-283)
+const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_", "trap_"], "combat": ["potion_"]}
 
 ## The action whose bar takes this item ("farm" / "fish"), or "" when no bar does.
 static func bar_action_of(id: String) -> String:
@@ -745,7 +750,7 @@ static func bar_action_of(id: String) -> String:
 	return ""
 
 static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
-	var prefix := "bait_" if mode == "fish" else "seed_"
+	var prefix := "potion_" if mode == "combat" else "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
 		var id := str(s.get("id", ""))
@@ -1605,6 +1610,8 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	# on their boards. One ready to hand in can be done now and leads; one still short follows what else can be done now,
 	# before the countdowns. The first session shows its tutorial request alone (the guide's row).
 	var progress: Array = []
+	var dig := GearLogic.first_dig_row(view)
+	if not dig.is_empty() and not P0Guide.guide_on(view): progress.append(dig)
 	var latest = null   # q(143): the short request tracked last keeps a row (Tracking · it shows in Today)
 	var latest_at := -1.0
 	if not P0Guide.first_phase(view):

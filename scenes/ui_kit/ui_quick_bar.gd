@@ -188,6 +188,7 @@ func _refresh() -> void:
 		cell.title = str(d.get("title", ""))
 		var qty := int(d.get("quantity", 0))
 		cell.quantity = "×%d" % qty if id != "" else ""
+		if id != "" and str(d.get("cooldown", "")) != "": cell.quantity += " · " + str(d.cooldown)
 		cell.pinned = bool(d.get("pinned", false)) and id != ""
 		if i == _target: cell.state = UiItemCell.State.DROP_TARGET   # an empty slot too: a bag item lands there (225)
 		elif id == "": cell.state = UiItemCell.State.GHOST if bool(d.get("ghost", false)) else UiItemCell.State.EMPTY

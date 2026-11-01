@@ -73,7 +73,19 @@ const GHOST_FAMILY := {
 	"farm": ["seed_", "seed_radish", "Seeds"],
 	"fish": ["bait_", "bait_worm", "Bait"],
 	"mine": ["torch", "torch", "Torch"],
+	"combat": ["potion_", "heart", "Potion"],
 }
+
+var _potion_until_ms := -1
+var _potion_second := -1
+
+## E/session supplies the remaining server cooldown once its view contract is available.
+func set_potion_cooldown(remaining_ms: float) -> void:
+	_potion_until_ms = Time.get_ticks_msec() + ceili(remaining_ms) if remaining_ms >= 0 else -1
+	if is_node_ready(): _refresh_bar()
+
+func potion_cooldown() -> float:
+	return maxf(0.0, _potion_until_ms - Time.get_ticks_msec()) if _potion_until_ms >= 0 else -1.0
 
 var view: Dictionary = {}
 var root: Control
@@ -185,6 +197,10 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
+	var second := ceili(potion_cooldown() / 1000.0)
+	if second != _potion_second:
+		_potion_second = second
+		if bar_mode == "combat": _refresh_bar()
 	guide_pulses.follow()
 	_guide_pulse_wait -= dt
 	if _guide_pulse_wait <= 0.0:
@@ -329,7 +345,7 @@ func _build_bar() -> void:
 	_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	_kit.add_child(_bar)
 	_bar.slot_tapped.connect(_on_slot_tapped)
-	_bar.ghost_tapped.connect(func(_i: int): open_bag())
+	_bar.ghost_tapped.connect(func(_i: int): open_bag("", "bag", "Materials" if bar_mode == "combat" else "All"))
 	_bar.pin_toggled.connect(_on_pin_toggled)
 	_bar.slots_swapped.connect(_on_slots_swapped)
 	_bar.slot_removed.connect(_on_slot_removed)
@@ -427,6 +443,10 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
+	if v.get("mine", {}).get("at", null) == null: _potion_until_ms = -1
+	if modal_kind == "first_dig" and JSON.stringify(P0Logic.GearLogic.first_dig(v)) != _first_dig_sig:
+		if P0Logic.GearLogic.first_dig(v).is_empty(): close_modal()
+		else: open_first_dig()
 	_check_account(v)
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
@@ -642,9 +662,8 @@ func set_mode(mode: String, place := "") -> void:
 func _refresh_bar() -> void:
 	var store := _quick_for(bar_mode)
 	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
-	# Combat's bar holds Healing Potions (§13.3.8), which P1 does not have yet: empty, and no ghost (GHOST_FAMILY).
 	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
-		else ([] as Array) if bar_mode == "combat" \
+		else ([] as Array) if bar_mode == "combat" and surface != "mine" \
 		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
@@ -674,7 +693,7 @@ func _refresh_bar() -> void:
 	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)) if str(id) != "" else 0)
 	var used := _bag_slots().size()
 	var sig := [bar_mode, ids, counts, store.pins.duplicate(), selected_bait if bar_mode == "fish" else selected_seed,
-		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"]]
+		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"], ceili(potion_cooldown() / 1000.0) if bar_mode == "combat" else 0]
 	if sig == _bar_sig: return
 	_bar_sig = sig
 	var slots := []
@@ -682,12 +701,14 @@ func _refresh_bar() -> void:
 		var id := str(ids[i])
 		if id == "": slots.append({})   # a gap left by a drag-remove (LOCK-05 v1.10): no item, no pin
 		else: slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
+		if id != "" and bar_mode == "combat" and potion_cooldown() > 0:
+			slots.back()["cooldown"] = P0Logic.duration(potion_cooldown())
 	# A-08 ghost (LOCK-04): a bar with nothing of this action in stock shows the action's family in the first empty
 	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. The first gap a drag-remove left
 	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
 	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
 	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
-	if not counts.any(func(n): return int(n) > 0) and bar_mode != "combat":
+	if not counts.any(func(n): return int(n) > 0) and (bar_mode != "combat" or surface == "mine"):
 		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
 		var gap := slots.find({})
 		if gap >= 0: slots[gap] = ghost
@@ -912,6 +933,8 @@ func _save_quick() -> void:
 ## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
 ## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
+	if surface == "mine" and bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and selected_seed.begins_with("potion_"):
+		a = P0Logic.GearLogic.drink_action(view, selected_seed, potion_cooldown())
 	# SYS-OFFLINE (WP6, §10.7.1): offline every action key is Unavailable with `Offline` as its second line (`Sow ·
 	# Offline`, the verb follows the action); a tap says nothing more than the banner already does.
 	if offline:
@@ -2837,6 +2860,9 @@ func open_today(given: Array = []) -> void:
 	panel.show_pressed.connect(_show_today_row)
 	panel.row_pressed.connect(func(i: int):
 		if i < 0 or i >= _today_rows.size(): return
+		if bool(_today_rows[i].get("first_dig", false)):
+			open_first_dig()
+			return
 		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
 		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given))
 		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
@@ -2866,7 +2892,7 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != ""
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or bool(r.get("first_dig", false))
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")
@@ -3328,6 +3354,24 @@ static func resident_face(key: String) -> Texture2D: return resident_crop(key, "
 ## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
 ## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).
 var _request_card: UiRequestCard
+var _first_dig_sig := ""
+
+func open_first_dig() -> void:
+	var data := P0Logic.GearLogic.first_dig_card(view)
+	if data.is_empty(): return
+	data.portrait = _portrait("pip")
+	var card := UiRequestCard.new(data)
+	card.theme = UiKit.theme()
+	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	card.offset_bottom = -bottom_pad()
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	card.dismissed.connect(func(): open_today())
+	_open_modal(card, 0.0, true)
+	modal_kind = "first_dig"
+	_first_dig_sig = JSON.stringify(P0Logic.GearLogic.first_dig(view))
+	_modal_back = func(): open_today()
 
 func open_resident_request(id: String) -> void:
 	var d := P0Logic.resident_bar(view, id)
