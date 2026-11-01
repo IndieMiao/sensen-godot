@@ -1,17 +1,21 @@
 extends RefCounted
-## Wild sites (SGODOT-355 first batch, plan v4 §1.4 / §3.3; 后裔's contract C v0): quarries, veins and the types not open
-## yet, one frozen catalog for every player, read by the map's viewport from GET /v1/p0/wild?bbox=s,w,n,e&zoom=z — at
-## most 40 a read (`capped`, `total`), none below zoom 6. A site is the catalog's entry (id `wd-<row>-<col>`, type,
-## lat / lng, name, near, open, mine) plus the player's own (km, trip, free, visited, pass_until, best_floor). Kept for
-## the session by id; a box read once is not read again. Preloaded, no class_name (a new global class needs an import).
+## Wild sites (SGODOT-355 first batch, plan v4 §1.4 / §3.3; 后裔's contract C v0.2, #616): one frozen catalog for every
+## player, read by the map's viewport from GET /v1/p0/wild?bbox=s,w,n,e&zoom=z — at most 40 a read (`capped`, `total`),
+## none below zoom 9; the mine types only — quarries and veins open, the geodes, abysses and ruins grey (`open: false`,
+## *Not open yet*); woodland, waterside and bloom sites stay in the catalog unshown (v4q(3)). A site is the catalog's
+## entry (id `wd-<row>-<col>`, type, lat / lng, name — the card's title —, short — the pin's label, q(137) —, near, open,
+## mine) plus the player's own (km, trip, free, visited, pass_until, best_floor). Kept for the session by id; a box read
+## once is not read again. Preloaded, no class_name (a new global class needs an import).
 ##
-## Until the server has the route, `mock` (a path to a wild_mock.json, the env P0_WILD_MOCK on a desktop) answers from
-## a local file: the player's own fields worked out here from the home city's base point (contract v0.2, q(184): the
-## point the nearest three cities count from too), the nearest three free.
+## Until the server's route is on the branch, `mock` (a path to a wild_mock.json, the env P0_WILD_MOCK on a desktop)
+## answers from a local file: the player's own fields worked out here from the home city's base point (q(184): the point
+## the nearest three cities count from too), the nearest three open ones free.
 
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 
-const MIN_ZOOM := 6.0
+const MIN_ZOOM := 9.0
+## The types the map shows (#616): the mine types, open or not yet.
+const SHOWN := ["quarry", "vein", "geode", "abyss", "ruin"]
 const CAP := 40
 const PREFIX := "wd-"
 
@@ -41,7 +45,7 @@ static func clear() -> void:
 	_failing.clear()
 	_mock_sites = []
 
-## The sites of a box at a zoom: `done(sites)` once they are in (at once when the box was read already, [] below zoom 6);
+## The sites of a box at a zoom: `done(sites)` once they are in (at once when the box was read already, [] below zoom 9);
 ## `failed()` when the read does not come back — the next ask reads again. A box is keyed by its corners to 0.5° and
 ## the zoom to a whole level, so a camera nudged a little asks nothing new.
 static func fetch(session: Node, box: Array, zoom: float, done := Callable(), failed := Callable()) -> void:
@@ -129,22 +133,22 @@ static func home_point(view: Dictionary) -> Vector2:
 	var home := P0Clusters.get_cluster(str(t.get("home", "")))
 	return Vector2(float(home.get("lat", 0.0)), float(home.get("lng", 0.0))) if not home.is_empty() else Vector2.ZERO
 
-## The server's answer worked out from a catalog: the nearest three free (one quarry and one vein among them when the
-## catalog has them, plan v4 §1.5), only the open types, trips by distance (a rough stand-in for the server's Trip
-## table), the cap and its order (the free three → visited → open → nearer).
+## The server's answer worked out from a catalog: the mine types shown (#616); the nearest three open ones free (one
+## quarry and one vein among them when the catalog has them, plan v4 §1.5); trips by distance (a rough stand-in for the
+## server's Trip table); the cap and its order (nearer first, then by id).
 static func mock_answer(catalog: Array, box: Array, home: Vector2) -> Dictionary:
-	var by_km := catalog.filter(func(s): return bool(s.get("open", false))) \
+	var by_km := catalog.filter(func(s): return str(s.get("type", "")) in SHOWN) \
 		.map(func(s): return [P0Clusters.distance_km(home.x, home.y, float(s.lat), float(s.lng)), s])
 	by_km.sort_custom(func(a, b): return a[0] < b[0])
 	var free := {}
 	for want in ["quarry", "vein"]:
 		for e in by_km:
-			if str(e[1].type) == want:
+			if str(e[1].type) == want and bool(e[1].open):
 				free[str(e[1].id)] = true
 				break
 	for e in by_km:
 		if free.size() >= 3: break
-		free[str(e[1].id)] = true
+		if bool(e[1].open): free[str(e[1].id)] = true
 	var sites: Array = []
 	for e in by_km:
 		var s: Dictionary = e[1]
@@ -156,6 +160,5 @@ static func mock_answer(catalog: Array, box: Array, home: Vector2) -> Dictionary
 	return {"sites": sites.slice(0, CAP), "capped": sites.size() > CAP, "total": sites.size()}
 
 static func _before(a: Dictionary, b: Dictionary) -> bool:
-	for k in ["free", "visited", "open"]:
-		if bool(a[k]) != bool(b[k]): return bool(a[k])
-	return float(a.km) < float(b.km)
+	if float(a.km) != float(b.km): return float(a.km) < float(b.km)
+	return str(a.id) < str(b.id)

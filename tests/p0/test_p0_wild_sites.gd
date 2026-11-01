@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
-## SGODOT-355 C (contract v0.1): the wild sites the map reads by viewport — kept by id, a box read once, nothing below
-## zoom 6, a box across the 180° line, the server's answer taken as it is; and the local stand-in that answers from
-## 后裔's wild_mock.json until the route is there (only open types, the nearest three free with a quarry and a vein).
+## SGODOT-355 C (contract v0.2, #616): the wild sites the map reads by viewport — kept by id, a box read once, nothing
+## below zoom 9, a box across the 180° line, the server's answer taken as it is; and the local stand-in that answers from
+## 后裔's wild_mock.json until the route is there (mine types only, the nearest three open ones free with a quarry and a
+## vein).
 
 const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")
 const MOCK := "res://tests/p0/fixtures/wild_mock.json"
@@ -33,9 +34,9 @@ func test_ids_say_wild_by_their_prefix() -> void:
 	assert_bool(P0WildSites.is_wild("gn-5391959")).is_false()
 	assert_bool(P0WildSites.is_wild("gn-5391959~wood0")).is_false()
 
-func test_below_zoom_six_nothing_is_asked() -> void:
+func test_below_zoom_nine_nothing_is_asked() -> void:
 	var got := []
-	P0WildSites.fetch(_session, SF_BOX, 5.5, func(sites): got.append(sites))
+	P0WildSites.fetch(_session, SF_BOX, 8.9, func(sites): got.append(sites))
 	assert_array(got).is_equal([[]])
 	assert_array(_session.asked).is_empty()
 
@@ -78,18 +79,18 @@ func test_the_view_s_here_wins_over_a_box_read() -> void:
 	P0WildSites.remember({"wild": {"here": {"id": "wd-255-114", "lat": 37.63, "lng": -122.83, "best_floor": 7}}})
 	assert_int(int(P0WildSites.site("wd-255-114").best_floor)).is_equal(7)
 
-func test_the_stand_in_frees_the_nearest_three_with_a_quarry_and_a_vein_and_only_open_types() -> void:
+func test_the_stand_in_frees_the_nearest_three_open_with_a_quarry_and_a_vein_and_shows_only_mine_types() -> void:
 	var answer := P0WildSites.mock_answer(_catalog(), [-90.0, -180.0, 90.0, 180.0], SF_HOME)
 	var sites: Array = answer.sites
 	assert_int(sites.size()).is_equal(P0WildSites.CAP)
 	assert_bool(answer.capped).is_true()
-	assert_bool(sites.all(func(s): return bool(s.open))).is_true()
+	assert_bool(sites.all(func(s): return str(s.type) in P0WildSites.SHOWN)).is_true()   # no woodland, waterside, bloom
 	var free := sites.filter(func(s): return bool(s.free))
+	assert_bool(free.all(func(s): return bool(s.open))).is_true()   # a grey site is never free
 	assert_int(free.size()).is_equal(3)
 	assert_bool(free.any(func(s): return str(s.type) == "quarry")).is_true()
 	assert_bool(free.any(func(s): return str(s.type) == "vein")).is_true()
-	assert_bool(sites.slice(0, 3).all(func(s): return bool(s.free))).is_true()   # the free three first
-	for i in range(4, sites.size()): assert_bool(float(sites[i - 1].km) <= float(sites[i].km)).is_true()   # then nearer first
+	for i in range(1, sites.size()): assert_bool(float(sites[i - 1].km) <= float(sites[i].km)).is_true()   # nearer first
 	assert_float(float(free[0].km)).is_less(100.0)
 
 func test_the_stand_in_answers_a_fetch_from_the_file() -> void:
