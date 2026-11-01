@@ -1,0 +1,35 @@
+# 355 第一批 A 客户端契约接入
+
+本轮是开发草稿，PR 只面向 `feat/355-b1`，由亚瑟审；**不是 farm-dev 发版变更**。按哪吒 11-02 的 `355-b1-A-view-contract.md` 和 `355-b1-A-client-checklist-liubang.md` 实现，v4q(1) 初稿 `28d1c01b` 尚待批准/校准。A1/A2 帧及缺口/满级/解锁正式文案未到，使用清单占位文案与现有组件。
+
+## 已实现
+
+- HOME-1 按 `next.skills[]` 显示 Farming/Fishing/Cooking 各自需求，只有表中出现的项才显示；`next.travel` 非空时增加 Stamps/Other climates。顺序保持材料、金币、技能、出门。现有 NEED-TILE HFlow 自动换行，不提前制作新面板样式。
+- 按当前面板的第一个缺口写按钮；服务器 `skills_short {skill,need,have}` / `travel_short {kind,need,have}` 的后备提示使用相同格式。来源项的 Skills 导航沿既有技能页与 Back 返回，出门项 Show 打开地图，不移动角色。
+- `homestead.max`（缺省时读内容表max_level）控制满级与Decor满级提示，不把10或17写进判断。`next == null` 且到达上限时写 `Max level for now`，无升级按钮。
+- `next.energy_gain` 控制升级页脚，正数显示+N，0不显示；HOME-2只显示事件 `energy` 的实得正值，0或缺字段省略，不再按等级推断 Energy full。
+- 田数只读 `homestead.plots.now` / `next.plots`；增长时显示 Fields N / +N to till，不从等级推算，不处理新档网格。
+- 背包四档名字/价格/容量从内容表bag_upgrades读取；新表没合前仍显示基线表的价格。假view测试会覆盖60/150/300/600及其它值，不把设计初值写进产品逻辑。
+- 补新解锁id，移除old_tree、clay_bank、plots_40/48展示；city_gather、pip_first_dive、stall_upgrade、travel_gates保持无行。third_stove的说明为three dishes at once，避免提前承诺之后才解锁的保温柜12份。
+
+图标占位：healing_potion用star、vein_mines用stone、decor_set_1/2用wood；sword/stamp已有。数字写进名称的orchard_10/sprinklers_12等按契约给出的语义id占位，若后续id/容量口径变化由协议同步，不自行推导新上限。没有新增图标或修改主题。
+
+## 验证方法
+
+新 `test_p1_home_contract_355.gd` 使用本地假view，未占用哪吒计划提供的 `tests/p0/fixtures/home_view_355.json` 路径。覆盖技能/出门格顺序及每类缺口、可省略门槛、动态田数/收益、Lv17满级和改为19的上限、四档可变价格、解锁/隐藏行、Today仍只管Lv1–2、16格窄屏换行、Skills往返和出门Show、服务器拒绝码。
+
+已有HOME/Today/Looks/Profile/快熟作物回归的skills fixture迁到数组，过时Energy full及农场采集点解锁期望按本契约更新；未改变其它采集/网格/厨房玩法测试。基线内容文件及服务端没有修改，内容变更后的联调须等哪吒服务端分支。
+
+本地已有类缓存缺最新ExternalLink/P0NotifyIOS，只用 --script 补对应本地索引；未用 --editor/--import，也没有启动ADB。首次新导航测试误用Close而非Back，已按既有返回导航语义修正。新测试带原生ResourceUID生成的.uid。
+
+最终 `tests/p0 + tests/ui_kit` **2080/2080，206组，0 errors/failures/flaky/skipped/orphans，exit0（report_904）**；新增契约测试9条，含Home原始返回目标的保留。日志 `output/liubang-355-a/full-delivery.log`。首轮全量的导航测试失败已由最终全量覆盖，不将首轮记为通过；report_903的2079是补返回链回归前的阶段结果。
+
+## 截图说明
+
+`output/liubang-355-a` 的截图是**假view驱动实际Godot UI的功能证据，不是已批准的A1/A2帧或真实服务端联调**。独立userdir `gensen-liubang-355-a`，P0 transport替身，无线上调用；复用农场背景只是显示环境，不代表新网格/采集搬出已经实现。画面中的数值仅为r9/契约示例，实际代码只读view/内容表。
+
+覆盖Lv5/15/16/17 HOME-1及滚动到底、满级隐藏按钮、HOME-2实得+50/+17/0。A1/A2的技能/出门分组样式与最终文案等不知火舞/安其拉定稿后再对齐，不把当前截图作为设计验收完成。
+
+最终10张功能截图、假view模型JSON和测试摘要上传355；截图进程正常退出，测试均结束，无本人后台服务或Godot进程留存。
+
+待项：v4q(1)批准与校准内容、哪吒服务端实际view联调、A1/A2帧及正式文案、占位图标确认。不得据本草稿单独上线，不合farm-dev、不改存档/最低版本；集成分支min_version与清档由对应负责人处理。

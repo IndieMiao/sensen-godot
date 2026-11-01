@@ -4,7 +4,7 @@ extends GdUnitTestSuite
 ## skill page names Lv7–10's conveniences and title instead of their ids (李元芳 on 286).
 
 func _view() -> Dictionary:
-	var next := {"level": 7, "coins": {"need": 1490, "have": 2000}, "skills": {"need": 13, "have": 20}, "materials": [],
+	var next := {"level": 7, "coins": {"need": 1490, "have": 2000}, "skills": [{"skill": "fishing", "need": 13, "have": 20}], "materials": [],
 		"energy": 260, "meals": 260, "unlocks": ["orchard_8", "sprinklers_10"], "can_upgrade": true, "block": null}
 	return {"energy": {"value": 142, "max": 250}, "bag": {"capacity": 25}, "skills": {"farming": {"level": 7}},
 		"homestead": {"level": 6, "next": next, "unlocks": {"board_slots": 3}}}
@@ -25,11 +25,11 @@ func test_home_1_and_the_banner_say_them() -> void:
 	assert_array(p.changes.slice(1).map(func(c): return str(c.note))).is_equal(["+1 slot", "+1 sprinkler"])   # q(172)
 	var m := P0Logic.home_moment(_view(), {"level": 7, "unlocks": ["orchard_8", "sprinklers_10"]})
 	assert_str(str(m.detail)).is_equal("Orchard 8/8\nSprinklers 10/10")
-	# and the 8 plots on the field's edge (q(172) ①), as Lv3's `Plots 40 · 10 more to till`
+	# 355 A gets fields from the view, not the old plot-count unlock ids.
 	var v := _view()
 	v.homestead.next.unlocks = ["orchard_8", "sprinklers_10", "plots_48"]
-	assert_str("%s · %s" % [P0Logic.home_panel(v).changes[-1].text, P0Logic.home_panel(v).changes[-1].note]).is_equal("Plots 48 · 8 more to till")
-	assert_str(str(P0Logic.home_moment(v, {"level": 7, "unlocks": ["orchard_8", "sprinklers_10", "plots_48"]}).detail)).ends_with("Plots 48")
+	assert_bool(P0Logic.home_panel(v).changes.any(func(c): return str(c.text).contains("Plots 48"))).is_false()
+	assert_str(str(P0Logic.home_moment(v, {"level": 7, "unlocks": ["orchard_8", "sprinklers_10", "plots_48"]}).detail)).not_contains("Plots 48")
 
 func test_the_cooking_page_names_every_level() -> void:
 	var view := {}

@@ -1159,7 +1159,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
-		"need_material", "skills_short", "max_level":
+		"need_material", "skills_short", "travel_short", "max_level":
 			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
 			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
 			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
@@ -1168,7 +1168,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
 			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
-				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("skill", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
+			elif code == "travel_short":
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("kind", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
 			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":

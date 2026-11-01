@@ -192,10 +192,14 @@ static func _look_row(ui: P0Ui, r: Dictionary) -> Control:
 ## A tapped tile: one source line above it; Show only moves the camera (LOCK-10 / LOCK-08).
 static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 	var src := P0Logic.home_source(ui.view, id)
-	var go := str(src.go) if ui.spot_reachable() else ""
+	var go := str(src.go) if str(src.go) in ["skills", "map"] or ui.spot_reachable() else ""
+	var home_back := ui._modal_back
 	var on_show := Callable() if go == "" else func():
-		ui.close_modal()
-		ui.show_spot.emit(go)
+		if go == "skills": ui.open_skills(func(): ui.open_home_panel(home_back))
+		else:
+			ui.close_modal()
+			if go == "map": ui.show_on_map.emit("map")
+			else: ui.show_spot.emit(go)
 	var layer := UiNeedSource.popup(ui.root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
 
