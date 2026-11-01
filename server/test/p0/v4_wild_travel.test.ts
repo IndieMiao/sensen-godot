@@ -82,7 +82,7 @@ describe('travel to a wild site (v4q(3) ④)', () => {
   it('a wild mine needs its pass and being there; inside, here is the site, not home', () => {
     const { c, s, ids } = setup(ROWS);
     expect(requirePass(c, s, 'mine', ids[3], T)).toMatchObject({ code: 'pass_required', detail: { preview: { wild: true } } });
-    expect(requirePass(c, s, 'mine', undefined, T)).toBeNull();   // the farm's own mine, until E moves it
+    expect(requirePass(c, s, 'mine', undefined, T)).toBeNull();   // without its place: E's mine_enter checks here
     const r = applyP0(c, s, { type: 'travel', to: ids[3] }, T);
     if (!r.ok) throw new Error(r.code);
     const there = r.state;
@@ -90,7 +90,9 @@ describe('travel to a wild site (v4q(3) ④)', () => {
     settleHere(c, there, 'mine', ids[3], T + 1000);
     expect(there.travel.here).toBe(ids[3]);
     settleHere(c, there, 'mine', undefined, T + 2000);
-    expect(there.travel.here).toBe(there.travel.home);
+    expect(there.travel.here).toBe(ids[3]);                     // a mine read without its place leaves here as it is
+    settleHere(c, there, 'home', undefined, T + 3000);
+    expect(there.travel.here).toBe(there.travel.home);          // the farm is home
   });
 
   it('a save keeps a wild site\'s pass and the player there; the view reads with the player at a wild site', () => {

@@ -224,7 +224,8 @@ export type PassRefusal = { code: 'pass_required' | 'trip_expired' | 'travel_req
  * walk in. Home's places need neither. What is already under way is never cut off (§11.5.1): a command at the place the
  * player already entered, and a reel of a line already out, pass; a new cast and a new entry are checked. */
 export function requirePass(c: P0Content, s: P0State, space: unknown, place: unknown, now: number, kind?: string): PassRefusal | null {
-  // v4q(3): a wild site's mine is checked the same way (its pass, and being there); the farm's own mine (no place) is home's
+  // v4q(3): a wild site's mine is checked the same way (its pass, and being there); a mine read without its place is E's
+  // to judge (mine_enter checks here === the mine)
   const wildMine = space === 'mine' && isWild(place);
   if ((space !== 'pond' && space !== 'outpost' && !wildMine) || typeof place !== 'string' || place === '') return null;
   const cluster = clusterOf(c, place);
@@ -336,18 +337,19 @@ export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0
 /**
  * Where the player is follows what they do (李元芳's cold start, 2026-10-10): the city they stand in is the one their
  * scene is in, not only the last `travel` / `return_home`. Called with every command and state read, after requirePass:
- * - the homestead's spaces (home: the farm and its kitchen; mine) are the home city;
+ * - the homestead's space (home: the farm and its kitchen) is the home city; a mine is its wild site (v4q(5) ①);
  * - entering a pond or an outpost (its pass already checked) puts the player in that place's city;
  * - otherwise (the map, a read without a space) a city whose Day Pass ran out lets go: back home, unless the player is
  *   still in a place there they entered with the pass (never cut off, §11.5.1).
  * Quiet: no event, no welcome (the client's own Go home says Welcome home). True when `here` changed.
  */
-const HOMESTEAD_SPACES = new Set(['home', 'mine']);
+const HOMESTEAD_SPACES = new Set(['home']);
 export function settleHere(c: P0Content, s: P0State, space: unknown, place: unknown, now: number): boolean {
   const t = s.travel, was = t.here;
-  // v4q(3): a wild site's mine is that site, not home (Rest and the rest judged by "away" read it so); the farm's own
-  // mine (no place, until E moves the mines out) stays home's
-  if (space === 'mine' && isWild(place)) { if (covers(s, place, now)) t.here = place; }
+  // v4q(3) / v4q(5) ①: the mines are out of the home city — a wild site's mine is that site, not home (Rest and the rest
+  // judged by "away" read it so); a mine read without its place leaves `here` as it is (周瑜's contract #625: mine reads
+  // and commands carry place = the mine's id)
+  if (space === 'mine') { if (isWild(place) && covers(s, place, now)) t.here = place; }
   else if (typeof space === 'string' && HOMESTEAD_SPACES.has(space)) t.here = t.home;
   else if ((space === 'pond' || space === 'outpost') && typeof place === 'string' && place !== '') {
     const cluster = clusterOf(c, place);
