@@ -304,7 +304,7 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 ## The pots stand where the art placed them in the Standard and Deluxe Rooms too: on each stove's burner, the Standard
 ## Room's stove 3 turned 45° (clear of the door frame and the back wall).
 func test_the_pots_follow_each_rooms_burners() -> void:
-	for lv in [5, 10]:
+	for lv in [5, 12]:   # the Standard Room and the Deluxe Room (Lv12 since v4q(1))
 		var r: P0Room = FARMHOUSE.new()
 		r.use_runtime = false
 		r.level = lv

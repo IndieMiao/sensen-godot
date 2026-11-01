@@ -12,12 +12,16 @@ func _view() -> Dictionary:
 func test_lv7_is_where_the_orchard_and_the_sprinklers_reach_their_most() -> void:
 	var h: Dictionary = P0Logic.content().homestead
 	var lv7: Dictionary = (h.levels as Array).filter(func(l): return int(l.level) == 7)[0]
-	assert_array(lv7.unlocks).is_equal(["orchard_8", "sprinklers_10", "plots_48"])   # q(172): and 8 more plots, 40–47
+	assert_array(lv7.unlocks).is_equal(["bag_upgrade_2", "orchard_8", "sprinklers_10"])   # v4q(1) ⑧ (Plots every level, no unlock)
 	# the numbers the lines say: 1 + level trees and 3 + level sprinklers, at most 8 and 10 — reached at Lv7, not before
 	assert_int(int(h.perennial_slots.base) + 7 * int(h.perennial_slots.per_level)).is_equal(int(h.perennial_slots.max))
 	assert_int(int(h.perennial_slots.max)).is_equal(8)
 	assert_int(int(h.sprinkler_max.base) + 7 * int(h.sprinkler_max.per_level)).is_equal(int(h.sprinkler_max.max))
 	assert_int(int(h.sprinkler_max.max)).is_equal(10)
+	# … and raised once more at Lv14 (v4q(1) ⑧: Orchard 10 / Sprinklers 12)
+	var raise := func(m: Dictionary) -> Array: return (m.raise as Array).map(func(r): return [int(r[0]), int(r[1])])
+	assert_array(raise.call(h.perennial_slots)).is_equal([[14, 10]])
+	assert_array(raise.call(h.sprinkler_max)).is_equal([[14, 12]])
 
 func test_home_1_and_the_banner_say_them() -> void:
 	var p := P0Logic.home_panel(_view())
