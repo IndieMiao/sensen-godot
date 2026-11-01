@@ -18,6 +18,11 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> **v0.5 增量（11-02 04:0x）**：照 v4q(5) 8c116700 ⑫ 和修复复核（`pm/q-review/v4q1345-fix-recheck.md`）补了四处：
+> - **火把改成发牌**：每层一副牌，第 k 块被敲开的岩石拿第 k 张；火把只照出牌堆里有什么；
+> - **背包满只挡敲岩石**，不挡进矿、不挡下楼；
+> - **放不下的掉落掉在地上**，这一层内走过去自动捡，离开这一层就没了，不进仓库；
+> - 写明「打倒的精英当天不回来」。
 > **v0.5（11-02 03:3x）**：照李白改过的 q 行（v4q(5) d867fa1e、v4q(6) 74cea9e6、v4q(7) 9c7c861e）和后裔 #616 的野外目录对齐：
 > - 守关的主产包：浅坑铜矿石 ×5，矿脉主矿 ×5（初值）；
 > - 精英掉落：本怪的掉落 ×2、必掉；
@@ -198,7 +203,11 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
    - **本段**：`from ≤ N ≤ to` 的那一段；没有（矿脉 F10 这种夹在两段之间的非守关层）就用**前一段**，即 `to < N` 里最大的那一段，岩石数和掉落都照它（答苏烈 950bbe3e ②）。守关层不需要段。
 4. 怪的顺序：按上面拼出来的顺序排，精英放最后、守关单独一只。`mine_attack` 的 targets / hurt_by 用这个下标（和现在一样）。
 5. 电梯站不在 `floorSpec` 里算（它不读 `records`）：`stations(records[mine])` = 10 的倍数且 ≤ `deepest`。F1 不是站；电梯机器在 F1 和各站都有，最上一站是 Entrance（出矿，v4q(5) ⑪）。view 的 `floor_state.station` 和 `stations` 都由它来。
-6. 岩石的掉落：用本段的 `drops` 加上矿脉主矿的 `main_weight`；每块岩石的掉落用 `rockDrop` 现有的随机办法，键换成「矿 + 层 + 日 + 岩石号」。
+6. **岩石的掉落按发牌**（v4q(5) ⑫，v4 引的 v3 写法）：
+   - 每层一副牌，张数 = 本层岩石数；
+   - 每张牌从本段的 `drops`（矿脉再加主矿的 `main_weight`）按权重抽出一样物品（`null` 表示只有石料），牌的顺序也由同一个随机流定，种子同第 2 步；
+   - **第 k 块被敲开的岩石拿第 k 张**，不管敲的是哪一块，所以挑着敲没有用；
+   - 石料照旧每块都给（`stonePerRock`，看镐）。
 
 **客户端不参与生成**：客户端照 view 给的怪物列表和岩石数来摆，位置用 mine_layout 的种子布点（键改成「矿 + 层 + 日」，岩石数取自 view）。
 
@@ -210,7 +219,14 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
    - 坐电梯（`via: "elevator"`）：当前层是 F1 或电梯站，目标是电梯站（Entrance 是出矿，不发命令，见第 11 条）。到了当天没进过的站照收层费（v4q(5)：`Floor 20 · 2 Energy`）。
    - 进的是今天没付过的层，扣 `floor_energy`；扣完以后 `picked` 清空。
 3. **纪录**：进了一层（付过或已付）且层号大于 `records[mine].deepest`，就更新 deepest，事件 `mine_record`。资历 = 所有矿 deepest 的最大值，只在 view 里算，不另存。
-4. **岩石**：想敲才敲（`mine_rock`），每块扣 `rock_energy`，沿用 0.9 秒的节奏检查和 q(48) 的背包检查。火把（`mine_torch`）照旧。守关层没有岩石。
+4. **岩石**：想敲才敲（`mine_rock`），每块扣 `rock_energy`，沿用 0.9 秒的节奏检查。守关层没有岩石。
+   - **背包检查只管敲岩石**（q(48) 改为只管敲岩石）：下一张牌的物品连同石料整份放不下时，`mine_rock` 回 `bag_full`，客户端把岩石置灰（`Mine · Bag full`）。**不挡进矿，不挡下楼**；满包也能进层、打怪。
+   - **火把**（`mine_torch`）只照出这一层的牌堆有什么，不照每块岩石：view 给 `floor_state.deck`，按物品合计（例如 `[["copper_ore", 2], ["iron_ore", 1]]`，只有石料的牌不列）。客户端一次 Info toast 写全层（第 7.4 节），不再画每块岩石上的图标（MINE-1 图 2 ① 作废）。
+5a. **放不下的掉落掉在地上**（v4q(5) ⑫）：
+   - 怪的掉落（守关的 `first` 和 `pack` 也算）背包放不下的那部分，不进收件箱、不进农场仓库，放进本层的 `ground`：`{id, item, qty, from}`，`from` 是掉它的怪的下标；
+   - 客户端把它画在那只怪倒下的地方，人走过去自动发 `mine_pick {floor, ground, day}`，放得下就进背包，放不下就留在地上；
+   - **离开这一层**（上下楼、坐电梯、出矿、倒地）或日切，`ground` 清空，东西就没了；
+   - 飘字 `Bag full · Iron Ore left on the floor`。
 5. **守关**：守关层只有守关。打倒以后：`records[mine].guards` 加上这一层；第一次打这种守关就给 `first` 加 `guard_firsts[kind]`；每次都给 `pack`。**默认**：在这座矿打过的守关层，以后再进来（走梯子或坐电梯）都不再有守关，进来就开。每周重打放第二批。
 6. **精英**：和普通怪一样，打倒就有掉落；数据里有 `once_a_day` 的，那一项每天只有第一次掉（精英史莱姆的石英已经去掉）。
 7. **击杀**：每打倒一只，`kills[kind] += 1`。
@@ -220,7 +236,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
    - 这一层今天仍算付过。
 9. **离开一层，守关和精英回满血**（**默认**，v4q(5) 复核 ①，奕星 11-02：怪的血存在当天状态里，人出矿又回满血，不堵的话可以出矿、坐电梯回来接着打，铜剑打铁背王要 80 下，进出 3–4 次就磨死了）：
    - 人离开一层，不管是倒地、出矿（`day.at` 变 null）、上下楼还是坐电梯，这一层里**还活着的**守关和精英都回到满血；
-   - 已经打倒的（hp 0）照旧算打倒，今天不再出现；
+   - 已经打倒的（hp 0）照旧算打倒，今天不再出现。**打倒的精英当天不回来**：上下楼一趟不会刷新精英（否则当天进过的层免费，可以 0 体力反复刷铜 ×2、甲壳 ×2）；
    - 普通怪不回血；
    - 层生成是确定性的，服务端知道这一层哪几个下标是守关和精英，在 `mine_floor`、`mine_enter`、倒地、notePresence 出矿这几处统一调一个 `restoreBosses(mine, floor)`。
 10. **日切**（家城 04:00，`dayKey` 变了；v4q(5) ⑥，不知火舞定，周瑜按实现确认可行）：
@@ -239,8 +255,9 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 |---|---|---|
 | `mine_enter` | `mine`, `floor?`（默认 1） | 从矿外进 |
 | `mine_floor` | `to`, `via?: "ladder" \| "elevator"` | 矿里换层 |
-| `mine_rock` | `floor`, `rock` | 沿用 |
-| `mine_torch` | `floor` | 沿用 |
+| `mine_rock` | `floor`, `rock`, `day` | 沿用；掉落按发牌（第 4 节第 6 条），整份放不下回 `bag_full` |
+| `mine_torch` | `floor`, `day` | 照出本层牌堆（`floor_state.deck`） |
+| `mine_pick` | `floor`, `ground`, `day` | 捡地上的掉落（第 5 节第 5a 条） |
 | `mine_attack` | `floor`, `targets?: number[]`, `hurt_by?: number`, `stunned?: number[]` | `stunned` 是这一下打中的、处在硬直里的岩甲虫下标（第 8 节） |
 | `mine_drink` | `item` | 在矿里喝药 |
 | `equip` | `item` | 沿用，加上武器 |
@@ -272,7 +289,8 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
     "stations": [ { "floor": 10, "paid": true }, { "floor": 20, "paid": false } ],
     "floor_state": {
       "floor": 12, "paid": true, "cleared": false, "rocks": 5, "left": 3, "broken": [true, false, …], "lit": false,
-      "preview": null, "bag_ok": true, "station": false, "guard": null,
+      "deck": null, "bag_ok": true, "station": false, "guard": null,
+      "ground": [ { "id": 1, "item": "iron_ore", "qty": 1, "from": 2 } ],
       "mobs": [ { "kind": "mob_rock_beetle", "hp": 18, "max": 18, "elite": false, "guard": false, "tier": 0 } ]
     },
     "next": { "floor": 13, "paid": false, "fee": 2, "open": false, "locked": null }
@@ -282,6 +300,8 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 ```
 - `at` 只在人在矿里时有；`floor_state` 只给当前层。换层以后看命令返回的 view。
 - `mobs` 的顺序就是 targets / hurt_by 的下标。`tier` 只有守关有，其余是 0。
+- `deck`：点了火把以后才有，是本层牌堆按物品的合计，敲掉的牌不算；没点火把是 null。`bag_ok`：下一张牌整份放得下，只影响岩石是否置灰。
+- `ground`：本层地上的掉落，`from` 是掉它的怪的下标，客户端据此摆位置。
 - `next`：往下一层的楼梯。`open` 表示本层清完了。`locked` 是 `"not_open"` 时，表示下一层超过了第一批的 `open_to`（矿脉 F41），楼梯是灰牌 `Floor 41 · Not open yet`。已经是这座矿最深层（浅坑到底）时，`next` 是 null，不画往下的楼梯。
 - `stations`：电梯面板的各站。`paid` 表示今天进过（行写 `Free`），否则行写 `2 Energy`；最上一行 Entrance 由客户端加。
 - `notice`：`{kind: 'reset', at, floor}`（日切，人留在原层）或 `{kind: 'ko', …}`；客户端显示一次。
@@ -297,6 +317,8 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - F1 的上行梯名字条写 `Entrance`；电梯面板最上一站是 `Entrance · Free`。两处都是出矿，回到地图上这座矿的矿口，地图打开、矿口卡弹出，主键 `Enter mine · Free`。
 - 电梯面板标题是 `Elevator · <这座矿的全名>`（例如 `Elevator · Ironvale Vein`）；行写 `Floor 10 · Free`、`Floor 20 · 2 Energy`，自己所在的那一站写 `Here`。
 - 日切：Info toast `New day · Floor 12 has changed`。
+- 火把：Info toast 一次写全层 `Floor 12 · Copper Ore ×2 · Iron Ore ×1`，太长就在「 · 」后换行。
+- 背包满：岩石置灰 `Mine · Bag full`；掉落放不下飘字 `Bag full · Iron Ore left on the floor`，东西留在原地，本层内走过去自动捡。
 - 矿脉 F40 下面的楼梯：灰牌 `Floor 41 · Not open yet`；浅坑最深层没有往下的楼梯。
 - 倒地卡：标题 `Knocked out`；第一行 `You're back at the entrance.`；第二行 F1–10 写 `You kept everything.`，F11 起写 `You dropped half of what you found on this floor:` 加上掉落列表；第三行 `Your best here is still Floor 14.`；按钮 `Close`。
 
@@ -411,7 +433,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 2. 浅坑 F1–4 史莱姆 2–3 只；F5–9 史莱姆正好 2 只、蝙蝠 1–2 只；F5 有精英史莱姆；F10、F20、F30 只有守关，没有岩石；F20 守关血量 ×1.5，F30 ×2。（只数从内容表读，不写死。）
 3. 矿脉 F10 只有两只精英；F20 是铁背史莱姆王；F40 是石英史莱姆王；`open_to: 40` 时进 F41 回 `bad_floor`。
 4. 清怪开梯子：本层还有怪时往下回 `floor_locked {left}`；全部打倒以后能下；没有怪的层进来就能下；往上随时能走。
-5. 岩石不敲也能下；敲一块扣 2 体力，掉落按本段 `drops`；矿脉 F1–9 主矿权重低，F10 起高。
+5. 岩石不敲也能下；敲一块扣 2 体力。掉落按发牌：同一层第 k 块敲开的岩石拿第 k 张，先敲哪块结果都一样；牌按本段 `drops` 抽，矿脉 F1–9 主矿权重低、F10 起高。火把以后 `deck` 等于没敲的牌按物品合计。
 6. 入层费：今天第一次进一层扣 2；同一天再进不扣；换日以后再扣。
 7. 纪录：进更深的层就更新 deepest 并发 `mine_record`；资历是所有矿 deepest 的最大值。
 8. 电梯：站是 ≤ deepest 的 10 的倍数（不含 F1）；从 F1 或站点出发才能坐；从别的层坐、或去非站点，都回 `bad_floor`；只扣目标层的入层费（今天没进过才扣）；view 的 `stations[].paid` 和这一致。
@@ -423,7 +445,9 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 13. 日切（人在矿里）：过了 04:00，人留在原层，`at` 和血量不变；这一层换成新一天的怪和岩石，算已付费；`notice.reset` 带层号；带着旧 `day` 的 `mine_attack` / `mine_rock` 回 `new_day`，对新层没有影响；view 和下一条命令算出同一层。人不在矿里时日切只清 `day`。
 13a. 下一层的锁：矿脉 F40 清完以后，`next.locked` 是 `not_open`，往 F41 回 `bad_floor`（detail 带 `not_open: true`）；浅坑到底时 `next` 是 null。
 14. 击杀：每种怪的击杀数累加；精英史莱姆打倒不会掉石英；数据里带 `once_a_day` 的掉落每天只给一次（测试用一个测试专用的怪来验这个机制）。
-15. 不能进：不在那座矿（`not_here`）、目录里没有（`unknown_place`）、类型没开（`not_open`）、背包放不下（`bag_full`）、体力不够（`need_energy`）。
+15. 不能进：不在那座矿（`not_here`）、目录里没有（`unknown_place`）、类型没开（`not_open`）、体力不够（`need_energy`）。**背包满不挡进矿、不挡下楼**；满包时 `mine_rock` 回 `bag_full`。
+15a. 掉在地上：背包满时打倒怪，放不下的部分进本层 `ground`；`mine_pick` 有空位就进背包，没有就留着；上下楼、坐电梯、出矿、倒地、日切以后 `ground` 清空。
+15b. 打倒的精英当天不回来：打倒以后上楼再下来，这一层的精英还是 0 血、不出现。
 16. 回血药：只能在矿里喝；扣 1 瓶；回血量、能喝的层、价格、库存**都从 `content.mine.potions` 读**，不写死数字（待用户定）；回血不超过上限；冷却中回 `potion_cooldown`；血满回 `hp_full`；没有药回 `no_potion`。
 17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 First Dig（intro_requests）Lv3 出现、不占 track_max；资历到 3 的那一下直接完成，记进 intro_done，得到铜剑并装上（手上是铁剑时不换）；只给一次。
 18. 旧命令 `mine_new_run`、`mine_express` 回 `unknown_command`（reducer 现有的码）。
@@ -456,5 +480,5 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 7a. **低档武器打高档守关的取整**：向上取整（木剑 2、铜剑 3），v4q(6)(7) 复核 ④ 的推荐，早上报用户。
 8. 所有数值：怪的血量和伤害、武器、配方、Pip 的 N、主产包的数量、掉落权重（李白校准）。
 9. 进矿时血量回满，出矿和倒地后也回满（v4q(5) 已写：进矿满血，倒地或出矿后下次进矿也满血）。日切留在原层时血量不变（我定的，q 行没写）。
-10. 日切留在原层（v4q(5) ⑥ 已定，周瑜按实现确认可行，不改成送回矿口）；文案见第 7.4 节；矿口卡、矿层、电梯、守关层、倒地卡的帧由安其拉出（E1–E6）。
+10. 日切留在原层（v4q(5) ⑥，周瑜按实现确认可行，不改成送回矿口）。这条 v4 定稿里没有，是补定的，报批时标〔待用户定〕，推荐保留；文案见第 7.4 节；矿口卡、矿层、电梯、守关层、倒地卡的帧由安其拉出（E1–E6）。
 11. 「每层当天第一次进 2 体力」里的「当天」是 v4q(5) 补定的，〔待用户定〕；数值在 `floor_energy`，是不是按天由数据定（`fee_per_day: true`）。
