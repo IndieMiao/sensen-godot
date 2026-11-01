@@ -1,0 +1,57 @@
+import Fastify from 'fastify';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { loadP0Content } from '../../src/p0/content.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
+import { freshState } from '../../src/p0/state.js';
+import { P0Store } from '../../src/p0/store.js';
+
+describe('355 E day-token HTTP and persisted mine state', () => {
+  it('refuses an old-day action, persists only the day reset, survives restart and exits without losing records', async () => {
+    const c = loadP0Content(); c.profile.timezone = 'Asia/Shanghai';
+    const dir = mkdtempSync(path.join(tmpdir(), 'sulie-mine-b1-')), file = path.join(dir, 'state.json');
+    const player = 'mine-http-test', mine = 'wd-dev-quarry';
+    let now = Date.UTC(2026, 10, 2, 2), store = new P0Store(c, file), app = Fastify();
+    const s = freshState(c, player, now); s.created_at = now - 30 * 86400000;
+    store.put(s);
+    const headers = { 'x-p0-player': player };
+    const start = async () => { registerP0Routes(app, { content: c, store, now: () => now, dev: false }); await app.ready(); };
+    const send = async (payload: Record<string, unknown>) => (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload })).json();
+    const read = async (space?: string) => (await app.inject({ method: 'GET', url: '/v1/p0/state' + (space ? `?space=${space}` : ''), headers })).json();
+    try {
+      await start();
+      const entry = await send({ type: 'mine_enter', mine }); expect(entry.ok).toBe(true);
+      const day = entry.state.mine.at.day;
+      now += 1000;
+      const hit = await send({ type: 'mine_attack', space: 'mine', floor: 1, day, targets: [0], hurt_by: 0, expect_seq: entry.state.seq });
+      expect(hit.ok).toBe(true);
+      const before = structuredClone(store.peek(player)!);
+      now += 86400000;
+      const viewed = await read();
+      expect(viewed.state.mine.at).toMatchObject({ mine, floor: 1, hp: hit.state.mine.at.hp });
+      expect(viewed.state.mine.at.day).not.toBe(day);
+      expect(store.peek(player)!.mine).toEqual(before.mine); // lazy view remains a copy
+      const refused = await send({ type: 'mine_rock', space: 'mine', floor: 1, rock: 0, day, expect_seq: before.seq });
+      expect(refused).toMatchObject({ ok: false, code: 'new_day' });
+      expect(refused.state.mine).toEqual(viewed.state.mine);
+      expect(store.peek(player)!.seq).toBe(before.seq);
+      expect(store.peek(player)!.mine.day!.picked).toEqual([]);
+      expect(store.peek(player)!.mine.day!.floors[`${mine}:1`].broken).toEqual([]);
+      expect(store.peek(player)!.mine.day!.floors[`${mine}:1`].paid).toBe(true);
+      const persisted = structuredClone(store.peek(player)!.mine);
+      await app.close(); store = new P0Store(c, file); app = Fastify(); await start();
+      expect(store.peek(player)!.mine).toEqual(persisted);
+      const moved = await send({ type: 'mine_rock', space: 'mine', floor: 1, rock: 0, day: refused.state.mine.at.day, expect_seq: before.seq });
+      expect(moved.ok).toBe(true);
+      expect(moved.events.filter((e: { kind: string }) => e.kind === 'energy')).toEqual([{ kind: 'energy', delta: -c.mine.rock_energy, reason: 'mine_rock' }]);
+      expect(await send({ type: 'mine_rock', space: 'mine', floor: 1, rock: 0, day: refused.state.mine.at.day, expect_seq: before.seq })).toMatchObject({ ok: false, code: 'stale_state' });
+      const exit = await read('map'); expect(exit.state.mine.at).toBeNull();
+      expect(store.peek(player)!.mine.day!.at).toBeNull();
+      expect(exit.state.mine.records[mine].deepest).toBe(1);
+      const again = await send({ type: 'mine_enter', mine });
+      expect(again.ok).toBe(true); expect(again.events.some((e: { kind: string }) => e.kind === 'energy')).toBe(false);
+    } finally { await app.close(); rmSync(dir, { recursive: true, force: true }); }
+  });
+});

@@ -89,7 +89,7 @@ type P0CommandBody =
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
-  | { ok: false; code: string; detail?: Record<string, unknown> };
+  | { ok: false; code: string; detail?: Record<string, unknown>; state?: P0State };
 
 const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok: false, code, detail });
 
@@ -115,6 +115,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     ? burners(c, s).findIndex(b => b.stove !== null && cmd.pot === (b.stove.id ?? null)) : -1;
   settleStove(c, s, now, events, aimed < 0 ? undefined : aimed);
   settleMine(c, s, now);
+  // The old day's in-flight action is refused, but the deterministic new floor must survive a restart.
+  if (isMineCommand(cmd) && cmd.type !== 'mine_enter' && cmd.day !== dayKey(c, s, now))
+    return { ok: false, code: 'new_day', state: s };
   settleParcels(c, s, now);
   // SGODOT-351: a hand left past its day or 24 h is stood and paid on any command (its result waits for bj_open)
   const bjSettled = settleBlackjack(c, s, now, events, cmd.type);
@@ -125,7 +128,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   noteEntered(s, cmd.space, cmd.place);
-  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);   // the city the player stands in
+  if (!isMineCommand(cmd)) settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);
   noteVisit(c, s, cmd.space, cmd.place, now, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);

@@ -102,27 +102,16 @@ export interface Homestead {
   looks?: Record<string, 'a' | 'b'>;   // LOOK-PICK (SGODOT-282): a stage's look once changed; absent = a (q(24): closing = a)
 }
 
-/** One mine run (§13.3, SGODOT-231; floors 3–5 SGODOT-275): floors[i] is floor i + 1; drops derive from the run seed.
- * mobs: each monster's HP left on that floor (content order); hp: the player's HP in the mine; express: started by Floor 5 ·
- * Express (it counts as having cleared floor 2). Runs saved before SGODOT-275 lack the newer fields (see mine.ts). */
-export interface MineRun {
-  id: number; seed: number; day: string;    // day = the player day it started; 04:00 ends it
-  floors: { paid: boolean; broken: number[]; lit: boolean; mobs?: number[] }[];
-  hp?: number; express?: boolean; attack_at?: number; hurt_at?: number;
-}
-export interface MineState {
-  run: MineRun | null;
-  count: number;                            // runs ever started (run ids)
-  ended: { reason: 'reset'; at: number } | null;   // an unfinished run the 04:00 rollover ended (shown once at the mine mouth)
-  swing_at: number;                         // last rock, for the 0.9 s anti-script tempo
-  express?: boolean;                        // the account has cleared floor 4 once: Floor 5 · Express (SGODOT-275)
-  elite?: { day: string; kills: number };   // elite kills this player day: its quartz drops on the first only (§13.3.4)
-  completed?: { run: number; at: number } | null;   // the last run its elite ended (Run complete, shown once)
-}
+/** v7 mines retain per-site records and a separate home-day session; no legacy runs. */
+export type MineState = MineB1State;
 
-/** 355 E/F/G v0.1, development v7 fields. The v7 skeleton installs these when the old mine is removed. */
+/** 355 E/F/G v0.4: active mine fields in development v7. */
 export interface MineB1Record { deepest: number; guards: number[]; first_at: number }
-export interface MineB1FloorState { paid: boolean; broken: number[]; lit: boolean; mobs: number[] }
+export interface MineB1Ground { id: number; item: string; qty: number; from: number }
+export interface MineB1FloorState {
+  paid: boolean; broken: number[]; lit: boolean; mobs: number[]; guard_hit_at?: number;
+  ground: MineB1Ground[]; ground_seq: number;
+}
 export interface MineB1Day {
   key: string;
   at: { mine: string; floor: number } | null;
@@ -131,7 +120,7 @@ export interface MineB1Day {
   picked: [string, number][];
   attack_at?: number; hurt_at?: number; drink_at?: number; swing_at?: number;
 }
-export type MineB1Notice = { kind: 'reset'; at: number }
+export type MineB1Notice = { kind: 'reset'; at: number; floor: number }
   | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };
 export interface MineB1State {
   records: Record<string, MineB1Record>; day: MineB1Day | null; notice: MineB1Notice | null;
@@ -176,7 +165,7 @@ export interface P0Day {
   bonus: number;                        // request completion bonus paid today (§9.13.2)
   sys_done: number;                     // system requests completed today (§9.6.4)
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
-  mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
+  once: Record<string, number>;          // content-limited monster drops for this home day
   barters?: number;                     // barters today (§8.4.5, ≤ 6)
   cards?: string[];                     // today's recipe cards on the Homestead Stall shelf, drawn once a day (§7.16.1, SGODOT-282)
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
@@ -252,7 +241,7 @@ export interface P0State {
 }
 
 export const emptyDay = (key = ''): P0Day => ({
-  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
+  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, ...freshMineB1DailyFields(), xp: {}, mishaps: 0,
 });
 
 /** opts.pending: the client creating the save can offer the home pick (SGODOT-303, routes' x-p0-features);
@@ -437,10 +426,8 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.facilities ??= [];
   s.facility_count ??= s.facilities.reduce((m, f) => Math.max(m, f.id), 0);
   clearNewBeds(c, s, addPlots(c, s), []);   // a save already at Lv7: pieces on the new beds back to storage (q(172))
-  // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
-  // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
-  const run = s.mine?.run;
-  if (run) while (run.floors.length < c.mine.floors.length) run.floors.push({ paid: false, broken: [], lit: false });
+  // Older versions are discarded by the v7 store; only fill missing fields of a v7 save here.
+  s.mine ??= freshMine();
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   recallAwayTraps(c, s, now, []);   // q(177) ③: a trap left outside home (a home put back after a rollback, #393), once every field is filled
   s.v = SAVE_VERSION;
@@ -467,7 +454,7 @@ export function letGoAway(c: P0Content, s: P0State): void {
   }
 }
 
-const freshMine = (): MineState => ({ run: null, count: 0, ended: null, swing_at: 0 });
+const freshMine = (): MineState => freshMineB1Fields().mine;
 
 function hashSeed(text: string): number {
   let h = 2166136261;

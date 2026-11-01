@@ -161,13 +161,18 @@ export function lockedTemplate(c: P0Content, s: P0State, board: BoardId, city = 
   return { template, gate: c.requests.templates[template].gate };
 }
 
-type Rand = () => number;
+export type Rand = () => number;
 
 /** mulberry32 seeded from the slot's identity: the same slot at the same time always draws the same request. A Market
  * Board elsewhere (q(270)) adds its city, so two cities' boards never draw alike; the home boards keep their v5 seed. */
 function slotRand(s: P0State, board: BoardId, slot: number, at: number, away = ''): Rand {
+  return seededRand(`${s.player}:${board}${away ? `@${away}` : ''}:${slot}:${at}`);
+}
+
+/** Same seeded stream exported by #609; mine generation must not advance the player's shared RNG. */
+export function seededRand(key: string): Rand {
   let h = 2166136261;
-  for (const ch of `${s.player}:${board}${away ? `@${away}` : ''}:${slot}:${at}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  for (const ch of key) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
   let a = h | 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;

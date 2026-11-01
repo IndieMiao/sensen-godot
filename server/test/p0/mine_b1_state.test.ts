@@ -41,8 +41,8 @@ describe('355 E/F/G v7 field initializers (contract v0.1 section 3)', () => {
     const day: MineB1Day = {
       key: '2026-11-02', at: { mine: 'wd-dev-vein', floor: 11 }, hp: 76,
       floors: {
-        'wd-dev-quarry:11': { paid: true, broken: [0], lit: false, mobs: [0, 0, 18] },
-        'wd-dev-vein:11': { paid: true, broken: [1, 3], lit: true, mobs: [18, 0, 5] },
+        'wd-dev-quarry:11': { paid: true, broken: [0], lit: false, mobs: [0, 0, 18], ground: [], ground_seq: 0 },
+        'wd-dev-vein:11': { paid: true, broken: [1, 3], lit: true, mobs: [18, 0, 5], ground: [{ id: 1, item: 'iron_ore', qty: 2, from: 1 }], ground_seq: 1 },
       },
       picked: [['iron_ore', 3]], attack_at: 3000, hurt_at: 4000, drink_at: 5000, swing_at: 6000,
     };
@@ -63,7 +63,7 @@ describe('355 E/F/G v7 field initializers (contract v0.1 section 3)', () => {
     fields.mine.day = { key: '2026-11-02', at: { mine: 'wd-dev-vein', floor: 20 }, hp: 76, floors: {}, picked: [] };
     const permanent = structuredClone({ records: fields.mine.records, kills: fields.kills, firsts: fields.guard_firsts });
     fields.mine.day = null;
-    const notice: MineB1Notice = { kind: 'reset', at: 3000 };
+    const notice: MineB1Notice = { kind: 'reset', at: 3000, floor: 20 };
     fields.mine.notice = notice;
     expect({ records: fields.mine.records, kills: fields.kills, firsts: fields.guard_firsts }).toEqual(permanent);
     expect(JSON.parse(JSON.stringify(fields)).mine).toMatchObject({ day: null, notice });

@@ -73,7 +73,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
       noteVisit(c, s, space, place, clock(s.clock_ms), []);   // the entry read checks in an explore request too (as noteSeenAt marks)
-      settleHere(c, s, space, place, clock(s.clock_ms));
+      if (space !== 'mine') settleHere(c, s, space, place, clock(s.clock_ms));
       settleGuide(c, s, guideKeys(c, before, s, null, []), clock(s.clock_ms));   // SGODOT-341: walking into a place is a guide step too
       store.put(s);
     } else {
@@ -134,13 +134,14 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const now = clock(s.clock_ms);
     const result = applyP0(c, s, (req.body ?? {}) as P0Command, now);
     if (result.ok) store.put(result.state);   // saved before the log line: the log can never cost a command
+    else if (result.code === 'new_day' && result.state) store.put(result.state);
     // Energy before = the stored value with natural recovery up to now, as the command saw it (a refusal: both the same).
     const before = { ...s, energy: { ...s.energy } };
     settleEnergy(c, before, now);
     deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, ip: req.ip, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
       ...(result.ok ? {} : { code: result.code, detail: result.detail ?? {} }),
       energy: [before.energy.value, result.ok ? result.state.energy.value : before.energy.value], events: result.ok ? result.events : [] });
-    if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now) });
+    if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(result.state ?? s, now) });
     return reply.send({ ok: true, events: result.events, state: view(result.state, now) });
   });
 
