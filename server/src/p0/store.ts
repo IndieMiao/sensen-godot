@@ -6,7 +6,7 @@ import { settleParcels } from './parcels.js';
 
 export class P0Store {
   private players = new Map<string, P0State>();
-  /** Saves brought up from an older version when the file was loaded (the server logs it at start). */
+  /** Saves older than this version when the file was loaded: since v7 they are cleared, not brought up (the server logs it). */
   readonly migrated: number = 0;
   constructor(private c: P0Content, private file?: string) {
     if (file && existsSync(file)) {
@@ -16,7 +16,9 @@ export class P0Store {
       const keep = `${file}.v${Math.min(...Object.values(saved).map(s => s.v as number))}.bak`;
       if (older && !existsSync(keep)) copyFileSync(file, keep);
       this.migrated = older;
-      for (const [id, state] of Object.entries(saved)) this.players.set(id, upgradeState(c, state));
+      // v7 (SGODOT-355 first batch) clears the save (plan v4 conclusion 20, q row B): a save older than v7 is not brought
+      // up — its player starts a new one on the next read. The file as it was stays in the .bak above.
+      for (const [id, state] of Object.entries(saved)) if ((state.v as number) >= SAVE_VERSION) this.players.set(id, upgradeState(c, state));
     }
   }
   /** opts.pending: a new save asks to pick a home (SGODOT-303), when the creating client can offer it; opts.guide: it

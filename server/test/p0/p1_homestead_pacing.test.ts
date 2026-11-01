@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0 } from '../../src/p0/reducer.js';
 import { maxEnergy } from '../../src/p0/rules.js';
-import { freshState, upgradeState } from '../../src/p0/state.js';
+import { freshState, upgradeState, SAVE_VERSION } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
 const c = loadP0Content(), T = Date.UTC(2026, 9, 28, 2);
@@ -84,7 +84,7 @@ describe('q(246) gates for every account, not just new saves', () => {
       const before = { level, coins: s.coins, energy: s.energy.value, plaque: structuredClone(s.homestead.plaque) };
       const r = upgradeState(c, JSON.parse(JSON.stringify(s)), T);
       expect({ level: r.homestead.level, coins: r.coins, energy: r.energy.value, plaque: r.homestead.plaque }).toEqual(before);
-      expect(r.v).toBe(6);
+      expect(r.v).toBe(SAVE_VERSION);
     }
   });
 });

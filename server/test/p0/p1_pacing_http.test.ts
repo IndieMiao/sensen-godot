@@ -6,7 +6,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
-import { freshState } from '../../src/p0/state.js';
+import { freshState, SAVE_VERSION } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 const c = loadP0Content(), T = Date.UTC(2026, 9, 28, 2), player = 'pacing-http-354';
 
@@ -59,7 +59,7 @@ describe('q(245)–q(247) HTTP and restart', () => {
       expect(up.state.energy.value).toBe(beforeEnergy + gain);
       const again = await send(upgradeCmd); expect(again).toMatchObject({ ok: false, code: 'stale_state' });
       expect(again.state.energy).toEqual(up.state.energy); expect(again.state.coins).toBe(up.state.coins);
-      expect(store.peek(player)!.v).toBe(6);
+      expect(store.peek(player)!.v).toBe(SAVE_VERSION);
     } finally {
       await app.close(); rmSync(dir, { recursive: true, force: true });
     }
