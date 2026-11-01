@@ -419,20 +419,12 @@ func _view() -> Dictionary:
 ## player was there, q(80)). Tapping outside closes the card and clears the selection.
 func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
 	var id := str(entry.get("id", ""))
-	# q(270) ③: a pin marked for another city's tracked board request opens that request's sheet (Details ›), to drop it
-	# from here; Back and the drop flow's Close come back to this card
-	var details := Callable()
-	var why: Dictionary = spec.get("reason", {}) if spec.get("reason", {}) is Dictionary else {}
-	var req := PinReason.request_of(_view(), str(why.get("request", "")))
-	if str(req.get("city", "")) != "" and bool(req.get("tracked", false)):
-		var rid := str(req.id)
-		details = func(): P0BoardRequest.open(rt.ui, "market", rid, func(): _open_place_card(entry, place_card(entry)))
 	P0PlaceSheet.open(rt.ui, spec,
 		func():
 			rt.ui.close_modal()
 			if id == HOME_PIN: _open_my_farm()
 			else: _open_outpost(id),
-		details,
+		Callable(),
 		func():
 			if city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
 		"place_card")
