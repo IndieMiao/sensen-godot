@@ -32,7 +32,7 @@ interface WildTable { seed: string; revision: number; grid_deg: number; types: s
 export interface Catalogue { revision: number; grid: number; byId: Map<string, WildSite>; map: Set<string>; minZoom: number }
 const loaded = new WeakMap<object, Catalogue | null>();
 
-export const isWild = (id: unknown): id is string => typeof id === 'string' && id.startsWith(WILD_PREFIX);
+export const isWild = (id: unknown): id is `wd-${string}` => typeof id === 'string' && id.startsWith(WILD_PREFIX);
 const rulesOf = (c: P0Content) => (worldOf(c) as unknown as { wild?: WildRules } | undefined)?.wild;
 
 /** The catalogue made from a table: the world's own (seed and revision) or an error — another world's points are never used. */
@@ -119,9 +119,32 @@ export function wildNearOf(c: P0Content, home: string): string[] {
   return pick.sort((a, b) => a.km - b.km || (a.s.id < b.s.id ? -1 : 1)).map(x => x.s.id);
 }
 
+/**
+ * v4q(3) ③a, the priced guarantee (pending the user): from the home's base point, the nearest iron vein, the nearest
+ * quartz vein and the nearest 2 quarries — what goes there costs at most Trip 2. Ties by id; frozen with the nearest 3
+ * when the home is set or changed (travel.wild_priced).
+ */
+export function wildPricedOf(c: P0Content, home: string): string[] {
+  const cat = catalogue(c), at = homeBase(c, { travel: { home } });
+  if (!cat || !at) return [];
+  const want: [(x: WildSite) => boolean, number][] = [
+    [x => x.type === 'vein' && x.mine?.main === 'iron_ore', 1], [x => x.type === 'vein' && x.mine?.main === 'quartz', 1], [x => x.type === 'quarry', 2]];
+  const out: string[] = [];
+  for (const [is, n] of want) {
+    let found: { s: WildSite; km: number }[] = [];
+    for (let km = 150; km <= 20_000 && found.length < n; km *= 2) found = around(cat, at, km).filter(x => is(x.s));
+    out.push(...found.slice(0, n).map(x => x.s.id));
+  }
+  return out;
+}
+export const wildPriced = (c: P0Content, s: P0State): string[] =>
+  (s.travel as { wild_priced?: string[] }).wild_priced ?? wildPricedOf(c, homeOf(c, s));
+
 /** The save's frozen nearest 3, else worked out now (a save made before the catalogue). */
-export const wildNear3 = (c: P0Content, s: P0State): string[] =>
-  (s.travel as { wild_near3?: string[] }).wild_near3 ?? wildNearOf(c, homeOf(c, s));
+export const wildNear3 = (c: P0Content, s: P0State): string[] => {
+  const kept = (s.travel as { wild_near3?: string[] }).wild_near3;   // v7 gives [] until it is filled
+  return kept?.length ? kept : wildNearOf(c, homeOf(c, s));
+};
 
 /** A site as the player sees it: the catalogue's fields and theirs (contract-c §3). */
 export function siteFor(c: P0Content, s: P0State, site: WildSite, now: number, near3 = wildNear3(c, s)) {
