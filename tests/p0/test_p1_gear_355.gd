@@ -187,7 +187,9 @@ func test_first_dig_card_has_only_close_no_bring_accept_or_deliver() -> void:
 	await get_tree().process_frame
 	assert_array(_texts(c)).contains(["Close"])
 	for text in ["Bring", "Accept", "Deliver to", "Not now"]: assert_bool(_texts(c).has(text)).is_false()
-	assert_int(c.action_button().kind).is_equal(UiCommandButton.Kind.SECONDARY)
+	assert_object(c.action_button()).is_null()
+	assert_that(c.data.needs[0].icon).is_same(P0Logic.icon("ladder"))
+	assert_int(c.find_children("*", "UiNeedTile", true, false)[0].state()).is_equal(UiNeedTile.State.COUNT)
 	c.free()
 
 func test_weapon_art_maps_new_ids_and_iron_is_a_recolor_of_copper() -> void:

@@ -83,7 +83,7 @@ static func first_dig_row(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)
 	if d.is_empty(): return {}
 	return {line = "Pip's First Dig · Floor %d/%d" % [int(d.get("have", 0)), int(d.floor)],
-		icon = "pickaxe", go = "", dot = "", first_dig = true}
+		icon = "ladder", go = "", dot = "", first_dig = true}
 
 static func first_dig_card(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)
@@ -94,9 +94,11 @@ static func first_dig_card(view: Dictionary) -> Dictionary:
 	if int(reward.get("affinity", 0)) > 0: parts.append("+%d Friendship" % int(reward.affinity))
 	var id := str(reward.get("weapon", ""))
 	if id != "": parts.append(P0Logic.item_name(view, id))
-	return {title = "Pip's First Dig", who = "Pip", needs_label = "", close_only = true,
+	var giver: Dictionary = P0Logic.content().get("residents", {}).get(str(d.get("giver", "res_pip")), {})
+	var who := "%s · %s · personal request" % [str(giver.get("name", "Pip")), str(giver.get("role", "Courier Kid"))]
+	return {title = "Pip's First Dig", who = who, needs_label = "", close_only = true,
 		line = "Ever been down a mine? Reach Floor %d and tell me what's down there!" % int(d.floor),
-		needs = [{name = "Reach Floor %d · any mine" % int(d.floor), have = int(d.get("have", 0)), need = int(d.floor), icon = P0Logic.icon("pickaxe")}],
+		needs = [{name = "Reach Floor %d · any mine" % int(d.floor), have = int(d.get("have", 0)), need = int(d.floor), icon = P0Logic.icon("ladder"), counting = true}],
 		reward = " · ".join(parts)}
 
 static func first_dig_reward(view: Dictionary, events: Array) -> String:
