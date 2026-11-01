@@ -106,5 +106,7 @@ describe('travel to a wild site (v4q(3) ④)', () => {
     expect(v.travel.here).toBe(ids[3]);
     expect(v.travel.passes[ids[3]]).toBeDefined();
     expect(v.travel.visits[ids[3]]).toBeDefined();
+    const here = (v as unknown as { wild: { here: { id: string; visited: boolean; pass_until: number } | null } }).wild.here;
+    expect(here).toMatchObject({ id: ids[3], visited: true, pass_until: T + 24 * 3_600_000 });   // contract-c §5
   });
 });

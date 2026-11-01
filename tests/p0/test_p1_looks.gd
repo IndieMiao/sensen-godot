@@ -36,7 +36,7 @@ func test_looks_rows_name_the_look_on_reached_stages_and_grey_the_rest() -> void
 
 func test_the_next_look_level_lists_its_stage_timber_or_stone() -> void:
 	var v := _view(4)
-	v.homestead.next = {"level": 5, "coins": {"need": 840, "have": 0}, "skills": {"need": 9, "have": 9},
+	v.homestead.next = {"level": 5, "coins": {"need": 840, "have": 0}, "skills": [{"skill": "fishing", "need": 9, "have": 9}],
 		"materials": [], "energy": 240, "meals": 240, "unlocks": ["notice_board", "trip_7", "porch", "standard_room"]}
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.look)).is_equal("Lv5 look · Porch")

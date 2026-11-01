@@ -11,7 +11,6 @@ const REASONS := {"decor_outside": "Outside your yard", "decor_overlap": "Space 
 const NONE := Vector2i(-1, -1)
 ## "Ignore no piece": the server numbers pieces from 1, and the client's pending ones are negative (#265).
 const NO_PIECE := 0
-const MAX_LEVEL := 10
 
 static func items() -> Dictionary: return P0Logic.content().get("decor", {}).get("items", {})
 static func yard() -> Dictionary: return P0Logic.content().get("decor", {}).get("yard", {})
@@ -143,7 +142,7 @@ static func cap_line(view: Dictionary, m: Dictionary = {}) -> String:
 	var level := int(view.get("homestead", {}).get("level", 1))
 	var head := "Decor %d/%d" % [used(view), cap(view)]
 	var adds := cap_at(level + 1, m) - cap_at(level, m)
-	if level >= MAX_LEVEL or adds <= 0: return head + " · Store one to place this"
+	if level >= P0Logic.homestead_max(view) or adds <= 0: return head + " · Store one to place this"
 	return head + " · Homestead Lv%d adds %d" % [level + 1, adds]
 
 ## Today's free row while pieces wait in Farm Storage (q(111), 29e28d3f): `Place Flower Planter · in storage`, several

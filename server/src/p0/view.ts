@@ -34,6 +34,7 @@ import { decorView } from './decor.js';
 import { titlesView } from './titles.js';
 import { guideView } from './guide.js';
 import { blackjackView } from './blackjack.js';
+import { isWild, siteFor, wildById, wildNear3 } from './wild.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
@@ -69,6 +70,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     blackjack: blackjackView(c, s, now),   // SGODOT-351 the card room's table: the gate, the hand in play, a result not yet seen
     guide: guideView(c, s, now),   // SGODOT-341: the new-player guide's step (or the recover entry to show), {step: null, end} when off
     home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
+    // v4q(3) (contract-c §5): the free 3 wild sites, and the one the player is at with all its fields (null elsewhere)
+    wild: { near3: wildNear3(c, s), here: wildHere(c, s, now) },
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, ...travelShown(c, s.travel), today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
       // q(256) (contract 043c0bc8 D): the fare table as content has it, for the confirm card, the Fare Board and the
@@ -598,4 +601,10 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
 function regionalItems(c: P0Content, kind: string, zone: string): string[] {
   const ids = kind === 'crop' ? c.crops.map(x => x.id) : kind === 'fish' ? c.fish.map(x => x.id) : [];
   return ids.filter(id => regionalOf(c, id, zone));
+}
+
+/** view.wild.here: the wild site the player is at, as the viewport read gives it (catalogue and the player's fields). */
+function wildHere(c: P0Content, s: P0State, now: number) {
+  const here = s.travel?.here, site = isWild(here) ? wildById(c, here) : undefined;
+  return site ? siteFor(c, s, site, now) : null;
 }
