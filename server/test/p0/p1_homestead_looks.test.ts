@@ -25,12 +25,12 @@ const refusal = (s: P0State, cmd: P0Command) => {
 const looks = (s: P0State) => viewOf(c, s, T0).homestead.looks;
 
 describe('Homestead looks (LOOK-PICK, q(112))', () => {
-  it('four stages: Fence & Mailbox Lv3, Porch Lv5, Kitchen Wing Lv8, Master Farmhouse Lv10, each on its level', () => {
+  it('four stages: Fence & Mailbox Lv3, Porch Lv5, Kitchen Wing Lv8, Master Farmhouse Lv15 (v4q(1)), each on its level', () => {
     expect(c.homestead.looks!.map(l => [l.id, l.level, l.name, l.a, l.b])).toEqual([
       ['fence', 3, 'Fence & Mailbox', 'Timber Fence', 'Stone Wall'],
       ['porch', 5, 'Porch', 'Timber Porch', 'Stone Porch'],
       ['kitchen_extension', 8, 'Kitchen Wing', 'Timber Kitchen Wing', 'Stone Kitchen Wing'],
-      ['master_farmhouse', 10, 'Master Farmhouse', 'Timber Lodge', 'Stone Manor'],
+      ['master_farmhouse', 15, 'Master Farmhouse', 'Timber Lodge', 'Stone Manor'],
     ]);
     for (const l of c.homestead.looks!) expect(c.homestead.levels.find(x => x.level === l.level)!.unlocks).toContain(l.id);
   });
@@ -65,20 +65,20 @@ describe('Homestead looks (LOOK-PICK, q(112))', () => {
   it('the upgrade to a look level names its stage in the homestead event; others do not', () => {
     const ready = (s: P0State) => {
       const next = c.homestead.levels.find(l => l.level === s.homestead.level + 1)!;
-      s.skills = { farming: 99_999, fishing: 99_999, cooking: s.skills.cooking };
+      s.skills = { farming: 99_999, fishing: 99_999, cooking: 99_999 };
       for (const [id, n] of next.materials) s.storage[id] = (s.storage[id] ?? 0) + n;
       s.coins = next.coins + 40;
       return s;
     };
     const ev = (lv: number) => step(ready(at(lv - 1)), { type: 'homestead_upgrade' }).ev.find(e => e.kind === 'homestead');
     expect(ev(5)).toMatchObject({ level: 5, look: 'porch' });
-    expect(ev(10)).toMatchObject({ level: 10, look: 'master_farmhouse' });
+    expect(ev(15)).toMatchObject({ level: 15, look: 'master_farmhouse' });
     expect(ev(4)).not.toHaveProperty('look');
   });
 
   it('a save without looks (P0, or P1 before LOOK-PICK) reads every reached stage as a', () => {
-    const { looks: _none, ...home } = at(10).homestead;
-    const up = upgradeState(c, { ...at(10), homestead: home } as P0State, T0);
+    const { looks: _none, ...home } = at(15).homestead;
+    const up = upgradeState(c, { ...at(15), homestead: home } as P0State, T0);
     expect(looks(up).map(l => l.look)).toEqual(['a', 'a', 'a', 'a']);
   });
 });

@@ -368,21 +368,21 @@ func test_full_bag_shows_where_more_room_comes_from() -> void:
 	v.bag.capacity = 25
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # room left: no row
 
-## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv6 until it is for sale, then
-## III Lv9; nothing once all three are bought, or when the view does not say a tier's state.
+## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv7 until it is for sale, then
+## III Lv11 (v4q(1) ⑧); nothing once the tiers the view states are bought, or when the view does not say a tier's state.
 func test_full_bag_points_at_the_next_upgrade_after_the_first() -> void:
 	var v := _view()
 	v.bag.capacity = 30
 	v.bag.slots = []
 	for i in 30: v.bag.slots.append({"id": "seed_radish", "qty": 1})
 	v["homestead"] = {"unlocks": {"bag_upgrade_1": "owned", "bag_upgrade_2": "locked", "bag_upgrade_3": "locked"}}
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv6")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv7")
 	v.homestead.unlocks.bag_upgrade_2 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade II")
 	v.homestead.unlocks.bag_upgrade_2 = "owned"
 	v.bag.capacity = 35
 	for i in 5: v.bag.slots.append({"id": "seed_radish", "qty": 1})
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv9")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv11")
 	v.homestead.unlocks.bag_upgrade_3 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade III")
 	v.homestead.unlocks.bag_upgrade_3 = "owned"

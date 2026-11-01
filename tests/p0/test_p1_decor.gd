@@ -76,7 +76,7 @@ func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
 	assert_str(P0Decor.header_line(v)).is_equal("Decor 12/24 · Goes to Farm Storage")
 	for i in 12: v.decor.placed.append({"uid": i + 13, "id": "deco_planter", "x": 98, "y": i, "rot": 0})
 	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Homestead Lv3 adds 4")
-	v.homestead.level = 10
+	v.homestead.level = 17   # the top level since v4q(1) (Lv10 before)
 	v.decor.cap = 24
 	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Store one to place this")
 	# decor_max.max (SGODOT-355 b1, the user decides 52): the level it is reached at adds nothing more

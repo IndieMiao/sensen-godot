@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CityClusters } from './clusters.js';
 import { cityPlaces } from './world.js';
+import type { LevelCap } from './homestead.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -225,11 +226,14 @@ export interface P0Content {
     warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     plots?: [number, number][];               // beds the homestead has by level: Lv1 8 … Lv17 41 (355 grid; absent = P0's start)
-    perennial_slots?: { base: number; per_level: number; max: number };   // trees that may stand: 1 + level, at most 8
-    sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
-    per_level: { energy: number; meals: number };
+    perennial_slots?: LevelCap;   // trees that may stand: 1 + level, at most 8, 10 from Lv14 (v4q(1) ⑧)
+    sprinkler_max?: LevelCap;     // sprinklers that may stand: 3 + level, at most 10, 12 from Lv14
+    energy_steps: [number, number][];         // v4q(1) ⑦: the Energy pool and meal cap, [from level, + a level]: [[2, 10], [11, 5]]
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
-    levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[]; energy?: number | 'full' }[];
+    // v4q(1): each skill's own gate (farming / fishing / cooking, absent = none), the travel gate from Lv16 (city stamps,
+    // other climate bands), and the Energy a level gives back — a number, always (Lv2–15 50, Lv16 on 0)
+    levels: { level: number; coins: number; skills: Partial<Record<'farming' | 'fishing' | 'cooking', number>>; travel?: { stamps: number; climates: number };
+      materials: [string, number][]; unlocks: string[]; energy: number }[];
     /** Looks (content/homestead_looks.json, §8.3.1, q(112)): a stage per look level, its id the level's unlock id. */
     looks?: HomesteadLook[];
   };
@@ -337,6 +341,7 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
   const dir = path.dirname(file);
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
+  checkHomestead(c);
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number }[])
@@ -365,6 +370,16 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     }
   }
   return c;
+}
+
+/** v4q(1) ⑥ (复核 ③): every level's `energy` is a number — a missing one used to mean a full refill. Wrong content
+ * stops the server here rather than refilling everyone. */
+export function checkHomestead(c: P0Content): void {
+  for (const l of c.homestead.levels) {
+    if (typeof l.energy !== 'number') throw new Error(`homestead.levels Lv${l.level}: energy must be a number (0 for none), got ${JSON.stringify(l.energy)}`);
+    if (typeof l.skills !== 'object' || l.skills === null) throw new Error(`homestead.levels Lv${l.level}: skills must be { farming?, fishing?, cooking? }`);
+  }
+  if (!Array.isArray(c.homestead.energy_steps)) throw new Error('homestead.energy_steps: [[from level, + a level], …] is required');
 }
 
 /**

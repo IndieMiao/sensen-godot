@@ -129,55 +129,53 @@ func test_a_legendary_page_shows_the_buff_capsule_on_the_extra_line() -> void:
 	assert_float(b.position.y).is_equal(79.0)
 	assert_bool(cap.get_global_rect().intersects(b.get_global_rect())).is_false()
 
-## 不知火舞 02ad95bc ①: stove buttons that crowd (< 44 px apart) go in a row 1 / 2 / 3, 44 apart, centred; with a strip
-## open, the buttons before its stove step left of the strip and those after it right of it, all kept on screen.
-func test_crowded_stove_buttons_go_in_a_row() -> void:
+## 不知火舞 on #634 (replacing 02ad95bc ①'s row): stove buttons that crowd (< 44 px apart) go in a two-column grid that
+## follows the burners on screen — the Deluxe cooker's back pair 4, 3 over its front pair 2, 1 — 44 apart, centred on the
+## cooker; a stove still to open keeps its cell, so nothing moves when it opens. The burners as the Deluxe Room shows them
+## from the warming cabinet (stoveprobe, Lv17).
+func test_crowded_stove_buttons_go_in_a_grid_that_follows_the_burners() -> void:
 	var FH := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
-	var spots := {"use_stove_1": Vector2(92, 309), "use_stove_2": Vector2(105, 317), "use_stove_3": Vector2(115, 300)}
-	var row: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 360.0)
-	assert_float(row.use_stove_1.y).is_equal(300.0)
-	assert_float(row.use_stove_2.x - row.use_stove_1.x).is_equal(44.0)
-	assert_float(row.use_stove_3.x - row.use_stove_2.x).is_equal(44.0)
-	assert_float((row.use_stove_1.x + row.use_stove_3.x) * 0.5).is_equal_approx((92.0 + 105.0 + 115.0) / 3.0, 0.01)
-	# 6e798a27 ②: the row keeps 44 from the Spice Rack and Warming Cabinet buttons, moving right as a whole
-	var rack := Vector2(35.4, 323.9)
-	var cabinet := Vector2(47.4, 356.7)
-	var clear: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 360.0, [rack, cabinet])
-	for n in ["use_stove_1", "use_stove_2", "use_stove_3"]:
-		for a in [rack, cabinet]: assert_float((clear[n] as Vector2).distance_to(a)).is_greater_equal(43.99)
-	assert_float(clear.use_stove_1.x).is_greater(row.use_stove_1.x)
-	assert_float(clear.use_stove_2.x - clear.use_stove_1.x).is_equal_approx(44.0, 0.01)
-	assert_float(clear.use_stove_3.x - clear.use_stove_2.x).is_equal_approx(44.0, 0.01)
-	assert_float(clear.use_stove_1.y).is_equal(300.0)
-	var far: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 360.0, [Vector2(300, 300)])
-	assert_vector(far.use_stove_1).is_equal(row.use_stove_1)
-	# stove 3's strip open: it stays at its own pot; 1 and 2, in order, centred over the strip, 44 apart, 6 above it
-	var s3 := Rect2(98, 284, 210, 32)
-	var open: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, s3, 360.0, [rack, cabinet])
-	assert_vector(open.use_stove_3).is_equal(spots.use_stove_3)
-	assert_float(open.use_stove_1.y).is_equal(284.0 - 6.0 - 14.0)
-	assert_float(open.use_stove_2.y).is_equal(284.0 - 6.0 - 14.0)
-	assert_float(open.use_stove_2.x - open.use_stove_1.x).is_equal_approx(44.0, 0.01)
-	assert_float((open.use_stove_1.x + open.use_stove_2.x) * 0.5).is_equal_approx(s3.get_center().x, 0.01)
-	# stove 1 open: 2 and 3 above it the same way
-	var s1 := Rect2(70, 293, 180, 32)
-	var one: Dictionary = FH.stove_row(spots, [0, 1, 2], 0, s1, 360.0)
-	assert_vector(one.use_stove_1).is_equal(spots.use_stove_1)
-	assert_float(one.use_stove_3.x - one.use_stove_2.x).is_equal_approx(44.0, 0.01)
-	assert_float((one.use_stove_2.x + one.use_stove_3.x) * 0.5).is_equal_approx(s1.get_center().x, 0.01)
-	# stove 1 open in the Standard Room (282): the Spice Rack's button sits where stove 2's lines up over the strip — the row
-	# moves the shorter way (here left) to keep 44 from it, still over the strip
+	var burners := {0: Vector2(184, 303), 1: Vector2(171, 295), 2: Vector2(201, 290), 3: Vector2(188, 282)}
+	var spots := {}
+	for i in 4: spots["use_stove_%d" % (i + 1)] = burners[i]
+	var g: Dictionary = FH.stove_row(spots, [0, 1, 2, 3], -1, Rect2(), 360.0, [], burners)
+	var cx := (184.0 + 171.0 + 201.0 + 188.0) / 4.0
+	assert_vector(g.use_stove_2).is_equal(Vector2(cx - 22.0, 282.0))   # front row: 2, 1
+	assert_vector(g.use_stove_1).is_equal(Vector2(cx + 22.0, 282.0))
+	assert_vector(g.use_stove_4).is_equal(Vector2(cx - 22.0, 238.0))   # back row: 4, 3
+	assert_vector(g.use_stove_3).is_equal(Vector2(cx + 22.0, 238.0))
+	# three stoves open (Lv12–16): the same cells, the fourth left empty
+	var three := spots.duplicate()
+	three.erase("use_stove_4")
+	var g3: Dictionary = FH.stove_row(three, [0, 1, 2], -1, Rect2(), 360.0, [], burners)
+	for n in ["use_stove_1", "use_stove_2", "use_stove_3"]: assert_vector(g3[n]).override_failure_message(n).is_equal(g[n])
+	assert_bool(g3.has("use_stove_4")).is_false()
+	# 6e798a27 ②: kept 44 from the Spice Rack and Warming Cabinet buttons, moving right as a whole
+	var rack := Vector2(150.0, 275.0)
+	var clear: Dictionary = FH.stove_row(spots, [0, 1, 2, 3], -1, Rect2(), 360.0, [rack], burners)
+	for n in spots: assert_float((clear[n] as Vector2).distance_to(rack)).override_failure_message(n).is_greater_equal(43.99)
+	assert_float(clear.use_stove_1.x - clear.use_stove_2.x).is_equal_approx(44.0, 0.01)
+	assert_float(clear.use_stove_2.x).is_greater(g.use_stove_2.x)
+	assert_float(clear.use_stove_1.y).is_equal(282.0)
+	# stove 1's strip open: it stays at its own pot, its cell empty; the grid's front row 6 above the strip
+	var s1 := Rect2(100, 296, 180, 32)
+	var open: Dictionary = FH.stove_row(spots, [0, 1, 2, 3], 0, s1, 360.0, [], burners)
+	assert_vector(open.use_stove_1).is_equal(spots.use_stove_1)
+	assert_vector(open.use_stove_2).is_equal(Vector2(cx - 22.0, 296.0 - 6.0 - 14.0))
+	assert_vector(open.use_stove_4).is_equal(Vector2(cx - 22.0, 296.0 - 6.0 - 14.0 - 44.0))
+	assert_vector(open.use_stove_3).is_equal(Vector2(cx + 22.0, 296.0 - 6.0 - 14.0 - 44.0))
+	# the strip's first frame (no rect yet): the open stove still keeps its own spot
+	var first: Dictionary = FH.stove_row(spots, [0, 1, 2, 3], 2, Rect2(), 360.0, [], burners)
+	assert_vector(first.use_stove_3).is_equal(spots.use_stove_3)
+	# stove 1 open in the Standard Room (282): the Spice Rack's button beside its cooker — stove 2 moves the shorter way
+	# to keep 44 from it, kept on screen
 	var two := {"use_stove_1": Vector2(235.3, 374.7), "use_stove_2": Vector2(247.0, 382.2)}
-	var shelf := Vector2(209.0, 338.8)
+	var shelf := Vector2(250.0, 338.8)
 	var strip1 := Rect2(101.3, 358.7, 150, 32)
 	var apart: Dictionary = FH.stove_row(two, [0, 1], 0, strip1, 360.0, [shelf])
 	assert_float((apart.use_stove_2 as Vector2).distance_to(shelf)).is_greater_equal(43.99)
-	assert_float(apart.use_stove_2.x).is_less(strip1.get_center().x)
-	assert_bool(strip1.position.x <= apart.use_stove_2.x and apart.use_stove_2.x <= strip1.end.x).is_true()
+	assert_float(apart.use_stove_2.x).is_between(22.0, 338.0)
 	assert_vector(apart.use_stove_1).is_equal(two.use_stove_1)
-	# the strip's first frame (no rect yet): the open stove still keeps its own spot
-	var first: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, Rect2(), 360.0)
-	assert_vector(first.use_stove_3).is_equal(spots.use_stove_3)
 
 ## 6e798a27 ① (02ad95bc ③): a Ready stove's strip shows the Ready badge in the pot's place, a cooking one the clock;
 ## empty keeps i-pot.

@@ -4,21 +4,21 @@ import { count, freeSlots } from './bag.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
-import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
+import { blessed, dayKey, foodCap, levelEnergy, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, SAVE_VERSION, type P0State } from './state.js';
 import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches, pick } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
-import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
+import { bigPot, boardSlots, chefSignGold, coinsNeeded, GATE_SKILLS, lookOf, nextLevel, stepAt, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, fieldCap, fieldsUsed, greenhousePlots, plotCount } from './garden.js';
-import { climateAt, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
+import { cityStamps, climateAt, climatesVisited, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
 import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { inboxView, settleParcels } from './parcels.js';
@@ -303,20 +303,28 @@ function queuedView(s: P0State, stove: Pot | null, queue: Pot | null, now: numbe
     starts_in: stove && !stove.left && stove.started_at + stove.ms > now ? stove.started_at + stove.ms - now : null } : null;
 }
 
-/** HOME-1 facts (§8.6.1): what the next level needs, what the player has (storage and bag apart) and what is unlocked. */
+/** HOME-1 facts (§8.6.1; v4q(1), 哪吒's A view contract): what the next level needs — each skill, the travel gate from
+ * Lv16, materials (storage and bag apart), coins — what it brings, and what is unlocked. */
 function homesteadView(c: P0Content, s: P0State) {
   const next = nextLevel(c, s);
   const upgrade = c.bag_upgrades[0];
   const bagTier = (id: string) => s.owned.includes(id) ? 'owned' : unlocked(c, s, id) ? 'for_sale' : 'locked';
+  const plotsAt = (level: number) => stepAt(c.homestead.plots, level, c.start.tilled_plots + c.start.wild_plots);
   return {
     level: s.homestead.level, max: c.homestead.max_level, plaque: s.homestead.plaque,
+    plots: { now: plotsAt(s.homestead.level), max: plotsAt(c.homestead.max_level) },   // the level's Plots and the batch's most
     next: next && {
       level: next.level,
       coins: { need: coinsNeeded(c, next.coins), have: s.coins },
-      skills: { need: next.skills, have: skillsTotal(c, s), farming: skillLevel(c, s, 'farming'), fishing: skillLevel(c, s, 'fishing') },
+      // only the skills the level gates (no Cooking before Lv6), in the button's order
+      skills: GATE_SKILLS.filter(k => next.skills[k] !== undefined).map(k => ({ skill: k, need: next.skills[k]!, have: skillLevel(c, s, k) })),
+      travel: next.travel ? { stamps: { need: next.travel.stamps, have: cityStamps(s) },
+        climates: { need: next.travel.climates, have: climatesVisited(c, s) } } : null,
       materials: next.materials.map(([id, need]) => ({ id, name: itemName(c, id), need, have: haveTotal(s, id), storage: stored(s, id), bag: haveTotal(s, id) - stored(s, id) })),
-      energy: c.energy.max_base + c.homestead.per_level.energy * (next.level - 1),
-      meals: c.cooking.food_cap + c.homestead.per_level.meals * (next.level - 1),
+      energy: c.energy.max_base + levelEnergy(c, next.level),   // the pool after the upgrade
+      meals: c.cooking.food_cap + levelEnergy(c, next.level),   // the day's meal cap after it (one formula, v4q(1) ⑦)
+      energy_gain: next.energy,                                 // what the upgrade gives back (Lv2–15 50, Lv16 on 0)
+      plots: plotsAt(next.level),
       unlocks: next.unlocks,
       can_upgrade: upgradeBlock(c, s) === null,
       block: upgradeBlock(c, s),
@@ -327,7 +335,6 @@ function homesteadView(c: P0Content, s: P0State) {
       bag_upgrade_1: bagTier(upgrade.id),
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
-      clay_bank: unlocked(c, s, 'clay_bank'),
       // P1 (SGODOT-282, §8.3.1): stoves 1 / 2 / 3, Big Pot, Notice Board, Chef's Sign (gold +5 points), Bag II / III.
       stoves: stoveCount(c, s), big_pot: bigPot(c, s), notice_board: unlocked(c, s, 'notice_board'),
       chefs_sign: chefSignGold(c, s) > 0, cabinet: cabinetCap(c, s),
