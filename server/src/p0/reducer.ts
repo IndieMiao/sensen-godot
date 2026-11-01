@@ -2,7 +2,6 @@
 import { cropById, cropBySeed, plotCrop, quickCrop, fastCrop, rodById, type P0Content } from './content.js';
 import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
-import { barter } from './barter.js';
 import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
@@ -52,7 +51,6 @@ type P0CommandBody =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
-  | { type: 'barter'; item: string; mineral: string; shop?: string }   // Market Square barter (§8.4.5)
   // Batch Cook (Cooking Lv8, q(200)): pots of one known page in a row; stove = the current one (fills first); big = the
   // stoves the player switched to Big Pot (q(201), kept on the device)
   | { type: 'batch_cook'; recipe: string; pots: number; stove?: number; big?: number[] }
@@ -388,11 +386,6 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
-      if (refusal) return fail(refusal.code, refusal.detail);
-      break;
-    }
-    case 'barter': {
-      const refusal = barter(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
