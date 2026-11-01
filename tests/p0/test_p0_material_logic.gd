@@ -264,8 +264,8 @@ func test_mine_keys_carry_the_equipped_pickaxe_badge() -> void:
 	v["gear"] = {"slots": {"mining": "pick_copper"}}
 	assert_str(str(P0MaterialLogic.mine_action(v, {"floor": 1, "target": "rock", "rock": 0}).tool)).is_equal("pick_copper")
 
-## The gathering spots and the workbench share the yard with other cards' facilities (the rest bench took the
-## workbench's first cell in 2B): no two footprints may overlap, none may cover a plot, all stay in the yard.
+## The workbench shares the yard with other cards' facilities (the rest bench took the workbench's first cell in 2B; the
+## gathering spots left the farm in SGODOT-355 b1): no two footprints may overlap, none may cover a plot, all stay in the yard.
 func test_material_footprints_overlap_nothing() -> void:
 	var owner := {}
 	for key in P0Garden.FOOTPRINTS:
@@ -280,29 +280,6 @@ func test_material_footprints_overlap_nothing() -> void:
 					# Row 18's back edge is the Lv3 fence line (z −12.35 m, SGODOT-228; 苏烈 on 231): nothing past row 17.
 					assert_int(c.y).override_failure_message("%s sits on the back fence" % key).is_less_equal(17)
 				owner[c] = key
-
-## Grove trunks block the cells they stand in, canopies don't (不知火舞 on 231): the way from the field's right edge
-## to the workbench front stays open.
-func test_grove_trunks_block_and_the_way_to_the_workbench_stays_open() -> void:
-	var bp := P0Garden.blueprint()
-	var at := bp.cell_to_world(bp.anchor("spot_grove"))
-	var trunks := P0SpotArt.solid_points("spot_grove", at)
-	assert_int(trunks.size()).is_equal(3)
-	P0Garden.block_points(bp, trunks)
-	for p in trunks: assert_bool(bp.is_walkable(bp.world_to_cell(p))).is_false()
-	# Breadth-first walk from the field's right edge (15, 11) to the cell in front of the workbench (17, 15).
-	var start := Vector2i(15, 11)
-	var goal := Vector2i(17, 15)
-	var seen := {start: true}
-	var queue := [start]
-	while not queue.is_empty():
-		var c: Vector2i = queue.pop_front()
-		for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
-			var n: Vector2i = c + d
-			if seen.has(n) or not bp.is_walkable(n): continue
-			seen[n] = true
-			queue.append(n)
-	assert_bool(seen.has(goal)).is_true()
 
 ## LOCK-07: one finger card, the nearest facility in its own reach; the showing card keeps it on a near-tie.
 func test_one_finger_card_for_the_nearest_facility() -> void:

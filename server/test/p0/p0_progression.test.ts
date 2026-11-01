@@ -179,10 +179,11 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
  * §14.2.1 first-session Energy ledger after q(101) (SGODOT-262: Joey's 11 fish took Energy from 172 up to 188), step by step
  * with the real commands on a new account (Newcomer Blessing: +1 every 2:40). Seed 22 lands casts 5–6 as crucians, so
  * Fishing Lv2 comes on cast 6 at 70 XP and the perch takes it to 110, as in the director table (the cook draws from the
- * same seeded rolls, so another seed may land a Fine fish on cast 5 or 6). Spends 90, gets 90 back, lowest 143, ends full.
+ * same seeded rolls, so another seed may land a Fine fish on cast 5 or 6). 355 grid: a new save has 8 beds, so the beds
+ * cost 16 rather than 60 and both meals only top up to max (the §14.2 director table is rewritten with the guide rework).
  */
 describe('first-session Energy ledger (§14.2.1, q(101); SGODOT-262)', () => {
-  it('casts cost 5 each all the way, Fishing Lv2 gives no Energy, both meals fit and the session ends at 200/200', () => {
+  it('casts cost 5 each all the way, Fishing Lv2 gives no Energy, the meals top up to max and the session ends at 200/200', () => {
     let s = freshState(c, 'ledger-player', T, 22);
     let t = T + 2 * 60_000;
     const period = regenMs(c, s, t);
@@ -208,34 +209,34 @@ describe('first-session Energy ledger (§14.2.1, q(101); SGODOT-262)', () => {
     };
 
     expect(energyAt(t)).toBe(200);
-    for (let i = 0; i < 20; i++) { s = step(s, { type: 'sow', plot: i, seed: 'seed_radish' }, t); t += 1_000; }
-    expect(energyAt(t)).toBe(160);                                       // the first bed: 20 radishes, 2 each
+    for (let i = 0; i < 2; i++) { s = step(s, { type: 'sow', plot: i, seed: 'seed_radish' }, t); t += 1_000; }
+    expect(energyAt(t)).toBe(196);                                       // two radishes, 2 each
     for (let i = 0; i < 3; i++) cast();
-    expect(energyAt(t)).toBe(145);                                       // casts 1–3, all landed (pin 1: crucians)
+    expect(energyAt(t)).toBe(181);                                       // casts 1–3, all landed (pin 1: crucians)
     t = afterTicks(6);
-    expect(energyAt(t)).toBe(151);                                       // +6 by minute 16 (blessing ×1.5)
-    expect(cookAndEat(['fish_crucian'], 'dish_grilled_crucian')).toMatchObject({ gain: 25 });
-    expect(energyAt(t)).toBe(176);                                       // Grilled Crucian, Good: 20 + 5
-    for (let i = 20; i < 30; i++) { s = step(s, { type: 'till', plot: i }, t); s = step(s, { type: 'sow', plot: i, seed: 'seed_lettuce' }, t); t += 1_000; }
-    expect(energyAt(t)).toBe(156);                                       // the second bed: 10 lettuce
+    expect(energyAt(t)).toBe(187);                                       // +6 by minute 16 (blessing ×1.5)
+    expect(cookAndEat(['fish_crucian'], 'dish_grilled_crucian')).toMatchObject({ nominal: 25, gain: 13 });
+    expect(energyAt(t)).toBe(200);                                       // Grilled Crucian, Good: 20 + 5, only up to max
+    for (let i = 2; i < 8; i++) { s = step(s, { type: 'sow', plot: i, seed: 'seed_lettuce' }, t); t += 1_000; }
+    expect(energyAt(t)).toBe(188);                                       // the other 6 beds: lettuce (S4)
     const pin2 = cast();
     expect(pin2).toContainEqual(expect.objectContaining({ kind: 'catch', result: 'broke_free', refund: 5 }));
-    expect(energyAt(t)).toBe(156);                                       // cast 4: the Fine fish breaks free, refunded
+    expect(energyAt(t)).toBe(188);                                       // cast 4: the Fine fish breaks free, refunded
     cast();
     const lv2 = cast();
-    expect(energyAt(t)).toBe(146);                                       // casts 5–6
+    expect(energyAt(t)).toBe(178);                                       // casts 5–6
     expect(lv2).toContainEqual(expect.objectContaining({ kind: 'level', skill: 'fishing', level: 2, energy: 0 }));
     expect(lv2.some(e => e.kind === 'energy' && (e as { delta: number }).delta > 0)).toBe(false);   // q(101): nothing back
     t = afterTicks(2);
-    expect(energyAt(t)).toBe(148);                                       // +2, minutes 17–22
+    expect(energyAt(t)).toBe(180);                                       // +2, minutes 17–22
     const perch = cast('bait_worm');
     expect(perch).toContainEqual(expect.objectContaining({ kind: 'catch', fish: 'fish_perch', result: 'landed' }));
     expect(perch).toContainEqual({ kind: 'energy', delta: 20, reason: 'reward' });
-    expect(energyAt(t)).toBe(163);                                       // cast 7 −5 (143), first Fine fish +20
+    expect(energyAt(t)).toBe(195);                                       // cast 7 −5 (175), first Fine fish +20
     t = afterTicks(2);
     expect(s.skills.fishing).toBe(110);                                  // 70 + perch 10 + its first-catch 30
-    expect(energyAt(t)).toBe(165);                                       // +2, minutes 23–28
-    expect(cookAndEat(['fish_crucian', 'wild_herb'], 'dish_herb_grilled_fish')).toMatchObject({ gain: 35 });
+    expect(energyAt(t)).toBe(197);                                       // +2, minutes 23–28
+    expect(cookAndEat(['fish_crucian', 'wild_herb'], 'dish_herb_grilled_fish')).toMatchObject({ nominal: 45, gain: 3 });
     expect(energyAt(t)).toBe(200);                                       // Herb Grilled Fish, Good 45, only up to max
   });
 });

@@ -74,7 +74,7 @@
         "optional": true,
         "done_on": {
           "key": "sow:crop_lettuce",
-          "count": 10
+          "count": 6
         },
         "done_if": {
           "ripe": {
@@ -82,7 +82,7 @@
           }
         },
         "row": {
-          "line": "Sow 10 Lettuce · 20 Energy",
+          "line": "Sow 6 Lettuce · 12 Energy",
           "icon": "seed_lettuce",
           "go": "home"
         },
@@ -92,7 +92,7 @@
             "pulse": true
           }
         ],
-        "pip": "While they grow, plant some lettuce. That one takes a few hours."
+        "pip": "While they grow, fill the rest of your plots with lettuce. That one takes a few hours."
       },
       {
         "id": "t_harvest_quick",
@@ -478,7 +478,7 @@
           "go": "home",
           "countdown": "crop_quick_radish"
         },
-        "pip": "While they grow, plant some lettuce. That one takes a few hours."
+        "pip": "While they grow, fill the rest of your plots with lettuce. That one takes a few hours."
       },
       {
         "id": "r_quick_ripe",

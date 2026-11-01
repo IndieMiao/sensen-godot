@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## P0 garden: the earlier fixed-plot spec grown to 30 beds; P0 view → CropField cells.
+## P0 garden: the earlier fixed-plot spec on the grid of content.garden.plots (63 beds, SGODOT-355 b1); P0 view → CropField cells.
 
 func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 	var seen := {}
@@ -10,40 +10,45 @@ func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 		# beds stand two cells apart, so every bed has a walkway beside it
 		assert_int(P0Garden.id_of(c + Vector2i(1, 0))).is_equal(-1)
 		assert_int(P0Garden.id_of(c + Vector2i(0, 1))).is_equal(-1)
-	assert_int(seen.size()).is_equal(48)   # all 48 laid out (q(172): 40–47 from Homestead Lv7); the view's garden.plots shows 30, 40 or 48
+	assert_int(seen.size()).is_equal(63)   # the whole 9 × 7 grid laid out; the view's garden.plots shows the open ones
 
-## P1 (q(59) §1.1): the client grid is the server's (content.garden.plots: the sprinkler's coverage is judged there).
-## 0–29 keep their P0 cells; 30–39 are two columns right of the field, row by row.
+## The client grid is the server's (content.garden.plots: sprinkler coverage and greenhouses are judged there). SGODOT-355
+## b1 (不知火舞 on 哪吒's grid, 11-02): 9 × 7 beds on the yard's x 2–18 × y −1–11; the starting 2 × 4 at x 8–14 × y 9–11
+## in front of the farmhouse door, then row by row out from the farmhouse, each row's middle first.
 func test_the_garden_grid_matches_the_content_table() -> void:
 	var table: Array = P0Logic.content().garden.plots   # content/farm_garden.json, merged in (SGODOT-275)
 	assert_array(P0Logic.content_errors).is_empty()
-	assert_int(table.size()).is_equal(P0Garden.MAX_PLOTS)
+	assert_int(table.size()).is_equal(P0Garden.max_plots())
 	for id in table.size():
 		assert_vector(P0Garden.grid_of(id)).override_failure_message("plot %d" % id).is_equal(Vector2i(int(table[id][0]), int(table[id][1])))
-	for id in 30: assert_vector(P0Garden.cell_of(id)).is_equal(P0Garden.PLOT_ORIGIN + Vector2i((id % 6) * 2, (id / 6) * 2))
-	assert_vector(P0Garden.cell_of(30)).is_equal(P0Garden.cell_of(5) + Vector2i(2, 0))
-	assert_vector(P0Garden.cell_of(39)).is_equal(P0Garden.cell_of(29) + Vector2i(4, 0))
-	# Homestead Lv7 (q(172) A, 不知火舞 282 4ddb69db): a whole row in front of the field, y 1, x 4–18, left to right
-	assert_array(range(40, 48).map(func(i): return P0Garden.cell_of(i))).is_equal([Vector2i(4, 1), Vector2i(6, 1), Vector2i(8, 1),
-		Vector2i(10, 1), Vector2i(12, 1), Vector2i(14, 1), Vector2i(16, 1), Vector2i(18, 1)])
+		var c := P0Garden.cell_of(id)
+		assert_bool(c.x >= 2 and c.x <= 18 and c.y >= -1 and c.y <= 11).override_failure_message("plot %d at %s" % [id, c]).is_true()
+	var start := range(8).map(func(i): return P0Garden.cell_of(i))
+	for c in [Vector2i(8, 9), Vector2i(10, 9), Vector2i(12, 9), Vector2i(14, 9), Vector2i(8, 11), Vector2i(10, 11), Vector2i(12, 11), Vector2i(14, 11)]:
+		assert_bool(start.has(c)).override_failure_message("start bed %s" % c).is_true()
+	# then the rest of those two rows, and row by row out from the farmhouse: never nearer the house than the bed before
+	for id in range(8, 13): assert_int(P0Garden.cell_of(id).y).is_equal(11)
+	for id in range(13, table.size()): assert_int(P0Garden.cell_of(id).y).is_less_equal(P0Garden.cell_of(id - 1).y)
+	assert_int(P0Garden.grid_of(-1).x).is_equal(-100)   # off the table
+	assert_int(P0Garden.grid_of(63).x).is_equal(-100)
 
-## At Homestead Lv1–2 the place of beds 30–39 is plain ground: walking there never steps up onto a bed (哪吒 on #215).
+## Where the homestead has no bed yet is plain ground: walking there never steps up onto a bed (哪吒 on #215).
 func test_no_bed_to_step_on_where_the_homestead_has_none_yet() -> void:
 	var bp := P0Garden.blueprint()
-	var at := bp.cell_to_world(P0Garden.cell_of(31))
-	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 30}})).is_false()
-	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 40}})).is_true()
-	assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(P0Garden.cell_of(29)), {"garden": {"plots": 30}})).is_true()
+	var at := bp.cell_to_world(P0Garden.cell_of(9))
+	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 8}})).is_false()
+	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 10}})).is_true()
+	assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(P0Garden.cell_of(7)), {"garden": {"plots": 8}})).is_true()
 
-## The view's garden.plots decides how many beds the homestead has (30 before Homestead Lv3, 40 from it).
+## The view's garden.plots decides how many beds are open (Homestead Lv1 8 … Lv17 41, plus the trees and sprinklers).
 func test_plot_count_follows_the_view() -> void:
-	assert_int(P0Garden.plot_count({})).is_equal(30)
-	assert_int(P0Garden.plot_count({"garden": {"plots": 40}})).is_equal(40)
-	assert_int(P0Garden.plot_count({"garden": {"plots": 99}})).is_equal(P0Garden.MAX_PLOTS)
-	var view := {"plots": [{"id": 31, "state": "wild"}], "garden": {"plots": 30}}
+	assert_int(P0Garden.plot_count({"garden": {"plots": 8}})).is_equal(8)
+	assert_int(P0Garden.plot_count({"garden": {"plots": 41}})).is_equal(41)
+	assert_int(P0Garden.plot_count({"garden": {"plots": 99}})).is_equal(P0Garden.max_plots())
+	var view := {"plots": [{"id": 9, "state": "wild"}], "garden": {"plots": 8}}
 	assert_bool(P0Garden.cells(view, 0).is_empty()).is_true()   # a plot the view does not have yet is not drawn
-	view.garden.plots = 40
-	assert_bool(P0Garden.cells(view, 0).has(P0Garden.cell_id(P0Garden.cell_of(31)))).is_true()
+	view.garden.plots = 10
+	assert_bool(P0Garden.cells(view, 0).has(P0Garden.cell_id(P0Garden.cell_of(9)))).is_true()
 
 func test_beds_can_be_walked_on_but_facilities_and_rocks_block() -> void:
 	# 2026-10-05 device review: crops don't collide; trees (yard edge), rocks and facilities do.
@@ -60,9 +65,9 @@ func test_beds_can_be_walked_on_but_facilities_and_rocks_block() -> void:
 		assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(c + Vector2i(1, 0)))).is_false()
 	for key in ["house", "storage", "well", "mine", "bench"]:
 		assert_bool(bp.is_walkable(bp.anchor(key))).is_false()
-	var rock := bp.cell_to_world(Vector2i(18, 5))
+	var rock := bp.cell_to_world(Vector2i(17, 5))   # a walkway between two beds
 	P0Garden.block_points(bp, [rock])
-	assert_bool(bp.is_walkable(Vector2i(18, 5))).is_false()
+	assert_bool(bp.is_walkable(Vector2i(17, 5))).is_false()
 
 func test_view_maps_to_old_cell_states() -> void:
 	var view := {"crops": [{"id": "crop_radish", "grow_h": 4}], "plots": [
@@ -84,19 +89,22 @@ func test_every_p0_crop_has_a_plant() -> void:
 		assert_str(code).is_not_empty()
 		assert_bool(CropField.CROPS.has(code)).is_true()
 
-## q(172) A (不知火舞 282 bf7c124b): from Homestead Lv7 the field's sand grows over the new front row and the walkway before
-## row 0 — one patch, its edges as before; at Lv1–6 that row is grass.
-func test_the_sand_reaches_the_front_row_only_from_lv7() -> void:
+## The sand lies under the beds open now and the walkways between (不知火舞 282 bf7c124b: one patch); the beds still to
+## open stay grass (SGODOT-355 b1).
+func test_the_sand_covers_the_open_beds_only() -> void:
 	var bp := P0Garden.blueprint()
 	var scenery: Node3D = auto_free(load("res://scenes/p0/p0_garden_scenery.gd").new())
 	add_child(scenery)
 	scenery.build(bp, "cottage")
 	var sand: Node3D = scenery.get_node("FieldSand")
-	var front_edge := func() -> float: return sand.position.z + sand.scale.z * 1.26 * 0.5   # its edge nearest the camera
-	var row := bp.cell_to_world(P0Garden.cell_of(40)).z
-	assert_float(front_edge.call()).is_less(row)   # Lv1–6: grass under the row
-	scenery.show_front_row(true)
-	assert_float(front_edge.call()).is_greater(row + 0.47)   # Lv7: the row's beds stand on sand, its front margin as row 0's
-	var back := sand.position.z - sand.scale.z * 1.26 * 0.5
-	scenery.show_front_row(false)
-	assert_float(sand.position.z - sand.scale.z * 1.26 * 0.5).is_equal_approx(back, 0.001)   # the back edge never moves
+	var right_edge := func() -> float: return sand.position.x + sand.scale.x * 1.26 * 0.5
+	var front_edge := func() -> float: return sand.position.z + sand.scale.z * 1.26 * 0.5   # nearest the camera
+	scenery.fit_sand(bp, 8)   # Homestead Lv1: the starting 2 × 4
+	var start_right := bp.cell_to_world(P0Garden.cell_of(3)).x
+	assert_float(right_edge.call()).is_greater(start_right + 0.47)
+	assert_float(right_edge.call()).is_less(bp.cell_to_world(P0Garden.cell_of(8)).x - 0.47)   # bed 8 (next to open) on grass
+	assert_float(front_edge.call()).is_less(bp.cell_to_world(P0Garden.cell_of(18)).z - 0.47)   # the next row out too
+	scenery.fit_sand(bp, P0Garden.max_plots())
+	var all: Rect2 = scenery.beds_rect(bp, P0Garden.max_plots())
+	assert_float(right_edge.call()).is_greater(all.end.x)
+	assert_float(front_edge.call()).is_greater(all.end.y)
