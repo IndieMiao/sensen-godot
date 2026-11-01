@@ -1,4 +1,4 @@
-# 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.2（周瑜 11-02）
+# 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.5（周瑜 11-02）
 
 > 给：苏烈（E / F / G 服务端）、刘邦（F / G 客户端）、亚瑟（矿口卡、审客户端 PR）、后裔（审服务端规则层 PR）、上官婉儿（怪物文件）。
 > 依据：方案 `355-gameplay-v4-2026-11-02.md` 第 3 章（3.2 清怪开梯子、3.3、3.5 怪物与守关表、3.6、3.8、3.11）、9.1 #8–#10；亚瑟的 `355-b1-tech-plan-2026-11-02.md`；后裔的 C 接口 `/Volumes/ACASIS/tmp/houyi-355/contract-c-v0.md`；上官婉儿的 3D 接口 v1（`355-b1-3d-plan-2026-11-02.md` 第 6 节）。代码按 farm-dev b2c46d3b 核过。
@@ -18,6 +18,13 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> **v0.5（11-02 03:3x）**：照李白改过的 q 行（v4q(5) d867fa1e、v4q(6) 74cea9e6、v4q(7) 9c7c861e）和后裔 #616 的野外目录对齐：
+> - 守关的主产包：浅坑铜矿石 ×5，矿脉主矿 ×5（初值）；
+> - 精英掉落：本怪的掉落 ×2、必掉；
+> - Pip 的 First Dig 照 q(218) intro_requests 做：Lv3 出现、自动接进 Today、不占 track_max、到第 3 层就完成、进度按资历；铜剑总是装上，除非手上是铁剑；
+> - 药价 25、冷却 3 秒，回满还是回 50 HP〔待用户定〕，推荐回满；
+> - C 的 `mine` 块：浅坑 `main` 是 null、另有 `yields`，`side` 是序号；
+> - `best_floor` 由 E 填。
 > **v0.4（11-02 03:0x）**：照 v4q(6)(7) 复核（`pm/q-review/v4q6-7-review.md`）和 q 行对齐：
 > - 铁剑配方：铁 6、硬木 4、煤 3、甲壳 2、150 coins；
 > - Pip 委托走到第 3 层就完成，不用回去交；
@@ -78,7 +85,7 @@
         "weapon_iron_sword":   { "name": "Iron Sword",   "attack": 8, "speed": 2.0, "tier": 2 }
       }
     },
-    "potions": { "potion_heal": { "name": "Healing Potion", "price": 20, "stock": 5, "sold_at": "homestead", "gate": { "homestead": 4 }, "heal": "full", "floors": "any", "cooldown_ms": 3000 } },
+    "potions": { "potion_heal": { "name": "Healing Potion", "price": 25, "stock": 5, "sold_at": "homestead", "gate": { "homestead": 4 }, "heal": "full", "floors": "any", "cooldown_ms": 3000 } },
     "monsters": {
       "mob_slime":              { "name": "Slime",          "hp": 9,  "damage": 10, "loot": [["copper_ore", 1, 35], ["rock_salt", 1, 25], ["bait_worm", 3, 40]] },
       "mob_elite_slime":        { "name": "Elite Slime",    "hp": 36, "damage": 20, "elite": true, "loot": [["copper_ore", 2, 100]] },
@@ -88,9 +95,9 @@
       "mob_elite_rock_beetle":  { "name": "Elite Rock Beetle", "hp": 60, "damage": 20, "elite": true, "stun_mult": 2, "loot": [["drop_t2_beetle_shell", 2, 100]] },
       "mob_shroomling":         { "name": "Shroomling",     "hp": 12, "damage": 8,  "loot": [["drop_t2_glow_spore", 1, 35], [null, 0, 65]] },
       "mob_elite_shroomling":   { "name": "Elite Shroomling", "hp": 45, "damage": 14, "elite": true, "loot": [["drop_t2_glow_spore", 2, 100]] },
-      "boss_slime_king":        { "name": "Slime King",          "hp": 80,  "damage": 18, "guard": true, "tier": 1, "first": [["drop_crown_shard", 1]], "pack": 5 },
-      "boss_slime_king_iron":   { "name": "Iron Slime King", "hp": 160, "damage": 22, "guard": true, "tier": 2, "first": [["drop_crown_shard", 1]], "pack": 8 },
-      "boss_slime_king_quartz": { "name": "Quartz Slime King",   "hp": 200, "damage": 25, "guard": true, "tier": 2, "first": [["drop_crown_shard", 1]], "pack": 8 }
+      "boss_slime_king":        { "name": "Slime King",          "hp": 80,  "damage": 18, "guard": true, "tier": 1, "first": [["drop_crown_shard", 1]], "pack": ["copper_ore", 5] },
+      "boss_slime_king_iron":   { "name": "Iron Slime King", "hp": 160, "damage": 22, "guard": true, "tier": 2, "first": [["drop_crown_shard", 1]], "pack": ["main", 5] },
+      "boss_slime_king_quartz": { "name": "Quartz Slime King",   "hp": 200, "damage": 25, "guard": true, "tier": 2, "first": [["drop_crown_shard", 1]], "pack": ["main", 5] }
     },
     "types": {
       "quarry": {
@@ -145,10 +152,12 @@
 - 浅坑 F5–9 照 v4 3.5：史莱姆固定 2 只、蝙蝠 1–2 只（答苏烈 ②，和 v4q(5) 一致）。
 - **精英史莱姆不再掉石英**（冲突清单第 3 节 §10.7「石英只在矿脉」，以 v4 为准），也不再有「每天第一次掉石英」。替代掉落：铜矿石 ×2、每次必掉（初值，v4q(6)(7) 复核 ⑦）。`once_a_day` 这个机制服务端照旧支持，用不用由数据定。
 - 史莱姆的掉落照现行，不改：铜 1（权重 35）、岩盐 1（25）、蚯蚓 3（40）。就是 `mine_p1.json` 现在写的那份（v4q(6)(7) 复核 ⑤）。
-- 矿脉的主矿：掉落表里没写主矿，按 `main_weight` 加进去：F1 起权重 10，到 C 给的 `main_from`（矿脉是 F10）起改为 40。副产 `side` 第一批掉不掉待定（第 13 节）。
+- 矿脉的主矿：掉落表里没写主矿，按 `main_weight` 加进去：F1 起权重 10，到 C 给的 `main_from`（矿脉是 F10）起改为 40。浅坑的 `main` 是 null，不加主矿（五样已经在本段 `drops` 里）。
+- **副产**：C 的 `site.mine.side` 是序号（0 到 sides−1，#616），不是物品 id。第一批掉不掉〔待用户定〕；要掉的话，在 `types.<type>.sides: [物品, …]` 里按序号换成物品，再加进本段 `drops`。没有 `sides` 就不掉。
 - 矿脉的门槛 `gate.homestead: 8` 照 v4 2.7。冲突清单第 2 节有人提议「开局就能去」，未确认，所以写成数据：改它不用改代码。
-- 守关的 `first`：每种守关个人第一次打倒必掉；`pack`：每次打倒给一包本矿主产（`main` 乘以 pack 个数）。
-- **回血药 `potions.potion_heal` 的每个字段都待用户定**（v4q(7) G）。初值用的是现行方案文档的数（§10、附录：Homestead Stall 卖、20 coins、日库存 5、HP 回满），`floors: "any"` 也是待定的初值。服务端和测试都**从这里读**，不写死。
+- 守关的 `first`：每种守关个人第一次打倒必掉。`pack`：每次打倒给的一包，写成 `[物品, 数量]`；物品写 `"main"` 时，表示这座矿的主矿（C 的 `site.mine.main`，矿脉才有）。浅坑在 C 目录里 `main` 是 null（浅坑五样都出，靠副产区分，#616），所以浅坑守关写死铜矿石 ×5（q 行初值）。
+- **精英的掉落 = 本怪的掉落 ×2、必掉**（v4q(6)）：内容表里每只精英把基础怪的掉落项数量 ×2，去掉空掉落（`null`）那一项。精英史莱姆是例外，写死铜矿石 ×2，不掉石英。
+- **回血药 `potions.potion_heal`**：药价 25、冷却 3 秒照 v4q(7) 9c7c861e；回满（`"full"`）还是回 50 HP〔待用户定〕，推荐回满；售卖处、日库存、门槛、能在哪些层喝都是初值。服务端和测试都**从这里读**，不写死。
 
 ## 3. 存档 v7 的字段（服务端 state.ts；**存档格式变更要等 q 行 B 让用户点头才能上线**，开发照做）
 ```ts
@@ -281,7 +290,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 现有字段，再加 `weapons`、`weapon`；物品卡和 Gear 页用 `content.mine.weapons` 里的名字和数值。
 
 ### 7.3 给矿口卡和 C 用的
-- C 的叠加字段 `best_floor` = `records[mine].deepest`，没有记录时是 0（后裔照这个填）。
+- C 的叠加字段 `best_floor` = `records[mine].deepest`，没有记录时是 0。#616 的 `siteFor` 现在写死 0，由 E 主 PR 改成读 `s.mine.records[id]?.deepest ?? 0`。
 - 矿口卡的其余内容由客户端算：矿型、最深层、主产和起始层来自 C 的 `mine` 块；每段的怪和守关来自 `content.mine.types[type]`；「你在这里到过第几层」和电梯站来自 `records`（10 的倍数且 ≤ deepest）。季节、新闻、钻地机第一批没有。
 
 ### 7.4 客户端文案（照 v4q(5) ⑪；以 q 行为准，这里只列 E 客户端要用的）
@@ -308,11 +317,12 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - **Gear 页现有的 Combat 槽变成可换**（结论第 4 节修订的说法）：存档里是 `gear.weapons` 和 `gear.weapon`；`equip {item}` 加一个分支：`weapons` 里有它就换成它。
 - 战斗读 `gear.weapon`，不再读 `tools.combat`（`tools.combat` 删掉）。武器槽开局就装着木剑；Lv3 只是给铜剑（现行规则，冲突清单第 2 节第 5 条）。
 
-### 9.2 铜剑：Pip「第一次下矿」委托
-- 新的需求类型 `{"kind": "floor", "floor": N}`：进度 = 资历（所有矿的 deepest 取最大）。**达到 N 就直接完成，不用回去交**（v4q(6)(7) 复核 ②）：在 `mine_record` 事件那一刻结算，发委托完成的事件和奖励，和别的委托一样记进完成列表。
-- 进度回调：`mine_record` 事件发生后，重算已接的这类委托（照现有的委托进度飘字）。
-- 新的奖励类型 `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`；**新武器攻击比当前武器高就自动换上**（木剑 3 → 铜剑 5 会换；木剑和铜剑同为 T1，所以不按档位比，v4q(6)(7) 复核 ③）；发事件 `gear`；只给一次（照现有的一次性奖励）。
-- 委托本身（Pip 的第几条、N 是几、文案、Lv3 出现）由李白在 residents 数据里加，初值 N = 3（q 行）。要不要在 Lv3 直接出现在 Today、不用去驿站接，待定（第 13 节）。
+### 9.2 铜剑：Pip 的 First Dig（q(218) intro_requests 的做法，v4q(7) 9c7c861e）
+- **不进委托线**：做成 Pip 的 `intro_requests` 里的一条（现有机制，residents.ts，完成的记进 `intro_done`）。id 和文案由李白在 residents 数据里加。
+- **Homestead Lv3 出现，自动接进 Today**，不用去驿站接；**不占 `track_max`**。
+- 新的需求类型 `{"kind": "floor", "floor": 3}`，进度 = 资历（所有矿的 deepest 取最大）。**达到 3 就直接完成，不用回去交**：在 `mine_record` 事件那一刻结算，记进 `intro_done`，发完成事件和奖励。
+- 新的奖励类型 `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
+- 这一条以前的 intro_requests 规则（`s.guide` 是 legacy 或没开引导时不出现，见 residents.ts）照旧。Lv3 和引导哪个先到由 D（引导改版）定，我和蒙恬对步骤。
 
 ### 9.3 铁剑：工作台
 - 配方 `{ id: "craft_iron_sword", out: "weapon_iron_sword", to: "weapon", gate: { homestead: 8 }, in: [["iron_ore", 6], ["hardwood", 4], ["coal", 3], ["drop_t2_beetle_shell", 2]], coins: 150 }`（照 q 行，v4q(6)(7) 复核 ①）。数值是初值；Lv8 照 v4 2.7（矿脉门槛待定，会跟着变）。
@@ -405,7 +415,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 6. 入层费：今天第一次进一层扣 2；同一天再进不扣；换日以后再扣。
 7. 纪录：进更深的层就更新 deepest 并发 `mine_record`；资历是所有矿 deepest 的最大值。
 8. 电梯：站是 ≤ deepest 的 10 的倍数（不含 F1）；从 F1 或站点出发才能坐；从别的层坐、或去非站点，都回 `bad_floor`；只扣目标层的入层费（今天没进过才扣）；view 的 `stations[].paid` 和这一致。
-9. 守关：打倒以后 `guards` 记下这一层；第一次打倒必掉王冠碎片并写 `guard_firsts`，第二次不掉；每次都有主产包；在这座矿打过以后，再进这一层就没有守关。
+9. 守关：打倒以后 `guards` 记下这一层；第一次打倒必掉王冠碎片并写 `guard_firsts`，第二次不掉；每次都有主产包（浅坑铜矿石 ×5，矿脉是 `main` ×5，都从内容表读）；在这座矿打过以后，再进这一层就没有守关。
 10. 伤害：木剑或铜剑打 T2 守关 = ⌈攻击 × under_tier⌉（初值下木剑 2、铜剑 3，测试从内容表读倍数）；铁剑打 T2 全额；硬直的岩甲虫 ×2；`stunned` 里放了不在 targets 里、或不是岩甲虫的下标，不加倍。
 11. 出手节奏：间隔小于 `1000 / speed × 0.9` ms 的一下作废；一下打中超过 4 只只算前 4 只。
 12. 倒地：F1–10 不扣东西；F11 起扣掉本层捡到的一半，向下取整；人回到矿口，`notice.ko` 写清楚丢了什么。
@@ -415,7 +425,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 14. 击杀：每种怪的击杀数累加；精英史莱姆打倒不会掉石英；数据里带 `once_a_day` 的掉落每天只给一次（测试用一个测试专用的怪来验这个机制）。
 15. 不能进：不在那座矿（`not_here`）、目录里没有（`unknown_place`）、类型没开（`not_open`）、背包放不下（`bag_full`）、体力不够（`need_energy`）。
 16. 回血药：只能在矿里喝；扣 1 瓶；回血量、能喝的层、价格、库存**都从 `content.mine.potions` 读**，不写死数字（待用户定）；回血不超过上限；冷却中回 `potion_cooldown`；血满回 `hp_full`；没有药回 `no_potion`。
-17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 floor 委托在资历到 N 的那一下直接完成（不用交），得到铜剑；铜剑攻击比当前高就自动换上；只给一次。
+17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 First Dig（intro_requests）Lv3 出现、不占 track_max；资历到 3 的那一下直接完成，记进 intro_done，得到铜剑并装上（手上是铁剑时不换）；只给一次。
 18. 旧命令 `mine_new_run`、`mine_express` 回 `unknown_command`（reducer 现有的码）。
 19. 开发矿：`wd-dev-quarry`、`wd-dev-vein` 不检查 here；没有 `dev_sites` 时回 `unknown_place`。
 
@@ -442,7 +452,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 4. **精英史莱姆的掉落**：不掉石英已定（以 v4 为准）；「每天一次」要不要、掉什么，交 v4q(6) 定。
 5. **矿脉门槛**：v4 写 Homestead Lv8；有人提议开局就能去（冲突清单第 2 节第 2 条），待定。
 6. **副产 `side`** 第一批掉不掉：三方说法不一，统一后标〔待用户定〕。
-7. **Pip 委托**：Lv3 直接出现在 Today，还是要去驿站接（冲突清单第 2 节第 18 条，待定）。到第 3 层直接完成、不用交，已经照 q 行写了。
+7. ~~Pip 委托在哪接~~：已定，照 q(218) intro_requests 做（第 9.2 节）。
 7a. **低档武器打高档守关的取整**：向上取整（木剑 2、铜剑 3），v4q(6)(7) 复核 ④ 的推荐，早上报用户。
 8. 所有数值：怪的血量和伤害、武器、配方、Pip 的 N、主产包的数量、掉落权重（李白校准）。
 9. 进矿时血量回满，出矿和倒地后也回满（v4q(5) 已写：进矿满血，倒地或出矿后下次进矿也满血）。日切留在原层时血量不变（我定的，q 行没写）。
