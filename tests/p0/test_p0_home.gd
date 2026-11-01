@@ -85,7 +85,7 @@ func test_p0_stops_at_lv3() -> void:
 	assert_str(str(p.title)).is_equal("Homestead Lv3")
 	assert_array(p.tiles).is_empty()
 
-## q(115) ②: Lv10 has no next level: `Max level for now` under the title, no Upgrade, and the Looks rows.
+## The content cap has no next level: neutral copy under the title, no Upgrade, and the Looks rows.
 func test_lv10_says_max_level_and_keeps_the_looks() -> void:
 	var v := _view(10)
 	v.homestead.next = null
@@ -93,7 +93,7 @@ func test_lv10_says_max_level_and_keeps_the_looks() -> void:
 		{"id": "kitchen_extension", "level": 8, "look": "a"}, {"id": "master_farmhouse", "level": 10, "look": "b"}]
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.title)).is_equal("Homestead Lv10")
-	assert_str(str(p.subtitle)).is_equal("Max level for now")
+	assert_str(str(p.subtitle)).is_equal("Highest level for now")
 	assert_bool(bool(p.button)).is_false()
 	assert_array(p.looks.map(func(r): return "%s … %s" % [r.name, r.value])).is_equal(
 		["Fence & Mailbox … Timber Fence ›", "Porch … Stone Porch ›", "Kitchen Wing … Timber Kitchen Wing ›", "Master Farmhouse … Stone Manor ›"])

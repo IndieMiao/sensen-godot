@@ -2186,8 +2186,7 @@ const P1_UNLOCKS := {
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
 	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
-	"vein_mines": {"icon": "stone", "text": "Ore Veins", "note": "on the map"},
-	"iron_sword": {"icon": "sword", "text": "Iron Sword", "note": "at the Workbench"},
+	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
 	"decor_set_1": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
 	"decor_set_2": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
 	"orchard_10": {"icon": "crop_apple", "text": "Orchard 10/10", "note": "+1 slot"},
@@ -2251,7 +2250,7 @@ const LOOK_ICONS := {"fence": "mailbox", "porch": "door", "kitchen_extension": "
 ## What changes' look row (q(115) ①): `Porch · Timber or Stone` with this note (q(117): `pick when you upgrade` ran past
 ## the row at the frame's size).
 const LOOK_NOTE := "pick one"
-const MAX_LEVEL_LINE := "Max level for now"   # 355 A provisional copy; the cap is independent of the Master title
+const MAX_LEVEL_LINE := "Highest level for now"   # 355 7d9aa825: neutral cap copy, independent of the Master title
 
 static func look_stages() -> Array:
 	return content().get("homestead", {}).get("looks", [])
@@ -2324,7 +2323,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 		"note": "now %d" % int(energy.get("max", 0))})
 	var plots_now := int(h.get("plots", {}).get("now", 0))
 	if h.get("plots") is Dictionary and int(next.get("plots", plots_now)) > plots_now:
-		out.changes.append({"icon": "field", "text": "Fields %d" % int(next.plots), "note": "+%d to till" % (int(next.plots) - plots_now)})
+		out.changes.append({"icon": "field", "text": "Plots %d" % int(next.plots), "note": "now %d" % plots_now})
 	var board_now := int(h.get("unlocks", {}).get("board_slots", 2))
 	for u in unlocks:
 		match str(u):

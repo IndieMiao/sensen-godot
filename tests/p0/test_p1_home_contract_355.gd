@@ -63,7 +63,7 @@ func test_optional_gates_absent_and_fields_and_footer_read_view_values() -> void
 	var p := P0Logic.home_panel(v)
 	assert_array(p.tiles.map(func(t): return t.id)).is_equal(["wood","coins","skill_farming","skill_fishing"])
 	assert_str(p.footer).is_equal("Upgrading is free of Energy · +37 Energy")
-	assert_dict(p.changes[1]).is_equal({icon="field",text="Fields 36",note="+5 to till"})
+	assert_dict(p.changes[1]).is_equal({icon="field",text="Plots 36",note="now 31"})
 	v.homestead.next.plots=31
 	v.homestead.next.energy_gain=0
 	v.homestead.next.skills=[]
@@ -74,7 +74,7 @@ func test_optional_gates_absent_and_fields_and_footer_read_view_values() -> void
 func test_max_and_decor_cap_follow_authoritative_cap_not_level_ten_or_seventeen() -> void:
 	var v := view(17)
 	var p := P0Logic.home_panel(v)
-	assert_str(p.subtitle).is_equal("Max level for now")
+	assert_str(p.subtitle).is_equal("Highest level for now")
 	assert_bool(p.button).is_false()
 	assert_array(p.tiles).is_empty()
 	v.homestead.max=19
@@ -101,15 +101,19 @@ func test_upgrade_event_gain_is_actual_at_any_level_and_bag_prices_are_content_d
 
 func test_unlock_ids_use_existing_icons_and_removed_or_no_row_ids_stay_hidden() -> void:
 	var v := view()
-	var ids := ["healing_potion","vein_mines","iron_sword","decor_set_1","decor_set_2","orchard_10","sprinklers_12","fourth_stove"]
+	var ids := ["healing_potion","potion_heal","decor_set_1","decor_set_2","orchard_10","sprinklers_12","fourth_stove"]
 	v.homestead.next.unlocks=ids
 	var p := P0Logic.home_panel(v)
 	assert_int(p.changes.size()).is_equal(2+ids.size())
 	for row in p.changes:
 		assert_bool(ResourceLoader.exists("res://assets/p0/icons/%s.svg"%row.icon)).is_true()
-	v.homestead.next.unlocks=["city_gather","pip_first_dive","stall_upgrade","travel_gates","old_tree","clay_bank","plots_40","plots_48","long_haul_ticket","trip_7"]
+	v.homestead.next.unlocks=["city_gather","pip_first_dive","stall_upgrade","travel_gates","old_tree","clay_bank","plots_40","plots_48","long_haul_ticket","trip_7","vein_mines","iron_sword"]
 	assert_int(P0Logic.home_panel(v).changes.size()).is_equal(2)
 	assert_str(P0Logic.home_moment(v,{level=16,unlocks=v.homestead.next.unlocks}).detail).is_empty()
+	for id in ["healing_potion","potion_heal"]:
+		v.homestead.next.unlocks=[id]
+		assert_str(P0Logic.home_panel(v).changes[-1].text).is_equal("Healing Potion")
+		assert_str(P0Logic.home_moment(v,{level=4,unlocks=[id]}).detail).is_equal("Healing Potion")
 
 func test_today_remains_early_only_and_requires_every_listed_skill() -> void:
 	var v := view(1)
