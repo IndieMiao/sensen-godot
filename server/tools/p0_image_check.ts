@@ -19,6 +19,7 @@ const files = ['assets/p0/p0_content.json', 'assets/p0/p0_outposts.json', 'asset
   'server/data/city_cluster_members.tsv', 'server/data/cities.tsv', 'server/data/world_water.json', 'assets/ponds/catalog.json',
   'server/data/ip-near.bin',   // q(188) ① Near you: made in the image (tools/ip_near_table.ts)
   'server/data/wild_sites.json',   // v4q(3) wild sites (tools/wild_sites_build.ts): without it the map has no quarries or veins
+  'server/data/gather_points.json',   // v4q(4) city gathering points (tools/gather_points_build.ts): without it no city has any
   // the avatar catalog the outpost rooms check a look against (src/p0/online/appearance.ts; SGODOT-304: no longer found
   // through Journey's regions.json)
   'assets/avatar/parts_manifest.json', 'assets/avatar/demo_denylist.json'];
