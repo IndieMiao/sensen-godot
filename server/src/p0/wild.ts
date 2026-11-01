@@ -1,9 +1,10 @@
 /**
  * Wild sites (v4q(3), SGODOT-355; v4 §1.4–1.5): the catalogue tools/wild_sites_build.ts made (server/data/wild_sites.json),
  * read once. A site is `wd-<row>-<col>` (one per 0.5° cell, added to, never taken away from); batch 1 opens quarries and
- * veins, the rest stay in the catalogue, off the map. Per player: the nearest 3 open sites from the home's base point
- * (q(184), as the nearest 3 cities) are free for good, with a quarry and a vein among them; the map reads the sites in its
- * viewport (GET /v1/p0/wild), at most VIEWPORT_CAP, the free, visited and nearest first.
+ * veins, geodes, abysses and ruins are grey pins (Not open yet), woods, waterside and bloom stay off the map. Per player:
+ * the nearest 3 open sites from the home's base point (q(184), as the nearest 3 cities) are free for good, with a quarry
+ * and a vein among them; the map reads the sites in its viewport (GET /v1/p0/wild), at most VIEWPORT_CAP, nearest the
+ * home's base point first, ties by id (the same every time, q(137) ⑤; review B5).
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -17,19 +18,18 @@ import { worldOf } from './world.js';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 export const WILD_PREFIX = 'wd-';
 export const VIEWPORT_CAP = 40;
-/** Below this zoom the map is a continent's: no wild pins (contract-c §4; the frames may move it). */
-export const VIEWPORT_MIN_ZOOM = 6;
 
-export interface WildMine { floors: number; main: string; main_from: number; side: number | null; open_to: number | null }
+/** A mine: a vein has one main (`main`), a quarry yields every main (`main` null) and is told apart by its side yield. */
+export interface WildMine { floors: number; main: string | null; yields: string[]; main_from: number; side: number | null; open_to: number | null }
 export interface WildSite {
-  id: string; type: string; lat: number; lng: number; name: string; short: string;
-  near: string; near_name: string; climate: string; continent: string; coastal: boolean; open: boolean; mine?: WildMine;
+  id: string; type: string; lat: number; lng: number; name: string; short: string; near: string; near_name: string;
+  climate: string; continent: string; country: string; coastal: boolean; open: boolean; mine?: WildMine;
 }
-interface MineRule { mains: string[]; main_from: number; open_to?: number }
-interface WildRules { grid_deg: number; open: string[]; mines: Record<string, MineRule>; type_words: Record<string, string> }
+interface MineRule { mains: string[]; one_main?: boolean; main_from: number; open_to?: number }
+interface WildRules { grid_deg: number; open: string[]; map: string[]; map_min_zoom: number; mines: Record<string, MineRule>; type_words: Record<string, string> }
 interface WildTable { seed: string; revision: number; grid_deg: number; types: string[]; fields: string[]; rows: unknown[][] }
 
-export interface Catalogue { revision: number; grid: number; byId: Map<string, WildSite> }
+export interface Catalogue { revision: number; grid: number; byId: Map<string, WildSite>; map: Set<string>; minZoom: number }
 const loaded = new WeakMap<object, Catalogue | null>();
 
 export const isWild = (id: unknown): id is string => typeof id === 'string' && id.startsWith(WILD_PREFIX);
@@ -43,22 +43,23 @@ export function catalogueOf(c: P0Content, table: WildTable): Catalogue {
     throw new Error(`server/data/wild_sites.json is for seed ${table.seed} revision ${table.revision}, the world is ${w.seed} revision ${w.revision}: rerun tools/wild_sites_build.ts`);
   }
   const at = (f: string) => table.fields.indexOf(f);
-  const [row, col, lat, lng, type, main, side, floors, coastal, near, word] =
-    ['row', 'col', 'lat', 'lng', 'type', 'main', 'side', 'floors', 'coastal', 'near', 'word'].map(at);
+  const [row, col, lat, lng, type, main, side, floors, coastal, near, word, country] =
+    ['row', 'col', 'lat', 'lng', 'type', 'main', 'side', 'floors', 'coastal', 'near', 'word', 'country'].map(at);
   const byId = new Map<string, WildSite>();
   for (const r of table.rows) {
     const t = table.types[r[type] as number], cl = clusterById(c, r[near] as string), id = `${WILD_PREFIX}${r[row]}-${r[col]}`;
     const s: WildSite = { id, type: t, lat: r[lat] as number, lng: r[lng] as number, name: `${r[word]} ${rules.type_words[t]}`,
       short: r[word] as string, near: r[near] as string, near_name: cl?.name ?? '', climate: cl?.climate ?? '',
-      continent: cl?.continent ?? '', coastal: r[coastal] === 1, open: rules.open.includes(t) };
+      continent: cl?.continent ?? '', country: country >= 0 ? (r[country] as string) : '', coastal: r[coastal] === 1, open: rules.open.includes(t) };
     const rule = rules.mines[t];
     if (rule) {
-      s.mine = { floors: r[floors] as number, main: r[main] as string, main_from: rule.main_from, side: r[side] as number | null,
-        open_to: rule.open_to === undefined ? null : rule.open_to };
+      const m = (r[main] as string | null) ?? null;
+      s.mine = { floors: r[floors] as number, main: m, yields: rule.one_main && m ? [m] : [...rule.mains], main_from: rule.main_from,
+        side: r[side] as number | null, open_to: rule.open_to === undefined ? null : rule.open_to };
     }
     byId.set(id, s);
   }
-  return { revision: table.revision, grid: table.grid_deg, byId };
+  return { revision: table.revision, grid: table.grid_deg, byId, map: new Set(rules.map), minZoom: rules.map_min_zoom };
 }
 
 /** The catalogue, read once per content; null when the file is not there (no wild sites: every lookup is empty). */
@@ -141,12 +142,13 @@ export function parseBbox(text: unknown): Bbox | null {
 }
 
 /**
- * contract-c §4: the open sites in a viewport, at most VIEWPORT_CAP — the free first, then the visited, then the nearest
- * home (ties by id). `total` counts every open site in the box.
+ * contract-c §4: the map's sites in a viewport (open ones and grey pins), at most VIEWPORT_CAP — nearest the home's base
+ * point first, ties by id (review B5: one order, the same however the camera moves). `total` counts them all in the box;
+ * the cap counts wild pins only (the city's own pins are not in this read).
  */
 export function viewport(c: P0Content, s: P0State, box: Bbox, zoom: number, now: number) {
   const cat = catalogue(c);
-  if (!cat || !(zoom >= VIEWPORT_MIN_ZOOM)) return { revision: cat?.revision ?? 0, sites: [], capped: false, total: 0 };
+  if (!cat || !(zoom >= cat.minZoom)) return { revision: cat?.revision ?? 0, sites: [], capped: false, total: 0 };
   const g = cat.grid, cols = Math.round(360 / g);
   const r0 = Math.floor((box.south + 90) / g), r1 = Math.floor((box.north + 90) / g);
   const c0 = Math.floor((box.west + 180) / g), span = (((box.east - box.west) % 360) + 360) % 360, c1 = c0 + Math.floor(span / g) + 1;
@@ -155,9 +157,8 @@ export function viewport(c: P0Content, s: P0State, box: Bbox, zoom: number, now:
   const near3 = wildNear3(c, s), found: ReturnType<typeof siteFor>[] = [];
   for (let r = r0; r <= r1; r++) for (let k = c0; k <= c1; k++) {
     const x = cat.byId.get(`${WILD_PREFIX}${r}-${((k % cols) + cols) % cols}`);
-    if (x && x.open && inBox(x)) found.push(siteFor(c, s, x, now, near3));
+    if (x && cat.map.has(x.type) && inBox(x)) found.push(siteFor(c, s, x, now, near3));
   }
-  const rank = (x: ReturnType<typeof siteFor>) => (x.free ? 0 : x.visited ? 1 : 2);
-  found.sort((a, b) => rank(a) - rank(b) || a.km - b.km || (a.id < b.id ? -1 : 1));
+  found.sort((a, b) => a.km - b.km || (a.id < b.id ? -1 : 1));
   return { revision: cat.revision, sites: found.slice(0, VIEWPORT_CAP), capped: found.length > VIEWPORT_CAP, total: found.length };
 }

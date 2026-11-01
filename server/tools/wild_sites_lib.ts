@@ -1,8 +1,8 @@
 /**
  * Wild sites (v4q(3), SGODOT-355; v4 §1.4–1.5, §3.3), offline only: the world's land from Natural Earth 10m (public
  * domain) rastered once, one site at most per grid cell on land, off the big lakes and away from every city, then every
- * type dealt out at once and the guarantees made good (a ruin per continent, abyss per region, quarries and veins of
- * different main near every cluster, a geode within reach). Used by tools/wild_sites_build.ts, which writes
+ * type dealt out at once and the guarantees made good (a ruin per continent, abyss per region, quarries of different
+ * side yield and veins of different main near every cluster, a geode within reach). A closed country (q(189)) has none. Used by tools/wild_sites_build.ts, which writes
  * server/data/wild_sites.json; the server only reads that table (src/p0/wild.ts).
  *
  * Deterministic: every draw is hash32(seed, site id, topic), and the guarantees walk the clusters in a fixed order, so
@@ -17,21 +17,26 @@ const MINES = new Set<WildType>(['quarry', 'vein', 'geode', 'abyss', 'ruin']);
 /** What a guarantee may turn into a quarry, vein or geode: never a ruin or abyss, never another guarantee's site. */
 const LOOSE = new Set<WildType>(['woodland', 'waterside', 'bloom']);
 
-export interface MineRule { floors: [number, number]; mains: string[]; main_from: number; open_to?: number }
+/** A mine type's rule. `mains`: a vein has one of them (iron or quartz, the guarantee wants both near); a quarry yields
+ * them all (v4 §3.3, v4q(5) ②) and is told apart by its side yield (v4q(3) review B3). */
+export interface MineRule { floors: [number, number]; mains: string[]; one_main?: boolean; main_from: number; open_to?: number }
 export interface WildConfig {
   grid_deg: number; city_min_km: number; lat_range: [number, number]; raster_deg: number; tries: number; jitter_deg: number;
-  coastal_km: number; lake_near_km: number; open: WildType[];
+  coastal_km: number; lake_near_km: number; open: WildType[]; map: WildType[]; map_min_zoom: number;
+  exclude_countries?: string[];
   shares: Partial<Record<WildType, number>>;
   near: { trip2_km: number; quarry: number; vein: number; geode_km: number };
   abyss: [number, number]; ruin: number;
   mines: Record<'quarry' | 'vein' | 'geode' | 'abyss' | 'ruin', MineRule>;
   sides: number; type_words: Record<WildType, string>;
+  /** The names' words by climate band (Tropical / Subtropical / Temperate / Cool); 李白's own pool, not the ponds' (review ⑤). */
+  words?: Record<string, string[] | string>;
 }
 
 export interface Site {
   id: string; row: number; col: number; lat: number; lng: number;
   type: WildType; main: string | null; side: number | null; floors: number | null;
-  coastal: boolean; wet: boolean; near: string; climate: string; continent: string;
+  coastal: boolean; wet: boolean; near: string; climate: string; continent: string; country: string;
   word: string; locked: boolean;
 }
 
@@ -53,16 +58,16 @@ export function polygonsOf(geo: { features: { geometry: { type: string; coordina
 
 /** A global lat/lng grid of cells `deg` wide, 1 inside the polygons (even–odd over every ring, holes included). */
 export class Raster {
-  readonly w: number; readonly h: number; readonly data: Uint8Array;
+  readonly w: number; readonly h: number; readonly data: Uint16Array;
   constructor(readonly deg: number) {
-    this.w = Math.round(360 / deg); this.h = Math.round(180 / deg); this.data = new Uint8Array(this.w * this.h);
+    this.w = Math.round(360 / deg); this.h = Math.round(180 / deg); this.data = new Uint16Array(this.w * this.h);
   }
   private rowOf(lat: number): number { return Math.min(this.h - 1, Math.max(0, Math.floor((lat + 90) / this.deg))); }
   private colOf(lng: number): number { return ((Math.floor((lng + 180) / this.deg) % this.w) + this.w) % this.w; }
   get(lat: number, lng: number): number { return this.data[this.rowOf(lat) * this.w + this.colOf(lng)]; }
 
-  /** Scanline fill: each row's centre line crossed by every ring edge, cells between pairs of crossings set. */
-  fill(polys: Polygon[]): this {
+  /** Scanline fill: each row's centre line crossed by every ring edge, cells between pairs of crossings set to value. */
+  fill(polys: Polygon[], value = 1): this {
     const xs: number[][] = Array.from({ length: this.h }, () => []);
     for (const poly of polys) for (const ring of poly) {
       for (let i = 0; i < ring.length - 1; i++) {
@@ -82,7 +87,7 @@ export class Raster {
       for (let k = 0; k + 1 < row.length; k += 2) {
         const c0 = Math.max(0, Math.ceil((row[k] + 180) / this.deg - 0.5));
         const c1 = Math.min(this.w - 1, Math.floor((row[k + 1] + 180) / this.deg - 0.5));
-        for (let c = c0; c <= c1; c++) this.data[r * this.w + c] = 1;
+        for (let c = c0; c <= c1; c++) this.data[r * this.w + c] = value;
       }
     }
     return this;
@@ -152,9 +157,22 @@ export class ClusterIndex {
 const u01 = (seed: string, id: string, topic: string) => hash32(seed, id, topic) / 0x1_0000_0000;
 export const siteId = (row: number, col: number) => `wd-${row}-${col}`;
 
+/** Countries by raster value (1-based), from Natural Earth admin 0 (ISO_A2, else ISO_A2_EH for France and Norway). */
+export function countryRaster(deg: number, geo: { features: { properties: Record<string, string>; geometry: { type: string; coordinates: unknown } | null }[] }) {
+  const r = new Raster(deg), codes = [''];
+  for (const f of geo.features) {
+    const code = f.properties.ISO_A2 !== '-99' ? f.properties.ISO_A2 : f.properties.ISO_A2_EH;
+    codes.push(code === '-99' ? '' : code);
+    r.fill(polygonsOf({ features: [f] }), codes.length - 1);
+  }
+  return { at: (lat: number, lng: number) => codes[r.get(lat, lng)] ?? '' };
+}
+
 /** One site at most per grid cell: the first of `tries` hashed points (the first near the centre) that is on land a raster
- * cell clear of the sea, off the big lakes, and city_min_km from every cluster centre. */
-export function placeSites(cfg: WildConfig, seed: string, land: Raster, lakes: Raster, clusters: ClusterIndex): Site[] {
+ * cell clear of the sea, off the big lakes, city_min_km from every cluster centre and not in a closed country (q(189)). */
+export function placeSites(cfg: WildConfig, seed: string, land: Raster, lakes: Raster, clusters: ClusterIndex,
+  countryAt: (lat: number, lng: number) => string = () => ''): Site[] {
+  const closed = new Set(cfg.exclude_countries ?? []);
   const out: Site[] = [], g = cfg.grid_deg;
   const r0 = Math.floor((cfg.lat_range[0] + 90) / g), r1 = Math.ceil((cfg.lat_range[1] + 90) / g);
   for (let row = r0; row < r1; row++) {
@@ -166,11 +184,13 @@ export function placeSites(cfg: WildConfig, seed: string, land: Raster, lakes: R
           : [0.05 * g + 0.9 * g * u01(seed, id, `y${t}`), 0.05 * g + 0.9 * g * u01(seed, id, `x${t}`)];
         const lat = +(south + dy).toFixed(4), lng = +(west + dx).toFixed(4);
         if (!land.clear(lat, lng, 1) || !lakes.clear(lat, lng, 0) || clusters.anyWithin(lat, lng, cfg.city_min_km)) continue;
+        const country = countryAt(lat, lng);
+        if (closed.has(country)) continue;
         const near = clusters.nearest(lat, lng);
         const coastal = land.within(lat, lng, cfg.coastal_km, 0);
         out.push({ id, row, col, lat, lng, type: 'woodland', main: null, side: null, floors: null, coastal,
           wet: coastal || lakes.within(lat, lng, cfg.lake_near_km, 1), near: near.id, climate: near.climate,
-          continent: near.continent, word: '', locked: false });
+          continent: near.continent, country, word: '', locked: false });
         break;
       }
     }
@@ -199,12 +219,12 @@ export class SiteIndex {
   }
 }
 
-function setMine(cfg: WildConfig, seed: string, s: Site, type: WildType, main?: string): void {
+function setMine(cfg: WildConfig, seed: string, s: Site, type: WildType, main?: string, side?: number): void {
   s.type = type;
   if (!MINES.has(type)) { s.main = s.side = s.floors = null; return; }
   const rule = cfg.mines[type as keyof WildConfig['mines']];
-  s.main = main ?? rule.mains[hash32(seed, s.id, 'main') % rule.mains.length];
-  s.side = rule.mains.length > 0 ? hash32(seed, s.id, 'side') % cfg.sides : null;
+  s.main = rule.one_main ? main ?? rule.mains[hash32(seed, s.id, 'main') % rule.mains.length] : null;
+  s.side = side ?? hash32(seed, s.id, 'side') % cfg.sides;
   s.floors = rule.floors[0] + hash32(seed, s.id, 'floors') % (rule.floors[1] - rule.floors[0] + 1);
 }
 
@@ -247,22 +267,26 @@ export function guarantee(cfg: WildConfig, seed: string, sites: Site[], clusters
   for (const cl of order) {
     const near = index.around(cl.lat, cl.lng, cfg.near.trip2_km);
     for (const kind of ['quarry', 'vein'] as const) {
-      const want = cfg.near[kind], mains = cfg.mines[kind].mains, got = new Map<string, Site>();
-      // keep what is there: one site per main, locked ones first
+      // what tells two apart: a vein's main (iron / quartz), a quarry's side yield (it yields every main, review B3)
+      const rule = cfg.mines[kind], want = cfg.near[kind], got = new Map<string, Site>();
+      const keyOf = (x: Site) => String(rule.one_main ? x.main : x.side);
+      const keys = rule.one_main ? rule.mains : Array.from({ length: cfg.sides }, (_, i) => String(i));
+      const turn = (x: Site, k: string) => (rule.one_main ? setMine(cfg, seed, x, kind, k) : setMine(cfg, seed, x, kind, undefined, Number(k)));
+      // keep what is there: one site a key, locked ones first
       for (const { s } of [...near].sort((a, b) => Number(b.s.locked) - Number(a.s.locked))) {
-        if (s.type === kind && s.main && !got.has(s.main) && got.size < want) got.set(s.main, s);
+        if (s.type === kind && !got.has(keyOf(s)) && got.size < want) got.set(keyOf(s), s);
       }
-      // short: an unlocked same-kind site with a main already counted takes a missing main, then the nearest loose site
-      const missing = () => mains.filter(m => !got.has(m)).sort((a, b) => hash32(seed, cl.id, `${kind}:${a}`) - hash32(seed, cl.id, `${kind}:${b}`));
+      // short: an unlocked same-kind site with a key already counted takes a missing one, then the nearest loose site
+      const missing = () => keys.filter(k => !got.has(k)).sort((a, b) => hash32(seed, cl.id, `${kind}:${a}`) - hash32(seed, cl.id, `${kind}:${b}`));
       for (const { s } of near) {
         if (got.size >= want) break;
         if (s.locked || s.type !== kind || [...got.values()].includes(s)) continue;
-        const m = missing()[0]; setMine(cfg, seed, s, kind, m); got.set(m, s);
+        const k = missing()[0]; turn(s, k); got.set(k, s);
       }
       for (const { s } of near) {
         if (got.size >= want) break;
         if (s.locked || !LOOSE.has(s.type)) continue;
-        const m = missing()[0]; setMine(cfg, seed, s, kind, m); got.set(m, s);
+        const k = missing()[0]; turn(s, k); got.set(k, s);
       }
       for (const s of got.values()) s.locked = true;
       if (got.size < want) short.push({ cluster: cl.id, name: cl.name, need: kind, have: got.size, want });
@@ -280,7 +304,7 @@ export function guarantee(cfg: WildConfig, seed: string, sites: Site[], clusters
 }
 
 /** Names: a word of the climate band's pool and the type word, never the same name twice within 300 km. */
-export function nameSites(cfg: WildConfig, seed: string, sites: Site[], words: Record<string, string[] | string>): void {
+export function nameSites(cfg: WildConfig, seed: string, sites: Site[], words: Record<string, string[] | string> = cfg.words ?? {}): void {
   const index = new SiteIndex(sites, cfg.grid_deg);
   for (const s of [...sites].sort((a, b) => (a.id < b.id ? -1 : 1))) {
     const band = s.climate.charAt(0).toUpperCase() + s.climate.slice(1);
