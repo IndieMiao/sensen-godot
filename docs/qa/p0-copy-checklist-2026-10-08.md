@@ -34,7 +34,7 @@
 | RECOVER 瓦片 · Eat | `3 dishes in bag` · `Open bag ›` / 灰 `No dishes in bag` |
 | RECOVER 瓦片 · Cook | `4 fish in creel` · `Show kitchen ›` / 离家灰 `At home` |
 | RECOVER 瓦片 · Tea ★ | `0/3 today · 40 coins` → `1/3 today · 50 coins` → `2/3 today · 60 coins` / 灰 `Need 15 more coins` / `3/3 today` / `Energy full`；引导 `Show on map ›`（q(46)、q(48)） |
-| RECOVER 瓦片 · Rest ★ | `Available` / 灰 `Rested today` / `Ready in 1h 12m` / `After 2h away` / 离家 `At home`；引导 `Show bench ›`（q(46)） |
+| RECOVER 瓦片 · Rest ★ | `Available` / 灰 `Rested today` / 离家 `At home`（`Ready in 1h 12m` / `After 2h away` 作废，q(269)）；引导 `Show bench ›`（q(46)） |
 | 体力不足（主行动键琥珀） | `Sow ×1 · Need 2 Energy` / `Cast · Need 5 Energy` / `Mine · Need 2 Energy`；矿口入口卡 `Enter mine · Need 2 Energy` 与下行梯小卡 `Floor 2 · Need 2 Energy` 同样琥珀、按下弹 Energy 卡（主行动键不显示，q(102)） |
 
 ## 2. 农场、驿站、长椅、工作台、采集点
@@ -46,7 +46,7 @@
 | 驿站棚（无人值守，LOCK-17） | 名字条 `Homestead Stall`（q(62)）；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)）；Buy 页新上架的行写 `◆ New for you`，棚上同时只挂一枚徽标，委托在时不挂 ◆（q(76)） |
 | 驿站委托板 | `Pond Catch · 2 Pond Crucian · 14 coins` / `Track` / `Tracked` / `Ready to deliver` / `Deliver` / `Requests today 4/6`（q(55)）；新号交教学委托前不显示 `Next request`，交完显示 `Next request 4h`；保留期里的空槽画成普通空槽，不带倒计时（q(99)） |
 | 驿站柜台扩容行与商品详情卡（P1） | 扩容行第三行 `Hardwood 0/4 · +2 more`（只差一种不写 `+0 more`）/ `Materials ready`；所有柜台商品行的 › 出背包同款详情卡（叠在柜台上方，Back 先关卡）：图标 + 名字 + 效果句、材料进度格（点格出来源）、价格行、主键同行内按钮（q(183)） |
-| 长椅 | 名字条 `+60 Energy` / 用过灰 `Rested today`（q(62)）；按钮 `Rest · +60 Energy` / 快满 `Rest · +25 Energy` / 冷却 `Rest · back after 2h away · 1h 12m to go` / 已用卡 `Used today` / `Uses 1/1` / 灰字 `Available again in 9h 12m`（到 04:00 换日的倒计时，不写 tomorrow；只有 `Close`，q(94)、q(96)） |
+| 长椅 | 名字条 `+60 Energy` / 用过灰 `Rested today`（q(62)）；按钮 `Rest · +60 Energy` / 快满 `Rest · +25 Energy` / 已用卡 `Used today` / `Uses 1/1` / 灰字 `Available again in 9h 12m`（到 04:00 换日的倒计时，不写 tomorrow；只有 `Close`，q(94)、q(96)）；原冷却态 `Rest · back after 2h away · 1h 12m to go` 作废（q(269)） |
 | 工作台 ★ | 名字条 `Workbench`（q(62)）；只有 `Tools / Supplies` 两个 Tab（q(31)）；按钮在卡片右下（q(45)）；缺料 `Need 6 more Timber`；门禁 `Farming Lv3`（堆肥配方，q(44)）；放不下 `No room · free a slot first`；铜镐 `Equip` / `Equipped`；手套 `Owned · always on`（q(46)） |
 | 工作台效果句 ★ | `Copper Pickaxe · 2 Stone per rock`（LOCK-29）/ `Gather Gloves · +1 at every gathering spot`（q(45)）/ 堆肥 `Crops ready 20% sooner`（q(46)） |
 | 采集点 ★ | 名字条 `Timber Grove`（其他写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)）；P0 共 5 处，没有 Old Tree（q(43)） |
