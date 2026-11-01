@@ -13,6 +13,15 @@ const MODEL_DIR := "res://assets/monsters/"
 const KINDS := {
 	"mob_slime": {"json": "mob_slime", "view": SlimeView, "brain": SlimeBrain},
 	"mob_elite_slime": {"json": "mob_elite_slime", "view": SlimeView, "brain": SlimeBrain, "elite": true},
+	"mob_cave_bat": {"json": "mob_cave_bat", "view": preload("res://modules/mining/monsters/bat_view.gd"), "brain": preload("res://modules/mining/monsters/bat_brain.gd")},
+	"mob_elite_cave_bat": {"json": "mob_cave_bat", "view": preload("res://modules/mining/monsters/bat_view.gd"), "brain": preload("res://modules/mining/monsters/bat_brain.gd"), "elite": true},
+	"mob_rock_beetle": {"json": "mob_rock_beetle", "view": preload("res://modules/mining/monsters/beetle_view.gd"), "brain": preload("res://modules/mining/monsters/beetle_brain.gd")},
+	"mob_elite_rock_beetle": {"json": "mob_rock_beetle", "view": preload("res://modules/mining/monsters/beetle_view.gd"), "brain": preload("res://modules/mining/monsters/beetle_brain.gd"), "elite": true},
+	"mob_shroomling": {"json": "mob_shroomling", "view": preload("res://modules/mining/monsters/shroom_view.gd"), "brain": preload("res://modules/mining/monsters/shroom_brain.gd")},
+	"mob_elite_shroomling": {"json": "mob_shroomling", "view": preload("res://modules/mining/monsters/shroom_view.gd"), "brain": preload("res://modules/mining/monsters/shroom_brain.gd"), "elite": true},
+	"boss_slime_king": {"json": "boss_slime_king", "view": preload("res://modules/mining/monsters/slime_king_view.gd"), "brain": preload("res://modules/mining/monsters/slime_king_brain.gd"), "elite": true},
+	"boss_slime_king_iron": {"json": "boss_slime_king", "view": preload("res://modules/mining/monsters/slime_king_view.gd"), "brain": preload("res://modules/mining/monsters/slime_king_brain.gd"), "elite": true},
+	"boss_slime_king_quartz": {"json": "boss_slime_king", "view": preload("res://modules/mining/monsters/slime_king_view.gd"), "brain": preload("res://modules/mining/monsters/slime_king_brain.gd"), "elite": true},
 }
 const UNKNOWN := {"json": "mob_slime", "view": SlimeView, "brain": SlimeBrain}
 

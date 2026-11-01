@@ -1,0 +1,12 @@
+{
+  "_note": "F development placeholder. HP/damage belong to server content; timings match the future model JSON contract and remain provisional.",
+  "radius": 0.3,
+  "hit_point": [0, 1.0, 0],
+  "durations": {"idle": 0.55, "move": 0.35, "fly_high": 1.2, "windup": 0.55, "attack": 0.45, "recover": 0.5, "hit": 0.18, "die": 0.5},
+  "hit_at": 0.25,
+  "contact_range": 0.67,
+  "move": {"speed": 2.8, "aggro": 6.5, "reach": 1.9, "dash_speed": 5.5},
+  "stun_resistant": false,
+  "knockback_resistance": 0.1,
+  "visual": {"color": "9186b8", "elite_color": "bc79bb", "accent": "bca4d2", "hover": 1.0, "high_offset": 0.3, "dive_offset": -0.7, "top": 1.3}
+}

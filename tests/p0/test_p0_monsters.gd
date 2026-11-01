@@ -38,12 +38,12 @@ func test_a_spec_is_a_copy() -> void:
 
 ## A kind the client does not know yet (the server ahead of F) is drawn and fought as a slime: nothing breaks.
 func test_an_unknown_kind_is_a_slime() -> void:
-	assert_bool(Monsters.known("mob_cave_bat")).is_false()
-	var spec := Monsters.spec("mob_cave_bat")
+	assert_bool(Monsters.known("mob_unregistered_test")).is_false()
+	var spec := Monsters.spec("mob_unregistered_test")
 	assert_float(float(spec.radius)).is_equal(0.4)
-	var node: Node3D = auto_free(Monsters.view("mob_cave_bat", spec))
+	var node: Node3D = auto_free(Monsters.view("mob_unregistered_test", spec))
 	assert_object(node.get_node_or_null("Body")).is_not_null()
-	assert_object(Monsters.brain("mob_cave_bat")).is_instanceof(SlimeBrain)
+	assert_object(Monsters.brain("mob_unregistered_test")).is_instanceof(SlimeBrain)
 
 ## The slime's look keeps the children the fight and its tests read, and the json's timings.
 func test_the_slime_view_children_and_actions() -> void:

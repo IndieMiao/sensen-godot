@@ -1,0 +1,12 @@
+{
+  "_note": "F development placeholder; post-charge stunned is the q(6) two-second window, including a missed charge.",
+  "radius": 0.45,
+  "hit_point": [0, 0.3, 0],
+  "durations": {"idle": 1.6, "move": 0.65, "windup": 0.85, "attack": 0.65, "recover": 0.4, "stunned": 2.0, "hit": 0.18, "die": 0.6},
+  "hit_at": 0.42,
+  "contact_range": 0.82,
+  "move": {"speed": 0.9, "aggro": 5.5, "reach": 2.0, "dash_speed": 3.4},
+  "stun_resistant": true,
+  "knockback_resistance": 0.6,
+  "visual": {"color": "92765d", "elite_color": "5f7f88", "accent": "f5a05c", "top": 0.58}
+}
