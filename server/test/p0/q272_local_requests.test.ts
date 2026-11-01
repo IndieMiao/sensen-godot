@@ -1,6 +1,7 @@
 /** q(272) (SGODOT-378, cross-city plan H step 2): local requests — away from home each city's keepers give the player
  * per_day a player day, drawn as that city's Market Board would; taken and handed in at the keeper's outpost, dropped
  * anywhere; the coins only, under the daily bonus cap and outside today's 6; a city left 30 days starts over. */
+import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
@@ -10,6 +11,8 @@ import { givers, pruneCities, settleLocals } from '../../src/p0/locals.js';
 import { mapMarkers } from '../../src/p0/markers.js';
 import { bonusCap, payBonus } from '../../src/p0/requests.js';
 import { viewOf } from '../../src/p0/view.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
+import { P0Store } from '../../src/p0/store.js';
 import { noteProgress, takenCounts } from '../../src/p0/request_progress.js';
 import type { P0Event } from '../../src/p0/progress.js';
 
@@ -229,5 +232,21 @@ describe('q(272) local requests', () => {
     pruneCities(c, s, later);
     expect(s.locals?.[HAYWARD]).toBeDefined();
     expect(s.markets[HAYWARD]).toBeDefined();
+  });
+
+  it('the routes mark a keeper\'s local request only for a client that shows them (x-p0-features: locals)', async () => {
+    const s = player(HAYWARD, 'q272-route-player');
+    settleLocals(c, s, T);
+    const store = new P0Store(c);
+    store.put(s);
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store, now: () => T, dev: false });
+    const marks = async (f: string) => ((await app.inject({ method: 'GET', url: '/v1/p0/state',
+      headers: { 'x-p0-player': s.player, 'x-p0-features': f } })).json().state.map_markers as { place: string; why: { request?: string } }[])
+      .filter(m => m.why.request?.startsWith('req_loc_'));
+    expect(await marks('choose_home,guide_v3')).toEqual([]);
+    // one mark a place (the market square's own board ! may stand for its keeper's too, as ` · +N more`)
+    expect((await marks('choose_home,guide_v3,locals')).length).toBeGreaterThan(0);
+    await app.close();
   });
 });

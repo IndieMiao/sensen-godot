@@ -39,7 +39,7 @@ import { blackjackView } from './blackjack.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
-export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
@@ -64,7 +64,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     coins: s.coins,
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
-    map_markers: mapMarkers(c, s, now),
+    map_markers: mapMarkers(c, s, now, { locals: opts.locals ?? true }),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     blackjack: blackjackView(c, s, now),   // SGODOT-351 the card room's table: the gate, the hand in play, a result not yet seen
