@@ -325,7 +325,6 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.firsts = [...new Set(s.firsts)];
   }
   s.travel ??= freshTravel(c);   // a v5 save from a build without the block cannot exist, but never read one without it
-  s.travel.wild_near3 ??= [];
   // A home the player picked stays (SGODOT-303, q(163)). A save that never picked one is the written city's (q(163) ③):
   // if the written city moved (as SGODOT-270 did), it moves home too and its frozen fallback list is made again (§11.2.3
   // "换城后重算一次"). A home the cluster table no longer knows goes back to the written city the same way.
