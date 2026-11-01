@@ -6,7 +6,8 @@ extends RefCounted
 ## the session by id; a box read once is not read again. Preloaded, no class_name (a new global class needs an import).
 ##
 ## Until the server has the route, `mock` (a path to a wild_mock.json, the env P0_WILD_MOCK on a desktop) answers from
-## a local file: the player's own fields worked out here from the home farm point, the nearest three free.
+## a local file: the player's own fields worked out here from the home city's base point (contract v0.2, q(184): the
+## point the nearest three cities count from too), the nearest three free.
 
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 
@@ -20,7 +21,7 @@ static var _sites: Dictionary = {}
 static var _read: Dictionary = {}
 static var _pending: Dictionary = {}
 static var _failing: Dictionary = {}
-## The local stand-in (see above): its sites, and the farm point the player's fields are worked out from.
+## The local stand-in (see above): the path of its file and its sites.
 static var mock := ""
 static var _mock_sites: Array = []
 
@@ -120,22 +121,20 @@ static func _answer_from_mock(session: Node, key: String, box: Array) -> void:
 		var data = JSON.parse_string(FileAccess.get_file_as_string(mock)) if FileAccess.file_exists(mock) else null
 		_mock_sites = data.get("sites", []) if data is Dictionary else []
 	var view: Dictionary = session.get("view") if session.get("view") is Dictionary else {}
-	accept(key, mock_answer(_mock_sites, box, farm_point(view)))
+	accept(key, mock_answer(_mock_sites, box, home_point(view)))
 
-## The farm point the player's own fields count from: travel.farm_at [lat, lng], else the home city's centre.
-static func farm_point(view: Dictionary) -> Vector2:
+## The point the player's own fields count from (contract v0.2): the home city's base, as the nearest three cities'.
+static func home_point(view: Dictionary) -> Vector2:
 	var t: Dictionary = view.get("travel", {}) if view.get("travel", null) is Dictionary else {}
-	var at = t.get("farm_at", null)
-	if at is Array and at.size() == 2: return Vector2(float(at[0]), float(at[1]))
 	var home := P0Clusters.get_cluster(str(t.get("home", "")))
 	return Vector2(float(home.get("lat", 0.0)), float(home.get("lng", 0.0))) if not home.is_empty() else Vector2.ZERO
 
 ## The server's answer worked out from a catalog: the nearest three free (one quarry and one vein among them when the
 ## catalog has them, plan v4 §1.5), only the open types, trips by distance (a rough stand-in for the server's Trip
 ## table), the cap and its order (the free three → visited → open → nearer).
-static func mock_answer(catalog: Array, box: Array, farm: Vector2) -> Dictionary:
+static func mock_answer(catalog: Array, box: Array, home: Vector2) -> Dictionary:
 	var by_km := catalog.filter(func(s): return bool(s.get("open", false))) \
-		.map(func(s): return [P0Clusters.distance_km(farm.x, farm.y, float(s.lat), float(s.lng)), s])
+		.map(func(s): return [P0Clusters.distance_km(home.x, home.y, float(s.lat), float(s.lng)), s])
 	by_km.sort_custom(func(a, b): return a[0] < b[0])
 	var free := {}
 	for want in ["quarry", "vein"]:

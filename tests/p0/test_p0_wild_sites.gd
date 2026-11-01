@@ -5,7 +5,7 @@ extends GdUnitTestSuite
 
 const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")
 const MOCK := "res://tests/p0/fixtures/wild_mock.json"
-const SF_FARM := Vector2(37.7749, -122.4194)
+const SF_HOME := Vector2(37.7749, -122.4194)
 const SF_BOX := [37.0, -123.5, 38.5, -121.5]
 
 ## A session stand-in: the wire the module asks on, and what it asked.
@@ -79,7 +79,7 @@ func test_the_view_s_here_wins_over_a_box_read() -> void:
 	assert_int(int(P0WildSites.site("wd-255-114").best_floor)).is_equal(7)
 
 func test_the_stand_in_frees_the_nearest_three_with_a_quarry_and_a_vein_and_only_open_types() -> void:
-	var answer := P0WildSites.mock_answer(_catalog(), [-90.0, -180.0, 90.0, 180.0], SF_FARM)
+	var answer := P0WildSites.mock_answer(_catalog(), [-90.0, -180.0, 90.0, 180.0], SF_HOME)
 	var sites: Array = answer.sites
 	assert_int(sites.size()).is_equal(P0WildSites.CAP)
 	assert_bool(answer.capped).is_true()
