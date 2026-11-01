@@ -1,5 +1,5 @@
 {
-  "_note": "Teaching seeds (q(217), SGODOT-343, 刘邦): Quick Radish Seeds, only for saves that start the new-player guide (start.guide_bag, before the usual start bag). Not a crop of crops[]: boards, barter, the Cookbook and the view walk crops[] and must not see it. Sown for `energy`, it ripens a fixed grow_s after it starts growing (Water, or sown under a sprinkler / greenhouse: no cut, no Compost, no Seed Saver) into `harvest` (crop_radish), whose yield, XP, first-harvest bonus and level it uses. The plot's crop is `id` (the field label). Never sold, bought back or stocked; the guide's resend is 341's.",
+  "_note": "Teaching seeds (q(217), SGODOT-343, 刘邦): Quick Radish Seeds, only for saves that start the new-player guide (start.guide_bag, before the usual start bag). Not a crop of crops[]: boards, the Cookbook and the view walk crops[] and must not see it. Sown for `energy`, it ripens a fixed grow_s after it starts growing (Water, or sown under a sprinkler / greenhouse: no cut, no Compost, no Seed Saver) into `harvest` (crop_radish), whose yield, XP, first-harvest bonus and level it uses. The plot's crop is `id` (the field label). Never sold, bought back or stocked; the guide's resend is 341's.",
   "quick_seeds": [
     {
       "id": "crop_quick_radish",

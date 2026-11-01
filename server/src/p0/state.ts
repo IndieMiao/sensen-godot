@@ -98,7 +98,6 @@ export interface ResidentState {
 
 export interface Homestead {
   level: number; plaque: { level: number; at: number }[];
-  bartered?: Record<string, number>;   // minerals got by barter toward the next level
   looks?: Record<string, 'a' | 'b'>;   // LOOK-PICK (SGODOT-282): a stage's look once changed; absent = a (q(24): closing = a)
 }
 
@@ -139,7 +138,6 @@ export interface P0Day {
   sys_done: number;                     // system requests completed today (§9.6.4)
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
   mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
-  barters?: number;                     // barters today (§8.4.5, ≤ 6)
   cards?: string[];                     // today's recipe cards on the Homestead Stall shelf, drawn once a day (§7.16.1, SGODOT-282)
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)

@@ -1,13 +1,12 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
 import { cropBySeed, fastCrop, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ResidentRequest, type ShopId, recipeById } from './content.js';
 import { count, freeSlots } from './bag.js';
-import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
+import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches, pick } from './requests.js';
@@ -401,19 +400,6 @@ function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
     // regional: only this climate's regional items (`items` lists them), as the Market Square takes them (§9.13.1)
     sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate * distance.factor, quota: r.quota,
       ...(r.regional ? { regional: true, items: regionalItems(c, kind, climateAt(c, s)) } : {}) })),
-    // Barter at the Market Square keeper (§8.4.5): give n regional items of this city's climate for 1 mineral; have
-    // counts no Gifted stack; spare = what the pick may take (0 when locked, less what a tracked request needs, as Sell
-    // All keeps back; q(166) review); room = how many more of each the next level lets come by barter, of `share` in all;
-    // resets_in = when today's barters come back (`Limit reached · 9h 12m`). None at the top level (nothing to climb to).
-    barter: shop === 'market' && c.homestead.barter && nextLevel(c, s) ? {
-      give: c.homestead.barter.give, daily: c.homestead.barter.daily, left: Math.max(0, c.homestead.barter.daily - (s.day.barters ?? 0)),
-      resets_in: untilRollover(c, s, now),
-      items: barterItems(c, climateAt(c, s)).map(id => {
-        const have = count(s.bag, id, 'skip');
-        return { id, name: itemName(c, id), have, spare: s.locked.includes(id) ? 0 : Math.max(0, have - protectedQty(s, id)) };
-      }),
-      minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id), share: barterShare(c, s, id) })),
-    } : null,
     // Recipe cards on this counter today (§7.16.1): the Stall's daily two (home), a Market's city's climate cards (q(182)).
     cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, climateAt(c, s)) : []).map(id => {
       const page = cardPage(id), price = cardPrice(c, id) ?? 0, recipe = recipeById(c, page);

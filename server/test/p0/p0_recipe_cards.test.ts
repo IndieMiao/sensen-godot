@@ -71,7 +71,7 @@ describe('Recipe cards (§7.16.1)', () => {
   });
 });
 
-// q(182): a Market shelves its own city's climate cards, as its buy-back and barter do; the Stall stays the home's.
+// q(182): a Market shelves its own city's climate cards, as its buy-back does; the Stall stays the home's.
 describe('a Market sells the cards of the city it stands in (q(182))', () => {
   const SINGAPORE = 'gn-1880252';   // Tropical; San Francisco is Temperate
   const there = { space: 'outpost', place: `${SINGAPORE}~market0` };

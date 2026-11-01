@@ -12,6 +12,8 @@ import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
 import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
+import { gatherPointsOf } from './gather_points.js';
+import { catalogue, parseBbox, viewport } from './wild.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus, pinArea } from './home_city.js';
 import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
@@ -95,7 +97,24 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = stateOf(player, req.headers);
     // The generator's place details (SGODOT-280: ponds and outposts with their points and art) go out here, per city, and
     // never in the state view; the home city's hand-written places are in the client already.
-    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), preview: preview(c, s, cluster, clock(s.clock_ms)) } });
+    // v4q(4) (contract-c §9): the city's gathering points, the written city's too
+    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), gather: gatherPointsOf(c, cluster), preview: preview(c, s, cluster, clock(s.clock_ms)) } });
+  });
+
+  /** v4q(3) (contract-c §4): the open wild sites in the map's viewport, at most VIEWPORT_CAP, with what they are to the
+   * player (free, visited, Trip, a pass); none below the continent zoom. The catalogue's revision rides along. */
+  app.get('/v1/p0/wild', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const { bbox, zoom } = (req.query ?? {}) as { bbox?: unknown; zoom?: unknown };
+    // below the pins' zoom nothing is drawn: an empty list whatever the box (周瑜 on #616), before the box is read
+    const cat = catalogue(c);
+    if (!(Number(zoom) >= (cat?.minZoom ?? Infinity))) return reply.header('x-wild-revision', String(cat?.revision ?? 0)).send({ ok: true, sites: [], capped: false, total: 0 });
+    const box = parseBbox(bbox);
+    if (!box) return reply.code(400).send({ ok: false, code: 'bad_bbox' });
+    const s = stateOf(player, req.headers);
+    const got = viewport(c, s, box, Number(zoom), clock(s.clock_ms));
+    return reply.header('x-wild-revision', String(got.revision)).send({ ok: true, sites: got.sites, capped: got.capped, total: got.total });
   });
 
   /** The home pick page (SGODOT-303, q(160) ④): the open cities, and with ?q= the cities by name with why one is grey. */

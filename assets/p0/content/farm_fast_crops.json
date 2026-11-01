@@ -1,5 +1,5 @@
 {
-  "_note": "q(245), SGODOT-354, plan 5.2.7: fast crops stay outside crops[]. Only plot growth, bag stacks and Homestead Stall buy/sell see them. Fixed duration from watering; no growth cuts, fertilizer, Seed Saver, recipes, gifts, requests, barter or local notifications. Existing q(217) teaching Quick Radish is unchanged.",
+  "_note": "q(245), SGODOT-354, plan 5.2.7: fast crops stay outside crops[]. Only plot growth, bag stacks and Homestead Stall buy/sell see them. Fixed duration from watering; no growth cuts, fertilizer, Seed Saver, recipes, gifts, requests or local notifications. Existing q(217) teaching Quick Radish is unchanged.",
   "fast_crops": [
     {
       "id": "crop_cress",

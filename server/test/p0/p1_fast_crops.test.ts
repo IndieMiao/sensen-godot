@@ -209,12 +209,12 @@ describe('fast crops cannot escape their three allowed paths', () => {
     noteHarvested(cc, s, 'crop_cress', 1); expect(s.residents.res_nadia.req!.progress).toBe(0);
   });
 
-  it('rejects fast harvests for cooking, gifting, compost and regional barter without mutation', () => {
+  it('rejects fast harvests for cooking, gifting and compost without mutation', () => {
     for (const f of c.fast_crops!) {
       const s = ready(f.id); add(c, s, f.id, 10); s.facilities = [{ id: 1, kind: 'compost_bin', plot: -1, cell: [17, 16] }];
       const before = structuredClone(s);
       for (const cmd of [{ type: 'cook', items: [f.id] }, { type: 'gift', resident: 'res_pip', item: f.id },
-        { type: 'compost', item: f.id, qty: 1 }, { type: 'barter', item: f.id, mineral: 'stone', qty: 1 }] as P0Command[]) {
+        { type: 'compost', item: f.id, qty: 1 }] as P0Command[]) {
         expect(applyP0(c, s, cmd, T).ok).toBe(false); expect(s).toEqual(before);
       }
       expect(guidePred(c, s, { common_crop: 1 }, T)).toBe(false);   // not a soup-recovery crop either
