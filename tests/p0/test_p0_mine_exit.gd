@@ -47,7 +47,9 @@ func test_leaving_goes_back_to_the_map_at_the_mines_mouth() -> void:
 	var mine = auto_free(P0Mine.new())   # not in the tree: only its way out
 	mine.rt = rt
 	mine.mine_id = Fx.MINE
+	mine._mine_name = "Ironvale Vein"
 	mine.actor = auto_free(P0Actor.new())
+	assert_str(P0Runtime.route_of(mine)).is_equal("mine:" + Fx.MINE)   # the map's way back is this mine, not the farm
 	mine._leave()
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -55,9 +57,21 @@ func test_leaving_goes_back_to_the_map_at_the_mines_mouth() -> void:
 	assert_bool(AppRouter.top_instance() == map).is_true()
 	assert_bool(is_instance_valid(mine_layer)).is_false()
 	assert_array(map.wild_cards).is_equal([Fx.MINE])
+	assert_str(rt.ui._place_text).is_equal("Ironvale Vein")   # the chip names the mine (E6), not the homestead
 	mine._leave()   # once only
 	await get_tree().process_frame
 	assert_array(map.wild_cards).is_equal([Fx.MINE])
+
+## The place chip in the mine leaves the same way as the Entrance (P0Runtime._on_place_pressed → p0_leave).
+func test_the_place_chip_leaves_by_the_entrance() -> void:
+	var rt := await _runtime([])
+	var mine = auto_free(P0Mine.new())   # not in the tree: only its way out
+	mine.rt = rt
+	mine.mine_id = Fx.MINE
+	mine.actor = auto_free(P0Actor.new())
+	rt.world = mine
+	rt._on_place_pressed()
+	assert_bool(mine._leaving).is_true()
 
 ## A knock-out's way out (E6): back on the map the knock-out card first; its Close opens the mouth card (328:182498).
 func test_the_knock_out_card_then_the_mouth_card() -> void:

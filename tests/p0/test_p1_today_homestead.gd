@@ -57,14 +57,14 @@ func test_a_material_cooling_down_goes_to_still_to_go() -> void:
 	assert_str(str(lines[1])).is_equal("Homestead Lv2 · Timber 6 to go")
 	assert_str(str(_home(v).go)).is_equal("spot_grove")   # the only place Timber comes from, cooling down
 
-## 355 b1: no runs a day — while the Rock Pile cools, Stone goes to the mine, always open.
-func test_stone_goes_to_the_mine_while_the_rock_pile_cools() -> void:
+## 355 b1: the mines left the farm and have no Show target yet (亚瑟 on #629) — while the Rock Pile cools, Stone points
+## at the Rock Pile, not doable now.
+func test_stone_points_at_the_cooling_rock_pile() -> void:
 	var v := _view()
 	v.homestead.next.materials = [{"id": "stone", "name": "Stone", "need": 4, "have": 0}]
 	_cool(v, "spot_rock_pile")
-	assert_str(str(_home(v).go)).is_equal("mine")
-	assert_str(str(_lines(v)[0])).is_equal("Homestead Lv2 · Stone 4 to go")   # the mine is open: doable now
-	assert_bool(P0Logic.homestead_row(v).now).is_true()
+	assert_str(str(_home(v).go)).is_equal("spot_rock_pile")
+	assert_bool(P0Logic.homestead_row(v).now).is_false()
 
 func test_coins_short_points_at_the_stall_and_lights_nothing() -> void:
 	var v := _view()
@@ -112,8 +112,10 @@ func test_none_during_the_guide_but_later_levels_keep_the_row() -> void:
 	v.homestead.next.level = 3
 	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Homestead Lv3 · Timber 6 to go")
 
-func test_the_sign_spots_and_the_mine_are_shown_on_the_farm() -> void:
-	for go in ["sign", "spot_grove", "spot_rock_pile", "mine"]:
+## The mine mouth left the farm in 355 b1: no longer a homestead target.
+func test_the_sign_and_spots_are_shown_on_the_farm() -> void:
+	assert_bool(P0Ui.home_target("mine")).is_false()
+	for go in ["sign", "spot_grove", "spot_rock_pile"]:
 		assert_str(P0Ui.show_label(go, "home", true)).is_equal("Show")
 		assert_str(P0Ui.show_label(go, "pond", true)).is_equal("Show on map")
 		assert_str(P0Ui.map_target(go)).is_equal("home")

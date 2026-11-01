@@ -74,6 +74,7 @@ var _ground := {}           # a drop on the floor: ground id → its icon (Sprit
 var _ground_tried := {}     # ground id → true once a pick-up was sent while standing on it
 var _ground_seen := {}      # ground ids already floated (`Bag full · … left on the floor`)
 var _reset_seen := 0.0      # the new-day notice already toasted (view.mine.notice.at)
+var _mine_name := ""        # this mine's name (view.mine.at.name), kept for the map's chip once out
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 # Camera unification (用户 via 奕星, 2026-10-09; target 哪吒, 65.8 px at 360 × 800): the farm's size and pinch — zoom 1 is
@@ -145,9 +146,13 @@ func p0_space() -> String: return "mine"
 ## Pass and where the player is by it).
 func p0_place() -> String: return mine_id
 func p0_energy_verb() -> String: return str(rt.ui.fab_state().get("verb", "Mine"))
+## The place chip's way out (P0Runtime._on_place_pressed): as the Entrance, back to the map at this mine's mouth.
+func p0_leave() -> void: _leave()
 
 func _set_place(v: Dictionary) -> void:
 	var line := P0MaterialLogic.mine_place(v)
+	var name := str(P0MaterialLogic.mine_at(v).get("name", ""))
+	if name != "": _mine_name = name
 	rt.ui.set_place(line if line != "" else "Floor %d" % floor_n)
 
 static func _notice_at(v: Dictionary, kind: String) -> float:
@@ -793,6 +798,9 @@ func _leave(then := Callable()) -> void:
 	actor.set_input(Vector2.ZERO)
 	var site := mine_id
 	var tree := Engine.get_main_loop() as SceneTree
+	# back on the map the chip names this mine (E6: `Ironvale Vein · Day Pass 23h`; P0Travel adds the pass), not the
+	# homestead (return_to is `mine:<id>`, P0Runtime.route_of)
+	if _mine_name != "": rt.ui.set_place(_mine_name)
 	rt.leave_room()
 	_at_mouth.call_deferred(tree, site, then)
 

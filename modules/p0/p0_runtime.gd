@@ -369,24 +369,26 @@ func _root_is_world() -> bool:
 	return root != null and root.has_method("p0_surface")
 
 ## Where the player is while the map is up (MAP-1, §10.6.1): the place chip keeps naming it, and a tap on the chip
-## goes back there. Set by every world but the map: "farm" for the farm, its farmhouse and the mine (they are the
-## homestead), "pond:<id>", "outpost:<id>".
+## goes back there. Set by every world but the map: "farm" for the farm and its farmhouse (the homestead),
+## "pond:<id>", "outpost:<id>", "mine:<id>" (a wild site's mine, 355 b1: the map opens its mouth card).
 var return_to := "farm"
 
 ## The route back to world `w` from the map, as return_to holds it.
 static func route_of(w: Object) -> String:
 	var id := ""
 	match space_of(w):
-		"pond": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""
+		"pond", "mine": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # a mine is a wild site (355 b1)
 		"outpost":
 			var o = w.get("outpost")
 			id = str((o as Dictionary).get("id", "")) if o is Dictionary else ""
 	# A pond or outpost that does not say which one goes back to the farm (刘邦 on #92), never to "pond:".
 	return "%s:%s" % [space_of(w), id] if id != "" else "farm"
 
-## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
+## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1). A world with its own
+## way out takes it (p0_leave: the mine back at its mouth, 355 b1).
 func _on_place_pressed() -> void:
 	if is_instance_valid(world) and str(_call("p0_surface", [])) == "map": _call("p0_return", [return_to])
+	elif is_instance_valid(world) and world.has_method("p0_leave"): world.call("p0_leave")
 	else: leave_world()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
@@ -614,6 +616,10 @@ func _mine_opened(events: Array) -> void:
 		if str(e.get("kind", "")) == "mine_floor" and str(e.get("mine", "")) == _entering_mine:
 			var id := _entering_mine
 			_entering_mine = ""
+			# in the mine already for the server's reads while the scene loads: a timed read with space=map in those frames
+			# would take the player out again (notePresence; 亚瑟 on #629). The scene's attach sets the same.
+			session.space = "mine"
+			session.place = id
 			AppRouter.open_instance(MINE_SCENE, {"mine": id, "floor": int(e.get("floor", 1))})
 			return
 

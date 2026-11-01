@@ -58,16 +58,17 @@ func _plain(src: Dictionary) -> Dictionary:
 
 func test_material_sources_name_the_spot_or_the_mine_type() -> void:
 	var v := _view()
-	# 355 b1: a mine type's mains (world_gen wild.mines), by the map's word — a quarry gives copper, clay and rock salt
-	assert_that(_plain(P0MaterialLogic.material_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarry", "go": "mine"})
+	# 355 b1: a mine type's mains (world_gen wild.mines), by the map's word — a quarry gives copper, clay and rock salt;
+	# no Show for a mine until C gives the nearest mouth (亚瑟 on #629)
+	assert_that(_plain(P0MaterialLogic.material_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarry", "go": ""})
 	assert_that(_plain(P0MaterialLogic.material_source(v, "wood"))).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
 	# Clay Bank opens at Homestead Lv2 (this view has no spot states, so the content's gate counts): open sources first (q(65)).
-	assert_that(_plain(P0MaterialLogic.material_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank from Homestead Lv2", "go": "mine"})
-	assert_that(_plain(P0MaterialLogic.material_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarry", "go": "mine"})
+	assert_that(_plain(P0MaterialLogic.material_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank from Homestead Lv2", "go": ""})
+	assert_that(_plain(P0MaterialLogic.material_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarry", "go": ""})
 	# Not materials: bait also comes from the tackle shop, seeds from the stall; the other rules say those.
 	assert_that(P0MaterialLogic.material_source(v, "bait_worm")).is_empty()
 	assert_that(P0MaterialLogic.material_source(v, "seed_radish")).is_empty()
-	assert_that(_plain(P0Logic.need_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarry", "go": "mine"})
+	assert_that(_plain(P0Logic.need_source(v, "copper_ore"))).is_equal({"text": "Copper Ore · Quarry", "go": ""})
 
 # --- The drawer ---
 

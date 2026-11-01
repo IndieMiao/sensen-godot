@@ -1801,9 +1801,9 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
 	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
 
-## Where a Homestead material's Show goes (q(255) ②): the spot yielding it that is open and ready; else the mine when it
-## yields it (every rock gives Stone; the rest are a quarry's or a vein's mains, P0MaterialLogic.mine_types_yielding);
-## else the open spot cooling down. {go, now}: now = it can be gathered there at once.
+## Where a Homestead material's Show goes (q(255) ②): the spot yielding it that is open and ready; else the open spot
+## cooling down. A mine's material has no target yet (355 b1: the mines left the farm; C will give the nearest mouth).
+## {go, now}: now = it can be gathered there at once.
 static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
 	var c := content()
 	var spots: Array = []
@@ -1812,8 +1812,7 @@ static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
 		if not y.is_empty() and str(y[0][0]) == id and bool(sp.get("open", false)): spots.append(sp)
 	for sp in spots:
 		if bool(sp.get("ready", false)): return {"go": str(sp.id), "now": true}
-	var mine_yields := id == "stone" or not P0MaterialLogic.mine_types_yielding(id).is_empty()
-	if mine_yields: return {"go": "mine", "now": true}   # 355 b1: no runs a day, a mine is always there to go down
+	# 355 b1: the mines are wild sites — no Show target until C gives the nearest mouth (亚瑟 on #629); not "now"
 	if not spots.is_empty():
 		spots.sort_custom(func(a, b): return float(a.get("ready_in", 0)) < float(b.get("ready_in", 0)))
 		return {"go": str(spots[0].id), "now": false}

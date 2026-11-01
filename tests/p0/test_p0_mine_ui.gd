@@ -144,23 +144,25 @@ func test_status_line_set_before_ready_is_kept() -> void:
 	await await_idle_frame()
 	assert_str(early._status_text.text).is_equal("Rocks 0/6")   # applied from _pending in _ready
 
-## COMBAT-ELITE (不知火舞 on 288): the HP card has its coral heart (HPBar 1124:79402); the status line sits clear of the
-## card on its right, and hides while the elite's card shows (the card names the elite and would cover half of it).
-func test_the_hp_card_has_its_heart_and_the_elite_card_hides_the_status_line() -> void:
-	ui.set_status_line("Elite Slime")
+## COMBAT-ELITE (不知火舞 on 288): the HP card has its coral heart (HPBar 1124:79402); the status line sits under the card,
+## left-aligned with it in the guard card's place (不知火舞 on #629), and hides while a guard's card shows there.
+func test_the_hp_card_has_its_heart_and_the_guard_card_hides_the_status_line() -> void:
+	ui.set_status_line("Iron Slime King")
 	ui.set_hp(60, 100)
 	await await_idle_frame()
 	var heart := ui.hp_bar().find_child("Heart", true, false) as TextureRect
 	assert_bool(heart.visible).is_true()
 	assert_str(heart.texture.resource_path).is_equal("res://assets/p0/icons/heart.svg")
 	assert_object(heart.modulate).is_equal(Color.WHITE)   # its own coral, no tint
-	var hp_right := ui.hp_bar().position.x + ui.hp_bar().get_combined_minimum_size().x
-	assert_float(ui._status.position.x).is_greater(hp_right)   # beside the card, not under it
+	var hp_bottom := ui.hp_bar().position.y + ui.hp_bar().get_combined_minimum_size().y
+	assert_float(ui._status.position.x).is_equal_approx(ui.hp_bar().position.x, 0.5)   # left-aligned with the card
+	assert_float(ui._status.position.y).is_greater_equal(hp_bottom)                    # under it, not beside it
 	assert_bool(ui._status.visible).is_true()
-	ui.set_hp(60, 100, {"name": "Elite Slime", "hp": 21, "max": 36})
+	ui.set_hp(60, 100, {"name": "Iron Slime King", "hp": 96, "max": 160})
 	assert_bool(ui.elite_bar().visible).is_true()
+	assert_float(ui.elite_bar().position.y).is_equal_approx(ui._status.position.y, 0.5)   # the card in the line's place
 	assert_bool(ui._status.visible).is_false()
-	ui.set_status_line("Elite Slime")   # the mine sets it every frame: it stays hidden under the card
+	ui.set_status_line("Iron Slime King")   # the mine sets it every frame: it stays hidden under the card
 	assert_bool(ui._status.visible).is_false()
-	ui.set_hp(60, 100)   # the elite down: the line is back
+	ui.set_hp(60, 100)   # the guard down: the line is back
 	assert_bool(ui._status.visible).is_true()

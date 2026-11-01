@@ -314,6 +314,8 @@ static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> V
 		"bag_full":   # what lies on the floor stays there (v4q(5) ⑫): its float said so when it fell
 			if type == "mine_pick": return ""
 			return BAG_FULL if type.begins_with("mine_") else "Bag full · free a slot first"
+		"not_here", "unknown_place":   # mine_enter away from its site, or a site gone: the mouth card shows why (C)
+			return ""
 		"not_open":   # a mine's type not open yet, or a vein before its Homestead level (v4 2.7)
 			return "Homestead Lv%d" % int(detail.homestead) if detail.has("homestead") else "Not open yet"
 		"homestead_level":
@@ -424,16 +426,19 @@ static func material_source(view: Dictionary, id: String) -> Dictionary:
 			"open": bool(sp.get("open", gate <= level))}
 		(first if gate <= 1 else gated).append(src)
 	var mines := mine_types_yielding(id)
-	if id == "stone": first.append({"name": "the mine", "go": "mine", "gate": 1, "open": true})   # every rock gives Stone (Li Bai on 228)
+	# no Show target for a mine yet: the mines left the farm (355 b1); C will give the nearest mouth (亚瑟 on #629)
+	if id == "stone": first.append({"name": "the mine", "go": "", "gate": 1, "open": true})   # every rock gives Stone (Li Bai on 228)
 	else:
-		for t in mines: first.append({"name": str(t.word), "go": "mine", "gate": 1, "open": true})
+		for t in mines: first.append({"name": str(t.word), "go": "", "gate": 1, "open": true})
 	var all: Array = first + gated
 	if all.is_empty(): return {}
 	var ordered: Array = all.filter(func(s): return s.open) + all.filter(func(s): return not s.open)
 	var parts: Array = ordered.map(func(s): return s.name if s.open else "%s from Homestead Lv%d" % [s.name, s.gate])
 	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
 	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
-	return {"text": text, "go": str(ordered[0].go)}
+	# Show: the first open source with somewhere to go (a mine has none yet, 355 b1), else the first source's
+	var showable: Array = ordered.filter(func(s): return s.open and str(s.go) != "")
+	return {"text": text, "go": str(showable[0].go) if not showable.is_empty() else str(ordered[0].go)}
 
 ## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
 ## mine content opens (content.mine.types: quarry and vein in the first batch), in that order — [{type, word}], the

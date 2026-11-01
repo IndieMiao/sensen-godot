@@ -226,12 +226,13 @@ func test_material_sources_name_the_spots_and_the_mine() -> void:
 	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
 	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Rock Pile · or the mine", "go": "spot_rock_pile"})
 	assert_that(_plain(P0Logic.home_source(v, "fiber"))).is_equal({"text": "Reeds · Reed Bank", "go": "spot_reed_bank"})
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank from Homestead Lv2", "go": "mine"})
-	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarry", "go": "mine"})   # 355 b1: a quarry's mains
+	# 355 b1: a quarry's mains; no Show for a mine until C gives the nearest mouth (亚瑟 on #629)
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank from Homestead Lv2", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarry", "go": ""})
 	assert_that(_plain(P0Logic.home_source(v, "bait_worm"))).is_equal({"text": "Worm Bait", "go": ""})   # a side yield, not a material
 	# Lv2 opens the Clay Bank: the gate goes, the order stays (Li Bai's example).
 	v.gather.spots[3].open = true
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank", "go": "mine"})
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank", "go": "spot_clay_bank"})
 	# Coins and skills keep their own lines.
 	assert_str(str(P0Logic.home_source(v, "coins").go)).is_equal("stall")
 	assert_str(str(P0Logic.home_source(v, "skills").go)).is_equal("")
