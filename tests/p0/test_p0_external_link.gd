@@ -11,6 +11,7 @@ func before_test() -> void:
 	_asked_before = ExternalLink.asked.size()
 
 func after_test() -> void:
+	P0Runtime.free_instance_for_tests()   # the Update screen's test brought one up (周瑜 on #608)
 	for f in [STORE, TIPS]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
 	assert_int(ExternalLink.shell_opens).override_failure_message("a test opened the system browser").is_equal(0)
 
@@ -25,10 +26,11 @@ func _ui() -> P0Ui:
 	await await_idle_frame()
 	return ui
 
-## The project's own code has no other door: a direct OS.shell_open anywhere but ExternalLink fails here.
+## The project's own code has no other door: shell_open anywhere but ExternalLink — `OS.shell_open(`, with a space, or
+## by name through call() — fails here.
 func test_only_external_link_calls_shell_open() -> void:
 	var found: Array = []
-	for root in ["res://modules", "res://scenes", "res://tools"]:
+	for root in ["res://modules", "res://scenes", "res://tools", "res://assets"]:
 		_scan(root, found)
 	assert_array(found).is_empty()
 
@@ -37,7 +39,7 @@ func _scan(dir: String, found: Array) -> void:
 	for f in DirAccess.get_files_at(dir):
 		var path := dir.path_join(f)
 		if not f.ends_with(".gd") or path == "res://modules/ui/external_link.gd": continue
-		if FileAccess.get_file_as_string(path).contains("OS.shell_open("): found.append(path)
+		if FileAccess.get_file_as_string(path).contains("shell_open"): found.append(path)
 
 func test_a_test_run_is_quiet() -> void:
 	assert_bool(ExternalLink.quiet()).is_true()   # gdUnit's runner is the main loop
