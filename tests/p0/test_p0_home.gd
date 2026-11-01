@@ -296,7 +296,13 @@ func test_a_refused_sow_on_a_full_field_says_the_plots() -> void:
 	v["homestead"] = {"level": 1}
 	rt.session.view = v
 	rt._on_refused("plots_full", {"used": 8, "cap": 8}, {"type": "sow", "plot": 8, "seed": "seed_lettuce"})
-	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8 · Homestead Lv2 adds 2")
+	# a line too long breaks at its « · », the dot dropped as every such break (UiKit.break_at_dot, 不知火舞 on #201 / #624)
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHomestead Lv2 adds 2")
+	# the grey Sow key's tap says the same
+	rt.ui.set_action(P0Logic.fields_full_action({"homestead": {"level": 1}, "garden": {"fields": {"used": 8, "cap": 8}}}))
+	rt.ui.clear_toast()
+	rt.ui._fab_pressed()
+	assert_str(rt.ui.toast_text()).is_equal("Plots 8/8\nHomestead Lv2 adds 2")
 
 ## A refused upgrade (后裔 on #150): away from home it says what HOME-1's grey button says; when the fresh view shows no gap
 ## any more (it changed under the tap) the server's detail names it instead of an empty toast.

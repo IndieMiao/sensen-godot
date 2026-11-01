@@ -182,7 +182,7 @@ func test_b_page_reuses_settings_layout_and_only_test_has_return_action() -> voi
 
 class RefusalUi extends P0Ui:
 	var errors: Array = []
-	func toast_error(message: String, _key := "") -> void: errors.append(message)
+	func toast_error(message: String, _key := "", _break := false) -> void: errors.append(message)
 
 func test_only_test_first_city_pick_can_return_directly_without_confirmation() -> void:
 	var ui: P0Ui = auto_free(P0Ui.new())
