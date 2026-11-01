@@ -64,13 +64,16 @@ function climateMet(c: P0Content, h: Homed, t: RequestTemplate): boolean {
  * home, q(128)'s four and the two out-of-zone ones), which stay on the home city's board.
  */
 export function eligible(c: P0Content, s: P0State, board: BoardId, city = homeOf(c, s)): string[] {
-  const home = city === homeOf(c, s), h = asHome(c, s, city);
-  return c.requests.boards[board].templates.filter(id => {
-    const t = c.requests.templates[id];
-    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, h, t) && (home || !t.home_only)
-      && (!t.need.regional || regionalPool(c, h, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need, h))
-      && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
-  });
+  return c.requests.boards[board].templates.filter(id => drawable(c, s, id, board, city));
+}
+
+/** One template can be drawn now for that board in that city (eligible); a keeper's local request (q(272)) asks it as
+ * the city's Market Board would. */
+export function drawable(c: P0Content, s: P0State, id: string, board: BoardId, city = homeOf(c, s)): boolean {
+  const home = city === homeOf(c, s), h = asHome(c, s, city), t = c.requests.templates[id];
+  return !!t && t.enabled !== false && gateMet(c, s, t) && climateMet(c, h, t) && (home || !t.home_only)
+    && (!t.need.regional || regionalPool(c, h, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need, h))
+    && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
 }
 
 /** An explore template can be drawn: one of the board's city's outposts to send the player to (Stamp Run), or a city elsewhere with one. */
@@ -161,13 +164,18 @@ export function lockedTemplate(c: P0Content, s: P0State, board: BoardId, city = 
   return { template, gate: c.requests.templates[template].gate };
 }
 
-type Rand = () => number;
+export type Rand = () => number;
 
 /** mulberry32 seeded from the slot's identity: the same slot at the same time always draws the same request. A Market
  * Board elsewhere (q(270)) adds its city, so two cities' boards never draw alike; the home boards keep their v5 seed. */
 function slotRand(s: P0State, board: BoardId, slot: number, at: number, away = ''): Rand {
+  return seededRand(`${s.player}:${board}${away ? `@${away}` : ''}:${slot}:${at}`);
+}
+
+/** mulberry32 seeded from a key's FNV-1a hash: its own stream, never shifting the fishing or cooking rolls. */
+export function seededRand(key: string): Rand {
   let h = 2166136261;
-  for (const ch of `${s.player}:${board}${away ? `@${away}` : ''}:${slot}:${at}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  for (const ch of key) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
   let a = h | 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -194,13 +202,19 @@ function growable(c: P0Content, s: P0State): string[] {
 function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at: number, city = homeOf(c, s)): BoardRequest | null {
   const open = eligible(c, s, board, city);
   if (!open.length) return null;
-  const away = city === homeOf(c, s) ? '' : city, h = asHome(c, s, city);
+  const away = city === homeOf(c, s) ? '' : city;
   const draw = slotRand(s, board, slot, at, away);
   const taken = slotsOf(c, s, board, city).map(sl => sl.req?.template);
   const fresh = open.filter(t => !taken.includes(t));
   const pool = fresh.length ? fresh : open;
   const template = pool[Math.floor(draw() * pool.length)];
-  const t = c.requests.templates[template];
+  return requestFor(c, s, template, draw, board, city, `${template}-${board}${slot}-${away ? `${away}-` : ''}${at.toString(36)}`, at);
+}
+
+/** The request one template makes in a city — its items and quantity from the draw's stream, after the template's own
+ * pick (a board slot's, or a keeper's local request, q(272)); null when an explore one finds nowhere to send the player. */
+export function requestFor(c: P0Content, s: P0State, template: string, draw: Rand, board: BoardId, city: string, id: string, at: number): BoardRequest | null {
+  const h = asHome(c, s, city), t = c.requests.templates[template];
   let items: string[] = [];
   let visit: BoardRequest['visit'];
   if (t.need.kind === 'visit' && t.need.visit && t.need.visit.where !== 'same_city') {   // cross-city: one city, its outpost
@@ -227,7 +241,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     items = crops.slice(0, t.need.distinct ?? 1);
   }
   return {
-    id: `${template}-${board}${slot}-${away ? `${away}-` : ''}${at.toString(36)}`, template, items, rarity: t.need.rarity,
+    id, template, items, rarity: t.need.rarity,
     ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: visit ? 1 : qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open', ...(visit ? { visit } : {}),
     ...(t.need.where ? { where: t.need.where } : {}),
@@ -375,10 +389,12 @@ export function findBoardRequest(c: P0Content, s: P0State, id: string): { board:
   return null;
 }
 
-/** Requests tracked now, every board of every city and the residents' together (track_max is the account's). */
+/** Requests tracked now, every board of every city, the residents' and the keepers' local ones (q(272)) together
+ * (track_max is the account's). */
 export function tracked(c: P0Content, s: P0State): number {
   return boardsOf(c, s).reduce((n, b) => n + b.slots.filter(sl => sl.req?.status === 'accepted').length, 0)
-    + Object.values(s.residents).filter(r => r.req).length;
+    + Object.values(s.residents).filter(r => r.req).length
+    + Object.values(s.locals ?? {}).reduce((n, l) => n + l.slots.filter(sl => sl.req.status === 'accepted').length, 0);
 }
 
 /** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */

@@ -9,8 +9,9 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
+import { cityName, giverOf, pruneCities, settleLocals, shownLocals } from './locals.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
-import { floorPrice, haveFor, matches, pick } from './requests.js';
+import { bonusCap, floorPrice, haveFor, matches, pick } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
@@ -43,7 +44,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
   expireGiftMeals(s);
+  pruneCities(c, s, now);   // q(272) ⑪, as the next command
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleLocals(c, s, now);   // q(272): the same local requests the next command finds
   settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
   settleMine(c, s, now);
   settleParcels(c, s, now);
@@ -113,6 +116,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     // q(270): `market` is the board of the city the player is in (the home city's where that city has no market square);
     // `elsewhere`, the requests tracked on other cities' boards, each with where it is handed in
     boards: { stall: boardView(c, s, 'stall', now), market: boardView(c, s, 'market', now, marketCity(c, s)), elsewhere: elsewhereView(c, s, now) },
+    // q(272): the keepers' local requests — today's in the city the player is in and the tracked ones elsewhere; a client
+    // without it shows none
+    locals: localsView(c, s, now),
     gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
@@ -372,7 +378,7 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
   const city = s.travel?.here ?? homeOf(c, s);
   const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
     : s.day.quota[quotaKey(c, q, city)] ?? 0;
-  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
+  return { used, cap: q === 'request_bonus' ? bonusCap(c, s) : c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
@@ -467,6 +473,15 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
     accepted_at: r.status === 'accepted' ? r.accepted_at ?? null : null,   // q(143); null on saves from before it
     expires_in: r.status === 'open' && r.id !== c.requests.tutorial.id ? Math.max(0, r.drawn_at + c.requests.expire_h * 3_600_000 - now) : null,
   };
+}
+
+/** q(272): each local request as a board's, with the keeper giving it (outpost, name plate, role) and its city; an
+ * untracked one goes at the day's end (the next player day draws anew). */
+function localsView(c: P0Content, s: P0State, now: number) {
+  const here = s.travel?.here || homeOf(c, s);
+  return shownLocals(c, s, now).map(({ city, req, place }) => ({ ...requestView(c, s, req, now),
+    expires_in: req.status === 'open' ? untilRollover(c, s, now) : null,
+    place, ...giverOf(c, city, place), cluster: city, city: cityName(c, city), here: city === here }));
 }
 
 /** q(270): the city whose Market Board the player sees — the one they are in, or home where that city has no market square. */

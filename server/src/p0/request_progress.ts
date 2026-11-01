@@ -19,8 +19,9 @@ export interface TakenCount { qty: number; have: number; items?: Record<string, 
 /** What each taken request counts now, by request id. */
 export function takenCounts(c: P0Content, s: P0State): Map<string, TakenCount> {
   const out = new Map<string, TakenCount>();
-  for (const { slots } of boardsOf(c, s)) for (const sl of slots) {
-    const r = sl.req;
+  // the boards' tracked requests and the keepers' local ones (q(272)), each a board request
+  const taken = [...boardsOf(c, s).flatMap(b => b.slots.map(sl => sl.req)), ...Object.values(s.locals ?? {}).flatMap(l => l.slots.map(sl => sl.req))];
+  for (const r of taken) {
     if (r?.status !== 'accepted' || r.kind === 'visit') continue;
     if (r.items.length > 1) {   // Market Basket: N of each
       const items: Record<string, number> = {};
