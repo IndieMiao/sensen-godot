@@ -224,7 +224,7 @@ export interface P0Content {
     stoves?: [number, number][];              // stoves in the kitchen: Lv1 1, Lv4 2, Lv8 3 (absent = 1)
     warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
-    plots?: [number, number][];               // plots the homestead has: Lv1 30, Lv3 40 (P1 q(59) §1.1; absent = P0's start)
+    plots?: [number, number][];               // beds the homestead has by level: Lv1 8 … Lv17 41 (355 grid; absent = P0's start)
     perennial_slots?: { base: number; per_level: number; max: number };   // trees that may stand: 1 + level, at most 8
     sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
     // Barter (§8.4.5, SGODOT-282): at the Market Square keeper, `give` of this climate's regional crops or fish for 1
