@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+<g transform="scale(2)">
+<!-- iron_ore (355 v4): copper_ore's rock with blue-grey iron flecks, so the two read apart -->
+<path d="M7 24L4 17L9 10L18 7L26 12L28 19L24 25L7 24Z" fill="#A9B0AC"/>
+<path d="M9 10L18 7L26 12L18 13Z" fill="#C4C2BA"/>
+<path d="M11.5 19.5L9 16.5L11 13L15 13.5L16 17Z" fill="#5E6F82"/>
+<path d="M18 15.5L17 12.5L20 11L22.5 13L21.5 15.5Z" fill="#6F8296"/>
+<path d="M18.5 23L17.5 19.5L21 18L23.5 20.5L22 23Z" fill="#53637A"/>
+</g>
+</svg>
