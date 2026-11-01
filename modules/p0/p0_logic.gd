@@ -1584,9 +1584,12 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 		var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
 		var full := sys_requests_full(view)
 		for r in PinReason.taken(view):
-			# a board request once today's 6 are done (q(270), 不知火舞): `Dusk Haul · Limit reached · 9h 12m`, nothing to press
+			# a board request once today's 6 are done (q(270), 不知火舞): `Dusk Haul · Limit reached · 9h 12m`, nothing to press;
+			# another city's ends with its city as its other rows do (q(270) ⑥): `… · 9h 12m · Hayward`
 			if bool(r.ready) and full and r.has("away"):
-				deliveries.append(_row("%s · Limit reached · %s" % [str(r.title), span(float(sys.get("resets_in", 0)))], "board", ""))
+				var capped := "%s · Limit reached · %s" % [str(r.title), span(float(sys.get("resets_in", 0)))]
+				if str(r.get("city", "")) != "": capped += " · " + str(r.city)
+				deliveries.append(_row(capped, "board", ""))
 			elif bool(r.ready):
 				var hand := _row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id))
 				if str(r.get("city", "")) != "": hand.board_request = str(r.id)   # q(270): the row opens its sheet (Drop)

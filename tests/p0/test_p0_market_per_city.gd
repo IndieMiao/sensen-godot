@@ -73,3 +73,13 @@ func test_the_home_board_shown_in_a_town_without_a_market_is_away() -> void:
 	assert_str(str(t[0].city)).is_equal("")   # home's own hand-in never names its city
 	v.travel.here = "gn-5391959"
 	assert_bool(bool(PinReason.taken(v)[0].away)).is_false()
+
+## 不知火舞 on #606: once today's 6 are done another city's hand-in still ends with its city; home's does not.
+func test_the_limit_reached_row_of_another_citys_request_ends_with_its_city() -> void:
+	var away := _req("dusk-hay", {"ready": true, "have": 4}).merged({"cluster": "gn-5355933", "city": "Hayward", "home": false,
+		"deliver_place": "gn-5355933~market0", "deliver_name": "Acorn Market Square"}, true)
+	var home := {"title": "Market Board", "home": true, "deliver_place": "sh_market_1", "slots": [_req("dusk-home", {"title": "Fresh Greens", "ready": true, "have": 4})]}
+	var v := _view(home, [away], 6)
+	v.firsts = ["harvest:crop_radish", "catch:fish_crucian", "cook:dish_grilled_crucian"]
+	var lines: Array = P0Logic.today_rows(v).map(func(r): return str(r.line))
+	assert_array(lines).contains(["Dusk Haul · Limit reached · 9h 12m · Hayward", "Fresh Greens · Limit reached · 9h 12m"])
