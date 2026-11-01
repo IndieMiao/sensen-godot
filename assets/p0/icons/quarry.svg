@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- quarry (355 v4, wild shallow pit): a dug-out pit with stepped walls and loose stone -->
+  <ellipse cx="32" cy="38" rx="28" ry="17" fill="#C9A27A"/>
+  <ellipse cx="32" cy="38" rx="22" ry="12" fill="#A9825C"/>
+  <path d="M12 38c2-7 10-11 20-11s18 4 20 11c-3-4-11-7-20-7s-17 3-20 7z" fill="#8A6648"/>
+  <ellipse cx="32" cy="41" rx="14" ry="6.5" fill="#7A5A3E"/>
+  <path d="M22 41l4-5 7 1 3 4-6 3z" fill="#A9B0AC"/>
+  <path d="M35 43l3-4 5 1 1 3-5 2z" fill="#8A918C"/>
+  <path d="M26 36l7 1-4 3z" fill="#C4C2BA"/>
+  <path d="M46 22l6-4 5 3-2 6-6 1z" fill="#A9B0AC"/>
+  <path d="M8 26l4-4 5 2-1 4-5 1z" fill="#8A918C"/>
+</svg>
