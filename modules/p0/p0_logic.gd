@@ -674,7 +674,8 @@ static func fields_full_action(view: Dictionary) -> Dictionary:
 		if int(step[0]) <= level: now = int(step[1])
 		elif int(step[0]) == level + 1: next = int(step[1])
 	if now >= 0 and next > now: toast += " · Homestead Lv%d adds %d" % [level + 1, next - now]
-	return {"icon": "sow", "verb": "Sow", "sub": label, "enabled": false, "amber": false, "cmd": {}, "need": 0, "toast": toast}
+	return {"icon": "sow", "verb": "Sow", "sub": label, "enabled": false, "amber": false, "cmd": {}, "need": 0, "toast": toast,
+		"toast_break": true}   # too long for a line, it breaks at its « · » (不知火舞 on #624)
 
 ## Harvest All's row (q(118) ④): from Farming Lv9 (content farming.conveniences), the plot in front and every other ripe
 ## annual on its garden row (trees are picked one by one); [] below that level.

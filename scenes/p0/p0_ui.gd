@@ -944,7 +944,9 @@ func _fab_pressed() -> void:
 	if _modal != null: return
 	if not _fab_state.get("enabled", false):
 		if bool(_fab_state.get("creel_full", false)): toast_creel_full()   # FISH-4 / q(83): the greyed Cast · Creel full
-		elif _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		# SGODOT-231: unavailable keys say why (LOCK-10); one marked toast_break breaks a line too long at a « · »
+		# (UiKit.break_at_dot; the full field's `Plots 8/8 · Homestead Lv2 adds 2`, 不知火舞 on #624)
+		elif _fab_state.has("toast"): toast(str(_fab_state.toast), 0.0, bool(_fab_state.get("toast_break", false)))
 		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
@@ -1692,6 +1694,9 @@ func _aim_toast() -> void:
 		_toasts.anchor_above(_toast_over)
 		if _toasts.get_parent() == root: root.move_child(_toasts, -1)
 		return
+	if placing():   # placement: over its caption pill (or its card), never on it (不知火舞 on #624)
+		_toasts.anchor_above(_place_bar.toast_dock())
+		return
 	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
@@ -1720,14 +1725,14 @@ func _aim_toast() -> void:
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
-func toast_error(text: String, action := "") -> void:
+func toast_error(text: String, action := "", break_at_dot := false) -> void:
 	if not _toasts: return
 	if _cover_up:
 		_cover_toast = {kind = "error", text = text, action = action}
 		return
 	_toast_bag_tab = ""
 	_aim_toast()
-	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.ERROR, action)
 
 ## FISH-4 / q(83): a full creel says one sentence — the badge's tap, the greyed Cast · Creel full and the server's
 ## creel_full alike — and its Open bag › opens the bag on its Fish page.

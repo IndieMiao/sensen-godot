@@ -1205,7 +1205,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			var cur := session.current()
 			var at := {"homestead": cur.get("homestead", {}),
 				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
-			ui.toast_error(str(P0Logic.fields_full_action(at).toast))
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast), "", true)   # broken at a « · » as the grey key's
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":
