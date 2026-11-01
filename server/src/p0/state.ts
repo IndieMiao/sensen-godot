@@ -145,11 +145,15 @@ export interface P0Day {
   bj_net?: number;                      // SGODOT-351: the card room's net coins today, hands begun today only — the observation log's, no economy's
 }
 
-/** The save version this server writes. Older saves are brought up to it at load (upgradeState). */
-export const SAVE_VERSION = 6;
+/** The save version this server writes. v7 is SGODOT-355's first batch: the save is cleared at that release (plan v4
+ * conclusion 20, q row B), so a save older than v7 is not brought up — the store takes it as no save at all (store.ts).
+ * upgradeState still fills a v7 save's optional fields. */
+export const SAVE_VERSION = 7;
+/** The weapon a new save holds (v7, 355 G; 周瑜's contract v0.1: weapon ids are weapon_*, the G PR adds the item). */
+export const START_WEAPON = 'weapon_wooden_sword';
 
 export interface P0State {
-  v: 6;
+  v: 7;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -187,7 +191,10 @@ export interface P0State {
   cookbook: string[];            // known recipe pages (Tasted or Discovered)
   book: CookbookBook;
   requests: Request[];
-  gear: { rods: string[]; rod: string; hoes: string[]; hoe: string; picks: string[]; pick: string };   // Tools & Gear: owned and equipped rod / hoe / pickaxe (no bag slots)
+  gear: { rods: string[]; rod: string; hoes: string[]; hoe: string; picks: string[]; pick: string;   // Tools & Gear: owned and equipped rod / hoe / pickaxe (no bag slots)
+    weapons: string[]; weapon: string };   // v7 (355 G): the weapon slot, owned and held; a new save has the Wooden Sword
+  kills: Record<string, number>;   // v7 (355 E/F, plan §3.6): monsters beaten, by kind (the second batch's bestiary reads it)
+  guard_firsts: Record<string, { at: number; mine: string; floor: number }>;   // v7: each guard kind's first fall to this player
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
@@ -220,7 +227,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
   const travel = freshTravel(c, opts.pending);
   const market: BoardSlot[] = [];   // the home city's Market Board, `boards.market` and `markets[home]` one array (q(270))
   return {
-    v: 6, player, created_at: now, clock_ms: 0,
+    v: 7, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
@@ -239,7 +246,9 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     cast: null, stove: null, queue: null, burners: [], cabinet: [],
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
     requests: pondCatch ? [{ ...c.requests.tutorial, status: 'open' }] : [],
-    gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
+    gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining,
+      weapons: [START_WEAPON], weapon: START_WEAPON },
+    kills: {}, guard_firsts: {},
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
@@ -267,7 +276,12 @@ export function tutorialRequest(c: P0Content, now: number): BoardRequest {
 export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0State {
   const s = raw as P0State & { v: number };
   s.requests ??= [{ ...c.requests.tutorial, status: 'open' }];
-  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining };
+  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining,
+    weapons: [START_WEAPON], weapon: START_WEAPON };
+  s.gear.weapons ??= [START_WEAPON];   // v7's own fields, filled on any save that lacks them (a test's hand-made one)
+  s.gear.weapon ??= START_WEAPON;
+  s.kills ??= {};
+  s.guard_firsts ??= {};
   if (s.v < 2) {
     s.fishing ??= { casts: 0, bites: 0, caught: {}, seen: [] };
     s.cast ??= null;

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- abyss (355 v4, mine type not open yet): a deep shaft with a rope ladder going down into the dark -->
+  <ellipse cx="32" cy="36" rx="28" ry="18" fill="#8A918C"/>
+  <ellipse cx="32" cy="36" rx="22" ry="13" fill="#3E4642"/>
+  <ellipse cx="32" cy="39" rx="15" ry="8" fill="#1F2422"/>
+  <path d="M10 33c3-6 12-10 22-10s19 4 22 10c-4-4-12-7-22-7s-18 3-22 7z" fill="#5A635E"/>
+  <path d="M27 18v26M37 18v26" stroke="#C9A27A" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M27 24h10M27 30h10M27 36h10M27 42h10" stroke="#B98A5E" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M24 16h16" stroke="#8E5A37" stroke-width="4" stroke-linecap="round"/>
+</svg>
