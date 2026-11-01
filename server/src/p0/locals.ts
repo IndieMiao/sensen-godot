@@ -35,13 +35,14 @@ export function givers(c: P0Content, city: string): { place: string; role: strin
     : roles[o.role] ? [{ place: o.id, role: o.role, templates: roles[o.role] }] : []);
 }
 
-/** The keeper giving a request: name plate and role as the outpost shows them (a generated city's, or a hand-written
- * one's from p0_outposts.json); empty where the city's places are not known. */
-export function giverOf(c: P0Content, city: string, place: string): { giver: string; giver_role: string } {
-  const gen = cityPlaces(c, city)?.detail.outposts.find(o => o.id === place)?.keeper;
-  const own = (c.outposts ?? []).find(o => o.id === place)?.keeper;
-  const k = gen ?? own;
-  return { giver: k?.name ?? '', giver_role: k?.role ?? '' };
+/** The keeper giving a request: name plate and role as the outpost shows them, and the outpost's name (a generated
+ * city's, or a hand-written one's from p0_outposts.json) — Deliver to names it from anywhere, the client not knowing
+ * that city's places at home; empty where the city's places are not known. */
+export function giverOf(c: P0Content, city: string, place: string): { giver: string; giver_role: string; place_name: string } {
+  const gen = cityPlaces(c, city)?.detail.outposts.find(o => o.id === place);
+  const own = (c.outposts ?? []).find(o => o.id === place);
+  const k = gen?.keeper ?? own?.keeper;
+  return { giver: k?.name ?? '', giver_role: k?.role ?? '', place_name: gen?.name ?? own?.name ?? '' };
 }
 
 /** A template a keeper may give in that city: as the city's Market Board could draw it, never an explore one; a fish one

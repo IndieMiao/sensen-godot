@@ -87,7 +87,9 @@ static func line(r: Dictionary) -> String:
 	var text := str(lines[absi(str(r.get("id", "")).hash()) % lines.size()])
 	return text.replace("{city}", str(r.get("city", ""))).replace("{outpost}", outpost_name(r))
 
+## The keeper's outpost: the server's place_name (known from anywhere), else this client's places.
 static func outpost_name(r: Dictionary) -> String:
+	if str(r.get("place_name", "")) != "": return str(r.place_name)
 	return str(P0Outposts.find(str(r.get("place", ""))).get("name", ""))
 
 ## Deliver to (091a3ae9 ②): `Wen · Xuhui Tackle Shop` in that city; away (opened from Today) ` · Shanghai` after it.

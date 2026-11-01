@@ -507,6 +507,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sit": _go_sit(step[1] if step.size() > 1 else "seat_table1_")
 		"stand": _stand_up()
 		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
+		"keeper": _open_keeper()   # a tap on the keeper: their greeting, with this outpost's local requests (q(272) shots)
 		"biteboard": if rt: rt.ui.open_bite_board(outpost)   # the Bite Board as after tapping the board (SGODOT-283 shots)
 		"fareboard": if rt: rt.ui.open_fare_board()   # Trip fares as after tapping the Fare Board (q(165) shots)
 		"bitepond": if rt: rt.ui.open_board_pond(outpost, step[1])   # bitepond:<pond id> — a row's pond card
