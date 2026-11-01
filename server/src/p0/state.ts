@@ -2,7 +2,7 @@
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots, clearNewBeds } from './garden.js';
-import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, writtenCluster, type TravelState } from './travel.js';
+import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, wildFrozen, writtenCluster, type TravelState } from './travel.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { placeOf } from './world.js';
 import { checkGuideTable, freshGuide, legacyGuide, type GuideState } from './guide.js';
@@ -332,6 +332,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   if (t.home !== writtenCluster(c) && (!t.home_chosen_at || !clusterById(c, t.home))) {
     const fresh = freshTravel(c);
     t.home = fresh.home; t.here = fresh.home; t.fallback = fresh.fallback;
+    delete t.wild_near3; delete t.wild_priced; Object.assign(t, wildFrozen(c, t.home));   // v4q(3): frozen with the fallback
     delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
   }
   // A server from before SGODOT-303 (a rollback to 0.2.5) moved a picked home back to the written city and kept the
@@ -344,6 +345,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       t.home = picked;
       delete t.passes[picked];
       t.fallback = fallbackOf(c, picked);
+      delete t.wild_near3; delete t.wild_priced; Object.assign(t, wildFrozen(c, picked));   // v4q(3): frozen with the fallback
     } else {
       delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
     }
