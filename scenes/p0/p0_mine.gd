@@ -431,6 +431,8 @@ func _swing() -> void:
 	_hold_sword(_sword_id)
 	if hit.is_empty(): return
 	var cmd := {"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))}
+	# struck while stunned (a Rock Beetle after its charge): the server doubles those (355 b1, contract-efg §8)
+	if not combat.last_stunned.is_empty(): cmd.stunned = combat.last_stunned.map(func(id): return Combat.mob_index(str(id)))
 	if rt.session.send(cmd, SWING_KEY % _swings): _swings_out[SWING_KEY % _swings] = true
 	_swings += 1
 
