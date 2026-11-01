@@ -120,6 +120,44 @@ export interface MineState {
   completed?: { run: number; at: number } | null;   // the last run its elite ended (Run complete, shown once)
 }
 
+/** 355 E/F/G v0.1, development v7 fields. The v7 skeleton installs these when the old mine is removed. */
+export interface MineB1Record { deepest: number; guards: number[]; first_at: number }
+export interface MineB1FloorState { paid: boolean; broken: number[]; lit: boolean; mobs: number[] }
+export interface MineB1Day {
+  key: string;
+  at: { mine: string; floor: number } | null;
+  hp: number;
+  floors: Record<string, MineB1FloorState>;
+  picked: [string, number][];
+  attack_at?: number; hurt_at?: number; drink_at?: number; swing_at?: number;
+}
+export type MineB1Notice = { kind: 'reset'; at: number }
+  | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };
+export interface MineB1State {
+  records: Record<string, MineB1Record>; day: MineB1Day | null; notice: MineB1Notice | null;
+}
+export interface MineB1PlayerFields {
+  mine: MineB1State;
+  kills: Record<string, number>;
+  guard_firsts: Record<string, { at: number; mine: string; floor: number }>;
+}
+export interface MineB1WeaponState { weapons: string[]; weapon: string }
+/** Merged into P0Day by the v7 skeleton; keyed by monster kind, only used by content with once_a_day. */
+export interface MineB1DailyFields { once: Record<string, number> }
+
+export function freshMineB1Fields(): MineB1PlayerFields {
+  return { mine: { records: {}, day: null, notice: null }, kills: {}, guard_firsts: {} };
+}
+
+export function freshMineB1DailyFields(): MineB1DailyFields {
+  return { once: {} };
+}
+
+/** Start with the weapon selected by content; owned weapons never take a bag slot. */
+export function freshMineB1Weapons(weapon: string): MineB1WeaponState {
+  return { weapons: [weapon], weapon };
+}
+
 /** Where the player's commands come from (q(41)). left_at was Rest's 2 h away (q(269) retired it): old saves keep it, unread. */
 /** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
 export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null;
