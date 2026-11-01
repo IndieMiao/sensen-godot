@@ -237,13 +237,19 @@ func _advance_visual(dt: float) -> void:
 	if _motion != null and _motion.is_valid() and not _motion_done: _motion.custom_step(dt)
 	if _player: _player.advance(dt)
 
-func update(enemy: Dictionary, _was: String, delta: float, stepped: bool, _elapsed: float) -> void:
+func _phase_action(phase: String) -> String:
+	if family == "mob_cave_bat" and phase in ["idle","stunned"]: return "fly_high" if phase=="idle" else "hit"
+	return str(PHASE_ACTION.get(phase, "idle"))
+
+func update(enemy: Dictionary, was: String, delta: float, stepped: bool, _elapsed: float) -> void:
 	if action == "die": return
 	var phase := str(enemy.phase)
-	var wanted := str(PHASE_ACTION.get(phase, "idle"))
-	if family == "mob_cave_bat" and phase in ["idle","stunned"]: wanted = "fly_high" if phase=="idle" else "hit"
+	var wanted := _phase_action(phase)
 	var changed := wanted != action
-	if changed: play(wanted)
+	if changed:
+		# Finish the old phase's final clock step (including a late spore release), but never an interrupted attack.
+		if stepped and _phase_action(was) == action: _advance_visual(clampf(delta,0,0.1))
+		play(wanted)
 	# A new phase starts after this frame's brain step, at zero; subsequent animation ticks share its clamped clock.
 	if not changed and (stepped or wanted in ["idle","fly_high"]): _advance_visual(clampf(delta,0,0.1))
 	_flash = 1.0 if float(enemy.flash)>0 else 0.0

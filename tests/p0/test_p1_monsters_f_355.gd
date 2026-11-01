@@ -276,3 +276,26 @@ func test_slow_frames_and_pause_do_not_advance_attack_animation_ahead_of_the_bra
 		assert_float(e.node.action_time).is_equal_approx(0.1,0.00001)
 		for i in 30:e.node.update(e,"windup",0.1,true,0.2+i*0.1)
 		assert_bool(e.node._motion_done).is_true()   # a held finished pose is never replayed/restarted
+
+func test_late_spore_timestamp_is_not_lost_when_the_attack_ends_in_that_frame() -> void:
+	var e:=_enemy("mob_shroomling",_player())
+	add_child(e.node)
+	e.node.meta.spore_at=0.99
+	e.node.play("spore")
+	e.node._motion.custom_step(0.9)
+	assert_object(e.node._spores).is_null()
+	e.phase="recover"
+	e.node.update(e,"spore",0.1,true,1.0)
+	assert_object(e.node._spores).is_not_null()
+	assert_str(e.node.action).is_equal("recover")
+
+func test_hit_interrupting_spore_never_releases_it_after_entering_hide() -> void:
+	var e:=_enemy("mob_shroomling",_player())
+	add_child(e.node)
+	e.node.meta.spore_at=0.99
+	e.node.play("spore")
+	e.node._motion.custom_step(0.9)
+	e.brain.on_hit(e,0.1)
+	e.node.update(e,"hide",0.1,true,1.0)
+	assert_object(e.node._spores).is_null()
+	assert_str(e.node.action).is_equal("hide")

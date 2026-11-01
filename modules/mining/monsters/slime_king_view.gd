@@ -81,11 +81,13 @@ func _pose(progress: float, name: String) -> void:
 		"die": body.scale = Vector3.ONE*maxf(0.001,1-progress)
 		_: body.scale = Vector3(1,1+sin(progress*TAU)*0.04,1)
 
-func update(enemy: Dictionary, _was: String, delta: float, stepped: bool, _elapsed: float) -> void:
+func update(enemy: Dictionary, was: String, delta: float, stepped: bool, _elapsed: float) -> void:
 	if _dying: return
 	var wanted := str(ACTIONS.get(str(enemy.phase),"idle"))
 	var changed := wanted != action
-	if changed: play(wanted)
+	if changed:
+		if stepped and str(ACTIONS.get(was,"idle")) == action: _advance_visual(clampf(delta,0,0.1))
+		play(wanted)
 	if not changed and (stepped or wanted == "idle"): _advance_visual(clampf(delta,0,0.1))
 	var body := get_node("Body") as MeshInstance3D
 	(body.material_override as StandardMaterial3D).albedo_color = Color("fff3bd") if enemy.flash>0 else get_meta("color")
