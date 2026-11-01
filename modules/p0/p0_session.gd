@@ -57,6 +57,7 @@ const _BJ_MOCK_MS := 120   # the reply's round trip, so the page's in-flight sta
 var _received_ms := 0
 var _refresh_left := REFRESH_S
 var _guide_maturity_checked := false
+var _expiry_ms := -1.0   # SGODOT-377: P0Logic.next_expiry of the view, -1 once read again (or none)
 ## UI moments for the observation log (S7): batched, sent apart from commands, dropped when the server is away.
 const UI_BATCH := 20
 const UI_FLUSH_S := 10.0
@@ -89,6 +90,7 @@ func _process(dt: float) -> void:
 	_ui_flush_left -= dt
 	if _ui_flush_left <= 0.0 or _ui_events.size() >= UI_BATCH: _flush_ui()
 	_refresh_guide_maturity(float(Time.get_ticks_msec() - _received_ms))
+	_refresh_expired(float(Time.get_ticks_msec() - _received_ms))
 	_refresh_left -= dt
 	if _refresh_left <= 0.0 and not busy:
 		_refresh_left = REFRESH_S
@@ -126,6 +128,14 @@ func _refresh_guide_maturity(elapsed_ms: float) -> void:
 		if busy: refresh_after()
 		else: refresh()
 		return
+
+## SGODOT-377: a resident's next request or a board slot that came due on the projection is the server's to fill: one
+## read when the first of them runs out, not the next periodic refresh up to 30 s later.
+func _refresh_expired(elapsed_ms: float) -> void:
+	if _expiry_ms < 0.0 or elapsed_ms < _expiry_ms: return
+	_expiry_ms = -1.0
+	if busy: refresh_after()
+	else: refresh()
 
 ## Pure client-page acknowledgement, sent only on a player confirmation. Keyed like other UI commands, so the
 ## home build queued behind it uses its reply's seq; revisiting a completed page never acknowledges another step.
@@ -254,6 +264,7 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 		view = state
 		_received_ms = Time.get_ticks_msec()
 		_guide_maturity_checked = false
+		_expiry_ms = P0Logic.next_expiry(view)
 	if bool(data.get("ok", false)):
 		state_changed.emit(view, data.get("events", []))
 		return {ok = true, code = "", network = false}

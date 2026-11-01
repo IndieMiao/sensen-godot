@@ -441,6 +441,7 @@ func set_view(v: Dictionary) -> void:
 	if notice_board() != null: _notice_board.refresh(v)
 	if passport() != null: _passport.call("refresh", v)
 	if blackjack() != null: _blackjack.refresh(v)
+	_refresh_rest_card(v)
 	_refresh_hud()
 	_refresh_bar()
 	_refresh_request_reward()
@@ -2713,7 +2714,10 @@ func open_rest_card() -> void:
 	var st := P0Logic.rest_state(view)
 	var v := _kit_card()
 	modal_kind = "rest"
-	v.add_child(UiObjectHeader.new({title = "Rest bench", state = str(st.sheet_state), effect = str(st.effect)}))
+	_rest_shown = st
+	_rest_header = UiObjectHeader.new({title = "Rest bench", state = str(st.sheet_state), effect = str(st.effect)})
+	_rest_note = null
+	v.add_child(_rest_header)
 	v.add_child(UiFactRow.new(str(st.fact), str(st.fact_value)))
 	if str(st.state) != "used":
 		var b := UiCommandButton.new(str(st.button) if st.can_rest else "", UiCommandButton.Kind.PRIMARY)
@@ -2728,6 +2732,22 @@ func open_rest_card() -> void:
 		var note := UiKit.label(str(st.note), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		v.add_child(note)
+		_rest_note = note
+
+## SGODOT-377: the open bench card follows the view — its countdowns tick in place (`1h 56m to go`, `Available again in
+## 9h 12m`); a change of state (the 2 h came round: Not yet → Rest) builds the card again.
+var _rest_shown := {}
+var _rest_header: UiObjectHeader = null
+var _rest_note: Label = null
+func _refresh_rest_card(v: Dictionary) -> void:
+	if modal_kind != "rest" or not is_instance_valid(_rest_header): return
+	var st := P0Logic.rest_state(v)
+	if st.state != _rest_shown.get("state") or st.button != _rest_shown.get("button"):
+		open_rest_card()
+		return
+	if st.sheet_state != _rest_shown.get("sheet_state"): _rest_header.state = str(st.sheet_state)
+	if st.note != _rest_shown.get("note") and is_instance_valid(_rest_note): _rest_note.text = str(st.note)
+	_rest_shown = st
 
 ## A centred card in the UI kit's look (InformationSheet 932:71686: surface, card radius, 16 inset, 12 gap) for the
 ## phase-2 panels (the Rest bench card).
