@@ -410,9 +410,10 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
   const found = findBoardRequest(c, s, id);
   if (!found) return { code: s.req_done.includes(id) ? 'request_done' : 'bad_request' };
   const { slot } = found, r = slot.req!;
-  // q(270) ①: a city's Market Board request is taken and handed in in that city, at any of its market squares — the
-  // outpost the command comes from says where (a Day Pass keeps `here` on the map too: no hand-in from afar, §9.3.4);
-  // a command without one falls back to the city the player is in. A drop goes from anywhere (it hands nothing in).
+  // q(270) ①: a city's Market Board request is taken and handed in in that city — the outpost the command comes from
+  // says which (a Day Pass keeps `here` on the map too: no hand-in from afar, §9.3.4); a command without one falls back
+  // to the city the player is in. Only the city is checked, not that the outpost is a market square: the client sends
+  // these from a market's board alone (亚瑟 on #606). A drop goes from anywhere (it hands nothing in).
   if (found.board === 'market' && type !== 'drop') {
     const from = at.space === 'outpost' && typeof at.place === 'string' ? clusterOf(c, at.place) : null;
     if ((from ?? (s.travel?.here || homeOf(c, s))) !== found.city) return { code: 'wrong_city', detail: { city: found.city } };

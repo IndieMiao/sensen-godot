@@ -60,3 +60,16 @@ func test_a_stamp_run_in_another_city_comes_back_to_that_citys_market() -> void:
 		"visit": {"place": "gn-5355933~tea0", "done": false, "name": "Willow Tea House", "city": "Hayward", "cluster": "gn-5355933"}})
 	var d := P0Board.detail(_view(_hayward([stamp]), []), "market", "stamp-hay")
 	assert_str(str(d.effect)).is_equal("Visit Willow Tea House, then come back to any Hayward market.")
+
+## 亚瑟 on #606 (a): in a town with no market square the board shown is home's (the server's marketCity); its hand-in
+## is still not done there, so it follows what can be done here like any other city's.
+func test_the_home_board_shown_in_a_town_without_a_market_is_away() -> void:
+	var home := {"title": "Market Board", "deliver_at": "market", "cluster": "gn-5391959", "city": "San Francisco", "home": true,
+		"deliver_place": "sh_market_1", "deliver_name": "", "slots": [_req("dusk-home", {"ready": true, "have": 4})]}
+	var v := _view(home, [])
+	v.travel = {"home": "gn-5391959", "here": "gn-9999999"}
+	var t: Array = PinReason.taken(v)
+	assert_bool(bool(t[0].away)).is_true()
+	assert_str(str(t[0].city)).is_equal("")   # home's own hand-in never names its city
+	v.travel.here = "gn-5391959"
+	assert_bool(bool(PinReason.taken(v)[0].away)).is_false()

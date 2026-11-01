@@ -10,6 +10,7 @@ extends RefCounted
 ## knows only the first session's (q(103) ④, the server's rule): while Pond Catch is on the Stall Board and taken, Reed Pond wears
 ## the ! until the bag holds the fish, then the homestead the ✓; untaken it hangs nowhere (its ! is the stall's own).
 
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # away from home: a home hand-in isn't done here (q(270))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const HOME := "home"
 static var REED_POND := P0City.beginner_pond()   # the beginner pond, where the server points Pond Catch too (SGODOT-270)
@@ -135,11 +136,13 @@ static func board_requests(view: Dictionary) -> Array:
 
 ## Where a board request is handed in (q(270) ⑥): {deliver, go, city ("" at home), away (not the city the player is
 ## in)} — the Stall, the home set's market square, or another city's Market Square 1 with ` · <City>` (q(128)'s form).
+## The home board is away whenever the player is: in a town with no market square the board shown is still home's
+## (the server's marketCity), and its hand-in is not done there either (亚瑟 on #606).
 static func market_at(view: Dictionary, board: String, from: Dictionary) -> Dictionary:
 	if board == "stall": return {"deliver": "Deliver at the Stall", "go": "stall", "city": "", "away": false}
 	if from.is_empty() or bool(from.get("home", true)):
 		return {"deliver": "Deliver at %s" % _outpost_name(view, "market"), "go": "outpost:" + P0Outposts.home_id(view, "market"),
-			"city": "", "away": from.has("deliver_place") and not is_same(from, view.get("boards", {}).get("market", {}))}
+			"city": "", "away": from.has("deliver_place") and (P0Travel.away(view) or not is_same(from, view.get("boards", {}).get("market", {})))}
 	var city := str(from.get("city", ""))
 	var name := str(from.get("deliver_name", ""))
 	return {"deliver": "Deliver at %s · %s" % [name if name != "" else "the market", city] if city != "" else "Deliver at %s" % name,
