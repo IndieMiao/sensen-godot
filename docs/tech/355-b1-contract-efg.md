@@ -18,6 +18,7 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> - 答苏烈 950bbe3e 的三处：① `floorSpec` 不再返回 `station`，电梯站由 view 和命令按 `records` 算（`stations(record)`）；② 没有所在段的非守关层（矿脉 F10）沿用前一段的岩石和掉落；③ 本日层状态加 `guard_hit_at`，给 `guard_fast` 用。
 > **改这份约定**：在 feat/355-b1 上用 PR 改本文件（`docs/tech/355-b1-contract-efg.md`），并找周瑜审（奕星定：接口变更归周瑜审）。以仓库这份为准；`/Volumes/ACASIS/tmp/zhouyu-355/contract-efg-v0.md` 只是 v0.2 以前的草稿。
 
 ## 0. 谁照哪节写、文件归谁
@@ -153,7 +154,9 @@ export interface MineDay {
   picked: [string, number][];                    // 进本层以后捡到的东西（倒地扣一半用）；换层清空
   attack_at?: number; hurt_at?: number; drink_at?: number; swing_at?: number;
 }
-export interface MineFloorState { paid: boolean; broken: number[]; lit: boolean; mobs: number[] }   // mobs：每只怪剩下的血量，顺序同第 4 节生成的列表
+export interface MineFloorState { paid: boolean; broken: number[]; lit: boolean; mobs: number[]; guard_hit_at?: number }
+// mobs：每只怪剩下的血量，顺序同第 4 节生成的列表
+// guard_hit_at：守关这一次第一下有效命中的时刻（第 8 节 guard_fast 用）；守关回满血时（倒地、离开这一层）和日切时清掉，断线不清
 export interface MineState { records: Record<string, MineRecord>; day: MineDay | null; notice: MineNotice | null }
 export type MineNotice = { kind: 'reset'; at: number } | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };
 // P0State 里：
@@ -168,13 +171,15 @@ export type MineNotice = { kind: 'reset'; at: number } | { kind: 'ko'; at: numbe
 
 ## 4. 层生成（服务端，确定性）
 ```
-floorSpec(c, site, floor, player, dayKey) -> { mobs: string[]; rocks: number; guard: string | null; hpMult: number; station: boolean }
+floorSpec(c, site, floor, player, dayKey) -> { mobs: string[]; rocks: number; drops: [string, number][]; guard: string | null; hpMult: number }
+stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ deepest；和层生成分开（答苏烈 950bbe3e ①）
 ```
 1. `type = site.type`；最深层取 `site.mine.floors`，第一批的上限取 `site.mine.open_to ?? site.mine.floors`。超出就是 `bad_floor`。
 2. 随机流：`seededRand(\`${player}:mine@${mineId}:${floor}:${dayKey}\`)`，用 boards.ts 里 #609 新导出的 `seededRand`，按方案 3.8，种子是「人 + 日期 + 矿口 + 层」。**每层的随机数按固定顺序取**：先定每种怪的只数（按 bands 的顺序），再定 add，再定岩石数。顺序写死，view 和命令才会算出同一个结果。
 3. 先看 `floors["N"]`：有 `guard` 就只有守关，岩石 0；有 `only` 就只有那几只，岩石照本段；否则按本段的 mobs 加上 `add`，再加 `elite`。
+   - **本段**：`from ≤ N ≤ to` 的那一段；没有（矿脉 F10 这种夹在两段之间的非守关层）就用**前一段**，即 `to < N` 里最大的那一段，岩石数和掉落都照它（答苏烈 950bbe3e ②）。守关层不需要段。
 4. 怪的顺序：按上面拼出来的顺序排，精英放最后、守关单独一只。`mine_attack` 的 targets / hurt_by 用这个下标（和现在一样）。
-5. `station`：10 的倍数且 ≤ 这座矿的 `deepest`（F1 不是站；电梯机器在 F1 和各站都有，最上一站是 Entrance = 出矿，v4q(5) ⑪）。
+5. 电梯站不在 `floorSpec` 里算（它不读 `records`）：`stations(records[mine])` = 10 的倍数且 ≤ `deepest`。F1 不是站；电梯机器在 F1 和各站都有，最上一站是 Entrance（出矿，v4q(5) ⑪）。view 的 `floor_state.station` 和 `stations` 都由它来。
 6. 岩石的掉落：用本段的 `drops` 加上矿脉主矿的 `main_weight`；每块岩石的掉落用 `rockDrop` 现有的随机办法，键换成「矿 + 层 + 日 + 岩石号」。
 
 **客户端不参与生成**：客户端照 view 给的怪物列表和岩石数来摆，位置用 mine_layout 的种子布点（键改成「矿 + 层 + 日」，岩石数取自 view）。
@@ -287,7 +292,7 @@ floorSpec(c, site, floor, player, dayKey) -> { mobs: string[]; rocks: number; gu
   - 两下的间隔 ≥ `1000 / speed × 0.9` ms，否则这一下作废（照现有的 `attack_at`）；
   - 一下最多打中 4 只；
   - `stunned` 里的下标必须也在 targets 里，而且是有 `stun_mult` 的怪；
-  - 守关从这一层第一次被打到被打倒的时间低于 `血量 ÷ 武器每秒最大伤害 × 0.8` 时，写一条日志 `guard_fast`。
+  - 守关从 `guard_hit_at`（这一次第一下有效命中）到被打倒的时间，低于 `血量 ÷ 武器每秒最大伤害 × 0.8` 时，写一条日志 `guard_fast`（答苏烈 950bbe3e ③）。
 
 ## 9. G 武器
 ### 9.1 装备
