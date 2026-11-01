@@ -37,3 +37,11 @@ rebase后的集成基线再跑全量：**2087/2087、207组、0 errors/failures/
 最终10张功能截图、假view模型JSON和测试摘要上传355；截图进程正常退出，测试均结束，无本人后台服务或Godot进程留存。
 
 待项：v4q(1)批准与校准内容、哪吒服务端实际view联调、A1/A2帧及正式文案、占位图标确认。不得据本草稿单独上线，不合farm-dev、不改存档/最低版本；集成分支min_version与清档由对应负责人处理。
+
+## 亚瑟审核后三项对齐
+
+按355 af674e41及不知火舞7d9aa825：田数行为 `Plots N · now M`，不承诺翻土；满级用中性灰 `Highest level for now`；暂不显示vein_mines/iron_sword，回血药healing_potion和potion_heal两个id都识别。HOME-1/HOME-2与隐藏解锁回归同步。
+
+已rebase到集成分支 **3592ace2**（含v7骨架）；为遵守不强推规则，用无内容变化的merge保留原发布头b64029bc为祖先，后续普通快进推送。树内容与rebase结果26f43143一致，工作头8a6f865f。新基线全量 **2079/2079、206组、0 errors/failures/flaky/skipped/orphans、exit0，report914**；测试数因上游移除旧换料用例变化，不是跳测。
+
+返修图使用Lv1/8/16/17、Lv15实得+50、Lv16不回体力、Lv1 Today材料行，仍是假view功能实拍。设计提出的Lv9 Today技能缺口行与A清单“只管Lv1–2，先不扩”的范围冲突，已在355 b09101d6请求确认，未伪造该行或自行扩范围。布局继续使用已测的现有自动换行组件，正式帧分组样式待走查反馈。
