@@ -326,7 +326,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
         mobs: spec.mobs.map((kind, i) => ({ kind, hp: state.mobs[i], max: maxHp(c, kind, spec.hpMult), elite: !!c.mine.monsters[kind].elite,
           guard: !!c.mine.monsters[kind].guard, tier: c.mine.monsters[kind].tier ?? 0 })) },
       next: next > site.mine.floors ? null : { floor: next, paid: day.floors[floorKey(site.id, next)]?.paid ?? false,
-        fee: day.floors[floorKey(site.id, next)]?.paid ? 0 : c.mine.floor_energy, open: cleared && next <= cap(site), locked: next > cap(site) ? 'not_open' : null },
+        fee: day.floors[floorKey(site.id, next)]?.paid ? 0 : c.mine.floor_energy, open: cleared, locked: next > cap(site) ? 'not_open' : null },
     };
   }
   return { floor_energy: c.mine.floor_energy, rock_energy: c.mine.rock_energy, hp_max: c.mine.combat.hp,

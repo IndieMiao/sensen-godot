@@ -83,6 +83,9 @@ describe('355 E deterministic content (cases 1-3,5)', () => {
     for (const n of [20, 40]) expect(floorSpec(x.c, site, n, 'p', 'd').guard).toBe(x.c.mine.types.vein.floors[n].guard);
     x.start(V, 40); expect(x.fail({ type: 'mine_floor', to: 41 })).toMatchObject({ code: 'bad_floor', detail: { max: 40, not_open: true } });
     expect(viewOf(x.c, x.s, x.now).mine.at!.next).toMatchObject({ floor: 41, locked: 'not_open', open: false });
+    x.kill(0);
+    expect(viewOf(x.c, x.s, x.now).mine.at!.next).toMatchObject({ floor: 41, locked: 'not_open', open: true });
+    expect(x.fail({ type: 'mine_floor', to: 41 })).toMatchObject({ code: 'bad_floor', detail: { not_open: true } });
   });
   it('main ore threshold and torch deck counts follow content/site data', () => {
     const x = scenario(), site = structuredClone(mineSite(x.c, V)!); site.mine.main_from = 7;
