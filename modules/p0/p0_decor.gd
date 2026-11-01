@@ -75,7 +75,7 @@ static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore 
 ## The same for any cells against `t` (taken()): what a yard facility (the Compost Bin) is judged by too.
 static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 	var y := yard()
-	var beds := P0Garden.plot_count(view)   # off the beds the homestead has beyond the field too (Lv7's 40–47, q(172))
+	var beds := P0Garden.plot_count(view)   # off the beds the homestead has beyond the field too (q(172))
 	for c in cs:
 		if not _rect(y.get("walk", [0, 0, 0, 0])).has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
 		var bed := P0Garden.id_of(c)

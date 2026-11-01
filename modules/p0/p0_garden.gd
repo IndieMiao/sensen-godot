@@ -302,7 +302,7 @@ static func block_points(bp: FarmBlueprint, points: Array) -> void:
 		bp.masks.walkable[r.y] = row.substr(0, r.x) + "0" + row.substr(r.x + 1)
 
 ## True when a world point stands on a bed (the player steps up onto it): one of the beds the view has (哪吒 on #215:
-## at Homestead Lv1–2 the place of 30–39 is plain ground, no step up); no view = any of the 40.
+## where a bed is still to open is plain ground, no step up); no view = any of the grid's.
 static func on_bed(bp: FarmBlueprint, p: Vector3, view = null) -> bool:
 	var c := bp.world_to_cell(p)
 	var id := id_of(c)

@@ -64,9 +64,9 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		Rect2(Vector2(house.x - 0.6, field_rect.position.y - 1.8), Vector2(1.2, 1.9)),
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
 	var spots := [house, bp.cell_to_world(bp.anchor("storage")),
-		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine"))]
-	for key in P0Garden.ANCHORS:   # SGODOT-231: gathering spots and the workbench stay clear of scatter
-		if str(key).begins_with("spot_") or key == "workbench": spots.append(bp.cell_to_world(bp.anchor(key)))
+		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine")),
+		bp.cell_to_world(bp.anchor("workbench"))]   # SGODOT-231: the workbench stays clear of scatter
+	var no_decor := {"decor": {"placed": []}}
 	for i in 420:
 		# the front band reaches 2.4 m past the fence, which moved 1.3 m nearer (q(172) A; 上官婉儿 on 282 c2a5bc4f: z +2.5 → +3.8)
 		var point := Vector3(rng.randf_range(-3.0, 16.0), 0.01, rng.randf_range(-16.0, -11.5) if i < 220 else rng.randf_range(-11.5, 3.8))
@@ -74,10 +74,12 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		if keep_clear.any(func(r: Rect2): return r.has_point(flat)): continue
 		if spots.any(func(s: Vector3): return Vector2(s.x, s.z).distance_to(flat) < (1.7 if s == house else 0.95)): continue
 		var asset := "grass_clump"
-		# a rock blocks its cell: none in the yard's front rows y −2…0 (the way in, x 9–10, runs through them; 上官婉儿 c2a5bc4f)
+		# a rock blocks its cell: none in the yard's front rows y −2…0 (the way in, x 9–10, runs through them; 上官婉儿 c2a5bc4f),
+		# nor on a cell Decorate may take (the gathering spots kept two clear until they left the farm, SGODOT-355 b1)
 		var front := bp.world_to_cell(point)
 		var front_row := P0Garden.WALK_RECT.has_point(front) and front.y <= 0
-		if i % 11 == 0 and not front_row: asset = "rock"
+		var decor_cell := P0Garden.WALK_RECT.has_point(front) and P0Decor.reason(no_decor, "deco_planter", front) == ""
+		if i % 11 == 0 and not front_row and not decor_cell: asset = "rock"
 		elif i % 5 == 0: asset = "daisy"
 		elif i % 9 == 0: asset = "pink_flower"
 		elif i % 13 == 0: asset = "blue_flower"

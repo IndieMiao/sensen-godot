@@ -9,23 +9,32 @@ func _view(plots := 40) -> Dictionary:
 		"bag": {"capacity": 25, "slots": [{"id": "seed_apple", "qty": 1}]}, "orchard": {"used": 0, "cap": 3},
 		"crops": [{"id": "crop_apple", "seed": "seed_apple", "energy": 6, "perennial": true}]}
 
-const BLOCK7 := [7, 8, 9, 10, 13, 14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28]
+## A plot by its [col, row] on the garden grid; the 16 plots of the 4×4 block whose lowest col and row that is (the
+## server tests' at() / block()).
+static func _at(col: int, row: int) -> int: return P0Garden.id_of(P0Garden.PLOT_ORIGIN + Vector2i(col, row) * 2)
+static func _block(col: int, row: int) -> Array:
+	var ids := []
+	for y in range(row, row + 4): for x in range(col, col + 4): ids.append(_at(x, y))
+	ids.sort()
+	return ids
 
 func test_the_block_and_its_reason_match_the_server() -> void:
-	var v := _view()
+	var v := _view()   # 40 open: rows 1–4 whole
+	var a := _at(1, 1)
 	assert_bool(P0FarmFacilities.is_block("greenhouse")).is_true()
 	assert_str(P0FarmFacilities.kind_of("craft_greenhouse")).is_equal("greenhouse")
-	var block := P0FarmFacilities.cover_of(v, 7, "greenhouse")
+	var block := P0FarmFacilities.cover_of(v, a, "greenhouse")
 	block.sort()
-	assert_array(block).is_equal(BLOCK7)
-	assert_str(P0FarmFacilities.spot_reason(v, 7, -1, "greenhouse")).is_empty()
-	assert_str(P0FarmFacilities.caption(v, 7, "greenhouse")).is_equal("Greenhouse · 4×4")
-	v.plots[14].crop = "crop_radish"
-	v.plots[14].state = "growing"
-	assert_str(P0FarmFacilities.spot_reason(v, 7, -1, "greenhouse")).is_equal("Needs 4×4 clear plots")
-	assert_array(P0FarmFacilities.blocked_of(v, 7, "greenhouse")).is_equal([14])
-	assert_str(P0FarmFacilities.spot_reason(_view(), 23, -1, "greenhouse")).is_equal("Needs 4×4 clear plots")   # off the grid
-	assert_str(P0FarmFacilities.spot_reason(_view(30), 4, -1, "greenhouse")).is_equal("Needs 4×4 clear plots")   # before Lv3
+	assert_array(block).is_equal(_block(1, 1))
+	assert_str(P0FarmFacilities.spot_reason(v, a, -1, "greenhouse")).is_empty()
+	assert_str(P0FarmFacilities.caption(v, a, "greenhouse")).is_equal("Greenhouse · 4×4")
+	var busy := _at(2, 3)
+	v.plots[busy].crop = "crop_radish"
+	v.plots[busy].state = "growing"
+	assert_str(P0FarmFacilities.spot_reason(v, a, -1, "greenhouse")).is_equal("Needs 4×4 clear plots")
+	assert_array(P0FarmFacilities.blocked_of(v, a, "greenhouse")).is_equal([busy])
+	assert_str(P0FarmFacilities.spot_reason(_view(), _at(5, 3), -1, "greenhouse")).is_equal("Needs 4×4 clear plots")   # off the grid
+	assert_str(P0FarmFacilities.spot_reason(_view(26), a, -1, "greenhouse")).is_equal("Needs 4×4 clear plots")   # row 1 not open yet
 
 func test_a_sprinkler_never_goes_under_glass_nor_a_tree() -> void:
 	var v := _view()
@@ -101,10 +110,10 @@ func test_the_greenhouse_strip_reads_its_cut() -> void:
 ## placement preview is the base alone.
 func test_the_greenhouse_is_the_294_model_with_its_own_glass() -> void:
 	var bp := P0Garden.blueprint()
-	var covers := [0.0, 1.0, 2.0, 3.0, 6.0, 7.0, 8.0, 9.0, 12.0, 13.0, 14.0, 15.0, 18.0, 19.0, 20.0, 21.0]
+	var covers := _block(2, 0).map(func(id): return float(id))   # as the view sends them
 	var gh: Node3D = auto_free(P0FarmFacilities.greenhouse_art(bp, covers))
 	assert_array(gh.get_children().map(func(n): return str(n.name))).is_equal(["GreenhouseBase", "GreenhouseRoof", "GreenhouseGlass"])
-	var mid := (bp.cell_to_world(P0Garden.cell_of(0)) + bp.cell_to_world(P0Garden.cell_of(21))) * 0.5
+	var mid := (bp.cell_to_world(P0Garden.cell_of(_at(2, 0))) + bp.cell_to_world(P0Garden.cell_of(_at(5, 3)))) * 0.5
 	assert_vector(gh.position).is_equal_approx(Vector3(mid.x, 0.0, mid.z), Vector3.ONE * 0.001)
 	for n in gh.get_children(): assert_object((n as MeshInstance3D).mesh).is_not_null()
 	var glass := gh.get_child(2) as MeshInstance3D
@@ -123,12 +132,12 @@ func test_the_greenhouse_is_the_294_model_with_its_own_glass() -> void:
 ## are walkable ground, no bed, and become solid; the beds under the glass stay walkable.
 func test_the_posts_take_the_four_walkway_crossings() -> void:
 	var bp := P0Garden.blueprint()
-	var covers := [0.0, 1.0, 2.0, 3.0, 6.0, 7.0, 8.0, 9.0, 12.0, 13.0, 14.0, 15.0, 18.0, 19.0, 20.0, 21.0]
+	var covers := _block(2, 0).map(func(id): return float(id))   # beds x 8–14, y 3–9
 	var posts := P0FarmFacilities.post_cells(bp, covers)
-	assert_array(posts).contains_exactly_in_any_order([Vector2i(3, 2), Vector2i(11, 2), Vector2i(3, 10), Vector2i(11, 10)])
+	assert_array(posts).contains_exactly_in_any_order([Vector2i(7, 2), Vector2i(15, 2), Vector2i(7, 10), Vector2i(15, 10)])
 	for c in posts:
 		assert_int(P0Garden.id_of(c)).is_equal(-1)
 		assert_bool(bp.is_walkable(c)).is_true()
-	# the block anchored on the right (plot 4: columns 4–7) keeps its posts on the field too
-	var right := [4.0, 5.0, 30.0, 31.0, 10.0, 11.0, 32.0, 33.0, 16.0, 17.0, 34.0, 35.0, 22.0, 23.0, 36.0, 37.0]
+	# the block on the grid's right edge (cols 4–7) keeps its posts on the field too
+	var right := _block(4, 0).map(func(id): return float(id))
 	assert_array(P0FarmFacilities.post_cells(bp, right)).contains_exactly_in_any_order([Vector2i(11, 2), Vector2i(19, 2), Vector2i(11, 10), Vector2i(19, 10)])
