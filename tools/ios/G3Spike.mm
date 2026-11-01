@@ -22,6 +22,12 @@
         } else {
             NSLog(@"[G3Spike] AppleSignIn 类缺失（Swift 文件未编入？）");
         }
+        Class notify = NSClassFromString(@"LocalNotify");   // SGODOT-356，inject_local_notify.py 编入
+        if (notify) {
+            [notify performSelector:@selector(setup)];
+        } else {
+            NSLog(@"[G3Spike] LocalNotify 类缺失（Swift 文件未编入？）");
+        }
     });
 }
 @end

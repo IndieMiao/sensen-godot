@@ -147,7 +147,7 @@ func _init() -> void:
 	ui.test_accounts = session.test_accounts
 	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
-	# Crop-ready notifications (SGODOT-350): Android's GodotNotify, per account on this phone; none elsewhere.
+	# Crop-ready notifications (SGODOT-350 / 356): Android's GodotNotify or iOS's LocalNotify, per account on this phone.
 	ui.notify = P0Notify.new(session.test_accounts.profile_file("p0_notify.json"), P0Notify.phone())
 	# a cold start is coming back too: what was set or shown while the app was gone goes (⑦; 李元芳 on #522)
 	ui.notify.came_back()
@@ -1819,7 +1819,7 @@ func _dev_shot(dt: float) -> void:
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
-			# Crop-ready notifications (SGODOT-350) on a desktop: notify:<never|allowed|refused|old> puts in a stand-in
+			# Crop-ready notifications (SGODOT-350 / 356) on a desktop: notify:<never|allowed|refused|old|ios-…> puts in a stand-in
 			# phone (tools/dev) with a fresh account file; notifications opens Settings › Notifications; ask:<crops|radishes>
 			# brings the soft prompt up as its conditions would.
 			"notify":
