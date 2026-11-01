@@ -1853,7 +1853,7 @@
       "coins": 14,
       "where": "any pond"
     },
-    "done_refill_h": 4,
+    "done_refill_h": 0,
     "drop_refill_h": 8,
     "expire_h": 72,
     "track_max": 3,
@@ -2813,7 +2813,7 @@
       "portrait": "pip",
       "likes": "Dessert",
       "gift_meal": "dish_carrot_cake",
-      "one_per_day": true,
+      "one_per_day": false,
       "lines": {
         "Stranger": "Hi! I'm Pip. I carry letters all over San Francisco.",
         "Acquainted": "You again! Got anything sweet?",
@@ -2863,7 +2863,7 @@
       "portrait": "kai",
       "likes": "Grilled",
       "gift_meal": "dish_grilled_crucian",
-      "one_per_day": true,
+      "one_per_day": false,
       "lines": {
         "Stranger": "Hm. You fish?",
         "Acquainted": "Fish bite early here.",

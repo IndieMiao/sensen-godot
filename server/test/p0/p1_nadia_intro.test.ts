@@ -97,9 +97,8 @@ describe('Nadia\'s teaching requests (q(218))', () => {
     expect(d.s.coins - coins).toBe(20);
     expect(d.ev).toContainEqual({ kind: 'request', id: SIX, status: 'done', coins: 20, bonus: 20 });
     expect(d.s.residents[NADIA]).toMatchObject({ next: 0, intro_done: [ONE, SIX] });
-    // ③ then her line from Potatoes, Please, 24 h after Six Radishes
-    expect(nadia(d.s, T0 + 8 * 60_000)).toMatchObject({ req: { id: 'req_res_nadia_1' }, state: 'wait' });
-    expect(nadia(d.s, T0 + 7 * 60_000 + DAY)).toMatchObject({ req: { id: 'req_res_nadia_1' }, state: 'open' });
+    // ③ then her line from Potatoes, Please, right away (q(268); 24 h after Six Radishes before 0.2.18)
+    expect(nadia(d.s, T0 + 8 * 60_000)).toMatchObject({ req: { id: 'req_res_nadia_1' }, state: 'open' });
   });
 
   it('only a harvest request for that crop counts, and only once accepted', () => {

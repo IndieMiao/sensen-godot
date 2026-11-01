@@ -136,7 +136,7 @@ describe('resident reward previews (q262)', () => {
 });
 
 describe('a P1 resident request line (§9.6.1)', () => {
-  it('Granny Wu: wood, then the next one 24 h after delivery once Acquainted; the bag pays the floor first', () => {
+  it('Granny Wu: wood, then the next one right after delivery once Acquainted (q(268)); the bag pays the floor first', () => {
     let s = fresh();
     expect(viewOf(c, s, T0).residents.res_granny_wu).toMatchObject({ request_state: 'open', request: { id: 'req_res_wu_1', kind: 'material', item: 'wood', qty: 6 } });
     s = step(s, { type: 'accept', request: 'req_res_wu_1' }).s;
@@ -147,9 +147,12 @@ describe('a P1 resident request line (§9.6.1)', () => {
     // Stranger still: the second (Something Warm) needs Acquainted
     expect(viewOf(c, r.s, T0 + 2 * DAY).residents.res_granny_wu).toMatchObject({ request_state: 'stage', need_stage: 'Acquainted' });
     r.s.residents.res_granny_wu.affinity = 15;
-    expect(viewOf(c, r.s, T0 + 20 * H).residents.res_granny_wu).toMatchObject({ request_state: 'wait', next_in: 5 * H });
-    expect(refuse(r.s, { type: 'accept', request: 'req_res_wu_2' }, T0 + 20 * H)).toMatchObject({ ok: false, code: 'request_wait', detail: { next_in: 5 * H } });
-    expect(viewOf(c, r.s, T0 + 25 * H).residents.res_granny_wu).toMatchObject({ request_state: 'open', request: { id: 'req_res_wu_2', kind: 'dish', style: 'Soup' } });
+    expect(viewOf(c, r.s, T0 + H).residents.res_granny_wu).toMatchObject({ request_state: 'open', request: { id: 'req_res_wu_2', kind: 'dish', style: 'Soup' } });
+    // §9.6.1's gap is still content: on a table with the old 24 h the next one waits for it
+    const gap = { ...c, affinity: { ...c.affinity, next_request_h: 24 } };
+    expect(viewOf(gap, r.s, T0 + 20 * H).residents.res_granny_wu).toMatchObject({ request_state: 'wait', next_in: 5 * H });
+    expect(applyP0(gap, r.s, { type: 'accept', request: 'req_res_wu_2' }, T0 + 20 * H)).toMatchObject({ ok: false, code: 'request_wait', detail: { next_in: 5 * H } });
+    expect(viewOf(gap, r.s, T0 + 25 * H).residents.res_granny_wu).toMatchObject({ request_state: 'open', request: { id: 'req_res_wu_2' } });
   });
 
   it('a style request takes only dishes of that style; a named dish only that dish', () => {
