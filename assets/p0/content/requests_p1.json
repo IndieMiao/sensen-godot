@@ -279,6 +279,7 @@
         "stamp": 1
       },
       "req_sys_regional_far_fish": {
+        "home_only": true,
         "title": "Visitor's Catch",
         "need": {
           "kind": "fish",
@@ -297,6 +298,7 @@
         "stamp": 1
       },
       "req_sys_regional_far_crop": {
+        "home_only": true,
         "title": "Seeds from Afar",
         "need": {
           "kind": "crop",
@@ -336,6 +338,7 @@
         "coins": 40
       },
       "req_sys_explore_city": {
+        "home_only": true,
         "title": "Postcard Trip",
         "need": {
           "kind": "visit",
@@ -362,6 +365,7 @@
         "coins": 60
       },
       "req_sys_explore_pond": {
+        "home_only": true,
         "title": "Far Pond",
         "need": {
           "kind": "fish",
@@ -380,6 +384,7 @@
         "stamp": 1
       },
       "req_sys_explore_tea": {
+        "home_only": true,
         "title": "Tea Trail",
         "need": {
           "kind": "visit",
@@ -406,6 +411,7 @@
         "coins": 40
       },
       "req_sys_explore_zone": {
+        "home_only": true,
         "title": "New Climate",
         "need": {
           "kind": "visit",

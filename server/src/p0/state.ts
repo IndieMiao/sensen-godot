@@ -148,10 +148,10 @@ export interface P0Day {
 }
 
 /** The save version this server writes. Older saves are brought up to it at load (upgradeState). */
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 export interface P0State {
-  v: 5;
+  v: 6;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -166,7 +166,10 @@ export interface P0State {
   owned: string[];               // one-time purchases: bag upgrades, specialty items
   homestead: Homestead;
   residents: Record<string, ResidentState>;
-  boards: { stall: BoardSlot[]; market: BoardSlot[] };
+  // q(270) (v6): one Market Board per city cluster (`markets`, made the first time the player is in that city). `market`
+  // stays the home city's board, as v5 and older had it (a server rolled back to v5 reads the board it knew), and
+  // markets[home] is the same array, linked at load, on every settle and on a home change. Walks: boards.boardsOf.
+  boards: { stall: BoardSlot[]; market: BoardSlot[]; markets: Record<string, BoardSlot[]> };
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   presence: Presence;
   inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
@@ -205,6 +208,12 @@ export const emptyDay = (key = ''): P0Day => ({
   key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
 });
 
+/** The Stall Board and the home city's Market Board, `market` and `markets[home]` one array (q(270)). */
+function freshBoards(stall: BoardSlot[], home: string): P0State['boards'] {
+  const market: BoardSlot[] = [];
+  return { stall, market, markets: { [home]: market } };
+}
+
 /** opts.pending: the client creating the save can offer the home pick (SGODOT-303, routes' x-p0-features);
  * opts.guide: it can show the new-player guide (SGODOT-341), so the save starts on the guide's first step. */
 export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player), opts: { pending?: boolean; guide?: boolean } = {}): P0State {
@@ -214,8 +223,9 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
   const plots: Plot[] = [];
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
+  const travel = freshTravel(c, opts.pending);
   return {
-    v: 5, player, created_at: now, clock_ms: 0,
+    v: 6, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
@@ -225,7 +235,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
     homestead: { level: 1, plaque: [] },
     residents: {},
-    boards: { stall: pondCatch ? [{ req: tutorialRequest(c, now), refill_at: 0 }] : [], market: [] }, req_done: [],
+    boards: freshBoards(pondCatch ? [{ req: tutorialRequest(c, now), refill_at: 0 }] : [], travel.home), req_done: [],
     presence: { left_at: null, last_at: 0, space: null, place: null },
     firsts: [], rewards: [],
     day: emptyDay(),
@@ -237,7 +247,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
-    travel: freshTravel(c, opts.pending),
+    travel,
     seen: [],
     facilities: [], facility_count: 0,
     fires: 0,
@@ -284,7 +294,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     const first = tutorialRequest(c, s.created_at ?? now);   // keep the request's age: it dates from the account (PR #15 review)
     s.boards ??= {
       stall: [old?.status === 'done' ? { req: null, refill_at: now } : { req: { ...first, status: old?.status === 'accepted' ? 'accepted' : 'open' }, refill_at: 0 }],
-      market: [],
+      market: [], markets: {},
     };
   }
   if (s.v < 4) {   // SGODOT-231: pickaxes, gathering spots, the mine run, the last auto-store
@@ -328,12 +338,18 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
     }
   }
+  if (s.v < 6) {   // q(270), SGODOT-378: the one Market Board becomes the home city's, with its requests and refill times
+    s.boards.markets ??= { [t.home]: s.boards.market ?? [] };
+  }
+  s.boards.markets ??= {};
+  s.boards.market ??= s.boards.markets[t.home] ?? [];   // the home board, one array under both names (P0State.boards)
+  s.boards.markets[t.home] = s.boards.market;
   if (t.day_hold && now >= t.day_hold.until) delete t.day_hold;   // q(173): the carried day is over
   // q(189) ③: a city the table no longer has (a closed country's): the player is home, its Day Pass goes, and an accepted
   // board request with a check-in there is dropped, free. Visits and stamps stay in the save (the view leaves them out).
   for (const id of Object.keys(t.passes)) if (!openCity(c, id)) delete t.passes[id];
   if (!openCity(c, t.here)) t.here = t.home;
-  for (const slots of Object.values(s.boards ?? {})) {
+  for (const slots of [s.boards.stall ?? [], ...Object.values(s.boards.markets ?? {})]) {
     for (const slot of slots) {
       const at = slot.req?.visit?.place, city = at ? clusterOf(c, at) : null;
       if (city && !openCity(c, city)) { slot.req = null; slot.refill_at = now; }

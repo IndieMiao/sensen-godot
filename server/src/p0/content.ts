@@ -116,6 +116,9 @@ export interface RequestTemplate {
   climate?: string[]; type?: 'output' | 'regional' | 'explore' | 'together'; text?: string;
   /** Quantity × scale, rounded up (李白's Wholesale Order and Fish Market Crate: 1.5). */
   scale?: number;
+  /** q(270) ②: drawn on the home city's Market Board only — a template that picks its city or its items by distance from
+   * home (Far Pond, Tea Trail, Postcard Trip, New Climate; Visitor's Catch and Seeds from Afar, out of home's zone). */
+  home_only?: boolean;
 }
 /** A personal request's one-time reward beyond coins and +5 (§9.6.1, Trusted story requests): an item, a recipe page Tasted, a title. */
 export interface ResidentReward { item?: [string, number]; recipe?: string; title?: string }

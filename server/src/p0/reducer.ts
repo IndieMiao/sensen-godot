@@ -314,8 +314,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'accept': case 'deliver': case 'drop': {
       const id = String(cmd.request ?? '');
-      const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(s))
-        : boardCommand(c, s, cmd.type, id, now, events);
+      const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(c, s))
+        : boardCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place });
       if (refusal) return fail(refusal.code, refusal.detail);
       if (cmd.type === 'deliver') noteDelivery(c, s, now);   // toward Regular in the city the player is in (§11.9.1)
       break;

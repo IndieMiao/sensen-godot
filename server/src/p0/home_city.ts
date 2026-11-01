@@ -317,6 +317,11 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   }
   if (t.here === from) t.here = city;
   t.home = city;
+  // q(270) ⑦: on a change each city keeps its Market Board and the home board (`market`) is the new home's, made there
+  // if new; the first pick takes the board the pending save had under San Francisco along (q(270) ⑤: no extra board)
+  s.boards.markets ??= {};
+  if (first) { delete s.boards.markets[from]; s.boards.markets[city] = s.boards.market ??= []; }
+  else s.boards.market = s.boards.markets[city] ??= [];
   t.farm_at = [at.lat, at.lng];
   t.home_set = set;
   t.home_chosen_at = now;
