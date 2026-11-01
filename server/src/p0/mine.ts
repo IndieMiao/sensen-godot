@@ -51,7 +51,8 @@ export function floorSpec(c: P0Content, site: MineSite, floor: number, player: s
   const drops: [string | null, number][] = band.drops.map(([id, weight]) => [id, weight]);
   if (site.mine.main && type.main_weight?.length) {
     let weight = type.main_weight[0][1];
-    for (const [from, w] of type.main_weight) if (floor >= from) weight = w;
+    // The second band shares the catalogue threshold shown on the mine entrance card (#625).
+    for (const [i, [from, w]] of type.main_weight.entries()) if (floor >= (i === 1 ? site.mine.main_from : from)) weight = w;
     const existing = drops.find(([id]) => id === site.mine.main);
     if (existing) existing[1] += weight; else drops.push([site.mine.main, weight]);
   }

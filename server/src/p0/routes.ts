@@ -75,7 +75,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
       noteVisit(c, s, space, place, clock(s.clock_ms), []);   // the entry read checks in an explore request too (as noteSeenAt marks)
-      if (space !== 'mine') settleHere(c, s, space, place, clock(s.clock_ms));
+      settleHere(c, s, space, place, clock(s.clock_ms));
       settleGuide(c, s, guideKeys(c, before, s, null, []), clock(s.clock_ms));   // SGODOT-341: walking into a place is a guide step too
       store.put(s);
     } else {

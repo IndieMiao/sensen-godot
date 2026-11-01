@@ -9,8 +9,42 @@ import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
+import { wildById, wildNear3 } from '../../src/p0/wild.js';
 
 describe('355 E day-token HTTP and persisted mine state', () => {
+  it('uses C travel settlement for mine commands and state reads, and preserves here when place is omitted', async () => {
+    const c = loadP0Content(), player = 'mine-c-travel', now = Date.UTC(2026, 10, 2, 2);
+    const s = freshState(c, player, now);
+    s.created_at = now - 30 * 86400000;
+    const mine = wildNear3(c, s).find(id => wildById(c, id)?.type === 'quarry')!;
+    expect(mine).toBeDefined();
+    const arrived = applyP0(c, s, { type: 'travel', to: mine }, now);
+    if (!arrived.ok) throw new Error(arrived.code);
+    arrived.state.travel.here = arrived.state.travel.home;
+    const dir = mkdtempSync(path.join(tmpdir(), 'sulie-mine-c-')), store = new P0Store(c, path.join(dir, 'state.json'));
+    const app = Fastify(), headers = { 'x-p0-player': player };
+    store.put(arrived.state);
+    registerP0Routes(app, { content: c, store, now: () => now, dev: false });
+    try {
+      await app.ready();
+      const rejected = (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers,
+        payload: { type: 'mine_enter', mine, space: 'mine', place: mine } })).json();
+      expect(rejected).toMatchObject({ ok: false, code: 'travel_required' });
+      // C permits refreshes from an already-entered mine; restore here if an older read sent it home.
+      const resumed = store.peek(player)!; resumed.presence.entered = mine; store.put(resumed);
+      const enter = (await app.inject({ method: 'POST', url: '/v1/p0/commands', headers,
+        payload: { type: 'mine_enter', mine, space: 'mine', place: mine } })).json();
+      expect(enter).toMatchObject({ ok: true, state: { travel: { here: mine }, mine: { at: { mine, floor: 1 } } } });
+      expect(store.peek(player)!.travel.here).toBe(mine);
+      const stored = store.peek(player)!; stored.travel.here = stored.travel.home; store.put(stored);
+      const read = (await app.inject({ method: 'GET', url: `/v1/p0/state?space=mine&place=${mine}`, headers })).json();
+      expect(read).toMatchObject({ ok: true, state: { travel: { here: mine } } });
+      expect(store.peek(player)!.travel.here).toBe(mine);
+      const bare = (await app.inject({ method: 'GET', url: '/v1/p0/state?space=mine', headers })).json();
+      expect(bare).toMatchObject({ ok: true, state: { travel: { here: mine }, mine: { at: { mine } } } });
+    } finally { await app.close(); rmSync(dir, { recursive: true, force: true }); }
+  });
+
   it('persists the home at the first guard kill and never rewrites it after moving home or killing that kind again', () => {
     const c = loadP0Content(), player = 'mine-first-home-test', mine = 'wd-dev-quarry';
     const dir = mkdtempSync(path.join(tmpdir(), 'sulie-mine-home-')), file = path.join(dir, 'state.json');
