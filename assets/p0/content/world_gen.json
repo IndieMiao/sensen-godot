@@ -239,23 +239,29 @@
    "no_numbers": true
   },
   "wild": {
+   "_note": "v4q(3) (SGODOT-355, v4 §1.4–1.5, §3.3): wild sites between the cities, made offline once by server/tools/wild_sites_build.ts (Natural Earth 10m land and lakes) into server/data/wild_sites.json, which the server reads. One site at most per grid cell (id wd-<row>-<col>), on land, not in a big lake, at least city_min_km from every cluster's centre; added to, never taken away from. Every type is dealt out at once; open are the ones batch 1 plays (the rest stay in the catalogue, off the map). shares: the base draw over the cells; near: every cluster gets quarries and veins of different main within trip2_km and a geode within geode_km, the nearest free sites turned to them; abyss: per region (continent × climate × coastal) a count in the range; ruin: per continent. Names: a word of the climate band's pond pool + the type word (map pins show the word only, q(137)). Numbers are design first values: 李白 checks them with the simulator before the catalogue is frozen (frozen at batch 1's release).",
    "grid_deg": 0.5,
-   "town_min_pop": 10000,
-   "terrain_words": [
-    "Tundra",
-    "Taiga",
-    "Steppe",
-    "Dune",
-    "Savanna",
-    "Rainforest",
-    "Highland",
-    "Reef",
-    "Coast"
-   ],
-   "residents": [
-    "res_pip",
-    "res_granny_wu"
-   ]
+   "city_min_km": 30,
+   "lat_range": [-56, 72],
+   "raster_deg": 0.05,
+   "tries": 9,
+   "jitter_deg": 0.2,
+   "coastal_km": 50,
+   "lake_near_km": 15,
+   "open": ["quarry", "vein"],
+   "shares": {"quarry": 0.22, "vein": 0.18, "geode": 0.04, "woodland": 0.3, "waterside": 0.16, "bloom": 0.1},
+   "near": {"trip2_km": 100, "quarry": 2, "vein": 2, "geode_km": 500},
+   "abyss": [1, 3],
+   "ruin": 1,
+   "mines": {
+    "quarry": {"floors": [20, 30], "mains": ["stone", "copper_ore", "coal", "clay", "rock_salt"], "main_from": 1},
+    "vein": {"floors": [40, 60], "mains": ["iron_ore", "quartz"], "main_from": 10, "open_to": 40},
+    "geode": {"floors": [50, 80], "mains": ["gem"], "main_from": 10, "open_to": 0},
+    "abyss": {"floors": [100, 150], "mains": ["core"], "main_from": 20, "open_to": 0},
+    "ruin": {"floors": [30, 30], "mains": ["relic"], "main_from": 10, "open_to": 0}
+   },
+   "sides": 8,
+   "type_words": {"quarry": "Quarry", "vein": "Vein", "geode": "Geode", "abyss": "Abyss", "ruin": "Ruins", "woodland": "Woods", "waterside": "Landing", "bloom": "Meadow"}
   },
   "ponds": {
    "_note": "§6.3.3: 3 from a cluster's first 500,000 people, one more per 500,000 more, at most 6. Ponds 1–3 sit on the 2.5 km ring at 0° / 120° / 240° (rotated by the cluster's hash), 4–6 on the 5 km ring between them. Pond 1 (nearest the centre) is the beginner Pond; 2 River; 3 Coast for a coastal cluster, else River; 4–6 by hash, at least one Pond kept.",

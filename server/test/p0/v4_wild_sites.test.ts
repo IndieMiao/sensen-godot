@@ -1,0 +1,141 @@
+/** v4q(3) (SGODOT-355): wild sites — the offline catalogue's raster and guarantees, the server's catalogue, the nearest 3
+ * free with a quarry and a vein, and the map's viewport read (contract-c §2–§4). */
+import Fastify from 'fastify';
+import { afterEach, describe, expect, it } from 'vitest';
+import { loadP0Content, type P0Content } from '../../src/p0/content.js';
+import { homeBase } from '../../src/p0/home.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
+import { freshState } from '../../src/p0/state.js';
+import { P0Store } from '../../src/p0/store.js';
+import { catalogueOf, parseBbox, useCatalogue, viewport, VIEWPORT_CAP, wildById, wildNearOf } from '../../src/p0/wild.js';
+import { worldOf } from '../../src/p0/world.js';
+import { guarantee, Raster, type Site, type WildConfig } from '../../tools/wild_sites_lib.js';
+
+const SF = 'gn-5391959', T = Date.parse('2026-11-02T18:00:00Z'), G = 0.5;
+const TYPES = ['quarry', 'vein', 'geode', 'abyss', 'ruin', 'woodland', 'waterside', 'bloom'];
+const FIELDS = ['row', 'col', 'lat', 'lng', 'type', 'main', 'side', 'floors', 'coastal', 'near', 'word'];
+const cellOf = (lat: number, lng: number) => [Math.floor((lat + 90) / G), Math.floor((lng + 180) / G)];
+
+/** A table of sites at (dLat, dLng) from a point, of the given types, stamped for this world (or another). */
+function table(c: P0Content, from: { lat: number; lng: number }, sites: [number, number, string, string?][], seed?: string) {
+  const w = worldOf(c)!;
+  return { seed: seed ?? w.seed, revision: w.revision, grid_deg: G, types: TYPES, fields: FIELDS,
+    rows: sites.map(([dLat, dLng, type, main], i) => {
+      const lat = from.lat + dLat, lng = from.lng + dLng, [row, col] = cellOf(lat, lng);
+      return [row, col, lat, lng, TYPES.indexOf(type), main ?? null, 0, main ? 30 : null, 0, SF, `W${i}`];
+    }) };
+}
+
+let content: P0Content | null = null;
+afterEach(() => { if (content) useCatalogue(content, null); content = null; });
+const setup = (rows: [number, number, string, string?][]) => {
+  const c = loadP0Content(); content = c;
+  const base = homeBase(c, { travel: { home: SF } })!;
+  useCatalogue(c, catalogueOf(c, table(c, base, rows)));
+  return { c, base };
+};
+
+describe('the offline catalogue (tools/wild_sites_lib.ts)', () => {
+  it('rasters a polygon even–odd, its hole left out', () => {
+    const square = [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]], [[4, 4], [6, 4], [6, 6], [4, 6], [4, 4]]];
+    const r = new Raster(0.5).fill([square]);
+    expect(r.get(2, 2)).toBe(1);
+    expect(r.get(5, 5)).toBe(0);     // the hole
+    expect(r.get(12, 2)).toBe(0);
+    expect(r.clear(2, 2, 1)).toBe(true);
+    expect(r.clear(0.1, 2, 1)).toBe(false);   // a cell from the edge
+    expect(r.within(12, 5, 300, 1)).toBe(true);
+  });
+
+  it('turns the nearest loose sites into quarries and veins of different main near a cluster, and locks them', () => {
+    const cfg = { grid_deg: G, near: { trip2_km: 100, quarry: 2, vein: 2, geode_km: 500 }, abyss: [1, 1], ruin: 1, sides: 4,
+      mines: { quarry: { floors: [20, 30], mains: ['stone', 'copper_ore'], main_from: 1 }, vein: { floors: [40, 60], mains: ['iron_ore', 'quartz'], main_from: 10, open_to: 40 },
+        geode: { floors: [50, 80], mains: ['gem'], main_from: 10 }, abyss: { floors: [100, 150], mains: ['core'], main_from: 20 }, ruin: { floors: [30, 30], mains: ['relic'], main_from: 10 } },
+    } as unknown as WildConfig;
+    const sites: Site[] = [];
+    for (let i = 0; i < 9; i++) {
+      const lat = 10.25 + Math.floor(i / 3) * G, lng = 20.25 + (i % 3) * G, [row, col] = cellOf(lat, lng);
+      sites.push({ id: `wd-${row}-${col}`, row, col, lat, lng, type: i === 0 ? 'quarry' : 'woodland', main: i === 0 ? 'stone' : null, side: null, floors: null,
+        coastal: false, wet: false, near: 'x', climate: 'temperate', continent: 'asia', word: '', locked: false });
+    }
+    const cl = { id: 'gn-1', name: 'Here', lat: 10.75, lng: 20.75, population: 1e6, climate: 'temperate', continent: 'asia' } as never;
+    const short = guarantee(cfg, 'seed', sites, [cl]);
+    expect(short.filter(x => x.need !== 'geode')).toEqual([]);
+    const mains = (t: string) => sites.filter(s => s.type === t).map(s => s.main).sort();
+    expect(mains('quarry')).toEqual(['copper_ore', 'stone']);
+    expect(mains('vein')).toEqual(['iron_ore', 'quartz']);
+    expect(sites.filter(s => s.type === 'quarry' || s.type === 'vein').every(s => s.locked)).toBe(true);
+    expect(sites.filter(s => s.type === 'ruin')).toHaveLength(1);
+  });
+});
+
+describe('the server catalogue (src/p0/wild.ts)', () => {
+  it('refuses a table made for another world', () => {
+    const c = loadP0Content();
+    expect(() => catalogueOf(c, table(c, { lat: 0, lng: 0 }, [[0, 0, 'quarry', 'stone']], 'another-seed'))).toThrow(/rerun tools\/wild_sites_build/);
+  });
+
+  it('names a site by its word and type, and opens quarries and veins only', () => {
+    const { c, base } = setup([[0.6, 0, 'vein', 'quartz'], [0, 0.8, 'woodland']]);
+    const [row, col] = cellOf(base.lat + 0.6, base.lng);
+    expect(wildById(c, `wd-${row}-${col}`)).toMatchObject({ name: 'W0 Vein', short: 'W0', open: true, mine: { main: 'quartz', main_from: 10, open_to: 40 } });
+    const [r2, c2] = cellOf(base.lat, base.lng + 0.8);
+    expect(wildById(c, `wd-${r2}-${c2}`)).toMatchObject({ type: 'woodland', open: false });
+    expect(wildById(c, 'gn-5391959')).toBeUndefined();
+  });
+
+  it('the nearest 3 open sites, a vein taking the place of the farther of two quarries when there is none', () => {
+    const { c, base } = setup([[0.5, 0, 'quarry', 'stone'], [0, 0.8, 'quarry', 'coal'], [-1, 0, 'quarry', 'clay'],
+      [0, -0.6, 'woodland'], [2, 2, 'vein', 'iron_ore']]);
+    const near = wildNearOf(c, SF).map(id => wildById(c, id)!);
+    expect(near.map(s => s.type).sort()).toEqual(['quarry', 'quarry', 'vein']);
+    expect(near.map(s => s.mine!.main)).not.toContain('clay');   // the farthest quarry gave way
+    expect(near.some(s => s.type === 'woodland')).toBe(false);   // not open: never one of the free 3
+    void base;
+  });
+
+  it('reads a viewport: open sites only, the free first, at most the cap, none below the continent zoom', () => {
+    const rows: [number, number, string, string?][] = [];
+    for (let i = 0; i < 60; i++) rows.push([-3 + Math.floor(i / 10) * G, -3 + (i % 10) * G, i % 2 ? 'vein' : 'quarry', i % 2 ? 'quartz' : 'stone']);
+    rows.push([0.25, 0.25, 'bloom']);
+    const { c, base } = setup(rows);
+    const s = freshState(c, 'wild-1', T);
+    const box = { south: base.lat - 4, west: base.lng - 4, north: base.lat + 4, east: base.lng + 4 };
+    const got = viewport(c, s, box, 9, T);
+    expect(got.total).toBe(60);
+    expect(got.sites).toHaveLength(VIEWPORT_CAP);
+    expect(got.capped).toBe(true);
+    expect(got.sites.slice(0, 3).every(x => x.free)).toBe(true);
+    expect(got.sites.some(x => x.type === 'bloom')).toBe(false);
+    expect(viewport(c, s, box, 5, T).sites).toEqual([]);
+  });
+
+  it('reads a box over the 180° line and refuses one that is not a box', () => {
+    expect(parseBbox('10,170,20,-170')).toEqual({ south: 10, west: 170, north: 20, east: -170 });
+    expect(parseBbox('20,0,10,5')).toBeNull();
+    expect(parseBbox('a,b,c,d')).toBeNull();
+    const c = loadP0Content(); content = c;
+    const w = worldOf(c)!;
+    const rows = [[Math.floor((15 + 90) / G), Math.floor((179.6 + 180) / G), 15.2, 179.6, 0, 'stone', 0, 25, 0, SF, 'East'],
+      [Math.floor((15 + 90) / G), Math.floor((-179.6 + 180) / G), 15.2, -179.6, 1, 'quartz', 0, 45, 0, SF, 'West']];
+    useCatalogue(c, catalogueOf(c, { seed: w.seed, revision: w.revision, grid_deg: G, types: TYPES, fields: FIELDS, rows }));
+    const got = viewport(c, freshState(c, 'wild-2', T), parseBbox('10,170,20,-170')!, 8, T);
+    expect(got.sites.map(x => x.short).sort()).toEqual(['East', 'West']);
+  });
+
+  it('GET /v1/p0/wild sends the viewport with the catalogue revision, 400 without a box', async () => {
+    const { c, base } = setup([[0.5, 0, 'quarry', 'stone'], [0, 0.8, 'vein', 'iron_ore']]);
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store: new P0Store(c), now: () => T, dev: false });
+    const headers = { 'x-p0-player': 'wild-route-1' };
+    const bbox = `${base.lat - 2},${base.lng - 2},${base.lat + 2},${base.lng + 2}`;
+    const res = await app.inject({ method: 'GET', url: `/v1/p0/wild?bbox=${bbox}&zoom=9`, headers });
+    expect(res.headers['x-wild-revision']).toBe(String(worldOf(c)!.revision));
+    const body = res.json();
+    expect(body).toMatchObject({ ok: true, capped: false, total: 2 });
+    expect(body.sites.map((x: { type: string }) => x.type).sort()).toEqual(['quarry', 'vein']);
+    expect(body.sites[0]).toMatchObject({ free: true, visited: false, pass_until: null, trip: expect.any(Number) });
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/wild?zoom=9', headers })).statusCode).toBe(400);
+    await app.close();
+  });
+});
