@@ -1,5 +1,7 @@
 # 355 第一批 A 客户端契约接入
 
+以下早期记录保留作历史；当前实现与验收范围以末节“HOME-1 走查返修”及最新 PR 评论为准。
+
 本轮是开发草稿，PR 只面向 `feat/355-b1`，由亚瑟审；**不是 farm-dev 发版变更**。按哪吒 11-02 的 `355-b1-A-view-contract.md` 和 `355-b1-A-client-checklist-liubang.md` 实现，v4q(1) 初稿 `28d1c01b` 尚待批准/校准。A1/A2 帧及缺口/满级/解锁正式文案未到，使用清单占位文案与现有组件。
 
 从farm-dev `ade61b9b`开工，集成分支建立后rebase到 `bc558130`；range-diff确认功能补丁 `dd68b0ee` 与 `b640f3ca` 等价。新基线包含怪物接口，不由本PR实现F/G。
@@ -45,3 +47,19 @@ rebase后的集成基线再跑全量：**2087/2087、207组、0 errors/failures/
 已rebase到集成分支 **3592ace2**（含v7骨架）；为遵守不强推规则，用无内容变化的merge保留原发布头b64029bc为祖先，后续普通快进推送。树内容与rebase结果26f43143一致，工作头8a6f865f。新基线全量 **2079/2079、206组、0 errors/failures/flaky/skipped/orphans、exit0，report914**；测试数因上游移除旧换料用例变化，不是跳测。
 
 返修图使用Lv1/8/16/17、Lv15实得+50、Lv16不回体力、Lv1 Today材料行，仍是假view功能实拍。设计提出的Lv9 Today技能缺口行与A清单“只管Lv1–2，先不扩”的范围冲突，已在355 b09101d6请求确认，未伪造该行或自行扩范围。布局继续使用已测的现有自动换行组件，正式帧分组样式待走查反馈。
+
+## HOME-1 走查返修
+
+355 `85a4af12`、奕星 `23ef600e` 明确本轮五处与 Lv8 Today，覆盖之前的占位口径。依据 v4q(1) `e53c18c9`、A1 `310:179667` / A2 `311:180478`：
+
+- 页脚只写 `Upgrading is free of Energy`，Energy 实得只进 HOME-2。
+- 按钮及拒绝提示为 `Need Fishing Lv5` / `Need 3 more stamps` / `Need 1 more climate`；优先顺序技能、出门、材料、金币，展示格仍先材料和金币。
+- `Climates` 使用正式 globe 图标；HOME 专用 NeedTile 子类将圆心固定四列，长标签按格宽缩小，技能和出门各起一组，不修改其它页面的 wrap 组件。
+- Today 每级均读 next，技能/出门缺口也出，技能行去重；只 Upgrade 行亮红点，交付优先、追踪第三行保底和引导优先保持。旧/不完整 skills 字典无法确定新门槛时不出升级行。
+- 对齐 b1 `33be4590`，已含 #624 网格、#628/#631 正式图标、#630 三种材料定义；不在客户端补原始 id 的硬编码名字。Decor 合并保留内容容量上限与动态 Homestead 等级上限。
+
+定向 51/51；修后全量 2081/2081、206组、0 errors/failures/flaky/skipped/orphans（report_3），随后在材料/图标完整的集成基线上再验。截图仍由隔离假 view 驱动（userdir `gensen-liubang-355-a-review2`），名称从实际内容读取，数值是覆盖分支的测试示例，非真实服务端或生产数据。材料目录 `output/liubang-355-a-review2/media`，包括 Lv1/8/16/17、HOME-2 两态、Lv8 Today。
+
+五处修改仍需不知火舞按新头复看；v4q 批准与真实 view 联调不由截图代替。PR 仅指向 feat/355-b1，不自合、不部署，不运行 editor/import。
+
+材料/图标完整基线最终结果：**2081/2081、206组、0 errors/failures/flaky/skipped/orphans、exit0，report_4**，代码树586af950，之后仅更新本文。日志 `/tmp/liubang-355-a-review2-integrated.log`；未修改代码后重复跑测试。
