@@ -1781,11 +1781,25 @@ func hold_toasts(on: bool, after_s := 0.0) -> void:
 	if after_s <= 0.0 or not is_inside_tree(): _say_held(held)
 	else: get_tree().create_timer(after_s).timeout.connect(func(): if not _cover_up: _say_held(held))
 
+## An Info toast about the city the player is in (a Day Pass ended): held under a cover like any, it is said then only
+## if the player is still in that city (q(261) ⑦: they may have flown on).
+func toast_in_city(text: String, cluster: String) -> void:
+	if _cover_up:
+		_cover_toast = {kind = "info", text = text, city = cluster}
+		return
+	toast(text)
+
 func _say_held(held: Dictionary) -> void:
+	if held.has("city") and P0Travel.here(view) != str(held.city): return
 	match str(held.kind):
 		"error": toast_error(str(held.text), str(held.get("action", "")))
 		"success": toast_success_when_clear(str(held.text), bool(held.get("brk", false)))
-		_: toast_when_clear(str(held.text))
+		_:   # as toast_when_clear, keeping its line break: after the welcome's card too
+			_held_toast = str(held.text)
+			_held_success = false
+			_held_break = bool(held.get("brk", false))
+			_held_after_tip = false
+			_flush_held_toast()
 
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""
@@ -2999,7 +3013,7 @@ func open_nearby_cities(pick: Callable) -> UiDrawer:
 const FareBoardDrawer := preload("res://scenes/p0/panels/p0_fare_board_drawer.gd")
 
 func open_fare_board() -> UiDrawer:
-	var d: UiDrawer = FareBoardDrawer.new(P0Travel.fares())
+	var d: UiDrawer = FareBoardDrawer.new(P0Travel.fares(view))
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
