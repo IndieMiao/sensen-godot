@@ -38,7 +38,7 @@ export type P0Event =
   | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts); spot -1: a free pin (q(216))
   // paid: the fare taken (q(256)); renewed false: a Day Pass still running was not re-signed and no visit counted (option B)
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
-      paid: { energy: number; coins: number }; renewed: boolean }
+      paid: { energy: number; coins: number }; renewed: boolean; wild?: true }   // wild: a wild site (v4q(3)), stamp null and no +10
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // energy: actual gain after the new cap (q247); look: the stage it opens
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)

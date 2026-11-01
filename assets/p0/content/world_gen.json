@@ -252,6 +252,7 @@
    "map": ["quarry", "vein", "geode", "abyss", "ruin"],
    "map_min_zoom": 9,
    "exclude_land": ["GL"],
+   "fares": {"_note": "v4q(3) ③a, pending the user: with guarantee on, the nearest iron vein, quartz vein and 2 quarries from the home's base point cost at most max_trip, every other wild site outside the free 3 at least min_trip (src/p0/travel.ts fareOf).", "guarantee": false, "max_trip": 2, "min_trip": 2},
    "shares": {"quarry": 0.22, "vein": 0.18, "geode": 0.04, "woodland": 0.3, "waterside": 0.16, "bloom": 0.1},
    "near": {"trip2_km": 100, "quarry": 2, "vein": 2, "geode_km": 500},
    "abyss": [1, 3],
