@@ -1876,7 +1876,10 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 	var reason := ""
 	var cmd := {}
 	var req = r.get("request", null)
-	match str(r.get("request_state", "none")):
+	var state := str(r.get("request_state", "none"))
+	var next_in = r.get("next_in", 0)
+	if state == "wait" and (next_in == null or float(next_in) <= 0.0): state = "open"   # no wait left to say (no cooldown since 0.2.18)
+	match state:
 		"open":
 			cmd = {"type": "accept", "request": str(req.id)}
 		"accepted":
@@ -2018,7 +2021,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				_: greet = "Coffee's fresh. %d %s left today." % [int(k.get("cups_left", 0)), "cup" if int(k.get("cups_left", 0)) == 1 else "cups"]
 			if pip != "": answer = "%s has a request for you." % pip
 			elif int(k.get("board_open", 0)) > 0: answer = _board_count(int(k.board_open))
-			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null else " The Market Board refills in %s." % span(float(k.refill_in)))
+			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null or float(k.refill_in) <= 0.0 else " The Market Board refills in %s." % span(float(k.refill_in)))
 		"tackle":
 			if str(k.get("greet", "")) == "reed_rod":
 				var rod := _rod_offer(view, "rod_reed")
@@ -2045,7 +2048,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
 			titles = titles.filter(func(t): return t != "")
 			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
-			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % span(float(k.refill_in)))
+			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null or float(k.refill_in) <= 0.0 else " Next request in %s." % span(float(k.refill_in)))
 		"casino":   # q(240): no number when coins are short (the table's key says how many); Play opens the table all the same
 			# — said only while the table is open (不知火舞 351 66d46cf9: not on screen while it is not)
 			var bj: Dictionary = view.get("blackjack", {}) if view.get("blackjack") is Dictionary else {}

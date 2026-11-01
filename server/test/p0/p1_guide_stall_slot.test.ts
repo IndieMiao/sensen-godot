@@ -1,5 +1,5 @@
 /** q(215) ④⑦ (SGODOT-341 / 344): a guided save without Pond Catch holds the Stall Board's first slot until Nadia's
- * first request is delivered — then it refills 4 h later, as after Pond Catch — and the guide ending before that
+ * first request is delivered — then it refills done_refill_h later (0 since q(268); 4 h before), as after Pond Catch — and the guide ending before that
  * (the fallback, a changed table) refills it at once. */
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
@@ -37,6 +37,8 @@ function stall(s: P0State, now: number, cc = c) {
   return t.boards.stall.map(sl => ({ req: sl.req?.id ?? null, held: heldSlot(cc, t, 'stall', sl), refill_at: sl.refill_at }));
 }
 const guided = (cc = c) => freshState(cc, 'guide-stall-01', T0, 42, { guide: true });
+/** The table with the 4 h done refill it shipped until q(268) (0.2.18), for the wait's own mechanics. */
+const timed = (() => { const t = content(); t.requests = { ...t.requests, done_refill_h: 4 }; return t; })();
 /** Take and hand in A Fresh Radish at `at`. */
 function deliverOne(s: P0State, at: number, cc = c): P0State {
   s = run(s, { type: 'accept', request: ONE }, at - 60_000, cc);
@@ -53,20 +55,28 @@ describe('the Stall Board\'s first slot in the guide (q(215) ④⑦)', () => {
     expect(stall(s, T0 + 40 * H).map(x => x.req)).toEqual([null, null]);
   });
 
-  it('refills 4 h after A Fresh Radish is delivered; slot 2 keeps its 72 h', () => {
+  it('q(268): refills at once when A Fresh Radish is delivered; slot 2 keeps its 72 h', () => {
     const at = T0 + H;
     const s = deliverOne(guided(), at);
     expect(s.guide?.step).toBe('t_nadia_2');
-    expect(stall(s, at)).toEqual([
+    expect(stall(s, at)[0]).toMatchObject({ held: false, refill_at: at });
+    expect(stall(s, at)[0].req).toMatch(/-stall0-/);
+    expect(stall(s, at)[1]).toEqual({ req: null, held: true, refill_at: T0 + 72 * H });
+  });
+
+  it('on a table with a done refill (4 h until q(268)) it waits that long, and the guide ending meanwhile does not bring it forward', () => {
+    const at = T0 + H;
+    const s = deliverOne(guided(timed), at, timed);
+    expect(s.guide?.step).toBe('t_nadia_2');
+    expect(stall(s, at, timed)).toEqual([
       { req: null, held: false, refill_at: at + 4 * H }, { req: null, held: true, refill_at: T0 + 72 * H }]);
-    expect(stall(s, at + 4 * H - 1)[0].req).toBeNull();
-    expect(stall(s, at + 4 * H)[0].req).toMatch(/-stall0-/);
-    expect(stall(s, at + 4 * H)[1].req).toBeNull();
-    // the guide ending (Six Radishes taken) inside those 4 h does not bring it forward
+    expect(stall(s, at + 4 * H - 1, timed)[0].req).toBeNull();
+    expect(stall(s, at + 4 * H, timed)[0].req).toMatch(/-stall0-/);
+    expect(stall(s, at + 4 * H, timed)[1].req).toBeNull();
     s.residents.res_nadia.affinity = 17;
-    const ended = run(s, { type: 'accept', request: SIX }, at + 2 * H);
+    const ended = run(s, { type: 'accept', request: SIX }, at + 2 * H, timed);
     expect(ended.guide).toMatchObject({ step: null, end: 'done' });
-    expect(stall(ended, at + 2 * H)[0]).toEqual({ req: null, held: false, refill_at: at + 4 * H });
+    expect(stall(ended, at + 2 * H, timed)[0]).toEqual({ req: null, held: false, refill_at: at + 4 * H });
   });
 
   it('refills at once when the guide ends before the delivery (a table without its step; 341\'s fallback ends the same way)', () => {

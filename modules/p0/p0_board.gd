@@ -21,10 +21,10 @@ static func facts(view: Dictionary, board: String) -> Array:
 	if not sys.is_empty(): out.append(["Requests today", "%d/%d" % [int(sys.get("used", 0)), int(sys.get("cap", 0))]])
 	var soonest := -1.0
 	for sl in view.get("boards", {}).get(board, {}).get("slots", []):
-		if sl.get("empty", false) and sl.has("refill_in"):
+		if sl.get("empty", false) and sl.has("refill_in") and float(sl.refill_in) > 0.0:   # a slot refilling now says nothing (0 h since 0.2.18)
 			var t := float(sl.refill_in)
 			soonest = t if soonest < 0.0 else minf(soonest, t)
-	if soonest >= 0.0: out.append(["Next request", P0Logic.span(soonest)])
+	if soonest > 0.0: out.append(["Next request", P0Logic.span(soonest)])
 	var bonus: Dictionary = q.get("request_bonus", {})
 	if int(bonus.get("used", 0)) > 0: out.append(["Bonus today", "%d/%d" % [int(bonus.used), int(bonus.get("cap", 0))]])
 	return out
@@ -202,7 +202,7 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 			d.example = far_tries(view, r)
 		for j in slots.size():
 			var other: Dictionary = slots[j]
-			if j != i and other.get("empty", false) and other.has("refill_in"):
+			if j != i and other.get("empty", false) and other.has("refill_in") and float(other.refill_in) > 0.0:
 				d.next = {slot = "%s board slot" % ["First", "Second", "Third"][mini(j, 2)], within = P0Logic.span(float(other.refill_in))}
 				break
 		return d
