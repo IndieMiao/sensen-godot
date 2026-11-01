@@ -1819,7 +1819,7 @@ func _dev_shot(dt: float) -> void:
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
-			# Crop-ready notifications (SGODOT-350) on a desktop: notify:<never|allowed|refused|old> puts in a stand-in
+			# Crop-ready notifications (SGODOT-350 / 356) on a desktop: notify:<never|allowed|refused|old|ios-…> puts in a stand-in
 			# phone (tools/dev) with a fresh account file; notifications opens Settings › Notifications; ask:<crops|radishes>
 			# brings the soft prompt up as its conditions would.
 			"notify":
