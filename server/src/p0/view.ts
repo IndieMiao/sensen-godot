@@ -500,7 +500,7 @@ function boardView(c: P0Content, s: P0State, board: BoardId, now: number, city =
   const at = board === 'market' ? marketOf(c, s, city) : null;
   return {
     title: c.requests.boards[board].title, deliver_at: board === 'stall' ? 'homestead' : 'market',
-    ...(at ? { cluster: city, city: at.city, home: city === homeOf(c, s) } : {}),
+    ...(at ? { cluster: city, city: at.city, home: city === homeOf(c, s), deliver_place: at.place, deliver_name: at.name } : {}),
     slots: slotsOf(c, s, board, city).slice(0, slotCount(c, s, board)).map(sl => sl.req ? requestView(c, s, sl.req, now)
       : locked ? { empty: true, locked: { template: locked.template, title: c.requests.templates[locked.template].title, gate: locked.gate } }
       // q(99): the new account's held slot 2 shows no countdown (clients count only slots with refill_in)
