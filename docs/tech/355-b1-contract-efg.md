@@ -329,6 +329,13 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - 电梯面板标题是 `Elevator · <这座矿的全名>`（例如 `Elevator · Ironvale Vein`）；行写 `Floor 10 · Free`、`Floor 20 · 2 Energy`，自己所在的那一站写 `Here`。
 - 日切：Info toast `New day · Floor 12 has changed`。
 - 火把：Info toast 一次写全层 `Floor 12 · Copper Ore ×2 · Iron Ore ×1`，太长就在「 · 」后换行。
+- Pip 的 First Dig（v4q(7) ③ 340e4c4e）：
+  - 标题 `Pip's First Dig`；
+  - 台词 `Ever been down a mine? Reach Floor 3 and tell me what's down there!`；
+  - 奖励行 `+5 Friendship · Copper Sword`；
+  - 委托卡目标行 `Reach Floor 3 · any mine`；
+  - Today `Pip's First Dig · Floor 1/3`（分子是资历）；
+  - 完成飘字 `Copper Sword · equipped`。手上是铁剑、没换装时的写法 q 行没给，先只写 `Copper Sword`，走查时请不知火舞定。
 - 背包满：岩石置灰 `Mine · Bag full`；掉落放不下飘字 `Bag full · Iron Ore left on the floor`，东西留在原地，本层内走过去自动捡。
 - 矿脉 F40 下面的楼梯：灰牌 `Floor 41 · Not open yet`；浅坑最深层没有往下的楼梯。
 - 倒地卡：标题 `Knocked out`；第一行 `You're back at the entrance.`；第二行 F1–10 写 `You kept everything.`，F11 起写 `You dropped half of what you found on this floor:` 加上掉落列表；第三行 `Your best here is still Floor 14.`；按钮 `Close`。
@@ -352,12 +359,12 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 
 ### 9.2 铜剑：Pip 的 First Dig（单列、独立的槽，v4q(7) ③ 340e4c4e）
 - **不走居民委托，也不走 `intro_requests`**：那套机制有 `r.next = 0`、和委托线共用一个槽、要交、只给新引导档这几道限制，都不适用。First Dig 是自己的一条：
-  - **内容**：`mine.first_dig: { "giver": "res_pip", "floor": 3, "gate": { "homestead": 3 }, "reward": { "weapon": "weapon_copper_sword" } }`。标题和文案由李白给，放进同一段。
+  - **内容**：`mine.first_dig: { "giver": "res_pip", "floor": 3, "gate": { "homestead": 3 }, "reward": { "weapon": "weapon_copper_sword", "affinity": 5 } }`。文案见第 7.4 节（v4q(7) ③，不知火舞审定）。
   - **存档**：不加新字段。完成以后在 `s.rewards` 里记 `first_dig`（现有的一次性奖励列表）。
   - **出现**：`homestead.level >= gate.homestead` 且 `rewards` 里没有 `first_dig`。不看好感、不看 Pip 的委托线、Pip 手上有委托也出现；**不占 `track_max`**。
   - **进度** = 资历（所有矿的 deepest 取最大）。
   - **完成**：资历 ≥ `floor` 就直接完成，不用交。两个时刻都要结算：`mine_record` 事件那一刻；还有它出现的那一刻，即升到 Lv3 的那条 `homestead_upgrade` 命令里，Lv3 前就到过第 3 层的当场完成。
-  - 完成时：记 `rewards: first_dig`，发事件 `{kind: 'first_dig', done: true}` 和奖励。
+  - 完成时：记 `rewards: first_dig`，发事件 `{kind: 'first_dig', done: true}` 和奖励：铜剑，加上 Pip 的好感 +5（走现有的好感加点，阶段照常升）。
 - **view**：`view.first_dig: null | { giver, floor, have, done: false }`，出现了、还没完成时才有；Today 照它出一行，第 7.4 节的文案按 q 行。
 - **奖励** `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
 - 和 D 的引导改版（「第一次下矿」那一步）会交叉，我和蒙恬对步骤。
