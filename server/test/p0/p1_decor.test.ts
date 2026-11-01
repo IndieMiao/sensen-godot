@@ -113,4 +113,17 @@ describe('placing in the yard', () => {
     s.decor = { placed: Array.from({ length: 20 }, (_, i) => ({ uid: i + 1, id: 'deco_planter', x: 99, y: i, rot: 0 as const })), count: 20 };
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 2, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_cap', detail: { cap: 20, used: 20 } });
   });
+
+  it('stops at decor_max.max when the content sets one (SGODOT-355 b1: 52 proposed, the yard has 53 free cells)', () => {
+    const capped = structuredClone(c);
+    (capped.homestead as { decor_max?: object }).decor_max = { base: 20, per_level: 4, max: 52 };
+    const s = stocked();
+    s.homestead.level = 8;
+    expect(decorCap(capped, s)).toBe(48);
+    s.homestead.level = 9;
+    expect(decorCap(capped, s)).toBe(52);
+    s.homestead.level = 17;
+    expect(decorCap(capped, s)).toBe(52);
+    expect(decorCap(c, s)).toBe(84);   // no max in the content yet: the formula alone
+  });
 });

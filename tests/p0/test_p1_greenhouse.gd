@@ -43,6 +43,17 @@ func test_a_whole_block_opens_with_bed_31() -> void:
 	assert_bool(P0FarmFacilities.has_open_block(_view(31))).is_true()
 	assert_array(P0FarmFacilities.cover_of(_view(31), _at(2, 1), "greenhouse")).has_size(16)
 
+## A finger points at the block round it (anchor one col and one row before it), kept on the open beds — the grid's left
+## col is −1, so a block there is reachable too (the anchor was kept at col 0 and row 0 before SGODOT-355 b1).
+func test_a_finger_reaches_every_block_on_the_grid() -> void:
+	var v := _view(36)   # rows 1–4 whole, cols −1…7
+	assert_int(P0FarmFacilities.anchor_for(v, _at(3, 2), "greenhouse")).is_equal(_at(2, 1))
+	assert_int(P0FarmFacilities.anchor_for(v, _at(-1, 2), "greenhouse")).is_equal(_at(-1, 1))   # the left edge
+	assert_int(P0FarmFacilities.anchor_for(v, _at(0, 2), "greenhouse")).is_equal(_at(-1, 1))
+	assert_int(P0FarmFacilities.anchor_for(v, _at(7, 4), "greenhouse")).is_equal(_at(4, 1))     # the right and front edges
+	var lv17 := _view(63)
+	assert_int(P0FarmFacilities.anchor_for(lv17, _at(0, -2), "greenhouse")).is_equal(_at(-1, -2))   # the far row
+
 func test_a_sprinkler_never_goes_under_glass_nor_a_tree() -> void:
 	var v := _view()
 	v.plots[8].greenhouse = true

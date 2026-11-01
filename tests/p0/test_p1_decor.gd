@@ -79,6 +79,19 @@ func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
 	v.homestead.level = 10
 	v.decor.cap = 24
 	assert_str(P0Decor.cap_line(v)).is_equal("Decor 24/24 · Store one to place this")
+	# decor_max.max (SGODOT-355 b1, the user decides 52): the level it is reached at adds nothing more
+	var m := {"base": 20, "per_level": 4, "max": 52}
+	assert_int(P0Decor.cap_at(9, m)).is_equal(52)
+	assert_int(P0Decor.cap_at(8, m)).is_equal(48)
+	v.homestead.level = 8
+	v.decor.cap = 48
+	v.decor.placed.resize(0)
+	for i in 48: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
+	assert_str(P0Decor.cap_line(v, m)).is_equal("Decor 48/48 · Homestead Lv9 adds 4")
+	v.homestead.level = 9
+	v.decor.cap = 52
+	for i in 4: v.decor.placed.append({"uid": i + 49, "id": "deco_planter", "x": 98, "y": i, "rot": 0})
+	assert_str(P0Decor.cap_line(v, m)).is_equal("Decor 52/52 · Store one to place this")
 
 func test_today_offers_a_free_row_while_decor_waits_in_storage() -> void:
 	var v := {"decor": {"placed": [], "cap": 20, "stored": {}}}

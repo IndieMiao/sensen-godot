@@ -1199,6 +1199,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("Sold out today · %d left" % int(detail.get("left", 0)))
 		"limit_reached":   # a day's allowance used (the Compost Bin, a counter's buy-back): q(121)'s words (哪吒 on #286)
 			ui.toast_error("Limit reached · %s" % P0Logic.span(float(detail.get("resets_in", 0))))
+		"plots_full":   # SGODOT-355 b1: the field's annuals at the level's Plots — the grey Sow key's words (亚瑟 on #624)
+			var cur := session.current()
+			var at := {"homestead": cur.get("homestead", {}),
+				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast))
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":

@@ -23,10 +23,11 @@ type WithDecor = P0Content & { decor?: { items: Record<string, DecorItem>; yard:
 export const decorOf = (c: P0Content) => (c as WithDecor).decor;
 export const isDecor = (c: P0Content, id: string) => !!decorOf(c)?.items[id];
 
-/** §8.3.2: 20 + 4 × (Homestead level − 1). */
+/** §8.3.2: 20 + 4 × (Homestead level − 1), at most decor_max.max when the content sets one (SGODOT-355 b1: the yard has
+ * 53 free cells since the field took the whole grid; 不知火舞 proposes 52, the user decides — 奕星 on #624). */
 export function decorCap(c: P0Content, s: P0State): number {
-  const m = (c.homestead as { decor_max?: { base: number; per_level: number } }).decor_max ?? { base: 20, per_level: 4 };
-  return m.base + m.per_level * Math.max(0, s.homestead.level - 1);
+  const m = (c.homestead as { decor_max?: { base: number; per_level: number; max?: number } }).decor_max ?? { base: 20, per_level: 4 };
+  return Math.min(m.base + m.per_level * Math.max(0, s.homestead.level - 1), m.max ?? Infinity);
 }
 
 /** The cells a piece covers at x, y. */

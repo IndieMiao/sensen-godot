@@ -496,7 +496,7 @@ func _snap(screen: Vector2) -> void:
 		_show_yard(v, cell)
 		return
 	var id := plot_at_screen(v, screen)
-	if is_block(str(placing.kind)) and id >= 0: id = _anchor_for(v, id, str(placing.kind))
+	if is_block(str(placing.kind)) and id >= 0: id = anchor_for(v, id, str(placing.kind))
 	if id == int(placing.plot): return
 	placing.plot = id
 	_show_spot(v, id)
@@ -513,13 +513,18 @@ func plot_at_screen(v: Dictionary, screen: Vector2) -> int:
 	return best
 
 ## A finger on a plot points at the block around it: the anchor one row and one col before it (the finger near the
-## block's middle), kept on the grid; -1 when no plot stands there.
-func _anchor_for(v: Dictionary, finger_plot: int, kind: String) -> int:
+## block's middle), kept on the open beds' cols and rows (the grid starts at col −1, row −2 since SGODOT-355 b1); -1 when
+## no plot stands there.
+static func anchor_for(v: Dictionary, finger_plot: int, kind: String) -> int:
 	var size := block_size(kind)
 	var g := P0Garden.grid_of(finger_plot) - Vector2i((size.x - 1) / 2, (size.y - 1) / 2)
-	var top := Vector2i.ZERO
-	for id in P0Garden.plot_count(v): top = Vector2i(maxi(top.x, P0Garden.grid_of(id).x), maxi(top.y, P0Garden.grid_of(id).y))
-	g = Vector2i(clampi(g.x, 0, maxi(0, top.x - size.x + 1)), clampi(g.y, 0, maxi(0, top.y - size.y + 1)))
+	var lo := P0Garden.grid_of(0)
+	var hi := lo
+	for id in P0Garden.plot_count(v):
+		var at := P0Garden.grid_of(id)
+		lo = Vector2i(mini(lo.x, at.x), mini(lo.y, at.y))
+		hi = Vector2i(maxi(hi.x, at.x), maxi(hi.y, at.y))
+	g = Vector2i(clampi(g.x, lo.x, maxi(lo.x, hi.x - size.x + 1)), clampi(g.y, lo.y, maxi(lo.y, hi.y - size.y + 1)))
 	for id in P0Garden.plot_count(v): if P0Garden.grid_of(id) == g: return id
 	return -1
 
