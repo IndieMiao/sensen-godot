@@ -332,7 +332,6 @@ function homesteadView(c: P0Content, s: P0State) {
       bag_upgrade_1: bagTier(upgrade.id),
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
-      clay_bank: unlocked(c, s, 'clay_bank'),
       // P1 (SGODOT-282, §8.3.1): stoves 1 / 2 / 3, Big Pot, Notice Board, Chef's Sign (gold +5 points), Bag II / III.
       stoves: stoveCount(c, s), big_pot: bigPot(c, s), notice_board: unlocked(c, s, 'notice_board'),
       chefs_sign: chefSignGold(c, s) > 0, cabinet: cabinetCap(c, s),
