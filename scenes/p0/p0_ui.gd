@@ -2453,7 +2453,11 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 			key.activated.connect(func():
 				close_modal()
 				command.emit({"type": "deliver", "request": str(lk.id)}))
-		else: key.activated.connect(func(): P0LocalRequest.open(self, str(lk.id), func(): open_keeper_greeting(role, c)))
+		else:
+			var open_card := func(): P0LocalRequest.open(self, str(lk.id), func(): open_keeper_greeting(role, c))
+			key.activated.connect(open_card)
+			# the gap key is grey (LOCK-10): a tap on it is unavailable_pressed, and it opens the card all the same
+			key.unavailable_pressed.connect(func(_r: String): open_card.call())
 		card.content.add_child(key)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)

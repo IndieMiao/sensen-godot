@@ -114,6 +114,29 @@ func test_the_request_card_rows_drop_and_page_through_the_keepers_requests() -> 
 	(links[1] as UiNavButton).pressed.emit()
 	assert_array(got).is_equal([1])
 
+func test_the_grey_gap_key_opens_the_request_card_when_tapped() -> void:
+	# the gap is a reason (LOCK-10): a tap emits unavailable_pressed, not activated — the card opens all the same
+	var ctx := {"keeper": "Wen", "place": "Xuhui Tackle Shop", "outpost": TACKLE}
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view([_loc("req_loc_g", {"status": "accepted"})]))
+	ui.open_keeper_greeting("tackle", ctx)
+	var key: UiCommandButton = ui._modal.find_children("LocalKey", "UiCommandButton", true, false)[0]
+	assert_str(key.reason).is_equal("Need 2 more Pond Crucian")
+	key.pressed.emit()
+	assert_str(ui.modal_kind).is_equal("local_request")
+	var rc: UiRequestCard = ui._modal.find_children("LocalRequestCard", "UiRequestCard", true, false)[0]
+	assert_str(str(rc.data.title)).is_equal("Pond Catch")
+
+## q(272) ⑦ (周瑜 on #610): handed in elsewhere, the server's wrong_place says where it goes — its hand-in row in the toast
+func test_a_local_request_refused_wrong_place_toasts_its_hand_in_row() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.view = _view([_loc("req_loc_w", {"status": "accepted", "ready": true, "have": 3})])
+	rt._on_refused("wrong_place", {}, {"type": "deliver", "request": "req_loc_w"})
+	assert_str(rt.ui.toast_text()).is_equal("Pond Catch · Deliver to Wen · Shanghai")
+
 func _ui() -> P0Ui:
 	var u := P0Ui.new()
 	add_child(auto_free(u))
@@ -134,7 +157,7 @@ func test_the_greeting_card_puts_one_key_under_trade_and_none_without_a_request(
 	var texts: Array = card.content.get_children().map(func(b): return (b as Button).text)
 	assert_str(str(texts[0])).is_equal("Trade")
 	assert_str(str(texts[1])).is_equal("Request")
-	(card.content.get_child(1) as UiCommandButton).activated.emit()
+	(card.content.get_child(1) as UiCommandButton).pressed.emit()   # as a tap
 	assert_str(ui.modal_kind).is_equal("local_request")
 	var rc: UiRequestCard = ui._modal.find_children("LocalRequestCard", "UiRequestCard", true, false)[0]
 	assert_array(rc.data.links).is_equal(["Wen's other requests · 1"])
