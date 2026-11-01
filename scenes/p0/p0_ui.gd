@@ -3721,14 +3721,14 @@ func open_map_data(back := Callable()) -> void:
 	modal_kind = "map_data"
 	_modal_back = back
 
-## A Map data row's address, opened in the browser: the two credits and Mapbox's feedback page.
+## A Map data row's address, opened in the browser (ExternalLink): the two credits and Mapbox's feedback page.
 func _open_map_data_row(what: String) -> void:
 	match what:
-		"mapbox_site": OS.shell_open(MapUsage.MAPBOX_CREDIT)
-		"osm_site": OS.shell_open(MapUsage.OSM_CREDIT)
+		"mapbox_site": ExternalLink.open(MapUsage.MAPBOX_CREDIT)
+		"osm_site": ExternalLink.open(MapUsage.OSM_CREDIT)
 		"improve":
 			var c := P0Clusters.get_cluster(P0Travel.home(view))
-			OS.shell_open(MapUsage.feedback_url(Vector3(float(c.get("lat", 0.0)), float(c.get("lng", 0.0)), 12.0)))
+			ExternalLink.open(MapUsage.feedback_url(Vector3(float(c.get("lat", 0.0)), float(c.get("lng", 0.0)), 12.0)))
 
 ## A credit's full text under its title (no frame; 不知火舞 on the Licenses brief).
 func open_license_text(id: String, back := Callable()) -> void:
@@ -3737,7 +3737,7 @@ func open_license_text(id: String, back := Callable()) -> void:
 	var page := P0SettingsPage.text(str(r.get("title", "")), P0Legal.full_text(r), safe_top(), safe_bottom(), link)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
-	page.open_pressed.connect(func(what: String): if what == "link" and str(link.get("url", "")) != "": OS.shell_open(str(link.url)))   # q(205) ⑥
+	page.open_pressed.connect(func(what: String): if what == "link" and str(link.get("url", "")) != "": ExternalLink.open(str(link.url)))   # q(205) ⑥
 	_open_modal(page, 0.0, true)
 	modal_kind = "license_text"
 	_modal_back = back
