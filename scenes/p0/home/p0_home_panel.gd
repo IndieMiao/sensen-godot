@@ -1,6 +1,6 @@
 extends RefCounted
 ## HOME-1 upgrade sheet (Figma 482:152) and the HOME-2 moment (482:154 / MomentBanner 1228:108620) for
-## Homestead Lv1–3 (plan §8.1–8.6, SGODOT-228). Data comes from P0Logic.home_panel / home_moment; this file
+## Homestead (SGODOT-228 / 355 A). Data comes from P0Logic.home_panel / home_moment; this file
 ## only lays them out with the kit (UiNeedTile, UiNeedSource, UiCommandButton) on P0Ui's modal base.
 
 const SHEET_TOP := 194.0        # sheet edge on the 360 × 800 frame; scrolling content above the fixed actions
@@ -56,7 +56,7 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		scroll.add_child(body)
 		frame.add_child(_fade(scroll))
 	body.add_child(UiKit.label(str(model.title), UiTokens.STYLE_C14_XB))
-	if str(model.subtitle) != "":   # Lv10: `Max level · Homestead Master` (q(115) ②)
+	if str(model.subtitle) != "":   # the current content cap, independent of the Master title
 		body.add_child(UiKit.label(str(model.subtitle), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
 	if str(model.look) != "":
 		body.add_child(UiKit.label(str(model.look), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY))
@@ -141,7 +141,7 @@ static func _fade(scroll: ScrollContainer) -> Control:
 	fade.visible = false
 	return fade
 
-## The Upgrade button (the first gap on it, LOCK-10); none at Lv10 (q(115) ②).
+## The Upgrade button (the first gap on it, LOCK-10); none at the current Homestead cap.
 static func _add_button(ui: P0Ui, col: Control, panel: Control, model: Dictionary) -> void:
 	var button := UiCommandButton.new(str(model.label))
 	button.reason = str(model.reason)
@@ -189,7 +189,7 @@ static func _look_row(ui: P0Ui, r: Dictionary) -> Control:
 			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed: P0LookPick.open(ui, id))
 	return row
 
-## A tapped tile: one source line above it; Show only moves the camera (LOCK-10 / LOCK-08).
+## A tapped tile's source: materials point at the world; 355 A's skill and travel gates open Skills / the map.
 static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 	var src := P0Logic.home_source(ui.view, id)
 	var go := str(src.go) if str(src.go) in ["skills", "map"] or ui.spot_reachable() else ""

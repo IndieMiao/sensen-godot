@@ -2193,8 +2193,7 @@ const P1_UNLOCKS := {
 	"orchard_10": {"icon": "crop_apple", "text": "Orchard 10/10", "note": "+1 slot"},
 	"sprinklers_12": {"icon": "facility_sprinkler", "text": "Sprinklers 12/12", "note": "+1 sprinkler"},
 	"fourth_stove": {"icon": "kitchen", "text": "Fourth Stove", "note": "four dishes at once"},
-	# Lv7 (P1 exit C18, 李白 q(172)): the orchard and the sprinklers reach their most (perennial_slots 1 + level up to 8,
-	# sprinkler_max 3 + level up to 10), §8.6.2's lines; notes q(172) (李白 fac20ed1, 不知火舞)
+	# Capacity labels follow the unlock ids supplied by the content table; later batches may add further tiers.
 	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": "+1 slot"},
 	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": "+1 sprinkler"},
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
