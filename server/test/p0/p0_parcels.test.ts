@@ -8,7 +8,7 @@ import { grantItems, PARCEL_LIFETIME_MS, settleParcels } from '../../src/p0/parc
 import { gainXp, type P0Event } from '../../src/p0/progress.js';
 import { applyP0, count, type P0Command } from '../../src/p0/reducer.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
-import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { viewOf } from '../../src/p0/view.js';
 
@@ -147,7 +147,7 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
     s.skills.fishing = 70;
     const v4 = JSON.parse(JSON.stringify(s)); delete v4.inbox;
     const v3 = JSON.parse(JSON.stringify(v4)); v3.v = 3; delete v3.mine; delete v3.gather;
-    expect(upgradeState(c, v3)).toMatchObject({ v: 6, inbox: { granted: [], parcels: [], waiting: [], updates: [] } });
+    expect(upgradeState(c, v3)).toMatchObject({ v: SAVE_VERSION, inbox: { granted: [], parcels: [], waiting: [], updates: [] } });
     const upgraded = upgradeState(c, v4);
     expect(upgraded.inbox).toEqual({ granted: [], parcels: [], waiting: [], updates: [] });
     expect(upgraded.bag).toEqual(s.bag);

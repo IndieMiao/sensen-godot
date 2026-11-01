@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
-import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 import { ownedTitles } from '../../src/p0/titles.js';
 import { gainXp, type P0Event } from '../../src/p0/progress.js';
@@ -123,7 +123,7 @@ describe('titles (q(180))', () => {
     delete old.title;
     const s = upgradeState(c, JSON.parse(JSON.stringify(old)), T0);
     expect('title' in s).toBe(false);
-    expect(s.v).toBe(6);
+    expect(s.v).toBe(SAVE_VERSION);
     expect('title' in step(s, { type: 'read_inbox', keys: [] })).toBe(false);
   });
 

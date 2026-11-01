@@ -6,7 +6,7 @@ import { loadP0Content } from '../../src/p0/content.js';
 import { rockDrop } from '../../src/p0/mine.js';
 import { notePresence } from '../../src/p0/presence.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
-import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
 const content = loadP0Content();
@@ -503,7 +503,7 @@ describe('save v4', () => {
     delete gear.picks; delete gear.pick;
     old.v = 3;
     const s = upgradeState(c, old as unknown as P0State, T0);
-    expect(s.v).toBe(6);
+    expect(s.v).toBe(SAVE_VERSION);
     expect(s.gear).toMatchObject({ picks: ['pick_starter'], pick: 'pick_starter' });
     expect(s.gather).toEqual({ ready_at: {}, last_at: 0 });
     expect(s.mine).toEqual({ run: null, count: 0, ended: null, swing_at: 0 });
