@@ -974,6 +974,7 @@ func _markers(v: Dictionary) -> void:
 
 ## Where each prompt sits on screen ({anchor name: point}); a room may spread prompts that crowd (the farmhouse's stoves).
 func _marker_spots(spots: Dictionary) -> Dictionary: return spots
+var _laid_out := {}   # {name: true}: buttons _marker_spots placed this frame, which spread() leaves out of its strip row
 
 # ---------------------------------------------------------------- prompt buttons kept apart (不知火舞 on 282)
 ## Folded prompt buttons keep 44 px apart, centre to centre (① below), and none sits under the open name strip (②); only
@@ -1005,8 +1006,9 @@ static func spread_rank(n: String) -> int:
 
 ## Where the folded buttons are drawn (pure, tested): `spots` {name: point}, `buttons` the names drawn as buttons (not the
 ## open one, which is its strip), `strip` the open strip's rect (empty: none), `screen` the screen, `top` the HUD's bottom,
-## `in_row` last frame's row. Returns {spots, row: {name: true}}.
-static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect2, top: float, in_row := {}) -> Dictionary:
+## `in_row` last frame's row, `keep` the buttons a room laid out itself this frame (the farmhouse's stove grid over its
+## open stove strip, #634), left out of the row over the strip. Returns {spots, row: {name: true}}.
+static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect2, top: float, in_row := {}, keep := {}) -> Dictionary:
 	var out := spots.duplicate()
 	# a button off the screen is not drawn (P0Ui.world_icon): left where it is, out of both rules
 	var order := buttons.filter(func(n): return screen.has_point(spots[n]))
@@ -1023,7 +1025,7 @@ static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect
 	var under: Array = []
 	if strip.has_area():
 		for n in order:
-			if n == "exit": continue
+			if n == "exit" or keep.has(n): continue
 			var reach := STRIP_REACH + (SPREAD_HOLD if in_row.has(n) else 0.0)
 			if strip.grow(reach).has_point(out[n]): under.append(n)
 	if not under.is_empty():
@@ -1067,7 +1069,7 @@ func _spread_markers(marks: Dictionary, spots: Dictionary) -> Dictionary:
 		var kind := str(marks[n].get("kind", ""))
 		if (kind == "facility" or kind == "seat") and n != _card: buttons.append(n)
 	var screen := get_viewport().get_visible_rect()
-	var laid := spread(spots, buttons, _card_rect, screen, _safe_top() + HUD_BOTTOM, _in_row)
+	var laid := spread(spots, buttons, _card_rect, screen, _safe_top() + HUD_BOTTOM, _in_row, _laid_out)
 	_in_row = laid.row
 	var out: Dictionary = laid.spots
 	for n in _spread_off.keys():   # a button gone from the screen starts afresh when it returns
