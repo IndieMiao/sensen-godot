@@ -93,6 +93,7 @@ describe('q(272) local requests', () => {
       expect(r.giver).not.toBe('');
       expect(r).toMatchObject({ city: 'Hayward', here: true, cluster: HAYWARD });
       expect((r as { place_name?: string }).place_name).not.toBe('');
+      expect(r).toMatchObject({ place_role: roleOf.get(r.place), look: expect.stringMatching(/_\d$/) });   // the card's face from anywhere
       expect(c.requests.templates[r.template].home_only).toBeFalsy();
     }
     const first = v.locals[0] as { id: string; place: string };

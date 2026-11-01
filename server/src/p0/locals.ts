@@ -35,14 +35,16 @@ export function givers(c: P0Content, city: string): { place: string; role: strin
     : roles[o.role] ? [{ place: o.id, role: o.role, templates: roles[o.role] }] : []);
 }
 
-/** The keeper giving a request: name plate and role as the outpost shows them, and the outpost's name (a generated
- * city's, or a hand-written one's from p0_outposts.json) — Deliver to names it from anywhere, the client not knowing
- * that city's places at home; empty where the city's places are not known. */
-export function giverOf(c: P0Content, city: string, place: string): { giver: string; giver_role: string; place_name: string } {
+/** The keeper giving a request: name plate and role as the outpost shows them, the outpost's name and role, and — a
+ * generated city's keeper — their look preset with the outpost's residents (the client's keeper_look gives way to a
+ * resident's hair, as in the room), so the card draws the same face from anywhere (不知火舞 on 378), the client not
+ * knowing that city's places at home; empty where the city's places are not known. */
+export function giverOf(c: P0Content, city: string, place: string) {
   const gen = cityPlaces(c, city)?.detail.outposts.find(o => o.id === place);
   const own = (c.outposts ?? []).find(o => o.id === place);
   const k = gen?.keeper ?? own?.keeper;
-  return { giver: k?.name ?? '', giver_role: k?.role ?? '', place_name: gen?.name ?? own?.name ?? '' };
+  return { giver: k?.name ?? '', giver_role: k?.role ?? '', place_name: gen?.name ?? own?.name ?? '', place_role: gen?.role ?? own?.role ?? '',
+    look: gen?.keeper.look ?? '', residents: gen?.residents ?? own?.residents ?? [] };
 }
 
 /** A template a keeper may give in that city: as the city's Market Board could draw it, never an explore one; a fish one
