@@ -817,14 +817,6 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	if rest_left <= 0:
 		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
 		rest_tile.on = false
-	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228)
-		var away = rest.get("away_ready_in")
-		if away == null:
-			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
-			rest_tile.on = false
-		elif float(away) > 0.0:
-			rest_tile.fact = "Ready in %s" % span(float(away))
-			rest_tile.on = false
 	if rest_tile.on and str(rs.get("state", "")) == "full":   # nothing to gain: no "+0 Energy" tile (亚瑟 on #37)
 		rest_tile.fact = "Energy full"
 		rest_tile.on = false
@@ -1044,13 +1036,12 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 			parcels.append(parcel)
 		own.call(v, "inbox")["parcels"] = parcels
-	# SGODOT-377: Rest's 2 h away and day reset, a resident's next request, the keepers' and boards' refills count down
-	# between reads too (the 30 s refresh moved them a minute at a time; the open bench card not at all)
+	# SGODOT-377: Rest's day reset, a resident's next request, the keepers' and boards' refills count down between reads
+	# too (the 30 s refresh moved them a minute at a time; the open bench card not at all)
 	var rest = v.get("rest", null)
-	if rest is Dictionary:
+	if rest is Dictionary and rest.get("resets_in", null) != null:
 		var r: Dictionary = own.call(v, "rest")
-		for key in ["away_ready_in", "resets_in"]:
-			if r.get(key, null) != null: r[key] = maxf(0.0, float(r[key]) - elapsed_ms)
+		r["resets_in"] = maxf(0.0, float(r.resets_in) - elapsed_ms)
 	var residents = v.get("residents", null)
 	if residents is Dictionary and residents.values().any(func(r): return r is Dictionary and r.get("next_in", null) != null):
 		var rs: Dictionary = own.call(v, "residents")
@@ -1080,9 +1071,11 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	return v
 
 ## SGODOT-377: ms until the first countdown in this server view that a read changes runs out — a resident's next request
-## opens, a keeper's or board's slot refills — or -1 for none. Rest's need no read: the bench opens on the projection.
+## opens, a keeper's or board's slot refills, the 04:00 day reset (Rest's `Used today` turns back; 周瑜 on #602) — or -1
+## for none.
 static func next_expiry(view: Dictionary) -> float:
 	var ins: Array = []
+	if view.get("rest") is Dictionary and view.rest.get("resets_in", null) != null: ins.append(float(view.rest.resets_in))
 	var of := func(key: String) -> Array: return view[key].values() if view.get(key) is Dictionary else []
 	for r in of.call("residents"):
 		if r is Dictionary and r.get("next_in", null) != null: ins.append(float(r.next_in))
@@ -2119,22 +2112,21 @@ static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
 		if str(r.get("id", "")) == id: return r.merged({"price": _shop_price(view, "tackle", id, int(r.get("price", 0)))})
 	return {}
 
-# ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(41), SGODOT-224)
-## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52;
-## q(70): `wait` is the strip's fact while it can't be used yet, "in 1h 12m" or "after 2h away"):
-## state "ready" / "away" (2 h away from home first, q(41)) / "used" / "full"; the badge (STATE-ICONS: Available,
-## Countdown with the time left, Used today); the sheet's lines and its one button. Used today, the sheet's last line
-## counts down to the 04:00 home-day reset like the mine's `Resets in 9h 12m` (q(96)).
-## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). away_ready_in null = never left home.
+# ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(269), SGODOT-224)
+## The bench's state from view.rest {used, limit, resets_in, amount} and Energy (FARM-7-2 482:52): state "ready" /
+## "used" / "full"; the badge (STATE-ICONS: Available, Used today); the sheet's lines and its one button. Used today,
+## the sheet's last line counts down to the 04:00 home-day reset like the mine's `Resets in 9h 12m` (q(96)).
+## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). q(269) (SGODOT-377, the user's ③): once a day
+## with no 2 h away first — the away state is gone (不知火舞 on 377 3d9f426f), and an away_ready_in a server before it
+## sends is not read: null there meant "never left", which no longer stops anything.
 static func rest_state(view: Dictionary) -> Dictionary:
 	var r: Dictionary = view.get("rest", {})
 	var e: Dictionary = view.get("energy", {})
 	var amount := int(r.get("amount", 60))
 	var gain := mini(amount, maxi(0, int(e.get("max", 200)) - int(e.get("value", 0))))
 	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	var away = r.get("away_ready_in", 0)
 	var out := {
-		"state": "ready", "badge": "available", "caption": "",
+		"state": "ready", "badge": "available",
 		"sheet_state": "Available", "effect": "Restores up to %d Energy" % amount,
 		"fact": "Uses left", "fact_value": "%d today" % maxi(0, int(r.get("limit", 1)) - int(r.get("used", 0))),
 		"button": ("Rest · +%d Energy" % gain) if gain < amount else "Rest", "reason": "", "can_rest": true,
@@ -2144,16 +2136,6 @@ static func rest_state(view: Dictionary) -> Dictionary:
 		out.merge({"state": "used", "badge": "used_today", "sheet_state": "Used today", "effect": "",
 			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
 			"close": "Close", "note": "Available again in " + span(float(r.get("resets_in", 0)))}, true)
-	elif away == null or float(away) > 0.0:
-		# q(41) / q(70): Rest opens 2 h after leaving the homestead. A new account that never left has no leave time
-		# (away_ready_in null): no countdown at all, just "after 2h away"; after the first leave the time to go.
-		# The caption is the capsule under the bench's badge (m:ss under an hour); the sentences say `42m`.
-		var left := "" if away == null else span(float(away))
-		var back := "Rest · back after %dh away" % int(r.get("away_h", 2))
-		out.merge({"state": "away", "badge": "countdown", "caption": "" if away == null else duration(float(away)), "effect": "",
-			"sheet_state": back if away == null else "%s · %s to go" % [back, left],
-			"wait": "after %dh away" % int(r.get("away_h", 2)) if away == null else "in " + left,
-			"reason": "Not yet", "can_rest": false, "close": "Close"}, true)
 	elif gain <= 0:
 		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
 	return out

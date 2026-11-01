@@ -22,7 +22,6 @@ import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, green
 import { climateAt, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
 import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
-import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, hasConvenience, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
@@ -115,9 +114,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
-    // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
-    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, s, now), amount: c.energy.rest_amount,
-      away_h: c.energy.rest_away_h, away_ready_in: restReadyIn(c, s, now) },
+    // q(269): once a player day, no 2 h away first — no away_h / away_ready_in (clients up to 0.2.17 read their absence
+    // as open, never as null's "not left yet")
+    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, s, now), amount: c.energy.rest_amount },
     stall: {
       keeper: c.stall.keeper,
       board: legacyBoard(c, s, now),   // the current Homestead Stall panel; SGODOT-224 reads boards.stall
