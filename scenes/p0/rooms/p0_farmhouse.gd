@@ -11,7 +11,7 @@ extends P0Room
 
 const STOVE := "use_stove_1"
 ## Stoves 2 and 3 (Homestead Lv4 / Lv8, SGODOT-282): their own burners on the range, each tapped and named alone.
-const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
+const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3", "use_stove_4"]   # stove 4: the Deluxe Room only (Homestead Lv17, v4q(1))
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
 const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (the model has no lamp of its own)

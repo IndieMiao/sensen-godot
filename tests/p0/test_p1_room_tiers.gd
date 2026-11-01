@@ -127,6 +127,15 @@ func test_the_warming_cabinet_faces_the_camera() -> void:
 		assert_float(front.dot(to_cam)).override_failure_message("Lv%d: the cabinet's back to the camera" % lv).is_greater(0.3)
 		assert_array(r.grid.point_path(r.actor.position, r.anchor("stand_warming_cabinet").global_position)).is_not_empty()
 
+## The Fourth Stove (Homestead Lv17, v4q(1) ⑧) is the Deluxe Room's back-left burner, an empty one on its cooker until now
+## (上官婉儿 on 355): its tap, badge, shot and drop anchors are there, the pot's mouth on it; the other rooms have three.
+func test_the_deluxe_cooker_takes_a_fourth_stove() -> void:
+	var r := _farmhouse(17)
+	for n in ["use_stove_4", "badge_stove_4", "cam_stove_4", "drop_pot_4"]: assert_object(r.anchor(n)).override_failure_message(n).is_not_null()
+	assert_vector(r.anchor("use_stove_4").position).is_equal_approx(Vector3(-4.245, 1.291, -0.859), Vector3.ONE * 0.001)
+	assert_float(r.anchor("badge_stove_4").position.y - r.anchor("use_stove_4").position.y).is_equal_approx(0.754, 0.001)   # as stoves 1–3
+	assert_object(_farmhouse(11).anchor("use_stove_4")).is_null()   # the Standard Room's cooker has three
+
 ## Opening the rack's or the cabinet's sheet frames that one: the Standard Room's stand apart.
 func test_each_corner_sheet_has_its_own_shot_in_the_bigger_rooms() -> void:
 	for lv in [5, 12]:

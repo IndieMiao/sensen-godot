@@ -310,7 +310,7 @@ func test_the_pots_follow_each_rooms_burners() -> void:
 		r.level = lv
 		add_child(r)
 		auto_free(r)
-		for i in 3:
+		for i in (4 if lv == 12 else 3):   # the Deluxe Room's cooker has a fourth burner, back left (Lv17, v4q(1))
 			var pot := r.art.get_node("stove_pots/stove_pot_%d" % (i + 1)) as Node3D
 			assert_vector(pot.global_position).override_failure_message("Lv%d pot %d" % [lv, i + 1]).is_equal_approx(r.anchor("use_stove_%d" % (i + 1)).global_position, Vector3.ONE * 0.001)
 			assert_float(pot.rotation_degrees.y).is_equal_approx(45.0 if lv == 5 and i == 2 else 0.0, 0.01)
