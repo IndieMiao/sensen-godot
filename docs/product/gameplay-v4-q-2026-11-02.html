@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Gensen 玩法 v4 改动清单</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #F7F8F3; --surface: #FFFFFF; --surface-2: #EEF2EA; --ink: #24302A; --ink-2: #55635C; --ink-3: #7E8B84;
+  --line: #CFD8CC; --line-2: #E2E8DF; --accent: #2E7D77; --accent-ink: #1F5F5A; --accent-soft: #DCEEEB;
+  --warm: #D9823B; --warm-soft: #FBEADB; --code-bg: #EEF2EA; --thead: #E9EFE6; --row: #F8FAF6; --shadow: 0 1px 2px rgba(36,48,42,.08);
+  --serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #141A17; --surface: #1C2420; --surface-2: #222C27; --ink: #E6EBE4; --ink-2: #AEBBB3; --ink-3: #7F8D86;
+    --line: #2C3731; --line-2: #26302B; --accent: #6FC2BA; --accent-ink: #8FD6CF; --accent-soft: #1E3733;
+    --warm: #E9A35F; --warm-soft: #3A2A1B; --code-bg: #222C27; --thead: #243029; --row: #1F2924; --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141A17; --surface: #1C2420; --surface-2: #222C27; --ink: #E6EBE4; --ink-2: #AEBBB3; --ink-3: #7F8D86;
+  --line: #2C3731; --line-2: #26302B; --accent: #6FC2BA; --accent-ink: #8FD6CF; --accent-soft: #1E3733;
+  --warm: #E9A35F; --warm-soft: #3A2A1B; --code-bg: #222C27; --thead: #243029; --row: #1F2924; --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.75; -webkit-text-size-adjust: 100%; }
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+.topbar-in { max-width: 1360px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.topbar .name { font-family: var(--serif); font-weight: 700; font-size: 17px; letter-spacing: .01em; }
+.topbar .meta { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .02em; }
+.topbar .meta span + span::before { content: "·"; margin: 0 8px; color: var(--line); }
+
+.shell { max-width: 1360px; margin: 0 auto; padding: 24px 20px 80px; display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 36px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 58px); align-self: start; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 8px; font-size: 13px; line-height: 1.5; }
+.toc .label { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px 2px; }
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li.c1 { margin: 0 0 6px; }
+.toc li.c1 > a { display: block; font-weight: 700; color: var(--ink); padding: 4px 8px; border-radius: 6px; }
+.toc li.c1 > ul { display: none; margin: 2px 0 6px 10px; border-left: 2px solid var(--line-2); }
+.toc li.c1.open > ul { display: block; }
+.toc li.c2 > a { display: block; color: var(--ink-2); padding: 3px 10px; border-left: 2px solid transparent; margin-left: -2px; }
+.toc a.active { color: var(--accent-ink); }
+.toc li.c2 > a.active { border-left-color: var(--accent); }
+.toc li.c1 > a.active { background: var(--accent-soft); }
+.toc-mobile { display: none; }
+
+article { min-width: 0; }
+.hero { padding: 8px 0 28px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 10px; }
+.hero h1.title { font-family: var(--serif); font-size: clamp(26px, 3.4vw, 40px); line-height: 1.25; margin: 0 0 14px; text-wrap: balance; font-weight: 700; }
+.hero .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+.hero .facts b { color: var(--ink); font-weight: 500; }
+
+article h1 { font-family: var(--serif); font-size: 28px; line-height: 1.3; margin: 64px 0 18px; padding-top: 18px; border-top: 3px solid var(--accent); text-wrap: balance; scroll-margin-top: 80px; }
+article h2 { font-family: var(--serif); font-size: 21px; line-height: 1.35; margin: 40px 0 12px; text-wrap: balance; scroll-margin-top: 80px; }
+article h3 { font-size: 16.5px; font-weight: 700; margin: 28px 0 8px; scroll-margin-top: 80px; }
+article h4 { font-size: 15px; font-weight: 700; margin: 20px 0 6px; color: var(--ink-2); scroll-margin-top: 80px; }
+article p, article li { max-width: 76ch; }
+article p { margin: 0 0 12px; }
+article ul, article ol { padding-left: 1.4em; margin: 0 0 14px; }
+article li { margin: 0 0 4px; }
+article hr { border: 0; border-top: 1px solid var(--line-2); margin: 28px 0; }
+article strong { font-weight: 700; }
+article blockquote { margin: 16px 0; padding: 10px 16px; border-left: 3px solid var(--warm); background: var(--warm-soft); border-radius: 0 6px 6px 0; color: var(--ink); }
+article blockquote p { margin: 0; }
+article code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; color: var(--accent-ink); }
+article pre { background: var(--code-bg); border: 1px solid var(--line-2); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.55; }
+article pre code { background: none; padding: 0; color: inherit; }
+
+.tbl { overflow-x: auto; margin: 12px 0 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.5; }
+thead th { background: var(--thead); color: var(--ink); text-align: left; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid var(--line); position: sticky; top: 0; white-space: nowrap; }
+tbody td { padding: 7px 10px; border-top: 1px solid var(--line-2); vertical-align: top; min-width: 60px; }
+tbody tr:nth-child(even) td { background: var(--row); }
+td code, th code { white-space: nowrap; }
+td { font-variant-numeric: tabular-nums; }
+
+.diagram { margin: 16px 0 22px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+.diagram pre.mermaid { background: none; border: 0; padding: 0; margin: 0; font-family: var(--mono); font-size: 12px; white-space: pre; }
+.diagram svg { max-width: 100%; height: auto; }
+
+.totop { position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); z-index: 20; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font: 500 12px var(--sans); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.totop.show { opacity: 1; pointer-events: auto; }
+
+@media (max-width: 1023px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 16px 16px 72px; }
+  .toc { display: none; }
+  .toc-mobile { display: block; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .toc-mobile summary { cursor: pointer; padding: 10px 14px; font-weight: 700; list-style: none; }
+  .toc-mobile summary::-webkit-details-marker { display: none; }
+  .toc-mobile summary::after { content: "目录"; float: right; font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--ink-3); }
+  .toc-mobile .toc { display: block; position: static; max-height: 60vh; padding: 0 12px 12px; }
+  .toc-mobile .toc li.c1 > ul { display: block; }
+  article h1 { font-size: 24px; margin-top: 48px; }
+  article h2 { font-size: 19px; }
+}
+</style>
+
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <span class="name">Gensen 玩法 v4 改动清单</span>
+  <span class="meta"><span>2026-10-02</span><span>3 章</span><span>2 张表</span><span>独立完整版</span></span>
+</div></header>
+
+<div class="shell">
+  <nav class="toc" id="toc" aria-label="目录">
+    <p class="label">Contents</p>
+    <ul><li class="c1"><a href="#ch0">第 0 章 说明</a><ul>
+<li class="c2"><a href="#s0-1">0.1 以哪份为准</a></li>
+<li class="c2"><a href="#s0-2">0.2 编号</a></li>
+<li class="c2"><a href="#s0-3">0.3 流程</a></li>
+</ul></li>
+<li class="c1"><a href="#ch1">第 1 章 改动清单</a><ul>
+<li class="c2"><a href="#s1-1">1.1 索引</a></li>
+</ul></li>
+<li class="c1"><a href="#ch2">第 2 章 旧文档冲突索引</a><ul>
+</ul></li></ul>
+  </nav>
+  <article>
+    <details class="toc-mobile"><summary>Gensen 玩法 v4 改动清单</summary><nav class="toc" aria-label="目录"><ul><li class="c1"><a href="#ch0">第 0 章 说明</a><ul>
+<li class="c2"><a href="#s0-1">0.1 以哪份为准</a></li>
+<li class="c2"><a href="#s0-2">0.2 编号</a></li>
+<li class="c2"><a href="#s0-3">0.3 流程</a></li>
+</ul></li>
+<li class="c1"><a href="#ch1">第 1 章 改动清单</a><ul>
+<li class="c2"><a href="#s1-1">1.1 索引</a></li>
+</ul></li>
+<li class="c1"><a href="#ch2">第 2 章 旧文档冲突索引</a><ul>
+</ul></li></ul></nav></details>
+    <div class="hero">
+      <p class="eyebrow">Game Design Document · Prototype Stage</p>
+      <h1 class="title">Gensen 玩法 v4 改动清单（v4q）</h1>
+      <div class="facts"><span><b>Energy</b> 200 · +1/4 min</span><span><b>Skills</b> Farming / Fishing ×10 Lv</span><span><b>Trips</b> 1–7</span><span><b>Crops</b> 20 · <b>Fish</b> 20 · <b>Dishes</b> 29</span></div>
+    </div>
+<ul>
+<li>状态：<strong>2026-11-02 建档</strong>：355 v4 方案定稿（用户 11-02「全按建议」，53 条）后新起的 q 文档；第一批 A–H 预留 v4q(1)–v4q(8)（台账：Plane「q 行台账（三）」）。</li>
+</ul>
+<h1 id="ch0">第 0 章 说明</h1>
+<h2 id="s0-1">0.1 以哪份为准</h2>
+<ul>
+<li><strong>本文件与 355 v4 方案（<code>docs/product/gameplay-v4-2026-11-02.md</code>，用户 11-02「全按建议」定稿）为准。</strong> 旧方案 <code>docs/product/gameplay-plan-v2-2026-10-02.md</code> 及其改动清单 q(1)–q(273) 与本文件或 v4 方案冲突的地方，<strong>一律以本文件为准</strong>；旧文档不删原文，冲突处加注「以 v4 为准，见 gameplay-v4-q v4q(n)」（第 2 章索引）。</li>
+<li>v4 方案里的数字是设计初值；进本文件的数字以本文件的 v4q 行为准（经模拟器校准、复核、用户批过的）。v4 方案正文按 v4q 行回写。</li>
+</ul>
+<h2 id="s0-2">0.2 编号</h2>
+<ul>
+<li>编号 <code>v4q(n)</code>，行文里写「v4q(3)」，和旧文档的 q(1)–q(273) 不重。</li>
+<li>v4q(1)–v4q(8) 预留给 1b 第一批（v4 方案第 10 章 10.2），按字母顺序：v4q(1) A 等级表与门槛、v4q(2) B 清档、v4q(3) C 野外地点、v4q(4) D 采集与引导改版、v4q(5) E 矿、v4q(6) F 新怪、v4q(7) G 武器与 Pip 委托、v4q(8) H 换料移除。之后从 v4q(9) 起顺排。</li>
+<li>标题前标类别：【数值】【规则】【界面】【文案】。</li>
+</ul>
+<h2 id="s0-3">0.3 流程</h2>
+<ul>
+<li>每条 v4q 一个独立提交，叠在最新 farm-dev 上 → 先交不知火舞审（界面、文案附改前改后图）→ 数值、规则类请奕星另做独立复核 → 挂台账卡【待批】→ 用户批 → 奕星推 → 台账记【已批·已推 sha】→ 通知实现。用户批之前不合。</li>
+<li>每条 v4q 一节，固定小标题：状态与来源 / 问题 / 改法 / 改哪 / 推翻 / 画面 / 实现。「推翻」写清推翻或复议的旧 q 行、锁定项（197 LOCK-n）和旧章节。</li>
+</ul>
+<h1 id="ch1">第 1 章 改动清单</h1>
+<h2 id="s1-1">1.1 索引</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>编号</th>
+<th>类别</th>
+<th>标题</th>
+<th>状态</th>
+<th>推翻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h1 id="ch2">第 2 章 旧文档冲突索引</h1>
+<p>旧方案的章节和已批 q 行里和 v4 冲突的地方，按诸葛亮的冲突清单逐条列出：旧位置 → 以哪条 v4q 为准。清单到了以后补。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>旧位置</th>
+<th>旧写法</th>
+<th>以此为准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+  </article>
+</div>
+<button class="totop" id="totop" type="button" aria-label="回到顶部">↑ Top</button>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var targets = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  function setActive(id) {
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + id); });
+    var cur = document.querySelector('#toc a[href="#' + id + '"]');
+    document.querySelectorAll('#toc li.c1').forEach(function (li) { li.classList.remove('open'); });
+    if (cur) { var c1 = cur.closest('li.c1'); if (c1) c1.classList.add('open'); }
+  }
+  if ('IntersectionObserver' in window) {
+    var visible = new Map();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) visible.set(e.target.id, e.boundingClientRect.top); else visible.delete(e.target.id); });
+      var best = null;
+      visible.forEach(function (top, id) { if (best === null || top < visible.get(best)) best = id; });
+      if (best) setActive(best);
+    }, { rootMargin: '-70px 0px -70% 0px' });
+    targets.forEach(function (t) { io.observe(t); });
+  }
+  if (targets.length) setActive(targets[0].id);
+  var btn = document.getElementById('totop');
+  window.addEventListener('scroll', function () { btn.classList.toggle('show', window.scrollY > 800); }, { passive: true });
+  btn.addEventListener('click', function () { window.scrollTo({ top: 0 }); });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  // The artifact viewer renders pre.mermaid natively; this fallback only runs for the local file.
+  function pending() { return Array.prototype.filter.call(document.querySelectorAll('pre.mermaid'), function (p) { return !p.querySelector('svg') && !p.getAttribute('data-processed'); }); }
+  setTimeout(function () {
+    var left = pending();
+    if (!left.length || !window.mermaid) return;
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    try { window.mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', flowchart: { htmlLabels: true } }); window.mermaid.run({ nodes: left }); } catch (e) {}
+  }, 1200);
+})();
+</script>
+
+</body>
+</html>
