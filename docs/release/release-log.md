@@ -53,6 +53,11 @@
 - 部署后：响应头 release `ce5f43b3`、image config `e85ab900…`；带访问密钥 200 / 不带 401；WSS 正常；号数 161；`Near you` 按真实 IP（从上海测是 Shanghai）。
 - 回滚：`server/deploy/p0/deploy-hk.sh --target us --expect-config sha256:82e9dbfc2ba94fadfb28f42ccdbdcebb5941b4763be7cdaa6ceedd9a41061928 up 99c901bc`，再请迁移方把版本响应头改回去。回滚后烤鱼那步做了菜没吃又显示 `Cook it: Grilled Crucian`，不影响存档。
 
+iOS（2026-11-01，SGODOT-356）：
+
+- 传 TestFlight：Gensen App（`app.gensen.maps`），版本 0.2.17 build 1，显示名 Gensen，源码 `ce5f43b3`（和安卓同一个冻结头），服务端地址同安卓（美西），x-p0-version `2026110151`。12:05 上传，12:07 Apple 处理完成（VALID），内部测试组可装。
+- 仍不含 iOS 本地通知（SGODOT-356 还没合入，原生桥仍是旧的 MapUnderlay）；也没有语音。
+
 内容（自 0.2.16）：
 
 - **新手引导烤鱼那步指向「吃」**：做了菜没吃时提示写 `Eat it: {菜名}`，Show 指到背包、锅或柜子里那道菜（SGODOT-368，q(266)，#580）。
