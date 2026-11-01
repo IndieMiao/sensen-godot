@@ -111,7 +111,7 @@ const HOME_ROLES = ['market', 'tea', 'tackle', 'post', 'pond'] as const;
 type HomeRole = typeof HOME_ROLES[number];
 
 /** Keys a step may count on (validateGuide); `ack:<step>` is the guide command's (§2.2). */
-export const GUIDE_KEY_KINDS = ['sow', 'water', 'harvest', 'buy', 'sell', 'barter', 'enter', 'talk', 'gift', 'learn', 'cast', 'catch',
+export const GUIDE_KEY_KINDS = ['sow', 'water', 'harvest', 'buy', 'sell', 'enter', 'talk', 'gift', 'learn', 'cast', 'catch',
   'cook', 'dish', 'eat', 'accept', 'deliver', 'home_pick', 'travel', 'ack'] as const;
 /** The client's built-in TipCard keys (P0Guide.TIPS) a step may name besides the table's own tips. */
 const BUILT_IN_TIPS = ['sow', 'cast', 'creel', 'cook', 'heat', 'meal', 'map'];
@@ -281,7 +281,6 @@ export function guideKeys(c: P0Content, before: P0State, s: P0State, cmd: { type
         if (type === 'buy' && e.delta > 0) add(`buy:${e.id}`, e.delta);
         break;
       case 'sale': add(`sell:${e.item}`, e.qty); add(`sell:${e.item}:${e.shop}`, e.qty); break;
-      case 'barter': add(`barter:${e.item}`); break;
       case 'cast': add('cast'); break;
       case 'catch': if (e.result === 'landed') { add('catch'); add(`catch:${e.fish}`); } break;
       case 'pot': add('cook'); if (e.dish) add(`cook:${e.dish}`); break;

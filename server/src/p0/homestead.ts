@@ -76,7 +76,6 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   s.coins -= next.coins;
   events.push({ kind: 'coins', delta: -next.coins });
   s.homestead.level = next.level;
-  s.homestead.bartered = {};   // the barter share counts toward one level at a time (§8.4.5)
   s.homestead.plaque.push({ level: next.level, at: now });
   // q(246): each level chooses a fixed reward or full refill; never reduce a bonus-zone value.
   const max = maxEnergy(c, s);
