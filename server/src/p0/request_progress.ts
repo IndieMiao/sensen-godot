@@ -7,7 +7,7 @@
  * fills the request (every item of a basket) says `done` instead, for the client's Success toast.
  */
 import type { P0Content } from './content.js';
-import { BOARDS, haveForRequest } from './boards.js';
+import { boardsOf, haveForRequest } from './boards.js';
 import type { P0Event } from './progress.js';
 import { haveFor } from './requests.js';
 import { progressOf, residentDef, residentRequest } from './residents.js';
@@ -19,7 +19,7 @@ export interface TakenCount { qty: number; have: number; items?: Record<string, 
 /** What each taken request counts now, by request id. */
 export function takenCounts(c: P0Content, s: P0State): Map<string, TakenCount> {
   const out = new Map<string, TakenCount>();
-  for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
+  for (const { slots } of boardsOf(c, s)) for (const sl of slots) {
     const r = sl.req;
     if (r?.status !== 'accepted' || r.kind === 'visit') continue;
     if (r.items.length > 1) {   // Market Basket: N of each

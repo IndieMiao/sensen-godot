@@ -1535,6 +1535,12 @@ static func today_chip_key(rows: Array) -> String:
 		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
 	return ""
 
+## Today's 6 board requests are done (view.quotas.sys_requests): no board hand-in until the reset, so no board wears a ✓
+## (q(270)) and its Today row reads Limit reached.
+static func sys_requests_full(view: Dictionary) -> bool:
+	var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
+	return not sys.is_empty() and int(sys.get("used", 0)) >= int(sys.get("cap", 6))
+
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
 static func today_lines(view: Dictionary) -> Array:
@@ -1574,16 +1580,29 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	var latest_at := -1.0
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
+		var away: Array = []   # q(270) / 奕星's review ⑦: another city's hand-in can't be done here; it follows what can
+		var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
+		var full := sys_requests_full(view)
 		for r in PinReason.taken(view):
-			if bool(r.ready): deliveries.append(_row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id)))
+			# a board request once today's 6 are done (q(270), 不知火舞): `Dusk Haul · Limit reached · 9h 12m`, nothing to press;
+			# another city's ends with its city as its other rows do (q(270) ⑥): `… · 9h 12m · Hayward`
+			if bool(r.ready) and full and r.has("away"):
+				var capped := "%s · Limit reached · %s" % [str(r.title), span(float(sys.get("resets_in", 0)))]
+				if str(r.get("city", "")) != "": capped += " · " + str(r.city)
+				deliveries.append(_row(capped, "board", ""))
+			elif bool(r.ready):
+				var hand := _row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id))
+				if str(r.get("city", "")) != "": hand.board_request = str(r.id)   # q(270): the row opens its sheet (Drop)
+				(away if bool(r.get("away", false)) else deliveries).append(hand)
 			else:
 				var row := _request_row(view, r)
+				if str(r.get("city", "")) != "": row.board_request = str(r.id)
 				progress.append(row)
 				# the latest accepted_at; none known (0, an older server or save): the first in board order
 				if float(r.accepted_at) > latest_at:
 					latest_at = float(r.accepted_at)
 					latest = row
-		now_rows = deliveries + now_rows
+		now_rows = deliveries + now_rows + away
 	# q(255) (order: 不知火舞 on 341 bbdef20e): after the guide and below Homestead Lv3, the first gap for the next level,
 	# one row. Upgrade follows the hand-ins; a material its Show can gather now follows the other things to do now,
 	# before the short requests; coins, or a material cooling down, goes with `still to go for the next level`.
@@ -1787,7 +1806,13 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 		var sowing := _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
 		sowing.sow_crop = str(items[0])   # the generic Sow row leaves this crop to it while Today shows it (today_rows)
 		return sowing
-	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
+	# another city's request ends with its city (q(270) ⑥), the need's name dropped first when the line runs long
+	var city := str(r.get("city", ""))
+	var line := "%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)]
+	if city != "":
+		line += " · " + city
+		if line.length() > P0Board.LINE_CHARS: line = "%s · %d/%d · %s" % [str(r.title), int(r.have), int(r.qty), city]
+	var row := _row(line, icon_id, "")
 	if kind != "fish": return row
 	var gate := fish_level_gate(view, items, r.get("rarity", null))
 	if not gate.is_empty():
@@ -1796,7 +1821,9 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 		row.gate = str(gate.id)
 		return row
 	for m in PinReason.markers(view):
-		if str(m.get("kind", "")) == "request" and str(m.get("why", {}).get("request", "")) == str(r.id) and str(m.get("place", "")).begins_with("pond_"):
+		# a pond's pin: the written city's `pond_…` or a generated city's `gn-…~pondN` (another city's request, q(270) ⑥)
+		var at := str(m.get("place", ""))
+		if str(m.get("kind", "")) == "request" and str(m.get("why", {}).get("request", "")) == str(r.id) and (at.begins_with("pond_") or at.contains("~pond")):
 			row.go = "pond:" + str(m.place)
 			break
 	return row

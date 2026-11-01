@@ -176,7 +176,7 @@ export function keptIndex(c: P0Content, s: P0State): KeptIndex {
     for (const t of r.in) if (!TAG.test(t) && !named.get(t)?.includes(r.id)) named.set(t, [...(named.get(t) ?? []), r.id]);
   }
   const ids = new Set<string>();
-  for (const slot of [...s.boards.stall, ...s.boards.market]) {
+  for (const slot of [...s.boards.stall, ...Object.values(s.markets ?? {}).flat()]) {   // every city's board (q(270))
     if (slot.req?.status === 'accepted') for (const id of slot.req.items) ids.add(id);
   }
   const needs: { kind: string; rarity?: number }[] = [];

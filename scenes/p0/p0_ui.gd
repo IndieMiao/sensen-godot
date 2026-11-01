@@ -2840,7 +2840,10 @@ func open_today(given: Array = []) -> void:
 	panel.row_pressed.connect(func(i: int):
 		if i < 0 or i >= _today_rows.size(): return
 		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
-		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given)))
+		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given))
+		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
+		elif str(_today_rows[i].get("board_request", "")) != "":
+			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given)))
 	_open_modal(panel, 0.0)
 	_today_panel = panel
 	modal_kind = "today"
@@ -2865,7 +2868,7 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != ""
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != ""
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")

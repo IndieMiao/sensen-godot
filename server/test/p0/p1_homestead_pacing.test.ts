@@ -84,7 +84,7 @@ describe('q(246) gates for every account, not just new saves', () => {
       const before = { level, coins: s.coins, energy: s.energy.value, plaque: structuredClone(s.homestead.plaque) };
       const r = upgradeState(c, JSON.parse(JSON.stringify(s)), T);
       expect({ level: r.homestead.level, coins: r.coins, energy: r.energy.value, plaque: r.homestead.plaque }).toEqual(before);
-      expect(r.v).toBe(5);
+      expect(r.v).toBe(6);
     }
   });
 });

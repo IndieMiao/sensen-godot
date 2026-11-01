@@ -10,6 +10,7 @@ extends RefCounted
 ## knows only the first session's (q(103) ④, the server's rule): while Pond Catch is on the Stall Board and taken, Reed Pond wears
 ## the ! until the bag holds the fish, then the homestead the ✓; untaken it hangs nowhere (its ! is the stall's own).
 
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # away from home: a home hand-in isn't done here (q(270))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const HOME := "home"
 static var REED_POND := P0City.beginner_pond()   # the beginner pond, where the server points Pond Catch too (SGODOT-270)
@@ -81,22 +82,22 @@ static func guide_line(view: Dictionary, place: String) -> String:
 static func progress_text(r: Dictionary) -> String:
 	return "%s · %s %d/%d" % [str(r.get("title", "")), str(r.get("need_name", "")), int(r.get("have", 0)), int(r.get("qty", 1))]
 
-## A request by id from the Stall Board, the Market Board or a resident: {id, title, item, need_name, have, qty, ready,
-## tracked, deliver (`Deliver at the Stall` / `Deliver at Mission Market Square` / `Deliver to Pip`)}; {} when gone.
+## A request by id from the Stall Board, a Market Board (the one shown, or another city's tracked one, q(270)) or a
+## resident: {id, title, item, need_name, have, qty, ready, tracked, city, deliver (`Deliver at the Stall` / `Deliver at
+## Mission Market Square` / `Deliver at Shibuya Market Square · Tokyo` / `Deliver to Pip`)}; {} when gone.
 static func request_of(view: Dictionary, id: String) -> Dictionary:
 	if id == "": return {}
-	var boards: Dictionary = view.get("boards", {})
-	for board in ["stall", "market"]:
-		for r in boards.get(board, {}).get("slots", []):
-			if not (r is Dictionary) or r.get("empty", false) or str(r.get("id", "")) != id: continue
-			var items: Array = r.get("items", [])
-			var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
-			return {"id": id, "title": str(r.get("title", "")), "item": str(items[0]) if items.size() == 1 else "",
-				"need_name": ("%s dishes" % " or ".join(styles)) if not styles.is_empty() and items.is_empty()
-					else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
-				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
-				"tracked": str(r.get("status", "")) == "accepted",
-				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name(view, "market")}
+	for e in board_requests(view):
+		var r: Dictionary = e.r
+		if str(r.get("id", "")) != id: continue
+		var items: Array = r.get("items", [])
+		var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
+		var at := market_at(view, e.board, e.from)
+		return {"id": id, "title": str(r.get("title", "")), "item": str(items[0]) if items.size() == 1 else "",
+			"need_name": ("%s dishes" % " or ".join(styles)) if not styles.is_empty() and items.is_empty()
+				else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
+			"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
+			"tracked": str(r.get("status", "")) == "accepted", "city": at.city, "away": at.away, "deliver": at.deliver}
 	# The Stall Board as the older view has it (stall.board.requests), for a server without view.boards.
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if not (r is Dictionary) or str(r.get("id", "")) != id: continue
@@ -119,6 +120,35 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 			"tracked": str(rv.get("request_state", "")) == "accepted", "deliver": "Deliver to %s" % resident_name(str(rid))}
 	return {}
 
+## Every board request the view holds, with the board it hangs on: [{board: "stall" | "market", from: that board's view
+## (another city's tracked request: its own entry, q(270)), r}] — the Stall Board's, the Market Board shown, then the
+## requests tracked on other cities' Market Boards (view.boards.elsewhere).
+static func board_requests(view: Dictionary) -> Array:
+	var out: Array = []
+	var boards: Dictionary = view.get("boards", {})
+	for board in ["stall", "market"]:
+		var b = boards.get(board, {})
+		for r in (b.get("slots", []) if b is Dictionary else []):
+			if r is Dictionary and not r.get("empty", false): out.append({"board": board, "from": b, "r": r})
+	for r in (boards.get("elsewhere", []) if boards.get("elsewhere", null) is Array else []):
+		if r is Dictionary: out.append({"board": "market", "from": r, "r": r})
+	return out
+
+## Where a board request is handed in (q(270) ⑥): {deliver, go, city ("" at home), away (not the city the player is
+## in)} — the Stall, the home set's market square, or another city's Market Square 1 with ` · <City>` (q(128)'s form).
+## The home board is away whenever the player is: in a town with no market square the board shown is still home's
+## (the server's marketCity), and its hand-in is not done there either (亚瑟 on #606).
+static func market_at(view: Dictionary, board: String, from: Dictionary) -> Dictionary:
+	if board == "stall": return {"deliver": "Deliver at the Stall", "go": "stall", "city": "", "away": false}
+	if from.is_empty() or bool(from.get("home", true)):
+		return {"deliver": "Deliver at %s" % _outpost_name(view, "market"), "go": "outpost:" + P0Outposts.home_id(view, "market"),
+			"city": "", "away": from.has("deliver_place") and (P0Travel.away(view) or not is_same(from, view.get("boards", {}).get("market", {})))}
+	var city := str(from.get("city", ""))
+	var name := str(from.get("deliver_name", ""))
+	return {"deliver": "Deliver at %s · %s" % [name if name != "" else "the market", city] if city != "" else "Deliver at %s" % name,
+		"go": "outpost:" + str(from.get("deliver_place", "")), "city": city,
+		"away": not is_same(from, view.get("boards", {}).get("market", {}))}
+
 ## The requests the player has taken (q(104), 李白 4ac4a4e7: they all go to Today): the Stall Board's, the Market
 ## Board's and the residents', in that order; the first session's Pond Catch is the guide's own row and is left out. Each
 ## {id, title, kind, items, rarity, need_name, have, qty, ready, deliver, deliver_go} — `deliver` as request_of writes
@@ -131,20 +161,25 @@ static func taken(view: Dictionary) -> Array:
 	else:   # an older view: stall.board.requests, one item each
 		for r in view.get("stall", {}).get("board", {}).get("requests", []):
 			if r is Dictionary: stall.append((r as Dictionary).merged({"items": [str(r.get("item", ""))] if str(r.get("item", "")) != "" else []}))
-	for board in ["stall", "market"]:
-		for r in (stall if board == "stall" else boards.get("market", {}).get("slots", [])):
-			if not (r is Dictionary) or r.get("empty", false) or str(r.get("status", "")) != "accepted": continue
-			if str(r.get("id", "")) == P0Guide.TUTORIAL: continue
-			var items: Array = r.get("items", [])
-			out.append({"id": str(r.get("id", "")), "title": str(r.get("title", "")), "kind": str(r.get("kind", "fish" if items.any(func(i): return str(i).begins_with("fish_")) else "")),
-				"items": items, "rarity": r.get("rarity", null),
-				"visit": r.get("visit", null), "where": r.get("where", null),   # cross-city (q(128)): the Today row says where
-				"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
-				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)),
-				"ready": bool(r.get("ready", int(r.get("have", 0)) >= int(r.get("qty", 1)))),
-				"accepted_at": accepted_at(r),   # q(143): when it was tracked (0 on an older server or save)
-				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name(view, "market"),
-				"deliver_go": "stall" if board == "stall" else "outpost:" + P0Outposts.home_id(view, "market")})
+	var rows: Array = stall.map(func(r): return {"board": "stall", "from": {}, "r": r})
+	for e in board_requests(view):
+		if str(e.board) == "market": rows.append(e)
+	for e in rows:
+		var r = e.r
+		var board := str(e.board)
+		if not (r is Dictionary) or r.get("empty", false) or str(r.get("status", "")) != "accepted": continue
+		if str(r.get("id", "")) == P0Guide.TUTORIAL: continue
+		var at := market_at(view, board, e.from)
+		var items: Array = r.get("items", [])
+		out.append({"id": str(r.get("id", "")), "title": str(r.get("title", "")), "kind": str(r.get("kind", "fish" if items.any(func(i): return str(i).begins_with("fish_")) else "")),
+			"items": items, "rarity": r.get("rarity", null),
+			"visit": r.get("visit", null), "where": r.get("where", null),   # cross-city (q(128)): the Today row says where
+			"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
+			"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)),
+			"ready": bool(r.get("ready", int(r.get("have", 0)) >= int(r.get("qty", 1)))),
+			"accepted_at": accepted_at(r),   # q(143): when it was tracked (0 on an older server or save)
+			"city": at.city, "away": at.away,   # q(270): another city's request names its city; away = not where the player is
+			"deliver": at.deliver, "deliver_go": at.go})
 	for rid in view.get("residents", {}):
 		var rv: Dictionary = view.residents[rid] if view.residents[rid] is Dictionary else {}
 		var q = rv.get("request", null)
