@@ -3,7 +3,7 @@
   "author": "ZHAOYUN",
   "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
   "changes": [
-    "Source 1.13 x 1.05 m footprint retained; add shallow stone facing inside original envelope; existing logs retained.",
+    "Source footprint and logs retained; replace blank chimney breast with four staggered stone courses, thin cooking ledge to .08 m, warm mid-grey N1 palette.",
     "Use shared SGODOT-178 fire, not new flames."
   ],
   "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
@@ -37,11 +37,12 @@
     "Dark red ember bed.011",
     "Dark red ember bed.012",
     "Dark red ember bed.013",
-    "Dark red ember bed.014",
+    "Dark red ember bed.014"
+  ],
+  "removed_parts": [
     "Underloft rounded plaster breast"
   ],
-  "removed_parts": [],
-  "triangles": 5208,
+  "triangles": 6100,
   "surfaces": 1,
-  "exported_sha256": "f5d2e8d0377447f285008c0ca1efe4c12082291494730f9b4fc92966968c7a27"
+  "exported_sha256": "dc1bed52953fad6a3e9a27a169f4d7964594b1ea7b5428c30a17364559981edf"
 }

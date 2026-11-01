@@ -21,7 +21,7 @@
         256,
         256
       ],
-      "override_hex": "C8C3B9"
+      "override_hex": "8C8376"
     },
     {
       "role": "cloth_green",
@@ -63,9 +63,11 @@
   "palette_overrides": {
     "wood_dark": "783B22",
     "cloth_green": "42683A",
-    "stone": "C8C3B9"
+    "stone": "8C8376"
   },
   "shell_regions_unchanged": true,
-  "override_reason": "Keep source hue families while matching shaded furniture readability under native P0 ACES lighting; cloth tile center alone is the sofa swatch.",
+  "rug_base_hex": "567E4A",
+  "rug_border_hex": "C4A15B",
+  "override_reason": "N1 v1.1: lighter forest-green rug and warm mid-grey stone per Huowu 319 1db13376; cloth tile center alone is the unchanged sofa swatch.",
   "purpose": "Original miniature landscape, rug weave, hide markings and static mirror impression; no extra room texture."
 }

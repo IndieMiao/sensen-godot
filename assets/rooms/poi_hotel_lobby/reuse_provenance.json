@@ -68,7 +68,7 @@
     "author": "ZHAOYUN",
     "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
     "changes": [
-      "Geometry, normals and game scale retained; only palette UV/color and scalar local AO added."
+      "N1-only copy scaled to .70 m diameter and .90 m table height per Huowu 319 1db13376; original 324 files unchanged."
     ],
     "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
     "source_collection": "KIT_round_side_table",
@@ -81,10 +81,15 @@
     "removed_parts": [],
     "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
     "source_asset": "round_side_table",
-    "locked_scale": true,
+    "locked_scale": false,
+    "scale_xyz": [
+      0.6363636363636362,
+      0.793475865109103,
+      0.6363636363636362
+    ],
     "triangles": 240,
     "surfaces": 1,
-    "exported_sha256": "ae1a0a755f264ac90138b1a048b8d25070acce64ea67060aca6ad0d2860a64af"
+    "exported_sha256": "9ab94878a3b96aaf7e893185170b94b9a9bf7bad02d6915b9fd43c5bb8d76658"
   },
   "frame_landscape": {
     "task": "SGODOT-319",
@@ -137,7 +142,7 @@
     "author": "ZHAOYUN",
     "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
     "changes": [
-      "Source 1.13 x 1.05 m footprint retained; add shallow stone facing inside original envelope; existing logs retained.",
+      "Source footprint and logs retained; replace blank chimney breast with four staggered stone courses, thin cooking ledge to .08 m, warm mid-grey N1 palette.",
       "Use shared SGODOT-178 fire, not new flames."
     ],
     "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
@@ -171,20 +176,21 @@
       "Dark red ember bed.011",
       "Dark red ember bed.012",
       "Dark red ember bed.013",
-      "Dark red ember bed.014",
+      "Dark red ember bed.014"
+    ],
+    "removed_parts": [
       "Underloft rounded plaster breast"
     ],
-    "removed_parts": [],
-    "triangles": 5208,
+    "triangles": 6100,
     "surfaces": 1,
-    "exported_sha256": "f5d2e8d0377447f285008c0ca1efe4c12082291494730f9b4fc92966968c7a27"
+    "exported_sha256": "dc1bed52953fad6a3e9a27a169f4d7964594b1ea7b5428c30a17364559981edf"
   },
   "hearth_mantel": {
     "task": "SGODOT-319",
     "author": "ZHAOYUN",
     "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
     "changes": [
-      "Only mantel shelf selected; unrelated original lamps/landscape/kettle excluded; rebase original absolute coordinates to hearth pivot."
+      "Only mantel shelf selected; thin from .15 to .08 m while retaining its top and supported decor; warm mid-grey stone palette."
     ],
     "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
     "source_collection": "KIT_hearth_mantel_details",
@@ -211,7 +217,7 @@
     ],
     "triangles": 108,
     "surfaces": 1,
-    "exported_sha256": "cc71cf4a7f21e9ff26ea554f9d3aad42a97932eaf9895e5d887571e64f374ef6"
+    "exported_sha256": "331582e4b2f2c73a96cadca4a001333dc5b6f821c0e370fd40cbb0bf3a911b28"
   },
   "mantel_decor": {
     "task": "SGODOT-319",
@@ -331,10 +337,12 @@
     "task": "SGODOT-319",
     "author": "ZHAOYUN",
     "source": "new",
-    "changes": [],
+    "changes": [
+      "N1 v1.1: 1.68 x .30 m frame around a 1.60 x .22 m runtime text area; mounting pivot retained."
+    ],
     "triangles": 284,
     "surfaces": 1,
-    "exported_sha256": "e18f45a43365ea2a2ec8b42876b00d69d50e2a16a268b2782aa08f576cef077e"
+    "exported_sha256": "823cd6c144728e8ddd78ee7ca10b997913ae1d55e47b68f74a32a53e5e8835b9"
   },
   "luggage_cart": {
     "task": "SGODOT-319",

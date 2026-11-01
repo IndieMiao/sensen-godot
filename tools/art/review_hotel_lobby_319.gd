@@ -104,6 +104,7 @@ func shot(name_: String, target: Vector3, width: float, yaw: float, pitch: float
 
 func native_entry() -> void:
 	var native: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://native-camera.json"))
+	check(native.layout_sha256 == FileAccess.get_sha256(KIT + "layout.json") and native.opening_passed, "current layout and hotel identity fit the native opening")
 	var columns: Array = native.basis
 	var vector := func(a: Array): return Vector3(a[0], a[1], a[2])
 	camera.transform = Transform3D(Basis(vector.call(columns[0]), vector.call(columns[1]), vector.call(columns[2])), vector.call(native.origin))
@@ -147,7 +148,7 @@ func validate() -> void:
 	check(glass == 1, "one shared shell glazing surface")
 	check(ao > 20, "N1 modules carry local AO")
 	check(art.find_children("seat_*", "Marker3D", true, false).size() == 8, "eight seats")
-	check(art.get_node("sign_name").get_meta("size") == [2.28, .145], "blank runtime name marker size")
+	check(art.get_node("sign_name").get_meta("size") == [1.60, .22], "blank runtime name marker size")
 	check(art.get_node("cam_default").get_meta("role") == "camera_follow_target" and art.get_node("cam_default").position == art.get_node("spawn").position, "default camera marker identifies the spawn follow target")
 	var nav: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://navigation.json"))
 	var space := vp.find_world_3d().direct_space_state

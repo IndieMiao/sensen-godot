@@ -28,7 +28,7 @@
       "name": "round_side_table",
       "triangles": 240,
       "surfaces": 1,
-      "bytes": 8092
+      "bytes": 8096
     },
     {
       "name": "frame_landscape",
@@ -44,9 +44,9 @@
     },
     {
       "name": "hearth",
-      "triangles": 5208,
+      "triangles": 6100,
       "surfaces": 1,
-      "bytes": 151596
+      "bytes": 175508
     },
     {
       "name": "hearth_mantel",
@@ -115,10 +115,10 @@
       "bytes": 22636
     }
   ],
-  "unique_triangles": 37104,
-  "furniture_scene_triangles": 42176,
+  "unique_triangles": 37996,
+  "furniture_scene_triangles": 43068,
   "furniture_surfaces": 28,
-  "scene_triangles": 60878,
+  "scene_triangles": 61770,
   "static_draw_surfaces": 38,
   "shared_fire_draws": 2,
   "atlas": {
@@ -130,6 +130,6 @@
     "shared_plant_and_fx_textures": "unchanged existing library assets"
   },
   "dynamic_particle_triangles_max": 40,
-  "scene_triangles_with_particles_max": 60918,
+  "scene_triangles_with_particles_max": 61810,
   "draw_surfaces_with_fx": 40
 }

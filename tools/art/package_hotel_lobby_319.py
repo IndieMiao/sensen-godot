@@ -2,8 +2,12 @@
 from pathlib import Path
 import colorsys
 import hashlib
+import io
 import json
+import re
 import shutil
+import subprocess
+import sys
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, PngImagePlugin
@@ -22,6 +26,79 @@ def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 def dump(path, data): path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 
 
+def verify_import_metadata():
+    report = json.loads((QA / "import-validation.json").read_text())
+    assert report["passed"] and len(report["resources"]) == 20
+    for row in report["resources"]:
+        for directory in [KIT, QA / "project/assets/rooms/poi_hotel_lobby"]:
+            text = (directory / row["file"]).read_text()
+            match = re.search(r'^uid="(uid://[a-z0-9]+)"$', text, re.MULTILINE)
+            assert match and match[1] == row["uid"], "Import metadata changed after Godot validation"
+    return report
+
+
+def technical_fix():
+    imports = verify_import_metadata()
+    raw = QA / "captures"
+    geometry = json.loads((QA / "geometry-validation.json").read_text())
+    runtime = json.loads((raw / "godot-validation.json").read_text())
+    native = json.loads((QA / "project/native-camera.json").read_text())
+    assert geometry["passed"] and runtime["passed"]
+    for name, row in geometry["assets"].items():
+        assert row["sha256"] == digest(KIT / (name + ".glb")), "Geometry changed after validation"
+    assert native["layout_sha256"] == digest(KIT / "layout.json")
+    unchanged = []
+    for path in sorted(KIT.glob("*.glb")):
+        if path.stem in ["blank_name_plaque", "round_side_table", "hearth", "hearth_mantel"]: continue
+        previous = subprocess.check_output(["git", "show", "9c0f4fb4:" + str(path.relative_to(ROOT))], cwd=ROOT)
+        assert path.read_bytes() == previous, path.name + " changed outside the approved revision"
+        unchanged.append(path.name)
+    assert len(unchanged) == 15
+    assert native["opening_passed"]
+    old_atlas = Image.open(io.BytesIO(subprocess.check_output(
+        ["git", "show", "9c0f4fb4:assets/rooms/poi_hotel_lobby/room_albedo_ao.png"], cwd=ROOT))).convert("RGB")
+    atlas_delta = np.any(np.asarray(old_atlas) != np.asarray(Image.open(KIT / "room_albedo_ao.png").convert("RGB")), axis=2)
+    palette = json.loads((HALL / "hall_palette.json").read_text())["slots"]
+    allowed = np.zeros(atlas_delta.shape, dtype=bool)
+    for role in ["stone", "cloth_green"]:
+        x, y, w, h = palette[role]["rect_px_top_left"]
+        allowed[y:y + h, x:x + w] = True
+    assert not np.any(atlas_delta & ~allowed)
+    atlas_change = {"regions": ["stone", "cloth_green"], "changed_pixels": int(atlas_delta.sum()), "outside_regions_changed": 0}
+    files = []
+    for source in ["entry_360", "full"]:
+        im = Image.open(raw / (source + ".png")).convert("RGB")
+        assert np.asarray(im).std() > 15
+        meta = PngImagePlugin.PngInfo()
+        meta.add_text("Author", "ZHAOYUN / \u8d75\u4e91")
+        meta.add_text("Description", "SGODOT-319 N1 v1.1; 43 degrees; 2026-11-02; default entry or uncropped panorama")
+        if source == "entry_360":
+            assert im.size == (360, 800)
+        else:
+            canvas = Image.new("RGB", (im.width + 48, im.height + 100), "#F5F5F2")
+            canvas.paste(im, (24, 58))
+            draw = ImageDraw.Draw(canvas)
+            draw.text((24, 12), "N1 v1.1 | 43-degree panorama | Revised tables, rug, stone hearth and name plaque", fill="#293330", font=font(25))
+            draw.text((24, canvas.height - 36), "SGODOT-319 | ZHAOYUN / \u8d75\u4e91 | 2026-11-02", fill="#293330", font=font(19))
+            im = canvas
+        path = DEST / ("SGODOT-319_N1_v1.1_" + source + ".png")
+        im.save(path, pnginfo=meta)
+        files.append({"name": path.name, "path": str(path.relative_to(ROOT)), "size": list(im.size), "sha256": digest(path)})
+    dump(DEST / "media-manifest-n1-v1.1.json", files)
+    dump(DEST / "native-camera-n1-v1.1.json", native)
+    dump(DEST / "n1-validation-v1.1.json", {"imports": imports, "geometry": geometry, "godot": runtime,
+        "native_camera": native, "unchanged_glbs": unchanged,
+        "atlas_sha256": digest(KIT / "room_albedo_ao.png"),
+        "atlas_change": atlas_change,
+        "runtime_restoration": json.loads((QA / "native-camera-restoration.json").read_text())
+            if (QA / "native-camera-restoration.json").exists() else {"scope": "Reused committed native camera trace; runtime checkout not touched in this reproduction."},
+        "early_navigation": json.loads((QA / "plan/godot-navigation.json").read_text()),
+        "layout_plan": json.loads((QA / "plan/plan-validation.json").read_text()),
+        "blend_sha256": digest(ROOT / "tools/art/source/poi_hotel_lobby/poi_hotel_lobby.blend"),
+        "scope": "Six requested v1.1 fixes; original P0 camera follows revised spawn at 43 degrees / 6.72 m; no gameplay code or phone validation."})
+    print("PACKAGED_N1_V1_1", len(files), "images; 20 imported UIDs; 15 other GLBs unchanged")
+
+
 def sheet(width, height, title):
     out = Image.new("RGB", (width, height), "#F5F5F2")
     draw = ImageDraw.Draw(out)
@@ -36,6 +113,7 @@ def fit(image, box):
 
 
 def main():
+    verify_import_metadata()
     DEST.mkdir(parents=True, exist_ok=True)
     raw = QA / "captures"
     geometry = json.loads((QA / "geometry-validation.json").read_text())
@@ -144,4 +222,6 @@ def main():
     print("PACKAGED_N1", len(files), "images; fire pixels changed", fire_check["changed_orange_pixels"], "standing separation", min(distances))
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    if "--technical-fix" in sys.argv: technical_fix()
+    else: main()

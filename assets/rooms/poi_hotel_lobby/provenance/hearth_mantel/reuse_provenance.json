@@ -3,7 +3,7 @@
   "author": "ZHAOYUN",
   "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
   "changes": [
-    "Only mantel shelf selected; unrelated original lamps/landscape/kettle excluded; rebase original absolute coordinates to hearth pivot."
+    "Only mantel shelf selected; thin from .15 to .08 m while retaining its top and supported decor; warm mid-grey stone palette."
   ],
   "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
   "source_collection": "KIT_hearth_mantel_details",
@@ -30,5 +30,5 @@
   ],
   "triangles": 108,
   "surfaces": 1,
-  "exported_sha256": "cc71cf4a7f21e9ff26ea554f9d3aad42a97932eaf9895e5d887571e64f374ef6"
+  "exported_sha256": "331582e4b2f2c73a96cadca4a001333dc5b6f821c0e370fd40cbb0bf3a911b28"
 }

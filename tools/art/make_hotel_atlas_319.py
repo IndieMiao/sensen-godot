@@ -18,7 +18,7 @@ def main():
     atlas = Image.open(HALL / "hall_albedo_ao.png").convert("RGB")
     palette = json.loads((HALL / "hall_palette.json").read_text())["slots"]
     changed = []
-    overrides = {"wood_dark": "783B22", "cloth_green": "42683A", "stone": "C8C3B9"}
+    overrides = {"wood_dark": "783B22", "cloth_green": "42683A", "stone": "8C8376"}
     for role in ["wood_dark", "stone"]:
         x, y, w, h = palette[role]["rect_px_top_left"]
         atlas.paste(Image.new("RGB", (w, h), "#" + overrides[role]), (x, y))
@@ -33,10 +33,11 @@ def main():
         changed.append({"role": role, "rect_px": [x, y, w, h]})
     def rug(image):
         draw = ImageDraw.Draw(image)
+        draw.rectangle((0, 0, 255, 255), fill="#567E4A")
         for i in range(-300, 512, 22):
-            draw.line((i, 0, i + 256, 256), fill="#304E29", width=1)
-            draw.line((i, 0, i - 256, 256), fill="#35512C", width=1)
-        for inset in [9, 14]: draw.rectangle((inset, inset, 255 - inset, 255 - inset), outline="#B7914F", width=2)
+            draw.line((i, 0, i + 256, 256), fill="#638C55", width=1)
+            draw.line((i, 0, i - 256, 256), fill="#5D844E", width=1)
+        for inset in [9, 14]: draw.rectangle((inset, inset, 255 - inset, 255 - inset), outline="#C4A15B", width=2)
     tile("cloth_green", rug, True)
     def hide(image):
         yy, xx = np.mgrid[0:256, 0:256]
@@ -80,7 +81,8 @@ def main():
     (OUT / "atlas_skin.json").write_text(json.dumps({"base": "assets/rooms/_shared/shell_hall/hall_albedo_ao.png",
         "base_sha256": hashlib.sha256((HALL / "hall_albedo_ao.png").read_bytes()).hexdigest(), "same_uv_layout": True,
         "changed_regions": changed, "palette_overrides": overrides, "shell_regions_unchanged": True,
-        "override_reason": "Keep source hue families while matching shaded furniture readability under native P0 ACES lighting; cloth tile center alone is the sofa swatch.",
+        "rug_base_hex": "567E4A", "rug_border_hex": "C4A15B",
+        "override_reason": "N1 v1.1: lighter forest-green rug and warm mid-grey stone per Huowu 319 1db13376; cloth tile center alone is the unchanged sofa swatch.",
         "purpose": "Original miniature landscape, rug weave, hide markings and static mirror impression; no extra room texture."}, indent=2) + "\n")
     print("N1_ATLAS", len(changed), "detail regions")
 

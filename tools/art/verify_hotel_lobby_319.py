@@ -102,13 +102,20 @@ def main():
     for source, name in [("armchair", "cream_armchair"), ("round_side_table", "round_side_table"), ("frame_landscape", "frame_landscape")]:
         original = local_mesh(QA / "deps/assets/rooms/_shared/shell_hall" / (source + ".glb"))
         produced = local[name]
+        scale = [.70 / 1.10, .90 / 1.13425, .70 / 1.10] if source == "round_side_table" else [1, 1, 1]
+        original["points"] = original["points"] * np.array(scale)
         original_bounds = np.array([original["points"].min(0), original["points"].max(0)])
         produced_bounds = np.array([produced["points"].min(0), produced["points"].max(0)])
         max_error = float(np.max(np.abs(original_bounds - produced_bounds)))
         exact = signature(original) == signature(produced)
-        check(max_error < .00003 and len(original["triangles"]) == len(produced["triangles"]), name + " original 324 bounds and count retained; no scaling")
-        check(exact, name + " original 324 triangle geometry retained")
-        report["reuse"][name] = {"source_commit": "104446a2", "bounds_max_error_m": max_error, "triangle_signature_equal": exact}
+        check(max_error < .00003 and len(original["triangles"]) == len(produced["triangles"]), name + " matches approved 324 source scale and count")
+        check(exact, name + " original 324 triangle geometry retained after approved scale")
+        report["reuse"][name] = {"source_commit": "104446a2", "approved_scale_xyz": scale, "bounds_max_error_m": max_error, "triangle_signature_equal": exact}
+    for table_name, lamp_name in [("round_side_table", "green_table_lamp"), ("table_sofa_right", "lamp_table_sofa_right"), ("table_sofa_back", "lamp_table_sofa_back")]:
+        lamp = placed[lamp_name]
+        center = (lamp["lo"] + lamp["hi"]) / 2
+        hit = placed[table_name]["bvh"].ray_cast(Vector((center[0], 2, center[2])), Vector((0, -1, 0)), 3)
+        check(hit[0] is not None and abs(hit[0].y - lamp["lo"][1]) < .001, lamp_name + " rests on resized table surface")
     for name in ["ring_sofa", "cream_armchair", "round_side_table", "hearth", "luggage_cart", "low_bookshelf", "floor_lamp", "central_planter"]:
         check(abs(float(local[name]["points"][:, 1].min())) < .001, name + " grounded at local Y=0")
     for anchor in [a for a in layout["anchors"] if a["name"].startswith("seat_")]:
@@ -161,6 +168,11 @@ def main():
         if not reason: unexpected.append(row)
     check(not unexpected, "No unexpected inter-module or wall crossing")
     report["unexpected_intersections"] = unexpected
+    plaque = local["blank_name_plaque"]["points"]
+    plaque_size = plaque.max(0) - plaque.min(0)
+    check(np.allclose(plaque_size[:2], [1.68, .30], atol=.0001), "Name plaque frame is 1.68 x .30 m")
+    sign = next(a for a in layout["anchors"] if a["name"] == "sign_name")
+    check(sign["size"] == [1.60, .22], "Runtime writable area is 1.60 x .22 m")
     check(stats["scene_triangles_with_particles_max"] == stats["scene_triangles"] + stats["dynamic_particle_triangles_max"], "Particle triangle ceiling matches static plus dynamic counts")
     check(stats["scene_triangles"] <= 150000 and stats["static_draw_surfaces"] + 2 <= 50, "Complete room including shared shell/plants and two fire draws meets budget")
     check(len(local["cowhide_rug"]["triangles"]) <= 1000, "Cowhide remains below 1k triangles")

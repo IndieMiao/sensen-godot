@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib
 import json
+import os
 import subprocess
 import shutil
 import sys
@@ -35,6 +36,8 @@ def main():
         shutil.copy2(ROOT / "output/hotel-lobby-319/plan/godot-navigation.json", project / "navigation.json")
         if (ROOT / "output/hotel-lobby-319/native-camera.json").exists():
             shutil.copy2(ROOT / "output/hotel-lobby-319/native-camera.json", project / "native-camera.json")
+        elif (ROOT / "docs/design/poi-hotel-lobby-319-2026-10-31/native-camera-n1-v1.1.json").exists():
+            shutil.copy2(ROOT / "docs/design/poi-hotel-lobby-319-2026-10-31/native-camera-n1-v1.1.json", project / "native-camera.json")
         elif (ROOT / "docs/design/poi-hotel-lobby-319-2026-10-31/native-camera-n1-v1.json").exists():
             shutil.copy2(ROOT / "docs/design/poi-hotel-lobby-319-2026-10-31/native-camera-n1-v1.json", project / "native-camera.json")
         (project / "project.godot").write_text('''config_version=5
@@ -58,6 +61,15 @@ lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
 script=ExtResource("1")
 ''')
         print("STAGED", project)
+        if "--import" in sys.argv:
+            assert os.environ.get("ANDROID_ADB_SERVER_PORT") == "5099"
+            subprocess.run(["godot", "--headless", "--path", str(project), "--editor", "--import"], check=True)
+            subprocess.run(["godot", "--headless", "--path", str(project), "--script",
+                str(ROOT / "tools/art/verify_hotel_imports_319.gd"), "--",
+                str(ROOT / "output/hotel-lobby-319/import-validation.json")], check=True)
+            for file in (project / "assets/rooms/poi_hotel_lobby").glob("*.import"):
+                shutil.copy2(file, ROOT / "assets/rooms/poi_hotel_lobby" / file.name)
+            print("SYNCED_N1_IMPORT_UIDS")
 
 
 if __name__ == "__main__": main()

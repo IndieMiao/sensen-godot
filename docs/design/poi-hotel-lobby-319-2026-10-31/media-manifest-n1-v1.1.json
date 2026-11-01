@@ -1,0 +1,20 @@
+[
+  {
+    "name": "SGODOT-319_N1_v1.1_entry_360.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1.1_entry_360.png",
+    "size": [
+      360,
+      800
+    ],
+    "sha256": "f2ee7028c88626ce54efc519f3e98514072313ea502821a058cc15def77b4b81"
+  },
+  {
+    "name": "SGODOT-319_N1_v1.1_full.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1.1_full.png",
+    "size": [
+      1488,
+      1420
+    ],
+    "sha256": "135bebff9840d313be20a84cb358f2de4859a795374b0a221c95882451b5b81a"
+  }
+]

@@ -1,4 +1,4 @@
-"""SGODOT-319 N1, full-size 324 furniture on the approved shared hall shell.
+"""SGODOT-319 N1, approved 324 furniture adaptations on the shared hall shell.
 
 Run prepare_hotel_lobby_319.py and make_hotel_atlas_319.py before Blender.
 Named parts remain editable; evaluated local-pivot copies alone are exported.
@@ -187,38 +187,57 @@ def reused_furniture():
             return mapping.get(obj.get("palette_slot", "oak"), obj.get("palette_slot", "oak"))
         kit = source_parts(name, path, "KIT_" + source, at, yaw, choose=choose)
         if source == "armchair": kit["collision"] = [dict(at=[0, .663, 0], size=[1.5, 1.326, .89])]
-        elif source == "round_side_table": kit["collision"] = [dict(kind="cylinder", at=[0, 1.13425 / 2, 0], radius=.55, height=1.13425)]
+        elif source == "round_side_table":
+            for obj in kit["objects"]: remap_positions(obj, Matrix.Diagonal((.70 / 1.10, .70 / 1.10, .90 / 1.13425, 1)))
+            kit["collision"] = [dict(kind="cylinder", at=[0, .45, 0], radius=.35, height=.90)]
         PROVENANCE[name].update(source_commit="104446a2a995c8a0269d12d27308b3d547b29f6e", source_asset=source,
             locked_scale=True, changes=["Geometry, normals and game scale retained; only palette UV/color and scalar local AO added."])
+        if source == "round_side_table":
+            PROVENANCE[name].update(locked_scale=False, scale_xyz=[.70 / 1.10, .90 / 1.13425, .70 / 1.10],
+                changes=["N1-only copy scaled to .70 m diameter and .90 m table height per Huowu 319 1db13376; original 324 files unchanged."])
         for obj in kit["objects"]:
             if obj.get("export_group") == "Artwork": obj["uv_mode"] = "front"
     p.instance("cream_armchair", "armchair_front", ROWS["armchair_front"]["position"], 90)
     for name in ["table_sofa_right", "table_sofa_back", "table_armchair"]:
         p.instance("round_side_table", name, ROWS[name]["position"])
     lamp_source = ROOT / "tools/art/source/post_215/post_215.blend"
-    at = ROWS["table_sofa_left"]["position"][:]; at[1] += 1.13425
+    at = ROWS["table_sofa_left"]["position"][:]; at[1] += .90
     kit = source_parts("green_table_lamp", lamp_source, "post_table_lamp", at, choose=lambda o:
         "leaf_light" if "warm shade" in o.name else "wood_dark" if "dark foot" in o.name else "accent_gold")
     PROVENANCE["green_table_lamp"]["changes"] = ["Post Office lamp geometry retained at .493 m high; warm shade recolored green, brass retained."]
     for name in ["table_sofa_right", "table_sofa_back"]:
-        at = ROWS[name]["position"][:]; at[1] += 1.13425
+        at = ROWS[name]["position"][:]; at[1] += .90
         p.instance("green_table_lamp", "lamp_" + name, at)
 
 
 def hearth():
     path = ROOT / "tools/art/source/deluxe_room_10/deluxe_room_10.blend"
-    source_parts("hearth", path, "KIT_hearth", ROWS["hearth"]["position"], 90, choose=lambda o:
+    source_parts("hearth", path, "KIT_hearth", ROWS["hearth"]["position"], 90,
+        keep=lambda n: not n.startswith("Underloft rounded plaster breast"), choose=lambda o:
         "wood_dark" if "log" in o.name.lower() else "leather" if "ember" in o.name.lower() or "lining" in o.name.lower() else "stone")
     p.KITS["hearth"]["collision"] = [dict(at=[0, 1.0425, .045], size=[1.13, 2.085, 1.05])]
     p.b.CURRENT = p.KITS["hearth"]
+    for obj in p.KITS["hearth"]["objects"]:
+        if obj["source_part"].startswith("Hearth rounded cooking ledge"):
+            transform = Matrix.Diagonal((1, 1, .5, 1)); transform.translation.z = 1.30 * .5
+            remap_positions(obj, transform)
+    # Staggered solid stones replace the blank chimney breast, retaining its envelope.
+    for row in range(4):
+        cuts = [-.36, -.12, .12, .36] if row % 2 == 0 else [-.36, 0, .36]
+        for left, right in zip(cuts, cuts[1:]):
+            cube("Chimney warm stone course %d" % row, ((left + right) / 2, 1.315 + (row + .5) * .1925, -.22),
+                (right - left - .014, .1785, .52), "stone", .014)
     for x in [-.43, .43]:
         for i, y in enumerate([.28, .56, .84]):
             cube("Stone facing jamb block", (x, y, .49), (.215, .245, .15), "stone", .028)
     for x in [-.36, -.12, .12, .36]: cube("Stone facing lintel block", (x, 1.10, .49), (.225, .23, .15), "stone", .025)
-    PROVENANCE["hearth"]["changes"] = ["Source 1.13 x 1.05 m footprint retained; add shallow stone facing inside original envelope; existing logs retained.", "Use shared SGODOT-178 fire, not new flames."]
+    PROVENANCE["hearth"]["changes"] = ["Source footprint and logs retained; replace blank chimney breast with four staggered stone courses, thin cooking ledge to .08 m, warm mid-grey N1 palette.", "Use shared SGODOT-178 fire, not new flames."]
     at = ROWS["hearth"]["position"][:]; at[1] += 1.53
-    source_parts("hearth_mantel", path, "KIT_hearth_mantel_details", at, 90,
+    mantel = source_parts("hearth_mantel", path, "KIT_hearth_mantel_details", at, 90,
         keep=lambda n: n.startswith("Deep oak mantel shelf"), origin=[2.14, 1.53, -1.72], choose=lambda _: "stone")
+    for obj in mantel["objects"]:
+        transform = Matrix.Diagonal((1, 1, .08 / .15, 1)); transform.translation.z = .075 * (1 - .08 / .15)
+        remap_positions(obj, transform)
     decor_at = at[:]; decor_at[1] -= .01
     source_parts("mantel_decor", path, "KIT_hearth_mantel_details", decor_at, 90,
         keep=lambda n: n.startswith(("Brass candlestick", "Cream wax candle")), origin=[2.14, 1.53, -1.72],
@@ -233,7 +252,7 @@ def hearth():
     cube("Small mantel picture backing", (-.43, .235, .30), (.20, .28, .025), "linen", .006)
     for x in [-.535, -.325]: cube("Small mantel picture side", (x, .235, .319), (.016, .30, .025), "accent_gold", .004)
     for y in [.093, .377]: cube("Small mantel picture crossbar", (-.43, y, .319), (.22, .016, .025), "accent_gold", .004)
-    PROVENANCE["hearth_mantel"]["changes"] = ["Only mantel shelf selected; unrelated original lamps/landscape/kettle excluded; rebase original absolute coordinates to hearth pivot."]
+    PROVENANCE["hearth_mantel"]["changes"] = ["Only mantel shelf selected; thin from .15 to .08 m while retaining its top and supported decor; warm mid-grey stone palette."]
     PROVENANCE["mantel_decor"]["changes"] = ["Original two candlesticks and candles retained; new oval mirror and small frame; no original room lamps."]
 
 
@@ -287,9 +306,10 @@ def walls_and_luggage():
     PROVENANCE["wall_clock"]["changes"] = ["Original .78 m diameter and 592-triangle geometry retained; recolor only; tick marks, no numerals."]
     for i, x in enumerate([.62, 1.52], 2): p.instance("wall_clock", "wall_clock_%d" % i, [x, 2.61, -2.955])
     begin("blank_name_plaque", [.62, 3.20, -2.95])
-    cube("Blank cream runtime name plate", (0, 0, 0), (2.48, .22, .035), "porcelain", .008)
-    for x in [-1.24, 1.24]: cube("Name plaque end trim", (x, 0, .025), (.025, .245, .025), "accent_gold", .005)
-    for y in [-.11, .11]: cube("Name plaque long trim", (0, y, .025), (2.48, .025, .025), "accent_gold", .004)
+    cube("Blank cream runtime name plate", (0, 0, 0), (1.68, .30, .035), "porcelain", .008)
+    for x in [-.825, .825]: cube("Name plaque end trim", (x, 0, .025), (.03, .30, .025), "accent_gold", .005)
+    for y in [-.135, .135]: cube("Name plaque long trim", (0, y, .025), (1.68, .03, .025), "accent_gold", .004)
+    PROVENANCE["blank_name_plaque"]["changes"] = ["N1 v1.1: 1.68 x .30 m frame around a 1.60 x .22 m runtime text area; mounting pivot retained."]
     begin("luggage_cart", notes=["New .95 x .77 m cart with three leather cases inside its footprint."])
     cube("Cart wood platform", (0, .21, 0), (.88, .07, .68), "wood_mid", .025)
     for z in [-.35, .35]: cube("Cart brass platform edge", (0, .22, z), (.92, .045, .035), "brass", .012)
@@ -487,15 +507,15 @@ def main():
     for seat in analysis["seats"]:
         if seat["module"] == "armchair_back": seat["module"] = "cream_armchair"
     seats = [{key: seat[key] for key in ["name", "module", "position", "yaw_degrees", "stand"]} for seat in analysis["seats"]]
-    p.MANIFEST_EXTRA.update(floor_y=.08, footprint=[6.8, 6.4], revision="SGODOT-319 N1 v1",
+    p.MANIFEST_EXTRA.update(floor_y=.08, footprint=[6.8, 6.4], revision="SGODOT-319 N1 v1.1",
         lighting={"angular_distance": .4},
         shared_shell="res://scenes/shell_hall/shell_hall_art.tscn", shell_atlas="res://assets/rooms/poi_hotel_lobby/room_albedo_ao.png",
         anchors=seats + [dict(name="spawn", position=PLAN["spawn"], yaw_degrees=180, module="hall_floor"),
             dict(name="cam_default", position=PLAN["spawn"], yaw_degrees=45, module="hall_floor",
                 role="camera_follow_target", pitch_degrees=43, orthographic_width=6.72, near=.1, far=40),
             dict(name="exit", position=PLAN["exit"], yaw_degrees=180, module="hall_floor"),
-            dict(name="badge_exit", position=[0, .55, 3.0], yaw_degrees=0, module="hall_floor"),
-            dict(name="sign_name", position=[.62, 3.20, -2.92], yaw_degrees=180, module="blank_name_plaque", size=[2.28, .145])],
+            dict(name="badge_exit", position=[PLAN["exit"][0], .55, 3.0], yaw_degrees=0, module="hall_floor"),
+            dict(name="sign_name", position=[.62, 3.20, -2.92], yaw_degrees=180, module="blank_name_plaque", size=[1.60, .22])],
         standing_16=analysis["standing_16"],
         shared_plants=[dict(name="plant_elevator", file="olive_tree.glb", position=ROWS["plant_elevator"]["position"], yaw_degrees=30, collision_radius=.31),
             dict(name="plant_cart", file="olive_tree.glb", position=ROWS["plant_cart"]["position"], yaw_degrees=125, collision_radius=.31)],
@@ -504,14 +524,25 @@ def main():
     lights = []
     for name in ["table_sofa_left", "table_sofa_right", "table_sofa_back"]:
         x, _, z = ROWS[name]["position"]
-        lights.append(dict(name="warm_" + name, kind="spot", position=[x, 1.48, z], target=[x, 1.21, z], color="FFD3A0", energy=.35, range=1.1, angle_degrees=65))
+        lights.append(dict(name="warm_" + name, kind="spot", position=[x, 1.24575, z], target=[x, .97575, z], color="FFD3A0", energy=.35, range=1.1, angle_degrees=65))
     x, _, z = ROWS["floor_lamp"]["position"]
     lights.append(dict(name="floor_lamp_warmth", kind="omni", position=[x, 1.61, z], color="FFD5A6", energy=.65, range=2.1))
     p.MANIFEST_EXTRA["local_lights"] = lights
     p.finalize({"position": [10.3429, 15.64, 10.3429], "target": [0, 2, 0], "size": 11, "pitch_degrees": 43,
         "yaw_degrees": 45, "near": .1, "far": 40}, json.loads((HALL / "layout.json").read_text())["review_lighting"])
     if "--geometry-only" not in sys.argv:
-        assets = [export_module(name) for name in p.KITS]
+        selected_arg = next((arg.split("=", 1)[1] for arg in sys.argv if arg.startswith("--asset=")), "")
+        selected = set(selected_arg.split(",")) if selected_arg else set()
+        assert selected.issubset(p.KITS)
+        previous_stats = json.loads((OUT / "asset_stats.json").read_text()) if selected else {}
+        previous_provenance = json.loads((OUT / "reuse_provenance.json").read_text()) if selected else {}
+        assets = []
+        for name in p.KITS:
+            if selected and name not in selected:
+                assets.append(next(row for row in previous_stats["assets"] if row["name"] == name))
+                PROVENANCE[name] = previous_provenance[name]
+            else:
+                assets.append(export_module(name))
         lookup = {a["name"]: a for a in assets}
         stats = {"assets": assets, "unique_triangles": sum(a["triangles"] for a in assets),
             "furniture_scene_triangles": sum(a["triangles"] for a in assets) + sum(lookup[i["asset"]]["triangles"] for i in p.INSTANCES),

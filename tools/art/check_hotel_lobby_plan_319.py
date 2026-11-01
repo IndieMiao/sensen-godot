@@ -122,7 +122,7 @@ def main():
         draw.ellipse((x - .25 * 155, y - .25 * 155, x + .25 * 155, y + .25 * 155), outline="#306CBA", width=2)
         draw.text((x - 8, y - 8), str(i), fill="#244E83", font=small)
     draw.text((60, 20), "SGODOT-319 / ZHAOYUN - Full-size circulation and standing clearance", fill="#263E35", font=font)
-    lines = ["Armchair 1.50 x 0.89 m | Side table diameter 1.10 m | No scaling",
+    lines = ["Armchair 1.50 x 0.89 m | N1 side table diameter 0.70 m, height 0.90 m",
         "Green area: reachable .70 m main-passage centers | Blue: 16 standing capsules",
         f'PASS={report["passed"]} | overlaps={len(overlaps)} | seat approaches={sum(s["reachable_radius_025"] for s in seats)}/8',
         "Red approach rings identify inaccessible positions; conservative full-height footprints."]

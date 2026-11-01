@@ -1,0 +1,121 @@
+{
+  "actual_actor_room_position": [
+    2.82499980926514,
+    0.0800000056624413,
+    2.375
+  ],
+  "anchor_visibility": {
+    "badge_exit": true,
+    "cam_default": true,
+    "exit": true,
+    "seat_armchair_1": true,
+    "seat_armchair_2": true,
+    "seat_sofa_1": true,
+    "seat_sofa_2": true,
+    "seat_sofa_3": true,
+    "seat_sofa_4": true,
+    "seat_sofa_5": true,
+    "seat_sofa_6": true,
+    "sign_name": true,
+    "spawn": true
+  },
+  "bag_only": true,
+  "basis": [
+    [
+      0.707106828689575,
+      0.0,
+      -0.707106828689575
+    ],
+    [
+      -0.482245653867722,
+      0.73135370016098,
+      -0.482245653867722
+    ],
+    [
+      0.517145156860352,
+      0.681998372077942,
+      0.517145156860352
+    ]
+  ],
+  "hotel_identity_screen_bounds": {
+    "blank_name_plaque": {
+      "inside_safe_band": true,
+      "rect": [
+        264.947540283203,
+        291.964721679688,
+        65.7230529785156,
+        56.576904296875
+      ]
+    },
+    "elevator": {
+      "inside_safe_band": true,
+      "rect": [
+        190.379364013672,
+        274.748443603516,
+        58.5635681152344,
+        141.807373046875
+      ]
+    },
+    "key_rack": {
+      "inside_safe_band": true,
+      "rect": [
+        238.525726318359,
+        330.119140625,
+        103.414367675781,
+        121.462005615234
+      ]
+    },
+    "wall_clock": {
+      "inside_safe_band": true,
+      "rect": [
+        245.760940551758,
+        293.212463378906,
+        35.0018157958984,
+        54.4313354492188
+      ]
+    },
+    "wall_clock_2": {
+      "inside_safe_band": true,
+      "rect": [
+        279.853576660156,
+        316.463562011719,
+        35.0018005371094,
+        54.4313659667969
+      ]
+    },
+    "wall_clock_3": {
+      "inside_safe_band": true,
+      "rect": [
+        313.946228027344,
+        339.714691162109,
+        35.0018005371094,
+        54.4313354492188
+      ]
+    }
+  },
+  "layout_sha256": "008dafc2dac6910c99d53eb000778a1f9f3f621983eaecd52a71189fef2b50c0",
+  "native_far": 4000.0,
+  "native_near": 0.0500000007450581,
+  "opening_passed": true,
+  "origin": [
+    8.58549308776855,
+    13.7199802398682,
+    8.13549423217773
+  ],
+  "pitch": -43.0,
+  "render_clip_note": "Framing retained exactly. Art review uses near=.1/far=40 for single-map daylight shadow precision; P2 integration must consume the art clip recommendation.",
+  "requested_spawn": [
+    2.84999990463257,
+    0.0799999982118607,
+    2.34999990463257
+  ],
+  "source": "Unmodified farm-dev P0Room.frame_all with native P0Ui bag-only layout",
+  "spawn_snap_distance_m": 0.0353554747998714,
+  "viewport": [
+    360,
+    800
+  ],
+  "width_m": 6.71999979019165,
+  "runtime_commit": "17cd10d56e62530d4bf6b7bec35386b255559d4b",
+  "native_room_sha256": "752b75da4f4bed2b1e847761b4cc278e3b11e27cbd4f092220529ebee42243fc"
+}
