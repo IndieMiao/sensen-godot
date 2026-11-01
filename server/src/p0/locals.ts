@@ -11,14 +11,15 @@
  */
 import type { P0Content } from './content.js';
 import type { Refusal } from './fishing.js';
-import { drawable, handIn, haveForRequest, payout, requestFor, seededRand, tracked } from './boards.js';
+import { drawable, handIn, haveForRequest, payout, regionalPool, requestFor, seededRand, tracked } from './boards.js';
+import { everFish, pondCity } from './fishing_world.js';
 import { homeFacts } from './home.js';
 import { cityOutposts } from './home_city.js';
 import type { P0Event } from './progress.js';
 import { handOver, haveFor, noteDone, payBonus } from './requests.js';
-import { dayKey } from './rules.js';
+import { dayKey, skillLevel } from './rules.js';
 import type { BoardRequest, LocalCity, P0State } from './state.js';
-import { homeOf } from './travel.js';
+import { clusterOf, homeOf, writtenCluster } from './travel.js';
 import { cityPlaces } from './world.js';
 
 export const LOCAL_PREFIX = 'req_loc_';
@@ -43,10 +44,38 @@ export function giverOf(c: P0Content, city: string, place: string): { giver: str
   return { giver: k?.name ?? '', giver_role: k?.role ?? '' };
 }
 
-/** A template a keeper may give in that city: as the city's Market Board could draw it, never an explore one. */
+/** A template a keeper may give in that city: as the city's Market Board could draw it, never an explore one; a fish one
+ * only for a fish the player can land there now (奕星's review of q(272): River Run's trout where the city's waters hold
+ * it, Local Waters' regional fish at the player's Fishing level). */
 function localDrawable(c: P0Content, s: P0State, id: string, city: string): boolean {
   const t = c.requests.templates[id];
-  return !!t && t.need.kind !== 'visit' && t.need.where !== 'not_home' && drawable(c, s, id, 'market', city);
+  if (!t || t.need.kind === 'visit' || t.need.where === 'not_home' || !drawable(c, s, id, 'market', city)) return false;
+  if (t.need.kind !== 'fish') return true;
+  if (t.need.id) return landable(c, s, t.need.id) && cityFish(c, city).has(t.need.id);
+  return !t.need.regional || regionalPool(c, { travel: { home: city } }, t.need).some(f => landable(c, s, f));
+}
+
+/** A fish the player's Fishing level lands (a higher one gets away, §4.6). */
+const landable = (c: P0Content, s: P0State, id: string) => (c.fish.find(f => f.id === id)?.level ?? Infinity) <= skillLevel(c, s, 'fishing');
+
+const fishCache = new WeakMap<P0Content, Map<string, Set<string>>>();
+/** Every fish a city's ponds and rivers can ever give (each site's habitat × the city's regional fish). */
+export function cityFish(c: P0Content, city: string): Set<string> {
+  let byCity = fishCache.get(c);
+  if (!byCity) fishCache.set(c, byCity = new Map());
+  let ids = byCity.get(city);
+  if (!ids) {
+    const sites = city === writtenCluster(c)
+      ? Object.entries(c.fishing.places).filter(([id]) => pondCity(c, id).cluster === city).map(([, p]) => p.site)
+      : (cityPlaces(c, city)?.detail.ponds ?? []).map(p => p.site);
+    ids = new Set();
+    for (const name of new Set(sites)) {
+      const site = c.fishing.sites[name];
+      if (site) for (const f of everFish(c, site, city)) ids.add(f.id);
+    }
+    byCity.set(city, ids);
+  }
+  return ids;
 }
 
 /**
@@ -79,7 +108,8 @@ function drawLocals(c: P0Content, s: P0State, city: string, day: string, at: num
     const pool = g.templates.filter(id => !used.has(id) && localDrawable(c, s, id, city));
     if (!pool.length) continue;
     const template = pool[Math.floor(draw() * pool.length)];
-    const req = requestFor(c, s, template, draw, 'market', city, `${LOCAL_PREFIX}${city}-${day}-${out.length}`, at);
+    const req = requestFor(c, s, template, draw, 'market', city, `${LOCAL_PREFIX}${city}-${day}-${out.length}`, at,
+      item => !item.startsWith('fish_') || landable(c, s, item));
     if (req) { out.push({ req, place: g.place }); used.add(template); }
   }
   return out;
@@ -141,14 +171,20 @@ export function localCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
 
 /**
  * q(272) ⑪: a city not visited for prune_days, with nothing tracked there, loses its Market Board and its local
- * requests; the next visit makes them as a first one. Never the home city nor the one the player is in.
+ * requests; the next visit makes them as a first one — they alone: its visits, stamp, Regular count and first-visit
+ * gift stay (奕星's review). "Visited" is the later of the last arrival and the end of its Day Pass (a stay on one pass
+ * does not move last_at). Never the home city, the one the player is in, one with a pass still running, nor the city of
+ * the outpost or pond the player is still inside (a lapsed pass does not send them home from there).
  */
 export function pruneCities(c: P0Content, s: P0State, now: number): void {
   const days = c.requests.local?.prune_days;
   if (!days) return;
-  const home = homeOf(c, s), here = s.travel?.here || home;
+  const t = s.travel, home = homeOf(c, s), here = t?.here || home;
+  const inside = s.presence?.entered ? clusterOf(c, s.presence.entered) : null;
   for (const city of new Set([...Object.keys(s.markets ?? {}), ...Object.keys(s.locals ?? {})])) {
-    if (city === home || city === here || now - (s.travel.visits[city]?.last_at ?? 0) < days * DAY) continue;
+    if (city === home || city === here || city === inside) continue;
+    const pass = t.passes[city]?.until ?? 0;
+    if (pass > now || now - Math.max(t.visits[city]?.last_at ?? 0, pass) < days * DAY) continue;
     const held = (s.markets?.[city] ?? []).some(sl => sl.req?.status === 'accepted')
       || (s.locals?.[city]?.slots ?? []).some(sl => sl.req.status === 'accepted');
     if (held) continue;

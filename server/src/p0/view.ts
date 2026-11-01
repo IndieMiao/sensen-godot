@@ -9,7 +9,7 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
-import { cityName, giverOf, pruneCities, settleLocals, shownLocals } from './locals.js';
+import { cityName, giverOf, settleLocals, shownLocals } from './locals.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { bonusCap, floorPrice, haveFor, matches, pick } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
@@ -44,7 +44,6 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
   expireGiftMeals(s);
-  pruneCities(c, s, now);   // q(272) ⑪, as the next command
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
   settleLocals(c, s, now);   // q(272): the same local requests the next command finds
   settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will

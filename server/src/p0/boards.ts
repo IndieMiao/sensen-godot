@@ -212,8 +212,10 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
 }
 
 /** The request one template makes in a city — its items and quantity from the draw's stream, after the template's own
- * pick (a board slot's, or a keeper's local request, q(272)); null when an explore one finds nowhere to send the player. */
-export function requestFor(c: P0Content, s: P0State, template: string, draw: Rand, board: BoardId, city: string, id: string, at: number): BoardRequest | null {
+ * pick (a board slot's, or a keeper's local request, q(272)); null when an explore one finds nowhere to send the player.
+ * `keep`: the regional items it may ask for (a keeper's: only the fish the player can land now). */
+export function requestFor(c: P0Content, s: P0State, template: string, draw: Rand, board: BoardId, city: string, id: string, at: number,
+  keep: (item: string) => boolean = () => true): BoardRequest | null {
   const h = asHome(c, s, city), t = c.requests.templates[template];
   let items: string[] = [];
   let visit: BoardRequest['visit'];
@@ -230,7 +232,8 @@ export function requestFor(c: P0Content, s: P0State, template: string, draw: Ran
     const places = visitPlaces(c, board, h);
     visit = { place: places[Math.floor(draw() * places.length)], done: false };
   } else if (t.need.regional) {   // regional: one of the climate's / city's items
-    const pool = regionalPool(c, h, t.need);
+    const pool = regionalPool(c, h, t.need).filter(keep);
+    if (!pool.length) return null;
     items = [pool[Math.floor(draw() * pool.length)]];
   } else if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
   // A crop request by rarity or family takes any such crop the player can grow (李白's Fine Produce, Orchard Basket).

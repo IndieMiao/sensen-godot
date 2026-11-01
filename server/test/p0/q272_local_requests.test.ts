@@ -10,6 +10,8 @@ import { settleBoards, tracked } from '../../src/p0/boards.js';
 import { givers, pruneCities, settleLocals } from '../../src/p0/locals.js';
 import { mapMarkers } from '../../src/p0/markers.js';
 import { bonusCap, payBonus } from '../../src/p0/requests.js';
+import { skillLevel } from '../../src/p0/rules.js';
+import { protectedQty } from '../../src/p0/shops.js';
 import { viewOf } from '../../src/p0/view.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -17,7 +19,7 @@ import { noteProgress, takenCounts } from '../../src/p0/request_progress.js';
 import type { P0Event } from '../../src/p0/progress.js';
 
 const c = loadP0Content();
-const SF = 'gn-5391959', HAYWARD = 'gn-5355933', LOUDI = 'gn-1802238';   // Loudi: an S-tier town, one Trading Post cabin
+const SF = 'gn-5391959', HAYWARD = 'gn-5355933', LOUDI = 'gn-1802238', SHANGHAI = 'gn-1796236', TOKYO = 'gn-1850147', NYC = 'gn-5128581';   // Loudi: an S-tier town, one Trading Post cabin
 const T = Date.parse('2026-10-10T18:00:00Z');   // 11:00 in San Francisco
 const H = 3_600_000, DAY = 24 * H;
 
@@ -64,7 +66,9 @@ describe('q(272) local requests', () => {
     const roles = c.requests.local!.roles;
     expect(Object.keys(roles).sort()).toEqual(['market', 'post', 'tackle', 'tea']);
     const all = Object.values(roles).flat();
-    expect(all).toHaveLength(23);
+    expect(all).toHaveLength(20);
+    // 奕星's numeric review: never the 0-Energy materials, whose hand-in skips the daily material buyback
+    for (const id of ['req_sys_material_wood', 'req_sys_material_fiber', 'req_sys_material_clay']) expect(all).not.toContain(id);
     for (const id of all) {
       const t = c.requests.templates[id];
       expect(t, id).toBeDefined();
@@ -232,6 +236,84 @@ describe('q(272) local requests', () => {
     pruneCities(c, s, later);
     expect(s.locals?.[HAYWARD]).toBeDefined();
     expect(s.markets[HAYWARD]).toBeDefined();
+  });
+
+  it('30 days from the later of the last arrival and the pass\'s end; never with a pass running nor while inside one of its outposts; visits and stamps stay', () => {
+    const s = player();
+    settleBoards(c, s, T);
+    settleLocals(c, s, T);
+    s.travel.here = SF;
+    s.travel.stamps = [...(s.travel.stamps ?? []), HAYWARD] as never;
+    const keep = (at: number, edit: (x: P0State) => void = () => {}) => {
+      const x = structuredClone(s);
+      edit(x);
+      pruneCities(c, x, at);
+      return x.markets[HAYWARD] !== undefined;
+    };
+    expect(keep(T + 31 * DAY)).toBe(false);
+    // a pass that ended 2 days after the arrival counts from its end
+    expect(keep(T + 31 * DAY, x => { x.travel.passes[HAYWARD] = { kind: 'day', from: T - H, until: T + 2 * DAY } as never; })).toBe(true);
+    expect(keep(T + 33 * DAY, x => { x.travel.passes[HAYWARD] = { kind: 'day', from: T - H, until: T + 2 * DAY } as never; })).toBe(false);
+    // still inside its market square (a lapsed pass does not send the player home from there)
+    expect(keep(T + 31 * DAY, x => { x.presence.entered = `${HAYWARD}~market0`; })).toBe(true);
+    const gone = structuredClone(s);
+    pruneCities(c, gone, T + 31 * DAY);
+    expect(gone.travel.visits[HAYWARD]).toEqual(s.travel.visits[HAYWARD]);
+    expect(gone.travel.stamps).toEqual(s.travel.stamps);
+  });
+
+  it('a fish one only for a fish the player can land there: none above the Fishing level (Local Waters too), River Run only where the city\'s waters hold trout', () => {
+    const drawn = (cc: P0Content, city: string, fishing: number) => {
+      const out: BoardRequest[] = [];
+      for (let n = 0; n < 40; n++) {
+        const s = player(city, `q272-fish-${n}`);
+        s.skills.fishing = fishing;
+        settleLocals(cc, s, T);
+        out.push(...(s.locals?.[city]?.slots ?? []).map(sl => sl.req));
+      }
+      return out;
+    };
+    const levelOf = (id: string) => c.fish.find(f => f.id === id)!.level;
+    const mid = player(SHANGHAI);
+    mid.skills.fishing = 300;   // Fishing Lv3: Local Waters open, Shanghai's regional fish not all landable
+    const lv = skillLevel(c, mid, 'fishing');
+    const shanghai = drawn(c, SHANGHAI, 300);
+    expect(shanghai.some(r => r.kind === 'fish')).toBe(true);
+    for (const r of shanghai) for (const i of r.items) if (i.startsWith('fish_')) expect(levelOf(i), i).toBeLessThanOrEqual(lv);
+    expect(drawn(c, HAYWARD, 5000).some(r => r.template === 'req_sys_fish_river')).toBe(true);
+    // the same city with no trout in its waters (a content where trout lives nowhere) never gives River Run
+    const dry = Object.create(Object.getPrototypeOf(c), Object.getOwnPropertyDescriptors(c)) as P0Content;
+    dry.fish = c.fish.map(f => (f.id === 'fish_trout' ? { ...f, where: [] } : f));
+    expect(drawn(dry, HAYWARD, 5000).some(r => r.template === 'req_sys_fish_river')).toBe(false);
+  });
+
+  it('a home change: a local request tracked in the new home is dropped, free (the event lists it)', () => {
+    const opened = Object.create(Object.getPrototypeOf(c), Object.getOwnPropertyDescriptors(c)) as P0Content & { world: { home?: object } };
+    opened.world = { ...opened.world, home: { ...opened.world.home, cities: [TOKYO, NYC] } };
+    const first = applyP0(opened, freshState(opened, 'q272-home-change', T, 7, { pending: true }), { type: 'choose_home', city: TOKYO, spot: 0 } as unknown as P0Command, T);
+    if (!first.ok) throw new Error(first.code);
+    let s = first.state;
+    s.travel.here = NYC;
+    s.travel.visits[NYC] = { n: 1, first_at: T, last_at: T, deliveries: 0, delivered_day: '' };
+    s.travel.passes[NYC] = { kind: 'day', from: T, until: T + 23 * H } as never;
+    settleLocals(opened, s, T);
+    const { req, place } = s.locals![NYC].slots[0];
+    const acc = applyP0(opened, s, { type: 'accept', request: req.id, space: 'outpost', place } as unknown as P0Command, T);
+    if (!acc.ok) throw new Error(acc.code);
+    s = acc.state;
+    const ch = applyP0(opened, s, { type: 'change_home', city: NYC, spot: 0, space: 'home' } as unknown as P0Command, T + H);
+    expect(ch.ok).toBe(true);
+    if (!ch.ok) return;
+    expect(ch.state.locals?.[NYC]).toBeUndefined();
+    expect(ch.events).toContainEqual(expect.objectContaining({ kind: 'home', action: 'changed', city: NYC, dropped: [req.id] }));
+    expect(tracked(opened, ch.state)).toBe(0);
+  });
+
+  it('Sell All keeps back what a tracked local request names', () => {
+    let s = itemisedPlayer();
+    const { req, place } = itemised(s);
+    s = step(s, { type: 'accept', request: req.id, ...at(place) });
+    expect(protectedQty(s, req.items[0])).toBe(req.kind === 'crop' || req.kind === 'material' ? req.qty : 0);
   });
 
   it('the routes mark a keeper\'s local request only for a client that shows them (x-p0-features: locals)', async () => {

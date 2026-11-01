@@ -8,7 +8,7 @@
         "tackle": ["req_sys_fish_common", "req_sys_fish_river", "req_sys_fish_fine", "req_sys_fish_bulk", "req_sys_regional_fish"],
         "tea": ["req_sys_dish_common", "req_sys_dish_soup", "req_sys_dish_fine", "req_sys_dish_trail", "req_sys_dish_tea", "req_sys_regional_dish"],
         "market": ["req_sys_crop_basic", "req_sys_crop_fine", "req_sys_fruit_basket", "req_sys_crop_mixed", "req_sys_crop_bulk", "req_sys_regional_crop"],
-        "post": ["req_sys_material_wood", "req_sys_material_fiber", "req_sys_material_clay", "req_sys_material_copper", "req_sys_material_hardwood", "req_sys_material_quartz"]
+        "post": ["req_sys_material_copper", "req_sys_material_hardwood", "req_sys_material_quartz"]
       }
     }
   }
