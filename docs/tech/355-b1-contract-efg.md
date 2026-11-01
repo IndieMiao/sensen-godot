@@ -18,6 +18,10 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> **v0.5 增量 3（11-02 04:3x）**：照李白 v4q(5) 196a0ffa、v4q(6) 46746a01、v4q(7) 340e4c4e 改了：
+> - Pip 的 First Dig **不走 intro_requests 机制**，独立的数据和结算（第 9.2 节）；
+> - `firsts` 记矿里第一次拿到的物品（`loot:<id>`），给第二批收集册回填；
+> - 12.2 节的日切用例改成留在原层。
 > **v0.5 增量 2（11-02 04:1x）**：照第二份修复复核（`pm/q-review/v4q2678-fix-recheck.md`）改了这几处：
 > - 药：价格 25、Lv4 驿站上架、日库存 5、任何一层、冷却 3 秒都按已定写，**只有回血量待用户定**；
 > - Pip 的 First Dig 用独立的槽，升到 Lv3 出现时就按资历结算；
@@ -236,6 +240,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 5. **守关**：守关层只有守关。打倒以后：`records[mine].guards` 加上这一层；第一次打这种守关就给 `first` 加 `guard_firsts[kind]`；每次都给 `pack`。**默认**：在这座矿打过的守关层，以后再进来（走梯子或坐电梯）都不再有守关，进来就开。每周重打放第二批。
 6. **精英**：和普通怪一样，打倒就有掉落；数据里有 `once_a_day` 的，那一项每天只有第一次掉（精英史莱姆的石英已经去掉）。
 7. **击杀**：每打倒一只，`kills[kind] += 1`。
+7a. **掉落首得**（v4q(6) 46746a01）：矿里任何来源（岩石、怪、守关的 first 和 pack、mine_pick）**第一次拿到**某样物品时，`firsts` 里没有 `loot:<id>` 就记进去，给第二批的收集册回填。只记，第一批不显示。
 8. **倒地**：血量到 0 时：
    - 层号 ≥ `ko_keep_from`（11）：从背包里扣掉 `picked` 里每样东西的 `⌊n × ko_lose⌋`（背包里不够就扣到 0）；
    - 人回到矿口（`day.at = null`）；`notice = {kind: 'ko', floor, lost}`；
@@ -345,15 +350,17 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - **Gear 页现有的 Combat 槽变成可换**（结论第 4 节修订的说法）：存档里是 `gear.weapons` 和 `gear.weapon`；`equip {item}` 加一个分支：`weapons` 里有它就换成它。
 - 战斗读 `gear.weapon`，不再读 `tools.combat`（`tools.combat` 删掉）。武器槽开局就装着木剑，Lv3 只是给铜剑。这一条是 v4q(7) ①，〔待用户定〕：开局，还是照 v4 原文 Lv3 才开武器槽。推荐开局，因为浅坑没有门槛、F1 就有史莱姆。数据上就是 #611 的 START_WEAPON；用户选了 Lv3，再加门槛。
 
-### 9.2 铜剑：Pip 的 First Dig（q(218) intro_requests 的做法，v4q(7) 9c7c861e）
-- **不进委托线，用独立的槽**（v4q(7) ③）：照 q(218) `intro_requests` 的做法，完成的记进 `intro_done`，但**不排进 Pip 的委托线**：不动 `r.next`，不和 Pip 现有的委托共用一个槽，Pip 手上有委托时照样出现。现有 `intro_requests` 只在委托线还没开始、共用槽时才出，这一条要单独判断：`s.homestead.level >= 3` 且不在 `intro_done` 里，就出现。id 和文案由李白在 residents 数据里加。
-- **Homestead Lv3 出现，自动接进 Today**，不用去驿站接；**不占 `track_max`**。
-- 新的需求类型 `{"kind": "floor", "floor": 3}`，进度 = 资历（所有矿的 deepest 取最大）。**达到 3 就直接完成，不用回去交**，两个时刻都要结算：
-  - `mine_record` 事件那一刻；
-  - **出现那一刻**：升到 Lv3 的那条 `homestead_upgrade` 命令里，Lv3 前就已经到过第 3 层的（浅坑没有门槛），这里当场完成。
-  - 完成时记进 `intro_done`，发完成事件和奖励。
-- 新的奖励类型 `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
-- 这一条以前的 intro_requests 规则（`s.guide` 是 legacy 或没开引导时不出现，见 residents.ts）照旧。Lv3 和引导哪个先到由 D（引导改版）定，我和蒙恬对步骤。
+### 9.2 铜剑：Pip 的 First Dig（单列、独立的槽，v4q(7) ③ 340e4c4e）
+- **不走居民委托，也不走 `intro_requests`**：那套机制有 `r.next = 0`、和委托线共用一个槽、要交、只给新引导档这几道限制，都不适用。First Dig 是自己的一条：
+  - **内容**：`mine.first_dig: { "giver": "res_pip", "floor": 3, "gate": { "homestead": 3 }, "reward": { "weapon": "weapon_copper_sword" } }`。标题和文案由李白给，放进同一段。
+  - **存档**：不加新字段。完成以后在 `s.rewards` 里记 `first_dig`（现有的一次性奖励列表）。
+  - **出现**：`homestead.level >= gate.homestead` 且 `rewards` 里没有 `first_dig`。不看好感、不看 Pip 的委托线、Pip 手上有委托也出现；**不占 `track_max`**。
+  - **进度** = 资历（所有矿的 deepest 取最大）。
+  - **完成**：资历 ≥ `floor` 就直接完成，不用交。两个时刻都要结算：`mine_record` 事件那一刻；还有它出现的那一刻，即升到 Lv3 的那条 `homestead_upgrade` 命令里，Lv3 前就到过第 3 层的当场完成。
+  - 完成时：记 `rewards: first_dig`，发事件 `{kind: 'first_dig', done: true}` 和奖励。
+- **view**：`view.first_dig: null | { giver, floor, have, done: false }`，出现了、还没完成时才有；Today 照它出一行，第 7.4 节的文案按 q 行。
+- **奖励** `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
+- 和 D 的引导改版（「第一次下矿」那一步）会交叉，我和蒙恬对步骤。
 
 ### 9.3 铁剑：工作台
 - 配方 `{ id: "craft_iron_sword", out: "weapon_iron_sword", to: "weapon", gate: { homestead: 8 }, in: [["iron_ore", 6], ["hardwood", 4], ["coal", 3], ["drop_t2_beetle_shell", 2]], coins: 150 }`（照 q 行，v4q(6)(7) 复核 ①）。数值是初值；Lv8 照 v4 2.7（矿脉门槛待定，会跟着变）。
@@ -453,12 +460,12 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 12a. 离开一层（倒地、出矿、上下楼、坐电梯），这一层还活着的守关和精英回满血，已经打倒的不回来，普通怪不回血。用例：守关打到一半出矿，坐电梯回来，血是满的。
 13. 日切（人在矿里）：过了 04:00，人留在原层，`at` 和血量不变；这一层换成新一天的怪和岩石，算已付费；`notice.reset` 带层号；带着旧 `day` 的 `mine_attack` / `mine_rock` 回 `new_day`，对新层没有影响；view 和下一条命令算出同一层。人不在矿里时日切只清 `day`。
 13a. 下一层的锁：矿脉 F40 清完以后，`next.locked` 是 `not_open`，往 F41 回 `bad_floor`（detail 带 `not_open: true`）；浅坑到底时 `next` 是 null。
-14. 击杀：每种怪的击杀数累加；精英史莱姆打倒不会掉石英；数据里带 `once_a_day` 的掉落每天只给一次（测试用一个测试专用的怪来验这个机制）。
+14. 击杀：每种怪的击杀数累加；第一次拿到某样矿里的物品时 `firsts` 记 `loot:<id>`，第二次不重复记；精英史莱姆打倒不会掉石英；数据里带 `once_a_day` 的掉落每天只给一次（测试用一个测试专用的怪来验这个机制）。
 15. 不能进：不在那座矿（`not_here`）、目录里没有（`unknown_place`）、类型没开（`not_open`）、体力不够（`need_energy`）。**背包满不挡进矿、不挡下楼**；满包时 `mine_rock` 回 `bag_full`。
 15a. 掉在地上：背包满时打倒怪，放不下的部分进本层 `ground`；`mine_pick` 有空位就进背包，没有就留着；上下楼、坐电梯、出矿、倒地、日切以后 `ground` 清空。
 15b. 打倒的精英当天不回来：打倒以后上楼再下来，这一层的精英还是 0 血、不出现。
 16. 回血药：只能在矿里喝，任何一层都能喝；扣 1 瓶；回血量、价格、库存都**从 `content.mine.potions` 读**，不写死数字（回血量待用户定）；回血不超过上限；冷却中回 `potion_cooldown`；血满回 `hp_full`；没有药回 `no_potion`。
-17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 First Dig（独立的槽）Lv3 出现、不占 track_max、Pip 手上有委托也出现；资历到 3 的那一下直接完成；Lv3 前已到过第 3 层的，升 Lv3 那条命令里当场完成；记进 intro_done，得到铜剑并装上（手上是铁剑时不换）；只给一次。
+17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 First Dig（`mine.first_dig`，不走 intro_requests）：Lv3 出现、不占 track_max、Pip 手上有委托也出现；资历到 3 的那一下直接完成；Lv3 前已到过第 3 层的，升 Lv3 那条命令里当场完成；完成记 `rewards: first_dig`，得到铜剑并装上（手上是铁剑时不换）；只给一次；`view.first_dig` 只在出现、未完成时有。
 18. 旧命令 `mine_new_run`、`mine_express` 回 `unknown_command`（reducer 现有的码）。
 19. 开发矿：`wd-dev-quarry`、`wd-dev-vein` 不检查 here；没有 `dev_sites` 时回 `unknown_place`。
 
@@ -467,7 +474,8 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
   - 按 view 的 `mobs` 生成怪，按岩石数摆岩石；
   - 本层没清完时下梯子是灰的，清完就亮；
   - 电梯只列站点；
-  - 倒地和日切各弹一次通知，然后出矿回地图；
+  - 倒地弹倒地卡（E6），关掉后停在地图上，并打开这座矿的矿口卡；
+  - 日切弹 `New day · Floor N has changed`，**人留在原层**，原地重建、回到楼梯口，不出矿；
   - 状态行不再有 Run 和 Express。
 - 刘邦（F）：
   - 每种怪的 brain：蝙蝠的俯冲节奏；岩甲虫硬直 2 秒、期间 `stunned()` 为 true；菇菇怪缩回 1 秒不进 targets、按 `spore_at` 打中；
