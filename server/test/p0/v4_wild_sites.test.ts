@@ -121,6 +121,9 @@ describe('the server catalogue (src/p0/wild.ts)', () => {
     expect(parseBbox('10,170,20,-170')).toEqual({ south: 10, west: 170, north: 20, east: -170 });
     expect(parseBbox('20,0,10,5')).toBeNull();
     expect(parseBbox('a,b,c,d')).toBeNull();
+    expect(parseBbox('0,-180,10,180')).toBeNull();     // the whole way round: wider than BBOX_MAX_DEG (周瑜 on #616)
+    expect(parseBbox('-30,0,30,5')).toBeNull();
+    expect(parseBbox('10,-10,30,10')).toEqual({ south: 10, west: -10, north: 30, east: 10 });   // 20° each way is the most
     const c = loadP0Content(); content = c;
     const w = worldOf(c)!;
     const rows = [[Math.floor((15 + 90) / G), Math.floor((179.6 + 180) / G), 15.2, 179.6, 0, null, 0, 25, 0, SF, 'East', 'FJ'],

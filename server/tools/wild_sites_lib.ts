@@ -23,7 +23,7 @@ export interface MineRule { floors: [number, number]; mains: string[]; one_main?
 export interface WildConfig {
   grid_deg: number; city_min_km: number; lat_range: [number, number]; raster_deg: number; tries: number; jitter_deg: number;
   coastal_km: number; lake_near_km: number; open: WildType[]; map: WildType[]; map_min_zoom: number;
-  exclude_countries?: string[];
+  exclude_countries?: string[]; exclude_land?: string[];
   shares: Partial<Record<WildType, number>>;
   near: { trip2_km: number; quarry: number; vein: number; geode_km: number };
   abyss: [number, number]; ruin: number;
@@ -303,17 +303,35 @@ export function guarantee(cfg: WildConfig, seed: string, sites: Site[], clusters
   return short;
 }
 
-/** Names: a word of the climate band's pool and the type word, never the same name twice within 300 km. */
+/**
+ * Names (v4q(3) 39d426c1): a word of the climate band's pool and the type word. The map's short name is the word alone,
+ * so a word is never twice among the sites nearest one cluster; only past the pool's size may it come again, and then on
+ * a site of another type. Where one type alone has more sites than the pool (53 clusters of the far north), a word may
+ * come again on that type too, but never within SAME_NAME_KM of the same name.
+ */
+export const SAME_NAME_KM = 150;
 export function nameSites(cfg: WildConfig, seed: string, sites: Site[], words: Record<string, string[] | string> = cfg.words ?? {}): void {
-  const index = new SiteIndex(sites, cfg.grid_deg);
-  for (const s of [...sites].sort((a, b) => (a.id < b.id ? -1 : 1))) {
-    const band = s.climate.charAt(0).toUpperCase() + s.climate.slice(1);
-    const pool = words[band];
-    if (!Array.isArray(pool) || pool.length === 0) throw new Error(`no pond words for climate ${s.climate}`);
-    const taken = new Set(index.around(s.lat, s.lng, 300).filter(x => x.s.word && x.s.type === s.type).map(x => x.s.word));
-    const start = hash32(seed, s.id, 'word') % pool.length;
-    s.word = pool[start];
-    for (let i = 0; i < pool.length; i++) { const w = pool[(start + i) % pool.length]; if (!taken.has(w)) { s.word = w; break; } }
+  const byNear = new Map<string, Site[]>();
+  for (const s of sites) (byNear.get(s.near) ?? byNear.set(s.near, []).get(s.near)!).push(s);
+  for (const group of byNear.values()) {
+    const taken = new Map<string, Set<string>>();   // word → the types that have it here
+    const named: Site[] = [];
+    for (const s of group.sort((a, b) => (a.id < b.id ? -1 : 1))) {
+      const band = s.climate.charAt(0).toUpperCase() + s.climate.slice(1);
+      const pool = words[band];
+      if (!Array.isArray(pool) || pool.length === 0) throw new Error(`no wild words for climate ${s.climate}`);
+      const start = hash32(seed, s.id, 'word') % pool.length;
+      const at = (i: number) => pool[(start + i) % pool.length];
+      let pick = -1;
+      for (let i = 0; i < pool.length && pick < 0; i++) if (!taken.has(at(i))) pick = i;
+      for (let i = 0; i < pool.length && pick < 0; i++) if (!taken.get(at(i))!.has(s.type)) pick = i;
+      for (let i = 0; i < pool.length && pick < 0; i++) {
+        if (!named.some(x => x.type === s.type && x.word === at(i) && distanceKm(x, s) < SAME_NAME_KM)) pick = i;
+      }
+      s.word = at(pick < 0 ? 0 : pick);
+      (taken.get(s.word) ?? taken.set(s.word, new Set()).get(s.word)!).add(s.type);
+      named.push(s);
+    }
   }
 }
 

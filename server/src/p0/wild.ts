@@ -132,13 +132,18 @@ export function siteFor(c: P0Content, s: P0State, site: WildSite, now: number, n
 }
 
 export interface Bbox { south: number; west: number; north: number; east: number }
-/** `s,w,n,e` in degrees; a box over the 180° line has west > east. Null when it does not read as one. */
+/** The widest box the viewport read takes, degrees each way: a phone at map_min_zoom sees far less (周瑜 on #616). */
+export const BBOX_MAX_DEG = 20;
+/** Degrees east from west to east; a box over the 180° line has west > east. */
+const spanOf = (b: Bbox) => (b.east >= b.west ? b.east - b.west : b.east - b.west + 360);
+/** `s,w,n,e` in degrees. Null when it does not read as one, or is wider than BBOX_MAX_DEG either way. */
 export function parseBbox(text: unknown): Bbox | null {
   const p = String(text ?? '').split(',').map(Number);
   if (p.length !== 4 || p.some(x => !Number.isFinite(x))) return null;
   const [south, west, north, east] = p;
   if (south < -90 || north > 90 || south > north || Math.abs(west) > 180 || Math.abs(east) > 180) return null;
-  return { south, west, north, east };
+  const box = { south, west, north, east };
+  return north - south > BBOX_MAX_DEG || spanOf(box) > BBOX_MAX_DEG ? null : box;
 }
 
 /**
@@ -151,7 +156,7 @@ export function viewport(c: P0Content, s: P0State, box: Bbox, zoom: number, now:
   if (!cat || !(zoom >= cat.minZoom)) return { revision: cat?.revision ?? 0, sites: [], capped: false, total: 0 };
   const g = cat.grid, cols = Math.round(360 / g);
   const r0 = Math.floor((box.south + 90) / g), r1 = Math.floor((box.north + 90) / g);
-  const c0 = Math.floor((box.west + 180) / g), span = (((box.east - box.west) % 360) + 360) % 360, c1 = c0 + Math.floor(span / g) + 1;
+  const c0 = Math.floor((box.west + 180) / g), c1 = c0 + Math.floor(spanOf(box) / g) + 1;
   const inBox = (x: WildSite) => x.lat >= box.south && x.lat <= box.north
     && (box.west <= box.east ? x.lng >= box.west && x.lng <= box.east : x.lng >= box.west || x.lng <= box.east);
   const near3 = wildNear3(c, s), found: ReturnType<typeof siteFor>[] = [];

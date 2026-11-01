@@ -3,6 +3,7 @@
  * plus review files in output/wild-sites (counts, the guarantees that could not be met, the open home cities' near sites).
  *
  *   npx tsx tools/wild_sites_build.ts --land <ne_10m_land.geojson> --lakes <ne_10m_lakes.geojson> --countries <ne_10m_admin_0_countries.geojson>
+ *     [--glaciers <ne_10m_glaciated_areas.geojson>]   (counts the sites on ice for the review)
  *
  * The world's seed and revision stamp the table (src/p0/wild.ts refuses another world's). Rules and numbers: world_gen.json
  * `wild` (see its _note) and tools/wild_sites_lib.ts.
@@ -28,8 +29,8 @@ const trial = arg('city-min-km');
 if (trial) cfg.city_min_km = Number(trial);
 // the game's clusters: a closed country's are not in them (content.ts, q(189)), and its land gets no site either
 const clusters = [...clustersOf(c)!.byId.values()];
-cfg.exclude_countries = c.travel?.closed_countries ?? [];
-if (!cfg.words) console.log('WARNING: world_gen.json wild.words is not there yet — the ponds\' words stand in (review ⑤: 李白\'s own pool replaces them)');
+cfg.exclude_countries = [...(c.travel?.closed_countries ?? []), ...(cfg.exclude_land ?? [])];
+if (!cfg.words) throw new Error('world_gen.json wild.words: the names\' words are missing');
 const land = new Raster(cfg.raster_deg).fill(polygonsOf(JSON.parse(readFileSync(arg('land')!, 'utf8'))));
 lap('land rastered');
 const lakes = new Raster(cfg.raster_deg).fill(polygonsOf(JSON.parse(readFileSync(arg('lakes')!, 'utf8'))));
@@ -41,7 +42,7 @@ lap(`${sites.length} sites placed`);
 drawTypes(cfg, world.seed, sites);
 const short = guarantee(cfg, world.seed, sites, clusters);
 lap(`guarantees (${short.length} short)`);
-nameSites(cfg, world.seed, sites, cfg.words ?? world.ponds.words);
+nameSites(cfg, world.seed, sites, cfg.words);
 lap('named');
 
 const fields = ['row', 'col', 'lat', 'lng', 'type', 'main', 'side', 'floors', 'coastal', 'near', 'word', 'country'];
@@ -56,6 +57,9 @@ writeFileSync(out, JSON.stringify(table) + '\n');
 lap(`wrote ${out} (${(JSON.stringify(table).length / 1e6).toFixed(2)} MB)`);
 
 // ---- review files ---------------------------------------------------------------------------------------------
+// glaciers (Natural Earth glaciated areas, --glaciers): how many sites stand on ice, for the review (李白: not excluded yet)
+const glaciers = arg('glaciers') ? new Raster(cfg.raster_deg).fill(polygonsOf(JSON.parse(readFileSync(arg('glaciers')!, 'utf8')))) : null;
+const onIce = glaciers ? sites.filter(s => glaciers.get(s.lat, s.lng) === 1) : [];
 const dir = path.join(ROOT, 'server/output/wild-sites', trial ? `trial-${trial}km` : '');
 mkdirSync(dir, { recursive: true });
 const count = (key: (s: Site) => string) => {
@@ -68,6 +72,8 @@ const lines = [`sites ${sites.length}`, '', 'by type:', ...count(s => s.type).ma
   '', 'veins by main:', ...count(s => (s.type === 'vein' ? `${s.main}` : '-')).filter(([k]) => k !== '-').map(([k, n]) => `  ${k} ${n}`),
   '', 'quarries by side:', ...count(s => (s.type === 'quarry' ? `${s.side}` : '-')).filter(([k]) => k !== '-').map(([k, n]) => `  ${k} ${n}`),
   '', 'by country (first 15):', ...count(s => s.country || '(none)').sort((a, b) => b[1] - a[1]).slice(0, 15).map(([k, n]) => `  ${k} ${n}`),
+  '', `on glaciers: ${glaciers ? onIce.length : 'not read (--glaciers)'}`,
+  ...(glaciers ? [...new Set(onIce.map(s => s.country || '(none)'))].map(k => `  ${k} ${onIce.filter(s => (s.country || '(none)') === k).length}`) : []),
   '', `short (${short.length}):`,
   ...['quarry', 'vein', 'geode'].map(k => `  ${k}: ${short.filter(x => x.need === k).length}`)];
 writeFileSync(path.join(dir, 'summary.txt'), lines.join('\n') + '\n');
