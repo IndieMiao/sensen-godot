@@ -5,19 +5,20 @@ extends Node
 ## One child node of the farm, like P0FarmMaterials: p0_farm.gd keeps one-line hooks. Facts come from the server view
 ## (plots[].covered / facility, facilities[].covers); the preview judges a spot with the same rules the place command
 ## checks (an empty plot of the homestead's, ring8 cover), so a Build the bar allows is one the server accepts.
-## Placeholder art (a post and a head of simple meshes) until the modelled sprinkler (q(59) §4: 美术总监).
+## SGODOT-244's modelled sprinkler keeps its authored head pivot and only turns on watering / tap.
 ## A greenhouse (q(118) ②; 不知火舞 on 241) is a glass roof over a 4×4 block of plots, placed by its anchor (the block's
 ## lowest col and row): four corner posts and a gable roof ~25% opaque, ~10% while the player stands under it; its 16
 ## plots wear a faint glass outline. Placeholder until 上官婉儿's model.
 
 const TAP_PX := 40.0            # a tap this close to a sprinkler's head opens its card
-const HEAD := Vector3(0, 0.55, 0)
+const HEAD := Vector3(0, 0.42, 0)
 const SNAP_PX := 70.0           # a finger this close to a bed's centre on screen points at that bed
 const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5; water, 284 v2 §2)
 const OK_TINT := Color(UiTokens.COLOR_PRIMARY, 0.30)  # the spot underfoot when it may stand there (284 v2 §2)
 const BAD_TINT := Color(UiTokens.COLOR_DANGER, 0.35)  # … when it may not
 const GLASS := Color(0.80, 0.94, 0.98)            # the greenhouse plots' outline
 const FarmArt = preload("res://modules/farm/farm_art.gd")
+const SprinklerArt = preload("res://scenes/p0/p0_sprinkler_art.gd")
 ## SGODOT-294's greenhouse (assets/farm/art/greenhouse_{base,roof,glass}.glb, their manifest entries): three parts on one
 ## ground-centred origin, +Z to the camera, unit scale, standing on the ground (its posts are in the walkways).
 const GLASS_ALPHA := 0.25         # the glass panes' opacity (manifest runtime_opacity_normal) …
@@ -42,6 +43,8 @@ var _finger := Vector2.INF      # placement: where the finger holds (the farm's 
 var _roofs := {}                # greenhouse id → its glass material (the fade under it)
 var _glass: Array = []          # greenhouse plots' outlines, reused
 var _solid := {}                # "x,y" → cell: yard cells a facility (the Compost Bin) made solid, switched back as it moves
+var _water_view := {}           # previous authoritative reply, never a frame's projected countdown
+var _water_player := ""
 
 func setup(farm_node: Node3D) -> P0FarmFacilities:
 	farm = farm_node
@@ -54,9 +57,13 @@ func _ready() -> void:
 	rt.ui.placement_done.connect(_on_done)
 	rt.ui.placement_requested.connect(begin_build)
 	rt.ui.placement_pan.connect(_on_pan)
+	_water_view = rt.session.view
+	_water_player = rt.session.player_id
+	rt.session.state_changed.connect(_water_changed)
 
 func _exit_tree() -> void:
 	if rt == null: return
+	if rt.session.state_changed.is_connected(_water_changed): rt.session.state_changed.disconnect(_water_changed)
 	for s in [[rt.ui.placement_point, _on_point], [rt.ui.placement_done, _on_done], [rt.ui.placement_requested, begin_build],
 			[rt.ui.placement_pan, _on_pan]]:
 		if (s[0] as Signal).is_connected(s[1]): (s[0] as Signal).disconnect(s[1])
@@ -242,28 +249,42 @@ func _draw_greenhouses(v: Dictionary) -> void:
 		o.visible = k < ids.size()
 		if o.visible: o.position = _bed_top(int(ids[k])) + Vector3(0, 0.008, 0)
 
-## Placeholder sprinkler: a grey post with a blue head (simple meshes, no new asset).
+## A whole scene, not FarmArt.mesh_for(): base, rotating head and the spray socket must stay separate.
 static func _sprinkler_art() -> Node3D:
-	var root := Node3D.new()
-	root.name = "Sprinkler"
-	var post := MeshInstance3D.new()
-	var pm := CylinderMesh.new()
-	pm.top_radius = 0.035
-	pm.bottom_radius = 0.05
-	pm.height = 0.45
-	post.mesh = pm
-	post.position = Vector3(0, 0.225, 0)
-	post.material_override = _mat(Color(0.55, 0.57, 0.6))
-	root.add_child(post)
-	var head := MeshInstance3D.new()
-	var hm := SphereMesh.new()
-	hm.radius = 0.09
-	hm.height = 0.12
-	head.mesh = hm
-	head.position = HEAD
-	head.material_override = _mat(Color(0.32, 0.58, 0.86))
-	root.add_child(head)
-	return root
+	return SprinklerArt.new()
+
+## Covered annuals start growing in the sow/place/move reply; there is no separate sprinkler-water event.
+## Ignore the first snapshot, unchanged growing crops, manual watering outside coverage and greenhouse-only cover.
+static func watered_sprinklers(before: Dictionary, after: Dictionary) -> Array:
+	if before.is_empty(): return []
+	var old := {}
+	for p in before.get("plots", []): old[int(p.get("id", -1))] = p
+	var watered := []
+	for p in after.get("plots", []):
+		var id := int(p.get("id", -1))
+		if str(p.get("state", "")) != "growing" or not old.has(id) or bool(p.get("tree", false)): continue
+		if not str(old[id].get("state", "")) in ["tilled", "sown"]: continue
+		watered.append(id)
+	var ids := []
+	for f in after.get("facilities", []):
+		if str(f.get("kind", "")) != "sprinkler": continue
+		if (f.get("covers", []) as Array).any(func(id): return watered.has(int(id))): ids.append(int(f.id))
+	return ids
+
+func _water_changed(v: Dictionary, _events: Array) -> void:
+	var before := _water_view
+	_water_view = v
+	var same_player := _water_player == rt.session.player_id
+	_water_player = rt.session.player_id
+	if not same_player or rt.world != farm: return
+	var ids := watered_sprinklers(before, v)
+	if ids.is_empty(): return
+	_sync_art(v.get("facilities", []))   # a newly placed sprinkler can water immediately
+	for id in ids: _play_sprinkler(id)
+
+func _play_sprinkler(id: int) -> void:
+	var node = _art.get(id)
+	if is_instance_valid(node) and node is SprinklerArt: node.play()
 
 static func _mat(c: Color, unshaded := false) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -751,4 +772,5 @@ func open_card(f: Dictionary) -> void:
 	if is_block(str(f.get("kind", ""))):
 		rt.ui.open_facility_card(greenhouse_card(rt.session.view, f), func(): begin_move(int(f.get("id", 0))))
 		return
+	_play_sprinkler(int(f.get("id", 0)))
 	rt.ui.open_facility_card(sprinkler_card(f), func(): begin_move(int(f.get("id", 0))))
