@@ -6,7 +6,7 @@ import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
-import { emptyDay, type P0State } from './state.js';
+import { emptyDay, SAVE_VERSION, type P0State } from './state.js';
 import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
@@ -56,6 +56,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   const covered = coveredPlots(c, s), greenhouse = greenhousePlots(c, s);
   return {
     now, content_version: c.version, seq: s.seq,
+    // v7 (355 b1): the save version this server writes. A client built for v7 that meets an older server (the new build
+    // out before the server) shows the maintenance card instead of playing on it (v4q(2) B review ③).
+    save_version: SAVE_VERSION,
     energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: regenMs(c, s, now) },
     blessing: blessed(c, s, now) ? { left: s.created_at + c.blessing.days * 86_400_000 - now, regen_mult: c.blessing.regen_mult, food_bonus: c.blessing.food_bonus } : null,
     coins: s.coins,
