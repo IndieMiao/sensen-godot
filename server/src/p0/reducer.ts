@@ -82,7 +82,7 @@ type P0CommandBody =
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
   | { type: 'wear_title'; id: string }   // q(180): put on a title the player has (titles.ts)
-  | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
+  | { type: 'travel'; to: string }   // v5 (SGODOT-278): a 24 h Day Pass; q(256): the Trip band's fare (travel.ts fareOf)
   | { type: 'return_home' }
   | { type: 'choose_home' | 'change_home'; city: string; spot?: number; at?: [number, number] }   // SGODOT-303 (home_city.ts): pick a home, change it once; at: a free pin (q(216))
   | { type: 'guide'; op: 'ack'; step: string };   // SGODOT-341: a guide step that waits for the player to read a line (guide.ts guideAck)
@@ -421,7 +421,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'travel': {
       const r = travel(c, s, cmd.to, now, events);
-      if (r) return fail(r.code);
+      if (r) return fail(r.code, r.detail);
       break;
     }
     case 'return_home': {
