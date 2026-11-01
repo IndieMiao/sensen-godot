@@ -1,4 +1,4 @@
-# 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.5（周瑜 11-02）
+# 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.6（周瑜 11-02）
 
 > 给：苏烈（E / F / G 服务端）、刘邦（F / G 客户端）、亚瑟（矿口卡、审客户端 PR）、后裔（审服务端规则层 PR）、上官婉儿（怪物文件）。
 > 依据：方案 `355-gameplay-v4-2026-11-02.md` 第 3 章（3.2 清怪开梯子、3.3、3.5 怪物与守关表、3.6、3.8、3.11）、9.1 #8–#10；亚瑟的 `355-b1-tech-plan-2026-11-02.md`；后裔的 C 接口 `/Volumes/ACASIS/tmp/houyi-355/contract-c-v0.md`；上官婉儿的 3D 接口 v1（`355-b1-3d-plan-2026-11-02.md` 第 6 节）。代码按 farm-dev b2c46d3b 核过。
@@ -18,6 +18,15 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> **v0.6（11-02 02:3x）**：
+> - 李白校准（v4q(5) 4ee5e8d5，奕星已同意）：矿脉 `main_weight` 改成 `[[1, 25], [10, 40]]`，F1–9 的主矿权重从 10 提到 25；
+> - 照苏烈 E 主 PR #620 的实现补了接口（周瑜审过）：
+>   - 本日层状态加 `ground` 和 `ground_seq`（第 3 节）；
+>   - 命令回 `new_day` 时，回包带日切后的 state，服务端存盘、不增 seq（第 5 节第 10 条）；
+>   - 人在矿里时再发 `mine_enter`，回 `not_here`（第 5 节第 1 条）；
+>   - 事件以第 6 节为准：`mine` 事件不再带 run，改带 mine；倒下的怪用 `mob_down`；倒地用 `mine_ko`；进层用 `mine_floor`；旧的 enter / continue / floor / cleared / express / defeat / knocked_out / complete 都删了；
+>   - `notice` 一直留到下一次 `mine_enter`，客户端按 `notice.at` 去重（第 7.1 节）；
+>   - 第一批 `fee_per_day` 只能是 true（第 2 节）。
 > **v0.5 增量 3（11-02 04:3x）**：照李白 v4q(5) 196a0ffa、v4q(6) 46746a01、v4q(7) 340e4c4e 改了：
 > - Pip 的 First Dig **不走 intro_requests 机制**，独立的数据和结算（第 9.2 节）；
 > - `firsts` 记矿里第一次拿到的物品（`loot:<id>`），给第二批收集册回填；
@@ -133,7 +142,7 @@
       },
       "vein": {
         "gate": { "homestead": 8 },
-        "main_weight": [[1, 10], [10, 40]],
+        "main_weight": [[1, 25], [10, 40]],
         "bands": [
           { "from": 1,  "to": 9,  "mobs": [["mob_slime", 1, 1], ["mob_rock_beetle", 1, 2]], "rocks": [4, 6], "drops": [["stone", 40], ["coal", 20], ["copper_ore", 15]] },
           { "from": 11, "to": 19, "mobs": [["mob_rock_beetle", 1, 2], ["mob_shroomling", 1, 1], ["mob_cave_bat", 1, 1]], "rocks": [4, 6], "drops": [["stone", 35], ["coal", 20]] },
@@ -167,8 +176,9 @@
 - 浅坑 F5–9 照 v4 3.5：史莱姆固定 2 只、蝙蝠 1–2 只（答苏烈 ②，和 v4q(5) 一致）。
 - **精英史莱姆不再掉石英**（冲突清单第 3 节 §10.7「石英只在矿脉」，以 v4 为准），也不再有「每天第一次掉石英」。替代掉落：铜矿石 ×2、每次必掉（初值，v4q(6)(7) 复核 ⑦）。`once_a_day` 这个机制服务端照旧支持，用不用由数据定。
 - 史莱姆的掉落照现行，不改：铜 1（权重 35）、岩盐 1（25）、蚯蚓 3（40）。就是 `mine_p1.json` 现在写的那份（v4q(6)(7) 复核 ⑤）。
-- 矿脉的主矿：掉落表里没写主矿，按 `main_weight` 加进去：F1 起权重 10，到 C 给的 `main_from`（矿脉是 F10）起改为 40。浅坑的 `main` 是 null，不加主矿（五样已经在本段 `drops` 里）。
+- 矿脉的主矿：掉落表里没写主矿，按 `main_weight` 加进去：F1 起权重 25（v0.6，李白校准 v4q(5) 4ee5e8d5；原来是 10），到 C 给的 `main_from`（矿脉是 F10）起改为 40。第二档从哪层起，读的是 C 的 `main_from`，表里的 10 只是写出来方便看，改它不起作用。浅坑的 `main` 是 null，不加主矿（五样已经在本段 `drops` 里）。
 - **副产**：C 的 `site.mine.side` 是序号（0 到 sides−1，#616），不是物品 id。第一批掉不掉〔待用户定〕；要掉的话，在 `types.<type>.sides: [物品, …]` 里按序号换成物品，再加进本段 `drops`。没有 `sides` 就不掉。
+- `fee_per_day`：第一批只能是 `true`，表示每层每天第一次进收 `floor_energy`。`false` 没有定义收费口径，服务端加载内容时遇到它就报错；q 行如果改了口径，先改本文件再实现。
 - 矿脉的门槛 `gate.homestead: 8` 照 v4 2.7。冲突清单第 2 节有人提议「开局就能去」，未确认，所以写成数据：改它不用改代码。
 - 守关的 `first`：每种守关个人第一次打倒必掉。`pack`：每次打倒给的一包，写成 `[物品, 数量]`；物品写 `"main"` 时，表示这座矿的主矿（C 的 `site.mine.main`，矿脉才有）。浅坑在 C 目录里 `main` 是 null（浅坑五样都出，靠副产区分，#616），所以浅坑守关写死铜矿石 ×5（q 行初值）。
 - **精英的掉落 = 本怪的掉落 ×2、必掉**（v4q(6)）：内容表里每只精英把基础怪的掉落项数量 ×2，去掉空掉落（`null`）那一项。精英史莱姆是例外，写死铜矿石 ×2，不掉石英。
@@ -187,11 +197,15 @@ export interface MineDay {
   picked: [string, number][];                    // 进本层以后捡到的东西（倒地扣一半用）；换层清空
   attack_at?: number; hurt_at?: number; drink_at?: number; swing_at?: number;
 }
-export interface MineFloorState { paid: boolean; broken: number[]; lit: boolean; mobs: number[]; guard_hit_at?: number }
+export interface MineFloorState {
+  paid: boolean; broken: number[]; lit: boolean; mobs: number[]; guard_hit_at?: number;
+  ground: { id: number; item: string; qty: number; from: number }[];   // 放不下的掉落（第 5 节第 5a 条）；离开这一层或日切时清空
+  ground_seq: number;                            // ground 的 id 计数：清空 ground 时不清它，所以同一天里 id 不会重复
+}
 // mobs：每只怪剩下的血量，顺序同第 4 节生成的列表
 // guard_hit_at：守关这一次第一下有效命中的时刻（第 8 节 guard_fast 用）；守关回满血时（倒地、离开这一层）和日切时清掉，断线不清
 export interface MineState { records: Record<string, MineRecord>; day: MineDay | null; notice: MineNotice | null }
-export type MineNotice = { kind: 'reset'; at: number } | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };
+export type MineNotice = { kind: 'reset'; at: number; floor: number } | { kind: 'ko'; at: number; floor: number; lost: [string, number][] };
 // P0State 里：
 //   mine: MineState;                                      // 取代旧的 MineState（run、count、express、elite、completed 都删）
 //   kills: Record<string, number>;                        // 按种的击杀数（方案 3.6，第二批成就回填）
@@ -222,7 +236,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 **客户端不参与生成**：客户端照 view 给的怪物列表和岩石数来摆，位置用 mine_layout 的种子布点（键改成「矿 + 层 + 日」，岩石数取自 view）。
 
 ## 5. 规则
-1. **进矿**：要人在这座矿的野外地点（`travel.here === mineId`，C 负责），开发矿不检查（第 11 节）。只能进 F1，或者这座矿的电梯站（10 的倍数且 ≤ `deepest`）。进的是今天没付过的层就扣 `floor_energy`。进矿时血量回满。
+1. **进矿**：要人在这座矿的野外地点（`travel.here === mineId`，C 负责），开发矿不检查（第 11 节）。只能进 F1，或者这座矿的电梯站（10 的倍数且 ≤ `deepest`）。进的是今天没付过的层就扣 `floor_energy`。进矿时血量回满，`notice` 清掉。人已经在矿里（`day.at` 不为空）时回 `not_here`（v0.6）。正常不会碰到：客户端回到地图或农场时，状态读取会通过 notePresence 先出矿。
 2. **换层**（`mine_floor {to}`）：
    - 往下（to = 当前层 + 1）：当前层的怪必须全部打倒（`mobs` 全是 0，守关算在内），否则回 `floor_locked {left}`；没有怪的层进来就算清完。
    - 往上（to = 当前层 − 1）：随时可以。
@@ -256,7 +270,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
    - `notice = {kind: 'reset', at, floor}`。客户端提示 `New day · Floor 12 has changed`，在原层原地重建，人放回楼梯口（客户端调现成的 `_go_floor(n)`）；
    - **这不算「离开一层」**（第 9 条），因为整层都重刷了，比回满血更彻底；
    - 服务端是懒结算：view 在拷贝上做、下一条命令落盘，两边算出同一层（种子相同）；
-   - **防旧命令**：日切那一刻还在路上的挥刀、敲岩石，不能打到新一天的层上。所以矿里的命令（`mine_floor`、`mine_rock`、`mine_torch`、`mine_attack`、`mine_drink`）都带 `day`（客户端照 `view.mine.at.day` 发），和当前 `dayKey` 对不上就回 `new_day`，什么也不做；回包里的 state 已经是新一天的层，客户端照第 3 点重建，不弹错误。
+   - **防旧命令**：日切那一刻还在路上的挥刀、敲岩石，不能打到新一天的层上。所以矿里的命令（`mine_floor`、`mine_rock`、`mine_torch`、`mine_pick`、`mine_attack`、`mine_drink`）都带 `day`（客户端照 `view.mine.at.day` 发），和当前 `dayKey` 对不上就回 `new_day`，什么也不做。回包里带着日切后的 state（v0.6），已经是新一天的层，服务端把它存盘、不增 seq；客户端照第 3 点重建，不弹错误。
    - 人不在矿里时，日切只是清掉 `day`。
 11. **出矿**：不需要命令。客户端离开矿时把 space 改成地图（现有的 `GET /state?space=`），服务端在 notePresence 里把 `day.at` 设成 null。血量下次进矿回满。
 12. **取消**：每天 2 局、Express、New run、Run complete、`ended` / `completed` 都删掉。
@@ -286,7 +300,15 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - `{kind:'heal', hp, item}`
 - `{kind:'gear', id, slot:'weapon'}`
 
-物品沿用 `item` 事件，血量沿用现有的 hurt 事件。
+- 矿里的动作（v0.6，照 #620）：`{kind:'mine', action, mine, floor, cost, …}`，不再带 run：
+  - `torch`：点了火把；
+  - `rock`：`rock`、`drop`（这块岩石的牌，`null` 表示只有石料）、`cost`；
+  - `hit`：`mob`（下标）、`hp`（剩下的血）、`damage`；
+  - `hurt`：`mob`（打中玩家的那只）、`hp`（玩家剩下的血）、`damage`。
+- 旧矿的 `enter`、`continue`、`floor`、`cleared`、`express`、`express_unlocked`、`defeat`、`knocked_out`、`complete` 都删了：进层看 `mine_floor`；层费看同一回包里 `reason: 'mine_floor'` 的 energy 事件；怪倒下看 `mob_down`；倒地看 `mine_ko`。
+- 掉在地上的东西没有单独的事件：客户端看 view 里新出现的 `ground` id（id 不会重复用），出 `Bag full · X left on the floor` 的飘字。
+
+物品沿用 `item` 事件。`mine_pick` 的拒绝码：地上没有这件东西回 `no_item {ground}`；整份放不下回 `bag_full`。岩石下标不对回 `bad_rock`。
 
 ## 7. view
 ### 7.1 `view.mine`
@@ -315,7 +337,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - `ground`：本层地上的掉落，`from` 是掉它的怪的下标，客户端据此摆位置。
 - `next`：往下一层的楼梯。`open` 表示本层清完了。`locked` 是 `"not_open"` 时，表示下一层超过了第一批的 `open_to`（矿脉 F41），楼梯是灰牌 `Floor 41 · Not open yet`。已经是这座矿最深层（浅坑到底）时，`next` 是 null，不画往下的楼梯。
 - `stations`：电梯面板的各站。`paid` 表示今天进过（行写 `Free`），否则行写 `2 Energy`；最上一行 Entrance 由客户端加。
-- `notice`：`{kind: 'reset', at, floor}`（日切，人留在原层）或 `{kind: 'ko', …}`；客户端显示一次。
+- `notice`：`{kind: 'reset', at, floor}`（日切，人留在原层）或 `{kind: 'ko', …}`。它一直留到下一次 `mine_enter` 才清掉（v0.6），所以客户端按 `notice.at` 去重，只显示一次：reset 只在矿里处理；倒地卡靠回包里的 `mine_ko` 事件弹出来，不靠 notice。
 
 ### 7.2 `view.gear`
 现有字段，再加 `weapons`、`weapon`；物品卡和 Gear 页用 `content.mine.weapons` 里的名字和数值。
