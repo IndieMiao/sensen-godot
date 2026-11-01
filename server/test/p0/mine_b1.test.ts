@@ -7,6 +7,7 @@ import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
 import { freshState } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
+import { catalogue, wildById } from '../../src/p0/wild.js';
 
 const T = Date.UTC(2026, 10, 2, 2), DAY = 86400000, Q = 'wd-dev-quarry', V = 'wd-dev-vein';
 function scenario() {
@@ -185,6 +186,17 @@ describe('355 E progression, fees and exits (cases 4,6-9,12a,15,18-19)', () => {
     expect(x.fail({ type: 'mine_enter', mine: Q })).toMatchObject({ code: 'need_energy' });
     for (const type of ['mine_new_run', 'mine_express']) expect(x.fail({ type })).toMatchObject({ code: 'unknown_command' });
     delete x.c.mine.dev_sites; expect(x.fail({ type: 'mine_enter', mine: Q })).toMatchObject({ code: 'unknown_place' });
+  });
+  it('resolves the real C catalogue before dev fixtures and preserves its here id during mine commands', () => {
+    const x = scenario(), site = [...catalogue(x.c)!.byId.values()].find(s => s.open && s.type === 'quarry')!;
+    expect(wildById(x.c, site.id)?.mine?.main).toBeNull();
+    expect(x.fail({ type: 'mine_enter', mine: site.id })).toMatchObject({ code: 'not_here' });
+    x.s.travel.here = site.id;
+    x.send({ type: 'mine_enter', mine: site.id });
+    expect(x.s.travel.here).toBe(site.id);
+    expect(viewOf(x.c, x.s, x.now).mine.at).toMatchObject({ mine: site.id, type: 'quarry', floor: 1 });
+    x.send({ type: 'mine_attack', floor: 1, targets: [0] });
+    expect(x.s.travel.here).toBe(site.id);
   });
 });
 

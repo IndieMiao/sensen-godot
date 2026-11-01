@@ -7,6 +7,7 @@ import type { Refusal } from './fishing.js';
 import { energyDetail, spendEnergy, type P0Event } from './progress.js';
 import { dayKey, rolloverAfter } from './rules.js';
 import type { MineB1Day, MineB1FloorState, MineB1Record, P0State } from './state.js';
+import { wildById } from './wild.js';
 
 export type MineCommand =
   | { type: 'mine_enter'; mine: string; floor?: number }
@@ -18,11 +19,12 @@ export type MineCommand =
 const TYPES = new Set(['mine_enter', 'mine_floor', 'mine_rock', 'mine_torch', 'mine_attack', 'mine_pick']);
 export const isMineCommand = (cmd: { type: string }): cmd is MineCommand => TYPES.has(cmd.type);
 
-// C attaches its catalogue here; no generator duplication or functions in serialized content.
+// Tests may substitute site facts; production resolves C's catalogue before the development fixtures.
 const catalogues = new WeakMap<P0Content, (id: string) => MineSite | undefined>();
 export function useMineCatalogue(c: P0Content, lookup: (id: string) => MineSite | undefined): void { catalogues.set(c, lookup); }
 export function mineSite(c: P0Content, id: string): MineSite | undefined {
-  return catalogues.get(c)?.(id) ?? c.mine.dev_sites?.find(site => site.id === id);
+  const site = catalogues.get(c)?.(id) ?? wildById(c, id);
+  return site?.mine ? { ...site, mine: site.mine } : c.mine.dev_sites?.find(dev => dev.id === id);
 }
 const cap = (site: MineSite) => Math.min(site.mine.floors, site.mine.open_to ?? site.mine.floors);
 const floorKey = (mine: string, floor: number) => `${mine}:${floor}`;
@@ -152,7 +154,7 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
   settleMine(c, s, now);
   if (cmd.type === 'mine_enter') {
     const site = typeof cmd.mine === 'string' ? mineSite(c, cmd.mine) : undefined;
-    if (!site) return { code: 'unknown_place' };
+    if (!site) return { code: typeof cmd.mine === 'string' && wildById(c, cmd.mine) ? 'not_open' : 'unknown_place' };
     if (site.open === false || !c.mine.types[site.type] || cap(site) < 1) return { code: 'not_open' };
     if (!c.mine.dev_sites?.includes(site) && s.travel.here !== site.id) return { code: 'not_here' };
     const gate = c.mine.types[site.type].gate;
