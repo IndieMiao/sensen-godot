@@ -9,6 +9,7 @@ import { existsSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
+import { catalogue } from '../src/p0/wild.js';
 import { clusterPopulation, waterTable } from '../src/p0/world.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -17,6 +18,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const files = ['assets/p0/p0_content.json', 'assets/p0/p0_outposts.json', 'assets/p0/p0_ponds.json', 'assets/p0/city_clusters.json',
   'server/data/city_cluster_members.tsv', 'server/data/cities.tsv', 'server/data/world_water.json', 'assets/ponds/catalog.json',
   'server/data/ip-near.bin',   // q(188) ① Near you: made in the image (tools/ip_near_table.ts)
+  'server/data/wild_sites.json',   // v4q(3) wild sites (tools/wild_sites_build.ts): without it the map has no quarries or veins
   // the avatar catalog the outpost rooms check a look against (src/p0/online/appearance.ts; SGODOT-304: no longer found
   // through Journey's regions.json)
   'assets/avatar/parts_manifest.json', 'assets/avatar/demo_denylist.json'];
@@ -34,6 +36,8 @@ const miami = miamiCluster ? clusterPopulation(miamiCluster) : 0;
 // and revision, or cityPlaces throws (Tokyo above would have).
 const water = waterTable(), world = (c as unknown as { world?: { seed: string; revision: number } }).world;
 const waterFixes = water && world && water.seed === world.seed && water.revision === world.revision ? Object.keys(water.fixes).length : 0;
-const ok = clusters > 10_000 && !!tokyo?.ponds?.length && miami === 780_231 && waterFixes > 1000;
-console.log(JSON.stringify({ ok, content: c.version, fragments: fragments.length, clusters, tokyo_ponds: tokyo?.ponds?.length ?? 0, miami_population: miami, water_fixes: waterFixes }));
+// wild_sites.json (v4q(3)): read for this world's seed and revision (catalogue throws on another world's table)
+const wild = catalogue(c)?.byId.size ?? 0;
+const ok = clusters > 10_000 && !!tokyo?.ponds?.length && miami === 780_231 && waterFixes > 1000 && wild > 40_000;
+console.log(JSON.stringify({ ok, content: c.version, fragments: fragments.length, clusters, tokyo_ponds: tokyo?.ponds?.length ?? 0, miami_population: miami, water_fixes: waterFixes, wild_sites: wild }));
 process.exit(ok ? 0 : 1);
