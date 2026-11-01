@@ -18,7 +18,7 @@ import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
-import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
+import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, fieldCap, fieldsUsed, greenhousePlots, plotCount } from './garden.js';
 import { climateAt, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
 import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
@@ -90,7 +90,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     orchard: orchardView(c, s),
     facilities: facilitiesView(c, s),
     compost: compostView(c, s, now),   // the Compost Bin's quota (q(118) ③); null without a bin
-    garden: { plots: plotCount(c, s) },
+    // plots: beds open on the grid; fields: annuals standing of the level's Plots (`Plots 41/41`, SGODOT-355 b1)
+    garden: { plots: plotCount(c, s), fields: { used: fieldsUsed(c, s), cap: fieldCap(c, s) } },
     bag: {
       capacity: s.bag_cap, free: freeSlots(s),
       // Every slot says locked / gifted (the item-info rules gate Lock and Gift on these fields, SGODOT-224).

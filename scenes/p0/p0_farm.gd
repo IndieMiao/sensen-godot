@@ -254,7 +254,7 @@ func _build_world() -> void:
 		xfs.append(Transform3D(Basis.IDENTITY, bp.cell_to_world(P0Garden.cell_of(id))))
 		tints.append(Color.WHITE)
 	beds = FarmArt.batch("plot", xfs, true, tints)
-	beds.multimesh.visible_instance_count = P0Garden.P0_PLOTS   # all 40 laid out; the view's garden.plots shows them
+	beds.multimesh.visible_instance_count = P0Garden.max_plots()   # all laid out; the view's garden.plots shows them
 	beds.name = "Beds"
 	add_child(beds)
 	crops = CropField.new(bp)
@@ -750,9 +750,9 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
-	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
+	# the beds open now (the view's garden.plots, in the order they open: SGODOT-355 b1); the rest stay grass
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
-	_scenery.show_front_row(P0Garden.plot_count(v) > P0Garden.GRID_PLOTS)   # Lv7's row gets the field's sand (q(172) A)
+	_scenery.fit_sand(bp, P0Garden.plot_count(v))   # the field's sand under the open beds only
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
@@ -808,7 +808,7 @@ func _pick_front(v: Dictionary) -> void:
 		for p in v.get("plots", []):
 			if int(p.get("id", -1)) == best: _front = p
 	# Row Hoe: the bed in front and its tilled neighbours in the row, the way the player faces first (plot ids grow along +x).
-	_row = P0Logic.row_plots(v, _front, P0Garden.COLUMNS, 1 if f.x >= 0.0 else -1)
+	_row = P0Logic.row_plots(v, _front, 0, 1 if f.x >= 0.0 else -1)
 	_hi.visible = not _front.is_empty() and not rt.ui.has_modal()
 	if _hi.visible:
 		_front_cell = P0Garden.cell_of(best)
@@ -1256,7 +1256,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var now := Time.get_ticks_msec()
 			for i in codes.size():
 				for stage in 3:
-					var id := stage * P0Garden.COLUMNS + i if i < P0Garden.COLUMNS else (stage + 3) * P0Garden.COLUMNS + i - P0Garden.COLUMNS
+					var id := stage * codes.size() + i
 					if id >= P0Garden.plot_count(): continue
 					var span := 3600000
 					var started := now - int(span * [0.2, 0.55, 1.2][stage])

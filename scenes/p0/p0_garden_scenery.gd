@@ -10,31 +10,24 @@ const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 var field_rect := Rect2()   # world xz rect covering every bed, for scatter exclusion
 var rock_points: Array = []  # scattered rocks; the farm makes their cells solid
 var _sand: Node3D            # the sand under the field
-var _sand_front := Rect2()   # the field with Homestead Lv7's front row (40–47) and the walkway before row 0
 
-## The sand under the field, grown over Homestead Lv7's front row and its walkway from the moment the view has those beds
-## (不知火舞 282 bf7c124b: one patch, as the Lv3 columns' was; at Lv1–6 that row stays grass).
-func show_front_row(on: bool) -> void:
-	var r := _sand_front if on else field_rect
+## The sand under the beds open now (SGODOT-355 b1: the first `count` of the grid's order), one patch over them and the
+## walkways between (不知火舞 282 bf7c124b); the beds still to open stay grass.
+func fit_sand(bp: FarmBlueprint, count: int) -> void:
+	var r := beds_rect(bp, count)
 	var size := r.size + Vector2(0.7, 0.7)
 	_sand.position = Vector3(r.get_center().x, 0.003, r.get_center().y)
 	_sand.scale = Vector3(size.x / 1.26, 1, size.y / 1.26)
 
 func build(bp: FarmBlueprint, style: String) -> void:
 	name = "GardenScenery"
-	var cell := bp.cell_m
-	var first := bp.cell_to_world(P0Garden.cell_of(0))
-	var last := bp.cell_to_world(P0Garden.cell_of(P0Garden.GRID_PLOTS - 1))   # the field's far corner (Lv7's 40–47 lie outside it)
-	var half := 0.47
-	field_rect = Rect2(Vector2(first.x - half, last.z - half), Vector2(last.x - first.x + half * 2, first.z - last.z + half * 2))
+	field_rect = beds_rect(bp, P0Garden.max_plots())   # the whole grid: kept clear of scatter, stones lead to it
 	# Sandy garden path under the beds, a little wider than the field (the old 9-plot garden used 3.1×).
 	_sand = Art.instance("path_tile", Vector3.ZERO)
 	_sand.name = "FieldSand"
 	_sand.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(_sand)
-	var lv7_row := bp.cell_to_world(P0Garden.cell_of(P0Garden.GRID_PLOTS))   # Homestead Lv7's row, in front of row 0
-	_sand_front = Rect2(field_rect.position, field_rect.size + Vector2(0, lv7_row.z - first.z))
-	show_front_row(false)
+	fit_sand(bp, P0Garden.max_plots())
 	var house := bp.cell_to_world(bp.anchor("house"))
 	var spawn := bp.cell_to_world(bp.anchor("spawn"))
 	# Stepping stones: field → front door, and the entrance → field.
@@ -70,9 +63,6 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	var keep_clear := [Rect2(field_rect.position - Vector2(0.45, 0.45), field_rect.size + Vector2(0.9, 0.9)),
 		Rect2(Vector2(house.x - 0.6, field_rect.position.y - 1.8), Vector2(1.2, 1.9)),
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
-	for id in range(P0Garden.GRID_PLOTS, P0Garden.MAX_PLOTS):   # Homestead Lv7's beds on the field's edge (q(172)), each
-		var bed := bp.cell_to_world(P0Garden.cell_of(id))
-		keep_clear.append(Rect2(Vector2(bed.x, bed.z) - Vector2.ONE * (half + 0.45), Vector2.ONE * (half + 0.45) * 2))
 	var spots := [house, bp.cell_to_world(bp.anchor("storage")),
 		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine"))]
 	for key in P0Garden.ANCHORS:   # SGODOT-231: gathering spots and the workbench stay clear of scatter
@@ -106,3 +96,13 @@ func build(bp: FarmBlueprint, style: String) -> void:
 
 static func _xf(p: Vector3, angle: float, scale: float) -> Transform3D:
 	return Transform3D(Basis(Vector3.UP, angle).scaled(Vector3.ONE * scale), p)
+
+## The world rect (x, z) over the first `count` beds of the grid, each bed's half (0.47 m) round its middle.
+static func beds_rect(bp: FarmBlueprint, count: int) -> Rect2:
+	var half := 0.47
+	var r := Rect2()
+	for id in maxi(1, count):
+		var at := bp.cell_to_world(P0Garden.cell_of(id))
+		var bed := Rect2(Vector2(at.x, at.z) - Vector2.ONE * half, Vector2.ONE * half * 2)
+		r = bed if id == 0 else r.merge(bed)
+	return r
