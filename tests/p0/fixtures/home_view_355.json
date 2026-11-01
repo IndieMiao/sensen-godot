@@ -1,0 +1,801 @@
+{
+  "_note": "355 第一批 A（哪吒 11-02）：view.homestead 按 /Volumes/ACASIS/tmp/gensen-ui-review/pm/plans/355-b1-A-view-contract.md 的形状手写的假 view，给 A 客户端测试用（刘邦）。数值是 r9 初值的示意，不是定稿；只有 homestead / energy / bag / skills / travel 这几块，别的字段测试自己补。lv5：缺 Fishing（技能格第一缺口）；lv15：技能都够、出门门槛不够（Lv16 起才有 travel）、energy_gain 0；lv16：全够可以升；lv17：满级（next null，homestead.max 17）。",
+  "lv5": {
+    "energy": {
+      "value": 120,
+      "max": 240
+    },
+    "bag": {
+      "capacity": 30
+    },
+    "skills": {
+      "farming": {
+        "level": 3,
+        "xp": 0
+      },
+      "fishing": {
+        "level": 2,
+        "xp": 0
+      },
+      "cooking": {
+        "level": 1,
+        "xp": 0
+      }
+    },
+    "homestead": {
+      "level": 5,
+      "max": 17,
+      "plaque": [
+        {
+          "level": 2,
+          "at": 1793672800000
+        },
+        {
+          "level": 3,
+          "at": 1793759200000
+        },
+        {
+          "level": 4,
+          "at": 1793845600000
+        },
+        {
+          "level": 5,
+          "at": 1793932000000
+        }
+      ],
+      "plots": {
+        "now": 16,
+        "max": 41
+      },
+      "next": {
+        "level": 6,
+        "coins": {
+          "need": 120,
+          "have": 95
+        },
+        "skills": [
+          {
+            "skill": "farming",
+            "need": 3,
+            "have": 3
+          },
+          {
+            "skill": "fishing",
+            "need": 3,
+            "have": 2
+          },
+          {
+            "skill": "cooking",
+            "need": 2,
+            "have": 1
+          }
+        ],
+        "travel": null,
+        "materials": [
+          {
+            "id": "wood",
+            "name": "Timber",
+            "need": 8,
+            "have": 8,
+            "storage": 8,
+            "bag": 0
+          },
+          {
+            "id": "fiber",
+            "name": "Reed",
+            "need": 4,
+            "have": 4,
+            "storage": 4,
+            "bag": 0
+          },
+          {
+            "id": "stone",
+            "name": "Stone",
+            "need": 5,
+            "have": 3,
+            "storage": 3,
+            "bag": 0
+          },
+          {
+            "id": "clay",
+            "name": "Clay",
+            "need": 3,
+            "have": 3,
+            "storage": 3,
+            "bag": 0
+          },
+          {
+            "id": "copper_ore",
+            "name": "Copper Ore",
+            "need": 3,
+            "have": 1,
+            "storage": 1,
+            "bag": 0
+          },
+          {
+            "id": "rock_salt",
+            "name": "Rock Salt",
+            "need": 1,
+            "have": 1,
+            "storage": 1,
+            "bag": 0
+          },
+          {
+            "id": "coal",
+            "name": "Coal",
+            "need": 2,
+            "have": 0,
+            "storage": 0,
+            "bag": 0
+          }
+        ],
+        "energy": 250,
+        "meals": 250,
+        "energy_gain": 50,
+        "plots": 18,
+        "unlocks": [
+          "big_pot"
+        ],
+        "can_upgrade": false,
+        "block": {
+          "code": "skills_short",
+          "detail": {
+            "skill": "fishing",
+            "need": 3,
+            "have": 2
+          }
+        }
+      },
+      "unlocks": {
+        "spice_rack": true,
+        "warming_cabinet": true,
+        "bag_upgrade_1": "owned",
+        "board_slots": 3,
+        "fence": true,
+        "stoves": 2,
+        "big_pot": false,
+        "notice_board": true,
+        "chefs_sign": false,
+        "cabinet": 6,
+        "bag_upgrade_2": "locked",
+        "bag_upgrade_3": "locked",
+        "bag_upgrade_4": "locked"
+      },
+      "looks": [
+        {
+          "id": "fence",
+          "level": 3,
+          "name": "Fence & Mailbox",
+          "a": "Timber Fence",
+          "b": "Stone Wall",
+          "look": "a"
+        },
+        {
+          "id": "porch",
+          "level": 5,
+          "name": "Porch",
+          "a": "Timber Porch",
+          "b": "Stone Porch",
+          "look": "a"
+        },
+        {
+          "id": "kitchen_extension",
+          "level": 8,
+          "name": "Kitchen Wing",
+          "a": "Timber Kitchen Wing",
+          "b": "Stone Kitchen Wing",
+          "look": null
+        },
+        {
+          "id": "master_farmhouse",
+          "level": 15,
+          "name": "Master Farmhouse",
+          "a": "Timber Lodge",
+          "b": "Stone Manor",
+          "look": null
+        }
+      ]
+    },
+    "travel": {
+      "stamps_total": 1
+    }
+  },
+  "lv15": {
+    "energy": {
+      "value": 250,
+      "max": 315
+    },
+    "bag": {
+      "capacity": 30
+    },
+    "skills": {
+      "farming": {
+        "level": 6,
+        "xp": 0
+      },
+      "fishing": {
+        "level": 7,
+        "xp": 0
+      },
+      "cooking": {
+        "level": 8,
+        "xp": 0
+      }
+    },
+    "homestead": {
+      "level": 15,
+      "max": 17,
+      "plaque": [
+        {
+          "level": 2,
+          "at": 1793672800000
+        },
+        {
+          "level": 3,
+          "at": 1793759200000
+        },
+        {
+          "level": 4,
+          "at": 1793845600000
+        },
+        {
+          "level": 5,
+          "at": 1793932000000
+        },
+        {
+          "level": 6,
+          "at": 1794018400000
+        },
+        {
+          "level": 7,
+          "at": 1794104800000
+        },
+        {
+          "level": 8,
+          "at": 1794191200000
+        },
+        {
+          "level": 9,
+          "at": 1794277600000
+        },
+        {
+          "level": 10,
+          "at": 1794364000000
+        },
+        {
+          "level": 11,
+          "at": 1794450400000
+        },
+        {
+          "level": 12,
+          "at": 1794536800000
+        },
+        {
+          "level": 13,
+          "at": 1794623200000
+        },
+        {
+          "level": 14,
+          "at": 1794709600000
+        },
+        {
+          "level": 15,
+          "at": 1794796000000
+        }
+      ],
+      "plots": {
+        "now": 36,
+        "max": 41
+      },
+      "next": {
+        "level": 16,
+        "coins": {
+          "need": 320,
+          "have": 900
+        },
+        "skills": [
+          {
+            "skill": "farming",
+            "need": 6,
+            "have": 6
+          },
+          {
+            "skill": "fishing",
+            "need": 7,
+            "have": 7
+          },
+          {
+            "skill": "cooking",
+            "need": 8,
+            "have": 8
+          }
+        ],
+        "travel": {
+          "stamps": {
+            "need": 6,
+            "have": 4
+          },
+          "climates": {
+            "need": 1,
+            "have": 0
+          }
+        },
+        "materials": [
+          {
+            "id": "hardwood",
+            "name": "Hardwood",
+            "need": 13,
+            "have": 13,
+            "storage": 13,
+            "bag": 0
+          },
+          {
+            "id": "flax",
+            "name": "Flax",
+            "need": 9,
+            "have": 9,
+            "storage": 9,
+            "bag": 0
+          },
+          {
+            "id": "iron_ore",
+            "name": "Iron Ore",
+            "need": 4,
+            "have": 4,
+            "storage": 4,
+            "bag": 0
+          },
+          {
+            "id": "quartz",
+            "name": "Quartz",
+            "need": 2,
+            "have": 2,
+            "storage": 2,
+            "bag": 0
+          }
+        ],
+        "energy": 320,
+        "meals": 320,
+        "energy_gain": 0,
+        "plots": 39,
+        "unlocks": [
+          "bag_upgrade_4",
+          "travel_gates"
+        ],
+        "can_upgrade": false,
+        "block": {
+          "code": "travel_short",
+          "detail": {
+            "kind": "stamps",
+            "need": 6,
+            "have": 4
+          }
+        }
+      },
+      "unlocks": {
+        "spice_rack": true,
+        "warming_cabinet": true,
+        "bag_upgrade_1": "owned",
+        "board_slots": 3,
+        "fence": true,
+        "stoves": 3,
+        "big_pot": true,
+        "notice_board": true,
+        "chefs_sign": true,
+        "cabinet": 12,
+        "bag_upgrade_2": "owned",
+        "bag_upgrade_3": "for_sale",
+        "bag_upgrade_4": "locked"
+      },
+      "looks": [
+        {
+          "id": "fence",
+          "level": 3,
+          "name": "Fence & Mailbox",
+          "a": "Timber Fence",
+          "b": "Stone Wall",
+          "look": "a"
+        },
+        {
+          "id": "porch",
+          "level": 5,
+          "name": "Porch",
+          "a": "Timber Porch",
+          "b": "Stone Porch",
+          "look": "a"
+        },
+        {
+          "id": "kitchen_extension",
+          "level": 8,
+          "name": "Kitchen Wing",
+          "a": "Timber Kitchen Wing",
+          "b": "Stone Kitchen Wing",
+          "look": "a"
+        },
+        {
+          "id": "master_farmhouse",
+          "level": 15,
+          "name": "Master Farmhouse",
+          "a": "Timber Lodge",
+          "b": "Stone Manor",
+          "look": "a"
+        }
+      ]
+    },
+    "travel": {
+      "stamps_total": 4
+    }
+  },
+  "lv16": {
+    "energy": {
+      "value": 200,
+      "max": 320
+    },
+    "bag": {
+      "capacity": 30
+    },
+    "skills": {
+      "farming": {
+        "level": 7,
+        "xp": 0
+      },
+      "fishing": {
+        "level": 8,
+        "xp": 0
+      },
+      "cooking": {
+        "level": 8,
+        "xp": 0
+      }
+    },
+    "homestead": {
+      "level": 16,
+      "max": 17,
+      "plaque": [
+        {
+          "level": 2,
+          "at": 1793672800000
+        },
+        {
+          "level": 3,
+          "at": 1793759200000
+        },
+        {
+          "level": 4,
+          "at": 1793845600000
+        },
+        {
+          "level": 5,
+          "at": 1793932000000
+        },
+        {
+          "level": 6,
+          "at": 1794018400000
+        },
+        {
+          "level": 7,
+          "at": 1794104800000
+        },
+        {
+          "level": 8,
+          "at": 1794191200000
+        },
+        {
+          "level": 9,
+          "at": 1794277600000
+        },
+        {
+          "level": 10,
+          "at": 1794364000000
+        },
+        {
+          "level": 11,
+          "at": 1794450400000
+        },
+        {
+          "level": 12,
+          "at": 1794536800000
+        },
+        {
+          "level": 13,
+          "at": 1794623200000
+        },
+        {
+          "level": 14,
+          "at": 1794709600000
+        },
+        {
+          "level": 15,
+          "at": 1794796000000
+        },
+        {
+          "level": 16,
+          "at": 1794882400000
+        }
+      ],
+      "plots": {
+        "now": 39,
+        "max": 41
+      },
+      "next": {
+        "level": 17,
+        "coins": {
+          "need": 440,
+          "have": 500
+        },
+        "skills": [
+          {
+            "skill": "farming",
+            "need": 7,
+            "have": 7
+          },
+          {
+            "skill": "fishing",
+            "need": 8,
+            "have": 8
+          },
+          {
+            "skill": "cooking",
+            "need": 8,
+            "have": 8
+          }
+        ],
+        "travel": {
+          "stamps": {
+            "need": 8,
+            "have": 8
+          },
+          "climates": {
+            "need": 2,
+            "have": 2
+          }
+        },
+        "materials": [
+          {
+            "id": "hardwood",
+            "name": "Hardwood",
+            "need": 16,
+            "have": 16,
+            "storage": 16,
+            "bag": 0
+          },
+          {
+            "id": "flax",
+            "name": "Flax",
+            "need": 11,
+            "have": 11,
+            "storage": 11,
+            "bag": 0
+          },
+          {
+            "id": "iron_ore",
+            "name": "Iron Ore",
+            "need": 5,
+            "have": 5,
+            "storage": 5,
+            "bag": 0
+          },
+          {
+            "id": "quartz",
+            "name": "Quartz",
+            "need": 3,
+            "have": 3,
+            "storage": 3,
+            "bag": 0
+          }
+        ],
+        "energy": 325,
+        "meals": 325,
+        "energy_gain": 0,
+        "plots": 41,
+        "unlocks": [
+          "fourth_stove"
+        ],
+        "can_upgrade": true,
+        "block": null
+      },
+      "unlocks": {
+        "spice_rack": true,
+        "warming_cabinet": true,
+        "bag_upgrade_1": "owned",
+        "board_slots": 3,
+        "fence": true,
+        "stoves": 3,
+        "big_pot": true,
+        "notice_board": true,
+        "chefs_sign": true,
+        "cabinet": 12,
+        "bag_upgrade_2": "owned",
+        "bag_upgrade_3": "for_sale",
+        "bag_upgrade_4": "for_sale"
+      },
+      "looks": [
+        {
+          "id": "fence",
+          "level": 3,
+          "name": "Fence & Mailbox",
+          "a": "Timber Fence",
+          "b": "Stone Wall",
+          "look": "a"
+        },
+        {
+          "id": "porch",
+          "level": 5,
+          "name": "Porch",
+          "a": "Timber Porch",
+          "b": "Stone Porch",
+          "look": "a"
+        },
+        {
+          "id": "kitchen_extension",
+          "level": 8,
+          "name": "Kitchen Wing",
+          "a": "Timber Kitchen Wing",
+          "b": "Stone Kitchen Wing",
+          "look": "a"
+        },
+        {
+          "id": "master_farmhouse",
+          "level": 15,
+          "name": "Master Farmhouse",
+          "a": "Timber Lodge",
+          "b": "Stone Manor",
+          "look": "a"
+        }
+      ]
+    },
+    "travel": {
+      "stamps_total": 8
+    }
+  },
+  "lv17": {
+    "energy": {
+      "value": 300,
+      "max": 325
+    },
+    "bag": {
+      "capacity": 30
+    },
+    "skills": {
+      "farming": {
+        "level": 8,
+        "xp": 0
+      },
+      "fishing": {
+        "level": 9,
+        "xp": 0
+      },
+      "cooking": {
+        "level": 9,
+        "xp": 0
+      }
+    },
+    "homestead": {
+      "level": 17,
+      "max": 17,
+      "plaque": [
+        {
+          "level": 2,
+          "at": 1793672800000
+        },
+        {
+          "level": 3,
+          "at": 1793759200000
+        },
+        {
+          "level": 4,
+          "at": 1793845600000
+        },
+        {
+          "level": 5,
+          "at": 1793932000000
+        },
+        {
+          "level": 6,
+          "at": 1794018400000
+        },
+        {
+          "level": 7,
+          "at": 1794104800000
+        },
+        {
+          "level": 8,
+          "at": 1794191200000
+        },
+        {
+          "level": 9,
+          "at": 1794277600000
+        },
+        {
+          "level": 10,
+          "at": 1794364000000
+        },
+        {
+          "level": 11,
+          "at": 1794450400000
+        },
+        {
+          "level": 12,
+          "at": 1794536800000
+        },
+        {
+          "level": 13,
+          "at": 1794623200000
+        },
+        {
+          "level": 14,
+          "at": 1794709600000
+        },
+        {
+          "level": 15,
+          "at": 1794796000000
+        },
+        {
+          "level": 16,
+          "at": 1794882400000
+        },
+        {
+          "level": 17,
+          "at": 1794968800000
+        }
+      ],
+      "plots": {
+        "now": 41,
+        "max": 41
+      },
+      "next": null,
+      "unlocks": {
+        "spice_rack": true,
+        "warming_cabinet": true,
+        "bag_upgrade_1": "owned",
+        "board_slots": 3,
+        "fence": true,
+        "stoves": 4,
+        "big_pot": true,
+        "notice_board": true,
+        "chefs_sign": true,
+        "cabinet": 12,
+        "bag_upgrade_2": "owned",
+        "bag_upgrade_3": "for_sale",
+        "bag_upgrade_4": "for_sale"
+      },
+      "looks": [
+        {
+          "id": "fence",
+          "level": 3,
+          "name": "Fence & Mailbox",
+          "a": "Timber Fence",
+          "b": "Stone Wall",
+          "look": "a"
+        },
+        {
+          "id": "porch",
+          "level": 5,
+          "name": "Porch",
+          "a": "Timber Porch",
+          "b": "Stone Porch",
+          "look": "a"
+        },
+        {
+          "id": "kitchen_extension",
+          "level": 8,
+          "name": "Kitchen Wing",
+          "a": "Timber Kitchen Wing",
+          "b": "Stone Kitchen Wing",
+          "look": "a"
+        },
+        {
+          "id": "master_farmhouse",
+          "level": 15,
+          "name": "Master Farmhouse",
+          "a": "Timber Lodge",
+          "b": "Stone Manor",
+          "look": "a"
+        }
+      ]
+    },
+    "travel": {
+      "stamps_total": 10
+    }
+  }
+}
