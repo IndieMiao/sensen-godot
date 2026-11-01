@@ -47,6 +47,8 @@ const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGO
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the home city's centre for Improve this map (q(133) v3)
 const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")   # the sheet the Passport and city pages use
+const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keepers' local requests (q(272))
+const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
@@ -2438,6 +2440,21 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if role == "casino": trade.activated.connect(func(): _play_blackjack(c))   # Play: the table page, no counter (q(240))
 	else: trade.activated.connect(func(): open_counter(role))
 	card.content.add_child(trade)
+	# q(272) (不知火舞 378 091a3ae9, LOCK-16 复议 197 1387e81b): a keeper away from home with a local request for the
+	# player — one full-width secondary key under Trade, the question below it; none at all when they have none
+	var lk := P0Locals.key(view, str(c.get("outpost", "")))
+	if not lk.is_empty():
+		var key := UiCommandButton.new(str(lk.text), UiCommandButton.Kind.SECONDARY)
+		key.name = "LocalKey"
+		key.reason = str(lk.reason)
+		key.fit_text = true
+		if lk.kind == "deliver":
+			key.sends = true
+			key.activated.connect(func():
+				close_modal()
+				command.emit({"type": "deliver", "request": str(lk.id)}))
+		else: key.activated.connect(func(): P0LocalRequest.open(self, str(lk.id), func(): open_keeper_greeting(role, c)))
+		card.content.add_child(key)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
 		ask.activated.connect(func(): card.line = str(lines.answer))
@@ -2841,6 +2858,9 @@ func open_today(given: Array = []) -> void:
 		if i < 0 or i >= _today_rows.size(): return
 		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
 		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given))
+		# a keeper's local request (q(272)): its card, Drop request › there; Not now / Close come back to Today
+		elif str(_today_rows[i].get("local_request", "")) != "":
+			P0LocalRequest.open(self, str(_today_rows[i].local_request), func(): open_today(given))
 		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
 		elif str(_today_rows[i].get("board_request", "")) != "":
 			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given)))
@@ -2868,7 +2888,7 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != ""
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != ""
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")
