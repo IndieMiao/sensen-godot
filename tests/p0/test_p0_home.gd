@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## HOME-1 / HOME-2 models (Figma 482:152 / 482:154, §8.6.1, LOCK-10) from the server's homestead facts.
 
 func _view(level := 2) -> Dictionary:
-	var next := {"level": 3, "coins": {"need": 440, "have": 830}, "skills": {"need": 5, "have": 13, "farming": 7, "fishing": 6},
+	var next := {"level": 3, "coins": {"need": 440, "have": 830}, "skills": [{"skill": "fishing", "need": 5, "have": 13}],
 		"materials": [
 			{"id": "wood", "name": "Timber", "need": 16, "have": 10, "storage": 10, "bag": 0},
 			{"id": "stone", "name": "Stone", "need": 12, "have": 12, "storage": 12, "bag": 0},
@@ -19,7 +19,7 @@ func test_home_panel_matches_the_page_14_sample() -> void:
 	var p := P0Logic.home_panel(_view())
 	assert_str(str(p.title)).is_equal("Homestead Lv2 → Lv3")
 	assert_str(str(p.look)).is_equal("Lv3 look · Fence & Mailbox")   # q(115): the stage's name, never Look A / B
-	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
+	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Fishing"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(
 		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I · 150 coins", "Stall Board · 3rd slot",
@@ -34,9 +34,9 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 	v.homestead.next.coins.have = 400
 	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Need 40 more coins")
 	v.homestead.next.coins.have = 440
-	v.homestead.next.skills.have = 4
-	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Skills total 5 needed · now 4")
-	v.homestead.next.skills.have = 5
+	v.homestead.next.skills[0].have = 4
+	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Need Fishing Lv5")
+	v.homestead.next.skills[0].have = 5
 	var ready := P0Logic.home_panel(v)
 	assert_str(str(ready.reason)).is_equal("")
 	assert_str(str(ready.label)).is_equal("Upgrade")
@@ -69,13 +69,13 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
 	v.homestead.next.level = 2
-	v.homestead.next.unlocks = ["spice_rack", "clay_bank"]
+	v.homestead.next.unlocks = ["spice_rack", "city_gather"]
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.look)).is_equal("")
 	assert_str(str(p.changes[1].text)).is_equal("Spice Rack")
-	assert_str("%s · %s" % [p.changes[2].text, p.changes[2].note]).is_equal("Clay Bank · Clay next to the Reed Bank")   # q(45)
-	var m := P0Logic.home_moment(v, {"level": 2, "unlocks": ["spice_rack", "clay_bank"]})
-	assert_str(str(m.detail)).is_equal("Spice Rack · seasonings off your bag\nClay Bank opened")
+	assert_int(p.changes.size()).is_equal(2)   # city_gather is taught by the guide, not a HOME row
+	var m := P0Logic.home_moment(v, {"level": 2, "unlocks": ["spice_rack", "city_gather"]})
+	assert_str(str(m.detail)).is_equal("Spice Rack · seasonings off your bag")
 
 func test_p0_stops_at_lv3() -> void:
 	var v := _view(3)
@@ -85,7 +85,7 @@ func test_p0_stops_at_lv3() -> void:
 	assert_str(str(p.title)).is_equal("Homestead Lv3")
 	assert_array(p.tiles).is_empty()
 
-## q(115) ②: Lv10 has no next level: `Max level · Homestead Master` under the title, no Upgrade, and the Looks rows.
+## The content cap has no next level: neutral copy under the title, no Upgrade, and the Looks rows.
 func test_lv10_says_max_level_and_keeps_the_looks() -> void:
 	var v := _view(10)
 	v.homestead.next = null
@@ -93,7 +93,7 @@ func test_lv10_says_max_level_and_keeps_the_looks() -> void:
 		{"id": "kitchen_extension", "level": 8, "look": "a"}, {"id": "master_farmhouse", "level": 10, "look": "b"}]
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.title)).is_equal("Homestead Lv10")
-	assert_str(str(p.subtitle)).is_equal("Max level · Homestead Master")
+	assert_str(str(p.subtitle)).is_equal("Highest level for now")
 	assert_bool(bool(p.button)).is_false()
 	assert_array(p.looks.map(func(r): return "%s … %s" % [r.name, r.value])).is_equal(
 		["Fence & Mailbox … Timber Fence ›", "Porch … Stone Porch ›", "Kitchen Wing … Timber Kitchen Wing ›", "Master Farmhouse … Stone Manor ›"])
@@ -130,7 +130,7 @@ func test_home_1_lays_out_tiles_changes_and_the_gap_on_the_button() -> void:
 	HomePanel.open(ui)
 	assert_str(ui.modal_kind).is_equal("homestead")
 	var tiles := ui.find_children("*", "UiNeedTile", true, false)
-	assert_array(tiles.map(func(t): return (t as UiNeedTile).item_name)).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
+	assert_array(tiles.map(func(t): return (t as UiNeedTile).item_name)).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Fishing"])
 	var button: UiCommandButton = ui.find_children("*", "UiCommandButton", true, false)[0]
 	assert_str(button.reason).is_equal("Need 6 more Timber")
 	button.unavailable_pressed.emit(button.reason)
@@ -319,8 +319,8 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 	rt.session.view = no_gap
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
-	rt._on_refused("skills_short", {"need": 5, "have": 4}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Skills total 5 needed · now 4")   # never "Can't do that (skills_short)"
+	rt._on_refused("skills_short", {"skill": "fishing", "need": 5, "have": 4}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Need Fishing Lv5")   # never "Can't do that (skills_short)"
 	rt._on_refused("max_level", {"level": 3}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Highest level for now")
 
@@ -413,7 +413,7 @@ func test_bag_upgrade_notes_follow_the_tiers_the_player_has() -> void:
 	v.homestead.next.level = 9
 	v.homestead.next.unlocks = ["bag_upgrade_3"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
-		["Bag Upgrade III · 1,000 coins · Bag 35 → 40"])
+		["Bag Upgrade III · 1000 coins · Bag 35 → 40"])
 
 ## Lv8 promises no stall look until the stall has its model (不知火舞 on 282, 李元芳's c62a6ed9 ③): neither HOME-1 nor the banner.
 func test_lv8_says_nothing_of_the_stall_yet() -> void:

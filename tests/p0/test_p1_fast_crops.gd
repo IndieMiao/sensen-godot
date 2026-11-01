@@ -171,27 +171,27 @@ func test_fast_crops_render_at_their_fixed_duration_with_distinct_tints_and_cann
 		assert_str(P0Logic.main_action(v, v.plots[i], "fert_compost").sub).is_equal(P0Logic.key_ready(FAST[i].grow_s * 500))
 	assert_bool(cells[P0Garden.cell_id(P0Garden.cell_of(0))].tint != cells[P0Garden.cell_id(P0Garden.cell_of(1))].tint).is_true()
 
-func test_home_banner_shows_actual_energy_and_keeps_full_for_level_five_onward() -> void:
-	for level in [2, 3, 4]:
-		assert_str(P0Logic.home_moment({energy = {max = 220}}, {level = level}).subtitle).is_equal("Max Energy 220 · Energy full")   # legacy field absent, not a reported zero
+func test_home_banner_shows_only_reported_actual_energy_at_every_level() -> void:
+	for level in [2, 3, 4, 5, 10, 15, 16, 17]:
+		assert_str(P0Logic.home_moment({energy = {max = 220}}, {level = level}).subtitle).is_equal("Max Energy 220")
 		for gain in [40, 15, 0]:
 			var banner := P0Logic.home_moment({energy = {max = 220}}, {level = level, energy = gain})
 			assert_str(banner.subtitle).is_equal("Max Energy 220" + (" · +%d Energy" % gain if gain > 0 else ""))
 	for level in [5, 10]:
-		assert_str(P0Logic.home_moment({energy = {max = 240}}, {level = level, energy = 0}).subtitle).is_equal("Max Energy 240 · Energy full")
+		assert_str(P0Logic.home_moment({energy = {max = 240}}, {level = level, energy = 0}).subtitle).is_equal("Max Energy 240")
 
 func test_home_panel_reads_reduced_gates_and_does_not_add_a_one_time_energy_reward_row() -> void:
 	for rule in [[2, 40, 3], [3, 80, 4], [4, 300, 6], [5, 750, 8]]:
 		var level: int = rule[0]
 		var v := view()
 		v.homestead = {level = level - 1, next = {level = level, coins = {need = rule[1] + 40, have = 2000},
-			skills = {need = rule[2], have = 10}, materials = [{id = "wood", name = "Timber", need = 6, have = 6}],
+			skills = [{skill = "fishing", need = rule[2], have = 10}], materials = [{id = "wood", name = "Timber", need = 6, have = 6}],
 			energy = 200 + (level - 1) * 10, meals = 200 + (level - 1) * 10, unlocks = [], can_upgrade = true}}
 		var panel := P0Logic.home_panel(v)
 		assert_int(panel.tiles[1].need).is_equal(rule[1] + 40)   # displayed wallet need includes the retained floor
 		assert_int(panel.tiles[2].need).is_equal(rule[2])
 		assert_bool(panel.changes.any(func(row): return str(row.text).contains("+40"))).is_false()
-		assert_str(panel.footer).is_equal("Upgrading is free of Energy" + (" · fills Energy to the new max" if level >= 5 else ""))
+		assert_str(panel.footer).is_equal("Upgrading is free of Energy")
 
 func test_reused_plant_batches_keep_each_fast_crop_tint_and_the_harvest_copy() -> void:
 	var v := view()

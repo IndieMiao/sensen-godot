@@ -1,7 +1,6 @@
 extends GdUnitTestSuite
 ## q(255) Today's Homestead row (SGODOT-341; 不知火舞 frames on 302 e7e3eb4f, order 341 bbdef20e): after the guide and
-## below Homestead Lv3, one row points at the next level's first gap — a material, then coins; nothing when only skills
-## are short; `Upgrade to Homestead Lv2` once everything is met, the only one that lights the red dot.
+## v4q(1) extends it to every level and includes skill/travel gaps; Upgrade alone lights the red dot.
 
 const KAI := "req_res_kai_1"
 
@@ -12,7 +11,7 @@ func _view() -> Dictionary:
 		"names": {"fish_crucian": "Pond Crucian", "crop_radish": "Radish", "wood": "Timber", "stone": "Stone", "fiber": "Reeds"},
 		"bag": {"capacity": 25, "slots": []},
 		"firsts": ["harvest:crop_radish"],
-		"homestead": {"level": 1, "next": {"level": 2, "coins": {"need": 80, "have": 120}, "skills": {"need": 3, "have": 3},
+		"homestead": {"level": 1, "next": {"level": 2, "coins": {"need": 80, "have": 120}, "skills": [{"skill": "fishing", "need": 3, "have": 3}],
 			"materials": [{"id": "fiber", "name": "Reeds", "need": 3, "have": 0}, {"id": "wood", "name": "Timber", "need": 6, "have": 0},
 				{"id": "stone", "name": "Stone", "need": 4, "have": 0}], "can_upgrade": false}},
 		"gather": {"spots": [
@@ -77,12 +76,12 @@ func test_coins_short_points_at_the_stall_and_lights_nothing() -> void:
 	assert_str(str(row.go)).is_equal("stall")
 	assert_array(P0Logic.today_dots(P0Logic.today_rows(v))).is_empty()
 
-func test_only_skills_short_says_nothing() -> void:
+func test_only_skills_short_shows_homestead_and_deduplicates_the_skill() -> void:
 	var v := _view()
 	v.homestead.next.materials = []
-	v.homestead.next.skills = {"need": 3, "have": 2}
-	assert_dict(_home(v)).is_empty()
-	assert_array(_lines(v)).contains(["Fishing Lv2 · 30 XP to go"])   # Today's own skill row says it
+	v.homestead.next.skills = [{"skill": "fishing", "need": 3, "have": 2}]
+	assert_str(_home(v).line).is_equal("Homestead Lv2 · Fishing Lv3 needed")
+	assert_bool(_lines(v).has("Fishing Lv2 · 30 XP to go")).is_false()
 
 func test_upgrade_follows_the_hand_ins_and_lights_the_dot() -> void:
 	var v := _view()
@@ -102,14 +101,14 @@ func test_a_gatherable_material_follows_the_other_things_to_do_now() -> void:
 	v.plots = [{"state": "ready", "crop": "crop_radish"}]
 	assert_array(_lines(v).slice(0, 2)).is_equal(["Harvest 1 Radish", "Homestead Lv2 · Timber 6 to go"])
 
-func test_none_during_the_guide_or_from_lv3() -> void:
+func test_none_during_the_guide_but_later_levels_keep_the_row() -> void:
 	var v := _view()
 	v["guide"] = {"step": "first_sow"}
 	assert_dict(P0Logic.homestead_row(v)).is_empty()
 	v.erase("guide")
 	v.homestead.level = 3
 	v.homestead.next.level = 4
-	assert_dict(P0Logic.homestead_row(v)).is_empty()
+	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Homestead Lv4 · Timber 6 to go")
 	v.homestead.level = 2
 	v.homestead.next.level = 3
 	assert_str(str(P0Logic.homestead_row(v).row.line)).is_equal("Homestead Lv3 · Timber 6 to go")
