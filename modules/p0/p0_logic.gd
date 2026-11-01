@@ -418,8 +418,9 @@ const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
-	if id.begins_with("weapon_"): id = "sword_wooden" if id == "weapon_wooden_sword" else "sword"
-	if id.begins_with("potion_"): id = "heart"   # G artwork pending; retain an existing HP glyph.
+	if id.begins_with("weapon_") or id.begins_with("potion_"):
+		if ResourceLoader.exists(ICON_DIR % id): return load(ICON_DIR % id)
+		id = "heart" if id.begins_with("potion_") else "sword_wooden" if id == "weapon_wooden_sword" else "sword"
 	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	if ResourceLoader.exists(path): return load(path)

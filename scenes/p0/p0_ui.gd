@@ -73,7 +73,7 @@ const GHOST_FAMILY := {
 	"farm": ["seed_", "seed_radish", "Seeds"],
 	"fish": ["bait_", "bait_worm", "Bait"],
 	"mine": ["torch", "torch", "Torch"],
-	"combat": ["potion_", "heart", "Potion"],
+	"combat": ["potion_", "potion_heal", "Potion"],
 }
 
 var _potion_until_ms := -1
@@ -933,6 +933,9 @@ func _save_quick() -> void:
 ## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
 ## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
+	if bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and view.get("gear", {}).has("weapon"):
+		a = a.duplicate()
+		a.tool = str(view.gear.weapon)
 	if surface == "mine" and bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and selected_seed.begins_with("potion_"):
 		a = P0Logic.GearLogic.drink_action(view, selected_seed, potion_cooldown())
 	# SYS-OFFLINE (WP6, §10.7.1): offline every action key is Unavailable with `Offline` as its second line (`Sow ·

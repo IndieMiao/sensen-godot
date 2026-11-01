@@ -10,12 +10,29 @@ static func potion(id: String) -> Dictionary:
 static func weapon_rows(view: Dictionary) -> Array:
 	var out := []
 	var gear: Dictionary = view.get("gear", {})
-	for id in gear.get("weapons", []):
-		if not id is String or weapon(id).is_empty(): continue
+	for id in P0Logic.content().get("mine", {}).get("combat", {}).get("weapons", {}):
+		if not str(id).begins_with("weapon_"): continue
 		var d := weapon(id).duplicate()
-		d.merge({id = id, owned = true, equipped = str(gear.get("weapon", "")) == id})
+		d.merge({id = id, owned = (gear.get("weapons", []) as Array).has(id), equipped = str(gear.get("weapon", "")) == id})
 		out.append(d)
 	return out
+
+static func weapon_recipe(id: String) -> Dictionary:
+	for r in P0Logic.content().get("workbench", {}).get("recipes", []):
+		if str(r.get("to", "")) == "weapon" and str(r.get("out", "")) == id: return r
+	return {}
+
+static func weapon_gate(view: Dictionary, id: String) -> String:
+	var recipe := weapon_recipe(id)
+	if recipe.is_empty(): return ""
+	var lv := int(recipe.get("gate", {}).get("homestead", 0))
+	return "Homestead Lv%d" % lv if int(view.get("homestead", {}).get("level", 1)) < lv else "Craft at Workbench"
+
+static func weapon_source(view: Dictionary, id: String) -> String:
+	if (view.get("gear", {}).get("weapons", []) as Array).has(id): return ""
+	if not weapon_recipe(id).is_empty(): return "Workbench"
+	if str(P0Logic.content().get("mine", {}).get("first_dig", {}).get("reward", {}).get("weapon", "")) == id: return "Pip's First Dig"
+	return ""
 
 static func weapon_effect(id: String) -> String:
 	var d := weapon(id)

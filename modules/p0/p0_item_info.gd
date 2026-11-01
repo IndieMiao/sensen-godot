@@ -312,6 +312,7 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 		can_afford = int(view.get("coins", 0)) >= (wallet if qty == 1 else wallet + int(offer.get("price", 0)) * (qty - 1)),
 		take_some = _stored(view, item_id) > _TAKE_SOME,
 		owned = bool(rod.get("owned", offer.get("owned", false))),
+		craftable_weapon = kind == "weapon" and not P0Logic.GearLogic.weapon_recipe(item_id).is_empty(),
 		materials_ok = (offer.get("materials", []) as Array).all(func(m): return int(m.get("have", 0)) >= int(m.get("need", 0))),
 		equipped = bool(rod.get("equipped", false)),
 		has_friends = int(view.get("social", {}).get("mutual", 0)) > 0,
@@ -400,6 +401,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		craft_note = _craft_note(view, item_id),
 		weapon_effect = P0Logic.GearLogic.weapon_effect(item_id),
 		weapon_tier = "T%d" % int(rod.tier) if rod.has("tier") else "",
+		weapon_source = P0Logic.GearLogic.weapon_source(view, item_id) if kind == "weapon" else "",
+		weapon_gate = P0Logic.GearLogic.weapon_gate(view, item_id) if kind == "weapon" else "",
 		potion_effect = P0Logic.GearLogic.potion_effect(item_id),
 		# Decorate (SGODOT-284, q(111) / q(113)): a piece's footprint, its row line (`1×1 · Classic lamp` /
 		# `5 pieces`) and the row's third line — the levels still to go while it is locked, else `In storage ×2`.

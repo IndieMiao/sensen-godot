@@ -315,7 +315,6 @@ static func gear_rows(view: Dictionary, key: String) -> Array:
 			for b in spec.get("buttons", []):
 				if StringName(b.get("id", &"")) != &"equipped": action = b
 			var effect := str(facts[0]) if facts.size() > 0 else ""
-			if key == "combat" and facts.size() > 1: effect += " · " + str(facts[1])
 			if not bool(spec.get("card", true)):   # no "<kind>/gear" rule yet (picks before SGODOT-224 adds it)
 				if r.has("stone"): effect = "%d Stone per rock" % int(r.stone)   # LOCK-29 wording
 				if r.get("owned", false) and not r.get("equipped", false): action = {id = &"equip", label = "Equip", kind = &"secondary"}

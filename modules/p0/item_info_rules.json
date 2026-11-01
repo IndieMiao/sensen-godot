@@ -423,10 +423,11 @@
     ]
   },
   "weapon/gear": {
-    "facts": ["{weapon_effect}", "{weapon_tier}"],
+    "facts": ["{weapon_effect}", "{weapon_source}", "{weapon_tier}"],
     "buttons": [
       {"id": "equipped", "label": "Equipped", "kind": "unavailable", "when": "owned & equipped"},
-      {"id": "equip", "label": "Equip", "kind": "primary", "when": "owned & !equipped"}
+      {"id": "equip", "label": "Equip", "kind": "primary", "when": "owned & !equipped"},
+      {"id": "weapon_gate", "label": "{weapon_gate}", "kind": "unavailable", "when": "!owned & craftable_weapon"}
     ]
   },
   "weapon/workbench": {

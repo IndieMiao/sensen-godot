@@ -17,6 +17,7 @@ func before_test() -> void:
 		IRON: {name = "Iron Sword", attack = 12, tier = 2}}
 	P0Logic._content.mine.potions = {POTION: {name = "Healing Potion", heal = "full", floors = "any", cooldown_ms = 1700}}
 	P0Logic._content.mine.first_dig = {giver = "res_pip", floor = 6, gate = {homestead = 4}, reward = {weapon = COPPER, affinity = 9}}
+	P0Logic._content.workbench.recipes.append({id = "craft_test", out = IRON, to = "weapon", coins = 137, gate = {homestead = 9}})
 
 func after_test() -> void:
 	P0Logic._content = _content
@@ -29,7 +30,7 @@ func _view() -> Dictionary:
 		mine = {hp_max = 120, at = {mine = "wd-dev-quarry", day = "2026-11-02", floor = 1, hp = 47}},
 		first_dig = {giver = "res_pip", floor = 6, have = 2, done = false}}
 
-func test_weapon_reuses_the_combat_slot_and_only_lists_owned_weapons() -> void:
+func test_weapon_reuses_the_combat_slot_and_shows_the_unowned_recipe_gate() -> void:
 	var v := _view()
 	var slots := P0BagDrawer.gear_slots(v)
 	assert_int(slots.size()).is_equal(6)
@@ -37,10 +38,14 @@ func test_weapon_reuses_the_combat_slot_and_only_lists_owned_weapons() -> void:
 	assert_str(slots[3].role).is_equal("Weapon")
 	assert_str(slots[3].item).is_equal(WOOD)
 	var rows := P0BagDrawer.gear_rows(v, "combat")
-	assert_array(rows.map(func(r): return r.id)).is_equal([WOOD, COPPER])
-	assert_array(rows.map(func(r): return r.state)).is_equal([&"equipped", &"owned"])
-	assert_str(rows[1].effect).is_equal("Attack 7 · T1")
+	assert_array(rows.map(func(r): return r.id)).is_equal([WOOD, COPPER, IRON])
+	assert_array(rows.map(func(r): return r.state)).is_equal([&"equipped", &"owned", &"Workbench"])
+	assert_str(rows[1].effect).is_equal("Attack 7")
 	assert_str(rows[1].action.id).is_equal("equip")
+	assert_str(rows[2].action.label).is_equal("Homestead Lv9")
+	assert_str(rows[2].action.kind).is_equal("unavailable")
+	v.homestead = {level = 9}
+	assert_str(P0BagDrawer.gear_rows(v, "combat")[2].action.label).is_equal("Craft at Workbench")
 	v.gear.weapon = COPPER
 	assert_str(P0BagDrawer.gear_slots(v)[3].item).is_equal(COPPER)
 	assert_str(P0BagDrawer.gear_rows(v, "combat")[1].state).is_equal("equipped")
@@ -50,8 +55,10 @@ func test_weapon_item_specs_read_content_attack_and_tier() -> void:
 	assert_bool(s.card).is_true()
 	assert_array(s.facts).is_equal(["Attack 7", "T1"])
 	assert_str(s.title).is_equal("Copper Sword")
-	assert_bool(P0ItemInfo.spec(_view(), IRON, &"gear").buttons.is_empty()).is_true()
+	assert_str(P0ItemInfo.spec(_view(), IRON, &"gear").buttons[0].kind).is_equal("unavailable")
 	assert_array(P0ItemInfo.spec(_view(), IRON, &"workbench").facts).is_equal(["Attack 12", "T2"])
+	for id in [COPPER, IRON, POTION]:
+		assert_that(P0Logic.icon(id)).is_same(load("res://assets/p0/icons/%s.svg" % id))
 
 func test_potion_is_in_materials_but_never_uses_material_gift_rules() -> void:
 	var v := _view()
@@ -116,10 +123,21 @@ func test_workbench_weapon_uses_craft_equip_and_equipped_states() -> void:
 	v.workbench = {recipes = [r]}
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].effect).is_equal("Attack 12")
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.cmd.type).is_equal("craft")
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Craft · 137 coins")
+	r.coins_need = 177
+	assert_array(P0MaterialLogic.workbench_model(v, "tools")[0].cost).is_empty()
 	r.owned = true
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.cmd.type).is_equal("equip")
 	r.equipped = true
 	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Equipped")
+	r.owned = false
+	r.block = {code = "homestead_level", detail = {level = 9}}
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Homestead Lv9")
+	r.block = {code = "no_coins", detail = {need = 23}}
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Need 23 more coins")
+	r.block = {code = "need_material", detail = {item = "coal", need = 3, have = 1}}
+	r.cost = [{id = "coal", name = "Coal", need = 3, have = 1}]
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Need 2 more Coal")
 
 func test_first_dig_reads_its_own_view_and_content_without_tracking_mutation() -> void:
 	var v := _view()
@@ -216,6 +234,12 @@ func test_combat_potion_selection_only_sends_when_main_key_is_pressed() -> void:
 	assert_int(sent.size()).is_equal(1)
 	assert_str(ui.quick_bar_node().slot(0).cooldown).is_equal("0:02")
 	assert_str(ui.quick_bar_node().cells()[0].quantity).is_equal("×5 · 0:02")
+	var many := _view()
+	many.bag.slots = [{id = POTION, qty = 340}]
+	ui.set_view(many)
+	var label: Label = ui.quick_bar_node().cells()[0]._qty
+	var width := label.get_theme_font(&"font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size(&"font_size")).x
+	assert_float(width).is_less_equal(UiTokens.SIZE_QUICK_SLOT_W - 8.0)
 	ui._on_slot_tapped(POTION)
 	ui.set_action({verb = "Attack", enabled = true, cmd = {type = "mine_swing"}})
 	assert_str(ui.fab_state().verb).is_equal("Attack")
