@@ -43,5 +43,11 @@ func _initialize() -> void:
 	if ponds != "":
 		out["ponds_path"] = ponds
 		out["ponds_sha256"] = FileAccess.get_sha256(ponds)
+	# SGODOT-374: P0's template override (new polygons, SystemPonds.template lays it over the catalog) is what the
+	# banks above were built from; the bake's manifest records it.
+	const TEMPLATES := "res://assets/p0/p0_pond_templates.json"
+	if FileAccess.file_exists(TEMPLATES):
+		out["templates_path"] = TEMPLATES
+		out["templates_sha256"] = FileAccess.get_sha256(TEMPLATES)
 	FileAccess.open(output, FileAccess.WRITE).store_string(JSON.stringify(out))
 	quit()

@@ -30,7 +30,10 @@ const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")
 const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # P0's own ponds: San Francisco (SGODOT-270)
 const P0City := preload("res://modules/p0/p0_city.gd")
-var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.8 / 1.4
+## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
+## fit one view whole; the opening and the walk stay at 1.0, the farm's player scale.
+const FAR_ZOOM := 0.68
+var _pinch = ElasticZoom.new(FAR_ZOOM, 1.4)   # rubber band past FAR_ZOOM / 1.4
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _band := Rect2()                   # the last camera band seen with no panel up
 var _opening := true                   # the opening shot: framed low in the band until the first step or pinch

@@ -99,9 +99,18 @@ static func nearest_water(id: String, point: Vector3, pond: Dictionary = {}) -> 
 	nearest += (p - nearest).normalized() * float(spec.width) * 0.5
 	return Vector3(nearest.x, 0, nearest.y)
 
+static var _polygons := {}   # spec.polygon → its PackedVector2Array: contains() runs hundreds of times per plan (周瑜 on #593)
+static var _polygons_lock := Mutex.new()   # WaterShore builds banks on worker threads
 static func _polygon(spec: Dictionary) -> PackedVector2Array:
+	_polygons_lock.lock()
+	var hit = _polygons.get(spec.polygon)
+	_polygons_lock.unlock()
+	if hit != null: return hit
 	var polygon := PackedVector2Array()
 	for p in spec.polygon: polygon.append(Vector2(p[0], p[1]))
+	_polygons_lock.lock()
+	_polygons[spec.polygon] = polygon
+	_polygons_lock.unlock()
 	return polygon
 
 static func _nearest_polygon(p: Vector2, polygon: PackedVector2Array) -> Vector2:
@@ -111,9 +120,27 @@ static func _nearest_polygon(p: Vector2, polygon: PackedVector2Array) -> Vector2
 		if p.distance_squared_to(q) < p.distance_squared_to(nearest): nearest = q
 	return nearest
 
+## The Cast key's landing: past the nearest bank, POND_REACH into a pond (q(267) ③: open water in front of the rod),
+## backing off in steps until the whole run from the bank, and FAR_CLEAR past the float, stays wet; 0.55 m (half a
+## river's width) elsewhere.
+const POND_REACH := 2.5
+const SHORE_REACH := 0.55
+const FAR_CLEAR := 0.25
 static func default_target(id: String, origin: Vector3, pond: Dictionary = {}) -> Vector3:
 	var edge := nearest_water(id, origin, pond)
-	return edge + (edge - origin).normalized() * minf(0.55, float(site(id, pond).get("width", 1.1)) * 0.5)
+	var dir := (edge - origin).normalized()
+	var spec := site(id, pond)
+	if spec.has("polygon"):
+		var reach := POND_REACH
+		while reach > SHORE_REACH:
+			var wet := true
+			for i in range(1, ceili((reach + FAR_CLEAR) / 0.1) + 1):
+				if not contains(id, edge + dir * minf(i * 0.1, reach + FAR_CLEAR), 0.0, pond):
+					wet = false
+					break
+			if wet: return edge + dir * reach
+			reach -= 0.25
+	return edge + dir * minf(SHORE_REACH, float(spec.get("width", 1.1)) * 0.5)
 
 static func dry_walkable(grid: BlueprintGrid, point: Vector3) -> bool:
 	var cell := grid.bp.world_to_cell(point)
