@@ -1,0 +1,9 @@
+{
+  "_note": "Placeholder Slime (355 b1, contract-efg §10): the keys of a model's json (assets/monsters/<id>/<id>.json, 上官婉儿's contract v1) — radius, hit_point, durations by action — plus the movement a brain reads. The numbers are the old mine table's slime (assets/farm/data/mining.json), as the mine has always felt; HP and damage are the server's.",
+  "radius": 0.4,
+  "hit_point": [0.0, 0.3, 0.0],
+  "durations": { "windup": 0.65, "attack": 0.28, "recover": 1.1, "hit": 0.18 },
+  "move": { "speed": 1.65, "aggro": 5.0, "reach": 1.55, "dash_speed": 4.2 },
+  "stun_resistant": false,
+  "knockback_resistance": 0
+}
