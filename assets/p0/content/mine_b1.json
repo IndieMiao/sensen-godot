@@ -1,5 +1,5 @@
 {
-  "_note": "355 E/F/G development, contract v0.5 9104357b. Existing floor/rock energy and picks stay in p0_content; existing monsters and combat/weapon keys stay in mine_p1. All numbers are provisional pending v4q(5-7) approval/calibration. Development sites must be removed before release.",
+  "_note": "355 E/F/G development, contract v0.6 and #620 review. Existing floor/rock energy and picks stay in p0_content; existing monsters and combat/weapon keys stay in mine_p1. Vein main weights 25 from F1 and 40 from F10 follow Li Bai calibration v4q(5) 4ee5e8d5. The vein homestead gate 8 is option B, pending the user's choice; remove gate for option A (available from the start). Other numbers remain provisional pending v4q(5-7) approval/calibration. Development sites must be removed before release.",
   "mine": {
     "combat": {
       "ko_keep_from": 11,
@@ -348,7 +348,7 @@
         "main_weight": [
           [
             1,
-            10
+            25
           ],
           [
             10,

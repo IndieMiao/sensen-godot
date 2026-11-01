@@ -87,11 +87,13 @@ describe('355 E deterministic content (cases 1-3,5)', () => {
     expect(viewOf(x.c, x.s, x.now).mine.at!.next).toMatchObject({ floor: 41, locked: 'not_open', open: true });
     expect(x.fail({ type: 'mine_floor', to: 41 })).toMatchObject({ code: 'bad_floor', detail: { not_open: true } });
   });
-  it('main ore threshold and torch deck counts follow content/site data', () => {
-    const x = scenario(), site = structuredClone(mineSite(x.c, V)!); site.mine.main_from = 7;
+  it('main ore thresholds follow the weight table rather than site display metadata; torch counts match the deck', () => {
+    const x = scenario(), site = structuredClone(mineSite(x.c, V)!); site.mine.main_from = 99;
+    x.c.mine.types.vein.main_weight = [[1, 13], [7, 31], [15, 52]];
     const before = floorSpec(x.c, site, 6, 'p', 'd'), after = floorSpec(x.c, site, 7, 'p', 'd');
     expect(before.drops.find(([id]) => id === site.mine.main)![1]).toBe(x.c.mine.types.vein.main_weight![0][1]);
     expect(after.drops.find(([id]) => id === site.mine.main)![1]).toBe(x.c.mine.types.vein.main_weight![1][1]);
+    expect(floorSpec(x.c, site, 15, 'p', 'd').drops.find(([id]) => id === site.mine.main)![1]).toBe(x.c.mine.types.vein.main_weight![2][1]);
     x.start(); x.s.bag.push({ id: 'torch', qty: 1 }); x.send({ type: 'mine_torch', floor: 1 });
     const view = viewOf(x.c, x.s, x.now).mine.at!.floor_state;
     const deck = floorSpec(x.c, mineSite(x.c, Q)!, 1, x.s.player, x.s.mine.day!.key).deck;
@@ -168,7 +170,7 @@ describe('355 E progression, fees and exits (cases 4,6-9,12a,15,18-19)', () => {
       x.start(Q, 10); x.kill(0);
       const kind = x.c.mine.types.quarry.floors['10'].guard!, def = x.c.mine.monsters[kind];
       expect(x.s.mine.records[Q].guards).toEqual([10]); expect(x.s.kills[kind]).toBe(1);
-      expect(x.s.guard_firsts[kind]).toMatchObject({ mine: Q, floor: 10 });
+      expect(x.s.guard_firsts[kind]).toMatchObject({ mine: Q, floor: 10, home: x.s.travel.home });
       for (const [id, qty] of def.first!) expect(count(x.s.bag, id)).toBe(qty);
       expect(count(x.s.bag, 'copper_ore')).toBe(def.pack![1]);
       notePresence(x.c, x.s, 'map', x.now, null); x.send({ type: 'mine_enter', mine: Q, floor: 10 });

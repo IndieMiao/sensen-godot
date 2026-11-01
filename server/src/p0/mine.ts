@@ -51,7 +51,7 @@ export function floorSpec(c: P0Content, site: MineSite, floor: number, player: s
   const drops: [string | null, number][] = band.drops.map(([id, weight]) => [id, weight]);
   if (site.mine.main && type.main_weight?.length) {
     let weight = type.main_weight[0][1];
-    for (const [from, w] of type.main_weight) if (floor >= (from === 1 ? 1 : site.mine.main_from)) weight = w;
+    for (const [from, w] of type.main_weight) if (floor >= from) weight = w;
     const existing = drops.find(([id]) => id === site.mine.main);
     if (existing) existing[1] += weight; else drops.push([site.mine.main, weight]);
   }
@@ -272,7 +272,7 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
     if (def.guard) {
       const first = !s.guard_firsts[kind];
       if (first) {
-        s.guard_firsts[kind] = { at: now, mine: site.id, floor: at.floor };
+        s.guard_firsts[kind] = { at: now, mine: site.id, floor: at.floor, home: s.travel.home };
         for (const [id, qty] of def.first ?? []) giveLoot(c, s, id, qty, events, i);
       }
       if (def.pack) {

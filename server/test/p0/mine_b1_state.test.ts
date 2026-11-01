@@ -12,7 +12,7 @@ describe('355 E/F/G v7 field initializers (contract v0.1 section 3)', () => {
     const a = freshMineB1Fields(), b = freshMineB1Fields();
     a.mine.records['wd-dev-quarry'] = { deepest: 10, guards: [10], first_at: 1000 };
     a.kills.mob_slime = 3;
-    a.guard_firsts.boss_slime_king = { at: 2000, mine: 'wd-dev-quarry', floor: 10 };
+    a.guard_firsts.boss_slime_king = { at: 2000, mine: 'wd-dev-quarry', floor: 10, home: 'gn-5391959' };
     const first = freshMineB1Weapons('weapon_wooden_sword'), second = freshMineB1Weapons('weapon_wooden_sword');
     first.weapons.push('weapon_copper_sword');
     first.weapon = 'weapon_copper_sword';
@@ -59,7 +59,7 @@ describe('355 E/F/G v7 field initializers (contract v0.1 section 3)', () => {
     const fields = freshMineB1Fields();
     fields.mine.records['wd-dev-vein'] = { deepest: 20, guards: [20], first_at: 1000 };
     fields.kills.boss_slime_king_iron = 1;
-    fields.guard_firsts.boss_slime_king_iron = { at: 2000, mine: 'wd-dev-vein', floor: 20 };
+    fields.guard_firsts.boss_slime_king_iron = { at: 2000, mine: 'wd-dev-vein', floor: 20, home: 'gn-5391959' };
     fields.mine.day = { key: '2026-11-02', at: { mine: 'wd-dev-vein', floor: 20 }, hp: 76, floors: {}, picked: [] };
     const permanent = structuredClone({ records: fields.mine.records, kills: fields.kills, firsts: fields.guard_firsts });
     fields.mine.day = null;

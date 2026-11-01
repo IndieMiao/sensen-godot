@@ -127,7 +127,7 @@ export interface MineB1State {
 export interface MineB1PlayerFields {
   mine: MineB1State;
   kills: Record<string, number>;
-  guard_firsts: Record<string, { at: number; mine: string; floor: number }>;
+  guard_firsts: Record<string, { at: number; mine: string; floor: number; home: string }>;
 }
 export interface MineB1WeaponState { weapons: string[]; weapon: string }
 /** Merged into P0Day by the v7 skeleton; keyed by monster kind, only used by content with once_a_day. */
@@ -221,7 +221,7 @@ export interface P0State {
   gear: { rods: string[]; rod: string; hoes: string[]; hoe: string; picks: string[]; pick: string;   // Tools & Gear: owned and equipped rod / hoe / pickaxe (no bag slots)
     weapons: string[]; weapon: string };   // v7 (355 G): the weapon slot, owned and held; a new save has the Wooden Sword
   kills: Record<string, number>;   // v7 (355 E/F, plan §3.6): monsters beaten, by kind (the second batch's bestiary reads it)
-  guard_firsts: Record<string, { at: number; mine: string; floor: number }>;   // v7: each guard kind's first fall to this player
+  guard_firsts: Record<string, { at: number; mine: string; floor: number; home: string }>;   // home is captured at the first kill, never inferred after a home change
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client

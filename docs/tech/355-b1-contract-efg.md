@@ -1,5 +1,7 @@
 # 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.6（周瑜 11-02）
 
+> **#620 审核修订（待周瑜复看）**：按后裔 6562021020、奕星转达，矿脉权重档位直接读 `main_weight[].from`；`guard_firsts` 加首杀当时的家城 `home`，之后换家和重复击杀不覆盖。
+
 > 给：苏烈（E / F / G 服务端）、刘邦（F / G 客户端）、亚瑟（矿口卡、审客户端 PR）、后裔（审服务端规则层 PR）、上官婉儿（怪物文件）。
 > 依据：方案 `355-gameplay-v4-2026-11-02.md` 第 3 章（3.2 清怪开梯子、3.3、3.5 怪物与守关表、3.6、3.8、3.11）、9.1 #8–#10；亚瑟的 `355-b1-tech-plan-2026-11-02.md`；后裔的 C 接口 `/Volumes/ACASIS/tmp/houyi-355/contract-c-v0.md`；上官婉儿的 3D 接口 v1（`355-b1-3d-plan-2026-11-02.md` 第 6 节）。代码按 farm-dev b2c46d3b 核过。
 > **数值都是初值**，李白用模拟器校准，q 行 E / F / G 定稿后只改 json。标「默认」的规则是我先定的，q 行另有定就照 q 行改。
@@ -176,7 +178,7 @@
 - 浅坑 F5–9 照 v4 3.5：史莱姆固定 2 只、蝙蝠 1–2 只（答苏烈 ②，和 v4q(5) 一致）。
 - **精英史莱姆不再掉石英**（冲突清单第 3 节 §10.7「石英只在矿脉」，以 v4 为准），也不再有「每天第一次掉石英」。替代掉落：铜矿石 ×2、每次必掉（初值，v4q(6)(7) 复核 ⑦）。`once_a_day` 这个机制服务端照旧支持，用不用由数据定。
 - 史莱姆的掉落照现行，不改：铜 1（权重 35）、岩盐 1（25）、蚯蚓 3（40）。就是 `mine_p1.json` 现在写的那份（v4q(6)(7) 复核 ⑤）。
-- 矿脉的主矿：掉落表里没写主矿，按 `main_weight` 加进去：F1 起权重 25（v0.6，李白校准 v4q(5) 4ee5e8d5；原来是 10），到 C 给的 `main_from`（矿脉是 F10）起改为 40。第二档从哪层起，读的是 C 的 `main_from`，表里的 10 只是写出来方便看，改它不起作用。浅坑的 `main` 是 null，不加主矿（五样已经在本段 `drops` 里）。
+- 矿脉的主矿：掉落表里没写主矿，按 `main_weight` 加进去：F1 起权重 25（v0.6，李白校准 v4q(5) 4ee5e8d5；原来是 10），F10 起 40。每档起始层直接读表里的 `from`，不再用 C 的 `main_from` 覆盖；`main_from` 仍是矿口展示的主产起始层数据。浅坑的 `main` 是 null，不加主矿（五样已经在本段 `drops` 里）。
 - **副产**：C 的 `site.mine.side` 是序号（0 到 sides−1，#616），不是物品 id。第一批掉不掉〔待用户定〕；要掉的话，在 `types.<type>.sides: [物品, …]` 里按序号换成物品，再加进本段 `drops`。没有 `sides` 就不掉。
 - `fee_per_day`：第一批只能是 `true`，表示每层每天第一次进收 `floor_energy`。`false` 没有定义收费口径，服务端加载内容时遇到它就报错；q 行如果改了口径，先改本文件再实现。
 - 矿脉的门槛 `gate.homestead: 8` 照 v4 2.7。冲突清单第 2 节有人提议「开局就能去」，未确认，所以写成数据：改它不用改代码。
@@ -209,12 +211,13 @@ export type MineNotice = { kind: 'reset'; at: number; floor: number } | { kind: 
 // P0State 里：
 //   mine: MineState;                                      // 取代旧的 MineState（run、count、express、elite、completed 都删）
 //   kills: Record<string, number>;                        // 按种的击杀数（方案 3.6，第二批成就回填）
-//   guard_firsts: Record<string, { at: number; mine: string; floor: number }>;   // 每种守关个人第一次打倒
+//   guard_firsts: Record<string, { at: number; mine: string; floor: number; home: string }>;   // 每种守关个人第一次打倒；home是当时s.travel.home的快照
 //   gear: { …现有; weapons: string[]; weapon: string };   // 起始 ['weapon_wooden_sword'] / 'weapon_wooden_sword'
 //   day.mine_runs 删掉
 ```
 - freshState 直接是这个形状（亚瑟的 v7 骨架会合进同一处）。不写迁移，v<7 按没有存档处理（亚瑟的方案 4.2）。
 - `once_a_day` 掉落的计数（数据里有才用）放 `day`：`s.day.once: Record<kind, number>`。
+- `guard_firsts[kind].home` 只在首次打倒该种守关时记下，不随玩家换家城、重复击杀或重启改写；不拿当前家城回填此前缺失的历史首杀。
 
 ## 4. 层生成（服务端，确定性）
 ```
@@ -482,7 +485,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 6. 入层费：今天第一次进一层扣 2；同一天再进不扣；换日以后再扣。
 7. 纪录：进更深的层就更新 deepest 并发 `mine_record`；资历是所有矿 deepest 的最大值。
 8. 电梯：站是 ≤ deepest 的 10 的倍数（不含 F1）；从 F1 或站点出发才能坐；从别的层坐、或去非站点，都回 `bad_floor`；只扣目标层的入层费（今天没进过才扣）；view 的 `stations[].paid` 和这一致。
-9. 守关：打倒以后 `guards` 记下这一层；第一次打倒必掉王冠碎片并写 `guard_firsts`，第二次不掉；每次都有主产包（浅坑铜矿石 ×5，矿脉是 `main` ×5，都从内容表读）；在这座矿打过以后，再进这一层就没有守关。
+9. 守关：打倒以后 `guards` 记下这一层；第一次打倒必掉王冠碎片并写 `guard_firsts`（含当时的家城home），第二次不掉；换家城及读档不改写首杀快照。每次都有主产包（浅坑铜矿石 ×5，矿脉是 `main` ×5，都从内容表读）；在这座矿打过以后，再进这一层就没有守关。
 10. 伤害：木剑或铜剑打 T2 守关 = ⌈攻击 × under_tier⌉（初值下木剑 2、铜剑 3，测试从内容表读倍数）；铁剑打 T2 全额；硬直的岩甲虫 ×2；`stunned` 里放了不在 targets 里、或不是岩甲虫的下标，不加倍。
 11. 出手节奏：间隔小于 `1000 / speed × 0.9` ms 的一下作废；一下打中超过 4 只只算前 4 只。
 12. 倒地：F1–10 不扣东西；F11 起扣掉本层捡到的一半，向下取整；人回到矿口，`notice.ko` 写清楚丢了什么。

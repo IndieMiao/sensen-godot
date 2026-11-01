@@ -4,11 +4,48 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
+import { notePresence } from '../../src/p0/presence.js';
+import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 
 describe('355 E day-token HTTP and persisted mine state', () => {
+  it('persists the home at the first guard kill and never rewrites it after moving home or killing that kind again', () => {
+    const c = loadP0Content(), player = 'mine-first-home-test', mine = 'wd-dev-quarry';
+    const dir = mkdtempSync(path.join(tmpdir(), 'sulie-mine-home-')), file = path.join(dir, 'state.json');
+    let now = Date.UTC(2026, 10, 2, 2), s = freshState(c, player, now);
+    s.created_at = now - 30 * 86400000;
+    s.mine.records[mine] = { deepest: 20, guards: [], first_at: now };
+    const home = s.travel.home;
+    const send = (cmd: Record<string, unknown>) => {
+      now += 1000;
+      const r = applyP0(c, s, { space: 'mine', day: s.mine.day?.key, ...cmd } as P0Command, now);
+      if (!r.ok) throw new Error(r.code);
+      s = r.state;
+    };
+    const kill = (floor: number) => {
+      send({ type: 'mine_enter', mine, floor });
+      while (s.mine.day!.floors[`${mine}:${floor}`].mobs[0] > 0) send({ type: 'mine_attack', floor, targets: [0] });
+    };
+    try {
+      kill(10);
+      const kind = c.mine.types.quarry.floors['10'].guard!;
+      const first = { at: now, mine, floor: 10, home };
+      expect(s.guard_firsts[kind]).toEqual(first);
+      const store = new P0Store(c, file); store.put(s);
+      s = new P0Store(c, file).peek(player)!;
+      expect(s.guard_firsts[kind]).toEqual(first);
+      notePresence(c, s, 'map', now, null);
+      s.travel.home = 'gn-1796236'; s.travel.here = s.travel.home;
+      expect(s.travel.home).not.toBe(home);
+      kill(20);
+      expect(s.kills[kind]).toBe(2);
+      expect(s.guard_firsts[kind]).toEqual(first);
+      store.put(s);
+      expect(new P0Store(c, file).peek(player)!.guard_firsts[kind]).toEqual(first);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
   it('refuses an old-day action, persists only the day reset, survives restart and exits without losing records', async () => {
     const c = loadP0Content(); c.profile.timezone = 'Asia/Shanghai';
     const dir = mkdtempSync(path.join(tmpdir(), 'sulie-mine-b1-')), file = path.join(dir, 'state.json');
