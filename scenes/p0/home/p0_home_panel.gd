@@ -64,13 +64,14 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		var needs := VBoxContainer.new()
 		needs.add_theme_constant_override(&"separation", 10)
 		needs.add_child(UiKit.label("Needs", UiTokens.STYLE_C12_XB))
-		var tiles: Array = []
+		var groups := [[], [], []]
 		for t in model.tiles:
-			var tile := UiNeedTile.new(str(t.name), int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
+			var tile := HomeNeedTile.new(str(t.name), int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
 			var id := str(t.id)
 			tile.pressed.connect(func(): _source(ui, tile, id))
-			tiles.append(tile)
-		needs.add_child(UiNeedTile.group(tiles))
+			groups[1 if id.begins_with("skill_") else 2 if id in ["stamps", "climates"] else 0].append(tile)
+		for tiles in groups:
+			if not tiles.is_empty(): needs.add_child(_needs_grid(tiles))
 		body.add_child(needs)
 	if not model.changes.is_empty():
 		var changes := VBoxContainer.new()
@@ -115,6 +116,39 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	col.add_child(close)
 	ui._open_modal(panel, 0.3, true)
 	ui.modal_kind = "homestead"
+
+## A1/A2 fix column centres while skills and travel each start a new row.
+static func _needs_grid(tiles: Array) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SIZE_NEED_TILE_GAP_X))
+	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SIZE_NEED_TILE_GAP_Y))
+	for tile in tiles: grid.add_child(tile)
+	while grid.get_child_count() % 4 != 0:
+		var spacer := Control.new()
+		spacer.custom_minimum_size.x = UiTokens.SIZE_NEED_TILE_RING_L
+		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		grid.add_child(spacer)
+	return grid
+
+class HomeNeedTile extends UiNeedTile:
+	func _ready() -> void:
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		resized.connect(_fit_label)
+		_fit_label.call_deferred()
+
+	func _get_minimum_size() -> Vector2:
+		return Vector2(ring_side(), super._get_minimum_size().y)
+
+	func _fit_label() -> void:
+		var labels := [_name, _have, _need]
+		var natural := 3.0
+		for label in labels:
+			natural += label.get_theme_font(&"font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
+		var font_size := mini(12, maxi(1, floori(12.0 * maxf(1.0, size.x - 3.0) / maxf(1.0, natural - 3.0))))
+		for label in labels: label.add_theme_font_size_override(&"font_size", font_size)
+		(get_child(0) as Control).size = size
 
 ## FADE_H over the scroll's bottom edge, shown while the scroll can still go down.
 static func _fade(scroll: ScrollContainer) -> Control:

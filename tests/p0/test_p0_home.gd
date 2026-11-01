@@ -35,7 +35,7 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Need 40 more coins")
 	v.homestead.next.coins.have = 440
 	v.homestead.next.skills[0].have = 4
-	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Fishing Lv5 needed · now 4")
+	assert_str(str(P0Logic.home_panel(v).reason)).is_equal("Need Fishing Lv5")
 	v.homestead.next.skills[0].have = 5
 	var ready := P0Logic.home_panel(v)
 	assert_str(str(ready.reason)).is_equal("")
@@ -320,7 +320,7 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
 	rt._on_refused("skills_short", {"skill": "fishing", "need": 5, "have": 4}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Fishing Lv5 needed · now 4")   # never "Can't do that (skills_short)"
+	assert_str(rt.ui.toast_text()).is_equal("Need Fishing Lv5")   # never "Can't do that (skills_short)"
 	rt._on_refused("max_level", {"level": 3}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Highest level for now")
 

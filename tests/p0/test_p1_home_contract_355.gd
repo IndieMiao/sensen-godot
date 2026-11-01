@@ -35,22 +35,24 @@ func test_separate_skill_and_travel_tiles_and_first_gap_follow_contract_order() 
 	var p := P0Logic.home_panel(v)
 	assert_array(p.tiles.map(func(t): return t.id)).is_equal(["wood","coins","skill_farming","skill_fishing","skill_cooking","stamps","climates"])
 	assert_array(p.tiles.slice(2,5).map(func(t): return t.icon)).is_equal(["hoe","rod","pot"])
-	assert_str(p.reason).is_equal("Fishing Lv3 needed · now 2")
+	assert_str(p.reason).is_equal("Need Fishing Lv3")
 	v.homestead.next.materials[0].have=2
+	assert_str(P0Logic.home_panel(v).reason).is_equal("Need Fishing Lv3")
+	v.homestead.next.coins.have=100
+	assert_str(P0Logic.home_panel(v).reason).is_equal("Need Fishing Lv3")
+	v.homestead.next.skills[1].have=3
+	assert_str(P0Logic.home_panel(v).reason).is_equal("Need Cooking Lv2")
+	v.homestead.next.skills[2].have=2
+	assert_str(P0Logic.home_panel(v).reason).is_equal("Need 2 more stamps")
+	v.homestead.next.travel.stamps.have=6
+	assert_str(P0Logic.home_panel(v).reason).is_equal("Need 1 more climate")
+	v.homestead.next.travel.climates.need=3
+	assert_str(P0Logic.home_panel(v).reason).is_equal("Need 3 more climates")
+	v.homestead.next.travel.climates.have=3
 	assert_str(P0Logic.home_panel(v).reason).is_equal("Need 4 more Timber")
 	v.homestead.next.materials[0].have=6
-	v.homestead.next.coins.have=100
 	assert_str(P0Logic.home_panel(v).reason).is_equal("Need 20 more coins")
 	v.homestead.next.coins.have=300
-	v.homestead.next.skills[1].have=3
-	assert_str(P0Logic.home_panel(v).reason).is_equal("Cooking Lv2 needed · now 1")
-	v.homestead.next.skills[2].have=2
-	assert_str(P0Logic.home_panel(v).reason).is_equal("6 stamps needed · now 4")
-	v.homestead.next.travel.stamps.have=6
-	assert_str(P0Logic.home_panel(v).reason).is_equal("Visit 1 more climate")
-	v.homestead.next.travel.climates.need=3
-	assert_str(P0Logic.home_panel(v).reason).is_equal("Visit 3 more climates")
-	v.homestead.next.travel.climates.have=3
 	assert_str(P0Logic.home_panel(v).reason).is_empty()
 	assert_str(P0Logic.home_panel(v,false).reason).is_equal("At home")
 
@@ -62,7 +64,7 @@ func test_optional_gates_absent_and_fields_and_footer_read_view_values() -> void
 	v.homestead.next.plots=36
 	var p := P0Logic.home_panel(v)
 	assert_array(p.tiles.map(func(t): return t.id)).is_equal(["wood","coins","skill_farming","skill_fishing"])
-	assert_str(p.footer).is_equal("Upgrading is free of Energy · +37 Energy")
+	assert_str(p.footer).is_equal("Upgrading is free of Energy")
 	assert_dict(p.changes[1]).is_equal({icon="field",text="Plots 36",note="now 31"})
 	v.homestead.next.plots=31
 	v.homestead.next.energy_gain=0
@@ -79,7 +81,7 @@ func test_max_and_decor_cap_follow_authoritative_cap_not_level_ten_or_seventeen(
 	assert_array(p.tiles).is_empty()
 	v.homestead.max=19
 	assert_str(P0Logic.home_panel(v).subtitle).is_empty()
-	assert_str(P0Decor.cap_line(v)).contains("Homestead Lv18")
+	assert_str(P0Decor.cap_line(v, {base=20,per_level=4,max=120})).contains("Homestead Lv18")
 	v.homestead.level=19
 	assert_str(P0Decor.cap_line(v)).contains("Store one to place this")
 	assert_bool(P0Logic.home_panel(v).button).is_false()
@@ -115,13 +117,25 @@ func test_unlock_ids_use_existing_icons_and_removed_or_no_row_ids_stay_hidden() 
 		assert_str(P0Logic.home_panel(v).changes[-1].text).is_equal("Healing Potion")
 		assert_str(P0Logic.home_moment(v,{level=4,unlocks=[id]}).detail).is_equal("Healing Potion")
 
-func test_today_remains_early_only_and_requires_every_listed_skill() -> void:
+func test_today_at_every_level_shows_skill_travel_gaps_and_deduplicates_skill_row() -> void:
 	var v := view(1)
 	v.homestead.next.materials=[]
-	assert_dict(P0Logic.homestead_row(v)).is_empty()
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv2 · Fishing Lv3 needed")
+	v.skills.fishing.next=80
+	assert_bool(P0Logic.today_rows(v).any(func(r): return str(r.line).begins_with("Fishing Lv"))).is_false()
 	for s in v.homestead.next.skills:s.have=s.need
 	assert_str(P0Logic.homestead_row(v).row.go).is_equal("sign")
-	v.homestead.level=3
+	v=view(8)
+	v.homestead.next.skills=[{skill="fishing",have=4,need=5}]
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv9 · Fishing Lv5 needed")
+	v=view(16)
+	for s in v.homestead.next.skills:s.have=s.need
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv17 · 2 stamps to go")
+	v.homestead.next.travel.stamps.have=6
+	assert_str(P0Logic.homestead_row(v).row.line).is_equal("Homestead Lv17 · 1 climate to go")
+	assert_str(P0Logic.homestead_row(v).row.dot).is_empty()
+	assert_dict(P0Logic.homestead_row(view(17))).is_empty()
+	v.homestead.next.skills={have=3,need=4}
 	assert_dict(P0Logic.homestead_row(v)).is_empty()
 
 func _ui(v: Dictionary) -> P0Ui:
@@ -134,7 +148,7 @@ func _ui(v: Dictionary) -> P0Ui:
 	ui.set_surface("farm")
 	return ui
 
-func test_all_gate_tiles_wrap_and_skill_source_navigation_returns_to_home() -> void:
+func test_four_column_centres_and_group_rows_and_skill_source_navigation() -> void:
 	var v := view(16)
 	for id in ["stone","fiber","clay","copper_ore","quartz","hardwood","rock_salt","iron_ore","coal"]:
 		v.homestead.next.materials.append({id=id,name=P0Logic.item_name(v,id),need=8,have=2})
@@ -146,6 +160,12 @@ func test_all_gate_tiles_wrap_and_skill_source_navigation_returns_to_home() -> v
 	for tile in tiles:
 		assert_float(tile.get_global_rect().end.x).is_less_equal(ui.root.get_global_rect().end.x)
 		assert_float(tile.size.x).is_greater_equal(tile.get_minimum_size().x)
+	for i in range(4,11):
+		assert_float(tiles[i]._ring.global_position.x).is_equal_approx(tiles[i%4]._ring.global_position.x, 0.5)
+	for i in range(11,14):
+		assert_float(tiles[i]._ring.global_position.x).is_equal_approx(tiles[i-11]._ring.global_position.x, 0.5)
+	assert_float(tiles[14]._ring.global_position.x).is_equal_approx(tiles[0]._ring.global_position.x, 0.5)
+	assert_float(tiles[15]._ring.global_position.x).is_equal_approx(tiles[1]._ring.global_position.x, 0.5)
 	var fishing = tiles.filter(func(t):return t.item_name=="Fishing")[0]
 	fishing.pressed.emit()
 	await await_idle_frame()
@@ -198,8 +218,8 @@ func test_travel_sources_show_map_and_refusal_details_have_readable_copy() -> vo
 	v.homestead.next.travel.climates.have=1
 	rt.session.view=v
 	rt._on_refused("travel_short",{kind="stamps",need=8,have=5},{type="homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("8 stamps needed · now 5")
+	assert_str(rt.ui.toast_text()).is_equal("Need 3 more stamps")
 	rt._on_refused("travel_short",{kind="climates",need=3,have=1},{type="homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Visit 2 more climates")
+	assert_str(rt.ui.toast_text()).is_equal("Need 2 more climates")
 	rt._on_refused("skills_short",{skill="cooking",need=8,have=6},{type="homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Cooking Lv8 needed · now 6")
+	assert_str(rt.ui.toast_text()).is_equal("Need Cooking Lv8")
