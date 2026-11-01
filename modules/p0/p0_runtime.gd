@@ -1525,7 +1525,7 @@ func _on_screen_action(kind: P0SysScreen.Kind) -> void:
 			_maint_left = MAINT_CHECK_S
 			if not session.busy: session.refresh()
 		P0SysScreen.Kind.UPDATE:
-			if _block_url != "": OS.shell_open(_block_url)
+			if _block_url != "": ExternalLink.open(_block_url)
 
 ## A P0 world AppRouter opened under the scene cover: the cover stays until its first read answers (q(78)). The
 ## launch cover has the very first world; a world that is not the one the cover was for leaves it alone.

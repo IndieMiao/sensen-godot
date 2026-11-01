@@ -64,8 +64,13 @@ func test_tapping_it_asks_the_page_to_open() -> void:
 	var page := await _page()
 	var hits := []
 	page.voice_pressed.connect(func(): hits.append(true))
+	var asked := ExternalLink.asked.size()
 	(page.find_child("VoiceProfileRow", true, false) as UiNavButton).pressed.emit()
 	assert_int(hits.size()).is_equal(1)
+	# no WebView plugin here: the page's address goes to ExternalLink, recorded and never opened in a test run (it
+	# opened the desktop's browser on every run until 11-01)
+	assert_array(ExternalLink.asked.slice(asked)).is_equal([VoiceMatchLink.url_for("solo", VoiceMatchLink._base_url())])
+	assert_int(ExternalLink.shell_opens).is_equal(0)
 
 func test_back_is_the_pages_while_it_is_up_and_for_the_press_that_closed_it() -> void:
 	await _page()
