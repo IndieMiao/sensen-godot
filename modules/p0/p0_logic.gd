@@ -960,7 +960,8 @@ static func freeze(x) -> void:
 
 ## Locally advance a view by elapsed ms (energy ticks and crop timers) between server refreshes.
 ## SGODOT-260 Q3: only the parts that age are copied (energy, plots, the guide row, the stoves, the cast and traps, the
-## inbox parcels); everything else is the server view's own, shared — callers read the result, never write into it.
+## inbox parcels, Rest, the residents' next requests, the keepers' and boards' refills); everything else is the server
+## view's own, shared — callers read the result, never write into it.
 static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	if elapsed_ms <= 0: return view
 	var v := view.duplicate(false)
@@ -1043,7 +1044,55 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 			parcels.append(parcel)
 		own.call(v, "inbox")["parcels"] = parcels
+	# SGODOT-377: Rest's 2 h away and day reset, a resident's next request, the keepers' and boards' refills count down
+	# between reads too (the 30 s refresh moved them a minute at a time; the open bench card not at all)
+	var rest = v.get("rest", null)
+	if rest is Dictionary:
+		var r: Dictionary = own.call(v, "rest")
+		for key in ["away_ready_in", "resets_in"]:
+			if r.get(key, null) != null: r[key] = maxf(0.0, float(r[key]) - elapsed_ms)
+	var residents = v.get("residents", null)
+	if residents is Dictionary and residents.values().any(func(r): return r is Dictionary and r.get("next_in", null) != null):
+		var rs: Dictionary = own.call(v, "residents")
+		for id in rs.keys():
+			if rs[id] is Dictionary and rs[id].get("next_in", null) != null:
+				var r: Dictionary = rs[id].duplicate()
+				r["next_in"] = maxf(0.0, float(r.next_in) - elapsed_ms)
+				rs[id] = r
+	var keepers = v.get("keepers", null)
+	if keepers is Dictionary:
+		for k in ["post", "market"]:
+			if keepers.get(k) is Dictionary and keepers[k].get("refill_in", null) != null:
+				var kd: Dictionary = own.call(own.call(v, "keepers"), k)
+				kd["refill_in"] = maxf(0.0, float(kd.refill_in) - elapsed_ms)
+	var boards = v.get("boards", null)
+	if boards is Dictionary:
+		for b in boards:
+			var slots = boards[b].get("slots", null) if boards[b] is Dictionary else null
+			if not (slots is Array and slots.any(func(sl): return sl is Dictionary and sl.get("refill_in", null) != null)): continue
+			var aged: Array = []
+			for sl in slots:
+				if sl is Dictionary and sl.get("refill_in", null) != null:
+					sl = sl.duplicate()
+					sl["refill_in"] = maxf(0.0, float(sl.refill_in) - elapsed_ms)
+				aged.append(sl)
+			own.call(own.call(v, "boards"), b)["slots"] = aged
 	return v
+
+## SGODOT-377: ms until the first countdown in this server view that a read changes runs out — a resident's next request
+## opens, a keeper's or board's slot refills — or -1 for none. Rest's need no read: the bench opens on the projection.
+static func next_expiry(view: Dictionary) -> float:
+	var ins: Array = []
+	var of := func(key: String) -> Array: return view[key].values() if view.get(key) is Dictionary else []
+	for r in of.call("residents"):
+		if r is Dictionary and r.get("next_in", null) != null: ins.append(float(r.next_in))
+	for k in of.call("keepers"):
+		if k is Dictionary and k.get("refill_in", null) != null: ins.append(float(k.refill_in))
+	for b in of.call("boards"):
+		for sl in (b.slots if b is Dictionary and b.get("slots") is Array else []):
+			if sl is Dictionary and sl.get("refill_in", null) != null: ins.append(float(sl.refill_in))
+	ins = ins.filter(func(ms): return ms > 0.0)
+	return ins.min() if not ins.is_empty() else -1.0
 
 ## LOCK-14 / q(87): one InboxNotice card (BAG-5-2) for the rewards of one server reply that did not fit the bag, {} when
 ## there is nothing to say: {title, item, quantity, line} for UiInboxNotice. The card speaks of the first parcel: its

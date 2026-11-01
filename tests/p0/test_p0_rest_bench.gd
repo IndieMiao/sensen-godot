@@ -57,3 +57,36 @@ func test_used_today() -> void:
 	assert_str(s.note).is_equal("Available again in 9h 12m")   # to the 04:00 reset, as the mine's `Resets in` (q(96))
 	assert_str(P0Logic.rest_state(_view({"used": 1, "resets_in": 2_520_000})).note).is_equal("Available again in 42m")   # q(97): not `42:00`
 	assert_bool(s.can_rest).is_false()
+
+static func _tips() -> String: return "user://test_p0_rest_bench_%d.json" % OS.get_process_id()
+static func _store() -> String: return "user://test_p0_rest_bench_bar_%d.json" % OS.get_process_id()
+
+func after_test() -> void:
+	for f in [_tips(), _store()]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
+
+func _sheet_texts(ui: P0Ui) -> Array:
+	return ui.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+
+## SGODOT-377: the open bench card follows the view — its countdown ticks in place, and when the 2 h come round its
+## button turns from Not yet to Rest without closing it.
+func test_the_open_card_counts_down_and_opens() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = _store()
+	ui.tips_path = _tips()
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view({"away_ready_in": 7020000}, 50))
+	ui.open_rest_card()
+	await await_idle_frame()
+	assert_array(_sheet_texts(ui)).contains(["Rest · back after 2h away · 1h 57m to go"])
+	ui.set_view(P0Logic.project(_view({"away_ready_in": 7020000}, 50), 60000.0))
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("rest")
+	assert_array(_sheet_texts(ui)).contains(["Rest · back after 2h away · 1h 56m to go"])
+	assert_array(_sheet_texts(ui)).not_contains(["Rest · back after 2h away · 1h 57m to go"])
+	ui.set_view(_view({"away_ready_in": 0}, 50))
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("rest")
+	var buttons := ui.find_children("*", "", true, false).filter(func(n): return n is UiCommandButton)
+	assert_int(buttons.size()).is_equal(1)
+	assert_bool((buttons[0] as UiCommandButton).reason == "").is_true()   # the Rest button, not the grey Not yet
