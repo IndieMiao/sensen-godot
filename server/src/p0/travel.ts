@@ -21,7 +21,7 @@ export interface TravelState {
   visits: Record<string, TravelVisit>;           // per cluster reached by travel (home not included)
   stamps: TravelStamp[];                         // first-visit order
   fallback: { near3: string[]; near10: string[] };   // frozen when the block is made (§11.2.3); empty until clusters load
-  wild_near3: string[];                          // v7 (355 C, plan §1.5): the three wild sites nearest home's base (q(184), as fallback.near3), free forever; frozen when the home is picked or changed; [] until wild.ts fills it
+  wild_near3?: string[];                         // v7 (355 C, plan §1.5): the three wild sites nearest home's base (q(184), as fallback.near3), free forever; frozen when the home is picked or changed; absent until then, and wild.ts works them out from home (wildNear3)
   explorer: number;                              // the highest Explorer medal granted: 0 / 3 / 10 / 30 / 100
   // Choosing a home (q(160)–q(163), SGODOT-303): optional, no save version. A save without them chose San Francisco
   // and farms at content.profile.farm_at (q(163) ③).
@@ -96,7 +96,7 @@ export function fallbackOf(c: P0Content, home: string): { near3: string[]; near1
  * the pick (SGODOT-303: only a client that can show it, so an older one's new player is San Francisco's, q(163) ⑤). */
 export const freshTravel = (c: P0Content, pending = false): TravelState => {
   const home = writtenCluster(c);
-  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), wild_near3: [], explorer: 0, ...(pending ? { pending: true as const } : {}) };
+  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), explorer: 0, ...(pending ? { pending: true as const } : {}) };
 };
 
 /** The climate zone (`Temperate`, as profile.climate) of a place's city, or of the city the player is in; home's when

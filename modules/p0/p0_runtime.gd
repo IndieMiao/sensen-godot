@@ -14,7 +14,6 @@ extends Node
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
-const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
@@ -675,9 +674,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
-	# A barter (q(166) ⑤): one Success toast `+1 Stone · −2 Pumpkin` says both sides, in place of the item floats
-	var barter_toast := P0Barter.toast(v, events)
-	if barter_toast != "": ui.toast_success(barter_toast)
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		if hushed.call(ev): continue
@@ -794,7 +790,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if P0Decor.is_decor(iid) and int(ev.delta) > 0:   # bought at the stall, into Farm Storage (SGODOT-284)
 					ui.toast_decor_bought(iid)
 					continue
-				if barter_toast != "": continue   # a barter says both sides in its toast, below (q(166) ⑤)
 				# where a collected dish went (the kitchen's Keep toast); what a pot took (Cook All floats it, q(124))
 				if iid.begins_with("dish_") or int(ev.delta) < 0: _call("p0_event", [ev, v])
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
@@ -1905,10 +1900,7 @@ func _dev_shot(dt: float) -> void:
 			"biteboard": ui.open_bite_board(P0Outposts.by_role("tackle"))   # the home tackle shop's Bite Board (its keeper's line)
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
-			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)
-				var row := ui.root.find_child("Barter_" + step[1], true, false) as UiShopRow
-				if row and row.buy: row.buy.activated.emit()
-			"scrollto":   # scrollto:Barter — the scroll holding that node brings it to its top (q(166) shots)
+			"scrollto":   # scrollto:<node name> — the scroll holding that node brings it to its top (q(166) shots)
 				var at := ui.root.find_child(step[1], true, false) as Control
 				var sc: Node = at.get_parent() if at else null
 				while sc != null and not (sc is ScrollContainer): sc = sc.get_parent()

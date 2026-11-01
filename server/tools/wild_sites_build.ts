@@ -5,6 +5,9 @@
  *   npx tsx tools/wild_sites_build.ts --land <ne_10m_land.geojson> --lakes <ne_10m_lakes.geojson> --countries <ne_10m_admin_0_countries.geojson>
  *     [--glaciers <ne_10m_glaciated_areas.geojson>]   (counts the sites on ice for the review)
  *
+ * Run tools/gather_points_build.ts first: a city's gathering points keep their words and the wild sites nearest it take
+ * others (v4q(4) f77fd19b).
+ *
  * The world's seed and revision stamp the table (src/p0/wild.ts refuses another world's). Rules and numbers: world_gen.json
  * `wild` (see its _note) and tools/wild_sites_lib.ts.
  */
@@ -42,7 +45,14 @@ lap(`${sites.length} sites placed`);
 drawTypes(cfg, world.seed, sites);
 const short = guarantee(cfg, world.seed, sites, clusters);
 lap(`guarantees (${short.length} short)`);
-nameSites(cfg, world.seed, sites, cfg.words);
+// the city gathering points' words, by cluster: theirs first (v4q(4) f77fd19b); made before this by tools/gather_points_build.ts
+const reserved = new Map<string, Set<string>>();
+try {
+  const g = JSON.parse(readFileSync(path.join(ROOT, 'server/data/gather_points.json'), 'utf8')) as { fields: string[]; rows: unknown[][] };
+  const [gc, gw] = [g.fields.indexOf('cluster'), g.fields.indexOf('word')];
+  for (const r of g.rows) (reserved.get(r[gc] as string) ?? reserved.set(r[gc] as string, new Set()).get(r[gc] as string)!).add(r[gw] as string);
+} catch { console.log('WARNING: no server/data/gather_points.json — the wild names do not keep clear of the gathering points\''); }
+nameSites(cfg, world.seed, sites, cfg.words, reserved);
 lap('named');
 
 const fields = ['row', 'col', 'lat', 'lng', 'type', 'main', 'side', 'floors', 'coastal', 'near', 'word', 'country'];

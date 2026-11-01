@@ -28,14 +28,14 @@ describe('save v5 (SGODOT-275)', () => {
     expect(SF_FALLBACK.near10).toHaveLength(10);
     const s = freshState(c, 'p0-new', now);
     expect(s.v).toBe(SAVE_VERSION);
-    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, wild_near3: [], explorer: 0 });
+    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
   });
 
   it('a v4 save gains the travel block and nothing else changes', () => {
     const raw = v4();
     const up = upgradeState(c, structuredClone(raw), now);
     expect(up.v).toBe(SAVE_VERSION);   // v5, v6 (q(270)), v7 (355): upgradeState still fills a hand-made old save
-    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, wild_near3: [], explorer: 0 });
+    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
     // v7's own fields (355): the weapon slot, kills and guard firsts, filled empty
     expect(up.gear.weapons).toEqual([START_WEAPON]);
     expect(up.kills).toEqual({});

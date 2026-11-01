@@ -2560,8 +2560,6 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 		# (item_info_rules.json; SGODOT-358: Sell All went unanswered)
 		&"sell", &"sell_all": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
 		&"drink": command.emit({"type": "drink", "item": id, "shop": role})
-		# q(166): 2 regional items for 1 mineral; the server reads the climate where the player stands
-		&"barter": command.emit({"type": "barter", "item": str(payload.get("item", "")), "mineral": id, "shop": role})
 		&"lock", &"unlock": command.emit({"type": String(action), "item": id})
 		_: push_warning("P0 counter: no command for %s" % action)
 

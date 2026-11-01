@@ -9,7 +9,7 @@ import { freshState } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { catalogueOf, parseBbox, useCatalogue, viewport, VIEWPORT_CAP, wildById, wildNearOf } from '../../src/p0/wild.js';
 import { worldOf } from '../../src/p0/world.js';
-import { guarantee, Raster, type Site, type WildConfig } from '../../tools/wild_sites_lib.js';
+import { guarantee, nameSites, Raster, type Site, type WildConfig } from '../../tools/wild_sites_lib.js';
 
 const SF = 'gn-5391959', T = Date.parse('2026-11-02T18:00:00Z'), G = 0.5;
 const TYPES = ['quarry', 'vein', 'geode', 'abyss', 'ruin', 'woodland', 'waterside', 'bloom'];
@@ -69,6 +69,17 @@ describe('the offline catalogue (tools/wild_sites_lib.ts)', () => {
     expect(sites.filter(s => s.type === 'vein').map(s => s.main).sort()).toEqual(['iron_ore', 'quartz']);
     expect(sites.filter(s => s.type === 'quarry' || s.type === 'vein').every(s => s.locked)).toBe(true);
     expect(sites.filter(s => s.type === 'ruin')).toHaveLength(1);
+  });
+
+  it('names the sites nearest a cluster with words its gathering points have not taken, and never twice (v4q(4) f77fd19b)', () => {
+    const sites: Site[] = Array.from({ length: 4 }, (_, i) => ({ id: `wd-200-${i}`, row: 200, col: i, lat: 10, lng: 20 + i * 0.5,
+      type: 'quarry', main: null, side: 0, floors: 25, coastal: false, wet: false, near: 'gn-1', climate: 'temperate', continent: 'asia',
+      country: 'CN', word: '', locked: false }) as Site);
+    const cfg = { type_words: {} } as unknown as WildConfig;
+    nameSites(cfg, 'seed', sites, { Temperate: ['Fox', 'Wolf', 'Boar', 'Stag', 'Owl', 'Hare'] }, new Map([['gn-1', new Set(['Fox', 'Wolf'])]]));
+    const used = sites.map(s => s.word);
+    expect(new Set(used).size).toBe(4);
+    expect(used.some(w => w === 'Fox' || w === 'Wolf')).toBe(false);
   });
 });
 
@@ -146,6 +157,8 @@ describe('the server catalogue (src/p0/wild.ts)', () => {
     expect(body.sites.map((x: { type: string }) => x.type).sort()).toEqual(['quarry', 'vein']);
     expect(body.sites[0]).toMatchObject({ free: true, visited: false, pass_until: null, trip: expect.any(Number) });
     expect((await app.inject({ method: 'GET', url: '/v1/p0/wild?zoom=9', headers })).statusCode).toBe(400);
+    // below the pins' zoom: an empty list, even for a box too wide to read (周瑜 on #616)
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/wild?bbox=-60,-180,60,180&zoom=5', headers })).json()).toEqual({ ok: true, sites: [], capped: false, total: 0 });
     await app.close();
   });
 });
