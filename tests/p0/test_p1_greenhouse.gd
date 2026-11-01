@@ -36,6 +36,13 @@ func test_the_block_and_its_reason_match_the_server() -> void:
 	assert_str(P0FarmFacilities.spot_reason(_view(), _at(5, 3), -1, "greenhouse")).is_equal("Needs 4×4 clear plots")   # off the grid
 	assert_str(P0FarmFacilities.spot_reason(_view(26), a, -1, "greenhouse")).is_equal("Needs 4×4 clear plots")   # row 1 not open yet
 
+## No whole 4×4 open yet (不知火舞 on the grid): placement says `More plots open as your Homestead grows` on entering. In
+## the opening order the first whole block (x 8–14 × y 5–11) opens with bed 31.
+func test_a_whole_block_opens_with_bed_31() -> void:
+	assert_bool(P0FarmFacilities.has_open_block(_view(30))).is_false()
+	assert_bool(P0FarmFacilities.has_open_block(_view(31))).is_true()
+	assert_array(P0FarmFacilities.cover_of(_view(31), _at(2, 1), "greenhouse")).has_size(16)
+
 func test_a_sprinkler_never_goes_under_glass_nor_a_tree() -> void:
 	var v := _view()
 	v.plots[8].greenhouse = true

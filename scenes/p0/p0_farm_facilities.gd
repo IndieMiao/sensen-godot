@@ -354,6 +354,13 @@ static func cover_of(view: Dictionary, plot: int, kind := "sprinkler") -> Array:
 		if id != plot and absi(g.x - at.x) <= 1 and absi(g.y - at.y) <= 1: out.append(id)
 	return out
 
+## Whether the beds open now hold one whole w × h block anywhere (trees and crops in it or not).
+static func has_open_block(view: Dictionary, kind := "greenhouse") -> bool:
+	var size := block_size(kind)
+	for id in P0Garden.plot_count(view):
+		if cover_of(view, id, kind).size() == size.x * size.y: return true
+	return false
+
 ## The plots of a greenhouse's block that are in the way (a crop, a sprinkler, another greenhouse), for the red cells.
 static func blocked_of(view: Dictionary, plot: int, kind: String, moving := -1) -> Array:
 	var block := cover_of(view, plot, kind)
@@ -413,6 +420,9 @@ func _begin(p: Dictionary) -> void:
 		_begin_yard(v)
 		return
 	placing.plot = nearest_spot(v, farm.actor.position, int(p.facility), str(p.kind))
+	# no whole block open on the grid yet (不知火舞 on the grid, SGODOT-355 b1): an Info toast on entering; the cells in the
+	# way still go red as q(130) ④ has it
+	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Homestead grows")
 	_preview = _greenhouse_art(cover_of(v, maxi(0, int(placing.plot)), str(p.kind)), false) if is_block(str(p.kind)) else _sprinkler_art()
 	_preview.name = "PlacementPreview"
 	farm.add_child(_preview)

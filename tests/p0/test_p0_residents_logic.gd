@@ -63,6 +63,27 @@ func test_row_hoe_skips_plots_that_are_not_tilled_and_trims_to_seeds_and_energy(
 	v.bag.slots = [{"id": "seed_radish", "qty": 1}]
 	assert_that(P0Logic.main_action(v, _plot(v, _at(5, 4)), "seed_radish", row).cmd).is_equal({"type": "sow", "plot": _at(5, 4), "seed": "seed_radish"})
 
+## SGODOT-355 b1 (不知火舞 on the grid, as q(130)): annuals stand on at most the level's Plots. A full field greys the key
+## with the count; its toast says what the next level adds (from the content ladder), only the count at the top; a Row
+## Hoe sows only the Plots left.
+func test_a_full_field_greys_sow_with_the_plots_count() -> void:
+	var v := _view()
+	v["homestead"] = {"level": 1}
+	v["garden"] = {"plots": 12, "fields": {"used": 8, "cap": 8}}
+	var a := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish")
+	assert_that([a.verb, a.sub, a.enabled, a.toast]).is_equal(["Sow", "Plots 8/8", false, "Plots 8/8 · Homestead Lv2 adds 2"])
+	v.homestead.level = 15
+	v.garden.fields = {"used": 36, "cap": 36}
+	assert_str(str(P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish").toast)).is_equal("Plots 36/36 · Homestead Lv16 adds 3")
+	v.homestead.level = 17
+	v.garden.fields = {"used": 41, "cap": 41}
+	var top := P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish")
+	assert_that([top.sub, top.toast]).is_equal(["Plots 41/41", "Plots 41/41"])
+	v.garden.fields = {"used": 39, "cap": 41}   # two left: the Row Hoe's three trims to two
+	var row := P0Logic.row_plots(v, _plot(v, _at(2, 4)), 6, 1)
+	assert_that(P0Logic.main_action(v, _plot(v, _at(2, 4)), "seed_radish", row).cmd).is_equal(
+		{"type": "sow", "plots": [_at(2, 4), _at(3, 4)], "seed": "seed_radish"})
+
 func test_starter_hoe_sows_one() -> void:
 	var v := _view()
 	v.gear.hoes[0].equipped = true
