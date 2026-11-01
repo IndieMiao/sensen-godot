@@ -169,7 +169,7 @@ function slotRand(s: P0State, board: BoardId, slot: number, at: number, away = '
   return seededRand(`${s.player}:${board}${away ? `@${away}` : ''}:${slot}:${at}`);
 }
 
-/** Same seeded stream exported by #609; mine generation must not advance the player's shared RNG. */
+/** mulberry32 seeded from a key's FNV-1a hash: its own stream, never shifting the fishing or cooking rolls. */
 export function seededRand(key: string): Rand {
   let h = 2166136261;
   for (const ch of key) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);

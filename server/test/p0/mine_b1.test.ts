@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { count } from '../../src/p0/bag.js';
-import { loadP0Content, type MineSite } from '../../src/p0/content.js';
-import { bagFitsFloor, floorSpec, mineSite, mineView, rockDrop, stations, useMineCatalogue } from '../../src/p0/mine.js';
+import { loadP0Content } from '../../src/p0/content.js';
+import { bagFitsFloor, floorSpec, mineSite, mineView, rockDrop, stations } from '../../src/p0/mine.js';
 import { notePresence } from '../../src/p0/presence.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
@@ -177,8 +177,7 @@ describe('355 E progression, fees and exits (cases 4,6-9,12a,15,18-19)', () => {
     } finally { warn.mockRestore(); }
   });
   it('rejects missing/closed/not-here sites, energy shortages and legacy commands atomically', () => {
-    const x = scenario(), real: MineSite = { ...structuredClone(mineSite(x.c, Q)!), id: 'wd-1-1', open: true };
-    useMineCatalogue(x.c, id => id === real.id ? real : undefined);
+    const x = scenario(), real = [...catalogue(x.c)!.byId.values()].find(site => site.open && site.type === 'quarry')!;
     expect(x.fail({ type: 'mine_enter', mine: 'missing' })).toMatchObject({ code: 'unknown_place' });
     expect(x.fail({ type: 'mine_enter', mine: real.id })).toMatchObject({ code: 'not_here' });
     real.open = false; expect(x.fail({ type: 'mine_enter', mine: real.id })).toMatchObject({ code: 'not_open' });

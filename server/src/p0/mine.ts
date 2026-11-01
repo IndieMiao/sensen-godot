@@ -19,11 +19,9 @@ export type MineCommand =
 const TYPES = new Set(['mine_enter', 'mine_floor', 'mine_rock', 'mine_torch', 'mine_attack', 'mine_pick']);
 export const isMineCommand = (cmd: { type: string }): cmd is MineCommand => TYPES.has(cmd.type);
 
-// Tests may substitute site facts; production resolves C's catalogue before the development fixtures.
-const catalogues = new WeakMap<P0Content, (id: string) => MineSite | undefined>();
-export function useMineCatalogue(c: P0Content, lookup: (id: string) => MineSite | undefined): void { catalogues.set(c, lookup); }
+// Catalogue first; development fixtures never replace an authored wild site.
 export function mineSite(c: P0Content, id: string): MineSite | undefined {
-  const site = catalogues.get(c)?.(id) ?? wildById(c, id);
+  const site = wildById(c, id);
   return site?.mine ? { ...site, mine: site.mine } : c.mine.dev_sites?.find(dev => dev.id === id);
 }
 const cap = (site: MineSite) => Math.min(site.mine.floors, site.mine.open_to ?? site.mine.floors);
