@@ -273,7 +273,7 @@
    "type_words": {"quarry": "Quarry", "vein": "Vein", "geode": "Geode", "abyss": "Abyss", "ruin": "Ruin", "woodland": "Woods", "waterside": "Landing", "bloom": "Meadow"}
   },
   "gather_points": {
-   "_note": "v4q(4) (SGODOT-355, v4 §4.1): the city gathering points' generation parameters. server/tools/gather_points_build.ts places them offline into server/data/gather_points.json (frozen with the wild sites: ids <cluster>~<kind><n>, the cooldowns are kept by id), which only the server reads; the city read (GET /v1/p0/city/:cluster) sends a city's. Cities: San Francisco, the open home cities (home.cities) and each one's nearest 10 (§11.2.3), about 140. Each point on a ring_km round the city's base point (q(184)), dry_m off water (WorldCover; a reed bank within near_water_m of it where it can), apart_m from each other and from_places_m from the city's ponds and outposts. home / other: points of a kind in a home city / any other; t2_with_near3: a home city and its nearest 3 have at least this many hardwood and flax points together, the missing ones going round the 3, nearest first. Names: a word of wild.words by climate band + the kind's word, never twice in a city; the wild sites nearest the city take other words (v4q(4) f77fd19b: build these first, then the wild sites). Counts and yields are first values: v4q(4) settles them.",
+   "_note": "v4q(4) (SGODOT-355, v4 §4.1): the city gathering points' generation parameters (counts per v4q(4) ②: a home city 3 wood and 3 stone, 2 each of reed, clay, herb, hardwood and flax — 16). server/tools/gather_points_build.ts places them offline into server/data/gather_points.json (frozen with the wild sites: ids <cluster>~<kind><n>, the cooldowns are kept by id), which only the server reads; the city read (GET /v1/p0/city/:cluster) sends a city's. Cities: San Francisco, the open home cities (home.cities) and each one's nearest 10 (§11.2.3), about 140. Each point on a ring_km round the city's base point (q(184)), dry_m off water (WorldCover; a reed bank within near_water_m of it where it can), apart_m from each other and from_places_m from the city's ponds and outposts. home / other: points of a kind in a home city / any other; t2_with_near3: a home city and its nearest 3 have at least this many hardwood and flax points together, the missing ones going round the 3, nearest first. Names: a word of wild.words by climate band + the kind's word, never twice in a city; the wild sites nearest the city take other words (v4q(4) f77fd19b: build these first, then the wild sites). Counts and yields are first values: v4q(4) settles them.",
    "ring_km": [1, 5],
    "apart_m": 300,
    "from_places_m": 150,
@@ -285,9 +285,9 @@
    "kinds": {
     "wood": {"tier": "T1", "word": "Grove", "yield": [["wood", 4]], "home": 3, "other": 1},
     "stone": {"tier": "T1", "word": "Rocks", "yield": [["stone", 4]], "home": 3, "other": 1},
-    "reed": {"tier": "T1", "word": "Reed Bank", "yield": [["fiber", 4], ["bait_worm", 2]], "home": 3, "other": 1, "near_water_m": 400},
-    "clay": {"tier": "T1", "word": "Clay Pit", "yield": [["clay", 4]], "home": 3, "other": 1},
-    "herb": {"tier": "T1", "word": "Herb Patch", "yield": [["wild_herb", 4]], "home": 3, "other": 1},
+    "reed": {"tier": "T1", "word": "Reed Bank", "yield": [["fiber", 4], ["bait_worm", 2]], "home": 2, "other": 1, "near_water_m": 400},
+    "clay": {"tier": "T1", "word": "Clay Pit", "yield": [["clay", 4]], "home": 2, "other": 1},
+    "herb": {"tier": "T1", "word": "Herb Patch", "yield": [["wild_herb", 4]], "home": 2, "other": 1},
     "hardwood": {"tier": "T2", "word": "Woods", "yield": [["hardwood", 3]], "home": 2, "other": 0},
     "flax": {"tier": "T2", "word": "Flax Field", "yield": [["flax", 3]], "home": 2, "other": 0}
    }
