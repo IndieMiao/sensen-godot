@@ -2088,6 +2088,20 @@
       "name": "Clay",
       "price": 2
     },
+    "coal": {
+      "name": "Coal",
+      "price": 4
+    },
+    "iron_ore": {
+      "name": "Iron Ore",
+      "price": null,
+      "floor": 5
+    },
+    "flax": {
+      "name": "Flax",
+      "price": null,
+      "floor": 4
+    },
     "wild_herb": {
       "name": "Wild Herb",
       "price": 1,
