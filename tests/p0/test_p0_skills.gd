@@ -128,7 +128,7 @@ func test_close_on_what_the_profile_opened_comes_back_to_the_profile() -> void:
 ## from the homestead the upgrade is greyed with HOME-1's own away wording.
 func test_the_farm_card_opens_home_1_over_the_profile() -> void:
 	var v := _view()
-	v["homestead"] = {"level": 1, "next": {"level": 2, "coins": {"need": 100, "have": 200}, "skills": {"need": 3, "have": 6},
+	v["homestead"] = {"level": 1, "next": {"level": 2, "coins": {"need": 100, "have": 200}, "skills": [{"skill": "fishing", "need": 3, "have": 6}],
 		"materials": [], "energy": 220, "meals": 220, "unlocks": [], "can_upgrade": true}}
 	var ui: P0Ui = await _ui_with_view(v)
 	ui.open_profile()

@@ -12,7 +12,7 @@ func _view() -> Dictionary:
 		"names": {"fish_crucian": "Pond Crucian", "crop_radish": "Radish", "wood": "Timber", "stone": "Stone", "fiber": "Reeds"},
 		"bag": {"capacity": 25, "slots": []},
 		"firsts": ["harvest:crop_radish"],
-		"homestead": {"level": 1, "next": {"level": 2, "coins": {"need": 80, "have": 120}, "skills": {"need": 3, "have": 3},
+		"homestead": {"level": 1, "next": {"level": 2, "coins": {"need": 80, "have": 120}, "skills": [{"skill": "fishing", "need": 3, "have": 3}],
 			"materials": [{"id": "fiber", "name": "Reeds", "need": 3, "have": 0}, {"id": "wood", "name": "Timber", "need": 6, "have": 0},
 				{"id": "stone", "name": "Stone", "need": 4, "have": 0}], "can_upgrade": false}},
 		"gather": {"spots": [
@@ -80,7 +80,7 @@ func test_coins_short_points_at_the_stall_and_lights_nothing() -> void:
 func test_only_skills_short_says_nothing() -> void:
 	var v := _view()
 	v.homestead.next.materials = []
-	v.homestead.next.skills = {"need": 3, "have": 2}
+	v.homestead.next.skills = [{"skill": "fishing", "need": 3, "have": 2}]
 	assert_dict(_home(v)).is_empty()
 	assert_array(_lines(v)).contains(["Fishing Lv2 · 30 XP to go"])   # Today's own skill row says it
 

@@ -413,7 +413,7 @@ const DISH_STANDIN := {
 	"dish_eel_skewers": "dish_mullet_skewers", "dish_herb_salmon": "dish_herb_baked_perch", "dish_pineapple_fish": "dish_bass_tomato_stew",
 	"dish_sweet_potato_cakes": "dish_carrot_cake", "dish_pumpkin_chowder": "dish_fisher_stew", "dish_beet_fish_soup": "dish_fish_soup"}
 
-const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
+const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "bag_upgrade_4": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
@@ -1756,8 +1756,8 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 	var short_coins := int(coins.get("need", 0)) - int(coins.get("have", 0))
 	if short_coins > 0:
 		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
-	var skills: Dictionary = next.get("skills", {})
-	if int(skills.get("have", 0)) < int(skills.get("need", 0)): return {}
+	for skill in next.get("skills", []):
+		if int(skill.get("have", 0)) < int(skill.get("need", 0)): return {}
 	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
 
 ## Where a Homestead material's Show goes (q(255) ②): the spot yielding it that is open and ready; else the mine when it
@@ -2179,18 +2179,24 @@ const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
 	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
 	"big_pot": {"icon": "big_pot", "text": "Big Pot · 2 servings on any stove", "note": ""},   # q(201): a stove switched to it
-	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II · 400 coins"},   # note: bag_tier_note
-	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
-	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III · 1,000 coins"},   # note: bag_tier_note
+	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II"},   # price and note come from the content tier
+	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "three dishes at once"},
+	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III"},
+	"bag_upgrade_4": {"icon": "bag", "text": "Bag Upgrade IV"},
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
-	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
+	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
+	"vein_mines": {"icon": "stone", "text": "Ore Veins", "note": "on the map"},
+	"iron_sword": {"icon": "sword", "text": "Iron Sword", "note": "at the Workbench"},
+	"decor_set_1": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
+	"decor_set_2": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
+	"orchard_10": {"icon": "crop_apple", "text": "Orchard 10/10", "note": "+1 slot"},
+	"sprinklers_12": {"icon": "facility_sprinkler", "text": "Sprinklers 12/12", "note": "+1 sprinkler"},
+	"fourth_stove": {"icon": "kitchen", "text": "Fourth Stove", "note": "four dishes at once"},
 	# Lv7 (P1 exit C18, 李白 q(172)): the orchard and the sprinklers reach their most (perennial_slots 1 + level up to 8,
 	# sprinkler_max 3 + level up to 10), §8.6.2's lines; notes q(172) (李白 fac20ed1, 不知火舞)
 	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": "+1 slot"},
 	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": "+1 sprinkler"},
-	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
-	"plots_48": {"icon": "field", "text": "Plots 48", "note": "8 more to till"},   # Lv7 (q(172)): 40–47 on the field's edge
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
 }
 # Lv8's `stall_upgrade` has no line (不知火舞 on 282, 李元芳's c62a6ed9 ③): the stall is still the crate stand-in, with no
@@ -2224,13 +2230,29 @@ static func _bag_tier(id: String) -> Dictionary:
 		if str(t.get("id", "")) == id: return t
 	return {}
 
+static func bag_upgrade_line(id: String) -> String:
+	var tier := _bag_tier(id)
+	if tier.is_empty(): return str(P1_UNLOCKS.get(id, {}).get("text", ""))
+	return "%s · %d coins" % [str(tier.name), int(tier.price)]
+
+static func homestead_max(view: Dictionary) -> int:
+	return int(view.get("homestead", {}).get("max", content().get("homestead", {}).get("max_level", 1)))
+
+## 355 A: provisional copy from the client checklist, shared by HOME-1 and refusal toasts.
+static func home_gate_gap(kind: String, need: int, have: int) -> String:
+	if kind == "stamps": return "%d stamps needed · now %d" % [need, have]
+	if kind == "climates":
+		var missing := maxi(0, need - have)
+		return "Visit %d more climate%s" % [missing, "" if missing == 1 else "s"]
+	return "%s Lv%d needed · now %d" % [kind.capitalize(), need, have]
+
 ## Homestead looks (§8.3.1, LOOK-PICK, SGODOT-282): content homestead.looks, one stage per look level, its id the
 ## level's unlock id — {id, level, name, a, b}, a timber and b stone (q(112)). HOME-1's icon per stage (Figma 2201:33545).
 const LOOK_ICONS := {"fence": "mailbox", "porch": "door", "kitchen_extension": "kitchen", "master_farmhouse": "home"}
 ## What changes' look row (q(115) ①): `Porch · Timber or Stone` with this note (q(117): `pick when you upgrade` ran past
 ## the row at the frame's size).
 const LOOK_NOTE := "pick one"
-const MAX_LEVEL_LINE := "Max level · Homestead Master"   # Lv10's HOME-1, under the title (q(115) ②)
+const MAX_LEVEL_LINE := "Max level for now"   # 355 A provisional copy; the cap is independent of the Master title
 
 static func look_stages() -> Array:
 	return content().get("homestead", {}).get("looks", [])
@@ -2263,48 +2285,54 @@ static func look_rows(view: Dictionary, at_home := true) -> Array:
 	return out if out.any(func(r): return bool(r.reached)) else []
 
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
-## materials → coins → skills, what changes, and the button (the first gap is written on it). Lv1–10 (P1, SGODOT-282).
+## materials → coins → skills → travel, what changes, and the first gap on the button (355 A view contract).
 ## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, tap, footer, max}
 static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var level := int(h.get("level", 1))
 	var next = h.get("next", null)
 	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
-		"reason": "", "tap": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null,
+		"reason": "", "tap": "", "footer": "Upgrading is free of Energy", "max": next == null,
 		"subtitle": "", "button": true, "looks": look_rows(view, at_home)}
 	if next == null:
-		# Lv10 (q(115) ②): `Max level · Homestead Master` under the title and no Upgrade; P0's cap keeps its grey button.
-		if level >= 10:
+		if level >= homestead_max(view):
 			out.subtitle = MAX_LEVEL_LINE
 			out.button = false
 		else:
 			out.reason = "Highest level for now"
 		return out
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
-	if int(next.level) >= 2 and int(next.level) <= 4: out.footer = "Upgrading is free of Energy"   # q(246): no false refill promise
+	if int(next.get("energy_gain", 0)) > 0: out.footer += " · +%d Energy" % int(next.energy_gain)
 	var unlocks: Array = next.get("unlocks", [])
-	for u in unlocks:   # §8.3.1 looks at Lv3 / 5 / 8 / 10 (q(115): `Lv5 look · Porch`, never Look A / B)
+	for u in unlocks:   # look stages and their levels come from content, never inferred from the current cap
 		var stage := look_stage(str(u))
 		if not stage.is_empty(): out.look = "Lv%d look · %s" % [int(next.level), str(stage.name)]
 	for m in next.get("materials", []):
 		out.tiles.append({"id": str(m.id), "name": str(m.name), "have": int(m.have), "need": int(m.need), "icon": str(m.id)})
 	out.tiles.append({"id": "coins", "name": "Coins", "have": int(next.coins.have), "need": int(next.coins.need), "icon": "coin"})
-	out.tiles.append({"id": "skills", "name": "Skills", "have": int(next.skills.have), "need": int(next.skills.need), "icon": "star"})
+	for skill in next.get("skills", []):
+		var id := str(skill.skill)
+		out.tiles.append({"id": "skill_" + id, "name": id.capitalize(), "have": int(skill.have), "need": int(skill.need),
+			"icon": str(GATE_SKILL_ICONS.get(id, "star"))})
+	var travel = next.get("travel", null)
+	if travel is Dictionary:
+		for id in ["stamps", "climates"]:
+			if not travel.get(id) is Dictionary: continue
+			out.tiles.append({"id": id, "name": "Stamps" if id == "stamps" else "Other climates",
+				"have": int(travel[id].have), "need": int(travel[id].need), "icon": "stamp" if id == "stamps" else "map"})
 	var energy: Dictionary = view.get("energy", {})
 	out.changes.append({"icon": "energy", "text": "Max Energy %d · Meals %d a day" % [int(next.energy), int(next.meals)],
 		"note": "now %d" % int(energy.get("max", 0))})
+	var plots_now := int(h.get("plots", {}).get("now", 0))
+	if h.get("plots") is Dictionary and int(next.get("plots", plots_now)) > plots_now:
+		out.changes.append({"icon": "field", "text": "Fields %d" % int(next.plots), "note": "+%d to till" % (int(next.plots) - plots_now)})
 	var board_now := int(h.get("unlocks", {}).get("board_slots", 2))
 	for u in unlocks:
 		match str(u):
 			"spice_rack": out.changes.append({"icon": "kitchen", "text": "Spice Rack", "note": "seasonings off your bag"})
-			"clay_bank": out.changes.append({"icon": "clay", "text": "Clay Bank", "note": "Clay next to the Reed Bank"})
 			"warming_cabinet": out.changes.append({"icon": "kitchen", "text": "Warming Cabinet", "note": "keeps 6 dishes by the stove"})
-			"bag_upgrade_1":
-				out.changes.append({"icon": "bag", "text": "Bag Upgrade I · 150 coins", "note": bag_tier_note(view, "bag_upgrade_1")})
-			"bag_upgrade_2", "bag_upgrade_3":
-				var line := (P1_UNLOCKS[str(u)] as Dictionary).duplicate()
-				line["note"] = bag_tier_note(view, str(u))
-				out.changes.append(line)
+			"bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3", "bag_upgrade_4":
+				out.changes.append({"icon": "bag", "text": bag_upgrade_line(str(u)), "note": bag_tier_note(view, str(u))})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
 			_ when not look_stage(str(u)).is_empty():   # q(115) ①: `Porch · Timber or Stone` · pick one
 				out.changes.append({"icon": str(LOOK_ICONS.get(str(u), "home")), "text": "%s · Timber or Stone" % str(look_stage(str(u)).name), "note": LOOK_NOTE})
@@ -2324,7 +2352,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 		var short := int(t.need) - int(t.have)
 		match str(t.id):
 			"coins": out.reason = "Need %d more coins" % short
-			"skills": out.reason = "Skills total %d needed · now %d" % [int(t.need), int(t.have)]
+			"stamps", "climates": out.reason = home_gate_gap(str(t.id), int(t.need), int(t.have))
+			_ when str(t.id).begins_with("skill_"): out.reason = home_gate_gap(str(t.id).trim_prefix("skill_"), int(t.need), int(t.have))
 			_: out.reason = "Need %d more %s" % [short, str(t.name)]
 		break
 	return out
@@ -2332,12 +2361,17 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 ## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places, the
 ## same line as the workbench (P0MaterialLogic.material_source, Li Bai q(65)).
 static func home_source(view: Dictionary, id: String) -> Dictionary:
-	var sk: Dictionary = view.get("skills", {})
+	if id.begins_with("skill_"):
+		var key := id.trim_prefix("skill_")
+		var next = view.get("homestead", {}).get("next", null)
+		if not next is Dictionary: return {"text": "", "go": ""}
+		for skill in next.get("skills", []):
+			if str(skill.skill) == key:
+				return {"text": "%s Lv%d · now %d" % [key.capitalize(), int(skill.need), int(skill.have)], "go": "skills"}
+		return {"text": "", "go": ""}
 	match id:
 		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
-		"skills":
-			return {"text": "Farming %d + Fishing %d · Cooking not counted" % [int(sk.get("farming", {}).get("level", 1)),
-				int(sk.get("fishing", {}).get("level", 1))], "go": ""}
+		"stamps", "climates": return {"text": "Stamps · visit new cities", "go": "map"}
 	return need_source(view, id)
 
 ## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the
@@ -2353,7 +2387,7 @@ static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
 	return out
 
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
-## what changed (actual Energy gained at Lv2–4, full from Lv5) and one line of consequences.
+## what changed (the event's actual Energy gain at any level) and one line of consequences.
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	var level := int(ev.get("level", 1))
 	var max_e := int(view.get("energy", {}).get("max", 0))
@@ -2361,15 +2395,12 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	for u in ev.get("unlocks", []):
 		match str(u):
 			"spice_rack": lines.append("Spice Rack · seasonings off your bag")
-			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
-			"bag_upgrade_1": lines.append("Bag Upgrade I · 150 coins")
+			"bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3", "bag_upgrade_4": lines.append(bag_upgrade_line(str(u)))
 			_:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): lines.append(str(line.text))
-	var energy := " · Energy full"
-	if level >= 2 and level <= 4 and ev.has("energy"):
-		var gain := maxi(0, int(ev.get("energy", 0)))   # actual server reward, including a cap / bonus-zone zero
-		energy = " · +%d Energy" % gain if gain > 0 else ""
+	var gain := maxi(0, int(ev.get("energy", 0)))
+	var energy := " · +%d Energy" % gain if gain > 0 else ""
 	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d" % max_e + energy,
 		"detail": "\n".join(lines)}
