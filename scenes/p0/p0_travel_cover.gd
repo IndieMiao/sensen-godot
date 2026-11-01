@@ -121,6 +121,19 @@ func show_progress(t: float) -> void:
 	_skippable = t >= P0TravelFlight.UP_S
 	hint.modulate.a = 1.0 if _skippable else 0.0
 
+## Down with the reply still out (SGODOT-361, 不知火舞 on 361 9146d012 ①): the km at its end, the route and the plane gone
+## as on landing, no Tap to skip (a tap does nothing now).
+func wait() -> void:
+	show_progress(P0TravelFlight.TOTAL_S)
+	_skippable = false
+	hint.modulate.a = 0.0
+	show_route(Vector2.INF, Vector2.INF, P0TravelFlight.TOTAL_S)
+
+## Down SLOW_REPLY_S and still no reply: the hint's line says so in LOADING-2's words, no spinner.
+func slow() -> void:
+	hint.text = "Taking longer than usual…"
+	hint.modulate.a = 1.0
+
 ## Where the map draws the two cities now (INF: not drawn), at `t` seconds of the flight.
 func show_route(from: Vector2, to: Vector2, t: float) -> void:
 	from_at = from

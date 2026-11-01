@@ -4,6 +4,7 @@
 Derived from unchanged published polygons. No locations, navigation or shared
 farm textures are regenerated. Requires numpy/Pillow; fixed per-template seeds.
 """
+import argparse
 import json
 from pathlib import Path
 import numpy as np
@@ -17,7 +18,7 @@ def smooth(a, b, value):
     t = np.clip((value - a) / (b - a), 0, 1)
     return t * t * (3 - 2 * t)
 
-def bake_bed(name, spec, seed):
+def bake_bed(name, spec, seed, out=OUT, deep_centre=0.0):
     rng = np.random.default_rng(seed)
     width, height = 768, 1024
     xx, zz = np.meshgrid((np.arange(width) + .5) / width * 12,
@@ -40,6 +41,9 @@ def bake_bed(name, spec, seed):
     depth *= 1 - .45*(1-smooth(.18,.40,far))
     depth += far*.65*(1-smooth(.25,1.2,distance))*smooth(.02,.20,distance)
     depth += np.sin(xx*.8+zz*.6)*np.sin(zz*.7)*.045*smooth(0,1,distance)
+    # SGODOT-374 (P0 open water): extra depth from about 1 m off the bank, front or back, so the middle reads as a
+    # lake rather than a channel; 0 keeps the bundled beds byte-identical.
+    depth += deep_centre*smooth(.9,2.6,distance)
     grain = rng.random(xx.shape)
     bed = np.empty((*xx.shape, 3))
     bed[:] = np.array([.56,.64,.57])
@@ -75,7 +79,7 @@ def bake_bed(name, spec, seed):
         depth[y0:y1,x0:x1] -= top*cover*radius*.45
         if len(centres)>=165: break
     rgba = np.dstack((np.clip(bed,0,1),np.clip(depth/2.5,0,1)))
-    Image.fromarray(np.uint8(np.round(rgba*255))).save(OUT/f'{name}_bed.png')
+    Image.fromarray(np.uint8(np.round(rgba*255))).save(out/f'{name}_bed.png')
     print(f'{name}: {len(centres)} submerged stones; {width}x{height} RGB + depth')
 
 def bake_caustics():
@@ -100,8 +104,27 @@ def bake_caustics():
     web = np.exp(-(ridge/.25)**2)*.56 + np.exp(-(ridge/.075)**2)*.30
     Image.fromarray(np.uint8(np.clip(web,0,1)*255)).filter(ImageFilter.GaussianBlur(.75)).save(OUT/'caustic_web.png')
 
+def res_path(path):
+    return ROOT/path.removeprefix('res://') if path.startswith('res://') else Path(path)
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--templates', help='a template override (P0, SGODOT-374: res://assets/p0/p0_pond_templates.json); '
+                        'each bed goes to its template\'s "art" folder; the caustic web is left alone')
+    parser.add_argument('--deep-centre', type=float, default=0.0, help='extra depth (m) from ~1 m off the bank')
+    args = parser.parse_args()
     catalog = json.loads((ROOT/'assets/ponds/catalog.json').read_text())
-    for index,(name,spec) in enumerate(sorted(catalog['templates'].items())):
-        bake_bed(name,spec,29092026+index)
-    bake_caustics()
+    if args.templates:
+        override = json.loads(res_path(args.templates).read_text())['templates']
+        # The seeds follow the catalog's sorted order, as the bundled beds' do.
+        for index,(name,spec) in enumerate(sorted(catalog['templates'].items())):
+            if name not in override: continue
+            spec = {**spec, **override[name]}
+            assert list(spec.get('extent', [12, 16])) == [12, 16], name
+            out = res_path(spec.get('art', 'res://assets/ponds/art/'))
+            out.mkdir(parents=True, exist_ok=True)
+            bake_bed(name, spec, 29092026+index, out, args.deep_centre)
+    else:
+        for index,(name,spec) in enumerate(sorted(catalog['templates'].items())):
+            bake_bed(name,spec,29092026+index, deep_centre=args.deep_centre)
+        bake_caustics()

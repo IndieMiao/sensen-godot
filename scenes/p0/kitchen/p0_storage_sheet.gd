@@ -24,6 +24,8 @@ var safe_bottom := 0.0
 var _drawer: UiDrawer
 var _close: UiCloseButton
 var _list: VBoxContainer
+var _rows := {}            # cabinet row id → its button (the guide's row pulse, SGODOT-368)
+var _eat: Control          # the selected row's Eat
 
 func _init(kind_: String, view_: Dictionary) -> void:
 	kind = kind_
@@ -66,6 +68,8 @@ func refresh(view_: Dictionary) -> void:
 	for c in _list.get_children():
 		_list.remove_child(c)
 		c.queue_free()
+	_rows = {}
+	_eat = null
 	if kind == "rack": _build_rack()
 	else: _build_cabinet()
 	_place_close.call_deferred()
@@ -110,6 +114,7 @@ func _cabinet_row(r: Dictionary) -> Control:
 	b.custom_minimum_size.y = row.get_combined_minimum_size().y
 	row.minimum_size_changed.connect(func(): b.custom_minimum_size.y = row.get_combined_minimum_size().y)
 	var id := str(r.id)
+	_rows[id] = b
 	b.pressed.connect(func():
 		selected = id
 		refresh(view))
@@ -124,6 +129,7 @@ func _cabinet_actions(id: String) -> Control:
 	eat_b.reason = str(eat.reason)
 	eat_b.sends = true   # eat (§10.7.1 Offline)
 	eat_b.activated.connect(func(): command.emit({"type": "eat", "item": id, "from": "cabinet"}))
+	_eat = eat_b
 	eat_b.unavailable_pressed.connect(func(reason): command.emit({"_toast": reason}))
 	box.add_child(eat_b)
 	var take := UiCommandButton.new(str(a.take), UiCommandButton.Kind.SECONDARY)
@@ -133,3 +139,14 @@ func _cabinet_actions(id: String) -> Control:
 	take.unavailable_pressed.connect(func(reason): command.emit({"_toast": reason}))
 	box.add_child(take)
 	return box
+
+## The guide's S8 targets (SGODOT-368) for a dish's base recipe: its row while another row is selected, else null.
+func guide_row(base: String) -> Control:
+	if P0Logic.base_id(selected) == base: return null
+	for id in _rows:
+		if P0Logic.base_id(str(id)) == base: return _rows[id]
+	return null
+
+## ...and the selected row's Eat when that row is the dish.
+func guide_eat(base: String) -> Control:
+	return _eat if _eat != null and P0Logic.base_id(selected) == base else null

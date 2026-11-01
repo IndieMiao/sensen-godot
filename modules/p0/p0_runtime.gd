@@ -282,7 +282,7 @@ func leave_to_map() -> void:
 	while AppRouter.instance_depth() > 0:
 		var depth := AppRouter.instance_depth()
 		AppRouter.pop_instance()
-		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+		if AppRouter.instance_depth() >= depth: return   # a layer that refuses to pop stays
 	var root := get_tree().current_scene
 	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
 
@@ -322,17 +322,16 @@ func _show_spot(where: String) -> void:
 
 ## The outposts' online counts for the Notice Board (q(164)): one GET /p0/presence, as the map polls it; a failure
 ## leaves the board without person badges (nobody shown is never wrong for a moment).
-var _presence: HTTPRequest
+var _presence: P0HttpRequest
 func _ask_presence() -> void:
 	if not is_instance_valid(_presence):
-		_presence = HTTPRequest.new()
-		_presence.timeout = 8.0
+		_presence = P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
 	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
 	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.request(session.base_url + "/p0/presence", headers)
+	_presence.send(session.base_url + "/p0/presence", headers)
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
@@ -425,7 +424,7 @@ func _process(dt: float) -> void:
 		if _probe_left <= 0.0: _probe()
 	var v := session.current()
 	if v.is_empty(): return
-	ui.set_view(v)
+	if ui.view_wanted(session.view, Time.get_ticks_msec()): ui.set_view(v)   # SGODOT-260 Q3: not every frame
 	_call("p0_frame", [v, dt])
 
 func _on_action(cmd: Dictionary) -> void:
@@ -613,10 +612,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var over_bar := ui.resident_float_at(str(thanks.get("resident", ""))) if not thanks.is_empty() else Vector2.INF
 	if over_bar.is_finite(): at = over_bar
 	# Arriving by air (q(147) ⑥, 不知火舞 on 299): the arrival's Energy — its float and the HUD's value — waits for the
-	# flight to land (release_travel), with its welcome; so does any Energy that comes while it flies.
+	# flight to land (release_travel), with its welcome; so does any Energy that comes while it flies, and the HUD's
+	# coins stay what they were too (q(261) ④).
 	var by_air := world != null and world.has_method("on_arrival") \
 		and (events.any(func(e): return str(e.get("kind", "")) == "arrival") or bool(_call("travelling", [])))
-	if by_air and not before.is_empty() and not ui.energy_held(): ui.hold_energy(before.get("energy", {}))
+	if by_air and not before.is_empty() and not ui.energy_held(): ui.hold_energy(before.get("energy", {}), int(before.get("coins", -1)))
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	last_catch_extras = {}

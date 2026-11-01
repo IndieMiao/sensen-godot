@@ -947,13 +947,36 @@ static func need_source(view: Dictionary, id: String) -> Dictionary:
 	if not material.is_empty(): return material
 	return {"text": label, "go": ""}
 
+## A view and everything in it made read-only (SGODOT-260 Q3: P0Session.view, whose parts current() shares).
+static func freeze(x) -> void:
+	if x is Dictionary:
+		if x.is_read_only(): return
+		for k in x: freeze(x[k])
+		x.make_read_only()
+	elif x is Array:
+		if x.is_read_only(): return
+		for i in x: freeze(i)
+		x.make_read_only()
+
 ## Locally advance a view by elapsed ms (energy ticks and crop timers) between server refreshes.
+## SGODOT-260 Q3: only the parts that age are copied (energy, plots, the guide row, the stoves, the cast and traps, the
+## inbox parcels); everything else is the server view's own, shared — callers read the result, never write into it.
 static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	if elapsed_ms <= 0: return view
-	var v := view.duplicate(true)
-	var e: Dictionary = v.get("energy", {})
-	var next_in = e.get("next_in", null)
+	var v := view.duplicate(false)
+	var owned: Array = []   # the dictionaries this projection copied (each copied once, then written in place)
+	# d[key] as a shallow copy of its own, the server view's dictionary left as it was
+	var own := func(d: Dictionary, key: String) -> Dictionary:
+		var sub: Dictionary = d[key]
+		if owned.any(func(o): return is_same(o, sub)): return sub
+		sub = sub.duplicate()
+		owned.append(sub)
+		d[key] = sub
+		return sub
+	var e = v.get("energy", null)
+	var next_in = e.get("next_in", null) if e is Dictionary else null
 	if next_in != null:
+		e = own.call(v, "energy")
 		var remaining := float(next_in) - elapsed_ms
 		var regen := float(e.get("regen_ms", 240000))
 		var value := int(e.get("value", 0))
@@ -963,31 +986,61 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 			remaining += regen
 		e["value"] = value
 		e["next_in"] = null if value >= maxv else remaining
-	for p in v.get("plots", []):
-		if str(p.get("state", "")) == "growing" and p.get("ready_in", null) != null:
-			p["ready_in"] = maxf(0.0, float(p["ready_in"]) - elapsed_ms)
-			if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
+	if v.get("plots") is Array:
+		var plots: Array = []
+		for p in v.plots:
+			if p is Dictionary and str(p.get("state", "")) == "growing" and p.get("ready_in", null) != null:
+				p = p.duplicate()
+				p["ready_in"] = maxf(0.0, float(p["ready_in"]) - elapsed_ms)
+				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
+			plots.append(p)
+		v["plots"] = plots
 	var guide = v.get("guide", null)
 	var row = guide.get("row", null) if guide is Dictionary else null
 	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:
+		row = own.call(own.call(v, "guide"), "row")
 		row.ready_in = maxf(0.0, float(row.ready_in) - elapsed_ms)
-	var stove = v.get("cooking", {}).get("stove", null)
-	var pots: Array = [stove] if stove is Dictionary else []
-	# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,
-	# which may be the same dictionary after the deep copy above, so each pot is aged once).
-	for st in v.get("cooking", {}).get("stoves", []):
-		if st is Dictionary and not pots.any(func(q): return is_same(q, st)): pots.append(st)
-	for st in pots:
-		if not st.has("ms") and not st.has("ready_in"): continue
-		st["elapsed"] = float(st.get("elapsed", 0)) + elapsed_ms
-		st["ready_in"] = maxf(0.0, float(st.get("ready_in", 0)) - elapsed_ms)
-	var cast = v.get("fishing", {}).get("cast", null)
-	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
-	# a trap's next fish counts down (its name strip `· next in 5h 12m`, q(109) ⑦); the next read brings the fish itself
-	for t in v.get("fishing", {}).get("trap", {}).get("traps", []):
-		if t is Dictionary and t.get("next_in", null) != null: t["next_in"] = maxf(0.0, float(t.next_in) - elapsed_ms)
-	for parcel in v.get("inbox", {}).get("parcels", []):
-		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
+	if v.get("cooking") is Dictionary:
+		var cooking: Dictionary = own.call(v, "cooking")
+		# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,
+		# which may be the same dictionary in the server view, so each pot is copied and aged once and stays shared).
+		var copies: Array = []   # [the view's pot, its aged copy], by reference (a dictionary key would match by content)
+		var age := func(st) -> Variant:
+			if not (st is Dictionary): return st
+			for pair in copies:
+				if is_same(pair[0], st): return pair[1]
+			var c: Dictionary = st.duplicate()
+			if c.has("ms") or c.has("ready_in"):
+				c["elapsed"] = float(c.get("elapsed", 0)) + elapsed_ms
+				c["ready_in"] = maxf(0.0, float(c.get("ready_in", 0)) - elapsed_ms)
+			copies.append([st, c])
+			return c
+		if cooking.get("stove") is Dictionary: cooking["stove"] = age.call(cooking.stove)
+		if cooking.get("stoves") is Array: cooking["stoves"] = (cooking.stoves as Array).map(age)
+	if v.get("fishing") is Dictionary:
+		var fishing: Dictionary = v.fishing
+		if fishing.get("cast") is Dictionary:
+			var cast: Dictionary = own.call(own.call(v, "fishing"), "cast")
+			cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+		# a trap's next fish counts down (its name strip `· next in 5h 12m`, q(109) ⑦); the next read brings the fish itself
+		var trap = fishing.get("trap", null)
+		if trap is Dictionary and trap.get("traps") is Array:
+			var traps: Array = []
+			for t in trap.traps:
+				if t is Dictionary and t.get("next_in", null) != null:
+					t = t.duplicate()
+					t["next_in"] = maxf(0.0, float(t.next_in) - elapsed_ms)
+				traps.append(t)
+			own.call(own.call(v, "fishing"), "trap")["traps"] = traps
+	var inbox = v.get("inbox", null)
+	if inbox is Dictionary and inbox.get("parcels") is Array:
+		var parcels: Array = []
+		for parcel in inbox.parcels:
+			if parcel is Dictionary:
+				parcel = parcel.duplicate()
+				parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
+			parcels.append(parcel)
+		own.call(v, "inbox")["parcels"] = parcels
 	return v
 
 ## LOCK-14 / q(87): one InboxNotice card (BAG-5-2) for the rewards of one server reply that did not fit the bag, {} when

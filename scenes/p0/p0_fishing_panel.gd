@@ -48,6 +48,28 @@ func _ready() -> void:
 func last_result() -> Dictionary:
 	return _last
 
+## q(49) (SGODOT-376): one card at a time. This panel is canvas layer 30, over the P0 UI and its TipCard (layer 10), so
+## the first cast's `Casting uses 5 Energy` came up under `Watch the float…` / `A bite!…`, half hidden. While a TipCard
+## is on screen or about to come up the status card waits; when the tip closes (its time, a tap, or doing what it
+## teaches) the card comes back with its latest line. A bite closes the tip at once (不知火舞 on 376): `A bite!` shows
+## the same frame. Every writer of the card's visibility runs this after it.
+var _held_for_tip := false
+## The result put the card away (on_catch: the pond's HUD cards say the result); a held card stays away then. Other
+## results with a line of their own (a reel report lost three times) come back like any card (周瑜 on #595).
+var _quiet := false
+
+func _hold_for_tip() -> void:
+	if rt != null and rt.ui != null and rt.ui.tip_up_or_coming():
+		_held_for_tip = true
+		_message_card.visible = false
+	elif _held_for_tip:
+		_held_for_tip = false
+		_message_card.visible = visible and not _quiet and (phase != "playing" or int(model.get("step", 0)) < 40)
+
+func _refresh_button() -> void:
+	super._refresh_button()
+	_hold_for_tip()
+
 ## +1: the gauge goes right of the float, -1 left (the pond frames the float with room on that side). A float beside
 ## the player's box points away from it; one above or below it takes the side with more room.
 static func gauge_side(float_x: float, player: Rect2, width: float) -> int:
@@ -101,6 +123,8 @@ func open_p0(runtime: P0Runtime, water_id: String, spec: Dictionary, target: Vec
 	_last = {}
 	_gauge.model = {}
 	for n in [_message_card, _primary, _guide, _gauge]: n.visible = true
+	_quiet = false
+	_hold_for_tip()
 	_title.text = title
 	show()
 	_fit.call_deferred()
@@ -116,6 +140,7 @@ func _action() -> void:
 	elif phase in ["ready", "result", "error"]: _p0_cast()
 
 func _p0_cast() -> void:
+	_quiet = false
 	busy = true
 	model = {}
 	_last = {}
@@ -168,6 +193,8 @@ func _p0_hook() -> void:
 	_refresh_button()
 
 func _process(dt: float) -> void:
+	if visible and rt != null and rt.ui != null and phase == "hook": rt.ui.hold_tips(1500)   # a bite takes the screen
+	_hold_for_tip()
 	if not visible or rt == null or busy: return
 	var now := Time.get_ticks_msec()
 	if phase in ["waiting", "hook"]:
@@ -179,6 +206,9 @@ func _process(dt: float) -> void:
 		elif now >= _bite_at and phase != "hook":
 			phase = "hook"
 			_show_notice("A bite! Tap to hook the fish!")
+			rt.ui.hold_tips(1500)   # the bite takes the screen (SGODOT-376 ②): the tip on screen closes, none comes up
+			rt.ui.close_tip()
+			_hold_for_tip()
 			Input.vibrate_handheld(80)
 			_refresh_button()
 		elif phase == "hook" and auto_play and now > _bite_at + 400:
@@ -198,7 +228,7 @@ func _process(dt: float) -> void:
 			FishingModel.step(model, held, tier)
 		_gauge.model = model
 		_gauge.queue_redraw()
-		_message_card.visible = int(model.get("step", 0)) < 40
+		_message_card.visible = int(model.get("step", 0)) < 40 and not _held_for_tip
 		_primary.set("progress", float(model.progress))
 		_primary.set("pulling", held)
 		_primary.queue_redraw()
@@ -231,6 +261,7 @@ func on_catch(ev: Dictionary) -> float:
 	var landed := str(ev.get("result", "")) == "landed"
 	model["outcome"] = "caught" if landed else "escaped"
 	_last = {"outcome": "caught", "fish_id": str(ev.fish), "tier": int(ev.rarity)} if landed else {"outcome": "escaped"}
+	_quiet = true
 	for n in [_message_card, _primary, _guide, _gauge]: n.visible = false
 	match str(ev.get("result", "")):
 		"landed": return 1.3     # FishingPresentation lifts the fish over 1.25 s

@@ -51,8 +51,3 @@ func test_global_city_gets_a_generated_city_map_with_residents() -> void:
 		assert_float(absf(float(r.lat) - 35.6895)).is_less(0.05)
 	# Curated cities keep their hand-made configuration.
 	assert_bool(CityMapData.city("los_angeles").has("generated")).is_false()
-
-func test_generated_farm_placement_uses_the_city_box() -> void:
-	var region := FarmRegions.remember_city(TOKYO)
-	assert_bool(FarmPlacement.generated_contains(region, {"lat": 35.68, "lng": 139.77})).is_true()
-	assert_bool(FarmPlacement.generated_contains(region, {"lat": 34.69, "lng": 135.50})).is_false()

@@ -54,6 +54,7 @@ export interface GuidePred {
   dish?: number;                      // edible dishes held, any recipe (the Mystery Dish is not one; S10's ♥)
   common_crop?: number;               // Common crops held, any kind (q(217) ③: soup needs one)
   parcel?: string;                    // an Inbox parcel of this item not yet claimed, queued ones too (q(254) ①: Pip's seeds)
+  meal?: true | MealWhere;            // S8 (SGODOT-368): a dish to eat is picked (mealPick), there if a place is named
   all?: GuidePred[]; any?: GuidePred[]; not?: GuidePred;
 }
 
@@ -89,6 +90,9 @@ export interface GuideContent {
   resend?: { item: string; qty: number; max: number; line: string; radish: string; deliver: string; dish: string; source: string };   // source: the parcel's From line in the Inbox (苏烈 on #503)
   /** The home-day rollovers after the save was made at which an unfinished guide ends by itself (q(215): 2). */
   timeout_days?: number;
+  /** S8's dish to eat (SGODOT-368, 不知火舞's spec): `prefer` first; else any other edible dish but `keep`; `keep` (the soup
+   * S10 hands in) only with no cookable fish left. A shown line, icon, mark item or Pip line names it as `{dish}`. */
+  meal?: { prefer: string; keep: string };
 }
 
 /** In the save (optional, no save version of its own). */
@@ -175,6 +179,30 @@ function isEdibleDish(c: P0Content, id: string): boolean {
   const base = dishParts(id).base;
   return base !== c.cooking.mystery.id && !!recipeById(c, base);
 }
+export type MealWhere = 'bag' | 'pot' | 'cabinet';
+/**
+ * S8's dish to eat (SGODOT-368): its base recipe and where to eat it — the bag (anywhere), a done pot not yet taken (at
+ * the stove: its card's Eat), the Warming Cabinet (at home). The dish by guide.meal's rule; for that dish, the bag before
+ * the pot before the cabinet. null: nothing to eat, or only the soup while a fish is left to grill (the step's own Cook it).
+ */
+export function mealPick(c: P0Content, s: P0State, now: number): { dish: string; where: MealWhere } | null {
+  const rule = c.guide?.meal;
+  if (!rule) return null;
+  const found: { dish: string; where: MealWhere }[] = [];
+  const add = (id: string, where: MealWhere) => { if (isEdibleDish(c, id)) found.push({ dish: dishParts(id).base, where }); };
+  for (const x of s.bag) if (x.qty > 0) add(x.id, 'bag');
+  for (const p of pots(s)) {
+    if (p.left?.length) p.left.forEach(id => add(id, 'pot'));
+    else if (!p.mystery && p.started_at + p.ms <= now && [s.stove, ...(s.burners ?? []).map(b => b.stove)].includes(p)) add(p.dish, 'pot');
+  }
+  for (const x of s.cabinet) if (x.qty > 0) add(x.id, 'cabinet');
+  const dish = found.find(f => f.dish === rule.prefer)?.dish ?? found.find(f => f.dish !== rule.keep)?.dish
+    ?? (found.length && heldWhere(s, id => isCookFish(c, id)) === 0 ? rule.keep : null);
+  if (!dish) return null;
+  for (const where of ['bag', 'pot', 'cabinet'] as const) if (found.some(f => f.dish === dish && f.where === where)) return { dish, where };
+  return null;
+}
+
 /** An Inbox parcel of this item not yet claimed, those queued behind a full Inbox too. */
 const inboxHolds = (s: P0State, id: string) => [...s.inbox.parcels, ...s.inbox.waiting].some(p => p.id === id);
 const pots = (s: P0State) => [s.stove, s.queue, ...(s.burners ?? []).flatMap(b => [b.stove, b.queue])].filter(p => p !== null);
@@ -198,6 +226,10 @@ export function guidePred(c: P0Content, s: P0State, p: GuidePred | undefined, no
   if (p.dish !== undefined && heldWhere(s, id => isEdibleDish(c, id)) < p.dish) return false;
   if (p.common_crop !== undefined && heldWhere(s, id => isCommonCrop(c, id)) < p.common_crop) return false;
   if (p.parcel !== undefined && !inboxHolds(s, p.parcel)) return false;
+  if (p.meal !== undefined) {
+    const m = mealPick(c, s, now);
+    if (!m || (p.meal !== true && m.where !== p.meal)) return false;
+  }
   if (p.all && !p.all.every(q => guidePred(c, s, q, now))) return false;
   if (p.any && !p.any.some(q => guidePred(c, s, q, now))) return false;
   if (p.not && guidePred(c, s, p.not, now)) return false;
@@ -446,6 +478,9 @@ export function guideView(c: P0Content, s: P0State, now: number) {
   const shown: GuideShow = rec ? recoverOf(c, rec) ?? {} : st;
   const count = shownProgress(c, s, st, rec);
   const row = shown.row ? { ...shown.row } : null;
+  const meal = rec ? mealPick(c, s, now) : null;   // only a `{dish}` in what is shown takes it (S8's eat entries)
+  const dish = (x: string) => (meal ? x.replace(/\{dish\}/g, m => (x === m ? meal.dish : itemName(c, meal.dish))) : x);   // alone: the id
+  if (row) for (const k of ['line', 'icon'] as const) if (typeof row[k] === 'string') row[k] = dish(row[k] as string);
   if (row && typeof row.line === 'string') row.line = fill(c, s, row.line, count);
   if (row && typeof row.go === 'string') row.go = guidePlace(c, s, row.go);
   if (row && typeof row.countdown === 'string') Object.assign(row, countdown(c, s, row.countdown, now));
@@ -453,8 +488,9 @@ export function guideView(c: P0Content, s: P0State, now: number) {
   const pipLine = ready && r ? r.line : shown.pip ?? st.pip;
   return {
     step: st.id, phase: st.phase ?? null, recover: rec, at: g.at, progress: count,
-    row, tip: shown.tip ?? null, marks: resolveMarks(c, s, shown.marks, count),
-    pip: { here: true, bang: (g.n['talk:res_pip'] ?? 0) === 0 || ready, line: pipLine ? fill(c, s, pipLine) : null,
+    row, tip: shown.tip ?? null,
+    marks: resolveMarks(c, s, shown.marks, count).map(m => (meal && typeof m.item === 'string' ? { ...m, item: dish(m.item) } : m)),
+    pip: { here: true, bang: (g.n['talk:res_pip'] ?? 0) === 0 || ready, line: pipLine ? fill(c, s, dish(pipLine)) : null,
       resend_left: r ? Math.max(0, r.max - (g.n.resend ?? 0)) : 0 },
     end: null, ended_at: null,
   };

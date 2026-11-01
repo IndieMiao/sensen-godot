@@ -186,16 +186,6 @@ func entry_pages() -> void:
 		await get_tree().create_timer(0.8).timeout
 		await page("06-map-farm-selected", "地图选中农场", "附近列表 → 选择农场", "选中角色旁显示农场微缩模型和拜访入口。", map_scene)
 	await clear_screen()
-	FarmChoice.clear()
-	model = fresh()
-	model.farm_id = ""
-	model.state = {}
-	map_scene = await mount(load(AppRouter.MAP).instantiate())
-	await get_tree().create_timer(3).timeout
-	map_scene._show_farm_selection()
-	await _settle(15)
-	await page("07-farm-selection", "选择农场布局", "新玩家 → 地图 → 选址", "选择农场布局与外观后建立自己的农场。", map_scene, map_scene.find_children("*", "ScrollContainer", true, false), "新账号展示状态，不创建线上农场")
-	await clear_screen()
 	FarmChoice.save("sh_b", 2)
 	var loading = await mount(load("res://modules/ui/loading_overlay.gd").new())
 	await page("08-loading", "场景加载", "打开街区、农场、换装等场景", "场景资源加载时的遮罩和进度反馈。", loading)
@@ -561,19 +551,6 @@ func extra_pages() -> void:
 		await clear_screen()
 
 func supplement_pages() -> void:
-	FarmRegions.save_choice("shanghai")
-	FarmChoice.clear()
-	model = fresh()
-	model.farm_id = ""
-	model.state = {}
-	var map_scene = await mount(load(AppRouter.MAP).instantiate())
-	await get_tree().create_timer(3).timeout
-	map_scene._show_farm_selection()
-	await _settle(5)
-	map_scene._begin_placement("sh_b")
-	await _settle(10)
-	await page("07b-farm-placement", "确认农场位置", "选择农场布局 → 安置农场", "拖动地图选择安置位置，中心标记显示落点；可返回更换布局或确认位置。", map_scene, [], "只展示选址，不创建线上农场")
-	await clear_screen()
 	FarmChoice.save("sh_b",2)
 	model = fresh()
 	var dress = await mount(load(AppRouter.DRESS).instantiate())

@@ -1,12 +1,13 @@
 extends GdUnitTestSuite
 ## SGODOT-275 travel, the free first version (plan v2 §11.8, q(108)): another city's bubble opens its travel card
-## (free, its distance and Trip, first visit or return), Fly sends `travel`, the server's arrival flies the camera to
-## the city and welcomes; the avatar then stands in that city and the place chip reads "Tokyo · Arrived" (no Day Pass);
+## (free, its distance and Trip, first visit or return), Fly flies the camera to the city and sends `travel`, its reply
+## (the server's arrival) welcomes (SGODOT-361); the avatar then stands in that city and the place chip reads "Tokyo · Arrived" (no Day Pass);
 ## a pond or outpost refused with pass_required / trip_expired opens the same card; going home sends `return_home`.
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const P0Map := preload("res://scenes/p0/p0_map.gd")
+const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const SF := "gn-5391959"
 const TOKYO := "gn-1850147"
 
@@ -15,6 +16,11 @@ func before_test() -> void:
 	P0Runtime.ensure().here = {"space": "home", "place": ""}
 
 func after_test() -> void:
+	var s := P0Runtime.ensure().session
+	s.transport = Callable()   # nothing held on the wire for the next test
+	s.busy = false
+	s._inflight = {}
+	s._queue = []
 	for key in WaterShore._pending.keys(): WorkerThreadPool.wait_for_task_completion(WaterShore._pending[key])
 	WaterShore._pending.clear()
 
@@ -47,6 +53,18 @@ func _toast_within(ui: P0Ui, secs: float) -> String:
 		t += get_process_delta_time()
 	return ui.toast_text()
 
+## The travel commands on the wire, held: the test answers them (_answer); a city's places read fails at once.
+var _wire: Array = []
+func _hold_wire(rt: P0Runtime) -> void:
+	_wire.clear()
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, cmd: Dictionary) -> void:
+		if str(cmd.get("type", "")) == "travel": _wire.append(cmd)
+		elif str(cmd.get("type", "")) == "city": P0CityPlaces.fail.call_deferred(str(cmd.cluster))   # never left waiting
+
+func _answer(rt: P0Runtime, view: Dictionary, events: Array) -> void:
+	var body := JSON.stringify({ok = true, state = view, events = events}).to_utf8_buffer()
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, body, _wire.pop_front())
+
 func _texts(node: Node) -> Array:
 	return node.find_children("*", "Label", true, false).map(func(l): return str((l as Label).text))
 
@@ -57,6 +75,7 @@ func test_another_citys_bubble_opens_its_silhouette_card_then_its_free_travel_ca
 	var rt: P0Runtime = m.rt
 	var sent: Array = []
 	rt.session.sent.connect(func(cmd): sent.append(cmd))
+	_hold_wire(rt)
 	m.fly_to_city(TOKYO)
 	# an unexplored city opens its silhouette card first (MAP-3-FREE); Travel details › opens the free travel card
 	assert_str(rt.ui.modal_kind).is_equal("city_card")
@@ -72,6 +91,9 @@ func test_another_citys_bubble_opens_its_silhouette_card_then_its_free_travel_ca
 	fly.activated.emit()
 	assert_array(sent.filter(func(c): return str(c.get("type", "")) == "travel").map(func(c): return str(c.to))).is_equal([TOKYO])
 	assert_str(rt.ui.modal_kind).is_empty()
+	assert_bool(m.travelling()).is_true()   # up at once, before any reply (q(261))
+	m._call_back()
+	await get_tree().process_frame   # the cover, off the map at once, is freed at the frame's end
 
 func test_the_home_citys_bubble_opens_no_card() -> void:
 	var m := _map()
@@ -80,14 +102,18 @@ func test_the_home_citys_bubble_opens_no_card() -> void:
 	m.fly_to_city("san_francisco")
 	assert_str((m.rt as P0Runtime).ui.modal_kind).is_empty()
 
-func test_an_arrival_flies_there_and_the_player_stands_in_that_city() -> void:
+func test_fly_flies_there_and_the_player_stands_in_that_city() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
-	var saved := _with_travel(rt, {home = SF, here = TOKYO, passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}},
-		visits = {TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8815})
+	var saved := _with_travel(rt, {home = SF, here = SF, passes = {}, visits = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
+	var there: Dictionary = rt.session.view.duplicate(true)
+	there.travel = {home = SF, here = TOKYO, passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}},
+		visits = {TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	_hold_wire(rt)
+	m._take_off(TOKYO, 8815)
+	_answer(rt, there, [{kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8815}])
 	assert_str(str(m.region.get("id", ""))).is_equal(TOKYO)
 	assert_bool(m.away()).is_true()
 	var tokyo := P0Clusters.get_cluster(TOKYO)
@@ -96,7 +122,10 @@ func test_an_arrival_flies_there_and_the_player_stands_in_that_city() -> void:
 	assert_float(at.y).is_equal_approx(float(tokyo.lng), 1e-4)
 	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome to Tokyo · Stamp collected")   # q(147): a fixed 3 s flight at any Trip, then the welcome
 	rt.ui.clear_toast()
-	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8815})
+	rt.ui.close_modal()
+	_hold_wire(rt)
+	m._take_off(TOKYO, 8815)
+	_answer(rt, there, [{kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8815}])
 	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome back")   # q(108): a return only floats Welcome back
 	rt.session.view = saved
 

@@ -15,8 +15,13 @@ func _page() -> Array:
 	avoider.keyboard_height = func(): return _kb
 	return [root, field, avoider]
 
-func _settle() -> void:
-	for i in 60: await get_tree().process_frame
+## Until the avoider has reached its target offset (it eases by frame time, so a frame count depends on the frame
+## rate: an undrawn window runs far above 60 fps), at most 3 s.
+func _settle(avoider: KeyboardAvoider) -> void:
+	var start := Time.get_ticks_msec()
+	for i in 2: await get_tree().process_frame
+	while avoider._offset != avoider.desired_offset() and Time.get_ticks_msec() - start < 3000:
+		await get_tree().process_frame
 
 func test_focused_field_and_content_below_move_above_the_keyboard() -> void:
 	var parts := _page()
@@ -26,12 +31,12 @@ func test_focused_field_and_content_below_move_above_the_keyboard() -> void:
 	field.grab_focus()
 	_kb = 320.0
 	var view := get_viewport().get_visible_rect().size.y
-	await _settle()
+	await _settle(avoider)
 	# Field bottom + 100 px of results must clear the keyboard top (minus the gap).
 	assert_float(field.get_global_rect().end.y + 100.0).is_less_equal(view - 320.0 - avoider.gap + 1.0)
 	assert_float(root.position.y).is_less(0.0)
 	_kb = 0.0
-	await _settle()
+	await _settle(avoider)
 	assert_float(root.position.y).is_equal_approx(0.0, 0.01)
 
 func test_no_shift_without_focus_inside_the_target() -> void:
@@ -41,7 +46,7 @@ func test_no_shift_without_focus_inside_the_target() -> void:
 	add_child(auto_free(other))
 	other.grab_focus()
 	_kb = 320.0
-	await _settle()
+	await _settle(parts[2])
 	assert_float(root.position.y).is_equal(0.0)
 
 func test_field_is_never_pushed_off_the_top() -> void:
@@ -52,7 +57,7 @@ func test_field_is_never_pushed_off_the_top() -> void:
 	parts[2].extra_below = 2000.0
 	field.grab_focus()
 	_kb = 400.0
-	await _settle()
+	await _settle(parts[2])
 	assert_float(field.get_global_rect().position.y).is_greater_equal(7.5)
 	assert_bool(root.position.y <= 0.0).is_true()
 

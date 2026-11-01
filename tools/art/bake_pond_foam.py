@@ -48,19 +48,19 @@ def bake_pattern():
     Image.fromarray(np.uint8(np.round(np.dstack([channels[0], froth, channels[1]]) * 255))).save(OUT / 'foam_pattern.png')
 
 
-def bake_contacts(data, merge=False):
+def bake_contacts(data, merge=False, out=OUT, shores=ROOT / 'assets/ponds'):
     width, height = 384, 512
     xx, zz = np.meshgrid((np.arange(width) + .5) * 12 / width, -(np.arange(height) + .5) * 16 / height)
     manifest = {'water_y': data['water_y'], 'catalog_sha256': data['catalog_sha256'], 'size': [width, height], 'distance_metres_per_unit': 1.0, 'entries': []}
     if merge:
-        manifest = json.loads((OUT / 'manifest.json').read_text())
+        manifest = json.loads((out / 'manifest.json').read_text())
         assert manifest['water_y'] == data['water_y'] and manifest['catalog_sha256'] == data['catalog_sha256']
         assert manifest['size'] == [width, height]
         ids = {e['id'] for e in data['entries']}
         manifest['entries'] = [e for e in manifest['entries'] if e['id'] not in ids]
         manifest['ponds'] = {**manifest.get('ponds', {}), data['ponds_path']: data['ponds_sha256']}
     for entry in data['entries']:
-        shore = Image.open(ROOT / 'assets/ponds' / (entry['template_id'] + '_shore.png')).getchannel('R')
+        shore = Image.open(shores / (entry['template_id'] + '_shore.png')).getchannel('R')
         distance = np.minimum(np.asarray(shore.resize((width, height), Image.Resampling.BILINEAR), dtype=float) / 255 * 2, 1)
         for ax, az, bx, bz in entry['segments']:
             x0 = max(0, int(np.floor((min(ax, bx) - 1) / 12 * width)))
@@ -75,18 +75,29 @@ def bake_contacts(data, merge=False):
             local = distance[y0:y1, x0:x1]
             np.minimum(local, np.hypot(u - t * dx, v - t * dz), out=local)
         assert entry['segments']
-        Image.fromarray(np.uint8(np.round(np.clip(distance, 0, 1) * 255))).save(OUT / (entry['id'] + '.png'))
+        Image.fromarray(np.uint8(np.round(np.clip(distance, 0, 1) * 255))).save(out / (entry['id'] + '.png'))
         manifest['entries'].append({k: v for k, v in entry.items() if k != 'segments'})
         print(entry['id'], len(entry['segments']), 'waterline segments', flush=True)
-    (OUT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+    for key in ('ponds_path', 'ponds_sha256', 'templates_path', 'templates_sha256'):
+        if not merge and key in data: manifest[key] = data[key]
+    (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('contacts', type=Path)
     parser.add_argument('--merge', action='store_true', help='add these ponds to the bundled masks (another pond list)')
+    parser.add_argument('--art', help='a template art folder (P0 override, SGODOT-374: res://assets/ponds/p0/): its own '
+                        'shore bands are read and its foam/ written with a manifest of its own; the shared pattern stays')
     args = parser.parse_args()
-    OUT.mkdir(parents=True, exist_ok=True)
-    if not args.merge:
-        bake_pattern()
-    bake_contacts(json.loads(args.contacts.read_text()), args.merge)
+    data = json.loads(args.contacts.read_text())
+    if args.art:
+        art = ROOT / args.art.removeprefix('res://')
+        out = art / 'foam'
+        out.mkdir(parents=True, exist_ok=True)
+        bake_contacts(data, False, out, art)
+    else:
+        OUT.mkdir(parents=True, exist_ok=True)
+        if not args.merge:
+            bake_pattern()
+        bake_contacts(data, args.merge)

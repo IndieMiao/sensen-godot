@@ -31,7 +31,12 @@ var access_key := ""
 ## test builds are never turned away for their version).
 var version := 0
 var player_id := ""
-var view: Dictionary = {}
+## The server's view. SGODOT-260 Q3: current() shares its unchanged parts with every caller, so nothing writes into it:
+## in the editor and the tests it is made read-only (a write is an error there; exported builds skip the walk).
+var view: Dictionary = {}:
+	set(v):
+		view = v
+		if OS.has_feature("editor"): P0Logic.freeze(v)
 ## Where the player is (P0Runtime sets it on attach / detach): home, pond, outpost, mine, map or "" when unknown.
 ## Sent beside each command for Rest's 2 h away rule (q(41)); never part of the command or its dedupe key.
 var space := ""
@@ -89,10 +94,20 @@ func _process(dt: float) -> void:
 		_refresh_left = REFRESH_S
 		refresh()
 
-## The server view advanced to "now" on the client clock.
+## The server view advanced to "now" on the client clock. SGODOT-260 Q3: one projection per view and millisecond (the
+## runtime's frame and every caller in it share it; project is a function of the two); callers read it, never write it.
+var _projected: Dictionary = {}
+var _projected_of: Dictionary = {}
+var _projected_ms := -1
 func current() -> Dictionary:
 	if view.is_empty(): return view
-	return P0Logic.project(view, float(Time.get_ticks_msec() - _received_ms))
+	var ms := Time.get_ticks_msec() - _received_ms
+	if ms != _projected_ms or not is_same(_projected_of, view):
+		_projected = P0Logic.project(view, float(ms))
+		if OS.has_feature("editor"): P0Logic.freeze(_projected)   # shared by every caller this millisecond (哪吒 on #573)
+		_projected_of = view
+		_projected_ms = ms
+	return _projected
 
 ## A locally expired crop may finish an optional guide step without any action. Ask the server once per view;
 ## a busy command finishes first, and failures fall back to the existing retry/periodic refresh (no frame storm).
@@ -174,12 +189,11 @@ func _flush_ui() -> void:
 		transport.call(HTTPClient.METHOD_POST, "/p0/telemetry", body, {"type": "telemetry"})
 		return
 	if not is_inside_tree(): return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 	add_child(http)
 	http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
 	# _headers(): the demo key too, or a deployed server (P0_ACCESS_KEYS) would refuse every report with 401
-	if http.request(base_url + "/p0/telemetry", _headers(), HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
+	if http.send(base_url + "/p0/telemetry", _headers(), HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
 
 func dev_skip(minutes: int) -> void:
 	_request(HTTPClient.METHOD_POST, "/p0/dev/skip", {"minutes": minutes}, {})
@@ -194,11 +208,10 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	if transport.is_valid():
 		transport.call(method, path, body, cmd)
 		return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # SGODOT-370: 8 s of live time, a world loading is not the server being slow
 	add_child(http)
 	http.request_completed.connect(_on_done.bind(http, cmd))
-	var err := http.request(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
+	var err := http.send(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
 	if err != OK:
 		http.queue_free()
 		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
@@ -236,8 +249,9 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 		connection_failed.emit("Unexpected server reply", cmd)
 		return {ok = false, code = "network", network = true}
 	if data.has("state"):
-		view = data.state
-		if bj_mock != null: bj_mock.decorate(view)
+		var state: Dictionary = data.state
+		if bj_mock != null: bj_mock.decorate(state)   # before it becomes the (read-only) view
+		view = state
 		_received_ms = Time.get_ticks_msec()
 		_guide_maturity_checked = false
 	if bool(data.get("ok", false)):

@@ -26,7 +26,7 @@ const barterView = (s: P0State) => viewOf(c, s, T0).shops.market.barter!;
 
 describe('Barter (§8.4.5)', () => {
   it('2 regional items become 1 mineral in farm storage', () => {
-    const r = run(at(4), trade('quartz'));   // Lv5 needs Quartz 2: one by barter
+    const r = run(at(5), trade('quartz'));   // Lv6 needs Quartz 2: one by barter
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(count(r.state.bag, 'crop_pumpkin')).toBe(38);
@@ -37,18 +37,18 @@ describe('Barter (§8.4.5)', () => {
   });
 
   it('at most half of the next level\'s need per mineral, counted until the next upgrade', () => {
-    let s = at(4);   // Lv5: Copper Ore 10 → 5 by barter
-    expect(barterView(s).minerals).toEqual(expect.arrayContaining([{ id: 'copper_ore', name: 'Copper Ore', room: 5, share: 5 }]));
-    for (let i = 0; i < 5; i++) { const r = run(s, trade('copper_ore')); if (!r.ok) throw new Error(r.code); s = r.state; }
+    let s = at(4);   // Lv5: Copper Ore 6 → 3 by barter
+    expect(barterView(s).minerals).toEqual(expect.arrayContaining([{ id: 'copper_ore', name: 'Copper Ore', room: 3, share: 3 }]));
+    for (let i = 0; i < 3; i++) { const r = run(s, trade('copper_ore')); if (!r.ok) throw new Error(r.code); s = r.state; }
     expect(run(s, trade('copper_ore'))).toMatchObject({ ok: false, code: 'barter_share' });
-    expect(barterView(s)).toMatchObject({ left: 1, minerals: expect.arrayContaining([{ id: 'copper_ore', name: 'Copper Ore', room: 0, share: 5 }]) });
+    expect(barterView(s)).toMatchObject({ left: 3, minerals: expect.arrayContaining([{ id: 'copper_ore', name: 'Copper Ore', room: 0, share: 3 }]) });
     expect(run(at(4), trade('wood'))).toMatchObject({ ok: false, code: 'not_barterable' });   // Timber is gathered, never bartered
     expect(run(at(3), trade('quartz'))).toMatchObject({ ok: false, code: 'barter_share' });   // Lv4 needs no Quartz
   });
 
   it('six a day, only at the Market Square; the view says when they come back', () => {
     let s = at(4);
-    const minerals = ['stone', 'stone', 'stone', 'clay', 'clay', 'clay'];
+    const minerals = ['stone', 'stone', 'stone', 'copper_ore', 'copper_ore', 'copper_ore'];
     for (const m of minerals) { const r = run(s, trade(m)); if (!r.ok) throw new Error(r.code); s = r.state; }
     expect(run(s, trade('stone'))).toMatchObject({ ok: false, code: 'barter_limit' });
     expect(barterView(s)).toMatchObject({ left: 0, daily: 6, give: 2 });

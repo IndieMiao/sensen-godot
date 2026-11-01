@@ -138,7 +138,9 @@ var _modal_veil: ColorRect   # the open modal's scrim (the home pick's real map 
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
 var _card_queue: Array = []
 var _teach: UiTipCard
-var _teach_left := 0.0
+## When the TipCard on screen closes by time, in Time.get_ticks_msec(); 0: none. Wall-clock, not summed frame deltas: on
+## slow frames the summed deltas ran far behind the clock, and a 2.5 s tip stayed ~11 s on the emulator (不知火舞 on 376).
+var _teach_until_ms := 0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
 var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
@@ -188,9 +190,7 @@ func _process(dt: float) -> void:
 	if _guide_pulse_wait <= 0.0:
 		_guide_pulse_wait = 0.1
 		_refresh_guide_pulses()
-	if _teach_left > 0.0:
-		_teach_left -= dt
-		if _teach_left <= 0.0: _hide_tip()
+	if _teach_until_ms > 0 and Time.get_ticks_msec() >= _teach_until_ms: _hide_tip()
 	if _notice_left > 0.0:
 		_notice_left -= dt
 		if _notice_left <= 0.0: _hide_notice()
@@ -198,7 +198,7 @@ func _process(dt: float) -> void:
 	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed). A dialog is always over
 	# the TipCard, whichever opened first (不知火舞 on 341): while one is open — a result card (the farmhouse's COOK-4
 	# too), the gate card, a confirm, a page — the tip waits; over a drawer (the stove's, the bag) it comes up.
-	if tips and not dialog_open():
+	if tips and not dialog_open() and not _tips_held():
 		var key := tips.next()
 		if key != "": _show_tip(P0Guide.tip_text(key), key)
 	if _teach and _teach.visible: _place_tip()
@@ -227,20 +227,48 @@ func _refresh_guide_pulses() -> void:
 				var page := str(mark.get("page", ""))
 				for drawer in _modal.find_children("*", "P0KitchenDrawer", true, false):
 					targets["cook:" + page] = {node = drawer.guide_cook_target(page)}
+			elif key == "eat":   # S8 (SGODOT-368): that dish's Eat — the cook card's, the bag card's, the cabinet row's
+				var dish := str(mark.get("item", ""))
+				var node := _guide_eat_target(dish)
+				if node != null: targets["eat:" + dish] = {node = node}
 		for mark in P0Guide.guide_marks(view):
 			if not mark is Dictionary or not bool(mark.get("pulse", false)): continue
-			if str(mark.get("object", "")) == "stove" and space == "home" and not has_modal():
+			var object := str(mark.get("object", ""))
+			if object in ["stove", "cabinet"] and space == "home" and not has_modal():
+				var anchor := "room:use_stove_" if object == "stove" else "room:use_warming_cabinet"   # cabinet: S8's dish (SGODOT-368)
 				for id in _name_bars:
 					var bar: UiWorldNameBar = _name_bars[id]
-					if str(id).begins_with("room:use_stove_") and bar.visible and bar.is_expanded():
-						targets["object:stove"] = {node = bar}
+					if str(id).begins_with(anchor) and bar.visible and bar.is_expanded():
+						targets["object:" + object] = {node = bar}
 						break
 			var item := str(mark.get("item", ""))
 			if item != "" and modal_kind == "gift" and is_instance_valid(_bag) and str(_bag.gift_to.get("id", "")) == P0Guide.marked_resident(view) and P0Guide.target_place(view, place):
 				var cells := guide_gift_cells(_bag.grid, item)
 				for id in cells:
 					targets["item:" + id] = {node = cells[id], overlay = guide_item_overlay(_bag), shape = UiGuidePulse.Shape.CARD, radius = UiTokens.RADIUS_CELL}
+			elif item != "" and modal_kind == "bag" and is_instance_valid(_bag) and not _bag.sheet.is_open():
+				# S8's dish in the bag (SGODOT-368): its cells, as the Gift drawer's soup; none once its card is open
+				var cells := guide_gift_cells(_bag.grid, item)
+				for id in cells:
+					targets["item:" + id] = {node = cells[id], overlay = guide_item_overlay(_bag), shape = UiGuidePulse.Shape.CARD, radius = UiTokens.RADIUS_CELL}
+			elif item != "" and modal_kind == "storage" and _modal != null:
+				for sheet in _modal.find_children("*", "P0StorageSheet", true, false):   # the cabinet's row of that dish
+					var row: Control = sheet.guide_row(item)
+					if row != null: targets["row:" + item] = {node = row}
 	guide_pulses.update(view, targets)
+
+## S8's Eat for a dish's base recipe (SGODOT-368), on whichever is open: the cook card showing that dish, the bag's
+## card for it, the cabinet with that row selected; null otherwise (finding never opens or selects anything).
+func _guide_eat_target(dish: String) -> Control:
+	if _modal == null: return null
+	if modal_kind == "kitchen_card":
+		for card in _modal.find_children("*", "UiRewardMoment", true, false):
+			if P0Logic.base_id(str(card.get_meta(&"dish", ""))) == dish: return card.primary_button()
+	elif modal_kind == "bag" and is_instance_valid(_bag) and _bag.sheet.is_open() and P0Logic.base_id(_bag.sheet.item_id()) == dish:
+		return _bag.sheet.button_for(&"eat")
+	elif modal_kind == "storage":
+		for sheet in _modal.find_children("*", "P0StorageSheet", true, false): return sheet.guide_eat(dish)
+	return null
 
 ## A server item mark names a base recipe; all visible qualities use their own cell, without selecting any.
 static func guide_gift_cells(grid: UiInventoryGrid, base: String) -> Dictionary:
@@ -420,24 +448,30 @@ func set_view(v: Dictionary) -> void:
 
 
 var _hold_here := ""
+var _hold_until_server := false
 var _hold_energy := {}
+var _hold_coins := -1
 
 ## While the map flies the player to another city (q(147) ⑤, SGODOT-299) the place chip reads the city they left
-## (`cluster`); "" lets it follow the view again, as on landing.
-func hold_here(cluster: String) -> void:
-	if cluster == _hold_here: return
+## (`cluster`) — from Fly, while the view still says it too (SGODOT-361); "" lets it follow the view again, as on
+## landing. until_server: only until the server's view says it (home's flight, landed before return_home).
+func hold_here(cluster: String, until_server := false) -> void:
+	if cluster == _hold_here and until_server == _hold_until_server: return
 	_hold_here = cluster
+	_hold_until_server = until_server
 	_hud_hash = 0
 	_refresh_hud()
 
 func energy_held() -> bool:
 	return not _hold_energy.is_empty()
 
-## ...and the HUD's Energy reads what it was before the arrival (q(147) ⑥: a first visit's +10 comes with the landing);
-## {} lets it follow the view again.
-func hold_energy(energy: Dictionary) -> void:
-	if energy == _hold_energy: return
+## ...and the HUD's Energy reads what it was before the arrival (q(147) ⑥: a first visit's +10 comes with the landing),
+## the coins too (q(261) ④: the HUD does not move under the cover); {} lets both follow the view again.
+func hold_energy(energy: Dictionary, coins := -1) -> void:
+	if energy.is_empty(): coins = -1
+	if energy == _hold_energy and coins == _hold_coins: return
 	_hold_energy = energy.duplicate()
+	_hold_coins = coins
 	_hud_hash = 0
 	_refresh_hud()
 
@@ -449,15 +483,16 @@ func _refresh_hud() -> void:
 	# chips would still take taps. None over the home pick either: its pages lie on the real map (PR-2b, HOME-WELCOME).
 	hud.visible = _hud_shown()
 	if view.is_empty(): return
-	if _hold_here != "" and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
+	if _hold_until_server and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
 	var seen := view
-	if _hold_here != "" or not _hold_energy.is_empty():   # flying to another city (q(147) ⑤ ⑥): until it lands
+	if _hold_here != "" or not _hold_energy.is_empty():   # flying to another city (q(147) ⑤ ⑥, q(261) ④): until it lands
 		seen = view.duplicate()
 		if _hold_here != "":   # the chip keeps the city left
 			var travel: Dictionary = (view.get("travel", {}) as Dictionary).duplicate()
 			travel["here"] = _hold_here
 			seen["travel"] = travel
 		if not _hold_energy.is_empty(): seen["energy"] = _hold_energy   # and Energy what it was
+		if _hold_coins >= 0: seen["coins"] = _hold_coins   # and the coins
 	var place := P0Travel.place(seen, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""), space)   # arrived in another city: Tokyo · Arrived (q(108))
 	var state := P0Logic.hud_state(seen, {"next_cost": int(fab_state().get("need", 0)), "place": place})
 	var dots: Array = state.get("today_dots", [])
@@ -1618,6 +1653,9 @@ func sys_text() -> String: return _sys.message if _sys != null and is_instance_v
 ## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
 func toast(text: String, seconds := 0.0, break_at_dot := false) -> void:
 	if not _toasts: return
+	if _cover_up:
+		_cover_toast = {kind = "info", text = text, brk = break_at_dot}
+		return
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.INFO, "", seconds)
 
@@ -1683,6 +1721,9 @@ func _aim_toast() -> void:
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
 func toast_error(text: String, action := "") -> void:
 	if not _toasts: return
+	if _cover_up:
+		_cover_toast = {kind = "error", text = text, action = action}
+		return
 	_toast_bag_tab = ""
 	_aim_toast()
 	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
@@ -1693,13 +1734,29 @@ const CREEL_FULL := "Creel full · 0 free slots · Sell or cook first"
 var _toast_bag_tab := ""   # the bag page the showing toast's Open bag › opens ("" = where the bag was)
 
 func toast_creel_full() -> void:
-	toast_error(CREEL_FULL, "Open bag")
+	toast_error(creel_full_text(view), "Open bag")
 	_toast_bag_tab = "Fish"
+
+## q(259) (不知火舞's spec, huowu-q259-spec.md): away from home the second part says what the creel's fish fetch at this
+## city's Tackle Shop and at home, `230 coins here · 304 at home` (the sums from the view's bag.creel_value, the same
+## shape as the away sell card's `{a} each · {b} at home`); at home or without the two sums, `Sell or cook first`. Three
+## lines, broken by the text itself — `Creel full · 0 free slots ·` / `230 coins here ·` / `304 at home`, each of which
+## fits the toast's 232 — not left to the line breaker: no-break spaces held on the desktop but an Android build broke at
+## one (`690 at` / `home`, 李元芳 on 366 c4560e68; without the text server's data the fallback breaker counts U+00A0 as
+## a space).
+static func creel_full_text(v: Dictionary) -> String:
+	var worth = (v.get("bag", {}) as Dictionary).get("creel_value", null)
+	if not (worth is Dictionary) or int(worth.get("here", 0)) <= 0 or int(worth.get("here", 0)) == int(worth.get("home", 0)):
+		return CREEL_FULL
+	return "Creel full · 0 free slots ·\n%s coins here ·\n%s at home" % [P0Travel.grouped(int(worth.here)), P0Travel.grouped(int(worth.home))]
 
 ## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success). `action` adds its line
 ## (`Place now ›` after a decor purchase).
 func toast_success(text: String, break_at_dot := false, action := "") -> void:
 	if not _toasts: return
+	if _cover_up:
+		_cover_toast = {kind = "success", text = text, brk = break_at_dot, action = action}
+		return
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS, action)
 
@@ -1709,6 +1766,26 @@ var _toast_decor := ""
 func toast_decor_bought(id: String) -> void:
 	_toast_decor = id
 	toast_success("%s · in Farm Storage" % P0Decor.name_of(id), true, "Place now")
+
+## q(261) ⑦ (SGODOT-361): a toast said while a cross-city flight's cover is up waits until it is down and its welcome
+## — and a first visit's card — has been said (`after_s`, then as toast_when_clear does); the latest one wins, as a
+## toast replaces a shown one. SYS lines (show_sys) are not held.
+var _cover_up := false
+var _cover_toast := {}
+
+func hold_toasts(on: bool, after_s := 0.0) -> void:
+	_cover_up = on
+	if on or _cover_toast.is_empty(): return
+	var held := _cover_toast
+	_cover_toast = {}
+	if after_s <= 0.0 or not is_inside_tree(): _say_held(held)
+	else: get_tree().create_timer(after_s).timeout.connect(func(): if not _cover_up: _say_held(held))
+
+func _say_held(held: Dictionary) -> void:
+	match str(held.kind):
+		"error": toast_error(str(held.text), str(held.get("action", "")))
+		"success": toast_success_when_clear(str(held.text), bool(held.get("brk", false)))
+		_: toast_when_clear(str(held.text))
 
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""
@@ -1807,6 +1884,31 @@ var _fingers := {}         # touch index (the mouse is -1) → down
 func _input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch: _finger(e.index, e.pressed)
 	elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT: _finger(-1, e.pressed)
+	# SGODOT-260 Q3: a touch, a drag, a click or a key — the runtime sets the view on its next frame (view_wanted)
+	if e is InputEventScreenTouch or e is InputEventScreenDrag or e is InputEventMouseButton or e is InputEventKey \
+			or (e is InputEventMouseMotion and (e as InputEventMouseMotion).button_mask != 0):
+		_touched = true
+
+var _touched := false
+var _shown_of: Dictionary = {}   # the session view the HUD and panels last showed (by reference)
+var _shown_sig := []
+var _shown_ms := -1_000_000
+
+## SGODOT-260 Q3: whether the runtime's frame should set the view (set_view rebuilds nothing unchanged, but working that
+## out every frame was most of a frame's view cost). Due when the server's view is new, when what this UI is showing
+## changed under it (a drawer opened or closed, the world, the bar's action or its pick, offline), after any input,
+## and otherwise at least every VIEW_FLOOR_MS — every countdown's second, and whatever moves without saying so, catch
+## up within a quarter second, as Today's rows always have (_refresh_today). `server_view` is the session's own view
+## (current() projects it); `now_ms` the clock.
+const VIEW_FLOOR_MS := 250
+func view_wanted(server_view: Dictionary, now_ms: int) -> bool:
+	var sig := [modal_kind, _modal, surface, bar_mode, space, selected_seed, selected_bait, offline]
+	if not _touched and is_same(server_view, _shown_of) and sig == _shown_sig and now_ms - _shown_ms < VIEW_FLOOR_MS: return false
+	_touched = false
+	_shown_of = server_view
+	_shown_sig = sig
+	_shown_ms = now_ms
+	return true
 
 func _finger(index: int, down: bool) -> void:
 	if down: _fingers[index] = true
@@ -2710,7 +2812,9 @@ func open_today(given: Array = []) -> void:
 func _refresh_today(force := true) -> void:
 	if modal_kind != "today" or not is_instance_valid(_today_panel): return
 	var now := Time.get_ticks_msec()
-	if not force and now - _today_refresh_ms < 250: return
+	# at most four times a second; 10 ms short of it so the runtime's quarter-second view (view_wanted, its own clock read
+	# in the same frame) always gets through, one gate and not two (哪吒 on #576)
+	if not force and now - _today_refresh_ms < VIEW_FLOOR_MS - 10: return
 	_today_refresh_ms = now
 	var rows := _today_given if not _today_given.is_empty() else P0Logic.today_rows(view)
 	var sig := JSON.stringify(rows) + space_here() + place + str(spot_reachable())
@@ -2740,6 +2844,9 @@ func _show_today_row(i: int) -> void:
 	if go == "inbox":
 		open_inbox("parcels")
 		return
+	if go == "bag":   # S8's dish to eat in the bag (SGODOT-368): the bag on its Dishes page, wherever the player is
+		open_bag("", "bag", "Dishes")
+		return
 	if show_label(go, space_here(), spot_reachable(), place) == "Show":
 		# q(99): only remember a named recipe while the stove is free. This still only moves the camera.
 		var page := str(row.get("page", ""))
@@ -2761,6 +2868,7 @@ static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.beg
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
 	if go == "inbox": return "Show"   # the Inbox opens anywhere: its Parcels page (q(254) ①, Pip's seeds)
+	if go == "bag": return "Show"     # and the bag: S8's dish to eat (SGODOT-368)
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
@@ -3663,12 +3771,35 @@ func tip_pending() -> bool:
 func tip_showing(key: String) -> bool:
 	return tips != null and tips.showing == key and _teach != null and _teach.visible
 
+## Any TipCard is on screen: the pond's fishing status card waits under it (q(49), SGODOT-376).
+func tip_on_screen() -> bool:
+	return _teach != null and _teach.visible
+
+## A TipCard is on screen, or waits and comes up on the next frame (no dialog, no Moment): the first cast's tip is asked
+## for in the same response that puts `Watch the float…` up, so the status card holds from that frame (SGODOT-376 ③).
+func tip_up_or_coming() -> bool:
+	if tip_on_screen(): return true
+	return tips != null and not tips.waiting.is_empty() and tips.moments == 0 and not dialog_open() and not _tips_held()
+
+## Keep new TipCards back for `ms` (the fishing panel renews it every frame while a bite waits for Hook: the bite takes
+## the screen, SGODOT-376 ②). Self-expiring, so a panel that goes away never keeps the tips back.
+var _tips_held_until_ms := 0
+func hold_tips(ms: int) -> void:
+	_tips_held_until_ms = Time.get_ticks_msec() + ms
+
+func _tips_held() -> bool:
+	return Time.get_ticks_msec() < _tips_held_until_ms
+
+## Close the TipCard on screen now (a bite takes the screen, SGODOT-376 ②).
+func close_tip() -> void:
+	if tip_on_screen(): _hide_tip()
+
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
 	if tips and tips.did(action): _hide_tip(false)
 
 func _hide_tip(close_queue := true) -> void:
-	_teach_left = 0.0
+	_teach_until_ms = 0
 	if _teach: _teach.hide()
 	if close_queue and tips: tips.close()
 	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
@@ -3695,7 +3826,7 @@ func _show_tip(text: String, key := "") -> void:
 	if _toasts != null and _toasts.get_parent() == root: root.move_child(_toasts, -1)
 	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)
 	_place_tip()
-	_teach_left = P0Guide.tip_seconds(text)
+	_teach_until_ms = Time.get_ticks_msec() + int(P0Guide.tip_seconds(text) * 1000.0)
 
 ## Where the TipCard sits (不知火舞 on 232, TUT-1-2 / TUT-3-04B / TUT-3-07B): centred; its top 120 under HUD row 2,
 ## clear of the joystick's centre, the main action key and the quick bar. In the kitchen (不知火舞 on 341), at x 16:

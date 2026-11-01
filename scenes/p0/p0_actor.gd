@@ -14,6 +14,11 @@ var _labour_left := 0.0
 var _attack_left := 0.0
 var _attack_lock := 0.0
 var _joy := Vector2.ZERO
+## SGODOT-306 (不知火舞 2a96260f): the stick held against something the body cannot pass — after PUSH_IDLE_S of steps
+## that went nowhere the body stands (idle), still turning with the stick; a step that moves runs again at once.
+## Only the clip: state stays "move" and mover.is_moving() keeps its meaning (the camera, doors, auto-walk use it).
+const PUSH_IDLE_S := 0.1
+var _stuck_s := 0.0
 var cam: Camera3D
 ## Optional ground height under a point (the farm's raised beds); the rig steps up onto it.
 var ground_height: Callable
@@ -51,6 +56,7 @@ func step(dt: float) -> void:
 	if state == "labour":
 		_labour_left -= dt
 		if _labour_left <= 0.0: state = "idle"
+	var stepped := false
 	if state in ["labour", "locked"] or cam == null:
 		mover.stop()
 	elif _attack_lock > 0.0:
@@ -63,13 +69,15 @@ func step(dt: float) -> void:
 		var dir := right.normalized() * _joy.x - fwd.normalized() * _joy.y
 		mover.set_joystick(Vector2(dir.x, dir.z).limit_length(1.0))
 		mover.step(dt)
+		stepped = true
 	var y := float(ground_height.call(mover.position)) if ground_height.is_valid() else 0.0
 	position = Vector3(mover.position.x, lerpf(position.y, y, clampf(dt * 14.0, 0, 1)), mover.position.z)
+	_stuck_s = _stuck_s + dt if stepped and mover.stuck else 0.0
 	if mover.is_moving() and _attack_lock <= 0.0:
 		look_at(position + mover.facing, Vector3.UP)
 		state = "move"
 		_attack_left = 0.0   # the stick past the strike takes the body back from the slash's follow-through
-		_play("run")
+		_play("idle" if _stuck_s >= PUSH_IDLE_S else "run")
 	elif state == "move":
 		state = "idle"
 	if state == "idle" and _attack_left <= 0.0: _play("idle")

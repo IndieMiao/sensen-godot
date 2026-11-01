@@ -133,12 +133,14 @@ func test_expired_crop_waits_for_the_command_and_does_not_storm_after_failure() 
 
 func test_an_expired_crop_on_a_legacy_save_does_not_add_a_read() -> void:
 	_guide_timer(45000)
-	session.view.guide = {"step": null, "end": "legacy"}
+	var legacy: Dictionary = session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	legacy.guide = {"step": null, "end": "legacy"}
+	session.view = legacy
 	session._refresh_guide_maturity(50000)
 	assert_array(sent).is_empty()
 
 func test_guide_ack_is_deduped_and_build_uses_its_returned_seq() -> void:
-	session.view.guide = {"step": "t_city"}
+	session.view = _guided(session.view)
 	assert_bool(session.guide_ack("t_city")).is_true()
 	assert_bool(session.guide_ack("t_city")).is_false()
 	session.send({"type": "choose_home", "city": "gn-1850147", "spot": 0}, "build")
@@ -150,7 +152,7 @@ func test_guide_ack_is_deduped_and_build_uses_its_returned_seq() -> void:
 	assert_bool(session.guide_ack("t_city")).is_false()
 
 func test_ack_failure_discards_the_queued_build_until_an_explicit_retry() -> void:
-	session.view.guide = {"step": "t_city"}
+	session.view = _guided(session.view)
 	session.guide_ack("t_city")
 	session.send({"type": "choose_home", "city": "gn-1850147", "spot": 0}, "build")
 	_fail()
@@ -173,3 +175,9 @@ func test_an_authoritative_zero_countdown_waits_for_action_instead_of_reading_fo
 	session.view = {"guide": {"step": "t_nadia_1", "recover": "r_radish_wait", "row": {"countdown": "crop_radish", "ready_in": 0}}}
 	for elapsed in [0.0, 1000.0, 10000.0]: session._refresh_guide_maturity(elapsed)
 	assert_array(sent).is_empty()
+
+## The view with the guide on its first step (the session's view is read-only, SGODOT-260 Q3: a changed copy in its place).
+func _guided(v: Dictionary) -> Dictionary:
+	var out := v.duplicate(true)
+	out.guide = {"step": "t_city"}
+	return out

@@ -150,12 +150,9 @@ var _map_is_ready := false
 ## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
 var street_mode := false
 var region: Dictionary = {}
-var _awaiting_account := false
 var _account_user_id := ""
 ## 平移边界（lat/lng）：position=(lat_min,lng_min)，size=(lat span,lng span)；零 size 不钳。
 var pan_bounds := Rect2()
-var candidate_overlay: CandidateOverlay = null
-var select_panel: SelectPanel = null
 ## 已有农场时的「家」模式：不再选地，底部是 Nearby Farmers，侧栏多一个 My Farm。
 var nearby_panel: NearbyPanel = null
 var my_farm_btn: Button = null
@@ -165,7 +162,6 @@ var _farm_choice: Dictionary = {}
 ## 上次拉取 Nearby 的地区。is_node_ready() 在 _ready() 内部就已经为真，所以
 ## enter_street_mode() 与 _ready() 尾部会各进一次 _build_region_ui()——按地区去重，别刷两遍。
 var _nearby_region := ""
-var _candidate_bps: Dictionary = {} # layout_patch_id -> FarmBlueprint
 const STREET_ZOOM_MIN := 15.0
 const STREET_ZOOM_MAX := 18.0
 ## 城市地图的无缝缩放（spec 2026-09-23-map-seamless-zoom-city-switch）：
@@ -195,16 +191,7 @@ var farm_overlay: CandidateOverlay
 var _zoom_label: Label
 var _nearby_generation := 0
 var _map_controls_built := false
-var _placement_mode := false
-var _placement_location: Dictionary = {}
-var _placement_pin: TextureRect
-var _placing_busy := false
 var _opening_farm := false
-var _relocation_mode := false
-var _relocation_session: FarmSession
-var _relocation_preview: FarmRelocationPreview
-var _relocation_generation := 0
-var _relocation_committed := false
 ## 城市气泡上的各城农场数（region_id -> int），进入低 zoom 时拉取，60 秒内不重拉。
 var city_farm_counts := {}
 var _counts_fetched_ms := -1
@@ -240,7 +227,6 @@ func _ready() -> void:
 	side_toolbar.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	load_bar.remove_theme_stylebox_override("background")
 	load_bar.remove_theme_stylebox_override("fill")
-	$HUD/SafeArea/Root.resized.connect(_layout_relocation_card)
 	_load_bar_started_ms = Time.get_ticks_msec()
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
@@ -355,8 +341,6 @@ func _process(_dt: float) -> void:
 		_update_active_city()
 		_update_city_detail()
 		city_map.tick(_dt)
-	if _placement_mode and _placement_pin:
-		_placement_pin.position = cam.unproject_position(center_world) - _placement_pin.get_parent().global_position - Vector2(14, 28)
 	if Engine.get_process_frames() % 30 == 0:
 		_refresh_header()
 
@@ -479,8 +463,6 @@ func _update_cameras() -> void:
 	# 同一份位姿喂给地图（单一权威）
 	if map:
 		map.set_camera(center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch)
-	if _placement_mode:
-		_update_placement_preview()
 
 ## The Godot camera alone for the current centre / zoom / bearing / pitch (no map, pawns or markers): enough for
 ## geo_to_screen while a host tries views (P0's opening frame), finished by one _update_cameras. Returns its distance.
@@ -555,8 +537,6 @@ func _reposition_pawns() -> void:
 	for p in _pawns:
 		(p.node as Node3D).position = MapGeoMath.geo_to_world(
 			p.lat, p.lng, anchor_lat, anchor_lng)
-	if candidate_overlay:
-		candidate_overlay.reanchor(anchor_lat, anchor_lng)
 	if farm_overlay:
 		farm_overlay.reanchor(anchor_lat, anchor_lng)
 
@@ -617,7 +597,6 @@ func _tween_zoom(target: float) -> void:
 ## —— 输入与 UI ————————————————————————————————————————————————
 
 func _unhandled_input(e: InputEvent) -> void:
-	if _placing_busy or _relocation_preview != null: return
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and e.device != InputEvent.DEVICE_ID_EMULATION:
 		if not e.pressed and not _map_mouse_down: return
 		_map_mouse_down = e.pressed
@@ -674,17 +653,11 @@ func _unhandled_input(e: InputEvent) -> void:
 				elif city_map and not e.canceled and not city_map.selected.is_empty():
 					city_map.clear_selection()
 					_last_tap_ms = 0
-				elif not _relocation_mode and not e.canceled and farm_markers and (not farm_markers.selected_id.is_empty() or (nearby_panel and nearby_panel.visible)):
+				elif not e.canceled and farm_markers and (not farm_markers.selected_id.is_empty() or (nearby_panel and nearby_panel.visible)):
 					_clear_farm_selection()
 					if nearby_panel: _set_nearby_open(false)
-				elif not _relocation_mode and not e.canceled and journey_map and journey_map.visible and journey_map.activate_at(e.position):
+				elif not e.canceled and journey_map and journey_map.visible and journey_map.activate_at(e.position):
 					_last_tap_ms = 0
-				elif _placement_mode and not _placing_busy:
-					var point = _ground_point(e.position)
-					if point != null:
-						var delta := (point as Vector3) - center_world
-						_apply_world_delta(delta)
-						_camera_dirty = true
 				elif _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
 					_tween_zoom(zoom + 1.0)
@@ -722,7 +695,7 @@ func _unhandled_input(e: InputEvent) -> void:
 			_fling_vel = _fling_vel.lerp(delta / dt, FLING_EMA)
 			_fling_peak = maxf(_fling_peak, _fling_vel.length())
 			_camera_dirty = true
-		# A drag cannot become a placement tap or seed the next double tap.
+		# A drag cannot become a tap or seed the next double tap.
 		_drag_accum_px += e.relative.length()
 		if _drag_accum_px > TAP_SLOP_PX:
 			_last_tap_ms = 0
@@ -797,172 +770,13 @@ func enter_street_mode(r: Dictionary) -> void:
 		_build_map_controls()
 	_camera_dirty = true
 
-## Called after the owner DTO commits, even when the current map is suspended.
-func refresh_owned_farm_after_relocation(choice: Dictionary) -> void:
-	var bp := FarmBlueprint.load_choice(choice)
-	if bp == null or bp.overlay.is_empty(): return
-	_farm_choice = choice.duplicate(true)
-	var own_region := FarmRegions.load_default().region(bp.region_id)
-	if not own_region.is_empty(): region = own_region
-	_nearby_generation += 1
-	_snapshots.clear()
-	_anchor_self_to_farm(bp.overlay.center)
-	if farm_markers:
-		farm_markers.put("self", bp, own_farm_name, true)
-		farm_markers.selected_id = ""
-		if is_instance_valid(farm_markers.miniature):
-			farm_markers.miniature.hide()
-			farm_markers.miniature.set("_key", "")
-	if farm_overlay:
-		farm_overlay.set_candidates([bp], anchor_lat, anchor_lng)
-		farm_overlay.select(bp.layout_patch_id)
-		farm_overlay.hide()
-	if farm_markers == null:
-		_enter_farm_home(region)
-	else:
-		_set_nearby_open(false)
-		_refresh_nearby()
-	_focus_region(region, bp)
-	_camera_dirty = true
-
-## Relocation always receives the owner's city, never the city currently browsed.
-func enter_relocation_mode(r: Dictionary, owner_session: FarmSession = null) -> void:
-	_remove_city_map()
-	_relocation_session = owner_session if owner_session != null else Net.session
-	_relocation_mode = true
-	# _ready may already have built the owner's regular map before router entry.
-	_nearby_generation += 1
-	for control in [nearby_panel, my_farm_btn, journey_footer, journey_map, journey_backdrop, farm_markers, farm_overlay]:
-		if is_instance_valid(control): control.hide()
-	if is_instance_valid(farm_markers) and is_instance_valid(farm_markers.miniature): farm_markers.miniature.hide()
-	enter_street_mode(r)
-	if is_node_ready(): edit_avatar_btn.get_parent().hide()
-	if _relocation_session != null and FarmPlacement.is_valid(_relocation_session.location):
-		fly_to(float(_relocation_session.location.lat), float(_relocation_session.location.lng))
-
-func _preview_relocation() -> void:
-	if _placing_busy or not FarmPlacement.generated_contains(region, _placement_location): return
-	if _relocation_session == null: return
-	_placing_busy = true
-	_reset_gesture()
-	select_panel.set_saving(true)
-	# Generating geography has no side effects: the player may leave while it loads.
-	select_panel._cancel.disabled = false
-	_relocation_generation += 1
-	var generation := _relocation_generation
-	var data: Dictionary = await _relocation_session.preview_relocation(str(region.get("id", "")), _placement_location)
-	if not is_inside_tree() or generation != _relocation_generation: return
-	_placing_busy = false
-	if data.is_empty():
-		select_panel.set_saving(false, _relocation_error(_relocation_session.last_error_code))
-		return
-	_relocation_preview = FarmRelocationPreview.new()
-	$HUD/SafeArea/Root.add_child(_relocation_preview)
-	_layout_relocation_card()
-	_relocation_preview.confirmed.connect(_confirm_relocation)
-	_relocation_preview.reselected.connect(_reselect_relocation)
-	_relocation_preview.cancelled.connect(_cancel_relocation)
-	if not _relocation_preview.configure(data, str(region.get("id", ""))):
-		_reselect_relocation()
-		select_panel.set_saving(false, _generation_error("INVALID_FARM_TERRAIN"))
-		return
-	select_panel.hide()
-	side_toolbar.hide()
-	if _placement_pin: _placement_pin.hide()
-	_layout_relocation_card.call_deferred()
-
-func _layout_relocation_card() -> void:
-	if not is_instance_valid(_relocation_preview): return
-	var area: Vector2 = ($HUD/SafeArea/Root as Control).size
-	var width := minf(620, maxf(1, area.x - 8))
-	var height := minf(620, maxf(1, area.y - 86))
-	_relocation_preview.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	_relocation_preview.position = Vector2((area.x - width) * 0.5, area.y - height - 4)
-	_relocation_preview.size = Vector2(width, height)
-
-func _reselect_relocation() -> void:
-	if _placing_busy or (_relocation_session != null and _relocation_session.relocation_pending()): return
-	if _relocation_preview:
-		_relocation_preview.queue_free()
-		_relocation_preview = null
-	select_panel.show()
-	side_toolbar.show()
-	select_panel.set_saving(false)
-	if _placement_pin: _placement_pin.show()
-	_update_placement_preview()
-
-func _confirm_relocation() -> void:
-	if _placing_busy or _relocation_preview == null or _relocation_session == null: return
-	_placing_busy = true
-	_reset_gesture()
-	_relocation_preview.set_busy(true)
-	if _relocation_committed:
-		await _finish_relocation()
-		return
-	var succeeded: bool = await _relocation_session.confirm_relocation(_relocation_preview.preview)
-	if not is_inside_tree(): return
-	_placing_busy = false
-	if not succeeded:
-		_relocation_preview.set_busy(false, _relocation_session.relocation_pending(), _relocation_error(_relocation_session.last_error_code))
-		if not _relocation_session.relocation_pending() and _relocation_session.last_error_code in ["RELOCATION_EXPIRED", "RELOCATION_CONFLICT"]:
-			_relocation_preview.confirm_button.disabled = true
-		return
-	_relocation_committed = true
-	await _finish_relocation()
-
-func _finish_relocation() -> void:
-	_placing_busy = true
-	var choice := _relocation_session.farm_choice()
-	FarmChoice.save_choice(choice)
-	await AppRouter.complete_farm_relocation(choice)
-	if not is_inside_tree(): return
-	# Scene loading can fail after the server commits. Retry entering the confirmed
-	# farm without issuing another relocation or resuming obsolete geometry.
-	_placing_busy = false
-	_relocation_preview.set_busy(false, true)
-	_relocation_preview.confirm_button.text = "Enter your farm"
-	_relocation_preview.status.text = "Your farm has moved. Tap to enter it."
-
-func _cancel_relocation() -> void:
-	if _relocation_committed: return
-	if _relocation_session != null and _relocation_session.relocation_pending(): return
-	# Preview requests may finish later; their result cannot mutate a farm or reopen UI.
-	if _placing_busy and _relocation_preview != null: return
-	_relocation_generation += 1
-	AppRouter.cancel_farm_relocation()
-
-static func _relocation_error(code: String) -> String:
-	return {
-		"RELOCATION_UNAVAILABLE": "This farm has no relocation opportunity left.",
-		"RELOCATION_EXPIRED": "This preview expired. Choose the location again.",
-		"RELOCATION_CONFLICT": "Your farm changed. Preview again to include the latest crops and decorations.",
-		"RELOCATION_BUSY": "Finish fishing and return from the mine before relocating.",
-		"RELOCATION_NO_SPACE": "This area cannot fit your crops and decorations. Choose another location.",
-		"PENDING_ACTION": "Check the previous action before relocating.",
-		"LOCAL_STORAGE": "Could not save the previous action. Try again.",
-	}.get(code, _generation_error(code))
-
-## 已经有农场就不再选地：候选层与 Create Farm 都不建，直接进「家」模式。
+## 有农场就进「家」模式；没有就只浏览地图（按地图选点建农场已退役，SGODOT-342）。
 ## _ready() 与 enter_street_mode() 两个入口都走这里，且可重入。
 func _build_region_ui(r: Dictionary) -> void:
-	if _relocation_mode:
-		load_candidates(r)
-		if select_panel: select_panel.set_relocation_mode()
-		return
 	_farm_choice = _resolve_farm_choice()
 	if _farm_choice.is_empty():
-		load_candidates(r)
-	elif farm_markers == null:
-		_placement_mode = false
-		if _placement_pin: _placement_pin.visible = false
-		if candidate_overlay:
-			remove_child(candidate_overlay)
-			candidate_overlay.queue_free()
-			candidate_overlay = null
-		if select_panel:
-			select_panel.get_parent().remove_child(select_panel)
-			select_panel.queue_free()
-			select_panel = null
+		return
+	if farm_markers == null:
 		_enter_farm_home(r)
 	elif str(r.get("id", "")) != _nearby_region:
 		_focus_region(r, FarmBlueprint.load_choice(_farm_choice))
@@ -976,150 +790,6 @@ func set_pan_bounds(center_lat: float, center_lng: float, half_m: float) -> void
 	var dlng := half_m / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(center_lat)))
 	pan_bounds = Rect2(center_lat - dlat, center_lng - dlng, 2.0 * dlat, 2.0 * dlng)
 	_clamp_to_bounds()
-
-## —— 候选流（PRD §4.3）——————————————————————————————————————————
-
-func load_candidates(r: Dictionary) -> void:
-	if candidate_overlay: return
-	_candidate_bps.clear()
-	var center := Vector2(float(r.center[0]), float(r.center[1]))
-	var preview := FarmPlacement.preview(str(r.get("id", "")), center)
-	_candidate_bps[preview.layout_patch_id] = preview
-	candidate_overlay = CandidateOverlay.new()
-	candidate_overlay.name = "FarmSelection"
-	candidate_overlay.outline_only = true
-	candidate_overlay.placement_outline = true
-	add_child(candidate_overlay)
-	candidate_overlay.set_candidates([preview], anchor_lat, anchor_lng)
-	select_panel = SelectPanel.new()
-	$HUD/SafeArea/Root.add_child(select_panel)
-	select_panel.set_generation_mode()
-	select_panel.confirmed.connect(_on_candidate_confirmed)
-	select_panel.placement_cancelled.connect(_cancel_placement)
-	fly_to(center.x, center.y)
-	_begin_placement(preview.layout_patch_id)
-
-func focus_candidate(id: String) -> void:
-	if not _candidate_bps.has(id):
-		return
-	var center: Vector2 = _candidate_bps[id].overlay.center
-	set_pan_bounds(center.x, center.y, 300.0)
-	fly_to(center.x, center.y)
-	candidate_overlay.select(id)
-	if select_panel.focused_id != id:
-		select_panel.focus(id)
-
-func _save_choice(id: String) -> void:
-	FarmChoice.save(id, _candidate_bps[id].revision, _placement_location if _placement_mode else {})
-
-func _on_candidate_confirmed(id: String) -> void:
-	if _placing_busy: return
-	if _relocation_mode:
-		await _preview_relocation()
-		return
-	if not _placement_mode:
-		_begin_placement(id)
-		return
-	if not FarmPlacement.generated_contains(region, _placement_location): return
-	_placing_busy = true
-	_reset_gesture()
-	select_panel.set_saving(true)
-	var choice := await _resolve_confirmed_farm(id)
-	if not is_inside_tree(): return
-	_placing_busy = false
-	if choice.is_empty():
-		select_panel.set_saving(false, location_status.text)
-		return
-	AppRouter.open_instance(AppRouter.FARM, choice)
-
-func _begin_placement(id: String) -> void:
-	if not _candidate_bps.has(id): return
-	_placement_mode = true
-	_reset_gesture()
-	var bounds: Array = region.get("placement_bounds", [])
-	if bounds.size() == 4:
-		pan_bounds = Rect2(float(bounds[0]), float(bounds[1]), float(bounds[2]) - float(bounds[0]), float(bounds[3]) - float(bounds[1]))
-	candidate_overlay.outline_only = true
-	if select_panel.generation_mode:
-		candidate_overlay.move_candidate(id, Vector2(center_lat, center_lng))
-	else:
-		var preview: FarmBlueprint = _candidate_bps[id].with_location({"lat": center_lat, "lng": center_lng})
-		candidate_overlay.set_candidates([preview], anchor_lat, anchor_lng)
-	candidate_overlay.select(id)
-	if _placement_pin == null:
-		_placement_pin = GameUi.picture(GameUi.icon("map-pin"), 28)
-		_placement_pin.modulate = GameUi.GREEN
-		$HUD/SafeArea/Root.add_child(_placement_pin)
-	_placement_pin.visible = true
-	_update_placement_preview()
-
-func _update_placement_preview() -> void:
-	if not _placement_mode or select_panel == null or _placing_busy or _relocation_preview != null: return
-	var next_location := {"lat": snappedf(center_lat, 0.000001), "lng": snappedf(center_lng, 0.000001)}
-	if _relocation_mode and next_location == _placement_location: return
-	_placement_location = next_location
-	candidate_overlay.move_candidate(select_panel.focused_id, Vector2(center_lat, center_lng))
-	select_panel.set_placement_mode(true, FarmPlacement.generated_contains(region, _placement_location))
-
-func _cancel_placement() -> void:
-	if _relocation_mode:
-		_cancel_relocation()
-		return
-	if _placing_busy: return
-	AppRouter.go_to_city_select()
-
-## 玩家选了 id，但**服务端已有农场时以服务端为准**：ensure_farm 取回的是旧农场，客户端若
-## 仍按新选的蓝图进场，发出去的格子全在别的坐标上（2026-09-04 真机全程 CELL_NOT_CULTIVABLE）。
-## 只有服务器确认农场后才能进入；失败留在选地页，允许重新连接。
-func _resolve_confirmed_farm(_id: String) -> Dictionary:
-	if await _connect_farm_service():
-		if not is_inside_tree(): return {}
-		# Guests browse only; creating a farm needs an account (2026-09-28 decision 2).
-		if not Net.account.profile_complete() and not await _require_account("Sign in to create your farm."):
-			location_status.text = L10n.text(AccountSession.describe("LOGIN_REQUIRED") if Net.is_guest() else "Add a nickname to create your farm.")
-			return {}
-		if not is_inside_tree(): return {}
-		var ok: bool = await Net.session.ensure_generated_farm(str(region.get("id", "")), _placement_location)
-		if not is_inside_tree(): return {}
-		if not ok:
-			if Net.session.last_error_code == "LOGIN_REQUIRED":
-				location_status.text = L10n.text(AccountSession.describe("LOGIN_REQUIRED"))
-				return {}
-			location_status.text = _generation_error(Net.session.last_error_code)
-			return {}
-		# The server decides the city from the pin; a border pick may land in the neighbouring city.
-		await Net.ensure_city(Net.session.region_id)
-		if not is_inside_tree(): return {}
-		var choice := Net.session.farm_choice()
-		if FarmBlueprint.load_choice(choice) == null:
-			location_status.text = _generation_error("INVALID_FARM_TERRAIN")
-			return {}
-		if _id != "map_selection" and str(choice.layout_patch_id) != _id:
-			location_status.text = L10n.format_text("You already have a farm at %s", _candidate_name(str(choice.layout_patch_id)))
-		FarmChoice.save_choice(choice)
-		return choice
-	location_status.text = "Could not connect. Try again."
-	return {}
-
-static func _generation_error(code: String) -> String:
-	return {
-		"LOCATION_ALL_WATER": "This area is entirely water. Choose another location.",
-		"LOCATION_ALL_DESERT": "This area is entirely desert. Choose another location.",
-		"LOCATION_UNSUITABLE": "There is not enough usable land. Choose another location.",
-		"GEOGRAPHY_UNAVAILABLE": "Map service is temporarily unavailable. Please try again.",
-		"GEOGRAPHY_INCOMPLETE": "This area has insufficient terrain information. Move the map to choose another area.",
-		"INVALID_FARM_TERRAIN": "The farm terrain could not be verified. Retry loading it.",
-		"GENERATION_UNSUPPORTED": "This server needs the compact farm update. Try again after updating.",
-		"LOCATION_OUTSIDE_REGION": "Choose an area inside this city",
-		"INVALID_LOCATION": "Choose a valid farm location",
-		"TRANSPORT": "Could not connect. Try again.",
-	}.get(code, "Could not save farm. Try again.")
-
-func _candidate_name(layout_id: String) -> String:
-	for c in region.get("candidates", []):
-		if str(c.get("layout_patch_id", "")) == layout_id:
-			return str(c.get("name", layout_id))
-	return layout_id
 
 func _clamp_to_bounds() -> void:
 	if pan_bounds.size == Vector2.ZERO:
@@ -1452,9 +1122,10 @@ func _resolve_farm_choice() -> Dictionary:
 func _server_has_no_farm() -> bool:
 	return Net and Net.logged_in() and not Net.session.has_farm() and Net.session.last_error_code == "NO_FARM"
 
-func _show_farm_selection() -> void:
+## The server has no farm for this player: leave home mode and keep browsing (no farm is created from the map).
+func _leave_farm_home() -> void:
 	_remove_city_map()
-	# A cached choice may belong to a different server. Keep it on disk until a new farm is confirmed.
+	# A cached choice may belong to a different server. Keep it on disk until the server confirms a farm.
 	_nearby_generation += 1
 	for node in [nearby_panel, my_farm_btn, farm_markers, farm_overlay]:
 		if node:
@@ -1467,16 +1138,14 @@ func _show_farm_selection() -> void:
 	_snapshots.clear()
 	_farm_choice = {}
 	_nearby_region = ""
-	load_candidates(region)
 	_camera_dirty = true
 
-## Net 在地图 _ready() 之后才 boot 完的情况：登录一到就重看一遍——有农场就从选地切到家。
+## Net 在地图 _ready() 之后才 boot 完的情况：登录一到就重看一遍——有农场就进家模式。
 func _on_net_booted(_ok: bool) -> void:
-	if _relocation_mode: return
 	if not street_mode:
 		return
 	if _server_has_no_farm():
-		_show_farm_selection()
+		_leave_farm_home()
 		return
 	if farm_markers != null:
 		if nearby_panel: nearby_panel.set_place_state(Net.session.state if Net and Net.session else {})
@@ -1485,14 +1154,6 @@ func _on_net_booted(_ok: bool) -> void:
 			_refresh_nearby()
 		return
 	if Net.session.has_farm():
-		if candidate_overlay:
-			remove_child(candidate_overlay)
-			candidate_overlay.queue_free()
-			candidate_overlay = null
-		if select_panel:
-			select_panel.get_parent().remove_child(select_panel)
-			select_panel.queue_free()
-			select_panel = null
 		_build_region_ui(region)
 
 ## Keep the browsing city independent of the saved farm's location.
@@ -1571,7 +1232,7 @@ func _setup_journey_map() -> void:
 	if CityMapData.has_city(str(region.get("id", ""))) or not nearby_panel: return
 	if not Net or not Net.session or not JourneyProgress.active(Net.session.state) or journey_map: return
 	journey_map = JourneyMap.new()
-	if Net.session.farm_terrain.is_empty(): journey_map.configure(JourneyStreets.load_for(Net.session))
+	journey_map.configure(JourneyStreets.load_for(Net.session))
 	journey_map.hide()
 	$HUD/SafeArea/Root.add_child(journey_map)
 	$HUD/SafeArea/Root.move_child(journey_map, 0)
@@ -1665,9 +1326,6 @@ func _clear_farm_selection() -> void:
 
 func is_back_navigation_locked() -> bool:
 	if city_map and city_map.consume_back(): return true
-	if _relocation_mode:
-		_cancel_relocation()
-		return true
 	if farm_markers and ((nearby_panel and nearby_panel.visible) or not farm_markers.selected_id.is_empty()):
 		_clear_farm_selection()
 		if nearby_panel: _set_nearby_open(false)
@@ -1729,10 +1387,6 @@ func _build_map_controls() -> void:
 	rail.add_child(home_button)
 
 func _focus_own_farm(highlight := true) -> void:
-	if _relocation_mode:
-		if _relocation_session != null and FarmPlacement.is_valid(_relocation_session.location):
-			fly_to(float(_relocation_session.location.lat), float(_relocation_session.location.lng))
-		return
 	if farm_markers == null or not farm_markers.points.has("self"): return
 	_clear_city_player()
 	var point: Dictionary = farm_markers.points.self
@@ -1826,7 +1480,6 @@ func _focus_blueprint(bp: FarmBlueprint) -> void:
 			center += Vector2(-shift.z / MapGeoMath.M_PER_DEG_LAT, shift.x / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(center.x))))
 	var from_lat := center_lat
 	var from_lng := center_lng
-	# Browsing bounds are independent of placement / relocation bounds.
 	if city_map: _city_bounds(); _set_zoom(home_zoom)
 	else: set_pan_bounds(center.x, center.y, 450)
 	center_lat = from_lat
@@ -1840,7 +1493,6 @@ func _focus_blueprint(bp: FarmBlueprint) -> void:
 		_camera_dirty = true, 0.0, 1.0, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 func _sync_farm_markers() -> void:
-	if _relocation_mode: return
 	if farm_markers == null: return
 	if farm_markers.points.has("self") and Net and Net.session:
 		farm_markers.points.self.plots = (Net.session.state.get("cells", {}) as Dictionary).size()
@@ -1874,19 +1526,9 @@ func _sync_farm_markers() -> void:
 			_zoom_label.hide()
 	_update_pawns(_cam_distance())
 
-## 登录墙：弹账号面板并等它关闭。返回关闭时是否已登录。
-func _require_account(reason: String) -> bool:
-	if Net.account.profile_complete(): return true
-	_awaiting_account = true
-	# Guests sign up; signed-in players without a nickname finish their profile first.
-	var panel := AccountPanel.open(self, "profile" if not Net.is_guest() else "sign_up", L10n.text(reason))
-	await panel.closed
-	_awaiting_account = false
-	return Net.account.profile_complete()
-
-## 在地图上登录 / 登出 / 删号：按新身份重建地图（登录墙流程自己接着走，不重建）。
+## 在地图上登录 / 登出 / 删号：按新身份重建地图。
 func _on_account_changed(_signed_in: bool) -> void:
-	if _awaiting_account or _relocation_mode or not is_inside_tree(): return
+	if not is_inside_tree(): return
 	if AppRouter.top_instance() != null: return
 	# No guest mode (2026-09-29): signing out or deleting the account goes back to the sign-in gate.
 	if Net.is_guest():
@@ -1928,7 +1570,6 @@ func _connect_farm_service() -> bool:
 	return Net.logged_in()
 
 func _open_my_farm() -> void:
-	if _relocation_mode: return
 	if _opening_farm or AppRouter.top_instance() != null: return
 	_opening_farm = true
 	if my_farm_btn: my_farm_btn.disabled = true
@@ -1938,7 +1579,7 @@ func _open_my_farm() -> void:
 	_opening_farm = false
 	if my_farm_btn: my_farm_btn.disabled = false
 	if _server_has_no_farm():
-		_show_farm_selection()
+		_leave_farm_home()
 		return
 	if not connected or not Net.session.has_farm():
 		location_status.text = "Could not connect. Try again."
@@ -1951,7 +1592,6 @@ func _open_my_farm() -> void:
 
 ## 服务端拿不到就落到随包样例（PRD §11.2）：D4 所需的两座系统农场不能被断网卡住。
 func _refresh_nearby() -> void:
-	if _relocation_mode: return
 	_nearby_generation += 1
 	var generation := _nearby_generation
 	var region_id := str(region.get("id", ""))
@@ -2164,7 +1804,7 @@ func in_active_city() -> bool:
 	return zoom >= AUTO_SWITCH_ZOOM and city_at(city_regions(), center_lat, center_lng, str(region.get("id", ""))) == str(region.get("id", ""))
 
 func _update_active_city(force := false) -> void:
-	if _relocation_mode or _placement_mode or zoom < AUTO_SWITCH_ZOOM: return
+	if zoom < AUTO_SWITCH_ZOOM: return
 	if _touch_count == 0 and _focus_tween and _focus_tween.is_running(): return # 飞行途中不切，落地再判
 	if not force and Engine.get_process_frames() % 10 != 0: return
 	var regions := city_regions()
@@ -2213,7 +1853,7 @@ func _switch_city(r: Dictionary) -> void:
 
 ## 有农场的玩家进城直接落在自己农场上（不飞行），而不是城市总览；农场不在当前城市则保持总览。
 func _land_on_own_farm() -> void:
-	if _relocation_mode or farm_markers == null or not farm_markers.points.has("self"): return
+	if farm_markers == null or not farm_markers.points.has("self"): return
 	var bp: FarmBlueprint = farm_markers.points.self.bp
 	if bp == null or bp.overlay.is_empty() or bp.region_id != str(region.get("id", "")): return
 	if _focus_tween: _focus_tween.kill()
@@ -2263,7 +1903,7 @@ func _fly_to(lat: float, lng: float, target_zoom: float, target_bearing: float, 
 	if on_land.is_valid(): _focus_tween.tween_callback(on_land)
 
 func _install_city_map() -> void:
-	if _relocation_mode or _placement_mode or not CityMapData.has_city(str(region.get("id", ""))): return
+	if not CityMapData.has_city(str(region.get("id", ""))): return
 	if city_map: return
 	_clear_farm_selection()
 	# The city uses geographic markers directly, with no nearby list or visit route.
@@ -2309,14 +1949,14 @@ func _install_city_map() -> void:
 	_layout_journey_drawer()
 
 func _on_city_landmark_requested(entry: Dictionary) -> void:
-	if _relocation_mode or _placement_mode or AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
 	var path := LandmarkScenes.path_for(str(region.get("id", "")), entry)
 	if path.is_empty(): return
 	_reset_gesture()
 	AppRouter.open_instance(path)
 
 func _on_city_pond_requested(entry: Dictionary) -> void:
-	if _relocation_mode or _placement_mode or AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
 	if Net.session == null or not Net.session.logged_in() or Net.session.has_unconfirmed_command(): return
 	var pond := SystemPonds.location(str(entry.get("id", "")))
 	if pond.is_empty(): return

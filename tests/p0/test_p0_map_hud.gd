@@ -273,7 +273,9 @@ func test_a_marked_pins_card_says_why_under_its_subtitle() -> void:
 	assert_str((col.get_child(2) as Label).text).is_equal(PondCard.BEGINNER_LINE)   # … above the description line
 	await _close(rt)
 	# The fish in the bag: Fern Pond's ! is gone with its line, and the homestead's card (away) says ✓ and why.
+	v = v.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
 	v.stall.board.requests[0].have = 2
+	rt.session.view = v
 	m._on_entry_selected(reed)
 	assert_object(rt.ui._modal.find_child("Reason", true, false)).is_null()
 	await _close(rt)

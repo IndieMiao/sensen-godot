@@ -47,8 +47,6 @@ func test_with_a_farm_the_map_shows_home_not_candidates() -> void:
 	_login_fake([{"status": 200, "json": {"region_id": "shanghai", "count": 0, "entries": []}}])
 	var m := _map()
 	await get_tree().process_frame
-	assert_object(m.select_panel).is_null()
-	assert_object(m.candidate_overlay).is_null()
 	assert_object(m.nearby_panel).is_not_null()
 	assert_object(m.my_farm_btn).is_not_null()
 	assert_str(m.my_farm_btn.text).is_equal("My Farm")
@@ -182,7 +180,6 @@ func test_server_farm_puts_map_in_home_mode_even_without_local_choice() -> void:
 	_login_with_farm("sh_c", [{"status": 200, "json": {"region_id": "shanghai", "count": 0, "entries": []}}])
 	var m := _map()
 	await get_tree().process_frame
-	assert_object(m.select_panel).is_null()
 	assert_object(m.nearby_panel).is_not_null()
 	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")
 
@@ -218,13 +215,12 @@ func test_late_login_does_not_pull_selected_city_back_to_own_farm() -> void:
 	Net.client.token = ""
 	var m := _map()
 	await get_tree().process_frame
-	assert_object(m.select_panel).is_not_null()
+	assert_object(m.farm_markers).is_null()
 	assert_float(m.center_lng).is_less(-118.0)
 	_login_with_farm("sh_c", [{"error": "down"}])
 	Net.session.state = {"journey": {"version": 1, "unlocks": [], "facts": []}}
 	m._on_net_booted(true)
 	await get_tree().create_timer(0.7).timeout
-	assert_object(m.select_panel).is_null()
 	assert_object(m.city_map).is_not_null()
 	assert_float(m.center_lng).is_less(-118.0)
 	assert_str(m._nearby_region).is_equal("los_angeles")
@@ -256,38 +252,17 @@ func test_shanghai_selection_with_la_farm_uses_shanghai_demo_neighbourhood() -> 
 	assert_str(m._nearby_region).is_equal("shanghai")
 	assert_str(FarmChoice.load().layout_patch_id).is_equal("la_b")
 
-func test_confirming_a_candidate_yields_to_the_servers_existing_farm() -> void:
-	# 2026-09-04 真机：服务端已有 sh_c，玩家在选地页点了 Old Town(sh_b) → 必须进 sh_c。
-	FarmChoice.clear()
-	var t := FakeTransport.new([
-		{"status": 200, "json": {"farm_id": "f1", "version": 3, "state": {},
-			"layout_patch_id": "sh_c", "blueprint_revision": 2, "region_id": "shanghai"}},  # GET /farms/me
-	])
-	Net.use_transport(t.callable())
-	Net.client.token = "tok"
-	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
-	Net.account.user_id = "test-user"
-	Net.account.display_name = "Tester"
-	var m := _map()
-	await get_tree().process_frame
-	var choice: Dictionary = await m._resolve_confirmed_farm("sh_b")
-	assert_str(str(choice.layout_patch_id)).is_equal("sh_c")
-	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")
-	assert_str(m.location_status.text).is_equal("You already have a farm at Yuyuan Road")
-
-func test_late_login_with_a_farm_switches_candidates_to_home() -> void:
-	# Net 在地图 _ready 之后才 boot 完：登录一到，选地面板要让位给家模式。
+func test_late_login_with_a_farm_switches_browsing_to_home() -> void:
+	# Net 在地图 _ready 之后才 boot 完：登录一到，浏览模式切到家模式。
 	FarmChoice.clear()
 	Net.use_transport(FakeTransport.new([]).callable())
 	Net.client.token = ""
 	var m := _map()
 	await get_tree().process_frame
-	assert_object(m.select_panel).is_not_null()
+	assert_object(m.farm_markers).is_null()
 	_login_with_farm("sh_c", [{"status": 200, "json": {"region_id": "shanghai", "count": 0, "entries": []}}])
 	m._on_net_booted(true)
 	await get_tree().process_frame
-	assert_object(m.select_panel).is_null()
-	assert_object(m.candidate_overlay).is_null()
 	assert_object(m.nearby_panel).is_not_null()
 
 func test_my_farm_then_sample_b_opens_two_distinct_farm_identities() -> void:
@@ -324,12 +299,12 @@ func test_cached_choice_is_not_an_owned_farm_when_server_reports_no_farm() -> vo
 	var t := _login_fake([])
 	Net.session.last_error_code = "NO_FARM"
 	var m := _map()
-	assert_object(m.select_panel).is_not_null()
+	assert_object(m.farm_markers).is_null()
 	assert_object(m.my_farm_btn).is_null()
 	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_a")
 	assert_int(t.requests.size()).is_equal(0)
 
-func test_late_no_farm_response_replaces_cached_home_with_selection() -> void:
+func test_late_no_farm_response_replaces_cached_home_with_browsing() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
 	var m := _map()
 	assert_object(m.my_farm_btn).is_not_null()
@@ -342,7 +317,6 @@ func test_late_no_farm_response_replaces_cached_home_with_selection() -> void:
 	assert_object(m.my_farm_btn).is_null()
 	assert_object(m.nearby_panel).is_null()
 	assert_object(m.farm_markers).is_null()
-	assert_object(m.select_panel).is_not_null()
 	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_a")
 	assert_int(AppRouter.instance_depth()).is_equal(0)
 	await get_tree().process_frame
@@ -355,7 +329,7 @@ func test_opening_cached_farm_checks_server_before_entering() -> void:
 	var m := _map()
 	await m._open_my_farm()
 	assert_int(AppRouter.instance_depth()).is_equal(0)
-	assert_object(m.select_panel).is_not_null()
+	assert_object(m.farm_markers).is_null()
 	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_a")
 	assert_str(t.requests[-1].method).is_equal("GET")
 	assert_bool(str(t.requests[-1].url).ends_with("/farms/me")).is_true()
