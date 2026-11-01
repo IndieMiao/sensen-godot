@@ -38,7 +38,7 @@ export type P0Event =
   | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts); spot -1: a free pin (q(216))
   // paid: the fare taken (q(256)); renewed false: a Day Pass still running was not re-signed and no visit counted (option B)
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
-      paid: { energy: number; coins: number }; renewed: boolean }
+      paid: { energy: number; coins: number }; renewed: boolean; wild?: true }   // wild: a wild site (v4q(3)), stamp null and no +10
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // energy: actual gain after the new cap (q247); look: the stage it opens
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
@@ -72,7 +72,7 @@ export type P0Event =
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[];
       x?: number; y?: number; reason?: 'plots' }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then; reason plots: moved off Lv7's new beds (q(172))
   | { kind: 'compost'; item: string; qty: number; used: number; cap: number }   // the Compost Bin turned crops into Compost (q(118) ③)
-  | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
+  | { kind: 'plots_added'; plots: number[]; reason: 'homestead' | 'facility' }   // new beds: a Homestead level's, or the one a tree / sprinkler opened (355 b1)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)
   | { kind: 'tree'; action: 'planted' | 'chopped'; plot: number; crop: string; used: number; cap: number }   // the orchard (q(118))
   | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' }

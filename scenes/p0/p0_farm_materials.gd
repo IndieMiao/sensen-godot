@@ -12,7 +12,8 @@ const MOUTH_HIT := Vector3(0, 0.8, 0)    # … and a tap on it is a tap on the g
 const BODY_GAP := 4.0           # px: a card lifted off the player clears its body by this much
 const NOTICE_S := 2.0           # "Run ended at daily reset" float (q(44))
 const SPOT_REACH := 3.0         # m: finger cards show and taps gather only this close (Arthur, 231)
-const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch", "spot_old_tree"]
+## The farm's gathering spots: none since SGODOT-355 b1 (v4 #49: they went to the cities, and two stood on new beds).
+const SPOTS: Array[String] = []
 
 var farm: Node3D                # p0_farm.gd: actor, cam
 var rt: P0Runtime
@@ -117,7 +118,8 @@ func frame(v: Dictionary, card := "") -> void:
 func _spot_marks(v: Dictionary, card: String) -> void:
 	for m in P0MaterialLogic.gather_marks(v):
 		var id := str(m.id)
-		var at: Vector3 = _spots.get(id, Vector3.ZERO)
+		if not _spots.has(id): continue   # a spot the server still lists that is not on the farm (SGODOT-355 b1)
+		var at: Vector3 = _spots[id]
 		farm.world_prompt(id, P0WorldPrompts.spot(v, m), at, Vector3(0, 1.3, 0), Vector3(0, 0.6, 0))
 	farm.world_prompt("workbench", P0WorldPrompts.workbench(), _bench, Vector3(0, 1.4, 0), Vector3(0, 0.8, 0))
 

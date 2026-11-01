@@ -74,7 +74,7 @@ describe('q(246) gates for every account, not just new saves', () => {
       expect(r.events.find(e => e.kind === 'homestead')).toMatchObject({ energy: 40 });
     }
     expect(s.energy.value).toBe(80); expect(s.coins).toBe(40); expect(s.storage).toEqual({});
-    expect(s.homestead.plaque.map(p => p.level)).toEqual([2, 3]); expect(s.plots).toHaveLength(40);
+    expect(s.homestead.plaque.map(p => p.level)).toEqual([2, 3]); expect(s.plots).toHaveLength(c.homestead.plots!.find(([lv]) => lv === 3)![1]);   // Lv3's beds (355 grid: 12)
   });
 
   it('loading existing reached levels neither downgrades nor refunds historical payments or rewards', () => {

@@ -5,7 +5,7 @@ import { catalog } from '../../src/p0/shops.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
-// P1 perennials on the 40-plot farm (q(118) ①, §5.2.4, SGODOT-240): a tree takes one plot, planted from its sapling
+// P1 perennials on the farm (q(118) ①, §5.2.4, SGODOT-240): a tree takes one plot, planted from its sapling
 // for 6 Energy, picked for 2 every 48 h; Orchard Feed halves a regrowth; 1 + Homestead level trees, 8 at most.
 const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 10, 18, 0, 0);
@@ -52,6 +52,7 @@ describe('saplings at the Market (§5.2.4)', () => {
 describe('a tree on a plot (q(118) ①)', () => {
   it('plants on one empty plot, tilled or wild, for 6 Energy, and grows at once', () => {
     let s = grower();
+    s.plots.find(p => p.id === 5)!.state = 'wild';   // only a save from before SGODOT-355 b1 has wild beds
     const wild = wildPlot(s);
     const { s: a, ev } = step(s, plant('seed_apple', wild));
     // §4.2.1: the planting's XP share is locked as paid — Lv9 planting a Lv7 tree is 2 levels over: 75%
