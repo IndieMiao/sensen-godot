@@ -34,7 +34,7 @@ const step = (s: P0State, cmd: P0Command, at = T) => {
   return r.state;
 };
 const atMarket = (place: string) => ({ space: 'outpost', place });
-const hayward = (s: P0State) => s.boards.markets[HAYWARD] ?? [];
+const hayward = (s: P0State) => s.markets[HAYWARD] ?? [];
 /** Fill the bag for a drawn request so it can be handed in. */
 function fill(s: P0State, r: BoardRequest): void {
   for (const id of r.items.length ? r.items : []) s.bag.push({ id, qty: r.qty });
@@ -47,17 +47,47 @@ describe('q(270) Market Board per city', () => {
     const held = structuredClone(s.boards.market);
     const v5 = JSON.parse(JSON.stringify(s)) as Omit<P0State, 'v'> & { v: number };
     v5.v = 5;
-    delete (v5.boards as { markets?: unknown }).markets;
+    delete (v5 as { markets?: unknown }).markets;
     const up = upgradeState(c, v5 as unknown as P0State, T);
     expect(up.v).toBe(6);
-    expect(Object.keys(up.boards.markets)).toEqual([SF]);
-    expect(up.boards.markets[SF]).toBe(up.boards.market);
+    expect(Object.keys(up.markets)).toEqual([SF]);
+    expect(up.markets[SF]).toBe(up.boards.market);
     expect(up.boards.market).toEqual(held);
+  });
+
+  it('a rollback to v5: every value of `boards` is still a board (v5\'s upgradeState walks them); back on v6, the board v5 played is home\'s and the other cities\' kept', () => {
+    const s = player(HAYWARD);
+    settleBoards(c, s, T);
+    expect(Object.values(s.boards).every(Array.isArray)).toBe(true);
+    const away = structuredClone(hayward(s));
+    // a v5 server reads it, keeps the fields it does not know, plays its one board and writes v: 5
+    const v5 = JSON.parse(JSON.stringify(s)) as P0State;
+    (v5 as { v: number }).v = 5;
+    v5.boards.market = [{ req: null, refill_at: T + 3 * H }];
+    const up = upgradeState(c, v5, T + H);
+    expect(up.boards.market).toEqual([{ req: null, refill_at: T + 3 * H }]);
+    expect(up.markets[SF]).toBe(up.boards.market);
+    expect(up.markets[HAYWARD]).toEqual(away);
+  });
+
+  it('a rollback with a home change meanwhile: the old home\'s copy loses the requests the board took along', () => {
+    const s = player();
+    settleBoards(c, s, T);
+    const taken = s.boards.market.find(sl => sl.req)!.req!;
+    const v5 = JSON.parse(JSON.stringify(s)) as P0State;
+    (v5 as { v: number }).v = 5;
+    // the v5 server moved home to Hayward; its one board went along
+    Object.assign(v5.travel, { home: HAYWARD, here: HAYWARD, home_set: { pond: `${HAYWARD}~pond0` }, home_chosen_at: T });
+    const up = upgradeState(c, v5, T + H);
+    expect(up.markets[HAYWARD]).toBe(up.boards.market);
+    expect(up.boards.market.some(sl => sl.req?.id === taken.id)).toBe(true);
+    expect(up.markets[SF].some(sl => sl.req?.id === taken.id)).toBe(false);
+    expect(up.markets[SF].find(sl => sl.req === null)).toEqual({ req: null, refill_at: T + H });
   });
 
   it('is made the first time the player is in the city, dated from the arrival: the view and the next command see the same requests', () => {
     const s = player(HAYWARD);
-    expect(s.boards.markets[HAYWARD]).toBeUndefined();
+    expect(s.markets[HAYWARD]).toBeUndefined();
     const v = viewOf(c, s, T);
     expect(v.boards.market).toMatchObject({ cluster: HAYWARD, city: 'Hayward', home: false });
     const shown = (v.boards.market.slots as { id?: string }[]).map(x => x.id);

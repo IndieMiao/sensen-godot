@@ -24,18 +24,18 @@ export const BOARDS: readonly BoardId[] = ['stall', 'market'];
 
 /**
  * q(270) (SGODOT-378, §9.6.4): a board and the city it hangs in — the Stall Board at home, one Market Board per city
- * cluster (s.boards.markets), the same board at every market square of that city. A city's board is made the first
+ * cluster (s.markets), the same board at every market square of that city. A city's board is made the first
  * time the player is there (settleBoards), so a city never visited takes no room in the save.
  */
 export interface BoardAt { board: BoardId; city: string; slots: BoardSlot[] }
 export function boardsOf(c: P0Content, s: P0State): BoardAt[] {
   const home = homeOf(c, s);
   return [{ board: 'stall', city: home, slots: s.boards.stall }, { board: 'market', city: home, slots: s.boards.market },
-    ...Object.entries(s.boards.markets ?? {}).filter(([city]) => city !== home).map(([city, slots]) => ({ board: 'market' as const, city, slots }))];
+    ...Object.entries(s.markets ?? {}).filter(([city]) => city !== home).map(([city, slots]) => ({ board: 'market' as const, city, slots }))];
 }
 /** A board's slots: the Stall Board, the home Market Board (`market`), or another city's ([] while it has none yet). */
 export function slotsOf(c: P0Content, s: P0State, board: BoardId, city = homeOf(c, s)): BoardSlot[] {
-  return board === 'stall' ? s.boards.stall : city === homeOf(c, s) ? s.boards.market : s.boards.markets?.[city] ?? [];
+  return board === 'stall' ? s.boards.stall : city === homeOf(c, s) ? s.boards.market : s.markets?.[city] ?? [];
 }
 /** Whether a city has a Market Board to hang: home always; elsewhere a city with a market square (an S-tier town has none). */
 export function hasMarket(c: P0Content, s: P0State, city: string): boolean {
@@ -242,12 +242,12 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
  */
 export function settleBoards(c: P0Content, s: P0State, now: number): void {
   const home = homeOf(c, s), here = s.travel?.here || home;
-  s.boards.markets ??= {};
-  s.boards.markets[home] = s.boards.market ??= [];   // `market` is the home board; markets[home] the same array (state.ts P0State.boards)
+  s.markets ??= {};
+  s.markets[home] = s.boards.market ??= [];   // `market` is the home board; markets[home] the same array (state.ts P0State.markets)
   const reach: [BoardId, string][] = [['stall', home], ['market', home]];
   if (here !== home && hasMarket(c, s, here)) reach.push(['market', here]);
   for (const [board, city] of reach) {
-    const slots = board === 'stall' ? s.boards.stall : city === home ? s.boards.market : (s.boards.markets[city] ??= []);
+    const slots = board === 'stall' ? s.boards.stall : city === home ? s.boards.market : (s.markets[city] ??= []);
     // a city's board dates from this stay's start: the Day Pass's (q(270) ①), else the arrival (a free Trip 1 city)
     const made = city === home ? s.created_at : s.travel.passes[city]?.from ?? s.travel.visits[city]?.last_at ?? now;
     // §14.1.2: a Stall Board slot added in the account's first 72 h (slot 2 at creation, slot 3 from a Homestead Lv3
