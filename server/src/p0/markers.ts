@@ -21,6 +21,7 @@
  * fish (Old Kai's Rare fish: Golden Koi, Fishing Lv4); it can still be taken in the shop before that.
  */
 import { boardsOf, handIn, slotCount } from './boards.js';
+import { shownLocals } from './locals.js';
 import { pondFishIds } from './fishing_world.js';
 import type { EventVenue, Need, OutpostDef, P0Content, ShopId } from './content.js';
 import { homeFacts, homeOf, type Homed } from './home.js';
@@ -117,7 +118,8 @@ function landable(c: P0Content, s: P0State, fish: string[]): string[] {
 /** The tutorial request is still on the Stall Board: the first session, one goal on the map. */
 const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
 
-export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
+/** opts.locals: the keepers' local requests' marks (q(272)), for a client that shows them (routes: `x-p0-features: locals`). */
+export function mapMarkers(c: P0Content, s: P0State, now: number, opts: { locals?: boolean } = {}): MapMarker[] {
   const all: MapMarker[] = guideMarkers(c, s, now);   // the guide's pins first (tracked), SGODOT-341
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   // q(270) ⑥: the home city's boards and the Market Board of the city the player is in show all they hold; another
@@ -145,6 +147,17 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
         reason.set(m, 'board:market');
       }
     }
+  }
+  // q(272) ⑧: the keepers' local requests — a ! on a keeper's outpost for one offered in the city the player is in, a ✓
+  // for one ready to hand in wherever the player is (none of today's 6: no `full` here), a tracked fish one on a pond of
+  // its own city
+  for (const { city, req: r, place } of opts.locals === false ? [] : shownLocals(c, s, now)) {
+    const tracked = r.status === 'accepted';
+    if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
+    else if (tracked && r.kind === 'fish') {
+      const pond = pondFor(c, { travel: { home: city } }, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
+      if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
+    } else if (!tracked) all.push({ place, kind: 'request', why: { request: r.id } });
   }
   for (const id of Object.keys(c.residents)) {
     const place = residentHome(c, s, id);

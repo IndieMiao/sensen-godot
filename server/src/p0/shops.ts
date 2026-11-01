@@ -236,7 +236,8 @@ export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeOf
 /** §9.6.4: items a tracked request names are kept back from Sell All. */
 export function protectedQty(s: P0State, id: string): number {
   let n = 0;
-  for (const slot of [...s.boards.stall, ...Object.values(s.markets ?? {}).flat()]) {   // every city's board (q(270))
+  // every city's board (q(270)) and the keepers' local requests (q(272))
+  for (const slot of [...s.boards.stall, ...Object.values(s.markets ?? {}).flat(), ...Object.values(s.locals ?? {}).flatMap(l => l.slots)]) {
     const r = slot.req;
     if (r?.status === 'accepted' && (r.kind === 'crop' || r.kind === 'material') && r.items.includes(id)) n += r.qty;
   }
