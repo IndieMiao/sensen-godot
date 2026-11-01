@@ -118,6 +118,21 @@ function climateOfCluster(c: P0Content, cluster: string | null | undefined): str
   return z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate;
 }
 
+/** v4q(1) ④: city stamps — first visits to cities (a wild site never stamps). */
+export function cityStamps(s: P0State): number {
+  return (s.travel?.stamps ?? []).filter(x => !isWild(x.cluster)).length;
+}
+
+/** v4q(1) ④: climate bands other than home's the player has arrived in — a city or a wild site with an arrival. */
+export function climatesVisited(c: P0Content, s: P0State): number {
+  const home = homeClimate(c, s), seen = new Set<string>();
+  for (const at of Object.keys(s.travel?.visits ?? {})) {
+    const z = climateOfCluster(c, at);
+    if (z !== home) seen.add(z);
+  }
+  return seen.size;
+}
+
 /** Distance from the home's base point (q(184)) and the Trip band, by CityClusters.trip (the client's P0Clusters rule). */
 export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number; name: string } {
   const at = homeBase(c, s), cl = clusters(c);
