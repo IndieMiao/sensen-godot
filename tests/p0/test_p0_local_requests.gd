@@ -62,7 +62,8 @@ func test_the_card_says_who_the_keepers_line_coins_only_and_deliver_to_with_the_
 	assert_bool((P0Logic.content().requests.local.lines.tackle as Array).has(str(d.line).replace("Shanghai", "{city}"))).is_true()
 	var away := _loc("req_loc_g", {"here": false, "status": "accepted"})
 	assert_str(P0Locals.deliver_to(away)).ends_with(" · Shanghai")
-	assert_str(str(P0LocalRequest.card_data(_view([away]), away).reason)).is_equal("Deliver in Shanghai")
+	# away, still short: the gap as in the city (不知火舞 on 378: no new line away)
+	assert_str(str(P0LocalRequest.card_data(_view([away]), away).reason)).is_equal("Need 2 more Pond Crucian")
 	# the day's bonus nearly spent: the reward says what is paid (q(262))
 	var v := _view([r])
 	v.quotas.request_bonus.used = 95

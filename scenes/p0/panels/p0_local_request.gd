@@ -25,9 +25,10 @@ static func open(ui: P0Ui, id: String, back: Callable, ring: Array = []) -> void
 	if tracked: links.append("Drop request")
 	if ring.size() >= 2: links.append("%s's other requests · %d" % [str(r.get("giver", "")), ring.size() - 1])
 	data["links"] = links
+	data["break_dots"] = true   # Deliver to breaks after a ` · ` (· Shanghai away)
 	var cmd := {}
 	if not tracked: cmd = {"type": "accept", "request": id}
-	elif bool(r.get("ready", false)) and bool(r.get("here", false)): cmd = {"type": "deliver", "request": id}
+	elif bool(r.get("ready", false)): cmd = {"type": "deliver", "request": id}   # away too: the server's wrong_place toasts where (⑦)
 	data["sends"] = not cmd.is_empty()
 	var card := UiRequestCard.new(data)
 	card.name = "LocalRequestCard"
@@ -64,11 +65,9 @@ static func card_data(view: Dictionary, r: Dictionary) -> Dictionary:
 	var needs: Array = [need] if items.size() <= 1 else items.map(func(i): return {"name": P0Logic.item_name(view, str(i)),
 		"have": int(r.get("have", 0)), "need": int(r.get("qty", 1)), "icon": P0Logic.icon(str(i))})
 	var tracked := str(r.get("status", "")) == "accepted"
-	var reason := ""
-	if tracked and not bool(r.get("here", false)): reason = "Deliver in %s" % str(r.get("city", ""))   # handed in to the keeper only
-	elif tracked and not bool(r.get("ready", false)): reason = P0Locals.gap_text(view, r)   # LOCK-10: the gap on the button
-	var keeper: Dictionary = P0Outposts.find(str(r.get("place", ""))).get("keeper", {})
-	var data := {"portrait": P0CounterDrawer.keeper_portrait(str(r.get("giver", "")), false, str(keeper.get("look", ""))),
+	# LOCK-10: a tracked one still short shows its gap on the button, here or away (不知火舞 on 378: no new line away)
+	var reason := P0Locals.gap_text(view, r) if tracked and not bool(r.get("ready", false)) else ""
+	var data := {"portrait": P0Locals.portrait(r),
 		"title": str(r.get("title", "")), "who": P0Locals.who(r), "line": P0Locals.line(r), "needs": needs,
 		"deliver_to": P0Locals.deliver_to(r), "action": "Deliver" if tracked else "Accept", "reason": reason, "item": item}
 	data.merge(rewards(view, r))

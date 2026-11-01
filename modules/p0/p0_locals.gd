@@ -77,6 +77,17 @@ static func who(r: Dictionary) -> String:
 	var role := str(r.get("giver_role", ""))
 	return "%s · %s · local request" % [str(r.get("giver", "")), role] if role != "" else "%s · local request" % str(r.get("giver", ""))
 
+## The card's 40 px round head (不知火舞 on 378): the keeper's face from the server's look (as their room draws it,
+## giving way to a resident's hair), a written keeper's own art, else their outpost's map icon — never empty, never
+## another's face.
+const ROLE_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel"}   # P0Map.PIN_ICONS
+static func portrait(r: Dictionary) -> Texture2D:
+	var giver := str(r.get("giver", ""))
+	var look := str(r.get("look", ""))
+	if look != "": return P0CounterDrawer.keeper_portrait(giver, false, load("res://modules/p0/p0_city_places.gd").keeper_look(look, r.get("residents", []) if r.get("residents", null) is Array else []))
+	if giver != "" and not str(r.get("place", "")).contains("~"): return P0CounterDrawer.keeper_portrait(giver, false, "")   # Finn, Ama, Sigrid, Mei
+	return P0Logic.icon(str(ROLE_ICONS.get(str(r.get("place_role", "")), "board")))
+
 ## The keeper's line on the card (q(272) ⑨): one of their role's, fixed by the request's id; an S-tier cabin keeper
 ## speaks for the kind asked (fish → the tackle shop's). {city} and {outpost} filled in.
 const KIND_ROLE := {"fish": "tackle", "dish": "tea", "crop": "market", "material": "post"}

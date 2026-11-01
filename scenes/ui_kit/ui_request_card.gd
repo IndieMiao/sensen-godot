@@ -8,8 +8,9 @@ extends PanelContainer
 ## [{name, have, need, icon}], reward, bonus_note (optional), deliver_to, action, reason, links (optional)}. Emits
 ## `action_pressed` / `dismissed`. links: NavigationRows between Deliver to and the button — a keeper's local request's
 ## `Drop request ›` and `Bo's other requests · 2 ›` (q(272), 不知火舞 378 77524b0e; a resident's card has none, LOCK-18
-## unchanged); a press emits `link_pressed` with its index. Deliver to breaks only after a ` · ` when it runs long
-## (`Wen · Xuhui Tackle Shop` / `Shanghai`, as q(270)).
+## unchanged); a press emits `link_pressed` with its index. break_dots (a local card's, 周瑜 on #610: a resident's
+## Deliver to stays as it was): Deliver to breaks only after a ` · ` when it runs long (`Wen · Xuhui Tackle Shop` /
+## `Shanghai`, as q(270)).
 
 signal action_pressed
 signal dismissed
@@ -84,7 +85,7 @@ func _init(data_: Dictionary = {}) -> void:
 		var v := UiKit.label(str(data[row[1]]), UiTokens.STYLE_C12_XB)
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		if row[1] == "deliver_to":
+		if row[1] == "deliver_to" and bool(data.get("break_dots", false)):
 			v.clip_text = true
 			v.resized.connect(func(): _fit_dots(v, str(data.deliver_to)))
 		if row[1] == "reward":
