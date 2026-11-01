@@ -30,7 +30,7 @@ static func _p(icon: String, text: String, fact := "", status := -1, dimmed := f
 ## else New while goods unlocked since the last visit wait (STALL-NEW, E-04; `fresh` = P0Ui.stall_has_new()). While the
 ## new-player guide is on, no state at all, only the plain button (q(215) ⑥: marks are the current step's targets).
 static func stall(view: Dictionary, fresh := false) -> Dictionary:
-	var board := P0Guide.stall_badge(view)
+	var board := P0Guide.stall_badge(view, true)
 	var status := -1
 	if board == "deliver": status = UiStatusBadge.State.DELIVERABLE
 	elif board != "": status = UiStatusBadge.State.REQUEST

@@ -1535,6 +1535,12 @@ static func today_chip_key(rows: Array) -> String:
 		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
 	return ""
 
+## Today's 6 board requests are done (view.quotas.sys_requests): no board hand-in until the reset, so no board wears a ✓
+## (q(270)) and its Today row reads Limit reached.
+static func sys_requests_full(view: Dictionary) -> bool:
+	var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
+	return not sys.is_empty() and int(sys.get("used", 0)) >= int(sys.get("cap", 6))
+
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
 static func today_lines(view: Dictionary) -> Array:
@@ -1576,7 +1582,7 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 		var deliveries: Array = []
 		var away: Array = []   # q(270) / 奕星's review ⑦: another city's hand-in can't be done here; it follows what can
 		var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
-		var full := not sys.is_empty() and int(sys.get("used", 0)) >= int(sys.get("cap", 6))
+		var full := sys_requests_full(view)
 		for r in PinReason.taken(view):
 			# a board request once today's 6 are done (q(270), 不知火舞): `Dusk Haul · Limit reached · 9h 12m`, nothing to press
 			if bool(r.ready) and full and r.has("away"):
