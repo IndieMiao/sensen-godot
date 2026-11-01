@@ -307,13 +307,16 @@ export function guarantee(cfg: WildConfig, seed: string, sites: Site[], clusters
  * Names (v4q(3) 39d426c1): a word of the climate band's pool and the type word. The map's short name is the word alone,
  * so a word is never twice among the sites nearest one cluster; only past the pool's size may it come again, and then on
  * a site of another type. Where one type alone has more sites than the pool (53 clusters of the far north), a word may
- * come again on that type too, but never within SAME_NAME_KM of the same name.
+ * come again on that type too, but never within SAME_NAME_KM of the same name. A cluster's city gathering points keep
+ * their words (v4q(4) f77fd19b: the pins show the word alone, gathering points first): `reserved` by cluster.
  */
 export const SAME_NAME_KM = 150;
-export function nameSites(cfg: WildConfig, seed: string, sites: Site[], words: Record<string, string[] | string> = cfg.words ?? {}): void {
+export function nameSites(cfg: WildConfig, seed: string, sites: Site[], words: Record<string, string[] | string> = cfg.words ?? {},
+  reserved: Map<string, Set<string>> = new Map()): void {
   const byNear = new Map<string, Site[]>();
   for (const s of sites) (byNear.get(s.near) ?? byNear.set(s.near, []).get(s.near)!).push(s);
-  for (const group of byNear.values()) {
+  for (const [near, group] of byNear) {
+    const kept = reserved.get(near) ?? new Set<string>();
     const taken = new Map<string, Set<string>>();   // word → the types that have it here
     const named: Site[] = [];
     for (const s of group.sort((a, b) => (a.id < b.id ? -1 : 1))) {
@@ -323,10 +326,10 @@ export function nameSites(cfg: WildConfig, seed: string, sites: Site[], words: R
       const start = hash32(seed, s.id, 'word') % pool.length;
       const at = (i: number) => pool[(start + i) % pool.length];
       let pick = -1;
-      for (let i = 0; i < pool.length && pick < 0; i++) if (!taken.has(at(i))) pick = i;
-      for (let i = 0; i < pool.length && pick < 0; i++) if (!taken.get(at(i))!.has(s.type)) pick = i;
+      for (let i = 0; i < pool.length && pick < 0; i++) if (!kept.has(at(i)) && !taken.has(at(i))) pick = i;
+      for (let i = 0; i < pool.length && pick < 0; i++) if (!kept.has(at(i)) && !taken.get(at(i))!.has(s.type)) pick = i;
       for (let i = 0; i < pool.length && pick < 0; i++) {
-        if (!named.some(x => x.type === s.type && x.word === at(i) && distanceKm(x, s) < SAME_NAME_KM)) pick = i;
+        if (!kept.has(at(i)) && !named.some(x => x.type === s.type && x.word === at(i) && distanceKm(x, s) < SAME_NAME_KM)) pick = i;
       }
       s.word = at(pick < 0 ? 0 : pick);
       (taken.get(s.word) ?? taken.set(s.word, new Set()).get(s.word)!).add(s.type);
