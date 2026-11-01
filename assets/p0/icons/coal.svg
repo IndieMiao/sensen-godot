@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+  <!-- coal (355 v4): near-black faceted lumps with a cool highlight -->
+  <path d="M10 52L6 40l8-10 12-2 8 8-2 14z" fill="#2B2E31"/>
+  <path d="M14 30l12-2 8 8-12 2z" fill="#44494E"/>
+  <path d="M28 54l-2-14 10-12 14-2 10 10-2 14-12 6z" fill="#34383C"/>
+  <path d="M36 28l14-2 10 10-14 2z" fill="#50565C"/>
+  <path d="M40 34l6-4 4 3-6 3z" fill="#8A939C"/>
+  <path d="M16 34l5-2 3 2-5 2z" fill="#7A838C"/>
+  <path d="M28 54l18-2 12-8v2l-12 8-18 2z" fill="#1E2023"/>
+</svg>
