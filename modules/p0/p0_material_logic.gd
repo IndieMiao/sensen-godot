@@ -378,35 +378,7 @@ static func energy_verb(cmd: Dictionary, fallback: String) -> String:
 		"mine_floor": return "Floor %d" % int(cmd.get("to", 2))
 	return fallback
 
-# --- Gathering spots (farm) ---
-
-## Finger card and badge per spot (§13.2.2, STATE-ICONS): READY with "Tap to gather", a countdown, or the Homestead gate.
-static func gather_marks(view: Dictionary) -> Array:
-	var out: Array = []
-	for sp in view.get("gather", {}).get("spots", []):
-		var name := str(sp.get("name", ""))
-		var mark := {"id": str(sp.get("id", "")), "name": name, "ready": bool(sp.get("ready", false)), "badge": "", "caption": ""}
-		if not sp.get("open", false):
-			mark.badge = "locked"
-			mark.caption = "%s · Homestead Lv%d" % [name, int(sp.get("homestead", 2))]
-		elif sp.get("ready", false):
-			mark.badge = "ready"
-			mark.caption = "%s · Tap to gather" % name
-		else:
-			mark.badge = "countdown"
-			mark.caption = "%s · Ready in %s" % [name, P0Logic.span(float(sp.get("ready_in", 0)))]
-		out.append(mark)
-	return out
-
-## Today line 2 (§13.2.2, q(46) wording): "Timber Grove · Ready in 2h 10m" for the soonest open spot that is not ready; "" if one is ready.
-static func today_gather_line(view: Dictionary) -> String:
-	var best := {}
-	for sp in view.get("gather", {}).get("spots", []):
-		if not sp.get("open", false): continue
-		if sp.get("ready", false): return ""
-		if best.is_empty() or float(sp.get("ready_in", 0)) < float(best.get("ready_in", 0)): best = sp
-	if best.is_empty(): return ""
-	return "%s · Ready in %s" % [str(best.get("name", "")), P0Logic.span(float(best.get("ready_in", 0)))]
+# --- Gathering (a city's points, v4q(4); the farm's spots left with v4q(4) ①) ---
 
 ## Floats for one gather event (MAT-2): "+6 Timber · Stored" for what went to Farm Storage. What went to the bag
 ## ("+2 Worm Bait") is an item event the runtime floats already, so the Reed Bank still shows two lines (Li Bai 3f6b8fb5).
@@ -424,67 +396,26 @@ static func stored_notice(view: Dictionary, shown_at: float) -> String:
 	for it in auto.get("items", []): parts.append("%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return "Stored · " + " · ".join(parts)
 
-## Locked spot sheet (MAT-3): tapping the Clay Bank before Homestead Lv2.
-static func locked_spot_sheet(view: Dictionary, spot_id: String) -> Dictionary:
-	for sp in view.get("gather", {}).get("spots", []):
-		if str(sp.get("id", "")) != spot_id: continue
-		var item := str((sp.get("yield", [[""]]) as Array)[0][0])
-		return {"title": str(sp.get("name", "")), "subtitle": "Locked",
-			"line": "Gather %s from this spot once unlocked." % P0Logic.item_name(view, item),
-			"facts": [["Unlock", "Homestead Lv%d" % int(sp.get("homestead", 2))]]}
-	return {}
-
-## Gather Gloves moment (MAT-GLOVES-RESULT): MomentBanner lines after crafting them.
-static func gloves_moment(view: Dictionary) -> Dictionary:
-	var next := 0
-	for sp in view.get("gather", {}).get("spots", []):
-		if str(sp.get("id", "")) == "spot_grove": next = int((sp.get("yield", [["", 0]]) as Array)[0][1])
-	return {"title": "Gather Gloves", "line": "+1 at every gathering spot",
-		"fact": "Next Timber harvest: %d" % next, "note": "Passive · no gear slot needed"}
-
 # --- Material sources (NeedSource) ---
 
 ## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08), shared
-## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `; a spot that is not open
-## yet comes last with its gate, `Clay · Quarry · or Clay Bank from Homestead Lv2`, and loses only the gate once
-## open, `Clay · Quarry · or Clay Bank`. Order: spots open from the start, then the mine types that yield it (355 b1:
-## a quarry's mains, a vein's; every rock gives Stone: `Stone · Rock Pile · or the mine`), then spots a Homestead level
-## opens; still-locked ones last.
-## `go` (Show, 不知火舞 on 228): the first open source ("spot_grove", "mine"); with none open, the first source (its
-## name strip says the gate). {} for anything that is not a material (content.materials) or that nothing yields.
+## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `: the mine types that
+## yield it (355 b1: a quarry's mains, a vein's; every rock gives Stone: `Stone · the mine`). The farm's gathering spots
+## were the first sources (`Clay · Clay Bank`) until they left with v4q(4) ① (the user, 11-02); a city's points are the
+## map's (亚瑟's C), not listed here yet.
+## `go` (Show, 不知火舞 on 228): none while every source is a mine (no mouth to show, 355 b1). {} for anything that is
+## not a material (content.materials) or that nothing here yields.
 ## Two lines at most (不知火舞 on 228): the label may break only before ` · or `, so every other space is a no-break
-## space — `Clay · Quarry` / `· or Clay Bank from Homestead Lv2`.
+## space — `Copper Ore · Quarry` / `· or Vein`.
 static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var c := P0Logic.content()
 	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
-	var live := {}   # the view's spot states (open / homestead) by id
-	for sp in view.get("gather", {}).get("spots", []): live[str(sp.get("id", ""))] = sp
-	var level := int(view.get("homestead", {}).get("level", 1))
-	var first: Array = []
-	var gated: Array = []
-	var gather: Dictionary = c.get("gather", {}).get("spots", {})
-	for sid in gather:
-		var y: Array = gather[sid].get("yield", [])
-		if y.is_empty() or str(y[0][0]) != id: continue   # a side yield (Worm Bait at the Reed Bank) is not the spot's material
-		var sp: Dictionary = live.get(str(sid), {})
-		var gate := int(sp.get("homestead", gather[sid].get("homestead", 1)))
-		var src := {"name": str(sp.get("name", gather[sid].get("name", ""))), "go": str(sid), "gate": gate,
-			"open": bool(sp.get("open", gate <= level))}
-		(first if gate <= 1 else gated).append(src)
-	var mines := mine_types_yielding(id)
-	# no Show target for a mine yet: the mines left the farm (355 b1); C will give the nearest mouth (亚瑟 on #629)
-	if id == "stone": first.append({"name": "the mine", "go": "", "gate": 1, "open": true})   # every rock gives Stone (Li Bai on 228)
-	else:
-		for t in mines: first.append({"name": str(t.word), "go": "", "gate": 1, "open": true})
-	var all: Array = first + gated
-	if all.is_empty(): return {}
-	var ordered: Array = all.filter(func(s): return s.open) + all.filter(func(s): return not s.open)
-	var parts: Array = ordered.map(func(s): return s.name if s.open else "%s from Homestead Lv%d" % [s.name, s.gate])
+	# every rock gives Stone (Li Bai on 228); no Show target for a mine yet: C will give the nearest mouth (亚瑟 on #629)
+	var parts: Array = ["the mine"] if id == "stone" else mine_types_yielding(id).map(func(t): return str(t.word))
+	if parts.is_empty(): return {}
 	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
 	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
-	# Show: the first open source with somewhere to go (a mine has none yet, 355 b1), else the first source's
-	var showable: Array = ordered.filter(func(s): return s.open and str(s.go) != "")
-	return {"text": text, "go": str(showable[0].go) if not showable.is_empty() else str(ordered[0].go)}
+	return {"text": text, "go": ""}
 
 ## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
 ## mine content opens (content.mine.types: quarry and vein in the first batch), in that order — [{type, word}], the
@@ -505,10 +436,9 @@ static func _nowrap(s: String) -> String:
 
 # --- Workbench (B2-06) ---
 
-## Effect line under each recipe name (LOCK-29; q(45) gloves sentence; Compost per Li Bai / Anqila, B2-06).
+## Effect line under each recipe name (LOCK-29; Compost per Li Bai / Anqila, B2-06; the Gather Gloves' left with 丁11).
 const EFFECTS := {
 	"pick_copper": "2 Stone per rock",
-	"gather_gloves": "+1 at every gathering spot",
 	"torch": "See what rocks hold",
 	"fert_compost": "Crops ready 20% sooner",
 	"facility_sprinkler": "Waters 8 plots for you",   # P1 FARM-5 v5 (q(59) §5)
@@ -550,11 +480,9 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 	return out
 
 static func _craft_button(r: Dictionary) -> Dictionary:
-	if r.get("owned", false):
-		if str(r.get("to", "")) == "gear":
-			if r.get("equipped", false): return {"label": "Equipped", "kind": "done", "cmd": {}}
-			return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
-		return {"label": "Owned · always on", "kind": "done", "cmd": {}}   # Gather Gloves (B2-06 GLOVES-DONE)
+	if r.get("owned", false) and str(r.get("to", "")) == "gear":   # the Gather Gloves' `Owned · always on` left with 丁11
+		if r.get("equipped", false): return {"label": "Equipped", "kind": "done", "cmd": {}}
+		return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
 	var block = r.get("block", null)
 	# P1 Facilities (SGODOT-241): Build opens placement mode (place_start, handled by the world); the place command is
 	# sent from there, with the plot.

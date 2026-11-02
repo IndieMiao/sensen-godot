@@ -1,5 +1,5 @@
 {
-  "_note": "355 E/F mine replacement: existing monster and combat keys stay in this fragment. Weapon IDs are weapon_*. Slime retains copper/salt/worm loot; elite slime drops copper, never quartz. Initial combat values follow contract v0.4 ad5d28c0, pending v4q approval/calibration. New bands, monsters and policy values are in mine_b1.json. Existing Quartz/Hardwood and Old Tree definitions remain.",
+  "_note": "355 E/F mine replacement: existing monster and combat keys stay in this fragment. Weapon IDs are weapon_*. Slime retains copper/salt/worm loot; elite slime drops copper, never quartz. Initial combat values follow contract v0.4 ad5d28c0, pending v4q approval/calibration. New bands, monsters and policy values are in mine_b1.json. Existing Quartz/Hardwood definitions remain; the Old Tree left the farm with v4q(4) ① (hardwood is a city point now).",
   "mine": {
     "monsters": {
       "mob_slime": {
@@ -73,20 +73,6 @@
       "name": "Hardwood",
       "price": null,
       "floor": 4
-    }
-  },
-  "gather": {
-    "spots": {
-      "spot_old_tree": {
-        "name": "Old Tree",
-        "yield": [
-          [
-            "hardwood",
-            1
-          ]
-        ],
-        "homestead": 3
-      }
     }
   }
 }

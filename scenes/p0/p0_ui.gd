@@ -2931,9 +2931,9 @@ func _show_today_row(i: int) -> void:
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
 const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
 
-## A target on the homestead: the fixed ones, the Homestead sign (q(255)), and the gathering spots. The mine mouth left
-## the farm in 355 b1.
-static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.begins_with("spot_")
+## A target on the homestead: the fixed ones and the Homestead sign (q(255)). The mine mouth left the farm in 355 b1,
+## the gathering spots with v4q(4) ①.
+static func home_target(go: String) -> bool: return go in HOME_TARGETS
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
@@ -3237,7 +3237,7 @@ func open_resident_profile(id: String) -> void:
 ## The workbench drawer (SGODOT-231 B2-06): P0WorkbenchDrawer over the view, Close 44 six above its top and 16 in
 ## (as RES-PIP's sheet). It follows the view while open; Craft / Equip go to the server, a grey button toasts its
 ## reason (LOCK-10) and a cost tile shows where the material comes from (NeedSource, Show only moves the camera,
-## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment, the gloves' banner) belongs to
+## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment) belongs to
 ## the farm's P0FarmMaterials.
 const _WORKBENCH_KIND := "workbench"
 var workbench_tab := "tools"

@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
-## SGODOT-235 B3: the mine and gathering-spot cards on the new shells — ElevatorPanel (MINE-P0-6; E3 in 355 b1), and
-## bottom Sheets with Close above for a spot that opens later (MAT-3).
+## SGODOT-235 B3: the mine's cards on the new shells — ElevatorPanel (MINE-P0-6; E3 in 355 b1). The farm spots' MAT-3
+## sheet left with v4q(4) ①.
 
 const Fx := preload("res://tests/p0/fixtures/mine_b1_view.gd")
 
@@ -13,8 +13,6 @@ func _view() -> Dictionary:
 		"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000},
 		"names": {"clay": "Clay"}, "bag": {"capacity": 25, "free": 25, "slots": []}, "plots": [], "coins": 40, "skills": {},
 		"rest": {"used": 0, "limit": 1, "resets_in": 3600000}, "homestead": {"level": 1},
-		"gather": {"spots": [{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "ready": false,
-			"yield": [["clay", 2]]}]},
 	}
 
 func before_test() -> void:
@@ -51,18 +49,3 @@ func test_elevator_panel_rows_pick_or_say_why() -> void:
 	p.row(2).pressed.emit()
 	assert_str(str(picked[2].type)).is_equal("energy_card")
 
-func test_locked_spot_says_the_gate_and_opens_the_homestead_sheet() -> void:
-	ui.set_view(_view())
-	var d := P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank")
-	await await_idle_frame()
-	assert_str(ui.modal_kind).is_equal("locked_spot")
-	assert_that(_labels(d)).contains(["Clay Bank", "Locked", "Unlock", "Homestead Lv2"])
-	var navs: Array = d.find_children("*", "UiNavButton", true, false)
-	assert_array(navs).has_size(1)   # View homestead only: no Details page in P0
-	(navs[0] as UiNavButton).pressed.emit()
-	assert_str(ui.modal_kind).is_equal("homestead")   # HOME-1 (a panel, no jump)
-	ui.back_modal()                                   # Android Back: one layer back, to MAT-3 (苏烈 on #102)
-	assert_str(ui.modal_kind).is_equal("locked_spot")
-	ui.back_modal()
-	assert_bool(ui.has_modal()).is_false()
-	assert_object(P0MaterialCards.open_locked_spot(ui, ui.view, "spot_unknown")).is_null()

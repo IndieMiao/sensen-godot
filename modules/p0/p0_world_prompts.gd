@@ -108,14 +108,3 @@ static func mine_facility(view: Dictionary, n: int, kind: String) -> Dictionary:
 			if bool(s.get("paid", false)): return _p("ladder", name, "Free")
 			return _p("ladder", name, "%d Energy" % int(s.get("fee", view.get("mine", {}).get("floor_energy", 2))))
 	return {}
-
-## A gathering spot from P0MaterialLogic.gather_marks: its first yield's icon; Ready from anywhere; locked (Clay Bank
-## before Homestead Lv2) with the level as its fact; cooling down: the time left.
-static func spot(view: Dictionary, mark: Dictionary) -> Dictionary:
-	var def: Dictionary = P0Logic.content().get("gather", {}).get("spots", {}).get(str(mark.id), {})
-	var first: Array = def.get("yield", [[""]])[0] if not def.get("yield", []).is_empty() else [""]
-	var icon := str(first[0]) if str(first[0]) != "" else "field"
-	match str(mark.badge):
-		"ready": return _p(icon, str(mark.name), "", UiStatusBadge.State.READY)
-		"locked": return _p(icon, str(mark.name), str(mark.caption).trim_prefix(str(mark.name) + " · "), UiStatusBadge.State.LOCKED)
-	return _p(icon, str(mark.name), str(mark.caption).trim_prefix(str(mark.name) + " · "))
