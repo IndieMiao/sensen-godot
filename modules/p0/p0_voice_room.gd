@@ -52,7 +52,8 @@ func fetch_status() -> void:
 	age = str(json.get("age", "unknown"))
 	changed.emit()
 
-## The mic key: on joins the room's voice (the 13+ gate first when not answered), off leaves it.
+## The mic key: the first tap joins the room's voice with the mic on (the 13+ gate first when not answered); after that
+## it only turns the mic on and off. The voice is left with the place (_exit_tree) or the app going to the background.
 func toggle_mic() -> void:
 	if not offered() or voice == null: return
 	if bool(voice.call("active")):
