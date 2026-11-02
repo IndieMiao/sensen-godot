@@ -29,11 +29,13 @@ const TIPS := {
 	"cook": "Tap Cook to grill your first fish",
 	"heat": "Tap when the needle hits gold!",
 	"meal": "Energy comes back over time. A meal brings it back now.",
-	"map": "Browse the map for free. Travel costs Energy and coins.",
+	"map": "Browse the map for free.",
+	"travel": "Travel costs Energy and coins.",   # v4q(4) ⑥ 丁21: a paid travel card's first opening, not while the guide is on
 }
 ## Doing what a tip teaches closes it (q(26)); the other tips wait out their time or a tap.
 
-## The seven built-in TipCards (q(215) §14.3). NPC dialogue never becomes a TipCard.
+## The eight built-in TipCards (q(215) §14.3; v4q(4) ⑥ split the map's into `map` and `travel`). NPC dialogue never
+## becomes a TipCard.
 static func tip_text(key: String) -> String:
 	return str(TIPS.get(key, ""))
 const TAUGHT_BY := {"sow": "sow", "cast": "cast", "cook": "cook", "heat": "heat"}
@@ -116,7 +118,7 @@ static func guide_shown(view: Dictionary) -> Dictionary:
 
 ## Adapt an actual place id to the existing camera-only Show route. Names always come from the server row.
 static func guide_go(view: Dictionary, go: String) -> String:
-	if go == "" or go in ["home", "plots", "stove", "stall", "bench", "board", "inbox"] or go.contains(":"): return go
+	if go == "" or go in ["home", "plots", "stove", "stall", "bench", "board", "inbox", "sign", "map"] or go.contains(":"): return go
 	var home = view.get("home", {}).get("set", {})
 	if go == str(home.get("pond", "")) or go == home_pond(view): return "pond:" + go
 	for role in ["market", "tea", "tackle", "post"]:
@@ -157,9 +159,12 @@ static func guide_rows(view: Dictionary) -> Array:
 			r.tail = "%d/%d" % [int(p.get("have", 0)), int(p.need)]
 	return [r]
 
-## Keep all seven original scene/event triggers (q(215) ⑤). A step never introduces an eighth card or starts one
-## early. TipQueue still handles seen state, the action closing a card, and RewardMoment ordering.
-static func tip_allowed(_view: Dictionary, key: String) -> bool:
+## Keep the original scene/event triggers (q(215) ⑤). A step never introduces a card of its own or starts one early.
+## TipQueue still handles seen state, the action closing a card, and RewardMoment ordering. `travel` (v4q(4) ⑥ 丁21:
+## the travel confirm card that costs Energy or coins calls teach("travel")) waits out the guide unseen, so the first
+## paid trip after it shows it.
+static func tip_allowed(view: Dictionary, key: String) -> bool:
+	if key == "travel" and guide_on(view): return false
 	return TIPS.has(key)
 
 ## The server's actual targets (plot numbers, place ids, resident ids and button keys), never bundled aliases.
@@ -431,7 +436,6 @@ static func free_now(view: Dictionary) -> Array:
 		if int(r.get("have", 0)) >= int(r.get("qty", 1)):
 			rows.append(_row("Deliver %s" % str(r.get("title", "")), "board", "stall"))
 			break
-	if view.get("mine", {}).get("run", null) != null: rows.append(_row("Mine run · Continue", "mine", ""))   # no camera target yet
 	rows = rows.slice(0, 3)
 	if rows.size() < 3: rows.append(_row("Browse the map", "map", "map"))   # the fallback, always possible
 	return rows

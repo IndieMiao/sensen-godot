@@ -6,10 +6,12 @@ extends "res://scenes/map_poc/map_poc.gd"
 ## cluster can be browsed (SGODOT-275, plan §11.8.1): its bubble at the country zoom, the camera city switching as
 ## the camera goes over it. Browsing moves only the camera; where the player is (the place chip) never changes.
 
+const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a city's 2 regional fish (MAP-5's Fish here)
+const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")   # the wild sites read by viewport (SGODOT-355 C)
 const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")   # the fog's holes as the map draws the ground (SGODOT-298)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
@@ -426,7 +428,10 @@ func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
 	var req := PinReason.request_of(_view(), str(why.get("request", "")))
 	if str(req.get("city", "")) != "" and bool(req.get("tracked", false)):
 		var rid := str(req.id)
-		details = func(): P0BoardRequest.open(rt.ui, "market", rid, func(): _open_place_card(entry, place_card(entry)))
+		var back := func(): _open_place_card(entry, place_card(entry))
+		# a keeper's local request tracked elsewhere opens its card instead (q(272) via q(271): Drop request › there)
+		if bool(req.get("local", false)): details = func(): P0LocalRequest.open(rt.ui, rid, back)
+		else: details = func(): P0BoardRequest.open(rt.ui, "market", rid, back)
 	P0PlaceSheet.open(rt.ui, spec,
 		func():
 			rt.ui.close_modal()
@@ -769,7 +774,16 @@ func _pan_by(shift: Vector2) -> void:
 func p0_return(route: String) -> void:
 	if route.begins_with("pond:"): _on_city_pond_requested({"id": route.trim_prefix("pond:")})
 	elif route.begins_with("outpost:"): _open_outpost(route.trim_prefix("outpost:"))
+	elif route.begins_with("mine:"): open_wild_card(route.trim_prefix("mine:"))   # a wild site's mine (周瑜's route_of, 355 b1 E)
 	else: _open_my_farm()
+
+## Back at a wild site from its mine (SGODOT-355 b1 C): 周瑜's p0_mine calls it after the pop (the Entrance, a knock-out),
+## the place pill's return (`mine:<id>`) too. The camera flies to the site; its mouth card (contract-efg §7.3 / 7.4) opens
+## on landing once the card is in. A site the map has not read (P0WildSites): the map stays as it is.
+func open_wild_card(site_id: String) -> void:
+	if not P0WildSites.has_site(site_id): return
+	var s := P0WildSites.site(site_id)
+	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), SHOW_ZOOM)
 
 ## Without the native map (desktop, tests holding the map in a SubViewport) the map drawn is the viewport: the camera
 ## follows its height as on a phone. map_poc takes the window's, which can be taller — the desktop's 1280 override, a

@@ -1,5 +1,6 @@
 extends GdUnitTestSuite
-## SGODOT-256 ①: tapping the Clay Bank fast must not leave its sheet full screen.
+## SGODOT-256 ①: a material sheet opened twice fast must not be left full screen (the Clay Bank's, till it left the farm
+## with v4q(4) ①; the mine's knock-out card now, E6).
 
 const STORE := "user://test_p0_sheet_double_tap.json"
 var ui: P0Ui
@@ -7,9 +8,10 @@ var ui: P0Ui
 func _view() -> Dictionary:
 	return {"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000}, "names": {"clay": "Clay"},
 		"bag": {"capacity": 25, "free": 25, "slots": []}, "plots": [], "coins": 40, "skills": {},
-		"rest": {"used": 0, "limit": 1, "resets_in": 3600000}, "homestead": {"level": 1},
-		"gather": {"spots": [{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "ready": false,
-			"yield": [["clay", 2]]}]}}
+		"rest": {"used": 0, "limit": 1, "resets_in": 3600000}, "homestead": {"level": 1}}
+
+func _ko() -> UiDrawer:
+	return P0MaterialCards.open_ko_card(ui, P0MaterialLogic.ko_card(ui.view, "wd-dev-quarry", 12, [["iron_ore", 3]]), Callable())
 
 func before_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
@@ -27,8 +29,8 @@ func _fitted(d: UiDrawer) -> float: return d.body.get_combined_minimum_size().y 
 ## The int10c case: a second tap reopens the sheet in the next frame's input, so the fit meant for "after layout" ran
 ## before the sheet's wrapped lines had a width and left it taller than the screen.
 func test_a_sheet_reopened_before_layout_still_fits_its_content() -> void:
-	P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank")
-	var d := P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank")
+	_ko()
+	var d := _ko()
 	get_tree().emit_signal(&"process_frame")   # the next frame's process before the new sheet is laid out
 	await await_idle_frame()
 	await await_idle_frame()
@@ -37,23 +39,23 @@ func test_a_sheet_reopened_before_layout_still_fits_its_content() -> void:
 	assert_float(d.size.y).is_equal_approx(d.height, 1.0)
 
 func test_every_material_sheet_fits_after_layout() -> void:
-	for open in [func(): return P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank"),
-			func(): return P0MaterialCards.open_new_run(ui, ui.view, func(_c): pass)]:
+	for open in [_ko]:
 		var d: UiDrawer = open.call()
 		await await_idle_frame()
 		await await_idle_frame()
 		assert_float(d.height).is_less(ui.root.size.y * 0.75)
 		assert_float(d.height).is_equal_approx(_fitted(d), 1.0)
 
-## A fast second tap on the spot's button reaches the farm while the sheet is already up: it opens nothing more.
-func test_a_tap_on_a_spot_while_a_sheet_is_up_opens_nothing_more() -> void:
-	var first := P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank")
+## A fast second tap on a farm card's button reaches the farm while a sheet is already up: it opens nothing more (the
+## farm's own card since its gathering spots left for the cities and its mine mouth for the wild sites, SGODOT-355 b1).
+func test_a_tap_on_a_farm_card_while_a_sheet_is_up_opens_nothing_more() -> void:
+	var first := _ko()
 	var rt := P0Runtime.new()
 	rt.ui = ui
 	var fm := P0FarmMaterials.new()
 	fm.rt = rt
-	assert_bool(fm.tap_card("spot_clay_bank")).is_true()   # taken, so the farm does nothing else with it
-	assert_str(ui.modal_kind).is_equal("locked_spot")
+	assert_bool(fm.tap_card("workbench")).is_true()   # taken, so the farm does nothing else with it
+	assert_str(ui.modal_kind).is_equal("mine_ko")
 	assert_object(ui._modal.get_child(1)).is_same(first)    # the same sheet: no second one opened
 	fm.free()
 	rt.free()

@@ -11,7 +11,7 @@ extends P0Room
 
 const STOVE := "use_stove_1"
 ## Stoves 2 and 3 (Homestead Lv4 / Lv8, SGODOT-282): their own burners on the range, each tapped and named alone.
-const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
+const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3", "use_stove_4"]   # stove 4: the Deluxe Room only (Homestead Lv17, v4q(1))
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
 const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (the model has no lamp of its own)
@@ -121,11 +121,12 @@ func card_pick(marks: Dictionary) -> String:
 	return n
 
 ## 不知火舞 02ad95bc ① / 6e798a27 ②: stove buttons closer than 44 px (centre to centre) overlap, and an open strip covers
-## the others. Folded, they go in one row above the hearth, 1 / 2 / 3 left to right, 44 apart, kept 44 from the Spice Rack
-## and Warming Cabinet buttons; with a strip open it stays at its own pot and the other stoves' buttons line up above it.
+## the others. Folded, they go in a small grid over the cooker (stove_row), kept 44 from the Spice Rack and Warming Cabinet
+## buttons; with a strip open it stays at its own pot and the other stoves' buttons sit above it.
 const STOVE_ROW_GAP := 44.0
 func _marker_spots(spots: Dictionary) -> Dictionary:
-	# only the stoves on screen: the row is kept on screen, and would pull off-screen ones to its edge with no stove there
+	_laid_out = {}
+	# only the stoves on screen: the grid is kept on screen, and would pull off-screen ones to its edge with no stove there
 	# (the Deluxe Room's door is far from its cooker)
 	var screen := get_viewport().get_visible_rect()
 	var shown: Array = []
@@ -142,44 +143,75 @@ func _marker_spots(spots: Dictionary) -> Dictionary:
 	if not crowded: return spots
 	var avoid: Array = []
 	for n in [RACK, CABINET]: if spots.has(n): avoid.append(spots[n])
-	return stove_row(spots, shown, open, strip, get_viewport().get_visible_rect().size.x, avoid)
+	# every burner the cooker has, open or not yet, where its button would hang: the grid's cells (a stove still to open
+	# keeps its cell, so the buttons never move when it opens)
+	var burners := {}
+	for i in STOVES.size():
+		var b := anchor("badge_" + STOVES[i].trim_prefix("use_"))
+		if b: burners[i] = cam.unproject_position(b.global_position)
+	if strip.has_area():   # the grid sits over its own stove's strip: the room's strip row leaves those buttons be
+		for i in shown: if i != open: _laid_out[STOVES[i]] = true
+	return stove_row(spots, shown, open, strip, get_viewport().get_visible_rect().size.x, avoid, burners)
 
 var _strip_rect := Rect2()   # the open stove strip on screen last frame (the other stoves line up above it)
 
-## The row (pure, tested). Folded: 1 / 2 / 3 left to right, 44 apart, centred on the stoves' mean x at their highest
-## y, kept on screen, then moved right as a whole until every button is 44 or more from each `avoid` spot (the Spice
-## Rack and Warming Cabinet buttons). With stove `open`'s strip showing (`strip`, its rect last frame): that stove keeps
-## its own spot, and the others, in order, are centred over the strip, 44 apart, 6 px above its top edge, moved the
-## shorter way, left or right, to keep 44 from those buttons too (before the strip has a rect, its first frame, the open
-## stove still keeps its spot and the rest take their folded places).
+## The grid (pure, tested; 不知火舞 on #634, replacing 02ad95bc ①'s one row 1 / 2 / 3 — the Fourth Stove's button went
+## to the end of the row, over the fridge). Two columns 44 apart that follow the burners on screen: `burners` (stove →
+## screen point, every burner of the cooker, open or not; the shown stoves' spots without it) top to bottom in pairs, the
+## back pair the back row, each pair left to right as the burners are; a burner alone in its row takes the column on its
+## side of the cooker's middle. Centred on the burners' mean x. Folded, the front row sits at the burners' highest y,
+## the back row 44 above; the grid is kept on screen, then moved right as a whole until every button is 44 or more
+## from each `avoid` spot (the Spice Rack and Warming Cabinet buttons). With stove `open`'s strip showing (`strip`, its
+## rect last frame): that stove keeps its own spot, its cell stays empty, and the grid's front row sits 6 px above the
+## strip's top edge, moved the shorter way, left or right, to keep 44 from those buttons too (before the strip has a
+## rect, its first frame, the open stove still keeps its spot and the rest take their folded places).
 const ROW_MARGIN := 22.0
 const ABOVE_STRIP := 6.0
 const STOVE_BUTTON := 28.0   # UiWorldIconButton's disc
-static func stove_row(spots: Dictionary, shown: Array, open: int, strip: Rect2, screen_w: float, avoid := []) -> Dictionary:
+static func stove_row(spots: Dictionary, shown: Array, open: int, strip: Rect2, screen_w: float, avoid := [], burners := {}) -> Dictionary:
 	var out := spots.duplicate()
-	var row: Array = shown.filter(func(i): return i != open) if open >= 0 and strip.has_area() else shown.duplicate()
+	var over_strip := open >= 0 and strip.has_area()
+	var placed: Array = shown.filter(func(i): return i != open) if over_strip else shown.duplicate()
+	var at := burners.duplicate()
+	for i in shown: if not at.has(i): at[i] = spots[STOVES[i]]
+	# the cells: burners top to bottom in pairs (row 0 the back), each pair left to right
+	var order: Array = at.keys()
+	order.sort_custom(func(a, b): return (at[a] as Vector2).y < (at[b] as Vector2).y)
 	var cx := 0.0
-	var y := INF
-	if row.size() < shown.size():
-		cx = strip.get_center().x
-		y = strip.position.y - ABOVE_STRIP - STOVE_BUTTON * 0.5
-	else:
-		for i in row:
-			cx += (spots[STOVES[i]] as Vector2).x
-			y = minf(y, (spots[STOVES[i]] as Vector2).y)
-		cx /= float(row.size())
-	var xs: Array = []
-	for k in row.size(): xs.append(cx + (float(k) - float(row.size() - 1) * 0.5) * STOVE_ROW_GAP)
+	for i in order: cx += (at[i] as Vector2).x
+	cx /= float(order.size())
+	var rows := ceili(order.size() / 2.0)
+	var cell := {}   # stove → Vector2i(col, row)
+	for r in rows:
+		var pair: Array = order.slice(r * 2, r * 2 + 2)
+		pair.sort_custom(func(a, b): return (at[a] as Vector2).x < (at[b] as Vector2).x)
+		if pair.size() == 1: cell[pair[0]] = Vector2i(1 if (at[pair[0]] as Vector2).x > cx else 0, r)
+		else: for c in 2: cell[pair[c]] = Vector2i(c, r)
+	var base := INF   # the front row's y
+	if over_strip: base = strip.position.y - ABOVE_STRIP - STOVE_BUTTON * 0.5
+	else: for i in at: base = minf(base, (at[i] as Vector2).y)   # every burner's: the same grid with a stove still to open
+	var ys: Array = []
+	for r in rows: ys.append(base - float(rows - 1 - r) * STOVE_ROW_GAP)
+	var xs := {}
+	for i in placed: xs[i] = cx + (float((cell[i] as Vector2i).x) - 0.5) * STOVE_ROW_GAP
+	var lo: float = xs.values().min()
+	var hi: float = xs.values().max()
 	var shift := 0.0
-	if xs.min() < ROW_MARGIN: shift = ROW_MARGIN - xs.min()
-	elif xs.max() > screen_w - ROW_MARGIN: shift = screen_w - ROW_MARGIN - xs.max()
-	if row.size() == shown.size():   # right, as a whole, past whichever of the rack / cabinet a button is too close to
-		shift += _clear_of(xs, shift, y, avoid, 1.0)
+	if lo < ROW_MARGIN: shift = ROW_MARGIN - lo
+	elif hi > screen_w - ROW_MARGIN: shift = screen_w - ROW_MARGIN - hi
+	var clear := func(dir: float) -> float:   # the most any grid row must move that way
+		var most := 0.0
+		for r in rows:
+			var row_xs: Array = placed.filter(func(i): return (cell[i] as Vector2i).y == r).map(func(i): return xs[i])
+			if not row_xs.is_empty(): most = maxf(most, _clear_of(row_xs, shift, ys[r], avoid, dir))
+		return most
+	if not over_strip:   # right, as a whole, past whichever of the rack / cabinet a button is too close to
+		shift += clear.call(1.0)
 	elif not avoid.is_empty():   # over an open strip too (the Standard Room's shelf sits beside its cooker, 282): the shorter way
-		var right := _clear_of(xs, shift, y, avoid, 1.0)
-		var left := _clear_of(xs, shift, y, avoid, -1.0)
-		shift += -left if left < right and float(xs.min()) + shift - left >= ROW_MARGIN else right
-	for k in row.size(): out[STOVES[row[k]]] = Vector2(xs[k] + shift, y)
+		var right: float = clear.call(1.0)
+		var left: float = clear.call(-1.0)
+		shift += -left if left < right and lo + shift - left >= ROW_MARGIN else right
+	for i in placed: out[STOVES[i]] = Vector2(xs[i] + shift, ys[(cell[i] as Vector2i).y])
 	if shown.has(open): out[STOVES[open]] = spots[STOVES[open]]   # the open strip never moves (its first frame too)
 	return out
 

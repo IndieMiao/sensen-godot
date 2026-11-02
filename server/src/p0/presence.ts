@@ -10,6 +10,7 @@ import type { P0State } from './state.js';
 import { noteSeenAt } from './markers.js';
 import { clusterOf } from './travel.js';
 import { placeOf } from './world.js';
+import { leaveMine } from './mine.js';
 
 const AWAY = new Set(['pond', 'outpost', 'mine']);
 
@@ -31,6 +32,7 @@ export function trackPresence(c: P0Content, s: P0State, space: unknown, now: num
  * `place` names the catalog pond inside a pond space (SGODOT-232 S6): see notePlace.
  */
 export function notePresence(c: P0Content, s: P0State, space: unknown, now: number, events: P0Event[] | null, place?: unknown): boolean {
+  if (typeof space === 'string' && space !== '' && space !== 'mine') leaveMine(c, s, now);
   const home = trackPresence(c, s, space, now);
   notePlace(c, s, space, place);
   if (home) storeMaterials(c, s, now, events);   // q(40): coming home stores the bag's materials (SGODOT-231)

@@ -1,4 +1,4 @@
-/** Homestead progression (plan §8.1–8.3, q(246)): gates and Energy rewards are content-driven. */
+/** Homestead progression (v4q(1), batch 1 to Lv17): gates and Energy rewards are content-driven. */
 import type { HomesteadLook, P0Content } from './content.js';
 import { gainEnergy, type P0Event } from './progress.js';
 import { maxEnergy, skillLevel } from './rules.js';
@@ -6,14 +6,14 @@ import type { P0State } from './state.js';
 import { missing, takeStorageFirst } from './storage.js';
 import { addPlots, clearNewBeds } from './garden.js';
 import type { Refusal } from './fishing.js';
+import { cityStamps, climatesVisited } from './travel.js';
 
 export function nextLevel(c: P0Content, s: P0State) {
   return c.homestead.levels.find(l => l.level === s.homestead.level + 1) ?? null;
 }
 
-export function skillsTotal(c: P0Content, s: P0State): number {
-  return skillLevel(c, s, 'farming') + skillLevel(c, s, 'fishing');
-}
+/** The skills a level gates, in the order the button and the refusal name the first short one (v4q(1) ③). */
+export const GATE_SKILLS = ['farming', 'fishing', 'cooking'] as const;
 
 /** Unlocks granted at or below the current level (spice_rack, warming_cabinet, bag_upgrade_1, board_slot_3, fence). */
 export function unlocked(c: P0Content, s: P0State, what: string): boolean {
@@ -27,10 +27,17 @@ export function stepAt(steps: [number, number][] | undefined, level: number, fal
   return v;
 }
 
-/** The most stoves a kitchen has (§8.3.2: the Third Stove is the last); content can never give more. */
-export const MAX_STOVES = 3;
+/** A count that grows with the Homestead level up to a most: base + per_level × level, at most `max` — raised from a
+ * level on by `raise` ([from level, most]; v4q(1) ⑧: trees 8 → 10 and sprinklers 10 → 12 at Lv14). */
+export interface LevelCap { base: number; per_level: number; max: number; raise?: [number, number][] }
+export function levelCap(m: LevelCap | undefined, level: number): number {
+  return m ? Math.min(stepAt(m.raise, level, m.max), m.base + m.per_level * level) : 0;
+}
 
-/** Stoves in the kitchen (§8.3.2): Lv1–3 1, Lv4–7 2, Lv8 on 3. */
+/** The most stoves a kitchen has (v4q(1) ⑧: the Fourth Stove at Lv17); content can never give more. */
+export const MAX_STOVES = 4;
+
+/** Stoves in the kitchen (v4q(1) ⑧): Lv1–3 1, Lv4–7 2, Lv8–16 3, Lv17 4. */
 export function stoveCount(c: P0Content, s: P0State): number {
   return Math.min(MAX_STOVES, Math.max(1, stepAt(c.homestead.stoves, s.homestead.level, 1)));
 }
@@ -50,12 +57,20 @@ export function boardSlots(c: P0Content, s: P0State): number {
 /** Coins a spend needs in the wallet: price + the 40-coin floor (q(32); seeds are exempt, §11.2.2 rule 9). */
 export function coinsNeeded(c: P0Content, price: number): number { return price + c.wallet_floor; }
 
-/** Why the next level can't be bought right now, in button order: skills, then materials, then coins (§8.6.1). */
+/** Why the next level can't be bought right now, in button order (v4q(1) 画面): each skill (Farming → Fishing →
+ * Cooking), the travel gate (stamps → climates), then materials, then coins. */
 export function upgradeBlock(c: P0Content, s: P0State): Refusal | null {
   const next = nextLevel(c, s);
   if (!next) return { code: 'max_level', detail: { level: s.homestead.level } };
-  const skills = skillsTotal(c, s);
-  if (skills < next.skills) return { code: 'skills_short', detail: { need: next.skills, have: skills } };
+  for (const skill of GATE_SKILLS) {
+    const need = next.skills[skill], have = skillLevel(c, s, skill);
+    if (need !== undefined && have < need) return { code: 'skills_short', detail: { skill, need, have } };
+  }
+  if (next.travel) {
+    const stamps = cityStamps(s), climates = climatesVisited(c, s);
+    if (stamps < next.travel.stamps) return { code: 'travel_short', detail: { kind: 'stamps', need: next.travel.stamps, have: stamps } };
+    if (climates < next.travel.climates) return { code: 'travel_short', detail: { kind: 'climates', need: next.travel.climates, have: climates } };
+  }
   const gap = missing(s, next.materials);
   if (gap) return { code: 'need_material', detail: gap };
   if (s.coins < coinsNeeded(c, next.coins)) return { code: 'no_coins', detail: { need: coinsNeeded(c, next.coins) - s.coins } };
@@ -77,14 +92,13 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   events.push({ kind: 'coins', delta: -next.coins });
   s.homestead.level = next.level;
   s.homestead.plaque.push({ level: next.level, at: now });
-  // q(246): each level chooses a fixed reward or full refill; never reduce a bonus-zone value.
-  const max = maxEnergy(c, s);
-  const room = Math.max(0, max - s.energy.value);
-  const gain = gainEnergy(c, s, now, next.energy === undefined || next.energy === 'full' ? room : Math.min(next.energy, room), events, 'homestead');
+  // v4q(1) ⑥: Lv2–15 give 50 back, Lv16 on none — only up to the pool, never reducing a bonus-zone value.
+  const room = Math.max(0, maxEnergy(c, s) - s.energy.value);
+  const gain = gainEnergy(c, s, now, Math.min(next.energy, room), events, 'homestead');
   // look: the stage this level opens (LOOK-PICK, SGODOT-282) — the client offers its two looks after HOME-2's banner.
   const look = lookStageAt(c, next.level);
   events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks, ...(look ? { look: look.id } : {}) });
-  // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39, homestead.plots), dropped in with the fence (HOME-2's plots_40 line).
+  // the level's beds (homestead.plots: Lv1 8 … Lv17 41, tilled, SGODOT-355 b1), dropped in with the level's look.
   const added = addPlots(c, s);
   if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
   clearNewBeds(c, s, added, events);   // Lv7's beds on the field's edge: pieces standing there go back to storage (q(172))

@@ -41,18 +41,18 @@ func _header(a: RefCounted) -> String:
 # 0.2.14 (341, the user on 10-29): Main's new save starts the guide; the toggle only latches into new test accounts.
 func test_toggle_only_affects_new_test_id_and_main_always_asks_for_the_guide() -> void:
 	assert_bool(accounts.enabled()).is_true()
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 	assert_bool(accounts.set_enabled(false)).is_true()
 	assert_bool(accounts.is_test()).is_false()
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")   # Off is for test accounts only
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3,locals")   # Off is for test accounts only
 	assert_bool(accounts.set_enabled(true)).is_true()
 	assert_bool(accounts.start_test("main-avatar")).is_true()
 	assert_bool(Accounts.valid_test_id(accounts.active_id())).is_true()
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 	accounts.set_enabled(false)
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")   # existing guide is not rolled back
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3,locals")   # existing guide is not rolled back
 	assert_bool(accounts.start_test("test-avatar")).is_true()
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,locals")
 
 func test_new_test_and_process_restart_preserve_main_and_isolate_preferences() -> void:
 	accounts.set_enabled(true)
@@ -67,7 +67,7 @@ func test_new_test_and_process_restart_preserve_main_and_isolate_preferences() -
 	# The same persistent directory loaded by a replacement client build: no process-only recovery state.
 	var relaunched = Accounts.new(dir)
 	assert_str(relaunched.active_id()).is_equal(test_id)
-	assert_str(_header(relaunched)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(relaunched)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 	assert_bool(relaunched.return_main()).is_true()
 	var returned = Accounts.new(dir)
 	assert_bool(returned.is_test()).is_false()
@@ -77,7 +77,7 @@ func test_new_test_and_process_restart_preserve_main_and_isolate_preferences() -
 	assert_str(FileAccess.get_file_as_string(dir + "p0_main_identity.backup")).is_equal(MAIN_BYTES)
 	assert_str(FileAccess.get_file_as_string(dir + "p0_tips.json")).is_equal('{"main_seen":true}')
 	assert_str(FileAccess.get_file_as_string(dir + "p0_quickbar.json")).is_equal('{"main_pin":"seed_radish"}')
-	assert_str(_header(returned)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(returned)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 
 func test_each_explicit_start_uses_a_new_recognizable_id_and_keeps_first_main_backup() -> void:
 	accounts.start_test("main-avatar")
@@ -126,26 +126,26 @@ func test_saved_off_survives_upgrade_and_return_to_main() -> void:
 	var upgraded = Accounts.new(dir)
 	assert_bool(upgraded.enabled()).is_false()
 	assert_bool(upgraded.start_test("main-avatar")).is_true()
-	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,locals")
 	assert_bool(upgraded.set_enabled(true)).is_true()
-	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")   # existing test stays as created
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,locals")   # existing test stays as created
 	assert_bool(Accounts.new(dir).guide_enabled()).is_false()
 	assert_bool(upgraded.return_main()).is_true()
 	assert_str(FileAccess.get_file_as_string(dir + "p0_player.txt")).is_equal(MAIN_BYTES)
 	assert_bool(upgraded.start_test("main-avatar")).is_true()
-	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 
 func test_absent_option_defaults_on_without_rewriting_old_active_test() -> void:
 	assert_bool(accounts.start_test("main-avatar")).is_true()   # no toggle needed on an unconfigured device
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 	var test_id := str(accounts.active_id())
 	_write("p0_test_options.json", JSON.stringify({active = test_id, active_guide = false, main_avatar = "main-avatar"}))
 	var upgraded = Accounts.new(dir)
 	assert_bool(upgraded.enabled()).is_true()
 	assert_str(upgraded.active_id()).is_equal(test_id)
-	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home")
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,locals")
 	assert_bool(upgraded.return_main()).is_true()
-	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(upgraded)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 
 func test_visible_entry_opens_existing_page_with_default_on_and_returns_to_settings() -> void:
 	var ui: P0Ui = auto_free(P0Ui.new())
@@ -163,7 +163,7 @@ func test_visible_entry_opens_existing_page_with_default_on_and_returns_to_setti
 	assert_bool(ui._modal.find_child("GuideTestToggle", true, false).on).is_true()
 	assert_object(ui._modal.find_child("ReturnMainAccount", true, false)).is_null()
 	assert_bool(accounts.is_test()).is_false()   # opening the page does not create a test or change Main's features
-	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3")
+	assert_str(_header(accounts)).is_equal("x-p0-features: choose_home,guide_v3,locals")
 	(ui._modal.find_children("*", "P0SettingsPage", true, false)[0] as P0SettingsPage).back_pressed.emit()
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("settings")
@@ -182,7 +182,7 @@ func test_b_page_reuses_settings_layout_and_only_test_has_return_action() -> voi
 
 class RefusalUi extends P0Ui:
 	var errors: Array = []
-	func toast_error(message: String, _key := "") -> void: errors.append(message)
+	func toast_error(message: String, _key := "", _break := false) -> void: errors.append(message)
 
 func test_only_test_first_city_pick_can_return_directly_without_confirmation() -> void:
 	var ui: P0Ui = auto_free(P0Ui.new())

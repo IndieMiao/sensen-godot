@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
-import { freshState, upgradeState, type BoardRequest, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type BoardRequest, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { boardsOf, eligible, handIn, settleBoards, tracked } from '../../src/p0/boards.js';
 import { mapMarkers } from '../../src/p0/markers.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -49,7 +49,7 @@ describe('q(270) Market Board per city', () => {
     v5.v = 5;
     delete (v5 as { markets?: unknown }).markets;
     const up = upgradeState(c, v5 as unknown as P0State, T);
-    expect(up.v).toBe(6);
+    expect(up.v).toBe(SAVE_VERSION);
     expect(Object.keys(up.markets)).toEqual([SF]);
     expect(up.markets[SF]).toBe(up.boards.market);
     expect(up.boards.market).toEqual(held);

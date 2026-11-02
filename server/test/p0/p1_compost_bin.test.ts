@@ -45,7 +45,7 @@ describe('the Compost Bin on the yard (q(118) ③)', () => {
   it('keeps to the yard: not on the field, a path or a yard object; one only', () => {
     const s = f7();
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 5, y: 5 }).code).toBe('decor_outside');   // the field
-    expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 9, y: 0 }).code).toBe('decor_path');
+    expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 13, y: 14 }).code).toBe('decor_path');   // the stall's path
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', x: 8, y: 15 }).code).toBe('decor_overlap');
     expect(refused(s, { type: 'place', recipe: 'craft_compost_bin', plot: 3 } as P0Command).code).toBe('bad_spot');
     const one = build(s);

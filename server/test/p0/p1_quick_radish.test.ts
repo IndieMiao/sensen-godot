@@ -37,11 +37,12 @@ describe('the start bag (q(217) ②)', () => {
   it('gives a guided save Quick Radish Seeds ×2 first, then the usual two stacks (3/25)', () => {
     const s = guided();
     expect(s.guide?.step).toBe('t_sow_quick');
-    expect(s.bag).toEqual([{ id: QUICK, qty: 2 }, { id: 'seed_radish', qty: 20 }, { id: 'seed_lettuce', qty: 10 }]);
+    // v4q(4) ⑥ 戊1 (q(217) ② for 8 starting Plots): Radish ×12, Lettuce ×6
+    expect(s.bag).toEqual([{ id: QUICK, qty: 2 }, { id: 'seed_radish', qty: 12 }, { id: 'seed_lettuce', qty: 6 }]);
   });
 
   it('gives a save outside the guide the two stacks as before', () => {
-    expect(freshState(c, 'quick-radish-02', T0, 42).bag).toEqual([{ id: 'seed_radish', qty: 20 }, { id: 'seed_lettuce', qty: 10 }]);
+    expect(freshState(c, 'quick-radish-02', T0, 42).bag).toEqual([{ id: 'seed_radish', qty: 12 }, { id: 'seed_lettuce', qty: 6 }]);
     // no steps in the table (the shipped one until 339's land): no guide, no quick seeds
     const plain = loadP0Content();
     plain.guide = { steps: [], recover: [], tips: {} };
@@ -82,11 +83,12 @@ describe('sow, water and harvest (q(217) ①)', () => {
     expect(t.skills.farming - xp1).toBe(cropById(c, 'crop_radish')!.xp);
   });
 
+  // SGODOT-355 b1: on the new grid bed 6 [4, 3] is beside bed 7 [5, 3], both in a new homestead's 8
   it('keeps 45 s under a sprinkler and a greenhouse: growing as sown, no cut', () => {
     let s = guided();
     s.facilities = [{ id: 1, kind: 'sprinkler', plot: 7 }];
-    s = run(s, { type: 'sow', plot: 8, seed: QUICK }).s;
-    expect(s.plots[8]).toMatchObject({ state: 'growing', crop: 'crop_quick_radish', ready_at: T0 + 45 * S });
+    s = run(s, { type: 'sow', plot: 6, seed: QUICK }).s;
+    expect(s.plots[6]).toMatchObject({ state: 'growing', crop: 'crop_quick_radish', ready_at: T0 + 45 * S });
     let g = guided();
     g.facilities = [{ id: 1, kind: 'greenhouse', plot: 4 }];
     const under = coverOf(c, 'greenhouse', 4, g.plots.length).find(id => g.plots[id].state === 'tilled')!;
@@ -98,9 +100,9 @@ describe('sow, water and harvest (q(217) ①)', () => {
     let s = guided();
     s.skills.farming = c.skills.farming[5];   // Farming Lv6, the sprinkler's gate
     s.storage = { wood: 20, stone: 20, copper_ore: 7 };
-    s = run(s, { type: 'sow', plot: 8, seed: QUICK }).s;
+    s = run(s, { type: 'sow', plot: 6, seed: QUICK }).s;
     s = run(s, { type: 'place', recipe: 'craft_sprinkler', plot: 7 }, T0 + 5 * S).s;
-    expect(s.plots[8]).toMatchObject({ state: 'growing', ready_at: T0 + 50 * S });
+    expect(s.plots[6]).toMatchObject({ state: 'growing', ready_at: T0 + 50 * S });
   });
 
   it('takes no Compost: the plot goes by its state, nothing is spent', () => {

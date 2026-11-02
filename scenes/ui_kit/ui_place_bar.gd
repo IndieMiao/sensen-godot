@@ -126,3 +126,6 @@ func set_safe_bottom(v: float) -> void:
 
 ## The bar's card in this control's coordinates (the scene's touches stop at its top).
 func card_rect() -> Rect2: return Rect2(_card.position, _card.size)
+
+## Where a toast docks while placing (不知火舞 on #624: never over the caption): above the pill when it shows, else the card.
+func toast_dock() -> Control: return _pill if _pill.visible else _card

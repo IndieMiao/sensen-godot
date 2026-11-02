@@ -92,10 +92,14 @@ func test_the_mine_keeps_its_back_for_the_page() -> void:
 	mine.rt = P0Runtime.ensure()
 	for i in 3: await await_idle_frame()   # in the tree: its ui is built
 	var real_ui = mine.rt.ui
-	assert_bool(mine.is_back_navigation_locked()).is_false()   # Back leaves the mine as before
+	mine.actor = auto_free(P0Actor.new())
 	real_ui.voice_match._open = true
 	assert_bool(mine.is_back_navigation_locked()).is_true()
+	assert_bool(mine._leaving).is_false()   # the page's Back: the mine stays
 	real_ui.voice_match._open = false
+	assert_bool(mine.is_back_navigation_locked()).is_true()
+	assert_bool(mine._leaving).is_true()   # then Back leaves the mine, by the Entrance (亚瑟 on #629, ⑥)
+	await await_idle_frame()
 	mine.free()
 
 func after() -> void:

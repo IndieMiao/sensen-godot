@@ -5,7 +5,7 @@
       { "id": "fence", "level": 3, "name": "Fence & Mailbox", "a": "Timber Fence", "b": "Stone Wall" },
       { "id": "porch", "level": 5, "name": "Porch", "a": "Timber Porch", "b": "Stone Porch" },
       { "id": "kitchen_extension", "level": 8, "name": "Kitchen Wing", "a": "Timber Kitchen Wing", "b": "Stone Kitchen Wing" },
-      { "id": "master_farmhouse", "level": 10, "name": "Master Farmhouse", "a": "Timber Lodge", "b": "Stone Manor" }
+      { "id": "master_farmhouse", "level": 15, "name": "Master Farmhouse", "a": "Timber Lodge", "b": "Stone Manor" }
     ]
   }
 }

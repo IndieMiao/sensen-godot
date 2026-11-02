@@ -1,5 +1,5 @@
 {
-  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard, ≤ 14 characters so a greyed button's second line holds it: the row reads `1×1 · Classic lamp`; a blurb says only what the yard really shows, q(131); a multi-piece one has no blurb and reads `5 pieces`, q(111) / q(113)), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk and off the field (`Outside your yard`), off every object (the house, facilities, gathering spots, the front fence, sign, plaque, mailbox and the Chef's Sign's cell: `Space taken`, as another piece), and off the paths (`Keep the path clear`, q(120) / 不知火舞 284 49b11f91: two cells wide to the map exit, the farmhouse door, the stall, the mine mouth and the workbench, so pieces — solid, like the facilities — never wall a place off). Rects are [x, y, w, h]. objects holds the facilities and spots both where farm-dev has them and where #215 moved them; gdUnit tests check P0Garden.FOOTPRINTS against it and walk a yard filled with pieces. walk (q(131) ②): the cells of a piece one may walk through, [dx, dy] at rot 0, turned with it — the Pergola's middle line, its posts on the four corners; they stay the piece's for placing (nothing else stands under it), only the walk grid lets the player through. walk ends inside the Homestead fence ring (Lv3; P0Garden.FENCE_RING, drawn as a Stone Wall with look b): its back stretch runs between rows 18 and 19 and its east one through column 19, so row 19 and column 19 — behind and on the fence — take no piece (李元芳's 0.2.1 smoke d83191bb: a Fountain offered on the back wall). P0Garden.WALK_RECT, where the player walks, is unchanged.",
+  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard, ≤ 14 characters so a greyed button's second line holds it: the row reads `1×1 · Classic lamp`; a blurb says only what the yard really shows, q(131); a multi-piece one has no blurb and reads `5 pieces`, q(111) / q(113)), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk and off the field (`Outside your yard`), off every object (the house, facilities, gathering spots, the front fence, sign, plaque, mailbox, the Chef's Sign's cell and the cell under its hanging board (4, 14: once the mine path's, v4q(5) ①): `Space taken`, as another piece), and off the paths (`Keep the path clear`, q(120) / 不知火舞 284 49b11f91: two cells wide to the map exit, the farmhouse door, the stall and the workbench, and the one cell before the rest bench joined to the plaque's ((6, 15)–(7, 15), so its finger card still shows in a full yard; 不知火舞 on #629), so pieces — solid, like the facilities — never wall a place off; the farm has no mine mouth since 355 b1, v4q(5) ①). Rects are [x, y, w, h]. objects holds the facilities and spots both where farm-dev has them and where #215 moved them; gdUnit tests check P0Garden.FOOTPRINTS against it and walk a yard filled with pieces. walk (q(131) ②): the cells of a piece one may walk through, [dx, dy] at rot 0, turned with it — the Pergola's middle line, its posts on the four corners; they stay the piece's for placing (nothing else stands under it), only the walk grid lets the player through. walk ends inside the Homestead fence ring (Lv3; P0Garden.FENCE_RING, drawn as a Stone Wall with look b): its back stretch runs between rows 18 and 19 and its east one through column 19, so row 19 and column 19 — behind and on the fence — take no piece (李元芳's 0.2.1 smoke d83191bb: a Fountain offered on the back wall). P0Garden.WALK_RECT, where the player walks, is unchanged.",
   "decor": {
     "items": {
       "deco_planter": {
@@ -152,10 +152,10 @@
       ],
       "field": [
         [
-          3,
-          2,
-          17,
-          11
+          1,
+          -2,
+          19,
+          15
         ]
       ],
       "objects": [
@@ -170,12 +170,6 @@
           15,
           1,
           1
-        ],
-        [
-          1,
-          13,
-          2,
-          2
         ],
         [
           5,
@@ -202,12 +196,6 @@
           1
         ],
         [
-          16,
-          -1,
-          1,
-          1
-        ],
-        [
           17,
           12,
           1,
@@ -215,31 +203,7 @@
         ],
         [
           18,
-          13,
-          1,
-          1
-        ],
-        [
-          18,
           4,
-          1,
-          1
-        ],
-        [
-          2,
-          4,
-          1,
-          1
-        ],
-        [
-          2,
-          7,
-          1,
-          1
-        ],
-        [
-          3,
-          17,
           1,
           1
         ],
@@ -274,6 +238,12 @@
           1
         ],
         [
+          4,
+          14,
+          1,
+          1
+        ],
+        [
           15,
           15,
           1,
@@ -282,12 +252,6 @@
         [
           12,
           16,
-          1,
-          1
-        ],
-        [
-          2,
-          10,
           1,
           1
         ],
@@ -362,7 +326,7 @@
         [
           9,
           -2,
-          2,
+          1,
           4
         ],
         [
@@ -378,16 +342,16 @@
           2
         ],
         [
-          3,
-          13,
-          2,
-          2
-        ],
-        [
           16,
           13,
           2,
           3
+        ],
+        [
+          6,
+          15,
+          2,
+          1
         ]
       ]
     }

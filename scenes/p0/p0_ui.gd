@@ -47,6 +47,8 @@ const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGO
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the home city's centre for Improve this map (q(133) v3)
 const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")   # the sheet the Passport and city pages use
+const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keepers' local requests (q(272))
+const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
@@ -533,19 +535,19 @@ func set_place(text: String) -> void:
 	_place_text = text
 	_refresh_hud()
 
-## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
-## today" for its first 3 s). "" hides it; changing action clears it.
-## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
-## (5 clear of the HP card, which is 194 wide with its heart: x 209 of 360); hp < 0 hides it. The elite's card under it
-## while one fights ({} hides it); the status line (`Elite Slime` on Floor 5) hides with it — the card names the elite
-## and would cover half of it (不知火舞 on 288; COMBAT-ELITE 1228:111690 has no such line).
-const _STATUS_RIGHT_OF_HP := 209.0
+## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's `Rocks 2/6 · 3 monsters
+## left`). "" hides it; changing action clears it.
+## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot; hp < 0 hides it. The status
+## line then sits under the HP card, left-aligned with it, in the guard card's place (不知火舞 on #629: to its right it
+## ran into the screen's edge at 360). A guard's card there while it fights ({} hides it); the status line hides with
+## it — the card names the guard (不知火舞 on 288 / 355).
 func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	if not is_node_ready(): return
 	var on := hp >= 0 and surface in ACTION_SURFACES
 	_hp.visible = on
 	if on: _hp.set_hp(hp, maximum)
-	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
+	_status.position.x = _creel.position.x
+	_status.position.y = _creel.position.y + (_hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN if on else 0.0)
 	var boss := on and not elite.is_empty()
 	_elite_hp.visible = boss
 	_status.visible = _status_text.text != "" and surface in ACTION_SURFACES and not boss
@@ -944,7 +946,9 @@ func _fab_pressed() -> void:
 	if _modal != null: return
 	if not _fab_state.get("enabled", false):
 		if bool(_fab_state.get("creel_full", false)): toast_creel_full()   # FISH-4 / q(83): the greyed Cast · Creel full
-		elif _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		# SGODOT-231: unavailable keys say why (LOCK-10); one marked toast_break breaks a line too long at a « · »
+		# (UiKit.break_at_dot; the full field's `Plots 8/8 · Homestead Lv2 adds 2`, 不知火舞 on #624)
+		elif _fab_state.has("toast"): toast(str(_fab_state.toast), 0.0, bool(_fab_state.get("toast_break", false)))
 		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
@@ -1692,6 +1696,9 @@ func _aim_toast() -> void:
 		_toasts.anchor_above(_toast_over)
 		if _toasts.get_parent() == root: root.move_child(_toasts, -1)
 		return
+	if placing():   # placement: over its caption pill (or its card), never on it (不知火舞 on #624)
+		_toasts.anchor_above(_place_bar.toast_dock())
+		return
 	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
@@ -1720,14 +1727,14 @@ func _aim_toast() -> void:
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
-func toast_error(text: String, action := "") -> void:
+func toast_error(text: String, action := "", break_at_dot := false) -> void:
 	if not _toasts: return
 	if _cover_up:
 		_cover_toast = {kind = "error", text = text, action = action}
 		return
 	_toast_bag_tab = ""
 	_aim_toast()
-	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.ERROR, action)
 
 ## FISH-4 / q(83): a full creel says one sentence — the badge's tap, the greyed Cast · Creel full and the server's
 ## creel_full alike — and its Open bag › opens the bag on its Fish page.
@@ -2438,6 +2445,25 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if role == "casino": trade.activated.connect(func(): _play_blackjack(c))   # Play: the table page, no counter (q(240))
 	else: trade.activated.connect(func(): open_counter(role))
 	card.content.add_child(trade)
+	# q(272) (不知火舞 378 091a3ae9, LOCK-16 复议 197 1387e81b): a keeper away from home with a local request for the
+	# player — one full-width secondary key under Trade, the question below it; none at all when they have none
+	var lk := P0Locals.key(view, str(c.get("outpost", "")))
+	if not lk.is_empty():
+		var key := UiCommandButton.new(str(lk.text), UiCommandButton.Kind.SECONDARY)
+		key.name = "LocalKey"
+		key.reason = str(lk.reason)
+		key.fit_text = true
+		if lk.kind == "deliver":
+			key.sends = true
+			key.activated.connect(func():
+				close_modal()
+				command.emit({"type": "deliver", "request": str(lk.id)}))
+		else:
+			var open_card := func(): P0LocalRequest.open(self, str(lk.id), func(): open_keeper_greeting(role, c))
+			key.activated.connect(open_card)
+			# the gap key is grey (LOCK-10): a tap on it is unavailable_pressed, and it opens the card all the same
+			key.unavailable_pressed.connect(func(_r: String): open_card.call())
+		card.content.add_child(key)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
 		ask.activated.connect(func(): card.line = str(lines.answer))
@@ -2808,7 +2834,7 @@ func open_radial() -> void:
 	_bar.cancel_drag()
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
-			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
+			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Enter the mine"]]:   # every mine floor fights (355 b1)
 		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]),
 			available = it[0] == bar_mode or actions_here.has(it[0]), reason = it[3]})
 	_radial.options = options
@@ -2839,6 +2865,9 @@ func open_today(given: Array = []) -> void:
 		if i < 0 or i >= _today_rows.size(): return
 		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
 		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given))
+		# a keeper's local request (q(272)): its card, Drop request › there; Not now / Close come back to Today
+		elif str(_today_rows[i].get("local_request", "")) != "":
+			P0LocalRequest.open(self, str(_today_rows[i].local_request), func(): open_today(given))
 		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
 		elif str(_today_rows[i].get("board_request", "")) != "":
 			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given)))
@@ -2866,7 +2895,7 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != ""
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != ""
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")
@@ -2900,10 +2929,11 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "mine"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
 
-## A target on the homestead: the fixed ones, the Homestead sign and the mine mouth (q(255)), and the gathering spots.
-static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.begins_with("spot_")
+## A target on the homestead: the fixed ones and the Homestead sign (q(255)). The mine mouth left the farm in 355 b1,
+## the gathering spots with v4q(4) ①.
+static func home_target(go: String) -> bool: return go in HOME_TARGETS
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
@@ -3207,7 +3237,7 @@ func open_resident_profile(id: String) -> void:
 ## The workbench drawer (SGODOT-231 B2-06): P0WorkbenchDrawer over the view, Close 44 six above its top and 16 in
 ## (as RES-PIP's sheet). It follows the view while open; Craft / Equip go to the server, a grey button toasts its
 ## reason (LOCK-10) and a cost tile shows where the material comes from (NeedSource, Show only moves the camera,
-## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment, the gloves' banner) belongs to
+## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment) belongs to
 ## the farm's P0FarmMaterials.
 const _WORKBENCH_KIND := "workbench"
 var workbench_tab := "tools"
@@ -3845,7 +3875,7 @@ func _hide_tip(close_queue := true) -> void:
 	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
 
 ## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2).
-const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}
+const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map", "travel": "travel"}
 
 ## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
 func _show_tip(text: String, key := "") -> void:

@@ -17,9 +17,11 @@ const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postc
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const MINE_SCENE := "res://scenes/p0/p0_mine.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # a local request's hand-in row for wrong_place (q(272))
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -175,6 +177,7 @@ func _init() -> void:
 	ui.go_pond.connect(func(id: String): _leave_then("go:pond:" + id))   # the Bite Board's pond card: Go (SGODOT-283)
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
+	session.command_settled.connect(_mine_enter_settled)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
 	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
 	session.sent.connect(func(cmd: Dictionary): _guide_feedback.sent(cmd, ui.view))
@@ -366,24 +369,26 @@ func _root_is_world() -> bool:
 	return root != null and root.has_method("p0_surface")
 
 ## Where the player is while the map is up (MAP-1, §10.6.1): the place chip keeps naming it, and a tap on the chip
-## goes back there. Set by every world but the map: "farm" for the farm, its farmhouse and the mine (they are the
-## homestead), "pond:<id>", "outpost:<id>".
+## goes back there. Set by every world but the map: "farm" for the farm and its farmhouse (the homestead),
+## "pond:<id>", "outpost:<id>", "mine:<id>" (a wild site's mine, 355 b1: the map opens its mouth card).
 var return_to := "farm"
 
 ## The route back to world `w` from the map, as return_to holds it.
 static func route_of(w: Object) -> String:
 	var id := ""
 	match space_of(w):
-		"pond": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""
+		"pond", "mine": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # a mine is a wild site (355 b1)
 		"outpost":
 			var o = w.get("outpost")
 			id = str((o as Dictionary).get("id", "")) if o is Dictionary else ""
 	# A pond or outpost that does not say which one goes back to the farm (刘邦 on #92), never to "pond:".
 	return "%s:%s" % [space_of(w), id] if id != "" else "farm"
 
-## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
+## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1). A world with its own
+## way out takes it (p0_leave: the mine back at its mouth, 355 b1).
 func _on_place_pressed() -> void:
 	if is_instance_valid(world) and str(_call("p0_surface", [])) == "map": _call("p0_return", [return_to])
+	elif is_instance_valid(world) and world.has_method("p0_leave"): world.call("p0_leave")
 	else: leave_world()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
@@ -591,7 +596,35 @@ func _read_home_places(v: Dictionary) -> void:
 	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
+## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
+## 亚瑟's P0Map.open_wild_card) or the dev step mine:<id>[:<floor>] — onto Floor 1 or one of its stops. The mine opens
+## over this world on the reply's mine_floor event, on the floor the server landed the player on; a refusal says why
+## (P0MaterialLogic.refusal_text) and nothing opens.
+var _entering_mine := ""
+func enter_mine(id: String, floor := 1) -> void:
+	if id == "" or _entering_mine != "": return
+	_entering_mine = id
+	if not session.send({"type": "mine_enter", "mine": id, "floor": floor}, "mine_enter"): _entering_mine = ""
+
+## A refused or failed mine_enter opens nothing; the next try may go.
+func _mine_enter_settled(key: String, ok: bool, _code: String) -> void:
+	if key == "mine_enter" and not ok: _entering_mine = ""
+
+func _mine_opened(events: Array) -> void:
+	if _entering_mine == "": return
+	for e in events:
+		if str(e.get("kind", "")) == "mine_floor" and str(e.get("mine", "")) == _entering_mine:
+			var id := _entering_mine
+			_entering_mine = ""
+			# in the mine already for the server's reads while the scene loads: a timed read with space=map in those frames
+			# would take the player out again (notePresence; 亚瑟 on #629). The scene's attach sets the same.
+			session.space = "mine"
+			session.place = id
+			AppRouter.open_instance(MINE_SCENE, {"mine": id, "floor": int(e.get("floor", 1))})
+			return
+
 func _on_state(v: Dictionary, events: Array) -> void:
+	_mine_opened(events)
 	var before: Dictionary = ui.view
 	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
@@ -1107,6 +1140,13 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) in ["cook", "batch_cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
+	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
+		var r := PinReason.request_of(session.view, str(cmd.request))
+		if not r.is_empty():
+			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -1159,7 +1199,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
-		"need_material", "skills_short", "max_level":
+		"need_material", "skills_short", "travel_short", "max_level":
 			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
 			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
 			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
@@ -1168,7 +1208,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
 			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
-				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("skill", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
+			elif code == "travel_short":
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("kind", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
 			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
@@ -1199,6 +1241,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("Sold out today · %d left" % int(detail.get("left", 0)))
 		"limit_reached":   # a day's allowance used (the Compost Bin, a counter's buy-back): q(121)'s words (哪吒 on #286)
 			ui.toast_error("Limit reached · %s" % P0Logic.span(float(detail.get("resets_in", 0))))
+		"plots_full":   # SGODOT-355 b1: the field's annuals at the level's Plots — the grey Sow key's words (亚瑟 on #624)
+			var cur := session.current()
+			var at := {"homestead": cur.get("homestead", {}),
+				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast), "", true)   # broken at a « · » as the grey key's
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":
@@ -2034,8 +2081,8 @@ func _dev_shot(dt: float) -> void:
 			"showmap":   # showmap:pond:pond_san_francisco_03 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
-			"newrun": P0MaterialCards.open_new_run(ui, session.current(), func(c: Dictionary): session.send(c))   # MINE-P0-7
-			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
+			"mine":   # mine:wd-dev-quarry[:20] — into that mine (355 b1, contract-efg §11: the development mines need no Day Pass)
+				enter_mine(step[1], int(step[2]) if step.size() > 2 else 1)
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()
 				ui.show_spot.emit(step[1])

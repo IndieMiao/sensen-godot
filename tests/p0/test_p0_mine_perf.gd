@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## Perf Q6 (SGODOT-260, plan 2026-10-16 §3.1): a fight on floors 3–5 no longer jerks. At most one slime finds its
+## Perf Q6 (SGODOT-260, plan 2026-10-16 §3.1): a fight on a floor no longer jerks. At most one slime finds its
 ## path a frame, however their chases line up; a slime is about 2k triangles, not 25k; it casts no real shadow
 ## (its blob shadow stays).
 
@@ -20,10 +20,8 @@ func _fight(n: int, mobs: Array) -> Array:
 	mover.position = L.SPAWN
 	var c: Node3D = auto_free(Combat.new())
 	add_child(c)
-	var floors := []
-	for i in 5: floors.append({"floor": i + 1, "paid": true, "rocks": 6, "left": 6, "broken": [], "mobs": mobs if i + 1 == n else []})
-	c.sync_p0({"mine": {"hp_max": 100, "weapon": {"id": "sword_wooden", "attack": 3, "speed": 2.0},
-		"run": {"id": 1, "hp": 100, "floors": floors}}}, n, mover)
+	c.sync_p0({"mine": {"hp_max": 100, "weapon": {"id": "weapon_wooden_sword", "attack": 3, "speed": 2.0},
+		"at": {"mine": "wd-254-114", "floor": n, "day": "2026-11-02", "hp": 100, "floor_state": {"floor": n, "mobs": mobs}}}}, n, mover)
 	return [c, mover]
 
 func _triangles(node: Node) -> int:

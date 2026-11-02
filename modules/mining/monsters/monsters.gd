@@ -36,19 +36,27 @@ static func known(kind: String) -> bool:
 static func is_elite(kind: String) -> bool:
 	return bool(entry(kind).get("elite", false))
 
-## A kind's json: the model's beside its glb (assets/monsters/<id>/<id>.json) when there is one, else the placeholder's;
-## the same keys either way (上官婉儿's contract v1). Read once.
+## A kind's json: the placeholder's — the movement a brain reads and a look's own numbers, which only it has — with the
+## model's beside its glb (assets/monsters/<id>/<id>.json) over it when there is one: the art's radius, hit_point,
+## durations, hit_at and spore_at (上官婉儿's contract v1, contract-efg §10). It had taken the model's alone, the bat's
+## speed and aggro gone with it (周瑜 on the bat blockout, 11-02). Read once.
 static func meta(kind: String) -> Dictionary:
 	var id := str(entry(kind).json)
-	if not _meta.has(id):
-		_meta[id] = {}
-		for path in [MODEL_DIR + id + "/" + id + ".json", PLACEHOLDER_DIR + id + ".json"]:
-			if FileAccess.file_exists(path):
-				var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-				if parsed is Dictionary:
-					_meta[id] = parsed
-					break
+	if not _meta.has(id): _meta[id] = layered([PLACEHOLDER_DIR + id + ".json", MODEL_DIR + id + "/" + id + ".json"])
 	return _meta[id]
+
+## The jsons at `paths` that are there, each over the ones before: a later key wins, and a later dictionary (durations)
+## is laid over the earlier one key by key — an action only the placeholder times keeps its time.
+static func layered(paths: Array) -> Dictionary:
+	var out := {}
+	for path in paths:
+		if not FileAccess.file_exists(path): continue
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if not parsed is Dictionary: continue
+		for key in parsed:
+			if out.get(key) is Dictionary and parsed[key] is Dictionary: (out[key] as Dictionary).merge(parsed[key], true)
+			else: out[key] = parsed[key]
+	return out
 
 ## The fight's numbers for one monster, from its json, under the old mine's names the fight has always used (a copy:
 ## each monster may change its own). HP is the server's (the view's max), set by the fight.
