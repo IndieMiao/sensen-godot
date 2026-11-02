@@ -167,13 +167,19 @@ describe('P0 voice (SGODOT-383)', () => {
     told.length = 0;
     const b2 = enter('player-bbbb');
     expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [String(b2.id)] }]]);
-    // B leaves: A hears a list without B's peer id — the next one to take it is no one A blocked (后裔 on #650)
+    // B leaves: A hears nothing — A's phone keeps refusing B's peer id, never opened to all while B may still be in
+    // LiveKit or come back (李元芳 on 384 b5b6a124); the next one to take it is no one A blocked: A hears a list without it
     told.length = 0;
     voice.departed(rooms.leave('player-bbbb')!);
-    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [] }]]);
+    expect(told).toEqual([]);
     const d = enter('player-dddd');
     expect(d.id).toBe(b2.id);   // B's peer id, taken at once
+    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [] }]]);
     expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    told.length = 0;
+    enter('player-eeee');   // a peer id A's phone never refused: A hears nothing
+    expect(told).toEqual([]);
+    rooms.leave('player-eeee');
     rooms.leave('player-dddd');
     const b3 = enter('player-bbbb');
     // A comes into a room where B already is: A is told whom they block there

@@ -116,7 +116,7 @@ export class P0Voice {
     token.addGrant({ roomJoin: true, room, canPublish: true, canPublishSources: [TrackSource.MICROPHONE], canSubscribe: true,
       canPublishData: false, canUpdateOwnMetadata: false });
     return { ok: true, url: this.config!.url, token: await token.toJwt(), lease_id: lease.id, room, capacity: Math.max(2, spec.capacity),
-      lease_ms: VOICE_LEASE_MS, self: String(o.id), blocked: this.blockedPeers(player) };
+      lease_ms: VOICE_LEASE_MS, self: String(o.id), blocked: this.phoneBlocks(player) };
   }
 
   heartbeat(player: string, leaseId: string): Refusal | Record<string, unknown> {
@@ -142,7 +142,7 @@ export class P0Voice {
     if (on) list.add(target); else list.delete(target);
     if (list.size) this.blocks[player] = [...list]; else delete this.blocks[player];
     writeJson(this.files?.blocks, this.blocks);
-    this.tell(player, { t: 'voice_blocks', blocked: this.blockedPeers(player) });
+    this.tellBlocks(player);
     this.seen(player, target);   // in one room they go out of each other's sight at once (and come back on Unblock)
     return { ok: true, blocked: this.blockedPeers(player) };
   }
@@ -163,7 +163,7 @@ export class P0Voice {
     const list = (this.blocks[player] ?? []).filter(p => p !== target);
     if (list.length) this.blocks[player] = list; else delete this.blocks[player];
     writeJson(this.files?.blocks, this.blocks);
-    this.tell(player, { t: 'voice_blocks', blocked: this.blockedPeers(player) });
+    this.tellBlocks(player);
     this.seen(player, target);
     return { ok: true, blocked: this.blockedList(player) };
   }
@@ -184,23 +184,38 @@ export class P0Voice {
     return { ok: true, already: false };
   }
 
-  /** The hub's hooks: someone came into a room (whoever there blocks them hears their new list; so do they, if they block
-   * anyone there), or left one (their grant ends, LiveKit lets them go, and whoever there blocked them hears their list
-   * without them — a peer id comes back at once, and the next one to take it is no one they blocked). */
+  /** The hub's hooks: someone came into a room (whoever there blocks them hears their new list, and so does whoever's
+   * phone still refuses the peer id they took — a peer id comes back at once, and the next one to take it is no one
+   * they blocked; they hear theirs, if they block anyone there), or left one (their grant ends and LiveKit lets them go;
+   * whoever blocked them hears nothing — their phone keeps refusing that id, never opened to all while the one blocked
+   * may still be in LiveKit or back under a new id: 李元芳 on 384 b5b6a124). */
   joined(o: Occupant): void {
     let mine = false;
     for (const m of this.rooms.members(o.outpost, o.room)) {
       if (m.player === o.player) continue;
-      if (this.blocking(m.player, o.player)) this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
+      if (this.blocking(m.player, o.player) || this.refused.get(m.player)?.has(String(o.id))) this.tellBlocks(m.player);
       if (this.blocking(o.player, m.player)) mine = true;
     }
-    if (mine) this.tell(o.player, { t: 'voice_blocks', blocked: this.blockedPeers(o.player) });
+    if (mine) this.tellBlocks(o.player);
   }
   departed(o: Occupant): void {
     const lease = this.leases.get(o.player);
     if (lease && lease.room === this.roomName(o)) void this.release(lease);
-    for (const m of this.rooms.members(o.outpost, o.room))   // the hub has them out of the room already
-      if (this.blocking(m.player, o.player)) this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
+    this.refused.delete(o.player);   // their next room's grant brings their list there
+  }
+
+  /** The peer ids each phone was last given as blocked (the grant, voice_blocks): what it refuses until told again. */
+  private refused = new Map<string, Set<string>>();
+
+  /** This player's blocked peers, noted as what their phone will refuse. */
+  private phoneBlocks(player: string): string[] {
+    const list = this.blockedPeers(player);
+    this.refused.set(player, new Set(list));
+    return list;
+  }
+
+  private tellBlocks(player: string): void {
+    this.tell(player, { t: 'voice_blocks', blocked: this.phoneBlocks(player) });
   }
 
   /** The peers in this player's room they block (theirs only: who blocks them is never said, 384). */
