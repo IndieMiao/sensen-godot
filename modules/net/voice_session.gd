@@ -11,8 +11,17 @@ var listening := true
 var participants: Array = []
 var capacity := 8
 var party_id := ""
+## P0 rooms (join_with, 2026-11-02): this phone's LiveKit identity (the hub's peer id) and the peers blocked either way
+## (the grant's `blocked`, then set_blocked from the hub's voice_blocks); never a player id (亚瑟 on the voice plan).
+var peer_self := ""
+var blocked: Array = []
+var _muted := {}   # identity → true: this phone's own Mute, set again after each connect
 var _backend: Object
 var _session: FarmSession
+## How the grant is asked for: func(action: String, body: Dictionary) -> {ok: bool, json: Dictionary}, awaited; action is
+## join / heartbeat / leave. join() makes Journey's from its FarmSession; join_with() takes the caller's (P0's).
+var _request := Callable()
+var _p0 := false
 var _wanted := false
 var _request_id := ""
 var _native_id := ""
@@ -58,6 +67,25 @@ func join(value: FarmSession) -> void:
 		changed.emit()
 		return
 	_session = value
+	var client := value.client
+	_start(func(action: String, body: Dictionary) -> Dictionary:
+		var r := await client.request("POST", "/online/voice/" + action, body)
+		return {"ok": r.is_success(), "json": r.json}, false)
+
+## P0's rooms and ponds (2026-11-02): the same session, its grant asked for by `request` (see _request) — the P0
+## server's /v1/p0/voice/* for the room the player is in, granting `self` and `blocked` instead of a party.
+func join_with(request: Callable) -> void:
+	if _wanted: return
+	error = ""
+	if not supported():
+		error = "VOICE_UNSUPPORTED"
+		changed.emit()
+		return
+	_start(request, true)
+
+func _start(request: Callable, p0: bool) -> void:
+	_request = request
+	_p0 = p0
 	_generation += 1
 	_request_id = _id()
 	_native_id = _id()
@@ -72,20 +100,23 @@ func leave() -> void:
 	_desired_microphone = false
 	_desired_listening = true
 	var lease := _lease_id
-	var client: ApiClient = _session.client if _session else null
+	var request := _request
 	_drop_native()
 	_lease_id = ""
 	_room = ""
 	party_id = ""
+	peer_self = ""
+	blocked = []
+	_muted = {}
 	participants = []
 	microphone = false
 	listening = true
 	state = "idle"
 	changed.emit()
-	if not lease.is_empty() and client: _release(client, lease)
+	if not lease.is_empty() and request.is_valid(): _release(request, lease)
 
-func _release(client: ApiClient, lease: String) -> void:
-	await client.request("POST", "/online/voice/leave", {"lease_id": lease})
+func _release(request: Callable, lease: String) -> void:
+	await request.call("leave", {"lease_id": lease})
 
 func invalidate_membership() -> void:
 	if not _wanted: return
@@ -106,6 +137,41 @@ func set_listening(enabled: bool) -> void:
 	_desired_listening = enabled
 	_backend.call("set_listening", _native_id, enabled)
 
+## Whether the native side can mute or block one person (GodotVoice capabilities `per_participant`, 2026-11-02).
+func per_participant() -> bool:
+	if _backend == null: return false
+	if not _backend.has_method("capabilities"): return _backend.has_method("set_participant_volume")   # test adapters
+	var caps = JSON.parse_string(str(_backend.call("capabilities")))
+	return caps is Dictionary and bool(caps.get("per_participant", false))
+
+## Mute (P0): one person silent on this phone only, by identity; kept across a reconnect of this session.
+func set_muted(identity: String, muted: bool) -> void:
+	if identity.is_empty(): return
+	if muted: _muted[identity] = true
+	else: _muted.erase(identity)
+	if state == "connected" and not _native_id.is_empty() and per_participant():
+		_backend.call("set_participant_volume", _native_id, identity, 0.0 if muted else 1.0)
+	changed.emit()
+
+func is_muted(identity: String) -> bool: return _muted.has(identity)
+
+## Block (P0): the server's list of peers blocked either way (the grant, then the hub's voice_blocks); none of their
+## tracks are taken, and one no longer listed is taken again.
+func set_blocked(ids: Array) -> void:
+	var next: Array = ids.map(func(i): return str(i))
+	var freed: Array = blocked.filter(func(i): return not next.has(i))
+	blocked = next
+	if state == "connected" and not _native_id.is_empty() and per_participant():
+		for id in freed: _backend.call("set_participant_subscribed", _native_id, id, true)
+		for id in blocked: _backend.call("set_participant_subscribed", _native_id, id, false)
+	changed.emit()
+
+## After a connect: this session's mutes and blocks onto the fresh native room.
+func _apply_people() -> void:
+	if not per_participant(): return
+	for id in blocked: _backend.call("set_participant_subscribed", _native_id, str(id), false)
+	for id in _muted: _backend.call("set_participant_volume", _native_id, str(id), 0.0)
+
 func _process(_delta: float) -> void:
 	if _backend and _backend.has_method("poll_events"): _backend.call("poll_events")
 	if not _wanted or not _foreground or state == "permission": return
@@ -119,27 +185,31 @@ func _process(_delta: float) -> void:
 	else: _heartbeat()
 
 func _connect_voice() -> void:
-	if _joining or _session == null: return
+	if _joining or not _request.is_valid(): return
 	_joining = true
 	var generation := _generation
-	var client := _session.client
+	var request := _request
 	var started := Time.get_ticks_msec()
-	var result := await client.request("POST", "/online/voice/join", {"request_id": _request_id})
+	var result: Dictionary = await request.call("join", {"request_id": _request_id})
 	_joining = false
+	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
 	if generation != _generation or not _wanted or not _foreground:
-		if result.is_success() and result.json.has("lease_id"): _release(client, str(result.json.lease_id))
+		if bool(result.get("ok", false)) and json.has("lease_id"): _release(request, str(json.lease_id))
 		return
-	if not result.is_success():
-		_failed(str(result.json.get("code", "VOICE_UNAVAILABLE")))
+	if not bool(result.get("ok", false)):
+		_failed(str(json.get("code", "VOICE_UNAVAILABLE")))
 		return
-	var grant: Dictionary = result.json
-	if not _valid_grant(grant):
+	var grant: Dictionary = json
+	if not _valid_grant(grant, _p0):
 		_failed("VOICE_UNAVAILABLE")
 		return
 	_lease_id = str(grant.lease_id)
 	_room = str(grant.room)
-	party_id = str(grant.party_id)
+	party_id = str(grant.get("party_id", ""))
 	capacity = int(grant.capacity)
+	if _p0:
+		peer_self = str(grant.self)
+		blocked = (grant.get("blocked", []) as Array).map(func(i): return str(i)) if grant.get("blocked") is Array else []
 	_lease_deadline = started + mini(20000, int(grant.lease_ms)) - 500
 	if _lease_deadline <= Time.get_ticks_msec():
 		_heartbeat_at = Time.get_ticks_msec() + 500
@@ -159,12 +229,14 @@ func _heartbeat() -> void:
 	var generation := _generation
 	var lease := _lease_id
 	var started := Time.get_ticks_msec()
-	var result := await _session.client.request("POST", "/online/voice/heartbeat", {"lease_id": lease})
+	var result: Dictionary = await _request.call("heartbeat", {"lease_id": lease})
 	_polling = false
 	if generation != _generation or not _wanted: return
-	_heartbeat_at = Time.get_ticks_msec() + (4500 if result.is_success() else 1500)
-	if not result.is_success():
-		var code := str(result.json.get("code", "VOICE_UNAVAILABLE"))
+	var json: Dictionary = result.get("json", {}) if result.get("json") is Dictionary else {}
+	var ok := bool(result.get("ok", false))
+	_heartbeat_at = Time.get_ticks_msec() + (4500 if ok else 1500)
+	if not ok:
+		var code := str(json.get("code", "VOICE_UNAVAILABLE"))
 		if code in ["UNAUTHENTICATED", "VOICE_NO_PARTY"]:
 			_failed(code)
 		elif code == "VOICE_EXPIRED":
@@ -172,10 +244,10 @@ func _heartbeat() -> void:
 			state = "reconnecting"
 			changed.emit()
 		return
-	if str(result.json.get("room", "")) != _room:
+	if str(json.get("room", "")) != _room:
 		invalidate_membership()
 		return
-	_lease_deadline = started + mini(20000, int(result.json.get("lease_ms", 0))) - 500
+	_lease_deadline = started + mini(20000, int(json.get("lease_ms", 0))) - 500
 	if not _native_id.is_empty(): _backend.call("renew_lease", _native_id, maxi(0, _lease_deadline - Time.get_ticks_msec()))
 
 func _failed(code: String) -> void:
@@ -208,6 +280,7 @@ func _on_native_event(raw: String) -> void:
 				state = "connected"
 				_backend.call("set_microphone", _native_id, _desired_microphone)
 				_backend.call("set_listening", _native_id, _desired_listening)
+				_apply_people()
 			microphone = bool(event.get("microphone", false))
 			listening = bool(event.get("listening", true))
 			participants = event.get("participants", []) if event.get("participants") is Array else []
@@ -246,10 +319,15 @@ func _exit_tree() -> void:
 static func _id() -> String:
 	return Crypto.new().generate_random_bytes(16).hex_encode()
 
-static func _valid_grant(grant: Dictionary) -> bool:
-	for field in ["url", "token", "lease_id", "room", "party_id"]:
+## Journey's party grant, or (p0) a P0 room's: `self` (the hub's peer id) instead of party_id, a room of up to 64
+## (p0_outposts.json's capacities run to 40; a pond's 8) and `blocked` a list when there.
+static func _valid_grant(grant: Dictionary, p0 := false) -> bool:
+	for field in ["url", "token", "lease_id", "room"] + ([] if p0 else ["party_id"]):
 		if not grant.get(field) is String or str(grant[field]).is_empty(): return false
-	return (str(grant.url).begins_with("wss://") or str(grant.url).begins_with("ws://")) and int(grant.get("capacity", 0)) in range(2, 9) and int(grant.get("lease_ms", 0)) in range(1000, 20001)
+	if p0 and (grant.get("self") == null or str(grant.self).is_empty()): return false
+	if p0 and grant.has("blocked") and not grant.blocked is Array: return false
+	var most := 65 if p0 else 9
+	return (str(grant.url).begins_with("wss://") or str(grant.url).begins_with("ws://")) and int(grant.get("capacity", 0)) in range(2, most) and int(grant.get("lease_ms", 0)) in range(1000, 20001)
 
 func status_text() -> String:
 	if not error.is_empty(): return error_text(error)
