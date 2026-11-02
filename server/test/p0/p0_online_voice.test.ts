@@ -193,6 +193,30 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(c.id).toBeGreaterThan(0);
   });
 
+  it('three in a room: B leaves, C takes B\'s peer id, B comes back under a new one — A refuses B\'s new id, never C\'s (李元芳 on 384 d18a76f2)', async () => {
+    const { voice, enter, told, rooms } = setup();
+    for (const p of ['player-aaaa', 'player-bbbb', 'player-cccc']) voice.setAge(p, true);
+    const a = enter('player-aaaa'), b = enter('player-bbbb');
+    voice.block('player-aaaa', b.id, true);
+    expect(((await voice.join('player-aaaa')) as any).blocked).toEqual([String(b.id)]);
+    told.length = 0;
+    voice.departed(rooms.leave('player-bbbb')!);
+    expect(told).toEqual([]);                       // A's phone keeps refusing B's old id
+    const c = enter('player-cccc');
+    expect(c.id).toBe(b.id);                        // C takes it at once
+    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [] }]]);   // A lets it go: it is C's now
+    told.length = 0;
+    const b2 = enter('player-bbbb');
+    expect(b2.id).not.toBe(c.id);
+    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [String(b2.id)] }]]);   // B's new id, not C's; B and C told nothing
+    expect(voice.blockedPeers('player-aaaa')).toEqual([String(b2.id)]);
+    told.length = 0;
+    voice.departed(rooms.leave('player-cccc')!);    // C goes: A's phone never refused C's id, nothing to say
+    expect(told).toEqual([]);
+    expect(voice.blockedPeers('player-aaaa')).toEqual([String(b2.id)]);
+    expect(a.id).toBeGreaterThan(0);
+  });
+
   it('the Blocked list, by handle (the blocked are out of sight): Unblock from it wherever the two are; Block and Unblock tell the hub (seen)', async () => {
     const { voice, enter, rooms } = setup();
     const seen: string[][] = [];
