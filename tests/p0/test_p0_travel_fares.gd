@@ -85,6 +85,9 @@ func test_map_5_trip_1_is_one_cost_free_row() -> void:
 	var spec := P0Map.travel_card(_view(), SALINAS, {}, 0)
 	assert_array((spec.facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Cost", "Fish here", "Visit"])
 	assert_str(str(spec.facts[1][1])).is_equal("Free")
+	# a return there: no `Return visit · half price` (half of nothing, 不知火舞 on #642); a running pass still says its hours
+	var back := _view({SALINAS: {n = 1}}, {SALINAS: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 7 * 3_600_000.0}})
+	assert_array((P0Map.travel_card(back, SALINAS, {}, 0).facts as Array).map(func(f): return str(f[0]))).is_equal(["Distance", "Cost", "Fish here", "Day Pass"])
 
 func test_map_5_short_of_coins_fly_reads_the_gap() -> void:
 	var spec := P0Map.travel_card(_view({}, {}, SF, 50), LA, {}, 0)

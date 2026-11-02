@@ -893,7 +893,7 @@ static func local_time(view: Dictionary, offset) -> String:
 ## MAP-5 (q(257) ②, Figma 9:125580 / MAP-5-RETURN 243:176049 / MAP-5-SHORT 243:176287; 不知火舞 on 367 ec5f2daa), pure:
 ## the city, `United States · 08:12 local · 14 online` (the local time once its preview is in, the online part only when
 ## some are), then Distance, Energy and Coins (`30 → 112 left`: what is left once paid) — or `Cost · Free` for a free
-## trip (Trip 1, the 3 nearest cities) — Fish here, Visit, and on a return with a running pass `Day Pass · 7h left` (it
+## trip (Trip 1, the 3 nearest cities) — Fish here, Visit (none on a free return), and on a return with a running pass `Day Pass · 7h left` (it
 ## is not renewed). Short of the fare, Fly reads the gap (coins first, LOCK-10). `view` is the projected view (its
 ## Energy now); `preview` the server's (its km and trip win), {} before it is in; `online` the city's players online.
 static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, online: int) -> Dictionary:
@@ -912,7 +912,9 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	var regional := P0FishWorld.regional_fish(cluster).size()
 	var crucian := P0Logic.item_name(view, "fish_crucian")
 	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
-	facts.append(["Visit", "Return visit · half price" if bool(f.revisit) else "First visit · stamp + 10 Energy"])
+	# a free return (Trip 1, the 3 nearest) says no half price: half of nothing only puzzles (q(257) ②, 不知火舞 on #642)
+	if not bool(f.revisit): facts.append(["Visit", "First visit · stamp + 10 Energy"])
+	elif not bool(f.free): facts.append(["Visit", "Return visit · half price"])
 	if bool(f.revisit) and float(f.pass_ms) > 0.0: facts.append(["Day Pass", "%s left" % P0Travel.pass_text(view, cluster)])
 	var gap := P0Travel.fare_gap(view, f)
 	return {
