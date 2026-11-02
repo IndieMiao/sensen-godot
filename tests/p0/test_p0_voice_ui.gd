@@ -59,7 +59,7 @@ func test_the_keys_come_with_voice_and_the_first_mic_asks_the_age_then_says_who_
 	f[1].changed.emit()   # the real Voice says so when the mic comes on
 	assert_bool(ui._voice_keys.mic_on).is_true()
 	assert_str(ui.toast_text()).starts_with("Mic on")
-	assert_str(ui.toast_text()).ends_with("everyone in this layer can hear you")   # broken at its « · » when too long
+	assert_str(ui.toast_text()).ends_with("others here can hear you")   # q(274) 补记二; broken at its « · » when too long
 	ui.clear_toast()
 	ui._voice_keys.mic.pressed.emit()   # off
 	f[1].changed.emit()
