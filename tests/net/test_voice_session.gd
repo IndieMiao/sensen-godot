@@ -184,6 +184,18 @@ func test_p0_blocks_go_out_before_the_room_is_connected() -> void:
 	assert_int(connect).is_greater_equal(0)
 	assert_int(f[1].calls.find(["subscribed", f[0]._native_id, "7", false])).is_greater(connect)
 
+## A block made while the room is still connecting goes out at once (周瑜 on #661): the plugin takes the room's tracks
+## at Connected by its own list, before Godot hears of it.
+func test_p0_a_block_while_connecting_goes_out_at_once() -> void:
+	var f := _p0_fixture()
+	f[0].join_with(f[2]); _event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	assert_str(f[0].state).is_equal("connecting")
+	f[0].set_blocked(["7", "9"])
+	f[0].set_muted("5", true)
+	assert_bool(f[1].calls.has(["subscribed", f[0]._native_id, "9", false])).is_true()
+	assert_bool(f[1].calls.has(["volume", f[0]._native_id, "5", 0.0])).is_true()
+
 ## P0's mic key joins with the mic on (383 6372bffe): the wish made before the room is up is taken at connect, after the
 ## blocks; an idle session keeps none.
 func test_p0_a_mic_on_before_the_room_is_up_goes_out_at_connect() -> void:
