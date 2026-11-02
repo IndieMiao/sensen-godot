@@ -49,7 +49,7 @@ describe('travel to a wild site (v4q(3) ④)', () => {
     expect(far).toMatchObject({ wild: true, type: 'quarry', open: true, free: false, country: '' });
     expect(far.trip).toBeGreaterThanOrEqual(3);
     expect(far.cost.coins).toBeGreaterThan(0);
-    expect(preview(c, s, ids[1], T).free).toBe(false);   // the second quarry, near as it is, is not one of the free 3
+    expect(preview(c, s, ids[1], T)).toMatchObject({ wild: true, free: false });   // the second quarry, near as it is, is not one of the free 3
     expect(travel(c, s, ids[5], T, [])).toEqual({ code: 'not_open', detail: { type: 'geode' } });
     expect(travel(c, s, 'wd-1-1', T, [])).toEqual({ code: 'unknown_place' });
   });
