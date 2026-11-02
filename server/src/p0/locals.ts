@@ -20,6 +20,7 @@ import { handOver, haveFor, noteDone, payBonus } from './requests.js';
 import { dayKey, skillLevel } from './rules.js';
 import type { BoardRequest, LocalCity, P0State } from './state.js';
 import { clusterOf, homeOf, writtenCluster } from './travel.js';
+import { isWild } from './wild.js';
 import { cityPlaces } from './world.js';
 
 export const LOCAL_PREFIX = 'req_loc_';
@@ -88,7 +89,8 @@ export function cityFish(c: P0Content, city: string): Set<string> {
  */
 export function settleLocals(c: P0Content, s: P0State, now: number): void {
   const home = homeOf(c, s), here = s.travel?.here || home;
-  if (!c.requests.local || here === home) return;
+  // v4q(3) B6 (a): a wild site has no keepers and no local requests — none drawn, no empty entry kept
+  if (!c.requests.local || here === home || isWild(here)) return;
   const day = dayKey(c, s, now), had = s.locals?.[here];
   if (had?.day === day) return;
   const kept = (had?.slots ?? []).filter(sl => sl.req.status === 'accepted');

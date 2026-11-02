@@ -95,6 +95,14 @@ describe('travel to a wild site (v4q(3) ④)', () => {
     expect(there.travel.here).toBe(there.travel.home);          // the farm is home
   });
 
+  it('no local requests at a wild site (v4q(3) B6 (a)): none drawn, no entry kept', () => {
+    const { c, s, ids } = setup(ROWS);
+    const r = applyP0(c, s, { type: 'travel', to: ids[3] }, T);
+    if (!r.ok) throw new Error(r.code);
+    expect((r.state as { locals?: Record<string, unknown> }).locals?.[ids[3]]).toBeUndefined();
+    expect(r.state.markets?.[ids[3]]).toBeUndefined();   // nor a Market Board (hasMarket: no market square there)
+  });
+
   it('a save keeps a wild site\'s pass and the player there; the view reads with the player at a wild site', () => {
     const { c, s, ids } = setup(ROWS);
     const r = applyP0(c, s, { type: 'travel', to: ids[3] }, T);
