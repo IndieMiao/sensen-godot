@@ -1,0 +1,79 @@
+[
+  {
+    "name": "SGODOT-355_mine_quarry_v0_band_1.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_band_1.jpg",
+    "sha256": "28ccb654f3774ff0044c2737823c700788c113023ac883969a1df5fbfb904dac",
+    "bytes": 215296,
+    "mime": "image/jpeg",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mine_quarry_v0_band_2.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_band_2.jpg",
+    "sha256": "2de9991721b95b4bbb2bf2aa8488207fac667f6d9ac8d54d0de7ed90595ac3a3",
+    "bytes": 202927,
+    "mime": "image/jpeg",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mine_quarry_v0_band_3.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_band_3.jpg",
+    "sha256": "8661e782cb548d04c10157b478b147098fff51f9f79a89d0aa2b70af6ccf7909",
+    "bytes": 188555,
+    "mime": "image/jpeg",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mine_quarry_v0_band_4.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_band_4.jpg",
+    "sha256": "db4197dde909efbdc7b016130b703eba7572d71fd4d45c08d52243791c4d37e3",
+    "bytes": 179818,
+    "mime": "image/jpeg",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mine_quarry_v0_guard_30.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_guard_30.jpg",
+    "sha256": "4ddf456c8d38890f71ecf92c0bb99086ef5e46945966142e9b85a301626d0b30",
+    "bytes": 194333,
+    "mime": "image/jpeg",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mine_quarry_v0_bands.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_bands.jpg",
+    "sha256": "b769d37a27e855effb5ad63b08380d89b52fcdc47a2661ecaea8d16e19a5d2f5",
+    "bytes": 1088589,
+    "mime": "image/jpeg",
+    "size": [
+      3696,
+      1800
+    ]
+  },
+  {
+    "name": "SGODOT-355_mine_quarry_v0_overview.jpg",
+    "path": "docs/design/quarry-355-2026-11-02/SGODOT-355_mine_quarry_v0_overview.jpg",
+    "sha256": "81ce8ec2d520b96545cb76b126ce350ba37965acbe77afda81243f301c3ade53",
+    "bytes": 165415,
+    "mime": "image/jpeg",
+    "size": [
+      1200,
+      960
+    ]
+  }
+]
