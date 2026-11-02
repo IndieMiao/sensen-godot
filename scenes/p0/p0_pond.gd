@@ -757,6 +757,8 @@ func attach_online(o: P0Online) -> void:
 
 ## Layer 2 and later say so once, as an outpost's do (奕星 on #646; P0Online.layer_notice).
 func _on_joined(info: Dictionary) -> void:
+	_line_sent = {"phase": "none"}   # a new join (a reconnect too) has no line of ours: the one out goes again next frame (周瑜 on #646)
+	_line_left = 0.0
 	var said := P0Online.layer_notice(info)
 	if said != "" and rt: rt.ui.toast(said)
 
