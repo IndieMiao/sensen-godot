@@ -113,7 +113,7 @@ td { font-variant-numeric: tabular-nums; }
 <body>
 <header class="topbar"><div class="topbar-in">
   <span class="name">Gensen 玩法 v4 改动清单</span>
-  <span class="meta"><span>2026-10-02</span><span>3 章</span><span>2 张表</span><span>独立完整版</span></span>
+  <span class="meta"><span>2026-10-02</span><span>3 章</span><span>4 张表</span><span>独立完整版</span></span>
 </div></header>
 
 <div class="shell">
@@ -126,6 +126,7 @@ td { font-variant-numeric: tabular-nums; }
 </ul></li>
 <li class="c1"><a href="#ch1">第 1 章 改动清单</a><ul>
 <li class="c2"><a href="#s1-1">1.1 索引</a></li>
+<li class="c2"><a href="#h-5cfa7268">v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西</a></li>
 </ul></li>
 <li class="c1"><a href="#ch2">第 2 章 旧文档冲突索引</a><ul>
 </ul></li></ul>
@@ -138,6 +139,7 @@ td { font-variant-numeric: tabular-nums; }
 </ul></li>
 <li class="c1"><a href="#ch1">第 1 章 改动清单</a><ul>
 <li class="c2"><a href="#s1-1">1.1 索引</a></li>
+<li class="c2"><a href="#h-5cfa7268">v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西</a></li>
 </ul></li>
 <li class="c1"><a href="#ch2">第 2 章 旧文档冲突索引</a><ul>
 </ul></li></ul></nav></details>
@@ -147,7 +149,7 @@ td { font-variant-numeric: tabular-nums; }
       <div class="facts"><span><b>Energy</b> 200 · +1/4 min</span><span><b>Skills</b> Farming / Fishing ×10 Lv</span><span><b>Trips</b> 1–7</span><span><b>Crops</b> 20 · <b>Fish</b> 20 · <b>Dishes</b> 29</span></div>
     </div>
 <ul>
-<li>状态：<strong>2026-11-02 建档</strong>：355 v4 方案定稿（用户 11-02「全按建议」，53 条）后新起的 q 文档；第一批 A–H 预留 v4q(1)–v4q(8)（台账：Plane「q 行台账（三）」）。</li>
+<li>状态：<strong>2026-11-02 建档</strong>：355 v4 方案定稿（用户 11-02「全按建议」，53 条）后新起的 q 文档；第一批 A–H 预留 v4q(1)–v4q(8)（台账：Plane「q 行台账（三）」）。 <strong>2026-11-02（v4q(1)，已批）：Homestead 第一批开到 Lv17，三项技能门槛、田开局 8 块、Lv2–15 升级回 50、体力池与饭量同一公式。</strong></li>
 </ul>
 <h1 id="ch0">第 0 章 说明</h1>
 <h2 id="s0-1">0.1 以哪份为准</h2>
@@ -180,14 +182,322 @@ td { font-variant-numeric: tabular-nums; }
 </thead>
 <tbody>
 <tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>v4q(1)</td>
+<td>【数值】【规则】【界面】</td>
+<td>Homestead 第一批等级表 Lv1–17、三项技能门槛、田、升级回 50、体力池</td>
+<td>已批</td>
+<td>q(246)、q(263)、q(172)、q(248)；旧第 8 章</td>
 </tr>
 </tbody>
 </table></div>
+<h2 id="h-5cfa7268">v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。标〔用户已定〕的几处是 v4 定稿里没有、这次补定的口径，用户按推荐定了。用户 2026-11-02「全按建议」定 355 v4（结论 11、17、18、19、23、24、32、40、45、46）；v4 方案第 2 章 2.3–2.7、第 10 章 10.2 的 A 行。数字是 v4 的设计初值（<code>pacing_r9.py</code>、sim354 按 v4 分配重跑），<strong>还没经过模拟器按第一批机制校准</strong>（交接第 6 节，排在 A–H 初稿之后），校准后要改数时在批前改本条或另起 v4q。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：现行 Homestead 只有 10 级：Lv5 起一个「技能和」门槛，Lv2–4 升级回 40、Lv5–10 回满（q(246)），Lv5–10 用 355 方案 A 的过渡数（q(263)），开局 30 块田、Lv3 40、Lv7 48（q(172)）。v4 要 30 级、第一周每天一级、门槛改成三项技能各自的等级、田开局 8 块每级 +2；第一批先开到 Lv17。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>等级上限 17</strong>（第一批；第二批开到 Lv19、2 期 Lv21，都用过渡行，第 52 条）。Lv18–30 的表留在 v4 方案 2.3，以后的批次另起 v4q。</p>
+<p>② <strong>Lv2–17 的消耗</strong>（30 分钟玩家的目标天数供参考，按建号后第几天）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>档</th>
+<th>目标天</th>
+<th>金币</th>
+<th>材料</th>
+<th>技能门槛 Farming / Fishing / Cooking</th>
+<th>出门门槛</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>T1</td>
+<td>0.1</td>
+<td>40</td>
+<td>木材 6、石料 4、芦苇 3</td>
+<td>1 / 1 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3</td>
+<td>T1</td>
+<td>0.1</td>
+<td>60</td>
+<td>石料 4、木材 2、黏土 2</td>
+<td>1 / 1 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td>T1</td>
+<td>0.4</td>
+<td>70</td>
+<td>木材 8、芦苇 4、石料 10、黏土 3、铜矿石 3、岩盐 1</td>
+<td>2 / 2 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td>T1</td>
+<td>1.4</td>
+<td>80</td>
+<td>木材 8、芦苇 4、石料 5、黏土 3、铜矿石 3、岩盐 1、煤 2</td>
+<td>3 / 2 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td>T1</td>
+<td>2.4</td>
+<td>80</td>
+<td>同 Lv5</td>
+<td>3 / 3 / 2</td>
+<td>—</td>
+</tr>
+<tr>
+<td>7</td>
+<td>T1</td>
+<td>3.4</td>
+<td>80</td>
+<td>同 Lv5</td>
+<td>4 / 3 / 3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td>T2</td>
+<td>4.4</td>
+<td>80</td>
+<td>木材 3、芦苇 2、石料 3、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>4 / 4 / 4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>T2</td>
+<td>5.4</td>
+<td>85</td>
+<td>同 Lv8</td>
+<td>4 / 5 / 4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>10</td>
+<td>T2</td>
+<td>6.4</td>
+<td>90</td>
+<td>同 Lv8</td>
+<td>4 / 5 / 5</td>
+<td>—</td>
+</tr>
+<tr>
+<td>11</td>
+<td>T2</td>
+<td>7.9</td>
+<td>115</td>
+<td>木材 3、芦苇 2、石料 2、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 1、石英 1、煤 1</td>
+<td>4 / 6 / 5</td>
+<td>—</td>
+</tr>
+<tr>
+<td>12</td>
+<td>T2</td>
+<td>9.4</td>
+<td>120</td>
+<td>同 Lv11</td>
+<td>4 / 6 / 6</td>
+<td>—</td>
+</tr>
+<tr>
+<td>13</td>
+<td>T2</td>
+<td>11.2</td>
+<td>150</td>
+<td>木材 4、芦苇 2、石料 3、黏土 2、硬木 4、亚麻 3、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>5 / 6 / 6</td>
+<td>—</td>
+</tr>
+<tr>
+<td>14</td>
+<td>T2</td>
+<td>13.2</td>
+<td>175</td>
+<td>木材 4、芦苇 3、石料 3、黏土 2、硬木 4、亚麻 3、铜矿石 1、铁矿石 2、石英 1、煤 2</td>
+<td>5 / 6 / 7</td>
+<td>—</td>
+</tr>
+<tr>
+<td>15</td>
+<td>T2</td>
+<td>15.6</td>
+<td>220</td>
+<td>木材 5、芦苇 3、石料 4、黏土 3、硬木 5、亚麻 4、铜矿石 2、铁矿石 2、石英 1、煤 2</td>
+<td>6 / 7 / 7</td>
+<td>—</td>
+</tr>
+<tr>
+<td>16</td>
+<td>T3（过渡）</td>
+<td>18.6</td>
+<td>280</td>
+<td>硬木 13、亚麻 9、铁矿石 4、石英 2</td>
+<td>6 / 7 / 8</td>
+<td>城市签章 6，去过 1 个别的气候带</td>
+</tr>
+<tr>
+<td>17</td>
+<td>T3（过渡）</td>
+<td>22.1</td>
+<td>400</td>
+<td>硬木 16、亚麻 11、铁矿石 5、石英 3</td>
+<td>7 / 8 / 8</td>
+<td>城市签章 8，去过 2 个别的气候带</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Lv16–17 是第一批的过渡行（第 46 条）：只用 T2 材料，出门门槛按气候带；2 期上 8 地域和 T3 材料时换回 v4 方案 2.3 的正表（另起 v4q）。</li>
+<li><strong>Lv3 / Lv4 材料</strong>（用户批，庚2；偏离 v4 2.3）：Lv3 石 8、木 4 → 石 4、木 2；Lv4 石 6 → 10（木 8 不变）——原表首会话石料 12 正好等于 3 个点 × 4、零余量。</li>
+<li>Lv2–17 金币合计 2,125；第一周每级 80–90，约占当天收入的一半。</li>
+<li>材料的来处：木材、芦苇、黏土、石料、亚麻、硬木走城里采集点（v4q(4)）和矿（v4q(5)）；铜矿石、岩盐、煤、铁矿石、石英走矿：Lv4 起要浅坑、Lv8 起要矿脉（v4q(5)）。家城没有矿（第 9、10 条）。</li>
+</ul>
+<p>③ <strong>技能门槛</strong>：Lv2–17 看 Farming、Fishing、Cooking 各自的等级（上表），三项都到才能升；取代现行的「技能和」（§8.1、q(263)）。Cooking 从 Lv6 起要求。<strong>Lv3 改成 1 / 1</strong>（用户定，丁1；v4 2.3 原 2 / 1：首会话里普通作物熟不了，按 2 / 1 要等第二次上线），Lv4 的 2 / 2 放在当晚。<strong>Lv12 改成 4 / 6 / 6</strong>（用户批，庚1；v4 2.3 原 5 / 6 / 6，校准与复核：Lv12 准时率约 72% → 94%；Lv13 照 v4）。</p>
+<p>④ <strong>出门门槛</strong>（Lv16 起）：城市签章数（只算城市，不算野外地点）和「去过 N 个别的气候带」。「去过」= 在那个气候带的城市或野外地点有过一次到达记录。签章照旧每天首访最多计 2 枚（§11.9.4）。</p>
+<p>⑤ <strong>田</strong>：开局 8 块，Lv1–15 每级 +2（Lv15 36 块），Lv16 39、Lv17 41（Lv16 起交替 +3 / +2）。只算一年生作物；果树、洒水器不占田数。<strong>新号的起步田重排成整齐的网格</strong>（现在新档是 20 块熟地 + 10 块荒地、前 8 块不成形；一键收获、温室、洒水器都按网格算）。格子领地放第二批，本条不改领地。
+<strong>第一批的田网格</strong>（不知火舞、哪吒定：pm/plans/355-b1-field-grid-proposal.md，示意图同目录 355-b1-field-grid-draft.png；第二批做格子领地时整个重做；63 格「一格不富余」，第二批开到 Lv19 要田 46 + 果树 10 + 洒水器 12 = 68 格，所以<strong>第二批的 Lv18–19 和格子领地同批上</strong>（或在它之后）：
+- <strong>网格 9 列 × 7 行 = 63 格</strong>：田块落在 x 2、4 … 18 × y −1、1 … 11，格距照旧（田和田之间隔一格走道，玩家站在走道上干活），全在现有围栏和走路范围里（q(145) x 1–18、y −2–18），不扩院子；出生点 (9, −1)、出口 (9, −2) 在 x 9 走道列上，不挪。比现在 48 格多出的是最左一列 x 2（芦苇岸、黏土岸、老树随 v4q(4) 搬出后空出）和最前一行 y −1。63 = Lv17 的田 41 + 果树 10 + 洒水器 12，一格不富余。
+- <strong>起始 8 块</strong>：2 × 4，正对农舍门（x 8–14 × y 9–11）。<strong>开的顺序</strong>：从农舍往外一行一行开（y 11 → 9 → 7 → 5 → 3 …），同一行先开中间 x 8–14，再按 x 16、6、18、4、2 往两边。Lv5 到 16 块（y 11 整行 + y 9 的 7 块）、Lv10 到 26、Lv15 到 36（y 5–11 四整行）、Lv17 到 41（再加 y 3 中间 5 块）。
+- <strong>新开的田直接是熟地</strong>，升级那一刻（HOME-2）冒出来，不用 Till<strong>〔用户已定，按推荐〕</strong>：v4 没写；现行 Lv3 / Lv7 扩田是荒地（q(59)、q(172) ①）；不知火舞、哪吒推荐熟地。定成荒地的话，v4q(4) ⑥ 引导里 Four Radishes 的「Lv2 再加 2 块，引导结束时正好 4 块能种」要多一步 Till。没开的格画成草地，不能走上去、不能种。
+- <strong>果树、洒水器不占田数</strong>（v4 2.5 原意，不另请用户定）：开出的格子 = 田数 + 已摆的果树和洒水器数。果树、洒水器摆在任何一块已开的空田上，摆下后按顺序再开下一格；拆掉时那一格变回空田，最后开的那一格如果空着就收回成草地，不空就留着。种一年生作物的上限按田数卡；<strong>田满了还想种</strong>（<code>plots_full</code>）照 q(130) ① 的满额写法：灰键只写计数 <code>Plots 8/8</code>，点了出 Info toast <code>Plots 8/8 · Homestead Lv2 adds 2</code>；封顶时灰键和 toast 都只写 <code>Plots 41/41</code>。取代 q(118) ①「树站在田上、占田」的算法（树仍站在田格上、不可通行）。
+- <strong>温室</strong>：规则照旧（盖在 4 × 4 块田上，16 格都要是已开的田、里面不能有果树和洒水器，q(118) ②）。按上面的顺序，不摆果树、洒水器时 Lv13 起放得下第一座（x 8–14 × y 5–11），Lv15 起放得下两座（如 x 2–8 和 x 10–16，都是 y 5–11）；这两个等级只供参考、不是门槛（先摆了树和洒水器，格子会开得早），界面上不写。放置态照 q(130) ④ 不变（小标 <code>Greenhouse · 4×4</code>，放不下一律 <code>Needs 4×4 clear plots</code>、冲突格染红）；只加一种情况：整个院子还没开出完整的 4 × 4 田时，进放置态出 Info toast <code>More plots open as your Homestead grows</code>（不写等级；第一座、第二座同一套）。
+- <strong>Harvest All</strong> 照旧收脚下那一行（q(118) ④），一行最多 9 格。
+- <strong>柱子</strong>照 q(140)（占走道交叉格）原样平移，代码不改。<strong>摆件禁放区</strong>（shops_decor.json 的 <code>decor.yard</code>）：<code>field</code> [3, 2, 17, 11] → [1, −2, 19, 15]（包住 63 格田和走道，前围栏行 y 13 之后不变）；<code>objects</code> 里 6 个农场采集点和矿口删掉（随 v4q(4)、v4q(5) 搬出），其余摆设都在走道上；入口路 <code>paths</code> [9, −2, 2, 4] 只留 x 9 一列（x 10 成了田），取代 q(120) / q(172) ③ 出口路禁放 x 9–10 的那句。
+- <strong>摆件上限</strong><strong>〔用户已定，按推荐〕</strong>（改 q(113) 的数）：禁放区扩到 [1, −2, 19, 15]、矿口随 v4q(5) 拆掉以后（周瑜 #629 13dd572f），院子能摆 1 × 1 的格子是 60 个，长椅前留两格路径格 (6, 15)、(7, 15) 接到牌匾那一格（只留一格会被四面的装饰围住、走不进去，周瑜实算），往这两格放东西被拒时写 <code>Keep the path clear</code>（q(120) 现有句），实际能摆 58 个。原公式 20 + 4 ×（Lv − 1）到 Lv10 是 56、Lv11 是 60，摆满就没有走道。推荐改成 min(20 + 4 ×（Lv − 1），52)：Lv9 到 52 封顶，摆满时还空 6 格当走道，水井、驿站棚、信箱、工作台前面都走得到（封 56 只剩 3 格，太挤）；到顶写法照 q(113) <code>Decor 52/52 · Store one to place this</code>（原 Lv10 封顶 56）；上限数的是件数，2 × 1 等大件占的格更多，放不下时照现有 <code>Space taken</code> 提示；第二批格子领地再放开。（不知火舞、哪吒、周瑜提）
+- <strong>镜头</strong>（不知火舞看过哪吒桌面实拍定，355 17cbb699）：进农场的开场镜头框住所有已开的田、农舍门和人物（引导期间加上 Pip），左右各留 16 px，放不下就拉远，最远到整座岛加一圈边；人一走动就回到默认跟随镜头，跟随镜头不变。引导期间新号第一次进农场，人落在起始田前的走道上，Pip 站在田边；平时进门的出生点 (9, −1) 不变。这条不出 Figma 帧。</p>
+<p>⑥ <strong>升级回体力</strong>：Lv2–15 每升一级回 50 体力（只补到上限）；Lv16 起不回（内容表里 Lv16–17 写 <code>energy: 0</code>）。取代现行 Lv2–4 回 40、Lv5–10 回满（q(246)、§3.4.8）。</p>
+<p>⑦ <strong>体力池和每日饭量上限</strong>：Lv1–10 = 200 + 10 ×（Lv − 1），Lv11 起每级 +5（Lv10 290、Lv17 325）。饭量上限用同一个公式（现在两处各算一份，一起改）。</p>
+<p>⑧ <strong>每级的新东西</strong>（把现有的解锁重新铺到 17 级，保证每级都有一样新东西；〔 〕里是之后的批次）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>新东西</th>
+<th>田</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>工作台、Basic Room、土灶 1 口</td>
+<td>8</td>
+</tr>
+<tr>
+<td>2</td>
+<td>调味架；引导带你去城里采集点（采集点 Lv1 起就能用，Lv2 的材料就从这里来，v4q(4)；v4 原写在 Lv2，<strong>〔用户已定，按推荐〕</strong>，诸葛亮冲突清单第 2 节第 1 条）</td>
+<td>10</td>
+</tr>
+<tr>
+<td>3</td>
+<td>背包扩容 I（30 格）、保温柜 6 份、委托板第 3 槽、外观阶段 1（篱笆与信箱）；Pip「第一次下矿」委托（奖励铜剑，第一次换武器；木剑开局就装着，v4q(7) ① <strong>〔用户已定，按推荐〕</strong>）</td>
+<td>12</td>
+</tr>
+<tr>
+<td>4</td>
+<td>第二口灶；驿站上架回血药（v4q(7)）〔第二批：熔炉 T1〕</td>
+<td>14</td>
+</tr>
+<tr>
+<td>5</td>
+<td>外观阶段 2（门廊 · Standard Room）；布告栏（世界动态以后在这里）</td>
+<td>16</td>
+</tr>
+<tr>
+<td>6</td>
+<td>大锅（一锅双份）〔第二批：药剂台 T1〕</td>
+<td>18</td>
+</tr>
+<tr>
+<td>7</td>
+<td>背包扩容 II（35 格）；果树 8 / 洒水器 10 上限</td>
+<td>20</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>进 T2</strong>：工作台可做铁剑（v4q(7)）；外观阶段 3（灶房扩建）· 第三口灶。矿脉从哪一级能去见 v4q(5) ②（<strong>〔用户已定，按推荐〕</strong>：推荐开局就能去，否则 Lv8 卡死——Lv8 要铁、石英只有矿脉出）</td>
+<td>22</td>
+</tr>
+<tr>
+<td>9</td>
+<td>保温柜 12 份、摊位升级〔第二批：织布机 T2〕</td>
+<td>24</td>
+</tr>
+<tr>
+<td>10</td>
+<td>名厨招牌 Chef's Sign</td>
+<td>26</td>
+</tr>
+<tr>
+<td>11</td>
+<td>背包扩容 III（40 格）</td>
+<td>28</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Deluxe Room〔第二批：展示馆一厅〕</td>
+<td>30</td>
+</tr>
+<tr>
+<td>13</td>
+<td>新摆件一批</td>
+<td>32</td>
+</tr>
+<tr>
+<td>14</td>
+<td>新摆件一批；果树 10 / 洒水器 12 上限</td>
+<td>34</td>
+</tr>
+<tr>
+<td>15</td>
+<td>外观阶段 4（大师农舍）；称号 Homestead Master（从 Lv10 挪到 Lv15；三项技能的称号仍在技能 Lv10）</td>
+<td>36</td>
+</tr>
+<tr>
+<td>16</td>
+<td>背包扩容 IV（45 格）；出门门槛开始</td>
+<td>39</td>
+</tr>
+<tr>
+<td>17</td>
+<td>第四口灶</td>
+<td>41</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>去掉的解锁：现行 Lv2 黏土岸（<code>clay_bank</code>）、Lv3 老树（<code>old_tree</code>）随农场采集点搬出一起去掉（v4q(4)）；Lv3 / Lv7 的「田 40 / 48」不再是解锁，改成每级加田（⑤）；长途票、Trip 7 资格是 P2，上线前不显示。</li>
+<li>外观阶段 3 / 5 / 8 / 10 → 3 / 5 / 8 / 15。</li>
+<li><strong>背包扩容的材料</strong>：I–III 照现行材料挪到新等级（I Lv3：芦苇 10、木材 6；II Lv7：硬木 4、黏土 6、铜矿石 4；III Lv11：硬木 8、石英 4、铜矿石 8）；IV（Lv16，新）初值硬木 10、亚麻 8、铁矿石 4。都待模拟器校准（IV 叠在 Lv16 升级的硬木 13、亚麻 9、铁 4 上，Lv16 那几天硬木约 23 件，校准时算进去）。城里的硬木、亚麻采集点不按 Homestead 等级开（Lv7 的 II、Lv8 的升级都要硬木）。</li>
+<li><strong>摆件</strong>：摆件商店现有 11 个门槛（7 件 Lv1、Recipe Stand Lv1、Windmill Lv3、Fountain Lv5、Pergola Lv8）第一批照现行不动（v4 2.7 要「按新等级重排」，第一批先取现行这个默认，报批时提一句）。Lv13、Lv14 的「新摆件一批」要新做美术和内容，<strong>第一批不做</strong>，这两级的新东西就是田 +2 和（Lv14）果树 / 洒水器上限——<strong>〔用户已定，按推荐〕</strong>（v4 2.7 要每级都有一样新东西）。</li>
+<li><strong>背包扩容价格降</strong>：I 60、II 150、III 300、IV 600 金币（现价 150 / 400 / 1,000）。</li>
+<li>依赖还没实现的 P2 功能（密友、帮工、长途票、Trip 7 资格）的后果，在那个功能上线前不显示。</li>
+<li><strong>名字一律沿用现有英文</strong>，不另起：<code>Spice Rack</code>、<code>Warming Cabinet</code>、<code>Stall Board · 3rd slot</code>、<code>Bag Upgrade I</code>、<code>Second Stove</code>（<code>Third Stove</code> / <code>Fourth Stove</code> 同一格式）、<code>Big Pot</code>、<code>Chef's Sign</code>、<code>Notice Board</code>、外观阶段 <code>Fence &amp; Mailbox</code> / <code>Porch</code> / <code>Kitchen Wing</code> / <code>Master Farmhouse</code>（q(112)）、<code>Basic Room</code> / <code>Standard Room</code> / <code>Deluxe Room</code>。Lv9 的「摊位升级」（<code>stall_upgrade</code>）现行没有英文行：摊位还是临时木箱、没有升级外观，升级面板和横幅都不写它（不知火舞 282）；第一批照旧不写，等摊位模型再定名（Lv9 仍有 <code>Warming Cabinet · keeps 12 dishes</code>）。回血药的名字归 v4q(7)。</li>
+</ul>
+<p>⑨ <strong>第一周</strong>（30 分钟玩家）：第 1 天首会话到 Lv3、当晚 Lv4，之后每天一级，第 7 天 Lv10；取代旧方案第 14 章的七日节奏表（q(248)）。首会话到 Lv3 的前提：家城木材、石料各 3 个采集点（v4q(4) ②）和 Lv3 门槛 1 / 1（③）。<strong>用户批的方向（庚5）</strong>：矿脉开局就能去（丁12，v4q(5) ②），<strong>第 3、4 天各开一座矿脉</strong>（铁矿脉、石英矿脉各从 F1 走到 F10，开出电梯站），<strong>第一只守关挪到第 2 天或第 5 天</strong>；Today / Pip 带人去矿脉的提示另起 v4q；改完按「照表走的玩家」再跑一次校准，再定逐日表（v4 2.8 按本条读）。</p>
+<p>⑩ <strong>存档</strong>：等级表跟着清档上线（v4q(2)，存档 v7），不做老号迁移。</p>
+<p>⑪ <strong>上线</strong>：A–H 可以分开批，但同一个版本上线、带最低版本（v4 方案 10.2）；D 和 A 同批合。</p>
+<p><strong>改哪</strong>：v4 方案第 2 章 2.3–2.8 按本条读；旧方案按诸葛亮冲突清单第 3 节 A 组逐条（已加注，9805c9a7），另含 §3.1.1、§3.1.3、§4.7.4、§4.8.1 / 4.8.6 / 4.8.7、§7.0 / 7.7、§8.0、§8.4、§10.4.3、§13.5.1 / 13.5.2、§14.1.2、§14.5、§16.3 HOME-1 / HOME-2 / BAG-5 / COOK-1；旧方案第 8 章（8.1 升级规则、8.2 十级消耗表、8.3 每级后果、8.5 到达天数、8.6 升级面板）、§3.1.2、§3.4.8（升级回满）、§13.0（九级合计）、第 14 章七日节奏表与 14.6.1 金币流水，以本条为准。</p>
+<p><strong>推翻</strong>：q(246)（Lv2–4 降门槛与回 40 体力、Lv5 技能和）、q(263)（355 方案 A 的 Lv5–10 过渡数）、q(172)（Lv7 田 40 → 48）与 q(118) ⑦ 的田数、q(248)（七日表按 q(246) 读）；q(255) ①（「到 Lv3 为止、Lv4 起不出」）和 ④（「只缺技能时不出」）（用户定，丁5，见画面）、q(255) ②（Show 指农场采集点 / 矿口，改指城里采集点和野外浅坑 / 矿脉，交 v4q(4) / v4q(5)）；q(14)（室内三档 Lv1 / 5 / 10 → Deluxe Lv12）；q(101) 末句「升级回满不变」；q(247) ③④、q(249) ②（横幅和页脚的「Lv5 起 fills Energy」）；q(59)、q(118) ①④、q(172) ③、q(120) 出口路禁放 x 9–10（田网格，见 ⑤；q(118) ② 温室规则、q(130) ①④ 满额和放置态写法不变，按本条读）；q(113) ① 摆件上限 Lv10 封顶 56 → Lv9 封顶 52（用户定，丁22，见 ⑤）；q(253) ②、q(115) ②、q(112) / q(24) 的 Lv10 外观阶段、q(110) ⑥、q(113) ①、q(174) ②④、q(179) / q(180) 的 Lv10 称号卡、q(194) ①、q(200) ③、q(202) ①、q(216) ④ 按本条读；旧方案第 8 章的技能和门槛、「升级回满」。HOME-1 不是锁定组件；技能拆成三格只换 NEED-TILE 的内容、缺口照旧写在按钮上，<strong>LOCK-10 不变</strong>，不用复议。197 记说明两项：<strong>LOCK-12</strong> 背包容量「30 / 35 / 40」加 IV 45；<strong>LOCK-33</strong> 末注 Deluxe Room Lv10 → Lv12。其余以诸葛亮冲突清单第 3 节 A 组为准。</p>
+<p><strong>画面</strong>（不知火舞定；安其拉出稿，不知火舞验收：P1 355 65079ece——改前 Q355-A-BEFORE 310:179618（现行 HOME-1）、A1 Lv8 → 9 310:179667 / 310:180610、A2 Lv16 → 17 311:180478 / 311:180957（金币格分母按 q(10) 改过，355 102d5f08）；P2 355 最新——A4 满级 352:185656、A3a 技能来源句 352:185811、A3b 签章来源句 352:185862、A3c 五句一览 352:186395（第三版 355 48dedfd0：放不下的三句在「 · 」处折行、圆点去掉）；清单 355 f45b01de）：</p>
+<ul>
+<li><strong>Needs</strong>：材料 + Coins 一组；技能另起一行，三格 NEED-TILE <code>Farming 4/4</code>、<code>Fishing 4/5</code>、<code>Cooking 4/4</code>，带技能图标，取代单格 <code>Skills 13/5</code>；Lv6 前 Cooking 没有门槛，只出两格。Lv16 起再起一行出门门槛：<code>Stamps 5/8</code>、<code>Climates 1/2</code>（「去过 N 个别的气候带」）。</li>
+<li><strong>按钮写第一个缺口</strong>，顺序：技能（Farming → Fishing → Cooking）→ 出门（签章 → 气候带）→ 材料 → 金币，和服务端拒绝码（哪吒契约）、拒绝时的 toast、Today 行同一个顺序（新加的技能、签章门槛容易看漏，先说；材料格本身有琥珀环）；写法 <code>Need 6 more Timber</code>（现行）、<code>Need Fishing Lv5</code>、<code>Need 3 more stamps</code>、<code>Need 1 more climate</code>。</li>
+<li><strong>点格子</strong>弹现有的来源一句（UiNeedSource）：<code>Farming Lv4 · Sow and harvest to level up</code>、<code>Fishing Lv5 · Catch fish to level up</code>、<code>Cooking Lv4 · Cook dishes to level up</code>、<code>Stamps · First visit to a city · up to 2 a day</code>、<code>Climates · Visit a city or wild site in another climate</code>；技能格另带 <code>Show</code>（打开那项技能页）。来源句一行放不下时照 q(103) 在「 · 」处折行、<strong>圆点去掉</strong>（<code>UiKit.break_at_dot</code>，#188），不缩短文案：如 <code>Farming Lv4</code> / <code>Sow and harvest to level up</code>。</li>
+<li><strong>What changes</strong> 恢复田数那一行 <code>Plots 24 · now 22</code>（P0 田固定时不列，q(33)；现在每级都变）；体力那一行照旧 <code>Max Energy 280 · Meals 280 a day · now 270</code>。</li>
+<li><strong>底注</strong>照 q(249)：只补一部分体力，所以底注一律只写 <code>Upgrading is free of Energy</code>，实际 +50 写在升级横幅上、写实得；Lv16 起不回体力，横幅也不写。</li>
+<li><strong>Lv17 封顶</strong>：标题下一行用现有的 <code>Highest level for now</code>（中性灰，q(46) 的封顶写法），不用 <code>Max level · Homestead Master</code>（Master 挪到 Lv15，上限以后还会开）；旧方案 §16.3 HOME-1 表里写的 10 级阶梯缩略，现行界面没做，第一批也不做；满级面板照现行满级帧（9:128426）的结构：<code>Homestead Lv17</code> / <code>Highest level for now</code> / Looks / Decorate / Close（帧 A4，不知火舞定）。</li>
+<li><strong>Today 行</strong>每级都出、<strong>只缺技能时也出</strong>，同一项技能的那行技能就不再出（去重），Homestead 行仍是一次只出一行、排序照 q(255) ⑥（推翻 q(255) ① ④；<strong>〔用户已定，按推荐〕</strong>，诸葛亮冲突清单第 2 节第 17 条），沿用 <code>Homestead Lv2 · Timber 6 to go</code> 的格式：技能不够 <code>Homestead Lv9 · Fishing Lv5 needed</code>；签章 <code>Homestead Lv17 · 3 stamps to go</code>；气候带 <code>Homestead Lv17 · 1 climate to go</code>。</li>
+</ul>
+<p><strong>实现</strong>：内容 <code>p0_content.json</code>（homestead、start、bag_upgrades）、<code>homestead_looks.json</code>、<code>farm_garden.json</code>、<code>shops_decor.json</code>、<code>requests_p1.json</code> 的门槛；服务端 homestead.ts、rules.ts（体力池和饭量同一公式）、view.ts、titles.ts（拆 <code>TITLE_LEVEL</code>：Homestead Master 15、技能称号仍 10）、garden.ts（果树 / 洒水器上限 Lv7 8 / 10、Lv14 10 / 12）、state.ts；<strong>灶上限 <code>MAX_STOVES</code> 3 → 4</strong>（Lv17 第四口灶，厨房场景加第四口灶的位置）；客户端升级面板、<code>P1_UNLOCKS</code>、<code>home_moment</code>、<code>MAX_LEVEL</code>、称号、田网格（没开的格画草地）。<strong>田 id 按 ⑤ 的开出顺序重新编号 0–62</strong>，<code>garden.plots</code> 按这个顺序写坐标，代码不写死 48；随清档上线，不迁移。view 字段和拒绝码（<code>skills_short</code> / <code>travel_short</code>、<code>next.skills</code> / <code>next.travel</code> / <code>next.energy_gain</code> / <code>next.plots</code>）按哪吒的契约 pm/plans/355-b1-A-view-contract.md；契约里 Lv2 的 <code>city_gather</code> 只做展示、不当门槛（采集点 Lv1 起能用）；Lv8 的 <code>vein_mines</code> 当不当门槛按 v4q(5) ② 用户定的来（选 A 不当门槛；周瑜接口数据现在默认 <code>gate.homestead: 8</code> 是 B，选 A 要改）。签章门槛数 <code>counted_on ≤ 今天</code> 的、不含家城。奕星排。</p>
 <h1 id="ch2">第 2 章 旧文档冲突索引</h1>
 <p>旧方案的章节和已批 q 行里和 v4 冲突的地方，按诸葛亮的冲突清单逐条列出：旧位置 → 以哪条 v4q 为准。清单到了以后补。</p>
 <div class="tbl"><table>
