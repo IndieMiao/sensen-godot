@@ -2111,7 +2111,7 @@
   },
   "wallet_floor": 40,
   "homestead": {
-    "_p1": "v4q(1) (SGODOT-355 b1, pending approval): Lv1–17 at r9's design values (v4 §2.3, the batch-1 bridge rows for Lv16–17), to be calibrated. skills: each skill's own gate (Cooking from Lv6); travel (Lv16 on): city stamps and other climate bands; energy: what a level gives back, always a number (Lv2–15 50, Lv16 on 0). Ladders are [from level, value]. Pending the user: Lv3's gate 2 / 1 or 1 / 1 (丁1), Lv8's vein_mines / iron_sword (丁12, not listed yet), Lv13–14's decor sets (丁4: not in batch 1). Lv4's potion_heal is v4q(7)'s Healing Potion.",
+    "_p1": "v4q(1) (SGODOT-355 b1; the user approved it 11-02, all as recommended): Lv1–17 at r9's design values (v4 §2.3, the batch-1 bridge rows for Lv16–17), to be calibrated. skills: each skill's own gate (Cooking from Lv6); travel (Lv16 on): city stamps and other climate bands; energy: what a level gives back, always a number (Lv2–15 50, Lv16 on 0). Ladders are [from level, value]. The user's 11-02 calls: Lv3's gate 1 / 1 (丁1), Lv12's 4 / 6 / 6 (庚1), Lv3 stone 4 wood 2 and Lv4 stone 10 (庚2), decor_max capped at 52 (丁22), Lv13–14's decor sets not in batch 1 (丁4); veins open from the start (丁12: the mine's own gate, not a level's). Lv4's potion_heal is v4q(7)'s Healing Potion.",
     "max_level": 17,
     "warming_cabinet": 6,
     "energy_steps": [
@@ -2186,7 +2186,8 @@
     },
     "decor_max": {
       "base": 20,
-      "per_level": 4
+      "per_level": 4,
+      "max": 52
     },
     "plots": [
       [
@@ -2327,17 +2328,17 @@
         "level": 3,
         "coins": 60,
         "skills": {
-          "farming": 2,
+          "farming": 1,
           "fishing": 1
         },
         "materials": [
           [
             "stone",
-            8
+            4
           ],
           [
             "wood",
-            4
+            2
           ],
           [
             "clay",
@@ -2371,7 +2372,7 @@
           ],
           [
             "stone",
-            6
+            10
           ],
           [
             "clay",
@@ -2750,7 +2751,7 @@
         "level": 12,
         "coins": 120,
         "skills": {
-          "farming": 5,
+          "farming": 4,
           "fishing": 6,
           "cooking": 6
         },

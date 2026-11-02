@@ -39,8 +39,8 @@ describe('v4q(1): the batch-1 table to Lv17 and 50 Energy back to Lv15, for ever
     expect(L.map(l => l.coins)).toEqual([40, 60, 70, 80, 80, 80, 80, 85, 90, 115, 120, 150, 175, 220, 280, 400]);
     expect(L.reduce((n, l) => n + l.coins, 0)).toBe(2125);
     expect(L.map(l => [l.skills.farming, l.skills.fishing, l.skills.cooking ?? null])).toEqual([
-      [1, 1, null], [2, 1, null], [2, 2, null], [3, 2, null], [3, 3, 2], [4, 3, 3], [4, 4, 4], [4, 5, 4], [4, 5, 5], [4, 6, 5],
-      [5, 6, 6], [5, 6, 6], [5, 6, 7], [6, 7, 7], [6, 7, 8], [7, 8, 8]]);
+      [1, 1, null], [1, 1, null], [2, 2, null], [3, 2, null], [3, 3, 2], [4, 3, 3], [4, 4, 4], [4, 5, 4], [4, 5, 5], [4, 6, 5],
+      [4, 6, 6], [5, 6, 6], [5, 6, 7], [6, 7, 7], [6, 7, 8], [7, 8, 8]]);
     expect(L.map(l => l.energy)).toEqual([50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 0, 0]);
     expect(L.map(l => l.travel ?? null)).toEqual([...Array(14).fill(null), { stamps: 6, climates: 1 }, { stamps: 8, climates: 2 }]);
     expect(L[0].materials).toEqual([['wood', 6], ['stone', 4], ['fiber', 3]]);
@@ -78,7 +78,7 @@ describe('v4q(1): the batch-1 table to Lv17 and 50 Energy back to Lv15, for ever
   });
 
   it('can perform two affordable upgrades on an old Lv1 account, with separate payments/rewards and no automatic upgrade', () => {
-    let s = ready(2, 0); s.coins = 140; s.storage = { wood: 10, stone: 12, fiber: 3, clay: 2 };
+    let s = ready(2, 0); s.coins = 140; s.storage = { wood: 8, stone: 8, fiber: 3, clay: 2 };   // Lv2 6 / 4 / reeds 3, Lv3 stone 4 wood 2 clay 2 (庚2)
     s.skills = { farming: c.skills.farming[1], fishing: c.skills.fishing[1], cooking: 0 };
     expect(viewOf(c, s, T).homestead.next!.can_upgrade).toBe(true);
     expect(s.homestead.level).toBe(1);

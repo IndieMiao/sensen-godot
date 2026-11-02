@@ -4,6 +4,7 @@ import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reduc
 import { maxEnergy, foodCap } from '../../src/p0/rules.js';
 import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
 import { haveTotal, takeStorageFirst } from '../../src/p0/storage.js';
+import { homeClimate } from '../../src/p0/travel.js';
 import { viewOf } from '../../src/p0/view.js';
 
 const c = loadP0Content();
@@ -19,11 +20,11 @@ function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[]
 const fresh = () => ({ ...freshState(c, 'player-home-01', T0, 7), created_at: T0 - 8 * 24 * H });
 /** XP at a skill's level (content skills: [level − 1] is where it starts). */
 const xp = (skill: 'farming' | 'fishing' | 'cooking', level: number) => c.skills[skill][level - 1];
-/** v4q(1) ②③: Lv2 1 / 1 and wood 6, stone 4, reeds 3, 40 coins; Lv3 2 / 1 and stone 8, wood 4, clay 2, 60 coins. */
+/** v4q(1) ②③: Lv2 1 / 1 and wood 6, stone 4, reeds 3, 40 coins; Lv3 1 / 1 (丁1) and stone 4, wood 2, clay 2 (庚2), 60 coins. */
 const LV2_SKILLS = { farming: 0, fishing: 0, cooking: 0 };
-const LV3_SKILLS = { farming: xp('farming', 2), fishing: 0, cooking: 0 };
+const LV3_SKILLS = { farming: 0, fishing: 0, cooking: 0 };
 const LV2_MATS: Record<string, number> = { wood: 6, stone: 4, fiber: 3 };
-const LV3_MATS: Record<string, number> = { stone: 8, wood: 4, clay: 2 };
+const LV3_MATS: Record<string, number> = { stone: 4, wood: 2, clay: 2 };
 
 function ready(level: 2 | 3): P0State {
   const s = fresh();
@@ -75,10 +76,11 @@ describe('Homestead batch 1 (v4q(1)): Lv1–3', () => {
 
   it('refuses with the first gap in button order: each skill (Farming → Fishing → Cooking), then materials, then coins', () => {
     let s = ready(3);
+    s.homestead.level = 3;   // Lv4: 2 / 2 (Lv3's 1 / 1 is where everyone starts, 丁1)
     s.skills = { farming: 0, fishing: 0, cooking: 900 };
     expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'skills_short', detail: { skill: 'farming', need: 2, have: 1 } });
     s = ready(3);
-    s.homestead.level = 3;   // Lv4: 2 / 2
+    s.homestead.level = 3;
     s.skills = { farming: xp('farming', 2), fishing: 0, cooking: 0 };
     expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'skills_short', detail: { skill: 'fishing', need: 2, have: 1 } });
     s.homestead.level = 5;   // Lv6: 3 / 3 / 2 — Cooking from Lv6
@@ -110,6 +112,16 @@ describe('Homestead batch 1 (v4q(1)): Lv1–3', () => {
     s.travel.visits = { 'gn-1816670': visit, 'gn-1809858': visit, 'gn-1796236': visit };   // Beijing, Guangzhou, Shanghai
     expect(viewOf(c, s, T0).homestead.next!.travel!.climates).toEqual({ need: 1, have: 2 });
     expect(block()).toMatchObject({ ok: true });
+  });
+
+  it('a visit to a place the content no longer knows counts no climate band, not the default one (亚瑟 on #634)', () => {
+    const s = fresh();
+    s.homestead.level = 15;
+    s.travel.home = 'gn-1809858';   // Guangzhou: home in a band other than the content's default (profile.climate)
+    expect(homeClimate(c, s)).not.toBe(c.profile.climate);
+    const visit = { n: 1, first_at: T0, last_at: T0, deliveries: 0, delivered_day: '' };
+    s.travel.visits = { 'gn-0000001': visit, 'wd-gone': visit };
+    expect(viewOf(c, s, T0).homestead.next!.travel!.climates.have).toBe(0);
   });
 
   it('every level\'s energy is a number: a missing one stops the content from loading (v4q(1) 复核 ③)', async () => {

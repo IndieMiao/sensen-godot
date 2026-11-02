@@ -132,10 +132,13 @@ export function cityStamps(s: P0State): number {
   return (s.travel?.stamps ?? []).filter(x => !isWild(x.cluster)).length;
 }
 
-/** v4q(1) ④: climate bands other than home's the player has arrived in — a city or a wild site with an arrival. */
+/** v4q(1) ④: climate bands other than home's the player has arrived in — a city or a wild site with an arrival. A visit
+ * whose place the content no longer knows counts for nothing (亚瑟 on #634): never the default climate's band. */
 export function climatesVisited(c: P0Content, s: P0State): number {
   const home = homeClimate(c, s), seen = new Set<string>();
   for (const at of Object.keys(s.travel?.visits ?? {})) {
+    const known = isWild(at) ? wildById(c, at)?.climate : clusterById(c, at)?.climate;
+    if (!known) continue;
     const z = climateOfCluster(c, at);
     if (z !== home) seen.add(z);
   }
