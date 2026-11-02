@@ -1,4 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';
 import { LIMITS, PATH, registerP0Online } from '../../src/p0/online/hub.js';
@@ -61,6 +64,15 @@ describe('P0 pond rooms (pond multiplayer, 11-02)', () => {
     expect(spec('pond_san_francisco_03')).toBeUndefined();   // a pond room says it is one
     expect(pondOfRoom('pond:gn-5355933~pond1')).toBe('gn-5355933~pond1');
     expect(pondOfRoom('sh_tea_1')).toBe('');
+  });
+
+  it('every template\'s water lies inside the room\'s walls, so a landing kept in them is never moved off the water (周瑜 on #646)', () => {
+    const file = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/p0/p0_pond_templates.json');
+    const templates = JSON.parse(readFileSync(file, 'utf8')).templates as Record<string, { polygon: [number, number][] }>;
+    const [x0, x1, z0, z1] = POND_BOUNDS;
+    expect(Object.keys(templates).length).toBeGreaterThan(0);
+    for (const [id, t] of Object.entries(templates))
+      for (const [x, z] of t.polygon) expect([id, x >= x0 && x <= x1 && z >= z0 && z <= z1]).toEqual([id, true]);
   });
 
   it('the 9th player of a pond lands in Room 2; presence counts ponds under `ponds`, by pond id', async () => {

@@ -32,6 +32,7 @@ const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # P0's own ponds: San
 const P0City := preload("res://modules/p0/p0_city.gd")
 const OnlineCrowd := preload("res://modules/net/online_crowd.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
+const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
 ## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
 ## fit one view whole; the opening and the walk stay at 1.0, the farm's player scale.
 const FAR_ZOOM := 0.68
@@ -70,6 +71,7 @@ var _trap_mark := Vector2.INF   # the cage's point on screen this frame (its str
 # — the others walk and fish in it; each one's fish are their own (the catch is each player's command on their own save).
 var crowd: Node3D   # an OnlineCrowd (tests give a stand-in)
 var online: P0Online
+var voice_room: Node   # P0VoiceRoom: the pond's voice (SGODOT-383), for the HUD's mic key and people drawer
 var _line_sent: Dictionary = {"phase": "none"}   # the last line told the room (none yet: nothing to take in)
 var _line_left := 0.0             # the reel's hold and fish go at most every LINE_SEND_S
 const LINE_SEND_S := 0.25
@@ -734,6 +736,10 @@ func _go_online(session: P0Session) -> void:
 	o.version = session.version
 	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
 	attach_online(o)
+	voice_room = P0VoiceRoom.new()
+	add_child(voice_room)
+	voice_room.setup(session, o, "pond")
+	o.joined.connect(func(_i): if voice_room.age == "unknown" and not voice_room.available: voice_room.fetch_status(), CONNECT_ONE_SHOT)
 	online.start(room_id(), Vector2(actor.position.x, actor.position.z))
 
 ## The pond's room on the server: `pond:<pond id>`.
@@ -751,8 +757,10 @@ func attach_online(o: P0Online) -> void:
 
 ## Layer 2 and later say so once, as an outpost's do (奕星 on #646; P0Online.layer_notice).
 func _on_joined(info: Dictionary) -> void:
+	_line_sent = {"phase": "none"}   # a new join (a reconnect too) has no line of ours: the one out goes again next frame (周瑜 on #646)
+	_line_left = 0.0
 	var said := P0Online.layer_notice(info)
-	if said != "" and rt: rt.ui.toast(said)
+	if said != "" and rt: rt.ui.toast(said, 0.0, true)   # Layer 1 is full / you're in Layer 2 (不知火舞 on #646)
 
 func _online_action() -> String:
 	if panel and panel.visible:
