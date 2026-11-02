@@ -114,7 +114,7 @@ func _on_online_failed(code: String) -> void:
 ## Layer 2 and later say so once; Layer 1 and a reconnect to the same layer say nothing (P0Online.layer_notice).
 func _on_joined(info: Dictionary) -> void:
 	var said := P0Online.layer_notice(info)
-	if said != "" and rt: rt.ui.toast(said)
+	if said != "" and rt: rt.ui.toast(said, 0.0, true)   # Layer 1 is full / you're in Layer 2 (不知火舞 on #646)
 	if seat != "": _stand_up()   # a new connection starts standing
 
 ## The space every P0 command carries (SGODOT-228 Rest "away from the farm"): outposts are "outpost".

@@ -760,7 +760,7 @@ func _on_joined(info: Dictionary) -> void:
 	_line_sent = {"phase": "none"}   # a new join (a reconnect too) has no line of ours: the one out goes again next frame (周瑜 on #646)
 	_line_left = 0.0
 	var said := P0Online.layer_notice(info)
-	if said != "" and rt: rt.ui.toast(said)
+	if said != "" and rt: rt.ui.toast(said, 0.0, true)   # Layer 1 is full / you're in Layer 2 (不知火舞 on #646)
 
 func _online_action() -> String:
 	if panel and panel.visible:
