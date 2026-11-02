@@ -1,0 +1,15 @@
+{
+  "task": "SGODOT-321",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source": "output/poi-service-hall-321/dependencies/assets/rooms/_shared/shell_hall/wall_sconce.glb",
+  "source_sha256": "ea46eaa935f609a8e4177c9f2be27c5e620b1031cd88d5dfdeeec39b8efaa7a1",
+  "changes": [
+    "N2 atlas/material and UV remap; original geometry retained"
+  ],
+  "scale_xyz": [
+    1,
+    1,
+    1
+  ]
+}

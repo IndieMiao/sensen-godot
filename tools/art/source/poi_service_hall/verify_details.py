@@ -32,7 +32,9 @@ def main():
         check(info['surfaces']==1,name+': one surface')
         check(info['mesh_names']==[name+'_mobile'],name+': named mobile mesh')
         check(info['triangles']==spec['triangles'] and info['triangles']<=8000,name+': measured triangle count and <=8k')
-        check(not doc.get('images'),name+': no embedded atlas duplication')
+        check(doc.get('images')==[{'uri':'hall_albedo_ao_n2.png'}]
+              and all(p.get('material')==0 for m in doc['meshes'] for p in m['primitives']),
+              name+': one external atlas material without embedded image duplication')
         for primitive in doc['meshes'][0]['primitives']:
             positions=read(primitive['attributes']['POSITION']);indices=read(primitive['indices']).reshape(-1,3)
             triangles=positions[indices]

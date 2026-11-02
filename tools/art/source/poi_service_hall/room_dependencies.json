@@ -1,0 +1,25 @@
+{
+  "shell_commit": "8804d7500077c2228846eb0d581c92181f54426c",
+  "hallkit_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+  "unchanged_dependency_sha256": {
+    "assets/rooms/_shared/shell_hall/hall_albedo_ao.png.import": "b100c3e1fb288599539cc96d469b9dd485147d732784e001f38676dded41f802",
+    "assets/rooms/_shared/shell_hall/hall_floor.glb": "c524275fa5e93d8020dd10749bddec7c45f8d05ab71d1436004354183ca603c8",
+    "assets/rooms/_shared/shell_hall/hall_back_wall.glb": "13fbf2361b7b8b3aeb71a0d1eefda149cac5e4db1536da56f5f2e8510199e387",
+    "assets/rooms/_shared/shell_hall/hall_back_wall.glb.import": "cf113c9a0e7f0492c27c09a1d0808879098ef248c47e0739ffe271d57195aec6",
+    "assets/rooms/_shared/shell_hall/hall_opaque.tres": "8cc33d830e70d4272fd8bec31df17f7085b70c126554450d2b6d0bc69374ffe0",
+    "assets/rooms/_shared/shell_hall/hall_palette.json": "38741c55e0362b0744e6c56dbe83699604bfb7dc83c61c4df5788d2b990704e1",
+    "assets/rooms/_shared/shell_hall/hall_floor.glb.import": "baa7c96fe978a973255055e3e7f587f5d9f4484200a76bd2e2663eeec9d2cd17",
+    "assets/rooms/_shared/shell_hall/hall_window_frame.glb.import": "9db079adc27c49b7f89c1a5256093f5e71285392e0086fb7428c9881fc151167",
+    "assets/rooms/_shared/shell_hall/hall_albedo_ao.png": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab",
+    "assets/rooms/_shared/shell_hall/hall_window_grid.glb.import": "19def99f1be9a7d0ca525186bba7f50f96c94f9a4317e48e2a0c99ca520a26e8",
+    "assets/rooms/_shared/shell_hall/hall_window_glass.glb": "0849913751ed7fb1978952137f67128cd33624921efcff01096061287b1af7ba",
+    "assets/rooms/_shared/shell_hall/hall_window_grid.glb": "c5d7b21964439870e575529e2efe36717ce417b1285f9fd9775a6b4c61c0844a",
+    "assets/rooms/_shared/shell_hall/hall_left_wall.glb": "77f448abe91cc4691c079bef3fd2904dd0f79f033e6474c1f9673c828444dd0b",
+    "assets/rooms/_shared/shell_hall/hall_glass.tres": "f7e40fef70255ba098bacdd512979328435e4a9bffaefaa45a4ed830582a62e9",
+    "assets/rooms/_shared/shell_hall/hall_left_wall.glb.import": "8f4dfac085142177c7bae166cde7ada3ca0a8f8c67e33b39c0ec6fe4870ef4a6",
+    "assets/rooms/_shared/shell_hall/hall_window_frame.glb": "d0b5e6547d0e366f60011609410b14bb1cc7c53e4129d4f481bfa536d027f3e5",
+    "assets/rooms/_shared/shell_hall/hall_window_glass.glb.import": "ac47d519332a2e8e696ef7246674320f131c19779fe2c64e4d6c0c5132e32f05"
+  },
+  "source_base": "9600c5dcc6035b6e177066985c9c56f32287e892",
+  "review_pr": 597
+}

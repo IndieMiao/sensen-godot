@@ -1,0 +1,15 @@
+{
+  "task": "SGODOT-321",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source": "output/poi-service-hall-321/dependencies/assets/rooms/_shared/shell_hall/round_side_table.glb",
+  "source_sha256": "b029d9e19b0bc08c4466f97d991fdde8dd2aefc6beaf59503e27c1c43a0e675b",
+  "changes": [
+    "N2 small table variant: baked scale to diameter .60m, height .75m; original 324 untouched"
+  ],
+  "scale_xyz": [
+    0.5454545454545454,
+    0.6612298875909192,
+    0.5454545454545454
+  ]
+}

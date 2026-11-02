@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import json
 import math
+import struct
 import sys
 
 import bpy
@@ -283,6 +284,16 @@ def export():
         bpy.ops.export_scene.gltf(filepath=str(KIT/(name+'.glb')),export_format='GLB',use_selection=True,use_active_scene=True,
             export_materials='NONE',export_texcoords=True,export_normals=True,export_yup=True,
             export_animations=False,export_cameras=False,export_lights=False,export_extras=False)
+        path=KIT/(name+'.glb');raw=path.read_bytes();length=struct.unpack_from('<I',raw,12)[0]
+        doc=json.loads(raw[20:20+length]);tail=raw[20+length:]
+        doc['images']=[{'uri':'hall_albedo_ao_n2.png'}];doc['textures']=[{'source':0}]
+        doc['materials']=[{'name':'N2HallAtlas','pbrMetallicRoughness':{'baseColorFactor':[1,1,1,1],
+            'baseColorTexture':{'index':0},'metallicFactor':0,'roughnessFactor':.85}}]
+        for mesh_data in doc['meshes']:
+            for primitive in mesh_data['primitives']:primitive['material']=0
+        encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*(-len(encoded)%4)
+        path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(tail))+
+            struct.pack('<II',len(encoded),0x4e4f534a)+encoded+tail)
         bpy.data.objects.remove(obj,do_unlink=True)
         bpy.context.window.scene=original_scene
         provenance={'asset':name,'author':'Huangzhong','virtual_user_id':AUTHOR,'kind':'new authored geometry',

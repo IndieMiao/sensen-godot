@@ -1,6 +1,6 @@
 {
   "revision": "v1",
-  "phase": "Independent detailed props; full B assembly awaits user approval",
+  "phase": "Independent props included in user-approved B room",
   "author": "Huangzhong",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "axes": "metres; Y up; +Z front",
@@ -84,7 +84,7 @@
         ],
         "triangles": 7956,
         "surfaces": 1,
-        "sha256": "6313edb7bb5c240b1905ad35828275375d79ac618b6a80e3181d4d8de0ee335f",
+        "sha256": "f6c011877eedccbe9d0c61d82eb6ed6c9a370f0a2265afffdf60414473030210",
         "mesh_names": [
           "sculpture_base_mobile"
         ]
@@ -125,7 +125,7 @@
         ],
         "triangles": 2072,
         "surfaces": 1,
-        "sha256": "67966adee834c94ad233cd6ab2cd535f481608543cdfff15803f8c60ef38c083",
+        "sha256": "ade28de0129fbbe7f0411aba3f57c689249063ce344c0812888f633d61b7dc24",
         "mesh_names": [
           "sculpture_body_mobile"
         ]
@@ -179,7 +179,7 @@
         ],
         "triangles": 3321,
         "surfaces": 1,
-        "sha256": "10481fe5f32b4de6bdffacba55b16eb1c6777861bb0b318684c3932a5e8a700c",
+        "sha256": "d1d1b5e98dcfb4c63afb3a3eea5f9a08c21d2099e0e7e939d876bb9f2896a0c3",
         "mesh_names": [
           "display_niche_1_mobile"
         ]
@@ -233,7 +233,7 @@
         ],
         "triangles": 3153,
         "surfaces": 1,
-        "sha256": "e1cc32345dedd99eabb1737bd5d0027cb8530b82a58cca53f7ff5f164a43e8ce",
+        "sha256": "d50889e47f5d1b6b13431ce0102325b468f7c38bf9dc1027dca42715d21596c9",
         "mesh_names": [
           "display_niche_2_mobile"
         ]
@@ -287,7 +287,7 @@
         ],
         "triangles": 2056,
         "surfaces": 1,
-        "sha256": "9b3a64fe45663d8e9b44f123458af90bbe1c44e934e9e598d77c01989d14956e",
+        "sha256": "2a91d5947a46dacdbf8a37e8fc12bb24e9535fb978e964e8c13d95e7a696974e",
         "mesh_names": [
           "brochure_rack_mobile"
         ]
@@ -341,7 +341,7 @@
         ],
         "triangles": 2176,
         "surfaces": 1,
-        "sha256": "aab22e288f374d63a920da8f24f512881cdabf18c3a3f9ccf68461f14482a943",
+        "sha256": "8c70a5c62346d0f10bd910c94294bf3b1184ecc3d640f3db6d079b9e2fd53378",
         "mesh_names": [
           "water_dispenser_mobile"
         ]
@@ -382,7 +382,7 @@
         ],
         "triangles": 588,
         "surfaces": 1,
-        "sha256": "9031d92d11c6cb3cf71d3521b0478000d10af9f4c65d504590e2b8db464961b0",
+        "sha256": "256b6d5cb2bcdc603ff5c46ee04de69c9e93a923c5eafbc9d0bb038686e6a08e",
         "mesh_names": [
           "call_screen_mobile"
         ]
@@ -423,7 +423,7 @@
         ],
         "triangles": 972,
         "surfaces": 1,
-        "sha256": "f14bc50a6fd3a6f413b3ee47720c645ae96b636e75b3c842d506351be59b7cb0",
+        "sha256": "61c20a440a3144ba366efec27767475a33df3da498eaab619dd9820c9984a723",
         "mesh_names": [
           "notice_board_mobile"
         ]
@@ -478,7 +478,7 @@
         ],
         "triangles": 540,
         "surfaces": 1,
-        "sha256": "8c6bfd711337cf1dea25fc6e4abaffe55a1c00fe013c9c7fc29eda8170166796",
+        "sha256": "d961f76dba10b30ebd9351df70b4d4c03a847cd795ac9d40f06cda20f7c33e84",
         "mesh_names": [
           "name_plaque_mobile"
         ]
@@ -519,7 +519,7 @@
         ],
         "triangles": 1944,
         "surfaces": 1,
-        "sha256": "9cf2ad81515caf8eeace29edc7ba8f86655bcf8fb366c61010cf80a908e884f8",
+        "sha256": "2e0523728673954a62a66fb674a8a0a3030692c373a35cc88c655ed246bc5dd0",
         "mesh_names": [
           "window_flowerbox_mobile"
         ]
