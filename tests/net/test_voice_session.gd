@@ -173,6 +173,22 @@ func test_p0_mutes_and_blocks_go_again_onto_a_reconnected_room() -> void:
 	assert_bool(f[1].calls.has(["subscribed", "native-2", "7", false])).is_true()
 	assert_bool(f[1].calls.has(["volume", "native-2", "5", 0.0])).is_true()
 
+## P0's mic key joins with the mic on (383 6372bffe): the wish made before the room is up is taken at connect, after the
+## blocks; an idle session keeps none.
+func test_p0_a_mic_on_before_the_room_is_up_goes_out_at_connect() -> void:
+	var f := _p0_fixture()
+	f[0].set_microphone(true)
+	assert_bool(f[0]._desired_microphone).is_false()
+	f[0].join_with(f[2])
+	f[0].set_microphone(true)
+	assert_bool(f[1].calls.any(func(c): return c[0] == "microphone")).is_false()
+	_event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	_event(f[0], "connected")
+	var block: int = f[1].calls.find(["subscribed", f[0]._native_id, "7", false])
+	assert_int(block).is_greater_equal(0)
+	assert_int(f[1].calls.find(["microphone", f[0]._native_id, true])).is_greater(block)
+
 func test_p0_an_older_plugin_is_never_asked_per_person() -> void:
 	var f := _p0_fixture(false)
 	f[0].join_with(f[2]); _event(f[0], "permission", {"granted": true})

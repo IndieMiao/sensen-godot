@@ -145,9 +145,12 @@ func invalidate_membership() -> void:
 	_heartbeat_at = 0
 	changed.emit()
 
+## Before the room is up the wish is kept and taken at connect (P0's mic key joins with the mic on — it was dropped, and a
+## first tap joined muted; 383 6372bffe); an idle session takes none.
 func set_microphone(enabled: bool) -> void:
-	if state != "connected" or _native_id.is_empty(): return
+	if not _wanted: return
 	_desired_microphone = enabled
+	if state != "connected" or _native_id.is_empty(): return
 	_backend.call("set_microphone", _native_id, enabled)
 
 func set_listening(enabled: bool) -> void:
