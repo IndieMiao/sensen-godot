@@ -58,6 +58,21 @@
 #               must be on record and the image still on the US host). Without this script the migration side puts the
 #               dated compose copy back and runs `docker compose -f … up -d --no-deps p0-p0-1`.
 #
+# --target preview: p0-preview on the same US West host, the weekly preview build for the user only (奕星 11-02,
+# user-approved: pm/preview/auth-preview.md). Everything of its own: compose $REMOTE/compose.preview.json (mode 600,
+# its env and keys kept by the migration side like production's), service and container p0-preview-1, data
+# $REMOTE/preview/data, its own gate (maintenance, minimum version), 256 MB / 0.5 CPU, public at
+# $SITE/preview/p0-next/v1 (the migration side's Caddy). Steps as on us, with these differences:
+#   up          only services["p0-preview-1"].image in compose.preview.json; /data must be the preview directory.
+#               It takes a tag a transfer checked on us or preview (one docker on that host)
+#   fetch-key   the preview access key out of compose.preview.json → output/p0-deploy/preview-key (0600, never
+#               printed), for smoke and the preview APK; smoke never makes one up
+#   smoke       $SITE/preview/p0-next with that key, and the production /preview/p0 healthz before and after
+#   verify-internal  the loopback Caddy at /preview/p0-next/v1/healthz
+#   min-version its url must be under https://oss2.sensenjoy.cn/p0/demo/preview/ (the preview APK, not the release)
+#   --expect-config  as on us
+# Production's compose, container and data are never named by a preview step.
+#
 # Hong Kong is frozen (奕星, 10-29): since the 10-28 move it is the fallback — P0 stopped, data frozen — until 11-01
 # 16:00 +08:00, and the machine goes on 11-05. Every step that writes there (transfer backup-caddy up caddy crontab
 # rollback energy maint-on maint-off min-version) refuses unless --confirm-hk-frozen-override comes first as well,
@@ -72,7 +87,7 @@ while :; do
   case "${1:-}" in
     --target)
       TARGET="${2:?--target hk|us}"; shift 2
-      case "$TARGET" in hk|us) ;; *) echo "unknown target: $TARGET (hk or us)"; exit 2 ;; esac ;;
+      case "$TARGET" in hk|us|preview) ;; *) echo "unknown target: $TARGET (hk, us or preview)"; exit 2 ;; esac ;;
     --confirm-hk-frozen-override) HK_OVERRIDE=1; shift ;;
     --expect-config)
       EXPECT_CONFIG="${2:?--expect-config sha256:<64 hex>}"; shift 2
@@ -88,19 +103,21 @@ for a in "$@"; do
   esac
 done
 if [ -n "$HK_OVERRIDE" ] && [ "$TARGET" != hk ]; then echo "--confirm-hk-frozen-override is for Hong Kong only"; exit 2; fi
-if [ -n "$EXPECT_CONFIG" ] && [ "$TARGET" != us ]; then echo "--expect-config is for --target us only"; exit 2; fi
+if [ -n "$EXPECT_CONFIG" ] && [ "$TARGET" = hk ]; then echo "--expect-config is for --target us or preview only"; exit 2; fi
 
 HK="${P0_HK:-farm@47.76.226.41}"
 DEV="${P0_DEV_HOST:-zhangshaojie@192.168.124.53}"
 SITE="${P0_SITE:-https://farm.sensenjoy.cn}"
 REMOTE=/opt/farm/p0
 CADDY=farm-caddy-1
+US_SERVICE=p0-p0-1   # the P0 container admin() and the observer steps reach (Hong Kong's has the same name)
+PREFIX=/preview/p0   # the public path
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/../../.." && pwd)
 out="$repo/output/p0-deploy/$(date +%Y-%m-%d)"
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=15)
 HOST_OPTS=("${SSH_OPTS[@]}")   # the target host's; the devserver keeps SSH_OPTS
-if [ "$TARGET" = us ]; then
+if [ "$TARGET" != hk ]; then
   HK="${P0_US_HOST:-tgt-us-p0}"
   REMOTE=/srv/migration-data/services/p0
   US_COMPOSE=compose.production.json
@@ -115,6 +132,13 @@ if [ "$TARGET" = us ]; then
   esac
   HOST_OPTS=(-F "${P0_US_SSH_CONFIG:-$HOME/.local/share/aliyun-migrations/liusen-20261026/private/ssh_config}" "${SSH_OPTS[@]}")
   out="$out/us"
+fi
+if [ "$TARGET" = preview ]; then
+  US_COMPOSE=compose.preview.json
+  US_SERVICE=p0-preview-1
+  US_DATA=/srv/migration-data/services/p0/preview/data
+  PREFIX=/preview/p0-next
+  out="${out%/us}/preview"
 fi
 mkdir -p "$out"
 hk() { ssh "${HOST_OPTS[@]}" "$HK" "$@"; }
@@ -136,7 +160,7 @@ admin_key() { secret "${P0_ADMIN_KEY:-}" admin-key 16; }
 admin() {   # $1 = path, $2 = JSON body (POST) or empty (GET)
   local method=GET body=null
   if [ -n "${2:-}" ]; then method=POST; body="$2"; fi
-  hk 'docker exec -i p0-p0-1 node --input-type=module -' <<JS
+  hk "docker exec -i $US_SERVICE node --input-type=module -" <<JS
 const r = await fetch('http://127.0.0.1:3111$1', { method: '$method',
   headers: { 'x-p0-admin': process.env.P0_ADMIN_KEY ?? '', 'content-type': 'application/json' },
   ...('$method' === 'POST' ? { body: JSON.stringify($body) } : {}) });
@@ -148,7 +172,9 @@ JS
 health() {   # $1 = label: Journey and farm healthz, saved for the before / after comparison
   # The Journey server is being retired (SGODOT-304): its path answers 410 Gone once stopped (★3), which is fine;
   # the old farm's /v1 must still answer 200.
-  for u in "$SITE/preview/journey/v1/healthz" "$SITE/v1/healthz"; do
+  local urls=("$SITE/preview/journey/v1/healthz" "$SITE/v1/healthz")
+  [ "$TARGET" != preview ] || urls+=("$SITE/preview/p0/v1/healthz")   # production P0, untouched by a preview step
+  for u in "${urls[@]}"; do
     code=$(curl_ -o "$out/hz.tmp" -w '%{http_code}' "$u" || echo 000)
     printf '%s %s %s %s\n' "$1" "$code" "$u" "$(head -c 200 "$out/hz.tmp")" | tee -a "$out/health.txt"
     case "$u:$code" in
@@ -168,10 +194,29 @@ if [ "$TARGET" = hk ] && [ -z "$HK_OVERRIDE" ]; then
       exit 2 ;;
   esac
 fi
-if [ "$TARGET" = us ]; then
+if [ "$TARGET" != hk ]; then
   case "$step" in
     backup-caddy|caddy|crontab|rollback)
-      echo "$step is Hong Kong only: on us the Caddy, the backups and the route are the migration side's"; exit 2 ;;
+      echo "$step is Hong Kong only: on $TARGET the Caddy, the backups and the route are the migration side's"; exit 2 ;;
+    fetch-key)
+      [ "$TARGET" = preview ] || { echo "fetch-key is for --target preview only: production's key stays with the migration side"; exit 2; }
+      f="$repo/output/p0-deploy/preview-key"
+      say "the preview access key from $HK:$REMOTE/$US_COMPOSE → $f (0600, not printed)"
+      ( umask 077; hk "python3 - $REMOTE/$US_COMPOSE $US_SERVICE" > "$f.tmp" <<'PY'
+import json, sys
+env = json.load(open(sys.argv[1]))['services'][sys.argv[2]].get('environment', {})
+if isinstance(env, list): env = dict(e.split('=', 1) for e in env if '=' in e)
+k = (env.get('P0_ACCESS_KEYS') or '').split(',')[0].strip()
+if not k: sys.exit('no P0_ACCESS_KEYS for ' + sys.argv[2])
+print(k)
+PY
+      ) || { rm -f "$f.tmp"; exit 1; }
+      # One line, one key: anything else the remote side printed (a login banner, a warning) must not become the key.
+      [ "$(wc -l < "$f.tmp" | tr -d ' ')" = 1 ] && grep -Eq '^[A-Za-z0-9_-]{8,128}$' "$f.tmp" \
+        || { rm -f "$f.tmp"; echo "FAIL: what came back is not one key line (not printed): nothing written" >&2; exit 1; }
+      mv "$f.tmp" "$f"
+      echo "written $(wc -c < "$f" | tr -d ' ') bytes"
+      exit 0 ;;
     transfer)
       sha="${1:?transfer <sha>}"
       arc="$out/p0-server-$sha.tar.gz"
@@ -202,14 +247,15 @@ PY
       sha="${1:?up <sha>}"
       [[ "$sha" =~ ^[0-9a-f]{7,40}$ ]] || { echo "bad sha: $sha"; exit 2; }
       # Only a tag a transfer here checked: its line in some day's us/image.txt, and US docker still reports that ID.
-      want=$({ cat "$repo"/output/p0-deploy/*/us/image.txt 2>/dev/null || true; } | sed -n "s/^us p0-server:$sha //p" | tail -1)
-      [ -n "$want" ] || { echo "no checked transfer of p0-server:$sha in output/p0-deploy/*/us/image.txt: run transfer first" >&2; exit 1; }
+      # us and preview share the host's docker, so a transfer checked for either serves both.
+      want=$({ cat "$repo"/output/p0-deploy/*/us/image.txt "$repo"/output/p0-deploy/*/preview/image.txt 2>/dev/null || true; } | sed -n "s/^us p0-server:$sha //p" | tail -1)
+      [ -n "$want" ] || { echo "no checked transfer of p0-server:$sha in output/p0-deploy/*/{us,preview}/image.txt: run transfer first" >&2; exit 1; }
       [ -z "$EXPECT_CONFIG" ] || [ "$want" = "$EXPECT_CONFIG" ] || { echo "FAIL: the checked transfer of p0-server:$sha is $want, not the expected $EXPECT_CONFIG: nothing changed" >&2; exit 1; }
       id=$(hk "docker image inspect p0-server:$sha --format '{{.Id}}'")
       [ "$id" = "$want" ] || { echo "FAIL: US p0-server:$sha is $id, the transfer checked $want" >&2; exit 1; }
       ts=$(date +%Y%m%dT%H%M%S)
       say "services[\"$US_SERVICE\"].image → p0-server:$sha in $HK:$REMOTE/$US_COMPOSE (a copy first)"
-      # The settings in the file stay byte for byte: only the one JSON string that is services["p0-p0-1"].image is
+      # The settings in the file stay byte for byte: only the one JSON string that is services[$US_SERVICE].image is
       # replaced, it must be in the file once, and the result must parse to the same document but for that field.
       # No key is read, written or printed here.
       hk "cd $REMOTE && cp -p $US_COMPOSE $US_COMPOSE.before-$sha-$ts && python3 - $US_COMPOSE $US_SERVICE $sha" <<'PY' | tee -a "$out/up.txt"
@@ -248,18 +294,18 @@ PY
       src=$(hk "docker inspect --format '{{range .Mounts}}{{if eq .Destination \"/data\"}}{{.Source}}{{end}}{{end}}' $US_SERVICE")
       [ "$src" = "$US_DATA" ] || { echo "FAIL: /data is $src, not $US_DATA" >&2; exit 1; }
       echo "$US_SERVICE healthy, /data = $src"
-      echo "NEXT: send p0-server:$sha / $id to the migration side: their Caddy answers X-P0-Release / X-P0-Image-Config"
+      [ "$TARGET" = preview ] || echo "NEXT: send p0-server:$sha / $id to the migration side: their Caddy answers X-P0-Release / X-P0-Image-Config"
       exit 0 ;;
     verify-internal)
-      say "on $HK: http://127.0.0.1:18090/preview/p0/v1/healthz (the loopback Caddy), with headers"
-      hk "curl -sS -D - http://127.0.0.1:18090/preview/p0/v1/healthz" | tee "$out/internal.txt"
+      say "on $HK: http://127.0.0.1:18090$PREFIX/v1/healthz (the loopback Caddy), with headers"
+      hk "curl -sS -D - http://127.0.0.1:18090$PREFIX/v1/healthz" | tee "$out/internal.txt"
       echo
       exit 0 ;;
     report)
       player="${1:?report <player id> [YYYY-MM-DD]}"; day="${2:-$(date -u +%Y-%m-%d)}"
       [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ && "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad player id or day"; exit 2; }
       say "F2: $player on $day (UTC) — session report, then the day's command and refusal counts"
-      hk "bash -s -- '$player' '$day'" < "$here/p0-report.sh" | tee "$out/report-$player-$day.txt"
+      hk "bash -s -- '$player' '$day' '$US_SERVICE'" < "$here/p0-report.sh" | tee "$out/report-$player-$day.txt"
       exit 0 ;;
   esac
 fi
@@ -372,8 +418,17 @@ PY
     hk "cat $REMOTE/Caddyfile.candidate > /opt/farm/Caddyfile && docker exec $CADDY caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile && echo reloaded"
     ;;
   smoke)
-    say "public smoke at $SITE/preview/p0"
-    P0_BASE="$SITE/preview/p0" P0_KEY="$(key)" "$here/smoke.sh" | tee "$out/smoke.txt"
+    if [ "$TARGET" = preview ]; then
+      # Its key only from fetch-key: secret() would make up a new one the preview server does not know.
+      [ -n "${P0_KEY:-}" ] || [ -s "$repo/output/p0-deploy/preview-key" ] || { echo "no preview key: run --target preview fetch-key first" >&2; exit 1; }
+      pkey="${P0_KEY:-$(tr -d '\n' < "$repo/output/p0-deploy/preview-key")}"
+      say "production healthz before"
+      health before
+    else
+      pkey="$(key)"
+    fi
+    say "public smoke at $SITE$PREFIX"
+    P0_BASE="$SITE$PREFIX" P0_KEY="$pkey" "$here/smoke.sh" | tee "$out/smoke.txt"
     say "Journey and farm healthz after"
     health after
     ;;
@@ -395,7 +450,7 @@ PY
     health rollback
     ;;
   players)
-    say "players by join time (admin, loopback inside p0-p0-1)"
+    say "players by join time (admin, loopback inside $US_SERVICE)"
     admin /admin/players | tee "$out/players.json"; echo
     ;;
   energy)
@@ -420,6 +475,9 @@ PY
     [[ "$v" =~ ^[0-9]{1,10}$ ]] || { echo "versionCode must be a whole number: $v"; exit 2; }
     re_url='^https://[A-Za-z0-9./:_~%?=&-]+$'   # no quotes or spaces: it goes into the JSON body as is
     [[ -z "$url" || "$url" =~ $re_url ]] || { echo "url must be an https link: $url"; exit 2; }
+    # The preview gate's Update must land on the preview APK, never the release one (奕星 11-02).
+    [ "$TARGET" != preview ] || [ -z "$url" ] || [[ "$url" == https://oss2.sensenjoy.cn/p0/demo/preview/* ]] \
+      || { echo "on preview the update url must be under https://oss2.sensenjoy.cn/p0/demo/preview/: $url"; exit 2; }
     say "minimum client versionCode $v${url:+ (update at $url)}; 0 = no minimum"
     if [ -n "$url" ]; then admin /admin/min-version "{\"version\":$v,\"url\":\"$url\"}"; else admin /admin/min-version "{\"version\":$v}"; fi | tee -a "$out/admin.txt"; echo
     ;;
@@ -438,6 +496,6 @@ PY
     ;;
   *)
     sed -n '2,20p' "$0"
-    [ "$TARGET" = us ] && sed -n '/^# --target us/,/^#$/p' "$0"
+    [ "$TARGET" = hk ] || sed -n "/^# --target $TARGET/,/^#\$/p" "$0"
     exit 2 ;;
 esac
