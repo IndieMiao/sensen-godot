@@ -1,0 +1,12 @@
+{
+  "asset": "entry_gate",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [],
+  "changes": [
+    "Separate brick-pier and blank arched plaque module; sign_name runtime anchor; no baked lettering"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "entry_gate_mobile"
+}

@@ -1,0 +1,17 @@
+{
+  "asset": "park_ground",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/grass_clump.glb",
+      "sha256": "857fc2b8fa5d0d3bb19485e3f927b4a8a73f89ac39f185163e2151181a3a1cec"
+    }
+  ],
+  "changes": [
+    "8x8m lawn; farm grass palette, fine colour-only grain"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "park_ground_mobile"
+}

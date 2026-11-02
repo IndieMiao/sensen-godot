@@ -1,0 +1,17 @@
+{
+  "asset": "front_fence",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/deco_fence.glb",
+      "sha256": "4e1ad4403ec5520e15b632735fb92c7268c3932d49112a701767216382657276"
+    }
+  ],
+  "changes": [
+    "Eight source segments; no rescaling or recolouring; centre entry left open"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "front_fence_mobile"
+}

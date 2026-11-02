@@ -1,0 +1,17 @@
+{
+  "asset": "shrub_layer",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/bush.glb",
+      "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+    }
+  ],
+  "changes": [
+    "Grouped farm bushes preserve original linear vertex colour; sized within border"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "shrub_layer_mobile"
+}

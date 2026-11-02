@@ -1,0 +1,442 @@
+{
+  "park_ground": {
+    "asset": "park_ground",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/grass_clump.glb",
+        "sha256": "857fc2b8fa5d0d3bb19485e3f927b4a8a73f89ac39f185163e2151181a3a1cec"
+      }
+    ],
+    "changes": [
+      "8x8m lawn; farm grass palette, fine colour-only grain"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "park_ground_mobile"
+  },
+  "grass_extension": {
+    "asset": "grass_extension",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "One quad, scaled to 60x60m by layout; no floor collider or walkable area outside the original 8x8m park"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "grass_extension_mobile"
+  },
+  "brick_paths": {
+    "asset": "brick_paths",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "Outer ring diameter 6.40m; inner 5.50m; .72m cross and entry path",
+      "Radial white stone centre; SVG ring centre z=0.16m"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "brick_paths_mobile"
+  },
+  "white_fence_segment": {
+    "asset": "white_fence_segment",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_fence.glb",
+        "sha256": "4e1ad4403ec5520e15b632735fb92c7268c3932d49112a701767216382657276"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_fence source parts; scale XYZ (1, 1, 1)",
+      "Palette replacement: none",
+      "Removed: none"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "white_fence_segment_mobile"
+  },
+  "front_fence": {
+    "asset": "front_fence",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_fence.glb",
+        "sha256": "4e1ad4403ec5520e15b632735fb92c7268c3932d49112a701767216382657276"
+      }
+    ],
+    "changes": [
+      "Eight source segments; no rescaling or recolouring; centre entry left open"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "front_fence_mobile"
+  },
+  "green_bench": {
+    "asset": "green_bench",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_bench.glb",
+        "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_bench source parts; scale XYZ (1.261261261261261, 1.0671641791044775, 1)",
+      "Palette replacement: {'wood': '3F7256', 'wood_light': '638D65', 'wood_dark': '345744'}",
+      "Removed: none",
+      "v1.1: width 1.40m; top remapped to .95m above unchanged .715m seat; 0.70m seat-centre spacing"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "green_bench_mobile"
+  },
+  "white_bench": {
+    "asset": "white_bench",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_bench.glb",
+        "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_bench source parts; scale XYZ (0.9369369369369369, 1, 1)",
+      "Palette replacement: {'wood': 'DDCEB8', 'wood_light': 'F4EBD8', 'wood_dark': 'C2BDAA'}",
+      "Removed: none"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "white_bench_mobile"
+  },
+  "bench_farm_control": {
+    "asset": "bench_farm_control",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_bench.glb",
+        "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_bench source parts; scale XYZ (1, 1, 1)",
+      "Palette replacement: none",
+      "Removed: none"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "bench_farm_control_mobile"
+  },
+  "fountain": {
+    "asset": "fountain",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_fountain.glb",
+        "sha256": "38357c007890ac81b39587bac073d43d441cc05e13d92ea0f42fa6d5484561be"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_fountain source parts; scale XYZ (1, 1, 1)",
+      "Palette replacement: none",
+      "Removed: ('still water',)"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "fountain_mobile"
+  },
+  "fountain_water": {
+    "asset": "fountain_water",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "modules/ponds/pond_water.gdshader",
+        "sha256": "523b4067b2784699ea4189d5656951fd6e454baa7400b2fc688624d799ff94e5"
+      }
+    ],
+    "changes": [
+      "Existing pond shader, unchanged; two basin surfaces and eight short streams",
+      "No new shader; shared flow, ripple and caustic textures retained"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "fountain_water_mobile"
+  },
+  "parterre_hedge": {
+    "asset": "parterre_hedge",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "Four repeated three-lobed clipped beds; main-image silhouette overrides SVG placeholders",
+      "Height .35m; per-quadrant footprint measured from final vertices"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "parterre_hedge_mobile"
+  },
+  "parterre_flowers": {
+    "asset": "parterre_flowers",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/rooms/_shared/plants/source/build_plants.py",
+        "sha256": "5aff279cb6b41ce800ef61a54ea4ff5fef982ffa6dea44ce3439e86c65383ff9"
+      }
+    ],
+    "changes": [
+      "Shared small five-petal botanical vocabulary; red/yellow/ivory palette and compact planting"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "parterre_flowers_mobile"
+  },
+  "rose_arch": {
+    "asset": "rose_arch",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_pergola.glb",
+        "sha256": "52688e3ae1ee33de34bff061e35009da1f518d46286ad4db2b3dc28be12a0b62"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_pergola source parts; scale XYZ (0.88, 0.79, 0.55)",
+      "Palette replacement: {'wood': 'E7DDC9', 'wood_light': 'F5ECD9'}",
+      "Removed: ('load bearing', 'roof', 'climbing', 'attached', 'paired', 'post flower')",
+      "Flat roof replaced by 2.45m rounded two-rib rose arch; rear white bench is decorative"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "rose_arch_mobile"
+  },
+  "park_lamp": {
+    "asset": "park_lamp",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "New 2.20m slim lamp, not enlarged deco_lantern; four placed instances"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "park_lamp_mobile"
+  },
+  "birdbath": {
+    "asset": "birdbath",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/deco_birdbath.glb",
+        "sha256": "2372a9eeccd20c6304513978934698b51167119b6909aa4bb1a8272461c93010"
+      },
+      {
+        "file": "tools/art/source/decor_290/decor_290.blend",
+        "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+      }
+    ],
+    "changes": [
+      "Editable deco_birdbath source parts; scale XYZ (1, 1, 1)",
+      "Palette replacement: none",
+      "Removed: none"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "birdbath_mobile"
+  },
+  "green_bin": {
+    "asset": "green_bin",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "New reference-matched green bin; no farm bin asset found in wp-3d-scene or farm-dev inventory"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "source_decision": "Shangguan confirmed New in Plane SGODOT-320 comment 77a66827-4aaa-4e0d-8dd5-c34bec3dead3",
+    "mesh_name": "green_bin_mobile"
+  },
+  "entry_gate": {
+    "asset": "entry_gate",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "Separate brick-pier and blank arched plaque module; sign_name runtime anchor; no baked lettering"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "entry_gate_mobile"
+  },
+  "park_tree": {
+    "asset": "park_tree",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/tree_0.glb",
+        "sha256": "3bfffa86739891eb564a621c9a91cccd36626efd5794a49030ce7ed78a4a511c"
+      }
+    ],
+    "changes": [
+      "Actual GLB geometry and linear vertex colour retained, then atlas baked"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "park_tree_mobile"
+  },
+  "bush_control": {
+    "asset": "bush_control",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/bush.glb",
+        "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+      }
+    ],
+    "changes": [
+      "Actual GLB geometry and linear vertex colour retained, then atlas baked"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "bush_control_mobile"
+  },
+  "front_shrub": {
+    "asset": "front_shrub",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/bush.glb",
+        "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+      }
+    ],
+    "changes": [
+      "v1.1: replace the two entrance-side trees with rounded bushes; measured top .90m; other four trees unchanged",
+      "v1.2: one simple box collider from actual transformed source vertices; shared by both entrance instances"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "front_shrub_mobile"
+  },
+  "backdrop_shrubs": {
+    "asset": "backdrop_shrubs",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/bush.glb",
+        "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+      }
+    ],
+    "changes": [
+      "v1.2: 21 low overlapping farm bushes, merged into one surface in the same N5 atlas",
+      "Decorative noncolliding row follows village card yaw at radius 5.9m, .2m in front of card; no shadows"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "backdrop_shrubs_mobile"
+  },
+  "shrub_layer": {
+    "asset": "shrub_layer",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/bush.glb",
+        "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+      }
+    ],
+    "changes": [
+      "Grouped farm bushes preserve original linear vertex colour; sized within border"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "shrub_layer_mobile"
+  },
+  "boundary_hedge": {
+    "asset": "boundary_hedge",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [],
+    "changes": [
+      "Main-reference clipped boundary; #406D35; corners stay inside 8m footprint"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "boundary_hedge_mobile"
+  },
+  "rear_topiary": {
+    "asset": "rear_topiary",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "assets/farm/art/bush.glb",
+        "sha256": "86bfd484a6a582c2a46862f517829207f0caf26e986c750d4e5c446f5836283f"
+      }
+    ],
+    "changes": [
+      "Compact six-tier clipped form in farm leaf palette; new silhouette"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "rear_topiary_mobile"
+  },
+  "village_backdrop": {
+    "asset": "village_backdrop",
+    "author": "Huangzhong",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "sources": [
+      {
+        "file": "tools/art/source/poi_city_park/reference/SGODOT-314_City_Park_Main_2026-10-31.png",
+        "sha256": "fe2133e33dd442b31862afc334f8e236dc286d64c085eece1608c8ceb9639834"
+      }
+    ],
+    "changes": [
+      "Approved main distant village/sky crop only; single noncolliding card, folded into same N5 atlas"
+    ],
+    "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+    "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+    "mesh_name": "village_backdrop_mobile"
+  }
+}

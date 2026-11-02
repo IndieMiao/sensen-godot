@@ -1,0 +1,23 @@
+{
+  "asset": "bench_farm_control",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "assets/farm/art/deco_bench.glb",
+      "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599"
+    },
+    {
+      "file": "tools/art/source/decor_290/decor_290.blend",
+      "sha256": "9c8dcdb4387684c6bb1faa8ea2c08236d3db56f95a3c7d70e1af6d52a8e9d847"
+    }
+  ],
+  "changes": [
+    "Editable deco_bench source parts; scale XYZ (1, 1, 1)",
+    "Palette replacement: none",
+    "Removed: none"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "bench_farm_control_mobile"
+}

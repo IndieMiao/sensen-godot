@@ -1,0 +1,94 @@
+[
+  {
+    "file": "SGODOT-320_N5_v1_default_43deg_360.png",
+    "bytes": 252216,
+    "sha256": "83f35d8b976e6081657f22081aef8dd0b0fbb11eec9474db4b2432379a657fd9",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      900
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_default_safe_bands.png",
+    "bytes": 254474,
+    "sha256": "311ef7bea1512e08a7db0876cb76242b683c26a1302e95a32b06206ec62191d0",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      900
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_panorama.png",
+    "bytes": 948357,
+    "sha256": "b322d08063004619d9b8080dab0ec26bbe3cf6a3d118f8b91882d8401db8807b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1400,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_topdown.png",
+    "bytes": 751356,
+    "sha256": "8e5252b08ffd01189ec8ece590bbf5e407764851beef3ec9ee5a68ea60e06dd7",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1100,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_fountain_detail.png",
+    "bytes": 788600,
+    "sha256": "5a5e3869cb84f6b51b2429dce1ef4b6987268e96449c98f98ae3e76ea21bb157",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1000
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_parterre_detail.png",
+    "bytes": 731932,
+    "sha256": "6ce2ef0f76f1da62cfefcada06ba6e893e941a192a1b929b4440b32dcf853dfd",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1000
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_reference_comparison.png",
+    "bytes": 1605401,
+    "sha256": "191b9650e6325ddc13b3eea05339c7acc226353dfd99e4c3061a278968daf0a3",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1700,
+      813
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_farm_atlas_comparison.png",
+    "bytes": 294033,
+    "sha256": "0d9c7ae7e8c8ccfbdc409ee119f7c4ea4ac5e4353174cc21501c960b17e9b0cf",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1120,
+      1915
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1_validation.json",
+    "bytes": 181942,
+    "sha256": "0092b940888ca00f0b10c0057fb6504d4b62cd5d35bc955058fafc84efe22163",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-320_N5_v1_asset_table.md",
+    "bytes": 1933,
+    "sha256": "998b284ceef71ebc94e6b0d968e16e0cc9ba9d48d6546c8498fd4bf9524b7be5",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

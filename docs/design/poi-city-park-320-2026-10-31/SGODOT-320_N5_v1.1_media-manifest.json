@@ -1,0 +1,64 @@
+[
+  {
+    "file": "SGODOT-320_N5_v1.1_default_43deg_360.png",
+    "bytes": 245883,
+    "sha256": "79ee4f83726ca734f10658a617b705b94204a55750658cbb972fbad84b258ae2",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      900
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1.1_default_safe_bands.png",
+    "bytes": 247285,
+    "sha256": "6e62a019baa2cf6edc3c099bec2582fcca988c6b3bbbe82881197885a49b9e55",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      900
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1.1_panorama.png",
+    "bytes": 914099,
+    "sha256": "e43143afddd7e8c100f716627455f2d832a7069c451da7fdae66cf07cd13b7e6",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1400,
+      1200
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1.1_minimum_zoom_360.png",
+    "bytes": 207411,
+    "sha256": "0cc9c557869cd079d30f3d0d1c55b744115c45fae6b43db07b76dbaaacafa057",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      900
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1.1_bench_seated_detail.png",
+    "bytes": 533225,
+    "sha256": "3f877e97921f977eecf9f70a7962295f21a9f84c7b7518bad6d15787a1ab2b1f",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1100,
+      950
+    ]
+  },
+  {
+    "file": "SGODOT-320_N5_v1.1_validation.json",
+    "bytes": 199090,
+    "sha256": "415c047a5edf9688b79137a48a1acd76b90b13b1fb0e37f14431744fe787253d",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-320_N5_v1.1_asset_table.md",
+    "bytes": 2203,
+    "sha256": "4fe860ebfb1e0b9bcc7e325651c9d9cc18b69ad6a6de56c8999c035f40047b73",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

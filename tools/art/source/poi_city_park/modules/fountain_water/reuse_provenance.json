@@ -1,0 +1,18 @@
+{
+  "asset": "fountain_water",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "sources": [
+    {
+      "file": "modules/ponds/pond_water.gdshader",
+      "sha256": "523b4067b2784699ea4189d5656951fd6e454baa7400b2fc688624d799ff94e5"
+    }
+  ],
+  "changes": [
+    "Existing pond shader, unchanged; two basin surfaces and eight short streams",
+    "No new shader; shared flow, ripple and caustic textures retained"
+  ],
+  "atlas": "A: emission bake into N5 shared 2048x2048 atlas",
+  "coordinates": "metres, Y up, +Z front; geometry baked at unit scale",
+  "mesh_name": "fountain_water_mobile"
+}
