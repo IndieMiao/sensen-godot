@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse
 import json
 import struct
+import subprocess
 import numpy as np
 
 HERE=Path(__file__).resolve().parent
@@ -47,7 +48,23 @@ check(np.ptp(colors[:,:3])>.5,"authored face and body colors present")
 bounds=[vertices.min(axis=0).tolist(),vertices.max(axis=0).tolist()]
 size=vertices.max(axis=0)-vertices.min(axis=0)
 check(abs(bounds[0][1])<.00001 and abs(size[1]-spec["height"])<.0001,"foot origin and JSON height match")
-check(.98<size[0]<1.08 and .66<size[2]<.75 and .40<size[1]<.48,"agreed approximate proportions including feet")
+check(size[0]<=1.10 and .94<size[2]<1.15 and .42<size[1]<.52,"formal proportions and total width limit")
+def rgb(code):
+    values=np.array([int(code[i:i+2],16)/255 for i in [0,2,4]])
+    return np.where(values<=.04045,values/12.92,((values+.055)/1.055)**2.4)
+shell_mask=np.zeros(len(vertices),dtype=bool)
+for role in ["shell","rim","bump"]:
+    shell_mask |= np.all(np.abs(colors[:,:3]-rgb(spec["palette"][role]))<.002,axis=1)
+dominant=joints[np.arange(len(vertices)),weights.argmax(axis=1)]
+shell_mask &= dominant==names.index("body")
+shell_vertices=vertices[shell_mask]
+shell_size=shell_vertices.max(axis=0)-shell_vertices.min(axis=0)
+check(abs(shell_size[0]-.82)<.01 and abs(shell_size[2]-.98)<.01,"formal carapace with orange rim .82 x .98 m")
+radius=float(np.max(np.linalg.norm(vertices[:,[0,2]],axis=1)))
+check(radius<=spec["radius"] and spec["radius"]-radius<.011,"collision radius covers measured resting footprint")
+baseline=json.loads(subprocess.check_output(["git","show","bf5279c3:assets/monsters/mob_rock_beetle/mob_rock_beetle.json"],cwd=args.runtime))
+check(spec["durations"]==baseline["durations"] and spec["hit_at"]==baseline["hit_at"],"approved action timings and contact event unchanged")
+check(set(names)=={"root","body","head","ant_l","ant_r","leg_l_1","leg_l_2","leg_l_3","leg_r_1","leg_r_2","leg_r_3"},"approved 11 bone names unchanged")
 root=next(i for i,node in enumerate(doc["nodes"]) if node["name"]=="root")
 anims={anim["name"]:anim for anim in doc["animations"]}
 check(set(anims)==set(spec["anims"]),"exact eight animation names")
@@ -70,6 +87,7 @@ for name,anim in anims.items():
     if spec["anims"][name]["loop"]: check(seamless,name+" loop endpoints match")
     loops[name]={"root_static":bool(stable),"loop_endpoints_match":bool(seamless)}
 report={"checks":checks,"passed":all(c["passed"] for c in checks),"triangles":triangles,"bounds":bounds,"size_xyz":size.tolist(),
+    "shell_size_xyz":shell_size.tolist(),"measured_radius":radius,"metadata_radius":spec["radius"],
     "width_vs_slime_diameter":float(size[0]/.8),"bones":names,"animations":loops,
     "runtime_glb_sha256":__import__("hashlib").sha256(raw).hexdigest()}
 (ROOT/"output/rock-beetle-355/glb-validation.json").write_text(json.dumps(report,indent=2)+"\n")

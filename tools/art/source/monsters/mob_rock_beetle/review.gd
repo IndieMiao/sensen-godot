@@ -51,6 +51,25 @@ func poses() -> Array:
 	for i in skeleton.get_bone_count(): result.append(skeleton.get_bone_global_pose(i))
 	return result
 
+func skinned_bounds(only_feet := false) -> AABB:
+	var arrays: Array=mesh.mesh.surface_get_arrays(0)
+	var transforms: Array[Transform3D]=[]
+	for i in mesh.skin.get_bind_count():
+		var bone:=mesh.skin.get_bind_bone(i)
+		if bone<0: bone=skeleton.find_bone(mesh.skin.get_bind_name(i))
+		transforms.append(skeleton.get_bone_global_pose(bone)*mesh.skin.get_bind_pose(i))
+	var bounds:=AABB()
+	var first:=true
+	for i in arrays[Mesh.ARRAY_VERTEX].size():
+		var v: Vector3=arrays[Mesh.ARRAY_VERTEX][i]
+		if only_feet and v.y>.055: continue
+		for j in 4:
+			if arrays[Mesh.ARRAY_WEIGHTS][i*4+j]<.5: continue
+			var p: Vector3=transforms[arrays[Mesh.ARRAY_BONES][i*4+j]]*v
+			if first: bounds=AABB(p,Vector3.ZERO);first=false
+			else: bounds=bounds.expand(p)
+	return bounds
+
 func difference(a: Array, b: Array) -> float:
 	var result := 0.0
 	for i in a.size():
@@ -114,15 +133,28 @@ func validate() -> void:
 		check((clip.loop_mode==Animation.LOOP_LINEAR)==bool(data.get("loop",false)),name_+" loop matches JSON")
 		var snapshots := []
 		var stable_root := true
+		var floor_min := INF
 		for t in [0.0,.25,.5,.75,.999]:
 			apply_pose(name_,t*clip.length)
 			snapshots.append(poses())
 			stable_root = stable_root and skeleton.get_bone_global_pose(root_i).is_equal_approx(root_pose)
+			floor_min=minf(floor_min,skinned_bounds().position.y)
 		var movement := 0.0
 		for p in snapshots: movement=maxf(movement,difference(snapshots[0],p))
 		check(movement>.002,name_+" changes bone poses")
 		check(stable_root and model.position==Vector3.ZERO,name_+" has no root motion")
-		report.animations[name_]={"length":clip.length,"loop":clip.loop_mode==Animation.LOOP_LINEAR,"pose_delta":movement,"root_static":stable_root}
+		check(floor_min>=-.012,name_+" stays above floor within 12 mm contact tolerance")
+		report.animations[name_]={"length":clip.length,"loop":clip.loop_mode==Animation.LOOP_LINEAR,"pose_delta":movement,"root_static":stable_root,"floor_min_y":floor_min}
+	var body_index:=skeleton.find_bone("body")
+	apply_pose("idle",0)
+	var rest_y:=skeleton.get_bone_global_pose(body_index).origin.y
+	report.stunned_samples=[]
+	for t in [0.0,.25,.5,.75]:
+		apply_pose("stunned",t)
+		var pose:=skeleton.get_bone_global_pose(body_index)
+		report.stunned_samples.append({"time":t,"drop_m":rest_y-pose.origin.y,
+			"roll_degrees":rad_to_deg(atan2(pose.basis.x.y,pose.basis.x.x)),"feet_min_y":skinned_bounds(true).position.y})
+	check(report.stunned_samples.all(func(s):return s.drop_m>=.04 and s.feet_min_y>.10),"stunned sinks the body and lifts all feet")
 	check(float(spec.anims.windup.length)>=.4 and float(spec.anims.windup.length)<=.7,"readable windup window")
 	check(float(spec.anims.attack.hit_at)>0 and float(spec.anims.attack.hit_at)<float(spec.anims.attack.length),"attack hit time inside clip")
 	var config := ConfigFile.new()
@@ -130,6 +162,7 @@ func validate() -> void:
 	var uid := str(config.get_value("remap","uid",""))
 	check(uid.begins_with("uid://") and ResourceUID.has_id(ResourceUID.text_to_id(uid)),"Godot-generated UID resolves")
 	check(config.get_value("params","gltf/texture_map_mode",-1)==1,"texture map mode one")
+	check(config.get_value("params","animation/remove_immutable_tracks",true)==false,"static tracks retained for transitions")
 	report.uid=uid
 
 func run() -> void:
@@ -186,6 +219,7 @@ func run() -> void:
 		var t: float = spec.anims[name_].length*.45
 		if name_=="attack": t=float(spec.anims[name_].hit_at)
 		if name_=="die": t=float(spec.anims[name_].length)
+		if name_=="stunned": t=.25
 		apply_pose(name_,t)
 		await save_view("action_"+name_)
 	for i in 4:
@@ -229,12 +263,15 @@ func mine_view() -> void:
 	var art = load("res://modules/mining/mine_art.gd")
 	var mine: Node3D = art.floor_scenery(3,true)
 	world.add_child(mine)
+	var red_mine: Node3D = art.floor_scenery(1,true)
+	world.add_child(red_mine)
+	red_mine.visible=false
 	model.position=Vector3(4.2,0,-3.2)
-	BlobShadow.attach(model,.45)
+	BlobShadow.attach(model,float(spec.radius))
 	var combat = load("res://modules/mining/mine_combat.gd").new()
 	world.add_child(combat)
 	var slime: Node3D = combat._slime({"radius":.4},false)
-	world.add_child(slime);slime.position=Vector3(5.4,0,-3.2)
+	world.add_child(slime);slime.position=Vector3(5.05,0,-4.05)
 	for n in ["Health","HealthFill","HealthTrack","Warning"]: slime.get_node(n).visible=false
 	var avatar = get_node("/root/Avatar")
 	var rig = avatar.create_rig()
@@ -244,7 +281,7 @@ func mine_view() -> void:
 	world.add_child(rig)
 	var oa=load("res://modules/net/online_appearance.gd")
 	rig.apply_config(oa.config({"version":1,"slots":{"hairHat":"hairhat1","cloth":"cloth1","shoes":"shoes1"}},true))
-	rig.position=Vector3(3.0,0,-3.2)
+	rig.position=Vector3(3.35,0,-2.35)
 	var frames:=0
 	while rig.is_busy() and frames<240:
 		frames+=1;await get_tree().process_frame
@@ -259,8 +296,50 @@ func mine_view() -> void:
 	sun.shadow_opacity=.58;sun.shadow_bias=.04;sun.shadow_normal_bias=.45
 	sun.directional_shadow_mode=DirectionalLight3D.SHADOW_ORTHOGONAL
 	aim(Vector3(4.2,.45,-3.2),6.72,45,43)
-	vp.size=Vector2i(360,800)
-	await save_view("mine_360")
-	vp.size=Vector2i(720,1600)
-	await save_view("mine_720")
-	report.mine={"floor":3,"renderer_source":"Unmodified farm-dev MineArt + MineCombat slime + Avatar rig","camera_pitch":43,"camera_width":6.72,"slime_radius":.4,"beetle_radius":.45}
+	report.mine={"floors":[1,3],"renderer_source":"Unmodified farm-dev MineArt + MineCombat slime + Avatar rig","camera_pitch":43,"camera_width":6.72,"slime_radius":.4,"beetle_radius":spec.radius,"samples":{}}
+	for row in [["red",true],["purple",false]]:
+		red_mine.visible=row[1]
+		mine.visible=not row[1]
+		vp.size=Vector2i(360,800)
+		await save_view("mine_"+row[0]+"_360")
+		var shell_pixel:=camera.unproject_position(mesh.to_global(shell_sample()))
+		var floor_pixel:=camera.unproject_position(model.position+Vector3(.8,.025,.6))
+		report.mine.samples[row[0]]={"shell_pixel":[shell_pixel.x,shell_pixel.y],"floor_pixel":[floor_pixel.x,floor_pixel.y]}
+		vp.size=Vector2i(720,1600)
+		await save_view("mine_"+row[0]+"_720")
+	if "--video" in OS.get_cmdline_user_args(): await animation_video()
+
+func shell_sample() -> Vector3:
+	var arrays: Array=mesh.mesh.surface_get_arrays(0)
+	var vertices: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+	var indices: PackedInt32Array=arrays[Mesh.ARRAY_INDEX]
+	var origin:=Vector3(-.13,1,-.04)
+	var best:=Vector3(-.13,0,-.04)
+	for i in range(0,indices.size(),3):
+		var hit=Geometry3D.ray_intersects_triangle(origin,Vector3.DOWN,vertices[indices[i]],vertices[indices[i+1]],vertices[indices[i+2]])
+		if hit is Vector3 and hit.y>best.y: best=hit
+	return best
+
+func animation_video() -> void:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT+"video"))
+	var label:=Label.new()
+	label.add_theme_font_size_override("font_size",30)
+	label.position=Vector2(24,26)
+	label.add_theme_color_override("font_color",Color.WHITE)
+	label.add_theme_color_override("font_outline_color",Color("26232A"))
+	label.add_theme_constant_override("outline_size",6)
+	vp.add_child(label)
+	var sequence: Array=[["idle",1.6],["windup",.6],["attack",.4],["stunned",2.0],["recover",.5],["hit",.25],["die",.8]]
+	var index:=0
+	for row in sequence:
+		label.text="Rock Beetle v1 | "+str(row[0])+" | ZHAOYUN"
+		for frame in roundi(float(row[1])*24):
+			var sample:=float(frame)/24
+			if row[0]=="stunned": sample=fmod(sample,1.0)
+			apply_pose(row[0],sample)
+			await get_tree().process_frame
+			RenderingServer.force_draw(true)
+			vp.get_texture().get_image().save_png(OUT+"video/frame_%04d.png"%index)
+			index+=1
+	report.video={"fps":24,"frames":index,"size":[720,1600],"sequence":sequence,"scope":"Authored in-place animation preview; displacement and combat remain program-owned."}
+	label.queue_free()

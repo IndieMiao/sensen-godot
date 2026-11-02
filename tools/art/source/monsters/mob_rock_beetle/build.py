@@ -1,4 +1,4 @@
-"""SGODOT-355 editable rigid-skinned rock beetle graybox, Godot metres and +Z front."""
+"""SGODOT-355 rock beetle formal v1, preserving the approved animation interface."""
 from pathlib import Path
 import argparse
 import json
@@ -8,6 +8,7 @@ import sys
 import bpy
 import bmesh
 from mathutils import Matrix, Vector
+from mathutils.bvhtree import BVHTree
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
@@ -24,14 +25,14 @@ ANIMS = {
     "die": {"length": .8, "loop": False},
     "stunned": {"length": 1.0, "loop": True},
 }
-COLORS = {"shell": "B78B70", "belly": "A47B62", "head": "C9A087", "leg": "AB826B",
-    "rim": "F5AA39", "bump": "C3977C", "horn": "F3E6D5", "eye": "26252D",
-    "glint": "FFF8EA", "cheek": "F2A0B4", "mouth": "785547"}
+COLORS = {"shell": "685B59", "belly": "514744", "head": "A18B7D", "leg": "7E6A5F",
+    "rim": "F2A13C", "bump": "85746B", "horn": "F3E6D5", "eye": "26252D",
+    "glint": "FFF8EA", "cheek": "E49AAD", "mouth": "654D48"}
 BONES = {"root": ((0, 0, 0), None), "body": ((0, .20, 0), "root"),
-    "head": ((0, .235, .27), "body"), "ant_l": ((-.105, .32, .35), "head"),
-    "ant_r": ((.105, .32, .35), "head")}
-for side, x in [("l", -.27), ("r", .27)]:
-    for i, z in enumerate([.20, 0, -.20], 1): BONES[f"leg_{side}_{i}"] = ((x, .17, z), "body")
+    "head": ((0, .24, .38), "body"), "ant_l": ((-.105, .333, .422), "head"),
+    "ant_r": ((.105, .333, .422), "head")}
+for side, x in [("l", -.275), ("r", .275)]:
+    for i, z in enumerate([.25, -.03, -.29], 1): BONES[f"leg_{side}_{i}"] = ((x, .175, z), "body")
 
 
 def point(p): return Vector((p[0], -p[2], p[1]))
@@ -103,8 +104,8 @@ def tube(name, points, radii, bone, color, tint=1, sides=6):
     return mesh(name, verts, faces, bone, color, tint)
 
 
-def face_disc(name, at, radii, color, segments):
-    verts = [at] + [(at[0]+radii[0]*math.cos(i*math.tau/segments),
+def face_disc(name, at, radii, color, segments, depth=0):
+    verts = [(at[0],at[1],at[2]+depth)] + [(at[0]+radii[0]*math.cos(i*math.tau/segments),
         at[1]+radii[1]*math.sin(i*math.tau/segments), at[2]) for i in range(segments)]
     return mesh(name, verts, [(0,i+1,(i+1)%segments+1) for i in range(segments)], "head", color, 0)
 
@@ -112,62 +113,67 @@ def face_disc(name, at, radii, color, segments):
 def shell():
     # Two dome halves leave a narrow longitudinal seam over the darker abdomen.
     for sign, start in [(1, -math.pi/2), (-1, math.pi/2)]:
-        verts = [(sign*.004, .447, -.025)]
-        n = 10
-        for ring in range(1, 5):
-            theta = ring * math.pi / 8
+        verts = [(sign*.003, .51, -.04)]
+        n = 12
+        for ring in range(1, 6):
+            theta = ring * math.pi / 10
             for j in range(n+1):
                 phi = start + j * math.pi / n
-                verts.append((sign*.004 + .358*math.sin(theta)*math.cos(phi),
-                    .205 + .242*math.cos(theta), -.025 + .315*math.sin(theta)*math.sin(phi)))
+                base = .225 + .085*max(0,math.sin(phi))**4
+                verts.append((sign*.003 + .37*math.sin(theta)*math.cos(phi),
+                    base + (.51-base)*math.cos(theta), -.04 + .455*math.sin(theta)*math.sin(phi)))
         faces = [(0, 1+j, 2+j) for j in range(n)]
-        for ring in range(3):
+        for ring in range(4):
             a = 1 + ring*(n+1); b = a+n+1
             faces += [(a+j,b+j,b+j+1,a+j+1) for j in range(n)]
         mesh("Carapace_" + ("R" if sign > 0 else "L"), verts, faces, "body", "shell")
     seam = []
-    for i in range(9):
-        a = -math.pi/2+i*math.pi/8
-        for x in [-.016,.016]: seam.append((x,.202+.242*math.cos(a),-.025+.315*math.sin(a)))
-    mesh("Recessed brown shell seam",seam,[(i*2,i*2+1,i*2+3,i*2+2) for i in range(8)],"body","belly")
+    for i in range(11):
+        a = -math.pi/2+i*math.pi/10
+        base = .31 if a>0 else .225
+        for x in [-.016,.016]: seam.append((x,base+(.51-base)*math.cos(a)-.003,-.04+.455*math.sin(a)))
+    mesh("Recessed brown shell seam",seam,[(i*2,i*2+1,i*2+3,i*2+2) for i in range(10)],"body","belly")
     verts = []
-    for i in range(28):
-        a = i*math.tau/28
-        for j in range(4):
-            b = j*math.tau/4
-            verts.append(((.36 + .023*math.cos(b))*math.cos(a),
-                .205 + .021*math.sin(b), -.025 + (.315 + .023*math.cos(b))*math.sin(a)))
-    faces = [(i*4+j, ((i+1)%28)*4+j, ((i+1)%28)*4+(j+1)%4, i*4+(j+1)%4) for i in range(28) for j in range(4)]
+    for i in range(24):
+        a = i*math.tau/24
+        for j in range(6):
+            b = j*math.tau/6
+            verts.append(((.375 + .035*math.cos(b))*math.cos(a),
+                .225 + .085*max(0,math.sin(a))**4 + .041*math.sin(b), -.04 + (.455 + .035*math.cos(b))*math.sin(a)))
+    faces = [(i*6+j, ((i+1)%24)*6+j, ((i+1)%24)*6+(j+1)%6, i*6+(j+1)%6) for i in range(24) for j in range(6)]
     mesh("Bright orange shell rim", verts, faces, "body", "rim", 0)
-    for i, at in enumerate([(-.21,.389,-.10),(.20,.392,-.12),(-.29,.309,.13),(.29,.31,.12)]):
-        ellipsoid("Rounded shell bump %d" % i, at, (.045,.019,.043), "body", "bump", segments=8, rings=4)
+    shells=[BVHTree.FromPolygons([v.co for v in obj.data.vertices],[list(f.vertices) for f in obj.data.polygons])
+        for obj in PARTS if obj.name.startswith("Carapace_")]
+    for i, (x,z) in enumerate([(-.205,-.15),(.20,-.12),(.275,.14)]):
+        hits=[tree.ray_cast(point((x,1,z)),Vector((0,0,-1)),2)[0] for tree in shells]
+        height=max(hit.z for hit in hits if hit is not None)
+        ellipsoid("Rounded shell bump %d" % i, (x,height+.007,z), (.047,.022,.053), "body", "bump", segments=8, rings=3)
 
 
 def form():
     shell()
-    ellipsoid("Low abdomen", (0,.185,-.015), (.335,.095,.28), "body", "belly", segments=10, rings=6)
-    ellipsoid("Tucked forward face", (0,.235,.277), (.172,.116,.134), "head", "head", 0, 12, 6)
-    tube("Single upward ivory horn", [(0,.243,.402),(0,.285,.427),(0,.351,.440),(0,.414,.428)],
-        [.046,.041,.024,.007], "head", "horn", 0, 8)
+    ellipsoid("Low abdomen", (0,.18,-.035), (.32,.095,.38), "body", "belly", segments=10, rings=6)
+    ellipsoid("Tucked forward face", (0,.24,.385), (.172,.118,.13), "head", "head", 0, 12, 6)
+    tube("Single upward ivory horn", [(0,.255,.50),(0,.30,.537),(0,.38,.54),(0,.45,.525)],
+        [.046,.041,.024,.008], "head", "horn", 0, 10)
     for side, sign in [("l",-1),("r",1)]:
-        ellipsoid("Black eye "+side, (sign*.092,.258,.391), (.024,.030,.012), "head", "eye", 0, 8, 4)
-        face_disc("Eye glint "+side, (sign*.092-.005,.268,.405), (.008,.009), "glint", 8)
-        face_disc("Pink cheek "+side, (sign*.129,.217,.372), (.027,.014), "cheek", 12)
-        tube("Short antenna "+side, [(sign*.105,.32,.35),(sign*.118,.359,.372),(sign*.135,.398,.373)],
-            [.009,.008,.007], "ant_"+side, "leg", sides=5)
-        ellipsoid("Antenna round tip "+side, (sign*.135,.398,.373), (.018,.020,.018), "ant_"+side, "bump", segments=6, rings=4)
-        for i, z in enumerate([.20,0,-.20],1):
-            sweep = [.065,0,-.06][i-1]
+        face_disc("Black eye "+side, (sign*.097,.266,.501), (.026,.032), "eye", 12, .012)
+        face_disc("Eye glint "+side, (sign*.097-.005,.276,.512), (.008,.009), "glint", 8)
+        face_disc("Pink cheek "+side, (sign*.133,.226,.474), (.027,.014), "cheek", 12)
+        tube("Short antenna "+side, [(sign*.105,.333,.422),(sign*.12,.378,.438),(sign*.142,.43,.44)],
+            [.015,.014,.012], "ant_"+side, "leg", sides=6)
+        ellipsoid("Antenna round tip "+side, (sign*.142,.43,.44), (.028,.028,.028), "ant_"+side, "bump", segments=8, rings=3)
+        for i, z in enumerate([.25,-.03,-.29],1):
+            sweep = [.025,0,-.025][i-1]
             tube("Jointed leg %s%d"%(side,i),
-                [(sign*.27,.17,z),(sign*.335,.153,z+sweep*.4),(sign*.414,.095,z+sweep),
-                 (sign*.468,.030,z+sweep*1.3),(sign*.478,.019,z+sweep*1.35)],
-                [.032,.040,.032,.021,.008], f"leg_{side}_{i}", "leg", sides=6)
-    tube("Small smile", [(-.027,.198,.397),(0,.190,.408),(.027,.198,.397)],
+                [(sign*.275,.175,z),(sign*.35,.19,z+sweep*.4),(sign*.408,.118,z+sweep),
+                 (sign*.438,.038,z+sweep*1.3),(sign*.448,.023,z+sweep*1.35)],
+                [.045,.057,.046,.03,.012], f"leg_{side}_{i}", "leg", sides=6)
+    tube("Small smile", [(-.027,.207,.505),(0,.199,.513),(.027,.207,.505)],
         [.003,.003,.003], "head", "mouth", 0, 5)
 
 
 def rig():
-    for obj in PARTS: obj.data.transform(Matrix.Diagonal((1.075, .85, 1, 1)))
     ground = min(v.co.z for o in PARTS for v in o.data.vertices)
     for obj in PARTS:
         for v in obj.data.vertices: v.co.z -= ground
@@ -181,8 +187,6 @@ def rig():
     for name, (at, parent) in BONES.items():
         bone = data.edit_bones.new(name)
         bone.head = point(at) - Vector((0,0,ground if name != "root" else 0))
-        bone.head.x *= 1.075
-        bone.head.y *= .85
         bone.tail = bone.head + Vector((0,0,.06))
         if parent: bone.parent = data.edit_bones[parent]
         bone.use_deform = True
@@ -217,38 +221,57 @@ def pose(arm, name, t):
                 leg.rotation_euler.z = max(0,math.sin(a))*.13*sign
     elif name == "windup":
         body.location.y = -.026*t
-        body.rotation_euler.x = -.10*t
-        head.rotation_euler.x = -.15*t
+        body.rotation_euler.x = .10*t
+        head.rotation_euler.x = .15*t
         for side, sign in [("l",-1),("r",1)]:
             arm.pose.bones["leg_"+side+"_1"].rotation_euler.y = math.sin(t*math.tau*2)*.24*sign
             arm.pose.bones["ant_"+side].rotation_euler.x = -.18*t
+            for i,z in enumerate([.25,-.03,-.29],1):
+                arm.pose.bones[f"leg_{side}_{i}"].location.y = (.026+max(0,z)*.10)*t
     elif name == "attack":
         body.location.y = -.025*(1-t)
-        body.rotation_euler.x = -.1*(1-t)
-        head.rotation_euler.x = -.24*math.sin(t*math.pi)
+        body.rotation_euler.x = .1*(1-t)
+        head.rotation_euler.x = .15*(1-t)+.24*math.sin(t*math.pi)
         for side, sign in [("l",-1),("r",1)]:
-            for i in range(1,4): arm.pose.bones[f"leg_{side}_{i}"].rotation_euler.y = .13*sign*math.sin(t*math.pi)
+            for i,z in enumerate([.25,-.03,-.29],1):
+                arm.pose.bones[f"leg_{side}_{i}"].rotation_euler.y = .13*sign*math.sin(t*math.pi)
+                arm.pose.bones[f"leg_{side}_{i}"].location.y = (.025+max(0,z)*.10)*(1-t)
     elif name == "recover":
-        body.location.y = -.025*(1-t)
-        head.rotation_euler.x = .11*math.sin(t*math.pi)
+        body.location.y = -.044*(1-t)
+        head.rotation_euler.x = .14*(1-t)+.11*math.sin(t*math.pi)
+        head.rotation_euler.y = math.sin(.4)*.38*(1-t)
+        for side,sign in [("l",-1),("r",1)]:
+            arm.pose.bones["ant_"+side].rotation_euler.x = 1.25*(1-t)
+            arm.pose.bones["ant_"+side].rotation_euler.z = sign*.30*(1-t)
+            for i in range(1,4):
+                arm.pose.bones[f"leg_{side}_{i}"].rotation_euler.z = sign*(1.75+.30*math.sin(i*1.2+sign))*(1-t)
+                arm.pose.bones[f"leg_{side}_{i}"].rotation_euler.y = .20*math.sin(i+sign)*(1-t)
     elif name == "hit":
-        body.rotation_euler.x = .18*math.sin(t*math.pi)
-        body.location.y = -.012*math.sin(t*math.pi)
-        head.rotation_euler.x = .12*math.sin(t*math.pi)
+        response = math.sin(t*math.pi)
+        body.rotation_euler.x = .30*response
+        body.rotation_euler.z = .05*response
+        body.location.y = .11*response
+        body.location.z = -.04*response
+        head.rotation_euler.x = .28*response
     elif name == "die":
         ease = min(1,t/.8); ease = ease*ease*(3-2*ease)
         body.rotation_euler.z = -1.35*ease
-        body.location.y = .32*ease
+        body.location.y = .32*ease+.105*math.sin(math.pi*ease)
         for side in ["l","r"]:
             for i in range(1,4): arm.pose.bones[f"leg_{side}_{i}"].rotation_euler.z = .65*ease*(1 if side=="l" else -1)
     elif name == "stunned":
-        body.location.y = -.027 + .003*math.cos(phase)
-        head.rotation_euler.y = math.sin(phase)*.16
-        head.rotation_euler.x = .09
+        body.location.y = -.047 + .003*math.cos(phase*2)
+        body.rotation_euler.z = math.radians(15)*math.sin(phase)
+        head.rotation_euler.y = math.sin(phase+.4)*.38
+        head.rotation_euler.x = .14
         for side, sign in [("l",-1),("r",1)]:
             ant = arm.pose.bones["ant_"+side]
-            ant.rotation_euler.x = .62 + .07*math.sin(phase)
-            ant.rotation_euler.z = sign*.25
+            ant.rotation_euler.x = 1.25 + .15*math.sin(phase)
+            ant.rotation_euler.z = sign*.30
+            for i in range(1,4):
+                leg = arm.pose.bones[f"leg_{side}_{i}"]
+                leg.rotation_euler.z = sign*(1.75+.30*math.sin(phase*2+i*1.2+sign))
+                leg.rotation_euler.y = .20*math.sin(phase*2+i+sign)
     # root never animates: locomotion and knockback belong to gameplay.
 
 
@@ -313,18 +336,19 @@ def main():
         export_yup=True,export_animations=True,export_animation_mode="ACTIONS",export_skins=True,
         export_force_sampling=True,export_frame_range=False,export_vertex_color="ACTIVE",
         export_materials="EXPORT",export_cameras=False,export_lights=False)
-    spec = {"id":ID,"radius":.45,"height":round(bounds[1][2]-bounds[0][2],4),
-        "hit_point":[0,.27,.05],"durations":{name:data["length"] for name,data in ANIMS.items()},
+    radius = math.ceil(max(math.hypot(v.co.x,v.co.y) for v in joined.data.vertices)*100)/100
+    spec = {"id":ID,"radius":radius,"height":round(bounds[1][2]-bounds[0][2],4),
+        "hit_point":[0,.28,.04],"durations":{name:data["length"] for name,data in ANIMS.items()},
         "hit_at":ANIMS["attack"]["hit_at"],"badge_point":[0,.65,0],"anims":ANIMS,
         "tint_mask":"UV2.x","source_concept":"Plane 355 c368e7dd / beetle_v3.png",
-        "stage":"graybox","cast_shadow":False}
+        "stage":"formal_v1","cast_shadow":False,"palette":COLORS}
     (out/(ID+".json")).write_text(json.dumps(spec,indent=2)+"\n")
     info = {"triangles":count,"bones":list(BONES),"parts":len(PARTS),"bounds_blender":bounds,
         "units":"metres","front":"+Z","binding":"one bone, weight 1 per vertex",
         "runtime_files":[str(p.relative_to(Path(parsed.runtime))) for p in out.glob("*")]}
     qa = ROOT/"output/rock-beetle-355"; qa.mkdir(parents=True,exist_ok=True)
     (qa/"build.json").write_text(json.dumps(info,indent=2)+"\n")
-    print("ROCK_BEETLE_GRAYBOX", count, "triangles",len(BONES),"bones", len(ANIMS),"animations", flush=True)
+    print("ROCK_BEETLE_FORMAL_V1", count, "triangles",len(BONES),"bones", len(ANIMS),"animations", flush=True)
 
 
 if __name__ == "__main__": main()
