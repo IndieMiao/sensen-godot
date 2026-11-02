@@ -3610,7 +3610,7 @@ func blackjack_refused(code: String, detail: Dictionary) -> void:
 
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
-func open_settings(back := Callable()) -> void:
+func open_settings(back := Callable(), read := true) -> void:
 	var version := P0Legal.version_line(P0Session.demo_config(
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
 	if test_accounts.is_test(): version += " · Test"
@@ -3630,7 +3630,7 @@ func open_settings(back := Callable()) -> void:
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
-	_privacy_read(func(): if modal_kind == "settings": open_settings(back))
+	if read: _privacy_read(func(): if modal_kind == "settings": open_settings(back, false))   # drawn again, not read again
 
 ## Settings › Blocked players (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP1–BP3 row 127): the account's voice
 ## away from any room (P0Runtime's P0VoiceRoom without one): whether this phone is offered voice, and whom it blocked —
@@ -3665,7 +3665,8 @@ func _privacy_read(then: Callable) -> void:
 	_privacy_shown = offered or not _blocked.is_empty()
 	if was != [_privacy_shown, _blocked, _blocked_read, _blocked_failed]: then.call()
 
-func open_blocked_players(back: Callable) -> void:
+## `read` false: drawn again with what was read, nothing asked (a failed read never loops; 后裔 on #667).
+func open_blocked_players(back: Callable, read := true) -> void:
 	var page := P0SettingsPage.blocked_players(_blocked, safe_top(), safe_bottom(),
 		"ok" if _blocked_read else ("failed" if _blocked_failed else "reading"))
 	page.theme = UiKit.theme()
@@ -3678,7 +3679,7 @@ func open_blocked_players(back: Callable) -> void:
 	_open_modal(page, 0.0, true)
 	modal_kind = "blocked_players"
 	_modal_back = back
-	_privacy_read(func(): if modal_kind == "blocked_players": open_blocked_players(back))
+	if read: _privacy_read(func(): if modal_kind == "blocked_players": open_blocked_players(back, false))
 
 ## Unblock: the page has taken the row away already (no card, no toast); a failure puts it back with the network's line.
 func _unblock(handle: String, back: Callable) -> void:
@@ -3687,7 +3688,7 @@ func _unblock(handle: String, back: Callable) -> void:
 		_blocked = _blocked.filter(func(r): return str(r.handle) != handle)
 		return
 	show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
-	if modal_kind == "blocked_players": open_blocked_players(back)
+	if modal_kind == "blocked_players": open_blocked_players(back, false)
 
 ## The crop-ready notifications (SGODOT-350; P0Notify). Settings › Notifications: the switch, and when the system has
 ## said no the notice whose link opens the system's page. The page is read again whenever the phone may have changed

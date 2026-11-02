@@ -117,6 +117,7 @@ func test_a_list_never_read_shows_retry_and_a_read_one_stays() -> void:
 	ui.open_blocked_players(func(): ui.open_settings())
 	await await_millis(50)
 	var page := _page(ui)
+	assert_int(asked.filter(func(a): return a[0] == "blocks").size()).is_equal(1)   # drawn again after it, not read again
 	assert_array(_labels(page.body)).is_equal(["Check your connection and try again.", "Retry"])
 	assert_bool(_labels(page.body).has("No one blocked")).is_false()
 	var reads := asked.filter(func(a): return a[0] == "blocks").size()
