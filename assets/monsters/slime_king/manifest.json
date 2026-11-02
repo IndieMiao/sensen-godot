@@ -1,0 +1,159 @@
+{
+  "task": "SGODOT-355",
+  "group": "headgear",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "axes": "metres; Y up; front +Z; normalized to slime radius 1.0",
+  "attachment_origin": [
+    0,
+    1.43,
+    0
+  ],
+  "slime_profile": [
+    [
+      0.04,
+      1.43
+    ],
+    [
+      0.4,
+      1.33
+    ],
+    [
+      0.65,
+      1.12
+    ],
+    [
+      0.83,
+      0.88
+    ],
+    [
+      0.94,
+      0.6
+    ],
+    [
+      1.0,
+      0.32
+    ]
+  ],
+  "slime_radial_segments": 32,
+  "body_colours": "Preview palette proposals only; runtime selects each king body tint.",
+  "assets": [
+    {
+      "name": "crown",
+      "file": "assets/monsters/slime_king/crown.glb",
+      "triangles": 728,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3070000112056732,
+          -0.06860929727554321,
+          -0.3070000112056732
+        ],
+        [
+          0.3070000112056732,
+          0.359000027179718,
+          0.35564348101615906
+        ]
+      ],
+      "dimensions_m": [
+        0.6140000224113464,
+        0.42760932445526123,
+        0.6626434922218323
+      ],
+      "triangle_limit": 800,
+      "sha256": "a75f75cb5689d0999bc50a3d522cbd480d4c2db5a4a7cb3ecd208ebde6109252",
+      "anchors": [],
+      "pivot": "head contact centre; attach at Y=1.43*r",
+      "slime_radius": 1.0,
+      "attachment_position": [
+        0,
+        1.43,
+        0
+      ],
+      "rounded_tips": 5,
+      "preview_body_tint": "79CDB6",
+      "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt",
+      "notes": [
+        "Original gold crown with five rounded lobes and a front round jewel; bottom conforms to radius-one slime."
+      ]
+    },
+    {
+      "name": "ironback_plates",
+      "file": "assets/monsters/slime_king/ironback_plates.glb",
+      "triangles": 672,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.23000000417232513,
+          -0.5781897902488708,
+          -0.8349999785423279
+        ],
+        [
+          0.23000000417232513,
+          0.07313036918640137,
+          0.38999998569488525
+        ]
+      ],
+      "dimensions_m": [
+        0.46000000834465027,
+        0.6513201594352722,
+        1.2249999642372131
+      ],
+      "triangle_limit": 800,
+      "sha256": "e5ce2f28d2aaffb60002f84b7175ddeba51b04a195ca360c0b3c0b707aa9b7b3",
+      "anchors": [],
+      "pivot": "head contact centre; rear along -Z",
+      "slime_radius": 1.0,
+      "attachment_position": [
+        0,
+        1.43,
+        0
+      ],
+      "plate_count": 5,
+      "preview_body_tint": "8FAEB9",
+      "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt",
+      "notes": [
+        "Five separate rounded iron-blue plates, visible forehead guard, eight rivets, fitted down the back."
+      ]
+    },
+    {
+      "name": "quartz_cluster",
+      "file": "assets/monsters/slime_king/quartz_cluster.glb",
+      "triangles": 368,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.24414999783039093,
+          -0.04008891433477402,
+          -0.24580000340938568
+        ],
+        [
+          0.23890000581741333,
+          0.5073888897895813,
+          0.14614999294281006
+        ]
+      ],
+      "dimensions_m": [
+        0.48305000364780426,
+        0.5474778041243553,
+        0.39194999635219574
+      ],
+      "triangle_limit": 800,
+      "sha256": "c32f87151596e58025d499a02623ee585bc25b0fd80125511dfe6d4301e06149",
+      "anchors": [],
+      "pivot": "head contact centre; attach at Y=1.43*r",
+      "slime_radius": 1.0,
+      "attachment_position": [
+        0,
+        1.43,
+        0
+      ],
+      "column_count": 4,
+      "preview_body_tint": "D7B8CF",
+      "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt",
+      "notes": [
+        "Four rounded opaque quartz columns with pale pink bases and near-white tips; vertex colour only."
+      ]
+    }
+  ]
+}
