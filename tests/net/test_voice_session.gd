@@ -112,9 +112,11 @@ func test_cancelled_permission_event_cannot_start_microphone_or_join() -> void:
 ## again on every connect; an older plugin without per_participant is never asked for either.
 class PeopleBackend extends Backend:
 	var per := true
-	func capabilities() -> String: return JSON.stringify({"protocol": 1, "supported": true, "per_participant": per})
+	func capabilities() -> String: return JSON.stringify({"protocol": 1, "supported": true, "per_participant": per,
+		"publish_permissions": per})
 	func set_participant_volume(id: String, who: String, v: float): calls.append(["volume", id, who, v])
 	func set_participant_subscribed(id: String, who: String, on: bool): calls.append(["subscribed", id, who, on])
+	func set_publish_allowed(id: String, who: String, on: bool): calls.append(["publish", id, who, on])
 
 func _p0_grant(blocked := ["7"]) -> Dictionary:
 	return {"url": "wss://example.test", "token": "ephemeral-token", "room": "p0-dev-sh_tea_1-1", "lease_id": "lease-p0-1",
@@ -228,3 +230,23 @@ func test_p0_lease_expired_on_a_heartbeat_joins_again() -> void:
 	assert_bool(f[0].active()).is_true()
 	assert_str(f[0].state).is_equal("reconnecting")
 	assert_str(f[0]._native_id).is_equal("")
+
+## SGODOT-384 (周瑜 on #647): a block keeps this phone's tracks from them through LiveKit's subscription permissions, as
+## well as taking none of theirs — on connect, on a new list, and allowed again once off it; an older plugin without
+## publish_permissions is never asked.
+func test_p0_block_keeps_our_tracks_from_them_through_livekit() -> void:
+	var f := _p0_fixture()
+	f[0].join_with(f[2]); _event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	_event(f[0], "connected")
+	var id: String = f[0]._native_id
+	assert_bool(f[1].calls.has(["publish", id, "7", false])).is_true()   # the grant's block, on connect
+	f[0].set_blocked(["5"])
+	assert_bool(f[1].calls.has(["publish", id, "7", true])).is_true()   # off the list: allowed again
+	assert_bool(f[1].calls.has(["publish", id, "5", false])).is_true()
+	var old := _p0_fixture(false)
+	old[0].join_with(old[2]); _event(old[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	_event(old[0], "connected")
+	old[0].set_blocked(["5"])
+	assert_bool(old[1].calls.any(func(c): return c[0] == "publish")).is_false()

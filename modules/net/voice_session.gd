@@ -11,8 +11,9 @@ var listening := true
 var participants: Array = []
 var capacity := 8
 var party_id := ""
-## P0 rooms (join_with, 2026-11-02): this phone's LiveKit identity (the hub's peer id) and the peers blocked either way
-## (the grant's `blocked`, then set_blocked from the hub's voice_blocks); never a player id (亚瑟 on the voice plan).
+## P0 rooms (join_with, 2026-11-02): this phone's LiveKit identity (the hub's peer id) and the peers this player blocks
+## (the grant's `blocked`, then set_blocked from the hub's voice_blocks; SGODOT-384: only one's own blocks are sent, the
+## blocked are never told); never a player id (亚瑟 on the voice plan).
 var peer_self := ""
 var blocked: Array = []
 var _muted := {}   # identity → true: this phone's own Mute, set again after each connect
@@ -159,21 +160,34 @@ func set_muted(identity: String, muted: bool) -> void:
 
 func is_muted(identity: String) -> bool: return _muted.has(identity)
 
-## Block (P0): the server's list of peers blocked either way (the grant, then the hub's voice_blocks); none of their
-## tracks are taken, and one no longer listed is taken again.
+## Whether the native side can keep this phone's tracks from one person (capabilities `publish_permissions`, SGODOT-384).
+func publish_permissions() -> bool:
+	if _backend == null: return false
+	if not _backend.has_method("capabilities"): return _backend.has_method("set_publish_allowed")   # test adapters
+	var caps = JSON.parse_string(str(_backend.call("capabilities")))
+	return caps is Dictionary and bool(caps.get("publish_permissions", false))
+
+## Block (P0): the peers this player blocks (the grant, then the hub's voice_blocks). Both ways, from this phone alone
+## (SGODOT-384, 周瑜 on #647): none of their tracks are taken, and LiveKit refuses them this phone's (subscription
+## permissions — a changed client cannot take them either); one no longer listed is allowed and taken again.
 func set_blocked(ids: Array) -> void:
 	var next: Array = ids.map(func(i): return str(i))
 	var freed: Array = blocked.filter(func(i): return not next.has(i))
 	blocked = next
-	if state == "connected" and not _native_id.is_empty() and per_participant():
-		for id in freed: _backend.call("set_participant_subscribed", _native_id, id, true)
-		for id in blocked: _backend.call("set_participant_subscribed", _native_id, id, false)
+	if state == "connected" and not _native_id.is_empty():
+		_block_natively(freed, true)
+		_block_natively(blocked, false)
 	changed.emit()
+
+func _block_natively(ids: Array, allow: bool) -> void:
+	for id in ids:
+		if per_participant(): _backend.call("set_participant_subscribed", _native_id, str(id), allow)
+		if publish_permissions(): _backend.call("set_publish_allowed", _native_id, str(id), allow)
 
 ## After a connect: this session's mutes and blocks onto the fresh native room.
 func _apply_people() -> void:
+	_block_natively(blocked, false)
 	if not per_participant(): return
-	for id in blocked: _backend.call("set_participant_subscribed", _native_id, str(id), false)
 	for id in _muted: _backend.call("set_participant_volume", _native_id, str(id), 0.0)
 
 func _process(_delta: float) -> void:

@@ -10,6 +10,7 @@ import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
 import io.livekit.android.room.Room
 import io.livekit.android.room.participant.Participant
+import io.livekit.android.room.participant.ParticipantTrackPermission
 import io.livekit.android.room.track.RemoteAudioTrack
 import io.livekit.android.room.track.RemoteTrackPublication
 import io.livekit.android.util.LoggingLevel
@@ -46,6 +47,9 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     // Block never subscribes to them. Both last one session; Godot sets them again after each connect.
     private val muted = mutableSetOf<String>()
     private val blocked = mutableSetOf<String>()
+    // SGODOT-384: whom this phone's own tracks are kept from — LiveKit refuses them the subscription (a changed client
+    // cannot take it either); everyone else in the room is allowed, the list renewed as people come and go.
+    private val denied = mutableSetOf<String>()
     private val decodedFrames = AtomicLong()
     private val decodedEnergy = AtomicLong()
     private val watchdog = object : Runnable {
@@ -57,7 +61,8 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     override fun getPluginName() = "GodotVoice"
     override fun getPluginSignals() = setOf(SignalInfo("voice_event", String::class.java))
     @UsedByGodot fun capabilities(): String = JSONObject().put("protocol", 1).put("supported", true).put("platform", "android")
-        .put("per_participant", true).toString()   // set_participant_volume / _subscribed (P0 Mute and Block, 2026-11-02)
+        .put("per_participant", true)   // set_participant_volume / _subscribed (P0 Mute and Block, 2026-11-02)
+        .put("publish_permissions", true).toString()   // set_publish_allowed (SGODOT-384)
     @UsedByGodot fun diagnostics(): String = JSONObject().put("decoded_frames", decodedFrames.get()).put("audio_energy", decodedEnergy.get()).toString()
     private fun emit(kind: String, id: String = session, body: JSONObject = JSONObject()) {
         body.put("event", kind).put("session", id)
@@ -89,7 +94,7 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     @UsedByGodot fun connect_voice(id: String, url: String, token: String) = runOnUiThread {
         finish("REPLACED", false)
         if (!foreground) return@runOnUiThread emit("disconnected", id, JSONObject().put("reason", "BACKGROUND"))
-        session = id; desiredMic = false; listening = true; muted.clear(); blocked.clear()
+        session = id; desiredMic = false; listening = true; muted.clear(); blocked.clear(); denied.clear()
         decodedFrames.set(0); decodedEnergy.set(0)
         LiveKit.loggingLevel = LoggingLevel.OFF
         val current = LiveKit.create(activity!!.applicationContext)
@@ -101,10 +106,13 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
             current.events.collect { event ->
                 if (room !== current || session != id) return@collect
                 when (event) {
-                    is RoomEvent.Connected, is RoomEvent.Reconnected -> snapshot("connected")
+                    is RoomEvent.Connected, is RoomEvent.Reconnected -> { applyPermissions(); snapshot("connected") }
                     is RoomEvent.Reconnecting -> emit("reconnecting")
                     is RoomEvent.Disconnected -> finish("DISCONNECTED")
-                    is RoomEvent.ParticipantConnected, is RoomEvent.ParticipantDisconnected,
+                    is RoomEvent.ParticipantConnected, is RoomEvent.ParticipantDisconnected -> {
+                        applyPermissions()   // a newcomer allowed unless denied (SGODOT-384)
+                        snapshot("participants")
+                    }
                     is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted -> snapshot("participants")
                     is RoomEvent.TrackPublished -> {
                         // a blocked person's new track is never taken (P0 Block, 2026-11-02)
@@ -190,6 +198,23 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
             participant.trackPublications.values.forEach { (it as? RemoteTrackPublication)?.setSubscribed(subscribed) }
         }
         snapshot("participants")
+    }
+    /** SGODOT-384 Block: keep (or stop keeping) this phone's tracks from one person — LiveKit refuses their subscription. */
+    @UsedByGodot fun set_publish_allowed(id: String, identity: String, allowed: Boolean) = runOnUiThread {
+        if (id != session || identity.isEmpty()) return@runOnUiThread
+        if (allowed) denied.remove(identity) else denied.add(identity)
+        applyPermissions()
+    }
+    /** Nobody denied: everyone may subscribe. Otherwise only the room's others not denied, each by identity. */
+    private fun applyPermissions() {
+        val current = room ?: return
+        if (denied.isEmpty()) {
+            current.localParticipant.setTrackSubscriptionPermissions(true, emptyList())
+            return
+        }
+        val allowed = current.remoteParticipants.values.mapNotNull { it.identity?.value }.filter { it !in denied }
+            .map { ParticipantTrackPermission(it, null, true, emptyList()) }
+        current.localParticipant.setTrackSubscriptionPermissions(false, allowed)
     }
     private fun volumeFor(identity: String?): Double = if (!listening || (identity != null && identity in muted)) 0.0 else 1.0
     private fun applyVolumes() {
