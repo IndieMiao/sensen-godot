@@ -22,6 +22,10 @@ var _session: FarmSession
 ## join / heartbeat / leave. join() makes Journey's from its FarmSession; join_with() takes the caller's (P0's).
 var _request := Callable()
 var _p0 := false
+## Refusals a retry cannot mend: the session ends with the code (Journey's, and P0's voice/join — 后裔 on #645: voice off,
+## not in a room, a room without voice such as Market Square, the voice room full, the age gate, no player key).
+const FINAL_CODES := ["UNAUTHENTICATED", "VOICE_NO_PARTY", "VOICE_FULL", "MICROPHONE_DENIED",
+	"VOICE_OFF", "NOT_IN_ROOM", "VOICE_NOT_HERE", "VOICE_ROOM_FULL", "AGE_GATE"]
 var _wanted := false
 var _request_id := ""
 var _native_id := ""
@@ -237,9 +241,9 @@ func _heartbeat() -> void:
 	_heartbeat_at = Time.get_ticks_msec() + (4500 if ok else 1500)
 	if not ok:
 		var code := str(json.get("code", "VOICE_UNAVAILABLE"))
-		if code in ["UNAUTHENTICATED", "VOICE_NO_PARTY"]:
+		if code in FINAL_CODES:
 			_failed(code)
-		elif code == "VOICE_EXPIRED":
+		elif code in ["VOICE_EXPIRED", "LEASE_EXPIRED"]:   # P0's lease gone: join again, as Journey's
 			_drop_native()
 			state = "reconnecting"
 			changed.emit()
@@ -252,7 +256,7 @@ func _heartbeat() -> void:
 
 func _failed(code: String) -> void:
 	error = code
-	if code in ["UNAUTHENTICATED", "VOICE_NO_PARTY", "VOICE_FULL", "MICROPHONE_DENIED"]:
+	if code in FINAL_CODES:
 		leave()
 		error = code
 		changed.emit()

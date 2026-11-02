@@ -193,3 +193,38 @@ func test_p0_grant_needs_self_not_a_party_and_allows_a_big_room() -> void:
 	assert_bool(PartyVoiceSession._valid_grant(bad_blocked, true)).is_false()
 	var party: Dictionary = _grant().json
 	assert_bool(PartyVoiceSession._valid_grant(party)).is_true()
+
+## P0's voice/join refusals (后裔 on #645): a final one ends the session with its code, no retry; VOICE_UNAVAILABLE
+## (LiveKit's side) waits and tries again; a heartbeat's LEASE_EXPIRED joins again as Journey's VOICE_EXPIRED does.
+func test_p0_final_refusals_end_and_only_voice_unavailable_retries() -> void:
+	for code in ["VOICE_OFF", "NOT_IN_ROOM", "VOICE_NOT_HERE", "VOICE_ROOM_FULL", "AGE_GATE", "UNAUTHENTICATED"]:
+		var voice := PartyVoiceSession.new()
+		add_child(auto_free(voice))
+		voice.set_process(false)
+		voice.set_backend(PeopleBackend.new())
+		voice.join_with(func(_a: String, _b: Dictionary) -> Dictionary: return {"ok": false, "json": {"code": code}})
+		_event(voice, "permission", {"granted": true})
+		await get_tree().process_frame
+		assert_bool(voice.active()).override_failure_message(code).is_false()
+		assert_str(voice.error).is_equal(code)
+	var busy := PartyVoiceSession.new()
+	add_child(auto_free(busy))
+	busy.set_process(false)
+	busy.set_backend(PeopleBackend.new())
+	busy.join_with(func(_a: String, _b: Dictionary) -> Dictionary: return {"ok": false, "json": {"code": "VOICE_UNAVAILABLE"}})
+	_event(busy, "permission", {"granted": true})
+	await get_tree().process_frame
+	assert_bool(busy.active()).is_true()
+	assert_str(busy.state).is_equal("reconnecting")
+
+func test_p0_lease_expired_on_a_heartbeat_joins_again() -> void:
+	var f := _p0_fixture()
+	f[0].join_with(f[2]); _event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	_event(f[0], "connected")
+	f[0]._request = func(_a: String, _b: Dictionary) -> Dictionary: return {"ok": false, "json": {"code": "LEASE_EXPIRED"}}
+	f[0]._heartbeat()
+	await get_tree().process_frame
+	assert_bool(f[0].active()).is_true()
+	assert_str(f[0].state).is_equal("reconnecting")
+	assert_str(f[0]._native_id).is_equal("")
