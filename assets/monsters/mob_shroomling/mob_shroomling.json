@@ -1,0 +1,102 @@
+{
+  "radius": 0.32,
+  "height": 0.7047500014305115,
+  "hit_point": [
+    0,
+    0.28,
+    0.04
+  ],
+  "badge_point": [
+    0,
+    0.92,
+    0
+  ],
+  "stage": "final_v1",
+  "palette": {
+    "cap": "E45D68",
+    "cap_spots": "FFFDF6",
+    "stem": "EEE0BD"
+  },
+  "spore_point": [
+    0,
+    0.65,
+    0
+  ],
+  "anims": {
+    "idle": {
+      "length": 1.2,
+      "loop": true
+    },
+    "move": {
+      "length": 0.6,
+      "loop": true
+    },
+    "windup": {
+      "length": 0.55,
+      "loop": false
+    },
+    "attack": {
+      "length": 0.4,
+      "loop": false,
+      "hit_at": 0.18
+    },
+    "recover": {
+      "length": 0.45,
+      "loop": false
+    },
+    "hit": {
+      "length": 0.25,
+      "loop": false
+    },
+    "die": {
+      "length": 0.75,
+      "loop": false
+    },
+    "hide": {
+      "length": 1.0,
+      "loop": false
+    },
+    "spore": {
+      "length": 0.8,
+      "loop": false,
+      "emit_at": 0.35
+    }
+  },
+  "note": "hide is a one-shot 1.0s clip ending tucked; consumer controls hold time. Spore emission is at .35s. No root motion.",
+  "id": "mob_shroomling",
+  "triangles": 1496,
+  "surfaces": 1,
+  "bones": 7,
+  "bounds": [
+    [
+      -0.30000001192092896,
+      0.0,
+      -0.30000001192092896
+    ],
+    [
+      0.30000001192092896,
+      0.7047500014305115,
+      0.30000001192092896
+    ]
+  ],
+  "tint_mask": "UV2.x",
+  "cast_shadow": false,
+  "root_motion": false,
+  "front": "+Z",
+  "source_concept": "Plane 355 c368e7dd",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "durations": {
+    "idle": 1.2,
+    "move": 0.6,
+    "windup": 0.55,
+    "attack": 0.4,
+    "recover": 0.45,
+    "hit": 0.25,
+    "die": 0.75,
+    "hide": 1.0,
+    "spore": 0.8
+  },
+  "hit_at": 0.18,
+  "spore_at": 0.35
+}
