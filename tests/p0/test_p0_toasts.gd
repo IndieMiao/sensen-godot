@@ -32,7 +32,7 @@ func after_test() -> void:
 func _panel() -> Control: return ui._toasts._panel
 
 func test_a_refusal_replaces_the_info_toast_in_the_error_tone() -> void:
-	ui.toast("Room 1 is full · you're in Room 2")
+	ui.toast("Layer 1 is full · you're in Layer 2")
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
 	ui.toast_error("Not ready yet")
 	assert_str(ui.toast_text()).is_equal("Not ready yet")
