@@ -135,7 +135,7 @@ func test_a_local_request_refused_wrong_place_toasts_its_hand_in_row() -> void:
 	await get_tree().process_frame
 	rt.session.view = _view([_loc("req_loc_w", {"status": "accepted", "ready": true, "have": 3})])
 	rt._on_refused("wrong_place", {}, {"type": "deliver", "request": "req_loc_w"})
-	assert_str(rt.ui.toast_text()).is_equal("Pond Catch · Deliver to Wen · Shanghai")
+	assert_str(rt.ui.toast_text()).is_equal("Pond Catch\nDeliver to Wen · Shanghai")   # an Error toast breaks at a " · " (#666)
 	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)   # a refused command's (§4.8.6, 不知火舞 11-02)
 
 func _ui() -> P0Ui:
