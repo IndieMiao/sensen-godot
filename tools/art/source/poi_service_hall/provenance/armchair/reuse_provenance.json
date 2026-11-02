@@ -1,0 +1,27 @@
+{
+  "task": "SGODOT-321",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "asset": "armchair",
+  "phase": "neutral blockout",
+  "measured_or_proposed_bounds": [
+    [
+      -0.7500000596046448,
+      0.0,
+      -0.45000001788139343
+    ],
+    [
+      0.7500000596046448,
+      1.3263769149780273,
+      0.4399999976158142
+    ]
+  ],
+  "source_asset": "armchair",
+  "source_sha256": "22b329539f0d85af367849719caaef67870e0a6923bb8790adc52f4fea84e2dc",
+  "changes": "Existing geometry unchanged, neutral review material override",
+  "scale": [
+    1,
+    1,
+    1
+  ]
+}

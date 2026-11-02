@@ -1,0 +1,15 @@
+{
+  "task": "SGODOT-321",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source": "output/poi-service-hall-321/dependencies/assets/rooms/_shared/shell_hall/armchair.glb",
+  "source_sha256": "22b329539f0d85af367849719caaef67870e0a6923bb8790adc52f4fea84e2dc",
+  "changes": [
+    "N2 atlas/material and UV remap; original geometry retained"
+  ],
+  "scale_xyz": [
+    1,
+    1,
+    1
+  ]
+}

@@ -1,0 +1,114 @@
+[
+  {
+    "file": "SGODOT-321_N2_blockout_A1_default_43deg_360.png",
+    "bytes": 130001,
+    "sha256": "c6952926f7abb3664c7476373ce46727bea868d0ac558f43443b83e5705f76f1",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      914
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_A1_overview_43deg.png",
+    "bytes": 392208,
+    "sha256": "38f6fc82c90042c2ce0a72ca34576dbed9fb114485fe2db2b3dceb5e87d94564",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1095
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_A1_top_capsule.png",
+    "bytes": 282990,
+    "sha256": "32c22e7100b968dd4359349e5bb5c6e3133de36af502fa42e98e0f318e6e9c2f",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1195
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_A2_default_43deg_360.png",
+    "bytes": 131699,
+    "sha256": "5439e6a7b3954b84a2b6ce91b8b1548fe9511031a78c36cd5be8bceb29d92b1e",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      933
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_A2_overview_43deg.png",
+    "bytes": 393846,
+    "sha256": "7ee04e5ad53ae6b3daab63c5354656d5cd999868d9b429f33ab9ca13dcf65b0d",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1095
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_A2_top_capsule.png",
+    "bytes": 293193,
+    "sha256": "712879b5ee7aebbfedcda7caaf1c60f758bc5d3d7b6ecf6cc7815f2630ff888f",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1195
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_B_default_43deg_360.png",
+    "bytes": 127195,
+    "sha256": "1b2e537650f350a63a56f297ac2f6eb87491e68f9fea6ef54af2b4c447950dfe",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      933
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_B_overview_43deg.png",
+    "bytes": 374142,
+    "sha256": "0a76894685449a8f812fd9848970136562f8b882ea27a52a3c8f41af95beb7a3",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1095
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_B_top_capsule.png",
+    "bytes": 261618,
+    "sha256": "a0cc038310ebb4ecd452d54f9c5b4b01fb19aa59d003f3ab0e6711fa8f2e85cc",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1195
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_comparison.png",
+    "bytes": 318536,
+    "sha256": "3bad89a4b774beade7348461be9b3903dfc28b0d16eb3db825c3ca74dd5cd718",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1800,
+      650
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_validation.json",
+    "bytes": 484414,
+    "sha256": "02125bc84b3572a2f38de04dbe11a6901fed65e291f59c316f6321c1e7430504",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-321_N2_blockout_decision.md",
+    "bytes": 1262,
+    "sha256": "ddbdb4ccf18e79442998a20d0123e0537b6c87f7ec9b41665ecd3202dd19fb5c",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "task": "SGODOT-321",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "asset": "display_niche_1",
+  "phase": "new white volume only",
+  "size_m": [
+    1.1,
+    2.4,
+    0.35
+  ],
+  "source": "Shangguan dispatch huangzhong-320v11-321-n2.txt",
+  "changes": "Placeholder envelope; detail and final palette await layout selection"
+}

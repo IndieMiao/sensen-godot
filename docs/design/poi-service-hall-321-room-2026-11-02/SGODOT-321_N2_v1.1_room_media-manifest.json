@@ -1,0 +1,14 @@
+[
+  {
+    "file": "SGODOT-321_N2_v1.1_room_default_43deg_360.png",
+    "bytes": 164285,
+    "sha256": "6452500952f0161b3d8aa45603eecd26daf3547348e0d9731e4711ab5e85fd7b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-321_N2_v1.1_room_validation.json",
+    "bytes": 133935,
+    "sha256": "39a395f0386447713fddb79a9c4c3ca0d288649e1ccafafb44365ad70739ade3",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

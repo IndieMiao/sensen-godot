@@ -1,0 +1,74 @@
+[
+  {
+    "file": "SGODOT-321_N2_v1_props_props_overview.png",
+    "bytes": 328984,
+    "sha256": "6c38c2c3c30b462a1b12a55ba8f884178582d514e087acea59a15cc5b73cc1cb",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1400,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_sculpture_detail.png",
+    "bytes": 256125,
+    "sha256": "79d329280ddb2fed02725d428c2119d9cfb18369f44e51db864ba0018770162e",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1000,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_niche_displays.png",
+    "bytes": 337562,
+    "sha256": "f85f2d904316906c6801650a2466a4398c06f37f2f74d2db781358f97f3c527b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1000,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_boards_and_service_props.png",
+    "bytes": 203337,
+    "sha256": "6225e0b0864bf25e224ef16871f7941469e288938660fde226dfe3ae049e53bb",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1000,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_fixed_props_default_43deg_360.png",
+    "bytes": 120896,
+    "sha256": "e9c76f808621179a07db85be7f99271a17324649035021dd9b745715a6a15f0b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      922
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_fixed_props_overview.png",
+    "bytes": 382701,
+    "sha256": "660ee519f82cf12d7c88b05d13d72c5b82ffce1c10f097cb01e76525f5bd2785",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_validation.json",
+    "bytes": 25201,
+    "sha256": "50ea4a62656a15ac576493d627c8a953bdefc3c73a2fc5dbd289827ddccb67da",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-321_N2_v1_props_asset_table.md",
+    "bytes": 1057,
+    "sha256": "97a9bba57efd979563c9f5dd8fa8397de1741a3d05e5a03f0cdcb37926c36d9a",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

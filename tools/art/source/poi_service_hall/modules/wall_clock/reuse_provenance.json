@@ -1,0 +1,15 @@
+{
+  "task": "SGODOT-321",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source": "assets/rooms/post_office/wall_clock.glb",
+  "source_sha256": "9104951fd03bd18502665463f1a093f977368e039f5236273242db663fcab7dd",
+  "changes": [
+    "N2 atlas/material and UV remap; original geometry retained"
+  ],
+  "scale_xyz": [
+    1,
+    1,
+    1
+  ]
+}

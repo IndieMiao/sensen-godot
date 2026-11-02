@@ -1,0 +1,15 @@
+{
+  "task": "SGODOT-321",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source": "output/poi-service-hall-321/dependencies/assets/rooms/_shared/shell_hall/sofa_three_seat.glb",
+  "source_sha256": "349930f297c891111ef23110c58b046df3a2c056755c9bdd31ce86dea9527ba6",
+  "changes": [
+    "N2 atlas/material and UV remap; original geometry retained"
+  ],
+  "scale_xyz": [
+    1,
+    1,
+    1
+  ]
+}

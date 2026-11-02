@@ -1,0 +1,27 @@
+{
+  "task": "SGODOT-321",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "asset": "peace_lily",
+  "phase": "neutral blockout",
+  "measured_or_proposed_bounds": [
+    [
+      -0.42371222376823425,
+      0.0,
+      -0.36864492297172546
+    ],
+    [
+      0.4300000071525574,
+      1.2400000095367432,
+      0.35786372423171997
+    ]
+  ],
+  "source_asset": "peace_lily",
+  "source_sha256": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
+  "changes": "Existing geometry unchanged, neutral review material override",
+  "scale": [
+    1,
+    1,
+    1
+  ]
+}

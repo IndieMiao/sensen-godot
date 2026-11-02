@@ -1,0 +1,26 @@
+[
+  {
+    "file": "SGODOT-321_N2_v1_room_default_43deg_360.png",
+    "bytes": 164088,
+    "sha256": "2478e5ea6c1c5fe88de655112af91d7a8fb07735684bc3fa1dda438f16ad70de",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-321_N2_v1_room_overview.png",
+    "bytes": 510492,
+    "sha256": "559b1b14023955dde5544801577905ebfbff099874aff6c564b931a59d4b4588",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-321_N2_v1_room_top_capsule.png",
+    "bytes": 412872,
+    "sha256": "8bc6e5b56bbb05dcc72d068cbbe685acb106e648524b8ecdb003a2b548c05ac2",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-321_N2_v1_room_validation.json",
+    "bytes": 134464,
+    "sha256": "a05b6d39a20857cd149c77289061c40182b0cc9ce662cbd68be7d7da1afac275",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

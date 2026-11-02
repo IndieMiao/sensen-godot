@@ -1,0 +1,6694 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "passed": true,
+  "geometry": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "armchair: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "armchair: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "armchair: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "armchair: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "armchair: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "armchair: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "armchair: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "armchair: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "armchair: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "call_screen: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "call_screen: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "call_screen: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "call_screen: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "call_screen: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "call_screen: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "call_screen: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "call_screen: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "call_screen: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "notice_board: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "notice_board: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "notice_board: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "notice_board: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "notice_board: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "notice_board: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "notice_board: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "notice_board: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "notice_board: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: one surface and <=8k triangles",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: one external skin, no embedded images",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: imported material slot",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: actual buffer bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: per-module provenance",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: generated UID and texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: valid nondegenerate geometry",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: normalized normals",
+        "passed": true
+      },
+      {
+        "check": "Sixteen unique import UIDs",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: original 324 geometry and normals byte-exact",
+        "passed": true
+      },
+      {
+        "check": "armchair: original 324 geometry and normals byte-exact",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: original 324 geometry and normals byte-exact",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: original source geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: original source geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "call_screen: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "notice_board: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: approved prop geometry unchanged",
+        "passed": true
+      },
+      {
+        "check": "Small table .60 diameter / .75 height from actual vertices",
+        "passed": true
+      },
+      {
+        "check": "Exact eight-seat contract",
+        "passed": true
+      },
+      {
+        "check": "Seat Y .795, .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "Room budget includes every repeated placement",
+        "passed": true
+      },
+      {
+        "check": "Total including unchanged shell below 150k / 50 budget",
+        "passed": true
+      },
+      {
+        "check": "Measured main clearance and sixteen reachable positions",
+        "passed": true
+      },
+      {
+        "check": "One 2048 RGBA atlas",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [0, 14]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [0, 15]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [1, 14]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [1, 15]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [2, 14]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [2, 15]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [3, 14]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [4, 14]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [12, 15]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [13, 15]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [14, 15]",
+        "passed": true
+      },
+      {
+        "check": "Botanical colour/alpha tile preserved: [15, 15]",
+        "passed": true
+      },
+      {
+        "check": "Plant retains alpha-scissor .45 and two-sided leaves",
+        "passed": true
+      },
+      {
+        "check": "Baked floor colour at world (0, 2.3)",
+        "passed": true
+      },
+      {
+        "check": "Baked floor colour at world (1.3, 0.18)",
+        "passed": true
+      },
+      {
+        "check": "Baked floor colour at world (0, -2.0)",
+        "passed": true
+      },
+      {
+        "check": "Baked floor colour at world (-2.7, 0.18)",
+        "passed": true
+      },
+      {
+        "check": "Baked floor colour at world (1.1, 1.8)",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_albedo_ao.png.import",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_floor.glb",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_back_wall.glb",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_back_wall.glb.import",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_opaque.tres",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_palette.json",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_floor.glb.import",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_window_frame.glb.import",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_albedo_ao.png",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_window_grid.glb.import",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_window_glass.glb",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_window_grid.glb",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_left_wall.glb",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_glass.tres",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_left_wall.glb.import",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_window_frame.glb",
+        "passed": true
+      },
+      {
+        "check": "Pinned shared dependency preserved: assets/rooms/_shared/shell_hall/hall_window_glass.glb.import",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "armchair": {
+        "bounds": [
+          [
+            -0.7500000596046448,
+            0.0,
+            -0.45000001788139343
+          ],
+          [
+            0.7500000596046448,
+            1.3263769149780273,
+            0.4399999976158142
+          ]
+        ],
+        "dimensions_m": [
+          1.5000001192092896,
+          1.3263769149780273,
+          0.8899999856948853
+        ],
+        "triangles": 1776,
+        "surfaces": 1,
+        "sha256": "db5a9130ee230b8b1d3cfbdd59ff8ace81f9d7c3641e634eec7746507abcda03",
+        "mesh_names": [
+          "armchair_mobile"
+        ]
+      },
+      "brochure_rack": {
+        "bounds": [
+          [
+            -0.35500001907348633,
+            0.0,
+            -0.23999999463558197
+          ],
+          [
+            0.35500001907348633,
+            1.100000023841858,
+            0.23999999463558197
+          ]
+        ],
+        "dimensions_m": [
+          0.7100000381469727,
+          1.100000023841858,
+          0.47999998927116394
+        ],
+        "triangles": 2056,
+        "surfaces": 1,
+        "sha256": "2a91d5947a46dacdbf8a37e8fc12bb24e9535fb978e964e8c13d95e7a696974e",
+        "mesh_names": [
+          "brochure_rack_mobile"
+        ]
+      },
+      "call_screen": {
+        "bounds": [
+          [
+            -0.4000000059604645,
+            -0.25,
+            -0.02500000037252903
+          ],
+          [
+            0.4000000059604645,
+            0.25,
+            0.04200011119246483
+          ]
+        ],
+        "dimensions_m": [
+          0.800000011920929,
+          0.5,
+          0.06700011342763901
+        ],
+        "triangles": 588,
+        "surfaces": 1,
+        "sha256": "256b6d5cb2bcdc603ff5c46ee04de69c9e93a923c5eafbc9d0bb038686e6a08e",
+        "mesh_names": [
+          "call_screen_mobile"
+        ]
+      },
+      "display_niche_1": {
+        "bounds": [
+          [
+            -0.5500001907348633,
+            0.0,
+            -0.0
+          ],
+          [
+            0.5500001907348633,
+            2.4000000953674316,
+            0.3499999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.1000003814697266,
+          2.4000000953674316,
+          0.3499999940395355
+        ],
+        "triangles": 3321,
+        "surfaces": 1,
+        "sha256": "d1d1b5e98dcfb4c63afb3a3eea5f9a08c21d2099e0e7e939d876bb9f2896a0c3",
+        "mesh_names": [
+          "display_niche_1_mobile"
+        ]
+      },
+      "display_niche_2": {
+        "bounds": [
+          [
+            -0.5500001907348633,
+            0.0,
+            -0.0
+          ],
+          [
+            0.5500001907348633,
+            2.4000000953674316,
+            0.3499999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.1000003814697266,
+          2.4000000953674316,
+          0.3499999940395355
+        ],
+        "triangles": 3153,
+        "surfaces": 1,
+        "sha256": "d50889e47f5d1b6b13431ce0102325b468f7c38bf9dc1027dca42715d21596c9",
+        "mesh_names": [
+          "display_niche_2_mobile"
+        ]
+      },
+      "name_plaque": {
+        "bounds": [
+          [
+            -0.5,
+            -0.17500001192092896,
+            -0.017500000074505806
+          ],
+          [
+            0.5,
+            0.17500001192092896,
+            0.03249998018145561
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          0.3500000238418579,
+          0.04999998211860657
+        ],
+        "triangles": 540,
+        "surfaces": 1,
+        "sha256": "d961f76dba10b30ebd9351df70b4d4c03a847cd795ac9d40f06cda20f7c33e84",
+        "mesh_names": [
+          "name_plaque_mobile"
+        ]
+      },
+      "notice_board": {
+        "bounds": [
+          [
+            -0.3500000834465027,
+            -0.44999998807907104,
+            -0.019999999552965164
+          ],
+          [
+            0.3500000834465027,
+            0.44999998807907104,
+            0.04549988731741905
+          ]
+        ],
+        "dimensions_m": [
+          0.7000001668930054,
+          0.8999999761581421,
+          0.06549988687038422
+        ],
+        "triangles": 972,
+        "surfaces": 1,
+        "sha256": "61c20a440a3144ba366efec27767475a33df3da498eaab619dd9820c9984a723",
+        "mesh_names": [
+          "notice_board_mobile"
+        ]
+      },
+      "peace_lily": {
+        "bounds": [
+          [
+            -0.42371222376823425,
+            0.0,
+            -0.36864492297172546
+          ],
+          [
+            0.4300000071525574,
+            1.2400000095367432,
+            0.35786372423171997
+          ]
+        ],
+        "dimensions_m": [
+          0.8537122011184692,
+          1.2400000095367432,
+          0.726508617401123
+        ],
+        "triangles": 946,
+        "surfaces": 1,
+        "sha256": "48ada69389daddee93f743b42c22662523b6982ca5da548128c532ca292daef0",
+        "mesh_names": [
+          "peace_lily_mobile"
+        ]
+      },
+      "sculpture_base": {
+        "bounds": [
+          [
+            -0.9300000071525574,
+            0.0,
+            -0.9300000071525574
+          ],
+          [
+            0.9300000071525574,
+            0.4000000059604645,
+            0.9300000071525574
+          ]
+        ],
+        "dimensions_m": [
+          1.8600000143051147,
+          0.4000000059604645,
+          1.8600000143051147
+        ],
+        "triangles": 7956,
+        "surfaces": 1,
+        "sha256": "f6c011877eedccbe9d0c61d82eb6ed6c9a370f0a2265afffdf60414473030210",
+        "mesh_names": [
+          "sculpture_base_mobile"
+        ]
+      },
+      "sculpture_body": {
+        "bounds": [
+          [
+            -0.2769845426082611,
+            0.0,
+            -0.06698445975780487
+          ],
+          [
+            0.30150508880615234,
+            1.1999999284744263,
+            0.1300000250339508
+          ]
+        ],
+        "dimensions_m": [
+          0.5784896612167358,
+          1.1999999284744263,
+          0.19698448479175568
+        ],
+        "triangles": 2072,
+        "surfaces": 1,
+        "sha256": "ade28de0129fbbe7f0411aba3f57c689249063ce344c0812888f633d61b7dc24",
+        "mesh_names": [
+          "sculpture_body_mobile"
+        ]
+      },
+      "small_round_table": {
+        "bounds": [
+          [
+            -0.30000001192092896,
+            0.0,
+            -0.30000001192092896
+          ],
+          [
+            0.30000001192092896,
+            0.75,
+            0.30000001192092896
+          ]
+        ],
+        "dimensions_m": [
+          0.6000000238418579,
+          0.75,
+          0.6000000238418579
+        ],
+        "triangles": 240,
+        "surfaces": 1,
+        "sha256": "621bd06ae346955889e18943af693dd440de089c8b23a7401dbfac06249d7c2c",
+        "mesh_names": [
+          "small_round_table_mobile"
+        ]
+      },
+      "sofa_three_seat": {
+        "bounds": [
+          [
+            -1.402999997138977,
+            0.0,
+            -0.45000001788139343
+          ],
+          [
+            1.402999997138977,
+            1.3263769149780273,
+            0.4399999976158142
+          ]
+        ],
+        "dimensions_m": [
+          2.805999994277954,
+          1.3263769149780273,
+          0.8899999856948853
+        ],
+        "triangles": 2340,
+        "surfaces": 1,
+        "sha256": "6a6b0eba3bf25e8ab202ca5b6f9b3e4729b31ddcad62c44d22e8a2beee94ef89",
+        "mesh_names": [
+          "sofa_three_seat_mobile"
+        ]
+      },
+      "wall_clock": {
+        "bounds": [
+          [
+            -0.38999998569488525,
+            -0.3900001049041748,
+            -0.04500007629394531
+          ],
+          [
+            0.38999998569488525,
+            0.3900001049041748,
+            0.0989999771118164
+          ]
+        ],
+        "dimensions_m": [
+          0.7799999713897705,
+          0.7800002098083496,
+          0.14400005340576172
+        ],
+        "triangles": 592,
+        "surfaces": 1,
+        "sha256": "189fa1924293e0fe308aeb1264a474a18eac01d74c70a7cbc5061d0464b3ec7b",
+        "mesh_names": [
+          "wall_clock_mobile"
+        ]
+      },
+      "wall_sconce": {
+        "bounds": [
+          [
+            -0.07000000029802322,
+            -0.2800000011920929,
+            -0.0
+          ],
+          [
+            0.07000000029802322,
+            0.2800000011920929,
+            0.15949998795986176
+          ]
+        ],
+        "dimensions_m": [
+          0.14000000059604645,
+          0.5600000023841858,
+          0.15949998795986176
+        ],
+        "triangles": 292,
+        "surfaces": 1,
+        "sha256": "8f2b913f10fabe420956bc6fdf0209c1912003b5eac140ff7d2c432ef6508590",
+        "mesh_names": [
+          "wall_sconce_mobile"
+        ]
+      },
+      "water_dispenser": {
+        "bounds": [
+          [
+            -0.2199999988079071,
+            0.0,
+            -0.23999999463558197
+          ],
+          [
+            0.2199999988079071,
+            1.2999999523162842,
+            0.29999998211860657
+          ]
+        ],
+        "dimensions_m": [
+          0.4399999976158142,
+          1.2999999523162842,
+          0.5399999618530273
+        ],
+        "triangles": 2176,
+        "surfaces": 1,
+        "sha256": "8c70a5c62346d0f10bd910c94294bf3b1184ecc3d640f3db6d079b9e2fd53378",
+        "mesh_names": [
+          "water_dispenser_mobile"
+        ]
+      },
+      "window_flowerbox": {
+        "bounds": [
+          [
+            -0.5,
+            0.0,
+            -0.10999999940395355
+          ],
+          [
+            0.5,
+            0.2004999965429306,
+            0.10999999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          0.2004999965429306,
+          0.2199999988079071
+        ],
+        "triangles": 1944,
+        "surfaces": 1,
+        "sha256": "2e0523728673954a62a66fb674a8a0a3030692c373a35cc88c655ed246bc5dd0",
+        "mesh_names": [
+          "window_flowerbox_mobile"
+        ]
+      }
+    },
+    "statistics": {
+      "room_triangles": 40926,
+      "room_surfaces": 26,
+      "shared_shell_triangles": 12966,
+      "shared_shell_surfaces": 8,
+      "scene_triangles": 53892,
+      "scene_surfaces": 34
+    },
+    "scope": "Buffer measurements and original-asset preservation; native capsule and visibility checks are separate."
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "position": [
+        0.0,
+        0.0800006240606308,
+        2.5
+      ]
+    },
+    "captures": [
+      {
+        "id": "default_43deg_360",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165,
+        "yaw": 45.0
+      },
+      {
+        "id": "overview",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          1200,
+          1000
+        ],
+        "width_m": 12.0,
+        "yaw": 45.0
+      },
+      {
+        "id": "top_capsule",
+        "pitch": 90.0,
+        "pixels": [
+          1200,
+          1100
+        ],
+        "width_m": 7.80000019073486,
+        "yaw": 0.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/display_niche_1/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/display_niche_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "External atlas material: /root/N2Room/@SubViewport@2/@Node3D@3/ServiceHallArt/wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "Actual assembled budget 53892 triangles / 34 surfaces",
+        "passed": true
+      },
+      {
+        "check": "Single shared N2 skin including plants and shell",
+        "passed": true
+      },
+      {
+        "check": "Eight user-approved seats",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_1: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_1: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_2: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_2: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_3: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_3: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_4: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_4: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_5: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_5: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_6: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_sofa_6: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_armchair_1: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_armchair_1: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "seat_armchair_2: actual seat height .715 above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_armchair_2: faces reachable front of furniture",
+        "passed": true
+      },
+      {
+        "check": "armchair: import settings",
+        "passed": true
+      },
+      {
+        "check": "armchair: UID present",
+        "passed": true
+      },
+      {
+        "check": "armchair: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: import settings",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: UID present",
+        "passed": true
+      },
+      {
+        "check": "brochure_rack: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "call_screen: import settings",
+        "passed": true
+      },
+      {
+        "check": "call_screen: UID present",
+        "passed": true
+      },
+      {
+        "check": "call_screen: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: import settings",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: UID present",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: import settings",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: UID present",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: import settings",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: UID present",
+        "passed": true
+      },
+      {
+        "check": "name_plaque: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "notice_board: import settings",
+        "passed": true
+      },
+      {
+        "check": "notice_board: UID present",
+        "passed": true
+      },
+      {
+        "check": "notice_board: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: import settings",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: UID present",
+        "passed": true
+      },
+      {
+        "check": "peace_lily: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: import settings",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: UID present",
+        "passed": true
+      },
+      {
+        "check": "sculpture_base: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: import settings",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: UID present",
+        "passed": true
+      },
+      {
+        "check": "sculpture_body: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: import settings",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: UID present",
+        "passed": true
+      },
+      {
+        "check": "small_round_table: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: import settings",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: UID present",
+        "passed": true
+      },
+      {
+        "check": "sofa_three_seat: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: import settings",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: UID present",
+        "passed": true
+      },
+      {
+        "check": "wall_clock: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: import settings",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: UID present",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: import settings",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: UID present",
+        "passed": true
+      },
+      {
+        "check": "water_dispenser: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: import settings",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: UID present",
+        "passed": true
+      },
+      {
+        "check": "window_flowerbox: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "Clock centre 2.45m above floor",
+        "passed": true
+      },
+      {
+        "check": "Name plaque usable area retained",
+        "passed": true
+      },
+      {
+        "check": "Sculpture front faces default camera",
+        "passed": true
+      },
+      {
+        "check": "Reference character assembled",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 0",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 1",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 2",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 3",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 4",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 5",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 6",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 7",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 8",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 9",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 10",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 11",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 12",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 13",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 14",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 15",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 16",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 17",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 18",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 19",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 20",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 21",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 22",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 23",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 24",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 25",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 26",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 27",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 28",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 29",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 30",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 31",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 32",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 33",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 34",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 35",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 36",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 37",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 38",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 39",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 40",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 41",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 42",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 43",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 44",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 45",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 46",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 47",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 48",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 49",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 50",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 51",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 52",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 53",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 54",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 55",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 56",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 57",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 58",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 59",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 60",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 61",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 62",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 63",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 64",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 65",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 66",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 67",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 68",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 69",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 70",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 71",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 72",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 73",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 74",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 75",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 76",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 77",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 78",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 79",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 80",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 81",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 82",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 83",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 84",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 85",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 86",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 87",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 88",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 89",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 90",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 91",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 92",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 93",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 94",
+        "passed": true
+      },
+      {
+        "check": "Main .70m ring capsule 95",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 0",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 1",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 2",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 3",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 4",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 5",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 6",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 7",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 8",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 9",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 10",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 11",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 12",
+        "passed": true
+      },
+      {
+        "check": "Main .70m entry capsule 13",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_sofa_1",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_sofa_2",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_sofa_3",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_sofa_4",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_sofa_5",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_sofa_6",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_armchair_1",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: seat_armchair_2",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_00",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_01",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_02",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_03",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_04",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_05",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_06",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_07",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_08",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_09",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_10",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_11",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_12",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_13",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_14",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: stand_15",
+        "passed": true
+      },
+      {
+        "check": "Native capsule sweep: exit",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-0.05, 2.5]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [2.05, -2.3]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-1.65, -1.1]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [2.05, 0.6]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-1.65, 1.1]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [0.45, -1.0]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [1.95, 2.3]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-1.65, 2.8]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [0.65, 1.2]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [1.85, -0.8]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-0.45, -2.0]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-1.15, 0.0]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-1.65, -2.3]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-0.55, 1.4]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [1.05, -1.9]",
+        "passed": true
+      },
+      {
+        "check": "Standing capsule: [-0.65, -0.9]",
+        "passed": true
+      },
+      {
+        "check": "Sculpture does not block notice_board",
+        "passed": true
+      },
+      {
+        "check": "Sculpture does not block brochure_rack",
+        "passed": true
+      },
+      {
+        "check": "Sculpture does not block call_screen",
+        "passed": true
+      },
+      {
+        "check": "Capture default_43deg_360",
+        "passed": true
+      },
+      {
+        "check": "Capture overview",
+        "passed": true
+      },
+      {
+        "check": "Capture top_capsule",
+        "passed": true
+      }
+    ],
+    "imported": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "renderer": "mobile",
+      "surfaces": 34,
+      "textures": [
+        "res://assets/rooms/poi_service_hall/hall_albedo_ao_n2.png"
+      ],
+      "triangles": 53892
+    },
+    "navigation": {
+      "capsule_radius_m": 0.25,
+      "grid_step_m": 0.1,
+      "main_capsule_radius_m": 0.35,
+      "main_min_m": 1.04000000238419,
+      "reachable_cells": 1299.0,
+      "ring_measurement_xz": [
+        [
+          -0.89,
+          0.18
+        ],
+        [
+          -1.93000000238419,
+          0.18
+        ]
+      ],
+      "ring_nearest_module": "sofa_1",
+      "routes": [
+        {
+          "name": "seat_sofa_1",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.55,
+              2.1
+            ],
+            [
+              -1.55,
+              2.0
+            ],
+            [
+              -1.55,
+              1.9
+            ],
+            [
+              -1.57000000238419,
+              1.925
+            ]
+          ]
+        },
+        {
+          "name": "seat_sofa_2",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.55,
+              2.1
+            ],
+            [
+              -1.55,
+              2.0
+            ],
+            [
+              -1.55,
+              1.9
+            ],
+            [
+              -1.55,
+              1.8
+            ],
+            [
+              -1.55,
+              1.7
+            ],
+            [
+              -1.55,
+              1.6
+            ],
+            [
+              -1.55,
+              1.5
+            ],
+            [
+              -1.55,
+              1.4
+            ],
+            [
+              -1.55,
+              1.3
+            ],
+            [
+              -1.55,
+              1.2
+            ],
+            [
+              -1.57000000238419,
+              1.25
+            ]
+          ]
+        },
+        {
+          "name": "seat_sofa_3",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.55,
+              2.1
+            ],
+            [
+              -1.55,
+              2.0
+            ],
+            [
+              -1.55,
+              1.9
+            ],
+            [
+              -1.55,
+              1.8
+            ],
+            [
+              -1.55,
+              1.7
+            ],
+            [
+              -1.55,
+              1.6
+            ],
+            [
+              -1.55,
+              1.5
+            ],
+            [
+              -1.55,
+              1.4
+            ],
+            [
+              -1.55,
+              1.3
+            ],
+            [
+              -1.55,
+              1.2
+            ],
+            [
+              -1.55,
+              1.1
+            ],
+            [
+              -1.55,
+              1.0
+            ],
+            [
+              -1.55,
+              0.9
+            ],
+            [
+              -1.55,
+              0.8
+            ],
+            [
+              -1.55,
+              0.7
+            ],
+            [
+              -1.55,
+              0.6
+            ],
+            [
+              -1.57000000238419,
+              0.575
+            ]
+          ]
+        },
+        {
+          "name": "seat_sofa_4",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              2.05,
+              2.1
+            ],
+            [
+              2.05,
+              2.0
+            ],
+            [
+              2.05,
+              1.9
+            ],
+            [
+              2.05,
+              1.8
+            ],
+            [
+              2.05,
+              1.7
+            ],
+            [
+              2.05,
+              1.6
+            ],
+            [
+              2.05,
+              1.5
+            ],
+            [
+              2.05,
+              1.4
+            ],
+            [
+              2.05,
+              1.3
+            ],
+            [
+              2.05,
+              1.2
+            ],
+            [
+              2.05,
+              1.1
+            ],
+            [
+              2.05,
+              1.0
+            ],
+            [
+              2.05,
+              0.9
+            ],
+            [
+              2.05,
+              0.8
+            ],
+            [
+              2.03000000238419,
+              0.775
+            ]
+          ]
+        },
+        {
+          "name": "seat_sofa_5",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              2.05,
+              2.1
+            ],
+            [
+              2.05,
+              2.0
+            ],
+            [
+              2.05,
+              1.9
+            ],
+            [
+              2.05,
+              1.8
+            ],
+            [
+              2.05,
+              1.7
+            ],
+            [
+              2.05,
+              1.6
+            ],
+            [
+              2.05,
+              1.5
+            ],
+            [
+              2.05,
+              1.4
+            ],
+            [
+              2.03000000238419,
+              1.45
+            ]
+          ]
+        },
+        {
+          "name": "seat_sofa_6",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              2.05,
+              2.1
+            ],
+            [
+              2.03000000238419,
+              2.125
+            ]
+          ]
+        },
+        {
+          "name": "seat_armchair_1",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.55,
+              2.1
+            ],
+            [
+              -1.55,
+              2.0
+            ],
+            [
+              -1.55,
+              1.9
+            ],
+            [
+              -1.55,
+              1.8
+            ],
+            [
+              -1.55,
+              1.7
+            ],
+            [
+              -1.55,
+              1.6
+            ],
+            [
+              -1.55,
+              1.5
+            ],
+            [
+              -1.55,
+              1.4
+            ],
+            [
+              -1.55,
+              1.3
+            ],
+            [
+              -1.55,
+              1.2
+            ],
+            [
+              -1.55,
+              1.1
+            ],
+            [
+              -1.55,
+              1.0
+            ],
+            [
+              -1.55,
+              0.9
+            ],
+            [
+              -1.55,
+              0.8
+            ],
+            [
+              -1.55,
+              0.7
+            ],
+            [
+              -1.55,
+              0.6
+            ],
+            [
+              -1.55,
+              0.5
+            ],
+            [
+              -1.55,
+              0.4
+            ],
+            [
+              -1.55,
+              0.3
+            ],
+            [
+              -1.55,
+              0.2
+            ],
+            [
+              -1.55,
+              0.1
+            ],
+            [
+              -1.55,
+              0.0
+            ],
+            [
+              -1.55,
+              -0.1
+            ],
+            [
+              -1.55,
+              -0.2
+            ],
+            [
+              -1.55,
+              -0.3
+            ],
+            [
+              -1.55,
+              -0.4
+            ],
+            [
+              -1.55,
+              -0.5
+            ],
+            [
+              -1.55,
+              -0.6
+            ],
+            [
+              -1.55,
+              -0.7
+            ],
+            [
+              -1.55,
+              -0.8
+            ],
+            [
+              -1.55,
+              -0.9
+            ],
+            [
+              -1.55,
+              -1.0
+            ],
+            [
+              -1.55,
+              -1.1
+            ],
+            [
+              -1.55,
+              -1.2
+            ],
+            [
+              -1.55,
+              -1.3
+            ],
+            [
+              -1.55,
+              -1.4
+            ],
+            [
+              -1.55,
+              -1.5
+            ],
+            [
+              -1.55,
+              -1.6
+            ],
+            [
+              -1.55,
+              -1.7
+            ],
+            [
+              -1.55,
+              -1.8
+            ],
+            [
+              -1.57000000238419,
+              -1.85
+            ]
+          ]
+        },
+        {
+          "name": "seat_armchair_2",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              2.05,
+              2.1
+            ],
+            [
+              2.05,
+              2.0
+            ],
+            [
+              2.05,
+              1.9
+            ],
+            [
+              2.05,
+              1.8
+            ],
+            [
+              2.05,
+              1.7
+            ],
+            [
+              2.05,
+              1.6
+            ],
+            [
+              2.05,
+              1.5
+            ],
+            [
+              2.05,
+              1.4
+            ],
+            [
+              2.05,
+              1.3
+            ],
+            [
+              2.05,
+              1.2
+            ],
+            [
+              2.05,
+              1.1
+            ],
+            [
+              2.05,
+              1.0
+            ],
+            [
+              2.05,
+              0.9
+            ],
+            [
+              2.05,
+              0.8
+            ],
+            [
+              2.05,
+              0.7
+            ],
+            [
+              2.05,
+              0.6
+            ],
+            [
+              2.05,
+              0.5
+            ],
+            [
+              2.05,
+              0.4
+            ],
+            [
+              2.05,
+              0.3
+            ],
+            [
+              2.05,
+              0.2
+            ],
+            [
+              2.05,
+              0.1
+            ],
+            [
+              2.05,
+              0.0
+            ],
+            [
+              2.05,
+              -0.1
+            ],
+            [
+              2.05,
+              -0.2
+            ],
+            [
+              2.05,
+              -0.3
+            ],
+            [
+              2.05,
+              -0.4
+            ],
+            [
+              2.05,
+              -0.5
+            ],
+            [
+              2.05,
+              -0.6
+            ],
+            [
+              2.05,
+              -0.7
+            ],
+            [
+              2.05,
+              -0.8
+            ],
+            [
+              2.05,
+              -0.9
+            ],
+            [
+              2.05,
+              -1.0
+            ],
+            [
+              2.05,
+              -1.1
+            ],
+            [
+              2.05,
+              -1.2
+            ],
+            [
+              2.05,
+              -1.3
+            ],
+            [
+              2.05,
+              -1.4
+            ],
+            [
+              2.05,
+              -1.5
+            ],
+            [
+              2.05,
+              -1.6
+            ],
+            [
+              2.03000000238419,
+              -1.55
+            ]
+          ]
+        },
+        {
+          "name": "stand_00",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.0499999999999998,
+              2.5
+            ]
+          ]
+        },
+        {
+          "name": "stand_01",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              2.05,
+              2.1
+            ],
+            [
+              2.05,
+              2.0
+            ],
+            [
+              2.05,
+              1.9
+            ],
+            [
+              2.05,
+              1.8
+            ],
+            [
+              2.05,
+              1.7
+            ],
+            [
+              2.05,
+              1.6
+            ],
+            [
+              2.05,
+              1.5
+            ],
+            [
+              2.05,
+              1.4
+            ],
+            [
+              2.05,
+              1.3
+            ],
+            [
+              2.05,
+              1.2
+            ],
+            [
+              2.05,
+              1.1
+            ],
+            [
+              2.05,
+              1.0
+            ],
+            [
+              2.05,
+              0.9
+            ],
+            [
+              2.05,
+              0.8
+            ],
+            [
+              2.05,
+              0.7
+            ],
+            [
+              2.05,
+              0.6
+            ],
+            [
+              2.05,
+              0.5
+            ],
+            [
+              2.05,
+              0.4
+            ],
+            [
+              2.05,
+              0.3
+            ],
+            [
+              2.05,
+              0.2
+            ],
+            [
+              2.05,
+              0.1
+            ],
+            [
+              2.05,
+              0.0
+            ],
+            [
+              2.05,
+              -0.1
+            ],
+            [
+              2.05,
+              -0.2
+            ],
+            [
+              2.05,
+              -0.3
+            ],
+            [
+              2.05,
+              -0.4
+            ],
+            [
+              2.05,
+              -0.5
+            ],
+            [
+              2.05,
+              -0.6
+            ],
+            [
+              2.05,
+              -0.7
+            ],
+            [
+              2.05,
+              -0.8
+            ],
+            [
+              2.05,
+              -0.9
+            ],
+            [
+              2.05,
+              -1.0
+            ],
+            [
+              2.05,
+              -1.1
+            ],
+            [
+              2.05,
+              -1.2
+            ],
+            [
+              2.05,
+              -1.3
+            ],
+            [
+              2.05,
+              -1.4
+            ],
+            [
+              2.05,
+              -1.5
+            ],
+            [
+              2.05,
+              -1.6
+            ],
+            [
+              2.05,
+              -1.7
+            ],
+            [
+              2.05,
+              -1.8
+            ],
+            [
+              2.05,
+              -1.9
+            ],
+            [
+              2.05,
+              -2.0
+            ],
+            [
+              2.05,
+              -2.1
+            ],
+            [
+              2.05,
+              -2.2
+            ],
+            [
+              2.05,
+              -2.3
+            ],
+            [
+              2.05,
+              -2.3
+            ]
+          ]
+        },
+        {
+          "name": "stand_02",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.65,
+              2.2
+            ],
+            [
+              -1.65,
+              2.1
+            ],
+            [
+              -1.65,
+              2.0
+            ],
+            [
+              -1.65,
+              1.9
+            ],
+            [
+              -1.65,
+              1.8
+            ],
+            [
+              -1.65,
+              1.7
+            ],
+            [
+              -1.65,
+              1.6
+            ],
+            [
+              -1.65,
+              1.5
+            ],
+            [
+              -1.65,
+              1.4
+            ],
+            [
+              -1.65,
+              1.3
+            ],
+            [
+              -1.65,
+              1.2
+            ],
+            [
+              -1.65,
+              1.1
+            ],
+            [
+              -1.65,
+              1.0
+            ],
+            [
+              -1.65,
+              0.9
+            ],
+            [
+              -1.65,
+              0.8
+            ],
+            [
+              -1.65,
+              0.7
+            ],
+            [
+              -1.65,
+              0.6
+            ],
+            [
+              -1.65,
+              0.5
+            ],
+            [
+              -1.65,
+              0.4
+            ],
+            [
+              -1.65,
+              0.3
+            ],
+            [
+              -1.65,
+              0.2
+            ],
+            [
+              -1.65,
+              0.1
+            ],
+            [
+              -1.65,
+              0.0
+            ],
+            [
+              -1.65,
+              -0.1
+            ],
+            [
+              -1.65,
+              -0.2
+            ],
+            [
+              -1.65,
+              -0.3
+            ],
+            [
+              -1.65,
+              -0.4
+            ],
+            [
+              -1.65,
+              -0.5
+            ],
+            [
+              -1.65,
+              -0.6
+            ],
+            [
+              -1.65,
+              -0.7
+            ],
+            [
+              -1.65,
+              -0.8
+            ],
+            [
+              -1.65,
+              -0.9
+            ],
+            [
+              -1.65,
+              -1.0
+            ],
+            [
+              -1.65,
+              -1.1
+            ],
+            [
+              -1.65,
+              -1.1
+            ]
+          ]
+        },
+        {
+          "name": "stand_03",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              2.05,
+              2.1
+            ],
+            [
+              2.05,
+              2.0
+            ],
+            [
+              2.05,
+              1.9
+            ],
+            [
+              2.05,
+              1.8
+            ],
+            [
+              2.05,
+              1.7
+            ],
+            [
+              2.05,
+              1.6
+            ],
+            [
+              2.05,
+              1.5
+            ],
+            [
+              2.05,
+              1.4
+            ],
+            [
+              2.05,
+              1.3
+            ],
+            [
+              2.05,
+              1.2
+            ],
+            [
+              2.05,
+              1.1
+            ],
+            [
+              2.05,
+              1.0
+            ],
+            [
+              2.05,
+              0.9
+            ],
+            [
+              2.05,
+              0.8
+            ],
+            [
+              2.05,
+              0.7
+            ],
+            [
+              2.05,
+              0.6
+            ],
+            [
+              2.05,
+              0.6
+            ]
+          ]
+        },
+        {
+          "name": "stand_04",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.65,
+              2.2
+            ],
+            [
+              -1.65,
+              2.1
+            ],
+            [
+              -1.65,
+              2.0
+            ],
+            [
+              -1.65,
+              1.9
+            ],
+            [
+              -1.65,
+              1.8
+            ],
+            [
+              -1.65,
+              1.7
+            ],
+            [
+              -1.65,
+              1.6
+            ],
+            [
+              -1.65,
+              1.5
+            ],
+            [
+              -1.65,
+              1.4
+            ],
+            [
+              -1.65,
+              1.3
+            ],
+            [
+              -1.65,
+              1.2
+            ],
+            [
+              -1.65,
+              1.1
+            ],
+            [
+              -1.65,
+              1.1
+            ]
+          ]
+        },
+        {
+          "name": "stand_05",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.25,
+              2.0
+            ],
+            [
+              1.25,
+              1.9
+            ],
+            [
+              1.25,
+              1.8
+            ],
+            [
+              1.25,
+              1.7
+            ],
+            [
+              1.25,
+              1.6
+            ],
+            [
+              1.25,
+              1.5
+            ],
+            [
+              1.25,
+              1.4
+            ],
+            [
+              1.25,
+              1.3
+            ],
+            [
+              1.25,
+              1.2
+            ],
+            [
+              1.25,
+              1.1
+            ],
+            [
+              1.25,
+              1.0
+            ],
+            [
+              1.25,
+              0.9
+            ],
+            [
+              1.25,
+              0.8
+            ],
+            [
+              1.25,
+              0.7
+            ],
+            [
+              1.25,
+              0.6
+            ],
+            [
+              1.25,
+              0.5
+            ],
+            [
+              1.25,
+              0.4
+            ],
+            [
+              1.25,
+              0.3
+            ],
+            [
+              1.25,
+              0.2
+            ],
+            [
+              1.25,
+              0.1
+            ],
+            [
+              1.25,
+              0.0
+            ],
+            [
+              1.25,
+              -0.1
+            ],
+            [
+              1.25,
+              -0.2
+            ],
+            [
+              1.25,
+              -0.3
+            ],
+            [
+              1.15,
+              -0.3
+            ],
+            [
+              1.15,
+              -0.4
+            ],
+            [
+              1.15,
+              -0.5
+            ],
+            [
+              1.05,
+              -0.5
+            ],
+            [
+              1.05,
+              -0.6
+            ],
+            [
+              0.95,
+              -0.6
+            ],
+            [
+              0.95,
+              -0.7
+            ],
+            [
+              0.85,
+              -0.7
+            ],
+            [
+              0.85,
+              -0.8
+            ],
+            [
+              0.75,
+              -0.8
+            ],
+            [
+              0.75,
+              -0.9
+            ],
+            [
+              0.65,
+              -0.9
+            ],
+            [
+              0.55,
+              -0.9
+            ],
+            [
+              0.55,
+              -1.0
+            ],
+            [
+              0.45,
+              -1.0
+            ],
+            [
+              0.45,
+              -1.0
+            ]
+          ]
+        },
+        {
+          "name": "stand_06",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.95,
+              2.1
+            ],
+            [
+              1.95,
+              2.2
+            ],
+            [
+              1.95,
+              2.3
+            ],
+            [
+              1.95,
+              2.3
+            ]
+          ]
+        },
+        {
+          "name": "stand_07",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.65,
+              2.2
+            ],
+            [
+              -1.65,
+              2.3
+            ],
+            [
+              -1.65,
+              2.4
+            ],
+            [
+              -1.65,
+              2.5
+            ],
+            [
+              -1.65,
+              2.6
+            ],
+            [
+              -1.65,
+              2.7
+            ],
+            [
+              -1.65,
+              2.8
+            ],
+            [
+              -1.65,
+              2.8
+            ]
+          ]
+        },
+        {
+          "name": "stand_08",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.65,
+              2.0
+            ],
+            [
+              0.65,
+              1.9
+            ],
+            [
+              0.65,
+              1.8
+            ],
+            [
+              0.65,
+              1.7
+            ],
+            [
+              0.65,
+              1.6
+            ],
+            [
+              0.65,
+              1.5
+            ],
+            [
+              0.65,
+              1.4
+            ],
+            [
+              0.65,
+              1.3
+            ],
+            [
+              0.65,
+              1.2
+            ],
+            [
+              0.65,
+              1.2
+            ]
+          ]
+        },
+        {
+          "name": "stand_09",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.35,
+              2.1
+            ],
+            [
+              1.45,
+              2.1
+            ],
+            [
+              1.55,
+              2.1
+            ],
+            [
+              1.65,
+              2.1
+            ],
+            [
+              1.75,
+              2.1
+            ],
+            [
+              1.85,
+              2.1
+            ],
+            [
+              1.85,
+              2.0
+            ],
+            [
+              1.85,
+              1.9
+            ],
+            [
+              1.85,
+              1.8
+            ],
+            [
+              1.85,
+              1.7
+            ],
+            [
+              1.85,
+              1.6
+            ],
+            [
+              1.85,
+              1.5
+            ],
+            [
+              1.85,
+              1.4
+            ],
+            [
+              1.85,
+              1.3
+            ],
+            [
+              1.85,
+              1.2
+            ],
+            [
+              1.85,
+              1.1
+            ],
+            [
+              1.85,
+              1.0
+            ],
+            [
+              1.85,
+              0.9
+            ],
+            [
+              1.85,
+              0.8
+            ],
+            [
+              1.85,
+              0.7
+            ],
+            [
+              1.85,
+              0.6
+            ],
+            [
+              1.85,
+              0.5
+            ],
+            [
+              1.85,
+              0.4
+            ],
+            [
+              1.85,
+              0.3
+            ],
+            [
+              1.85,
+              0.2
+            ],
+            [
+              1.85,
+              0.1
+            ],
+            [
+              1.85,
+              0.0
+            ],
+            [
+              1.85,
+              -0.1
+            ],
+            [
+              1.85,
+              -0.2
+            ],
+            [
+              1.85,
+              -0.3
+            ],
+            [
+              1.85,
+              -0.4
+            ],
+            [
+              1.85,
+              -0.5
+            ],
+            [
+              1.85,
+              -0.6
+            ],
+            [
+              1.85,
+              -0.7
+            ],
+            [
+              1.85,
+              -0.8
+            ],
+            [
+              1.85,
+              -0.8
+            ]
+          ]
+        },
+        {
+          "name": "stand_10",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.15,
+              2.1
+            ],
+            [
+              -1.15,
+              2.0
+            ],
+            [
+              -1.15,
+              1.9
+            ],
+            [
+              -1.15,
+              1.8
+            ],
+            [
+              -1.15,
+              1.7
+            ],
+            [
+              -1.15,
+              1.6
+            ],
+            [
+              -1.15,
+              1.5
+            ],
+            [
+              -1.15,
+              1.4
+            ],
+            [
+              -1.15,
+              1.3
+            ],
+            [
+              -1.15,
+              1.2
+            ],
+            [
+              -1.15,
+              1.1
+            ],
+            [
+              -1.15,
+              1.0
+            ],
+            [
+              -1.15,
+              0.9
+            ],
+            [
+              -1.15,
+              0.8
+            ],
+            [
+              -1.15,
+              0.7
+            ],
+            [
+              -1.15,
+              0.6
+            ],
+            [
+              -1.15,
+              0.5
+            ],
+            [
+              -1.15,
+              0.4
+            ],
+            [
+              -1.15,
+              0.3
+            ],
+            [
+              -1.15,
+              0.2
+            ],
+            [
+              -1.15,
+              0.1
+            ],
+            [
+              -1.15,
+              0.0
+            ],
+            [
+              -1.15,
+              -0.1
+            ],
+            [
+              -1.15,
+              -0.2
+            ],
+            [
+              -1.15,
+              -0.3
+            ],
+            [
+              -1.05,
+              -0.3
+            ],
+            [
+              -1.05,
+              -0.4
+            ],
+            [
+              -1.05,
+              -0.5
+            ],
+            [
+              -0.95,
+              -0.5
+            ],
+            [
+              -0.95,
+              -0.6
+            ],
+            [
+              -0.85,
+              -0.6
+            ],
+            [
+              -0.85,
+              -0.7
+            ],
+            [
+              -0.75,
+              -0.7
+            ],
+            [
+              -0.75,
+              -0.8
+            ],
+            [
+              -0.65,
+              -0.8
+            ],
+            [
+              -0.65,
+              -0.9
+            ],
+            [
+              -0.55,
+              -0.9
+            ],
+            [
+              -0.45,
+              -0.9
+            ],
+            [
+              -0.45,
+              -1.0
+            ],
+            [
+              -0.45,
+              -1.1
+            ],
+            [
+              -0.45,
+              -1.2
+            ],
+            [
+              -0.45,
+              -1.3
+            ],
+            [
+              -0.45,
+              -1.4
+            ],
+            [
+              -0.45,
+              -1.5
+            ],
+            [
+              -0.45,
+              -1.6
+            ],
+            [
+              -0.45,
+              -1.7
+            ],
+            [
+              -0.45,
+              -1.8
+            ],
+            [
+              -0.45,
+              -1.9
+            ],
+            [
+              -0.45,
+              -2.0
+            ],
+            [
+              -0.45,
+              -2.0
+            ]
+          ]
+        },
+        {
+          "name": "stand_11",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.15,
+              2.1
+            ],
+            [
+              -1.15,
+              2.0
+            ],
+            [
+              -1.15,
+              1.9
+            ],
+            [
+              -1.15,
+              1.8
+            ],
+            [
+              -1.15,
+              1.7
+            ],
+            [
+              -1.15,
+              1.6
+            ],
+            [
+              -1.15,
+              1.5
+            ],
+            [
+              -1.15,
+              1.4
+            ],
+            [
+              -1.15,
+              1.3
+            ],
+            [
+              -1.15,
+              1.2
+            ],
+            [
+              -1.15,
+              1.1
+            ],
+            [
+              -1.15,
+              1.0
+            ],
+            [
+              -1.15,
+              0.9
+            ],
+            [
+              -1.15,
+              0.8
+            ],
+            [
+              -1.15,
+              0.7
+            ],
+            [
+              -1.15,
+              0.6
+            ],
+            [
+              -1.15,
+              0.5
+            ],
+            [
+              -1.15,
+              0.4
+            ],
+            [
+              -1.15,
+              0.3
+            ],
+            [
+              -1.15,
+              0.2
+            ],
+            [
+              -1.15,
+              0.1
+            ],
+            [
+              -1.15,
+              0.0
+            ],
+            [
+              -1.15,
+              0.0
+            ]
+          ]
+        },
+        {
+          "name": "stand_12",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.25,
+              2.2
+            ],
+            [
+              -1.35,
+              2.2
+            ],
+            [
+              -1.45,
+              2.2
+            ],
+            [
+              -1.55,
+              2.2
+            ],
+            [
+              -1.65,
+              2.2
+            ],
+            [
+              -1.65,
+              2.1
+            ],
+            [
+              -1.65,
+              2.0
+            ],
+            [
+              -1.65,
+              1.9
+            ],
+            [
+              -1.65,
+              1.8
+            ],
+            [
+              -1.65,
+              1.7
+            ],
+            [
+              -1.65,
+              1.6
+            ],
+            [
+              -1.65,
+              1.5
+            ],
+            [
+              -1.65,
+              1.4
+            ],
+            [
+              -1.65,
+              1.3
+            ],
+            [
+              -1.65,
+              1.2
+            ],
+            [
+              -1.65,
+              1.1
+            ],
+            [
+              -1.65,
+              1.0
+            ],
+            [
+              -1.65,
+              0.9
+            ],
+            [
+              -1.65,
+              0.8
+            ],
+            [
+              -1.65,
+              0.7
+            ],
+            [
+              -1.65,
+              0.6
+            ],
+            [
+              -1.65,
+              0.5
+            ],
+            [
+              -1.65,
+              0.4
+            ],
+            [
+              -1.65,
+              0.3
+            ],
+            [
+              -1.65,
+              0.2
+            ],
+            [
+              -1.65,
+              0.1
+            ],
+            [
+              -1.65,
+              0.0
+            ],
+            [
+              -1.65,
+              -0.1
+            ],
+            [
+              -1.65,
+              -0.2
+            ],
+            [
+              -1.65,
+              -0.3
+            ],
+            [
+              -1.65,
+              -0.4
+            ],
+            [
+              -1.65,
+              -0.5
+            ],
+            [
+              -1.65,
+              -0.6
+            ],
+            [
+              -1.65,
+              -0.7
+            ],
+            [
+              -1.65,
+              -0.8
+            ],
+            [
+              -1.65,
+              -0.9
+            ],
+            [
+              -1.65,
+              -1.0
+            ],
+            [
+              -1.65,
+              -1.1
+            ],
+            [
+              -1.65,
+              -1.2
+            ],
+            [
+              -1.65,
+              -1.3
+            ],
+            [
+              -1.65,
+              -1.4
+            ],
+            [
+              -1.65,
+              -1.5
+            ],
+            [
+              -1.65,
+              -1.6
+            ],
+            [
+              -1.65,
+              -1.7
+            ],
+            [
+              -1.65,
+              -1.8
+            ],
+            [
+              -1.65,
+              -1.9
+            ],
+            [
+              -1.65,
+              -2.0
+            ],
+            [
+              -1.65,
+              -2.1
+            ],
+            [
+              -1.65,
+              -2.2
+            ],
+            [
+              -1.65,
+              -2.3
+            ],
+            [
+              -1.65,
+              -2.3
+            ]
+          ]
+        },
+        {
+          "name": "stand_13",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.55,
+              2.3
+            ],
+            [
+              -0.55,
+              2.2
+            ],
+            [
+              -0.55,
+              2.1
+            ],
+            [
+              -0.55,
+              2.0
+            ],
+            [
+              -0.55,
+              1.9
+            ],
+            [
+              -0.55,
+              1.8
+            ],
+            [
+              -0.55,
+              1.7
+            ],
+            [
+              -0.55,
+              1.6
+            ],
+            [
+              -0.55,
+              1.5
+            ],
+            [
+              -0.55,
+              1.4
+            ],
+            [
+              -0.55,
+              1.4
+            ]
+          ]
+        },
+        {
+          "name": "stand_14",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              0.0499999999999998,
+              2.5
+            ],
+            [
+              0.15,
+              2.5
+            ],
+            [
+              0.25,
+              2.5
+            ],
+            [
+              0.35,
+              2.5
+            ],
+            [
+              0.35,
+              2.4
+            ],
+            [
+              0.35,
+              2.3
+            ],
+            [
+              0.45,
+              2.3
+            ],
+            [
+              0.45,
+              2.2
+            ],
+            [
+              0.55,
+              2.2
+            ],
+            [
+              0.55,
+              2.1
+            ],
+            [
+              0.65,
+              2.1
+            ],
+            [
+              0.75,
+              2.1
+            ],
+            [
+              0.85,
+              2.1
+            ],
+            [
+              0.95,
+              2.1
+            ],
+            [
+              1.05,
+              2.1
+            ],
+            [
+              1.15,
+              2.1
+            ],
+            [
+              1.25,
+              2.1
+            ],
+            [
+              1.25,
+              2.0
+            ],
+            [
+              1.25,
+              1.9
+            ],
+            [
+              1.25,
+              1.8
+            ],
+            [
+              1.25,
+              1.7
+            ],
+            [
+              1.25,
+              1.6
+            ],
+            [
+              1.25,
+              1.5
+            ],
+            [
+              1.25,
+              1.4
+            ],
+            [
+              1.25,
+              1.3
+            ],
+            [
+              1.25,
+              1.2
+            ],
+            [
+              1.25,
+              1.1
+            ],
+            [
+              1.25,
+              1.0
+            ],
+            [
+              1.25,
+              0.9
+            ],
+            [
+              1.25,
+              0.8
+            ],
+            [
+              1.25,
+              0.7
+            ],
+            [
+              1.25,
+              0.6
+            ],
+            [
+              1.25,
+              0.5
+            ],
+            [
+              1.25,
+              0.4
+            ],
+            [
+              1.25,
+              0.3
+            ],
+            [
+              1.25,
+              0.2
+            ],
+            [
+              1.25,
+              0.1
+            ],
+            [
+              1.25,
+              0.0
+            ],
+            [
+              1.25,
+              -0.1
+            ],
+            [
+              1.25,
+              -0.2
+            ],
+            [
+              1.25,
+              -0.3
+            ],
+            [
+              1.15,
+              -0.3
+            ],
+            [
+              1.15,
+              -0.4
+            ],
+            [
+              1.15,
+              -0.5
+            ],
+            [
+              1.05,
+              -0.5
+            ],
+            [
+              1.05,
+              -0.6
+            ],
+            [
+              1.05,
+              -0.7
+            ],
+            [
+              1.05,
+              -0.8
+            ],
+            [
+              1.05,
+              -0.9
+            ],
+            [
+              1.05,
+              -1.0
+            ],
+            [
+              1.05,
+              -1.1
+            ],
+            [
+              1.05,
+              -1.2
+            ],
+            [
+              1.05,
+              -1.3
+            ],
+            [
+              1.05,
+              -1.4
+            ],
+            [
+              1.05,
+              -1.5
+            ],
+            [
+              1.05,
+              -1.6
+            ],
+            [
+              1.05,
+              -1.7
+            ],
+            [
+              1.05,
+              -1.8
+            ],
+            [
+              1.05,
+              -1.9
+            ],
+            [
+              1.05,
+              -1.9
+            ]
+          ]
+        },
+        {
+          "name": "stand_15",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.15,
+              2.5
+            ],
+            [
+              -0.25,
+              2.5
+            ],
+            [
+              -0.35,
+              2.5
+            ],
+            [
+              -0.45,
+              2.5
+            ],
+            [
+              -0.55,
+              2.5
+            ],
+            [
+              -0.55,
+              2.4
+            ],
+            [
+              -0.65,
+              2.4
+            ],
+            [
+              -0.65,
+              2.3
+            ],
+            [
+              -0.75,
+              2.3
+            ],
+            [
+              -0.75,
+              2.2
+            ],
+            [
+              -0.85,
+              2.2
+            ],
+            [
+              -0.95,
+              2.2
+            ],
+            [
+              -1.05,
+              2.2
+            ],
+            [
+              -1.15,
+              2.2
+            ],
+            [
+              -1.15,
+              2.1
+            ],
+            [
+              -1.15,
+              2.0
+            ],
+            [
+              -1.15,
+              1.9
+            ],
+            [
+              -1.15,
+              1.8
+            ],
+            [
+              -1.15,
+              1.7
+            ],
+            [
+              -1.15,
+              1.6
+            ],
+            [
+              -1.15,
+              1.5
+            ],
+            [
+              -1.15,
+              1.4
+            ],
+            [
+              -1.15,
+              1.3
+            ],
+            [
+              -1.15,
+              1.2
+            ],
+            [
+              -1.15,
+              1.1
+            ],
+            [
+              -1.15,
+              1.0
+            ],
+            [
+              -1.15,
+              0.9
+            ],
+            [
+              -1.15,
+              0.8
+            ],
+            [
+              -1.15,
+              0.7
+            ],
+            [
+              -1.15,
+              0.6
+            ],
+            [
+              -1.15,
+              0.5
+            ],
+            [
+              -1.15,
+              0.4
+            ],
+            [
+              -1.15,
+              0.3
+            ],
+            [
+              -1.15,
+              0.2
+            ],
+            [
+              -1.15,
+              0.1
+            ],
+            [
+              -1.15,
+              0.0
+            ],
+            [
+              -1.15,
+              -0.1
+            ],
+            [
+              -1.15,
+              -0.2
+            ],
+            [
+              -1.15,
+              -0.3
+            ],
+            [
+              -1.05,
+              -0.3
+            ],
+            [
+              -1.05,
+              -0.4
+            ],
+            [
+              -1.05,
+              -0.5
+            ],
+            [
+              -0.95,
+              -0.5
+            ],
+            [
+              -0.95,
+              -0.6
+            ],
+            [
+              -0.85,
+              -0.6
+            ],
+            [
+              -0.85,
+              -0.7
+            ],
+            [
+              -0.75,
+              -0.7
+            ],
+            [
+              -0.75,
+              -0.8
+            ],
+            [
+              -0.65,
+              -0.8
+            ],
+            [
+              -0.65,
+              -0.9
+            ],
+            [
+              -0.65,
+              -0.9
+            ]
+          ]
+        },
+        {
+          "name": "exit",
+          "points_xz": [
+            [
+              -0.0499999999999998,
+              2.5
+            ],
+            [
+              -0.0499999999999998,
+              2.6
+            ],
+            [
+              -0.0499999999999998,
+              2.7
+            ],
+            [
+              -0.0499999999999998,
+              2.8
+            ],
+            [
+              0.0,
+              2.88
+            ]
+          ]
+        }
+      ],
+      "standing_positions_xz": [
+        [
+          -0.0499999999999998,
+          2.5
+        ],
+        [
+          2.05,
+          -2.3
+        ],
+        [
+          -1.65,
+          -1.1
+        ],
+        [
+          2.05,
+          0.6
+        ],
+        [
+          -1.65,
+          1.1
+        ],
+        [
+          0.45,
+          -1.0
+        ],
+        [
+          1.95,
+          2.3
+        ],
+        [
+          -1.65,
+          2.8
+        ],
+        [
+          0.65,
+          1.2
+        ],
+        [
+          1.85,
+          -0.8
+        ],
+        [
+          -0.45,
+          -2.0
+        ],
+        [
+          -1.15,
+          0.0
+        ],
+        [
+          -1.65,
+          -2.3
+        ],
+        [
+          -0.55,
+          1.4
+        ],
+        [
+          1.05,
+          -1.9
+        ],
+        [
+          -0.65,
+          -0.9
+        ]
+      ]
+    },
+    "occlusion": {
+      "brochure_rack": {
+        "blocked_by_sculpture": 0,
+        "tested": 81
+      },
+      "call_screen": {
+        "blocked_by_sculpture": 0,
+        "tested": 81
+      },
+      "notice_board": {
+        "blocked_by_sculpture": 0,
+        "tested": 81
+      }
+    },
+    "passed": true,
+    "routes": [
+      {
+        "blocked_segments": [],
+        "name": "seat_sofa_1"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_sofa_2"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_sofa_3"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_sofa_4"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_sofa_5"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_sofa_6"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_armchair_1"
+      },
+      {
+        "blocked_segments": [],
+        "name": "seat_armchair_2"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_00"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_01"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_02"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_03"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_04"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_05"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_06"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_07"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_08"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_09"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_10"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_11"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_12"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_13"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_14"
+      },
+      {
+        "blocked_segments": [],
+        "name": "stand_15"
+      },
+      {
+        "blocked_segments": [],
+        "name": "exit"
+      }
+    ]
+  }
+}

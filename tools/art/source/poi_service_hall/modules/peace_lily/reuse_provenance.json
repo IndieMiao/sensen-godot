@@ -1,0 +1,15 @@
+{
+  "task": "SGODOT-321",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source": "assets/rooms/_shared/plants/peace_lily.glb",
+  "source_sha256": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
+  "changes": [
+    "N2 atlas/material and UV remap; original geometry retained"
+  ],
+  "scale_xyz": [
+    1,
+    1,
+    1
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "task": "SGODOT-321",
+  "phase": "layout blockout, not detailed art",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "dependencies": [
+    {
+      "pr": 594,
+      "commit": "3aa234665681f8fe9e9acc63784c3ef65bf93ff4",
+      "files": [
+        {
+          "path": "assets/rooms/_shared/shell_hall/README_shell.md",
+          "sha256": "2ee33ec8f5c6f910b17c432f499c9ff57b9c2e46dc57201e8837bca8316caea9"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_albedo_ao.png",
+          "sha256": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_albedo_ao.png.import",
+          "sha256": "b100c3e1fb288599539cc96d469b9dd485147d732784e001f38676dded41f802"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_back_wall.glb",
+          "sha256": "f1b58d7db45106701e73aa83056342011ac99ccc6fd970a0c8b0e36533fa07c2"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_back_wall.glb.import",
+          "sha256": "cf113c9a0e7f0492c27c09a1d0808879098ef248c47e0739ffe271d57195aec6"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_floor.glb",
+          "sha256": "66c20670acc1c1f3ed51526513f834186aa6339e5d9b0214a3c793c8ddc96135"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_floor.glb.import",
+          "sha256": "baa7c96fe978a973255055e3e7f587f5d9f4484200a76bd2e2663eeec9d2cd17"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_left_wall.glb",
+          "sha256": "9e47404a0bcd94764409957705f0b834a6f4faae6303433df3b56bc38defb2ca"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_left_wall.glb.import",
+          "sha256": "8f4dfac085142177c7bae166cde7ada3ca0a8f8c67e33b39c0ec6fe4870ef4a6"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_palette.json",
+          "sha256": "f6a02bc32c02544ff39ef4d6061208d3577b33e8464dffbc0c750ccbd5e5a6e0"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_window_frame.glb",
+          "sha256": "9784b2957f00b6dc21be8d31eb639e26f0d7c36c7f7daa0222dbd11e2f73caaa"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_window_frame.glb.import",
+          "sha256": "9db079adc27c49b7f89c1a5256093f5e71285392e0086fb7428c9881fc151167"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_window_glass.glb",
+          "sha256": "ecdea492182dadb3ee5469d7915ba0ea8db103f41880a5b19f2d5e1426ca184d"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_window_glass.glb.import",
+          "sha256": "ac47d519332a2e8e696ef7246674320f131c19779fe2c64e4d6c0c5132e32f05"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_window_grid.glb",
+          "sha256": "21e87250a88eb9362a548eeb1720b86ecd85d8ce3002b7db8c4d3ee1574a832c"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_window_grid.glb.import",
+          "sha256": "19def99f1be9a7d0ca525186bba7f50f96c94f9a4317e48e2a0c99ca520a26e8"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/layout.json",
+          "sha256": "123a30fe7b4c273f6c21d7773d2bda89965d281629ca38343cf3f702ff032ecd"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/hall_back_wall/reuse_provenance.json",
+          "sha256": "8063a63168312accbc53411ae0be31d3839b44d04cb1a46129b11fc7394dd749"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/hall_floor/reuse_provenance.json",
+          "sha256": "7d1df3e92c6d915b1f08b2c6fca98db2f2c20e88e193fe3799ec8b7a8288c07b"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/hall_left_wall/reuse_provenance.json",
+          "sha256": "73ac6190741e59180c0c236bac8f90d4c60a810b686b45cf02d657e68f80ddd9"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/hall_window_frame/reuse_provenance.json",
+          "sha256": "b37cde858e4d8053013aecba2f1d0f65786dc513cb32cacfd57468e3432454cd"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/hall_window_glass/reuse_provenance.json",
+          "sha256": "82b9eba224e2fedd99ecc83bab1771d96679affa728884f20e692acd31948f45"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/hall_window_grid/reuse_provenance.json",
+          "sha256": "af16b3c2a41199121d6c46894a9f924d2e8d4cfec30d8fa3b6582eca88269933"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/shell_asset_stats.json",
+          "sha256": "84fc9000ec107847ff5cbe6462267cbd653e02bc38820e6ab319a3bc5906f0b7"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/shell_reuse_provenance.json",
+          "sha256": "39e47e3b3e42517e3c16c276df0984a9aa979e0a8708d8b942df3f5f1e38cba0"
+        },
+        {
+          "path": "scenes/shell_hall/shell_hall_art.gd",
+          "sha256": "09626759f40f234004d50f0bf70cdde6b1873f52be90948d7828fbd6ea13d697"
+        },
+        {
+          "path": "scenes/shell_hall/shell_hall_art.gd.uid",
+          "sha256": "3d06749b4ddc46b7104119a564cc4402f55e854fe972f0716295f2d3534c9d04"
+        },
+        {
+          "path": "scenes/shell_hall/shell_hall_art.tscn",
+          "sha256": "6d58f3752750ae7bf93e9f6c4f28b80458c4342403b9de012bcddc98116ab51d"
+        }
+      ]
+    },
+    {
+      "pr": 563,
+      "commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+      "files": [
+        {
+          "path": "assets/rooms/_shared/shell_hall/README.md",
+          "sha256": "bece4874000b384ddcc747167e5d3ffb0b718c1273f390abdb1d61f8d386bb1d"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/armchair.glb",
+          "sha256": "22b329539f0d85af367849719caaef67870e0a6923bb8790adc52f4fea84e2dc"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/armchair.glb.import",
+          "sha256": "5a55babefb2b559812168bb8adbc7950793107d44d496ba7561a0e4d379c33d2"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/asset_stats.json",
+          "sha256": "887d72c48d456053ff85a5d9b2e1d9d9b583e96c8531a279feee10e9ec6c3c53"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/bench_three_seat.glb",
+          "sha256": "ddb0151743a9e5682db3fef2afaefc0992390fd254a193c474ccca3d46587cfb"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/bench_three_seat.glb.import",
+          "sha256": "3602ee0e48435f62fb8c54dbe3f9583a16563cfa62a9d979be985b9b46bd2a7d"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/display_cabinet.glb",
+          "sha256": "2c78d031503f0a9c57686fb39ae0b32967c907c029174cc7e7f3721f00fe5cea"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/display_cabinet.glb.import",
+          "sha256": "c8f29325d0cc4937c7b53de0c904c2fc3126be733702cf2008336c8c39bd373d"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/display_island.glb",
+          "sha256": "ce0af3d751975e120245f4e0f886fb5bed5cf356aaa53a1c5242afc047bd2fc6"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/display_island.glb.import",
+          "sha256": "bb8492476f3c169e6d460b748874701632ab9653f8ca8d8cd7cf8880b04a88f4"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/frame_landscape.glb",
+          "sha256": "b7405a867b8624ce38616390138db1e52f6cbe572b06934a5238a3e470866d0f"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/frame_landscape.glb.import",
+          "sha256": "7441b1e171f10bd57ffd2871b222f7ac274ad23059de8d4d7a11855772099b6c"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/frame_portrait.glb",
+          "sha256": "e3a38641e331388e6ae70f7479eca9deeb2ab1f655399dff8fb1dbb219122fd8"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/frame_portrait.glb.import",
+          "sha256": "b6c6e3b4dbd3967e77be99be19add925a162973112c39e79e68d5e3ee3f76126"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_glass.tres",
+          "sha256": "f7e40fef70255ba098bacdd512979328435e4a9bffaefaa45a4ed830582a62e9"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hall_opaque.tres",
+          "sha256": "8cc33d830e70d4272fd8bec31df17f7085b70c126554450d2b6d0bc69374ffe0"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hallkit_palette.png",
+          "sha256": "cf680867ad12bee9954f9574a7e40ecbf6c6b3b4a8f72fe186feca06e3321926"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/hallkit_palette.png.import",
+          "sha256": "f32433136192a55585e7e03084a72ce23dda588a081e82ec3ac98c539c687753"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/palette.json",
+          "sha256": "4030fb2265f27fefc455ca7090d08b39abe92b20784ef81203dbf67025fb46ec"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/armchair/reuse_provenance.json",
+          "sha256": "a182f9aa472cbd50dd9066f3b2f288e53ea76ddd749d827e530e7754247ca12d"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/bench_three_seat/reuse_provenance.json",
+          "sha256": "2c4f8de25d7d67228536ddd94749fa802ee72170132532258f8cdcdd2a7b4969"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/display_cabinet/reuse_provenance.json",
+          "sha256": "810f95187dbd2669c78b357429c73a3684b7520128753c6c2e0ca68ec50606c6"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/display_island/reuse_provenance.json",
+          "sha256": "e1a67799fa1e91c69cc68810ed4b46a56698f4f24f97130eca814f15160ed9cb"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/frame_landscape/reuse_provenance.json",
+          "sha256": "722182d2393de59b795c9b962af26328d3287f8d1ac3af8e17b3b933431a9cd0"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/frame_portrait/reuse_provenance.json",
+          "sha256": "461cf3d5c10cb3c1a98807ef77eeacf7c25eb66ab1c192efe943ca198cbf1752"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/round_side_table/reuse_provenance.json",
+          "sha256": "351838d30b948b2f2d42ddbad16427231fc47d635de8c657ad97372000247914"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/round_stool/reuse_provenance.json",
+          "sha256": "75a5aa2bf943b66a607438fd1493cffebaec83735835d549e96decc8bfb2c940"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/sofa_three_seat/reuse_provenance.json",
+          "sha256": "6363a0a0a5c775686b506aa4ab6886133a0e1f049c3027d69d4dcadd2c4e463c"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/provenance/wall_sconce/reuse_provenance.json",
+          "sha256": "40219ceb8ccc5551a1db9a23d774865863080f0f323a94bb01f1d14d4eef225d"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/round_side_table.glb",
+          "sha256": "b029d9e19b0bc08c4466f97d991fdde8dd2aefc6beaf59503e27c1c43a0e675b"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/round_side_table.glb.import",
+          "sha256": "daa051adf39bd617f14c8c7f24776ea434c4258631ebfffc7406445ea61bcda3"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/round_stool.glb",
+          "sha256": "ed28942fc59fdb030f76fd0867cee138828fce7cb8f4285e33887e4c07407450"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/round_stool.glb.import",
+          "sha256": "f1e43a0b52def284b1a169355843947f029a86b19c028a467a3443c2519f1007"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/sofa_three_seat.glb",
+          "sha256": "349930f297c891111ef23110c58b046df3a2c056755c9bdd31ce86dea9527ba6"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/sofa_three_seat.glb.import",
+          "sha256": "055828d3ec795016094c52a2e55f92cd71e6a50ef60acd0613d541c4b0a6806f"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/source_measurements.json",
+          "sha256": "1b9203efe73753476a56e94f0767e776e038786abdfb4c259099ce7de54487f2"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/table_candidates.json",
+          "sha256": "db035cd02dd3e17b7db3a217c2c13aa57c3d2153dab40bc23cf6d2ffe79b19c1"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/wall_sconce.glb",
+          "sha256": "ea46eaa935f609a8e4177c9f2be27c5e620b1031cd88d5dfdeeec39b8efaa7a1"
+        },
+        {
+          "path": "assets/rooms/_shared/shell_hall/wall_sconce.glb.import",
+          "sha256": "2a03a9d44697134844356be89130b7138712c0e92cb193be1fbd9d1e44dd07c7"
+        },
+        {
+          "path": "tools/art/source/hallkit_324/hallkit_324.blend",
+          "sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d"
+        }
+      ]
+    }
+  ],
+  "rule": "Original shell and hallkit files copied only into ignored output; never changed by this branch"
+}

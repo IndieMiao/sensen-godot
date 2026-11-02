@@ -1,0 +1,27 @@
+{
+  "task": "SGODOT-321",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "asset": "small_round_table",
+  "phase": "neutral blockout",
+  "measured_or_proposed_bounds": [
+    [
+      -0.3,
+      0,
+      -0.3
+    ],
+    [
+      0.3,
+      0.75,
+      0.3
+    ]
+  ],
+  "source_asset": "small_round_table",
+  "source_sha256": null,
+  "changes": "New 0.60m diameter / 0.75m height white proxy; no detailed asset claimed",
+  "scale": [
+    1,
+    1,
+    1
+  ]
+}
