@@ -2,7 +2,7 @@
 
 赵云。按上官婉儿 355 `5ada1f3f` 调整暖色深度梯度、台阶边沿和木支架，交 v1 技术与画面复核。运行时仍只推 `art/monsters-355`；源与审阅分支 `wp-3d-scene-zhaoyun-quarry-355` 开草稿 PR 到 `wp-3d-scene`。未批准合并。
 
-运行时 v1 增量 `1f37f4ef`，仅改 `assets/mine/types/quarry/backdrop.glb` 和 `palette.json`；推送前已 pull --rebase。
+运行时 v1 增量 `942d78f8`，仅改 `assets/mine/types/quarry/backdrop.glb` 和 `palette.json`；推送前已 pull --rebase，保留共享分支同时到达的提交。
 
 ## v1 变化
 
