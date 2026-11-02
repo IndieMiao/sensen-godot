@@ -176,6 +176,7 @@ func test_a_speaker_s_name_tag_and_row_go_green() -> void:
 	(f[2] as P0Online)._message(JSON.stringify({"t": "voice_blocks", "blocked": [4]}))
 	f[1].changed.emit()
 	assert_dict(crowd.speaking).is_empty()
+	await await_idle_frame()   # the drawer's rows it refreshed away are queue_free'd: gone a frame on, not orphans
 
 func test_no_room_no_keys() -> void:
 	var ui := await _ui()
