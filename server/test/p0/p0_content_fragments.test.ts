@@ -1,11 +1,14 @@
 /** SGODOT-275 (亚瑟's cross-city plan §6): from P1 on, each line adds its content in its own file under
  * assets/p0/content/, merged into the main table in name order. A fragment only adds: an id, a key or a scalar that
  * is already there fails loudly, naming the file and the path, so two lines can never change the same entry. */
-import { mkdtempSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CONTENT_FRAGMENT, DEFAULT_P0_CONTENT, loadP0Content, mergeContent, mergeContentDir } from '../../src/p0/content.js';
+import { CONTENT_FRAGMENT, DEFAULT_P0_CONTENT, itemName, loadP0Content, mergeContent, mergeContentDir, sellPriceOf } from '../../src/p0/content.js';
+import { freshState } from '../../src/p0/state.js';
+import { viewOf } from '../../src/p0/view.js';
+import { worldOf } from '../../src/p0/world.js';
 
 const base = () => ({
   crops: [{ id: 'crop_radish', energy: 2 }],
@@ -15,6 +18,54 @@ const base = () => ({
 });
 
 describe('P0 content fragments (SGODOT-275)', () => {
+  it('rejects divergent ore thresholds and accepts a jointly changed content/catalogue threshold', () => {
+    const c = loadP0Content(), dir = mkdtempSync(path.join(tmpdir(), 'p0-mine-threshold-'));
+    const file = path.join(dir, 'p0_content.json');
+    const rule = (worldOf(c) as unknown as { wild: { mines: { vein: { main_from: number } } } }).wild.mines.vein;
+    try {
+      c.mine.types.vein.main_weight![1][0] = rule.main_from + 3;
+      writeFileSync(file, JSON.stringify(c));
+      expect(() => loadP0Content(file)).toThrow('main_weight[1].from must equal world.wild.mines.vein.main_from');
+      rule.main_from = c.mine.types.vein.main_weight![1][0];
+      writeFileSync(file, JSON.stringify(c));
+      expect(loadP0Content(file).mine.types.vein.main_weight![1][0]).toBe(rule.main_from);
+      c.mine.types.vein.main_weight!.pop();
+      writeFileSync(file, JSON.stringify(c));
+      expect(() => loadP0Content(file)).toThrow('main_weight[1].from must equal');
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it('exposes monster drop names and selling rules without redefining shared ore or flax', () => {
+    const c = loadP0Content(), now = Date.UTC(2026, 10, 2), v = viewOf(c, freshState(c, 'mine-materials', now), now);
+    const drops = {
+      drop_t1_bat_wing: { name: 'Bat Wing', price: 4 },
+      drop_t2_beetle_shell: { name: 'Beetle Shell', price: null, floor: 5 },
+      drop_t2_glow_spore: { name: 'Glow Spores', price: 5 },
+      drop_crown_shard: { name: 'Crown Shard', price: null },
+    };
+    for (const [id, def] of Object.entries(drops)) {
+      expect(c.materials[id]).toEqual(def);
+      expect(itemName(c, id)).toBe(def.name);
+      expect(v.names[id]).toBe(def.name);
+      expect(sellPriceOf(c, id)).toBe(def.price);
+    }
+    expect(c.materials.iron_ore).toEqual({ name: 'Iron Ore', price: null, floor: 5 });
+    expect(c.materials.coal).toEqual({ name: 'Coal', price: 4 });
+    expect(c.materials.flax).toEqual({ name: 'Flax', price: null, floor: 4 });
+  });
+
+  it('rejects unsupported mine fee periods while loading content', () => {
+    const c = loadP0Content(), dir = mkdtempSync(path.join(tmpdir(), 'p0-mine-fee-'));
+    const file = path.join(dir, 'p0_content.json');
+    try {
+      writeFileSync(file, JSON.stringify(c));
+      expect(loadP0Content(file).mine.fee_per_day).toBe(true);
+      c.mine.fee_per_day = false;
+      writeFileSync(file, JSON.stringify(c));
+      expect(() => loadP0Content(file)).toThrow('mine.fee_per_day must be true');
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
   it('a fragment adds new ids, new keys and new entries without touching what is there', () => {
     const c = base();
     mergeContent(c, {

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CityClusters } from './clusters.js';
-import { cityPlaces } from './world.js';
+import { cityPlaces, worldOf } from './world.js';
 import type { LevelCap } from './homestead.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
@@ -134,11 +134,21 @@ export interface ResidentRequest {
 }
 /** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
-/** §13.3.3 one mine floor: weighted extra drop per rock (null = nothing extra), its rock count (default mine.rocks; floor 5
- * has none) and its monsters by id (§13.3.4, SGODOT-275). */
-export interface MineFloorDef { floor: number; drops: [string | null, number][]; rocks?: number; mobs?: string[] }
+/** 355 E: per-type floor bands, special floors and the site facts supplied by C. */
+export interface MineBand {
+  from: number; to: number; mobs: [string, number, number][]; rocks: [number, number]; drops: [string | null, number][];
+}
+export interface MineFloorOverride { add?: [string, number, number][]; elite?: string; only?: string[]; guard?: string; hp_mult?: number }
+export interface MineSite {
+  id: string; type: string; name: string; near: string; open?: boolean;
+  mine: { floors: number; main: string | null; main_from: number; side: string | number | null; open_to: number | null };
+}
+export interface MineWeapon { name: string; attack: number; speed: number; tier: number }
 /** §13.3.4 a mine monster: loot as [item, qty, weight]; once_a_day = an item it gives a player at most once a player day. */
-export interface MineMonster { name: string; hp: number; damage: number; loot: [string, number, number][]; once_a_day?: string }
+export interface MineMonster {
+  name: string; hp: number; damage: number; loot?: [string | null, number, number][]; once_a_day?: string;
+  elite?: boolean; guard?: boolean; tier?: number; stun_mult?: number; first?: [string, number][]; pack?: [string, number];
+}
 /** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
 export interface WorkbenchRecipe {
   id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
@@ -209,7 +219,7 @@ export interface P0Content {
   blessing: { days: number; regen_mult: number; food_bonus: number };
   tackle: { keeper: { role: string; name: string }; buy: string[] };
   tools: {
-    farming: string; fishing: string; mining: string; combat: string; names: Record<string, string>;
+    farming: string; fishing: string; mining: string; names: Record<string, string>;
     row_hoe: { id: string; price: number; skill: Skill; gate: number; sow: number };
   };
   materials: Record<string, { name: string; price: number | null; floor?: number; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1); floor: a request's price for one with no buyback (quartz, hardwood)
@@ -312,14 +322,18 @@ export interface P0Content {
   supplies: Record<string, { name: string }>;
   /** §13.2 (SGODOT-231): spot regrow, anti-script tempo between taps, the gloves and their bonus. */
   gather: { regen_h: number; tempo_ms: number; gloves: string; gloves_bonus: number; spots: Record<string, GatherSpot> };
-  /** §13.3 floors 1–5 (SGODOT-231, LOCK-21; 3–5 SGODOT-275). picks: Stone per rock by pickaxe; combat: the mine's HP and the
-   * Combat slot's weapons; express_unlock_floor: the floor whose first clear opens Floor 5 · Express for the account. */
+  /** 355 E/F: all provisional economy and combat values live in the three non-overlapping mine fragments. */
   mine: {
-    runs_per_day: number; floor_energy: number; rock_energy: number; rocks: number; restart_floor: number; tempo_ms: number;
-    floors: MineFloorDef[]; picks: Record<string, { stone: number }>;
+    floor_energy: number; rock_energy: number; fee_per_day: boolean; picks: Record<string, { stone: number }>;
     monsters: Record<string, MineMonster>;
-    combat: { hp: number; invulnerability_ms: number; weapons: Record<string, { attack: number; speed: number }> };
-    express_unlock_floor: number;
+    combat: { hp: number; invulnerability_ms: number; ko_keep_from: number; ko_lose: number; under_tier: number;
+      weapons: Record<string, MineWeapon> };
+    types: Record<string, { bands: MineBand[]; floors: Record<string, MineFloorOverride>;
+      main_weight?: [number, number][]; gate?: { homestead: number } }>;
+    dev_sites?: MineSite[];
+    potions: Record<string, { name: string; price: number; stock: number; sold_at: string; gate: { homestead: number };
+      heal: number | 'full'; floors: 'any' | number[]; cooldown_ms: number }>;
+    rules: { rock_tempo_ms: number; attack_tempo_factor: number; max_targets: number; guard_fast_factor: number };
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
@@ -345,6 +359,10 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
   const dir = path.dirname(file);
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
+  if (c.mine.fee_per_day !== true) throw new Error('p0 content: mine.fee_per_day must be true for batch 1');
+  const mainFrom = (worldOf(c) as { wild?: { mines?: { vein?: { main_from: number } } } } | undefined)?.wild?.mines?.vein?.main_from;
+  if (!Number.isInteger(mainFrom) || c.mine.types.vein.main_weight?.[1]?.[0] !== mainFrom)
+    throw new Error('p0 content: mine.types.vein.main_weight[1].from must equal world.wild.mines.vein.main_from');
   checkHomestead(c);
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
@@ -480,6 +498,8 @@ export function cityPostcardCluster(c: P0Content, id: string): { id: string; nam
 }
 
 export function itemKind(id: string): string {
+  if (id.startsWith('weapon_')) return 'weapon';
+  if (id.startsWith('potion_')) return 'consumable';
   const head = id.split('_')[0];
   return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
 }
@@ -505,6 +525,8 @@ export function ingredient(c: P0Content, id: string): { family: Family; rarity: 
 
 /** Display name for any bag id the P0 content knows. */
 export function itemName(c: P0Content, id: string): string {
+  const mineItem = c.mine.combat.weapons[id] ?? c.mine.potions[id];
+  if (mineItem) return mineItem.name;
   const crop = cropById(c, id) ?? cropBySeed(c, id) ?? quickCrop(c, id) ?? fastCrop(c, id);
   if (crop) return crop.id === id ? crop.name : crop.seed_name;
   const fish = fishById(c, id);

@@ -1,9 +1,7 @@
-/** SGODOT-231: gathering spots, mine floors 1–2, the workbench, coming home and Timber Run from storage (floors 3–5,
- * combat, Express, quartz and the Old Tree: SGODOT-275, p0_mine_deep.test.ts). */
+/** Material workflows retained during 355 E. Mine rules now live in mine_b1*.test.ts. */
 import { describe, expect, it } from 'vitest';
 import { add, count } from '../../src/p0/bag.js';
 import { loadP0Content } from '../../src/p0/content.js';
-import { rockDrop } from '../../src/p0/mine.js';
 import { notePresence } from '../../src/p0/presence.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State, SAVE_VERSION } from '../../src/p0/state.js';
@@ -28,239 +26,6 @@ function refuse(s: P0State, cmd: P0Command, now = T0): { code: string; detail?: 
   if (r.ok) throw new Error(`${cmd.type} was accepted`);
   return { code: r.code, detail: r.detail };
 }
-const energySpent = (ev: P0Event[]) => ev.filter(e => e.kind === 'energy').reduce((n, e) => n + (e.kind === 'energy' ? -e.delta : 0), 0);
-/** Break every rock of one floor, one swing a second; returns the state, the clock after the last swing and the Energy spent. */
-function clearFloor(s: P0State, floor: number, t: number): { s: P0State; t: number; spent: number } {
-  let spent = 0;
-  for (let rock = 0; rock < c.mine.rocks; rock++) {
-    t += STEP;
-    const r = step(s, { type: 'mine_rock', floor, rock, space: 'mine' }, t);
-    s = r.s; spent += energySpent(r.ev);
-  }
-  return { s, t, spent };
-}
-
-describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
-  it('Enter mine pays floor 1 (2 Energy) and starts run 1 of 2; Continue run is free and lands on the deepest paid floor', () => {
-    let { s, ev } = step(fresh(), { type: 'mine_enter', space: 'home' });
-    expect(energySpent(ev)).toBe(2);
-    expect(ev).toContainEqual({ kind: 'mine', action: 'enter', run: 1, floor: 1, cost: 2 });
-    expect(s.day.mine_runs).toBe(1);
-    ({ s, ev } = step(s, { type: 'mine_enter', space: 'home' }, T0 + STEP));
-    expect(energySpent(ev)).toBe(0);
-    expect(ev).toContainEqual({ kind: 'mine', action: 'continue', run: 1, floor: 1, cost: 0 });
-    expect(s.day.mine_runs).toBe(1);
-  });
-
-  it('a full A run (floors 1 → 2, 12 rocks) costs 28 Energy: floor fees 4 + rocks 24 (§13.3.5)', () => {
-    let s = fresh(), t = T0, spent = 0, cleared;
-    let r = step(s, { type: 'mine_enter' }, t); s = r.s; spent += energySpent(r.ev);
-    cleared = clearFloor(s, 1, t); s = cleared.s; t = cleared.t; spent += cleared.spent;
-    r = step(s, { type: 'mine_floor', floor: 2, space: 'mine' }, t += STEP); s = r.s; spent += energySpent(r.ev);
-    cleared = clearFloor(s, 2, t); s = cleared.s; spent += cleared.spent;
-    expect(spent).toBe(28);
-    expect(count(s.bag, 'stone')).toBe(12);
-    expect(s.mine.run!.floors.slice(0, 2).every(f => f.broken.length === 6)).toBe(true);
-  });
-
-  it('every rock is 2 Energy and gives Stone (1 with the Starter Pickaxe) plus its derived drop; a broken rock is gone', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    const before = s.energy.value;
-    const r = step(s, { type: 'mine_rock', floor: 1, rock: 0, space: 'mine' }, T0 + STEP);
-    expect(before - r.s.energy.value).toBe(2);
-    expect(count(r.s.bag, 'stone')).toBe(1);
-    const drop = rockDrop(c, r.s, r.s.mine.run!, 1, 0);
-    expect(r.ev).toContainEqual({ kind: 'mine', action: 'rock', run: 1, floor: 1, rock: 0, drop, cost: 2 });
-    if (drop) expect(count(r.s.bag, drop)).toBe(1);
-    s = r.s;
-    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + 2 * STEP).code).toBe('rock_gone');
-  });
-
-  it('swings faster than 0.9 s are refused as tempo (anti-script tempo)', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    s = step(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + STEP).s;
-    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 1 }, T0 + STEP + 300).code).toBe('tempo');
-  });
-
-  it('floor 2 needs floor 1 cleared, then pays 2 once; going back to a paid floor is free', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    expect(refuse(s, { type: 'mine_floor', floor: 2 })).toEqual({ code: 'clear_floor_first', detail: { floor: 1 } });
-    let t = T0;
-    ({ s, t } = clearFloor(s, 1, t));
-    let r = step(s, { type: 'mine_floor', floor: 2 }, t += STEP);
-    expect(energySpent(r.ev)).toBe(2);
-    r = step(r.s, { type: 'mine_floor', floor: 1 }, t += STEP);
-    expect(energySpent(r.ev)).toBe(0);
-    r = step(r.s, { type: 'mine_floor', floor: 2 }, t += STEP);
-    expect(energySpent(r.ev)).toBe(0);
-    expect(refuse(r.s, { type: 'mine_rock', floor: 3, rock: 0 }, t + STEP).code).toBe('floor_not_paid');
-    expect(refuse(r.s, { type: 'mine_rock', floor: 6, rock: 0 }, t + STEP).code).toBe('bad_floor');
-  });
-
-  it('a floor clears with its sixth rock (Floor 1 cleared · Elevator stop)', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    let t = T0;
-    for (let rock = 0; rock < 5; rock++) s = step(s, { type: 'mine_rock', floor: 1, rock }, t += STEP).s;
-    const last = step(s, { type: 'mine_rock', floor: 1, rock: 5 }, t + STEP);
-    expect(last.ev).toContainEqual({ kind: 'mine', action: 'cleared', run: 1, floor: 1, cost: 0 });
-  });
-
-  it('New run needs this run\'s floor 2 cleared, costs 2 and counts; a third run of the day is refused', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    expect(refuse(s, { type: 'mine_new_run' })).toEqual({ code: 'clear_floor_first', detail: { floor: 2 } });
-    let t = T0;
-    ({ s, t } = clearFloor(s, 1, t));
-    s = step(s, { type: 'mine_floor', floor: 2 }, t += STEP).s;
-    ({ s, t } = clearFloor(s, 2, t));
-    const r = step(s, { type: 'mine_new_run' }, t += STEP);
-    expect(energySpent(r.ev)).toBe(2);
-    expect(r.s.mine.run!.id).toBe(2);
-    expect(r.s.mine.run!.floors.map(f => f.paid)).toEqual([true, false, false, false, false]);
-    expect(r.s.day.mine_runs).toBe(2);
-    s = r.s;
-    ({ s, t } = clearFloor(s, 1, t));
-    s = step(s, { type: 'mine_floor', floor: 2 }, t += STEP).s;
-    ({ s, t } = clearFloor(s, 2, t));
-    expect(refuse(s, { type: 'mine_new_run' }, t + STEP).code).toBe('no_runs');
-  });
-
-  it('the 04:00 rollover ends an unfinished run once (Run ended at daily reset); the next Enter mine starts a new run', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    const after = T0 + 20 * H;   // 06:00 next day Shanghai
-    const v = viewOf(c, s, after);
-    expect(v.mine.run).toBeNull();
-    expect(v.mine.ended).toEqual({ reason: 'reset', at: T0 + 18 * H });   // 04:00 Shanghai on 10-09, the same on every read
-    expect(viewOf(c, s, after + H).mine.ended).toEqual(v.mine.ended);
-    expect(v.mine.runs.used).toBe(0);
-    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 0 }, after).code).toBe('no_run');
-    const r = step(s, { type: 'mine_enter' }, after);
-    expect(r.ev).toContainEqual({ kind: 'mine', action: 'enter', run: 2, floor: 1, cost: 2 });
-    expect(r.s.mine.ended).toBeNull();
-  });
-
-  it('drops derive from the run, floor and rock: a torch preview matches what the rocks give; floor 2 never gives clay', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    add(c, s, 'torch', 2);
-    expect(viewOf(c, s, T0).mine.run!.floors[0].preview).toBeNull();
-    const lit = step(s, { type: 'mine_torch', floor: 1, space: 'mine' }, T0 + STEP);
-    expect(count(lit.s.bag, 'torch')).toBe(1);
-    expect(refuse(lit.s, { type: 'mine_torch', floor: 1 }, T0 + 2 * STEP).code).toBe('lit');
-    const preview = viewOf(c, lit.s, T0 + STEP).mine.run!.floors[0].preview!;
-    s = lit.s;
-    let t = T0 + STEP;
-    for (let rock = 0; rock < 6; rock++) {
-      const r = step(s, { type: 'mine_rock', floor: 1, rock }, t += STEP);
-      expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'rock', rock, drop: preview[rock] }));
-      s = r.s;
-    }
-    const run = s.mine.run!;
-    const floor2 = new Set(Array.from({ length: 400 }, (_, i) => rockDrop(c, s, { ...run, seed: i }, 2, i % 6)));
-    expect(floor2.has('clay')).toBe(false);
-    expect([...floor2].sort()).toEqual(['copper_ore', 'quartz', 'rock_salt', null].sort());
-  });
-
-  it('P1 restores floor 2\'s quartz: copper 30 / rock salt 20 / quartz 15 / none 35 (§13.3.3; P0 had folded it into salt, q(47)); floor 1 is unchanged', () => {
-    const { s } = step(fresh(), { type: 'mine_enter' });
-    const run = s.mine.run!;
-    const share = (floor: number) => {
-      const n: Record<string, number> = {};
-      for (let seed = 0; seed < 3000; seed++) {
-        const id = String(rockDrop(c, s, { ...run, seed }, floor, seed % 6));
-        n[id] = (n[id] ?? 0) + 1;
-      }
-      return Object.fromEntries(Object.entries(n).map(([k, v]) => [k, Math.round(v / 30)]));   // percent
-    };
-    const f2 = share(2);
-    expect(Object.keys(f2).sort()).toEqual(['copper_ore', 'null', 'quartz', 'rock_salt']);
-    expect(Math.abs(f2.copper_ore - 30)).toBeLessThanOrEqual(3);
-    expect(Math.abs(f2.rock_salt - 20)).toBeLessThanOrEqual(3);
-    expect(Math.abs(f2.quartz - 15)).toBeLessThanOrEqual(3);
-    expect(Math.abs(f2.null - 35)).toBeLessThanOrEqual(3);
-    expect(c.mine.floors[0].drops).toEqual([['copper_ore', 35], ['rock_salt', 25], ['clay', 15], [null, 25]]);
-  });
-
-  it('a fee is never paid into a floor whose first rock would not fit: Enter mine / New run / Floor 2 · Bag full (q(48))', () => {
-    const full = fresh();
-    for (let i = 0; i < 22; i++) full.bag.push({ id: 'fish_crucian', qty: 10 });   // 1 free slot: Stone + an ore need 2
-    expect(viewOf(c, full, T0).mine.entry_bag_ok).toBe(false);
-    expect(refuse(full, { type: 'mine_enter' })).toEqual({ code: 'bag_full', detail: { floor: 1 } });
-    expect(full.day.mine_runs).toBe(0);
-    // Inside a run: floor 1 cleared, then the bag fills before the stairs.
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    let t = T0;
-    ({ s, t } = clearFloor(s, 1, t));
-    s.bag = Array.from({ length: s.bag_cap }, () => ({ id: 'fish_crucian', qty: 10 }));   // no slot, no Stone stack
-    const energy = s.energy.value;
-    expect(refuse(s, { type: 'mine_floor', floor: 2 }, t + STEP)).toEqual({ code: 'bag_full', detail: { floor: 2 } });
-    expect(s.energy.value).toBe(energy);
-    // Continue run and a paid floor stay free and open.
-    expect(step(s, { type: 'mine_enter' }, t + STEP).ev).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'continue' }));
-    expect(step(s, { type: 'mine_floor', floor: 1 }, t + STEP).ev).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'floor', floor: 1, cost: 0 }));
-  });
-
-  it('New run with a full bag is refused before any Energy (q(48))', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    let t = T0;
-    ({ s, t } = clearFloor(s, 1, t));
-    s = step(s, { type: 'mine_floor', floor: 2 }, t += STEP).s;
-    ({ s, t } = clearFloor(s, 2, t));
-    s.bag = Array.from({ length: s.bag_cap }, () => ({ id: 'fish_crucian', qty: 10 }));
-    const energy = s.energy.value;
-    expect(refuse(s, { type: 'mine_new_run' }, t + STEP)).toEqual({ code: 'bag_full', detail: { floor: 1 } });
-    expect(s.energy.value).toBe(energy);
-  });
-
-  it('a torch needs one in the bag', () => {
-    const { s } = step(fresh(), { type: 'mine_enter' });
-    expect(refuse(s, { type: 'mine_torch', floor: 1 }, T0 + STEP)).toEqual({ code: 'no_item', detail: { item: 'torch' } });
-  });
-
-  it('the Copper Pickaxe gives 2 Stone per rock, still 2 Energy (LOCK-29)', () => {
-    let s = fresh();
-    s.gear.picks.push('pick_copper');
-    s = step(s, { type: 'equip', item: 'pick_copper' }).s;
-    s = step(s, { type: 'mine_enter' }, T0 + STEP).s;
-    const before = s.energy.value;
-    s = step(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + 2 * STEP).s;
-    expect(count(s.bag, 'stone')).toBe(2);
-    expect(before - s.energy.value).toBe(2);
-    expect(viewOf(c, s, T0 + 2 * STEP).gear.slots.mining).toBe('pick_copper');
-  });
-
-  it('a full bag greys the whole floor by the worst case (Stone + any ore), not by the rock\'s real drop (q(44))', () => {
-    let { s } = step(fresh(), { type: 'mine_enter' });
-    // 25 slots: 2 seed stacks + 22 fish stacks = 24 used, 1 free. Stone and an ore would need 2 slots.
-    for (let i = 0; i < 22; i++) s.bag.push({ id: 'fish_crucian', qty: 10 });
-    expect(viewOf(c, s, T0).mine.run!.floors[0].bag_ok).toBe(false);
-    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + STEP)).toEqual({ code: 'bag_full', detail: { floor: 1 } });
-    s.bag.pop();   // 2 free slots
-    expect(viewOf(c, s, T0).mine.run!.floors[0].bag_ok).toBe(true);
-    expect(step(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + STEP).s.mine.run!.floors[0].broken).toEqual([0]);
-  });
-
-  it('commands inside the mine from another space are refused; older clients without space still work', () => {
-    const { s } = step(fresh(), { type: 'mine_enter', space: 'home' });
-    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 0, space: 'home' }, T0 + STEP).code).toBe('not_in_mine');
-    expect(step(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + STEP).s.mine.run!.floors[0].broken).toEqual([0]);
-  });
-
-  it('a retried swing with the same expect_seq never applies twice (SGODOT-211)', () => {
-    const { s } = step(fresh(), { type: 'mine_enter' });
-    const cmd: P0Command = { type: 'mine_rock', floor: 1, rock: 0, expect_seq: s.seq };
-    const once = step(s, cmd, T0 + STEP).s;
-    expect(refuse(once, cmd, T0 + 3 * STEP).code).toBe('stale_state');
-  });
-
-  it('Enter mine with less than 2 Energy is need_energy; with no runs left no_runs', () => {
-    const s = fresh();
-    s.energy = { value: 1, tick_ms: T0 };
-    expect(refuse(s, { type: 'mine_enter' })).toMatchObject({ code: 'need_energy', detail: { need: 2, have: 1 } });
-    const t = fresh();
-    t.day = { ...t.day, key: '2026-10-08', mine_runs: 2 };
-    expect(refuse(t, { type: 'mine_enter' })).toMatchObject({ code: 'no_runs', detail: { used: 2, limit: 2 } });
-  });
-});
-
 describe('gathering spots (§13.2, q(44))', () => {
   it('a spot is 0 Energy, its material goes to Farm Storage, and it is ready again 8 h later', () => {
     const s0 = fresh();
@@ -421,8 +186,8 @@ describe('workbench (§13.4, q(31) / q(44))', () => {
 
 describe('coming home (q(40)) and Timber Run from storage', () => {
   it('the first command back at home moves the bag\'s materials to storage; seeds, worms, torches and (Lv1) seasonings stay', () => {
-    let { s } = step(fresh(), { type: 'mine_enter', space: 'home' });
-    s = step(s, { type: 'mine_rock', floor: 1, rock: 0, space: 'mine' }, T0 + STEP).s;
+    let { s } = step(fresh(), { type: 'mine_enter', mine: 'wd-dev-quarry', space: 'home' });
+    s = step(s, { type: 'mine_rock', day: s.mine.day!.key, floor: 1, rock: 0, space: 'mine' }, T0 + STEP).s;
     add(c, s, 'torch', 2); add(c, s, 'bait_worm', 3); add(c, s, 'wild_herb', 3); add(c, s, 'rock_salt', 1); add(c, s, 'copper_ore', 2);
     const stone = count(s.bag, 'stone');
     const r = step(s, { type: 'gather', spot: 'spot_grove', space: 'home' }, T0 + 2 * STEP);
@@ -506,8 +271,8 @@ describe('save v4', () => {
     expect(s.v).toBe(SAVE_VERSION);
     expect(s.gear).toMatchObject({ picks: ['pick_starter'], pick: 'pick_starter' });
     expect(s.gather).toEqual({ ready_at: {}, last_at: 0 });
-    expect(s.mine).toEqual({ run: null, count: 0, ended: null, swing_at: 0 });
+    expect(s.mine).toEqual({ records: {}, day: null, notice: null });
     expect(s.storage_auto).toBeNull();
-    expect(s.day.mine_runs).toBe(0);
+    expect(s.day.once).toEqual({});
   });
 });

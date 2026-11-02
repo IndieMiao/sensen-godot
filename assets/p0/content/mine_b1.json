@@ -1,0 +1,554 @@
+{
+  "_note": "355 E/F/G development, contract v0.6 and #620 review. Existing floor/rock energy and picks stay in p0_content; existing monsters and combat/weapon keys stay in mine_p1. Vein main weights 25 from F1 and 40 from F10 follow Li Bai calibration v4q(5) 4ee5e8d5. The vein homestead gate 8 is option B, pending the user's choice; remove gate for option A (available from the start). Crown Shard is currently not sellable (price null), pending the user's choice; its price is content-configurable. Other numbers remain provisional pending v4q(5-7) approval/calibration. Development sites' main_from is not validated. Development sites must be removed before release.",
+  "materials": {
+    "drop_t1_bat_wing": { "name": "Bat Wing", "price": 4 },
+    "drop_t2_beetle_shell": { "name": "Beetle Shell", "price": null, "floor": 5 },
+    "drop_t2_glow_spore": { "name": "Glow Spores", "price": 5 },
+    "drop_crown_shard": { "name": "Crown Shard", "price": null }
+  },
+  "mine": {
+    "combat": {
+      "ko_keep_from": 11,
+      "ko_lose": 0.5,
+      "under_tier": 0.5
+    },
+    "monsters": {
+      "mob_cave_bat": {
+        "name": "Cave Bat",
+        "hp": 5,
+        "damage": 6,
+        "loot": [
+          [
+            "drop_t1_bat_wing",
+            1,
+            40
+          ],
+          [
+            null,
+            0,
+            60
+          ]
+        ]
+      },
+      "mob_elite_cave_bat": {
+        "name": "Elite Cave Bat",
+        "hp": 20,
+        "damage": 12,
+        "elite": true,
+        "loot": [
+          [
+            "drop_t1_bat_wing",
+            2,
+            100
+          ]
+        ]
+      },
+      "mob_rock_beetle": {
+        "name": "Rock Beetle",
+        "hp": 18,
+        "damage": 12,
+        "stun_mult": 2,
+        "loot": [
+          [
+            "drop_t2_beetle_shell",
+            1,
+            35
+          ],
+          [
+            null,
+            0,
+            65
+          ]
+        ]
+      },
+      "mob_elite_rock_beetle": {
+        "name": "Elite Rock Beetle",
+        "hp": 60,
+        "damage": 20,
+        "elite": true,
+        "stun_mult": 2,
+        "loot": [
+          [
+            "drop_t2_beetle_shell",
+            2,
+            100
+          ]
+        ]
+      },
+      "mob_shroomling": {
+        "name": "Shroomling",
+        "hp": 12,
+        "damage": 8,
+        "loot": [
+          [
+            "drop_t2_glow_spore",
+            1,
+            35
+          ],
+          [
+            null,
+            0,
+            65
+          ]
+        ]
+      },
+      "mob_elite_shroomling": {
+        "name": "Elite Shroomling",
+        "hp": 45,
+        "damage": 14,
+        "elite": true,
+        "loot": [
+          [
+            "drop_t2_glow_spore",
+            2,
+            100
+          ]
+        ]
+      },
+      "boss_slime_king": {
+        "name": "Slime King",
+        "hp": 80,
+        "damage": 18,
+        "guard": true,
+        "tier": 1,
+        "first": [
+          [
+            "drop_crown_shard",
+            1
+          ]
+        ],
+        "pack": [
+          "copper_ore",
+          5
+        ]
+      },
+      "boss_slime_king_iron": {
+        "name": "Iron Slime King",
+        "hp": 160,
+        "damage": 22,
+        "guard": true,
+        "tier": 2,
+        "first": [
+          [
+            "drop_crown_shard",
+            1
+          ]
+        ],
+        "pack": [
+          "main",
+          5
+        ]
+      },
+      "boss_slime_king_quartz": {
+        "name": "Quartz Slime King",
+        "hp": 200,
+        "damage": 25,
+        "guard": true,
+        "tier": 2,
+        "first": [
+          [
+            "drop_crown_shard",
+            1
+          ]
+        ],
+        "pack": [
+          "main",
+          5
+        ]
+      }
+    },
+    "types": {
+      "quarry": {
+        "bands": [
+          {
+            "from": 1,
+            "to": 4,
+            "mobs": [
+              [
+                "mob_slime",
+                2,
+                3
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                30
+              ],
+              [
+                "copper_ore",
+                25
+              ],
+              [
+                "coal",
+                15
+              ],
+              [
+                "clay",
+                15
+              ],
+              [
+                "rock_salt",
+                15
+              ]
+            ]
+          },
+          {
+            "from": 5,
+            "to": 9,
+            "mobs": [
+              [
+                "mob_slime",
+                2,
+                2
+              ],
+              [
+                "mob_cave_bat",
+                1,
+                2
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                30
+              ],
+              [
+                "copper_ore",
+                25
+              ],
+              [
+                "coal",
+                15
+              ],
+              [
+                "clay",
+                15
+              ],
+              [
+                "rock_salt",
+                15
+              ]
+            ]
+          },
+          {
+            "from": 11,
+            "to": 19,
+            "mobs": [
+              [
+                "mob_cave_bat",
+                2,
+                2
+              ],
+              [
+                "mob_rock_beetle",
+                1,
+                2
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                25
+              ],
+              [
+                "copper_ore",
+                25
+              ],
+              [
+                "coal",
+                20
+              ],
+              [
+                "clay",
+                15
+              ],
+              [
+                "rock_salt",
+                15
+              ]
+            ]
+          },
+          {
+            "from": 21,
+            "to": 29,
+            "mobs": [
+              [
+                "mob_rock_beetle",
+                2,
+                2
+              ],
+              [
+                "mob_shroomling",
+                1,
+                2
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                20
+              ],
+              [
+                "copper_ore",
+                25
+              ],
+              [
+                "coal",
+                25
+              ],
+              [
+                "clay",
+                15
+              ],
+              [
+                "rock_salt",
+                15
+              ]
+            ]
+          }
+        ],
+        "floors": {
+          "5": {
+            "elite": "mob_elite_slime"
+          },
+          "10": {
+            "guard": "boss_slime_king"
+          },
+          "15": {
+            "elite": "mob_elite_cave_bat"
+          },
+          "20": {
+            "guard": "boss_slime_king",
+            "hp_mult": 1.5
+          },
+          "25": {
+            "elite": "mob_elite_rock_beetle"
+          },
+          "30": {
+            "guard": "boss_slime_king",
+            "hp_mult": 2
+          }
+        }
+      },
+      "vein": {
+        "gate": {
+          "homestead": 8
+        },
+        "main_weight": [
+          [
+            1,
+            25
+          ],
+          [
+            10,
+            40
+          ]
+        ],
+        "bands": [
+          {
+            "from": 1,
+            "to": 9,
+            "mobs": [
+              [
+                "mob_slime",
+                1,
+                1
+              ],
+              [
+                "mob_rock_beetle",
+                1,
+                2
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                40
+              ],
+              [
+                "coal",
+                20
+              ],
+              [
+                "copper_ore",
+                15
+              ]
+            ]
+          },
+          {
+            "from": 11,
+            "to": 19,
+            "mobs": [
+              [
+                "mob_rock_beetle",
+                1,
+                2
+              ],
+              [
+                "mob_shroomling",
+                1,
+                1
+              ],
+              [
+                "mob_cave_bat",
+                1,
+                1
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                35
+              ],
+              [
+                "coal",
+                20
+              ]
+            ]
+          },
+          {
+            "from": 21,
+            "to": 39,
+            "mobs": [
+              [
+                "mob_rock_beetle",
+                2,
+                2
+              ],
+              [
+                "mob_shroomling",
+                1,
+                2
+              ],
+              [
+                "mob_cave_bat",
+                1,
+                1
+              ]
+            ],
+            "rocks": [
+              4,
+              6
+            ],
+            "drops": [
+              [
+                "stone",
+                30
+              ],
+              [
+                "coal",
+                20
+              ]
+            ]
+          }
+        ],
+        "floors": {
+          "5": {
+            "elite": "mob_elite_rock_beetle"
+          },
+          "10": {
+            "only": [
+              "mob_elite_rock_beetle",
+              "mob_elite_slime"
+            ]
+          },
+          "15": {
+            "elite": "mob_elite_shroomling"
+          },
+          "20": {
+            "guard": "boss_slime_king_iron"
+          },
+          "25": {
+            "elite": "mob_elite_rock_beetle"
+          },
+          "30": {
+            "only": [
+              "mob_elite_rock_beetle",
+              "mob_elite_shroomling"
+            ]
+          },
+          "35": {
+            "elite": "mob_elite_shroomling"
+          },
+          "40": {
+            "guard": "boss_slime_king_quartz"
+          }
+        }
+      }
+    },
+    "potions": {
+      "potion_heal": {
+        "name": "Healing Potion",
+        "price": 25,
+        "stock": 5,
+        "sold_at": "homestead",
+        "gate": {
+          "homestead": 4
+        },
+        "heal": "full",
+        "floors": "any",
+        "cooldown_ms": 3000
+      }
+    },
+    "dev_sites": [
+      {
+        "id": "wd-dev-quarry",
+        "type": "quarry",
+        "name": "Dev Quarry",
+        "near": "gn-5391959",
+        "mine": {
+          "floors": 30,
+          "main": "copper_ore",
+          "main_from": 1,
+          "side": null,
+          "open_to": null
+        }
+      },
+      {
+        "id": "wd-dev-vein",
+        "type": "vein",
+        "name": "Dev Vein",
+        "near": "gn-5391959",
+        "mine": {
+          "floors": 41,
+          "main": "iron_ore",
+          "main_from": 10,
+          "side": null,
+          "open_to": 40
+        }
+      }
+    ],
+    "rules": {
+      "rock_tempo_ms": 900,
+      "attack_tempo_factor": 0.9,
+      "max_targets": 4,
+      "guard_fast_factor": 0.8
+    },
+    "fee_per_day": true
+  }
+}

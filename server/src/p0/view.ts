@@ -214,7 +214,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
     gear: {
-      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: s.gear.pick, combat: c.tools.combat },
+      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: s.gear.pick, combat: s.gear.weapon },
+      weapons: s.gear.weapons, weapon: s.gear.weapon,
       // Hoes (§9.11.2): sow = plots per Sow action (Starter Hoe 1, Row Hoe 3).
       hoes: [c.tools.farming, c.tools.row_hoe.id].map(id => ({ id, name: itemName(c, id), owned: s.gear.hoes.includes(id),
         equipped: s.gear.hoe === id, sow: id === c.tools.row_hoe.id ? c.tools.row_hoe.sow : 1,
