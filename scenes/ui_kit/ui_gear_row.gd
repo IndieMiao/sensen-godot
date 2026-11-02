@@ -2,6 +2,7 @@ class_name UiGearRow
 extends PanelContainer
 ## One candidate on the Gear side (SGODOT-225; "Gear candidate" rows of BAG-2 · Gear, LOCK-13; F-07 rod/gear):
 ## icon · name · state · effect, with at most one action on the right.
+##   note   a line of its own under the effect, as muted (q(278) a rod's tier: `Legendary needs Fishing Lv7–9`).
 ##   state  &"equipped" draws the green `✓ Equipped` badge; &"owned" reads `Owned`; anything else is the gate and
 ##          source of an item the player does not own yet (`Fishing Lv3 · Tackle Shop`), and the row is greyed.
 ##   action {id, label, kind} from the item-info spec (Equip is a compact secondary; nothing for the equipped one,
@@ -46,10 +47,12 @@ func _init(data_: Dictionary = {}) -> void:
 	if state == &"equipped": col.add_child(equipped_badge())
 	elif state == &"owned": col.add_child(UiKit.label("Owned", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	elif str(state) != "": col.add_child(UiKit.label(str(state), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
-	if str(data.get("effect", "")) != "":
-		var effect := UiKit.label(str(data.effect), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
-		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		col.add_child(effect)
+	for key in ["effect", "note"]:
+		if str(data.get(key, "")) == "": continue
+		var line := UiKit.label(str(data[key]), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
+		line.name = key.capitalize()
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(line)
 	var a: Dictionary = data.get("action", {})
 	if not a.is_empty():
 		var b := UiCommandButton.new(str(a.get("label", "")),

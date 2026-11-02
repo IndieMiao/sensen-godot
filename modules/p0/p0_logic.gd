@@ -106,6 +106,16 @@ static func break_free_need(view: Dictionary, ev: Dictionary) -> String:
 	var rod := rod_for(view, int(ev.get("rarity", 2)))
 	return "" if rod.is_empty() else "%s · Fishing Lv%d · %d coins" % [str(rod.name), int(rod.level), int(rod.price)]
 
+## The float of a gate fish breaking free again, after its card (§6.1.1), the refund as it came back with no + (q(50)):
+## a level gate in the card's word and whose level it is — `Too strong · Fishing Lv8 · 3 Energy back`, `Too strong ·
+## Fishing Lv4 · Energy refunded (8 left today)` (q(278); it read `Got away · Lv8`; 不知火舞 386 1c3d0416: no +) —
+## a rod gate as before, `Got away · Reed Rod · 3 Energy back`.
+static func break_free_float(view: Dictionary, ev: Dictionary) -> String:
+	var refund := refund_line(view, ev).trim_prefix("+")
+	if ev.has("need_level"): return "Too strong · Fishing Lv%d · %s" % [int(ev.need_level), refund]
+	var rod := rod_for(view, int(ev.get("rarity", 2)))
+	return "Got away · %s · %s" % [str(rod.name) if not rod.is_empty() else "rod too light", refund]
+
 ## The Energy a failed catch gave back, as it really came back (q(55)): inside the daily protection
 ## `Energy refunded (8 left today)`, else `+3 Energy back`.
 static func refund_line(view: Dictionary, ev: Dictionary) -> String:
@@ -1592,6 +1602,12 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 				deliveries.append(_row(capped, "board", ""))
 			elif bool(r.ready):
 				var hand := _row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id))
+				# `Dusk Haul · Deliver at Shibuya Market Square · Tokyo`, `Pond Catch · Deliver to Wen · Shanghai`: broken before
+				# the city as the progress rows are, nothing dropped — the place is where to go (q(276) ⑥ ⑦)
+				var at := str(r.get("city", ""))
+				if at != "" and str(hand.line).ends_with(" · " + at):
+					hand.line = str(hand.line).trim_suffix(" · " + at)
+					_city_row(hand, at)
 				if r.get("local", false): hand.local_request = str(r.id)   # q(272): the row opens its card (Drop request ›)
 				elif str(r.get("city", "")) != "": hand.board_request = str(r.id)   # q(270): the row opens its sheet (Drop)
 				(away if bool(r.get("away", false)) else deliveries).append(hand)
@@ -1789,6 +1805,15 @@ static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
 static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:
 	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false, "dot": dot}
 
+## A row that ends with ` · <city>` (q(276)): `city` tells Today where to break when the line runs long, `line_short` (when
+## given) the first line without the need's name, for when even that runs long — `Pond Catch · Pond Crucian 1/2` /
+## `Rio de Janeiro`, `Big Market Order · 1/2` / `Mexico City`.
+static func _city_row(row: Dictionary, city: String, short := "") -> Dictionary:
+	row.line = str(row.line) + " · " + city
+	row.city = city
+	if short != "": row.line_short = short + " · " + city
+	return row
+
 ## A taken request still short (李白 4ac4a4e7): `An Old Man's Catch · Rare fish 0/1`, what it takes as its card says it.
 ## A fish one shows on the map the pond its ! hangs on; one the player cannot land yet (q(104)) has no Show, a small line
 ## `Fishing Lv4 needed`, and the whole row opens that fish's gate card (`gate`: the Fish-dex silhouette's, P0Ui).
@@ -1808,13 +1833,11 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 		var sowing := _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
 		sowing.sow_crop = str(items[0])   # the generic Sow row leaves this crop to it while Today shows it (today_rows)
 		return sowing
-	# another city's request ends with its city (q(270) ⑥), the need's name dropped first when the line runs long
+	# another city's request ends with its city (q(270) ⑥), a keeper's local one too (q(272) ⑧): Today measures it and
+	# breaks before the city, the need's name dropped only when the first line still runs long (q(276), `line_short`)
 	var city := str(r.get("city", ""))
-	var line := "%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)]
-	if city != "":
-		line += " · " + city
-		if line.length() > P0Board.LINE_CHARS: line = "%s · %d/%d · %s" % [str(r.title), int(r.have), int(r.qty), city]
-	var row := _row(line, icon_id, "")
+	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
+	if city != "": _city_row(row, city, "%s · %d/%d" % [str(r.title), int(r.have), int(r.qty)])
 	if kind != "fish": return row
 	var gate := fish_level_gate(view, items, r.get("rarity", null))
 	if not gate.is_empty():

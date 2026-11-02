@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # P0 internal demo APK (SGODOT-232 D2). Preset "Android P0": feature p0 (opens straight into P0, no adb marker),
 # package com.sensen.p0demo (never the Journey package, never the user's com.sensen.p0proto), its own version.
+# --preset "Android P0 Preview" (355 previews, 11-02): the same export as package com.sensen.p0preview, label Gensen
+# Preview, so it installs beside the release instead of over it; publish_demo_apk.mjs takes only com.sensen.p0demo.
 #   tools/p0/build_demo_apk.sh --server https://host/preview/p0/v1 [--key DEMO_KEY] [--code N] [--name 0.1.N]
 #                              [--out build/p0-demo.apk]
 # Versions (user, 2026-10-09): versionName from the preset (0.1.0); versionCode YYYYMMDDNN, by default the build
@@ -16,7 +18,7 @@
 # APK must carry no networkSecurityConfig at all (checked below).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-SERVER="" KEY="" CODE="" NAME="" OUT="build/p0-demo.apk"
+SERVER="" KEY="" CODE="" NAME="" OUT="build/p0-demo.apk" PRESET="Android P0"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --server) SERVER="$2"; shift 2 ;;
@@ -24,10 +26,17 @@ while [[ $# -gt 0 ]]; do
     --code) CODE="$2"; shift 2 ;;
     --name) NAME="$2"; shift 2 ;;
     --out) OUT="$2"; shift 2 ;;
+    --preset) PRESET="$2"; shift 2 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
 done
 [[ "$SERVER" == http://* || "$SERVER" == https://* ]] || { echo "--server http(s)://…/v1 is required" >&2; exit 2; }
+case "$PRESET" in
+  "Android P0") PACKAGE=com.sensen.p0demo ;;
+  "Android P0 Preview") PACKAGE=com.sensen.p0preview ;;
+  *) echo "--preset is \"Android P0\" or \"Android P0 Preview\"" >&2; exit 2 ;;
+esac
+export P0_PRESET="$PRESET" P0_PACKAGE="$PACKAGE"
 # The native side the demo needs, as in the int test packages (SGODOT-261: an APK exported from a bare template had
 # no Mapbox and no LiveKit, so its map was black). android/ is not tracked: tools/android/setup_android_build.sh puts
 # the Mapbox overlay on the 4.7.2 template and the four prepare_*_plugin.py add voice (LiveKit), WebView, Sign in
@@ -134,7 +143,8 @@ python3 - "$SERVER" "$KEY" "$CODE" "$NAME" <<'PY'
 import json, re, sys
 url, key, code, name = sys.argv[1:5]
 p = "export_presets.cfg"; s = open(p).read()
-i = s.index('name="Android P0"'); head, seg = s[:i], s[i:]
+import os
+i = s.index(f'name="{os.environ["P0_PRESET"]}"\n'); head, seg = s[:i], s[i:]
 if code: seg = re.sub(r"version/code=\d+", f"version/code={int(code)}", seg, count=1)
 if name: seg = re.sub(r'version/name="[^"]*"', f'version/name="{name}"', seg, count=1)
 open(p, "w").write(head + seg)
@@ -143,13 +153,13 @@ open(p, "w").write(head + seg)
 version = int(re.search(r"version/code=(\d+)", seg).group(1))
 # Settings › Version (q(129)) shows the name too: `0.2.1 (2026101001)`.
 named = re.search(r'version/name="([^"]*)"', seg)
-if not named: sys.exit('build_demo_apk: the "Android P0" preset has no version/name (Settings › Version reads it)')
+if not named: sys.exit(f'build_demo_apk: the "{os.environ["P0_PRESET"]}" preset has no version/name (Settings › Version reads it)')
 version_name = named.group(1)
 json.dump({"url": url.rstrip("/"), "key": key, "version": version, "name": version_name}, open("assets/p0/demo_server.json", "w"))
 PY
 
 "$GODOT" --headless --path . --import > "$LOGS/import.log" 2>&1 || true
-"$GODOT" --headless --path . --export-debug "Android P0" "$OUT" > "$LOGS/export.log" 2>&1 \
+"$GODOT" --headless --path . --export-debug "$PRESET" "$OUT" > "$LOGS/export.log" 2>&1 \
   || { echo "export failed, see $LOGS/export.log" >&2; exit 1; }
 
 # Read back what was built: package, version, signer, the baked server (never print the key), checksum.
@@ -161,7 +171,7 @@ python3 - "$OUT" "$SERVER" "$KEY" "$LOGS" "$COMMIT" "$DIRTY" "$DEV_CLEARTEXT" <<
 import fnmatch, hashlib, json, os, re, sys, zipfile
 apk, server, key, logs, commit, dirty, dev_cleartext = sys.argv[1:8]
 presets = open("export_presets.cfg").read()
-seg = presets[presets.index('name="Android P0"'):]
+seg = presets[presets.index(f'name="{os.environ["P0_PRESET"]}"\n'):]
 excluded = [p.strip() for p in re.search(r'exclude_filter="([^"]*)"', seg).group(1).split(",") if p.strip()]
 untracked = [f for f in os.environ.get("P0_UNTRACKED", "").splitlines()
              if f and not any(fnmatch.fnmatch(f, p) for p in excluded)]
@@ -205,7 +215,7 @@ result = {
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
-ok = result["package"] == "com.sensen.p0demo" and result["server_matches"] and result["version_baked"] == result["version_code"] \
+ok = result["package"] == os.environ["P0_PACKAGE"] and result["server_matches"] and result["version_baked"] == result["version_code"] \
     and result["native_ok"] and result["legal_ok"] and result["network_security_config"] == bool(dev_cleartext)
 sys.exit(0 if ok else 1)
 PY
