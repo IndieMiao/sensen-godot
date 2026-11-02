@@ -110,6 +110,31 @@ func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	await await_idle_frame()
 	assert_str(ui.toast_text()).is_equal("Report sent")
 
+class FakeCrowd extends Node:
+	var speaking: Dictionary = {}
+
+## §3: who speaks goes green over their head — the crowd's `speaking`, the drawer's dot; a muted speaker does not.
+func test_a_speaker_s_name_tag_and_row_go_green() -> void:
+	var ui := await _ui()
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	var crowd: FakeCrowd = auto_free(FakeCrowd.new())
+	(f[2] as P0Online).crowd = crowd
+	ui.set_voice_room(room)
+	await room.fetch_status()
+	f[1].participants = [{"id": "4", "speaking": true}, {"id": "5", "speaking": true}]
+	room.set_muted(5, true)
+	f[1].changed.emit()
+	assert_dict(crowd.speaking).is_equal({4: true})
+	ui._voice_keys.people.pressed.emit()
+	assert_float((ui._people.list.get_child(0).find_child("Speaking", true, false) as Control).modulate.a).is_equal(1.0)
+	assert_float((ui._people.list.get_child(1).find_child("Speaking", true, false) as Control).modulate.a).is_equal(0.0)
+	# 384 (奕星 via 周瑜 on #650): lit only while their voice really reaches this phone — a block either way (the server
+	# sends voice_blocks to both phones) leaves no light, so the blocked one cannot tell from it
+	(f[2] as P0Online)._message(JSON.stringify({"t": "voice_blocks", "blocked": [4]}))
+	f[1].changed.emit()
+	assert_dict(crowd.speaking).is_empty()
+
 func test_no_room_no_keys() -> void:
 	var ui := await _ui()
 	ui.set_voice_room(null)

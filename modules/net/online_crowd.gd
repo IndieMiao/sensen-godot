@@ -9,6 +9,9 @@ var show_health := true
 ## Optional (id) -> float: ground height of a member (P0 outposts lift seated players onto their seat).
 var height_of := Callable()
 var actors: Dictionary = {}
+## Peer ids speaking now (P0 voice, SGODOT-383 §3): their name tag goes primary green while they do.
+var speaking: Dictionary = {}
+const SPEAKING_COLOR := Color("3E7D43")   # UiTokens.COLOR_PRIMARY
 var rigs: Array[Dictionary] = []
 var bodies: MultiMeshInstance3D
 var heads: MultiMeshInstance3D
@@ -151,6 +154,7 @@ func step(delta: float, local_position: Vector3) -> void:
 				entry.animation = animation
 				entry.rig.play_motion(animation)
 			entry.label.text = L10n.format_text("Traveller %s", str(actor.member.player).substr(0, 4)) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
+			entry.label.modulate = SPEAKING_COLOR if speaking.has(id) else Color.WHITE
 		else:
 			var basis := Basis(Vector3.UP, float(actor.yaw))
 			if work: basis = basis.rotated(Vector3.RIGHT, sin(_time * 5) * .25)

@@ -4509,6 +4509,11 @@ func _voice_refresh() -> void:
 	_voice_keys.set_mic(on)
 	var rows: Array = voice_room.call("people")
 	_voice_keys.set_count(rows.size())
+	var crowd = voice_room.get("online").get("crowd") if voice_room.get("online") else null
+	if crowd != null and "speaking" in crowd:   # §3: a speaker's name tag goes green (not a muted or blocked one)
+		var now := {}
+		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked): now[int(r.peer)] = true
+		crowd.set("speaking", now)
 	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)
 	if on and not _mic_was_on and not _mic_toast_said:
 		_mic_toast_said = true
