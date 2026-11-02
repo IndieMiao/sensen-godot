@@ -1721,7 +1721,9 @@ func _aim_toast() -> void:
 	_toasts.anchor_above(_bar)
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
-## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
+## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08). Two lines break at a " · ", the dot
+## dropped, as Info toasts that opt in and Today's rows do (q(103); 不知火舞 11-02: `Pond Catch · Deliver to Wen` /
+## `Shanghai`, not mid-phrase) — only a sentence with a " · " that a line cannot hold; any other wraps by words as before.
 func toast_error(text: String, action := "") -> void:
 	if not _toasts: return
 	if _cover_up:
@@ -1729,7 +1731,7 @@ func toast_error(text: String, action := "") -> void:
 		return
 	_toast_bag_tab = ""
 	_aim_toast()
-	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+	_toasts.show_toast(_break_at_dot(text), ToastLayer.Severity.ERROR, action)
 
 ## FISH-4 / q(83): a full creel says one sentence — the badge's tap, the greyed Cast · Creel full and the server's
 ## creel_full alike — and its Open bag › opens the bag on its Fish page.

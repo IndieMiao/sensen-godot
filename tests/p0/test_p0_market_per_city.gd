@@ -98,6 +98,6 @@ func test_wrong_city_toasts_where_the_request_goes() -> void:
 	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 	rt.session.view = _view({"title": "Market Board", "home": true, "slots": []}, [])   # the request gone from the view
 	rt._on_refused("wrong_city", {"city": "gn-5355933"}, {"type": "accept", "request": "dusk-hay"})
-	assert_str(rt.ui.toast_text()).is_equal("Deliver at the market · Hayward")
+	assert_str(rt.ui.toast_text()).is_equal("Deliver at the market\nHayward")   # an Error toast breaks at a " · " (不知火舞 11-02)
 	assert_str(rt.ui.toast_text()).not_contains("wrong_city")
 	assert_str(P0Runtime.wrong_city_line({}, "", "")).is_equal("Deliver at the market")   # no city either
