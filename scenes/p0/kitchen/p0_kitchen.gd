@@ -1002,6 +1002,7 @@ func _open_card(fields: Dictionary) -> void:
 	var v := rt.session.current()
 	var card := UiRewardMoment.new()
 	_card = card
+	card.set_meta(&"dish", _card_dish)   # the guide's Eat pulse names the dish (SGODOT-368)
 	card.theme = UiKit.theme()
 	var none := bool(fields.get("none", false))   # nothing came out (a refunded trial pot): OK only, no Keep
 	fields.erase("dish_id")

@@ -15,6 +15,7 @@ var _pending_create := ""
 var _got_ready := false
 var _frames := 0
 var _locale := "zh_CN"
+var _city_style := false
 ## POIS 回包按 request_id 收集分包：{id: {"parts": n, "chunks": {index: features}}}。
 var _poi_parts: Dictionary = {}
 
@@ -40,6 +41,15 @@ func set_language(locale: String) -> void:
 	_locale = locale
 	_send("LANG|" + _locale)
 
+## The city colours, as Android's (CityMapView turns them on): sent again with LANG, so one sent before the listener
+## was up still lands (SGODOT-356).
+func set_city_style(enabled: bool) -> void:
+	_city_style = enabled
+	_send(city_style_packet(enabled))
+
+static func city_style_packet(enabled: bool) -> String:
+	return "CITYSTYLE|%d" % (1 if enabled else 0)
+
 func get_pixel_ratio() -> float:
 	return _ratio
 
@@ -51,6 +61,7 @@ func poll() -> void:
 	if _frames % CREATE_RESEND_FRAMES == 0:
 		_send("LANG|" + _locale)
 		_send(MapUsage.telem_packet())   # Map data's switch, again: a TELEM sent before the listener was up is lost (周瑜 on #309)
+		_send(city_style_packet(_city_style))
 	if not _got_ready and not _pending_create.is_empty() \
 			and _frames % CREATE_RESEND_FRAMES == 0:
 		_send(_pending_create)

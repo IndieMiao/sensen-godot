@@ -9,6 +9,11 @@
 # export_presets.cfg is restored too. Godot's Android exporter stops "its" adb server when it exits, so this script
 # points it at a private port (P0_ADB_PORT, default 5071) and never touches another session's adb (5037 and others).
 # Internal demo only: giving this APK to anyone outside needs the user's approval (AGENTS.md: only Journey goes out).
+# P0_DEV_CLEARTEXT=<host> (an internal voice test only, 11-02): LiveKit's Android SDK talks to its server through
+# Java, which targetSdk 36 keeps off plain ws:// — the devserver's LiveKit is ws://192.168.124.53:7880. With it set,
+# this export alone gets a network security config letting that one host through; the manifest and res/xml are put
+# back afterwards, build.json says so (dev_cleartext), and publish_demo_apk.mjs refuses such an APK. Without it the
+# APK must carry no networkSecurityConfig at all (checked below).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 SERVER="" KEY="" CODE="" NAME="" OUT="build/p0-demo.apk"
@@ -60,6 +65,8 @@ if (( ${#missing[@]} )); then
 fi
 CODE="${CODE:-$(date +%Y%m%d)01}"
 [[ "$CODE" =~ ^20[0-9]{6}[0-9]{2}$ ]] || { echo "--code must be YYYYMMDDNN, got $CODE" >&2; exit 2; }
+DEV_CLEARTEXT="${P0_DEV_CLEARTEXT:-}"
+[[ -z "$DEV_CLEARTEXT" || "$DEV_CLEARTEXT" =~ ^[A-Za-z0-9.-]+$ ]] || { echo "P0_DEV_CLEARTEXT takes one host name or IPv4" >&2; exit 2; }
 # What the APK is built from, read before this script touches export_presets.cfg (周瑜 on #163): tracked changes, and
 # untracked files, since an all_resources export packs untracked scenes, scripts and json too (the preset's
 # exclude_filter is applied to the list in build.json; publish_demo_apk.mjs refuses anything but .uid files). Files git
@@ -89,8 +96,38 @@ CFG=assets/p0/demo_server.json
 # A full template: BSD mktemp -t takes a prefix, GNU mktemp -t needs X's, so neither form of -t works on both.
 BACKUP="$(mktemp "${TMPDIR:-/tmp}/p0demo_presets.XXXXXX")"
 cp export_presets.cfg "$BACKUP"
-restore() { cp "$BACKUP" export_presets.cfg; rm -f "$BACKUP" "$CFG"; }
+MANIFEST="$B/src/main/AndroidManifest.xml" NSC="$B/res/xml/network_security_config.xml"
+MANIFEST_BACKUP="$(mktemp "${TMPDIR:-/tmp}/p0demo_manifest.XXXXXX")"
+cp "$MANIFEST" "$MANIFEST_BACKUP"
+restore() {
+  cp "$BACKUP" export_presets.cfg; rm -f "$BACKUP" "$CFG"
+  cp "$MANIFEST_BACKUP" "$MANIFEST"; rm -f "$MANIFEST_BACKUP"; [[ -n "${WROTE_NSC:-}" ]] && rm -f "$NSC"
+  [[ -n "${MADE_XML_DIR:-}" ]] && rmdir "$(dirname "$NSC")" 2>/dev/null; return 0
+}
 trap restore EXIT
+if [[ -n "$DEV_CLEARTEXT" ]]; then
+  [[ -e "$NSC" ]] && { echo "$NSC is already there: not writing over it" >&2; exit 2; }
+  [[ -d "$(dirname "$NSC")" ]] || MADE_XML_DIR=1   # an empty res/xml this script made goes too (后裔 on #651)
+  mkdir -p "$(dirname "$NSC")"; WROTE_NSC=1
+  cat > "$NSC" <<XML
+<?xml version="1.0" encoding="utf-8"?>
+<!-- tools/p0/build_demo_apk.sh, P0_DEV_CLEARTEXT: this export only, removed afterwards -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">$DEV_CLEARTEXT</domain>
+    </domain-config>
+</network-security-config>
+XML
+  python3 - "$MANIFEST" <<'PY'
+import re, sys
+p = sys.argv[1]; s = open(p).read()
+if "networkSecurityConfig" in s: sys.exit("the manifest already names a networkSecurityConfig")
+s, n = re.subn(r"<application\b", '<application android:networkSecurityConfig="@xml/network_security_config"', s, count=1)
+if n != 1: sys.exit("no <application> in the manifest")
+open(p, "w").write(s)
+PY
+  echo "P0_DEV_CLEARTEXT: plain traffic to $DEV_CLEARTEXT allowed in this export only" >&2
+fi
 mkdir -p "$(dirname "$OUT")" "$LOGS"
 
 python3 - "$SERVER" "$KEY" "$CODE" "$NAME" <<'PY'
@@ -119,9 +156,10 @@ PY
 BT="$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)"
 "$BT/aapt" dump badging "$OUT" > "$LOGS/badging.txt"
 "$BT/apksigner" verify --print-certs "$OUT" > "$LOGS/signer.txt"
-python3 - "$OUT" "$SERVER" "$KEY" "$LOGS" "$COMMIT" "$DIRTY" <<'PY'
+"$BT/aapt" dump xmltree "$OUT" AndroidManifest.xml > "$LOGS/manifest.txt"
+python3 - "$OUT" "$SERVER" "$KEY" "$LOGS" "$COMMIT" "$DIRTY" "$DEV_CLEARTEXT" <<'PY'
 import fnmatch, hashlib, json, os, re, sys, zipfile
-apk, server, key, logs, commit, dirty = sys.argv[1:7]
+apk, server, key, logs, commit, dirty, dev_cleartext = sys.argv[1:8]
 presets = open("export_presets.cfg").read()
 seg = presets[presets.index('name="Android P0"'):]
 excluded = [p.strip() for p in re.search(r'exclude_filter="([^"]*)"', seg).group(1).split(",") if p.strip()]
@@ -160,10 +198,14 @@ result = {
     "native_ok": not native_missing, "native_missing": native_missing,
     "legal_ok": not legal_missing, "legal_missing": legal_missing,
     "untracked_exported": untracked[:200], "untracked_exported_count": len(untracked),
+    # P0_DEV_CLEARTEXT: the host let through for this export (an internal voice test), else null; whether the APK's
+    # manifest names a network security config at all
+    "dev_cleartext": dev_cleartext or None,
+    "network_security_config": "networkSecurityConfig" in open(f"{logs}/manifest.txt").read(),
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
 ok = result["package"] == "com.sensen.p0demo" and result["server_matches"] and result["version_baked"] == result["version_code"] \
-    and result["native_ok"] and result["legal_ok"]
+    and result["native_ok"] and result["legal_ok"] and result["network_security_config"] == bool(dev_cleartext)
 sys.exit(0 if ok else 1)
 PY

@@ -45,8 +45,6 @@ func test_zoom_buttons_reach_limits_from_a_fractional_pinch_level() -> void:
 
 func test_double_tap_starts_a_zoom_tween_while_browsing() -> void:
 	var m := _map()
-	# New farms use taps to move their chosen location; double-tap zoom belongs to browsing.
-	m._placement_mode = false
 	await get_tree().create_timer(0.01).timeout
 	for k in 2:
 		var down := InputEventScreenTouch.new()

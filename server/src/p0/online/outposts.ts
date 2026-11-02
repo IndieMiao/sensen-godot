@@ -45,3 +45,23 @@ export function generatedOutpostSpec(table: OutpostEntry[], detail: (outpost: st
     return { id: outpost, role: d.role as OutpostRole, capacity: d.capacity, bounds: room.bounds, seats: room.seats };
   };
 }
+
+/** A pond's online room (11-02, the user's pond multiplayer via 奕星): `pond:<pond id>`. */
+export const POND_ROOM = 'pond:';
+/** Players per pond room (the user, 11-02: 8 to a pond). */
+export const POND_CAPACITY = 8;
+/** The pond scene's walkable meadow, x / z metres (PondScenery.MEADOW, Rect2(-3, -19, 18, 21)): every template's. */
+export const POND_BOUNDS: [number, number, number, number] = [-3, 15, -19, 2];
+
+/** The pond a `pond:<id>` room is for, or "" when the id is no pond room's. */
+export const pondOfRoom = (room: string): string => room.startsWith(POND_ROOM) ? room.slice(POND_ROOM.length) : '';
+
+/** The room spec of a pond the content knows (`known`: world.placeOf, hand-written or generated), no seats; undefined
+ * for any other id. Made on first join and dropped once the pond's last room empties, as a generated outpost's is. */
+export function pondRoomSpec(known: (pond: string) => boolean) {
+  return (room: string): OutpostSpec | undefined => {
+    const pond = pondOfRoom(room);
+    if (!pond || !known(pond)) return undefined;
+    return { id: room, role: 'pond', capacity: POND_CAPACITY, bounds: POND_BOUNDS, seats: [] };
+  };
+}

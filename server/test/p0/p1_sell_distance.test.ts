@@ -109,7 +109,9 @@ describe('the creel\'s worth here and at home (q(259))', () => {
   it('a town without a Tackle Shop (S tier: only the Trading Post): none — nowhere there to sell them (周瑜 on #567)', () => {
     const LOUDI = 'gn-1802238';
     expect(cityPlaces(c, LOUDI)!.detail.outposts.map(o => o.role)).toEqual(['post']);
-    const s = step(fresh(), { type: 'travel', to: LOUDI }).s;
+    const s0 = fresh();
+    s0.coins = 5000;   // the fare to Loudi (#568, q(256)): 500 and the 40 the wallet keeps
+    const s = step(s0, { type: 'travel', to: LOUDI }).s;
     s.bag.push({ id: 'fish_trout', qty: 30 });
     expect(viewOf(c, s, T0).bag.creel_value).toBeNull();
   });
@@ -118,6 +120,7 @@ describe('the creel\'s worth here and at home (q(259))', () => {
     let s: P0State = freshState(c, 'player-sell-distance-nyc', T0, 7, { pending: true });
     s.created_at = T0 - 8 * DAY;
     s = step(s, { type: 'choose_home', city: NYC, spot: 0 } as P0Command).s;
+    s.coins = 5000;   // the fare to San Francisco (#568, q(256)): 300 and the 40 the wallet keeps
     s = step(s, { type: 'travel', to: SF }).s;
     s.bag = s.bag.filter(b => !b.id.startsWith('fish_'));
     s.bag.push({ id: 'fish_salmon', qty: 2 });

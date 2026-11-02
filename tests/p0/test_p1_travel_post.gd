@@ -90,7 +90,7 @@ func test_trip_fares_reads_as_the_frame() -> void:
 	var d: UiDrawer = rt.ui.open_fare_board()
 	assert_str(rt.ui.modal_kind).is_equal("fare_board")
 	await get_tree().create_timer(0.6).timeout   # slid up
-	assert_float(d.height).is_equal(476.0)
+	assert_float(d.height).is_equal(496.0)   # with q(257) ①'s footnote (FARE-BOARD 9:133836)
 	var sheet := d.get_global_rect()   # P0Ui's root is the window's (headless 640 wide): measured from the sheet
 	var head: Control = d.find_child("Head", true, false)
 	assert_str((d.find_child("Title", true, false) as Label).text).is_equal("Trip fares")

@@ -51,8 +51,8 @@ static func after_quiet(at_ms: float, bias_min: int) -> float:
 	return float(local_s + to_8 - bias_min * 60) * 1000.0
 
 # ---------------------------------------------------------------- the switch, the ask and the phone (q(236) ④ ⑤)
-## The phone's side: GodotNotify (Android) — null elsewhere, where there is no soft prompt and no Notifications row
-## (⑧: iOS waits for its own notifications). `native` is it, or a test double with the same methods.
+## The phone's side: GodotNotify (Android) or P0NotifyIOS (iOS, SGODOT-356) — null elsewhere, where there is no soft
+## prompt and no Notifications row. `native` is it, or a test double with the same methods.
 var native: Object
 ## Per account on this phone (TestAccounts.profile_file): `asked` — the soft prompt answered (Allow or Not now) —
 ## and `choice` — the player's: "on", "off", or "" never chosen. A reinstall or another phone starts unasked (q(235) ③).
@@ -67,7 +67,8 @@ func _init(path_ := "", native_: Object = null) -> void:
 		if data is Dictionary: _saved = data
 
 static func phone() -> Object:
-	return Engine.get_singleton("GodotNotify") if Engine.has_singleton("GodotNotify") else null
+	if Engine.has_singleton("GodotNotify"): return Engine.get_singleton("GodotNotify")
+	return P0NotifyIOS.new() if OS.get_name() == "iOS" else null
 
 func available() -> bool: return native != null
 
@@ -94,11 +95,13 @@ func system_refused() -> bool:
 	if s.is_empty() or bool(s.get("allowed", false)): return false
 	return not bool(s.get("needs_grant", false)) or bool(s.get("asked", false))
 
-## The soft prompt may come (the view's conditions aside): not answered on this phone; not on Android 13+ when the
-## system already allows (on by default) or already said no to the game's dialog (④).
+## The soft prompt may come (the view's conditions aside): not answered on this phone; not on Android 13+ (and iOS)
+## when the system already allows (on by default) or already said no to the game's dialog (④); not before the phone
+## has said which (iOS answers a moment after launch).
 func may_ask() -> bool:
 	if native == null or asked(): return false
 	var s := system()
+	if s.is_empty(): return false
 	if bool(s.get("needs_grant", false)) and (bool(s.get("allowed", false)) or bool(s.get("asked", false))): return false
 	return true
 

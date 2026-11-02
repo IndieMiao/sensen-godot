@@ -2,6 +2,7 @@ extends GdUnitTestSuite
 
 const FARM := preload("res://scenes/farm/farm.tscn")
 var _locale := ""
+var _posted := false
 
 func before_test() -> void:
 	_locale = TranslationServer.get_locale()
@@ -18,8 +19,7 @@ func _farm(size: Vector2i) -> Node:
 	viewport.own_world_3d = true
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(viewport)
-	var terrain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/generated_shoreline_farm_terrain.json"))
-	var plot := FarmPlot.register_terrain(terrain)
+	var plot := FarmPlot.blueprint_for()
 	var available: Array[Vector2i] = []
 	for y in plot.grid.y:
 		for x in plot.grid.x:
@@ -28,8 +28,8 @@ func _farm(size: Vector2i) -> Node:
 	var cells := {"%d,%d" % [available[0].x, available[0].y]: {"state": "growing", "crop": "R", "ready_at": 1},
 		"%d,%d" % [available[1].x, available[1].y]: {"state": "tilled", "crop": null}}
 	var session := FarmSession.new(ApiClient.new("https://farm-ui-fixture.invalid/v1", FakeTransport.new([]).callable()))
-	session._adopt({"farm_id": "farm-ui-fixture", "region_id": "los_angeles", "layout_patch_id": terrain.layout_id,
-		"blueprint_revision": 1, "farm_terrain": terrain, "location": terrain.source.center, "version": 1,
+	session._adopt({"farm_id": "farm-ui-fixture", "region_id": "los_angeles", "layout_patch_id": "la_c",
+		"blueprint_revision": 2, "version": 1,
 		"state": {"wallet": 5432, "cells": cells, "clock": {"chapter_index": 0, "field_condition": "sunny"},
 			"inventory": {"seeds": {"R": {"bound": 6}, "L": {"bound": 3}, "C": {"bound": 2}, "H": {"bound": 1}}, "produce": {}},
 			"xp": {"total": 0, "first_harvest_crops": []}, "chapters": []}})
@@ -44,10 +44,21 @@ func _farm(size: Vector2i) -> Node:
 	farm._update_camera()
 	return farm
 
+func _drawn() -> void:
+	_posted = true
+
+## The screenshot is only a review aid: a window that does not draw (headless, the runner's minimized window on macOS,
+## an occluded one) never posts a draw, so it waits at most 2 s for one and skips the picture without it.
 func _capture(farm: Node, file: String) -> void:
-	if DisplayServer.get_name() == "headless": return
+	if DisplayServer.get_name() == "headless" or not DisplayServer.window_can_draw(): return
 	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	_posted = false
+	RenderingServer.frame_post_draw.connect(_drawn, CONNECT_ONE_SHOT)
+	var start := Time.get_ticks_msec()
+	while not _posted and Time.get_ticks_msec() - start < 2000: await get_tree().process_frame
+	if not _posted:
+		RenderingServer.frame_post_draw.disconnect(_drawn)
+		return
 	var directory := "res://output/ui-redesign-2026-09-21/farm"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(directory))
 	assert_int(farm.get_viewport().get_texture().get_image().save_png(directory.path_join(file))).is_equal(OK)

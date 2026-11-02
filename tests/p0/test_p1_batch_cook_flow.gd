@@ -285,6 +285,7 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 	assert_vector(steam.global_position).is_equal_approx(vent.global_position, Vector3.ONE * 0.001)
 	assert_float(steam.scale_amount_max).is_equal_approx(1.2 * 0.6, 0.001)
 	# ready: up again, the steam from the mouth
+	v = v.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
 	v.cooking.stoves[0].ready_in = 0
 	_set_view(v)
 	frame.call()
@@ -293,6 +294,7 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 	assert_object(k.stage.steam_point).is_null()   # the mouth's steam
 	assert_object(r.call("steam_from", 0)).is_same(r.anchor("drop_pot_1"))
 	# collected: shut
+	v = v.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
 	v.cooking.stoves = [{}, {}, {}]
 	_set_view(v)
 	frame.call()

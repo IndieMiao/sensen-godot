@@ -6,13 +6,14 @@ import { barter } from './barter.js';
 import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
+import { isLocal, localCommand, pruneCities, settleLocals } from './locals.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteHarvested, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { setLook, upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
-import { notePresence, restReadyIn } from './presence.js';
+import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
@@ -82,7 +83,7 @@ type P0CommandBody =
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
   | { type: 'wear_title'; id: string }   // q(180): put on a title the player has (titles.ts)
-  | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
+  | { type: 'travel'; to: string }   // v5 (SGODOT-278): a 24 h Day Pass; q(256): the Trip band's fare (travel.ts fareOf)
   | { type: 'return_home' }
   | { type: 'choose_home' | 'change_home'; city: string; spot?: number; at?: [number, number] }   // SGODOT-303 (home_city.ts): pick a home, change it once; at: a free pin (q(216))
   | { type: 'guide'; op: 'ack'; step: string };   // SGODOT-341: a guide step that waits for the player to read a line (guide.ts guideAck)
@@ -107,7 +108,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleCards(c, s);   // today's recipe cards are fixed on the first command of the day
+  pruneCities(c, s, now);   // q(272) ⑪: a city not visited for 30 days, nothing tracked there, starts over
   settleBoards(c, s, now);
+  settleLocals(c, s, now);   // q(272): the day's local requests of the city the player is in
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.
   // With several stoves (SGODOT-282) only the stove holding that pot waits; the others settle as usual.
@@ -292,12 +295,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'rest': {
       if (s.day.rest >= 1) return fail('rest_used');
-      // q(41): at home, 2 h after last leaving it. Older clients send no space; they keep the old rule.
-      if (cmd.space !== undefined) {
-        if (cmd.space !== 'home') return fail('not_home');
-        const wait = restReadyIn(c, s, now);
-        if (wait === null || wait > 0) return fail('away_short', { ready_in: wait, away_h: c.energy.rest_away_h });
-      }
+      // q(269) (SGODOT-377, the user's ③): once a player day, at home; no 2 h away first (q(41) / q(70) retired: a
+      // trip out restarted those 2 h, so a player who kept going out never rested). Older clients send no space.
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
       const max = maxEnergy(c, s);
       if (s.energy.value >= max) return fail('energy_full');
       const gain = Math.min(c.energy.rest_amount, max - s.energy.value);
@@ -317,8 +317,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'accept': case 'deliver': case 'drop': {
       const id = String(cmd.request ?? '');
-      const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(s))
-        : boardCommand(c, s, cmd.type, id, now, events);
+      const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(c, s))
+        : isLocal(id) ? localCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place })   // q(272)
+        : boardCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place });
       if (refusal) return fail(refusal.code, refusal.detail);
       if (cmd.type === 'deliver') noteDelivery(c, s, now);   // toward Regular in the city the player is in (§11.9.1)
       break;
@@ -421,7 +422,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'travel': {
       const r = travel(c, s, cmd.to, now, events);
-      if (r) return fail(r.code);
+      if (r) return fail(r.code, r.detail);
       break;
     }
     case 'return_home': {

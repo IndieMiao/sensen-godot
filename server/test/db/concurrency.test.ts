@@ -167,6 +167,19 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
     expect(fresh.kind).toBe('version_mismatch');
   });
 
+  it('a farm saved with map-generated terrain takes no new commands; a retry still gets its result (SGODOT-304)', async () => {
+    const owner = await seedFarm();
+    const e = env('before', 0, [cells[0]]);
+    expect((await store.applyCommand(owner, e, { type: 'till_cells', cell_ids: [cells[0]] })).kind).toBe('applied');
+    await pool.query('UPDATE farms SET farm_terrain = $1 WHERE owner_id = $2',
+      [JSON.stringify({ format: 1, layout_id: 'geo', plot: {}, source: {} }), owner]);
+    const before = (await pool.query('SELECT version, state FROM farms WHERE owner_id = $1', [owner])).rows[0];
+    expect((await store.applyCommand(owner, e, { type: 'till_cells', cell_ids: [cells[0]] })).kind).toBe('replayed');
+    expect((await store.applyCommand(owner, env('after', 1, [cells[1]]), { type: 'till_cells', cell_ids: [cells[1]] })).kind)
+      .toBe('version_mismatch');
+    expect((await pool.query('SELECT version, state FROM farms WHERE owner_id = $1', [owner])).rows[0]).toEqual(before);
+  });
+
   it('建农场：同 key 同 payload 重放，同 key 换 payload 报 mismatch', async () => {
     const { player } = await store.authAnonymous(installKeyHmac(newInstallKey(), 'p'));
     const farm = newFarm(player.id);

@@ -249,6 +249,61 @@ func test_a_failed_arrival_says_couldnt_get_there_and_retry_goes_again() -> void
 	rt._tick_screens(P0Runtime.ARRIVE_FAIL_S + 0.1)   # 20 s without an answer
 	assert_int(rt.ui.screen_kind()).is_equal(K.PLACE_FAIL)
 
+## SGODOT-382: a room that refused the join (TRAVEL_REQUIRED) sent the player back to the map before the trip arrived —
+## the trip is over: no Couldn't get there 20 s later over the map; and one already up closes on Go back even when
+## its trip was dropped.
+func test_a_trip_that_ends_on_the_map_is_over_and_couldnt_get_there_always_closes() -> void:
+	rt.session.view = _view()
+	rt._scene_overlay("res://scenes/p0/p0_outpost.tscn", {"outpost_id": "gn-5355933~market0"}).free()
+	var room := auto_free(Node.new()) as Node
+	room.scene_file_path = "res://scenes/p0/p0_outpost.tscn"
+	add_child(room)
+	rt.attach(room)
+	var map := auto_free(Node.new()) as Node
+	map.scene_file_path = "res://scenes/p0/p0_map.tscn"
+	add_child(map)
+	rt.attach(map)   # the room left for the map (P0Outpost._on_online_failed)
+	rt._tick_screens(P0Runtime.ARRIVE_FAIL_S + 0.1)
+	assert_int(rt.ui.screen_kind()).is_equal(-1)   # nothing over the map
+	rt._arrival_failed()   # as before the fix: Couldn't get there with no trip behind it
+	assert_int(rt.ui.screen_kind()).is_equal(K.PLACE_FAIL)
+	rt.swap_root = func(): pass
+	rt.ui.screen().card.secondary.pressed.emit()   # Go back
+	assert_int(rt.ui.screen_kind()).is_equal(-1)
+
+## SGODOT-382: a pond (no travel card of its own) told travel_required goes back to the map for that city's travel card.
+func test_travel_required_in_a_pond_goes_back_to_the_maps_travel_card() -> void:
+	var w := _arrive_at_pond()
+	_state()
+	rt.swap_root = func(): pass
+	rt.session.refused.emit("travel_required", {"preview": {"cluster": "gn-5355933", "name": "Hayward"}}, {"type": "cast"})
+	assert_str(rt.after_leave).is_equal("travel:gn-5355933")
+	assert_bool(is_instance_valid(w)).is_true()
+
+## 周瑜 on #642: refused while the pond's fishing panel is up (its back lock closes the panel and keeps the pond) — it
+## still goes back to the map for the travel card; the lock is not asked.
+func test_travel_required_with_the_fishing_panel_up_still_goes_back_to_the_map() -> void:
+	rt.session.view = _view()
+	rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}).free()
+	var stub := GDScript.new()
+	stub.source_code = "extends Node\nvar asked := 0\nfunc is_back_navigation_locked() -> bool:\n\tasked += 1\n\treturn true"
+	stub.reload()
+	var w := auto_free(Node.new()) as Node
+	w.set_script(stub)
+	w.scene_file_path = "res://scenes/p0/p0_pond.tscn"
+	add_child(w)
+	rt.attach(w)
+	_state()
+	rt.return_to = "pond:pond_san_francisco_03"   # the map's chip would go back here
+	var left := [0]
+	rt.swap_root = func(): left[0] += 1
+	rt.session.refused.emit("travel_required", {"preview": {"cluster": "gn-5355933", "name": "Hayward"}}, {"type": "cast"})
+	assert_str(rt.after_leave).is_equal("travel:gn-5355933")
+	assert_int(left[0]).is_equal(1)   # off to the map
+	assert_int(w.asked).is_equal(0)   # the panel's lock never asked
+	# not a place to go back to: the map's chip names where the player is (不知火舞 on #642: it kept the pond's name)
+	assert_str(rt.return_to).is_equal("farm")
+
 func test_go_back_and_back_leave_for_where_the_player_came_from() -> void:
 	var left := [0]
 	rt.swap_root = func(): left[0] += 1   # not pushed on AppRouter here: Go back takes the map way

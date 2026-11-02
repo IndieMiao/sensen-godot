@@ -94,38 +94,8 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		add_child(_rotor)
 	_smoke(house, style)
 	_build_boundary(bp)
-	if bp.layout_patch_id.begins_with("geo_"): _build_geographic_verges(bp)
 	_build_field_cover(bp)
 	set_process(_rotor != null)
-
-## Follow the actual road and water edges with low plants and pebbles. Every
-## instance stays on dry lawn/rock; generated curves never get box-road meshes.
-func _build_geographic_verges(bp: FarmBlueprint) -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = bp.checksum.hash()
-	var grasses: Array = []
-	var flowers: Array = []
-	var stones: Array = []
-	for j in range(1, bp.grid.y - 1):
-		for i in range(1, bp.grid.x - 1):
-			var cell := Vector2i(i, j)
-			if FarmPlot.kind_at(bp.layout_patch_id, cell) not in ["lawn", "rock"]: continue
-			var shore := false
-			var path_edge := false
-			for offset in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
-				var neighbour := FarmPlot.kind_at(bp.layout_patch_id, cell + offset)
-				shore = shore or neighbour == "water"
-				path_edge = path_edge or neighbour == "path"
-			if not shore and not path_edge: continue
-			var point := bp.cell_to_world(cell)
-			if point.distance_to(bp.cell_to_world(bp.anchor("house"))) < 2.5 or point.distance_to(bp.cell_to_world(bp.anchor("mine"))) < 1.7: continue
-			# Keep banks low enough to see the float from the fishing side camera.
-			if rng.randf() < 0.36: grasses.append(_transform(point, rng.randf_range(0, TAU), rng.randf_range(0.28, 0.48)))
-			if rng.randf() < 0.09: flowers.append(_transform(point + Vector3(0.12, 0, 0.10), rng.randf_range(0, TAU), 0.45))
-			if shore and rng.randf() < 0.13: stones.append(_transform(point, rng.randf_range(0, TAU), rng.randf_range(0.32, 0.52)))
-	add_child(Art.batch("grass_clump", grasses, false))
-	add_child(Art.batch("daisy", flowers, false))
-	add_child(Art.batch("rock", stones, true))
 
 func _build_field_cover(bp: FarmBlueprint) -> void:
 	# Low meadow tufts are visual only and disappear as soon as that cell is farmed.
@@ -248,8 +218,6 @@ func _build_boundary(bp: FarmBlueprint) -> void:
 			var bush := Transform3D.IDENTITY
 			if i % 2 == 0:
 				bush = _transform(position + Vector3(0.15, 0, -0.18), i, rng.randf_range(0.7, 1.2))
-			# Consume the same random values so dry banks and legacy scenery retain their arrangement.
-			if bp.layout_patch_id.begins_with("geo_") and _boundary_water(bp, side, along): continue
 			rocks.append(rock)
 			if i % 2 == 0: bushes.append(bush)
 	# Inner cliff islands receive scattered rocks, preserving their true non-walkable cells.
@@ -276,17 +244,3 @@ func _build_boundary(bp: FarmBlueprint) -> void:
 	var bush_layer := Art.batch("bush", bushes)
 	bush_layer.name = "BoundaryBushes"
 	add_child(bush_layer)
-
-static func _boundary_water(bp: FarmBlueprint, side: int, along: float) -> bool:
-	var at := clampi(floori(along / bp.cell_m), 0, bp.grid.x - 1)
-	# A cluster spans more than one cell. Keep its footprint clear of adjacent water too.
-	for inward in 2:
-		for offset in [-1, 0, 1]:
-			var cell: Vector2i
-			match side:
-				0: cell = Vector2i(inward, at + offset)
-				1: cell = Vector2i(bp.grid.x - 1 - inward, at + offset)
-				2: cell = Vector2i(at + offset, inward)
-				_: cell = Vector2i(at + offset, bp.grid.y - 1 - inward)
-			if FarmPlot.kind_at(bp.layout_patch_id, cell) == "water": return true
-	return false

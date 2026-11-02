@@ -351,7 +351,7 @@ func test_rest_tile_at_full_energy_says_so_and_is_off() -> void:
 	var rest: Dictionary = P0Logic.energy_card(v, 2, "Sow").tiles.filter(func(t): return t.label == "Rest")[0]
 	assert_that([rest.fact, rest.on]).is_equal(["Energy full", false])
 
-func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
+func test_energy_card_tea_and_rest_read_the_drinks_facts_and_rest_has_no_away() -> void:
 	var v := _view()
 	v.energy = {"value": 1, "max": 200, "next_in": 161000, "regen_ms": 240000}
 	v["drinks"] = {"used": 1, "limit": 3, "left": 2, "price": 50, "need": null, "full": false, "resets_in": 3600000}
@@ -361,16 +361,18 @@ func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
 	assert_str(str(tiles["Tea"].fact)).is_equal("1/3 today · 50 coins")
 	assert_bool(bool(tiles["Tea"].on)).is_true()
 	assert_str(str(tiles["Tea"].go)).is_equal("outpost:tea")
-	assert_str(str(tiles["Rest"].fact)).is_equal("Ready in 1h 12m")
-	assert_bool(bool(tiles["Rest"].on)).is_false()
+	# q(269) (SGODOT-377): no 2 h away — a server before it that still sends a countdown is not read
+	assert_str(str(tiles["Rest"].fact)).is_equal("Available")
+	assert_bool(bool(tiles["Rest"].on)).is_true()
 	v.drinks.need = 245   # drinksView: price + the 40-coin floor; with 230 coins that is 15 short
 	v.rest.away_ready_in = null
 	tiles = {}
 	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
 	assert_str(str(tiles["Tea"].fact)).is_equal("Need 15 more coins")
 	assert_bool(bool(tiles["Tea"].on)).is_false()
-	assert_str(str(tiles["Rest"].fact)).is_equal("After 2h away")
-	v.rest.away_ready_in = 0
+	assert_str(str(tiles["Rest"].fact)).is_equal("Available")   # null was "never left": no longer stops Rest
+	v.rest.erase("away_ready_in")
+	v.rest.erase("away_h")   # the server's view since q(269)
 	tiles = {}
 	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
 	assert_str(str(tiles["Rest"].fact)).is_equal("Available")
@@ -482,14 +484,10 @@ func test_bell_reads_the_inbox_badge_and_lists_parcels_read_only() -> void:
 	await get_tree().process_frame
 	assert_int(ui.find_children("*", "UiEmptyState", true, false).size()).is_equal(1)
 
-func test_rest_tile_follows_the_away_rule() -> void:
+## q(269) (SGODOT-377): once a day, no 2 h away first — the tile has no `After 2h away` / `Ready in …` any more.
+func test_rest_tile_has_no_away_rule() -> void:
 	var v := _view()
-	v.rest = {"used": 0, "limit": 1, "resets_in": 3600000, "away_h": 2, "away_ready_in": null}
-	var rest: Dictionary = P0Logic.energy_card(v, 2, "Sow ×1").tiles[3]
-	assert_that([rest.fact, rest.on]).is_equal(["After 2h away", false])
-	v.rest.away_ready_in = 4320000
-	assert_str(str(P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].fact)).is_equal("Ready in 1h 12m")
-	v.rest.away_ready_in = 0
+	v.rest = {"used": 0, "limit": 1, "resets_in": 3600000}
 	# near full (142/200, Rest gives 60) it says the real gain, like the bench card (225)
 	assert_that([P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].fact, P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].on]).is_equal(["+58 Energy", true])
 	v.rest.used = 1

@@ -10,13 +10,16 @@ func _theme() -> Theme:
 	return load(THEME_PATH) as Theme
 
 func test_accent_matches_token() -> void:
+	## Since c1d0d261 (09-23, the app-wide restyle: lime primary on white cards) the theme's primary comes from
+	## GameUi.LIME, not DesignTokens.ACCENT, which stayed with the old teal (Journey scenes still read it).
 	var sb := _theme().get_stylebox(&"normal", &"AccentButton") as StyleBoxFlat
 	assert_object(sb).is_not_null()
-	assert_bool(sb.bg_color.is_equal_approx(DesignTokens.ACCENT)).is_true()
+	assert_bool(sb.bg_color.is_equal_approx(GameUi.LIME)).is_true()
 
 func test_accent_pressed_matches_deep_token() -> void:
+	## Since c1d0d261 (09-23 restyle) a pressed primary keeps its GameUi.LIME, not DesignTokens.ACCENT_DEEP.
 	var sb := _theme().get_stylebox(&"pressed", &"AccentButton") as StyleBoxFlat
-	assert_bool(sb.bg_color.is_equal_approx(DesignTokens.ACCENT_DEEP)).is_true()
+	assert_bool(sb.bg_color.is_equal_approx(GameUi.LIME)).is_true()
 
 func test_body_font_size_is_token_default() -> void:
 	assert_int(_theme().default_font_size).is_equal(DesignTokens.FONT_BODY)
@@ -56,11 +59,11 @@ func test_ink_is_dark_enough_for_contrast() -> void:
 
 func test_button_font_color_matches_ink_token() -> void:
 	var color := _theme().get_color(&"font_color", &"Button")
-	assert_bool(color.is_equal_approx(DesignTokens.INK)).is_true()
+	assert_bool(color.is_equal_approx(GameUi.INK)).is_true()   # GameUi.INK since c1d0d261 (09-23 restyle)
 
 func test_label_font_color_matches_ink_token() -> void:
 	var color := _theme().get_color(&"font_color", &"Label")
-	assert_bool(color.is_equal_approx(DesignTokens.INK)).is_true()
+	assert_bool(color.is_equal_approx(GameUi.INK)).is_true()   # GameUi.INK since c1d0d261 (09-23 restyle)
 
 func test_pill_font_size_matches_token() -> void:
 	## 紧凑行动控件用专属中间字号 FONT_PILL。
@@ -71,6 +74,6 @@ func test_selected_and_marker_colors_match_tokens() -> void:
 	var selected := _theme().get_stylebox(&"normal", &"ChoiceSelectedButton") as StyleBoxFlat
 	var marker := _theme().get_stylebox(&"normal", &"MarkerButton") as StyleBoxFlat
 	var marker_pressed := _theme().get_stylebox(&"pressed", &"MarkerButton") as StyleBoxFlat
-	assert_bool(selected.bg_color.is_equal_approx(DesignTokens.SURFACE_TINT)).is_true()
+	assert_bool(selected.bg_color.is_equal_approx(GameUi.MINT)).is_true()   # GameUi.MINT since c1d0d261 (09-23 restyle)
 	assert_bool(marker.bg_color.is_equal_approx(DesignTokens.MARKER)).is_true()
 	assert_bool(marker_pressed.bg_color.is_equal_approx(DesignTokens.MARKER_PRESSED)).is_true()

@@ -817,14 +817,6 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	if rest_left <= 0:
 		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
 		rest_tile.on = false
-	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228)
-		var away = rest.get("away_ready_in")
-		if away == null:
-			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
-			rest_tile.on = false
-		elif float(away) > 0.0:
-			rest_tile.fact = "Ready in %s" % span(float(away))
-			rest_tile.on = false
 	if rest_tile.on and str(rs.get("state", "")) == "full":   # nothing to gain: no "+0 Energy" tile (亚瑟 on #37)
 		rest_tile.fact = "Energy full"
 		rest_tile.on = false
@@ -947,13 +939,39 @@ static func need_source(view: Dictionary, id: String) -> Dictionary:
 	if not material.is_empty(): return material
 	return {"text": label, "go": ""}
 
+## A view and everything in it made read-only (SGODOT-260 Q3: P0Session.view, whose parts current() shares).
+static func freeze(x) -> void:
+	if x is Dictionary:
+		if x.is_read_only(): return
+		for k in x: freeze(x[k])
+		x.make_read_only()
+	elif x is Array:
+		if x.is_read_only(): return
+		for i in x: freeze(i)
+		x.make_read_only()
+
 ## Locally advance a view by elapsed ms (energy ticks and crop timers) between server refreshes.
+## SGODOT-260 Q3: only the parts that age are copied (energy, plots, the guide row, the stoves, the cast and traps, the
+## inbox parcels, Rest, the residents' next requests, the keepers' and boards' refills); everything else is the server
+## view's own, shared — callers read the result, never write into it.
 static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 	if elapsed_ms <= 0: return view
-	var v := view.duplicate(true)
-	var e: Dictionary = v.get("energy", {})
-	var next_in = e.get("next_in", null)
+	var v := view.duplicate(false)
+	# the server's clock moves on too: a Day Pass's countdown on the chip and its running out (q(257) ⑤, SGODOT-367)
+	if v.has("now"): v["now"] = float(v.now) + elapsed_ms
+	var owned: Array = []   # the dictionaries this projection copied (each copied once, then written in place)
+	# d[key] as a shallow copy of its own, the server view's dictionary left as it was
+	var own := func(d: Dictionary, key: String) -> Dictionary:
+		var sub: Dictionary = d[key]
+		if owned.any(func(o): return is_same(o, sub)): return sub
+		sub = sub.duplicate()
+		owned.append(sub)
+		d[key] = sub
+		return sub
+	var e = v.get("energy", null)
+	var next_in = e.get("next_in", null) if e is Dictionary else null
 	if next_in != null:
+		e = own.call(v, "energy")
 		var remaining := float(next_in) - elapsed_ms
 		var regen := float(e.get("regen_ms", 240000))
 		var value := int(e.get("value", 0))
@@ -963,32 +981,111 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 			remaining += regen
 		e["value"] = value
 		e["next_in"] = null if value >= maxv else remaining
-	for p in v.get("plots", []):
-		if str(p.get("state", "")) == "growing" and p.get("ready_in", null) != null:
-			p["ready_in"] = maxf(0.0, float(p["ready_in"]) - elapsed_ms)
-			if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
+	if v.get("plots") is Array:
+		var plots: Array = []
+		for p in v.plots:
+			if p is Dictionary and str(p.get("state", "")) == "growing" and p.get("ready_in", null) != null:
+				p = p.duplicate()
+				p["ready_in"] = maxf(0.0, float(p["ready_in"]) - elapsed_ms)
+				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
+			plots.append(p)
+		v["plots"] = plots
 	var guide = v.get("guide", null)
 	var row = guide.get("row", null) if guide is Dictionary else null
 	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:
+		row = own.call(own.call(v, "guide"), "row")
 		row.ready_in = maxf(0.0, float(row.ready_in) - elapsed_ms)
-	var stove = v.get("cooking", {}).get("stove", null)
-	var pots: Array = [stove] if stove is Dictionary else []
-	# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,
-	# which may be the same dictionary after the deep copy above, so each pot is aged once).
-	for st in v.get("cooking", {}).get("stoves", []):
-		if st is Dictionary and not pots.any(func(q): return is_same(q, st)): pots.append(st)
-	for st in pots:
-		if not st.has("ms") and not st.has("ready_in"): continue
-		st["elapsed"] = float(st.get("elapsed", 0)) + elapsed_ms
-		st["ready_in"] = maxf(0.0, float(st.get("ready_in", 0)) - elapsed_ms)
-	var cast = v.get("fishing", {}).get("cast", null)
-	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
-	# a trap's next fish counts down (its name strip `· next in 5h 12m`, q(109) ⑦); the next read brings the fish itself
-	for t in v.get("fishing", {}).get("trap", {}).get("traps", []):
-		if t is Dictionary and t.get("next_in", null) != null: t["next_in"] = maxf(0.0, float(t.next_in) - elapsed_ms)
-	for parcel in v.get("inbox", {}).get("parcels", []):
-		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
+	if v.get("cooking") is Dictionary:
+		var cooking: Dictionary = own.call(v, "cooking")
+		# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,
+		# which may be the same dictionary in the server view, so each pot is copied and aged once and stays shared).
+		var copies: Array = []   # [the view's pot, its aged copy], by reference (a dictionary key would match by content)
+		var age := func(st) -> Variant:
+			if not (st is Dictionary): return st
+			for pair in copies:
+				if is_same(pair[0], st): return pair[1]
+			var c: Dictionary = st.duplicate()
+			if c.has("ms") or c.has("ready_in"):
+				c["elapsed"] = float(c.get("elapsed", 0)) + elapsed_ms
+				c["ready_in"] = maxf(0.0, float(c.get("ready_in", 0)) - elapsed_ms)
+			copies.append([st, c])
+			return c
+		if cooking.get("stove") is Dictionary: cooking["stove"] = age.call(cooking.stove)
+		if cooking.get("stoves") is Array: cooking["stoves"] = (cooking.stoves as Array).map(age)
+	if v.get("fishing") is Dictionary:
+		var fishing: Dictionary = v.fishing
+		if fishing.get("cast") is Dictionary:
+			var cast: Dictionary = own.call(own.call(v, "fishing"), "cast")
+			cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+		# a trap's next fish counts down (its name strip `· next in 5h 12m`, q(109) ⑦); the next read brings the fish itself
+		var trap = fishing.get("trap", null)
+		if trap is Dictionary and trap.get("traps") is Array:
+			var traps: Array = []
+			for t in trap.traps:
+				if t is Dictionary and t.get("next_in", null) != null:
+					t = t.duplicate()
+					t["next_in"] = maxf(0.0, float(t.next_in) - elapsed_ms)
+				traps.append(t)
+			own.call(own.call(v, "fishing"), "trap")["traps"] = traps
+	var inbox = v.get("inbox", null)
+	if inbox is Dictionary and inbox.get("parcels") is Array:
+		var parcels: Array = []
+		for parcel in inbox.parcels:
+			if parcel is Dictionary:
+				parcel = parcel.duplicate()
+				parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
+			parcels.append(parcel)
+		own.call(v, "inbox")["parcels"] = parcels
+	# SGODOT-377: Rest's day reset, a resident's next request, the keepers' and boards' refills count down between reads
+	# too (the 30 s refresh moved them a minute at a time; the open bench card not at all)
+	var rest = v.get("rest", null)
+	if rest is Dictionary and rest.get("resets_in", null) != null:
+		var r: Dictionary = own.call(v, "rest")
+		r["resets_in"] = maxf(0.0, float(r.resets_in) - elapsed_ms)
+	var residents = v.get("residents", null)
+	if residents is Dictionary and residents.values().any(func(r): return r is Dictionary and r.get("next_in", null) != null):
+		var rs: Dictionary = own.call(v, "residents")
+		for id in rs.keys():
+			if rs[id] is Dictionary and rs[id].get("next_in", null) != null:
+				var r: Dictionary = rs[id].duplicate()
+				r["next_in"] = maxf(0.0, float(r.next_in) - elapsed_ms)
+				rs[id] = r
+	var keepers = v.get("keepers", null)
+	if keepers is Dictionary:
+		for k in ["post", "market"]:
+			if keepers.get(k) is Dictionary and keepers[k].get("refill_in", null) != null:
+				var kd: Dictionary = own.call(own.call(v, "keepers"), k)
+				kd["refill_in"] = maxf(0.0, float(kd.refill_in) - elapsed_ms)
+	var boards = v.get("boards", null)
+	if boards is Dictionary:
+		for b in boards:
+			var slots = boards[b].get("slots", null) if boards[b] is Dictionary else null
+			if not (slots is Array and slots.any(func(sl): return sl is Dictionary and sl.get("refill_in", null) != null)): continue
+			var aged: Array = []
+			for sl in slots:
+				if sl is Dictionary and sl.get("refill_in", null) != null:
+					sl = sl.duplicate()
+					sl["refill_in"] = maxf(0.0, float(sl.refill_in) - elapsed_ms)
+				aged.append(sl)
+			own.call(own.call(v, "boards"), b)["slots"] = aged
 	return v
+
+## SGODOT-377: ms until the first countdown in this server view that a read changes runs out — a resident's next request
+## opens, a keeper's or board's slot refills, the 04:00 day reset (Rest's `Used today` turns back; 周瑜 on #602) — or -1
+## for none.
+static func next_expiry(view: Dictionary) -> float:
+	var ins: Array = []
+	if view.get("rest") is Dictionary and view.rest.get("resets_in", null) != null: ins.append(float(view.rest.resets_in))
+	var of := func(key: String) -> Array: return view[key].values() if view.get(key) is Dictionary else []
+	for r in of.call("residents"):
+		if r is Dictionary and r.get("next_in", null) != null: ins.append(float(r.next_in))
+	for k in of.call("keepers"):
+		if k is Dictionary and k.get("refill_in", null) != null: ins.append(float(k.refill_in))
+	for b in of.call("boards"):
+		for sl in (b.slots if b is Dictionary and b.get("slots") is Array else []):
+			if sl is Dictionary and sl.get("refill_in", null) != null: ins.append(float(sl.refill_in))
+	ins = ins.filter(func(ms): return ms > 0.0)
+	return ins.min() if not ins.is_empty() else -1.0
 
 ## LOCK-14 / q(87): one InboxNotice card (BAG-5-2) for the rewards of one server reply that did not fit the bag, {} when
 ## there is nothing to say: {title, item, quantity, line} for UiInboxNotice. The card speaks of the first parcel: its
@@ -1438,6 +1535,12 @@ static func today_chip_key(rows: Array) -> String:
 		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
 	return ""
 
+## Today's 6 board requests are done (view.quotas.sys_requests): no board hand-in until the reset, so no board wears a ✓
+## (q(270)) and its Today row reads Limit reached.
+static func sys_requests_full(view: Dictionary) -> bool:
+	var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
+	return not sys.is_empty() and int(sys.get("used", 0)) >= int(sys.get("cap", 6))
+
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
 static func today_lines(view: Dictionary) -> Array:
@@ -1477,16 +1580,31 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	var latest_at := -1.0
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
+		var away: Array = []   # q(270) / 奕星's review ⑦: another city's hand-in can't be done here; it follows what can
+		var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
+		var full := sys_requests_full(view)
 		for r in PinReason.taken(view):
-			if bool(r.ready): deliveries.append(_row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id)))
+			# a board request once today's 6 are done (q(270), 不知火舞): `Dusk Haul · Limit reached · 9h 12m`, nothing to press;
+			# another city's ends with its city as its other rows do (q(270) ⑥): `… · 9h 12m · Hayward`
+			if bool(r.ready) and full and r.has("away") and not r.get("local", false):   # a keeper's local one is not of the 6 (q(272))
+				var capped := "%s · Limit reached · %s" % [str(r.title), span(float(sys.get("resets_in", 0)))]
+				if str(r.get("city", "")) != "": capped += " · " + str(r.city)
+				deliveries.append(_row(capped, "board", ""))
+			elif bool(r.ready):
+				var hand := _row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id))
+				if r.get("local", false): hand.local_request = str(r.id)   # q(272): the row opens its card (Drop request ›)
+				elif str(r.get("city", "")) != "": hand.board_request = str(r.id)   # q(270): the row opens its sheet (Drop)
+				(away if bool(r.get("away", false)) else deliveries).append(hand)
 			else:
 				var row := _request_row(view, r)
+				if r.get("local", false): row.local_request = str(r.id)
+				elif str(r.get("city", "")) != "": row.board_request = str(r.id)
 				progress.append(row)
 				# the latest accepted_at; none known (0, an older server or save): the first in board order
 				if float(r.accepted_at) > latest_at:
 					latest_at = float(r.accepted_at)
 					latest = row
-		now_rows = deliveries + now_rows
+		now_rows = deliveries + now_rows + away
 	# q(255) (order: 不知火舞 on 341 bbdef20e): after the guide and below Homestead Lv3, the first gap for the next level,
 	# one row. Upgrade follows the hand-ins; a material its Show can gather now follows the other things to do now,
 	# before the short requests; coins, or a material cooling down, goes with `still to go for the next level`.
@@ -1690,7 +1808,13 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 		var sowing := _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
 		sowing.sow_crop = str(items[0])   # the generic Sow row leaves this crop to it while Today shows it (today_rows)
 		return sowing
-	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
+	# another city's request ends with its city (q(270) ⑥), the need's name dropped first when the line runs long
+	var city := str(r.get("city", ""))
+	var line := "%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)]
+	if city != "":
+		line += " · " + city
+		if line.length() > P0Board.LINE_CHARS: line = "%s · %d/%d · %s" % [str(r.title), int(r.have), int(r.qty), city]
+	var row := _row(line, icon_id, "")
 	if kind != "fish": return row
 	var gate := fish_level_gate(view, items, r.get("rarity", null))
 	if not gate.is_empty():
@@ -1699,7 +1823,9 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 		row.gate = str(gate.id)
 		return row
 	for m in PinReason.markers(view):
-		if str(m.get("kind", "")) == "request" and str(m.get("why", {}).get("request", "")) == str(r.id) and str(m.get("place", "")).begins_with("pond_"):
+		# a pond's pin: the written city's `pond_…` or a generated city's `gn-…~pondN` (another city's request, q(270) ⑥)
+		var at := str(m.get("place", ""))
+		if str(m.get("kind", "")) == "request" and str(m.get("why", {}).get("request", "")) == str(r.id) and (at.begins_with("pond_") or at.contains("~pond")):
 			row.go = "pond:" + str(m.place)
 			break
 	return row
@@ -1779,7 +1905,10 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 	var reason := ""
 	var cmd := {}
 	var req = r.get("request", null)
-	match str(r.get("request_state", "none")):
+	var state := str(r.get("request_state", "none"))
+	var next_in = r.get("next_in", 0)
+	if state == "wait" and (next_in == null or float(next_in) <= 0.0): state = "open"   # no wait left to say (no cooldown since 0.2.18)
+	match state:
 		"open":
 			cmd = {"type": "accept", "request": str(req.id)}
 		"accepted":
@@ -1921,7 +2050,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				_: greet = "Coffee's fresh. %d %s left today." % [int(k.get("cups_left", 0)), "cup" if int(k.get("cups_left", 0)) == 1 else "cups"]
 			if pip != "": answer = "%s has a request for you." % pip
 			elif int(k.get("board_open", 0)) > 0: answer = _board_count(int(k.board_open))
-			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null else " The Market Board refills in %s." % span(float(k.refill_in)))
+			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null or float(k.refill_in) <= 0.0 else " The Market Board refills in %s." % span(float(k.refill_in)))
 		"tackle":
 			if str(k.get("greet", "")) == "reed_rod":
 				var rod := _rod_offer(view, "rod_reed")
@@ -1948,7 +2077,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
 			titles = titles.filter(func(t): return t != "")
 			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
-			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % span(float(k.refill_in)))
+			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null or float(k.refill_in) <= 0.0 else " Next request in %s." % span(float(k.refill_in)))
 		"casino":   # q(240): no number when coins are short (the table's key says how many); Play opens the table all the same
 			# — said only while the table is open (不知火舞 351 66d46cf9: not on screen while it is not)
 			var bj: Dictionary = view.get("blackjack", {}) if view.get("blackjack") is Dictionary else {}
@@ -2015,22 +2144,21 @@ static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
 		if str(r.get("id", "")) == id: return r.merged({"price": _shop_price(view, "tackle", id, int(r.get("price", 0)))})
 	return {}
 
-# ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(41), SGODOT-224)
-## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52;
-## q(70): `wait` is the strip's fact while it can't be used yet, "in 1h 12m" or "after 2h away"):
-## state "ready" / "away" (2 h away from home first, q(41)) / "used" / "full"; the badge (STATE-ICONS: Available,
-## Countdown with the time left, Used today); the sheet's lines and its one button. Used today, the sheet's last line
-## counts down to the 04:00 home-day reset like the mine's `Resets in 9h 12m` (q(96)).
-## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). away_ready_in null = never left home.
+# ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(269), SGODOT-224)
+## The bench's state from view.rest {used, limit, resets_in, amount} and Energy (FARM-7-2 482:52): state "ready" /
+## "used" / "full"; the badge (STATE-ICONS: Available, Used today); the sheet's lines and its one button. Used today,
+## the sheet's last line counts down to the 04:00 home-day reset like the mine's `Resets in 9h 12m` (q(96)).
+## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). q(269) (SGODOT-377, the user's ③): once a day
+## with no 2 h away first — the away state is gone (不知火舞 on 377 3d9f426f), and an away_ready_in a server before it
+## sends is not read: null there meant "never left", which no longer stops anything.
 static func rest_state(view: Dictionary) -> Dictionary:
 	var r: Dictionary = view.get("rest", {})
 	var e: Dictionary = view.get("energy", {})
 	var amount := int(r.get("amount", 60))
 	var gain := mini(amount, maxi(0, int(e.get("max", 200)) - int(e.get("value", 0))))
 	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	var away = r.get("away_ready_in", 0)
 	var out := {
-		"state": "ready", "badge": "available", "caption": "",
+		"state": "ready", "badge": "available",
 		"sheet_state": "Available", "effect": "Restores up to %d Energy" % amount,
 		"fact": "Uses left", "fact_value": "%d today" % maxi(0, int(r.get("limit", 1)) - int(r.get("used", 0))),
 		"button": ("Rest · +%d Energy" % gain) if gain < amount else "Rest", "reason": "", "can_rest": true,
@@ -2040,16 +2168,6 @@ static func rest_state(view: Dictionary) -> Dictionary:
 		out.merge({"state": "used", "badge": "used_today", "sheet_state": "Used today", "effect": "",
 			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
 			"close": "Close", "note": "Available again in " + span(float(r.get("resets_in", 0)))}, true)
-	elif away == null or float(away) > 0.0:
-		# q(41) / q(70): Rest opens 2 h after leaving the homestead. A new account that never left has no leave time
-		# (away_ready_in null): no countdown at all, just "after 2h away"; after the first leave the time to go.
-		# The caption is the capsule under the bench's badge (m:ss under an hour); the sentences say `42m`.
-		var left := "" if away == null else span(float(away))
-		var back := "Rest · back after %dh away" % int(r.get("away_h", 2))
-		out.merge({"state": "away", "badge": "countdown", "caption": "" if away == null else duration(float(away)), "effect": "",
-			"sheet_state": back if away == null else "%s · %s to go" % [back, left],
-			"wait": "after %dh away" % int(r.get("away_h", 2)) if away == null else "in " + left,
-			"reason": "Not yet", "can_rest": false, "close": "Close"}, true)
 	elif gain <= 0:
 		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
 	return out

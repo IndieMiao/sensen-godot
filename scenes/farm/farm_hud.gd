@@ -704,7 +704,6 @@ func set_action(text: String, progress: float, _pending: int) -> void:
 		_fit_cta_text()
 
 static func reject_text(code: String) -> String:
-	if code == "FARM_RELOCATED": return L10n.text("This farm has moved. Reloading its new ground…")
 	if code == "INVALID_FARM_TERRAIN": return L10n.text("The farm terrain could not be verified. Retry loading it.")
 	return L10n.text(str(REJECT_TEXT.get(code, "Action unavailable")))
 

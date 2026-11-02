@@ -196,6 +196,7 @@ func test_the_mouth_card_states() -> void:
 	card.pressed.emit()
 	assert_str(farm.rt.ui.toast_text()).starts_with("Mine runs today 2/2 · Resets in ")
 	assert_str(farm.rt.ui.modal_kind).is_empty()   # no MINE-P0-8 drawer
+	run = run.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
 	run.new_run_block = "no_runs"
 	farm.rt.session.view = _mouth_view(run, 200, 2)   # the run in hand, 2/2: Continue run over the pill (EXPRESS-4)
 	m.frame(farm.rt.session.current())

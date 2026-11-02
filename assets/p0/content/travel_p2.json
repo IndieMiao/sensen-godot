@@ -1,6 +1,10 @@
 {
   "_note": "Content fragments (SGODOT-275, cross-city plan §6 on the 275 card). From P1 on, new data goes in a file of its own here, never into p0_content.json: <line>_<topic>.json in lower case (farm_*, fish_*, mine_*, cook_*, homestead_*, residents_*, requests_*, world_*, travel_*), shaped like the main table with the same top-level keys. The server (loadP0Content) and the client (P0Logic.content) merge the files in name order: objects key by key, arrays of objects with an id append by id; a key, an id or a scalar already there is an error, so a fragment adds and never changes an entry. Changing an existing entry is done in p0_content.json by the line that owns that block. Keys starting with _ are skipped. This file holds the travel line's data (亚瑟 / 蒙恬).",
   "travel": {
+    "fares": {
+      "energy": [0, 10, 20, 30, 40, 50, 60],
+      "coins": [0, 20, 60, 120, 200, 300, 500]
+    },
     "landmarks": {
       "gn-5368361": {
         "landmark": "Hollywood Sign",

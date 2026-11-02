@@ -192,6 +192,9 @@ func _build_actions() -> Control:
 	_actions.add_child(_note)
 	return _actions
 
+## The primary action's control (a guide pulse lights it, SGODOT-368: the cook card's Eat at S8).
+func primary_button() -> Control: return _primary
+
 func set_tone(v: Tone) -> void: tone = v; _refresh()
 func set_event(v: String) -> void: event = v; _refresh()
 func set_icon(v: Texture2D) -> void: icon = v; _refresh()

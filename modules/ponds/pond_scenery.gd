@@ -52,6 +52,7 @@ static func build(entry: Dictionary) -> PondScenery:
 	for i in 36:
 		var x := scene._rng.randf_range(4.9, 7.2)
 		var z := scene._rng.randf_range(-2.7, -0.4)
+		if FishingModel.contains(str(entry.id), Vector3(x, 0, z), .8, spec): continue   # P0's wider ponds come near the path (SGODOT-374)
 		PlaceScenery._oval(pebbles, Vector3(scene._rng.randf_range(0.045, 0.10), 0.018, scene._rng.randf_range(0.04, 0.09)), Vector3(x, 0.004, z), Color("d4c6a3").srgb_to_linear())
 	var pebble_material := StandardMaterial3D.new()
 	pebble_material.vertex_color_use_as_albedo = true

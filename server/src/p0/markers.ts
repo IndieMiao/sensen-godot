@@ -20,7 +20,8 @@
  * ` · +N more` (q(103)); the Market Board's open slots are one reason (the card writes `Market Board · 2 requests`). A resident's open fish request lights their outpost only once the player can land such a
  * fish (Old Kai's Rare fish: Golden Koi, Fishing Lv4); it can still be taken in the shop before that.
  */
-import { BOARDS, handIn, slotCount } from './boards.js';
+import { boardsOf, handIn, slotCount } from './boards.js';
+import { shownLocals } from './locals.js';
 import { pondFishIds } from './fishing_world.js';
 import type { EventVenue, Need, OutpostDef, P0Content, ShopId } from './content.js';
 import { homeFacts, homeOf, type Homed } from './home.js';
@@ -117,19 +118,28 @@ function landable(c: P0Content, s: P0State, fish: string[]): string[] {
 /** The tutorial request is still on the Stall Board: the first session, one goal on the map. */
 const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
 
-export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
+/** opts.locals: the keepers' local requests' marks (q(272)), for a client that shows them (routes: `x-p0-features: locals`). */
+export function mapMarkers(c: P0Content, s: P0State, now: number, opts: { locals?: boolean } = {}): MapMarker[] {
   const all: MapMarker[] = guideMarkers(c, s, now);   // the guide's pins first (tracked), SGODOT-341
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
-  for (const board of BOARDS) {
-    const place = board === 'stall' ? 'home' : homeSetOf(c, s)?.market ?? null;
-    for (const slot of (s.boards[board] ?? []).slice(0, slotCount(c, s, board))) {   // the slots the board shows
+  // q(270) ⑥: the home city's boards and the Market Board of the city the player is in show all they hold; another
+  // city's board only its tracked requests — a ✓ on that city's market wherever the player is, so they know where to go.
+  // Today's 6 done, no board shows a ✓ — markets and the Homestead Stall alike, home's too (the hand-in would be refused;
+  // a resident's ✓ stays); a tracked fish request points to a pond of its own city.
+  const home = homeOf(c, s), here = s.travel?.here || home, full = s.day.sys_done >= c.quotas.sys_requests.cap;
+  for (const { board, city, slots } of boardsOf(c, s)) {
+    const place = board === 'stall' ? 'home' : city === home ? homeSetOf(c, s)?.market ?? null
+      : cityOutposts(c, city).find(o => o.role === 'market')?.id ?? null;
+    const shown = city === home || city === here, own: Homed = city === home ? s : { travel: { home: city } };
+    for (const slot of slots.slice(0, slotCount(c, s, board))) {   // the slots the board shows
       const r = slot.req;
       if (!r || !place) continue;
       const tracked = r.status === 'accepted';
-      if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
+      if (!shown && !tracked) continue;
+      if (handIn(c, s, r)) { if (!full) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } }); }
       else if (tracked && r.kind === 'visit' && r.visit) all.push({ place: r.visit.place, kind: 'request', why: { request: r.id, tracked: true } });   // Stamp Run: go there
       else if (tracked && r.kind === 'fish' && r.where !== 'not_home') {   // only the fish the player can land yet (q(104)); Far Pond: ponds elsewhere, no pin
-        const pond = pondFor(c, s, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
+        const pond = pondFor(c, own, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
         if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
       } else if (!tracked && board === 'market') {
         const m: MapMarker = { place, kind: 'request', why: { request: r.id } };
@@ -137,6 +147,17 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
         reason.set(m, 'board:market');
       }
     }
+  }
+  // q(272) ⑧: the keepers' local requests — a ! on a keeper's outpost for one offered in the city the player is in, a ✓
+  // for one ready to hand in wherever the player is (none of today's 6: no `full` here), a tracked fish one on a pond of
+  // its own city
+  for (const { city, req: r, place } of opts.locals === false ? [] : shownLocals(c, s, now)) {
+    const tracked = r.status === 'accepted';
+    if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
+    else if (tracked && r.kind === 'fish') {
+      const pond = pondFor(c, { travel: { home: city } }, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
+      if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
+    } else if (!tracked) all.push({ place, kind: 'request', why: { request: r.id } });
   }
   for (const id of Object.keys(c.residents)) {
     const place = residentHome(c, s, id);

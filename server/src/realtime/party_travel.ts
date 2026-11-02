@@ -79,7 +79,7 @@ export class PartyTravel {
       const channel = current?.kind === 'farm' && current.home === farm!.id ? current.channel : 1;
       destination = { kind: 'farm', key: 'farm:' + farm!.id + ':' + channel, home: farm!.id, channel, floor: 0,
         region: farm!.region_id, layout: farm!.layout_patch_id, revision: farm!.blueprint_revision,
-        terrain: farm!.farm_terrain?.plot.checksum ?? '', nonce: '', epoch: 0 };
+        terrain: '', nonce: '', epoch: 0 };
     }
     const grant: TravelGrant = { purpose: 'party-travel', player, target, party: entry.party!.id, mode, destination, expires: Date.now() + 60000 };
     await this.validate(grant, player);
@@ -135,7 +135,6 @@ export class PartyTravel {
       const farm = await this.deps.store.farmById(destination.home);
       if (!farm) fail('NOT_FOUND');
       if (farm!.layout_patch_id !== destination.layout || farm!.blueprint_revision !== destination.revision || farm!.region_id !== destination.region) fail('DESTINATION_CHANGED');
-      if ((farm!.farm_terrain?.plot.checksum ?? '') !== (destination.terrain ?? '')) fail('DESTINATION_CHANGED');
       const permitted = destination.kind === 'farm' ? await this.canVisitFarm(player, farm!) : await this.canVisitStreet(player, farm!);
       if (!permitted) fail('PARTY_ACCESS_REQUIRED');
     }

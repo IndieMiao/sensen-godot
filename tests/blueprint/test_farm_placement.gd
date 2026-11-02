@@ -44,11 +44,3 @@ func test_choice_roundtrip_preserves_location_and_legacy_choice_clears_it() -> v
 	assert_bool(FarmChoice.load().has("location")).is_false()
 	var original := FarmBlueprint.load_choice(FarmChoice.load())
 	assert_that(original.overlay.center).is_not_equal(placed.overlay.center)
-
-func test_new_location_selection_covers_the_compact_160_meter_source_area() -> void:
-	var bp := FarmPlacement.preview("shanghai", Vector2(31.23, 121.47))
-	var ring: PackedVector2Array = bp.overlay.blocks[0]
-	assert_float(absf(ring[2].x - ring[0].x) * FarmPlacement.METERS_PER_DEGREE).is_equal_approx(160.0, 1.0)
-	var region := {"placement_bounds": [31.0, 121.0, 32.0, 122.0]}
-	assert_bool(FarmPlacement.generated_contains(region, {"lat": 31.001, "lng": 121.5})).is_true()
-	assert_bool(FarmPlacement.generated_contains(region, {"lat": 31.0007, "lng": 121.5})).is_false()

@@ -54,7 +54,8 @@ export interface FishSite { name: string; template: string; weights: number[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
 export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
-export interface OutpostDef { id: string; role: string; name?: string; residents: string[]; cluster?: string; lat?: number; lng?: number }   // name: SGODOT-341's Today line
+export interface OutpostDef { id: string; role: string; name?: string; residents: string[]; cluster?: string; lat?: number; lng?: number;   // name: SGODOT-341's Today line
+  keeper?: { name: string; role: string } }   // the hand-written keeper (Finn · Tackle Keeper), who gives local requests (q(272))
 
 /** A Homestead look stage (LOOK-PICK, SGODOT-282): picked at `level`, a (timber) or b (stone). */
 export interface HomesteadLook { id: string; level: number; name: string; a: string; b: string }
@@ -116,6 +117,9 @@ export interface RequestTemplate {
   climate?: string[]; type?: 'output' | 'regional' | 'explore' | 'together'; text?: string;
   /** Quantity × scale, rounded up (李白's Wholesale Order and Fish Market Crate: 1.5). */
   scale?: number;
+  /** q(270) ②: drawn on the home city's Market Board only — a template that picks its city or its items by distance from
+   * home (Far Pond, Tea Trail, Postcard Trip, New Climate; Visitor's Catch and Seeds from Afar, out of home's zone). */
+  home_only?: boolean;
 }
 /** A personal request's one-time reward beyond coins and +5 (§9.6.1, Trusted story requests): an item, a recipe page Tasted, a title. */
 export interface ResidentReward { item?: [string, number]; recipe?: string; title?: string }
@@ -173,7 +177,7 @@ export interface P0Content {
   outposts?: OutpostDef[];   // loaded from p0_outposts.json beside the table (loadP0Content)
   event_venues?: EventVenue[];   // §9.3.3, content/map_events.json: empty in the prototype (only the field is kept)
   version: string;
-  energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
+  energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number };
   day: { utc_offset_hours: number; rollover_hour: number };   // the offset is the fallback when profile.timezone is absent
   start: { coins: number; tilled_plots: number; wild_plots: number; bag: [string, number][]; guide_bag?: [string, number][] };   // guide_bag: q(217), a guided save's first stacks
   bag: { capacity: number; stack: Record<string, number> };
@@ -212,7 +216,8 @@ export interface P0Content {
   /** Travel line data (content/travel_p2.json, SGODOT-275): landmark stamps by cluster (plan §11.9.3 表 11-18) and the
    * display names of clusters whose seed city is not the one players look for (none at present: San Diego, once gn-3981609's, is a cluster of its own, SGODOT-280). */
   travel?: { landmarks?: Record<string, { landmark: string; stamp: string }>; cluster_names?: Record<string, string>; closed_countries?: string[];
-    country_names?: Record<string, string>; city_only_countries?: string[]; city_only_clusters?: string[] };   // q(210), q(211)
+    country_names?: Record<string, string>; city_only_countries?: string[]; city_only_clusters?: string[];   // q(210), q(211)
+    fares?: { energy: number[]; coins: number[] } };   // q(256) §11.2.1: a first visit's Energy and coins by Trip 1–7 (index 0 = Trip 1)
   homestead: {
     max_level: number;
     warming_cabinet: number;                  // portions once unlocked (Lv3, §7.7)
@@ -244,7 +249,8 @@ export interface P0Content {
    * the counter's city (tripOf: Trip 1–7, index trip − 1). Unit = max(1, ⌊full price × rate × this⌋). */
   sell_distance: { home: number; trip: number[] };
   market: { buy: string[]; specialty: string[] };
-  quotas: Record<QuotaId, { cap: number; scope: string; per_city?: boolean }>;   // per_city: one count per account × city cluster (§11.7.3)
+  // by_homestead (q(272) ⑩): [from Homestead level, cap] rows, the last one reached wins over cap (request_bonus)
+  quotas: Record<QuotaId, { cap: number; scope: string; per_city?: boolean; by_homestead?: [number, number][] }>;   // per_city: one count per account × city cluster (§11.7.3)
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
     /** §7.5.3 Taught: from this stage, every `every_days` days, one page the player has not got yet. */
@@ -272,6 +278,8 @@ export interface P0Content {
     floor_rate: number;                       // floor price = ⌊sell price × rate⌋
     boards: Record<BoardId, { title: string; slots?: number; templates: string[] }>;
     templates: Record<string, RequestTemplate>;
+    /** q(272): local requests from the keepers of a city away from home (content/requests_local.json); none without it. */
+    local?: { per_day: number; prune_days: number; roles: Record<string, string[]> };
   };
   /** §3.4.8 one-time energy: by rarity (index = rarity − 1) and [count, energy] milestones; may pass max by ≤ max_over. */
   rewards: { first_fish: number[]; first_dish: number[]; cookbook: [number, number][]; fishdex: [number, number][]; max_over: number };
@@ -338,8 +346,9 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
-    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number }[])
+    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number; keeper?: { name?: string; role?: string } }[])
       .map(o => ({ id: o.id, role: o.role, ...(o.name ? { name: o.name } : {}), residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}),
+        ...(o.keeper?.name ? { keeper: { name: o.keeper.name, role: o.keeper.role ?? '' } } : {}),
         ...(typeof o.lat === 'number' && typeof o.lng === 'number' ? { lat: o.lat, lng: o.lng } : {}) }));   // lat/lng: SGODOT-303's 300 m
   }
   // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.

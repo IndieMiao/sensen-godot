@@ -42,6 +42,7 @@ pointing/android/disable_scroll_deadzone=true
 [internationalization]
 
 locale/fallback="en"
+locale/include_text_server_data=true
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")

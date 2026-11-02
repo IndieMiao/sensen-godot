@@ -5,6 +5,7 @@
  * (no token, local and dev servers only); presence lives in memory only, never in the P0 save file.
  * Positions are the client's: the server only keeps them inside the room and within walking speed.
  */
+import { createHash } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
@@ -13,6 +14,7 @@ import { defaultAppearance, type Appearance, type AppearanceCatalog } from './ap
 import { upgradeRefusal, type P0Gate } from '../gate.js';
 import { P0_ACTIONS, snapshotFrame } from './frame.js';
 import { OutpostRooms, type Occupant } from './rooms.js';
+import { POND_ROOM, pondOfRoom } from './outposts.js';
 
 export const PATH = '/v1/p0/online';
 export const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
@@ -27,9 +29,21 @@ export const LIMITS = {
   appearance_ms: 500,
   /** Socket backpressure: skip frames above, close above. */
   skip_bytes: 64 * 1024, close_bytes: 256 * 1024,
+  /** Pond rooms: the fishing states go out every this many snapshot ticks (OnlineCrowd drops one older than 1 s). */
+  fishing_ticks: 5,
+  /** A landed or lost fish stays shown this long, then the line is in. */
+  result_ms: 3_000,
 };
 
-interface Conn { ws: WebSocket; player: string; epoch: number; appearance: Appearance; tokens: number; tokenAt: number; lastSeen: number; dressedAt: number }
+/** A pond room's fishing (11-02, pond multiplayer): what the others see of a line — its cast, bite, reel and the fish
+ * landed, the shape OnlineCrowd.fishing_snapshot / FishingPresentation.configure_remote read (the realtime room's
+ * fishingView). Shown only: the catch itself is each player's own command on their own save, never this. */
+export const FISH_PHASES = ['casting', 'waiting', 'hook', 'playing', 'result'] as const;
+interface Fishing { sequence: number; phase: typeof FISH_PHASES[number]; at: number; castAt: number; target: [number, number];
+  held: boolean; fish: number; outcome?: 'caught' | 'escaped'; fishId?: string }
+
+interface Conn { ws: WebSocket; player: string; epoch: number; appearance: Appearance; tokens: number; tokenAt: number; lastSeen: number; dressedAt: number;
+  fishing?: Fishing; casts: number }
 /** keys: the demo access keys (P0_ACCESS_KEYS, SGODOT-232 D1). The upgrade is not a Fastify request, so the
  * guard's onRequest hook never sees it: the hub checks x-p0-key itself. Empty or absent = no key (local playtests). */
 /** pass: v5 (SGODOT-278) — may this player join this outpost? An error code (PASS_REQUIRED / TRIP_EXPIRED) when not. */
@@ -76,7 +90,7 @@ export class P0OnlineHub {
     const now = Date.now();
     const old = this.byPlayer.get(player);
     if (old) { this.depart(old, true); old.ws.close(4001, 'SESSION_REPLACED'); }
-    const c: Conn = { ws, player, epoch: 0, appearance: defaultAppearance(), tokens: LIMITS.burst, tokenAt: now, lastSeen: now, dressedAt: 0 };
+    const c: Conn = { ws, player, epoch: 0, appearance: defaultAppearance(), tokens: LIMITS.burst, tokenAt: now, lastSeen: now, dressedAt: 0, casts: 0 };
     this.conns.add(c);
     this.byPlayer.set(player, c);
     ws.on('error', () => {});
@@ -108,6 +122,7 @@ export class P0OnlineHub {
         case 'input': this.input(c, b); break;
         case 'act': this.act(c, b); break;
         case 'appearance': this.dress(c, b); break;
+        case 'fish': this.fish(c, b); break;
         default: throw new Error('SCHEMA');
       }
     } catch (error) {
@@ -138,6 +153,7 @@ export class P0OnlineHub {
 
   /** Leaves the current instance and tells the others. `remember` keeps the place for a quick reconnect. */
   private depart(c: Conn, remember: boolean): void {
+    c.fishing = undefined;
     const left = this.deps.rooms.leave(c.player, remember);
     if (!left) return;
     const members = this.deps.rooms.members(left.outpost, left.room);
@@ -189,6 +205,41 @@ export class P0OnlineHub {
     for (const m of members) if (m.player !== c.player) this.toPlayer(m.player, { t: 'peer', count: members.length, member: this.view(me) });
   }
 
+  /** A pond room's line (`{t:'fish', epoch, phase, target?, held?, fish?, outcome?, fish_id?}`), sent by the client as its
+   * fishing panel changes phase (and as the reel's hold and the fish move); `phase: 'none'` takes the line in. Ignored
+   * outside a pond room or for a stale epoch; a cast starts a new sequence, so the others draw a new line. */
+  private fish(c: Conn, b: Record<string, unknown>): void {
+    const me = this.deps.rooms.occupant(c.player);
+    if (!me || b.epoch !== c.epoch || !pondOfRoom(me.outpost)) return;
+    if (b.phase === 'none') { c.fishing = undefined; return; }
+    const phase = FISH_PHASES.find(p => p === b.phase);
+    if (!phase) throw new Error('SCHEMA');
+    const now = Date.now();
+    const [x0, x1, z0, z1] = this.deps.rooms.spec(me.outpost)!.bounds;
+    const target = Array.isArray(b.target) && b.target.length === 2 && b.target.every(v => typeof v === 'number' && Number.isFinite(v))
+      ? [Math.min(x1, Math.max(x0, Number(b.target[0]))), Math.min(z1, Math.max(z0, Number(b.target[1])))] as [number, number] : undefined;
+    const was = c.fishing;
+    if (phase === 'casting' || !was) {
+      if (!target) { if (phase === 'casting') throw new Error('SCHEMA'); return; }   // a line starts where it lands
+      c.fishing = { sequence: ++c.casts, phase, at: now, castAt: now, target, held: false, fish: 0.5 };
+    } else if (was.phase !== phase) { was.phase = phase; was.at = now; }
+    const f = c.fishing!;
+    if (typeof b.held === 'boolean') f.held = b.held;
+    if (typeof b.fish === 'number' && Number.isFinite(b.fish)) f.fish = Math.min(1, Math.max(0, b.fish));
+    if (phase === 'result') {
+      f.outcome = b.outcome === 'caught' ? 'caught' : 'escaped';
+      f.fishId = f.outcome === 'caught' && typeof b.fish_id === 'string' && /^[a-z0-9_]{1,40}$/.test(b.fish_id) ? b.fish_id : undefined;
+      f.held = false;
+    }
+  }
+
+  /** One line as the others draw it: ages in seconds from its phase's and its cast's start. */
+  private fishingView(id: number, f: Fishing, now: number) {
+    return { id, sequence: f.sequence, target: f.target, phase: f.phase, age: Math.max(0, now - f.at) / 1000,
+      cast_age: Math.max(0, now - f.castAt) / 1000, held: f.held, fish: f.fish,
+      ...(f.outcome ? { outcome: f.outcome } : {}), ...(f.fishId ? { fish_id: f.fishId } : {}) };
+  }
+
   private parseAppearance(raw: unknown): Appearance {
     if (this.deps.appearances) return this.deps.appearances.parse(raw);
     if (!raw || typeof raw !== 'object' || JSON.stringify(raw).length > 900) throw new Error('APPEARANCE_INVALID');
@@ -201,7 +252,7 @@ export class P0OnlineHub {
   }
 
   private view(m: Occupant) {
-    return { id: m.id, player: m.player, seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance() };
+    return { id: m.id, player: publicPlayer(m.player), seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance() };
   }
 
   private step(): void {
@@ -219,6 +270,25 @@ export class P0OnlineHub {
       if (c.ws.bufferedAmount > LIMITS.skip_bytes || c.ws.readyState !== WebSocket.OPEN) continue;
       c.ws.send(snapshotFrame(this.tick, c.epoch, groups.get(key)!));
     }
+    if (this.tick % LIMITS.fishing_ticks === 0) this.fishingStep(now, groups);
+  }
+
+  /** The pond rooms' lines to everyone in them, while anyone there has one out (a result goes after LIMITS.result_ms). */
+  private fishingStep(now: number, groups: Map<string, Occupant[]>): void {
+    for (const members of groups.values()) {
+      if (!members.length || !members[0].outpost.startsWith(POND_ROOM)) continue;
+      const lines = [];
+      for (const m of members) {
+        const c = this.byPlayer.get(m.player);
+        if (c?.fishing?.phase === 'result' && now - c.fishing.at > LIMITS.result_ms) c.fishing = undefined;
+        if (c?.fishing) lines.push(this.fishingView(m.id, c.fishing, now));
+      }
+      if (!lines.length) continue;
+      for (const m of members) {
+        const c = this.byPlayer.get(m.player);
+        if (c) this.send(c, { t: 'fishing', epoch: c.epoch, members: lines.filter(l => l.id !== m.id) });
+      }
+    }
   }
 
   private toPlayer(player: string, payload: object): void {
@@ -231,13 +301,28 @@ export class P0OnlineHub {
   }
 }
 
+/** What the room sees of a player (11-02): x-p0-player is the P0 server's only credential (with the shared demo key), so a
+ * roster never carries it — a stable, one-way handle instead (16 hex of its SHA-256). The clients use the field for the
+ * name tag (its first 4: `Traveller 8c3f`, no prefix to show — 奕星 on #646) and the outfit cache only, so an older
+ * client reads it as before. */
+export const publicPlayer = (player: string): string => createHash('sha256').update('p0-online/' + player).digest('hex').slice(0, 16);
+
 /** Registers the WebSocket upgrade and the presence route; tools/p0_server.ts only calls this. */
 export function registerP0Online(app: FastifyInstance, deps: P0OnlineDeps): P0OnlineHub {
   const hub = new P0OnlineHub(deps);
   app.server.on('upgrade', (req, socket, head) => {
     if (req.url?.split('?')[0] === PATH) hub.upgrade(req, socket, head);
   });
-  app.get('/v1/p0/presence', async () => ({ ok: true, outposts: deps.rooms.presence() }));
+  // Ponds' rooms count apart (`ponds`, by pond id): an older client reads `outposts` only (亚瑟 on the 11-02 plan)
+  app.get('/v1/p0/presence', async () => {
+    const outposts: Record<string, { online: number; rooms: number }> = {}, ponds: typeof outposts = {};
+    for (const [id, p] of Object.entries(deps.rooms.presence())) {
+      const pond = pondOfRoom(id);
+      if (pond) ponds[pond] = p;
+      else outposts[id] = p;
+    }
+    return { ok: true, outposts, ponds };
+  });
   app.addHook('preClose', async () => hub.close());
   return hub;
 }
