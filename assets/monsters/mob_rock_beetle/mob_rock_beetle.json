@@ -1,0 +1,65 @@
+{
+  "id": "mob_rock_beetle",
+  "radius": 0.45,
+  "height": 0.4334,
+  "hit_point": [
+    0,
+    0.27,
+    0.05
+  ],
+  "durations": {
+    "idle": 1.6,
+    "move": 0.8,
+    "windup": 0.6,
+    "attack": 0.4,
+    "recover": 0.5,
+    "hit": 0.25,
+    "die": 0.8,
+    "stunned": 1.0
+  },
+  "hit_at": 0.18,
+  "badge_point": [
+    0,
+    0.65,
+    0
+  ],
+  "anims": {
+    "idle": {
+      "length": 1.6,
+      "loop": true
+    },
+    "move": {
+      "length": 0.8,
+      "loop": true
+    },
+    "windup": {
+      "length": 0.6,
+      "loop": false
+    },
+    "attack": {
+      "length": 0.4,
+      "loop": false,
+      "hit_at": 0.18
+    },
+    "recover": {
+      "length": 0.5,
+      "loop": false
+    },
+    "hit": {
+      "length": 0.25,
+      "loop": false
+    },
+    "die": {
+      "length": 0.8,
+      "loop": false
+    },
+    "stunned": {
+      "length": 1.0,
+      "loop": true
+    }
+  },
+  "tint_mask": "UV2.x",
+  "source_concept": "Plane 355 c368e7dd / beetle_v3.png",
+  "stage": "graybox",
+  "cast_shadow": false
+}
