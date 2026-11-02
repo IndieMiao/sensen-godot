@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import io.livekit.android.ConnectOptions
 import io.livekit.android.LiveKit
 import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
@@ -109,19 +110,25 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
             current.events.collect { event ->
                 if (room !== current || session != id) return@collect
                 when (event) {
-                    is RoomEvent.Connected, is RoomEvent.Reconnected -> { applyPermissions(); snapshot("connected") }
+                    // nothing is taken by itself (autoSubscribe off): everyone not blocked, here and after a full
+                    // reconnect, which builds every publication anew unsubscribed (SGODOT-384; 亚瑟 on 2.28.2)
+                    is RoomEvent.Connected, is RoomEvent.Reconnected -> { applyPermissions(); takeAllowed(); snapshot("connected") }
                     is RoomEvent.Reconnecting -> emit("reconnecting")
                     is RoomEvent.Disconnected -> finish("DISCONNECTED")
-                    is RoomEvent.ParticipantConnected, is RoomEvent.ParticipantDisconnected -> {
+                    is RoomEvent.ParticipantConnected -> {
                         applyPermissions()   // a newcomer allowed unless denied (SGODOT-384)
+                        // and taken unless blocked, should its first info carry tracks whose TrackPublished is lost (亚瑟);
+                        // the newcomer's alone, not everyone's again at each arrival (周瑜 on #661)
+                        takeAllowed(event.participant)
                         snapshot("participants")
                     }
+                    is RoomEvent.ParticipantDisconnected -> { applyPermissions(); snapshot("participants") }
                     is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted,
                     is RoomEvent.TrackUnsubscribed, is RoomEvent.TrackSubscriptionPermissionChanged -> snapshot("participants")
                     is RoomEvent.TrackPublished -> {
-                        // our own microphone out: say so (383 6372bffe); a blocked person's new track is never taken (P0 Block)
+                        // our own microphone out: say so (383 6372bffe); someone's new track taken unless blocked (P0 Block)
                         if (event.participant is LocalParticipant) snapshot("microphone")
-                        else if (event.participant.identity?.value in blocked) (event.publication as? RemoteTrackPublication)?.setSubscribed(false)
+                        else (event.publication as? RemoteTrackPublication)?.setSubscribed(event.participant.identity?.value !in blocked)
                     }
                     is RoomEvent.TrackSubscribed -> {
                         val who = event.participant.identity?.value
@@ -153,8 +160,11 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
         }
         connectJob = scope.launch {
             try {
-                current.connect(url, token)
+                // SGODOT-384: LiveKit took the blocked one's tracks for some 200 ms before Block could drop them (李元芳 on
+                // 384 046f7b43); Godot sets the blocks right after connect_voice, Connected takes the rest
+                current.connect(url, token, ConnectOptions(autoSubscribe = false))
                 if (room === current && session == id) {
+                    takeAllowed()   // again here, in case Connected came before the participants did (亚瑟)
                     snapshot("connected")
                 }
             } catch (_: CancellationException) { }
@@ -209,6 +219,15 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
         if (id != session || identity.isEmpty()) return@runOnUiThread
         if (allowed) denied.remove(identity) else denied.add(identity)
         applyPermissions()
+    }
+    /** Every track of everyone here not blocked (TrackPublished is not to be counted on for those already in the room),
+     *  or of one person only. */
+    private fun takeAllowed(only: Participant? = null) {
+        val people = if (only != null) listOf(only) else room?.remoteParticipants?.values ?: return
+        people.forEach { participant ->
+            val allow = participant.identity?.value !in blocked
+            participant.trackPublications.values.forEach { (it as? RemoteTrackPublication)?.setSubscribed(allow) }
+        }
     }
     /** Nobody denied: everyone may subscribe. Otherwise only the room's others not denied, each by identity. */
     private fun applyPermissions() {

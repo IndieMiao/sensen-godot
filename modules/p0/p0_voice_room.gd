@@ -52,7 +52,8 @@ func fetch_status() -> void:
 	age = str(json.get("age", "unknown"))
 	changed.emit()
 
-## The mic key: on joins the room's voice (the 13+ gate first when not answered), off leaves it.
+## The mic key: the first tap joins the room's voice with the mic on (the 13+ gate first when not answered); after that
+## it only turns the mic on and off. The voice is left with the place (_exit_tree) or the app going to the background.
 func toggle_mic() -> void:
 	if not offered() or voice == null: return
 	if bool(voice.call("active")):
@@ -103,6 +104,23 @@ func set_muted(peer: int, muted: bool) -> void:
 ## Block / Unblock: the server keeps it and tells this phone alone (voice_blocks); this phone shuts it both ways (384).
 func set_blocked(peer: int, on: bool) -> void:
 	await _call(HTTPClient.METHOD_POST, "block", {"peer": peer, "on": on})
+
+## The Blocked list (q(28) Settings › Blocked players): who this player blocks, as handles — the blocked are out of
+## sight in a room from the Block on (the hub keeps the two from each other), so Unblock is from here, wherever they are.
+## [{handle, name}] (name as a name tag writes it), [] when the server has none; null when it is not reached or says
+## nothing readable — never [], which the page would show as `No one blocked` (奕星, 384's list before the switch).
+func blocked_list() -> Variant:
+	var r: Dictionary = await _call(HTTPClient.METHOD_GET, "blocks", {})
+	var json: Dictionary = r.get("json", {}) if r.get("json") is Dictionary else {}
+	if not bool(r.get("ok", false)) or not json.get("blocked") is Array: return null
+	var rows: Array = json.blocked
+	return rows.map(func(b): return {"handle": str(b.get("handle", "")), "name": "Traveller %s" % str(b.get("handle", "")).substr(0, 4)})
+
+## Unblock from the Blocked list, by handle: true when the server took it (both come back into each other's sight).
+func unblock(handle: String) -> bool:
+	var r: Dictionary = await _call(HTTPClient.METHOD_POST, "unblock", {"handle": handle})
+	changed.emit()
+	return bool(r.get("ok", false))
 
 ## Report: a line on the server for a person to read later; the toast is the HUD's — "sent" (Report sent), "already"
 ## (You already reported this: the server keeps no second line) or "failed".

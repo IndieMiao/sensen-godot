@@ -16,6 +16,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { appendFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { FastifyInstance } from 'fastify';
 import { AccessToken, RoomServiceClient, TrackSource } from 'livekit-server-sdk';
+import { publicPlayer } from './hub.js';
 import type { Occupant, OutpostRooms } from './rooms.js';
 
 export interface P0VoiceConfig { url: string; apiKey: string; apiSecret: string; namespace: string }
@@ -56,6 +57,8 @@ export class P0Voice {
   private media?: P0VoiceMedia;
   /** The hub's way to a player's socket (set once the hub is up). */
   tell: (player: string, payload: object) => void = () => {};
+  /** The hub's: a Block or Unblock between two players takes each out of (or back into) the other's view (seenChanged). */
+  seen: (a: string, b: string) => void = () => {};
 
   constructor(readonly config: P0VoiceConfig | null, private rooms: OutpostRooms, private files: P0VoiceFiles | null,
     private now: () => number = Date.now, media?: P0VoiceMedia) {
@@ -113,7 +116,7 @@ export class P0Voice {
     token.addGrant({ roomJoin: true, room, canPublish: true, canPublishSources: [TrackSource.MICROPHONE], canSubscribe: true,
       canPublishData: false, canUpdateOwnMetadata: false });
     return { ok: true, url: this.config!.url, token: await token.toJwt(), lease_id: lease.id, room, capacity: Math.max(2, spec.capacity),
-      lease_ms: VOICE_LEASE_MS, self: String(o.id), blocked: this.blockedPeers(player) };
+      lease_ms: VOICE_LEASE_MS, self: String(o.id), blocked: this.phoneBlocks(player) };
   }
 
   heartbeat(player: string, leaseId: string): Refusal | Record<string, unknown> {
@@ -139,8 +142,30 @@ export class P0Voice {
     if (on) list.add(target); else list.delete(target);
     if (list.size) this.blocks[player] = [...list]; else delete this.blocks[player];
     writeJson(this.files?.blocks, this.blocks);
-    this.tell(player, { t: 'voice_blocks', blocked: this.blockedPeers(player) });
+    this.tellBlocks(player);
+    this.seen(player, target);   // in one room they go out of each other's sight at once (and come back on Unblock)
     return { ok: true, blocked: this.blockedPeers(player) };
+  }
+
+  /** Whether a and b are kept out of each other's sight in a room (the hub's hides): a Block either way (q(28), 383 V3). */
+  hides(a: string, b: string): boolean { return this.blocking(a, b) || this.blocking(b, a); }
+
+  /** Who this player blocks, as handles (the roster's public `player`, never an id): their Blocked list, which outlives a
+   * room — the blocked are out of sight, so Unblock is from this list (unblock). */
+  blockedList(player: string): { handle: string }[] {
+    return (this.blocks[player] ?? []).map(p => ({ handle: publicPlayer(p) }));
+  }
+
+  /** Unblock by handle, from the Blocked list, wherever the two are. */
+  unblock(player: string, handle: string): Refusal | Record<string, unknown> {
+    const target = (this.blocks[player] ?? []).find(p => publicPlayer(p) === handle);
+    if (!target) return refuse('NOT_BLOCKED', 404);
+    const list = (this.blocks[player] ?? []).filter(p => p !== target);
+    if (list.length) this.blocks[player] = list; else delete this.blocks[player];
+    writeJson(this.files?.blocks, this.blocks);
+    this.tellBlocks(player);
+    this.seen(player, target);
+    return { ok: true, blocked: this.blockedList(player) };
   }
 
   /** Report: one line — who, whom, when, where — for a person to read later (the user, 11-02); nothing else happens.
@@ -159,23 +184,38 @@ export class P0Voice {
     return { ok: true, already: false };
   }
 
-  /** The hub's hooks: someone came into a room (whoever there blocks them hears their new list; so do they, if they block
-   * anyone there), or left one (their grant ends, LiveKit lets them go, and whoever there blocked them hears their list
-   * without them — a peer id comes back at once, and the next one to take it is no one they blocked). */
+  /** The hub's hooks: someone came into a room (whoever there blocks them hears their new list, and so does whoever's
+   * phone still refuses the peer id they took — a peer id comes back at once, and the next one to take it is no one
+   * they blocked; they hear theirs, if they block anyone there), or left one (their grant ends and LiveKit lets them go;
+   * whoever blocked them hears nothing — their phone keeps refusing that id, never opened to all while the one blocked
+   * may still be in LiveKit or back under a new id: 李元芳 on 384 b5b6a124). */
   joined(o: Occupant): void {
     let mine = false;
     for (const m of this.rooms.members(o.outpost, o.room)) {
       if (m.player === o.player) continue;
-      if (this.blocking(m.player, o.player)) this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
+      if (this.blocking(m.player, o.player) || this.refused.get(m.player)?.has(String(o.id))) this.tellBlocks(m.player);
       if (this.blocking(o.player, m.player)) mine = true;
     }
-    if (mine) this.tell(o.player, { t: 'voice_blocks', blocked: this.blockedPeers(o.player) });
+    if (mine) this.tellBlocks(o.player);
   }
   departed(o: Occupant): void {
     const lease = this.leases.get(o.player);
     if (lease && lease.room === this.roomName(o)) void this.release(lease);
-    for (const m of this.rooms.members(o.outpost, o.room))   // the hub has them out of the room already
-      if (this.blocking(m.player, o.player)) this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
+    this.refused.delete(o.player);   // their next room's grant brings their list there
+  }
+
+  /** The peer ids each phone was last given as blocked (the grant, voice_blocks): what it refuses until told again. */
+  private refused = new Map<string, Set<string>>();
+
+  /** This player's blocked peers, noted as what their phone will refuse. */
+  private phoneBlocks(player: string): string[] {
+    const list = this.blockedPeers(player);
+    this.refused.set(player, new Set(list));
+    return list;
+  }
+
+  private tellBlocks(player: string): void {
+    this.tell(player, { t: 'voice_blocks', blocked: this.phoneBlocks(player) });
   }
 
   /** The peers in this player's room they block (theirs only: who blocks them is never said, 384). */
@@ -281,6 +321,16 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice): void {
     const peer = peerOf(b.peer);
     if (peer === null || typeof b.on !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
     return answer(reply, voice.block(p, peer, b.on));
+  });
+  app.get('/v1/p0/voice/blocks', async (req, reply) => {
+    const p = playerOf(req.headers);
+    return p ? { ok: true, blocked: voice.blockedList(p) } : answer(reply, unauth);
+  });
+  app.post('/v1/p0/voice/unblock', async (req, reply) => {
+    const p = playerOf(req.headers), b = body(req.body);
+    if (!p) return answer(reply, unauth);
+    if (typeof b.handle !== 'string' || !/^[0-9a-f]{16}$/.test(b.handle)) return answer(reply, { code: 'SCHEMA', status: 400 });
+    return answer(reply, voice.unblock(p, b.handle));
   });
   app.post('/v1/p0/voice/report', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);

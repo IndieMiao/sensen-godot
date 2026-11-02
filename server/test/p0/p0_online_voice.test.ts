@@ -5,6 +5,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadOutposts, pondRoomSpec } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
+import { publicPlayer } from '../../src/p0/online/hub.js';
 import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, RELEASE_RETRY_MS, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
 
 // Voice in the online rooms (SGODOT-383; the user, 11-02 via 奕星, q(274)): the voice room is the hub's room; LiveKit sees
@@ -166,13 +167,19 @@ describe('P0 voice (SGODOT-383)', () => {
     told.length = 0;
     const b2 = enter('player-bbbb');
     expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [String(b2.id)] }]]);
-    // B leaves: A hears a list without B's peer id — the next one to take it is no one A blocked (后裔 on #650)
+    // B leaves: A hears nothing — A's phone keeps refusing B's peer id, never opened to all while B may still be in
+    // LiveKit or come back (李元芳 on 384 b5b6a124); the next one to take it is no one A blocked: A hears a list without it
     told.length = 0;
     voice.departed(rooms.leave('player-bbbb')!);
-    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [] }]]);
+    expect(told).toEqual([]);
     const d = enter('player-dddd');
     expect(d.id).toBe(b2.id);   // B's peer id, taken at once
+    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [] }]]);
     expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    told.length = 0;
+    enter('player-eeee');   // a peer id A's phone never refused: A hears nothing
+    expect(told).toEqual([]);
+    rooms.leave('player-eeee');
     rooms.leave('player-dddd');
     const b3 = enter('player-bbbb');
     // A comes into a room where B already is: A is told whom they block there
@@ -184,6 +191,25 @@ describe('P0 voice (SGODOT-383)', () => {
     expect(voice.block('player-aaaa', b3.id, false)).toEqual({ ok: true, blocked: [] });
     expect(JSON.parse(readFileSync(files.blocks, 'utf8'))).toEqual({});
     expect(c.id).toBeGreaterThan(0);
+  });
+
+  it('the Blocked list, by handle (the blocked are out of sight): Unblock from it wherever the two are; Block and Unblock tell the hub (seen)', async () => {
+    const { voice, enter, rooms } = setup();
+    const seen: string[][] = [];
+    voice.seen = (a, b) => seen.push([a, b]);
+    enter('player-aaaa');
+    const b = enter('player-bbbb');
+    voice.block('player-aaaa', b.id, true);
+    expect(seen).toEqual([['player-aaaa', 'player-bbbb']]);
+    expect(voice.hides('player-aaaa', 'player-bbbb')).toBe(true);
+    expect(voice.hides('player-bbbb', 'player-aaaa')).toBe(true);   // either way
+    expect(voice.blockedList('player-aaaa')).toEqual([{ handle: publicPlayer('player-bbbb') }]);
+    expect(voice.blockedList('player-bbbb')).toEqual([]);   // the blocked one's own list says nothing of it
+    rooms.leave('player-bbbb');   // apart now: still unblocked from the list
+    expect(voice.unblock('player-aaaa', 'ffffffffffffffff')).toMatchObject({ code: 'NOT_BLOCKED', status: 404 });
+    expect(voice.unblock('player-aaaa', publicPlayer('player-bbbb'))).toEqual({ ok: true, blocked: [] });
+    expect(voice.hides('player-aaaa', 'player-bbbb')).toBe(false);
+    expect(seen).toEqual([['player-aaaa', 'player-bbbb'], ['player-aaaa', 'player-bbbb']]);
   });
 
   it('Report writes one line — who, whom, when, where — and nothing else happens', () => {

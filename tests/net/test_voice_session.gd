@@ -173,6 +173,29 @@ func test_p0_mutes_and_blocks_go_again_onto_a_reconnected_room() -> void:
 	assert_bool(f[1].calls.has(["subscribed", "native-2", "7", false])).is_true()
 	assert_bool(f[1].calls.has(["volume", "native-2", "5", 0.0])).is_true()
 
+## LiveKit takes no one's tracks by itself (SGODOT-384, 384 046f7b43): the blocks go to the native room right after it
+## is asked to connect, before it says connected — none of the blocked one's tracks go through first.
+func test_p0_blocks_go_out_before_the_room_is_connected() -> void:
+	var f := _p0_fixture()
+	f[0].join_with(f[2]); _event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	assert_str(f[0].state).is_equal("connecting")
+	var connect: int = f[1].calls.find(["connect", f[0]._native_id])
+	assert_int(connect).is_greater_equal(0)
+	assert_int(f[1].calls.find(["subscribed", f[0]._native_id, "7", false])).is_greater(connect)
+
+## A block made while the room is still connecting goes out at once (周瑜 on #661): the plugin takes the room's tracks
+## at Connected by its own list, before Godot hears of it.
+func test_p0_a_block_while_connecting_goes_out_at_once() -> void:
+	var f := _p0_fixture()
+	f[0].join_with(f[2]); _event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	assert_str(f[0].state).is_equal("connecting")
+	f[0].set_blocked(["7", "9"])
+	f[0].set_muted("5", true)
+	assert_bool(f[1].calls.has(["subscribed", f[0]._native_id, "9", false])).is_true()
+	assert_bool(f[1].calls.has(["volume", f[0]._native_id, "5", 0.0])).is_true()
+
 ## P0's mic key joins with the mic on (383 6372bffe): the wish made before the room is up is taken at connect, after the
 ## blocks; an idle session keeps none.
 func test_p0_a_mic_on_before_the_room_is_up_goes_out_at_connect() -> void:
@@ -296,4 +319,8 @@ func test_blocks_are_set_before_the_microphone_on_connect() -> void:
 	await get_tree().process_frame
 	_event(f[0], "connected", {"participants": []})
 	var order: Array = f[1].calls.map(func(c): return str(c[0])).filter(func(n): return n in ["publish", "subscribed", "microphone"])
-	assert_bool(order.find("microphone") > order.find("subscribed")).is_true()
+	# both of the block's calls there, both before the mic (周瑜 on #650: a missing one finds -1 and would pass)
+	assert_int(order.find("subscribed")).is_greater_equal(0)
+	assert_int(order.find("publish")).is_greater_equal(0)
+	assert_int(order.find("microphone")).is_greater(order.find("subscribed"))
+	assert_int(order.find("microphone")).is_greater(order.find("publish"))

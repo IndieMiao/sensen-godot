@@ -169,7 +169,7 @@ func set_muted(identity: String, muted: bool) -> void:
 	if identity.is_empty(): return
 	if muted: _muted[identity] = true
 	else: _muted.erase(identity)
-	if state == "connected" and not _native_id.is_empty() and per_participant():
+	if _native_up() and per_participant():
 		_backend.call("set_participant_volume", _native_id, identity, 0.0 if muted else 1.0)
 	changed.emit()
 
@@ -188,10 +188,13 @@ func set_blocked(ids: Array) -> void:
 	var next: Array = ids.map(func(i): return str(i))
 	var freed: Array = blocked.filter(func(i): return not next.has(i))
 	blocked = next
-	if state == "connected" and not _native_id.is_empty():
+	if _native_up():   # connecting too: the plugin takes the room's tracks at Connected by this list (周瑜 on #661)
 		_block_natively(freed, true)
 		_block_natively(blocked, false)
 	changed.emit()
+
+## A native room asked for (connecting, connected or reconnecting), not the permission request's id.
+func _native_up() -> bool: return state != "permission" and not _native_id.is_empty()
 
 func _block_natively(ids: Array, allow: bool) -> void:
 	for id in ids:
@@ -205,6 +208,8 @@ func _apply_people() -> void:
 	for id in _muted: _backend.call("set_participant_volume", _native_id, str(id), 0.0)
 
 func _process(_delta: float) -> void:
+	# test adapters only: has_method never sees a JNISingleton's methods, and the Android plugin pushes its events (a
+	# polling iOS bridge would need its capabilities to say so instead; 周瑜 on #650)
 	if _backend and _backend.has_method("poll_events"): _backend.call("poll_events")
 	if not _wanted or not _foreground or state == "permission": return
 	var now := Time.get_ticks_msec()
@@ -253,6 +258,9 @@ func _connect_voice() -> void:
 	error = ""
 	_heartbeat_at = Time.get_ticks_msec() + 4500
 	_backend.call("connect_voice", _native_id, str(grant.url), str(grant.token))
+	# the blocks before LiveKit is in the room: it takes no one's tracks by itself, so none of the blocked one's go
+	# through first (SGODOT-384, 384 046f7b43); again at connected
+	_apply_people()
 	_backend.call("renew_lease", _native_id, maxi(0, _lease_deadline - Time.get_ticks_msec()))
 	changed.emit()
 
