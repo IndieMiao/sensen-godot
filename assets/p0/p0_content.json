@@ -3266,6 +3266,12 @@
     },
     "request_bonus": {
       "cap": 100,
+      "by_homestead": [
+        [
+          1,
+          100
+        ]
+      ],
       "scope": "all requests"
     },
     "sys_requests": {

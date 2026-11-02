@@ -6,6 +6,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 ## cluster can be browsed (SGODOT-275, plan §11.8.1): its bubble at the country zoom, the camera city switching as
 ## the camera goes over it. Browsing moves only the camera; where the player is (the place chip) never changes.
 
+const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
@@ -427,7 +428,10 @@ func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
 	var req := PinReason.request_of(_view(), str(why.get("request", "")))
 	if str(req.get("city", "")) != "" and bool(req.get("tracked", false)):
 		var rid := str(req.id)
-		details = func(): P0BoardRequest.open(rt.ui, "market", rid, func(): _open_place_card(entry, place_card(entry)))
+		var back := func(): _open_place_card(entry, place_card(entry))
+		# a keeper's local request tracked elsewhere opens its card instead (q(272) via q(271): Drop request › there)
+		if bool(req.get("local", false)): details = func(): P0LocalRequest.open(rt.ui, rid, back)
+		else: details = func(): P0BoardRequest.open(rt.ui, "market", rid, back)
 	P0PlaceSheet.open(rt.ui, spec,
 		func():
 			rt.ui.close_modal()
