@@ -155,6 +155,7 @@ func step(delta: float, local_position: Vector3) -> void:
 				entry.rig.play_motion(animation)
 			entry.label.text = L10n.format_text("Traveller %s", str(actor.member.player).substr(0, 4)) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
 			entry.label.modulate = SPEAKING_COLOR if speaking.has(id) else Color.WHITE
+			entry.label.outline_modulate = Color.WHITE if speaking.has(id) else Color.BLACK   # green on light, as 383 V1 reads
 		else:
 			var basis := Basis(Vector3.UP, float(actor.yaw))
 			if work: basis = basis.rotated(Vector3.RIGHT, sin(_time * 5) * .25)

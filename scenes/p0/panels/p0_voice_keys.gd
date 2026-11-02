@@ -2,8 +2,9 @@ extends Control
 ## Voice controls in a room (SGODOT-383; q(274); 不知火舞's spec 383 6d206dfb §1–2): under the HUD's second row on the
 ## right, 16 from the edge, on the Creel pill's line — the space's own layer, not the HUD (LOCK-06 unchanged). Left
 ## the mic key, a 40 round icon key with no words (as ⇄): off the mic-off icon, secondary on the surface disc; on the
-## mic icon, white on the primary disc. Right, 8 apart, the people pill: the map pins' person and how many others are
-## in this layer (q(137) ③), the Creel pill's look (UiCreelBadge); a tap opens the layer's people drawer.
+## mic icon, white on the primary disc. Right, 8 apart, the people pill: the map pins' person, secondary as the frame
+## has it (383 V1), and how many others are in this layer (q(137) ③), the Creel pill's look (UiCreelBadge); a tap opens
+## the layer's people drawer. The key, the pill and the Creel pill share one middle line (383 V1).
 
 signal mic_pressed
 signal people_pressed
@@ -35,6 +36,8 @@ func _init() -> void:
 	people = UiCreelBadge.new(PERSON)
 	people.name = "People"
 	people.pressed.connect(func(): people_pressed.emit())
+	for i in people.find_children("*", "TextureRect", true, false): (i as TextureRect).modulate = UiTokens.COLOR_SECONDARY
+	people.minimum_size_changed.connect(func(): place(_right, _top))   # the theme's font comes once in the tree
 	add_child(people)
 	set_mic(false)
 	set_count(0)
@@ -55,13 +58,14 @@ func set_count(n: int) -> void:
 	people.text = str(n)
 	place(_right, _top)   # the pill grows to the left: the row keeps its right edge
 
-## Right-aligned at `right` (the screen's x less 16), the row's top at `top`; the mic key and the pill share its middle.
+## Right-aligned at `right` (the screen's x less 16), the people pill's top at `top` (the Creel pill's: the same pill,
+## so the same middle line, shown or not); the mic key shares its middle.
 func place(right: float, top: float) -> void:
 	_right = right
 	_top = top
 	var w := people.get_combined_minimum_size().x
 	var h := maxf(SIDE, people.get_combined_minimum_size().y)
-	position = Vector2(right - w - GAP - SIDE, top)
+	position = Vector2(right - w - GAP - SIDE, top + people.get_combined_minimum_size().y * 0.5 - h * 0.5)
 	size = Vector2(w + GAP + SIDE, h)
 	_layout()
 

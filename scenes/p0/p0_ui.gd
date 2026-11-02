@@ -4514,7 +4514,7 @@ func _voice_refresh() -> void:
 		var now := {}
 		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked): now[int(r.peer)] = true
 		crowd.set("speaking", now)
-	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)
+	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)   # on the Creel pill's line, in a room too (383 V1 / V6)
 	if on and not _mic_was_on and not _mic_toast_said:
 		_mic_toast_said = true
 		toast(MIC_ON_TOAST, 0.0, true)
@@ -4545,13 +4545,12 @@ func open_people() -> void:
 		if on: _confirm_block(peer)
 		else: voice_room.call("set_blocked", peer, false))   # Unblock at once, no card (§5)
 	d.connect(&"report_pressed", _report)
-	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
-	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE, close_layer)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)   # its own Close under the rows (V3), no ✕ over it
 	_people = d
 	modal_kind = "people"
 
-## §5: `Block Traveller ab12?`, `You won't hear each other.` / `They won't be told.`, Block / Cancel (q(28)'s card, the
-## confirm frame the home move uses).
+## §5: `Block Traveller ab12?`, `You won't hear each other.` / `They won't be told.`, Block (red, V4) / Cancel (q(28)'s
+## card, the confirm frame the home move uses).
 func _confirm_block(peer: int) -> void:
 	var who := ""
 	for r in voice_room.call("people"): if int(r.peer) == peer: who = str(r.name)
@@ -4561,6 +4560,7 @@ func _confirm_block(peer: int) -> void:
 	confirm.card.find_child("Title", true, false).text = "Block %s?" % who
 	confirm.card.find_child("Body", true, false).text = "You won't hear each other.\nThey won't be told."
 	confirm.move.label = "Block"
+	confirm.move.kind = UiCommandButton.Kind.DESTRUCTIVE   # V4: the red key
 	confirm.move.sends = false
 	var back := func():
 		confirm.queue_free()

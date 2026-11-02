@@ -48,6 +48,10 @@ func test_the_keys_come_with_voice_and_the_first_mic_asks_the_age_then_says_who_
 	await room.fetch_status()
 	assert_bool(ui._voice_keys.visible).is_true()
 	assert_str(ui._voice_keys.people.text).is_equal("2")   # the others, not the player
+	await await_idle_frame()
+	var keys = ui._voice_keys   # on the Creel pill's line (V1 / V6), its top, shown or not; the mic on the pill's middle
+	assert_float(keys.people.get_global_rect().position.y).is_equal_approx(ui._creel.position.y, 0.5)
+	assert_float(keys.mic.get_global_rect().get_center().y).is_equal_approx(keys.people.get_global_rect().get_center().y, 0.5)
 	assert_bool(ui._voice_keys.mic_on).is_false()          # the mic starts off
 	ui._voice_keys.mic.pressed.emit()
 	assert_str(ui.modal_kind).is_equal("age")              # the 13+ card first
@@ -96,10 +100,11 @@ func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	assert_str(ui.modal_kind).is_equal("people")
 	var d = ui._people
 	assert_str(d.title.text).ends_with("Layer 2")
-	assert_int(d.list.get_child_count()).is_equal(2)
+	assert_int(d.list.get_children().filter(func(c): return c.name.begins_with("Person_")).size()).is_equal(2)
+	assert_int(d.list.get_child_count()).is_equal(3)   # a line between the rows (V3)
 	d.mute_pressed.emit(4, true)
 	assert_bool(room.people().filter(func(r): return r.peer == 4)[0].muted).is_true()
-	assert_str((d.list.get_child(0).find_child("Mute", true, false) as Button).text).is_equal("Unmute")
+	assert_str((d.list.find_child("Person_4", false, false).find_child("Mute", true, false) as Button).text).is_equal("Unmute")
 	d.block_pressed.emit(5, true)
 	assert_str(ui.modal_kind).is_equal("block_confirm")   # Block asks first (§5)
 	var confirm := ui._modal.find_child("BlockConfirm", true, false)
@@ -109,6 +114,41 @@ func test_the_people_drawer_mutes_blocks_after_its_card_and_reports() -> void:
 	d.report_pressed.emit(4)
 	await await_idle_frame()
 	assert_str(ui.toast_text()).is_equal("Report sent")
+	d.close.pressed.emit()   # its own Close under the rows (V3)
+	assert_str(ui.modal_kind).is_not_equal("people")
+
+## §7 as V5 has it (383 50108c43): the wheel opens on this year with nothing picked; a tap on a year picks it, a drag
+## the year it stops on.
+func test_the_year_wheel_opens_on_this_year_and_picks_where_it_stops() -> void:
+	var card = P0Ui.AgeCard.new(2026)
+	card.animate = false
+	card.size = Vector2(360, P0Ui.AgeCard.HEIGHT)
+	add_child(auto_free(card))
+	await await_idle_frame()
+	assert_int(card.centred()).is_equal(2026)
+	assert_int(card.year).is_equal(0)
+	assert_bool(card.go.disabled).is_true()
+	var mid: float = card.wheel.size.y * 0.5
+	_click(card, mid - P0Ui.AgeCard.NEXT, mid - P0Ui.AgeCard.NEXT)   # a tap on the year over the band
+	assert_int(card.year).is_equal(2025)
+	assert_bool(card.go.disabled).is_false()
+	_click(card, mid, mid + 3.0 * P0Ui.AgeCard.STEP)   # dragged three rows down: three years earlier
+	assert_int(card.year).is_equal(2022)
+
+func _click(card, from_y: float, to_y: float) -> void:
+	var down := InputEventMouseButton.new()
+	down.button_index = MOUSE_BUTTON_LEFT
+	down.pressed = true
+	down.position = Vector2(180, from_y)
+	card._wheel_input(down)
+	if to_y != from_y:
+		var move := InputEventMouseMotion.new()
+		move.position = Vector2(180, to_y)
+		card._wheel_input(move)
+	var up := InputEventMouseButton.new()
+	up.button_index = MOUSE_BUTTON_LEFT
+	up.position = Vector2(180, to_y)
+	card._wheel_input(up)
 
 class FakeCrowd extends Node:
 	var speaking: Dictionary = {}
@@ -127,10 +167,12 @@ func test_a_speaker_s_name_tag_and_row_go_green() -> void:
 	f[1].changed.emit()
 	assert_dict(crowd.speaking).is_equal({4: true})
 	ui._voice_keys.people.pressed.emit()
-	assert_float((ui._people.list.get_child(0).find_child("Speaking", true, false) as Control).modulate.a).is_equal(1.0)
-	assert_float((ui._people.list.get_child(1).find_child("Speaking", true, false) as Control).modulate.a).is_equal(0.0)
-	# 384 (奕星 via 周瑜 on #650): lit only while their voice really reaches this phone — a block either way (the server
-	# sends voice_blocks to both phones) leaves no light, so the blocked one cannot tell from it
+	assert_float((ui._people.list.find_child("Person_4", false, false).find_child("Speaking", true, false) as Control).modulate.a).is_equal(1.0)
+	assert_float((ui._people.list.find_child("Person_5", false, false).find_child("Speaking", true, false) as Control).modulate.a).is_equal(0.0)
+	# 384 (奕星 via 周瑜 on #650): lit only while their voice really reaches this phone. The blocker's phone has the
+	# block in its voice_blocks (the server sends them to the blocker only, since #650) and lights nothing; the blocked
+	# one's phone never hears of it, and stays dark because the plugin reports `speaking` only for a track it is
+	# subscribed to (亚瑟 on #650), which a block takes away — so the blocked one cannot tell from it either
 	(f[2] as P0Online)._message(JSON.stringify({"t": "voice_blocks", "blocked": [4]}))
 	f[1].changed.emit()
 	assert_dict(crowd.speaking).is_empty()
