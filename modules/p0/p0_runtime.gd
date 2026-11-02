@@ -15,6 +15,7 @@ extends Node
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
 const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
+const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")   # Settings › Blocked players: the account's voice (SGODOT-384)
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
@@ -154,6 +155,11 @@ func _init() -> void:
 	ui.notify.came_back()
 	if ui.notify.available(): ui.notify.native.connect("permission", func(_granted): ui.notify_changed())
 	ui.test_account_requested.connect(_switch_test_account)
+	# Settings › Blocked players (SGODOT-384): the account's voice, status and blocks, with no room
+	var voice_account := P0VoiceRoom.new()
+	voice_account.session = session
+	add_child(voice_account)
+	ui.voice_account = voice_account
 	add_child(ui)
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))

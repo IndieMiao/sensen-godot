@@ -3612,13 +3612,14 @@ func blackjack_refused(code: String, detail: Dictionary) -> void:
 
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
-func open_settings(back := Callable()) -> void:
+func open_settings(back := Callable(), read := true) -> void:
 	var version := P0Legal.version_line(P0Session.demo_config(
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
 	if test_accounts.is_test(): version += " · Test"
 	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
-		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "")
+		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
+		(_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD) if _privacy_shown else P0SettingsPage.BLOCKED_NONE)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3626,10 +3627,72 @@ func open_settings(back := Callable()) -> void:
 		if what == "home": change_home.emit(func(): open_settings(back))
 		elif what == "test_options": open_test_options(func(): open_settings(back))
 		elif what == "notifications": open_notifications(func(): open_settings(back))
+		elif what == "blocked_players": open_blocked_players(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
+	if read: _privacy_read(func(): if modal_kind == "settings": open_settings(back, false))   # drawn again, not read again
+
+## Settings › Blocked players (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP1–BP3 row 127): the account's voice
+## away from any room (P0Runtime's P0VoiceRoom without one): whether this phone is offered voice, and whom it blocked —
+## now that the two never see each other in a room, the only place a block is lifted. The Privacy group shows while
+## voice is offered here, or while anyone is blocked (a block outlives the switch going off, and an iPhone has none).
+var voice_account: Node
+var _blocked: Array = []        # [{handle, name}] as last read, the server's order
+var _blocked_read := false      # read once at least this launch: before that an empty list is not `No one blocked`
+var _blocked_failed := false    # and the last try failed: the Blocked page's empty state and Retry
+var _privacy_shown := false
+var _unblocks := 0              # Unblocks sent and answered: a read overlapping one is dropped (it may hold them, 周瑜 #667)
+
+## The server asked again; `then` when what the pages show has changed (they are opened again with it). A list that
+## was not read (blocked_list null, 后裔 ed9c83b2) keeps the last one read; none read this launch, the Privacy group
+## stays only while voice is offered (its row without a number) and the page shows the empty state (不知火舞 6e014af3).
+func _privacy_read(then: Callable) -> void:
+	if voice_account == null: return
+	var unblocks := _unblocks
+	await voice_account.call("fetch_status")
+	var got = await voice_account.call("blocked_list")
+	if unblocks != _unblocks: return
+	# offered as a room's would be (P0VoiceRoom.offered) — its own Voice left unset: it never joins or leaves a call
+	var phone = get_node_or_null("/root/Voice")
+	var offered: bool = bool(voice_account.get("available")) and str(voice_account.get("age")) != "no" \
+		and phone != null and bool(phone.call("supported"))
+	var was := [_privacy_shown, _blocked, _blocked_read, _blocked_failed]
+	if got is Array:
+		_blocked = got
+		_blocked_read = true
+		_blocked_failed = false
+	elif not _blocked_read: _blocked_failed = true
+	_privacy_shown = offered or not _blocked.is_empty()
+	if was != [_privacy_shown, _blocked, _blocked_read, _blocked_failed]: then.call()
+
+## `read` false: drawn again with what was read, nothing asked (a failed read never loops; 后裔 on #667).
+func open_blocked_players(back: Callable, read := true) -> void:
+	var page := P0SettingsPage.blocked_players(_blocked, safe_top(), safe_bottom(),
+		"ok" if _blocked_read else ("failed" if _blocked_failed else "reading"))
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(what: String):
+		if what == "retry":   # Retry only when tapped, nothing by itself
+			_blocked_failed = false
+			open_blocked_players(back)
+		else: _unblock(what, back))
+	_open_modal(page, 0.0, true)
+	modal_kind = "blocked_players"
+	_modal_back = back
+	if read: _privacy_read(func(): if modal_kind == "blocked_players": open_blocked_players(back, false))
+
+## Unblock: the page has taken the row away already (no card, no toast); a failure puts it back with the network's line.
+func _unblock(handle: String, back: Callable) -> void:
+	_unblocks += 1
+	var ok: bool = await voice_account.call("unblock", handle)
+	_unblocks += 1   # again at its answer: a read begun meanwhile may have been served before the Unblock was
+	if ok:
+		_blocked = _blocked.filter(func(r): return str(r.handle) != handle)
+		return
+	show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
+	if modal_kind == "blocked_players": open_blocked_players(back, false)
 
 ## The crop-ready notifications (SGODOT-350; P0Notify). Settings › Notifications: the switch, and when the system has
 ## said no the notice whose link opens the system's page. The page is read again whenever the phone may have changed
