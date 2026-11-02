@@ -5,8 +5,10 @@
  * that room ends it. LiveKit sees the hub's peer id (never the player id, the P0 server's only credential: 亚瑟 on the
  * plan). Market Square has none (the user). Off unless P0_VOICE=on with the LiveKit keys (tools/p0_server.ts).
  *
- * The least against harassment the user set: Mute is the phone's own; Block is kept here, by player, both ways — neither
- * takes the other's tracks (the grant's and voice_blocks' `blocked`); Report is a log line for a person to read later.
+ * The least against harassment the user set: Mute is the phone's own; Block is kept here, by player, and works both ways
+ * on the blocker's phone alone (SGODOT-384, 周瑜 on #647): it takes none of their tracks, and LiveKit lets them take none
+ * of its own (its track subscription permissions) — so only the blocker is ever told (the grant's and voice_blocks'
+ * `blocked`); the one blocked never learns it. Report is a log line for a person to read later.
  * The 13+ gate is a yes / no per player (no birthday is kept); without a yes there is no grant. Blocks and the gate live in
  * their own small files beside the save, never in it.
  */
@@ -128,7 +130,8 @@ export class P0Voice {
     if (lease && lease.id === leaseId) await this.release(lease);
   }
 
-  /** Block (or unblock) someone in this player's room by their peer id; both hear the new lists at once. */
+  /** Block (or unblock) someone in this player's room by their peer id; the blocker hears the new list at once (their
+   * phone shuts both ways, 384), the one blocked is told nothing. */
   block(player: string, peer: number, on: boolean): Refusal | Record<string, unknown> {
     const target = this.playerAt(player, peer);
     if (!target) return refuse('NOT_IN_ROOM', 404);
@@ -136,7 +139,7 @@ export class P0Voice {
     if (on) list.add(target); else list.delete(target);
     if (list.size) this.blocks[player] = [...list]; else delete this.blocks[player];
     writeJson(this.files?.blocks, this.blocks);
-    for (const p of [player, target]) this.tell(p, { t: 'voice_blocks', blocked: this.blockedPeers(p) });
+    this.tell(player, { t: 'voice_blocks', blocked: this.blockedPeers(player) });
     return { ok: true, blocked: this.blockedPeers(player) };
   }
 
@@ -156,29 +159,31 @@ export class P0Voice {
     return { ok: true, already: false };
   }
 
-  /** The hub's hooks: someone came into a room (the others with a block either way hear their new lists), or left one
-   * (their grant ends, and LiveKit lets them go). */
+  /** The hub's hooks: someone came into a room (whoever there blocks them hears their new list; so do they, if they block
+   * anyone there), or left one (their grant ends, and LiveKit lets them go). */
   joined(o: Occupant): void {
-    for (const m of this.rooms.members(o.outpost, o.room))
-      if (m.player !== o.player && this.blockedEitherWay(m.player, o.player)) {
-        this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
-        this.tell(o.player, { t: 'voice_blocks', blocked: this.blockedPeers(o.player) });
-      }
+    let mine = false;
+    for (const m of this.rooms.members(o.outpost, o.room)) {
+      if (m.player === o.player) continue;
+      if (this.blocking(m.player, o.player)) this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
+      if (this.blocking(o.player, m.player)) mine = true;
+    }
+    if (mine) this.tell(o.player, { t: 'voice_blocks', blocked: this.blockedPeers(o.player) });
   }
   departed(o: Occupant): void {
     const lease = this.leases.get(o.player);
     if (lease && lease.room === this.roomName(o)) void this.release(lease);
   }
 
-  /** The peers in this player's room either of the two blocks. */
+  /** The peers in this player's room they block (theirs only: who blocks them is never said, 384). */
   blockedPeers(player: string): string[] {
     const o = this.rooms.occupant(player);
     if (!o) return [];
-    return this.rooms.members(o.outpost, o.room).filter(m => m.player !== player && this.blockedEitherWay(player, m.player)).map(m => String(m.id));
+    return this.rooms.members(o.outpost, o.room).filter(m => m.player !== player && this.blocking(player, m.player)).map(m => String(m.id));
   }
 
-  private blockedEitherWay(a: string, b: string): boolean {
-    return (this.blocks[a] ?? []).includes(b) || (this.blocks[b] ?? []).includes(a);
+  private blocking(a: string, b: string): boolean {
+    return (this.blocks[a] ?? []).includes(b);
   }
 
   private playerAt(player: string, peer: number): string | undefined {
