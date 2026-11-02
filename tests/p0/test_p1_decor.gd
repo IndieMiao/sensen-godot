@@ -3,8 +3,8 @@ const P0Farm := preload("res://scenes/p0/p0_farm.gd")
 ## Decorate (SGODOT-284): the server judges a spot with content decor.yard; it must agree with the garden the client
 ## draws (P0Garden), so a piece never stands on a bed, in the house or on a facility the player can see, and the client
 ## (P0Decor) judges a spot as the server does. Pieces are solid: a yard filled with them still lets the player walk to
-## the exit, the door, the stall and the workbench (q(120), 不知火舞 49b11f91; no mine mouth nor gathering spots on the farm
-## since 355 b1).
+## the exit, the door, the stall, the workbench and the cell before the rest bench (q(120), 不知火舞 49b11f91 and on #629; no
+## mine mouth nor gathering spots on the farm since 355 b1).
 
 func _yard() -> Dictionary:
 	return P0Logic.content().get("decor", {}).get("yard", {})
@@ -52,7 +52,7 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Space taken")
 	for at in [Vector2i(9, -1), Vector2i(10, -2)]:   # the way to the map exit runs through the field now (SGODOT-355 b1)
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Outside your yard")
-	for at in [Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(17, 15)]:
+	for at in [Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(17, 15), Vector2i(6, 15), Vector2i(7, 15)]:   # … and the bench's
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Keep the path clear")
 	for at in [Vector2i(1, 13), Vector2i(2, 14), Vector2i(4, 13)]:   # the mine mouth and its path were here (355 b1, v4q(5) ①)
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("")
@@ -121,7 +121,7 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 			n += 1
 			v.decor.placed.append({"uid": n, "id": "deco_planter", "x": x, "y": y, "rot": 0})
 			grid.set_solid(Vector2i(x, y), true)
-	assert_int(n).is_greater(50)   # plenty of yard is left to decorate (53 once the field took the whole grid, 60 with the mine mouth gone too, SGODOT-355 b1)
+	assert_int(n).is_greater(50)   # plenty of yard is left to decorate (53 once the field took the whole grid; 58 with the mine mouth gone and the bench's cell kept, SGODOT-355 b1)
 	var from: Vector2i = P0Garden.ANCHORS.spawn
 	var reach := func(target: Vector3, within: float) -> bool:
 		for y in range(o.y, o.y + bp.grid.y):
@@ -135,6 +135,8 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_bool(reach.call(cell.call(Vector2i(9, 14)), 0.1)).override_failure_message("the farmhouse door").is_true()
 	assert_bool(reach.call(cell.call(Vector2i(14, 14)), 0.1)).override_failure_message("the stall").is_true()
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.workbench), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message("the workbench").is_true()
+	# the cell before the rest bench, where its finger card is the nearest (不知火舞 on #629): one walks onto it
+	assert_bool(reach.call(cell.call(Vector2i(6, 15)), 0.1)).override_failure_message("before the bench").is_true()
 
 ## FARM-6-DECOR (Figma 2187:33369): the stall's Decor page — its tab, its fact line, the rows' four states.
 func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:

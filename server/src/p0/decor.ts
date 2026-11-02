@@ -24,8 +24,8 @@ export const decorOf = (c: P0Content) => (c as WithDecor).decor;
 export const isDecor = (c: P0Content, id: string) => !!decorOf(c)?.items[id];
 
 /** §8.3.2: 20 + 4 × (Homestead level − 1), at most decor_max.max when the content sets one (SGODOT-355 b1: the yard has
- * 60 free cells since the field took the whole grid and the mine mouth left (53 before, when 不知火舞 proposed 52); the
- * user decides — 奕星 on #624). */
+ * 58 free cells since the field took the whole grid, the mine mouth left and the bench kept its cell (53 before, when
+ * 不知火舞 proposed 52; she keeps 52, 6 cells to walk on); the user decides — 奕星 on #624, #629). */
 export function decorCap(c: P0Content, s: P0State): number {
   const m = (c.homestead as { decor_max?: { base: number; per_level: number; max?: number } }).decor_max ?? { base: 20, per_level: 4 };
   return Math.min(m.base + m.per_level * Math.max(0, s.homestead.level - 1), m.max ?? Infinity);
