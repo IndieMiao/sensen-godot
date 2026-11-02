@@ -1,11 +1,11 @@
 {
   "id": "mob_rock_beetle",
-  "radius": 0.58,
-  "height": 0.4937,
+  "radius": 0.725,
+  "height": 0.6171,
   "hit_point": [
     0,
-    0.28,
-    0.04
+    0.35,
+    0.05
   ],
   "durations": {
     "idle": 1.6,
@@ -20,7 +20,7 @@
   "hit_at": 0.18,
   "badge_point": [
     0,
-    0.65,
+    0.8125,
     0
   ],
   "anims": {
@@ -60,12 +60,12 @@
   },
   "tint_mask": "UV2.x",
   "source_concept": "Plane 355 c368e7dd / beetle_v3.png",
-  "stage": "formal_v1",
+  "stage": "formal_v1.1",
   "cast_shadow": false,
   "palette": {
     "shell": "685B59",
     "belly": "514744",
-    "head": "A18B7D",
+    "head": "C9A087",
     "leg": "7E6A5F",
     "rim": "F2A13C",
     "bump": "85746B",
