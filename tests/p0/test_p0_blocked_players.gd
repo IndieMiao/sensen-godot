@@ -156,3 +156,36 @@ func test_a_list_read_before_an_unblock_is_dropped() -> void:
 	await ui._privacy_read(func(): reopened[0] = true)
 	assert_bool(reopened[0]).is_false()
 	assert_int(ui._blocked.size()).is_equal(2)   # left as it was: the Unblock's own answer takes the row out
+
+## q(277): `Voice chat ›` under `Blocked players` in the Privacy card, only while this phone is offered voice (不知火舞);
+## alone when nobody is blocked here; neither row, no group. Its page: the PageHeader and P0Legal's words.
+func test_voice_chat_rides_with_the_voice_entry() -> void:
+	var both := P0SettingsPage.settings("dev", 0.0, 0.0, {}, "", 2, true)
+	add_child(auto_free(both))
+	var vc: UiSettingRow = both.body.find_child("VoiceChat", true, false)
+	assert_array(_labels(vc)).is_equal(["Voice chat", "›"])
+	assert_object(vc.get_parent()).is_same(both.body.find_child("BlockedPlayers", true, false).get_parent())   # one card
+	var texts := _labels(both.body)
+	assert_int(texts.find("Voice chat")).is_greater(texts.find("Blocked players"))
+	assert_int(texts.find("Voice chat")).is_less(texts.find("Legal"))
+	var alone := P0SettingsPage.settings("dev", 0.0, 0.0, {}, "", P0SettingsPage.BLOCKED_NONE, true)
+	add_child(auto_free(alone))
+	assert_bool(_labels(alone.body).has("Privacy")).is_true()
+	assert_object(alone.body.find_child("BlockedPlayers", true, false)).is_null()
+	var none := P0SettingsPage.settings("dev", 0.0, 0.0, {}, "", P0SettingsPage.BLOCKED_NONE, false)
+	add_child(auto_free(none))
+	assert_bool(_labels(none.body).has("Privacy")).is_false()
+	# here no voice is offered (the server's off): only Blocked players, for the two blocked
+	var ui := await _ui()
+	ui.open_settings()
+	await await_millis(50)
+	assert_object(_page(ui).body.find_child("BlockedPlayers", true, false)).is_not_null()
+	assert_object(_page(ui).body.find_child("VoiceChat", true, false)).is_null()
+	ui.open_voice_chat_info(func(): ui.open_settings())
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("voice_chat")
+	assert_str(_page(ui).header.title).is_equal("Voice chat")
+	assert_array(_labels(_page(ui).body)).is_equal([P0Legal.VOICE_CHAT])
+	_page(ui).back_pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("settings")
