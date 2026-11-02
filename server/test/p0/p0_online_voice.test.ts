@@ -166,13 +166,22 @@ describe('P0 voice (SGODOT-383)', () => {
     told.length = 0;
     const b2 = enter('player-bbbb');
     expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [String(b2.id)] }]]);
+    // B leaves: A hears a list without B's peer id — the next one to take it is no one A blocked (后裔 on #650)
+    told.length = 0;
+    voice.departed(rooms.leave('player-bbbb')!);
+    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [] }]]);
+    const d = enter('player-dddd');
+    expect(d.id).toBe(b2.id);   // B's peer id, taken at once
+    expect(voice.blockedPeers('player-aaaa')).toEqual([]);
+    rooms.leave('player-dddd');
+    const b3 = enter('player-bbbb');
     // A comes into a room where B already is: A is told whom they block there
     rooms.leave('player-aaaa');
     told.length = 0;
     enter('player-aaaa');
-    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [String(b2.id)] }]]);
+    expect(told).toEqual([['player-aaaa', { t: 'voice_blocks', blocked: [String(b3.id)] }]]);
     // unblock
-    expect(voice.block('player-aaaa', b2.id, false)).toEqual({ ok: true, blocked: [] });
+    expect(voice.block('player-aaaa', b3.id, false)).toEqual({ ok: true, blocked: [] });
     expect(JSON.parse(readFileSync(files.blocks, 'utf8'))).toEqual({});
     expect(c.id).toBeGreaterThan(0);
   });

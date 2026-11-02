@@ -160,7 +160,8 @@ export class P0Voice {
   }
 
   /** The hub's hooks: someone came into a room (whoever there blocks them hears their new list; so do they, if they block
-   * anyone there), or left one (their grant ends, and LiveKit lets them go). */
+   * anyone there), or left one (their grant ends, LiveKit lets them go, and whoever there blocked them hears their list
+   * without them — a peer id comes back at once, and the next one to take it is no one they blocked). */
   joined(o: Occupant): void {
     let mine = false;
     for (const m of this.rooms.members(o.outpost, o.room)) {
@@ -173,6 +174,8 @@ export class P0Voice {
   departed(o: Occupant): void {
     const lease = this.leases.get(o.player);
     if (lease && lease.room === this.roomName(o)) void this.release(lease);
+    for (const m of this.rooms.members(o.outpost, o.room))   // the hub has them out of the room already
+      if (this.blocking(m.player, o.player)) this.tell(m.player, { t: 'voice_blocks', blocked: this.blockedPeers(m.player) });
   }
 
   /** The peers in this player's room they block (theirs only: who blocks them is never said, 384). */
