@@ -9,11 +9,13 @@ import io.livekit.android.LiveKit
 import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
 import io.livekit.android.room.Room
+import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.participant.ParticipantTrackPermission
 import io.livekit.android.room.participant.RemoteParticipant
 import io.livekit.android.room.track.RemoteAudioTrack
 import io.livekit.android.room.track.RemoteTrackPublication
+import io.livekit.android.room.track.Track
 import io.livekit.android.util.LoggingLevel
 import com.twilio.audioswitch.AudioDevice
 import com.sensen.permission.PermissionActivity
@@ -117,8 +119,9 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
                     is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted,
                     is RoomEvent.TrackUnsubscribed, is RoomEvent.TrackSubscriptionPermissionChanged -> snapshot("participants")
                     is RoomEvent.TrackPublished -> {
-                        // a blocked person's new track is never taken (P0 Block, 2026-11-02)
-                        if (event.participant.identity?.value in blocked) (event.publication as? RemoteTrackPublication)?.setSubscribed(false)
+                        // our own microphone out: say so (383 6372bffe); a blocked person's new track is never taken (P0 Block)
+                        if (event.participant is LocalParticipant) snapshot("microphone")
+                        else if (event.participant.identity?.value in blocked) (event.publication as? RemoteTrackPublication)?.setSubscribed(false)
                     }
                     is RoomEvent.TrackSubscribed -> {
                         val who = event.participant.identity?.value
@@ -246,14 +249,18 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
             // still says a blocker speaks to the one they blocked, whose card would light with no sound (and tell them).
             val heard = local || audible(p)
             users.put(JSONObject().put("id", id).put("name", p.name ?: id.take(8))
-                .put("speaking", p.isSpeaking && heard).put("microphone", p.isMicrophoneEnabled && heard).put("local", local)
+                .put("speaking", p.isSpeaking && heard).put("microphone", micOn(p) && heard).put("local", local)
                 .put("audible", heard).put("muted", id in muted).put("blocked", id in blocked))
         }
         add(current.localParticipant, true)
         current.remoteParticipants.values.forEach { add(it, false) }
-        emit(kind, body = JSONObject().put("participants", users).put("microphone", current.localParticipant.isMicrophoneEnabled)
+        emit(kind, body = JSONObject().put("participants", users).put("microphone", micOn(current.localParticipant))
             .put("listening", listening))
     }
+    /** Whether someone's microphone is out and not muted, read off the publication itself: isMicrophoneEnabled is a flow
+     *  derived from it a beat later, so right after setMicrophoneEnabled a first mic on still read false — the key stayed
+     *  off while the room heard us (383 6372bffe). */
+    private fun micOn(p: Participant): Boolean = p.getTrackPublication(Track.Source.MICROPHONE)?.let { !it.muted } ?: false
     /** A remote participant whose audio this phone has subscribed to (allowed by them and taken by us). */
     private fun audible(p: Participant): Boolean = (p as? RemoteParticipant)?.trackPublications?.values?.any {
         val pub = it as? RemoteTrackPublication
