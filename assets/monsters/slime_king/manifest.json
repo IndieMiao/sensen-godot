@@ -124,23 +124,23 @@
       "surfaces": 1,
       "bounds": [
         [
-          -0.3402000069618225,
-          -0.04650876298546791,
-          -0.2981008291244507
+          -0.4422599971294403,
+          -0.06485109031200409,
+          -0.3875310719013214
         ],
         [
-          0.352400004863739,
-          0.5374770164489746,
-          0.15875190496444702
+          0.4581199884414673,
+          0.7026391625404358,
+          0.20637747645378113
         ]
       ],
       "dimensions_m": [
-        0.6926000118255615,
-        0.5839857794344425,
-        0.4568527340888977
+        0.9003799855709076,
+        0.7674902528524399,
+        0.5939085483551025
       ],
       "triangle_limit": 800,
-      "sha256": "0a5b746850c243d9262cbea3475f34db7eff3fc1cce80be9a3c4fd069eb75b54",
+      "sha256": "eb9d20fa0bf63cef8ace28d89ada4503bf56968ceee50f3bdb3e751ecf001ae7",
       "anchors": [],
       "pivot": "head contact centre; attach at Y=1.43*r",
       "slime_radius": 1.0,
@@ -153,8 +153,8 @@
       "preview_body_tint": "D7B8CF",
       "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt",
       "notes": [
-        "v1.1: five outward-leaning faceted quartz prisms with different lengths and pointed tips.",
-        "White bases, faint lavender tips, alternating light/dark facets; opaque vertex colour only."
+        "v1.2: enlarge the v1.1 five-column cluster by 1.3 and refit its enlarged bases to the same radius-one head.",
+        "Shape, faceted white/lavender colours, 280 triangles and attachment origin retained; runtime scales with king radius."
       ]
     }
   ]

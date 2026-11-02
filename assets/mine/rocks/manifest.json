@@ -28,13 +28,14 @@
         0.8846932649612427
       ],
       "triangle_limit": 400,
-      "sha256": "dae338bfd8367f360480eeffad1b574131fe074c244bfa3699f284c4547506e6",
+      "sha256": "40324e9f23f6e0d168b9c0cc1409d3ba3c2177826f258e1ad18e62e318bd04bc",
       "anchors": [],
       "origin": "bottom centre; Y up; front +Z",
       "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
       "shadow_radius_m": 0.52,
       "notes": [
-        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+        "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+        "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
       ]
     },
     {
@@ -60,13 +61,14 @@
         0.9002999365329742
       ],
       "triangle_limit": 400,
-      "sha256": "b59896c667f771da7055ac7f357a2926a55e616450dd2d75e99cf51f3768c10c",
+      "sha256": "4010c5dbab671da077e71a4a75a78f436e438cf27781aaff52ea8212a8f91ce1",
       "anchors": [],
       "origin": "bottom centre; Y up; front +Z",
       "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
       "shadow_radius_m": 0.52,
       "notes": [
-        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+        "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+        "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
       ]
     },
     {
@@ -124,13 +126,14 @@
         0.8851995766162872
       ],
       "triangle_limit": 400,
-      "sha256": "24305eb8713a7c4462c4f2f979590d06c3b44ac8ce6e71d5e91f047c1f3dea31",
+      "sha256": "db81c71622bfd14584dec6cca4d57df0c68c35d048ab6f251ddd4cbc4d6e4778",
       "anchors": [],
       "origin": "bottom centre; Y up; front +Z",
       "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
       "shadow_radius_m": 0.52,
       "notes": [
-        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+        "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+        "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
       ]
     }
   ]
