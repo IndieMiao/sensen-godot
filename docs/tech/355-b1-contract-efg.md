@@ -20,6 +20,7 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> **v0.7+（11-02 晚）**：第 10 节补怪物导入的后处理脚本（上官婉儿 11-02）：导入时顶点色当底色、关投影；运行时换材质、选模型时要注意的两点。
 > **v0.7（11-02 15:xx）用户批复**：用户 14:4x 批了 355 待批清单「全按推荐」、v4q 八条整条批（奕星转）。E / F / G 原来标〔待用户定〕的都按推荐定了，本文件里对应的地方改成已定：
 > - 丁12 矿脉开局就能去：删掉 `types.vein.gate`（内容改动归苏烈，亚瑟对账时分的）；
 > - 丁13 第一批不掉副产，矿口卡不出 `Also` 行；
@@ -479,6 +480,11 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
   - ShroomBrain：被打后 hide 1 秒，`can_be_hit()` 为 false；每隔一段时间放 spore（打中算一次普通命中）；
   - SlimeKingBrain：照史莱姆，体型和数值放大，可以加一个蓄力重跳。
 - 一层 4–5 只的时候，照 SGODOT-260：每帧最多一只寻路；模型不投实时阴影，用圆形假影。
+- **导入后处理**（上官婉儿 11-02，从蝙蝠灰模起）：每只怪的 `.glb.import` 都挂同一份脚本 `assets/monsters/material_import.gd`（带 `.uid`），和 N1 酒店大堂的 `assets/rooms/poi_hotel_lobby/material_import.gd` 是同一个做法。它只做两件事：
+  - 导入后的默认材质打开顶点色当底色（线性顶点色；Godot 4.7 导入 glTF 时默认不用顶点色，不开的话模型是白的）；
+  - 所有网格关掉投影，照上一条「不投实时阴影，用圆形假影」。运行时不要再把 `cast_shadow` 打开。
+  - 染色（UV2.x 遮罩）、受击闪白这些仍然归运行时材质。**整个换材质时**（`material_override`，或者换成 ShaderMaterial），导入脚本打开的顶点色带不过去，要自己打开：StandardMaterial3D 设 `vertex_color_use_as_albedo`，着色器里乘 `COLOR`。**只改参数时**（复制导入的材质，再改 albedo / emission），顶点色已经是开着的。
+  - 程序本机不跑 `--import`，没导入过的机器上 glb 加载不出来。所以「有 glb 就用 glb」要以 `load()` 拿得到场景为准，不能只看文件在不在；拿不到就退回占位体和占位 json，测试和桌面截图不会因此挂。
 - **接口落地 PR（周瑜）**：建 monsters.gd、monster_view.gd、monster_brain.gd，把史莱姆移到 slime_view.gd / slime_brain.gd 和占位 json（行为不变），p0_mine_combat.gd 改成按 view 的 `mobs[].kind` 走注册表。旧矿（scenes/mine、online_combat）还在用的 mine_combat.gd 不动。这个 PR 合了以后，刘邦只在 monsters/ 下加新文件和 KINDS 的行，不碰 mine_combat.gd 和 p0_mine*.gd。
 - **导出**：json 不是资源，导出包默认不带。接口落地 PR 已在 export_presets.cfg 的 include_filter 加了 `modules/mining/monsters/placeholder/*.json,assets/monsters/*.json`。
 - 发命令（客户端）：挥一下时，把命中的怪里 `can_be_hit()` 的放进 targets，其中 `stunned()` 的再放进 stunned；hurt 管线照现在的 `mine_hurt` 键。
