@@ -1124,11 +1124,12 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
 	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
-	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥). An Error toast, as
+	# every refused command's but Energy's (§4.8.6; 不知火舞 11-02: wrong_place and wrong_city alike)
 	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
 		var r := PinReason.request_of(session.view, str(cmd.request))
 		if not r.is_empty():
-			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
 	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
 		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
