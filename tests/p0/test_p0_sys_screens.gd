@@ -280,6 +280,27 @@ func test_travel_required_in_a_pond_goes_back_to_the_maps_travel_card() -> void:
 	assert_str(rt.after_leave).is_equal("travel:gn-5355933")
 	assert_bool(is_instance_valid(w)).is_true()
 
+## 周瑜 on #642: refused while the pond's fishing panel is up (its back lock closes the panel and keeps the pond) — it
+## still goes back to the map for the travel card; the lock is not asked.
+func test_travel_required_with_the_fishing_panel_up_still_goes_back_to_the_map() -> void:
+	rt.session.view = _view()
+	rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}).free()
+	var stub := GDScript.new()
+	stub.source_code = "extends Node\nvar asked := 0\nfunc is_back_navigation_locked() -> bool:\n\tasked += 1\n\treturn true\n"
+	stub.reload()
+	var w := auto_free(Node.new()) as Node
+	w.set_script(stub)
+	w.scene_file_path = "res://scenes/p0/p0_pond.tscn"
+	add_child(w)
+	rt.attach(w)
+	_state()
+	var left := [0]
+	rt.swap_root = func(): left[0] += 1
+	rt.session.refused.emit("travel_required", {"preview": {"cluster": "gn-5355933", "name": "Hayward"}}, {"type": "cast"})
+	assert_str(rt.after_leave).is_equal("travel:gn-5355933")
+	assert_int(left[0]).is_equal(1)   # off to the map
+	assert_int(w.asked).is_equal(0)   # the panel's lock never asked
+
 func test_go_back_and_back_leave_for_where_the_player_came_from() -> void:
 	var left := [0]
 	rt.swap_root = func(): left[0] += 1   # not pushed on AppRouter here: Go back takes the map way

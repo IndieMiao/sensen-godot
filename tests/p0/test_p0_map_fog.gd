@@ -251,6 +251,7 @@ func test_a_pin_of_a_city_without_a_pass_opens_its_city_card() -> void:
 	# its travel card first (it walked in and was refused inside)
 	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
 	rt.ui.close_modal()
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"}, false)).is_false()   # its tap: its card as ever (q(257) ⑦)
 	var there: Dictionary = rt.session.view.duplicate(true)
 	there.travel.here = TOKYO
 	rt.session.view = there

@@ -120,11 +120,16 @@ func test_3_visited_with_a_pass_opens_the_place_card() -> void:
 	m.city_map.select(_entry(HUT))
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
 	rt.ui.close_modal()
-	# q(256) ④ (SGODOT-382): the pass still running but the player back home — the way back is a trip at the revisit
-	# fare: the city's travel card, never the place (walked into, the server refused it inside)
+	# the pass still running but the player back home: the pin's card as ever (q(212) ②, q(257) ⑦; 不知火舞 on #642) —
+	# its Go is the way back, a trip at the revisit fare (q(256) ④, SGODOT-382): the city's travel card, never the room
 	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS})
 	m.city_map.select(_entry(HUT))
+	assert_str(rt.ui.modal_kind).is_equal("place_card")
+	var go := rt.ui._modal.find_child("Primary", true, false) as UiCommandButton
+	assert_str(go.label).is_equal("Go")
+	go.pressed.emit()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	assert_int(AppRouter.instance_depth()).is_equal(0)   # not walked in
 	rt.ui.close_modal()
 
 ## (4) Visited, the pass run out: the city's travel card.

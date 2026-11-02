@@ -1156,8 +1156,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			var to := str(preview.get("cluster", ""))
 			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(to, preview)
 			# a pond or a room the player should not be in (SGODOT-382): back to the map, where the city's travel card
-			# opens at the fare the server named, as a room that refused the join does
-			elif to != "" and is_instance_valid(world): _leave_then("travel:" + to)
+			# opens at the fare the server named, as a room that refused the join does. No back lock is asked: the
+			# pond's would only close its fishing panel and keep the player there (周瑜 on #642)
+			elif to != "" and is_instance_valid(world):
+				after_leave = "travel:" + to
+				leave_to_map()
 			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
