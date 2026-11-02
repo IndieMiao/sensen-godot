@@ -147,6 +147,12 @@ describe('P0 voice (SGODOT-383)', () => {
     expect((await post('/v1/p0/voice/heartbeat', { lease_id: r.json().lease_id })).statusCode).toBe(200);
     expect((await post('/v1/p0/voice/heartbeat', { lease_id: 'nope' })).statusCode).toBe(410);
     expect((await post('/v1/p0/voice/block', { peer: 'x', on: true })).statusCode).toBe(400);
+    // a peer id as the grant writes it (a string) or as a number: the same person (蒙恬 on #647)
+    enter('player-bbbb');
+    expect((await post('/v1/p0/voice/block', { peer: '2', on: true })).json()).toEqual({ ok: true, blocked: ['2'] });
+    expect((await post('/v1/p0/voice/block', { peer: 2, on: false })).json()).toEqual({ ok: true, blocked: [] });
+    expect((await post('/v1/p0/voice/report', { peer: '2' })).json()).toEqual({ ok: true });
+    expect((await post('/v1/p0/voice/report', { peer: '2.5' })).statusCode).toBe(400);
     expect((await post('/v1/p0/voice/leave', { lease_id: r.json().lease_id })).json()).toEqual({ ok: true });
     await app.close();
   });

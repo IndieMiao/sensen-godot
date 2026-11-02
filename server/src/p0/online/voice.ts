@@ -211,6 +211,9 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice): void {
   const answer = (reply: { code(n: number): { send(b: object): unknown } }, r: Refusal | Record<string, unknown>) =>
     'status' in r && typeof r.status === 'number' && 'code' in r ? reply.code(r.status).send({ ok: false, code: r.code }) : reply.code(200).send(r);
   const body = (b: unknown) => (b && typeof b === 'object' ? b : {}) as Record<string, unknown>;
+  // a peer id as the grant and voice_blocks write it ("2", LiveKit's identity) or as a number: both (蒙恬 on #647)
+  const peerOf = (v: unknown): number | null => typeof v === 'number' ? (Number.isInteger(v) ? v : null)
+    : typeof v === 'string' && /^\d{1,5}$/.test(v) ? Number(v) : null;
   const unauth = { code: 'UNAUTHENTICATED', status: 401 };
   app.get('/v1/p0/voice/status', async (req, reply) => {
     const p = playerOf(req.headers);
@@ -241,13 +244,15 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice): void {
   app.post('/v1/p0/voice/block', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
     if (!p) return answer(reply, unauth);
-    if (!Number.isInteger(b.peer) || typeof b.on !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
-    return answer(reply, voice.block(p, Number(b.peer), b.on));
+    const peer = peerOf(b.peer);
+    if (peer === null || typeof b.on !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
+    return answer(reply, voice.block(p, peer, b.on));
   });
   app.post('/v1/p0/voice/report', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);
     if (!p) return answer(reply, unauth);
-    if (!Number.isInteger(b.peer)) return answer(reply, { code: 'SCHEMA', status: 400 });
-    return answer(reply, voice.report(p, Number(b.peer), typeof b.reason === 'string' ? b.reason : ''));
+    const peer = peerOf(b.peer);
+    if (peer === null) return answer(reply, { code: 'SCHEMA', status: 400 });
+    return answer(reply, voice.report(p, peer, typeof b.reason === 'string' ? b.reason : ''));
   });
 }
