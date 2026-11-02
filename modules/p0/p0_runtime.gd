@@ -1103,6 +1103,16 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	_dex_energy.erase(id)
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
+## q(270) ⑥'s toast for a Market Board request taken or handed in in the wrong city (379 6760e0f8, no new copy): its
+## hand-in row as Today writes it (`Deliver at Shibuya Market Square · Tokyo`, P0PinReason.market_at); a view that no
+## longer has the request names the server's city as that row does without a square's name (`Deliver at the market ·
+## Tokyo`), never the code.
+static func wrong_city_line(view: Dictionary, request: String, city: String) -> String:
+	var r := PinReason.request_of(view, request)
+	if str(r.get("deliver", "")) != "": return str(r.deliver)
+	var name := str(P0Clusters.get_cluster(city).get("name", "")) if city != "" else ""
+	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
+
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
@@ -1120,6 +1130,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if not r.is_empty():
 			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
+		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
+		return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})

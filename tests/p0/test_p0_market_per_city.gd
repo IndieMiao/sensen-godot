@@ -83,3 +83,20 @@ func test_the_limit_reached_row_of_another_citys_request_ends_with_its_city() ->
 	v.firsts = ["harvest:crop_radish", "catch:fish_crucian", "cook:dish_grilled_crucian"]
 	var lines: Array = P0Logic.today_rows(v).map(func(r): return str(r.line))
 	assert_array(lines).contains(["Dusk Haul · Limit reached · 9h 12m · Hayward", "Fresh Greens · Limit reached · 9h 12m"])
+
+## q(270) ⑥ (379 6760e0f8): another city's request taken or handed in in the wrong city — the server's wrong_city — says
+## where it goes in the toast, its hand-in row; a view without it (gone stale) names the server's city; never the code.
+func test_wrong_city_toasts_where_the_request_goes() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var away := _req("dusk-hay").merged({"cluster": "gn-5355933", "city": "Hayward", "home": false,
+		"deliver_place": "gn-5355933~market0", "deliver_name": "Acorn Market Square"}, true)
+	rt.session.view = _view({"title": "Market Board", "home": true, "slots": []}, [away])
+	rt._on_refused("wrong_city", {"city": "gn-5355933"}, {"type": "deliver", "request": "dusk-hay"})
+	assert_str(rt.ui.toast_text()).is_equal("Deliver at Acorn Market Square · Hayward")
+	rt.session.view = _view({"title": "Market Board", "home": true, "slots": []}, [])   # the request gone from the view
+	rt._on_refused("wrong_city", {"city": "gn-5355933"}, {"type": "accept", "request": "dusk-hay"})
+	assert_str(rt.ui.toast_text()).is_equal("Deliver at the market · Hayward")
+	assert_str(rt.ui.toast_text()).not_contains("wrong_city")
+	assert_str(P0Runtime.wrong_city_line({}, "", "")).is_equal("Deliver at the market")   # no city either
