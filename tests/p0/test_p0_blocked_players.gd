@@ -10,11 +10,17 @@ const TIPS := "user://test_p0_blocked_players_tips.json"
 var blocks: Array = []
 var asked: Array = []
 var unblock_ok := true
+var blocks_ok := true
+var status_ok := true
+var during_blocks := Callable()
 
 func before_test() -> void:
 	blocks = [{"handle": "5dd4a1b2c3d4e5f6"}, {"handle": "e57e0a1b2c3d4e5f"}]
 	asked = []
 	unblock_ok = true
+	blocks_ok = true
+	status_ok = true
+	during_blocks = Callable()
 
 func after_test() -> void:
 	for f in [STORE, TIPS]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
@@ -35,8 +41,10 @@ func _ui() -> P0Ui:
 	acc.request = func(_m: int, path: String, body: Dictionary) -> Dictionary:
 		asked.append([path.get_file(), body])
 		match path.get_file():
-			"status": return {"ok": true, "json": {"available": false, "age": "unknown"}}
-			"blocks": return {"ok": true, "json": {"blocked": blocks.duplicate()}}
+			"status": return {"ok": true, "json": {"available": false, "age": "unknown"}} if status_ok else {"ok": false, "json": {}}
+			"blocks":
+				if during_blocks.is_valid(): during_blocks.call()
+				return {"ok": true, "json": {"blocked": blocks.duplicate()}} if blocks_ok else {"ok": false, "json": {}}
 			"unblock":
 				if unblock_ok: blocks = blocks.filter(func(b): return b.handle != body.handle)
 				return {"ok": unblock_ok, "json": {}}
@@ -99,3 +107,51 @@ func test_an_unblock_that_did_not_go_through_puts_the_row_back() -> void:
 	(_page(ui).body.find_child("Blocked_5dd4a1b2c3d4e5f6", true, false).find_child("Unblock", true, false) as Button).pressed.emit()
 	await await_millis(50)
 	assert_array(_labels(_page(ui).body)).is_equal(["Traveller 5dd4", "Unblock", "Traveller e57e", "Unblock"])
+
+## A list not read (blocked_list null, 后裔 ed9c83b2) is never `No one blocked` (不知火舞 384 6e014af3): none read this
+## launch, the page shows the empty state and Retry, which reads again only when tapped; once one is read, a failed read
+## leaves it as it was.
+func test_a_list_never_read_shows_retry_and_a_read_one_stays() -> void:
+	var ui := await _ui()
+	blocks_ok = false
+	ui.open_blocked_players(func(): ui.open_settings())
+	await await_millis(50)
+	var page := _page(ui)
+	assert_array(_labels(page.body)).is_equal(["Check your connection and try again.", "Retry"])
+	assert_bool(_labels(page.body).has("No one blocked")).is_false()
+	var reads := asked.filter(func(a): return a[0] == "blocks").size()
+	await await_millis(100)
+	assert_int(asked.filter(func(a): return a[0] == "blocks").size()).is_equal(reads)   # no retry by itself
+	blocks_ok = true
+	(page.body.find_child("Retry", true, false) as UiCommandButton).activated.emit()
+	await await_millis(50)
+	assert_array(_labels(_page(ui).body)).is_equal(["Traveller 5dd4", "Unblock", "Traveller e57e", "Unblock"])
+	blocks_ok = false
+	ui.open_blocked_players(func(): ui.open_settings())
+	await await_millis(50)
+	assert_array(_labels(_page(ui).body)).is_equal(["Traveller 5dd4", "Unblock", "Traveller e57e", "Unblock"])
+
+## Settings while the list was never read: the row without a number while voice is offered; no group when the status
+## is not read either (不知火舞 384 6e014af3).
+func test_settings_without_a_read_list() -> void:
+	var page := P0SettingsPage.settings("dev", 0.0, 0.0, {}, "", P0SettingsPage.BLOCKED_UNREAD)
+	add_child(auto_free(page))
+	assert_array(_labels(page.body.find_child("BlockedPlayers", true, false))).is_equal(["Blocked players", "›"])
+	var ui := await _ui()
+	blocks_ok = false
+	status_ok = false
+	ui.open_settings()
+	await await_millis(50)
+	assert_object(_page(ui).body.find_child("BlockedPlayers", true, false)).is_null()
+
+## A list read before an Unblock answers after it: dropped, the row does not come back (周瑜 on #667).
+func test_a_list_read_before_an_unblock_is_dropped() -> void:
+	var ui := await _ui()
+	await ui._privacy_read(func(): pass)
+	var reopened := [false]
+	during_blocks = func():   # an Unblock goes out while this read is out
+		ui._unblocks += 1
+		during_blocks = Callable()
+	await ui._privacy_read(func(): reopened[0] = true)
+	assert_bool(reopened[0]).is_false()
+	assert_int(ui._blocked.size()).is_equal(2)   # left as it was: the Unblock's own answer takes the row out

@@ -3617,7 +3617,7 @@ func open_settings(back := Callable()) -> void:
 	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
 		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
-		_blocked.size() if _privacy_shown else -1)
+		(_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD) if _privacy_shown else P0SettingsPage.BLOCKED_NONE)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3638,28 +3638,43 @@ func open_settings(back := Callable()) -> void:
 ## voice is offered here, or while anyone is blocked (a block outlives the switch going off, and an iPhone has none).
 var voice_account: Node
 var _blocked: Array = []        # [{handle, name}] as last read, the server's order
+var _blocked_read := false      # read once at least this launch: before that an empty list is not `No one blocked`
+var _blocked_failed := false    # and the last try failed: the Blocked page's empty state and Retry
 var _privacy_shown := false
+var _unblocks := 0              # Unblocks sent: a read begun before one is dropped (its list may still hold them, 周瑜 #667)
 
-## The server asked again; `then` when what the pages show has changed (they are opened again with it).
+## The server asked again; `then` when what the pages show has changed (they are opened again with it). A list that
+## was not read (blocked_list null, 后裔 ed9c83b2) keeps the last one read; none read this launch, the Privacy group
+## stays only while voice is offered (its row without a number) and the page shows the empty state (不知火舞 6e014af3).
 func _privacy_read(then: Callable) -> void:
 	if voice_account == null: return
+	var unblocks := _unblocks
 	await voice_account.call("fetch_status")
-	var rows: Array = await voice_account.call("blocked_list")
+	var got = await voice_account.call("blocked_list")
+	if unblocks != _unblocks: return
 	# offered as a room's would be (P0VoiceRoom.offered) — its own Voice left unset: it never joins or leaves a call
 	var phone = get_node_or_null("/root/Voice")
 	var offered: bool = bool(voice_account.get("available")) and str(voice_account.get("age")) != "no" \
 		and phone != null and bool(phone.call("supported"))
-	var shown := offered or not rows.is_empty()
-	if shown == _privacy_shown and rows == _blocked: return
-	_privacy_shown = shown
-	_blocked = rows
-	then.call()
+	var was := [_privacy_shown, _blocked, _blocked_read, _blocked_failed]
+	if got is Array:
+		_blocked = got
+		_blocked_read = true
+		_blocked_failed = false
+	elif not _blocked_read: _blocked_failed = true
+	_privacy_shown = offered or not _blocked.is_empty()
+	if was != [_privacy_shown, _blocked, _blocked_read, _blocked_failed]: then.call()
 
 func open_blocked_players(back: Callable) -> void:
-	var page := P0SettingsPage.blocked_players(_blocked, safe_top(), safe_bottom())
+	var page := P0SettingsPage.blocked_players(_blocked, safe_top(), safe_bottom(),
+		"ok" if _blocked_read else ("failed" if _blocked_failed else "reading"))
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
-	page.open_pressed.connect(func(handle: String): _unblock(handle, back))
+	page.open_pressed.connect(func(what: String):
+		if what == "retry":   # Retry only when tapped, nothing by itself
+			_blocked_failed = false
+			open_blocked_players(back)
+		else: _unblock(what, back))
 	_open_modal(page, 0.0, true)
 	modal_kind = "blocked_players"
 	_modal_back = back
@@ -3667,6 +3682,7 @@ func open_blocked_players(back: Callable) -> void:
 
 ## Unblock: the page has taken the row away already (no card, no toast); a failure puts it back with the network's line.
 func _unblock(handle: String, back: Callable) -> void:
+	_unblocks += 1
 	if await voice_account.call("unblock", handle):
 		_blocked = _blocked.filter(func(r): return str(r.handle) != handle)
 		return

@@ -21,9 +21,12 @@ extends Control
 ##             the voice blocks, the only way to lift one now that the two never see each other in a room. A row each in
 ##             one card, the name as their name tag writes it (`Traveller 5dd4`) and the people drawer's text key
 ##             `Unblock`; a tap takes the row away at once — no card, no toast — and emits open_pressed(handle). No one:
-##             `No one blocked`, secondary, centred. No date under a name: the server keeps none (后裔 on #661).
+##             `No one blocked`, secondary, centred — only once the list has been read. Never read this launch and
+##             the read failed: in the list's place the empty state (wifi_off, `Check your connection and try again.`)
+##             and `Retry` (Compact secondary), as the home pick's error (不知火舞 384 6e014af3); Retry emits
+##             open_pressed("retry"), nothing retries by itself. No date under a name: the server keeps none (后裔 #661).
 ## Emits back_pressed, open_pressed(what): "licenses", a row id, or a Map data row ("mapbox_site", "osm_site",
-## "improve", "notifications", "system_settings", "blocked_players"), a blocked player's handle on BLOCKED;
+## "improve", "notifications", "system_settings", "blocked_players"), a blocked player's handle or "retry" on BLOCKED;
 ## toggled(what, on): "telemetry", "crops_ready".
 
 signal back_pressed
@@ -40,8 +43,12 @@ const _CONTENT_GAP := 12    # header → content (SET-LICENSES: 64 → 76)
 const _GROUP_GAP := 8       # group title → its card → the next title
 const _BODY_SIZE := 13      # the licence text: Regular 13 (Caption R12 a step up; no 13 Regular style exported)
 const _PARAGRAPH_GAP := 8
-const _EMPTY_TOP := 32      # BLOCKED's `No one blocked` under the header (BP3)
+const _EMPTY_TOP := 15      # BLOCKED's `No one blocked` under the header: 68 from its middle (BP3)
 const NO_ONE_BLOCKED := "No one blocked"
+const READ_FAILED := "Check your connection and try again."
+## settings(blocked): no Privacy group, or the row with no number (the list not read this launch)
+const BLOCKED_NONE := -1
+const BLOCKED_UNREAD := -2
 ## A long text (Mapbox's LICENSE.md: 660 paragraphs, about 0.3 s laid out at once on a desktop) opens with its first
 ## screens and fills in the rest a batch a frame, so the page is up at once.
 const _FIRST_PARAGRAPHS := 30
@@ -93,9 +100,10 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
 ## `Set for good`. No home (a view not in yet): no Home group. `notifications` "On" / "Off": one row, `Notifications`
 ## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group. `blocked` ≥ 0: the
-## `Privacy` group before Legal, one row `Blocked players` with how many ›, 0 too (BP1, SGODOT-384); −1: none.
+## `Privacy` group before Legal, one row `Blocked players` with how many ›, 0 too (BP1, SGODOT-384); BLOCKED_UNREAD the
+## row with › alone (not read this launch); BLOCKED_NONE no group.
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
-		blocked := -1) -> P0SettingsPage:
+		blocked := BLOCKED_NONE) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -113,8 +121,8 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
 	page._group("", [tests])
-	if blocked >= 0:
-		var privacy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked))
+	if blocked != BLOCKED_NONE:
+		var privacy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked) if blocked >= 0 else "")
 		privacy.name = "BlockedPlayers"
 		privacy.pressed.connect(func(): page.open_pressed.emit("blocked_players"))
 		page._group("Privacy", [privacy])
@@ -183,8 +191,9 @@ static func notifications(on: bool, refused_for: String, safe_top := 0.0, safe_b
 	page._group("", [crops])
 	return page
 
-## BLOCKED: `rows` [{handle, name}] in the server's order.
-static func blocked_players(rows: Array, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+## BLOCKED: `rows` [{handle, name}] in the server's order; `read` "ok" (as last read), "reading" (not yet: nothing
+## shown, never `No one blocked`) or "failed" (never read this launch: the empty state and Retry).
+static func blocked_players(rows: Array, safe_top := 0.0, safe_bottom := 0.0, read := "ok") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.BLOCKED, "Blocked players", safe_top, safe_bottom)
 	var list: Array = []
 	for r in rows:
@@ -201,8 +210,9 @@ static func blocked_players(rows: Array, safe_top := 0.0, safe_bottom := 0.0) ->
 		key.pressed.connect(func(): page._unblocked(row, handle))
 		row.find_child("Row", true, false).add_child(key)
 		list.append(row)
-	if list.is_empty(): page._no_one()
-	else: page._group("", list)
+	if not list.is_empty(): page._group("", list)
+	elif read == "ok": page._no_one()
+	elif read == "failed": page._read_failed()
 	return page
 
 ## BLOCKED: the row goes at once, the card closing up; the last one leaves `No one blocked`.
@@ -214,6 +224,24 @@ func _unblocked(row: Control, handle: String) -> void:
 		for c in body.get_children(): c.queue_free()
 		_no_one()
 	open_pressed.emit(handle)
+
+func _read_failed() -> void:
+	var gap := Control.new()
+	gap.custom_minimum_size.y = _EMPTY_TOP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(gap)
+	var box := VBoxContainer.new()
+	box.name = "Error"
+	box.add_theme_constant_override(&"separation", 4)
+	box.add_child(UiEmptyState.new(READ_FAILED, preload("res://assets/ui/kit_icons/wifi_off.svg")))
+	var retry := UiCommandButton.new("Retry", UiCommandButton.Kind.SECONDARY, true)
+	retry.name = "Retry"
+	retry.fit_text = true
+	retry.min_width = 68   # Compact/Command: hugs its label, at least 68
+	retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	retry.activated.connect(func(): open_pressed.emit("retry"))
+	box.add_child(retry)
+	body.add_child(box)
 
 func _no_one() -> void:
 	var gap := Control.new()
