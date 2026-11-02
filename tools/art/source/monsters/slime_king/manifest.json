@@ -84,23 +84,23 @@
       "surfaces": 1,
       "bounds": [
         [
-          -0.23000000417232513,
-          -0.5781897902488708,
-          -0.8349999785423279
+          -0.5099999904632568,
+          -0.7297502160072327,
+          -0.8650000095367432
         ],
         [
-          0.23000000417232513,
-          0.07313036918640137,
-          0.38999998569488525
+          0.5099999904632568,
+          0.1075068861246109,
+          0.7599999904632568
         ]
       ],
       "dimensions_m": [
-        0.46000000834465027,
-        0.6513201594352722,
-        1.2249999642372131
+        1.0199999809265137,
+        0.8372571021318436,
+        1.625
       ],
       "triangle_limit": 800,
-      "sha256": "e5ce2f28d2aaffb60002f84b7175ddeba51b04a195ca360c0b3c0b707aa9b7b3",
+      "sha256": "4fdbe9f204181745675a86fd7a519889210f92faeafce8b5bcdd2b02b4ac31ff",
       "anchors": [],
       "pivot": "head contact centre; rear along -Z",
       "slime_radius": 1.0,
@@ -113,33 +113,34 @@
       "preview_body_tint": "8FAEB9",
       "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt",
       "notes": [
-        "Five separate rounded iron-blue plates, visible forehead guard, eight rivets, fitted down the back."
+        "v1.1: wide contiguous blue-grey helmet shell with a forehead guard wider than the eyes.",
+        "Darker iron centre, warm worn edges and eight bright rivets; same attachment origin and UID."
       ]
     },
     {
       "name": "quartz_cluster",
       "file": "assets/monsters/slime_king/quartz_cluster.glb",
-      "triangles": 368,
+      "triangles": 280,
       "surfaces": 1,
       "bounds": [
         [
-          -0.24414999783039093,
-          -0.04008891433477402,
-          -0.24580000340938568
+          -0.3402000069618225,
+          -0.04650876298546791,
+          -0.2981008291244507
         ],
         [
-          0.23890000581741333,
-          0.5073888897895813,
-          0.14614999294281006
+          0.352400004863739,
+          0.5374770164489746,
+          0.15875190496444702
         ]
       ],
       "dimensions_m": [
-        0.48305000364780426,
-        0.5474778041243553,
-        0.39194999635219574
+        0.6926000118255615,
+        0.5839857794344425,
+        0.4568527340888977
       ],
       "triangle_limit": 800,
-      "sha256": "c32f87151596e58025d499a02623ee585bc25b0fd80125511dfe6d4301e06149",
+      "sha256": "0a5b746850c243d9262cbea3475f34db7eff3fc1cce80be9a3c4fd069eb75b54",
       "anchors": [],
       "pivot": "head contact centre; attach at Y=1.43*r",
       "slime_radius": 1.0,
@@ -148,11 +149,12 @@
         1.43,
         0
       ],
-      "column_count": 4,
+      "column_count": 5,
       "preview_body_tint": "D7B8CF",
       "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt",
       "notes": [
-        "Four rounded opaque quartz columns with pale pink bases and near-white tips; vertex colour only."
+        "v1.1: five outward-leaning faceted quartz prisms with different lengths and pointed tips.",
+        "White bases, faint lavender tips, alternating light/dark facets; opaque vertex colour only."
       ]
     }
   ]

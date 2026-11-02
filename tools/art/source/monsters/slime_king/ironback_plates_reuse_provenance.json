@@ -5,9 +5,10 @@
   "kind": "original procedural geometry",
   "asset": "ironback_plates",
   "source_blend": "tools/art/source/monsters/slime_king/ironback_plates.blend",
-  "runtime_sha256": "e5ce2f28d2aaffb60002f84b7175ddeba51b04a195ca360c0b3c0b707aa9b7b3",
+  "runtime_sha256": "4fdbe9f204181745675a86fd7a519889210f92faeafce8b5bcdd2b02b4ac31ff",
   "changes": [
-    "Five separate rounded iron-blue plates, visible forehead guard, eight rivets, fitted down the back."
+    "v1.1: wide contiguous blue-grey helmet shell with a forehead guard wider than the eyes.",
+    "Darker iron centre, warm worn edges and eight bright rivets; same attachment origin and UID."
   ],
   "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
 }

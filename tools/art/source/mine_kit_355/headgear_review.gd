@@ -1,5 +1,7 @@
 extends Node
 const MineCombat=preload("res://modules/mining/mine_combat.gd")
+const ContextArt=preload("res://modules/mining/mine_art.gd")
+const ContextCamera=preload("res://modules/farm/farm_camera.gd")
 var vp:SubViewport
 var world:Node3D
 var camera:Camera3D
@@ -53,7 +55,7 @@ func validate(model,spec):
 	check(model.find_children("*","CollisionObject3D",true,false).is_empty(),id+": no runtime collision")
 	var mesh:MeshInstance3D=meshes[0];var arrays=mesh.mesh.surface_get_arrays(0)
 	check(mesh.mesh.get_surface_count()==1,id+": one surface")
-	check(arrays[Mesh.ARRAY_INDEX].size()/3==spec.triangles and spec.triangles<=800,id+": measured triangles and budget")
+	check(arrays[Mesh.ARRAY_INDEX].size()/3==spec.triangles and spec.triangles<=spec.triangle_limit,id+": measured triangles and budget")
 	check(mesh.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,id+": imported shadows off")
 	var mat=mesh.get_active_material(0)
 	check(mat is StandardMaterial3D and mat.vertex_color_use_as_albedo and not mat.vertex_color_is_srgb and mat.albedo_texture==null,id+": linear vertex paint, no texture")
@@ -84,6 +86,53 @@ func contact(model):
 	return {"minimum_gap_m":minimum,"samples":samples,"penetrating_samples":penetrating,
 		"method":"Downward physics rays on actual unmodified _slime_body(1.0); only 0.04 m radius top opening capped"}
 
+func mine_lighting():
+	var environment=world.find_children("*","WorldEnvironment",true,false)[0].environment
+	environment.background_color=Color("242125");environment.ambient_light_color=Color("e8dfea");environment.ambient_light_energy=.48
+	var sun=world.find_children("*","DirectionalLight3D",true,false)[0]
+	sun.rotation_degrees=Vector3(-51,-38,0);sun.light_color=Color("ffe8ce");sun.light_energy=1.15;sun.shadow_opacity=.58
+	sun.shadow_bias=.04;sun.shadow_normal_bias=.45;sun.shadow_blur=1.6
+
+func reference_player(parent):
+	var avatar=Avatar.create_rig()
+	for child in avatar.get_children():
+		if child is RigActivity:child.free()
+	avatar.assembler=AvatarAssemblerMerged.new();parent.add_child(avatar);avatar.apply_config(Avatar.slot_table.default_config())
+	var ticks=0
+	while avatar.is_busy() and ticks<900:await get_tree().process_frame;ticks+=1
+	check(not avatar.is_busy(),"Actual reference player assembled")
+	avatar.play_motion("idle");var anim=avatar.get_node("AnimationPlayer");anim.seek(.3,true);anim.pause()
+	var lo=INF;var hi=-INF
+	for node in avatar.find_children("*","MeshInstance3D",true,false):
+		if node.mesh==null or not node.is_visible_in_tree():continue
+		var mesh=node.bake_mesh_from_current_skeleton_pose() if node.skin!=null else node.mesh
+		if mesh==null:continue
+		for i in mesh.get_surface_count():
+			for vertex in mesh.surface_get_arrays(i)[Mesh.ARRAY_VERTEX]:
+				var p=avatar.global_transform.affine_inverse()*node.global_transform*vertex;lo=minf(lo,p.y);hi=maxf(hi,p.y)
+	avatar.scale=Vector3.ONE*1.745/(hi-lo);avatar.position=Vector3(3.0,-lo*avatar.scale.y,-3.8);avatar.rotation_degrees.y=180
+	return avatar
+
+func mine_contexts(manifest):
+	mine_lighting();report.mine_contexts=[]
+	for floor_number in [1,3]:
+		var fixture=Node3D.new();world.add_child(fixture);fixture.add_child(ContextArt.floor_scenery(floor_number,false))
+		await reference_player(fixture)
+		var combat=MineCombat.new();var slime=combat._slime({"radius":1.0},false);fixture.add_child(slime);combat.free()
+		slime.position=Vector3(4.9,0,-3.8)
+		for name in ["HealthFill","HealthTrack","Health"]:slime.get_node(name).visible=false
+		for spec in manifest.assets:
+			var model=load("res://"+spec.file).instantiate();slime.add_child(model);model.position.y=1.43
+			(slime.get_node("Body").material_override as StandardMaterial3D).albedo_color=Color(spec.preview_body_tint)
+			vp.size=Vector2i(360,800);camera.size=ContextCamera.close_view_size(Vector2(360,800))/.8
+			ContextCamera.place(camera,Vector3(4.2,.7,-3.8))
+			var name=spec.name+("_red_mine_43deg" if floor_number==1 else "_purple_mine_43deg")
+			await capture(name)
+			report.mine_contexts.append({"id":name,"floor":floor_number,"slime_radius_m":1.0,"player_height_m":1.745,"camera_zoom":.8,"width_m":camera.size})
+			model.queue_free();await get_tree().process_frame
+		fixture.queue_free();await get_tree().process_frame
+	check(report.mine_contexts.size()==6,"All three headpieces in both mines, with actual player")
+
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output);setup()
 	var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://assets/monsters/slime_king/manifest.json"))
@@ -105,7 +154,8 @@ func run():
 		if spec.name=="ironback_plates":
 			pose(145,43,2.8,Vector3(0,.93,0));await capture(spec.name+"_mounted_rear")
 		report.assets[spec.name]=row;model.queue_free();await get_tree().process_frame
-	proxy.queue_free();slime.queue_free()
+	proxy.queue_free();slime.queue_free();await get_tree().process_frame
+	await mine_contexts(manifest)
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","Actual Mobile renderer")
 	report.passed=report.checks.all(func(c):return c.passed)

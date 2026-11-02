@@ -2,7 +2,11 @@
 from pathlib import Path
 import math
 import sys
+import json
+import argparse
 import bpy
+from mathutils import Vector
+from mathutils.bvhtree import BVHTree
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'mine_kit_355'))
 import static_asset as s
 
@@ -71,7 +75,7 @@ def plate(name,cx,cz,width,depth,color):
                 if i in [0,4] and j in [0,4]:px*=.92;pz*=.86
                 xx=cx+px;zz=cz+pz;edge=i in [0,4] or j in [0,4]
                 y=height(xx,zz)-TOP+.003+(0 if layer==0 else .036 if edge else .052)
-                points.append((xx,y,zz));colors.append('61768C' if layer==0 else '9CAFBE' if edge else color)
+                points.append((xx,y,zz));colors.append('354552' if layer==0 else 'AD9875' if edge else color)
     faces=[]
     for layer in range(2):
         for j in range(4):
@@ -84,41 +88,64 @@ def plate(name,cx,cz,width,depth,color):
 
 
 def ironback():
-    s.start('ironback_plates');specs=[('Forehead guard',0,.29,.42,.20),('Top cap plate',0,.035,.46,.23),
-        ('Upper back plate',0,-.225,.44,.20),('Mid back plate',0,-.475,.40,.20),('Lower back plate',0,-.725,.32,.22)]
+    s.start('ironback_plates');specs=[('Wide forehead guard',0,.65,.94,.22),('Front helmet shell',0,.31,.96,.42),
+        ('Top helmet shell',0,-.10,1.02,.40),('Upper back shell',0,-.49,.94,.34),('Lower back shell',0,-.765,.72,.20)]
     for index,(name,x,z,w,d) in enumerate(specs):
-        lift=plate(name,x,z,w,d,'8398AF')
+        plate(name,x,z,w,d,'4B6072')
+        obj=s.PARTS[-1];obj.data.calc_loop_triangles()
+        tree=BVHTree.FromPolygons([v.co for v in obj.data.vertices],[t.vertices for t in obj.data.loop_triangles],all_triangles=True)
         for dx in ([-w*.28,w*.28] if index in [0,2,4] else [0]):
-            y=height(x+dx,z)-TOP+.057+lift
-            s.ellipsoid(name+' round rivet '+str(dx),(x+dx,y,z),(.038,.018,.038),'D2DFE5',6,3)
+            hit,normal,_,_=tree.ray_cast(s.vector((x+dx,2,z)),Vector((0,0,-1)))
+            assert hit is not None
+            if normal.z<0:normal=-normal
+            centre=hit+normal*.009
+            rivet=s.ellipsoid(name+' round rivet '+str(dx),s.world(centre),(.047,.022,.047),'E0C99C',6,3)
+            rotation=Vector((0,0,1)).rotation_difference(normal)
+            for vertex in rivet.data.vertices:vertex.co=centre+rotation@(vertex.co-centre)
     return s.export('ironback_plates',DIRECTORY,SOURCE,800,{'pivot':'head contact centre; rear along -Z',
         'slime_radius':1.0,'attachment_position':[0,TOP,0],'plate_count':5,
         'preview_body_tint':'8FAEB9','reference':'mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt',
-        'notes':['Five separate rounded iron-blue plates, visible forehead guard, eight rivets, fitted down the back.']})
+        'notes':['v1.1: wide contiguous blue-grey helmet shell with a forehead guard wider than the eyes.',
+            'Darker iron centre, warm worn edges and eight bright rivets; same attachment origin and UID.']})
 
 
 def quartz():
     s.start('quartz_cluster',.60)
-    columns=[(0,0,.09,.50,0,.018),(-.15,.07,.065,.32,-.045,.02),(.14,.045,.07,.37,.045,.015),(.015,-.16,.06,.28,.01,-.04)]
+    columns=[(0,0,.09,.53,.015,-.015),(-.15,.065,.075,.36,-.16,.04),
+        (.15,.045,.08,.42,.17,.025),(-.095,-.14,.065,.31,-.095,-.14),(.09,-.13,.07,.46,.10,-.14)]
     for index,(x,z,r,h,lean_x,lean_z) in enumerate(columns):
-        n=8;points=[];colors=[];profiles=[(0,.82),(.035,1),(.72,.95),(.90,.78),(.98,.40),(1,.12)]
+        n=6;points=[];colors=[];profiles=[(0,.82),(.045,1),(.72,1),(.88,.62),(1,.035)]
         for row,(t,rr) in enumerate(profiles):
             for i in range(n):
                 a=math.tau*i/n;xx=x+math.cos(a)*r*rr+lean_x*t;zz=z+math.sin(a)*r*rr+lean_z*t
                 bottom=height(xx,zz)-TOP+.003
                 y=bottom if row==0 else height(x,z)-TOP+t*h
-                points.append((xx,y,zz));colors.append(['CDB4C7','E5D3DF','F4E9EC','F9F3F2','FFFDF6','FFFEFA'][row])
-        faces=[(row*n+i,row*n+(i+1)%n,(row+1)*n+(i+1)%n,(row+1)*n+i) for row in range(5) for i in range(n)]
-        faces += [tuple(reversed(range(n))),tuple(5*n+i for i in range(n))]
-        obj=s.mesh('Rounded quartz column '+str(index+1),points,faces,'F4E9EC',vertex_colors=colors);fit(obj)
+                points.append((xx,y,zz));colors.append(['F5F3EA','FFFDF4','F0F0F3','D7C6E8','CAB7DD'][row])
+        faces=[(row*n+i,row*n+(i+1)%n,(row+1)*n+(i+1)%n,(row+1)*n+i) for row in range(4) for i in range(n)]
+        faces += [tuple(reversed(range(n))),tuple(4*n+i for i in range(n))]
+        obj=s.mesh('Faceted pointed quartz column '+str(index+1),points,faces,'FFFDF4',False,colors);fit(obj)
+        paint=obj.data.color_attributes['Color']
+        for poly in obj.data.polygons:
+            # Real prism faces alternate in value without transparent materials.
+            gain=[1.0,.83,.95,.88,1.0,.86][poly.index%6]
+            for loop_index in poly.loop_indices:
+                color=paint.data[loop_index].color
+                paint.data[loop_index].color=tuple(color[i]*gain if i<3 else color[i] for i in range(4))
     return s.export('quartz_cluster',DIRECTORY,SOURCE,800,{'pivot':'head contact centre; attach at Y=1.43*r',
-        'slime_radius':1.0,'attachment_position':[0,TOP,0],'column_count':4,
+        'slime_radius':1.0,'attachment_position':[0,TOP,0],'column_count':5,
         'preview_body_tint':'D7B8CF','reference':'mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt',
-        'notes':['Four rounded opaque quartz columns with pale pink bases and near-white tips; vertex colour only.']})
+        'notes':['v1.1: five outward-leaning faceted quartz prisms with different lengths and pointed tips.',
+            'White bases, faint lavender tips, alternating light/dark facets; opaque vertex colour only.']})
 
 
 def main():
-    assets=[crown(),ironback(),quartz()]
+    parser=argparse.ArgumentParser();parser.add_argument('--only',nargs='+')
+    args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    builders={'crown':crown,'ironback_plates':ironback,'quartz_cluster':quartz}
+    previous={}
+    if args.only:
+        previous={row['name']:row for row in json.loads((s.RUNTIME/DIRECTORY/'manifest.json').read_text())['assets']}
+    assets=[build() if not args.only or name in args.only else previous[name] for name,build in builders.items()]
     manifest={'task':'SGODOT-355','group':'headgear','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
         'axes':'metres; Y up; front +Z; normalized to slime radius 1.0',
         'attachment_origin':[0,TOP,0],'slime_profile':PROFILE,'slime_radial_segments':32,

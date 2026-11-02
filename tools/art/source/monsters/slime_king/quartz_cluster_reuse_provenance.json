@@ -5,9 +5,10 @@
   "kind": "original procedural geometry",
   "asset": "quartz_cluster",
   "source_blend": "tools/art/source/monsters/slime_king/quartz_cluster.blend",
-  "runtime_sha256": "c32f87151596e58025d499a02623ee585bc25b0fd80125511dfe6d4301e06149",
+  "runtime_sha256": "0a5b746850c243d9262cbea3475f34db7eff3fc1cce80be9a3c4fd069eb75b54",
   "changes": [
-    "Four rounded opaque quartz columns with pale pink bases and near-white tips; vertex colour only."
+    "v1.1: five outward-leaning faceted quartz prisms with different lengths and pointed tips.",
+    "White bases, faint lavender tips, alternating light/dark facets; opaque vertex colour only."
   ],
   "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
 }
