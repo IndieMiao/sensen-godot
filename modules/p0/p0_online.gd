@@ -10,6 +10,7 @@ signal seat_changed(id: int, seat: String)
 signal result(seq: int, ok: bool, code: String)
 signal failed(code: String)
 signal connection_changed(connected: bool)
+signal fishing(states: Array)            # a pond room's lines of the others (11-02): OnlineCrowd.fishing_snapshot's shape
 
 const PROTOCOL := 1
 const SEND_S := 0.1
@@ -117,6 +118,15 @@ func stand() -> int:
 	_act_seq += 1
 	_send({"t": "act", "seq": _act_seq, "epoch": epoch, "action": "stand"})
 	return _act_seq
+
+## A pond room's line (pond multiplayer, 11-02): {phase: casting|waiting|hook|playing|result|none, target?: [x, z],
+## held?, fish?, outcome?, fish_id?} as the fishing panel moves; the server shows it to the others in the room only.
+func fish(state: Dictionary) -> void:
+	if epoch == 0: return
+	var m := state.duplicate()
+	m["t"] = "fish"
+	m["epoch"] = epoch
+	_send(m)
 
 func seat_of(id: int) -> String:
 	return str(members.get(id, {}).get("seat", ""))
@@ -227,6 +237,11 @@ func _message(text: String) -> void:
 			result.emit(int(m.seq), bool(m.ok), str(m.get("code", "")))
 		"error":
 			failed.emit(str(m.get("code", "")))
+		"fishing":
+			if int(m.get("epoch", -1)) != epoch: return
+			var states: Array = m.get("members", []) if m.get("members", []) is Array else []
+			if crowd and crowd.has_method("fishing_snapshot"): crowd.call("fishing_snapshot", states)
+			fishing.emit(states)
 
 func _frame(data: PackedByteArray) -> void:
 	var tick := frame_tick(data)

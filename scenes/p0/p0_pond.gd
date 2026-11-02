@@ -30,6 +30,8 @@ const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")
 const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # P0's own ponds: San Francisco (SGODOT-270)
 const P0City := preload("res://modules/p0/p0_city.gd")
+const OnlineCrowd := preload("res://modules/net/online_crowd.gd")
+const P0Travel := preload("res://modules/p0/p0_travel.gd")
 ## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
 ## fit one view whole; the opening and the walk stay at 1.0, the farm's player scale.
 const FAR_ZOOM := 0.68
@@ -63,6 +65,14 @@ var _trap_open := false
 const COLLECT_HIDE_MS := 1400
 var _trap_hidden_s := 0.0   # what is left of it, in game time (frames, not the wall clock: a recording keeps it too)
 var _trap_mark := Vector2.INF   # the cage's point on screen this frame (its strip's, its floats' and flights' start)
+
+# Pond multiplayer (the user, 11-02 via 奕星; SGODOT-383): the pond is an online room of 8, `pond:<id>`, as an outpost is
+# — the others walk and fish in it; each one's fish are their own (the catch is each player's command on their own save).
+var crowd: Node3D   # an OnlineCrowd (tests give a stand-in)
+var online: P0Online
+var _line_sent: Dictionary = {"phase": "none"}   # the last line told the room (none yet: nothing to take in)
+var _line_left := 0.0             # the reel's hold and fish go at most every LINE_SEND_S
+const LINE_SEND_S := 0.25
 
 ## The pond id (P0Ponds): the session sends it with the entry read and every command from here (q(36)).
 func p0_place() -> String:
@@ -132,8 +142,14 @@ func _ready() -> void:
 	rt.attach(self)
 	rt.ui.set_mode("fish", P0City.chip_for(str(entry.get("name", "Pond")), str(entry.get("id", ""))))
 	_arrival_hint()
+	var c := OnlineCrowd.new()
+	c.show_health = false
+	crowd = c
+	add_child(crowd)   # pond metres: the scene's own, no room offset
+	_go_online(rt.session)
 
 func _exit_tree() -> void:
+	if online: online.stop()
 	_end_fishing()
 	if is_instance_valid(_trap_card): _trap_card.queue_free()
 	if rt: rt.detach(self)
@@ -160,6 +176,8 @@ func p0_tap(screen: Vector2) -> void:
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	_trap_hidden_s = maxf(0.0, _trap_hidden_s - dt)
+	_tell_line(dt)
+	if crowd and crowd.has_method("step"): crowd.call("step", dt, actor.position)   # the others, between their frames
 	if panel.visible:   # the fishing presentation owns the rig; the camera only pans to frame the cast
 		_frame_fishing(dt)
 		return
@@ -702,3 +720,76 @@ func _make_trap_float() -> Node3D:
 		root.add_child(mesh)
 	root.scale = Vector3.ONE * FLOAT_SCALE
 	return root
+
+
+# ---------------------------------------------------------------- the pond's online room (SGODOT-383)
+func _go_online(session: P0Session) -> void:
+	if session == null: return
+	if not session.is_node_ready(): await session.ready   # a pond booted first (dev) makes the runtime this frame
+	if not is_inside_tree(): return
+	var o := P0Online.new()
+	o.url = P0Online.ws_url(session.base_url)
+	o.player_id = session.player_id
+	o.access_key = session.access_key
+	o.version = session.version
+	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
+	attach_online(o)
+	online.start(room_id(), Vector2(actor.position.x, actor.position.z))
+
+## The pond's room on the server: `pond:<pond id>`.
+func room_id() -> String: return "pond:" + p0_place()
+
+## Wires a room connection to this pond: the crowd, our position and what we are doing (a line out: fishing_wait, the
+## reel: fishing_reel, as the others' rigs are posed), and a refused join.
+func attach_online(o: P0Online) -> void:
+	online = o
+	o.crowd = crowd
+	o.source = func(): return {"position": actor.position, "yaw": atan2(actor.facing().x, actor.facing().z), "action": _online_action()}
+	add_child(o)
+	o.failed.connect(_on_online_failed)
+
+func _online_action() -> String:
+	if panel and panel.visible:
+		if panel.phase in ["playing", "settling"]: return "fishing_reel"
+		if panel.phase in ["casting", "waiting", "hook"]: return "fishing_wait"
+	return "run" if actor.state == "move" else "idle"
+
+## The room refused the join (a pass gone, or the player not in that city, as an outpost's room can): back to the map for
+## the city's travel card, as a refused command here does (SGODOT-382) — the pond is no place to go back to.
+func _on_online_failed(code: String) -> void:
+	if not code in ["PASS_REQUIRED", "TRIP_EXPIRED", "TRAVEL_REQUIRED"] or rt == null or rt.world != self: return
+	var id := p0_place()
+	var cluster := str(entry.get("cluster", ""))
+	if cluster == "": cluster = id.substr(0, id.find("~")) if id.find("~") > 0 else P0Travel.written()   # as P0Map.cluster_of_entry
+	rt.after_leave = "travel:" + cluster
+	rt.return_to = "farm"
+	rt.leave_to_map()
+
+## What the room sees of our line: the panel's phase as it changes (its landing with a cast), the reel's hold and fish at
+## most every LINE_SEND_S, the result with the fish landed, and `none` once the line is in.
+func _tell_line(dt: float) -> void:
+	if online == null: return
+	_line_left -= dt
+	var line := line_state()
+	if line == _line_sent: return
+	var same_phase := str(line.get("phase", "")) == str(_line_sent.get("phase", ""))
+	if same_phase and _line_left > 0.0: return
+	_line_left = LINE_SEND_S
+	_line_sent = line
+	online.fish(line)
+
+## The line as the others draw it (OnlineCrowd.fishing_snapshot via the server): {phase: none} with no panel up.
+func line_state() -> Dictionary:
+	if panel == null or not panel.visible: return {"phase": "none"}
+	var phase := str(panel.phase)
+	if phase == "ready": return {"phase": "none"}
+	if phase == "settling": phase = "playing"
+	var out := {"phase": phase, "target": [snappedf(panel.landing.x, 0.01), snappedf(panel.landing.z, 0.01)]}   # always: a line starts where it lands
+	if phase == "playing":
+		out["held"] = bool(panel.held)
+		out["fish"] = snappedf(clampf(float(panel.model.get("fish", 0.5)), 0.0, 1.0), 0.05)
+	if phase == "result":
+		var r := panel.last_result()
+		out["outcome"] = "caught" if str(r.get("outcome", "")) == "caught" else "escaped"
+		if out.outcome == "caught": out["fish_id"] = str(r.get("fish_id", ""))
+	return out

@@ -13,8 +13,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
-import { generatedOutpostSpec, loadOutposts } from '../src/p0/online/outposts.js';
-import { roomPlace } from '../src/p0/world.js';
+import { generatedOutpostSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
+import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
@@ -68,7 +68,9 @@ const log = new P0EventLog(eventDir === '' ? undefined : eventDir, undefined, un
 // Generated outposts (SGODOT-280) get a room on first join, sized and walled like the room their art stands in for.
 const outpostTable = loadOutposts();
 const generatedRoom = generatedOutpostSpec(outpostTable, id => roomPlace(content, id));
-const rooms = new OutpostRooms(outpostTable, Date.now, generatedRoom);
+// Ponds (11-02, pond multiplayer): `pond:<id>`, a room of 8 for a pond the content knows, made on first join.
+const pondRoom = pondRoomSpec(id => !!placeOf(content, id));
+const rooms = new OutpostRooms(outpostTable, Date.now, id => pondRoom(id) ?? generatedRoom(id));
 // q(188) ① `Near you`: the address table made from DB-IP City Lite at image build (tools/ip_near_table.ts); none, no guess.
 let ipNear: IpNear | undefined;
 if (process.env.P0_IP_NEAR_TABLE) {
@@ -78,10 +80,12 @@ if (process.env.P0_IP_NEAR_TABLE) {
 registerP0Routes(app, { content, store, now: Date.now, dev, log, rooms, ipNear });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
-const pass = (player: string, outpost: string) => {
+// A pond's room checks the pond's city as entering the pond does (its city from the pond, never `pond:…`; home's are free).
+const pass = (player: string, room: string) => {
   const s = store.peek(player);
   if (!s) return null;
-  const r = requirePass(content, s, 'outpost', outpost, Date.now() + s.clock_ms, s.presence.entered === outpost ? 'rejoin' : undefined);
+  const pond = pondOfRoom(room), place = pond || room;
+  const r = requirePass(content, s, pond ? 'pond' : 'outpost', place, Date.now() + s.clock_ms, s.presence.entered === place ? 'rejoin' : undefined);
   return r ? r.code.toUpperCase() : null;
 };
 registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')) });
