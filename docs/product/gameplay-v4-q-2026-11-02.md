@@ -1,6 +1,6 @@
 # Gensen 玩法 v4 改动清单（v4q）
 
-- 状态：**2026-11-02 建档**：355 v4 方案定稿（用户 11-02「全按建议」，53 条）后新起的 q 文档；第一批 A–H 预留 v4q(1)–v4q(8)（台账：Plane「q 行台账（三）」）。 **2026-11-02（v4q(1)，已批）：Homestead 第一批开到 Lv17，三项技能门槛、田开局 8 块、Lv2–15 升级回 50、体力池与饭量同一公式。** **2026-11-02（v4q(2)，已批，用户明确点头）：第一批清档上线，存档 v7 以下一律清，不迁移、不补偿，设备本地「已看过」一起重置。** **2026-11-02（v4q(3)，已批）：野外地点全球一次生成、冻结，第一批开放浅坑和矿脉，能上地图（未开放的矿型灰钉）、能飞过去，最近 3 个永远免费，野外不盖章；离城中心下限 20 km（用户定）；最近 3 个免费是浅坑、铁矿脉、石英矿脉各一。** **2026-11-02（v4q(4)，已批：第一段 11-02，⑥ 引导 11-02 晚）：农场 6 个采集点搬出，改为城里采集点（地图图钉 + 卡片），每次 3 体力、冷却 4 小时、先进背包；新手引导 v4（S6a 采集、S7a 升级、委托 2 改 Four Radishes）。** **2026-11-02（v4q(5)，已批）：矿搬出家城，第一批浅坑和矿脉（到 F40），清完怪就开梯子，每座矿各记进度和电梯，取消每天 2 局和 Express，矿口卡，第一批就记击杀。** **2026-11-02（v4q(6)，已批）：第一批新怪蝙蝠、岩甲虫、菇菇怪，史莱姆王和矿脉的两只换色守关，换色精英，新掉落。** **2026-11-02（v4q(7)，已批）：武器槽第一批上，铜剑由 Pip「第一次下矿」委托给，铁剑工作台做，回血药 Lv4 驿站上架，武器低于守关一档每下伤害减半。** **2026-11-02（v4q(8)，已批）：移除特产换料，矿物只从矿里来。**
+- 状态：**2026-11-02 建档**：355 v4 方案定稿（用户 11-02「全按建议」，53 条）后新起的 q 文档；第一批 A–H 预留 v4q(1)–v4q(8)（台账：Plane「q 行台账（三）」）。 **2026-11-02（v4q(1)，已批）：Homestead 第一批开到 Lv17，三项技能门槛、田开局 8 块、Lv2–15 升级回 50、体力池与饭量同一公式。** **2026-11-02（v4q(2)，已批，用户明确点头）：第一批清档上线，存档 v7 以下一律清，不迁移、不补偿，设备本地「已看过」一起重置。** **2026-11-02（v4q(3)，已批）：野外地点全球一次生成、冻结，第一批开放浅坑和矿脉，能上地图（未开放的矿型灰钉）、能飞过去，最近 3 个永远免费，野外不盖章；离城中心下限 20 km（用户定）；最近 3 个免费是浅坑、铁矿脉、石英矿脉各一。** **2026-11-02（v4q(4)，已批：第一段 11-02，⑥ 引导 11-02 晚）：农场 6 个采集点搬出，改为城里采集点（地图图钉 + 卡片），每次 3 体力、冷却 4 小时、先进背包；新手引导 v4（S6a 采集、S7a 升级、委托 2 改 Four Radishes）。** **2026-11-02（v4q(5)，已批）：矿搬出家城，第一批浅坑和矿脉（到 F40），清完怪就开梯子，每座矿各记进度和电梯，取消每天 2 局和 Express，矿口卡，第一批就记击杀。** **2026-11-02（v4q(6)，已批）：第一批新怪蝙蝠、岩甲虫、菇菇怪，史莱姆王和矿脉的两只换色守关，换色精英，新掉落。** **2026-11-02（v4q(7)，已批）：武器槽第一批上，铜剑由 Pip「第一次下矿」委托给，铁剑工作台做，回血药 Lv4 驿站上架，武器低于守关一档每下伤害减半。** **2026-11-02（v4q(8)，已批）：移除特产换料，矿物只从矿里来。** **2026-11-02（v4q(9)，已批）：第一周带人去矿脉——Today 加「开矿脉」行（`Ironvale Vein · Reach Floor 10`，引导结束、First Dig 完成、接下来三级里有一级要铁时出现（Lv5 起），到 F10 或 Homestead Lv7 消失，石英同理；排在 Homestead 材料行前面、不被 q(143) 顶），Pip 说一次指向矿脉的话。**
 
 # 第 0 章 说明
 
@@ -31,6 +31,7 @@
 | v4q(6) | 【规则】【文案】 | 新怪：蝙蝠、岩甲虫、菇菇怪 + 史莱姆王和换色守关、换色精英；掉落与英文名 | 已批 | §13.3.4；q(116) |
 | v4q(7) | 【规则】【数值】【界面】【文案】 | 武器槽、铜剑（Pip 委托）、铁剑（工作台）、回血药、战斗快捷栏；低一档伤害减半 | 已批 | §10.5；§13.1.2；§13.4；§9.6.2 加例外；q(138) ④；q(170)、q(218) 按本条读 |
 | v4q(8) | 【规则】【文案】 | 移除特产换料：矿物只从矿里来 | 已批 | q(166)；q(175) ② 后半与 ④；q(181) ②③；q(263) ⑧；q(168) ① |
+| v4q(9) | 【规则】【界面】【文案】 | 第一周带人去矿脉：Today「开矿脉」行 + Pip 一句 | 已批 | 无 |
 
 ## v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西
 
@@ -118,7 +119,7 @@
 - 依赖还没实现的 P2 功能（密友、帮工、长途票、Trip 7 资格）的后果，在那个功能上线前不显示。
 - **名字一律沿用现有英文**，不另起：`Spice Rack`、`Warming Cabinet`、`Stall Board · 3rd slot`、`Bag Upgrade I`、`Second Stove`（`Third Stove` / `Fourth Stove` 同一格式）、`Big Pot`、`Chef's Sign`、`Notice Board`、外观阶段 `Fence & Mailbox` / `Porch` / `Kitchen Wing` / `Master Farmhouse`（q(112)）、`Basic Room` / `Standard Room` / `Deluxe Room`。Lv9 的「摊位升级」（`stall_upgrade`）现行没有英文行：摊位还是临时木箱、没有升级外观，升级面板和横幅都不写它（不知火舞 282）；第一批照旧不写，等摊位模型再定名（Lv9 仍有 `Warming Cabinet · keeps 12 dishes`）。回血药的名字归 v4q(7)。
 
-⑨ **第一周**（30 分钟玩家）：第 1 天首会话到 Lv3、当晚 Lv4，之后每天一级，第 7 天 Lv10；取代旧方案第 14 章的七日节奏表（q(248)）。首会话到 Lv3 的前提：家城木材、石料各 3 个采集点（v4q(4) ②）和 Lv3 门槛 1 / 1（③）。**用户批的方向（庚5）**：矿脉开局就能去（丁12，v4q(5) ②），**第 3、4 天各开一座矿脉**（铁矿脉、石英矿脉各从 F1 走到 F10，开出电梯站），**第一只守关挪到第 2 天或第 5 天**；Today / Pip 带人去矿脉的提示另起 v4q；改完按「照表走的玩家」再跑一次校准，再定逐日表（v4 2.8 按本条读）。
+⑨ **第一周**（30 分钟玩家）：第 1 天首会话到 Lv3、当晚 Lv4，之后每天一级，第 7 天 Lv10；取代旧方案第 14 章的七日节奏表（q(248)）。首会话到 Lv3 的前提：家城木材、石料各 3 个采集点（v4q(4) ②）和 Lv3 门槛 1 / 1（③）。**用户批的方向（庚5）**：矿脉开局就能去（丁12，v4q(5) ②），**第 3、4 天各开一座矿脉**（铁矿脉、石英矿脉各从 F1 走到 F10，开出电梯站），**第一只守关挪到第 2 天或第 5 天**；Today / Pip 带人去矿脉的提示见 v4q(9)（待批）；改完按「照表走的玩家」再跑一次校准，再定逐日表（v4 2.8 按本条读）。
 
 ⑩ **存档**：等级表跟着清档上线（v4q(2)，存档 v7），不做老号迁移。
 
@@ -392,7 +393,7 @@
 
 **推翻**（其余以诸葛亮冲突清单第 3 节 E 组 103 条为准）：§13.3（农场矿洞、5 层、敲完岩石开梯子、每天 2 局、Express、局）；q(62)（`Combat · Mine floors 3–5`）、q(108) ①（Express 小字）、q(110) ②（`Mine five floors. Slimes from Floor 3.`）作废；q(43) / q(47) / q(59) 旧掉落表旋钮作废；q(44) 的矿洞款（`No runs left`、`Run ended at daily reset`、P0 电梯）作废、满包整层灰显保留；q(48) 改为只管敲岩石；q(55)、q(122)、q(173) ① 的局数举例删掉、规则保留；q(35)、q(120) ④、q(145) ③ 给农场矿口留的缺口改写；q(193) ②「挖矿仍在自家农场」改写；q(39)（首周岩盐来自农场矿洞 1–2 层）改成来自最近的浅坑；q(255) ②（材料 Show 指向农场矿口）改成指向最近产这种矿的浅坑 / 矿脉；q(65) 与 §8.6 的来源句 `Clay · Mine floor 1` 改写成矿型加起始层；**LOCK-21** 矿洞按层计费与按键文案复议（197 cb585675，随本条批；层费 2 保留；`Runs today`、Express、`New run` / `Continue run` 去掉；敲岩不再是开梯子的条件）；q(196)（入口卡局数）、q(116) ①②（精英石英每天一次）作废，q(116) ③ 保留并扩到守关；q(102) 的矿口点击触发改为地图矿口；q(175)（下矿必经）按本条读，矿换了地方；q(204) Mine Hut 仍是 Ivo 的家、不是矿口。
 
-**画面**（安其拉出稿，不知火舞验收通过，页面 14 Review row 119；怪和守关是占位剪影，图钉和物品图标是草稿，地图底图是拉远的旧金山）：**P1**（355 65079ece）E1 矿口卡 321:181190、E1-HERE 321:181494（`Enter mine · 2 Energy`）、当天进过 321:181671（`Enter mine · Free`）；E2 矿层 323:181423（第三版 355 968d58dd：HP 卡照主件原宽，状态行 `Rocks 2/6 · 2 monsters left` 在 HP 卡下面、左对齐）、名字条三态 323:181572（`Floor 4 · Clear Floor 3 first` 灰牌 / `2 Energy` / `Free`，F1 上行梯 `Entrance`）、四瓣环 E2-RING 325:181641（LOCK-21 复议 197 cb585675）；E3 电梯 326:181733（`Elevator · Ironvale Vein`，`Entrance · Free` / `Floor 10 · Here` / `Floor 20 · 2 Energy`）。**P2**（355 5f1a9c95）E4 未开放矿口卡 329:182456（`Glimmer Geode` / `Geode mine · near San Jose` / `Not open yet`，没有 `Go`）；E5 守关层 329:182739（玩家 HP 卡在 HUD 下，守关用现有 UiHpBar ELITE 卡 `Iron Slime King`，楼梯灰牌 `Floor 21 · Clear Floor 20 first`，主键 `Attack`，快捷栏 `Healing Potion ×2`），首杀飘字 329:182895 `First kill · Iron Slime King`；E6 倒地卡 F11 起 328:182082（`You dropped half of what you found on this floor:` 列出丢的东西）/ F1–10 328:182298（`You kept everything.`）/ 关掉后停在地图上的矿口卡 328:182498（`Enter mine · Free`）。改前：现行 MINE-1 9:108033、MINE-ELEV-EXPRESS 9:126458（`Run 1/2 today`、Express）。
+**画面**（安其拉出稿，不知火舞验收通过，页面 14 Review row 119；怪和守关是占位剪影，E2 矿脉 F3 场景里的蝙蝠 11-02 已更正为 Rock Beetle（④；v4q(9) 补注），图钉和物品图标是草稿，地图底图是拉远的旧金山）：**P1**（355 65079ece）E1 矿口卡 321:181190、E1-HERE 321:181494（`Enter mine · 2 Energy`）、当天进过 321:181671（`Enter mine · Free`）；E2 矿层 323:181423（第三版 355 968d58dd：HP 卡照主件原宽，状态行 `Rocks 2/6 · 2 monsters left` 在 HP 卡下面、左对齐）、名字条三态 323:181572（`Floor 4 · Clear Floor 3 first` 灰牌 / `2 Energy` / `Free`，F1 上行梯 `Entrance`）、四瓣环 E2-RING 325:181641（LOCK-21 复议 197 cb585675）；E3 电梯 326:181733（`Elevator · Ironvale Vein`，`Entrance · Free` / `Floor 10 · Here` / `Floor 20 · 2 Energy`）。**P2**（355 5f1a9c95）E4 未开放矿口卡 329:182456（`Glimmer Geode` / `Geode mine · near San Jose` / `Not open yet`，没有 `Go`）；E5 守关层 329:182739（玩家 HP 卡在 HUD 下，守关用现有 UiHpBar ELITE 卡 `Iron Slime King`，楼梯灰牌 `Floor 21 · Clear Floor 20 first`，主键 `Attack`，快捷栏 `Healing Potion ×2`），首杀飘字 329:182895 `First kill · Iron Slime King`；E6 倒地卡 F11 起 328:182082（`You dropped half of what you found on this floor:` 列出丢的东西）/ F1–10 328:182298（`You kept everything.`）/ 关掉后停在地图上的矿口卡 328:182498（`Enter mine · Free`）。改前：现行 MINE-1 9:108033、MINE-ELEV-EXPRESS 9:126458（`Run 1/2 today`、Express）。
 
 **实现**：数值和字段照周瑜接口（仓库 `docs/tech/355-b1-contract-efg.md`，PR #614 / #617）。服务端 mine.ts 基本重写、state.ts（删 `day.mine_runs`，加 `kills`、`guard_firsts`）、reducer.ts（删 `mine_new_run` / `mine_express`）、view.ts（`view.mine`）、content.ts、progress.ts（新事件）、travel.ts（`HOMESTEAD_SPACES`，随 v4q(3)）；新内容表 `mine_b1.json`；客户端 p0_mine.gd、modules/mining/*、农场矿口（p0_farm.gd、p0_farm_materials.gd、p0_garden.gd 的 `mine` 锚点）、p0_material_logic.gd（电梯面板行、楼梯牌、Combat 置灰、快捷栏）、p0_world_prompts.gd、p0_ui.gd、panels/p0_material_cards.gd、ui_kit 的 ui_entry_card / ui_elevator_panel 与快照、p0_logic.gd 的 Show 路由、p0_guide.gd 的 `Mine run · Continue`；测试 server/test/p0/p0_mine_deep、p0_material_chain 与 tests/p0/test_p0_mine_*；docs/qa 文案核对清单；遥测白名单。存档随 v4q(2) 清档到 v7，不迁移旧矿进度。奕星排。
 
@@ -468,7 +469,7 @@
 
 **推翻**：§10.5（武器只有木剑、靠掉落）；§13.1.2「药水只在 3–5 层能用、没有配方也不掉落是故意的」；§13.4 / §13.8 #7「工作台不做武器」；§9.6.2「委托只收农场产出」加例外（Pip 的「下到第 N 层」）；q(138) ④ 木剑改为当前武器；§9.4.4 和 q(170) 里 Pip 的 P1 两条（Sweet Delivery、Pip's Big Route）按本条读（不动）；q(218) 的教学委托机制按本条读（Pip's First Dig 不走它）。
 
-**画面**（安其拉出稿，不知火舞验收通过 355 5813fc1e）：G1 BAG-2-WEAPON 342:184617（Gear 页 Weapon 槽列表：`Wooden Sword · Owned · Attack 3` 带 `Equip`、`Copper Sword · ✓ Equipped · Attack 5`、`Iron Sword · Workbench · Attack 8` 灰键 `Homestead Lv8`；底注 `Gear does not use Bag slots.` 是现有句）；G2 WORKBENCH-IRON 343:184859（Tools 页铁剑卡 `Iron Sword · Attack 8`，材料 Iron Ore / Hardwood / Coal / Beetle Shell，按钮写第一个缺口 `Need 2 more Coal`；**金币写在键上**：`Craft · 150 coins`，钱不够 `Need N more coins`，N = 价格 + 40 − 钱包，照 q(10)；帧里同页的 Gather Gloves 卡是「手套照旧」那个选项的画法，v4q(4) ④ 选去掉的话这张卡不出）；G3 Pip's First Dig 344:185082（委托卡照下面的画法）；G3b Today 行 346:185441；G3c 完成飘字 344:185250；G3-ALT 驿站接单备选 344:185421（③ 不按推荐时用）；G4 MINE-POTION 344:185539（不知火舞 355 968d58dd：快捷栏选中 `Healing Potion ×2`，主键 `Drink`，HP 卡 40%，状态行 `Rocks 2/6 · 2 monsters left` 在 HP 卡下面）。G 组全部通过。改前：现行 Gear 页只有木剑，工作台不做武器。不知火舞界面上赞成「木剑开局就在武器槽」（Gear 页本来就画着它）和「Pip 委托升到 Lv3 直接出现在 Today」，两处仍报用户定。
+**画面**（安其拉出稿，不知火舞验收通过 355 5813fc1e）：G1 BAG-2-WEAPON 342:184617（Gear 页 Weapon 槽列表：`Wooden Sword · Owned · Attack 3` 带 `Equip`、`Copper Sword · ✓ Equipped · Attack 5`、`Iron Sword · Workbench · Attack 8` 灰键 `Homestead Lv8`；底注 `Gear does not use Bag slots.` 是现有句）；G2 WORKBENCH-IRON 343:184859（Tools 页铁剑卡 `Iron Sword · Attack 8`，材料 Iron Ore / Hardwood / Coal / Beetle Shell，按钮写第一个缺口 `Need 2 more Coal`；**金币写在键上**：`Craft · 150 coins`，钱不够 `Need N more coins`，N = 价格 + 40 − 钱包，照 q(10)；帧里同页的 Gather Gloves 卡是「手套照旧」那个选项的画法，v4q(4) ④ 选去掉的话这张卡不出）；G3 Pip's First Dig 344:185082（委托卡照下面的画法）；G3b Today 行 346:185441；G3c 完成飘字 344:185250；G3-ALT 驿站接单备选 344:185421（③ 不按推荐时用）；G4 MINE-POTION 344:185539（矿脉 F3 场景里的蝙蝠 11-02 已更正为 Rock Beetle（v4q(5) ④），G3c 同；v4q(9) 补注；不知火舞 355 968d58dd：快捷栏选中 `Healing Potion ×2`，主键 `Drink`，HP 卡 40%，状态行 `Rocks 2/6 · 2 monsters left` 在 HP 卡下面）。G 组全部通过。改前：现行 Gear 页只有木剑，工作台不做武器。不知火舞界面上赞成「木剑开局就在武器槽」（Gear 页本来就画着它）和「Pip 委托升到 Lv3 直接出现在 Today」，两处仍报用户定。
 - **Pip's First Dig 委托卡**（不知火舞定，安其拉 G3 照画）：按推荐（Lv3 自动接），从 Today 打开的是已接的卡——目标行是 NEED-TILE `Reach Floor 3 · any mine` 1/3，**不带 `Bring` 标签**（现在 `scenes/ui_kit/ui_request_card.gd` 把 `Bring` 写死了，实现时这一类需求不显示这个标签）；Reward `+5 Friendship · Copper Sword`；不画 Deliver to；底部只有全宽次键 `Close`，不出 Accept、也不出灰键。③ 不按推荐时：从驿站打开、没接的卡照现有，底部 `Accept` / `Not now`。没有新英文（`Close` 是现成写法，倒地卡、BOARD-DROPPED 都用它）。
 
 **实现**：服务端 state.ts、reducer.ts、workbench.ts（`to: 'weapon'`）、content.ts（`itemKind`、新需求类型）、residents.ts（Pip 委托与矿里进度回调）、parcels.ts；客户端 Gear 页、物品卡、战斗快捷栏、combat_art；内容表武器、配方、驿站货架。奕星排。
@@ -494,6 +495,45 @@
 **画面**：无新帧（只删入口和文案）。
 
 **实现**：服务端 barter.ts 及引用、内容 `homestead.barter`；客户端 p0_barter.gd、柜台换料段、toast、测试。奕星排。
+
+## v4q(9) 【规则】【界面】【文案】第一周带人去矿脉：Today 的「开矿脉」行和 Pip 的一句
+
+**状态与来源**：**已批，校准已跑**：用户 2026-11-02 17:05 飞书「v4q 9 ok，加 Lv9 终止，校准跑完再并」（om_x100b61b169e34484de84dc3cfd40b7e，奕星回读核过是用户本人）；校准跑完后，用户 18:15 飞书「v4q 9 选 ab」（om_x100b61b263ada4a8c01ac7164a01a50，奕星回读核过）：**a 终止从 Lv9 提前到 Lv7**、**b 矿脉行排在 Homestead 材料行前面、不被 q(143) 的保底顶掉**，都写进 ①。同一时段另有一条经他人代发的飞书回复（「石英改 F5」），不算数、不做。用户 2026-11-02 批庚5「同意方向」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md 庚5：第 3、4 天各开一座矿脉，「Today 现在只写下一级缺什么，玩家第 3 天不会想到去开矿脉，要加 Today 或引导的提示……另起 q 行报你」）和丁12 选 A（矿脉开局就能去，v4q(5) ②）。v4q(1) ⑨ 写「Today / Pip 带人去矿脉的提示另起 v4q」，就是这一条。规格是不知火舞 2026-11-02 定稿、和蒙恬对过的（/Volumes/ACASIS/tmp/huowu-a/355/vein-guide/spec-2026-11-02.md）；依据还有李白校准 11-02 第 10 条（不提前开矿脉，Lv8 准时率 17%）。Pip 那一句由李白定。**不知火舞 2026-11-02 审过**（按钮、Pip 一句照本稿；出现条件放宽到「接下来三级」、红点、图标、人在矿里不带按钮、和 Homestead 行去重、同档先后、改家城也是她定的；审核记录 381 f5e74657、355 af8bb80d）。奕星复核（pm/plans/v4q9-review-2026-11-02.md）退回的三处已改。挂 SGODOT-381。
+
+**校准**（11-02，李白；报告 /Volumes/ACASIS/tmp/libai-tools/calib/report-2026-11-02-v4q9.md，脚本 c7_vein_guide.py，固定种子可重跑，文末有李白复核；奕星看过）：a + b 下，每天材料 9 分钟的玩家铁 / 石英矿脉在第 3 / 4 天前到 F10 的 98 / 95%，Lv5–12 准时 99–100%；7.2 分钟档 Lv8 / 9 / 10 准时 96 / 99 / 99%（没这一行时 93 / 96 / 97），但铁第 3 天前只有 56%；手慢档 9 分钟里推不下一趟 F1→F10。照原写（Homestead 行在前、Lv9 终止）：从上往下做的玩家准时率不降、带路几乎没用（铁第 3 天前 28%）；看到就先推的玩家 Lv8 降到 92%（7.2 分钟档 55%）。另：主矿 F1–9 权重 25 下，第一周推不推 F10 对升级材料几乎没差，推 F10 的价值在电梯站、F20 铁史莱姆王和铁剑。第一只守关放第 2 天、第一周逐日表另起（改 v4q(1) ⑨ / v4 2.8）。不确定：Today 上别的行按概率抽、F1→F10 的时长没真机掐。
+
+**问题**：v4q(1) ⑨ 要第 3、4 天各开一座矿脉（铁、石英各从 F1 走到 F10），可现在 Today 的 Homestead 行只看下一级（v4q(1) 每级都出，丁5）：Lv5、Lv6（第 2、3 天）的下一级都不要铁和石英，要到 Lv7（第 4 天）才会指向矿脉，玩家第 3 天不会想到去开矿脉。不提前开，Lv8 准时率只有 17%（校准 11-02 第 10 条）。
+
+**改法**
+
+① **Today 加「开矿脉」行**（主）：
+- **服务端给字段、客户端加行，不进引导**（Today 行在客户端拼，同 q(128) 外城签到行不进引导的做法）。「这里的最深纪录」读矿的存档（v4q(5) ⑤）。
+- **出现条件（四条都满足）**：引导已经结束（`guide.step` 为空；不进引导的号同样适用）；Pip's First Dig 已完成（v4q(7) ③）；离家最近的免费铁矿脉（v4q(3) ③ 的那一座），玩家在那里的最深纪录 < 10；**接下来三级里有一级要用 Iron Ore**（v4q(1) 等级表）。按 v4q(1) 的表，Lv8 起每级都要铁，所以 **Lv5 起**满足最后一条，照 v4q(1) ⑨ 的节奏就是第 2 天升到 Lv5 之后出现，第 3 天开矿脉之前已经在了（不知火舞定：原稿写「接下来两级」，要到 Lv6、第 3 天升级以后才出来，太晚；校准：两级 Lv8 准时率 68%，「三级」不用改）。连同下面的 Lv7 终止，这一行只在 **Lv5、Lv6** 出现（第 2 天升 Lv5 后到第 4 天升 Lv7 前）。
+- **写法**：`Ironvale Vein · Reach Floor 10`（新格式；矿名是那座矿的全名，`Ironvale Vein` 是示意名，同 v4q(3)）。不加 `· Elevator`。按钮照 §14.5 现有规则，客户端自动选写法（`p0_ui` 的 `show_label`）：人在地图页写 `Show`，在别处写 `Show on map`；点了打开地图、镜头移到那座矿的图钉、弹矿口卡（E1，v4q(5)），玩家自己点 `Go`。**人已经在这座矿里时**，这一行照样显示（到 F10 前一直在），但不带按钮（不知火舞定）。
+- **红点**：亮，照 q(107)「新解锁、还没看过的行」：第一次出现时亮一次，打开 Today 就灭，之后不再亮（不知火舞定；按 q(107)「类型 + 对象」记已看，每座矿亮一次。q(255) 的 Homestead 行只有 `Upgrade to Homestead` 那一行亮、材料行不亮，这一类另算）。
+- **消失**：这座矿的最深纪录到 10，这一行就消失。铁矿脉开完以后，石英矿脉照同样的四条出一行（第四条换成「接下来三级里有一级要 Quartz」，矿取离家最近的免费石英矿脉）；两座都到过 F10 就不再出。**任何一座铁矿脉的最深纪录到过 10 就不出铁的这一行**（改家城以后，新的最近铁矿脉从 0 起，也不再出），石英同理（不知火舞定）。**Homestead 到 Lv7 起，铁矿脉、石英矿脉两行都不再出**，就算还没到过 F10（用户定 a；原写 Lv9）：到 Lv7 时下一级 Lv8 本身就要铁和石英，交给 Homestead 行带（它的 Show 也指最近产这种矿的矿脉，v4q(5)）。校准：Lv9 才终止时，第 3、4 天没赶上的人会在第 5、6 天（Lv8、Lv9 到期那天）被这一行拉去推 F10，挤掉当天的料。
+- **和 Homestead 行去重**（不知火舞定）：Homestead 行（v4q(1)，每级都出，丁5）的第一个缺口是 Iron Ore / Quartz、Show 指的正是这一行要指的那座矿时，**只留 Homestead 行，不出矿脉行**（已批的行优先；Homestead 行写着升级还差什么，Show 一样带过去，F10 的目标 Lv5–7 已经由矿脉行讲过）。两行指不同的矿时（铁矿脉已到过 F10、矿脉行换成石英，Homestead 行还缺铁）两行都出。（Lv7 终止以后，Lv5、Lv6 的下一级不要铁和石英，这条实际碰不到，留作口径。）
+- **一次只出一行**矿脉行（先铁后石英；铁矿脉已经到过 F10、石英没到时只出石英那一行）。
+- **排序**（用户定 b）：算可立即做；在可立即做一组里**排在 Homestead 材料行前面**（q(255) ⑥、q(258) 的同类先后：可交付的委托行 > `Upgrade to Homestead` > 收获、浇水等其它可立即做 > **矿脉行** > Homestead 材料行），不压在可交付的委托行和 Upgrade 行前面；**不被 q(143) 的保底顶掉**：q(143) 排满时替换第 3 行，矿脉行在第 3 行时同交付行一样不让，这一次保底行不出。人在这座矿里、不带按钮时仍算可立即做（不知火舞定）。图标用矿脉图钉那枚（`vein.svg`，第 1 批正式图标，不知火舞定）。
+
+② **Pip 的一句**（辅）：
+- Pip's First Dig 完成后，**下一次和 Pip 说话**换成指向矿脉的一句，**只说一次**（存档里记一下说过，换设备也不再说；随 v7 清档，不迁移，v4q(2)）。说完以后照原来按好感阶段的台词（q(273) 等）。和 Pip 说话前已经到过那座铁矿脉的 F10，就不说这一句。
+- 台词：`Copper's a start! There's iron at Ironvale Vein. Get down to Floor 10!`（矿名取玩家那座铁矿脉）。（不知火舞审定）。她的候选原是 `Copper's a start. The iron is deeper. Try Ironvale Vein!`，李白改了两处：正式矿名从词池取、不一定带 Iron，所以把「铁」写明；铁在另一座矿、不是这座矿更深的地方，`deeper` 会读成「这座矿往下走」，改成和 Today 行同一个目标 `Floor 10`。对话条照 LOCK-18，字数和 First Dig 的台词差不多。
+- 不做成委托，不占追踪名额，不给奖励。
+
+③ **不做**：不加引导步骤、不弹教学卡；不改矿的规则和数值。不给 Joey 验收（Joey 11-18 那版走不到第 3 天，奕星定）。
+
+**新英文**：`<矿名> · Reach Floor 10`（Today 行格式）、Pip 一句 1 句。`Show` / `Show on map` 是现成写法。
+
+**改哪**：v4q(1) ⑨「Today / Pip 带人去矿脉的提示另起 v4q」读作本条；v4 方案 2.8 引注同。旧方案 §14.5「来源」列、§9.5.3 Today 行写法和 q(258) 的同类先后清单加这一类行（以本条为准）。逐日表等用户定、「照表走」重跑校准后再改 v4q(1) ⑨ / v4 2.8，这一条的出现条件跟着核。
+
+**推翻**：无。
+
+**画面**（安其拉出稿 355 6b407248，不知火舞验收通过 355 1e9965c0，VG3 / VG4 第二版 355 8359ee99；页面 14 Review row 125 382:187179；矿名是示意，地图底图是拉远的旧金山）：**VG1** 农场里的 Today 382:187180（Lv5，Today 芯片亮红点；三行依次是可交付的 `Tea Trail · Deliver at Mission Market Square`、`Ironvale Vein · Reach Floor 10`（vein 图标）、`Homestead Lv6 · Timber 3 to go`，都带 `Show on map`，在 · 处折成两行；**VG1 按 b 对调第 2、3 行（安其拉 355 294a4dfa，不知火舞重验 355 6985ab89）**）；**VG2** 点了以后 382:187345（第二版 355 988293c6：地图停在 Ironvale 钉上，弹矿口卡，`You · Not visited`、`Cost · Free`，Monsters 按内容表从浅到深最多 3 种 `Slime · Rock Beetle · Shroomling`）；**VG3** Pip 一句 384:187616（LOCK-18 对话条，好感 Stranger 5/15）；**VG4** 人在这座矿里 384:187745（第二版：芯片 `Ironvale Vein · Floor 3`，F3 只有史莱姆和岩甲虫；矿脉行在、不带按钮）。改前：现行 Today 实拍（李元芳，安卓 0.2.20 正式包，人在农场，三行 `Sow your first plot` / `Deliver 2 Pond Crucian · Stall` / `Cook it: Grilled Crucian`，没有矿脉行；381 附件 e33fd0a2）。
+
+另：v4q(5) 的 E2 323:181423、v4q(7) 的 G4 344:185539 和 G3c 344:185250（都已批）在矿脉 F3 的场景里画了蝙蝠，和 v4q(5) ④ 不符（矿脉 F1–9 只有史莱姆和岩甲虫）；11-02 已把这三张里的蝙蝠换成 Rock Beetle（换占位图，不知火舞定），免得照帧实现时画进 F3。
+
+**实现**：服务端给字段——最近 3 个免费野外点带类型和名字（现在 `view.wild.near3` 只给 id）、First Dig 完成状态（客户端读 `view.first_dig.done`，服务端还没有）；最深纪录现成（`view.mine.records[id].deepest`）。客户端在 `_today_rows` 加这一行，按钮去向（地图 + 矿口卡，`open_wild_card`；Today 指向野外点亚瑟 C 第 2 部分在做），红点键 `vein:<id>`；Pip 一句进内容表，存档加「说过」的记号。奕星排。
 
 # 第 2 章 旧文档冲突索引
 
