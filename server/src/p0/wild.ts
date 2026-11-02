@@ -92,30 +92,22 @@ function around(cat: Catalogue, at: { lat: number; lng: number }, km: number): {
 }
 
 /**
- * v4 §1.5: the nearest 3 open wild sites from a home's base point (q(184)), with at least one quarry and one vein — the
- * nearest of a missing type takes the place of the farthest that is not the only one of its type. Frozen into the save
- * with the city fallback (travel.wild_near3) and worked out again when the home changes.
+ * v4 §1.5 as the user set it (11-02 庚3, v4q(3) ③): the free 3 from a home's base point (q(184)) are the nearest quarry,
+ * the nearest iron vein and the nearest quartz vein — one of each, however far (the search widens until it finds it), so
+ * the first week's veins cost no fare (they were "at least one quarry and one vein": 6 of 13 homes paid for the second).
+ * Nearest first, ties by id. Frozen into the save with the city fallback (travel.wild_near3) and worked out again when the
+ * home changes; saves frozen under the old rule are frozen again with week 3's clean start (v4q(2)).
  */
 export function wildNearOf(c: P0Content, home: string): string[] {
   const cat = catalogue(c), at = homeBase(c, { travel: { home } });
   if (!cat || !at) return [];
-  // the search widens until it finds what it wants: three sites, then a missing type wherever it is (李白 on v4q(3) ③a)
-  const nearest = (want: (x: WildSite) => boolean, n: number) => {
+  const nearest = (want: (x: WildSite) => boolean) => {
     let found: { s: WildSite; km: number }[] = [];
-    for (let km = 150; km <= 20_000 && found.length < n; km *= 2) found = around(cat, at, km).filter(x => want(x.s));
-    return found.slice(0, n);
+    for (let km = 150; km <= 20_000 && !found.length; km *= 2) found = around(cat, at, km).filter(x => want(x.s));
+    return found[0];
   };
-  const pick = nearest(() => true, 3);
-  for (const need of ['quarry', 'vein']) {
-    if (pick.some(x => x.s.type === need)) continue;
-    const add = nearest(x => x.type === need, 1)[0];
-    if (!add) continue;
-    // drop the farthest pick whose type another pick also has (else the farthest)
-    let drop = -1;
-    for (let i = pick.length - 1; i >= 0 && drop < 0; i--) if (pick.filter(x => x.s.type === pick[i].s.type).length > 1) drop = i;
-    pick.splice(drop < 0 ? pick.length - 1 : drop, 1);
-    pick.push(add);
-  }
+  const pick = [nearest(x => x.type === 'quarry'), nearest(x => x.type === 'vein' && x.mine?.main === 'iron_ore'),
+    nearest(x => x.type === 'vein' && x.mine?.main === 'quartz')].filter((x): x is { s: WildSite; km: number } => !!x);
   return pick.sort((a, b) => a.km - b.km || (a.s.id < b.s.id ? -1 : 1)).map(x => x.s.id);
 }
 
