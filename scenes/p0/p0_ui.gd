@@ -3641,7 +3641,7 @@ var _blocked: Array = []        # [{handle, name}] as last read, the server's or
 var _blocked_read := false      # read once at least this launch: before that an empty list is not `No one blocked`
 var _blocked_failed := false    # and the last try failed: the Blocked page's empty state and Retry
 var _privacy_shown := false
-var _unblocks := 0              # Unblocks sent: a read begun before one is dropped (its list may still hold them, 周瑜 #667)
+var _unblocks := 0              # Unblocks sent and answered: a read overlapping one is dropped (it may hold them, 周瑜 #667)
 
 ## The server asked again; `then` when what the pages show has changed (they are opened again with it). A list that
 ## was not read (blocked_list null, 后裔 ed9c83b2) keeps the last one read; none read this launch, the Privacy group
@@ -3684,7 +3684,9 @@ func open_blocked_players(back: Callable, read := true) -> void:
 ## Unblock: the page has taken the row away already (no card, no toast); a failure puts it back with the network's line.
 func _unblock(handle: String, back: Callable) -> void:
 	_unblocks += 1
-	if await voice_account.call("unblock", handle):
+	var ok: bool = await voice_account.call("unblock", handle)
+	_unblocks += 1   # again at its answer: a read begun meanwhile may have been served before the Unblock was
+	if ok:
 		_blocked = _blocked.filter(func(r): return str(r.handle) != handle)
 		return
 	show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
