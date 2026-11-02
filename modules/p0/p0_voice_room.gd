@@ -7,8 +7,9 @@ extends Node
 ## of the server before the player first wants voice.
 ##
 ## Per person (the least against harassment the user set): Mute is this phone's own, kept by the person's public handle
-## (the roster's `player`, never their id: it outlives their peer id across layers); Block goes to the server, both ways,
-## and comes back as `blocked` peer ids (the grant, the hub's voice_blocks); Report is one line on the server.
+## (the roster's `player`, never their id: it outlives their peer id across layers); Block goes to the server, which
+## tells the blocker alone their `blocked` peer ids (the grant, the hub's voice_blocks): their phone shuts it both ways,
+## LiveKit keeping their tracks from the blocked one, who is never told (SGODOT-384); Report is one line on the server.
 ## The 13+ gate: the server keeps a yes / no; until it has a yes there is no voice (`age` "unknown": ask first).
 
 signal changed
@@ -99,7 +100,7 @@ func set_muted(peer: int, muted: bool) -> void:
 	if voice: voice.call("set_muted", str(peer), muted)
 	changed.emit()
 
-## Block / Unblock: the server keeps it both ways and tells both phones (voice_blocks).
+## Block / Unblock: the server keeps it and tells this phone alone (voice_blocks); this phone shuts it both ways (384).
 func set_blocked(peer: int, on: bool) -> void:
 	await _call(HTTPClient.METHOD_POST, "block", {"peer": peer, "on": on})
 

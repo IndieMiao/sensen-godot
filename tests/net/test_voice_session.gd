@@ -250,3 +250,34 @@ func test_p0_block_keeps_our_tracks_from_them_through_livekit() -> void:
 	_event(old[0], "connected")
 	old[0].set_blocked(["5"])
 	assert_bool(old[1].calls.any(func(c): return c[0] == "publish")).is_false()
+
+## SGODOT-384 (李元芳 on 384 f25aa80d): the Android plugin is a JNISingleton, whose methods has_method never sees — a
+## script-less backend is asked capabilities() outright, only a scripted test adapter has_method. (Mute and Block read
+## false on phones and never reached LiveKit.)
+func test_a_native_backend_is_never_judged_by_has_method() -> void:
+	var voice := PartyVoiceSession.new()
+	add_child(auto_free(voice))
+	voice.set_process(false)
+	var native := Object.new()   # no script, as the JNISingleton: has_method sees nothing it can call
+	voice._backend = native
+	assert_bool(voice._adapter_without("capabilities")).is_false()
+	assert_bool(voice._adapter_without("set_publish_allowed")).is_false()
+	native.free()
+	var adapter := PeopleBackend.new()
+	voice._backend = adapter
+	assert_bool(voice._adapter_without("capabilities")).is_false()
+	assert_bool(voice._adapter_without("no_such_method")).is_true()
+	assert_bool(voice.per_participant()).is_true()
+	assert_bool(voice.publish_permissions()).is_true()
+	voice._backend = null
+
+## Blocks go to the native room before the mic is turned on at a connect (SGODOT-384: a track published first could be
+## taken by the blocked one before the permissions arrive).
+func test_blocks_are_set_before_the_microphone_on_connect() -> void:
+	var f := _p0_fixture()
+	f[0].join_with(f[2])
+	_event(f[0], "permission", {"granted": true})
+	await get_tree().process_frame
+	_event(f[0], "connected", {"participants": []})
+	var order: Array = f[1].calls.map(func(c): return str(c[0])).filter(func(n): return n in ["publish", "subscribed", "microphone"])
+	assert_bool(order.find("microphone") > order.find("subscribed")).is_true()
