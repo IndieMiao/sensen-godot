@@ -92,7 +92,7 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 				fallen[i] = enemy.node.position
 				_die(id, enemy)
 			continue
-		if dying.has(id):   # back up while falling (a reply's view rolled back): standing again
+		if str(enemy.phase) == "dead":   # back up (a reply's view rolled back), falling or fallen: standing again
 			dying.erase(id)
 			enemy.phase = "idle"
 			enemy.node.call("play", "idle")
@@ -118,12 +118,12 @@ func down(i: int) -> void:
 ## slime's placeholder) is gone now, as it always was.
 func _die(id: String, enemy: Dictionary) -> void:
 	enemies.erase(id)
+	enemy.phase = "dead"   # no brain runs it; back above 0 HP it stands again (亚瑟 on #685)
 	var node = enemy.node
 	var left := float(node.call("duration", "die")) if node.has_method("duration") else 0.0
 	if left <= 0.0:
 		node.visible = false
 		return
-	enemy.phase = "dead"
 	node.visible = true
 	node.call("play", "die")
 	dying[id] = {"enemy": enemy, "left": left}

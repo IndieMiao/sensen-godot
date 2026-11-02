@@ -139,6 +139,15 @@ func test_a_monster_down_plays_its_die_and_then_goes() -> void:
 	assert_bool(c.dying.has(ids[2])).is_false()
 	assert_bool(c.enemies.has(ids[2])).is_true()
 	assert_str(nodes[2].action).is_equal("idle")
+	# back up after the die played out, or after one with no die time: standing again too, not stuck "dead" (亚瑟 on #685)
+	mobs[0].hp = 9
+	mobs[1].hp = 9
+	c.sync_p0(view.call(), 3, mover)
+	for i in [0, 1]:
+		assert_bool(c.enemies.has(ids[i])).override_failure_message("mob %d" % i).is_true()
+		assert_str(str(c.enemies[ids[i]].phase)).override_failure_message("mob %d" % i).is_equal("idle")
+		assert_bool(nodes[i].visible).is_true()
+	assert_str(nodes[0].action).is_equal("idle")
 
 ## A floor with every rock broken (as test_p0_mine_deep's Layout_bp): open ground around the spawn.
 func _mover() -> PlayerMover:
