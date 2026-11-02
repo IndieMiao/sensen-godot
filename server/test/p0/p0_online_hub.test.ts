@@ -2,7 +2,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';
 import { FRAME_HEADER, FRAME_MEMBER, P0_ACTIONS } from '../../src/p0/online/frame.js';
-import { LIMITS, PATH, registerP0Online } from '../../src/p0/online/hub.js';
+import { LIMITS, PATH, publicPlayer, registerP0Online } from '../../src/p0/online/hub.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { loadP0Content } from '../../src/p0/content.js';
@@ -61,6 +61,26 @@ function decode(frame: Buffer) {
 }
 
 describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
+  it('no roster, peer or other message to the room carries a player id: x-p0-player is the only credential (11-02)', async () => {
+    const { port } = await server();
+    const a = await connect(port, 'p0-secret-aaaa1111');
+    const b = await connect(port, 'p0-secret-bbbb2222');
+    await join(a, 'sh_tea_1', [1, 1]);
+    await join(b, 'sh_tea_1');
+    send(b, { t: 'appearance', appearance: {} });
+    await until(msg(b, 'roster'));
+    await until(msg(a, 'peer'));
+    await new Promise(r => setTimeout(r, 150));
+    for (const [c, other] of [[a, 'p0-secret-bbbb2222'], [b, 'p0-secret-aaaa1111']] as const) {
+      expect(JSON.stringify(c.json)).not.toContain(other);
+      for (const f of c.frames) expect(f.includes(Buffer.from(other))).toBe(false);
+    }
+    // the handle is stable and one-way: the same player, the same handle; another player, another
+    expect(publicPlayer('p0-secret-aaaa1111')).toBe(publicPlayer('p0-secret-aaaa1111'));
+    expect(publicPlayer('p0-secret-aaaa1111')).not.toBe(publicPlayer('p0-secret-bbbb2222'));
+    expect(publicPlayer('p0-secret-aaaa1111')).toMatch(/^p-[0-9a-f]{16}$/);
+  });
+
   it('rejects a missing or malformed player id at the upgrade', async () => {
     const { port } = await server();
     await expect(connect(port, 'bad id!')).rejects.toThrow('HTTP 400');
@@ -73,8 +93,8 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     expect((await join(a, 'sh_tea_1', [1, 1])).room).toBe(1);
     const joined = await join(b, 'sh_tea_1');
     expect(joined).toMatchObject({ outpost: 'sh_tea_1', room: 1, capacity: 12, rejoined: false, self: 2, epoch: 1 });
-    expect((await until(msg(b, 'roster'))).members.map((m: any) => m.player)).toEqual(['player-aaaa', 'player-bbbb']);
-    expect(await until(msg(a, 'peer'))).toMatchObject({ count: 2, member: { id: 2, player: 'player-bbbb' } });
+    expect((await until(msg(b, 'roster'))).members.map((m: any) => m.player)).toEqual([publicPlayer('player-aaaa'), publicPlayer('player-bbbb')]);
+    expect(await until(msg(a, 'peer'))).toMatchObject({ count: 2, member: { id: 2, player: publicPlayer('player-bbbb') } });
     const presence = await app!.inject({ method: 'GET', url: '/v1/p0/presence' });
     expect(presence.json().outposts.sh_tea_1).toEqual({ online: 2, rooms: 1 });
     send(b, { t: 'leave' });

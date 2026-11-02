@@ -5,6 +5,7 @@
  * (no token, local and dev servers only); presence lives in memory only, never in the P0 save file.
  * Positions are the client's: the server only keeps them inside the room and within walking speed.
  */
+import { createHash } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
@@ -251,7 +252,7 @@ export class P0OnlineHub {
   }
 
   private view(m: Occupant) {
-    return { id: m.id, player: m.player, seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance() };
+    return { id: m.id, player: publicPlayer(m.player), seat: m.seat, appearance: this.byPlayer.get(m.player)?.appearance ?? defaultAppearance() };
   }
 
   private step(): void {
@@ -299,6 +300,11 @@ export class P0OnlineHub {
     if (c.ws.readyState === WebSocket.OPEN) c.ws.send(JSON.stringify(payload));
   }
 }
+
+/** What the room sees of a player (11-02): x-p0-player is the P0 server's only credential (with the shared demo key), so a
+ * roster never carries it — a stable, one-way handle instead (`p-` and 16 hex of its SHA-256). The clients use the field
+ * for the name tag and the outfit cache only, so an older client reads it as before. */
+export const publicPlayer = (player: string): string => 'p-' + createHash('sha256').update('p0-online/' + player).digest('hex').slice(0, 16);
 
 /** Registers the WebSocket upgrade and the presence route; tools/p0_server.ts only calls this. */
 export function registerP0Online(app: FastifyInstance, deps: P0OnlineDeps): P0OnlineHub {
