@@ -1,0 +1,16 @@
+{
+  "module": "hall_floor",
+  "author": "ZHAOYUN",
+  "task": "SGODOT-319",
+  "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+  "source": "tools/art/source/mine_hut/mine_hut.blend",
+  "source_module": "room_shell",
+  "retained_object": "Honey timber foundation",
+  "source_sha256": "da501ebc507794dac073afb0f333e53a14579a5be020fa895a6a87231720d9f8",
+  "changes": [
+    "Retain 6.8 x 6.4 footprint and editable bevelled foundation",
+    "Lower foundation top to .04 m",
+    "Replace straight planks with authored 0.64 x 0.16 m herringbone",
+    "Remap all UVs to HallAtlas"
+  ]
+}

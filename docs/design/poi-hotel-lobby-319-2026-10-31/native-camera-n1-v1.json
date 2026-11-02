@@ -1,0 +1,64 @@
+{
+  "actual_actor_room_position": [
+    -0.0250000953674316,
+    0.0800000056624413,
+    2.52500009536743
+  ],
+  "anchor_visibility": {
+    "badge_exit": true,
+    "cam_default": true,
+    "exit": true,
+    "seat_armchair_1": true,
+    "seat_armchair_2": true,
+    "seat_sofa_1": true,
+    "seat_sofa_2": true,
+    "seat_sofa_3": true,
+    "seat_sofa_4": true,
+    "seat_sofa_5": true,
+    "seat_sofa_6": true,
+    "sign_name": true,
+    "spawn": true
+  },
+  "bag_only": true,
+  "basis": [
+    [
+      0.707106828689575,
+      0.0,
+      -0.707106828689575
+    ],
+    [
+      -0.482245653867722,
+      0.73135370016098,
+      -0.482245653867722
+    ],
+    [
+      0.517145156860352,
+      0.681998372077942,
+      0.517145156860352
+    ]
+  ],
+  "layout_sha256": "e1905ae26cc4a70902af20362160ffe84e58c030a8deada7f8232f5492234d88",
+  "native_far": 4000.0,
+  "native_near": 0.0500000007450581,
+  "origin": [
+    7.19878530502319,
+    13.7199802398682,
+    9.52220344543457
+  ],
+  "pitch": -43.0,
+  "render_clip_note": "Framing retained exactly. Art review uses near=.1/far=40 for single-map daylight shadow precision; P2 integration must consume the art clip recommendation.",
+  "requested_spawn": [
+    0,
+    0.08,
+    2.5
+  ],
+  "source": "Unmodified farm-dev P0Room.frame_all with native P0Ui bag-only layout",
+  "spawn_snap_distance_m": 0.0353554747998714,
+  "viewport": [
+    360,
+    800
+  ],
+  "width_m": 6.71999979019165,
+  "runtime_commit": "17cd10d56e62530d4bf6b7bec35386b255559d4b",
+  "native_room_sha256": "752b75da4f4bed2b1e847761b4cc278e3b11e27cbd4f092220529ebee42243fc"
+}

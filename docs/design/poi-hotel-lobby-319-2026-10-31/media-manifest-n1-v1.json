@@ -1,0 +1,102 @@
+[
+  {
+    "name": "SGODOT-319_N1_v1_room_full.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_room_full.png",
+    "size": [
+      1488,
+      1420
+    ],
+    "bytes": 1025161,
+    "sha256": "798b92d98dec770541e125a4da0a701ea35103244e8b25a331bec8dec6bee391"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_room_top.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_room_top.png",
+    "size": [
+      1248,
+      1300
+    ],
+    "bytes": 1068994,
+    "sha256": "a218bfa1992dfa054c864744de83c28642e5a7c8a4b56bc0a739f1cf45ef5d47"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_room_hearth.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_room_hearth.png",
+    "size": [
+      1248,
+      1100
+    ],
+    "bytes": 666954,
+    "sha256": "b33285e06117937b0c2a0075b7558d955e2ab34501d3dbc77b4d5e959c86a5b5"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_room_keys.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_room_keys.png",
+    "size": [
+      1248,
+      1100
+    ],
+    "bytes": 461969,
+    "sha256": "7b9aaf4ba61bc482d4c4e711e602baee41b152dc4889fee248eef90251980d95"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_room_sofa.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_room_sofa.png",
+    "size": [
+      1248,
+      1200
+    ],
+    "bytes": 975437,
+    "sha256": "bf89e92de909c350b5e385f45f53e4a044b8e3b9f22fdfeca3d6a2d79375a34d"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_entry_360.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_entry_360.png",
+    "size": [
+      360,
+      800
+    ],
+    "bytes": 163431,
+    "sha256": "f7e5988419652844729184879d5f889b89ffd94379897c9f71a5dcf3adcf2f2c"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_entry_720.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_entry_720.png",
+    "size": [
+      720,
+      1600
+    ],
+    "bytes": 521327,
+    "sha256": "75df19cbbc0413d1f0941088fe6c5896e38d0e590c4f452e4a848efca72768fd"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_room_reference.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_room_reference.png",
+    "size": [
+      2048,
+      1100
+    ],
+    "bytes": 1836730,
+    "sha256": "0af0838daed07314220b67680211cbb0c883f342c7b8987ee34430b5cca109d8"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_local_lights.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_local_lights.png",
+    "size": [
+      2048,
+      1050
+    ],
+    "bytes": 803750,
+    "sha256": "95e2a92540e161198f68cdc13474b7a9c237d49c0c192728cea7ee48a9ea0b8f"
+  },
+  {
+    "name": "SGODOT-319_N1_v1_clearance.png",
+    "path": "docs/design/poi-hotel-lobby-319-2026-10-31/SGODOT-319_N1_v1_clearance.png",
+    "size": [
+      1348,
+      1480
+    ],
+    "bytes": 91607,
+    "sha256": "259b5271d9cf911de482b6193d1b9474c7d7ab0ce578a472b91e04036049f90b"
+  }
+]

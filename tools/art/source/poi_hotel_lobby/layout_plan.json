@@ -1,0 +1,30 @@
+{
+  "revision": "SGODOT-319 N1 v1.1 approved smaller side tables and right-side arrival",
+  "units": "metres, X/Z floor plane, Y up",
+  "floor_y": 0.08,
+  "inner_floor": [-3.03, -2.83, 3.36, 3.16],
+  "spawn": [2.85, 0.08, 2.35],
+  "exit": [2.85, 0.08, 2.88],
+  "seat_height_above_floor": 0.715,
+  "main_clearance_width": 0.70,
+  "body_radius": 0.25,
+  "body_height": 1.745,
+  "placements": [
+    {"name": "ring_sofa", "shape": "circle", "position": [1.10, 0.08, 0.58], "radius": 1.215, "height": 1.08, "source": "new", "seat_angles": [30, 90, 150, 210, 270, 330]},
+    {"name": "central_planter", "shape": "circle", "position": [1.10, 0.08, 0.58], "radius": 0.545, "height": 1.05, "source": "new", "contained_by": "ring_sofa"},
+    {"name": "armchair_back", "shape": "box", "position": [-2.35, 0.08, -1.25], "yaw_degrees": 90, "size": [1.50, 1.326, 0.89], "source": "324/armchair", "locked_scale": true},
+    {"name": "armchair_front", "shape": "box", "position": [-2.35, 0.08, 1.45], "yaw_degrees": 90, "size": [1.50, 1.326, 0.89], "source": "324/armchair", "locked_scale": true},
+    {"name": "table_sofa_left", "shape": "circle", "position": [-0.493, 0.08, 1.62], "radius": 0.35, "height": 0.90, "source": "324/round_side_table N1 scaled copy", "lamp": true},
+    {"name": "table_sofa_right", "shape": "circle", "position": [2.693, 0.08, 1.47], "radius": 0.35, "height": 0.90, "source": "324/round_side_table N1 scaled copy", "lamp": true},
+    {"name": "table_sofa_back", "shape": "circle", "position": [1.16, 0.08, -1.20], "radius": 0.35, "height": 0.90, "source": "324/round_side_table N1 scaled copy", "lamp": true},
+    {"name": "table_armchair", "shape": "circle", "position": [-0.70, 0.08, -1.20], "radius": 0.35, "height": 0.90, "source": "324/round_side_table N1 scaled copy"},
+    {"name": "hearth", "shape": "box", "position": [-2.54, 0.08, 0.10], "yaw_degrees": 90, "size": [1.13, 2.085, 1.05], "shape_offset": [0, 0, 0.045], "source": "deluxe_room_10/hearth"},
+    {"name": "low_bookshelf", "shape": "box", "position": [-2.77, 0.08, 2.65], "yaw_degrees": 90, "size": [0.90, 1.10, 0.42], "source": "new"},
+    {"name": "floor_lamp", "shape": "circle", "position": [-1.90, 0.08, 2.70], "radius": 0.28, "height": 1.90, "source": "new"},
+    {"name": "elevator", "shape": "box", "position": [-1.30, 0.08, -2.81], "yaw_degrees": 0, "size": [1.40, 2.60, 0.16], "source": "new", "wall_mounted": true},
+    {"name": "key_rack", "shape": "box", "position": [0.62, 0.88, -2.66], "yaw_degrees": 0, "size": [2.21, 1.30, 0.36], "source": "post_office/sorting_cabinet", "wall_mounted": true},
+    {"name": "luggage_cart", "shape": "box", "position": [2.65, 0.08, -2.08], "yaw_degrees": 0, "size": [0.95, 1.75, 0.77], "source": "new"},
+    {"name": "plant_elevator", "shape": "circle", "position": [-2.58, 0.08, -2.34], "radius": 0.31, "height": 2.003, "source": "shared plants"},
+    {"name": "plant_cart", "shape": "circle", "position": [2.95, 0.08, -0.55], "radius": 0.31, "height": 2.003, "source": "shared plants"}
+  ]
+}

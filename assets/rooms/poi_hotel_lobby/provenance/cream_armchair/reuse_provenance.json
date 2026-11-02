@@ -1,0 +1,31 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
+  "changes": [
+    "Geometry, normals and game scale retained; only palette UV/color and scalar local AO added."
+  ],
+  "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+  "source_collection": "KIT_armchair",
+  "retained_parts": [
+    "Sofa continuous oak base.002",
+    "Sofa foot.008",
+    "Sofa foot.009",
+    "Sofa foot.010",
+    "Sofa foot.011",
+    "Full upholstered sofa back.002",
+    "Plump seat cushion.002",
+    "Recessed oak sofa arm support.004",
+    "Clean continuous upholstered arm.004",
+    "Recessed oak sofa arm support.005",
+    "Clean continuous upholstered arm.005",
+    "Puffed loose cushion.004"
+  ],
+  "removed_parts": [],
+  "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+  "source_asset": "armchair",
+  "locked_scale": true,
+  "triangles": 1776,
+  "surfaces": 1,
+  "exported_sha256": "ddc852ee949cdb0d1b059101cd19200778d472de85061cffa03e73b222007d75"
+}

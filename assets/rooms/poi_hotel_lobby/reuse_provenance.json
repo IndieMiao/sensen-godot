@@ -1,0 +1,396 @@
+{
+  "ring_sofa": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "New 2.43 m outside diameter, six equal 60-degree cushions; seat top .715 m above floor."
+    ],
+    "triangles": 6768,
+    "surfaces": 1,
+    "exported_sha256": "740d7426bd5094596e91203fda582c3d2e5a10b6b49bc4cb84e5565bd8d3c86a"
+  },
+  "central_planter": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "New 1.09 m central planter, separate from two shared floor plants."
+    ],
+    "triangles": 2068,
+    "surfaces": 1,
+    "exported_sha256": "6a36de594e85b56af01842df75911c5c974b73f5ec4a00e1a9af456e02c999a6"
+  },
+  "central_foliage": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "New compact broad-leaf planting; no extra floor pot."
+    ],
+    "triangles": 4992,
+    "surfaces": 1,
+    "exported_sha256": "2878663694a35a5dfb185cff59cfce8ecec628cb9ba14439b1d47422c59c30b0"
+  },
+  "cream_armchair": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
+    "changes": [
+      "Geometry, normals and game scale retained; only palette UV/color and scalar local AO added."
+    ],
+    "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+    "source_collection": "KIT_armchair",
+    "retained_parts": [
+      "Sofa continuous oak base.002",
+      "Sofa foot.008",
+      "Sofa foot.009",
+      "Sofa foot.010",
+      "Sofa foot.011",
+      "Full upholstered sofa back.002",
+      "Plump seat cushion.002",
+      "Recessed oak sofa arm support.004",
+      "Clean continuous upholstered arm.004",
+      "Recessed oak sofa arm support.005",
+      "Clean continuous upholstered arm.005",
+      "Puffed loose cushion.004"
+    ],
+    "removed_parts": [],
+    "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+    "source_asset": "armchair",
+    "locked_scale": true,
+    "triangles": 1776,
+    "surfaces": 1,
+    "exported_sha256": "ddc852ee949cdb0d1b059101cd19200778d472de85061cffa03e73b222007d75"
+  },
+  "round_side_table": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
+    "changes": [
+      "N1-only copy scaled to .70 m diameter and .90 m table height per Huowu 319 1db13376; original 324 files unchanged."
+    ],
+    "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+    "source_collection": "KIT_round_side_table",
+    "retained_parts": [
+      "Splayed wood table leg.003",
+      "Splayed wood table leg.004",
+      "Splayed wood table leg.005",
+      "Ivory cafe tabletop.001"
+    ],
+    "removed_parts": [],
+    "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+    "source_asset": "round_side_table",
+    "locked_scale": false,
+    "scale_xyz": [
+      0.6363636363636362,
+      0.793475865109103,
+      0.6363636363636362
+    ],
+    "triangles": 240,
+    "surfaces": 1,
+    "exported_sha256": "9ab94878a3b96aaf7e893185170b94b9a9bf7bad02d6915b9fd43c5bb8d76658"
+  },
+  "frame_landscape": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
+    "changes": [
+      "Geometry, normals and game scale retained; only palette UV/color and scalar local AO added."
+    ],
+    "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+    "source_collection": "KIT_frame_landscape",
+    "retained_parts": [
+      "Picture backing.002",
+      "Picture vertical frame.004",
+      "Picture vertical frame.005",
+      "Picture horizontal frame.004",
+      "Picture horizontal frame.005",
+      "Artwork.001"
+    ],
+    "removed_parts": [],
+    "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+    "source_asset": "frame_landscape",
+    "locked_scale": true,
+    "triangles": 542,
+    "surfaces": 2,
+    "exported_sha256": "7df9af347d03ebaed85e63a83283e82f493e232a2d7f5b0582edeeb6fe776908"
+  },
+  "green_table_lamp": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/post_215/post_215.blend",
+    "changes": [
+      "Post Office lamp geometry retained at .493 m high; warm shade recolored green, brass retained."
+    ],
+    "source_sha256": "c5ed6a5732ed7a5bd09a46a207cce53c604ace55ca4356839dbfd2991590850c",
+    "source_collection": "post_table_lamp",
+    "retained_parts": [
+      "Desk lamp / dark foot",
+      "Desk lamp / brass stem",
+      "Desk lamp / warm shade",
+      "Desk lamp / brass shade edge",
+      "Desk lamp / finial"
+    ],
+    "removed_parts": [],
+    "triangles": 696,
+    "surfaces": 1,
+    "exported_sha256": "e9ca9f47d2baf8ba9e2b68153103a77a90f671ee5beae7a7f5869388b02c45af"
+  },
+  "hearth": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+    "changes": [
+      "Source footprint and logs retained; replace blank chimney breast with four staggered stone courses, thin cooking ledge to .08 m, warm mid-grey N1 palette.",
+      "Use shared SGODOT-178 fire, not new flames."
+    ],
+    "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+    "source_collection": "KIT_hearth",
+    "retained_parts": [
+      "Broad rounded hearth foot",
+      "Rounded lime plaster stove",
+      "Thick rounded plaster firebox arch",
+      "Warm red firebox lining",
+      "Hearth rounded cooking ledge",
+      "Crossed charred firebox log",
+      "Visible charred log end",
+      "Visible charred log end.001",
+      "Crossed charred firebox log.001",
+      "Visible charred log end.002",
+      "Visible charred log end.003",
+      "Crossed charred firebox log.002",
+      "Visible charred log end.004",
+      "Visible charred log end.005",
+      "Dark red ember bed",
+      "Dark red ember bed.001",
+      "Dark red ember bed.002",
+      "Dark red ember bed.003",
+      "Dark red ember bed.004",
+      "Dark red ember bed.005",
+      "Dark red ember bed.006",
+      "Dark red ember bed.007",
+      "Dark red ember bed.008",
+      "Dark red ember bed.009",
+      "Dark red ember bed.010",
+      "Dark red ember bed.011",
+      "Dark red ember bed.012",
+      "Dark red ember bed.013",
+      "Dark red ember bed.014"
+    ],
+    "removed_parts": [
+      "Underloft rounded plaster breast"
+    ],
+    "triangles": 6100,
+    "surfaces": 1,
+    "exported_sha256": "dc1bed52953fad6a3e9a27a169f4d7964594b1ea7b5428c30a17364559981edf"
+  },
+  "hearth_mantel": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+    "changes": [
+      "Only mantel shelf selected; thin from .15 to .08 m while retaining its top and supported decor; warm mid-grey stone palette."
+    ],
+    "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+    "source_collection": "KIT_hearth_mantel_details",
+    "retained_parts": [
+      "Deep oak mantel shelf"
+    ],
+    "removed_parts": [
+      "Brass candlestick",
+      "Cream wax candle",
+      "Brass candlestick.001",
+      "Cream wax candle.001",
+      "Picture backing.002",
+      "Picture vertical frame.003",
+      "Picture vertical frame.004",
+      "Picture horizontal frame.003",
+      "Picture horizontal frame.004",
+      "Landscape sky",
+      "Landscape distant hills",
+      "Landscape foreground",
+      "Lamp brass foot.001",
+      "Lamp stem.001",
+      "Curved wall light bracket",
+      "Wall lamp black shade"
+    ],
+    "triangles": 108,
+    "surfaces": 1,
+    "exported_sha256": "331582e4b2f2c73a96cadca4a001333dc5b6f821c0e370fd40cbb0bf3a911b28"
+  },
+  "mantel_decor": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+    "changes": [
+      "Original two candlesticks and candles retained; new oval mirror and small frame; no original room lamps."
+    ],
+    "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+    "source_collection": "KIT_hearth_mantel_details",
+    "retained_parts": [
+      "Brass candlestick",
+      "Cream wax candle",
+      "Brass candlestick.001",
+      "Cream wax candle.001"
+    ],
+    "removed_parts": [
+      "Deep oak mantel shelf",
+      "Picture backing.002",
+      "Picture vertical frame.003",
+      "Picture vertical frame.004",
+      "Picture horizontal frame.003",
+      "Picture horizontal frame.004",
+      "Landscape sky",
+      "Landscape distant hills",
+      "Landscape foreground",
+      "Lamp brass foot.001",
+      "Lamp stem.001",
+      "Curved wall light bracket",
+      "Wall lamp black shade"
+    ],
+    "triangles": 1622,
+    "surfaces": 1,
+    "exported_sha256": "2e4fc4b6e1a5457971757bac13d457146f675c25f79ffd47829f4286f632c02d"
+  },
+  "elevator": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "Closed decorative brass double door, no digits, service or opening."
+    ],
+    "triangles": 672,
+    "surfaces": 1,
+    "exported_sha256": "d5771ee146c755573c67c919fa30655594cf032ae1326f68ef43f2c012d810c8"
+  },
+  "key_rack": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/post_office/post_office.blend",
+    "changes": [
+      "Remove floor drawers, labels and handles; retain 2.21 m width, rebuild upper cubbies as 1.30 m high shallow hanging key rack.",
+      "12 keys and wall mounting standoffs added; no letters or transactions."
+    ],
+    "source_sha256": "15725e7256a0188bc9b132f2086e7c4fd544bf186ed8afbb43b8c52cb8d965c1",
+    "source_collection": "KIT_sorting_cabinet",
+    "retained_parts": [
+      "Sorting cabinet back",
+      "Sorting cabinet stile",
+      "Sorting cabinet stile.001",
+      "Cabinet oak crown",
+      "Mail cubby shelf",
+      "Mail cubby shelf.001",
+      "Mail cubby shelf.002",
+      "Mail cubby shelf.003",
+      "Vertical cubby separator",
+      "Vertical cubby separator.001",
+      "Vertical cubby separator.002"
+    ],
+    "removed_parts": [
+      "Sorting bottom drawer",
+      "Drawer brass label frame",
+      "Drawer label",
+      "Sorting bottom drawer.001",
+      "Drawer brass label frame.001",
+      "Drawer label.001",
+      "Drawer brass pull",
+      "Drawer brass pull.001"
+    ],
+    "triangles": 4524,
+    "surfaces": 1,
+    "exported_sha256": "e12428184411e1601f68871a14fa6e9d25d26c26136f9354424b666190aff888"
+  },
+  "wall_clock": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/post_office/post_office.blend",
+    "changes": [
+      "Original .78 m diameter and 592-triangle geometry retained; recolor only; tick marks, no numerals."
+    ],
+    "source_sha256": "15725e7256a0188bc9b132f2086e7c4fd544bf186ed8afbb43b8c52cb8d965c1",
+    "source_collection": "KIT_wall_clock",
+    "retained_parts": [
+      "Clock oak rim",
+      "Clock cream dial",
+      "Clock hour mark",
+      "Clock hour mark.001",
+      "Clock hour mark.002",
+      "Clock hour mark.003",
+      "Clock hour mark.004",
+      "Clock hour mark.005",
+      "Clock hour mark.006",
+      "Clock hour mark.007",
+      "Clock hour mark.008",
+      "Clock hour mark.009",
+      "Clock hour mark.010",
+      "Clock hour mark.011",
+      "Clock hour hand",
+      "Clock minute hand"
+    ],
+    "removed_parts": [],
+    "triangles": 592,
+    "surfaces": 1,
+    "exported_sha256": "fc24ffbcd5520bc5ea635b01187f945e11fe15d5e077a9b6d8c772b97f6c15f1"
+  },
+  "blank_name_plaque": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "N1 v1.1: 1.68 x .30 m frame around a 1.60 x .22 m runtime text area; mounting pivot retained."
+    ],
+    "triangles": 284,
+    "surfaces": 1,
+    "exported_sha256": "823cd6c144728e8ddd78ee7ca10b997913ae1d55e47b68f74a32a53e5e8835b9"
+  },
+  "luggage_cart": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "New .95 x .77 m cart with three leather cases inside its footprint."
+    ],
+    "triangles": 2712,
+    "surfaces": 1,
+    "exported_sha256": "08315af2055d41829cf4da8d5741b6c9050a0b197a2707b6c4f5cafac78a06a2"
+  },
+  "low_bookshelf": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [],
+    "triangles": 2372,
+    "surfaces": 1,
+    "exported_sha256": "c5f91a00df15c208c7d646a178504df2653878a49faceeacc5241d7b37c2bf4f"
+  },
+  "floor_lamp": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [],
+    "triangles": 1392,
+    "surfaces": 1,
+    "exported_sha256": "1a1e1ce55bd3d0c9559e21f99394bfa23d981438f12e477909c52b97dcb038b8"
+  },
+  "green_rug": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [],
+    "triangles": 220,
+    "surfaces": 1,
+    "exported_sha256": "8bc02feb048b80753559b931260ac93cd29d60f5301c5c87a307cc1669b14401"
+  },
+  "cowhide_rug": {
+    "task": "SGODOT-319",
+    "author": "ZHAOYUN",
+    "source": "new",
+    "changes": [
+      "New 316-triangle flat contoured hide, not the 7,838-triangle Mine Hut rug."
+    ],
+    "triangles": 316,
+    "surfaces": 1,
+    "exported_sha256": "9c27c80ef234a1bfcf357fbac123903ef6b8abee9140b20e2701d4692c9703b3"
+  }
+}

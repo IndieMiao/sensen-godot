@@ -1,0 +1,13 @@
+{
+  "module": "hall_window_glass",
+  "author": "ZHAOYUN",
+  "task": "SGODOT-319",
+  "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+  "source": "tools/art/build_basic_room.py + scene_room_pipeline.py",
+  "reuse_kind": "Construction helpers; new hall geometry",
+  "changes": [
+    "Two 3.7 m walls without end columns",
+    "Rectangular true window apertures; casing and grille are separate local-pivot modules",
+    "Semantic HallAtlas UVs"
+  ]
+}
