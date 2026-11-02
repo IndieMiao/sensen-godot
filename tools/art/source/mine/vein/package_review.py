@@ -8,7 +8,7 @@ from PIL import Image,ImageDraw,ImageFont
 
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[4]
 OUT=ROOT/'output/mine-vein-355'
-parser=argparse.ArgumentParser();parser.add_argument('--preview-only',action='store_true');parser.add_argument('--stage',choices=['v0','v1'],default='v1');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--preview-only',action='store_true');parser.add_argument('--stage',choices=['v0','v1','v1.1'],default='v1.1');args=parser.parse_args()
 DOC=ROOT/'docs/design/mine-vein-355-2026-11-02'/args.stage;DOC.mkdir(parents=True,exist_ok=True)
 prefix='SGODOT-355_mine_vein_'+args.stage+'_'
 runtime=ROOT/'output/monsters-355/runtime/assets/mine/types/vein'
@@ -56,20 +56,31 @@ assert all(row['foreground_max_channel_delta']<=1 for row in comparisons),compar
 if args.preview_only:
     (OUT/'foreground-validation.json').write_text(json.dumps(comparisons,indent=2)+'\n')
     print(path,json.dumps(comparisons));raise SystemExit(0)
-depth_name='depth-validation-v1.json' if args.stage=='v1' else 'depth-validation.json'
-depth=json.loads((OUT/depth_name).read_text())
+colour_audit=None;inherited=None
+if args.stage=='v1.1':
+    accepted=json.loads((DOC.parent/'v1/SGODOT-355_mine_vein_v1_validation.json').read_text())
+    colour_audit=json.loads((OUT/'quartz-colour-validation.json').read_text())
+    assert colour_audit['passed'] and colour_audit['baseline_sha256']==accepted['glb']['geometry']['sha256']
+    assert colour_audit['sha256']==hashlib.sha256((runtime/'backdrop.glb').read_bytes()).hexdigest()
+    depth=accepted['depth'];outline=accepted['outline_raster_comparison']
+    inherited={'stage':'v1','glb_sha256':colour_audit['baseline_sha256'],
+        'reason':'Only quartz RGB bytes change; all geometry, UV, normals, indices, materials and other colours are identical.'}
+else:
+    depth_name='depth-validation-v1.json' if args.stage=='v1' else 'depth-validation.json'
+    depth=json.loads((OUT/depth_name).read_text())
 assert len(depth['cases'])==10 and all(case['worst']['far_margin']>=.05 and case['near_margin']>0 for case in depth['cases'])
 assert depth['zoom_step']==.01 and depth['across_step']==.05 and depth['down_step']==.1
-assert 'ERROR:' not in (OUT/('depth-v1.log' if args.stage=='v1' else 'depth.log')).read_text()
+if args.stage!='v1.1':assert 'ERROR:' not in (OUT/('depth-v1.log' if args.stage=='v1' else 'depth.log')).read_text()
 uv2=json.loads((OUT/'uv2-empty/uv2-report.json').read_text())
 assert uv2['backdrop.glb']['mask_0_vertices']>0 and uv2['backdrop.glb']['mask_1_vertices']>0
 assert uv2['backdrop.glb']['other_vertices']==0 and uv2['backdrop.glb']['non_gray_mask_0_vertices']==0
 assert (OUT/'uv2-empty/backdrop.glb').read_bytes()==(runtime/'backdrop.glb').read_bytes()
-outline=json.loads((OUT/'outline-validation.json').read_text()) if args.stage=='v1' else None
-assert args.stage!='v1' or outline['passed']
+if args.stage!='v1.1':outline=json.loads((OUT/'outline-validation.json').read_text()) if args.stage=='v1' else None
+assert args.stage=='v0' or outline['passed']
 report={'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','stage':args.stage,
     'glb':glb,'godot':godot,'depth':depth,'foreground_comparisons':comparisons,
     'gltf_document_uv2':uv2,'vein_mask':1,'outline_raster_comparison':outline,
+    'colour_byte_audit':colour_audit,'inherited_geometry_validation':inherited,
     'review_shader_formula':'mix(mix(COLOR.rgb * floor_tint, COLOR.rgb, UV2.y * vein_mask), void_tint, UV2.x)',
     'palette':palette,'provenance':json.loads((SRC/'reuse_provenance.json').read_text()),
     'dependencies':json.loads((OUT/'dependencies.json').read_text())}

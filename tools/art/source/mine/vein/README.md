@@ -1,7 +1,7 @@
-# SGODOT-355 矿脉 vein v1
+# SGODOT-355 矿脉 vein v1.1
 
-黄忠，2026-11-03。按共同规格的 ★、★★ 修订及上官婉儿 355 / ed70303f 返修，供技术和画面验收。
-v1 重做矿脉位置、形状和明暗，修复 v0 端头的保护边像素越界；配色表保持已通过的 v0。本轮源/审阅开草稿 PR 进 wp-3d-scene。
+黄忠，2026-11-03。按上官婉儿 355 / 5b186df5 仅调整白脉顶点色，供画面复验。
+v1 的技术、形状和位置已通过；v1.1 保留其几何、锈红、UV、UID 和配色表。源/审阅 PR #687 保持草稿，目标 wp-3d-scene。
 
 ## 文件与原点
 
@@ -12,7 +12,7 @@ v1 重做矿脉位置、形状和明暗，修复 v0 端头的保护边像素越�
 - 3,595 三角形，1 mesh / 1 surface / 0 贴图，线性顶点色，不透明，无碰撞。
 - 根节点 identity，米制，Y up；网格保留俯角 43°、偏航 14.5° 的原朝向。沿视线前移 1 m 仍由 `MineBackdrop` 做。
 - 保留连续主体岩层与内保护区；沿同一条折线，从上方岩体斜穿到下方，矿层中间保持空洞，不增加几何。
-- 白脉有宽窄变化、暗棱面，线性颜色峰值 .79、暗面约 .66；锈红夹层加宽并保留面间明暗，不再使用纯白直带。
+- 白脉以 sRGB `#B4B3BA` 到 `#C8C6CE` 的淡紫灰为主体，凹面降至 `#A9A5B5`，按实际面法线分配明暗；转换一次到线性顶点色。实测 sRGB 加权亮度 .65492–.78040，差 .12548；暗凹面略低于 .70，以保留约 .12 的明暗跨度。锈红夹层颜色保持。
 - 所有新增矿脉几何距原内轮廓退开 0.08 m。三档像素栅格轮廓完全一致；Godot 4×MSAA 对照保护区和内边缘均为零变化。
 - 原主岩层的全部顶点在相机平面的投影保持。8 个外缘顶点只沿视线收进不足 3 mm，以满足深度硬界；不改变投影轮廓。
 - 实测 `dot(P,N)` 为约 -6.967996 至 -5.669998 m，N=(.183116,.681998,.708058)。
@@ -27,7 +27,7 @@ Blender 的 `Fade_UV2` 中，暗岩 v=1、矿脉 v=0；导出 glTF 时翻 V，Go
 每次交付前在空工程用指定的 GLTFDocument 方法直接读文件，不执行 `--import` 或 `--editor`。
 本次独立读入结果：
 
-| 项 | 原背景 | vein v1 |
+| 项 | 原背景 | vein v1.1 |
 | --- | ---: | ---: |
 | UV2.y 最小 | 1.0 | -0.0000152587890625 |
 | UV2.y 最大 | 1.0 | 1.0 |
@@ -62,6 +62,10 @@ ALBEDO = mix(mix(COLOR.rgb * floor_tint, COLOR.rgb, UV2.y * vein_mask), void_tin
 
 ## 自验
 
+v1.1 直接修改已通过 v1 GLB 的 501 个白脉顶点 RGB（167 个三角面，共 3,003 字节），不重新导出几何。
+颜色审计逐字节核对其他数据：JSON、材质、索引、位置、法线、两个 UV、alpha、锈红及灰岩颜色全部保持。
+本轮重跑 39 项资产检查、Godot 导入、独立 UV 检查和五个实际视图；几何、轮廓及深度证据继承 v1，报告用 baseline SHA 和颜色审计关联，不冒充本轮重跑。
+
 独立 GLB 检查预算、线性颜色、0/1 矿脉遮罩、深度界、palette schema、连续层段及明度递减。
 内轮廓用实际 GLB 三角形投影比较；仅对 Float32 带来的微米级接缝做 0.01 mm 焊接和 0.05 mm 毛刺清理。
 另直接逐点核对原主体岩层投影，避免依赖轮廓算法自证。
@@ -76,13 +80,24 @@ v1 重新扫描 1,451,883 个机位，最小 far 余量 0.357143 m、near 余量
 真实 Godot 4.7.2 Vulkan Mobile / RTX 2060，每段原始 720×1600（360×800 的 2 倍），43°、zoom=.8。
 每段放实际玩家 H=1.745 m、青绿史莱姆、紫蝙蝠、红帽菇菇怪、岩甲虫和四种正式矿石；另附 F40 守关场地。
 展示使用原紫灰矿的几何，只临时改颜色；没有提交 MineArt、MineBackdrop、着色器或测试代码的运行时改动。
-除总表外，四段和守关层各交独立的 720×1600 JPG，在原画面底部空白处署名。
+v1.1 按要求只交四段和守关层总表及验证 JSON；v1 的五张独立 720×1600 JPG 保留为历史材料。
 本轮是桌面美术审阅，不是手机性能测量，也未合并或发布。
 
 ## 复现
 
 先准备本机独立 `output/monsters-355/runtime` 工作树和 `output/art-setup/venv`（NumPy、Pillow、Shapely）。
 生成器会覆盖 `vein.blend`，人工修改前先保留源。
+
+本次只改色的复现路径：从运行时 v1 提交 `827ef079491be0e06054c2fecbe33fbfbe6b6f63` 取出
+`assets/mine/types/vein/backdrop.glb` 保存为 `output/mine-vein-355/vein-v1.glb`（SHA-256 `f3ce040a4a9b29fe557b487abf1ebda9071cb77e200caad8d4354f4045db5253`）。
+运行时目标文件须为 v1 或仅改过白脉色的版本；补丁会拒绝其他字节变化。
+
+```sh
+output/art-setup/venv/bin/python tools/art/source/mine/vein/apply_quartz_colour.py --baseline output/mine-vein-355/vein-v1.glb
+blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/mine/vein/recolour_source.py
+```
+
+完整重建才运行 `build.py`；本次交付使用上面的颜色补丁保持已通过的几何字节。完整重建及出图命令：
 
 ```sh
 blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/mine/vein/build.py
@@ -101,5 +116,5 @@ godot --headless --path . -s res://uv2_check.gd
 ```
 
 本脚本沿用上官婉儿的 GLTFDocument 检查方式，追加 0/1 计数、灰度检查和节点清理。
-最后用 `package_review.py` 打包原分辨率 JPG 总表与验证 JSON；脚本要求深度、UV 和主体像素检查全部完成。
-v1 还要运行 `outline_review.gd` 和 `verify_outline.py`；深度报告文件名为 `depth-validation-v1.json`，避免误用 v0 结果。
+最后用 `package_review.py --stage v1.1` 打包原分辨率 JPG 总表与验证 JSON；脚本验证本轮 UV、主体像素与颜色审计，并关联已通过 v1 的几何证据。
+完整重建几何后需要重新运行 `outline_review.gd`、`verify_outline.py` 及全密度深度测试；v1 的原深度报告为 `depth-validation-v1.json`。

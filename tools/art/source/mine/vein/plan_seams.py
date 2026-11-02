@@ -2,10 +2,12 @@
 from pathlib import Path
 import json
 import sys
+import math
 import numpy as np
 from shapely.geometry import Polygon
 from shapely.ops import triangulate, unary_union
 from shapely import set_precision
+from quartz_colour import facet_colours
 
 source=Path(sys.argv[1]);target=Path(sys.argv[2])
 data=json.loads(source.read_text())
@@ -44,6 +46,15 @@ for name,region,color,lift in regions:
                 fades=np.clip(homogeneous@fade,0,1)
                 shade=([.84,.93,1.0,.90][len(patches)%4] if name=='Quartz_White_Seam' else [.76,1.,.88,1.08][len(patches)%4])
                 patches.append({'uvn':np.column_stack((uv,n)).tolist(),'fade':fades.tolist(),'shade':shade})
+    if name=='Quartz_White_Seam':
+        pitch=math.radians(43);yaw=math.radians(14.5)
+        n=np.array([math.sin(yaw)*math.cos(pitch),math.sin(pitch),math.cos(yaw)*math.cos(pitch)])
+        r=np.array([math.cos(yaw),0,-math.sin(yaw)]);u=np.cross(n,r);basis=np.column_stack((r,u,n))
+        normals=[]
+        for patch in patches:
+            points=np.array(patch['uvn']);normal=np.cross(points[1]-points[0],points[2]-points[0])
+            normals.append((basis@normal).tolist())
+        for patch,rgb in zip(patches,facet_colours(normals)):patch['linear_rgb']=rgb
     result.append({'name':name,'color':color,'triangles':patches})
 target.write_text(json.dumps(result,indent=2)+'\n')
 print('Mineral triangles:',sum(len(row['triangles']) for row in result))

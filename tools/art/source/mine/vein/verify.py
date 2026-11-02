@@ -40,9 +40,12 @@ check(np.all(np.ptp(colors[rock,:3],axis=1)<1e-6),'Non-mineral COLOR_0 is graysc
 check(colors[rock,:3].min()>=.419 and colors[rock,:3].max()<=.961,'Rock grayscale in original .42-.96 range')
 check(np.allclose(colors[:,3],1) if colors.shape[1]==4 else True,'Opaque vertex colours')
 check(mask[:,0].min()>=-1e-6 and mask[:,0].max()<=1.000001,'UV2.x remains a 0..1 void fade')
-quartz=colors[mineral,:3][np.min(colors[mineral,:3],axis=1)>.5]
-check(quartz.size>0 and quartz.max()<=.801 and quartz.max()>=.75,'Quartz linear peak .75-.80, below pure white')
-check(float(quartz.max()-quartz.min())>.10,'Quartz facets retain visible value variation')
+quartz=colors[mineral,:3][np.min(colors[mineral,:3],axis=1)>.3]
+quartz_srgb=np.where(quartz<=.0031308,quartz*12.92,1.055*quartz**(1/2.4)-.055)
+quartz_luma=quartz_srgb@np.array([.2126,.7152,.0722])
+check(.77<=quartz_luma.max()<=.79,'Quartz highlight sRGB luma about .78')
+check(.11<=np.ptp(quartz_luma)<=.14,'Quartz sRGB facet contrast about .12')
+check(np.all(quartz_srgb[:,2]-quartz_srgb[:,0]>.015),'Quartz has pale lavender hue, not neutral gray')
 check(np.any(colors[mineral,0]>colors[mineral,1]*2),'Rust edge has authored linear colour')
 normal=np.array([.183116,.681998,.708058]);depth=points@normal
 check(depth.min()>=-6.97 and depth.max()<=-5.60,'All vertices within required camera-depth slab')
@@ -115,6 +118,8 @@ report['coal_palette_contrast']=contrast
 report['geometry']={'triangles':len(indices),'surfaces':1,'depth_min':float(depth.min()),'depth_max':float(depth.max()),
     'bounds':[points.min(axis=0).tolist(),points.max(axis=0).tolist()],
     'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'mineral_vertices':int(mineral.sum()),'rock_vertices':int(rock.sum())}
+report['quartz_srgb']={'rgb_min':quartz_srgb.min(axis=0).tolist(),'rgb_max':quartz_srgb.max(axis=0).tolist(),
+    'luma_min':float(quartz_luma.min()),'luma_max':float(quartz_luma.max()),'luma_span':float(np.ptp(quartz_luma))}
 config=OUT/'project/assets/mine/types/vein/backdrop.glb.import'
 if config.exists():
     text=config.read_text();uid=re.search(r'^uid="([^"]+)"',text,re.M)

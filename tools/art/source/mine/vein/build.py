@@ -50,11 +50,12 @@ for obj in collection.objects:
 
 material=base.data.materials[0]
 for region in json.loads((OUT/'seam-plan.json').read_text()):
-    positions=[];faces=[];fades=[];shades=[]
+    positions=[];faces=[];fades=[];vertex_colours=[]
     for patch in region['triangles']:
         start=len(positions)
         for point,fade in zip(patch['uvn'],patch['fade']):
-            positions.append(blender(R*point[0]+U*point[1]+N*point[2]));fades.append(fade);shades.append(patch['shade'])
+            positions.append(blender(R*point[0]+U*point[1]+N*point[2]));fades.append(fade)
+            vertex_colours.append(patch.get('linear_rgb',[c*patch['shade'] for c in region['color']]))
         faces.append((start,start+1,start+2))
     mesh=bpy.data.meshes.new(region['name']);mesh.from_pydata(positions,[],faces);mesh.update()
     obj=bpy.data.objects.new(region['name'],mesh);collection.objects.link(obj)
@@ -65,14 +66,14 @@ for region in json.loads((OUT/'seam-plan.json').read_text()):
         p=godot(mesh.vertices[loop.vertex_index].co)
         uv.data[loop.index].uv=(p.dot(R)/24,p.dot(U)/24)
         mask.data[loop.index].uv=(fades[loop.vertex_index],0)
-        colors.data[loop.index].color=(*(c*shades[loop.vertex_index] for c in region['color']),1)
+        colors.data[loop.index].color=(*vertex_colours[loop.vertex_index],1)
     mesh.color_attributes.active_color=colors;mesh.color_attributes.render_color_index=mesh.color_attributes.find(colors.name)
     obj['mineral_mask']=1
 
 # Keep the editable source independent from obsolete embedded R1 generators.
 for text in list(bpy.data.texts):bpy.data.texts.remove(text)
 note=bpy.data.texts.new('README_VEIN.txt')
-note.write('SGODOT-355 vein v1. Named parts copied from accepted mine_backdrop.blend.\nRebuild/export with adjacent build.py. COLOR is linear; Blender Fade_UV2.y is inverted at glTF export.\n')
+note.write('SGODOT-355 vein v1.1. Named parts copied from accepted mine_backdrop.blend.\nRebuild/export with adjacent build.py. COLOR is linear; Blender Fade_UV2.y is inverted at glTF export.\n')
 bpy.context.view_layer.update()
 bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'vein.blend'))
 bpy.ops.object.select_all(action='DESELECT');copies=[]
@@ -87,13 +88,13 @@ bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=T
     export_materials='EXPORT',export_normals=True,export_texcoords=True,export_vertex_color='ACTIVE',
     export_all_vertex_colors=False,export_animations=False,export_skins=False)
 shutil.copy2(SRC/'palette.json',RUNTIME/'palette.json')
-report={'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','stage':'v1',
+report={'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','stage':'v1.1',
     'source':'assets/mine/backdrop/source/mine_backdrop.blend','source_sha256':hashlib.sha256((SRC/'base_reference.blend').read_bytes()).hexdigest(),
     'removed_exterior_details':removed,'depth_only_clamped_vertices':adjusted,'triangles':count,'surfaces':1,
     'runtime_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'axes':{'N':list(N),'R':list(R),'U':list(U)},
     'changes':['Retain protected inner footprint and camera-space alignment; runtime retains the 1m forward offset.',
         'Variable-width kinked mineral vein runs diagonally behind the mine, exposed in upper and lower background.',
-        'Mineral geometry is inset 0.08m from the original surface boundary; quartz linear peak .79 with shaded facets and wider rust margins.',
+        'Mineral geometry is inset 0.08m; quartz is pale lavender sRGB with facet-aligned highlights and darker recesses. Rust retained.',
         'UV2.x retains edge fade; UV2.y is 1 only for un-tinted mineral color; remaining rock is grayscale.']}
 (SRC/'reuse_provenance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print('VEIN_EXPORT',count,'triangles',adjusted,'depth-only clamped vertices',flush=True)
