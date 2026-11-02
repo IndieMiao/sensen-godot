@@ -140,8 +140,9 @@ func _switch_test_account(action: String) -> void:
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:
-	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
-	TranslationServer.set_locale("en")
+	# English by default, 中文 when the player picked it in Settings (0.2.21, the user 11-02; it was English-only from
+	# 2026-09-04): P0's own table, never Journey's (Localization.use_p0).
+	Localization.use_p0()
 	session = P0Session.new()
 	add_child(session)
 	ui = P0Ui.new()

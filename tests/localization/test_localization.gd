@@ -130,3 +130,47 @@ func test_marker_names_and_tooltips_follow_locale_without_replacing_nodes() -> v
 	TranslationServer.set_locale("zh_CN")
 	markers.refresh_language()
 	assert_str(markers._owner_labels.a.text).is_equal("农场主 1234")
+
+## P0 中文版 (0.2.21): P0's own table — a line exactly, else as a %d / %s template with each %s caught translated again
+## (an item's name), else line by line and by its ` · ` parts; `{1}` / `{2}` reorder; nothing known keeps the English.
+const LocalizationScript := preload("res://modules/ui/localization.gd")
+
+func _p0_table() -> Translation:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"_note": "x", "Settings": "设置", "Upgrade": "升级", "Stone": "石料", "Copper Ore": "铜矿石",
+		"Need %d more %s": "还差 %d 个%s", "Plots %d/%d": "田 %d/%d", "%s · %d coins": "%s · %d 金币",
+		"%s Lv%d needed · now %d": "需要%s Lv%d · 现在 %d", "Visit %s with %s": "和{2}一起去{1}", "Fishing": "钓鱼"})
+	return t
+
+func test_p0_table_translates_lines_templates_parts_and_leaves_the_rest() -> void:
+	var t := _p0_table()
+	assert_str(String(t.get_message("Settings"))).is_equal("设置")
+	assert_str(String(t.get_message("Need 2 more Stone"))).is_equal("还差 2 个石料")
+	assert_str(String(t.get_message("Need 1,200 more Copper Ore"))).is_equal("还差 1,200 个铜矿石")
+	assert_str(String(t.get_message("Plots 8/8"))).is_equal("田 8/8")
+	assert_str(String(t.get_message("Fishing Lv3 needed · now 2"))).is_equal("需要钓鱼 Lv3 · 现在 2")
+	assert_str(String(t.get_message("Visit Fern Pond with Mei"))).is_equal("和Mei一起去Fern Pond")   # {1} {2}: reordered
+	assert_str(String(t.get_message("Upgrade · Stone"))).is_equal("升级 · 石料")   # by its ` · ` parts
+	assert_str(String(t.get_message("Upgrade\nNeed 3 more Stone"))).is_equal("升级\n还差 3 个石料")   # line by line
+	assert_str(String(t.get_message("Fern Pond"))).is_equal("")   # a name it does not hold: the English stays
+	assert_str(String(t.get_message("270/270"))).is_equal("")   # no letters: nothing to translate
+	assert_str(String(t.get_message("_note"))).is_equal("")   # notes are no lines
+
+func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() -> void:
+	var path := "user://p0-language-test-%d.cfg" % Time.get_ticks_usec()
+	var loc: Node = LocalizationScript.new()
+	TranslationServer.set_locale("zh_CN")   # a new instance's _init sets Journey's own pick
+	assert_str(loc.p0_language(path)).is_equal("en")
+	assert_int(loc.select_p0_language("fr", path)).is_equal(ERR_INVALID_PARAMETER)
+	assert_int(loc.select_p0_language("zh_CN", path)).is_equal(OK)
+	assert_str(TranslationServer.get_locale()).is_equal("zh_CN")   # before_test's; select does not switch now
+	assert_str(loc.p0_language(path)).is_equal("zh_CN")
+	TranslationServer.set_locale("en")
+	loc.use_p0(path)   # the next start: P0's table in, Journey's (this instance's) out, the picked locale
+	assert_str(TranslationServer.get_locale()).is_equal("zh_CN")
+	assert_object(loc._journey).is_null()
+	assert_object(loc.p0_translation).is_not_null()
+	TranslationServer.remove_translation(loc.p0_translation)
+	loc.free()
+	DirAccess.remove_absolute(path)

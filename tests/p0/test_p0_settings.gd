@@ -294,3 +294,50 @@ func test_a_long_text_fills_in_over_frames() -> void:
 	assert_bool(page.complete()).is_true()
 	assert_int(page.body.get_child_count()).is_equal(all.size())
 	assert_str((page.body.get_child(all.size() - 1) as Label).text).is_equal(str(all[-1]))
+
+## 0.2.21 中文版 (不知火舞 on it, 11-02): General · Language › between Home / Notifications and Test options, its value the
+## language in use in its own words; its page lists English and 中文 untranslated, a ✓ on the pick, and while the pick is
+## not the language on screen a line says a restart applies it. The three UiKit weights draw Chinese (Noto Sans SC).
+func test_settings_offers_language_between_notifications_and_test_options() -> void:
+	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("0.2.21 (2026110301)", 0.0, 0.0, {}, "On", "English"))
+	add_child(page)
+	await await_idle_frame()
+	assert_array(_labels(page.body)).is_equal(["Notifications", "On", "›", "General", "Language", "English", "›",
+		"Test options", "›", "Legal", "Licenses", "›", "Version", "0.2.21 (2026110301)"])
+	var said := []
+	page.open_pressed.connect(func(w): said.append(w))
+	(page.body.find_child("Language", true, false).find_child("Hit", true, false) as Button).pressed.emit()
+	assert_array(said).is_equal(["language"])
+
+func test_the_language_page_marks_the_pick_and_says_a_restart_applies_it() -> void:
+	var page: P0SettingsPage = auto_free(P0SettingsPage.language("zh_CN", "en"))
+	add_child(page)
+	await await_idle_frame()
+	assert_str(page.header.title).is_equal("Language")
+	var en: UiSettingRow = page.body.find_child("Language_en", true, false)
+	var zh: UiSettingRow = page.body.find_child("Language_zh_CN", true, false)
+	assert_array(_labels(en)).is_equal(["English", "›"])   # no value on the one not picked
+	assert_array(_labels(zh)).is_equal(["简体中文", "✓", "›"])
+	assert_int(zh.auto_translate_mode).is_equal(Node.AUTO_TRANSLATE_MODE_DISABLED)
+	assert_object(page.body.find_child("RestartNote", true, false)).is_not_null()
+	var said := []
+	page.open_pressed.connect(func(w): said.append(w))
+	(en.find_child("Hit", true, false) as Button).pressed.emit()
+	assert_array(said).is_equal(["language:en"])
+	var same: P0SettingsPage = auto_free(P0SettingsPage.language("en", "en"))   # the pick is on screen: no line
+	add_child(same)
+	await await_idle_frame()
+	assert_object(same.body.find_child("RestartNote", true, false)).is_null()
+
+func test_the_ui_weights_draw_chinese_through_noto_sans_sc_only_under_chinese() -> void:
+	var paths := [UiTokens.FONT_REGULAR_PATH, UiTokens.FONT_BOLD_PATH, UiTokens.FONT_EXTRABOLD_PATH]
+	var heights := paths.map(func(p): return (load(p) as Font).get_height(14))
+	for path in paths: assert_int((load(path) as FontVariation).fallbacks.size()).is_equal(0)   # English: as measured
+	Localization.set_cjk_fonts(true)
+	for path in paths:
+		var font := load(path) as FontVariation
+		assert_int(font.fallbacks.size()).override_failure_message(path).is_equal(1)
+		assert_bool(font.has_char(0x4E2D)).override_failure_message(path).is_true()   # 中
+		assert_float(font.get_string_size("中文", HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x).is_greater(20.0)
+	Localization.set_cjk_fonts(false)
+	for i in paths.size(): assert_float((load(paths[i]) as Font).get_height(14)).is_equal(heights[i])

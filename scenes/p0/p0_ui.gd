@@ -158,8 +158,9 @@ func _ready() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.theme = GameUi.theme()
-	# App copy is English-only (user rule 2026-09-04): keep the Localization autoload from translating P0 labels.
-	root.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	# Labels and buttons translate as they draw (0.2.21: English by default, 中文 by the player's choice) through P0's
+	# own table (Localization.use_p0 took Journey's away); a name the table does not hold stays as it is.
+	root.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_INHERIT
 	add_child(root)
 	voice_match = VoiceMatchLink.new()   # the profile's Voice Profile (SGODOT-349)
 	voice_match.name = "VoiceMatchLink"
@@ -3616,12 +3617,14 @@ func open_settings(back := Callable()) -> void:
 	if test_accounts.is_test(): version += " · Test"
 	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
-		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "")
+		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
+		LANGUAGE_NAMES.get(Localization.p0_language(), "English"))
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
 		# Home city › (SGODOT-303 PR-4): the change; its ‹ Settings comes back here
 		if what == "home": change_home.emit(func(): open_settings(back))
+		elif what == "language": open_language(func(): open_settings(back))
 		elif what == "test_options": open_test_options(func(): open_settings(back))
 		elif what == "notifications": open_notifications(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
@@ -3653,6 +3656,24 @@ func open_notifications(back: Callable) -> void:
 ## The phone's notification state may have changed: the page on screen shows it again.
 func notify_changed() -> void:
 	if modal_kind == "notifications" and notify != null: open_notifications(_notif_back)
+
+## Settings › Language (0.2.21 中文版): the pick is saved for the next start (Localization.select_p0_language); the page
+## shows it again with the restart line while the pick is not the language on screen.
+const LANGUAGE_NAMES := {"en": "English", "zh_CN": "简体中文"}
+
+func open_language(back: Callable) -> void:
+	var page := P0SettingsPage.language(Localization.p0_language(), TranslationServer.get_locale(), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(what: String):
+		if not what.begins_with("language:"): return
+		if Localization.select_p0_language(what.trim_prefix("language:")) != OK:
+			show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
+			return
+		open_language(back))
+	_open_modal(page, 0.0, true)
+	modal_kind = "language"
+	_modal_back = back
 
 func open_test_options(back: Callable) -> void:
 	var page := P0SettingsPage.test_options(test_accounts.enabled(), test_accounts.is_test(), safe_top(), safe_bottom())

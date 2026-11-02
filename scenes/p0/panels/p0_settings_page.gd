@@ -24,7 +24,7 @@ signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, LANGUAGE }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -85,7 +85,9 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
 ## `Set for good`. No home (a view not in yet): no Home group. `notifications` "On" / "Off": one row, `Notifications`
 ## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group.
-static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "") -> P0SettingsPage:
+## `language` (0.2.21 中文版): the row's value, the language in use in its own words (`English` / `中文`); "" for none.
+static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
+		language := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -99,6 +101,11 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		notif.name = "Notifications"
 		notif.pressed.connect(func(): page.open_pressed.emit("notifications"))
 		page._group("", [notif])
+	if language != "":   # General · Language › between Home and Legal (不知火舞 on the 中文版, 11-02)
+		var lang := UiSettingRow.new(UiSettingRow.Kind.LINK, "Language", "", language)
+		lang.name = "Language"
+		lang.pressed.connect(func(): page.open_pressed.emit("language"))
+		page._group("General", [lang])
 	var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
@@ -248,3 +255,24 @@ func _group(title: String, rows: Array) -> void:
 		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		body.add_child(gap)
 	body.add_child(UiSettingRow.group(rows))
+
+## Settings › Language (0.2.21 中文版): `English` and `中文`, each in its own words (never translated), a ✓ on the one
+## picked; a pick is kept for the next start — the line under says so (the user's pick: a restart applies it).
+## `current` the language picked (P0_SUPPORTED's), `running` the one this start shows.
+static func language(current: String, running: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.LANGUAGE, "Language", safe_top, safe_bottom)
+	var rows: Array = []
+	for pair in [["en", "English"], ["zh_CN", "简体中文"]]:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, str(pair[1]), "", "✓" if current == pair[0] else "")
+		row.name = "Language_" + str(pair[0])
+		row.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a language's own name, in its own words
+		var locale := str(pair[0])
+		row.pressed.connect(func(): page.open_pressed.emit("language:" + locale))
+		rows.append(row)
+	page._group("", rows)
+	if current != running:
+		var note := UiKit.label("Restart the app to use the new language.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		note.name = "RestartNote"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(note)
+	return page
