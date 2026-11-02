@@ -6,6 +6,7 @@ extends P0Room
 ## Square 30). Counters and residents open the panel entries of SGODOT-224 / 225 when present; until then the
 ## tackle counter keeps the existing greeting.
 
+const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keeper's local requests (q(272))
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
@@ -239,7 +240,7 @@ func _open_keeper() -> void:
 ## What P0Logic.keeper_lines takes from the outpost data (names and places are data, not UI copy): the keeper's
 ## name, the place ("Keeps the stall · Mission Market Square") and, for the tackle shop, the pond it names.
 func keeper_ctx() -> Dictionary:
-	var ctx := {"keeper": str(keeper.get("name", "")), "place": place_name}
+	var ctx := {"keeper": str(keeper.get("name", "")), "place": place_name, "outpost": str(outpost.get("id", ""))}   # outpost: its local requests (q(272))
 	if keeper.has("look"): ctx["look"] = str(keeper.look)   # a generated keeper's portrait is drawn from it (SGODOT-300)
 	if outpost.has("nearest"): ctx["nearest"] = (outpost.nearest as Dictionary).duplicate()
 	return ctx
@@ -372,8 +373,10 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 		# stays lit over those two; P0Ui decides what shows under which modal). The keeper is this room's only keeper.
 		var who := rt.ui.speaker() if rt != null else ""
 		var talking := who != "" and who == ("keeper" if n == "npc_keeper" else str(npcs[n].id))
+		# the keeper's own mark: a local request of theirs (q(272), 不知火舞 091a3ae9: ✓ first, then !)
+		var mark := P0Locals.badge(view, str(outpost.get("id", ""))) if n == "npc_keeper" else ""
 		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking,
-			badge = P0Guide.resident_badge(view, str(npcs[n].id), str(outpost.get("id", "")))}
+			badge = mark if mark != "" else P0Guide.resident_badge(view, str(npcs[n].id), str(outpost.get("id", "")))}
 	if SEAT_GROUPS.has(n):
 		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
 	if n == "use_market_board":
@@ -504,6 +507,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sit": _go_sit(step[1] if step.size() > 1 else "seat_table1_")
 		"stand": _stand_up()
 		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
+		"keeper": _open_keeper()   # a tap on the keeper: their greeting, with this outpost's local requests (q(272) shots)
 		"biteboard": if rt: rt.ui.open_bite_board(outpost)   # the Bite Board as after tapping the board (SGODOT-283 shots)
 		"fareboard": if rt: rt.ui.open_fare_board()   # Trip fares as after tapping the Fare Board (q(165) shots)
 		"bitepond": if rt: rt.ui.open_board_pond(outpost, step[1])   # bitepond:<pond id> — a row's pond card

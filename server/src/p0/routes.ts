@@ -60,7 +60,10 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (!deps.rooms.occupant(st.player) && entered && !placeOf(c, entered) && clusterOf(c, entered) === here) n += 1;
     return n;
   };
-  const view = (st: P0State, at: number) => viewOf(c, st, at, { online: townOnline(st) });
+  // q(272): the keepers' local requests wear map marks only for a client that shows them (`locals`): an older one would
+  // write a keeper's ! as the Market Board's count
+  const view = (st: P0State, at: number, headers: Record<string, unknown>) =>
+    viewOf(c, st, at, { online: townOnline(st), locals: features(headers).includes('locals') });
 
   app.get('/v1/p0/state', async (req, reply) => {
     const player = playerOf(req.headers);
@@ -70,7 +73,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (typeof space === 'string' && space !== '') {   // the read a client makes on entering a space (q(41))
       // v5: entering a pond or outpost in a city without a pass is refused, with the confirm panel's preview.
       const refused = requirePass(c, s, space, place, clock(s.clock_ms));
-      if (refused) return reply.send({ ok: false, code: refused.code, detail: refused.detail, state: view(s, clock(s.clock_ms)) });
+      if (refused) return reply.send({ ok: false, code: refused.code, detail: refused.detail, state: view(s, clock(s.clock_ms), req.headers) });
       const before = { ...s, presence: { ...s.presence } };   // guideKeys reads only presence off it (no plots changed, no command)
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
@@ -85,7 +88,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       settleGuide(c, s, new Map(), clock(s.clock_ms));
       if (moved || (s.guide ? JSON.stringify(s.guide) : null) !== was) store.put(s);
     }
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
 
   /** A city's places and silhouette card (note §4): home returns the hand-written tables; others come from the generator. */
@@ -159,8 +162,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, ip: req.ip, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
       ...(result.ok ? {} : { code: result.code, detail: result.detail ?? {} }),
       energy: [before.energy.value, result.ok ? result.state.energy.value : before.energy.value], events: result.ok ? result.events : [] });
-    if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now) });
-    return reply.send({ ok: true, events: result.events, state: view(result.state, now) });
+    if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now, req.headers) });
+    return reply.send({ ok: true, events: result.events, state: view(result.state, now, req.headers) });
   });
 
   /** UI moments for the observation log (S7): known kinds only, a few a minute per player; nothing in the game changes. */
@@ -194,7 +197,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = stateOf(player, req.headers);
     s.clock_ms += minutes * 60_000;
     store.put(s);
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   /** Playtests only: set the stored energy (eating, Energy Card and zero-energy states need a low bar). */
   app.post('/v1/p0/dev/energy', async (req, reply) => {
@@ -206,7 +209,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const now = clock(s.clock_ms);
     s.energy = { value, tick_ms: now };
     store.put(s);
-    return reply.send({ ok: true, state: view(s, now) });
+    return reply.send({ ok: true, state: view(s, now, req.headers) });
   });
   /** Playtests only: fill every free bag slot with one item (the creel-full state, FISH-4). */
   app.post('/v1/p0/dev/fill', async (req, reply) => {
@@ -217,7 +220,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = stateOf(player, req.headers);
     add(c, s, id, 1_000_000);
     store.put(s);
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   /** Playtests only: put items in the bag or the farm storage (materials have no P0 source until the mine / gathering land). */
   app.post('/v1/p0/dev/grant', async (req, reply) => {
@@ -231,13 +234,13 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (to === 'storage') putInStorage(s, id, qty);
     else add(c, s, id, qty);
     store.put(s);
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   app.post('/v1/p0/dev/reset', async (req, reply) => {
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const s = store.reset(player, deps.now(), newSave(req.headers));
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   /** Playtests only (SGODOT-351): the card room's table for a save — its Homestead level (the gate, Lv2) and coins. */
   app.post('/v1/p0/dev/blackjack', async (req, reply) => {
@@ -251,7 +254,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (level !== undefined) s.homestead.level = level;
     if (coins !== undefined) s.coins = coins;
     store.put(s);
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
   /** Playtests only (SGODOT-341): put this save's guide on a step — `first`, `end` or a step id — counts cleared. */
   app.post('/v1/p0/dev/guide', async (req, reply) => {
@@ -261,6 +264,6 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const refusal = setGuide(c, s, String((req.body as { step?: string } | undefined)?.step ?? ''), clock(s.clock_ms));
     if (refusal) return reply.code(400).send({ ok: false, code: refusal.code });
     store.put(s);
-    return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+    return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });
   });
 }

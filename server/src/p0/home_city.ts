@@ -314,6 +314,9 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
     const v = t.visits[from];
     if (!v && !first) t.visits[from] = { n: 1, first_at: t.home_chosen_at ?? s.created_at, last_at: now, deliveries: 0, delivered_day: '' };
     delete t.passes[city];   // home needs no pass
+    // q(272): home gives no local requests — one tracked in the new home is dropped, free, as a resident's above
+    for (const sl of s.locals?.[city]?.slots ?? []) if (sl.req.status === 'accepted') dropped.push(sl.req.id);
+    delete s.locals?.[city];
   }
   if (t.here === from) t.here = city;
   t.home = city;

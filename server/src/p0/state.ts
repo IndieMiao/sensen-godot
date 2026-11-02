@@ -174,6 +174,9 @@ export interface P0State {
   // settle and on a home change. Outside `boards`: a server rolled back to v5 walks every value of `boards` as a board,
   // and reads the home board it knew. Walks: boards.boardsOf.
   markets: Record<string, BoardSlot[]>;
+  // q(272): each city's local requests from its keepers (locals.ts), by city cluster; absent until the first away from
+  // home, filled in place (no version of its own, as the inbox): a server without it keeps the field as it was.
+  locals?: Record<string, LocalCity>;
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   presence: Presence;
   inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
@@ -210,6 +213,10 @@ export interface P0State {
   rng: number;
   seq: number;
 }
+
+/** q(272): a city's local requests — `day` the player day they were drawn on (dayKey), each slot a request and the
+ * keeper's outpost giving it. Tracked ones stay past their day; the untracked go at the next day's draw. */
+export interface LocalCity { day: string; slots: { req: BoardRequest; place: string }[] }
 
 export const emptyDay = (key = ''): P0Day => ({
   key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,

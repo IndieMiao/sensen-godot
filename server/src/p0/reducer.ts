@@ -5,6 +5,7 @@ import { add, count, room, take } from './bag.js';
 import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
+import { isLocal, localCommand, pruneCities, settleLocals } from './locals.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteHarvested, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -110,7 +111,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleCards(c, s);   // today's recipe cards are fixed on the first command of the day
+  pruneCities(c, s, now);   // q(272) ⑪: a city not visited for 30 days, nothing tracked there, starts over
   settleBoards(c, s, now);
+  settleLocals(c, s, now);   // q(272): the day's local requests of the city the player is in
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.
   // With several stoves (SGODOT-282) only the stove holding that pot waits; the others settle as usual.
@@ -322,6 +325,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'accept': case 'deliver': case 'drop': {
       const id = String(cmd.request ?? '');
       const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(c, s))
+        : isLocal(id) ? localCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place })   // q(272)
         : boardCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place });
       if (refusal) return fail(refusal.code, refusal.detail);
       if (cmd.type === 'deliver') noteDelivery(c, s, now);   // toward Regular in the city the player is in (§11.9.1)
