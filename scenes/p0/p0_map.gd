@@ -36,6 +36,7 @@ const LOCATE_ZOOM := 14.0
 var rt: P0Runtime
 var _presence: P0HttpRequest
 var _online := {}   # outpost id → players online across its rooms
+var _pond_online := {}   # pond id → players online at it (the pond rooms, /presence `ponds`, 2026-11-02)
 var _marks_sig := ""
 
 func _initial_region_id() -> String:
@@ -143,6 +144,7 @@ func _install_city_map() -> void:
 		city_map.pond_action = "Go"
 		city_map.destination_style = _destination_style
 		city_map.host_card = _own_card
+		city_map.pin_online = _pin_online   # outposts' and ponds' counts (q(137) ③; the pond rooms, 2026-11-02)
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
 		city_map.poi_shown = poi_shown   # q(212) ⑤: no POI in the fog
@@ -188,7 +190,11 @@ func _origin() -> Vector2:
 func _pond_info(entry: Dictionary) -> Dictionary:
 	if rt == null or rt.session == null: return {}
 	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(entry.lat), float(entry.lng)))
-	return PondCard.info(rt.session.view, str(entry.id), km)
+	var info := PondCard.info(rt.session.view, str(entry.id), km)
+	# Online now under Distance as an outpost's card has it, only with someone in (q(72); the pond rooms, 2026-11-02)
+	var online := int(_pond_online.get(str(entry.id), 0))
+	if online > 0 and info.get("facts") is Array: (info.facts as Array).insert(1, ["Online now", str(online)])
+	return info
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
@@ -465,11 +471,27 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200 or city_map == null: return
 	var data = JSON.parse_string(body.get_string_from_utf8())
 	if not (data is Dictionary) or not (data.get("outposts") is Dictionary): return
+	# the pond rooms (2026-11-02): `ponds` beside `outposts`, keyed by the pond's id (a `pond:` room id read the same);
+	# an older server without it: none in
+	var ponds := {}
+	var by_pond = data.get("ponds", {})
+	if by_pond is Dictionary:
+		for id in by_pond:
+			var n := int((by_pond[id] as Dictionary).get("online", 0)) if by_pond[id] is Dictionary else 0
+			if n > 0: ponds[str(id).trim_prefix("pond:")] = n
+	if ponds != _pond_online:
+		_pond_online = ponds
+		city_map.refresh_pins()   # a pond's pin is the map's own entry: no set_places brings its count
 	var online := {}
 	for id in data.outposts: online[str(id)] = int(data.outposts[id].get("online", 0))
 	if online == _online: return
 	_online = online
 	_set_outpost_places()
+
+## Who is in at a pin (CityMapView.pin_online): a pond's from the pond rooms, an outpost's on its own entry.
+func _pin_online(entry: Dictionary) -> int:
+	if str(entry.get("kind", "")) == "pond": return int(_pond_online.get(str(entry.get("id", "")), 0))
+	return int(entry.get("online", 0))
 
 ## The city view's own controls: the recenter key brings the camera back to the player at LOCATE_ZOOM from any zoom
 ## (q(158), the user on 301; it kept the zoom before, 不知火舞 on 234); outfits are not in P0 (their button is gone with
@@ -1898,6 +1920,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
 			_online[step[1]] = int(step[2])
 			_set_outpost_places()
+		"pondonline":   # pondonline:pond_san_francisco_03:3 — the same for a pond's pin and card (2026-11-02)
+			_pond_online[step[1]] = int(step[2])
+			city_map.refresh_pins()
 		"pin":   # pin:home / pin:sh_tea_1 — a tap on that pin (its card), the Homestead pin only while away
 			var hit: Array = city_map.entries.filter(func(e): return str(e.get("id", "")) == step[1]) if city_map else []
 			if not hit.is_empty(): city_map.select(hit[0])
