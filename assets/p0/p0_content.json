@@ -3422,65 +3422,8 @@
     }
   },
   "gather": {
-    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage; worms go to the bag, any that do not fit go to storage (q(44)); seasonings (Rock Salt, Wild Herb) go to the bag and are not stored on coming home until the Spice Rack at Homestead Lv2, which puts them away (q(46)). P0 has no Old Tree (hardwood is P1, q(44)). Gather Gloves are gone (the user, 11-02 丁11; batch 2 makes them again with the tools).",
-    "regen_h": 8,
-    "tempo_ms": 900,
-    "spots": {
-      "spot_grove": {
-        "name": "Timber Grove",
-        "yield": [
-          [
-            "wood",
-            6
-          ]
-        ],
-        "homestead": 1
-      },
-      "spot_rock_pile": {
-        "name": "Rock Pile",
-        "yield": [
-          [
-            "stone",
-            4
-          ]
-        ],
-        "homestead": 1
-      },
-      "spot_reed_bank": {
-        "name": "Reed Bank",
-        "yield": [
-          [
-            "fiber",
-            3
-          ],
-          [
-            "bait_worm",
-            2
-          ]
-        ],
-        "homestead": 1
-      },
-      "spot_herb_patch": {
-        "name": "Herb Patch",
-        "yield": [
-          [
-            "wild_herb",
-            2
-          ]
-        ],
-        "homestead": 1
-      },
-      "spot_clay_bank": {
-        "name": "Clay Bank",
-        "yield": [
-          [
-            "clay",
-            2
-          ]
-        ],
-        "homestead": 2
-      }
-    }
+    "_note": "v4q(4) ③–⑤ (SGODOT-355; the user, 11-02): gathering is a city's points (gather_points.ts, `<cluster>~<kind><n>`), 3 Energy, 4 h by point id; the farm's six spots left with v4q(4) ①, and the Homestead's clay_bank / old_tree with them. tempo_ms: the anti-script tempo between taps. Gather Gloves are gone (丁11; batch 2 makes them again with the tools).",
+    "tempo_ms": 900
   },
   "mine": {
     "_note": "SGODOT-231 / SGODOT-275 §13.3 / LOCK-21, floors 1–5: 2 Energy the first time a run reaches a floor, 2 per rock, ≤ 2 runs a player day, a new run needs floor 2 cleared (an Express run counts as having it), 04:00 ends an unfinished run. Each rock: Stone by the pickaxe, plus one weighted extra drop derived from the run, floor and rock (§13.3.3; P1 restores floor 2's quartz, q(47) folded it into Rock Salt for P0). Floors 1–4 clear when their 6 rocks are broken (monsters may be left); floor 5 has no rocks and clears when its elite is beaten, which ends the run. Monsters (§13.3.4): attacking, being hit and kills are 0 Energy; the Wooden Sword's 3 damage takes a slime in 3 swings and the elite in 12. The elite drops quartz once a player day: a second kill shares quartz's weight out over the others. Express (§13.3.1): once the account has cleared floor 4, the mouth and every elevator offer Floor 5 · Express · Free (no floor 5 fee; from the mouth it starts a run). HP counts only inside the mine: 0 sends the player back to the mine mouth with the run kept; entering the mine refills it.",

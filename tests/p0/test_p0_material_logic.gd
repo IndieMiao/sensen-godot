@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
-## SGODOT-231 P0MaterialLogic: the mine's floors (LOCK-21, q(44); 355 b1, contract-efg §7), gathering marks, workbench
-## cards (B2-06).
+## SGODOT-231 P0MaterialLogic: the mine's floors (LOCK-21, q(44); 355 b1, contract-efg §7), a gather's floats, workbench
+## cards (B2-06). The farm's gathering marks and the gloves left with v4q(4) ① and 丁11.
 
 const Fx := preload("res://tests/p0/fixtures/mine_b1_view.gd")
 
@@ -14,20 +14,10 @@ func test_stored_notice_shows_once() -> void:
 	assert_str(P0MaterialLogic.stored_notice(v, 0.0)).is_equal("Stored · 12 Stone · 3 Copper Ore")
 	assert_str(P0MaterialLogic.stored_notice(v, 2000.0)).is_equal("")
 
-func test_gather_marks_and_today_line() -> void:
-	var v := {"names": {"wood": "Timber"}, "gather": {"gloves": false, "spots": [
-		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "ready": false, "ready_in": 7800000, "yield": [["wood", 6]]},
-		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "ready": false, "ready_in": 0, "yield": [["clay", 2]]},
-	]}}
-	var marks := P0MaterialLogic.gather_marks(v)
-	assert_str(str(marks[0].caption)).is_equal("Timber Grove · Ready in 2h 10m")
-	assert_str(str(marks[0].badge)).is_equal("countdown")
-	assert_str(str(marks[1].caption)).is_equal("Clay Bank · Homestead Lv2")
-	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("Timber Grove · Ready in 2h 10m")
-	v.gather.spots[0].ready = true
-	assert_str(str(P0MaterialLogic.gather_marks(v)[0].caption)).is_equal("Timber Grove · Tap to gather")
-	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("")
-	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 6, "storage"], ["bait_worm", 2, "bag"]]})).is_equal(["+6 Timber · Stored"])
+## A city point's gather floats what went to Farm Storage (MAT-2); the bag's are the runtime's item floats.
+func test_gather_floats_say_what_was_stored() -> void:
+	var v := {"names": {"wood": "Timber"}}
+	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 4, "storage"], ["bait_worm", 2, "bag"]]})).is_equal(["+4 Timber · Stored"])
 
 func _recipe(id: String, tab: String, item: String, name: String, to: String, cost: Array, block = null, owned := false, equipped := false) -> Dictionary:
 	return {"id": id, "tab": tab, "item": item, "name": name, "qty": 2 if to == "bag" else 1, "to": to, "have": 6 if to == "bag" else null,
@@ -39,16 +29,13 @@ func test_workbench_cards_write_gaps_on_the_button() -> void:
 	var v := {"workbench": {"tabs": ["tools", "supplies"], "recipes": [
 		_recipe("craft_copper_pickaxe", "tools", "pick_copper", "Copper Pickaxe", "gear", [ore, wood],
 			{"code": "need_material", "detail": {"item": "copper_ore", "need": 5, "have": 4}}),
-		_recipe("craft_gather_gloves", "tools", "gather_gloves", "Gather Gloves", "owned", [], null, true),
 		_recipe("craft_torch", "supplies", "torch", "Torch", "bag", [wood]),
 		_recipe("craft_compost", "supplies", "fert_compost", "Compost", "bag", [], {"code": "locked", "detail": {"skill": "farming", "level": 3}}),
 	]}}
 	var tools := P0MaterialLogic.workbench_model(v, "tools")
-	assert_int(tools.size()).is_equal(2)
+	assert_int(tools.size()).is_equal(1)
 	assert_str(str(tools[0].effect)).is_equal("2 Stone per rock")
 	assert_that(tools[0].button).is_equal({"label": "Need 1 more Copper Ore", "kind": "unavailable", "cmd": {}})
-	assert_str(str(tools[1].effect)).is_equal("+1 at every gathering spot")
-	assert_str(str(tools[1].button.label)).is_equal("Owned · always on")
 	var supplies := P0MaterialLogic.workbench_model(v, "supplies")
 	assert_that(supplies[0].button).is_equal({"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": "craft_torch"}})
 	assert_str(str(supplies[0].yield)).is_equal("You get 2")
@@ -70,18 +57,6 @@ func test_mining_quick_bar_holds_torches_only() -> void:
 	assert_array(P0MaterialLogic.mine_candidates(v)).is_empty()
 	v.bag.slots = [{"id": "torch", "qty": 3}, {"id": "seed_radish", "qty": 20}]
 	assert_array(P0MaterialLogic.mine_candidates(v)).is_equal(["torch"])
-
-func test_locked_spot_sheet_and_gloves_moment() -> void:
-	var v := {"names": {"clay": "Clay"}, "gather": {"gloves": true, "spots": [
-		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "ready": true, "ready_in": 0, "yield": [["wood", 7]]},
-		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "ready": false, "ready_in": 0, "yield": [["clay", 2]]},
-	]}}
-	var locked := P0MaterialLogic.locked_spot_sheet(v, "spot_clay_bank")
-	assert_str(str(locked.line)).is_equal("Gather Clay from this spot once unlocked.")
-	assert_that(locked.facts).is_equal([["Unlock", "Homestead Lv2"]])
-	var moment := P0MaterialLogic.gloves_moment(v)
-	assert_str(str(moment.fact)).is_equal("Next Timber harvest: 7")
-	assert_str(str(moment.note)).is_equal("Passive · no gear slot needed")
 
 ## The workbench shares the yard with other cards' facilities (the rest bench took the workbench's first cell in 2B; the
 ## gathering spots left the farm in SGODOT-355 b1): no two footprints may overlap, none may cover a plot, all stay in the yard.
@@ -299,7 +274,7 @@ func test_material_refusals_are_quiet_or_say_why() -> void:
 	assert_str(str(P0MaterialLogic.refusal_text("bad_floor", {"max": 40, "not_open": true}, {"type": "mine_floor", "to": 41}))).is_equal("Floor 41 · Not open yet")
 	assert_str(str(P0MaterialLogic.refusal_text("bad_floor", {"max": 40}, {"type": "mine_floor", "to": 7}))).is_empty()
 	assert_str(str(P0MaterialLogic.refusal_text("not_open", {"homestead": 8}, {"type": "mine_enter", "mine": "wd-1-1"}))).is_equal("Homestead Lv8")
-	assert_str(str(P0MaterialLogic.refusal_text("homestead_level", {"need": 2}, {"type": "gather", "spot": "spot_clay_bank"}))).is_equal("Homestead Lv2")
+	assert_str(str(P0MaterialLogic.refusal_text("homestead_level", {"need": 2}, {"type": "gather", "spot": "gn-5391959~clay0"}))).is_equal("Homestead Lv2")
 	assert_str(str(P0MaterialLogic.refusal_text("tempo", {}, {"type": "gather"}))).is_empty()
 	# need_energy and other commands keep the runtime's own handling.
 	assert_object(P0MaterialLogic.refusal_text("need_energy", {"need": 2}, rock)).is_null()

@@ -392,7 +392,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
 		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
 		pick_source = str({"start": "Starter", "workbench": "Workbench"}.get(str(rod.get("source", "")), "")) if not rod.get("owned", false) else "",
-		# A workbench item (SGODOT-231 B2-06): its effect line, then In Gear for an owned pickaxe or the gloves' passive note.
+		# A workbench item (SGODOT-231 B2-06): its effect line, then In Gear for an owned pickaxe.
 		craft_effect = str(P0MaterialLogic.EFFECTS.get(item_id, "")),
 		craft_note = _craft_note(view, item_id),
 		# Decorate (SGODOT-284, q(111) / q(113)): a piece's footprint, its row line (`1×1 · Classic lamp` /
@@ -421,9 +421,7 @@ static func _decor_third(view: Dictionary, item_id: String, offer: Dictionary) -
 static func _craft_note(view: Dictionary, item_id: String) -> String:
 	for r in view.get("workbench", {}).get("recipes", []):
 		if str(r.get("item", "")) != item_id or not r.get("owned", false): continue
-		match str(r.get("to", "")):
-			"gear": return "In Gear"
-			"owned": return "Passive · no gear slot needed"
+		if str(r.get("to", "")) == "gear": return "In Gear"   # the Gather Gloves' passive note left with 丁11
 	return ""
 
 static func _deliverable(view: Dictionary, item_id: String, target: Dictionary) -> bool:

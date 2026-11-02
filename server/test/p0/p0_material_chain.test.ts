@@ -26,73 +26,14 @@ function refuse(s: P0State, cmd: P0Command, now = T0): { code: string; detail?: 
   if (r.ok) throw new Error(`${cmd.type} was accepted`);
   return { code: r.code, detail: r.detail };
 }
-describe('gathering spots (§13.2, q(44))', () => {
-  it('a spot is 0 Energy, its material goes to Farm Storage, and it is ready again 8 h later', () => {
-    const s0 = fresh();
-    let { s, ev } = step(s0, { type: 'gather', spot: 'spot_grove', space: 'home' });
-    expect(s.energy.value).toBe(s0.energy.value);
-    expect(s.storage.wood).toBe(6);
-    expect(count(s.bag, 'wood')).toBe(0);
-    expect(ev).toContainEqual({ kind: 'gather', spot: 'spot_grove', items: [['wood', 6, 'storage']], ready_in: 8 * H });
-    expect(refuse(s, { type: 'gather', spot: 'spot_grove' }, T0 + 7 * H)).toEqual({ code: 'not_ready', detail: { ready_in: H } });
-    ({ s } = step(s, { type: 'gather', spot: 'spot_grove' }, T0 + 8 * H));
-    expect(s.storage.wood).toBe(12);
-  });
-
-  it('the Reed Bank\'s worms go to the bag; Gather Gloves an old save still owns add nothing (the user, 11-02 丁11)', () => {
-    const s0 = fresh();
-    s0.owned.push('gather_gloves');
-    const { s, ev } = step(s0, { type: 'gather', spot: 'spot_reed_bank' });
-    expect(s.storage.fiber).toBe(3);
-    expect(count(s.bag, 'bait_worm')).toBe(2);
-    expect(ev).toContainEqual({ kind: 'gather', spot: 'spot_reed_bank', items: [['fiber', 3, 'storage'], ['bait_worm', 2, 'bag']], ready_in: 8 * H });
-  });
-
-  it('worms that do not fit in the bag go to storage with the reeds', () => {
-    const s0 = fresh();
-    for (let i = 0; i < 23; i++) s0.bag.push({ id: 'fish_crucian', qty: 10 });   // 25 / 25
-    const { s } = step(s0, { type: 'gather', spot: 'spot_reed_bank' });
-    expect(count(s.bag, 'bait_worm')).toBe(0);
-    expect(s.storage).toEqual({ fiber: 3, bait_worm: 2 });
-  });
-
-  it('the Herb Patch\'s Wild Herb goes to the bag before the Spice Rack and to storage from Homestead Lv2 (q(46))', () => {
-    const lv1 = step(fresh(), { type: 'gather', spot: 'spot_herb_patch' });
-    expect(count(lv1.s.bag, 'wild_herb')).toBe(2);
-    expect(lv1.ev).toContainEqual({ kind: 'gather', spot: 'spot_herb_patch', items: [['wild_herb', 2, 'bag']], ready_in: 8 * H });
-    const s2 = fresh();
-    s2.homestead.level = 2;
-    const lv2 = step(s2, { type: 'gather', spot: 'spot_herb_patch' });
-    expect(lv2.s.storage.wild_herb).toBe(2);
-    expect(count(lv2.s.bag, 'wild_herb')).toBe(0);
-  });
-
-  it('the Clay Bank opens at Homestead Lv2, the Old Tree at Lv3 with 1 Hardwood a round (P1, §13.2.1)', () => {
-    const s = fresh();
-    expect(refuse(s, { type: 'gather', spot: 'spot_clay_bank' })).toEqual({ code: 'homestead_level', detail: { need: 2 } });
-    s.homestead.level = 2;
-    expect(step(s, { type: 'gather', spot: 'spot_clay_bank' }).s.storage.clay).toBe(2);
-    expect(refuse(s, { type: 'gather', spot: 'spot_old_tree' }, T0 + STEP)).toEqual({ code: 'homestead_level', detail: { need: 3 } });
-    s.homestead.level = 3;
-    const tree = step(s, { type: 'gather', spot: 'spot_old_tree' }, T0 + STEP).s;
-    expect(tree.storage.hardwood).toBe(1);
-    expect(refuse(tree, { type: 'gather', spot: 'spot_old_tree' }, T0 + 2 * STEP).code).toBe('not_ready');
-    expect(viewOf(c, fresh(), T0).gather.spots.map(sp => sp.id)).toEqual(['spot_grove', 'spot_rock_pile', 'spot_reed_bank', 'spot_herb_patch', 'spot_clay_bank', 'spot_old_tree']);
-  });
-
-  it('taps faster than 0.9 s are refused as tempo; gathering from away is not_home', () => {
-    const { s } = step(fresh(), { type: 'gather', spot: 'spot_grove' });
-    expect(refuse(s, { type: 'gather', spot: 'spot_rock_pile' }, T0 + 500).code).toBe('tempo');
-    expect(refuse(fresh(), { type: 'gather', spot: 'spot_grove', space: 'mine' }).code).toBe('not_home');
-  });
-
-  it('the view says which spots are open and ready, and what a gather gives (no gloves any more: 丁11)', () => {
-    const s = fresh();
-    s.owned.push('gather_gloves');
-    const v = viewOf(c, s, T0).gather;
-    expect('gloves' in v).toBe(false);
-    expect(v.spots[0]).toEqual({ id: 'spot_grove', name: 'Timber Grove', open: true, homestead: 1, ready: true, ready_in: 0, yield: [['wood', 6]] });
-    expect(v.spots[4]).toMatchObject({ id: 'spot_clay_bank', open: false, ready: false });
+describe('the farm has no gathering spots (v4q(4) ①; the user, 11-02)', () => {
+  it('a farm spot\'s old id is bad_spot, the content has none, and the view lists only the city points cooling down', () => {
+    for (const spot of ['spot_grove', 'spot_rock_pile', 'spot_reed_bank', 'spot_herb_patch', 'spot_clay_bank', 'spot_old_tree']) {
+      expect(refuse(fresh(), { type: 'gather', spot, space: 'home' }).code).toBe('bad_spot');
+    }
+    expect('spots' in c.gather).toBe(false);
+    expect(viewOf(c, fresh(), T0).gather).toEqual({ city_ready: {} });
+    expect(c.homestead.levels.flatMap(l => l.unlocks).filter(u => u === 'clay_bank' || u === 'old_tree')).toEqual([]);
   });
 });
 
@@ -189,7 +130,9 @@ describe('coming home (q(40)) and Timber Run from storage', () => {
     s = step(s, { type: 'mine_rock', day: s.mine.day!.key, floor: 1, rock: 0, space: 'mine' }, T0 + STEP).s;
     add(c, s, 'torch', 2); add(c, s, 'bait_worm', 3); add(c, s, 'wild_herb', 3); add(c, s, 'rock_salt', 1); add(c, s, 'copper_ore', 2);
     const stone = count(s.bag, 'stone');
-    const r = step(s, { type: 'gather', spot: 'spot_grove', space: 'home' }, T0 + 2 * STEP);
+    // the first command read at home (any: the farm has no gathering spot now, v4q(4) ①)
+    const r: { s: P0State; ev: P0Event[] } = { s: structuredClone(s), ev: [] };
+    expect(notePresence(c, r.s, 'home', T0 + 2 * STEP, r.ev)).toBe(true);
     expect(count(r.s.bag, 'stone')).toBe(0);
     expect(count(r.s.bag, 'copper_ore')).toBe(0);
     expect(r.s.storage.stone).toBe(stone);

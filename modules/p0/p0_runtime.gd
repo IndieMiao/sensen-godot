@@ -2083,7 +2083,6 @@ func _dev_shot(dt: float) -> void:
 				ui.show_on_map.emit(":".join(step.slice(1)))
 			"mine":   # mine:wd-dev-quarry[:20] — into that mine (355 b1, contract-efg §11: the development mines need no Day Pass)
 				enter_mine(step[1], int(step[2]) if step.size() > 2 else 1)
-			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()
 				ui.show_spot.emit(step[1])

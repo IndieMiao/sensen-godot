@@ -206,45 +206,25 @@ func _plain(src: Dictionary) -> Dictionary:
 
 func test_material_source_breaks_only_before_or() -> void:
 	var v := _view()
-	v.erase("gather")
 	v["names"] = {"clay": "Clay", "rock_salt": "Rock Salt"}
-	v["homestead"] = {"level": 1}
-	var gated := str(P0MaterialLogic.material_source(v, "clay").text)
-	assert_array(Array(gated.split(" "))).is_equal(["Clay\u00a0·\u00a0Quarry", "·\u00a0or\u00a0Clay\u00a0Bank\u00a0from\u00a0Homestead\u00a0Lv2"])
+	# every space a no-break one: a source line breaks only before ` · or ` (one source each now, v4q(4) ①)
+	assert_str(str(P0MaterialLogic.material_source(v, "clay").text)).is_equal("Clay\u00a0·\u00a0Quarry")
 	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt\u00a0·\u00a0Quarry")
 
-func test_material_sources_name_the_spots_and_the_mine() -> void:
-	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): ` · or `, open sources first,
-	# a spot not open yet last with "from Homestead LvN"; Show goes to the first open source.
+func test_material_sources_name_the_mine() -> void:
+	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): the mine types that yield it.
+	# The farm's gathering spots (Timber Grove, Rock Pile, Reed Bank, Clay Bank) left with v4q(4) ①: a city's points
+	# are the map's (亚瑟's C), so Timber and Reeds have no line here for now.
 	var v := _view()
-	v["gather"] = {"spots": [
-		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "yield": [["wood", 6]]},
-		{"id": "spot_rock_pile", "name": "Rock Pile", "open": true, "homestead": 1, "yield": [["stone", 4]]},
-		{"id": "spot_reed_bank", "name": "Reed Bank", "open": true, "homestead": 1, "yield": [["fiber", 3], ["bait_worm", 2]]},
-		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "yield": [["clay", 2]]}]}
 	v["names"] = {"wood": "Timber", "stone": "Stone", "fiber": "Reeds", "clay": "Clay", "rock_salt": "Rock Salt", "bait_worm": "Worm Bait"}
-	assert_that(_plain(P0Logic.home_source(v, "wood"))).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
-	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · Rock Pile · or the mine", "go": "spot_rock_pile"})
-	assert_that(_plain(P0Logic.home_source(v, "fiber"))).is_equal({"text": "Reeds · Reed Bank", "go": "spot_reed_bank"})
+	assert_that(_plain(P0Logic.home_source(v, "stone"))).is_equal({"text": "Stone · the mine", "go": ""})
 	# 355 b1: a quarry's mains; no Show for a mine until C gives the nearest mouth (亚瑟 on #629)
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank from Homestead Lv2", "go": ""})
+	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry", "go": ""})
 	assert_that(_plain(P0Logic.home_source(v, "rock_salt"))).is_equal({"text": "Rock Salt · Quarry", "go": ""})
-	assert_that(_plain(P0Logic.home_source(v, "bait_worm"))).is_equal({"text": "Worm Bait", "go": ""})   # a side yield, not a material
-	# Lv2 opens the Clay Bank: the gate goes, the order stays (Li Bai's example).
-	v.gather.spots[3].open = true
-	assert_that(_plain(P0Logic.home_source(v, "clay"))).is_equal({"text": "Clay · Quarry · or Clay Bank", "go": "spot_clay_bank"})
+	assert_str(str(P0Logic.home_source(v, "wood").go)).is_empty()
 	# Coins and skills keep their own lines.
 	assert_str(str(P0Logic.home_source(v, "coins").go)).is_equal("stall")
 	assert_str(str(P0Logic.home_source(v, "skills").go)).is_equal("")
-
-func test_material_source_without_spot_states_reads_the_homestead_level() -> void:
-	var v := _view()   # no view.gather (a view from before the spots): the content's gate against the Homestead level
-	v.erase("gather")
-	v["names"] = {"clay": "Clay"}
-	v["homestead"] = {"level": 1}
-	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Quarry · or Clay Bank from Homestead Lv2")
-	v.homestead.level = 2
-	assert_str(str(_plain(P0MaterialLogic.material_source(v, "clay")).text)).is_equal("Clay · Quarry · or Clay Bank")
 
 func test_plaque_lines_date_each_upgrade() -> void:
 	var v := _view(3)

@@ -55,6 +55,14 @@ describe('city gathering (v4q(4) ③–⑤)', () => {
     expect(hard.ok && hard.state.storage.hardwood).toBe(3);
   });
 
+  it('taps faster than 0.9 s are refused as tempo (tempo_ms, the farm\'s spots gone: v4q(4) ①)', () => {
+    const { c, s } = setup();
+    const r = run(c, s, { type: 'gather', spot: WOOD, space: 'home' } as P0Command, T);
+    if (!r.ok) throw new Error(r.code);
+    expect(run(c, r.state, { type: 'gather', spot: REED, space: 'home' } as P0Command, T + 500)).toMatchObject({ ok: false, code: 'tempo' });
+    expect(run(c, r.state, { type: 'gather', spot: REED, space: 'home' } as P0Command, T + c.gather.tempo_ms).ok).toBe(true);
+  });
+
   it('away, in that city, it all goes to the bag, home with the player; another city\'s point is refused (not_here)', () => {
     const { c, s } = setup();
     inTokyo(s);
