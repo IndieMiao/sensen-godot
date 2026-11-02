@@ -1,4 +1,21 @@
-# SGODOT-355 浅坑 Quarry v1
+# SGODOT-355 浅坑 Quarry v1.1
+
+按上官婉儿 355 `3900260a`，v1 背景、支架和地面梯度已通过，v1.1 仅调整运行时 `palette.json` 的 wall / backdrop_tint。GLB、Blender 源和 .import 与 v1 逐字节相同；ground、fog 四段全部保留。源生成器只同步调色常量，没有重建背景。
+
+运行时 v1.1 增量 `cfd3436f`，已在共享分支推送前 pull --rebase。
+
+| 层段 | ground（不变） | wall | backdrop_tint |
+|---|---|---|---|
+| 1–4 | #DCA26E | #B85E43 | #653425 |
+| 5–10 | #CD925B | #A0563B | #582F20 |
+| 11–20 | #BA824A | #884C35 | #4B2A1D |
+| 21–30 | #A07146 | #70422E | #3E2419 |
+
+第一段恢复线上原值，排除后续色相条件；后三段岩壁 HSL 色相约 16.04° / 16.63° / 18.18°，L=.429 / .371 / .310，S=.461 / .439 / .418；背景按相同红岩色系下降。地面仍为 28–30° 暖色，与红岩墙分开。
+
+本次只交一张五列总表 `SGODOT-355_mine_quarry_v1.1_bands.jpg`（四段 + 守关）。25 项 GLB / 配色检查和 25 项 Godot 检查通过；空目录原 `uv2_check.gd` 实测 UV2.y min=max=0，5840 顶点，值为 1 的顶点数 0。几何未变，沿用 v1 全密度裁剪证据；保留性的哈希核对见 `validation-v1.1.json`。最新媒体清单 `media-manifest-v1.1.json`，草稿 PR #686 待复核和用户批准。
+
+## v1 历史（墙色由 v1.1 替代）
 
 赵云。按上官婉儿 355 `5ada1f3f` 调整暖色深度梯度、台阶边沿和木支架，交 v1 技术与画面复核。运行时仍只推 `art/monsters-355`；源与审阅分支 `wp-3d-scene-zhaoyun-quarry-355` 开草稿 PR 到 `wp-3d-scene`。未批准合并。
 
@@ -108,6 +125,6 @@ godot --path output/quarry-355/project --display-driver wayland --rendering-meth
 output/art-setup/venv/bin/python "$QUARRY_SOURCE/package.py" --runtime "$QUARRY_RUNTIME"
 ```
 
-打包前还需按派活执行空工程检查：将原检查脚本、旧背景 `orig.glb` 和本件 `backdrop.glb` 放入仅有 `project.godot` 的空工位，加载私有环境后在该目录运行 `godot --headless --path . -s res://uv2_check.gd`；输出记录为 `output/quarry-355/uv2-godot-v1.txt`。不在该工位运行导入或编辑器。
+打包前还需按派活执行空工程检查：将原检查脚本、旧背景 `orig.glb` 和本件 `backdrop.glb` 放入仅有 `project.godot` 的空工位，加载私有环境后在该目录运行 `godot --headless --path . -s res://uv2_check.gd`；输出记录为 `output/quarry-355/uv2-godot-v1.1.txt`（按交付版本命名）。不在该工位运行导入或编辑器。当前打包默认 v1.1，可用 `--revision v1` 重现上一版媒体格式。
 
 生成器从原已验收 backdrop.blend 复制开始。当前 quarry.blend 内嵌 `EXPORT_RUNTIME.py` 可导出手工编辑后的具名部件；默认使用源中记录的运行时工位，也可通过环境变量 `QUARRY_RUNTIME` 指定另一工位。旧的 257 制作脚本和 contour 数据保留为来源记录，不用旧脚本覆盖当前 quarry 编辑。

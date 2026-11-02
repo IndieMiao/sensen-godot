@@ -70,7 +70,9 @@ for band in bands:
         h,l,s=colorsys.rgb_to_hls(*[int(code[i:i+2],16)/255 for i in [1,3,5]])
         row[role]={"h":h*360,"s":s,"l":l}
     palette_hsl.append(row)
-check(all(25<=c["h"]<=32 and c["s"]>=.28 for row in palette_hsl for c in row.values()),"warm HSL hue and saturation retained in all four bands")
+check(all(25<=row["ground"]["h"]<=32 and row["ground"]["s"]>=.28 for row in palette_hsl),"warm ground hue and saturation retained in all four bands")
+check(bands[0]["wall"]=="#b85e43" and bands[0]["backdrop_tint"]=="#653425","first band restores live red rock wall and backdrop")
+check(all(14<=row[role]["h"]<=20 and row[role]["s"]>=.3 for row in palette_hsl[1:] for role in ["wall","backdrop_tint"]),"deeper wall and backdrop retain red rock hue and saturation")
 check(all(abs(row["ground"]["l"]-target)<.005 for row,target in zip(palette_hsl,[.65,.58,.51,.45])),"ground HSL lightness follows .65/.58/.51/.45")
 report={"passed":all(c["passed"] for c in checks),"checks":checks,"triangles":len(indices),"surfaces":1,"textures":0,
     "palette_hsl":palette_hsl,

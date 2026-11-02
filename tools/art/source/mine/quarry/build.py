@@ -17,10 +17,10 @@ R=Vector((math.cos(yaw),0,-math.sin(yaw)))
 U=Vector((-math.sin(yaw)*math.sin(pitch),math.cos(pitch),-math.cos(yaw)*math.sin(pitch)))
 N=Vector((math.sin(yaw)*math.cos(pitch),math.sin(pitch),math.cos(yaw)*math.cos(pitch)))
 PALETTE={"bands":[
-    {"from":1,"to":4,"ground":"#dca26e","wall":"#b97941","backdrop_tint":"#664324","fog":"#242125"},
-    {"from":5,"to":10,"ground":"#cd925b","wall":"#a06c3b","backdrop_tint":"#583b20","fog":"#242225"},
-    {"from":11,"to":20,"ground":"#ba824a","wall":"#885e35","backdrop_tint":"#4b341d","fog":"#222125"},
-    {"from":21,"to":30,"ground":"#a07146","wall":"#704e2e","backdrop_tint":"#3e2b19","fog":"#201f23"},
+    {"from":1,"to":4,"ground":"#dca26e","wall":"#b85e43","backdrop_tint":"#653425","fog":"#242125"},
+    {"from":5,"to":10,"ground":"#cd925b","wall":"#a0563b","backdrop_tint":"#582f20","fog":"#242225"},
+    {"from":11,"to":20,"ground":"#ba824a","wall":"#884c35","backdrop_tint":"#4b2a1d","fog":"#222125"},
+    {"from":21,"to":30,"ground":"#a07146","wall":"#70422e","backdrop_tint":"#3e2419","fog":"#201f23"},
 ]}
 
 def godot(p): return Vector((p.x,p.z,-p.y))
