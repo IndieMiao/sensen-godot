@@ -45,7 +45,8 @@ describe('Homestead Lv4–17 (v4q(1))', () => {
     expect(c.homestead.levels.reduce((n, l) => n + l.coins, 0)).toBe(2125);
     const total: Record<string, number> = {};
     for (const l of c.homestead.levels) for (const [id, n] of l.materials) total[id] = (total[id] ?? 0) + n;
-    expect(total).toEqual({ wood: 70, stone: 56, fiber: 37, clay: 31, copper_ore: 21, rock_salt: 4, coal: 16, hardwood: 57, flax: 40, iron_ore: 23, quartz: 13 });
+    expect(total).toEqual({ wood: 68, stone: 56,   // 庚2: Lv3 stone 4 wood 2, Lv4 stone 10
+      fiber: 37, clay: 31, copper_ore: 21, rock_salt: 4, coal: 16, hardwood: 57, flax: 40, iron_ore: 23, quartz: 13 });
   });
 
   it('climbs from Lv3 to Lv17 one level at a time, 50 back each level to Lv15 and none after, then stops', () => {
