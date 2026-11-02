@@ -1,0 +1,15 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "guard_arena",
+  "source_blend": "tools/art/source/mine_kit_355/models/guard_arena.blend",
+  "runtime_sha256": "f675ff59bd06dda02fd0f5161dc1ea63f27ad0be0094035870068f4e033f95cd",
+  "changes": [
+    "Decorative oval rubble boundary; centre empty, no collision anywhere.",
+    "Two rear torches and crown-carved stele only within world X 2.7..6.8.",
+    "Ellipse rounds the rear-left corner away from the coexisting elevator."
+  ],
+  "reference": "Director dispatch 2026-11-02"
+}

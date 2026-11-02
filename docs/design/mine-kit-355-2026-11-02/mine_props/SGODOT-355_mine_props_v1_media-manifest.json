@@ -1,0 +1,44 @@
+[
+  {
+    "file": "SGODOT-355_mine_props_v1_arena_two_mines_43deg.png",
+    "sha256": "bc015e68e1a21a4c39410bcd535b66144c92ec5dbca770d09ba0aae72e2777e5",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_props_v1_elevator_two_mines_43deg.png",
+    "sha256": "b2c560a1d7779c9a010b28992d2132bd9e25256513b2579f2a988e0496e59332",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_props_v1_red_both_props_43deg.png",
+    "sha256": "e31bfa7d601732b561185777817561f9735ef591faccc9bb26016901a6668eff",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_props_v1_purple_both_props_43deg.png",
+    "sha256": "5441e6b0d984e73c2c4904968b16759332ee812b2cb3ffd785df882255d0e477",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_props_v1_four_ores_two_mines_43deg.png",
+    "sha256": "533965dfab8e0a6e1f603c7005730d1433fa25c7c9ea9328c87e52d6934ee5bd",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_props_v1_elevator_detail.png",
+    "sha256": "53be019d07b2123712c0a9044eb87ffbf44da275e34952932f6988bd15a5a437",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_props_v1_validation.json",
+    "sha256": "a5fdea4ba671c654fef2c5a0f56d72fdfee4fc3886a1f734f060da3b5bdc845d",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "rock_copper_ore",
+  "source_blend": "tools/art/source/mine_kit_355/models/rock_copper_ore.blend",
+  "runtime_sha256": "24305eb8713a7c4462c4f2f979590d06c3b44ac8ce6e71d5e91f047c1f3dea31",
+  "changes": [
+    "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+  ],
+  "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63"
+}

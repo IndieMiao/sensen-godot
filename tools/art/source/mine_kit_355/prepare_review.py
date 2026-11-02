@@ -84,6 +84,7 @@ manifest = json.loads((RUNTIME / 'assets/avatar/parts_manifest.json').read_text(
 manifest['parts'] = [p for p in manifest['parts'] if p['id'] in ['body00', 'eyes00', 'hairhat0', 'cloth0', 'shoes0']]
 (PROJECT / 'assets/avatar/parts_manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 shutil.copy2(SRC / (args.group + '_review.gd'), PROJECT / 'review.gd')
+shutil.copy2(SRC / 'headgear_review.gd', PROJECT / 'static_review.gd')
 (PROJECT / 'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="StaticKitReview" type="Node"]\nscript=ExtResource("1")\n')
 (PROJECT / 'project.godot').write_text(f'''config_version=5
 [application]

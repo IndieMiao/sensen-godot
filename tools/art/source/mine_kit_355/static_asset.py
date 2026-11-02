@@ -88,6 +88,11 @@ def export(name,directory,source_dir,limit,metadata,anchors=None):
     directory=RUNTIME/directory;source_dir=ROOT/source_dir
     directory.mkdir(parents=True,exist_ok=True);source_dir.mkdir(parents=True,exist_ok=True)
     (source_dir/'.gdignore').touch()
+    markers=[]
+    for spec in anchors or []:
+        marker=bpy.data.objects.new(spec['name'],None);bpy.context.collection.objects.link(marker)
+        marker.location=vector(spec['position'])
+        marker.empty_display_type='ARROWS';markers.append(marker)
     bpy.context.view_layer.update()
     bpy.ops.wm.save_as_mainfile(filepath=str(source_dir/(name+'.blend')))
     copies=[];graph=bpy.context.evaluated_depsgraph_get()
@@ -105,9 +110,7 @@ def export(name,directory,source_dir,limit,metadata,anchors=None):
     assert triangles<=limit,(name,triangles,limit)
     positions=[world(v.co) for v in obj.data.vertices]
     bounds=[[min(p[i] for p in positions) for i in range(3)],[max(p[i] for p in positions) for i in range(3)]]
-    for spec in anchors or []:
-        marker=bpy.data.objects.new(spec['name'],None);bpy.context.collection.objects.link(marker)
-        marker.location=vector(spec['position']);marker.empty_display_type='ARROWS';marker.select_set(True)
+    for marker in markers:marker.select_set(True)
     path=directory/(name+'.glb')
     bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,
         export_yup=True,export_materials='EXPORT',export_vertex_color='ACTIVE',export_texcoords=False,
