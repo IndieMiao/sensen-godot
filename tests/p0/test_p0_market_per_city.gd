@@ -37,13 +37,60 @@ func test_the_board_of_the_city_the_player_is_in_is_not_away() -> void:
 	assert_bool(bool(t[0].away)).is_false()
 	assert_str(str(t[0].deliver)).is_equal("Deliver at Acorn Market Square · Hayward")
 
-func test_the_progress_line_ends_with_the_city_and_drops_the_need_first_when_long() -> void:
+## q(276): the row keeps its whole line — Today measures it, breaks before the city and drops the need only when the
+## first line still runs long (`line_short`); no longer cut by characters.
+func test_the_progress_line_ends_with_the_city_and_keeps_the_need_for_today_to_measure() -> void:
 	var row := P0Logic._request_row({}, {"id": "a", "title": "Dusk Haul", "kind": "crop", "items": [], "need_name": "Fine fish",
 		"have": 1, "qty": 4, "city": "Hayward"})
 	assert_str(str(row.line)).is_equal("Dusk Haul · Fine fish 1/4 · Hayward")
 	var long := P0Logic._request_row({}, {"id": "b", "title": "Market Basket", "kind": "crop", "items": [], "need_name": "Radish and Carrot",
 		"have": 2, "qty": 6, "city": "Rio de Janeiro"})
-	assert_str(str(long.line)).is_equal("Market Basket · 2/6 · Rio de Janeiro")
+	assert_str(str(long.line)).is_equal("Market Basket · Radish and Carrot 2/6 · Rio de Janeiro")
+	assert_str(str(long.line_short)).is_equal("Market Basket · 2/6 · Rio de Janeiro")
+	assert_str(str(long.city)).is_equal("Rio de Janeiro")
+	assert_bool(row.has("line_short") and not P0Logic._request_row({}, {"id": "c", "title": "Fresh Greens", "kind": "crop",
+		"items": [], "need_name": "Radish", "have": 1, "qty": 4}).has("city")).is_true()   # a home city's row: no city, as before
+
+## q(276) (不知火舞 379 517289ca; Nunito ExtraBold 14 in the 223 px a row has beside its Show key): one line when it fits;
+## else broken before the city, the dot dropped — not at an earlier dot; the need dropped only when the first line still
+## runs long; a hand-in row's square never dropped, its first line left to the label's wrap.
+func test_today_breaks_a_city_row_before_its_city() -> void:
+	var l := UiKit.label("", UiTokens.STYLE_BODY_XB14, UiTokens.COLOR_TEXT)
+	l.theme = UiKit.theme()
+	add_child(auto_free(l))
+	var f := l.get_theme_font(&"font")
+	var fs := l.get_theme_font_size(&"font_size")
+	var lines := func(line: String, city: String, short := "") -> String: return UiTodayPanel.city_lines(line, short, city, f, fs, 223.0)
+	assert_str(lines.call("Dusk Haul · Carp 1/4 · Tokyo", "Tokyo")).is_equal("Dusk Haul · Carp 1/4 · Tokyo")   # fits: one line
+	assert_str(lines.call("Dusk Haul · Fine fish 1/4 · Hayward", "Hayward", "Dusk Haul · 1/4 · Hayward")) \
+		.is_equal("Dusk Haul · Fine fish 1/4\nHayward")
+	assert_str(lines.call("Pond Catch · Pond Crucian 1/2 · Rio de Janeiro", "Rio de Janeiro", "Pond Catch · 1/2 · Rio de Janeiro")) \
+		.is_equal("Pond Catch · Pond Crucian 1/2\nRio de Janeiro")
+	assert_str(lines.call("Big Market Order · Northern Pike 1/2 · Mexico City", "Mexico City", "Big Market Order · 1/2 · Mexico City")) \
+		.is_equal("Big Market Order · 1/2\nMexico City")
+	assert_str(lines.call("Pond Catch · Deliver to Wen · Shanghai", "Shanghai")).is_equal("Pond Catch · Deliver to Wen\nShanghai")
+	assert_str(lines.call("Dusk Haul · Deliver at Shibuya Market Square · Tokyo", "Tokyo")) \
+		.is_equal("Dusk Haul · Deliver at Shibuya Market Square\nTokyo")   # the square whole; the label wraps its line
+
+## q(276) ⑦: another city's hand-in row in Today — the city its own line, the square's name whole (a third line if need be).
+func test_a_long_hand_in_row_keeps_its_square_and_puts_the_city_on_its_own_line() -> void:
+	var away := _req("dusk-tyo", {"title": "Dusk Haul", "ready": true, "have": 4}).merged({"cluster": "gn-1850147", "city": "Tokyo",
+		"home": false, "deliver_place": "gn-1850147~market0", "deliver_name": "Shibuya Market Square"}, true)
+	var v := _view({"title": "Market Board", "home": true, "slots": []}, [away])
+	v.firsts = ["harvest:crop_radish", "catch:fish_crucian", "cook:dish_grilled_crucian"]
+	var rows: Array = P0Logic.today_rows(v).filter(func(r): return str(r.get("dot", "")) == "deliver:dusk-tyo")
+	assert_int(rows.size()).is_equal(1)
+	assert_str(str(rows[0].line)).is_equal("Dusk Haul · Deliver at Shibuya Market Square · Tokyo")
+	assert_str(str(rows[0].city)).is_equal("Tokyo")
+	assert_bool(rows[0].has("line_short")).is_false()   # nothing dropped from a hand-in row
+	var panel := UiTodayPanel.new(rows.map(func(r): return r.merged({"icon": null}, true)))   # P0Ui gives the icon's texture
+	panel.theme = UiKit.theme()
+	add_child(auto_free(panel))
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var line: Label = panel.find_child("Line", true, false)
+	assert_str(line.text).is_equal("Dusk Haul · Deliver at Shibuya Market Square\nTokyo")
+	assert_int(line.max_lines_visible).is_equal(3)
 
 func test_the_sheet_names_the_boards_city_and_opens_for_a_request_elsewhere() -> void:
 	var here := _view(_hayward([_req("dusk-here", {"status": "open"})]), [])
