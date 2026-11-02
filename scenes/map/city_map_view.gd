@@ -104,6 +104,10 @@ var host_chrome := false: set = set_host_chrome
 var destination_style := Callable()
 ## func(entry) -> bool: the host shows its own card for this pin (P0PlaceSheet), so selecting it opens no info panel.
 var host_card := Callable()
+## func(entry) -> int: who is in at this pin, the MapDestination's top-right count (P0: an outpost's or a pond's from
+## /presence, the pond rooms of 2026-11-02); unset = the entry's own `online`. Not part of destination_style, which the
+## host caches: a count changes every presence read, and refresh_pins() asks for it again.
+var pin_online := Callable()
 ## () -> float (screen px): the top of the card the host has open over the map, INF with none, 0 for a page that covers
 ## it (P0: P0Ui.modal_top). With host_chrome the map's credit line keeps above it (q(133) v3).
 var credits_floor := Callable()
@@ -1095,6 +1099,11 @@ func _layout_wanted() -> bool:
 	_layout_refs = refs
 	return wanted
 
+## The pins drawn again on the next pass with nothing else changed (a pond's count from /presence: its entry is the
+## map's own, so no set_places brings it).
+func refresh_pins() -> void:
+	_layout_refs = []
+
 ## A fresh packing from the next pass: no pin holds its place for having been shown (the DEST_HOLD and PACK_MARGIN
 ## grace), so a view the host has just chosen — P0's opening view — packs as if first seen at its own zoom (不知火舞 on
 ## #457: a tackle shop 35 px from its pond stayed only because the view before it had shown it).
@@ -1358,7 +1367,8 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		pin.plate = bool(dest.get("plate", false))
 		pin.silhouette = bool(dest.get("silhouette", false))   # a fogged city's place: the glyph alone (MAP-2)
 		pin.text = _dest_text(entry)
-		pin.online = int(entry.get("online", 0))   # who is in: the top-right count, none at 0 (q(137))
+		# who is in: the top-right count, none at 0 (q(137))
+		pin.online = int(pin_online.call(entry)) if pin_online.is_valid() else int(entry.get("online", 0))
 		pin.name_shown = label_fits
 		pin.above_gap = above_gap
 		pin.label_above = label_above
