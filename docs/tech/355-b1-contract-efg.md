@@ -438,13 +438,13 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 目录 `modules/mining/monsters/`。**占位体、灰模、正式模型走同一个接口，换模型只换资源路径**（上官婉儿的接口 v1；亚瑟要求写明）：
 - **占位怪从第一天起就走 `play(动作名)`**：动作名照 3D 约定（idle / move / windup / attack / recover / hit / die，加上 fly_high / stunned / hide / spore）。占位体用代码 tween 实现同名动作，不直接改变换。
 - **时长和命中时刻从 json 读**：占位体也带一份同样格式的 json，放在 `modules/mining/monsters/placeholder/<id>.json`，键和 `assets/monsters/<id>/<id>.json` 完全一样（radius、hit_point、durations、hit_at、spore_at）。brain 只读 `view.meta`，不写死数字。
-- 有 `assets/monsters/<id>/<id>.glb` 就用 glb 和它旁边的 json；没有就用占位体和占位 json。动作的循环方式由程序按 json 设置（idle、move、fly_high、stunned 循环，其余单次）。
+- 有 `assets/monsters/<id>/<id>.glb` 就用 glb，没有就用占位体。json **占位的打底、模型的盖在上面**（11-02 蝙蝠灰模起）：模型 json 管美术的数（radius、hit_point、durations、hit_at、spore_at），占位 json 另外带玩法的数（move、contact_range、stun_resistant、knockback_resistance、visual 等），模型 json 里没有的键照用占位的；`durations` 这类字典按键逐个盖。动作的循环方式由程序按动作名设置（idle、move、fly_high、stunned 循环，其余单次），模型 json 里的 `anims` / `loop` 客户端不读。模型 json 的键名只认上面五个（蝙蝠灰模的 `hurt_point`、`anims.*.length` 已请上官婉儿改成 `hit_point`、`durations`、顶层 `hit_at`）。
 - 头饰 glb 的原点在接触面中心，挂到史莱姆头顶，位置是 `meta.hit_point` 往上到身体顶，由 `attach()` 做。
 
 ```gdscript
 # monsters.gd — 注册表（刘邦加新怪只改这里的 KINDS，加一行）
 const KINDS := { "mob_slime": {"json": "mob_slime", "view": SlimeView, "brain": SlimeBrain}, … }
-static func meta(kind) -> Dictionary     # 有 assets/monsters/<json>/<json>.json 用它，否则用 placeholder/<json>.json
+static func meta(kind) -> Dictionary     # placeholder/<json>.json 打底，assets/monsters/<json>/<json>.json 有就盖在上面
 static func spec(kind) -> Dictionary     # 从 json 换算出战斗用的数（radius、move_speed、aggro_range、attack_range、
                                          # windup_seconds、dash_speed、dash_seconds、recovery_seconds、stun_resistant、
                                          # knockback_resistance）；每只怪一份拷贝；HP 由战斗按 view 设
