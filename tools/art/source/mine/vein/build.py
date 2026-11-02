@@ -73,7 +73,7 @@ for region in json.loads((OUT/'seam-plan.json').read_text()):
 # Keep the editable source independent from obsolete embedded R1 generators.
 for text in list(bpy.data.texts):bpy.data.texts.remove(text)
 note=bpy.data.texts.new('README_VEIN.txt')
-note.write('SGODOT-355 vein v1.1. Named parts copied from accepted mine_backdrop.blend.\nRebuild/export with adjacent build.py. COLOR is linear; Blender Fade_UV2.y is inverted at glTF export.\n')
+note.write('SGODOT-355 vein v1.2. Named parts copied from accepted mine_backdrop.blend.\nRebuild/export with adjacent build.py. COLOR is linear; Blender Fade_UV2.y is inverted at glTF export.\n')
 bpy.context.view_layer.update()
 bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'vein.blend'))
 bpy.ops.object.select_all(action='DESELECT');copies=[]
@@ -88,7 +88,7 @@ bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=T
     export_materials='EXPORT',export_normals=True,export_texcoords=True,export_vertex_color='ACTIVE',
     export_all_vertex_colors=False,export_animations=False,export_skins=False)
 shutil.copy2(SRC/'palette.json',RUNTIME/'palette.json')
-report={'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','stage':'v1.1',
+report={'author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','stage':'v1.2',
     'source':'assets/mine/backdrop/source/mine_backdrop.blend','source_sha256':hashlib.sha256((SRC/'base_reference.blend').read_bytes()).hexdigest(),
     'removed_exterior_details':removed,'depth_only_clamped_vertices':adjusted,'triangles':count,'surfaces':1,
     'runtime_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'axes':{'N':list(N),'R':list(R),'U':list(U)},

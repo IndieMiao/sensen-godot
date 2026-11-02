@@ -1,0 +1,23 @@
+[
+  {
+    "file": "SGODOT-355_mine_vein_v1.2_bands.jpg",
+    "bytes": 883013,
+    "sha256": "448600efb196c5a76f4fb6c8ddb0633c195b723c9c5505942c0c0178d1af40bb",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1.2_band_31_40.jpg",
+    "bytes": 198633,
+    "sha256": "2a1a9f6a306aff66c3c3e3365eca20cb2ef3cec9c8f0a6e61f9cf53dc713cd1e",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1.2_validation.json",
+    "bytes": 490542,
+    "sha256": "3beef202fbdddff92bb6a15b7f922efc320f1ab8b99aac9e241973e6d02fecd4",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

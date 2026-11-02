@@ -88,6 +88,7 @@ func backdrop_checks():
 	report.backdrop={"triangles":arrays[Mesh.ARRAY_INDEX].size()/3,"rock_vertices":rock,"mineral_vertices":seam}
 
 func scene(band,index,guard=false):
+	var measured_ores=[]
 	ProjectSettings.set_setting("mine_vein/ground",Color(band.ground));ProjectSettings.set_setting("mine_vein/wall",Color(band.wall))
 	ProjectSettings.set_setting("mine_vein/backdrop_tint",Color(band.backdrop_tint));MineBackdrop.VOID=Color(band.fog)
 	MineArt._floor_cache.clear();mine=Probe.new();vp.add_child(mine);mine._build_floor(3)
@@ -109,11 +110,24 @@ func scene(band,index,guard=false):
 		for id in ["iron_ore","quartz","coal","copper_ore"]:
 			var root=load("res://assets/mine/rocks/rock_"+id+".glb").instantiate();mine.add_child(root)
 			root.position=Vector3(2.2+1.7*n,0,-2.3);BlobShadow.attach(root,.52);n+=1
+			if id in ["iron_ore","quartz"]:measured_ores.append(root)
 	mine._band=band_rect;mine._focus=Vector3(4.75,0,-.75);mine._zoom=.8;mine._update_camera()
 	var name="guard_f40" if guard else "band_"+str(index+1)
 	await capture(name)
 	mine.backdrop.visible=false;await capture(name+"_without_backdrop");mine.backdrop.visible=true
 	if index==0:backdrop_checks()
+	if index in [2,3] and not guard:
+		# Isolate visible stone-body pixels, then measure ground at those exact pixels.
+		for i in measured_ores.size():
+			var shader=Shader.new()
+			shader.code="shader_type spatial; render_mode unshaded, fog_disabled, cull_disabled; uniform vec3 id_color; void fragment(){ bool stone=COLOR.r<0.3 && COLOR.b>COLOR.r && COLOR.g>COLOR.r; ALBEDO=stone?id_color:vec3(0.0); }"
+			var mat=ShaderMaterial.new();mat.shader=shader
+			mat.set_shader_parameter("id_color",Vector3(1,0,1) if i==0 else Vector3(0,1,0))
+			for mesh in measured_ores[i].find_children("*","MeshInstance3D",true,false):
+				if mesh.mesh!=null and mesh.name!="BlobShadow":mesh.material_override=mat
+		await capture(name+"_ore_masks")
+		for root in measured_ores:root.visible=false
+		await capture(name+"_ground_under_ores")
 	report.bands.append({"from":band.from,"to":band.to,"guard":guard,"colors":band,"player_height_m":1.745,
 		"monsters":["slime","bat","shroomling","rock_beetle"] if not guard else ["quartz_king"],
 		"ore_order":["iron_ore","quartz","coal","copper_ore"] if not guard else [],"zoom":.8,"camera_band":[band_rect.position.x,band_rect.position.y,band_rect.size.x,band_rect.size.y]})

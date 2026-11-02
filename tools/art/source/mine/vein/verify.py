@@ -40,11 +40,11 @@ check(np.all(np.ptp(colors[rock,:3],axis=1)<1e-6),'Non-mineral COLOR_0 is graysc
 check(colors[rock,:3].min()>=.419 and colors[rock,:3].max()<=.961,'Rock grayscale in original .42-.96 range')
 check(np.allclose(colors[:,3],1) if colors.shape[1]==4 else True,'Opaque vertex colours')
 check(mask[:,0].min()>=-1e-6 and mask[:,0].max()<=1.000001,'UV2.x remains a 0..1 void fade')
-quartz=colors[mineral,:3][np.min(colors[mineral,:3],axis=1)>.3]
+quartz=colors[mineral,:3][colors[mineral,2]>colors[mineral,0]]
 quartz_srgb=np.where(quartz<=.0031308,quartz*12.92,1.055*quartz**(1/2.4)-.055)
 quartz_luma=quartz_srgb@np.array([.2126,.7152,.0722])
-check(.77<=quartz_luma.max()<=.79,'Quartz highlight sRGB luma about .78')
-check(.11<=np.ptp(quartz_luma)<=.14,'Quartz sRGB facet contrast about .12')
+check(.54<=quartz_luma.min()<=.56 and .64<=quartz_luma.max()<=.66,'Quartz sRGB luma about .55-.65')
+check(.09<=np.ptp(quartz_luma)<=.11,'Quartz retains sRGB facet contrast about .10')
 check(np.all(quartz_srgb[:,2]-quartz_srgb[:,0]>.015),'Quartz has pale lavender hue, not neutral gray')
 check(np.any(colors[mineral,0]>colors[mineral,1]*2),'Rust edge has authored linear colour')
 normal=np.array([.183116,.681998,.708058]);depth=points@normal
@@ -99,7 +99,9 @@ palette=json.loads((path.parent/'palette.json').read_text());bands=palette['band
 baseline_path=ROOT/'docs/design/mine-vein-355-2026-11-02/v0/SGODOT-355_mine_vein_v0_validation.json'
 if baseline_path.exists():
     baseline=json.loads(baseline_path.read_text())
-    check(palette==baseline['palette'],'Approved v0 palette retained')
+    unchanged=[{k:v for k,v in b.items() if k!='ground' or i<2} for i,b in enumerate(bands)]
+    original=[{k:v for k,v in b.items() if k!='ground' or i<2} for i,b in enumerate(baseline['palette']['bands'])]
+    check(unchanged==original,'Only ground in F21-40 may differ from approved palette')
 check([(b['from'],b['to']) for b in bands]==[(1,10),(11,20),(21,30),(31,40)],'Continuous exact 1..40 layer bands')
 check(all(set(b)=={'from','to','ground','wall','backdrop_tint','fog'} for b in bands),'Palette matches agreed schema')
 check(all(re.fullmatch(r'#[0-9a-fA-F]{6}',b[key]) for b in bands for key in ['ground','wall','backdrop_tint','fog']),'All palette colours are six-digit hex')
@@ -107,7 +109,7 @@ def luminance(value):
     values=np.array([int(value[i:i+2],16)/255 for i in [1,3,5]])
     linear=np.where(values<=.04045,values/12.92,((values+.055)/1.055)**2.4)
     return float(linear@np.array([.2126,.7152,.0722]))
-for key in ['ground','wall','backdrop_tint']:
+for key in ['wall','backdrop_tint']:
     values=[luminance(b[key]) for b in bands]
     check(all(a>b for a,b in zip(values,values[1:])),key+' gets progressively darker')
 check(all(b['fog'].lower()!='#000000' for b in bands),'Void stays nonblack; no real fog')

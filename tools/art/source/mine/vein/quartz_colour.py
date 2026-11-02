@@ -1,9 +1,9 @@
 """Pale-lavender quartz in sRGB, converted once to linear vertex colour."""
 import math
 
-DARK=(169/255,165/255,181/255)
-MID=(180/255,179/255,186/255)
-LIGHT=(200/255,198/255,206/255)
+DARK=(142/255,138/255,154/255)
+MID=(152/255,149/255,160/255)
+LIGHT=(167/255,164/255,177/255)
 KEY=(-.4,.65,1.)
 
 def linear(value):

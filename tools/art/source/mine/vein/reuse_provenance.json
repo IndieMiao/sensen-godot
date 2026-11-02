@@ -1,7 +1,7 @@
 {
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
-  "stage": "v1.1",
+  "stage": "v1.2",
   "source": "assets/mine/backdrop/source/mine_backdrop.blend",
   "source_sha256": "11fa87714ac6ff77a2abf6a659b1980607691615e4826e4a08185a83d70d14aa",
   "removed_exterior_details": [
@@ -37,7 +37,7 @@
   "depth_only_clamped_vertices": 8,
   "triangles": 3595,
   "surfaces": 1,
-  "runtime_sha256": "dd6f7d1e3e1df77c50612dee629bc6e9bede7f6b23cf69905f3335ff77d03352",
+  "runtime_sha256": "1b25eaef77880ab795d286d5e6501fbc4a5209afce099484b2c736f0d2b55aca",
   "axes": {
     "N": [
       0.1831163465976715,
@@ -59,6 +59,6 @@
     "Retain protected inner footprint and camera-space alignment; runtime retains the 1m forward offset.",
     "Variable-width kinked mineral vein runs diagonally behind the mine, exposed in upper and lower background.",
     "UV2.x retains edge fade; UV2.y is 1 only for un-tinted mineral color; remaining rock is grayscale.",
-    "v1.1: only quartz RGB changes; pale lavender sRGB highlights #C8C6CE, darker recesses #A9A5B5, facet-aligned shading. Rust, shape, position, UV and UID retained."
+    "v1.2: quartz RGB reduced to pale lavender sRGB luma .55-.65 with existing facet shading; rust, shape, position, UV and UID retained. Only F21-40 ground palette entries brighten to cool blue for ore separation."
   ]
 }
