@@ -101,14 +101,22 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 	return config.save(path)
 
 ## P0's zh_CN table (assets/localization/p0_zh_CN.json: English source → Chinese). A line not in it is tried as a
-## template — a source with %d / %s (`Need %d more %s` → `还差 %d 个%s`; `{1}` / `{2}` in the Chinese to reorder) — with
-## each %s it caught translated again (an item's name); then line by line, then by its ` · ` parts. Nothing found: ""
-## (TranslationServer keeps the English). Answers are cached: labels ask again on every redraw.
+## template — a source with format specs (%d, %s, %+d, %.1f; %% a percent sign: `Need %d more %s` → `还差 %d 个%s`;
+## `{1}` / `{2}` in the Chinese to reorder) — with each %s it caught translated again (an item's name, a weekday) and a
+## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts. Nothing found: "" (the
+## English stays). Answers are cached: labels ask again on every redraw.
 class P0Translation extends Translation:
 	var _exact := {}
 	var _templates: Array = []   # [RegEx, Chinese, literal length] — the longest literal tried first
 	var _cache := {}
 	const CACHE_MAX := 4096
+	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
+	static var SPEC := _spec_re()
+
+	static func _spec_re() -> RegEx:
+		var re := RegEx.new()
+		re.compile("%[+-]?[0-9]*(\\.[0-9]+)?[dsf]")
+		return re
 
 	func load_table(path: String) -> void:
 		locale = "zh_CN"
@@ -125,7 +133,7 @@ class P0Translation extends Translation:
 			var en := str(source)
 			var zh = data[source]
 			if en.begins_with("_") or not zh is String or str(zh).is_empty(): continue
-			if en.contains("%d") or en.contains("%s"):
+			if SPEC.search(en) != null:
 				var re := RegEx.new()
 				if re.compile(_pattern(en)) == OK:
 					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length()])
@@ -137,10 +145,17 @@ class P0Translation extends Translation:
 		var out := "^"
 		var i := 0
 		while i < en.length():
-			if en[i] == "%" and i + 1 < en.length() and en[i + 1] in ["d", "s"]:
-				out += "(-?[0-9][0-9,]*)" if en[i + 1] == "d" else "(.+?)"
+			if en[i] == "%" and i + 1 < en.length() and en[i + 1] == "%":
+				out += "%"
 				i += 2
 				continue
+			if en[i] == "%":
+				var m := SPEC.search(en, i)
+				if m != null and m.get_start() == i:
+					var kind := m.get_string().right(1)
+					out += "(.*?)" if kind == "s" else ("([+-]?[0-9][0-9,]*\\.?[0-9]*)" if kind == "f" else "([+-]?[0-9][0-9,]*)")
+					i = m.get_end()
+					continue
 			var c := en[i]
 			out += ("\\" + c) if c in ".^$*+?()[]{}|\\/" else c
 			i += 1
@@ -188,26 +203,36 @@ class P0Translation extends Translation:
 			var values: Array = []
 			for g in range(1, m.get_group_count() + 1):
 				var v := m.get_string(g)
-				var z := "" if v.is_valid_int() or v.replace(",", "").is_valid_int() else translate_line(v)
+				if v in PLURAL_ENDINGS:
+					values.append("")
+					continue
+				var z := "" if v.is_empty() or v.replace(",", "").replace("+", "").replace("-", "").is_valid_float() else translate_line(v)
 				values.append(z if z != "" else v)
 			return _fill(str(entry[1]), values)
 		return ""
 
-	## The Chinese template filled: `{1}`…`{n}` by position when it has them, else %d / %s in order.
+	## The Chinese template filled: `{1}`…`{n}` by position when it has them (any may be left out — a plural's ending),
+	## else its format specs in order; `%%` is a percent sign either way.
 	static func _fill(zh: String, values: Array) -> String:
-		if zh.contains("{1}"):
+		if zh.contains("{1}") or zh.contains("{2}"):
 			var out := zh
 			for i in values.size(): out = out.replace("{%d}" % (i + 1), str(values[i]))
-			return out
+			return out.replace("%%", "%")
 		var out := ""
 		var k := 0
 		var i := 0
 		while i < zh.length():
-			if zh[i] == "%" and i + 1 < zh.length() and zh[i + 1] in ["d", "s"] and k < values.size():
-				out += str(values[k])
-				k += 1
+			if zh[i] == "%" and i + 1 < zh.length() and zh[i + 1] == "%":
+				out += "%"
 				i += 2
 				continue
+			if zh[i] == "%" and k < values.size():
+				var m := SPEC.search(zh, i)
+				if m != null and m.get_start() == i:
+					out += str(values[k])
+					k += 1
+					i = m.get_end()
+					continue
 			out += zh[i]
 			i += 1
 		return out

@@ -174,3 +174,19 @@ func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() 
 	TranslationServer.remove_translation(loc.p0_translation)
 	loc.free()
 	DirAccess.remove_absolute(path)
+
+## 李白's notes on the first draft (q(275)): %% is a percent sign, %+d / %.1f are numbers, a %s may be empty, and a
+## plural's ending (`dish%s` → "" / s / es) never reaches the Chinese; a weekday or the like caught by a %s is looked up.
+func test_p0_table_reads_percent_signs_signed_and_decimal_numbers_and_drops_plural_endings() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"Crops ready %d%% sooner": "作物早 %d%% 成熟", "%+d Friendship": "好感 %+d", "%.1f km": "%.1f 公里",
+		"%d dish%s in bag": "背包里有 %d 份料理%s", "%d slot%s free": "空 {1} 格", "Your day resets %s 4 AM": "每天%s凌晨 4 点重置",
+		"Mon": "周一"})
+	assert_str(String(t.get_message("Crops ready 20% sooner"))).is_equal("作物早 20% 成熟")
+	assert_str(String(t.get_message("+5 Friendship"))).is_equal("好感 +5")
+	assert_str(String(t.get_message("12.5 km"))).is_equal("12.5 公里")
+	assert_str(String(t.get_message("1 dish in bag"))).is_equal("背包里有 1 份料理")
+	assert_str(String(t.get_message("3 dishes in bag"))).is_equal("背包里有 3 份料理")
+	assert_str(String(t.get_message("2 slots free"))).is_equal("空 2 格")   # {1} alone: the ending left out
+	assert_str(String(t.get_message("Your day resets Mon 4 AM"))).is_equal("每天周一凌晨 4 点重置")

@@ -26,6 +26,7 @@ def copy_like(t: str) -> bool:
     return t[0].isupper() or t[0] in '%·+-–' or ' ' in t
 
 def norm(t: str) -> str:
+    t = re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), t)   # GDScript's \u2060 and the like, as shown
     t = t.replace('\\n', '\n').replace('\\"', '"')
     return re.sub(r'\s*·\s*$', '', re.sub(r'^\s*·\s*', '', t)).strip()
 
@@ -34,7 +35,7 @@ def main() -> None:
     def add(src: str, where: str) -> None:
         src = norm(src)
         if not src or not copy_like(src): return
-        e = out.setdefault(src, {"where": [], "kind": "template" if re.search(r'%[ds]', src) else "line"})
+        e = out.setdefault(src, {"where": [], "kind": "template" if re.search(r'%[+-]?\d*(?:\.\d+)?[dsf]', src.replace('%%', '')) else "line"})
         if len(e["where"]) < 5: e["where"].append(where)
     files = subprocess.run(['git', 'ls-files', *DIRS], capture_output=True, text=True, cwd=ROOT).stdout.split()
     for f in files:
