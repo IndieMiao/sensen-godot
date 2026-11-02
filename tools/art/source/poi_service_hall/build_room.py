@@ -126,6 +126,7 @@ def source_variant(name,source,kind,scale=None,plant_tiles=None):
                     mask=((uv>=lo-1e-6)&(uv<=hi+1e-6)).all(1)
                     target=slot
                     if name in ['sofa_three_seat','armchair'] and slot in ['sage','sage_dark','linen_green','linen','sky']:target='cloth_green'
+                    if name=='small_round_table' and slot in ['linen','porcelain']:target='oak_light'
                     target_rect=PALETTE[target]['uv_rect_gltf'];a=np.array(target_rect[:2]);b=np.array(target_rect[2:])
                     result[mask]=a+(uv[mask]-lo)/(hi-lo)*(b-a);assigned|=mask
                 assert assigned.all(),(name,'unmapped UV')
@@ -150,7 +151,7 @@ def source_variant(name,source,kind,scale=None,plant_tiles=None):
     PROVENANCE[name]={'task':'SGODOT-321','author':'黄忠','virtual_user_id':AUTHOR,
         'source':str(source.relative_to(ROOT)),'source_sha256':original_hash,
         'changes':['N2 atlas/material and UV remap; original geometry retained' if not scale else
-            'N2 small table variant: baked scale to diameter .60m, height .75m; original 324 untouched'],
+            'N2 small table variant: baked scale to diameter .60m, height .75m; v1.1 tabletop remapped to light oak; original 324 untouched'],
         'scale_xyz':scale or [1,1,1]}
 
 

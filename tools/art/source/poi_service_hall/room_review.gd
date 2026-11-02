@@ -149,11 +149,13 @@ func capture(name):
 	print("N2_ROOM_CAPTURE ",name)
 
 func run():
-	output=ProjectSettings.globalize_path("res://../room_captures");DirAccess.make_dir_recursive_absolute(output)
+	var tabletop_only="--tabletop-only" in OS.get_cmdline_user_args()
+	output=ProjectSettings.globalize_path("res://../room_captures_v1.1" if tabletop_only else "res://../room_captures");DirAccess.make_dir_recursive_absolute(output)
 	setup();pose(6.72);geometry();await avatar();await routes();occlusion()
 	await capture("default_43deg_360")
-	vp.size=Vector2i(1200,1000);pose(12,43,45,Vector3(0,1.85,.1));await capture("overview")
-	rig.visible=false;overlay.visible=true;vp.size=Vector2i(1200,1100);pose(7.8,90,0,Vector3.ZERO);await capture("top_capsule")
+	if not tabletop_only:
+		vp.size=Vector2i(1200,1000);pose(12,43,45,Vector3(0,1.85,.1));await capture("overview")
+		rig.visible=false;overlay.visible=true;vp.size=Vector2i(1200,1100);pose(7.8,90,0,Vector3.ZERO);await capture("top_capsule")
 	report.passed=report.checks.all(func(c):return c.passed)
 	var f=FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE);f.store_string(JSON.stringify(report,"\t")+"\n");f.close()
 	print("N2_ROOM_VALIDATION ",report.passed);get_tree().quit(0 if report.passed else 1)

@@ -4,6 +4,12 @@
 用户 2026-11-02 批准 C48，按 B 做原尺寸 8 座；批准转达见 321 `2eaa12b5`。
 本轮交完整美术装配，PR #597 目标 `wp-3d-scene`，保持草稿，待技术、画面复验和用户批准合并。
 
+## v1.1 桌面颜色
+
+整间 v1 已通过上官婉儿技术检查 `37ca2d70` 和不知火舞画面验收 `6d36ddde`，按唯一修改项将三张小圆桌桌面从白色重映射到浅木色 `oak_light #D59A53`，与沙发木腿同色系。桌腿、几何、摆放、挂点、图集和预算均保持；Blender 装配源同步。原 v1 图片保留，本轮只交 [v1.1 默认 43°](SGODOT-321_N2_v1.1_room_default_43deg_360.png)。
+
+复现时先按下方流程重建和导入，再运行 `room_review.gd` 的 `--tabletop-only` 参数，仅拍默认图；打包命令加 `package_room.py --revision v1.1`。实际 UV 对照确认变化仅落在桌面高度区域，桌腿 UV 和全部位置顶点不变。
+
 ## 装配与依赖
 
 - 场景：`scenes/poi_service_hall/poi_service_hall_art.tscn`。读取 `assets/rooms/poi_service_hall/layout.json`，包含室内摆放、碰撞和挂点；不依赖游戏账号、服务或玩法。
