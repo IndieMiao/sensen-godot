@@ -211,6 +211,9 @@ if not k: sys.exit('no P0_ACCESS_KEYS for ' + sys.argv[2])
 print(k)
 PY
       ) || { rm -f "$f.tmp"; exit 1; }
+      # One line, one key: anything else the remote side printed (a login banner, a warning) must not become the key.
+      [ "$(wc -l < "$f.tmp" | tr -d ' ')" = 1 ] && grep -Eq '^[A-Za-z0-9_-]{8,128}$' "$f.tmp" \
+        || { rm -f "$f.tmp"; echo "FAIL: what came back is not one key line (not printed): nothing written" >&2; exit 1; }
       mv "$f.tmp" "$f"
       echo "written $(wc -c < "$f" | tr -d ' ') bytes"
       exit 0 ;;
