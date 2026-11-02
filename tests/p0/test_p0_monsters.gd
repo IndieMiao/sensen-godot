@@ -110,3 +110,27 @@ func _mover() -> PlayerMover:
 	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
 	mover.position = Layout.SPAWN
 	return mover
+
+## A model's json is laid over its placeholder's (周瑜 on the bat blockout, 11-02): the art's timings and hit point win,
+## the movement only the placeholder has stays, and durations go action by action; a json that is not there is skipped.
+func test_a_models_json_is_laid_over_the_placeholders() -> void:
+	var dir := "user://test_p0_monsters_meta/"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
+	var write := func(name: String, data: Dictionary) -> String:
+		var f := FileAccess.open(dir + name, FileAccess.WRITE)
+		f.store_string(JSON.stringify(data))
+		f.close()
+		return dir + name
+	var placeholder: String = write.call("placeholder.json", {"radius": 0.3, "hit_point": [0, 1.0, 0], "hit_at": 0.25,
+		"durations": {"windup": 0.55, "die": 0.5, "stunned": 2.0}, "move": {"speed": 2.8, "aggro": 6.5}})
+	var model: String = write.call("model.json", {"radius": 0.35, "hit_point": [0, 1.0, 0.05], "hit_at": 0.2,
+		"durations": {"windup": 0.55, "die": 0.7}, "anims": {"die": {"length": 0.7, "loop": false}}})
+	var m := Monsters.layered([placeholder, model, dir + "none.json"])
+	assert_float(float(m.radius)).is_equal(0.35)
+	assert_array(m.hit_point).is_equal([0.0, 1.0, 0.05])   # JSON numbers read as floats
+	assert_float(float(m.hit_at)).is_equal(0.2)
+	assert_that(m.durations).is_equal({"windup": 0.55, "die": 0.7, "stunned": 2.0})   # the placeholder's stunned kept
+	assert_that(m.move).is_equal({"speed": 2.8, "aggro": 6.5})                       # only the placeholder has it
+	assert_that(Monsters.layered([placeholder]).durations).is_equal({"windup": 0.55, "die": 0.5, "stunned": 2.0})
+	for f in ["placeholder.json", "model.json"]: DirAccess.remove_absolute(ProjectSettings.globalize_path(dir + f))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(dir))
