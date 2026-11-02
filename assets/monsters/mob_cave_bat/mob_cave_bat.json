@@ -1,0 +1,79 @@
+{
+  "radius": 0.3,
+  "height": 1.309616208076477,
+  "hurt_point": [
+    0,
+    1.0,
+    0.05
+  ],
+  "badge_point": [
+    0,
+    1.55,
+    0
+  ],
+  "hover_center": [
+    0,
+    1.0,
+    0
+  ],
+  "anims": {
+    "idle": {
+      "length": 1.0,
+      "loop": true
+    },
+    "move": {
+      "length": 0.6,
+      "loop": true
+    },
+    "windup": {
+      "length": 0.55,
+      "loop": false
+    },
+    "attack": {
+      "length": 0.45,
+      "loop": false,
+      "hit_at": 0.2
+    },
+    "recover": {
+      "length": 0.5,
+      "loop": false
+    },
+    "hit": {
+      "length": 0.25,
+      "loop": false
+    },
+    "die": {
+      "length": 0.7,
+      "loop": false
+    },
+    "fly_high": {
+      "length": 0.4,
+      "loop": true
+    }
+  },
+  "note": "Hover height is in rest pose; fly_high adds no flight-height offset. Movement and blob shadow belong to the consumer.",
+  "id": "mob_cave_bat",
+  "triangles": 1376,
+  "surfaces": 1,
+  "bones": 10,
+  "bounds": [
+    [
+      -0.5,
+      0.7450000047683716,
+      -0.16500000655651093
+    ],
+    [
+      0.5,
+      1.309616208076477,
+      0.1704999953508377
+    ]
+  ],
+  "tint_mask": "UV2.x",
+  "cast_shadow": false,
+  "root_motion": false,
+  "front": "+Z",
+  "stage": "blockout",
+  "source_concept": "Plane 355 c368e7dd",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+}
