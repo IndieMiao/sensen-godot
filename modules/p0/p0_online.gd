@@ -11,6 +11,8 @@ signal result(seq: int, ok: bool, code: String)
 signal failed(code: String)
 signal connection_changed(connected: bool)
 signal fishing(states: Array)            # a pond room's lines of the others (11-02): OnlineCrowd.fishing_snapshot's shape
+signal roster_changed                    # members changed (P0VoiceRoom puts this phone's mutes on the new peers)
+signal voice_blocks(peers: Array)        # the server's blocked peers, either way, in this room (P0Voice, SGODOT-383)
 
 const PROTOCOL := 1
 const SEND_S := 0.1
@@ -243,6 +245,10 @@ func _message(text: String) -> void:
 			result.emit(int(m.seq), bool(m.ok), str(m.get("code", "")))
 		"error":
 			failed.emit(str(m.get("code", "")))
+		"voice_blocks":
+			# peer ids as LiveKit identities: "4" (the server sends strings; a number from JSON is a float, never "4.0")
+			voice_blocks.emit((m.get("blocked", []) as Array).map(func(i): return str(int(i)) if (i is float or i is int) else str(i))
+				if m.get("blocked") is Array else [])
 		"fishing":
 			if int(m.get("epoch", -1)) != epoch: return
 			var states: Array = m.get("members", []) if m.get("members", []) is Array else []
@@ -260,6 +266,7 @@ func _frame(data: PackedByteArray) -> void:
 		if int(state.id) != self_id and members.has(int(state.id)): crowd.call("sample", int(state.id), state)
 
 func _roster() -> void:
+	roster_changed.emit()
 	if crowd == null: return
 	var others := {}
 	for id in members:
