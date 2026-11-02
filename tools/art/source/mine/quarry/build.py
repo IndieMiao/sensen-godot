@@ -1,4 +1,4 @@
-"""Quarry v0: edit a copy of the approved backdrop, preserving its inner boundary."""
+"""Quarry v1: warm depth bands, readable terrace edges and timber supports."""
 from pathlib import Path
 import argparse
 import hashlib
@@ -17,10 +17,10 @@ R=Vector((math.cos(yaw),0,-math.sin(yaw)))
 U=Vector((-math.sin(yaw)*math.sin(pitch),math.cos(pitch),-math.cos(yaw)*math.sin(pitch)))
 N=Vector((math.sin(yaw)*math.cos(pitch),math.sin(pitch),math.cos(yaw)*math.cos(pitch)))
 PALETTE={"bands":[
-    {"from":1,"to":4,"ground":"#dca26e","wall":"#b85e43","backdrop_tint":"#653425","fog":"#242125"},
-    {"from":5,"to":10,"ground":"#c39b76","wall":"#9e6650","backdrop_tint":"#57382c","fog":"#242225"},
-    {"from":11,"to":20,"ground":"#ac927c","wall":"#88685b","backdrop_tint":"#4b3932","fog":"#222125"},
-    {"from":21,"to":30,"ground":"#958474","wall":"#736157","backdrop_tint":"#3f3530","fog":"#201f23"},
+    {"from":1,"to":4,"ground":"#dca26e","wall":"#b97941","backdrop_tint":"#664324","fog":"#242125"},
+    {"from":5,"to":10,"ground":"#cd925b","wall":"#a06c3b","backdrop_tint":"#583b20","fog":"#242225"},
+    {"from":11,"to":20,"ground":"#ba824a","wall":"#885e35","backdrop_tint":"#4b341d","fog":"#222125"},
+    {"from":21,"to":30,"ground":"#a07146","wall":"#704e2e","backdrop_tint":"#3e2b19","fog":"#201f23"},
 ]}
 
 def godot(p): return Vector((p.x,p.z,-p.y))
@@ -73,7 +73,7 @@ def main():
         for local in [0,3]:
             baseline_inner.append(list(godot(base.data.vertices[polygon.vertices[local]].co)))
     # Keep ring zero byte-stable; edit only the relief outside that protected edge.
-    tones=[.55,.94,.44,.88,.44,.82,.43,.72,.51,.44]
+    tones=[.55,.54,.95,.42,.94,.43,.92,.44,.51,.44]
     depths=[-6.93,-6.91,-6.79,-6.91,-6.77,-6.92,-6.79,-6.93,-6.85,-6.94,-6.94]
     gray=base.data.color_attributes["StrataGray"]
     for index,polygon in enumerate(base.data.polygons):
@@ -111,19 +111,19 @@ def main():
         mesh.color_attributes.active_color=c
         mesh.uv_layers.new(name="UVMap");uv=mesh.uv_layers.new(name="Fade_UV2")
         for polygon in mesh.polygons:
-            g=[.45,.55,.82,.60,.94][polygon.index]
+            g=[.58,.72,.96,.80,.96][polygon.index]
             for li in polygon.loop_indices:
                 c.data[li].color=(g,g,g,1)
                 uv.data[li].uv=(fade(coords[mesh.loops[li].vertex_index]),1)
         ob["role"]="Shallow timber relief outside the unchanged protection contour; no collision."
-    supports=[(2.2,-1.6,1.35,.85),(7.5,-2.65,1.45,.88),(-1.7,2.0,.85,1.1),
-        (13.1,2.8,.80,1.0),(5.8,7.25,1.5,.72)]
+    supports=[(4.2,-1.88,1.45,.78),(6.65,-2.40,1.45,.78),(-1.7,2.0,.85,1.1),
+        (13.1,2.8,.80,1.0),(5.8,7.25,1.5,.60)]
     for i,(x,y,w,h) in enumerate(supports):
         left=(x-w/2,y-h);right=(x+w/2,y-h)
-        beam(f"05_Timber_{i}_left",left,(left[0],y),.13)
-        beam(f"05_Timber_{i}_right",right,(right[0],y),.13)
-        beam(f"05_Timber_{i}_lintel",(x-w*.61,y),(x+w*.61,y),.16)
-        beam(f"05_Timber_{i}_brace",(x-w*.43,y-h*.91),(x+w*.43,y-h*.12),.10)
+        beam(f"05_Timber_{i}_left",left,(left[0],y),.24)
+        beam(f"05_Timber_{i}_right",right,(right[0],y),.24)
+        beam(f"05_Timber_{i}_lintel",(x-w*.61,y),(x+w*.61,y),.28)
+        beam(f"05_Timber_{i}_brace",(x-w*.43,y-h*.91),(x+w*.43,y-h*.12),.20)
     for ob in collection.objects:
         # glTF export flips Blender's V: authored 1 becomes the required mask 0.
         for row in ob.data.uv_layers["Fade_UV2"].data: row.uv.y=1
@@ -131,7 +131,7 @@ def main():
     for polygon in list(base.data.polygons)[:112]:
         for local in [0,3]: after_inner.append(list(godot(base.data.vertices[polygon.vertices[local]].co)))
     assert baseline_inner==after_inner
-    bpy.context.scene["quarry_stage"]="v0"
+    bpy.context.scene["quarry_stage"]="v1"
     bpy.context.scene["quarry_runtime_project"]=str(runtime)
     bpy.context.scene["channels"]="COLOR.rgb linear grayscale; alpha1; UV2.x void fade; UV2.y0."
     text=bpy.data.texts["EXPORT_RUNTIME.py"]
@@ -151,6 +151,6 @@ def main():
         "basis":{"right":list(R),"up":list(U),"normal":list(N)},"parts":len(collection.objects),
         "runtime_forward_translation_m":1.0,"mesh_forward_translation_m":0.0}
     (QA/"build.json").write_text(json.dumps(info,indent=2)+"\n")
-    print("QUARRY_V0",triangles,"triangles",len(collection.objects),"parts; inner unchanged",len(baseline_inner))
+    print("QUARRY_V1",triangles,"triangles",len(collection.objects),"parts; inner unchanged",len(baseline_inner))
 
 if __name__=="__main__": main()

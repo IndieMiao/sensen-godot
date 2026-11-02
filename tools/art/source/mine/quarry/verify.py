@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import struct
+import colorsys
 
 import numpy as np
 from shapely.geometry import Polygon
@@ -61,7 +62,18 @@ for role in ["ground","wall","backdrop_tint"]:
     values=[luminance(b[role]) for b in bands]
     check(all(a>b for a,b in zip(values,values[1:])),role+" gets progressively darker")
 check(all(luminance(b["fog"])>.005 for b in bands),"void colors stay above black")
+palette_hsl=[]
+for band in bands:
+    row={}
+    for role in ["ground","wall","backdrop_tint"]:
+        code=band[role]
+        h,l,s=colorsys.rgb_to_hls(*[int(code[i:i+2],16)/255 for i in [1,3,5]])
+        row[role]={"h":h*360,"s":s,"l":l}
+    palette_hsl.append(row)
+check(all(25<=c["h"]<=32 and c["s"]>=.28 for row in palette_hsl for c in row.values()),"warm HSL hue and saturation retained in all four bands")
+check(all(abs(row["ground"]["l"]-target)<.005 for row,target in zip(palette_hsl,[.65,.58,.51,.45])),"ground HSL lightness follows .65/.58/.51/.45")
 report={"passed":all(c["passed"] for c in checks),"checks":checks,"triangles":len(indices),"surfaces":1,"textures":0,
+    "palette_hsl":palette_hsl,
     "depth_range":depth.tolist() and [float(depth.min()),float(depth.max())],"gray_range":[float(colors[:,0].min()),float(colors[:,0].max())],
     "protected_overlap_m2":overlap,"inner_edge_max_error_m":float(nearest.max()),
     "runtime_glb_sha256":hashlib.sha256(raw).hexdigest()}

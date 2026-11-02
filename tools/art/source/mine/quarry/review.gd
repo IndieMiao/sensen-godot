@@ -5,6 +5,7 @@ const OUT="res://../captures/"
 var vp: SubViewport
 var mine: Node3D
 var fixtures: Node3D
+var coal: Node3D
 var ui: P0Ui
 var checks:=[]
 var report:={"captures":[],"bands":[]}
@@ -44,7 +45,8 @@ func populate() -> void:
 	fixtures=Node3D.new();mine.add_child(fixtures)
 	for i in 4:
 		var name_: String=["rock_iron_ore","rock_quartz","rock_coal","rock_copper_ore"][i]
-		add_asset("res://assets/mine/rocks/"+name_+".glb",Vector3(2.6+i*1.4,0,-2.8),.52)
+		var rock:=add_asset("res://assets/mine/rocks/"+name_+".glb",Vector3(2.6+i*1.4,0,-2.8),.52)
+		if name_=="rock_coal": coal=rock
 	add_asset("res://assets/monsters/mob_rock_beetle/mob_rock_beetle.glb",Vector3(4.1,0,-4.8),.725)
 	add_asset("res://assets/monsters/mob_shroomling/mob_shroomling.glb",Vector3(5.5,0,-4.8),.32)
 	add_asset("res://assets/monsters/mob_cave_bat/mob_cave_bat.glb",Vector3(6.35,0,-4.8),.35)
@@ -120,6 +122,16 @@ func run() -> void:
 		if index==0: check_backdrop()
 		vp.size=Vector2i(720,1600)
 		await capture("band_%d"%(index+1))
+		if index==0:
+			var coal_mesh: MeshInstance3D=coal.find_children("*","MeshInstance3D",true,false)[0]
+			var faces:=coal_mesh.mesh.get_faces()
+			report.coal_mask_triangles=[]
+			for face in range(0,faces.size(),3):
+				var triangle:=[]
+				for corner in 3:
+					var pixel: Vector2=mine.cam.unproject_position(coal_mesh.to_global(faces[face+corner]))
+					triangle.append([pixel.x,pixel.y])
+				report.coal_mask_triangles.append(triangle)
 		var coal_pixel: Vector2=mine.cam.unproject_position(Vector3(5.4,.48,-2.7))
 		var floor_pixel: Vector2=mine.cam.unproject_position(Vector3(6.0,.02,-2.15))
 		report.bands.append({"band":ART.QA_BANDS[index],"coal_pixel":[coal_pixel.x,coal_pixel.y],"floor_pixel":[floor_pixel.x,floor_pixel.y]})

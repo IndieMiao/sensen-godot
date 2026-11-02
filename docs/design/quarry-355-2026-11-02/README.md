@@ -1,4 +1,33 @@
-# SGODOT-355 浅坑 Quarry v0
+# SGODOT-355 浅坑 Quarry v1
+
+赵云。按上官婉儿 355 `5ada1f3f` 调整暖色深度梯度、台阶边沿和木支架，交 v1 技术与画面复核。运行时仍只推 `art/monsters-355`；源与审阅分支 `wp-3d-scene-zhaoyun-quarry-355` 开草稿 PR 到 `wp-3d-scene`。未批准合并。
+
+运行时 v1 增量 `1f37f4ef`，仅改 `assets/mine/types/quarry/backdrop.glb` 和 `palette.json`；推送前已 pull --rebase。
+
+## v1 变化
+
+配色按 **HSL** 校准（此处 L 是 HSL 明度，不是下面像素检查的 CIE L*）：
+
+| 层段 | 地面 | H | S | L | 岩壁 | 背景套色 |
+|---|---|---:|---:|---:|---|---|
+| 1–4 | #DCA26E | 28.36° | .611 | .647 | #B97941 | #664324 |
+| 5–10 | #CD925B | 28.95° | .533 | .580 | #A06C3B | #583B20 |
+| 11–20 | #BA824A | 30.00° | .448 | .510 | #885E35 | #4B341D |
+| 21–30 | #A07146 | 28.67° | .391 | .451 | #704E2E | #3E2B19 |
+
+地面、岩壁、背景套色全部保持 28–30° 暖色，最低 S=.391，主要靠 L 逐段下降；第一段地面保留原色。岩壁改为同色系赭石，背景套色继续约为岩壁 RGB 的 55%。四段 fog 沿用 v0，不启用真实雾。
+
+台阶窄边沿设为线性灰度 .95 / .94 / .92，相邻宽立面 .42 / .43 / .44，取代原先亮立面与暗细缝。木撑立柱 .13→.24 m、横梁 .16→.28 m、斜撑 .10→.20 m；侧面灰度 .58–.96、正面 .96。两组前侧支架向默认取景中间收，背侧保留一组，上下各能完整看见支架；侧边两组保留。内轮廓、浮雕基底几何、外缘渐隐函数和前移约定不变。
+
+预算仍为 **2968 三角形 / 1 mesh / 1 surface / 0 textures**，45 个具名部件。`.import` 和 UID `uid://mfcdrjqauttn` 保持。空目录运行原 `uv2_check.gd`：**Godot UV2.y min=0、max=0，5840 个顶点，值为 1 的顶点数 0**。自验使用正式公式、显式 `vein_mask=1`。
+
+最新媒体前缀 `SGODOT-355_mine_quarry_v1_`，包含四段、守关层、总表、全景，以及第 1/4 段 v0/v1 同镜头对比，全部 JPG。最新证据 `validation-v1.json`、`media-manifest-v1.json`。v0 图和验证保留为历史。
+
+煤的辨识度检查新增整块矿石轮廓内颜色中位数：按实际煤网格投影生成遮罩，向内缩 2 px，排除地面和假影；保留旧 3×3 亮面采样作为补充，不把煤的小亮面当成整块煤的颜色。23 项 GLB 检查包含新的 HSL 条件；25 项 Godot 检查继续覆盖材质、遮罩和截图，完整深度扫描与主体开关差分随 v1 重跑。
+
+v1 结果：四段主体开/关差分最大 RGB 差均为 0；地面比煤主体中位数高 47.99 / 42.43 / 36.09 / 28.90 L*，最深段旧亮面采样差为 8.02 L*，两种统计均保留。1,451,883 个全密度机位复测通过，最小 far 余量 0.357079 m，2 测试、0 错误/失败/跳过/孤儿。灯光、默认镜头与 v0 保持一致。
+
+## v0 历史记录
 
 赵云，2026-11-02。按上官婉儿 `dispatch-mine-layers.md`（含周瑜确认的 ★ 段）交背景粗模、配色初稿和逐段矿内截图。v0 待技术与画面复核，正式版目标仍为 11-10；不是最终验收、程序接入或合并批准。
 
@@ -73,12 +102,12 @@ godot --headless --path output/quarry-355/project --editor --import
 godot --headless --path output/quarry-355/project --script res://configure.gd
 godot --headless --path output/quarry-355/project --editor --import
 python3 "$QUARRY_SOURCE/prepare.py" --runtime "$QUARRY_RUNTIME" --sync-import
-P0_BACKDROP_DEPTH_FULL=1 P0_BACKDROP_DEPTH_JSON="$PWD/output/quarry-355/depth-full.json" SENSEN_LANGUAGE=en godot --headless --path output/quarry-355/project --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://tests/p0/test_p0_mine_backdrop_depth.gd
+P0_BACKDROP_DEPTH_FULL=1 P0_BACKDROP_DEPTH_JSON="$PWD/output/quarry-355/depth-full-v1.json" SENSEN_LANGUAGE=en godot --headless --path output/quarry-355/project --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -a res://tests/p0/test_p0_mine_backdrop_depth.gd
 nvidia-smi
 godot --path output/quarry-355/project --display-driver wayland --rendering-method mobile --rendering-driver vulkan --max-fps 30
 output/art-setup/venv/bin/python "$QUARRY_SOURCE/package.py" --runtime "$QUARRY_RUNTIME"
 ```
 
-打包前还需按派活执行空工程检查：将原检查脚本、旧背景 `orig.glb` 和本件 `backdrop.glb` 放入仅有 `project.godot` 的空工位，加载私有环境后在该目录运行 `godot --headless --path . -s res://uv2_check.gd`；输出记录为 `output/quarry-355/uv2-godot-v0.txt`。不在该工位运行导入或编辑器。
+打包前还需按派活执行空工程检查：将原检查脚本、旧背景 `orig.glb` 和本件 `backdrop.glb` 放入仅有 `project.godot` 的空工位，加载私有环境后在该目录运行 `godot --headless --path . -s res://uv2_check.gd`；输出记录为 `output/quarry-355/uv2-godot-v1.txt`。不在该工位运行导入或编辑器。
 
 生成器从原已验收 backdrop.blend 复制开始。当前 quarry.blend 内嵌 `EXPORT_RUNTIME.py` 可导出手工编辑后的具名部件；默认使用源中记录的运行时工位，也可通过环境变量 `QUARRY_RUNTIME` 指定另一工位。旧的 257 制作脚本和 contour 数据保留为来源记录，不用旧脚本覆盖当前 quarry 编辑。
