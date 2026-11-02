@@ -117,6 +117,7 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
                     is RoomEvent.Disconnected -> finish("DISCONNECTED")
                     is RoomEvent.ParticipantConnected, is RoomEvent.ParticipantDisconnected -> {
                         applyPermissions()   // a newcomer allowed unless denied (SGODOT-384)
+                        takeAllowed()   // and taken unless blocked, should its first info carry tracks whose TrackPublished is lost (亚瑟)
                         snapshot("participants")
                     }
                     is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted,
@@ -160,6 +161,7 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
                 // 384 046f7b43); Godot sets the blocks right after connect_voice, Connected takes the rest
                 current.connect(url, token, ConnectOptions(autoSubscribe = false))
                 if (room === current && session == id) {
+                    takeAllowed()   // again here, in case Connected came before the participants did (亚瑟)
                     snapshot("connected")
                 }
             } catch (_: CancellationException) { }
