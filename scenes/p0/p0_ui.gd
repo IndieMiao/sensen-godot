@@ -4453,3 +4453,141 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	modal_kind = "facility"
 	sheet.open("facility", &"facility")
 	return sheet
+
+# ---------------------------------------------------------------- voice (SGODOT-383, q(274); 不知火舞's spec 383 6d206dfb)
+## The room's voice, from the world (an outpost's or a pond's P0VoiceRoom; null with none — the map, the farm, Market
+## Square still has one with here = false). P0Runtime hands it over every frame; the keys follow its `changed`.
+const VoiceKeys := preload("res://scenes/p0/panels/p0_voice_keys.gd")
+const PeopleDrawer := preload("res://scenes/p0/panels/p0_people_drawer.gd")
+const AgeCard := preload("res://scenes/p0/panels/p0_age_card.gd")
+const MIC_ON_TOAST := "Mic on · everyone in this layer can hear you"
+const VOICE_NOT_AVAILABLE := "Voice chat isn't available"
+const REPORT_SENT := "Report sent"
+const REPORT_ALREADY := "You already reported this"
+const VOICE_KEYS_RIGHT := 16.0
+static var _mic_toast_said := false   # the first mic on after the app opens says who hears (§2); later ones do not
+var voice_room: Node
+var _voice_keys: Control
+var _people: UiDrawer
+var _mic_was_on := false
+var _mic_denied := false   # the system said no once: the key only says why from then on (§2)
+
+func set_voice_room(r: Node) -> void:
+	if r == voice_room: return
+	if is_instance_valid(voice_room):
+		for s in [[&"changed", _voice_refresh], [&"age_needed", open_age_card]]:
+			if voice_room.is_connected(s[0], s[1]): voice_room.disconnect(s[0], s[1])
+	voice_room = r if is_instance_valid(r) else null
+	_mic_was_on = false
+	if voice_room:
+		voice_room.connect(&"changed", _voice_refresh)
+		voice_room.connect(&"age_needed", open_age_card)
+	if modal_kind == "people": close_modal()
+	_voice_refresh()
+
+func _voice() -> Node: return voice_room.get("voice") if voice_room else null
+
+func _mic_on() -> bool:
+	var v := _voice()
+	return v != null and bool(v.call("active")) and bool(v.get("microphone"))
+
+## The keys shown or not, the mic's state, the count, an open drawer's rows; a first mic on says who hears.
+func _voice_refresh() -> void:
+	var shown := voice_room != null and bool(voice_room.call("offered")) and surface != "map"
+	if shown and _voice_keys == null:
+		_voice_keys = VoiceKeys.new()
+		_voice_keys.theme = UiKit.theme()
+		_voice_keys.mic_pressed.connect(_on_mic_pressed)
+		_voice_keys.people_pressed.connect(open_people)
+		root.add_child(_voice_keys)
+	if _voice_keys == null: return
+	_voice_keys.visible = shown
+	if not shown: return
+	var v := _voice()
+	if v != null and str(v.get("error")) == "MICROPHONE_DENIED": _mic_denied = true
+	var on := _mic_on()
+	_voice_keys.set_mic(on)
+	var rows: Array = voice_room.call("people")
+	_voice_keys.set_count(rows.size())
+	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)
+	if on and not _mic_was_on and not _mic_toast_said:
+		_mic_toast_said = true
+		toast(MIC_ON_TOAST, 0.0, true)
+	_mic_was_on = on
+	if modal_kind == "people" and is_instance_valid(_people): _people.call("refresh", rows)
+
+func _on_mic_pressed() -> void:
+	if voice_room == null: return
+	if _mic_denied:   # the system box comes only the first time (§2): from then on the key says why and stays off
+		toast(PartyVoiceSession.error_text("MICROPHONE_DENIED"))
+		return
+	voice_room.call("toggle_mic")
+
+## This layer's people (§4): the space and its layer in the title, a row each; Mute here, Block after its card, Report.
+func open_people() -> void:
+	if voice_room == null: return
+	var layer := int(voice_room.get("online").get("room")) if voice_room.get("online") else 0
+	var space := place_text().get_slice(" · ", 1) if place_text().contains(" · ") else place_text()
+	var d: UiDrawer = PeopleDrawer.new("%s · Layer %d" % [space, maxi(1, layer)] if space != "" else "Layer %d" % maxi(1, layer),
+		voice_room.call("people"))
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_layer)
+	d.connect(&"mute_pressed", func(peer: int, on: bool): voice_room.call("set_muted", peer, on))
+	d.connect(&"mute_all_pressed", func(on: bool):
+		for r in voice_room.call("people"): if not bool(r.blocked): voice_room.call("set_muted", int(r.peer), on))
+	d.connect(&"block_pressed", func(peer: int, on: bool):
+		if on: _confirm_block(peer)
+		else: voice_room.call("set_blocked", peer, false))   # Unblock at once, no card (§5)
+	d.connect(&"report_pressed", _report)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE, close_layer)
+	_people = d
+	modal_kind = "people"
+
+## §5: `Block Traveller ab12?`, `You won't hear each other.` / `They won't be told.`, Block / Cancel (q(28)'s card, the
+## confirm frame the home move uses).
+func _confirm_block(peer: int) -> void:
+	var who := ""
+	for r in voice_room.call("people"): if int(r.peer) == peer: who = str(r.name)
+	var confirm = load("res://scenes/p0/panels/p0_home_move_confirm.gd").new()
+	confirm.name = "BlockConfirm"
+	confirm.theme = UiKit.theme()
+	confirm.card.find_child("Title", true, false).text = "Block %s?" % who
+	confirm.card.find_child("Body", true, false).text = "You won't hear each other.\nThey won't be told."
+	confirm.move.label = "Block"
+	confirm.move.sends = false
+	var back := func():
+		confirm.queue_free()
+		modal_kind = "people"
+		_modal_back = Callable()
+	confirm.cancelled.connect(back)
+	confirm.move_pressed.connect(func():
+		back.call()
+		voice_room.call("set_blocked", peer, true))
+	_modal.add_child(confirm)   # over the drawer, which stays behind it
+	modal_kind = "block_confirm"
+	_modal_back = back
+
+## §6: no reason asked; the server's word in an Info toast (sent / already; a failure as the network's).
+func _report(peer: int) -> void:
+	var said = await voice_room.call("report", peer)
+	match str(said):
+		"sent", "true": toast(REPORT_SENT)
+		"already": toast(REPORT_ALREADY)
+		_: show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")   # failed: as any command the network lost
+
+## §7: the 13+ gate the first time the mic key is tapped. Old enough goes on to the mic (P0VoiceRoom.answer_age), not
+## old enough hides voice on this phone with an Info toast. Nothing else is kept.
+func open_age_card() -> void:
+	if voice_room == null: return
+	var d: UiDrawer = AgeCard.new()
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_layer)
+	d.connect(&"answered", func(ok: bool):
+		close_modal()
+		if not ok: toast(VOICE_NOT_AVAILABLE)
+		voice_room.call("answer_age", ok))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	modal_kind = "age"
