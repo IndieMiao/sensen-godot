@@ -1,0 +1,13 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "ironback_plates",
+  "source_blend": "tools/art/source/monsters/slime_king/ironback_plates.blend",
+  "runtime_sha256": "e5ce2f28d2aaffb60002f84b7175ddeba51b04a195ca360c0b3c0b707aa9b7b3",
+  "changes": [
+    "Five separate rounded iron-blue plates, visible forehead guard, eight rivets, fitted down the back."
+  ],
+  "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
+}

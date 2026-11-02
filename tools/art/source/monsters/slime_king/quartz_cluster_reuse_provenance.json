@@ -1,0 +1,13 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "quartz_cluster",
+  "source_blend": "tools/art/source/monsters/slime_king/quartz_cluster.blend",
+  "runtime_sha256": "c32f87151596e58025d499a02623ee585bc25b0fd80125511dfe6d4301e06149",
+  "changes": [
+    "Four rounded opaque quartz columns with pale pink bases and near-white tips; vertex colour only."
+  ],
+  "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
+}
