@@ -1,5 +1,7 @@
 # SGODOT-355 矿脉 vein v0 审阅
 
+历史版：上官婉儿在 ed70303f 指出端头的保护边像素越界及条带造型问题，后续以 v1 为准。
+
 黄忠，2026-11-02。背景粗模与四段配色初稿，待上官婉儿技术检查、不知火舞画面验收。
 
 - 运行时：`assets/mine/types/vein/backdrop.glb`、带 UID 的 `.import`、`palette.json`。

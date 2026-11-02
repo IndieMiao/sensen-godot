@@ -40,7 +40,9 @@ check(np.all(np.ptp(colors[rock,:3],axis=1)<1e-6),'Non-mineral COLOR_0 is graysc
 check(colors[rock,:3].min()>=.419 and colors[rock,:3].max()<=.961,'Rock grayscale in original .42-.96 range')
 check(np.allclose(colors[:,3],1) if colors.shape[1]==4 else True,'Opaque vertex colours')
 check(mask[:,0].min()>=-1e-6 and mask[:,0].max()<=1.000001,'UV2.x remains a 0..1 void fade')
-check(np.any(np.all(colors[mineral,:3]>.90,axis=1)),'Quartz seam retains linear white above .90')
+quartz=colors[mineral,:3][np.min(colors[mineral,:3],axis=1)>.5]
+check(quartz.size>0 and quartz.max()<=.801 and quartz.max()>=.75,'Quartz linear peak .75-.80, below pure white')
+check(float(quartz.max()-quartz.min())>.10,'Quartz facets retain visible value variation')
 check(np.any(colors[mineral,0]>colors[mineral,1]*2),'Rust edge has authored linear colour')
 normal=np.array([.183116,.681998,.708058]);depth=points@normal
 check(depth.min()>=-6.97 and depth.max()<=-5.60,'All vertices within required camera-depth slab')
@@ -82,7 +84,19 @@ for start in range(0,len(original_uv),128):
     max_error=max(max_error,float(distances.min(axis=1).max()))
 check(max_error<.00001,'Every original primary-surface vertex retained within 0.01mm in projection')
 report['protected_contour']['max_primary_projected_vertex_error_m']=max_error
+mineral_v=points[mineral]@up;mineral_u=points[mineral]@right
+check(np.any(mineral_v>7.5) and np.any(mineral_v< -3.0),'Mineral vein is exposed in upper and lower background')
+check(float(np.median(mineral_u[mineral_v>7.5]))<float(np.median(mineral_u[mineral_v< -3.0])),
+    'Upper and lower vein exposures follow the same diagonal')
+mineral_indices=indices[np.all(mineral[indices],axis=1)]
+inset=min(Polygon(current_uv[triangle]).distance(old_hole) for triangle in mineral_indices)
+check(inset>=.079,'Actual mineral triangles retreat at least 79mm from the protected contour')
+report['protected_contour']['minimum_mineral_inset_m']=inset
 palette=json.loads((path.parent/'palette.json').read_text());bands=palette['bands']
+baseline_path=ROOT/'docs/design/mine-vein-355-2026-11-02/v0/SGODOT-355_mine_vein_v0_validation.json'
+if baseline_path.exists():
+    baseline=json.loads(baseline_path.read_text())
+    check(palette==baseline['palette'],'Approved v0 palette retained')
 check([(b['from'],b['to']) for b in bands]==[(1,10),(11,20),(21,30),(31,40)],'Continuous exact 1..40 layer bands')
 check(all(set(b)=={'from','to','ground','wall','backdrop_tint','fog'} for b in bands),'Palette matches agreed schema')
 check(all(re.fullmatch(r'#[0-9a-fA-F]{6}',b[key]) for b in bands for key in ['ground','wall','backdrop_tint','fog']),'All palette colours are six-digit hex')
@@ -108,7 +122,9 @@ if config.exists():
     check('import_script/path=""' in text,'No monster import script')
     for key in ['meshes/generate_lods=false','meshes/create_shadow_meshes=false','meshes/light_baking=0','gltf/texture_map_mode=1']:
         check(key in text,key)
-    if uid:report['uid']=uid[1];shutil.copy2(config,Path(str(path)+'.import'))
+    if uid:
+        report['uid']=uid[1];shutil.copy2(config,Path(str(path)+'.import'))
+        if baseline_path.exists():check(uid[1]==baseline['glb']['uid'],'Original vein import UID preserved')
 report['passed']=all(c['passed'] for c in report['checks'])
 (OUT/'glb-validation.json').write_text(json.dumps(report,indent=2)+'\n')
 print(len(report['checks']),'checks; passed:',report['passed'])

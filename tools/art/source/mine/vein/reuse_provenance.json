@@ -1,7 +1,7 @@
 {
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
-  "stage": "v0",
+  "stage": "v1",
   "source": "assets/mine/backdrop/source/mine_backdrop.blend",
   "source_sha256": "11fa87714ac6ff77a2abf6a659b1980607691615e4826e4a08185a83d70d14aa",
   "removed_exterior_details": [
@@ -35,9 +35,9 @@
     "04_Dead_Root_02"
   ],
   "depth_only_clamped_vertices": 8,
-  "triangles": 3628,
+  "triangles": 3595,
   "surfaces": 1,
-  "runtime_sha256": "9ba0a4e91d2c543783d890c23fdfce07fa76a51ee68347f0d3a854d80ad6941c",
+  "runtime_sha256": "f3ce040a4a9b29fe557b487abf1ebda9071cb77e200caad8d4354f4045db5253",
   "axes": {
     "N": [
       0.1831163465976715,
@@ -57,7 +57,8 @@
   },
   "changes": [
     "Retain protected inner footprint and camera-space alignment; runtime retains the 1m forward offset.",
-    "Clip a continuous diagonal quartz-white ribbon with rust margins to the existing exterior surface.",
+    "Variable-width kinked mineral vein runs diagonally behind the mine, exposed in upper and lower background.",
+    "Mineral geometry is inset 0.08m from the original surface boundary; quartz linear peak .79 with shaded facets and wider rust margins.",
     "UV2.x retains edge fade; UV2.y is 1 only for un-tinted mineral color; remaining rock is grayscale."
   ]
 }

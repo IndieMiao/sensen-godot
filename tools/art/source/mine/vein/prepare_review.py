@@ -88,7 +88,7 @@ path=PROJECT/'tests/p0/test_p0_mine_backdrop_depth.gd';text=path.read_text()
 text=text.replace('\t\t\tvar case: Dictionary = await _sweep(size, floor_n)',
     '\t\t\tprint("VEIN_DEPTH_BEGIN ",size," floor ",floor_n)\n\t\t\tvar case: Dictionary = await _sweep(size, floor_n)\n\t\t\tprint("VEIN_DEPTH_DONE ",size," floor ",floor_n," views ",case.views," margin ",case.worst.far_margin)')
 path.write_text(text);patches[str(path.relative_to(PROJECT))]='Progress logging only; test assertions, density and camera code unchanged'
-for filename in ['review.gd']:
+for filename in ['review.gd','outline_review.gd']:
     if (SRC/filename).exists():shutil.copy2(SRC/filename,PROJECT/filename)
 (PROJECT/'review.tscn').write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="VeinReview" type="Node"]\nscript=ExtResource("1")\n')
 (PROJECT/'project.godot').write_text('''config_version=5
