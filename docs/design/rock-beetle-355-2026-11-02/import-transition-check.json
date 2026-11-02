@@ -1,0 +1,400 @@
+{
+	"checks": [
+		{
+			"from": "die",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "attack"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "die"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "die",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "hit"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "die",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "idle"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "die",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.000690533954184502,
+			"passed": true,
+			"stale_bones": [],
+			"to": "move"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "die",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "recover"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "die",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "windup",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "stunned"
+		},
+		{
+			"from": "attack",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		},
+		{
+			"from": "die",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		},
+		{
+			"from": "hit",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		},
+		{
+			"from": "idle",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		},
+		{
+			"from": "move",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		},
+		{
+			"from": "recover",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		},
+		{
+			"from": "stunned",
+			"max_error": 0.0,
+			"passed": true,
+			"stale_bones": [],
+			"to": "windup"
+		}
+	],
+	"import_contract_passed": true,
+	"passed": true,
+	"remove_immutable_tracks": false,
+	"uid": "uid://crslv7oobgd44"
+}

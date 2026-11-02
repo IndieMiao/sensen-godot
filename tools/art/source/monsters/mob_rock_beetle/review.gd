@@ -171,6 +171,8 @@ func run() -> void:
 	skeleton=model.find_children("*","Skeleton3D",true,false)[0]
 	player=model.find_children("*","AnimationPlayer",true,false)[0]
 	player.callback_mode_process=AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	for name_ in player.get_animation_list():
+		player.get_animation(name_).loop_mode=Animation.LOOP_LINEAR if name_ in ["idle","move","stunned"] else Animation.LOOP_NONE
 	mesh=model.find_children("*","MeshInstance3D",true,false)[0]
 	spec=JSON.parse_string(FileAccess.get_file_as_string(KIT+"mob_rock_beetle.json"))
 	for i in 5: await get_tree().process_frame

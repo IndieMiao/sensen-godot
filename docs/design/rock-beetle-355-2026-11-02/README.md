@@ -2,6 +2,12 @@
 
 赵云，2026-11-02。按上官婉儿派活和已批准的 `beetle_v3.png` 制作，交灰模技术检查与程序接口试接。正式版仍按 11-09 交付，本次不代表正式画面验收；不开运行时或美术 PR，不改 355 卡状态。
 
+## 导入配置追补
+
+按周瑜和上官婉儿的复核，GLB 导入文件改为蝙蝠的简洁模板，保留 `uid://crslv7oobgd44`，设置 `animation/remove_immutable_tracks=false`、`nodes/use_name_suffixes=true`、`meshes/ensure_tangents=false`、`meshes/create_shadow_meshes=false`，`_subresources={}`。Godot 重导后为 45 行。`configure.gd` 同步使用该模板，避免以后重建回到旧配置；循环由播放方按动作名设置。
+
+`check_transition.gd` 通过 56 组不同动作之间的实际 `play/advance` 切换，不在两动作之间重置骨骼或 seek；和独立起播目标动作逐骨对照，`move → hit` 六腿无残姿，最大误差为 0。证据见 `import-transition-check.json`。此前 G0 图片和验证保留为历史记录，此次不改 GLB 或 JSON。
+
 ## 交付
 
 - 运行时共享分支：`art/monsters-355`，从 farm-dev `0beeca15` 开工，只增加 `assets/monsters/mob_rock_beetle/`。
