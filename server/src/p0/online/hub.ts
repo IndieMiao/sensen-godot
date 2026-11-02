@@ -47,8 +47,10 @@ interface Conn { ws: WebSocket; player: string; epoch: number; appearance: Appea
 /** keys: the demo access keys (P0_ACCESS_KEYS, SGODOT-232 D1). The upgrade is not a Fastify request, so the
  * guard's onRequest hook never sees it: the hub checks x-p0-key itself. Empty or absent = no key (local playtests). */
 /** pass: v5 (SGODOT-278) — may this player join this outpost? An error code (PASS_REQUIRED / TRIP_EXPIRED) when not. */
+/** joined / departed: someone came into a room or left one (P0Voice: the blocks to tell, the grant to end). */
 export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number; keys?: string[]; gate?: P0Gate;
-  pass?: (player: string, outpost: string) => string | null }
+  pass?: (player: string, outpost: string) => string | null;
+  joined?: (o: Occupant) => void; departed?: (o: Occupant) => void }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -149,6 +151,7 @@ export class P0OnlineHub {
     const members = this.deps.rooms.members(me.outpost, me.room);
     this.send(c, { t: 'roster', count: members.length, members: members.map(m => this.view(m)) });
     for (const m of members) if (m.player !== c.player) this.toPlayer(m.player, { t: 'peer', count: members.length, member: this.view(me) });
+    this.deps.joined?.(me);
   }
 
   /** Leaves the current instance and tells the others. `remember` keeps the place for a quick reconnect. */
@@ -156,6 +159,7 @@ export class P0OnlineHub {
     c.fishing = undefined;
     const left = this.deps.rooms.leave(c.player, remember);
     if (!left) return;
+    this.deps.departed?.(left);
     const members = this.deps.rooms.members(left.outpost, left.room);
     for (const m of members) this.toPlayer(m.player, { t: 'left', id: left.id, count: members.length });
   }
@@ -290,6 +294,9 @@ export class P0OnlineHub {
       }
     }
   }
+
+  /** A message to one player's socket, from outside the hub (P0Voice's voice_blocks). */
+  tell(player: string, payload: object): void { this.toPlayer(player, payload); }
 
   private toPlayer(player: string, payload: object): void {
     const c = this.byPlayer.get(player);

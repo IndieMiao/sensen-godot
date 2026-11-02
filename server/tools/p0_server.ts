@@ -13,6 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
+import { P0Voice, p0VoiceFromEnv, registerP0Voice } from '../src/p0/online/voice.js';
 import { generatedOutpostSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
 import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
@@ -88,7 +89,15 @@ const pass = (player: string, room: string) => {
   const r = requirePass(content, s, pond ? 'pond' : 'outpost', place, Date.now() + s.clock_ms, s.presence.entered === place ? 'rejoin' : undefined);
   return r ? r.code.toUpperCase() : null;
 };
-registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')) });
+// Voice in the rooms (SGODOT-383): off unless P0_VOICE=on with the LiveKit keys; its blocks, 13+ answers and reports in
+// their own files beside the save, never in it.
+const voiceDir = path.dirname(stateFile);
+const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.join(voiceDir, 'voice_blocks.json'),
+  ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
+registerP0Voice(app, voice);
+const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
+  joined: o => voice.joined(o), departed: o => voice.departed(o) });
+voice.tell = (player, payload) => hub.tell(player, payload);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
@@ -99,7 +108,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
