@@ -2,10 +2,10 @@ import Fastify from 'fastify';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadOutposts, pondRoomSpec } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
-import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
+import { NO_VOICE_ROLES, P0Voice, p0VoiceFromEnv, registerP0Voice, RELEASE_RETRY_MS, VOICE_LEASE_MS } from '../../src/p0/online/voice.js';
 
 // Voice in the online rooms (SGODOT-383; the user, 11-02 via 奕星, q(274)): the voice room is the hub's room; LiveKit sees
 // the peer id, never the player id; Market Square has none; Block is both ways and kept; Report is a log line; no 13+
@@ -21,11 +21,23 @@ function setup(config: typeof CONFIG | null = CONFIG) {
   const rooms = new OutpostRooms(loadOutposts(), () => now, pondRoomSpec(id => id === 'pond_san_francisco_03'));
   const removed: [string, string][] = [];
   const files = { blocks: path.join(dir, 'blocks.json'), ages: path.join(dir, 'ages.json'), reports: path.join(dir, 'reports.jsonl') };
-  const voice = new P0Voice(config, rooms, files, () => now, { removeParticipant: async (room, id) => { removed.push([room, id]); } });
+  // LiveKit's rooms: "room/identity" → the participant's metadata (the lease their token carried)
+  const present = new Map<string, string>();
+  const media = { fail: 0,
+    getParticipant: async (room: string, id: string) => {
+      if (media.fail > 0) { media.fail--; throw new Error('livekit down'); }
+      const m = present.get(room + '/' + id);
+      if (m === undefined) throw Object.assign(new Error('participant not found'), { status: 404, code: 'not_found' });
+      return { metadata: m };
+    },
+    removeParticipant: async (room: string, id: string) => { removed.push([room, id]); present.delete(room + '/' + id); } };
+  const voice = new P0Voice(config, rooms, files, () => now, media);
+  /** The phone joins LiveKit with its grant's token. */
+  const inLiveKit = (grant: Record<string, any>) => present.set(grant.room + '/' + grant.self, jwt(grant.token).metadata);
   const told: [string, any][] = [];
   voice.tell = (player, payload) => told.push([player, payload]);
   const enter = (player: string, place = 'sh_tea_1') => { rooms.join(player, place); voice.joined(rooms.occupant(player)!); return rooms.occupant(player)!; };
-  return { rooms, voice, removed, told, files, enter, tick: (ms: number) => { now += ms; } };
+  return { rooms, voice, removed, told, files, enter, inLiveKit, media, tick: (ms: number) => { now += ms; } };
 }
 const jwt = (token: string) => JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
 
@@ -78,10 +90,11 @@ describe('P0 voice (SGODOT-383)', () => {
   });
 
   it('a heartbeat keeps the lease while the player stays; leaving the room ends it and LiveKit lets them go', async () => {
-    const { voice, enter, rooms, removed, tick } = setup();
+    const { voice, enter, rooms, removed, tick, inLiveKit } = setup();
     voice.setAge('player-aaaa', true);
     enter('player-aaaa');
     const grant = await voice.join('player-aaaa') as Record<string, any>;
+    inLiveKit(grant);
     tick(VOICE_LEASE_MS - 1000);
     expect(voice.heartbeat('player-aaaa', grant.lease_id)).toMatchObject({ ok: true, room: grant.room });
     expect(voice.heartbeat('player-aaaa', 'another-lease')).toMatchObject({ code: 'LEASE_EXPIRED', status: 410 });
@@ -95,6 +108,46 @@ describe('P0 voice (SGODOT-383)', () => {
     const again = await voice.join('player-aaaa') as Record<string, any>;
     tick(VOICE_LEASE_MS + 1);
     expect(voice.heartbeat('player-aaaa', again.lease_id)).toMatchObject({ code: 'LEASE_EXPIRED' });
+  });
+
+  it('a peer id comes back at once: a removal checks the participant is still that lease\'s, never the newcomer\'s (周瑜 on #647)', async () => {
+    const { voice, enter, rooms, removed, inLiveKit } = setup();
+    for (const p of ['player-aaaa', 'player-bbbb']) voice.setAge(p, true);
+    const a = enter('player-aaaa');
+    const ga = await voice.join('player-aaaa') as Record<string, any>;
+    inLiveKit(ga);
+    expect(jwt(ga.token).metadata).toBe(ga.lease_id);
+    // A leaves; before LiveKit is asked, B walks in and takes A's peer id, and joins voice
+    const left = rooms.leave('player-aaaa', false)!;
+    const b = enter('player-bbbb');
+    expect(b.id).toBe(a.id);
+    const gb = await voice.join('player-bbbb') as Record<string, any>;
+    inLiveKit(gb);
+    voice.departed(left);
+    await new Promise(r => setTimeout(r, 0));
+    expect(removed).toEqual([]);   // that identity is B's lease now: kept
+    expect(voice.heartbeat('player-bbbb', gb.lease_id)).toMatchObject({ ok: true });
+  });
+
+  it('a removal LiveKit fails is logged and tried again; one already gone is done', async () => {
+    vi.useFakeTimers();
+    try {
+      const { voice, enter, rooms, removed, inLiveKit, media } = setup();
+      voice.setAge('player-aaaa', true);
+      enter('player-aaaa');
+      const g = await voice.join('player-aaaa') as Record<string, any>;
+      inLiveKit(g);
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      media.fail = 1;
+      voice.departed(rooms.leave('player-aaaa')!);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(removed).toEqual([]);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0][0])).toContain('release_failed');
+      await vi.advanceTimersByTimeAsync(RELEASE_RETRY_MS);
+      expect(removed).toEqual([[g.room, g.self]]);   // the second try
+      warn.mockRestore();
+    } finally { vi.useRealTimers(); }
   });
 
   it('Block is both ways and kept: both hear their lists at once, a grant carries them, and one coming in later is told', async () => {

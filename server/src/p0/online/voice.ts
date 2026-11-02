@@ -17,8 +17,13 @@ import { AccessToken, RoomServiceClient, TrackSource } from 'livekit-server-sdk'
 import type { Occupant, OutpostRooms } from './rooms.js';
 
 export interface P0VoiceConfig { url: string; apiKey: string; apiSecret: string; namespace: string }
-/** The LiveKit side the server calls (tests replace it). */
-export interface P0VoiceMedia { removeParticipant(room: string, identity: string): Promise<void> }
+/** The LiveKit side the server calls (tests replace it). A participant's metadata is the lease that let them in. */
+export interface P0VoiceMedia {
+  getParticipant(room: string, identity: string): Promise<{ metadata?: string }>;
+  removeParticipant(room: string, identity: string): Promise<void>;
+}
+/** A lease's removal from LiveKit: tried this many times, this far apart, each failure logged (周瑜 on #647). */
+export const RELEASE_TRIES = 3, RELEASE_RETRY_MS = 2_000;
 
 export const VOICE_LEASE_MS = 20_000;
 /** Roles whose rooms have no voice (the user, 11-02: Market Square's 30 not this time). */
@@ -99,7 +104,10 @@ export class P0Voice {
     const lease: Lease = mine?.room === room && mine.peer === o.id ? mine : { id: randomUUID(), player, room, peer: o.id, expires: 0 };
     lease.expires = now + VOICE_LEASE_MS;
     this.leases.set(player, lease);
-    const token = new AccessToken(this.config!.apiKey, this.config!.apiSecret, { identity: String(o.id), ttl: 60, name: `Traveller ${o.id}` });
+    // the lease rides as the participant's metadata: a peer id is the lowest free one and comes back at once, so a removal
+    // checks it is still this lease's participant before it goes (周瑜 on #647)
+    const token = new AccessToken(this.config!.apiKey, this.config!.apiSecret, { identity: String(o.id), ttl: 60, name: `Traveller ${o.id}`,
+      metadata: lease.id });
     token.addGrant({ roomJoin: true, room, canPublish: true, canPublishSources: [TrackSource.MICROPHONE], canSubscribe: true,
       canPublishData: false, canUpdateOwnMetadata: false });
     return { ok: true, url: this.config!.url, token: await token.toJwt(), lease_id: lease.id, room, capacity: Math.max(2, spec.capacity),
@@ -184,9 +192,22 @@ export class P0Voice {
     if (lease) await this.release(lease);
   }
 
-  private async release(lease: Lease): Promise<void> {
+  /** Ends a lease: out of the server's books at once, and out of LiveKit if that participant is still this lease's — never
+   * whoever took the peer id since. A failure is logged and tried again (RELEASE_TRIES); one gone already is done. */
+  private async release(lease: Lease, attempt = 1): Promise<void> {
     if (this.leases.get(lease.player) === lease) this.leases.delete(lease.player);
-    try { await this.media?.removeParticipant(lease.room, String(lease.peer)); } catch { /* gone already, or LiveKit down: the token runs out */ }
+    if (!this.media) return;
+    const identity = String(lease.peer);
+    try {
+      const p = await this.media.getParticipant(lease.room, identity);
+      if (p.metadata !== lease.id) return;   // someone else is that peer id now
+      await this.media.removeParticipant(lease.room, identity);
+    } catch (error) {
+      const e = error as { status?: number; code?: string; message?: string };
+      if (e?.status === 404 || e?.code === 'not_found') return;   // left LiveKit already
+      console.warn(JSON.stringify({ voice: 'release_failed', room: lease.room, peer: identity, attempt, error: String(e?.message ?? error).slice(0, 200) }));
+      if (attempt < RELEASE_TRIES) setTimeout(() => { void this.release(lease, attempt + 1); }, RELEASE_RETRY_MS).unref?.();
+    }
   }
 
   private sweep(): void {
