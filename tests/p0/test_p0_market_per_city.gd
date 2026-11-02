@@ -95,6 +95,7 @@ func test_wrong_city_toasts_where_the_request_goes() -> void:
 	rt.session.view = _view({"title": "Market Board", "home": true, "slots": []}, [away])
 	rt._on_refused("wrong_city", {"city": "gn-5355933"}, {"type": "deliver", "request": "dusk-hay"})
 	assert_str(rt.ui.toast_text()).is_equal("Deliver at Acorn Market Square · Hayward")
+	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 	rt.session.view = _view({"title": "Market Board", "home": true, "slots": []}, [])   # the request gone from the view
 	rt._on_refused("wrong_city", {"city": "gn-5355933"}, {"type": "accept", "request": "dusk-hay"})
 	assert_str(rt.ui.toast_text()).is_equal("Deliver at the market · Hayward")
