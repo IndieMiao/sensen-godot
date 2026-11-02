@@ -160,6 +160,32 @@ func test_an_outpost_pin_says_who_is_in() -> void:
 	_look_fresh(m, Vector2(float(tea.lat), float(tea.lng)), 16.0)
 	assert_bool(pin._count.visible).is_false()
 
+## The pond rooms (2026-11-02): /presence carries `ponds` beside `outposts`; a pond's pin wears its count as an
+## outpost's does and its card says Online now under Distance, both gone at 0 (q(72)); a `pond:` room id reads the same,
+## and a server without `ponds` leaves every pond at none.
+func test_a_pond_pin_says_who_is_in() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	var pond: Dictionary = city.entries.filter(func(e): return str(e.id) == NEAREST_POND)[0]
+	var at := Vector2(float(pond.lat), float(pond.lng))
+	var body := JSON.stringify({"ok": true, "outposts": {}, "ponds": {"pond:" + NEAREST_POND: {"online": 3, "rooms": 1}}})
+	m._on_presence(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body.to_utf8_buffer())
+	_look_fresh(m, at, 16.0)
+	var pin: UiMapDestination = city.markers[NEAREST_POND].dest
+	assert_int(pin.online).is_equal(3)
+	assert_bool(pin._count.visible).is_true()
+	var facts: Array = m._pond_info(pond).facts
+	assert_array(facts[0]).is_equal(["Distance", facts[0][1]])
+	assert_array(facts[1]).is_equal(["Online now", "3"])
+	body = JSON.stringify({"ok": true, "outposts": {}})   # an older server, or nobody at the pond: no count, no row
+	m._on_presence(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body.to_utf8_buffer())
+	_look_fresh(m, at, 16.0)
+	assert_int(pin.online).is_equal(0)
+	assert_bool(pin._count.visible).is_false()
+	assert_bool(m._pond_info(pond).facts.any(func(f): return f[0] == "Online now")).is_false()
+
 ## q(137) ①: the short name drops the type word; a name that is only one stays whole.
 func test_a_short_name_is_the_place_without_its_type() -> void:
 	for pair in [["Willow Pond", "Willow"], ["Reed Creek", "Reed"], ["Elm Cove", "Elm"], ["Maple Market Square", "Maple"],
