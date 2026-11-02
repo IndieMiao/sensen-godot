@@ -1057,7 +1057,7 @@ func _show_guide_resend(resend: Dictionary) -> void:
 	UiItemFly.launch(ui.root, at, bag, P0Logic.icon(id), n, 0.0, func(): UiItemFly.bump(bag))
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
-## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
+## ones a float; a gate break-free gets the four-line card once per species, then "Too strong · Fishing Lv4" (q(278));
 ## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
 ## floats rise (over the player's head for a landed fish, the cast point for an escape, when the pond knows
 ## them); `card_after` holds the Caught! card that long after the reply's floats there (不知火舞 on 231 / #154).
@@ -1082,10 +1082,8 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
 				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
-			else:   # second time on: `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back` (q(50))
-				var rod := P0Logic.rod_for(v, int(ev.get("rarity", 2)))
-				var what := ("Lv%d" % int(ev.need_level)) if ev.has("need_level") else (str(rod.name) if not rod.is_empty() else "rod too light")
-				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, UiFloatText.Tone.ENERGY_GAIN)
+			else:   # second time on: `Too strong · Fishing Lv8 · 3 Energy back` (q(278)) / `Got away · Reed Rod · …` (q(50))
+				ui.float_text(P0Logic.break_free_float(v, ev), where, UiFloatText.Tone.ENERGY_GAIN)
 		"escaped":
 			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
@@ -2030,6 +2028,11 @@ func _dev_shot(dt: float) -> void:
 				var gone := {"fish": step[1], "rarity": int(P0Logic.item(session.current(), step[1]).get("rarity", 3)), "refund": 5, "protected_left": 8}
 				if step.size() < 3 or step[2] == "level": gone["need_level"] = 4
 				ui.show_got_away(gone)
+			"rowinfo":   # rowinfo:rod_carbon — the open counter's row › card (q(278) shots)
+				for d in ui.find_children("*", "P0CounterDrawer", true, false): ui.counter_info(d, step[1])
+			"breakfloat":   # breakfloat:8 — a gate fish breaking free again, its float (q(278) shots)
+				ui.float_text(P0Logic.break_free_float(session.current(), {"rarity": 4, "need_level": int(step[1]), "refund": 3}),
+					anchor(), UiFloatText.Tone.ENERGY_GAIN)
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()

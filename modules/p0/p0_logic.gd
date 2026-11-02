@@ -106,6 +106,16 @@ static func break_free_need(view: Dictionary, ev: Dictionary) -> String:
 	var rod := rod_for(view, int(ev.get("rarity", 2)))
 	return "" if rod.is_empty() else "%s · Fishing Lv%d · %d coins" % [str(rod.name), int(rod.level), int(rod.price)]
 
+## The float of a gate fish breaking free again, after its card (§6.1.1), the refund as it came back with no + (q(50)):
+## a level gate in the card's word and whose level it is — `Too strong · Fishing Lv8 · 3 Energy back`, `Too strong ·
+## Fishing Lv4 · Energy refunded (8 left today)` (q(278); it read `Got away · Lv8`; 不知火舞 386 1c3d0416: no +) —
+## a rod gate as before, `Got away · Reed Rod · 3 Energy back`.
+static func break_free_float(view: Dictionary, ev: Dictionary) -> String:
+	var refund := refund_line(view, ev).trim_prefix("+")
+	if ev.has("need_level"): return "Too strong · Fishing Lv%d · %s" % [int(ev.need_level), refund]
+	var rod := rod_for(view, int(ev.get("rarity", 2)))
+	return "Got away · %s · %s" % [str(rod.name) if not rod.is_empty() else "rod too light", refund]
+
 ## The Energy a failed catch gave back, as it really came back (q(55)): inside the daily protection
 ## `Energy refunded (8 left today)`, else `+3 Energy back`.
 static func refund_line(view: Dictionary, ev: Dictionary) -> String:
