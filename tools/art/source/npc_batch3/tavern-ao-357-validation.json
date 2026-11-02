@@ -1,0 +1,32 @@
+{
+  "method": "Preserve source RGB ratios; softly raise only the bracket-shadow region toward same-height left/right timber samples.",
+  "world_rectangle_xy": [
+    -0.32,
+    3.02,
+    0.38,
+    3.7
+  ],
+  "source_sampling_x_m": [
+    -0.48,
+    0.53
+  ],
+  "changed_pixels": 297,
+  "changed_pixel_bounds_xyxy": [
+    815,
+    1027,
+    841,
+    1049
+  ],
+  "other_assets_and_batches_pixels_changed": 0,
+  "8px_other_asset_gutter_preserved": true,
+  "alpha_exact": true,
+  "outside_mask_exact": true,
+  "front_plane_uv_residual": 4.868791325662869e-08,
+  "original_png_sha256": "f85631fa4db950586d580e2e3ac5ce787b7646c1fc3099e09ed2336a0a00a9ee",
+  "new_png_sha256": "f7e6ec34c6fe22adf0c054f08d98ead5f42c35caa970b30a4986a96a146f7f60",
+  "glb_reexports": [],
+  "all_glb_geometry_and_uv_unchanged": true,
+  "runtime_png_exception_approved": true,
+  "original_png_bytes": 3477815,
+  "new_png_bytes": 3240245
+}

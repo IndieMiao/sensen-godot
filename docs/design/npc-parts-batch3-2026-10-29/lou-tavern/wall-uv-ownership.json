@@ -1,0 +1,35 @@
+{
+  "glb_files_scanned": 44,
+  "back_wall_covered_pixels": 167272,
+  "back_wall_exclusive_pixels": 167272,
+  "back_wall_overlap_with_other_pixels": 0,
+  "bounds": [
+    [
+      -3.700000047683716,
+      -0.07500004768371582,
+      -0.1549999713897705
+    ],
+    [
+      3.8349997997283936,
+      3.944999933242798,
+      0.27499985694885254
+    ]
+  ],
+  "projection_world_xy": [
+    -1.6,
+    2.15,
+    1.6,
+    3.75
+  ],
+  "glb_embedded_images": [],
+  "batches": [
+    {
+      "batch": "front_dressing",
+      "same_back_wall_triangles": 0
+    },
+    {
+      "batch": "back_dressing",
+      "same_back_wall_triangles": 5812
+    }
+  ]
+}

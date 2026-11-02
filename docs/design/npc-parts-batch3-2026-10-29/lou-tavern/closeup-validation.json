@@ -1,0 +1,42 @@
+{
+	"adapter": "NVIDIA GeForce RTX 2060",
+	"captures": [
+		{
+			"camera_size": 1.0,
+			"look": "lou_now",
+			"name": "lou_cloth_before_front.png",
+			"resolution": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_size": 1.0,
+			"look": "lou_now",
+			"name": "lou_cloth_before_back.png",
+			"resolution": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_size": 1.0,
+			"look": "lou_new",
+			"name": "lou_cloth_after_front.png",
+			"resolution": [
+				640,
+				640
+			]
+		},
+		{
+			"camera_size": 1.0,
+			"look": "lou_new",
+			"name": "lou_cloth_after_back.png",
+			"resolution": [
+				640,
+				640
+			]
+		}
+	],
+	"renderer": "mobile"
+}

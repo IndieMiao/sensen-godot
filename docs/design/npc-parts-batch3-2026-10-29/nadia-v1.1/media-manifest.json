@@ -1,0 +1,23 @@
+[
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1.1_01_hat_front.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia-v1.1/SGODOT-347_NADIA_v1.1_01_hat_front.png",
+    "size": 203561,
+    "sha256": "41c93fa556bf048cfb0096e1471074dae99472d69ae37b1d1ab908b21bdd78d8"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1.1_02_hat_back.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia-v1.1/SGODOT-347_NADIA_v1.1_02_hat_back.png",
+    "size": 181097,
+    "sha256": "425699ef7c9612eb0edaf2ae8af646e2b569c1aa85f0572fe7c83f7bd61ba04c"
+  },
+  {
+    "issue": 347,
+    "name": "SGODOT-347_NADIA_v1.1_03_market_lineup.png",
+    "path": "docs/design/npc-parts-batch3-2026-10-29/nadia-v1.1/SGODOT-347_NADIA_v1.1_03_market_lineup.png",
+    "size": 384675,
+    "sha256": "6b73abccf1fdb2ee39bbf5185066dd15619dd22ecbbad88802cb359c8bcae71c"
+  }
+]

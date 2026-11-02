@@ -1,0 +1,80 @@
+[
+  {
+    "id": "hairhat51_npc_lena",
+    "base": "hairhat51",
+    "triangles": 1103,
+    "triangle_delta": 0,
+    "fbx_byte_identical": true,
+    "source_texture_size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 2250208,
+    "protected_pixels_exact": true,
+    "outside_mask_exact": true,
+    "alpha_exact": true,
+    "sha256": {
+      "SM_hairHat51.fbx": "8119356d6c891b6ab295051ed7f9f9a62d380103da0020459d3a57b9352afb64",
+      "T_lena_hairHat51_D.png": "6604d2b9b9c301397d9c43f6b27d72cc3f4a2b25fb6cc93362ec4024d3096fc4"
+    },
+    "hat_palette": [
+      "98702C",
+      "C9A346",
+      "E7C76D"
+    ],
+    "badge": "navy",
+    "mask": "G-B > 30, excluding hair UV coverage; badge component 2"
+  },
+  {
+    "id": "hairhat36_npc_rafa",
+    "base": "hairhat36_npc_pip",
+    "triangles": 1214,
+    "triangle_delta": 0,
+    "fbx_byte_identical": true,
+    "source_texture_size": [
+      1024,
+      1024
+    ],
+    "changed_pixels": 378685,
+    "protected_pixels_exact": true,
+    "outside_mask_exact": true,
+    "alpha_exact": true,
+    "sha256": {
+      "SM_hairHat36.fbx": "4d9f753eefbd69c80060b0b2d4fd352d9e7dccfd8d4308afc20f315e069fce4a",
+      "T_rafa_hairHat36_D.png": "78e7feea9b1c42970d341924a352f61e74cfbfdf88d40e9f3735dad4d1abcbe5"
+    },
+    "crown_palette": [
+      "B9BDC3",
+      "E9E8DF",
+      "F8F5EB"
+    ],
+    "mask": "Crown component 2 blue pixels only; all other component UVs excluded"
+  },
+  {
+    "id": "cloth1_1_npc_rafa",
+    "base": "cloth1_1",
+    "triangles": 1629,
+    "triangle_delta": 0,
+    "fbx_byte_identical": true,
+    "source_texture_size": [
+      1024,
+      1024
+    ],
+    "changed_pixels": 483601,
+    "protected_pixels_exact": true,
+    "outside_mask_exact": true,
+    "alpha_exact": true,
+    "sha256": {
+      "SK_dt_skin01.fbx": "2ced73fa4cb64e73bc459a6339cb68625a235add2d9f72b612fd1933b8d36f02",
+      "T_rafa_cloth01_D.png": "9967f7926335aaf8b68c6e1ca102fe94d6ef3fa916295918276db714be14aad5"
+    },
+    "pattern": "Horizontal stripes projected from original FBX rest-space Y into existing UVs",
+    "period_cm": 6.0,
+    "navy_band_cm": 2.2,
+    "palette": [
+      "EFEFE8",
+      "25384F"
+    ],
+    "max_overlapping_uv_height_difference_cm": 1.0242742121135961e-07
+  }
+]

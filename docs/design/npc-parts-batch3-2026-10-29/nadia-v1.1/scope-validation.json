@@ -1,0 +1,34 @@
+{
+  "runtime_baseline": "ad751863b42770d4e8f70dd3889a4bca230b4b2f",
+  "only_hat_source_and_scene_changed": true,
+  "runtime_files": [
+    {
+      "path": "assets/avatar/parts/hairhat41_npc_nadia_baker_scene.tscn",
+      "sha256": "ffbf2f10a4d47095958371fe4b215df973972ae7f3e6bab7d0ed80e2f98b8317"
+    },
+    {
+      "path": "assets/avatar/source/hairhat41_npc_nadia_baker/SM_hairHat41.fbx",
+      "sha256": "48794143777e278174b09e056d92f22873b167c23320bf7ecf0d4eaba0fab580"
+    }
+  ],
+  "scene_node_ids_names_transforms_retained": true,
+  "other_five_parts_and_tavern_exact": true,
+  "manifest_text_and_order_exact": true,
+  "recipe_npc_only_and_slots_exact": true,
+  "v1_image_source": "docs/design/npc-parts-batch3-2026-10-29/nadia/SGODOT-347_NADIA_v1_02_nadia_hat.png",
+  "v1_image_sha256": "bd378c927e24e8edc3dea8fe5373a844882c05d15b9d6d680f8acf53d957ee37",
+  "v1_crop_rectangles_xyxy": {
+    "front": [
+      492,
+      128,
+      952,
+      588
+    ],
+    "back": [
+      492,
+      640,
+      952,
+      1100
+    ]
+  }
+}

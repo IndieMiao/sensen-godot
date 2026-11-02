@@ -1,0 +1,20 @@
+{
+  "baseline": "ad751863",
+  "hair_vertices_unchanged": 303,
+  "hat_vertices_translated": 448,
+  "cap_drop_cm": 2.0,
+  "mouth_vertices_inset": 160,
+  "mouth_radius_inset_cm": 2.0,
+  "native_axis": "X-up, cm",
+  "crown_shape_exact": true,
+  "hair_positions_and_normals_exact": true,
+  "indices_uv_material_assignments_exact": true,
+  "nodes_hierarchy_transforms_axes_units_connections_exact": true,
+  "blend_vertex_positions_match_fbx": true,
+  "triangles": 1296,
+  "triangle_delta_from_v1": 0,
+  "encoder_metadata_excluded": [
+    "FileId",
+    "CreationTime"
+  ]
+}

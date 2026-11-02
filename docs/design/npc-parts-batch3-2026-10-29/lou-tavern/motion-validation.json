@@ -1,0 +1,58 @@
+{
+	"badge": {
+		"canvas_scale": 2,
+		"image": "native_badge_72px.png",
+		"name_anchor_m": [
+			0.0,
+			2.0,
+			0.0
+		],
+		"native_logical_px": 36,
+		"physical_px": 72.0
+	},
+	"captures": [
+		{
+			"motion": "idle",
+			"name": "idle_030_032.png",
+			"time": 0.3,
+			"yaw": 0.32
+		},
+		{
+			"motion": "walk",
+			"name": "walk_000_032.png",
+			"time": 0.0,
+			"yaw": 0.32
+		},
+		{
+			"motion": "walk",
+			"name": "walk_020_032.png",
+			"time": 0.2,
+			"yaw": 0.32
+		},
+		{
+			"motion": "walk",
+			"name": "walk_040_032.png",
+			"time": 0.4,
+			"yaw": 0.32
+		},
+		{
+			"motion": "walk",
+			"name": "walk_060_032.png",
+			"time": 0.6,
+			"yaw": 0.32
+		},
+		{
+			"motion": "idle",
+			"name": "idle_030_157.png",
+			"time": 0.3,
+			"yaw": 1.57
+		},
+		{
+			"motion": "idle",
+			"name": "idle_030_346.png",
+			"time": 0.3,
+			"yaw": 3.46
+		}
+	],
+	"renderer": "mobile"
+}

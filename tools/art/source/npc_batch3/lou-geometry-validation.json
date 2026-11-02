@@ -1,0 +1,22 @@
+{
+  "triangles": 2811,
+  "vertices": 1554,
+  "original_vertices_retained": 591,
+  "original_node_names_hierarchy_transforms_axes_units_exact": true,
+  "connections_exact": true,
+  "original_skin_weights_and_bind_matrices_exact": false,
+  "original_bind_matrices_exact": true,
+  "skin_weight_arrays_rebuilt": true,
+  "clusters_extended_for_new_geometry": 17,
+  "other_objects_and_geometry_exact": true,
+  "sha256": "aa139c6e5de7ce695675bca4c51d067dfcb7341ff72f5ff8fd70324b09c7d6bb",
+  "base": "cloth1",
+  "base_triangles": 1629,
+  "triangle_delta": 1182,
+  "retained_shirt_vertices": 591,
+  "retained_shirt_triangles": 1111,
+  "shirt_hem_tucked_vertices": 88,
+  "trousers_source": "cloth36_npc_sigrid independent component 7",
+  "trousers_vertices": 522,
+  "trousers_triangles": 1040
+}

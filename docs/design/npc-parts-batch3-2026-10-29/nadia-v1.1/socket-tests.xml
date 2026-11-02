@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-30" name="report_4" tests="1" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="test_socket_placement" package="tests/assembly" timestamp="2026-10-30T03:02:13" hostname="localhost" tests="1" failures="0" errors="0" skipped="0" flaky="0" time="1.621">
+		<testcase name="test_every_hairhat_sits_on_the_head" classname="test_socket_placement" time="1.615">
+		</testcase>
+	</testsuite>
+</testsuites>

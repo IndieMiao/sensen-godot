@@ -1,0 +1,132 @@
+{
+  "lena_now": {
+    "slots": {
+      "hairHat": "hairhat41",
+      "glass": "glass1",
+      "cloth": "cloth1_1",
+      "shoes": "shoes1"
+    }
+  },
+  "lena_a": {
+    "slots": {
+      "hairHat": "hairhat51",
+      "glass": "glass1",
+      "cloth": "cloth1_1",
+      "shoes": "shoes1"
+    }
+  },
+  "rafa_now": {
+    "slots": {
+      "hairHat": "hairhat51",
+      "cloth": "cloth1_1",
+      "shoes": "shoes4"
+    }
+  },
+  "rafa_r1": {
+    "slots": {
+      "hairHat": "hairhat36_npc_pip",
+      "cloth": "cloth1_1",
+      "shoes": "shoes4"
+    }
+  },
+  "nadia_now": {
+    "slots": {
+      "hairHat": "hairhat41_npc_auburn",
+      "cloth": "cloth1_1",
+      "shoes": "shoes2"
+    }
+  },
+  "sigrid": {
+    "slots": {
+      "hairHat": "hairhat36_npc_sigrid",
+      "cloth": "cloth36_npc_sigrid",
+      "shoes": "shoes3"
+    }
+  },
+  "finn": {
+    "slots": {
+      "hairHat": "hairhat51",
+      "cloth": "cloth12_npc_finn",
+      "shoes": "shoes4"
+    }
+  },
+  "mei": {
+    "slots": {
+      "hairHat": "hairhat12_npc_mei",
+      "cloth": "cloth11_npc_mei",
+      "shoes": "shoes2"
+    }
+  },
+  "theo": {
+    "slots": {
+      "hairHat": "hairhat43",
+      "cloth": "cloth1",
+      "shoes": "shoes4"
+    }
+  },
+  "sam_now": {
+    "slots": {
+      "hairHat": "hairhat41",
+      "cloth": "cloth42",
+      "shoes": "shoes3"
+    }
+  },
+  "hana_a": {
+    "slots": {
+      "hairHat": "hairhat43_npc_black",
+      "cloth": "cloth11_npc_mei",
+      "shoes": "shoes5"
+    }
+  },
+  "lena_new": {
+    "slots": {
+      "hairHat": "hairhat51_npc_lena",
+      "glass": "glass1",
+      "cloth": "cloth1_1",
+      "shoes": "shoes1"
+    }
+  },
+  "rafa_new": {
+    "slots": {
+      "hairHat": "hairhat36_npc_rafa",
+      "cloth": "cloth1_1_npc_rafa",
+      "shoes": "shoes4"
+    }
+  },
+  "rafa_hat_only": {
+    "slots": {
+      "hairHat": "hairhat36_npc_rafa",
+      "cloth": "cloth1_1",
+      "shoes": "shoes4"
+    }
+  },
+  "ama": {
+    "slots": {
+      "hairHat": "hairhat80_npc_ama",
+      "cloth": "cloth11",
+      "shoes": "shoes5"
+    }
+  },
+  "pip": {
+    "slots": {
+      "hairHat": "hairhat36_npc_pip",
+      "cloth": "cloth1",
+      "shoes": "shoes1",
+      "messengerBag": "messengerbag4"
+    }
+  },
+  "nadia_hat_only": {
+    "slots": {
+      "hairHat": "hairhat41_npc_nadia_baker",
+      "cloth": "cloth1_1",
+      "shoes": "shoes2"
+    }
+  },
+  "nadia_new": {
+    "slots": {
+      "hairHat": "hairhat41_npc_nadia_baker",
+      "cloth": "cloth1_1_npc_nadia",
+      "shoes": "shoes2"
+    }
+  }
+}
