@@ -1,0 +1,36 @@
+{
+  "bands": [
+    {
+      "from": 1,
+      "to": 4,
+      "ground": "#dca26e",
+      "wall": "#b85e43",
+      "backdrop_tint": "#653425",
+      "fog": "#242125"
+    },
+    {
+      "from": 5,
+      "to": 10,
+      "ground": "#c39b76",
+      "wall": "#9e6650",
+      "backdrop_tint": "#57382c",
+      "fog": "#242225"
+    },
+    {
+      "from": 11,
+      "to": 20,
+      "ground": "#ac927c",
+      "wall": "#88685b",
+      "backdrop_tint": "#4b3932",
+      "fog": "#222125"
+    },
+    {
+      "from": 21,
+      "to": 30,
+      "ground": "#958474",
+      "wall": "#736157",
+      "backdrop_tint": "#3f3530",
+      "fog": "#201f23"
+    }
+  ]
+}
