@@ -1,5 +1,5 @@
 {
-  "_note": "355 E/F/G development, contract v0.6 and #620 review. Existing floor/rock energy and picks stay in p0_content; existing monsters and combat/weapon keys stay in mine_p1. Vein main weights 25 from F1 and 40 from F10 follow Li Bai calibration v4q(5) 4ee5e8d5. The vein homestead gate 8 is option B, pending the user's choice; remove gate for option A (available from the start). Crown Shard is currently not sellable (price null), pending the user's choice; its price is content-configurable. Other numbers remain provisional pending v4q(5-7) approval/calibration. Development sites' main_from is not validated. Development sites must be removed before release.",
+  "_note": "355 E/F/G development, contract v0.6 and #620 review. Existing floor/rock energy and picks stay in p0_content; existing monsters and combat/weapon keys stay in mine_p1. Vein main weights 25 from F1 and 40 from F10 follow Li Bai calibration v4q(5) 4ee5e8d5. Veins are available from the start (355 Ding12, approved 2026-11-02). Crown Shard is currently not sellable (price null), pending the user's choice; its price is content-configurable. Other numbers remain provisional pending v4q(5-7) approval/calibration. Development sites' main_from is not validated. Development sites must be removed before release.",
   "materials": {
     "drop_t1_bat_wing": { "name": "Bat Wing", "price": 4 },
     "drop_t2_beetle_shell": { "name": "Beetle Shell", "price": null, "floor": 5 },
@@ -348,9 +348,6 @@
         }
       },
       "vein": {
-        "gate": {
-          "homestead": 8
-        },
         "main_weight": [
           [
             1,
