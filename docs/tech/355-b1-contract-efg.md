@@ -466,12 +466,13 @@ func update(enemy: Dictionary, was: String, delta: float, stepped: bool, elapsed
 func step(enemy: Dictionary, fight, player: PlayerMover, dt: float, may_path: bool) -> bool
 #   移动 enemy.mover，改 enemy.phase / timer；打中玩家时调 fight.touch(enemy)；
 #   may_path = 这一帧还没有别的怪寻过路（每帧最多一只寻路）；返回自己这一帧寻没寻路
-#   可以用 fight._slide(mover, offset)（防穿墙的小步移动）、fight._dash_step(enemy, player, offset)（冲到身体边缘就停）、
-#   fight.invulnerability（玩家无敌剩余秒数）
+#   可以用 fight.slide(mover, offset)（防穿墙的小步移动）、fight.dash_step(enemy, player, offset)（冲到身体边缘就停）、
+#   fight.touch(enemy)、fight.invulnerability（玩家无敌剩余秒数）；不调 fight 的下划线方法（亚瑟在 #627 提出）
 func can_be_hit(enemy) -> bool                  # 菇菇怪缩回时 false：不进 targets
 func stunned(enemy) -> bool                     # 岩甲虫硬直时 true：打中就报进 stunned
 func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一刻）：默认是旧矿的短硬直，spec.stun_resistant 时不硬直
 ```
+- **死亡**（E 接，刘邦在 #627 问）：怪的 hp 归 0（同步时或 `mob_down`），战斗当场把它移出 `enemies`（不再受击、不再接触、不算活着）。它的 json 有 `durations.die` 时，调 `node.play("die")`，记进 `dying`，每帧照样调 `node.update(enemy, "dead", …)`，`enemy.phase` 是 `"dead"`，到 die 的时长再隐藏；没有 die 时长（史莱姆的占位）就当场隐藏，和以前一样。淡出、下落由外观在 `update` 里按 `action == "die"` 画。同一层再同步回 hp > 0（回包回滚了）时，它重新站起来，播 idle。
 - 战斗的字典照旧（p0_mine_combat.gd 的 `enemies`）：`id`、`kind`、`node`（MonsterView）、`spec`、`brain`、`mover`、`index`、`hp`、`phase`、`timer`、`repath`、`direction`、`flash`、`did_hit`、`elite`。phase 的名字由各自的 brain 定；史莱姆是 idle / chase / windup / dash / recover / stunned。
 - 行为（方案 3.5）：
   - SlimeBrain：现有的跳扑，从 mine_combat.gd 搬过来，行为不变；

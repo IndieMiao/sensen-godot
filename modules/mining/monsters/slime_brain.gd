@@ -33,7 +33,7 @@ func step(enemy: Dictionary, fight, player: PlayerMover, dt: float, may_path: bo
 				enemy.phase = "dash"
 				enemy.timer = float(spec.dash_seconds)
 		"dash":
-			fight._slide(movement, fight._dash_step(enemy, player, enemy.direction * float(spec.dash_speed) * dt))
+			fight.slide(movement, fight.dash_step(enemy, player, enemy.direction * float(spec.dash_speed) * dt))
 			if not enemy.did_hit and fight.invulnerability <= 0 and movement.position.distance_to(player.position) <= float(spec.radius) + 0.35 and movement.grid.segment_walkable(movement.position, player.position):
 				enemy.did_hit = true
 				fight.touch(enemy)
