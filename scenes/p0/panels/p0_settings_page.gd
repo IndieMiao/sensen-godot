@@ -271,7 +271,7 @@ static func language(current: String, running: String, safe_top := 0.0, safe_bot
 		rows.append(row)
 	page._group("", rows)
 	if current != running:
-		var note := UiKit.label("Restart the app to use the new language.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		var note := UiKit.label("Restart the app to use the new language", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
 		note.name = "RestartNote"
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		page.body.add_child(note)

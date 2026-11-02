@@ -9045,7 +9045,7 @@
   ],
   "kind": "template"
  },
- "Restart the app to use the new language.": {
+ "Restart the app to use the new language": {
   "where": [
    "scenes/p0/panels/p0_settings_page.gd:274"
   ],
@@ -9312,7 +9312,7 @@
  "SENSEN_LANGUAGE": {
   "where": [
    "modules/ui/localization.gd:26",
-   "modules/ui/localization.gd:58"
+   "modules/ui/localization.gd:52"
   ],
   "kind": "line"
  },
