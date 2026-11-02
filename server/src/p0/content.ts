@@ -132,7 +132,7 @@ export interface ResidentRequest {
   /** q(218): what the resident says on the open bar once it is handed in (the client fills `{pond}`, the home's beginner pond). */
   thanks?: string;
 }
-/** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
+/** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
 /** 355 E: per-type floor bands, special floors and the site facts supplied by C. */
 export interface MineBand {
@@ -320,8 +320,8 @@ export interface P0Content {
   };
   /** Consumables made at the workbench, with no shop row (Torch). */
   supplies: Record<string, { name: string }>;
-  /** §13.2 (SGODOT-231): spot regrow, anti-script tempo between taps, the gloves and their bonus. */
-  gather: { regen_h: number; tempo_ms: number; gloves: string; gloves_bonus: number; spots: Record<string, GatherSpot> };
+  /** §13.2 (SGODOT-231): spot regrow and the anti-script tempo between taps (a city's points too; no gloves: 丁11). */
+  gather: { regen_h: number; tempo_ms: number; spots: Record<string, GatherSpot> };
   /** 355 E/F: all provisional economy and combat values live in the three non-overlapping mine fragments. */
   mine: {
     floor_energy: number; rock_energy: number; fee_per_day: boolean; picks: Record<string, { stone: number }>;

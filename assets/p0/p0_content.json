@@ -2047,8 +2047,7 @@
       "pick_starter": "Starter Pickaxe",
       "sword_wooden": "Wooden Sword",
       "tool_row_hoe": "Row Hoe",
-      "pick_copper": "Copper Pickaxe",
-      "gather_gloves": "Gather Gloves"
+      "pick_copper": "Copper Pickaxe"
     },
     "row_hoe": {
       "id": "tool_row_hoe",
@@ -3422,11 +3421,9 @@
     }
   },
   "gather": {
-    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage (+1 with Gather Gloves); worms go to the bag, any that do not fit go to storage (q(44)); seasonings (Rock Salt, Wild Herb) go to the bag and are not stored on coming home until the Spice Rack at Homestead Lv2, which puts them away (q(46)). P0 has no Old Tree (hardwood is P1, q(44)).",
+    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage; worms go to the bag, any that do not fit go to storage (q(44)); seasonings (Rock Salt, Wild Herb) go to the bag and are not stored on coming home until the Spice Rack at Homestead Lv2, which puts them away (q(46)). P0 has no Old Tree (hardwood is P1, q(44)). Gather Gloves are gone (the user, 11-02 丁11; batch 2 makes them again with the tools).",
     "regen_h": 8,
     "tempo_ms": 900,
-    "gloves": "gather_gloves",
-    "gloves_bonus": 1,
     "spots": {
       "spot_grove": {
         "name": "Timber Grove",
@@ -3514,23 +3511,6 @@
           [
             "copper_ore",
             5
-          ],
-          [
-            "wood",
-            4
-          ]
-        ]
-      },
-      {
-        "id": "craft_gather_gloves",
-        "tab": "tools",
-        "out": "gather_gloves",
-        "qty": 1,
-        "to": "owned",
-        "cost": [
-          [
-            "fiber",
-            8
           ],
           [
             "wood",
