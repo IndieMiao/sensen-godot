@@ -4582,8 +4582,8 @@ func _report(peer: int) -> void:
 		"already": toast(REPORT_ALREADY)
 		_: show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")   # failed: as any command the network lost
 
-## §7: the 13+ gate the first time the mic key is tapped. Old enough goes on to the mic (P0VoiceRoom.answer_age), not
-## old enough hides voice on this phone with an Info toast. Nothing else is kept.
+## §7: the 13+ gate (14 by the year, the user 11-02) the first time the mic key is tapped. Old enough goes on to the
+## mic (P0VoiceRoom.answer_age), not old enough hides voice on this phone with an Info toast. Nothing else is kept.
 func open_age_card() -> void:
 	if voice_room == null: return
 	var d: UiDrawer = AgeCard.new()

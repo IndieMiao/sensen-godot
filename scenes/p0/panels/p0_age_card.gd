@@ -1,8 +1,8 @@
 extends UiDrawer
 ## The 13+ gate before voice (SGODOT-383; q(274) ④, its way still for the user to confirm; 不知火舞's spec 383 6d206dfb
 ## §7): a bottom card the first time the mic key is tapped. `Voice chat`, then `What year were you born?` over a year
-## wheel, and `Continue`, grey until a year is picked. The age is worked out here and only yes / no leaves (answered:
-## 13 or more this year); the year itself is never kept.
+## wheel, and `Continue`, grey until a year is picked. The age is worked out here and only yes / no leaves (answered);
+## the year itself is never kept.
 ## The wheel as 安其拉's V5 has it (383 50108c43, Figma row 124; q(274) 补记二): years run down to this year, a hundred
 ## of them; the one in the middle sits on a primary-tint band, large, two either side fade out. It opens on this year
 ## with nothing picked (the question stays neutral: nothing nudges an answer); a drag that settles, a tap on a year or
@@ -12,7 +12,7 @@ signal answered(ok: bool)
 
 const HEIGHT := 380.0
 const YEARS := 100
-const MIN_AGE := 13
+const MIN_AGE := 14   # this year less the birth year (the user, 11-02 via 奕星: way (a), the year alone, never under 13)
 const TITLE := "Voice chat"
 const QUESTION := "What year were you born?"
 const CONTINUE := "Continue"
@@ -80,7 +80,8 @@ func _init(this_year_: int = 0) -> void:
 	body.add_child(go)
 	_layout()
 
-## 13 or more in `now`'s year counts as old enough (the spec's rule: the year alone is asked).
+## Old enough: born MIN_AGE or more years before `now`'s year. A year alone cannot tell a 12-year-old born late in the
+## year from a 13-year-old (后裔 on #657), so 14 by the year: everyone it lets through is 13 or more (COPPA's side).
 static func ok_for(born: int, now: int) -> bool:
 	return now - born >= MIN_AGE
 

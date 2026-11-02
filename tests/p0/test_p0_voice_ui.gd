@@ -73,8 +73,8 @@ func test_the_keys_come_with_voice_and_the_first_mic_asks_the_age_then_says_who_
 	assert_str(ui.toast_text()).is_empty()
 
 func test_a_child_s_answer_hides_voice() -> void:
-	assert_bool(P0Ui.AgeCard.ok_for(2013, 2026)).is_true()
-	assert_bool(P0Ui.AgeCard.ok_for(2014, 2026)).is_false()
+	assert_bool(P0Ui.AgeCard.ok_for(2012, 2026)).is_true()
+	assert_bool(P0Ui.AgeCard.ok_for(2013, 2026)).is_false()   # 14 by the year: one born late in 2013 may still be 12 (user 11-02, way (a))
 	var ui := await _ui()
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
