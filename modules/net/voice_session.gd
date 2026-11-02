@@ -255,6 +255,9 @@ func _connect_voice() -> void:
 	error = ""
 	_heartbeat_at = Time.get_ticks_msec() + 4500
 	_backend.call("connect_voice", _native_id, str(grant.url), str(grant.token))
+	# the blocks before LiveKit is in the room: it takes no one's tracks by itself, so none of the blocked one's go
+	# through first (SGODOT-384, 384 046f7b43); again at connected
+	_apply_people()
 	_backend.call("renew_lease", _native_id, maxi(0, _lease_deadline - Time.get_ticks_msec()))
 	changed.emit()
 
