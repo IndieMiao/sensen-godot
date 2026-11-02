@@ -5,7 +5,7 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
-import { wildById, wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
+import { parseBbox, siteFor, viewport, wildById, wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
 import type { WorldContent } from '../../src/p0/world.js';
 
 const c: P0Content = loadP0Content();
@@ -58,5 +58,18 @@ describe('the wild sites a save freezes (v4q(3))', () => {
     expect(up.travel.home).toBe(TOKYO);
     expect(up.travel.wild_near3).toEqual(wildNearOf(opened, TOKYO));
     expect(up.travel.wild_priced).toEqual(wildPricedOf(opened, TOKYO));
+  });
+
+  it('a site says the deepest floor the player reached in its mine — the viewport and view.wild.here alike (contract-c §3)', () => {
+    const s = freshState(c, 'wild-best-1', T0);
+    const [id, other] = s.travel.wild_near3!, site = wildById(c, id)!;
+    expect(siteFor(c, s, site, T0).best_floor).toBe(0);   // not been down
+    s.mine.records[id] = { deepest: 14, guards: [10], first_at: T0 };
+    expect(siteFor(c, s, site, T0).best_floor).toBe(14);
+    expect(siteFor(c, s, wildById(c, other)!, T0).best_floor).toBe(0);   // a record is its own mine's
+    const box = parseBbox(`${site.lat - 0.3},${site.lng - 0.3},${site.lat + 0.3},${site.lng + 0.3}`)!;
+    expect(viewport(c, s, box, 10, T0).sites.find(x => x.id === id)?.best_floor).toBe(14);
+    s.travel.here = id;
+    expect((viewOf(c, s, T0) as { wild: { here: { id: string; best_floor: number } } }).wild.here).toMatchObject({ id, best_floor: 14 });
   });
 });
