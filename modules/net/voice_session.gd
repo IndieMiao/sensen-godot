@@ -11,8 +11,9 @@ var listening := true
 var participants: Array = []
 var capacity := 8
 var party_id := ""
-## P0 rooms (join_with, 2026-11-02): this phone's LiveKit identity (the hub's peer id) and the peers blocked either way
-## (the grant's `blocked`, then set_blocked from the hub's voice_blocks); never a player id (亚瑟 on the voice plan).
+## P0 rooms (join_with, 2026-11-02): this phone's LiveKit identity (the hub's peer id) and the peers this player blocks
+## (the grant's `blocked`, then set_blocked from the hub's voice_blocks; SGODOT-384: only one's own blocks are sent, the
+## blocked are never told); never a player id (亚瑟 on the voice plan).
 var peer_self := ""
 var blocked: Array = []
 var _muted := {}   # identity → true: this phone's own Mute, set again after each connect
@@ -50,11 +51,24 @@ func set_backend(value: Object) -> void:
 	_backend = value
 	if _backend: _backend.connect("voice_event", _on_native_event)
 
+## What the native side says it can do ({} for a test adapter without `capabilities`). The Android plugin is a
+## JNISingleton, whose methods has_method never sees: only a scripted adapter is asked has_method; the singleton is asked
+## capabilities() outright (SGODOT-384: per_participant and publish_permissions read false on phones, so Mute and Block
+## never reached LiveKit — 李元芳 on 384 f25aa80d).
+func _caps() -> Dictionary:
+	if _backend == null or _adapter_without("capabilities"): return {}
+	var caps = JSON.parse_string(str(_backend.call("capabilities")))
+	return caps if caps is Dictionary else {}
+
+## A scripted test adapter that lacks this method (a native singleton has every method its plugin registers).
+func _adapter_without(method: String) -> bool:
+	return _backend.get_script() != null and not _backend.has_method(method)
+
 func supported() -> bool:
 	if _backend == null: return false
-	if not _backend.has_method("capabilities"): return true # Test adapters.
-	var caps = JSON.parse_string(str(_backend.call("capabilities")))
-	return caps is Dictionary and caps.get("supported", false) and int(caps.get("protocol", 0)) == 1
+	if _adapter_without("capabilities"): return true # Test adapters.
+	var caps := _caps()
+	return bool(caps.get("supported", false)) and int(caps.get("protocol", 0)) == 1
 
 func active() -> bool:
 	return _wanted
@@ -131,9 +145,12 @@ func invalidate_membership() -> void:
 	_heartbeat_at = 0
 	changed.emit()
 
+## Before the room is up the wish is kept and taken at connect (P0's mic key joins with the mic on — it was dropped, and a
+## first tap joined muted; 383 6372bffe); an idle session takes none.
 func set_microphone(enabled: bool) -> void:
-	if state != "connected" or _native_id.is_empty(): return
+	if not _wanted: return
 	_desired_microphone = enabled
+	if state != "connected" or _native_id.is_empty(): return
 	_backend.call("set_microphone", _native_id, enabled)
 
 func set_listening(enabled: bool) -> void:
@@ -144,9 +161,8 @@ func set_listening(enabled: bool) -> void:
 ## Whether the native side can mute or block one person (GodotVoice capabilities `per_participant`, 2026-11-02).
 func per_participant() -> bool:
 	if _backend == null: return false
-	if not _backend.has_method("capabilities"): return _backend.has_method("set_participant_volume")   # test adapters
-	var caps = JSON.parse_string(str(_backend.call("capabilities")))
-	return caps is Dictionary and bool(caps.get("per_participant", false))
+	if _adapter_without("capabilities"): return _backend.has_method("set_participant_volume")   # test adapters
+	return bool(_caps().get("per_participant", false))
 
 ## Mute (P0): one person silent on this phone only, by identity; kept across a reconnect of this session.
 func set_muted(identity: String, muted: bool) -> void:
@@ -159,21 +175,33 @@ func set_muted(identity: String, muted: bool) -> void:
 
 func is_muted(identity: String) -> bool: return _muted.has(identity)
 
-## Block (P0): the server's list of peers blocked either way (the grant, then the hub's voice_blocks); none of their
-## tracks are taken, and one no longer listed is taken again.
+## Whether the native side can keep this phone's tracks from one person (capabilities `publish_permissions`, SGODOT-384).
+func publish_permissions() -> bool:
+	if _backend == null: return false
+	if _adapter_without("capabilities"): return _backend.has_method("set_publish_allowed")   # test adapters
+	return bool(_caps().get("publish_permissions", false))
+
+## Block (P0): the peers this player blocks (the grant, then the hub's voice_blocks). Both ways, from this phone alone
+## (SGODOT-384, 周瑜 on #647): none of their tracks are taken, and LiveKit refuses them this phone's (subscription
+## permissions — a changed client cannot take them either); one no longer listed is allowed and taken again.
 func set_blocked(ids: Array) -> void:
 	var next: Array = ids.map(func(i): return str(i))
 	var freed: Array = blocked.filter(func(i): return not next.has(i))
 	blocked = next
-	if state == "connected" and not _native_id.is_empty() and per_participant():
-		for id in freed: _backend.call("set_participant_subscribed", _native_id, id, true)
-		for id in blocked: _backend.call("set_participant_subscribed", _native_id, id, false)
+	if state == "connected" and not _native_id.is_empty():
+		_block_natively(freed, true)
+		_block_natively(blocked, false)
 	changed.emit()
+
+func _block_natively(ids: Array, allow: bool) -> void:
+	for id in ids:
+		if per_participant(): _backend.call("set_participant_subscribed", _native_id, str(id), allow)
+		if publish_permissions(): _backend.call("set_publish_allowed", _native_id, str(id), allow)
 
 ## After a connect: this session's mutes and blocks onto the fresh native room.
 func _apply_people() -> void:
+	_block_natively(blocked, false)
 	if not per_participant(): return
-	for id in blocked: _backend.call("set_participant_subscribed", _native_id, str(id), false)
 	for id in _muted: _backend.call("set_participant_volume", _native_id, str(id), 0.0)
 
 func _process(_delta: float) -> void:
@@ -282,9 +310,10 @@ func _on_native_event(raw: String) -> void:
 			if not _wanted: return
 			if event.event == "connected":
 				state = "connected"
+				# blocks and mutes before the mic goes out: no one blocked takes a track that is published first (SGODOT-384)
+				_apply_people()
 				_backend.call("set_microphone", _native_id, _desired_microphone)
 				_backend.call("set_listening", _native_id, _desired_listening)
-				_apply_people()
 			microphone = bool(event.get("microphone", false))
 			listening = bool(event.get("listening", true))
 			participants = event.get("participants", []) if event.get("participants") is Array else []
