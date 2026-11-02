@@ -5,7 +5,7 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
-import { parseBbox, siteFor, viewport, wildById, wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
+import { near3Sites, nearestFreeVein, parseBbox, siteFor, viewport, wildById, wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
 import type { WorldContent } from '../../src/p0/world.js';
 
 const c: P0Content = loadP0Content();
@@ -26,8 +26,24 @@ describe('the wild sites a save freezes (v4q(3))', () => {
     expect(types).toContain('quarry');
     expect(types).toContain('vein');
     expect(s.travel.wild_priced).toHaveLength(4);
-    const v = viewOf(c, s, T0) as { wild: { near3: string[]; here: unknown } };
-    expect(v.wild).toEqual({ near3: s.travel.wild_near3, here: null });   // at home: no wild site here
+    const v = viewOf(c, s, T0) as { wild: { near3: string[]; near3_sites: unknown[]; here: unknown } };
+    expect(v.wild).toEqual({ near3: s.travel.wild_near3, near3_sites: near3Sites(c, s), here: null });   // at home: no wild site here
+  });
+
+  it('near3_sites: the free 3 in near3\'s order with type, main and name; the nearest free iron and quartz veins (v4q(9))', () => {
+    const s = freshState(c, 'wild-frozen-sites', T0);
+    const sites = (viewOf(c, s, T0) as { wild: { near3_sites: { id: string; type: string; main: string | null; name: string }[] } }).wild.near3_sites;
+    expect(sites.map(x => x.id)).toEqual(s.travel.wild_near3);
+    for (const x of sites) {
+      const site = wildById(c, x.id)!;
+      expect(x).toEqual({ id: site.id, type: site.type, main: site.mine?.main ?? null, name: site.name });
+      expect(x.name).toBe(siteFor(c, s, site, T0).name);   // the pin's and the mine card's name
+    }
+    expect(sites.map(x => x.type === 'quarry' ? 'quarry' : x.main).sort()).toEqual(['iron_ore', 'quarry', 'quartz']);   // 庚3: one of each
+    const iron = nearestFreeVein(c, s, 'iron_ore')!, quartz = nearestFreeVein(c, s, 'quartz')!;
+    expect(iron).toEqual({ id: sites.find(x => x.main === 'iron_ore')!.id, name: sites.find(x => x.main === 'iron_ore')!.name });
+    expect(quartz.id).toBe(sites.find(x => x.main === 'quartz')!.id);
+    expect(nearestFreeVein(c, s, 'copper_ore')).toBeNull();   // none of the 3
   });
 
   it('picking a home freezes that city\'s lists instead', () => {

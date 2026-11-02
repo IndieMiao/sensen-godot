@@ -138,6 +138,22 @@ export const wildNear3 = (c: P0Content, s: P0State): string[] => {
   return kept?.length ? kept : wildNearOf(c, homeOf(c, s));
 };
 
+/** The free 3 as Today's vein row reads them (v4q(9), 亚瑟): near3's order (nearest first), each `{id, type, main, name}` —
+ * `main` a vein's one main (`iron_ore` / `quartz`), null for a quarry; `name` the site's full name, the very field its pin
+ * and its mine card show (`siteFor`'s, the viewport's). */
+export function near3Sites(c: P0Content, s: P0State, near3 = wildNear3(c, s)): { id: string; type: string; main: string | null; name: string }[] {
+  return near3.map(id => wildById(c, id)).filter((x): x is WildSite => !!x)
+    .map(x => ({ id: x.id, type: x.type, main: x.mine?.main ?? null, name: x.name }));
+}
+
+/** The nearest free vein of one main (`iron_ore`, `quartz`) — from the save's frozen 3, which hold one of each (庚3): the one
+ * Today's vein row (`<name> · Reach Floor 10`) and Pip's line (`There's iron at <name>`) both name, so the two are always
+ * the same mine (v4q(9); 亚瑟, 周瑜's Pip line reads this too). null when none of the 3 is one. */
+export function nearestFreeVein(c: P0Content, s: P0State, main: string): { id: string; name: string } | null {
+  const v = near3Sites(c, s).find(x => x.type === 'vein' && x.main === main);
+  return v ? { id: v.id, name: v.name } : null;
+}
+
 /** A site as the player sees it: the catalogue's fields and theirs (contract-c §3); best_floor is the deepest floor they
  * reached in its mine (E's records, contract-efg §3), 0 before they went down. */
 export function siteFor(c: P0Content, s: P0State, site: WildSite, now: number, near3 = wildNear3(c, s)) {
