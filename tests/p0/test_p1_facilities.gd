@@ -142,6 +142,24 @@ func test_placement_mode_takes_the_screen_and_gives_it_back() -> void:
 	assert_bool(ui._keys.visible).is_true()
 	assert_bool(ui.hud._row2.visible).is_true()
 
+## A toast while placing sits over the caption pill (or the bar's card without one), never on it (不知火舞 on #624: the
+## greenhouse's `More plots open as your Homestead grows` covered `Greenhouse · 4×4`).
+func test_a_toast_while_placing_sits_over_the_caption() -> void:
+	var ui := await _ui()
+	ui.begin_placement({"confirm": "Build"})
+	ui.set_placement({"caption": "Greenhouse · 4×4", "reason": "Needs 4×4 clear plots"})
+	await await_idle_frame()
+	ui.toast("More plots open as your Homestead grows")
+	await await_idle_frame()
+	var toast := ui._toasts._panel.get_global_rect()
+	assert_float(toast.end.y).is_less_equal(ui._place_bar._pill.get_global_rect().position.y)
+	ui.set_placement({"caption": "", "reason": ""})
+	await await_idle_frame()
+	ui.toast("Plot occupied")
+	await await_idle_frame()
+	assert_float(ui._toasts._panel.get_global_rect().end.y).is_less_equal(ui._place_bar._card.get_global_rect().position.y)
+	ui.end_placement()
+
 ## A card or drawer closing in placement mode (Decorate's piece card, the Compost Bin's, a drawer that opened Decorate)
 ## leaves the main key, the switch key and the quick bar away (不知火舞 on 284, Figma DECOR-NONE-SELECTED 2243:33040 /
 ## DECOR-PLACE: only Done or the place bar at the bottom; q(23): no labour while placing). Ending placement brings

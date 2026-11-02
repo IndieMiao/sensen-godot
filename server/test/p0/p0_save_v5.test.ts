@@ -3,6 +3,7 @@ import { chmodSync, existsSync, mkdtempSync, readdirSync, readFileSync, writeFil
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { freshState, SAVE_VERSION, START_WEAPON, upgradeState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
@@ -12,6 +13,8 @@ import { viewOf } from '../../src/p0/view.js';
 const c = loadP0Content();
 /** San Francisco's frozen fallback lists from the homestead (亚瑟's #213): Hayward, Concord, Fairfield … Chico. */
 const SF_FALLBACK = freshTravel(c).fallback;
+// v4q(3): the wild sites a new San Francisco save freezes with its fallback (the free 3, the priced guarantee's 4)
+const SF_WILD = { wild_near3: wildNearOf(c, 'gn-5391959'), wild_priced: wildPricedOf(c, 'gn-5391959') };
 const now = Date.parse('2026-10-10T03:00:00Z');
 /** A v4 save as the live server writes it today: the current shape without the travel block. */
 const v4 = (player = 'p0-test'): P0State => {
@@ -28,14 +31,14 @@ describe('save v5 (SGODOT-275)', () => {
     expect(SF_FALLBACK.near10).toHaveLength(10);
     const s = freshState(c, 'p0-new', now);
     expect(s.v).toBe(SAVE_VERSION);
-    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
+    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, ...SF_WILD, explorer: 0 });
   });
 
   it('a v4 save gains the travel block and nothing else changes', () => {
     const raw = v4();
     const up = upgradeState(c, structuredClone(raw), now);
     expect(up.v).toBe(SAVE_VERSION);   // v5, v6 (q(270)), v7 (355): upgradeState still fills a hand-made old save
-    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
+    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, ...SF_WILD, explorer: 0 });
     // v7's own fields (355): the weapon slot, kills and guard firsts, filled empty
     expect(up.gear.weapons).toEqual([START_WEAPON]);
     expect(up.kills).toEqual({});

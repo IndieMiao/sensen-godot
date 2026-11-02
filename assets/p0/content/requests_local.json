@@ -1,0 +1,41 @@
+{
+  "_note": "q(272) (SGODOT-378, cross-city plan H step 2): local requests — away from home (a second home too), each outpost keeper gives the player some; per_day a city per player day (the home's 04:00), drawn the first time the player is there that day; roles: the templates each keeper role draws from (q(272) ④: fish at the tackle shop, dishes at the tea house, crops at the market, materials at the travel post; an S-tier city's Trading Post cabin keeper draws from all four). Templates as the boards' (requirement, quantity, completion bonus, gates); explore, shared and out-of-zone ones never. prune_days (q(272) ⑪): a city not visited this long, with nothing tracked there, loses its Market Board and its local requests; the next visit makes them as a first one. lines (q(272) ⑨, client only): what a keeper says on the request card, by role, one fixed by the request id; {city} the city's name, {outpost} the outpost's; a cabin keeper speaks for the kind asked.",
+  "requests": {
+    "local": {
+      "per_day": 3,
+      "prune_days": 30,
+      "roles": {
+        "tackle": ["req_sys_fish_common", "req_sys_fish_river", "req_sys_fish_fine", "req_sys_fish_bulk", "req_sys_regional_fish"],
+        "tea": ["req_sys_dish_common", "req_sys_dish_soup", "req_sys_dish_fine", "req_sys_dish_trail", "req_sys_dish_tea", "req_sys_regional_dish"],
+        "market": ["req_sys_crop_basic", "req_sys_crop_fine", "req_sys_fruit_basket", "req_sys_crop_mixed", "req_sys_crop_bulk", "req_sys_regional_crop"],
+        "post": ["req_sys_material_copper", "req_sys_material_hardwood", "req_sys_material_quartz"]
+      },
+      "lines": {
+        "tackle": [
+          "Not many anglers pass through {city}. Could you bring me some fish?",
+          "My regulars are out of town. Could you fill an order?",
+          "You fish, right? I've got buyers waiting.",
+          "The cooler's nearly empty. Can you help me stock it?"
+        ],
+        "tea": [
+          "We're short in the kitchen today. Could you cook something for us?",
+          "Guests keep asking for home cooking. Can you help out?",
+          "Tea's easy. Food's the hard part. Got any dishes to spare?",
+          "A traveler who cooks! Could you make us something?"
+        ],
+        "market": [
+          "Our growers can't keep up. Bring me some produce?",
+          "You've got a farm? {city} could use your crops.",
+          "My stall's half empty. Help me fill it?",
+          "Real farm produce sells best here. Got any to spare?"
+        ],
+        "post": [
+          "Shipments are late again. Can you help me out?",
+          "We're fixing up {outpost}. I could use some supplies.",
+          "Every traveler brings something. Got any materials?",
+          "The post needs repairs. Could you lend a hand?"
+        ]
+      }
+    }
+  }
+}

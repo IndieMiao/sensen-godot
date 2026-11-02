@@ -32,6 +32,16 @@ func test_the_door_and_the_stoves_never_move() -> void:
 		for m in ["exit", "use_stove_1", "use_spice_rack", "use_bench"]:
 			if m != n: assert_float((out[n] as Vector2).distance_to(out[m])).override_failure_message("%s ~ %s" % [n, m]).is_greater_equal(43.99)
 
+## #634: over the farmhouse's own stove strip, the stove buttons its grid placed (keep) stay where it put them; the rack
+## under that strip still lines up above it.
+func test_a_rooms_own_layout_stays_out_of_the_strip_row() -> void:
+	var strip := Rect2(140, 345, 179, 32)
+	var spots := {"use_spice_rack": Vector2(332.5, 338.8), "use_stove_2": Vector2(220, 325)}
+	var laid: Dictionary = P0Room.spread(spots, spots.keys(), strip, SCREEN, 80.0, {}, {"use_stove_2": true})
+	assert_vector(laid.spots.use_stove_2).is_equal(spots.use_stove_2)
+	assert_dict(laid.row).is_equal({"use_spice_rack": true})
+	assert_float((laid.spots.use_spice_rack as Vector2).distance_to(spots.use_stove_2)).is_greater_equal(43.99)
+
 func test_kept_off_the_screens_sides() -> void:
 	var out: Dictionary = _spread({"use_spice_rack": Vector2(330, 400), "use_warming_cabinet": Vector2(335, 410)},
 		["use_spice_rack", "use_warming_cabinet"]).spots

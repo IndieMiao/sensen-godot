@@ -64,13 +64,16 @@ function climateMet(c: P0Content, h: Homed, t: RequestTemplate): boolean {
  * home, q(128)'s four and the two out-of-zone ones), which stay on the home city's board.
  */
 export function eligible(c: P0Content, s: P0State, board: BoardId, city = homeOf(c, s)): string[] {
-  const home = city === homeOf(c, s), h = asHome(c, s, city);
-  return c.requests.boards[board].templates.filter(id => {
-    const t = c.requests.templates[id];
-    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, h, t) && (home || !t.home_only)
-      && (!t.need.regional || regionalPool(c, h, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need, h))
-      && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
-  });
+  return c.requests.boards[board].templates.filter(id => drawable(c, s, id, board, city));
+}
+
+/** One template can be drawn now for that board in that city (eligible); a keeper's local request (q(272)) asks it as
+ * the city's Market Board would. */
+export function drawable(c: P0Content, s: P0State, id: string, board: BoardId, city = homeOf(c, s)): boolean {
+  const home = city === homeOf(c, s), h = asHome(c, s, city), t = c.requests.templates[id];
+  return !!t && t.enabled !== false && gateMet(c, s, t) && climateMet(c, h, t) && (home || !t.home_only)
+    && (!t.need.regional || regionalPool(c, h, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need, h))
+    && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
 }
 
 /** An explore template can be drawn: one of the board's city's outposts to send the player to (Stamp Run), or a city elsewhere with one. */
@@ -199,13 +202,21 @@ function growable(c: P0Content, s: P0State): string[] {
 function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at: number, city = homeOf(c, s)): BoardRequest | null {
   const open = eligible(c, s, board, city);
   if (!open.length) return null;
-  const away = city === homeOf(c, s) ? '' : city, h = asHome(c, s, city);
+  const away = city === homeOf(c, s) ? '' : city;
   const draw = slotRand(s, board, slot, at, away);
   const taken = slotsOf(c, s, board, city).map(sl => sl.req?.template);
   const fresh = open.filter(t => !taken.includes(t));
   const pool = fresh.length ? fresh : open;
   const template = pool[Math.floor(draw() * pool.length)];
-  const t = c.requests.templates[template];
+  return requestFor(c, s, template, draw, board, city, `${template}-${board}${slot}-${away ? `${away}-` : ''}${at.toString(36)}`, at);
+}
+
+/** The request one template makes in a city — its items and quantity from the draw's stream, after the template's own
+ * pick (a board slot's, or a keeper's local request, q(272)); null when an explore one finds nowhere to send the player.
+ * `keep`: the regional items it may ask for (a keeper's: only the fish the player can land now). */
+export function requestFor(c: P0Content, s: P0State, template: string, draw: Rand, board: BoardId, city: string, id: string, at: number,
+  keep: (item: string) => boolean = () => true): BoardRequest | null {
+  const h = asHome(c, s, city), t = c.requests.templates[template];
   let items: string[] = [];
   let visit: BoardRequest['visit'];
   if (t.need.kind === 'visit' && t.need.visit && t.need.visit.where !== 'same_city') {   // cross-city: one city, its outpost
@@ -221,7 +232,8 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     const places = visitPlaces(c, board, h);
     visit = { place: places[Math.floor(draw() * places.length)], done: false };
   } else if (t.need.regional) {   // regional: one of the climate's / city's items
-    const pool = regionalPool(c, h, t.need);
+    const pool = regionalPool(c, h, t.need).filter(keep);
+    if (!pool.length) return null;
     items = [pool[Math.floor(draw() * pool.length)]];
   } else if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
   // A crop request by rarity or family takes any such crop the player can grow (李白's Fine Produce, Orchard Basket).
@@ -232,7 +244,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     items = crops.slice(0, t.need.distinct ?? 1);
   }
   return {
-    id: `${template}-${board}${slot}-${away ? `${away}-` : ''}${at.toString(36)}`, template, items, rarity: t.need.rarity,
+    id, template, items, rarity: t.need.rarity,
     ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: visit ? 1 : qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open', ...(visit ? { visit } : {}),
     ...(t.need.where ? { where: t.need.where } : {}),
@@ -380,10 +392,12 @@ export function findBoardRequest(c: P0Content, s: P0State, id: string): { board:
   return null;
 }
 
-/** Requests tracked now, every board of every city and the residents' together (track_max is the account's). */
+/** Requests tracked now, every board of every city, the residents' and the keepers' local ones (q(272)) together
+ * (track_max is the account's). */
 export function tracked(c: P0Content, s: P0State): number {
   return boardsOf(c, s).reduce((n, b) => n + b.slots.filter(sl => sl.req?.status === 'accepted').length, 0)
-    + Object.values(s.residents).filter(r => r.req).length;
+    + Object.values(s.residents).filter(r => r.req).length
+    + Object.values(s.locals ?? {}).reduce((n, l) => n + l.slots.filter(sl => sl.req.status === 'accepted').length, 0);
 }
 
 /** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */

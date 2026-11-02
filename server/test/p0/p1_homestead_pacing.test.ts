@@ -1,20 +1,27 @@
-/** SGODOT-354 q(246)/q(247): early gates and content-driven actual Energy, with v5 saves retained. */
+/** v4q(1) (SGODOT-355 b1): the batch-1 table, each skill's gate, the travel gate and content-driven Energy back. */
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0 } from '../../src/p0/reducer.js';
-import { maxEnergy } from '../../src/p0/rules.js';
+import { foodCap, levelEnergy, maxEnergy } from '../../src/p0/rules.js';
 import { freshState, upgradeState, SAVE_VERSION } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
 const c = loadP0Content(), T = Date.UTC(2026, 9, 28, 2);
+const VISIT = { n: 1, first_at: T, last_at: T, deliveries: 0, delivered_day: '' };
+/** A save one level short of `level` with everything that level asks for: Lv10 skills, the coins and materials, and from
+ * Lv16 the stamps and two other climate bands (Guangzhou, Moscow). */
 function ready(level: number, energy: number, cc = c) {
   const s = freshState(cc, 'pacing-old-account', T, 4);
   s.created_at = T - 30 * 86400000;
   s.homestead.level = level - 1;
   const next = cc.homestead.levels.find(x => x.level === level)!;
-  s.skills = { farming: cc.skills.farming[9], fishing: cc.skills.fishing[9], cooking: 0 };
+  s.skills = { farming: cc.skills.farming[9], fishing: cc.skills.fishing[9], cooking: cc.skills.cooking[9] };
   s.coins = next.coins + 40; s.storage = Object.fromEntries(next.materials);
   s.energy = { value: energy, tick_ms: T };
+  if (next.travel) {
+    s.travel.stamps = Array.from({ length: next.travel.stamps }, (_, k) => ({ cluster: `gn-${k}`, kind: 'climate' as const, at: T, counted_on: '2026-10-28' }));
+    s.travel.visits = { 'gn-1809858': VISIT, 'gn-524901': VISIT };
+  }
   return s;
 }
 function upgrade(level: number, energy: number, cc = c) {
@@ -24,23 +31,25 @@ function upgrade(level: number, energy: number, cc = c) {
   return { before, ...r };
 }
 
-describe('q(246) gates for every account, not just new saves', () => {
-  it('matches the approved Lv2–4 gates including Lv4 300 and the SGODOT-355 option A Lv5–10 ladder', () => {
-    expect(c.homestead.levels.slice(0, 5).map(l => [l.level, l.coins, l.skills, l.materials, l.energy])).toEqual([
-      [2, 40, 3, [['wood', 6], ['stone', 4], ['fiber', 3]], 40],
-      [3, 80, 4, [['stone', 8], ['copper_ore', 2], ['clay', 2]], 40],
-      [4, 300, 6, [['wood', 12], ['stone', 10], ['fiber', 6], ['copper_ore', 4], ['clay', 4], ['rock_salt', 3]], 40],
-      [5, 450, 8, [['wood', 12], ['stone', 10], ['fiber', 7], ['copper_ore', 6], ['clay', 5], ['quartz', 1], ['rock_salt', 2]], 'full'],
-      [6, 800, 10, [['wood', 16], ['stone', 14], ['fiber', 10], ['copper_ore', 8], ['clay', 6], ['quartz', 2], ['hardwood', 2]], 'full'],
-    ]);
-    expect(c.homestead.levels.slice(5).map(l => [l.coins, l.skills, l.energy])).toEqual([
-      [1300, 12, 'full'], [1800, 14, 'full'], [2300, 16, 'full'], [3000, 19, 'full'],
-    ]);
+describe('v4q(1): the batch-1 table to Lv17 and 50 Energy back to Lv15, for every account', () => {
+  it('matches v4q(1) ②③④⑥: coins (2,125 in all), each skill\'s gate, the travel gate from Lv16, 50 back to Lv15', () => {
+    const L = c.homestead.levels;
+    expect(c.homestead.max_level).toBe(17);
+    expect(L.map(l => l.level)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+    expect(L.map(l => l.coins)).toEqual([40, 60, 70, 80, 80, 80, 80, 85, 90, 115, 120, 150, 175, 220, 280, 400]);
+    expect(L.reduce((n, l) => n + l.coins, 0)).toBe(2125);
+    expect(L.map(l => [l.skills.farming, l.skills.fishing, l.skills.cooking ?? null])).toEqual([
+      [1, 1, null], [2, 1, null], [2, 2, null], [3, 2, null], [3, 3, 2], [4, 3, 3], [4, 4, 4], [4, 5, 4], [4, 5, 5], [4, 6, 5],
+      [5, 6, 6], [5, 6, 6], [5, 6, 7], [6, 7, 7], [6, 7, 8], [7, 8, 8]]);
+    expect(L.map(l => l.energy)).toEqual([50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 0, 0]);
+    expect(L.map(l => l.travel ?? null)).toEqual([...Array(14).fill(null), { stamps: 6, climates: 1 }, { stamps: 8, climates: 2 }]);
+    expect(L[0].materials).toEqual([['wood', 6], ['stone', 4], ['fiber', 3]]);
+    expect(L[14].materials).toEqual([['hardwood', 13], ['flax', 9], ['iron_ore', 4], ['quartz', 2]]);   // Lv16: the bridge row, T2 only
   });
 
-  it.each([2, 3, 4])('Lv%d gives only actual Energy: 40, remaining room, zero at/above the new cap', level => {
-    const cap = 200 + 10 * (level - 1);
-    for (const [before, gain] of [[0, 40], [cap - 1, 1], [cap, 0], [cap + 15, 0]]) {
+  it.each([2, 3, 4, 8, 11, 15])('Lv%d gives back only what fits: 50, the room left, nothing at or above the new pool', level => {
+    const cap = 200 + levelEnergy(c, level);
+    for (const [before, gain] of [[0, 50], [cap - 1, 1], [cap, 0], [cap + 15, 0]]) {
       const r = upgrade(level, before);
       expect(r.state.energy.value).toBe(before + gain);
       expect(r.events.find(e => e.kind === 'homestead')).toMatchObject({ level, energy: gain });
@@ -49,20 +58,27 @@ describe('q(246) gates for every account, not just new saves', () => {
     }
   });
 
-  it('reads the reward from content, not a hardcoded level check, and retains full-refill semantics from Lv5', () => {
+  it('the pool and the meal cap share one ladder: +10 a level to Lv10, then +5 (Lv10 290, Lv17 325)', () => {
+    expect([1, 2, 10, 11, 15, 17].map(l => 200 + levelEnergy(c, l))).toEqual([200, 210, 290, 295, 315, 325]);
+    const s = ready(17, 10);
+    s.homestead.level = 17;
+    expect(maxEnergy(c, s)).toBe(325);
+    expect(foodCap(c, s, T)).toBe(c.cooking.food_cap + 125);
+  });
+
+  it('reads the reward from content, not a level check: Lv16–17 give nothing back', () => {
     const cc: P0Content = structuredClone(c);
     cc.homestead.levels[0].energy = 7;
     expect(upgrade(2, 100, cc).state.energy.value).toBe(107);
-    for (const level of [5, 6, 7, 8, 9, 10]) {
+    for (const level of [16, 17]) {
       const r = upgrade(level, 1);
-      expect(r.state.energy.value).toBe(maxEnergy(c, r.state));
-      expect(r.events.find(e => e.kind === 'homestead')).toMatchObject({ energy: maxEnergy(c, r.state) - 1 });
+      expect(r.state.energy.value).toBe(1);
+      expect(r.events.find(e => e.kind === 'homestead')).toMatchObject({ level, energy: 0 });
     }
-    expect(upgrade(5, 270).state.energy.value).toBe(270);
   });
 
   it('can perform two affordable upgrades on an old Lv1 account, with separate payments/rewards and no automatic upgrade', () => {
-    let s = ready(2, 0); s.coins = 160; s.storage = { wood: 6, stone: 12, fiber: 3, copper_ore: 2, clay: 2 };
+    let s = ready(2, 0); s.coins = 140; s.storage = { wood: 10, stone: 12, fiber: 3, clay: 2 };
     s.skills = { farming: c.skills.farming[1], fishing: c.skills.fishing[1], cooking: 0 };
     expect(viewOf(c, s, T).homestead.next!.can_upgrade).toBe(true);
     expect(s.homestead.level).toBe(1);
@@ -71,14 +87,14 @@ describe('q(246) gates for every account, not just new saves', () => {
       if (!r.ok) throw new Error(r.code);
       s = r.state;
       expect(s.homestead.level).toBe(level);
-      expect(r.events.find(e => e.kind === 'homestead')).toMatchObject({ energy: 40 });
+      expect(r.events.find(e => e.kind === 'homestead')).toMatchObject({ energy: 50 });
     }
-    expect(s.energy.value).toBe(80); expect(s.coins).toBe(40); expect(s.storage).toEqual({});
+    expect(s.energy.value).toBe(100); expect(s.coins).toBe(40); expect(s.storage).toEqual({});
     expect(s.homestead.plaque.map(p => p.level)).toEqual([2, 3]); expect(s.plots).toHaveLength(c.homestead.plots!.find(([lv]) => lv === 3)![1]);   // Lv3's beds (355 grid: 12)
   });
 
   it('loading existing reached levels neither downgrades nor refunds historical payments or rewards', () => {
-    for (const level of [2, 3, 4, 5, 10]) {
+    for (const level of [2, 3, 4, 5, 10, 17]) {
       const s = ready(level, 123); s.homestead.level = level; s.coins = 71;
       s.homestead.plaque = [{ level, at: T - 10 * 86400000 }];
       const before = { level, coins: s.coins, energy: s.energy.value, plaque: structuredClone(s.homestead.plaque) };

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CityClusters } from './clusters.js';
 import { cityPlaces, worldOf } from './world.js';
+import type { LevelCap } from './homestead.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -54,7 +55,8 @@ export interface FishSite { name: string; template: string; weights: number[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
 export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
-export interface OutpostDef { id: string; role: string; name?: string; residents: string[]; cluster?: string; lat?: number; lng?: number }   // name: SGODOT-341's Today line
+export interface OutpostDef { id: string; role: string; name?: string; residents: string[]; cluster?: string; lat?: number; lng?: number;   // name: SGODOT-341's Today line
+  keeper?: { name: string; role: string } }   // the hand-written keeper (Finn · Tackle Keeper), who gives local requests (q(272))
 
 /** A Homestead look stage (LOOK-PICK, SGODOT-282): picked at `level`, a (timber) or b (stone). */
 export interface HomesteadLook { id: string; level: number; name: string; a: string; b: string }
@@ -235,11 +237,14 @@ export interface P0Content {
     warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     plots?: [number, number][];               // beds the homestead has by level: Lv1 8 … Lv17 41 (355 grid; absent = P0's start)
-    perennial_slots?: { base: number; per_level: number; max: number };   // trees that may stand: 1 + level, at most 8
-    sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
-    per_level: { energy: number; meals: number };
+    perennial_slots?: LevelCap;   // trees that may stand: 1 + level, at most 8, 10 from Lv14 (v4q(1) ⑧)
+    sprinkler_max?: LevelCap;     // sprinklers that may stand: 3 + level, at most 10, 12 from Lv14
+    energy_steps: [number, number][];         // v4q(1) ⑦: the Energy pool and meal cap, [from level, + a level]: [[2, 10], [11, 5]]
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
-    levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[]; energy?: number | 'full' }[];
+    // v4q(1): each skill's own gate (farming / fishing / cooking, absent = none), the travel gate from Lv16 (city stamps,
+    // other climate bands), and the Energy a level gives back — a number, always (Lv2–15 50, Lv16 on 0)
+    levels: { level: number; coins: number; skills: Partial<Record<'farming' | 'fishing' | 'cooking', number>>; travel?: { stamps: number; climates: number };
+      materials: [string, number][]; unlocks: string[]; energy: number }[];
     /** Looks (content/homestead_looks.json, §8.3.1, q(112)): a stage per look level, its id the level's unlock id. */
     looks?: HomesteadLook[];
   };
@@ -255,7 +260,8 @@ export interface P0Content {
    * the counter's city (tripOf: Trip 1–7, index trip − 1). Unit = max(1, ⌊full price × rate × this⌋). */
   sell_distance: { home: number; trip: number[] };
   market: { buy: string[]; specialty: string[] };
-  quotas: Record<QuotaId, { cap: number; scope: string; per_city?: boolean }>;   // per_city: one count per account × city cluster (§11.7.3)
+  // by_homestead (q(272) ⑩): [from Homestead level, cap] rows, the last one reached wins over cap (request_bonus)
+  quotas: Record<QuotaId, { cap: number; scope: string; per_city?: boolean; by_homestead?: [number, number][] }>;   // per_city: one count per account × city cluster (§11.7.3)
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
     /** §7.5.3 Taught: from this stage, every `every_days` days, one page the player has not got yet. */
@@ -283,6 +289,8 @@ export interface P0Content {
     floor_rate: number;                       // floor price = ⌊sell price × rate⌋
     boards: Record<BoardId, { title: string; slots?: number; templates: string[] }>;
     templates: Record<string, RequestTemplate>;
+    /** q(272): local requests from the keepers of a city away from home (content/requests_local.json); none without it. */
+    local?: { per_day: number; prune_days: number; roles: Record<string, string[]> };
   };
   /** §3.4.8 one-time energy: by rarity (index = rarity − 1) and [count, energy] milestones; may pass max by ≤ max_over. */
   rewards: { first_fish: number[]; first_dish: number[]; cookbook: [number, number][]; fishdex: [number, number][]; max_over: number };
@@ -355,10 +363,12 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const mainFrom = (worldOf(c) as { wild?: { mines?: { vein?: { main_from: number } } } } | undefined)?.wild?.mines?.vein?.main_from;
   if (!Number.isInteger(mainFrom) || c.mine.types.vein.main_weight?.[1]?.[0] !== mainFrom)
     throw new Error('p0 content: mine.types.vein.main_weight[1].from must equal world.wild.mines.vein.main_from');
+  checkHomestead(c);
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
-    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number }[])
+    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; name?: string; residents?: string[]; cluster?: string; lat?: number; lng?: number; keeper?: { name?: string; role?: string } }[])
       .map(o => ({ id: o.id, role: o.role, ...(o.name ? { name: o.name } : {}), residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}),
+        ...(o.keeper?.name ? { keeper: { name: o.keeper.name, role: o.keeper.role ?? '' } } : {}),
         ...(typeof o.lat === 'number' && typeof o.lng === 'number' ? { lat: o.lat, lng: o.lng } : {}) }));   // lat/lng: SGODOT-303's 300 m
   }
   // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
@@ -383,6 +393,16 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     }
   }
   return c;
+}
+
+/** v4q(1) ⑥ (复核 ③): every level's `energy` is a number — a missing one used to mean a full refill. Wrong content
+ * stops the server here rather than refilling everyone. */
+export function checkHomestead(c: P0Content): void {
+  for (const l of c.homestead.levels) {
+    if (typeof l.energy !== 'number') throw new Error(`homestead.levels Lv${l.level}: energy must be a number (0 for none), got ${JSON.stringify(l.energy)}`);
+    if (typeof l.skills !== 'object' || l.skills === null) throw new Error(`homestead.levels Lv${l.level}: skills must be { farming?, fishing?, cooking? }`);
+  }
+  if (!Array.isArray(c.homestead.energy_steps)) throw new Error('homestead.energy_steps: [[from level, + a level], …] is required');
 }
 
 /**

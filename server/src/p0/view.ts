@@ -4,21 +4,22 @@ import { count, freeSlots } from './bag.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { batchRoom, burners, cookSlots, keptIndex, keptReason, mealValue, recipeRarity, servingPicks, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
-import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
+import { blessed, dayKey, foodCap, levelEnergy, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, SAVE_VERSION, type P0State } from './state.js';
 import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
 import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
+import { cityName, giverOf, settleLocals, shownLocals } from './locals.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
-import { floorPrice, haveFor, matches, pick } from './requests.js';
+import { bonusCap, floorPrice, haveFor, matches, pick } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
-import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
+import { bigPot, boardSlots, chefSignGold, coinsNeeded, GATE_SKILLS, lookOf, nextLevel, stepAt, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, fieldCap, fieldsUsed, greenhousePlots, plotCount } from './garden.js';
-import { climateAt, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
+import { cityStamps, climateAt, climatesVisited, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
 import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { inboxView, settleParcels } from './parcels.js';
@@ -34,15 +35,17 @@ import { decorView } from './decor.js';
 import { titlesView } from './titles.js';
 import { guideView } from './guide.js';
 import { blackjackView } from './blackjack.js';
+import { isWild, siteFor, wildById, wildNear3 } from './wild.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
-export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleLocals(c, s, now);   // q(272): the same local requests the next command finds
   settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
   settleMine(c, s, now);
   settleParcels(c, s, now);
@@ -63,12 +66,14 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     coins: s.coins,
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
-    map_markers: mapMarkers(c, s, now),
+    map_markers: mapMarkers(c, s, now, { locals: opts.locals ?? true }),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     blackjack: blackjackView(c, s, now),   // SGODOT-351 the card room's table: the gate, the hand in play, a result not yet seen
     guide: guideView(c, s, now),   // SGODOT-341: the new-player guide's step (or the recover entry to show), {step: null, end} when off
     home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
+    // v4q(3) (contract-c §5): the free 3 wild sites, and the one the player is at with all its fields (null elsewhere)
+    wild: { near3: wildNear3(c, s), here: wildHere(c, s, now) },
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, ...travelShown(c, s.travel), today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
       // q(256) (contract 043c0bc8 D): the fare table as content has it, for the confirm card, the Fare Board and the
@@ -116,6 +121,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     // q(270): `market` is the board of the city the player is in (the home city's where that city has no market square);
     // `elsewhere`, the requests tracked on other cities' boards, each with where it is handed in
     boards: { stall: boardView(c, s, 'stall', now), market: boardView(c, s, 'market', now, marketCity(c, s)), elsewhere: elsewhereView(c, s, now) },
+    // q(272): the keepers' local requests — today's in the city the player is in and the tracked ones elsewhere; a client
+    // without it shows none
+    locals: localsView(c, s, now),
     gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
@@ -301,20 +309,28 @@ function queuedView(s: P0State, stove: Pot | null, queue: Pot | null, now: numbe
     starts_in: stove && !stove.left && stove.started_at + stove.ms > now ? stove.started_at + stove.ms - now : null } : null;
 }
 
-/** HOME-1 facts (§8.6.1): what the next level needs, what the player has (storage and bag apart) and what is unlocked. */
+/** HOME-1 facts (§8.6.1; v4q(1), 哪吒's A view contract): what the next level needs — each skill, the travel gate from
+ * Lv16, materials (storage and bag apart), coins — what it brings, and what is unlocked. */
 function homesteadView(c: P0Content, s: P0State) {
   const next = nextLevel(c, s);
   const upgrade = c.bag_upgrades[0];
   const bagTier = (id: string) => s.owned.includes(id) ? 'owned' : unlocked(c, s, id) ? 'for_sale' : 'locked';
+  const plotsAt = (level: number) => stepAt(c.homestead.plots, level, c.start.tilled_plots + c.start.wild_plots);
   return {
     level: s.homestead.level, max: c.homestead.max_level, plaque: s.homestead.plaque,
+    plots: { now: plotsAt(s.homestead.level), max: plotsAt(c.homestead.max_level) },   // the level's Plots and the batch's most
     next: next && {
       level: next.level,
       coins: { need: coinsNeeded(c, next.coins), have: s.coins },
-      skills: { need: next.skills, have: skillsTotal(c, s), farming: skillLevel(c, s, 'farming'), fishing: skillLevel(c, s, 'fishing') },
+      // only the skills the level gates (no Cooking before Lv6), in the button's order
+      skills: GATE_SKILLS.filter(k => next.skills[k] !== undefined).map(k => ({ skill: k, need: next.skills[k]!, have: skillLevel(c, s, k) })),
+      travel: next.travel ? { stamps: { need: next.travel.stamps, have: cityStamps(s) },
+        climates: { need: next.travel.climates, have: climatesVisited(c, s) } } : null,
       materials: next.materials.map(([id, need]) => ({ id, name: itemName(c, id), need, have: haveTotal(s, id), storage: stored(s, id), bag: haveTotal(s, id) - stored(s, id) })),
-      energy: c.energy.max_base + c.homestead.per_level.energy * (next.level - 1),
-      meals: c.cooking.food_cap + c.homestead.per_level.meals * (next.level - 1),
+      energy: c.energy.max_base + levelEnergy(c, next.level),   // the pool after the upgrade
+      meals: c.cooking.food_cap + levelEnergy(c, next.level),   // the day's meal cap after it (one formula, v4q(1) ⑦)
+      energy_gain: next.energy,                                 // what the upgrade gives back (Lv2–15 50, Lv16 on 0)
+      plots: plotsAt(next.level),
       unlocks: next.unlocks,
       can_upgrade: upgradeBlock(c, s) === null,
       block: upgradeBlock(c, s),
@@ -325,7 +341,6 @@ function homesteadView(c: P0Content, s: P0State) {
       bag_upgrade_1: bagTier(upgrade.id),
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
-      clay_bank: unlocked(c, s, 'clay_bank'),
       // P1 (SGODOT-282, §8.3.1): stoves 1 / 2 / 3, Big Pot, Notice Board, Chef's Sign (gold +5 points), Bag II / III.
       stoves: stoveCount(c, s), big_pot: bigPot(c, s), notice_board: unlocked(c, s, 'notice_board'),
       chefs_sign: chefSignGold(c, s) > 0, cabinet: cabinetCap(c, s),
@@ -376,7 +391,7 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
   const city = s.travel?.here ?? homeOf(c, s);
   const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
     : s.day.quota[quotaKey(c, q, city)] ?? 0;
-  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
+  return { used, cap: q === 'request_bonus' ? bonusCap(c, s) : c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
@@ -458,6 +473,15 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
     accepted_at: r.status === 'accepted' ? r.accepted_at ?? null : null,   // q(143); null on saves from before it
     expires_in: r.status === 'open' && r.id !== c.requests.tutorial.id ? Math.max(0, r.drawn_at + c.requests.expire_h * 3_600_000 - now) : null,
   };
+}
+
+/** q(272): each local request as a board's, with the keeper giving it (outpost, name plate, role) and its city; an
+ * untracked one goes at the day's end (the next player day draws anew). */
+function localsView(c: P0Content, s: P0State, now: number) {
+  const here = s.travel?.here || homeOf(c, s);
+  return shownLocals(c, s, now).map(({ city, req, place }) => ({ ...requestView(c, s, req, now),
+    expires_in: req.status === 'open' ? untilRollover(c, s, now) : null,
+    place, ...giverOf(c, city, place), cluster: city, city: cityName(c, city), here: city === here }));
 }
 
 /** q(270): the city whose Market Board the player sees — the one they are in, or home where that city has no market square. */
@@ -592,4 +616,10 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
 function regionalItems(c: P0Content, kind: string, zone: string): string[] {
   const ids = kind === 'crop' ? c.crops.map(x => x.id) : kind === 'fish' ? c.fish.map(x => x.id) : [];
   return ids.filter(id => regionalOf(c, id, zone));
+}
+
+/** view.wild.here: the wild site the player is at, as the viewport read gives it (catalogue and the player's fields). */
+function wildHere(c: P0Content, s: P0State, now: number) {
+  const here = s.travel?.here, site = isWild(here) ? wildById(c, here) : undefined;
+  return site ? siteFor(c, s, site, now) : null;
 }

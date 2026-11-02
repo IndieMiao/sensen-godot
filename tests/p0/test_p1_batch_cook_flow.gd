@@ -304,13 +304,13 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 ## The pots stand where the art placed them in the Standard and Deluxe Rooms too: on each stove's burner, the Standard
 ## Room's stove 3 turned 45° (clear of the door frame and the back wall).
 func test_the_pots_follow_each_rooms_burners() -> void:
-	for lv in [5, 10]:
+	for lv in [5, 12]:   # the Standard Room and the Deluxe Room (Lv12 since v4q(1))
 		var r: P0Room = FARMHOUSE.new()
 		r.use_runtime = false
 		r.level = lv
 		add_child(r)
 		auto_free(r)
-		for i in 3:
+		for i in (4 if lv == 12 else 3):   # the Deluxe Room's cooker has a fourth burner, back left (Lv17, v4q(1))
 			var pot := r.art.get_node("stove_pots/stove_pot_%d" % (i + 1)) as Node3D
 			assert_vector(pot.global_position).override_failure_message("Lv%d pot %d" % [lv, i + 1]).is_equal_approx(r.anchor("use_stove_%d" % (i + 1)).global_position, Vector3.ONE * 0.001)
 			assert_float(pot.rotation_degrees.y).is_equal_approx(45.0 if lv == 5 and i == 2 else 0.0, 0.01)

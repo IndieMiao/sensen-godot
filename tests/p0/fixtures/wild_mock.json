@@ -1,0 +1,6433 @@
+{
+ "_mock": "后裔 355 C 假数据：坐标没有过陆地掩膜，类型和数字随手分的，只给客户端接 UI 用；字段以 contract-c 为准。",
+ "revision": 0,
+ "sites": [
+  {
+   "id": "wd-255-114",
+   "type": "quarry",
+   "lat": 37.6325,
+   "lng": -122.835,
+   "name": "Flint Quarry",
+   "short": "Flint",
+   "near": "gn-5391959",
+   "near_name": "San Francisco",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-254-114",
+   "type": "vein",
+   "lat": 37.355,
+   "lng": -122.7175,
+   "name": "Ash Vein",
+   "short": "Ash",
+   "near": "gn-5391959",
+   "near_name": "San Francisco",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 41,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-255-113",
+   "type": "geode",
+   "lat": 37.855,
+   "lng": -123.2725,
+   "name": "Thistle Geode",
+   "short": "Thistle",
+   "near": "gn-5378044",
+   "near_name": "Novato",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false,
+   "mine": {
+    "floors": 59,
+    "main": "gem_local",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-256-113",
+   "type": "quarry",
+   "lat": 38.245,
+   "lng": -123.22,
+   "name": "Ash Quarry",
+   "short": "Ash",
+   "near": "gn-5393287",
+   "near_name": "Santa Rosa",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 30,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-254-113",
+   "type": "quarry",
+   "lat": 37.2125,
+   "lng": -123.1725,
+   "name": "Fern Quarry",
+   "short": "Fern",
+   "near": "gn-5391959",
+   "near_name": "San Francisco",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "stone",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-257-115",
+   "type": "woodland",
+   "lat": 38.6525,
+   "lng": -122.1275,
+   "name": "Moss Woods",
+   "short": "Moss",
+   "near": "gn-5347335",
+   "near_name": "Fairfield",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-255-112",
+   "type": "vein",
+   "lat": 37.825,
+   "lng": -123.6475,
+   "name": "Cedar Vein",
+   "short": "Cedar",
+   "near": "gn-5378044",
+   "near_name": "Novato",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 46,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-253-114",
+   "type": "woodland",
+   "lat": 36.8225,
+   "lng": -122.7,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-5393052",
+   "near_name": "Santa Cruz",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-254-117",
+   "type": "quarry",
+   "lat": 37.31,
+   "lng": -121.2625,
+   "name": "Heron Quarry",
+   "short": "Heron",
+   "near": "gn-5352214",
+   "near_name": "Gilroy",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-257-116",
+   "type": "woodland",
+   "lat": 38.7475,
+   "lng": -121.82,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-5389489",
+   "near_name": "Sacramento",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-256-112",
+   "type": "geode",
+   "lat": 38.125,
+   "lng": -123.85,
+   "name": "Cedar Geode",
+   "short": "Cedar",
+   "near": "gn-5393287",
+   "near_name": "Santa Rosa",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false,
+   "mine": {
+    "floors": 59,
+    "main": "gem_local",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-257-113",
+   "type": "waterside",
+   "lat": 38.81,
+   "lng": -123.1525,
+   "name": "Lark Fishing Spot",
+   "short": "Lark",
+   "near": "gn-5404476",
+   "near_name": "Ukiah",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-254-112",
+   "type": "woodland",
+   "lat": 37.37,
+   "lng": -123.8475,
+   "name": "Lark Woods",
+   "short": "Lark",
+   "near": "gn-5391959",
+   "near_name": "San Francisco",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-253-113",
+   "type": "vein",
+   "lat": 36.745,
+   "lng": -123.2925,
+   "name": "Ember Vein",
+   "short": "Ember",
+   "near": "gn-5393052",
+   "near_name": "Santa Cruz",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 55,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-256-118",
+   "type": "quarry",
+   "lat": 38.1825,
+   "lng": -120.8675,
+   "name": "Fern Quarry",
+   "short": "Fern",
+   "near": "gn-5351428",
+   "near_name": "Galt",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 23,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-257-112",
+   "type": "waterside",
+   "lat": 38.6725,
+   "lng": -123.6575,
+   "name": "Ember Fishing Spot",
+   "short": "Ember",
+   "near": "gn-5404476",
+   "near_name": "Ukiah",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-260-213",
+   "type": "quarry",
+   "lat": 40.18,
+   "lng": -73.2825,
+   "name": "Ember Quarry",
+   "short": "Ember",
+   "near": "gn-5100619",
+   "near_name": "Long Branch",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 27,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-262-210",
+   "type": "vein",
+   "lat": 41.2475,
+   "lng": -74.77,
+   "name": "Fern Vein",
+   "short": "Fern",
+   "near": "gn-5106279",
+   "near_name": "West Milford",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 55,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-261-209",
+   "type": "quarry",
+   "lat": 40.8225,
+   "lng": -75.1925,
+   "name": "Slate Quarry",
+   "short": "Slate",
+   "near": "gn-5178127",
+   "near_name": "Allentown",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-259-212",
+   "type": "quarry",
+   "lat": 39.81,
+   "lng": -73.79,
+   "name": "Thistle Quarry",
+   "short": "Thistle",
+   "near": "gn-4504476",
+   "near_name": "Toms River",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 20,
+    "main": "stone",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-260-209",
+   "type": "vein",
+   "lat": 40.32,
+   "lng": -75.155,
+   "name": "Granite Vein",
+   "short": "Granite",
+   "near": "gn-5198034",
+   "near_name": "Limerick",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 52,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-259-213",
+   "type": "geode",
+   "lat": 39.83,
+   "lng": -73.3175,
+   "name": "Slate Geode",
+   "short": "Slate",
+   "near": "gn-4504476",
+   "near_name": "Toms River",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false,
+   "mine": {
+    "floors": 66,
+    "main": "gem_local",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-260-214",
+   "type": "vein",
+   "lat": 40.335,
+   "lng": -72.72,
+   "name": "Heron Vein",
+   "short": "Heron",
+   "near": "gn-5138022",
+   "near_name": "Shirley",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 43,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-262-209",
+   "type": "abyss",
+   "lat": 41.355,
+   "lng": -75.14,
+   "name": "Slate Abyss",
+   "short": "Slate",
+   "near": "gn-5211303",
+   "near_name": "Scranton",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false,
+   "mine": {
+    "floors": 112,
+    "main": "core_local",
+    "main_from": 20,
+    "side": "amber",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-263-213",
+   "type": "woodland",
+   "lat": 41.84,
+   "lng": -73.335,
+   "name": "Moss Woods",
+   "short": "Moss",
+   "near": "gn-4845193",
+   "near_name": "Waterbury",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-263-210",
+   "type": "woodland",
+   "lat": 41.86,
+   "lng": -74.725,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-5126842",
+   "near_name": "Middletown",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-258-212",
+   "type": "vein",
+   "lat": 39.335,
+   "lng": -73.7475,
+   "name": "Lark Vein",
+   "short": "Lark",
+   "near": "gn-4500546",
+   "near_name": "Atlantic City",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 60,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-263-209",
+   "type": "waterside",
+   "lat": 41.76,
+   "lng": -75.235,
+   "name": "Cedar Fishing Spot",
+   "short": "Cedar",
+   "near": "gn-5211303",
+   "near_name": "Scranton",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-259-214",
+   "type": "waterside",
+   "lat": 39.71,
+   "lng": -72.7125,
+   "name": "Thistle Fishing Spot",
+   "short": "Thistle",
+   "near": "gn-5138022",
+   "near_name": "Shirley",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-264-211",
+   "type": "waterside",
+   "lat": 42.2875,
+   "lng": -74.3325,
+   "name": "Lark Fishing Spot",
+   "short": "Lark",
+   "near": "gn-5106834",
+   "near_name": "Albany",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-258-210",
+   "type": "woodland",
+   "lat": 39.2275,
+   "lng": -74.7575,
+   "name": "Cedar Woods",
+   "short": "Cedar",
+   "near": "gn-4500546",
+   "near_name": "Atlantic City",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-258-213",
+   "type": "quarry",
+   "lat": 39.23,
+   "lng": -73.1375,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-4500546",
+   "near_name": "Atlantic City",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-283-362",
+   "type": "quarry",
+   "lat": 51.6275,
+   "lng": 1.155,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-2637433",
+   "near_name": "Southend-on-Sea",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "stone",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-281-361",
+   "type": "vein",
+   "lat": 50.745,
+   "lng": 0.84,
+   "name": "Ember Vein",
+   "short": "Ember",
+   "near": "gn-2650497",
+   "near_name": "Eastbourne",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 53,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-281-362",
+   "type": "quarry",
+   "lat": 50.7975,
+   "lng": 1.1275,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-2649258",
+   "near_name": "Folkestone",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "clay",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-280-359",
+   "type": "woodland",
+   "lat": 50.3525,
+   "lng": -0.265,
+   "name": "Slate Woods",
+   "short": "Slate",
+   "near": "gn-2654710",
+   "near_name": "Brighton",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-285-361",
+   "type": "waterside",
+   "lat": 52.7125,
+   "lng": 0.8725,
+   "name": "Flint Fishing Spot",
+   "short": "Flint",
+   "near": "gn-2641181",
+   "near_name": "Norwich",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-280-360",
+   "type": "woodland",
+   "lat": 50.18,
+   "lng": 0.28,
+   "name": "Thistle Woods",
+   "short": "Thistle",
+   "near": "gn-3018794",
+   "near_name": "Fécamp",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-280-357",
+   "type": "woodland",
+   "lat": 50.3125,
+   "lng": -1.2225,
+   "name": "Heron Woods",
+   "short": "Heron",
+   "near": "gn-2638568",
+   "near_name": "Sandown",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-280-358",
+   "type": "quarry",
+   "lat": 50.1625,
+   "lng": -0.8675,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-2638568",
+   "near_name": "Sandown",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "clay",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-280-361",
+   "type": "waterside",
+   "lat": 50.1525,
+   "lng": 0.69,
+   "name": "Willow Fishing Spot",
+   "short": "Willow",
+   "near": "gn-3021411",
+   "near_name": "Dieppe",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-280-356",
+   "type": "woodland",
+   "lat": 50.145,
+   "lng": -1.735,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-3025466",
+   "near_name": "Cherbourg",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-286-362",
+   "type": "vein",
+   "lat": 53.1825,
+   "lng": 1.2425,
+   "name": "Heron Vein",
+   "short": "Heron",
+   "near": "gn-2637762",
+   "near_name": "Skegness",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 40,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-249-639",
+   "type": "quarry",
+   "lat": 34.8125,
+   "lng": 139.705,
+   "name": "Ember Quarry",
+   "short": "Ember",
+   "near": "gn-11612454",
+   "near_name": "Minamibōsō",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-249-640",
+   "type": "vein",
+   "lat": 34.7675,
+   "lng": 140.3075,
+   "name": "Heron Vein",
+   "short": "Heron",
+   "near": "gn-2112309",
+   "near_name": "Katsuura",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 49,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-250-641",
+   "type": "quarry",
+   "lat": 35.215,
+   "lng": 140.85,
+   "name": "Lark Quarry",
+   "short": "Lark",
+   "near": "gn-2112309",
+   "near_name": "Katsuura",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 24,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-252-641",
+   "type": "vein",
+   "lat": 36.29,
+   "lng": 140.8125,
+   "name": "Ember Vein",
+   "short": "Ember",
+   "near": "gn-2111901",
+   "near_name": "Mito",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 52,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-251-642",
+   "type": "woodland",
+   "lat": 35.785,
+   "lng": 141.1775,
+   "name": "Cedar Woods",
+   "short": "Cedar",
+   "near": "gn-6822103",
+   "near_name": "Kamisu",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-250-636",
+   "type": "woodland",
+   "lat": 35.24,
+   "lng": 138.2525,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-1851717",
+   "near_name": "Shizuoka",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-249-641",
+   "type": "vein",
+   "lat": 34.7475,
+   "lng": 140.78,
+   "name": "Flint Vein",
+   "short": "Flint",
+   "near": "gn-2112309",
+   "near_name": "Katsuura",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 59,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-248-639",
+   "type": "woodland",
+   "lat": 34.34,
+   "lng": 139.7025,
+   "name": "Willow Woods",
+   "short": "Willow",
+   "near": "gn-1852357",
+   "near_name": "Shimoda",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-252-642",
+   "type": "waterside",
+   "lat": 36.3525,
+   "lng": 141.1475,
+   "name": "Ash Fishing Spot",
+   "short": "Ash",
+   "near": "gn-2112708",
+   "near_name": "Hitachi",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-250-642",
+   "type": "quarry",
+   "lat": 35.1625,
+   "lng": 141.24,
+   "name": "Lark Quarry",
+   "short": "Lark",
+   "near": "gn-2112309",
+   "near_name": "Katsuura",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 20,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-248-637",
+   "type": "vein",
+   "lat": 34.3675,
+   "lng": 138.8,
+   "name": "Ember Vein",
+   "short": "Ember",
+   "near": "gn-1852357",
+   "near_name": "Shimoda",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 49,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-249-642",
+   "type": "quarry",
+   "lat": 34.7425,
+   "lng": 141.1475,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-2112309",
+   "near_name": "Katsuura",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 26,
+    "main": "coal",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-248-638",
+   "type": "quarry",
+   "lat": 34.175,
+   "lng": 139.3725,
+   "name": "Ash Quarry",
+   "short": "Ash",
+   "near": "gn-1852357",
+   "near_name": "Shimoda",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-248-640",
+   "type": "quarry",
+   "lat": 34.2075,
+   "lng": 140.2375,
+   "name": "Ember Quarry",
+   "short": "Ember",
+   "near": "gn-11612454",
+   "near_name": "Minamibōsō",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "clay",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-254-638",
+   "type": "quarry",
+   "lat": 37.2625,
+   "lng": 139.27,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-6825490",
+   "near_name": "Minamiuonuma",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "clay",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-253-642",
+   "type": "bloom",
+   "lat": 36.6375,
+   "lng": 141.36,
+   "name": "Ember Bloom Field",
+   "short": "Ember",
+   "near": "gn-2112539",
+   "near_name": "Iwaki",
+   "climate": "temperate",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-247-122",
+   "type": "quarry",
+   "lat": 33.7675,
+   "lng": -118.69,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-5367929",
+   "near_name": "Long Beach",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 23,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-248-124",
+   "type": "vein",
+   "lat": 34.335,
+   "lng": -117.7325,
+   "name": "Granite Vein",
+   "short": "Granite",
+   "near": "gn-5384170",
+   "near_name": "Pomona",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 57,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-246-122",
+   "type": "quarry",
+   "lat": 33.345,
+   "lng": -118.635,
+   "name": "Thistle Quarry",
+   "short": "Thistle",
+   "near": "gn-5367929",
+   "near_name": "Long Beach",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 23,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-246-123",
+   "type": "quarry",
+   "lat": 33.2425,
+   "lng": -118.3225,
+   "name": "Thistle Quarry",
+   "short": "Thistle",
+   "near": "gn-5367929",
+   "near_name": "Long Beach",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "clay",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-249-122",
+   "type": "vein",
+   "lat": 34.8325,
+   "lng": -118.7525,
+   "name": "Fern Vein",
+   "short": "Fern",
+   "near": "gn-5393049",
+   "near_name": "Santa Clarita",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 56,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-247-121",
+   "type": "vein",
+   "lat": 33.63,
+   "lng": -119.335,
+   "name": "Granite Vein",
+   "short": "Granite",
+   "near": "gn-5380184",
+   "near_name": "Oxnard",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 56,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-246-121",
+   "type": "woodland",
+   "lat": 33.2425,
+   "lng": -119.2125,
+   "name": "Heron Woods",
+   "short": "Heron",
+   "near": "gn-5380184",
+   "near_name": "Oxnard",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-249-121",
+   "type": "vein",
+   "lat": 34.8375,
+   "lng": -119.2925,
+   "name": "Moss Vein",
+   "short": "Moss",
+   "near": "gn-5392952",
+   "near_name": "Santa Barbara",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 42,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-250-123",
+   "type": "vein",
+   "lat": 35.24,
+   "lng": -118.2825,
+   "name": "Slate Vein",
+   "short": "Slate",
+   "near": "gn-5364940",
+   "near_name": "Lancaster",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 52,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-250-122",
+   "type": "bloom",
+   "lat": 35.22,
+   "lng": -118.67,
+   "name": "Ash Bloom Field",
+   "short": "Ash",
+   "near": "gn-5325738",
+   "near_name": "Bakersfield",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-245-123",
+   "type": "vein",
+   "lat": 32.8025,
+   "lng": -118.1725,
+   "name": "Slate Vein",
+   "short": "Slate",
+   "near": "gn-5378771",
+   "near_name": "Oceanside",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 52,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-245-122",
+   "type": "woodland",
+   "lat": 32.8475,
+   "lng": -118.775,
+   "name": "Fern Woods",
+   "short": "Fern",
+   "near": "gn-5367929",
+   "near_name": "Long Beach",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-250-124",
+   "type": "abyss",
+   "lat": 35.2925,
+   "lng": -117.685,
+   "name": "Ash Abyss",
+   "short": "Ash",
+   "near": "gn-5387494",
+   "near_name": "Ridgecrest",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false,
+   "mine": {
+    "floors": 124,
+    "main": "core_local",
+    "main_from": 20,
+    "side": "turquoise",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-249-120",
+   "type": "quarry",
+   "lat": 34.695,
+   "lng": -119.675,
+   "name": "Flint Quarry",
+   "short": "Flint",
+   "near": "gn-5392952",
+   "near_name": "Santa Barbara",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 20,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-247-120",
+   "type": "vein",
+   "lat": 33.7025,
+   "lng": -119.855,
+   "name": "Heron Vein",
+   "short": "Heron",
+   "near": "gn-5392952",
+   "near_name": "Santa Barbara",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 42,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-249-126",
+   "type": "woodland",
+   "lat": 34.625,
+   "lng": -116.705,
+   "name": "Moss Woods",
+   "short": "Moss",
+   "near": "gn-5326305",
+   "near_name": "Barstow Heights",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-231-200",
+   "type": "quarry",
+   "lat": 25.76,
+   "lng": -79.87,
+   "name": "Flint Quarry",
+   "short": "Flint",
+   "near": "gn-4164138",
+   "near_name": "Miami",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "stone",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-231-198",
+   "type": "vein",
+   "lat": 25.7025,
+   "lng": -80.8175,
+   "name": "Flint Vein",
+   "short": "Flint",
+   "near": "gn-4159050",
+   "near_name": "Homestead",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 55,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-230-200",
+   "type": "bloom",
+   "lat": 25.2425,
+   "lng": -79.83,
+   "name": "Heron Bloom Field",
+   "short": "Heron",
+   "near": "gn-4164138",
+   "near_name": "Miami",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-232-198",
+   "type": "quarry",
+   "lat": 26.2825,
+   "lng": -80.6375,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-4147241",
+   "near_name": "Belle Glade",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 26,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-232-200",
+   "type": "quarry",
+   "lat": 26.3675,
+   "lng": -79.8575,
+   "name": "Fern Quarry",
+   "short": "Fern",
+   "near": "gn-4155966",
+   "near_name": "Fort Lauderdale",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "coal",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-231-201",
+   "type": "waterside",
+   "lat": 25.7225,
+   "lng": -79.23,
+   "name": "Thistle Fishing Spot",
+   "short": "Thistle",
+   "near": "gn-4164138",
+   "near_name": "Miami",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-232-201",
+   "type": "quarry",
+   "lat": 26.3425,
+   "lng": -79.3425,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-3571971",
+   "near_name": "Lucaya",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "coal",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-230-197",
+   "type": "quarry",
+   "lat": 25.3475,
+   "lng": -81.1525,
+   "name": "Flint Quarry",
+   "short": "Flint",
+   "near": "gn-4159050",
+   "near_name": "Homestead",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "stone",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-229-199",
+   "type": "quarry",
+   "lat": 24.795,
+   "lng": -80.2075,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-4159050",
+   "near_name": "Homestead",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 27,
+    "main": "clay",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-231-197",
+   "type": "quarry",
+   "lat": 25.8525,
+   "lng": -81.28,
+   "name": "Fern Quarry",
+   "short": "Fern",
+   "near": "gn-4163388",
+   "near_name": "Marco Island",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 27,
+    "main": "clay",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-232-197",
+   "type": "vein",
+   "lat": 26.225,
+   "lng": -81.2,
+   "name": "Granite Vein",
+   "short": "Granite",
+   "near": "gn-4159553",
+   "near_name": "Immokalee",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 50,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-230-201",
+   "type": "vein",
+   "lat": 25.1325,
+   "lng": -79.26,
+   "name": "Thistle Vein",
+   "short": "Thistle",
+   "near": "gn-4164138",
+   "near_name": "Miami",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 54,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-233-200",
+   "type": "woodland",
+   "lat": 26.86,
+   "lng": -79.715,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-4177887",
+   "near_name": "West Palm Beach",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-229-198",
+   "type": "woodland",
+   "lat": 24.6725,
+   "lng": -80.705,
+   "name": "Cedar Woods",
+   "short": "Cedar",
+   "near": "gn-4159050",
+   "near_name": "Homestead",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-233-201",
+   "type": "waterside",
+   "lat": 26.655,
+   "lng": -79.245,
+   "name": "Thistle Fishing Spot",
+   "short": "Thistle",
+   "near": "gn-3571971",
+   "near_name": "Lucaya",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-229-200",
+   "type": "bloom",
+   "lat": 24.6275,
+   "lng": -79.7175,
+   "name": "Slate Bloom Field",
+   "short": "Slate",
+   "near": "gn-4159050",
+   "near_name": "Homestead",
+   "climate": "subtropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-241-603",
+   "type": "quarry",
+   "lat": 30.8725,
+   "lng": 121.7975,
+   "name": "Slate Quarry",
+   "short": "Slate",
+   "near": "gn-13608000",
+   "near_name": "Jinshan",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "clay",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-243-602",
+   "type": "vein",
+   "lat": 31.6975,
+   "lng": 121.2375,
+   "name": "Slate Vein",
+   "short": "Slate",
+   "near": "gn-13608003",
+   "near_name": "Chongming",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 41,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-242-604",
+   "type": "quarry",
+   "lat": 31.225,
+   "lng": 122.3075,
+   "name": "Lark Quarry",
+   "short": "Lark",
+   "near": "gn-13608003",
+   "near_name": "Chongming",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "stone",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-243-604",
+   "type": "vein",
+   "lat": 31.71,
+   "lng": 122.155,
+   "name": "Ash Vein",
+   "short": "Ash",
+   "near": "gn-13608003",
+   "near_name": "Chongming",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 60,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-243-601",
+   "type": "quarry",
+   "lat": 31.705,
+   "lng": 120.695,
+   "name": "Lark Quarry",
+   "short": "Lark",
+   "near": "gn-1799722",
+   "near_name": "Nantong",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-241-604",
+   "type": "quarry",
+   "lat": 30.67,
+   "lng": 122.2975,
+   "name": "Granite Quarry",
+   "short": "Granite",
+   "near": "gn-1886762",
+   "near_name": "Zhoushan",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-240-603",
+   "type": "woodland",
+   "lat": 30.2425,
+   "lng": 121.75,
+   "name": "Slate Woods",
+   "short": "Slate",
+   "near": "gn-1799397",
+   "near_name": "Ningbo",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-242-605",
+   "type": "vein",
+   "lat": 31.34,
+   "lng": 122.71,
+   "name": "Thistle Vein",
+   "short": "Thistle",
+   "near": "gn-13608003",
+   "near_name": "Chongming",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 48,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-244-603",
+   "type": "waterside",
+   "lat": 32.2525,
+   "lng": 121.8575,
+   "name": "Heron Fishing Spot",
+   "short": "Heron",
+   "near": "gn-1804979",
+   "near_name": "Juegang",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-242-600",
+   "type": "waterside",
+   "lat": 31.1575,
+   "lng": 120.145,
+   "name": "Fern Fishing Spot",
+   "short": "Fern",
+   "near": "gn-1806535",
+   "near_name": "Huzhou",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-241-605",
+   "type": "woodland",
+   "lat": 30.7675,
+   "lng": 122.67,
+   "name": "Fern Woods",
+   "short": "Fern",
+   "near": "gn-1886762",
+   "near_name": "Zhoushan",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-241-600",
+   "type": "woodland",
+   "lat": 30.6575,
+   "lng": 120.3025,
+   "name": "Heron Woods",
+   "short": "Heron",
+   "near": "gn-1806535",
+   "near_name": "Huzhou",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-244-604",
+   "type": "vein",
+   "lat": 32.14,
+   "lng": 122.2675,
+   "name": "Slate Vein",
+   "short": "Slate",
+   "near": "gn-13608003",
+   "near_name": "Chongming",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 43,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-243-605",
+   "type": "woodland",
+   "lat": 31.7175,
+   "lng": 122.68,
+   "name": "Moss Woods",
+   "short": "Moss",
+   "near": "gn-13608003",
+   "near_name": "Chongming",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-245-602",
+   "type": "quarry",
+   "lat": 32.645,
+   "lng": 121.37,
+   "name": "Thistle Quarry",
+   "short": "Thistle",
+   "near": "gn-1804979",
+   "near_name": "Juegang",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "coal",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-245-603",
+   "type": "quarry",
+   "lat": 32.6875,
+   "lng": 121.6725,
+   "name": "Heron Quarry",
+   "short": "Heron",
+   "near": "gn-1804979",
+   "near_name": "Juegang",
+   "climate": "subtropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 30,
+    "main": "stone",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-182-568",
+   "type": "quarry",
+   "lat": 1.2375,
+   "lng": 104.32,
+   "name": "Granite Quarry",
+   "short": "Granite",
+   "near": "gn-1624863",
+   "near_name": "Tanjung Pinang",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 27,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-181-567",
+   "type": "vein",
+   "lat": 0.82,
+   "lng": 103.65,
+   "name": "Ember Vein",
+   "short": "Ember",
+   "near": "gn-1624974",
+   "near_name": "Tanjung Balai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 51,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-183-568",
+   "type": "quarry",
+   "lat": 1.675,
+   "lng": 104.3475,
+   "name": "Thistle Quarry",
+   "short": "Thistle",
+   "near": "gn-1732738",
+   "near_name": "Kota Tinggi",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-181-566",
+   "type": "woodland",
+   "lat": 0.7425,
+   "lng": 103.2325,
+   "name": "Heron Woods",
+   "short": "Heron",
+   "near": "gn-1624974",
+   "near_name": "Tanjung Balai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-182-569",
+   "type": "quarry",
+   "lat": 1.2825,
+   "lng": 104.81,
+   "name": "Lark Quarry",
+   "short": "Lark",
+   "near": "gn-1624863",
+   "near_name": "Tanjung Pinang",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-180-567",
+   "type": "vein",
+   "lat": 0.27,
+   "lng": 103.8125,
+   "name": "Lark Vein",
+   "short": "Lark",
+   "near": "gn-1624974",
+   "near_name": "Tanjung Balai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 53,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-184-568",
+   "type": "woodland",
+   "lat": 2.1725,
+   "lng": 104.365,
+   "name": "Lark Woods",
+   "short": "Lark",
+   "near": "gn-1732826",
+   "near_name": "Mersing",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-183-569",
+   "type": "vein",
+   "lat": 1.6975,
+   "lng": 104.84,
+   "name": "Fern Vein",
+   "short": "Fern",
+   "near": "gn-1624863",
+   "near_name": "Tanjung Pinang",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 55,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-182-565",
+   "type": "woodland",
+   "lat": 1.3625,
+   "lng": 102.775,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-1732687",
+   "near_name": "Batu Pahat",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-180-568",
+   "type": "waterside",
+   "lat": 0.175,
+   "lng": 104.16,
+   "name": "Fern Fishing Spot",
+   "short": "Fern",
+   "near": "gn-1624863",
+   "near_name": "Tanjung Pinang",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-184-566",
+   "type": "waterside",
+   "lat": 2.2725,
+   "lng": 103.19,
+   "name": "Cedar Fishing Spot",
+   "short": "Cedar",
+   "near": "gn-1732811",
+   "near_name": "Kluang",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-180-566",
+   "type": "vein",
+   "lat": 0.2575,
+   "lng": 103.23,
+   "name": "Willow Vein",
+   "short": "Willow",
+   "near": "gn-1624974",
+   "near_name": "Tanjung Balai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 59,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-181-565",
+   "type": "quarry",
+   "lat": 0.6825,
+   "lng": 102.67,
+   "name": "Flint Quarry",
+   "short": "Flint",
+   "near": "gn-1624974",
+   "near_name": "Tanjung Balai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "coal",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-183-570",
+   "type": "woodland",
+   "lat": 1.7025,
+   "lng": 105.1575,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-1624863",
+   "near_name": "Tanjung Pinang",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-184-569",
+   "type": "quarry",
+   "lat": 2.3575,
+   "lng": 104.83,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1732826",
+   "near_name": "Mersing",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-185-567",
+   "type": "quarry",
+   "lat": 2.7275,
+   "lng": 103.6275,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1732826",
+   "near_name": "Mersing",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-220-161",
+   "type": "quarry",
+   "lat": 20.2225,
+   "lng": -99.365,
+   "name": "Slate Quarry",
+   "short": "Slate",
+   "near": "gn-3526708",
+   "near_name": "Ixmiquilpan",
+   "climate": "tropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 24,
+    "main": "stone",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-216-161",
+   "type": "vein",
+   "lat": 18.2175,
+   "lng": -99.1975,
+   "name": "Slate Vein",
+   "short": "Slate",
+   "near": "gn-3526798",
+   "near_name": "Iguala de la Independencia",
+   "climate": "tropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 56,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-221-161",
+   "type": "quarry",
+   "lat": 20.84,
+   "lng": -99.185,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-3526708",
+   "near_name": "Ixmiquilpan",
+   "climate": "tropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-221-160",
+   "type": "quarry",
+   "lat": 20.85,
+   "lng": -99.7075,
+   "name": "Slate Quarry",
+   "short": "Slate",
+   "near": "gn-3518692",
+   "near_name": "San Juan del Río",
+   "climate": "tropical",
+   "continent": "north_america",
+   "open": true,
+   "mine": {
+    "floors": 25,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-221-163",
+   "type": "woodland",
+   "lat": 20.8125,
+   "lng": -98.315,
+   "name": "Thistle Woods",
+   "short": "Thistle",
+   "near": "gn-3526952",
+   "near_name": "Huejutla de Reyes",
+   "climate": "tropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-216-164",
+   "type": "bloom",
+   "lat": 18.2225,
+   "lng": -97.67,
+   "name": "Lark Bloom Field",
+   "short": "Lark",
+   "near": "gn-3516109",
+   "near_name": "Tehuacán",
+   "climate": "tropical",
+   "continent": "north_america",
+   "open": false
+  },
+  {
+   "id": "wd-224-589",
+   "type": "quarry",
+   "lat": 22.1475,
+   "lng": 114.685,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1819729",
+   "near_name": "Hong Kong",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 24,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-223-588",
+   "type": "vein",
+   "lat": 21.75,
+   "lng": 114.25,
+   "name": "Slate Vein",
+   "short": "Slate",
+   "near": "gn-1819729",
+   "near_name": "Hong Kong",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 40,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-223-587",
+   "type": "quarry",
+   "lat": 21.7225,
+   "lng": 113.8625,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-1790437",
+   "near_name": "Zhuhai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-223-589",
+   "type": "quarry",
+   "lat": 21.6475,
+   "lng": 114.7275,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1819729",
+   "near_name": "Hong Kong",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 25,
+    "main": "coal",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-224-586",
+   "type": "woodland",
+   "lat": 22.1575,
+   "lng": 113.16,
+   "name": "Heron Woods",
+   "short": "Heron",
+   "near": "gn-1790437",
+   "near_name": "Zhuhai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-222-588",
+   "type": "vein",
+   "lat": 21.305,
+   "lng": 114.32,
+   "name": "Cedar Vein",
+   "short": "Cedar",
+   "near": "gn-1819729",
+   "near_name": "Hong Kong",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 54,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-223-590",
+   "type": "woodland",
+   "lat": 21.8425,
+   "lng": 115.145,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-1795928",
+   "near_name": "Shanwei",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-222-587",
+   "type": "quarry",
+   "lat": 21.3325,
+   "lng": 113.8075,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1790437",
+   "near_name": "Zhuhai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 25,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-223-586",
+   "type": "vein",
+   "lat": 21.76,
+   "lng": 113.185,
+   "name": "Flint Vein",
+   "short": "Flint",
+   "near": "gn-1790437",
+   "near_name": "Zhuhai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 50,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-224-590",
+   "type": "quarry",
+   "lat": 22.3275,
+   "lng": 115.3425,
+   "name": "Ember Quarry",
+   "short": "Ember",
+   "near": "gn-1795928",
+   "near_name": "Shanwei",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "stone",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-226-589",
+   "type": "bloom",
+   "lat": 23.2875,
+   "lng": 114.655,
+   "name": "Cedar Bloom Field",
+   "short": "Cedar",
+   "near": "gn-1806776",
+   "near_name": "Huizhou",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-222-589",
+   "type": "quarry",
+   "lat": 21.26,
+   "lng": 114.855,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1819729",
+   "near_name": "Hong Kong",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 20,
+    "main": "coal",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-223-585",
+   "type": "waterside",
+   "lat": 21.865,
+   "lng": 112.7975,
+   "name": "Flint Fishing Spot",
+   "short": "Flint",
+   "near": "gn-1796989",
+   "near_name": "Changsha",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-226-590",
+   "type": "quarry",
+   "lat": 23.25,
+   "lng": 115.18,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-1795928",
+   "near_name": "Shanwei",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "clay",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-222-586",
+   "type": "vein",
+   "lat": 21.16,
+   "lng": 113.3725,
+   "name": "Lark Vein",
+   "short": "Lark",
+   "near": "gn-1790437",
+   "near_name": "Zhuhai",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": true,
+   "mine": {
+    "floors": 52,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-224-591",
+   "type": "woodland",
+   "lat": 22.13,
+   "lng": 115.695,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-1795928",
+   "near_name": "Shanwei",
+   "climate": "tropical",
+   "continent": "asia",
+   "open": false
+  },
+  {
+   "id": "wd-298-397",
+   "type": "quarry",
+   "lat": 59.1975,
+   "lng": 18.7825,
+   "name": "Fern Quarry",
+   "short": "Fern",
+   "near": "gn-2673730",
+   "near_name": "Stockholm",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 23,
+    "main": "clay",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-298-394",
+   "type": "vein",
+   "lat": 59.135,
+   "lng": 17.3225,
+   "name": "Fern Vein",
+   "short": "Fern",
+   "near": "gn-2687700",
+   "near_name": "Nyköping",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 57,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-297-396",
+   "type": "woodland",
+   "lat": 58.835,
+   "lng": 18.26,
+   "name": "Willow Woods",
+   "short": "Willow",
+   "near": "gn-2673730",
+   "near_name": "Stockholm",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-299-394",
+   "type": "waterside",
+   "lat": 59.63,
+   "lng": 17.25,
+   "name": "Ash Fishing Spot",
+   "short": "Ash",
+   "near": "gn-2666199",
+   "near_name": "Uppsala",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-298-398",
+   "type": "bloom",
+   "lat": 59.33,
+   "lng": 19.1575,
+   "name": "Willow Bloom Field",
+   "short": "Willow",
+   "near": "gn-2688250",
+   "near_name": "Norrtälje",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-297-397",
+   "type": "geode",
+   "lat": 58.86,
+   "lng": 18.8675,
+   "name": "Ember Geode",
+   "short": "Ember",
+   "near": "gn-2673730",
+   "near_name": "Stockholm",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false,
+   "mine": {
+    "floors": 75,
+    "main": "gem_local",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-297-395",
+   "type": "waterside",
+   "lat": 58.6675,
+   "lng": 17.6875,
+   "name": "Willow Fishing Spot",
+   "short": "Willow",
+   "near": "gn-2687700",
+   "near_name": "Nyköping",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-299-398",
+   "type": "quarry",
+   "lat": 59.72,
+   "lng": 19.245,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-2688250",
+   "near_name": "Norrtälje",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 23,
+    "main": "coal",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-298-393",
+   "type": "bloom",
+   "lat": 59.17,
+   "lng": 16.685,
+   "name": "Heron Bloom Field",
+   "short": "Heron",
+   "near": "gn-2701223",
+   "near_name": "Katrineholm",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-298-399",
+   "type": "woodland",
+   "lat": 59.2275,
+   "lng": 19.625,
+   "name": "Ember Woods",
+   "short": "Ember",
+   "near": "gn-2688250",
+   "near_name": "Norrtälje",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-297-398",
+   "type": "waterside",
+   "lat": 58.805,
+   "lng": 19.3425,
+   "name": "Fern Fishing Spot",
+   "short": "Fern",
+   "near": "gn-2673730",
+   "near_name": "Stockholm",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-300-396",
+   "type": "woodland",
+   "lat": 60.2625,
+   "lng": 18.1475,
+   "name": "Thistle Woods",
+   "short": "Thistle",
+   "near": "gn-2666199",
+   "near_name": "Uppsala",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-300-395",
+   "type": "vein",
+   "lat": 60.2725,
+   "lng": 17.8,
+   "name": "Ember Vein",
+   "short": "Ember",
+   "near": "gn-2666199",
+   "near_name": "Uppsala",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 51,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-299-399",
+   "type": "woodland",
+   "lat": 59.755,
+   "lng": 19.87,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-3041732",
+   "near_name": "Mariehamn",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-296-396",
+   "type": "woodland",
+   "lat": 58.285,
+   "lng": 18.185,
+   "name": "Cedar Woods",
+   "short": "Cedar",
+   "near": "gn-2662689",
+   "near_name": "Visby",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-297-399",
+   "type": "vein",
+   "lat": 58.7075,
+   "lng": 19.7125,
+   "name": "Lark Vein",
+   "short": "Lark",
+   "near": "gn-2673730",
+   "near_name": "Stockholm",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 43,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-290-384",
+   "type": "quarry",
+   "lat": 55.3275,
+   "lng": 12.185,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-2614481",
+   "near_name": "Roskilde",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 24,
+    "main": "rock_salt",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-292-384",
+   "type": "vein",
+   "lat": 56.2075,
+   "lng": 12.2525,
+   "name": "Ash Vein",
+   "short": "Ash",
+   "near": "gn-2706767",
+   "near_name": "Helsingborg",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 49,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-291-387",
+   "type": "waterside",
+   "lat": 55.7925,
+   "lng": 13.6625,
+   "name": "Ash Fishing Spot",
+   "short": "Ash",
+   "near": "gn-2693678",
+   "near_name": "Lund",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-292-383",
+   "type": "woodland",
+   "lat": 56.26,
+   "lng": 11.8375,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-2706767",
+   "near_name": "Helsingborg",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-292-386",
+   "type": "woodland",
+   "lat": 56.33,
+   "lng": 13.3375,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-2708365",
+   "near_name": "Halmstad",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-292-387",
+   "type": "waterside",
+   "lat": 56.275,
+   "lng": 13.7375,
+   "name": "Ash Fishing Spot",
+   "short": "Ash",
+   "near": "gn-2699310",
+   "near_name": "Kristianstad",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-292-382",
+   "type": "vein",
+   "lat": 56.2425,
+   "lng": 11.29,
+   "name": "Fern Vein",
+   "short": "Fern",
+   "near": "gn-2619154",
+   "near_name": "Kalundborg",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 60,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-289-385",
+   "type": "vein",
+   "lat": 54.6425,
+   "lng": 12.755,
+   "name": "Moss Vein",
+   "short": "Moss",
+   "near": "gn-2826287",
+   "near_name": "Stralsund",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 42,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-293-384",
+   "type": "woodland",
+   "lat": 56.705,
+   "lng": 12.125,
+   "name": "Granite Woods",
+   "short": "Granite",
+   "near": "gn-2708365",
+   "near_name": "Halmstad",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-289-386",
+   "type": "quarry",
+   "lat": 54.6925,
+   "lng": 13.2775,
+   "name": "Cedar Quarry",
+   "short": "Cedar",
+   "near": "gn-2826287",
+   "near_name": "Stralsund",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 21,
+    "main": "coal",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-290-388",
+   "type": "vein",
+   "lat": 55.2875,
+   "lng": 14.3175,
+   "name": "Flint Vein",
+   "short": "Flint",
+   "near": "gn-2662149",
+   "near_name": "Ystad",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 55,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "obsidian",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-289-387",
+   "type": "quarry",
+   "lat": 54.755,
+   "lng": 13.78,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-2826287",
+   "near_name": "Stralsund",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "clay",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-293-382",
+   "type": "quarry",
+   "lat": 56.7,
+   "lng": 11.3225,
+   "name": "Ember Quarry",
+   "short": "Ember",
+   "near": "gn-2664996",
+   "near_name": "Varberg",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 29,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-293-383",
+   "type": "quarry",
+   "lat": 56.85,
+   "lng": 11.76,
+   "name": "Thistle Quarry",
+   "short": "Thistle",
+   "near": "gn-2664996",
+   "near_name": "Varberg",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 25,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-289-382",
+   "type": "quarry",
+   "lat": 54.66,
+   "lng": 11.24,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-2615961",
+   "near_name": "Nykøbing Falster",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 26,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-289-388",
+   "type": "vein",
+   "lat": 54.66,
+   "lng": 14.3125,
+   "name": "Ash Vein",
+   "short": "Ash",
+   "near": "gn-3083955",
+   "near_name": "Świnoujście",
+   "climate": "temperate",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 50,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-299-410",
+   "type": "quarry",
+   "lat": 59.8525,
+   "lng": 25.1425,
+   "name": "Willow Quarry",
+   "short": "Willow",
+   "near": "gn-658225",
+   "near_name": "Helsinki",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "clay",
+    "main_from": 1,
+    "side": "obsidian",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-299-409",
+   "type": "vein",
+   "lat": 59.82,
+   "lng": 24.7925,
+   "name": "Granite Vein",
+   "short": "Granite",
+   "near": "gn-658225",
+   "near_name": "Helsinki",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 55,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-299-411",
+   "type": "woodland",
+   "lat": 59.87,
+   "lng": 25.6475,
+   "name": "Slate Woods",
+   "short": "Slate",
+   "near": "gn-658225",
+   "near_name": "Helsinki",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-299-408",
+   "type": "quarry",
+   "lat": 59.7025,
+   "lng": 24.2225,
+   "name": "Ash Quarry",
+   "short": "Ash",
+   "near": "gn-588409",
+   "near_name": "Tallinn",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 25,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-300-412",
+   "type": "vein",
+   "lat": 60.13,
+   "lng": 26.2775,
+   "name": "Granite Vein",
+   "short": "Granite",
+   "near": "gn-660561",
+   "near_name": "Porvoo",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 51,
+    "main": "quartz",
+    "main_from": 10,
+    "side": "turquoise",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-299-412",
+   "type": "quarry",
+   "lat": 59.6325,
+   "lng": 26.305,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-591260",
+   "near_name": "Kohtla-Järve",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 22,
+    "main": "clay",
+    "main_from": 1,
+    "side": "turquoise",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-298-410",
+   "type": "abyss",
+   "lat": 59.2525,
+   "lng": 25.1475,
+   "name": "Heron Abyss",
+   "short": "Heron",
+   "near": "gn-588409",
+   "near_name": "Tallinn",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false,
+   "mine": {
+    "floors": 112,
+    "main": "core_local",
+    "main_from": 20,
+    "side": "amber",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-298-411",
+   "type": "vein",
+   "lat": 59.22,
+   "lng": 25.6375,
+   "name": "Moss Vein",
+   "short": "Moss",
+   "near": "gn-588409",
+   "near_name": "Tallinn",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 47,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "garnet_chip",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-298-408",
+   "type": "woodland",
+   "lat": 59.19,
+   "lng": 24.2225,
+   "name": "Ash Woods",
+   "short": "Ash",
+   "near": "gn-588409",
+   "near_name": "Tallinn",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-302-409",
+   "type": "geode",
+   "lat": 61.24,
+   "lng": 24.8175,
+   "name": "Willow Geode",
+   "short": "Willow",
+   "near": "gn-659180",
+   "near_name": "Hämeenlinna",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false,
+   "mine": {
+    "floors": 65,
+    "main": "gem_local",
+    "main_from": 10,
+    "side": "jade_chip",
+    "open_to": 0
+   }
+  },
+  {
+   "id": "wd-298-407",
+   "type": "quarry",
+   "lat": 59.2575,
+   "lng": 23.645,
+   "name": "Granite Quarry",
+   "short": "Granite",
+   "near": "gn-588409",
+   "near_name": "Tallinn",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 26,
+    "main": "clay",
+    "main_from": 1,
+    "side": "jade_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-302-407",
+   "type": "woodland",
+   "lat": 61.1475,
+   "lng": 23.6825,
+   "name": "Flint Woods",
+   "short": "Flint",
+   "near": "gn-659935",
+   "near_name": "Forssa",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-298-412",
+   "type": "bloom",
+   "lat": 59.22,
+   "lng": 26.255,
+   "name": "Flint Bloom Field",
+   "short": "Flint",
+   "near": "gn-591260",
+   "near_name": "Kohtla-Järve",
+   "climate": "cool",
+   "continent": "europe",
+   "open": false
+  },
+  {
+   "id": "wd-302-408",
+   "type": "quarry",
+   "lat": 61.3275,
+   "lng": 24.2275,
+   "name": "Fern Quarry",
+   "short": "Fern",
+   "near": "gn-634963",
+   "near_name": "Tampere",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 28,
+    "main": "copper_ore",
+    "main_from": 1,
+    "side": "amber",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-298-406",
+   "type": "vein",
+   "lat": 59.255,
+   "lng": 23.235,
+   "name": "Willow Vein",
+   "short": "Willow",
+   "near": "gn-639853",
+   "near_name": "Raseborg",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 57,
+    "main": "iron_ore",
+    "main_from": 10,
+    "side": "amber",
+    "open_to": 40
+   }
+  },
+  {
+   "id": "wd-297-408",
+   "type": "quarry",
+   "lat": 58.8625,
+   "lng": 24.315,
+   "name": "Moss Quarry",
+   "short": "Moss",
+   "near": "gn-589580",
+   "near_name": "Pärnu",
+   "climate": "cool",
+   "continent": "europe",
+   "open": true,
+   "mine": {
+    "floors": 24,
+    "main": "clay",
+    "main_from": 1,
+    "side": "garnet_chip",
+    "open_to": null
+   }
+  },
+  {
+   "id": "wd-243-120",
+   "type": "ruin",
+   "lat": 31.6,
+   "lng": -119.8,
+   "name": "Pacific Ruin",
+   "short": "Pacific",
+   "near": "gn-5391959",
+   "near_name": "San Francisco",
+   "climate": "temperate",
+   "continent": "north_america",
+   "open": false,
+   "mine": {
+    "floors": 30,
+    "main": "relic_local",
+    "main_from": 10,
+    "side": null,
+    "open_to": 0
+   }
+  }
+ ],
+ "gather": {
+  "gn-5391959": [
+   {
+    "id": "gn-5391959~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 37.77724,
+    "lng": -122.37758,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 37.81059,
+    "lng": -122.40027,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 37.74375,
+    "lng": -122.40268,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 37.77919,
+    "lng": -122.38542,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 37.76664,
+    "lng": -122.46484,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 37.77825,
+    "lng": -122.37139,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 37.74496,
+    "lng": -122.38872,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 37.80258,
+    "lng": -122.38792,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 37.7725,
+    "lng": -122.4545,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 37.76511,
+    "lng": -122.41073,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 37.73222,
+    "lng": -122.40892,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 37.75559,
+    "lng": -122.411,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 37.76312,
+    "lng": -122.43027,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5391959~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 37.77928,
+    "lng": -122.38463,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-5128581": [
+   {
+    "id": "gn-5128581~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 40.70339,
+    "lng": -74.02248,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 40.73401,
+    "lng": -74.04316,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 40.72807,
+    "lng": -74.01224,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 40.68681,
+    "lng": -73.96975,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 40.70251,
+    "lng": -74.03284,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 40.71291,
+    "lng": -73.98024,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 40.6925,
+    "lng": -73.98939,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 40.69335,
+    "lng": -73.95618,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 40.74695,
+    "lng": -74.02166,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 40.73881,
+    "lng": -73.95972,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 40.71497,
+    "lng": -73.95273,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 40.71711,
+    "lng": -73.99444,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 40.73189,
+    "lng": -73.97512,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5128581~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 40.71802,
+    "lng": -73.98272,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-2643743": [
+   {
+    "id": "gn-2643743~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 51.51161,
+    "lng": -0.11137,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 51.49622,
+    "lng": -0.0995,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 51.52486,
+    "lng": -0.08827,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 51.52813,
+    "lng": -0.14042,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 51.50806,
+    "lng": -0.10419,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 51.51321,
+    "lng": -0.10615,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 51.48424,
+    "lng": -0.18147,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 51.49962,
+    "lng": -0.09031,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 51.49919,
+    "lng": -0.14241,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 51.50781,
+    "lng": -0.10913,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 51.5249,
+    "lng": -0.09083,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 51.50139,
+    "lng": -0.08823,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 51.51299,
+    "lng": -0.14044,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2643743~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 51.4759,
+    "lng": -0.15131,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-1850147": [
+   {
+    "id": "gn-1850147~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 35.69746,
+    "lng": 139.68191,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 35.68246,
+    "lng": 139.7184,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 35.70245,
+    "lng": 139.65414,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 35.67954,
+    "lng": 139.69769,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 35.6608,
+    "lng": 139.70457,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 35.6863,
+    "lng": 139.71658,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 35.69301,
+    "lng": 139.71899,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 35.67673,
+    "lng": 139.70799,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 35.68265,
+    "lng": 139.67361,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 35.70207,
+    "lng": 139.70666,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 35.70357,
+    "lng": 139.68739,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 35.67839,
+    "lng": 139.70059,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 35.67557,
+    "lng": 139.64189,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1850147~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 35.68115,
+    "lng": 139.69718,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-5368361": [
+   {
+    "id": "gn-5368361~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 34.03172,
+    "lng": -118.2152,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 34.09179,
+    "lng": -118.22341,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 34.04314,
+    "lng": -118.22304,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 34.03067,
+    "lng": -118.23155,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 34.0736,
+    "lng": -118.25156,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 34.03467,
+    "lng": -118.24857,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 34.05289,
+    "lng": -118.25899,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 34.04768,
+    "lng": -118.20899,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 34.05398,
+    "lng": -118.21353,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 34.04139,
+    "lng": -118.22631,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 34.06333,
+    "lng": -118.29367,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 34.055,
+    "lng": -118.23118,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 34.0325,
+    "lng": -118.20243,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-5368361~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 34.0652,
+    "lng": -118.26604,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-4164138": [
+   {
+    "id": "gn-4164138~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 25.76653,
+    "lng": -80.22011,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 25.74751,
+    "lng": -80.23036,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 25.75456,
+    "lng": -80.18655,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 25.76703,
+    "lng": -80.17157,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 25.76852,
+    "lng": -80.21028,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 25.74713,
+    "lng": -80.18725,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 25.80259,
+    "lng": -80.22403,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 25.7533,
+    "lng": -80.16161,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 25.75463,
+    "lng": -80.1726,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 25.81153,
+    "lng": -80.20954,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 25.80009,
+    "lng": -80.19923,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 25.79386,
+    "lng": -80.14906,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 25.79157,
+    "lng": -80.17232,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-4164138~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 25.79815,
+    "lng": -80.17644,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-1796236": [
+   {
+    "id": "gn-1796236~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 31.22067,
+    "lng": 121.40615,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 31.21017,
+    "lng": 121.47167,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 31.23511,
+    "lng": 121.49537,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 31.20433,
+    "lng": 121.4303,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 31.21604,
+    "lng": 121.4803,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 31.24348,
+    "lng": 121.47892,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 31.24821,
+    "lng": 121.42547,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 31.22305,
+    "lng": 121.43016,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 31.24647,
+    "lng": 121.44484,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 31.23125,
+    "lng": 121.4418,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 31.18849,
+    "lng": 121.47164,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 31.21421,
+    "lng": 121.49861,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 31.20621,
+    "lng": 121.466,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1796236~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 31.21994,
+    "lng": 121.47705,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-1880252": [
+   {
+    "id": "gn-1880252~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 1.29344,
+    "lng": 103.86324,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 1.27116,
+    "lng": 103.853,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 1.28837,
+    "lng": 103.8127,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 1.32845,
+    "lng": 103.83198,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 1.30608,
+    "lng": 103.83477,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 1.29496,
+    "lng": 103.84223,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 1.27765,
+    "lng": 103.80814,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 1.27262,
+    "lng": 103.83576,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 1.25645,
+    "lng": 103.87603,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 1.27608,
+    "lng": 103.8419,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 1.31391,
+    "lng": 103.86242,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 1.28901,
+    "lng": 103.86258,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 1.26383,
+    "lng": 103.8469,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1880252~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 1.29534,
+    "lng": 103.82892,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-3530597": [
+   {
+    "id": "gn-3530597~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 19.42095,
+    "lng": -99.14093,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 19.41503,
+    "lng": -99.12071,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 19.45495,
+    "lng": -99.1496,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 19.41507,
+    "lng": -99.09718,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 19.46989,
+    "lng": -99.137,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 19.44266,
+    "lng": -99.13781,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 19.44352,
+    "lng": -99.16037,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 19.45782,
+    "lng": -99.15989,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 19.44367,
+    "lng": -99.14984,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 19.42072,
+    "lng": -99.1394,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 19.41925,
+    "lng": -99.15963,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 19.42847,
+    "lng": -99.09824,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 19.4487,
+    "lng": -99.11029,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-3530597~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 19.44233,
+    "lng": -99.09615,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-1819729": [
+   {
+    "id": "gn-1819729~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 22.29567,
+    "lng": 114.17338,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 22.30068,
+    "lng": 114.15053,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 22.25994,
+    "lng": 114.14833,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 22.26651,
+    "lng": 114.18396,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 22.31198,
+    "lng": 114.18242,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 22.30863,
+    "lng": 114.1491,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 22.2423,
+    "lng": 114.1706,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 22.30068,
+    "lng": 114.18254,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 22.29999,
+    "lng": 114.18767,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 22.26238,
+    "lng": 114.17409,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 22.26381,
+    "lng": 114.16564,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 22.25494,
+    "lng": 114.18439,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 22.30861,
+    "lng": 114.18926,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-1819729~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 22.25324,
+    "lng": 114.19229,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-2673730": [
+   {
+    "id": "gn-2673730~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 59.33834,
+    "lng": 17.99828,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 59.34615,
+    "lng": 18.07451,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 59.30482,
+    "lng": 18.06108,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 59.33068,
+    "lng": 18.02021,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 59.34411,
+    "lng": 18.13066,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 59.32673,
+    "lng": 18.12818,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 59.31795,
+    "lng": 18.06949,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 59.34517,
+    "lng": 18.06436,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 59.30642,
+    "lng": 18.07584,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 59.32842,
+    "lng": 18.10469,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 59.34704,
+    "lng": 18.10717,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 59.3481,
+    "lng": 18.0899,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 59.35068,
+    "lng": 18.09282,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2673730~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 59.34645,
+    "lng": 18.03524,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-2618425": [
+   {
+    "id": "gn-2618425~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 55.69071,
+    "lng": 12.51182,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 55.64287,
+    "lng": 12.53565,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 55.69546,
+    "lng": 12.52428,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 55.6941,
+    "lng": 12.55506,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 55.66171,
+    "lng": 12.56641,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 55.68359,
+    "lng": 12.51823,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 55.65778,
+    "lng": 12.49646,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 55.68709,
+    "lng": 12.56097,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 55.65346,
+    "lng": 12.49649,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 55.67594,
+    "lng": 12.4997,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 55.69929,
+    "lng": 12.61853,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 55.68085,
+    "lng": 12.51612,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 55.66988,
+    "lng": 12.54832,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-2618425~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 55.65992,
+    "lng": 12.55738,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ],
+  "gn-658225": [
+   {
+    "id": "gn-658225~wood0",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 60.1773,
+    "lng": 24.97229,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~wood1",
+    "kind": "wood",
+    "tier": "T1",
+    "name": "Timber Grove",
+    "lat": 60.14316,
+    "lng": 24.88604,
+    "yield": [
+     [
+      "wood",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~stone0",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 60.21323,
+    "lng": 24.92776,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~stone1",
+    "kind": "stone",
+    "tier": "T1",
+    "name": "Rock Pile",
+    "lat": 60.18022,
+    "lng": 24.92632,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~reed0",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 60.18747,
+    "lng": 24.97846,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~reed1",
+    "kind": "reed",
+    "tier": "T1",
+    "name": "Reed Bank",
+    "lat": 60.15299,
+    "lng": 24.96753,
+    "yield": [
+     [
+      "fiber",
+      4
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~clay0",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 60.15763,
+    "lng": 24.88645,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~clay1",
+    "kind": "clay",
+    "tier": "T1",
+    "name": "Clay Bank",
+    "lat": 60.17803,
+    "lng": 24.94417,
+    "yield": [
+     [
+      "clay",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~herb0",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 60.15244,
+    "lng": 24.92087,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~herb1",
+    "kind": "herb",
+    "tier": "T1",
+    "name": "Herb Patch",
+    "lat": 60.19181,
+    "lng": 24.8951,
+    "yield": [
+     [
+      "wild_herb",
+      4
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~hardwood0",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 60.18821,
+    "lng": 24.97717,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~hardwood1",
+    "kind": "hardwood",
+    "tier": "T2",
+    "name": "Old Tree",
+    "lat": 60.16952,
+    "lng": 25.003,
+    "yield": [
+     [
+      "hardwood",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~flax0",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 60.16751,
+    "lng": 24.90255,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   },
+   {
+    "id": "gn-658225~flax1",
+    "kind": "flax",
+    "tier": "T2",
+    "name": "Flax Field",
+    "lat": 60.14594,
+    "lng": 24.92794,
+    "yield": [
+     [
+      "flax",
+      3
+     ]
+    ],
+    "energy": 3,
+    "cooldown_h": 4
+   }
+  ]
+ }
+}

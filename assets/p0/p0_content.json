@@ -2112,13 +2112,19 @@
   },
   "wallet_floor": 40,
   "homestead": {
-    "_p1": "SGODOT-282: Lv1–10 from Li Bai's P1 table (docs/product/p1-content-2026-10-10/homestead.json, 337d72f9; plan §8.2.1 / §8.3). Ladders are [from level, value].",
-    "max_level": 10,
+    "_p1": "v4q(1) (SGODOT-355 b1, pending approval): Lv1–17 at r9's design values (v4 §2.3, the batch-1 bridge rows for Lv16–17), to be calibrated. skills: each skill's own gate (Cooking from Lv6); travel (Lv16 on): city stamps and other climate bands; energy: what a level gives back, always a number (Lv2–15 50, Lv16 on 0). Ladders are [from level, value]. Pending the user: Lv3's gate 2 / 1 or 1 / 1 (丁1), Lv8's vein_mines / iron_sword (丁12, not listed yet), Lv13–14's decor sets (丁4: not in batch 1). Lv4's potion_heal is v4q(7)'s Healing Potion.",
+    "max_level": 17,
     "warming_cabinet": 6,
-    "per_level": {
-      "energy": 10,
-      "meals": 10
-    },
+    "energy_steps": [
+      [
+        2,
+        10
+      ],
+      [
+        11,
+        5
+      ]
+    ],
     "board_slots": [
       [
         1,
@@ -2141,6 +2147,10 @@
       [
         8,
         3
+      ],
+      [
+        17,
+        4
       ]
     ],
     "warming_cabinet_by_level": [
@@ -2149,25 +2159,106 @@
         6
       ],
       [
-        8,
+        9,
         12
       ]
     ],
     "perennial_slots": {
       "base": 1,
       "per_level": 1,
-      "max": 8
+      "max": 8,
+      "raise": [
+        [
+          14,
+          10
+        ]
+      ]
     },
     "sprinkler_max": {
       "base": 3,
       "per_level": 1,
-      "max": 10
+      "max": 10,
+      "raise": [
+        [
+          14,
+          12
+        ]
+      ]
     },
     "decor_max": {
       "base": 20,
       "per_level": 4
     },
-    "plots": [[1, 8], [2, 10], [3, 12], [4, 14], [5, 16], [6, 18], [7, 20], [8, 22], [9, 24], [10, 26], [11, 28], [12, 30], [13, 32], [14, 34], [15, 36], [16, 39], [17, 41]],
+    "plots": [
+      [
+        1,
+        8
+      ],
+      [
+        2,
+        10
+      ],
+      [
+        3,
+        12
+      ],
+      [
+        4,
+        14
+      ],
+      [
+        5,
+        16
+      ],
+      [
+        6,
+        18
+      ],
+      [
+        7,
+        20
+      ],
+      [
+        8,
+        22
+      ],
+      [
+        9,
+        24
+      ],
+      [
+        10,
+        26
+      ],
+      [
+        11,
+        28
+      ],
+      [
+        12,
+        30
+      ],
+      [
+        13,
+        32
+      ],
+      [
+        14,
+        34
+      ],
+      [
+        15,
+        36
+      ],
+      [
+        16,
+        39
+      ],
+      [
+        17,
+        41
+      ]
+    ],
     "_plots_note": "SGODOT-355 b1 (v4 2.5): the Plots an annual may stand on, by Homestead level — 8 at Lv1, +2 a level to 36 at Lv15, 39 at Lv16, 41 at Lv17. Trees and sprinklers open a bed of their own beside them (content.garden.plots).",
     "rooms": [
       [
@@ -2179,7 +2270,7 @@
         "standard"
       ],
       [
-        10,
+        12,
         "deluxe"
       ]
     ],
@@ -2201,7 +2292,7 @@
         3
       ],
       [
-        10,
+        15,
         4
       ]
     ],
@@ -2210,7 +2301,10 @@
       {
         "level": 2,
         "coins": 40,
-        "skills": 3,
+        "skills": {
+          "farming": 1,
+          "fishing": 1
+        },
         "materials": [
           [
             "wood",
@@ -2226,23 +2320,25 @@
           ]
         ],
         "unlocks": [
-          "spice_rack",
-          "clay_bank"
+          "spice_rack"
         ],
-        "energy": 40
+        "energy": 50
       },
       {
         "level": 3,
-        "coins": 80,
-        "skills": 4,
+        "coins": 60,
+        "skills": {
+          "farming": 2,
+          "fishing": 1
+        },
         "materials": [
           [
             "stone",
             8
           ],
           [
-            "copper_ore",
-            2
+            "wood",
+            4
           ],
           [
             "clay",
@@ -2250,296 +2346,697 @@
           ]
         ],
         "unlocks": [
-          "warming_cabinet",
           "bag_upgrade_1",
+          "warming_cabinet",
           "board_slot_3",
           "fence",
-          "old_tree",
-          "plots_40"
+          "pip_first_dive"
         ],
-        "energy": 40
+        "energy": 50
       },
       {
         "level": 4,
-        "coins": 300,
-        "skills": 6,
+        "coins": 70,
+        "skills": {
+          "farming": 2,
+          "fishing": 2
+        },
         "materials": [
           [
             "wood",
-            12
-          ],
-          [
-            "stone",
-            10
+            8
           ],
           [
             "fiber",
+            4
+          ],
+          [
+            "stone",
             6
           ],
           [
-            "copper_ore",
-            4
+            "clay",
+            3
           ],
           [
-            "clay",
-            4
+            "copper_ore",
+            3
           ],
           [
             "rock_salt",
-            3
+            1
           ]
         ],
         "unlocks": [
           "second_stove",
-          "long_haul_ticket"
+          "potion_heal"
         ],
-        "energy": 40
+        "energy": 50
       },
       {
         "level": 5,
-        "coins": 450,
-        "skills": 8,
+        "coins": 80,
+        "skills": {
+          "farming": 3,
+          "fishing": 2
+        },
         "materials": [
           [
             "wood",
-            12
-          ],
-          [
-            "stone",
-            10
+            8
           ],
           [
             "fiber",
-            7
+            4
           ],
           [
-            "copper_ore",
-            6
+            "stone",
+            5
           ],
           [
             "clay",
+            3
+          ],
+          [
+            "copper_ore",
+            3
+          ],
+          [
+            "rock_salt",
+            1
+          ],
+          [
+            "coal",
+            2
+          ]
+        ],
+        "unlocks": [
+          "porch",
+          "notice_board",
+          "standard_room"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 6,
+        "coins": 80,
+        "skills": {
+          "farming": 3,
+          "fishing": 3,
+          "cooking": 2
+        },
+        "materials": [
+          [
+            "wood",
+            8
+          ],
+          [
+            "fiber",
+            4
+          ],
+          [
+            "stone",
             5
+          ],
+          [
+            "clay",
+            3
+          ],
+          [
+            "copper_ore",
+            3
+          ],
+          [
+            "rock_salt",
+            1
+          ],
+          [
+            "coal",
+            2
+          ]
+        ],
+        "unlocks": [
+          "big_pot"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 7,
+        "coins": 80,
+        "skills": {
+          "farming": 4,
+          "fishing": 3,
+          "cooking": 3
+        },
+        "materials": [
+          [
+            "wood",
+            8
+          ],
+          [
+            "fiber",
+            4
+          ],
+          [
+            "stone",
+            5
+          ],
+          [
+            "clay",
+            3
+          ],
+          [
+            "copper_ore",
+            3
+          ],
+          [
+            "rock_salt",
+            1
+          ],
+          [
+            "coal",
+            2
+          ]
+        ],
+        "unlocks": [
+          "bag_upgrade_2",
+          "orchard_8",
+          "sprinklers_10"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 8,
+        "coins": 80,
+        "skills": {
+          "farming": 4,
+          "fishing": 4,
+          "cooking": 4
+        },
+        "materials": [
+          [
+            "wood",
+            3
+          ],
+          [
+            "fiber",
+            2
+          ],
+          [
+            "stone",
+            3
+          ],
+          [
+            "clay",
+            2
+          ],
+          [
+            "hardwood",
+            3
+          ],
+          [
+            "flax",
+            2
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            2
           ],
           [
             "quartz",
             1
           ],
           [
-            "rock_salt",
-            2
+            "coal",
+            1
           ]
         ],
         "unlocks": [
-          "notice_board",
-          "trip_7",
-          "porch",
-          "standard_room"
+          "kitchen_extension",
+          "third_stove"
         ],
-        "energy": "full"
-      },
-      {
-        "level": 6,
-        "coins": 800,
-        "skills": 10,
-        "materials": [
-          [
-            "wood",
-            16
-          ],
-          [
-            "stone",
-            14
-          ],
-          [
-            "fiber",
-            10
-          ],
-          [
-            "copper_ore",
-            8
-          ],
-          [
-            "clay",
-            6
-          ],
-          [
-            "quartz",
-            2
-          ],
-          [
-            "hardwood",
-            2
-          ]
-        ],
-        "unlocks": [
-          "big_pot",
-          "bag_upgrade_2"
-        ],
-        "energy": "full"
-      },
-      {
-        "level": 7,
-        "coins": 1300,
-        "skills": 12,
-        "materials": [
-          [
-            "wood",
-            20
-          ],
-          [
-            "stone",
-            20
-          ],
-          [
-            "fiber",
-            10
-          ],
-          [
-            "copper_ore",
-            12
-          ],
-          [
-            "clay",
-            8
-          ],
-          [
-            "quartz",
-            4
-          ],
-          [
-            "hardwood",
-            4
-          ]
-        ],
-        "unlocks": [
-          "orchard_8",
-          "sprinklers_10",
-          "plots_48"
-        ],
-        "energy": "full"
-      },
-      {
-        "level": 8,
-        "coins": 1800,
-        "skills": 14,
-        "materials": [
-          [
-            "wood",
-            18
-          ],
-          [
-            "stone",
-            18
-          ],
-          [
-            "fiber",
-            8
-          ],
-          [
-            "copper_ore",
-            12
-          ],
-          [
-            "clay",
-            8
-          ],
-          [
-            "quartz",
-            4
-          ],
-          [
-            "hardwood",
-            6
-          ]
-        ],
-        "unlocks": [
-          "third_stove",
-          "warming_cabinet_12",
-          "stall_upgrade",
-          "kitchen_extension"
-        ],
-        "energy": "full"
+        "energy": 50
       },
       {
         "level": 9,
-        "coins": 2300,
-        "skills": 16,
+        "coins": 85,
+        "skills": {
+          "farming": 4,
+          "fishing": 5,
+          "cooking": 4
+        },
         "materials": [
           [
             "wood",
-            14
-          ],
-          [
-            "stone",
-            16
+            3
           ],
           [
             "fiber",
-            6
+            2
           ],
           [
-            "copper_ore",
-            12
+            "stone",
+            3
           ],
           [
             "clay",
-            4
-          ],
-          [
-            "quartz",
-            4
+            2
           ],
           [
             "hardwood",
-            7
+            3
+          ],
+          [
+            "flax",
+            2
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            2
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            1
+          ]
+        ],
+        "unlocks": [
+          "warming_cabinet_12",
+          "stall_upgrade"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 10,
+        "coins": 90,
+        "skills": {
+          "farming": 4,
+          "fishing": 5,
+          "cooking": 5
+        },
+        "materials": [
+          [
+            "wood",
+            3
+          ],
+          [
+            "fiber",
+            2
+          ],
+          [
+            "stone",
+            3
+          ],
+          [
+            "clay",
+            2
+          ],
+          [
+            "hardwood",
+            3
+          ],
+          [
+            "flax",
+            2
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            2
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            1
+          ]
+        ],
+        "unlocks": [
+          "chefs_sign"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 11,
+        "coins": 115,
+        "skills": {
+          "farming": 4,
+          "fishing": 6,
+          "cooking": 5
+        },
+        "materials": [
+          [
+            "wood",
+            3
+          ],
+          [
+            "fiber",
+            2
+          ],
+          [
+            "stone",
+            2
+          ],
+          [
+            "clay",
+            2
+          ],
+          [
+            "hardwood",
+            3
+          ],
+          [
+            "flax",
+            2
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            1
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            1
           ]
         ],
         "unlocks": [
           "bag_upgrade_3"
         ],
-        "energy": "full"
+        "energy": 50
       },
       {
-        "level": 10,
-        "coins": 3000,
-        "skills": 19,
+        "level": 12,
+        "coins": 120,
+        "skills": {
+          "farming": 5,
+          "fishing": 6,
+          "cooking": 6
+        },
         "materials": [
           [
             "wood",
-            10
-          ],
-          [
-            "stone",
-            16
+            3
           ],
           [
             "fiber",
-            6
+            2
           ],
           [
-            "copper_ore",
-            13
+            "stone",
+            2
           ],
           [
             "clay",
+            2
+          ],
+          [
+            "hardwood",
+            3
+          ],
+          [
+            "flax",
+            2
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            1
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            1
+          ]
+        ],
+        "unlocks": [
+          "deluxe_room"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 13,
+        "coins": 150,
+        "skills": {
+          "farming": 5,
+          "fishing": 6,
+          "cooking": 6
+        },
+        "materials": [
+          [
+            "wood",
+            4
+          ],
+          [
+            "fiber",
+            2
+          ],
+          [
+            "stone",
+            3
+          ],
+          [
+            "clay",
+            2
+          ],
+          [
+            "hardwood",
+            4
+          ],
+          [
+            "flax",
+            3
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            2
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            1
+          ]
+        ],
+        "unlocks": [],
+        "energy": 50
+      },
+      {
+        "level": 14,
+        "coins": 175,
+        "skills": {
+          "farming": 5,
+          "fishing": 6,
+          "cooking": 7
+        },
+        "materials": [
+          [
+            "wood",
+            4
+          ],
+          [
+            "fiber",
+            3
+          ],
+          [
+            "stone",
+            3
+          ],
+          [
+            "clay",
+            2
+          ],
+          [
+            "hardwood",
+            4
+          ],
+          [
+            "flax",
+            3
+          ],
+          [
+            "copper_ore",
+            1
+          ],
+          [
+            "iron_ore",
+            2
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            2
+          ]
+        ],
+        "unlocks": [
+          "orchard_10",
+          "sprinklers_12"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 15,
+        "coins": 220,
+        "skills": {
+          "farming": 6,
+          "fishing": 7,
+          "cooking": 7
+        },
+        "materials": [
+          [
+            "wood",
+            5
+          ],
+          [
+            "fiber",
+            3
+          ],
+          [
+            "stone",
+            4
+          ],
+          [
+            "clay",
+            3
+          ],
+          [
+            "hardwood",
+            5
+          ],
+          [
+            "flax",
+            4
+          ],
+          [
+            "copper_ore",
+            2
+          ],
+          [
+            "iron_ore",
+            2
+          ],
+          [
+            "quartz",
+            1
+          ],
+          [
+            "coal",
+            2
+          ]
+        ],
+        "unlocks": [
+          "master_farmhouse",
+          "title_homestead_master"
+        ],
+        "energy": 50
+      },
+      {
+        "level": 16,
+        "coins": 280,
+        "skills": {
+          "farming": 6,
+          "fishing": 7,
+          "cooking": 8
+        },
+        "travel": {
+          "stamps": 6,
+          "climates": 1
+        },
+        "materials": [
+          [
+            "hardwood",
+            13
+          ],
+          [
+            "flax",
+            9
+          ],
+          [
+            "iron_ore",
             4
           ],
           [
             "quartz",
-            5
-          ],
-          [
-            "hardwood",
-            8
+            2
           ]
         ],
         "unlocks": [
-          "chefs_sign",
-          "master_farmhouse",
-          "deluxe_room",
-          "title_homestead_master"
+          "bag_upgrade_4",
+          "travel_gates"
         ],
-        "energy": "full"
+        "energy": 0
+      },
+      {
+        "level": 17,
+        "coins": 400,
+        "skills": {
+          "farming": 7,
+          "fishing": 8,
+          "cooking": 8
+        },
+        "travel": {
+          "stamps": 8,
+          "climates": 2
+        },
+        "materials": [
+          [
+            "hardwood",
+            16
+          ],
+          [
+            "flax",
+            11
+          ],
+          [
+            "iron_ore",
+            5
+          ],
+          [
+            "quartz",
+            3
+          ]
+        ],
+        "unlocks": [
+          "fourth_stove"
+        ],
+        "energy": 0
       }
     ],
     "_p2_only": {
@@ -2548,11 +3045,13 @@
       "helpers": "Lv1–3 1 / Lv4–7 2 / Lv8–10 3（P2 社交）"
     },
     "_unlock_notes": {
-      "long_haul_ticket": "P2 第二版（收费旅行）才生效；P1 免费版只显示资格",
-      "trip_7": "同上",
       "porch": "阶段 2 外观（a / b 二选一卡随布置模式）",
       "kitchen_extension": "阶段 3 外观",
-      "master_farmhouse": "阶段 4 外观"
+      "master_farmhouse": "阶段 4 外观（v4q(1)：Lv10 → Lv15）",
+      "pip_first_dive": "G（v4q(7)）的 Pip 委托，无界面行",
+      "potion_heal": "驿站上架回血药（v4q(7)：itemKind 认 potion_*）",
+      "travel_gates": "出门门槛开始，无界面行",
+      "stall_upgrade": "仍无界面行（不知火舞 282）"
     }
   },
   "bag_upgrades": [
@@ -2560,7 +3059,7 @@
       "id": "bag_upgrade_1",
       "name": "Bag Upgrade I",
       "homestead": 3,
-      "price": 150,
+      "price": 60,
       "materials": [
         [
           "fiber",
@@ -2576,8 +3075,8 @@
     {
       "id": "bag_upgrade_2",
       "name": "Bag Upgrade II",
-      "homestead": 6,
-      "price": 400,
+      "homestead": 7,
+      "price": 150,
       "materials": [
         [
           "hardwood",
@@ -2598,8 +3097,8 @@
     {
       "id": "bag_upgrade_3",
       "name": "Bag Upgrade III",
-      "homestead": 9,
-      "price": 1000,
+      "homestead": 11,
+      "price": 300,
       "materials": [
         [
           "hardwood",
@@ -2616,6 +3115,28 @@
       ],
       "capacity": 40,
       "requires": "bag_upgrade_2"
+    },
+    {
+      "id": "bag_upgrade_4",
+      "name": "Bag Upgrade IV",
+      "homestead": 16,
+      "price": 600,
+      "materials": [
+        [
+          "hardwood",
+          10
+        ],
+        [
+          "flax",
+          8
+        ],
+        [
+          "iron_ore",
+          4
+        ]
+      ],
+      "capacity": 45,
+      "requires": "bag_upgrade_3"
     }
   ],
   "drinks": {
@@ -2744,6 +3265,12 @@
     },
     "request_bonus": {
       "cap": 100,
+      "by_homestead": [
+        [
+          1,
+          100
+        ]
+      ],
       "scope": "all requests"
     },
     "sys_requests": {

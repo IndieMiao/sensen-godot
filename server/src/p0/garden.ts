@@ -11,7 +11,7 @@
 import { createHash } from 'node:crypto';
 import type { Crop, P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
-import { coinsNeeded, stepAt } from './homestead.js';
+import { coinsNeeded, levelCap, stepAt, type LevelCap } from './homestead.js';
 import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import { skillLevel, untilRollover } from './rules.js';
@@ -214,8 +214,7 @@ export function facilityCap(c: P0Content, s: P0State, kind: string, level?: numb
   const def = c.facilities.kinds[kind];
   if (!def) return 0;
   if (def.cap_by_farming) return stepAt(def.cap_by_farming, level ?? skillLevel(c, s, 'farming'), 0);
-  const m = (c.homestead as Record<string, unknown>)[`${kind}_max`] as { base: number; per_level: number; max: number } | undefined;
-  return m ? Math.min(m.max, m.base + m.per_level * (level ?? s.homestead.level)) : 0;
+  return levelCap((c.homestead as Record<string, unknown>)[`${kind}_max`] as LevelCap | undefined, level ?? s.homestead.level);
 }
 
 /** What lets one more stand next: {homestead_next} or {farming_next} (a level), null when the cap no longer grows. */

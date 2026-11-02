@@ -20,6 +20,7 @@ const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # a local request's hand-in row for wrong_place (q(272))
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -1107,6 +1108,13 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) in ["cook", "batch_cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
+	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
+		var r := PinReason.request_of(session.view, str(cmd.request))
+		if not r.is_empty():
+			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -1159,7 +1167,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
-		"need_material", "skills_short", "max_level":
+		"need_material", "skills_short", "travel_short", "max_level":
 			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
 			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
 			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
@@ -1168,7 +1176,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
 			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
-				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("skill", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
+			elif code == "travel_short":
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("kind", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
 			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
@@ -1203,7 +1213,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			var cur := session.current()
 			var at := {"homestead": cur.get("homestead", {}),
 				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
-			ui.toast_error(str(P0Logic.fields_full_action(at).toast))
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast), "", true)   # broken at a « · » as the grey key's
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":

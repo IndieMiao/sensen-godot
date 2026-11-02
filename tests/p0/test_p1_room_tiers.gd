@@ -24,17 +24,18 @@ func _farmhouse(level: int, phone := false) -> P0Room:
 
 func test_the_room_follows_the_homestead_level() -> void:
 	var by_level := {}
-	for lv in [1, 4, 5, 7, 9, 10]: by_level[lv] = FARMHOUSE.room_for(lv)
-	assert_dict(by_level).is_equal({1: "basic", 4: "basic", 5: "standard", 7: "standard", 9: "standard", 10: "deluxe"})
-	for lv in [4, 5, 10]:
+	for lv in [1, 4, 5, 7, 10, 11, 12, 17]: by_level[lv] = FARMHOUSE.room_for(lv)
+	assert_dict(by_level).is_equal({1: "basic", 4: "basic", 5: "standard", 7: "standard", 10: "standard", 11: "standard",
+		12: "deluxe", 17: "deluxe"})   # the Deluxe Room at Lv12 since v4q(1) ⑧ (q(14)'s Lv10)
+	for lv in [4, 5, 12]:
 		var r := _farmhouse(lv)
-		var kit := {4: "basic_room", 5: "standard_room_5", 10: "deluxe_room_10"}[lv] as String
+		var kit := {4: "basic_room", 5: "standard_room_5", 12: "deluxe_room_10"}[lv] as String
 		assert_str(r.art.scene_file_path).override_failure_message("Lv%d" % lv).is_equal("res://scenes/%s/%s_art.tscn" % [kit, kit])
 		assert_str(r.layout_path).is_equal("res://assets/rooms/%s/layout.json" % kit)
 
 ## Every kitchen anchor is there; the stands are reached from the door; the art that takes each tap exists.
 func test_each_rooms_kitchen_corner_is_complete_and_reachable() -> void:
-	for lv in [1, 5, 10]:
+	for lv in [1, 5, 12]:   # the three rooms (Deluxe at Lv12, v4q(1))
 		var r := _farmhouse(lv if lv > 1 else 3)   # Lv3: the Basic Room's rack and cabinet are out
 		var label := "Lv%d %s" % [lv, r.get("room_kind")]
 		for n in KITCHEN: assert_object(r.anchor(n)).override_failure_message("%s %s" % [label, n]).is_not_null()
@@ -72,7 +73,7 @@ func test_the_cabinet_glow_and_the_cooking_fire_follow_the_room() -> void:
 	assert_float(glow.position.x - cab.position.x).is_equal_approx(0.25, 0.002)   # it faces +X, as in the Basic Room
 	assert_float(glow.position.z).is_equal_approx(cab.position.z, 0.002)
 	assert_object(standard.call("stove_fire")).is_null()
-	var deluxe := _farmhouse(10)
+	var deluxe := _farmhouse(12)
 	assert_bool(deluxe.art.has_node("warming_cabinet_glow")).is_false()
 	assert_object(deluxe.call("stove_fire")).is_null()
 
@@ -126,9 +127,18 @@ func test_the_warming_cabinet_faces_the_camera() -> void:
 		assert_float(front.dot(to_cam)).override_failure_message("Lv%d: the cabinet's back to the camera" % lv).is_greater(0.3)
 		assert_array(r.grid.point_path(r.actor.position, r.anchor("stand_warming_cabinet").global_position)).is_not_empty()
 
+## The Fourth Stove (Homestead Lv17, v4q(1) ⑧) is the Deluxe Room's back-left burner, an empty one on its cooker until now
+## (上官婉儿 on 355): its tap, badge, shot and drop anchors are there, the pot's mouth on it; the other rooms have three.
+func test_the_deluxe_cooker_takes_a_fourth_stove() -> void:
+	var r := _farmhouse(17)
+	for n in ["use_stove_4", "badge_stove_4", "cam_stove_4", "drop_pot_4"]: assert_object(r.anchor(n)).override_failure_message(n).is_not_null()
+	assert_vector(r.anchor("use_stove_4").position).is_equal_approx(Vector3(-4.245, 1.291, -0.859), Vector3.ONE * 0.001)
+	assert_float(r.anchor("badge_stove_4").position.y - r.anchor("use_stove_4").position.y).is_equal_approx(0.754, 0.001)   # as stoves 1–3
+	assert_object(_farmhouse(11).anchor("use_stove_4")).is_null()   # the Standard Room's cooker has three
+
 ## Opening the rack's or the cabinet's sheet frames that one: the Standard Room's stand apart.
 func test_each_corner_sheet_has_its_own_shot_in_the_bigger_rooms() -> void:
-	for lv in [5, 10]:
+	for lv in [5, 12]:
 		var r := _farmhouse(lv)
 		for n in ["cam_spice_rack", "cam_warming_cabinet"]: assert_object(r.anchor(n)).override_failure_message("Lv%d %s" % [lv, n]).is_not_null()
 	assert_object(_farmhouse(3).anchor("cam_spice_rack")).is_null()   # the Basic Room keeps its one corner shot
@@ -136,7 +146,7 @@ func test_each_corner_sheet_has_its_own_shot_in_the_bigger_rooms() -> void:
 ## The Deluxe Room opens at its door, its cooker across the room off screen: the stoves' buttons stay with their stoves,
 ## not pulled onto the screen's edge by the row that keeps crowded stove buttons on screen.
 func test_stoves_off_screen_keep_their_buttons_off_screen() -> void:
-	var r := _farmhouse(10, true)
+	var r := _farmhouse(12, true)
 	var screen := r.get_viewport().get_visible_rect()
 	var spots := {}
 	for n in ["use_stove_1", "use_stove_2", "use_stove_3"]:

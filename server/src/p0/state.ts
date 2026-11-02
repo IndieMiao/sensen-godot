@@ -2,7 +2,7 @@
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots, clearNewBeds } from './garden.js';
-import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, writtenCluster, type TravelState } from './travel.js';
+import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, openCity, wildFrozen, writtenCluster, type TravelState } from './travel.js';
 import { recallAwayTraps } from './fish_trap.js';
 import { placeOf } from './world.js';
 import { checkGuideTable, freshGuide, legacyGuide, type GuideState } from './guide.js';
@@ -201,6 +201,9 @@ export interface P0State {
   // settle and on a home change. Outside `boards`: a server rolled back to v5 walks every value of `boards` as a board,
   // and reads the home board it knew. Walks: boards.boardsOf.
   markets: Record<string, BoardSlot[]>;
+  // q(272): each city's local requests from its keepers (locals.ts), by city cluster; absent until the first away from
+  // home, filled in place (no version of its own, as the inbox): a server without it keeps the field as it was.
+  locals?: Record<string, LocalCity>;
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   presence: Presence;
   inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
@@ -237,6 +240,10 @@ export interface P0State {
   rng: number;
   seq: number;
 }
+
+/** q(272): a city's local requests — `day` the player day they were drawn on (dayKey), each slot a request and the
+ * keeper's outpost giving it. Tracked ones stay past their day; the untracked go at the next day's draw. */
+export interface LocalCity { day: string; slots: { req: BoardRequest; place: string }[] }
 
 export const emptyDay = (key = ''): P0Day => ({
   key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, ...freshMineB1DailyFields(), xp: {}, mishaps: 0,
@@ -359,6 +366,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   if (t.home !== writtenCluster(c) && (!t.home_chosen_at || !clusterById(c, t.home))) {
     const fresh = freshTravel(c);
     t.home = fresh.home; t.here = fresh.home; t.fallback = fresh.fallback;
+    delete t.wild_near3; delete t.wild_priced; Object.assign(t, wildFrozen(c, t.home));   // v4q(3): frozen with the fallback
     delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
   }
   // A server from before SGODOT-303 (a rollback to 0.2.5) moved a picked home back to the written city and kept the
@@ -371,6 +379,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       t.home = picked;
       delete t.passes[picked];
       t.fallback = fallbackOf(c, picked);
+      delete t.wild_near3; delete t.wild_priced; Object.assign(t, wildFrozen(c, picked));   // v4q(3): frozen with the fallback
     } else {
       delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
     }

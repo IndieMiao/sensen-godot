@@ -74,7 +74,8 @@ static func confirm_drop(ui: P0Ui, role: String, id: String, back := Callable())
 		ui.command.emit({"type": "drop", "request": id}))
 	col.add_child(drop)
 
-## BOARD-DROPPED: what dropping left (the server confirmed); Close goes back to the list.
+## BOARD-DROPPED: what dropping left (the server confirmed); Close goes back to the list — a keeper's local request
+## (gone.local, q(272)) to where its card was opened, with no Next request (it is not replaced today).
 static func dropped(ui: P0Ui, gone: Dictionary) -> void:
 	var role := str(gone.get("role", "homestead"))
 	var back = gone.get("back", null)   # where BOARD-1 came from (Today for another city's request, q(270)); else the list
@@ -82,8 +83,26 @@ static func dropped(ui: P0Ui, gone: Dictionary) -> void:
 	var col := _sheet(ui, "board_dropped", "Close", back)
 	col.add_child(UiObjectHeader.new({title = str(gone.get("title", "")), state = "Dropped",
 		effect = "Your %s remain in your bag." % str(gone.get("noun", "items"))}))
-	col.add_child(UiFactRow.new("Next request", P0Board.drop_wait()))
+	if not bool(gone.get("local", false)): col.add_child(UiFactRow.new("Next request", P0Board.drop_wait()))
 	_details(ui, col, str(gone.get("item", "")))
+
+## BOARD-3 for a keeper's local request (q(272), 不知火舞 378 77524b0e): the same sheet, its own sentence and no wait —
+## it is not replaced today (no promise for tomorrow). r: {id, title, noun, item}; `keep` back to its card, `back` where
+## the card was opened (BOARD-DROPPED's Close goes there).
+static func confirm_local_drop(ui: P0Ui, r: Dictionary, keep: Callable, back: Callable) -> void:
+	var col := _sheet(ui, "board_drop", "Keep tracking", keep)
+	col.add_child(UiObjectHeader.new({title = str(r.title), state = "Drop request",
+		effect = "Dropping removes tracking. It won't be replaced today."}))
+	_details(ui, col, str(r.item))
+	var stay := UiKit.label("Your %s stay in your bag." % str(r.noun), UiTokens.STYLE_BODY_XB14)
+	stay.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(stay)
+	var drop := UiCommandButton.new("Drop request", UiCommandButton.Kind.DESTRUCTIVE)
+	drop.sends = true   # drop (§10.7.1 Offline)
+	drop.activated.connect(func():
+		ui.pending_drop = {"id": str(r.id), "title": str(r.title), "noun": str(r.noun), "item": str(r.item), "back": back, "local": true}
+		ui.command.emit({"type": "drop", "request": str(r.id)}))
+	col.add_child(drop)
 
 ## Details ›: the item's InfoSheet laid over this sheet on a scrim (不知火舞 on 224) — read only, ×0 when the bag has
 ## none; a tap outside it or Back goes back to the sheet under it. None for a request with no single item.
