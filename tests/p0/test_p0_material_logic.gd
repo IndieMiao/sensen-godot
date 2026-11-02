@@ -325,3 +325,42 @@ func test_the_status_line() -> void:
 		.is_equal("Iron Slime King")
 	assert_str(P0MaterialLogic.mine_status(Fx.view(20, {"rocks": 0, "mobs": [Fx.mob("boss_slime_king_iron", 0, 160, false, true, 2)]}), 20)).is_equal("")
 	assert_str(P0MaterialLogic.mine_status(Fx.view(3), 4)).is_equal("")
+
+# --- A wild site's mine on its mouth card (E1 321:181190, v4q(5) ⑩ ⑪; 亚瑟's card draws the rows) ---
+
+## A site as the viewport sends it (contract-c §2 §3): the catalogue's mine block and the player's best_floor.
+static func _site(type: String, mine: Dictionary, best := 0, open := true) -> Dictionary:
+	return {"id": "wd-254-114", "type": type, "name": "Ironvale Vein", "open": open, "best_floor": best, "mine": mine}
+
+const VEIN := {"floors": 46, "main": "iron_ore", "main_from": 10, "side": 1, "open_to": 40}
+const QUARRY := {"floors": 26, "main": null, "main_from": 1, "side": 3, "open_to": null}
+
+## A vein not been down yet: its main ore from F10, the first 3 monster kinds by floor, each guardian on its floors (one
+## line a kind), Not visited; no Also row (丁13). Floors 1–40 for the type line: F41 on is not open.
+func test_a_veins_rows_on_its_mouth_card() -> void:
+	var v := _view()
+	v.names["iron_ore"] = "Iron Ore"
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("vein", VEIN))).is_equal([
+		["Main ore", "Iron Ore · from F10"],
+		["Monsters", "Slime · Rock Beetle · Shroomling"],
+		["Boss", "Iron Slime King · F20\nQuartz Slime King · F40"],
+		["You", "Not visited"]])
+	assert_str(P0MaterialLogic.wild_mine_floors(_site("vein", VEIN))).is_equal("Floors 1–40")
+	# been down to F12 (best_floor: records[id].deepest, #643)
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("vein", VEIN, 12)).back()).is_equal(["You", "Best here F12"])
+
+## A quarry has no single main ore (#616: all five), so no Main ore row; its guardian on every floor it guards down to
+## its last floor (26 here: F30's is past it).
+func test_a_quarrys_rows_have_no_main_ore() -> void:
+	assert_that(P0MaterialLogic.wild_mine_rows(_view(), _site("quarry", QUARRY, 7))).is_equal([
+		["Monsters", "Slime · Cave Bat · Rock Beetle"],
+		["Boss", "Slime King · F10, F20"],
+		["You", "Best here F7"]])
+	assert_str(P0MaterialLogic.wild_mine_floors(_site("quarry", QUARRY))).is_equal("Floors 1–26")
+
+## A grey pin (a mine type not open yet, E4 329:182456) has no rows: the card says Not open yet itself.
+func test_a_mine_not_open_yet_has_no_rows() -> void:
+	var grey := _site("geode", {"floors": 60, "main": "gem", "main_from": 10, "side": null, "open_to": 0}, 0, false)
+	assert_array(P0MaterialLogic.wild_mine_rows(_view(), grey)).is_empty()
+	assert_str(P0MaterialLogic.wild_mine_floors(grey)).is_equal("")
+	assert_array(P0MaterialLogic.wild_mine_rows(_view(), {"id": "wd-1-1", "type": "woodland", "open": true})).is_empty()   # no mine
