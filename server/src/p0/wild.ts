@@ -146,12 +146,13 @@ export const wildNear3 = (c: P0Content, s: P0State): string[] => {
   return kept?.length ? kept : wildNearOf(c, homeOf(c, s));
 };
 
-/** A site as the player sees it: the catalogue's fields and theirs (contract-c §3). */
+/** A site as the player sees it: the catalogue's fields and theirs (contract-c §3); best_floor is the deepest floor they
+ * reached in its mine (E's records, contract-efg §3), 0 before they went down. */
 export function siteFor(c: P0Content, s: P0State, site: WildSite, now: number, near3 = wildNear3(c, s)) {
   const at = homeBase(c, s), km = at ? distanceKm(at, site) : 0;
   const pass = s.travel.passes[site.id];
   return { ...site, km: Math.round(km * 10) / 10, trip: tripByKm(km), free: near3.includes(site.id), visited: !!s.travel.visits[site.id],
-    pass_until: pass && pass.until > now ? pass.until : null, best_floor: 0 };
+    pass_until: pass && pass.until > now ? pass.until : null, best_floor: s.mine?.records?.[site.id]?.deepest ?? 0 };
 }
 
 export interface Bbox { south: number; west: number; north: number; east: number }
