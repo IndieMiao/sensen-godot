@@ -54,21 +54,36 @@ func poses() -> Array:
 func skinned_bounds(only_feet := false) -> AABB:
 	var arrays: Array=mesh.mesh.surface_get_arrays(0)
 	var transforms: Array[Transform3D]=[]
+	var rest_transforms: Array[Transform3D]=[]
+	var leg_binds: Array[bool]=[]
 	for i in mesh.skin.get_bind_count():
 		var bone:=mesh.skin.get_bind_bone(i)
 		if bone<0: bone=skeleton.find_bone(mesh.skin.get_bind_name(i))
 		transforms.append(skeleton.get_bone_global_pose(bone)*mesh.skin.get_bind_pose(i))
+		rest_transforms.append(skeleton.get_bone_global_rest(bone)*mesh.skin.get_bind_pose(i))
+		leg_binds.append(skeleton.get_bone_name(bone).begins_with("leg_"))
 	var bounds:=AABB()
 	var first:=true
 	for i in arrays[Mesh.ARRAY_VERTEX].size():
 		var v: Vector3=arrays[Mesh.ARRAY_VERTEX][i]
-		if only_feet and v.y>.055: continue
 		for j in 4:
 			if arrays[Mesh.ARRAY_WEIGHTS][i*4+j]<.5: continue
-			var p: Vector3=transforms[arrays[Mesh.ARRAY_BONES][i*4+j]]*v
+			var bind: int=arrays[Mesh.ARRAY_BONES][i*4+j]
+			if only_feet:
+				var rest: Vector3=model.to_local(skeleton.to_global(rest_transforms[bind]*v))
+				if not leg_binds[bind] or rest.y>.055*1.25: continue
+			var p: Vector3=model.to_local(skeleton.to_global(transforms[bind]*v))
 			if first: bounds=AABB(p,Vector3.ZERO);first=false
 			else: bounds=bounds.expand(p)
 	return bounds
+
+func bone_point(value: Vector3, bone_name: String) -> Vector3:
+	var bone:=skeleton.find_bone(bone_name)
+	for i in mesh.skin.get_bind_count():
+		if mesh.skin.get_bind_bone(i)==bone or mesh.skin.get_bind_name(i)==bone_name:
+			return skeleton.to_global(skeleton.get_bone_global_pose(bone)*mesh.skin.get_bind_pose(i)*value)
+	assert(false,"Missing skin bind: "+bone_name)
+	return Vector3.ZERO
 
 func difference(a: Array, b: Array) -> float:
 	var result := 0.0
@@ -125,6 +140,7 @@ func validate() -> void:
 	check(is_equal_approx(float(spec.hit_at),float(spec.anims.attack.hit_at)),"top-level hit_at matches attack contact")
 	var root_i := skeleton.find_bone("root")
 	apply_pose("idle",0)
+	report.rest_bounds={"position":str(skinned_bounds().position),"size":str(skinned_bounds().size)}
 	var root_pose := skeleton.get_bone_global_pose(root_i)
 	for name_ in spec.anims:
 		var clip := player.get_animation(name_)
@@ -147,14 +163,23 @@ func validate() -> void:
 		report.animations[name_]={"length":clip.length,"loop":clip.loop_mode==Animation.LOOP_LINEAR,"pose_delta":movement,"root_static":stable_root,"floor_min_y":floor_min}
 	var body_index:=skeleton.find_bone("body")
 	apply_pose("idle",0)
-	var rest_y:=skeleton.get_bone_global_pose(body_index).origin.y
+	var rest_y:=skeleton.to_global(skeleton.get_bone_global_pose(body_index).origin).y
 	report.stunned_samples=[]
 	for t in [0.0,.25,.5,.75]:
 		apply_pose("stunned",t)
 		var pose:=skeleton.get_bone_global_pose(body_index)
-		report.stunned_samples.append({"time":t,"drop_m":rest_y-pose.origin.y,
+		report.stunned_samples.append({"time":t,"drop_m":rest_y-skeleton.to_global(pose.origin).y,
 			"roll_degrees":rad_to_deg(atan2(pose.basis.x.y,pose.basis.x.x)),"feet_min_y":skinned_bounds(true).position.y})
-	check(report.stunned_samples.all(func(s):return s.drop_m>=.04 and s.feet_min_y>.10),"stunned sinks the body and lifts all feet")
+	var stun_floor_min:=INF
+	var stun_feet_min:=INF
+	for frame in 61:
+		apply_pose("stunned",float(frame)/60)
+		stun_floor_min=minf(stun_floor_min,skinned_bounds().position.y)
+		stun_feet_min=minf(stun_feet_min,skinned_bounds(true).position.y)
+	report.stunned_full_cycle={"samples":61,"floor_min_y":stun_floor_min,"feet_min_y":stun_feet_min}
+	check(stun_floor_min>=-.012,"full stunned cycle stays within 12 mm contact tolerance")
+	check(report.stunned_samples.all(func(s):return s.drop_m>=.04) and stun_feet_min>.01,
+		"stunned sinks body and shortened feet stay clear of floor")
 	check(float(spec.anims.windup.length)>=.4 and float(spec.anims.windup.length)<=.7,"readable windup window")
 	check(float(spec.anims.attack.hit_at)>0 and float(spec.anims.attack.hit_at)<float(spec.anims.attack.length),"attack hit time inside clip")
 	var config := ConfigFile.new()
@@ -212,9 +237,9 @@ func run() -> void:
 	validate()
 	apply_pose("idle",0)
 	for view in [["front",0.0,0.0],["side",90.0,0.0],["top",0.0,89.99],["hero",35.0,35.0]]:
-		aim(Vector3(0,.23,0),1.25,view[1],view[2])
+		aim(Vector3(0,.2875,0),1.5625,view[1],view[2])
 		await save_view(view[0])
-	aim(Vector3(0,.30,0),1.45,30,30)
+	aim(Vector3(0,.375,0),1.8125,30,30)
 	for name_ in spec.anims:
 		var t: float = spec.anims[name_].length*.45
 		if name_=="attack": t=float(spec.anims[name_].hit_at)
@@ -237,7 +262,7 @@ func run() -> void:
 	get_tree().quit(0 if report.passed else 1)
 
 func tint_check() -> void:
-	aim(Vector3(0,.23,0),1.25,0,0)
+	aim(Vector3(0,.2875,0),1.5625,0,0)
 	var shader := Shader.new()
 	shader.code = "shader_type spatial; uniform float amount=0.0; void fragment(){ ALBEDO=COLOR.rgb*mix(vec3(1.0),vec3(1.5,0.6,1.2),UV2.x*amount); ROUGHNESS=0.78; SPECULAR=0.28; }"
 	var material := ShaderMaterial.new()
@@ -256,7 +281,7 @@ func tint_check() -> void:
 		if c.r<.05 and c.g<.05 and c.b<.05 and v.x>0:
 			sum+=v;count+=1
 	check(count>0,"protected eye vertices found")
-	var pixel:=camera.unproject_position(sum/maxi(count,1))
+	var pixel:=camera.unproject_position(bone_point(sum/maxi(count,1),"head"))
 	report.tint_eye_pixel=[pixel.x,pixel.y]
 
 func mine_view() -> void:
@@ -302,7 +327,7 @@ func mine_view() -> void:
 		mine.visible=not row[1]
 		vp.size=Vector2i(360,800)
 		await save_view("mine_"+row[0]+"_360")
-		var shell_pixel:=camera.unproject_position(mesh.to_global(shell_sample()))
+		var shell_pixel:=camera.unproject_position(bone_point(shell_sample(),"body"))
 		var floor_pixel:=camera.unproject_position(model.position+Vector3(.8,.025,.6))
 		report.mine.samples[row[0]]={"shell_pixel":[shell_pixel.x,shell_pixel.y],"floor_pixel":[floor_pixel.x,floor_pixel.y]}
 		vp.size=Vector2i(720,1600)

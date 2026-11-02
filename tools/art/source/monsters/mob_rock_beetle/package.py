@@ -18,9 +18,9 @@ parser=argparse.ArgumentParser();parser.add_argument("--runtime",required=True);
 runtime=Path(args.runtime).resolve()
 kit=runtime/"assets/monsters/mob_rock_beetle"
 spec=json.loads((kit/"mob_rock_beetle.json").read_text())
-formal=spec.get("stage")=="formal_v1"
-if formal: PREFIX="SGODOT-355_mob_rock_beetle_v1_"
-revision="v1" if formal else "graybox"
+formal=spec.get("stage","").startswith("formal_v")
+revision=spec["stage"].removeprefix("formal_") if formal else "graybox"
+if formal: PREFIX="SGODOT-355_mob_rock_beetle_"+revision+"_"
 DEST.mkdir(parents=True,exist_ok=True)
 raw=QA/"captures"
 report=json.loads((raw/"validation.json").read_text())
@@ -52,7 +52,7 @@ def sheet(title,frames,columns):
         x0=16+(i%columns)*cell;y0=58+(i//columns)*(cell+40)
         out.paste(image,(x0+(cell-16-image.width)//2,y0))
         draw.text((x0,y0+cell),label,fill="#28352F",font=font(20))
-    label="FORMAL V1" if formal else "GRAYBOX G0"
+    label="FORMAL "+revision.upper() if formal else "GRAYBOX G0"
     draw.text((24,out.height-34),"SGODOT-355 | "+label+" | ZHAOYUN / \u8d75\u4e91 | 2026-11-02",fill="#28352F",font=font(20))
     return out
 views=sheet("Rock Beetle | %s triangles / 11 bones / rigid skin" % format(glb["triangles"], ","),
@@ -62,9 +62,13 @@ actions=[("action_"+name,name+" / "+str(data["length"])+" s"+(" / loop" if data[
 actions += [("stunned_%d"%i,"stunned / %.2f s"%(i*.25)) for i in range(4)]
 motion=sheet("Rock Beetle | Eight final action names + stunned cycle samples",actions,4)
 files=[]
-for name,im in [("three_views",views),("actions",motion)]:
+sheets=[("three_views",views),("actions",motion)]
+if revision=="v1.1":
+    sheets=[("stunned",sheet("Rock Beetle v1.1 | Stunned / 0.25 s",[("action_stunned","Unchanged v1 animation; shorter legs lifted")],1))]
+for name,im in sheets:
     path=DEST/(PREFIX+name+".png");im.save(path);files.append(path)
 mine_files=["mine_red_360","mine_red_720","mine_purple_360","mine_purple_720"] if formal else ["mine_360","mine_720"]
+if revision=="v1.1": mine_files=["mine_red_720","mine_purple_720"]
 for name in mine_files:
     im=Image.open(raw/(name+".png")).convert("RGB")
     meta=PngImagePlugin.PngInfo()
@@ -80,8 +84,11 @@ evidence={"glb":glb,"godot":report,"tint_pixels":{"body_changed_pixels":changed,
     "runtime_base":json.loads((QA/"stage-snapshot.json").read_text())["runtime_game_base"],
     "shared_import_source":"art/monsters-355 b3a4f713 assets/monsters/material_import.gd",
     "scope":"Asset contract and desktop Mobile/Vulkan art verification. No production account, AI/combat wiring, Android or physical-device performance."}
+if revision=="v1.1":
+    evidence["build"]=json.loads((QA/"build.json").read_text())
+    assert all(.66<ratio<.68 for ratio in evidence["build"]["leg_centreline_length_ratios_before_global_scale"])
 if formal:
-    evidence["transition_checks"]=json.loads((QA/"transition-formal-v1.json").read_text())
+    evidence["transition_checks"]=json.loads((QA/("transition-formal-"+revision+".json")).read_text())
     assert evidence["transition_checks"]["passed"]
     def lightness(rgb):
         value=np.array(rgb)/255
@@ -99,6 +106,7 @@ if formal:
         measured["floor_minus_shell_L_star"]=measured["floor"]["L_star"]-measured["shell"]["L_star"]
         assert measured["floor_minus_shell_L_star"]>=12
         evidence["mine_lightness"][mine]=measured
+if formal and revision=="v1":
     video=DEST/(PREFIX+"motion.mp4")
     subprocess.run(["ffmpeg","-y","-loglevel","error","-framerate","24","-i",str(raw/"video/frame_%04d.png"),
         "-frames:v",str(report["video"]["frames"]),"-c:v","libx264","-threads","2","-preset","veryfast","-crf","20",

@@ -1,8 +1,23 @@
-# SGODOT-355 岩甲虫正式版 v1
+# SGODOT-355 岩甲虫正式版 v1.1
 
-赵云，2026-11-02。灰模 bf5279c3 已通过上官婉儿技术检查（355 5a8606d9）；本版按她的三处意见及不知火舞 6a4c6bba 的补充调整，交正式首版技术检查、画面验收。未批准合并，355 状态仍由奕星管理。
+赵云，2026-11-02。v1 技术检查通过（355 fe3a6d67）；v1.1 按不知火舞 236f9afe 和上官婉儿派活调整，交复核。源与审阅更新草稿 PR #682；运行时仍只推 art/monsters-355，不开 PR、不合并，355 状态由奕星管理。
 
-## 本版变化
+运行时 v1.1 提交 **5c043e4c**（基于共享分支 b4a8d3ea），仅改岩甲虫 GLB、JSON 两个文件。
+
+## v1.1 本次返修
+
+- 整体以静态骨架变换等比放大 **1.25 倍**；脚底原点、朝向保持。壳含橙边实测 **长 1.225 × 宽 1.025 m**，整体含头为 **宽 1.025 × 深 1.3802 × 高 0.6171 m**。按实际 v1 的 0.98 m 壳长乘 1.25，未单独压缩前后轴去凑 1.1 m。
+- 六腿中心线长变为 v1 的 **66.76%–67.12%**，粗细保持，横向收进壳下。保留支点高度和脚底平面，使旧 stunned 动作仍能翘腿；只调整腿网格，不修改动作曲线。
+- 只把头的底色 A18B7D 恢复为浅暖棕 **C9A087**；壳 685B59、橙边、眼睛、腮红和触角不改。非腿几何在除去整体缩放后与 v1 逐顶点一致。
+- **radius=0.58×1.25=0.725**，**hit_point=[0,0.28,0.04]×1.25=[0,0.35,0.05]**；height=0.6171，badge_point=[0,0.8125,0]。按要求保留缩放后的半径，不因腿收短再缩碰撞圈。
+- **1470 三角形 / 1 mesh / 1 surface / 11 bones** 不变。8 个动作的名称、时长、逐轨道采样值（相对静止支点）、源文件 pose/animations 函数均与 v1 一致；整体缩放会同步放大动作的空间幅度。
+- `.import` 与 v1 逐字节相同，保留 **uid://crslv7oobgd44**、remove_immutable_tracks=false 和共享导入脚本；本轮仅在隔离工程重新导入，不覆盖运行时导入文件。
+
+最新证据为 `validation-v1.1.json`、`media-manifest-v1.1.json`。独立 GLB 55 项、Godot 实渲 89 项、连续动作切换 56 组通过；检查器按实际蒙皮变换计算缩放后的包围盒，脚端仅从腿骨绑定顶点采样。stunned 全周期 61 帧核查：脚端最低离地 **14.7 mm**，全模型最低 **-3.8 mm**（原接触容差 12 mm 内）。腿收短后低侧脚端抬升小于 v1，故离地检查改按 10 mm 留量，旧的 100 mm 不是本轮规格；动作曲线没有为此调整。玩家及普通史莱姆大小、镜头和矿场景保持原样。
+
+交付三张署名图，前缀 `SGODOT-355_mob_rock_beetle_v1.1_`：红岩矿、紫灰岩壁矿各一张 43° / 6.72 m 图（720×1600，360×800 的 2 倍），以及一张 stunned 近景。沿用现有 MineArt、MineCombat 史莱姆和 Avatar；这是桌面 Mobile/Vulkan 美术工位，不是 AI 打斗或真机性能验收。v1 与 G0 图、视频、验证文件保留。
+
+## v1 制作记录（历史）
 
 | 项目 | 正式 v1 |
 |---|---|
@@ -25,7 +40,7 @@
 
 美术源和审阅分支为 `wp-3d-scene-zhaoyun-monsters-355`，正式版开草稿 PR 到 wp-3d-scene。具名 Blender 源、生成/验证/拍摄脚本、beetle_v3 与现有史莱姆参考图位于 `tools/art/source/monsters/mob_rock_beetle/`。不做战斗 AI 接入、发包或主线合并。
 
-## 模型与接口
+## v1 模型与接口（历史）
 
 **1470 三角形 / 1 mesh / 1 surface / 11 bones**。米制、Y 上、+Z 正面，根在脚底中心；全部平滑法线，每个顶点严格绑定单骨、权重 1。壳的三个圆鼓包按壳面射线定位。UV2.x=1 为壳/躯体/腿，脸、眼、高光、腮红、独角和橙边为 0；没有位图贴图或黑描边。
 
@@ -59,9 +74,9 @@
 
 configure.gd 按同一模板生成，保留本件 UID 和路径，不写高级导入里的默认项。check_transition.gd 在两动作之间不 reset、不 seek，用 play/advance 对照独立起播目标动作；正式版 56 组切换通过，move → hit 六腿无残姿。灰模追补证据另保留在 import-transition-check.json。
 
-## 验证与媒体
+## v1 验证与媒体（历史）
 
-最新记录：`validation-v1.json`、`media-manifest-v1.json`。
+v1 记录：`validation-v1.json`、`media-manifest-v1.json`。
 
 - 40 项独立 GLB 检查通过：预算、刚性权重、平滑法线、UV2、尺寸、按实测取半径、客户端字段、全部时长、root 静止和循环首尾。
 - 88 项 Godot Mobile/Vulkan 实渲检查通过；动作抽样还核了蒙皮后落地位置（12 mm 接触容差）、身体下沉和脚抬高，另有 56 组实际连续动作切换检查。
@@ -72,7 +87,7 @@ configure.gd 按同一模板生成，保留本件 UID 和路径，不写高级�
 - 交三视图、8 动作与 stunned 四相位拼图、两种矿各 360/720 宽截图，以及 6.125 秒、24 FPS、720×1600 动作视频，共 7 份。前缀 `SGODOT-355_mob_rock_beetle_v1_`，署名上传 Plane 355，并下载回读校验。
 - 视频首、中、尾已解码抽帧查看；这是桌面原地动画审阅，不是手机性能或战斗接入验收。
 
-G0 图片、media-manifest-graybox.json 和 validation-graybox.json 保留为历史版本，不覆盖。当前正式版仍待上官婉儿和不知火舞复核。
+G0 图片、media-manifest-graybox.json 和 validation-graybox.json 保留为历史版本，不覆盖。v1 技术复核通过，画面返修已进入上方 v1.1。
 
 ## 复现
 
@@ -85,12 +100,9 @@ BEETLE_SOURCE="$PWD/tools/art/source/monsters/mob_rock_beetle"
 blender --background --factory-startup --threads 2 --python "$BEETLE_SOURCE/build.py" -- --runtime "$BEETLE_RUNTIME"
 python3 "$BEETLE_SOURCE/prepare.py" --runtime "$BEETLE_RUNTIME"
 godot --headless --path output/rock-beetle-355/project --editor --import
-godot --headless --path output/rock-beetle-355/project --script res://configure.gd
-godot --headless --path output/rock-beetle-355/project --editor --import
-godot --headless --path output/rock-beetle-355/project --script "$BEETLE_SOURCE/check_transition.gd" -- "$PWD/output/rock-beetle-355/transition-formal-v1.json"
+godot --headless --path output/rock-beetle-355/project --script "$BEETLE_SOURCE/check_transition.gd" -- "$PWD/output/rock-beetle-355/transition-formal-v1.1.json"
 nvidia-smi
-godot --path output/rock-beetle-355/project --display-driver wayland --rendering-method mobile --rendering-driver vulkan --max-fps 30 -- --video
-cp output/rock-beetle-355/project/assets/monsters/mob_rock_beetle/*.import "$BEETLE_RUNTIME/assets/monsters/mob_rock_beetle/"
+godot --path output/rock-beetle-355/project --display-driver wayland --rendering-method mobile --rendering-driver vulkan --max-fps 30
 output/art-setup/venv/bin/python "$BEETLE_SOURCE/verify.py" --runtime "$BEETLE_RUNTIME"
 output/art-setup/venv/bin/python "$BEETLE_SOURCE/package.py" --runtime "$BEETLE_RUNTIME"
 ```

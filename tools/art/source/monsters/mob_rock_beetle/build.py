@@ -1,4 +1,4 @@
-"""SGODOT-355 rock beetle formal v1, preserving the approved animation interface."""
+"""SGODOT-355 rock beetle v1.1, retaining the approved v1 action curves."""
 from pathlib import Path
 import argparse
 import json
@@ -15,6 +15,9 @@ ROOT = HERE.parents[4]
 ID = "mob_rock_beetle"
 PARTS = []
 FPS = 60
+MODEL_SCALE = 1.25
+LEG_REACH_SCALE = .35
+LEG_LENGTH_RATIOS = []
 ANIMS = {
     "idle": {"length": 1.6, "loop": True},
     "move": {"length": .8, "loop": True},
@@ -25,7 +28,7 @@ ANIMS = {
     "die": {"length": .8, "loop": False},
     "stunned": {"length": 1.0, "loop": True},
 }
-COLORS = {"shell": "685B59", "belly": "514744", "head": "A18B7D", "leg": "7E6A5F",
+COLORS = {"shell": "685B59", "belly": "514744", "head": "C9A087", "leg": "7E6A5F",
     "rim": "F2A13C", "bump": "85746B", "horn": "F3E6D5", "eye": "26252D",
     "glint": "FFF8EA", "cheek": "E49AAD", "mouth": "654D48"}
 BONES = {"root": ((0, 0, 0), None), "body": ((0, .20, 0), "root"),
@@ -165,10 +168,24 @@ def form():
         ellipsoid("Antenna round tip "+side, (sign*.142,.43,.44), (.028,.028,.028), "ant_"+side, "bump", segments=8, rings=3)
         for i, z in enumerate([.25,-.03,-.29],1):
             sweep = [.025,0,-.025][i-1]
-            tube("Jointed leg %s%d"%(side,i),
-                [(sign*.275,.175,z),(sign*.35,.19,z+sweep*.4),(sign*.408,.118,z+sweep),
-                 (sign*.438,.038,z+sweep*1.3),(sign*.448,.023,z+sweep*1.35)],
+            points = [(sign*.275,.175,z),(sign*.35,.19,z+sweep*.4),(sign*.408,.118,z+sweep),
+                 (sign*.438,.038,z+sweep*1.3),(sign*.448,.023,z+sweep*1.35)]
+            leg = tube("Jointed leg %s%d"%(side,i), points,
                 [.045,.057,.046,.03,.012], f"leg_{side}_{i}", "leg", sides=6)
+            # Tuck horizontal reach while retaining hip height for the v1 kicks.
+            ground = min(v.co.z for v in leg.data.vertices)
+            hip = Vector(points[0])
+            shortened = [Vector((hip.x+(p[0]-hip.x)*LEG_REACH_SCALE,min(p[1],hip.y),
+                hip.z+(p[2]-hip.z)*LEG_REACH_SCALE)) for p in points]
+            length = lambda chain: sum((Vector(b)-Vector(a)).length for a,b in zip(chain,chain[1:]))
+            LEG_LENGTH_RATIOS.append(length(shortened)/length(points))
+            for ring, (old, new) in enumerate(zip(points, shortened)):
+                for vertex in list(leg.data.vertices)[ring*6:(ring+1)*6]:
+                    vertex.co += point(new-Vector(old))
+            lift = ground-min(v.co.z for v in leg.data.vertices)
+            for vertex in leg.data.vertices: vertex.co.z += lift
+            pivot = shortened[0]+Vector((0,lift,0))
+            BONES[f"leg_{side}_{i}"] = (tuple(pivot), "body")
     tube("Small smile", [(-.027,.207,.505),(0,.199,.513),(.027,.207,.505)],
         [.003,.003,.003], "head", "mouth", 0, 5)
 
@@ -311,6 +328,8 @@ def main():
     vertex = mat.node_tree.nodes.new("ShaderNodeVertexColor"); vertex.layer_name = "Color"
     mat.node_tree.links.new(vertex.outputs["Color"],shader.inputs["Base Color"])
     form(); arm = rig(); animations(arm)
+    # A static rig transform scales geometry and motion without editing curves.
+    arm.scale = (MODEL_SCALE,)*3
     # Preserve named source parts and export one joined mesh with rigid weights.
     originals = list(PARTS)
     bpy.ops.object.select_all(action="DESELECT")
@@ -326,8 +345,8 @@ def main():
     count = len(joined.data.loop_triangles)
     assert count <= 1500, count
     for src in originals: src.hide_render = True; src.hide_set(True)
-    bounds = [[min(v.co[i] for v in joined.data.vertices) for i in range(3)],
-              [max(v.co[i] for v in joined.data.vertices) for i in range(3)]]
+    bounds = [[min(v.co[i] for v in joined.data.vertices)*MODEL_SCALE for i in range(3)],
+              [max(v.co[i] for v in joined.data.vertices)*MODEL_SCALE for i in range(3)]]
     bpy.ops.wm.save_as_mainfile(filepath=str(HERE/(ID+".blend")))
     bpy.ops.object.select_all(action="DESELECT")
     joined.select_set(True); arm.select_set(True)
@@ -336,19 +355,20 @@ def main():
         export_yup=True,export_animations=True,export_animation_mode="ACTIONS",export_skins=True,
         export_force_sampling=True,export_frame_range=False,export_vertex_color="ACTIVE",
         export_materials="EXPORT",export_cameras=False,export_lights=False)
-    radius = math.ceil(max(math.hypot(v.co.x,v.co.y) for v in joined.data.vertices)*100)/100
+    radius = .58*MODEL_SCALE
     spec = {"id":ID,"radius":radius,"height":round(bounds[1][2]-bounds[0][2],4),
-        "hit_point":[0,.28,.04],"durations":{name:data["length"] for name,data in ANIMS.items()},
-        "hit_at":ANIMS["attack"]["hit_at"],"badge_point":[0,.65,0],"anims":ANIMS,
+        "hit_point":[0,round(.28*MODEL_SCALE,4),round(.04*MODEL_SCALE,4)],"durations":{name:data["length"] for name,data in ANIMS.items()},
+        "hit_at":ANIMS["attack"]["hit_at"],"badge_point":[0,.65*MODEL_SCALE,0],"anims":ANIMS,
         "tint_mask":"UV2.x","source_concept":"Plane 355 c368e7dd / beetle_v3.png",
-        "stage":"formal_v1","cast_shadow":False,"palette":COLORS}
+        "stage":"formal_v1.1","cast_shadow":False,"palette":COLORS}
     (out/(ID+".json")).write_text(json.dumps(spec,indent=2)+"\n")
     info = {"triangles":count,"bones":list(BONES),"parts":len(PARTS),"bounds_blender":bounds,
+        "leg_centreline_length_ratios_before_global_scale":LEG_LENGTH_RATIOS,"uniform_scale":MODEL_SCALE,
         "units":"metres","front":"+Z","binding":"one bone, weight 1 per vertex",
         "runtime_files":[str(p.relative_to(Path(parsed.runtime))) for p in out.glob("*")]}
     qa = ROOT/"output/rock-beetle-355"; qa.mkdir(parents=True,exist_ok=True)
     (qa/"build.json").write_text(json.dumps(info,indent=2)+"\n")
-    print("ROCK_BEETLE_FORMAL_V1", count, "triangles",len(BONES),"bones", len(ANIMS),"animations", flush=True)
+    print("ROCK_BEETLE_FORMAL_V1.1", count, "triangles",len(BONES),"bones", len(ANIMS),"animations", flush=True)
 
 
 if __name__ == "__main__": main()

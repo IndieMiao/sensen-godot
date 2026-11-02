@@ -1,0 +1,1521 @@
+{
+  "glb": {
+    "checks": [
+      {
+        "check": "one mesh and one primitive",
+        "passed": true
+      },
+      {
+        "check": "at most 1500 triangles",
+        "passed": true
+      },
+      {
+        "check": "one skin with 11 bones",
+        "passed": true
+      },
+      {
+        "check": "named root and six leg bones",
+        "passed": true
+      },
+      {
+        "check": "rigid one-bone weights",
+        "passed": true
+      },
+      {
+        "check": "UV2.x binary body mask",
+        "passed": true
+      },
+      {
+        "check": "finite vertices and normals",
+        "passed": true
+      },
+      {
+        "check": "smooth unit normals",
+        "passed": true
+      },
+      {
+        "check": "vertex colors without bitmap textures",
+        "passed": true
+      },
+      {
+        "check": "authored face and body colors present",
+        "passed": true
+      },
+      {
+        "check": "static uniform 1.25 rig scale with identity mesh transform",
+        "passed": true
+      },
+      {
+        "check": "bind matrices cancel baked rig scale in rest skin",
+        "passed": true
+      },
+      {
+        "check": "foot origin and JSON height match",
+        "passed": true
+      },
+      {
+        "check": "v1.1 enlarged body with tucked leg width",
+        "passed": true
+      },
+      {
+        "check": "carapace and rim exactly 1.25 times v1",
+        "passed": true
+      },
+      {
+        "check": "radius covers tucked footprint and equals v1 times 1.25",
+        "passed": true
+      },
+      {
+        "check": "hit_point equals v1 times 1.25",
+        "passed": true
+      },
+      {
+        "check": "all non-leg geometry including antennae unchanged before global scale",
+        "passed": true
+      },
+      {
+        "check": "only head base colour changes to light warm brown",
+        "passed": true
+      },
+      {
+        "check": "import file and UID byte-identical to approved v1",
+        "passed": true
+      },
+      {
+        "check": "source pose and animation curve generation unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved action timings and contact event unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved 11 bone names unchanged",
+        "passed": true
+      },
+      {
+        "check": "exact eight animation names",
+        "passed": true
+      },
+      {
+        "check": "client durations cover all exported actions",
+        "passed": true
+      },
+      {
+        "check": "client hit_point key",
+        "passed": true
+      },
+      {
+        "check": "top-level client hit time",
+        "passed": true
+      },
+      {
+        "check": "review timings agree with client durations",
+        "passed": true
+      },
+      {
+        "check": "attack GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "attack root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "attack exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "die GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "die root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "die exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "hit GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "hit root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "hit exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "idle GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "idle root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "idle exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "idle loop endpoints match",
+        "passed": true
+      },
+      {
+        "check": "move GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "move root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "move exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "move loop endpoints match",
+        "passed": true
+      },
+      {
+        "check": "recover GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "recover root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "recover exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "stunned GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "stunned root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "stunned exported motion unchanged relative to rest pivots",
+        "passed": true
+      },
+      {
+        "check": "stunned loop endpoints match",
+        "passed": true
+      },
+      {
+        "check": "windup GLB matches client duration",
+        "passed": true
+      },
+      {
+        "check": "windup root channels remain constant",
+        "passed": true
+      },
+      {
+        "check": "windup exported motion unchanged relative to rest pivots",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "triangles": 1470,
+    "bounds": [
+      [
+        -0.512499995715916,
+        0.0,
+        -0.6624999741092319
+      ],
+      [
+        0.512499995715916,
+        0.6170705052773728,
+        0.7176727163444863
+      ]
+    ],
+    "size_xyz": [
+      1.024999991431832,
+      0.6170705052773728,
+      1.3801726904537182
+    ],
+    "shell_size_xyz": [
+      1.024999991431832,
+      0.4006338030194312,
+      1.224999982491135
+    ],
+    "measured_radius": 0.7178474365895775,
+    "metadata_radius": 0.725,
+    "width_vs_slime_diameter": 1.28124998928979,
+    "bones": [
+      "root",
+      "body",
+      "head",
+      "ant_l",
+      "ant_r",
+      "leg_l_1",
+      "leg_l_2",
+      "leg_l_3",
+      "leg_r_1",
+      "leg_r_2",
+      "leg_r_3"
+    ],
+    "animations": {
+      "attack": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "die": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "hit": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "idle": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "move": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "recover": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "stunned": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      },
+      "windup": {
+        "root_static": true,
+        "loop_endpoints_match": true
+      }
+    },
+    "runtime_glb_sha256": "8dcabc267c707d5805c31ffb2bcf197856fb7d3a14c56a00ee140422bbf30526"
+  },
+  "godot": {
+    "adapter": "NVIDIA GeForce RTX 2060",
+    "animations": {
+      "attack": {
+        "floor_min_y": -0.000587387476116419,
+        "length": 0.400000005960464,
+        "loop": false,
+        "pose_delta": 0.24835541844368,
+        "root_static": true
+      },
+      "die": {
+        "floor_min_y": 0.0,
+        "length": 0.800000011920929,
+        "loop": false,
+        "pose_delta": 1.68294048309326,
+        "root_static": true
+      },
+      "hit": {
+        "floor_min_y": 0.0,
+        "length": 0.25,
+        "loop": false,
+        "pose_delta": 0.570677757263184,
+        "root_static": true
+      },
+      "idle": {
+        "floor_min_y": -0.0082552433013916,
+        "length": 1.60000002384186,
+        "loop": true,
+        "pose_delta": 0.0985890924930573,
+        "root_static": true
+      },
+      "move": {
+        "floor_min_y": 0.0,
+        "length": 0.800000011920929,
+        "loop": true,
+        "pose_delta": 0.288522779941559,
+        "root_static": true
+      },
+      "recover": {
+        "floor_min_y": 3.70415727957152e-05,
+        "length": 0.5,
+        "loop": false,
+        "pose_delta": 1.70609211921692,
+        "root_static": true
+      },
+      "stunned": {
+        "floor_min_y": -0.00364712439477444,
+        "length": 1.0,
+        "loop": true,
+        "pose_delta": 0.880664706230164,
+        "root_static": true
+      },
+      "windup": {
+        "floor_min_y": -0.000612281728535891,
+        "length": 0.600000023841858,
+        "loop": false,
+        "pose_delta": 0.24910144507885,
+        "root_static": true
+      }
+    },
+    "captures": [
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.2875, 18.0)]",
+        "name": "front",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.5625
+      },
+      {
+        "camera": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (18.0, 0.2875, 0.0)]",
+        "name": "side",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.5625
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (0.0, 18.2875, 0.003142)]",
+        "name": "top",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.5625
+      },
+      {
+        "camera": "[X: (0.819152, 0.0, -0.573576), Y: (-0.32899, 0.819152, -0.469846), Z: (0.469846, 0.573576, 0.67101), O: (8.457233, 10.61188, 12.07818)]",
+        "name": "hero",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.5625
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_idle",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_move",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_windup",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_attack",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_recover",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_hit",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_die",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "action_stunned",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "stunned_0",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "stunned_1",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "stunned_2",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (0.866025, 0.0, -0.5), Y: (-0.25, 0.866025, -0.433013), Z: (0.433013, 0.5, 0.75), O: (7.794229, 9.375, 13.5)]",
+        "name": "stunned_3",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.8125
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.2875, 18.0)]",
+        "name": "tint_base",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.5625
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.2875, 18.0)]",
+        "name": "tint_changed",
+        "size": [
+          720,
+          720
+        ],
+        "width_m": 1.5625
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.50861, 12.72597, 6.108613)]",
+        "name": "mine_red_360",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.50861, 12.72597, 6.108613)]",
+        "name": "mine_red_720",
+        "size": [
+          720,
+          1600
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.50861, 12.72597, 6.108613)]",
+        "name": "mine_purple_360",
+        "size": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.50861, 12.72597, 6.108613)]",
+        "name": "mine_purple_720",
+        "size": [
+          720,
+          1600
+        ],
+        "width_m": 6.71999979019165
+      }
+    ],
+    "checks": [
+      {
+        "check": "one skeleton",
+        "passed": true
+      },
+      {
+        "check": "11 bones",
+        "passed": true
+      },
+      {
+        "check": "named root",
+        "passed": true
+      },
+      {
+        "check": "one skinned mesh",
+        "passed": true
+      },
+      {
+        "check": "one surface",
+        "passed": true
+      },
+      {
+        "check": "11 skin binds",
+        "passed": true
+      },
+      {
+        "check": "triangle budget",
+        "passed": true
+      },
+      {
+        "check": "model casts no real shadow",
+        "passed": true
+      },
+      {
+        "check": "imported vertex colors enabled",
+        "passed": true
+      },
+      {
+        "check": "shared import fix enables embedded material",
+        "passed": true
+      },
+      {
+        "check": "vertex colors and UV2 retained",
+        "passed": true
+      },
+      {
+        "check": "every vertex has exactly one weight of one",
+        "passed": true
+      },
+      {
+        "check": "binary UV2.x tint mask",
+        "passed": true
+      },
+      {
+        "check": "all eight final action names",
+        "passed": true
+      },
+      {
+        "check": "client hit_point key",
+        "passed": true
+      },
+      {
+        "check": "client durations cover all actions",
+        "passed": true
+      },
+      {
+        "check": "top-level hit_at matches attack contact",
+        "passed": true
+      },
+      {
+        "check": "idle duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "idle loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "idle changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "idle has no root motion",
+        "passed": true
+      },
+      {
+        "check": "idle stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "move duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "move loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "move changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "move has no root motion",
+        "passed": true
+      },
+      {
+        "check": "move stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "windup duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "windup loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "windup changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "windup has no root motion",
+        "passed": true
+      },
+      {
+        "check": "windup stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "attack duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "attack loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "attack changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "attack has no root motion",
+        "passed": true
+      },
+      {
+        "check": "attack stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "recover duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "recover loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "recover changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "recover has no root motion",
+        "passed": true
+      },
+      {
+        "check": "recover stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "hit duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "hit loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "hit changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "hit has no root motion",
+        "passed": true
+      },
+      {
+        "check": "hit stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "die duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "die loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "die changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "die has no root motion",
+        "passed": true
+      },
+      {
+        "check": "die stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "stunned duration matches client JSON",
+        "passed": true
+      },
+      {
+        "check": "stunned loop matches JSON",
+        "passed": true
+      },
+      {
+        "check": "stunned changes bone poses",
+        "passed": true
+      },
+      {
+        "check": "stunned has no root motion",
+        "passed": true
+      },
+      {
+        "check": "stunned stays above floor within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "full stunned cycle stays within 12 mm contact tolerance",
+        "passed": true
+      },
+      {
+        "check": "stunned sinks body and shortened feet stay clear of floor",
+        "passed": true
+      },
+      {
+        "check": "readable windup window",
+        "passed": true
+      },
+      {
+        "check": "attack hit time inside clip",
+        "passed": true
+      },
+      {
+        "check": "import config readable",
+        "passed": true
+      },
+      {
+        "check": "Godot-generated UID resolves",
+        "passed": true
+      },
+      {
+        "check": "texture map mode one",
+        "passed": true
+      },
+      {
+        "check": "static tracks retained for transitions",
+        "passed": true
+      },
+      {
+        "check": "front screenshot",
+        "passed": true
+      },
+      {
+        "check": "side screenshot",
+        "passed": true
+      },
+      {
+        "check": "top screenshot",
+        "passed": true
+      },
+      {
+        "check": "hero screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_idle screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_move screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_windup screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_attack screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_recover screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_hit screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_die screenshot",
+        "passed": true
+      },
+      {
+        "check": "action_stunned screenshot",
+        "passed": true
+      },
+      {
+        "check": "stunned_0 screenshot",
+        "passed": true
+      },
+      {
+        "check": "stunned_1 screenshot",
+        "passed": true
+      },
+      {
+        "check": "stunned_2 screenshot",
+        "passed": true
+      },
+      {
+        "check": "stunned_3 screenshot",
+        "passed": true
+      },
+      {
+        "check": "tint_base screenshot",
+        "passed": true
+      },
+      {
+        "check": "tint_changed screenshot",
+        "passed": true
+      },
+      {
+        "check": "protected eye vertices found",
+        "passed": true
+      },
+      {
+        "check": "actual player rig loaded in mine comparison",
+        "passed": true
+      },
+      {
+        "check": "mine_red_360 screenshot",
+        "passed": true
+      },
+      {
+        "check": "mine_red_720 screenshot",
+        "passed": true
+      },
+      {
+        "check": "mine_purple_360 screenshot",
+        "passed": true
+      },
+      {
+        "check": "mine_purple_720 screenshot",
+        "passed": true
+      }
+    ],
+    "material": {
+      "roughness": 0.779999971389771,
+      "specular": 0.5,
+      "vertex_colors": true
+    },
+    "mine": {
+      "beetle_radius": 0.725,
+      "camera_pitch": 43,
+      "camera_width": 6.72,
+      "floors": [
+        1,
+        3
+      ],
+      "renderer_source": "Unmodified farm-dev MineArt + MineCombat slime + Avatar rig",
+      "samples": {
+        "purple": {
+          "floor_pixel": [
+            187.576141357422,
+            452.819854736328
+          ],
+          "shell_pixel": [
+            176.590728759766,
+            389.670715332031
+          ]
+        },
+        "red": {
+          "floor_pixel": [
+            187.576141357422,
+            452.819854736328
+          ],
+          "shell_pixel": [
+            176.590728759766,
+            389.670715332031
+          ]
+        }
+      },
+      "slime_radius": 0.4
+    },
+    "passed": true,
+    "renderer": "mobile",
+    "rest_bounds": {
+      "position": "(-0.5125, 0.0, -0.6625)",
+      "size": "(1.025, 0.617071, 1.380173)"
+    },
+    "stunned_full_cycle": {
+      "feet_min_y": 0.0147387385368347,
+      "floor_min_y": -0.00378216616809368,
+      "samples": 61
+    },
+    "stunned_samples": [
+      {
+        "drop_m": 0.0549999922513962,
+        "feet_min_y": 0.159483268857002,
+        "roll_degrees": 0.0,
+        "time": 0.0
+      },
+      {
+        "drop_m": 0.0607190728187561,
+        "feet_min_y": 0.0154873728752136,
+        "roll_degrees": 14.9178362586232,
+        "time": 0.25
+      },
+      {
+        "drop_m": 0.0567809343338013,
+        "feet_min_y": 0.157702341675758,
+        "roll_degrees": 1.83697028554972e-15,
+        "time": 0.5
+      },
+      {
+        "drop_m": 0.0607190728187561,
+        "feet_min_y": 0.0228904001414776,
+        "roll_degrees": -14.9178362586232,
+        "time": 0.75
+      }
+    ],
+    "tint_eye_pixel": [
+      415.872009277344,
+      348.677917480469
+    ],
+    "tint_vertices": {
+      "protected": 1130,
+      "tintable": 1700
+    },
+    "triangles": 1470,
+    "uid": "uid://crslv7oobgd44"
+  },
+  "tint_pixels": {
+    "body_changed_pixels": 55904,
+    "protected_eye_max_error_rgb255": 0.0
+  },
+  "stunned_changed_pixels": [
+    48194,
+    12531,
+    52338
+  ],
+  "runtime_files": [
+    {
+      "path": "assets/monsters/mob_rock_beetle/mob_rock_beetle.glb",
+      "sha256": "8dcabc267c707d5805c31ffb2bcf197856fb7d3a14c56a00ee140422bbf30526",
+      "bytes": 284648
+    },
+    {
+      "path": "assets/monsters/mob_rock_beetle/mob_rock_beetle.glb.import",
+      "sha256": "273329c68490177b3ded356658c75c392f3bcf33f947c49b2c312921acbe7761",
+      "bytes": 1236
+    },
+    {
+      "path": "assets/monsters/mob_rock_beetle/mob_rock_beetle.json",
+      "sha256": "80a1695bf5a99eb8771640fd8806bdc68423b3f8d28377faa4c1d86b35bf7711",
+      "bytes": 1286
+    }
+  ],
+  "source_blend_sha256": "d12cc42e374da25415c3ff3c0ca633ab4da4004ee76663069ad49c47305f791a",
+  "runtime_base": "0beeca15f63fd3378b073bfd1d2a0767575f3d33",
+  "shared_import_source": "art/monsters-355 b3a4f713 assets/monsters/material_import.gd",
+  "scope": "Asset contract and desktop Mobile/Vulkan art verification. No production account, AI/combat wiring, Android or physical-device performance.",
+  "build": {
+    "triangles": 1470,
+    "bones": [
+      "root",
+      "body",
+      "head",
+      "ant_l",
+      "ant_r",
+      "leg_l_1",
+      "leg_l_2",
+      "leg_l_3",
+      "leg_r_1",
+      "leg_r_2",
+      "leg_r_3"
+    ],
+    "parts": 27,
+    "bounds_blender": [
+      [
+        -0.5124999955296516,
+        -0.7176727056503296,
+        0.0
+      ],
+      [
+        0.5124999955296516,
+        0.6624999642372131,
+        0.6170704960823059
+      ]
+    ],
+    "leg_centreline_length_ratios_before_global_scale": [
+      0.6676173278531958,
+      0.671219881321051,
+      0.6676173299709459,
+      0.6676173278531958,
+      0.671219881321051,
+      0.6676173299709459
+    ],
+    "uniform_scale": 1.25,
+    "units": "metres",
+    "front": "+Z",
+    "binding": "one bone, weight 1 per vertex",
+    "runtime_files": [
+      "assets/monsters/mob_rock_beetle/mob_rock_beetle.glb.import",
+      "assets/monsters/mob_rock_beetle/mob_rock_beetle.glb",
+      "assets/monsters/mob_rock_beetle/mob_rock_beetle.json"
+    ]
+  },
+  "transition_checks": {
+    "checks": [
+      {
+        "from": "die",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "attack"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "die"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "die",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "hit"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "die",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "idle"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "die",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.000690533954184502,
+        "passed": true,
+        "stale_bones": [],
+        "to": "move"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "die",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "recover"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "die",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "windup",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "stunned"
+      },
+      {
+        "from": "attack",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      },
+      {
+        "from": "die",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      },
+      {
+        "from": "hit",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      },
+      {
+        "from": "idle",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      },
+      {
+        "from": "move",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      },
+      {
+        "from": "recover",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      },
+      {
+        "from": "stunned",
+        "max_error": 0.0,
+        "passed": true,
+        "stale_bones": [],
+        "to": "windup"
+      }
+    ],
+    "import_contract_passed": true,
+    "passed": true,
+    "remove_immutable_tracks": false,
+    "uid": "uid://crslv7oobgd44"
+  },
+  "mine_lightness": {
+    "purple": {
+      "shell": {
+        "rgb": [
+          124.0,
+          101.0,
+          92.0
+        ],
+        "L_star": 44.75211664289896
+      },
+      "floor": {
+        "rgb": [
+          211.0,
+          156.0,
+          122.0
+        ],
+        "L_star": 68.7736849060491
+      },
+      "floor_minus_shell_L_star": 24.021568263150137
+    },
+    "red": {
+      "shell": {
+        "rgb": [
+          124.0,
+          101.0,
+          92.0
+        ],
+        "L_star": 44.75211664289896
+      },
+      "floor": {
+        "rgb": [
+          237.0,
+          162.0,
+          105.0
+        ],
+        "L_star": 72.80298365714128
+      },
+      "floor_minus_shell_L_star": 28.05086701424232
+    }
+  }
+}
