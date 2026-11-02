@@ -249,6 +249,37 @@ func test_a_failed_arrival_says_couldnt_get_there_and_retry_goes_again() -> void
 	rt._tick_screens(P0Runtime.ARRIVE_FAIL_S + 0.1)   # 20 s without an answer
 	assert_int(rt.ui.screen_kind()).is_equal(K.PLACE_FAIL)
 
+## SGODOT-382: a room that refused the join (TRAVEL_REQUIRED) sent the player back to the map before the trip arrived —
+## the trip is over: no Couldn't get there 20 s later over the map; and one already up closes on Go back even when
+## its trip was dropped.
+func test_a_trip_that_ends_on_the_map_is_over_and_couldnt_get_there_always_closes() -> void:
+	rt.session.view = _view()
+	rt._scene_overlay("res://scenes/p0/p0_outpost.tscn", {"outpost_id": "gn-5355933~market0"}).free()
+	var room := auto_free(Node.new()) as Node
+	room.scene_file_path = "res://scenes/p0/p0_outpost.tscn"
+	add_child(room)
+	rt.attach(room)
+	var map := auto_free(Node.new()) as Node
+	map.scene_file_path = "res://scenes/p0/p0_map.tscn"
+	add_child(map)
+	rt.attach(map)   # the room left for the map (P0Outpost._on_online_failed)
+	rt._tick_screens(P0Runtime.ARRIVE_FAIL_S + 0.1)
+	assert_int(rt.ui.screen_kind()).is_equal(-1)   # nothing over the map
+	rt._arrival_failed()   # as before the fix: Couldn't get there with no trip behind it
+	assert_int(rt.ui.screen_kind()).is_equal(K.PLACE_FAIL)
+	rt.swap_root = func(): pass
+	rt.ui.screen().card.secondary.pressed.emit()   # Go back
+	assert_int(rt.ui.screen_kind()).is_equal(-1)
+
+## SGODOT-382: a pond (no travel card of its own) told travel_required goes back to the map for that city's travel card.
+func test_travel_required_in_a_pond_goes_back_to_the_maps_travel_card() -> void:
+	var w := _arrive_at_pond()
+	_state()
+	rt.swap_root = func(): pass
+	rt.session.refused.emit("travel_required", {"preview": {"cluster": "gn-5355933", "name": "Hayward"}}, {"type": "cast"})
+	assert_str(rt.after_leave).is_equal("travel:gn-5355933")
+	assert_bool(is_instance_valid(w)).is_true()
+
 func test_go_back_and_back_leave_for_where_the_player_came_from() -> void:
 	var left := [0]
 	rt.swap_root = func(): left[0] += 1   # not pushed on AppRouter here: Go back takes the map way

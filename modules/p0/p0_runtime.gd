@@ -1153,7 +1153,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		# but the player is not in that city — the same card, at the return fare
 		"pass_required", "trip_expired", "travel_required":
 			var preview: Dictionary = detail.get("preview", {})
-			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
+			var to := str(preview.get("cluster", ""))
+			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(to, preview)
+			# a pond or a room the player should not be in (SGODOT-382): back to the map, where the city's travel card
+			# opens at the fare the server named, as a room that refused the join does
+			elif to != "" and is_instance_valid(world): _leave_then("travel:" + to)
 			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
@@ -1542,16 +1546,20 @@ func _begin_arrival(w: Node) -> void:
 	# AppRouter gives a load 30 s; a cover older than that belonged to a trip that never arrived.
 	if _launch_s >= 0.0 or session.view.is_empty() or w.scene_file_path != str(_arrive.path) \
 			or Time.get_ticks_msec() - int(_arrive.t0) > 35000:
-		_arrive = {}
+		# not this trip's world (a room that refused the join sent the player back to the map, SGODOT-382): the trip is
+		# over — its clock stops too, or 20 s later Couldn't get there would open over the map with nothing to undo
+		_end_arrival()
 		return
 	_arrive_s = 0.0
 
 func _end_arrival() -> void:
-	if _arrive.is_empty(): return
+	var had := not _arrive.is_empty()
 	_arrive = {}
 	_arrive_s = -1.0
+	# the covers go whatever is left of the trip: Go back on a Couldn't get there whose trip was already dropped must
+	# still close it (SGODOT-382: it stayed up over the map, Back and Go back dead)
 	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
-	_flush_arrival_toast()
+	if had: _flush_arrival_toast()
 
 ## A toast for the place being opened (Go home's `Welcome home`, 司空震 on 286): said once its loading cover is gone, not
 ## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S.
