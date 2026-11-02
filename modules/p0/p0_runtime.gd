@@ -420,6 +420,8 @@ func _process(dt: float) -> void:
 	_dev_shot(dt)
 	_dev_mem(dt)
 	_tick_screens(dt)
+	# the room's voice for the HUD's mic key and people drawer (SGODOT-383): an outpost's or a pond's, else none
+	ui.set_voice_room(world.get("voice_room") if is_instance_valid(world) else null)
 	if ui.offline:
 		_probe_left -= dt
 		if _probe_left <= 0.0: _probe()
