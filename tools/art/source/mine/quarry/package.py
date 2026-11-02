@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import re
 
 import numpy as np
 from PIL import Image,ImageDraw,ImageFont
@@ -73,6 +74,12 @@ evidence={"glb":glb,"godot":godot,"pixels":pixels,"depth_full":depth,"stage":jso
     "source_blend_sha256":digest(HERE/"quarry.blend"),"source_parent":json.loads((QA/"build.json").read_text())["source_sha256"],
     "runtime_files":[{"path":str(p.relative_to(runtime)),"sha256":digest(p),"bytes":p.stat().st_size} for p in sorted(kit.iterdir()) if p.is_file()],
     "scope":"Desktop Mobile/Vulkan art fixture with temporary palette and mask shader overlays only. No gameplay integration or physical-device performance claim."}
+uv_log=(QA/"uv2-godot-v0.txt").read_text()
+match=re.search(r"^backdrop\.glb err=(\d+) UV2 min=\(([-.\d]+), ([-.\d]+)\) max=\(([-.\d]+), ([-.\d]+)\) n=(\d+)$",uv_log,re.MULTILINE)
+assert match and int(match[1])==0 and float(match[3])==0 and float(match[5])==0
+evidence["direct_godot_uv2"]={"tool":"incoming/monsters-355/uv2_check.gd (unmodified)","empty_project":True,"editor_or_import":False,
+    "min_y":float(match[3]),"max_y":float(match[5]),"vertices":int(match[6]),"one_vertices":0,"log":uv_log}
+assert godot["vein_mask"]==1
 (DEST/"validation-v0.json").write_text(json.dumps(evidence,indent=2)+"\n")
 (DEST/"media-manifest-v0.json").write_text(json.dumps([{"name":p.name,"path":str(p.relative_to(ROOT)),"sha256":digest(p),
     "bytes":p.stat().st_size,"mime":"image/jpeg","size":list(Image.open(p).size)} for p in files],indent=2)+"\n")

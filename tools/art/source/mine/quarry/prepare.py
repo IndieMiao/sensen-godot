@@ -36,10 +36,13 @@ text=backdrop.read_text().replace('extends RefCounted\n','extends RefCounted\n'+
 text=text.replace('res://assets/mine/backdrop/mine_backdrop.glb','res://assets/mine/types/quarry/backdrop.glb')
 text=text.replace('return TINTS.get(floor_n, TINTS[2])','return Color(QA_BANDS[qa_band].backdrop_tint)')
 text=text.replace('mat.set_shader_parameter("void_tint", VOID)','mat.set_shader_parameter("void_tint", Color(QA_BANDS[qa_band].fog))')
+text=text.replace('mat.shader = SHADER','mat.shader = SHADER\n\tmat.set_shader_parameter("vein_mask", 1.0)')
 backdrop.write_text(text)
 shader=project/"modules/mining/mine_backdrop.gdshader"
 text=shader.read_text()
-text=text.replace('COLOR.rgb * floor_tint','mix(COLOR.rgb * floor_tint, COLOR.rgb, clamp(UV2.y, 0.0, 1.0))')
+text=text.replace('uniform vec3 floor_tint','uniform float vein_mask = 0.0;\n\nuniform vec3 floor_tint')
+text=text.replace('ALBEDO = mix(COLOR.rgb * floor_tint, void_tint, clamp(UV2.x, 0.0, 1.0));',
+    'ALBEDO = mix(mix(COLOR.rgb * floor_tint, COLOR.rgb, UV2.y * vein_mask), void_tint, UV2.x);')
 shader.write_text(text)
 test=project/"tests/p0/test_p0_mine_backdrop_depth.gd"
 text=test.read_text()

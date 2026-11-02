@@ -77,6 +77,9 @@ func check_backdrop() -> void:
 	var arrays: Array=mesh.mesh.surface_get_arrays(0)
 	check(arrays[Mesh.ARRAY_INDEX].size()/3<=4000,"imported triangle budget")
 	check(mesh.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"backdrop casts no shadow")
+	var material:=mesh.material_override as ShaderMaterial
+	check(is_equal_approx(float(material.get_shader_parameter("vein_mask")),1.0),"types backdrop explicitly uses vein_mask=1")
+	report.vein_mask=material.get_shader_parameter("vein_mask")
 	var masks: PackedVector2Array=arrays[Mesh.ARRAY_TEX_UV2]
 	var zero:=true
 	for uv in masks: zero=zero and absf(uv.y)<.0001

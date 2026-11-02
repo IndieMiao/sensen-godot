@@ -22,7 +22,7 @@
 - 原点、米制、Y-up、43° 俯角 / 14.5° 偏航对齐约定不变。网格中没有加入向相机的 1 m 位移，仍由 `MineBackdrop.FORWARD_M` 完成。
 - 沿 N 的深度范围 **-6.970811 至 -5.602000 m**。最小值来自逐顶点保留的原内缘，沿用原 README 的精确值（派活中的 -6.97 是两位小数）；没有比原背景更深。
 - `COLOR_0.rgb` 为相等的线性灰度，范围约 **0.4223–0.9569**，alpha 恒为 1。木撑也只用灰度，靠形状和明暗分层。
-- `UV2.x` 保留外缘虚空渐隐；**导出 GLB 和 Godot 导入后的 `UV2.y` 都为 0**。Blender 的 UV V 会在 glTF 导出时翻转，因此源中写 V=1，实际输出遮罩为 0。
+- `UV2.x` 保留外缘虚空渐隐；**导出 GLB 和 Godot 导入后的 `UV2.y` 都为 0**。Blender 的 UV V 会在 glTF 导出时翻转，因此源中写 V=1，实际输出遮罩为 0。按新增 ★★ 段，在空工程直接运行原 `uv2_check.gd`（无 `--import` / `--editor`），实测 **UV2.y min=0、max=0，5840 个顶点，值为 1 的顶点数 0**；原背景对照读到 min=max=1。日志保留在验证 JSON；原小脚本未释放临时场景，退出有资源泄漏提示，两个文件的读取 err 均为 0。
 - `.import` 由 Godot 生成新 UID **uid://mfcdrjqauttn**，参数复制旧背景模板，`texture_map_mode=1`，无 monsters 的 `material_import.gd`。
 
 ## 配色初稿
@@ -39,14 +39,14 @@
 `fog` 仅作 Environment 背景色和 shader 的 `void_tint`，不启用实际雾。临时审阅 shader 按周瑜公式：
 
 ```glsl
-ALBEDO = mix(mix(COLOR.rgb * floor_tint, COLOR.rgb, UV2.y), void_tint, UV2.x);
+ALBEDO = mix(mix(COLOR.rgb * floor_tint, COLOR.rgb, UV2.y * vein_mask), void_tint, UV2.x);
 ```
 
-使用现有输入 clamp，uniform 名保持 `floor_tint` / `void_tint`；浅坑的 UV2.y=0，仍为灰度乘楼层套色。
+uniform 名保持 `floor_tint` / `void_tint`；审阅时显式设 **vein_mask=1**，已按该公式重拍全部图。浅坑的 UV2.y=0，仍为灰度乘楼层套色。正式程序接入归周瑜。
 
 ## 验证与画面
 
-21 项独立 GLB 验证、24 项 Godot 实渲检查通过。使用 Godot 4.7.2、RTX 2060、Mobile/Vulkan、4× MSAA；沿用 P0Mine 灯光、太阳、相机和深度设置。工位隔离用户目录、localhost:9，不连接生产账号或存档；没有 Android/真机性能结论。
+21 项独立 GLB 验证、25 项 Godot 实渲检查通过。使用 Godot 4.7.2、RTX 2060、Mobile/Vulkan、4× MSAA；沿用 P0Mine 灯光、太阳、相机和深度设置。工位隔离用户目录、localhost:9，不连接生产账号或存档；没有 Android/真机性能结论。
 
 - 四段使用同一个原矿室壳，便于比较配色；隔离工程临时覆盖 `MineArt` 颜色和 `MineBackdrop` 资源/套色，临时 shader 支持 UV2.y。运行时不提交这些代码改动，程序尚未正式读取 palette。
 - 按真实 `P0Mine._update_camera()`，玩家站在 `Layout.SPAWN`，使用 P0Ui 的默认镜头区域。先以 360×800 算取景，再按相同投影拍 720×1600；俯角 43°、偏航 14.5°、视宽 6.72 m、zoom=1。UI 只在拍图时隐藏，没有单独放大角色。
@@ -78,5 +78,7 @@ nvidia-smi
 godot --path output/quarry-355/project --display-driver wayland --rendering-method mobile --rendering-driver vulkan --max-fps 30
 output/art-setup/venv/bin/python "$QUARRY_SOURCE/package.py" --runtime "$QUARRY_RUNTIME"
 ```
+
+打包前还需按派活执行空工程检查：将原检查脚本、旧背景 `orig.glb` 和本件 `backdrop.glb` 放入仅有 `project.godot` 的空工位，加载私有环境后在该目录运行 `godot --headless --path . -s res://uv2_check.gd`；输出记录为 `output/quarry-355/uv2-godot-v0.txt`。不在该工位运行导入或编辑器。
 
 生成器从原已验收 backdrop.blend 复制开始。当前 quarry.blend 内嵌 `EXPORT_RUNTIME.py` 可导出手工编辑后的具名部件；默认使用源中记录的运行时工位，也可通过环境变量 `QUARRY_RUNTIME` 指定另一工位。旧的 257 制作脚本和 contour 数据保留为来源记录，不用旧脚本覆盖当前 quarry 编辑。

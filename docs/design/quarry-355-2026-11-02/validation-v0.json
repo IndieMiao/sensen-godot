@@ -326,6 +326,10 @@
         "passed": true
       },
       {
+        "check": "types backdrop explicitly uses vein_mask=1",
+        "passed": true
+      },
+      {
         "check": "Godot UV2.y zero",
         "passed": true
       },
@@ -404,7 +408,8 @@
     ],
     "passed": true,
     "renderer": "mobile",
-    "uid": "uid://mfcdrjqauttn"
+    "uid": "uid://mfcdrjqauttn",
+    "vein_mask": 1.0
   },
   "pixels": [
     {
@@ -9865,7 +9870,7 @@
     "zoom_step": 0.01
   },
   "stage": {
-    "runtime_base": "5c043e4c378626a2e96179d1a8d8b0b000cf8bd8",
+    "runtime_base": "d29e177dff181534113507f6a7b6cbcb91ec89bf",
     "local_only_overlays": [
       "modules/mining/mine_art.gd",
       "modules/mining/mine_backdrop.gd",
@@ -9893,5 +9898,15 @@
       "bytes": 641
     }
   ],
-  "scope": "Desktop Mobile/Vulkan art fixture with temporary palette and mask shader overlays only. No gameplay integration or physical-device performance claim."
+  "scope": "Desktop Mobile/Vulkan art fixture with temporary palette and mask shader overlays only. No gameplay integration or physical-device performance claim.",
+  "direct_godot_uv2": {
+    "tool": "incoming/monsters-355/uv2_check.gd (unmodified)",
+    "empty_project": true,
+    "editor_or_import": false,
+    "min_y": 0.0,
+    "max_y": 0.0,
+    "vertices": 5840,
+    "one_vertices": 0,
+    "log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\norig.glb err=0 UV2 min=(-0.000015, 1.0) max=(1.0, 1.0) n=7204\nbackdrop.glb err=0 UV2 min=(-0.000015, 0.0) max=(1.0, 0.0) n=5840\nERROR: Pages in use exist at exit in PagedAllocator: N20RasterizerSceneDummy21GeometryInstanceDummyE\n   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)\nWARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.\n   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)\nWARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.\n   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)\nWARNING: 8 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\nERROR: 2 RID allocations of type 'N13RendererDummy15MaterialStorage13DummyMaterialE' were leaked at exit.\nERROR: 1 RID allocations of type 'N13RendererDummy15MaterialStorage11DummyShaderE' were leaked at exit.\nERROR: 2 RID allocations of type 'N13RendererDummy9DummyMeshE' were leaked at exit.\nERROR: 2 RID allocations of type 'N17RendererSceneCull8InstanceE' were leaked at exit.\n"
+  }
 }
