@@ -1486,10 +1486,10 @@ static func _tip_cards() -> Control:
 			["creel", "Your creel is your bag: 10 fish per free slot."], ["cast", "Casting uses 5 Energy"],
 			["cook", "Tap Cook to grill your first fish"], ["heat", "Tap when the needle hits gold!"],
 			["meal", "Energy comes back over time. A meal brings it back now."],
-			["map", "Browse the map for free. Travel costs Energy and coins."]]:
+			["map", "Browse the map for free."], ["travel", "Travel costs Energy and coins."]]:
 		var card := UiTipCard.new()
 		# The shared P0 icons each tip passes at run time (P0Ui.TIP_ICONS).
-		var icon: String = {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}.get(str(t[0]), "")
+		var icon: String = {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map", "travel": "travel"}.get(str(t[0]), "")
 		card.show_tip(str(t[1]), _tex(icon) if icon != "" else null)
 		card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(card)

@@ -11,7 +11,7 @@ func _nadia(over: Dictionary) -> Dictionary:
 
 func test_the_teaching_requests_are_found_by_id_but_stay_out_of_her_line() -> void:
 	assert_str(str(P0Logic.resident_request("res_nadia", "req_res_nadia_radish").get("title", ""))).is_equal("A Fresh Radish")
-	assert_str(str(P0Logic.resident_request("res_nadia", "req_res_nadia_six_radishes").get("title", ""))).is_equal("Six Radishes")
+	assert_str(str(P0Logic.resident_request("res_nadia", "req_res_nadia_six_radishes").get("title", ""))).is_equal("Four Radishes")   # v4q(4) ⑥ 丁20; the id kept
 	assert_str(str(P0Logic.resident_request("res_nadia", "req_res_nadia_1").get("title", ""))).is_equal("Potatoes, Please")
 	assert_dict(P0Logic.resident_request("res_nadia", "req_res_nobody")).is_empty()
 	assert_str(P0Logic.request_owner("req_res_nadia_six_radishes")).is_equal("res_nadia")

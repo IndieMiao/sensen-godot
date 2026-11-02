@@ -803,14 +803,14 @@
         },
         {
           "id": "req_res_nadia_six_radishes",
-          "title": "Six Radishes",
-          "text": "Radish buns for market day. Could you grow me six?",
+          "title": "Four Radishes",
+          "text": "Radish buns for market day. Could you grow me four?",
           "stage": "Acquainted",
           "need": {
             "kind": "harvest",
             "id": "crop_radish"
           },
-          "qty": 6,
+          "qty": 4,
           "coins": 20
         }
       ],
