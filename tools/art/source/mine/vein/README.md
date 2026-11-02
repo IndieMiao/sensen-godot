@@ -1,7 +1,7 @@
-# SGODOT-355 矿脉 vein v1.2
+# SGODOT-355 矿脉 vein v1.3
 
-黄忠，2026-11-03。按不知火舞 355 / 7ecf2483 及上官婉儿后续明确口径返修：仅调整 F21–40 的地面配色和白脉顶点色，供画面复验。
-v1.2 保留已通过的几何、锈红、UV、UID、岩块及其他 palette 字段。源/审阅 PR #687 保持草稿，目标 wp-3d-scene。
+黄忠，2026-11-03。按不知火舞 355 / 0e1767ab 及上官婉儿明确口径返修：v1.3 只降低 F21–40 地面的蓝色饱和度并略压暗，供画面复验。
+背景 GLB、白脉顶点色、锈红、UV、UID、岩块、Blender 源及其余 palette 字段均保持 v1.2。源/审阅 PR #687 保持草稿，目标 wp-3d-scene。
 
 ## 文件与原点
 
@@ -27,7 +27,7 @@ Blender 的 `Fade_UV2` 中，暗岩 v=1、矿脉 v=0；导出 glTF 时翻 V，Go
 每次交付前在空工程用指定的 GLTFDocument 方法直接读文件，不执行 `--import` 或 `--editor`。
 本次独立读入结果：
 
-| 项 | 原背景 | vein v1.2 |
+| 项 | 原背景 | vein v1.3 |
 | --- | ---: | ---: |
 | UV2.y 最小 | 1.0 | -0.0000152587890625 |
 | UV2.y 最大 | 1.0 | 1.0 |
@@ -53,21 +53,23 @@ ALBEDO = mix(mix(COLOR.rgb * floor_tint, COLOR.rgb, UV2.y * vein_mask), void_tin
 | --- | --- | --- | --- | --- |
 | 1–10 | #B8A2A0 | #94768D | #4D3D49 | #242125 |
 | 11–20 | #A29C9E | #7E7189 | #423B47 | #242126 |
-| 21–30 | #9BB2C8 | #6C7180 | #383B43 | #222126 |
-| 31–40 | #98AEC7 | #5D6877 | #30363E | #201F24 |
+| 21–30 | #A1ADB9 | #6C7180 | #383B43 | #222126 |
+| 31–40 | #99A6B2 | #5D6877 | #30363E | #201F24 |
 
 首段保留原紫灰岩壁 #94768D，地面由 #C69B80 向冷灰调整，减少与铜矿、甲虫橙边的近色。
-岩壁、背景逐渐冷却压暗，fog 沿用已通过值；后两段地面提亮偏蓝，以拉开铁、石英岩块本体的亮度差，不再要求地面逐段压暗。
+岩壁、背景逐渐冷却压暗，fog 沿用已通过值。后两段改为低饱和石头灰蓝，且第 4 段比第 3 段暗。
+指定的 #9CA8B4 / #94A1AD 首轮实测中，后一段与石英差值只有 .14172；按授权，两色各通道加 5/255（约 .02），得到上表颜色。
+两档 palette 的 HSV 饱和度约 .130 / .140，保留低饱和；原 v1.2 为约 .225 / .236。
 `measure_contrast.py` 在真实渲染中测量铁、石英的可见灰色本体，并在隐藏这两个矿石和附带阴影后，测同一批像素处的地面。
 ID 遮罩剔除矿物条纹并收边 1 像素；报告中给出像素数、中位数及 10%–90% 区间，不用单个点代表整块。亮度口径为 sRGB 编码值的 `.2126R + .7152G + .0722B`，另记录线性亮度，避免混用。
-两段实测结果见最新 `docs/design/mine-vein-355-2026-11-02/v1.2/README.md` 和 validation JSON。
+两段实测结果见最新 `docs/design/mine-vein-355-2026-11-02/v1.3/README.md` 和 validation JSON。
 守关、精英层包含在所在段，连续覆盖 1–40。
 
 ## 自验
 
-v1.2 直接修改已通过 v1 GLB 的 501 个白脉顶点 RGB（167 个三角面，相对 v1 共 3,000 字节），不重新导出几何。
-颜色审计逐字节核对其他数据：JSON、材质、索引、位置、法线、两个 UV、alpha、锈红及灰岩颜色全部保持。
-本轮重跑 38 项资产检查、Godot 导入、独立 UV 检查、五个实际视图和深段矿石亮度对照；取消地面逐段压暗的旧断言。几何、轮廓及深度证据继承 v1，报告用 baseline SHA 和颜色审计关联，不冒充本轮重跑。
+v1.3 的整个 GLB 与 v1.2 字节一致，SHA-256 为 `1b25eaef77880ab795d286d5e6501fbc4a5209afce099484b2c736f0d2b55aca`。
+本轮重跑 38 项资产检查、Godot 导入、独立 UV 检查、五个实际视图和深段矿石亮度对照。
+报告还核对只改两个 ground 字段。几何、轮廓及深度证据以完整 GLB SHA 关联继承；源模型与 `reuse_provenance.json` 保持 v1.2，不冒充本轮重建。
 
 独立 GLB 检查预算、线性颜色、0/1 矿脉遮罩、深度界、palette schema、连续层段及明度递减。
 内轮廓用实际 GLB 三角形投影比较；仅对 Float32 带来的微米级接缝做 0.01 mm 焊接和 0.05 mm 毛刺清理。
@@ -83,7 +85,7 @@ v1 重新扫描 1,451,883 个机位，最小 far 余量 0.357143 m、near 余量
 真实 Godot 4.7.2 Vulkan Mobile / RTX 2060，每段原始 720×1600（360×800 的 2 倍），43°、zoom=.8。
 每段放实际玩家 H=1.745 m、青绿史莱姆、紫蝙蝠、红帽菇菇怪、岩甲虫和四种正式矿石；另附 F40 守关场地。
 展示使用原紫灰矿的几何，只临时改颜色；没有提交 MineArt、MineBackdrop、着色器或测试代码的运行时改动。
-v1.2 交四段和守关层总表、F31–40 独立 720×1600 JPG 及验证 JSON；之前版本保留为历史材料。
+v1.3 交四段和守关层总表、F21–30 与 F31–40 各一张独立 720×1600 JPG 及验证 JSON；之前版本保留为历史材料。
 本轮是桌面美术审阅，不是手机性能测量，也未合并或发布。
 
 ## 复现
@@ -91,7 +93,8 @@ v1.2 交四段和守关层总表、F31–40 独立 720×1600 JPG 及验证 JSON�
 先准备本机独立 `output/monsters-355/runtime` 工作树和 `output/art-setup/venv`（NumPy、Pillow、Shapely）。
 生成器会覆盖 `vein.blend`，人工修改前先保留源。
 
-本次只改色的复现路径：从运行时 v1 提交 `827ef079491be0e06054c2fecbe33fbfbe6b6f63` 取出
+本轮只需将本目录 `palette.json` 同步到运行时，再 prepare/render/measure/package；不运行 Blender 或白脉颜色补丁。
+下列为 v1.2 白脉颜色的重建路径，留作源交接：从运行时 v1 提交 `827ef079491be0e06054c2fecbe33fbfbe6b6f63` 取出
 `assets/mine/types/vein/backdrop.glb` 保存为 `output/mine-vein-355/vein-v1.glb`（SHA-256 `f3ce040a4a9b29fe557b487abf1ebda9071cb77e200caad8d4354f4045db5253`）。
 运行时目标文件须为 v1 或仅改过白脉色的版本；补丁会拒绝其他字节变化。
 
@@ -101,7 +104,7 @@ blender --background --factory-startup --threads 2 --python-exit-code 1 --python
 cp tools/art/source/mine/vein/palette.json output/monsters-355/runtime/assets/mine/types/vein/palette.json
 ```
 
-完整重建才运行 `build.py`；本次交付使用上面的颜色补丁保持已通过的几何字节。完整重建及出图命令：
+完整重建才运行 `build.py`；v1.3 不重建模型。完整重建及出图命令：
 
 ```sh
 blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/mine/vein/build.py
@@ -121,5 +124,5 @@ godot --headless --path . -s res://uv2_check.gd
 ```
 
 本脚本沿用上官婉儿的 GLTFDocument 检查方式，追加 0/1 计数、灰度检查和节点清理。
-最后用 `package_review.py --stage v1.2` 打包总表、单图与验证 JSON；脚本验证本轮 UV、主体像素、矿石对比及颜色审计，并关联已通过 v1 的几何证据。
+最后用 `package_review.py --stage v1.3` 打包总表、两张单图与验证 JSON；脚本验证本轮 UV、主体像素、矿石对比、palette 改动范围及 GLB 字节保持。
 完整重建几何后需要重新运行 `outline_review.gd`、`verify_outline.py` 及全密度深度测试；v1 的原深度报告为 `depth-validation-v1.json`。
