@@ -280,4 +280,8 @@ func test_blocks_are_set_before_the_microphone_on_connect() -> void:
 	await get_tree().process_frame
 	_event(f[0], "connected", {"participants": []})
 	var order: Array = f[1].calls.map(func(c): return str(c[0])).filter(func(n): return n in ["publish", "subscribed", "microphone"])
-	assert_bool(order.find("microphone") > order.find("subscribed")).is_true()
+	# both of the block's calls there, both before the mic (周瑜 on #650: a missing one finds -1 and would pass)
+	assert_int(order.find("subscribed")).is_greater_equal(0)
+	assert_int(order.find("publish")).is_greater_equal(0)
+	assert_int(order.find("microphone")).is_greater(order.find("subscribed"))
+	assert_int(order.find("microphone")).is_greater(order.find("publish"))

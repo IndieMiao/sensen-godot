@@ -104,6 +104,21 @@ func set_muted(peer: int, muted: bool) -> void:
 func set_blocked(peer: int, on: bool) -> void:
 	await _call(HTTPClient.METHOD_POST, "block", {"peer": peer, "on": on})
 
+## The Blocked list (q(28) Settings › Blocked players): who this player blocks, as handles — the blocked are out of
+## sight in a room from the Block on (the hub keeps the two from each other), so Unblock is from here, wherever they are.
+## [{handle, name}] (name as a name tag writes it); [] when the server has none or is not reached.
+func blocked_list() -> Array:
+	var r: Dictionary = await _call(HTTPClient.METHOD_GET, "blocks", {})
+	var json: Dictionary = r.get("json", {}) if r.get("json") is Dictionary else {}
+	var rows: Array = json.get("blocked", []) if json.get("blocked") is Array else []
+	return rows.map(func(b): return {"handle": str(b.get("handle", "")), "name": "Traveller %s" % str(b.get("handle", "")).substr(0, 4)})
+
+## Unblock from the Blocked list, by handle: true when the server took it (both come back into each other's sight).
+func unblock(handle: String) -> bool:
+	var r: Dictionary = await _call(HTTPClient.METHOD_POST, "unblock", {"handle": handle})
+	changed.emit()
+	return bool(r.get("ok", false))
+
 ## Report: a line on the server for a person to read later; the toast is the HUD's — "sent" (Report sent), "already"
 ## (You already reported this: the server keeps no second line) or "failed".
 func report(peer: int, reason := "") -> String:

@@ -114,6 +114,17 @@ func test_blocks_from_the_hub_reach_voice_and_block_report_go_to_the_server() ->
 	answers["report"] = {"ok": true, "already": true}
 	assert_str(await room.report(4)).is_equal("already")   # You already reported this (不知火舞's spec §6)
 
+## The blocked are out of sight from the Block on: the Blocked list (handles) and Unblock by handle (q(28)).
+func test_the_blocked_list_and_unblock_by_handle() -> void:
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	answers["blocks"] = {"ok": true, "blocked": [{"handle": "bbbb2222bbbb2222"}]}
+	var rows: Array = await room.blocked_list()
+	assert_array(rows).is_equal([{"handle": "bbbb2222bbbb2222", "name": "Traveller bbbb"}])
+	assert_array(asked[-1]).is_equal([HTTPClient.METHOD_GET, "/p0/voice/blocks", {}])
+	assert_bool(await room.unblock("bbbb2222bbbb2222")).is_true()
+	assert_array(asked[-1]).is_equal([HTTPClient.METHOD_POST, "/p0/voice/unblock", {"handle": "bbbb2222bbbb2222"}])
+
 func test_a_new_layer_with_voice_on_asks_again() -> void:
 	var f := _room()
 	f[1].is_active = true

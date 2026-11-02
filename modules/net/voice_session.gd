@@ -202,6 +202,8 @@ func _apply_people() -> void:
 	for id in _muted: _backend.call("set_participant_volume", _native_id, str(id), 0.0)
 
 func _process(_delta: float) -> void:
+	# test adapters only: has_method never sees a JNISingleton's methods, and the Android plugin pushes its events (a
+	# polling iOS bridge would need its capabilities to say so instead; 周瑜 on #650)
 	if _backend and _backend.has_method("poll_events"): _backend.call("poll_events")
 	if not _wanted or not _foreground or state == "permission": return
 	var now := Time.get_ticks_msec()

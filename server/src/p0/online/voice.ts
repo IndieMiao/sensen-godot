@@ -16,6 +16,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { appendFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { FastifyInstance } from 'fastify';
 import { AccessToken, RoomServiceClient, TrackSource } from 'livekit-server-sdk';
+import { publicPlayer } from './hub.js';
 import type { Occupant, OutpostRooms } from './rooms.js';
 
 export interface P0VoiceConfig { url: string; apiKey: string; apiSecret: string; namespace: string }
@@ -56,6 +57,8 @@ export class P0Voice {
   private media?: P0VoiceMedia;
   /** The hub's way to a player's socket (set once the hub is up). */
   tell: (player: string, payload: object) => void = () => {};
+  /** The hub's: a Block or Unblock between two players takes each out of (or back into) the other's view (seenChanged). */
+  seen: (a: string, b: string) => void = () => {};
 
   constructor(readonly config: P0VoiceConfig | null, private rooms: OutpostRooms, private files: P0VoiceFiles | null,
     private now: () => number = Date.now, media?: P0VoiceMedia) {
@@ -140,7 +143,29 @@ export class P0Voice {
     if (list.size) this.blocks[player] = [...list]; else delete this.blocks[player];
     writeJson(this.files?.blocks, this.blocks);
     this.tell(player, { t: 'voice_blocks', blocked: this.blockedPeers(player) });
+    this.seen(player, target);   // in one room they go out of each other's sight at once (and come back on Unblock)
     return { ok: true, blocked: this.blockedPeers(player) };
+  }
+
+  /** Whether a and b are kept out of each other's sight in a room (the hub's hides): a Block either way (q(28), 383 V3). */
+  hides(a: string, b: string): boolean { return this.blocking(a, b) || this.blocking(b, a); }
+
+  /** Who this player blocks, as handles (the roster's public `player`, never an id): their Blocked list, which outlives a
+   * room — the blocked are out of sight, so Unblock is from this list (unblock). */
+  blockedList(player: string): { handle: string }[] {
+    return (this.blocks[player] ?? []).map(p => ({ handle: publicPlayer(p) }));
+  }
+
+  /** Unblock by handle, from the Blocked list, wherever the two are. */
+  unblock(player: string, handle: string): Refusal | Record<string, unknown> {
+    const target = (this.blocks[player] ?? []).find(p => publicPlayer(p) === handle);
+    if (!target) return refuse('NOT_BLOCKED', 404);
+    const list = (this.blocks[player] ?? []).filter(p => p !== target);
+    if (list.length) this.blocks[player] = list; else delete this.blocks[player];
+    writeJson(this.files?.blocks, this.blocks);
+    this.tell(player, { t: 'voice_blocks', blocked: this.blockedPeers(player) });
+    this.seen(player, target);
+    return { ok: true, blocked: this.blockedList(player) };
   }
 
   /** Report: one line — who, whom, when, where — for a person to read later (the user, 11-02); nothing else happens.
@@ -281,6 +306,16 @@ export function registerP0Voice(app: FastifyInstance, voice: P0Voice): void {
     const peer = peerOf(b.peer);
     if (peer === null || typeof b.on !== 'boolean') return answer(reply, { code: 'SCHEMA', status: 400 });
     return answer(reply, voice.block(p, peer, b.on));
+  });
+  app.get('/v1/p0/voice/blocks', async (req, reply) => {
+    const p = playerOf(req.headers);
+    return p ? { ok: true, blocked: voice.blockedList(p) } : answer(reply, unauth);
+  });
+  app.post('/v1/p0/voice/unblock', async (req, reply) => {
+    const p = playerOf(req.headers), b = body(req.body);
+    if (!p) return answer(reply, unauth);
+    if (typeof b.handle !== 'string' || !/^[0-9a-f]{16}$/.test(b.handle)) return answer(reply, { code: 'SCHEMA', status: 400 });
+    return answer(reply, voice.unblock(p, b.handle));
   });
   app.post('/v1/p0/voice/report', async (req, reply) => {
     const p = playerOf(req.headers), b = body(req.body);

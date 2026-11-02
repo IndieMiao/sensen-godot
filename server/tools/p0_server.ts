@@ -96,8 +96,9 @@ const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.joi
   ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
 registerP0Voice(app, voice);
 const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
-  joined: o => voice.joined(o), departed: o => voice.departed(o) });
+  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b) });
 voice.tell = (player, payload) => hub.tell(player, payload);
+voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
