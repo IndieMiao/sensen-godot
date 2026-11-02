@@ -103,10 +103,13 @@ func set_muted(peer: int, muted: bool) -> void:
 func set_blocked(peer: int, on: bool) -> void:
 	await _call(HTTPClient.METHOD_POST, "block", {"peer": peer, "on": on})
 
-## Report: a line on the server for a person to read later; the toast is the HUD's.
-func report(peer: int, reason := "") -> bool:
+## Report: a line on the server for a person to read later; the toast is the HUD's — "sent" (Report sent), "already"
+## (You already reported this: the server keeps no second line) or "failed".
+func report(peer: int, reason := "") -> String:
 	var r: Dictionary = await _call(HTTPClient.METHOD_POST, "report", {"peer": peer, "reason": reason})
-	return bool(r.get("ok", false))
+	if not bool(r.get("ok", false)): return "failed"
+	var json: Dictionary = r.get("json", {}) if r.get("json") is Dictionary else {}
+	return "already" if bool(json.get("already", false)) else "sent"
 
 ## A new layer (or a reconnect into one): a voice session on goes again for this room's grant.
 func _on_room(info: Dictionary) -> void:

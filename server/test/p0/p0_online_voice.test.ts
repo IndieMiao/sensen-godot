@@ -123,7 +123,8 @@ describe('P0 voice (SGODOT-383)', () => {
     const { voice, enter, files } = setup();
     enter('player-aaaa');
     const b = enter('player-bbbb');
-    expect(voice.report('player-aaaa', b.id, 'shouting')).toEqual({ ok: true });
+    expect(voice.report('player-aaaa', b.id, 'shouting')).toEqual({ ok: true, already: false });
+    expect(voice.report('player-aaaa', b.id, '')).toEqual({ ok: true, already: true });   // You already reported this: no second line
     const line = JSON.parse(readFileSync(files.reports, 'utf8').trim());
     expect(line).toMatchObject({ kind: 'voice_report', reporter: 'player-aaaa', reported: 'player-bbbb', place: 'sh_tea_1', room: 1, reason: 'shouting' });
     expect(voice.blockedPeers('player-aaaa')).toEqual([]);
@@ -151,7 +152,7 @@ describe('P0 voice (SGODOT-383)', () => {
     enter('player-bbbb');
     expect((await post('/v1/p0/voice/block', { peer: '2', on: true })).json()).toEqual({ ok: true, blocked: ['2'] });
     expect((await post('/v1/p0/voice/block', { peer: 2, on: false })).json()).toEqual({ ok: true, blocked: [] });
-    expect((await post('/v1/p0/voice/report', { peer: '2' })).json()).toEqual({ ok: true });
+    expect((await post('/v1/p0/voice/report', { peer: '2' })).json()).toEqual({ ok: true, already: false });
     expect((await post('/v1/p0/voice/report', { peer: '2.5' })).statusCode).toBe(400);
     expect((await post('/v1/p0/voice/leave', { lease_id: r.json().lease_id })).json()).toEqual({ ok: true });
     await app.close();

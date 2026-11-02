@@ -45,6 +45,7 @@ export class P0Voice {
   private leases = new Map<string, Lease>();   // by player
   private blocks: Record<string, string[]>;    // player → the players they block
   private ages: Record<string, boolean>;       // player → 13+ (true) or not (false); absent: not asked yet
+  private reported = new Set<string>();        // "reporter reported": a second report says so (不知火舞's spec §6), not a second line
   private media?: P0VoiceMedia;
   /** The hub's way to a player's socket (set once the hub is up). */
   tell: (player: string, payload: object) => void = () => {};
@@ -131,16 +132,20 @@ export class P0Voice {
     return { ok: true, blocked: this.blockedPeers(player) };
   }
 
-  /** Report: one line — who, whom, when, where — for a person to read later (the user, 11-02); nothing else happens. */
+  /** Report: one line — who, whom, when, where — for a person to read later (the user, 11-02); nothing else happens.
+   * The same person again (this server's run): `already`, no second line (You already reported this). */
   report(player: string, peer: number, reason: string): Refusal | Record<string, unknown> {
     const target = this.playerAt(player, peer);
     const o = this.rooms.occupant(player);
     if (!target || !o) return refuse('NOT_IN_ROOM', 404);
+    const key = player + ' ' + target;
+    if (this.reported.has(key)) return { ok: true, already: true };
+    this.reported.add(key);
     const line = { kind: 'voice_report', at: new Date(this.now()).toISOString(), reporter: player, reported: target,
       place: o.outpost, room: o.room, reason: reason.slice(0, 200) };
     console.log(JSON.stringify(line));
     if (this.files?.reports) appendFileSync(this.files.reports, JSON.stringify(line) + '\n');
-    return { ok: true };
+    return { ok: true, already: false };
   }
 
   /** The hub's hooks: someone came into a room (the others with a block either way hear their new lists), or left one

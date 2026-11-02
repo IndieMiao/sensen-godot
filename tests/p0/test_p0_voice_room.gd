@@ -109,8 +109,10 @@ func test_blocks_from_the_hub_reach_voice_and_block_report_go_to_the_server() ->
 	assert_array(f[1].calls[-1]).is_equal(["blocked", ["4"]])
 	await room.set_blocked(4, true)
 	assert_array(asked[-1]).is_equal([HTTPClient.METHOD_POST, "/p0/voice/block", {"peer": 4, "on": true}])
-	assert_bool(await room.report(4, "shouting")).is_true()
+	assert_str(await room.report(4, "shouting")).is_equal("sent")
 	assert_array(asked[-1]).is_equal([HTTPClient.METHOD_POST, "/p0/voice/report", {"peer": 4, "reason": "shouting"}])
+	answers["report"] = {"ok": true, "already": true}
+	assert_str(await room.report(4)).is_equal("already")   # You already reported this (不知火舞's spec §6)
 
 func test_a_new_layer_with_voice_on_asks_again() -> void:
 	var f := _room()
