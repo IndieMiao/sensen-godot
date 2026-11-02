@@ -1,0 +1,137 @@
+{
+  "task": "SGODOT-355",
+  "group": "mine_props",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "axes": "metres; Y up; front +Z",
+  "assets": [
+    {
+      "name": "rock_iron_ore",
+      "file": "assets/mine/rocks/rock_iron_ore.glb",
+      "triangles": 114,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.42009392380714417,
+          0.0,
+          -0.4404867887496948
+        ],
+        [
+          0.46876177191734314,
+          0.6299999952316284,
+          0.44420647621154785
+        ]
+      ],
+      "dimensions_m": [
+        0.8888556957244873,
+        0.6299999952316284,
+        0.8846932649612427
+      ],
+      "triangle_limit": 400,
+      "sha256": "dae338bfd8367f360480eeffad1b574131fe074c244bfa3699f284c4547506e6",
+      "anchors": [],
+      "origin": "bottom centre; Y up; front +Z",
+      "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+      "shadow_radius_m": 0.52,
+      "notes": [
+        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+      ]
+    },
+    {
+      "name": "rock_quartz",
+      "file": "assets/mine/rocks/rock_quartz.glb",
+      "triangles": 114,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.4400201737880707,
+          0.0,
+          -0.4666350483894348
+        ],
+        [
+          0.4484900236129761,
+          0.6299999952316284,
+          0.43366488814353943
+        ]
+      ],
+      "dimensions_m": [
+        0.8885101974010468,
+        0.6299999952316284,
+        0.9002999365329742
+      ],
+      "triangle_limit": 400,
+      "sha256": "b59896c667f771da7055ac7f357a2926a55e616450dd2d75e99cf51f3768c10c",
+      "anchors": [],
+      "origin": "bottom centre; Y up; front +Z",
+      "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+      "shadow_radius_m": 0.52,
+      "notes": [
+        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+      ]
+    },
+    {
+      "name": "rock_coal",
+      "file": "assets/mine/rocks/rock_coal.glb",
+      "triangles": 114,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.44517871737480164,
+          0.0,
+          -0.46551039814949036
+        ],
+        [
+          0.4258612096309662,
+          0.6299999952316284,
+          0.42973971366882324
+        ]
+      ],
+      "dimensions_m": [
+        0.8710399270057678,
+        0.6299999952316284,
+        0.8952501118183136
+      ],
+      "triangle_limit": 400,
+      "sha256": "1e47273c18cec9f7d86846efe705738d1f031be1d8edf68653cd572579c1c334",
+      "anchors": [],
+      "origin": "bottom centre; Y up; front +Z",
+      "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+      "shadow_radius_m": 0.52,
+      "notes": [
+        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+      ]
+    },
+    {
+      "name": "rock_copper_ore",
+      "file": "assets/mine/rocks/rock_copper_ore.glb",
+      "triangles": 114,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.45235884189605713,
+          0.0,
+          -0.44176656007766724
+        ],
+        [
+          0.4288462996482849,
+          0.6299999952316284,
+          0.44343301653862
+        ]
+      ],
+      "dimensions_m": [
+        0.881205141544342,
+        0.6299999952316284,
+        0.8851995766162872
+      ],
+      "triangle_limit": 400,
+      "sha256": "24305eb8713a7c4462c4f2f979590d06c3b44ac8ce6e71d5e91f047c1f3dea31",
+      "anchors": [],
+      "origin": "bottom centre; Y up; front +Z",
+      "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+      "shadow_radius_m": 0.52,
+      "notes": [
+        "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+      ]
+    }
+  ]
+}

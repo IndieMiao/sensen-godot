@@ -1,0 +1,132 @@
+{
+  "task": "SGODOT-355",
+  "group": "mine_props",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "axes": "metres; Y up; front +Z",
+  "assets": [
+    {
+      "name": "guard_arena",
+      "file": "assets/mine/props/guard_arena.glb",
+      "triangles": 2421,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -3.444850206375122,
+          0.0,
+          -2.1835238933563232
+        ],
+        [
+          3.4442200660705566,
+          1.559999942779541,
+          2.1689937114715576
+        ]
+      ],
+      "dimensions_m": [
+        6.889070272445679,
+        1.559999942779541,
+        4.352517604827881
+      ],
+      "triangle_limit": 3000,
+      "sha256": "f675ff59bd06dda02fd0f5161dc1ea63f27ad0be0094035870068f4e033f95cd",
+      "anchors": [],
+      "origin": "ground centre",
+      "placement_world": [
+        4.9,
+        0,
+        -3.8
+      ],
+      "clear_ellipse_m": [
+        6.0,
+        3.6
+      ],
+      "rubble_height_limit_m": 0.25,
+      "collision": "none",
+      "tall_geometry_world_x_range": [
+        2.7,
+        6.8
+      ],
+      "notes": [
+        "Decorative oval rubble boundary; centre empty, no collision anywhere.",
+        "Two rear torches and crown-carved stele only within world X 2.7..6.8.",
+        "Ellipse rounds the rear-left corner away from the coexisting elevator."
+      ]
+    },
+    {
+      "name": "elevator_station",
+      "file": "assets/mine/props/elevator_station.glb",
+      "triangles": 2394,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7250000238418579,
+          0.0,
+          -0.6499999761581421
+        ],
+        [
+          0.8700000047683716,
+          2.240000009536743,
+          0.6499999761581421
+        ]
+      ],
+      "dimensions_m": [
+        1.5950000286102295,
+        2.240000009536743,
+        1.2999999523162842
+      ],
+      "triangle_limit": 2500,
+      "sha256": "ce6c01a5506b12eeca4b437f1201ae1b16b9974463d3fb7f9a5150719d18a14b",
+      "anchors": [
+        {
+          "name": "PlateAnchor",
+          "position": [
+            0,
+            0.99,
+            0.515
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "size": [
+            0.5,
+            0.3
+          ]
+        },
+        {
+          "name": "LampAnchor",
+          "position": [
+            0.8,
+            0.73,
+            0.47
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "origin": "ground centre",
+      "placement_world": [
+        1.25,
+        0,
+        -6.75
+      ],
+      "base_size_m": [
+        1.45,
+        1.3
+      ],
+      "platform_top_m": 0.17,
+      "plate_face_z": 0.51,
+      "plate_backing_front_z": 0.48,
+      "collision": "none",
+      "notes": [
+        "Timber station, four posts, bracing, rear drum and hanging rope; no modelled lamp.",
+        "Blank 0.50 x 0.30 m plate projects 0.03 m from backing; PlateAnchor is 0.005 m in front of plate.",
+        "LampAnchor matches runtime indicator; support post retained."
+      ]
+    }
+  ]
+}
