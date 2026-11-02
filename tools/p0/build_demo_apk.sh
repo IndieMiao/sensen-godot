@@ -101,11 +101,13 @@ MANIFEST_BACKUP="$(mktemp "${TMPDIR:-/tmp}/p0demo_manifest.XXXXXX")"
 cp "$MANIFEST" "$MANIFEST_BACKUP"
 restore() {
   cp "$BACKUP" export_presets.cfg; rm -f "$BACKUP" "$CFG"
-  cp "$MANIFEST_BACKUP" "$MANIFEST"; rm -f "$MANIFEST_BACKUP"; [[ -n "${WROTE_NSC:-}" ]] && rm -f "$NSC"; return 0
+  cp "$MANIFEST_BACKUP" "$MANIFEST"; rm -f "$MANIFEST_BACKUP"; [[ -n "${WROTE_NSC:-}" ]] && rm -f "$NSC"
+  [[ -n "${MADE_XML_DIR:-}" ]] && rmdir "$(dirname "$NSC")" 2>/dev/null; return 0
 }
 trap restore EXIT
 if [[ -n "$DEV_CLEARTEXT" ]]; then
   [[ -e "$NSC" ]] && { echo "$NSC is already there: not writing over it" >&2; exit 2; }
+  [[ -d "$(dirname "$NSC")" ]] || MADE_XML_DIR=1   # an empty res/xml this script made goes too (后裔 on #651)
   mkdir -p "$(dirname "$NSC")"; WROTE_NSC=1
   cat > "$NSC" <<XML
 <?xml version="1.0" encoding="utf-8"?>
