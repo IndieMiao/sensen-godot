@@ -198,12 +198,13 @@ func test_back_while_seated_stands_up_and_walks_out() -> void:
 	assert_int(left[0]).is_equal(1)
 
 func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> void:
-	assert_dict(_room("sh_market_1").keeper_ctx()).is_equal({"keeper": "Mei", "place": "Mission Market Square"})
-	assert_dict(_room("sh_tackle_1").keeper_ctx()).is_equal({"keeper": "Finn", "place": "Mission Tackle Shop",
+	# outpost: the room's own id, whose keeper's local requests the greeting card's key reads (q(272))
+	assert_dict(_room("sh_market_1").keeper_ctx()).is_equal({"keeper": "Mei", "place": "Mission Market Square", "outpost": "sh_market_1"})
+	assert_dict(_room("sh_tackle_1").keeper_ctx()).is_equal({"keeper": "Finn", "place": "Mission Tackle Shop", "outpost": "sh_tackle_1",
 		"nearest": {"name": "Fern Pond", "site": "pond"}})
 	# The board and the shelf open the counter without the greeting: they carry the keeper ctx themselves.
 	assert_dict(_room("sh_market_1").counter_opts("board")).is_equal({"section": "board",
-		"ctx": {"keeper": "Mei", "place": "Mission Market Square"}})
+		"ctx": {"keeper": "Mei", "place": "Mission Market Square", "outpost": "sh_market_1"}})
 	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
 		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])
 

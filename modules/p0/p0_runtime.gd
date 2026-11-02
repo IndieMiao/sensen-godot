@@ -21,6 +21,7 @@ const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # a local request's hand-in row for wrong_place (q(272))
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -147,7 +148,7 @@ func _init() -> void:
 	ui.test_accounts = session.test_accounts
 	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
-	# Crop-ready notifications (SGODOT-350): Android's GodotNotify, per account on this phone; none elsewhere.
+	# Crop-ready notifications (SGODOT-350 / 356): Android's GodotNotify or iOS's LocalNotify, per account on this phone.
 	ui.notify = P0Notify.new(session.test_accounts.profile_file("p0_notify.json"), P0Notify.phone())
 	# a cold start is coming back too: what was set or shown while the app was gone goes (⑦; 李元芳 on #522)
 	ui.notify.came_back()
@@ -282,7 +283,7 @@ func leave_to_map() -> void:
 	while AppRouter.instance_depth() > 0:
 		var depth := AppRouter.instance_depth()
 		AppRouter.pop_instance()
-		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+		if AppRouter.instance_depth() >= depth: return   # a layer that refuses to pop stays
 	var root := get_tree().current_scene
 	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
 
@@ -322,17 +323,16 @@ func _show_spot(where: String) -> void:
 
 ## The outposts' online counts for the Notice Board (q(164)): one GET /p0/presence, as the map polls it; a failure
 ## leaves the board without person badges (nobody shown is never wrong for a moment).
-var _presence: HTTPRequest
+var _presence: P0HttpRequest
 func _ask_presence() -> void:
 	if not is_instance_valid(_presence):
-		_presence = HTTPRequest.new()
-		_presence.timeout = 8.0
+		_presence = P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
 	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
 	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.request(session.base_url + "/p0/presence", headers)
+	_presence.send(session.base_url + "/p0/presence", headers)
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
@@ -425,8 +425,28 @@ func _process(dt: float) -> void:
 		if _probe_left <= 0.0: _probe()
 	var v := session.current()
 	if v.is_empty(): return
-	ui.set_view(v)
+	if ui.view_wanted(session.view, Time.get_ticks_msec()): ui.set_view(v)   # SGODOT-260 Q3: not every frame
+	_watch_day_pass(v)   # every frame: a pass runs out on the clock, not on a refresh
 	_call("p0_frame", [v, dt])
+
+## q(257) ⑤ / q(261) ⑦ (SGODOT-367): the Day Pass of the city the player is in running out says so once, an Info toast
+## with the city's return fare (`Day Pass ended · Re-entry 15 Energy · 60 coins`); elsewhere it ends quietly. Said
+## under a flight's cover it waits, and is said only if the player is still in that city then (P0Ui.toast_in_city).
+var _pass_seen := {}   # {city, until}: the running pass of the city the player is in, last seen
+
+func _watch_day_pass(v: Dictionary) -> void:
+	if not P0Travel.away(v):
+		_pass_seen = {}
+		return
+	var here := P0Travel.here(v)
+	var until := float(v.get("travel", {}).get("passes", {}).get(here, {}).get("until", 0))
+	if P0Travel.pass_left_ms(v, here) > 0.0:
+		_pass_seen = {city = here, until = until}
+		return
+	if str(_pass_seen.get("city", "")) != here or float(_pass_seen.get("until", -1.0)) != until: return
+	_pass_seen = {}
+	# two lines as MAP-7-PASS-ENDED (243:176843) breaks them; a first line too wide for the toast's 232 wraps to three
+	ui.toast_in_city("Day Pass ended · Re-entry\n%s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
 
 func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
@@ -739,6 +759,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				var part := {kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"}
 				if by_air:
+					# a fare's `−30 Energy` and a first visit's `+10 Energy` are lines of their own, the +10 over the fare's
+					# coins: `−30 Energy` · `−120 coins` · `+10 Energy` from the bottom (q(261) ④, 不知火舞 on 367 ec5f2daa ⑤)
+					if str(ev.get("reason", "")) == "first_visit": part.merge({kind = "energy_bonus", key = "energy_bonus"}, true)
 					travel_floats.append(part)
 					continue
 				# Row Hoe's Sow ×3 says its beds: `−6 Energy · 3 plots` (q(124) ③); the seeds it took count them
@@ -794,7 +817,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "blackjack": continue   # the table floats its own wins over the hand (q(240))
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
-				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
+				var coin_part := {kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS}
+				if by_air:   # a fare's `−120 coins` (q(256)): with the landing, after `−30 Energy`, before `+10 Energy` (q(261) ④)
+					travel_floats.append(coin_part)
+					continue
+				floats.append(coin_part)
 			"parcel":
 				if not guide_feedback.fresh and str(ev.get("key", "")).begins_with("guide_resend:"): continue
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one InboxNotice card under the bell for the
@@ -1086,6 +1113,13 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) in ["cook", "batch_cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
+	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
+		var r := PinReason.request_of(session.view, str(cmd.request))
+		if not r.is_empty():
+			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -1109,10 +1143,28 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if str(said) != "": ui.toast_error(str(said))
 		return
 	match code:
-		"pass_required", "trip_expired":   # SGODOT-275: a place in a city without a pass — its free travel card (q(108))
+		"not_enough_coins", "not_enough_energy":   # a fare the server would not take (q(261) ⑤): the gap, once called back
+			if str(cmd.get("type", "")) == "travel":
+				# coins: the gap (fare + floor − wallet); Energy: the fare, as Fly's amber key says it (不知火舞 on 367 e0efcc15)
+				if code == "not_enough_coins": ui.toast_error("Need %d more coins" % int(detail.get("need", 0)))
+				else: ui.toast_error("Need %d Energy" % int(detail.get("cost", detail.get("need", 0))))
+			else: ui.toast_error("Can't do that (%s)" % code)
+		# SGODOT-275: a place in a city without a pass — its travel card (q(108)); travel_required (q(256) ④): a pass,
+		# but the player is not in that city — the same card, at the return fare
+		"pass_required", "trip_expired", "travel_required":
 			var preview: Dictionary = detail.get("preview", {})
-			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
-			else: ui.toast_error("Travel to %s first · free" % str(preview.get("name", "that city")))
+			var to := str(preview.get("cluster", ""))
+			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(to, preview)
+			# a pond or a room the player should not be in (SGODOT-382): back to the map, where the city's travel card
+			# opens at the fare the server named, as a room that refused the join does. No back lock is asked: the
+			# pond's would only close its fishing panel and keep the player there (周瑜 on #642)
+			elif to != "" and is_instance_valid(world):
+				after_leave = "travel:" + to
+				# not a place to go back to: the map's chip names where the player is (LOCK-06; 不知火舞 on #642: it kept
+				# `Hayward · Acorn Creek` with the home icon after a pass ran out there and the server had them home)
+				return_to = "farm"
+				leave_to_map()
+			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
@@ -1491,7 +1543,7 @@ func _on_screen_action(kind: P0SysScreen.Kind) -> void:
 			_maint_left = MAINT_CHECK_S
 			if not session.busy: session.refresh()
 		P0SysScreen.Kind.UPDATE:
-			if _block_url != "": OS.shell_open(_block_url)
+			if _block_url != "": ExternalLink.open(_block_url)
 
 ## A P0 world AppRouter opened under the scene cover: the cover stays until its first read answers (q(78)). The
 ## launch cover has the very first world; a world that is not the one the cover was for leaves it alone.
@@ -1500,16 +1552,20 @@ func _begin_arrival(w: Node) -> void:
 	# AppRouter gives a load 30 s; a cover older than that belonged to a trip that never arrived.
 	if _launch_s >= 0.0 or session.view.is_empty() or w.scene_file_path != str(_arrive.path) \
 			or Time.get_ticks_msec() - int(_arrive.t0) > 35000:
-		_arrive = {}
+		# not this trip's world (a room that refused the join sent the player back to the map, SGODOT-382): the trip is
+		# over — its clock stops too, or 20 s later Couldn't get there would open over the map with nothing to undo
+		_end_arrival()
 		return
 	_arrive_s = 0.0
 
 func _end_arrival() -> void:
-	if _arrive.is_empty(): return
+	var had := not _arrive.is_empty()
 	_arrive = {}
 	_arrive_s = -1.0
+	# the covers go whatever is left of the trip: Go back on a Couldn't get there whose trip was already dropped must
+	# still close it (SGODOT-382: it stayed up over the map, Back and Go back dead)
 	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
-	_flush_arrival_toast()
+	if had: _flush_arrival_toast()
 
 ## A toast for the place being opened (Go home's `Welcome home`, 司空震 on 286): said once its loading cover is gone, not
 ## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S.
@@ -1785,7 +1841,7 @@ func _dev_shot(dt: float) -> void:
 			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
-			# Crop-ready notifications (SGODOT-350) on a desktop: notify:<never|allowed|refused|old> puts in a stand-in
+			# Crop-ready notifications (SGODOT-350 / 356) on a desktop: notify:<never|allowed|refused|old|ios-…> puts in a stand-in
 			# phone (tools/dev) with a fresh account file; notifications opens Settings › Notifications; ask:<crops|radishes>
 			# brings the soft prompt up as its conditions would.
 			"notify":

@@ -181,6 +181,18 @@ func test_stall_badge_comes_from_the_board() -> void:
 	v.stall.board.requests[0].have = 2
 	assert_str(Guide.stall_badge(v)).is_equal("deliver")
 
+func test_the_stalls_mark_hangs_no_check_once_todays_six_are_done() -> void:   # q(270), as the map's pins
+	var v := _view()
+	v.stall.board.requests[0].status = "accepted"
+	v.stall.board.requests[0].have = 2
+	v.quotas = {"sys_requests": {"used": 6, "cap": 6, "resets_in": 3_600_000}}
+	assert_str(Guide.stall_badge(v, true)).is_equal("")
+	assert_str(Guide.stall_badge(v)).is_equal("deliver")                # the drawer still opens on the board
+	v.stall.board.requests.append({"id": "req_stall_2", "title": "Fresh Greens", "item": "crop_lettuce", "qty": 2, "status": "open", "have": 0})
+	assert_str(Guide.stall_badge(v, true)).is_equal("request")          # an open one keeps its !
+	v.quotas.sys_requests.used = 5
+	assert_str(Guide.stall_badge(v, true)).is_equal("deliver")
+
 func test_stall_hangs_no_mark_while_the_guide_is_on() -> void:   # q(215) ④ ⑥
 	var v := _guided("sow_two")
 	v.stall = {"board": {"requests": [{"id": "req_stall_1", "title": "Fresh Greens", "item": "crop_lettuce", "qty": 2, "status": "open", "have": 0}]}}

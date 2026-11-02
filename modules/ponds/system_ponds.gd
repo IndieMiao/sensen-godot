@@ -86,8 +86,22 @@ static func validated_region(payload: Dictionary, region: String) -> Array:
 		if not entry.is_empty() and str(entry.region_id) == region and not result.any(func(e): return e.id == entry.id): result.append(entry)
 	return result
 
+## P0's own outlines (SGODOT-374): laid over the frozen catalog's templates field by field (polygon, navigation,
+## extent, art), keeping each template's id, revision and fish profile, so the server's template + layout revision 1
+## still name them and catalog_revision does not move.
+const P0_TEMPLATES := "res://assets/p0/p0_pond_templates.json"
+static var _p0: Dictionary = {}
+static var _p0_read := false
+
 static func template(id: String) -> Dictionary:
-	return data().templates.get(id, {}).duplicate(true)
+	var spec: Dictionary = data().templates.get(id, {}).duplicate(true)
+	if spec.is_empty(): return spec
+	if not _p0_read:
+		_p0_read = true
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(P0_TEMPLATES)) if FileAccess.file_exists(P0_TEMPLATES) else null
+		_p0 = parsed.get("templates", {}) if parsed is Dictionary else {}
+	spec.merge((_p0.get(id, {}) as Dictionary).duplicate(true), true)
+	return spec
 
 static func texture(id: String) -> Texture2D:
 	return load("res://assets/ponds/%s.svg" % id) if TITLES.has(id) else null
@@ -96,7 +110,7 @@ static func site(entry: Dictionary) -> Dictionary:
 	var spec := template(str(entry.get("template_id", "")))
 	if spec.is_empty(): return {}
 	return {"name": entry.name, "space": "pond", "stand": spec.navigation.spawn,
-		"polygon": spec.polygon, "extent": spec.extent, "template_id": spec.id,
+		"polygon": spec.polygon, "extent": spec.extent, "template_id": spec.id, "art": spec.get("art", ""),
 		"decoration_seed": entry.decoration_seed,
 		"fish_weights": FishingModel.data().sites[spec.fish_profile].fish_weights}
 

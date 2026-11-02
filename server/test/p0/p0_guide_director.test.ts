@@ -297,6 +297,74 @@ describe('off the path', () => {
     r.gift('dish_grilled_crucian');   // any edible dish will do (S10)
     expect(r.step).toBe('t_nadia_2');
   });
+  // SGODOT-368 (不知火舞's spec): a dish cooked and kept, not eaten, used to leave S8 on `Cook it`. The real flow: collect
+  // (the dish goes to the cabinet or the bag; the card's Keep sends nothing), then Eat where it lies.
+  const s8 = (player: string) => { const r = new Run(player).pick(); r.harvest(r.sowQuick()); r.nadia1().fish(2); r.s.energy.value = 100; r.check(); return r; };
+  const EAT_PIP = "Eat it while it's warm. A meal brings your Energy back.";
+  it('S8, kept to the bag: Eat it with the bag\'s cell and Eat pulsing; eaten from the bag, S8 passes', () => {
+    const r = s8('director-s8-bag');
+    expect(r.view.row.line).toBe('Cook it: Grilled Crucian');
+    r.cook(['fish_crucian']);   // collect without eat: the card's Keep
+    const kept = r.s.bag.find(x => x.id.startsWith('dish_grilled_crucian'));
+    expect(kept).toBeDefined();
+    expect(r.step).toBe('t_meal');
+    expect(r.view).toMatchObject({ recover: 'r_eat_bag', row: { line: 'Eat it: Grilled Crucian', icon: 'dish_grilled_crucian', go: 'bag' },
+      pip: { line: EAT_PIP } });
+    expect(r.view.marks).toEqual([{ item: 'dish_grilled_crucian', pulse: true }, { button: 'eat', item: 'dish_grilled_crucian', pulse: true }]);
+    r.do({ type: 'eat', item: kept!.id, space: 'pond', place: r.set.pond });   // the bag eats anywhere
+    expect(r.step).toBe('t_soup');
+  });
+  it('S8, kept to the Warming Cabinet: home, the cabinet and its row pulse; eaten from the cabinet, S8 passes', () => {
+    const r = s8('director-s8-cabinet');
+    r.s.homestead.level = 3;   // the Warming Cabinet (Lv3): Keep fills it before the bag
+    r.cook(['fish_crucian']);
+    expect(r.s.cabinet.map(x => x.id.split('@')[0])).toContain('dish_grilled_crucian');
+    expect(r.view).toMatchObject({ recover: 'r_eat_cabinet', row: { line: 'Eat it: Grilled Crucian', go: 'home' }, pip: { line: EAT_PIP } });
+    expect(r.view.marks).toEqual([{ place: 'home', object: 'farmhouse', kind: 'request' }, { object: 'cabinet', pulse: true },
+      { item: 'dish_grilled_crucian', pulse: true }, { button: 'eat', item: 'dish_grilled_crucian', pulse: true }]);
+    const id = r.s.cabinet.find(x => x.id.startsWith('dish_grilled_crucian'))!.id;
+    r.do({ type: 'eat', item: id, from: 'cabinet', space: 'home' });
+    expect(r.step).toBe('t_soup');
+  });
+  it('S8, a done pot not yet taken: the stove and the card\'s Eat; taken and kept it moves to the bag\'s entry', () => {
+    const r = s8('director-s8-pot');
+    r.do({ type: 'cook', items: ['fish_crucian'], space: 'home' });
+    expect(r.view.recover).toBeNull();   // still cooking: Cook it, the stove as before
+    r.now += r.s.stove!.ms + S; r.check();
+    expect(r.view).toMatchObject({ recover: 'r_eat_pot', row: { line: 'Eat it: Grilled Crucian', go: 'home' }, pip: { line: EAT_PIP } });
+    expect(r.view.marks.slice(1)).toEqual([{ object: 'stove', pulse: true }, { button: 'eat', item: 'dish_grilled_crucian', pulse: true }]);
+    r.do({ type: 'collect', space: 'home' });
+    expect(r.view.recover).toBe('r_eat_bag');
+    r.do({ type: 'eat', item: r.s.bag.find(x => x.id.startsWith('dish_grilled_crucian'))!.id, space: 'home' });
+    expect(r.step).toBe('t_soup');
+  });
+  it('S8 eats a dish where it is quickest: the bag before a done pot before the Warming Cabinet', () => {
+    const r = s8('director-s8-where');
+    r.s.homestead.level = 3;
+    r.s.bag.push({ id: 'dish_grilled_crucian', qty: 1 });
+    r.s.cabinet.push({ id: 'dish_grilled_crucian', qty: 1 } as never); r.check();
+    expect(r.view.recover).toBe('r_eat_bag');   // the bag and the cabinet: the bag (eaten anywhere)
+    r.do({ type: 'cook', items: ['fish_crucian'], space: 'home' });
+    r.now += r.s.stove!.ms + S; r.check();
+    expect(r.view.recover).toBe('r_eat_bag');   // the bag and a done pot: the bag
+    r.s.bag = r.s.bag.filter(x => !x.id.startsWith('dish_')); r.check();
+    expect(r.view.recover).toBe('r_eat_pot');   // a done pot and the cabinet: the pot
+  });
+  it('S8 picks the dish: Grilled Crucian first, else another dish, the soup only with no fish left; a full bar still passes', () => {
+    const r = s8('director-s8-pick');
+    r.s.bag.push({ id: 'dish_veggie_plate', qty: 1 }); r.check();
+    expect(r.view).toMatchObject({ recover: 'r_eat_bag', row: { line: 'Eat it: Veggie Plate', icon: 'dish_veggie_plate' } });
+    r.s.cabinet.push({ id: 'dish_grilled_crucian', qty: 1 } as never); r.check();
+    expect(r.view).toMatchObject({ recover: 'r_eat_cabinet', row: { line: 'Eat it: Grilled Crucian' } });   // preferred, though in the cabinet
+    r.s.cabinet = []; r.s.bag = r.s.bag.filter(x => !x.id.startsWith('dish_'));
+    r.s.bag.push({ id: 'dish_fish_soup', qty: 1 }); r.check();
+    expect(r.view).toMatchObject({ recover: null, row: { line: 'Cook it: Grilled Crucian' } });   // a fish left: grill it, keep the soup
+    r.s.bag = r.s.bag.filter(x => !x.id.startsWith('fish_')); r.check();
+    expect(r.view).toMatchObject({ recover: 'r_eat_bag', row: { line: 'Eat it: Fresh Fish Soup' } });
+    r.s.energy.value = maxEnergy(c, r.s);
+    r.do({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect(r.step).toBe('t_soup');
+  });
   it('no fish at S8 before the soup: Catch 2 fish, counted 1/2, 2/2', () => {
     const r = new Run('director-two-fish').pick();
     r.harvest(r.sowQuick());

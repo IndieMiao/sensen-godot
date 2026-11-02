@@ -245,7 +245,7 @@ func _build_preview(parent: Node) -> void:
 	street_button.hide()
 	parent.add_child(_preview)
 
-## 与 SelectPanel 同一个坑：PRESET_MODE_MINSIZE 按调用时刻的最小尺寸算 offset_top，
+## 与已删除的选地面板同一个坑：PRESET_MODE_MINSIZE 按调用时刻的最小尺寸算 offset_top，
 ## 子节点变了必须重算，否则面板长到父容器底边以下。
 func _apply_bottom_preset() -> void:
 	if _body_scroll and _body:

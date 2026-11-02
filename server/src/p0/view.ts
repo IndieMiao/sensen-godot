@@ -8,9 +8,10 @@ import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
 import { buyback, catalog, drinkPrice, isSpecialty, offerOf, owns, protectedQty, quotaKey, quotaScope, regionalOf, sellDistance, walletNeed } from './shops.js';
-import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
+import { boardsOf, farFish, farTries, handIn, hasMarket, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount, slotsOf } from './boards.js';
+import { cityName, giverOf, settleLocals, shownLocals } from './locals.js';
 import { expireGiftMeals, giftClues, giftPointsView, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
-import { floorPrice, haveFor, matches, pick } from './requests.js';
+import { bonusCap, floorPrice, haveFor, matches, pick } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
@@ -22,11 +23,10 @@ import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, green
 import { climateAt, clusterById, clusterOf, homeClimate, travelShown } from './travel.js';
 import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
-import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, hasConvenience, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
-import { cityRegion, homeView, residentPlace } from './home_city.js';
+import { cityOutposts, cityRegion, homeSetOf, homeView, residentPlace } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
 import { sureBite } from './fishing.js';
@@ -39,12 +39,13 @@ import { blackjackView } from './blackjack.js';
 
 /** opts.online: players in the outpost rooms of the town the player is in (q(206), routes' townOnline), for the Tea Host's
  * answer; null when not known. */
-export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null; locals?: boolean } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleLocals(c, s, now);   // q(272): the same local requests the next command finds
   settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
   settleMine(c, s, now);
   settleParcels(c, s, now);
@@ -62,7 +63,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     coins: s.coins,
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
-    map_markers: mapMarkers(c, s, now),
+    map_markers: mapMarkers(c, s, now, { locals: opts.locals ?? true }),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     blackjack: blackjackView(c, s, now),   // SGODOT-351 the card room's table: the gate, the hand in play, a result not yet seen
@@ -70,6 +71,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, ...travelShown(c, s.travel), today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
+      // q(256) (contract 043c0bc8 D): the fare table as content has it, for the confirm card, the Fare Board and the
+      // silhouette card to price locally; travel charges fareOf's
+      fares: c.travel?.fares ?? null,
       // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
       admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)),
       // q(208) ①: the row's second part as shown (cityRegion: state in the US, else the country, none when it is the
@@ -108,13 +112,18 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
     titles: titlesView(c, s),   // q(180): {list: title ids in the fixed order, wearing: the one worn or null} (titles.ts)
-    boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
+    // q(270): `market` is the board of the city the player is in (the home city's where that city has no market square);
+    // `elsewhere`, the requests tracked on other cities' boards, each with where it is handed in
+    boards: { stall: boardView(c, s, 'stall', now), market: boardView(c, s, 'market', now, marketCity(c, s)), elsewhere: elsewhereView(c, s, now) },
+    // q(272): the keepers' local requests — today's in the city the player is in and the tracked ones elsewhere; a client
+    // without it shows none
+    locals: localsView(c, s, now),
     gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
-    // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
-    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, s, now), amount: c.energy.rest_amount,
-      away_h: c.energy.rest_away_h, away_ready_in: restReadyIn(c, s, now) },
+    // q(269): once a player day, no 2 h away first — no away_h / away_ready_in (clients up to 0.2.17 read their absence
+    // as open, never as null's "not left yet")
+    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, s, now), amount: c.energy.rest_amount },
     stall: {
       keeper: c.stall.keeper,
       board: legacyBoard(c, s, now),   // the current Homestead Stall panel; SGODOT-224 reads boards.stall
@@ -368,7 +377,7 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
   const city = s.travel?.here ?? homeOf(c, s);
   const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
     : s.day.quota[quotaKey(c, q, city)] ?? 0;
-  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
+  return { used, cap: q === 'request_bonus' ? bonusCap(c, s) : c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
@@ -465,12 +474,48 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   };
 }
 
-/** A board: its slots as requests, empty slots with their refill time, or the lowest gate when nothing is open yet. */
-function boardView(c: P0Content, s: P0State, board: BoardId, now: number) {
-  const locked = lockedTemplate(c, s, board);
+/** q(272): each local request as a board's, with the keeper giving it (outpost, name plate, role) and its city; an
+ * untracked one goes at the day's end (the next player day draws anew). */
+function localsView(c: P0Content, s: P0State, now: number) {
+  const here = s.travel?.here || homeOf(c, s);
+  return shownLocals(c, s, now).map(({ city, req, place }) => ({ ...requestView(c, s, req, now),
+    expires_in: req.status === 'open' ? untilRollover(c, s, now) : null,
+    place, ...giverOf(c, city, place), cluster: city, city: cityName(c, city), here: city === here }));
+}
+
+/** q(270): the city whose Market Board the player sees — the one they are in, or home where that city has no market square. */
+function marketCity(c: P0Content, s: P0State): string {
+  const here = s.travel?.here || homeOf(c, s);
+  return hasMarket(c, s, here) ? here : homeOf(c, s);
+}
+
+/** A city's market square a board request is handed in at, and the city's name as the location chip writes it (q(270) ⑥). */
+function marketOf(c: P0Content, s: P0State, city: string): { place: string | null; name: string; city: string } {
+  if (city === homeOf(c, s)) return { place: homeSetOf(c, s)?.market ?? null, name: '', city: homeFacts(c, s).name };
+  const o = cityPlaces(c, city)?.detail.outposts.find(x => x.role === 'market') ?? null;
+  return { place: o?.id ?? cityOutposts(c, city).find(x => x.role === 'market')?.id ?? null, name: o?.name ?? '',
+    city: homeFacts(c, { travel: { home: city } }).name };
+}
+
+/** Requests tracked on other cities' Market Boards (q(270) ⑥): Today, the map's ✓ and the tracked list name where each goes. */
+function elsewhereView(c: P0Content, s: P0State, now: number) {
+  const shown = marketCity(c, s);
+  return boardsOf(c, s).filter(b => b.board === 'market' && b.city !== shown).flatMap(b => {
+    const at = marketOf(c, s, b.city);
+    return b.slots.filter(sl => sl.req?.status === 'accepted').map(sl => ({ ...requestView(c, s, sl.req!, now),
+      cluster: b.city, city: at.city, home: b.city === homeOf(c, s), deliver_place: at.place, deliver_name: at.name }));
+  });
+}
+
+/** A board: its slots as requests, empty slots with their refill time, or the lowest gate when nothing is open yet. A
+ * Market Board says which city it hangs in (q(270): its copy names that city, `any Tokyo market`). */
+function boardView(c: P0Content, s: P0State, board: BoardId, now: number, city = homeOf(c, s)) {
+  const locked = lockedTemplate(c, s, board, city);
+  const at = board === 'market' ? marketOf(c, s, city) : null;
   return {
     title: c.requests.boards[board].title, deliver_at: board === 'stall' ? 'homestead' : 'market',
-    slots: s.boards[board].slice(0, slotCount(c, s, board)).map(sl => sl.req ? requestView(c, s, sl.req, now)
+    ...(at ? { cluster: city, city: at.city, home: city === homeOf(c, s), deliver_place: at.place, deliver_name: at.name } : {}),
+    slots: slotsOf(c, s, board, city).slice(0, slotCount(c, s, board)).map(sl => sl.req ? requestView(c, s, sl.req, now)
       : locked ? { empty: true, locked: { template: locked.template, title: c.requests.templates[locked.template].title, gate: locked.gate } }
       // q(99): the new account's held slot 2 shows no countdown (clients count only slots with refill_in)
       : heldSlot(c, s, board, sl) ? { empty: true, held: true }
@@ -541,9 +586,10 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
 /** Facts behind the four keepers' greeting cards (Li Bai b7d8b665 D); the client picks the line (SGODOT-224 keeper_lines). */
 function keepersView(c: P0Content, s: P0State, now: number, online: number | null) {
   const left = c.drinks.daily - s.day.drinks, full = s.energy.value >= maxEnergy(c, s);
-  const market = boardView(c, s, 'market', now).slots;
+  const city = marketCity(c, s);   // q(270): the board of the city the player is in
+  const market = boardView(c, s, 'market', now, city).slots;
   const marketOpen = market.filter(x => 'id' in x) as { template: string }[];
-  const refills = s.boards.market.filter(sl => !sl.req).map(sl => Math.max(0, sl.refill_at - now));
+  const refills = slotsOf(c, s, 'market', city).filter(sl => !sl.req).map(sl => Math.max(0, sl.refill_at - now));
   const pip = requestState(c, s, 'res_pip', now).state;
   const fishing = skillLevel(c, s, 'fishing');
   const reed = c.fishing.rods.find(r => r.id === 'rod_reed');

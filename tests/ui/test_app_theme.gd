@@ -68,9 +68,10 @@ func test_accent_color_is_mint() -> void:
 func test_toggle_button_keeps_dark_text_after_touch() -> void:
 	## Android 会在抬手后保留 hover；toggle 的 hover+pressed 也必须保持可读。
 	var theme := load(THEME_PATH) as Theme
+	## The ink is GameUi.INK since c1d0d261 (09-23 restyle); DesignTokens.INK kept the old one.
 	for state in [&"font_pressed_color", &"font_hover_pressed_color"]:
 		assert_bool(theme.get_color(state, &"SecondaryButton").is_equal_approx(
-			DesignTokens.INK)).is_true()
+			GameUi.INK)).is_true()
 
 func test_button_icons_are_tinted_dark_not_left_at_engine_white() -> void:
 	## assets/ui/icons/*.svg 全是白色描边，靠主题的 icon_*_color 乘法调制成墨色。
@@ -109,4 +110,4 @@ func test_marker_uses_non_accent_signal_color() -> void:
 	# The selected game palette uses a pale violet marker with dark text.
 	assert_float(marker.b).is_greater(marker.g)
 	assert_bool(theme.get_color(&"font_color", &"MarkerButton").is_equal_approx(
-		DesignTokens.INK)).is_true()
+		GameUi.INK)).is_true()   # GameUi.INK since c1d0d261 (09-23 restyle)

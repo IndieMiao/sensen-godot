@@ -268,7 +268,9 @@ func refresh() -> void:
 		c.hide()
 		c.queue_free()
 	for b in _spec.get("buttons", []):
-		_buttons.add_child(_button(b))
+		var n := _button(b)
+		n.set_meta(&"action", StringName(b.get("id", &"")))
+		_buttons.add_child(n)
 	# No button and no last fact (a Fishing gate card): no empty 44 touch row under the content.
 	_lift.visible = not _spec.get("buttons", []).is_empty() or _last_fact != ""
 	_box.content_margin_bottom = 0.0 if _lift.visible else _PAD_T   # the touch row pads the bottom when it is there
@@ -413,6 +415,11 @@ func scrim() -> ColorRect:
 
 func is_open() -> bool: return visible
 func item_id() -> String: return _item
+## The open card's button for an action id (a guide pulse lights it, SGODOT-368: Eat at S8); null without one.
+func button_for(action: StringName) -> Control:
+	for c in _buttons.get_children():
+		if not c.is_queued_for_deletion() and c.get_meta(&"action", &"") == action: return c
+	return null
 func context() -> StringName: return _context
 func spec() -> Dictionary: return _spec
 

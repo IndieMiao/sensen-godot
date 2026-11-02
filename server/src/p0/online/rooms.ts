@@ -4,7 +4,7 @@
  */
 
 /** Outpost roles, the same ids as the counter entries (open_keeper_greeting(role), SGODOT-224). */
-export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market' | 'mine_hut' | 'casino';   // casino: San Francisco's card room only (SGODOT-351)
+export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market' | 'mine_hut' | 'casino' | 'pond';   // casino: San Francisco's card room only (SGODOT-351); pond: a pond's room, `pond:<id>` (outposts.ts pondRoomSpec)
 export interface OutpostSpec {
   id: string;
   role: OutpostRole;

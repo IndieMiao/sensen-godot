@@ -302,7 +302,9 @@ func test_a_judged_rings_float_starts_clear_of_its_dot() -> void:
 func test_queue_next_is_offered_only_from_cooking_lv5_with_nothing_waiting() -> void:
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
-	rt.session.view.cooking.stove = {"id": 3, "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	var cooking: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	cooking.cooking.stove = {"id": 3, "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	rt.session.view = cooking
 	k.watch(rt.session.view.cooking.stove)   # Lv1–4: no Queue ×2
 	assert_bool(k.get("_queue_next").visible).is_false()
 	k.open_queue()

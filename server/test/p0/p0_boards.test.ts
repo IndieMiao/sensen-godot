@@ -20,6 +20,9 @@ const fresh = () => freshState(c, 'player-board-01', T0, 5);
 const req = (over: Partial<BoardRequest>): BoardRequest => ({
   id: 'r1', template: 'req_sys_fish_common', items: [], rarity: 1, kind: 'fish', qty: 2, bonus: 10, drawn_at: T0, status: 'open', ...over });
 const done = (ev: P0Event[]) => ev.find(e => e.kind === 'request' && e.status === 'done') as Extract<P0Event, { kind: 'request' }>;
+// q(268) (0.2.18, user's B): a delivered request's slot refills at once (done refill 0 h); a dropped one still waits
+// 8 h (no redraw farming). The done wait is still content, so its countdown is checked on a table keeping the old 4 h.
+const timed = { ...c, requests: { ...c.requests, done_refill_h: 4, drop_refill_h: 8 } };
 
 describe('Stall Board (§9.6, §14.1.2)', () => {
   it('a new homestead has the tutorial in slot 1 and slot 2 empty for 72 h; the Market Board shows its lowest gate', () => {
@@ -30,18 +33,33 @@ describe('Stall Board (§9.6, §14.1.2)', () => {
     expect(v.boards.market.slots[0]).toMatchObject({ empty: true, locked: { template: 'req_sys_fish_fine', title: 'Dusk Haul', gate: [['fishing', 3]] } });
   });
 
-  it('the held slot never counts as the next request; after the tutorial the freed slot does (q(99))', () => {
+  it('the held slot never counts as the next request; after the tutorial the freed slot does (q(99), timed table)', () => {
+    const tstep = (s: P0State, cmd: P0Command, now = T0) => { const r = applyP0(timed, s, cmd, now); if (!r.ok) throw new Error(r.code); return { s: r.state }; };
     let s = fresh();
-    expect(viewOf(c, s, T0 + 10 * 60_000).stall.board.refill_in).toBe(0);   // legacy shape: no refilling slot yet
+    expect(viewOf(timed, s, T0 + 10 * 60_000).stall.board.refill_in).toBe(0);   // legacy shape: no refilling slot yet
     s.bag.push({ id: 'fish_crucian', qty: 2 });
-    s = step(s, { type: 'accept', request: 'req_pond_catch' }).s;
-    s = step(s, { type: 'deliver', request: 'req_pond_catch' }).s;
-    const v = viewOf(c, s, T0);
+    s = tstep(s, { type: 'accept', request: 'req_pond_catch' }).s;
+    s = tstep(s, { type: 'deliver', request: 'req_pond_catch' }).s;
+    const v = viewOf(timed, s, T0);
     expect(v.boards.stall.slots[0]).toEqual({ empty: true, refill_in: 4 * H });   // the tutorial's slot: back in 4 h
     expect(v.boards.stall.slots[1]).toEqual({ empty: true, held: true });          // still held
     expect(v.stall.board.refill_in).toBe(4 * H);
-    s = step(s, { type: 'drop', request: (viewOf(c, s, T0 + 5 * H).boards.stall.slots[0] as { id: string }).id }, T0 + 5 * H).s;
-    expect(viewOf(c, s, T0 + 5 * H).boards.stall.slots[0]).toEqual({ empty: true, refill_in: 8 * H });   // a drop's wait still counts
+    s = tstep(s, { type: 'drop', request: (viewOf(timed, s, T0 + 5 * H).boards.stall.slots[0] as { id: string }).id }, T0 + 5 * H).s;
+    expect(viewOf(timed, s, T0 + 5 * H).boards.stall.slots[0]).toEqual({ empty: true, refill_in: 8 * H });   // a drop's wait still counts
+  });
+
+  it('q(268): delivering refills the slot at once, dropping still waits 8 h; the held slot 2 keeps its 72 h', () => {
+    let s = fresh();
+    s.bag.push({ id: 'fish_crucian', qty: 2 });
+    s = step(s, { type: 'accept', request: 'req_pond_catch' }).s;
+    s = step(s, { type: 'deliver', request: 'req_pond_catch' }).s;
+    expect(s.boards.stall[0].refill_at).toBe(T0);
+    const next = viewOf(c, s, T0).boards.stall.slots[0] as { id: string };
+    expect(next.id).toMatch(/^req_sys_/);                                    // a new request right away
+    expect(viewOf(c, s, T0).boards.stall.slots[1]).toEqual({ empty: true, held: true });
+    expect(viewOf(c, s, T0).stall.board.refill_in).toBe(0);
+    s = step(s, { type: 'drop', request: next.id }, T0 + H).s;
+    expect(viewOf(c, s, T0 + H).boards.stall.slots[0]).toEqual({ empty: true, refill_in: 8 * H });   // a drop still waits
   });
 
   it('slot 2 fills after 72 h; the view and the next command see the same request', () => {
@@ -54,7 +72,7 @@ describe('Stall Board (§9.6, §14.1.2)', () => {
     expect(r.s.boards.stall[1].req).toMatchObject({ id: shown.id, status: 'accepted' });
   });
 
-  it('delivery pays floor × qty + bonus, frees the slot for 4 h; a repeat says request_done', () => {
+  it('delivery pays floor × qty + bonus and frees the slot; a repeat says request_done', () => {
     const s = fresh();
     s.boards.stall[1] = { req: req({ id: 'r1' }), refill_at: 0 };
     s.bag.push({ id: 'fish_carp', qty: 1 }, { id: 'fish_crucian', qty: 3 });
@@ -62,7 +80,7 @@ describe('Stall Board (§9.6, §14.1.2)', () => {
     expect(count(r.s.bag, 'fish_crucian')).toBe(1);   // the cheapest Common fish go first
     expect(count(r.s.bag, 'fish_carp')).toBe(1);
     expect(done(r.ev)).toMatchObject({ coins: 2 * 2 + 10, bonus: 10 });
-    expect(r.s.boards.stall[1]).toEqual({ req: null, refill_at: T0 + 4 * H });
+    expect(r.s.boards.stall[1]).toEqual({ req: null, refill_at: T0 });   // refills at once (q(268); 4 h before 0.2.18)
     expect(refuse(r.s, { type: 'deliver', request: 'r1' })).toMatchObject({ ok: false, code: 'request_done' });
   });
 

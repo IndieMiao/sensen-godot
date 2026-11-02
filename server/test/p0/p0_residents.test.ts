@@ -117,7 +117,20 @@ describe('gift meal (§3.4.5, K-2, q(33))', () => {
 });
 
 describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => {
-  it("Pip's three requests come one a player day, regardless of stage, and pay +5 and 20 coins each", () => {
+  it('one_per_day is still honoured where the table sets it (it shipped true until q(268)): the next waits for 04:00', () => {
+    const daily = { ...c, residents: { ...c.residents, res_pip: { ...c.residents.res_pip!, one_per_day: true } } };
+    let s = fresh();
+    let r = applyP0(daily, s, { type: 'accept', request: 'req_res_pip_1' }, T0);
+    if (!r.ok) throw new Error(r.code);
+    r.state.bag.push({ id: 'fish_carp', qty: 1 });
+    r = applyP0(daily, r.state, { type: 'deliver', request: 'req_res_pip_1' }, T0);
+    if (!r.ok) throw new Error(r.code);
+    s = r.state;
+    expect(viewOf(daily, s, T0).residents.res_pip).toMatchObject({ request_state: 'wait', request: { id: 'req_res_pip_2' }, next_in: 18 * H });
+    expect(applyP0(daily, s, { type: 'accept', request: 'req_res_pip_2' }, T0)).toMatchObject({ ok: false, code: 'request_wait' });
+  });
+
+  it("Pip's three requests come one after another (q(268); one a player day before 0.2.18), regardless of stage, and pay +5 and 20 coins each", () => {
     let s = fresh();
     expect(pip(s)).toMatchObject({ request_state: 'open', request: { id: 'req_res_pip_1', kind: 'fish', qty: 1, have: 0 } });
     expect(refuse(s, { type: 'deliver', request: 'req_res_pip_1' })).toMatchObject({ ok: false, code: 'not_accepted' });
@@ -131,8 +144,7 @@ describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => 
     expect(r.s.coins).toBe(200);
     expect(aff(r.ev)).toMatchObject({ delta: 5, reason: 'request' });
     expect(count(r.s.bag, 'fish_carp')).toBe(0);
-    expect(pip(r.s)).toMatchObject({ request_state: 'wait', request: { id: 'req_res_pip_2' }, next_in: 18 * H });
-    expect(refuse(r.s, { type: 'accept', request: 'req_res_pip_2' })).toMatchObject({ ok: false, code: 'request_wait' });
+    expect(pip(r.s)).toMatchObject({ request_state: 'open', request: { id: 'req_res_pip_2' }, next_in: null });   // no wait (q(268))
     // ② next day: five plots sown after accepting (the Row Hoe's three count as three)
     const day2 = T0 + DAY;
     s = step(r.s, { type: 'accept', request: 'req_res_pip_2' }, day2).s;

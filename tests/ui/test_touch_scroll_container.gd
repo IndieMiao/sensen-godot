@@ -241,7 +241,9 @@ func test_party_close_stays_at_top_right_after_scrolling_and_refresh() -> void:
 	scroll.scroll_vertical = 200
 	await _settle()
 	assert_that(close.get_global_rect()).is_equal(top_right)
-	assert_float(top_right.end.x).is_equal_approx(online.panel.get_global_rect().end.x - 12, 1)
+	# the panel's own padding (GameUi.panel_style), not a figure: it changed with the 09-23 restyle (c1d0d261)
+	var pad := online.panel.get_theme_stylebox("panel").content_margin_right
+	assert_float(top_right.end.x).is_equal_approx(online.panel.get_global_rect().end.x - pad, 1)
 	var offset := scroll.scroll_vertical
 	online._draw_party()
 	await _settle()

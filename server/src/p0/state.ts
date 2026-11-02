@@ -120,7 +120,7 @@ export interface MineState {
   completed?: { run: number; at: number } | null;   // the last run its elite ended (Run complete, shown once)
 }
 
-/** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
+/** Where the player's commands come from (q(41)). left_at was Rest's 2 h away (q(269) retired it): old saves keep it, unread. */
 /** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
 export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null;
   entered?: string | null;   // the pond / outpost entered with a valid pass (v5): commands there are not re-checked
@@ -148,10 +148,10 @@ export interface P0Day {
 }
 
 /** The save version this server writes. Older saves are brought up to it at load (upgradeState). */
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 export interface P0State {
-  v: 5;
+  v: 6;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -167,6 +167,14 @@ export interface P0State {
   homestead: Homestead;
   residents: Record<string, ResidentState>;
   boards: { stall: BoardSlot[]; market: BoardSlot[] };
+  // q(270) (v6): one Market Board per city cluster, made the first time the player is in that city. `boards.market`
+  // stays the home city's board, as v5 and older had it, and markets[home] is the same array, linked at load, on every
+  // settle and on a home change. Outside `boards`: a server rolled back to v5 walks every value of `boards` as a board,
+  // and reads the home board it knew. Walks: boards.boardsOf.
+  markets: Record<string, BoardSlot[]>;
+  // q(272): each city's local requests from its keepers (locals.ts), by city cluster; absent until the first away from
+  // home, filled in place (no version of its own, as the inbox): a server without it keeps the field as it was.
+  locals?: Record<string, LocalCity>;
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   presence: Presence;
   inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
@@ -201,6 +209,10 @@ export interface P0State {
   seq: number;
 }
 
+/** q(272): a city's local requests — `day` the player day they were drawn on (dayKey), each slot a request and the
+ * keeper's outpost giving it. Tracked ones stay past their day; the untracked go at the next day's draw. */
+export interface LocalCity { day: string; slots: { req: BoardRequest; place: string }[] }
+
 export const emptyDay = (key = ''): P0Day => ({
   key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
 });
@@ -214,8 +226,10 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
   const plots: Plot[] = [];
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
+  const travel = freshTravel(c, opts.pending);
+  const market: BoardSlot[] = [];   // the home city's Market Board, `boards.market` and `markets[home]` one array (q(270))
   return {
-    v: 5, player, created_at: now, clock_ms: 0,
+    v: 6, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
@@ -225,7 +239,8 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
     homestead: { level: 1, plaque: [] },
     residents: {},
-    boards: { stall: pondCatch ? [{ req: tutorialRequest(c, now), refill_at: 0 }] : [], market: [] }, req_done: [],
+    boards: { stall: pondCatch ? [{ req: tutorialRequest(c, now), refill_at: 0 }] : [], market }, markets: { [travel.home]: market },
+    req_done: [],
     presence: { left_at: null, last_at: 0, space: null, place: null },
     firsts: [], rewards: [],
     day: emptyDay(),
@@ -237,7 +252,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
-    travel: freshTravel(c, opts.pending),
+    travel,
     seen: [],
     facilities: [], facility_count: 0,
     fires: 0,
@@ -328,12 +343,25 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
     }
   }
+  if (s.v < 6 && !s.markets) {   // q(270), SGODOT-378: the one Market Board becomes the home city's, with its requests and refill times
+    s.markets = { [t.home]: s.boards.market ?? [] };
+  } else if (s.v < 6) {
+    // back from a v5 server (a rollback): `boards.market` is the board it played; the other cities' boards waited as they
+    // were. One it read under another home (a home change meanwhile) holds requests that board took along: those go.
+    const held = new Set((s.boards.market ?? []).map(slot => slot.req?.id).filter(Boolean));
+    for (const [city, slots] of Object.entries(s.markets)) {
+      if (city !== t.home) for (const slot of slots) if (slot.req && held.has(slot.req.id)) { slot.req = null; slot.refill_at = now; }
+    }
+  }
+  s.markets ??= {};
+  s.boards.market ??= s.markets[t.home] ?? [];   // the home board, one array under both names (P0State.markets)
+  s.markets[t.home] = s.boards.market;
   if (t.day_hold && now >= t.day_hold.until) delete t.day_hold;   // q(173): the carried day is over
   // q(189) ③: a city the table no longer has (a closed country's): the player is home, its Day Pass goes, and an accepted
   // board request with a check-in there is dropped, free. Visits and stamps stay in the save (the view leaves them out).
   for (const id of Object.keys(t.passes)) if (!openCity(c, id)) delete t.passes[id];
   if (!openCity(c, t.here)) t.here = t.home;
-  for (const slots of Object.values(s.boards ?? {})) {
+  for (const slots of [s.boards.stall ?? [], ...Object.values(s.markets ?? {})]) {
     for (const slot of slots) {
       const at = slot.req?.visit?.place, city = at ? clusterOf(c, at) : null;
       if (city && !openCity(c, city)) { slot.req = null; slot.refill_at = now; }

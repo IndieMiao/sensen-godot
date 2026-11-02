@@ -16,7 +16,8 @@ func test_the_pond_opens_at_the_farms_size_and_pitch_and_pinches_like_it() -> vo
 	assert_float(P0Pond.view_size(PHONE, 0.8)).is_equal_approx(8.4, 0.001)
 	var pond = auto_free(P0Pond.new())   # not in the tree: only its camera fields
 	assert_float(pond._zoom).is_equal(1.0)
-	assert_float(exp(pond._pinch._low)).is_equal_approx(0.8, 0.0001)    # the farm's ElasticZoom range
+	assert_float(P0Pond.view_size(PHONE, P0Pond.FAR_ZOOM)).is_equal_approx(9.882, 0.001)   # the open-water ponds' widest (374)
+	assert_float(exp(pond._pinch._low)).is_equal_approx(0.68, 0.0001)   # past the farm's 0.8 (不知火舞 on 374)
 	assert_float(exp(pond._pinch._high)).is_equal_approx(1.4, 0.0001)
 
 func test_the_camera_looks_up_the_pond_at_43_degrees() -> void:
@@ -38,7 +39,7 @@ func test_the_sides_stop_flush_with_the_meadow() -> void:
 ## Checked through a real camera: the band's top row meets the meadow's far edge, its bottom row the near edge.
 func test_the_band_stops_on_the_meadows_far_and_near_edges() -> void:
 	var art := PondScenery.MEADOW
-	for zoom in [1.0, 0.8]:
+	for zoom in [1.0, 0.8, P0Pond.FAR_ZOOM]:
 		var cam := _phone_camera(zoom)
 		for at in [Vector3(6, 0, -18), Vector3(6, 0.2, -18)]:   # 0.2: standing on a raised bank
 			var far := P0Pond.clamp_focus(at, cam.size, PHONE, BAND, art)
@@ -47,8 +48,8 @@ func test_the_band_stops_on_the_meadows_far_and_near_edges() -> void:
 		var near := P0Pond.clamp_focus(Vector3(6, 0, 1), cam.size, PHONE, BAND, art)
 		P0Pond.place(cam, near)
 		assert_float(_ground(cam, BAND.end.y).z).is_equal_approx(art.end.y, 0.001)
-		var mid := P0Pond.clamp_focus(Vector3(6, 0, -8), cam.size, PHONE, BAND, art)
-		assert_float(mid.z).is_equal(-8.0)
+		var mid := P0Pond.clamp_focus(Vector3(6, 0, -5), cam.size, PHONE, BAND, art)   # inside every zoom's range (374)
+		assert_float(mid.z).is_equal(-5.0)
 
 ## Where the meadow can't fill the band along an axis, that axis holds the middle (不知火舞: 装得下就居中).
 func test_a_meadow_smaller_than_the_band_holds_the_middle() -> void:
@@ -79,7 +80,7 @@ func test_the_opening_shot_puts_the_feet_40_px_above_the_key_and_inside_the_safe
 ## The whole pond in one view at the farthest zoom (美术总监 / 奕星): every shape's water is narrower than the screen and
 ## shallower than the band's ground there.
 func test_every_pond_fits_the_band_at_the_farthest_zoom() -> void:
-	var size := P0Pond.view_size(PHONE, 0.8)
+	var size := P0Pond.view_size(PHONE, P0Pond.FAR_ZOOM)
 	var depth := BAND.size.y / (PHONE.x / size) / sin(deg_to_rad(P0Pond.PITCH_DEG))
 	for t in ["crescent", "gourd", "meander"]:
 		var poly: Array = SystemPonds.template(t).polygon

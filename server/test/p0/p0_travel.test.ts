@@ -1,4 +1,4 @@
-/** SGODOT-278: cross-city travel (free first version), passes and stamps (note 0fc0bc5e §2–§4). */
+/** SGODOT-278: cross-city travel, passes and stamps (note 0fc0bc5e §2–§4); fares since q(256) (SGODOT-367, p1_travel_fares). */
 import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
@@ -25,9 +25,12 @@ c.fishing.places[TOKYO_POND] = { ...c.fishing.places.pond_san_francisco_03, city
 const T = Date.parse('2026-10-10T18:00:00Z');   // 11:00 in San Francisco
 const DAY = 86_400_000;
 
-const fresh = () => freshState(c, 'travel-player', T, 7);
+// q(256): travel takes the Trip band's fare; these saves can pay for every trip here (the fares have their own tests)
+const fresh = () => { const s = freshState(c, 'travel-player', T, 7); s.coins = 5000; s.energy.value = 200; return s; };
 const run = (s: P0State, cmd: P0Command, at = T): P0Result => applyP0(c, s, cmd, at);
 function step(s: P0State, cmd: P0Command, at = T) { const r = run(s, cmd, at); if (!r.ok) throw new Error(r.code); return r; }
+/** A route test's player, made with the coins and Energy to pay for Tokyo (q(256)). */
+function canPay(store: P0Store, player: string) { const s = store.get(player, T); s.coins = 5000; s.energy.value = 200; store.put(s); }
 
 describe('travel (SGODOT-278)', () => {
   it('fresh saves freeze the fallback list from the farm; trips follow table 11-4', () => {
@@ -40,7 +43,7 @@ describe('travel (SGODOT-278)', () => {
     expect(tripOf(c, s, SF)).toEqual({ km: 0, trip: 1, name: 'Local' });
   });
 
-  it('a first visit: Day Pass, stamp, +10 Energy, arrival event; free', () => {
+  it('a first visit: the fare, Day Pass, stamp, +10 Energy, arrival event', () => {
     const s0 = fresh();
     s0.energy.value = 100;
     const r = step(s0, { type: 'travel', to: TOKYO });
@@ -49,9 +52,10 @@ describe('travel (SGODOT-278)', () => {
     expect(s.travel.passes[TOKYO]).toEqual({ kind: 'day', from: T, until: T + DAY });
     expect(s.travel.visits[TOKYO]).toMatchObject({ n: 1, first_at: T });
     expect(s.travel.stamps).toEqual([{ cluster: TOKYO, kind: 'landmark', at: T, counted_on: '2026-10-10' }]);   // Tokyo Tower (SGODOT-303)
-    expect(s.energy.value).toBe(110);
-    expect(s.coins).toBe(s0.coins);
-    expect(r.events).toContainEqual(expect.objectContaining({ kind: 'arrival', cluster: TOKYO, first: true, energy: 10, pass_until: T + DAY }));
+    expect(s.energy.value).toBe(100 - 50 + 10);   // Trip 6: 50 Energy, 300 coins (q(256))
+    expect(s.coins).toBe(s0.coins - 300);
+    expect(r.events).toContainEqual(expect.objectContaining({ kind: 'arrival', cluster: TOKYO, first: true, energy: 10, pass_until: T + DAY,
+      paid: { energy: 50, coins: 300 }, renewed: true }));
   });
 
   it('the silhouette card\'s preview: climate and the city\'s own local time (MAP-3-FREE)', () => {
@@ -98,10 +102,10 @@ describe('travel (SGODOT-278)', () => {
     let s = fresh();
     s = step(s, { type: 'travel', to: TOKYO }).state;
     s = step(s, { type: 'travel', to: NYC }, T + 1).state;
-    const before = s.energy.value;
+    const before = s.energy.value, fare = preview(c, s, LDN, T + 2).cost.energy;
     const r = step(s, { type: 'travel', to: LDN }, T + 2);
     expect(r.state.travel.stamps.map(x => x.counted_on)).toEqual(['2026-10-10', '2026-10-10', '2026-10-11']);
-    expect(r.state.energy.value).toBe(before);
+    expect(r.state.energy.value).toBe(before - fare);   // the fare only: no +10
   });
 
   it('three counted stamps give Explorer Bronze once (+30)', () => {
@@ -136,7 +140,7 @@ describe('requirePass (SGODOT-278)', () => {
   it('a pond in a city never travelled to: pass_required with the confirm panel preview', () => {
     const r = run(fresh(), { type: 'cast', space: 'pond', place: TOKYO_POND });
     expect(r).toMatchObject({ ok: false, code: 'pass_required',
-      detail: { message: 'Pass required', preview: { cluster: TOKYO, name: 'Tokyo', trip: 6, cost: { energy: 0, coins: 0, item: null }, first_visit: true } } });
+      detail: { message: 'Pass required', preview: { cluster: TOKYO, name: 'Tokyo', trip: 6, cost: { energy: 50, coins: 300, item: null }, revisit: false, pass_until: null, first_visit: true } } });
   });
 
   it('with a Day Pass the pond fishes; once it runs out a new cast is trip_expired, the line already out still reels', () => {
@@ -169,6 +173,7 @@ describe('requirePass (SGODOT-278)', () => {
     let now = T;
     registerP0Routes(app, { content: c, store, now: () => now, dev: false });
     const headers = { 'x-p0-player': 'travel-route-2' };
+    canPay(store, 'travel-route-2');
     const at = `/v1/p0/state?space=pond&place=${encodeURIComponent(TOKYO_POND)}`;
     await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'travel', to: TOKYO } });
     expect((await app.inject({ method: 'GET', url: at, headers })).json().ok).toBe(true);
@@ -185,6 +190,7 @@ describe('requirePass (SGODOT-278)', () => {
     let now = T;
     registerP0Routes(app, { content: c, store, now: () => now, dev: false });
     const headers = { 'x-p0-player': 'travel-cold-1' };
+    canPay(store, 'travel-cold-1');
     await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'travel', to: TOKYO } });
     expect(store.get('travel-cold-1', now).travel.here).toBe(TOKYO);
     const farm = await app.inject({ method: 'GET', url: '/v1/p0/state?space=home', headers });
@@ -199,6 +205,7 @@ describe('requirePass (SGODOT-278)', () => {
     let now = T;
     registerP0Routes(app, { content: c, store, now: () => now, dev: false });
     const headers = { 'x-p0-player': 'travel-cold-2' };
+    canPay(store, 'travel-cold-2');
     await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'travel', to: TOKYO } });
     expect((await app.inject({ method: 'GET', url: '/v1/p0/state?space=map', headers })).json().state.travel.here).toBe(TOKYO);
     now = T + DAY + 1;
@@ -207,10 +214,13 @@ describe('requirePass (SGODOT-278)', () => {
     await app.close();
   });
 
-  it('entering a place of a covered city puts the player there; an expired pass inside a place it was entered with does not move them', () => {
+  it('entering a place of the city the player is in puts them there; an expired pass inside a place it was entered with does not move them', () => {
     let s = step(fresh(), { type: 'travel', to: TOKYO }).state;
     s = step(s, { type: 'return_home' }, T + 10).state;
-    s = step(s, { type: 'cast', space: 'pond', place: TOKYO_POND }, T + 20).state;   // back to Tokyo's pond, pass still on
+    // q(256) ④: the pass still runs but the player is home — no walking back in; the revisit fare first (option B)
+    expect(run(s, { type: 'cast', space: 'pond', place: TOKYO_POND }, T + 20)).toMatchObject({ ok: false, code: 'travel_required' });
+    s = step(s, { type: 'travel', to: TOKYO }, T + 20).state;
+    s = step(s, { type: 'cast', space: 'pond', place: TOKYO_POND }, T + 30).state;
     expect(s.travel.here).toBe(TOKYO);
     const late = step(s, { type: 'reel', outcome: 'cancel', space: 'pond', place: TOKYO_POND }, T + DAY + 5).state;
     expect(late.travel.here).toBe(TOKYO);   // still in the pond it entered with the pass

@@ -116,6 +116,9 @@ static func forecast_row(label: String, days: Array) -> MarginContainer:
 
 ## Opens the sheet as `ui`'s modal (modal_kind = kind). go: the primary's action (the sheet does not close itself;
 ## the caller decides); details: Details › (none when empty); closed: called once the sheet leaves the tree.
+## spec.blocked: the primary's gap in LOCK-10's unavailable look (`Need 10 more coins`, still tappable: a tap calls
+## spec.on_blocked, never `go`; spec.blocked_energy: in need-energy's amber, an Energy gap); spec.footer: a caption
+## under it (MAP-5: `Return home is always free`).
 ## Returns the holder.
 static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable(), closed := Callable(), kind := "place_card") -> Control:
 	var holder := Control.new()
@@ -173,7 +176,16 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 	primary.name = "Primary"
 	primary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	primary.activated.connect(go)
+	if str(spec.get("blocked", "")) != "":
+		primary.reason = str(spec.blocked)
+		primary.need_energy = bool(spec.get("blocked_energy", false))
+		if spec.get("on_blocked") is Callable: primary.unavailable_pressed.connect(func(_r): (spec.on_blocked as Callable).call())
 	col.add_child(primary)
+	if str(spec.get("footer", "")) != "":
+		var foot := UiKit.label(str(spec.footer), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+		foot.name = "Footer"
+		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(foot)
 	holder.add_child(panel)
 	var close := UiCloseButton.new()   # floats 6 above the sheet's top-right corner
 	close.pressed.connect(ui.close_modal)

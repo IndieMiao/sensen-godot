@@ -76,9 +76,6 @@ func test_city_map_zooms_out_to_country_level_and_flattens() -> void:
 	_look(m, 31.23, 121.47, 12.0)
 	assert_float(m.center_lat).is_equal_approx(31.23, 1e-9)
 	assert_float(m.center_lng).is_equal_approx(121.47, 1e-9)
-	# 选址/搬家模式的下限不变。
-	m.enter_relocation_mode(FarmRegions.load_default().region("los_angeles"))
-	assert_float(m._minimum_zoom()).is_equal(m.STREET_ZOOM_MIN)
 
 func test_country_view_shows_only_city_bubbles_and_own_portrait() -> void:
 	var m := _map()

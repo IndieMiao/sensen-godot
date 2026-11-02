@@ -82,8 +82,9 @@ func test_another_citys_bubble_opens_its_silhouette_card_then_its_free_travel_ca
 	(rt.ui.root.find_child("Link_Travel_details", true, false) as Button).pressed.emit()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	var texts := _texts(rt.ui.root)
-	assert_array(texts).contains(["Tokyo, Japan", "Unexplored", "Free", "First visit · stamp + 10 Energy"])
-	assert_bool(texts.any(func(t): return str(t).ends_with(" km · Trip 6 · Intercontinental"))).is_true()
+	# MAP-5 (q(257) ②): the city, its country, the trip and the first visit (no fares from this view: Cost · Free)
+	assert_array(texts).contains(["Tokyo", "Japan", "Cost", "Free", "First visit · stamp + 10 Energy", "Return home is always free"])
+	assert_bool(texts.any(func(t): return str(t).ends_with(" km · Trip 6"))).is_true()
 	assert_dict(rt.here).is_equal({"space": "home", "place": ""})   # the card is not a trip: nothing sent yet
 	assert_array(sent.filter(func(c): return str(c.get("type", "")) == "travel")).is_empty()
 	var fly: Node = rt.ui.root.find_children("Primary", "", true, false)[0]
@@ -109,7 +110,7 @@ func test_fly_flies_there_and_the_player_stands_in_that_city() -> void:
 	var rt: P0Runtime = m.rt
 	var saved := _with_travel(rt, {home = SF, here = SF, passes = {}, visits = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
 	var there: Dictionary = rt.session.view.duplicate(true)
-	there.travel = {home = SF, here = TOKYO, passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}},
+	there.travel = {home = SF, here = TOKYO, passes = {TOKYO: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 24 * 3_600_000.0}},
 		visits = {TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
 	_hold_wire(rt)
 	m._take_off(TOKYO, 8815)
@@ -126,22 +127,23 @@ func test_fly_flies_there_and_the_player_stands_in_that_city() -> void:
 	_hold_wire(rt)
 	m._take_off(TOKYO, 8815)
 	_answer(rt, there, [{kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8815}])
-	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome back")   # q(108): a return only floats Welcome back
+	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome back · Day Pass 24h")   # a return: Welcome back, its pass (q(257) ⑤)
 	rt.session.view = saved
 
-func test_away_the_chip_reads_the_arrived_city_with_no_day_pass() -> void:
+## q(257) ⑤ (SGODOT-367; q(108) ③'s free version showed none): away the chip reads `Tokyo · Arrived · Day Pass 7h`.
+func test_away_the_chip_reads_the_arrived_city_and_its_day_pass() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
-	var saved := _with_travel(rt, {home = SF, here = TOKYO, passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}},
+	var saved := _with_travel(rt, {home = SF, here = TOKYO, passes = {TOKYO: {kind = "day", from = 1.0, until = 1_000_000_000.0 + 7 * 3_600_000.0}},
 		visits = {TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
 	rt.ui.set_view(rt.session.view)
 	var place: Dictionary = rt.ui.hud.data.place
 	assert_str(str(place.city)).is_equal("Tokyo")
 	assert_str(str(place.space)).is_equal("Arrived")
 	assert_int(int(place.kind)).is_equal(UiHud.PlaceKind.FOREIGN)
-	assert_str(str(place.day_pass)).is_empty()
+	assert_str(str(place.day_pass)).is_equal("7h")
 	rt.session.view = saved
 	rt.ui.set_view(saved)
 
@@ -153,9 +155,13 @@ func test_a_place_refused_without_a_pass_opens_that_citys_travel_card() -> void:
 	rt._on_refused("pass_required", {"message": "Pass required", "preview": {"cluster": TOKYO, "name": "Tokyo", "km": 8815,
 		"trip": 6, "trip_name": "Intercontinental", "first_visit": true}}, {"type": "cast", "space": "pond", "place": TOKYO + "~pond0"})
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
-	assert_array(_texts(rt.ui.root)).contains(["8,815 km · Trip 6 · Intercontinental"])
+	assert_array(_texts(rt.ui.root)).contains(["8,815 km · Trip 6"])   # the server's preview: its km and trip
 	rt.ui.close_modal()
 	rt._on_refused("trip_expired", {"preview": {"cluster": TOKYO}}, {})
+	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	rt.ui.close_modal()
+	# q(256) ④: a pass, but the player is not in that city — the same card (MAP-5-RETURN), at the return fare
+	rt._on_refused("travel_required", {"message": "Travel first", "preview": {"cluster": TOKYO}}, {"type": "enter"})
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	rt.ui.close_modal()
 
@@ -228,17 +234,17 @@ func test_the_silhouette_card_reads_the_city_and_fills_in_its_places() -> void:
 	assert_str(str(empty.title)).is_equal("Tokyo")
 	assert_str(str(empty.state)).is_equal("Unexplored")
 	assert_str(str(empty.effect)).is_equal("Preview the city before traveling.")
-	assert_array(empty.facts.map(func(f): return str(f[0]))).is_equal(["Climate", "Trip", "Local time"])
+	assert_array(empty.facts.map(func(f): return str(f[0]))).is_equal(["Climate", "Trip", "Fare", "Local time"])   # Fare: q(257) ⑥
 	assert_str(str(empty.facts[0][1])).is_equal("Temperate")
 	assert_str(str(empty.facts[1][1])).is_equal("6 · Intercontinental")
-	assert_str(str(empty.facts[2][1])).is_equal("–")
+	assert_str(str(empty.facts[3][1])).is_equal("–")
 	assert_array(empty.rows.map(func(r): return str(r.quantity))).is_equal(["–", "–", "–"])
 	var city := {"preview": {"cluster": TOKYO, "trip": 6, "km": 8278, "trip_name": "Intercontinental", "utc_offset_min": 540,
 		"counts": {"ponds": 4, "outposts": 9, "residents": 9}}}
 	var full: Dictionary = P0Map.city_card(rt.session.view, TOKYO, city)
 	assert_array(full.rows.map(func(r): return "%s %s" % [r.quantity, r.unit])).is_equal(["4 ponds", "9 outposts", "9 residents"])
 	# local time = the view's clock + the city's offset: 1_000_000_000 ms (1970-01-12 13:46:40 UTC) + 9 h
-	assert_str(str(full.facts[2][1])).is_equal("22:46")
+	assert_str(str(full.facts[3][1])).is_equal("22:46")
 	assert_str(str(full.dismiss)).is_equal("Keep browsing")
 	rt.ui.close_modal()
 	m.open_city_card(TOKYO)

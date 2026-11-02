@@ -33,7 +33,7 @@ describe('save v5 (SGODOT-275)', () => {
   it('a v4 save gains the travel block and nothing else changes', () => {
     const raw = v4();
     const up = upgradeState(c, structuredClone(raw), now);
-    expect(up.v).toBe(5);
+    expect(up.v).toBe(6);   // v5 and then v6 (q(270))
     expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
     const { v: _a, travel: _b, ...rest } = up;   // (no fishing_city keys in this save)
     const { v: _c, ...was } = raw;
@@ -60,7 +60,7 @@ describe('save v5 (SGODOT-275)', () => {
     expect(upgradeState(c, structuredClone(s), now).travel).toEqual(s.travel);
   });
 
-  it('the store keeps the v4 file once, then rewrites it as v5', () => {
+  it('the store keeps the v4 file once, then rewrites it at the current version (v6 since q(270))', () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), 'p0-v5-'));
     const file = path.join(dir, 'p0-state.json');
     const input = JSON.stringify({ a: v4('a'), b: v4('b') });
@@ -70,7 +70,7 @@ describe('save v5 (SGODOT-275)', () => {
     expect(readFileSync(`${file}.v4.bak`, 'utf8')).toBe(input);
     store.put(store.peek('a')!);
     const written = JSON.parse(readFileSync(file, 'utf8')) as Record<string, P0State>;
-    expect(Object.values(written).map(s => s.v)).toEqual([5, 5]);
+    expect(Object.values(written).map(s => s.v)).toEqual([6, 6]);
     const again = new P0Store(c, file);
     expect(again.migrated).toBe(0);
     expect(readFileSync(`${file}.v4.bak`, 'utf8')).toBe(input);   // not overwritten by the second load

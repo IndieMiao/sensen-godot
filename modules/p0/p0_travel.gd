@@ -61,6 +61,12 @@ static func pass_left_ms(view: Dictionary, cluster: String) -> float:
 static func covers(view: Dictionary, cluster: String) -> bool:
 	return cluster == home(view) or pass_left_ms(view, cluster) > 0.0
 
+## Whether a place of that city can be walked into from here (q(256) ④, option B): the home city, or the city the player
+## is in with its Day Pass running. A pass for a city the player has left is the way back at the revisit fare — its
+## travel card first, as the server's travel_required says (SGODOT-382).
+static func in_city(view: Dictionary, cluster: String) -> bool:
+	return cluster == home(view) or (cluster == here(view) and covers(view, cluster))
+
 ## §11.7.1 fog's three states: "second_home" for a city set as one (travel.second_homes, P2's second version sets
 ## them; the client already draws the state), "explored" once visited or the home city, else "unexplored".
 static func fog(view: Dictionary, cluster: String) -> String:
@@ -90,9 +96,9 @@ static func pass_text(view: Dictionary, cluster: String) -> String:
 	var minutes := ceili(ms / 60000.0)
 	return "%dh" % ceili(minutes / 60.0) if minutes >= 60 else "%dm" % minutes
 
-## The place chip while away (LOCK-06): the arrived city's name and Foreign (Tokyo · Arrived). The free first version
-## shows no Day Pass (q(108), pending the user: the server still issues one, an expired one only brings back the free
-## confirm panel); pass_text is kept for the paid version. At home the scene's own "City · Space" stands. `info` is
+## The place chip while away (LOCK-06): the arrived city's name and Foreign, and its Day Pass while it runs (q(257) ⑤:
+## `Los Angeles · Arrived · Day Pass 23h`, `Tokyo · Sumida Pond · Day Pass 7h`; q(108) ③'s free version showed none).
+## At home the scene's own "City · Space" stands. `info` is
 ## P0Logic.place_info's {city, space, kind, day_pass}.
 ## A scene of the home city ("San Francisco · Homestead" on the map) is not where an arrived player is: away, the chip
 ## reads "<City> · Arrived" until they go into a space of that city (whose own chip names its city).
@@ -109,7 +115,7 @@ static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary
 	if str(info.get("city", "")) != city: out["space"] = "Arrived"
 	out["city"] = city
 	out["kind"] = UiHud.PlaceKind.FOREIGN
-	out["day_pass"] = ""
+	out["day_pass"] = pass_text(view, here(view))
 	return out
 
 ## At home the scenes write the written city into their chip (P0City.chip: `San Francisco · Homestead`); a generated
@@ -151,19 +157,70 @@ static func home_base(view: Dictionary) -> Vector2:
 static func trip(view: Dictionary, cluster: String) -> Dictionary:
 	return P0Clusters.trip(cluster, home(view), home_base(view), view.get("travel", {}).get("fallback", {}))
 
+# ---------------------------------------------------------------- fares (q(256) / q(257), SGODOT-367)
+## Every coin spend but seeds keeps this much in the wallet (§8.1.1, the server's content.wallet_floor).
+const WALLET_FLOOR := 40
+
+## q(256) ①: the seven tiers' first-visit fares, Trip 1 first — view.travel.fares, the server's content table
+## ({energy: [0, 10, …], coins: [0, 20, …]}); a server from before sends none: every trip is free there.
+static func fare_table(view: Dictionary) -> Dictionary:
+	var t = view.get("travel", {}).get("fares", {})
+	return t if t is Dictionary and t.get("energy") is Array and t.get("coins") is Array else {}
+
+## What going to a cluster costs now (q(256), the server's fareOf: its preview and the travel reply settle it): the
+## trip tier's fare (the frozen fallback in the tier: the 3 nearest cities are Trip 1, free), each half rounded up on a
+## return (visited before); nothing home or where the player already is with a running pass. {energy, coins, revisit,
+## free (nothing to pay), pass_ms (ms left on a running pass: no new pass, no visit counted, q(256) ②)}.
+static func fare(view: Dictionary, cluster: String) -> Dictionary:
+	var revisit := visits(view, cluster) > 0
+	var out := {energy = 0, coins = 0, revisit = revisit, free = true, pass_ms = pass_left_ms(view, cluster)}
+	var table := fare_table(view)
+	if table.is_empty() or cluster == home(view) or (cluster == here(view) and covers(view, cluster)): return out
+	var i := clampi(int(trip(view, cluster).get("trip", 1)) - 1, 0, (table.energy as Array).size() - 1)
+	var e := int(table.energy[i])
+	var c := int(table.coins[mini(i, (table.coins as Array).size() - 1)])
+	if revisit:
+		e = ceili(e / 2.0)
+		c = ceili(c / 2.0)
+	out.merge({energy = e, coins = c, free = e == 0 and c == 0}, true)
+	return out
+
+## `30 Energy · 120 coins`, `Free` for nothing to pay (the silhouette card's Fare, q(257) ⑥).
+static func fare_text(f: Dictionary) -> String:
+	return "Free" if bool(f.get("free", true)) else "%d Energy · %d coins" % [int(f.energy), int(f.coins)]
+
+## q(257) ③ (LOCK-10; 不知火舞 on 367 e0efcc15): what Fly says when the fare cannot be paid — the coins first, grey
+## (`Need 10 more coins`: fare + the 40 floor − the wallet), else the Energy in need-energy's amber with the fare
+## (`Fly · Need 30 Energy`, as the main key and the mine's entry card write it); {} when it can. {text, short ("coins"
+## / "energy"), need (what is missing: the Energy card's)}.
+static func fare_gap(view: Dictionary, f: Dictionary) -> Dictionary:
+	var coins := int(view.get("coins", 0))
+	if int(f.coins) > 0 and coins < int(f.coins) + WALLET_FLOOR:
+		var need := int(f.coins) + WALLET_FLOOR - coins
+		return {text = "Need %d more coins" % need, short = "coins", need = need}
+	var energy := int(view.get("energy", {}).get("value", 0))
+	if int(f.energy) > energy:
+		var need := int(f.energy) - energy
+		return {text = "Fly · Need %d Energy" % int(f.energy), short = "energy", need = need}
+	return {}
+
 # ---------------------------------------------------------------- the Travel Post's Fare Board (q(165))
 ## q(165) Trip fares (§9.11.4 / §17.3.1, read only): the seven tiers in order, each {title `Trip 1 · Local`, line its
 ## bounds (§11.1 — `Up to 30 km, or the 3 nearest cities`, `Up to 100 km, or the 10 nearest cities` with the frozen
-## fallback lists of §11.2.3, … `Over 10,000 km`), fare}. Travel is free in P2's first version, every fare `Free`; its
-## costs come here when they do.
-static func fares() -> Array:
+## fallback lists of §11.2.3, … `Over 10,000 km`), fare: the tier's first-visit fare on two lines (`30 Energy` /
+## `120 coins`, q(257) ①), `Free` for Trip 1 (free: true) and for every tier from a server without fares.
+static func fares(view := {}) -> Array:
 	var km: Array = P0Clusters.TRIP_KM
 	var nearest := {0: 3, 1: 10}   # Trip 1: near3, Trip 2: near10
+	var table := fare_table(view)
 	var out := []
 	for i in P0Clusters.TRIP_NAMES.size():
 		var line := ("Up to %s km" % grouped(int(km[i]))) if i < km.size() else ("Over %s km" % grouped(int(km[-1])))
 		if nearest.has(i): line += ", or the %d nearest cities" % int(nearest[i])
-		out.append({title = "Trip %d · %s" % [i + 1, P0Clusters.TRIP_NAMES[i]], line = line, fare = "Free"})
+		var e := int(table.energy[i]) if i < (table.get("energy", []) as Array).size() else 0
+		var c := int(table.coins[i]) if i < (table.get("coins", []) as Array).size() else 0
+		out.append({title = "Trip %d · %s" % [i + 1, P0Clusters.TRIP_NAMES[i]], line = line, free = e == 0 and c == 0,
+			fare = "Free" if e == 0 and c == 0 else "%d Energy\n%d coins" % [e, c]})
 	return out
 
 # ---------------------------------------------------------------- Nearby cities (MAP-8)

@@ -19,7 +19,7 @@ export type P0Event =
   // Portions left on the stove because neither the cabinet nor the bag had room (Bag full · dish left on the stove).
   | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
-  | { kind: 'coins'; delta: number }
+  | { kind: 'coins'; delta: number; reason?: string }   // reason: 'travel' (q(256)), the fare's coins
   | { kind: 'recipe'; page: string; from: 'card' }   // a recipe card bought: the page is Tasted (§7.16.1)
   | { kind: 'milestone'; id: string; title: string; coins: number; cabinet: number; decor: string | null }   // Cookbook milestone (§7.6.1)
   | { kind: 'first'; what: string; xp: number; name?: string }   // name: the city of a fishing_city first (v5 keys are cluster ids)
@@ -36,7 +36,9 @@ export type P0Event =
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
   | { kind: 'home'; action: 'chosen' | 'changed'; city: string; from: string; spot: number; dropped: string[] }   // SGODOT-303 (home_city.ts); spot -1: a free pin (q(216))
-  | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
+  // paid: the fare taken (q(256)); renewed false: a Day Pass still running was not re-signed and no visit counted (option B)
+  | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number;
+      paid: { energy: number; coins: number }; renewed: boolean }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // energy: actual gain after the new cap (q247); look: the stage it opens
   | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)

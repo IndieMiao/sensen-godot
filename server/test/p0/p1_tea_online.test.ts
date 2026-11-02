@@ -24,8 +24,10 @@ describe("the Tea Host's count by town (q(206))", () => {
     rooms.join('player-other-b', 'sh_market_1');
     rooms.join('player-other-c', tokyoTea);
     const app = Fastify();
-    registerP0Routes(app, { content: c, store: new P0Store(c), now: () => Date.now(), dev: false, rooms });
+    const store = new P0Store(c);
+    registerP0Routes(app, { content: c, store, now: () => Date.now(), dev: false, rooms });
     const hd = { 'x-p0-player': 'player-tea-01' };
+    const rich = store.get('player-tea-01', Date.now()); rich.coins = 5000; store.put(rich);   // Tokyo's fare (q(256))
     const online = async (url: string) => (await app.inject({ method: 'GET', url, headers: hd })).json().state.keepers.tea.online;
 
     expect(await online('/v1/p0/state')).toBe(2);   // San Francisco's two, not Tokyo's

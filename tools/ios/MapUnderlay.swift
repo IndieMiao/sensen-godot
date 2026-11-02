@@ -5,6 +5,7 @@
 // 协议（UTF-8 文本，'|' 分隔）：
 //   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1 ／ LANG|locale ／ POIS|request_id
 //                 ／ TELEM|0/1（Licenses › Mapbox › Share anonymous map usage, q(133) v3）
+//                 ／ CITYSTYLE|0/1（城市配色，同 Android setCityStyle；SGODOT-356）
 //   本层 → Godot：POIS|request_id|part|parts|{"features":[...]}（一次查询拆成多包，每包不超过约 7 KB；Godot 收齐再拼）
 //   本层 → Godot：READY|pixelRatio（样式加载完成后，答复 CREATE 的来源端口）
 import UIKit
@@ -28,6 +29,9 @@ class MapUnderlay: NSObject {
     private var cancelables = Set<AnyCancelable>()
     private var mapLocale = Locale(identifier: "zh-Hans")
     private var styleLoaded = false
+    private var cityStyle = false
+    /// (layer, property) → the style's own value, put back when the city colours go off.
+    private var originalCityProperties: [String: (layer: String, property: String, value: Any)] = [:]
 
     @objc class func setup() {
         shared.start()
@@ -189,6 +193,13 @@ class MapUnderlay: NSObject {
             if UserDefaults.standard.object(forKey: "MGLMapboxMetricsEnabled") as? Bool != on {
                 UserDefaults.standard.set(on, forKey: "MGLMapboxMetricsEnabled")
             }
+        case "CITYSTYLE" where p.count >= 2:
+            // Sent again with LANG's repeats: only a change is applied.
+            let on = p[1] != "0"
+            if on != cityStyle {
+                cityStyle = on
+                applyCityStyle()
+            }
         default:
             NSLog("[MapUnderlay] unknown command: \(p.first ?? "")")
         }
@@ -321,7 +332,14 @@ class MapUnderlay: NSObject {
         mv.mapboxMap.onStyleLoaded.observe { [weak self] _ in
             NSLog("[MapUnderlay] style loaded")
             self?.styleLoaded = true
+            // Streets v12 is a globe at low zoom; the game's overlay is Web Mercator, so lock it as Android does, or
+            // the pins drift off the map at the country view.
+            do { try self?.mapView?.mapboxMap.setProjection(StyleProjection(name: .mercator)) } catch {
+                NSLog("[MapUnderlay] projection failed: \(error)")
+            }
+            self?.originalCityProperties.removeAll()   // a new style: its own values are read afresh
             self?.localizeMap()
+            self?.applyCityStyle()
             self?.sendReady()
         }.store(in: &cancelables)
         mv.mapboxMap.onMapLoadingError.observe { [weak self] event in
@@ -342,6 +360,52 @@ class MapUnderlay: NSObject {
             try map.localizeLabels(into: mapLocale)
         } catch {
             NSLog("[MapUnderlay] localization failed: \(error)")
+        }
+    }
+
+    // MARK: - 城市配色（Android GodotMapPlugin.applyCityStyle 的孪生，颜色与字号一致）
+
+    private func applyCityStyle() {
+        guard styleLoaded, let map = mapView?.mapboxMap else { return }
+        if !cityStyle {
+            for o in originalCityProperties.values {
+                try? map.setLayerProperty(for: o.layer, property: o.property, value: o.value)
+            }
+            originalCityProperties.removeAll()
+            return
+        }
+        func set(_ id: String, _ property: String, _ value: Any) {
+            let key = id + "|" + property
+            if originalCityProperties[key] == nil {
+                originalCityProperties[key] = (id, property, map.layerProperty(for: id, property: property).value)
+            }
+            do { try map.setLayerProperty(for: id, property: property, value: value) } catch {
+                NSLog("[MapUnderlay] city style \(id).\(property): \(error)")
+            }
+        }
+        for layer in map.allLayerIdentifiers {
+            let id = layer.id
+            let line = layer.type == .line
+            if id == "land" { set(id, "background-color", "#f4f1e7") }
+            else if id == "water" { set(id, "fill-color", "#a3dcea") }
+            else if id == "water-shadow" { set(id, "fill-color", "#8ec4d0") }
+            else if id == "waterway" { set(id, "line-color", "#a3dcea") }
+            else if id == "landuse" || id == "national-park" { set(id, "fill-color", "#d4e5c8") }
+            else if id == "landcover" { set(id, "fill-color", "#e1ebd8") }
+            else if id == "building" { set(id, "fill-color", "#e6e1d4") }
+            else if line && (id.hasPrefix("road-") || id.hasPrefix("bridge-")) && !id.contains("rail") {
+                set(id, "line-color", id.hasSuffix("case") ? "#e3d8c5" : id.contains("motorway") ? "#ead2af" : "#fffdf7")
+            } else if id == "poi-label" || id.contains("road-number") || id.contains("airport-label")
+                        || id.contains("transit-label") || id.contains("settlement-subdivision") {
+                set(id, "visibility", "none")
+            } else if layer.type == .symbol {
+                set(id, "text-color", "#77877c")
+                set(id, "text-halo-color", "#faf8f0")
+                // The country view has to tell its levels apart: country > state > the rest (city districts all 11).
+                let size: Double = id.hasPrefix("country-label") || id.hasPrefix("continent-label") ? 14
+                    : id.hasPrefix("state-label") ? 12 : 11
+                set(id, "text-size", size)
+            }
         }
     }
 
