@@ -3616,7 +3616,8 @@ func open_settings(back := Callable()) -> void:
 	if test_accounts.is_test(): version += " · Test"
 	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
-		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "")
+		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
+		_blocked.size() if _privacy_shown else -1)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3624,10 +3625,53 @@ func open_settings(back := Callable()) -> void:
 		if what == "home": change_home.emit(func(): open_settings(back))
 		elif what == "test_options": open_test_options(func(): open_settings(back))
 		elif what == "notifications": open_notifications(func(): open_settings(back))
+		elif what == "blocked_players": open_blocked_players(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
+	_privacy_read(func(): if modal_kind == "settings": open_settings(back))
+
+## Settings › Blocked players (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP1–BP3 row 127): the account's voice
+## away from any room (P0Runtime's P0VoiceRoom without one): whether this phone is offered voice, and whom it blocked —
+## now that the two never see each other in a room, the only place a block is lifted. The Privacy group shows while
+## voice is offered here, or while anyone is blocked (a block outlives the switch going off, and an iPhone has none).
+var voice_account: Node
+var _blocked: Array = []        # [{handle, name}] as last read, the server's order
+var _privacy_shown := false
+
+## The server asked again; `then` when what the pages show has changed (they are opened again with it).
+func _privacy_read(then: Callable) -> void:
+	if voice_account == null: return
+	await voice_account.call("fetch_status")
+	var rows: Array = await voice_account.call("blocked_list")
+	# offered as a room's would be (P0VoiceRoom.offered) — its own Voice left unset: it never joins or leaves a call
+	var phone = get_node_or_null("/root/Voice")
+	var offered: bool = bool(voice_account.get("available")) and str(voice_account.get("age")) != "no" \
+		and phone != null and bool(phone.call("supported"))
+	var shown := offered or not rows.is_empty()
+	if shown == _privacy_shown and rows == _blocked: return
+	_privacy_shown = shown
+	_blocked = rows
+	then.call()
+
+func open_blocked_players(back: Callable) -> void:
+	var page := P0SettingsPage.blocked_players(_blocked, safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(handle: String): _unblock(handle, back))
+	_open_modal(page, 0.0, true)
+	modal_kind = "blocked_players"
+	_modal_back = back
+	_privacy_read(func(): if modal_kind == "blocked_players": open_blocked_players(back))
+
+## Unblock: the page has taken the row away already (no card, no toast); a failure puts it back with the network's line.
+func _unblock(handle: String, back: Callable) -> void:
+	if await voice_account.call("unblock", handle):
+		_blocked = _blocked.filter(func(r): return str(r.handle) != handle)
+		return
+	show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
+	if modal_kind == "blocked_players": open_blocked_players(back)
 
 ## The crop-ready notifications (SGODOT-350; P0Notify). Settings › Notifications: the switch, and when the system has
 ## said no the notice whose link opens the system's page. The page is read again whenever the phone may have changed

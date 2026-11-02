@@ -17,14 +17,20 @@ extends Control
 ##             switch `Crops ready` (`When a plot is ready to harvest`); when the system has said no, above it the Info
 ##             toast card `Notifications are off for <the app's name>` with `Open system settings ›` (不知火舞 350
 ##             7bffafd7) — and the switch reads off whatever the frame drew (dbd8d596).
+##   BLOCKED   (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP2 / BP3 row 127) from Settings' `Blocked players ›`:
+##             the voice blocks, the only way to lift one now that the two never see each other in a room. A row each in
+##             one card, the name as their name tag writes it (`Traveller 5dd4`) and the people drawer's text key
+##             `Unblock`; a tap takes the row away at once — no card, no toast — and emits open_pressed(handle). No one:
+##             `No one blocked`, secondary, centred. No date under a name: the server keeps none (后裔 on #661).
 ## Emits back_pressed, open_pressed(what): "licenses", a row id, or a Map data row ("mapbox_site", "osm_site",
-## "improve", "notifications", "system_settings"); toggled(what, on): "telemetry", "crops_ready".
+## "improve", "notifications", "system_settings", "blocked_players"), a blocked player's handle on BLOCKED;
+## toggled(what, on): "telemetry", "crops_ready".
 
 signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, BLOCKED }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -34,6 +40,8 @@ const _CONTENT_GAP := 12    # header → content (SET-LICENSES: 64 → 76)
 const _GROUP_GAP := 8       # group title → its card → the next title
 const _BODY_SIZE := 13      # the licence text: Regular 13 (Caption R12 a step up; no 13 Regular style exported)
 const _PARAGRAPH_GAP := 8
+const _EMPTY_TOP := 32      # BLOCKED's `No one blocked` under the header (BP3)
+const NO_ONE_BLOCKED := "No one blocked"
 ## A long text (Mapbox's LICENSE.md: 660 paragraphs, about 0.3 s laid out at once on a desktop) opens with its first
 ## screens and fills in the rest a batch a frame, so the page is up at once.
 const _FIRST_PARAGRAPHS := 30
@@ -84,8 +92,10 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## Legal group (Licenses and Version) (341 d559585e, corrected by 0d94c10d: Home → Notifications → Test options → Legal). `home` {name, line, open}: while the change is open, `Home city · Tokyo` ›
 ## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
 ## `Set for good`. No home (a view not in yet): no Home group. `notifications` "On" / "Off": one row, `Notifications`
-## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group.
-static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "") -> P0SettingsPage:
+## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group. `blocked` ≥ 0: the
+## `Privacy` group before Legal, one row `Blocked players` with how many ›, 0 too (BP1, SGODOT-384); −1: none.
+static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
+		blocked := -1) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -103,6 +113,11 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
 	page._group("", [tests])
+	if blocked >= 0:
+		var privacy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked))
+		privacy.name = "BlockedPlayers"
+		privacy.pressed.connect(func(): page.open_pressed.emit("blocked_players"))
+		page._group("Privacy", [privacy])
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
@@ -167,6 +182,48 @@ static func notifications(on: bool, refused_for: String, safe_top := 0.0, safe_b
 	crops.toggled.connect(func(value: bool): page.toggled.emit("crops_ready", value))
 	page._group("", [crops])
 	return page
+
+## BLOCKED: `rows` [{handle, name}] in the server's order.
+static func blocked_players(rows: Array, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.BLOCKED, "Blocked players", safe_top, safe_bottom)
+	var list: Array = []
+	for r in rows:
+		var handle := str(r.get("handle", ""))
+		var row := UiSettingRow.new(UiSettingRow.Kind.VALUE, str(r.get("name", "")))
+		row.name = "Blocked_" + handle
+		var none := row.find_child("Value", true, false)   # VALUE's value slot, empty here: the key takes its place
+		none.get_parent().remove_child(none)
+		none.free()
+		var key := UiNavButton.new("Unblock", true)
+		key.name = "Unblock"
+		key.chevron = false
+		key.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		key.pressed.connect(func(): page._unblocked(row, handle))
+		row.find_child("Row", true, false).add_child(key)
+		list.append(row)
+	if list.is_empty(): page._no_one()
+	else: page._group("", list)
+	return page
+
+## BLOCKED: the row goes at once, the card closing up; the last one leaves `No one blocked`.
+func _unblocked(row: Control, handle: String) -> void:
+	var card := row.get_parent()
+	row.get_parent().remove_child(row)
+	row.queue_free()
+	if card.get_child_count() == 0:
+		for c in body.get_children(): c.queue_free()
+		_no_one()
+	open_pressed.emit(handle)
+
+func _no_one() -> void:
+	var gap := Control.new()
+	gap.custom_minimum_size.y = _EMPTY_TOP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(gap)
+	var none := UiKit.label(NO_ONE_BLOCKED, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	none.name = "NoOneBlocked"
+	none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body.add_child(none)
 
 ## LICENSES: one group per P0Legal group, a row per credit (`MIT License` under it; a data credit's attribution, then
 ## its licence), each row › to its text.
