@@ -1,0 +1,5 @@
+{
+ "res_lena":  {"slots": {"hairHat": "hairhat51_npc_lena", "glass": "glass1", "cloth": "cloth1_1", "shoes": "shoes1"}},
+ "res_rafa":  {"slots": {"hairHat": "hairhat36_npc_rafa", "cloth": "cloth1_1_npc_rafa", "shoes": "shoes4"}},
+ "res_nadia": {"slots": {"hairHat": "hairhat41_npc_nadia_baker", "cloth": "cloth1_1_npc_nadia", "shoes": "shoes2"}}
+}
