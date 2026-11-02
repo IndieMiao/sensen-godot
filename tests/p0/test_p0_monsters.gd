@@ -102,6 +102,44 @@ func test_the_swing_skips_the_unhittable_and_reports_the_stunned() -> void:
 	assert_bool(hit.has(ids[2])).is_true()
 	assert_array(c.last_stunned).is_equal([ids[1]])
 
+## A monster down plays its `die` for its json's time, out of the fight at once, and then is gone; one that times no die
+## (the slime's placeholder) goes at once, as before; a second sync saying it again does not start it over, and one
+## that has it back up stands it again (刘邦 on #627: E plays die, F's views draw it).
+func test_a_monster_down_plays_its_die_and_then_goes() -> void:
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	var mover := _mover()
+	var mobs := [SLIME.duplicate(), SLIME.duplicate(), SLIME.duplicate()]
+	var view := func() -> Dictionary: return {"mine": {"weapon": {"attack": 3, "speed": 2.0}, "at": {"mine": "wd-254-114",
+		"floor": 3, "day": "2026-11-02", "floor_state": {"floor": 3, "mobs": mobs}}}}
+	c.sync_p0(view.call(), 3, mover)
+	var ids: Array = c.enemies.keys()
+	var nodes: Array = ids.map(func(id): return c.enemies[id].node)
+	for i in [0, 2]:   # these two time a die (a copy: the kind's json stays as it is)
+		nodes[i].meta = (nodes[i].meta as Dictionary).duplicate(true)
+		nodes[i].meta["durations"]["die"] = 0.3
+	mobs[0].hp = 0
+	mobs[1].hp = 0
+	c.sync_p0(view.call(), 3, mover)
+	assert_array(c.enemies.keys()).is_equal([ids[2]])                # both out of the fight at once
+	assert_bool(c.dying.has(ids[0])).is_true()
+	assert_str(nodes[0].action).is_equal("die")
+	assert_bool(nodes[0].visible).is_true()
+	assert_bool(c.dying.has(ids[1]) or nodes[1].visible).is_false()   # no die time: gone now
+	assert_bool(c.fallen.has(0) and c.fallen.has(1)).is_true()
+	c.step(0.2, mover, false)
+	c.sync_p0(view.call(), 3, mover)                                  # said again: not started over
+	assert_float(float(c.dying[ids[0]].left)).is_equal_approx(0.1, 0.001)
+	c.step(0.2, mover, true)                                          # plays out even while the fight holds still
+	assert_bool(c.dying.has(ids[0]) or nodes[0].visible).is_false()
+	c.down(2)
+	assert_bool(c.dying.has(ids[2])).is_true()
+	mobs[2].hp = 9                                                    # the view rolled back: standing again
+	c.sync_p0(view.call(), 3, mover)
+	assert_bool(c.dying.has(ids[2])).is_false()
+	assert_bool(c.enemies.has(ids[2])).is_true()
+	assert_str(nodes[2].action).is_equal("idle")
+
 ## A floor with every rock broken (as test_p0_mine_deep's Layout_bp): open ground around the spawn.
 func _mover() -> PlayerMover:
 	var nodes: Array = []
