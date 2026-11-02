@@ -1,0 +1,106 @@
+[
+  {
+    "file": "SGODOT-216_tea_v1_default_43deg_360.png",
+    "bytes": 209973,
+    "sha256": "6b45516ca7f3fe333e8660e2d8b2e21f80b7c5599cbda44eff0c377bffa148d3",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      360,
+      903
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_overview.png",
+    "bytes": 753620,
+    "sha256": "d9af87ab5d709fca8d6e8aa3fe2e54f2728637b15483bbb47a9ee9742cf6f071",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_topdown_capsules.png",
+    "bytes": 609905,
+    "sha256": "860b352139532b0b60098d9329a49d15c491d9401cee9e31d0f1cbd1b67334db",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1200,
+      1303
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_seated_stool.png",
+    "bytes": 610772,
+    "sha256": "4b6169bb725115736ef758e5a7ac2fefae221c6a13423502218387986f975a1a",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1100,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_counter_coffee_corner.png",
+    "bytes": 1134700,
+    "sha256": "26c554108a34fd9899076d802cbce6b75840b1f3732eafd612a9baee7239747e",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1400,
+      1103
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_reference_comparison.png",
+    "bytes": 853263,
+    "sha256": "5c333fd97215d176d41c99bf1ccc6e4f2da58aa9315f57bb2ba85f6de31861ba",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1300,
+      797
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_plant_atlas_comparison.png",
+    "bytes": 292295,
+    "sha256": "d1625d9ac9a1474531d6efb07ff6c0d33e4d7561339762488e986e0cc7baa068",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      1000,
+      1291
+    ]
+  },
+  {
+    "file": "SGODOT-216_tea_v1_validation.json",
+    "bytes": 107617,
+    "sha256": "879a19e699454ff2080e117f90dea56013de011554dd9b94d3df2c7065b89834",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-216_tea_v1_scene_bench_result.json",
+    "bytes": 24300,
+    "sha256": "daf0c54880415c18fcc14986f09d86eceaf9ea78552e62553f903f023bb27122",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-216_tea_v1_asset_table.md",
+    "bytes": 1882,
+    "sha256": "af1517180389a7b4fe44085d1e338f9d0d0817e0ec3b469575eac86c33e58f5a",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-216_tea_v1_walkthrough.mp4",
+    "bytes": 274033,
+    "sha256": "27aea4ef73b3037b7277fa0cc52055f3c52a55ab3c6a8b42d8c35b057a622aee",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-216_tea_v1_scene_bench_collisions.png",
+    "bytes": 962937,
+    "sha256": "a38ced6a926e3efdeb267f6d992c0aeae34d41eadb3824e0f497737c56471da6",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "pixels": [
+      960,
+      823
+    ]
+  }
+]

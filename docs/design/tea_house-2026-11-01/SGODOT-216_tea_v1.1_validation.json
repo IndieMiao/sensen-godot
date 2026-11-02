@@ -1,0 +1,2842 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "passed": true,
+  "geometry": {
+    "checks": [
+      {
+        "check": "room_shell: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "room_shell: one material slot",
+        "passed": true
+      },
+      {
+        "check": "room_shell: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "room_shell: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "room_shell: one surface",
+        "passed": true
+      },
+      {
+        "check": "room_shell: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "room_shell: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "room_shell: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "room_shell: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "room_shell: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "room_shell: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: one material slot",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: one surface",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "left_wall: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "left_wall: one material slot",
+        "passed": true
+      },
+      {
+        "check": "left_wall: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "left_wall: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "left_wall: one surface",
+        "passed": true
+      },
+      {
+        "check": "left_wall: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "left_wall: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "left_wall: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "left_wall: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "left_wall: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "left_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "back_wall: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "back_wall: one material slot",
+        "passed": true
+      },
+      {
+        "check": "back_wall: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "back_wall: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "back_wall: one surface",
+        "passed": true
+      },
+      {
+        "check": "back_wall: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "back_wall: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "back_wall: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "back_wall: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "back_wall: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "back_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_window: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_window: one material slot",
+        "passed": true
+      },
+      {
+        "check": "round_window: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "round_window: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_window: one surface",
+        "passed": true
+      },
+      {
+        "check": "round_window: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "round_window: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_window: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "round_window: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "round_window: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "round_window: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: one material slot",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: one surface",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: one material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: one surface",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: one material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: one surface",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_bench: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "window_bench: one material slot",
+        "passed": true
+      },
+      {
+        "check": "window_bench: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "window_bench: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "window_bench: one surface",
+        "passed": true
+      },
+      {
+        "check": "window_bench: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "window_bench: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "window_bench: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "window_bench: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "window_bench: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "window_bench: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "counter: one material slot",
+        "passed": true
+      },
+      {
+        "check": "counter: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "counter: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "counter: one surface",
+        "passed": true
+      },
+      {
+        "check": "counter: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "counter: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "counter: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "counter: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "counter: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "counter: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: one material slot",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: one surface",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: one material slot",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: one surface",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: one material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: one surface",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: one material slot",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: one surface",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one material slot",
+        "passed": true
+      },
+      {
+        "check": "name_sign: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "name_sign: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one surface",
+        "passed": true
+      },
+      {
+        "check": "name_sign: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "name_sign: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "name_sign: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "name_sign: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "name_sign: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "name_sign: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: one material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: one surface",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: one material slot",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: one surface",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: one material slot",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: one surface",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: original shared plant positions retained exactly",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: one external room atlas",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: one material slot",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: actual external albedo binding",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: one surface",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: primitive binds material slot",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: finite vertices and no zero-area triangles",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: UVs remain in assigned atlas region",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: measured triangle count matches manifest",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: provenance exists",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: leaf scissor and no shadows",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: original shared plant positions retained exactly",
+        "passed": true
+      },
+      {
+        "check": "Actual placed triangles <=200000",
+        "passed": true
+      },
+      {
+        "check": "Actual placed surfaces <=60",
+        "passed": true
+      },
+      {
+        "check": "Actual placed plant triangles <=100000",
+        "passed": true
+      },
+      {
+        "check": "Exactly one 2048x2048 atlas",
+        "passed": true
+      },
+      {
+        "check": "Actual tree canopy clears the left wall and its projecting timber",
+        "passed": true
+      },
+      {
+        "check": "Full immutable gameplay anchor contract including four legacy seats",
+        "passed": true
+      },
+      {
+        "check": "Exactly twelve seats",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3: world seat height and owning module",
+        "passed": true
+      },
+      {
+        "check": "No redundant stand anchors for seats",
+        "passed": true
+      },
+      {
+        "check": "Blank sign and outward anchor in rear-left wall bay",
+        "passed": true
+      },
+      {
+        "check": "Spawn at least 1.2m from exit",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "room_shell": {
+        "triangles": 9476,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -3.4000000953674316,
+            -0.18000000715255737,
+            -3.200000047683716
+          ],
+          [
+            3.4000000953674316,
+            0.07999999821186066,
+            3.200000047683716
+          ]
+        ],
+        "dimensions_m": [
+          6.800000190734863,
+          0.26000000536441803,
+          6.400000095367432
+        ],
+        "sha256": "01c89b38cbaaa442e0e7efeef9b8b5dfdaae6113e396b36e3160880dc27d2ae8"
+      },
+      "entry_deck": {
+        "triangles": 108,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            -0.14000000059604645,
+            -0.5999999046325684
+          ],
+          [
+            0.6499999761581421,
+            0.07999999821186066,
+            0.5999999046325684
+          ]
+        ],
+        "dimensions_m": [
+          1.2999999523162842,
+          0.2199999988079071,
+          1.1999998092651367
+        ],
+        "sha256": "8d60ac6b5e1d6358dad03b5ca2d9fe9c756cf3190a351cb4a59643b169500490"
+      },
+      "left_wall": {
+        "triangles": 1756,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -3.240000009536743,
+            -7.450580596923828e-09,
+            -0.10000012069940567
+          ],
+          [
+            3.240000009536743,
+            3.700000286102295,
+            0.2849999964237213
+          ]
+        ],
+        "dimensions_m": [
+          6.480000019073486,
+          3.7000002935528755,
+          0.385000117123127
+        ],
+        "sha256": "4e6c640558c4bfe36b7cb611e06a587e399da673f45f9c067e47ddb8ae46d39c"
+      },
+      "back_wall": {
+        "triangles": 1080,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -3.440000057220459,
+            -7.450580596923828e-09,
+            -0.09999990463256836
+          ],
+          [
+            3.440000057220459,
+            3.700000286102295,
+            0.2849998474121094
+          ]
+        ],
+        "dimensions_m": [
+          6.880000114440918,
+          3.7000002935528755,
+          0.38499975204467773
+        ],
+        "sha256": "8ffb4f208c42c8323e0bf1cc6a59ed85985b351ea06ee22bab08a13c93c2986a"
+      },
+      "round_window": {
+        "triangles": 1536,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.8799999952316284,
+            -0.8799999952316284,
+            -0.05500008538365364
+          ],
+          [
+            0.8799999356269836,
+            0.880000114440918,
+            0.055000122636556625
+          ]
+        ],
+        "dimensions_m": [
+          1.759999930858612,
+          1.7600001096725464,
+          0.11000020802021027
+        ],
+        "sha256": "c7be8c0243c3143a2be058b8e74446f36b626989f49e4c7b86eb98d623635c77"
+      },
+      "window_backdrop": {
+        "triangles": 2,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.7799999713897705,
+            -0.7799999713897705,
+            -1.6610325559440753e-08
+          ],
+          [
+            0.7799999713897705,
+            0.7799999713897705,
+            5.157943760991657e-08
+          ]
+        ],
+        "dimensions_m": [
+          1.559999942779541,
+          1.559999942779541,
+          6.818976316935732e-08
+        ],
+        "sha256": "cb4cc3169b76e7f6c4c1fafe2d4a1fc0c7b5c68a3be5986e03028c1f089fab22"
+      },
+      "tea_table_1": {
+        "triangles": 3210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999998807907104,
+            1.4901161193847656e-08,
+            -0.4670000374317169
+          ],
+          [
+            0.44999998807907104,
+            1.2172499895095825,
+            0.46700000762939453
+          ]
+        ],
+        "dimensions_m": [
+          0.8999999761581421,
+          1.2172499746084213,
+          0.9340000450611115
+        ],
+        "sha256": "4f472b6492e4bf19f8acd7ea20c1de096708cd5e03ec8812370e9c3fd2203d89"
+      },
+      "tea_table_1_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.10656380653381348,
+            -0.03437185287475586,
+            -0.09785965085029602
+          ],
+          [
+            0.1119300127029419,
+            0.21391749382019043,
+            0.09653379023075104
+          ]
+        ],
+        "dimensions_m": [
+          0.21849381923675537,
+          0.2482893466949463,
+          0.19439344108104706
+        ],
+        "sha256": "ced35067f9040288b9add7c3d062aded57d5139942b8c6d52af0cde73615d3cb"
+      },
+      "tea_table_2": {
+        "triangles": 3210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999998807907104,
+            1.4901161193847656e-08,
+            -0.46700000762939453
+          ],
+          [
+            0.44999995827674866,
+            1.2172499895095825,
+            0.46700000762939453
+          ]
+        ],
+        "dimensions_m": [
+          0.8999999463558197,
+          1.2172499746084213,
+          0.9340000152587891
+        ],
+        "sha256": "3d6edbeacfe36709e1d21cbc76c117f14b45985d0f60a37330ef3ade4d1171ef"
+      },
+      "tea_table_2_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.10656383633613586,
+            -0.03437185287475586,
+            -0.09785962104797363
+          ],
+          [
+            0.1119299829006195,
+            0.21391749382019043,
+            0.09653377532958984
+          ]
+        ],
+        "dimensions_m": [
+          0.21849381923675537,
+          0.2482893466949463,
+          0.19439339637756348
+        ],
+        "sha256": "82869e1b69d1863c9dba4c3bd443202f53bc8410c0045dfe1542ce3c18c0e232"
+      },
+      "tea_table_3": {
+        "triangles": 3210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999992847442627,
+            1.4901161193847656e-08,
+            -0.46700000762939453
+          ],
+          [
+            0.44999992847442627,
+            1.2172499895095825,
+            0.46700000762939453
+          ]
+        ],
+        "dimensions_m": [
+          0.8999998569488525,
+          1.2172499746084213,
+          0.9340000152587891
+        ],
+        "sha256": "faca844f8b63dd4a83e5a4aca0cefa4ba595e4b8568f01f3c07515819460a428"
+      },
+      "tea_table_3_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.10656380653381348,
+            -0.03437185287475586,
+            -0.09785965085029602
+          ],
+          [
+            0.11192989349365234,
+            0.21391749382019043,
+            0.09653379023075104
+          ]
+        ],
+        "dimensions_m": [
+          0.21849370002746582,
+          0.2482893466949463,
+          0.19439344108104706
+        ],
+        "sha256": "6097a0903009eb38363bb0fbf1a2957ab6137d6e7f4039e5ae8878dc96915ae7"
+      },
+      "round_stool_sage": {
+        "triangles": 836,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2800006866455078,
+            0.0,
+            -0.2800000011920929
+          ],
+          [
+            0.2800006866455078,
+            0.7149999737739563,
+            0.2800000011920929
+          ]
+        ],
+        "dimensions_m": [
+          0.5600013732910156,
+          0.7149999737739563,
+          0.5600000023841858
+        ],
+        "sha256": "aa576253eec5905eab1d813d6999fb5105ee5e754ca11d26e795d83f0f3177ea"
+      },
+      "round_stool_linen": {
+        "triangles": 836,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2800006866455078,
+            0.0,
+            -0.2800000011920929
+          ],
+          [
+            0.2800006866455078,
+            0.7149999737739563,
+            0.2800000011920929
+          ]
+        ],
+        "dimensions_m": [
+          0.5600013732910156,
+          0.7149999737739563,
+          0.5600000023841858
+        ],
+        "sha256": "c0b591904265043f398a7ab644ce81e1b67fd6b97bdcc6047efd639918c2c0ff"
+      },
+      "window_bench": {
+        "triangles": 864,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.0499999523162842,
+            -1.4901161193847656e-08,
+            -0.2500000298023224
+          ],
+          [
+            1.0499999523162842,
+            0.7150000333786011,
+            0.2500000596046448
+          ]
+        ],
+        "dimensions_m": [
+          2.0999999046325684,
+          0.7150000482797623,
+          0.5000000894069672
+        ],
+        "sha256": "aa9f6f3d673ed2568450977f2d13b545998b1a7d047a4a291f2aea2c0f643cb7"
+      },
+      "counter": {
+        "triangles": 5628,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.100000023841858,
+            -1.4901161193847656e-08,
+            -0.3250000476837158
+          ],
+          [
+            1.100000023841858,
+            1.4960123300552368,
+            0.34999990463256836
+          ]
+        ],
+        "dimensions_m": [
+          2.200000047683716,
+          1.496012344956398,
+          0.6749999523162842
+        ],
+        "sha256": "62805454164b9d4bd70d30d1a0f0a1d1af4c2403bea403ac2c0a8f0149775714"
+      },
+      "counter_flowers": {
+        "triangles": 420,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.17544043064117432,
+            -0.05658769607543945,
+            -0.16111040115356445
+          ],
+          [
+            0.18427503108978271,
+            0.3521813154220581,
+            0.1589275598526001
+          ]
+        ],
+        "dimensions_m": [
+          0.35971546173095703,
+          0.40876901149749756,
+          0.32003796100616455
+        ],
+        "sha256": "cb9e58a8146a17679f83a24751a776b2cf668044eddc904804a7f84857066756"
+      },
+      "coffee_console": {
+        "triangles": 1976,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.5,
+            -1.4901161193847656e-08,
+            -0.25
+          ],
+          [
+            0.5,
+            1.1050000190734863,
+            0.25
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          1.1050000339746475,
+          0.5
+        ],
+        "sha256": "f2bf75b17b10b3972b99207abe68f0f517ec3a6b821322b8bc65666f23c1da96"
+      },
+      "wall_shelves": {
+        "triangles": 4876,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.9500000476837158,
+            1.959999918937683,
+            -0.0
+          ],
+          [
+            0.949999988079071,
+            3.1726748943328857,
+            0.3600001335144043
+          ]
+        ],
+        "dimensions_m": [
+          1.9000000357627869,
+          1.2126749753952026,
+          0.3600001335144043
+        ],
+        "sha256": "ab9fa5b2737c2e354cb6026f45b35b541acbeb64daa598d95c67b65349ed49f8"
+      },
+      "decorative_door": {
+        "triangles": 1356,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6100000143051147,
+            4.470348358154297e-08,
+            -0.03749990463256836
+          ],
+          [
+            0.6100001335144043,
+            2.424999952316284,
+            0.16750001907348633
+          ]
+        ],
+        "dimensions_m": [
+          1.220000147819519,
+          2.4249999076128006,
+          0.2049999237060547
+        ],
+        "sha256": "2852b50d7d56634c2c0af6e374d50e807709644bd367fdb8e17371c0f7ab0401"
+      },
+      "name_sign": {
+        "triangles": 540,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.5999999046325684,
+            -0.19000005722045898,
+            -0.027499914169311523
+          ],
+          [
+            0.6000000238418579,
+            0.19000005722045898,
+            0.053999900817871094
+          ]
+        ],
+        "dimensions_m": [
+          1.1999999284744263,
+          0.38000011444091797,
+          0.08149981498718262
+        ],
+        "sha256": "15227f115e0090765cb28872e9935f773531561271bdacd8c29675ce53fe8aa5"
+      },
+      "wall_lantern": {
+        "triangles": 892,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.1700000762939453,
+            -0.4025000035762787,
+            -0.10000000149011612
+          ],
+          [
+            0.1700000762939453,
+            0.4025000035762787,
+            0.4399999976158142
+          ]
+        ],
+        "dimensions_m": [
+          0.3400001525878906,
+          0.8050000071525574,
+          0.5399999991059303
+        ],
+        "sha256": "ba6bc0ee612c9343ce91dfb9c26c80f1b862bd7ef0c1049ae6b3172014f01dd1"
+      },
+      "lantern_glow": {
+        "triangles": 108,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.125,
+            -0.3400000035762787,
+            0.1850000023841858
+          ],
+          [
+            0.125,
+            0.10000000149011612,
+            0.39499998092651367
+          ]
+        ],
+        "dimensions_m": [
+          0.25,
+          0.4400000050663948,
+          0.20999997854232788
+        ],
+        "sha256": "820a5b14638862aa29a8f3d43de5203706ae7e199ecb4c3f3a6eaf4bf3020c5e"
+      },
+      "corner_tree": {
+        "triangles": 2868,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.5467196702957153,
+            0.0,
+            -0.548795759677887
+          ],
+          [
+            0.550000011920929,
+            2.003474712371826,
+            0.5465248823165894
+          ]
+        ],
+        "dimensions_m": [
+          1.0967196822166443,
+          2.003474712371826,
+          1.0953206419944763
+        ],
+        "sha256": "b2d2675a5f170c8666ff858d284f7aed7c56052fdf928e9e2bab6308cc864e55"
+      },
+      "shelf_pothos": {
+        "triangles": 2048,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2805624008178711,
+            -0.7420061230659485,
+            -0.20170821249485016
+          ],
+          [
+            0.29818734526634216,
+            0.366049587726593,
+            0.23490522801876068
+          ]
+        ],
+        "dimensions_m": [
+          0.5787497460842133,
+          1.1080557107925415,
+          0.43661344051361084
+        ],
+        "sha256": "4f00f474f4603a3f7d1f161b91a34068d186615ebba2ebfcfd77baec3abe24e9"
+      }
+    },
+    "author": "Huangzhong",
+    "placed_triangles": 55948,
+    "placed_surfaces": 36,
+    "plant_triangles": 6596,
+    "passed": true
+  },
+  "source": {
+    "checks": [
+      {
+        "check": "counter: actual named contact height",
+        "passed": true,
+        "measured": 1.149999976158142
+      },
+      {
+        "check": "window_bench: actual named contact height",
+        "passed": true,
+        "measured": 0.7150000333786011
+      },
+      {
+        "check": "round_stool_sage: actual named contact height",
+        "passed": true,
+        "measured": 0.7149999737739563
+      },
+      {
+        "check": "round_stool_linen: actual named contact height",
+        "passed": true,
+        "measured": 0.7149999737739563
+      },
+      {
+        "check": "tea_table_1: actual named contact height",
+        "passed": true,
+        "measured": 1.0
+      },
+      {
+        "check": "tea_table_1: actual tabletop diameter .90m",
+        "passed": true,
+        "measured": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.07999998331069946
+        ]
+      },
+      {
+        "check": "tea_table_2: actual named contact height",
+        "passed": true,
+        "measured": 1.0
+      },
+      {
+        "check": "tea_table_2: actual tabletop diameter .90m",
+        "passed": true,
+        "measured": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.07999998331069946
+        ]
+      },
+      {
+        "check": "tea_table_3: actual named contact height",
+        "passed": true,
+        "measured": 1.0
+      },
+      {
+        "check": "tea_table_3: actual tabletop diameter .90m",
+        "passed": true,
+        "measured": [
+          0.8999999761581421,
+          0.8999999761581421,
+          0.07999998331069946
+        ]
+      },
+      {
+        "check": "decorative_door: actual named contact height",
+        "passed": true,
+        "measured": 2.3299999237060547
+      },
+      {
+        "check": "No baked name lettering",
+        "passed": true,
+        "measured": 0
+      },
+      {
+        "check": "Actual sign fits measured rear-left wall bay below beam",
+        "passed": true,
+        "measured": {
+          "wall_bay_width_m": 1.2950000762939453,
+          "left_m": 0.0475001335144043,
+          "right_m": 0.047500014305114746,
+          "beam_gap_m": 0.12999987602233887,
+          "sign_world_bounds": [
+            [
+              -2.992499828338623,
+              3.009999990463257,
+              -2.8974997997283936
+            ],
+            [
+              -1.7924998998641968,
+              3.390000104904175,
+              -2.815999984741211
+            ]
+          ]
+        }
+      },
+      {
+        "check": "Actual sign centred between corner timber and first post",
+        "passed": true,
+        "measured": -2.39249986410141
+      }
+    ],
+    "passed": true
+  },
+  "preservation": {
+    "baseline": "cf833168cbd0591855b9dcee12f04e8b22fbced2",
+    "passed": true,
+    "checks": [
+      {
+        "check": "room_shell: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "room_shell: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "left_wall: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "left_wall: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "back_wall: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "back_wall: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "round_window: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "round_window: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "window_bench: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "window_bench: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "counter: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "counter: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "name_sign: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "name_sign: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: approved local geometry preserved to 10 micrometres",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: original import configuration and UID retained",
+        "passed": true
+      },
+      {
+        "check": "All non-sign placements and collider definitions unchanged",
+        "passed": true
+      },
+      {
+        "check": "All seating, NPC, entrance and camera anchors unchanged",
+        "passed": true
+      },
+      {
+        "check": "instances: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "boundaries: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "bench: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "preflight: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "camera: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "local_lights: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "review_lighting: approved contract unchanged",
+        "passed": true
+      },
+      {
+        "check": "Direct assets account for 45424 triangles and 21 surfaces",
+        "passed": true
+      },
+      {
+        "check": "Nine stools and three two-part lamps account for 10524 triangles and 15 surfaces",
+        "passed": true
+      },
+      {
+        "check": "Total remains 55948 triangles / 36 surfaces",
+        "passed": true
+      }
+    ],
+    "direct_assets": {
+      "triangles": 45424,
+      "surfaces": 21
+    },
+    "instance_breakdown": [
+      {
+        "asset": "lantern_glow",
+        "instances": 3,
+        "triangles_each": 108,
+        "triangles": 324,
+        "surfaces": 3
+      },
+      {
+        "asset": "round_stool_linen",
+        "instances": 3,
+        "triangles_each": 836,
+        "triangles": 2508,
+        "surfaces": 3
+      },
+      {
+        "asset": "round_stool_sage",
+        "instances": 6,
+        "triangles_each": 836,
+        "triangles": 5016,
+        "surfaces": 6
+      },
+      {
+        "asset": "wall_lantern",
+        "instances": 3,
+        "triangles_each": 892,
+        "triangles": 2676,
+        "surfaces": 3
+      }
+    ]
+  },
+  "godot": {
+    "avatar": {
+      "height_m": 1.745,
+      "scale": 1.01551556587219,
+      "source_height_m": 1.71833898495782
+    },
+    "captures": [
+      {
+        "id": "v1.1_default_43deg_360",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165,
+        "yaw": 45.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/room_shell/room_shell/room_shell_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/entry_deck/entry_deck/entry_deck_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/left_wall/left_wall/left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/back_wall/back_wall/back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/round_window/round_window/round_window_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/window_backdrop/window_backdrop/window_backdrop_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_1/tea_table_1/tea_table_1_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_1_flowers/tea_table_1_flowers/tea_table_1_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_2/tea_table_2/tea_table_2_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_2_flowers/tea_table_2_flowers/tea_table_2_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_3/tea_table_3/tea_table_3_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/tea_table_3_flowers/tea_table_3_flowers/tea_table_3_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/window_bench/window_bench/window_bench_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/counter/counter/counter_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/counter_flowers/counter_flowers/counter_flowers_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/coffee_console/coffee_console/coffee_console_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_shelves/wall_shelves/wall_shelves_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/decorative_door/decorative_door/decorative_door_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/name_sign/name_sign/name_sign_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/corner_tree/corner_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/shelf_pothos/shelf_pothos/pothos_export",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_1_1/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_1_2/round_stool_linen/round_stool_linen_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_1_3/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_2_1/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_2_2/round_stool_linen/round_stool_linen_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_2_3/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_3_1/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_3_2/round_stool_linen/round_stool_linen_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/stool_3_3/round_stool_sage/round_stool_sage_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_lantern_1/wall_lantern/wall_lantern_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/lantern_glow_1/lantern_glow/lantern_glow_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_lantern_2/wall_lantern/wall_lantern_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/lantern_glow_2/lantern_glow/lantern_glow_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/wall_lantern_3/wall_lantern/wall_lantern_001",
+        "passed": true
+      },
+      {
+        "check": "Imported mesh retains external texture material: /root/TeaReview/@SubViewport@2/@Node3D@3/TeaHouseArt/lantern_glow_3/lantern_glow/lantern_glow_001",
+        "passed": true
+      },
+      {
+        "check": "Actual placed imported triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "Actual placed imported surfaces and budget",
+        "passed": true
+      },
+      {
+        "check": "Plant budget <=100k triangles",
+        "passed": true
+      },
+      {
+        "check": "One 2048x2048 atlas",
+        "passed": true
+      },
+      {
+        "check": "room_shell: actual import config",
+        "passed": true
+      },
+      {
+        "check": "room_shell: import UID",
+        "passed": true
+      },
+      {
+        "check": "room_shell: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: actual import config",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: import UID",
+        "passed": true
+      },
+      {
+        "check": "entry_deck: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "left_wall: actual import config",
+        "passed": true
+      },
+      {
+        "check": "left_wall: import UID",
+        "passed": true
+      },
+      {
+        "check": "left_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "back_wall: actual import config",
+        "passed": true
+      },
+      {
+        "check": "back_wall: import UID",
+        "passed": true
+      },
+      {
+        "check": "back_wall: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_window: actual import config",
+        "passed": true
+      },
+      {
+        "check": "round_window: import UID",
+        "passed": true
+      },
+      {
+        "check": "round_window: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: actual import config",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: import UID",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_backdrop: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_1_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_2_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "tea_table_3_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: actual import config",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: import UID",
+        "passed": true
+      },
+      {
+        "check": "round_stool_sage: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: actual import config",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: import UID",
+        "passed": true
+      },
+      {
+        "check": "round_stool_linen: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "window_bench: actual import config",
+        "passed": true
+      },
+      {
+        "check": "window_bench: import UID",
+        "passed": true
+      },
+      {
+        "check": "window_bench: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter: actual import config",
+        "passed": true
+      },
+      {
+        "check": "counter: import UID",
+        "passed": true
+      },
+      {
+        "check": "counter: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: actual import config",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: import UID",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "counter_flowers: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: actual import config",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: import UID",
+        "passed": true
+      },
+      {
+        "check": "coffee_console: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: actual import config",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: import UID",
+        "passed": true
+      },
+      {
+        "check": "wall_shelves: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: actual import config",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: import UID",
+        "passed": true
+      },
+      {
+        "check": "decorative_door: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: actual import config",
+        "passed": true
+      },
+      {
+        "check": "name_sign: import UID",
+        "passed": true
+      },
+      {
+        "check": "name_sign: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: actual import config",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: import UID",
+        "passed": true
+      },
+      {
+        "check": "wall_lantern: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: actual import config",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: import UID",
+        "passed": true
+      },
+      {
+        "check": "lantern_glow: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: actual import config",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: import UID",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "corner_tree: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: actual import config",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: import UID",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "shelf_pothos: no leaf/backdrop shadows",
+        "passed": true
+      },
+      {
+        "check": "Twelve delivered seating anchors",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_1: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_2: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table1_3: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_1: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_2: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table2_3: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_1: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_2: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_table3_3: yaw faces the tea table",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3: real surface Y and module",
+        "passed": true
+      },
+      {
+        "check": "Blank wall sign carries runtime text size",
+        "passed": true
+      },
+      {
+        "check": "Exactly three local lantern lights",
+        "passed": true
+      },
+      {
+        "check": "Reference avatar assembled",
+        "passed": true
+      },
+      {
+        "check": "Capture v1.1_default_43deg_360",
+        "passed": true
+      },
+      {
+        "check": "Complete sign lies inside default viewport and clear of HUD bands",
+        "passed": true
+      },
+      {
+        "check": "Sign clear of projected nameplate allowance: npc_keeper",
+        "passed": true
+      },
+      {
+        "check": "Sign clear of projected nameplate allowance: npc_hana",
+        "passed": true
+      },
+      {
+        "check": "Sign clear of projected nameplate allowance: npc_lena",
+        "passed": true
+      }
+    ],
+    "colour_points": {},
+    "imported": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "plant_triangles": 6596.0,
+      "renderer": "mobile",
+      "surfaces": 36,
+      "triangles": 55948
+    },
+    "passed": true,
+    "plant_controls": [],
+    "routes": [],
+    "sign": {
+      "anchor": [
+        -2.39249992370605,
+        3.20000004768372,
+        -2.81200003623962
+      ],
+      "module_position": [
+        -2.39249992370605,
+        3.20000004768372,
+        -2.86999988555908
+      ],
+      "screen_max": [
+        232.68977355957,
+        192.507797241211
+      ],
+      "screen_min": [
+        184.968933105469,
+        146.116775512695
+      ],
+      "writable_size": [
+        1.04,
+        0.26
+      ]
+    }
+  }
+}

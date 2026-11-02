@@ -1,0 +1,14 @@
+[
+  {
+    "file": "SGODOT-216_tea_v1.1_default_43deg_360.png",
+    "bytes": 210902,
+    "sha256": "f37e1259f569a786a7a23667d4b90a05e700affbdd5edbaa5f6c7f6920018e6a",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-216_tea_v1.1_validation.json",
+    "bytes": 76094,
+    "sha256": "57d1fcc49ae9ab3a73049991de96f61993bc9ba2a6cd0ec3c09ec984603356b7",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

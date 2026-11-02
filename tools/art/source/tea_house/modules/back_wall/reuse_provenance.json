@@ -1,0 +1,11 @@
+{
+  "asset": "back_wall",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "new authored geometry",
+  "reference": "Stark 2681:135483 approved 216-tea.png; director dispatch 2026-10-31",
+  "source_script": "tools/art/build_tea_house.py",
+  "changes": [],
+  "units": "metres; Y up; +Z front",
+  "reference_sha256": "b5b2913b291cdcb90e2e5b67446967c36b5caef4e29a6cc071ac84730248130d"
+}
