@@ -5,9 +5,10 @@
   "kind": "original procedural geometry",
   "asset": "rock_iron_ore",
   "source_blend": "tools/art/source/mine_kit_355/models/rock_iron_ore.blend",
-  "runtime_sha256": "dae338bfd8367f360480eeffad1b574131fe074c244bfa3699f284c4547506e6",
+  "runtime_sha256": "40324e9f23f6e0d168b9c0cc1409d3ba3c2177826f258e1ad18e62e318bd04bc",
   "changes": [
-    "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+    "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+    "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
   ],
   "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63"
 }

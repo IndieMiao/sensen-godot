@@ -3,6 +3,8 @@ from pathlib import Path
 import math
 import random
 import sys
+import argparse
+import json
 import bpy
 from mathutils import Vector
 sys.path.insert(0,str(Path(__file__).resolve().parent))
@@ -40,11 +42,11 @@ def ore(kind,index):
             faces.extend([(a,b,c),(a,c,d)])
     faces += [(28,21+i,21+(i+1)%n) for i in range(n)]
     faces += [tuple(reversed(range(n)))]
-    stone='333B43' if kind=='coal' else '69777B'
+    stone={'coal':'333B43','iron_ore':'606D75','copper_ore':'9D6852'}.get(kind,'69777B')
     colors=[colour(stone,rng.uniform(.92,1.09)) for p in points]
     s.mesh('Seven-sided four-tier stone',points,faces,stone,False,colors)
-    palette={'iron_ore':['A45544','C37B57','925143'], 'quartz':['E6CEDF','F8F1E9','DFC0D5'],
-        'coal':['202A33','536471','374550'], 'copper_ore':['D79758','6EAB94','B67F4C']}[kind]
+    palette={'iron_ore':['703C3E','8B4840','B4BFC3'], 'quartz':['D6C7EF','FAF8F1','C6ADE6'],
+        'coal':['202A33','536471','374550'], 'copper_ore':['EB994D','F2B46A','6EAB94']}[kind]
     for layer in [1,2]:
         for i in [0,1,3,4,6]:
             a,b,c,d=[points[j] for j in [layer*n+i,layer*n+(i+1)%n,(layer+1)*n+(i+1)%n,(layer+1)*n+i]]
@@ -56,10 +58,14 @@ def ore(kind,index):
                 normal=((b-a).cross(c-a) if side<0 else (c-a).cross(d-a)).normalized()
                 if normal.dot((a+b+c+d)/4-Vector((0,.28,0)))<0:normal=-normal
                 patch=[a+(b-a)*(u-v)+(c-a)*v+normal*.002 for u,v in uv] if side<0 else [a+(c-a)*u+(d-a)*(v-u)+normal*.002 for u,v in uv]
-                s.mesh('Irregular mineral seam '+str(layer)+' '+str(i)+' '+str(side),patch,[tuple(range(len(patch)))],palette[(i+index)%3],False)
+                tint=palette[(i+index)%3]
+                if kind=='iron_ore' and layer==2 and i in [1,6]:tint=palette[2]
+                if kind=='copper_ore':tint=palette[2] if layer==1 and i==4 else palette[(i+layer)%2]
+                s.mesh('Irregular mineral seam '+str(layer)+' '+str(i)+' '+str(side),patch,[tuple(range(len(patch)))],tint,False)
     return s.export('rock_'+kind,ROCKS,SOURCE,400,{'origin':'bottom centre; Y up; front +Z',
         'reference':'mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63',
-        'shadow_radius_m':.52,'notes':['New fixed rock variant with exposed mineral colour patches; no texture or collision.']})
+        'shadow_radius_m':.52,'notes':['Fixed rock variant with exposed mineral colour patches; no texture or collision.',
+            'v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz.']})
 
 def pebble(name,at,size,seed,color):
     obj=s.ellipsoid(name,at,size,color,7,4)
@@ -160,8 +166,11 @@ def elevator():
             'LampAnchor matches runtime indicator; support post retained.']},anchors)
 
 def main():
-    rocks=[ore(kind,i) for i,kind in enumerate(['iron_ore','quartz','coal','copper_ore'])]
-    props=[arena(),elevator()]
+    parser=argparse.ArgumentParser();parser.add_argument('--ores-only',action='store_true')
+    args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+    previous={row['name']:row for row in json.loads((s.RUNTIME/ROCKS/'manifest.json').read_text())['assets']} if args.ores_only else {}
+    rocks=[previous['rock_coal'] if args.ores_only and kind=='coal' else ore(kind,i) for i,kind in enumerate(['iron_ore','quartz','coal','copper_ore'])]
+    props=json.loads((s.RUNTIME/PROPS/'manifest.json').read_text())['assets'] if args.ores_only else [arena(),elevator()]
     for directory,assets in [(ROCKS,rocks),(PROPS,props)]:
         manifest={'task':'SGODOT-355','group':'mine_props','author':'黄忠',
             'virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80','axes':'metres; Y up; front +Z','assets':assets}

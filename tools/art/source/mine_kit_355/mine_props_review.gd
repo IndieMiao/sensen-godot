@@ -4,6 +4,7 @@ const MineCamera=preload("res://modules/farm/farm_camera.gd")
 
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output);setup()
+	var ores_only="--ores-v11" in OS.get_cmdline_user_args()
 	var assets=[]
 	for directory in ["assets/mine/rocks","assets/mine/props"]:
 		assets.append_array(JSON.parse_string(FileAccess.get_file_as_string("res://"+directory+"/manifest.json")).assets)
@@ -16,7 +17,8 @@ func run():
 				var expected=Vector3(anchor.position[0],anchor.position[1],anchor.position[2])
 				check(node!=null and node.position.distance_to(expected)<.00001,spec.name+": "+anchor.name+" position")
 				check(node.basis.is_equal_approx(Basis.IDENTITY),spec.name+": "+anchor.name+" front +Z")
-			pose(20,25,2.7,Vector3(0,1.1,0));await capture("elevator_detail")
+			if not ores_only:
+				pose(20,25,2.7,Vector3(0,1.1,0));await capture("elevator_detail")
 		model.queue_free();await get_tree().process_frame
 	mine_lighting()
 	for floor_number in [1,3]:
@@ -30,10 +32,11 @@ func run():
 			var model=load("res://"+spec.file).instantiate();fixture.add_child(model)
 			model.position=Vector3(spec.placement_world[0],spec.placement_world[1],spec.placement_world[2])
 		var prefix="red" if floor_number==1 else "purple"
-		vp.size=Vector2i(900,800);pose(0,43,11.4,Vector3(4.75,.35,-3.85));await capture(prefix+"_both_props_43deg")
-		vp.size=Vector2i(360,800);camera.size=MineCamera.close_view_size(Vector2(360,800))/.8
-		MineCamera.place(camera,Vector3(4.9,.4,-3.8));await capture(prefix+"_arena_default_43deg")
-		MineCamera.place(camera,Vector3(2.2,.6,-5.6));await capture(prefix+"_elevator_default_43deg")
+		if not ores_only:
+			vp.size=Vector2i(900,800);pose(0,43,11.4,Vector3(4.75,.35,-3.85));await capture(prefix+"_both_props_43deg")
+			vp.size=Vector2i(360,800);camera.size=MineCamera.close_view_size(Vector2(360,800))/.8
+			MineCamera.place(camera,Vector3(4.9,.4,-3.8));await capture(prefix+"_arena_default_43deg")
+			MineCamera.place(camera,Vector3(2.2,.6,-5.6));await capture(prefix+"_elevator_default_43deg")
 		var rocks=Node3D.new();fixture.add_child(rocks);var index=0
 		for spec in assets:
 			if not spec.name.begins_with("rock_"):continue

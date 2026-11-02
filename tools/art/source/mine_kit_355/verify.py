@@ -7,6 +7,7 @@ import math
 import re
 import shutil
 import sys
+from collections import Counter
 
 ROOT=Path(__file__).resolve().parents[4]
 RUNTIME=ROOT/'output/monsters-355/runtime'
@@ -15,6 +16,8 @@ from verify_chef_sign import load_glb, accessor, cross, sub
 
 parser=argparse.ArgumentParser()
 parser.add_argument('group',choices=['headgear','mine_props'])
+parser.add_argument('--compare-quartz',type=Path)
+parser.add_argument('--compare-ores',type=Path)
 args=parser.parse_args()
 OUT=ROOT/'output/mine-kit-355'/args.group
 directories=['assets/monsters/slime_king'] if args.group=='headgear' else ['assets/mine/rocks','assets/mine/props']
@@ -104,6 +107,23 @@ for directory in directories:
 
 godot=json.loads((OUT/'captures/godot-validation.json').read_text())
 check(godot['passed'] and godot['renderer']['method']=='mobile','Completed Godot Mobile validation')
+if args.compare_ores:
+    previous=json.loads((ROOT/'docs/design/mine-kit-355-2026-11-02/mine_props/SGODOT-355_mine_props_v1_validation.json').read_text())
+    for name in godot['assets']:
+        check(godot['assets'][name]['uid']==previous['godot']['assets'][name]['uid'],name+': approved v1 UID retained')
+    for row in previous['manifest']['props']['assets']:
+        check(hashlib.sha256((RUNTIME/row['file']).read_bytes()).hexdigest()==row['sha256'],row['name']+': approved GLB unchanged')
+    def shape_signature(doc,data):
+        primitive=doc['meshes'][0]['primitives'][0]
+        points=accessor(doc,data,primitive['attributes']['POSITION']);normals=accessor(doc,data,primitive['attributes']['NORMAL'])
+        indices=[i[0] for i in accessor(doc,data,primitive['indices'])]
+        return Counter(tuple(sorted(points[j]+normals[j] for j in indices[i:i+3])) for i in range(0,len(indices),3))
+    for name,reference in [('iron_ore','iron-v1.glb'),('quartz','quartz-rock-v1.glb'),('coal','coal-v1.glb'),('copper_ore','copper-v1.glb')]:
+        old,old_data=load_glb(args.compare_ores/reference)
+        current,current_data=load_glb(RUNTIME/'assets/mine/rocks'/('rock_'+name+'.glb'))
+        check(shape_signature(old,old_data)==shape_signature(current,current_data),name+': exact triangle positions and normals retained')
+        check(old['materials']==current['materials'],name+': material settings retained')
+    check((args.compare_ores/'coal-v1.glb').read_bytes()==(RUNTIME/'assets/mine/rocks/rock_coal.glb').read_bytes(),'Coal GLB byte-identical to approved v1')
 if args.group=='headgear':
     prior=ROOT/'docs/design/mine-kit-355-2026-11-02/headgear/SGODOT-355_slime_king_v1_validation.json'
     if prior.exists():
@@ -112,6 +132,26 @@ if args.group=='headgear':
             check(godot['assets'][name]['uid']==previous['godot']['assets'][name]['uid'],name+': v1 import UID preserved')
         approved=next(a for a in previous['manifest']['assets'] if a['name']=='crown')
         check(hashlib.sha256((RUNTIME/approved['file']).read_bytes()).hexdigest()==approved['sha256'],'Approved crown GLB unchanged from v1')
+    if args.compare_quartz:
+        previous=json.loads((ROOT/'docs/design/mine-kit-355-2026-11-02/headgear/v1.1/SGODOT-355_slime_king_v1.1_validation.json').read_text())
+        approved=next(a for a in previous['manifest']['assets'] if a['name']=='ironback_plates')
+        check(hashlib.sha256((RUNTIME/approved['file']).read_bytes()).hexdigest()==approved['sha256'],'Approved ironback GLB unchanged from v1.1')
+        old,old_data=load_glb(args.compare_quartz)
+        current,current_data=load_glb(RUNTIME/'assets/monsters/slime_king/quartz_cluster.glb')
+        def mineral_signature(doc,data):
+            prim=doc['meshes'][0]['primitives'][0]
+            colors=accessor(doc,data,prim['attributes']['COLOR_0']);indices=[i[0] for i in accessor(doc,data,prim['indices'])]
+            return Counter(tuple(sorted(tuple(round(v,5) for v in colors[j]) for j in indices[i:i+3])) for i in range(0,len(indices),3))
+        check(mineral_signature(old,old_data)==mineral_signature(current,current_data),'Quartz: exact coloured triangle multiset retained')
+        check(old['materials']==current['materials'],'Quartz: material and opacity retained')
+        prior=next(a for a in previous['manifest']['assets'] if a['name']=='quartz_cluster')
+        row=next(a for a in report['assets'] if a['name']=='quartz_cluster')
+        for axis in [0,2]:
+            span=row['bounds'][1][axis]-row['bounds'][0][axis]
+            check(abs(span/prior['dimensions_m'][axis]-1.3)<.0001,'Quartz: measured 1.3x span on axis '+str(axis))
+        check(.69<=row['bounds'][1][1]<=.71,'Quartz: normalized height above head about .70m')
+        check(.74<=row['bounds'][1][1]-row['bounds'][0][1]<=.79,'Quartz: refitted total height about .75m')
+        check(len(godot['mine_contexts'])==1 and godot['mine_contexts'][0]['slime_radius_m']==.85,'Quartz: requested red-mine capture uses actual king radius .85')
 for log in ['import.log','render.log']:
     text=(OUT/log).read_text()
     check(not re.search(r'(?:SCRIPT )?ERROR:',text),'No errors in '+log)

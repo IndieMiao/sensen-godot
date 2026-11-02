@@ -113,6 +113,7 @@ def quartz():
     s.start('quartz_cluster',.60)
     columns=[(0,0,.09,.53,.015,-.015),(-.15,.065,.075,.36,-.16,.04),
         (.15,.045,.08,.42,.17,.025),(-.095,-.14,.065,.31,-.095,-.14),(.09,-.13,.07,.46,.10,-.14)]
+    columns=[tuple(value*1.3 for value in column) for column in columns]
     for index,(x,z,r,h,lean_x,lean_z) in enumerate(columns):
         n=6;points=[];colors=[];profiles=[(0,.82),(.045,1),(.72,1),(.88,.62),(1,.035)]
         for row,(t,rr) in enumerate(profiles):
@@ -134,8 +135,8 @@ def quartz():
     return s.export('quartz_cluster',DIRECTORY,SOURCE,800,{'pivot':'head contact centre; attach at Y=1.43*r',
         'slime_radius':1.0,'attachment_position':[0,TOP,0],'column_count':5,
         'preview_body_tint':'D7B8CF','reference':'mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt',
-        'notes':['v1.1: five outward-leaning faceted quartz prisms with different lengths and pointed tips.',
-            'White bases, faint lavender tips, alternating light/dark facets; opaque vertex colour only.']})
+        'notes':['v1.2: enlarge the v1.1 five-column cluster by 1.3 and refit its enlarged bases to the same radius-one head.',
+            'Shape, faceted white/lavender colours, 280 triangles and attachment origin retained; runtime scales with king radius.']})
 
 
 def main():

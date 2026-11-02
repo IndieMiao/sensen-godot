@@ -1,0 +1,1500 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "manifest": {
+    "task": "SGODOT-355",
+    "group": "mine_props",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "axes": "metres; Y up; front +Z",
+    "assets": [
+      {
+        "name": "rock_iron_ore",
+        "file": "assets/mine/rocks/rock_iron_ore.glb",
+        "triangles": 114,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.42009392380714417,
+            0.0,
+            -0.4404867887496948
+          ],
+          [
+            0.46876177191734314,
+            0.6299999952316284,
+            0.44420647621154785
+          ]
+        ],
+        "dimensions_m": [
+          0.8888556957244873,
+          0.6299999952316284,
+          0.8846932649612427
+        ],
+        "triangle_limit": 400,
+        "sha256": "40324e9f23f6e0d168b9c0cc1409d3ba3c2177826f258e1ad18e62e318bd04bc",
+        "anchors": [],
+        "origin": "bottom centre; Y up; front +Z",
+        "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+        "shadow_radius_m": 0.52,
+        "notes": [
+          "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+          "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
+        ]
+      },
+      {
+        "name": "rock_quartz",
+        "file": "assets/mine/rocks/rock_quartz.glb",
+        "triangles": 114,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.4400201737880707,
+            0.0,
+            -0.4666350483894348
+          ],
+          [
+            0.4484900236129761,
+            0.6299999952316284,
+            0.43366488814353943
+          ]
+        ],
+        "dimensions_m": [
+          0.8885101974010468,
+          0.6299999952316284,
+          0.9002999365329742
+        ],
+        "triangle_limit": 400,
+        "sha256": "4010c5dbab671da077e71a4a75a78f436e438cf27781aaff52ea8212a8f91ce1",
+        "anchors": [],
+        "origin": "bottom centre; Y up; front +Z",
+        "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+        "shadow_radius_m": 0.52,
+        "notes": [
+          "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+          "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
+        ]
+      },
+      {
+        "name": "rock_coal",
+        "file": "assets/mine/rocks/rock_coal.glb",
+        "triangles": 114,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44517871737480164,
+            0.0,
+            -0.46551039814949036
+          ],
+          [
+            0.4258612096309662,
+            0.6299999952316284,
+            0.42973971366882324
+          ]
+        ],
+        "dimensions_m": [
+          0.8710399270057678,
+          0.6299999952316284,
+          0.8952501118183136
+        ],
+        "triangle_limit": 400,
+        "sha256": "1e47273c18cec9f7d86846efe705738d1f031be1d8edf68653cd572579c1c334",
+        "anchors": [],
+        "origin": "bottom centre; Y up; front +Z",
+        "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+        "shadow_radius_m": 0.52,
+        "notes": [
+          "New fixed rock variant with exposed mineral colour patches; no texture or collision."
+        ]
+      },
+      {
+        "name": "rock_copper_ore",
+        "file": "assets/mine/rocks/rock_copper_ore.glb",
+        "triangles": 114,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.45235884189605713,
+            0.0,
+            -0.44176656007766724
+          ],
+          [
+            0.4288462996482849,
+            0.6299999952316284,
+            0.44343301653862
+          ]
+        ],
+        "dimensions_m": [
+          0.881205141544342,
+          0.6299999952316284,
+          0.8851995766162872
+        ],
+        "triangle_limit": 400,
+        "sha256": "db81c71622bfd14584dec6cca4d57df0c68c35d048ab6f251ddd4cbc4d6e4778",
+        "anchors": [],
+        "origin": "bottom centre; Y up; front +Z",
+        "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63",
+        "shadow_radius_m": 0.52,
+        "notes": [
+          "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+          "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
+        ]
+      }
+    ]
+  },
+  "glb": {
+    "checks": [
+      {
+        "check": "rock_iron_ore: single mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: named mesh",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: no skin or animation",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: one untextured material",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: geometry / normals / vertex colours only",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: measured triangle count / budget",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: opaque colours",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: unit normals",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: actual vertex bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: unit scales",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: geometry baked around declared origin",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: nondegenerate triangles and consistent winding",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: ground origin",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: code-scale radius and height",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: rendered GLB equals delivery hash",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: generated import UID",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: animation/import=false",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: animation/remove_immutable_tracks=false",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: meshes/ensure_tangents=false",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: meshes/create_shadow_meshes=false",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: gltf/texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: _subresources={}",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: import_script/path=\"res://assets/monsters/material_import.gd\"",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: single mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: named mesh",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: no skin or animation",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: one untextured material",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: geometry / normals / vertex colours only",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: measured triangle count / budget",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: opaque colours",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: unit normals",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: actual vertex bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: unit scales",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: geometry baked around declared origin",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: nondegenerate triangles and consistent winding",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: ground origin",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: code-scale radius and height",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: rendered GLB equals delivery hash",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: generated import UID",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: animation/import=false",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: animation/remove_immutable_tracks=false",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: meshes/ensure_tangents=false",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: meshes/create_shadow_meshes=false",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: gltf/texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: _subresources={}",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: import_script/path=\"res://assets/monsters/material_import.gd\"",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: single mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: named mesh",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: no skin or animation",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: one untextured material",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: geometry / normals / vertex colours only",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: measured triangle count / budget",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: opaque colours",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: unit normals",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: actual vertex bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: unit scales",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: geometry baked around declared origin",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: nondegenerate triangles and consistent winding",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: ground origin",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: code-scale radius and height",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: rendered GLB equals delivery hash",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: generated import UID",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: animation/import=false",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: animation/remove_immutable_tracks=false",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: meshes/ensure_tangents=false",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: meshes/create_shadow_meshes=false",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: gltf/texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: _subresources={}",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: import_script/path=\"res://assets/monsters/material_import.gd\"",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: single mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: named mesh",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: no skin or animation",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: one untextured material",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: geometry / normals / vertex colours only",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: measured triangle count / budget",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: opaque colours",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: unit normals",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: actual vertex bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: unit scales",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: geometry baked around declared origin",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: nondegenerate triangles and consistent winding",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: ground origin",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: code-scale radius and height",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: rendered GLB equals delivery hash",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: generated import UID",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: animation/import=false",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: animation/remove_immutable_tracks=false",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: meshes/ensure_tangents=false",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: meshes/create_shadow_meshes=false",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: gltf/texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: _subresources={}",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: import_script/path=\"res://assets/monsters/material_import.gd\"",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: single mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: named mesh",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: no skin or animation",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: one untextured material",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: geometry / normals / vertex colours only",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: measured triangle count / budget",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: opaque colours",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: unit normals",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: actual vertex bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: unit scales",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: geometry baked around declared origin",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: nondegenerate triangles and consistent winding",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: ground origin",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: footprint budget",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: all tall geometry in authorized rear strip",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: tall geometry clears both transport anchors",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: no triangle projection intersects elevator base",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: 6.0 x 3.6 ellipse remains empty at triangle samples",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: rendered GLB equals delivery hash",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: generated import UID",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: animation/import=false",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: animation/remove_immutable_tracks=false",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: meshes/ensure_tangents=false",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: meshes/create_shadow_meshes=false",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: gltf/texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: _subresources={}",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: import_script/path=\"res://assets/monsters/material_import.gd\"",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: single mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: named mesh",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: no skin or animation",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: one untextured material",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: geometry / normals / vertex colours only",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured triangle count / budget",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: opaque colours",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: unit normals",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: actual vertex bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: unit scales",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: geometry baked around declared origin",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: nondegenerate triangles and consistent winding",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: ground origin",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: height <=2.3m",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: exact empty PlateAnchor",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: PlateAnchor faces +Z",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: exact empty LampAnchor",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: LampAnchor faces +Z",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured plate projects >=3cm from backing",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured blank plate 0.5 x 0.3m",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured platform plank top .17m",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: rendered GLB equals delivery hash",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: generated import UID",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: animation/import=false",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: animation/remove_immutable_tracks=false",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: meshes/ensure_tangents=false",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: meshes/create_shadow_meshes=false",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: gltf/texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: _subresources={}",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: import_script/path=\"res://assets/monsters/material_import.gd\"",
+        "passed": true
+      },
+      {
+        "check": "Completed Godot Mobile validation",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: approved v1 UID retained",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: approved v1 UID retained",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: approved v1 UID retained",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: approved v1 UID retained",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: approved v1 UID retained",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: approved v1 UID retained",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: approved GLB unchanged",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: approved GLB unchanged",
+        "passed": true
+      },
+      {
+        "check": "iron_ore: exact triangle positions and normals retained",
+        "passed": true
+      },
+      {
+        "check": "iron_ore: material settings retained",
+        "passed": true
+      },
+      {
+        "check": "quartz: exact triangle positions and normals retained",
+        "passed": true
+      },
+      {
+        "check": "quartz: material settings retained",
+        "passed": true
+      },
+      {
+        "check": "coal: exact triangle positions and normals retained",
+        "passed": true
+      },
+      {
+        "check": "coal: material settings retained",
+        "passed": true
+      },
+      {
+        "check": "copper_ore: exact triangle positions and normals retained",
+        "passed": true
+      },
+      {
+        "check": "copper_ore: material settings retained",
+        "passed": true
+      },
+      {
+        "check": "Coal GLB byte-identical to approved v1",
+        "passed": true
+      },
+      {
+        "check": "No errors in import.log",
+        "passed": true
+      },
+      {
+        "check": "No errors in render.log",
+        "passed": true
+      }
+    ],
+    "assets": [
+      {
+        "name": "rock_iron_ore",
+        "triangles": 114,
+        "bounds": [
+          [
+            -0.42009392380714417,
+            0.0,
+            -0.4404867887496948
+          ],
+          [
+            0.46876177191734314,
+            0.6299999952316284,
+            0.44420647621154785
+          ]
+        ],
+        "sha256": "40324e9f23f6e0d168b9c0cc1409d3ba3c2177826f258e1ad18e62e318bd04bc"
+      },
+      {
+        "name": "rock_quartz",
+        "triangles": 114,
+        "bounds": [
+          [
+            -0.4400201737880707,
+            0.0,
+            -0.4666350483894348
+          ],
+          [
+            0.4484900236129761,
+            0.6299999952316284,
+            0.43366488814353943
+          ]
+        ],
+        "sha256": "4010c5dbab671da077e71a4a75a78f436e438cf27781aaff52ea8212a8f91ce1"
+      },
+      {
+        "name": "rock_coal",
+        "triangles": 114,
+        "bounds": [
+          [
+            -0.44517871737480164,
+            0.0,
+            -0.46551039814949036
+          ],
+          [
+            0.4258612096309662,
+            0.6299999952316284,
+            0.42973971366882324
+          ]
+        ],
+        "sha256": "1e47273c18cec9f7d86846efe705738d1f031be1d8edf68653cd572579c1c334"
+      },
+      {
+        "name": "rock_copper_ore",
+        "triangles": 114,
+        "bounds": [
+          [
+            -0.45235884189605713,
+            0.0,
+            -0.44176656007766724
+          ],
+          [
+            0.4288462996482849,
+            0.6299999952316284,
+            0.44343301653862
+          ]
+        ],
+        "sha256": "db81c71622bfd14584dec6cca4d57df0c68c35d048ab6f251ddd4cbc4d6e4778"
+      },
+      {
+        "name": "guard_arena",
+        "triangles": 2421,
+        "bounds": [
+          [
+            -3.444850206375122,
+            0.0,
+            -2.1835238933563232
+          ],
+          [
+            3.4442200660705566,
+            1.559999942779541,
+            2.1689937114715576
+          ]
+        ],
+        "sha256": "f675ff59bd06dda02fd0f5161dc1ea63f27ad0be0094035870068f4e033f95cd"
+      },
+      {
+        "name": "elevator_station",
+        "triangles": 2394,
+        "bounds": [
+          [
+            -0.7250000238418579,
+            0.0,
+            -0.6499999761581421
+          ],
+          [
+            0.8700000047683716,
+            2.240000009536743,
+            0.6499999761581421
+          ]
+        ],
+        "sha256": "ce6c01a5506b12eeca4b437f1201ae1b16b9974463d3fb7f9a5150719d18a14b"
+      }
+    ],
+    "passed": true
+  },
+  "godot": {
+    "assets": {
+      "elevator_station": {
+        "bounds": [
+          [
+            -0.725000023841858,
+            0.0,
+            -0.649999976158142
+          ],
+          [
+            0.870000004768372,
+            2.24000000953674,
+            0.649999976158142
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 2394,
+        "uid": "uid://tcjrjqtqjqw5"
+      },
+      "guard_arena": {
+        "bounds": [
+          [
+            -3.44485020637512,
+            0.0,
+            -2.18352389335632
+          ],
+          [
+            3.44422030448914,
+            1.55999994277954,
+            2.16899371147156
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 2421,
+        "uid": "uid://btd03i8i2vt1u"
+      },
+      "rock_coal": {
+        "bounds": [
+          [
+            -0.445178717374802,
+            0.0,
+            -0.46551039814949
+          ],
+          [
+            0.425861209630966,
+            0.629999995231628,
+            0.429739683866501
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 114,
+        "uid": "uid://c8h275k58fjcf"
+      },
+      "rock_copper_ore": {
+        "bounds": [
+          [
+            -0.452358841896057,
+            0.0,
+            -0.441766560077667
+          ],
+          [
+            0.428846299648285,
+            0.629999995231628,
+            0.443432986736298
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 114,
+        "uid": "uid://dwomt3mrvoxqk"
+      },
+      "rock_iron_ore": {
+        "bounds": [
+          [
+            -0.420093923807144,
+            0.0,
+            -0.440486788749695
+          ],
+          [
+            0.468761771917343,
+            0.629999995231628,
+            0.444206476211548
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 114,
+        "uid": "uid://bvw8ex741ik5d"
+      },
+      "rock_quartz": {
+        "bounds": [
+          [
+            -0.440020173788071,
+            0.0,
+            -0.466635048389435
+          ],
+          [
+            0.448490053415298,
+            0.629999995231628,
+            0.433664858341217
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 114,
+        "uid": "uid://c1tnqridfoqxx"
+      }
+    },
+    "captures": [
+      {
+        "id": "red_four_ores_43deg",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          900,
+          500
+        ],
+        "width_m": 7.40000009536743,
+        "yaw": 0.0
+      },
+      {
+        "id": "purple_four_ores_43deg",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          900,
+          500
+        ],
+        "width_m": 7.40000009536743,
+        "yaw": 0.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "rock_iron_ore: one mesh node",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: no rig or animations",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: no runtime collision",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: one surface",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: measured triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: imported shadows off",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: linear vertex paint, no texture",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: vertex paint retained",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: measured bound axis 0",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: measured bound axis 1",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: measured bound axis 2",
+        "passed": true
+      },
+      {
+        "check": "rock_iron_ore: Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: one mesh node",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: no rig or animations",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: no runtime collision",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: one surface",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: measured triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: imported shadows off",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: linear vertex paint, no texture",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: vertex paint retained",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: measured bound axis 0",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: measured bound axis 1",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: measured bound axis 2",
+        "passed": true
+      },
+      {
+        "check": "rock_quartz: Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: one mesh node",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: no rig or animations",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: no runtime collision",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: one surface",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: measured triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: imported shadows off",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: linear vertex paint, no texture",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: vertex paint retained",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: measured bound axis 0",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: measured bound axis 1",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: measured bound axis 2",
+        "passed": true
+      },
+      {
+        "check": "rock_coal: Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: one mesh node",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: no rig or animations",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: no runtime collision",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: one surface",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: measured triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: imported shadows off",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: linear vertex paint, no texture",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: vertex paint retained",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: measured bound axis 0",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: measured bound axis 1",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: measured bound axis 2",
+        "passed": true
+      },
+      {
+        "check": "rock_copper_ore: Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: one mesh node",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: no rig or animations",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: no runtime collision",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: one surface",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: measured triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: imported shadows off",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: linear vertex paint, no texture",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: vertex paint retained",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: measured bound axis 0",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: measured bound axis 1",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: measured bound axis 2",
+        "passed": true
+      },
+      {
+        "check": "guard_arena: Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: one mesh node",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: no rig or animations",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: no runtime collision",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: one surface",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured triangles and budget",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: imported shadows off",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: linear vertex paint, no texture",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: vertex paint retained",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured bound axis 0",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured bound axis 1",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: measured bound axis 2",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: Godot-generated UID",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: PlateAnchor position",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: PlateAnchor front +Z",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: LampAnchor position",
+        "passed": true
+      },
+      {
+        "check": "elevator_station: LampAnchor front +Z",
+        "passed": true
+      },
+      {
+        "check": "Actual reference player assembled",
+        "passed": true
+      },
+      {
+        "check": "Capture red_four_ores_43deg",
+        "passed": true
+      },
+      {
+        "check": "Actual reference player assembled",
+        "passed": true
+      },
+      {
+        "check": "Capture purple_four_ores_43deg",
+        "passed": true
+      },
+      {
+        "check": "Actual Mobile renderer",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "dependencies": {
+    "runtime_base": "bd93076fa03e5ad9bd572d5509af10686f3d1862",
+    "files": {
+      "assets/avatar/base/animations.res": "f5c0c26371928aa080110e44413074b294a6e419b2c846166ca06a0f7b28e02d",
+      "assets/avatar/base/base_rig.tscn": "b6ca9f025ba752dc2ba1af9209d0f3ad02f867cec1b7ee210c17d6319fc53741",
+      "assets/avatar/common/T_black.png": "6e0eb5421289a2a098d0d9f2cf60b1539d613ce703562018b238502e4a712e4f",
+      "assets/avatar/demo_denylist.json": "5baa4e68e8047fe63e783a2850c9ff5740e4be22950a1422813f019aae63876e",
+      "assets/avatar/npc_only.json": "0dfa155c5ef5322940d3e23931a051b41ddf2d20c52db9685ce6a46ad6ff0717",
+      "assets/avatar/parts/body00.res": "c1f7f1948206f2013ad2ee3920032ace092acf1870e87ff48890dda7e0bb1f7e",
+      "assets/avatar/parts/cloth0.res": "7ddd1a2061d6d92ea90e21a83460cb921f5d0a7258191447ec00050d0d7bc965",
+      "assets/avatar/parts/eyes00.res": "546da65dd37456cf0d63c72f65484c5b4e3356fd457f99985ddb578b41ff4024",
+      "assets/avatar/parts/hairhat0.res": "2dee63f000ba58fea6101090950eb07db17e94de5f9716e5956437db62539678",
+      "assets/avatar/parts/hairhat0_scene.tscn": "510406e32a2b014b629f1ec5c913642c827cdbad1e695aa35ee56db0eda9de38",
+      "assets/avatar/parts/shoes0.res": "9c4d5a651f150ead79d29308d516c633cae3a8a76da5ecc296e211f985701568",
+      "assets/avatar/parts_manifest.json": "63c196b3dfc8c1055a0069462fda8381f0c84295a34d7fa86588d24a3b13af76",
+      "assets/avatar/source/body00/T_base_boy_body_AO.png": "03da3d31c1320dc95e5f2d9d6c2a7252ac779d188d5c4e1ba1e15dcc329f2520",
+      "assets/avatar/source/body00/T_base_boy_body_D.png": "6310690c90ad8970055d093be8ba1a47418d5ad9ae90f483d3717c885aae0573",
+      "assets/avatar/source/cloth0/T_base_boy_cloth_AO.png": "2378193698c5d71d21a75edef6360913256d07bc0c9fb1bed11a29faca669c41",
+      "assets/avatar/source/cloth0/T_base_boy_cloth_D.png": "6b7167dcd7ff2e99e15999f57678c64e4bfe5a163164b4c2395923fcb7ca7146",
+      "assets/avatar/source/hairhat0/T_base_boy_hairHat_D.png": "83eb3e76199182afacd8aa4a2e0244c1a4ec285fb946c2876b6930ccc03f84c5",
+      "assets/avatar/source/shoes0/T_base_boy_shoes_AO.png": "138816b6b5daf7908a7c0fe7984911f63f8f1e2eea4fa0d5733236d53b8f580d",
+      "assets/avatar/source/shoes0/T_base_boy_shoes_D.png": "e6a4ce729f1056a921f6dfb06eb8a88adc5024b8bd19004af02ccbe6c4440a4d",
+      "assets/farm/art/meadow.png": "3f0dc02952aa3a74c86619189616f31f0eac5d340d37dc9d63893ce434a7c832",
+      "assets/farm/art/water/bank_grass.png": "2059acb14773b79d64e5e7f5fdceb5dcef553bc7380803efcec086ebab86b460",
+      "assets/farm/art/water/shore_stone.png": "1b48d476b9cedfc855a8a5f40b54ea977da2af293361332e7b564935d3b3dd8e",
+      "assets/farm/art/water/surface_flow.png": "e29cdf4573dab94f7c9eaaf54ffd437050952f52ee564f13a1b0a78c2eb98548",
+      "assets/farm/data/chapters.json": "e1e6725fc7fbb01d70db6711d3962056f5634b0d55dbc5625d2b56c09e36b6f0",
+      "assets/farm/data/character.json": "5066cd0a30e75191f65a7d11c5dce3fb3b3befdc7b57474523b5afa6f018f392",
+      "assets/farm/data/crops.json": "1645cad30f2665fb7857bc58204f653d4a1ae19326d70bb64bf069e4e31923cc",
+      "assets/farm/data/decorations.json": "d66d7e167eef69aeff0bd0d4a9c99d8b31f4b306a31f618f530def4948bf899d",
+      "assets/farm/data/economy.json": "29354905606559e240832c62caa36f28ebdab00aded4b7f74b11ac0059d124ac",
+      "assets/farm/data/fishing.json": "ebda473fbc8df0e0c3928adeb7ff6dd1d5675720e992925281bc841ca5a85ca7",
+      "assets/farm/data/items.json": "068673262c4419db78617b5beddbf6671ecebc0898edcd70883ef2ea0b9e8bf5",
+      "assets/farm/data/journey.json": "d8b70540f4c376088e770279ff155401253d06c0aaccc503a0b420849b905ac6",
+      "assets/farm/data/mining.json": "3850a9db2e030d035db297cf5b5159a5cc0191f34c9de78ba1ad9022cded0451",
+      "assets/farm/data/places.json": "248bbd9de4d952abefe9a3ed11ac423e980975307f382aeb81c22527f14f030f",
+      "assets/farm/data/recipes.json": "6d1fa21323bcb50b0b4a84befc509e07e80e02dd16e81ecd5e8a402aedfd1a3d",
+      "assets/farm/data/residents.json": "1b76390c811cc20dedfc3adc08d533cdc6a0d7d003d4da4d3e05feddc016cf66",
+      "assets/monsters/material_import.gd": "31585dd61b815ffb3b6d3516717f31dbed31c1162da569ec62a417d2234636f7",
+      "assets/ui/app_theme.tres": "ef3bc31cc9c9393dd281fbe6591469573117904ce486c4e681133c2c89a97ccd",
+      "assets/ui/fonts/NotoSansSC-Regular.otf": "faa6c9df652116dde789d351359f3d7e5d2285a2b2a1f04a2d7244df706d5ea9",
+      "assets/ui/fonts/Nunito.ttf": "bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207",
+      "assets/ui/icons/lucide/chevron-down.svg": "8aede5c90c6b9d9ce259c9c350e24f4f0d30e468aae8b1e0bd843d28a954a079",
+      "assets/ui/icons/lucide/circle-check.svg": "506ade7ce6513494021340602225bafb4303505b7198b9ec8e0b472756c28dd5",
+      "assets/ui/icons/lucide/circle.svg": "7049faa47401b722561c2491aa3eb6e9058fce043457d4904d5fb28d7c812932",
+      "modules/avatar/assembly/assembler.gd": "1999f2b492d4a460c46c858c8bd1b8daa0a6c0cea32b36cca9ff2587c49a62c8",
+      "modules/avatar/assembly/assembler_direct.gd": "463d89e893a66bb766c22be302df29953be159d5710cd72fe49e672f4bc11c5d",
+      "modules/avatar/assembly/assembler_merged.gd": "fb65781c7a1b66f7ba60911a589049eec5450ef5106da36cf1d413b28b6a6841",
+      "modules/avatar/assembly/avatar_rig.gd": "d26b27337e63e33bca56b9b94a75640752d56f9c4fe20a6132f4071b56c1bc85",
+      "modules/avatar/assembly/blob_shadow.gd": "9465e8d994fe3fd41d99bf956d1d1e4495256fae483c20a99aa992be6b7c1c0a",
+      "modules/avatar/assembly/part_def.gd": "a8d9991857606729229691ad0fdbb865e854df80ffb9fc882a56c828f425d3ce",
+      "modules/avatar/assembly/rig_activity.gd": "db0cb5ab5796014dd32d3b503241c97a403a2dc47e078c19d4722bbf2f6b1d5c",
+      "modules/avatar/avatar_service.gd": "ff2979a844436c964c9fca2c73db7de89f2e0b18572964c34a619f13e0bbf1ba",
+      "modules/avatar/catalog/part_catalog.gd": "0687f79f37cce5d865f348a153710152b50f3bdf39edd4da01a7eec43990ddb0",
+      "modules/avatar/content/content_repo.gd": "786c108ffde5a3d931e45bd1a419765a099960022d819de4377a0b1c5e3d2bee",
+      "modules/avatar/data/avatar_config.gd": "85f597a498884a7cf8064ccec06a28c4eb34b96aee657e6a4cd6888e5d6e8089",
+      "modules/avatar/data/slot_def.gd": "d3d490cd46a5de4039bbb4cffb770dc567a0daa8d0b449d940e1dacbe8593d57",
+      "modules/avatar/data/slot_table.gd": "31401ba57e141abc70b087872ce78a3861b31a7acc7bb042b5a9912d1286678e",
+      "modules/avatar/data/slot_table.tres": "a10d1fba4aba717f1499cfa37f24ca602b1fc3161b3c942b662cf384128de835",
+      "modules/avatar/loading/part_cache.gd": "03b9782a610025e624ed5fd6b932f32b31fc3789b5cd459730dbc575626f310b",
+      "modules/avatar/loading/part_loader.gd": "b0c8a0b54d8fb5cea30aa93904cf55b351b3cd4010f231fc566ac57c4b3e487d",
+      "modules/avatar/persistence/outfit_store.gd": "8aadb02b3bf70f5d7f0b9339fcd22ca2ab7e200144264bfe7597c4f7200f31d7",
+      "modules/avatar/seeded_outfit.gd": "03f90ceec17c67aba2e13e37c2877ce13c7f2c104f2677a4f6db6c26d4f67fa4",
+      "modules/avatar/shaders/avatar_toon.gdshader": "66723d2e8fad1efe85d098156520e7f47ace869502bc8448eb60414b75a7f73e",
+      "modules/avatar/shaders/material_factory.gd": "aac6f9f53e47aa09030a81ccfbaf9cc456b773da3e5a6b009ce46f3a32b57195",
+      "modules/avatar/thumbs/part_thumbnailer.gd": "48723b981d19903d43a8fbf97ac754406100fcb0a8b3a5a7d34ecba80163603d",
+      "modules/blueprint/blueprint.gd": "bfa17d24435670ca82047593cd787eb5f807c17923863016dd3fb1b3be77e7c0",
+      "modules/blueprint/blueprint_grid.gd": "4902f7cb0f00235c987cb3a56699f69ccf32723df71ef80d6bfd0b65dd78d4a6",
+      "modules/blueprint/farm_placement.gd": "60a5922c54689dc56fb1b842c3bfb3da7ab740af96576f6473a08e6ee4901040",
+      "modules/character/character_model.gd": "d95a51d8b6c7fea01a4a11d3b326f5f10482ee65a502d90bc4a6529ad0b5cbc3",
+      "modules/farm/crop_info.gd": "6afed8b662b03c128b2107a84e9451acfd2ca79cf97ba75be6ea2569484a1ab1",
+      "modules/farm/crop_plant_mesh.gd": "89eba86807820275c79de31de0b7ac93615a81fe895d2afedff2a1118f966b90",
+      "modules/farm/day_goals.gd": "6bdc72b117990c1f97815396849ebecfeeb9479bdb3a2f6a4ba0b7c7f1d9c3ed",
+      "modules/farm/decoration_layout.gd": "0a449a7083e1959e968e9183b7ba697265c8897b280f99afcf9556dc31fdd9de",
+      "modules/farm/farm_art.gd": "c389f99b08eca2702126783716fcba626121dc62c72fa01eb4b920045f53b6f4",
+      "modules/farm/farm_camera.gd": "e00de7afbda6bbfd490a0e434f0987eb0a06b8176d97efbd986b3204f447de24",
+      "modules/farm/farm_props.gd": "78597dd0820a409861dedda2eb031f3917dd56ae1554747072425fd0bf225b8f",
+      "modules/farm/journey_gatherings.gd": "db87247db740e9467698b95df2a4eaf6e42a7ce3f38d45e06992bb5ee95d6f3b",
+      "modules/farm/journey_progress.gd": "546ba584597a9649bfa406707e51543af02dfd406deacc3d6e897578c5e560e9",
+      "modules/farm/journey_requests.gd": "1f004fd9c7acc47f5d280f16fdfd703824175d83e532cc2afaba33a1bdd27a2c",
+      "modules/farm/journey_workshop.gd": "1ad6d8d4f098a80ab3d11da67a3c45e57d00d72bb64d73b2d7f2aa8938322d66",
+      "modules/farm/next_step.gd": "df59e59bae70a707b38d41c91e766c29717a72f7902b0a9be67d4f71cc991e10",
+      "modules/farm/place_catalog.gd": "fd9def6527f2f4859810a7ef96de49bebdae28f999145e3cb564bc4b5e60a2e5",
+      "modules/farm/place_scenery.gd": "6b6f77ab80560733cc9e3df04f263386bad73bfe883d18407f1130b8fcd1ef72",
+      "modules/farm/player_mover.gd": "a9f637738bb13e050c93f1d174406758cdb25416f3f948d73cb56cf778214f8c",
+      "modules/farm/resident_cast.gd": "6410589cc231f66aba7bf06d196d401cfe8ec23765ae166468239931cf4d9e5c",
+      "modules/farm/shaders/garden_path.gdshader": "55ac8fe85db7dc072fc03031e6a2c55872d273f9f9c551bb0e03b6b9b22ff49d",
+      "modules/farm/shaders/garden_soil.gdshader": "959b2ca467c93205ecda58231651e477f9af8993e126732439526c89f5e6752a",
+      "modules/farm/street_commons.gd": "083ba751e7b2aaf02e76623215d11125592b492940018a62d7247e28f1ed55e4",
+      "modules/fishing/bank_plants.gdshader": "49779029db8b959270bbf42deeee22d4f45e2ffe5da7e06dd761018823102fb6",
+      "modules/fishing/fishing_model.gd": "22137c9e88e496c6b093f1de4abe0a854ff6612bfebff2fbe6289dc78c0805ff",
+      "modules/fishing/shore_rock.gdshader": "40c9a627a74a3032a60b498da18eb0fbfd814a120a2473e9a8d1d9ecb1c5a298",
+      "modules/fishing/street_bank.gdshader": "4519e5bcc924ae1682fda7b51bf26a4a7d9faba045a8190141293916cf27fbd8",
+      "modules/fishing/water_shore.gd": "6b79dd14610930b6a6b51235d2a32f7ef43a688be5764ec87a3d1e28731cdb63",
+      "modules/inventory/bag_model.gd": "b6b9f3a72847542b7034010e3aefa2d2f7192520e25c352774281b4e0b0111cd",
+      "modules/inventory/item_catalog.gd": "03df76fa1efe11374bc884738d35b77127c36cd0b41e5076018032d51cede8f0",
+      "modules/mining/mine_art.gd": "7a475f569499618509298039cddb6d08cb92acc12d2f7bf38252a3b5b20f9fa8",
+      "modules/mining/mine_combat.gd": "70207b7a46f7cb65f1a90b6d6c1928fbe5dcb14e17a2dc73ffaf8ff0ea71b755",
+      "modules/mining/mine_layout.gd": "21d39456885ae7d633e37500ba4194e71f3e566a998c9cb4d6aa370259001fec",
+      "modules/mining/mine_mesh.gd": "0937de580a0676695679549bf90a2d28d0a849b5e40477dae614ba1e2ca4725e",
+      "modules/net/api_client.gd": "f459c30ee0c4d6b0d05ab55f201dba993d01fc83fac2f1619b21710350389d7b",
+      "modules/net/farm_command_journal.gd": "38fdc1626678374329be098413099861ebe7f5f25fc8b9b8ab0c509dddb3246e",
+      "modules/net/farm_session.gd": "a6d9c91337e925cd2a172aacb52ab5b720c327717cfe04ccaadcdb8ce815c3e1",
+      "modules/ponds/pond_stone.gdshader": "5938f2769bf52c121a1f941e8cfe03189766e81a68bf040b657b6c57f2f04790",
+      "modules/ui/game_ui.gd": "2f4ad7b5984505b1ee61b16f231187de81be60c35404b582c8586952edd7e858",
+      "modules/ui/l10n.gd": "e15729323aacf711ca088bad9ef4c7bb0f81b0570a26280f762dedc435058596",
+      "modules/ui/touch_scroll_container.gd": "0a23465c259d27fecee338bea8125f1ab72196643aeae06828fde2c0a0f71efe",
+      "modules/ui/ui_metrics.gd": "67df4460c940af6e77be7d2f1cfcb4bb337f7d97d309f850181fb82283216f89",
+      "scenes/dressing_room/dressing_camera.gd": "09a5f23f69cad0173a77e6e1da9435027e71b73ba1c66f9024a82359156eeebe",
+      "scenes/farm/farm_hud.gd": "a457634ca36e8fe48702045a2f5f335694140d94aed1b0003c6b2660b7017d6f"
+    }
+  }
+}

@@ -113,29 +113,31 @@ func reference_player(parent):
 	avatar.scale=Vector3.ONE*1.745/(hi-lo);avatar.position=Vector3(3.0,-lo*avatar.scale.y,-3.8);avatar.rotation_degrees.y=180
 	return avatar
 
-func mine_contexts(manifest):
+func mine_contexts(manifest,floor_numbers=[1,3],radius=1.0):
 	mine_lighting();report.mine_contexts=[]
-	for floor_number in [1,3]:
+	for floor_number in floor_numbers:
 		var fixture=Node3D.new();world.add_child(fixture);fixture.add_child(ContextArt.floor_scenery(floor_number,false))
 		await reference_player(fixture)
-		var combat=MineCombat.new();var slime=combat._slime({"radius":1.0},false);fixture.add_child(slime);combat.free()
+		var combat=MineCombat.new();var slime=combat._slime({"radius":radius},false);fixture.add_child(slime);combat.free()
 		slime.position=Vector3(4.9,0,-3.8)
 		for name in ["HealthFill","HealthTrack","Health"]:slime.get_node(name).visible=false
 		for spec in manifest.assets:
-			var model=load("res://"+spec.file).instantiate();slime.add_child(model);model.position.y=1.43
+			var model=load("res://"+spec.file).instantiate();slime.add_child(model);model.position.y=1.43*radius;model.scale=Vector3.ONE*radius
 			(slime.get_node("Body").material_override as StandardMaterial3D).albedo_color=Color(spec.preview_body_tint)
 			vp.size=Vector2i(360,800);camera.size=ContextCamera.close_view_size(Vector2(360,800))/.8
 			ContextCamera.place(camera,Vector3(4.2,.7,-3.8))
 			var name=spec.name+("_red_mine_43deg" if floor_number==1 else "_purple_mine_43deg")
 			await capture(name)
-			report.mine_contexts.append({"id":name,"floor":floor_number,"slime_radius_m":1.0,"player_height_m":1.745,"camera_zoom":.8,"width_m":camera.size})
+			report.mine_contexts.append({"id":name,"floor":floor_number,"slime_radius_m":radius,"player_height_m":1.745,"camera_zoom":.8,"width_m":camera.size})
 			model.queue_free();await get_tree().process_frame
 		fixture.queue_free();await get_tree().process_frame
-	check(report.mine_contexts.size()==6,"All three headpieces in both mines, with actual player")
+	check(report.mine_contexts.size()==floor_numbers.size()*manifest.assets.size(),"Requested mine contexts completed with actual player")
 
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output);setup()
 	var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://assets/monsters/slime_king/manifest.json"))
+	var quartz_only="--quartz-v12" in OS.get_cmdline_user_args()
+	if quartz_only:manifest.assets=manifest.assets.filter(func(spec):return spec.name=="quartz_cluster")
 	var combat=MineCombat.new();var slime=combat._slime({"radius":1.0},false);world.add_child(slime)
 	for name in ["HealthFill","HealthTrack","Health"]:slime.get_node(name).visible=false
 	var proxy=collision_proxy(combat._slime_body(1.0));combat.free()
@@ -155,7 +157,8 @@ func run():
 			pose(145,43,2.8,Vector3(0,.93,0));await capture(spec.name+"_mounted_rear")
 		report.assets[spec.name]=row;model.queue_free();await get_tree().process_frame
 	proxy.queue_free();slime.queue_free();await get_tree().process_frame
-	await mine_contexts(manifest)
+	if quartz_only:await mine_contexts(manifest,[1],.85)
+	else:await mine_contexts(manifest)
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","Actual Mobile renderer")
 	report.passed=report.checks.all(func(c):return c.passed)
