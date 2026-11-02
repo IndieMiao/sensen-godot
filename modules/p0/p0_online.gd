@@ -51,6 +51,12 @@ var _stopped := true
 var _last: Dictionary = {}
 var _last_tick := -1
 
+## Layer 2 and later say so once (SGODOT-227 28c0580b; the user, 11-02: a room is a "Layer" to the player): the toast
+## for a join, "" for Layer 1 and a reconnect to the layer just left. Outposts and ponds alike.
+static func layer_notice(info: Dictionary) -> String:
+	var n := int(info.get("room", 1))
+	return "Layer %d is full · you're in Layer %d" % [n - 1, n] if n > 1 and not bool(info.get("rejoined", false)) else ""
+
 ## http://host:3110/v1 → ws://host:3110/v1/p0/online (https → wss).
 static func ws_url(base_url: String) -> String:
 	var u := base_url.strip_edges().trim_suffix("/")

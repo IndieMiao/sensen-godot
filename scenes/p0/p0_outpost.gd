@@ -105,10 +105,10 @@ func _on_online_failed(code: String) -> void:
 	rt.after_leave = "travel:" + cluster if cluster != "" else ""
 	rt.leave_room()
 
-## Room 2 and later say so once; Room 1 and a reconnect to the same room say nothing (SGODOT-227 28c0580b).
+## Layer 2 and later say so once; Layer 1 and a reconnect to the same layer say nothing (P0Online.layer_notice).
 func _on_joined(info: Dictionary) -> void:
-	var n := int(info.get("room", 1))
-	if n > 1 and not bool(info.get("rejoined", false)) and rt: rt.ui.toast("Room %d is full · you're in Room %d" % [n - 1, n])
+	var said := P0Online.layer_notice(info)
+	if said != "" and rt: rt.ui.toast(said)
 	if seat != "": _stand_up()   # a new connection starts standing
 
 ## The space every P0 command carries (SGODOT-228 Rest "away from the farm"): outposts are "outpost".

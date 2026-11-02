@@ -302,9 +302,10 @@ export class P0OnlineHub {
 }
 
 /** What the room sees of a player (11-02): x-p0-player is the P0 server's only credential (with the shared demo key), so a
- * roster never carries it — a stable, one-way handle instead (`p-` and 16 hex of its SHA-256). The clients use the field
- * for the name tag and the outfit cache only, so an older client reads it as before. */
-export const publicPlayer = (player: string): string => 'p-' + createHash('sha256').update('p0-online/' + player).digest('hex').slice(0, 16);
+ * roster never carries it — a stable, one-way handle instead (16 hex of its SHA-256). The clients use the field for the
+ * name tag (its first 4: `Traveller 8c3f`, no prefix to show — 奕星 on #646) and the outfit cache only, so an older
+ * client reads it as before. */
+export const publicPlayer = (player: string): string => createHash('sha256').update('p0-online/' + player).digest('hex').slice(0, 16);
 
 /** Registers the WebSocket upgrade and the presence route; tools/p0_server.ts only calls this. */
 export function registerP0Online(app: FastifyInstance, deps: P0OnlineDeps): P0OnlineHub {

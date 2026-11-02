@@ -78,7 +78,7 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     // the handle is stable and one-way: the same player, the same handle; another player, another
     expect(publicPlayer('p0-secret-aaaa1111')).toBe(publicPlayer('p0-secret-aaaa1111'));
     expect(publicPlayer('p0-secret-aaaa1111')).not.toBe(publicPlayer('p0-secret-bbbb2222'));
-    expect(publicPlayer('p0-secret-aaaa1111')).toMatch(/^p-[0-9a-f]{16}$/);
+    expect(publicPlayer('p0-secret-aaaa1111')).toMatch(/^[0-9a-f]{16}$/);   // the name tag's 4: hex, no prefix (奕星 on #646)
   });
 
   it('rejects a missing or malformed player id at the upgrade', async () => {

@@ -108,3 +108,14 @@ func test_a_line_before_the_join_is_not_sent() -> void:
 	o.transport = func(m: Dictionary): sent.append(m)
 	o.fish({"phase": "casting", "target": [1, 1]})
 	assert_array(sent).is_empty()
+
+## 奕星 on #646: Layer 2 and later say so once, as an outpost's do; Layer 1 and a reconnect say nothing. The user, 11-02:
+## the player reads a room as a "Layer".
+func test_layer_2_says_so_once() -> void:
+	assert_str(P0Online.layer_notice({"room": 2, "rejoined": false})).is_equal("Layer 1 is full · you're in Layer 2")
+	assert_str(P0Online.layer_notice({"room": 3, "rejoined": false})).is_equal("Layer 2 is full · you're in Layer 3")
+	assert_str(P0Online.layer_notice({"room": 2, "rejoined": true})).is_empty()   # back in the layer just left
+	assert_str(P0Online.layer_notice({"room": 1, "rejoined": false})).is_empty()
+	var pond := _pond()
+	var o := _online(pond)
+	assert_bool(o.joined.is_connected(pond._on_joined)).is_true()

@@ -746,7 +746,13 @@ func attach_online(o: P0Online) -> void:
 	o.crowd = crowd
 	o.source = func(): return {"position": actor.position, "yaw": atan2(actor.facing().x, actor.facing().z), "action": _online_action()}
 	add_child(o)
+	o.joined.connect(_on_joined)
 	o.failed.connect(_on_online_failed)
+
+## Layer 2 and later say so once, as an outpost's do (奕星 on #646; P0Online.layer_notice).
+func _on_joined(info: Dictionary) -> void:
+	var said := P0Online.layer_notice(info)
+	if said != "" and rt: rt.ui.toast(said)
 
 func _online_action() -> String:
 	if panel and panel.visible:
