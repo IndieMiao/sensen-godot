@@ -39,13 +39,13 @@ describe('gathering spots (§13.2, q(44))', () => {
     expect(s.storage.wood).toBe(12);
   });
 
-  it('Gather Gloves add 1 to the material only; the Reed Bank\'s worms go to the bag', () => {
+  it('the Reed Bank\'s worms go to the bag; Gather Gloves an old save still owns add nothing (the user, 11-02 丁11)', () => {
     const s0 = fresh();
     s0.owned.push('gather_gloves');
     const { s, ev } = step(s0, { type: 'gather', spot: 'spot_reed_bank' });
-    expect(s.storage.fiber).toBe(4);
+    expect(s.storage.fiber).toBe(3);
     expect(count(s.bag, 'bait_worm')).toBe(2);
-    expect(ev).toContainEqual({ kind: 'gather', spot: 'spot_reed_bank', items: [['fiber', 4, 'storage'], ['bait_worm', 2, 'bag']], ready_in: 8 * H });
+    expect(ev).toContainEqual({ kind: 'gather', spot: 'spot_reed_bank', items: [['fiber', 3, 'storage'], ['bait_worm', 2, 'bag']], ready_in: 8 * H });
   });
 
   it('worms that do not fit in the bag go to storage with the reeds', () => {
@@ -86,12 +86,12 @@ describe('gathering spots (§13.2, q(44))', () => {
     expect(refuse(fresh(), { type: 'gather', spot: 'spot_grove', space: 'mine' }).code).toBe('not_home');
   });
 
-  it('the view says which spots are open and ready, and what a gather gives now (gloves included)', () => {
+  it('the view says which spots are open and ready, and what a gather gives (no gloves any more: 丁11)', () => {
     const s = fresh();
     s.owned.push('gather_gloves');
     const v = viewOf(c, s, T0).gather;
-    expect(v.gloves).toBe(true);
-    expect(v.spots[0]).toEqual({ id: 'spot_grove', name: 'Timber Grove', open: true, homestead: 1, ready: true, ready_in: 0, yield: [['wood', 7]] });
+    expect('gloves' in v).toBe(false);
+    expect(v.spots[0]).toEqual({ id: 'spot_grove', name: 'Timber Grove', open: true, homestead: 1, ready: true, ready_in: 0, yield: [['wood', 6]] });
     expect(v.spots[4]).toMatchObject({ id: 'spot_clay_bank', open: false, ready: false });
   });
 });
@@ -151,13 +151,12 @@ describe('workbench (§13.4, q(31) / q(44))', () => {
     ]);
   });
 
-  it('Gather Gloves work at once and are owned', () => {
+  it('Gather Gloves are no recipe any more (the user, 11-02 丁11)', () => {
     const s0 = fresh();
     s0.storage = { fiber: 8, wood: 4 };
-    const { s } = step(s0, { type: 'craft', recipe: 'craft_gather_gloves' });
-    expect(s.owned).toContain('gather_gloves');
-    expect(step(s, { type: 'gather', spot: 'spot_grove' }, T0 + STEP).s.storage.wood).toBe(7);
-    expect(refuse(s, { type: 'craft', recipe: 'craft_gather_gloves' }).code).toBe('owned');
+    expect(c.workbench.recipes.some(r => r.out === 'gather_gloves')).toBe(false);
+    expect(refuse(s0, { type: 'craft', recipe: 'craft_gather_gloves' }).code).toBe('bad_recipe');
+    expect(s0.storage).toEqual({ fiber: 8, wood: 4 });
   });
 
   it('the view gives each recipe\'s costs (storage and bag apart), gate, owned and first block', () => {
