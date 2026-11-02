@@ -124,6 +124,17 @@ func test_the_blocked_list_and_unblock_by_handle() -> void:
 	assert_array(asked[-1]).is_equal([HTTPClient.METHOD_GET, "/p0/voice/blocks", {}])
 	assert_bool(await room.unblock("bbbb2222bbbb2222")).is_true()
 	assert_array(asked[-1]).is_equal([HTTPClient.METHOD_POST, "/p0/voice/unblock", {"handle": "bbbb2222bbbb2222"}])
+	answers["blocks"] = {"ok": true, "blocked": []}
+	assert_array(await room.blocked_list()).is_empty()   # none blocked: `No one blocked`
+
+## The Blocked list not reached is null, never [] (奕星): the page must not say `No one blocked` for a failed read.
+func test_the_blocked_list_not_reached_is_null_not_empty() -> void:
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": false, "json": {}}
+	assert_that(await room.blocked_list()).is_null()
+	room.request = func(_m: int, _p: String, _b: Dictionary) -> Dictionary: return {"ok": true, "json": {"code": "x"}}
+	assert_that(await room.blocked_list()).is_null()   # an answer without the list
 
 func test_a_new_layer_with_voice_on_asks_again() -> void:
 	var f := _room()
