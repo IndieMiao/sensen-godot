@@ -1160,6 +1160,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			# pond's would only close its fishing panel and keep the player there (周瑜 on #642)
 			elif to != "" and is_instance_valid(world):
 				after_leave = "travel:" + to
+				# not a place to go back to: the map's chip names where the player is (LOCK-06; 不知火舞 on #642: it kept
+				# `Hayward · Acorn Creek` with the home icon after a pass ran out there and the server had them home)
+				return_to = "farm"
 				leave_to_map()
 			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
