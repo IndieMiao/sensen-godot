@@ -111,9 +111,14 @@ export function storeMaterials(c: P0Content, s: P0State, now: number, events: P0
   events?.push({ kind: 'stored', items, reason });
 }
 
-/** §13.2 spots as facts: open (Homestead level), ready or how long until, and what a gather would give now. */
+/** §13.2 spots as facts: open (Homestead level), ready or how long until, and what a gather would give now. city_ready:
+ * the city points still cooling down, id → ms until ready (v4q(4); 亚瑟 on #659: in the view, which every command brings
+ * back, not the city read, which the client keeps per city). */
 export function gatherView(c: P0Content, s: P0State, now: number) {
+  const city_ready: Record<string, number> = {};
+  for (const [id, at] of Object.entries(s.gather.ready_at)) if (id.includes('~') && at > now) city_ready[id] = at - now;
   return {
+    city_ready,
     spots: Object.entries(c.gather.spots).map(([id, def]) => {
       const ready_in = Math.max(0, (s.gather.ready_at[id] ?? 0) - now);
       const open = s.homestead.level >= def.homestead;

@@ -7,6 +7,7 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { gatherCatalogueOf, useGatherCatalogue } from '../../src/p0/gather_points.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
+import { viewOf } from '../../src/p0/view.js';
 import { worldOf } from '../../src/p0/world.js';
 
 const SF = 'gn-5391959', TOKYO = 'gn-1850147', T = Date.parse('2026-11-02T18:00:00Z'), H = 3_600_000;
@@ -43,6 +44,8 @@ describe('city gathering (v4q(4) ③–⑤)', () => {
     expect(r.state.storage.wood).toBe(4);
     expect(count(r.state.bag, 'wood')).toBe(0);
     expect(r.events).toContainEqual({ kind: 'gather', spot: WOOD, items: [['wood', 4, 'storage']], ready_in: 4 * H });
+    expect(viewOf(c, r.state, T + H).gather.city_ready).toEqual({ [WOOD]: 3 * H });   // the view says it cools down (亚瑟 on #659)
+    expect(viewOf(c, r.state, T + 4 * H).gather.city_ready).toEqual({});              // ready: no longer listed
     const again = run(c, r.state, { type: 'gather', spot: WOOD, space: 'home' } as P0Command, T + 3 * H);
     expect(again).toMatchObject({ ok: false, code: 'not_ready', detail: { ready_in: H } });
     const later = run(c, r.state, { type: 'gather', spot: WOOD, space: 'home' } as P0Command, T + 4 * H);
