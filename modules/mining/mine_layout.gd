@@ -18,6 +18,20 @@ const FALLBACK_POSITIONS := [Vector3(2.0, 0, -2.15), Vector3(4.5, 0, -2.4),
 
 static var _layouts: Dictionary = {}
 
+## The P0 mine's rock spots (355 b1, contract-efg §4: the server says how many, the client places them): `count` of the
+## six fixed spots — reachable and framed on every chamber — in an order drawn from `key` (mine, floor and day), so a
+## floor keeps its look all day and the next day's is new. Rock i of the view stands at the i-th.
+static func p0_rocks(count: int, key: String) -> Array:
+	var order := range(FALLBACK_POSITIONS.size())
+	var rng := RandomNumberGenerator.new()
+	rng.seed = key.sha256_text().substr(0, 15).hex_to_int()
+	for i in range(order.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t: int = order[i]
+		order[i] = order[j]
+		order[j] = t
+	return order.slice(0, clampi(count, 0, order.size())).map(func(i): return FALLBACK_POSITIONS[i])
+
 static func data() -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
 

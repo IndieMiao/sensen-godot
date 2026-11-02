@@ -76,14 +76,16 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 9, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the house: Space taken
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 12, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' }); // the mailbox
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 6, y: 13, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the front fence
-    // q(120): Keep the path clear — two cells wide to the door, the stall, the mine mouth, the workbench; the path to
+    // q(120): Keep the path clear — two cells wide to the door, the stall, the workbench, one to before the bench (no mine mouth since 355 b1); the path to
     // the map exit now runs through the field (355 grid), so it is the field that keeps it clear
     for (const [x, y] of [[9, -1], [10, -2]] as const)
       expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });
-    for (const [x, y, where] of [[8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
+    for (const [x, y, where] of [[8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [17, 15, 'workbench'], [6, 15, 'bench'], [7, 15, 'bench']] as const)
       expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME }), where).toMatchObject({ ok: false, code: 'decor_path' });
-    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 15, ...HOME })).toMatchObject({ ok: true });   // just off the mine path
-    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 3, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_path' });   // on it (4, 14 would reach the Chef's Sign's cell)
+    for (const [x, y] of [[1, 13], [2, 14], [4, 13]] as const)   // the mine mouth and its path were here (355 b1, v4q(5) ①)
+      expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME })).toMatchObject({ ok: true });
+    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 15, ...HOME })).toMatchObject({ ok: true });
+    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 3, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });   // (4, 14): under the Chef's Sign's board
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 0, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });  // off the yard
     s = step(s, { type: 'place_decor', item: 'deco_bench', x: 6, y: 18, ...HOME }).s;   // 2 × 1: cells 6–7, 18
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 7, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });
@@ -114,7 +116,7 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 2, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_cap', detail: { cap: 20, used: 20 } });
   });
 
-  it('stops at decor_max.max when the content sets one (SGODOT-355 b1: 52 proposed, the yard has 53 free cells)', () => {
+  it('stops at decor_max.max when the content sets one (SGODOT-355 b1: 52 proposed, the yard has 58 free cells)', () => {
     const capped = structuredClone(c);
     (capped.homestead as { decor_max?: object }).decor_max = { base: 20, per_level: 4, max: 52 };
     const s = stocked();

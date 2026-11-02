@@ -1,45 +1,28 @@
 class_name P0FarmMaterials
 extends Node
-## SGODOT-231 on the homestead: the mine mouth (tapped like any facility, SGODOT-266: walk up, then its EntryCard with
-## the fee button; "The mine" sheet, the world badge and the once-only "Run ended at daily reset"), the five gathering
-## spots (tap when near, 0 Energy, Ready / countdown marks, floats) and the workbench. One child node of the farm, so p0_farm.gd keeps a few one-line
-## hooks; copy comes from P0MaterialLogic.
+## SGODOT-231 on the homestead: the gathering spots (tap when near, 0 Energy, Ready / countdown marks, floats) and the
+## workbench. The mine mouth left the farm in 355 b1 (v4q(5) ①: the mines are wild sites, entered from the map). One
+## child node of the farm, so p0_farm.gd keeps a few one-line hooks; copy comes from P0MaterialLogic.
 
-const P0_MINE := "res://scenes/p0/p0_mine.tscn"
-const MOUTH_REACH := 2.4        # m: the mouth's strip opens, a tapped walk ends, its EntryCard stays
-const MOUTH_MARK := Vector3(0, 1.9, 0)   # the mouth's badge / world prompt sits here …
-const MOUTH_HIT := Vector3(0, 0.8, 0)    # … and a tap on it is a tap on the gate
 const BODY_GAP := 4.0           # px: a card lifted off the player clears its body by this much
-const NOTICE_S := 2.0           # "Run ended at daily reset" float (q(44))
 const SPOT_REACH := 3.0         # m: finger cards show and taps gather only this close (Arthur, 231)
 ## The farm's gathering spots: none since SGODOT-355 b1 (v4 #49: they went to the cities, and two stood on new beds).
 const SPOTS: Array[String] = []
 
 var farm: Node3D                # p0_farm.gd: actor, cam
 var rt: P0Runtime
-var mouth := Vector3.ZERO
-var _entry: UiEntryCard
-var _entry_card := {}           # P0MaterialLogic.mine_mouth_card while the card shows
-var _card_open := false         # the mouth was tapped and walked up to: its card shows until the player leaves it
-var _reset_shown := 0.0
 var _stored_shown := 0.0
-var _opening := false
 var _spots := {}                # spot id → world position (the spot's anchor cell)
 var _bench := Vector3.ZERO
-var _mouth_art: Node3D          # the mouth's model: a tap anywhere on it is a tap on the mouth
-var _to_mouth := false          # a tap on the mouth from afar: walking up to it
 
-func setup(farm_node: Node3D, mouth_at: Vector3, art: Node3D = null) -> P0FarmMaterials:
+func setup(farm_node: Node3D) -> P0FarmMaterials:
 	farm = farm_node
-	mouth = mouth_at
-	_mouth_art = art
 	name = "FarmMaterials"
 	return self
 
 func _ready() -> void:
 	rt = P0Runtime.ensure()
 	rt.session.state_changed.connect(_on_state)
-	_ensure_entry()   # may not be possible yet: see _ensure_entry
 	_build_spots()
 	# Floats for a past auto-store are not news: only arrivals after entering the farm float.
 	var auto = rt.session.current().get("storage", {}).get("auto", null)
@@ -56,14 +39,6 @@ func _build_spots() -> void:
 
 func _exit_tree() -> void:
 	if rt and rt.session.state_changed.is_connected(_on_state): rt.session.state_changed.disconnect(_on_state)
-	if is_instance_valid(_entry): _entry.queue_free()
-
-## The card lives on the shared UI layer: hide it whenever the farm is not the active world (the mine, the map).
-func _process(_dt: float) -> void:
-	if is_instance_valid(_entry) and rt and rt.world != farm: _entry.visible = false
-
-func near_mouth() -> bool:
-	return flat(farm.actor.position, mouth) < MOUTH_REACH
 
 ## Ground distance: the player's y follows the ground (beds, slopes), facilities sit at 0 (Arthur on 231, int5 #11).
 static func flat(a: Vector3, b: Vector3) -> float:
@@ -75,36 +50,11 @@ func card_candidates() -> Array:
 	var out: Array = []
 	for id in SPOTS: out.append([id, _spots.get(id, Vector3.ZERO), SPOT_REACH])
 	out.append(["workbench", _bench, SPOT_REACH])
-	# The mouth takes the farm's one card when it is nearest: its strip, or its EntryCard once tapped, so the Herb
-	# Patch's card never sits on it (LOCK-07; desktop check of the root-scene fix, #39 follow-up).
-	out.append(["mine", mouth, MOUTH_REACH])
 	return out
 
-## Every frame on the farm: badge, EntryCard and the reset notice. `card` is the farm's one finger card this frame.
+## Every frame on the farm: the spots' and the workbench's prompts and the stored notice. `card` is the farm's one
+## finger card this frame.
 func frame(v: Dictionary, card := "") -> void:
-	var cam: Camera3D = farm.cam
-	var near := near_mouth()
-	if _to_mouth and not farm.actor.mover.is_moving():   # arrived: the stick cancels the walk (cancel_walk)
-		_to_mouth = false
-		if near: _at_mouth()
-	if _card_open and not near: _card_open = false   # walked off: the card folds
-	var top := cam.unproject_position(mouth + Vector3(0, 1.9, 0))
-	# A world prompt like the other facilities, with or without an unfinished run (Figma MINE-P0-5, 不知火舞 on #190: the
-	# Run 1/2 badge is gone): the pickaxe button within 8 m, the strip `The mine · Runs today 1/2` when it holds the
-	# farm's card. Once tapped and walked up to, its EntryCard takes the strip's place, the name on the card's title row.
-	var open := _card_open and not rt.ui.has_modal()
-	farm.world_prompt("mine", P0WorldPrompts.mine(v), mouth, MOUTH_MARK, MOUTH_HIT, not open)
-	if _ensure_entry(): _entry.visible = open
-	if is_instance_valid(_entry) and _entry.visible:
-		_entry_card = P0MaterialLogic.mine_mouth_card(v)
-		_show_card(_entry, _entry_card)
-		# Placed as TapCard: the pointer on the gate, under the HUD, never over the player (不知火舞 on #190).
-		rt.ui.place_card(_entry, top, farm.actor.screen_box(cam), BODY_GAP)
-	if near:
-		var notice := P0MaterialLogic.reset_notice(v, _reset_shown)
-		if notice != "":
-			_reset_shown = float(v.mine.ended.at)
-			rt.ui.float_text(notice, top + Vector2(0, -8), UiFloatText.Tone.ITEM)
 	_spot_marks(v, card)
 	var stored := P0MaterialLogic.stored_notice(v, _stored_shown)
 	if stored != "":
@@ -123,59 +73,10 @@ func _spot_marks(v: Dictionary, card: String) -> void:
 		farm.world_prompt(id, P0WorldPrompts.spot(v, m), at, Vector3(0, 1.3, 0), Vector3(0, 0.6, 0))
 	farm.world_prompt("workbench", P0WorldPrompts.workbench(), _bench, Vector3(0, 1.4, 0), Vector3(0, 0.8, 0))
 
-## The mouth card's content (mine_mouth_card) on a UiEntryCard. LOCK-10: a grey button still takes the press and says
-## why (苏烈, #39), so it is never disabled.
-static func _show_card(e: UiEntryCard, c: Dictionary) -> void:
-	e.title = str(c.get("title", ""))
-	e.title_fact = str(c.get("fact", ""))
-	var main: Dictionary = c.get("main", {})
-	e.action = str(main.get("label", ""))
-	e.state = UiEntryCard.State.AVAILABLE if bool(main.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
-	e.amber = bool(main.get("amber", false))
-	var second: Dictionary = c.get("second", {})
-	var pill := bool(second.get("pill", false))   # 2/2: the grey `Resets in …` pill in New run's place (EXPRESS-4)
-	e.pill = str(second.get("label", "")) if pill else ""
-	e.second = "" if pill else str(second.get("label", ""))
-	e.second_state = UiEntryCard.State.AVAILABLE if bool(second.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
-	e.second_amber = bool(second.get("amber", false))
-	var express: Dictionary = c.get("express", {})   # Floor 5 · Express · Free (P1), under New run when a run is open
-	e.third = str(express.get("label", ""))
-	e.third_state = UiEntryCard.State.AVAILABLE if bool(express.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
-	e.note = str(c.get("note", ""))
-
-## A real tap with the EntryCard up (it is passive, so the scene layer's tap arrives here first from p0_tap): on it,
-## its button's; anywhere else the card folds ("点别处就收起", 不知火舞 9ce583a8) and the tap goes on to the farm.
-func tap_entry(screen: Vector2) -> bool:
-	if not is_instance_valid(_entry) or not _entry.visible: return false
-	if _entry.tap_at(screen + rt.ui.root.global_position) != "": return true
-	close_card()
-	return false
-
-func close_card() -> void:
-	_card_open = false
-	if is_instance_valid(_entry): _entry.visible = false
-
-## The stick takes over: a walk to the mouth stops there (SGODOT-266: pushing the stick on the way cancels).
-func cancel_walk() -> void:
-	_to_mouth = false
-
-func card_open() -> bool: return is_instance_valid(_entry) and _entry.visible
-
-## The mouth was tapped and walked up to and its card is meant to show (it may not have drawn yet this frame).
-func card_wanted() -> bool: return _card_open
-
-## Taps on the farm's material facilities (LOCK-07): the mouth walks up to it (tap_mouth); a spot gathers when the
-## player stands near it, a locked one shows MAT-3; the workbench opens its drawer.
+## Taps on the farm's material facilities (LOCK-07): a spot gathers when the player stands near it, a locked one
+## shows MAT-3; the workbench opens its drawer.
 func tap(screen: Vector2) -> bool:
 	var cam: Camera3D = farm.cam
-	if _mouth_hit(screen):
-		# The model's box reaches the Herb Patch's and the bench's tap circles (苏烈 on #156): a tap on both goes to the
-		# nearer of the mouth's middle and that facility's point.
-		var others: Array = [cam.unproject_position(_bench + Vector3(0, 0.8, 0))]
-		for id in SPOTS: others.append(cam.unproject_position(_spots.get(id, Vector3.ZERO) + Vector3(0, 0.6, 0)))
-		if mouth_nearest(screen, _mouth_centre(), others):
-			tap_mouth()
-			return true
 	for id in SPOTS:
 		var at: Vector3 = _spots.get(id, Vector3.ZERO)
 		if cam.unproject_position(at + Vector3(0, 0.6, 0)).distance_to(screen) >= 64: continue
@@ -184,64 +85,6 @@ func tap(screen: Vector2) -> bool:
 	if cam.unproject_position(_bench + Vector3(0, 0.8, 0)).distance_to(screen) < 64 and flat(farm.actor.position, _bench) < SPOT_REACH:
 		return tap_card("workbench")
 	return false
-
-## A tap on the mouth — its model, button or strip (不知火舞 on 231, int11 ②; SGODOT-266) — walks the player up to it
-## (the stick on the way cancels); there its EntryCard opens with the fee button (`Enter mine · 2 Energy`, or
-## `Continue run · Free` and `New run`): the tap itself never spends Energy. With today's runs used up it is the card
-## too, with its grey `Resets in …` pill (MINE-GATE-EXPRESS-3 / -4; the P0 MINE-P0-8 drawer for that state is gone,
-## 不知火舞 on 286, q(196)).
-func tap_mouth() -> void:
-	if near_mouth():
-		_at_mouth()
-		return
-	for p in mouth_stands(farm.grid, mouth, farm.actor.position):
-		if farm.actor.mover.set_target_position(p):
-			_to_mouth = true
-			return
-	_at_mouth()   # nowhere to stand by it (not on the shipped farm): answer from here
-
-func _at_mouth() -> void:
-	farm.actor.face(mouth)
-	_card_open = true
-
-## Walkable points by the mouth, well inside MOUTH_REACH, nearest the player first (the mouth's own cell is the gate).
-static func mouth_stands(grid: BlueprintGrid, at: Vector3, from: Vector3) -> Array:
-	var bp := grid.bp
-	var centre := bp.world_to_cell(at)
-	var reach := ceili(MOUTH_REACH / bp.cell_m)
-	var out: Array = []
-	for dy in range(-reach, reach + 1):
-		for dx in range(-reach, reach + 1):
-			var cell := centre + Vector2i(dx, dy)
-			if not bp.in_bounds(cell) or grid.astar.is_point_solid(cell): continue   # the grid may start before row 0 (q(172) A)
-			var p := bp.cell_to_world(cell)
-			var d := flat(p, at)
-			if d > 0.5 and d < MOUTH_REACH - 0.5: out.append(p)
-	out.sort_custom(func(a, b): return flat(a, from) < flat(b, from))
-	return out
-
-## Whether a tap on the mouth's box is the mouth's: unless another facility's tap circle holds it with its point nearer.
-static func mouth_nearest(screen: Vector2, mouth_at: Vector2, others: Array, radius := 64.0) -> bool:
-	var d := screen.distance_to(mouth_at)
-	for o in others:
-		var e := screen.distance_to(o)
-		if e < radius and e < d: return false
-	return true
-
-func _mouth_centre() -> Vector2:
-	var cam: Camera3D = farm.cam
-	if is_instance_valid(_mouth_art):
-		var box := screen_box(cam, _mouth_art)
-		if box.has_area(): return box.get_center()
-	return cam.unproject_position(mouth + MOUTH_HIT)
-
-## The mouth's model on screen (any part of it counts); a circle round the gate without the model.
-func _mouth_hit(screen: Vector2) -> bool:
-	var cam: Camera3D = farm.cam
-	if is_instance_valid(_mouth_art) and _mouth_art.is_visible_in_tree():
-		var box := screen_box(cam, _mouth_art)
-		if box.has_area(): return box.has_point(screen)
-	return cam.unproject_position(mouth + MOUTH_HIT).distance_to(screen) < 60
 
 ## A model's bounds projected on screen: every mesh's box corners (geometry only: a light's box is its whole range).
 static func screen_box(cam: Camera3D, root: Node3D) -> Rect2:
@@ -263,10 +106,7 @@ static func screen_box(cam: Camera3D, root: Node3D) -> Rect2:
 func tap_card(id: String) -> bool:
 	# A tap that reaches the world while a sheet or card is already up (a fast second tap on a spot's button before the
 	# frame hides it) opens nothing more (SGODOT-256 ①).
-	if rt.ui.has_modal() and (id in SPOTS or id in ["workbench", "mine"]): return true
-	if id == "mine":   # the mouth's strip or button
-		tap_mouth()
-		return true
+	if rt.ui.has_modal() and (id in SPOTS or id == "workbench"): return true
 	if id == "workbench":
 		farm.actor.face(_bench)
 		_open_workbench()
@@ -287,11 +127,10 @@ func tap_card(id: String) -> bool:
 func _open_workbench() -> void:
 	rt.ui.open_workbench()
 
-## A NeedSource Show target this helper owns (a gathering spot, "mine", "workbench"), else null (LOCK-08: Show only
-## moves the camera there).
+## A NeedSource Show target this helper owns (a gathering spot, "workbench"), else null (LOCK-08: Show only moves the
+## camera there). "mine" is the map's now (no mouth on the farm, 355 b1).
 func spot_at(where: String) -> Variant:
 	if _spots.has(where): return _spots[where]
-	if where == "mine": return mouth
 	if where == "workbench": return _bench
 	return null
 
@@ -318,20 +157,15 @@ func _on_craft(v: Dictionary, e: Dictionary) -> void:
 ## Commands this helper owns; false lets the farm handle the rest.
 func act(cmd: Dictionary) -> bool:
 	match str(cmd.get("type", "")):
-		"mine_enter", "mine_new_run", "mine_express":
-			close_card()
-			rt.session.send(cmd)
 		"toast":
 			rt.ui.toast(str(cmd.get("text", "")))
 		_:
 			return false
 	return true
 
-## A run starts or continues: open the mine on the floor the server landed it on (Continue run: the deepest paid;
-## Express: Floor 5).
 ## A gather floats what went to storage at the spot (the runtime floats what went to the bag).
 func _on_state(v: Dictionary, events: Array) -> void:
-	if rt.world != farm or _opening: return
+	if rt.world != farm: return
 	for e in events:
 		if str(e.get("kind", "")) == "craft": _on_craft(v, e)
 	for e in events:
@@ -339,51 +173,4 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			# One item line with the runtime's own (what went to the bag), in the reply's three lines (q(49) ①).
 			rt.ui.queue_floats(P0MaterialLogic.gather_floats(v, e).map(func(line: String) -> Dictionary:
 				return {kind = "item", key = line, text = line, tone = UiFloatText.Tone.ITEM}), rt.anchor())
-	for e in events:
-		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) in ["enter", "continue", "express"]:
-			_opening = true
-			AppRouter.open_instance(P0_MINE, {"floor": int(e.get("floor", 1))})
-			get_tree().create_timer(1.0).timeout.connect(func(): _opening = false)
-			return
 
-## The EntryCard hangs on the P0 UI's root, which only exists once the UI is in the tree. With the farm as the root
-## scene (the first session, desktop P0_SHOT) this helper is ready before the runtime is — P0Runtime.ensure() adds it
-## deferred — so the card is built on the first call that can carry it (刘邦 / 奕星 on #39). True once it exists.
-func _ensure_entry() -> bool:
-	if is_instance_valid(_entry): return true
-	if rt == null or rt.ui == null or not rt.ui.is_node_ready() or rt.ui.root == null: return false
-	_build_entry_card()
-	return true
-
-## EntryCard (UiEntryCard, 1468:94344, MINE-P0-5): over the mouth, only while the mouth holds the farm's one card,
-## only with an unfinished run; the whole card is the button (New run · 2 Energy + its consequence; grey with the
-## reason when it can't).
-func _build_entry_card() -> void:
-	_entry = UiEntryCard.new()
-	_entry.theme = UiKit.theme()   # the P0 root still carries GameUi's theme
-	_entry.passive = true          # a drag starting on it is the joystick; tap_entry() takes the real tap
-	_entry.pressed.connect(func(): _press(_entry_card.get("main", {})))
-	_entry.second_pressed.connect(func(): _press(_entry_card.get("second", {})))
-	_entry.third_pressed.connect(func(): _press(_entry_card.get("express", {})))
-	_entry.visible = false
-	rt.ui.root.add_child(_entry)
-
-## One of the card's buttons (P0MaterialLogic._button): grey says why; amber opens the Energy card for that fee; Enter
-## mine / Continue run go in; New run asks first (MINE-P0-7).
-func _press(b: Dictionary) -> void:
-	if b.is_empty(): return
-	if not bool(b.get("enabled", false)):
-		rt.ui.toast(str(b.get("toast", b.get("label", ""))))
-		return
-	var cmd: Dictionary = b.get("cmd", {})
-	match str(cmd.get("type", "")):
-		"mine_enter": act(cmd)
-		"mine_new_run":
-			P0MaterialCards.open_new_run(rt.ui, rt.session.current(), func(c: Dictionary): act(c))
-		"mine_express":   # §13.3.9: from the mouth a new run; with one open it ends it, so it asks as New run does
-			var v := rt.session.current()
-			if v.get("mine", {}).get("run", null) != null:
-				P0MaterialCards.open_new_run(rt.ui, v, func(_c: Dictionary): act({"type": "mine_express", "space": "home"}))
-			else: act({"type": "mine_express", "space": "home"})
-		"energy_card":
-			rt.energy_card(int(b.get("need", 0)), str(b.get("verb", "")))

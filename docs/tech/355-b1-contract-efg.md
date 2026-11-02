@@ -481,8 +481,8 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 
 ## 11. 开发用矿（接 C 之前）
 - 服务端解析矿 id：先查 C 的目录；查不到再查 `content.mine.dev_sites`。开发矿不检查 `travel.here`，其余规则和真矿一样。
-- 客户端：调试步骤 `p0_dev mine:<id>[:<floor>]` 直接进矿；在 b1 上，农场的矿口暂时进 `wd-dev-quarry`，接 C 以后删掉。
-- **发版前删掉 `dev_sites` 和农场矿口**（放进 M4 的发版清单）。
+- 客户端：调试步骤 `mine:<id>[:<floor>]`（P0_SHOT 的步骤，走 `P0Runtime.enter_mine`）直接进矿。农场矿口已在 E 客户端 #629 拆掉（v4q(5) ①）：接 C 的矿口卡（亚瑟的 `P0Map.open_wild_card`）之前，只能用调试步骤进矿。
+- **发版前删掉 `dev_sites`**（放进 M4 的发版清单）。
 
 ## 12. 测试清单
 ### 12.1 服务端（苏烈，vitest，`server/test/p0/mine_b1*.test.ts`）

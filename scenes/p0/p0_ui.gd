@@ -535,19 +535,19 @@ func set_place(text: String) -> void:
 	_place_text = text
 	_refresh_hud()
 
-## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
-## today" for its first 3 s). "" hides it; changing action clears it.
-## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
-## (5 clear of the HP card, which is 194 wide with its heart: x 209 of 360); hp < 0 hides it. The elite's card under it
-## while one fights ({} hides it); the status line (`Elite Slime` on Floor 5) hides with it — the card names the elite
-## and would cover half of it (不知火舞 on 288; COMBAT-ELITE 1228:111690 has no such line).
-const _STATUS_RIGHT_OF_HP := 209.0
+## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's `Rocks 2/6 · 3 monsters
+## left`). "" hides it; changing action clears it.
+## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot; hp < 0 hides it. The status
+## line then sits under the HP card, left-aligned with it, in the guard card's place (不知火舞 on #629: to its right it
+## ran into the screen's edge at 360). A guard's card there while it fights ({} hides it); the status line hides with
+## it — the card names the guard (不知火舞 on 288 / 355).
 func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	if not is_node_ready(): return
 	var on := hp >= 0 and surface in ACTION_SURFACES
 	_hp.visible = on
 	if on: _hp.set_hp(hp, maximum)
-	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
+	_status.position.x = _creel.position.x
+	_status.position.y = _creel.position.y + (_hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN if on else 0.0)
 	var boss := on and not elite.is_empty()
 	_elite_hp.visible = boss
 	_status.visible = _status_text.text != "" and surface in ACTION_SURFACES and not boss
@@ -2834,7 +2834,7 @@ func open_radial() -> void:
 	_bar.cancel_drag()
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
-			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
+			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Enter the mine"]]:   # every mine floor fights (355 b1)
 		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]),
 			available = it[0] == bar_mode or actions_here.has(it[0]), reason = it[3]})
 	_radial.options = options
@@ -2929,9 +2929,10 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "mine"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
 
-## A target on the homestead: the fixed ones, the Homestead sign and the mine mouth (q(255)), and the gathering spots.
+## A target on the homestead: the fixed ones, the Homestead sign (q(255)), and the gathering spots. The mine mouth left
+## the farm in 355 b1.
 static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.begins_with("spot_")
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:

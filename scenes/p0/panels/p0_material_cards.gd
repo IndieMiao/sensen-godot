@@ -1,9 +1,9 @@
 class_name P0MaterialCards
 extends RefCounted
 ## SGODOT-231 cards for the mine and the gathering spots, on the new shells (SGODOT-235 B3): the ElevatorPanel above the
-## elevator key (MINE-P0-6, LOCK-21), and bottom Sheets with a Close 44 above them (UiDrawer, as the workbench and the
-## resident profile) for the New run confirmation (MINE-P0-7) and a spot that opens later (MAT-3); the mouth itself
-## answers with its EntryCard, at 2/2 too (MINE-GATE-EXPRESS-3 / -4: the P0 "The mine" sheet MINE-P0-1 / P0-8 is gone). Sheet content follows the frames: ObjectHeader, Fact rows, then the fixed
+## elevator key (MINE-P0-6, LOCK-21; E3 in 355 b1), and bottom Sheets with a Close 44 above them (UiDrawer, as the
+## workbench and the resident profile) for a spot that opens later (MAT-3) and the mine's knock-out card (E6, 355 b1).
+## Sheet content follows the frames: ObjectHeader, Fact rows, then the fixed
 ## decision area (Cost, a note, one command, Dismiss). Copy and states come from P0MaterialLogic; these functions only
 ## lay them out and route taps back to the caller.
 
@@ -14,15 +14,14 @@ const VIEW_HOMESTEAD := "View homestead"   # MAT-3 NavigationRow (the row draws 
 const HomePanel := preload("res://scenes/p0/home/p0_home_panel.gd")
 const DECISION_GAP := 12         # the fixed decision area starts 12 below the content (Cost at y 12)
 const ELEVATOR_KINDS := {"here": UiElevatorPanel.State.HERE, "free": UiElevatorPanel.State.FREE,
-	"cost": UiElevatorPanel.State.COST, "locked": UiElevatorPanel.State.LOCKED, "short": UiElevatorPanel.State.SHORT,
-	"express": UiElevatorPanel.State.EXPRESS}
+	"cost": UiElevatorPanel.State.COST, "locked": UiElevatorPanel.State.LOCKED, "short": UiElevatorPanel.State.SHORT}
 
-## MINE-P0-6: ElevatorPanel `Elevator · stops this run`, one row per stop (Here / Free / 2 Energy / Clear Floor 1 first /
-## Need 2 Energy). No scrim (the frame keeps the scene, key and bar in view); a tap outside or Back closes it. `pick`
-## gets the row's cmd (mine_leave, mine_floor, energy_card); a locked row toasts its reason (LOCK-10).
+## E3 326:181733 (MINE-P0-6's panel): ElevatorPanel `Elevator · Ironvale Vein`, the Entrance and one row per stop
+## (Free / Here / 2 Energy / Need 2 Energy). No scrim (the frame keeps the scene, key and bar in view); a tap outside or
+## Back closes it. `pick` gets the row's cmd (mine_leave, mine_floor, energy_card); a grey row toasts its line (LOCK-10).
 static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable) -> UiElevatorPanel:
 	var rows := P0MaterialLogic.elevator_rows(view, here)
-	var panel := UiElevatorPanel.new(P0MaterialLogic.ELEVATOR_TITLE, rows.map(func(r: Dictionary) -> Dictionary:
+	var panel := UiElevatorPanel.new(P0MaterialLogic.elevator_title(view), rows.map(func(r: Dictionary) -> Dictionary:
 		return {"floor": r.name, "value": r.state, "state": ELEVATOR_KINDS.get(str(r.kind), UiElevatorPanel.State.LOCKED)}))
 	panel.theme = UiKit.theme()
 	panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -40,29 +39,41 @@ static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable)
 	ui.modal_kind = "elevator"
 	return panel
 
-## MINE-P0-7: from the EntryCard's New run · 2 Energy. ObjectHeader `The mine` / `New run`, the runs fact, then Cost
-## `New run · 2 Energy`, `Your stored materials stay yours.`, Command/destructive `Start new run` (sends mine_new_run)
-## and Dismiss `Keep current run` (closes).
-static func open_new_run(ui: P0Ui, view: Dictionary, send: Callable) -> UiDrawer:
-	var sheet := P0MaterialLogic.new_run_sheet(view)
+## E6 (328:182082 from Floor 11, 328:182298 on Floors 1–10; v4q(5) ⑪): the knock-out card on the map, back at the
+## mine's mouth — `Knocked out`, `You're back at the entrance.`, what was kept or dropped (each dropped item its icon and
+## `Iron Ore ×3`), `Your best here is still Floor 14.` in the muted colour, and a Close text button. Close (or a tap
+## outside, Back) closes it and calls `closed` — the caller opens the mine's mouth card then (328:182498). spec is
+## P0MaterialLogic.ko_card.
+const KO_ICON := 28.0
+static func open_ko_card(ui: P0Ui, spec: Dictionary, closed: Callable) -> UiDrawer:
 	var d := _sheet(ui)
-	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle}))
-	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
+	d.name = "KnockOutCard"
+	d.body.add_child(UiKit.label(str(spec.title), UiTokens.STYLE_TITLE_XB20))
+	for line in spec.lines:
+		var l := UiKit.label(str(line), UiTokens.STYLE_BODY_R14)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		d.body.add_child(l)
+	if not (spec.lost as Array).is_empty():
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", UiTokens.SPACE_PAGE)
+		for item in spec.lost:
+			var cell := HBoxContainer.new()
+			cell.add_theme_constant_override(&"separation", 6)
+			cell.add_child(UiKit.icon(P0Logic.icon(str(item.item)), KO_ICON))
+			var t := UiKit.label(str(item.text), UiTokens.STYLE_BODY_B14)
+			t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			cell.add_child(t)
+			row.add_child(cell)
+		d.body.add_child(row)
+	var best := UiKit.label(str(spec.best), UiTokens.STYLE_BODY_R14)
+	best.add_theme_color_override(&"font_color", UiTokens.COLOR_MUTED)
+	d.body.add_child(best)
 	_decision_gap(d)
-	d.body.add_child(UiFactRow.new(str(sheet.cost[0]), str(sheet.cost[1]), UiFactRow.Kind.COST))
-	var note := UiKit.label(str(sheet.note), UiTokens.STYLE_BODY_B14)   # body/Bold 14 (MINE-P0-7)
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.body.add_child(note)
-	var go := UiCommandButton.new(str(sheet.confirm.label), UiCommandButton.Kind.DESTRUCTIVE)
-	var cmd: Dictionary = sheet.confirm.cmd
-	go.activated.connect(func():
-		ui.close_modal()
-		send.call(cmd))
-	d.body.add_child(go)
-	var keep := UiDismissButton.new(str(sheet.keep))
-	keep.pressed.connect(ui.close_modal)
-	d.body.add_child(keep)
-	_show(ui, d, "new_run")
+	var close := UiDismissButton.new(str(spec.button))
+	close.pressed.connect(ui.close_modal)
+	d.body.add_child(close)
+	d.tree_exited.connect(func(): if closed.is_valid(): closed.call(), CONNECT_ONE_SHOT)
+	_show(ui, d, "mine_ko")
 	return d
 
 ## MAT-3: a spot that opens later (Clay Bank before Homestead Lv2): ObjectHeader `Clay Bank` / `Locked` / what it

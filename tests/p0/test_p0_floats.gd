@@ -305,15 +305,14 @@ func test_a_split_item_group_pops_together_and_its_lines_never_meet() -> void:
 		if i == 15:   # at rest: FLOAT_GROUP_GAP apart
 			assert_float(low_top - high_bottom).is_equal_approx(P0Ui.FLOAT_GROUP_GAP, 0.1)
 
-## The day's second elite (q(116) ②; 李白 / 不知火舞 B7 on 286): `Quartz · first kill each day` is a result line of its own
-## over the kill's items (q(124) ⑦, as `Harvest 3 of 5 · bag full`), never joined to them — `+3 Worm Bait · Quartz · first
-## kill each day` read as if quartz came.
-func test_the_quartz_note_is_a_line_over_the_items() -> void:
+## A drop the bag had no room for (v4q(5) ⑫): `Bag full · Iron Ore left on the floor` is a result line of its own over
+## the kill's items (q(124) ⑦, as `Harvest 3 of 5 · bag full`), never joined to them.
+func test_the_ground_note_is_a_line_over_the_items() -> void:
 	var ui := P0Ui.new()
 	ui.quick_store = STORE
 	add_child(auto_free(ui))
 	await get_tree().process_frame
 	var lines := ui.float_lines([{kind = "item", key = "bait_worm", amount = 3, fmt = "%s Worm Bait", tone = UiFloatText.Tone.ITEM},
-		P0MaterialLogic.quartz_once_float()], Vector2(180, 500))
-	assert_array(lines.map(func(f): return f.text)).is_equal(["+3 Worm Bait", "Quartz · first kill each day"])
+		P0MaterialLogic.ground_float({"names": {"iron_ore": "Iron Ore"}}, "iron_ore")], Vector2(180, 500))
+	assert_array(lines.map(func(f): return f.text)).is_equal(["+3 Worm Bait", "Bag full · Iron Ore left on the floor"])
 	assert_float((lines[1] as Control).position.y).is_less((lines[0] as Control).position.y)   # the note above the items

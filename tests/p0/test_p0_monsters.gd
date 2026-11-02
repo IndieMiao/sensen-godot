@@ -83,7 +83,8 @@ func test_the_swing_skips_the_unhittable_and_reports_the_stunned() -> void:
 	add_child(c)
 	var mover := _mover()
 	var mobs := [SLIME.duplicate(), SLIME.duplicate(), SLIME.duplicate()]
-	c.sync_p0({"mine": {"weapon": {"attack": 3, "speed": 2.0}, "run": {"id": 1, "floors": [{"floor": 3, "mobs": mobs}]}}}, 3, mover)
+	c.sync_p0({"mine": {"weapon": {"attack": 3, "speed": 2.0}, "at": {"mine": "wd-254-114", "floor": 3, "day": "2026-11-02",
+		"floor_state": {"floor": 3, "mobs": mobs}}}}, 3, mover)
 	assert_int(c.enemies.size()).is_equal(3)
 	var ids: Array = c.enemies.keys()
 	var brains := []

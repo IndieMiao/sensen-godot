@@ -144,50 +144,25 @@ func test_status_line_set_before_ready_is_kept() -> void:
 	await await_idle_frame()
 	assert_str(early._status_text.text).is_equal("Rocks 0/6")   # applied from _pending in _ready
 
-## Farm as the root scene (first session, desktop P0_SHOT): P0FarmMaterials is ready before P0Runtime.ensure()'s
-## deferred add, so the UI has no root yet. The mine's EntryCard must wait for it, not add_child on null (刘邦 on #39).
-func test_entry_card_waits_for_the_ui_root() -> void:
-	var runtime := P0Runtime.new()   # not in the tree: its P0Ui has not built its root
-	var m := P0FarmMaterials.new()
-	m.rt = runtime
-	assert_bool(m._ensure_entry()).is_false()
-	assert_bool(is_instance_valid(m._entry)).is_false()
-	runtime.ui = ui                  # the suite's P0Ui, in the tree and ready
-	assert_bool(m._ensure_entry()).is_true()
-	assert_object(m._entry.get_parent()).is_same(ui.root)
-	assert_bool(m._ensure_entry()).is_true()   # built once
-	m.free()
-	runtime.free()
-
-## LOCK-07: the mine mouth is one of the farm's card candidates, so standing at it no other finger card shows next to
-## its EntryCard; the farm has no gathering spots since SGODOT-355 b1, so the workbench is the only other.
-func test_the_mouth_takes_the_card_when_nearest() -> void:
-	var m := P0FarmMaterials.new()
-	m.mouth = Vector3(1.3, 0, -9.1)
-	m._bench = Vector3(4.3, 0, -11.4)
-	var cands := m.card_candidates()
-	assert_array(cands.map(func(c): return str(c[0]))).contains_exactly_in_any_order(["workbench", "mine"])
-	assert_str(P0Garden.pick_card(cands, Vector3(2.3, 0, -8.8), "")).is_equal("mine")
-	assert_str(P0Garden.pick_card(cands, Vector3(4.3, 0, -11.0), "")).is_equal("workbench")
-	m.free()
-
-## COMBAT-ELITE (不知火舞 on 288): the HP card has its coral heart (HPBar 1124:79402); the status line sits clear of the
-## card on its right, and hides while the elite's card shows (the card names the elite and would cover half of it).
-func test_the_hp_card_has_its_heart_and_the_elite_card_hides_the_status_line() -> void:
-	ui.set_status_line("Elite Slime")
+## COMBAT-ELITE (不知火舞 on 288): the HP card has its coral heart (HPBar 1124:79402); the status line sits under the card,
+## left-aligned with it in the guard card's place (不知火舞 on #629), and hides while a guard's card shows there.
+func test_the_hp_card_has_its_heart_and_the_guard_card_hides_the_status_line() -> void:
+	ui.set_status_line("Iron Slime King")
 	ui.set_hp(60, 100)
 	await await_idle_frame()
 	var heart := ui.hp_bar().find_child("Heart", true, false) as TextureRect
 	assert_bool(heart.visible).is_true()
 	assert_str(heart.texture.resource_path).is_equal("res://assets/p0/icons/heart.svg")
 	assert_object(heart.modulate).is_equal(Color.WHITE)   # its own coral, no tint
-	var hp_right := ui.hp_bar().position.x + ui.hp_bar().get_combined_minimum_size().x
-	assert_float(ui._status.position.x).is_greater(hp_right)   # beside the card, not under it
+	var hp_bottom := ui.hp_bar().position.y + ui.hp_bar().get_combined_minimum_size().y
+	assert_float(ui._status.position.x).is_equal_approx(ui.hp_bar().position.x, 0.5)   # left-aligned with the card
+	assert_float(ui._status.position.y).is_greater_equal(hp_bottom)                    # under it, not beside it
 	assert_bool(ui._status.visible).is_true()
-	ui.set_hp(60, 100, {"name": "Elite Slime", "hp": 21, "max": 36})
+	ui.set_hp(60, 100, {"name": "Iron Slime King", "hp": 96, "max": 160})
 	assert_bool(ui.elite_bar().visible).is_true()
+	assert_float(ui.elite_bar().position.y).is_equal_approx(ui._status.position.y, 0.5)   # the card in the line's place
 	assert_bool(ui._status.visible).is_false()
-	ui.set_status_line("Elite Slime")   # the mine sets it every frame: it stays hidden under the card
+	ui.set_status_line("Iron Slime King")   # the mine sets it every frame: it stays hidden under the card
 	assert_bool(ui._status.visible).is_false()
-	ui.set_hp(60, 100)   # the elite down: the line is back
+	ui.set_hp(60, 100)   # the guard down: the line is back
 	assert_bool(ui._status.visible).is_true()

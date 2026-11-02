@@ -14,7 +14,7 @@ static func _energy(view: Dictionary) -> int:
 	return int(view.get("energy", {}).get("value", 0))
 
 ## A key's sub "Free" is not shown (q(122): a 0-Energy action shows its verb alone, P0Ui drops it); Free stays only where
-## a paid choice sits beside it — the elevator rows, Express and the mouth card's Continue run (LOCK-21), not keys.
+## a paid choice sits beside it — the elevator rows and the ladders' strips (LOCK-21, E2 323:181572), not keys.
 static func _key(icon: String, verb: String, sub: String, cmd := {}, enabled := true, amber := false, need := 0) -> Dictionary:
 	return {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
 
@@ -31,186 +31,44 @@ static func _with_pick(view: Dictionary, key: Dictionary) -> Dictionary:
 	key["tool"] = str(view.get("gear", {}).get("slots", {}).get("mining", "pickaxe"))
 	return key
 
-static func _runs_line(mine: Dictionary) -> String:
-	var runs: Dictionary = mine.get("runs", {})
-	return "Mine runs today %d/%d · Resets in %s" % [int(runs.get("used", 0)), int(runs.get("limit", 2)), P0Logic.span(float(runs.get("resets_in", 0)))]
+## Where the player is in the mine (355 b1, contract-efg §7.1): view.mine.at — the mine, its name and type, the floor,
+## HP, the day, the elevator's stops, this floor and the stairs up and down; {} outside a mine.
+static func mine_at(view: Dictionary) -> Dictionary:
+	var at = view.get("mine", {}).get("at", null)
+	return at if at is Dictionary else {}
 
-## Today's runs are all used (the card's title already says `Runs today 2/2`).
-static func _runs_spent(mine: Dictionary) -> bool:
-	var runs: Dictionary = mine.get("runs", {})
-	return int(runs.get("used", 0)) >= int(runs.get("limit", 2))
-
-## The mouth card's grey pill at 2/2 (MINE-GATE-EXPRESS-3 / -4, 安其拉 803b04d1, 不知火舞 8234faef; q(196)): only the
-## reset, `Resets in 9h 12m` — the title row has `Runs today 2/2` — and its tap toasts the whole line (_runs_line).
-static func _resets_pill(mine: Dictionary) -> Dictionary:
-	var runs: Dictionary = mine.get("runs", {})
-	return {"label": "Resets in %s" % P0Logic.span(float(runs.get("resets_in", 0))), "enabled": false, "amber": false,
-		"cmd": {}, "need": 0, "verb": "", "toast": _runs_line(mine), "pill": true}
-
+## Floor n as the view has it (at.floor_state), {} unless the player is on it.
 static func _floor(view: Dictionary, n: int) -> Dictionary:
-	var run = view.get("mine", {}).get("run", null)
-	if run == null: return {}
-	for f in run.get("floors", []):
-		if int(f.get("floor", 0)) == n: return f
-	return {}
+	var at := mine_at(view)
+	if at.is_empty() or int(at.get("floor", 0)) != n: return {}
+	var f = at.get("floor_state", null)
+	return f if f is Dictionary else {}
 
-# --- Mine mouth (farm side) ---
+## The stairs below (at.next) or above (at.prev) floor n: {floor, paid, fee, open?, locked?}, {} for none — the deepest
+## floor of a quarry has no way down, Floor 1's way up is the Entrance.
+static func _stairs(view: Dictionary, n: int, key: String) -> Dictionary:
+	var at := mine_at(view)
+	if at.is_empty() or int(at.get("floor", 0)) != n: return {}
+	var s = at.get(key, null)
+	return s if s is Dictionary else {}
 
-## The EntryCard at the farm's mine mouth (SGODOT-266; 不知火舞 2e580bed / 9ce583a8, copy 李白 q(102)): the player
-## tapped the mouth and walked up to it; entering costs the first floor's fee, confirmed here, never by the tap or the
-## main key (LOCK-21 复议 2026-10-09). {title, fact, main, second, note}: title `The mine` · fact `Runs today 0/2`;
-## main {label, enabled, amber, cmd, need, verb, toast} — `Enter mine · 2 Energy`, amber `Enter mine · Need 2 Energy`
-## (the Energy card), grey `Enter mine · Bag full` (q(48)); with an unfinished run `Continue run · Free` and the second,
-## `New run · 2 Energy` (mine_entry_card) with its note `Current run will end`. With today's runs used up, the grey
-## pill `Resets in 9h 12m` (MINE-GATE-EXPRESS-3 / -4): in New run's place under Continue run, or alone with no run; at
-## 2/2 neither New run nor Express is offered.
-static func mine_mouth_card(view: Dictionary) -> Dictionary:
-	var mine: Dictionary = view.get("mine", {})
-	var fee := int(mine.get("floor_energy", 2))
-	var runs: Dictionary = mine.get("runs", {})
-	var card := {"title": "The mine", "fact": "Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
-		"main": {}, "second": {}, "note": ""}
-	card["express"] = {}
-	if mine.get("run", null) != null and _runs_spent(mine):
-		# MINE-GATE-EXPRESS-4: the run in hand can always be finished; New run's place is the grey pill, and neither
-		# New run nor Express (a run of the day too) is offered; no note
-		card.main = _button("Continue run · Free", {"type": "mine_enter"})
-		card.second = _resets_pill(mine)
-	elif mine.get("run", null) != null:
-		card.main = _button("Continue run · Free", {"type": "mine_enter"})
-		var e := mine_entry_card(view)
-		card.second = {"label": e.label, "enabled": e.enabled, "amber": e.amber, "cmd": e.cmd, "toast": e.get("toast", ""),
-			"need": fee, "verb": "New run"}
-		card.express = _express_button(mine, e)
-		card.note = str(e.line2)
-		# q(108) ①: New run and Express stack over one note, which names both: `Current run will end · Runs today 1/2`
-		if not card.express.is_empty() and card.note != "": card.note = "%s · %s" % [card.note, card.fact]
-	elif _runs_spent(mine):   # MINE-GATE-EXPRESS-3: no run and none left today, the grey pill alone
-		card.main = _resets_pill(mine)
-	elif not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
-		card.main = _button("Enter mine · Bag full", {}, false)
-		card.express = _express_button(mine, {})
-	elif _energy(view) < fee:
-		card.main = _button("Enter mine · Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee, "Enter mine")
-		card.express = _express_button(mine, {})
-	else:
-		card.main = _button("Enter mine · %d Energy" % fee, {"type": "mine_enter"}, true, false, fee, "Enter mine")
-		card.express = _express_button(mine, {})
-	return card
+## A monster kind's name (content.mine.monsters: `Iron Slime King`), the id itself if the content lacks it.
+static func monster_name(kind: String) -> String:
+	return str(P0Logic.content().get("mine", {}).get("monsters", {}).get(kind, {}).get("name", kind))
 
-const EXPRESS := "Floor 5 · Express · Free"
-
-## The mouth card's Express (§13.3.1, q(108)): only once the account has cleared Floor 4, 0 Energy, a run of the day.
-## With an unfinished run it ends that run as New run does, so it is greyed for the same reason (`entry` is
-## mine_entry_card); with none it starts a run straight on Floor 5 (no fee, so no Energy or bag gate).
-static func _express_button(mine: Dictionary, entry: Dictionary) -> Dictionary:
-	if not bool(mine.get("express", false)): return {}
-	if not entry.is_empty() and not bool(entry.get("enabled", false)):
-		return {"label": EXPRESS, "enabled": false, "amber": false, "cmd": {}, "toast": str(entry.get("toast", entry.get("label", "")))}
-	return {"label": EXPRESS, "enabled": true, "amber": false, "cmd": {"type": "mine_express"}, "toast": ""}
-
-## One card button {label, enabled, amber, cmd, need, verb, toast}: verb names the action on the Energy card; a grey
-## press toasts exactly its label (不知火舞 on 266, 5181bba0).
-static func _button(label: String, cmd: Dictionary, enabled := true, amber := false, need := 0, verb := "") -> Dictionary:
-	return {"label": label, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need, "verb": verb, "toast": "" if enabled else label}
-
-## The mouth card's second button with an unfinished run (MINE-P0-5, mine_mouth_card): `New run · 2 Energy` to start
-## over. {show, label, line2, enabled, amber, cmd}; line2, the note under it, is empty when unavailable (the reason is
-## the label).
-static func mine_entry_card(view: Dictionary) -> Dictionary:
-	var mine: Dictionary = view.get("mine", {})
-	var run = mine.get("run", null)
-	if run == null: return {"show": false}
-	var fee := int(mine.get("floor_energy", 2))
-	var runs: Dictionary = mine.get("runs", {})
-	match str(run.get("new_run_block", "")):
-		"clear_floor_2":
-			return {"show": true, "label": "New run · Clear Floor 2 first", "line2": "", "enabled": false, "amber": false, "cmd": {},
-				"toast": "New run · Clear Floor 2 first"}
-		"no_runs":
-			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": _runs_line(mine)}
-	if not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
-		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": "New run · Bag full"}
-	var consequence := "Current run will end"   # Runs today sits in the card's title row (不知火舞 9ce583a8)
-	if _energy(view) < fee:   # warning action line, the consequence kept, the tap opens the Energy card (不知火舞 on #45)
-		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": consequence, "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
-	return {"show": true, "label": "New run · %d Energy" % fee, "line2": consequence, "enabled": true, "amber": false, "cmd": {"type": "mine_new_run"}}
-
-## What a server refusal of a material command says (苏烈's #39 review). null: not ours, the runtime's own wording
-## applies (need_energy opens the Energy card). "": quiet — a race the next frame shows anyway (a held repeat hitting
-## the 0.9 s tempo, a rock another press already broke, a torch already lit, a run that just ended). Else a toast.
-static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> Variant:
-	var type := str(cmd.get("type", ""))
-	if not (type.begins_with("mine_") or type == "gather"): return null
-	match code:
-		# mob_gone / bad_target: a swing racing a kill or the floor's change; the next frame shows it
-		"tempo", "rock_gone", "lit", "no_run", "floor_not_paid", "bad_floor", "not_in_mine", "stale_state", "bad_spot", "mob_gone", "bad_target":
-			return ""
-		"no_rocks":
-			return "No rocks here"
-		"express_locked":
-			return "Clear Floor %d first" % int(detail.get("floor", 4))
-		"bag_full":
-			return BAG_FULL if type.begins_with("mine_") else "Bag full · free a slot first"
-		"no_runs":
-			return "Enter mine · No runs left"
-		"clear_floor_first":   # detail.floor is the floor to clear (going to Floor 2 → 1; a new run → restart_floor 2)
-			return "Clear Floor %d first" % int(detail.get("floor", 1))
-		"homestead_level":
-			return "Homestead Lv%d" % int(detail.get("need", 2))
-		"not_ready":
-			return "Ready in %s" % P0Logic.span(float(detail.get("ready_in", 0)))
-	return null
-
-## The Energy card's verb for a refused material command ("Mine", "Enter mine", "Floor 2"); `fallback` for others.
-static func energy_verb(cmd: Dictionary, fallback: String) -> String:
-	match str(cmd.get("type", "")):
-		"mine_rock": return "Mine"
-		"mine_enter", "mine_new_run": return "Enter mine"
-		"mine_floor": return "Floor %d" % int(cmd.get("floor", 2))
-		"mine_express": return "Express"
-	return fallback
-
-## "Run ended at daily reset" once per ended run (q(44)): the text when the view's `ended.at` is newer than the last shown.
-static func reset_notice(view: Dictionary, shown_at: float) -> String:
-	var ended = view.get("mine", {}).get("ended", null)
-	if ended == null or float(ended.get("at", 0)) <= shown_at: return ""
-	return "Run ended at daily reset"
-
-## New run confirmation (MINE-P0-7), opened from the EntryCard: {title, subtitle, facts, cost, note, confirm, keep}.
-## No "Unmined rocks…" line: a new run needs floor 2 cleared, so nothing is left to lose (Li Bai, 231 3f6b8fb5).
-static func new_run_sheet(view: Dictionary) -> Dictionary:
-	var mine: Dictionary = view.get("mine", {})
-	var runs: Dictionary = mine.get("runs", {})
-	var used := int(runs.get("used", 0))
-	var limit := int(runs.get("limit", 2))
-	return {"title": "The mine", "subtitle": "New run", "facts": [["Runs today", "%d/%d → %d/%d" % [used, limit, mini(used + 1, limit), limit]]],
-		"cost": ["New run", "%d Energy" % int(mine.get("floor_energy", 2))], "note": "Your stored materials stay yours.",
-		"confirm": {"label": "Start new run", "cmd": {"type": "mine_new_run"}}, "keep": "Keep current run"}
-
-## Status line under the HUD in the mine (MINE-1 / P0-2): "Rocks 2/6" for the floor; "Run 1/2 today" just after entering.
-static func mine_status(view: Dictionary, n: int, just_entered := false) -> String:
-	var mine: Dictionary = view.get("mine", {})
-	if just_entered:
-		var runs: Dictionary = mine.get("runs", {})
-		return "Run %d/%d today" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
-	var floor := _floor(view, n)
-	if floor.is_empty(): return ""
-	var rocks := int(floor.get("rocks", mine.get("rocks", 6)))
-	var line := "Rocks %d/%d" % [rocks - int(floor.get("left", rocks)), rocks] if rocks > 0 else ""
-	# Floors 3–5 add the monsters still standing (MINE-3 `… · 1 Slime`): `Rocks 2/6 · 1 Slime`, Floor 5 `Elite Slime`.
-	var mobs: Array = (floor.get("mobs", []) as Array).filter(func(m): return int(m.get("hp", 0)) > 0)
-	if not mobs.is_empty():
-		var elite := mobs.any(func(m): return str(m.get("kind", "")) == "mob_elite_slime")
-		var word := "Elite Slime" if elite else ("%d Slime%s" % [mobs.size(), "" if mobs.size() == 1 else "s"])
-		line = word if line == "" else "%s · %s" % [line, word]
-	return line
+## The place chip in the mine (E2 323:181423): `Ironvale Vein · Floor 3`.
+static func mine_place(view: Dictionary) -> String:
+	var at := mine_at(view)
+	if at.is_empty(): return ""
+	return "%s · Floor %d" % [str(at.get("name", "")), int(at.get("floor", 1))]
 
 # --- Inside the mine ---
 
 ## Main action key in the mine: Mining itself only (SGODOT-266, user on 263 ③). ctx: {floor: int, target: "rock" | "",
 ## rock: int, item: String} where item is the quick-bar selection ("torch" or ""). Rocks never respond to taps (LOCK-02);
-## the ladders and the elevator are tapped like any facility (mine_facility), so the key never names them.
+## the ladders and the elevator are tapped like any facility (mine_facility), so the key never names them. Rocks are
+## the player's choice (355 b1: the stairs open on the monsters, not the rocks); a full bag greys them alone,
+## `Mine · Bag full` (v4q(5) ⑫, q(48)).
 ## A 0-Energy move shows its verb alone (`Light Torch`, q(122); was `Light Torch · Free`, q(46)).
 static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	return _with_pick(view, _mine_action(view, ctx))
@@ -219,11 +77,12 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var n := int(ctx.get("floor", 1))
 	var floor := _floor(view, n)
-	if floor.is_empty(): return _key("pickaxe", "Mine", "Run ended", {}, false)
-	if int(floor.get("rocks", mine.get("rocks", 6))) == 0: return _key("pickaxe", "Mine", "No rocks here", {}, false)   # §13.3.8 Floor 5
+	if floor.is_empty(): return _key("pickaxe", "Mine", "", {}, false)
+	if int(floor.get("rocks", 0)) == 0: return _key("pickaxe", "Mine", "No rocks here", {}, false)   # a guard's floor
 	if str(ctx.get("item", "")) == "torch":
 		if floor.get("lit", false): return _key("torch", "Light Torch", "Lit", {}, false)
 		return _key("torch", "Light Torch", "Free", {"type": "mine_torch", "floor": n})
+	if int(floor.get("left", 0)) == 0: return _key("pickaxe", "Mine", "No rocks here", {}, false)   # q(62), 不知火舞 on 355
 	if str(ctx.get("target", "")) == "rock":
 		var rock := int(ctx.get("rock", -1))
 		var broken: Array = floor.get("broken", [])
@@ -232,67 +91,93 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 		if not floor.get("bag_ok", true): return _unavailable("pickaxe", "Mine", "Bag full", BAG_FULL)
 		if _energy(view) < cost: return _key("pickaxe", "Mine", "Need %d Energy" % cost, {"type": "energy_card"}, true, true, cost)
 		return _key("pickaxe", "Mine", "%d Energy" % cost, {"type": "mine_rock", "floor": n, "rock": rock}, true, false, cost)
-	if int(floor.get("left", 0)) == 0: return _key("pickaxe", "Mine", "Floor cleared", {}, false)
 	return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
 
-## Combat's main action key on mine floors 3–5 (§13.3.8, COMBAT-1): `Attack`, 0 Energy and no sub-line, the sword's
-## badge; a swing with nothing in reach still swings (the old mine's). ctx {floor}. Floors 1–2 have no Combat.
+## Combat's main action key (§13.3.8, COMBAT-1): `Attack`, 0 Energy and no sub-line, the sword's badge; a swing with
+## nothing in reach still swings (the old mine's). ctx {floor}.
 static func combat_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	var n := int(ctx.get("floor", 1))
 	var k := _key("sword", "Attack", "", {"type": "mine_swing", "floor": n}, not _floor(view, n).is_empty())
 	k["tool"] = "sword"
 	return k
 
-## Which actions a mine floor offers on the switch key (§13.3.2): Combat only where there are monsters (3–5).
-static func mine_actions(n: int) -> Array:
-	return ["mine", "combat"] if n >= 3 else ["mine"]
+## The switch key's actions in the mine: Mining and Combat on every floor (355 b1: monsters from Floor 1 on; the radial
+## E2 325:181641).
+static func mine_actions() -> Array:
+	return ["mine", "combat"]
 
-## The main key's mode on landing on a floor (李元芳 R5 on 288: Express straight to Floor 5 met the elite with the key
-## still on `Mine · No rocks here`): Combat when a monster of this floor is still up, Mining otherwise; floors 1–2 never
-## fight (§13.3.8). Only on arrival — the player's own pick on the radial stays until the next floor.
+## The main key's mode on landing on a floor (李元芳 R5 on 288): Combat while a monster of this floor is up, Mining
+## otherwise. Only on arrival — the player's own pick on the radial stays until the next floor.
 static func landing_mode(view: Dictionary, n: int) -> String:
-	if n < 3: return "mine"
 	return "combat" if mobs_up(view, n) > 0 else "mine"
 
-## Monsters of floor n still standing in the view's run.
+## Monsters of floor n still standing.
 static func mobs_up(view: Dictionary, n: int) -> int:
-	var run = view.get("mine", {}).get("run", null)
-	if not (run is Dictionary): return 0
-	for f in run.get("floors", []):
-		if int(f.get("floor", 0)) == n: return (f.get("mobs", []) as Array).filter(func(m): return int(m.get("hp", 0)) > 0).size()
-	return 0
+	return (_floor(view, n).get("mobs", []) as Array).filter(func(m): return int(m.get("hp", 0)) > 0).size()
 
-## The mine's facilities, tapped and walked to (SGODOT-266; 不知火舞's spec 2e580bed, 197 LOCK-21 复议 2026-10-09):
-## kind "exit" (floor 1's up ladder), "up" (the up ladder below floor 1), "stairs" (the down ladder), "elevator".
-## What arriving does: {card: false, cmd} goes at once — the free moves (Exit, Floor 1, a floor paid this run) and
-## the elevator's stop panel; {card: true, label, enabled, amber, cmd, need, toast} shows the EntryCard over the ladder
-## with the fee button (`Floor 2 · 2 Energy`): amber `Need 2 Energy` opens the Energy card, grey says why (LOCK-10).
-## The fee itself is unchanged: 2 per new floor, 0 for ladders and the elevator.
+## The guard fighting on floor n for its HUD card (E5 329:182739, UiHpBar ELITE under the player's): {name, hp, max}
+## once it has been hit — before that the status line names it (不知火舞 on 355) —, {} when there is none, it is down or
+## still untouched. Elites have no card (contract-efg §7.4: the guard's only).
+static func guard_card(view: Dictionary, n: int) -> Dictionary:
+	for m in _floor(view, n).get("mobs", []):
+		var hp := int(m.get("hp", 0))
+		if bool(m.get("guard", false)) and hp > 0 and hp < int(m.get("max", hp)):
+			return {"name": monster_name(str(m.get("kind", ""))), "hp": hp, "max": int(m.max)}
+	return {}
+
+## The status line under the HUD in the mine (MINE-1 / P0-2; 不知火舞 on 355): the rocks broken and the monsters still
+## standing — `Rocks 2/6 · 3 monsters left` (`1 monster left`; elites count, every kind alike), `Rocks 2/6` once they are
+## down, the monsters alone on a floor without rocks; a guard not yet hit by its name (`Iron Slime King`) — once hit,
+## its card covers the line (P0Ui.set_hp). "" off the floor.
+static func mine_status(view: Dictionary, n: int) -> String:
+	var floor := _floor(view, n)
+	if floor.is_empty(): return ""
+	var parts: Array = []
+	var rocks := int(floor.get("rocks", 0))
+	if rocks > 0: parts.append("Rocks %d/%d" % [rocks - int(floor.get("left", rocks)), rocks])
+	var up: Array = (floor.get("mobs", []) as Array).filter(func(m): return int(m.get("hp", 0)) > 0)
+	var guard: Array = up.filter(func(m): return bool(m.get("guard", false)))
+	if not guard.is_empty(): parts.append(monster_name(str(guard[0].get("kind", ""))))
+	elif not up.is_empty(): parts.append("%d monster%s left" % [up.size(), "" if up.size() == 1 else "s"])
+	return " · ".join(parts)
+
+## The mine's facilities, tapped and walked to (SGODOT-266; 不知火舞's spec 2e580bed, LOCK-21): kind "exit" (Floor 1's
+## way up, the Entrance), "up", "stairs" (down) and "elevator" (Floor 1 and the stops). What arriving does:
+## {card: false, cmd} goes at once — leaving, a floor paid today, the elevator's panel; {card: true, label, enabled,
+## amber, cmd, need, verb, toast} shows the EntryCard over the ladder with the fee button (`Floor 13 · 2 Energy`): amber
+## `Need 2 Energy` opens the Energy card, grey says why (LOCK-10) — `Floor 13 · Clear Floor 12 first` while a monster
+## stands (355 b1: the stairs open on the monsters), `Floor 41 · Not open yet` past the first batch's floors.
+## Moves carry `to` and `via` (contract-efg §6); the scene adds the day.
 static func mine_facility(view: Dictionary, n: int, kind: String) -> Dictionary:
-	var mine: Dictionary = view.get("mine", {})
-	var fee := int(mine.get("floor_energy", 2))
 	match kind:
 		"elevator": return {"card": false, "cmd": {"type": "elevator"}}
 		"exit": return {"card": false, "cmd": {"type": "mine_exit"}}
-		"up": return {"card": false, "cmd": {"type": "mine_floor", "floor": n - 1}}
-		"stairs":
-			var floor := _floor(view, n)
-			var next := _floor(view, n + 1)
-			if floor.is_empty() or next.is_empty(): return {"card": false, "cmd": {}}
-			var verb := "Floor %d" % (n + 1)
-			if next.get("paid", false): return {"card": false, "cmd": {"type": "mine_floor", "floor": n + 1}}
-			if not floor.get("cleared", false): return _fee_card("%s · Clear Floor %d first" % [verb, n])
-			if not next.get("bag_ok", true): return _fee_card("%s · Bag full" % verb)   # q(48)
+		"up", "stairs":
+			var down := kind == "stairs"
+			var s := _stairs(view, n, "next" if down else "prev")
+			if s.is_empty():   # no way down (a quarry's last floor); a view without `prev` (contract-efg v0.7) goes up as a free move
+				return {"card": false, "cmd": {} if down or n <= 1 or _floor(view, n).is_empty() else {"type": "mine_floor", "to": n - 1, "via": "ladder"}}
+			var to := int(s.get("floor", n + 1 if down else n - 1))
+			var verb := "Floor %d" % to
+			var move := {"type": "mine_floor", "to": to, "via": "ladder"}
+			if down and str(s.get("locked", "")) == "not_open": return _fee_card("%s · Not open yet" % verb)
+			if down and not bool(s.get("open", false)): return _fee_card("%s · Clear Floor %d first" % [verb, n])
+			if bool(s.get("paid", false)): return {"card": false, "cmd": move}
+			var fee := int(s.get("fee", view.get("mine", {}).get("floor_energy", 2)))
 			if _energy(view) < fee:
 				return {"card": true, "label": "%s · Need %d Energy" % [verb, fee], "enabled": true, "amber": true,
 					"cmd": {"type": "energy_card"}, "need": fee, "verb": verb}
 			return {"card": true, "label": "%s · %d Energy" % [verb, fee], "enabled": true, "amber": false,
-				"cmd": {"type": "mine_floor", "floor": n + 1}, "need": fee, "verb": verb}
+				"cmd": move, "need": fee, "verb": verb}
 	return {"card": false, "cmd": {}}
 
 ## A grey fee button: its label is the reason, and a press toasts exactly that line (不知火舞 on 266, 5181bba0).
 static func _fee_card(label: String) -> Dictionary:
 	return {"card": true, "label": label, "enabled": false, "amber": false, "cmd": {}, "toast": label}
+
+## Whether floor n has the elevator: Floor 1 and every stop (contract-efg §4 ⑤; F1 is no stop, the machine is there).
+static func has_elevator(view: Dictionary, n: int) -> bool:
+	return n == 1 or bool(_floor(view, n).get("station", false))
 
 ## Mining quick bar: torches only (§13.3.8; P0 has no dynamite). Ghost word when empty: "Torch" (q(44)).
 const MINE_FAMILY := ["torch"]
@@ -313,21 +198,23 @@ static func mine_bar(view: Dictionary, previous: Array, pinned: Array = [], remo
 		if not bar.has(id) and not removed.has(id): bar.append(id)
 	return bar
 
-const ELEVATOR_TITLE := "Elevator · stops this run"   # MINE-P0-6 panel header
+## The elevator panel's header (E3 326:181733, v4q(5) ⑪): `Elevator · Ironvale Vein`.
+static func elevator_title(view: Dictionary) -> String:
+	return "Elevator · %s" % str(mine_at(view).get("name", ""))
 
-## Elevator card rows (§13.3.9, q(44); P0: Entrance, Floor 1, Floor 2, no Express). here: 0 = entrance, else a floor.
-## Each row {name, state, kind, label, enabled, amber, cmd}: MINE-P0-6 draws name left and state right ("Floor 1" ·
-## "Free"); label is the joined line (≤ 26 characters). kind is the ElevatorRow state (LOCK-21): "here", "free",
-## "cost" (an unpaid floor's fee), "locked" (Clear Floor N first / Bag full), "short" (Need 2 Energy).
-## cmd type "mine_leave" (back to the farm), "mine_floor" {floor} or "energy_card".
+## Elevator rows (E3 326:181733, v4q(5) ⑪): the Entrance first (leaving: back to the map at this mine's mouth), then
+## each stop of this mine — every 10th floor down to the deepest reached (contract-efg §4 ⑤, F1 is none). here: the
+## floor the player is on. Each row {name, state, kind, label, enabled, amber, cmd}: the panel draws name left and state
+## right (`Floor 20` · `2 Energy`); label is the joined line. kind is the ElevatorRow state (LOCK-21): "here", "free",
+## "cost" (a stop not paid today), "short" (Need 2 Energy). cmd type "mine_leave", "mine_floor" {to, via} or
+## "energy_card".
 static func elevator_rows(view: Dictionary, here: int) -> Array:
 	var rows: Array = []
 	for r in _elevator_rows(view, here):
 		var parts := str(r.label).split(" · ", true, 1)
 		r["name"] = parts[0]
 		r["state"] = parts[1] if parts.size() > 1 else ""
-		if bool(r.get("express", false)): r["kind"] = "express"
-		elif r.state == "Here": r["kind"] = "here"
+		if r.state == "Here": r["kind"] = "here"
 		elif r.state == "Free": r["kind"] = "free"
 		elif r.amber: r["kind"] = "short"
 		elif r.enabled: r["kind"] = "cost"
@@ -336,90 +223,114 @@ static func elevator_rows(view: Dictionary, here: int) -> Array:
 	return rows
 
 static func _elevator_rows(view: Dictionary, here: int) -> Array:
-	var mine: Dictionary = view.get("mine", {})
-	var fee := int(mine.get("floor_energy", 2))
-	var rows: Array = []
-	rows.append({"label": "Entrance · Here" if here == ENTRANCE else "Entrance · Free", "enabled": here != ENTRANCE, "amber": false,
-		"cmd": {} if here == ENTRANCE else {"type": "mine_leave"}})
-	var run = mine.get("run", null)
-	if run == null: return rows
-	var floors: Array = run.get("floors", [])
-	for i in floors.size():
-		var f: Dictionary = floors[i]
-		var n := int(f.get("floor", i + 1))
-		var row := {"label": "", "enabled": false, "amber": false, "cmd": {}}
-		if n == here: row.label = "Floor %d · Here" % n
-		elif f.get("paid", false): row = {"label": "Floor %d · Free" % n, "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
-		elif i > 0 and not floors[i - 1].get("cleared", false): row.label = "Floor %d · Clear Floor %d first" % [n, n - 1]
-		elif not f.get("bag_ok", true): row.label = "Floor %d · Bag full" % n   # q(48)
-		elif _energy(view) < fee: row = {"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true,
-			"cmd": {"type": "energy_card", "need": fee, "verb": "Floor %d" % n}}
-		else: row = {"label": "Floor %d · %d Energy" % [n, fee], "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
-		# §13.3.1 Express: a free ride to Floor 5 from any stop once the account has cleared Floor 4, where Floor 5 would
-		# otherwise cost its fee or wait for Floor 4 (MINE-ELEV-EXPRESS, row 58: `Floor 5` · `Express · Free`).
-		if n == floors.size() and n != here and not f.get("paid", false) and bool(mine.get("express", false)):
-			row = {"label": "Floor %d · Express · Free" % n, "enabled": true, "amber": false, "express": true,
-				"cmd": {"type": "mine_express"}}
-		rows.append(row)
+	var at := mine_at(view)
+	var fee := int(view.get("mine", {}).get("floor_energy", 2))
+	var rows: Array = [{"label": "Entrance · Free", "enabled": true, "amber": false, "cmd": {"type": "mine_leave"}}]
+	for st in at.get("stations", []):
+		var n := int(st.get("floor", 0))
+		var move := {"type": "mine_floor", "to": n, "via": "elevator"}
+		if n == here: rows.append({"label": "Floor %d · Here" % n, "enabled": false, "amber": false, "cmd": {}})
+		elif bool(st.get("paid", false)): rows.append({"label": "Floor %d · Free" % n, "enabled": true, "amber": false, "cmd": move})
+		elif _energy(view) < fee: rows.append({"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true,
+			"cmd": {"type": "energy_card", "need": fee, "verb": "Floor %d" % n}})
+		else: rows.append({"label": "Floor %d · %d Energy" % [n, fee], "enabled": true, "amber": false, "cmd": move})
 	return rows
 
-## What each rock of a floor shows: gone, greyed by a full bag (whole floor, q(44)), and the torch preview icon id
-## ("" = Stone only, null = not lit).
+## What each rock of floor n shows: gone, or greyed by a full bag (the whole floor, `Mine · Bag full`). The torch lights
+## the floor's deck, not each rock (v4q(5) ⑫: torch_toast), so no rock carries a preview any more.
 static func rock_marks(view: Dictionary, n: int) -> Array:
 	var floor := _floor(view, n)
 	var out: Array = []
-	if floor.is_empty(): return out
-	var broken: Array = floor.get("broken", [])
-	var preview = floor.get("preview", null)
-	for i in broken.size():
-		var drop = null
-		if preview is Array and i < preview.size(): drop = "" if preview[i] == null else str(preview[i])
-		out.append({"broken": bool(broken[i]), "grey": not floor.get("bag_ok", true), "preview": drop})
+	for b in floor.get("broken", []): out.append({"broken": bool(b), "grey": not floor.get("bag_ok", true)})
 	return out
 
-## Floats for mine events: floor fees, a cleared floor (Floor 1 cleared · Elevator stop). Drops float as items (runtime).
-static func mine_event_text(e: Dictionary) -> String:
-	if str(e.get("kind", "")) != "mine": return ""
-	match str(e.get("action", "")):
-		"enter", "floor":
-			return "Floor %d · −%d Energy" % [int(e.get("floor", 1)), int(e.get("cost", 0))] if int(e.get("cost", 0)) > 0 else ""
-		"cleared":
-			return "Floor %d cleared · Elevator stop" % int(e.get("floor", 1))
-		"express_unlocked":   # MINE-4: in place of the cleared line on Floor 4's first clear
-			return "Floor %d cleared · Floor 5 Express unlocked" % int(e.get("floor", 4))
-		"knocked_out":
-			return "Knocked out · back at the entrance"
-	return ""
+## The torch's Info toast (v4q(5) ⑪ ⑫): what the floor's rocks still hold, in one line — `Floor 12 · Copper Ore ×2 ·
+## Iron Ore ×1` (the scene breaks it after a ` · ` when long); `Floor 12 · Stone only` when no card holds more than
+## Stone. "" before the torch is lit.
+static func torch_toast(view: Dictionary, n: int) -> String:
+	var deck = _floor(view, n).get("deck", null)
+	if not (deck is Array): return ""
+	var parts: Array = ["Floor %d" % n]
+	for d in deck: parts.append("%s ×%d" % [P0Logic.item_name(view, str(d[0])), int(d[1])])
+	if parts.size() == 1: parts.append("Stone only")
+	return " · ".join(parts)
 
-## A cleared floor's float, with Floor 4's first clear naming Express instead (MINE-4): the events of one reply.
-static func mine_event_lines(events: Array) -> Array:
-	var unlocked := events.any(func(e): return str(e.get("kind", "")) == "mine" and str(e.get("action", "")) == "express_unlocked")
-	var out: Array = []
+## A new day while inside (v4q(5) ⑥ ⑪): the floor is drawn again and the player stays — the Info toast.
+static func new_day_toast(n: int) -> String:
+	return "New day · Floor %d has changed" % n
+
+## The first fall of a guard kind (E5 329:182895): `First kill · Iron Slime King`, a result float.
+static func first_kill_float(kind: String) -> Dictionary:
+	var text := "First kill · %s" % monster_name(kind)
+	return {kind = "result", key = text, text = text, tone = UiFloatText.Tone.ITEM}
+
+## A drop the bag had no room for lies on the floor (v4q(5) ⑫): `Bag full · Iron Ore left on the floor`.
+static func ground_float(view: Dictionary, item: String) -> Dictionary:
+	var text := "Bag full · %s left on the floor" % P0Logic.item_name(view, item)
+	return {kind = "result", key = text, text = text, tone = UiFloatText.Tone.ITEM}
+
+## The floor fee's float (q(46), the Energy line of the reply's three, q(49) ①): `Floor 12 · −2 Energy` from a reply's
+## mine_floor event and its Energy spent for it (reason mine_floor); "" for a free move.
+static func floor_fee_line(events: Array) -> String:
+	var spent := 0
+	var floor := 0
 	for e in events:
-		if str(e.get("kind", "")) != "mine": continue
-		var a := str(e.get("action", ""))
-		if a == "cleared" and (unlocked or int(e.get("floor", 0)) >= 5): continue   # Floor 5's clear is Run complete
-		var t := mine_event_text(e)
-		if t != "": out.append({"action": a, "text": t, "floor": int(e.get("floor", 0))})
-	return out
+		match str(e.get("kind", "")):
+			"energy": if str(e.get("reason", "")) == "mine_floor": spent -= int(e.get("delta", 0))
+			"mine_floor": floor = int(e.get("floor", 0))
+	return "Floor %d · −%d Energy" % [floor, spent] if spent > 0 and floor > 0 else ""
 
-## The Run complete banner (MINE-5, MomentBanner Kind=Complete): `Run complete` / `Elite Slime defeated`, the elite's
-## loot as one reward pill (`+2 Quartz`) and the day's runs. loot [item, qty] from the defeat event; null none.
-static func run_complete(view: Dictionary, loot) -> Dictionary:
-	var runs: Dictionary = view.get("mine", {}).get("runs", {})
-	var rewards: Array = []
-	if loot is Array and loot.size() == 2:
-		rewards.append({"text": "+%d %s" % [int(loot[1]), P0Logic.item_name(view, str(loot[0]))], "item": str(loot[0])})
-	return {"kind": "complete", "title": "Run complete", "subtitle": "Elite Slime defeated", "rewards": rewards,
-		"detail": "Mine runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]}
+## The knock-out card (E6 328:182082 / 328:182298, v4q(5) ⑪) over the mine's mouth card on the map: {title, lines,
+## lost, best, button}. lost [[item, qty]…] from the mine_ko event: from Floor 11 on, half of what this floor gave;
+## on Floors 1–10 nothing. best: this mine's deepest (records), which a fall never lowers.
+static func ko_card(view: Dictionary, mine: String, floor: int, lost: Array) -> Dictionary:
+	var best := int(view.get("mine", {}).get("records", {}).get(mine, {}).get("deepest", floor))
+	var keep_from := int(P0Logic.content().get("mine", {}).get("combat", {}).get("ko_keep_from", 11))
+	var dropped := floor >= keep_from and not lost.is_empty()
+	return {"title": "Knocked out", "lines": ["You're back at the entrance.",
+		"You dropped half of what you found on this floor:" if dropped else "You kept everything."],
+		"lost": lost.map(func(l): return {"item": str(l[0]), "text": "%s ×%d" % [P0Logic.item_name(view, str(l[0])), int(l[1])]}) if dropped else [],
+		"best": "Your best here is still Floor %d." % best, "button": "Close"}
 
-## The elite's second kill of the day drops no quartz (§13.3.4): the float that says so once.
-const QUARTZ_ONCE := "Quartz · first kill each day"   # q(116) ②: shown from the day's second elite on
+## What a server refusal of a material command says (苏烈's #39 review). null: not ours, the runtime's own wording
+## applies (need_energy opens the Energy card). "": quiet — a race the next frame shows anyway (a held repeat hitting
+## the 0.9 s tempo, a rock another press already broke, a torch already lit, a swing racing a kill, an item on the floor
+## someone already picked up) or a new day's state the reply already carries (new_day: the scene rebuilds the floor
+## without an error, v4q(5) ⑥, contract-efg §5 ⑩). Else a toast.
+static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> Variant:
+	var type := str(cmd.get("type", ""))
+	if not (type.begins_with("mine_") or type == "gather"): return null
+	match code:
+		"tempo", "rock_gone", "lit", "not_in_mine", "stale_state", "bad_spot", "mob_gone", "bad_target", "bad_rock", "new_day":
+			return ""
+		"bad_floor":   # past the first batch's floors (F41 of a vein); any other bad floor is a race the view settles
+			return "Floor %d · Not open yet" % int(cmd.get("to", 0)) if bool(detail.get("not_open", false)) else ""
+		"floor_locked":   # the stairs open once this floor's monsters are down (355 b1)
+			return "Floor %d · Clear Floor %d first" % [int(cmd.get("to", 1)), int(cmd.get("to", 1)) - 1]
+		"no_item":   # a torch gone meanwhile; a drop on the floor already picked up is a race
+			return "No torches" if str(detail.get("item", "")) == "torch" else ""
+		"no_rocks":
+			return "No rocks here"
+		"bag_full":   # what lies on the floor stays there (v4q(5) ⑫): its float said so when it fell
+			if type == "mine_pick": return ""
+			return BAG_FULL if type.begins_with("mine_") else "Bag full · free a slot first"
+		"not_here", "unknown_place":   # mine_enter away from its site, or a site gone: the mouth card shows why (C)
+			return ""
+		"not_open":   # a mine's type not open yet, or a vein before its Homestead level (v4 2.7)
+			return "Homestead Lv%d" % int(detail.homestead) if detail.has("homestead") else "Not open yet"
+		"homestead_level":
+			return "Homestead Lv%d" % int(detail.get("need", 2))
+		"not_ready":
+			return "Ready in %s" % P0Logic.span(float(detail.get("ready_in", 0)))
+	return null
 
-## Its float: a result line of its own over the kill's items (q(124) ⑦, as `Harvest 3 of 5 · bag full`), never joined
-## to them — `+3 Worm Bait · Quartz · first kill each day` read as if quartz came (李白 / 不知火舞 B7 on 286).
-static func quartz_once_float() -> Dictionary:
-	return {kind = "result", key = QUARTZ_ONCE, text = QUARTZ_ONCE, tone = UiFloatText.Tone.ITEM}
+## The Energy card's verb for a refused material command ("Mine", "Enter mine", "Floor 13"); `fallback` for others.
+static func energy_verb(cmd: Dictionary, fallback: String) -> String:
+	match str(cmd.get("type", "")):
+		"mine_rock": return "Mine"
+		"mine_enter": return "Enter mine"
+		"mine_floor": return "Floor %d" % int(cmd.get("to", 2))
+	return fallback
 
 # --- Gathering spots (farm) ---
 
@@ -489,13 +400,14 @@ static func gloves_moment(view: Dictionary) -> Dictionary:
 
 ## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08), shared
 ## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `; a spot that is not open
-## yet comes last with its gate, `Clay · Mine floor 1 · or Clay Bank from Homestead Lv2`, and loses only the gate once
-## open, `Clay · Mine floor 1 · or Clay Bank`. Order: spots open from the start, then the mine floors that yield it
-## (every rock gives Stone: `Stone · Rock Pile · or the mine`), then spots a Homestead level opens; still-locked ones last.
+## yet comes last with its gate, `Clay · Quarry · or Clay Bank from Homestead Lv2`, and loses only the gate once
+## open, `Clay · Quarry · or Clay Bank`. Order: spots open from the start, then the mine types that yield it (355 b1:
+## a quarry's mains, a vein's; every rock gives Stone: `Stone · Rock Pile · or the mine`), then spots a Homestead level
+## opens; still-locked ones last.
 ## `go` (Show, 不知火舞 on 228): the first open source ("spot_grove", "mine"); with none open, the first source (its
 ## name strip says the gate). {} for anything that is not a material (content.materials) or that nothing yields.
 ## Two lines at most (不知火舞 on 228): the label may break only before ` · or `, so every other space is a no-break
-## space and the floor range's en dash is followed by U+2060 — `Clay · Mine floor 1` / `· or Clay Bank from Homestead Lv2`.
+## space — `Clay · Quarry` / `· or Clay Bank from Homestead Lv2`.
 static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var c := P0Logic.content()
 	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
@@ -513,23 +425,32 @@ static func material_source(view: Dictionary, id: String) -> Dictionary:
 		var src := {"name": str(sp.get("name", gather[sid].get("name", ""))), "go": str(sid), "gate": gate,
 			"open": bool(sp.get("open", gate <= level))}
 		(first if gate <= 1 else gated).append(src)
-	var floors: Array = []
-	for f in c.get("mine", {}).get("floors", []):
-		var yields := id == "stone"
-		for d in f.get("drops", []):
-			if d[0] != null and str(d[0]) == id: yields = true
-		if yields: floors.append(int(f.get("floor", 0)))
-	if not floors.is_empty():
-		var where := "Mine floor %d" % floors[0] if floors.size() == 1 else "Mine floors %d–\u2060%d" % [floors.min(), floors.max()]
-		if id == "stone": where = "the mine"   # every rock gives Stone: no floors to name (Li Bai on 228)
-		first.append({"name": where, "go": "mine", "gate": 1, "open": true})
+	var mines := mine_types_yielding(id)
+	# no Show target for a mine yet: the mines left the farm (355 b1); C will give the nearest mouth (亚瑟 on #629)
+	if id == "stone": first.append({"name": "the mine", "go": "", "gate": 1, "open": true})   # every rock gives Stone (Li Bai on 228)
+	else:
+		for t in mines: first.append({"name": str(t.word), "go": "", "gate": 1, "open": true})
 	var all: Array = first + gated
 	if all.is_empty(): return {}
 	var ordered: Array = all.filter(func(s): return s.open) + all.filter(func(s): return not s.open)
 	var parts: Array = ordered.map(func(s): return s.name if s.open else "%s from Homestead Lv%d" % [s.name, s.gate])
 	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
 	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
-	return {"text": text, "go": str(ordered[0].go)}
+	# Show: the first open source with somewhere to go (a mine has none yet, 355 b1), else the first source's
+	var showable: Array = ordered.filter(func(s): return s.open and str(s.go) != "")
+	return {"text": text, "go": str(showable[0].go) if not showable.is_empty() else str(ordered[0].go)}
+
+## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
+## mine content opens (content.mine.types: quarry and vein in the first batch), in that order — [{type, word}], the
+## word the map names them by (`Quarry`, `Vein`). Stone comes from every rock; callers say `the mine` for it.
+static func mine_types_yielding(id: String) -> Array:
+	var c := P0Logic.content()
+	var wild: Dictionary = c.get("world", {}).get("wild", {})
+	var out: Array = []
+	for t in c.get("mine", {}).get("types", {}):
+		if (wild.get("mines", {}).get(t, {}).get("mains", []) as Array).has(id):
+			out.append({"type": str(t), "word": str(wild.get("type_words", {}).get(t, str(t).capitalize()))})
+	return out
 
 const _NBSP := "\u00a0"
 
