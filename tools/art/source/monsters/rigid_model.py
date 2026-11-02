@@ -55,7 +55,7 @@ def ellipsoid(name,at,size,color,bone,mask,material,segments=8,rings=6,roll=0):
 
 
 def pillow(name,outline,depth,color,bone,material):
-    points=[Vector(p) for p in outline];center=sum(points,Vector())/len(points);n=len(points)
+    points=[Vector(p) for p in outline];center=sum(points,Vector((0,0)))/len(points);n=len(points)
     vertices=[v((p.x,p.y,depth)) for p in points]
     vertices += [v((center.x+(p.x-center.x)*.88,center.y+(p.y-center.y)*.88,depth+.012)) for p in points]
     vertices += [v((center.x+(p.x-center.x)*.88,center.y+(p.y-center.y)*.88,depth-.012)) for p in points]
@@ -126,6 +126,8 @@ def export(identity,rig,metadata):
     for face in mesh.data.polygons:face.material_index=0
     mesh.data.calc_loop_triangles();triangles=len(mesh.data.loop_triangles)
     assert triangles<=1500,(identity,triangles)
+    points=[(p.co.x,p.co.z,-p.co.y) for p in mesh.data.vertices]
+    bounds=[[min(p[i] for p in points) for i in range(3)],[max(p[i] for p in points) for i in range(3)]]
     rig.select_set(True);bpy.context.view_layer.objects.active=rig
     bpy.ops.export_scene.gltf(filepath=str(directory/(identity+'.glb')),export_format='GLB',use_selection=True,
         export_yup=True,export_materials='EXPORT',export_texcoords=True,export_normals=True,
@@ -133,6 +135,7 @@ def export(identity,rig,metadata):
         export_nla_strips=True,export_frame_range=False,export_force_sampling=True,export_frame_step=1,
         export_optimize_animation_size=False,export_cameras=False,export_lights=False)
     metadata.update(id=identity,triangles=triangles,surfaces=1,bones=len(rig.data.bones),
+        bounds=bounds,height=bounds[1][1],
         tint_mask='UV2.x',cast_shadow=False,root_motion=False,front='+Z',stage='blockout',
         source_concept='Plane 355 c368e7dd',author='黄忠',virtual_user_id='5281cd25-6a49-4df8-9802-f3e534956e80')
     (directory/(identity+'.json')).write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n')

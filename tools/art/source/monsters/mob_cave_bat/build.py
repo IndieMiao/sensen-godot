@@ -14,6 +14,7 @@ ANIMS={'idle':{'length':1.0,'loop':True},'move':{'length':.6,'loop':True},
 
 def pose(name,u,t,bones):
     body=bones['body'];flap=0;fold=0
+    cycle=u*math.tau if name in ['idle','move','fly_high'] else t*math.tau
     if name in ['idle','move','fly_high']:
         phase=u*math.tau*(2 if name=='idle' else 1)
         flap=math.sin(phase)*(.55 if name=='idle' else .80)
@@ -38,9 +39,9 @@ def pose(name,u,t,bones):
     for side,sign in [('l',-1),('r',1)]:
         bones['wing_'+side+'1'].rotation_euler.y=sign*flap
         bones['wing_'+side+'1'].rotation_euler.z=sign*fold*.55
-        bones['wing_'+side+'2'].rotation_euler.z=sign*(fold+.10*math.sin(t*math.tau*2))
-        bones['ear_'+side].rotation_euler.y=sign*.06*math.sin(t*math.tau)
-        bones['foot_'+side].rotation_euler.x=.12*math.sin(t*math.tau*2+sign*.3)
+        bones['wing_'+side+'2'].rotation_euler.z=sign*(fold+.10*math.sin(cycle*2))
+        bones['ear_'+side].rotation_euler.y=sign*.06*math.sin(cycle)
+        bones['foot_'+side].rotation_euler.x=.12*math.sin(cycle*2+sign*.3)
 
 
 def main():

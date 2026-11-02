@@ -1,0 +1,26 @@
+[
+  {
+    "file": "SGODOT-355_mob_cave_bat_blockout_three_views.png",
+    "bytes": 63632,
+    "sha256": "6b9a0853d36e56f848b4b87cc344308b68e8c5402c0fb147eacdc2902f4adb1b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_blockout_animation_keys.png",
+    "bytes": 168948,
+    "sha256": "0cf1af3a6f78837c74f01ca7f1d89d7e3f62bd913207d88d7654809001adec92",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_blockout_mine_default_43deg.png",
+    "bytes": 155171,
+    "sha256": "a149f2c12209ae8ac0e57ddb0fa545f6ce366a59dc3e5d5b9efe0995fd84f7d6",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_blockout_validation.json",
+    "bytes": 81145,
+    "sha256": "9e0d1b7536b5d74699eec48e0d17761cc1d6effe4676677d12857571835f4921",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
