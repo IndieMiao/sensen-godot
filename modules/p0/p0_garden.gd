@@ -27,12 +27,13 @@ const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the l
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
 ## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right and the
-## rest bench (FARM-7, q(30)) on its left, two cells wide, clear of the beds, the stall and the mine.
+## rest bench (FARM-7, q(30)) on its left, two cells wide, clear of the beds and the stall. No mine mouth: the mines are
+## wild sites (355 b1, v4q(5) ①).
 const ANCHORS := {
 	# q(172) A: the way in two rows nearer the camera (it was (9, 1) / (9, 0)), the field's new front row before it
 	"spawn": Vector2i(9, -1), "exit": Vector2i(9, -2),
 	"house": Vector2i(9, 16), "storage": Vector2i(14, 15),
-	"well": Vector2i(15, 13), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
+	"well": Vector2i(15, 13), "bench": Vector2i(5, 16),
 	# the workbench on the house's right past the stall (SGODOT-224's rest bench takes the left, Vector2i(5, 16)). The six
 	# gathering spots left the farm for the cities (SGODOT-355 b1, v4 #49; two stood on the grid's new beds).
 	"workbench": Vector2i(17, 16),
@@ -40,7 +41,7 @@ const ANCHORS := {
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
-	"well": Rect2i(15, 13, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
+	"well": Rect2i(15, 13, 1, 1), "bench": Rect2i(5, 16, 2, 1),
 	"workbench": Rect2i(16, 16, 3, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints. The yard ends inside the Homestead fence
@@ -126,7 +127,8 @@ static func blueprint() -> FarmBlueprint:
 
 ## Homestead fence (plan §8.3, q(35); 不知火舞 on SGODOT-228 7e1db1f8), one fence.glb kit:
 ## Lv1–2 only the stretch in front of the farmhouse, either side of the door path with a 2 m opening;
-## Lv3 adds the ring round the field and yard, open at the mine and the way out to the map.
+## Lv3 adds the ring round the field and yard, open only at the way out to the map (its west stretch closed where the
+## mine mouth stood, 355 b1).
 ## Each segment is {pos: Vector3, yaw: float, stretch: float} (stretch scales fence.glb along its length).
 const FENCE_SEG := 1.24              # fence.glb length (m)
 const FENCE_FRONT_ROW := 13          # the yard row between the field and the farmhouse
@@ -141,12 +143,9 @@ static func fence_front(bp: FarmBlueprint) -> Array:
 static func fence_ring(bp: FarmBlueprint) -> Array:
 	var r := FENCE_RING
 	var exit := bp.cell_to_world(ANCHORS.exit)
-	var mine := Rect2i(FOOTPRINTS.mine)
-	var mine_z0 := bp.cell_to_world(mine.position).z + bp.cell_m * 0.5        # near edge of the mine (towards the camera)
-	var mine_z1 := mine_z0 - mine.size.y * bp.cell_m
 	var out: Array = []
 	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.east, r.back), []))
-	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.west, r.front), [Vector2(mine_z1 - 0.2, mine_z0 + 0.2)]))
+	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.west, r.front), []))
 	out.append_array(_fence_run(Vector2(r.east, r.back), Vector2(r.east, r.front), []))
 	out.append_array(_fence_run(Vector2(r.west, r.front), Vector2(r.east, r.front), [Vector2(exit.x - 1.0, exit.x + 1.0)]))
 	return out
@@ -245,12 +244,13 @@ static func plaque_point(bp: FarmBlueprint) -> Vector3:
 ## The Chef's Sign (Homestead Lv10, §7.7; SGODOT-282): a free-standing hanging sign on a post (上官婉儿's prop shape,
 ## 不知火舞 on 282) left of the door, in the plaque's row, two cells left of it: the board hangs to the post's left, on the
 ## grass left of the bench, clear of it on screen and tapped apart from it. Nearer the door are the path (x 8–10), the Lv3
-## front fence (row 13) and the plaque; one cell nearer, the board lay over the bench. Off the mine path (x 3–4).
+## front fence (row 13) and the plaque; one cell nearer, the board lay over the bench.
 ## Anchor `chef_sign`: the post's foot, +Z toward the camera. A yard object (no decor on it); solid once the sign is up.
 const CHEF_SIGN_CELL := Vector2i(5, 14)
-## The mine path's cell under its hanging board (0.15 m from the board's edge to the cell's middle at shoulder height):
-## not walked while the sign stands, so no one passes through the board (不知火舞 282 33835f54, B; 上官婉儿 56fa9620) —
-## the way to the mine goes by (4,13) or (4,15). Still a path to decor (nothing is placed on it).
+## The cell under its hanging board (0.15 m from the board's edge to the cell's middle at shoulder height; the mine path's
+## until the mouth left the farm, 355 b1): not walked while the sign stands, so no one passes through the board (不知火舞
+## 282 33835f54, B; 上官婉儿 56fa9620) — the way round goes by (4,13) or (4,15). A yard object to decor, so nothing is
+## placed under the board either.
 const CHEF_SIGN_BOARD_CELL := Vector2i(4, 14)
 
 static func chef_sign_point(bp: FarmBlueprint) -> Vector3:

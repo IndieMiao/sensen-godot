@@ -1139,12 +1139,12 @@ func _screen_rect(n: Node) -> Rect2:
 			first = false
 	return r
 
-## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the path cell under its
+## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the cell under its
 ## board (P0Garden.CHEF_SIGN_BOARD_CELL), back if it ever goes.
 func _show_chef_sign(on: bool) -> void:
 	if _chef_sign_node.visible == on: return
 	_chef_sign_node.visible = on
-	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the path under its board
+	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the cell under its board
 		if bp.is_walkable(c): grid.set_solid(c, on)   # a cell the plan blocks stays blocked
 
 ## The Notice Board up from Homestead Lv5 (q(164) ①): shown, and its cell solid, as the Chef's Sign.

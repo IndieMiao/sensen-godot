@@ -3,7 +3,8 @@ const P0Farm := preload("res://scenes/p0/p0_farm.gd")
 ## Decorate (SGODOT-284): the server judges a spot with content decor.yard; it must agree with the garden the client
 ## draws (P0Garden), so a piece never stands on a bed, in the house or on a facility the player can see, and the client
 ## (P0Decor) judges a spot as the server does. Pieces are solid: a yard filled with them still lets the player walk to
-## the exit, the door, the stall, the mine mouth, the gathering spots and the workbench (q(120), 不知火舞 49b11f91).
+## the exit, the door, the stall and the workbench (q(120), 不知火舞 49b11f91; no mine mouth nor gathering spots on the farm
+## since 355 b1).
 
 func _yard() -> Dictionary:
 	return P0Logic.content().get("decor", {}).get("yard", {})
@@ -51,10 +52,12 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Space taken")
 	for at in [Vector2i(9, -1), Vector2i(10, -2)]:   # the way to the map exit runs through the field now (SGODOT-355 b1)
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Outside your yard")
-	for at in [Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
+	for at in [Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(17, 15)]:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Keep the path clear")
+	for at in [Vector2i(1, 13), Vector2i(2, 14), Vector2i(4, 13)]:   # the mine mouth and its path were here (355 b1, v4q(5) ①)
+		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 15))).is_equal("")
-	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(3, 14))).is_equal("Keep the path clear")   # (4, 14) would reach the Chef's Sign's cell
+	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(3, 14))).is_equal("Space taken")   # (4, 14): under the Chef's Sign's board
 	v.decor.placed = [{"uid": 1, "id": "deco_bench", "x": 6, "y": 18, "rot": 0}]   # 2 × 1: cells 6–7, 18
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(7, 18))).is_equal("Space taken")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(7, 18), 0, 1)).is_equal("")   # moving the bench itself
@@ -118,7 +121,7 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 			n += 1
 			v.decor.placed.append({"uid": n, "id": "deco_planter", "x": x, "y": y, "rot": 0})
 			grid.set_solid(Vector2i(x, y), true)
-	assert_int(n).is_greater(50)   # plenty of yard is left to decorate (53 since the field took the whole grid, SGODOT-355 b1)
+	assert_int(n).is_greater(50)   # plenty of yard is left to decorate (53 once the field took the whole grid, 60 with the mine mouth gone too, SGODOT-355 b1)
 	var from: Vector2i = P0Garden.ANCHORS.spawn
 	var reach := func(target: Vector3, within: float) -> bool:
 		for y in range(o.y, o.y + bp.grid.y):
@@ -185,7 +188,7 @@ func test_the_yard_edge_is_dashed_round_the_walk_rect() -> void:
 ## The grid round a picked piece is the yard's (不知火舞 on 284): where a piece could stand and the paths, never the field.
 func test_the_grid_round_a_piece_is_the_yard_only() -> void:
 	var v := {"decor": {"placed": [], "cap": 20, "stored": {}}}
-	var halo := P0FarmDecor.halo_cells(v, [Vector2i(4, 15), Vector2i(5, 15)])   # a bench by the mine path
+	var halo := P0FarmDecor.halo_cells(v, [Vector2i(4, 15), Vector2i(5, 15)])   # a bench in the yard's west corner
 	assert_int(halo.size()).is_greater(10)
 	for h in halo:
 		var c: Vector2i = h[0]
@@ -193,7 +196,7 @@ func test_the_grid_round_a_piece_is_the_yard_only() -> void:
 		assert_str(P0Decor.reason(v, "deco_planter", c)).override_failure_message(str(c)).is_not_equal("Space taken")
 		assert_int(maxi(absi(c.x - 4), absi(c.y - 15))).is_less_equal(4)
 	assert_bool(halo.any(func(h): return (h[0] as Vector2i).y <= 12)).is_false()   # rows up to 12 are the field (SGODOT-355 b1)
-	assert_bool(halo.any(func(h): return bool(h[2]))).is_true()                    # the mine path at x 3–4 is in reach
+	assert_bool(halo.any(func(h): return bool(h[2]))).is_true()                    # the door's path at x 8 is in reach
 
 ## The stall's ten pieces have their own icons (安其拉, 284 2ab958d8), not the sprout stand-in.
 func test_every_sold_piece_has_its_icon() -> void:
