@@ -26,7 +26,8 @@ extends Control
 ##             and `Retry` (Compact secondary), as the home pick's error (不知火舞 384 6e014af3); Retry emits
 ##             open_pressed("retry"), nothing retries by itself. No date under a name: the server keeps none (后裔 #661).
 ## Emits back_pressed, open_pressed(what): "licenses", a row id, or a Map data row ("mapbox_site", "osm_site",
-## "improve", "notifications", "system_settings", "blocked_players"), a blocked player's handle or "retry" on BLOCKED;
+## "improve", "notifications", "system_settings", "blocked_players", "voice_chat"), a blocked player's handle or
+## "retry" on BLOCKED;
 ## toggled(what, on): "telemetry", "crops_ready".
 
 signal back_pressed
@@ -101,9 +102,10 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## `Set for good`. No home (a view not in yet): no Home group. `notifications` "On" / "Off": one row, `Notifications`
 ## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group. `blocked` ≥ 0: the
 ## `Privacy` group before Legal, one row `Blocked players` with how many ›, 0 too (BP1, SGODOT-384); BLOCKED_UNREAD the
-## row with › alone (not read this launch); BLOCKED_NONE no group.
+## row with › alone (not read this launch); BLOCKED_NONE no such row. `voice_chat`: under it in the same card
+## `Voice chat ›`, no value (q(277); only while this phone is offered voice, 不知火舞). Neither: no Privacy group.
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
-		blocked := BLOCKED_NONE) -> P0SettingsPage:
+		blocked := BLOCKED_NONE, voice_chat := false) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -121,11 +123,18 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
 	page._group("", [tests])
+	var privacy: Array = []
 	if blocked != BLOCKED_NONE:
-		var privacy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked) if blocked >= 0 else "")
-		privacy.name = "BlockedPlayers"
-		privacy.pressed.connect(func(): page.open_pressed.emit("blocked_players"))
-		page._group("Privacy", [privacy])
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked) if blocked >= 0 else "")
+		row.name = "BlockedPlayers"
+		row.pressed.connect(func(): page.open_pressed.emit("blocked_players"))
+		privacy.append(row)
+	if voice_chat:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, "Voice chat")
+		row.name = "VoiceChat"
+		row.pressed.connect(func(): page.open_pressed.emit("voice_chat"))
+		privacy.append(row)
+	if not privacy.is_empty(): page._group("Privacy", privacy)
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
