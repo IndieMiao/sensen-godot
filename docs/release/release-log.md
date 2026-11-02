@@ -60,7 +60,8 @@
 
 iOS（2026-11-02，SGODOT-356）：
 
-- （待补：0.2.20 (1)，x-p0-version `2026110252`，源码 `d2dee66e`）
+- 传 TestFlight：Gensen App（`app.gensen.maps`），版本 0.2.20 build 1，显示名 Gensen，源码 `d2dee66e`（和安卓同一个冻结头），服务端地址同安卓（美西），x-p0-version `2026110252`。14:25 上传，14:28 Apple 处理完成（VALID），内部测试组可装。
+- 照常带 iOS 作物成熟本地通知（打包时把仓库里的原生桥同步进 Xcode 工程）。iOS 还没有语音。
 
 内容（自 0.2.19）：
 
