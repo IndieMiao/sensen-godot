@@ -21,6 +21,7 @@ const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # a local request's hand-in row for wrong_place (q(272))
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -1112,6 +1113,13 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) in ["cook", "batch_cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
+	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
+		var r := PinReason.request_of(session.view, str(cmd.request))
+		if not r.is_empty():
+			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
