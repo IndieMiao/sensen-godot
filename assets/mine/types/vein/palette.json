@@ -2,7 +2,7 @@
   "bands": [
     {"from": 1, "to": 10, "ground": "#b8a2a0", "wall": "#94768d", "backdrop_tint": "#4d3d49", "fog": "#242125"},
     {"from": 11, "to": 20, "ground": "#a29c9e", "wall": "#7e7189", "backdrop_tint": "#423b47", "fog": "#242126"},
-    {"from": 21, "to": 30, "ground": "#9bb2c8", "wall": "#6c7180", "backdrop_tint": "#383b43", "fog": "#222126"},
-    {"from": 31, "to": 40, "ground": "#98aec7", "wall": "#5d6877", "backdrop_tint": "#30363e", "fog": "#201f24"}
+    {"from": 21, "to": 30, "ground": "#a1adb9", "wall": "#6c7180", "backdrop_tint": "#383b43", "fog": "#222126"},
+    {"from": 31, "to": 40, "ground": "#99a6b2", "wall": "#5d6877", "backdrop_tint": "#30363e", "fog": "#201f24"}
   ]
 }
