@@ -99,15 +99,17 @@ describe('the server catalogue (src/p0/wild.ts)', () => {
     expect(wildById(c, 'gn-5391959')).toBeUndefined();
   });
 
-  it('the nearest 3 open sites, a vein taking the place of the farther of two quarries when there is none', () => {
+  it('the free 3 are the nearest quarry, iron vein and quartz vein, however far (the user, 11-02 庚3, v4q(3) ③)', () => {
     const { c, base } = setup([[0.5, 0, 'quarry', 'stone'], [0, 0.8, 'quarry', 'coal'], [-1, 0, 'quarry', 'clay'],
-      [0, -0.6, 'woodland'], [2, 2, 'vein', 'iron_ore']]);
+      [0, -0.6, 'woodland'], [2, 2, 'vein', 'iron_ore'], [1.5, 1.5, 'vein', 'iron_ore'], [-6, -6, 'vein', 'quartz']]);
     const near = wildNearOf(c, SF).map(id => wildById(c, id)!);
-    expect(near.map(s => s.type).sort()).toEqual(['quarry', 'quarry', 'vein']);
-    const [r3, c3] = cellOf(base.lat - 1, base.lng);
-    expect(near.map(s => s.id)).not.toContain(`wd-${r3}-${c3}`);   // the farthest quarry gave way
+    expect(near.map(s => [s.type, s.mine?.main ?? null])).toEqual([['quarry', null], ['vein', 'iron_ore'], ['vein', 'quartz']]);   // nearest first (a quarry has no main)
+    const [r2, c2] = cellOf(base.lat + 1.5, base.lng + 1.5);
+    expect(near[1].id).toBe(`wd-${r2}-${c2}`);   // the nearer iron vein
     expect(near.some(s => s.type === 'woodland')).toBe(false);   // not open: never one of the free 3
-    void base;
+    // no quartz vein anywhere: the two that there are
+    const { c: c2nd } = setup([[0.5, 0, 'quarry', 'stone'], [2, 2, 'vein', 'iron_ore']]);
+    expect(wildNearOf(c2nd, SF).map(id => wildById(c2nd, id)!.type)).toEqual(['quarry', 'vein']);
   });
 
   it('reads a viewport: open sites and grey pins, nearest home first, at most the cap, none below the pins\' zoom', () => {

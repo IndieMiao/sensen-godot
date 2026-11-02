@@ -41,13 +41,15 @@ const ROWS: [number, number, string, string?][] = [[0.3, 0.3, 'quarry'], [0.4, -
   [2.2, 0.6, 'vein', 'quartz'], [-3.5, 0.6, 'quarry'], [1.3, 1.5, 'geode']];
 
 describe('travel to a wild site (v4q(3) ④)', () => {
-  it('the nearest 3 are free; farther, its Trip from the home\'s base point; a grey pin and an unknown id refused', () => {
+  it('the free 3 (the nearest quarry, iron vein and quartz vein) cost nothing; another, its Trip from the home\'s base point; a grey pin and an unknown id refused', () => {
     const { c, s, ids } = setup(ROWS);
-    expect(wildNearOf(c, SF).sort()).toEqual(ids.slice(0, 3).sort());
-    expect(fareOf(c, s, ids[0], T)).toMatchObject({ energy: 0, coins: 0 });
-    const far = preview(c, s, ids[3], T);
-    expect(far).toMatchObject({ wild: true, type: 'vein', open: true, free: false, country: '', trip: 3 });
+    expect(wildNearOf(c, SF)).toEqual([ids[0], ids[2], ids[3]]);   // the user, 11-02 庚3: one of each, the quartz vein ~250 km away too
+    for (const id of [ids[0], ids[2], ids[3]]) expect(fareOf(c, s, id, T)).toMatchObject({ energy: 0, coins: 0 });
+    const far = preview(c, s, ids[4], T);
+    expect(far).toMatchObject({ wild: true, type: 'quarry', open: true, free: false, country: '' });
+    expect(far.trip).toBeGreaterThanOrEqual(3);
     expect(far.cost.coins).toBeGreaterThan(0);
+    expect(preview(c, s, ids[1], T)).toMatchObject({ wild: true, free: false });   // the second quarry, near as it is, is not one of the free 3
     expect(travel(c, s, ids[5], T, [])).toEqual({ code: 'not_open', detail: { type: 'geode' } });
     expect(travel(c, s, 'wd-1-1', T, [])).toEqual({ code: 'unknown_place' });
   });
@@ -68,13 +70,14 @@ describe('travel to a wild site (v4q(3) ④)', () => {
     expect(r.state.travel.visits[ids[3]].deliveries).toBe(0);
   });
 
-  it('the priced guarantee (wild.fares, pending the user): the nearest iron and quartz veins and 2 quarries at most Trip 2, the rest at least Trip 2', () => {
+  it('the priced guarantee (wild.fares; the user, 11-02 丁7): the nearest iron and quartz veins and 2 quarries at most Trip 2, the rest at least Trip 2', () => {
     const fares = { guarantee: true, max_trip: 2, min_trip: 2 };
     const { c, s, ids } = setup([...ROWS, [0.6, 0.6, 'quarry']], fares);
     expect(wildPricedOf(c, SF).sort()).toEqual([ids[0], ids[1], ids[2], ids[3]].sort());   // iron, quartz, the nearest 2 quarries
     const at = (id: string) => fareOf(c, s, id, T);
     const trip2 = c.travel!.fares!.coins[1];
-    expect(at(ids[3]).coins).toBe(trip2);                  // quartz vein ~250 km (Trip 3) costs Trip 2
+    expect(at(ids[3]).coins).toBe(0);                      // the quartz vein ~250 km: one of the free 3 now (庚3)
+    expect(at(ids[1]).coins).toBe(trip2);                  // the second quarry, priced, ~47 km (Trip 1): outside the free 3, Trip 2
     expect(at(ids[6]).coins).toBe(trip2);                  // a quarry outside the free 3 within Trip 1–2 costs at least Trip 2
     expect(at(ids[4]).coins).toBe(c.travel!.fares!.coins[2]);   // the far quarry, not priced: its own Trip 3
   });
