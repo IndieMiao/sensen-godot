@@ -170,15 +170,15 @@ JS
 }
 
 health() {   # $1 = label: Journey and farm healthz, saved for the before / after comparison
-  # The Journey server is being retired (SGODOT-304): its path answers 410 Gone once stopped (★3), which is fine;
-  # the old farm's /v1 must still answer 200.
+  # The Journey server is retired (SGODOT-304) and so is the old farm since the 10-30 move to US West: both paths
+  # answer 410 Gone, which is fine (200 too, should either come back). On us and preview the production P0 must answer 200.
   local urls=("$SITE/preview/journey/v1/healthz" "$SITE/v1/healthz")
-  [ "$TARGET" != preview ] || urls+=("$SITE/preview/p0/v1/healthz")   # production P0, untouched by a preview step
+  [ "$TARGET" = hk ] || urls+=("$SITE/preview/p0/v1/healthz")   # production P0 (a preview step never touches it)
   for u in "${urls[@]}"; do
     code=$(curl_ -o "$out/hz.tmp" -w '%{http_code}' "$u" || echo 000)
     printf '%s %s %s %s\n' "$1" "$code" "$u" "$(head -c 200 "$out/hz.tmp")" | tee -a "$out/health.txt"
     case "$u:$code" in
-      */preview/journey/*:200|*/preview/journey/*:410|*:200) ;;
+      */preview/journey/*:410|"$SITE"/v1/healthz:410|*:200) ;;
       *) echo "FAIL: $u is $code"; return 1 ;;
     esac
   done
