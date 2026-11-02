@@ -169,7 +169,7 @@ func set_muted(identity: String, muted: bool) -> void:
 	if identity.is_empty(): return
 	if muted: _muted[identity] = true
 	else: _muted.erase(identity)
-	if state == "connected" and not _native_id.is_empty() and per_participant():
+	if _native_up() and per_participant():
 		_backend.call("set_participant_volume", _native_id, identity, 0.0 if muted else 1.0)
 	changed.emit()
 
@@ -188,10 +188,13 @@ func set_blocked(ids: Array) -> void:
 	var next: Array = ids.map(func(i): return str(i))
 	var freed: Array = blocked.filter(func(i): return not next.has(i))
 	blocked = next
-	if state == "connected" and not _native_id.is_empty():
+	if _native_up():   # connecting too: the plugin takes the room's tracks at Connected by this list (周瑜 on #661)
 		_block_natively(freed, true)
 		_block_natively(blocked, false)
 	changed.emit()
+
+## A native room asked for (connecting, connected or reconnecting), not the permission request's id.
+func _native_up() -> bool: return state != "permission" and not _native_id.is_empty()
 
 func _block_natively(ids: Array, allow: bool) -> void:
 	for id in ids:
