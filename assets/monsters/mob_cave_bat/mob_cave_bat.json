@@ -1,7 +1,7 @@
 {
   "radius": 0.3,
   "height": 1.309616208076477,
-  "hurt_point": [
+  "hit_point": [
     0,
     1.0,
     0.05
@@ -16,6 +16,17 @@
     1.0,
     0
   ],
+  "durations": {
+    "idle": 1.0,
+    "move": 0.6,
+    "windup": 0.55,
+    "attack": 0.45,
+    "recover": 0.5,
+    "hit": 0.25,
+    "die": 0.7,
+    "fly_high": 0.4
+  },
+  "hit_at": 0.2,
   "anims": {
     "idle": {
       "length": 1.0,
