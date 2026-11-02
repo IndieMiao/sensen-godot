@@ -2,6 +2,7 @@ extends "res://modules/mining/monsters/slime_view.gd"
 ## F adapter: keep the existing HP/band/shadow nodes; the visual beneath Body is either a model or a tweened stand-in.
 
 const TINT = preload("res://modules/mining/monsters/f_model_tint.gdshader")
+const FADE = preload("res://modules/mining/monsters/f_model_fade.gdshader")
 const PHASE_ACTION := {"idle":"idle", "chase":"move", "fly_high":"fly_high", "windup":"windup", "dash":"attack",
 	"recover":"recover", "stunned":"stunned", "hide":"hide", "spore":"spore"}
 
@@ -25,8 +26,7 @@ var _elite := false
 
 func build(spec: Dictionary, elite: bool) -> void:
 	_elite = elite
-	var fallback: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://modules/mining/monsters/placeholder/"+family+".json"))
-	style = (meta.get("visual", fallback.get("visual", {})) as Dictionary).duplicate(true)
+	style = (meta.get("visual", {}) as Dictionary).duplicate(true)
 	super.build(spec, false)
 	var body := get_node("Body") as MeshInstance3D
 	body.mesh = null
@@ -53,13 +53,13 @@ func build(spec: Dictionary, elite: bool) -> void:
 			if not players.is_empty(): _player = players[0]
 			if _player:
 				_player.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
-				for key in _player.get_animation_list():
-					var clip := _player.get_animation(key).duplicate() as Animation
-					clip.loop_mode = Animation.LOOP_LINEAR if str(key).get_file() in LOOPS else Animation.LOOP_NONE
-					var library_name := str(key).get_slice("/", 0) if str(key).contains("/") else ""
+				for library_name in _player.get_animation_library_list():
 					var library := _player.get_animation_library(library_name).duplicate() as AnimationLibrary
-					library.remove_animation(str(key).get_file())
-					library.add_animation(str(key).get_file(), clip)
+					for key in library.get_animation_list():
+						var clip := library.get_animation(key).duplicate() as Animation
+						clip.loop_mode = Animation.LOOP_LINEAR if str(key) in LOOPS else Animation.LOOP_NONE
+						library.remove_animation(key)
+						library.add_animation(key, clip)
 					_player.remove_animation_library(library_name)
 					_player.add_animation_library(library_name, library)
 	if not using_model: build_placeholder()
@@ -70,8 +70,9 @@ func build(spec: Dictionary, elite: bool) -> void:
 	if family == "mob_shroomling":
 		var warning := get_node("Warning") as MeshInstance3D
 		var ring := warning.mesh as TorusMesh
-		ring.inner_radius = maxf(0.01, float(meta.spore_range)-0.06)
-		ring.outer_radius = float(meta.spore_range)
+		var spore_range := float(meta.get("spore_range", 1.0))
+		ring.inner_radius = maxf(0.01, spore_range-0.06)
+		ring.outer_radius = spore_range
 		(warning.material_override as StandardMaterial3D).albedo_color = Color(BAND_COLOR, 0.3)
 		(warning.material_override as StandardMaterial3D).transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	set_tint({"color": style.get("elite_color" if elite else "color", "ffffff"), "strength": 0.65 if elite else 0.0})
@@ -84,9 +85,6 @@ func build_placeholder() -> void:
 func _ready() -> void:
 	play("fly_high" if family == "mob_cave_bat" else "idle")
 	set_process(false)
-
-func _process(delta: float) -> void:
-	if action == "die": _advance_visual(clampf(delta,0,0.1))
 
 func part(parent: Node3D, title: String, size: Vector3, at: Vector3, color: Color, tintable := true) -> MeshInstance3D:
 	var shape := SphereMesh.new()
@@ -123,6 +121,7 @@ func set_tint(params: Dictionary) -> void:
 	var value = params.get("color", style.get("color", "ffffff"))
 	var color: Color = value if value is Color else Color(str(value))
 	style["shown_color"] = color
+	style["tint_strength"] = float(params.get("strength", 0.65))
 	if _model_material:
 		_model_material.set_shader_parameter("tint", color)
 		_model_material.set_shader_parameter("tint_strength", float(params.get("strength", 0.65)))
@@ -130,8 +129,13 @@ func set_tint(params: Dictionary) -> void:
 
 func paint() -> void:
 	if _model_material:
+		var shader := FADE if action == "die" else TINT
+		if _model_material.shader != shader:
+			_model_material.shader = shader
+			_model_material.set_shader_parameter("tint", style.get("shown_color", Color.WHITE))
+			_model_material.set_shader_parameter("tint_strength", float(style.get("tint_strength", 0.0)))
 		_model_material.set_shader_parameter("flash", _flash)
-		_model_material.set_shader_parameter("opacity", _opacity)
+		if action == "die": _model_material.set_shader_parameter("opacity", _opacity)
 	for part_node in _painted:
 		var original: Color = part_node.get_meta("base_color", Color.WHITE)
 		var color: Color = style.get("shown_color", original) if part_node.get_meta("tintable", false) else original
@@ -147,13 +151,14 @@ func play(name: String) -> void:
 	if _motion != null and _motion.is_valid(): _motion.kill()
 	if not is_inside_tree() or visual == null: return
 	_opacity = 1.0
+	_flash = 0.0
 	paint()
 	visible = true
 	visual.scale = Vector3.ONE
 	visual.rotation = Vector3.ZERO
 	_from_height = flight.position.y
 	if family == "mob_cave_bat" and name in LOOPS:
-		_from_height = float(style.high_offset)
+		_from_height = float(style.get("high_offset", 0.0))
 		flight.position.y = _from_height
 	var span := maxf(0.01, duration(name))
 	if _player:
@@ -170,15 +175,15 @@ func play(name: String) -> void:
 	_motion.finished.connect(func(): _motion_done = true)
 	if name in LOOPS: _motion.set_loops()
 	_motion.tween_method(_pose.bind(name), 0.0, 1.0, span)
-	set_process(name == "die")
-	if name == "die": _motion.tween_callback(func(): visible = false; set_process(false))
+	if name == "die":
+		for key in ["Band", "Warning", "Health", "HealthFill", "HealthTrack"]: get_node(key).hide()
 	if name == "spore":
 		# Particle release uses the same normalized animation clock as the hit; _pose fires it once.
 		set_meta("spore_released", false)
 
 func _pose(progress: float, name: String) -> void:
 	var wave := sin(progress * TAU)
-	if family == "mob_cave_bat":
+	if family == "mob_cave_bat" and name != "die":
 		var goal := float(style.get("dive_offset", 0.0)) if name == "attack" else float(style.get("high_offset", 0.0))
 		flight.position.y = lerpf(_from_height, goal, progress)
 	if not using_model:
@@ -242,7 +247,9 @@ func _phase_action(phase: String) -> String:
 	return str(PHASE_ACTION.get(phase, "idle"))
 
 func update(enemy: Dictionary, was: String, delta: float, stepped: bool, _elapsed: float) -> void:
-	if action == "die": return
+	if action == "die":
+		_advance_visual(delta)   # E owns death lifetime and calls this even while combat is paused.
+		return
 	var phase := str(enemy.phase)
 	var wanted := _phase_action(phase)
 	var changed := wanted != action
@@ -255,7 +262,7 @@ func update(enemy: Dictionary, was: String, delta: float, stepped: bool, _elapse
 	_flash = 1.0 if float(enemy.flash)>0 else 0.0
 	paint()
 	if family == "mob_cave_bat":
-		var top := float(style.top)+flight.position.y
+		var top := float(style.get("top", 1.0))+flight.position.y
 		get_node("Health").position.y = top+0.35
 		get_node("HealthFill").position.y = top+0.12
 		get_node("HealthTrack").position.y = top+0.12

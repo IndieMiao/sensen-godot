@@ -1,5 +1,7 @@
 # 355 第一批 F 客户端功能草稿
 
+早期占位记录保留作历史；当前正式模型接入与返修见末节。A已合，v4q(6)已批准，三只正式GLB/头饰及E死亡接线均已进b1；仍需本头代码复看、李白手感核对和不知火舞走查。
+
 PR 目标 `feat/355-b1`，亚瑟审功能、周瑜看接口。A 的 #618 保持挂起，本轮不改 A。v4q(6) 仍待批，正式模型尚未交付；本轮是代码占位行为与资源接口草稿，不能当作最终美术、真实服务端结算或上线验收。
 
 从bc558130开工，随后rebase到集成分支9de46821（已含最新v0.5文档及#613假view）；功能提交c9caed14与8b3a1d91的range-diff等价，之后补动画末帧/中断回归。没有把A客户端#618带入本分支。
@@ -39,3 +41,27 @@ E现有HUD把怪数/精英名称固定写Slime/Elite Slime，F不改HUD；最终
 普通/精英/三色王各一张合照与2.96秒待机视频；三种行为视频为蝙蝠9.32秒、岩甲虫8.36秒、菇菇8.36秒，各有两张截图、解码帧和状态JSON。挥刀调用真实combat.swing及玩家slash动作，记录蝙蝠dash时命中、甲虫stunned时命中并带stunned标记、菇菇命中后hide；不是服务端扣血。王与精英合照的旧固定Elite Slime大卡由QA隐藏以免挡住模型，非产品代码修改；其余旧Run/Slime文字仍保留。按原帧时间差VFR编码，无加速；状态采样检查飞高不可打、俯冲可打、硬直、hide与spore均实际出现，图像像素非空且变化。桌面Metal不是Android/真机性能验收。
 
 首次QA脚本类型推断错误导致autoload未运行，已修正并按本次确认的PID53776停掉失败进程；失败画面未上传。正常最终6轮捕获均exit0，无脚本/引擎错误；所有本人捕获进程已按记录PID核退出。无editor/import、ADB、生产部署或存档操作。
+
+## 正式模型与审核返修
+
+按亚瑟6579777021/6579894236、周瑜6579874162，合入b1 dbc48746（#680/#683/#684正式资源，#675分层meta，#685公开移动接口及死亡生命周期）。保留历史普通merge，不强推。未手改E或三个基类，本PR的差异仍集中在F文件/KINDS/回归。
+
+- 外观只读注册表提供的meta，不再重复打开占位JSON；模型JSON覆盖半径/动作等，move/visual等占位信息保留。spore_range读缺省。动画库每库复制一次，每个动画在副本里设置循环，原导入资源不变。
+- 正常模型材质不写ALPHA；die才切透明变体（blend_mix/depth_draw_always），沿用UV2保护面部细节、精英染色、闪白。复活回idle重置为不透明。新shader带原生UID。
+- F脑子使用公开fight.slide/dash_step；怪与守关die都只在update推进，无自己的_process或隐藏回调。E收到HP归零立即移出战斗，暂停时也推进die，到时隐藏、换层清理；重复HP0不重播，回滚HP正数恢复idle。死亡时隐藏预警与HP部件。
+- 正式蝙蝠收翅/下落由GLB动画负责，不在die额外把Flight插值回高位，也不缩放正式模型。正式甲虫radius=.725，读取交付hit_point=[0,.35,.05]，不重复乘尺寸。
+- 冲撞命中不能小于身体接触边界：取max(占位contact_range, radius + E.PLAYER_RADIUS)。甲虫删过期绝对.82，命中1.075，E停止1.055；蝙蝠旧.67比正式停止.68还小，命中下限改为.70。起手move.reach、速度、hit_at、伤害不变；仍只在hit_at给一次命中机会，侧移可躲。
+- 岩甲虫stunned clip为1秒循环；另以占位stunned_seconds=2保持已定玩法硬直2秒，避免正式动画时长覆盖玩法窗口。请周瑜审这项命名与接口，李白核手感（355 e23afe8c）。
+- 三种守关KINDS去elite，标guard；头饰按交付README以radius=1归一化，挂在body顶并乘实际半径.85。
+
+### 验证
+
+新增回归涵盖实际三怪GLB加载、共享动画库隔离、常态opaque/die透明/复活opaque、无占位文件也可build、真实E HP0/down/暂停/重复回包/回滚/换层、甲虫contact边界/物理停止/反击、2秒硬直与1秒loop分离、蝙蝠物理停止处命中、头饰缩放。F测试现20条，加原注册表9条；所有新资源带UID。
+
+真实模型缓存由GLTFDocument在--script中读取已交GLB、生成PackedScene，应用交付后处理相同的线性顶点色/关投影，原生保存/加载。未运行editor/import，未改变源GLB/JSON/.import，也未用网络或用户存档。
+
+材料在output/liubang-355-f/review/media，私有userdir gensen-liubang-355-f-review。新mine.at.floor_state fixture驱动真实P0Mine、brain、swing及E死亡路径；末尾给HP0 view/mob_down，非直接play(die)。玩家HP固定，接触只采样，不做服务端扣血结算；这些不是生产/真机测试。三怪在红岩F1/紫灰F21对照，各自行为录像另拍；组合怪只是美术/动作fixture，不代表正式层刷怪配表。默认43°/zoom1，三王同框用既有zoom.8以免裁掉模型。
+
+7段VFR按实际墙钟采样编码，全部720x1600、解码像素逐帧变化，常态透明采样0，尾帧live/visible均0；原图和解码帧逐张看过。蝙蝠约7.16秒，2次contact约.68m，挥刀命中；甲虫约11.24秒，2次contact约1.055m、硬直反击带stunned标记并侧移躲避；菇菇约7.04秒，受击hide与spore均出现。三王用正式头饰。截图/视频及采样上传355供亚瑟、不知火舞、李白复看，当前不宣称走查通过或Ready。
+
+返修最终全量 **p0+ui_kit 2111/2111、209组、0 errors/failures/flaky/skipped/orphans、exit0（report_931）**。定向29条headless亦通过；20条F+9条既有接口。最初测试编译类型/测试fixture缺spec字段已修，失败阶段不当通过。全部测试/捕获进程已结束，素材未改、无线上/存档/部署操作。

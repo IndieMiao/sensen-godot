@@ -21,6 +21,7 @@ func build(spec: Dictionary, _elite: bool) -> void:
 		if packed:
 			var ornament := attach(packed, top)
 			ornament.name = "GuardOrnament"
+			ornament.scale = Vector3.ONE * _radius   # art is normalized to a 1 m king body.
 			ornament.reparent(body, false)
 	else:
 		var ornament := Node3D.new()
@@ -51,9 +52,6 @@ func _ready() -> void:
 	play("idle")
 	set_process(false)
 
-func _process(delta: float) -> void:
-	if _dying: _advance_visual(clampf(delta,0,0.1))
-
 func play(name: String) -> void:
 	if name == action and name in LOOPS and _motion != null: return
 	super.play(name)
@@ -67,8 +65,8 @@ func play(name: String) -> void:
 	_motion.finished.connect(func(): _motion_done = true)
 	if name in LOOPS: _motion.set_loops()
 	_motion.tween_method(_pose.bind(name), 0.0, 1.0, maxf(0.01,duration(name)))
-	set_process(_dying)
-	if _dying: _motion.tween_callback(func(): visible = false; set_process(false))
+	if _dying:
+		for key in ["Band", "Warning", "Health", "HealthFill", "HealthTrack"]: get_node(key).hide()
 
 func _pose(progress: float, name: String) -> void:
 	var body := get_node("Body") as MeshInstance3D
@@ -82,7 +80,9 @@ func _pose(progress: float, name: String) -> void:
 		_: body.scale = Vector3(1,1+sin(progress*TAU)*0.04,1)
 
 func update(enemy: Dictionary, was: String, delta: float, stepped: bool, _elapsed: float) -> void:
-	if _dying: return
+	if _dying:
+		_advance_visual(delta)
+		return
 	var wanted := str(ACTIONS.get(str(enemy.phase),"idle"))
 	var changed := wanted != action
 	if changed:

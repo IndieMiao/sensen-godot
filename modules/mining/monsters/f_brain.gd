@@ -44,8 +44,10 @@ func timed_hit(enemy: Dictionary, fight, player: PlayerMover, action: String, at
 	if fight.invulnerability <= 0.0 and in_reach(enemy, player, reach): fight.touch(enemy)
 
 func charge(enemy: Dictionary, fight, player: PlayerMover, dt: float) -> void:
-	fight._slide(enemy.mover, fight._dash_step(enemy, player, enemy.direction * float(enemy.spec.dash_speed) * dt))
-	timed_hit(enemy, fight, player, "attack", "hit_at", float(data(enemy).get("contact_range", enemy.spec.radius)))
+	fight.slide(enemy.mover, fight.dash_step(enemy, player, enemy.direction * float(enemy.spec.dash_speed) * dt))
+	# Imported body radii must not put the stop boundary outside the touch test.
+	var contact: float = maxf(float(enemy.spec.radius) + fight.PLAYER_RADIUS, float(data(enemy).get("contact_range", 0.0)))
+	timed_hit(enemy, fight, player, "attack", "hit_at", contact)
 
 func place(enemy: Dictionary) -> void:
 	enemy.node.position = enemy.mover.position

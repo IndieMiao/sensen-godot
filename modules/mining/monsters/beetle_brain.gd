@@ -18,7 +18,9 @@ func step(enemy: Dictionary, fight, player: PlayerMover, dt: float, may_path: bo
 			if enemy.timer <= 0.0: enter(enemy, "dash", "attack")
 		"dash":
 			charge(enemy, fight, player, dt)
-			if enemy.timer <= 0.0: enter(enemy, "stunned")
+			if enemy.timer <= 0.0:
+				enter(enemy, "stunned")
+				enemy.timer = float(data(enemy).get("stunned_seconds", seconds(enemy, "stunned")))
 		"stunned":
 			if enemy.timer <= 0.0: enemy.phase = "chase"
 	place(enemy)
