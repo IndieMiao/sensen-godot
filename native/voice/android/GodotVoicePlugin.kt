@@ -11,6 +11,7 @@ import io.livekit.android.events.collect
 import io.livekit.android.room.Room
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.track.RemoteAudioTrack
+import io.livekit.android.room.track.RemoteTrackPublication
 import io.livekit.android.util.LoggingLevel
 import com.twilio.audioswitch.AudioDevice
 import com.sensen.permission.PermissionActivity
@@ -41,6 +42,10 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     private var expiresAt = 0L
     private var desiredMic = false
     private var listening = true
+    // P0 rooms (2026-11-02): per person, by LiveKit identity (the hub's peer id) — Mute is this phone's volume only,
+    // Block never subscribes to them. Both last one session; Godot sets them again after each connect.
+    private val muted = mutableSetOf<String>()
+    private val blocked = mutableSetOf<String>()
     private val decodedFrames = AtomicLong()
     private val decodedEnergy = AtomicLong()
     private val watchdog = object : Runnable {
@@ -51,7 +56,8 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     }
     override fun getPluginName() = "GodotVoice"
     override fun getPluginSignals() = setOf(SignalInfo("voice_event", String::class.java))
-    @UsedByGodot fun capabilities(): String = JSONObject().put("protocol", 1).put("supported", true).put("platform", "android").toString()
+    @UsedByGodot fun capabilities(): String = JSONObject().put("protocol", 1).put("supported", true).put("platform", "android")
+        .put("per_participant", true).toString()   // set_participant_volume / _subscribed (P0 Mute and Block, 2026-11-02)
     @UsedByGodot fun diagnostics(): String = JSONObject().put("decoded_frames", decodedFrames.get()).put("audio_energy", decodedEnergy.get()).toString()
     private fun emit(kind: String, id: String = session, body: JSONObject = JSONObject()) {
         body.put("event", kind).put("session", id)
@@ -83,7 +89,7 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     @UsedByGodot fun connect_voice(id: String, url: String, token: String) = runOnUiThread {
         finish("REPLACED", false)
         if (!foreground) return@runOnUiThread emit("disconnected", id, JSONObject().put("reason", "BACKGROUND"))
-        session = id; desiredMic = false; listening = true
+        session = id; desiredMic = false; listening = true; muted.clear(); blocked.clear()
         decodedFrames.set(0); decodedEnergy.set(0)
         LiveKit.loggingLevel = LoggingLevel.OFF
         val current = LiveKit.create(activity!!.applicationContext)
@@ -100,9 +106,18 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
                     is RoomEvent.Disconnected -> finish("DISCONNECTED")
                     is RoomEvent.ParticipantConnected, is RoomEvent.ParticipantDisconnected,
                     is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted -> snapshot("participants")
+                    is RoomEvent.TrackPublished -> {
+                        // a blocked person's new track is never taken (P0 Block, 2026-11-02)
+                        if (event.participant.identity?.value in blocked) (event.publication as? RemoteTrackPublication)?.setSubscribed(false)
+                    }
                     is RoomEvent.TrackSubscribed -> {
+                        val who = event.participant.identity?.value
+                        if (who != null && who in blocked) {
+                            (event.publication as? RemoteTrackPublication)?.setSubscribed(false)
+                            return@collect
+                        }
                         (event.track as? RemoteAudioTrack)?.let { track ->
-                            track.setVolume(if (listening) 1.0 else 0.0)
+                            track.setVolume(volumeFor(who))
                             // Counters only: no recording, retention or transport of PCM.
                             track.addSink { data, bits, _, _, _, _ ->
                                 decodedFrames.incrementAndGet()
@@ -157,10 +172,31 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     @UsedByGodot fun set_listening(id: String, enabled: Boolean) = runOnUiThread {
         if (id != session) return@runOnUiThread
         listening = enabled
-        room?.remoteParticipants?.values?.forEach { participant ->
-            participant.trackPublications.values.forEach { (it.track as? RemoteAudioTrack)?.setVolume(if (enabled) 1.0 else 0.0) }
-        }
+        applyVolumes()
         snapshot("listening")
+    }
+    /** P0 Mute (2026-11-02): one person's volume on this phone only, 0 or 1; they still hear us. */
+    @UsedByGodot fun set_participant_volume(id: String, identity: String, volume: Double) = runOnUiThread {
+        if (id != session || identity.isEmpty()) return@runOnUiThread
+        if (volume <= 0.0) muted.add(identity) else muted.remove(identity)
+        applyVolumes()
+        snapshot("participants")
+    }
+    /** P0 Block (2026-11-02): stop (or start again) taking one person's tracks; the server lists both ways' blocks. */
+    @UsedByGodot fun set_participant_subscribed(id: String, identity: String, subscribed: Boolean) = runOnUiThread {
+        if (id != session || identity.isEmpty()) return@runOnUiThread
+        if (subscribed) blocked.remove(identity) else blocked.add(identity)
+        room?.remoteParticipants?.values?.filter { it.identity?.value == identity }?.forEach { participant ->
+            participant.trackPublications.values.forEach { (it as? RemoteTrackPublication)?.setSubscribed(subscribed) }
+        }
+        snapshot("participants")
+    }
+    private fun volumeFor(identity: String?): Double = if (!listening || (identity != null && identity in muted)) 0.0 else 1.0
+    private fun applyVolumes() {
+        room?.remoteParticipants?.values?.forEach { participant ->
+            val v = volumeFor(participant.identity?.value)
+            participant.trackPublications.values.forEach { (it.track as? RemoteAudioTrack)?.setVolume(v) }
+        }
     }
     @UsedByGodot fun set_speaker(id: String, enabled: Boolean) = runOnUiThread {
         if (id != session) return@runOnUiThread
@@ -180,7 +216,8 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
         fun add(p: Participant, local: Boolean) {
             val id = p.identity?.value ?: return
             users.put(JSONObject().put("id", id).put("name", p.name ?: id.take(8))
-                .put("speaking", p.isSpeaking).put("microphone", p.isMicrophoneEnabled).put("local", local))
+                .put("speaking", p.isSpeaking).put("microphone", p.isMicrophoneEnabled).put("local", local)
+                .put("muted", id in muted).put("blocked", id in blocked))
         }
         add(current.localParticipant, true)
         current.remoteParticipants.values.forEach { add(it, false) }
