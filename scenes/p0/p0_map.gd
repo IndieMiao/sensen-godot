@@ -192,7 +192,7 @@ func _pond_info(entry: Dictionary) -> Dictionary:
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
-	if _travel_first(entry): return
+	if _travel_first(entry, false): return
 	if str(entry.get("kind", "")) == "place":
 		var spec := place_card(entry)
 		if spec.is_empty(): return
@@ -435,7 +435,7 @@ func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
 		func():
 			rt.ui.close_modal()
 			if id == HOME_PIN: _open_my_farm()
-			else: _open_outpost(id),
+			elif not _travel_first(entry): _open_outpost(id),   # its Go: in that city, or its travel card first (SGODOT-382)
 		details,
 		func():
 			if city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
@@ -893,7 +893,7 @@ static func local_time(view: Dictionary, offset) -> String:
 ## MAP-5 (q(257) ②, Figma 9:125580 / MAP-5-RETURN 243:176049 / MAP-5-SHORT 243:176287; 不知火舞 on 367 ec5f2daa), pure:
 ## the city, `United States · 08:12 local · 14 online` (the local time once its preview is in, the online part only when
 ## some are), then Distance, Energy and Coins (`30 → 112 left`: what is left once paid) — or `Cost · Free` for a free
-## trip (Trip 1, the 3 nearest cities) — Fish here, Visit, and on a return with a running pass `Day Pass · 7h left` (it
+## trip (Trip 1, the 3 nearest cities) — Fish here, Visit (none on a free return), and on a return with a running pass `Day Pass · 7h left` (it
 ## is not renewed). Short of the fare, Fly reads the gap (coins first, LOCK-10). `view` is the projected view (its
 ## Energy now); `preview` the server's (its km and trip win), {} before it is in; `online` the city's players online.
 static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, online: int) -> Dictionary:
@@ -912,7 +912,9 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	var regional := P0FishWorld.regional_fish(cluster).size()
 	var crucian := P0Logic.item_name(view, "fish_crucian")
 	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
-	facts.append(["Visit", "Return visit · half price" if bool(f.revisit) else "First visit · stamp + 10 Energy"])
+	# a free return (Trip 1, the 3 nearest) says no half price: half of nothing only puzzles (q(257) ②, 不知火舞 on #642)
+	if not bool(f.revisit): facts.append(["Visit", "First visit · stamp + 10 Energy"])
+	elif not bool(f.free): facts.append(["Visit", "Return visit · half price"])
 	if bool(f.revisit) and float(f.pass_ms) > 0.0: facts.append(["Day Pass", "%s left" % P0Travel.pass_text(view, cluster)])
 	var gap := P0Travel.fare_gap(view, f)
 	return {
@@ -1355,13 +1357,16 @@ static func cluster_of_entry(entry: Dictionary) -> String:
 ## §11.7.2, q(212): a pond or place of a city not visited is its silhouette, and its tap, a Show on map landing on it
 ## and its Go all open that city's silhouette card (MAP-3-FREE) — pass or none: the fog first (a pass without a visit
 ## showed the place's card, its real name and Go). A visited city's without a pass opens its travel card (the server
-## would refuse with pass_required anyway). Those cards are the city's, not the pin's: the pin is not kept selected
-## while one is up — a tap gives it the press alone (CityMapView.select), as a city bubble opens the same card with no
-## pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
-func _travel_first(entry: Dictionary) -> bool:
+## would refuse with pass_required anyway). One with a pass the player is not in opens its own card on a tap or a Show
+## on map (q(212) ②, q(257) ⑦: the pin's card is as ever), and its Go the travel card (q(256) ④: the way back is a trip
+## at the revisit fare; it walked in and was refused inside, SGODOT-382) — going false for the tap, true for a Go.
+## Those cards are the city's, not the pin's: the pin is not kept selected while one is up — a tap gives it the press
+## alone (CityMapView.select), as a city bubble opens the same card with no pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
+func _travel_first(entry: Dictionary, going := true) -> bool:
 	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
 	var cluster := cluster_of_entry(entry)
-	if P0Travel.fog(_view(), cluster) != "unexplored" and P0Travel.covers(_view(), cluster): return false
+	var open := P0Travel.in_city(_view(), cluster) if going else P0Travel.covers(_view(), cluster)
+	if P0Travel.fog(_view(), cluster) != "unexplored" and open: return false
 	if city_map: city_map.clear_selection()
 	open_city_card(cluster)   # unexplored: the silhouette card first (MAP-3-FREE); visited: its travel card
 	return true

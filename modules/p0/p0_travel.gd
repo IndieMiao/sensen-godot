@@ -61,6 +61,12 @@ static func pass_left_ms(view: Dictionary, cluster: String) -> float:
 static func covers(view: Dictionary, cluster: String) -> bool:
 	return cluster == home(view) or pass_left_ms(view, cluster) > 0.0
 
+## Whether a place of that city can be walked into from here (q(256) ④, option B): the home city, or the city the player
+## is in with its Day Pass running. A pass for a city the player has left is the way back at the revisit fare — its
+## travel card first, as the server's travel_required says (SGODOT-382).
+static func in_city(view: Dictionary, cluster: String) -> bool:
+	return cluster == home(view) or (cluster == here(view) and covers(view, cluster))
+
 ## §11.7.1 fog's three states: "second_home" for a city set as one (travel.second_homes, P2's second version sets
 ## them; the client already draws the state), "explored" once visited or the home city, else "unexplored".
 static func fog(view: Dictionary, cluster: String) -> String:
