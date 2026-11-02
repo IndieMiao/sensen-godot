@@ -36,6 +36,12 @@ weights=read(attrs['WEIGHTS_0']);joints=read(attrs['JOINTS_0'])
 check(np.allclose(weights.max(1),1) and (np.count_nonzero(weights,axis=1)==1).all(),'Exactly one 100 percent rigid influence per vertex')
 check(len(doc['skins'])==1 and len(doc['skins'][0]['joints'])==spec['bones']<=16,'One skin and <=16 joints')
 check((joints<spec['bones']).all(),'All joints reference the skin')
+if args.id=='mob_cave_bat':
+    body_node=next(i for i,node in enumerate(doc['nodes']) if node.get('name')=='body')
+    body_joint=doc['skins'][0]['joints'].index(body_node)
+    body_points=points[joints[:,0]==body_joint]
+    check(abs(np.ptp(body_points[:,0])-spec.get('body_width',.4))<1e-5,'Actual body width matches stage specification')
+    check(abs(np.ptp(points[:,0])-spec.get('wingspan',1.0))<1e-5,'Actual wingspan matches stage specification')
 mask=read(attrs['TEXCOORD_1'])[:,0];colors=read(attrs['COLOR_0'])
 check(set(np.round(mask,6))=={0,1},'UV2.x contains both binary tint regions')
 check(len(colors)==len(points) and len(np.unique(colors,axis=0))>=5,'Actual vertex paint has body and face colours')
@@ -53,12 +59,18 @@ check(spec['hit_at']==spec['anims']['attack']['hit_at'],'Client top-level hit_at
 if 'spore' in spec['anims']:check(spec['spore_at']==spec['anims']['spore']['emit_at'],'Client spore_at matches emission time')
 for animation in doc['animations']:
     name=animation['name'];expected=spec['anims'][name];duration=0.;moving=0
+    covered={(c['target']['node'],c['target']['path']) for c in animation['channels']}
+    required={(joint,kind) for joint in doc['skins'][0]['joints'] for kind in ['translation','rotation','scale']}
+    check(covered>=required,name+': every bone has complete tracks for safe action switching')
     for channel in animation['channels']:
         sampler=animation['samplers'][channel['sampler']];times=read(sampler['input']).ravel();values=read(sampler['output'])
         duration=max(duration,float(times.max()));moving+=int(not np.allclose(values,values[0],atol=1e-5))
         check(np.isfinite(values).all() and (np.diff(times)>0).all(),name+': valid '+channel['target']['path']+' track')
         if channel['target']['node']==root:
             check(np.allclose(values,values[0],atol=1e-6),name+': constant root '+channel['target']['path'])
+        if args.id=='mob_cave_bat' and spec.get('stage')=='final_v1' and name=='die' and channel['target']['node']==body_node:
+            if channel['target']['path']=='scale':check(np.allclose(values,1), 'Final bat death preserves body volume for runtime fade')
+            if channel['target']['path']=='translation':check(abs(np.linalg.norm(values[-1]-values[0])-.62)<.00001,'Final bat death drops .62m after folding')
         if expected.get('loop'):
             endpoint=np.allclose(values[0],values[-1],atol=1e-5)
             if channel['target']['path']=='rotation':endpoint|=np.allclose(values[0],-values[-1],atol=1e-5)
@@ -72,8 +84,10 @@ check(.4<=spec['anims']['windup']['length']<=.7,'Windup leaves .4-.7 seconds war
 text=(DIRECTORY/(args.id+'.glb.import')).read_text()
 check(bool(re.search(r'uid="uid://[^\"]+"',text)),'Godot generated import UID retained')
 check('animation/import=true' in text and 'gltf/texture_map_mode=1' in text,'Animations and external-map import settings')
+check('animation/remove_immutable_tracks=false' in text,'Import preserves constant tracks across action switches')
+check('_subresources={}' in text,'No advanced-import default override expansion')
 check(not spec['root_motion'] and not spec['cast_shadow'],'Consumer contract: no root motion, fake shadow only')
-result={'id':args.id,'stage':'blockout','passed':all(c['passed'] for c in checks),'checks':checks,
+result={'id':args.id,'stage':spec.get('stage','blockout'),'passed':all(c['passed'] for c in checks),'checks':checks,
     'bounds':spec['bounds'],'triangles':len(indices),'bones':spec['bones'],'anims':spec['anims'],
     'glb_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 (OUT/'geometry-validation.json').write_text(json.dumps(result,indent=2)+'\n')

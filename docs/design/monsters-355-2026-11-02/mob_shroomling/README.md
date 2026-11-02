@@ -4,6 +4,8 @@
 
 本阶段交比例、骨骼、全部动作和实际导入验证。正式版计划 11-08，灰模不等于正式画面验收。运行时只推 `art/monsters-355`，不建 PR；源和审阅推 `wp-3d-scene-huangzhong-monsters-355`，正式版再开审阅 PR。
 
+本目录保留灰模历史材料；红盖、提白斑点及双矿对照见 [正式版 v1 候选](final_v1/README.md)，等待技术和画面复验。
+
 ## 尺寸与材质
 
 - **1,496 三角形 / 7 骨 / 1 surface**，米、Y 向上、正面 +Z，根节点在脚底中心，单位比例。
@@ -45,7 +47,7 @@
 
 ```bash
 source ~/.codex-huangzhong/env.sh
-blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/monsters/mob_shroomling/build.py
+blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/monsters/mob_shroomling/build.py -- --stage blockout
 output/art-setup/venv/bin/python tools/art/source/monsters/prepare_review.py mob_shroomling
 godot --headless --path output/monsters-355/mob_shroomling/project --editor --import
 godot --headless --path output/monsters-355/mob_shroomling/project --script res://configure.gd -- "$PWD/output/monsters-355/runtime"

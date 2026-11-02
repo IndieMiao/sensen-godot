@@ -2,6 +2,8 @@
 from pathlib import Path
 import math
 import sys
+import argparse
+from mathutils import Matrix
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent))
 import rigid_model as m
 
@@ -12,7 +14,7 @@ ANIMS={'idle':{'length':1.0,'loop':True},'move':{'length':.6,'loop':True},
     'die':{'length':.70,'loop':False},'fly_high':{'length':.4,'loop':True}}
 
 
-def pose(name,u,t,bones):
+def pose(name,u,t,bones,stage='blockout'):
     body=bones['body'];flap=0;fold=0
     cycle=u*math.tau if name in ['idle','move','fly_high'] else t*math.tau
     if name in ['idle','move','fly_high']:
@@ -34,8 +36,14 @@ def pose(name,u,t,bones):
         k=math.sin(math.pi*u);flap=-.35*k;fold=.3*k
         body.rotation_euler.x=math.radians(-18*k);body.scale=(1+.10*k,1-.12*k,1-.08*k)
     elif name=='die':
-        k=min(1,u/.85);fold=k;flap=-.5*k;body.rotation_euler.x=math.radians(-85*k)
-        body.location.z=-.78*k;body.scale=(max(.12,1-k*.88),)*3
+        if stage=='final_v1':
+            fold=min(1,u/.32);fold=fold*fold*(3-2*fold)
+            drop=max(0,min(1,(u-.28)/.55));drop=drop*drop*(3-2*drop)
+            flap=-.5*fold;body.rotation_euler.x=math.radians(-15*drop)
+            body.location.z=-.62*drop
+        else:
+            k=min(1,u/.85);fold=k;flap=-.5*k;body.rotation_euler.x=math.radians(-85*k)
+            body.location.z=-.78*k;body.scale=(max(.12,1-k*.88),)*3
     for side,sign in [('l',-1),('r',1)]:
         bones['wing_'+side+'1'].rotation_euler.y=sign*flap
         bones['wing_'+side+'1'].rotation_euler.z=sign*fold*.55
@@ -45,6 +53,8 @@ def pose(name,u,t,bones):
 
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--stage',choices=['blockout','final_v1'],default='final_v1')
+    args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
     mat=m.start(ID)
     m.ellipsoid('Round lavender body',(0,1,0),(.40,.40,.33),'A794BF','body',1,mat,16,8)
     for side,sign in [('l',-1),('r',1)]:
@@ -64,9 +74,20 @@ def main():
     for side,sign in [('l',-1),('r',1)]:
         bones += [('ear_'+side,'body',(sign*.11,1.16,0)),('wing_'+side+'1','body',(sign*.14,1.06,-.045)),
             ('wing_'+side+'2','wing_'+side+'1',(sign*.305,1.24,-.045)),('foot_'+side,'body',(sign*.075,.82,0))]
-    rig=m.skeleton(bones);m.animate(rig,ANIMS,pose)
-    m.export(ID,rig,{'radius':.30,'height':1.33,'hit_point':[0,1.0,.05],'badge_point':[0,1.55,0],
-        'hover_center':[0,1.0,0],'anims':ANIMS,'note':'Hover height is in rest pose; fly_high adds no flight-height offset. Movement and blob shadow belong to the consumer.'})
+    if args.stage=='final_v1':
+        for part in m.PARTS:
+            transform=Matrix.Diagonal((1.30 if part['bone'].startswith('wing_') else 1.25,1.25,1.25,1))
+            transform.translation.z=-.25
+            part.data.transform(transform);part.data.update()
+        bones=[(name,parent,at if name=='root' else (
+            at[0]*(1.30 if name.startswith('wing_') else 1.25),1+(at[1]-1)*1.25,at[2]*1.25))
+            for name,parent,at in bones]
+    rig=m.skeleton(bones);m.animate(rig,ANIMS,lambda name,u,t,bones:pose(name,u,t,bones,args.stage))
+    m.export(ID,rig,{'radius':.35 if args.stage=='final_v1' else .30,'height':1.33,'hit_point':[0,1.0,.05],'badge_point':[0,1.55,0],
+        'stage':args.stage,'body_width':.50 if args.stage=='final_v1' else .40,
+        'wingspan':1.30 if args.stage=='final_v1' else 1.0,
+        'hover_center':[0,1.0,0],'anims':ANIMS,
+        'note':'Hover height is in rest pose; fly_high adds no flight-height offset. Final die folds wings then drops .62m without shrinking; runtime fades it out. Movement and blob shadow belong to the consumer.'})
 
 
 if __name__=='__main__':main()

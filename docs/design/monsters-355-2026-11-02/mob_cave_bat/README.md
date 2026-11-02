@@ -3,7 +3,7 @@
 黄忠，virtual_user_id `5281cd25-6a49-4df8-9802-f3e534956e80`。
 依据用户 11-02 批准的设定图 v1.1（Plane 355 `c368e7dd`）、上官婉儿派活及共同接口约定制作。此阶段交比例、骨骼与最终动作接口，正式美术仍需技术和画面复验；正式版计划 11-06。
 
-11-02 灰模技术检查已通过，已交周瑜接入。正式版按总监后续意见增大身体至约 0.50 m 宽、翼展约 1.30 m，radius 改约 0.35，使矿内识别尺寸接近史莱姆；悬停高度和动作名不变。本目录记录仍是已交灰模尺寸，放大尚未应用。
+11-02 灰模技术检查已通过，已交周瑜接入。本目录保留灰模尺寸与历史材料；放大与死亡动作修改见 [正式版 v1 候选](final_v1/README.md)，该版等待技术和画面复验。
 
 运行时文件在基于 `origin/farm-dev 0beeca15` 的 `art/monsters-355` 分支，只推送、不建 PR：
 
@@ -58,7 +58,7 @@ gltf/texture_map_mode=1
 
 ```bash
 source ~/.codex-huangzhong/env.sh
-blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/monsters/mob_cave_bat/build.py
+blender --background --factory-startup --threads 2 --python-exit-code 1 --python tools/art/source/monsters/mob_cave_bat/build.py -- --stage blockout
 output/art-setup/venv/bin/python tools/art/source/monsters/prepare_review.py mob_cave_bat
 godot --headless --path output/monsters-355/mob_cave_bat/project --editor --import
 godot --headless --path output/monsters-355/mob_cave_bat/project --script res://configure.gd -- "$PWD/output/monsters-355/runtime"

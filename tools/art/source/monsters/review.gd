@@ -48,7 +48,7 @@ func setup():
 	body=meshes[0]
 	check(body.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"Imported model disables real shadow casting")
 	BlobShadow.attach(model,spec.radius*1.15)
-	ground=MeshInstance3D.new();var plane=PlaneMesh.new();plane.size=Vector2(8,8);ground.mesh=plane
+	ground=MeshInstance3D.new();var plane=PlaneMesh.new();plane.size=Vector2(80,80) if spec.stage=="final_v1" else Vector2(8,8);ground.mesh=plane
 	var mat=StandardMaterial3D.new();mat.albedo_color=Color("DCE4E2");mat.roughness=1
 	ground.material_override=mat;ground.position.y=-.018;world.add_child(ground)
 	for name in spec.anims:
@@ -94,7 +94,7 @@ func geometry():
 	check(model.transform.is_equal_approx(Transform3D.IDENTITY),"Unit root transform at ground origin")
 	check(absf(actual[1][1]-spec.height)<.001,"Actual rest height matches JSON")
 	if identity=="mob_cave_bat":
-		check(absf(actual[1][0]-actual[0][0]-1)<.001,"One metre rest wingspan")
+		check(absf(actual[1][0]-actual[0][0]-spec.get("wingspan",1.0))<.001,"Rest wingspan matches stage specification")
 		var at=skeleton.global_transform*skeleton.get_bone_global_rest(skeleton.find_bone("body")).origin
 		check(absf(at.y-1.0)<.001,"Hover body centre in rest at Y=1.0")
 	elif identity=="mob_shroomling":
@@ -118,7 +118,7 @@ func motions():
 			frames.append({"time":time,"bounds":bounds(p)})
 		check(maximum>.004,name+": actual skinned vertices move")
 		report.animations[name]={"length":spec.anims[name].length,"loop":spec.anims[name].get("loop",false),
-			"max_vertex_displacement_m":maximum,"samples":frames}
+			"track_count":player.get_animation(name).get_track_count(),"max_vertex_displacement_m":maximum,"samples":frames}
 
 func capture(name):
 	for i in 5:await RenderingServer.frame_post_draw
@@ -127,19 +127,32 @@ func capture(name):
 		"pitch":-camera.rotation_degrees.x,"yaw":camera.rotation_degrees.y})
 	print("MONSTER_CAPTURE ",name)
 
-func mine_context():
-	ground.visible=false;var mine=MineArt.floor_scenery(1,false);world.add_child(mine)
+func transitions():
+	await seek("idle",0);var baseline=points();report.transitions=[]
+	for name in spec.anims:
+		player.play(name);player.seek(spec.anims[name].length*.85,true);player.advance(0)
+		await get_tree().process_frame
+		player.play("idle");player.seek(0,true);player.advance(0)
+		await get_tree().process_frame
+		var actual=points();var error=0.
+		for i in actual.size():error=maxf(error,actual[i].distance_to(baseline[i]))
+		check(error<.0001,name+" -> idle restores all parts without manual pose reset")
+		report.transitions.append({"from":name,"to":"idle","max_vertex_error_m":error})
+
+func mine_context(floor_number=1,capture_name="mine_default_43deg"):
+	ground.visible=false;var fixture=Node3D.new();world.add_child(fixture)
+	var mine=MineArt.floor_scenery(floor_number,false);fixture.add_child(mine)
 	environment.background_color=Color("242125");environment.ambient_light_color=Color("e8dfea");environment.ambient_light_energy=.48
 	sun.rotation_degrees=Vector3(-51,-38,0);sun.light_color=Color("ffe8ce");sun.light_energy=1.15;sun.shadow_opacity=.58
 	sun.shadow_bias=.04;sun.shadow_normal_bias=.45;sun.shadow_blur=1.6
-	var combat=MineCombat.new();var slime=combat._slime({"radius":.4},false);world.add_child(slime);combat.free()
+	var combat=MineCombat.new();var slime=combat._slime({"radius":.4},false);fixture.add_child(slime);combat.free()
 	slime.position=Vector3(5.4,0,-3.1)
 	for name in ["HealthFill","HealthTrack","Health"]:slime.get_node(name).visible=false
 	model.position=Vector3(4.2,0,-3.1);await seek("idle",.125)
 	var avatar=Avatar.create_rig()
 	for child in avatar.get_children():
 		if child is RigActivity:child.free()
-	avatar.assembler=AvatarAssemblerMerged.new();world.add_child(avatar);avatar.apply_config(Avatar.slot_table.default_config())
+	avatar.assembler=AvatarAssemblerMerged.new();fixture.add_child(avatar);avatar.apply_config(Avatar.slot_table.default_config())
 	var ticks=0
 	while avatar.is_busy() and ticks<900:await get_tree().process_frame;ticks+=1
 	check(not avatar.is_busy(),"Actual reference player assembled")
@@ -154,9 +167,12 @@ func mine_context():
 				var p=avatar.global_transform.affine_inverse()*node.global_transform*vertex;lo=minf(lo,p.y);hi=maxf(hi,p.y)
 	avatar.scale=Vector3.ONE*1.745/(hi-lo);avatar.position=Vector3(3.0,-lo*avatar.scale.y,-3.1);avatar.rotation_degrees.y=180
 	vp.size=Vector2i(360,800);camera.size=MineCamera.close_view_size(Vector2(360,800))/.8
-	MineCamera.place(camera,Vector3(4.2,.7,-3.1));await capture("mine_default_43deg")
-	report.mine={"source":"Unmodified farm-dev mine_art.gd and mine_combat.gd slime", "floor":1,
+	MineCamera.place(camera,Vector3(4.2,.7,-3.1));await capture(capture_name)
+	report.mine={"source":"Unmodified farm-dev mine_art.gd and mine_combat.gd slime", "floor":floor_number,
 		"player_height_m":1.745,"slime_radius_m":.4,"camera_zoom":.8,"width_m":camera.size}
+	if not report.has("mine_contexts"):report.mine_contexts={}
+	report.mine_contexts[capture_name]=report.mine.duplicate(true)
+	fixture.queue_free();await get_tree().process_frame
 
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
@@ -171,6 +187,7 @@ func run():
 			else:pose_camera(view[1])
 			await capture(view[0])
 		await motions()
+		await transitions()
 		for name in spec.anims:
 			var time=spec.anims[name].get("hit_at",spec.anims[name].get("emit_at",spec.anims[name].length*.5))
 			if name in ["idle","move","fly_high"]:time=spec.anims[name].length*.125
@@ -179,8 +196,15 @@ func run():
 			if identity=="mob_shroomling":pose_camera(20,18,1.15,Vector3(0,.35,0))
 			else:pose_camera(20,18,1.75,Vector3(0,.70,0))
 			await capture("action_"+name)
-	await mine_context()
-	check(report.has("mine") and FileAccess.file_exists(output+"/mine_default_43deg.png"),"Mine comparison completed")
+		if identity=="mob_cave_bat" and spec.stage=="final_v1":
+			for key in [["death_start",0.0],["death_folded",.22],["death_dropped",.58]]:
+				await seek("die",key[1]);pose_camera(20,18,1.75,Vector3(0,.70,0));await capture(key[0])
+	if spec.stage=="final_v1":
+		await mine_context(1,"red_mine_default_43deg");await mine_context(3,"purple_mine_default_43deg")
+		check(report.get("mine_contexts",{}).size()==2,"Both red and purple-rock mine comparisons completed")
+	else:
+		await mine_context()
+		check(report.has("mine") and FileAccess.file_exists(output+"/mine_default_43deg.png"),"Mine comparison completed")
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","Actual Mobile renderer")
 	report.passed=report.checks.all(func(c):return c.passed)

@@ -6,14 +6,18 @@ import json
 from PIL import Image,ImageDraw,ImageFont
 
 ROOT=Path(__file__).resolve().parents[4]
-parser=argparse.ArgumentParser();parser.add_argument('id');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('id');parser.add_argument('--stage',default='blockout');args=parser.parse_args()
 OUT=ROOT/'output/monsters-355'/args.id
-DOC=ROOT/'docs/design/monsters-355-2026-11-02'/args.id;DOC.mkdir(parents=True,exist_ok=True)
-PREFIX='SGODOT-355_'+args.id+'_blockout_'
+DOC=ROOT/'docs/design/monsters-355-2026-11-02'/args.id
+if args.stage!='blockout':DOC=DOC/args.stage
+DOC.mkdir(parents=True,exist_ok=True)
+PREFIX='SGODOT-355_'+args.id+'_'+args.stage+'_'
+STAGE='灰模' if args.stage=='blockout' else '正式版 v1 / 待验收'
 AUTHOR='5281cd25-6a49-4df8-9802-f3e534956e80'
 spec=json.loads((ROOT/'output/monsters-355/runtime/assets/monsters'/args.id/(args.id+'.json')).read_text())
 geometry=json.loads((OUT/'geometry-validation.json').read_text());godot=json.loads((OUT/'captures/godot-validation.json').read_text())
 assert geometry['passed'] and godot['passed']
+assert spec.get('stage','blockout')==args.stage
 FONT='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 font=lambda size:ImageFont.truetype(FONT,size)
 files=[]
@@ -22,7 +26,7 @@ def write(name,image):
     p=DOC/(PREFIX+name+'.png');image.save(p);files.append(p)
 
 def footer(draw,size):
-    draw.text((16,size[1]-28),'【黄忠】 SGODOT-355 / '+args.id+' / 灰模 / Godot Mobile',font=font(16),fill='#415650')
+    draw.text((16,size[1]-28),'【黄忠】 SGODOT-355 / '+args.id+' / '+STAGE+' / Godot Mobile',font=font(16),fill='#415650')
 
 three=Image.new('RGB',(1440,610),'#edf2ef');draw=ImageDraw.Draw(three)
 draw.text((16,10),args.id+' / 三视图',font=font(24),fill='#30463f')
@@ -43,11 +47,21 @@ for i,(name,anim) in enumerate(spec['anims'].items()):
     image=Image.open(OUT/'captures'/('action_'+name+'.png')).convert('RGB').resize((360,360),Image.Resampling.LANCZOS)
     sheet.paste(image,(x,y+27))
 footer(draw,sheet.size);write('animation_keys',sheet)
-capture=Image.open(OUT/'captures/mine_default_43deg.png').convert('RGB')
-mine=Image.new('RGB',(360,900),'#edf2ef');mine.paste(capture,(0,68));draw=ImageDraw.Draw(mine)
-draw.text((12,8),'灰模 / 矿内默认 43°',font=font(17),fill='#30463f')
-draw.text((12,39),'玩家 1.745 m / 史莱姆 r=0.40 m',font=font(12),fill='#52675f')
-draw.text((12,877),'【黄忠】 SGODOT-355 / Godot Mobile',font=font(12),fill='#415650');write('mine_default_43deg',mine)
+if args.id=='mob_cave_bat' and args.stage=='final_v1':
+    sequence=Image.new('RGB',(1440,610),'#edf2ef');draw=ImageDraw.Draw(sequence)
+    draw.text((16,10),'die / 先收翅，再下落；保留体积，程序接淡出',font=font(23),fill='#30463f')
+    for i,(name,title) in enumerate([('death_start','0.00s / 开始'),('death_folded','0.22s / 收拢翅膀'),('death_dropped','0.58s / 已下落约 0.62m')]):
+        sequence.paste(Image.open(OUT/'captures'/(name+'.png')).convert('RGB'),(i*480,95))
+        draw.text((i*480+16,62),title,font=font(18),fill='#30463f')
+    footer(draw,sequence.size);write('death_sequence',sequence)
+mine_views=[('mine_default_43deg','灰模 / 矿内默认 43°')] if args.stage=='blockout' else [
+    ('red_mine_default_43deg','正式版 v1 / 红岩矿 43°'),('purple_mine_default_43deg','正式版 v1 / 紫灰岩矿 43°')]
+for name,title in mine_views:
+    capture=Image.open(OUT/'captures'/(name+'.png')).convert('RGB')
+    mine=Image.new('RGB',(360,900),'#edf2ef');mine.paste(capture,(0,68));draw=ImageDraw.Draw(mine)
+    draw.text((12,8),title,font=font(17),fill='#30463f')
+    draw.text((12,39),'玩家 1.745 m / 史莱姆 r=0.40 m',font=font(12),fill='#52675f')
+    draw.text((12,877),'【黄忠】 SGODOT-355 / Godot Mobile',font=font(12),fill='#415650');write(name,mine)
 record=DOC/(PREFIX+'validation.json')
 record.write_text(json.dumps({'author':'黄忠','virtual_user_id':AUTHOR,'passed':True,'geometry':geometry,'godot':godot},ensure_ascii=False,indent=2)+'\n');files.append(record)
 (DOC/(PREFIX+'media-manifest.json')).write_text(json.dumps([{'file':p.name,'bytes':p.stat().st_size,

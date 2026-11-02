@@ -1,0 +1,38 @@
+[
+  {
+    "file": "SGODOT-355_mob_cave_bat_final_v1_three_views.png",
+    "bytes": 80654,
+    "sha256": "4530ab8743e0d117e9a422b9b6bfbffbfc12cbb0ac72c850487a51ef67e799d5",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_final_v1_animation_keys.png",
+    "bytes": 234107,
+    "sha256": "847bb1a64901b603ae156aa0015f2084b4718d54e6e0e5e1a5850fb9c7d50358",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_final_v1_death_sequence.png",
+    "bytes": 120038,
+    "sha256": "2898aab6cfc8bbf15b32b7d85c61682b7e464e3fb0b1bd19ae1182c0a71ad36f",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_final_v1_red_mine_default_43deg.png",
+    "bytes": 155118,
+    "sha256": "1247d8ff9fecef1012bd3e4c52e4b55cb3c9c6d2d1bb963b957c165a97ae7c8f",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_final_v1_purple_mine_default_43deg.png",
+    "bytes": 151807,
+    "sha256": "df89f6ecb83516c5df5901e648ed99091181f137e188345d1007b67f67acb40b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_cave_bat_final_v1_validation.json",
+    "bytes": 87728,
+    "sha256": "90855685f8a26fe2e98946c32264b910282095a81d3de14f5325741b91d3f95a",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

@@ -2,6 +2,7 @@
 from pathlib import Path
 import math
 import sys
+import argparse
 import bpy
 import bmesh
 from mathutils import Vector
@@ -28,7 +29,7 @@ def mesh(name,vertices,faces,color,bone,mask,mat):
 PROFILE=[(0,.40),(.265,.39),(.295,.40),(.30,.435),(.28,.51),(.235,.59),(.16,.657),(.08,.69),(0,.70)]
 
 
-def cap(mat):
+def cap(mat,stage):
     vertices=[];rings=[];faces=[];segments=32
     for radius,y in PROFILE:
         ring=[]
@@ -42,7 +43,7 @@ def cap(mat):
             if len(a)==1:faces.append((a[0],b[j],b[i]))
             elif len(b)==1:faces.append((a[i],a[j],b[0]))
             else:faces.append((a[i],a[j],b[j],b[i]))
-    obj=mesh('Rounded coral mushroom cap',vertices,faces,'D9857D','cap',1,mat)
+    obj=mesh('Rounded coral mushroom cap',vertices,faces,'E45D68' if stage=='final_v1' else 'D9857D','cap',1,mat)
     colors=obj.data.color_attributes['Color']
     rgb=[int('D8C6A6'[i:i+2],16)/255 for i in [0,2,4]]
     linear=[((v+.055)/1.055)**2.4 for v in rgb]
@@ -63,7 +64,7 @@ def cap(mat):
                 points.append((px,height(px,pz),pz))
         faces=[(0,i+1,(i+1)%12+1) for i in range(12)]
         faces += [(i+1,13+i,13+(i+1)%12,1+(i+1)%12) for i in range(12)]
-        patch=mesh('Cream cap spot '+str(index+1),points,faces,'F7E5C4','cap',0,mat)
+        patch=mesh('Cream cap spot '+str(index+1),points,faces,'FFFDF6' if stage=='final_v1' else 'F7E5C4','cap',0,mat)
         for face in patch.data.polygons:
             if face.normal.z<0:
                 bm=bmesh.new();bm.from_mesh(patch.data);bmesh.ops.reverse_faces(bm,faces=bm.faces);bm.to_mesh(patch.data);bm.free();break
@@ -123,6 +124,8 @@ def pose(name,u,t,bones):
 
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--stage',choices=['blockout','final_v1'],default='final_v1')
+    args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
     mat=m.start(ID)
     m.ellipsoid('Cream rounded stem',(0,.255,0),(.29,.36,.265),'EEE0BD','stem',1,mat,16,8)
     for side,sign in [('l',-1),('r',1)]:
@@ -131,12 +134,14 @@ def main():
         m.ellipsoid('Black eye '+side,(sign*.054,.307,.127),(.031,.046,.022),'30303C','stem',0,mat,8,6)
         m.ellipsoid('White eye glint '+side,(sign*.054-.005,.318,.138),(.011,.013,.006),'FFF8ED','stem',0,mat,6,4)
         m.ellipsoid('Rose cheek '+side,(sign*.092,.271,.111),(.040,.025,.010),'E8B0C6','stem',0,mat,8,4)
-    cap(mat)
+    cap(mat,args.stage)
     bones=[('root',None,(0,0,0)),('stem','root',(0,.24,0)),('cap','stem',(0,.40,0)),
         ('arm_l','stem',(-.14,.32,0)),('arm_r','stem',(.14,.32,0)),
         ('foot_l','root',(-.075,.08,0)),('foot_r','root',(.075,.08,0))]
     rig=m.skeleton(bones);m.animate(rig,ANIMS,pose)
     m.export(ID,rig,{'radius':.32,'height':.70,'hit_point':[0,.28,.04],'badge_point':[0,.92,0],
+        'stage':args.stage,'palette':{'cap':'E45D68' if args.stage=='final_v1' else 'D9857D',
+            'cap_spots':'FFFDF6' if args.stage=='final_v1' else 'F7E5C4','stem':'EEE0BD'},
         'spore_point':[0,.65,0],'anims':ANIMS,
         'note':'hide is a one-shot 1.0s clip ending tucked; consumer controls hold time. Spore emission is at .35s. No root motion.'})
 

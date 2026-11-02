@@ -1,6 +1,7 @@
 """Named smooth parts, one rigid bone per vertex, one vertex-colour glTF surface."""
 from pathlib import Path
 import json
+import hashlib
 import math
 import sys
 import bpy
@@ -136,10 +137,21 @@ def export(identity,rig,metadata):
         export_optimize_animation_size=False,export_cameras=False,export_lights=False)
     metadata.update(id=identity,triangles=triangles,surfaces=1,bones=len(rig.data.bones),
         bounds=bounds,height=bounds[1][1],
-        tint_mask='UV2.x',cast_shadow=False,root_motion=False,front='+Z',stage='blockout',
+        tint_mask='UV2.x',cast_shadow=False,root_motion=False,front='+Z',stage=metadata.get('stage','blockout'),
         source_concept='Plane 355 c368e7dd',author='黄忠',virtual_user_id='5281cd25-6a49-4df8-9802-f3e534956e80')
     metadata['durations']={name:clip['length'] for name,clip in metadata['anims'].items()}
     metadata['hit_at']=metadata['anims']['attack']['hit_at']
     if 'spore' in metadata['anims']:metadata['spore_at']=metadata['anims']['spore']['emit_at']
     (directory/(identity+'.json')).write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n')
+    reference=SOURCE/'reference/SGODOT-355_monsters_concept_v1.1.jpg'
+    provenance={'asset':identity,'stage':metadata['stage'],'kind':'original procedural geometry',
+        'author':'黄忠','virtual_user_id':metadata['virtual_user_id'],
+        'source_script':str((source/'build.py').relative_to(ROOT)),
+        'source_blend':str((source/(identity+'.blend')).relative_to(ROOT)),
+        'reference':'Plane 355 c368e7dd / approved concept v1.1',
+        'reference_sha256':hashlib.sha256(reference.read_bytes()).hexdigest(),
+        'runtime_sha256':hashlib.sha256((directory/(identity+'.glb')).read_bytes()).hexdigest(),
+        'triangles':triangles,'bones':metadata['bones'],'surfaces':1,
+        'method':'Named smooth Blender parts; one rigid bone per vertex; original vertex colours and UV2.x tint mask; no external mesh or texture.'}
+    (source/'reuse_provenance.json').write_text(json.dumps(provenance,ensure_ascii=False,indent=2)+'\n')
     print('MONSTER_EXPORT',identity,triangles,len(rig.data.bones),flush=True)
