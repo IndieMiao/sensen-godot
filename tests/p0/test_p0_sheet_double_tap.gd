@@ -45,15 +45,14 @@ func test_every_material_sheet_fits_after_layout() -> void:
 		assert_float(d.height).is_equal_approx(_fitted(d), 1.0)
 
 ## A fast second tap on a farm card's button reaches the farm while a sheet is already up: it opens nothing more (the
-## farm's own cards since its gathering spots left for the cities, SGODOT-355 b1).
+## farm's own card since its gathering spots left for the cities and its mine mouth for the wild sites, SGODOT-355 b1).
 func test_a_tap_on_a_farm_card_while_a_sheet_is_up_opens_nothing_more() -> void:
 	var first := P0MaterialCards.open_locked_spot(ui, ui.view, "spot_clay_bank")
 	var rt := P0Runtime.new()
 	rt.ui = ui
 	var fm := P0FarmMaterials.new()
 	fm.rt = rt
-	for id in ["workbench", "mine"]:
-		assert_bool(fm.tap_card(id)).override_failure_message(id).is_true()   # taken, so the farm does nothing else with it
+	assert_bool(fm.tap_card("workbench")).is_true()   # taken, so the farm does nothing else with it
 	assert_str(ui.modal_kind).is_equal("locked_spot")
 	assert_object(ui._modal.get_child(1)).is_same(first)    # the same sheet: no second one opened
 	fm.free()
