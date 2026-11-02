@@ -31,8 +31,8 @@ for i,(name,title) in enumerate([('front','正面'),('side','右侧'),('back','�
     three.paste(Image.open(OUT/'captures'/(name+'.png')).convert('RGB'),(i*480,100))
     draw.text((i*480+16,75),title,font=font(18),fill='#30463f')
 footer(draw,three.size);write('three_views',three)
-columns=4;rows=(len(spec['anims'])+columns-1)//columns
-sheet=Image.new('RGB',(1440,rows*390+120),'#edf2ef');draw=ImageDraw.Draw(sheet)
+columns=3 if len(spec['anims'])==9 else 4;rows=(len(spec['anims'])+columns-1)//columns
+sheet=Image.new('RGB',(columns*360,rows*390+120),'#edf2ef');draw=ImageDraw.Draw(sheet)
 draw.text((16,10),args.id+' / 全动作关键帧',font=font(24),fill='#30463f')
 for i,(name,anim) in enumerate(spec['anims'].items()):
     x=(i%columns)*360;y=55+(i//columns)*390

@@ -138,5 +138,8 @@ def export(identity,rig,metadata):
         bounds=bounds,height=bounds[1][1],
         tint_mask='UV2.x',cast_shadow=False,root_motion=False,front='+Z',stage='blockout',
         source_concept='Plane 355 c368e7dd',author='黄忠',virtual_user_id='5281cd25-6a49-4df8-9802-f3e534956e80')
+    metadata['durations']={name:clip['length'] for name,clip in metadata['anims'].items()}
+    metadata['hit_at']=metadata['anims']['attack']['hit_at']
+    if 'spore' in metadata['anims']:metadata['spore_at']=metadata['anims']['spore']['emit_at']
     (directory/(identity+'.json')).write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n')
     print('MONSTER_EXPORT',identity,triangles,len(rig.data.bones),flush=True)

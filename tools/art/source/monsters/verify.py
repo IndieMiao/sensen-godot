@@ -40,10 +40,17 @@ mask=read(attrs['TEXCOORD_1'])[:,0];colors=read(attrs['COLOR_0'])
 check(set(np.round(mask,6))=={0,1},'UV2.x contains both binary tint regions')
 check(len(colors)==len(points) and len(np.unique(colors,axis=0))>=5,'Actual vertex paint has body and face colours')
 check((mask[colors[:,:3].max(1)<.08]==0).all(),'Dark eyes and mouth excluded from tint')
-check((mask[(colors[:,0]>.5)&(colors[:,2]>.25)&(colors[:,1]<.55)]==0).all(),'Pink face patches excluded from tint')
+cheek=np.array([int('E8B0C6'[i:i+2],16)/255 for i in [0,2,4]])
+cheek=((cheek+.055)/1.055)**2.4
+pink=np.max(abs(colors[:,:3]-cheek),axis=1)<.006
+check(pink.any() and (mask[pink]==0).all(),'Pink face patches excluded from tint')
 names=[node.get('name','') for node in doc['nodes']];check(names.count('root')==1,'Exactly one root bone')
 root=names.index('root');check(np.allclose(doc['nodes'][root].get('translation',[0,0,0]),[0,0,0]),'Root origin on ground')
 check(set(a['name'] for a in doc['animations'])==set(spec['anims']),'Exact final animation names')
+check('hit_point' in spec and 'hurt_point' not in spec,'Client hit_point key replaces hurt_point')
+check(spec['durations']=={name:clip['length'] for name,clip in spec['anims'].items()},'Client durations match all animation metadata')
+check(spec['hit_at']==spec['anims']['attack']['hit_at'],'Client top-level hit_at matches attack')
+if 'spore' in spec['anims']:check(spec['spore_at']==spec['anims']['spore']['emit_at'],'Client spore_at matches emission time')
 for animation in doc['animations']:
     name=animation['name'];expected=spec['anims'][name];duration=0.;moving=0
     for channel in animation['channels']:
@@ -57,6 +64,7 @@ for animation in doc['animations']:
             if channel['target']['path']=='rotation':endpoint|=np.allclose(values[0],-values[-1],atol=1e-5)
             check(endpoint,name+': loop endpoints coincide for '+channel['target']['path'])
     check(abs(duration-expected['length'])<.00001,name+': JSON timing matches glTF')
+    check(abs(duration-spec['durations'][name])<.00001,name+': client duration matches glTF')
     check(moving>0,name+': has moving bone tracks')
     for event in ['hit_at','emit_at']:
         if event in expected:check(0<expected[event]<duration,name+': valid '+event)

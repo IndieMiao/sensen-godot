@@ -97,6 +97,9 @@ func geometry():
 		check(absf(actual[1][0]-actual[0][0]-1)<.001,"One metre rest wingspan")
 		var at=skeleton.global_transform*skeleton.get_bone_global_rest(skeleton.find_bone("body")).origin
 		check(absf(at.y-1.0)<.001,"Hover body centre in rest at Y=1.0")
+	elif identity=="mob_shroomling":
+		check(absf(actual[1][0]-actual[0][0]-.60)<.001,"Shroom cap diameter .60m")
+		check(absf(actual[0][1])<.0001 and absf(actual[1][1]-.70)<.01,"Shroom rests on ground and height about .70m including cap spots")
 	var config=ConfigFile.new();config.load("res://assets/monsters/"+identity+"/"+identity+".glb.import")
 	check(str(config.get_value("remap","uid","")).begins_with("uid://"),"Godot-generated import UID")
 	report.geometry={"rest_bounds":actual,"triangles":spec.triangles,"bones":skeleton.get_bone_count(),
@@ -161,15 +164,21 @@ func run():
 	if "--context-only" in OS.get_cmdline_user_args():
 		report=JSON.parse_string(FileAccess.get_file_as_string(output+"/godot-validation.json"))
 	else:
-		await geometry();await motions()
+		await geometry()
 		player.stop();skeleton.reset_bone_poses();await get_tree().process_frame
 		for view in [["front",0],["side",90],["back",180]]:
-			pose_camera(view[1]);await capture(view[0])
+			if identity=="mob_shroomling":pose_camera(view[1],0,1.05,Vector3(0,.37,0))
+			else:pose_camera(view[1])
+			await capture(view[0])
+		await motions()
 		for name in spec.anims:
 			var time=spec.anims[name].get("hit_at",spec.anims[name].get("emit_at",spec.anims[name].length*.5))
 			if name in ["idle","move","fly_high"]:time=spec.anims[name].length*.125
 			if name=="die":time=spec.anims[name].length*.85
-			await seek(name,time);pose_camera(20,18,1.75,Vector3(0,.70,0));await capture("action_"+name)
+			await seek(name,time)
+			if identity=="mob_shroomling":pose_camera(20,18,1.15,Vector3(0,.35,0))
+			else:pose_camera(20,18,1.75,Vector3(0,.70,0))
+			await capture("action_"+name)
 	await mine_context()
 	check(report.has("mine") and FileAccess.file_exists(output+"/mine_default_43deg.png"),"Mine comparison completed")
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}

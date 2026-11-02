@@ -1,0 +1,26 @@
+[
+  {
+    "file": "SGODOT-355_mob_shroomling_blockout_three_views.png",
+    "bytes": 96794,
+    "sha256": "9270041fd8ce9cca79dbc3cfe5c5b78986f90b0af542221d53fbf2b44fa2009b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_shroomling_blockout_animation_keys.png",
+    "bytes": 273952,
+    "sha256": "e0cc14197a1cdff3b1a71e7ab5fef98bcec2fad4af2f0de6f024f7464ca43eb0",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_shroomling_blockout_mine_default_43deg.png",
+    "bytes": 154912,
+    "sha256": "b29c31e76315dce71a5b128a9c7bb5100875badb7561f96f1e4ea60f590f3404",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mob_shroomling_blockout_validation.json",
+    "bytes": 77878,
+    "sha256": "64dae43fbb6790d4643ca602ad5aaa77769d2784492f79bcd1f72918db94347b",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

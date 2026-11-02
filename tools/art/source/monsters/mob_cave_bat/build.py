@@ -65,7 +65,7 @@ def main():
         bones += [('ear_'+side,'body',(sign*.11,1.16,0)),('wing_'+side+'1','body',(sign*.14,1.06,-.045)),
             ('wing_'+side+'2','wing_'+side+'1',(sign*.305,1.24,-.045)),('foot_'+side,'body',(sign*.075,.82,0))]
     rig=m.skeleton(bones);m.animate(rig,ANIMS,pose)
-    m.export(ID,rig,{'radius':.30,'height':1.33,'hurt_point':[0,1.0,.05],'badge_point':[0,1.55,0],
+    m.export(ID,rig,{'radius':.30,'height':1.33,'hit_point':[0,1.0,.05],'badge_point':[0,1.55,0],
         'hover_center':[0,1.0,0],'anims':ANIMS,'note':'Hover height is in rest pose; fly_high adds no flight-height offset. Movement and blob shadow belong to the consumer.'})
 
 
