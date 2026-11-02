@@ -292,6 +292,52 @@ static func ko_card(view: Dictionary, mine: String, floor: int, lost: Array) -> 
 		"lost": lost.map(func(l): return {"item": str(l[0]), "text": "%s ×%d" % [P0Logic.item_name(view, str(l[0])), int(l[1])]}) if dropped else [],
 		"best": "Your best here is still Floor %d." % best, "button": "Close"}
 
+# --- A wild site's mine on its mouth card (C's card, E's rows: contract-c §2, contract-efg §7.3) ---
+
+## The mine's part of a wild site's mouth card (E1 321:181190, v4q(5) ⑩ ⑪), [title, text] rows in the card's order, for
+## 亚瑟's card to draw as they come: `Main ore` `Iron Ore · from F10` (a vein; a quarry has no single main, #616),
+## `Monsters` the first 3 kinds by floor, `Boss` each guardian on its floors (`Iron Slime King · F20`, one line a kind),
+## `You` `Best here F12` / `Not visited`. No `Also` row (丁13: no side ore in the first batch). `site` is the viewport's
+## (P0WildSites: the catalogue's `mine` and the player's best_floor); a mine not open yet (a grey pin) has no rows — the
+## card says Not open yet itself. Floors past the mine's open ones (a vein's F41 on) are not on the card.
+static func wild_mine_rows(view: Dictionary, site: Dictionary) -> Array:
+	var mine = site.get("mine", null)
+	if not bool(site.get("open", false)) or not (mine is Dictionary): return []
+	var last := wild_mine_last(site)
+	var type: Dictionary = P0Logic.content().get("mine", {}).get("types", {}).get(str(site.get("type", "")), {})
+	var rows: Array = []
+	if mine.get("main", null) != null:
+		rows.append(["Main ore", "%s · from F%d" % [P0Logic.item_name(view, str(mine.main)), int(mine.get("main_from", 1))]])
+	var kinds: Array = []
+	for band in type.get("bands", []):
+		if int(band.get("from", 1)) > last: continue
+		for m in band.get("mobs", []):
+			if not kinds.has(str(m[0])): kinds.append(str(m[0]))
+	if not kinds.is_empty():
+		rows.append(["Monsters", " · ".join(kinds.slice(0, 3).map(func(k): return monster_name(k)))])
+	var guards := {}   # kind → its floors, in the order met
+	var floors: Array = type.get("floors", {}).keys().map(func(f): return int(f))
+	floors.sort()
+	for f in floors:
+		var g := str(type.floors[str(f)].get("guard", ""))
+		if g != "" and f <= last: guards[g] = guards.get(g, []) + ["F%d" % f]
+	if not guards.is_empty():
+		rows.append(["Boss", "\n".join(guards.keys().map(func(g): return "%s · %s" % [monster_name(g), ", ".join(guards[g])]))])
+	var best := int(site.get("best_floor", 0))
+	rows.append(["You", "Best here F%d" % best if best > 0 else "Not visited"])
+	return rows
+
+## The deepest floor open in a wild site's mine: a vein's open_to (40; F41 on is `Not open yet`), else its floors.
+static func wild_mine_last(site: Dictionary) -> int:
+	var mine: Dictionary = site.get("mine", {}) if site.get("mine", null) is Dictionary else {}
+	var floors := int(mine.get("floors", 0))
+	return mini(floors, int(mine.open_to)) if mine.get("open_to", null) != null and int(mine.open_to) > 0 else floors
+
+## The floors part of the card's type line (`Vein mine · Floors 1–40 · near San Jose`, E1): `Floors 1–40`, "" for none.
+static func wild_mine_floors(site: Dictionary) -> String:
+	var last := wild_mine_last(site)
+	return "Floors 1–%d" % last if bool(site.get("open", false)) and last > 0 else ""
+
 ## What a server refusal of a material command says (苏烈's #39 review). null: not ours, the runtime's own wording
 ## applies (need_energy opens the Energy card). "": quiet — a race the next frame shows anyway (a held repeat hitting
 ## the 0.9 s tempo, a rock another press already broke, a torch already lit, a swing racing a kill, an item on the floor
