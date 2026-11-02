@@ -29,6 +29,9 @@ const HAPTIC_MS := 20
 var _weapon := {"damage": 3, "speed": 2.0, "range": REACH, "knockback": KNOCKBACK}
 ## Where each monster of this floor fell (index → position): a drop the bag had no room for lies there (v4q(5) ⑫).
 var fallen := {}
+## Monsters down and still showing their `die` (id → {enemy, left}): out of the fight, their look played on until the
+## json's die time runs out (contract-efg §10; 刘邦 on #627).
+var dying := {}
 
 ## The weapon from the view (mine.weapon {attack, speed}); damage feeds the floating number only.
 func weapon(_state: Dictionary) -> Dictionary:
@@ -50,6 +53,7 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 		for enemy in _actors.values(): enemy.node.queue_free()
 		enemies.clear()
 		_actors.clear()
+		dying.clear()
 		fallen.clear()
 		_fx.clear()   # a strike from the last floor never lands on this one
 		grace = LANDING_GRACE_S
@@ -84,10 +88,14 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 				for bar in ["HealthFill", "HealthTrack"]: (enemy.node.get_node(bar) as Node3D).visible = true
 		enemy.hp = hp
 		if hp <= 0:
-			fallen[i] = enemy.node.position
-			enemy.node.visible = false
-			enemies.erase(id)
+			if enemies.has(id):   # just now: once, however many syncs say it again
+				fallen[i] = enemy.node.position
+				_die(id, enemy)
 			continue
+		if str(enemy.phase) == "dead":   # back up (a reply's view rolled back), falling or fallen: standing again
+			dying.erase(id)
+			enemy.phase = "idle"
+			enemy.node.call("play", "idle")
 		enemy.node.visible = true
 		enemies[id] = enemy
 		enemy.mover.bp = player_mover.bp
@@ -103,8 +111,22 @@ func down(i: int) -> void:
 	_number(enemy.node.position + Vector3(0, 1, 0), str(int(enemy.hp)), Color("fff3bd"))
 	fallen[i] = enemy.node.position
 	enemy.hp = 0
-	enemy.node.visible = false
+	_die(id, enemy)
+
+## Down: out of the fight at once (no hit, no touch, not alive for the ladder), its look playing `die` for its json's
+## time (a model folds and fades, 上官婉儿; 刘邦's views fade in update) and then gone; a kind that times no die (the
+## slime's placeholder) is gone now, as it always was.
+func _die(id: String, enemy: Dictionary) -> void:
 	enemies.erase(id)
+	enemy.phase = "dead"   # no brain runs it; back above 0 HP it stands again (亚瑟 on #685)
+	var node = enemy.node
+	var left := float(node.call("duration", "die")) if node.has_method("duration") else 0.0
+	if left <= 0.0:
+		node.visible = false
+		return
+	node.visible = true
+	node.call("play", "die")
+	dying[id] = {"enemy": enemy, "left": left}
 
 ## The id a monster index goes by in the old combat ("slime_1" …) and back.
 static func mob_id(i: int) -> String: return "slime_%d" % (i + 1)
@@ -159,6 +181,11 @@ func _dash_step(enemy: Dictionary, player: PlayerMover, offset: Vector3) -> Vect
 	if disc < 0.0: return offset
 	var t := (-b - sqrt(disc)) / (2.0 * a)   # where |from + t·flat| first reaches contact
 	return offset * t if t >= 0.0 and t <= 1.0 else offset
+
+## A brain's moves (contract-efg §10; 亚瑟 on #627: not the fight's private helpers): `slide` a short move that never goes
+## through a wall, `dash_step` a dash's step cut where the body would reach the player's edge.
+func slide(mover: PlayerMover, offset: Vector3) -> void: _slide(mover, offset)
+func dash_step(enemy: Dictionary, player: PlayerMover, offset: Vector3) -> Vector3: return _dash_step(enemy, player, offset)
 
 ## Flat distance from `at` to a monster's body edge (its spec radius), 0 inside it.
 static func edge_distance(at: Vector3, enemy: Dictionary) -> float:
@@ -239,6 +266,15 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 		var was := str(before.get(id, ""))
 		if str(e.phase) == "windup" and was != "windup" and HAPTIC_MS > 0 and OS.has_feature("mobile"): Input.vibrate_handheld(HAPTIC_MS)
 		e.node.update(e, was, delta, stepped, _elapsed)
+	# the fallen play their die out, paused or not (a reply's sync can down one while the fight holds still)
+	for id in dying.keys():
+		var d: Dictionary = dying[id]
+		var e: Dictionary = d.enemy
+		e.node.update(e, "dead", delta, stepped, _elapsed)
+		d.left = float(d.left) - delta
+		if float(d.left) <= 0.0:
+			e.node.visible = false
+			dying.erase(id)
 
 ## The old mine's frame (mine_combat.step) with the moves from each monster's brain: the clocks, the landing grace, then
 ## each monster, at most one finding its path a frame (perf Q6). Whether the monsters moved this frame.
