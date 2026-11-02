@@ -143,7 +143,7 @@ describe('coming home (q(40)) and Timber Run from storage', () => {
     expect(r.s.storage.wild_herb).toBeUndefined();
     expect(count(r.s.bag, 'torch')).toBe(2);
     expect(count(r.s.bag, 'bait_worm')).toBe(3);
-    expect(count(r.s.bag, 'seed_radish')).toBe(20);
+    expect(count(r.s.bag, 'seed_radish')).toBe(12);   // the start bag's (v4q(4) ⑥ 戊1)
     const stored = r.ev.find(e => e.kind === 'stored');
     expect(stored).toMatchObject({ kind: 'stored', reason: 'home' });
     expect(r.s.storage_auto?.at).toBe(T0 + 2 * STEP);

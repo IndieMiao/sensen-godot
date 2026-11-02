@@ -37,11 +37,12 @@ describe('the start bag (q(217) ②)', () => {
   it('gives a guided save Quick Radish Seeds ×2 first, then the usual two stacks (3/25)', () => {
     const s = guided();
     expect(s.guide?.step).toBe('t_sow_quick');
-    expect(s.bag).toEqual([{ id: QUICK, qty: 2 }, { id: 'seed_radish', qty: 20 }, { id: 'seed_lettuce', qty: 10 }]);
+    // v4q(4) ⑥ 戊1 (q(217) ② for 8 starting Plots): Radish ×12, Lettuce ×6
+    expect(s.bag).toEqual([{ id: QUICK, qty: 2 }, { id: 'seed_radish', qty: 12 }, { id: 'seed_lettuce', qty: 6 }]);
   });
 
   it('gives a save outside the guide the two stacks as before', () => {
-    expect(freshState(c, 'quick-radish-02', T0, 42).bag).toEqual([{ id: 'seed_radish', qty: 20 }, { id: 'seed_lettuce', qty: 10 }]);
+    expect(freshState(c, 'quick-radish-02', T0, 42).bag).toEqual([{ id: 'seed_radish', qty: 12 }, { id: 'seed_lettuce', qty: 6 }]);
     // no steps in the table (the shipped one until 339's land): no guide, no quick seeds
     const plain = loadP0Content();
     plain.guide = { steps: [], recover: [], tips: {} };

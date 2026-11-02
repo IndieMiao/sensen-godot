@@ -3875,7 +3875,7 @@ func _hide_tip(close_queue := true) -> void:
 	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
 
 ## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2).
-const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}
+const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map", "travel": "travel"}
 
 ## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
 func _show_tip(text: String, key := "") -> void:

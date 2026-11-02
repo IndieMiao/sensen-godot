@@ -1886,7 +1886,7 @@ static func _first_sow_row(view: Dictionary) -> Dictionary:
 	return r
 
 ## A resident's request entry in the content table by id: their line (`requests`) or their teaching requests
-## (`intro_requests`, q(218): Nadia's A Fresh Radish / Six Radishes, kept outside the line); {} when neither has it.
+## (`intro_requests`, q(218): Nadia's A Fresh Radish / Four Radishes, kept outside the line); {} when neither has it.
 static func resident_request(id: String, req_id: String) -> Dictionary:
 	var def: Dictionary = content().get("residents", {}).get(id, {})
 	for q in def.get("requests", []) + def.get("intro_requests", []):
@@ -2005,7 +2005,7 @@ static func _request_gap(view: Dictionary, req: Dictionary) -> String:
 	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	match str(req.get("kind", "")):
 		"sow": return "Plant %d more plot%s" % [left, "" if left == 1 else "s"]
-		# q(218) ②: Six Radishes counts what is harvested after accepting — `Harvest 4 more Radishes` / `Harvest 1 more Radish`
+		# q(218) ②: Four Radishes counts what is harvested after accepting — `Harvest 3 more Radishes` / `Harvest 1 more Radish`
 		"harvest":
 			var crop := item_name(view, item) if item != "" else "crop"
 			return "Harvest %d more %s" % [left, plural(crop) if left > 1 else crop]
