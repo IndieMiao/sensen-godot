@@ -256,6 +256,7 @@ func test_p0_city_list_is_the_home_cities_and_their_fallback_ten() -> void:
 ## returned so (P0Board.place_line: the outpost's name cut, the city whole).
 func test_p0_widths_are_measured_on_the_chinese() -> void:
 	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
 	t.set_table({"The Old Riverside Botanical Tea Pavilion": "老河畔植物园茶亭", "Shanghai": "上海",
 		"Botanical Tea Pavilion of the Long Riverside Walk": "长长的河畔步道旁边那座植物园里的茶亭和花园"})
 	TranslationServer.add_translation(t)
@@ -323,3 +324,27 @@ func test_p0_the_gear_rod_line_reads_as_one_sentence() -> void:
 		"Lands up to %s fish · Bite window %.1f s": "最高可钓到%s鱼 · 咬钩窗口 %.1f 秒"})
 	assert_str(String(t.get_message("Lands up to Fine fish · Bite window 2.2 s"))).is_equal("最高可钓到上品鱼 · 咬钩窗口 2.2 秒")
 	assert_str(String(t.get_message("Lands up to Fine fish"))).is_equal("最高可钓到上品鱼")
+
+## #649 第二批 ⑤ (zh-01 「小萝卜种子」 past the slot): a quick slot's name under 中文 is broken by the character over the
+## slot's 52, two lines at most; past two a last 「种子」 goes. English as before.
+func test_p0_a_quick_slots_chinese_name_breaks_by_the_character() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"Quick Radish Seeds": "小萝卜种子", "Giant Red Radish Seeds": "超级无敌快熟大红萝卜种子"})
+	TranslationServer.add_translation(t)
+	Localization.set_cjk_fonts(true)
+	assert_str(UiItemCell.quick_name("Quick Radish Seeds")).is_equal("小萝卜种子")   # two lines at most: whole
+	assert_int(UiItemCell.quick_lines("小萝卜种子")).is_less_equal(2)
+	assert_int(UiItemCell.quick_lines("超级无敌快熟大红萝卜种子")).is_greater(2)
+	assert_str(UiItemCell.quick_name("Giant Red Radish Seeds")).is_equal("超级无敌快熟大红萝卜")
+	var cell := UiItemCell.new(UiItemCell.Density.QUICK)
+	add_child(cell)
+	cell.title = "Quick Radish Seeds"
+	assert_int(cell._name.autowrap_mode).is_equal(TextServer.AUTOWRAP_ARBITRARY)
+	TranslationServer.set_locale("en")
+	assert_str(UiItemCell.quick_name("Quick Radish Seeds")).is_equal("Quick Radish")
+	cell.title = "Radish Seeds"
+	assert_int(cell._name.autowrap_mode).is_equal(TextServer.AUTOWRAP_WORD)
+	cell.queue_free()
+	Localization.set_cjk_fonts(false)
+	TranslationServer.remove_translation(t)

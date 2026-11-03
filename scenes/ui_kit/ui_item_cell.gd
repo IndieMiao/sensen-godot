@@ -310,6 +310,7 @@ static func _place(c: Control, anchor_x: float, x: float, y: float, w: float, h:
 ## 52; a word wider than that — `Chamomile`, `Strawberry` — sets the whole name in C9, the floor. A word wider still
 ## at C9 is a naming matter (李白), not a smaller size. A hyphen is a break too (`Salt-` / `Grilled`).
 static func quick_name_style(title: String) -> StringName:
+	if _cjk(title): return UiTokens.STYLE_C10_B   # broken by the character (中文): no word is wider than the slot
 	var th := UiKit.theme()
 	var font := th.get_font(&"font", UiTokens.STYLE_C10_B)
 	var fs := th.get_font_size(&"font_size", UiTokens.STYLE_C10_B)
@@ -321,11 +322,24 @@ static func quick_name_style(title: String) -> StringName:
 ## quick_name_style drops a last word `Seeds` / `Seed` (the seed-packet icon says it): `Quick Radish Seeds` →
 ## `Quick Radish`. Still more than two lines, it is set as q(197) sets it; nothing else is cut. Quick slots only (and
 ## the bag drawer's bar row, the same cell); the Bag's cells, the item card and Today keep the whole name.
+## Under 中文 (#649 第二批 ⑤, zh-01 「小萝卜种子」 past the slot) the name is the translation, broken by the character:
+## past two lines a last 「种子」 goes the same way (「小萝卜」).
 static func quick_name(title: String) -> String:
+	var shown := String(TranslationServer.translate(title))
+	if _cjk(shown):
+		if quick_lines(shown) <= 2 or not shown.ends_with(SEED_ZH): return shown
+		return shown.trim_suffix(SEED_ZH)
 	if quick_lines(title) <= 2: return title
 	for tail in [" Seeds", " Seed"]:
 		if title.ends_with(tail): return title.trim_suffix(tail)
 	return title
+const SEED_ZH := "种子"
+
+## Chinese in it (CJK and up): broken by the character, as AUTOWRAP_ARBITRARY does, not between words.
+static func _cjk(text: String) -> bool:
+	for c in text:
+		if c.unicode_at(0) >= 0x2E80: return true
+	return false
 
 ## Lines a quick slot's name takes across the slot's full 52 at its style, breaking between words (and after a hyphen)
 ## as the label's AUTOWRAP_WORD does.
@@ -337,6 +351,13 @@ static func quick_lines(title: String) -> int:
 	var width := float(UiTokens.SIZE_QUICK_SLOT_W)
 	var lines := 0
 	var line := ""
+	if _cjk(title):
+		for c in title:
+			if line != "" and font.get_string_size(line + c, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > width:
+				lines += 1
+				line = c.strip_edges()
+			else: line += c
+		return lines + (1 if line != "" else 0)
 	for word in title.replace("-", "- ").split(" ", false):
 		var joined := word if line == "" else (line + word if line.ends_with("-") else line + " " + word)
 		if line != "" and font.get_string_size(joined, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > width:
@@ -690,6 +711,7 @@ func _refresh_quick(s: State) -> void:
 	_qty.offset_bottom = name_top + _QUICK_NAME_H + _QUICK_QTY_H
 	_name.text = quick_name(title)
 	_name.theme_type_variation = quick_name_style(_name.text)
+	_name.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if _cjk(_name.text) else TextServer.AUTOWRAP_WORD
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
 	var ghost := s == State.GHOST
