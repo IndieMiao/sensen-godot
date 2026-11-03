@@ -58,6 +58,10 @@ assert.equal(build.package, PACKAGE);
 assert.equal(build.signer_sha256, CERTIFICATE, 'demo updates must keep the same certificate');
 assert.equal(build.server, API, 'the APK must point at the Hong Kong P0 server');
 assert.equal(build.key_baked, true, 'the demo key is missing from the APK');
+// An internal voice test export (build_demo_apk.sh with P0_DEV_CLEARTEXT) lets plain traffic through to a LAN host:
+// never a release. A build.json from before the switch has neither field, so only a true / a host refuses.
+assert(!build.dev_cleartext && build.network_security_config !== true,
+  'this APK was built with P0_DEV_CLEARTEXT (plain traffic allowed for an internal test): rebuild without it to publish');
 assert.equal(build.version_baked, build.version_code, 'x-p0-version must equal the versionCode');
 assert.equal(build.native_ok, true, 'Mapbox / LiveKit / the token are missing from the APK: ' + (build.native_missing ?? []).join(', '));
 assert.equal(build.legal_ok, true, 'license texts are missing from the APK: ' + (build.legal_missing ?? ['(built before the check)']).join(', '));

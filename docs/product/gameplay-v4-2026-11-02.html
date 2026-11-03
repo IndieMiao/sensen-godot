@@ -113,7 +113,7 @@ td { font-variant-numeric: tabular-nums; }
 <body>
 <header class="topbar"><div class="topbar-in">
   <span class="name">Gensen 玩法设定 v4</span>
-  <span class="meta"><span>2026-10-02</span><span>11 章</span><span>34 张表</span><span>独立完整版</span></span>
+  <span class="meta"><span>2026-10-02</span><span>11 章</span><span>33 张表</span><span>独立完整版</span></span>
 </div></header>
 
 <div class="shell">
@@ -612,8 +612,8 @@ td { font-variant-numeric: tabular-nums; }
 <h2 id="s1-5">1.5 免费的近处（第 36 条）</h2>
 <ul>
 <li>离家最近的 3 座城、最近的 3 个野外地点：<strong>永远免费</strong>（q(256) 兜底口径）；最近 10 座 ≤ Trip 2。</li>
-<li>「最近 3 个野外地点」= <strong>建档时按农场点算、冻结</strong>的 3 个（和城市兜底 clusters.ts 同口径），并保证其中<strong>至少 1 座浅坑、1 座矿脉</strong>，不够就把最近的换进来（审查 v4-1 #17：第一周去矿脉不花钱）。</li>
-<li>家附近（Trip 2 以内）保证至少 2 座浅坑、2 座矿脉，主产 / 副产互不相同（审查 v4-2 #10）。</li>
+<li>「最近 3 个野外地点」= <strong>选家城、改家城时按家城基点算、冻结</strong>的 3 个（同 q(184)），保证是<strong>浅坑、铁矿脉、石英矿脉各一座</strong>，不够就把最近的那种换进来（<strong>以 v4q(3) ③ 为准，用户 2026-11-02 批，庚3</strong>；原写「建档时按农场点、至少 1 座浅坑、1 座矿脉」）。</li>
+<li>家附近（Trip 2 以内）保证至少 2 座浅坑、2 座矿脉，主产 / 副产互不相同（审查 v4-2 #10）。（<strong>以 v4q(3) ③a 为准</strong>：改成计价保证——离家最近的铁矿脉、石英矿脉各一座加 2 座浅坑路费 ≤ Trip 2；野外点离城中心下限 20 km，用户定。）</li>
 </ul>
 <h2 id="s1-6">1.6 每档出门理由（第 14 条；30 分钟玩家）</h2>
 <div class="tbl"><table>
@@ -789,7 +789,10 @@ td { font-variant-numeric: tabular-nums; }
 <li>只上线一次的玩家（没有当晚那次）：第 1 天到 Lv3，Lv4 挪到第 2 天，之后整体晚半天到一天，Lv10 约第 7–8 天。</li>
 </ul>
 <h2 id="s2-3">2.3 三十级表</h2>
-<p>金币 = 档期天数 × 上一级的日收入（第 5 章 5.1）× 份额（第一周 50%，之后 40%），只要求不低于上一级，<strong>去掉了「× 1.05」的下限</strong>；Lv2–4 由开局钱包 180 和第 1 天卖货付。材料 = 档期天数 × 每天 9 分钟 × 份额 − 路上的时间 − 第一次去新矿的时间（记一半，第 3 章 3.7），按每件要几分钟折成件数；晶核、遗珍四舍五入，超出预算的部分折成天数加进到达日。</p>
+<blockquote>
+<p><strong>以 v4q(1) 为准（用户 2026-11-02 批）</strong>：Lv3 门槛 1 / 1（丁1）、Lv12 门槛 4 / 6 / 6（庚1）、Lv3 材料石 4 木 2、Lv4 石 10（庚2），下表已改；其余第一批口径见 v4q(1)。
+金币 = 档期天数 × 上一级的日收入（第 5 章 5.1）× 份额（第一周 50%，之后 40%），只要求不低于上一级，<strong>去掉了「× 1.05」的下限</strong>；Lv2–4 由开局钱包 180 和第 1 天卖货付。材料 = 档期天数 × 每天 9 分钟 × 份额 − 路上的时间 − 第一次去新矿的时间（记一半，第 3 章 3.7），按每件要几分钟折成件数；晶核、遗珍四舍五入，超出预算的部分折成天数加进到达日。</p>
+</blockquote>
 <div class="tbl"><table>
 <thead>
 <tr>
@@ -817,8 +820,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>T1</td>
 <td>0.1</td>
 <td>60</td>
-<td>石料 8、木材 4、黏土 2</td>
-<td>2 / 1 / —</td>
+<td>石料 4、木材 2、黏土 2</td>
+<td>1 / 1 / —</td>
 <td>—</td>
 </tr>
 <tr>
@@ -826,7 +829,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>T1</td>
 <td>0.4</td>
 <td>70</td>
-<td>木材 8、芦苇 4、石料 6、黏土 3、铜矿石 3、岩盐 1</td>
+<td>木材 8、芦苇 4、石料 10、黏土 3、铜矿石 3、岩盐 1</td>
 <td>2 / 2 / —</td>
 <td>—</td>
 </tr>
@@ -899,7 +902,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>9.4</td>
 <td>120</td>
 <td>木材 3、芦苇 2、石料 2、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 1、石英 1、煤 1</td>
-<td>5 / 6 / 6</td>
+<td>4 / 6 / 6</td>
 <td>—</td>
 </tr>
 <tr>
@@ -1270,66 +1273,19 @@ td { font-variant-numeric: tabular-nums; }
 <li>依赖还没实现的 P2 功能（密友、帮工、长途票、Trip 7 资格）的后果，在对应功能上线前不显示。</li>
 </ul>
 <h2 id="s2-8">2.8 第一周（30 分钟玩家，第一批的机制）</h2>
-<div class="tbl"><table>
-<thead>
-<tr>
-<th>天</th>
-<th>等级</th>
-<th>新东西</th>
-<th>去哪（新地方加粗）</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1 · 首会话</td>
-<td>Lv1 → 3</td>
-<td>调味架、保温柜、篱笆；田 8 → 12；Pip 委托</td>
-<td>家城：种、钓、做菜；<strong>家城的城里采集点</strong></td>
-</tr>
-<tr>
-<td>1 · 晚</td>
-<td>Lv4</td>
-<td>第二口灶；回血药</td>
-<td><strong>最近的浅坑</strong>（免费）F1–3，拿到铜剑</td>
-</tr>
-<tr>
-<td>2</td>
-<td>Lv5</td>
-<td>门廊、布告栏</td>
-<td><strong>第一座邻城</strong>（免费，第一枚签章，掌柜的本地委托）</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Lv6</td>
-<td>大锅</td>
-<td>浅坑 F4–8</td>
-</tr>
-<tr>
-<td>4</td>
-<td>Lv7</td>
-<td>背包 II</td>
-<td>浅坑 F10 <strong>第一只守关史莱姆王</strong>（个人首杀）</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Lv8</td>
-<td>进 T2：矿脉、铁剑配方</td>
-<td><strong>最近的矿脉</strong>（免费）F1–10</td>
-</tr>
-<tr>
-<td>6</td>
-<td>Lv9</td>
-<td>保温柜 12、摊位升级</td>
-<td><strong>第二座邻城</strong>（第二枚签章）</td>
-</tr>
-<tr>
-<td>7</td>
-<td>Lv10</td>
-<td>名厨招牌</td>
-<td>矿脉 F11–20，带铁剑打 F20 守关</td>
-</tr>
-</tbody>
-</table></div>
+<blockquote>
+<p><strong>以 v4q(1) ⑨ 为准（用户 2026-11-02 批方向，庚5）</strong>：矿脉开局就能去（丁12），第 3、4 天各开一座矿脉（铁、石英各走到 F10），第一只守关挪到第 2 天或第 5 天；Today / Pip 的带路提示见 v4q(9)。下表是原稿；<strong>逐日表、一周结算和第一只守关（第 2 天）以 v4q(10) 为准</strong>。
+| 天 | 等级 | 新东西 | 去哪（新地方加粗） |
+|---|---|---|---|
+| 1 · 首会话 | Lv1 → 3 | 调味架、保温柜、篱笆；田 8 → 12；Pip 委托 | 家城：种、钓、做菜；<strong>家城的城里采集点</strong> |
+| 1 · 晚 | Lv4 | 第二口灶；回血药 | <strong>最近的浅坑</strong>（免费）F1–3，拿到铜剑 |
+| 2 | Lv5 | 门廊、布告栏 | <strong>第一座邻城</strong>（免费，第一枚签章，掌柜的本地委托） |
+| 3 | Lv6 | 大锅 | 浅坑 F4–8 |
+| 4 | Lv7 | 背包 II | 浅坑 F10 <strong>第一只守关史莱姆王</strong>（个人首杀） |
+| 5 | Lv8 | 进 T2：矿脉、铁剑配方 | <strong>最近的矿脉</strong>（免费）F1–10 |
+| 6 | Lv9 | 保温柜 12、摊位升级 | <strong>第二座邻城</strong>（第二枚签章） |
+| 7 | Lv10 | 名厨招牌 | 矿脉 F11–20，带铁剑打 F20 守关 |</p>
+</blockquote>
 <p>一周结算：Lv10、2–3 枚签章、浅坑过 F10 守关、矿脉到 F20 左右。每天下矿约 4–5 层（第 51 条以后只要清怪，岩石按需敲）。第二批起加入熔炉、药剂台、织布机后，这张表按 v3 6.7 补齐（以本表为底）。</p>
 <h2 id="s2-9">2.9 存档</h2>
 <p>测试期清档（第 20 条）：不做老号迁移、不做补偿。存档版本 6 → 7（q(270) 已到 v6）。清档前做 P0 备份、约好窗口，执行前再找用户确认。清档同时要清掉设备本地的「已看过」（教学卡、快捷栏、通知已问过，现在按设备存），否则老设备上的新号看不到教学卡。</p>

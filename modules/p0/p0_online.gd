@@ -10,6 +10,9 @@ signal seat_changed(id: int, seat: String)
 signal result(seq: int, ok: bool, code: String)
 signal failed(code: String)
 signal connection_changed(connected: bool)
+signal fishing(states: Array)            # a pond room's lines of the others (11-02): OnlineCrowd.fishing_snapshot's shape
+signal roster_changed                    # members changed (P0VoiceRoom puts this phone's mutes on the new peers)
+signal voice_blocks(peers: Array)        # the server's blocked peers, either way, in this room (P0Voice, SGODOT-383)
 
 const PROTOCOL := 1
 const SEND_S := 0.1
@@ -49,6 +52,12 @@ var _attempt := 0
 var _stopped := true
 var _last: Dictionary = {}
 var _last_tick := -1
+
+## Layer 2 and later say so once (SGODOT-227 28c0580b; the user, 11-02: a room is a "Layer" to the player): the toast
+## for a join, "" for Layer 1 and a reconnect to the layer just left. Outposts and ponds alike.
+static func layer_notice(info: Dictionary) -> String:
+	var n := int(info.get("room", 1))
+	return "Layer %d is full · you're in Layer %d" % [n - 1, n] if n > 1 and not bool(info.get("rejoined", false)) else ""
 
 ## http://host:3110/v1 → ws://host:3110/v1/p0/online (https → wss).
 static func ws_url(base_url: String) -> String:
@@ -117,6 +126,15 @@ func stand() -> int:
 	_act_seq += 1
 	_send({"t": "act", "seq": _act_seq, "epoch": epoch, "action": "stand"})
 	return _act_seq
+
+## A pond room's line (pond multiplayer, 11-02): {phase: casting|waiting|hook|playing|result|none, target?: [x, z],
+## held?, fish?, outcome?, fish_id?} as the fishing panel moves; the server shows it to the others in the room only.
+func fish(state: Dictionary) -> void:
+	if epoch == 0: return
+	var m := state.duplicate()
+	m["t"] = "fish"
+	m["epoch"] = epoch
+	_send(m)
 
 func seat_of(id: int) -> String:
 	return str(members.get(id, {}).get("seat", ""))
@@ -227,6 +245,15 @@ func _message(text: String) -> void:
 			result.emit(int(m.seq), bool(m.ok), str(m.get("code", "")))
 		"error":
 			failed.emit(str(m.get("code", "")))
+		"voice_blocks":
+			# peer ids as LiveKit identities: "4" (the server sends strings; a number from JSON is a float, never "4.0")
+			voice_blocks.emit((m.get("blocked", []) as Array).map(func(i): return str(int(i)) if (i is float or i is int) else str(i))
+				if m.get("blocked") is Array else [])
+		"fishing":
+			if int(m.get("epoch", -1)) != epoch: return
+			var states: Array = m.get("members", []) if m.get("members", []) is Array else []
+			if crowd and crowd.has_method("fishing_snapshot"): crowd.call("fishing_snapshot", states)
+			fishing.emit(states)
 
 func _frame(data: PackedByteArray) -> void:
 	var tick := frame_tick(data)
@@ -239,6 +266,7 @@ func _frame(data: PackedByteArray) -> void:
 		if int(state.id) != self_id and members.has(int(state.id)): crowd.call("sample", int(state.id), state)
 
 func _roster() -> void:
+	roster_changed.emit()
 	if crowd == null: return
 	var others := {}
 	for id in members:
