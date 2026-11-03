@@ -1,0 +1,51 @@
+{
+	"default_variant": "A",
+	"layout": "layout.json",
+	"material_source_atlas": "room_albedo_ao.png",
+	"options": {
+		"sign_b": {
+			"hide_meshes": [],
+			"parent": ".",
+			"scene": "variants/b/sign_patch.tscn"
+		}
+	},
+	"room_id": "poi_hotel_lobby",
+	"schema_version": 1,
+	"variants": {
+		"A": {
+			"atlas": "room_albedo_ao.png",
+			"enabled_options": [],
+			"sign": {
+				"anchor": "sign_name",
+				"offset_m": [
+					0,
+					0,
+					0
+				],
+				"size_m": [
+					1.6,
+					0.22
+				]
+			}
+		},
+		"B": {
+			"atlas": "room_albedo_ao_b.png",
+			"enabled_options": [
+				"sign_b"
+			],
+			"sign": {
+				"anchor": "sign_name",
+				"baked_text": false,
+				"offset_m": [
+					0,
+					0,
+					0.009
+				],
+				"size_m": [
+					1.6,
+					0.22
+				]
+			}
+		}
+	}
+}
