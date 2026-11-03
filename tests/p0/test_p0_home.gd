@@ -207,9 +207,9 @@ func _plain(src: Dictionary) -> Dictionary:
 func test_material_source_breaks_only_before_or() -> void:
 	var v := _view()
 	v["names"] = {"clay": "Clay", "rock_salt": "Rock Salt"}
-	# every space a no-break one: a source line breaks only before ` · or ` (355 3b2c6a43)
-	assert_str(str(P0MaterialLogic.material_source(v, "clay").text)).is_equal("Clay\u00a0·\u00a0Clay\u00a0Pits\u00a0in\u00a0town ·\u00a0or\u00a0Quarries")
-	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt\u00a0·\u00a0Quarries")
+	# every space within a part a no-break one: the card breaks only at a ` · ` (eb1d7c20, UiNeedSource.fit_to)
+	assert_str(str(P0MaterialLogic.material_source(v, "clay").text)).is_equal("Clay · Clay\u00a0Pits\u00a0in\u00a0town · or\u00a0Quarries")
+	assert_str(str(P0MaterialLogic.material_source(v, "rock_salt").text)).is_equal("Rock\u00a0Salt · Quarries")
 
 func test_material_sources_name_the_mine() -> void:
 	# HOME-1 uses the workbench's line (P0MaterialLogic.material_source, Li Bai q(65)): the city's spots and the mines

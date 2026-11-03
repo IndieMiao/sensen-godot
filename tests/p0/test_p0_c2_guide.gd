@@ -49,10 +49,18 @@ func test_a_gathered_material_goes_to_the_spot_the_server_would_pick() -> void:
 	assert_dict(P0Logic._home_material_go(near_cooling, "wood")).is_equal({"go": "gather:" + HOME + "~wood1", "now": true})   # the ready one
 	var all_cooling := _view({"gather": {"city_ready": {HOME + "~wood0": 60000, HOME + "~wood1": 1000}}})
 	assert_dict(P0Logic._home_material_go(all_cooling, "wood")).is_equal({"go": "gather:" + HOME + "~wood0", "now": false})
-	var full := _view({"bag": {"free": 0, "slots": [{"id": "fiber", "qty": 97}]}})
-	assert_dict(P0Logic._home_material_go(full, "fiber")).is_equal({"go": "gather:" + HOME + "~reed0", "now": false})   # 2 of room < 4
+	var full := _view({"bag": {"free": 0, "slots": [{"id": "fiber", "qty": 99}]}})
+	assert_dict(P0Logic._home_material_go(full, "fiber")).is_equal({"go": "gather:" + HOME + "~reed0", "now": true})   # eb1d7c20: the bag is not asked
 	assert_dict(P0Logic._home_material_go(full, "wild_herb")).is_equal({"go": "", "now": false})   # no Herb Patch in this city
-	assert_int(P0Logic.bag_room(full, "fiber")).is_equal(2)
+
+## eb1d7c20: in another town its spots come first; one without such a spot points home; mines are always home's.
+func test_in_another_town_its_spots_come_first() -> void:
+	_spots()
+	PLACES.accept("gn-away", {"gather": [{"id": "gn-away~wood0", "kind": "wood", "lat": 40.0, "lng": 50.0, "yield": [["wood", 4]]}]})
+	var away := _view({"travel": {"home": HOME, "here": "gn-away"}})
+	assert_dict(P0Logic._home_material_go(away, "wood")).is_equal({"go": "gather:gn-away~wood0", "now": true})
+	assert_dict(P0Logic._home_material_go(away, "fiber")).is_equal({"go": "gather:" + HOME + "~reed0", "now": true})
+	assert_dict(P0Logic._home_material_go(away, "iron_ore")).is_equal({"go": "mine:wv1", "now": false})
 
 func test_ores_go_to_the_free_vein_or_quarry_and_clay_falls_back_to_the_quarry() -> void:
 	_spots()
@@ -121,7 +129,24 @@ func test_need_sources_name_the_city_spots_and_the_mines() -> void:
 	assert_str(str(P0MaterialLogic.material_source(v, "wood").go)).is_equal("gather:" + HOME + "~wood0")
 	assert_str(str(P0MaterialLogic.material_source(v, "iron_ore").go)).is_equal("mine:wv1")
 	var clay := str(P0MaterialLogic.material_source(v, "clay").text)
-	assert_int(clay.count(" ")).is_equal(1)   # the one breakable space: before `· or`
-	assert_bool(clay.contains(" · or Quarries")).is_true()
+	assert_str(clay).is_equal("Clay · Clay\u00a0Pits\u00a0in\u00a0town · or\u00a0Quarries")   # breakable only at a ` · `
 	assert_dict(P0MaterialLogic.material_source(v, "bait_worm")).is_empty()
 	assert_dict(P0MaterialLogic.material_source(v, "seed_radish")).is_empty()
+
+## eb1d7c20: the card breaks only at a ` · `, the dot dropped — before ` · or ` first, else after the material.
+func test_the_source_card_breaks_at_a_dot() -> void:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(host)
+	var pill := UiNeedSource.new("Clay · Clay\u00a0Pits\u00a0in\u00a0town · or\u00a0Quarries", true)
+	host.add_child(pill)
+	pill.fit_to(317.0)   # the card's width on a 360 screen
+	assert_str(pill._label.text).is_equal("Clay · Clay\u00a0Pits\u00a0in\u00a0town\nor\u00a0Quarries")
+	pill.text = "Iron\u00a0Ore · Iron\u00a0veins\u00a0from\u00a0Floor\u00a010"
+	pill.fit_to(200.0)
+	assert_str(pill._label.text).is_equal("Iron\u00a0Ore\nIron\u00a0veins\u00a0from\u00a0Floor\u00a010")
+	pill.text = "Coal · Quarries"
+	pill.fit_to(317.0)
+	assert_str(pill._label.text).is_equal("Coal · Quarries")   # one that fits stays one line
+	host.queue_free()

@@ -404,8 +404,8 @@ static func stored_notice(view: Dictionary, shown_at: float) -> String:
 ## for what they yield, the mines for ores (`Quarries`, `Iron veins from Floor 10`); every rock gives Stone, a Quarry Clay.
 ## `go` (Show, 不知火舞 on 228): the spot or mine Today points at (P0Logic._home_material_go, 355 C2). {} for anything
 ## no source names (a seed, bait — the tackle shop's — or a geode's gem not open in the first batch).
-## Two lines at most (不知火舞 on 228): the label may break only before ` · or `, so every other space is a no-break
-## space — `Clay · Clay Pits in town` / `· or Quarries`.
+## Two lines at most (eb1d7c20, as UiKit.break_at_dot): only at a ` · `, the dot dropped, before ` · or ` first, else
+## after the material — `Clay · Clay Pits in town` / `or Quarries`; every space within a part is a no-break one.
 const SOURCES := {
 	"wood": ["Groves in town"], "stone": ["Rocks in town", "any mine"], "fiber": ["Reed Banks in town"],
 	"wild_herb": ["Herb Patches in town"], "clay": ["Clay Pits in town", "Quarries"],
@@ -416,8 +416,8 @@ const SOURCES := {
 static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var parts: Array = SOURCES.get(id, [])
 	if parts.is_empty(): return {}
-	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
-	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
+	var text := _nowrap(P0Logic.item_name(view, id)) + " · " + _nowrap(parts[0])
+	for i in range(1, parts.size()): text += " · " + _nowrap("or %s" % parts[i])   # UiNeedSource breaks only at a ` · `
 	return {"text": text, "go": str(P0Logic._home_material_go(view, id).go)}   # Show: the spot or mine Today points at (355 C2)
 
 ## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
