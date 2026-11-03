@@ -4703,13 +4703,14 @@ func open_voice_profile() -> void:
 		"open": voice_match.open("solo")
 		"refuse": toast(VOICE_PROFILE_NOT_AVAILABLE)
 		_:
+			# over the profile's place, and back on it after (P281-5: the toast with the card still there)
 			var d: UiDrawer = AgeCard.new(0, "Voice Profile")
 			d.theme = UiKit.theme()
 			d.safe_bottom = safe_bottom()
-			d.close_requested.connect(close_layer)
+			d.close_requested.connect(func(): open_profile())
 			d.connect(&"answered", func(ok: bool):
-				close_modal()
 				voice_account.call("answer_age", ok)   # kept for voice too: the one answer
+				open_profile()
 				if ok: voice_match.open("solo")
 				else: toast(VOICE_PROFILE_NOT_AVAILABLE))
 			_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
