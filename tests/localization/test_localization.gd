@@ -314,3 +314,12 @@ func test_p0_ctx_formats_the_trip_tier() -> void:
 	TranslationServer.set_locale("en")
 	assert_str("%s · %s" % [Localization.ctx("%d", "trip") % 6, "Continental"]).is_equal("6 · Continental")
 	Localization.p0_translation = kept
+
+## #649 第二批 ⑥ (zh-11 「距 上品鱼 Lands up · 咬钩窗口 2.2 秒」): the Gear row's rod line is one sentence, so the place
+## line's `%s to %s · %s` no longer takes it; the shelf's `Lands up to %s fish` alone reads as before.
+func test_p0_the_gear_rod_line_reads_as_one_sentence() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"%s to %s · %s": "距 {2} {1} · {3}", "Lands up to %s fish": "最高可钓到%s鱼", "Fine": "上品",
+		"Lands up to %s fish · Bite window %.1f s": "最高可钓到%s鱼 · 咬钩窗口 %.1f 秒"})
+	assert_str(String(t.get_message("Lands up to Fine fish · Bite window 2.2 s"))).is_equal("最高可钓到上品鱼 · 咬钩窗口 2.2 秒")
+	assert_str(String(t.get_message("Lands up to Fine fish"))).is_equal("最高可钓到上品鱼")
