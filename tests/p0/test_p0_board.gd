@@ -328,10 +328,10 @@ func test_p1_cross_city_card_and_today_say_where() -> void:
 	row = P0Board.cards(v, "market")[0]
 	assert_array([row.status, row.command, row.reason]).is_equal(["Ready to deliver", "Deliver", ""])
 	assert_str(str(P0Logic.PinReason.taken(v)[0].deliver)).is_equal("Deliver at Mission Market Square")
-	# one line of about 40: a long name is cut, the city kept
+	# one line LINE_W wide (40 characters of English, as it was): a long name is cut, the city kept
 	var cut := P0Board.place_line("The Old Riverside Botanical Tea Pavilion", "Shanghai")
-	assert_int(cut.length()).is_less_equal(P0Board.LINE_CHARS)
-	assert_bool(cut.ends_with("… · Shanghai")).is_true()
+	assert_str(cut).is_equal("The Old Riverside Botanical Tea… · Shanghai")   # the 40-character cut's own
+	assert_float(P0Logic.text_width(cut)).is_less_equal(P0Board.LINE_W)
 	assert_str(P0Board.place_line("Lotus Tea House", "Shanghai")).is_equal("Lotus Tea House · Shanghai")
 
 ## Far Pond (q(128) 甲): fish the home city's ponds don't have, as the bag holds them; the count and the fish to try are

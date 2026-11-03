@@ -236,3 +236,16 @@ func test_p0_city_list_is_the_home_cities_and_their_fallback_ten() -> void:
 	assert_str(String(t.get_message("Tokyo"))).is_equal("东京")
 	assert_str(String(t.get_message("Tokyo · Japan"))).is_equal("东京 · Japan")
 	assert_str(String(t.get_message("Paris"))).is_equal("")   # off the list: the English stays
+
+## #649 第二批 ⑨: a line kept to a width is measured as it shows — under 中文 the Chinese, cut by its own width, and
+## returned so (P0Board.place_line: the outpost's name cut, the city whole).
+func test_p0_widths_are_measured_on_the_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"The Old Riverside Botanical Tea Pavilion": "老河畔植物园茶亭", "Shanghai": "上海",
+		"Botanical Tea Pavilion of the Long Riverside Walk": "长长的河畔步道旁边那座植物园里的茶亭和花园"})
+	TranslationServer.add_translation(t)
+	assert_str(P0Board.place_line("The Old Riverside Botanical Tea Pavilion", "Shanghai")).is_equal("老河畔植物园茶亭 · 上海")
+	var cut := P0Board.place_line("Botanical Tea Pavilion of the Long Riverside Walk", "Shanghai")
+	assert_bool(cut.ends_with("… · 上海")).override_failure_message(cut).is_true()
+	assert_float(P0Logic.text_width(cut)).is_less_equal(P0Board.LINE_W)
+	TranslationServer.remove_translation(t)
