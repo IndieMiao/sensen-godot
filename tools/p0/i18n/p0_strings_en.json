@@ -20,7 +20,7 @@
  },
  "%[+-]?[0-9]*(\\\\.[0-9]+)?[dsf]": {
   "where": [
-   "modules/ui/localization.gd:118"
+   "modules/ui/localization.gd:123"
   ],
   "kind": "line"
  },
@@ -676,7 +676,8 @@
   "where": [
    "modules/p0/p0_item_info.gd:477"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "%s now %s on the hook": {
   "where": [
@@ -915,7 +916,8 @@
   "where": [
    "scenes/p0/p0_ui.gd:4634"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "%s · Limit reached · %s": {
   "where": [
@@ -2388,14 +2390,16 @@
   "where": [
    "scenes/p0/p0_ui.gd:4658"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Blocked players": {
   "where": [
    "scenes/p0/panels/p0_settings_page.gd:134",
    "scenes/p0/panels/p0_settings_page.gd:212"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Blossom Pond": {
   "where": [
@@ -4230,13 +4234,15 @@
   "where": [
    "modules/p0/p0_runtime.gd:1121"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Deliver at the market · %s": {
   "where": [
    "modules/p0/p0_runtime.gd:1121"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Deliver to": {
   "where": [
@@ -6899,7 +6905,8 @@
   "where": [
    "scenes/p0/p0_ui.gd:4634"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Layer %d is full · you're in Layer %d": {
   "where": [
@@ -7284,7 +7291,8 @@
   "where": [
    "modules/p0/p0_item_info.gd:477"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Lv1–3": {
   "where": [
@@ -7632,7 +7640,8 @@
   "where": [
    "scenes/p0/p0_ui.gd:4561"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Minds the tackle": {
   "where": [
@@ -7851,14 +7860,16 @@
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:115"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Mute all": {
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:40",
    "scenes/p0/panels/p0_people_drawer.gd:85"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "My farm": {
   "where": [
@@ -8508,13 +8519,15 @@
   "where": [
    "scenes/p0/panels/p0_settings_page.gd:48"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "No one else here": {
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:21"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "No open farms nearby yet": {
   "where": [
@@ -9198,6 +9211,12 @@
   ],
   "kind": "line"
  },
+ "P0_I18N_MISSES": {
+  "where": [
+   "modules/ui/localization.gd:185"
+  ],
+  "kind": "line"
+ },
  "P0_KITCHEN_RECTS": {
   "where": [
    "scenes/p0/rooms/p0_farmhouse.gd:737"
@@ -9870,7 +9889,8 @@
   "where": [
    "scenes/p0/panels/p0_settings_page.gd:143"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Produce": {
   "where": [
@@ -10335,7 +10355,8 @@
   "where": [
    "scenes/p0/p0_ui.gd:4563"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Request": {
   "where": [
@@ -12613,7 +12634,8 @@
   "where": [
    "modules/p0/p0_logic.gd:115"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Tools": {
   "where": [
@@ -12781,7 +12803,8 @@
    "modules/p0/p0_voice_room.gd:90",
    "modules/p0/p0_voice_room.gd:117"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Tried before": {
   "where": [
@@ -12940,7 +12963,8 @@
    "scenes/p0/panels/p0_people_drawer.gd:120",
    "scenes/p0/panels/p0_settings_page.gd:221"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Undo": {
   "where": [
@@ -13009,13 +13033,15 @@
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:115"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Unmute all": {
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:85"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Unpin": {
   "where": [
@@ -13336,13 +13362,15 @@
    "scenes/p0/panels/p0_age_card.gd:16",
    "scenes/p0/panels/p0_settings_page.gd:139"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Voice chat isn't available": {
   "where": [
    "scenes/p0/p0_ui.gd:4562"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Wait · Full in %s": {
   "where": [
@@ -13557,7 +13585,8 @@
   "where": [
    "scenes/p0/panels/p0_age_card.gd:17"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "What's fresh today?": {
   "where": [
@@ -13737,7 +13766,8 @@
   "where": [
    "scenes/p0/p0_ui.gd:4564"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "You bet coins here. You always keep at least": {
   "where": [
@@ -13806,7 +13836,8 @@
   "where": [
    "scenes/p0/p0_ui.gd:4659"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Your %s remain in your bag.": {
   "where": [
@@ -13943,7 +13974,8 @@
   "where": [
    "modules/p0/p0_legal.gd:9"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "Zoom in to explore": {
   "where": [
