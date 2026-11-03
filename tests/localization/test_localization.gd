@@ -276,3 +276,17 @@ func test_p0_a_number_template_goes_before_a_name_one_as_long() -> void:
 	t.set_table({"%d XP": "%d 经验", "%s XP": "%s经验", "Farming": "种植"})
 	assert_str(String(t.get_message("+20 XP"))).is_equal("+20 经验")
 	assert_str(String(t.get_message("Farming XP"))).is_equal("种植经验")
+
+## #649 第二批 ③: `Since %s` is one line with the date inside; under 中文 the date is Chinese (「10 月 2 日」, the year in
+## front when not this one), so the table's `%s加入` reads 「10 月 2 日加入」.
+func test_p0_since_is_one_line_with_a_chinese_date() -> void:
+	var oct2 := Time.get_unix_time_from_datetime_dict({year = 2026, month = 10, day = 2, hour = 12}) * 1000.0
+	var now := Time.get_unix_time_from_datetime_dict({year = 2026, month = 10, day = 8, hour = 12}) * 1000.0
+	var later := Time.get_unix_time_from_datetime_dict({year = 2027, month = 1, day = 3, hour = 12}) * 1000.0
+	assert_str(P0ProfilePage.since_text(oct2, now)).is_equal("10 月 2 日")   # before_test's zh_CN: the locale on screen
+	assert_str(P0ProfilePage.since_text(oct2, later)).is_equal("2026 年 10 月 2 日")
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"Since %s": "%s加入"})
+	assert_str(String(t.get_message("Since %s" % P0ProfilePage.since_text(oct2, now)))).is_equal("10 月 2 日加入")
+	TranslationServer.set_locale("en")
+	assert_str(P0ProfilePage.since_text(oct2, now)).is_equal("Oct 2")

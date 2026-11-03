@@ -748,7 +748,7 @@
    "modules/p0/p0_guide.gd:152",
    "modules/p0/p0_logic.gd:798",
    "modules/p0/p0_logic.gd:1666",
-   "scenes/p0/panels/p0_profile_page.gd:238"
+   "scenes/p0/panels/p0_profile_page.gd:241"
   ],
   "kind": "template",
   "done": true
@@ -757,7 +757,7 @@
   "where": [
    "modules/p0/p0_logic.gd:788",
    "modules/p0/p0_notify.gd:41",
-   "scenes/p0/panels/p0_profile_page.gd:237"
+   "scenes/p0/panels/p0_profile_page.gd:240"
   ],
   "kind": "template",
   "done": true
@@ -4713,7 +4713,7 @@
  },
  "Edit look": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:324"
+   "scenes/p0/panels/p0_profile_page.gd:327"
   ],
   "kind": "line",
   "done": true
@@ -12000,11 +12000,11 @@
   "kind": "line",
   "done": true
  },
- "Since": {
+ "Since %s": {
   "where": [
    "scenes/p0/panels/p0_profile_page.gd:180"
   ],
-  "kind": "line",
+  "kind": "template",
   "done": true
  },
  "Sing with me! No? Then eat with me.": {
