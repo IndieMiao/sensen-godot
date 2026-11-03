@@ -18,6 +18,9 @@ static var _failing: Dictionary = {}   # cluster → [failed callables] of the s
 ## generated id → its entry (ponds: a SystemPonds location; outposts: a p0_outposts-shaped entry).
 static var _ponds: Dictionary = {}
 static var _outposts: Dictionary = {}
+## gathering spot id (`gn-1796236~wood0`) → its entry (contract C §9: id, cluster, kind, tier, name, short, lat, lng, yield,
+## energy, cooldown_h).
+static var _gather: Dictionary = {}
 
 ## The city id a generated place id carries (`gn-1850147~pond0` → `gn-1850147`), "" for a hand-written id.
 static func cluster_of(id: String) -> String:
@@ -66,14 +69,15 @@ static func fail(cluster: String) -> void:
 	_failing.erase(cluster)
 	for f in told: if _alive(f): (f as Callable).call()
 
-## A city's answer (the route's `city`: ponds / outposts ids, residents, fish, detail {ponds, outposts}, preview).
-## Every caller waiting on it is told, in the order they asked.
+## A city's answer (the route's `city`: ponds / outposts ids, residents, fish, detail {ponds, outposts}, gather, preview).
+## Every caller waiting on it is told, in the order they asked. The hand-written home city is read too, for its
+## gathering spots alone (v4q(4), contract C §9): the server sends it no `detail`, its ponds and outposts are the client's.
 static func accept(cluster: String, city_: Dictionary) -> void:
 	var waiting: Array = _pending.get(cluster, [])
 	_pending.erase(cluster)
 	_failing.erase(cluster)
 	var detail: Dictionary = city_.get("detail", {}) if city_.get("detail") is Dictionary else {}
-	var out := {ponds = [], outposts = [], huts = [], fish = city_.get("fish", []), residents = int(city_.get("residents", 0)),
+	var out := {ponds = [], outposts = [], huts = [], gather = [], fish = city_.get("fish", []), residents = int(city_.get("residents", 0)),
 		tier = str(city_.get("tier", "")), climate = str(city_.get("climate", "")), preview = city_.get("preview", {})}
 	for p in detail.get("ponds", []):
 		var entry := pond_entry(cluster, p)
@@ -90,6 +94,11 @@ static func accept(cluster: String, city_: Dictionary) -> void:
 		if entry.is_empty(): continue
 		_outposts[entry.id] = entry   # found by id as an outpost is (P0Outposts.find): its room opens in the outpost scene
 		out.huts.append(entry)
+	for g in city_.get("gather", []) if city_.get("gather") is Array else []:
+		var entry := gather_entry(cluster, g)
+		if entry.is_empty(): continue
+		_gather[entry.id] = entry
+		out.gather.append(entry)
 	_cities[cluster] = out
 	for done in waiting: if _alive(done): (done as Callable).call(out)
 
@@ -156,6 +165,23 @@ static func hut_entry(cluster: String, h: Dictionary) -> Dictionary:
 	entry["cluster"] = cluster
 	return entry
 
+## A gathering spot as the server sends it (contract C §9), its numbers typed; {} without an id. `yield` is [[item, n]…]
+## (a Reed Bank's worms the second pair).
+static func gather_entry(cluster: String, g) -> Dictionary:
+	if not g is Dictionary or str(g.get("id", "")) == "": return {}
+	var yields: Array = []
+	for y in g.get("yield", []) if g.get("yield") is Array else []:
+		if y is Array and y.size() >= 2: yields.append([str(y[0]), int(y[1])])
+	return {"id": str(g.id), "cluster": str(g.get("cluster", cluster)), "kind": str(g.get("kind", "")), "tier": str(g.get("tier", "")),
+		"name": str(g.get("name", "")), "short": str(g.get("short", "")), "lat": float(g.get("lat", 0.0)), "lng": float(g.get("lng", 0.0)),
+		"yield": yields, "energy": int(g.get("energy", 0)), "cooldown_h": float(g.get("cooldown_h", 0.0))}
+
+## A city's gathering spots as read ([] before the city is in).
+static func gather(cluster: String) -> Array: return city(cluster).get("gather", [])
+
+## A gathering spot by its id, {} when its city has not been read.
+static func gather_spot(id: String) -> Dictionary: return _gather.get(id, {})
+
 ## A city's Mine Huts as read ([] before the city is in, or for a city without one).
 static func huts(cluster: String) -> Array: return city(cluster).get("huts", [])
 
@@ -220,3 +246,4 @@ static func clear() -> void:
 	_failing.clear()
 	_ponds.clear()
 	_outposts.clear()
+	_gather.clear()

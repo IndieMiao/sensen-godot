@@ -60,6 +60,24 @@ func test_a_box_is_asked_once_and_its_answer_kept_by_id() -> void:
 	assert_int(_session.asked.size()).is_equal(1)
 	assert_int(got.back()).is_equal(1)
 
+## 周瑜 on #708: the box asked for is the one keyed — grown out to the 0.5° grid — so a key read means that very box was
+## read. A small box asks its whole grid cell; a pan within it asks nothing; a pan into the next cell asks it (zoom 12,
+## −122.600 dragged 22 km east: the two exact boxes do not touch, and the second is read).
+func test_a_box_is_grown_to_the_grid_and_a_pan_out_of_it_reads_again() -> void:
+	var small := [37.70, -122.60, 37.80, -122.45]
+	P0WildSites.fetch(_session, small, 12.0)
+	assert_int(_session.asked.size()).is_equal(1)
+	assert_str(str(_session.asked[0][0])).starts_with("/p0/wild?bbox=37.5000,-123.0000,38.0000,-122.0000&zoom=12")
+	P0WildSites.accept(str(_session.asked[0][1].key), {"sites": []})
+	P0WildSites.fetch(_session, [37.72, -122.55, 37.79, -122.40], 12.0)   # inside the cell read
+	assert_int(_session.asked.size()).is_equal(1)
+	var east := 22.0 / (111.32 * cos(deg_to_rad(37.75)))   # 22 km in degrees of longitude here
+	P0WildSites.fetch(_session, [37.70, -122.60 + east, 37.80, -122.45 + east], 12.0)
+	assert_int(_session.asked.size()).is_equal(2)
+	assert_str(str(_session.asked[1][0])).starts_with("/p0/wild?bbox=37.5000,-122.5000,38.0000,-122.0000&zoom=12")
+	assert_array(P0WildSites.grid_box([-17.2, 179.8, -16.9, 180.3])).is_equal([-17.5, 179.5, -16.5, -179.5])   # across 180°
+	assert_array(P0WildSites.grid_box([89.8, -10.0, 90.0, 10.0])).is_equal([89.5, -10.0, 90.0, 10.0])
+
 func test_a_failed_read_tells_who_asked_and_reads_again_next_time() -> void:
 	var failed := []
 	P0WildSites.fetch(_session, SF_BOX, 9.0, Callable(), func(): failed.append(true))

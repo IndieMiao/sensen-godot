@@ -595,13 +595,14 @@ func release_travel() -> void:
 ## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
 const TREE_XP := "tree_xp"
 
-## A generated home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home
-## set (P0Outposts.home: names, Show on map, Today) has them; the written city's are the client's own tables.
+## Home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home set
+## (P0Outposts.home: names, Show on map, Today) has them; the written city's ponds and outposts are the client's own
+## tables, but its gathering spots are the server's (v4q(4)) — the guide's S6a and Today point at them before the map.
 func _read_home_places(v: Dictionary) -> void:
 	var travel = load("res://modules/p0/p0_travel.gd")
 	var home := str(travel.home(v))
 	var places = load("res://modules/p0/p0_city_places.gd")
-	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
+	if home == "" or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
 ## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
