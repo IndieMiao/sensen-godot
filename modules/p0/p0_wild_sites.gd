@@ -32,6 +32,9 @@ static var _mock_sites: Array = []
 static func is_wild(id: String) -> bool: return id.begins_with(PREFIX)
 static func has_site(id: String) -> bool: return _sites.has(id)
 static func site(id: String) -> Dictionary: return _sites.get(id, {})
+## Every site read this session, of the types the map shows; how many (a map redraws its pins when it grows).
+static func all() -> Array: return _sites.values().filter(func(x): return str(x.get("type", "")) in SHOWN)
+static func count() -> int: return _sites.size()
 
 ## The sites known in a box (south, west, north, east; west > east across the 180° line), in the server's order.
 static func in_box(box: Array) -> Array:
