@@ -66,6 +66,7 @@ func use_p0(path := P0_SETTINGS_PATH) -> void:
 ## `Cooking` 烹饪中, the family `Water` 水 vs the button's `Water` 浇水. Under P0's 中文 the table's `"<src>@<context>"`
 ## (`Cooking@skill`, `Water@family`) when it has one, else `src` as it is — English always `src`. The label keeps
 ## translating: the Chinese has no letters (P0Translation passes it), and a word with no such key reads its plain one.
+## A format too: `ctx("%d", "trip") % 6` is `6` in English, 「第 6 档」 by `%d@trip` (the city card's `6 · Continental`).
 func ctx(src: String, context: String) -> String:
 	if p0_translation == null or TranslationServer.get_locale() != "zh_CN": return src
 	return str(p0_translation.exact("%s@%s" % [src, context], src))
@@ -159,7 +160,7 @@ class P0Translation extends Translation:
 			var en := str(source)
 			var zh = data[source]
 			if en.begins_with("_") or not zh is String or str(zh).is_empty(): continue
-			if SPEC.search(en) != null:
+			if SPEC.search(en) != null and not en.contains("@"):   # a context key (`%d@trip`) is Localization.ctx's, whole
 				var re := RegEx.new()
 				if re.compile(_pattern(en)) == OK:
 					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s"), en.contains(" · ")])

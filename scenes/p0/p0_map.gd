@@ -889,7 +889,7 @@ static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Di
 	if local == "": local = "–"
 	return {
 		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before traveling.",
-		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]],
+		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%s · %s" % [Localization.ctx("%d", "trip") % int(trip.get("trip", 1)), str(trip.get("name", ""))]],   # 「第 6 档 · 洲际」 (#649 第二批 ⑧)
 			["Fare", P0Travel.fare_text(P0Travel.fare(view, cluster))], ["Local time", local]],   # q(257) ⑥: the first-visit fare
 		"rows": [
 			{"icon": P0Logic.icon("pond"), "title": "Ponds", "effect": "Basic and regional fishing", "quantity": count.call("ponds"), "unit": "ponds"},

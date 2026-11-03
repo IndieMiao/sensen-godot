@@ -299,3 +299,18 @@ func test_p0_a_one_part_template_leaves_a_line_of_parts_to_its_parts() -> void:
 		"%s · %d left": "%s · 剩 %d", "Carrot": "胡萝卜"})
 	assert_str(String(t.get_message("Common · First cook +10 XP"))).is_equal("常见 · 首次做出 +10 经验")
 	assert_str(String(t.get_message("Carrot · 3 left"))).is_equal("胡萝卜 · 剩 3")   # a template with ` · ` still does
+
+## #649 第二批 ⑧ (zh-27): the city card's trip is `6 · Continental` in English and 「第 6 档 · 洲际」 under 中文 — the
+## number's own words by `%d@trip` (Localization.ctx, a format), the ` · ` and the tier's name as before.
+func test_p0_ctx_formats_the_trip_tier() -> void:
+	var kept = Localization.p0_translation
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"%d@trip": "第 %d 档", "Continental": "洲际"})
+	Localization.p0_translation = t
+	var line: String = "%s · %s" % [Localization.ctx("%d", "trip") % 6, "Continental"]
+	assert_str(line).is_equal("第 6 档 · Continental")
+	assert_str(String(t.get_message(line))).is_equal("第 6 档 · 洲际")
+	assert_str(String(t.get_message("6 · Continental"))).is_equal("6 · 洲际")   # the old line: the number left bare (zh-27)
+	TranslationServer.set_locale("en")
+	assert_str("%s · %s" % [Localization.ctx("%d", "trip") % 6, "Continental"]).is_equal("6 · Continental")
+	Localization.p0_translation = kept
