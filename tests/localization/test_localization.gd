@@ -219,3 +219,20 @@ func test_p0_ctx_reads_a_words_context_key_under_chinese_only() -> void:
 	TranslationServer.set_locale("en")
 	assert_str(Localization.ctx("Cooking", "skill")).is_equal("Cooking")
 	Localization.p0_translation = kept
+
+## #649 第二批 ④: the cities named in Chinese are the open home cities and each one's fallback ten (extract.py's
+## p0_cities_en.json, from the server's homeCities / fallbackOf), their Chinese in the main table; any other city keeps
+## its English.
+func test_p0_city_list_is_the_home_cities_and_their_fallback_ten() -> void:
+	var cities: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tools/p0/i18n/p0_cities_en.json"))
+	var homes := {}
+	for name in cities:
+		for h in cities[name].homes: homes[h] = true
+	assert_int(homes.size()).is_equal(13)
+	for name in ["San Francisco", "Tokyo", "Shanghai", "London", "Oxford", "Yokohama", "Paris"]:
+		assert_bool(cities.has(name)).override_failure_message(name).is_equal(name not in ["Yokohama", "Paris"])
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"Tokyo": "东京", "San Francisco": "旧金山"})
+	assert_str(String(t.get_message("Tokyo"))).is_equal("东京")
+	assert_str(String(t.get_message("Tokyo · Japan"))).is_equal("东京 · Japan")
+	assert_str(String(t.get_message("Paris"))).is_equal("")   # off the list: the English stays
