@@ -1,11 +1,18 @@
 /** 355 G (contract-efg §9.2, v4q(7) ③; v4q(9) ②): Pip's First Dig — shown from Lv3, done on reaching F3 of any mine
  * (or on the Lv3 upgrade for one who got there first), the Copper Sword and +5 with Pip once — and Pip's one line toward
  * the iron vein, said once on a talk with Pip. */
+import Fastify from 'fastify';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
+import { setGuide } from '../../src/p0/guide.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
+import { P0Store } from '../../src/p0/store.js';
 import { viewOf } from '../../src/p0/view.js';
 import { nearestFreeVein } from '../../src/p0/wild.js';
 
@@ -139,6 +146,21 @@ describe('Pip\'s First Dig (contract-efg §9.2)', () => {
     expect(x.s.rewards).toContain('first_dig');
     expect(x.s.residents.res_pip.req?.id).toBe('req_res_pip_1');   // the request is untouched
   });
+
+  it('the playtest route that sets the Homestead level settles it as the upgrade would (后裔 on #697)', async () => {
+    const player = 'first-dig-dev', s = freshState(c, player, T);
+    s.mine.records[Q] = { deepest: 3, guards: [], first_at: T - DAY };
+    const dir = mkdtempSync(path.join(tmpdir(), 'zhouyu-first-dig-')), store = new P0Store(c, path.join(dir, 'state.json'));
+    const app = Fastify();
+    store.put(s);
+    registerP0Routes(app, { content: c, store, now: () => T, dev: true });
+    try {
+      await app.ready();
+      const r = (await app.inject({ method: 'POST', url: '/v1/p0/dev/blackjack', headers: { 'x-p0-player': player }, payload: { homestead: 3 } })).json();
+      expect(r).toMatchObject({ ok: true, state: { first_dig: { have: 3, done: true }, gear: { weapon: 'weapon_copper_sword' } } });
+      expect(store.peek(player)!.rewards).toContain('first_dig');
+    } finally { await app.close(); rmSync(dir, { recursive: true, force: true }); }
+  });
 });
 
 describe('Pip\'s line toward the iron vein (v4q(9) ②)', () => {
@@ -178,6 +200,19 @@ describe('Pip\'s line toward the iron vein (v4q(9) ②)', () => {
     const ev = x.send({ type: 'talk', resident: 'res_pip' });
     expect(kinds(ev)).not.toContain('affinity');
     expect(x.s.seen).toContain('line:pip_vein');
+  });
+
+  it('while the guide is on, Pip\'s guide line goes first: none given, a talk keeps it; the first talk after the guide says it (不知火舞)', () => {
+    const x = done();
+    expect(setGuide(c, x.s, 't_gift', T)).toBeNull();
+    expect(x.view().pip_line).toBeNull();
+    x.send({ type: 'talk', resident: 'res_pip' });
+    expect(x.s.seen ?? []).not.toContain('line:pip_vein');   // not lost: still due
+    expect(setGuide(c, x.s, 'end', T)).toBeNull();
+    expect(x.view().pip_line).toMatchObject({ key: 'pip_vein' });
+    x.send({ type: 'talk', resident: 'res_pip' });
+    expect(x.s.seen).toContain('line:pip_vein');
+    expect(x.view().pip_line).toBeNull();
   });
 
   it('not said once that vein\'s deepest has reached Floor 10, nor with no free iron vein', () => {

@@ -3,9 +3,11 @@
  * handed in. It shows from Homestead Lv3, counts the deepest floor of any mine and is done the moment that reaches its
  * floor: on the mine_record that gets there, or on the Lv3 upgrade itself for a player who went down first. Done is kept
  * with the one-time rewards (`first_dig`); a done one still shows, done, so Today's vein row tells it from one not yet
- * shown (v4q(9)). Pip's one line toward the iron vein (v4q(9) ②) follows it, said once: `line:pip_vein` in `seen`.
+ * shown (v4q(9)). Pip's one line toward the iron vein (v4q(9) ②) follows it, said once: `line:pip_vein` in `seen`;
+ * while the guide is on, Pip's guide line goes first and this one waits for the first talk after it (不知火舞 11-03).
  */
 import type { P0Content } from './content.js';
+import { guideOn } from './guide.js';
 import { mineRank } from './mine.js';
 import type { P0Event } from './progress.js';
 import { addAffinity, residentDef } from './residents.js';
@@ -42,11 +44,12 @@ export function settleFirstDig(c: P0Content, s: P0State, now: number, events: P0
   if (d.reward.affinity && residentDef(c, d.giver)) addAffinity(c, s, d.giver, d.reward.affinity, 'first_dig', now, events);
 }
 
-/** view.pip_line: Pip's line toward the nearest free iron vein (the one Today's vein row names), once First Dig is done,
- * until said, and only while that vein's deepest is short of Floor 10; null otherwise or with no such vein. */
+/** view.pip_line: Pip's line toward the nearest free iron vein (the one Today's vein row names), once First Dig is done
+ * and the guide is over, until said, and only while that vein's deepest is short of Floor 10; null otherwise or with no
+ * such vein. */
 export function pipLine(c: P0Content, s: P0State): { key: 'pip_vein'; vein: string; name: string } | null {
   const d = c.mine.first_dig;
-  if (!d?.lines?.pip_vein || !s.rewards.includes(DONE) || s.seen?.includes(SAID)) return null;
+  if (!d?.lines?.pip_vein || !s.rewards.includes(DONE) || s.seen?.includes(SAID) || guideOn(s)) return null;
   const vein = nearestFreeVein(c, s, 'iron_ore');
   if (!vein || (s.mine.records[vein.id]?.deepest ?? 0) >= VEIN_FLOOR) return null;
   return { key: 'pip_vein', vein: vein.id, name: vein.name };
