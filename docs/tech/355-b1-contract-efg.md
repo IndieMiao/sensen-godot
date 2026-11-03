@@ -26,6 +26,7 @@
 > - 第 9.4 节：写全 `mine_drink` 的字段、拒绝的先后顺序、事件，以及售卖（Homestead Stall、Lv4、日库存）；
 > - 第 7.1 节：`view.mine.at.potion_ready_in`（喝药的剩余冷却，毫秒，0 表示可以喝；人不在矿里时没有 `at`，也就没有这一项）。#636 的 `set_potion_cooldown(remaining_ms)` 照它读，拒绝码 `potion_cooldown` 也带 `ready_in`；
 > - 第 10 节：`stunned_seconds`（岩甲虫硬直 2 秒）是玩法的数，只放占位 json（#627 接口复核时补）。
+> **v0.9+（11-04）**：矿层摆件和岩块接入（周瑜，原排 11-05，提前）：第 10.1 节补了三处做法：守关层按内容表判断（打过以后也摆场地）；牌子上的层号同时受高度和宽度限制；glb 是否已导入，看导入文件在不在。
 > **v0.8（11-03）**：G 服务端的 v4q(9) 两件（周瑜，奕星 11-02 派）：
 > - 第 9.2 节：First Dig **完成以后 `view.first_dig` 照样给**（`done: true`、`have` = `floor`），Lv3 以前才是 null（v4q(9) 的矿脉行要分清「完成了」和「还没出现」，和亚瑟、刘邦对过，#636 评论 6574856129）；写明完成时的事件（`first_dig`、`gear`、`affinity`）；
 > - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，用户已批）；第 7.4 节补台词；
@@ -527,11 +528,11 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 - 新矿石岩块：`assets/mine/rocks/rock_<iron_ore|quartz|coal|copper_ore>.glb`。原点在底面中心，Y 向上；尺寸照现在代码拼的岩石（半径约 0.47 m、高约 0.63 m，假影半径 0.52）；单个 surface，顶点色；≤ 400 三角面；不带动作（敲碎的抖动和缩小由程序做）。
 - 摆件：`assets/mine/props/guard_arena.glb`（守关层）、`assets/mine/props/elevator_station.glb`（电梯站）。原点在地面中心，单位米。
 - .import 必须带 uid。
-- 本机没导入的 glb 以 `load()` 拿得到为准，拿不到就退回 mine_art.gd 代码拼的，测试和截图不因此挂。
+- 本机没导入的 glb 以 `load()` 拿得到为准，拿不到就退回 mine_art.gd 代码拼的，测试和截图不因此挂。判断方法（v0.9+，`MineArt.kit`）：读 `<glb>.import` 里 `[remap] path` 指向的导入文件，它存在才 `load()`。不能用 `ResourceLoader.exists`：只要有 .import 它就返回 true，没导入时照样 true，接着 `load()` 会报错。
 - **口径**（坐标都是层里的米，原点和 `mine_layout.gd` 一样）：
-  - 守关场地 `guard_arena.glb`：摆在 (4.9, 0, −3.8)，即 `ROCK_BOUNDS` 的中心；外框不超过 `ROCK_BOUNDS` 的 7.0 × 4.5；整个只当装饰、不带碰撞；后沿的高物放在 x 2.7–6.8（离电梯 (1.25, 0, −6.75) 和下行梯 (8.25, 0, −6.75) 都 ≥ 1.6 m，实测 x 3.15–6.51）；≤ 3000 面。
-  - 电梯站 `elevator_station.glb`：换掉代码拼的电梯，摆在 `Layout.ELEVATOR` (1.25, 0, −6.75)，+Z 朝镜头；底座 1.45 × 1.3，平台顶面 0.17，总高 ≤ 2.3；≤ 2500 面。两个空节点：`PlateAnchor` (0, 0.99, 0.515) 挂 Label3D 写层号（只写数字或 `F10` 这样的短号，深色粗体，字高约占牌子的七成），`LampAnchor` (0.8, 0.73, 0.47) 挂锁定 / 解锁灯（锁定琥珀 `#dba158`、解锁绿 `#a5e3bc`，照现在代码的颜色）。
-  - 岩块（不知火舞 11-03 定，上官婉儿同意）：**每座矿统一用它主矿的岩块**：铁矿脉 `rock_iron_ore`、石英矿脉 `rock_quartz`、浅坑 `rock_copper_ore`；煤块这批不用。岩石掉什么按发牌定（第 5 节），敲开前看不出，所以不按矿种随机画，以免给错误提示。每块绕竖轴随机转一个角度、大小在 0.9–1.1 倍之间随机，同一块固定（按岩石的序号和本层的种子算）。
+  - 守关场地 `guard_arena.glb`：只摆在守关层，按内容表 `mine.types[type].floors[层].guard` 判断（v0.9+，`P0MaterialLogic.guard_floor`）：守关在前一天打过以后，服务端的 `floor_state.guard` 是 null，这一层照样摆场地。摆在 (4.9, 0, −3.8)，即 `ROCK_BOUNDS` 的中心；两支火把的光由程序加，位置是从 glb 里量出来的火苗处，即场地坐标 (−1.65, 1.42, −2.01) 和 (1.5, 1.42, −2.01)；外框不超过 `ROCK_BOUNDS` 的 7.0 × 4.5；整个只当装饰、不带碰撞；后沿的高物放在 x 2.7–6.8（离电梯 (1.25, 0, −6.75) 和下行梯 (8.25, 0, −6.75) 都 ≥ 1.6 m，实测 x 3.15–6.51）；≤ 3000 面。
+  - 电梯站 `elevator_station.glb`：换掉代码拼的电梯，摆在 `Layout.ELEVATOR` (1.25, 0, −6.75)，+Z 朝镜头；底座 1.45 × 1.3，平台顶面 0.17，总高 ≤ 2.3；≤ 2500 面。两个空节点：`PlateAnchor` (0, 0.99, 0.515) 挂 Label3D 写层号（只写数字或 `F10` 这样的短号，深色粗体，字高约占牌子的七成；v0.9+ 写成 `F` 加层号。`F10`–`F40` 三个字按七成高排会超出 0.5 m 的牌宽，所以字的大小取两者里小的那个：字高不超过牌高的七成，字宽不超过牌宽的 86%），`LampAnchor` (0.8, 0.73, 0.47) 挂锁定 / 解锁灯（锁定琥珀 `#dba158`、解锁绿 `#a5e3bc`，照现在代码的颜色）。
+  - 岩块（不知火舞 11-03 定，上官婉儿同意）：**每座矿统一用它主矿的岩块**：铁矿脉 `rock_iron_ore`、石英矿脉 `rock_quartz`、浅坑 `rock_copper_ore`；煤块这批不用。岩石掉什么按发牌定（第 5 节），敲开前看不出，所以不按矿种随机画，以免给错误提示。每块绕竖轴随机转一个角度、大小在 0.9–1.1 倍之间随机，同一块固定（按岩石的序号和本层的种子算）。v0.9+：本层的种子和摆岩石位置用的是同一个（`<矿 id>:<层>:<day>`）；转角和缩放放在里面的 `Rock` 节点上，不放在根节点上，因为敲碎时的抖动和缩小作用在根节点。主矿从 `view.mine.records[矿].main` 读（浅坑一律用铜矿石）；读不到时，或者岩块没导入，就退回代码拼的岩石，转角和缩放照样加。
   - 守关层的王出生在 `mine_combat.SPAWNS[0]` (4.75, 0, −5.0)，会满层追，跳扑约 2.5 m（占位数，F 的数值为准）。
   - 配色：每段四个键 `ground` / `wall` / `backdrop_tint` / `fog`，按 `from ≤ 层 ≤ to` 查，超出最后一段就用最后一段；第 1 段和现在线上的颜色一样。`backdrop_tint` 是背景的 floor_tint；`fog` 同时给背景的 void_tint 和 `Environment.background_color`（不开真正的雾）。`vein_tint` 已撤回，不加。
   - 背景 shader 加 `uniform float vein_mask = 0.0`，只有 `types/<type>/backdrop.glb` 设 1（老的 mine_backdrop.glb 在 Godot 里 UV2.y 全是 1.0，不开关会整片不套色）；UV2.y 以 Godot 读到的值为准（Blender 导出时 v 会翻成 1 − v）。

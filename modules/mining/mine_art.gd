@@ -16,6 +16,28 @@ static var _rock_cache: Dictionary = {}
 const STONE := Color("71857e")
 const TIMBER := Color("ae9173")
 const METAL := Color("456d70")
+## The 355 mine kit (contract-efg §10.1; 黄忠's v1 in assets/mine/props and assets/mine/rocks).
+const STATION := "res://assets/mine/props/elevator_station.glb"
+const ARENA := "res://assets/mine/props/guard_arena.glb"
+const ROCK_KIT := "res://assets/mine/rocks/rock_%s.glb"
+const ARENA_AT := Vector3(4.9, 0, -3.8)   # ROCK_BOUNDS' middle
+const ARENA_TORCHES := [Vector3(-1.65, 1.42, -2.01), Vector3(1.5, 1.42, -2.01)]   # its two rear flames, measured off the glb
+const LAMP_UNLOCKED := Color("a5e3bc")
+const LAMP_LOCKED := Color("dba158")
+const PLATE_INK := Color("3b2a20")
+const PLATE := Vector2(0.5, 0.3)   # the station's blank plate, PlateAnchor 0.005 m before it
+static var _kit: Dictionary = {}
+
+## One piece of the 3D kit, instanced, or null where this machine never imported it (no --import here): the code art
+## stands in then, so tests and shots never fail for it (contract-efg §10.1). A .glb's ResourceLoader.exists is true off
+## its .import alone, so the imported file itself is looked for.
+static func kit(path: String) -> Node3D:
+	if not _kit.has(path):
+		var cfg := ConfigFile.new()
+		var imported := cfg.load(path + ".import") == OK and FileAccess.file_exists(str(cfg.get_value("remap", "path", "")))
+		_kit[path] = load(path) if imported else null
+	var scene := _kit[path] as PackedScene
+	return scene.instantiate() as Node3D if scene else null
 
 static func _surface() -> SurfaceTool:
 	var surface := SurfaceTool.new()
@@ -282,7 +304,75 @@ static func _mushrooms(stone: SurfaceTool,caps: SurfaceTool,p: Vector3) -> void:
 		for dot in 3:
 			Meshes.oval(caps,q+Vector3(sin(dot*2.1)*r*0.4,h+r*0.40,cos(dot*2.1)*r*0.4),Vector3(r*0.22,0.016,r*0.18),tint.lightened(0.3))
 
-static func elevator(unlocked: bool) -> MeshInstance3D:
+## The elevator (Floor 1 and each stop): 黄忠's station on Layout.ELEVATOR, +Z to the camera, its plate saying the floor
+## (`F10`) and its lamp green when unlocked, amber when not; the code-built one where the station is not imported.
+## MineElevator either way — p0_mine finds the facility by that name.
+static func elevator(unlocked: bool, floor_number := 0) -> Node3D:
+	var model := kit(STATION)
+	if model == null: return _elevator_mesh(unlocked)
+	var root := Node3D.new()
+	root.name = "MineElevator"
+	root.position = Layout.ELEVATOR
+	root.add_child(model)
+	dress_station(root, floor_number, unlocked)
+	return root
+
+## The station's plate and lamp on its two anchors (contract-efg §10.1): the floor's short number in dark bold, its
+## glyphs about seven tenths of the plate's height unless that would run past the plate's sides (`F40`); the lamp.
+static func dress_station(root: Node3D, floor_number: int, unlocked: bool) -> void:
+	var plate := root.find_child("PlateAnchor", true, false) as Node3D
+	if plate and floor_number > 0:
+		var label := Label3D.new()
+		label.name = "FloorPlate"
+		label.text = "F%d" % floor_number
+		label.font = UiKit.font(&"bold")
+		label.font_size = 96
+		label.outline_size = 0
+		label.modulate = PLATE_INK
+		var width := label.font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.font_size).x
+		var cap := label.font.get_ascent(label.font_size) * 0.7   # Nunito's figures stand about 0.7 of its ascent
+		label.pixel_size = minf(PLATE.y * 0.7 / cap, PLATE.x * 0.86 / width)
+		plate.add_child(label)
+	var lamp_at := root.find_child("LampAnchor", true, false) as Node3D
+	if lamp_at:
+		var lamp := MeshInstance3D.new()
+		lamp.name = "ElevatorLamp"
+		var ball := SphereMesh.new()
+		ball.radius = 0.0475
+		ball.height = 0.095
+		lamp.mesh = ball
+		lamp.scale = Vector3(1, 1, 0.47)   # the code lamp's flattened bead
+		var glow := StandardMaterial3D.new()
+		glow.albedo_color = LAMP_UNLOCKED if unlocked else LAMP_LOCKED
+		glow.emission_enabled = true
+		glow.emission = glow.albedo_color
+		glow.emission_energy_multiplier = 0.6
+		lamp.material_override = glow
+		lamp.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		lamp_at.add_child(lamp)
+
+## A guard's floor (floor_state.guard): 黄忠's arena on ROCK_BOUNDS' middle — decoration only, no collision, nothing on
+## the walk grid — with a warm light on each of its two torches; null where it is not imported (the code art had none).
+static func guard_arena() -> Node3D:
+	var model := kit(ARENA)
+	if model == null: return null
+	var root := Node3D.new()
+	root.name = "GuardArena"
+	root.position = ARENA_AT
+	root.add_child(model)
+	for p in ARENA_TORCHES:
+		var torch := OmniLight3D.new()
+		torch.name = "ArenaTorch"
+		torch.position = p
+		torch.light_color = Color("ffb35c")
+		torch.light_energy = 0.85
+		torch.omni_range = 2.6
+		torch.omni_attenuation = 1.35
+		torch.shadow_enabled = false
+		root.add_child(torch)
+	return root
+
+static func _elevator_mesh(unlocked: bool) -> MeshInstance3D:
 	var s := Meshes.surface()
 	var p := Layout.ELEVATOR
 	Meshes.block(s,p+Vector3(0,0.06,0),Vector3(1.40,0.15,1.3),IRON,4,0.045)
@@ -328,17 +418,32 @@ static func ladder(position: Vector3, upward: bool) -> MeshInstance3D:
 		Meshes.block(s,position+Vector3(0,lerpf(0.05,height,t),lerpf(0.4,-0.39,t)),Vector3(0.72,0.085,0.10),EDGE,13+i,0.019)
 	return Meshes.finish(s,"UpLadder" if upward else "DownLadder","wood")
 
-static func rock(position: Vector3, index: int, floor_number: int) -> Node3D:
-	var key := "%d:%d" % [clampi(floor_number,1,5),index%6]
-	if not _rock_cache.has(key): _rock_cache[key] = _ore(index%6,floor_number)
+## A rock on its spot. With `ore` (P0MaterialLogic.rock_ore: a vein its main ore's, a quarry Copper Ore's) 黄忠's block
+## of that ore, every rock of the mine the same one — what a rock gives is the server's deck, unseen before it breaks, so
+## the model never hints at it (不知火舞 11-03, contract-efg §10.1); the code-built ore without, or where the block is not
+## imported. With `floor_seed` (the floor's, as Layout.p0_rocks) it turns about Y and sizes 0.9–1.1×, by its index, the same
+## each time. The pose is the inner Rock's: the break's shake and shrink stay on the root (p0_mine._break_rock).
+static func rock(position: Vector3, index: int, floor_number: int, ore := "", floor_seed := "") -> Node3D:
 	var root := Node3D.new()
 	root.position = position
-	var node := MeshInstance3D.new()
+	var node: Node3D = kit(ROCK_KIT % ore) if ore != "" else null
+	if node == null:
+		var key := "%d:%d" % [clampi(floor_number,1,5),index%6]
+		if not _rock_cache.has(key): _rock_cache[key] = _ore(index%6,floor_number)
+		var mesh := MeshInstance3D.new()
+		mesh.mesh = _rock_cache[key]
+		mesh.material_override = Meshes.material()
+		node = mesh
 	node.name = "Rock"
-	node.mesh = _rock_cache[key]
-	node.material_override = Meshes.material()
+	var size := 1.0
+	if floor_seed != "":
+		var rng := RandomNumberGenerator.new()
+		rng.seed = hash("%s:%d" % [floor_seed, index])
+		node.rotation.y = rng.randf() * TAU
+		size = rng.randf_range(0.9, 1.1)
+		node.scale = Vector3.ONE * size
 	root.add_child(node)
-	BlobShadow.attach(root,0.52)
+	BlobShadow.attach(root,0.52*size)
 	return root
 
 static func _ore(index: int, floor_number: int) -> ArrayMesh:
