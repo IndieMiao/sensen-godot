@@ -114,8 +114,8 @@ def shelving():
     corbel=next(x for x in parts if x[0].startswith("Shelf corbel"))
     def panel(name,at,size,key="oak"):
         obj=copy_part(board,name,key);fit(obj,at,size);return obj
-    for name,w,h,d,levels in [("rear_bookcase",.90,2.30,.65,4),("right_storage",1.10,1.16,.50,3),("low_cabinet",.80,.90,.48,1)]:
-        begin(name,str(path.relative_to(ROOT)),["Basic Room shelf board rebuilt into named case panels, shelves and back.","Original low-poly book blocks added; no object above tall bookcase top."])
+    for name,w,h,d,levels in [("rear_bookcase",.90,1.50,.65,3),("right_storage",1.10,1.16,.50,3),("low_cabinet",.80,.90,.48,1)]:
+        begin(name,str(path.relative_to(ROOT)),["Basic Room shelf board rebuilt into named case panels, shelves and back.","v1.1 rear case lowered to 1.50 m with three book tiers and a separate shared potted plant." if name=="rear_bookcase" else "Original low-poly book blocks added."])
         for x in [-w/2+.035,w/2-.035]:panel("Case side",(x,h/2,0),(.07,h,d))
         panel("Case recessed back",(0,h/2,-d/2+.025),(w-.14,h-.12,.035),"wood_mid")
         ys=[.10+i*(h-.15)/levels for i in range(levels+1)]
@@ -247,7 +247,7 @@ def export(name):
     return result
 
 def layout(assets):
-    plan=PLAN;plan["stage"]="detail_v1"
+    plan=PLAN;plan["stage"]="detail_v1.1"
     props=json.loads((OUT/"props/prop_manifest.json").read_text());by_prop={a["name"]:a for a in props["assets"]}
     rename={"proxy_teacher_desk":"teacher_desk","proxy_blackboard":"blackboard","proxy_globe":"globe",
         "proxy_stationery_1":"stationery_1","proxy_stationery_6":"stationery_6","proxy_study":"plaster_study",
@@ -268,11 +268,12 @@ def layout(assets):
             if name=="display_shelf_1":model="book_shelf"
             row["model"]=model;spec=owned[model]
             if model=="low_cabinet":row["size"]=[.80,.90,.48];row["yaw_degrees"]=90
-            if model=="rear_bookcase":row["size"][1]=2.30
+            if model=="rear_bookcase":row["size"][1]=1.50
             if model in ["display_shelf","book_shelf"]:row["position"][1]=1.74 if name.endswith("1") else 2.40
-            if model=="pendant":row["position"][1]=2.73
+            if model=="pendant":row["position"]=[-1.80 if name.endswith("1") else 2.40,2.96,1.25]
             if model=="wall_sconce":row["position"][0]=-3.10;row["yaw_degrees"]=90
-            if name=="plant_5":continue
+            if name=="plant_5":
+                row["position"]=[-2.65,1.58,-2.50];row["support"]="rear_bookcase"
             if name=="plant_6":
                 row["position"]=[2.96,1.84,-2.82];row["support"]="display_shelf_1"
         row["bounds"]=spec["bounds"]
@@ -294,7 +295,7 @@ def layout(assets):
     plan["assets"]=assets+[{**a,"name":"props/"+a["name"],"file":"props/"+a["file"]} for a in props["assets"]]
     plan["local_lights"]=[]
     for i,z in enumerate([-.55,.55],1):plan["local_lights"].append(dict(name="wall_warmth_%d"%i,position=[-2.88,2.22,z],color="FFDB9F",energy=.65,range=1.2))
-    for i,x in enumerate([-1.35,2.05],1):plan["local_lights"].append(dict(name="pendant_warmth_%d"%i,position=[x,2.71,-1.40],color="FFE2AF",energy=.65,range=2.2))
+    for i,x in enumerate([-1.80,2.40],1):plan["local_lights"].append(dict(name="pendant_warmth_%d"%i,position=[x,2.94,1.25],color="FFE2AF",energy=.65,range=2.2))
     for i,z in enumerate([-1.8,1.8],1):plan["local_lights"].append(dict(name="window_fill_%d"%i,position=[-2.80,2.15,z],color="FFF3DA",energy=.50,range=3.2))
     plan["review_lighting"].update(background="E7E3D9",ambient_color="F3EADC",ambient=.52,sun_color="FFF0D4",sun=1.1,shadow_bias=.04,shadow_normal_bias=.12)
     plan["lighting"]={"angular_distance":.4}
@@ -303,7 +304,7 @@ def layout(assets):
     stats=dict(assets=plan["assets"],unique_triangles=sum(a["triangles"] for a in plan["assets"]),
         scene_triangles=shell["scene_triangles"]+sum(by[r["model"]]["triangles"] for r in rows),
         static_draw_surfaces=shell["static_draw_surfaces"]+len(rows),shared_shell_stats=shell,
-        room_atlas=dict(file="room_albedo_ao.png",size=[2048,2048]),plants_triangles=owned["small_plant"]["triangles"]*5)
+        room_atlas=dict(file="room_albedo_ao.png",size=[2048,2048]),plants_triangles=owned["small_plant"]["triangles"]*sum(r["model"]=="small_plant" for r in rows))
     assert stats["scene_triangles"]<=150000 and stats["static_draw_surfaces"]<=50,stats
     dump(OUT/"asset_stats.json",stats);dump(OUT/"reuse_provenance.json",PROVENANCE)
     # Editable furniture, including linked repeats, stays arranged in the source.
@@ -319,7 +320,15 @@ def main():
     p.start("poi_classroom","SGODOT-317 R3 / 322 330d4474")
     p.b.PALETTE.update({key:slot["hex_srgb"] for key,slot in PALETTE.items()})
     student_furniture();shelving();lamps_and_plants();uv_material()
-    assets=[export(name) for name in p.KITS]
+    selected=next((arg.split("=",1)[1] for arg in sys.argv if arg.startswith("--asset=")),None)
+    prior={a["name"]:a for a in json.loads((OUT/"asset_stats.json").read_text())["assets"]} if selected else {}
+    prior_provenance=json.loads((OUT/"reuse_provenance.json").read_text()) if selected else {}
+    assert selected is None or selected in p.KITS
+    assets=[]
+    for name in p.KITS:
+        if selected and name!=selected:
+            assets.append(prior[name]);PROVENANCE[name]=prior_provenance[name]
+        else:assets.append(export(name))
     layout(assets)
 
 if __name__=="__main__":main()

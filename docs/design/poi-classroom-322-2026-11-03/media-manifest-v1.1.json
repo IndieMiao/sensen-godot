@@ -1,0 +1,35 @@
+[
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1.1_default_clean.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1.1_default_clean.png",
+    "sha256": "dcd4fd7c27a6a4e08edbd5c185d1c972909e9f6a1a390b2053f2aeb819322773",
+    "bytes": 662583,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1.1_six_seats.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1.1_six_seats.png",
+    "sha256": "12aa50ede3b14467db3119980af241c8d01ce15b87bfabd15b4dadc69c24192f",
+    "bytes": 790113,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1.1_stark_comparison.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1.1_stark_comparison.png",
+    "sha256": "d73dd51af91036fdfc7e626628deb29f148e097a663e086630fd15e4bacc56e2",
+    "bytes": 2360772,
+    "mime": "image/png",
+    "size": [
+      2362,
+      1195
+    ]
+  }
+]

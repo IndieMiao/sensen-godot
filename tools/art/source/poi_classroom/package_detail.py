@@ -7,7 +7,8 @@ from PIL import Image,ImageDraw,ImageFont,PngImagePlugin
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];QA=ROOT/"output/classroom-322"
 KIT=ROOT/"assets/rooms/poi_classroom";DEST=ROOT/"docs/design/poi-classroom-322-2026-11-03"
-PREFIX="SGODOT-322_POI_CLASSROOM_v1_"
+REVISION=json.loads((KIT/"layout.json").read_text())["stage"].removeprefix("detail_")
+PREFIX="SGODOT-322_POI_CLASSROOM_"+REVISION+"_"
 FONT="/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 font=lambda size:ImageFont.truetype(FONT,size)
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -27,9 +28,10 @@ def main():
         assert np.asarray(image).std()>12,name
         return image
     def save(image,name):
+        if REVISION=="v1.1" and name not in ["default_clean","stark_comparison","six_seats"]:return
         path=DEST/(PREFIX+name+".png");metadata=PngImagePlugin.PngInfo()
         metadata.add_text("Author","ZHAOYUN / \u8d75\u4e91")
-        metadata.add_text("Description","SGODOT-322 detail v1 / Godot Mobile Vulkan / 317 R3 / camera contract in README")
+        metadata.add_text("Description","SGODOT-322 detail "+REVISION+" / Godot Mobile Vulkan / 317 R3 / camera contract in README")
         image.save(path,pnginfo=metadata);assert path.stat().st_size<4_000_000
         files.append(path)
     def captioned(image,text):
@@ -81,8 +83,18 @@ def main():
         source_blend_sha256=digest(HERE/"classroom_detail.blend"),layout_sha256=digest(KIT/"layout.json"),
         camera_note="Original P0 frame_all projection and spawn; review applies hall near=.1/far=40 from layout. Legacy P0 ignores these and uses far=4000; clip control is included. No consumer runtime code changed.",
         scope="Desktop Mobile/Vulkan art review. No Android, physical phone, multiplayer/service integration or release.")
-    (DEST/"validation-v1.json").write_text(json.dumps(reports,indent=2)+"\n")
-    (DEST/"media-manifest-v1.json").write_text(json.dumps([dict(name=p.name,path=str(p.relative_to(ROOT)),sha256=digest(p),bytes=p.stat().st_size,mime="image/png",size=list(Image.open(p).size)) for p in files],indent=2)+"\n")
-    print("CLASSROOM_V1_PACKAGE",len(files),"images",stats["scene_triangles"],"triangles",stats["static_draw_surfaces"],"surfaces")
+    if REVISION=="v1.1":
+        samples=[s for s in reports["godot"]["color_samples"] if s["surface"]=="desk_4"]
+        colors=np.array([list(bytes.fromhex(s["rgb"])) for s in samples])
+        previous=Image.open(DEST/"SGODOT-322_POI_CLASSROOM_v1_default_clean.png").convert("RGB")
+        prior=np.array([previous.getpixel(tuple(s["pixel"])) for s in samples])
+        target=np.array([229,198,160]);median=np.median(colors,axis=0)
+        assert np.max(np.abs(median-target))<=12
+        reports["furniture_color_review"]={"target_lit_srgb":"E5C6A0","sample_module":"desk_4",
+            "current_median_rgb":median.tolist(),"v1_same_pixels_median_rgb":np.median(prior,axis=0).tolist(),
+            "method":"Six unobscured sunlit tabletop samples in the same default camera; not a full-image color fidelity metric."}
+    (DEST/("validation-"+REVISION+".json")).write_text(json.dumps(reports,indent=2)+"\n")
+    (DEST/("media-manifest-"+REVISION+".json")).write_text(json.dumps([dict(name=p.name,path=str(p.relative_to(ROOT)),sha256=digest(p),bytes=p.stat().st_size,mime="image/png",size=list(Image.open(p).size)) for p in files],indent=2)+"\n")
+    print("CLASSROOM_PACKAGE",REVISION,len(files),"images",stats["scene_triangles"],"triangles",stats["static_draw_surfaces"],"surfaces")
 
 if __name__=="__main__":main()

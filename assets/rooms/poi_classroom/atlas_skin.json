@@ -10,7 +10,7 @@
   "gutter_px": 16,
   "slots": {
     "parquet": {
-      "hex_srgb": "CF9B66",
+      "hex_srgb": "C89E73",
       "rect_px_top_left": [
         0,
         0,
@@ -242,7 +242,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "oak": {
-      "hex_srgb": "E5C6A0",
+      "hex_srgb": "BB9C78",
       "rect_px_top_left": [
         512,
         1024,
@@ -271,7 +271,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "oak_light": {
-      "hex_srgb": "EBD0A9",
+      "hex_srgb": "C0A582",
       "rect_px_top_left": [
         768,
         1024,
@@ -822,7 +822,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "floor_solid": {
-      "hex_srgb": "CF9B66",
+      "hex_srgb": "C89E73",
       "rect_px_top_left": [
         1536,
         1536,
@@ -1183,7 +1183,9 @@
   "source_sha256": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab",
   "notes": [
     "Same hall UV slots; shared shell files unchanged.",
-    "317 R3 wall E8D8C0, floor CF9B66, furniture E5C6A0, book blue 487594.",
+    "v1.1: furniture albedo lowered/warmed toward the E5C6A0 lit appearance requested in 322 c1ea2382/b4643b1a.",
+    "Floor C89E73 reduces orange relative to v1 CF9B66; furniture/floor separation is reviewed in actual lighting.",
+    "wood_mid/oak_edge are shared with the hall foundation and perimeter; keep their v1 colors.",
     "Sage 939D83 follows the main image; absent from the four-color palette.",
     "Parquet slot replaced by original straight-board bitmap; floor UV remains rotated 90 degrees.",
     "Furniture contact AO is scalar COLOR_0; no photographs, text or final lighting baked."

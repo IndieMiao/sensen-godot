@@ -51,26 +51,26 @@
     {
       "name": "rear_bookcase",
       "file": "rear_bookcase.glb",
-      "triangles": 13848,
+      "triangles": 10548,
       "surfaces": 1,
       "bounds": [
         [
           -0.44999998807907104,
-          -2.3841858265427618e-08,
+          -5.662441071585533e-10,
           -0.32499998807907104
         ],
         [
           0.44999998807907104,
-          2.3000001907348633,
+          1.5,
           0.32499998807907104
         ]
       ],
       "dimensions_m": [
         0.8999999761581421,
-        2.3000002145767215,
+        1.5000000005662442,
         0.6499999761581421
       ],
-      "sha256": "6d2129e26fc2ff891f762546759e989dbcd564d5e74682a282a348f63affc151"
+      "sha256": "a24a358d25c8253932d2c262cfae756b1b60ae5ae7e536493b6fcc1751968f61"
     },
     {
       "name": "right_storage",
@@ -528,9 +528,9 @@
       "provenance": "tools/art/source/poi_classroom/props/modules/name_sign/reuse_provenance.json"
     }
   ],
-  "unique_triangles": 40914,
-  "scene_triangles": 74286,
-  "static_draw_surfaces": 45,
+  "unique_triangles": 37614,
+  "scene_triangles": 71932,
+  "static_draw_surfaces": 46,
   "shared_shell_stats": {
     "atlas": {
       "file": "hall_albedo_ao.png",
@@ -602,5 +602,5 @@
       2048
     ]
   },
-  "plants_triangles": 4730
+  "plants_triangles": 5676
 }

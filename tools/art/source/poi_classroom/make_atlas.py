@@ -10,11 +10,11 @@ ROOT = HERE.parents[3]
 HALL = ROOT / "assets/rooms/_shared/shell_hall"
 OUT = ROOT / "assets/rooms/poi_classroom"
 COLORS = {
-    "parquet": "CF9B66", "plaster": "E8D8C0", "panel": "939D83",
+    "parquet": "C89E73", "plaster": "E8D8C0", "panel": "939D83",
     "cornice": "F2E6D1", "skirting": "D8CDB5", "window": "F4E9D6",
     "plaster_solid": "E8D8C0", "wainscot_solid": "939D83", "cornice_solid": "F2E6D1",
-    "window_solid": "F4E9D6", "floor_solid": "CF9B66", "wood_dark": "A67F56",
-    "wood_mid": "CAAA7E", "oak": "E5C6A0", "oak_light": "EBD0A9", "oak_edge": "D9B68B",
+    "window_solid": "F4E9D6", "floor_solid": "C89E73", "wood_dark": "A67F56",
+    "wood_mid": "CAAA7E", "oak": "BB9C78", "oak_light": "C0A582", "oak_edge": "D9B68B",
     "brass": "B98D44", "linen": "F0E8D6", "sky": "487594", "sage": "7B927C",
     "sage_dark": "536E62", "linen_green": "A9B79A", "porcelain": "FFF1D5",
     "petal": "CB947C", "leaf": "60894C", "leaf_light": "81A660", "leaf_dark": "446A3F",
@@ -59,7 +59,9 @@ def main():
     palette.update(atlas="room_albedo_ao.png", task="SGODOT-322", author="ZHAOYUN",
         source_sha256=hashlib.sha256((HALL/"hall_albedo_ao.png").read_bytes()).hexdigest(),
         notes=["Same hall UV slots; shared shell files unchanged.",
-               "317 R3 wall E8D8C0, floor CF9B66, furniture E5C6A0, book blue 487594.",
+               "v1.1: furniture albedo lowered/warmed toward the E5C6A0 lit appearance requested in 322 c1ea2382/b4643b1a.",
+               "Floor C89E73 reduces orange relative to v1 CF9B66; furniture/floor separation is reviewed in actual lighting.",
+               "wood_mid/oak_edge are shared with the hall foundation and perimeter; keep their v1 colors.",
                "Sage 939D83 follows the main image; absent from the four-color palette.",
                "Parquet slot replaced by original straight-board bitmap; floor UV remains rotated 90 degrees.",
                "Furniture contact AO is scalar COLOR_0; no photographs, text or final lighting baked."])

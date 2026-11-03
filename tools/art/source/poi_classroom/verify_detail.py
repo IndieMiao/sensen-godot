@@ -2,11 +2,13 @@
 from pathlib import Path
 import hashlib
 import itertools
+import io
 import json
 import math
 import subprocess
 import sys
 import numpy as np
+from PIL import Image
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
 sys.path.insert(0,str(ROOT/"tools/art"))
@@ -22,9 +24,18 @@ def main():
     for directory in ["assets/rooms/_shared/shell_hall","scenes/shell_hall"]:
         check(subprocess.run(["git","diff","--exit-code","HEAD","--",directory],cwd=ROOT,capture_output=True).returncode==0,"unchanged shared shell: "+directory)
     check(subprocess.run(["git","diff","--exit-code","350bd1f1","--","assets/rooms/poi_classroom/props"],cwd=ROOT,capture_output=True).returncode==0,"all approved prop files byte-identical to 350bd1f1")
+    palette=json.loads((KIT/"atlas_skin.json").read_text())["slots"]
+    old_atlas=np.asarray(Image.open(io.BytesIO(subprocess.check_output(["git","show","e2eedb94:assets/rooms/poi_classroom/room_albedo_ao.png"],cwd=ROOT))).convert("RGB"))
+    new_atlas=np.asarray(Image.open(KIT/"room_albedo_ao.png").convert("RGB"))
+    allowed=np.zeros((2048,2048),dtype=bool)
+    for key in ["parquet","floor_solid","oak","oak_light"]:
+        x,y,w,h=palette[key]["rect_px_top_left"];allowed[y:y+h,x:x+w]=True
+    check(not np.any(np.any(old_atlas!=new_atlas,axis=2)&~allowed),"atlas edits confined to furniture and floor slots")
     bounds={}
     for spec in plan["assets"]:
         path=KIT/spec["file"];doc,blob=load_glb(path)
+        old_import=subprocess.check_output(["git","show","e2eedb94:assets/rooms/poi_classroom/"+spec["file"]+".import"],cwd=ROOT)
+        check(Path(str(path)+".import").read_bytes()==old_import,spec["name"]+" import and UID unchanged")
         triangles=0;surfaces=0;verts=[]
         for mesh in doc["meshes"]:
             check(mesh["name"].endswith("_mobile"),spec["name"]+" mesh suffix")
@@ -40,10 +51,19 @@ def main():
             check(doc.get("images")==[{"uri":"room_albedo_ao.png"}],spec["name"]+" one external atlas")
         array=np.concatenate(verts);lo=array.min(0);hi=array.max(0);bounds[spec["name"]]=(lo,hi)
         meshes.append(dict(name=spec["name"],triangles=triangles,surfaces=surfaces,bounds=[lo.tolist(),hi.tolist()],sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
-    for name,size in [("student_desk",[1.02,1.13425,.58]),("student_stool",[.48,.715,.48]),("rear_bookcase",[.9,2.3,.65])]:
+    for name,size in [("student_desk",[1.02,1.13425,.58]),("student_stool",[.48,.715,.48]),("rear_bookcase",[.9,1.5,.65])]:
         lo,hi=bounds[name];check(np.allclose(hi-lo,size,atol=.00001),name+" required dimensions")
     world={}
     rows={r["name"]:r for r in plan["placements"]}
+    baseline=json.loads(subprocess.check_output(["git","show","e2eedb94:assets/rooms/poi_classroom/layout.json"],cwd=ROOT,text=True))
+    check(plan["anchors"]==baseline["anchors"],"all v1 anchors unchanged")
+    for row in baseline["placements"]:
+        if row["name"] not in ["rear_bookcase","pendant_1","pendant_2"]:
+            check(rows[row["name"]]==row,"v1 placement unchanged: "+row["name"])
+    for spec in plan["assets"]:
+        if spec["name"]=="rear_bookcase":continue
+        old=subprocess.check_output(["git","show","e2eedb94:assets/rooms/poi_classroom/"+spec["file"]],cwd=ROOT)
+        check((KIT/spec["file"]).read_bytes()==old,"v1 mesh unchanged: "+spec["name"])
     for row in rows.values():
         lo,hi=bounds[row["model"]];vertices=np.array(list(itertools.product(*zip(lo,hi))))
         a=math.radians(row["yaw_degrees"]);rotation=np.array([[math.cos(a),0,math.sin(a)],[0,1,0],[-math.sin(a),0,math.cos(a)]])

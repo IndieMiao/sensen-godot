@@ -1,6 +1,6 @@
 # SGODOT-322 Editable Sources
 
-赵云，细模 v1。当前主源为 `classroom_detail.blend`；`classroom_blockout.blend` 和 `layout_plan.json` 保留已通过白模。`build_detail.py` 从白模计划派生最终 layout，不运行 `plan.py` 覆盖最终计划。
+赵云，细模 v1.1。当前主源为 `classroom_detail.blend`；`classroom_blockout.blend` 和 `layout_plan.json` 保留已通过白模。`build_detail.py` 从白模计划派生最终 layout，不运行 `plan.py` 覆盖最终计划。v1.1 仅重导后角柜可追加 `-- --asset=rear_bookcase`；其余 GLB 原样保留，源文件仍更新全套配色和摆位。
 
 Source collections are evaluated into independently editable named mesh parts, then joined only on runtime export copies. Module-local scalar AO is exported in COLOR_0. The shared hall and Huangzhong's `props/` remain read-only.
 

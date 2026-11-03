@@ -109,6 +109,26 @@ func validate() -> void:
 	check(books.intersects(Rect2(0,100,360,610)),"reading books visible in default safe view")
 	report.reading_books_screen_rect=[books.position.x,books.position.y,books.size.x,books.size.y]
 	check(room.art.find_children("*","OmniLight3D",true,false).size()<=6,"at most six unshadowed local lights")
+	report.pendant_clearance=[]
+	for lamp_name in ["pendant_1","pendant_2"]:
+		var lamp_rect:=screen_bounds(room.art.get_node(lamp_name))
+		for subject in ["blackboard","teacher_desk","rear_bookcase"]:
+			var subject_rect:=screen_bounds(room.art.get_node(subject))
+			var overlap:=lamp_rect.intersection(subject_rect).get_area()
+			report.pendant_clearance.append({"lamp":lamp_name,"subject":subject,"overlap_px2":overlap})
+			check(overlap<.01,lamp_name+" clears "+subject+" in default camera")
+
+func sample_furniture() -> void:
+	var image:=vp.get_texture().get_image()
+	report.color_samples=[]
+	for name_ in ["desk_2","desk_3","desk_4","desk_5"]:
+		var desk: Node3D=room.art.get_node(name_)
+		for x in [-.3,0.0,.3]:
+			for z in [-.12,.12]:
+				var at:=desk.to_global(Vector3(x,1.13425,z))
+				var pixel:=Vector2i(room.cam.unproject_position(at))
+				var color:=image.get_pixelv(pixel)
+				report.color_samples.append({"surface":name_,"pixel":[pixel.x,pixel.y],"rgb":color.to_html(false)})
 
 func run() -> void:
 	if DisplayServer.get_name()=="headless":get_tree().quit(2);return
@@ -139,6 +159,7 @@ func run() -> void:
 	var native: Transform3D=room.cam.global_transform
 	await capture("default_clean_360",Vector2i(360,800))
 	await capture("default_clean_720",Vector2i(720,1600))
+	sample_furniture()
 	var projected_before: Vector2=room.cam.unproject_position(room.actor.global_position)
 	room.cam.near=float(report.native_clip_before[0]);room.cam.far=float(report.native_clip_before[1])
 	await capture("default_native_clip_720",Vector2i(720,1600))
