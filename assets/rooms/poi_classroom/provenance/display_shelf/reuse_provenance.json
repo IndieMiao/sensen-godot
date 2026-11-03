@@ -1,0 +1,31 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/basic_room/basic_room.blend",
+  "changes": [
+    "Kitchen shelf and corbels resized; upper shelf has two wordless miniature prints, lower shelf has books."
+  ],
+  "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+  "source_collection": "KIT_wall_shelf",
+  "name": "display_shelf",
+  "file": "display_shelf.glb",
+  "triangles": 564,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.5600000023841858,
+      -0.019999999552965164,
+      -0.1599999964237213
+    ],
+    [
+      0.5600000023841858,
+      0.5,
+      0.1599999964237213
+    ]
+  ],
+  "dimensions_m": [
+    1.1200000047683716,
+    0.5199999995529652,
+    0.3199999928474426
+  ],
+  "sha256": "fba2416787b2609e319d84df9a2c83a4d59a562bb74490c251673aaa84ceb941"
+}

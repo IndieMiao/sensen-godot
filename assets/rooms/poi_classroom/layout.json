@@ -1,0 +1,2356 @@
+{
+  "task": "SGODOT-322",
+  "design": "SGODOT-317 R3",
+  "stage": "detail_v1.1",
+  "units": "metres",
+  "floor_y": 0.08,
+  "footprint": [
+    6.8,
+    6.4
+  ],
+  "wall_height": 3.7,
+  "inner_floor": [
+    -3.18,
+    -2.98,
+    3.34,
+    3.14
+  ],
+  "reference_svg_scale_px_m": 120,
+  "placements": [
+    {
+      "name": "desk_1",
+      "model": "student_desk",
+      "position": [
+        -0.55,
+        0.08,
+        -0.95
+      ],
+      "size": [
+        1.02,
+        1.1342500000000002,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "role": "student desk",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5671250000000001,
+            0
+          ],
+          "size": [
+            1.02,
+            1.1342500000000002,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stool_1",
+      "model": "student_stool",
+      "position": [
+        -0.55,
+        0.08,
+        -0.41999999999999993
+      ],
+      "size": [
+        0.48,
+        0.715,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "role": "student stool",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.3575,
+            0
+          ],
+          "radius": 0.24,
+          "height": 0.715
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "desk_2",
+      "model": "student_desk",
+      "position": [
+        1.6,
+        0.08,
+        -0.95
+      ],
+      "size": [
+        1.02,
+        1.1342500000000002,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "role": "student desk",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5671250000000001,
+            0
+          ],
+          "size": [
+            1.02,
+            1.1342500000000002,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stool_2",
+      "model": "student_stool",
+      "position": [
+        1.6,
+        0.08,
+        -0.41999999999999993
+      ],
+      "size": [
+        0.48,
+        0.715,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "role": "student stool",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.3575,
+            0
+          ],
+          "radius": 0.24,
+          "height": 0.715
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "desk_3",
+      "model": "student_desk",
+      "position": [
+        -0.55,
+        0.08,
+        0.3
+      ],
+      "size": [
+        1.02,
+        1.1342500000000002,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "role": "student desk",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5671250000000001,
+            0
+          ],
+          "size": [
+            1.02,
+            1.1342500000000002,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stool_3",
+      "model": "student_stool",
+      "position": [
+        -0.55,
+        0.08,
+        0.8300000000000001
+      ],
+      "size": [
+        0.48,
+        0.715,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "role": "student stool",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.3575,
+            0
+          ],
+          "radius": 0.24,
+          "height": 0.715
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "desk_4",
+      "model": "student_desk",
+      "position": [
+        1.6,
+        0.08,
+        0.3
+      ],
+      "size": [
+        1.02,
+        1.1342500000000002,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "role": "student desk",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5671250000000001,
+            0
+          ],
+          "size": [
+            1.02,
+            1.1342500000000002,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stool_4",
+      "model": "student_stool",
+      "position": [
+        1.6,
+        0.08,
+        0.8300000000000001
+      ],
+      "size": [
+        0.48,
+        0.715,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "role": "student stool",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.3575,
+            0
+          ],
+          "radius": 0.24,
+          "height": 0.715
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "desk_5",
+      "model": "student_desk",
+      "position": [
+        -0.55,
+        0.08,
+        1.55
+      ],
+      "size": [
+        1.02,
+        1.1342500000000002,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "role": "student desk",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5671250000000001,
+            0
+          ],
+          "size": [
+            1.02,
+            1.1342500000000002,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stool_5",
+      "model": "student_stool",
+      "position": [
+        -0.55,
+        0.08,
+        2.08
+      ],
+      "size": [
+        0.48,
+        0.715,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "role": "student stool",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.3575,
+            0
+          ],
+          "radius": 0.24,
+          "height": 0.715
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "desk_6",
+      "model": "student_desk",
+      "position": [
+        1.6,
+        0.08,
+        1.55
+      ],
+      "size": [
+        1.02,
+        1.1342500000000002,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "role": "student desk",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5671250000000001,
+            0
+          ],
+          "size": [
+            1.02,
+            1.1342500000000002,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stool_6",
+      "model": "student_stool",
+      "position": [
+        1.6,
+        0.08,
+        2.08
+      ],
+      "size": [
+        0.48,
+        0.715,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "role": "student stool",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.3575,
+            0
+          ],
+          "radius": 0.24,
+          "height": 0.715
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "rear_bookcase",
+      "model": "rear_bookcase",
+      "position": [
+        -2.65,
+        0.08,
+        -2.5
+      ],
+      "size": [
+        0.9,
+        1.5,
+        0.65
+      ],
+      "yaw_degrees": 0,
+      "role": "rear tall bookcase",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.44999998807907104,
+          -5.662441071585533e-10,
+          -0.32499998807907104
+        ],
+        [
+          0.44999998807907104,
+          1.5,
+          0.32499998807907104
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.75,
+            0
+          ],
+          "size": [
+            0.9,
+            1.5,
+            0.65
+          ]
+        }
+      ]
+    },
+    {
+      "name": "right_storage",
+      "model": "right_storage",
+      "position": [
+        2.55,
+        0.08,
+        -2.67
+      ],
+      "size": [
+        1.1,
+        1.16,
+        0.5
+      ],
+      "yaw_degrees": 0,
+      "role": "right storage bookcase",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.550000011920929,
+          -1.668930060816365e-08,
+          -0.25
+        ],
+        [
+          0.550000011920929,
+          1.159999966621399,
+          0.25
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.58,
+            0
+          ],
+          "size": [
+            1.1,
+            1.16,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_cabinet_1",
+      "model": "low_cabinet",
+      "position": [
+        -2.91,
+        0.08,
+        0.85
+      ],
+      "size": [
+        0.8,
+        0.9,
+        0.48
+      ],
+      "yaw_degrees": 90,
+      "role": "left low cabinet",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.4000000059604645,
+          -1.1920929132713809e-08,
+          -0.23999999463558197
+        ],
+        [
+          0.4000000059604645,
+          0.8999999761581421,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.45,
+            0
+          ],
+          "size": [
+            0.8,
+            0.9,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_cabinet_2",
+      "model": "low_cabinet",
+      "position": [
+        -2.91,
+        0.08,
+        1.7
+      ],
+      "size": [
+        0.8,
+        0.9,
+        0.48
+      ],
+      "yaw_degrees": 90,
+      "role": "left low cabinet",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.4000000059604645,
+          -1.1920929132713809e-08,
+          -0.23999999463558197
+        ],
+        [
+          0.4000000059604645,
+          0.8999999761581421,
+          0.23999999463558197
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.45,
+            0
+          ],
+          "size": [
+            0.8,
+            0.9,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "display_shelf_1",
+      "model": "book_shelf",
+      "position": [
+        2.55,
+        1.74,
+        -2.82
+      ],
+      "size": [
+        1.12,
+        0.1,
+        0.32
+      ],
+      "yaw_degrees": 0,
+      "role": "right display shelf",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5600000023841858,
+          -0.019999999552965164,
+          -0.1599999964237213
+        ],
+        [
+          0.5600000023841858,
+          0.38999998569488525,
+          0.1599999964237213
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "display_shelf_2",
+      "model": "display_shelf",
+      "position": [
+        2.55,
+        2.4,
+        -2.82
+      ],
+      "size": [
+        1.12,
+        0.1,
+        0.32
+      ],
+      "yaw_degrees": 0,
+      "role": "right display shelf",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.5600000023841858,
+          -0.019999999552965164,
+          -0.1599999964237213
+        ],
+        [
+          0.5600000023841858,
+          0.5,
+          0.1599999964237213
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "teacher_desk",
+      "model": "props/teacher_desk",
+      "position": [
+        0.38,
+        0.08,
+        -2.38
+      ],
+      "size": [
+        1.3,
+        1.13425,
+        0.723
+      ],
+      "yaw_degrees": 0,
+      "role": "teacher desk body envelope",
+      "collidable": true,
+      "owner": "huangzhong",
+      "bounds": [
+        [
+          -0.6499999761581421,
+          0.0,
+          -0.3615000247955322
+        ],
+        [
+          0.6499999761581421,
+          1.184249997138977,
+          0.3615000247955322
+        ]
+      ],
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.5671250224113464,
+            -0.0014999955892562866
+          ],
+          "size": [
+            1.3,
+            1.1342500000000002,
+            0.72
+          ]
+        }
+      ]
+    },
+    {
+      "name": "blackboard",
+      "model": "props/blackboard",
+      "position": [
+        0.38,
+        1.97,
+        -2.99
+      ],
+      "size": [
+        1.9,
+        1.1,
+        0.16
+      ],
+      "yaw_degrees": 0,
+      "role": "blank blackboard envelope",
+      "collidable": false,
+      "owner": "huangzhong",
+      "bounds": [
+        [
+          -0.9500000476837158,
+          -0.550000011920929,
+          0.0
+        ],
+        [
+          0.9500000476837158,
+          0.550000011920929,
+          0.1599999964237213
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "globe",
+      "model": "props/globe",
+      "position": [
+        0.06,
+        1.21425,
+        -2.3815
+      ],
+      "size": [
+        0.36886,
+        0.46943,
+        0.32
+      ],
+      "yaw_degrees": 0,
+      "role": "globe_mount envelope",
+      "collidable": false,
+      "owner": "huangzhong",
+      "support": "teacher_desk",
+      "mount": {
+        "module": "teacher_desk",
+        "node": "globe_mount"
+      },
+      "bounds": [
+        [
+          -0.18442970514297485,
+          0.0,
+          -0.1599999964237213
+        ],
+        [
+          0.18442970514297485,
+          0.46942970156669617,
+          0.1599999964237213
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "stationery_1",
+      "model": "props/desk_stationery",
+      "position": [
+        -0.55,
+        1.2142500000000003,
+        -0.95
+      ],
+      "size": [
+        0.545,
+        0.255,
+        0.27
+      ],
+      "yaw_degrees": 0,
+      "role": "book and pencil cup envelope",
+      "collidable": false,
+      "owner": "huangzhong",
+      "support": "desk_1",
+      "bounds": [
+        [
+          -0.27250009775161743,
+          0.0,
+          -0.13500000536441803
+        ],
+        [
+          0.27250009775161743,
+          0.2549999952316284,
+          0.13500000536441803
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "stationery_6",
+      "model": "props/desk_stationery",
+      "position": [
+        1.6,
+        1.2142500000000003,
+        1.55
+      ],
+      "size": [
+        0.545,
+        0.255,
+        0.27
+      ],
+      "yaw_degrees": 0,
+      "role": "book and pencil cup envelope",
+      "collidable": false,
+      "owner": "huangzhong",
+      "support": "desk_6",
+      "bounds": [
+        [
+          -0.27250009775161743,
+          0.0,
+          -0.13500000536441803
+        ],
+        [
+          0.27250009775161743,
+          0.2549999952316284,
+          0.13500000536441803
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plaster_study",
+      "model": "props/plaster_study",
+      "position": [
+        -2.91,
+        0.98,
+        0.85
+      ],
+      "size": [
+        0.677514,
+        0.505,
+        0.23818
+      ],
+      "yaw_degrees": 90,
+      "role": "combined study object envelope",
+      "collidable": false,
+      "owner": "huangzhong",
+      "support": "low_cabinet_1",
+      "bounds": [
+        [
+          -0.3387569785118103,
+          0.0,
+          -0.11908960342407227
+        ],
+        [
+          0.3387569785118103,
+          0.5049999952316284,
+          0.11908960342407227
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "reading_cushion_1",
+      "model": "props/reading_cushion",
+      "position": [
+        -2.82,
+        0.08,
+        -0.73
+      ],
+      "size": [
+        0.6,
+        0.16,
+        0.6
+      ],
+      "yaw_degrees": 0,
+      "role": "decorative cushion",
+      "collidable": true,
+      "owner": "huangzhong",
+      "bounds": [
+        [
+          -0.30000001192092896,
+          0.0,
+          -0.30000001192092896
+        ],
+        [
+          0.30000001192092896,
+          0.1599999964237213,
+          0.30000001192092896
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.08,
+            0
+          ],
+          "radius": 0.3,
+          "height": 0.16
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "reading_cushion_2",
+      "model": "props/reading_cushion",
+      "position": [
+        -2.1,
+        0.08,
+        -0.73
+      ],
+      "size": [
+        0.6,
+        0.16,
+        0.6
+      ],
+      "yaw_degrees": 0,
+      "role": "decorative cushion",
+      "collidable": true,
+      "owner": "huangzhong",
+      "bounds": [
+        [
+          -0.30000001192092896,
+          0.0,
+          -0.30000001192092896
+        ],
+        [
+          0.30000001192092896,
+          0.1599999964237213,
+          0.30000001192092896
+        ]
+      ],
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.08,
+            0
+          ],
+          "radius": 0.3,
+          "height": 0.16
+        }
+      ],
+      "shape": "circle"
+    },
+    {
+      "name": "name_sign",
+      "model": "props/name_sign",
+      "position": [
+        0.38,
+        3.19,
+        -2.99
+      ],
+      "size": [
+        1.45,
+        0.38,
+        0.046
+      ],
+      "yaw_degrees": 0,
+      "role": "blank runtime sign envelope",
+      "collidable": false,
+      "owner": "huangzhong",
+      "bounds": [
+        [
+          -0.7250000238418579,
+          -0.1899999976158142,
+          0.0
+        ],
+        [
+          0.7250000238418579,
+          0.1899999976158142,
+          0.04600000008940697
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "pendant_1",
+      "model": "pendant",
+      "position": [
+        -1.8,
+        2.96,
+        1.25
+      ],
+      "size": [
+        0.4,
+        0.38,
+        0.4
+      ],
+      "yaw_degrees": 0,
+      "role": "shared pendant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.19994999468326569,
+          -0.007999995723366737,
+          -0.19994999468326569
+        ],
+        [
+          0.19994999468326569,
+          0.6959999799728394,
+          0.19994999468326569
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "pendant_2",
+      "model": "pendant",
+      "position": [
+        2.4,
+        2.96,
+        1.25
+      ],
+      "size": [
+        0.4,
+        0.38,
+        0.4
+      ],
+      "yaw_degrees": 0,
+      "role": "shared pendant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.19994999468326569,
+          -0.007999995723366737,
+          -0.19994999468326569
+        ],
+        [
+          0.19994999468326569,
+          0.6959999799728394,
+          0.19994999468326569
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "wall_sconce_1",
+      "model": "wall_sconce",
+      "position": [
+        -3.1,
+        2.05,
+        -0.55
+      ],
+      "size": [
+        0.25,
+        0.27,
+        0.25
+      ],
+      "yaw_degrees": 90,
+      "role": "shared wall sconce envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.07000000029802322,
+          -0.2800000011920929,
+          0.0
+        ],
+        [
+          0.07000000029802322,
+          0.2800000011920929,
+          0.15949998795986176
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "wall_sconce_2",
+      "model": "wall_sconce",
+      "position": [
+        -3.1,
+        2.05,
+        0.55
+      ],
+      "size": [
+        0.25,
+        0.27,
+        0.25
+      ],
+      "yaw_degrees": 90,
+      "role": "shared wall sconce envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.07000000029802322,
+          -0.2800000011920929,
+          0.0
+        ],
+        [
+          0.07000000029802322,
+          0.2800000011920929,
+          0.15949998795986176
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plant_1",
+      "model": "small_plant",
+      "position": [
+        -3.03,
+        1.2,
+        -2.03
+      ],
+      "size": [
+        0.26,
+        0.36,
+        0.26
+      ],
+      "yaw_degrees": 0,
+      "role": "shared potted plant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plant_2",
+      "model": "small_plant",
+      "position": [
+        -3.03,
+        1.2,
+        -1.53
+      ],
+      "size": [
+        0.26,
+        0.36,
+        0.26
+      ],
+      "yaw_degrees": 0,
+      "role": "shared potted plant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plant_3",
+      "model": "small_plant",
+      "position": [
+        -3.03,
+        1.2,
+        1.53
+      ],
+      "size": [
+        0.26,
+        0.36,
+        0.26
+      ],
+      "yaw_degrees": 0,
+      "role": "shared potted plant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plant_4",
+      "model": "small_plant",
+      "position": [
+        -3.03,
+        1.2,
+        2.03
+      ],
+      "size": [
+        0.26,
+        0.36,
+        0.26
+      ],
+      "yaw_degrees": 0,
+      "role": "shared potted plant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plant_5",
+      "model": "small_plant",
+      "position": [
+        -2.65,
+        1.58,
+        -2.5
+      ],
+      "size": [
+        0.26,
+        0.36,
+        0.26
+      ],
+      "yaw_degrees": 0,
+      "role": "shared potted plant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "support": "rear_bookcase",
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "plant_6",
+      "model": "small_plant",
+      "position": [
+        2.96,
+        1.84,
+        -2.82
+      ],
+      "size": [
+        0.26,
+        0.36,
+        0.26
+      ],
+      "yaw_degrees": 0,
+      "role": "shared potted plant envelope",
+      "collidable": false,
+      "owner": "zhaoyun",
+      "support": "display_shelf_1",
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "colliders": []
+    },
+    {
+      "name": "reading_books",
+      "model": "reading_books",
+      "position": [
+        -2.48,
+        0.08,
+        -0.12
+      ],
+      "size": [
+        0.34,
+        0.16,
+        0.27
+      ],
+      "bounds": [
+        [
+          -0.17000000178813934,
+          -0.000499999150633812,
+          -0.12999999523162842
+        ],
+        [
+          0.17000000178813934,
+          0.16449999809265137,
+          0.1339999884366989
+        ]
+      ],
+      "yaw_degrees": 0,
+      "role": "reading corner book stack",
+      "collidable": true,
+      "owner": "zhaoyun",
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.08,
+            0
+          ],
+          "size": [
+            0.34,
+            0.16,
+            0.27
+          ]
+        }
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "name": "spawn",
+      "position": [
+        2.9,
+        0.08,
+        2.5
+      ],
+      "yaw_degrees": 180,
+      "module": "hall_floor"
+    },
+    {
+      "name": "exit",
+      "position": [
+        0.5,
+        0.08,
+        2.88
+      ],
+      "yaw_degrees": 180,
+      "module": "hall_floor"
+    },
+    {
+      "name": "badge_exit",
+      "position": [
+        0.5,
+        0.55,
+        3.0
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "cam_default",
+      "position": [
+        2.9,
+        0.08,
+        2.5
+      ],
+      "yaw_degrees": 45,
+      "module": "hall_floor",
+      "role": "camera_follow_target",
+      "pitch_degrees": 43,
+      "orthographic_width": 6.72
+    },
+    {
+      "name": "sign_door",
+      "position": [
+        0.38,
+        3.19,
+        -2.938
+      ],
+      "yaw_degrees": 0,
+      "module": "name_sign",
+      "size": [
+        1.3,
+        0.28
+      ]
+    },
+    {
+      "name": "seat_desk_1",
+      "position": [
+        -0.55,
+        0.7949999999999999,
+        -0.41999999999999993
+      ],
+      "yaw_degrees": 0,
+      "module": "stool_1",
+      "desk_module": "desk_1",
+      "stand": [
+        0.19999999999999996,
+        0.08,
+        -0.35
+      ]
+    },
+    {
+      "name": "seat_desk_2",
+      "position": [
+        1.6,
+        0.7949999999999999,
+        -0.41999999999999993
+      ],
+      "yaw_degrees": 0,
+      "module": "stool_2",
+      "desk_module": "desk_2",
+      "stand": [
+        0.8500000000000001,
+        0.08,
+        -0.35
+      ]
+    },
+    {
+      "name": "seat_desk_3",
+      "position": [
+        -0.55,
+        0.7949999999999999,
+        0.8300000000000001
+      ],
+      "yaw_degrees": 0,
+      "module": "stool_3",
+      "desk_module": "desk_3",
+      "stand": [
+        0.19999999999999996,
+        0.08,
+        0.8999999999999999
+      ]
+    },
+    {
+      "name": "seat_desk_4",
+      "position": [
+        1.6,
+        0.7949999999999999,
+        0.8300000000000001
+      ],
+      "yaw_degrees": 0,
+      "module": "stool_4",
+      "desk_module": "desk_4",
+      "stand": [
+        0.8500000000000001,
+        0.08,
+        0.8999999999999999
+      ]
+    },
+    {
+      "name": "seat_desk_5",
+      "position": [
+        -0.55,
+        0.7949999999999999,
+        2.08
+      ],
+      "yaw_degrees": 0,
+      "module": "stool_5",
+      "desk_module": "desk_5",
+      "stand": [
+        0.19999999999999996,
+        0.08,
+        2.15
+      ]
+    },
+    {
+      "name": "seat_desk_6",
+      "position": [
+        1.6,
+        0.7949999999999999,
+        2.08
+      ],
+      "yaw_degrees": 0,
+      "module": "stool_6",
+      "desk_module": "desk_6",
+      "stand": [
+        0.8500000000000001,
+        0.08,
+        2.15
+      ]
+    },
+    {
+      "name": "stand_desk_1",
+      "position": [
+        0.19999999999999996,
+        0.08,
+        -0.35
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "stand_desk_2",
+      "position": [
+        0.8500000000000001,
+        0.08,
+        -0.35
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "stand_desk_3",
+      "position": [
+        0.19999999999999996,
+        0.08,
+        0.8999999999999999
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "stand_desk_4",
+      "position": [
+        0.8500000000000001,
+        0.08,
+        0.8999999999999999
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "stand_desk_5",
+      "position": [
+        0.19999999999999996,
+        0.08,
+        2.15
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "stand_desk_6",
+      "position": [
+        0.8500000000000001,
+        0.08,
+        2.15
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    }
+  ],
+  "spawn": [
+    2.9,
+    0.08,
+    2.5
+  ],
+  "exit": [
+    0.5,
+    0.08,
+    2.88
+  ],
+  "main_target": [
+    0.5,
+    0.08,
+    -1.55
+  ],
+  "camera": {
+    "position": [
+      10.342903137207031,
+      15.63996696472168,
+      10.342903137207031
+    ],
+    "target": [
+      0.0,
+      2.0,
+      0.0
+    ],
+    "size": 11.0,
+    "pitch_degrees": 43,
+    "yaw_degrees": 45,
+    "near": 0.1,
+    "far": 40.0
+  },
+  "review_lighting": {
+    "background": "E7E3D9",
+    "ambient_color": "F3EADC",
+    "ambient": 0.52,
+    "sun_color": "FFF0D4",
+    "sun": 1.1,
+    "sun_position": [
+      -6,
+      4,
+      -1
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.04,
+    "shadow_normal_bias": 0.12,
+    "shadow_mode": "orthogonal_single",
+    "shadow_distance": 30,
+    "angular_distance": 0.4
+  },
+  "shared_shell": "res://scenes/shell_hall/shell_hall_art.tscn",
+  "source_ownership": {
+    "zhaoyun": [
+      "layout.json",
+      "asset_stats.json",
+      "root GLBs and atlas",
+      "scenes/poi_classroom/*"
+    ],
+    "huangzhong": "props/ copied byte-for-byte from 350bd1f1 / PR #689. No files modified."
+  },
+  "prop_interface": {
+    "source_commit": "350bd1f1",
+    "source_pr": 689,
+    "manifest": "assets/rooms/poi_classroom/props/prop_manifest.json",
+    "globe_mount_local": [
+      -0.32,
+      1.13425,
+      -0.0015
+    ],
+    "stationery_size": [
+      0.545,
+      0.255,
+      0.27
+    ]
+  },
+  "shell_atlas": "res://assets/rooms/poi_classroom/room_albedo_ao.png",
+  "assets": [
+    {
+      "name": "student_desk",
+      "file": "student_desk.glb",
+      "triangles": 972,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5099999904632568,
+          0.0,
+          -0.28999999165534973
+        ],
+        [
+          0.5099999904632568,
+          1.1342500448226929,
+          0.28999999165534973
+        ]
+      ],
+      "dimensions_m": [
+        1.0199999809265137,
+        1.1342500448226929,
+        0.5799999833106995
+      ],
+      "sha256": "28c0e127f743ac9f93dbed3dd83de2d7f7ffe03224351aed61898b8a7100b5a3"
+    },
+    {
+      "name": "student_stool",
+      "file": "student_stool.glb",
+      "triangles": 1232,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.23999999463558197,
+          -2.38418573772492e-09,
+          -0.23999999463558197
+        ],
+        [
+          0.23999999463558197,
+          0.7149999737739563,
+          0.23999999463558197
+        ]
+      ],
+      "dimensions_m": [
+        0.47999998927116394,
+        0.714999976158142,
+        0.47999998927116394
+      ],
+      "sha256": "43d8762d46109a21dc2906cd10778961e1ea20cba36a48e6695fc0cdbf8dd298"
+    },
+    {
+      "name": "rear_bookcase",
+      "file": "rear_bookcase.glb",
+      "triangles": 10548,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.44999998807907104,
+          -5.662441071585533e-10,
+          -0.32499998807907104
+        ],
+        [
+          0.44999998807907104,
+          1.5,
+          0.32499998807907104
+        ]
+      ],
+      "dimensions_m": [
+        0.8999999761581421,
+        1.5000000005662442,
+        0.6499999761581421
+      ],
+      "sha256": "a24a358d25c8253932d2c262cfae756b1b60ae5ae7e536493b6fcc1751968f61"
+    },
+    {
+      "name": "right_storage",
+      "file": "right_storage.glb",
+      "triangles": 11916,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.550000011920929,
+          -1.668930060816365e-08,
+          -0.25
+        ],
+        [
+          0.550000011920929,
+          1.159999966621399,
+          0.25
+        ]
+      ],
+      "dimensions_m": [
+        1.100000023841858,
+        1.1599999833106995,
+        0.5
+      ],
+      "sha256": "13c72d934150a6d63e1e61f53dcfe20ea6f6138fdfef64b4a2525289132359e0"
+    },
+    {
+      "name": "low_cabinet",
+      "file": "low_cabinet.glb",
+      "triangles": 3948,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.4000000059604645,
+          -1.1920929132713809e-08,
+          -0.23999999463558197
+        ],
+        [
+          0.4000000059604645,
+          0.8999999761581421,
+          0.23999999463558197
+        ]
+      ],
+      "dimensions_m": [
+        0.800000011920929,
+        0.8999999880790712,
+        0.47999998927116394
+      ],
+      "sha256": "6a8fa24c6cad2206c0cf7de0769571ca5166658ecb302d966239572dc2e3df2b"
+    },
+    {
+      "name": "display_shelf",
+      "file": "display_shelf.glb",
+      "triangles": 564,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5600000023841858,
+          -0.019999999552965164,
+          -0.1599999964237213
+        ],
+        [
+          0.5600000023841858,
+          0.5,
+          0.1599999964237213
+        ]
+      ],
+      "dimensions_m": [
+        1.1200000047683716,
+        0.5199999995529652,
+        0.3199999928474426
+      ],
+      "sha256": "fba2416787b2609e319d84df9a2c83a4d59a562bb74490c251673aaa84ceb941"
+    },
+    {
+      "name": "book_shelf",
+      "file": "book_shelf.glb",
+      "triangles": 2604,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.5600000023841858,
+          -0.019999999552965164,
+          -0.1599999964237213
+        ],
+        [
+          0.5600000023841858,
+          0.38999998569488525,
+          0.1599999964237213
+        ]
+      ],
+      "dimensions_m": [
+        1.1200000047683716,
+        0.4099999852478504,
+        0.3199999928474426
+      ],
+      "sha256": "90a39105854dd0e633eedeb616e670a37cf4ba2a7709406c11f6334450aa2a51"
+    },
+    {
+      "name": "reading_books",
+      "file": "reading_books.glb",
+      "triangles": 1296,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.17000000178813934,
+          -0.000499999150633812,
+          -0.12999999523162842
+        ],
+        [
+          0.17000000178813934,
+          0.16449999809265137,
+          0.1339999884366989
+        ]
+      ],
+      "dimensions_m": [
+        0.3400000035762787,
+        0.16499999724328518,
+        0.26399998366832733
+      ],
+      "sha256": "e454800b4be21d7813a7029bb6e03f3645e93f1e1c109c86ec0d0f93346bd9a0"
+    },
+    {
+      "name": "pendant",
+      "file": "pendant.glb",
+      "triangles": 904,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.19994999468326569,
+          -0.007999995723366737,
+          -0.19994999468326569
+        ],
+        [
+          0.19994999468326569,
+          0.6959999799728394,
+          0.19994999468326569
+        ]
+      ],
+      "dimensions_m": [
+        0.39989998936653137,
+        0.7039999756962061,
+        0.39989998936653137
+      ],
+      "sha256": "082fc99a6f89f8c0d229e38b1909fb37664fa64df83e5ebe67997e3ffe1eaa4e"
+    },
+    {
+      "name": "wall_sconce",
+      "file": "wall_sconce.glb",
+      "triangles": 292,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.07000000029802322,
+          -0.2800000011920929,
+          0.0
+        ],
+        [
+          0.07000000029802322,
+          0.2800000011920929,
+          0.15949998795986176
+        ]
+      ],
+      "dimensions_m": [
+        0.14000000059604645,
+        0.5600000023841858,
+        0.15949998795986176
+      ],
+      "sha256": "88d7dddbaf8370a2aac0c215c2b1d214c8c66d889346e6d1af089e7b79f0f3e6"
+    },
+    {
+      "name": "small_plant",
+      "file": "small_plant.glb",
+      "triangles": 946,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.12711367011070251,
+          0.0,
+          -0.11059348285198212
+        ],
+        [
+          0.1290000081062317,
+          0.3720000088214874,
+          0.10735911875963211
+        ]
+      ],
+      "dimensions_m": [
+        0.2561136782169342,
+        0.3720000088214874,
+        0.21795260161161423
+      ],
+      "sha256": "adec5f1e5e070e91019e4f2c135f9a6fe081f9786b559cc18e2487bf78b4bd87"
+    },
+    {
+      "name": "props/blackboard",
+      "file": "props/blackboard.glb",
+      "module": "M06",
+      "description": "Blank dark-green chalkboard with softened wood frame and chalk ledge",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "usable_area_m": [
+        1.77,
+        0.96
+      ],
+      "triangles": 264,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.9500000476837158,
+          -0.550000011920929,
+          0.0
+        ],
+        [
+          0.9500000476837158,
+          0.550000011920929,
+          0.1599999964237213
+        ]
+      ],
+      "dimensions_m": [
+        1.9000000953674316,
+        1.100000023841858,
+        0.1599999964237213
+      ],
+      "sha256": "0ab69ef68ab380804fe2cf89adb0ae2d8002637bf6dd2add589b943a9baa97d8",
+      "provenance": "tools/art/source/poi_classroom/props/modules/blackboard/reuse_provenance.json"
+    },
+    {
+      "name": "props/teacher_desk",
+      "file": "props/teacher_desk.glb",
+      "module": "M07",
+      "description": "Ivory paneled teacher desk with wood top; scenery only, no NPC or use anchors",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "desktop_height_m": 1.1342500000000002,
+      "mounts": [
+        {
+          "name": "globe_mount",
+          "position": [
+            -0.3199999928474426,
+            1.1342500448226929,
+            -0.0014999955892562866
+          ]
+        }
+      ],
+      "colliders": [
+        {
+          "position": [
+            0.0,
+            0.5671250224113464,
+            -0.0014999955892562866
+          ],
+          "size": [
+            1.3,
+            1.1342500000000002,
+            0.72
+          ]
+        }
+      ],
+      "triangles": 484,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.6499999761581421,
+          0.0,
+          -0.3615000247955322
+        ],
+        [
+          0.6499999761581421,
+          1.184249997138977,
+          0.3615000247955322
+        ]
+      ],
+      "dimensions_m": [
+        1.2999999523162842,
+        1.184249997138977,
+        0.7230000495910645
+      ],
+      "sha256": "71a5ae06344a7669672ce0df54080eeb84369086892b06957a829b4960379d4a",
+      "provenance": "tools/art/source/poi_classroom/props/modules/teacher_desk/reuse_provenance.json"
+    },
+    {
+      "name": "props/globe",
+      "file": "props/globe.glb",
+      "module": "M08",
+      "description": "Separate tilted classroom globe; vertex-colored continents and matte brass meridian",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "triangles": 496,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.18442970514297485,
+          0.0,
+          -0.1599999964237213
+        ],
+        [
+          0.18442970514297485,
+          0.46942970156669617,
+          0.1599999964237213
+        ]
+      ],
+      "dimensions_m": [
+        0.3688594102859497,
+        0.46942970156669617,
+        0.3199999928474426
+      ],
+      "sha256": "af415292aad2798ea3fd557bdcfaa577d01013a1bde64dc756ede85569f21a04",
+      "provenance": "tools/art/source/poi_classroom/props/modules/globe/reuse_provenance.json"
+    },
+    {
+      "name": "props/desk_stationery",
+      "file": "props/desk_stationery.glb",
+      "module": "M05",
+      "description": "Open blank book and hollow pencil cup with three pencils",
+      "quantity": 2,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "triangles": 270,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.27250009775161743,
+          0.0,
+          -0.13500000536441803
+        ],
+        [
+          0.27250009775161743,
+          0.2549999952316284,
+          0.13500000536441803
+        ]
+      ],
+      "dimensions_m": [
+        0.5450001955032349,
+        0.2549999952316284,
+        0.27000001072883606
+      ],
+      "sha256": "96fed975006aea323791703a5dbe796ef067db6efafc4f4f2fa185eb88cd83f9",
+      "provenance": "tools/art/source/poi_classroom/props/modules/desk_stationery/reuse_provenance.json"
+    },
+    {
+      "name": "props/plaster_study",
+      "file": "props/plaster_study.glb",
+      "module": "M12",
+      "description": "Neutral plaster head-and-shoulders study plus faceted geometric solid; no religious motifs",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "triangles": 470,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3387569785118103,
+          0.0,
+          -0.11908960342407227
+        ],
+        [
+          0.3387569785118103,
+          0.5049999952316284,
+          0.11908960342407227
+        ]
+      ],
+      "dimensions_m": [
+        0.6775139570236206,
+        0.5049999952316284,
+        0.23817920684814453
+      ],
+      "sha256": "574d198d3c368b03c17ab04263cec44f39a050cba31bb1650ff4a3c7eea298d1",
+      "provenance": "tools/art/source/poi_classroom/props/modules/plaster_study/reuse_provenance.json"
+    },
+    {
+      "name": "props/reading_cushion",
+      "file": "props/reading_cushion.glb",
+      "module": "M13",
+      "description": "Soft sage reading cushion; decoration only, no seat anchor",
+      "quantity": 2,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "triangles": 188,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.30000001192092896,
+          0.0,
+          -0.30000001192092896
+        ],
+        [
+          0.30000001192092896,
+          0.1599999964237213,
+          0.30000001192092896
+        ]
+      ],
+      "dimensions_m": [
+        0.6000000238418579,
+        0.1599999964237213,
+        0.6000000238418579
+      ],
+      "sha256": "a3f48274f0902cf316c76335621ef240985d1a887d9f9aa6d540b91527168750",
+      "provenance": "tools/art/source/poi_classroom/props/modules/reading_cushion/reuse_provenance.json"
+    },
+    {
+      "name": "props/name_sign",
+      "file": "props/name_sign.glb",
+      "module": "M19",
+      "description": "Blank ivory runtime sign with thin wood frame",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [
+        {
+          "name": "sign_door",
+          "position": [
+            0.0,
+            0.0,
+            0.052000001072883606
+          ],
+          "yaw_degrees": 0,
+          "size": [
+            1.3,
+            0.28
+          ],
+          "module": "name_sign",
+          "text": "",
+          "front": "+Z"
+        }
+      ],
+      "triangles": 220,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.7250000238418579,
+          -0.1899999976158142,
+          0.0
+        ],
+        [
+          0.7250000238418579,
+          0.1899999976158142,
+          0.04600000008940697
+        ]
+      ],
+      "dimensions_m": [
+        1.4500000476837158,
+        0.3799999952316284,
+        0.04600000008940697
+      ],
+      "sha256": "a0e25de36ba1e3034d8610c6ac1a6e19db19c0a5f3ea68b4e17de82e5bbfc8eb",
+      "provenance": "tools/art/source/poi_classroom/props/modules/name_sign/reuse_provenance.json"
+    }
+  ],
+  "local_lights": [
+    {
+      "name": "wall_warmth_1",
+      "position": [
+        -2.88,
+        2.22,
+        -0.55
+      ],
+      "color": "FFDB9F",
+      "energy": 0.65,
+      "range": 1.2
+    },
+    {
+      "name": "wall_warmth_2",
+      "position": [
+        -2.88,
+        2.22,
+        0.55
+      ],
+      "color": "FFDB9F",
+      "energy": 0.65,
+      "range": 1.2
+    },
+    {
+      "name": "pendant_warmth_1",
+      "position": [
+        -1.8,
+        2.94,
+        1.25
+      ],
+      "color": "FFE2AF",
+      "energy": 0.65,
+      "range": 2.2
+    },
+    {
+      "name": "pendant_warmth_2",
+      "position": [
+        2.4,
+        2.94,
+        1.25
+      ],
+      "color": "FFE2AF",
+      "energy": 0.65,
+      "range": 2.2
+    },
+    {
+      "name": "window_fill_1",
+      "position": [
+        -2.8,
+        2.15,
+        -1.8
+      ],
+      "color": "FFF3DA",
+      "energy": 0.5,
+      "range": 3.2
+    },
+    {
+      "name": "window_fill_2",
+      "position": [
+        -2.8,
+        2.15,
+        1.8
+      ],
+      "color": "FFF3DA",
+      "energy": 0.5,
+      "range": 3.2
+    }
+  ],
+  "lighting": {
+    "angular_distance": 0.4
+  }
+}
