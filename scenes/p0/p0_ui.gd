@@ -4703,17 +4703,22 @@ func open_voice_profile() -> void:
 		"open": voice_match.open("solo")
 		"refuse": toast(VOICE_PROFILE_NOT_AVAILABLE)
 		_:
-			# over the profile's place, and back on it after (P281-5: the toast with the card still there)
+			# over the profile, dimmed under it (帧 422:190483, 不知火舞 390 954da6ce): closed or answered, the layer goes and
+			# the profile is there as it was (_over_profile, as Skills over it); then the page, or the toast on the profile
+			_over_profile = true
 			var d: UiDrawer = AgeCard.new(0, "Voice Profile")
 			d.theme = UiKit.theme()
 			d.safe_bottom = safe_bottom()
-			d.close_requested.connect(func(): open_profile())
+			d.close_requested.connect(close_layer)
 			d.connect(&"answered", func(ok: bool):
-				voice_account.call("answer_age", ok)   # kept for voice too: the one answer
-				open_profile()
+				# kept for voice too: the one answer. voice_account is never set up for a room (no Voice of its own), so its
+				# answer_age(true) does not turn a mic on: toggle_mic returns at once (后裔 on #715)
+				voice_account.call("answer_age", ok)
+				close_layer()
 				if ok: voice_match.open("solo")
 				else: toast(VOICE_PROFILE_NOT_AVAILABLE))
 			_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+			_modal_back = func(): open_profile()
 			modal_kind = "age"
 
 ## What a Voice Profile tap does for voice's 13+ answer (`ok` / `no` / `unknown`): "open", "refuse" or "ask".
