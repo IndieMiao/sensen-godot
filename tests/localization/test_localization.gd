@@ -290,3 +290,12 @@ func test_p0_since_is_one_line_with_a_chinese_date() -> void:
 	assert_str(String(t.get_message("Since %s" % P0ProfilePage.since_text(oct2, now)))).is_equal("10 月 2 日加入")
 	TranslationServer.set_locale("en")
 	assert_str(P0ProfilePage.since_text(oct2, now)).is_equal("Oct 2")
+
+## #649 第二批 ⑦ (zh-24 「First cook +10 经验」): a template with no ` · ` of its own never takes a line that has one —
+## `%s XP` caught the kitchen card's `Common · First cook +10 XP` whole; its parts go one by one.
+func test_p0_a_one_part_template_leaves_a_line_of_parts_to_its_parts() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"%s XP": "%s经验", "First cook +%d XP": "首次做出 +%d 经验", "Common": "常见",
+		"%s · %d left": "%s · 剩 %d", "Carrot": "胡萝卜"})
+	assert_str(String(t.get_message("Common · First cook +10 XP"))).is_equal("常见 · 首次做出 +10 经验")
+	assert_str(String(t.get_message("Carrot · 3 left"))).is_equal("胡萝卜 · 剩 3")   # a template with ` · ` still does

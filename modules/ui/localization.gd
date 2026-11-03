@@ -124,7 +124,7 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
-	var _templates: Array = []   # [RegEx, Chinese, literal length, %s count] — the longest literal tried first
+	var _templates: Array = []   # [RegEx, Chinese, literal length, %s count, has ` · `] — the longest literal tried first
 	var _cache := {}
 	const CACHE_MAX := 4096
 	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
@@ -162,7 +162,7 @@ class P0Translation extends Translation:
 			if SPEC.search(en) != null:
 				var re := RegEx.new()
 				if re.compile(_pattern(en)) == OK:
-					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s")])
+					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s"), en.contains(" · ")])
 			else:
 				_exact[en] = str(zh)
 		# as long: the one with fewer %s first — `%d XP` takes `+20 XP` (「+20 经验」), `%s XP` the skill's `Farming XP`
@@ -270,6 +270,9 @@ class P0Translation extends Translation:
 		for entry in _templates:
 			var m: RegExMatch = (entry[0] as RegEx).search(s)
 			if m == null: continue
+			# a template with no ` · ` of its own is one part: `%s XP` does not take `Common · First cook +10 XP` whole,
+			# the line's parts go one by one (`First cook +%d XP` the second) — #649 第二批 ⑦
+			if not bool(entry[4]) and s.contains(" · "): continue
 			var values: Array = []
 			for g in range(1, m.get_group_count() + 1):
 				var v := m.get_string(g)
