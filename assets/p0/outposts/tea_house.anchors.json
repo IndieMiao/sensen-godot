@@ -1,5 +1,5 @@
 {
-  "_note": "Oak Tea House and every generated tea house on the tea house kit (SGODOT-216, assets/rooms/tea_house, 上官婉儿 #598 84d0ff88): every anchor is the kit's layout.json but the two residents' spots, moved so the opening shot takes in Hana and Lena with the player, Ama and the counter (不知火舞 214 36bbf7b6), neither reads as staff and no seat's prompt sits on a name tag (不知火舞 216 ce290834; 上官婉儿's third spots, worked out on screen with the tags and the seats' prompts, /Volumes/ACASIS/tmp/art-director/tea-216-npc/final3.py): Lena on the guests' side between the window bench's top and the counter's left end, three-quarter to the camera; Hana in the front right, the guests' side, well away from the counter, turned towards where she is talked to.",
+  "_note": "Oak Tea House and every generated tea house on the tea house kit (SGODOT-216, assets/rooms/tea_house, 上官婉儿 #598 84d0ff88): every anchor is the kit's layout.json but the two residents' spots, moved so the opening shot takes in Hana and Lena with the player, Ama and the counter (不知火舞 214 36bbf7b6), neither reads as staff and no seat's prompt sits on a name tag (不知火舞 216 ce290834; 上官婉儿's third spots, worked out on screen with the tags and the seats' prompts, /Volumes/ACASIS/tmp/art-director/tea-216-npc/final3.py): Lena on the guests' side between the window bench's top and the counter's left end, three-quarter to the camera; Hana in the front right, the guests' side, well away from the counter, facing the camera, a little towards where she is talked to (yaw −150: a resident is mostly looked at, 上官婉儿).",
   "anchors": [
     {
       "name": "npc_hana",
@@ -8,7 +8,7 @@
         0.08,
         2.05
       ],
-      "yaw_degrees": 150
+      "yaw_degrees": -150
     },
     {
       "name": "stand_hana",
