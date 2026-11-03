@@ -22,7 +22,7 @@
 > - 补了 q 行的文案（第 7.4 节）。
 > **v0.8（11-03）**：G 服务端的 v4q(9) 两件（周瑜，奕星 11-02 派）：
 > - 第 9.2 节：First Dig **完成以后 `view.first_dig` 照样给**（`done: true`、`have` = `floor`），Lv3 以前才是 null（v4q(9) 的矿脉行要分清「完成了」和「还没出现」，和亚瑟、刘邦对过，#636 评论 6574856129）；写明完成时的事件（`first_dig`、`gear`、`affinity`）；
-> - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，补注待用户批）；第 7.4 节补台词；
+> - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，用户已批）；第 7.4 节补台词；
 > - 试玩路由 `/v1/p0/dev/blackjack` 改 Homestead 等级时也结算 First Dig（后裔审 #697 时提的）；
 > - 第 10.1 节补矿层资源的口径（守关场地、电梯站、守关层王的出生点、配色的键），资产已进 b1。
 > **v0.7+（11-02 晚）**：第 10 节补怪物导入的后处理脚本（上官婉儿 11-02）：导入时顶点色当底色、关投影；运行时换材质、选模型时要注意的两点。
@@ -420,7 +420,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - **view**：`view.first_dig: null | { giver, floor, have, done }`。Lv3 以前是 null；出现了、还没完成时 `done: false`，`have` 是资历（不超过 `floor`）；**完成以后照样给，`{ giver, floor, have: floor, done: true }`**（v4q(9) 的矿脉行要分清「完成了」和「还没出现」）。Today 只照 `done: false` 的出一行，第 7.4 节的文案按 q 行。
 - **Pip 一句**（v4q(9) ②）：`view.pip_line: null | { key: 'pip_vein', vein, name }`。条件四条都满足才给：First Dig 已完成；引导已经结束（`guide.step` 为空，不进引导的号同样算）；`seen` 里没有 `line:pip_vein`；那座铁矿脉（`wild.ts` 的 `nearestFreeVein(c, s, 'iron_ore')`，离家最近的免费铁矿脉，和 Today 矿脉行永远指同一座）的 deepest < 10。没有这座矿脉时不给。`name` 是那座矿的全名（地图钉和矿口卡上的同一个），客户端拿它填台词的 `%s`。
   - **记「说过」走现有的 `talk`，不加新命令**：`{type: 'talk', resident: 'res_pip'}` 时 `pip_line` 待说，就往 `seen` 记 `line:pip_vein`，不管当天的聊天好感加没加；之后 view 不再给 `pip_line`。和别的居民说话不记。
-  - **引导台词先说**（**不知火舞定，补注待用户批**：11-03 奕星请她定；李白在 v4q(9) 补注、挂 302，奕星报用户，b1 合回 farm-dev 之前要批）：引导进行中服务端不给 `pip_line`，Pip 照说引导台词，这时和 Pip 说话也不记「说过」；引导结束以后的下一次和 Pip 说话才说矿脉这一句，只说一次，不会因为撞上引导而丢掉。
+  - **引导台词先说**（不知火舞定，**用户已批**：v4q(9) ② 的 11-03 补注随 q(279) 报，用户 11-03 在奕星终端回「279 ok」、无消息 id；补注 3c09a6ce、已批 farm-dev c8a2b4bb，302 记录 b1cbc904）：引导进行中服务端不给 `pip_line`，Pip 照说引导台词，这时和 Pip 说话也不记「说过」；引导结束以后的下一次和 Pip 说话才说矿脉这一句，只说一次，不会因为撞上引导而丢掉。
   - 客户端（刘邦，#636）：打开 Pip 对话时，看到 `pip_line` 就说这一句并留到这轮对话结束，再照常发 `talk`；回包里 `pip_line` 没了也不撤。没有 `pip_line` 就照原来的台词（引导台词或好感阶段的台词）。
   - **存档**：不加新字段（`seen` 是现有字段），v7 清档，不迁移。
 - **奖励** `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
