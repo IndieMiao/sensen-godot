@@ -22,7 +22,7 @@
    "figma_node": "299:3069"
   },
   "painted_ladies": {
-   "zh": "彩绘女士",
+   "zh": "Painted Ladies",
    "en": "Painted Ladies",
    "city": "San Francisco",
    "figma_node": "299:3070"
@@ -46,7 +46,7 @@
    "figma_node": "299:3073"
   },
   "powells_books": {
-   "zh": "鲍威尔书城",
+   "zh": "Powell's Books",
    "en": "Powell's Books",
    "city": "Portland",
    "figma_node": "299:3074"
@@ -64,7 +64,7 @@
    "figma_node": "299:3076"
   },
   "crater_lake": {
-   "zh": "火山口湖国家公园",
+   "zh": "火山口湖",
    "en": "Crater Lake",
    "city": "Oregon",
    "figma_node": "299:3077"
@@ -82,7 +82,7 @@
    "figma_node": "299:3079"
   },
   "chihuly_garden_glass": {
-   "zh": "奇胡利玻璃艺术园",
+   "zh": "Chihuly Garden and Glass",
    "en": "Chihuly Garden and Glass",
    "city": "Seattle",
    "figma_node": "299:3080"
@@ -166,7 +166,7 @@
    "figma_node": "299:3093"
   },
   "cloud_gate": {
-   "zh": "云门豆子",
+   "zh": "云门",
    "en": "Cloud Gate",
    "city": "Chicago",
    "figma_node": "299:3094"
