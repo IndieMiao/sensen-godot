@@ -1,0 +1,46 @@
+[
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_WHITE_v0_default_clean.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_WHITE_v0_default_clean.png",
+    "sha256": "4b544c0eb41600e4182bc98b473fe0d253471dc81730e8e9793e2c5086addca1",
+    "bytes": 165251,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_WHITE_v0_default_43.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_WHITE_v0_default_43.png",
+    "sha256": "fcc4c8cbce19038ce0f0b1fdffee0404bec60f91c4add85d507fc5b00848ffd0",
+    "bytes": 194880,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_WHITE_v0_topdown_ruler.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_WHITE_v0_topdown_ruler.png",
+    "sha256": "a4ee452096d5a2cded8bd500695b2301ba0e632e4f86d6b6d9bc15fb8a2ebc01",
+    "bytes": 234395,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1420
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_WHITE_v0_six_seats.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_WHITE_v0_six_seats.png",
+    "sha256": "50739f40557b5b89f3f3b8a3a9bd4ba8b0f8d8b472e6ff4100cd880301c6c9ed",
+    "bytes": 263379,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  }
+]

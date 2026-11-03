@@ -1,0 +1,81 @@
+{
+  "phase": "white blockout",
+  "owned_modules": {
+    "blockout_student_desk": 60,
+    "blockout_student_stool": 140,
+    "blockout_box": 12,
+    "blockout_cylinder": 92,
+    "blockout_ball": 224
+  },
+  "placed_proxy_triangles": 3992,
+  "placed_proxy_surfaces": 37,
+  "shared_shell_stats": {
+    "atlas": {
+      "file": "hall_albedo_ao.png",
+      "size": [
+        2048,
+        2048
+      ],
+      "purpose": "Authored color + shell-local contact AO; no baked direct light or furniture AO"
+    },
+    "assets": [
+      {
+        "name": "hall_floor",
+        "triangles": 634,
+        "surfaces": 1,
+        "vertices": 332,
+        "bytes": 15940
+      },
+      {
+        "name": "hall_left_wall",
+        "triangles": 4552,
+        "surfaces": 1,
+        "vertices": 2352,
+        "bytes": 161456
+      },
+      {
+        "name": "hall_back_wall",
+        "triangles": 4752,
+        "surfaces": 1,
+        "vertices": 2464,
+        "bytes": 165216
+      },
+      {
+        "name": "hall_window_frame",
+        "triangles": 864,
+        "surfaces": 1,
+        "vertices": 448,
+        "bytes": 31292
+      },
+      {
+        "name": "hall_window_grid",
+        "triangles": 648,
+        "surfaces": 1,
+        "vertices": 336,
+        "bytes": 23848
+      },
+      {
+        "name": "hall_window_glass",
+        "triangles": 4,
+        "surfaces": 1,
+        "vertices": 8,
+        "bytes": 1784
+      }
+    ],
+    "unique_triangles": 11454,
+    "scene_triangles": 12966,
+    "static_draw_surfaces": 8,
+    "materials": 2,
+    "glass_surfaces": 1,
+    "placed_instances": 8,
+    "reference_budget": {
+      "scene_triangles": 150000,
+      "static_draw_surfaces": 50
+    }
+  },
+  "final_budget": {
+    "triangles": 150000,
+    "surfaces": 50
+  },
+  "scope": "Proxy cost only; final asset budget must be rechecked after assembly"
+}
