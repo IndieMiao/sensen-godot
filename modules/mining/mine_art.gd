@@ -27,6 +27,7 @@ const LAMP_LOCKED := Color("dba158")
 const PLATE_INK := Color("3b2a20")
 const PLATE := Vector2(0.5, 0.3)   # the station's blank plate, PlateAnchor 0.005 m before it
 static var _kit: Dictionary = {}
+static var _palettes: Dictionary = {}
 
 ## One piece of the 3D kit, instanced, or null where this machine never imported it (no --import here): the code art
 ## stands in then, so tests and shots never fail for it (contract-efg §10.1). A .glb's ResourceLoader.exists is true off
@@ -79,20 +80,42 @@ static func entrance() -> Node3D:
 static func variant_of(floor_number: int) -> int:
 	return clampi(1 + floor_number / 10, 1, 5)
 
-static func chamber(floor_number: int) -> Node3D:
-	var root := _chamber_instance(variant_of(floor_number))
+## A mine type's colours on a floor (contract-efg §10.1; C59, 上官婉儿's assets/mine/types/<type>/palette.json): the band
+## with from ≤ floor ≤ to — past the last band the last — as {ground, wall, backdrop_tint, fog} Colors; {} for a type
+## with no palette (the colours by variant then, as before). Band 1 is the colours the mine had.
+static func palette(type: String, floor_number: int) -> Dictionary:
+	if not _palettes.has(type):
+		var path := "res://assets/mine/types/%s/palette.json" % type
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path)) if type != "" and FileAccess.file_exists(path) else null
+		var bands: Array = []
+		for b in (parsed.get("bands", []) if parsed is Dictionary else []):
+			bands.append({"from": int(b.from), "to": int(b.to), "ground": Color(str(b.ground)), "wall": Color(str(b.wall)),
+				"backdrop_tint": Color(str(b.backdrop_tint)), "fog": Color(str(b.fog))})
+		_palettes[type] = bands
+	var bands: Array = _palettes[type]
+	if bands.is_empty(): return {}
+	var out: Dictionary = bands[0]
+	for b in bands:
+		if int(b.from) <= floor_number: out = b   # the floor's band; past the last one, the last
+	return out
+
+## A floor's chamber: its variant's shape (variant_of) in its mine type's colours (palette), else the variant's own.
+static func chamber(floor_number: int, type := "") -> Node3D:
+	var colours := palette(type, floor_number)
+	var root := _chamber_instance(variant_of(floor_number), colours.get("ground", null), colours.get("wall", null))
 	root.add_child(ladder(Layout.UP, true))
 	return root
 
-static func _chamber_instance(number: int) -> Node3D:
-	if not _floor_cache.has(number):
-		var template := _chamber(number)
+static func _chamber_instance(number: int, ground = null, wall = null) -> Node3D:
+	var key = number if ground == null else "%d:%s:%s" % [number, (ground as Color).to_html(false), (wall as Color).to_html(false)]
+	if not _floor_cache.has(key):
+		var template := _chamber(number, ground, wall)
 		for child in template.get_children(): child.owner = template
 		var packed := PackedScene.new()
 		packed.pack(template)
 		template.free()
-		_floor_cache[number] = packed
-	return (_floor_cache[number] as PackedScene).instantiate() as Node3D
+		_floor_cache[key] = packed
+	return (_floor_cache[key] as PackedScene).instantiate() as Node3D
 
 static func floor_scenery(floor_number: int, elevator_unlocked: bool) -> Node3D:
 	var number := clampi(floor_number, 1, 5)
@@ -116,7 +139,7 @@ static func _outline(number: int) -> PackedVector2Array:
 			Vector2(10.15,-1.2),Vector2(9.8,-0.12),Vector2(8.8,0.4),Vector2(1.0,0.4),Vector2(-0.35,-0.12),Vector2(-0.6,-1.2),Vector2(-0.48,-4.4)])
 	return points
 
-static func _chamber(number: int) -> Node3D:
+static func _chamber(number: int, ground_colour = null, wall_colour = null) -> Node3D:
 	var root := Node3D.new()
 	root.name = "MineScenery"
 	var stone := Meshes.surface()
@@ -129,8 +152,8 @@ static func _chamber(number: int) -> Node3D:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 240924 + number * 197
 	var outline := _outline(number)
-	var ground: Color = FLOOR_COLORS[number - 1]
-	var wall: Color = WALL_COLORS[number - 1]
+	var ground: Color = FLOOR_COLORS[number - 1] if ground_colour == null else ground_colour
+	var wall: Color = WALL_COLORS[number - 1] if wall_colour == null else wall_colour
 	var base := Meshes.surface()
 	var expanded := PackedVector2Array()
 	for p in outline:

@@ -56,3 +56,23 @@ func test_every_p0_preset_ships_every_license_text() -> void:
 			var shipped := filters.any(func(f: String) -> bool: return rel.matchn(f.trim_prefix("res://")) or rel.get_file().matchn(f))
 			assert_bool(shipped).override_failure_message("%s is not in the %s include_filter" % [rel, name]).is_true()
 	assert_int(p0_presets).is_greater_equal(1)
+
+## Data the P0 mine reads as plain files (355 b1): the monsters' json — the placeholders' and the models' beside their
+## glb (contract-efg §10) — and each mine type's palette.json (§10.1). Every P0 preset ships them, the preview one too
+## (it once had none: its monsters would have fallen back to slimes on the 11-08 preview build).
+func test_every_p0_preset_ships_the_mines_json() -> void:
+	var cfg := ConfigFile.new()
+	assert_int(cfg.load("res://export_presets.cfg")).is_equal(OK)
+	var files: Array[String] = ["modules/mining/monsters/placeholder/mob_slime.json", "assets/monsters/mob_cave_bat/mob_cave_bat.json",
+		"assets/mine/types/quarry/palette.json", "assets/mine/types/vein/palette.json"]
+	var p0_presets := 0
+	for s in cfg.get_sections():
+		var features := Array(str(cfg.get_value(s, "custom_features", "")).split(",")).map(func(f: String) -> String: return f.strip_edges())
+		if s.ends_with(".options") or not ("p0" in features): continue
+		p0_presets += 1
+		var filters := Array(str(cfg.get_value(s, "include_filter", "")).split(",")).map(func(f: String) -> String: return f.strip_edges())
+		for rel in files:
+			assert_bool(FileAccess.file_exists("res://" + rel)).override_failure_message("%s is not in the repository" % rel).is_true()
+			assert_bool(filters.any(func(f: String) -> bool: return f != "" and rel.matchn(f))) \
+				.override_failure_message("%s is not in the %s include_filter" % [rel, cfg.get_value(s, "name", s)]).is_true()
+	assert_int(p0_presets).is_greater_equal(2)
