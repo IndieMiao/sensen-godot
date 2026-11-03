@@ -2,9 +2,10 @@
  * Enterable POIs (SGODOT-313; the user 11-03 "POI 提前"; q(279) eaf3edc1, pending the user; plan
  * pm/plans/poi-enter-plan-2026-11-03.md): a map POI the template table picks a kit for opens a room of its own,
  * `poi:<template>@<city cluster>:<12 hex>`. The hex is poiRoomKey: the first 12 lowercase hex of the SHA-256 of the
- * client's POI id as UTF-8 — `tile:<feature id>`, or `tile:<name>:<lon>:<lat>` for a feature without one (GodotMapPlugin.kt,
- * MapUnderlay.swift); Godot's `id.sha256_text().left(12)` (亚瑟, D). Every phone works it out alike, so one POI is one
- * room; the server only checks its form. The feature id changes when Mapbox updates its tiles: a room key only, never saved.
+ * client's POI id as UTF-8 — `tile:<feature id>`, or for a feature without one `tile:<name>:<lon>:<lat>` with lon / lat
+ * written `%.5f` by the client's GDScript from the plugin's numbers (亚瑟, D: Kotlin and Swift write a double differently,
+ * so the plugins' own strings are not used); Godot's `id.sha256_text().left(12)`. Every phone works it out alike, so one
+ * POI is one room on both platforms; the server only checks its form. The feature id changes when Mapbox updates its tiles: a room key only, never saved.
  * The table (assets/p0/poi_templates.json) is the client's too: capacity, each template's kit, door sign, walls and seats,
  * the maki / class rows that pick one, and the class names by maki.
  */

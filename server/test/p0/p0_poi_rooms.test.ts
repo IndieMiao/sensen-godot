@@ -45,7 +45,7 @@ describe('enterable POI rooms (SGODOT-313)', () => {
   });
   it("a POI's room key: the first 12 hex of the SHA-256 of its id, as every phone works it out (亚瑟, D)", () => {
     expect(poiRoomKey('tile:1086226316')).toBe('3c0834443165');                       // a tile feature id
-    expect(poiRoomKey('tile:Fern Pond Café:-122.4194:37.7749')).toBe('fb9518b82257');   // none: name and place, UTF-8
+    expect(poiRoomKey('tile:Fern Pond Café:-122.41940:37.77490')).toBe('8cec1cad8318');   // none: name and %.5f place, UTF-8
     expect(parsePoiRoom(`poi:hotel_lobby@${SF}:${poiRoomKey('tile:1086226316')}`)?.key).toBe('3c0834443165');
   });
   it('a room id names a template, a city and 12 hex of the tile id; anything else is no POI room', () => {
