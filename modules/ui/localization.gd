@@ -213,6 +213,9 @@ class P0Translation extends Translation:
 				any = any or z != ""
 				parts.append(z if z != "" else seg)
 			return " · ".join(parts) if any else ""
+		if s.begins_with("· ") and s.length() > 2:   # a caption's second half drawn on its own (`· Mission Market Square`)
+			var rest := translate_line(s.substr(2))
+			return "· " + rest if rest != "" else ""
 		if s.ends_with(LINK) and s.length() > LINK.length():
 			var head := translate_line(s.left(s.length() - LINK.length()))
 			return head + LINK if head != "" else ""

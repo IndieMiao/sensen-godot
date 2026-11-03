@@ -168,6 +168,7 @@ func test_p0_table_reads_a_links_arrow_and_a_list_of_known_items() -> void:
 	assert_str(String(t.get_message("Carrot, Herb · Decorate ›"))).is_equal("胡萝卜、香草 · 布置 ›")
 	assert_str(String(t.get_message("Carrot, Kale"))).is_equal("")   # Kale unknown: the whole list stays
 	assert_str(String(t.get_message("Unknown ›"))).is_equal("")
+	assert_str(String(t.get_message("· Decorate"))).is_equal("· 布置")   # a caption's half on its own label
 
 func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() -> void:
 	var path := "user://p0-language-test-%d.cfg" % Time.get_ticks_usec()
