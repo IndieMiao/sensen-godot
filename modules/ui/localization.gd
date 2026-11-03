@@ -75,13 +75,20 @@ func ctx(src: String, context: String) -> String:
 ## every line's height, which would move the English layouts measured to the frames.
 const CJK_FONT := "res://assets/ui/fonts/NotoSansSC-Regular.otf"
 const CJK_EMBOLDEN := {400: 0.0, 700: 0.45, 800: 0.6}
+## The three weights as set here, held for as long as this autoload lives: nothing else may hold them yet when P0 starts
+## (the theme loads later), and a font no one holds leaves the resource cache — the next load() made a new one without
+## the fallback, and Chinese was drawn by the system's fallback font: thin at every weight, 远 and 鉴 boxes (B 档 shots,
+## SGODOT-385, 11-03).
+var _cjk_held: Array[FontVariation] = []
 func set_cjk_fonts(on: bool) -> void:
+	_cjk_held.clear()
 	for weight in CJK_EMBOLDEN:
 		var font := load("res://assets/ui/fonts/nunito_w%d.tres" % weight) as FontVariation
 		if font == null: continue
 		if not on:
 			font.fallbacks = []
 			continue
+		_cjk_held.append(font)
 		var cjk := FontVariation.new()
 		cjk.base_font = load(CJK_FONT)
 		cjk.variation_embolden = float(CJK_EMBOLDEN[weight])
@@ -112,8 +119,8 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## template — a source with format specs (%d, %s, %+d, %.1f; %% a percent sign: `Need %d more %s` → `还差 %d 个%s`;
 ## `{1}` / `{2}` in the Chinese to reorder) — with each %s it caught translated again (an item's name, a weekday) and a
 ## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts; a link's ` ›` (`Edit look ›`) and
-## a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`) are read around. Nothing found: "" (the English
-## stays). Answers are cached: labels ask again on every redraw. P0_I18N_MISSES=<file> (QA): every line drawn that found
+## a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`), spaces around a line (`Muscle Memory `) and a
+## count after it (`Home Cook 0/8`) are read around. Nothing found: "" (the English stays). Answers are cached: labels ask again on every redraw. P0_I18N_MISSES=<file> (QA): every line drawn that found
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
@@ -125,10 +132,16 @@ class P0Translation extends Translation:
 	var _misses := {}
 	var _miss_file: FileAccess
 	static var SPEC := _spec_re()
+	static var COUNT := _count_re()
 
 	static func _spec_re() -> RegEx:
 		var re := RegEx.new()
 		re.compile("%[+-]?[0-9]*(\\.[0-9]+)?[dsf]")
+		return re
+
+	static func _count_re() -> RegEx:
+		var re := RegEx.new()
+		re.compile(" [0-9][0-9,]*/[0-9][0-9,]*$")
 		return re
 
 	func load_table(path: String) -> void:
@@ -206,6 +219,12 @@ class P0Translation extends Translation:
 		if _exact.has(s): return _exact[s]
 		var t := _template(s)
 		if t != "": return t
+		var bare := s.strip_edges()
+		if bare != s and bare != "":   # a label padded with spaces (`Muscle Memory `): the spaces stay where they were
+			var z := translate_line(bare)
+			if z == "": return ""
+			var at := s.find(bare)
+			return s.left(at) + z + s.substr(at + bare.length())
 		if s.contains("\n"):
 			var lines := s.split("\n")
 			var parts: Array = []
@@ -230,6 +249,12 @@ class P0Translation extends Translation:
 		if s.ends_with(LINK) and s.length() > LINK.length():
 			var head := translate_line(s.left(s.length() - LINK.length()))
 			return head + LINK if head != "" else ""
+		var count := COUNT.search(s)
+		# A title with its count after it (`Home Cook 0/8`): the count stays. Only `n/m` — a bare number may be part of
+		# the name (`Floor 10`).
+		if count != null and count.get_start() > 0:
+			var head := translate_line(s.left(count.get_start()))
+			return head + count.get_string() if head != "" else ""
 		if s.contains(", "):   # a list: only when every item is known, joined the Chinese way
 			var items: Array = []
 			for item in s.split(", "):

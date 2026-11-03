@@ -334,10 +334,14 @@ func test_the_ui_weights_draw_chinese_through_noto_sans_sc_only_under_chinese() 
 	var heights := paths.map(func(p): return (load(p) as Font).get_height(14))
 	for path in paths: assert_int((load(path) as FontVariation).fallbacks.size()).is_equal(0)   # English: as measured
 	Localization.set_cjk_fonts(true)
+	# held by the autoload: when nothing else holds a weight yet (P0's start, before the theme), it must not leave the
+	# cache and come back from the next load() without its fallback (B 档 shots: 远 and 鉴 boxes, no bold, 11-03)
+	assert_int(Localization._cjk_held.size()).is_equal(3)
 	for path in paths:
 		var font := load(path) as FontVariation
 		assert_int(font.fallbacks.size()).override_failure_message(path).is_equal(1)
 		assert_bool(font.has_char(0x4E2D)).override_failure_message(path).is_true()   # 中
 		assert_float(font.get_string_size("中文", HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x).is_greater(20.0)
 	Localization.set_cjk_fonts(false)
+	assert_int(Localization._cjk_held.size()).is_equal(0)
 	for i in paths.size(): assert_float((load(paths[i]) as Font).get_height(14)).is_equal(heights[i])
