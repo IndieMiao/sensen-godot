@@ -924,7 +924,7 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	if preview.has("trip"): trip = {km = int(preview.get("km", trip.get("km", 0))), trip = int(preview.trip), name = str(preview.get("trip_name", trip.get("name", "")))}
 	var f := P0Travel.fare(view, cluster)
 	var parts: Array = [P0Clusters.country_part(c)]
-	parts.append(local_time(view, preview.get("utc_offset_min", null)) + " local" if preview.get("utc_offset_min", null) != null else "")
+	parts.append("%s local" % local_time(view, preview.get("utc_offset_min", null)) if preview.get("utc_offset_min", null) != null else "")
 	parts.append("%d online" % online if online > 0 else "")
 	var facts: Array = [["Distance", "%s · Trip %d" % [P0PlaceSheet.distance_text(float(trip.get("km", 0))), int(trip.get("trip", 1))]]]
 	if bool(f.free): facts.append(["Cost", "Free"])

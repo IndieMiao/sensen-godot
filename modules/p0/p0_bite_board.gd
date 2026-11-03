@@ -19,6 +19,10 @@ const LURE_LEVEL := 5
 const QUIET := "Quiet day. Any pond will do."
 const TIME_WORDS := {"dawn_dusk": "at dawn and dusk", "night": "at night"}
 const WEATHER_WORDS := {"rain": "in the rain", "wind": "in the wind", "sun": "in the sun"}
+## The keeper's line as whole sentences, so a translation can order them (SGODOT-385): the fish, up to two conditions
+## (its best time, the weather) or its only time and the weather, then the bait's own sentence — by how many conditions.
+const LINE := ["%s bite. %s", "%s bite %s. %s", "%s bite %s %s. %s"]
+const LINE_ONLY := ["%s only bite %s. %s", "%s only bite %s %s. %s"]
 
 ## The board's section titles at this Fishing level (Forecast from Lv3, as the pond card's Forecast row).
 static func titles(level: int) -> Array:
@@ -54,22 +58,22 @@ static func line(fish_ids: Array, weather: String, level: int, caught: Dictionar
 	var f: Dictionary = p.fish
 	var regional := bool(f.get("regional", false))
 	var name := "Regional fish" if regional and int(caught.get(str(f.id), 0)) <= 0 else str(f.get("plural", f.get("name", f.id)))
-	var parts := PackedStringArray([name])
+	var conds: Array = []
+	var only := ""
 	var t = f.get("time", null)
 	if t is String:   # night_only / dawn_dusk_only
-		parts.append("only bite " + str(TIME_WORDS.get(str(t).trim_suffix("_only"), "")))
-	else:
-		parts.append("bite")
-		# its best window, named only when it raises the bite (over ×1) and is one the line has words for (苏烈 on #262)
-		if t is Dictionary and not t.is_empty():
-			var key := ""
-			var top := 1.0
-			for k in t:
-				if float(t[k]) > top and TIME_WORDS.has(str(k)): top = float(t[k]); key = str(k)
-			if key != "": parts.append(str(TIME_WORDS[key]))
-	if bool(p.weather_match) and WEATHER_WORDS.has(weather): parts.append(str(WEATHER_WORDS[weather]))
+		only = str(TIME_WORDS.get(str(t).trim_suffix("_only"), ""))
+	# its best window, named only when it raises the bite (over ×1) and is one the line has words for (苏烈 on #262)
+	elif t is Dictionary and not t.is_empty():
+		var key := ""
+		var top := 1.0
+		for k in t:
+			if float(t[k]) > top and TIME_WORDS.has(str(k)): top = float(t[k]); key = str(k)
+		if key != "": conds.append(str(TIME_WORDS[key]))
+	if bool(p.weather_match) and WEATHER_WORDS.has(weather): conds.append(str(WEATHER_WORDS[weather]))
 	var bait := "Try a Spinner Lure." if regional and level >= LURE_LEVEL else "Bring worms."
-	return " ".join(parts) + ". " + bait
+	if t is String: return str(LINE_ONLY[conds.size()]) % ([name, only] + conds + [bait])
+	return str(LINE[conds.size()]) % ([name] + conds + [bait])
 
 ## As shown, in curly quotes (the frames' 2255:32861): `“Rainbow Trout bite in the rain. Bring worms.” — Finn`. The space
 ## after the dash does not break, so a line that wraps keeps `— Finn` together (不知火舞 on #262).
