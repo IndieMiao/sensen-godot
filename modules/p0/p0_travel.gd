@@ -216,7 +216,8 @@ static func fares(view := {}) -> Array:
 	var out := []
 	for i in P0Clusters.TRIP_NAMES.size():
 		var line := ("Up to %s km" % grouped(int(km[i]))) if i < km.size() else ("Over %s km" % grouped(int(km[-1])))
-		if nearest.has(i): line += ", or the %d nearest cities" % int(nearest[i])
+		# the whole sentence a translation can order (SGODOT-385): `Up to 30 km, or the 3 nearest cities`
+		if nearest.has(i): line = "Up to %s km, or the %d nearest cities" % [grouped(int(km[i])), int(nearest[i])]
 		var e := int(table.energy[i]) if i < (table.get("energy", []) as Array).size() else 0
 		var c := int(table.coins[i]) if i < (table.get("coins", []) as Array).size() else 0
 		out.append({title = "Trip %d · %s" % [i + 1, P0Clusters.TRIP_NAMES[i]], line = line, free = e == 0 and c == 0,

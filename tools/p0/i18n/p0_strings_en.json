@@ -12,12 +12,6 @@
   ],
   "kind": "template"
  },
- "%.1f|%d|%d|%s|%dx%d|%d|%s|%s": {
-  "where": [
-   "scenes/p0/p0_map.gd:1607"
-  ],
-  "kind": "template"
- },
  "%[+-]?[0-9]*(\\\\.[0-9]+)?[dsf]": {
   "where": [
    "modules/ui/localization.gd:123"
@@ -65,7 +59,7 @@
  },
  "%d Energy\n%d coins": {
   "where": [
-   "modules/p0/p0_travel.gd:223"
+   "modules/p0/p0_travel.gd:224"
   ],
   "kind": "template",
   "done": true
@@ -113,7 +107,7 @@
    "modules/p0/p0_board.gd:85",
    "modules/p0/p0_board.gd:87",
    "scenes/p0/p0_ui.gd:3461",
-   "scenes/p0/panels/p0_counter_drawer.gd:491",
+   "scenes/p0/panels/p0_counter_drawer.gd:492",
    "scenes/p0/panels/p0_local_request.gd:87"
   ],
   "kind": "template",
@@ -286,6 +280,12 @@
   "kind": "template",
   "done": true
  },
+ "%d s": {
+  "where": [
+   "modules/p0/p0_kitchen_logic.gd:262"
+  ],
+  "kind": "template"
+ },
  "%d to do": {
   "where": [
    "modules/p0/p0_inbox.gd:43"
@@ -428,7 +428,7 @@
  },
  "%s %d/%d today · Resets in %s": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:497"
+   "scenes/p0/panels/p0_counter_drawer.gd:498"
   ],
   "kind": "template",
   "done": true
@@ -509,12 +509,21 @@
   "kind": "template",
   "done": true
  },
- "%s _ready start": {
+ "%s bite %s %s. %s": {
   "where": [
-   "scenes/p0/p0_farm.gd:106",
-   "scenes/p0/p0_mine.gd:106",
-   "scenes/p0/p0_pond.gd:90",
-   "scenes/p0/rooms/p0_room.gd:120"
+   "modules/p0/p0_bite_board.gd:24"
+  ],
+  "kind": "template"
+ },
+ "%s bite %s. %s": {
+  "where": [
+   "modules/p0/p0_bite_board.gd:24"
+  ],
+  "kind": "template"
+ },
+ "%s bite. %s": {
+  "where": [
+   "modules/p0/p0_bite_board.gd:24"
   ],
   "kind": "template"
  },
@@ -658,6 +667,12 @@
   "kind": "template",
   "done": true
  },
+ "%s local": {
+  "where": [
+   "scenes/p0/p0_map.gd:927"
+  ],
+  "kind": "template"
+ },
  "%s need Fishing Lv%d.": {
   "where": [
    "modules/p0/p0_logic.gd:2087"
@@ -703,10 +718,22 @@
  },
  "%s only": {
   "where": [
-   "modules/p0/p0_bite_board.gd:97"
+   "modules/p0/p0_bite_board.gd:101"
   ],
   "kind": "template",
   "done": true
+ },
+ "%s only bite %s %s. %s": {
+  "where": [
+   "modules/p0/p0_bite_board.gd:25"
+  ],
+  "kind": "template"
+ },
+ "%s only bite %s. %s": {
+  "where": [
+   "modules/p0/p0_bite_board.gd:25"
+  ],
+  "kind": "template"
  },
  "%s ready at the stove": {
   "where": [
@@ -829,8 +856,8 @@
  },
  "%s · +%d Energy": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:490",
-   "scenes/p0/panels/p0_counter_drawer.gd:501"
+   "scenes/p0/panels/p0_counter_drawer.gd:491",
+   "scenes/p0/panels/p0_counter_drawer.gd:502"
   ],
   "kind": "template",
   "done": true
@@ -1061,9 +1088,9 @@
   "kind": "template",
   "done": true
  },
- "%s%s_%d.webp": {
+ "%s's": {
   "where": [
-   "modules/map/city_map_data.gd:193"
+   "modules/p0/p0_inbox.gd:109"
   ],
   "kind": "template"
  },
@@ -1073,6 +1100,30 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "%s's Desk": {
+  "where": [
+   "scenes/p0/panels/p0_counter_drawer.gd:57"
+  ],
+  "kind": "template"
+ },
+ "%s's Stall": {
+  "where": [
+   "scenes/p0/panels/p0_counter_drawer.gd:57"
+  ],
+  "kind": "template"
+ },
+ "%s's Tackle": {
+  "where": [
+   "scenes/p0/panels/p0_counter_drawer.gd:57"
+  ],
+  "kind": "template"
+ },
+ "%s's Tea": {
+  "where": [
+   "scenes/p0/panels/p0_counter_drawer.gd:57"
+  ],
+  "kind": "template"
  },
  "%s's neighbourhood": {
   "where": [
@@ -1140,12 +1191,6 @@
   ],
   "kind": "template"
  },
- "%s: needs yaw_degrees": {
-  "where": [
-   "modules/p0/p0_room_anchors.gd:90"
-  ],
-  "kind": "template"
- },
  "%s: position must be [x, y, z]": {
   "where": [
    "modules/p0/p0_room_anchors.gd:89"
@@ -1158,33 +1203,9 @@
   ],
   "kind": "template"
  },
- "%s: unknown prefix %s_": {
-  "where": [
-   "modules/p0/p0_room_anchors.gd:79"
-  ],
-  "kind": "template"
- },
  "%s: use lower-case words joined by underscores": {
   "where": [
    "modules/p0/p0_room_anchors.gd:76"
-  ],
-  "kind": "template"
- },
- "%s:regional:%s:1": {
-  "where": [
-   "modules/p0/p0_fish_world.gd:48"
-  ],
-  "kind": "template"
- },
- "%s:regional:%s:2": {
-  "where": [
-   "modules/p0/p0_fish_world.gd:51"
-  ],
-  "kind": "template"
- },
- "%s:weather:%s:%s": {
-  "where": [
-   "modules/p0/p0_fish_world.gd:27"
   ],
   "kind": "template"
  },
@@ -1194,12 +1215,6 @@
   ],
   "kind": "template",
   "done": true
- },
- "%s?longitude=%s&latitude=%s&types=place,region,country&language=%s&access_token=%s": {
-  "where": [
-   "scenes/map/place_geocoder.gd:38"
-  ],
-  "kind": "template"
  },
  "%ss %d/%d": {
   "where": [
@@ -1282,7 +1297,7 @@
  },
  "+%d more": {
   "where": [
-   "modules/p0/p0_bite_board.gd:157",
+   "modules/p0/p0_bite_board.gd:161",
    "modules/p0/p0_item_info.gd:498",
    "modules/p0/p0_kitchen_logic.gd:954",
    "modules/p0/p0_logic.gd:396",
@@ -1342,17 +1357,31 @@
   "kind": "line",
   "done": true
  },
- ", or the %d nearest cities": {
+ "+{meal} Energy": {
   "where": [
-   "modules/p0/p0_travel.gd:219"
+   "modules/p0/item_info_rules.json#facts"
   ],
-  "kind": "template",
-  "done": true
+  "kind": "line"
  },
  "--qa-scene=": {
   "where": [
    "modules/ui/app_router.gd:315",
    "modules/ui/app_router.gd:317"
+  ],
+  "kind": "line"
+ },
+ "1 Rare fish · Golden Koi · Pond": {
+  "where": [
+   "assets/p0/p0_content.json#need_line",
+   "assets/p0/content/residents_p1.json#need_line",
+   "assets/p0/content/residents_p1.json#need_line",
+   "assets/p0/content/residents_p1.json#need_line"
+  ],
+  "kind": "line"
+ },
+ "1 fish every 8h · keeps 3": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
   ],
   "kind": "line"
  },
@@ -1603,14 +1632,14 @@
  },
  "A new connection": {
   "where": [
-   "modules/p0/p0_travel.gd:287"
+   "modules/p0/p0_travel.gd:288"
   ],
   "kind": "line",
   "done": true
  },
  "A regular here": {
   "where": [
-   "modules/p0/p0_travel.gd:287"
+   "modules/p0/p0_travel.gd:288"
   ],
   "kind": "line",
   "done": true
@@ -1621,6 +1650,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "A salad from the nursery corner.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
  },
  "A salad, please. Fresh as you like.": {
   "where": [
@@ -1643,6 +1678,12 @@
   "kind": "line",
   "done": true
  },
+ "A traveler who cooks! Could you make us something?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tea"
+  ],
+  "kind": "line"
+ },
  "Accept": {
   "where": [
    "scenes/p0/p0_ui.gd:3441",
@@ -1651,6 +1692,16 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Acquainted": {
+  "where": [
+   "assets/p0/p0_content.json#stages",
+   "assets/p0/content/residents_p1.json#stage",
+   "assets/p0/content/residents_p1.json#stage",
+   "assets/p0/content/residents_p1.json#stage",
+   "assets/p0/content/residents_p1.json#stage"
+  ],
+  "kind": "line"
  },
  "Add %s to cook this recipe again.": {
   "where": [
@@ -1673,6 +1724,22 @@
   "kind": "line",
   "done": true
  },
+ "Ahoy! River's calm today.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
+ },
+ "All": {
+  "where": [
+   "modules/p0/p0_kitchen_logic.gd:9",
+   "modules/p0/p0_kitchen_logic.gd:10",
+   "modules/p0/p0_kitchen_logic.gd:184",
+   "modules/p0/p0_kitchen_logic.gd:205",
+   "modules/p0/p0_kitchen_logic.gd:392"
+  ],
+  "kind": "line"
+ },
  "All quiet.": {
   "where": [
    "modules/p0/p0_logic.gd:2076"
@@ -1689,7 +1756,7 @@
  },
  "Ama": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:58",
+   "scenes/p0/panels/p0_counter_drawer.gd:59",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_outposts.json#name"
   ],
@@ -1708,6 +1775,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Any": {
+  "where": [
+   "modules/p0/p0_kitchen_logic.gd:45"
+  ],
+  "kind": "line"
  },
  "Any %s %s": {
   "where": [
@@ -1744,6 +1817,12 @@
   "kind": "line",
   "done": true
  },
+ "Any time you need a crossing, my friend.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
  "Anything to eat on the road? I leave tomorrow.": {
   "where": [
    "assets/p0/content/residents_p1.json#text"
@@ -1760,12 +1839,6 @@
  "AppRouter 无法打开场景 %s（错误 %d）": {
   "where": [
    "modules/ui/app_router.gd:281"
-  ],
-  "kind": "template"
- },
- "AppRouter: QA scene -> %s": {
-  "where": [
-   "modules/ui/app_router.gd:304"
   ],
   "kind": "template"
  },
@@ -1789,6 +1862,20 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Apple Tree": {
+  "where": [
+   "assets/p0/content/farm_crops.json#plant_name"
+  ],
+  "kind": "line"
+ },
+ "Apr": {
+  "where": [
+   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_runtime.gd:1629",
+   "scenes/p0/panels/p0_profile_page.gd:32"
+  ],
+  "kind": "line"
  },
  "Arctic": {
   "where": [
@@ -1834,7 +1921,11 @@
  },
  "At home only": {
   "where": [
-   "modules/p0/p0_runtime.gd:1205"
+   "modules/p0/p0_runtime.gd:1205",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -1962,8 +2053,7 @@
   "where": [
    "modules/ui/kit/ui_tokens.gd:402",
    "scenes/p0/panels/p0_fish_dex.gd:159",
-   "scenes/p0/panels/p0_fish_dex.gd:175",
-   "scenes/ui_kit/ui_segment_tab.gd:100"
+   "scenes/p0/panels/p0_fish_dex.gd:175"
   ],
   "kind": "line",
   "done": true
@@ -1972,7 +2062,7 @@
   "where": [
    "modules/p0/p0_logic.gd:2237",
    "scenes/p0/panels/p0_compost_drawer.gd:54",
-   "scenes/p0/panels/p0_counter_drawer.gd:200",
+   "scenes/p0/panels/p0_counter_drawer.gd:201",
    "scenes/ui_kit/ui_bag_header.gd:39",
    "scenes/ui_kit/ui_quick_bar.gd:203"
   ],
@@ -2138,6 +2228,15 @@
   ],
   "kind": "line"
  },
+ "Bar full · Unpin one first": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Barbary Card Room": {
   "where": [
    "modules/p0/p0_runtime.gd:2103",
@@ -2170,7 +2269,7 @@
  },
  "Barter_": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:403"
+   "scenes/p0/panels/p0_counter_drawer.gd:404"
   ],
   "kind": "line"
  },
@@ -2251,6 +2350,18 @@
   "kind": "line",
   "done": true
  },
+ "Best bread in the square. Don't tell the others.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
+ },
+ "Best friend on the whole route. Don't tell the pigeons.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
  "Bets are coins. You always keep at least 40 coins.": {
   "where": [
    "scenes/p0/panels/p0_blackjack_page.gd:327"
@@ -2272,6 +2383,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Big orders today. I need a partner.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
  },
  "Bigger Creel": {
   "where": [
@@ -2312,7 +2429,7 @@
  },
  "Bite Board · %s": {
   "where": [
-   "modules/p0/p0_bite_board.gd:261"
+   "modules/p0/p0_bite_board.gd:265"
   ],
   "kind": "template",
   "done": true
@@ -2473,6 +2590,12 @@
   "kind": "line",
   "done": true
  },
+ "Bought today · {restock_in}": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Bring": {
   "where": [
    "scenes/ui_kit/ui_request_card.gd:72"
@@ -2538,7 +2661,7 @@
  },
  "Bring worms.": {
   "where": [
-   "modules/p0/p0_bite_board.gd:71"
+   "modules/p0/p0_bite_board.gd:74"
   ],
   "kind": "line",
   "done": true
@@ -2559,7 +2682,7 @@
  },
  "Browse your visited cities and stamps.": {
   "where": [
-   "modules/p0/p0_travel.gd:288"
+   "modules/p0/p0_travel.gd:289"
   ],
   "kind": "line",
   "done": true
@@ -2605,7 +2728,7 @@
  },
  "Build your connection with this city.": {
   "where": [
-   "modules/p0/p0_travel.gd:306"
+   "modules/p0/p0_travel.gd:307"
   ],
   "kind": "line",
   "done": true
@@ -2639,9 +2762,11 @@
  },
  "Buy": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:62",
-   "scenes/p0/panels/p0_counter_drawer.gd:62",
-   "scenes/ui_kit/ui_shop_row.gd:121"
+   "scenes/p0/panels/p0_counter_drawer.gd:63",
+   "scenes/p0/panels/p0_counter_drawer.gd:63",
+   "scenes/ui_kit/ui_shop_row.gd:121",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -2701,12 +2826,24 @@
   "kind": "line",
   "done": true
  },
+ "Café Owner": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
+ },
  "Café Regular": {
   "where": [
    "assets/p0/content/residents_p1.json#title"
   ],
   "kind": "line",
   "done": true
+ },
+ "Campfire Elder": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
  },
  "Can cook": {
   "where": [
@@ -2793,10 +2930,7 @@
  },
  "Card": {
   "where": [
-   "modules/ui/kit/ui_tokens.gd:399",
-   "scenes/p0/kitchen/p0_kitchen_stage.gd:73",
-   "scenes/p0/kitchen/p0_kitchen_stage.gd:97",
-   "scenes/p0/kitchen/p0_kitchen_stage.gd:350"
+   "modules/ui/kit/ui_tokens.gd:399"
   ],
   "kind": "line"
  },
@@ -2813,6 +2947,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Careful of the seedlings. Hello.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
  },
  "Carp Fish Cakes": {
   "where": [
@@ -2896,12 +3036,25 @@
   "kind": "template",
   "done": true
  },
+ "Catch 1 fish · {have}/{need}": {
+  "where": [
+   "assets/p0/content/guide_steps.json#why"
+  ],
+  "kind": "line"
+ },
  "Catch 1 fish · {pond}": {
   "where": [
    "assets/p0/content/guide_steps.json#line"
   ],
   "kind": "line",
   "done": true
+ },
+ "Catch 2 fish · {have}/{need}": {
+  "where": [
+   "assets/p0/content/guide_steps.json#why",
+   "assets/p0/content/guide_steps.json#why"
+  ],
+  "kind": "line"
  },
  "Catch 2 fish · {pond}": {
   "where": [
@@ -2913,7 +3066,7 @@
  },
  "Catch both regional fish and learn a regional recipe": {
   "where": [
-   "modules/p0/p0_travel.gd:313"
+   "modules/p0/p0_travel.gd:314"
   ],
   "kind": "line",
   "done": true
@@ -3018,6 +3171,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Charm": {
+  "where": [
+   "scenes/p0/panels/p0_bag_drawer.gd#GEAR_SLOTS"
+  ],
+  "kind": "line"
  },
  "Check again": {
   "where": [
@@ -3147,7 +3306,7 @@
  },
  "Cities visited": {
   "where": [
-   "modules/p0/p0_travel.gd:289"
+   "modules/p0/p0_travel.gd:290"
   ],
   "kind": "line",
   "done": true
@@ -3166,11 +3325,17 @@
   "kind": "line",
   "done": true
  },
+ "Citrus Tree": {
+  "where": [
+   "assets/p0/content/farm_crops.json#plant_name"
+  ],
+  "kind": "line"
+ },
  "City Specialty": {
   "where": [
    "scenes/p0/p0_outpost.gd:233",
    "scenes/p0/p0_outpost.gd:392",
-   "scenes/p0/panels/p0_counter_drawer.gd:112"
+   "scenes/p0/panels/p0_counter_drawer.gd:113"
   ],
   "kind": "line",
   "done": true
@@ -3263,7 +3428,7 @@
  },
  "Clear": {
   "where": [
-   "modules/p0/p0_bite_board.gd:80"
+   "modules/p0/p0_bite_board.gd:84"
   ],
   "kind": "line",
   "done": true
@@ -3416,7 +3581,7 @@
  },
  "Collection": {
   "where": [
-   "modules/p0/p0_travel.gd:288"
+   "modules/p0/p0_travel.gd:289"
   ],
   "kind": "line",
   "done": true
@@ -3436,7 +3601,8 @@
  },
  "Combat": {
   "where": [
-   "scenes/p0/p0_ui.gd:2837"
+   "scenes/p0/p0_ui.gd:2837",
+   "scenes/p0/panels/p0_bag_drawer.gd#GEAR_SLOTS"
   ],
   "kind": "line",
   "done": true
@@ -3459,8 +3625,8 @@
  },
  "Complete": {
   "where": [
-   "modules/p0/p0_travel.gd:309",
-   "modules/p0/p0_travel.gd:311"
+   "modules/p0/p0_travel.gd:310",
+   "modules/p0/p0_travel.gd:312"
   ],
   "kind": "line",
   "done": true
@@ -3495,6 +3661,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Compost early, water late. That's the trick.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "Compost today %d/%d\n%s": {
   "where": [
@@ -3714,6 +3886,16 @@
   "kind": "line",
   "done": true
  },
+ "Cool": {
+  "where": [
+   "assets/p0/p0_content.json#card_zones",
+   "assets/p0/p0_content.json#card_zone",
+   "assets/p0/content/farm_crops.json#zone",
+   "assets/p0/content/fish_p1.json#zones",
+   "assets/p0/content/fish_p1.json#zones"
+  ],
+  "kind": "line"
+ },
  "Copper Order": {
   "where": [
    "assets/p0/content/requests_p1.json#title"
@@ -3727,6 +3909,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Copper Pickaxe": {
+  "where": [
+   "assets/p0/p0_content.json#pick_copper"
+  ],
+  "kind": "line"
  },
  "Copper Run": {
   "where": [
@@ -3828,19 +4016,18 @@
   "kind": "line",
   "done": true
  },
- "Count": {
-  "where": [
-   "scenes/p0/kitchen/p0_kitchen_stage.gd:97",
-   "scenes/p0/kitchen/p0_kitchen_stage.gd:350"
-  ],
-  "kind": "line"
- },
  "Counts across all tea houses · %d cups a day": {
   "where": [
    "scenes/p0/panels/p0_counter_drawer.gd:41"
   ],
   "kind": "template",
   "done": true
+ },
+ "Courier Kid": {
+  "where": [
+   "assets/p0/p0_content.json#role"
+  ],
+  "kind": "line"
  },
  "Courtyard": {
   "where": [
@@ -4032,10 +4219,16 @@
  },
  "Cups used": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:488"
+   "scenes/p0/panels/p0_counter_drawer.gd:489"
   ],
   "kind": "line",
   "done": true
+ },
+ "Curator": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
  },
  "Curator's Friend": {
   "where": [
@@ -4060,8 +4253,8 @@
  },
  "Dawn": {
   "where": [
-   "modules/p0/p0_bite_board.gd:82",
-   "modules/p0/p0_bite_board.gd:108",
+   "modules/p0/p0_bite_board.gd:86",
+   "modules/p0/p0_bite_board.gd:112",
    "modules/p0/p0_fish_world.gd:12"
   ],
   "kind": "line",
@@ -4069,14 +4262,14 @@
  },
  "Dawn & dusk": {
   "where": [
-   "modules/p0/p0_bite_board.gd:83"
+   "modules/p0/p0_bite_board.gd:87"
   ],
   "kind": "line",
   "done": true
  },
  "Day": {
   "where": [
-   "modules/p0/p0_bite_board.gd:82",
+   "modules/p0/p0_bite_board.gd:86",
    "modules/p0/p0_fish_world.gd:12"
   ],
   "kind": "line",
@@ -4110,7 +4303,8 @@
  },
  "Dealer": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:59"
+   "scenes/p0/panels/p0_counter_drawer.gd:60",
+   "assets/p0/p0_outposts.json#role"
   ],
   "kind": "line",
   "done": true
@@ -4149,7 +4343,7 @@
   "where": [
    "scenes/p0/panels/p0_bag_drawer.gd:22",
    "scenes/p0/panels/p0_bag_drawer.gd:25",
-   "scenes/p0/panels/p0_counter_drawer.gd:62"
+   "scenes/p0/panels/p0_counter_drawer.gd:63"
   ],
   "kind": "line",
   "done": true
@@ -4272,12 +4466,15 @@
   "kind": "line",
   "done": true
  },
- "Desk": {
+ "Dessert": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:56"
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style"
   ],
-  "kind": "line",
-  "done": true
+  "kind": "line"
  },
  "Details": {
   "where": [
@@ -4349,12 +4546,6 @@
   "kind": "line",
   "done": true
  },
- "Dot": {
-  "where": [
-   "scenes/ui_kit/ui_segment_tab.gd:103"
-  ],
-  "kind": "line"
- },
  "Double": {
   "where": [
    "modules/p0/p0_blackjack.gd:149",
@@ -4418,8 +4609,8 @@
  },
  "Dusk": {
   "where": [
-   "modules/p0/p0_bite_board.gd:82",
-   "modules/p0/p0_bite_board.gd:108"
+   "modules/p0/p0_bite_board.gd:86",
+   "modules/p0/p0_bite_board.gd:112"
   ],
   "kind": "line",
   "done": true
@@ -4548,6 +4739,16 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Empty": {
+  "where": [
+   "modules/p0/p0_kitchen_logic.gd:71",
+   "modules/p0/p0_trap.gd:76",
+   "scenes/p0/panels/p0_bag_drawer.gd:297",
+   "scenes/p0/rooms/p0_farmhouse.gd:442",
+   "scenes/ui_kit/ui_item_cell.gd:573"
+  ],
+  "kind": "line"
  },
  "Empty · next in %s": {
   "where": [
@@ -4724,7 +4925,9 @@
   "where": [
    "modules/p0/p0_material_logic.gd:589",
    "scenes/p0/panels/p0_bag_drawer.gd:319",
-   "scenes/p0/panels/p0_material_cards.gd:148"
+   "scenes/p0/panels/p0_material_cards.gd:148",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -4742,6 +4945,30 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Even a failed dish teaches you something.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
+ },
+ "Every stamp tells where someone has been.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
+ },
+ "Every traveler brings something. Got any materials?": {
+  "where": [
+   "assets/p0/content/requests_local.json#post"
+  ],
+  "kind": "line"
+ },
+ "Every trip starts at a station. Where to next?": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "Everything on your farm moves with you. You can't change your home city again.": {
   "where": [
@@ -4800,6 +5027,12 @@
   "kind": "line",
   "done": true
  },
+ "FRESH BREAD! Oh — hello, didn't see you there.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
+ },
  "Facilities": {
   "where": [
    "scenes/p0/panels/p0_workbench_drawer.gd:23"
@@ -4807,9 +5040,11 @@
   "kind": "line",
   "done": true
  },
- "Fade": {
+ "Familiar": {
   "where": [
-   "scenes/p0/panels/p0_home_pick_page.gd:165"
+   "assets/p0/p0_content.json#stages",
+   "assets/p0/p0_content.json#gift_meal_stage",
+   "assets/p0/content/residents_p1.json#stage"
   ],
   "kind": "line"
  },
@@ -4846,6 +5081,12 @@
   "kind": "line",
   "done": true
  },
+ "Farm Storage · {footprint}": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
+ },
  "Farm unavailable right now": {
   "where": [
    "scenes/map/nearby_panel.gd:408"
@@ -4859,6 +5100,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Farmer's Homestead": {
+  "where": [
+   "assets/p0/p0_content.json#farm_name"
+  ],
+  "kind": "line"
  },
  "Farmers": {
   "where": [
@@ -4878,7 +5125,8 @@
  },
  "Farming": {
   "where": [
-   "scenes/p0/p0_ui.gd:2836"
+   "scenes/p0/p0_ui.gd:2836",
+   "scenes/p0/panels/p0_bag_drawer.gd#GEAR_SLOTS"
   ],
   "kind": "line",
   "done": true
@@ -4932,6 +5180,12 @@
   "kind": "line",
   "done": true
  },
+ "Faster bites": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
+ },
  "Favorite dishes": {
   "where": [
    "scenes/ui_kit/ui_resident_profile.gd:66"
@@ -4977,6 +5231,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Ferryman": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
  },
  "Ferryman's Stew": {
   "where": [
@@ -5045,9 +5305,15 @@
   "kind": "line",
   "done": true
  },
+ "Fine+": {
+  "where": [
+   "assets/p0/content/residents_p1.json#likes"
+  ],
+  "kind": "line"
+ },
  "Finn": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:58",
+   "scenes/p0/panels/p0_counter_drawer.gd:59",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_content.json#name",
    "assets/p0/p0_outposts.json#name"
@@ -5170,7 +5436,7 @@
  },
  "First visits today": {
   "where": [
-   "modules/p0/p0_travel.gd:289"
+   "modules/p0/p0_travel.gd:290"
   ],
   "kind": "line",
   "done": true
@@ -5215,6 +5481,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Fish bite early here.": {
+  "where": [
+   "assets/p0/p0_content.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "Fish escaped": {
   "where": [
@@ -5291,15 +5563,16 @@
  "Fishing": {
   "where": [
    "scenes/map/city_map_view.gd:326",
-   "scenes/p0/p0_ui.gd:2836"
+   "scenes/p0/p0_ui.gd:2836",
+   "scenes/p0/panels/p0_bag_drawer.gd#GEAR_SLOTS"
   ],
   "kind": "line",
   "done": true
  },
  "Fishing Lv%d": {
   "where": [
-   "modules/p0/p0_bite_board.gd:187",
-   "modules/p0/p0_bite_board.gd:252",
+   "modules/p0/p0_bite_board.gd:191",
+   "modules/p0/p0_bite_board.gd:256",
    "modules/p0/p0_pond_card.gd:94"
   ],
   "kind": "template",
@@ -5512,6 +5785,13 @@
   "kind": "line",
   "done": true
  },
+ "Fly": {
+  "where": [
+   "scenes/p0/p0_map.gd:944",
+   "scenes/p0/p0_map.gd:970"
+  ],
+  "kind": "line"
+ },
  "Fly · Need %d Energy": {
   "where": [
    "modules/p0/p0_travel.gd:204"
@@ -5568,6 +5848,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Forty years down there. You're the first I'd take along.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
  },
  "Fountain": {
   "where": [
@@ -5735,6 +6021,12 @@
   "kind": "line",
   "done": true
  },
+ "Gardener": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
+ },
  "Gardener's Show": {
   "where": [
    "assets/p0/content/residents_p1.json#title"
@@ -5751,7 +6043,8 @@
  },
  "Gather Gloves": {
   "where": [
-   "modules/p0/p0_material_logic.gd:485"
+   "modules/p0/p0_material_logic.gd:485",
+   "assets/p0/p0_content.json#gather_gloves"
   ],
   "kind": "line",
   "done": true
@@ -5823,7 +6116,8 @@
  "Gift": {
   "where": [
    "modules/p0/p0_item_info.gd:224",
-   "scenes/ui_kit/ui_resident_bar.gd:41"
+   "scenes/ui_kit/ui_resident_bar.gd:41",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -5837,7 +6131,9 @@
  },
  "Gift already given today": {
   "where": [
-   "modules/p0/p0_logic.gd:1925"
+   "modules/p0/p0_logic.gd:1925",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -5857,12 +6153,31 @@
   "kind": "template",
   "done": true
  },
+ "Gift to a resident": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Gift · %s": {
   "where": [
    "modules/p0/p0_item_info.gd:226"
   ],
   "kind": "template",
   "done": true
+ },
+ "Gift · Mutual friends only": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
+ "Gift ›": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
  },
  "Gifted · can't be sold · can eat · can gift to a Resident": {
   "where": [
@@ -5976,6 +6291,12 @@
   "kind": "line",
   "done": true
  },
+ "Grapevine": {
+  "where": [
+   "assets/p0/content/farm_crops.json#plant_name"
+  ],
+  "kind": "line"
+ },
  "Grapevine Cutting": {
   "where": [
    "assets/p0/content/farm_crops.json#seed_name"
@@ -6027,6 +6348,16 @@
   "kind": "line",
   "done": true
  },
+ "Grilled": {
+  "where": [
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style"
+  ],
+  "kind": "line"
+ },
  "Grilled Crucian": {
   "where": [
    "modules/p0/p0_guide.gd:262",
@@ -6048,6 +6379,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Grilled skewers. Station lunch.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
  },
  "Growing": {
   "where": [
@@ -6078,15 +6415,33 @@
   "kind": "line",
   "done": true
  },
+ "Guests keep asking for home cooking. Can you help out?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tea"
+  ],
+  "kind": "line"
+ },
  "GuidePulse 1407:113987 (SGODOT-232 U6, A-03): ring stroke 2, growth to +10 and frame inset 4 are constants in UiGuidePulse until the next token export adds them; color/primary and MOTION_NEW_UNLOCK_FLASH_MS (600 ms, ease-out) are tokens": {
   "where": [
    "modules/ui/kit/ui_tokens.gd:411"
   ],
   "kind": "line"
  },
+ "HA! Well, it's food. Probably.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
  "HBoxContainer": {
   "where": [
    "modules/p0/p0_runtime.gd:2060"
+  ],
+  "kind": "line"
+ },
+ "Ha! Brave cooking. The fish would be proud.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
   ],
   "kind": "line"
  },
@@ -6097,10 +6452,22 @@
   "kind": "line",
   "done": true
  },
+ "Half of this garden is yours now.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
  "Hana": {
   "where": [
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/content/residents_p1.json#name"
+  ],
+  "kind": "line"
+ },
+ "Harbor Elder": {
+  "where": [
+   "assets/p0/p0_content.json#role"
   ],
   "kind": "line"
  },
@@ -6301,6 +6668,24 @@
   "kind": "line",
   "done": true
  },
+ "Here's my soup recipe. A fish from {pond} and a radish, that's all it takes.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#thanks"
+  ],
+  "kind": "line"
+ },
+ "Here, from the road. Don't ask where.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
+ "Hi! I'm Pip. I carry letters all over San Francisco.": {
+  "where": [
+   "assets/p0/p0_content.json#Stranger"
+  ],
+  "kind": "line"
+ },
  "Hi, I'm Pip! These quick radishes are ready in no time. Plant them here!": {
   "where": [
    "assets/p0/content/guide_steps.json#pip"
@@ -6326,11 +6711,28 @@
  "Hit": {
   "where": [
    "modules/p0/p0_blackjack.gd:149",
-   "scenes/p0/panels/p0_blackjack_page.gd:195",
-   "scenes/ui_kit/ui_info_sheet.gd:249"
+   "scenes/p0/panels/p0_blackjack_page.gd:195"
   ],
   "kind": "line",
   "done": true
+ },
+ "Hm. That's… a choice.": {
+  "where": [
+   "assets/p0/p0_content.json#mystery"
+  ],
+  "kind": "line"
+ },
+ "Hm. The gulls might like it.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
+ "Hm. You fish?": {
+  "where": [
+   "assets/p0/p0_content.json#Stranger"
+  ],
+  "kind": "line"
  },
  "Hmm… not a dish": {
   "where": [
@@ -6348,7 +6750,7 @@
  },
  "Home": {
   "where": [
-   "modules/p0/p0_travel.gd:280",
+   "modules/p0/p0_travel.gd:281",
    "scenes/p0/p0_ui.gd:4298",
    "scenes/p0/panels/p0_settings_page.gd:117"
   ],
@@ -6488,7 +6890,9 @@
  "Homestead Stall": {
   "where": [
    "modules/p0/p0_world_prompts.gd:38",
-   "scenes/p0/panels/p0_counter_drawer.gd:156"
+   "scenes/p0/panels/p0_counter_drawer.gd:157",
+   "assets/p0/p0_content.json#scope",
+   "assets/p0/p0_content.json#scope"
   ],
   "kind": "line",
   "done": true
@@ -6507,6 +6911,48 @@
   "kind": "line",
   "done": true
  },
+ "Hrm. Tastes like the bottom of a cart.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
+ "I always save you a seat at the tea table.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
+ "I made too much again. Take some.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
+ "I saved you something. Don't tell the others.": {
+  "where": [
+   "assets/p0/p0_content.json#Familiar"
+  ],
+  "kind": "line"
+ },
+ "I'd catalog your cooking, but I'd rather eat it.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
+ "I'd like your help with a special exhibit.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
+ "I'll put it in the compost. Lovingly.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
  "I'll take your %s. Same price as your stall.": {
   "where": [
    "modules/p0/p0_logic.gd:2145"
@@ -6514,12 +6960,24 @@
   "kind": "template",
   "done": true
  },
+ "I'll… label it 'experimental'.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
  "I'm starving. Any dish will do!": {
   "where": [
    "assets/p0/p0_content.json#text"
   ],
   "kind": "line",
   "done": true
+ },
+ "I've seen markets you wouldn't believe.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "If not claimed: sellable items turn into coins at 80% · gifts go back · the rest is lost": {
   "where": [
@@ -6534,6 +6992,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "In Cookbook": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
  },
  "In Gear": {
   "where": [
@@ -6621,6 +7085,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Interesting. I'll… trade it on.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
  },
  "It got away": {
   "where": [
@@ -6729,7 +7199,7 @@
  },
  "Keep visiting and trading": {
   "where": [
-   "modules/p0/p0_travel.gd:311"
+   "modules/p0/p0_travel.gd:312"
   ],
   "kind": "line",
   "done": true
@@ -6775,6 +7245,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Kindred": {
+  "where": [
+   "assets/p0/p0_content.json#stages"
+  ],
+  "kind": "line"
  },
  "Kindred · %s": {
   "where": [
@@ -6826,12 +7302,6 @@
    "modules/ui/game_ui.gd:173",
    "scenes/map/city_map_view.gd:644",
    "scenes/map/city_map_view.gd:656"
-  ],
-  "kind": "line"
- },
- "Land": {
-  "where": [
-   "scenes/p0/panels/p0_home_welcome.gd:201"
   ],
   "kind": "line"
  },
@@ -7035,6 +7505,12 @@
   "kind": "line",
   "done": true
  },
+ "Lighthouse Keeper": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
+ },
  "Liked by": {
   "where": [
    "modules/p0/p0_logic.gd:535"
@@ -7071,6 +7547,15 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "Limit reached · {quota_resets_in}": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
  },
  "Line": {
   "where": [
@@ -7124,7 +7609,7 @@
  "Local": {
   "where": [
    "modules/p0/p0_clusters.gd:10",
-   "modules/p0/p0_travel.gd:313"
+   "modules/p0/p0_travel.gd:314"
   ],
   "kind": "line",
   "done": true
@@ -7173,8 +7658,8 @@
  },
  "Local trades": {
   "where": [
-   "modules/p0/p0_travel.gd:307",
-   "modules/p0/p0_travel.gd:312"
+   "modules/p0/p0_travel.gd:308",
+   "modules/p0/p0_travel.gd:313"
   ],
   "kind": "line",
   "done": true
@@ -7183,7 +7668,9 @@
   "where": [
    "modules/p0/p0_logic.gd:157",
    "modules/p0/p0_material_logic.gd:475",
-   "scenes/p0/panels/p0_bag_drawer.gd:312"
+   "scenes/p0/panels/p0_bag_drawer.gd:312",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -7194,6 +7681,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Long trips go easier with a friend who's been.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
  },
  "Look saved": {
   "where": [
@@ -7227,7 +7720,7 @@
  "Lou": {
   "where": [
    "modules/p0/p0_runtime.gd:2103",
-   "scenes/p0/panels/p0_counter_drawer.gd:59",
+   "scenes/p0/panels/p0_counter_drawer.gd:60",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_outposts.json#name"
   ],
@@ -7402,20 +7895,7 @@
  },
  "MapZoom_": {
   "where": [
-   "scenes/map/city_map_view.gd:407",
-   "scenes/map/city_map_view.gd:523"
-  ],
-  "kind": "line"
- },
- "MapZoom_minus": {
-  "where": [
-   "scenes/map/city_map_view.gd:482"
-  ],
-  "kind": "line"
- },
- "MapZoom_plus": {
-  "where": [
-   "scenes/map/city_map_view.gd:482"
+   "scenes/map/city_map_view.gd:407"
   ],
   "kind": "line"
  },
@@ -7428,6 +7908,12 @@
   "kind": "line",
   "done": true
  },
+ "Market Baker": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
+ },
  "Market Basket": {
   "where": [
    "assets/p0/p0_content.json#title"
@@ -7439,7 +7925,7 @@
   "where": [
    "scenes/p0/p0_outpost.gd:231",
    "scenes/p0/p0_outpost.gd:390",
-   "scenes/p0/panels/p0_counter_drawer.gd:62",
+   "scenes/p0/panels/p0_counter_drawer.gd:63",
    "assets/p0/p0_content.json#title"
   ],
   "kind": "line",
@@ -7468,7 +7954,8 @@
  },
  "Market Keeper": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:58"
+   "scenes/p0/panels/p0_counter_drawer.gd:59",
+   "assets/p0/p0_outposts.json#role"
   ],
   "kind": "line",
   "done": true
@@ -7599,7 +8086,7 @@
  },
  "Mei": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:58",
+   "scenes/p0/panels/p0_counter_drawer.gd:59",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_outposts.json#name"
   ],
@@ -7642,6 +8129,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Mind your head. Low ceilings down there.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
  },
  "Minds the tackle": {
   "where": [
@@ -7734,7 +8227,8 @@
  },
  "Mining": {
   "where": [
-   "scenes/p0/p0_ui.gd:2837"
+   "scenes/p0/p0_ui.gd:2837",
+   "scenes/p0/panels/p0_bag_drawer.gd#GEAR_SLOTS"
   ],
   "kind": "line",
   "done": true
@@ -7879,6 +8373,24 @@
   "kind": "line",
   "done": true
  },
+ "My kitchen is your kitchen.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
+ "My regulars are out of town. Could you fill an order?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tackle"
+  ],
+  "kind": "line"
+ },
+ "My stall's half empty. Help me fill it?": {
+  "where": [
+   "assets/p0/content/requests_local.json#market"
+  ],
+  "kind": "line"
+ },
  "Mystery Dish": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:603",
@@ -7899,6 +8411,24 @@
   "where": [
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/content/residents_p1.json#name"
+  ],
+  "kind": "line"
+ },
+ "Nadia · A Fresh Radish": {
+  "where": [
+   "assets/p0/content/guide_steps.json#why"
+  ],
+  "kind": "line"
+ },
+ "Nadia · Bring your soup": {
+  "where": [
+   "assets/p0/content/guide_steps.json#why"
+  ],
+  "kind": "line"
+ },
+ "Nadia · New request": {
+  "where": [
+   "assets/p0/content/guide_steps.json#why"
   ],
   "kind": "line"
  },
@@ -8043,6 +8573,22 @@
   "kind": "line",
   "done": true
  },
+ "Need {coins_short} more coins": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
+ "Need {materials_short}": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Needs": {
   "where": [
    "scenes/p0/home/p0_home_panel.gd:66"
@@ -8064,6 +8610,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Neighbor towns are closer than you think. Go see one.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "Neighbourhood map": {
   "where": [
@@ -8093,6 +8645,12 @@
   "kind": "line",
   "done": true
  },
+ "New Cookbook page": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
+ },
  "New city! +%d XP": {
   "where": [
    "scenes/p0/p0_ui.gd:4087"
@@ -8115,6 +8673,12 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "New in town? So am I. I'm always new in town.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
  },
  "New pots for the stall. Clay from the creek.": {
   "where": [
@@ -8314,12 +8878,11 @@
   "kind": "template",
   "done": true
  },
- "Next:": {
+ "Next: %s": {
   "where": [
    "scenes/p0/panels/p0_skills_drawer.gd:77"
   ],
-  "kind": "line",
-  "done": true
+  "kind": "template"
  },
  "Next: Lv%d": {
   "where": [
@@ -8372,9 +8935,9 @@
  },
  "Night": {
   "where": [
-   "modules/p0/p0_bite_board.gd:82",
-   "modules/p0/p0_bite_board.gd:83",
-   "modules/p0/p0_bite_board.gd:108",
+   "modules/p0/p0_bite_board.gd:86",
+   "modules/p0/p0_bite_board.gd:87",
+   "modules/p0/p0_bite_board.gd:112",
    "modules/p0/p0_fish_world.gd:12"
   ],
   "kind": "line",
@@ -8659,6 +9222,12 @@
   "kind": "line",
   "done": true
  },
+ "Not many anglers pass through {city}. Could you bring me some fish?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tackle"
+  ],
+  "kind": "line"
+ },
  "Not now": {
   "where": [
    "modules/p0/p0_logic.gd:2188",
@@ -8745,12 +9314,6 @@
   "kind": "line",
   "done": true
  },
- "Number": {
-  "where": [
-   "scenes/ui_kit/ui_segment_tab.gd:102"
-  ],
-  "kind": "line"
- },
  "Nursery": {
   "where": [
    "modules/ui/l10n.gd:19",
@@ -8760,12 +9323,32 @@
   "kind": "line",
   "done": true
  },
+ "OK": {
+  "where": [
+   "scenes/p0/kitchen/p0_kitchen.gd:1013"
+  ],
+  "kind": "line"
+ },
  "Oak Tea House": {
   "where": [
    "assets/p0/p0_outposts.json#name"
   ],
   "kind": "line",
   "done": true
+ },
+ "Oct": {
+  "where": [
+   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_runtime.gd:1629",
+   "scenes/p0/panels/p0_profile_page.gd:32"
+  ],
+  "kind": "line"
+ },
+ "Off": {
+  "where": [
+   "scenes/p0/p0_ui.gd:3622"
+  ],
+  "kind": "line"
  },
  "Off you go! I'll keep an eye on your plots.": {
   "where": [
@@ -8801,6 +9384,30 @@
   "kind": "line",
   "done": true
  },
+ "Oh! A visitor. Please, look around.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
+ },
+ "Oh! Um. I'll… display it?": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
+ "Oh… thanks, I suppose.": {
+  "where": [
+   "assets/p0/p0_content.json#mystery_line"
+  ],
+  "kind": "line"
+ },
+ "Oh… well, I've eaten worse.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
  "Old Kai": {
   "where": [
    "assets/p0/outpost_npcs.json#name",
@@ -8809,6 +9416,12 @@
   "kind": "line",
   "done": true
  },
+ "Old Miner": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
+ },
  "Old Tree": {
   "where": [
    "modules/p0/p0_logic.gd:2212",
@@ -8816,6 +9429,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "On": {
+  "where": [
+   "scenes/p0/p0_ui.gd:3622"
+  ],
+  "kind": "line"
  },
  "On Schedule": {
   "where": [
@@ -8941,6 +9560,12 @@
   "kind": "line",
   "done": true
  },
+ "Our growers can't keep up. Bring me some produce?": {
+  "where": [
+   "assets/p0/content/requests_local.json#market"
+  ],
+  "kind": "line"
+ },
  "Out of %s · no bait on the hook": {
   "where": [
    "scenes/p0/p0_ui.gd:657"
@@ -9025,7 +9650,10 @@
  },
  "Owned": {
   "where": [
-   "scenes/ui_kit/ui_gear_row.gd:48"
+   "scenes/ui_kit/ui_gear_row.gd:48",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -9037,29 +9665,11 @@
   "kind": "line",
   "done": true
  },
- "P0 bag: no command for %s": {
-  "where": [
-   "scenes/p0/p0_ui.gd:2410"
-  ],
-  "kind": "template"
- },
- "P0 counter: no command for %s": {
-  "where": [
-   "scenes/p0/p0_ui.gd:2590"
-  ],
-  "kind": "template"
- },
  "P0 pond: unknown pond id": {
   "where": [
    "scenes/p0/p0_pond.gd:92"
   ],
   "kind": "line"
- },
- "P0 ponds: %s does not fit a bundled template": {
-  "where": [
-   "modules/p0/p0_ponds.gd:18"
-  ],
-  "kind": "template"
  },
  "P0 test-account main identity backup could not be verified": {
   "where": [
@@ -9078,18 +9688,6 @@
    "modules/p0/p0_runtime.gd:1841"
   ],
   "kind": "line"
- },
- "P0ItemInfo: unknown context %s": {
-  "where": [
-   "modules/p0/p0_item_info.gd:82"
-  ],
-  "kind": "template"
- },
- "P0ItemInfo: unknown flag %s": {
-  "where": [
-   "modules/p0/p0_item_info.gd:158"
-  ],
-  "kind": "template"
  },
  "P0KitchenDrawer": {
   "where": [
@@ -9112,18 +9710,6 @@
   ],
   "kind": "line"
  },
- "P0Online: %s refused the connection or is unreachable (a demo server needs the right x-p0-key)": {
-  "where": [
-   "modules/p0/p0_online.gd:194"
-  ],
-  "kind": "template"
- },
- "P0Room: no room kit '%s', keeping the Basic Room": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:114"
-  ],
-  "kind": "template"
- },
  "P0Runtime: the pick map is not on top; left to the stack": {
   "where": [
    "modules/p0/p0_runtime.gd:1466"
@@ -9142,12 +9728,6 @@
    "scenes/p0/p0_travel_cover.gd:44"
   ],
   "kind": "line"
- },
- "P0_AIM %d %s": {
-  "where": [
-   "scenes/p0/p0_farm.gd:703"
-  ],
-  "kind": "template"
  },
  "P0_AUTO": {
   "where": [
@@ -9241,23 +9821,11 @@
   ],
   "kind": "line"
  },
- "P0_MEM static=%d video=%d nodes=%d stack=%d pick=%s fps=%d frame_ms=%.1f": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1454"
-  ],
-  "kind": "template"
- },
  "P0_PATHCELLS": {
   "where": [
    "scenes/p0/p0_farm.gd:1247"
   ],
   "kind": "line"
- },
- "P0_PERF %s fps=%d draws=%d prims=%d": {
-  "where": [
-   "scenes/p0/rooms/p0_room.gd:895"
-  ],
-  "kind": "template"
  },
  "P0_PROMPT_RECTS": {
   "where": [
@@ -9296,18 +9864,6 @@
   ],
   "kind": "line"
  },
- "P0_SHOT step %s frame %d": {
-  "where": [
-   "modules/p0/p0_runtime.gd:1779"
-  ],
-  "kind": "template"
- },
- "P0_SHOT: %s works in the farmhouse only": {
-  "where": [
-   "modules/p0/p0_runtime.gd:2121"
-  ],
-  "kind": "template"
- },
  "P0_SHOT: unknown step": {
   "where": [
    "modules/p0/p0_runtime.gd:2143"
@@ -9339,12 +9895,6 @@
    "scenes/p0/rooms/p0_farmhouse.gd:687"
   ],
   "kind": "line"
- },
- "P0_TIMING %s +%d ms": {
-  "where": [
-   "modules/p0/p0_runtime.gd:100"
-  ],
-  "kind": "template"
  },
  "P0_UI_RECTS": {
   "where": [
@@ -9445,7 +9995,7 @@
  },
  "Passport": {
   "where": [
-   "modules/p0/p0_travel.gd:288",
+   "modules/p0/p0_travel.gd:289",
    "scenes/p0/panels/p0_passport_drawer.gd:41"
   ],
   "kind": "line",
@@ -9627,6 +10177,12 @@
   "kind": "line",
   "done": true
  },
+ "Pip's seeds": {
+  "where": [
+   "assets/p0/content/guide_steps.json#source"
+  ],
+  "kind": "line"
+ },
  "Place": {
   "where": [
    "modules/map/city_map_data.gd:7",
@@ -9759,7 +10315,7 @@
  },
  "Pond": {
   "where": [
-   "modules/p0/p0_bite_board.gd:172",
+   "modules/p0/p0_bite_board.gd:176",
    "modules/p0/p0_city_places.gd:107",
    "modules/p0/p0_guide.gd:462",
    "modules/p0/p0_guide.gd:464",
@@ -9790,6 +10346,12 @@
   "kind": "line",
   "done": true
  },
+ "Pond Crucians": {
+  "where": [
+   "assets/p0/p0_content.json#plural"
+  ],
+  "kind": "line"
+ },
  "Ponds": {
   "where": [
    "modules/p0/p0_bite_board.gd:16",
@@ -9816,7 +10378,8 @@
  },
  "Post Clerk": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:59"
+   "scenes/p0/panels/p0_counter_drawer.gd:60",
+   "assets/p0/p0_outposts.json#role"
   ],
   "kind": "line",
   "done": true
@@ -9834,6 +10397,12 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "Postcard from {name}": {
+  "where": [
+   "assets/p0/content/residents_p1.json#postcard"
+  ],
+  "kind": "line"
  },
  "Postcards": {
   "where": [
@@ -10050,6 +10619,12 @@
   "kind": "line",
   "done": true
  },
+ "RECOVER": {
+  "where": [
+   "scenes/ui_kit/ui_energy_card.gd:111"
+  ],
+  "kind": "line"
+ },
  "Rack": {
   "where": [
    "scenes/ui_kit/ui_item_cell.gd:476"
@@ -10101,7 +10676,7 @@
  },
  "Rain": {
   "where": [
-   "modules/p0/p0_bite_board.gd:80",
+   "modules/p0/p0_bite_board.gd:84",
    "modules/p0/p0_fish_world.gd:11",
    "scenes/map/nearby_panel.gd:20"
   ],
@@ -10130,6 +10705,13 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Rare+": {
+  "where": [
+   "assets/p0/content/residents_p1.json#likes",
+   "assets/p0/content/residents_p1.json#likes"
+  ],
+  "kind": "line"
  },
  "Ready": {
   "where": [
@@ -10162,6 +10744,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Real farm produce sells best here. Got any to spare?": {
+  "where": [
+   "assets/p0/content/requests_local.json#market"
+  ],
+  "kind": "line"
  },
  "Recent": {
   "where": [
@@ -10262,7 +10850,7 @@
  },
  "Regional": {
   "where": [
-   "modules/p0/p0_bite_board.gd:188",
+   "modules/p0/p0_bite_board.gd:192",
    "modules/p0/p0_clusters.gd:10",
    "modules/p0/p0_item_info.gd:220",
    "modules/p0/p0_pond_card.gd:94"
@@ -10273,7 +10861,7 @@
  "Regional fish": {
   "where": [
    "modules/p0/p0_bite_board.gd:16",
-   "modules/p0/p0_bite_board.gd:56",
+   "modules/p0/p0_bite_board.gd:60",
    "modules/p0/p0_logic.gd:375"
   ],
   "kind": "line",
@@ -10286,6 +10874,12 @@
   "kind": "line",
   "done": true
  },
+ "Regional seeds grow fine here. Just give them time.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
  "Regional · %s": {
   "where": [
    "modules/p0/p0_item_info.gd:220"
@@ -10295,8 +10889,8 @@
  },
  "Regular": {
   "where": [
-   "modules/p0/p0_travel.gd:264",
-   "modules/p0/p0_travel.gd:311"
+   "modules/p0/p0_travel.gd:265",
+   "modules/p0/p0_travel.gd:312"
   ],
   "kind": "line",
   "done": true
@@ -10419,6 +11013,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Residents only": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
  },
  "Rest": {
   "where": [
@@ -10543,6 +11143,12 @@
   "kind": "line",
   "done": true
  },
+ "Ring": {
+  "where": [
+   "scenes/p0/panels/p0_bag_drawer.gd#GEAR_SLOTS"
+  ],
+  "kind": "line"
+ },
  "River": {
   "where": [
    "modules/p0/p0_pond_card.gd:13"
@@ -10563,6 +11169,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "River Eels": {
+  "where": [
+   "assets/p0/content/fish_p1.json#plural"
+  ],
+  "kind": "line"
  },
  "River Friend": {
   "where": [
@@ -10678,9 +11290,9 @@
   "kind": "line",
   "done": true
  },
- "Row": {
+ "Row Hoe": {
   "where": [
-   "scenes/p0/panels/p0_home_welcome.gd:84"
+   "assets/p0/p0_content.json#tool_row_hoe"
   ],
   "kind": "line"
  },
@@ -10770,7 +11382,11 @@
  },
  "Salad": {
   "where": [
-   "modules/ui/l10n.gd:19"
+   "modules/ui/l10n.gd:19",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style"
   ],
   "kind": "line",
   "done": true
@@ -10788,6 +11404,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Salt-grilled. The miner's lunch.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
  },
  "Salted Potatoes": {
   "where": [
@@ -10927,6 +11549,12 @@
   "kind": "line",
   "done": true
  },
+ "See the green in the rock? That's copper.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
+ },
  "See what rocks hold": {
   "where": [
    "modules/p0/p0_material_logic.gd:545"
@@ -10994,6 +11622,15 @@
   "kind": "line",
   "done": true
  },
+ "Sell": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Sell %d at Homestead Stall": {
   "where": [
    "modules/p0/p0_guide.gd:429"
@@ -11015,9 +11652,18 @@
   "kind": "template",
   "done": true
  },
+ "Sell at home": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Sell here": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:216"
+   "scenes/p0/panels/p0_counter_drawer.gd:217"
   ],
   "kind": "line",
   "done": true
@@ -11028,6 +11674,18 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "Sells for {sell}": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
+ },
+ "Sells for {sell} · Fish-dex {dex}": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
  },
  "Send us a postcard. Check in at a Market in another city.": {
   "where": [
@@ -11113,6 +11771,12 @@
   ],
   "kind": "line"
  },
+ "Shipments are late again. Can you help me out?": {
+  "where": [
+   "assets/p0/content/requests_local.json#post"
+  ],
+  "kind": "line"
+ },
  "Shop": {
   "where": [
    "modules/map/city_map_data.gd:7"
@@ -11190,7 +11854,7 @@
  },
  "Sigrid": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:59",
+   "scenes/p0/panels/p0_counter_drawer.gd:60",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_outposts.json#name"
   ],
@@ -11210,12 +11874,30 @@
   "kind": "line",
   "done": true
  },
+ "Sing with me! No? Then eat with me.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
  "Sit a minute. Hot tea, %d Energy a cup.": {
   "where": [
    "modules/p0/p0_logic.gd:2065"
   ],
   "kind": "template",
   "done": true
+ },
+ "Sit by the fire, dear. Warm your hands.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
+ },
+ "Sit. I grilled too much again.": {
+  "where": [
+   "assets/p0/p0_content.json#Familiar"
+  ],
+  "kind": "line"
  },
  "Six Radishes": {
   "where": [
@@ -11303,12 +11985,39 @@
   "kind": "line",
   "done": true
  },
+ "Snakeheads": {
+  "where": [
+   "assets/p0/content/fish_p1.json#plural"
+  ],
+  "kind": "line"
+ },
  "Sold out today · %d left": {
   "where": [
    "modules/p0/p0_runtime.gd:1243"
   ],
   "kind": "template",
   "done": true
+ },
+ "Sold out · {restock_in}": {
+  "where": [
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
+ "Some fish bite better in the rain. Watch the sky.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
+ },
+ "Some nights you can see the big ones' shadows.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
  },
  "Someone's sitting there": {
   "where": [
@@ -11358,6 +12067,16 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Soup": {
+  "where": [
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style"
+  ],
+  "kind": "line"
  },
  "Soup Day": {
   "where": [
@@ -11538,20 +12257,19 @@
   "kind": "line",
   "done": true
  },
- "Stall": {
-  "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:56"
-  ],
-  "kind": "line",
-  "done": true
- },
  "Stall Board": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:62",
+   "scenes/p0/panels/p0_counter_drawer.gd:63",
    "assets/p0/p0_content.json#title"
   ],
   "kind": "line",
   "done": true
+ },
+ "Stall Board and Market Board": {
+  "where": [
+   "assets/p0/p0_content.json#scope"
+  ],
+  "kind": "line"
  },
  "Stall Board · 3rd slot": {
   "where": [
@@ -11559,6 +12277,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Stallhand": {
+  "where": [
+   "assets/p0/p0_content.json#role"
+  ],
+  "kind": "line"
  },
  "Stamp Desk": {
   "where": [
@@ -11634,6 +12358,18 @@
   "kind": "line",
   "done": true
  },
+ "Starter Hoe": {
+  "where": [
+   "assets/p0/p0_content.json#hoe_starter"
+  ],
+  "kind": "line"
+ },
+ "Starter Pickaxe": {
+  "where": [
+   "assets/p0/p0_content.json#pick_starter"
+  ],
+  "kind": "line"
+ },
  "Starter Rod": {
   "where": [
    "scenes/p0/panels/p0_fish_dex.gd:200",
@@ -11648,6 +12384,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Station Master": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
  },
  "Station Master's Lunch": {
   "where": [
@@ -11683,6 +12425,16 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Stew": {
+  "where": [
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style"
+  ],
+  "kind": "line"
  },
  "Stew for the Stall": {
   "where": [
@@ -11772,7 +12524,10 @@
  },
  "Store": {
   "where": [
-   "scenes/p0/p0_farm_decor.gd:581"
+   "scenes/p0/p0_farm_decor.gd:581",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -11807,7 +12562,11 @@
  },
  "Stranger": {
   "where": [
-   "modules/p0/p0_logic.gd:1922"
+   "modules/p0/p0_logic.gd:1922",
+   "assets/p0/p0_content.json#stages",
+   "assets/p0/p0_content.json#stage",
+   "assets/p0/p0_content.json#stage",
+   "assets/p0/p0_content.json#stage"
   ],
   "kind": "line",
   "done": true
@@ -11850,6 +12609,16 @@
  "Subtitle": {
   "where": [
    "modules/p0/p0_runtime.gd:2057"
+  ],
+  "kind": "line"
+ },
+ "Subtropical": {
+  "where": [
+   "assets/p0/p0_content.json#card_zones",
+   "assets/p0/p0_content.json#card_zone",
+   "assets/p0/content/farm_crops.json#zone",
+   "assets/p0/content/fish_p1.json#zones",
+   "assets/p0/content/fish_p1.json#zones"
   ],
   "kind": "line"
  },
@@ -11926,15 +12695,16 @@
  "Tackle": {
   "where": [
    "scenes/p0/panels/p0_bag_drawer.gd:22",
-   "scenes/p0/panels/p0_bag_drawer.gd:25",
-   "scenes/p0/panels/p0_counter_drawer.gd:56"
+   "scenes/p0/panels/p0_bag_drawer.gd:25"
   ],
   "kind": "line",
   "done": true
  },
  "Tackle Keeper": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:58"
+   "scenes/p0/panels/p0_counter_drawer.gd:59",
+   "assets/p0/p0_content.json#role",
+   "assets/p0/p0_outposts.json#role"
   ],
   "kind": "line",
   "done": true
@@ -11967,6 +12737,12 @@
   "kind": "template",
   "done": true
  },
+ "Take all": {
+  "where": [
+   "modules/p0/item_info_rules.json#label"
+  ],
+  "kind": "line"
+ },
  "Take back": {
   "where": [
    "modules/p0/p0_trap.gd:82"
@@ -11996,6 +12772,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Take the good stool. You've earned it.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
  },
  "Taking longer than usual…": {
   "where": [
@@ -12068,14 +12850,16 @@
    "modules/p0/p0_logic.gd:855",
    "modules/ui/l10n.gd:19",
    "scenes/p0/panels/p0_counter_drawer.gd:43",
-   "scenes/p0/panels/p0_counter_drawer.gd:56"
+   "assets/p0/p0_content.json#style",
+   "assets/p0/p0_content.json#style"
   ],
   "kind": "line",
   "done": true
  },
  "Tea Host": {
   "where": [
-   "scenes/p0/panels/p0_counter_drawer.gd:58"
+   "scenes/p0/panels/p0_counter_drawer.gd:59",
+   "assets/p0/p0_outposts.json#role"
   ],
   "kind": "line",
   "done": true
@@ -12122,6 +12906,28 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Tea's easy. Food's the hard part. Got any dishes to spare?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tea"
+  ],
+  "kind": "line"
+ },
+ "Tea's warm. Sit with me a while.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
+ "Temperate": {
+  "where": [
+   "assets/p0/p0_content.json#card_zones",
+   "assets/p0/p0_content.json#card_zone",
+   "assets/p0/p0_content.json#climate",
+   "assets/p0/content/farm_crops.json#zone",
+   "assets/p0/content/fish_p1.json#zones"
+  ],
+  "kind": "line"
  },
  "Ten letters, ten towns. I need fuel. Two sweets, please?": {
   "where": [
@@ -12237,6 +13043,12 @@
   "kind": "line",
   "done": true
  },
+ "The cooler's nearly empty. Can you help me stock it?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tackle"
+  ],
+  "kind": "line"
+ },
  "The dealer draws to 16 and stands on all 17s.": {
   "where": [
    "scenes/p0/panels/p0_blackjack_page.gd:286"
@@ -12258,6 +13070,12 @@
   "kind": "line",
   "done": true
  },
+ "The light's on. Come in from the wind.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
+ },
  "The mine": {
   "where": [
    "modules/p0/p0_material_logic.gd:71",
@@ -12267,12 +13085,24 @@
   "kind": "line",
   "done": true
  },
+ "The mine's yours as much as mine now.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
  "The path is busy. Try again in a moment.": {
   "where": [
    "scenes/map/journey_street.gd:571"
   ],
   "kind": "line",
   "done": true
+ },
+ "The post needs repairs. Could you lend a hand?": {
+  "where": [
+   "assets/p0/content/requests_local.json#post"
+  ],
+  "kind": "line"
  },
  "The pot is full · tap ✕ above to take one out": {
   "where": [
@@ -12281,12 +13111,24 @@
   "kind": "line",
   "done": true
  },
+ "The river tells stories, if you listen.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
  "The square needs a new stage. Hardwood from the old tree.": {
   "where": [
    "assets/p0/content/requests_p1.json#text"
   ],
   "kind": "line",
   "done": true
+ },
+ "The stars look better with company.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
  },
  "The stove is busy · %s left": {
   "where": [
@@ -12352,6 +13194,18 @@
   "kind": "line",
   "done": true
  },
+ "This fire will always be here for you.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
+ "This is… not on the timetable.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#mystery"
+  ],
+  "kind": "line"
+ },
  "This parcel is no longer waiting": {
   "where": [
    "modules/p0/p0_runtime.gd:1200"
@@ -12365,6 +13219,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "This station's always open for you.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
  },
  "This version is out of date.": {
   "where": [
@@ -12637,6 +13497,12 @@
   "kind": "template",
   "done": true
  },
+ "Took this off the stove for you. Eat while it's hot!": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
  "Tools": {
   "where": [
    "scenes/p0/panels/p0_workbench_drawer.gd:23"
@@ -12716,6 +13582,12 @@
   "kind": "line",
   "done": true
  },
+ "Trains run on time. So should you.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
+ },
  "Trap already here": {
   "where": [
    "modules/p0/p0_trap.gd:41",
@@ -12771,7 +13643,7 @@
  },
  "Travel here to collect its stamp": {
   "where": [
-   "modules/p0/p0_travel.gd:310"
+   "modules/p0/p0_travel.gd:311"
   ],
   "kind": "line",
   "done": true
@@ -12797,6 +13669,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Traveling Trader": {
+  "where": [
+   "assets/p0/content/residents_p1.json#role"
+  ],
+  "kind": "line"
  },
  "Traveller %s": {
   "where": [
@@ -12829,7 +13707,7 @@
  },
  "Trip %d · %s": {
   "where": [
-   "modules/p0/p0_travel.gd:222",
+   "modules/p0/p0_travel.gd:223",
    "scenes/p0/p0_map.gd:877"
   ],
   "kind": "template",
@@ -12842,12 +13720,32 @@
   "kind": "line",
   "done": true
  },
+ "Tropical": {
+  "where": [
+   "assets/p0/p0_content.json#card_zones",
+   "assets/p0/p0_content.json#card_zone",
+   "assets/p0/p0_content.json#card_zone",
+   "assets/p0/content/farm_crops.json#zone",
+   "assets/p0/content/fish_p1.json#zones"
+  ],
+  "kind": "line"
+ },
  "Trout from moving water. Rainbow Trout only.": {
   "where": [
    "assets/p0/content/requests_p1.json#text"
   ],
   "kind": "line",
   "done": true
+ },
+ "Trusted": {
+  "where": [
+   "assets/p0/p0_content.json#stages",
+   "assets/p0/content/residents_p1.json#stage",
+   "assets/p0/content/residents_p1.json#stage",
+   "assets/p0/content/residents_p1.json#stage",
+   "assets/p0/content/residents_p1.json#stage"
+  ],
+  "kind": "line"
  },
  "Try %s": {
   "where": [
@@ -12865,7 +13763,7 @@
  },
  "Try a Spinner Lure.": {
   "where": [
-   "modules/p0/p0_bite_board.gd:71"
+   "modules/p0/p0_bite_board.gd:74"
   ],
   "kind": "line",
   "done": true
@@ -12958,6 +13856,12 @@
   "kind": "line",
   "done": true
  },
+ "Um… thanks? I'll save it for later.": {
+  "where": [
+   "assets/p0/p0_content.json#mystery"
+  ],
+  "kind": "line"
+ },
  "Unblock": {
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:120",
@@ -12975,7 +13879,7 @@
  },
  "Unexplored": {
   "where": [
-   "modules/p0/p0_travel.gd:305",
+   "modules/p0/p0_travel.gd:306",
    "scenes/p0/p0_map.gd:891",
    "scenes/p0/p0_map.gd:1357",
    "scenes/p0/p0_map.gd:1358"
@@ -13024,7 +13928,10 @@
  },
  "Unlock": {
   "where": [
-   "modules/p0/p0_material_logic.gd:477"
+   "modules/p0/p0_material_logic.gd:477",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true
@@ -13058,6 +13965,12 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "Up to %s km, or the %d nearest cities": {
+  "where": [
+   "modules/p0/p0_travel.gd:220"
+  ],
+  "kind": "template"
  },
  "Update": {
   "where": [
@@ -13206,6 +14119,12 @@
   "kind": "line",
   "done": true
  },
+ "Veggie plate, on the house. Eat!": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Familiar"
+  ],
+  "kind": "line"
+ },
  "Version": {
   "where": [
    "scenes/p0/panels/p0_settings_page.gd:147"
@@ -13313,8 +14232,8 @@
  },
  "Visited": {
   "where": [
-   "modules/p0/p0_travel.gd:265",
-   "modules/p0/p0_travel.gd:309",
+   "modules/p0/p0_travel.gd:266",
+   "modules/p0/p0_travel.gd:310",
    "scenes/p0/p0_map.gd:1358"
   ],
   "kind": "line",
@@ -13336,9 +14255,9 @@
  },
  "Visits": {
   "where": [
-   "modules/p0/p0_travel.gd:307",
-   "modules/p0/p0_travel.gd:312",
-   "modules/p0/p0_travel.gd:314"
+   "modules/p0/p0_travel.gd:308",
+   "modules/p0/p0_travel.gd:313",
+   "modules/p0/p0_travel.gd:315"
   ],
   "kind": "line",
   "done": true
@@ -13524,6 +14443,18 @@
   "kind": "line",
   "done": true
  },
+ "We're fixing up {outpost}. I could use some supplies.": {
+  "where": [
+   "assets/p0/content/requests_local.json#post"
+  ],
+  "kind": "line"
+ },
+ "We're short in the kitchen today. Could you cook something for us?": {
+  "where": [
+   "assets/p0/content/requests_local.json#tea"
+  ],
+  "kind": "line"
+ },
  "Welcome back": {
   "where": [
    "scenes/p0/p0_map.gd:1018"
@@ -13552,6 +14483,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Welcome in! Grab a seat anywhere.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Stranger"
+  ],
+  "kind": "line"
  },
  "Welcome to %s · Stamp collected": {
   "where": [
@@ -13608,6 +14545,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Wherever you go, I've probably been. Ask me anything.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
  },
  "While they grow, plant some lettuce. That one takes a few hours.": {
   "where": [
@@ -13690,7 +14633,7 @@
  },
  "Windy": {
   "where": [
-   "modules/p0/p0_bite_board.gd:80",
+   "modules/p0/p0_bite_board.gd:84",
    "modules/p0/p0_fish_world.gd:11"
   ],
   "kind": "line",
@@ -13717,6 +14660,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "Wooden Sword": {
+  "where": [
+   "assets/p0/p0_content.json#sword_wooden"
+  ],
+  "kind": "line"
  },
  "Workbench": {
   "where": [
@@ -13748,6 +14697,12 @@
   ],
   "kind": "line"
  },
+ "XP": {
+  "where": [
+   "scenes/p0/panels/p0_skills_drawer.gd:109"
+  ],
+  "kind": "line"
+ },
  "XP %d%% · Reduced": {
   "where": [
    "modules/p0/p0_logic.gd:291"
@@ -13761,6 +14716,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "You again! Got anything sweet?": {
+  "where": [
+   "assets/p0/p0_content.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "You already reported this": {
   "where": [
@@ -13790,6 +14751,12 @@
   "kind": "line",
   "done": true
  },
+ "You fish, right? I've got buyers waiting.": {
+  "where": [
+   "assets/p0/content/requests_local.json#tackle"
+  ],
+  "kind": "line"
+ },
  "You get %d": {
   "where": [
    "modules/p0/p0_material_logic.gd:565"
@@ -13803,6 +14770,12 @@
   ],
   "kind": "template",
   "done": true
+ },
+ "You look like you need a proper meal.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Acquainted"
+  ],
+  "kind": "line"
  },
  "You look rested. Tea's here when you need it.": {
   "where": [
@@ -13825,6 +14798,18 @@
   "kind": "line",
   "done": true
  },
+ "You read the water well now.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
+ "You remind me of my grandson. He never sat still either.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
  "You win": {
   "where": [
    "modules/p0/p0_blackjack.gd:87"
@@ -13838,6 +14823,24 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "You're market family now!": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
+ "You're on my route now. Every day!": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
+ "You've got a farm? {city} could use your crops.": {
+  "where": [
+   "assets/p0/content/requests_local.json#market"
+  ],
+  "kind": "line"
  },
  "Your %s remain in your bag.": {
   "where": [
@@ -13930,7 +14933,7 @@
   "where": [
    "modules/p0/p0_home_pick.gd:65",
    "modules/p0/p0_travel.gd:141",
-   "modules/p0/p0_travel.gd:281"
+   "modules/p0/p0_travel.gd:282"
   ],
   "kind": "line",
   "done": true
@@ -13949,9 +14952,21 @@
   "kind": "line",
   "done": true
  },
+ "Your name is in the founders' book now.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Kindred"
+  ],
+  "kind": "line"
+ },
+ "Your passport's filling up. I've been counting.": {
+  "where": [
+   "assets/p0/content/residents_p1.json#Trusted"
+  ],
+  "kind": "line"
+ },
  "Your stamp has been collected": {
   "where": [
-   "modules/p0/p0_travel.gd:310"
+   "modules/p0/p0_travel.gd:311"
   ],
   "kind": "line",
   "done": true
@@ -14012,12 +15027,24 @@
   "kind": "template",
   "done": true
  },
+ "all requests": {
+  "where": [
+   "assets/p0/p0_content.json#scope"
+  ],
+  "kind": "line"
+ },
  "any %s market": {
   "where": [
    "modules/p0/p0_board.gd:201"
   ],
   "kind": "template",
   "done": true
+ },
+ "any pond": {
+  "where": [
+   "assets/p0/p0_content.json#where"
+  ],
+  "kind": "line"
  },
  "at dawn and dusk": {
   "where": [
@@ -14225,19 +15252,18 @@
   "kind": "template",
   "done": true
  },
- "only bite": {
-  "where": [
-   "modules/p0/p0_bite_board.gd:60"
-  ],
-  "kind": "line",
-  "done": true
- },
  "or %s": {
   "where": [
    "modules/p0/p0_material_logic.gd:531"
   ],
   "kind": "template",
   "done": true
+ },
+ "outposts": {
+  "where": [
+   "scenes/p0/p0_map.gd:896"
+  ],
+  "kind": "line"
  },
  "p0 content: %s: %s already has id %s": {
   "where": [
@@ -14264,6 +15290,12 @@
   "kind": "line",
   "done": true
  },
+ "ponds": {
+  "where": [
+   "scenes/p0/p0_map.gd:895"
+  ],
+  "kind": "line"
+ },
  "request done": {
   "where": [
    "scenes/p0/p0_ui.gd:3175"
@@ -14278,6 +15310,12 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "residents": {
+  "where": [
+   "scenes/p0/p0_map.gd:897"
+  ],
+  "kind": "line"
  },
  "rod too light": {
   "where": [
@@ -14384,12 +15422,11 @@
   "kind": "line",
   "done": true
  },
- "x-p0-version: %d": {
+ "{energy} Energy per plot · Ready in {grow}": {
   "where": [
-   "modules/p0/p0_online.gd:147",
-   "modules/p0/p0_session.gd:302"
+   "modules/p0/item_info_rules.json#facts"
   ],
-  "kind": "template"
+  "kind": "line"
  },
  "{name}'s Best Friend": {
   "where": [
@@ -14398,6 +15435,21 @@
   ],
   "kind": "line",
   "done": true
+ },
+ "{sell_here} each": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts",
+   "modules/p0/item_info_rules.json#facts",
+   "modules/p0/item_info_rules.json#facts",
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
+ },
+ "{stored} · Farm Storage": {
+  "where": [
+   "modules/p0/item_info_rules.json#facts"
+  ],
+  "kind": "line"
  },
  "© Mapbox": {
   "where": [
@@ -14443,7 +15495,9 @@
  },
  "✓ Equipped": {
   "where": [
-   "scenes/ui_kit/ui_gear_row.gd:78"
+   "scenes/ui_kit/ui_gear_row.gd:78",
+   "modules/p0/item_info_rules.json#label",
+   "modules/p0/item_info_rules.json#label"
   ],
   "kind": "line",
   "done": true

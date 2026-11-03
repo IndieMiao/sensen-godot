@@ -74,7 +74,7 @@ static func skills_data(view: Dictionary) -> Dictionary:
 		var next := "Top level"
 		if not top:
 			var opens := P0Logic.level_unlocks(view, key, lv + 1)
-			next = ("Next: " + P0Logic.and_list(opens)) if not opens.is_empty() else "Next: Lv%d · %d XP to go" % [lv + 1, maxi(0, need - xp)]
+			next = ("Next: %s" % P0Logic.and_list(opens)) if not opens.is_empty() else "Next: Lv%d · %d XP to go" % [lv + 1, maxi(0, need - xp)]
 		var rows: Array = []
 		for l in range(2, th.size() + 1):
 			var opens := P0Logic.level_unlocks(view, key, l)
