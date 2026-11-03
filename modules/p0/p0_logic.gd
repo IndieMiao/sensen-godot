@@ -1030,6 +1030,14 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 			plots.append(p)
 		v["plots"] = plots
+	# a city gathering spot's cooldown (v4q(4): view.gather.city_ready, ms left): counted down, gone once ready
+	var g = v.get("gather", null)
+	if g is Dictionary and g.get("city_ready") is Dictionary and not (g.city_ready as Dictionary).is_empty():
+		var left := {}
+		for id in g.city_ready:
+			var ms := float(g.city_ready[id]) - elapsed_ms
+			if ms > 0.0: left[id] = ms
+		own.call(v, "gather")["city_ready"] = left
 	var guide = v.get("guide", null)
 	var row = guide.get("row", null) if guide is Dictionary else null
 	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:
