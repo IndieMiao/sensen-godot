@@ -175,6 +175,23 @@ static func mine_facility(view: Dictionary, n: int, kind: String) -> Dictionary:
 static func _fee_card(label: String) -> Dictionary:
 	return {"card": true, "label": label, "enabled": false, "amber": false, "cmd": {}, "toast": label}
 
+## The ore block this mine's rocks are drawn as (contract-efg §10.1, 不知火舞 11-03): a vein its main ore's (`iron_ore` /
+## `quartz`, view.mine.records' main), a quarry Copper Ore's; "" when not known (the code-built rock then).
+static func rock_ore(view: Dictionary) -> String:
+	var at := mine_at(view)
+	if str(at.get("type", "")) == "quarry": return "copper_ore"
+	var main = view.get("mine", {}).get("records", {}).get(str(at.get("mine", "")), {}).get("main", null)
+	return str(main) if main is String else ""
+
+## Whether floor n of this mine is a guard's (content mine.types[type].floors: a quarry's F10 / 20 / 30, a vein's F20 /
+## 40), its guard down or not: the arena stands either way (contract-efg §10.1). The view's floor_state.guard is null once
+## the guard is beaten on an earlier day (server mine.ts currentSpec), so the content says.
+static func guard_floor(view: Dictionary, n: int) -> bool:
+	if _floor(view, n).get("guard", null) != null: return true
+	var type: Dictionary = P0Logic.content().get("mine", {}).get("types", {}).get(str(mine_at(view).get("type", "")), {})
+	var special = type.get("floors", {}).get(str(n), null)
+	return special is Dictionary and special.get("guard", null) != null
+
 ## Whether floor n has the elevator: Floor 1 and every stop (contract-efg §4 ⑤; F1 is no stop, the machine is there).
 static func has_elevator(view: Dictionary, n: int) -> bool:
 	return n == 1 or bool(_floor(view, n).get("station", false))

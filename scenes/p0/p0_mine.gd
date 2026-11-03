@@ -210,22 +210,27 @@ func _build_floor(n: int) -> void:
 	objects = Node3D.new()
 	objects.name = "MineObjects"
 	add_child(objects)
-	if P0MaterialLogic.has_elevator(v, n): objects.add_child(Art.elevator(true))
+	if P0MaterialLogic.has_elevator(v, n): objects.add_child(Art.elevator(true, n))
 	if at.get("next", null) is Dictionary: objects.add_child(Art.ladder(Layout.DOWN, false))
 	var floor: Dictionary = at.get("floor_state", {}) if int(at.get("floor", 0)) == n else {}
-	_positions = Layout.p0_rocks(int(floor.get("rocks", 0)), "%s:%d:%s" % [mine_id, n, _day])
+	if P0MaterialLogic.guard_floor(v, n):   # a guard's floor, beaten or not: its arena, decoration only (contract-efg §10.1)
+		var arena: Node3D = Art.guard_arena()
+		if arena: objects.add_child(arena)
+	var floor_seed := "%s:%d:%s" % [mine_id, n, _day]
+	_positions = Layout.p0_rocks(int(floor.get("rocks", 0)), floor_seed)
 	var broken := _broken(v, n)
+	var ore := P0MaterialLogic.rock_ore(v)
 	for i in _positions.size():
 		if broken[i]: continue
-		var rock := Art.rock(_positions[i], i, Art.variant_of(n))
+		var rock := Art.rock(_positions[i], i, Art.variant_of(n), ore, floor_seed)
 		rock.name = "Rock%d" % i
 		objects.add_child(rock)
 		_rocks[i] = rock
 	_ground_seen.clear()
 	for g in floor.get("ground", []): _ground_seen[int(g.get("id", 0))] = true   # lying here already: no float
 	_art_points = _art_vertices(scenery)
-	for node in objects.get_children():   # the elevator and the down ladder stand against the walls; rocks are inside
-		if not str(node.name).begins_with("Rock"): _art_points.append_array(_art_vertices(node))
+	for node in objects.get_children():   # the elevator and the down ladder stand against the walls; rocks and a guard's arena are inside
+		if not str(node.name).begins_with("Rock") and node.name != &"GuardArena": _art_points.append_array(_art_vertices(node))
 	_art_right = Vector3.ZERO
 	_find_facilities(n)
 	# The underground backdrop (SGODOT-257) hangs off the world itself, outside scenery / objects: the camera's walls box
