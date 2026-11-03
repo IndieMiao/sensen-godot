@@ -14,7 +14,7 @@
  },
  "%[+-]?[0-9]*(\\\\.[0-9]+)?[dsf]": {
   "where": [
-   "modules/ui/localization.gd:140"
+   "modules/ui/localization.gd:141"
   ],
   "kind": "line"
  },
@@ -9908,7 +9908,7 @@
  },
  "P0_I18N_MISSES": {
   "where": [
-   "modules/ui/localization.gd:209"
+   "modules/ui/localization.gd:210"
   ],
   "kind": "line"
  },

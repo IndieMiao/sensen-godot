@@ -350,3 +350,18 @@ func test_p0_a_quick_slots_chinese_name_breaks_by_the_character() -> void:
 	cell.queue_free()
 	Localization.set_cjk_fonts(false)
 	TranslationServer.remove_translation(t)
+
+## #649 第二批 ⑩ (the Skills page's 「下一级：Carrot and Herb」): a list's last item after ` and ` / ` or ` — 胡萝卜和香草,
+## 胡萝卜、香草和土豆, 烤物或汤品 — when every item is known; a template still has the line first (`Try %s or %s`), and
+## a sentence with a word the table does not hold stays English.
+func test_p0_a_list_reads_its_last_and_or_or() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"Carrot": "胡萝卜", "Herb": "香草", "Potato": "土豆", "Grilled": "烤物", "Soup": "汤品",
+		"Next: %s": "下一级：%s", "Try %s or %s": "试试 %s 或 %s", "%s dishes": "%s类料理"})
+	assert_str(String(t.get_message("Carrot and Herb"))).is_equal("胡萝卜和香草")
+	assert_str(String(t.get_message("Next: Carrot and Herb"))).is_equal("下一级：胡萝卜和香草")
+	assert_str(String(t.get_message("Carrot, Herb and Potato"))).is_equal("胡萝卜、香草和土豆")
+	assert_str(String(t.get_message("Grilled or Soup dishes"))).is_equal("烤物或汤品类料理")
+	assert_str(String(t.get_message("Try Carrot or Herb"))).is_equal("试试 胡萝卜 或 香草")   # the template's own
+	assert_str(String(t.get_message("Carrot, Herb"))).is_equal("胡萝卜、香草")
+	assert_str(String(t.get_message("Salt and pepper"))).is_equal("")   # not every item known: English

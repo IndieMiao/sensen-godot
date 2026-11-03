@@ -130,6 +130,7 @@ class P0Translation extends Translation:
 	const CACHE_MAX := 4096
 	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
 	const LINK := " ›"   # a row or key that opens something: the arrow stays, the words before it are translated
+	const LIST_LAST := {" and ": "和", " or ": "或"}   # a list's last item: `Carrot and Herb` 胡萝卜和香草
 	var _misses := {}
 	var _miss_file: FileAccess
 	static var SPEC := _spec_re()
@@ -261,14 +262,27 @@ class P0Translation extends Translation:
 		if count != null and count.get_start() > 0:
 			var head := translate_line(s.left(count.get_start()))
 			return head + count.get_string() if head != "" else ""
-		if s.contains(", "):   # a list: only when every item is known, joined the Chinese way
-			var items: Array = []
-			for item in s.split(", "):
-				var z := translate_line(item)
-				if z == "": return ""
-				items.append(z)
-			return "、".join(items)
+		# a list: only when every item is known, joined the Chinese way — `Carrot, Herb` 胡萝卜、香草; with its last item
+		# after ` and ` / ` or ` (`Carrot and Herb`, `A, B and C`, `Grilled or Soup`) 和 / 或 before it (#649 第二批 ⑩).
+		# A template has had the whole line first (`Try %s or %s`); a sentence with an unknown word stays English.
+		for conj in LIST_LAST:
+			var at := s.rfind(conj)
+			if at <= 0: continue
+			var items := _list_items(s.left(at).split(", ") + PackedStringArray([s.substr(at + conj.length())]))
+			if items.is_empty(): return ""
+			return "、".join(items.slice(0, -1)) + str(LIST_LAST[conj]) + str(items[-1])
+		if s.contains(", "):
+			return "、".join(_list_items(s.split(", ")))
 		return ""
+
+	## Each item's Chinese, or [] when one is not known.
+	func _list_items(parts: PackedStringArray) -> Array:
+		var items: Array = []
+		for item in parts:
+			var z := translate_line(item)
+			if z == "": return []
+			items.append(z)
+		return items
 
 	func _template(s: String) -> String:
 		for entry in _templates:
