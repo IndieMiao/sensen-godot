@@ -175,21 +175,16 @@ func on_refused() -> void:
 	_show_notice("Cast when you are ready.")
 	_refresh_button()
 
-## The Legendary tier as P0 plays it (q(282), SGODOT-389; 用户「传奇鱼 AB」, 奕星's assessment legendary-fish-difficulty-
-## 2026-11-03 A′): the content's 0.20 / 0.56 / 16 / 0.14 landed about one reel in four for a player of 0.2 s; these bring
-## §6.5.3's 62 %, each still harder than Rare's (narrowest band, fastest, most turns, steepest loss). Over fishing.json
-## here, not in it (q(282): the file is in the old farm server's content hash).
-const LEGENDARY := {"bar_size": 0.22, "fish_speed": 0.47, "turn_steps": 20, "loss": 0.13}
-## B (q(282)): a Spinner Lure on the hook slows a Rare or Legendary fish on the line (×0.8: Legendary about 69 %, Rare with the
+## B (q(282), SGODOT-389; 用户「传奇鱼 AB」, 奕星's assessment legendary-fish-difficulty-2026-11-03): a Spinner Lure on the hook slows a Rare or Legendary fish on the line (×0.8: Legendary about 69 %, Rare with the
 ## Carbon Rod 93 %; the simulation in the PR).
 const LURE := "bait_lure"
 const LURE_SLOW := 0.8
 
-## The reel's tier for a bite of `rarity`: the content's, P0's Legendary over it, the lure's slowing, then the rod (Reed
+## The reel's tier for a bite of `rarity`: the content's (fishing.json; its Legendary eased by q(282)'s A′), the lure's
+## slowing, then the rod (Reed
 ## +3 / Carbon +5 points of band, Carbon −10 % loss, §6.5.2) and the sure bite (q(219)). `fishing`: view.fishing.
 static func reel_tier(rarity: int, fishing: Dictionary, sure: bool) -> Dictionary:
 	var tier: Dictionary = (FishingModel.data().tiers[str(rarity)] as Dictionary).duplicate()
-	if rarity == 4: tier.merge(LEGENDARY, true)
 	var cast = fishing.get("cast", null)
 	if rarity >= 3 and cast is Dictionary and str(cast.get("bait", "")) == LURE: tier["fish_speed"] = float(tier.fish_speed) * LURE_SLOW
 	tier["bar_size"] = minf(0.45, float(tier.bar_size) + float(fishing.get("band_bonus", 0.0)))   # Reed +3 / Carbon +5 points (§6.5.2)

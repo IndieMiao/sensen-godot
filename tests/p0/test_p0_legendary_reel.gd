@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
-## 传说鱼收线 (q(282), SGODOT-389; 用户「传奇鱼 AB»): A′ — P0's Legendary tier over fishing.json's (0.22 / 0.47 / 20 /
-## 0.13), each value still harder than Rare's, the file itself untouched; B — a Spinner Lure slows a Rare or Legendary fish
-## ×0.8. The rod's band and loss and the sure bite apply after both; Common, Fine and Rare unchanged.
+## 传说鱼收线 (q(282), SGODOT-389; 用户「传奇鱼 AB»): A′ — fishing.json's Legendary tier eased to 0.22 / 0.47 / 20 / 0.13
+## (only P0 reads the file now: the old farm server and Journey are retired, 周瑜 / 奕星), each value still harder than
+## Rare's; B — a Spinner Lure slows a Rare or Legendary fish ×0.8. The rod's band and loss and the sure bite apply after
+## both; Common, Fine and Rare unchanged.
 
 const CARBON := {"band_bonus": 0.05, "loss_mult": 0.9}
 
@@ -13,7 +14,7 @@ func test_legendary_is_p0s_own_and_still_harder_than_rare() -> void:
 	assert_float(float(legend.fish_speed)).is_greater(float(rare.fish_speed))
 	assert_int(int(legend.turn_steps)).is_less(int(rare.turn_steps))
 	assert_float(float(legend.loss)).is_greater(float(rare.loss))
-	assert_float(float(FishingModel.data().tiers["4"].fish_speed)).is_equal(0.56)   # fishing.json itself: as it was (q(282))
+	assert_float(float(FishingModel.data().tiers["4"].fish_speed)).is_equal(0.47)   # the table holds what P0 plays: one set of numbers
 	var was := {1: [0.34, 0.2, 40.0, 0.08], 2: [0.29, 0.32, 30.0, 0.1], 3: [0.24, 0.44, 22.0, 0.12]}   # Common, Fine, Rare
 	for r in was:
 		var t := P0FishingPanel.reel_tier(r, {}, false)
