@@ -138,12 +138,14 @@ export const wildNear3 = (c: P0Content, s: P0State): string[] => {
   return kept?.length ? kept : wildNearOf(c, homeOf(c, s));
 };
 
-/** The free 3 as Today's vein row reads them (v4q(9), 亚瑟): near3's order (nearest first), each `{id, type, main, name}` —
- * `main` a vein's one main (`iron_ore` / `quartz`), null for a quarry; `name` the site's full name, the very field its pin
- * and its mine card show (`siteFor`'s, the viewport's). */
-export function near3Sites(c: P0Content, s: P0State, near3 = wildNear3(c, s)): { id: string; type: string; main: string | null; name: string }[] {
+/** The free 3 as Today's vein row reads them (v4q(9), 亚瑟): near3's order (nearest first), each `{id, type, main, name,
+ * lat, lng}` — `main` a vein's one main (`iron_ore` / `quartz`), null for a quarry; `name` the site's full name, the very
+ * field its pin and its mine card show (`siteFor`'s, the viewport's); lat / lng for a Show that flies to a site the
+ * viewport has not read yet (亚瑟, C part 2). */
+export function near3Sites(c: P0Content, s: P0State, near3 = wildNear3(c, s)):
+  { id: string; type: string; main: string | null; name: string; lat: number; lng: number }[] {
   return near3.map(id => wildById(c, id)).filter((x): x is WildSite => !!x)
-    .map(x => ({ id: x.id, type: x.type, main: x.mine?.main ?? null, name: x.name }));
+    .map(x => ({ id: x.id, type: x.type, main: x.mine?.main ?? null, name: x.name, lat: x.lat, lng: x.lng }));
 }
 
 /** The nearest free vein of one main (`iron_ore`, `quartz`) — from the save's frozen 3, which hold one of each (庚3): the one
