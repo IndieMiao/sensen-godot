@@ -13,12 +13,15 @@ import { skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 import { haveTotal, missing, stored, takeStorageFirst } from './storage.js';
 import { fieldRecipeView, placeBlock } from './garden.js';
+import { coinsNeeded } from './homestead.js';
 
 export function owned(s: P0State, r: WorkbenchRecipe): boolean {
-  return r.to === 'gear' ? s.gear.picks.includes(r.out) : r.to === 'owned' ? s.owned.includes(r.out) : false;
+  return r.to === 'gear' ? s.gear.picks.includes(r.out) : r.to === 'owned' ? s.owned.includes(r.out)
+    : r.to === 'weapon' ? s.gear.weapons.includes(r.out) : false;
 }
 
-/** Why a recipe can't be made now, in button order: owned, level gate, materials, bag room. */
+/** Why a recipe can't be made now, in button order: owned, level gate (a skill's, then the Homestead's), materials,
+ * coins (with the 40 floor, as a shop's), bag room. */
 export function craftBlock(c: P0Content, s: P0State, r: WorkbenchRecipe): Refusal | null {
   if (r.to === 'field') return placeBlock(c, s, r);   // P1: built in place (the place command), never crafted
   if (owned(s, r)) return { code: 'owned' };
@@ -27,8 +30,10 @@ export function craftBlock(c: P0Content, s: P0State, r: WorkbenchRecipe): Refusa
     if (skillLevel(c, s, skill) < level)
       return { code: 'locked', detail: { skill, level, xp_to_go: Math.max(0, c.skills[skill][level - 1] - s.skills[skill]) } };
   }
+  if (r.homestead && s.homestead.level < r.homestead) return { code: 'homestead_level', detail: { need: r.homestead } };
   const gap = missing(s, r.cost);
   if (gap) return { code: 'need_material', detail: gap };
+  if (r.coins && s.coins < coinsNeeded(c, r.coins)) return { code: 'no_coins', detail: { need: coinsNeeded(c, r.coins) - s.coins } };
   if (r.to === 'bag' && room(c, s, r.out) < r.qty) return { code: 'bag_full', detail: { room: room(c, s, r.out) } };
   return null;
 }
@@ -41,9 +46,11 @@ export function craft(c: P0Content, s: P0State, cmd: { recipe?: unknown; space?:
   const block = craftBlock(c, s, r);
   if (block) return block;
   for (const [item, qty] of r.cost) { takeStorageFirst(s, item, qty); events.push({ kind: 'item', id: item, delta: -qty }); }
+  if (r.coins) { s.coins -= r.coins; events.push({ kind: 'coins', delta: -r.coins }); }
   if (r.to === 'bag') { add(c, s, r.out, r.qty); events.push({ kind: 'item', id: r.out, delta: r.qty }); }
   else if (r.to === 'gear') s.gear.picks.push(r.out);   // §13.1.3: equipped with Equip at the workbench or in Gear (PICKAXE-DONE)
   else if (r.to === 'owned') s.owned.push(r.out);
+  else s.gear.weapons.push(r.out);   // 355 G §9.3: into the weapon slot, not in hand — Equip in Gear, as the pickaxe
   events.push({ kind: 'craft', recipe: r.id, item: r.out, qty: r.qty, to: r.to });
   return null;
 }
@@ -62,9 +69,12 @@ export function workbenchView(c: P0Content, s: P0State) {
         cost: r.cost.map(([id, need]) => ({ id, name: itemName(c, id), need, have: haveTotal(s, id), storage: stored(s, id), bag: haveTotal(s, id) - stored(s, id) })),
         gate: r.gate ? { skill: r.gate[0], level: r.gate[1], ok: skillLevel(c, s, r.gate[0]) >= r.gate[1],
           xp_to_go: Math.max(0, c.skills[r.gate[0]][r.gate[1] - 1] - s.skills[r.gate[0]]) } : null,
-        owned: owned(s, r), equipped: r.to === 'gear' && s.gear.pick === r.out,
+        ...(r.homestead ? { homestead: { level: r.homestead, ok: s.homestead.level >= r.homestead } } : {}),
+        owned: owned(s, r), equipped: r.to === 'gear' ? s.gear.pick === r.out : r.to === 'weapon' && s.gear.weapon === r.out,
         can_craft: block === null, block,
-        ...(r.to === 'field' ? fieldRecipeView(c, s, r) : {}),   // P1 Facilities: Sprinklers 4/6 on the button
+        // P1 Facilities: Sprinklers 4/6 on the button; a crafted recipe's coins as a facility's (a Coins tile, q(10))
+        ...(r.to === 'field' ? fieldRecipeView(c, s, r)
+          : r.coins ? { coins: r.coins, coins_need: coinsNeeded(c, r.coins), coins_have: s.coins } : {}),
       };
     }),
   };

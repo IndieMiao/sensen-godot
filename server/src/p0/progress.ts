@@ -65,7 +65,7 @@ export type P0Event =
       rock?: number; drop?: string | null;
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
-  | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
+  | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'weapon' }
   // SGODOT-351 blackjack (blackjack.ts): a hand dealt (its view), each card drawn after (the hole card turned with
   // hole), a hand paid (the dealer's cards, each hand's result, payout and net, the wallet after)
   | { kind: 'bj_dealt'; n: number; bet: number; hand: ReturnType<typeof import('./blackjack.js').handView> }
