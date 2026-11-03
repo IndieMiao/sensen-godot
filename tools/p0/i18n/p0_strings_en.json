@@ -14,7 +14,7 @@
  },
  "%[+-]?[0-9]*(\\\\.[0-9]+)?[dsf]": {
   "where": [
-   "modules/ui/localization.gd:123"
+   "modules/ui/localization.gd:131"
   ],
   "kind": "line"
  },
@@ -9908,7 +9908,7 @@
  },
  "P0_I18N_MISSES": {
   "where": [
-   "modules/ui/localization.gd:185"
+   "modules/ui/localization.gd:198"
   ],
   "kind": "line"
  },
@@ -12004,8 +12004,7 @@
   "where": [
    "scenes/p0/panels/p0_profile_page.gd:180"
   ],
-  "kind": "line",
-  "done": true
+  "kind": "line"
  },
  "Sing with me! No? Then eat with me.": {
   "where": [
