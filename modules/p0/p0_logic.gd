@@ -1816,14 +1816,21 @@ static func vein_row(view: Dictionary, home_row := {}) -> Dictionary:
 		if site.is_empty() or _vein_reached(records, sites, main): continue
 		var go := "mine:" + str(site.id)
 		if not home_row.is_empty() and str(home_row.get("row", {}).get("go", "")) == go: return {}   # the Homestead row says it
-		return _row("%s · Reach Floor %d" % [str(site.get("name", "")), VEIN_FLOOR], "vein", go, "vein:" + str(site.id))
+		# down that mine (VG4 384:187745): the row stays, with no button (周瑜 on #711: not left to show_label)
+		var down := str(view.get("mine", {}).get("at", {}).get("mine", "")) == str(site.id) if view.get("mine", null) is Dictionary and view.mine.get("at") is Dictionary else false
+		return _row("%s · Reach Floor %d" % [str(site.get("name", "")), VEIN_FLOOR], "vein", "" if down else go, "vein:" + str(site.id))
 	return {}
 
-## Whether a vein of this main has been gone down to Floor 10: any record of the free three's, or of a site the map
-## has read (P0WildSites), that is a vein of it (不知火舞: any iron vein's F10 ends the iron row, a new home's too).
+## Whether a vein of this main has been gone down to Floor 10 (不知火舞: any iron vein's F10 ends the iron row, a new
+## home's too): a record's own type / main (周瑜 #712: the server's, every mine the player has been down), else — a
+## server before it — one of the free three's or a site the map has read (P0WildSites).
 static func _vein_reached(records: Dictionary, near3: Variant, main: String) -> bool:
 	for id in records:
-		if int((records[id] as Dictionary).get("deepest", 0)) < VEIN_FLOOR: continue
+		var rec: Dictionary = records[id]
+		if int(rec.get("deepest", 0)) < VEIN_FLOOR: continue
+		if rec.has("type"):
+			if str(rec.get("type", "")) == "vein" and str(rec.get("main", "")) == main: return true
+			continue
 		var x := {}
 		for n in near3 if near3 is Array else []:
 			if n is Dictionary and str(n.get("id", "")) == str(id): x = n

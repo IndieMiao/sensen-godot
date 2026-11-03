@@ -61,3 +61,17 @@ func test_in_today_it_follows_the_things_to_do_now_and_keeps_its_place() -> void
 	assert_bool(lines.has("Ironvale Vein · Reach Floor 10")).is_true()
 	assert_int(lines.find("Ironvale Vein · Reach Floor 10")).is_greater(lines.find(lines.filter(func(l): return l.begins_with("Harvest"))[0]))
 	assert_array(P0Logic.today_dots(rows)).contains(["vein:wd-254-115"])
+
+## 周瑜 on #711: down that very mine the row stays without a button; #712: a record's own type / main says which vein it
+## is, any mine the player has been down (a paid one, an old home's) — nothing else needed.
+func test_down_that_mine_no_button_and_a_records_own_type_counts() -> void:
+	var down := P0Logic.vein_row(_view(5, {}, {"mine": {"records": {}, "at": {"mine": "wd-254-115", "floor": 4}}}))
+	assert_str(str(down.line)).is_equal("Ironvale Vein · Reach Floor 10")
+	assert_str(str(down.go)).is_equal("")
+	assert_str(str(down.dot)).is_equal("vein:wd-254-115")
+	var elsewhere := P0Logic.vein_row(_view(5, {}, {"mine": {"records": {}, "at": {"mine": "wd-255-116", "floor": 2}}}))
+	assert_str(str(elsewhere.go)).is_equal("mine:wd-254-115")
+	var paid_vein := {"wd-180-90": {"deepest": 10, "type": "vein", "main": "iron_ore"}}
+	assert_str(str(P0Logic.vein_row(_view(5, paid_vein)).line)).is_equal("Shrew Vein · Reach Floor 10")
+	var quarry := {"wd-180-91": {"deepest": 25, "type": "quarry", "main": null}}
+	assert_str(str(P0Logic.vein_row(_view(5, quarry)).line)).is_equal("Ironvale Vein · Reach Floor 10")
