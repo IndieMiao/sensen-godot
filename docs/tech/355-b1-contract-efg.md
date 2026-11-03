@@ -25,6 +25,7 @@
 > - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，用户已批）；第 7.4 节补台词；
 > - 试玩路由 `/v1/p0/dev/blackjack` 改 Homestead 等级时也结算 First Dig（后裔审 #697 时提的）；
 > - 第 10.1 节补矿层资源的口径（守关场地、电梯站、守关层王的出生点、配色的键），资产已进 b1；
+> - 第 7.1 节 `view.mine.records[id]` 加 `type`、`main`（亚瑟 11-03，给 Today 矿脉行判断用）；
 > - 第 7.1 节加 `view.mine.paid_today`（今天各矿交过费的层，出矿后照样给），矿口卡的 `Enter mine · Free` 照它写（亚瑟 11-03）。
 > **v0.7+（11-02 晚）**：第 10 节补怪物导入的后处理脚本（上官婉儿 11-02）：导入时顶点色当底色、关投影；运行时换材质、选模型时要注意的两点。
 > **v0.7（11-02 15:xx）用户批复**：用户 14:4x 批了 355 待批清单「全按推荐」、v4q 八条整条批（奕星转）。E / F / G 原来标〔待用户定〕的都按推荐定了，本文件里对应的地方改成已定：
@@ -357,11 +358,12 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
     },
     "next": { "floor": 13, "paid": false, "fee": 2, "open": false, "locked": null }
   },
-  "records": { "wd-254-114": { "deepest": 23, "guards": [20] } },
+  "records": { "wd-254-114": { "deepest": 23, "guards": [20], "type": "vein", "main": "iron_ore" } },
   "paid_today": { "wd-254-114": [1, 2, 10] }
 }
 ```
 - `at` 只在人在矿里时有；`floor_state` 只给当前层。换层以后看命令返回的 view。
+- `records[id].type` / `.main`（v0.8，亚瑟审 #711 时要的）：这条纪录是哪种矿（`quarry` / `vein`）、主矿是什么（矿脉写 `iron_ore` / `quartz`，浅坑写 null）。服务端按目录或开发矿查出来给，存档里不存；查不到这座矿时两项都是 null。客户端判断「任何一座铁矿脉到过 F10」（v4q(9) ①）时只看 records，不用另外读这座矿。
 - `paid_today`（v0.8，亚瑟要给矿口卡用）：今天每座矿交过层费的层，从小到大；出了矿也照样给。人在矿外时，日切以后清空；日切时人如果在矿里，当前这一层按新的一天记成已付（丁15：留在原层、不再收层费），所以那时是 `{当前矿: [当前层]}`，不是空的（后裔审 #705 时提的）。矿口卡的主键照它写：这座矿的 F1 在里面就写 `Enter mine · Free`，不在就写 `Enter mine · 2 Energy`（LOCK-21）。没进过任何矿时是 `{}`。
 - 按周瑜355评论a5b58542补 `at.prev: null | {floor, paid, fee}`：F1为null；其余为上一层，paid读当天该矿该层记录，已付fee=0，否则为floor_energy。用于电梯到深层后向上进入未付费层的名字条和收费卡；不含next的清怪限制。
 - `mobs` 的顺序就是 targets / hurt_by 的下标。`tier` 只有守关有，其余是 0。

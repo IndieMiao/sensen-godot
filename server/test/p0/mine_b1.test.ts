@@ -425,3 +425,17 @@ describe('view.mine.paid_today: the floors paid for today, out of the mine too (
     expect((viewOf(x.c, x.s, x.now + DAY).mine as unknown as { paid_today: Record<string, number[]> }).paid_today).toEqual({});
   });
 });
+
+describe('view.mine.records: each record says its mine\'s type and main (v4q(9) ①, 亚瑟 on #711)', () => {
+  it('a quarry and a vein say theirs; a mine no longer known says null; the save keeps no new field', () => {
+    const x = scenario();
+    x.s.mine.records[Q] = { deepest: 3, guards: [], first_at: T };
+    x.s.mine.records[V] = { deepest: 12, guards: [10], first_at: T };
+    x.s.mine.records['wd-gone'] = { deepest: 5, guards: [], first_at: T };
+    const records = (viewOf(x.c, x.s, x.now).mine as unknown as { records: Record<string, unknown> }).records;
+    expect(records[Q]).toEqual({ deepest: 3, guards: [], type: 'quarry', main: 'copper_ore' });
+    expect(records[V]).toEqual({ deepest: 12, guards: [10], type: 'vein', main: 'iron_ore' });
+    expect(records['wd-gone']).toEqual({ deepest: 5, guards: [], type: null, main: null });
+    expect(Object.keys(x.s.mine.records[V]).sort()).toEqual(['deepest', 'first_at', 'guards']);
+  });
+});
