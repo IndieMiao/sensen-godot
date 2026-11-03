@@ -1,0 +1,760 @@
+{
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "baseline_height_m": 1.745,
+  "axes": "metres; Y up; +Z front",
+  "scope": "17 unique props, 18 placed instances. Local exhibit assignments only; scene layout owned by Zhaoyun.",
+  "gallery": {
+    "layout": "two rows of three",
+    "local_width_m": 2.4,
+    "local_height_m": 1.25
+  },
+  "assets": [
+    {
+      "name": "display_cabinet",
+      "file": "display_cabinet.glb",
+      "module": "M04",
+      "description": "Ivory display cabinet, deep-green plinth and clear five-panel hood",
+      "quantity": 2,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_height_m": 1.0,
+      "glass_top_m": 1.5,
+      "instance_ids": [
+        "glass_case_1",
+        "glass_case_2"
+      ],
+      "interior_bounds": [
+        [
+          -0.435,
+          1.0,
+          -0.855
+        ],
+        [
+          0.435,
+          1.485,
+          0.855
+        ]
+      ],
+      "colliders": [
+        {
+          "position": [
+            0,
+            0.75,
+            0
+          ],
+          "size": [
+            0.95,
+            1.5,
+            1.8
+          ]
+        }
+      ],
+      "triangles": 282,
+      "surfaces": 2,
+      "bounds": [
+        [
+          -0.4749999940395355,
+          0.0,
+          -0.8999999761581421
+        ],
+        [
+          0.4749999940395355,
+          1.5,
+          0.8999999761581421
+        ]
+      ],
+      "dimensions_m": [
+        0.949999988079071,
+        1.5,
+        1.7999999523162842
+      ],
+      "sha256": "715291700eb16790a04451659d80ceab62dd2e924b64db4d6d85e33a50b171f1",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/display_cabinet/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_plinth",
+      "file": "exhibit_plinth.glb",
+      "module": "M05",
+      "description": "Ivory and deep-green square plinth for the upright ammonite",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_height_m": 1.1,
+      "colliders": [
+        {
+          "position": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            0.7,
+            1.1,
+            0.7
+          ]
+        }
+      ],
+      "triangles": 176,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3499999940395355,
+          0.0,
+          -0.3499999940395355
+        ],
+        [
+          0.3499999940395355,
+          1.100000023841858,
+          0.3499999940395355
+        ]
+      ],
+      "dimensions_m": [
+        0.699999988079071,
+        1.100000023841858,
+        0.699999988079071
+      ],
+      "sha256": "f69fb43b0e31757c5211cad7ef725eb1c47a5e13c3aaf5173276d02c711802f4",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_plinth/reuse_provenance.json"
+    },
+    {
+      "name": "abstract_frame_01",
+      "file": "abstract_frame_01.glb",
+      "module": "M06",
+      "description": "Original abstract color blocks; no copied artwork or lettering",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "art_palette_srgb": {
+        "paper": "F2E5CA",
+        "sage": "83916D",
+        "ochre": "C1A16C",
+        "orange": "C66F3F"
+      },
+      "gallery_offset": [
+        -0.85,
+        0.35,
+        0
+      ],
+      "triangles": 239,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.35000017285346985,
+          -0.2750000059604645,
+          0.0
+        ],
+        [
+          0.35000017285346985,
+          0.2750000059604645,
+          0.04999999701976776
+        ]
+      ],
+      "dimensions_m": [
+        0.7000003457069397,
+        0.550000011920929,
+        0.04999999701976776
+      ],
+      "sha256": "afea6ea59d2d04e452f7685a180382b018e126bcecd299886fbe8d9c830522f0",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_01/reuse_provenance.json"
+    },
+    {
+      "name": "abstract_frame_02",
+      "file": "abstract_frame_02.glb",
+      "module": "M06",
+      "description": "Original abstract color blocks; no copied artwork or lettering",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "art_palette_srgb": {
+        "beige": "E3CFAB",
+        "paper": "F3E8D1",
+        "sage_dark": "4F674D",
+        "orange_light": "E1A36B"
+      },
+      "gallery_offset": [
+        0.0,
+        0.35,
+        0
+      ],
+      "triangles": 231,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.35000017285346985,
+          -0.2750000059604645,
+          0.0
+        ],
+        [
+          0.35000017285346985,
+          0.2750000059604645,
+          0.04999999701976776
+        ]
+      ],
+      "dimensions_m": [
+        0.7000003457069397,
+        0.550000011920929,
+        0.04999999701976776
+      ],
+      "sha256": "c64151f5e2b94eeec3f810a9cacb8ca845379541a74f4710fb7b941aad45bffe",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_02/reuse_provenance.json"
+    },
+    {
+      "name": "abstract_frame_03",
+      "file": "abstract_frame_03.glb",
+      "module": "M06",
+      "description": "Original abstract color blocks; no copied artwork or lettering",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "art_palette_srgb": {
+        "paper": "EEDFC0",
+        "orange": "B8653E",
+        "sage": "738166",
+        "ochre": "D5BF95"
+      },
+      "gallery_offset": [
+        0.85,
+        0.35,
+        0
+      ],
+      "triangles": 228,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.35000017285346985,
+          -0.2750000059604645,
+          0.0
+        ],
+        [
+          0.35000017285346985,
+          0.2750000059604645,
+          0.04999999701976776
+        ]
+      ],
+      "dimensions_m": [
+        0.7000003457069397,
+        0.550000011920929,
+        0.04999999701976776
+      ],
+      "sha256": "a6bc9e4aea710fc2664328cd4c38df5eaf5adf3b059639cde5144b9a34926920",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_03/reuse_provenance.json"
+    },
+    {
+      "name": "abstract_frame_04",
+      "file": "abstract_frame_04.glb",
+      "module": "M06",
+      "description": "Original abstract color blocks; no copied artwork or lettering",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "art_palette_srgb": {
+        "beige": "E7D8BA",
+        "sage_dark": "687A56",
+        "orange_light": "C88B59",
+        "paper": "F2E7D1"
+      },
+      "gallery_offset": [
+        -0.85,
+        -0.35,
+        0
+      ],
+      "triangles": 227,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.35000017285346985,
+          -0.2750000059604645,
+          0.0
+        ],
+        [
+          0.35000017285346985,
+          0.2750000059604645,
+          0.04999999701976776
+        ]
+      ],
+      "dimensions_m": [
+        0.7000003457069397,
+        0.550000011920929,
+        0.04999999701976776
+      ],
+      "sha256": "8b6cac3a485c9e460367554d3c07e987b389c6fe5f95765a85d160684e4c0cae",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_04/reuse_provenance.json"
+    },
+    {
+      "name": "abstract_frame_05",
+      "file": "abstract_frame_05.glb",
+      "module": "M06",
+      "description": "Original abstract color blocks; no copied artwork or lettering",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "art_palette_srgb": {
+        "paper": "F0E7D3",
+        "sage": "8D9C7A",
+        "ochre": "BA9559",
+        "orange": "D69461"
+      },
+      "gallery_offset": [
+        0.0,
+        -0.35,
+        0
+      ],
+      "triangles": 240,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3499999940395355,
+          -0.2750000059604645,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2750000059604645,
+          0.04999992251396179
+        ]
+      ],
+      "dimensions_m": [
+        0.699999988079071,
+        0.550000011920929,
+        0.04999992251396179
+      ],
+      "sha256": "a1f86271142881739cbe09d8f794a0eff4589475279edad196bca43d181a0ee8",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_05/reuse_provenance.json"
+    },
+    {
+      "name": "abstract_frame_06",
+      "file": "abstract_frame_06.glb",
+      "module": "M06",
+      "description": "Original abstract color blocks; no copied artwork or lettering",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "art_palette_srgb": {
+        "beige": "DCC9A6",
+        "sage": "5F7255",
+        "orange": "A85F42",
+        "paper": "E8D6B2"
+      },
+      "gallery_offset": [
+        0.85,
+        -0.35,
+        0
+      ],
+      "triangles": 229,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3499999940395355,
+          -0.2750000059604645,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2750000059604645,
+          0.04999992251396179
+        ]
+      ],
+      "dimensions_m": [
+        0.699999988079071,
+        0.550000011920929,
+        0.04999992251396179
+      ],
+      "sha256": "8dc05dd1c4bfbf58cdc83c3b6b0c1143ef8fe2140a782f33d0a0d2121936dd60",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_06/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_shallow_bowl",
+      "file": "exhibit_shallow_bowl.glb",
+      "module": "M14",
+      "description": "Low open terracotta bowl",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "glass_case_1",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_1_exhibit_1",
+        "slot": "rear",
+        "position": [
+          0,
+          1.0,
+          -0.55
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 252,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.1469999998807907,
+          0.0,
+          -0.1469999998807907
+        ],
+        [
+          0.1469999998807907,
+          0.10999999940395355,
+          0.1469999998807907
+        ]
+      ],
+      "dimensions_m": [
+        0.2939999997615814,
+        0.10999999940395355,
+        0.2939999997615814
+      ],
+      "sha256": "d58d531d55e85b7235929440db7216c757e8d0caa7abf7c1c5f5921cb91d6f75",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_shallow_bowl/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_terracotta_jar",
+      "file": "exhibit_terracotta_jar.glb",
+      "module": "M14",
+      "description": "Open necked terracotta jar",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "glass_case_2",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_2_exhibit_2",
+        "slot": "middle",
+        "position": [
+          0,
+          1.0,
+          0
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 316,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.11500000208616257,
+          0.0,
+          -0.11500000208616257
+        ],
+        [
+          0.11500000208616257,
+          0.30000001192092896,
+          0.11500000208616257
+        ]
+      ],
+      "dimensions_m": [
+        0.23000000417232513,
+        0.30000001192092896,
+        0.23000000417232513
+      ],
+      "sha256": "601ae6f17a2045f5437975208b59fac3d4cd3d753c742dfce0e626f2b5a1183d",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_terracotta_jar/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_leaf_fossil",
+      "file": "exhibit_leaf_fossil.glb",
+      "module": "M14",
+      "description": "Small stone slab with original plant impression",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "glass_case_1",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_1_exhibit_3",
+        "slot": "front",
+        "position": [
+          0,
+          1.0,
+          0.55
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 286,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.1599999964237213,
+          0.0,
+          -0.11999999731779099
+        ],
+        [
+          0.1599999964237213,
+          0.06656506657600403,
+          0.11999999731779099
+        ]
+      ],
+      "dimensions_m": [
+        0.3199999928474426,
+        0.06656506657600403,
+        0.23999999463558197
+      ],
+      "sha256": "00872b1cf2560f2a02282568d44527294d78bb7f41ded214b767641373728dc7",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_leaf_fossil/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_shell_fragment",
+      "file": "exhibit_shell_fragment.glb",
+      "module": "M14",
+      "description": "Small fan-shaped shell impression in a pale stone",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "glass_case_1",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_1_exhibit_2",
+        "slot": "middle",
+        "position": [
+          0,
+          1.0,
+          0
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 260,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.14000000059604645,
+          0.0,
+          -0.125
+        ],
+        [
+          0.14000000059604645,
+          0.08253365010023117,
+          0.125
+        ]
+      ],
+      "dimensions_m": [
+        0.2800000011920929,
+        0.08253365010023117,
+        0.25
+      ],
+      "sha256": "69692783143f873eb69311d34eabf354a928f9ab5acbc79bff064498bd3e5cb3",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_shell_fragment/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_fossil_rock",
+      "file": "exhibit_fossil_rock.glb",
+      "module": "M14",
+      "description": "Faceted warm stone study with a stable flat contact face",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "glass_case_2",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_2_exhibit_1",
+        "slot": "rear",
+        "position": [
+          0,
+          1.0,
+          -0.55
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 80,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.14881156384944916,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          0.14881156384944916,
+          0.19814002513885498,
+          0.12999999523162842
+        ]
+      ],
+      "dimensions_m": [
+        0.2976231276988983,
+        0.19814002513885498,
+        0.25999999046325684
+      ],
+      "sha256": "f2b06dcff1268654bb27edeb280088b29bcaff248360dc2c2df0cae5b21f9b38",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_fossil_rock/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_spiral_fossil",
+      "file": "exhibit_spiral_fossil.glb",
+      "module": "M14",
+      "description": "Flat ammonite fossil for the front of cabinet two",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "glass_case_2",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_2_exhibit_3",
+        "slot": "front",
+        "position": [
+          0,
+          1.0,
+          0.55
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 442,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.14499999582767487,
+          0.0,
+          -0.14499999582767487
+        ],
+        [
+          0.14499999582767487,
+          0.0978277176618576,
+          0.14499999582767487
+        ]
+      ],
+      "dimensions_m": [
+        0.28999999165534973,
+        0.0978277176618576,
+        0.28999999165534973
+      ],
+      "sha256": "b1375decd2f01dae9fe242474072e2f10033c788353c62900b6432a82ccb2a7e",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_spiral_fossil/reuse_provenance.json"
+    },
+    {
+      "name": "exhibit_ammonite",
+      "file": "exhibit_ammonite.glb",
+      "module": "M14",
+      "description": "Upright original ammonite study on a small foot",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "display_assignment": {
+        "container": "display_plinth",
+        "container_asset": "exhibit_plinth",
+        "instance_name": "plinth_exhibit",
+        "slot": "center",
+        "position": [
+          0,
+          1.1,
+          0
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 486,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.18000000715255737,
+          0.0,
+          -0.08500000089406967
+        ],
+        [
+          0.18000000715255737,
+          0.3799999952316284,
+          0.08500000089406967
+        ]
+      ],
+      "dimensions_m": [
+        0.36000001430511475,
+        0.3799999952316284,
+        0.17000000178813934
+      ],
+      "sha256": "f0628167601f24f2b6158dcaa2d2c8cf9e28eb2204b72b707df768a488e07f00",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_ammonite/reuse_provenance.json"
+    },
+    {
+      "name": "floor_mosaic",
+      "file": "floor_mosaic.glb",
+      "module": "M03",
+      "description": "Thin concentric beige stone medallion; no collision",
+      "quantity": 1,
+      "origin": "bottom_center",
+      "front": "+Z",
+      "anchors": [],
+      "colliders": [],
+      "triangles": 524,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.9700000286102295,
+          0.0,
+          -0.9700000286102295
+        ],
+        [
+          0.9700000286102295,
+          0.00800000037997961,
+          0.9700000286102295
+        ]
+      ],
+      "dimensions_m": [
+        1.940000057220459,
+        0.00800000037997961,
+        1.940000057220459
+      ],
+      "sha256": "0d5b41e95c3e713da207c39553aed5351fc8000c55928c717b6955b8b2d5fa97",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json"
+    },
+    {
+      "name": "name_sign",
+      "file": "name_sign.glb",
+      "module": "M15",
+      "description": "Blank light-wood runtime sign",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [
+        {
+          "name": "sign_door",
+          "position": [
+            0.0,
+            0.0,
+            0.05200020968914032
+          ],
+          "size": [
+            1.24,
+            0.28
+          ],
+          "module": "name_sign",
+          "yaw_degrees": 0,
+          "text": ""
+        }
+      ],
+      "triangles": 220,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.6899999976158142,
+          -0.17000000178813934,
+          0.0
+        ],
+        [
+          0.6899999976158142,
+          0.17000000178813934,
+          0.044000230729579926
+        ]
+      ],
+      "dimensions_m": [
+        1.3799999952316284,
+        0.3400000035762787,
+        0.044000230729579926
+      ],
+      "sha256": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json"
+    }
+  ],
+  "unique_triangles": 4718,
+  "placed_triangles": 5000,
+  "unique_surfaces": 18,
+  "placed_surfaces": 20
+}
