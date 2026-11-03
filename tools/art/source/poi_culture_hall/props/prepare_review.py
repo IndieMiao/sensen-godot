@@ -38,6 +38,10 @@ def copy(relative):
         for suffix in ['.import','.uid']:
             if Path(str(source)+suffix).exists():shutil.copy2(Path(str(source)+suffix),Path(str(target)+suffix))
 copy('assets/rooms/poi_culture_hall/props')
+current_files={a['file'] for a in json.loads((KIT/'prop_manifest.json').read_text())['assets']}
+for old in (DEST/'assets/rooms/poi_culture_hall/props').glob('*.glb'):
+    if old.name not in current_files:
+        old.unlink();Path(str(old)+'.import').unlink(missing_ok=True)
 for path in json.loads((ROOT/'tools/dev/scene_bench/fixtures/avatar-dependencies.json').read_text()):copy(path.removeprefix('res://'))
 copy('modules/avatar');copy('assets/avatar/demo_denylist.json')
 manifest=json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text())

@@ -241,6 +241,47 @@ def sign():
         box('Sign horizontal edge '+str(side),(0,side*.156,.026),(1.324,.028,.036),'wood_edge',.004)
     SPECS['name_sign']['anchors']=[{'name':'sign_door','position':[0,0,.052],'size':[1.24,.28],'module':'name_sign','yaw_degrees':0,'text':''}]
 
+def combine(name,module,members,wall=False):
+    bpy.context.view_layer.update()
+    begin(name,module,'Baked single-surface group; named editable components retained',wall=wall)
+    target=p.KITS[name];components=[]
+    for child_name,offset in members:
+        kit=p.KITS[child_name];spec=SPECS[child_name];points=[];triangles=0
+        bpy.context.view_layer.update();graph=bpy.context.evaluated_depsgraph_get()
+        for obj in kit['objects']:
+            evaluated=obj.evaluated_get(graph);mesh=evaluated.to_mesh();mesh.calc_loop_triangles()
+            matrix=kit['root'].matrix_world.inverted()@obj.matrix_world
+            points.extend(Vector((q.x,q.z,-q.y)) for q in [matrix@v.co for v in mesh.vertices])
+            triangles+=sum(t.area>1e-12 for t in mesh.loop_triangles);evaluated.to_mesh_clear()
+        lo=Vector(tuple(min(v[i] for v in points) for i in range(3)))
+        hi=Vector(tuple(max(v[i] for v in points) for i in range(3)))
+        pivot=Vector(((lo.x+hi.x)/2,(lo.y+hi.y)/2 if wall else lo.y,lo.z if wall else (lo.z+hi.z)/2))
+        for obj in kit['objects']:
+            transform=Matrix.Translation(p.b.v(offset))@Matrix.Translation(-p.b.v(pivot))@kit['root'].matrix_world.inverted()@obj.matrix_world
+            for collection in list(obj.users_collection):collection.objects.unlink(obj)
+            target['collection'].objects.link(obj);obj.parent=target['root'];obj.matrix_parent_inverse=Matrix.Identity(4);obj.matrix_local=transform
+            obj.name=child_name+' / '+obj.name;target['objects'].append(obj)
+        component={k:v for k,v in spec.items() if k not in ['file','quantity','display_assignment','gallery_offset']}
+        if 'display_assignment' in spec:
+            component['slot']=spec['display_assignment']['slot'];component['source_instance_name']=spec['display_assignment']['instance_name']
+        components.append({**component,'position':offset,'bounds':[list(lo-pivot),list(hi-pivot)],'triangles':triangles})
+        bpy.data.objects.remove(kit['root'],do_unlink=True);bpy.data.collections.remove(kit['collection'])
+        del p.KITS[child_name];del SPECS[child_name]
+    SPECS[name]['components']=components
+    if wall:SPECS[name]['gallery_offset']=[0,0,0]
+    else:
+        SPECS[name]['origin']='display_surface_center'
+        case='glass_case_'+name[-1]
+        SPECS[name]['display_assignment']={'container':case,'container_asset':'display_cabinet','instance_name':name,
+            'slot':'three baked exhibits','position':[0,1.0,0],'yaw_degrees':0}
+
+def grouped_delivery():
+    combine('artwork_set','M06',[(f'abstract_frame_{i:02d}',SPECS[f'abstract_frame_{i:02d}']['gallery_offset']) for i in range(1,7)],wall=True)
+    for i in [1,2]:
+        members=[(s['name'],[0,0,s['display_assignment']['position'][2]]) for s in SPECS.values()
+            if s.get('display_assignment',{}).get('container')=='glass_case_'+str(i)]
+        combine('case_exhibits_'+str(i),'M14',members)
+
 def export():
     bpy.context.view_layer.update()
     materials=[]
@@ -271,6 +312,7 @@ def export():
         lo=Vector(tuple(min(v[i] for v in points) for i in range(3)));hi=Vector(tuple(max(v[i] for v in points) for i in range(3)))
         pivot=Vector(((lo.x+hi.x)/2,(lo.y+hi.y)/2 if SPECS[name]['origin']=='back_center' else lo.y,
             lo.z if SPECS[name]['origin']=='back_center' else (lo.z+hi.z)/2))
+        if SPECS[name]['origin']=='display_surface_center':pivot=Vector((0,0,0))
         for obj in copies:
             for v in obj.data.vertices:v.co-=p.b.v(pivot)
         for source in kit['objects']:source.location-=p.b.v(pivot)
@@ -309,14 +351,14 @@ def export():
         print('PROP',name,spec['triangles'],spec['dimensions_m'],flush=True)
     bpy.data.scenes.remove(temp);bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'culture_props.blend'))
     manifest={'revision':'v1','author':'黄忠','virtual_user_id':AUTHOR,'baseline_height_m':1.745,'axes':'metres; Y up; +Z front',
-        'scope':'17 unique props, 18 placed instances. Local exhibit assignments only; scene layout owned by Zhaoyun.',
+        'scope':'8 grouped GLBs, 9 placed instances; 17 authored components. Scene layout owned by Zhaoyun.',
         'gallery':{'layout':'two rows of three','local_width_m':2.40,'local_height_m':1.25},'assets':list(SPECS.values()),
         'unique_triangles':sum(s['triangles'] for s in SPECS.values()),'placed_triangles':sum(s['triangles']*s['quantity'] for s in SPECS.values()),
         'unique_surfaces':sum(s['surfaces'] for s in SPECS.values()),'placed_surfaces':sum(s['surfaces']*s['quantity'] for s in SPECS.values())}
     write(KIT/'prop_manifest.json',manifest)
-    assert len(SPECS)==17 and all(s['triangles']<=600 for s in SPECS.values())
+    assert len(SPECS)==8 and all(all(c['triangles']<=600 for c in s['components']) if 'components' in s else s['triangles']<=600 for s in SPECS.values())
     print('CULTURE_PROPS_READY',manifest['unique_triangles'],manifest['placed_triangles'],manifest['placed_surfaces'],flush=True)
 
 if __name__=='__main__':
     p.start('poi_culture_hall/props','SGODOT-323 original props / 318 R3');p.b.PALETTE.update(COLORS)
-    cabinet();plinth();paintings();vessels();leaf_fossil();shell_fragment();rock();ammonites();mosaic();sign();export()
+    cabinet();plinth();paintings();vessels();leaf_fossil();shell_fragment();rock();ammonites();mosaic();sign();grouped_delivery();export()

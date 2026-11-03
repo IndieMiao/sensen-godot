@@ -4,7 +4,7 @@
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "baseline_height_m": 1.745,
   "axes": "metres; Y up; +Z front",
-  "scope": "17 unique props, 18 placed instances. Local exhibit assignments only; scene layout owned by Zhaoyun.",
+  "scope": "8 grouped GLBs, 9 placed instances; 17 authored components. Scene layout owned by Zhaoyun.",
   "gallery": {
     "layout": "two rows of three",
     "local_width_m": 2.4,
@@ -119,516 +119,6 @@
       ],
       "sha256": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_plinth/reuse_provenance.json"
-    },
-    {
-      "name": "abstract_frame_01",
-      "file": "abstract_frame_01.glb",
-      "module": "M06",
-      "description": "Original abstract color blocks; no copied artwork or lettering",
-      "quantity": 1,
-      "origin": "back_center",
-      "front": "+Z",
-      "anchors": [],
-      "art_palette_srgb": {
-        "paper": "F2E5CA",
-        "sage": "83916D",
-        "ochre": "C1A16C",
-        "orange": "C66F3F"
-      },
-      "gallery_offset": [
-        -0.85,
-        0.35,
-        0
-      ],
-      "triangles": 239,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.35000017285346985,
-          -0.2750000059604645,
-          0.0
-        ],
-        [
-          0.35000017285346985,
-          0.2750000059604645,
-          0.04999999701976776
-        ]
-      ],
-      "dimensions_m": [
-        0.7000003457069397,
-        0.550000011920929,
-        0.04999999701976776
-      ],
-      "sha256": "afea6ea59d2d04e452f7685a180382b018e126bcecd299886fbe8d9c830522f0",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_01/reuse_provenance.json"
-    },
-    {
-      "name": "abstract_frame_02",
-      "file": "abstract_frame_02.glb",
-      "module": "M06",
-      "description": "Original abstract color blocks; no copied artwork or lettering",
-      "quantity": 1,
-      "origin": "back_center",
-      "front": "+Z",
-      "anchors": [],
-      "art_palette_srgb": {
-        "beige": "E3CFAB",
-        "paper": "F3E8D1",
-        "sage_dark": "4F674D",
-        "orange_light": "E1A36B"
-      },
-      "gallery_offset": [
-        0.0,
-        0.35,
-        0
-      ],
-      "triangles": 231,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.35000017285346985,
-          -0.2750000059604645,
-          0.0
-        ],
-        [
-          0.35000017285346985,
-          0.2750000059604645,
-          0.04999999701976776
-        ]
-      ],
-      "dimensions_m": [
-        0.7000003457069397,
-        0.550000011920929,
-        0.04999999701976776
-      ],
-      "sha256": "56369b959d6cd39b77e94d0b4945271c8c0fcdf3d8c8e6b62bb8682e74304adf",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_02/reuse_provenance.json"
-    },
-    {
-      "name": "abstract_frame_03",
-      "file": "abstract_frame_03.glb",
-      "module": "M06",
-      "description": "Original abstract color blocks; no copied artwork or lettering",
-      "quantity": 1,
-      "origin": "back_center",
-      "front": "+Z",
-      "anchors": [],
-      "art_palette_srgb": {
-        "paper": "EEDFC0",
-        "orange": "B8653E",
-        "sage": "738166",
-        "ochre": "D5BF95"
-      },
-      "gallery_offset": [
-        0.85,
-        0.35,
-        0
-      ],
-      "triangles": 228,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.35000017285346985,
-          -0.2750000059604645,
-          0.0
-        ],
-        [
-          0.35000017285346985,
-          0.2750000059604645,
-          0.04999999701976776
-        ]
-      ],
-      "dimensions_m": [
-        0.7000003457069397,
-        0.550000011920929,
-        0.04999999701976776
-      ],
-      "sha256": "a6bc9e4aea710fc2664328cd4c38df5eaf5adf3b059639cde5144b9a34926920",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_03/reuse_provenance.json"
-    },
-    {
-      "name": "abstract_frame_04",
-      "file": "abstract_frame_04.glb",
-      "module": "M06",
-      "description": "Original abstract color blocks; no copied artwork or lettering",
-      "quantity": 1,
-      "origin": "back_center",
-      "front": "+Z",
-      "anchors": [],
-      "art_palette_srgb": {
-        "beige": "E7D8BA",
-        "sage_dark": "687A56",
-        "orange_light": "C88B59",
-        "paper": "F2E7D1"
-      },
-      "gallery_offset": [
-        -0.85,
-        -0.35,
-        0
-      ],
-      "triangles": 227,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.35000017285346985,
-          -0.2750000059604645,
-          0.0
-        ],
-        [
-          0.35000017285346985,
-          0.2750000059604645,
-          0.04999999701976776
-        ]
-      ],
-      "dimensions_m": [
-        0.7000003457069397,
-        0.550000011920929,
-        0.04999999701976776
-      ],
-      "sha256": "8b6cac3a485c9e460367554d3c07e987b389c6fe5f95765a85d160684e4c0cae",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_04/reuse_provenance.json"
-    },
-    {
-      "name": "abstract_frame_05",
-      "file": "abstract_frame_05.glb",
-      "module": "M06",
-      "description": "Original abstract color blocks; no copied artwork or lettering",
-      "quantity": 1,
-      "origin": "back_center",
-      "front": "+Z",
-      "anchors": [],
-      "art_palette_srgb": {
-        "paper": "F0E7D3",
-        "sage": "8D9C7A",
-        "ochre": "BA9559",
-        "orange": "D69461"
-      },
-      "gallery_offset": [
-        0.0,
-        -0.35,
-        0
-      ],
-      "triangles": 240,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.3499999940395355,
-          -0.2750000059604645,
-          0.0
-        ],
-        [
-          0.3499999940395355,
-          0.2750000059604645,
-          0.04999992251396179
-        ]
-      ],
-      "dimensions_m": [
-        0.699999988079071,
-        0.550000011920929,
-        0.04999992251396179
-      ],
-      "sha256": "a1f86271142881739cbe09d8f794a0eff4589475279edad196bca43d181a0ee8",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_05/reuse_provenance.json"
-    },
-    {
-      "name": "abstract_frame_06",
-      "file": "abstract_frame_06.glb",
-      "module": "M06",
-      "description": "Original abstract color blocks; no copied artwork or lettering",
-      "quantity": 1,
-      "origin": "back_center",
-      "front": "+Z",
-      "anchors": [],
-      "art_palette_srgb": {
-        "beige": "DCC9A6",
-        "sage": "5F7255",
-        "orange": "A85F42",
-        "paper": "E8D6B2"
-      },
-      "gallery_offset": [
-        0.85,
-        -0.35,
-        0
-      ],
-      "triangles": 229,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.3499999940395355,
-          -0.2750000059604645,
-          0.0
-        ],
-        [
-          0.3499999940395355,
-          0.2750000059604645,
-          0.04999992251396179
-        ]
-      ],
-      "dimensions_m": [
-        0.699999988079071,
-        0.550000011920929,
-        0.04999992251396179
-      ],
-      "sha256": "1ff92248034c039382f58dba446af18174947ce705302b727b737d9c468d6e0a",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_06/reuse_provenance.json"
-    },
-    {
-      "name": "exhibit_shallow_bowl",
-      "file": "exhibit_shallow_bowl.glb",
-      "module": "M14",
-      "description": "Low open terracotta bowl",
-      "quantity": 1,
-      "origin": "bottom_center",
-      "front": "+Z",
-      "anchors": [],
-      "display_assignment": {
-        "container": "glass_case_1",
-        "container_asset": "display_cabinet",
-        "instance_name": "case_1_exhibit_1",
-        "slot": "rear",
-        "position": [
-          0,
-          1.0,
-          -0.55
-        ],
-        "yaw_degrees": 0
-      },
-      "triangles": 252,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.1469999998807907,
-          0.0,
-          -0.1469999998807907
-        ],
-        [
-          0.1469999998807907,
-          0.10999999940395355,
-          0.1469999998807907
-        ]
-      ],
-      "dimensions_m": [
-        0.2939999997615814,
-        0.10999999940395355,
-        0.2939999997615814
-      ],
-      "sha256": "d58d531d55e85b7235929440db7216c757e8d0caa7abf7c1c5f5921cb91d6f75",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_shallow_bowl/reuse_provenance.json"
-    },
-    {
-      "name": "exhibit_terracotta_jar",
-      "file": "exhibit_terracotta_jar.glb",
-      "module": "M14",
-      "description": "Open necked terracotta jar",
-      "quantity": 1,
-      "origin": "bottom_center",
-      "front": "+Z",
-      "anchors": [],
-      "display_assignment": {
-        "container": "glass_case_2",
-        "container_asset": "display_cabinet",
-        "instance_name": "case_2_exhibit_2",
-        "slot": "middle",
-        "position": [
-          0,
-          1.0,
-          0
-        ],
-        "yaw_degrees": 0
-      },
-      "triangles": 316,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.11500000208616257,
-          0.0,
-          -0.11500000208616257
-        ],
-        [
-          0.11500000208616257,
-          0.30000001192092896,
-          0.11500000208616257
-        ]
-      ],
-      "dimensions_m": [
-        0.23000000417232513,
-        0.30000001192092896,
-        0.23000000417232513
-      ],
-      "sha256": "601ae6f17a2045f5437975208b59fac3d4cd3d753c742dfce0e626f2b5a1183d",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_terracotta_jar/reuse_provenance.json"
-    },
-    {
-      "name": "exhibit_leaf_fossil",
-      "file": "exhibit_leaf_fossil.glb",
-      "module": "M14",
-      "description": "Small stone slab with original plant impression",
-      "quantity": 1,
-      "origin": "bottom_center",
-      "front": "+Z",
-      "anchors": [],
-      "display_assignment": {
-        "container": "glass_case_1",
-        "container_asset": "display_cabinet",
-        "instance_name": "case_1_exhibit_3",
-        "slot": "front",
-        "position": [
-          0,
-          1.0,
-          0.55
-        ],
-        "yaw_degrees": 0
-      },
-      "triangles": 286,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.1599999964237213,
-          0.0,
-          -0.11999999731779099
-        ],
-        [
-          0.1599999964237213,
-          0.06656506657600403,
-          0.11999999731779099
-        ]
-      ],
-      "dimensions_m": [
-        0.3199999928474426,
-        0.06656506657600403,
-        0.23999999463558197
-      ],
-      "sha256": "e2515b82cc0da4c239e855f504a7263f0f465ff62a0e640fd0609fa563afa181",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_leaf_fossil/reuse_provenance.json"
-    },
-    {
-      "name": "exhibit_shell_fragment",
-      "file": "exhibit_shell_fragment.glb",
-      "module": "M14",
-      "description": "Small fan-shaped shell impression in a pale stone",
-      "quantity": 1,
-      "origin": "bottom_center",
-      "front": "+Z",
-      "anchors": [],
-      "display_assignment": {
-        "container": "glass_case_1",
-        "container_asset": "display_cabinet",
-        "instance_name": "case_1_exhibit_2",
-        "slot": "middle",
-        "position": [
-          0,
-          1.0,
-          0
-        ],
-        "yaw_degrees": 0
-      },
-      "triangles": 260,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.14000000059604645,
-          0.0,
-          -0.125
-        ],
-        [
-          0.14000000059604645,
-          0.08253365010023117,
-          0.125
-        ]
-      ],
-      "dimensions_m": [
-        0.2800000011920929,
-        0.08253365010023117,
-        0.25
-      ],
-      "sha256": "69692783143f873eb69311d34eabf354a928f9ab5acbc79bff064498bd3e5cb3",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_shell_fragment/reuse_provenance.json"
-    },
-    {
-      "name": "exhibit_fossil_rock",
-      "file": "exhibit_fossil_rock.glb",
-      "module": "M14",
-      "description": "Faceted warm stone study with a stable flat contact face",
-      "quantity": 1,
-      "origin": "bottom_center",
-      "front": "+Z",
-      "anchors": [],
-      "display_assignment": {
-        "container": "glass_case_2",
-        "container_asset": "display_cabinet",
-        "instance_name": "case_2_exhibit_1",
-        "slot": "rear",
-        "position": [
-          0,
-          1.0,
-          -0.55
-        ],
-        "yaw_degrees": 0
-      },
-      "triangles": 80,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.14881156384944916,
-          0.0,
-          -0.12999999523162842
-        ],
-        [
-          0.14881156384944916,
-          0.19814002513885498,
-          0.12999999523162842
-        ]
-      ],
-      "dimensions_m": [
-        0.2976231276988983,
-        0.19814002513885498,
-        0.25999999046325684
-      ],
-      "sha256": "f2b06dcff1268654bb27edeb280088b29bcaff248360dc2c2df0cae5b21f9b38",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_fossil_rock/reuse_provenance.json"
-    },
-    {
-      "name": "exhibit_spiral_fossil",
-      "file": "exhibit_spiral_fossil.glb",
-      "module": "M14",
-      "description": "Flat ammonite fossil for the front of cabinet two",
-      "quantity": 1,
-      "origin": "bottom_center",
-      "front": "+Z",
-      "anchors": [],
-      "display_assignment": {
-        "container": "glass_case_2",
-        "container_asset": "display_cabinet",
-        "instance_name": "case_2_exhibit_3",
-        "slot": "front",
-        "position": [
-          0,
-          1.0,
-          0.55
-        ],
-        "yaw_degrees": 0
-      },
-      "triangles": 442,
-      "surfaces": 1,
-      "bounds": [
-        [
-          -0.14499999582767487,
-          0.0,
-          -0.14499999582767487
-        ],
-        [
-          0.14499999582767487,
-          0.0978277176618576,
-          0.14499999582767487
-        ]
-      ],
-      "dimensions_m": [
-        0.28999999165534973,
-        0.0978277176618576,
-        0.28999999165534973
-      ],
-      "sha256": "b1375decd2f01dae9fe242474072e2f10033c788353c62900b6432a82ccb2a7e",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_spiral_fossil/reuse_provenance.json"
     },
     {
       "name": "exhibit_ammonite",
@@ -751,10 +241,498 @@
       ],
       "sha256": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json"
+    },
+    {
+      "name": "artwork_set",
+      "file": "artwork_set.glb",
+      "module": "M06",
+      "description": "Baked single-surface group; named editable components retained",
+      "quantity": 1,
+      "origin": "back_center",
+      "front": "+Z",
+      "anchors": [],
+      "components": [
+        {
+          "name": "abstract_frame_01",
+          "module": "M06",
+          "description": "Original abstract color blocks; no copied artwork or lettering",
+          "origin": "back_center",
+          "front": "+Z",
+          "anchors": [],
+          "art_palette_srgb": {
+            "paper": "F2E5CA",
+            "sage": "83916D",
+            "ochre": "C1A16C",
+            "orange": "C66F3F"
+          },
+          "position": [
+            -0.85,
+            0.35,
+            0
+          ],
+          "bounds": [
+            [
+              -0.35000017285346985,
+              -0.2750000059604645,
+              0.0
+            ],
+            [
+              0.35000017285346985,
+              0.2750000059604645,
+              0.04999999701976776
+            ]
+          ],
+          "triangles": 239
+        },
+        {
+          "name": "abstract_frame_02",
+          "module": "M06",
+          "description": "Original abstract color blocks; no copied artwork or lettering",
+          "origin": "back_center",
+          "front": "+Z",
+          "anchors": [],
+          "art_palette_srgb": {
+            "beige": "E3CFAB",
+            "paper": "F3E8D1",
+            "sage_dark": "4F674D",
+            "orange_light": "E1A36B"
+          },
+          "position": [
+            0.0,
+            0.35,
+            0
+          ],
+          "bounds": [
+            [
+              -0.35000017285346985,
+              -0.2750000059604645,
+              0.0
+            ],
+            [
+              0.35000017285346985,
+              0.2750000059604645,
+              0.04999999701976776
+            ]
+          ],
+          "triangles": 231
+        },
+        {
+          "name": "abstract_frame_03",
+          "module": "M06",
+          "description": "Original abstract color blocks; no copied artwork or lettering",
+          "origin": "back_center",
+          "front": "+Z",
+          "anchors": [],
+          "art_palette_srgb": {
+            "paper": "EEDFC0",
+            "orange": "B8653E",
+            "sage": "738166",
+            "ochre": "D5BF95"
+          },
+          "position": [
+            0.85,
+            0.35,
+            0
+          ],
+          "bounds": [
+            [
+              -0.35000017285346985,
+              -0.2750000059604645,
+              0.0
+            ],
+            [
+              0.35000017285346985,
+              0.2750000059604645,
+              0.04999999701976776
+            ]
+          ],
+          "triangles": 228
+        },
+        {
+          "name": "abstract_frame_04",
+          "module": "M06",
+          "description": "Original abstract color blocks; no copied artwork or lettering",
+          "origin": "back_center",
+          "front": "+Z",
+          "anchors": [],
+          "art_palette_srgb": {
+            "beige": "E7D8BA",
+            "sage_dark": "687A56",
+            "orange_light": "C88B59",
+            "paper": "F2E7D1"
+          },
+          "position": [
+            -0.85,
+            -0.35,
+            0
+          ],
+          "bounds": [
+            [
+              -0.35000017285346985,
+              -0.2750000059604645,
+              0.0
+            ],
+            [
+              0.35000017285346985,
+              0.2750000059604645,
+              0.04999999701976776
+            ]
+          ],
+          "triangles": 227
+        },
+        {
+          "name": "abstract_frame_05",
+          "module": "M06",
+          "description": "Original abstract color blocks; no copied artwork or lettering",
+          "origin": "back_center",
+          "front": "+Z",
+          "anchors": [],
+          "art_palette_srgb": {
+            "paper": "F0E7D3",
+            "sage": "8D9C7A",
+            "ochre": "BA9559",
+            "orange": "D69461"
+          },
+          "position": [
+            0.0,
+            -0.35,
+            0
+          ],
+          "bounds": [
+            [
+              -0.3499999940395355,
+              -0.2750000059604645,
+              0.0
+            ],
+            [
+              0.3499999940395355,
+              0.2750000059604645,
+              0.04999992251396179
+            ]
+          ],
+          "triangles": 240
+        },
+        {
+          "name": "abstract_frame_06",
+          "module": "M06",
+          "description": "Original abstract color blocks; no copied artwork or lettering",
+          "origin": "back_center",
+          "front": "+Z",
+          "anchors": [],
+          "art_palette_srgb": {
+            "beige": "DCC9A6",
+            "sage": "5F7255",
+            "orange": "A85F42",
+            "paper": "E8D6B2"
+          },
+          "position": [
+            0.85,
+            -0.35,
+            0
+          ],
+          "bounds": [
+            [
+              -0.3499999940395355,
+              -0.2750000059604645,
+              0.0
+            ],
+            [
+              0.3499999940395355,
+              0.2750000059604645,
+              0.04999992251396179
+            ]
+          ],
+          "triangles": 229
+        }
+      ],
+      "gallery_offset": [
+        0,
+        0,
+        0
+      ],
+      "triangles": 1394,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.200000524520874,
+          -0.625,
+          0.0
+        ],
+        [
+          1.200000524520874,
+          0.625,
+          0.050000399351119995
+        ]
+      ],
+      "dimensions_m": [
+        2.400001049041748,
+        1.25,
+        0.050000399351119995
+      ],
+      "sha256": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/artwork_set/reuse_provenance.json"
+    },
+    {
+      "name": "case_exhibits_1",
+      "file": "case_exhibits_1.glb",
+      "module": "M14",
+      "description": "Baked single-surface group; named editable components retained",
+      "quantity": 1,
+      "origin": "display_surface_center",
+      "front": "+Z",
+      "anchors": [],
+      "components": [
+        {
+          "name": "exhibit_shallow_bowl",
+          "module": "M14",
+          "description": "Low open terracotta bowl",
+          "origin": "bottom_center",
+          "front": "+Z",
+          "anchors": [],
+          "slot": "rear",
+          "source_instance_name": "case_1_exhibit_1",
+          "position": [
+            0,
+            0,
+            -0.55
+          ],
+          "bounds": [
+            [
+              -0.1469999998807907,
+              0.0,
+              -0.1469999998807907
+            ],
+            [
+              0.1469999998807907,
+              0.10999999940395355,
+              0.1469999998807907
+            ]
+          ],
+          "triangles": 252
+        },
+        {
+          "name": "exhibit_leaf_fossil",
+          "module": "M14",
+          "description": "Small stone slab with original plant impression",
+          "origin": "bottom_center",
+          "front": "+Z",
+          "anchors": [],
+          "slot": "front",
+          "source_instance_name": "case_1_exhibit_3",
+          "position": [
+            0,
+            0,
+            0.55
+          ],
+          "bounds": [
+            [
+              -0.1599999964237213,
+              0.0,
+              -0.11999999731779099
+            ],
+            [
+              0.1599999964237213,
+              0.06656506657600403,
+              0.11999999731779099
+            ]
+          ],
+          "triangles": 286
+        },
+        {
+          "name": "exhibit_shell_fragment",
+          "module": "M14",
+          "description": "Small fan-shaped shell impression in a pale stone",
+          "origin": "bottom_center",
+          "front": "+Z",
+          "anchors": [],
+          "slot": "middle",
+          "source_instance_name": "case_1_exhibit_2",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "bounds": [
+            [
+              -0.14000000059604645,
+              0.0,
+              -0.125
+            ],
+            [
+              0.14000000059604645,
+              0.08253365010023117,
+              0.125
+            ]
+          ],
+          "triangles": 260
+        }
+      ],
+      "display_assignment": {
+        "container": "glass_case_1",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_exhibits_1",
+        "slot": "three baked exhibits",
+        "position": [
+          0,
+          1.0,
+          0
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 798,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.1599999964237213,
+          0.0,
+          -0.6970002055168152
+        ],
+        [
+          0.1599999964237213,
+          0.10999999940395355,
+          0.6700001955032349
+        ]
+      ],
+      "dimensions_m": [
+        0.3199999928474426,
+        0.10999999940395355,
+        1.3670003414154053
+      ],
+      "sha256": "b0af4b06afef68b607a9174899240effedd0ab1bfe4277db7045720cdf466828",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/case_exhibits_1/reuse_provenance.json"
+    },
+    {
+      "name": "case_exhibits_2",
+      "file": "case_exhibits_2.glb",
+      "module": "M14",
+      "description": "Baked single-surface group; named editable components retained",
+      "quantity": 1,
+      "origin": "display_surface_center",
+      "front": "+Z",
+      "anchors": [],
+      "components": [
+        {
+          "name": "exhibit_terracotta_jar",
+          "module": "M14",
+          "description": "Open necked terracotta jar",
+          "origin": "bottom_center",
+          "front": "+Z",
+          "anchors": [],
+          "slot": "middle",
+          "source_instance_name": "case_2_exhibit_2",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "bounds": [
+            [
+              -0.11500000208616257,
+              0.0,
+              -0.11500000208616257
+            ],
+            [
+              0.11500000208616257,
+              0.30000001192092896,
+              0.11500000208616257
+            ]
+          ],
+          "triangles": 316
+        },
+        {
+          "name": "exhibit_fossil_rock",
+          "module": "M14",
+          "description": "Faceted warm stone study with a stable flat contact face",
+          "origin": "bottom_center",
+          "front": "+Z",
+          "anchors": [],
+          "slot": "rear",
+          "source_instance_name": "case_2_exhibit_1",
+          "position": [
+            0,
+            0,
+            -0.55
+          ],
+          "bounds": [
+            [
+              -0.14881156384944916,
+              0.0,
+              -0.12999999523162842
+            ],
+            [
+              0.14881156384944916,
+              0.19814002513885498,
+              0.12999999523162842
+            ]
+          ],
+          "triangles": 80
+        },
+        {
+          "name": "exhibit_spiral_fossil",
+          "module": "M14",
+          "description": "Flat ammonite fossil for the front of cabinet two",
+          "origin": "bottom_center",
+          "front": "+Z",
+          "anchors": [],
+          "slot": "front",
+          "source_instance_name": "case_2_exhibit_3",
+          "position": [
+            0,
+            0,
+            0.55
+          ],
+          "bounds": [
+            [
+              -0.14499999582767487,
+              0.0,
+              -0.14499999582767487
+            ],
+            [
+              0.14499999582767487,
+              0.0978277176618576,
+              0.14499999582767487
+            ]
+          ],
+          "triangles": 442
+        }
+      ],
+      "display_assignment": {
+        "container": "glass_case_2",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_exhibits_2",
+        "slot": "three baked exhibits",
+        "position": [
+          0,
+          1.0,
+          0
+        ],
+        "yaw_degrees": 0
+      },
+      "triangles": 838,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.14881156384944916,
+          0.0,
+          -0.6800001859664917
+        ],
+        [
+          0.14881156384944916,
+          0.30000001192092896,
+          0.695000171661377
+        ]
+      ],
+      "dimensions_m": [
+        0.2976231276988983,
+        0.30000001192092896,
+        1.3750003576278687
+      ],
+      "sha256": "4934ffc0a51bd5360e1a0a7fff5bb90e9d36960b7595516d63a405abab76b7ba",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/case_exhibits_2/reuse_provenance.json"
     }
   ],
   "unique_triangles": 4982,
   "placed_triangles": 5396,
-  "unique_surfaces": 18,
-  "placed_surfaces": 20
+  "unique_surfaces": 9,
+  "placed_surfaces": 11
 }

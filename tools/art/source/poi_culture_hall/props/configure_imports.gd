@@ -1,8 +1,9 @@
 extends SceneTree
 func _initialize():
 	var root=OS.get_cmdline_user_args()[0];var directory="assets/rooms/poi_culture_hall/props/"
-	for name in DirAccess.get_files_at("res://"+directory):
-		if not name.ends_with(".glb.import"):continue
+	var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://"+directory+"prop_manifest.json"))
+	for asset in manifest.assets:
+		var name=asset.file+".import"
 		var config=ConfigFile.new();assert(config.load("res://"+directory+name)==OK)
 		config.set_value("params","gltf/texture_map_mode",1)
 		config.set_value("params","import_script/path","res://"+directory+"material_import.gd")

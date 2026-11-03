@@ -18,7 +18,7 @@ def check(ok,label):
 def linear(color):
     rgb=np.array(list(bytes.fromhex(color)))/255
     return np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
-check(len(specs)==17 and sum(s['quantity'] for s in specs.values())==18,'17 unique GLBs / 18 instances')
+check(len(specs)==8 and sum(s['quantity'] for s in specs.values())==9,'8 grouped GLBs / 9 instances')
 uids=[];unique=0;placed=0;surfaces=0
 for name,spec in specs.items():
     path=KIT/spec['file'];doc,data=load_glb(path);primitives=doc['meshes'][0]['primitives'];all_points=[];triangles=0;glass=[]
@@ -49,14 +49,20 @@ for name,spec in specs.items():
                 aperture=[.445,.87] if name=='display_cabinet' else [.31,.31]
                 check(not np.any((abs(centers[:,0])<aperture[0]-.001)&(abs(centers[:,2])<aperture[1]-.001)),name+': no coplanar green top faces inside ivory display bed')
         if name=='floor_mosaic':check(np.all(normals[points[:,1]>.007,1]>.999),'Mosaic stone faces point upward')
-        if name.startswith('abstract_frame'):
-            art=(abs(points[:,0])<.3131)&(abs(points[:,1])<.239)&(points[:,2]>.037)&(points[:,2]<.043)
-            check(art.any() and np.all(normals[art,2]>.999),name+': artwork front faces outward')
+        if name=='artwork_set':
+            for component in spec['components']:
+                x,y,_=component['position']
+                art=(abs(points[:,0]-x)<.3131)&(abs(points[:,1]-y)<.239)&(points[:,2]>.037)&(points[:,2]<.043)
+                check(art.any() and np.all(normals[art,2]>.999),component['name']+': artwork front faces outward')
     points=np.concatenate(all_points);lo=points.min(axis=0);hi=points.max(axis=0)
-    check(triangles==spec['triangles'] and triangles<=600,name+': actual triangles <=600')
+    check(triangles==spec['triangles'],name+': measured group triangles match manifest')
+    if 'components' in spec:
+        check(sum(c['triangles'] for c in spec['components'])==triangles and all(c['triangles']<=600 for c in spec['components']),name+': baked grouping preserves constituent budgets and triangle sum')
+    else:check(triangles<=600,name+': single authored component <=600 triangles')
     check(len(glass)==(1 if name=='display_cabinet' else 0),name+': only cabinet has glass')
     check(np.allclose([lo,hi],spec['bounds'],atol=1e-5),name+': real bounds match manifest')
-    if spec['origin']=='bottom_center':check(abs(lo[1])<1e-5 and abs(lo[0]+hi[0])<1e-5 and abs(lo[2]+hi[2])<1e-5,name+': bottom-center pivot')
+    if spec['origin']=='display_surface_center':check(abs(lo[1])<1e-5 and np.allclose(spec['display_assignment']['position'],[0,1.,0]),name+': origin at cabinet display-surface center')
+    elif spec['origin']=='bottom_center':check(abs(lo[1])<1e-5 and abs(lo[0]+hi[0])<1e-5 and abs(lo[2]+hi[2])<1e-5,name+': bottom-center pivot')
     else:check(abs(lo[2])<1e-5 and np.max(abs(lo[:2]+hi[:2]))<1e-5,name+': back-center pivot')
     check(not doc.get('animations') and not doc.get('skins'),name+': static prop')
     for node in doc['nodes']:
@@ -75,21 +81,26 @@ for name,spec in specs.items():
     report['assets'][name]={'triangles':triangles,'surfaces':len(primitives),'bounds':[lo.tolist(),hi.tolist()],
         'dimensions_m':(hi-lo).tolist(),'uid':uid,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
     unique+=triangles;placed+=triangles*spec['quantity'];surfaces+=len(primitives)*spec['quantity']
-check(len(set(uids))==17,'All 17 import UIDs are distinct')
+check(len(set(uids))==8,'All 8 import UIDs are distinct')
+check({p.name for p in KIT.glob('*.glb')}=={s['file'] for s in specs.values()},'Only the eight current grouped assets are delivered')
 check(np.allclose(report['assets']['display_cabinet']['dimensions_m'],[.95,1.5,1.8],atol=1e-5),'Cabinet final envelope .95 x 1.50 x 1.80m')
 check(np.allclose(report['assets']['exhibit_plinth']['dimensions_m'],[.70,1.10,.70],atol=1e-5),'Plinth final envelope .70 x 1.10 x .70m')
 mosaic=report['assets']['floor_mosaic']['dimensions_m']
 check(abs(mosaic[0]-1.94)<1e-5 and abs(mosaic[2]-1.94)<1e-5 and mosaic[1]<=.01,'Floor mosaic diameter 1.94m and height <=.01m')
-frames=[s for s in specs.values() if s['module']=='M06']
+frames=specs['artwork_set']['components']
 check(len(frames)==6 and len({json.dumps(s['art_palette_srgb'],sort_keys=True) for s in frames})==6,'Six different abstract palettes')
-for s in frames:check(np.allclose(s['dimensions_m'][:2],[.70,.55],atol=1e-5),s['name']+': .70 x .55m')
-gallery=np.array([np.array(s['bounds'])+np.array(s['gallery_offset']) for s in frames])
+for s in frames:check(np.allclose((np.array(s['bounds'][1])-np.array(s['bounds'][0]))[:2],[.70,.55],atol=1e-5),s['name']+': .70 x .55m')
+gallery=np.array([np.array(s['bounds'])+np.array(s['position']) for s in frames])
 width=gallery[:,1,0].max()-gallery[:,0,0].min();height=gallery[:,1,1].max()-gallery[:,0,1].min()
 check(width<=2.50 and abs(width-2.40)<1e-5 and abs(height-1.25)<1e-5,'Two-by-three gallery fits 2.5m wall span')
 groups={}
 for s in specs.values():
     if 'display_assignment' not in s:continue
-    slot=s['display_assignment'];bounds=np.array(s['bounds'])+np.array(slot['position']);groups.setdefault(slot['container'],[]).append((s['name'],bounds))
+    slot=s['display_assignment'];bounds=np.array(s['bounds'])+np.array(slot['position'])
+    for c in s.get('components',[{'name':s['name'],'bounds':s['bounds'],'position':[0,0,0]}]):
+        cbounds=np.array(c['bounds'])+np.array(c['position'])+np.array(slot['position'])
+        groups.setdefault(slot['container'],[]).append((c['name'],cbounds))
+        check(abs(cbounds[0,1]-specs[slot['container_asset']]['display_height_m'])<1e-5,c['name']+': grouped constituent touches display surface')
     support=specs[slot['container_asset']]['display_height_m']
     check(abs(bounds[0,1]-support)<1e-5,s['name']+': sits on actual parent support height')
     if slot['container_asset']=='display_cabinet':

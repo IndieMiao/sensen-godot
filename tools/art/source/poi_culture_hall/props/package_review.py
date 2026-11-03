@@ -13,26 +13,26 @@ reports={name:json.loads((OUT/file).read_text()) for name,file in [
 assert all(v['passed'] for v in reports.values())
 assert 'ERROR:' not in (OUT/'render.log').read_text()
 names={'display_cabinet':'玻璃展柜 ×2','exhibit_plinth':'象牙白展台',
-    **{f'abstract_frame_{i:02d}':f'抽象画框 {i:02d}' for i in range(1,7)},
+    'artwork_set':'六画组合（2 排 × 3 列）','case_exhibits_1':'玻璃柜 1 展品组合（3 件）','case_exhibits_2':'玻璃柜 2 展品组合（3 件）',
     'exhibit_shallow_bowl':'浅陶碗','exhibit_terracotta_jar':'陶罐','exhibit_leaf_fossil':'叶形化石',
     'exhibit_shell_fragment':'扇形化石','exhibit_fossil_rock':'岩块标本','exhibit_spiral_fossil':'平放螺旋化石',
     'exhibit_ammonite':'直立菊石','floor_mosaic':'同心圆石拼花','name_sign':'空白浅木招牌'}
 font='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 title=ImageFont.truetype(font,38);label=ImageFont.truetype(font,26);small=ImageFont.truetype(font,23)
 prefix='SGODOT-323_props_v1_';files=[]
-board=Image.new('RGB',(2592,1920),'white');draw=ImageDraw.Draw(board)
+board=Image.new('RGB',(2560,1700),'white');draw=ImageDraw.Draw(board)
 draw.text((24,15),'SGODOT-323 / N3 文化大厅新做件 / v1 / 实际 GLB 尺寸',font=title,fill='#283D34')
-draw.text((24,70),'17 个独立件 / 展柜复用 2 次 / 4,718 独立面；摆放 5,000 面、20 surface / 单件最高 524 面',font=label,fill='#3C5146')
+draw.text((24,70),'8 个交付组 / 展柜复用 2 次 / 4,982 独立面；摆放 5,396 面、11 surface / 组合内原子件各 ≤600 面',font=label,fill='#3C5146')
 for i,spec in enumerate(manifest['assets']):
-    x=(i%6)*432+16;y=(i//6)*580+118
-    image=Image.open(OUT/'captures'/(spec['name']+'.png')).convert('RGB');assert image.size==(400,440)
+    x=(i%4)*640+20;y=(i//4)*760+118
+    image=Image.open(OUT/'captures'/(spec['name']+'.png')).convert('RGB');assert image.size==(600,600)
     board.paste(image,(x,y))
-    draw.text((x,y+438),names[spec['name']],font=label,fill='#283D34')
+    draw.text((x,y+608),names[spec['name']],font=label,fill='#283D34')
     dims=reports['geometry']['assets'][spec['name']]['dimensions_m']
-    draw.text((x,y+478),'宽 %.3f × 高 %.3f × 深 %.3f m'%tuple(dims),font=small,fill='#3C5146')
-    draw.text((x,y+515),'%d 三角面 / %d surface'%(spec['triangles'],spec['surfaces']),font=small,fill='#3C5146')
-draw.text((24,1880),'各格独立取景，不同比例；尺寸来自导出顶点。画框每幅 0.70 × 0.55 m；整组两排三列宽 2.40 m。',font=small,fill='#3C5146')
-draw.text((2430,1880),'【黄忠】',font=small,fill='#283D34')
+    draw.text((x,y+648),'宽 %.3f × 高 %.3f × 深 %.3f m'%tuple(dims),font=small,fill='#3C5146')
+    draw.text((x,y+685),'%d 三角面 / %d surface'%(spec['triangles'],spec['surfaces']),font=small,fill='#3C5146')
+draw.text((24,1660),'各格独立取景，不同比例；尺寸来自导出顶点。画组与展品组的位置已烘入网格，不再分别摆子件。',font=small,fill='#3C5146')
+draw.text((2400,1660),'【黄忠】',font=small,fill='#283D34')
 path=DOC/(prefix+'dimensions.jpg');board.save(path,quality=94,subsampling=0,optimize=True);files.append(path)
 image=Image.open(OUT/'captures/scale_43deg.png').convert('RGB');assert image.size==(1800,1800)
 board=Image.new('RGB',(1800,1940),'white');board.paste(image,(0,90));draw=ImageDraw.Draw(board)
@@ -49,5 +49,5 @@ for s in manifest['assets']:
     dims=reports['geometry']['assets'][s['name']]['dimensions_m']
     rows.append('| `%s` | %d | %d | %d | %.3f × %.3f × %.3f |'%(
         s['name'],s['quantity'],s['triangles'],s['surfaces'],*dims))
-(DOC/'asset-table.md').write_text('# 实际导出资产统计\n\n'+'\n'.join(rows)+'\n\n17 独立 GLB：4,718 三角面 / 18 surface。按展柜两次、其余各一次摆放：5,000 三角面 / 20 surface。\n')
+(DOC/'asset-table.md').write_text('# 实际导出资产统计\n\n'+'\n'.join(rows)+'\n\n8 个组合 GLB：4,982 三角面 / 9 surface。按展柜两次、其余各一次摆放：5,396 三角面 / 11 surface。组合件总面数照实列出，原子件各不超过 600 面。\n')
 print(DOC)

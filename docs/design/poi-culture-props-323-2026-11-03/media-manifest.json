@@ -1,0 +1,23 @@
+[
+  {
+    "file": "SGODOT-323_props_v1_dimensions.jpg",
+    "bytes": 429637,
+    "sha256": "defe26da1e19905577978b3df2a146655381170b629603b4503eab514dc4301d",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-323_props_v1_scale_43deg.jpg",
+    "bytes": 293889,
+    "sha256": "992af4b5aaa46efadb08f5711d85ef8f7fb4ed0f986e71617a56df843f0d0e86",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-323_props_v1_validation.json",
+    "bytes": 65104,
+    "sha256": "9c15913436450b67cef60793864d3566f7641316bccd9a55733ccbfe03cabca7",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

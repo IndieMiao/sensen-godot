@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cico80ycdi54"
-path="res://.godot/imported/abstract_frame_01.glb-7909102359b64b70f1c9833f8e5c432f.scn"
+uid="uid://cf0tlj688mlng"
+path="res://.godot/imported/artwork_set.glb-a6db0ab0b58bc6e0e2401552f323eff6.scn"
 
 [deps]
 
-source_file="res://assets/rooms/poi_culture_hall/props/abstract_frame_01.glb"
-dest_files=["res://.godot/imported/abstract_frame_01.glb-7909102359b64b70f1c9833f8e5c432f.scn"]
+source_file="res://assets/rooms/poi_culture_hall/props/artwork_set.glb"
+dest_files=["res://.godot/imported/artwork_set.glb-a6db0ab0b58bc6e0e2401552f323eff6.scn"]
 
 [params]
 

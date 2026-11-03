@@ -21,7 +21,7 @@ func fixture(name,position,size):
 	node.material_override=matte("FFFFFF");node.position=position;world.add_child(node);return node
 func setup():
 	manifest=JSON.parse_string(FileAccess.get_file_as_string(KIT+"prop_manifest.json"))
-	vp=SubViewport.new();vp.size=Vector2i(400,440);vp.own_world_3d=true;vp.msaa_3d=Viewport.MSAA_4X
+	vp=SubViewport.new();vp.size=Vector2i(600,600);vp.own_world_3d=true;vp.msaa_3d=Viewport.MSAA_4X
 	vp.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(vp)
 	world=Node3D.new();vp.add_child(world);props=Node3D.new();world.add_child(props)
 	var env=Environment.new();env.background_mode=Environment.BG_COLOR;env.background_color=Color.WHITE
@@ -56,7 +56,10 @@ func geometry():
 				if mat.resource_name.begins_with("CultureGlass"):
 					glass+=1;check(mat.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA and absf(mat.albedo_color.a-.16)<.001,"Cabinet glass is its own translucent surface")
 				else:check(mat.roughness>=.85 and mat.transparency==BaseMaterial3D.TRANSPARENCY_DISABLED,spec.name+": opaque matte surface")
-		check(tris==spec.triangles and tris<=600 and count==spec.surfaces,spec.name+": imported budget")
+		check(tris==spec.triangles and count==spec.surfaces,spec.name+": imported group budget")
+		if spec.has("components"):
+			check(spec.components.all(func(c):return c.triangles<=600),spec.name+": original components each <=600 triangles")
+		else:check(tris<=600,spec.name+": single component <=600 triangles")
 		check(glass==(1 if spec.name=="display_cabinet" else 0),spec.name+": only cabinet has glass")
 		check(lo.distance_to(vec(spec.bounds[0]))<.0001 and hi.distance_to(vec(spec.bounds[1]))<.0001,spec.name+": actual imported bounds")
 		var cfg=ConfigFile.new();check(cfg.load(KIT+spec.file+".import")==OK,spec.name+": import config")
@@ -80,6 +83,7 @@ func individual(spec):
 	if spec.name=="floor_mosaic":pitch=75; yaw=0
 	if spec.name in ["exhibit_leaf_fossil","exhibit_shell_fragment","exhibit_spiral_fossil","exhibit_shallow_bowl"]:pitch=55
 	if spec.name=="exhibit_ammonite":pitch=15; yaw=12
+	if spec.name.begins_with("case_exhibits_"):pitch=55
 	camera.rotation_degrees=Vector3(-pitch,yaw,0)
 	var lo=Vector3.INF;var hi=-Vector3.INF
 	for x in [spec.bounds[0][0],spec.bounds[1][0]]:

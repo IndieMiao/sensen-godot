@@ -8,7 +8,7 @@ bpy.ops.wm.open_mainfile(filepath=str(SRC/'culture_props.blend'));graph=bpy.cont
 checks=[]
 def check(ok,label):checks.append({'check':label,'passed':bool(ok)})
 collections=[c for c in bpy.data.collections if c.name.startswith('KIT_')]
-check(len(collections)==17,'17 independently editable module collections')
+check(len(collections)==8,'8 export groups with named editable components')
 for c in collections:
     objects=[o for o in c.objects if o.type=='MESH']
     check(bool(objects) and all(not o.name.startswith(('Cube','Sphere','Cone','Icosphere')) for o in objects),c.name+': descriptive part names')
