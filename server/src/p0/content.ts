@@ -147,12 +147,14 @@ export interface MineMonster {
   name: string; hp: number; damage: number; loot?: [string | null, number, number][]; once_a_day?: string;
   elite?: boolean; guard?: boolean; tier?: number; stun_mult?: number; first?: [string, number][]; pack?: [string, number];
 }
-/** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
+/** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools); 355 G: a weapon
+ * into the weapon slot (contract-efg §9.3, the Iron Sword). */
 export interface WorkbenchRecipe {
-  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
+  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field' | 'weapon';
   cost: [string, number][]; gate?: [Skill, number];
+  homestead?: number;  // 355 G: the Homestead level it opens at (Iron Sword Lv8), as a shop offer's; `gate` stays a skill's
   facility?: string;   // to: field (P1, SGODOT-239): the facility it builds in place (place command), never crafted
-  coins?: number;      // coins paid as it is placed, on top of the materials (greenhouse 300, §5.7; the 40 floor kept)
+  coins?: number;      // coins paid as it is placed or crafted, on top of the materials (greenhouse 300, §5.7; Iron Sword 150; the 40 floor kept)
 }
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
 export interface FacilityDef {
@@ -368,6 +370,8 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const dig = c.mine.first_dig;
   if (dig && (!c.residents[dig.giver] || (dig.reward.weapon !== undefined && !c.mine.combat.weapons[dig.reward.weapon])))
     throw new Error('p0 content: mine.first_dig names a resident or a weapon the table does not have');
+  for (const r of c.workbench.recipes)
+    if (r.to === 'weapon' && !c.mine.combat.weapons[r.out]) throw new Error(`p0 content: workbench ${r.id} makes ${r.out}, not a weapon of mine.combat`);
   checkHomestead(c);
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {

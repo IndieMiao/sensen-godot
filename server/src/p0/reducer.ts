@@ -323,6 +323,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (s.gear.rods.includes(id) && rodById(c, id)) s.gear.rod = id;
       else if (s.gear.hoes.includes(id)) s.gear.hoe = id;
       else if (s.gear.picks.includes(id)) s.gear.pick = id;
+      else if (s.gear.weapons.includes(id) && c.mine.combat.weapons[id]) s.gear.weapon = id;   // 355 G §9.1: the weapon slot
       else return fail('not_owned');
       break;
     }
