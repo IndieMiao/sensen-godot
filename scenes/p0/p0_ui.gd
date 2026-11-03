@@ -47,6 +47,8 @@ const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGO
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the home city's centre for Improve this map (q(133) v3)
 const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")   # the sheet the Passport and city pages use
+const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keepers' local requests (q(272))
+const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
@@ -553,19 +555,19 @@ func set_place(text: String) -> void:
 	_place_text = text
 	_refresh_hud()
 
-## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
-## today" for its first 3 s). "" hides it; changing action clears it.
-## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
-## (5 clear of the HP card, which is 194 wide with its heart: x 209 of 360); hp < 0 hides it. The elite's card under it
-## while one fights ({} hides it); the status line (`Elite Slime` on Floor 5) hides with it — the card names the elite
-## and would cover half of it (不知火舞 on 288; COMBAT-ELITE 1228:111690 has no such line).
-const _STATUS_RIGHT_OF_HP := 209.0
+## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's `Rocks 2/6 · 3 monsters
+## left`). "" hides it; changing action clears it.
+## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot; hp < 0 hides it. The status
+## line then sits under the HP card, left-aligned with it, in the guard card's place (不知火舞 on #629: to its right it
+## ran into the screen's edge at 360). A guard's card there while it fights ({} hides it); the status line hides with
+## it — the card names the guard (不知火舞 on 288 / 355).
 func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	if not is_node_ready(): return
 	var on := hp >= 0 and surface in ACTION_SURFACES
 	_hp.visible = on
 	if on: _hp.set_hp(hp, maximum)
-	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
+	_status.position.x = _creel.position.x
+	_status.position.y = _creel.position.y + (_hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN if on else 0.0)
 	var boss := on and not elite.is_empty()
 	_elite_hp.visible = boss
 	_status.visible = _status_text.text != "" and surface in ACTION_SURFACES and not boss
@@ -970,7 +972,9 @@ func _fab_pressed() -> void:
 	if _modal != null: return
 	if not _fab_state.get("enabled", false):
 		if bool(_fab_state.get("creel_full", false)): toast_creel_full()   # FISH-4 / q(83): the greyed Cast · Creel full
-		elif _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		# SGODOT-231: unavailable keys say why (LOCK-10); one marked toast_break breaks a line too long at a « · »
+		# (UiKit.break_at_dot; the full field's `Plots 8/8 · Homestead Lv2 adds 2`, 不知火舞 on #624)
+		elif _fab_state.has("toast"): toast(str(_fab_state.toast), 0.0, bool(_fab_state.get("toast_break", false)))
 		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
@@ -1718,6 +1722,9 @@ func _aim_toast() -> void:
 		_toasts.anchor_above(_toast_over)
 		if _toasts.get_parent() == root: root.move_child(_toasts, -1)
 		return
+	if placing():   # placement: over its caption pill (or its card), never on it (不知火舞 on #624)
+		_toasts.anchor_above(_place_bar.toast_dock())
+		return
 	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
@@ -1745,7 +1752,9 @@ func _aim_toast() -> void:
 	_toasts.anchor_above(_bar)
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
-## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
+## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08). Two lines break at a " · ", the dot
+## dropped, as Info toasts that opt in and Today's rows do (q(103); 不知火舞 11-02: `Pond Catch · Deliver to Wen` /
+## `Shanghai`, not mid-phrase) — only a sentence with a " · " that a line cannot hold; any other wraps by words as before.
 func toast_error(text: String, action := "") -> void:
 	if not _toasts: return
 	if _cover_up:
@@ -1753,7 +1762,7 @@ func toast_error(text: String, action := "") -> void:
 		return
 	_toast_bag_tab = ""
 	_aim_toast()
-	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+	_toasts.show_toast(_break_at_dot(text), ToastLayer.Severity.ERROR, action)
 
 ## FISH-4 / q(83): a full creel says one sentence — the badge's tap, the greyed Cast · Creel full and the server's
 ## creel_full alike — and its Open bag › opens the bag on its Fish page.
@@ -2464,6 +2473,25 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	if role == "casino": trade.activated.connect(func(): _play_blackjack(c))   # Play: the table page, no counter (q(240))
 	else: trade.activated.connect(func(): open_counter(role))
 	card.content.add_child(trade)
+	# q(272) (不知火舞 378 091a3ae9, LOCK-16 复议 197 1387e81b): a keeper away from home with a local request for the
+	# player — one full-width secondary key under Trade, the question below it; none at all when they have none
+	var lk := P0Locals.key(view, str(c.get("outpost", "")))
+	if not lk.is_empty():
+		var key := UiCommandButton.new(str(lk.text), UiCommandButton.Kind.SECONDARY)
+		key.name = "LocalKey"
+		key.reason = str(lk.reason)
+		key.fit_text = true
+		if lk.kind == "deliver":
+			key.sends = true
+			key.activated.connect(func():
+				close_modal()
+				command.emit({"type": "deliver", "request": str(lk.id)}))
+		else:
+			var open_card := func(): P0LocalRequest.open(self, str(lk.id), func(): open_keeper_greeting(role, c))
+			key.activated.connect(open_card)
+			# the gap key is grey (LOCK-10): a tap on it is unavailable_pressed, and it opens the card all the same
+			key.unavailable_pressed.connect(func(_r: String): open_card.call())
+		card.content.add_child(key)
 	if str(lines.question) != "" and str(lines.answer) != "":
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
 		ask.activated.connect(func(): card.line = str(lines.answer))
@@ -2834,7 +2862,7 @@ func open_radial() -> void:
 	_bar.cancel_drag()
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
-			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
+			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Enter the mine"]]:   # every mine floor fights (355 b1)
 		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]),
 			available = it[0] == bar_mode or actions_here.has(it[0]), reason = it[3]})
 	_radial.options = options
@@ -2868,6 +2896,9 @@ func open_today(given: Array = []) -> void:
 			return
 		var gate := P0Logic.fish_gate(view, str(_today_rows[i].get("gate", "")))
 		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given))
+		# a keeper's local request (q(272)): its card, Drop request › there; Not now / Close come back to Today
+		elif str(_today_rows[i].get("local_request", "")) != "":
+			P0LocalRequest.open(self, str(_today_rows[i].local_request), func(): open_today(given))
 		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
 		elif str(_today_rows[i].get("board_request", "")) != "":
 			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given)))
@@ -2895,7 +2926,7 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or bool(r.get("first_dig", false))
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != "" or bool(r.get("first_dig", false))
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")
@@ -2929,10 +2960,11 @@ func _show_today_row(i: int) -> void:
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button. In an outpost, a
 ## target at that very outpost (`outpost:<its id>`, a resident's request handed in there; q(204) ⑨: Ivo's in his Mine
 ## Hut) reads Show and the camera goes to the resident (here_place: the place the player is in).
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign", "mine"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench", "sign"]
 
-## A target on the homestead: the fixed ones, the Homestead sign and the mine mouth (q(255)), and the gathering spots.
-static func home_target(go: String) -> bool: return go in HOME_TARGETS or go.begins_with("spot_")
+## A target on the homestead: the fixed ones and the Homestead sign (q(255)). The mine mouth left the farm in 355 b1,
+## the gathering spots with v4q(4) ①.
+static func home_target(go: String) -> bool: return go in HOME_TARGETS
 
 static func show_label(go: String, here: String, camera_here: bool, here_place := "") -> String:
 	if go == "": return ""
@@ -3236,7 +3268,7 @@ func open_resident_profile(id: String) -> void:
 ## The workbench drawer (SGODOT-231 B2-06): P0WorkbenchDrawer over the view, Close 44 six above its top and 16 in
 ## (as RES-PIP's sheet). It follows the view while open; Craft / Equip go to the server, a grey button toasts its
 ## reason (LOCK-10) and a cost tile shows where the material comes from (NeedSource, Show only moves the camera,
-## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment, the gloves' banner) belongs to
+## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment) belongs to
 ## the farm's P0FarmMaterials.
 const _WORKBENCH_KIND := "workbench"
 var workbench_tab := "tools"
@@ -3631,13 +3663,15 @@ func blackjack_refused(code: String, detail: Dictionary) -> void:
 
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
-func open_settings(back := Callable()) -> void:
+func open_settings(back := Callable(), read := true) -> void:
 	var version := P0Legal.version_line(P0Session.demo_config(
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
 	if test_accounts.is_test(): version += " · Test"
 	var page := P0SettingsPage.settings(version,
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
-		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "")
+		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
+		(_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD) if _privacy_shown else P0SettingsPage.BLOCKED_NONE,
+		_voice_offered)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3645,10 +3679,84 @@ func open_settings(back := Callable()) -> void:
 		if what == "home": change_home.emit(func(): open_settings(back))
 		elif what == "test_options": open_test_options(func(): open_settings(back))
 		elif what == "notifications": open_notifications(func(): open_settings(back))
+		elif what == "blocked_players": open_blocked_players(func(): open_settings(back))
+		elif what == "voice_chat": open_voice_chat_info(func(): open_settings(back))
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
 	_modal_back = back
+	if read: _privacy_read(func(): if modal_kind == "settings": open_settings(back, false))   # drawn again, not read again
+
+## Settings › Blocked players (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP1–BP3 row 127): the account's voice
+## away from any room (P0Runtime's P0VoiceRoom without one): whether this phone is offered voice, and whom it blocked —
+## now that the two never see each other in a room, the only place a block is lifted. The Privacy group shows while
+## voice is offered here, or while anyone is blocked (a block outlives the switch going off, and an iPhone has none).
+var voice_account: Node
+var _blocked: Array = []        # [{handle, name}] as last read, the server's order
+var _blocked_read := false      # read once at least this launch: before that an empty list is not `No one blocked`
+var _blocked_failed := false    # and the last try failed: the Blocked page's empty state and Retry
+var _privacy_shown := false
+var _voice_offered := false     # this phone is offered voice (status read): Privacy's `Voice chat ›` (q(277))
+var _unblocks := 0              # Unblocks sent and answered: a read overlapping one is dropped (it may hold them, 周瑜 #667)
+
+## The server asked again; `then` when what the pages show has changed (they are opened again with it). A list that
+## was not read (blocked_list null, 后裔 ed9c83b2) keeps the last one read; none read this launch, the Privacy group
+## stays only while voice is offered (its row without a number) and the page shows the empty state (不知火舞 6e014af3).
+func _privacy_read(then: Callable) -> void:
+	if voice_account == null: return
+	var unblocks := _unblocks
+	await voice_account.call("fetch_status")
+	var got = await voice_account.call("blocked_list")
+	if unblocks != _unblocks: return
+	# offered as a room's would be (P0VoiceRoom.offered) — its own Voice left unset: it never joins or leaves a call
+	var phone = get_node_or_null("/root/Voice")
+	var offered: bool = bool(voice_account.get("available")) and str(voice_account.get("age")) != "no" \
+		and phone != null and bool(phone.call("supported"))
+	var was := [_privacy_shown, _blocked, _blocked_read, _blocked_failed, _voice_offered]
+	_voice_offered = offered   # a status not read reads as not offered: no `Voice chat` row (不知火舞)
+	if got is Array:
+		_blocked = got
+		_blocked_read = true
+		_blocked_failed = false
+	elif not _blocked_read: _blocked_failed = true
+	_privacy_shown = offered or not _blocked.is_empty()
+	if was != [_privacy_shown, _blocked, _blocked_read, _blocked_failed, _voice_offered]: then.call()
+
+## Settings › Privacy › Voice chat (q(277)): where voice goes, as the Licenses' text pages (PageHeader, Regular 13).
+func open_voice_chat_info(back: Callable) -> void:
+	var page := P0SettingsPage.text("Voice chat", P0Legal.VOICE_CHAT, safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	_open_modal(page, 0.0, true)
+	modal_kind = "voice_chat"
+	_modal_back = back
+
+## `read` false: drawn again with what was read, nothing asked (a failed read never loops; 后裔 on #667).
+func open_blocked_players(back: Callable, read := true) -> void:
+	var page := P0SettingsPage.blocked_players(_blocked, safe_top(), safe_bottom(),
+		"ok" if _blocked_read else ("failed" if _blocked_failed else "reading"))
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(what: String):
+		if what == "retry":   # Retry only when tapped, nothing by itself
+			_blocked_failed = false
+			open_blocked_players(back)
+		else: _unblock(what, back))
+	_open_modal(page, 0.0, true)
+	modal_kind = "blocked_players"
+	_modal_back = back
+	if read: _privacy_read(func(): if modal_kind == "blocked_players": open_blocked_players(back, false))
+
+## Unblock: the page has taken the row away already (no card, no toast); a failure puts it back with the network's line.
+func _unblock(handle: String, back: Callable) -> void:
+	_unblocks += 1
+	var ok: bool = await voice_account.call("unblock", handle)
+	_unblocks += 1   # again at its answer: a read begun meanwhile may have been served before the Unblock was
+	if ok:
+		_blocked = _blocked.filter(func(r): return str(r.handle) != handle)
+		return
+	show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")
+	if modal_kind == "blocked_players": open_blocked_players(back, false)
 
 ## The crop-ready notifications (SGODOT-350; P0Notify). Settings › Notifications: the switch, and when the system has
 ## said no the notice whose link opens the system's page. The page is read again whenever the phone may have changed
@@ -3892,7 +4000,7 @@ func _hide_tip(close_queue := true) -> void:
 	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
 
 ## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2).
-const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}
+const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map", "travel": "travel"}
 
 ## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
 func _show_tip(text: String, key := "") -> void:
@@ -4474,3 +4582,146 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	modal_kind = "facility"
 	sheet.open("facility", &"facility")
 	return sheet
+
+# ---------------------------------------------------------------- voice (SGODOT-383, q(274); 不知火舞's spec 383 6d206dfb)
+## The room's voice, from the world (an outpost's or a pond's P0VoiceRoom; null with none — the map, the farm, Market
+## Square still has one with here = false). P0Runtime hands it over every frame; the keys follow its `changed`.
+const VoiceKeys := preload("res://scenes/p0/panels/p0_voice_keys.gd")
+const PeopleDrawer := preload("res://scenes/p0/panels/p0_people_drawer.gd")
+const AgeCard := preload("res://scenes/p0/panels/p0_age_card.gd")
+const MIC_ON_TOAST := "Mic on · others here can hear you"   # q(274) 补记二 dc052823 (the longer line ran to three)
+const VOICE_NOT_AVAILABLE := "Voice chat isn't available"
+const REPORT_SENT := "Report sent"
+const REPORT_ALREADY := "You already reported this"
+const VOICE_KEYS_RIGHT := 16.0
+static var _mic_toast_said := false   # the first mic on after the app opens says who hears (§2); later ones do not
+var voice_room: Node
+var _voice_keys: Control
+var _people: UiDrawer
+var _mic_was_on := false
+var _mic_denied := false   # the system said no once: the key only says why from then on (§2)
+
+func set_voice_room(r: Node) -> void:
+	if r == voice_room: return
+	if is_instance_valid(voice_room):
+		for s in [[&"changed", _voice_refresh], [&"age_needed", open_age_card]]:
+			if voice_room.is_connected(s[0], s[1]): voice_room.disconnect(s[0], s[1])
+	voice_room = r if is_instance_valid(r) else null
+	_mic_was_on = false
+	if voice_room:
+		voice_room.connect(&"changed", _voice_refresh)
+		voice_room.connect(&"age_needed", open_age_card)
+	if modal_kind == "people": close_modal()
+	_voice_refresh()
+
+func _voice() -> Node: return voice_room.get("voice") if voice_room else null
+
+func _mic_on() -> bool:
+	var v := _voice()
+	return v != null and bool(v.call("active")) and bool(v.get("microphone"))
+
+## The keys shown or not, the mic's state, the count, an open drawer's rows; a first mic on says who hears.
+func _voice_refresh() -> void:
+	var shown := voice_room != null and bool(voice_room.call("offered")) and surface != "map"
+	if shown and _voice_keys == null:
+		_voice_keys = VoiceKeys.new()
+		_voice_keys.theme = UiKit.theme()
+		_voice_keys.mic_pressed.connect(_on_mic_pressed)
+		_voice_keys.people_pressed.connect(open_people)
+		root.add_child(_voice_keys)
+	if _voice_keys == null: return
+	_voice_keys.visible = shown
+	if not shown: return
+	var v := _voice()
+	if v != null and str(v.get("error")) == "MICROPHONE_DENIED": _mic_denied = true
+	var on := _mic_on()
+	_voice_keys.set_mic(on)
+	var rows: Array = voice_room.call("people")
+	_voice_keys.set_count(rows.size())
+	var crowd = voice_room.get("online").get("crowd") if voice_room.get("online") else null
+	if crowd != null and "speaking" in crowd:   # §3: a speaker's name tag goes green (not a muted or blocked one)
+		var now := {}
+		for r in rows: if bool(r.speaking) and not bool(r.muted) and not bool(r.blocked): now[int(r.peer)] = true
+		crowd.set("speaking", now)
+	_voice_keys.place(root.size.x - VOICE_KEYS_RIGHT, _creel.position.y)   # on the Creel pill's line, in a room too (383 V1 / V6)
+	if on and not _mic_was_on and not _mic_toast_said:
+		_mic_toast_said = true
+		toast(MIC_ON_TOAST, 0.0, true)
+	_mic_was_on = on
+	if modal_kind == "people" and is_instance_valid(_people): _people.call("refresh", rows)
+
+func _on_mic_pressed() -> void:
+	if voice_room == null: return
+	if _mic_denied:   # the system box comes only the first time (§2): from then on the key says why and stays off
+		toast(PartyVoiceSession.error_text("MICROPHONE_DENIED"))
+		return
+	voice_room.call("toggle_mic")
+
+## This layer's people (§4): the space and its layer in the title, a row each; Mute here, Block after its card, Report.
+func open_people() -> void:
+	if voice_room == null: return
+	var layer := int(voice_room.get("online").get("room")) if voice_room.get("online") else 0
+	var space := place_text().get_slice(" · ", 1) if place_text().contains(" · ") else place_text()
+	var d: UiDrawer = PeopleDrawer.new("%s · Layer %d" % [space, maxi(1, layer)] if space != "" else "Layer %d" % maxi(1, layer),
+		voice_room.call("people"))
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_layer)
+	d.connect(&"mute_pressed", func(peer: int, on: bool): voice_room.call("set_muted", peer, on))
+	d.connect(&"mute_all_pressed", func(on: bool):
+		for r in voice_room.call("people"): if not bool(r.blocked): voice_room.call("set_muted", int(r.peer), on))
+	d.connect(&"block_pressed", func(peer: int, on: bool):
+		if on: _confirm_block(peer)
+		else: voice_room.call("set_blocked", peer, false))   # Unblock at once, no card (§5)
+	d.connect(&"report_pressed", _report)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)   # its own Close under the rows (V3), no ✕ over it
+	_people = d
+	modal_kind = "people"
+
+## §5: `Block Traveller ab12?`, `You won't hear each other.` / `They won't be told.`, Block (red, V4) / Cancel (q(28)'s
+## card, the confirm frame the home move uses).
+func _confirm_block(peer: int) -> void:
+	var who := ""
+	for r in voice_room.call("people"): if int(r.peer) == peer: who = str(r.name)
+	var confirm = load("res://scenes/p0/panels/p0_home_move_confirm.gd").new()
+	confirm.name = "BlockConfirm"
+	confirm.theme = UiKit.theme()
+	confirm.card.find_child("Title", true, false).text = "Block %s?" % who
+	confirm.card.find_child("Body", true, false).text = "You won't hear each other.\nThey won't be told."
+	confirm.move.label = "Block"
+	confirm.move.kind = UiCommandButton.Kind.DESTRUCTIVE   # V4: the red key
+	confirm.move.sends = false
+	var back := func():
+		confirm.queue_free()
+		modal_kind = "people"
+		_modal_back = Callable()
+	confirm.cancelled.connect(back)
+	confirm.move_pressed.connect(func():
+		back.call()
+		voice_room.call("set_blocked", peer, true))
+	_modal.add_child(confirm)   # over the drawer, which stays behind it
+	modal_kind = "block_confirm"
+	_modal_back = back
+
+## §6: no reason asked; the server's word in an Info toast (sent / already; a failure as the network's).
+func _report(peer: int) -> void:
+	var said = await voice_room.call("report", peer)
+	match str(said):
+		"sent", "true": toast(REPORT_SENT)
+		"already": toast(REPORT_ALREADY)
+		_: show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again")   # failed: as any command the network lost
+
+## §7: the 13+ gate (14 by the year, the user 11-02) the first time the mic key is tapped. Old enough goes on to the
+## mic (P0VoiceRoom.answer_age), not old enough hides voice on this phone with an Info toast. Nothing else is kept.
+func open_age_card() -> void:
+	if voice_room == null: return
+	var d: UiDrawer = AgeCard.new()
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_layer)
+	d.connect(&"answered", func(ok: bool):
+		close_modal()
+		if not ok: toast(VOICE_NOT_AVAILABLE)
+		voice_room.call("answer_age", ok))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	modal_kind = "age"

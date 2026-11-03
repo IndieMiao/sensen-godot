@@ -332,9 +332,12 @@ func info_card(item_id: String) -> Dictionary:
 	if row == null: return {}
 	var s := row.spec()
 	var facts: Array = s.get("facts", [])
+	# a rod's tier, once it can be bought (q(278)): a fact line of its own under the reach, the price beside the key under
+	# it (the state line takes one line: the key's row is lifted to y 38 beside it)
+	var note := str(s.get("card_note", ""))
 	return {id = item_id, title = str(s.get("title", "")), icon = s.get("icon", null), rarity_text = str(facts[0]) if not facts.is_empty() else "",
-		needs = s.get("needs", []), facts = [str(s.get("price", {}).get("text", ""))], buttons = (s.get("buttons", []) as Array).slice(0, 1),
-		info = false}
+		needs = s.get("needs", []), facts = ([note] if note != "" else []) + [str(s.get("price", {}).get("text", ""))],
+		buttons = (s.get("buttons", []) as Array).slice(0, 1), info = false}
 
 ## The shelf's row for an item, null when none shows it.
 func row_of(item_id: String) -> UiShopRow:

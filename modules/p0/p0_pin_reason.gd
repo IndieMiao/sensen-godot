@@ -11,6 +11,7 @@ extends RefCounted
 ## the ! until the bag holds the fish, then the homestead the ✓; untaken it hangs nowhere (its ! is the stall's own).
 
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # away from home: a home hand-in isn't done here (q(270))
+const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keepers' local requests (q(272))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const HOME := "home"
 static var REED_POND := P0City.beginner_pond()   # the beginner pond, where the server points Pond Catch too (SGODOT-270)
@@ -59,6 +60,7 @@ static func line(view: Dictionary, m: Dictionary) -> String:
 		"request":
 			if bool(why.get("tracked", false)) and not r.is_empty(): return progress_text(r)
 			if resident != "": return "%s · New request" % resident_name(resident)
+			if bool(r.get("local", false)): return "%s · New request" % str(r.giver)   # q(272) ⑧: a keeper's, as a resident's
 			var open := market_open(view)
 			return "Market Board · %d %s" % [open, "request" if open == 1 else "requests"]
 		"new":
@@ -98,6 +100,9 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 				else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
 			"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
 			"tracked": str(r.get("status", "")) == "accepted", "city": at.city, "away": at.away, "deliver": at.deliver}
+	# q(272): a keeper's local request — handed in to them, `Deliver to Wen · Shanghai` (⑧: always with the city)
+	var loc := P0Locals.find(view, id)
+	if not loc.is_empty(): return _local(view, loc)
 	# The Stall Board as the older view has it (stall.board.requests), for a server without view.boards.
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if not (r is Dictionary) or str(r.get("id", "")) != id: continue
@@ -180,6 +185,11 @@ static func taken(view: Dictionary) -> Array:
 			"accepted_at": accepted_at(r),   # q(143): when it was tracked (0 on an older server or save)
 			"city": at.city, "away": at.away,   # q(270): another city's request names its city; away = not where the player is
 			"deliver": at.deliver, "deliver_go": at.go})
+	for loc in P0Locals.all(view):   # q(272): the keepers' local requests taken, here and elsewhere
+		if str(loc.get("status", "")) != "accepted": continue
+		var items: Array = loc.get("items", [])
+		out.append(_local(view, loc).merged({"kind": str(loc.get("kind", "")), "items": items, "rarity": loc.get("rarity", null),
+			"visit": null, "where": null, "accepted_at": accepted_at(loc)}))
 	for rid in view.get("residents", {}):
 		var rv: Dictionary = view.residents[rid] if view.residents[rid] is Dictionary else {}
 		var q = rv.get("request", null)
@@ -192,6 +202,20 @@ static func taken(view: Dictionary) -> Array:
 			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + resident_place(rv, str(rid)),
 			"accepted_at": accepted_at(q)}))
 	return out
+
+## A local request as request_of gives it (q(272) ⑧): handed in to its keeper — `Deliver to Wen · Shanghai`, the city
+## always (they are all away from home); `away` when the player is not in its city.
+static func _local(view: Dictionary, r: Dictionary) -> Dictionary:
+	var items: Array = r.get("items", [])
+	var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
+	return {"id": str(r.get("id", "")), "title": str(r.get("title", "")), "item": str(items[0]) if items.size() == 1 else "",
+		"need_name": ("%s dishes" % " or ".join(styles)) if not styles.is_empty() and items.is_empty()
+			else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
+		"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
+		"tracked": str(r.get("status", "")) == "accepted", "city": str(r.get("city", "")), "away": not bool(r.get("here", false)),
+		"local": true, "giver": str(r.get("giver", "")),
+		"deliver": "Deliver to %s · %s" % [str(r.get("giver", "")), str(r.get("city", ""))],
+		"deliver_go": "outpost:" + str(r.get("place", ""))}
 
 ## When a taken request was tracked (q(143), the view's `accepted_at`, ms); 0 when the server or the save has none, as
 ## the earliest.

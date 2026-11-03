@@ -6,10 +6,12 @@ extends "res://scenes/map_poc/map_poc.gd"
 ## cluster can be browsed (SGODOT-275, plan §11.8.1): its bubble at the country zoom, the camera city switching as
 ## the camera goes over it. Browsing moves only the camera; where the player is (the place chip) never changes.
 
+const P0LocalRequest := preload("res://scenes/p0/panels/p0_local_request.gd")   # a local request's card (q(272))
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a city's 2 regional fish (MAP-5's Fish here)
+const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")   # the wild sites read by viewport (SGODOT-355 C)
 const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")   # the fog's holes as the map draws the ground (SGODOT-298)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
@@ -35,6 +37,7 @@ const LOCATE_ZOOM := 14.0
 var rt: P0Runtime
 var _presence: P0HttpRequest
 var _online := {}   # outpost id → players online across its rooms
+var _pond_online := {}   # pond id → players online at it (the pond rooms, /presence `ponds`, 2026-11-02)
 var _marks_sig := ""
 
 func _initial_region_id() -> String:
@@ -142,6 +145,7 @@ func _install_city_map() -> void:
 		city_map.pond_action = "Go"
 		city_map.destination_style = _destination_style
 		city_map.host_card = _own_card
+		city_map.pin_online = _pin_online   # outposts' and ponds' counts (q(137) ③; the pond rooms, 2026-11-02)
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
 		city_map.poi_shown = poi_shown   # q(212) ⑤: no POI in the fog
@@ -187,11 +191,15 @@ func _origin() -> Vector2:
 func _pond_info(entry: Dictionary) -> Dictionary:
 	if rt == null or rt.session == null: return {}
 	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(entry.lat), float(entry.lng)))
-	return PondCard.info(rt.session.view, str(entry.id), km)
+	var info := PondCard.info(rt.session.view, str(entry.id), km)
+	# Online now under Distance as an outpost's card has it, only with someone in (q(72); the pond rooms, 2026-11-02)
+	var online := int(_pond_online.get(str(entry.id), 0))
+	if online > 0 and info.get("facts") is Array: (info.facts as Array).insert(1, ["Online now", str(online)])
+	return info
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
-	if _travel_first(entry): return
+	if _travel_first(entry, false): return
 	if str(entry.get("kind", "")) == "place":
 		var spec := place_card(entry)
 		if spec.is_empty(): return
@@ -426,12 +434,15 @@ func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
 	var req := PinReason.request_of(_view(), str(why.get("request", "")))
 	if str(req.get("city", "")) != "" and bool(req.get("tracked", false)):
 		var rid := str(req.id)
-		details = func(): P0BoardRequest.open(rt.ui, "market", rid, func(): _open_place_card(entry, place_card(entry)))
+		var back := func(): _open_place_card(entry, place_card(entry))
+		# a keeper's local request tracked elsewhere opens its card instead (q(272) via q(271): Drop request › there)
+		if bool(req.get("local", false)): details = func(): P0LocalRequest.open(rt.ui, rid, back)
+		else: details = func(): P0BoardRequest.open(rt.ui, "market", rid, back)
 	P0PlaceSheet.open(rt.ui, spec,
 		func():
 			rt.ui.close_modal()
 			if id == HOME_PIN: _open_my_farm()
-			else: _open_outpost(id),
+			elif not _travel_first(entry): _open_outpost(id),   # its Go: in that city, or its travel card first (SGODOT-382)
 		details,
 		func():
 			if city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
@@ -461,11 +472,27 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200 or city_map == null: return
 	var data = JSON.parse_string(body.get_string_from_utf8())
 	if not (data is Dictionary) or not (data.get("outposts") is Dictionary): return
+	# the pond rooms (2026-11-02): `ponds` beside `outposts`, keyed by the pond's id (a `pond:` room id read the same);
+	# an older server without it: none in
+	var ponds := {}
+	var by_pond = data.get("ponds", {})
+	if by_pond is Dictionary:
+		for id in by_pond:
+			var n := int((by_pond[id] as Dictionary).get("online", 0)) if by_pond[id] is Dictionary else 0
+			if n > 0: ponds[str(id).trim_prefix("pond:")] = n
+	if ponds != _pond_online:
+		_pond_online = ponds
+		city_map.refresh_pins()   # a pond's pin is the map's own entry: no set_places brings its count
 	var online := {}
 	for id in data.outposts: online[str(id)] = int(data.outposts[id].get("online", 0))
 	if online == _online: return
 	_online = online
 	_set_outpost_places()
+
+## Who is in at a pin (CityMapView.pin_online): a pond's from the pond rooms, an outpost's on its own entry.
+func _pin_online(entry: Dictionary) -> int:
+	if str(entry.get("kind", "")) == "pond": return int(_pond_online.get(str(entry.get("id", "")), 0))
+	return int(entry.get("online", 0))
 
 ## The city view's own controls: the recenter key brings the camera back to the player at LOCATE_ZOOM from any zoom
 ## (q(158), the user on 301; it kept the zoom before, 不知火舞 on 234); outfits are not in P0 (their button is gone with
@@ -769,7 +796,16 @@ func _pan_by(shift: Vector2) -> void:
 func p0_return(route: String) -> void:
 	if route.begins_with("pond:"): _on_city_pond_requested({"id": route.trim_prefix("pond:")})
 	elif route.begins_with("outpost:"): _open_outpost(route.trim_prefix("outpost:"))
+	elif route.begins_with("mine:"): open_wild_card(route.trim_prefix("mine:"))   # a wild site's mine (周瑜's route_of, 355 b1 E)
 	else: _open_my_farm()
+
+## Back at a wild site from its mine (SGODOT-355 b1 C): 周瑜's p0_mine calls it after the pop (the Entrance, a knock-out),
+## the place pill's return (`mine:<id>`) too. The camera flies to the site; its mouth card (contract-efg §7.3 / 7.4) opens
+## on landing once the card is in. A site the map has not read (P0WildSites): the map stays as it is.
+func open_wild_card(site_id: String) -> void:
+	if not P0WildSites.has_site(site_id): return
+	var s := P0WildSites.site(site_id)
+	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), SHOW_ZOOM)
 
 ## Without the native map (desktop, tests holding the map in a SubViewport) the map drawn is the viewport: the camera
 ## follows its height as on a phone. map_poc takes the window's, which can be taller — the desktop's 1280 override, a
@@ -889,7 +925,7 @@ static func local_time(view: Dictionary, offset) -> String:
 ## MAP-5 (q(257) ②, Figma 9:125580 / MAP-5-RETURN 243:176049 / MAP-5-SHORT 243:176287; 不知火舞 on 367 ec5f2daa), pure:
 ## the city, `United States · 08:12 local · 14 online` (the local time once its preview is in, the online part only when
 ## some are), then Distance, Energy and Coins (`30 → 112 left`: what is left once paid) — or `Cost · Free` for a free
-## trip (Trip 1, the 3 nearest cities) — Fish here, Visit, and on a return with a running pass `Day Pass · 7h left` (it
+## trip (Trip 1, the 3 nearest cities) — Fish here, Visit (none on a free return), and on a return with a running pass `Day Pass · 7h left` (it
 ## is not renewed). Short of the fare, Fly reads the gap (coins first, LOCK-10). `view` is the projected view (its
 ## Energy now); `preview` the server's (its km and trip win), {} before it is in; `online` the city's players online.
 static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, online: int) -> Dictionary:
@@ -908,7 +944,9 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	var regional := P0FishWorld.regional_fish(cluster).size()
 	var crucian := P0Logic.item_name(view, "fish_crucian")
 	facts.append(["Fish here", "%s + %d regional" % [crucian, regional] if regional > 0 else crucian])
-	facts.append(["Visit", "Return visit · half price" if bool(f.revisit) else "First visit · stamp + 10 Energy"])
+	# a free return (Trip 1, the 3 nearest) says no half price: half of nothing only puzzles (q(257) ②, 不知火舞 on #642)
+	if not bool(f.revisit): facts.append(["Visit", "First visit · stamp + 10 Energy"])
+	elif not bool(f.free): facts.append(["Visit", "Return visit · half price"])
 	if bool(f.revisit) and float(f.pass_ms) > 0.0: facts.append(["Day Pass", "%s left" % P0Travel.pass_text(view, cluster)])
 	var gap := P0Travel.fare_gap(view, f)
 	return {
@@ -1351,13 +1389,16 @@ static func cluster_of_entry(entry: Dictionary) -> String:
 ## §11.7.2, q(212): a pond or place of a city not visited is its silhouette, and its tap, a Show on map landing on it
 ## and its Go all open that city's silhouette card (MAP-3-FREE) — pass or none: the fog first (a pass without a visit
 ## showed the place's card, its real name and Go). A visited city's without a pass opens its travel card (the server
-## would refuse with pass_required anyway). Those cards are the city's, not the pin's: the pin is not kept selected
-## while one is up — a tap gives it the press alone (CityMapView.select), as a city bubble opens the same card with no
-## pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
-func _travel_first(entry: Dictionary) -> bool:
+## would refuse with pass_required anyway). One with a pass the player is not in opens its own card on a tap or a Show
+## on map (q(212) ②, q(257) ⑦: the pin's card is as ever), and its Go the travel card (q(256) ④: the way back is a trip
+## at the revisit fare; it walked in and was refused inside, SGODOT-382) — going false for the tap, true for a Go.
+## Those cards are the city's, not the pin's: the pin is not kept selected while one is up — a tap gives it the press
+## alone (CityMapView.select), as a city bubble opens the same card with no pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
+func _travel_first(entry: Dictionary, going := true) -> bool:
 	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
 	var cluster := cluster_of_entry(entry)
-	if P0Travel.fog(_view(), cluster) != "unexplored" and P0Travel.covers(_view(), cluster): return false
+	var open := P0Travel.in_city(_view(), cluster) if going else P0Travel.covers(_view(), cluster)
+	if P0Travel.fog(_view(), cluster) != "unexplored" and open: return false
 	if city_map: city_map.clear_selection()
 	open_city_card(cluster)   # unexplored: the silhouette card first (MAP-3-FREE); visited: its travel card
 	return true
@@ -1889,6 +1930,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
 			_online[step[1]] = int(step[2])
 			_set_outpost_places()
+		"pondonline":   # pondonline:pond_san_francisco_03:3 — the same for a pond's pin and card (2026-11-02)
+			_pond_online[step[1]] = int(step[2])
+			city_map.refresh_pins()
 		"pin":   # pin:home / pin:sh_tea_1 — a tap on that pin (its card), the Homestead pin only while away
 			var hit: Array = city_map.entries.filter(func(e): return str(e.get("id", "")) == step[1]) if city_map else []
 			if not hit.is_empty(): city_map.select(hit[0])

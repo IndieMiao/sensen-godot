@@ -64,11 +64,11 @@ func _map() -> Node:
 	return map
 
 ## The travel block: home, visits and passes (a clean save is home San Francisco, nowhere else).
-func _travel(m: Node, home := SF, visits := {}, passes := {}) -> void:
+func _travel(m: Node, home := SF, visits := {}, passes := {}, here := "") -> void:
 	var rt: P0Runtime = m.rt
 	var v: Dictionary = rt.session.view.duplicate(true)
 	v["now"] = 1_000_000_000.0
-	v["travel"] = {home = home, here = home, visits = visits, passes = passes, stamps = [], fallback = {near3 = [], near10 = []},
+	v["travel"] = {home = home, here = here if here != "" else home, visits = visits, passes = passes, stamps = [], fallback = {near3 = [], near10 = []},
 		explorer = 0}
 	rt.session.view = v
 
@@ -114,11 +114,22 @@ func test_2_a_pass_without_a_visit_opens_the_silhouette_card() -> void:
 ## (3) Visited with a pass: the place's own card, its name and Go.
 func test_3_visited_with_a_pass_opens_the_place_card() -> void:
 	var m: Node = await _map()
-	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS})
+	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS}, DENVER)   # in Denver, its pass running
 	var rt: P0Runtime = m.rt
 	assert_bool(bool(m._destination_style(_entry(HUT)).get("silhouette", false))).is_false()
 	m.city_map.select(_entry(HUT))
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
+	rt.ui.close_modal()
+	# the pass still running but the player back home: the pin's card as ever (q(212) ②, q(257) ⑦; 不知火舞 on #642) —
+	# its Go is the way back, a trip at the revisit fare (q(256) ④, SGODOT-382): the city's travel card, never the room
+	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS})
+	m.city_map.select(_entry(HUT))
+	assert_str(rt.ui.modal_kind).is_equal("place_card")
+	var go := rt.ui._modal.find_child("Primary", true, false) as UiCommandButton
+	assert_str(go.label).is_equal("Go")
+	go.pressed.emit()
+	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	assert_int(AppRouter.instance_depth()).is_equal(0)   # not walked in
 	rt.ui.close_modal()
 
 ## (4) Visited, the pass run out: the city's travel card.
@@ -155,7 +166,7 @@ func test_6_san_franciscos_written_places_are_its_own_with_a_home_elsewhere() ->
 	assert_str(rt.ui.modal_kind).is_equal("city_card")
 	assert_str(m._card_city).is_equal(SF)
 	rt.ui.close_modal()
-	_travel(m, TOKYO, {SF: {n = 1}}, {SF: PASS})   # visited: its card as ever
+	_travel(m, TOKYO, {SF: {n = 1}}, {SF: PASS}, SF)   # visited and there with its pass: its card as ever (q(256) ④)
 	m.city_map.select(tea)
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
 	rt.ui.close_modal()
@@ -200,8 +211,8 @@ func test_7_the_pin_is_not_kept_selected_by_a_citys_card() -> void:
 	rt.ui.back_modal()
 	assert_str(rt.ui.modal_kind).is_equal("")
 	assert_dict(m.city_map.selected).is_empty()
-	# visited with a pass: the place card holds its pin while it is up, and lets it go on closing
-	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS})
+	# visited, there with a pass (q(256) ④): the place card holds its pin while it is up, and lets it go on closing
+	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS}, DENVER)
 	m.city_map.select(_entry(HUT))
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
 	assert_str(str(m.city_map.selected.get("id", ""))).is_equal(HUT)
@@ -212,7 +223,7 @@ func test_7_the_pin_is_not_kept_selected_by_a_citys_card() -> void:
 ## (8) The first visit's Show local pond lands on the pond of a city now visited: its pond card, not a silhouette's.
 func test_8_show_local_pond_lands_on_a_visited_citys_pond() -> void:
 	var m: Node = await _map()
-	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS})
+	_travel(m, SF, {DENVER: {n = 1}}, {DENVER: PASS}, DENVER)   # just arrived: in Denver
 	var rt: P0Runtime = m.rt
 	m.city_map.select(_entry(POND))
 	assert_str(rt.ui.modal_kind).is_not_equal("city_card")

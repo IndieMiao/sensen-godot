@@ -83,7 +83,8 @@ func test_the_swing_skips_the_unhittable_and_reports_the_stunned() -> void:
 	add_child(c)
 	var mover := _mover()
 	var mobs := [SLIME.duplicate(), SLIME.duplicate(), SLIME.duplicate()]
-	c.sync_p0({"mine": {"weapon": {"attack": 3, "speed": 2.0}, "run": {"id": 1, "floors": [{"floor": 3, "mobs": mobs}]}}}, 3, mover)
+	c.sync_p0({"mine": {"weapon": {"attack": 3, "speed": 2.0}, "at": {"mine": "wd-254-114", "floor": 3, "day": "2026-11-02",
+		"floor_state": {"floor": 3, "mobs": mobs}}}}, 3, mover)
 	assert_int(c.enemies.size()).is_equal(3)
 	var ids: Array = c.enemies.keys()
 	var brains := []
@@ -101,6 +102,53 @@ func test_the_swing_skips_the_unhittable_and_reports_the_stunned() -> void:
 	assert_bool(hit.has(ids[2])).is_true()
 	assert_array(c.last_stunned).is_equal([ids[1]])
 
+## A monster down plays its `die` for its json's time, out of the fight at once, and then is gone; one that times no die
+## (the slime's placeholder) goes at once, as before; a second sync saying it again does not start it over, and one
+## that has it back up stands it again (刘邦 on #627: E plays die, F's views draw it).
+func test_a_monster_down_plays_its_die_and_then_goes() -> void:
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	var mover := _mover()
+	var mobs := [SLIME.duplicate(), SLIME.duplicate(), SLIME.duplicate()]
+	var view := func() -> Dictionary: return {"mine": {"weapon": {"attack": 3, "speed": 2.0}, "at": {"mine": "wd-254-114",
+		"floor": 3, "day": "2026-11-02", "floor_state": {"floor": 3, "mobs": mobs}}}}
+	c.sync_p0(view.call(), 3, mover)
+	var ids: Array = c.enemies.keys()
+	var nodes: Array = ids.map(func(id): return c.enemies[id].node)
+	for i in [0, 2]:   # these two time a die (a copy: the kind's json stays as it is)
+		nodes[i].meta = (nodes[i].meta as Dictionary).duplicate(true)
+		nodes[i].meta["durations"]["die"] = 0.3
+	mobs[0].hp = 0
+	mobs[1].hp = 0
+	c.sync_p0(view.call(), 3, mover)
+	assert_array(c.enemies.keys()).is_equal([ids[2]])                # both out of the fight at once
+	assert_bool(c.dying.has(ids[0])).is_true()
+	assert_str(nodes[0].action).is_equal("die")
+	assert_bool(nodes[0].visible).is_true()
+	assert_bool(c.dying.has(ids[1]) or nodes[1].visible).is_false()   # no die time: gone now
+	assert_bool(c.fallen.has(0) and c.fallen.has(1)).is_true()
+	c.step(0.2, mover, false)
+	c.sync_p0(view.call(), 3, mover)                                  # said again: not started over
+	assert_float(float(c.dying[ids[0]].left)).is_equal_approx(0.1, 0.001)
+	c.step(0.2, mover, true)                                          # plays out even while the fight holds still
+	assert_bool(c.dying.has(ids[0]) or nodes[0].visible).is_false()
+	c.down(2)
+	assert_bool(c.dying.has(ids[2])).is_true()
+	mobs[2].hp = 9                                                    # the view rolled back: standing again
+	c.sync_p0(view.call(), 3, mover)
+	assert_bool(c.dying.has(ids[2])).is_false()
+	assert_bool(c.enemies.has(ids[2])).is_true()
+	assert_str(nodes[2].action).is_equal("idle")
+	# back up after the die played out, or after one with no die time: standing again too, not stuck "dead" (亚瑟 on #685)
+	mobs[0].hp = 9
+	mobs[1].hp = 9
+	c.sync_p0(view.call(), 3, mover)
+	for i in [0, 1]:
+		assert_bool(c.enemies.has(ids[i])).override_failure_message("mob %d" % i).is_true()
+		assert_str(str(c.enemies[ids[i]].phase)).override_failure_message("mob %d" % i).is_equal("idle")
+		assert_bool(nodes[i].visible).is_true()
+	assert_str(nodes[0].action).is_equal("idle")
+
 ## A floor with every rock broken (as test_p0_mine_deep's Layout_bp): open ground around the spawn.
 func _mover() -> PlayerMover:
 	var nodes: Array = []
@@ -109,3 +157,27 @@ func _mover() -> PlayerMover:
 	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
 	mover.position = Layout.SPAWN
 	return mover
+
+## A model's json is laid over its placeholder's (周瑜 on the bat blockout, 11-02): the art's timings and hit point win,
+## the movement only the placeholder has stays, and durations go action by action; a json that is not there is skipped.
+func test_a_models_json_is_laid_over_the_placeholders() -> void:
+	var dir := "user://test_p0_monsters_meta/"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
+	var write := func(name: String, data: Dictionary) -> String:
+		var f := FileAccess.open(dir + name, FileAccess.WRITE)
+		f.store_string(JSON.stringify(data))
+		f.close()
+		return dir + name
+	var placeholder: String = write.call("placeholder.json", {"radius": 0.3, "hit_point": [0, 1.0, 0], "hit_at": 0.25,
+		"durations": {"windup": 0.55, "die": 0.5, "stunned": 2.0}, "move": {"speed": 2.8, "aggro": 6.5}})
+	var model: String = write.call("model.json", {"radius": 0.35, "hit_point": [0, 1.0, 0.05], "hit_at": 0.2,
+		"durations": {"windup": 0.55, "die": 0.7}, "anims": {"die": {"length": 0.7, "loop": false}}})
+	var m := Monsters.layered([placeholder, model, dir + "none.json"])
+	assert_float(float(m.radius)).is_equal(0.35)
+	assert_array(m.hit_point).is_equal([0.0, 1.0, 0.05])   # JSON numbers read as floats
+	assert_float(float(m.hit_at)).is_equal(0.2)
+	assert_that(m.durations).is_equal({"windup": 0.55, "die": 0.7, "stunned": 2.0})   # the placeholder's stunned kept
+	assert_that(m.move).is_equal({"speed": 2.8, "aggro": 6.5})                       # only the placeholder has it
+	assert_that(Monsters.layered([placeholder]).durations).is_equal({"windup": 0.55, "die": 0.5, "stunned": 2.0})
+	for f in ["placeholder.json", "model.json"]: DirAccess.remove_absolute(ProjectSettings.globalize_path(dir + f))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(dir))

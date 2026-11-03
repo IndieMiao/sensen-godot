@@ -9,7 +9,7 @@ extends UiDrawer
 ##   source_requested(tile, item_id)   a tapped NEED-TILE: the owner pops NeedSource above it (Show only moves the
 ##                                     camera, LOCK-08)
 ## A craft that stays here (Torch, Compost) floats `+2 Torch` on its card (TORCH-DONE, float_on); the Copper
-## Pickaxe's Moment and the gloves' banner belong to the owner.
+## Pickaxe's Moment belongs to the owner.
 ## Tapping a card's item icon shows the shared InfoSheet (P0ItemInfo context &"workbench", read only) docked under the
 ## tabs, as the bag docks it above its grid; the same icon again, another tab or a closed drawer folds it.
 

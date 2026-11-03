@@ -10,7 +10,7 @@ import { clusterById, clustersOf as clusters, countryPart, HOME_ALIAS, homeBase,
 import { gainEnergy, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
-import { isWild, wildById, wildNear3, wildPriced } from './wild.js';
+import { isWild, wildById, wildNear3, wildNearOf, wildPriced, wildPricedOf } from './wild.js';
 import { worldOf } from './world.js';
 
 export interface TravelPass { kind: 'day'; from: number; until: number }
@@ -24,6 +24,7 @@ export interface TravelState {
   stamps: TravelStamp[];                         // first-visit order
   fallback: { near3: string[]; near10: string[] };   // frozen when the block is made (§11.2.3); empty until clusters load
   wild_near3?: string[];                         // v7 (355 C, plan §1.5): the three wild sites nearest home's base (q(184), as fallback.near3), free forever; frozen when the home is picked or changed; absent until then, and wild.ts works them out from home (wildNear3)
+  wild_priced?: string[];                        // v4q(3) ③a: the nearest iron and quartz veins and 2 quarries from home's base (the priced guarantee, wild.fares); frozen with wild_near3
   explorer: number;                              // the highest Explorer medal granted: 0 / 3 / 10 / 30 / 100
   // Choosing a home (q(160)–q(163), SGODOT-303): optional, no save version. A save without them chose San Francisco
   // and farms at content.profile.farm_at (q(163) ③).
@@ -95,11 +96,19 @@ export function fallbackOf(c: P0Content, home: string): { near3: string[]; near1
   return at && cl ? cl.fallback(home, at) : { near3: [], near10: [] };
 }
 
+/** v4q(3): the wild sites a home's save freezes with its city fallback — the free 3 and the priced guarantee's 4 (none
+ * without the catalogue: wild.ts then works them out when asked). */
+export function wildFrozen(c: P0Content, home: string): { wild_near3?: string[]; wild_priced?: string[] } {
+  const near3 = wildNearOf(c, home), priced = wildPricedOf(c, home);
+  return { ...(near3.length ? { wild_near3: near3 } : {}), ...(priced.length ? { wild_priced: priced } : {}) };
+}
+
 /** A new save's travel block: home is the written city until the player picks one; `pending` asks the client to offer
  * the pick (SGODOT-303: only a client that can show it, so an older one's new player is San Francisco's, q(163) ⑤). */
 export const freshTravel = (c: P0Content, pending = false): TravelState => {
   const home = writtenCluster(c);
-  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), explorer: 0, ...(pending ? { pending: true as const } : {}) };
+  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), ...wildFrozen(c, home), explorer: 0,
+    ...(pending ? { pending: true as const } : {}) };
 };
 
 /** The climate zone (`Temperate`, as profile.climate) of a place's city, or of the city the player is in; home's when
@@ -116,6 +125,24 @@ export const homeClimate = (c: P0Content, s?: Homed): string => homeFacts(c, s).
 function climateOfCluster(c: P0Content, cluster: string | null | undefined): string {
   const z = cluster ? (isWild(cluster) ? wildById(c, cluster)?.climate : clusterById(c, cluster)?.climate) : undefined;
   return z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate;
+}
+
+/** v4q(1) ④: city stamps — first visits to cities (a wild site never stamps). */
+export function cityStamps(s: P0State): number {
+  return (s.travel?.stamps ?? []).filter(x => !isWild(x.cluster)).length;
+}
+
+/** v4q(1) ④: climate bands other than home's the player has arrived in — a city or a wild site with an arrival. A visit
+ * whose place the content no longer knows counts for nothing (亚瑟 on #634): never the default climate's band. */
+export function climatesVisited(c: P0Content, s: P0State): number {
+  const home = homeClimate(c, s), seen = new Set<string>();
+  for (const at of Object.keys(s.travel?.visits ?? {})) {
+    const known = isWild(at) ? wildById(c, at)?.climate : clusterById(c, at)?.climate;
+    if (!known) continue;
+    const z = climateOfCluster(c, at);
+    if (z !== home) seen.add(z);
+  }
+  return seen.size;
 }
 
 /** Distance from the home's base point (q(184)) and the Trip band, by CityClusters.trip (the client's P0Clusters rule). */

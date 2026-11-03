@@ -1,8 +1,8 @@
 /**
- * Gathering spots and coming home (plan §13.2, §10.4.8, q(40) / q(44); SGODOT-231). A spot is gathered with one tap,
- * 0 Energy, and is ready again 8 h after it was gathered. Its material goes straight to Farm Storage (+1 with Gather
- * Gloves); the Reed Bank's worms go to the bag, any that don't fit go to storage with the reeds. Coming home moves the
- * seven materials from the bag to storage; seeds, fertilizer, bait and torches stay with the player.
+ * Gathering and coming home (plan §10.4.8, q(40); v4q(4), SGODOT-355). Gathering is a city's points (`<cluster>~<kind><n>`,
+ * gather_points.ts; see gatherPoint): the farm's six spots (Timber Grove … Old Tree, 0 Energy, 8 h) left the farm with
+ * v4q(4) ① (the user, 11-02), and Gather Gloves with them (丁11: batch 2 makes them again with the tools). Coming home
+ * moves the bag's materials to storage; seeds, fertilizer, bait and torches stay with the player.
  * q(46): seasonings (Rock Salt, Wild Herb) travel with the player until the Spice Rack (Homestead Lv2): before it they go
  * to the bag like worms and stay there at home, because the Lv1 stove cooks from the bag; the upgrade puts them away.
  * TODO(P1): only at home; the P0 server trusts cmd.space (absent on older clients).
@@ -11,13 +11,14 @@ import { add, room, take } from './bag.js';
 import type { P0Content } from './content.js';
 import type { Refusal } from './fishing.js';
 import { unlocked } from './homestead.js';
-import type { P0Event } from './progress.js';
+import type { GatherPoint } from './gather_points.js';
+import { gatherPointById } from './gather_points.js';
+import { energyDetail, spendEnergy, type P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { putInStorage } from './storage.js';
 
 const H = 3_600_000;
 
-export function hasGloves(c: P0Content, s: P0State): boolean { return s.owned.includes(c.gather.gloves); }
 
 /** Rock Salt and Wild Herb (materials with an ingredient family, §7.3.1). */
 export function isSeasoning(c: P0Content, id: string): boolean { return !!c.materials[id]?.ingr; }
@@ -27,30 +28,40 @@ export function carried(c: P0Content, s: P0State, id: string): boolean {
   return !c.materials[id] || (isSeasoning(c, id) && !unlocked(c, s, 'spice_rack'));
 }
 
-/** What one gather gives now: the material with the gloves' +1, then the side yield (worms) as listed. */
-export function spotYield(c: P0Content, s: P0State, spot: string): [string, number][] {
-  const def = c.gather.spots[spot];
-  return def.yield.map(([id, qty], i) => [id, i === 0 && hasGloves(c, s) ? qty + c.gather.gloves_bonus : qty]);
+/** The gather command: a city's point by id; anything else (a farm spot's old id too) is bad_spot. */
+export function gather(c: P0Content, s: P0State, cmd: { spot?: unknown; space?: string }, now: number, events: P0Event[]): Refusal | null {
+  const point = gatherPointById(c, cmd.spot);
+  return point ? gatherPoint(c, s, point, cmd.space, now, events) : { code: 'bad_spot' };
 }
 
-export function gather(c: P0Content, s: P0State, cmd: { spot?: unknown; space?: string }, now: number, events: P0Event[]): Refusal | null {
-  if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
-  const id = String(cmd.spot ?? ''), def = c.gather.spots[id];
-  if (!def) return { code: 'bad_spot' };
-  if (s.homestead.level < def.homestead) return { code: 'homestead_level', detail: { need: def.homestead } };
-  const ready = s.gather.ready_at[id] ?? 0;
+/**
+ * A city's gathering point (v4q(4) ③–⑤; the user, 11-02: 丁9 / 丁10 / 丁11): in that city — `travel.here` is its cluster,
+ * so on the farm (here is home) a home city's points are gathered from the map too (丁9) — from Homestead Lv1 (丁3). One
+ * tap: 3 Energy (the point's), ready again 4 h after (its cooldown_h, by point id and player); T1 gives 4, T2 3, a reed
+ * bank 2 worms besides. Away it all goes to the bag, home with the player (storeMaterials): the whole main yield must
+ * fit or nothing is gathered — no Energy, no cooldown (丁10: `No room · free a slot first`); worms that don't fit go to
+ * Farm Storage (q(44)). On the farm (space `home`) the material goes to storage at once, as coming home would put it, the
+ * bag not asked; worms and seasonings before the Spice Rack go to the bag as far as they fit, as the farm's spots did.
+ */
+export function gatherPoint(c: P0Content, s: P0State, point: GatherPoint, space: string | undefined, now: number, events: P0Event[]): Refusal | null {
+  if (s.travel.here !== point.cluster) return { code: 'not_here', detail: { cluster: point.cluster } };
+  const ready = s.gather.ready_at[point.id] ?? 0;
   if (now < ready) return { code: 'not_ready', detail: { ready_in: ready - now } };
   if (now - s.gather.last_at < c.gather.tempo_ms) return { code: 'tempo', detail: { ready_in: c.gather.tempo_ms - (now - s.gather.last_at) } };
+  if (s.energy.value < point.energy) return { code: 'need_energy', detail: energyDetail(c, s, now, point.energy) };
+  const onFarm = space === 'home';
+  const [main] = point.yield;
+  if (!onFarm && main && room(c, s, main[0]) < main[1]) return { code: 'bag_full', detail: { item: main[0], need: main[1] } };
+  spendEnergy(c, s, now, point.energy, events, 'gather');
   const items: [string, number, 'storage' | 'bag'][] = [];
-  for (const [item, qty] of spotYield(c, s, id)) {
-    // Materials go to storage; worms (and seasonings before the Spice Rack) go to the bag as far as they fit.
-    const toBag = carried(c, s, item) ? Math.min(qty, room(c, s, item)) : 0;
+  for (const [item, qty] of point.yield) {
+    const toBag = !onFarm || carried(c, s, item) ? Math.min(qty, room(c, s, item)) : 0;
     if (toBag > 0) { add(c, s, item, toBag); items.push([item, toBag, 'bag']); events.push({ kind: 'item', id: item, delta: toBag }); }
     if (qty - toBag > 0) { putInStorage(s, item, qty - toBag); items.push([item, qty - toBag, 'storage']); }
   }
-  s.gather.ready_at[id] = now + c.gather.regen_h * H;
+  s.gather.ready_at[point.id] = now + point.cooldown_h * H;
   s.gather.last_at = now;
-  events.push({ kind: 'gather', spot: id, items, ready_in: c.gather.regen_h * H });
+  events.push({ kind: 'gather', spot: point.id, items, ready_in: point.cooldown_h * H });
   return null;
 }
 
@@ -74,14 +85,10 @@ export function storeMaterials(c: P0Content, s: P0State, now: number, events: P0
   events?.push({ kind: 'stored', items, reason });
 }
 
-/** §13.2 spots as facts: open (Homestead level), ready or how long until, and what a gather would give now. */
-export function gatherView(c: P0Content, s: P0State, now: number) {
-  return {
-    gloves: hasGloves(c, s),
-    spots: Object.entries(c.gather.spots).map(([id, def]) => {
-      const ready_in = Math.max(0, (s.gather.ready_at[id] ?? 0) - now);
-      const open = s.homestead.level >= def.homestead;
-      return { id, name: def.name, open, homestead: def.homestead, ready: open && ready_in === 0, ready_in, yield: spotYield(c, s, id) };
-    }),
-  };
+/** city_ready: the city points still cooling down, id → ms until ready (v4q(4); 亚瑟 on #659: in the view, which every
+ * command brings back, not the city read, which the client keeps per city). The farm's spots left with v4q(4) ①. */
+export function gatherView(_c: P0Content, s: P0State, now: number) {
+  const city_ready: Record<string, number> = {};
+  for (const [id, at] of Object.entries(s.gather.ready_at)) if (id.includes('~') && at > now) city_ready[id] = at - now;
+  return { city_ready };
 }

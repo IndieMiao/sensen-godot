@@ -53,8 +53,15 @@ export type P0Event =
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
   | { kind: 'kindred'; resident: string; postcard: string; title: string }   // first reached Kindred (q(171))
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
-  | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared' | 'express' | 'express_unlocked'
-      | 'hit' | 'defeat' | 'hurt' | 'knocked_out' | 'complete'; run: number; floor: number; cost: number;
+  | { kind: 'mine_floor'; mine: string; floor: number; cleared: boolean; station: boolean }
+  | { kind: 'mine_record'; mine: string; deepest: number }
+  | { kind: 'mob_down'; index: number; mob: string }
+  | { kind: 'guard_down'; mob: string; floor: number; first: boolean }
+  | { kind: 'mine_ko'; floor: number; lost: [string, number][] }
+  // 355 G (contract-efg §9.2): Pip's First Dig done (weapon: its reward, equipped: now in hand), and a weapon into the slot
+  | { kind: 'first_dig'; done: true; weapon: string | null; equipped: boolean }
+  | { kind: 'gear'; item: string; equipped: boolean }
+  | { kind: 'mine'; action: 'torch' | 'rock' | 'hit' | 'hurt'; mine: string; floor: number; cost: number;
       rock?: number; drop?: string | null;
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }

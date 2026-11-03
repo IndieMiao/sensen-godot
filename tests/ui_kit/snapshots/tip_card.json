@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    590
+    642
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        520
+        572
       ],
       "children": [
         {
@@ -296,7 +296,7 @@
             16,
             526,
             296,
-            64
+            48
           ],
           "children": [
             {
@@ -305,14 +305,14 @@
                 30,
                 538,
                 268,
-                40
+                24
               ],
               "children": [
                 {
                   "type": "TextureRect",
                   "rect": [
                     30,
-                    547,
+                    539,
                     22,
                     22
                   ]
@@ -321,12 +321,54 @@
                   "type": "Label",
                   "rect": [
                     62,
-                    538,
+                    540,
                     236,
-                    40
+                    20
                   ],
                   "variation": "BodyB14",
-                  "text": "Browse the map for free. Travel costs Energy and coins."
+                  "text": "Browse the map for free."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            16,
+            594,
+            296,
+            48
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                30,
+                606,
+                268,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    30,
+                    607,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    62,
+                    608,
+                    236,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Travel costs Energy and coins."
                 }
               ]
             }

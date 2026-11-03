@@ -51,8 +51,18 @@ static func entrance() -> Node3D:
 	result.add_child(_mesh(surface, "MineArch"))
 	return result
 
-static func floor_scenery(floor_number: int, elevator_unlocked: bool) -> Node3D:
-	var number := clampi(floor_number, 1, 5)
+## The P0 mine's chamber for a floor (355 b1): the look of its band — B1 for Floors 1–9, B2 for 10–19 … B5 from 40 on
+## (contract-efg §10.1: the palettes by band come with the 3D on 11-14) — and its up ladder; the elevator is the
+## caller's, as only Floor 1 and the stops have one (contract-efg §4 ⑤).
+static func variant_of(floor_number: int) -> int:
+	return clampi(1 + floor_number / 10, 1, 5)
+
+static func chamber(floor_number: int) -> Node3D:
+	var root := _chamber_instance(variant_of(floor_number))
+	root.add_child(ladder(Layout.UP, true))
+	return root
+
+static func _chamber_instance(number: int) -> Node3D:
 	if not _floor_cache.has(number):
 		var template := _chamber(number)
 		for child in template.get_children(): child.owner = template
@@ -60,7 +70,11 @@ static func floor_scenery(floor_number: int, elevator_unlocked: bool) -> Node3D:
 		packed.pack(template)
 		template.free()
 		_floor_cache[number] = packed
-	var root := (_floor_cache[number] as PackedScene).instantiate() as Node3D
+	return (_floor_cache[number] as PackedScene).instantiate() as Node3D
+
+static func floor_scenery(floor_number: int, elevator_unlocked: bool) -> Node3D:
+	var number := clampi(floor_number, 1, 5)
+	var root := _chamber_instance(number)
 	if number in [1, 5]: root.add_child(elevator(elevator_unlocked))
 	root.add_child(ladder(Layout.UP, true))
 	return root

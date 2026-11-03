@@ -14,12 +14,15 @@ extends Node
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
+const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")   # Settings › Blocked players: the account's voice (SGODOT-384)
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
+const MINE_SCENE := "res://scenes/p0/p0_mine.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the pick map opens only over a city it knows (SGODOT-342)
 const P0HomePin := preload("res://modules/p0/p0_home_pin.gd")   # the free pin (SGODOT-342): a same-city move taken
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # the home city (SGODOT-303: the change of home)
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # a local request's hand-in row for wrong_place (q(272))
 static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
@@ -152,6 +155,11 @@ func _init() -> void:
 	ui.notify.came_back()
 	if ui.notify.available(): ui.notify.native.connect("permission", func(_granted): ui.notify_changed())
 	ui.test_account_requested.connect(_switch_test_account)
+	# Settings › Blocked players (SGODOT-384): the account's voice, status and blocks, with no room
+	var voice_account := P0VoiceRoom.new()
+	voice_account.session = session
+	add_child(voice_account)
+	ui.voice_account = voice_account
 	add_child(ui)
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
@@ -175,6 +183,7 @@ func _init() -> void:
 	ui.go_pond.connect(func(id: String): _leave_then("go:pond:" + id))   # the Bite Board's pond card: Go (SGODOT-283)
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
+	session.command_settled.connect(_mine_enter_settled)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
 	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
 	session.sent.connect(func(cmd: Dictionary): _guide_feedback.sent(cmd, ui.view))
@@ -366,24 +375,26 @@ func _root_is_world() -> bool:
 	return root != null and root.has_method("p0_surface")
 
 ## Where the player is while the map is up (MAP-1, §10.6.1): the place chip keeps naming it, and a tap on the chip
-## goes back there. Set by every world but the map: "farm" for the farm, its farmhouse and the mine (they are the
-## homestead), "pond:<id>", "outpost:<id>".
+## goes back there. Set by every world but the map: "farm" for the farm and its farmhouse (the homestead),
+## "pond:<id>", "outpost:<id>", "mine:<id>" (a wild site's mine, 355 b1: the map opens its mouth card).
 var return_to := "farm"
 
 ## The route back to world `w` from the map, as return_to holds it.
 static func route_of(w: Object) -> String:
 	var id := ""
 	match space_of(w):
-		"pond": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""
+		"pond", "mine": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # a mine is a wild site (355 b1)
 		"outpost":
 			var o = w.get("outpost")
 			id = str((o as Dictionary).get("id", "")) if o is Dictionary else ""
 	# A pond or outpost that does not say which one goes back to the farm (刘邦 on #92), never to "pond:".
 	return "%s:%s" % [space_of(w), id] if id != "" else "farm"
 
-## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
+## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1). A world with its own
+## way out takes it (p0_leave: the mine back at its mouth, 355 b1).
 func _on_place_pressed() -> void:
 	if is_instance_valid(world) and str(_call("p0_surface", [])) == "map": _call("p0_return", [return_to])
+	elif is_instance_valid(world) and world.has_method("p0_leave"): world.call("p0_leave")
 	else: leave_world()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
@@ -418,6 +429,8 @@ func _process(dt: float) -> void:
 	_dev_shot(dt)
 	_dev_mem(dt)
 	_tick_screens(dt)
+	# the room's voice for the HUD's mic key and people drawer (SGODOT-383): an outpost's or a pond's, else none
+	ui.set_voice_room(world.get("voice_room") if is_instance_valid(world) else null)
 	if ui.offline:
 		_probe_left -= dt
 		if _probe_left <= 0.0: _probe()
@@ -591,7 +604,35 @@ func _read_home_places(v: Dictionary) -> void:
 	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
+## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
+## 亚瑟's P0Map.open_wild_card) or the dev step mine:<id>[:<floor>] — onto Floor 1 or one of its stops. The mine opens
+## over this world on the reply's mine_floor event, on the floor the server landed the player on; a refusal says why
+## (P0MaterialLogic.refusal_text) and nothing opens.
+var _entering_mine := ""
+func enter_mine(id: String, floor := 1) -> void:
+	if id == "" or _entering_mine != "": return
+	_entering_mine = id
+	if not session.send({"type": "mine_enter", "mine": id, "floor": floor}, "mine_enter"): _entering_mine = ""
+
+## A refused or failed mine_enter opens nothing; the next try may go.
+func _mine_enter_settled(key: String, ok: bool, _code: String) -> void:
+	if key == "mine_enter" and not ok: _entering_mine = ""
+
+func _mine_opened(events: Array) -> void:
+	if _entering_mine == "": return
+	for e in events:
+		if str(e.get("kind", "")) == "mine_floor" and str(e.get("mine", "")) == _entering_mine:
+			var id := _entering_mine
+			_entering_mine = ""
+			# in the mine already for the server's reads while the scene loads: a timed read with space=map in those frames
+			# would take the player out again (notePresence; 亚瑟 on #629). The scene's attach sets the same.
+			session.space = "mine"
+			session.place = id
+			AppRouter.open_instance(MINE_SCENE, {"mine": id, "floor": int(e.get("floor", 1))})
+			return
+
 func _on_state(v: Dictionary, events: Array) -> void:
+	_mine_opened(events)
 	var before: Dictionary = ui.view
 	var guide_feedback := _guide_feedback.take(before, v, events)
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
@@ -1053,7 +1094,7 @@ func _show_guide_resend(resend: Dictionary) -> void:
 	UiItemFly.launch(ui.root, at, bag, P0Logic.icon(id), n, 0.0, func(): UiItemFly.bump(bag))
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
-## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
+## ones a float; a gate break-free gets the four-line card once per species, then "Too strong · Fishing Lv4" (q(278));
 ## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
 ## floats rise (over the player's head for a landed fish, the cast point for an escape, when the pond knows
 ## them); `card_after` holds the Caught! card that long after the reply's floats there (不知火舞 on 231 / #154).
@@ -1078,10 +1119,8 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
 				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
-			else:   # second time on: `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back` (q(50))
-				var rod := P0Logic.rod_for(v, int(ev.get("rarity", 2)))
-				var what := ("Lv%d" % int(ev.need_level)) if ev.has("need_level") else (str(rod.name) if not rod.is_empty() else "rod too light")
-				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, UiFloatText.Tone.ENERGY_GAIN)
+			else:   # second time on: `Too strong · Fishing Lv8 · 3 Energy back` (q(278)) / `Got away · Reed Rod · …` (q(50))
+				ui.float_text(P0Logic.break_free_float(v, ev), where, UiFloatText.Tone.ENERGY_GAIN)
 		"escaped":
 			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
@@ -1099,6 +1138,16 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	_dex_energy.erase(id)
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
+## q(270) ⑥'s toast for a Market Board request taken or handed in in the wrong city (379 6760e0f8, no new copy): its
+## hand-in row as Today writes it (`Deliver at Shibuya Market Square · Tokyo`, P0PinReason.market_at); a view that no
+## longer has the request names the server's city as that row does without a square's name (`Deliver at the market ·
+## Tokyo`), never the code.
+static func wrong_city_line(view: Dictionary, request: String, city: String) -> String:
+	var r := PinReason.request_of(view, request)
+	if str(r.get("deliver", "")) != "": return str(r.deliver)
+	var name := str(P0Clusters.get_cluster(city).get("name", "")) if city != "" else ""
+	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
+
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
@@ -1109,6 +1158,17 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) in ["cook", "batch_cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
+	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥). An Error toast, as
+	# every refused command's but Energy's (§4.8.6; 不知火舞 11-02: wrong_place and wrong_city alike)
+	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
+		var r := PinReason.request_of(session.view, str(cmd.request))
+		if not r.is_empty():
+			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
+			return
+	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
+		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
+		return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -1142,7 +1202,17 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		# but the player is not in that city — the same card, at the return fare
 		"pass_required", "trip_expired", "travel_required":
 			var preview: Dictionary = detail.get("preview", {})
-			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
+			var to := str(preview.get("cluster", ""))
+			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(to, preview)
+			# a pond or a room the player should not be in (SGODOT-382): back to the map, where the city's travel card
+			# opens at the fare the server named, as a room that refused the join does. No back lock is asked: the
+			# pond's would only close its fishing panel and keep the player there (周瑜 on #642)
+			elif to != "" and is_instance_valid(world):
+				after_leave = "travel:" + to
+				# not a place to go back to: the map's chip names where the player is (LOCK-06; 不知火舞 on #642: it kept
+				# `Hayward · Acorn Creek` with the home icon after a pass ran out there and the server had them home)
+				return_to = "farm"
+				leave_to_map()
 			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
@@ -1161,7 +1231,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_home":
 			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
 			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
-		"need_material", "skills_short", "max_level":
+		"need_material", "skills_short", "travel_short", "max_level":
 			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
 			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
 			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
@@ -1170,7 +1240,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
 			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
-				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("skill", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
+			elif code == "travel_short":
+				ui.toast_error(P0Logic.home_gate_gap(str(detail.get("kind", "")), int(detail.get("need", 0)), int(detail.get("have", 0))))
 			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
@@ -1205,7 +1277,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			var cur := session.current()
 			var at := {"homestead": cur.get("homestead", {}),
 				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
-			ui.toast_error(str(P0Logic.fields_full_action(at).toast))
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast))   # broken at its « · » as the grey key's (toast_error always does, 11-02)
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":
@@ -1536,16 +1608,20 @@ func _begin_arrival(w: Node) -> void:
 	# AppRouter gives a load 30 s; a cover older than that belonged to a trip that never arrived.
 	if _launch_s >= 0.0 or session.view.is_empty() or w.scene_file_path != str(_arrive.path) \
 			or Time.get_ticks_msec() - int(_arrive.t0) > 35000:
-		_arrive = {}
+		# not this trip's world (a room that refused the join sent the player back to the map, SGODOT-382): the trip is
+		# over — its clock stops too, or 20 s later Couldn't get there would open over the map with nothing to undo
+		_end_arrival()
 		return
 	_arrive_s = 0.0
 
 func _end_arrival() -> void:
-	if _arrive.is_empty(): return
+	var had := not _arrive.is_empty()
 	_arrive = {}
 	_arrive_s = -1.0
+	# the covers go whatever is left of the trip: Go back on a Couldn't get there whose trip was already dropped must
+	# still close it (SGODOT-382: it stayed up over the map, Back and Go back dead)
 	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
-	_flush_arrival_toast()
+	if had: _flush_arrival_toast()
 
 ## A toast for the place being opened (Go home's `Welcome home`, 司空震 on 286): said once its loading cover is gone, not
 ## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S.
@@ -1993,6 +2069,11 @@ func _dev_shot(dt: float) -> void:
 				var gone := {"fish": step[1], "rarity": int(P0Logic.item(session.current(), step[1]).get("rarity", 3)), "refund": 5, "protected_left": 8}
 				if step.size() < 3 or step[2] == "level": gone["need_level"] = 4
 				ui.show_got_away(gone)
+			"rowinfo":   # rowinfo:rod_carbon — the open counter's row › card (q(278) shots)
+				for d in ui.find_children("*", "P0CounterDrawer", true, false): ui.counter_info(d, step[1])
+			"breakfloat":   # breakfloat:8 — a gate fish breaking free again, its float (q(278) shots)
+				ui.float_text(P0Logic.break_free_float(session.current(), {"rarity": 4, "need_level": int(step[1]), "refund": 3}),
+					anchor(), UiFloatText.Tone.ENERGY_GAIN)
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
@@ -2041,8 +2122,8 @@ func _dev_shot(dt: float) -> void:
 			"showmap":   # showmap:pond:pond_san_francisco_03 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
-			"newrun": P0MaterialCards.open_new_run(ui, session.current(), func(c: Dictionary): session.send(c))   # MINE-P0-7
-			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
+			"mine":   # mine:wd-dev-quarry[:20] — into that mine (355 b1, contract-efg §11: the development mines need no Day Pass)
+				enter_mine(step[1], int(step[2]) if step.size() > 2 else 1)
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()
 				ui.show_spot.emit(step[1])

@@ -79,9 +79,17 @@ export function handOver(c: P0Content, s: P0State, id: string, qty: number): voi
   else take(s.bag, id, qty, 'skip');
 }
 
-/** Completion bonus actually paid today: request bonuses share a 100-coin daily cap (§9.13.2). */
+/** The daily cap on completion bonuses (§9.13.2): by the Homestead level where the content gives one (q(272) ⑩), else cap. */
+export function bonusCap(c: P0Content, s: Pick<P0State, 'homestead'>): number {
+  const q = c.quotas.request_bonus;
+  let cap = q.cap;
+  for (const [from, n] of q.by_homestead ?? []) if (s.homestead.level >= from) cap = n;
+  return cap;
+}
+
+/** Completion bonus actually paid today: request bonuses share a daily cap (§9.13.2, bonusCap). */
 export function payBonus(c: P0Content, s: P0State, bonus: number): number {
-  const paid = Math.max(0, Math.min(bonus, c.quotas.request_bonus.cap - s.day.bonus));
+  const paid = Math.max(0, Math.min(bonus, bonusCap(c, s) - s.day.bonus));
   s.day.bonus += paid;
   return paid;
 }

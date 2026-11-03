@@ -21,7 +21,7 @@ import { carryGiftParcels } from './parcels.js';
 import { dayKey, rolloverAfter } from './rules.js';
 import type { P0Event } from './progress.js';
 import { letGoAway, type P0State } from './state.js';
-import { clusterOf, fallbackOf } from './travel.js';
+import { clusterOf, fallbackOf, wildFrozen } from './travel.js';
 import { cityPlaces, clusterAdmin, hash32, km, offset, tierOf, worldOf } from './world.js';
 
 type Point = { lat: number; lng: number };
@@ -314,6 +314,9 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
     const v = t.visits[from];
     if (!v && !first) t.visits[from] = { n: 1, first_at: t.home_chosen_at ?? s.created_at, last_at: now, deliveries: 0, delivered_day: '' };
     delete t.passes[city];   // home needs no pass
+    // q(272): home gives no local requests — one tracked in the new home is dropped, free, as a resident's above
+    for (const sl of s.locals?.[city]?.slots ?? []) if (sl.req.status === 'accepted') dropped.push(sl.req.id);
+    delete s.locals?.[city];
   }
   if (t.here === from) t.here = city;
   t.home = city;
@@ -328,6 +331,8 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   if (cmd.type === 'change_home') t.home_changes = (t.home_changes ?? 0) + 1;
   delete t.pending;
   t.fallback = fallbackOf(c, city);
+  delete t.wild_near3; delete t.wild_priced;
+  Object.assign(t, wildFrozen(c, city));   // v4q(3): the free 3 and the priced guarantee frozen again with the fallback
   if (hold) { t.day_hold = hold; carryGiftParcels(s, oldEnd, hold.until); }
   letGoAway(c, s);
   recallAwayTraps(c, s, now, events);   // q(177) ③

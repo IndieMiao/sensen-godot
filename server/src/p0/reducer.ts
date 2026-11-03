@@ -5,6 +5,7 @@ import { add, count, room, take } from './bag.js';
 import { settleCards } from './cards.js';
 import { batchCook, burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
+import { isLocal, localCommand, pruneCities, settleLocals } from './locals.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteHarvested, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -13,6 +14,7 @@ import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
+import { notePipLine, settleFirstDig } from './first_dig.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
 import { addPlots, compost, cropGrowH, facilityAt, fieldCap, fieldsUsed, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
@@ -87,7 +89,7 @@ type P0CommandBody =
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
-  | { ok: false; code: string; detail?: Record<string, unknown> };
+  | { ok: false; code: string; detail?: Record<string, unknown>; state?: P0State };
 
 const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok: false, code, detail });
 
@@ -110,7 +112,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleCards(c, s);   // today's recipe cards are fixed on the first command of the day
+  pruneCities(c, s, now);   // q(272) ⑪: a city not visited for 30 days, nothing tracked there, starts over
   settleBoards(c, s, now);
+  settleLocals(c, s, now);   // q(272): the day's local requests of the city the player is in
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.
   // With several stoves (SGODOT-282) only the stove holding that pot waits; the others settle as usual.
@@ -118,6 +122,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     ? burners(c, s).findIndex(b => b.stove !== null && cmd.pot === (b.stove.id ?? null)) : -1;
   settleStove(c, s, now, events, aimed < 0 ? undefined : aimed);
   settleMine(c, s, now);
+  // The old day's in-flight action is refused, but the deterministic new floor must survive a restart.
+  if (isMineCommand(cmd) && cmd.type !== 'mine_enter' && cmd.day !== dayKey(c, s, now))
+    return { ok: false, code: 'new_day', state: s };
   settleParcels(c, s, now);
   // SGODOT-351: a hand left past its day or 24 h is stood and paid on any command (its result waits for bj_open)
   const bjSettled = settleBlackjack(c, s, now, events, cmd.type);
@@ -128,7 +135,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   noteEntered(s, cmd.space, cmd.place);
-  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);   // the city the player stands in
+  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);
   noteVisit(c, s, cmd.space, cmd.place, now, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
@@ -322,6 +329,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'accept': case 'deliver': case 'drop': {
       const id = String(cmd.request ?? '');
       const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(c, s))
+        : isLocal(id) ? localCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place })   // q(272)
         : boardCommand(c, s, cmd.type, id, now, events, { space: cmd.space, place: cmd.place });
       if (refusal) return fail(refusal.code, refusal.detail);
       if (cmd.type === 'deliver') noteDelivery(c, s, now);   // toward Regular in the city the player is in (§11.9.1)
@@ -331,6 +339,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : cmd.type === 'learn' ? learn(c, s, cmd, now, events)
         : giftResident(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (cmd.type === 'talk') notePipLine(c, s, cmd.resident);   // v4q(9) ②: Pip's vein line, if due, is said in this talk
       break;
     }
     case 'cabinet_take': {
@@ -351,6 +360,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      settleFirstDig(c, s, now, events);   // 355 G: First Dig shows at Lv3, done at once for one who already reached its floor
       break;
     }
     case 'chop': {
@@ -458,6 +468,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (!isMineCommand(cmd)) return fail('unknown_command');
       const refusal = mineCommand(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (events.some(e => e.kind === 'mine_record')) settleFirstDig(c, s, now, events);   // 355 G: a new deepest may finish First Dig
     }
   }
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in

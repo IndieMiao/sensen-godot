@@ -92,30 +92,22 @@ function around(cat: Catalogue, at: { lat: number; lng: number }, km: number): {
 }
 
 /**
- * v4 §1.5: the nearest 3 open wild sites from a home's base point (q(184)), with at least one quarry and one vein — the
- * nearest of a missing type takes the place of the farthest that is not the only one of its type. Frozen into the save
- * with the city fallback (travel.wild_near3) and worked out again when the home changes.
+ * v4 §1.5 as the user set it (11-02 庚3, v4q(3) ③): the free 3 from a home's base point (q(184)) are the nearest quarry,
+ * the nearest iron vein and the nearest quartz vein — one of each, however far (the search widens until it finds it), so
+ * the first week's veins cost no fare (they were "at least one quarry and one vein": 6 of 13 homes paid for the second).
+ * Nearest first, ties by id. Frozen into the save with the city fallback (travel.wild_near3) and worked out again when the
+ * home changes; saves frozen under the old rule are frozen again with week 3's clean start (v4q(2)).
  */
 export function wildNearOf(c: P0Content, home: string): string[] {
   const cat = catalogue(c), at = homeBase(c, { travel: { home } });
   if (!cat || !at) return [];
-  // the search widens until it finds what it wants: three sites, then a missing type wherever it is (李白 on v4q(3) ③a)
-  const nearest = (want: (x: WildSite) => boolean, n: number) => {
+  const nearest = (want: (x: WildSite) => boolean) => {
     let found: { s: WildSite; km: number }[] = [];
-    for (let km = 150; km <= 20_000 && found.length < n; km *= 2) found = around(cat, at, km).filter(x => want(x.s));
-    return found.slice(0, n);
+    for (let km = 150; km <= 20_000 && !found.length; km *= 2) found = around(cat, at, km).filter(x => want(x.s));
+    return found[0];
   };
-  const pick = nearest(() => true, 3);
-  for (const need of ['quarry', 'vein']) {
-    if (pick.some(x => x.s.type === need)) continue;
-    const add = nearest(x => x.type === need, 1)[0];
-    if (!add) continue;
-    // drop the farthest pick whose type another pick also has (else the farthest)
-    let drop = -1;
-    for (let i = pick.length - 1; i >= 0 && drop < 0; i--) if (pick.filter(x => x.s.type === pick[i].s.type).length > 1) drop = i;
-    pick.splice(drop < 0 ? pick.length - 1 : drop, 1);
-    pick.push(add);
-  }
+  const pick = [nearest(x => x.type === 'quarry'), nearest(x => x.type === 'vein' && x.mine?.main === 'iron_ore'),
+    nearest(x => x.type === 'vein' && x.mine?.main === 'quartz')].filter((x): x is { s: WildSite; km: number } => !!x);
   return pick.sort((a, b) => a.km - b.km || (a.s.id < b.s.id ? -1 : 1)).map(x => x.s.id);
 }
 
@@ -146,12 +138,29 @@ export const wildNear3 = (c: P0Content, s: P0State): string[] => {
   return kept?.length ? kept : wildNearOf(c, homeOf(c, s));
 };
 
-/** A site as the player sees it: the catalogue's fields and theirs (contract-c §3). */
+/** The free 3 as Today's vein row reads them (v4q(9), 亚瑟): near3's order (nearest first), each `{id, type, main, name}` —
+ * `main` a vein's one main (`iron_ore` / `quartz`), null for a quarry; `name` the site's full name, the very field its pin
+ * and its mine card show (`siteFor`'s, the viewport's). */
+export function near3Sites(c: P0Content, s: P0State, near3 = wildNear3(c, s)): { id: string; type: string; main: string | null; name: string }[] {
+  return near3.map(id => wildById(c, id)).filter((x): x is WildSite => !!x)
+    .map(x => ({ id: x.id, type: x.type, main: x.mine?.main ?? null, name: x.name }));
+}
+
+/** The nearest free vein of one main (`iron_ore`, `quartz`) — from the save's frozen 3, which hold one of each (庚3): the one
+ * Today's vein row (`<name> · Reach Floor 10`) and Pip's line (`There's iron at <name>`) both name, so the two are always
+ * the same mine (v4q(9); 亚瑟, 周瑜's Pip line reads this too). null when none of the 3 is one. */
+export function nearestFreeVein(c: P0Content, s: P0State, main: string): { id: string; name: string } | null {
+  const v = near3Sites(c, s).find(x => x.type === 'vein' && x.main === main);
+  return v ? { id: v.id, name: v.name } : null;
+}
+
+/** A site as the player sees it: the catalogue's fields and theirs (contract-c §3); best_floor is the deepest floor they
+ * reached in its mine (E's records, contract-efg §3), 0 before they went down. */
 export function siteFor(c: P0Content, s: P0State, site: WildSite, now: number, near3 = wildNear3(c, s)) {
   const at = homeBase(c, s), km = at ? distanceKm(at, site) : 0;
   const pass = s.travel.passes[site.id];
   return { ...site, km: Math.round(km * 10) / 10, trip: tripByKm(km), free: near3.includes(site.id), visited: !!s.travel.visits[site.id],
-    pass_until: pass && pass.until > now ? pass.until : null, best_floor: 0 };
+    pass_until: pass && pass.until > now ? pass.until : null, best_floor: s.mine?.records?.[site.id]?.deepest ?? 0 };
 }
 
 export interface Bbox { south: number; west: number; north: number; east: number }

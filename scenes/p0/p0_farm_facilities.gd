@@ -420,16 +420,16 @@ func _begin(p: Dictionary) -> void:
 		_begin_yard(v)
 		return
 	placing.plot = nearest_spot(v, farm.actor.position, int(p.facility), str(p.kind))
-	# no whole block open on the grid yet (不知火舞 on the grid, SGODOT-355 b1): an Info toast on entering; the cells in the
-	# way still go red as q(130) ④ has it
-	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Homestead grows")
 	_preview = _greenhouse_art(cover_of(v, maxi(0, int(placing.plot)), str(p.kind)), false) if is_block(str(p.kind)) else _sprinkler_art()
 	_preview.name = "PlacementPreview"
 	farm.add_child(_preview)
 	rt.ui.begin_placement({"confirm": p.confirm})
-	if int(placing.plot) >= 0: farm.placement_camera_begin(_spot_center(v, int(placing.plot)))
-	else: farm.placement_camera_begin(farm.actor.position)
+	# no spot to take: the camera frames the open beds, not the grass where the player stands (不知火舞 on #624)
+	farm.placement_camera_begin(_spot_center(v, int(placing.plot)) if int(placing.plot) >= 0 else beds_center(v))
 	_show_spot(v, int(placing.plot))
+	# no whole block open on the grid yet (不知火舞 on the grid, SGODOT-355 b1): an Info toast on entering, over the caption;
+	# the cells in the way still go red as q(130) ④ has it
+	if is_block(str(p.kind)) and not has_open_block(v, str(p.kind)): rt.ui.toast("More plots open as your Homestead grows")
 
 ## A yard facility: the preview starts on the free cell nearest the workbench (a moved one: nearest where it stands).
 func _begin_yard(v: Dictionary) -> void:
@@ -457,6 +457,14 @@ func _show_yard(v: Dictionary, cell: Vector2i) -> void:
 	farm.placement_grid(at)
 	_paint_tints([[at, BAD_TINT if reason != "" else OK_TINT]] if cell != P0Decor.NONE else [])
 	rt.ui.set_placement({"caption": caption(v, -1, str(placing.kind)), "reason": reason})   # two keys: the reason on Done
+
+## The middle of the open beds, at their tops (the placement camera when there is no spot to take).
+func beds_center(v: Dictionary) -> Vector3:
+	var n := P0Garden.plot_count(v)
+	if n <= 0: return farm.actor.position
+	var sum := Vector3.ZERO
+	for id in n: sum += _bed_top(id)
+	return sum / float(n)
 
 ## Where a spot's preview stands: the bed top, or the middle of a greenhouse's block.
 func _spot_center(v: Dictionary, plot: int) -> Vector3:

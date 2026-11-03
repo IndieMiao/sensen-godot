@@ -10,7 +10,6 @@ const P0NoticeBoardLogic := preload("res://modules/p0/p0_notice_board.gd")   # t
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
-const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const FarmGuide = preload("res://scenes/p0/p0_farm_guide.gd")
@@ -51,9 +50,8 @@ var beds: MultiMeshInstance3D
 var _hi: MeshInstance3D
 var _house := Vector3.ZERO
 var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
-var _mine := Vector3.ZERO
 var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
-var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
+var _materials: P0FarmMaterials   # SGODOT-231: gathering spots and the workbench (the mine mouth left in 355 b1)
 var _facilities: P0FarmFacilities   # P1 SGODOT-241: sprinklers, placement mode, Coverage
 var _decor: P0FarmDecor             # P1 SGODOT-284: the yard's decor, Decorate
 var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this frame (P0Garden.pick_card)
@@ -164,8 +162,8 @@ func resume() -> void:
 	cam.make_current()
 	if rt:
 		rt.attach(self)
-		rt.ui.set_mode("farm")   # back from the mine (SGODOT-231): seeds on the bar, the farm's chip
-		rt.ui.set_place(PLACE)   # back from the farmhouse or the mine
+		rt.ui.set_mode("farm")   # back from a layer above (SGODOT-231): seeds on the bar, the farm's chip
+		rt.ui.set_place(PLACE)   # back from the farmhouse
 	if _inside:
 		# Out through the farmhouse door: stand on the doorstep facing the field.
 		_inside = false
@@ -202,12 +200,8 @@ func _build_world() -> void:
 	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
 	_bench = bp.cell_to_world(bp.anchor("bench")) + Vector3(bp.cell_m * 0.5, 0, 0)
 	props.add_child(_bench_prop(_bench))
-	_mine = bp.cell_to_world(bp.anchor("mine")) + Vector3(-0.3, 0, 0.3)
-	var mine := MineArt.entrance()
-	mine.position = _mine
-	mine.rotation.y = PI * 0.15
-	props.add_child(mine)
-	_materials = P0FarmMaterials.new().setup(self, _mine, mine)
+	# No mine mouth on the farm since 355 b1 (v4q(5) ①): the mines are wild sites, entered from the map.
+	_materials = P0FarmMaterials.new().setup(self)
 	add_child(_materials)
 	_scenery = GardenScenery.new()
 	add_child(_scenery)
@@ -701,7 +695,7 @@ func p0_show_spot(where: String) -> void:
 	if where == "stall": at = _stall
 	elif where == "sign": at = _sign   # Upgrade to Homestead LvN (q(255))
 	elif where == "plots": at = _plots_center()
-	elif _materials.spot_at(where) != null: at = _materials.spot_at(where)   # SGODOT-231: spot_*, mine, workbench
+	elif _materials.spot_at(where) != null: at = _materials.spot_at(where)   # SGODOT-231: spot_*, workbench
 	_opening = false
 	_focus = at
 	_cam_follow.hold()
@@ -724,7 +718,6 @@ func p0_show_spot(where: String) -> void:
 # ---------------------------------------------------------------- frame
 func p0_joystick(v: Vector2) -> void:
 	if actor: actor.set_input(v)
-	if v != Vector2.ZERO and _materials: _materials.cancel_walk()   # a tapped walk to the mine mouth stops (266)
 
 var _dev_aim := Vector3.INF   # aimcell (shots): steer the joystick straight at this point, logging the player each frame
 
@@ -758,12 +751,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		if _guide != null: _guide.hide_marks()
 		return
 	_pick_front(v)
-	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
-	# The mouth's EntryCard holds the farm's one card while it is up (LOCK-07: one at a time; 亚瑟 on #190): a gathering
-	# spot or the bench nearby keeps its button, never opens its strip beside it.
-	if _materials.card_wanted(): _card = "mine"
 	_materials.frame(v, _card)
 	_hold_repeat()
 	_prompts(v)
@@ -1006,15 +995,11 @@ func _hold_repeat() -> void:
 	rt.holding_repeat = false
 
 ## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)), the farmhouse
-## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
+## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37).
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	var card := str(rt.ui.tapped_card)
 	if _guide != null and _guide.tap(screen, card): return
-	# The mine's EntryCard sits over the scene (passive, SGODOT-231): a tap on it is its button's; any other tap folds
-	# it and goes on (SGODOT-266).
-	if card == "" and _materials.tap_entry(screen): return
-	if card != "": _materials.close_card()
 	if _tap_card(card): return
 	if _facilities != null and _facilities.tap(screen): return   # P1: a sprinkler's status card (SGODOT-241)
 	if _sign_hit(screen):
@@ -1043,7 +1028,7 @@ func p0_tap(screen: Vector2) -> void:
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
 		actor.face(_door)
 		enter_farmhouse()
-	elif _materials.tap(screen): pass   # SGODOT-231: mine mouth sheet, gathering spots, workbench (last: smallest targets)
+	elif _materials.tap(screen): pass   # SGODOT-231: gathering spots, workbench (last: smallest targets)
 
 ## A finger card's tap goes to its own facility by id, never through the point test: the point of one facility can
 ## sit under another's mark (the farmhouse card's point under the sign's caption, PR #21 review).
@@ -1154,12 +1139,12 @@ func _screen_rect(n: Node) -> Rect2:
 			first = false
 	return r
 
-## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the path cell under its
+## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the cell under its
 ## board (P0Garden.CHEF_SIGN_BOARD_CELL), back if it ever goes.
 func _show_chef_sign(on: bool) -> void:
 	if _chef_sign_node.visible == on: return
 	_chef_sign_node.visible = on
-	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the path under its board
+	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the cell under its board
 		if bp.is_walkable(c): grid.set_solid(c, on)   # a cell the plan blocks stays blocked
 
 ## The Notice Board up from Homestead Lv5 (q(164) ①): shown, and its cell solid, as the Chef's Sign.
@@ -1313,11 +1298,6 @@ func p0_dev(step: PackedStringArray) -> bool:
 				bench_seat = at.call(_bench + Vector3(0, 0.35, 0)), unit_x = at.call(_chef_sign + Vector3.RIGHT) - at.call(_chef_sign),
 				shift = CHEF_SIGN_SHIFT.x, look = _chef_sign_look}))
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
-		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
-		"cardtap", "cardnew", "cardexpress":   # a real tap on the mouth's EntryCard: main / New run / Express (SGODOT-266, 288)
-			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
-			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
-			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		"island":   # the whole island in the picture, as far as the opening may zoom out (#624 walkthrough: a farm end to end)
 			var corners: Array[Vector3] = []
@@ -1398,5 +1378,4 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(name: String) -> bool:
 	match name:
 		"idle": return not actor.busy()
-		"card": return _materials.card_open()
 	return false

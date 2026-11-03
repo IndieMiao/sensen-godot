@@ -61,6 +61,12 @@ static func pass_left_ms(view: Dictionary, cluster: String) -> float:
 static func covers(view: Dictionary, cluster: String) -> bool:
 	return cluster == home(view) or pass_left_ms(view, cluster) > 0.0
 
+## Whether a place of that city can be walked into from here (q(256) ④, option B): the home city, or the city the player
+## is in with its Day Pass running. A pass for a city the player has left is the way back at the revisit fare — its
+## travel card first, as the server's travel_required says (SGODOT-382).
+static func in_city(view: Dictionary, cluster: String) -> bool:
+	return cluster == home(view) or (cluster == here(view) and covers(view, cluster))
+
 ## §11.7.1 fog's three states: "second_home" for a city set as one (travel.second_homes, P2's second version sets
 ## them; the client already draws the state), "explored" once visited or the home city, else "unexplored".
 static func fog(view: Dictionary, cluster: String) -> String:
@@ -96,12 +102,18 @@ static func pass_text(view: Dictionary, cluster: String) -> String:
 ## P0Logic.place_info's {city, space, kind, day_pass}.
 ## A scene of the home city ("San Francisco · Homestead" on the map) is not where an arrived player is: away, the chip
 ## reads "<City> · Arrived" until they go into a space of that city (whose own chip names its city).
-## The homestead's own spaces (the farm, its farmhouse and kitchen, the mine) are always home, whatever `here` still
-## says: on a cold start the first read goes out before the farm is attached, so the server's `here` can lag one read
-## (李元芳, SGODOT-278; the server settles it on the next read, #233).
-const HOMESTEAD_SPACES := ["home", "mine"]
+## The homestead's own spaces (the farm, its farmhouse and kitchen) are always home, whatever `here` still says: on a
+## cold start the first read goes out before the farm is attached, so the server's `here` can lag one read (李元芳,
+## SGODOT-278; the server settles it on the next read, #233). A mine is a wild site since 355 b1 (v4q(5) ①), never
+## home: its own chip (`Ironvale Vein · Floor 3`) with the foreign mark and no Day Pass (E1 / E2, 不知火舞 on #629).
+const HOMESTEAD_SPACES := ["home"]
 
 static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary:
+	if space == "mine":
+		var mine := info.duplicate()
+		mine["kind"] = UiHud.PlaceKind.FOREIGN
+		mine["day_pass"] = ""
+		return mine
 	if not away(view) or space in HOMESTEAD_SPACES: return home_chip(view, info)
 	var c := P0Clusters.get_cluster(here(view))
 	var out := info.duplicate()

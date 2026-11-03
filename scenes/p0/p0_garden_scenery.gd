@@ -64,7 +64,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		Rect2(Vector2(house.x - 0.6, field_rect.position.y - 1.8), Vector2(1.2, 1.9)),
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
 	var spots := [house, bp.cell_to_world(bp.anchor("storage")),
-		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine")),
+		bp.cell_to_world(bp.anchor("well")),
 		bp.cell_to_world(bp.anchor("workbench"))]   # SGODOT-231: the workbench stays clear of scatter
 	var no_decor := {"decor": {"placed": []}}
 	for i in 420:

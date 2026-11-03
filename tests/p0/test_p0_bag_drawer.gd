@@ -69,6 +69,9 @@ func test_gear_has_six_slots_and_rod_candidates_follow_the_rules() -> void:
 	assert_str(str(rows[1].action.label)).is_equal("Equip")
 	assert_bool((rows[2].action as Dictionary).is_empty()).is_true()            # not owned: no jump to the shop (LOCK-08)
 	assert_str(str(rows[1].effect)).contains("Lands up to")
+	# q(278): an owned rod's tier under its effect while the player is short of it (Fishing Lv3: the Fine fish all in
+	# reach); none under the Carbon Rod's greyed gate row (不知火舞 386 1c3d0416)
+	assert_that(rows.map(func(r): return r.note)).is_equal(["", "Rare needs Fishing Lv4–6", ""])
 	assert_that(P0BagDrawer.gear_rows(v, "farming").map(func(r): return r.state)).is_equal([&"equipped"])
 	assert_array(P0BagDrawer.gear_rows(v, "ring")).is_empty()
 
@@ -368,21 +371,21 @@ func test_full_bag_shows_where_more_room_comes_from() -> void:
 	v.bag.capacity = 25
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # room left: no row
 
-## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv6 until it is for sale, then
-## III Lv9; nothing once all three are bought, or when the view does not say a tier's state.
+## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv7 until it is for sale, then
+## III Lv11 (v4q(1) ⑧); nothing once the tiers the view states are bought, or when the view does not say a tier's state.
 func test_full_bag_points_at_the_next_upgrade_after_the_first() -> void:
 	var v := _view()
 	v.bag.capacity = 30
 	v.bag.slots = []
 	for i in 30: v.bag.slots.append({"id": "seed_radish", "qty": 1})
 	v["homestead"] = {"unlocks": {"bag_upgrade_1": "owned", "bag_upgrade_2": "locked", "bag_upgrade_3": "locked"}}
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv6")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv7")
 	v.homestead.unlocks.bag_upgrade_2 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade II")
 	v.homestead.unlocks.bag_upgrade_2 = "owned"
 	v.bag.capacity = 35
 	for i in 5: v.bag.slots.append({"id": "seed_radish", "qty": 1})
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv9")
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv11")
 	v.homestead.unlocks.bag_upgrade_3 = "for_sale"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade III")
 	v.homestead.unlocks.bag_upgrade_3 = "owned"

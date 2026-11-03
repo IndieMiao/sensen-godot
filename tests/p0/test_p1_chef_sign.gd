@@ -16,7 +16,7 @@ func test_its_cell_is_yard_left_of_the_door_path_off_the_field_and_the_paths() -
 	assert_bool(inside.call(yard.get("objects", []))).is_true()   # its cell is a yard object: no decor on it (the server's too)
 	for k in P0Garden.FOOTPRINTS: assert_bool((P0Garden.FOOTPRINTS[k] as Rect2i).has_point(c)).is_false()
 	assert_int(c.x).is_less(P0Garden.PLAQUE_CELL.x)   # left of the plaque, so left of the path (x 8–10)
-	assert_int(c.x).is_greater(4)   # off the mine path (x 3–4)
+	assert_int(c.x).is_greater(P0Garden.CHEF_SIGN_BOARD_CELL.x)   # its board hangs on the post's left
 	assert_int(c.y).is_equal(P0Garden.PLAQUE_CELL.y)
 	var bp := P0Garden.blueprint()
 	assert_bool(bp.is_walkable(c)).is_true()
@@ -40,19 +40,21 @@ func test_the_sign_is_the_timber_or_stone_model_after_lv10s_look() -> void:
 	assert_vector(farm.CHEF_SIGN_HIT).is_equal(Vector3(-0.332, 1.285, 0))   # board_center
 	assert_float(farm.CHEF_SIGN_SHIFT.x).is_between(0.0, 0.185)
 
-## B (不知火舞 282 33835f54; 上官婉儿 56fa9620): its board hangs over the mine path's (4,14) at shoulder height, so with the
-## sign up that cell is not walked; the door, the spawn and the bench still reach both cells before the mine mouth, never
-## through it. The farm's grid as it stands: the yard fence's front, the Homestead sign, the mailbox, then the sign's cells.
-func test_with_the_sign_up_the_way_to_the_mine_goes_round_its_board() -> void:
+## B (不知火舞 282 33835f54; 上官婉儿 56fa9620): its board hangs over (4,14) at shoulder height, so with the sign up that
+## cell is not walked; the door, the spawn and the bench still reach the yard's west corner (where the mine mouth stood
+## until 355 b1), never through it. No decor stands under the board either: the cell is a yard object.
+## The farm's grid as it stands: the yard fence's front, the Homestead sign, the mailbox, then the sign's cells.
+func test_with_the_sign_up_the_way_west_goes_round_its_board() -> void:
 	var bp := P0Garden.blueprint()
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))
 	P0Garden.block_points(bp, [P0Garden.sign_point(bp), P0Garden.mailbox_point(bp)])
 	var grid := BlueprintGrid.new(bp)
 	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]: grid.set_solid(c, true)
 	var board := P0Garden.CHEF_SIGN_BOARD_CELL
-	assert_bool(P0Decor.yard().get("paths", []).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(board))).is_true()   # still a path to decor
+	assert_bool(P0Decor.yard().get("objects", []).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(board))).is_true()   # a yard object to decor
+	assert_str(P0Decor.reason({"decor": {"placed": [], "cap": 20, "stored": {}}}, "deco_planter", board)).is_equal("Space taken")
 	for from in [Vector2i(9, 14), P0Garden.ANCHORS.spawn, Vector2i(6, 15)]:   # the door's walkway, the spawn, before the bench
-		for to in [Vector2i(3, 13), Vector2i(3, 14)]:   # the cells before the mine mouth
+		for to in [Vector2i(3, 13), Vector2i(3, 14)]:   # the yard's west corner
 			var path := grid.point_path(bp.cell_to_world(from), bp.cell_to_world(to))
 			assert_array(path).override_failure_message("%s → %s" % [from, to]).is_not_empty()
 			for i in range(1, path.size()):   # every 5 cm along it

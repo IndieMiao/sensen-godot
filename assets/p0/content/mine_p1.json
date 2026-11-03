@@ -1,5 +1,5 @@
 {
-  "_note": "Mine line, P1 (SGODOT-275 / 288; 周瑜). New data for floors 3–5, fighting and Express (§13.3.1–13.3.4, §13.3.8): the monsters (§13.3.4 loot as [item, qty, weight]; once_a_day = an item a player gets from that monster at most once a player day), the mine's HP and the Combat slot's weapons, and the floor whose first clear opens Express. Quartz and Hardwood are new materials with no buyback (price null, §13.3.6); floor is their shadow price (5 / 4, §8.4.1), the floor a request pays for them. The Old Tree opens at Homestead Lv3 with 1 Hardwood a round (§13.2.1); with the 8 h regrow that is at most 3 rounds a day. Floors 1–5 themselves (rocks, drops, monsters per floor) are edited in p0_content.json, which this line owns.",
+  "_note": "355 E/F mine replacement: existing monster and combat keys stay in this fragment. Weapon IDs are weapon_*. Slime retains copper/salt/worm loot; elite slime drops copper, never quartz. Initial combat values follow contract v0.4 ad5d28c0, pending v4q approval/calibration. New bands, monsters and policy values are in mine_b1.json. Existing Quartz/Hardwood definitions remain; the Old Tree left the farm with v4q(4) ① (hardwood is a city point now).",
   "mine": {
     "monsters": {
       "mob_slime": {
@@ -28,42 +28,40 @@
         "name": "Elite Slime",
         "hp": 36,
         "damage": 20,
+        "elite": true,
         "loot": [
           [
             "copper_ore",
-            4,
-            30
-          ],
-          [
-            "rock_salt",
-            3,
-            25
-          ],
-          [
-            "bait_worm",
-            3,
-            25
-          ],
-          [
-            "quartz",
             2,
-            20
+            100
           ]
-        ],
-        "once_a_day": "quartz"
+        ]
       }
     },
     "combat": {
       "hp": 100,
       "invulnerability_ms": 1000,
       "weapons": {
-        "sword_wooden": {
+        "weapon_wooden_sword": {
+          "name": "Wooden Sword",
           "attack": 3,
-          "speed": 2.0
+          "speed": 2,
+          "tier": 1
+        },
+        "weapon_copper_sword": {
+          "name": "Copper Sword",
+          "attack": 5,
+          "speed": 2,
+          "tier": 1
+        },
+        "weapon_iron_sword": {
+          "name": "Iron Sword",
+          "attack": 8,
+          "speed": 2,
+          "tier": 2
         }
       }
-    },
-    "express_unlock_floor": 4
+    }
   },
   "materials": {
     "quartz": {
@@ -75,20 +73,6 @@
       "name": "Hardwood",
       "price": null,
       "floor": 4
-    }
-  },
-  "gather": {
-    "spots": {
-      "spot_old_tree": {
-        "name": "Old Tree",
-        "yield": [
-          [
-            "hardwood",
-            1
-          ]
-        ],
-        "homestead": 3
-      }
     }
   }
 }
