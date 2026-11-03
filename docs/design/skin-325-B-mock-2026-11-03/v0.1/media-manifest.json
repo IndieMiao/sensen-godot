@@ -1,0 +1,23 @@
+[
+  {
+    "file": "SGODOT-325_skin_B_mock_v0.1_N1_compare.jpg",
+    "bytes": 565717,
+    "sha256": "df0d66b663a2875f100c598c2dd6f5a93a624915f6764ed89370ffd39bebe9bd",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_mock_v0.1_N2_compare.jpg",
+    "bytes": 485096,
+    "sha256": "910b2cbfad3dfdb0f17f63550f5258cf5631c1e0a51034c7d68178f6cf70c675",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_mock_v0.1_validation.json",
+    "bytes": 173316,
+    "sha256": "d851c339d0f5686380c583423e5600252f8b150b85cd3e4c4d66a760da07e2b8",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

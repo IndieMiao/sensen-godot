@@ -1,0 +1,4013 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "stage": "v0.1 mock - docs only",
+  "source_preservation": {
+    "checks": [
+      {
+        "check": "All staged runtime source files retain their original SHA-256",
+        "passed": true
+      },
+      {
+        "check": "Every private-project GLB is byte-identical to source",
+        "passed": true
+      },
+      {
+        "check": "No tracked runtime, source or tool edits",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: original 2048px atlas dimensions",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: alpha untouched",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved linen",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved porcelain",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved print_portrait",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved print_landscape",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved sky",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved glass",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved leaf",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved leaf_light",
+        "passed": true
+      },
+      {
+        "check": "N1 preserved leaf_dark",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: original 2048px atlas dimensions",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: alpha untouched",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [0, 1024]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [128, 1024]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [0, 1152]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [128, 1152]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [768, 1280]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [896, 1280]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [768, 1408]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [896, 1408]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [1280, 1792]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [1408, 1792]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [1280, 1920]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved plant tile [1408, 1920]",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved dots/glass print_portrait",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved dots/glass linen_green",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved dots/glass accent_gold",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved dots/glass terra_light",
+        "passed": true
+      },
+      {
+        "check": "N2 preserved dots/glass glass",
+        "passed": true
+      },
+      {
+        "check": "N1 plaque has no baked letters or marks",
+        "passed": true
+      }
+    ],
+    "changed_sources": [],
+    "source_commit": "e5a30a98981b590aed6bb573c9629842295883d8",
+    "source_files": 239,
+    "original_glbs": 53,
+    "passed": true
+  },
+  "palette": {
+    "stage": "B palette v0.1 mock only",
+    "author": "黄忠",
+    "rooms": {
+      "poi_hotel_lobby": {
+        "source": "assets/rooms/poi_hotel_lobby/room_albedo_ao.png",
+        "source_sha256": "0df498ac3dadd225850dd282b07efa4700e870b64cb671276b6e0514f4779534",
+        "mock_sha256": "204a72715a138ea481fcd4952960d97b71d025d63822206fc26f7e2ab7bab0e5",
+        "changes": [
+          {
+            "slot": "plaster",
+            "from": "E7CBB0",
+            "to": "F3ECE2"
+          },
+          {
+            "slot": "plaster_solid",
+            "from": "E7CBB0",
+            "to": "F3ECE2"
+          },
+          {
+            "slot": "parquet",
+            "from": "CB8655",
+            "to": "D7B48A"
+          },
+          {
+            "slot": "floor_solid",
+            "from": "CB8655",
+            "to": "D7B48A"
+          },
+          {
+            "slot": "panel",
+            "from": "652E18",
+            "to": "A97B52"
+          },
+          {
+            "slot": "cornice",
+            "from": "672F1A",
+            "to": "A97B52"
+          },
+          {
+            "slot": "skirting",
+            "from": "723A20",
+            "to": "A97B52"
+          },
+          {
+            "slot": "window",
+            "from": "BE7839",
+            "to": "A97B52"
+          },
+          {
+            "slot": "wainscot_solid",
+            "from": "652E18",
+            "to": "A97B52"
+          },
+          {
+            "slot": "cornice_solid",
+            "from": "672F1A",
+            "to": "A97B52"
+          },
+          {
+            "slot": "window_solid",
+            "from": "BE7839",
+            "to": "A97B52"
+          },
+          {
+            "slot": "wood_dark",
+            "from": "783B22",
+            "to": "A97B52"
+          },
+          {
+            "slot": "wood_mid",
+            "from": "7B4023",
+            "to": "A97B52"
+          },
+          {
+            "slot": "oak",
+            "from": "BE8747",
+            "to": "A97B52"
+          },
+          {
+            "slot": "oak_light",
+            "from": "D59A53",
+            "to": "A97B52"
+          },
+          {
+            "slot": "oak_edge",
+            "from": "AF7338",
+            "to": "A97B52"
+          },
+          {
+            "slot": "brass",
+            "from": "C0924A",
+            "to": "C9A04E"
+          },
+          {
+            "slot": "cloth_green:center",
+            "from": "42683A",
+            "to": "5E9AA0"
+          },
+          {
+            "slot": "cloth_green:rug",
+            "from": "567E4A",
+            "to": "8DBDB6"
+          }
+        ],
+        "texture_dimensions": [
+          2048,
+          2048
+        ]
+      },
+      "poi_service_hall": {
+        "source": "assets/rooms/poi_service_hall/hall_albedo_ao_n2.png",
+        "source_sha256": "79067b0b25e6f07abd962ee77554de9d4836af6c4244672c6bb2f4af1e172651",
+        "mock_sha256": "f035524a52c193d86bb5b7ec2a847b30810f9a6c60319675bfc31a75b0a10f5b",
+        "changes": [
+          {
+            "slot": "plaster",
+            "from": "EBCAA8",
+            "to": "EEF3EE"
+          },
+          {
+            "slot": "plaster_solid",
+            "from": "EBCAA8",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "panel",
+            "from": "D3BEA3",
+            "to": "DCE7DF"
+          },
+          {
+            "slot": "wainscot_solid",
+            "from": "D3BEA3",
+            "to": "DCE7DF"
+          },
+          {
+            "slot": "skirting",
+            "from": "C4B098",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "window",
+            "from": "E7D2B5",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "window_solid",
+            "from": "E7D2B5",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "cornice",
+            "from": "672F1A",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "cornice_solid",
+            "from": "672F1A",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "floor_solid",
+            "from": "DFD1B4",
+            "to": "E4E2DA"
+          },
+          {
+            "slot": "cloth_green",
+            "from": "435B76",
+            "to": "5F9680"
+          },
+          {
+            "slot": "print_landscape",
+            "from": "6180A3",
+            "to": "3E9E6A"
+          },
+          {
+            "slot": "wood_mid",
+            "from": "7B4023",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "oak",
+            "from": "BE8747",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "oak_light",
+            "from": "D59A53",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "oak_edge",
+            "from": "AF7338",
+            "to": "CFB48C"
+          },
+          {
+            "slot": "parquet:tiles",
+            "from": "DFD1B4",
+            "to": "E4E2DA"
+          },
+          {
+            "slot": "parquet:cross-and-ring",
+            "from": "6180A3",
+            "to": "7FB59C"
+          }
+        ],
+        "texture_dimensions": [
+          2048,
+          2048
+        ]
+      }
+    },
+    "adjustments": []
+  },
+  "godot": {
+    "captures": [
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (8.585493, 13.71998, 8.135494)]",
+        "name": "N1_A_default",
+        "pitch": -43.0,
+        "pixels": [
+          720,
+          1600
+        ],
+        "width": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (8.585493, 13.71998, 8.135494)]",
+        "name": "N1_B_default",
+        "pitch": -43.0,
+        "pixels": [
+          720,
+          1600
+        ],
+        "width": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (11.37719, 16.10396, 11.72719)]",
+        "name": "N2_A_default",
+        "pitch": -42.9999961853027,
+        "pixels": [
+          720,
+          1600
+        ],
+        "width": 6.71999979019165
+      },
+      {
+        "camera": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (11.37719, 16.10396, 11.72719)]",
+        "name": "N2_B_default",
+        "pitch": -42.9999961853027,
+        "pixels": [
+          720,
+          1600
+        ],
+        "width": 6.71999979019165
+      }
+    ],
+    "checks": [
+      {
+        "check": "N1 native opening matches current layout",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: actual player assembled",
+        "passed": true
+      },
+      {
+        "check": "N1 player feet stand on actual rug triangles",
+        "passed": true
+      },
+      {
+        "check": "Capture N1_A_default",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: shell and furniture use B atlas",
+        "passed": true
+      },
+      {
+        "check": "N1: original mesh node inventory unchanged",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged ring_sofa/ring_sofa/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged ring_sofa/ring_sofa/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged ring_sofa/ring_sofa/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged ring_sofa/ring_sofa/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged ring_sofa/ring_sofa/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged ring_sofa/ring_sofa/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged central_planter/central_planter/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged central_planter/central_planter/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged central_planter/central_planter/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged central_planter/central_planter/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged central_planter/central_planter/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged central_planter/central_planter/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged central_foliage/central_foliage/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged central_foliage/central_foliage/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged central_foliage/central_foliage/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged central_foliage/central_foliage/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged central_foliage/central_foliage/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged central_foliage/central_foliage/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged cream_armchair/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged cream_armchair/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged cream_armchair/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged cream_armchair/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged cream_armchair/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged cream_armchair/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged round_side_table/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged round_side_table/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged round_side_table/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged round_side_table/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged round_side_table/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged round_side_table/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged frame_landscape/frame_landscape/Artwork",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged frame_landscape/frame_landscape/Artwork",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged frame_landscape/frame_landscape/Artwork",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged frame_landscape/frame_landscape/Artwork",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged frame_landscape/frame_landscape/Artwork",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged frame_landscape/frame_landscape/Artwork",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged frame_landscape/frame_landscape/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged frame_landscape/frame_landscape/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged frame_landscape/frame_landscape/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged frame_landscape/frame_landscape/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged frame_landscape/frame_landscape/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged frame_landscape/frame_landscape/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged green_table_lamp/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged green_table_lamp/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged green_table_lamp/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged green_table_lamp/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged green_table_lamp/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged green_table_lamp/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hearth/hearth/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hearth/hearth/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hearth/hearth/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hearth/hearth/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hearth/hearth/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hearth/hearth/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged hearth_mantel/hearth_mantel/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged hearth_mantel/hearth_mantel/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged hearth_mantel/hearth_mantel/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged hearth_mantel/hearth_mantel/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged hearth_mantel/hearth_mantel/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged hearth_mantel/hearth_mantel/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged mantel_decor/mantel_decor/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged mantel_decor/mantel_decor/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged mantel_decor/mantel_decor/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged mantel_decor/mantel_decor/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged mantel_decor/mantel_decor/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged mantel_decor/mantel_decor/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged elevator/elevator/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged elevator/elevator/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged elevator/elevator/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged elevator/elevator/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged elevator/elevator/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged elevator/elevator/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged key_rack/key_rack/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged key_rack/key_rack/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged key_rack/key_rack/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged key_rack/key_rack/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged key_rack/key_rack/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged key_rack/key_rack/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged wall_clock/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged wall_clock/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged wall_clock/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged wall_clock/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged wall_clock/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged wall_clock/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged blank_name_plaque/blank_name_plaque/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged blank_name_plaque/blank_name_plaque/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged blank_name_plaque/blank_name_plaque/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged blank_name_plaque/blank_name_plaque/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged blank_name_plaque/blank_name_plaque/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged blank_name_plaque/blank_name_plaque/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged luggage_cart/luggage_cart/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged luggage_cart/luggage_cart/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged luggage_cart/luggage_cart/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged luggage_cart/luggage_cart/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged luggage_cart/luggage_cart/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged luggage_cart/luggage_cart/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged low_bookshelf/low_bookshelf/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged low_bookshelf/low_bookshelf/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged low_bookshelf/low_bookshelf/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged low_bookshelf/low_bookshelf/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged low_bookshelf/low_bookshelf/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged low_bookshelf/low_bookshelf/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged floor_lamp/floor_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged floor_lamp/floor_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged floor_lamp/floor_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged floor_lamp/floor_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged floor_lamp/floor_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged floor_lamp/floor_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged green_rug/green_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged green_rug/green_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged green_rug/green_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged green_rug/green_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged green_rug/green_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged green_rug/green_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged cowhide_rug/cowhide_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged cowhide_rug/cowhide_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged cowhide_rug/cowhide_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged cowhide_rug/cowhide_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged cowhide_rug/cowhide_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged cowhide_rug/cowhide_rug/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged armchair_front/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged armchair_front/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged armchair_front/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged armchair_front/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged armchair_front/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged armchair_front/cream_armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged table_sofa_right/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged table_sofa_right/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged table_sofa_right/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged table_sofa_right/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged table_sofa_right/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged table_sofa_right/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged table_sofa_back/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged table_sofa_back/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged table_sofa_back/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged table_sofa_back/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged table_sofa_back/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged table_sofa_back/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged table_armchair/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged table_armchair/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged table_armchair/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged table_armchair/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged table_armchair/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged table_armchair/round_side_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged lamp_table_sofa_right/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged lamp_table_sofa_right/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged lamp_table_sofa_right/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged lamp_table_sofa_right/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged lamp_table_sofa_right/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged lamp_table_sofa_right/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged lamp_table_sofa_back/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged lamp_table_sofa_back/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged lamp_table_sofa_back/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged lamp_table_sofa_back/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged lamp_table_sofa_back/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged lamp_table_sofa_back/green_table_lamp/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged wall_clock_2/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged wall_clock_2/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged wall_clock_2/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged wall_clock_2/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged wall_clock_2/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged wall_clock_2/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged wall_clock_3/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged wall_clock_3/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged wall_clock_3/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged wall_clock_3/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged wall_clock_3/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged wall_clock_3/wall_clock/Body",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged plant_elevator/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged plant_elevator/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged plant_elevator/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged plant_elevator/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged plant_elevator/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged plant_elevator/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: furniture transform unchanged plant_cart/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original vertices unchanged plant_cart/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original normals unchanged plant_cart/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original uv unchanged plant_cart/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: original colors unchanged plant_cart/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1: topology unchanged plant_cart/olive_tree/olive_tree_export",
+        "passed": true
+      },
+      {
+        "check": "N1 native opening matches current layout",
+        "passed": true
+      },
+      {
+        "check": "Capture N1_B_default",
+        "passed": true
+      },
+      {
+        "check": "N1: exact same A/B camera",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: actual player assembled",
+        "passed": true
+      },
+      {
+        "check": "N2 player feet stand on central cross strip",
+        "passed": true
+      },
+      {
+        "check": "Capture N2_A_default",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: shell and furniture use B atlas",
+        "passed": true
+      },
+      {
+        "check": "One merged niche to switch interior",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: original display objects hidden, frame retained",
+        "passed": true
+      },
+      {
+        "check": "display_niche_1: frame normal re-encoding error <.0002",
+        "passed": true
+      },
+      {
+        "check": "One merged niche to switch interior",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: original display objects hidden, frame retained",
+        "passed": true
+      },
+      {
+        "check": "display_niche_2: frame normal re-encoding error <.0002",
+        "passed": true
+      },
+      {
+        "check": "N2: original mesh node inventory unchanged",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_floor/hall_floor/hall_floor_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged sofa_1/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged sofa_2/sofa_three_seat/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged armchair_1/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged armchair_2/armchair/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged table_1/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged table_2/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged table_3/small_round_table/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged plant_1/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged plant_2/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged plant_3/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged plant_4/peace_lily/peace_lily_export",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged sculpture_base/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged sculpture_body/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged display_niche_1/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged display_niche_1/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged display_niche_1/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged display_niche_1/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged display_niche_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged display_niche_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged display_niche_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged display_niche_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged brochure_rack/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged water_dispenser/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged call_screen/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged notice_board/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged name_plaque/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged window_flowerbox/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged window_flowerbox_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged wall_clock/wall_clock/wall_clock_001",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged wall_sconce_1/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged wall_sconce_2/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: furniture transform unchanged wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original vertices unchanged wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original normals unchanged wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original uv unchanged wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: original colors unchanged wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "N2: topology unchanged wall_sconce_3/wall_sconce/Body",
+        "passed": true
+      },
+      {
+        "check": "Capture N2_B_default",
+        "passed": true
+      },
+      {
+        "check": "N2: exact same A/B camera",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "rooms": {
+      "poi_hotel_lobby": {
+        "avatar": {
+          "height": 1.745,
+          "position": [
+            2.20000004768372,
+            0.0837006270885468,
+            2.34999990463257
+          ]
+        },
+        "baseline": {
+          "armchair_front/cream_armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "24fca5e605749db16e29b75ddcb1bd7803d8f11cb7444e3bc266d393c151a2f0",
+                "indices": "129aa06710b016e487a453172831b4d5f0d7b1f2d9c78f9e63eefa652f869b65",
+                "normals": "89da69f12139e1b2a51f38d88541e8bf672f1c7cf163e42c5e8de02e1c4a67d6",
+                "uv": "ed7a85a812aa582d06f98cc68e8b754aa31747139a70131ea6e11b3a3169b269",
+                "vertices": "9ab4090c7be77b312d8cc4a9d79ef23f8743effad7dd4360f1d68ce75d6345d2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.35, 0.08, 1.45)]"
+          },
+          "blank_name_plaque/blank_name_plaque/Body": {
+            "surfaces": [
+              {
+                "colors": "a1dfb2cbe8bb246dd350701d8bf26d8fb2ecc16419f1281027e5e33401c7316f",
+                "indices": "2cfbd231547d7caaddd79e794bb8db1b3b7988992f5e71b6baa92df942607bd0",
+                "normals": "5154f05379372daa442f613a494314677db67b51d8470e166a93f4823224435f",
+                "uv": "007507affe3b8af1cdc4d0e08570589e18a8b6cbfd0e30978500613d0867a53c",
+                "vertices": "c199243edb0202d4b7bf75224fb9b49d6da432cb65ba9713fce9cb76efb17606"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.62, 3.2, -2.95)]"
+          },
+          "central_foliage/central_foliage/Body": {
+            "surfaces": [
+              {
+                "colors": "0751a59bf8fb585bf7d068038fa525b16ee56a3615fb61fa17c55aecf40915f7",
+                "indices": "7a793be7a14437454896496817a8df159c33af4c9f3e05676f253063bc546270",
+                "normals": "37fd2d5972a78da36c04c0f3f8d1f63b28ac8623ff1664607afec13b788193b5",
+                "uv": "4f9bd5500dbbe9d8f9bf4d2d3513384dc451e0353725f173b285e5362bbda38b",
+                "vertices": "e4042da02edbeb125e0bf1cb0027438deb7ed5e109e7390bee500a96d5393088"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.1, 0.08, 0.58)]"
+          },
+          "central_planter/central_planter/Body": {
+            "surfaces": [
+              {
+                "colors": "6bef318e1d26bea4d1c920604a8ddb38652d8ccc16543224bc88f3f0c7a4d7e4",
+                "indices": "964262c7745f6ffe51efc273ecbf91771321f332466af2b4bc1fa08901d095c0",
+                "normals": "569bc57bb3c3de1d45c46b1c108627e6fcfac2b713fa8dae672306753571fa71",
+                "uv": "32d02eab090b98a4b574f62cfc66c289e4094a02a4acd8ba7822b622b8eaa8ce",
+                "vertices": "59808b005c0761e0a264d34160f0c77e0739c643150fd4dfca483ac0cd7c995e"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.1, 0.08, 0.58)]"
+          },
+          "cowhide_rug/cowhide_rug/Body": {
+            "surfaces": [
+              {
+                "colors": "fd81acce1c79b6419c0169f154b9a82f901e20c9c72b197df5ea33067a6b0657",
+                "indices": "c0552c045e61b1abe178c52b0bfd18e422ed457c3142064ee2f9525ecf2be07e",
+                "normals": "0f739e2b924f6fc2e705edec81e3dd61753ad0bead05c888702a90c3dc81bb9b",
+                "uv": "90a1068015004c4e64c76a5eb4ba69db062db2b88ef62de26f599880fdf7b5c0",
+                "vertices": "8a9db228979ff8abedd901bdf77cd353b8ebd262192d9d95edd88a7a7fc9bba4"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-1.43, 0.081, 0.1)]"
+          },
+          "cream_armchair/cream_armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "24fca5e605749db16e29b75ddcb1bd7803d8f11cb7444e3bc266d393c151a2f0",
+                "indices": "129aa06710b016e487a453172831b4d5f0d7b1f2d9c78f9e63eefa652f869b65",
+                "normals": "89da69f12139e1b2a51f38d88541e8bf672f1c7cf163e42c5e8de02e1c4a67d6",
+                "uv": "ed7a85a812aa582d06f98cc68e8b754aa31747139a70131ea6e11b3a3169b269",
+                "vertices": "9ab4090c7be77b312d8cc4a9d79ef23f8743effad7dd4360f1d68ce75d6345d2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.35, 0.08, -1.25)]"
+          },
+          "elevator/elevator/Body": {
+            "surfaces": [
+              {
+                "colors": "40647d6713da209d27c74c202f3c27d840db6a6c0aa84582660846b7addff279",
+                "indices": "88f629a8fe8311b94a5ec82b9e73ff9848e6a0852d75aed55e5808926289a763",
+                "normals": "c21675808560b9084006a13db4586e653f693df1ecb1da853f8fe0dd828ca22a",
+                "uv": "6f3187377b157066cce0a1b14cfbeea0bafc4a39306cf4dffe55d28a37f7d20c",
+                "vertices": "0872ac3d0f556433b08d01929222486a26e2f26b5e2d2ec70213e5c11589a7cc"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.3, 0.08, -2.81)]"
+          },
+          "floor_lamp/floor_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "6d4075fd9ebd483e4943000c594226b8afa85fdbe326a03724641a0000b0dd6e",
+                "indices": "3a5afe7c6f27f93f5cd962de9744ea4fac4727827d3143072262c95505316de1",
+                "normals": "f47cab1518e02830b145da2cc8497a2c34bbe3dca58dd3400f5c6b20564cae53",
+                "uv": "6d2923ca1ab4415ac2c9b29b4715483747c29ae0b296c5eba4150aac4a5c0378",
+                "vertices": "c0463be4c65d75d8544d09a709ed28121993f2802fb880a0d0fbc91d48b88afa"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.9, 0.08, 2.7)]"
+          },
+          "frame_landscape/frame_landscape/Artwork": {
+            "surfaces": [
+              {
+                "colors": "36ab9fbe9bbbf9d1baade8f167b3c3bce5450eb957fdd623e1f6e21f5f443631",
+                "indices": "71246b05ac440a81e576113b433726d74a928ef5dccbaa04c591b733562d3850",
+                "normals": "01e38fc687a06517c61aabe38b6022530cdb562edd63fc1112891b9c0ce364b9",
+                "uv": "60de5c26f60aae19778d4c070c3ceb8442ba5282944e37424b4b7698534fc4f6",
+                "vertices": "2eb8e9053b958b989bcc636d57a7c9ee8732af178f2ed3a603de9f2730912cc4"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.55, 2.43, -2.99)]"
+          },
+          "frame_landscape/frame_landscape/Body": {
+            "surfaces": [
+              {
+                "colors": "89be2964d116fcb6177b572922a688a03f571504e0658b92b4633efcfe3b3fbb",
+                "indices": "99357a246c5a29fa2a69cd01eaeb8f4d48dab497aac8b8761fda000ff0b398cc",
+                "normals": "929717e2c7f46c6c2a5bd4e2742be9be75e74f205cf120dbd38311c002b4c226",
+                "uv": "d68dd79eb427aa325e0cc6663bee62fe2ca544c41aaf582c63b7d9096b7c27e3",
+                "vertices": "bf0fba9c5212e2e30b11c696204e6787eaf2cb333170f387fbd54e79b66311b6"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.55, 2.43, -2.99)]"
+          },
+          "green_rug/green_rug/Body": {
+            "surfaces": [
+              {
+                "colors": "29c9ecd197d3fab746fac583a0166a3ea53e74099fa9ea96e8bb27e275ece7a1",
+                "indices": "d23b6ac9f2278a5179ad5ed49777e6b454b54469cca36bfcad5f2a28593a8501",
+                "normals": "7f42208dd869cdcc54f8d868418eec441fd2f907bd1cfc44c1dcd111a31c885a",
+                "uv": "049c3f3626159a27d68486452c6d8b53a35006ef2b95a373924096960e7ea92d",
+                "vertices": "7c116310b0a7e98e4933064ecf52bb8b8cf001c94116d7e4d8a548b56aa7e5dc"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.05, 0.081, 0.65)]"
+          },
+          "green_table_lamp/green_table_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "0f1d7f93746e867f1f3c313959fa1d5781516ee5ecd8c13f7e7f42c5482f5033",
+                "indices": "da701c989d795660c8c9d530cc98b31e4dd4c82fa47f64f1e2defdb72000bf78",
+                "normals": "018984e8d9c53391097553fa5d7cf7f0b326d41e990917599e072855bf6be614",
+                "uv": "00c0a062dbaf837160b52911f4fdb9e77d152fa620ef247955e245e82c973672",
+                "vertices": "4d307a23a47031e51002be2f720f23448623b412be410e0aad04c15b5f5b560f"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.493, 0.98, 1.62)]"
+          },
+          "hall_back_wall/hall_back_wall/hall_back_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "eea6a7ca3ed1075a5e3bc322a31c763971030547fb9192f311f2862bf678db15",
+                "normals": "a2a3eb5057d755b38e48f8cd78ead2bfc308e9da4fe8cbf993e2797d680574d5",
+                "uv": "00348181c2916eca50850d1ca1fa130d9010950b8eaf4c4025b4e1d66a353139",
+                "vertices": "c2f4549bbd5457002feb4d73174f6b3e6414370667aae54fce64a1807232679c"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.1, 0.08, -3.1)]"
+          },
+          "hall_floor/hall_floor/hall_floor_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "5554dc05eb346687046c3d6f9ff4bc9515dcd3abf6d42e0b46fc4feb44c04ac0",
+                "normals": "5b8f14db5616af30a6fb2fba5a06cdf5c2a4265983b5051d03eb4e45035141ac",
+                "uv": "9b473d431d1f672e8509b676e6ace4e9b0d494bab5fddbde479d65be0d737a6a",
+                "vertices": "fd83fc293ac4e4698310babd2a653f6bcbdaab1c6562d3dbc0b0e0d27ac9497e"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "hall_left_wall/hall_left_wall/hall_left_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9743bd7de3890462de22bee46a28033a8462b6229569661d164ac4bd25be846d",
+                "normals": "1855d74faa9a3842b5e71414da8b3495dc1843aa70fbfa978038e36068ec39ac",
+                "uv": "9e51ead8c7d0332634480441807aa7bfafdb15cde8f2cd2b8cebfef2f39b0286",
+                "vertices": "3a357f3ac8a0875f169b05d7093b057d2d5f03ec0f72f6e1cd2a3b730187138e"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.3, 0.08, 0.0)]"
+          },
+          "hall_window_frame/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "hall_window_frame_front/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "hall_window_glass/hall_window_glass/hall_window_glass_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "05c1c7076998ce47afbd407ba6e3e2b3e9174594c472ed27e8847e545703b463",
+                "normals": "b8aebbe495b5247a06e2d8d7c3da1124d3861115237352dd16f81337f208fb9f",
+                "uv": "730c36593296b65868d373fec84a9ac0e8834895bc4d58c45f5f8d0ea15038c3",
+                "vertices": "c03b82075e60c5ce7eae604b3edf8b3e8dc7d526f239e56d11efd3d7341a1b28"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "hall_window_grid/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "hall_window_grid_front/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "hearth/hearth/Body": {
+            "surfaces": [
+              {
+                "colors": "b6752859cb1346c9234ff6af868306e375d55069f5160dff26fc512061f5dd78",
+                "indices": "a62c8892b7fb632f72c19b710fd9a147e09c35b2fe5d825bfe73a17077163c73",
+                "normals": "2be520abfd47a39f24152590be8e3f9d82bc9573617b3ce66b8e1c1e3fd73239",
+                "uv": "e44651fcb762021d166db007679bb036b150b4d0a2a73cbd19aa913aefbd1fec",
+                "vertices": "2d277839b70bb645c09cc635242a4144a77e761ecdad706cdc920fbf3f1609f4"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.54, 0.08, 0.1)]"
+          },
+          "hearth_mantel/hearth_mantel/Body": {
+            "surfaces": [
+              {
+                "colors": "32e15bd7f47cfd367d5d0484d1b470c1b0ee658984989b31a4cdcb80dbdcd3fe",
+                "indices": "f818dc4aaa598d8fa39f557600df7c695251014ab61f52cab208b3cec8804ec9",
+                "normals": "a0b05f5edbd57da1e33647e6216fe86bd455bf218c4b8e4a0181000d142a99fe",
+                "uv": "87b86954fb53c26e9646e26b1b48d7e6da7312f04c6980ad71b37d0bf2968aeb",
+                "vertices": "b8dff584cc41fdd3b5fd35c4ed563dfef37faff60e3b6d752499153da19e88d7"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.54, 1.61, 0.1)]"
+          },
+          "key_rack/key_rack/Body": {
+            "surfaces": [
+              {
+                "colors": "3d92cc8e78558bd54fee89330799002d04bb6e55aacbc42ae0c9fcd109cefd17",
+                "indices": "b7898e79012d05fc782fd50ca4185724ec92b3c92b4b61564aa77fb711b8dbe5",
+                "normals": "c9c780e7fa332d1d5c458b66e3625e93e8f6a24294e6b1536eded79a6636c6da",
+                "uv": "3129b3dce95aaf450e564cf23409f61390473c47f1d95a34b29ee30668b0956c",
+                "vertices": "81bb9076c1a5ea94fd745ea27f0841d68fb49d1e11becaca988024f9167c92f1"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.62, 0.88, -2.66)]"
+          },
+          "lamp_table_sofa_back/green_table_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "0f1d7f93746e867f1f3c313959fa1d5781516ee5ecd8c13f7e7f42c5482f5033",
+                "indices": "da701c989d795660c8c9d530cc98b31e4dd4c82fa47f64f1e2defdb72000bf78",
+                "normals": "018984e8d9c53391097553fa5d7cf7f0b326d41e990917599e072855bf6be614",
+                "uv": "00c0a062dbaf837160b52911f4fdb9e77d152fa620ef247955e245e82c973672",
+                "vertices": "4d307a23a47031e51002be2f720f23448623b412be410e0aad04c15b5f5b560f"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.16, 0.98, -1.2)]"
+          },
+          "lamp_table_sofa_right/green_table_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "0f1d7f93746e867f1f3c313959fa1d5781516ee5ecd8c13f7e7f42c5482f5033",
+                "indices": "da701c989d795660c8c9d530cc98b31e4dd4c82fa47f64f1e2defdb72000bf78",
+                "normals": "018984e8d9c53391097553fa5d7cf7f0b326d41e990917599e072855bf6be614",
+                "uv": "00c0a062dbaf837160b52911f4fdb9e77d152fa620ef247955e245e82c973672",
+                "vertices": "4d307a23a47031e51002be2f720f23448623b412be410e0aad04c15b5f5b560f"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.693, 0.98, 1.47)]"
+          },
+          "low_bookshelf/low_bookshelf/Body": {
+            "surfaces": [
+              {
+                "colors": "894e61cdf89a8a141dc31e1f57b21c4965534ed96da0e6be1e5d4ff2cf057905",
+                "indices": "9187fd8ae344bda39b3aa6578a6b3d33e603eb730fa8ce0165fab6665f4b3b30",
+                "normals": "8ee12b56b913445dd69d7706e8ddec406670d5379e883e6b40e84889f84df5ed",
+                "uv": "732b7dcc645e67e280ffcb32861ef4663ef01943abd4b686e0c00835e4332da8",
+                "vertices": "13a83280bec51a240ab59b299c375012b695c654fe49d11225fc00d54ca8def9"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.77, 0.08, 2.65)]"
+          },
+          "luggage_cart/luggage_cart/Body": {
+            "surfaces": [
+              {
+                "colors": "3cd64937279518e3b899388aea64475c3d278a39cdd52e482ba5e98a4232a101",
+                "indices": "93dfedf8d5e7ed9b2380df3ef9cfd88deb79ff3c077a451dcde1e5d7bcfced93",
+                "normals": "baece75e4734c6a3f978f8a7ab8d1e3ce9dcfe8bd68d05e451915989c692ed8c",
+                "uv": "a5dbfaa52854c0fa6f0aea16d72f763b19f391ad7be873adf550830802313870",
+                "vertices": "7a1154a6e1d3950c64fc1bf288d82f167c2e985dff4aa5427860b104a192805a"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.65, 0.08, -2.08)]"
+          },
+          "mantel_decor/mantel_decor/Body": {
+            "surfaces": [
+              {
+                "colors": "30fd06ff04aaa6debf6fa99e89eba7eb8ee8108f0084195a94712c4efeb85131",
+                "indices": "59797a4af8f775bd19b6eaf34558ed45d1aa8fb46b2b07d289a34a8a4a38007e",
+                "normals": "9854a6eefc129f2d1e5737a718246b73254f91a99e115adaa893a65cc1280f08",
+                "uv": "f2d7347b7fd317716a4d4da18292536264be47bda584b38a7c9ac709c815742a",
+                "vertices": "1751a16933fce2a551cea998cb27fe99a5e96fe0c79d178630d58f721ee7d461"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.54, 1.6, 0.1)]"
+          },
+          "plant_cart/olive_tree/olive_tree_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "1727e842302bff08fe8533e92827beaddce8831083ad5c3520295b5dc4e87c25",
+                "normals": "d6c49f76da5e7834e6e667f394cfab0120ed0ae82286272e38180dbd820f0173",
+                "uv": "21dafc828d036885f04ca8ee36f7f688039508d03949200ab0d61835055f7ae2",
+                "vertices": "71ca5e9132097b0333b2febc247fd14a8737ffc371f581dbf749decd19cdcd64"
+              }
+            ],
+            "transform": "[X: (-0.573576, 0.0, -0.819152), Y: (0.0, 1.0, 0.0), Z: (0.819152, 0.0, -0.573576), O: (2.95, 0.08, -0.55)]"
+          },
+          "plant_elevator/olive_tree/olive_tree_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "1727e842302bff08fe8533e92827beaddce8831083ad5c3520295b5dc4e87c25",
+                "normals": "d6c49f76da5e7834e6e667f394cfab0120ed0ae82286272e38180dbd820f0173",
+                "uv": "21dafc828d036885f04ca8ee36f7f688039508d03949200ab0d61835055f7ae2",
+                "vertices": "71ca5e9132097b0333b2febc247fd14a8737ffc371f581dbf749decd19cdcd64"
+              }
+            ],
+            "transform": "[X: (0.866025, 0.0, -0.5), Y: (0.0, 1.0, 0.0), Z: (0.5, 0.0, 0.866025), O: (-2.58, 0.08, -2.34)]"
+          },
+          "ring_sofa/ring_sofa/Body": {
+            "surfaces": [
+              {
+                "colors": "cf43e3e32089b57fe4dba48d1320c044cae2a618939034391e74d7757d353ddc",
+                "indices": "041cb21dc1fc5bb393009bd7d06e25132ee930a428c52547b3d2a8a17347d5d8",
+                "normals": "fa86058d71b0c47abd39af8bd4c9f15d5a1c5183f3db742c462fcabd4b07162d",
+                "uv": "95d438990a1ddd10a474c0a53da4daa4b81cb17e1785e814d0189e80386b5aa7",
+                "vertices": "4ca57433cdd5a6a35dab969a268bb850e8b9e36259e77342f697d4d9068d2697"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.1, 0.08, 0.58)]"
+          },
+          "round_side_table/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.493, 0.08, 1.62)]"
+          },
+          "table_armchair/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.7, 0.08, -1.2)]"
+          },
+          "table_sofa_back/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.16, 0.08, -1.2)]"
+          },
+          "table_sofa_right/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.693, 0.08, 1.47)]"
+          },
+          "wall_clock/wall_clock/Body": {
+            "surfaces": [
+              {
+                "colors": "a97219fb3413251bac4f33212aa15823948dceff294afdf1d5955f0e141a5461",
+                "indices": "d0cd37f865a82a0c76eed97dd63773f794b4fef875b68d6c6a36131299757a8f",
+                "normals": "c7c2c9c00b7637c452ef19d1177387e036f06c1e1c2098fbc4d613cc25218040",
+                "uv": "28286c230ff4970aedf2c3224cf431af69eb22ca05090187bbbecb68d682522a",
+                "vertices": "500de419a21107e2aad371061373ae6ed6b7ccd36f6f9934ef4d3c36b982c0a7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.28, 2.61, -2.955)]"
+          },
+          "wall_clock_2/wall_clock/Body": {
+            "surfaces": [
+              {
+                "colors": "a97219fb3413251bac4f33212aa15823948dceff294afdf1d5955f0e141a5461",
+                "indices": "d0cd37f865a82a0c76eed97dd63773f794b4fef875b68d6c6a36131299757a8f",
+                "normals": "c7c2c9c00b7637c452ef19d1177387e036f06c1e1c2098fbc4d613cc25218040",
+                "uv": "28286c230ff4970aedf2c3224cf431af69eb22ca05090187bbbecb68d682522a",
+                "vertices": "500de419a21107e2aad371061373ae6ed6b7ccd36f6f9934ef4d3c36b982c0a7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.62, 2.61, -2.955)]"
+          },
+          "wall_clock_3/wall_clock/Body": {
+            "surfaces": [
+              {
+                "colors": "a97219fb3413251bac4f33212aa15823948dceff294afdf1d5955f0e141a5461",
+                "indices": "d0cd37f865a82a0c76eed97dd63773f794b4fef875b68d6c6a36131299757a8f",
+                "normals": "c7c2c9c00b7637c452ef19d1177387e036f06c1e1c2098fbc4d613cc25218040",
+                "uv": "28286c230ff4970aedf2c3224cf431af69eb22ca05090187bbbecb68d682522a",
+                "vertices": "500de419a21107e2aad371061373ae6ed6b7ccd36f6f9934ef4d3c36b982c0a7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.52, 2.61, -2.955)]"
+          }
+        },
+        "lighting": {
+          "ambient": 0.400000005960464,
+          "sun": 1.20000004768372,
+          "tonemap": 3
+        },
+        "mock": {
+          "armchair_front/cream_armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "24fca5e605749db16e29b75ddcb1bd7803d8f11cb7444e3bc266d393c151a2f0",
+                "indices": "129aa06710b016e487a453172831b4d5f0d7b1f2d9c78f9e63eefa652f869b65",
+                "normals": "89da69f12139e1b2a51f38d88541e8bf672f1c7cf163e42c5e8de02e1c4a67d6",
+                "uv": "ed7a85a812aa582d06f98cc68e8b754aa31747139a70131ea6e11b3a3169b269",
+                "vertices": "9ab4090c7be77b312d8cc4a9d79ef23f8743effad7dd4360f1d68ce75d6345d2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.35, 0.08, 1.45)]"
+          },
+          "blank_name_plaque/blank_name_plaque/Body": {
+            "surfaces": [
+              {
+                "colors": "a1dfb2cbe8bb246dd350701d8bf26d8fb2ecc16419f1281027e5e33401c7316f",
+                "indices": "2cfbd231547d7caaddd79e794bb8db1b3b7988992f5e71b6baa92df942607bd0",
+                "normals": "5154f05379372daa442f613a494314677db67b51d8470e166a93f4823224435f",
+                "uv": "007507affe3b8af1cdc4d0e08570589e18a8b6cbfd0e30978500613d0867a53c",
+                "vertices": "c199243edb0202d4b7bf75224fb9b49d6da432cb65ba9713fce9cb76efb17606"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.62, 3.2, -2.95)]"
+          },
+          "central_foliage/central_foliage/Body": {
+            "surfaces": [
+              {
+                "colors": "0751a59bf8fb585bf7d068038fa525b16ee56a3615fb61fa17c55aecf40915f7",
+                "indices": "7a793be7a14437454896496817a8df159c33af4c9f3e05676f253063bc546270",
+                "normals": "37fd2d5972a78da36c04c0f3f8d1f63b28ac8623ff1664607afec13b788193b5",
+                "uv": "4f9bd5500dbbe9d8f9bf4d2d3513384dc451e0353725f173b285e5362bbda38b",
+                "vertices": "e4042da02edbeb125e0bf1cb0027438deb7ed5e109e7390bee500a96d5393088"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.1, 0.08, 0.58)]"
+          },
+          "central_planter/central_planter/Body": {
+            "surfaces": [
+              {
+                "colors": "6bef318e1d26bea4d1c920604a8ddb38652d8ccc16543224bc88f3f0c7a4d7e4",
+                "indices": "964262c7745f6ffe51efc273ecbf91771321f332466af2b4bc1fa08901d095c0",
+                "normals": "569bc57bb3c3de1d45c46b1c108627e6fcfac2b713fa8dae672306753571fa71",
+                "uv": "32d02eab090b98a4b574f62cfc66c289e4094a02a4acd8ba7822b622b8eaa8ce",
+                "vertices": "59808b005c0761e0a264d34160f0c77e0739c643150fd4dfca483ac0cd7c995e"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.1, 0.08, 0.58)]"
+          },
+          "cowhide_rug/cowhide_rug/Body": {
+            "surfaces": [
+              {
+                "colors": "fd81acce1c79b6419c0169f154b9a82f901e20c9c72b197df5ea33067a6b0657",
+                "indices": "c0552c045e61b1abe178c52b0bfd18e422ed457c3142064ee2f9525ecf2be07e",
+                "normals": "0f739e2b924f6fc2e705edec81e3dd61753ad0bead05c888702a90c3dc81bb9b",
+                "uv": "90a1068015004c4e64c76a5eb4ba69db062db2b88ef62de26f599880fdf7b5c0",
+                "vertices": "8a9db228979ff8abedd901bdf77cd353b8ebd262192d9d95edd88a7a7fc9bba4"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-1.43, 0.081, 0.1)]"
+          },
+          "cream_armchair/cream_armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "24fca5e605749db16e29b75ddcb1bd7803d8f11cb7444e3bc266d393c151a2f0",
+                "indices": "129aa06710b016e487a453172831b4d5f0d7b1f2d9c78f9e63eefa652f869b65",
+                "normals": "89da69f12139e1b2a51f38d88541e8bf672f1c7cf163e42c5e8de02e1c4a67d6",
+                "uv": "ed7a85a812aa582d06f98cc68e8b754aa31747139a70131ea6e11b3a3169b269",
+                "vertices": "9ab4090c7be77b312d8cc4a9d79ef23f8743effad7dd4360f1d68ce75d6345d2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.35, 0.08, -1.25)]"
+          },
+          "elevator/elevator/Body": {
+            "surfaces": [
+              {
+                "colors": "40647d6713da209d27c74c202f3c27d840db6a6c0aa84582660846b7addff279",
+                "indices": "88f629a8fe8311b94a5ec82b9e73ff9848e6a0852d75aed55e5808926289a763",
+                "normals": "c21675808560b9084006a13db4586e653f693df1ecb1da853f8fe0dd828ca22a",
+                "uv": "6f3187377b157066cce0a1b14cfbeea0bafc4a39306cf4dffe55d28a37f7d20c",
+                "vertices": "0872ac3d0f556433b08d01929222486a26e2f26b5e2d2ec70213e5c11589a7cc"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.3, 0.08, -2.81)]"
+          },
+          "floor_lamp/floor_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "6d4075fd9ebd483e4943000c594226b8afa85fdbe326a03724641a0000b0dd6e",
+                "indices": "3a5afe7c6f27f93f5cd962de9744ea4fac4727827d3143072262c95505316de1",
+                "normals": "f47cab1518e02830b145da2cc8497a2c34bbe3dca58dd3400f5c6b20564cae53",
+                "uv": "6d2923ca1ab4415ac2c9b29b4715483747c29ae0b296c5eba4150aac4a5c0378",
+                "vertices": "c0463be4c65d75d8544d09a709ed28121993f2802fb880a0d0fbc91d48b88afa"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.9, 0.08, 2.7)]"
+          },
+          "frame_landscape/frame_landscape/Artwork": {
+            "surfaces": [
+              {
+                "colors": "36ab9fbe9bbbf9d1baade8f167b3c3bce5450eb957fdd623e1f6e21f5f443631",
+                "indices": "71246b05ac440a81e576113b433726d74a928ef5dccbaa04c591b733562d3850",
+                "normals": "01e38fc687a06517c61aabe38b6022530cdb562edd63fc1112891b9c0ce364b9",
+                "uv": "60de5c26f60aae19778d4c070c3ceb8442ba5282944e37424b4b7698534fc4f6",
+                "vertices": "2eb8e9053b958b989bcc636d57a7c9ee8732af178f2ed3a603de9f2730912cc4"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.55, 2.43, -2.99)]"
+          },
+          "frame_landscape/frame_landscape/Body": {
+            "surfaces": [
+              {
+                "colors": "89be2964d116fcb6177b572922a688a03f571504e0658b92b4633efcfe3b3fbb",
+                "indices": "99357a246c5a29fa2a69cd01eaeb8f4d48dab497aac8b8761fda000ff0b398cc",
+                "normals": "929717e2c7f46c6c2a5bd4e2742be9be75e74f205cf120dbd38311c002b4c226",
+                "uv": "d68dd79eb427aa325e0cc6663bee62fe2ca544c41aaf582c63b7d9096b7c27e3",
+                "vertices": "bf0fba9c5212e2e30b11c696204e6787eaf2cb333170f387fbd54e79b66311b6"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.55, 2.43, -2.99)]"
+          },
+          "green_rug/green_rug/Body": {
+            "surfaces": [
+              {
+                "colors": "29c9ecd197d3fab746fac583a0166a3ea53e74099fa9ea96e8bb27e275ece7a1",
+                "indices": "d23b6ac9f2278a5179ad5ed49777e6b454b54469cca36bfcad5f2a28593a8501",
+                "normals": "7f42208dd869cdcc54f8d868418eec441fd2f907bd1cfc44c1dcd111a31c885a",
+                "uv": "049c3f3626159a27d68486452c6d8b53a35006ef2b95a373924096960e7ea92d",
+                "vertices": "7c116310b0a7e98e4933064ecf52bb8b8cf001c94116d7e4d8a548b56aa7e5dc"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.05, 0.081, 0.65)]"
+          },
+          "green_table_lamp/green_table_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "0f1d7f93746e867f1f3c313959fa1d5781516ee5ecd8c13f7e7f42c5482f5033",
+                "indices": "da701c989d795660c8c9d530cc98b31e4dd4c82fa47f64f1e2defdb72000bf78",
+                "normals": "018984e8d9c53391097553fa5d7cf7f0b326d41e990917599e072855bf6be614",
+                "uv": "00c0a062dbaf837160b52911f4fdb9e77d152fa620ef247955e245e82c973672",
+                "vertices": "4d307a23a47031e51002be2f720f23448623b412be410e0aad04c15b5f5b560f"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.493, 0.98, 1.62)]"
+          },
+          "hall_back_wall/hall_back_wall/hall_back_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "eea6a7ca3ed1075a5e3bc322a31c763971030547fb9192f311f2862bf678db15",
+                "normals": "a2a3eb5057d755b38e48f8cd78ead2bfc308e9da4fe8cbf993e2797d680574d5",
+                "uv": "00348181c2916eca50850d1ca1fa130d9010950b8eaf4c4025b4e1d66a353139",
+                "vertices": "c2f4549bbd5457002feb4d73174f6b3e6414370667aae54fce64a1807232679c"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.1, 0.08, -3.1)]"
+          },
+          "hall_floor/hall_floor/hall_floor_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "5554dc05eb346687046c3d6f9ff4bc9515dcd3abf6d42e0b46fc4feb44c04ac0",
+                "normals": "5b8f14db5616af30a6fb2fba5a06cdf5c2a4265983b5051d03eb4e45035141ac",
+                "uv": "9b473d431d1f672e8509b676e6ace4e9b0d494bab5fddbde479d65be0d737a6a",
+                "vertices": "fd83fc293ac4e4698310babd2a653f6bcbdaab1c6562d3dbc0b0e0d27ac9497e"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "hall_left_wall/hall_left_wall/hall_left_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9743bd7de3890462de22bee46a28033a8462b6229569661d164ac4bd25be846d",
+                "normals": "1855d74faa9a3842b5e71414da8b3495dc1843aa70fbfa978038e36068ec39ac",
+                "uv": "9e51ead8c7d0332634480441807aa7bfafdb15cde8f2cd2b8cebfef2f39b0286",
+                "vertices": "3a357f3ac8a0875f169b05d7093b057d2d5f03ec0f72f6e1cd2a3b730187138e"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.3, 0.08, 0.0)]"
+          },
+          "hall_window_frame/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "hall_window_frame_front/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "hall_window_glass/hall_window_glass/hall_window_glass_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "05c1c7076998ce47afbd407ba6e3e2b3e9174594c472ed27e8847e545703b463",
+                "normals": "b8aebbe495b5247a06e2d8d7c3da1124d3861115237352dd16f81337f208fb9f",
+                "uv": "730c36593296b65868d373fec84a9ac0e8834895bc4d58c45f5f8d0ea15038c3",
+                "vertices": "c03b82075e60c5ce7eae604b3edf8b3e8dc7d526f239e56d11efd3d7341a1b28"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "hall_window_grid/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "hall_window_grid_front/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "hearth/hearth/Body": {
+            "surfaces": [
+              {
+                "colors": "b6752859cb1346c9234ff6af868306e375d55069f5160dff26fc512061f5dd78",
+                "indices": "a62c8892b7fb632f72c19b710fd9a147e09c35b2fe5d825bfe73a17077163c73",
+                "normals": "2be520abfd47a39f24152590be8e3f9d82bc9573617b3ce66b8e1c1e3fd73239",
+                "uv": "e44651fcb762021d166db007679bb036b150b4d0a2a73cbd19aa913aefbd1fec",
+                "vertices": "2d277839b70bb645c09cc635242a4144a77e761ecdad706cdc920fbf3f1609f4"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.54, 0.08, 0.1)]"
+          },
+          "hearth_mantel/hearth_mantel/Body": {
+            "surfaces": [
+              {
+                "colors": "32e15bd7f47cfd367d5d0484d1b470c1b0ee658984989b31a4cdcb80dbdcd3fe",
+                "indices": "f818dc4aaa598d8fa39f557600df7c695251014ab61f52cab208b3cec8804ec9",
+                "normals": "a0b05f5edbd57da1e33647e6216fe86bd455bf218c4b8e4a0181000d142a99fe",
+                "uv": "87b86954fb53c26e9646e26b1b48d7e6da7312f04c6980ad71b37d0bf2968aeb",
+                "vertices": "b8dff584cc41fdd3b5fd35c4ed563dfef37faff60e3b6d752499153da19e88d7"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.54, 1.61, 0.1)]"
+          },
+          "key_rack/key_rack/Body": {
+            "surfaces": [
+              {
+                "colors": "3d92cc8e78558bd54fee89330799002d04bb6e55aacbc42ae0c9fcd109cefd17",
+                "indices": "b7898e79012d05fc782fd50ca4185724ec92b3c92b4b61564aa77fb711b8dbe5",
+                "normals": "c9c780e7fa332d1d5c458b66e3625e93e8f6a24294e6b1536eded79a6636c6da",
+                "uv": "3129b3dce95aaf450e564cf23409f61390473c47f1d95a34b29ee30668b0956c",
+                "vertices": "81bb9076c1a5ea94fd745ea27f0841d68fb49d1e11becaca988024f9167c92f1"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.62, 0.88, -2.66)]"
+          },
+          "lamp_table_sofa_back/green_table_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "0f1d7f93746e867f1f3c313959fa1d5781516ee5ecd8c13f7e7f42c5482f5033",
+                "indices": "da701c989d795660c8c9d530cc98b31e4dd4c82fa47f64f1e2defdb72000bf78",
+                "normals": "018984e8d9c53391097553fa5d7cf7f0b326d41e990917599e072855bf6be614",
+                "uv": "00c0a062dbaf837160b52911f4fdb9e77d152fa620ef247955e245e82c973672",
+                "vertices": "4d307a23a47031e51002be2f720f23448623b412be410e0aad04c15b5f5b560f"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.16, 0.98, -1.2)]"
+          },
+          "lamp_table_sofa_right/green_table_lamp/Body": {
+            "surfaces": [
+              {
+                "colors": "0f1d7f93746e867f1f3c313959fa1d5781516ee5ecd8c13f7e7f42c5482f5033",
+                "indices": "da701c989d795660c8c9d530cc98b31e4dd4c82fa47f64f1e2defdb72000bf78",
+                "normals": "018984e8d9c53391097553fa5d7cf7f0b326d41e990917599e072855bf6be614",
+                "uv": "00c0a062dbaf837160b52911f4fdb9e77d152fa620ef247955e245e82c973672",
+                "vertices": "4d307a23a47031e51002be2f720f23448623b412be410e0aad04c15b5f5b560f"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.693, 0.98, 1.47)]"
+          },
+          "low_bookshelf/low_bookshelf/Body": {
+            "surfaces": [
+              {
+                "colors": "894e61cdf89a8a141dc31e1f57b21c4965534ed96da0e6be1e5d4ff2cf057905",
+                "indices": "9187fd8ae344bda39b3aa6578a6b3d33e603eb730fa8ce0165fab6665f4b3b30",
+                "normals": "8ee12b56b913445dd69d7706e8ddec406670d5379e883e6b40e84889f84df5ed",
+                "uv": "732b7dcc645e67e280ffcb32861ef4663ef01943abd4b686e0c00835e4332da8",
+                "vertices": "13a83280bec51a240ab59b299c375012b695c654fe49d11225fc00d54ca8def9"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.77, 0.08, 2.65)]"
+          },
+          "luggage_cart/luggage_cart/Body": {
+            "surfaces": [
+              {
+                "colors": "3cd64937279518e3b899388aea64475c3d278a39cdd52e482ba5e98a4232a101",
+                "indices": "93dfedf8d5e7ed9b2380df3ef9cfd88deb79ff3c077a451dcde1e5d7bcfced93",
+                "normals": "baece75e4734c6a3f978f8a7ab8d1e3ce9dcfe8bd68d05e451915989c692ed8c",
+                "uv": "a5dbfaa52854c0fa6f0aea16d72f763b19f391ad7be873adf550830802313870",
+                "vertices": "7a1154a6e1d3950c64fc1bf288d82f167c2e985dff4aa5427860b104a192805a"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.65, 0.08, -2.08)]"
+          },
+          "mantel_decor/mantel_decor/Body": {
+            "surfaces": [
+              {
+                "colors": "30fd06ff04aaa6debf6fa99e89eba7eb8ee8108f0084195a94712c4efeb85131",
+                "indices": "59797a4af8f775bd19b6eaf34558ed45d1aa8fb46b2b07d289a34a8a4a38007e",
+                "normals": "9854a6eefc129f2d1e5737a718246b73254f91a99e115adaa893a65cc1280f08",
+                "uv": "f2d7347b7fd317716a4d4da18292536264be47bda584b38a7c9ac709c815742a",
+                "vertices": "1751a16933fce2a551cea998cb27fe99a5e96fe0c79d178630d58f721ee7d461"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.54, 1.6, 0.1)]"
+          },
+          "plant_cart/olive_tree/olive_tree_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "1727e842302bff08fe8533e92827beaddce8831083ad5c3520295b5dc4e87c25",
+                "normals": "d6c49f76da5e7834e6e667f394cfab0120ed0ae82286272e38180dbd820f0173",
+                "uv": "21dafc828d036885f04ca8ee36f7f688039508d03949200ab0d61835055f7ae2",
+                "vertices": "71ca5e9132097b0333b2febc247fd14a8737ffc371f581dbf749decd19cdcd64"
+              }
+            ],
+            "transform": "[X: (-0.573576, 0.0, -0.819152), Y: (0.0, 1.0, 0.0), Z: (0.819152, 0.0, -0.573576), O: (2.95, 0.08, -0.55)]"
+          },
+          "plant_elevator/olive_tree/olive_tree_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "1727e842302bff08fe8533e92827beaddce8831083ad5c3520295b5dc4e87c25",
+                "normals": "d6c49f76da5e7834e6e667f394cfab0120ed0ae82286272e38180dbd820f0173",
+                "uv": "21dafc828d036885f04ca8ee36f7f688039508d03949200ab0d61835055f7ae2",
+                "vertices": "71ca5e9132097b0333b2febc247fd14a8737ffc371f581dbf749decd19cdcd64"
+              }
+            ],
+            "transform": "[X: (0.866025, 0.0, -0.5), Y: (0.0, 1.0, 0.0), Z: (0.5, 0.0, 0.866025), O: (-2.58, 0.08, -2.34)]"
+          },
+          "ring_sofa/ring_sofa/Body": {
+            "surfaces": [
+              {
+                "colors": "cf43e3e32089b57fe4dba48d1320c044cae2a618939034391e74d7757d353ddc",
+                "indices": "041cb21dc1fc5bb393009bd7d06e25132ee930a428c52547b3d2a8a17347d5d8",
+                "normals": "fa86058d71b0c47abd39af8bd4c9f15d5a1c5183f3db742c462fcabd4b07162d",
+                "uv": "95d438990a1ddd10a474c0a53da4daa4b81cb17e1785e814d0189e80386b5aa7",
+                "vertices": "4ca57433cdd5a6a35dab969a268bb850e8b9e36259e77342f697d4d9068d2697"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.1, 0.08, 0.58)]"
+          },
+          "round_side_table/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.493, 0.08, 1.62)]"
+          },
+          "table_armchair/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.7, 0.08, -1.2)]"
+          },
+          "table_sofa_back/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.16, 0.08, -1.2)]"
+          },
+          "table_sofa_right/round_side_table/Body": {
+            "surfaces": [
+              {
+                "colors": "0b498326797b4be16acbe10949518ec3d20056e0bd92a29ccc7ce588c51162e7",
+                "indices": "698d9a6872d1a707c19843b20fac41a5ffbabdb17a4a90db0bea1be106d3f8d9",
+                "normals": "4075434153973d1f5161abc88d42fd88509bcdac7913d0fe4bc2a4885c7a5304",
+                "uv": "7d0f3b8a794723566c59011b5fdcf37e312c2cac5671a446e1ad7d27f51479a9",
+                "vertices": "318e8adba61d661030d6ddc35512b7e17ef72113aa3a2633e056d81c3af343b7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.693, 0.08, 1.47)]"
+          },
+          "wall_clock/wall_clock/Body": {
+            "surfaces": [
+              {
+                "colors": "a97219fb3413251bac4f33212aa15823948dceff294afdf1d5955f0e141a5461",
+                "indices": "d0cd37f865a82a0c76eed97dd63773f794b4fef875b68d6c6a36131299757a8f",
+                "normals": "c7c2c9c00b7637c452ef19d1177387e036f06c1e1c2098fbc4d613cc25218040",
+                "uv": "28286c230ff4970aedf2c3224cf431af69eb22ca05090187bbbecb68d682522a",
+                "vertices": "500de419a21107e2aad371061373ae6ed6b7ccd36f6f9934ef4d3c36b982c0a7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.28, 2.61, -2.955)]"
+          },
+          "wall_clock_2/wall_clock/Body": {
+            "surfaces": [
+              {
+                "colors": "a97219fb3413251bac4f33212aa15823948dceff294afdf1d5955f0e141a5461",
+                "indices": "d0cd37f865a82a0c76eed97dd63773f794b4fef875b68d6c6a36131299757a8f",
+                "normals": "c7c2c9c00b7637c452ef19d1177387e036f06c1e1c2098fbc4d613cc25218040",
+                "uv": "28286c230ff4970aedf2c3224cf431af69eb22ca05090187bbbecb68d682522a",
+                "vertices": "500de419a21107e2aad371061373ae6ed6b7ccd36f6f9934ef4d3c36b982c0a7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.62, 2.61, -2.955)]"
+          },
+          "wall_clock_3/wall_clock/Body": {
+            "surfaces": [
+              {
+                "colors": "a97219fb3413251bac4f33212aa15823948dceff294afdf1d5955f0e141a5461",
+                "indices": "d0cd37f865a82a0c76eed97dd63773f794b4fef875b68d6c6a36131299757a8f",
+                "normals": "c7c2c9c00b7637c452ef19d1177387e036f06c1e1c2098fbc4d613cc25218040",
+                "uv": "28286c230ff4970aedf2c3224cf431af69eb22ca05090187bbbecb68d682522a",
+                "vertices": "500de419a21107e2aad371061373ae6ed6b7ccd36f6f9934ef4d3c36b982c0a7"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.52, 2.61, -2.955)]"
+          }
+        },
+        "mock_only": true,
+        "recolored_surfaces": 36,
+        "sign": {
+          "sample_text": "blank",
+          "size": [
+            1.6,
+            0.22
+          ]
+        }
+      },
+      "poi_service_hall": {
+        "avatar": {
+          "height": 1.745,
+          "position": [
+            0.0,
+            0.0800006240606308,
+            2.5
+          ]
+        },
+        "baseline": {
+          "SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "eea6a7ca3ed1075a5e3bc322a31c763971030547fb9192f311f2862bf678db15",
+                "normals": "a2a3eb5057d755b38e48f8cd78ead2bfc308e9da4fe8cbf993e2797d680574d5",
+                "uv": "00348181c2916eca50850d1ca1fa130d9010950b8eaf4c4025b4e1d66a353139",
+                "vertices": "c2f4549bbd5457002feb4d73174f6b3e6414370667aae54fce64a1807232679c"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.1, 0.08, -3.1)]"
+          },
+          "SharedHall/hall_floor/hall_floor/hall_floor_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "5554dc05eb346687046c3d6f9ff4bc9515dcd3abf6d42e0b46fc4feb44c04ac0",
+                "normals": "5b8f14db5616af30a6fb2fba5a06cdf5c2a4265983b5051d03eb4e45035141ac",
+                "uv": "9b473d431d1f672e8509b676e6ace4e9b0d494bab5fddbde479d65be0d737a6a",
+                "vertices": "fd83fc293ac4e4698310babd2a653f6bcbdaab1c6562d3dbc0b0e0d27ac9497e"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9743bd7de3890462de22bee46a28033a8462b6229569661d164ac4bd25be846d",
+                "normals": "1855d74faa9a3842b5e71414da8b3495dc1843aa70fbfa978038e36068ec39ac",
+                "uv": "9e51ead8c7d0332634480441807aa7bfafdb15cde8f2cd2b8cebfef2f39b0286",
+                "vertices": "3a357f3ac8a0875f169b05d7093b057d2d5f03ec0f72f6e1cd2a3b730187138e"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.3, 0.08, 0.0)]"
+          },
+          "SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "05c1c7076998ce47afbd407ba6e3e2b3e9174594c472ed27e8847e545703b463",
+                "normals": "b8aebbe495b5247a06e2d8d7c3da1124d3861115237352dd16f81337f208fb9f",
+                "uv": "730c36593296b65868d373fec84a9ac0e8834895bc4d58c45f5f8d0ea15038c3",
+                "vertices": "c03b82075e60c5ce7eae604b3edf8b3e8dc7d526f239e56d11efd3d7341a1b28"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "armchair_1/armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "b9626a4eddd0fcc42c171b123defd1d906f7f130698321181307d5fd5e6014ef",
+                "normals": "3333787326037aac8930d56c7b94b83e28174efa735d1f6e079e2cf4b2aa90c3",
+                "uv": "6c7169875675b646a4f80bd68b410947446f6c140cf30f4d95ddbc92a44a2486",
+                "vertices": "a34877db75abd9ae6513bec429a036192b32ea6f451694785bcef9f5c5149fb5"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.37, 0.08, -1.85)]"
+          },
+          "armchair_2/armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "b9626a4eddd0fcc42c171b123defd1d906f7f130698321181307d5fd5e6014ef",
+                "normals": "3333787326037aac8930d56c7b94b83e28174efa735d1f6e079e2cf4b2aa90c3",
+                "uv": "6c7169875675b646a4f80bd68b410947446f6c140cf30f4d95ddbc92a44a2486",
+                "vertices": "a34877db75abd9ae6513bec429a036192b32ea6f451694785bcef9f5c5149fb5"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, 1.0), Y: (0.0, 1.0, 0.0), Z: (-1.0, 0.0, -0.0), O: (2.83, 0.08, -1.55)]"
+          },
+          "brochure_rack/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "824ae90ce12d296a18d3e784ba8fcb41037322800c10898a5d2df45e307d0b07",
+                "normals": "eab51caed31260c674359d7b1d66bc50b3e3b8516b1e7f6318019dd1ab0bec10",
+                "uv": "a01c7c37fa11d3dda74bb15409bf13c1cedd7f9ae79df842bac48639f63505ee",
+                "vertices": "ba21b97f00713c7b46b10928742afa291295cc5d62128274de644f51bd647813"
+              }
+            ],
+            "transform": "[X: (0.990268, 0.0, -0.139173), Y: (0.0, 1.0, 0.0), Z: (0.139173, 0.0, 0.990268), O: (-0.1, 0.08, -2.55)]"
+          },
+          "call_screen/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "eefc695ef9dfb9682f59e329c00058489ff35f85bf860ee5e70c24810f72be9a",
+                "normals": "6bc9b6f3e4772857d89ac14c04b11e3424146a906050c7305b8d8664b788557c",
+                "uv": "9f97724322f67ff28960ee39912efa7c07347629babe1b9b5f7a76d8471a7403",
+                "vertices": "ab7921678d1ba3c552da2d81f194b1c60176a956351bf477838f11db796fdab2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.04, 1.83, 0.0)]"
+          },
+          "display_niche_1/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "99f059ba9940fabf3a67a8cd0f7835708dfdb110b81b891f42e76cbd2b6bd59c",
+                "normals": "797ca0c5657434c05782cb2f1226b2f5376b89c45947856e658f15adc6552c84",
+                "uv": "5e0b3924e49caebf20a55e6b7e921a1e7193c1eb6a1703788869d5be1090aa7d",
+                "vertices": "7c226ba285db84e3f908fd58502160b154f92c8191af6dea7b4fe164a5b095fc"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.65, 0.08, -2.98)]"
+          },
+          "display_niche_2/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "7899322cab52e90978edebc56e1d762a40a7d39a98bd79b1786f58efdd02b0a5",
+                "normals": "51fbc1442cc0f07b3cb46aeda23098c64a05692c83651029412f361146877997",
+                "uv": "5a2fa55141db0939e4c4d0ae7278d44ab1bc498cd2a48ff11a62c118ae097e47",
+                "vertices": "b82fa09fb41da8768d6490a90a99b125653166c90bc9ebc73969789277c0b7a8"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.65, 0.08, -2.98)]"
+          },
+          "name_plaque/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "cf6566f97c9532f91729aef8f9a1e9fee7ff464092e0d96fa33f50dccf9fcb76",
+                "normals": "9333d7c8a62d9ece041837bdf60703389251b922a82ca81ea2461b5f87712cf2",
+                "uv": "2cbef78f8b15357b5fe16427eb0fe5c0b80dc0215b3b49ab37c56c13bbc1762b",
+                "vertices": "d44dfda09f2e0f367bd580dca4b69b9c4ea4c6c7ba369adde126d6c988d0d5c4"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 3.08, -2.96)]"
+          },
+          "notice_board/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "d2ab40f551396cd2dd959e0ecade69e1a728a4591860a31602695e9548ae9b48",
+                "normals": "dfef563c074d9521f0d20f0c292876c24f4d96810ab0b58ccdd631a0a9d05f35",
+                "uv": "38437fe851302cb42bfe72476b65e589a8d871234d522a1af42c7cf539d7fc52",
+                "vertices": "bc83e94afbe69a46cd41e69f3c95aef4dde2918b2c1f49d0f6b0b67f56289684"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 1.63, -2.83)]"
+          },
+          "plant_1/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.75, 0.08, -2.45)]"
+          },
+          "plant_2/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.95, 0.08, -2.0)]"
+          },
+          "plant_3/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.1, 0.08, 2.7)]"
+          },
+          "plant_4/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.85, 0.08, 2.65)]"
+          },
+          "sculpture_base/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "7cbd86cde4ecd6c024b4510de805c1268ba4a8bbce6d80335a0bbf546526a8d0",
+                "normals": "3bf570bc86b6d514ebecd8f227612b56ead4ea97ac64d8cafd1b18cdd8742539",
+                "uv": "2081b36da4d0d8b710751eed6f5c391b5dee1de4588e81052f27f178d338c544",
+                "vertices": "f5132748367f141579168b276fa0f62163a46730afcc66800e7442b667683bb1"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.04, 0.08, 0.18)]"
+          },
+          "sculpture_body/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "ff3392f894233e3257dd430d81b9eaf7cba6de2ed93c4e7cda1d740a5860ef30",
+                "normals": "6775f304a85fcf963d6b10d9ef820e45bb8211d1f2795d471dcba0272cb0f05d",
+                "uv": "6cdb9e631cd07f57ac52b10b27d20cc63b2908c24b5d1baf0f6065a1e64aa887",
+                "vertices": "e0ca401a5c2e04fffbb72b08159562eae55207367d8e16f7b276a3503d72fc5d"
+              }
+            ],
+            "transform": "[X: (0.707107, 0.0, -0.707107), Y: (0.0, 1.0, 0.0), Z: (0.707107, 0.0, 0.707107), O: (0.04, 0.48, 0.18)]"
+          },
+          "sofa_1/sofa_three_seat/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2ed3426642b4b0659699fb40622b5fd701f873533c02468cfbcc28673af4ddb2",
+                "normals": "bf0d4a618b63efd7baa088558c001f527ec436449da9a744f9bb442634869bc3",
+                "uv": "898c3266ee0552e5483d62a516872b76f6e4b2d2abf39ce31222871c19edd819",
+                "vertices": "e0ecc8f92c989ca60a1a3c125d5caea35f138e0b9b549a75f5aaee3580b08a44"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.37, 0.08, 1.25)]"
+          },
+          "sofa_2/sofa_three_seat/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2ed3426642b4b0659699fb40622b5fd701f873533c02468cfbcc28673af4ddb2",
+                "normals": "bf0d4a618b63efd7baa088558c001f527ec436449da9a744f9bb442634869bc3",
+                "uv": "898c3266ee0552e5483d62a516872b76f6e4b2d2abf39ce31222871c19edd819",
+                "vertices": "e0ecc8f92c989ca60a1a3c125d5caea35f138e0b9b549a75f5aaee3580b08a44"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, 1.0), Y: (0.0, 1.0, 0.0), Z: (-1.0, 0.0, -0.0), O: (2.83, 0.08, 1.45)]"
+          },
+          "table_1/small_round_table/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "a66f9bcef013393c7488ea080886b60c18c4b52db05d3b8f8c2e9ce5270100ae",
+                "normals": "652c66efee9be59978a044e2fe153d6ba57e9705fb64723fc404af068bbf0cc0",
+                "uv": "9b3d449043e107c01a63c084e2c1d64cd9a9408a028ad0c41191bb1484c84879",
+                "vertices": "04118a15a5de96d5da813e9fb160431846611f078268cd9602eb13af57f7e518"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-2.48, 0.08, -0.75)]"
+          },
+          "table_2/small_round_table/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "a66f9bcef013393c7488ea080886b60c18c4b52db05d3b8f8c2e9ce5270100ae",
+                "normals": "652c66efee9be59978a044e2fe153d6ba57e9705fb64723fc404af068bbf0cc0",
+                "uv": "9b3d449043e107c01a63c084e2c1d64cd9a9408a028ad0c41191bb1484c84879",
+                "vertices": "04118a15a5de96d5da813e9fb160431846611f078268cd9602eb13af57f7e518"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.95, 0.08, -0.4)]"
+          },
+          "table_3/small_round_table/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "a66f9bcef013393c7488ea080886b60c18c4b52db05d3b8f8c2e9ce5270100ae",
+                "normals": "652c66efee9be59978a044e2fe153d6ba57e9705fb64723fc404af068bbf0cc0",
+                "uv": "9b3d449043e107c01a63c084e2c1d64cd9a9408a028ad0c41191bb1484c84879",
+                "vertices": "04118a15a5de96d5da813e9fb160431846611f078268cd9602eb13af57f7e518"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.7, 0.08, 2.82)]"
+          },
+          "wall_clock/wall_clock/wall_clock_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "fb401eb1e95e2e210163ef5363a3806b3e2f8dd5895d92abcb4d0eaeec1dc40b",
+                "normals": "d97a2c50154e9c44deefc67029c8cfa0492d0d1732a32eb67a47599993a7af67",
+                "uv": "f39343cee849e2a8bc154b85f2657452421f7ad86f1e91ad8c45b0c905b85ee5",
+                "vertices": "98d95b6b433e2469d4e42c501cecd765a7449466e00849c58d646f4f4f70dee8"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.035, 2.53, 0.0)]"
+          },
+          "wall_sconce_1/wall_sconce/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9c73b13f4a5651ced6e287b685155a592f8aa8dbd8df9c136340ba6727653ca5",
+                "normals": "c96bcad5ea689aca4bb234ca88a24c7bd9cb3241d3a8d14defc5869041721110",
+                "uv": "34c336b37828df63f28357a80ccb52967c6c28705210dd9294b0aa0cf3131581",
+                "vertices": "252c4e71989ca85ca2bed684415e13653ed1ded2b9ce2b5e3cbc6dfcf33b0ed2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.04, 2.43, 2.78)]"
+          },
+          "wall_sconce_2/wall_sconce/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9c73b13f4a5651ced6e287b685155a592f8aa8dbd8df9c136340ba6727653ca5",
+                "normals": "c96bcad5ea689aca4bb234ca88a24c7bd9cb3241d3a8d14defc5869041721110",
+                "uv": "34c336b37828df63f28357a80ccb52967c6c28705210dd9294b0aa0cf3131581",
+                "vertices": "252c4e71989ca85ca2bed684415e13653ed1ded2b9ce2b5e3cbc6dfcf33b0ed2"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-2.7, 2.43, -2.97)]"
+          },
+          "wall_sconce_3/wall_sconce/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9c73b13f4a5651ced6e287b685155a592f8aa8dbd8df9c136340ba6727653ca5",
+                "normals": "c96bcad5ea689aca4bb234ca88a24c7bd9cb3241d3a8d14defc5869041721110",
+                "uv": "34c336b37828df63f28357a80ccb52967c6c28705210dd9294b0aa0cf3131581",
+                "vertices": "252c4e71989ca85ca2bed684415e13653ed1ded2b9ce2b5e3cbc6dfcf33b0ed2"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.6, 2.43, -2.97)]"
+          },
+          "water_dispenser/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "97e335321e7b2233fd94c71ea435a3b362b9782fde01ed54f7c223ece400e81e",
+                "normals": "a9444848c9984dfe708c14b7f4da80c9cd7ac9c4d56fb1fd7205de865e9e604b",
+                "uv": "d78ae927dcd649ebb290adcb988d830c889010fb972273c7f6e060ee729d37b8",
+                "vertices": "c2cb818bb92cf28d0d3e5dc311b01de89600530d99caea441e1c38103b7e5e4c"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (3.02, 0.08, -2.6)]"
+          },
+          "window_flowerbox/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "910b9b48e89f030a1b74305457af6ec0302a9b36af3f3381908b0fd02cda152a",
+                "normals": "bc3ec135b65b2b4cbc2a3216cc31776846c6c2657b389e5e97faafa9cfeb35f5",
+                "uv": "824082b5d49dcf912724dbbc5c76fc45130c73976cd99922c900dc385c09cf60",
+                "vertices": "0501c3b97f2d77c9e9ce3e30fb83ebe7953a500fbfe2dd7c74ad6239ce3e40f8"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.91, 1.06, -1.78)]"
+          },
+          "window_flowerbox_2/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "910b9b48e89f030a1b74305457af6ec0302a9b36af3f3381908b0fd02cda152a",
+                "normals": "bc3ec135b65b2b4cbc2a3216cc31776846c6c2657b389e5e97faafa9cfeb35f5",
+                "uv": "824082b5d49dcf912724dbbc5c76fc45130c73976cd99922c900dc385c09cf60",
+                "vertices": "0501c3b97f2d77c9e9ce3e30fb83ebe7953a500fbfe2dd7c74ad6239ce3e40f8"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.91, 1.06, 1.78)]"
+          }
+        },
+        "lighting": {
+          "ambient": 0.550000011920929,
+          "sun": 1.0,
+          "tonemap": 0
+        },
+        "medicine": {
+          "count": 3,
+          "frame_normal_max_reencoding_error": {
+            "display_niche_1": 0.000104779377579689,
+            "display_niche_2": 0.000104779377579689
+          },
+          "letters": false,
+          "removed_interior_triangles": {
+            "display_niche_1": 620,
+            "display_niche_2": 452
+          }
+        },
+        "mock": {
+          "SharedHall/hall_back_wall/hall_back_wall/hall_back_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "eea6a7ca3ed1075a5e3bc322a31c763971030547fb9192f311f2862bf678db15",
+                "normals": "a2a3eb5057d755b38e48f8cd78ead2bfc308e9da4fe8cbf993e2797d680574d5",
+                "uv": "00348181c2916eca50850d1ca1fa130d9010950b8eaf4c4025b4e1d66a353139",
+                "vertices": "c2f4549bbd5457002feb4d73174f6b3e6414370667aae54fce64a1807232679c"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.1, 0.08, -3.1)]"
+          },
+          "SharedHall/hall_floor/hall_floor/hall_floor_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "5554dc05eb346687046c3d6f9ff4bc9515dcd3abf6d42e0b46fc4feb44c04ac0",
+                "normals": "5b8f14db5616af30a6fb2fba5a06cdf5c2a4265983b5051d03eb4e45035141ac",
+                "uv": "9b473d431d1f672e8509b676e6ace4e9b0d494bab5fddbde479d65be0d737a6a",
+                "vertices": "fd83fc293ac4e4698310babd2a653f6bcbdaab1c6562d3dbc0b0e0d27ac9497e"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "SharedHall/hall_left_wall/hall_left_wall/hall_left_wall_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9743bd7de3890462de22bee46a28033a8462b6229569661d164ac4bd25be846d",
+                "normals": "1855d74faa9a3842b5e71414da8b3495dc1843aa70fbfa978038e36068ec39ac",
+                "uv": "9e51ead8c7d0332634480441807aa7bfafdb15cde8f2cd2b8cebfef2f39b0286",
+                "vertices": "3a357f3ac8a0875f169b05d7093b057d2d5f03ec0f72f6e1cd2a3b730187138e"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.3, 0.08, 0.0)]"
+          },
+          "SharedHall/hall_window_frame/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "SharedHall/hall_window_frame_front/hall_window_frame/hall_window_frame_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2d506789b23e96227645fcbff95115ea74a75122444fbeed14fc86892c8c680b",
+                "normals": "37dd446224bacbd339accb7e93bff971a81ab73763c117042b605406daf23dd1",
+                "uv": "5c11853701788235f228a55cad4f888b102a29a00c83d5ffd6b8237b2352f5bd",
+                "vertices": "1f3bb9e05bea6a99cedf55081d70c196b430db8386304343c790b6e8082e840d"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "SharedHall/hall_window_glass/hall_window_glass/hall_window_glass_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "05c1c7076998ce47afbd407ba6e3e2b3e9174594c472ed27e8847e545703b463",
+                "normals": "b8aebbe495b5247a06e2d8d7c3da1124d3861115237352dd16f81337f208fb9f",
+                "uv": "730c36593296b65868d373fec84a9ac0e8834895bc4d58c45f5f8d0ea15038c3",
+                "vertices": "c03b82075e60c5ce7eae604b3edf8b3e8dc7d526f239e56d11efd3d7341a1b28"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 0.0, 0.0)]"
+          },
+          "SharedHall/hall_window_grid/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, -1.78)]"
+          },
+          "SharedHall/hall_window_grid_front/hall_window_grid/hall_window_grid_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "269b6a72508edb2d2632b3965a81db5349f811cb15fa0f4431b8aba08318901f",
+                "normals": "e3cd45d7465e7bee14edc8ae25f5de3867f90da3728c35d3a48d26188e9c66da",
+                "uv": "634bb18f1e37ae81b596dc07765f0113255f2f3f7e6608e9a3cbc59392930450",
+                "vertices": "b12c7b54c04a8be6d18aa5b129e692d93cf60de831a23c8b7fcdcfd6895a8c1b"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.2, 2.22, 1.78)]"
+          },
+          "armchair_1/armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "b9626a4eddd0fcc42c171b123defd1d906f7f130698321181307d5fd5e6014ef",
+                "normals": "3333787326037aac8930d56c7b94b83e28174efa735d1f6e079e2cf4b2aa90c3",
+                "uv": "6c7169875675b646a4f80bd68b410947446f6c140cf30f4d95ddbc92a44a2486",
+                "vertices": "a34877db75abd9ae6513bec429a036192b32ea6f451694785bcef9f5c5149fb5"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.37, 0.08, -1.85)]"
+          },
+          "armchair_2/armchair/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "b9626a4eddd0fcc42c171b123defd1d906f7f130698321181307d5fd5e6014ef",
+                "normals": "3333787326037aac8930d56c7b94b83e28174efa735d1f6e079e2cf4b2aa90c3",
+                "uv": "6c7169875675b646a4f80bd68b410947446f6c140cf30f4d95ddbc92a44a2486",
+                "vertices": "a34877db75abd9ae6513bec429a036192b32ea6f451694785bcef9f5c5149fb5"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, 1.0), Y: (0.0, 1.0, 0.0), Z: (-1.0, 0.0, -0.0), O: (2.83, 0.08, -1.55)]"
+          },
+          "brochure_rack/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "824ae90ce12d296a18d3e784ba8fcb41037322800c10898a5d2df45e307d0b07",
+                "normals": "eab51caed31260c674359d7b1d66bc50b3e3b8516b1e7f6318019dd1ab0bec10",
+                "uv": "a01c7c37fa11d3dda74bb15409bf13c1cedd7f9ae79df842bac48639f63505ee",
+                "vertices": "ba21b97f00713c7b46b10928742afa291295cc5d62128274de644f51bd647813"
+              }
+            ],
+            "transform": "[X: (0.990268, 0.0, -0.139173), Y: (0.0, 1.0, 0.0), Z: (0.139173, 0.0, 0.990268), O: (-0.1, 0.08, -2.55)]"
+          },
+          "call_screen/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "eefc695ef9dfb9682f59e329c00058489ff35f85bf860ee5e70c24810f72be9a",
+                "normals": "6bc9b6f3e4772857d89ac14c04b11e3424146a906050c7305b8d8664b788557c",
+                "uv": "9f97724322f67ff28960ee39912efa7c07347629babe1b9b5f7a76d8471a7403",
+                "vertices": "ab7921678d1ba3c552da2d81f194b1c60176a956351bf477838f11db796fdab2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.04, 1.83, 0.0)]"
+          },
+          "display_niche_1/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "f43d54ccaeaa559b7ae06e03d7f1e3677e7bf15743641386e74ac6d8df6dee52",
+                "normals": "f15cada0aa2e36b49ff3fe18e1f02818e911acd36b5b6f5a3077b90fd62be3cc",
+                "uv": "5e0b3924e49caebf20a55e6b7e921a1e7193c1eb6a1703788869d5be1090aa7d",
+                "vertices": "7c226ba285db84e3f908fd58502160b154f92c8191af6dea7b4fe164a5b095fc"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.65, 0.08, -2.98)]"
+          },
+          "display_niche_2/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "d01763b9a890d7fab88aebbffe0e40b3080019e0a1dd2692eb0d7701ba8cbb3f",
+                "normals": "08a1ddb89c48a38e0382970b126cae827b0ab48abea7fafd8c43f65998de4c2d",
+                "uv": "5a2fa55141db0939e4c4d0ae7278d44ab1bc498cd2a48ff11a62c118ae097e47",
+                "vertices": "b82fa09fb41da8768d6490a90a99b125653166c90bc9ebc73969789277c0b7a8"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.65, 0.08, -2.98)]"
+          },
+          "name_plaque/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "cf6566f97c9532f91729aef8f9a1e9fee7ff464092e0d96fa33f50dccf9fcb76",
+                "normals": "9333d7c8a62d9ece041837bdf60703389251b922a82ca81ea2461b5f87712cf2",
+                "uv": "2cbef78f8b15357b5fe16427eb0fe5c0b80dc0215b3b49ab37c56c13bbc1762b",
+                "vertices": "d44dfda09f2e0f367bd580dca4b69b9c4ea4c6c7ba369adde126d6c988d0d5c4"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 3.08, -2.96)]"
+          },
+          "notice_board/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "d2ab40f551396cd2dd959e0ecade69e1a728a4591860a31602695e9548ae9b48",
+                "normals": "dfef563c074d9521f0d20f0c292876c24f4d96810ab0b58ccdd631a0a9d05f35",
+                "uv": "38437fe851302cb42bfe72476b65e589a8d871234d522a1af42c7cf539d7fc52",
+                "vertices": "bc83e94afbe69a46cd41e69f3c95aef4dde2918b2c1f49d0f6b0b67f56289684"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.0, 1.63, -2.83)]"
+          },
+          "plant_1/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.75, 0.08, -2.45)]"
+          },
+          "plant_2/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-0.95, 0.08, -2.0)]"
+          },
+          "plant_3/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-1.1, 0.08, 2.7)]"
+          },
+          "plant_4/peace_lily/peace_lily_export": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "0e688d237839b31260eb1b3ddb452bb9689f63ae386e84ad5ee58b8654e3ac99",
+                "normals": "43c8c1252c670a92f0b01e47884cf3c5a0142969227a420976668507ddd8f857",
+                "uv": "6e7897f071c1f5e05eca001e1a7128f87b00a483a043ffca19ba49bb18f03ad8",
+                "vertices": "a9561321b70b2392931868e1e588908d864e416905bc945caeee871fd2b6db82"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.85, 0.08, 2.65)]"
+          },
+          "sculpture_base/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "7cbd86cde4ecd6c024b4510de805c1268ba4a8bbce6d80335a0bbf546526a8d0",
+                "normals": "3bf570bc86b6d514ebecd8f227612b56ead4ea97ac64d8cafd1b18cdd8742539",
+                "uv": "2081b36da4d0d8b710751eed6f5c391b5dee1de4588e81052f27f178d338c544",
+                "vertices": "f5132748367f141579168b276fa0f62163a46730afcc66800e7442b667683bb1"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (0.04, 0.08, 0.18)]"
+          },
+          "sculpture_body/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "ff3392f894233e3257dd430d81b9eaf7cba6de2ed93c4e7cda1d740a5860ef30",
+                "normals": "6775f304a85fcf963d6b10d9ef820e45bb8211d1f2795d471dcba0272cb0f05d",
+                "uv": "6cdb9e631cd07f57ac52b10b27d20cc63b2908c24b5d1baf0f6065a1e64aa887",
+                "vertices": "e0ca401a5c2e04fffbb72b08159562eae55207367d8e16f7b276a3503d72fc5d"
+              }
+            ],
+            "transform": "[X: (0.707107, 0.0, -0.707107), Y: (0.0, 1.0, 0.0), Z: (0.707107, 0.0, 0.707107), O: (0.04, 0.48, 0.18)]"
+          },
+          "sofa_1/sofa_three_seat/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2ed3426642b4b0659699fb40622b5fd701f873533c02468cfbcc28673af4ddb2",
+                "normals": "bf0d4a618b63efd7baa088558c001f527ec436449da9a744f9bb442634869bc3",
+                "uv": "898c3266ee0552e5483d62a516872b76f6e4b2d2abf39ce31222871c19edd819",
+                "vertices": "e0ecc8f92c989ca60a1a3c125d5caea35f138e0b9b549a75f5aaee3580b08a44"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.37, 0.08, 1.25)]"
+          },
+          "sofa_2/sofa_three_seat/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "2ed3426642b4b0659699fb40622b5fd701f873533c02468cfbcc28673af4ddb2",
+                "normals": "bf0d4a618b63efd7baa088558c001f527ec436449da9a744f9bb442634869bc3",
+                "uv": "898c3266ee0552e5483d62a516872b76f6e4b2d2abf39ce31222871c19edd819",
+                "vertices": "e0ecc8f92c989ca60a1a3c125d5caea35f138e0b9b549a75f5aaee3580b08a44"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, 1.0), Y: (0.0, 1.0, 0.0), Z: (-1.0, 0.0, -0.0), O: (2.83, 0.08, 1.45)]"
+          },
+          "table_1/small_round_table/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "a66f9bcef013393c7488ea080886b60c18c4b52db05d3b8f8c2e9ce5270100ae",
+                "normals": "652c66efee9be59978a044e2fe153d6ba57e9705fb64723fc404af068bbf0cc0",
+                "uv": "9b3d449043e107c01a63c084e2c1d64cd9a9408a028ad0c41191bb1484c84879",
+                "vertices": "04118a15a5de96d5da813e9fb160431846611f078268cd9602eb13af57f7e518"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-2.48, 0.08, -0.75)]"
+          },
+          "table_2/small_round_table/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "a66f9bcef013393c7488ea080886b60c18c4b52db05d3b8f8c2e9ce5270100ae",
+                "normals": "652c66efee9be59978a044e2fe153d6ba57e9705fb64723fc404af068bbf0cc0",
+                "uv": "9b3d449043e107c01a63c084e2c1d64cd9a9408a028ad0c41191bb1484c84879",
+                "vertices": "04118a15a5de96d5da813e9fb160431846611f078268cd9602eb13af57f7e518"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.95, 0.08, -0.4)]"
+          },
+          "table_3/small_round_table/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "a66f9bcef013393c7488ea080886b60c18c4b52db05d3b8f8c2e9ce5270100ae",
+                "normals": "652c66efee9be59978a044e2fe153d6ba57e9705fb64723fc404af068bbf0cc0",
+                "uv": "9b3d449043e107c01a63c084e2c1d64cd9a9408a028ad0c41191bb1484c84879",
+                "vertices": "04118a15a5de96d5da813e9fb160431846611f078268cd9602eb13af57f7e518"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (1.7, 0.08, 2.82)]"
+          },
+          "wall_clock/wall_clock/wall_clock_001": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "fb401eb1e95e2e210163ef5363a3806b3e2f8dd5895d92abcb4d0eaeec1dc40b",
+                "normals": "d97a2c50154e9c44deefc67029c8cfa0492d0d1732a32eb67a47599993a7af67",
+                "uv": "f39343cee849e2a8bc154b85f2657452421f7ad86f1e91ad8c45b0c905b85ee5",
+                "vertices": "98d95b6b433e2469d4e42c501cecd765a7449466e00849c58d646f4f4f70dee8"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.035, 2.53, 0.0)]"
+          },
+          "wall_sconce_1/wall_sconce/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9c73b13f4a5651ced6e287b685155a592f8aa8dbd8df9c136340ba6727653ca5",
+                "normals": "c96bcad5ea689aca4bb234ca88a24c7bd9cb3241d3a8d14defc5869041721110",
+                "uv": "34c336b37828df63f28357a80ccb52967c6c28705210dd9294b0aa0cf3131581",
+                "vertices": "252c4e71989ca85ca2bed684415e13653ed1ded2b9ce2b5e3cbc6dfcf33b0ed2"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-3.04, 2.43, 2.78)]"
+          },
+          "wall_sconce_2/wall_sconce/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9c73b13f4a5651ced6e287b685155a592f8aa8dbd8df9c136340ba6727653ca5",
+                "normals": "c96bcad5ea689aca4bb234ca88a24c7bd9cb3241d3a8d14defc5869041721110",
+                "uv": "34c336b37828df63f28357a80ccb52967c6c28705210dd9294b0aa0cf3131581",
+                "vertices": "252c4e71989ca85ca2bed684415e13653ed1ded2b9ce2b5e3cbc6dfcf33b0ed2"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (-2.7, 2.43, -2.97)]"
+          },
+          "wall_sconce_3/wall_sconce/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "9c73b13f4a5651ced6e287b685155a592f8aa8dbd8df9c136340ba6727653ca5",
+                "normals": "c96bcad5ea689aca4bb234ca88a24c7bd9cb3241d3a8d14defc5869041721110",
+                "uv": "34c336b37828df63f28357a80ccb52967c6c28705210dd9294b0aa0cf3131581",
+                "vertices": "252c4e71989ca85ca2bed684415e13653ed1ded2b9ce2b5e3cbc6dfcf33b0ed2"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (2.6, 2.43, -2.97)]"
+          },
+          "water_dispenser/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "97e335321e7b2233fd94c71ea435a3b362b9782fde01ed54f7c223ece400e81e",
+                "normals": "a9444848c9984dfe708c14b7f4da80c9cd7ac9c4d56fb1fd7205de865e9e604b",
+                "uv": "d78ae927dcd649ebb290adcb988d830c889010fb972273c7f6e060ee729d37b8",
+                "vertices": "c2cb818bb92cf28d0d3e5dc311b01de89600530d99caea441e1c38103b7e5e4c"
+              }
+            ],
+            "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, 1.0, 0.0), Z: (0.0, 0.0, 1.0), O: (3.02, 0.08, -2.6)]"
+          },
+          "window_flowerbox/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "910b9b48e89f030a1b74305457af6ec0302a9b36af3f3381908b0fd02cda152a",
+                "normals": "bc3ec135b65b2b4cbc2a3216cc31776846c6c2657b389e5e97faafa9cfeb35f5",
+                "uv": "824082b5d49dcf912724dbbc5c76fc45130c73976cd99922c900dc385c09cf60",
+                "vertices": "0501c3b97f2d77c9e9ce3e30fb83ebe7953a500fbfe2dd7c74ad6239ce3e40f8"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.91, 1.06, -1.78)]"
+          },
+          "window_flowerbox_2/Export temporary/Body": {
+            "surfaces": [
+              {
+                "colors": "7e071fd9b023ed8f18458a73613a0834f6220bd5cc50357ba3493c6040a9ea8c",
+                "indices": "910b9b48e89f030a1b74305457af6ec0302a9b36af3f3381908b0fd02cda152a",
+                "normals": "bc3ec135b65b2b4cbc2a3216cc31776846c6c2657b389e5e97faafa9cfeb35f5",
+                "uv": "824082b5d49dcf912724dbbc5c76fc45130c73976cd99922c900dc385c09cf60",
+                "vertices": "0501c3b97f2d77c9e9ce3e30fb83ebe7953a500fbfe2dd7c74ad6239ce3e40f8"
+              }
+            ],
+            "transform": "[X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (-2.91, 1.06, 1.78)]"
+          }
+        },
+        "mock_only": true,
+        "recolored_surfaces": 34,
+        "sign": {
+          "sample_text": "green cross; right side blank",
+          "size": [
+            0.88,
+            0.23
+          ]
+        }
+      }
+    }
+  }
+}
