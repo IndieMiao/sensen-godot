@@ -1,0 +1,37 @@
+[
+  {
+    "file": "SGODOT-325_skin_B_mock_v0_N1_compare.jpg",
+    "bytes": 567750,
+    "sha256": "8ffaa3dac8336234d4b352d09b219ca8b90c3c65db30b6b2cbdeea4d9e8693f9",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_mock_v0_N1_B_overview.jpg",
+    "bytes": 429812,
+    "sha256": "9fc325b9231882f7e8576807fd48d349ec95e0b9e23117961ae498aeaaa73b8a",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_mock_v0_N2_compare.jpg",
+    "bytes": 484859,
+    "sha256": "fb2e4eb73a287f83e1c21545c80e7c0f033cdeb87d7919affbdbf0d28c8efce9",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_mock_v0_N2_B_overview.jpg",
+    "bytes": 338251,
+    "sha256": "58efc6c63c70897c0388fe5cae5b0d706b023dfc9adc69b115e8222af2ce76bb",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_mock_v0_validation.json",
+    "bytes": 174772,
+    "sha256": "4f6e6062b73fb50c9f2fa81e45d404be7a984880fa71b24c2ea714a1d81c7f46",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
