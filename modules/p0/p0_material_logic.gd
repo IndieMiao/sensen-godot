@@ -327,6 +327,46 @@ static func wild_mine_rows(view: Dictionary, site: Dictionary) -> Array:
 	rows.append(["You", "Best here F%d" % best if best > 0 else "Not visited"])
 	return rows
 
+## A wild site's type word as its name ends (v4q(3) ④): the mouth card's type line says `<word> mine`.
+const WILD_TYPE_WORDS := {"quarry": "Quarry", "vein": "Vein", "geode": "Geode", "abyss": "Abyss", "ruin": "Ruins"}
+
+## A wild site's mouth card (E1 321:181190 / E1-HERE 321:181494 / 321:181671, E4 329:182456; v4q(5) ⑩ ⑪, LOCK-21): the
+## name, `Vein mine · Floors 1–40 · near San Jose`, the mine's rows (wild_mine_rows) and, away from it, `Distance` and
+## `Cost` (the viewport's `cost`, #706: `Free` for the nearest three) with `Go` (the wild travel card). At the site:
+## `Enter mine · 2 Energy` (content.mine.floor_energy), `Enter mine · Free` once Floor 1 is paid today
+## (view.mine.paid_today, #705: its 1 in the list), amber `Enter mine · Need 2 Energy` short of it. A type not open yet
+## (E4): the type line and `Not open yet`, no key. {state: go | enter | energy | closed, …the P0PlaceSheet spec}.
+static func mine_card(view: Dictionary, site: Dictionary, here: bool, km := -1.0) -> Dictionary:
+	var type_line := "%s mine" % str(WILD_TYPE_WORDS.get(str(site.get("type", "")), str(site.get("type", "")).capitalize()))
+	var floors := wild_mine_floors(site)
+	if floors != "": type_line += " · " + floors
+	if str(site.get("near_name", "")) != "": type_line += " · near " + str(site.near_name)
+	var out := {"title": str(site.get("name", "")), "subtitle": type_line, "state": "closed"}
+	if not bool(site.get("open", false)):
+		out.line = "Not open yet"
+		out.no_primary = true
+		return out
+	var facts: Array = wild_mine_rows(view, site)
+	if not here:
+		if km >= 0.0: facts.append(["Distance", P0PlaceSheet.distance_text(km)])
+		var cost: Dictionary = site.get("cost", {}) if site.get("cost", null) is Dictionary else {}
+		if not cost.is_empty():
+			facts.append(["Cost", load("res://modules/p0/p0_travel.gd").fare_text({"free": int(cost.get("energy", 0)) == 0 and int(cost.get("coins", 0)) == 0,
+				"energy": int(cost.get("energy", 0)), "coins": int(cost.get("coins", 0))})])
+		out.merge({"facts": facts, "primary": "Go", "state": "go"}, true)
+		return out
+	var paid: Array = (view.get("mine", {}).get("paid_today", {}) as Dictionary).get(str(site.get("id", "")), []) if view.get("mine") is Dictionary and view.mine.get("paid_today") is Dictionary else []
+	var cost := int(P0Logic.content().get("mine", {}).get("floor_energy", 2))
+	out.merge({"facts": facts, "state": "enter"}, true)
+	if paid.has(1) or paid.has(1.0): out.primary = "Enter mine · Free"
+	elif int(view.get("energy", {}).get("value", 0)) < cost:
+		out.primary = "Enter mine"
+		out.blocked = "Enter mine · Need %d Energy" % cost
+		out.blocked_energy = true
+		out.state = "energy"
+	else: out.primary = "Enter mine · %d Energy" % cost
+	return out
+
 ## The deepest floor open in a wild site's mine: a vein's open_to (40; F41 on is `Not open yet`), else its floors.
 static func wild_mine_last(site: Dictionary) -> int:
 	var mine: Dictionary = site.get("mine", {}) if site.get("mine", null) is Dictionary else {}

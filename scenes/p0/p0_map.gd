@@ -200,6 +200,16 @@ func _pond_info(entry: Dictionary) -> Dictionary:
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
+	# SGODOT-355: a wild site opens its mouth card wherever it is (no city's, no fog); a gathering spot its own card in
+	# a city explored (Go on it travels), the city's silhouette card in the fog
+	if bool(entry.get("wild", false)):
+		city_map.info.hide()
+		open_mine_card(str(entry.get("id", "")))
+		return
+	if bool(entry.get("gather", false)) and P0Travel.fog(_view(), cluster_of_entry(entry)) != "unexplored":
+		city_map.info.hide()
+		_open_gather_card(str(entry.get("id", "")))
+		return
 	if _travel_first(entry, false): return
 	if str(entry.get("kind", "")) == "place":
 		var spec := place_card(entry)
@@ -316,6 +326,7 @@ var _styles_explored := ""   # home and the count of cities visited the styles w
 ## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
 ## keep that name card.
 func _own_card(entry: Dictionary) -> bool:
+	if bool(entry.get("gather", false)) or bool(entry.get("wild", false)): return true   # SGODOT-355's cards
 	match str(entry.get("kind", "")):
 		"pond": return not _pond_info(entry).is_empty()
 		"place": return not place_card(entry).is_empty()
@@ -393,6 +404,148 @@ static func short_name(name: String) -> String:
 	return name
 
 # ---------------------------------------------------------------- gathering spots and wild sites (SGODOT-355 C)
+## The gathering spot's card (D2, P0MaterialLogic.gather_card) or a wild site's mouth card (E1) open now, and the spec
+## it reads: its key follows the view (a gather's reply turns it to `Ready in 4h`, the card staying open; a cooldown
+## counts down; Energy comes back; Floor 1 paid today) — p0_frame.
+var _live_card: Control
+var _live_spec := Callable()
+var _live_sig := ""
+
+func gather_card_spec(id: String) -> Dictionary:
+	var spot := P0CityPlaces.gather_spot(id)
+	if spot.is_empty() or rt == null: return {}
+	var v := rt.session.current()   # its cooldown and Energy counted on since the view came
+	var ready := float((v.get("gather", {}).get("city_ready", {}) as Dictionary).get(id, 0.0)) if v.get("gather") is Dictionary else 0.0
+	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(spot.lat), float(spot.lng)))
+	return P0MaterialLogic.gather_card(v, spot, P0Travel.here(v) == str(spot.cluster), ready, km)
+
+func _open_gather_card(id: String) -> void:
+	var spec := gather_card_spec(id)
+	if spec.is_empty(): return
+	spec["on_blocked"] = func():   # amber: the Energy card (LOCK-02); grey (cooling, no room): the key says why already
+		var now := gather_card_spec(id)
+		if str(now.get("state", "")) == "energy": rt.ui.open_energy_card(int(P0CityPlaces.gather_spot(id).get("energy", 0)), "Gather")
+	_open_live_card(id, spec, gather_card_spec.bind(id), _gather_go.bind(id), "gather_card")
+
+func _open_live_card(id: String, spec: Dictionary, live: Callable, go: Callable, kind: String) -> void:
+	_live_spec = live
+	_live_sig = _card_key_sig(spec)
+	var holder: Array = [null]
+	holder[0] = P0PlaceSheet.open(rt.ui, spec, go, Callable(), func():
+		if _live_card == holder[0]:
+			_live_card = null
+			_live_spec = Callable()
+		if city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(), kind)
+	_live_card = holder[0]
+
+## Gather: `{type: gather, spot}` (the card stays open; the reply's item event floats `+4 Timber`, the key turns to
+## `Ready in 4h` — no toast, no teaching card, D2-GATHERED). Go (not in its city): that city's card, its travel card.
+func _gather_go(id: String) -> void:
+	var spec := gather_card_spec(id)
+	match str(spec.get("state", "")):
+		"ready":
+			var cmd := {"type": "gather", "spot": id}
+			rt.session.send(cmd, P0Session.ui_key(cmd))
+		"go":
+			rt.ui.close_modal()
+			open_city_card(str(P0CityPlaces.gather_spot(id).get("cluster", "")))
+
+## The open gathering card's key as the view has it now (p0_frame): only when what it says changed.
+func _refresh_live_card() -> void:
+	if _live_card == null or not is_instance_valid(_live_card) or not _live_spec.is_valid(): return
+	var spec: Dictionary = _live_spec.call()
+	var sig := _card_key_sig(spec)
+	if sig == _live_sig: return
+	_live_sig = sig
+	var key := _live_card.find_child("Primary", true, false) as UiCommandButton
+	if key == null: return
+	key.label = str(spec.get("primary", ""))
+	key.need_energy = bool(spec.get("blocked_energy", false))
+	key.reason = str(spec.get("blocked", ""))
+
+static func _card_key_sig(spec: Dictionary) -> String:
+	return "%s|%s|%s" % [spec.get("primary", ""), spec.get("blocked", ""), spec.get("blocked_energy", false)]
+
+## A wild site's mouth card (P0MaterialLogic.mine_card) as the view has it now: the site as the viewport read it, the
+## view's own fields for the one the player is at (P0WildSites.remember); {} for a site not read.
+func mine_card_spec(id: String) -> Dictionary:
+	if rt == null or not P0WildSites.has_site(id): return {}
+	var site := P0WildSites.site(id)
+	var v := rt.session.current()
+	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(site.lat), float(site.lng)))
+	return P0MaterialLogic.mine_card(v, site, P0Travel.here(v) == id, km)
+
+## The mouth card (E1 / E4): Go → the wild travel card (C3); at the site Enter mine (P0Runtime.enter_mine), amber short
+## of Energy (the Energy card); not open yet, no key.
+func open_mine_card(id: String) -> void:
+	var spec := mine_card_spec(id)
+	if spec.is_empty(): return
+	spec["on_blocked"] = func(): rt.ui.open_energy_card(int(P0Logic.content().get("mine", {}).get("floor_energy", 2)), "Enter mine")
+	_open_live_card(id, spec, mine_card_spec.bind(id), _mine_go.bind(id), "mine_card")
+
+func _mine_go(id: String) -> void:
+	match str(mine_card_spec(id).get("state", "")):
+		"go":
+			rt.ui.close_modal()
+			open_wild_travel(id)
+		"enter":
+			rt.ui.close_modal()
+			rt.enter_mine(id)
+
+## C3 354:186011 (安其拉 d17dfb13): a wild site's travel card — its name, the mouth card's type line, Distance, Energy and
+## Coins (`Free` for the nearest three; else the fare and what is left, as a city's), Fly (the fare's gap grey or amber,
+## q(257) ③), `Return home is always free`. The fare is the viewport's `cost` (#706: fareOf's, what travel takes).
+static func wild_travel_card(view: Dictionary, site: Dictionary, km: float) -> Dictionary:
+	var cost: Dictionary = site.get("cost", {}) if site.get("cost", null) is Dictionary else {}
+	var f := {"energy": int(cost.get("energy", 0)), "coins": int(cost.get("coins", 0))}
+	f["free"] = int(f.energy) == 0 and int(f.coins) == 0
+	var card := P0MaterialLogic.mine_card(view, site, false)
+	var facts: Array = [["Distance", P0PlaceSheet.distance_text(km)]]
+	facts.append(["Energy", "Free" if int(f.energy) == 0 else _fare_left(int(f.energy), int(view.get("energy", {}).get("value", 0)))])
+	facts.append(["Coins", "Free" if int(f.coins) == 0 else _fare_left(int(f.coins), int(view.get("coins", 0)))])
+	var gap := P0Travel.fare_gap(view, f)
+	return {"title": str(card.title), "subtitle": str(card.subtitle), "facts": facts, "primary": "Fly",
+		"blocked": str(gap.get("text", "")), "gap": gap, "blocked_energy": str(gap.get("short", "")) == "energy",
+		"footer": "Return home is always free", "fare": f}
+
+func open_wild_travel(id: String) -> void:
+	if rt == null or not P0WildSites.has_site(id): return
+	var site := P0WildSites.site(id)
+	var spec := wild_travel_card(rt.session.current(), site, P0PlaceSheet.km_between(_origin(), Vector2(float(site.lat), float(site.lng))))
+	var gap: Dictionary = spec.gap
+	spec["on_blocked"] = func():
+		if str(gap.get("short", "")) == "coins": rt.ui.toast_error("Wallet floor · keep %d coins" % P0Travel.WALLET_FLOOR)
+		else: rt.ui.open_energy_card(int(gap.get("need", 0)), "Fly")
+	P0PlaceSheet.open(rt.ui, spec, func():
+		rt.ui.close_modal()
+		_fly_to_wild(id), Callable(), Callable(), "travel_card")
+	# v4q(4) ⑥ 丁21: a travel card that costs Energy or coins teaches travel once (the guide holds it, P0Guide.tip_allowed)
+	if not bool(spec.fare.free): rt.ui.teach("travel")
+
+## Fly to a wild site: `travel` goes as the camera flies there; once it is taken the player is at the site (its chip,
+## C2 `Ironvale Vein · Day Pass 23h`) and its mouth card opens with Enter mine. A refusal says why as any travel's does
+## (P0Runtime) and the camera stays over the site.
+func _fly_to_wild(id: String) -> void:
+	var site := P0WildSites.site(id)
+	var cmd := {"type": "travel", "to": id}
+	var key := P0Session.ui_key(cmd)
+	var settled := [false, false]   # [taken, landed]
+	var both := func():
+		if settled[0] and settled[1] and rt != null and P0Travel.here(_view()) == id: open_mine_card(id)
+	var on_settled := func(k: String, ok: bool, _code: String):
+		if k != key: return
+		settled[0] = ok
+		if ok: both.call()
+	rt.session.command_settled.connect(on_settled)   # let go after 30 s below (another command may settle first)
+	rt.session.send(cmd, key)
+	_show_target = id
+	_fly("wild:" + id, float(site.lat), float(site.lng), WILD_ZOOM, func():
+		settled[1] = true
+		both.call())
+	get_tree().create_timer(30.0).timeout.connect(func():
+		if rt != null and rt.session.command_settled.is_connected(on_settled): rt.session.command_settled.disconnect(on_settled))
+const WILD_ZOOM := 12.0   # where a flight to a wild site lands: the site and its surroundings
+
 ## A gathering spot's pin entry (contract C §9; P0CityPlaces.gather_spot holds the spot).
 static func gather_entry(g: Dictionary) -> Dictionary:
 	return {"id": str(g.id), "kind": "place", "name": str(g.get("name", "")), "lat": float(g.lat), "lng": float(g.lng),
@@ -900,7 +1053,8 @@ func p0_return(route: String) -> void:
 func open_wild_card(site_id: String) -> void:
 	if not P0WildSites.has_site(site_id): return
 	var s := P0WildSites.site(site_id)
-	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), SHOW_ZOOM)
+	_show_target = site_id
+	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), WILD_ZOOM, open_mine_card.bind(site_id))
 
 ## Without the native map (desktop, tests holding the map in a SubViewport) the map drawn is the viewport: the camera
 ## follows its height as on a phone. map_poc takes the window's, which can be taller — the desktop's 1280 override, a
@@ -1076,6 +1230,8 @@ func open_travel(cluster: String, preview := {}) -> void:
 	_travel_card = P0PlaceSheet.open(rt.ui, spec, func():
 		rt.ui.close_modal()
 		_take_off(cluster, int(P0Travel.trip(_view(), cluster).get("km", 0)) if not preview.has("km") else int(preview.km)), Callable(), Callable(), "travel_card")
+	# v4q(4) ⑥ 丁21: a travel card that costs Energy or coins teaches travel once (the guide holds it, P0Guide.tip_allowed)
+	if not bool(P0Travel.fare(rt.session.current(), cluster).free): rt.ui.teach("travel")
 
 var _travel_card: Control   # the travel card open now (its holder)
 
@@ -1491,6 +1647,7 @@ static func cluster_of_entry(entry: Dictionary) -> String:
 ## alone (CityMapView.select), as a city bubble opens the same card with no pin at all (不知火舞 on 327, 11ca174e; it stayed raised after the card closed, q(212) ⑥). True when it opened one.
 func _travel_first(entry: Dictionary, going := true) -> bool:
 	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
+	if bool(entry.get("wild", false)): return false   # no city's: its mouth card says Go (SGODOT-355)
 	var cluster := cluster_of_entry(entry)
 	var open := P0Travel.in_city(_view(), cluster) if going else P0Travel.covers(_view(), cluster)
 	if P0Travel.fog(_view(), cluster) != "unexplored" and open: return false
@@ -1941,6 +2098,7 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
 	if city_map.home_key.visible != key_shown: city_map.home_key.visible = key_shown   # the home key with it
 	_place_nearby_key(key_shown)
+	_refresh_live_card()
 	P0WildSites.remember(view)   # the site the player is at, with the view's own fields (contract C §5)
 	if P0WildSites.count() != _wild_count: _set_outpost_places()
 	var list := _marks_now(view)

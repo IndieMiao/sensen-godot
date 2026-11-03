@@ -115,6 +115,14 @@ static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary
 		mine["day_pass"] = ""
 		return mine
 	if not away(view) or space in HOMESTEAD_SPACES: return home_chip(view, info)
+	if here(view).begins_with("wd-"):   # at a wild site (C2 326:182063): its name and its Day Pass, `Ironvale Vein · Day Pass 23h`
+		var site = view.get("wild", {}).get("here", null) if view.get("wild", null) is Dictionary else null
+		var at := info.duplicate()
+		at["city"] = str(site.get("name", "")) if site is Dictionary else str(info.get("city", ""))
+		at["space"] = ""
+		at["kind"] = UiHud.PlaceKind.FOREIGN
+		at["day_pass"] = pass_text(view, here(view))
+		return at
 	var c := P0Clusters.get_cluster(here(view))
 	var out := info.duplicate()
 	var city := str(c.name) if not c.is_empty() else str(info.get("city", ""))
