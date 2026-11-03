@@ -100,3 +100,28 @@ func test_an_old_saves_reply_blocks_with_maintenance_and_never_becomes_the_view(
 	assert_bool(bool(s._handle(HTTPRequest.RESULT_SUCCESS, 200, reply.call({"save_version": 7}), {}).ok)).is_true()
 	assert_int(int(s.view.save_version)).is_equal(7)
 	s.free()
+
+## 355 3b2c6a43 (李白's note 547a1962, pending the user's word): the twelve NeedSource lines; a long one breaks only
+## before ` · or ` (no-break spaces everywhere else, two lines at most); Show where Today points.
+func test_need_sources_name_the_city_spots_and_the_mines() -> void:
+	_spots()
+	var v := _view({"names": {"wood": "Timber", "stone": "Stone", "fiber": "Reeds", "wild_herb": "Herb", "clay": "Clay",
+		"hardwood": "Hardwood", "flax": "Flax", "copper_ore": "Copper Ore", "coal": "Coal", "rock_salt": "Rock Salt",
+		"iron_ore": "Iron Ore", "quartz": "Quartz"}})
+	var lines := {"wood": "Timber · Groves in town", "stone": "Stone · Rocks in town · or any mine",
+		"fiber": "Reeds · Reed Banks in town", "wild_herb": "Herb · Herb Patches in town",
+		"clay": "Clay · Clay Pits in town · or Quarries", "hardwood": "Hardwood · Woods in some towns",
+		"flax": "Flax · Flax Fields in some towns", "copper_ore": "Copper Ore · Quarries", "coal": "Coal · Quarries",
+		"rock_salt": "Rock Salt · Quarries", "iron_ore": "Iron Ore · Iron veins from Floor 10",
+		"quartz": "Quartz · Quartz veins from Floor 10"}
+	for id in lines:
+		var src := P0MaterialLogic.material_source(v, id)
+		assert_str(str(src.text).replace(" ", " ")).override_failure_message(id).is_equal(str(lines[id]))
+		assert_str(str(src.go)).override_failure_message(id).is_equal(str(P0Logic._home_material_go(v, id).go))
+	assert_str(str(P0MaterialLogic.material_source(v, "wood").go)).is_equal("gather:" + HOME + "~wood0")
+	assert_str(str(P0MaterialLogic.material_source(v, "iron_ore").go)).is_equal("mine:wv1")
+	var clay := str(P0MaterialLogic.material_source(v, "clay").text)
+	assert_int(clay.count(" ")).is_equal(1)   # the one breakable space: before `· or`
+	assert_bool(clay.contains(" · or Quarries")).is_true()
+	assert_dict(P0MaterialLogic.material_source(v, "bait_worm")).is_empty()
+	assert_dict(P0MaterialLogic.material_source(v, "seed_radish")).is_empty()
