@@ -222,6 +222,9 @@ class P0Translation extends Translation:
 		if _exact.has(s): return _exact[s]
 		var t := _template(s)
 		if t != "": return t
+		if s.ends_with(" · ") and s.length() > 3:   # a line's first half drawn on its own (the HUD's `San Francisco · `)
+			var head := translate_line(s.left(s.length() - 3))
+			return head + " · " if head != "" else ""
 		var bare := s.strip_edges()
 		if bare != s and bare != "":   # a label padded with spaces (`Muscle Memory `): the spaces stay where they were
 			var z := translate_line(bare)

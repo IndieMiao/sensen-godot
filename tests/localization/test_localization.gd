@@ -250,6 +250,7 @@ func test_p0_city_list_is_the_home_cities_and_their_fallback_ten() -> void:
 	t.set_table({"Tokyo": "东京", "San Francisco": "旧金山"})
 	assert_str(String(t.get_message("Tokyo"))).is_equal("东京")
 	assert_str(String(t.get_message("Tokyo · Japan"))).is_equal("东京 · Japan")
+	assert_str(String(t.get_message("San Francisco · "))).is_equal("旧金山 · ")   # the HUD's place pill, its tail apart
 	assert_str(String(t.get_message("Paris"))).is_equal("")   # off the list: the English stays
 
 ## #649 第二批 ⑨: a line kept to a width is measured as it shows — under 中文 the Chinese, cut by its own width, and
@@ -330,11 +331,12 @@ func test_p0_the_gear_rod_line_reads_as_one_sentence() -> void:
 func test_p0_a_quick_slots_chinese_name_breaks_by_the_character() -> void:
 	var t: Translation = LocalizationScript.P0Translation.new()
 	t.locale = "zh_CN"
-	t.set_table({"Quick Radish Seeds": "小萝卜种子", "Giant Red Radish Seeds": "超级无敌快熟大红萝卜种子"})
+	t.set_table({"Quick Radish Seeds": "小萝卜种子", "Giant Red Radish Seeds": "超级无敌快熟大红萝卜种子", "Lettuce Seeds": "生菜种子"})
 	TranslationServer.add_translation(t)
 	Localization.set_cjk_fonts(true)
-	assert_str(UiItemCell.quick_name("Quick Radish Seeds")).is_equal("小萝卜种子")   # two lines at most: whole
-	assert_int(UiItemCell.quick_lines("小萝卜种子")).is_less_equal(2)
+	assert_str(UiItemCell.quick_name("Quick Radish Seeds")).is_equal("小萝卜\n种子")   # two lines: 种子 whole on the second
+	assert_int(UiItemCell.quick_lines("小萝卜种子")).is_equal(2)   # 51 px: past the slot's padded 44
+	assert_str(UiItemCell.quick_name("Lettuce Seeds")).is_equal("生菜种子")   # one line (41 px): as it is
 	assert_int(UiItemCell.quick_lines("超级无敌快熟大红萝卜种子")).is_greater(2)
 	assert_str(UiItemCell.quick_name("Giant Red Radish Seeds")).is_equal("超级无敌快熟大红萝卜")
 	var cell := UiItemCell.new(UiItemCell.Density.QUICK)

@@ -4781,7 +4781,7 @@
    "modules/p0/p0_trap.gd:76",
    "scenes/p0/panels/p0_bag_drawer.gd:297",
    "scenes/p0/rooms/p0_farmhouse.gd:442",
-   "scenes/ui_kit/ui_item_cell.gd:594"
+   "scenes/ui_kit/ui_item_cell.gd:602"
   ],
   "kind": "line",
   "done": true
@@ -7087,7 +7087,7 @@
  },
  "In pot": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:650"
+   "scenes/ui_kit/ui_item_cell.gd:658"
   ],
   "kind": "line",
   "done": true
@@ -9313,7 +9313,7 @@
  },
  "Not for\ncooking": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:650"
+   "scenes/ui_kit/ui_item_cell.gd:658"
   ],
   "kind": "line",
   "done": true
@@ -10746,7 +10746,7 @@
  },
  "Rack": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:497"
+   "scenes/ui_kit/ui_item_cell.gd:505"
   ],
   "kind": "line",
   "done": true
@@ -11692,7 +11692,7 @@
  },
  "Seed": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:333"
+   "scenes/ui_kit/ui_item_cell.gd:336"
   ],
   "kind": "line"
  },
@@ -13945,7 +13945,7 @@
  },
  "Try it": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:507"
+   "scenes/ui_kit/ui_item_cell.gd:515"
   ],
   "kind": "line",
   "done": true
