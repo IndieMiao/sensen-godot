@@ -79,6 +79,18 @@ static func first_dig(view: Dictionary) -> Dictionary:
 	var d = view.get("first_dig", null)
 	return d if d is Dictionary and not bool(d.get("done", false)) and int(d.get("floor", 0)) > 0 else {}
 
+## v4q(9), #697: the server offers/consumes this line. Keep only this conversation's copy in the UI.
+static func pip_line(view: Dictionary, resident: String) -> String:
+	if resident != "res_pip" or P0Guide.guide_on(view): return ""
+	var first = view.get("first_dig", null)
+	if not first is Dictionary or not bool(first.get("done", false)): return ""
+	var line = view.get("pip_line", null)
+	if not line is Dictionary or str(line.get("key", "")) != "pip_vein": return ""
+	var name := str(line.get("name", "")).strip_edges()
+	if name == "" or str(line.get("vein", "")) == "": return ""
+	var template := str(P0Logic.content().get("mine", {}).get("first_dig", {}).get("lines", {}).get("pip_vein", ""))
+	return template.replace("%s", name) if template.contains("%s") else ""
+
 static func first_dig_row(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)
 	if d.is_empty(): return {}

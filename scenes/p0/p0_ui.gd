@@ -3144,17 +3144,21 @@ func inbox_claim_done() -> void:
 ## shows the bar from P0Logic.resident_bar (SGODOT-228). Returns false when the view has no such resident.
 var _resident := ""
 var _reply := {}   # {id, line}: the resident's answer shown in the bubble until another resident's bar opens
+var _pip_vein_line := ""   # shown before talk consumes view.pip_line; never a persistent "said" flag
 
 func open_resident(id: String) -> bool:
 	var d := P0Logic.resident_bar(view, id)
 	if d.is_empty(): return false
+	var new_talk := _resident != id or modal_kind != "resident"
+	if new_talk: _pip_vein_line = P0Logic.GearLogic.pip_line(view, id)
 	# C2/C3: keep the confirmed resend answer through this conversation's rebuilds, then let a new talk read
 	# Pip's current server step. His old answer must not cover the next water/harvest instruction forever.
 	if surface == "farm" and id == "res_pip" and modal_kind != "resident": _reply = {}
-	if _resident != id or modal_kind != "resident": command.emit({"type": "talk", "resident": id})
 	if _resident != id: _reply = {}
 	_resident = id
 	_show_resident(d)
+	# Draw first: even a synchronous talk reply may withdraw pip_line and rebuild this same bar.
+	if new_talk: command.emit({"type": "talk", "resident": id})
 	return true
 
 ## Whether the resident bar offers Request here: not on the player's own farm (q(222) ②, Pip as the new-player
@@ -3222,6 +3226,7 @@ func _show_resident(d: Dictionary) -> void:
 		var line = P0Guide.pip(view).get("line")
 		if line is String and line != "": data.line = line
 	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
+	if str(d.id) == "res_pip" and _pip_vein_line != "" and not P0Guide.guide_on(view): data.line = _pip_vein_line
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
 	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
