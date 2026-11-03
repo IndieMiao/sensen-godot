@@ -1,0 +1,17 @@
+{
+  "revision": "v1.2",
+  "colors": {
+    "mosaic_cream": "F1DDBC",
+    "mosaic_terracotta": "E2A77A",
+    "mosaic_center": "D39A6E",
+    "mosaic_grout": "D3BB9A"
+  },
+  "row_roles": ["mosaic_center", "mosaic_cream", "mosaic_terracotta", "mosaic_terracotta", "mosaic_cream", "mosaic_cream", "mosaic_terracotta"],
+  "bands": [
+    {"radius_min": 0.0, "radius_max": 0.14, "role": "mosaic_center"},
+    {"radius_min": 0.14, "radius_max": 0.30, "role": "mosaic_cream"},
+    {"radius_min": 0.30, "radius_max": 0.62, "role": "mosaic_terracotta"},
+    {"radius_min": 0.62, "radius_max": 0.90, "role": "mosaic_cream"},
+    {"radius_min": 0.90, "radius_max": 0.97, "role": "mosaic_terracotta"}
+  ]
+}

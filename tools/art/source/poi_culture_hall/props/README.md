@@ -19,6 +19,7 @@
 - `prop_manifest.json` 的 `display_assignment` 列明两个展品组及菊石的容器和容器局部坐标，`components` 保留子件名、前中后槽位和原白模实例名。容器的整间坐标/朝向由赵云按已批白模保留。
 - 六画合成 `artwork_set.glb`，一张 mesh、一个 surface。每幅 0.70 × 0.55 m；按原 0.15 m 横向/竖向边间距烘为两排三列，整组宽 2.40 m、高 1.25 m，原点为整组背面中心。组内坐标在 `components.position`，无需重复实例化六画。
 - `floor_mosaic` 直径 1.94 m、厚 0.008 m，不带碰撞，导入时关投影。
+- v1.2 拼花只改 COLOR_0 的 RGB：四道奶油/浅赤陶色环和稍深圆心，原石缝保留；几何、法线、索引、材质和 alpha 字节不变。色板/色环半径见 `mosaic_palette.json`。
 - `name_sign` 可写区 1.24 × 0.28 m，空节点 `sign_door` 位于正面中心，metadata 带 size/module；画面留空运行时写字。
 - 新件不新增 seat、NPC 或交互挂点。后墙前 2 m 净空和整间碰撞/导航由场景执行人验证。
 
@@ -47,6 +48,26 @@ output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/package
 `--only-exhibits` 不写其余六个 GLB，保留 UID 与摆位。增量检查直接用 v1 提交的顶点计算 1.4 倍后的期望位置，
 并量新顶点和托座上下表面；其余 GLB、所有 import 和材质导入脚本逐文件核 SHA-256。
 对比图沿用已归档的 v1 原始截图 `output/culture-props-323/captures`，新图写入 `captures-v1.1`。
+
+## v1.2 仅拼花顶点色
+
+```bash
+source ~/.codex-huangzhong/env.sh
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/recolor_mosaic.py
+blender --background --python tools/art/source/poi_culture_hall/props/recolor_mosaic.py -- --source
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/prepare_mosaic_review.py
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/verify_mosaic_revision.py
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/verify.py
+blender --background --python tools/art/source/poi_culture_hall/props/verify_source.py
+godot --headless --path output/culture-mosaic-323/project --editor --import
+nvidia-smi
+godot --path output/culture-mosaic-323/project --rendering-method mobile --rendering-driver vulkan
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/package_mosaic_review.py
+```
+
+本增量直接写原 GLB 的 16 位线性顶点 RGB，保持所有其他字节；Blender 源只同步拼花部件的材料色。
+完整生成器也读取同一色板，按原七排石块归为四道色环。两道宽环各包含两排原石块，未重划几何。
+审阅工程从赵云固定头 a5ffdae1 只读提取真实 N3 地面、图集与灯光参数，不改其源文件或场景。
 
 ## 复现与检查
 

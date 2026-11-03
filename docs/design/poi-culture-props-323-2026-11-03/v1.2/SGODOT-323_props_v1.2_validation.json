@@ -1,0 +1,1657 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "instruction": "323 b31eaf83 / d5f8ef32",
+  "palette": {
+    "revision": "v1.2",
+    "colors": {
+      "mosaic_cream": "F1DDBC",
+      "mosaic_terracotta": "E2A77A",
+      "mosaic_center": "D39A6E",
+      "mosaic_grout": "D3BB9A"
+    },
+    "row_roles": [
+      "mosaic_center",
+      "mosaic_cream",
+      "mosaic_terracotta",
+      "mosaic_terracotta",
+      "mosaic_cream",
+      "mosaic_cream",
+      "mosaic_terracotta"
+    ],
+    "bands": [
+      {
+        "radius_min": 0.0,
+        "radius_max": 0.14,
+        "role": "mosaic_center"
+      },
+      {
+        "radius_min": 0.14,
+        "radius_max": 0.3,
+        "role": "mosaic_cream"
+      },
+      {
+        "radius_min": 0.3,
+        "radius_max": 0.62,
+        "role": "mosaic_terracotta"
+      },
+      {
+        "radius_min": 0.62,
+        "radius_max": 0.9,
+        "role": "mosaic_cream"
+      },
+      {
+        "radius_min": 0.9,
+        "radius_max": 0.97,
+        "role": "mosaic_terracotta"
+      }
+    ]
+  },
+  "revision": {
+    "base_commit": "85b0656588f7f2cea516f42e677c47ab466e1295",
+    "checks": [
+      {
+        "check": "Entire GLB JSON, accessors, materials, node transforms and mesh metadata unchanged",
+        "passed": true
+      },
+      {
+        "check": "GLB byte length unchanged",
+        "passed": true
+      },
+      {
+        "check": "524 triangles / one surface retained",
+        "passed": true
+      },
+      {
+        "check": "Actual vertex bounds 1.94 x .008 x 1.94m",
+        "passed": true
+      },
+      {
+        "check": "Only COLOR_0 RGB bytes changed; geometry/normals/indices/alpha byte-identical",
+        "passed": true
+      },
+      {
+        "check": "Vertex alpha unchanged",
+        "passed": true
+      },
+      {
+        "check": "Uniform authored sRGB #D39A6E across radial band 0",
+        "passed": true
+      },
+      {
+        "check": "Uniform authored sRGB #F1DDBC across radial band 1",
+        "passed": true
+      },
+      {
+        "check": "Uniform authored sRGB #E2A77A across radial band 2",
+        "passed": true
+      },
+      {
+        "check": "Uniform authored sRGB #F1DDBC across radial band 3",
+        "passed": true
+      },
+      {
+        "check": "Uniform authored sRGB #E2A77A across radial band 4",
+        "passed": true
+      },
+      {
+        "check": "Uniform authored sRGB #D3BB9A across radial band 5",
+        "passed": true
+      },
+      {
+        "check": "Every stone triangle is flat-coloured, without angular checkerboarding or gradients",
+        "passed": true
+      },
+      {
+        "check": "All seven other GLBs, imports/UIDs and material hook unchanged",
+        "passed": true
+      },
+      {
+        "check": "Manifest preserves origin",
+        "passed": true
+      },
+      {
+        "check": "Manifest preserves bounds",
+        "passed": true
+      },
+      {
+        "check": "Manifest preserves dimensions_m",
+        "passed": true
+      },
+      {
+        "check": "Manifest preserves triangles",
+        "passed": true
+      },
+      {
+        "check": "Manifest preserves surfaces",
+        "passed": true
+      },
+      {
+        "check": "Manifest preserves colliders",
+        "passed": true
+      },
+      {
+        "check": "Manifest hash matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "Whole kit remains 6,140 placed triangles / 11 surfaces",
+        "passed": true
+      },
+      {
+        "check": "Rendered project uses exact delivered GLB",
+        "passed": true
+      }
+    ],
+    "bands": [
+      {
+        "band": 0,
+        "radius_m": [
+          0,
+          0.14
+        ],
+        "srgb": "#D39A6E",
+        "vertices": 36
+      },
+      {
+        "band": 1,
+        "radius_m": [
+          0.14,
+          0.3
+        ],
+        "srgb": "#F1DDBC",
+        "vertices": 48
+      },
+      {
+        "band": 2,
+        "radius_m": [
+          0.3,
+          0.62
+        ],
+        "srgb": "#E2A77A",
+        "vertices": 168
+      },
+      {
+        "band": 3,
+        "radius_m": [
+          0.62,
+          0.9
+        ],
+        "srgb": "#F1DDBC",
+        "vertices": 264
+      },
+      {
+        "band": 4,
+        "radius_m": [
+          0.9,
+          0.97
+        ],
+        "srgb": "#E2A77A",
+        "vertices": 168
+      },
+      {
+        "band": 5,
+        "radius_m": [
+          0,
+          0.97
+        ],
+        "srgb": "#D3BB9A",
+        "vertices": 96
+      }
+    ],
+    "changed_rgb_bytes": 4680,
+    "before_sha256": "0d5b41e95c3e713da207c39553aed5351fc8000c55928c717b6955b8b2d5fa97",
+    "after_sha256": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688",
+    "preserved_files": {
+      "artwork_set.glb": {
+        "before": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5",
+        "after": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5"
+      },
+      "artwork_set.glb.import": {
+        "before": "d9a8160ca253d7068c172f4409caad8b6b8cedf693fe09b3231f5c593c0eb919",
+        "after": "d9a8160ca253d7068c172f4409caad8b6b8cedf693fe09b3231f5c593c0eb919"
+      },
+      "case_exhibits_1.glb": {
+        "before": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2",
+        "after": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2"
+      },
+      "case_exhibits_1.glb.import": {
+        "before": "2068b03e8176c8162ce9a4f1353396ee64bf646ce1b9a57e5abf10db53c5d806",
+        "after": "2068b03e8176c8162ce9a4f1353396ee64bf646ce1b9a57e5abf10db53c5d806"
+      },
+      "case_exhibits_2.glb": {
+        "before": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b",
+        "after": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b"
+      },
+      "case_exhibits_2.glb.import": {
+        "before": "e8cb5e8e00c5dd154d942b5043e4eff52d6db0de2406e304a07205a4c17b3680",
+        "after": "e8cb5e8e00c5dd154d942b5043e4eff52d6db0de2406e304a07205a4c17b3680"
+      },
+      "display_cabinet.glb": {
+        "before": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c",
+        "after": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c"
+      },
+      "display_cabinet.glb.import": {
+        "before": "4e9f38b1f041177254d7b4e6f896be5285ebd521efb1cf83331094eec7889219",
+        "after": "4e9f38b1f041177254d7b4e6f896be5285ebd521efb1cf83331094eec7889219"
+      },
+      "exhibit_ammonite.glb": {
+        "before": "f0628167601f24f2b6158dcaa2d2c8cf9e28eb2204b72b707df768a488e07f00",
+        "after": "f0628167601f24f2b6158dcaa2d2c8cf9e28eb2204b72b707df768a488e07f00"
+      },
+      "exhibit_ammonite.glb.import": {
+        "before": "1202601600725d6500856ad516d43d6ecd73f850195c3dc1b7ec9309dbaf8b55",
+        "after": "1202601600725d6500856ad516d43d6ecd73f850195c3dc1b7ec9309dbaf8b55"
+      },
+      "exhibit_plinth.glb": {
+        "before": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9",
+        "after": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9"
+      },
+      "exhibit_plinth.glb.import": {
+        "before": "acdc769a9422a1783af40ffc3a9ef05933e0875b3a653b36d5f0c1323ae91097",
+        "after": "acdc769a9422a1783af40ffc3a9ef05933e0875b3a653b36d5f0c1323ae91097"
+      },
+      "floor_mosaic.glb.import": {
+        "before": "6c00a239045e3224a73fdb7d7f4a581798da3eab3041a0bbe0d3eef78667fb28",
+        "after": "6c00a239045e3224a73fdb7d7f4a581798da3eab3041a0bbe0d3eef78667fb28"
+      },
+      "material_import.gd": {
+        "before": "308ed43029bd176a85ea6d792eeac218a18b8fac75a0e6bf1b42ea0d4d354ec7",
+        "after": "308ed43029bd176a85ea6d792eeac218a18b8fac75a0e6bf1b42ea0d4d354ec7"
+      },
+      "material_import.gd.uid": {
+        "before": "99a68ed3c2a54506f694dd4f0cf8e3f4c61535e3e31bd9e509c06a44abe58c85",
+        "after": "99a68ed3c2a54506f694dd4f0cf8e3f4c61535e3e31bd9e509c06a44abe58c85"
+      },
+      "name_sign.glb": {
+        "before": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992",
+        "after": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992"
+      },
+      "name_sign.glb.import": {
+        "before": "93832deb3d2cb9f9430788d4e5f751d6c68abae9dc6c4d52681b5ee48317f6ed",
+        "after": "93832deb3d2cb9f9430788d4e5f751d6c68abae9dc6c4d52681b5ee48317f6ed"
+      }
+    },
+    "passed": true
+  },
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "8 grouped GLBs / 9 instances",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: no textures",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: actual display support height",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: no coplanar green top faces inside ivory display bed",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "Cabinet separate alpha-blended glass surface",
+        "passed": true
+      },
+      {
+        "check": "Glass hood starts at display bed and reaches 1.5m",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: single authored component <=600 triangles",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: static prop",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: source provenance",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: no textures",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: actual display support height",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: no coplanar green top faces inside ivory display bed",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: single authored component <=600 triangles",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: static prop",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: source provenance",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: no textures",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: single authored component <=600 triangles",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: static prop",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: source provenance",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: no textures",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "Mosaic stone faces point upward",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: single authored component <=600 triangles",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: static prop",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "floor_mosaic: source provenance",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "name_sign: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "name_sign: no textures",
+        "passed": true
+      },
+      {
+        "check": "name_sign: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "name_sign: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "name_sign: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "name_sign: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "name_sign: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "name_sign: single authored component <=600 triangles",
+        "passed": true
+      },
+      {
+        "check": "name_sign: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "name_sign: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "name_sign: back-center pivot",
+        "passed": true
+      },
+      {
+        "check": "name_sign: static prop",
+        "passed": true
+      },
+      {
+        "check": "name_sign: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "name_sign: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "Blank sign usable area 1.24 x .28m",
+        "passed": true
+      },
+      {
+        "check": "Sign anchor at blank front center",
+        "passed": true
+      },
+      {
+        "check": "name_sign: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "name_sign: source provenance",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: no textures",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_01: artwork front faces outward",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_02: artwork front faces outward",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_03: artwork front faces outward",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_04: artwork front faces outward",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_05: artwork front faces outward",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_06: artwork front faces outward",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: baked grouping preserves constituent budgets and triangle sum",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: back-center pivot",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: static prop",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "artwork_set: source provenance",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: no textures",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: baked grouping preserves constituent budgets and triangle sum",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: origin at cabinet display-surface center",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: static prop",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: source provenance",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: expected surface count",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: no textures",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: finite vertices / unit normals",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: linear vertex color data",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: opaque matte body",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: measured group triangles match manifest",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: baked grouping preserves constituent budgets and triangle sum",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: only cabinet has glass",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: real bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: origin at cabinet display-surface center",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: static prop",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: no seat or service anchors",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: local material import hook",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: source provenance",
+        "passed": true
+      },
+      {
+        "check": "All 8 import UIDs are distinct",
+        "passed": true
+      },
+      {
+        "check": "Only the eight current grouped assets are delivered",
+        "passed": true
+      },
+      {
+        "check": "Cabinet final envelope .95 x 1.50 x 1.80m",
+        "passed": true
+      },
+      {
+        "check": "Plinth final envelope .70 x 1.10 x .70m",
+        "passed": true
+      },
+      {
+        "check": "Floor mosaic diameter 1.94m and height <=.01m",
+        "passed": true
+      },
+      {
+        "check": "Six different abstract palettes",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_01: .70 x .55m",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_02: .70 x .55m",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_03: .70 x .55m",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_04: .70 x .55m",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_05: .70 x .55m",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_06: .70 x .55m",
+        "passed": true
+      },
+      {
+        "check": "Two-by-three gallery fits 2.5m wall span",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: sits on actual parent support height",
+        "passed": true
+      },
+      {
+        "check": "exhibit_ammonite: fits plinth display surface",
+        "passed": true
+      },
+      {
+        "check": "exhibit_shallow_bowl: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "exhibit_leaf_fossil: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "exhibit_shell_fragment: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: sits on actual parent support height",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1: wholly inside glass hood",
+        "passed": true
+      },
+      {
+        "check": "exhibit_terracotta_jar: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "exhibit_fossil_rock: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "exhibit_spiral_fossil: grouped constituent touches display surface",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: sits on actual parent support height",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2: wholly inside glass hood",
+        "passed": true
+      },
+      {
+        "check": "Exactly three exhibits per case plus one plinth ammonite",
+        "passed": true
+      },
+      {
+        "check": "exhibit_shallow_bowl / exhibit_leaf_fossil: no exhibit overlap",
+        "passed": true
+      },
+      {
+        "check": "exhibit_shallow_bowl / exhibit_shell_fragment: no exhibit overlap",
+        "passed": true
+      },
+      {
+        "check": "exhibit_leaf_fossil / exhibit_shell_fragment: no exhibit overlap",
+        "passed": true
+      },
+      {
+        "check": "exhibit_terracotta_jar / exhibit_fossil_rock: no exhibit overlap",
+        "passed": true
+      },
+      {
+        "check": "exhibit_terracotta_jar / exhibit_spiral_fossil: no exhibit overlap",
+        "passed": true
+      },
+      {
+        "check": "exhibit_fossil_rock / exhibit_spiral_fossil: no exhibit overlap",
+        "passed": true
+      },
+      {
+        "check": "Unique and placed totals match measured buffers",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "display_cabinet": {
+        "triangles": 414,
+        "surfaces": 2,
+        "bounds": [
+          [
+            -0.4749999940395355,
+            0.0,
+            -0.8999999761581421
+          ],
+          [
+            0.4749999940395355,
+            1.5,
+            0.8999999761581421
+          ]
+        ],
+        "dimensions_m": [
+          0.949999988079071,
+          1.5,
+          1.7999999523162842
+        ],
+        "uid": "uid://d34jvuek38sg5",
+        "sha256": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c"
+      },
+      "exhibit_plinth": {
+        "triangles": 308,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.3499999940395355,
+            0.0,
+            -0.3500000238418579
+          ],
+          [
+            0.3499999940395355,
+            1.100000023841858,
+            0.3500000238418579
+          ]
+        ],
+        "dimensions_m": [
+          0.699999988079071,
+          1.100000023841858,
+          0.7000000476837158
+        ],
+        "uid": "uid://ovtgs1g70eoc",
+        "sha256": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9"
+      },
+      "exhibit_ammonite": {
+        "triangles": 486,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.18000000715255737,
+            0.0,
+            -0.08500000089406967
+          ],
+          [
+            0.18000000715255737,
+            0.3799999952316284,
+            0.08500000089406967
+          ]
+        ],
+        "dimensions_m": [
+          0.36000001430511475,
+          0.3799999952316284,
+          0.17000000178813934
+        ],
+        "uid": "uid://b6g513olvj7fm",
+        "sha256": "f0628167601f24f2b6158dcaa2d2c8cf9e28eb2204b72b707df768a488e07f00"
+      },
+      "floor_mosaic": {
+        "triangles": 524,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.9700000286102295,
+            0.0,
+            -0.9700000286102295
+          ],
+          [
+            0.9700000286102295,
+            0.00800000037997961,
+            0.9700000286102295
+          ]
+        ],
+        "dimensions_m": [
+          1.940000057220459,
+          0.00800000037997961,
+          1.940000057220459
+        ],
+        "uid": "uid://bck6xfpy6n36n",
+        "sha256": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688"
+      },
+      "name_sign": {
+        "triangles": 220,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6899999976158142,
+            -0.17000000178813934,
+            -0.0
+          ],
+          [
+            0.6899999976158142,
+            0.17000000178813934,
+            0.044000230729579926
+          ]
+        ],
+        "dimensions_m": [
+          1.3799999952316284,
+          0.3400000035762787,
+          0.044000230729579926
+        ],
+        "uid": "uid://cqa2or7tfml8q",
+        "sha256": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992"
+      },
+      "artwork_set": {
+        "triangles": 1394,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.200000524520874,
+            -0.625,
+            -0.0
+          ],
+          [
+            1.200000524520874,
+            0.625,
+            0.050000399351119995
+          ]
+        ],
+        "dimensions_m": [
+          2.400001049041748,
+          1.25,
+          0.050000399351119995
+        ],
+        "uid": "uid://cf0tlj688mlng",
+        "sha256": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5"
+      },
+      "case_exhibits_1": {
+        "triangles": 1170,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2643199861049652,
+            0.0,
+            -0.7928439974784851
+          ],
+          [
+            0.2643199861049652,
+            0.21400000154972076,
+            0.8143199682235718
+          ]
+        ],
+        "dimensions_m": [
+          0.5286399722099304,
+          0.21400000154972076,
+          1.6071639657020569
+        ],
+        "uid": "uid://dg54o53djd7il",
+        "sha256": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2"
+      },
+      "case_exhibits_2": {
+        "triangles": 1210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.24583670496940613,
+            0.0,
+            -0.7958366870880127
+          ],
+          [
+            0.24583670496940613,
+            0.48000001907348633,
+            0.7895399928092957
+          ]
+        ],
+        "dimensions_m": [
+          0.49167340993881226,
+          0.48000001907348633,
+          1.5853766798973083
+        ],
+        "uid": "uid://can6egwr6yo38",
+        "sha256": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b"
+      }
+    },
+    "placements": [
+      {
+        "asset": "exhibit_ammonite",
+        "container": "display_plinth",
+        "container_asset": "exhibit_plinth",
+        "instance_name": "plinth_exhibit",
+        "slot": "center",
+        "position": [
+          0,
+          1.1,
+          0
+        ],
+        "yaw_degrees": 0,
+        "parent_local_bounds": [
+          [
+            -0.18000000715255737,
+            1.1,
+            -0.08500000089406967
+          ],
+          [
+            0.18000000715255737,
+            1.4799999952316285,
+            0.08500000089406967
+          ]
+        ]
+      },
+      {
+        "asset": "case_exhibits_1",
+        "container": "glass_case_1",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_exhibits_1",
+        "slot": "three baked exhibits",
+        "position": [
+          0,
+          1.0,
+          0
+        ],
+        "yaw_degrees": 0,
+        "parent_local_bounds": [
+          [
+            -0.2643199861049652,
+            1.0,
+            -0.7928439974784851
+          ],
+          [
+            0.2643199861049652,
+            1.2140000015497208,
+            0.8143199682235718
+          ]
+        ]
+      },
+      {
+        "asset": "case_exhibits_2",
+        "container": "glass_case_2",
+        "container_asset": "display_cabinet",
+        "instance_name": "case_exhibits_2",
+        "slot": "three baked exhibits",
+        "position": [
+          0,
+          1.0,
+          0
+        ],
+        "yaw_degrees": 0,
+        "parent_local_bounds": [
+          [
+            -0.24583670496940613,
+            1.0,
+            -0.7958366870880127
+          ],
+          [
+            0.24583670496940613,
+            1.4800000190734863,
+            0.7895399928092957
+          ]
+        ]
+      }
+    ],
+    "unique_triangles": 5726,
+    "placed_triangles": 6140,
+    "placed_surfaces": 11,
+    "gallery_size_m": [
+      2.40000034570694,
+      1.250000011920929
+    ],
+    "passed": true
+  },
+  "source": {
+    "checks": [
+      {
+        "check": "8 export groups with named editable components",
+        "passed": true
+      },
+      {
+        "check": "KIT_artwork_set: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_artwork_set: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_case_exhibits_1: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_case_exhibits_1: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_case_exhibits_2: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_case_exhibits_2: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_display_cabinet: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_display_cabinet: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_exhibit_ammonite: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_exhibit_ammonite: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_exhibit_plinth: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_exhibit_plinth: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_floor_mosaic: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_floor_mosaic: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_name_sign: descriptive part names",
+        "passed": true
+      },
+      {
+        "check": "KIT_name_sign: one local module root",
+        "passed": true
+      },
+      {
+        "check": "Five independently editable glass panels",
+        "passed": true
+      },
+      {
+        "check": "Source glass transparency visible in Blender",
+        "passed": true
+      },
+      {
+        "check": "display_cabinet: source support height",
+        "passed": true
+      },
+      {
+        "check": "exhibit_plinth: source support height",
+        "passed": true
+      },
+      {
+        "check": "Temporary export scene removed",
+        "passed": true
+      }
+    ],
+    "named_parts": {
+      "KIT_artwork_set": 54,
+      "KIT_case_exhibits_1": 24,
+      "KIT_case_exhibits_2": 19,
+      "KIT_display_cabinet": 20,
+      "KIT_exhibit_ammonite": 15,
+      "KIT_exhibit_plinth": 7,
+      "KIT_floor_mosaic": 175,
+      "KIT_name_sign": 5
+    },
+    "passed": true
+  },
+  "godot": {
+    "captures": [
+      {
+        "file": "mosaic_topdown.png",
+        "pitch_degrees": 90.0,
+        "samples": {
+          "center": {
+            "pixel": [
+              636.078552246094,
+              609.597717285156
+            ],
+            "rendered_srgb": "#e9b883"
+          },
+          "cream_inner": {
+            "pixel": [
+              705.652465820312,
+              651.035949707031
+            ],
+            "rendered_srgb": "#f4ead6"
+          },
+          "cream_outer": {
+            "pixel": [
+              971.468200683594,
+              637.271179199219
+            ],
+            "rendered_srgb": "#f4ead6"
+          },
+          "rim": {
+            "pixel": [
+              1097.26489257812,
+              637.364990234375
+            ],
+            "rendered_srgb": "#f1c594"
+          },
+          "terracotta": {
+            "pixel": [
+              799.745178222656,
+              634.28759765625
+            ],
+            "rendered_srgb": "#f1c594"
+          }
+        },
+        "size": [
+          1200,
+          1200
+        ],
+        "width_m": 2.25,
+        "yaw_degrees": 0.0
+      },
+      {
+        "file": "mosaic_terracotta_43deg.png",
+        "pitch_degrees": 42.9999961853027,
+        "samples": {
+          "center": {
+            "pixel": [
+              734.869934082031,
+              565.013916015625
+            ],
+            "rendered_srgb": "#e9b782"
+          },
+          "cream_inner": {
+            "pixel": [
+              750.668640136719,
+              607.527160644531
+            ],
+            "rendered_srgb": "#f4ead6"
+          },
+          "cream_outer": {
+            "pixel": [
+              907.660217285156,
+              704.052734375
+            ],
+            "rendered_srgb": "#f4ead6"
+          },
+          "rim": {
+            "pixel": [
+              978.245727539062,
+              752.263732910156
+            ],
+            "rendered_srgb": "#f1c594"
+          },
+          "terracotta": {
+            "pixel": [
+              812.908813476562,
+              637.147033691406
+            ],
+            "rendered_srgb": "#f1c594"
+          }
+        },
+        "size": [
+          1440,
+          1100
+        ],
+        "width_m": 3.40000009536743,
+        "yaw_degrees": 45.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "Actual mesh name retained",
+        "passed": true
+      },
+      {
+        "check": "Mosaic does not cast shadow",
+        "passed": true
+      },
+      {
+        "check": "Linear vertex colors used by actual imported material",
+        "passed": true
+      },
+      {
+        "check": "524 actual triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "Actual imported diameter and height unchanged",
+        "passed": true
+      },
+      {
+        "check": "Bottom-center origin retained",
+        "passed": true
+      },
+      {
+        "check": "Real terracotta floor supports mosaic at .08m",
+        "passed": true
+      },
+      {
+        "check": "Original .5mm placement clearance retained",
+        "passed": true
+      },
+      {
+        "check": "Capture mosaic_topdown",
+        "passed": true
+      },
+      {
+        "check": "Capture mosaic_terracotta_43deg",
+        "passed": true
+      },
+      {
+        "check": "Actual Mobile renderer",
+        "passed": true
+      }
+    ],
+    "fixture": {
+      "lighting": {
+        "ambient": 0.45,
+        "ambient_color": "ECEFF0",
+        "angular_distance": 0.4,
+        "background": "DCE3E5",
+        "shadow_bias": 0.04,
+        "shadow_distance": 30.0,
+        "shadow_mode": "orthogonal_single",
+        "shadow_normal_bias": 0.12,
+        "sun": 0.85,
+        "sun_color": "FFF7EC",
+        "sun_position": [
+          -6.0,
+          4.0,
+          -1.0
+        ],
+        "sun_target": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "mosaic_position": [
+        0.54,
+        0.0805,
+        0.520000000000001
+      ],
+      "real_floor_y": 0.0800000429153442,
+      "scope": "Real N3 floor and atlas; isolated unoccluded detail, no room assembly changes",
+      "source_art_commit": "a5ffdae184629cd12c082944e2019b5c79248afd",
+      "tonemap": "ACES"
+    },
+    "geometry": {
+      "bounds": [
+        [
+          -0.970000028610229,
+          0.0,
+          -0.970000028610229
+        ],
+        [
+          0.970000028610229,
+          0.00800000037997961,
+          0.970000028610229
+        ]
+      ],
+      "surfaces": 1,
+      "triangles": 524
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  },
+  "floor_source": {
+    "art_commit": "a5ffdae184629cd12c082944e2019b5c79248afd",
+    "files": {
+      "assets/rooms/_shared/shell_hall/hall_floor.glb": "c524275fa5e93d8020dd10749bddec7c45f8d05ab71d1436004354183ca603c8",
+      "assets/rooms/_shared/shell_hall/hall_floor.glb.import": "baa7c96fe978a973255055e3e7f587f5d9f4484200a76bd2e2663eeec9d2cd17",
+      "assets/rooms/_shared/shell_hall/hall_albedo_ao.png": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab",
+      "assets/rooms/_shared/shell_hall/hall_albedo_ao.png.import": "b100c3e1fb288599539cc96d469b9dd485147d732784e001f38676dded41f802",
+      "assets/rooms/_shared/shell_hall/layout.json": "b7901f3b0ff9f32190a846d4eaeb09057935b65247a3063230bdf336fbb51d6d",
+      "assets/rooms/poi_culture_hall/room_albedo_ao.png": "605a71555d6759de8ac4d48619fd3027e0713416bfe923a04d8edf3ed36a7a2b",
+      "assets/rooms/poi_culture_hall/room_albedo_ao.png.import": "314722a8ecae1501a2e56d7c27a52af2aae68d2c2c2f6816f787272a3f89051c",
+      "assets/rooms/poi_culture_hall/layout.json": "20779fee3d0d93774af24647916e3e3d40afbc6f4d53201fd39b3e503498885c"
+    },
+    "scope": "Exact N3 hall_floor geometry and terracotta room atlas; only copied into output; no source/scene edits"
+  }
+}

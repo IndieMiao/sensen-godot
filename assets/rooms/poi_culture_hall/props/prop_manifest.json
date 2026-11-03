@@ -1,5 +1,5 @@
 {
-  "revision": "v1.1",
+  "revision": "v1.2",
   "author": "黄忠",
   "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
   "baseline_height_m": 1.745,
@@ -167,7 +167,7 @@
       "name": "floor_mosaic",
       "file": "floor_mosaic.glb",
       "module": "M03",
-      "description": "Thin concentric beige stone medallion; no collision",
+      "description": "Four alternating warm cream / light terracotta rings and darker center; no collision",
       "quantity": 1,
       "origin": "bottom_center",
       "front": "+Z",
@@ -192,8 +192,53 @@
         0.00800000037997961,
         1.940000057220459
       ],
-      "sha256": "0d5b41e95c3e713da207c39553aed5351fc8000c55928c717b6955b8b2d5fa97",
-      "provenance": "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json"
+      "sha256": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688",
+      "provenance": "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json",
+      "color_pattern": {
+        "revision": "v1.2",
+        "colors": {
+          "mosaic_cream": "F1DDBC",
+          "mosaic_terracotta": "E2A77A",
+          "mosaic_center": "D39A6E",
+          "mosaic_grout": "D3BB9A"
+        },
+        "row_roles": [
+          "mosaic_center",
+          "mosaic_cream",
+          "mosaic_terracotta",
+          "mosaic_terracotta",
+          "mosaic_cream",
+          "mosaic_cream",
+          "mosaic_terracotta"
+        ],
+        "bands": [
+          {
+            "radius_min": 0.0,
+            "radius_max": 0.14,
+            "role": "mosaic_center"
+          },
+          {
+            "radius_min": 0.14,
+            "radius_max": 0.3,
+            "role": "mosaic_cream"
+          },
+          {
+            "radius_min": 0.3,
+            "radius_max": 0.62,
+            "role": "mosaic_terracotta"
+          },
+          {
+            "radius_min": 0.62,
+            "radius_max": 0.9,
+            "role": "mosaic_cream"
+          },
+          {
+            "radius_min": 0.9,
+            "radius_max": 0.97,
+            "role": "mosaic_terracotta"
+          }
+        ]
+      }
     },
     {
       "name": "name_sign",

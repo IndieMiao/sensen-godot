@@ -1,0 +1,23 @@
+[
+  {
+    "file": "SGODOT-323_props_v1.2_mosaic_topdown.jpg",
+    "bytes": 222188,
+    "sha256": "d1c8fd2c9c7372dbd01af8ff9a0842d9f6e54a821f6150427969b8a01f69e19f",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-323_props_v1.2_mosaic_terracotta_43deg.jpg",
+    "bytes": 294766,
+    "sha256": "953c291a90db16126d6166e6dadce6073b74c0eff2ffde5e23e5b497d3c1e1a5",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-323_props_v1.2_validation.json",
+    "bytes": 43821,
+    "sha256": "7be37679c73d1da900833efb1b745632053f827512d62dbd44143aac04aa1300",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
