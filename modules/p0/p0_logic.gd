@@ -1719,6 +1719,9 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 		if fish > 0 and not guided_stove: now_rows.append(_row("Cook with %d fish" % fish, "pot", "stove"))
 	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
 	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
+	# v4q(9) ① (user b): the vein row follows the other things to do now, before the Homestead material row
+	var vein := vein_row(view, home_row)
+	if not vein.is_empty(): now_rows.append(vein)
 	if not home_row.is_empty() and bool(home_row.now) and str(home_row.row.go) != "sign": now_rows.append(home_row.row)
 	now_rows.append_array(progress)
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
@@ -1766,7 +1769,7 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	# or is Upgrade to Homestead (不知火舞 on 341, A′: a moment, as a hand-in is pay; a material row still gives way).
 	var keeps := func(r: Dictionary) -> bool:
 		var dot := str(r.get("dot", ""))
-		return dot.begins_with("deliver:") or dot.begins_with("homestead:")
+		return dot.begins_with("deliver:") or dot.begins_with("homestead:") or dot.begins_with("vein:")   # v4q(9) ①: nor the vein row
 	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
 			and not keeps.call(rows[2]):
 		rows[2] = latest
@@ -1774,6 +1777,55 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	if P0Guide.guide_on(view) and not lead.is_empty():
 		rows = lead + rows.filter(func(r): return str(r.get("dot", "")) != str(lead[0].dot) and str(r.line) != str(lead[0].line))
 	return P0Guide.focus_first(rows.slice(0, 3))
+
+## v4q(9) ① (SGODOT-355; 不知火舞 / the user a+b, 11-02): `Ironvale Vein · Reach Floor 10`, Show to the nearest free iron
+## vein (view.wild.near3_sites, the very one Pip's line and the server's nearestFreeVein name) — when the guide is over,
+## Pip's First Dig is done (view.first_dig.done), nobody has reached its Floor 10 (view.mine.records: that vein's, and any
+## other vein of the same main the client knows), one of the next three Homestead levels needs Iron Ore, and Homestead
+## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. None when the
+## Homestead row already points at that very mine (its first gap is that ore, its Show that mine). Red dot `vein:<id>`,
+## once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
+const VEIN_MAINS := ["iron_ore", "quartz"]
+const VEIN_UNTIL_LEVEL := 7
+const VEIN_FLOOR := 10
+static func vein_row(view: Dictionary, home_row := {}) -> Dictionary:
+	if P0Guide.guide_on(view): return {}
+	var dig = view.get("first_dig", null)
+	if not dig is Dictionary or not bool(dig.get("done", false)): return {}
+	var lv := int(view.get("homestead", {}).get("level", 1))
+	if lv >= VEIN_UNTIL_LEVEL: return {}
+	var levels: Array = content().get("homestead", {}).get("levels", [])
+	var sites = view.get("wild", {}).get("near3_sites", []) if view.get("wild", null) is Dictionary else []
+	var records: Dictionary = view.get("mine", {}).get("records", {}) if view.get("mine", null) is Dictionary and view.mine.get("records") is Dictionary else {}
+	for main in VEIN_MAINS:
+		if not levels.any(func(l): return int(l.get("level", 0)) in range(lv + 1, lv + 4) \
+				and (l.get("materials", []) as Array).any(func(m): return str(m[0]) == main)): continue
+		var site := {}
+		for x in sites if sites is Array else []:
+			if x is Dictionary and str(x.get("type", "")) == "vein" and str(x.get("main", "")) == main:
+				site = x
+				break
+		if site.is_empty() or _vein_reached(records, sites, main): continue
+		var go := "mine:" + str(site.id)
+		if not home_row.is_empty() and str(home_row.get("row", {}).get("go", "")) == go: return {}   # the Homestead row says it
+		return _row("%s · Reach Floor %d" % [str(site.get("name", "")), VEIN_FLOOR], "vein", go, "vein:" + str(site.id))
+	return {}
+
+## Whether a vein of this main has been gone down to Floor 10: any record of the free three's, or of a site the map
+## has read (P0WildSites), that is a vein of it (不知火舞: any iron vein's F10 ends the iron row, a new home's too).
+static func _vein_reached(records: Dictionary, near3: Variant, main: String) -> bool:
+	for id in records:
+		if int((records[id] as Dictionary).get("deepest", 0)) < VEIN_FLOOR: continue
+		var x := {}
+		for n in near3 if near3 is Array else []:
+			if n is Dictionary and str(n.get("id", "")) == str(id): x = n
+		if x.is_empty():
+			var wild = load("res://modules/p0/p0_wild_sites.gd")
+			if wild.has_site(str(id)):
+				var s: Dictionary = wild.site(str(id))
+				x = {"type": str(s.get("type", "")), "main": s.get("mine", {}).get("main", null) if s.get("mine") is Dictionary else null}
+		if str(x.get("type", "")) == "vein" and str(x.get("main", "")) == main: return true
+	return false
 
 ## The order q(255) ① takes a Homestead level's materials in: Timber, Stone, Reeds, Copper Ore, Clay, Rock Salt.
 const HOME_MATERIAL_ORDER := ["wood", "stone", "fiber", "copper_ore", "clay", "rock_salt"]
