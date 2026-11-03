@@ -141,12 +141,14 @@ func _switch_test_account(action: String) -> void:
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:
-	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
-	TranslationServer.set_locale("en")
+	# English by default, 中文 when the player picked it in Settings (0.2.21, the user 11-02; it was English-only from
+	# 2026-09-04): P0's own table, never Journey's (Localization.use_p0).
+	Localization.use_p0()
 	session = P0Session.new()
 	add_child(session)
 	ui = P0Ui.new()
 	ui.test_accounts = session.test_accounts
+	ui.player_of = func() -> String: return session.player_id   # Settings' support code (q(281))
 	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
 	# Crop-ready notifications (SGODOT-350 / 356): Android's GodotNotify or iOS's LocalNotify, per account on this phone.

@@ -236,10 +236,11 @@ func _text() -> VBoxContainer:
 	return text
 
 ## The name and ` · state` side by side while both fit whole; else the state hides and the name takes the line, its
-## end an ellipsis when it still runs over.
+## end an ellipsis when it still runs over. Measured as they show (translated under 中文: 「费尔菲尔德」 was cut at
+## Fairfield's English width, 不知火舞 385 fd216262).
 static func _fit_first(first: HBoxContainer, city: Label, region: Label) -> void:
 	var w := func(l: Label) -> float:
-		return l.get_theme_font(&"font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x
+		return l.get_theme_font(&"font").get_string_size(String(l.atr(l.text)), HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x
 	var name_w: float = w.call(city)
 	var both := name_w + float(w.call(region)) <= first.size.x
 	region.visible = both

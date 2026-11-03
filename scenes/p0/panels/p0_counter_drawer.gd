@@ -52,8 +52,9 @@ const _TRACK := Vector2(110, 3) # Compact/Shop Bag capacity track
 const _SCOPE_H := 36.0
 const _DRINK_INSET := 12.0      # NPC-6: fact / line / command at x 24
 const _DRINK_GAP := 6.0         # keeper bar (with its note) to `Cups used`
-## Shop titles over the keeper's place (KeeperBar Titled: `Finn's Tackle`, `Mei's Stall`, `Ama's Tea`, `Sigrid's Desk`).
-const SHOP_NOUN := {"tackle": "Tackle", "market": "Stall", "tea": "Tea", "post": "Desk"}
+## Shop titles over the keeper's place (KeeperBar Titled: `Finn's Tackle`, `Mei's Stall`, `Ama's Tea`, `Sigrid's Desk`),
+## whole templates so a translation can order them (SGODOT-385).
+const SHOP_TITLE := {"tackle": "%s's Tackle", "market": "%s's Stall", "tea": "%s's Tea", "post": "%s's Desk"}
 ## Keeper role and P0 name when the opener passes no ctx (assets/p0/p0_outposts.json keeper, SGODOT-227).
 const KEEPERS := {"tackle": ["Tackle Keeper", "Finn"], "market": ["Market Keeper", "Mei"], "tea": ["Tea Host", "Ama"],
 	"post": ["Post Clerk", "Sigrid"], "casino": ["Dealer", "Lou"]}   # casino: no counter, the greeting's Play (SGODOT-351)
@@ -168,7 +169,7 @@ func _build_head() -> void:
 		var who: Array = KEEPERS.get(role, ["", ""])
 		var name := str(ctx.get("keeper", who[1]))
 		keeper_bar.portrait = keeper_portrait(name, false, str(ctx.get("look", "")))
-		keeper_bar.title = "%s's %s" % [name, str(SHOP_NOUN.get(role, ""))]
+		keeper_bar.title = str(SHOP_TITLE.get(role, "%s")) % name
 		keeper_bar.place = str(ctx.get("place", ""))
 		keeper_bar.keeper = "%s · %s" % [str(ctx.get("role", who[0])), name]
 		keeper_bar.close_pressed.connect(func(): close_requested.emit())
