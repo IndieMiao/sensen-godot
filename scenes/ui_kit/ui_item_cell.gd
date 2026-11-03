@@ -322,13 +322,16 @@ static func quick_name_style(title: String) -> StringName:
 ## quick_name_style drops a last word `Seeds` / `Seed` (the seed-packet icon says it): `Quick Radish Seeds` →
 ## `Quick Radish`. Still more than two lines, it is set as q(197) sets it; nothing else is cut. Quick slots only (and
 ## the bag drawer's bar row, the same cell); the Bag's cells, the item card and Today keep the whole name.
-## Under 中文 (#649 第二批 ⑤, zh-01 「小萝卜种子」 past the slot) the name is the translation, broken by the character:
-## past two lines a last 「种子」 goes the same way (「小萝卜」).
+## Under 中文 (#649 第二批 ⑤, zh-01 「小萝卜种子」 past the slot) the name is the translation, broken by the character
+## within the slot's padding (as the icon and the count): on two lines a last 「种子」 takes the second whole (「小萝卜」 /
+## 「种子」, no 「子」 alone), past two it goes the same way as ` Seeds` (「小萝卜」).
 static func quick_name(title: String) -> String:
 	var shown := String(TranslationServer.translate(title))
 	if _cjk(shown):
-		if quick_lines(shown) <= 2 or not shown.ends_with(SEED_ZH): return shown
-		return shown.trim_suffix(SEED_ZH)
+		var lines := quick_lines(shown)
+		if lines <= 1 or not shown.ends_with(SEED_ZH): return shown
+		var head := shown.trim_suffix(SEED_ZH)
+		return head + "\n" + SEED_ZH if lines == 2 and quick_lines(head) == 1 else head
 	if quick_lines(title) <= 2: return title
 	for tail in [" Seeds", " Seed"]:
 		if title.ends_with(tail): return title.trim_suffix(tail)
@@ -352,7 +355,12 @@ static func quick_lines(title: String) -> int:
 	var lines := 0
 	var line := ""
 	if _cjk(title):
+		width -= _QUICK_PAD * 2.0   # 中文 keeps to the padding: at the full 52 it touched the slot's edge (zh-01)
 		for c in title:
+			if c == "\n":
+				lines += 1
+				line = ""
+				continue
 			if line != "" and font.get_string_size(line + c, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > width:
 				lines += 1
 				line = c.strip_edges()
@@ -711,7 +719,11 @@ func _refresh_quick(s: State) -> void:
 	_qty.offset_bottom = name_top + _QUICK_NAME_H + _QUICK_QTY_H
 	_name.text = quick_name(title)
 	_name.theme_type_variation = quick_name_style(_name.text)
-	_name.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if _cjk(_name.text) else TextServer.AUTOWRAP_WORD
+	var cjk := _cjk(_name.text)
+	_name.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY if cjk else TextServer.AUTOWRAP_WORD
+	_name.offset_left = 0.0 if cjk else -_QUICK_PAD   # 中文 within the padding, as quick_lines measures it
+	_name.offset_right = 0.0 if cjk else _QUICK_PAD
+	_name.custom_minimum_size.x = UiTokens.SIZE_QUICK_SLOT_W - (_QUICK_PAD * 2.0 if cjk else 0.0)
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
 	var ghost := s == State.GHOST
