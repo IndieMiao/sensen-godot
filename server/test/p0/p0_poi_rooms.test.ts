@@ -1,19 +1,27 @@
 /** Enterable POIs (SGODOT-313, plan poi-enter-plan-2026-11-03): the template table, POI room ids, a room's spec. */
 import { describe, expect, it } from 'vitest';
-import { loadPoiTemplates, parsePoiRoom, poiRoomSpec, templateFor } from '../../src/p0/online/poi.js';
+import { loadP0Content } from '../../src/p0/content.js';
+import { loadPoiTemplates, parsePoiRoom, poiPassPlace, poiRoomSpec, templateFor } from '../../src/p0/online/poi.js';
+import { freshState } from '../../src/p0/state.js';
+import { requirePass } from '../../src/p0/travel.js';
 
 const table = loadPoiTemplates();
+const SF = 'gn-5391959', TOKYO = 'gn-1850147';
 
 describe('enterable POI rooms (SGODOT-313)', () => {
   it('the table: 16 to a room, each template walled and seated, every maki / class row a template there', () => {
     expect(table.capacity).toBe(16);
-    expect(Object.keys(table.templates).sort()).toEqual(['city_park', 'hotel_lobby', 'service_hall']);
+    expect(Object.keys(table.templates).sort()).toEqual(['city_park', 'classroom', 'hotel_lobby', 'service_hall']);
     expect(table.templates.hotel_lobby.seats).toHaveLength(8);
+    expect(table.templates.classroom.seats).toHaveLength(6);
+    expect(table.templates.classroom.sign).toBe('sign_door');   // N4's door sign; the others' is sign_name
+    expect(table.templates.service_hall.sign).toBe('sign_name');
     expect(table.templates.city_park.bounds).toEqual([-4, 4, -4, 4]);
   });
   it('picks by maki, else class, else none', () => {
     expect(templateFor(table, 'lodging', '')).toBe('hotel_lobby');
     expect(templateFor(table, 'bank', 'commercial_services')).toBe('service_hall');
+    expect(templateFor(table, 'library', 'education')).toBe('classroom');
     expect(templateFor(table, 'picnic-site', 'park_like')).toBe('city_park');   // no maki row: its class's
     expect(templateFor(table, 'restaurant', 'food_and_drink')).toBe('');        // no Go in
   });
@@ -28,5 +36,18 @@ describe('enterable POI rooms (SGODOT-313)', () => {
       bounds: table.templates.city_park.bounds, seats: table.templates.city_park.seats });
     expect(spec('poi:museum@gn-5391959:0123456789ab')).toBeUndefined();
     expect(spec('poi:city_park@gn-1850147:0123456789ab')).toBeUndefined();
+  });
+  it("joining one is judged by its city's pass, as that city's outposts are: home's free, another's with its pass and there", () => {
+    const c = loadP0Content(), T = Date.parse('2026-10-10T18:00:00Z');
+    const s = freshState(c, 'poi-player', T, 7);
+    expect(s.travel.home).toBe(SF);
+    expect(poiPassPlace('pond:pond_fern')).toBe('');
+    expect(requirePass(c, s, 'outpost', poiPassPlace(`poi:hotel_lobby@${SF}:0123456789ab`), T)).toBeNull();
+    expect(requirePass(c, s, 'outpost', poiPassPlace(`poi:hotel_lobby@${TOKYO}:0123456789ab`), T)?.code).toBe('pass_required');
+    s.travel.passes[TOKYO] = { kind: 'day', from: T, until: T + 86_400_000 };
+    expect(requirePass(c, s, 'outpost', poiPassPlace(`poi:hotel_lobby@${TOKYO}:0123456789ab`), T)?.code).toBe('travel_required');   // a pass, not there
+    s.travel.here = TOKYO;
+    expect(requirePass(c, s, 'outpost', poiPassPlace(`poi:hotel_lobby@${TOKYO}:0123456789ab`), T)).toBeNull();
+    expect(requirePass(c, s, 'outpost', poiPassPlace(`poi:hotel_lobby@${TOKYO}:0123456789ab`), T + 86_400_001)?.code).toBe('trip_expired');
   });
 });

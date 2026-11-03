@@ -7,24 +7,25 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { OutpostSpec } from './rooms.js';
 
 export const POI_ROOM = 'poi:';
 const POI_ROOM_RE = /^poi:([a-z][a-z0-9_]{0,31})@(gn-[0-9]{1,12}):([0-9a-f]{12})$/;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 export const DEFAULT_POI_TEMPLATES = path.join(ROOT, 'assets/p0/poi_templates.json');
 
-export interface PoiTemplate { art: string; door: string; bounds: [number, number, number, number]; seats: string[] }
+export interface PoiTemplate { art: string; door: string; sign: string; bounds: [number, number, number, number]; seats: string[] }
 export interface PoiTable { capacity: number; templates: Record<string, PoiTemplate>; maki: Record<string, string>; class: Record<string, string> }
 export interface PoiRoom { template: string; cluster: string; key: string }
 
-/** The table, checked: a capacity of 2–64, each template with a kit, walls and distinct seat_ names, every maki / class
- * row naming a template there. */
+/** The table, checked: a capacity of 2–64, each template with a kit, its door's sign_ anchor, walls and distinct seat_
+ * names, every maki / class row naming a template there. */
 export function loadPoiTemplates(file = DEFAULT_POI_TEMPLATES): PoiTable {
   const t = JSON.parse(readFileSync(file, 'utf8')) as PoiTable;
   if (!Number.isInteger(t.capacity) || t.capacity < 2 || t.capacity > 64 || !t.templates || typeof t.templates !== 'object') throw new Error('POI_SCHEMA');
   for (const [id, p] of Object.entries(t.templates)) {
     const [x0, x1, z0, z1] = p.bounds ?? [];
-    if (!/^[a-z][a-z0-9_]{0,31}$/.test(id) || !p.art || !p.door || !(x0 < x1 && z0 < z1) || !Array.isArray(p.seats) ||
+    if (!/^[a-z][a-z0-9_]{0,31}$/.test(id) || !p.art || !p.door || !/^sign_[a-z0-9_]+$/.test(p.sign ?? '') || !(x0 < x1 && z0 < z1) || !Array.isArray(p.seats) ||
       p.seats.some(s => !/^seat_[a-z0-9_]+$/.test(s)) || new Set(p.seats).size !== p.seats.length) throw new Error('POI_SCHEMA:' + id);
   }
   for (const rows of [t.maki ?? {}, t.class ?? {}]) for (const [k, v] of Object.entries(rows)) if (!t.templates[v]) throw new Error('POI_SCHEMA:' + k);
@@ -40,12 +41,19 @@ export function parsePoiRoom(room: string): PoiRoom | null {
 /** The room spec of a POI room whose template is in the table and whose city the content knows (`city`), undefined for
  * any other id: made on first join, dropped once its last room empties, as a pond's is. */
 export function poiRoomSpec(table: PoiTable, city: (cluster: string) => boolean) {
-  return (room: string): { id: string; role: 'poi'; capacity: number; bounds: [number, number, number, number]; seats: string[] } | undefined => {
+  return (room: string): OutpostSpec | undefined => {
     const p = parsePoiRoom(room);
     const t = p ? table.templates[p.template] : undefined;
     if (!p || !t || !city(p.cluster)) return undefined;
     return { id: room, role: 'poi', capacity: table.capacity, bounds: t.bounds, seats: t.seats };
   };
+}
+
+/** The place requirePass judges a POI room by: its city's (`<cluster>~poi`, which clusterOf reads as that city), so
+ * home's are free and another city's need its pass and being there, as its outposts do; "" when the id is no POI room. */
+export function poiPassPlace(room: string): string {
+  const p = parsePoiRoom(room);
+  return p ? `${p.cluster}~poi` : '';
 }
 
 /** The template a map POI opens (its maki, else its class), or "" — no Go in. */

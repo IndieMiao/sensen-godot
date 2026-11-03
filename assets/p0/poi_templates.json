@@ -1,10 +1,11 @@
 {
- "_note": "Enterable POIs (SGODOT-313; the user 11-03 \"POI 提前\", 奕星 via terminal, no message id; plan pm/plans/poi-enter-plan-2026-11-03.md; q row pending — the maki / class rows below are the plan's proposal until 李白's q row settles them). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the door's words). A POI's room is `poi:<template>@<city cluster>:<tile id>` — the tile feature id changes when Mapbox updates its tiles, so it is a room key only, never saved. Pick: the POI's maki, else its class, else no Go in.",
+ "_note": "Enterable POIs (SGODOT-313; the user 11-03 \"POI 提前\", 奕星 via terminal, no message id; plan pm/plans/poi-enter-plan-2026-11-03.md; q row pending — the maki / class rows below are the plan's proposal until 李白's q row settles them). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the door's words and the anchor they go on, `sign`). A POI's room is `poi:<template>@<city cluster>:<tile id>` — the tile feature id changes when Mapbox updates its tiles, so it is a room key only, never saved. Pick: the POI's maki, else its class, else no Go in.",
  "capacity": 16,
  "templates": {
   "hotel_lobby": {
    "art": "poi_hotel_lobby",
    "door": "Hotel",
+   "sign": "sign_name",
    "bounds": [
     -3.4,
     3.4,
@@ -25,6 +26,7 @@
   "service_hall": {
    "art": "poi_service_hall",
    "door": "Service Hall",
+   "sign": "sign_name",
    "bounds": [
     -3.4,
     3.4,
@@ -45,6 +47,7 @@
   "city_park": {
    "art": "poi_city_park",
    "door": "City Park",
+   "sign": "sign_name",
    "bounds": [
     -4.0,
     4.0,
@@ -61,6 +64,25 @@
     "seat_bench_7",
     "seat_bench_8"
    ]
+  },
+  "classroom": {
+   "art": "poi_classroom",
+   "door": "Library",
+   "sign": "sign_door",
+   "bounds": [
+    -3.4,
+    3.4,
+    -3.2,
+    3.0
+   ],
+   "seats": [
+    "seat_desk_1",
+    "seat_desk_2",
+    "seat_desk_3",
+    "seat_desk_4",
+    "seat_desk_5",
+    "seat_desk_6"
+   ]
   }
  },
  "maki": {
@@ -71,6 +93,9 @@
   "doctor": "service_hall",
   "hospital": "service_hall",
   "police": "service_hall",
+  "school": "classroom",
+  "library": "classroom",
+  "college": "classroom",
   "park": "city_park",
   "garden": "city_park",
   "pitch": "city_park",

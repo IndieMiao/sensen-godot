@@ -15,12 +15,13 @@ import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
 import { P0Voice, p0VoiceFromEnv, registerP0Voice } from '../src/p0/online/voice.js';
 import { generatedOutpostSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
+import { loadPoiTemplates, poiPassPlace, poiRoomSpec } from '../src/p0/online/poi.js';
 import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
 import { SAVE_VERSION } from '../src/p0/state.js';
-import { requirePass } from '../src/p0/travel.js';
+import { clusterById, requirePass } from '../src/p0/travel.js';
 import { AppearanceCatalog } from '../src/p0/online/appearance.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 import { openIpNear, type IpNear } from '../src/p0/ip_city.js';
@@ -71,7 +72,10 @@ const outpostTable = loadOutposts();
 const generatedRoom = generatedOutpostSpec(outpostTable, id => roomPlace(content, id));
 // Ponds (11-02, pond multiplayer): `pond:<id>`, a room of 8 for a pond the content knows, made on first join.
 const pondRoom = pondRoomSpec(id => !!placeOf(content, id));
-const rooms = new OutpostRooms(outpostTable, Date.now, id => pondRoom(id) ?? generatedRoom(id));
+// Enterable POIs (SGODOT-313, q row pending): `poi:<template>@<city>:<hex>`, a room of 16 walled and seated by its template,
+// for a city the clusters know; made on first join and dropped when empty, never saved.
+const poiRoom = poiRoomSpec(loadPoiTemplates(), cluster => !!clusterById(content, cluster));
+const rooms = new OutpostRooms(outpostTable, Date.now, id => pondRoom(id) ?? poiRoom(id) ?? generatedRoom(id));
 // q(188) ① `Near you`: the address table made from DB-IP City Lite at image build (tools/ip_near_table.ts); none, no guess.
 let ipNear: IpNear | undefined;
 if (process.env.P0_IP_NEAR_TABLE) {
@@ -82,10 +86,11 @@ registerP0Routes(app, { content, store, now: Date.now, dev, log, rooms, ipNear }
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
 // A pond's room checks the pond's city as entering the pond does (its city from the pond, never `pond:…`; home's are free).
+// A POI's room checks the city in its id the same way (poiPassPlace): home's free, another city's with its pass and there.
 const pass = (player: string, room: string) => {
   const s = store.peek(player);
   if (!s) return null;
-  const pond = pondOfRoom(room), place = pond || room;
+  const pond = pondOfRoom(room), place = pond || poiPassPlace(room) || room;
   const r = requirePass(content, s, pond ? 'pond' : 'outpost', place, Date.now() + s.clock_ms, s.presence.entered === place ? 'rejoin' : undefined);
   return r ? r.code.toUpperCase() : null;
 };
