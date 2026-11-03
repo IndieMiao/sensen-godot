@@ -170,6 +170,21 @@ func test_p0_table_reads_a_links_arrow_and_a_list_of_known_items() -> void:
 	assert_str(String(t.get_message("Unknown ›"))).is_equal("")
 	assert_str(String(t.get_message("· Decorate"))).is_equal("· 布置")   # a caption's half on its own label
 
+
+## B 档 shots (SGODOT-385, 11-03): spaces around a line and a `n/m` count after a title are read around; a bare
+## number after a name is not (it may be part of the name).
+func test_p0_table_reads_spaces_around_a_line_and_a_count_after_a_title() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"Muscle Memory": "肌肉记忆", "Home Cook": "家常厨师", "Decorate": "布置", "Floor": "层"})
+	assert_str(String(t.get_message("Muscle Memory "))).is_equal("肌肉记忆 ")
+	assert_str(String(t.get_message("  Decorate\n"))).is_equal("  布置\n")
+	assert_str(String(t.get_message("Home Cook 0/8"))).is_equal("家常厨师 0/8")
+	assert_str(String(t.get_message("Home Cook 1,200/1,500 · Decorate"))).is_equal("家常厨师 1,200/1,500 · 布置")
+	assert_str(String(t.get_message("Floor 10"))).is_equal("")   # a bare number: the English stays
+	assert_str(String(t.get_message("Unknown 0/8"))).is_equal("")
+	assert_str(String(t.get_message("   "))).is_equal("")
+
 func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() -> void:
 	var path := "user://p0-language-test-%d.cfg" % Time.get_ticks_usec()
 	var loc: Node = LocalizationScript.new()
