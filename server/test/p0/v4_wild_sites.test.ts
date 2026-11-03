@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { homeBase } from '../../src/p0/home.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
+import { preview } from '../../src/p0/travel.js';
 import { freshState } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { catalogueOf, parseBbox, useCatalogue, viewport, VIEWPORT_CAP, wildById, wildNearOf } from '../../src/p0/wild.js';
@@ -161,6 +162,25 @@ describe('the server catalogue (src/p0/wild.ts)', () => {
     expect((await app.inject({ method: 'GET', url: '/v1/p0/wild?zoom=9', headers })).statusCode).toBe(400);
     // below the pins' zoom: an empty list, even for a box too wide to read (周瑜 on #616)
     expect((await app.inject({ method: 'GET', url: '/v1/p0/wild?bbox=-60,-180,60,180&zoom=5', headers })).json()).toEqual({ ok: true, sites: [], capped: false, total: 0 });
+    await app.close();
+  });
+
+  it("each site carries its fare as the travel card has it (cost: free ones 0, the others the card's; 亚瑟, C part 2)", async () => {
+    const { c, base } = setup([[0.5, 0, 'quarry', 'stone'], [0, 0.8, 'vein', 'iron_ore'], [0, -0.8, 'vein', 'quartz'],
+      [1.0, 0, 'quarry', 'stone'], [1.5, 0, 'quarry', 'stone'], [-1.5, 0.5, 'quarry', 'stone']]);
+    const store = new P0Store(c), app = Fastify();
+    registerP0Routes(app, { content: c, store, now: () => T, dev: false });
+    const headers = { 'x-p0-player': 'wild-route-cost' };
+    const bbox = `${base.lat - 2},${base.lng - 2},${base.lat + 2},${base.lng + 2}`;
+    const body = (await app.inject({ method: 'GET', url: `/v1/p0/wild?bbox=${bbox}&zoom=9`, headers })).json();
+    const s = store.get('wild-route-cost', T);
+    type Row = { id: string; free: boolean; cost: { energy: number; coins: number } };
+    for (const x of body.sites as Row[]) {
+      const card = preview(c, s, x.id, T + s.clock_ms).cost;
+      expect(x.cost).toEqual({ energy: card.energy, coins: card.coins });
+      if (x.free) expect(x.cost).toEqual({ energy: 0, coins: 0 });
+    }
+    expect((body.sites as Row[]).some(x => !x.free && x.cost.energy + x.cost.coins > 0)).toBe(true);   // a priced one is in
     await app.close();
   });
 });

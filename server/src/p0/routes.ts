@@ -10,7 +10,7 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
+import { cityInfo, clusterById, clusterOf, fareOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { gatherPointsOf } from './gather_points.js';
 import { catalogue, parseBbox, viewport } from './wild.js';
@@ -107,7 +107,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
 
   /** v4q(3) (contract-c §4): the open wild sites in the map's viewport, at most VIEWPORT_CAP, with what they are to the
-   * player (free, visited, Trip, a pass); none below the continent zoom. The catalogue's revision rides along. */
+   * player (free, visited, Trip, a pass, and `cost` — the fare as travel takes it now, the travel card's own (fareOf),
+   * so the card needs no second read; 亚瑟, C part 2); none below the continent zoom. The catalogue's revision rides along. */
   app.get('/v1/p0/wild', async (req, reply) => {
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
@@ -118,8 +119,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const box = parseBbox(bbox);
     if (!box) return reply.code(400).send({ ok: false, code: 'bad_bbox' });
     const s = stateOf(player, req.headers);
-    const got = viewport(c, s, box, Number(zoom), clock(s.clock_ms));
-    return reply.header('x-wild-revision', String(got.revision)).send({ ok: true, sites: got.sites, capped: got.capped, total: got.total });
+    const now = clock(s.clock_ms), got = viewport(c, s, box, Number(zoom), now);
+    const sites = got.sites.map(x => { const f = fareOf(c, s, x.id, now); return { ...x, cost: { energy: f.energy, coins: f.coins } }; });
+    return reply.header('x-wild-revision', String(got.revision)).send({ ok: true, sites, capped: got.capped, total: got.total });
   });
 
   /** The home pick page (SGODOT-303, q(160) ④): the open cities, and with ?q= the cities by name with why one is grey. */
