@@ -1825,11 +1825,64 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
 	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
 
-## Where a Homestead material's Show goes (q(255) ②) — {go, now}, now = it can be gathered there at once. The farm's
-## spots were the targets until they left with v4q(4) ① (the user, 11-02); a city's point or a mine on the map is C's
-## (亚瑟: the nearest point / mouth), so none for now.
-static func _home_material_go(_view: Dictionary, _id: String) -> Dictionary:
+## Where a Homestead material's Show goes (q(255) ②, 355 C2; 李白's v4q(4) / (5) addendum eb1d7c20) — {go, now}, now = it
+## can be had there at once. A gathered material: the spot gather_spot_for picks (`gather:<id>`), now when it is ready.
+## Iron Ore / Quartz: the free vein of that main (view.wild.near3_sites, from home); Copper Ore / Coal / Rock Salt: the
+## free quarry (`mine:<id>`), now while the player is down it. Clay: a ready Clay Pit, else (every pit cooling) the
+## quarry, else the pit. A spot cooling down still points (now false: q(255) ⑥ lists it with what is still to go); the
+## city's spots not read yet (P0Runtime._read_home_places), or no such site: no target.
+const GATHERED := ["wood", "stone", "fiber", "clay", "wild_herb", "hardwood", "flax"]   # the yields of world_gen gather_points
+const VEIN_ORES := ["iron_ore", "quartz"]
+const QUARRY_ORES := ["copper_ore", "coal", "rock_salt"]
+static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
+	var spot := gather_spot_for(view, id) if id in GATHERED else {}
+	if not spot.is_empty() and (bool(spot.ready) or id != "clay"): return {"go": "gather:" + str(spot.id), "now": bool(spot.ready)}
+	var site := ""
+	if id in VEIN_ORES: site = near3_site(view, "vein", id)
+	elif id in QUARRY_ORES or id == "clay": site = near3_site(view, "quarry")
+	if site != "": return {"go": "mine:" + site, "now": str(view.get("mine", {}).get("at", {}).get("mine", "")) == site}
+	if not spot.is_empty(): return {"go": "gather:" + str(spot.id), "now": false}
 	return {"go": "", "now": false}
+
+## The gathering spot for `item` (eb1d7c20): in the city the player is in when it has one (another town's spots first),
+## else in the home city — of the spots whose first yield is it, the nearest that can be gathered now (not in
+## view.gather.city_ready) {id, ready: true}; every one cooling: the nearest {id, ready: false}. Nearest to the city's
+## base point (P0Clusters; the farm when the city is not in the table), the table's order breaking a tie. {} when no
+## spot of it is read.
+static func gather_spot_for(view: Dictionary, item: String) -> Dictionary:
+	var places = load("res://modules/p0/p0_city_places.gd")
+	var home := str(load("res://modules/p0/p0_travel.gd").home(view))
+	var here := str(view.get("travel", {}).get("here", ""))
+	var yields := func(p: Dictionary) -> bool:
+		var y: Array = p.get("yield", [])
+		return not y.is_empty() and str(y[0][0]) == item
+	var city := home
+	var spots: Array = (places.gather(here) as Array).filter(yields) if here != "" and here != home else []
+	if spots.is_empty(): spots = (places.gather(home) as Array).filter(yields)
+	else: city = here
+	if spots.is_empty(): return {}
+	var cl := P0Clusters.get_cluster(city)
+	var farm: Dictionary = view.get("home", {}).get("farm", {}) if view.get("home", {}).get("farm") is Dictionary else {}
+	var base := Vector2(float(cl.lat), float(cl.lng)) if not cl.is_empty() else (Vector2(float(farm.get("lat", 0.0)), float(farm.get("lng", 0.0))) if not farm.is_empty() else Vector2.INF)
+	var far := func(p: Dictionary) -> float:
+		if base == Vector2.INF: return 0.0
+		return pow(float(p.lat) - base.x, 2.0) + pow((float(p.lng) - base.y) * cos(deg_to_rad(base.x)), 2.0)
+	var cooling: Dictionary = view.get("gather", {}).get("city_ready", {}) if view.get("gather", {}).get("city_ready") is Dictionary else {}
+	var best := {}
+	var any := {}
+	for p in spots:
+		if any.is_empty() or float(far.call(p)) < float(far.call(any)): any = p
+		if int(cooling.get(str(p.id), 0)) > 0: continue
+		if best.is_empty() or float(far.call(p)) < float(far.call(best)): best = p
+	return {"id": str(best.id), "ready": true} if not best.is_empty() else {"id": str(any.id), "ready": false}
+
+## One of the free three wild sites (view.wild.near3_sites, nearest first) of `type` — a vein of `main`, or the quarry —
+## its id, "" when none.
+static func near3_site(view: Dictionary, type: String, main := "") -> String:
+	var sites = view.get("wild", {}).get("near3_sites", [])
+	for x in sites if sites is Array else []:
+		if x is Dictionary and str(x.get("type", "")) == type and (main == "" or str(x.get("main", "")) == main): return str(x.get("id", ""))
+	return ""
 
 ## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.
 static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:

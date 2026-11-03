@@ -258,6 +258,10 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	if typeof(data) != TYPE_DICTIONARY:
 		connection_failed.emit("Unexpected server reply", cmd)
 		return {ok = false, code = "network", network = true}
+	if data.has("state") and save_too_old(data.state):   # an old server's or an unmigrated save's: maintenance, not the world
+		var held := {"code": "maintenance"}
+		blocked.emit("maintenance", held)
+		return {ok = false, code = "maintenance", network = true}
 	if data.has("state"):
 		var state: Dictionary = data.state
 		if bj_mock != null: bj_mock.decorate(state)   # before it becomes the (read-only) view
@@ -271,6 +275,13 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	refused.emit(str(data.get("code", "")), data.get("detail", {}), cmd)
 	if data.has("state"): state_changed.emit(view, [])
 	return {ok = false, code = str(data.get("code", "")), network = false}
+
+## v4q(2) ② (355 b1's two guards, 381 66475c4d): a state with no save_version, or one before SAVE_VERSION, is an old
+## server's or a save not migrated yet — it never becomes the view; the runtime shows SYS-MAINT without a time
+## (`We'll be back soon.` · Check again, which reads again, as for the server's own 503).
+const SAVE_VERSION := 7
+static func save_too_old(state) -> bool:
+	return not state is Dictionary or state.get("save_version", null) == null or int(state.save_version) < SAVE_VERSION
 
 ## The server's whole-screen refusals (q(74)): 426 {code: "update_required", url} and 503 {code: "maintenance",
 ## back_at}. Both the status and the body's code must match, so a proxy's plain 503 stays a network failure.

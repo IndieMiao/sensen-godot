@@ -482,23 +482,26 @@ static func stored_notice(view: Dictionary, shown_at: float) -> String:
 # --- Material sources (NeedSource) ---
 
 ## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08), shared
-## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `: the mine types that
-## yield it (355 b1: a quarry's mains, a vein's; every rock gives Stone: `Stone · the mine`). The farm's gathering spots
-## were the first sources (`Clay · Clay Bank`) until they left with v4q(4) ① (the user, 11-02); a city's points are the
-## map's (亚瑟's C), not listed here yet.
-## `go` (Show, 不知火舞 on 228): none while every source is a mine (no mouth to show, 355 b1). {} for anything that is
-## not a material (content.materials) or that nothing here yields.
-## Two lines at most (不知火舞 on 228): the label may break only before ` · or `, so every other space is a no-break
-## space — `Copper Ore · Quarry` / `· or Vein`.
+## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: `<material> · <source>`, sources joined by ` · or `.
+## The words are 不知火舞's (355 3b2c6a43, 李白's note 547a1962, pending the user's word): the city's gathering spots
+## for what they yield, the mines for ores (`Quarries`, `Iron veins from Floor 10`); every rock gives Stone, a Quarry Clay.
+## `go` (Show, 不知火舞 on 228): the spot or mine Today points at (P0Logic._home_material_go, 355 C2). {} for anything
+## no source names (a seed, bait — the tackle shop's — or a geode's gem not open in the first batch).
+## Two lines at most (eb1d7c20, as UiKit.break_at_dot): only at a ` · `, the dot dropped, before ` · or ` first, else
+## after the material — `Clay · Clay Pits in town` / `or Quarries`; every space within a part is a no-break one.
+const SOURCES := {
+	"wood": ["Groves in town"], "stone": ["Rocks in town", "any mine"], "fiber": ["Reed Banks in town"],
+	"wild_herb": ["Herb Patches in town"], "clay": ["Clay Pits in town", "Quarries"],
+	"hardwood": ["Woods in some towns"], "flax": ["Flax Fields in some towns"],
+	"copper_ore": ["Quarries"], "coal": ["Quarries"], "rock_salt": ["Quarries"],
+	"iron_ore": ["Iron veins from Floor 10"], "quartz": ["Quartz veins from Floor 10"],
+}
 static func material_source(view: Dictionary, id: String) -> Dictionary:
-	var c := P0Logic.content()
-	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
-	# every rock gives Stone (Li Bai on 228); no Show target for a mine yet: C will give the nearest mouth (亚瑟 on #629)
-	var parts: Array = ["the mine"] if id == "stone" else mine_types_yielding(id).map(func(t): return str(t.word))
+	var parts: Array = SOURCES.get(id, [])
 	if parts.is_empty(): return {}
-	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
-	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
-	return {"text": text, "go": ""}
+	var text := _nowrap(P0Logic.item_name(view, id)) + " · " + _nowrap(parts[0])
+	for i in range(1, parts.size()): text += " · " + _nowrap("or %s" % parts[i])   # UiNeedSource breaks only at a ` · `
+	return {"text": text, "go": str(P0Logic._home_material_go(view, id).go)}   # Show: the spot or mine Today points at (355 C2)
 
 ## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
 ## mine content opens (content.mine.types: quarry and vein in the first batch), in that order — [{type, word}], the

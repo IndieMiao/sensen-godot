@@ -2418,10 +2418,14 @@ func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
 ## A tapped NEED-TILE: one source line just above it; Show only moves the camera (LOCK-10 / LOCK-08).
 func _show_need_source(tile: Control, id: String) -> void:
 	var src := P0Logic.need_source(view, id)
-	var go := str(src.go) if spot_reachable() else ""
+	var go := str(src.go)
+	# 355 C2: a city's spot or a wild mine is a map pin (Show on map from here, Show on the map), as Today's rows go
+	var label := show_label(go, space_here(), spot_reachable(), place)
+	if label == "": go = ""
 	var on_show := Callable() if go == "" else func():
 		close_modal()
-		show_spot.emit(go)
+		if label == "Show": show_spot.emit(go)
+		else: show_on_map.emit(map_target(go))
 	var layer := UiNeedSource.popup(root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
 
@@ -2942,6 +2946,9 @@ static func show_label(go: String, here: String, camera_here: bool, here_place :
 	if go == "inbox": return "Show"   # the Inbox opens anywhere: its Parcels page (q(254) ①, Pip's seeds)
 	if go == "bag": return "Show"     # and the bag: S8's dish to eat (SGODOT-368)
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
+	# 355 C2: a wild mine (`mine:<site>`) the player is down: nothing to show (the row stays, without a button); a
+	# gathering spot (`gather:<id>`) or another mine is a map pin as any (Show on the map, Show on map elsewhere)
+	if here == "mine" and here_place != "" and go == "mine:" + here_place: return ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if home_target(go) and here in ["home", "farm"]: return "Show" if camera_here else ""

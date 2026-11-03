@@ -596,7 +596,7 @@ func test_pin_confirm_retries_a_lost_city_ack_before_build_and_uses_returned_seq
 	assert_array(session._queue).is_empty()
 	flow.confirm.move.activated.emit()
 	assert_str(posts[-1].body.type).is_equal("guide")
-	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": {"seq": 5}}).to_utf8_buffer(), posts[-1].cmd)
+	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": {"seq": 5, "save_version": 7}}).to_utf8_buffer(), posts[-1].cmd)
 	assert_str(posts[-1].body.type).is_equal("choose_home")
 	assert_int(posts[-1].body.expect_seq).is_equal(5)
 	assert_float(posts[-1].body.lat).is_equal_approx(37.759, 1e-9)

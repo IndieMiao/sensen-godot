@@ -13,7 +13,7 @@ func before_test() -> void:
 	session.view = {"seq": 7}
 
 func _reply(state_seq: int, ok := true, code := "") -> void:
-	var data := {"ok": ok, "state": {"seq": state_seq}}
+	var data := {"ok": ok, "state": {"seq": state_seq, "save_version": 7}}
 	if not ok: data["code"] = code
 	session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify(data).to_utf8_buffer(), sent[-1].cmd)
 
