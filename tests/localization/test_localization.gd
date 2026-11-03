@@ -396,3 +396,28 @@ func test_p0_pieced_lines_read_whole_under_chinese() -> void:
 	TranslationServer.set_locale("en")
 	assert_str(P0Logic._count_word(3)).is_equal("three")
 	TranslationServer.remove_translation(t)
+
+## 0.2.23 (不知火舞 385 fd216262): a Nearby row's name and ` · state` are measured as they show — 「费尔菲尔德」 was cut at
+## Fairfield's English width and the gap before 「· 加州」 followed the English.
+const CityRowScript := preload("res://scenes/p0/panels/p0_city_row.gd")
+func test_p0_a_city_rows_name_is_measured_in_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"Fairfield": "费尔菲尔德", "California": "加州"})
+	TranslationServer.add_translation(t)
+	var first := HBoxContainer.new()
+	first.theme = UiKit.theme()
+	first.size = Vector2(300, 24)
+	add_child(first)
+	var city := UiKit.label("Fairfield", UiTokens.STYLE_ROW_TITLE_XB15)
+	var region := UiKit.label(" · California", UiTokens.STYLE_C13_B)
+	first.add_child(city)
+	first.add_child(region)
+	CityRowScript._fit_first(first, city, region)
+	var font := city.get_theme_font(&"font")
+	var zh_w := ceilf(font.get_string_size("费尔菲尔德", HORIZONTAL_ALIGNMENT_LEFT, -1, city.get_theme_font_size(&"font_size")).x)
+	assert_float(city.custom_minimum_size.x).is_equal(zh_w)
+	assert_bool(region.visible).is_true()
+	assert_str(String(region.atr(region.text))).is_equal(" · 加州")
+	first.queue_free()
+	TranslationServer.remove_translation(t)
