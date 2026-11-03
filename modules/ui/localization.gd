@@ -67,13 +67,20 @@ func use_p0(path := P0_SETTINGS_PATH) -> void:
 ## every line's height, which would move the English layouts measured to the frames.
 const CJK_FONT := "res://assets/ui/fonts/NotoSansSC-Regular.otf"
 const CJK_EMBOLDEN := {400: 0.0, 700: 0.45, 800: 0.6}
+## The three weights as set here, held for as long as this autoload lives: nothing else may hold them yet when P0 starts
+## (the theme loads later), and a font no one holds leaves the resource cache — the next load() made a new one without
+## the fallback, and Chinese was drawn by the system's fallback font: thin at every weight, 远 and 鉴 boxes (B 档 shots,
+## SGODOT-385, 11-03).
+var _cjk_held: Array[FontVariation] = []
 func set_cjk_fonts(on: bool) -> void:
+	_cjk_held.clear()
 	for weight in CJK_EMBOLDEN:
 		var font := load("res://assets/ui/fonts/nunito_w%d.tres" % weight) as FontVariation
 		if font == null: continue
 		if not on:
 			font.fallbacks = []
 			continue
+		_cjk_held.append(font)
 		var cjk := FontVariation.new()
 		cjk.base_font = load(CJK_FONT)
 		cjk.variation_embolden = float(CJK_EMBOLDEN[weight])
