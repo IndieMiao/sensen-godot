@@ -1,0 +1,3474 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "passed": true,
+  "geometry": {
+    "id": "mob_cave_bat",
+    "stage": "blockout",
+    "passed": true,
+    "checks": [
+      {
+        "check": "One mesh and surface",
+        "passed": true
+      },
+      {
+        "check": "Actual triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "One material and no textures",
+        "passed": true
+      },
+      {
+        "check": "All normals normalized",
+        "passed": true
+      },
+      {
+        "check": "No degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "JSON bounds from exported vertices",
+        "passed": true
+      },
+      {
+        "check": "JSON height includes rest hover offset",
+        "passed": true
+      },
+      {
+        "check": "Exactly one 100 percent rigid influence per vertex",
+        "passed": true
+      },
+      {
+        "check": "One skin and <=16 joints",
+        "passed": true
+      },
+      {
+        "check": "All joints reference the skin",
+        "passed": true
+      },
+      {
+        "check": "UV2.x contains both binary tint regions",
+        "passed": true
+      },
+      {
+        "check": "Actual vertex paint has body and face colours",
+        "passed": true
+      },
+      {
+        "check": "Dark eyes and mouth excluded from tint",
+        "passed": true
+      },
+      {
+        "check": "Pink face patches excluded from tint",
+        "passed": true
+      },
+      {
+        "check": "Exactly one root bone",
+        "passed": true
+      },
+      {
+        "check": "Root origin on ground",
+        "passed": true
+      },
+      {
+        "check": "Exact final animation names",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "attack: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "attack: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "attack: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "attack: valid hit_at",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "die: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "die: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "die: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "fly_high: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "fly_high: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "fly_high: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "fly_high: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "hit: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "hit: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "hit: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "idle: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "idle: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "idle: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "idle: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for translation",
+        "passed": true
+      },
+      {
+        "check": "move: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for rotation",
+        "passed": true
+      },
+      {
+        "check": "move: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "move: loop endpoints coincide for scale",
+        "passed": true
+      },
+      {
+        "check": "move: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "move: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "recover: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "recover: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "recover: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: constant root translation",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: constant root rotation",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: constant root scale",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid translation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid rotation track",
+        "passed": true
+      },
+      {
+        "check": "windup: valid scale track",
+        "passed": true
+      },
+      {
+        "check": "windup: JSON timing matches glTF",
+        "passed": true
+      },
+      {
+        "check": "windup: has moving bone tracks",
+        "passed": true
+      },
+      {
+        "check": "Windup leaves .4-.7 seconds warning",
+        "passed": true
+      },
+      {
+        "check": "Godot generated import UID retained",
+        "passed": true
+      },
+      {
+        "check": "Animations and external-map import settings",
+        "passed": true
+      },
+      {
+        "check": "Consumer contract: no root motion, fake shadow only",
+        "passed": true
+      }
+    ],
+    "bounds": [
+      [
+        -0.5,
+        0.7450000047683716,
+        -0.16500000655651093
+      ],
+      [
+        0.5,
+        1.309616208076477,
+        0.1704999953508377
+      ]
+    ],
+    "triangles": 1376,
+    "bones": 10,
+    "anims": {
+      "idle": {
+        "length": 1.0,
+        "loop": true
+      },
+      "move": {
+        "length": 0.6,
+        "loop": true
+      },
+      "windup": {
+        "length": 0.55,
+        "loop": false
+      },
+      "attack": {
+        "length": 0.45,
+        "loop": false,
+        "hit_at": 0.2
+      },
+      "recover": {
+        "length": 0.5,
+        "loop": false
+      },
+      "hit": {
+        "length": 0.25,
+        "loop": false
+      },
+      "die": {
+        "length": 0.7,
+        "loop": false
+      },
+      "fly_high": {
+        "length": 0.4,
+        "loop": true
+      }
+    },
+    "glb_sha256": "488d4d7101d2c0ba5f93100b932c6b6acb546963ffe4b63df307351ff71566f3"
+  },
+  "godot": {
+    "animations": {
+      "attack": {
+        "length": 0.45,
+        "loop": false,
+        "max_vertex_displacement_m": 0.525904834270477,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.312959641218185,
+                0.76261568069458,
+                -0.254918605089188
+              ],
+              [
+                0.312959641218185,
+                1.3124144077301,
+                0.173216938972473
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.350711673498154,
+                0.765917003154755,
+                -0.179487586021423
+              ],
+              [
+                0.350711673498154,
+                1.2988429069519,
+                0.179487586021423
+              ]
+            ],
+            "time": 0.05
+          },
+          {
+            "bounds": [
+              [
+                -0.368271321058273,
+                0.757408022880554,
+                -0.184756964445114
+              ],
+              [
+                0.368271321058273,
+                1.27208411693573,
+                0.209152579307556
+              ]
+            ],
+            "time": 0.1
+          },
+          {
+            "bounds": [
+              [
+                -0.379824578762054,
+                0.740807890892029,
+                -0.201140522956848
+              ],
+              [
+                0.379824578762054,
+                1.20297837257385,
+                0.236240923404694
+              ]
+            ],
+            "time": 0.15
+          },
+          {
+            "bounds": [
+              [
+                -0.381809681653976,
+                0.736730337142944,
+                -0.218047201633453
+              ],
+              [
+                0.381809681653976,
+                1.15145063400269,
+                0.271296322345734
+              ]
+            ],
+            "time": 0.2
+          },
+          {
+            "bounds": [
+              [
+                -0.382811158895493,
+                0.736934661865234,
+                -0.216343402862549
+              ],
+              [
+                0.382811158895493,
+                1.14595627784729,
+                0.276170194149017
+              ]
+            ],
+            "time": 0.25
+          },
+          {
+            "bounds": [
+              [
+                -0.404237329959869,
+                0.743902087211609,
+                -0.205465495586395
+              ],
+              [
+                0.404237329959869,
+                1.16979396343231,
+                0.253015697002411
+              ]
+            ],
+            "time": 0.3
+          },
+          {
+            "bounds": [
+              [
+                -0.439454287290573,
+                0.75350683927536,
+                -0.183294296264648
+              ],
+              [
+                0.439454287290573,
+                1.21642315387726,
+                0.219365179538727
+              ]
+            ],
+            "time": 0.35
+          },
+          {
+            "bounds": [
+              [
+                -0.475833177566528,
+                0.753979682922363,
+                -0.176088988780975
+              ],
+              [
+                0.475833177566528,
+                1.26031684875488,
+                0.181523501873016
+              ]
+            ],
+            "time": 0.4
+          }
+        ]
+      },
+      "die": {
+        "length": 0.7,
+        "loop": false,
+        "max_vertex_displacement_m": 1.10682952404022,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.745047152042389,
+                -0.165000006556511
+              ],
+              [
+                0.5,
+                1.30961620807648,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.431647509336472,
+                0.675595700740814,
+                -0.145428657531738
+              ],
+              [
+                0.431647509336472,
+                1.16584837436676,
+                0.15037676692009
+              ]
+            ],
+            "time": 0.0777777777777778
+          },
+          {
+            "bounds": [
+              [
+                -0.358223289251328,
+                0.612138986587524,
+                -0.163946181535721
+              ],
+              [
+                0.358223289251328,
+                1.01473617553711,
+                0.131069138646126
+              ]
+            ],
+            "time": 0.155555555555556
+          },
+          {
+            "bounds": [
+              [
+                -0.290112555027008,
+                0.553153038024902,
+                -0.172418594360352
+              ],
+              [
+                0.290112555027008,
+                0.860722482204437,
+                0.114732846617699
+              ]
+            ],
+            "time": 0.233333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.225728988647461,
+                0.49176424741745,
+                -0.163917541503906
+              ],
+              [
+                0.225728988647461,
+                0.711312890052795,
+                0.101028323173523
+              ]
+            ],
+            "time": 0.311111111111111
+          },
+          {
+            "bounds": [
+              [
+                -0.163032352924347,
+                0.415337353944778,
+                -0.142470628023148
+              ],
+              [
+                0.163032352924347,
+                0.567535102367401,
+                0.0912359356880188
+              ]
+            ],
+            "time": 0.388888888888889
+          },
+          {
+            "bounds": [
+              [
+                -0.102770209312439,
+                0.335479557514191,
+                -0.10743048787117
+              ],
+              [
+                0.102770209312439,
+                0.441719055175781,
+                0.0731752514839172
+              ]
+            ],
+            "time": 0.466666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.057838499546051,
+                0.240031838417053,
+                -0.0670566409826279
+              ],
+              [
+                0.057838499546051,
+                0.320297181606293,
+                0.0484401285648346
+              ]
+            ],
+            "time": 0.544444444444444
+          },
+          {
+            "bounds": [
+              [
+                -0.0349221229553223,
+                0.187064349651337,
+                -0.0411582589149475
+              ],
+              [
+                0.0349221229553223,
+                0.240779638290405,
+                0.0303471013903618
+              ]
+            ],
+            "time": 0.622222222222222
+          }
+        ]
+      },
+      "fly_high": {
+        "length": 0.4,
+        "loop": true,
+        "max_vertex_displacement_m": 0.24149477481842,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.750065684318542,
+                -0.16502183675766
+              ],
+              [
+                0.5,
+                1.30077123641968,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.481776058673859,
+                0.758763670921326,
+                -0.16502183675766
+              ],
+              [
+                0.481776058673859,
+                1.31116437911987,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.0444444444444444
+          },
+          {
+            "bounds": [
+              [
+                -0.46418035030365,
+                0.762163817882538,
+                -0.16502183675766
+              ],
+              [
+                0.46418035030365,
+                1.31440651416779,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.0888888888888889
+          },
+          {
+            "bounds": [
+              [
+                -0.465884029865265,
+                0.76380330324173,
+                -0.16502183675766
+              ],
+              [
+                0.465884029865265,
+                1.31404054164886,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.133333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.502178192138672,
+                0.755809485912323,
+                -0.16502183675766
+              ],
+              [
+                0.502178192138672,
+                1.30599391460419,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.177777777777778
+          },
+          {
+            "bounds": [
+              [
+                -0.474952697753906,
+                0.744940578937531,
+                -0.16502183675766
+              ],
+              [
+                0.474952697753906,
+                1.29840755462646,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.222222222222222
+          },
+          {
+            "bounds": [
+              [
+                -0.404527962207794,
+                0.738144755363464,
+                -0.16502183675766
+              ],
+              [
+                0.404527962207794,
+                1.31406140327454,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.266666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.377460211515427,
+                0.737248241901398,
+                -0.16502183675766
+              ],
+              [
+                0.377460211515427,
+                1.32864773273468,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.311111111111111
+          },
+          {
+            "bounds": [
+              [
+                -0.42867124080658,
+                0.743021190166473,
+                -0.16502183675766
+              ],
+              [
+                0.42867124080658,
+                1.31212317943573,
+                0.170184478163719
+              ]
+            ],
+            "time": 0.355555555555556
+          }
+        ]
+      },
+      "hit": {
+        "length": 0.25,
+        "loop": false,
+        "max_vertex_displacement_m": 0.162881091237068,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.745047152042389,
+                -0.165000006556511
+              ],
+              [
+                0.5,
+                1.30961620807648,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.503796339035034,
+                0.752631008625031,
+                -0.1577008664608
+              ],
+              [
+                0.503796339035034,
+                1.29924023151398,
+                0.161789894104004
+              ]
+            ],
+            "time": 0.0277777777777778
+          },
+          {
+            "bounds": [
+              [
+                -0.495872795581818,
+                0.761514604091644,
+                -0.15752737224102
+              ],
+              [
+                0.495872795581818,
+                1.2870591878891,
+                0.15742039680481
+              ]
+            ],
+            "time": 0.0555555555555556
+          },
+          {
+            "bounds": [
+              [
+                -0.484442740678787,
+                0.768456220626831,
+                -0.187013804912567
+              ],
+              [
+                0.484442740678787,
+                1.27828514575958,
+                0.154181510210037
+              ]
+            ],
+            "time": 0.0833333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.475251883268356,
+                0.773031532764435,
+                -0.203535318374634
+              ],
+              [
+                0.475251883268356,
+                1.27368092536926,
+                0.151951834559441
+              ]
+            ],
+            "time": 0.111111111111111
+          },
+          {
+            "bounds": [
+              [
+                -0.475251883268356,
+                0.773031532764435,
+                -0.203535318374634
+              ],
+              [
+                0.475251883268356,
+                1.27368092536926,
+                0.151951834559441
+              ]
+            ],
+            "time": 0.138888888888889
+          },
+          {
+            "bounds": [
+              [
+                -0.484442710876465,
+                0.768456220626831,
+                -0.187013775110245
+              ],
+              [
+                0.484442710876465,
+                1.27828514575958,
+                0.154181510210037
+              ]
+            ],
+            "time": 0.166666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.495872795581818,
+                0.761514604091644,
+                -0.15752737224102
+              ],
+              [
+                0.495872795581818,
+                1.28783249855042,
+                0.15742039680481
+              ]
+            ],
+            "time": 0.194444444444444
+          },
+          {
+            "bounds": [
+              [
+                -0.503789961338043,
+                0.752631008625031,
+                -0.1577008664608
+              ],
+              [
+                0.503789961338043,
+                1.30035018920898,
+                0.161789894104004
+              ]
+            ],
+            "time": 0.222222222222222
+          }
+        ]
+      },
+      "idle": {
+        "length": 1.0,
+        "loop": true,
+        "max_vertex_displacement_m": 0.176267445087433,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.745047152042389,
+                -0.165000006556511
+              ],
+              [
+                0.5,
+                1.30961620807648,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.478811144828796,
+                0.759662926197052,
+                -0.165000006556511
+              ],
+              [
+                0.478811144828796,
+                1.32488059997559,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.111111111111111
+          },
+          {
+            "bounds": [
+              [
+                -0.503932118415833,
+                0.749899387359619,
+                -0.165000006556511
+              ],
+              [
+                0.503932118415833,
+                1.31595075130463,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.222222222222222
+          },
+          {
+            "bounds": [
+              [
+                -0.438293159008026,
+                0.732780158519745,
+                -0.165000006556511
+              ],
+              [
+                0.438293159008026,
+                1.32298898696899,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.333333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.459740817546844,
+                0.735654652118683,
+                -0.165000006556511
+              ],
+              [
+                0.459740817546844,
+                1.31863081455231,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.444444444444444
+          },
+          {
+            "bounds": [
+              [
+                -0.496992379426956,
+                0.754499077796936,
+                -0.165000006556511
+              ],
+              [
+                0.496992379426956,
+                1.31841588020325,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.555555555555556
+          },
+          {
+            "bounds": [
+              [
+                -0.486780345439911,
+                0.757679164409637,
+                -0.165000006556511
+              ],
+              [
+                0.486780345439911,
+                1.32037913799286,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.666666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.484282076358795,
+                0.74010294675827,
+                -0.165000006556511
+              ],
+              [
+                0.484282076358795,
+                1.30644989013672,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.777777777777778
+          },
+          {
+            "bounds": [
+              [
+                -0.423623532056808,
+                0.731131196022034,
+                -0.165000006556511
+              ],
+              [
+                0.423623532056808,
+                1.32483124732971,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.888888888888889
+          }
+        ]
+      },
+      "move": {
+        "length": 0.6,
+        "loop": true,
+        "max_vertex_displacement_m": 0.259666353464127,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.748458683490753,
+                -0.163414672017097
+              ],
+              [
+                0.5,
+                1.30664885044098,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.481952488422394,
+                0.759740173816681,
+                -0.163414672017097
+              ],
+              [
+                0.481952488422394,
+                1.31694173812866,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.0666666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.453554749488831,
+                0.762580811977386,
+                -0.163414672017097
+              ],
+              [
+                0.453554749488831,
+                1.32170283794403,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.133333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.458591341972351,
+                0.760848999023438,
+                -0.163414672017097
+              ],
+              [
+                0.458591341972351,
+                1.32092332839966,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.2
+          },
+          {
+            "bounds": [
+              [
+                -0.501455664634705,
+                0.753003537654877,
+                -0.163414672017097
+              ],
+              [
+                0.501455664634705,
+                1.31219041347504,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.266666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.472468882799149,
+                0.744494795799255,
+                -0.163414672017097
+              ],
+              [
+                0.472468882799149,
+                1.31894719600677,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.333333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.381309986114502,
+                0.737190008163452,
+                -0.163414672017097
+              ],
+              [
+                0.381309986114502,
+                1.3477817773819,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.4
+          },
+          {
+            "bounds": [
+              [
+                -0.361759454011917,
+                0.733873426914215,
+                -0.163414672017097
+              ],
+              [
+                0.361759454011917,
+                1.35262835025787,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.466666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.429446935653687,
+                0.738584756851196,
+                -0.163414672017097
+              ],
+              [
+                0.429446935653687,
+                1.33124351501465,
+                0.174508303403854
+              ]
+            ],
+            "time": 0.533333333333333
+          }
+        ]
+      },
+      "recover": {
+        "length": 0.5,
+        "loop": false,
+        "max_vertex_displacement_m": 0.105340518057346,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.76261568069458,
+                -0.170011192560196
+              ],
+              [
+                0.5,
+                1.29081726074219,
+                0.173216909170151
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.49214631319046,
+                0.760918140411377,
+                -0.169265419244766
+              ],
+              [
+                0.49214631319046,
+                1.29882097244263,
+                0.174035996198654
+              ]
+            ],
+            "time": 0.0555555555555556
+          },
+          {
+            "bounds": [
+              [
+                -0.482136607170105,
+                0.758934378623962,
+                -0.168211594223976
+              ],
+              [
+                0.482136607170105,
+                1.3121303319931,
+                0.174538254737854
+              ]
+            ],
+            "time": 0.111111111111111
+          },
+          {
+            "bounds": [
+              [
+                -0.473560512065887,
+                0.755016207695007,
+                -0.16685163974762
+              ],
+              [
+                0.473560512065887,
+                1.32099008560181,
+                0.174722909927368
+              ]
+            ],
+            "time": 0.166666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.468853533267975,
+                0.750872135162354,
+                -0.165188014507294
+              ],
+              [
+                0.468853533267975,
+                1.32563376426697,
+                0.174680158495903
+              ]
+            ],
+            "time": 0.222222222222222
+          },
+          {
+            "bounds": [
+              [
+                -0.46885347366333,
+                0.748000800609589,
+                -0.163223788142204
+              ],
+              [
+                0.46885347366333,
+                1.32638192176819,
+                0.174476727843285
+              ]
+            ],
+            "time": 0.277777777777778
+          },
+          {
+            "bounds": [
+              [
+                -0.473560512065887,
+                0.746481895446777,
+                -0.163650363683701
+              ],
+              [
+                0.473560512065887,
+                1.32315039634705,
+                0.173955738544464
+              ]
+            ],
+            "time": 0.333333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.482136607170105,
+                0.74566650390625,
+                -0.164399713277817
+              ],
+              [
+                0.482136607170105,
+                1.31543016433716,
+                0.17311817407608
+              ]
+            ],
+            "time": 0.388888888888889
+          },
+          {
+            "bounds": [
+              [
+                -0.49214631319046,
+                0.745164036750793,
+                -0.164849862456322
+              ],
+              [
+                0.49214631319046,
+                1.31032073497772,
+                0.171965569257736
+              ]
+            ],
+            "time": 0.444444444444444
+          }
+        ]
+      },
+      "windup": {
+        "length": 0.55,
+        "loop": false,
+        "max_vertex_displacement_m": 0.294314920902252,
+        "samples": [
+          {
+            "bounds": [
+              [
+                -0.5,
+                0.745047152042389,
+                -0.165000006556511
+              ],
+              [
+                0.5,
+                1.30961620807648,
+                0.170499995350838
+              ]
+            ],
+            "time": 0.0
+          },
+          {
+            "bounds": [
+              [
+                -0.488586217164993,
+                0.744365453720093,
+                -0.163384541869164
+              ],
+              [
+                0.488586217164993,
+                1.3117424249649,
+                0.170458614826202
+              ]
+            ],
+            "time": 0.0611111111111111
+          },
+          {
+            "bounds": [
+              [
+                -0.469845652580261,
+                0.744782626628876,
+                -0.161477044224739
+              ],
+              [
+                0.469845652580261,
+                1.31314098834991,
+                0.170126885175705
+              ]
+            ],
+            "time": 0.122222222222222
+          },
+          {
+            "bounds": [
+              [
+                -0.449801743030548,
+                0.744387209415436,
+                -0.159286364912987
+              ],
+              [
+                0.449801743030548,
+                1.31377875804901,
+                0.169510960578918
+              ]
+            ],
+            "time": 0.183333333333333
+          },
+          {
+            "bounds": [
+              [
+                -0.430998682975769,
+                0.743930280208588,
+                -0.165435343980789
+              ],
+              [
+                0.430998682975769,
+                1.31523787975311,
+                0.168617278337479
+              ]
+            ],
+            "time": 0.244444444444444
+          },
+          {
+            "bounds": [
+              [
+                -0.410982012748718,
+                0.744111061096191,
+                -0.172612935304642
+              ],
+              [
+                0.410982012748718,
+                1.32185220718384,
+                0.167452931404114
+              ]
+            ],
+            "time": 0.305555555555556
+          },
+          {
+            "bounds": [
+              [
+                -0.386270016431808,
+                0.745181739330292,
+                -0.181090876460075
+              ],
+              [
+                0.386270016431808,
+                1.32788574695587,
+                0.166288644075394
+              ]
+            ],
+            "time": 0.366666666666667
+          },
+          {
+            "bounds": [
+              [
+                -0.351936459541321,
+                0.746921598911285,
+                -0.191473260521889
+              ],
+              [
+                0.351936459541321,
+                1.33321690559387,
+                0.164876937866211
+              ]
+            ],
+            "time": 0.427777777777778
+          },
+          {
+            "bounds": [
+              [
+                -0.308105617761612,
+                0.750112414360046,
+                -0.197751373052597
+              ],
+              [
+                0.308105617761612,
+                1.3379864692688,
+                0.163218766450882
+              ]
+            ],
+            "time": 0.488888888888889
+          }
+        ]
+      }
+    },
+    "captures": [
+      {
+        "id": "front",
+        "pitch": 0.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.64999997615814,
+        "yaw": 0.0
+      },
+      {
+        "id": "side",
+        "pitch": 0.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.64999997615814,
+        "yaw": 90.0
+      },
+      {
+        "id": "back",
+        "pitch": 0.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.64999997615814,
+        "yaw": 180.0
+      },
+      {
+        "id": "action_idle",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_move",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_windup",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_attack",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_recover",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_hit",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_die",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "action_fly_high",
+        "pitch": 18.0,
+        "pixels": [
+          480.0,
+          480.0
+        ],
+        "width_m": 1.75,
+        "yaw": 19.9999980926514
+      },
+      {
+        "id": "mine_default_43deg",
+        "pitch": 43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 7.5,
+        "yaw": 14.4999990463257
+      }
+    ],
+    "checks": [
+      {
+        "check": "One Skeleton3D and AnimationPlayer imported",
+        "passed": true
+      },
+      {
+        "check": "One skinned mesh",
+        "passed": true
+      },
+      {
+        "check": "Imported model disables real shadow casting",
+        "passed": true
+      },
+      {
+        "check": "Required animation: idle",
+        "passed": true
+      },
+      {
+        "check": "idle: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "idle: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: move",
+        "passed": true
+      },
+      {
+        "check": "move: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "move: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: windup",
+        "passed": true
+      },
+      {
+        "check": "windup: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "windup: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: attack",
+        "passed": true
+      },
+      {
+        "check": "attack: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "attack: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: recover",
+        "passed": true
+      },
+      {
+        "check": "recover: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "recover: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: hit",
+        "passed": true
+      },
+      {
+        "check": "hit: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "hit: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: die",
+        "passed": true
+      },
+      {
+        "check": "die: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "die: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Required animation: fly_high",
+        "passed": true
+      },
+      {
+        "check": "fly_high: exact JSON duration",
+        "passed": true
+      },
+      {
+        "check": "fly_high: imported animation tracks",
+        "passed": true
+      },
+      {
+        "check": "Single surface",
+        "passed": true
+      },
+      {
+        "check": "Measured triangles <=1500",
+        "passed": true
+      },
+      {
+        "check": "Measured bones <=16",
+        "passed": true
+      },
+      {
+        "check": "Root bone named root",
+        "passed": true
+      },
+      {
+        "check": "UV2 tint mask survives import",
+        "passed": true
+      },
+      {
+        "check": "Vertex colour survives import",
+        "passed": true
+      },
+      {
+        "check": "Skinned mesh bound to skeleton",
+        "passed": true
+      },
+      {
+        "check": "Vertex paint material, no textures",
+        "passed": true
+      },
+      {
+        "check": "Unit root transform at ground origin",
+        "passed": true
+      },
+      {
+        "check": "Actual rest height matches JSON",
+        "passed": true
+      },
+      {
+        "check": "One metre rest wingspan",
+        "passed": true
+      },
+      {
+        "check": "Hover body centre in rest at Y=1.0",
+        "passed": true
+      },
+      {
+        "check": "Godot-generated import UID",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "idle: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "idle: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "move: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "move: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "windup: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "windup: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "attack: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "attack: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "recover: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "recover: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "hit: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "hit: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "die: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "die: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 0",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 1",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 2",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 3",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 4",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 5",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 6",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 7",
+        "passed": true
+      },
+      {
+        "check": "fly_high: no root translation at sample 8",
+        "passed": true
+      },
+      {
+        "check": "fly_high: actual skinned vertices move",
+        "passed": true
+      },
+      {
+        "check": "Capture front",
+        "passed": true
+      },
+      {
+        "check": "Capture side",
+        "passed": true
+      },
+      {
+        "check": "Capture back",
+        "passed": true
+      },
+      {
+        "check": "Capture action_idle",
+        "passed": true
+      },
+      {
+        "check": "Capture action_move",
+        "passed": true
+      },
+      {
+        "check": "Capture action_windup",
+        "passed": true
+      },
+      {
+        "check": "Capture action_attack",
+        "passed": true
+      },
+      {
+        "check": "Capture action_recover",
+        "passed": true
+      },
+      {
+        "check": "Capture action_hit",
+        "passed": true
+      },
+      {
+        "check": "Capture action_die",
+        "passed": true
+      },
+      {
+        "check": "Capture action_fly_high",
+        "passed": true
+      },
+      {
+        "check": "Actual Mobile renderer",
+        "passed": true
+      },
+      {
+        "check": "Actual reference player assembled",
+        "passed": true
+      },
+      {
+        "check": "Capture mine_default_43deg",
+        "passed": true
+      },
+      {
+        "check": "Mine comparison completed",
+        "passed": true
+      },
+      {
+        "check": "Actual Mobile renderer",
+        "passed": true
+      }
+    ],
+    "geometry": {
+      "bones": 10.0,
+      "height": 1.30961620807648,
+      "rest_bounds": [
+        [
+          -0.5,
+          0.745000004768372,
+          -0.165000006556511
+        ],
+        [
+          0.5,
+          1.30961620807648,
+          0.170499995350838
+        ]
+      ],
+      "surface_count": 1.0,
+      "triangles": 1376.0,
+      "uid": "uid://btbkmxg5skb7"
+    },
+    "mine": {
+      "camera_zoom": 0.8,
+      "floor": 1,
+      "player_height_m": 1.745,
+      "slime_radius_m": 0.4,
+      "source": "Unmodified farm-dev mine_art.gd and mine_combat.gd slime",
+      "width_m": 7.5
+    },
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  }
+}

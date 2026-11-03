@@ -1,0 +1,16 @@
+{
+  "asset": "mob_cave_bat",
+  "stage": "final_v1",
+  "kind": "original procedural geometry",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "source_script": "tools/art/source/monsters/mob_cave_bat/build.py",
+  "source_blend": "tools/art/source/monsters/mob_cave_bat/mob_cave_bat.blend",
+  "reference": "Plane 355 c368e7dd / approved concept v1.1",
+  "reference_sha256": "55f66d019b2d34ba1542cc442c7481c97c44ed3e19978c00ece737cc36e969b4",
+  "runtime_sha256": "cdc92f70fa07b21e7bfa5f16ba458183c7d2a67b33ab27b40c077c75c9ad1dd8",
+  "triangles": 1376,
+  "bones": 10,
+  "surfaces": 1,
+  "method": "Named smooth Blender parts; one rigid bone per vertex; original vertex colours and UV2.x tint mask; no external mesh or texture."
+}
