@@ -532,18 +532,23 @@ func _fly_to_wild(id: String) -> void:
 	var settled := [false, false]   # [taken, landed]
 	var both := func():
 		if settled[0] and settled[1] and rt != null and P0Travel.here(_view()) == id: open_mine_card(id)
-	var on_settled := func(k: String, ok: bool, _code: String):
+	# heard once: let go at its own key's settling (周瑜 on #710: a refused trip flown again within the old wait — the same
+	# key — had the first listener open the card mid-air), else after 30 s (the reply never came)
+	var listener: Array = [Callable()]
+	var let_go := func():
+		if rt != null and rt.session.command_settled.is_connected(listener[0]): rt.session.command_settled.disconnect(listener[0])
+	listener[0] = func(k: String, ok: bool, _code: String):
 		if k != key: return
+		let_go.call()
 		settled[0] = ok
 		if ok: both.call()
-	rt.session.command_settled.connect(on_settled)   # let go after 30 s below (another command may settle first)
+	rt.session.command_settled.connect(listener[0])
 	rt.session.send(cmd, key)
 	_show_target = id
 	_fly("wild:" + id, float(site.lat), float(site.lng), WILD_ZOOM, func():
 		settled[1] = true
 		both.call())
-	get_tree().create_timer(30.0).timeout.connect(func():
-		if rt != null and rt.session.command_settled.is_connected(on_settled): rt.session.command_settled.disconnect(on_settled))
+	get_tree().create_timer(30.0).timeout.connect(let_go)
 const WILD_ZOOM := 12.0   # where a flight to a wild site lands: the site and its surroundings
 
 ## A gathering spot's pin entry (contract C §9; P0CityPlaces.gather_spot holds the spot).

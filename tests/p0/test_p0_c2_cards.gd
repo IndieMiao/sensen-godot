@@ -192,3 +192,23 @@ func test_a_wild_pin_opens_its_mouth_card_and_go_opens_its_travel_card() -> void
 	m._on_entry_selected(P0Map.wild_entry(GEODE))
 	assert_str(m.rt.ui.modal_kind).is_equal("mine_card")
 	assert_object(m._live_card.find_child("Primary", true, false)).is_null()
+
+## 周瑜 on #710: the flight's listener lets go as its own key settles — a refused trip flown again (the same key) is
+## heard by the new flight alone, and nothing is left connected.
+func test_a_wild_flight_hears_its_travel_once_and_lets_go() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	P0WildSites.accept("t", {"sites": [VEIN]})
+	var rt: P0Runtime = m.rt
+	while rt.ui.has_modal(): rt.ui.close_modal()   # a card left open by another test (the runtime is shared)
+	rt.session.transport = func(_m: int, _p: String, _b: Dictionary, _c: Dictionary): pass
+	var before := rt.session.command_settled.get_connections().size()
+	m._fly_to_wild(VEIN.id)
+	assert_int(rt.session.command_settled.get_connections().size()).is_equal(before + 1)
+	var key := P0Session.ui_key({"type": "travel", "to": VEIN.id})
+	rt.session.command_settled.emit("another", true, "")   # someone else's: still listening
+	assert_int(rt.session.command_settled.get_connections().size()).is_equal(before + 1)
+	rt.session.command_settled.emit(key, false, "not_enough_coins")   # refused: let go, no card
+	assert_int(rt.session.command_settled.get_connections().size()).is_equal(before)
+	assert_str(rt.ui.modal_kind).is_not_equal("mine_card")
