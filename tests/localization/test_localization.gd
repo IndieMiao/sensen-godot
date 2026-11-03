@@ -184,6 +184,10 @@ func test_p0_table_reads_spaces_around_a_line_and_a_count_after_a_title() -> voi
 	assert_str(String(t.get_message("Floor 10"))).is_equal("")   # a bare number: the English stays
 	assert_str(String(t.get_message("Unknown 0/8"))).is_equal("")
 	assert_str(String(t.get_message("   "))).is_equal("")
+	# a line quoted whole (the postcards page's `“…”`): the words inside
+	t.set_table({"My kitchen is your kitchen.": "我的厨房就是你的厨房。"})
+	assert_str(String(t.get_message("“My kitchen is your kitchen.”"))).is_equal("“我的厨房就是你的厨房。”")
+	assert_str(String(t.get_message("“Unknown.”"))).is_equal("")
 
 func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() -> void:
 	var path := "user://p0-language-test-%d.cfg" % Time.get_ticks_usec()

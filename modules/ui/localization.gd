@@ -119,9 +119,10 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## P0's zh_CN table (assets/localization/p0_zh_CN.json: English source → Chinese). A line not in it is tried as a
 ## template — a source with format specs (%d, %s, %+d, %.1f; %% a percent sign: `Need %d more %s` → `还差 %d 个%s`;
 ## `{1}` / `{2}` in the Chinese to reorder) — with each %s it caught translated again (an item's name, a weekday) and a
-## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts; a link's ` ›` (`Edit look ›`) and
-## a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`), spaces around a line (`Muscle Memory `) and a
-## count after it (`Home Cook 0/8`) are read around. Nothing found: "" (the English stays). Answers are cached: labels ask again on every redraw. P0_I18N_MISSES=<file> (QA): every line drawn that found
+## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts; a link's ` ›` (`Edit look ›`),
+## a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`), spaces around a line (`Muscle Memory `), curly
+## quotes around it and a count after it (`Home Cook 0/8`) are read around. Nothing found: "" (the English stays).
+## Answers are cached: labels ask again on every redraw. P0_I18N_MISSES=<file> (QA): every line drawn that found
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
@@ -232,6 +233,9 @@ class P0Translation extends Translation:
 			if z == "": return ""
 			var at := s.find(bare)
 			return s.left(at) + z + s.substr(at + bare.length())
+		if s.begins_with("“") and s.ends_with("”") and s.length() > 2:   # a line quoted whole (the postcards' resident lines)
+			var said := translate_line(s.substr(1, s.length() - 2))
+			return "“" + said + "”" if said != "" else ""
 		if s.contains("\n"):
 			var lines := s.split("\n")
 			var parts: Array = []
