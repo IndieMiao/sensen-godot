@@ -210,7 +210,7 @@ static func _panels() -> Control:
 		v.add_child(panel)
 	# Toast R1 tones (1178:82265; SGODOT-233): Success / Info / Error, an Error with its guiding action.
 	for t in [[ToastLayer.Severity.SUCCESS, "Floor 2 cleared · Elevator stop", ""],
-			[ToastLayer.Severity.INFO, "Room 1 is full · you're in Room 2", ""],
+			[ToastLayer.Severity.INFO, "Layer 1 is full · you're in Layer 2", ""],
 			[ToastLayer.Severity.ERROR, "Creel full · 0 free slots · Sell or cook first", "Open bag"]]:
 		var toast := ToastLayer.card(t[0], t[1], t[2])
 		toast.custom_minimum_size = Vector2(ToastLayer.WIDTH, UiTokens.SIZE_TOAST_MIN_H)

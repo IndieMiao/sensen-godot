@@ -318,7 +318,7 @@ static func gear_rows(view: Dictionary, key: String) -> Array:
 				if r.has("stone"): effect = "%d Stone per rock" % int(r.stone)   # LOCK-29 wording
 				if r.get("owned", false) and not r.get("equipped", false): action = {id = &"equip", label = "Equip", kind = &"secondary"}
 			out.append({id = id, icon = P0Logic.icon(id), title = str(spec.get("title", r.get("name", id))), state = state,
-				effect = effect, action = action})
+				effect = effect, note = str(spec.get("fact_note", "")), action = action})   # note: a rod's tier, q(278)
 		return out
 	var id := _slot_item(view.get("gear", {}).get("slots", {}), key)
 	if id != "":

@@ -69,6 +69,9 @@ func test_gear_has_six_slots_and_rod_candidates_follow_the_rules() -> void:
 	assert_str(str(rows[1].action.label)).is_equal("Equip")
 	assert_bool((rows[2].action as Dictionary).is_empty()).is_true()            # not owned: no jump to the shop (LOCK-08)
 	assert_str(str(rows[1].effect)).contains("Lands up to")
+	# q(278): an owned rod's tier under its effect while the player is short of it (Fishing Lv3: the Fine fish all in
+	# reach); none under the Carbon Rod's greyed gate row (不知火舞 386 1c3d0416)
+	assert_that(rows.map(func(r): return r.note)).is_equal(["", "Rare needs Fishing Lv4–6", ""])
 	assert_that(P0BagDrawer.gear_rows(v, "farming").map(func(r): return r.state)).is_equal([&"equipped"])
 	assert_array(P0BagDrawer.gear_rows(v, "ring")).is_empty()
 

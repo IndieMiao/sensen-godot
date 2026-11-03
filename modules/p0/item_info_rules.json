@@ -14,7 +14,8 @@
     "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts.",
     "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\").",
     "{count_source} is \"12 · Harvested at home\"; without a known source the line drops (the title already shows ×N).",
-    "fact_note: a secondary line under the fact beside the buttons (q(252) ③: an away counter's `8 at home` under `6 each`); empty drops it."
+    "fact_note: a secondary line under the fact beside the buttons (q(252) ③: an away counter's `8 at home` under `6 each`; a Gear row's line under its effect, q(278) a rod's tier); empty drops it.",
+    "card_note: a buy row's › card, a secondary fact line of its own under the row's line 2 (the card's state line), above the price (q(278): `Legendary needs Fishing Lv7–9` under `Lands up to Legendary fish`); empty drops it."
   ],
   "seed/bag": {
     "facts": [
@@ -427,6 +428,7 @@
       "{rod_effect}",
       "{rod_gate}"
     ],
+    "fact_note": "{rod_tier}",
     "buttons": [
       {
         "id": "equipped",
@@ -445,8 +447,10 @@
   "rod/counter_buy": {
     "facts": [
       "{rod_reach}",
-      "{owned_line}"
+      "{owned_line}",
+      "{rod_tier_shelf}"
     ],
+    "card_note": "{rod_tier_shelf}",
     "price": true,
     "buttons": [
       {

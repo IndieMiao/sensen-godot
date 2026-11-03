@@ -271,6 +271,52 @@ func test_rods_in_gear_equip_or_show_equipped() -> void:
 	for r in v.gear.rods: if str(r.id) == "rod_reed": r.owned = true
 	assert_array(_labels(P0ItemInfo.spec(v, "rod_reed", &"gear"))).is_equal(["primary:Equip"])   # solid (BAG-2)
 
+## q(278) (SGODOT-386): a rod says which Fishing levels its top tier needs, from the content's fish (Fine Lv2–3, Rare
+## Lv4–6, Legendary Lv7–9) — the Gear slot's muted note under the effect, for a rod the player has (不知火舞 386
+## 1c3d0416: none under a greyed gate row) — until the player reaches the tier's highest.
+func test_a_rod_says_the_fishing_levels_its_top_tier_needs() -> void:
+	var v := _view()
+	v.gear.rods.append({"id": "rod_carbon", "name": "Carbon Rod", "reach": 4, "level": 6, "hook_bonus_ms": 800, "owned": false, "equipped": false})
+	var note := func(id: String) -> String: return str(P0ItemInfo.spec(v, id, &"gear").get("fact_note", ""))
+	v["skills"] = {"fishing": {"level": 1, "xp": 0}}
+	assert_array([note.call("rod_starter"), note.call("rod_reed"), note.call("rod_carbon")]).is_equal(
+		["Fine needs Fishing Lv2–3", "", ""])   # the Reed and Carbon Rods not bought yet
+	for r in v.gear.rods: r.owned = true
+	assert_array([note.call("rod_starter"), note.call("rod_reed"), note.call("rod_carbon")]).is_equal(
+		["Fine needs Fishing Lv2–3", "Rare needs Fishing Lv4–6", "Legendary needs Fishing Lv7–9"])
+	v.skills.fishing.level = 3   # the Starter Rod's Fine fish all within reach: no line
+	assert_array([note.call("rod_starter"), note.call("rod_reed")]).is_equal(["", "Rare needs Fishing Lv4–6"])
+	v.skills.fishing.level = 8
+	assert_array([note.call("rod_reed"), note.call("rod_carbon")]).is_equal(["", "Legendary needs Fishing Lv7–9"])
+	v.skills.fishing.level = 9
+	assert_str(note.call("rod_carbon")).is_empty()
+	# none of the tier's fish above the rod's own level: nothing to say; a tier of one level reads `LvX`
+	assert_str(P0ItemInfo.rod_tier(v, {"reach": 4, "level": 9})).is_empty()
+	v.skills.fishing.level = 0
+	assert_str(P0ItemInfo.rod_tier(v, {"reach": 1, "level": 0})).is_equal("Common needs Fishing Lv1")
+	assert_str(P0ItemInfo.rod_tier(v, {"id": "pick_copper", "stone": 2})).is_empty()   # a pickaxe has no tier
+
+## q(278): on the Tackle Shop's shelf the tier is line 3, and the › card's line under the reach (card_note), only once
+## the rod can be bought (the Buy key says the gate till then) and not once it is in Gear (`In Gear` on the row).
+func test_the_shelf_says_the_tier_once_the_rod_can_be_bought() -> void:
+	var v := _view()
+	v["skills"] = {"fishing": {"level": 2, "xp": 0}}
+	var spec := func() -> Dictionary: return P0ItemInfo.spec(v, "rod_reed", &"counter_buy", {counter = "tackle"})
+	assert_array(spec.call().facts).is_equal(["Lands up to Rare fish"])   # Fishing Lv3 needed
+	assert_str(str(spec.call().card_note)).is_empty()
+	v.tackle.buy[0].unlocked = true
+	v.skills.fishing.level = 3
+	assert_array(spec.call().facts).is_equal(["Lands up to Rare fish", "Rare needs Fishing Lv4–6"])
+	assert_str(str(spec.call().card_note)).is_equal("Rare needs Fishing Lv4–6")
+	v.tackle.buy[0].owned = true
+	v.gear.rods[1].owned = true
+	assert_array(spec.call().facts).is_equal(["Lands up to Rare fish", "In Gear"])
+	assert_str(str(spec.call().card_note)).is_empty()
+	v.tackle.buy[0].owned = false
+	v.gear.rods[1].owned = false
+	v.skills.fishing.level = 6
+	assert_array(spec.call().facts).is_equal(["Lands up to Rare fish"])
+
 func test_snapshot_of_every_kind_and_context() -> void:
 	var v := _view()
 	var out := {}

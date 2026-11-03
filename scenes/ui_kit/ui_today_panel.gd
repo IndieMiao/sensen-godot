@@ -42,7 +42,7 @@ func set_rows(rows: Array) -> void:
 	if structure == _structure and _list.get_child_count() > 0:
 		for i in visible_rows.size():
 			var row := _list.get_child(i * 2)
-			_set_line(row.find_child("Line", true, false), str(visible_rows[i].get("line", "")))
+			_set_line(row.find_child("Line", true, false), visible_rows[i])
 			var tail := row.find_child("Tail", true, false) as Label
 			if tail != null: tail.text = str(visible_rows[i].get("tail", ""))
 		return
@@ -85,8 +85,9 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 	line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	# Two lines break at a " · " (不知火舞 on #201): `Catch 2 Pond Crucian` / `Fern Pond`, not `… Crucian ·` / `Fern Pond`.
 	line.name = "Line"
+	line.set_meta("row", r)
 	line.set_meta("sentence", str(r.get("line", "")))
-	line.resized.connect(func(): _set_line(line, str(line.get_meta("sentence", ""))))
+	line.resized.connect(func(): _set_line(line, line.get_meta("row", {})))
 	text.add_child(line)
 	if state == "short" and str(r.get("tail", "")) != "":
 		var tail := UiKit.label(str(r.tail), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
@@ -122,7 +123,29 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 				row_pressed.emit(index))
 	return row
 
-static func _set_line(line: Label, sentence: String) -> void:
-	line.set_meta("sentence", sentence)
-	var shown := UiKit.break_at_dot(sentence, line.get_theme_font(&"font"), line.get_theme_font_size(&"font_size"), line.size.x)
+## A row's sentence as its line shows it, measured at the line's width: two lines break at a " · " (UiKit.break_at_dot);
+## a row that ends with its city (`city`, q(276)) breaks only before it, the dot dropped and the city whole on a line of
+## its own — the need's name dropped (`line_short`) only when the first line still runs long; a first line long even so
+## wraps by words (the label takes a third line: a square's name is never cut, the city never shortened).
+static func _set_line(line: Label, r: Dictionary) -> void:
+	line.set_meta("row", r)
+	line.set_meta("sentence", str(r.get("line", "")))
+	var font := line.get_theme_font(&"font")
+	var size := line.get_theme_font_size(&"font_size")
+	var city := str(r.get("city", ""))
+	var shown := UiKit.break_at_dot(str(r.get("line", "")), font, size, line.size.x) if city == "" \
+		else city_lines(str(r.get("line", "")), str(r.get("line_short", "")), city, font, size, line.size.x)
+	line.max_lines_visible = 2 if city == "" else 3
 	if line.text != shown: line.text = shown
+
+## q(276): `sentence` (` · <city>` at its end) in `width` — as it is when it fits; else broken before the city, the dot
+## dropped (`Pond Catch · Pond Crucian 1/2` / `Rio de Janeiro`); `short` (the same without the need's name) taking the
+## first line's place when that still runs long (`Big Market Order · 1/2` / `Mexico City`).
+static func city_lines(sentence: String, short: String, city: String, font: Font, size: int, width: float) -> String:
+	if font == null or width <= 0.0: return sentence
+	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= width
+	if fits.call(sentence): return sentence
+	var tail := " · " + city
+	var first := sentence.trim_suffix(tail)
+	if not fits.call(first) and short != "": first = short.trim_suffix(tail)
+	return first + "\n" + city
