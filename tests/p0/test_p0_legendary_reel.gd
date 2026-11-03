@@ -30,3 +30,35 @@ func test_the_lure_slows_a_rare_or_legendary_fish_and_the_rod_still_applies() ->
 	assert_float(float(t.bar_size)).is_equal_approx(0.27, 0.0001)   # Carbon +5 points over 0.22
 	assert_float(float(t.loss)).is_equal_approx(0.117, 0.0001)      # Carbon −10 % of 0.13
 	assert_bool(bool(t.sure)).is_true()
+
+## The recordings' Legend toggle (SGODOT-389): test builds only, beside the clock buttons; while on, a bite reels as a
+## Legendary fish that never breaks free (the server's fish still lands).
+func test_the_legend_toggle_is_a_test_build_tool_and_makes_the_reel_legendary() -> void:
+	assert_bool(P0Ui.dev_tools_on(true, false)).is_true()
+	assert_bool(P0Ui.dev_tools_on(false, false)).is_false()   # a release build: none of them
+	assert_bool(P0Ui.dev_tools_on(true, true)).is_false()     # the demo APK: none either
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.view = {"fishing": {"cast": {"rarity": 1, "hook_ms": 2200, "breaks": null}}}
+	var panel: P0FishingPanel = auto_free(P0FishingPanel.new())
+	panel.rt = rt
+	add_child(panel)
+	await get_tree().process_frame
+	panel.set_process(false)
+	rt.ui.dev_legendary = true
+	panel.on_cast({"bite_in": 0, "rarity": 1, "breaks": {"after_ms": 1500}})
+	assert_int(panel._rarity).is_equal(4)
+	assert_bool(panel._breaks).is_false()
+	rt.ui.dev_legendary = false
+	panel.on_cast({"bite_in": 0, "rarity": 2, "breaks": null})
+	assert_int(panel._rarity).is_equal(2)
+
+## q(282) fb4d6991 (不知火舞, row 132 426:190515): the lure's Tackle Shop row `More Rare fish`; its bag card `More Rare fish` /
+## `Rare and Legendary swim slower`; a worm's as before.
+func test_the_lure_says_what_it_does() -> void:
+	var v := {"bag": {"free": 20, "slots": [{"id": "bait_lure", "qty": 3}, {"id": "bait_worm", "qty": 5}]}}
+	assert_array(P0ItemInfo.spec(v, "bait_lure", &"bag").facts).is_equal(["More Rare fish", "Rare and Legendary swim slower"])
+	assert_array(P0ItemInfo.spec(v, "bait_worm", &"bag").facts).is_equal(["Faster bites"])
+	assert_str(str(P0ItemInfo.tokens(v, "bait_lure", &"counter_buy", {}).use)).is_equal("More Rare fish")
+	assert_str(str(P0ItemInfo.tokens(v, "bait_worm", &"counter_buy", {}).use)).is_equal("Bites come faster")

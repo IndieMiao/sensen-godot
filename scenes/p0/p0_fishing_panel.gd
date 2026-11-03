@@ -162,6 +162,9 @@ func on_cast(ev: Dictionary) -> void:
 	_hook_until = _bite_at + hook_ms
 	_rarity = int(ev.get("rarity", 1))
 	_breaks = ev.get("breaks", null) != null
+	if rt.ui != null and bool(rt.ui.get("dev_legendary")):   # test builds' Legend toggle (q(282) recordings): the reel only
+		_rarity = 4
+		_breaks = false
 	_sure = cast is Dictionary and bool(cast.get("sure", false)) and not _breaks
 	phase = "waiting"
 	_gauge.model = {}

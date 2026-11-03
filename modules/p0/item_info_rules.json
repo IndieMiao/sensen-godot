@@ -374,7 +374,8 @@
   },
   "bait/bag": {
     "facts": [
-      "Faster bites"
+      "{bait_fact}",
+      "{bait_slower}"
     ],
     "buttons": [
       {
