@@ -339,7 +339,8 @@ export function mineView(c: P0Content, s: P0State, now: number) {
 }
 
 /** The floors paid for today, by mine, lowest first (fee_per_day): kept out of the mine too, so the mine card's key
- * reads `Enter mine · Free` once F1 is paid today (LOCK-21, 亚瑟 for C part 2). Empty after the day rolls over. */
+ * reads `Enter mine · Free` once F1 is paid today (LOCK-21, 亚瑟 for C part 2). Empty after the day rolls over — but
+ * for a player in the mine then, whose floor is paid for the new day where they stand (settleMine; 后裔 on #705). */
 function paidToday(s: P0State): Record<string, number[]> {
   const out: Record<string, number[]> = {};
   for (const [key, state] of Object.entries(s.mine.day?.floors ?? {})) {
