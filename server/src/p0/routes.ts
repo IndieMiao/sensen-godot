@@ -21,6 +21,7 @@ import { pondOfRoom } from './online/outposts.js';
 import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 import { guideKeys, settleGuide, setGuide } from './guide.js';
+import { settleFirstDig } from './first_dig.js';
 
 /** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
  * log: the observation log (S7). */
@@ -253,7 +254,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (level !== undefined && (!Number.isInteger(level) || level < 1 || level > c.homestead.levels.length)) return reply.code(400).send({ ok: false, code: 'bad_level' });
     if (coins !== undefined && (!Number.isInteger(coins) || coins < 0 || coins > 1_000_000)) return reply.code(400).send({ ok: false, code: 'bad_qty' });
     const s = stateOf(player, req.headers);
-    if (level !== undefined) s.homestead.level = level;
+    if (level !== undefined) { s.homestead.level = level; settleFirstDig(c, s, clock(s.clock_ms), []); }   // 355 G: as the upgrade would (后裔 on #697)
     if (coins !== undefined) s.coins = coins;
     store.put(s);
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });

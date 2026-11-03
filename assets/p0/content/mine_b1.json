@@ -512,6 +512,20 @@
         "cooldown_ms": 3000
       }
     },
+    "first_dig": {
+      "giver": "res_pip",
+      "floor": 3,
+      "gate": {
+        "homestead": 3
+      },
+      "reward": {
+        "weapon": "weapon_copper_sword",
+        "affinity": 5
+      },
+      "lines": {
+        "pip_vein": "Copper's a start! There's iron at %s. Get down to Floor 10!"
+      }
+    },
     "dev_sites": [
       {
         "id": "wd-dev-quarry",

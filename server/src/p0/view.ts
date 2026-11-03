@@ -16,6 +16,7 @@ import { bigPot, boardSlots, chefSignGold, coinsNeeded, GATE_SKILLS, lookOf, nex
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
+import { firstDigView, pipLine } from './first_dig.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, fieldCap, fieldsUsed, greenhousePlots, plotCount } from './garden.js';
@@ -113,6 +114,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })),
       auto: s.storage_auto },   // last auto-store on coming home (q(40)): the client floats it once per new `at`
     mine: mineView(c, s, now),
+    // 355 G (contract-efg §9.2): Pip's First Dig — null before Lv3, {giver, floor, have, done} after (done stays shown);
+    // pip_line, Pip's one line toward the iron vein while it is due ({key, vein, name}, v4q(9) ②), else null
+    first_dig: firstDigView(c, s), pip_line: pipLine(c, s),
     gather: gatherView(c, s, now),
     workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
