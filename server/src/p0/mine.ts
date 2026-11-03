@@ -335,7 +335,20 @@ export function mineView(c: P0Content, s: P0State, now: number) {
     };
   }
   return { floor_energy: c.mine.floor_energy, rock_energy: c.mine.rock_energy, hp_max: c.mine.combat.hp,
-    rank, weapon: { id: s.gear.weapon, ...weapon(c, s) }, notice: s.mine.notice, at: here, records };
+    rank, weapon: { id: s.gear.weapon, ...weapon(c, s) }, notice: s.mine.notice, at: here, records, paid_today: paidToday(s) };
+}
+
+/** The floors paid for today, by mine, lowest first (fee_per_day): kept out of the mine too, so the mine card's key
+ * reads `Enter mine · Free` once F1 is paid today (LOCK-21, 亚瑟 for C part 2). Empty after the day rolls over. */
+function paidToday(s: P0State): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  for (const [key, state] of Object.entries(s.mine.day?.floors ?? {})) {
+    if (!state.paid) continue;
+    const at = key.lastIndexOf(':');
+    (out[key.slice(0, at)] ??= []).push(Number(key.slice(at + 1)));
+  }
+  for (const floors of Object.values(out)) floors.sort((a, b) => a - b);
+  return out;
 }
 
 function deckCounts(deck: (string | null)[]): [string, number][] {
