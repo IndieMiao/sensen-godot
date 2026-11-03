@@ -1,0 +1,1507 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "Seven unique / nine placed modules",
+        "passed": true
+      },
+      {
+        "check": "blackboard: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "blackboard: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "blackboard: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "blackboard: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "blackboard: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "blackboard: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "blackboard: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "blackboard: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "blackboard: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "blackboard: back-center pivot",
+        "passed": true
+      },
+      {
+        "check": "blackboard: static prop",
+        "passed": true
+      },
+      {
+        "check": "blackboard: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "blackboard: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "blackboard: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "blackboard: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "blackboard: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "Blackboard width 1.8-2.0m",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: static prop",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "Actual wood desktop at .65H = 1.13425m",
+        "passed": true
+      },
+      {
+        "check": "globe: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "globe: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "globe: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "globe: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "globe: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "globe: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "globe: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "globe: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "globe: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "globe: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "globe: static prop",
+        "passed": true
+      },
+      {
+        "check": "globe: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "globe: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "globe: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "globe: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "globe: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: static prop",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: static prop",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: bottom-center pivot",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: static prop",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one mesh / surface",
+        "passed": true
+      },
+      {
+        "check": "name_sign: mobile mesh naming",
+        "passed": true
+      },
+      {
+        "check": "name_sign: one material / no textures",
+        "passed": true
+      },
+      {
+        "check": "name_sign: matte nonmetallic",
+        "passed": true
+      },
+      {
+        "check": "name_sign: measured triangles <=600",
+        "passed": true
+      },
+      {
+        "check": "name_sign: measured bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "name_sign: finite geometry / unit normals",
+        "passed": true
+      },
+      {
+        "check": "name_sign: no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "name_sign: opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "name_sign: back-center pivot",
+        "passed": true
+      },
+      {
+        "check": "name_sign: static prop",
+        "passed": true
+      },
+      {
+        "check": "name_sign: no seat / NPC / use anchors",
+        "passed": true
+      },
+      {
+        "check": "name_sign: baked unit transform",
+        "passed": true
+      },
+      {
+        "check": "name_sign: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: vertex-color import hook",
+        "passed": true
+      },
+      {
+        "check": "name_sign: authored provenance",
+        "passed": true
+      },
+      {
+        "check": "sign_door writable area 1.30 x .28m",
+        "passed": true
+      },
+      {
+        "check": "sign_door center exported",
+        "passed": true
+      },
+      {
+        "check": "Text anchor clears front of sign",
+        "passed": true
+      },
+      {
+        "check": "Seven distinct import UIDs",
+        "passed": true
+      },
+      {
+        "check": "Budget includes repeated stationery and cushions",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "blackboard": {
+        "triangles": 264,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.9500000476837158,
+            -0.550000011920929,
+            -0.0
+          ],
+          [
+            0.9500000476837158,
+            0.550000011920929,
+            0.1599999964237213
+          ]
+        ],
+        "dimensions_m": [
+          1.9000000953674316,
+          1.100000023841858,
+          0.1599999964237213
+        ],
+        "uid": "uid://cqkktwow4kdbr",
+        "sha256": "0ab69ef68ab380804fe2cf89adb0ae2d8002637bf6dd2add589b943a9baa97d8"
+      },
+      "teacher_desk": {
+        "triangles": 484,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            0.0,
+            -0.3615000247955322
+          ],
+          [
+            0.6499999761581421,
+            1.184249997138977,
+            0.3615000247955322
+          ]
+        ],
+        "dimensions_m": [
+          1.2999999523162842,
+          1.184249997138977,
+          0.7230000495910645
+        ],
+        "uid": "uid://0glomp412dg7",
+        "sha256": "71a5ae06344a7669672ce0df54080eeb84369086892b06957a829b4960379d4a"
+      },
+      "globe": {
+        "triangles": 496,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.18442970514297485,
+            0.0,
+            -0.1599999964237213
+          ],
+          [
+            0.18442970514297485,
+            0.46942970156669617,
+            0.1599999964237213
+          ]
+        ],
+        "dimensions_m": [
+          0.3688594102859497,
+          0.46942970156669617,
+          0.3199999928474426
+        ],
+        "uid": "uid://ctmwla0v2eu30",
+        "sha256": "af415292aad2798ea3fd557bdcfaa577d01013a1bde64dc756ede85569f21a04"
+      },
+      "desk_stationery": {
+        "triangles": 270,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.27250009775161743,
+            0.0,
+            -0.13500000536441803
+          ],
+          [
+            0.27250009775161743,
+            0.2549999952316284,
+            0.13500000536441803
+          ]
+        ],
+        "dimensions_m": [
+          0.5450001955032349,
+          0.2549999952316284,
+          0.27000001072883606
+        ],
+        "uid": "uid://bogjhjghd2fjm",
+        "sha256": "96fed975006aea323791703a5dbe796ef067db6efafc4f4f2fa185eb88cd83f9"
+      },
+      "plaster_study": {
+        "triangles": 470,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.3387569785118103,
+            0.0,
+            -0.11908960342407227
+          ],
+          [
+            0.3387569785118103,
+            0.5049999952316284,
+            0.11908960342407227
+          ]
+        ],
+        "dimensions_m": [
+          0.6775139570236206,
+          0.5049999952316284,
+          0.23817920684814453
+        ],
+        "uid": "uid://d0licswv4krv8",
+        "sha256": "574d198d3c368b03c17ab04263cec44f39a050cba31bb1650ff4a3c7eea298d1"
+      },
+      "reading_cushion": {
+        "triangles": 188,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.30000001192092896,
+            0.0,
+            -0.30000001192092896
+          ],
+          [
+            0.30000001192092896,
+            0.1599999964237213,
+            0.30000001192092896
+          ]
+        ],
+        "dimensions_m": [
+          0.6000000238418579,
+          0.1599999964237213,
+          0.6000000238418579
+        ],
+        "uid": "uid://drar2wgsuij3u",
+        "sha256": "a3f48274f0902cf316c76335621ef240985d1a887d9f9aa6d540b91527168750"
+      },
+      "name_sign": {
+        "triangles": 220,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.7250000238418579,
+            -0.1899999976158142,
+            -0.0
+          ],
+          [
+            0.7250000238418579,
+            0.1899999976158142,
+            0.04600000008940697
+          ]
+        ],
+        "dimensions_m": [
+          1.4500000476837158,
+          0.3799999952316284,
+          0.04600000008940697
+        ],
+        "uid": "uid://c3vh5omdtnmeh",
+        "sha256": "a0e25de36ba1e3034d8610c6ac1a6e19db19c0a5f3ea68b4e17de82e5bbfc8eb"
+      }
+    },
+    "unique_triangles": 2392,
+    "placed_triangles": 2850,
+    "placed_surfaces": 9,
+    "passed": true
+  },
+  "godot": {
+    "assets": {
+      "blackboard": {
+        "bounds": [
+          [
+            -0.950000047683716,
+            -0.550000011920929,
+            0.0
+          ],
+          [
+            0.950000047683716,
+            0.550000011920929,
+            0.159999996423721
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 264
+      },
+      "desk_stationery": {
+        "bounds": [
+          [
+            -0.272500097751617,
+            0.0,
+            -0.135000005364418
+          ],
+          [
+            0.272500097751617,
+            0.254999995231628,
+            0.135000005364418
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 270
+      },
+      "globe": {
+        "bounds": [
+          [
+            -0.184429705142975,
+            0.0,
+            -0.159999996423721
+          ],
+          [
+            0.184429705142975,
+            0.469429701566696,
+            0.159999996423721
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 496
+      },
+      "name_sign": {
+        "bounds": [
+          [
+            -0.725000023841858,
+            -0.189999997615814,
+            0.0
+          ],
+          [
+            0.725000023841858,
+            0.189999997615814,
+            0.046000000089407
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 220
+      },
+      "plaster_study": {
+        "bounds": [
+          [
+            -0.33875697851181,
+            0.0,
+            -0.119089603424072
+          ],
+          [
+            0.33875697851181,
+            0.504999995231628,
+            0.119089603424072
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 470
+      },
+      "reading_cushion": {
+        "bounds": [
+          [
+            -0.300000011920929,
+            0.0,
+            -0.300000011920929
+          ],
+          [
+            0.300000011920929,
+            0.159999996423721,
+            0.300000011920929
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 188
+      },
+      "teacher_desk": {
+        "bounds": [
+          [
+            -0.649999976158142,
+            0.0,
+            -0.361500024795532
+          ],
+          [
+            0.649999976158142,
+            1.18424999713898,
+            0.361500024795532
+          ]
+        ],
+        "surfaces": 1,
+        "triangles": 484
+      }
+    },
+    "avatar": {
+      "actual_unscaled_bounds_y": [
+        -6.14634643625322e-07,
+        1.71833837032318
+      ],
+      "height_m": 1.745,
+      "scale": 1.01551556587219
+    },
+    "captures": [
+      {
+        "id": "blackboard",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 2.40598726272583,
+        "yaw": 15.0
+      },
+      {
+        "id": "teacher_desk",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 1.84978175163269,
+        "yaw": 15.0
+      },
+      {
+        "id": "globe",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 0.562965273857117,
+        "yaw": 15.0
+      },
+      {
+        "id": "desk_stationery",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 0.76450115442276,
+        "yaw": 15.0
+      },
+      {
+        "id": "plaster_study",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 0.91804301738739,
+        "yaw": 15.0
+      },
+      {
+        "id": "reading_cushion",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 0.942111492156982,
+        "yaw": 15.0
+      },
+      {
+        "id": "name_sign",
+        "pitch": 19.9999980926514,
+        "pixels": [
+          400,
+          600
+        ],
+        "width_m": 1.81089496612549,
+        "yaw": 15.0
+      },
+      {
+        "id": "scale_43deg",
+        "pitch": 42.9999961853027,
+        "pixels": [
+          1600,
+          1450
+        ],
+        "width_m": 6.71999979019165,
+        "yaw": 45.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "blackboard: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "blackboard: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "blackboard: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "blackboard: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "blackboard: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "blackboard: import config",
+        "passed": true
+      },
+      {
+        "check": "blackboard: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "blackboard: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: import config",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "teacher_desk: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "globe: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "globe: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "globe: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "globe: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "globe: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "globe: import config",
+        "passed": true
+      },
+      {
+        "check": "globe: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "globe: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: import config",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "desk_stationery: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: import config",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "plaster_study: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: import config",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "reading_cushion: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "name_sign: mesh resource name",
+        "passed": true
+      },
+      {
+        "check": "name_sign: imported vertex color enabled",
+        "passed": true
+      },
+      {
+        "check": "name_sign: matte zero-texture material",
+        "passed": true
+      },
+      {
+        "check": "name_sign: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "name_sign: actual imported bounds",
+        "passed": true
+      },
+      {
+        "check": "name_sign: import config",
+        "passed": true
+      },
+      {
+        "check": "name_sign: UID / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "name_sign: no seating anchor",
+        "passed": true
+      },
+      {
+        "check": "sign_door at blank sign center",
+        "passed": true
+      },
+      {
+        "check": "All nine placed prop instances <=3000 triangles",
+        "passed": true
+      },
+      {
+        "check": "Capture blackboard",
+        "passed": true
+      },
+      {
+        "check": "Capture teacher_desk",
+        "passed": true
+      },
+      {
+        "check": "Capture globe",
+        "passed": true
+      },
+      {
+        "check": "Capture desk_stationery",
+        "passed": true
+      },
+      {
+        "check": "Capture plaster_study",
+        "passed": true
+      },
+      {
+        "check": "Capture reading_cushion",
+        "passed": true
+      },
+      {
+        "check": "Capture name_sign",
+        "passed": true
+      },
+      {
+        "check": "Actual player assembled",
+        "passed": true
+      },
+      {
+        "check": "Capture scale_43deg",
+        "passed": true
+      },
+      {
+        "check": "Actual Mobile renderer",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "placed_triangles": 2850,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "unique_triangles": 2392
+  },
+  "source": {
+    "checks": [
+      {
+        "check": "Seven editable module collections",
+        "passed": true
+      },
+      {
+        "check": "KIT_blackboard: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_blackboard: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_desk_stationery: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_desk_stationery: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_globe: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_globe: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_name_sign: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_name_sign: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_plaster_study: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_plaster_study: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_reading_cushion: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_reading_cushion: one local module root",
+        "passed": true
+      },
+      {
+        "check": "KIT_teacher_desk: descriptive editable parts",
+        "passed": true
+      },
+      {
+        "check": "KIT_teacher_desk: one local module root",
+        "passed": true
+      },
+      {
+        "check": "Geometric study flat face touches plinth",
+        "passed": true
+      },
+      {
+        "check": "Editable source desktop at .65H",
+        "passed": true
+      },
+      {
+        "check": "Temporary export scene removed from source",
+        "passed": true
+      }
+    ],
+    "named_parts": {
+      "KIT_blackboard": 6,
+      "KIT_desk_stationery": 10,
+      "KIT_globe": 5,
+      "KIT_name_sign": 5,
+      "KIT_plaster_study": 14,
+      "KIT_reading_cushion": 1,
+      "KIT_teacher_desk": 11
+    },
+    "passed": true
+  },
+  "manifest": {
+    "revision": "v1",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "baseline_height_m": 1.745,
+    "axes": "metres, Y up, +Z front",
+    "material": "ClassroomPropsVertex; matte vertex colours; zero textures",
+    "scope": "Seven unique modules / nine placed instances. No room assembly or seat/NPC anchors.",
+    "assets": [
+      {
+        "name": "blackboard",
+        "file": "blackboard.glb",
+        "module": "M06",
+        "description": "Blank dark-green chalkboard with softened wood frame and chalk ledge",
+        "quantity": 1,
+        "origin": "back_center",
+        "front": "+Z",
+        "anchors": [],
+        "usable_area_m": [
+          1.77,
+          0.96
+        ],
+        "triangles": 264,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.9500000476837158,
+            -0.550000011920929,
+            0.0
+          ],
+          [
+            0.9500000476837158,
+            0.550000011920929,
+            0.1599999964237213
+          ]
+        ],
+        "dimensions_m": [
+          1.9000000953674316,
+          1.100000023841858,
+          0.1599999964237213
+        ],
+        "sha256": "0ab69ef68ab380804fe2cf89adb0ae2d8002637bf6dd2add589b943a9baa97d8",
+        "provenance": "tools/art/source/poi_classroom/props/modules/blackboard/reuse_provenance.json"
+      },
+      {
+        "name": "teacher_desk",
+        "file": "teacher_desk.glb",
+        "module": "M07",
+        "description": "Ivory paneled teacher desk with wood top; scenery only, no NPC or use anchors",
+        "quantity": 1,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "desktop_height_m": 1.1342500000000002,
+        "mounts": [
+          {
+            "name": "globe_mount",
+            "position": [
+              -0.3199999928474426,
+              1.1342500448226929,
+              -0.0014999955892562866
+            ]
+          }
+        ],
+        "colliders": [
+          {
+            "position": [
+              0.0,
+              0.5671250224113464,
+              -0.0014999955892562866
+            ],
+            "size": [
+              1.3,
+              1.1342500000000002,
+              0.72
+            ]
+          }
+        ],
+        "triangles": 484,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            0.0,
+            -0.3615000247955322
+          ],
+          [
+            0.6499999761581421,
+            1.184249997138977,
+            0.3615000247955322
+          ]
+        ],
+        "dimensions_m": [
+          1.2999999523162842,
+          1.184249997138977,
+          0.7230000495910645
+        ],
+        "sha256": "71a5ae06344a7669672ce0df54080eeb84369086892b06957a829b4960379d4a",
+        "provenance": "tools/art/source/poi_classroom/props/modules/teacher_desk/reuse_provenance.json"
+      },
+      {
+        "name": "globe",
+        "file": "globe.glb",
+        "module": "M08",
+        "description": "Separate tilted classroom globe; vertex-colored continents and matte brass meridian",
+        "quantity": 1,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "triangles": 496,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.18442970514297485,
+            0.0,
+            -0.1599999964237213
+          ],
+          [
+            0.18442970514297485,
+            0.46942970156669617,
+            0.1599999964237213
+          ]
+        ],
+        "dimensions_m": [
+          0.3688594102859497,
+          0.46942970156669617,
+          0.3199999928474426
+        ],
+        "sha256": "af415292aad2798ea3fd557bdcfaa577d01013a1bde64dc756ede85569f21a04",
+        "provenance": "tools/art/source/poi_classroom/props/modules/globe/reuse_provenance.json"
+      },
+      {
+        "name": "desk_stationery",
+        "file": "desk_stationery.glb",
+        "module": "M05",
+        "description": "Open blank book and hollow pencil cup with three pencils",
+        "quantity": 2,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "triangles": 270,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.27250009775161743,
+            0.0,
+            -0.13500000536441803
+          ],
+          [
+            0.27250009775161743,
+            0.2549999952316284,
+            0.13500000536441803
+          ]
+        ],
+        "dimensions_m": [
+          0.5450001955032349,
+          0.2549999952316284,
+          0.27000001072883606
+        ],
+        "sha256": "96fed975006aea323791703a5dbe796ef067db6efafc4f4f2fa185eb88cd83f9",
+        "provenance": "tools/art/source/poi_classroom/props/modules/desk_stationery/reuse_provenance.json"
+      },
+      {
+        "name": "plaster_study",
+        "file": "plaster_study.glb",
+        "module": "M12",
+        "description": "Neutral plaster head-and-shoulders study plus faceted geometric solid; no religious motifs",
+        "quantity": 1,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "triangles": 470,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.3387569785118103,
+            0.0,
+            -0.11908960342407227
+          ],
+          [
+            0.3387569785118103,
+            0.5049999952316284,
+            0.11908960342407227
+          ]
+        ],
+        "dimensions_m": [
+          0.6775139570236206,
+          0.5049999952316284,
+          0.23817920684814453
+        ],
+        "sha256": "574d198d3c368b03c17ab04263cec44f39a050cba31bb1650ff4a3c7eea298d1",
+        "provenance": "tools/art/source/poi_classroom/props/modules/plaster_study/reuse_provenance.json"
+      },
+      {
+        "name": "reading_cushion",
+        "file": "reading_cushion.glb",
+        "module": "M13",
+        "description": "Soft sage reading cushion; decoration only, no seat anchor",
+        "quantity": 2,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "triangles": 188,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.30000001192092896,
+            0.0,
+            -0.30000001192092896
+          ],
+          [
+            0.30000001192092896,
+            0.1599999964237213,
+            0.30000001192092896
+          ]
+        ],
+        "dimensions_m": [
+          0.6000000238418579,
+          0.1599999964237213,
+          0.6000000238418579
+        ],
+        "sha256": "a3f48274f0902cf316c76335621ef240985d1a887d9f9aa6d540b91527168750",
+        "provenance": "tools/art/source/poi_classroom/props/modules/reading_cushion/reuse_provenance.json"
+      },
+      {
+        "name": "name_sign",
+        "file": "name_sign.glb",
+        "module": "M19",
+        "description": "Blank ivory runtime sign with thin wood frame",
+        "quantity": 1,
+        "origin": "back_center",
+        "front": "+Z",
+        "anchors": [
+          {
+            "name": "sign_door",
+            "position": [
+              0.0,
+              0.0,
+              0.052000001072883606
+            ],
+            "yaw_degrees": 0,
+            "size": [
+              1.3,
+              0.28
+            ],
+            "module": "name_sign",
+            "text": "",
+            "front": "+Z"
+          }
+        ],
+        "triangles": 220,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.7250000238418579,
+            -0.1899999976158142,
+            0.0
+          ],
+          [
+            0.7250000238418579,
+            0.1899999976158142,
+            0.04600000008940697
+          ]
+        ],
+        "dimensions_m": [
+          1.4500000476837158,
+          0.3799999952316284,
+          0.04600000008940697
+        ],
+        "sha256": "a0e25de36ba1e3034d8610c6ac1a6e19db19c0a5f3ea68b4e17de82e5bbfc8eb",
+        "provenance": "tools/art/source/poi_classroom/props/modules/name_sign/reuse_provenance.json"
+      }
+    ],
+    "unique_triangles": 2392,
+    "placed_triangles": 2850
+  },
+  "source_sha256": "f56b519950ad9a088c20ac4f0d93533002620eda2db7dc227e293bcc2c687633"
+}
