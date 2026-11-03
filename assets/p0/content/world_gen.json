@@ -1074,8 +1074,8 @@
   "room": {
    "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's kit. `anchors` is what the server names to every client; `client_anchors` is the file this client reads instead (the trading post's cabin.anchors.json: Pip and its s_order resident in the tea house's two resident spots), kept apart because 0.2.5 and older have no such file — fold it into `anchors` once they are gone. `client_art` likewise is the kit this client opens instead of `art` (the tackle shop's own kit, SGODOT-214, which 0.2.9 and older do not have: they read tackle.anchors.json as the Farm Tools Store's) — fold it into `art` once they are gone.",
    "tea": {
-    "art": "coffee_shop",
-    "anchors": "res://assets/p0/outposts/tea.anchors.json",
+    "art": "tea_house",
+    "anchors": "res://assets/p0/outposts/tea_house.anchors.json",
     "category": "Tea house · Hot tea"
    },
    "tackle": {
@@ -1098,7 +1098,11 @@
     "art": "coffee_shop",
     "anchors": "res://assets/p0/outposts/tea.anchors.json",
     "client_anchors": "res://assets/p0/outposts/cabin.anchors.json",
-    "category": "Trading post · All counters"
+    "category": "Trading post · All counters",
+    "_note_room": "The cabin stays on the Coffee Shop kit (不知火舞 216 5759f002: a four-role room; the tea house's own kit has none of the other three roles' spots, and would look like the town's tea house), which no hand-written outpost is on since the tea house moved to its own kit (SGODOT-216): its walls, seats and backdrop are its own here, as the Mine Hut's are.",
+    "bounds": [-3.1, 3.1, -2.85, 2.85],
+    "seats": ["seat_table1_1", "seat_table1_2", "seat_table2_1", "seat_table2_2"],
+    "backdrop": {"top": "E6F5F1", "bottom": "FFFBEE", "blend": [0.5, 0.85]}
    },
    "mine_hut": {
     "_note": "q(204): Ivo's Mine Hut (SGODOT-308 kit). Its presence is the hut going live: the server places huts and Ivo, and the client counts Ivo in the Postcards (P0Kindred). No hand-written room stands in for it, so its online room takes bounds (the kit's 6.8 × 6.4 m footprint) and seats (none) from here.",

@@ -31,7 +31,7 @@ const CITY := {
 				"residents": ["res_pip"], "art": "post_office", "anchors": "res://assets/p0/outposts/post.anchors.json", "capacity": 12},
 			{"id": "gn-5419384~cabin0", "role": "market", "cabin": true, "name": "Aspen Cabin", "lat": 39.76, "lng": -105.0,
 				"category": "Trading post · All counters", "keeper": {"role": "Trader", "name": "Ada", "look": "market_cool_0"},
-				"residents": [], "art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "capacity": 12}],
+				"residents": [], "art": "tea_house", "anchors": "res://assets/p0/outposts/tea_house.anchors.json", "capacity": 12}],
 		"huts": [
 			{"id": "gn-5419384~hut0", "role": "mine_hut", "name": "Golden Mine Hut", "lat": 39.7555, "lng": -105.2211,
 				"category": "Mine hut · Old miner", "keeper": null, "residents": ["res_ivo"], "capacity": 12}]},

@@ -10,7 +10,7 @@ import { OutpostRooms } from '../../src/p0/online/rooms.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { P0Store } from '../../src/p0/store.js';
 import { requirePass } from '../../src/p0/travel.js';
-import { cityPlaces } from '../../src/p0/world.js';
+import { cityPlaces, roomPlace } from '../../src/p0/world.js';
 
 const c = loadP0Content();
 const table = loadOutposts();
@@ -93,5 +93,22 @@ describe('generated outpost rooms (SGODOT-280)', () => {
     expect(await wait(m => m.t === 'joined')).toMatchObject({ outpost, room: 1, capacity: 12 });
     ws.terminate();
     await app.close();
+  });
+});
+
+describe('the tea house on its own kit, the trading post on the Coffee Shop (SGODOT-216)', () => {
+  const live = generatedOutpostSpec(table, id => roomPlace(c, id));   // as p0_server resolves them
+  it('a generated tea house is walled and seated like Oak Tea House on the tea house kit', () => {
+    const tea = cityPlaces(c, TOKYO)!.detail.outposts.find(o => o.role === 'tea')!;
+    const oak = table.find(o => o.id === 'sh_tea_1')!;
+    expect(tea.art).toBe('tea_house');
+    expect(live(tea.id)).toMatchObject({ role: 'tea', bounds: oak.bounds, seats: oak.seats });
+  });
+  it('an S-tier trading post keeps the Coffee Shop: its own walls and four seats (world.room.cabin; 不知火舞 216 5759f002)', () => {
+    const w = (c as unknown as { world: { room: { cabin: { art: string; bounds: number[]; seats: string[] } } } }).world;
+    const cabin = 'gn-3925033~cabin0';
+    expect(w.room.cabin.art).toBe('coffee_shop');
+    expect(live(cabin)).toMatchObject({ role: 'post', bounds: w.room.cabin.bounds, seats: w.room.cabin.seats });
+    expect(live(cabin)!.seats).toEqual(['seat_table1_1', 'seat_table1_2', 'seat_table2_1', 'seat_table2_2']);
   });
 });

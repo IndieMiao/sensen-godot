@@ -391,6 +391,12 @@ static func _set_sun_shadow(sun: DirectionalLight3D, review: Dictionary) -> void
 ## range, so the far plane decides whether the Post Office's west wall shades the floor by its door (signed: it does
 ## not, with review_room.gd's default camera; with this room's old 70 m it did). Basic Room: 0.1 / 70 as before;
 ## review_room.gd (review shadow values): Godot's defaults 0.05 / 4000; render_r1: 0.05 / 150.
+## The camera's near and far planes: the kit's own when its layout.camera gives them (the tea house's and the hall
+## kits' 0.1 / 40, 上官婉儿 on SGODOT-216: far 4000 cost the shadows their precision), else review_clip's.
+static func camera_clip(camera: Dictionary, review: Dictionary) -> Vector2:
+	var clip := review_clip(review)
+	return Vector2(float(camera.get("near", clip.x)), float(camera.get("far", clip.y)))
+
 static func review_clip(review: Dictionary) -> Vector2:
 	if review.is_empty(): return Vector2(0.1, 70.0)
 	if SHADOW_KEYS.any(func(k): return review.has(k)): return Vector2(0.05, 4000.0)
@@ -434,7 +440,7 @@ func _build_camera() -> void:
 	cam.name = "RoomCamera"
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
-	var clip := review_clip(review_lighting())
+	var clip := camera_clip(spec, review_lighting())
 	cam.near = clip.x
 	cam.far = clip.y
 	add_child(cam)

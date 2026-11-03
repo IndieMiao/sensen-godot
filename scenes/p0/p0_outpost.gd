@@ -16,7 +16,8 @@ const DECOR := ["use_coffee_pot"]
 ## Tapping the counter is tapping the keeper (LOCK-15 / 16).
 const COUNTERS := ["use_counter", "use_stall_1", "npc_keeper"]
 ## Furniture that seats: its seat_ anchors are seat_<group>_<n>.
-const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_tea_table_2": "seat_table2_", "use_bench": "seat_bench_"}
+const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_tea_table_2": "seat_table2_", "use_tea_table_3": "seat_table3_",
+	"use_bench": "seat_bench_"}   # the tea house's third table on its own kit (SGODOT-216)
 ## sit_idle puts the hip joint 0.426 m above the rig root and the thighs rest about 0.086 m below the joint
 ## (measured on the base rig, SGODOT-227), so a seated root sits this far below the seat surface.
 const SIT_ROOT_BELOW_SEAT := 0.34
@@ -51,6 +52,7 @@ func setup(args: Dictionary) -> void:
 
 func _room_ready() -> void:
 	_spawn_npcs()
+	_write_sign()
 	actor.ground_height = func(_p: Vector3) -> float:
 		if not _glide.is_empty(): return _glide_point().y
 		return seat_root_y(seat) if seat != "" else floor_y
@@ -165,6 +167,63 @@ func _room_frame(_view: Dictionary, dt: float) -> void:
 	if crowd: crowd.step(dt, to_room(actor.position))
 
 # ---------------------------------------------------------------- keeper and residents
+# ---------------------------------------------------------------- the name sign (SGODOT-216; 不知火舞 216 5759f002)
+## The kit's sign_name board, written at run time: the outpost's name as the place chip has it, Nunito ExtraBold in
+## walnut ink (#4A3424; #FFF6E5 when the anchor says `ink: light`), no outline, shadow or glow, flat on the board 2 mm
+## in front of it, one-sided. Read up close, not from the opening view.
+const SIGN_INK := Color("4A3424")
+const SIGN_INK_LIGHT := Color("FFF6E5")
+const SIGN_CAP := 0.55        # cap height, of the board's writable height
+const SIGN_CAP_MIN := 0.35    # the smallest it shrinks to
+const SIGN_SIDE := 0.06       # clear at each side, of its width
+const SIGN_FONT_PX := 96      # the glyphs' raster; pixel_size scales them to metres
+const CAP_OF_EM := 0.7        # Nunito's cap height, of its font size
+const SIGN_FRONT_M := 0.002
+## The kind words a name may end with (world.ts named / placeWord): dropped when the whole name does not fit.
+const TYPE_WORDS := [" Tea House", " Tackle Shop", " Market Square", " Travel Post", " Trading Post", " Mine Hut"]
+
+func _write_sign() -> void:
+	var m := anchor("sign_name")
+	var given = anchor_data("sign_name").get("size", [])
+	var size := Vector2(float(given[0]), float(given[1])) if given is Array and given.size() >= 2 else Vector2.ZERO
+	if m == null or size.x <= 0.0 or size.y <= 0.0 or place_name == "": return
+	var font: Font = UiKit.theme().get_font(&"font", UiTokens.STYLE_BODY_XB14)
+	var fit := sign_fit(place_name, font, size)
+	var label := Label3D.new()
+	label.name = "SignText"
+	label.text = str(fit.text)
+	label.font = font
+	label.font_size = SIGN_FONT_PX
+	label.pixel_size = float(fit.cap) / (SIGN_FONT_PX * CAP_OF_EM)
+	label.modulate = SIGN_INK_LIGHT if str(anchor_data("sign_name").get("ink", "")) == "light" else SIGN_INK
+	label.outline_size = 0
+	label.shaded = true
+	label.double_sided = false
+	label.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.rotation.y = PI                          # its text faces its +Z; the anchor faces its −Z (yaw_dir)
+	label.position = Vector3(0, 0, -SIGN_FRONT_M)  # on the board, just in front
+	m.add_child(label)
+
+## The sign's words and cap height (metres) for a board `size` (writable width × height): one line at SIGN_CAP of the
+## height, shrunk to fit the width less SIGN_SIDE a side, down to SIGN_CAP_MIN; then without the kind word (`Willowbrook`);
+## then the place word in two lines at the space nearest the middle, at the smallest size — never cut.
+static func sign_fit(name: String, font: Font, size: Vector2) -> Dictionary:
+	var room_w := size.x * (1.0 - 2.0 * SIGN_SIDE)
+	var tries := [name]
+	for w in TYPE_WORDS:
+		if name.ends_with(w) and name.length() > w.length(): tries.append(name.trim_suffix(w))
+	for t in tries:
+		var em_w := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, SIGN_FONT_PX).x / (SIGN_FONT_PX * CAP_OF_EM)   # width per metre of cap
+		var cap := minf(size.y * SIGN_CAP, room_w / maxf(em_w, 0.0001))
+		if cap >= size.y * SIGN_CAP_MIN - 0.00001: return {"text": t, "cap": cap}
+	var place: String = tries[-1]
+	var best := -1
+	for i in place.length():
+		if place[i] == " " and (best < 0 or absf(i - place.length() / 2.0) < absf(best - place.length() / 2.0)): best = i
+	return {"text": place if best < 0 else place.substr(0, best) + "\n" + place.substr(best + 1), "cap": size.y * SIGN_CAP_MIN}
+
 func _spawn_npcs() -> void:
 	var data := P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {}) as Dictionary
 	var cast := {"npc_keeper": str(keeper.get("name", "")).to_lower()}

@@ -124,6 +124,13 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 	var room := {}
 	for h in P0Outposts.all():
 		if str(h.get("art", "")) == art: room = h
+	# a kit no hand-written outpost is on (the S-tier trading post's Coffee Shop since the tea house has its own,
+	# SGODOT-216): its walls, seats and backdrop are the room kind's own (world.room.cabin), as the server's are
+	if room.is_empty() and kit.get("bounds") is Array:
+		room = {"art": art, "anchors": str(kit.get("anchors", "")), "bounds": kit.bounds, "seats": kit.get("seats", []),
+			"backdrop": kit.get("backdrop", {})}
+	# else the hand-written room of its role, as the server falls back (a server still naming the tea house's old kit)
+	if room.is_empty() and kind != "cabin": room = P0Outposts.by_role(kind)
 	if room.is_empty() or str(o.get("id", "")) == "": return {}
 	var entry: Dictionary = room.duplicate(true)
 	for k in ["id", "role", "name", "category", "lat", "lng", "capacity", "keeper", "residents", "nearest"]:
