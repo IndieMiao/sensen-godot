@@ -36,12 +36,13 @@ var _down_y := 0.0
 var _down_at := 0.0
 var _settle: Tween
 
-func _init(this_year_: int = 0) -> void:
+## `title`: what the gate stands before — `Voice chat` (the mic key), `Voice Profile` (its row on Android, q(281) ④).
+func _init(this_year_: int = 0, title_ := TITLE) -> void:
 	super(HEIGHT)
 	pad = UiTokens.SPACE_PAGE
 	this_year = this_year_ if this_year_ > 0 else int(Time.get_date_dict_from_system().year)
 	at = YEARS - 1
-	var title := UiKit.label(TITLE, UiTokens.STYLE_TITLE_XB20)
+	var title := UiKit.label(title_, UiTokens.STYLE_TITLE_XB20)
 	title.name = "Title"
 	body.add_child(title)
 	var ask := UiKit.label(QUESTION, UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SECONDARY)

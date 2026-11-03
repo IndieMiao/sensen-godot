@@ -11,6 +11,34 @@ const ENGINE := "engine"   # a row's text: Godot's own license and its third-par
 
 static var _data := {}
 
+## q(281) ① (SGODOT-390): the Privacy Policy, by platform — Legal's first row opens it in the system browser. The row
+## shows only once the pages are up: PRIVACY_LIVE stays false until they are (奕星 / 后裔 say so), then one line flips.
+const PRIVACY_LIVE := false
+const PRIVACY_IOS := "https://gensen.app/privacy"
+const PRIVACY_ANDROID := "https://gensen.app/privacy-android"
+static func privacy_url(os_name: String, live := PRIVACY_LIVE) -> String:
+	if not live: return ""
+	return PRIVACY_IOS if os_name == "iOS" else PRIVACY_ANDROID
+
+## q(281) ② (后裔's privacy-server-2026-11-03 ①): the support code a player sends with a request about their data —
+## SHA-256 of `p0-support/v1/` + the player id (UTF-8), its first 50 bits as 10 Crockford Base32 characters (0–9 and
+## the letters but I L O U), `XXXXX-XXXXX`. Worked out here, so it shows offline; the server has the same function to
+## look a save up. Not a credential. "" without an id.
+const SUPPORT_PREFIX := "p0-support/v1/"
+const CROCKFORD := "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+static func support_code(player_id: String) -> String:
+	if player_id == "": return ""
+	var ctx := HashingContext.new()
+	ctx.start(HashingContext.HASH_SHA256)
+	ctx.update((SUPPORT_PREFIX + player_id).to_utf8_buffer())
+	var digest := ctx.finish()
+	var bits := 0   # the first 56 bits; the top 50 are used
+	for i in 7: bits = (bits << 8) | digest[i]
+	bits = bits >> 6
+	var out := ""
+	for i in 10: out = CROCKFORD[(bits >> (5 * i)) & 31] + out
+	return out.left(5) + "-" + out.right(5)
+
 ## The page's groups in order: [{title, rows: [{id, title, license, credit?, text}]}].
 static func groups() -> Array:
 	if _data.is_empty():

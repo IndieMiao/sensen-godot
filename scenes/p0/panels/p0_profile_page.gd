@@ -141,7 +141,10 @@ func refresh(view_: Dictionary) -> void:
 		tile.pressed.connect(func(): collection_pressed.emit(key))
 		tiles.append(tile)
 	col.add_child(UiNeedTile.group(tiles))
-	col.add_child(_voice_row())
+	if voice_profile_shown(OS.get_name()): col.add_child(_voice_row())
+
+## q(281) ③ (SGODOT-390): no Voice Profile on an iPhone (the card is not there at all); Android keeps it (the user).
+static func voice_profile_shown(os_name: String) -> bool: return os_name != "iOS"
 
 ## `Voice Profile ›` under Collections (SGODOT-349, 不知火舞 2ca37b44): the NavigationRow main (9:99743, 49 high,
 ## label and ›, no icon) on a full-width card that looks like the farm card (radius 12, the raised surface, no stroke);

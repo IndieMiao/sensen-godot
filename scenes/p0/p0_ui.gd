@@ -3526,7 +3526,7 @@ func open_profile(look_saved := false) -> void:
 		_over_profile = true
 		open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
-	page.voice_pressed.connect(func(): voice_match.open("solo"))   # SGODOT-349: no transition of the game's own
+	page.voice_pressed.connect(open_voice_profile)   # SGODOT-349: no transition of the game's own; q(281) ④ its age gate
 	page.collection_pressed.connect(func(key: String):
 		if key == "cities":
 			_over_profile = true
@@ -3613,6 +3613,9 @@ func blackjack_refused(code: String, detail: Dictionary) -> void:
 
 ## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
 ## from (`back`), as each page under it does to the one before.
+## The player id the session plays as (P0Runtime sets it): the support code's (q(281) ②).
+var player_of := func() -> String: return ""
+
 func open_settings(back := Callable(), read := true) -> void:
 	var version := P0Legal.version_line(P0Session.demo_config(
 		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else ""))
@@ -3621,7 +3624,8 @@ func open_settings(back := Callable(), read := true) -> void:
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
 		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
 		(_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD) if _privacy_shown else P0SettingsPage.BLOCKED_NONE,
-		_voice_offered, LANGUAGE_NAMES.get(TranslationServer.get_locale(), "English"))   # the language on screen (不知火舞 A6), not a pick for the next start
+		_voice_offered, LANGUAGE_NAMES.get(TranslationServer.get_locale(), "English"),   # the language on screen (不知火舞 A6), not a pick for the next start
+		P0Legal.privacy_url(OS.get_name()), P0Legal.support_code(str(player_of.call())))   # q(281) (SGODOT-390)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
@@ -3632,6 +3636,10 @@ func open_settings(back := Callable(), read := true) -> void:
 		elif what == "notifications": open_notifications(func(): open_settings(back))
 		elif what == "blocked_players": open_blocked_players(func(): open_settings(back))
 		elif what == "voice_chat": open_voice_chat_info(func(): open_settings(back))
+		elif what == "privacy": ExternalLink.open(P0Legal.privacy_url(OS.get_name()))   # the system browser (q(281) ①)
+		elif what == "support_code":   # q(281) ②: the whole row copies the code; the row itself stays as it is
+			DisplayServer.clipboard_set(P0Legal.support_code(str(player_of.call())))
+			toast("Support code copied")
 		else: open_licenses(func(): open_settings(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "settings"
@@ -4682,6 +4690,35 @@ func _report(peer: int) -> void:
 
 ## §7: the 13+ gate (14 by the year, the user 11-02) the first time the mic key is tapped. Old enough goes on to the
 ## mic (P0VoiceRoom.answer_age), not old enough hides voice on this phone with an Info toast. Nothing else is kept.
+## q(281) ④ (SGODOT-390, 不知火舞 18f24a30): Voice Profile behind voice's 13+ gate, the one answer for both (the server's,
+## voice_account): passed — the voice-match page as ever; not — the card stays, a tap says `Voice Profile isn't
+## available`; not answered — the age card first, titled `Voice Profile`, then the page or the toast.
+const VOICE_PROFILE_NOT_AVAILABLE := "Voice Profile isn't available"
+func open_voice_profile() -> void:
+	if voice_account == null:
+		voice_match.open("solo")
+		return
+	if str(voice_account.get("age")) == "unknown": await voice_account.call("fetch_status")   # answered on another screen
+	match voice_profile_step(str(voice_account.get("age"))):
+		"open": voice_match.open("solo")
+		"refuse": toast(VOICE_PROFILE_NOT_AVAILABLE)
+		_:
+			var d: UiDrawer = AgeCard.new(0, "Voice Profile")
+			d.theme = UiKit.theme()
+			d.safe_bottom = safe_bottom()
+			d.close_requested.connect(close_layer)
+			d.connect(&"answered", func(ok: bool):
+				close_modal()
+				voice_account.call("answer_age", ok)   # kept for voice too: the one answer
+				if ok: voice_match.open("solo")
+				else: toast(VOICE_PROFILE_NOT_AVAILABLE))
+			_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+			modal_kind = "age"
+
+## What a Voice Profile tap does for voice's 13+ answer (`ok` / `no` / `unknown`): "open", "refuse" or "ask".
+static func voice_profile_step(age: String) -> String:
+	return "open" if age == "ok" else ("refuse" if age == "no" else "ask")
+
 func open_age_card() -> void:
 	if voice_room == null: return
 	var d: UiDrawer = AgeCard.new()
