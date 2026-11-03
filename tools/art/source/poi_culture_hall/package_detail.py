@@ -47,7 +47,7 @@ def main():
         path = DEST / (PREFIX + name + ".png")
         meta = PngImagePlugin.PngInfo()
         meta.add_text("Author", "ZHAOYUN / 赵云")
-        meta.add_text("Description", "SGODOT-323 assembled v1; Godot Mobile Vulkan; Huangzhong approved props 6d21e183, case enlargement pending")
+        meta.add_text("Description", "SGODOT-323 assembled v1; Godot Mobile Vulkan; approved props v1.1 85b06565 with enlarged exhibits and pedestals")
         im.save(path, pnginfo=meta)
         assert path.stat().st_size < 4_000_000
         files.append(path)
@@ -81,7 +81,7 @@ def main():
     d.text((22, 1540), "ZHAOYUN / 赵云", font=font(25), fill="white")
     save(viewing, "viewing_area")
     save(caption(raw("seated_overview"), "3 bench seats + 1 stool | native sit_idle / .715 m seat | ZHAOYUN / 赵云"), "four_seats")
-    save(caption(raw("overview"), "43 deg panorama | 23,140 triangles / 28 surfaces | ZHAOYUN / 赵云"), "overview")
+    save(caption(raw("overview"), "43 deg panorama | %s triangles / %s surfaces | ZHAOYUN / 赵云" % (format(stats["scene_triangles"],","),stats["static_draw_surfaces"])), "overview")
 
     top = raw("topdown").convert("RGBA")
     overlay = Image.new("RGBA", top.size)
@@ -127,14 +127,14 @@ def main():
     d.text((30,15),"Stark 318 R3 main",font=font(28),fill="#29454A")
     d.text((1230,15),"N3 v1 | Godot Mobile Vulkan",font=font(28),fill="#29454A")
     d.text((30,1170),"对照机位：按主图地板边估算 35.26° / 45°；实际开场仍为 43° / 6.72 m。布局遵循 323 已批 2 m 留空提案。",font=font(26),fill="#29454A")
-    d.text((30,1210),"展柜内展品为黄忠 v1；放大版待替换。画面无调色，整间保留。ZHAOYUN / 赵云",font=font(25),fill="#29454A")
+    d.text((30,1210),"已接黄忠展品组 v1.1：1.4 倍展品 + 0.06 m 托座。画面无调色，整间保留。ZHAOYUN / 赵云",font=font(25),fill="#29454A")
     save(comparison,"stark_comparison")
 
     reports.update(stats=stats, layout_sha256=digest(KIT/"layout.json"), atlas_sha256=digest(KIT/"room_albedo_ao.png"),
                    source_blend_sha256=digest(HERE/"culture_hall_v1.blend"),
                    stage=json.loads((QA/"stage.json").read_text()),
                    opening_approved="95aed0c2 / 1eb4f28b; exact same native player-follow camera as approved white stage",
-                   pending="Supplier case_exhibits_1/_2 enlargement; current approved v1 kept byte-identical",
+                   supplier_revision="Approved v1.1 85b06565; 1.4x individual exhibits and .06 m pedestals, supplier files kept byte-identical",
                    scope="Game-rendered art review; isolated copied P0 runtime, near=.1/far=40 hall contract; no public-client changes or device/service acceptance")
     (DEST/"validation-v1.json").write_text(json.dumps(reports,indent=2,ensure_ascii=False)+"\n")
     (DEST/"media-manifest-v1.json").write_text(json.dumps([dict(name=p.name,path=str(p.relative_to(ROOT)),sha256=digest(p),bytes=p.stat().st_size,mime="image/png",size=list(Image.open(p).size)) for p in files],indent=2)+"\n")

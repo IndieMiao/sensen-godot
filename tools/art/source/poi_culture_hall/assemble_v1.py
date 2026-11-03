@@ -9,7 +9,7 @@ import sys
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 KIT = ROOT / "assets/rooms/poi_culture_hall"
-APPROVED_PROPS_COMMIT = "6d21e183e53b182cfda5c06220b247dfdcf061e7"
+APPROVED_PROPS_COMMIT = "85b0656588f7f2cea516f42e677c47ab466e1295"
 sys.path.insert(0, str(ROOT / "tools/art"))
 from verify_chef_sign import load_glb
 
@@ -88,8 +88,8 @@ def assemble():
                 source_ownership=dict(zhaoyun="Hall skin, six reusable modules, assembly and validation",
                                       huangzhong="Approved props and editable sources copied byte-for-byte; individual glass materials retained"),
                 props_dependency=dict(branch="wp-3d-scene-huangzhong-culture-323", commit=APPROVED_PROPS_COMMIT,
-                                      manifest="props/prop_manifest.json", technical_approval="323 8d679529",
-                                      pending="case_exhibits_1/2 enlargement from supplier; same display-surface origins"),
+                                      manifest="props/prop_manifest.json", technical_approval="323 8d679529 / 7aa982a6",
+                                      revision=manifest["revision"], notes="Enlarged exhibits with .06 m pedestals; unchanged display-surface origins"),
                 height_assumptions=dict(case_top=1.50, case_display_surface=1.00, plinth_top=1.10,
                                         artwork_group_center_y=centre[1], artwork_group_height=1.25,
                                         sign_center_y=sign["position"][1], track_y=3.49))

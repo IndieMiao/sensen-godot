@@ -1,6 +1,6 @@
 # N3 Culture Hall Editable Sources
 
-赵云，SGODOT-323整间装配v1。白模及开场获95aed0c2/1eb4f28b通过，独立部分fa0f5e08通过；本轮按8d679529接黄忠固定供应版6d21e183，开场不偏移。reference/保留318 R3资料；摆位以323 1f4f9753为准。
+赵云，SGODOT-323整间装配v1。白模及开场获95aed0c2/1eb4f28b通过，独立部分fa0f5e08通过；本轮按8d679529/7aa982a6接黄忠固定供应版v1.1（85b06565），开场不偏移。reference/保留318 R3资料；摆位以323 1f4f9753为准。
 
 完整源为 `culture_hall_v1.blend`；`culture_hall_reuse.blend`保留六个独立模块源，`props/culture_props.blend`是黄忠原样供应的详细命名源。`layout_plan.json`是已批白模输入；不要运行plan.py或build_blockout.py覆盖细模layout。复现历史白模使用aee2d5d0及当时README。
 
@@ -36,6 +36,6 @@ godot --path output/culture-hall-323/project --display-driver wayland --renderin
 output/art-setup/venv/bin/python "$CULTURE_SOURCE/package_detail.py"
 ```
 
-Two case-exhibit groups await the supplier's larger version. Update the pinned supplier commit only after approval, retain display-surface origins, then rerun assembly/verification/rendering. Full-room v1 uses captures-v1/ and a new manifest/receipt; historical deliveries remain intact.
+The two case-exhibit groups now use the approved 1.4x individual exhibits with .06 m pedestals. Group origins and slots are unchanged. Future supplier updates must retain their approved commit and rerun assembly/verification/rendering. Full-room v1 uses captures-v1/; the updated media manifest has a separate delivery receipt and supersedes the original ff0258f8 pictures.
 
 复制的供应README记载黄忠自己的5097端口；赵云一律使用上面的环境和私有ADB5099，不运行别人的环境脚本。保持已通过开场，看画从屋内看画区进行。

@@ -124,10 +124,13 @@ func scale_review():
 			var slot=spec.display_assignment;add_prop(spec.name,vec(slot.position),slot.instance_name,props.get_node(slot.container))
 	await avatar();pose(7.8,43,45,Vector3(0,1.45,.3));await capture("scale_43deg")
 	pose(2.5,35,25,Vector3(-1.55,1.17,.75));vp.size=Vector2i(1000,1000);await capture("cabinet_glass_detail")
+	pose(2.5,35,25,Vector3(1.55,1.17,.75));await capture("cabinet_2_glass_detail")
 func run():
-	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
+	var revision=OS.get_cmdline_user_args().has("--exhibits-only")
+	output=ProjectSettings.globalize_path("res://../captures-v1.1" if revision else "res://../captures");DirAccess.make_dir_recursive_absolute(output)
 	setup();geometry()
-	for spec in manifest.assets:await individual(spec)
+	for spec in manifest.assets:
+		if not revision or spec.name.begins_with("case_exhibits_"):await individual(spec)
 	await scale_review();check(RenderingServer.get_current_rendering_method()=="mobile","Actual Mobile renderer")
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	report.passed=report.checks.all(func(c):return c.passed)

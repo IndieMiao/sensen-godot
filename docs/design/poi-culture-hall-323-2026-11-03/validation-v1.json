@@ -22406,6 +22406,10 @@
         "passed": true
       },
       {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/package_exhibits_review.py",
+        "passed": true
+      },
+      {
         "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/package_review.py",
         "passed": true
       },
@@ -22439,6 +22443,10 @@
       },
       {
         "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/verify.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/verify_exhibits_revision.py",
         "passed": true
       },
       {
@@ -23081,22 +23089,22 @@
       {
         "name": "case_exhibits_1",
         "clearance_to_hood_xyz": [
-          0.2750000035762787,
+          0.1706800138950348,
           0.0,
-          0.1579997944831848
+          0.040680031776428205
         ]
       },
       {
         "name": "case_exhibits_2",
         "clearance_to_hood_xyz": [
-          0.28618843615055084,
+          0.18916329503059387,
           0.0,
-          0.15999982833862303
+          0.05916331291198729
         ]
       }
     ],
     "totals": {
-      "triangles": 23140,
+      "triangles": 23884,
       "surfaces": 28
     },
     "import_uids": {
@@ -23115,13 +23123,13 @@
       "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/case_exhibits_1.glb.import": "uid://dg54o53djd7il",
       "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/case_exhibits_2.glb.import": "uid://can6egwr6yo38"
     },
-    "approved_supplier_commit": "6d21e183e53b182cfda5c06220b247dfdcf061e7",
+    "approved_supplier_commit": "85b0656588f7f2cea516f42e677c47ab466e1295",
     "supplier_files_sha256": {
       "assets/rooms/poi_culture_hall/props/artwork_set.glb": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5",
       "assets/rooms/poi_culture_hall/props/artwork_set.glb.import": "d9a8160ca253d7068c172f4409caad8b6b8cedf693fe09b3231f5c593c0eb919",
-      "assets/rooms/poi_culture_hall/props/case_exhibits_1.glb": "b0af4b06afef68b607a9174899240effedd0ab1bfe4277db7045720cdf466828",
+      "assets/rooms/poi_culture_hall/props/case_exhibits_1.glb": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2",
       "assets/rooms/poi_culture_hall/props/case_exhibits_1.glb.import": "2068b03e8176c8162ce9a4f1353396ee64bf646ce1b9a57e5abf10db53c5d806",
-      "assets/rooms/poi_culture_hall/props/case_exhibits_2.glb": "4934ffc0a51bd5360e1a0a7fff5bb90e9d36960b7595516d63a405abab76b7ba",
+      "assets/rooms/poi_culture_hall/props/case_exhibits_2.glb": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b",
       "assets/rooms/poi_culture_hall/props/case_exhibits_2.glb.import": "e8cb5e8e00c5dd154d942b5043e4eff52d6db0de2406e304a07205a4c17b3680",
       "assets/rooms/poi_culture_hall/props/display_cabinet.glb": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c",
       "assets/rooms/poi_culture_hall/props/display_cabinet.glb.import": "4e9f38b1f041177254d7b4e6f896be5285ebd521efb1cf83331094eec7889219",
@@ -23135,12 +23143,12 @@
       "assets/rooms/poi_culture_hall/props/material_import.gd.uid": "99a68ed3c2a54506f694dd4f0cf8e3f4c61535e3e31bd9e509c06a44abe58c85",
       "assets/rooms/poi_culture_hall/props/name_sign.glb": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992",
       "assets/rooms/poi_culture_hall/props/name_sign.glb.import": "93832deb3d2cb9f9430788d4e5f751d6c68abae9dc6c4d52681b5ee48317f6ed",
-      "assets/rooms/poi_culture_hall/props/prop_manifest.json": "8051b4bca9409af0356fa308c3ee9aab02fde45b212fb692ea4f4964106abf44",
+      "assets/rooms/poi_culture_hall/props/prop_manifest.json": "749b46b5662fccfa4f8b13604ef1f4380161656c5959ab2874bb30f3bda9f3fb",
       "tools/art/source/poi_culture_hall/props/.gdignore": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-      "tools/art/source/poi_culture_hall/props/README.md": "8099a0412b5a661b18a22098c2ebaf9eb8c4f006213dbeb973320ba7a3b23d2a",
-      "tools/art/source/poi_culture_hall/props/build_props.py": "87bdc6bff55a7c3984b4269851970897fb4c94afa853db33a87a2ecd59bd1637",
+      "tools/art/source/poi_culture_hall/props/README.md": "e409f685a70fdbb2255ed7edbfc32879b9d1c51d47a92a2f82bb31680f38736d",
+      "tools/art/source/poi_culture_hall/props/build_props.py": "80e90dc0089506bec551f90e10476401296bf6efc4447d101ec0af263d1265d8",
       "tools/art/source/poi_culture_hall/props/configure_imports.gd": "92def55b788ab11f1a2246a1d799fc59a7a5d107d428dc382d11d7c302a4855a",
-      "tools/art/source/poi_culture_hall/props/culture_props.blend": "8408b217351e03986a24dba5afa4a7968a1b35f096f7748bad328b4ea3ba7158",
+      "tools/art/source/poi_culture_hall/props/culture_props.blend": "f2365ba6f181da360286b247506dba93fbd95467b65c50670b4a32d1756c2f27",
       "tools/art/source/poi_culture_hall/props/modules/abstract_frame_01/reuse_provenance.json": "e2e68dbf97bb482e354596ebca60854a20937fdd6881f7b72e887bab312166cc",
       "tools/art/source/poi_culture_hall/props/modules/abstract_frame_02/reuse_provenance.json": "a5e90df4a1128989a225c5b341c19d477101f53fb31c6193ae12327eeb68550e",
       "tools/art/source/poi_culture_hall/props/modules/abstract_frame_03/reuse_provenance.json": "adfa56405067684088b61fd644182d72f09d02a77719041beb8d7ab3d7a20ae0",
@@ -23161,15 +23169,17 @@
       "tools/art/source/poi_culture_hall/props/modules/exhibit_terracotta_jar/reuse_provenance.json": "ccc496b5aaed97d4bc18b6e6423add7cf68534e1da01f2639ed964ca6e210b8c",
       "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json": "514939d409387f4414f9a0f110b127178ebe9fad16725d495d53c268e43a5859",
       "tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json": "c173aebd6e541ed96335c40f01e05371805a6f304f5c0d8c108eda1955c917ae",
-      "tools/art/source/poi_culture_hall/props/package_review.py": "bb81f9dbfb54e9fe441e3d602bdcfdea205bf1d92be95b6347115b657973842d",
+      "tools/art/source/poi_culture_hall/props/package_exhibits_review.py": "0d27152b5ff5e983b6fe55f4021ceac67f54fd75762b118fcc74bdbac7ebb037",
+      "tools/art/source/poi_culture_hall/props/package_review.py": "5234a5613de5b1189d79f1b7d50d04d88c2e629ad27e93c94695f0295ae4912b",
       "tools/art/source/poi_culture_hall/props/prepare_review.py": "d2966d82ee5539e71dae9d28365b4a0d3711f9a3359d4618cc5fd64b3bf331a0",
       "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_Culture_Hall_Main_2026-10-31.png": "8609be557a72138aaa597741fb8d9af2dce5acb6162ef107c5b31ad77bf5b8cb",
       "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_Module_List.md": "1a0f17a0dc06b97b612ae142fd4a6018a3657f1f3bf1fa9099a3adde23d9f0a2",
       "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_palette.md": "be545e233124e217349b8e2b4a52c34b66806c8932dae3f8a04599a845e7b166",
       "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_props.md": "2cec13a0cf1008a15c9b9fbedf78a846fbd626fe47eb494cbc4eab8e4052334a",
       "tools/art/source/poi_culture_hall/props/reference/SGODOT-323_N3_layout_proposal_v0.png": "8018dc7b123e64933c190bfc240deda46ab22658587e428e974be1f5de3d558c",
-      "tools/art/source/poi_culture_hall/props/review.gd": "08389afb46db7d33998092321eb5109c67eb89c2e82458759b60d66c89d45e5d",
+      "tools/art/source/poi_culture_hall/props/review.gd": "68d9864f2bfef8f8d6e56ecde018a8f7261d44833fdd7bfc6a7ce2e1ecf03b85",
       "tools/art/source/poi_culture_hall/props/verify.py": "106f27aeb0ea5330f669a3ed09fb0377cf8aab4cb1725ae2536b4ef0280a96fb",
+      "tools/art/source/poi_culture_hall/props/verify_exhibits_revision.py": "addc9b36fe0a15b22af94b2177c356bc2e7963282e8487e00b82cbaef5253e6d",
       "tools/art/source/poi_culture_hall/props/verify_source.py": "974c628fdd595d777bc81ddf3ac27cf47c729b52d273345693aeb4b1c9c18003"
     }
   },
@@ -23243,7 +23253,7 @@
       },
       {
         "name": "case_exhibits_1",
-        "bounds_max_error_m": 5.587935447692871e-08,
+        "bounds_max_error_m": 5.960464477539063e-08,
         "passed": true
       },
       {
@@ -23258,12 +23268,12 @@
       },
       {
         "name": "artwork_set",
-        "bounds_max_error_m": 2.859160304069519e-07,
+        "bounds_max_error_m": 1.909211277961731e-07,
         "passed": true
       },
       {
         "name": "name_sign",
-        "bounds_max_error_m": 2.7008354663848877e-07,
+        "bounds_max_error_m": 2.086162567138672e-07,
         "passed": true
       },
       {
@@ -23903,7 +23913,7 @@
     ],
     "stage": "detail_v1",
     "surfaces": 28,
-    "triangles": 23140,
+    "triangles": 23884,
     "viewing_area": {
       "artworks": [
         {
@@ -24608,6 +24618,21 @@
             "anchors": [],
             "slot": "rear",
             "source_instance_name": "case_1_exhibit_1",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.24284399980306623,
+            "exhibit_bounds": [
+              [
+                -0.20579999685287476,
+                0.05999999865889549,
+                -0.20579999685287476
+              ],
+              [
+                0.20579999685287476,
+                0.21400000154972076,
+                0.20579999685287476
+              ]
+            ],
             "position": [
               0,
               0,
@@ -24615,17 +24640,17 @@
             ],
             "bounds": [
               [
-                -0.1469999998807907,
+                -0.24284400045871735,
                 0.0,
-                -0.1469999998807907
+                -0.24284400045871735
               ],
               [
-                0.1469999998807907,
-                0.10999999940395355,
-                0.1469999998807907
+                0.24284400045871735,
+                0.21400000154972076,
+                0.24284400045871735
               ]
             ],
-            "triangles": 252
+            "triangles": 376
           },
           {
             "name": "exhibit_leaf_fossil",
@@ -24636,6 +24661,21 @@
             "anchors": [],
             "slot": "front",
             "source_instance_name": "case_1_exhibit_3",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.2643199940919876,
+            "exhibit_bounds": [
+              [
+                -0.2239999920129776,
+                0.05999999865889549,
+                -0.1679999977350235
+              ],
+              [
+                0.2239999920129776,
+                0.15319108963012695,
+                0.1679999977350235
+              ]
+            ],
             "position": [
               0,
               0,
@@ -24643,17 +24683,17 @@
             ],
             "bounds": [
               [
-                -0.1599999964237213,
+                -0.2643199861049652,
                 0.0,
-                -0.11999999731779099
+                -0.2643199861049652
               ],
               [
-                0.1599999964237213,
-                0.06656506657600403,
-                0.11999999731779099
+                0.2643199861049652,
+                0.15319108963012695,
+                0.2643199861049652
               ]
             ],
-            "triangles": 286
+            "triangles": 410
           },
           {
             "name": "exhibit_shell_fragment",
@@ -24664,6 +24704,21 @@
             "anchors": [],
             "slot": "middle",
             "source_instance_name": "case_1_exhibit_2",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.2312800009846687,
+            "exhibit_bounds": [
+              [
+                -0.19599999487400055,
+                0.05999999865889549,
+                -0.17499999701976776
+              ],
+              [
+                0.19599999487400055,
+                0.17554710805416107,
+                0.17499999701976776
+              ]
+            ],
             "position": [
               0,
               0,
@@ -24671,17 +24726,17 @@
             ],
             "bounds": [
               [
-                -0.14000000059604645,
+                -0.23127999901771545,
                 0.0,
-                -0.125
+                -0.23127999901771545
               ],
               [
-                0.14000000059604645,
-                0.08253365010023117,
-                0.125
+                0.23127999901771545,
+                0.17554710805416107,
+                0.23127999901771545
               ]
             ],
-            "triangles": 260
+            "triangles": 384
           }
         ],
         "display_assignment": {
@@ -24696,26 +24751,26 @@
           ],
           "yaw_degrees": 0
         },
-        "triangles": 798,
+        "triangles": 1170,
         "surfaces": 1,
         "bounds": [
           [
-            -0.1599999964237213,
+            -0.2643199861049652,
             0.0,
-            -0.6970002055168152
+            -0.7928439974784851
           ],
           [
-            0.1599999964237213,
-            0.10999999940395355,
-            0.6700001955032349
+            0.2643199861049652,
+            0.21400000154972076,
+            0.8143199682235718
           ]
         ],
         "dimensions_m": [
-          0.3199999928474426,
-          0.10999999940395355,
-          1.3670003414154053
+          0.5286399722099304,
+          0.21400000154972076,
+          1.607163906097412
         ],
-        "sha256": "b0af4b06afef68b607a9174899240effedd0ab1bfe4277db7045720cdf466828",
+        "sha256": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2",
         "provenance": "tools/art/source/poi_culture_hall/props/modules/case_exhibits_1/reuse_provenance.json",
         "supplier_asset": "case_exhibits_1"
       },
@@ -24738,6 +24793,21 @@
             "anchors": [],
             "slot": "middle",
             "source_instance_name": "case_2_exhibit_2",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.18998000344634053,
+            "exhibit_bounds": [
+              [
+                -0.16099999845027924,
+                0.05999999865889549,
+                -0.16099999845027924
+              ],
+              [
+                0.16099999845027924,
+                0.48000001907348633,
+                0.16099999845027924
+              ]
+            ],
             "position": [
               0,
               0,
@@ -24745,17 +24815,17 @@
             ],
             "bounds": [
               [
-                -0.11500000208616257,
+                -0.18998000025749207,
                 0.0,
-                -0.11500000208616257
+                -0.18998000025749207
               ],
               [
-                0.11500000208616257,
-                0.30000001192092896,
-                0.11500000208616257
+                0.18998000025749207,
+                0.48000001907348633,
+                0.18998000025749207
               ]
             ],
-            "triangles": 316
+            "triangles": 440
           },
           {
             "name": "exhibit_fossil_rock",
@@ -24766,6 +24836,21 @@
             "anchors": [],
             "slot": "rear",
             "source_instance_name": "case_2_exhibit_1",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.24583670347929,
+            "exhibit_bounds": [
+              [
+                -0.20833618938922882,
+                0.05999999865889549,
+                -0.18199999630451202
+              ],
+              [
+                0.20833618938922882,
+                0.3373960256576538,
+                0.18199999630451202
+              ]
+            ],
             "position": [
               0,
               0,
@@ -24773,17 +24858,17 @@
             ],
             "bounds": [
               [
-                -0.14881156384944916,
+                -0.24583670496940613,
                 0.0,
-                -0.12999999523162842
+                -0.24583670496940613
               ],
               [
-                0.14881156384944916,
-                0.19814002513885498,
-                0.12999999523162842
+                0.24583670496940613,
+                0.3373960256576538,
+                0.24583670496940613
               ]
             ],
-            "triangles": 80
+            "triangles": 204
           },
           {
             "name": "exhibit_spiral_fossil",
@@ -24794,6 +24879,21 @@
             "anchors": [],
             "slot": "front",
             "source_instance_name": "case_2_exhibit_3",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.23953999310731885,
+            "exhibit_bounds": [
+              [
+                -0.2029999941587448,
+                0.05999999865889549,
+                -0.2029999941587448
+              ],
+              [
+                0.2029999941587448,
+                0.19695881009101868,
+                0.2029999941587448
+              ]
+            ],
             "position": [
               0,
               0,
@@ -24801,17 +24901,17 @@
             ],
             "bounds": [
               [
-                -0.14499999582767487,
+                -0.2395399957895279,
                 0.0,
-                -0.14499999582767487
+                -0.2395399957895279
               ],
               [
-                0.14499999582767487,
-                0.0978277176618576,
-                0.14499999582767487
+                0.2395399957895279,
+                0.19695881009101868,
+                0.2395399957895279
               ]
             ],
-            "triangles": 442
+            "triangles": 566
           }
         ],
         "display_assignment": {
@@ -24826,26 +24926,26 @@
           ],
           "yaw_degrees": 0
         },
-        "triangles": 838,
+        "triangles": 1210,
         "surfaces": 1,
         "bounds": [
           [
-            -0.14881156384944916,
+            -0.24583670496940613,
             0.0,
-            -0.6800001859664917
+            -0.7958366870880127
           ],
           [
-            0.14881156384944916,
-            0.30000001192092896,
-            0.695000171661377
+            0.24583670496940613,
+            0.48000001907348633,
+            0.7895399928092957
           ]
         ],
         "dimensions_m": [
-          0.2976231276988983,
-          0.30000001192092896,
-          1.3750003576278687
+          0.49167340993881226,
+          0.48000001907348633,
+          1.5853767395019531
         ],
-        "sha256": "4934ffc0a51bd5360e1a0a7fff5bb90e9d36960b7595516d63a405abab76b7ba",
+        "sha256": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b",
         "provenance": "tools/art/source/poi_culture_hall/props/modules/case_exhibits_2/reuse_provenance.json",
         "supplier_asset": "case_exhibits_2"
       }
@@ -24914,7 +25014,7 @@
         "static_draw_surfaces": 50
       }
     },
-    "scene_triangles": 23140,
+    "scene_triangles": 23884,
     "static_draw_surfaces": 28,
     "atlas": {
       "file": "room_albedo_ao.png",
@@ -24927,21 +25027,22 @@
     },
     "props_dependency": {
       "branch": "wp-3d-scene-huangzhong-culture-323",
-      "commit": "6d21e183e53b182cfda5c06220b247dfdcf061e7",
+      "commit": "85b0656588f7f2cea516f42e677c47ab466e1295",
       "manifest": "props/prop_manifest.json",
-      "technical_approval": "323 8d679529",
-      "pending": "case_exhibits_1/2 enlargement from supplier; same display-surface origins"
+      "technical_approval": "323 8d679529 / 7aa982a6",
+      "revision": "v1.1",
+      "notes": "Enlarged exhibits with .06 m pedestals; unchanged display-surface origins"
     }
   },
-  "layout_sha256": "ccad56e29f72859efcf1e46a396b85286988f48748d5dd5a13e2a6e00e63921d",
+  "layout_sha256": "20779fee3d0d93774af24647916e3e3d40afbc6f4d53201fd39b3e503498885c",
   "atlas_sha256": "605a71555d6759de8ac4d48619fd3027e0713416bfe923a04d8edf3ed36a7a2b",
-  "source_blend_sha256": "265c7180ae57e59d94906773501899b1a115af55c6bc2ac91e8b46bf4c0514a4",
+  "source_blend_sha256": "6a25d973c3b3d1ac21caace87d1f90bc6fb60e7786b3f5fe27d890ab7ab2ee98",
   "stage": {
     "runtime_base": "cfd3436f2927bd8becbfd555c89a8b8c2524efae",
-    "art_base": "fa0f5e0858fb42af385a6bfc3bebab7cae69269d",
+    "art_base": "ff0258f8433d57efdc09f94612750c0a50932f6b",
     "scope": "Isolated copied P0 runtime. Asset/scene overlay only; no runtime code edits, network localhost:9."
   },
   "opening_approved": "95aed0c2 / 1eb4f28b; exact same native player-follow camera as approved white stage",
-  "pending": "Supplier case_exhibits_1/_2 enlargement; current approved v1 kept byte-identical",
+  "supplier_revision": "Approved v1.1 85b06565; 1.4x individual exhibits and .06 m pedestals, supplier files kept byte-identical",
   "scope": "Game-rendered art review; isolated copied P0 runtime, near=.1/far=40 hall contract; no public-client changes or device/service acceptance"
 }

@@ -2,8 +2,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_default_clean.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_default_clean.png",
-    "sha256": "026e580c4b7fee43282c4146259a4e216d71b77b4d74f033693aa0509b869ad3",
-    "bytes": 355980,
+    "sha256": "d921d8c4ed568cc0003e370095f4a8ddfe0831dbd1b964968062eb7f5761449a",
+    "bytes": 358268,
     "mime": "image/png",
     "size": [
       720,
@@ -13,8 +13,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_default_43_safe.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_default_43_safe.png",
-    "sha256": "50c028072d0c776d6c61a9b654020f69d3d454a715b2fa3dc23c697849bfd94f",
-    "bytes": 385894,
+    "sha256": "8e6fba33fdbf13e6b31003d99a2ff51ade26e15eb063b9e862f33174bbc2f18c",
+    "bytes": 387937,
     "mime": "image/png",
     "size": [
       720,
@@ -24,8 +24,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_viewing_area.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_viewing_area.png",
-    "sha256": "ccede792fdf476fc4c5c805b073a752e8cc9c42a7b0b9bd6d51455b3e772f92a",
-    "bytes": 401757,
+    "sha256": "f44faf1273e8769f6dab2bb329e402864167c40df8bf4283b39ccb5a0da33852",
+    "bytes": 405134,
     "mime": "image/png",
     "size": [
       720,
@@ -35,8 +35,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_four_seats.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_four_seats.png",
-    "sha256": "fc64dda597a4ff98bc244134300b908bd5e018d09128e5a309b51feb6eec6343",
-    "bytes": 541842,
+    "sha256": "5a1b3462e69b694026a90d959e799323423f51c7e2645576beb02265612d07a5",
+    "bytes": 544479,
     "mime": "image/png",
     "size": [
       1200,
@@ -46,8 +46,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_overview.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_overview.png",
-    "sha256": "49cbd7ff4bf2f7037b7796d037c6d1381aa4a39fe65ba99848e4654e36daca1f",
-    "bytes": 506505,
+    "sha256": "ff9a5a6a2c99d49d3e0c816007dac70d35a942dd81d5db4bef5d8e84c3323f67",
+    "bytes": 508573,
     "mime": "image/png",
     "size": [
       1200,
@@ -57,8 +57,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_topdown_ruler.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_topdown_ruler.png",
-    "sha256": "34e422aed0bb16f4f993a72a390528b2fc4380ed01d267e7bdbd0690d1c88d61",
-    "bytes": 321572,
+    "sha256": "badf80bd2c88ea3c27add35650ecfa7e9afb5939fb5b721ea5c201d7af775f02",
+    "bytes": 329503,
     "mime": "image/png",
     "size": [
       1200,
@@ -68,8 +68,8 @@
   {
     "name": "SGODOT-323_POI_CULTURE_HALL_v1_stark_comparison.png",
     "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1_stark_comparison.png",
-    "sha256": "7dbb1945940207d300102374065a0d4d49e3e9d1ea7f2ecd48246191c725b95c",
-    "bytes": 2260309,
+    "sha256": "ba533d511035bfb8a56982c0cb9d04470193638c22c39409a985a5a25f6c29bc",
+    "bytes": 2261086,
     "mime": "image/png",
     "size": [
       2400,

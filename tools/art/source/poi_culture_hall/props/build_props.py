@@ -19,7 +19,7 @@ COLORS={'ivory':'EFDFBD','bed':'F4E8CE','green':'465823','glass':'C2D8D3','glass
     'wood':'E3C696','wood_edge':'C7A06B','paper':'F2E5CA','orange':'C66F3F','orange_light':'DB9A63',
     'sage':'83916D','sage_dark':'536746','ochre':'C1A16C','beige':'DCC9A6','grout':'C7B48E',
     'stone':'B9A27E','stone_light':'D5C09C','stone_dark':'927C5C','fossil':'C7AC82','groove':'93734E',
-    'clay':'B86742','clay_light':'D68B5C','clay_inner':'8D4E36'}
+    'clay':'B86742','clay_light':'D68B5C','clay_inner':'8D4E36','pedestal':'E4D7BF'}
 
 def write(path,value):
     path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
@@ -256,15 +256,27 @@ def combine(name,module,members,wall=False):
         lo=Vector(tuple(min(v[i] for v in points) for i in range(3)))
         hi=Vector(tuple(max(v[i] for v in points) for i in range(3)))
         pivot=Vector(((lo.x+hi.x)/2,(lo.y+hi.y)/2 if wall else lo.y,lo.z if wall else (lo.z+hi.z)/2))
+        scale=1.0 if wall else 1.4;lift=0.0 if wall else .06
+        placed_offset=Vector(offset)+Vector((0,lift,0))
         for obj in kit['objects']:
-            transform=Matrix.Translation(p.b.v(offset))@Matrix.Translation(-p.b.v(pivot))@kit['root'].matrix_world.inverted()@obj.matrix_world
+            transform=Matrix.Translation(p.b.v(placed_offset))@Matrix.Scale(scale,4)@Matrix.Translation(-p.b.v(pivot))@kit['root'].matrix_world.inverted()@obj.matrix_world
             for collection in list(obj.users_collection):collection.objects.unlink(obj)
             target['collection'].objects.link(obj);obj.parent=target['root'];obj.matrix_parent_inverse=Matrix.Identity(4);obj.matrix_local=transform
             obj.name=child_name+' / '+obj.name;target['objects'].append(obj)
         component={k:v for k,v in spec.items() if k not in ['file','quantity','display_assignment','gallery_offset']}
         if 'display_assignment' in spec:
             component['slot']=spec['display_assignment']['slot'];component['source_instance_name']=spec['display_assignment']['instance_name']
-        components.append({**component,'position':offset,'bounds':[list(lo-pivot),list(hi-pivot)],'triangles':triangles})
+        local_lo=(lo-pivot)*scale+Vector((0,lift,0));local_hi=(hi-pivot)*scale+Vector((0,lift,0))
+        if not wall:
+            radius=max((hi-lo).x,(hi-lo).z)*scale*.5*1.18
+            stand=p.lathe(child_name+' / Pale beveled pedestal',offset,
+                [(0,radius*.9),(.006,radius),(.054,radius),(.06,radius*.9)],'pedestal',16)
+            stand.data.calc_loop_triangles();triangles+=len(stand.data.loop_triangles)
+            component.update(exhibit_scale=scale,pedestal_height_m=lift,pedestal_radius_m=radius,
+                exhibit_bounds=[list(local_lo),list(local_hi)])
+            local_lo=Vector((min(local_lo.x,-radius),0,min(local_lo.z,-radius)))
+            local_hi=Vector((max(local_hi.x,radius),max(local_hi.y,lift),max(local_hi.z,radius)))
+        components.append({**component,'position':offset,'bounds':[list(local_lo),list(local_hi)],'triangles':triangles})
         bpy.data.objects.remove(kit['root'],do_unlink=True);bpy.data.collections.remove(kit['collection'])
         del p.KITS[child_name];del SPECS[child_name]
     SPECS[name]['components']=components
@@ -284,6 +296,8 @@ def grouped_delivery():
 
 def export():
     bpy.context.view_layer.update()
+    only_exhibits='--only-exhibits' in sys.argv
+    previous={s['name']:s for s in json.loads((KIT/'prop_manifest.json').read_text())['assets']} if only_exhibits else {}
     materials=[]
     for name,roughness in [('CulturePropsVertex',.9),('CultureGlass',.16)]:
         mat=bpy.data.materials.new(name);mat.use_nodes=True;bsdf=mat.node_tree.nodes.get('Principled BSDF')
@@ -292,6 +306,9 @@ def export():
         mat.node_tree.links.new(color.outputs['Color'],bsdf.inputs['Base Color']);materials.append(mat)
     original=bpy.context.scene;temp=bpy.data.scenes.new('Temporary prop export')
     for name,kit in p.KITS.items():
+        if only_exhibits and not name.startswith('case_exhibits_'):
+            SPECS[name]=previous[name]
+            continue
         copies=[];points=[]
         for source in kit['objects']:
             graph=bpy.context.evaluated_depsgraph_get();data=bpy.data.meshes.new_from_object(source.evaluated_get(graph),preserve_all_data_layers=True,depsgraph=graph)
@@ -350,7 +367,7 @@ def export():
         write(SRC/'modules'/name/'reuse_provenance.json',provenance);spec['provenance']=str((SRC/'modules'/name/'reuse_provenance.json').relative_to(ROOT))
         print('PROP',name,spec['triangles'],spec['dimensions_m'],flush=True)
     bpy.data.scenes.remove(temp);bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'culture_props.blend'))
-    manifest={'revision':'v1','author':'黄忠','virtual_user_id':AUTHOR,'baseline_height_m':1.745,'axes':'metres; Y up; +Z front',
+    manifest={'revision':'v1.1','author':'黄忠','virtual_user_id':AUTHOR,'baseline_height_m':1.745,'axes':'metres; Y up; +Z front',
         'scope':'8 grouped GLBs, 9 placed instances; 17 authored components. Scene layout owned by Zhaoyun.',
         'gallery':{'layout':'two rows of three','local_width_m':2.40,'local_height_m':1.25},'assets':list(SPECS.values()),
         'unique_triangles':sum(s['triangles'] for s in SPECS.values()),'placed_triangles':sum(s['triangles']*s['quantity'] for s in SPECS.values()),

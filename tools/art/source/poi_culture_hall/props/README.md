@@ -14,6 +14,7 @@
 
 - `display_cabinet.glb` 摆两次：实例 ID `glass_case_1`、`glass_case_2`；占地 0.95 × 1.80 m，总高 1.50 m。
 - 柜内**实际陈列面 y=1.00 m**，不是白模的 1.04 m。`case_exhibits_1/2` 的原点对齐这个展示面中心，组位置为容器局部 `[0,1,0]`；各组三个展品 local z=-0.55 / 0 / 0.55 已烘入网格，不再单独摆放。
+- v1.1 保留上述坐标，将六件展品分别绕原中心放大 1.4 倍，加 0.06 m 浅色倒角圆托座；最高陶罐加托座共 0.48 m。`components` 另列 exhibit_scale、pedestal_height_m、exhibit_bounds。
 - `exhibit_plinth.glb` 的陈列面 **y=1.10 m**，不是白模的 1.15 m。菊石 `plinth_exhibit` 放在台面中心。
 - `prop_manifest.json` 的 `display_assignment` 列明两个展品组及菊石的容器和容器局部坐标，`components` 保留子件名、前中后槽位和原白模实例名。容器的整间坐标/朝向由赵云按已批白模保留。
 - 六画合成 `artwork_set.glb`，一张 mesh、一个 surface。每幅 0.70 × 0.55 m；按原 0.15 m 横向/竖向边间距烘为两排三列，整组宽 2.40 m、高 1.25 m，原点为整组背面中心。组内坐标在 `components.position`，无需重复实例化六画。
@@ -24,9 +25,28 @@
 玻璃独立 surface，alpha=0.16，双面、低反光；其余是粗糙度 0.9 的哑光顶点色，无贴图。
 全部 `.glb.import` 有独立 UID、`gltf/texture_map_mode=1`，挂同目录 `material_import.gd`（含 UID），启用线性顶点色并保留独立玻璃材质。
 
-按新增合组要求保持造型，没有为合组减面：画组 1,394 面、柜 1 展品组 798 面、柜 2 展品组 838 面。
+画组 1,394 面；v1.1 加托座后，柜 1 展品组 1,170 面、柜 2 展品组 1,210 面，两个组仍各一个 surface。
 组合体照实记录总面数，内部原子件各不超过 600 面；其余单件也不超过 600 面。
-全部交付组独立统计为 4,982 面 / 9 surface，展柜复用后 5,396 面 / 11 surface。
+全部交付组独立统计为 5,726 面 / 9 surface，展柜复用后 6,140 面 / 11 surface。
+
+## v1.1 仅重导展品组
+
+```bash
+source ~/.codex-huangzhong/env.sh
+blender --background --python tools/art/source/poi_culture_hall/props/build_props.py -- --only-exhibits
+blender --background --python tools/art/source/poi_culture_hall/props/verify_source.py
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/verify_exhibits_revision.py
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/prepare_review.py
+godot --headless --path output/culture-props-323/project --editor --import
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/verify.py
+nvidia-smi
+godot --path output/culture-props-323/project --rendering-method mobile --rendering-driver vulkan -- --exhibits-only
+output/art-setup/venv/bin/python tools/art/source/poi_culture_hall/props/package_exhibits_review.py
+```
+
+`--only-exhibits` 不写其余六个 GLB，保留 UID 与摆位。增量检查直接用 v1 提交的顶点计算 1.4 倍后的期望位置，
+并量新顶点和托座上下表面；其余 GLB、所有 import 和材质导入脚本逐文件核 SHA-256。
+对比图沿用已归档的 v1 原始截图 `output/culture-props-323/captures`，新图写入 `captures-v1.1`。
 
 ## 复现与检查
 
