@@ -32,13 +32,17 @@ describe('enterable POI rooms (SGODOT-313)', () => {
     expect(templateFor(table, 'post', 'public_facilities')).toBe('');            // post offices wait for E9, whatever their class
     expect(templateFor(table, 'religious-christian', 'public_facilities')).toBe('');
     expect(templateFor(table, 'place-of-worship', '')).toBe('');
+    expect(templateFor(table, 'prison', 'public_facilities')).toBe('');          // would fall to Service Hall
+    expect(templateFor(table, 'cemetery', 'park_like')).toBe('');                // would fall to Park
     expect(templateFor(table, 'restaurant', 'food_and_drink')).toBe('');        // no Go in
   });
   it("one class name for card, door and chip: by maki, else the template's (q(279) ⑥)", () => {
+    const all = new Set([...Object.values(table.names), ...Object.values(table.templates).map(t => t.door)]);
+    expect(all.size).toBe(16);   // q(279) ⑥: 16 new English words
     expect(poiName(table, 'doctor', 'medical')).toBe('Clinic');
     expect(poiName(table, 'hospital-JP', 'medical')).toBe('Hospital');
     expect(poiName(table, 'pitch', 'park_like')).toBe('Sports Field');
-    expect(poiName(table, 'dog-park', 'park_like')).toBe('Park');               // no name of its own
+    expect(poiName(table, 'dog-park', 'park_like')).toBe('Dog Park');           // its own, not Park
     expect(poiName(table, '', 'public_facilities')).toBe('Service Hall');
     expect(poiName(table, '', 'education')).toBe('School');
     expect(poiName(table, 'cafe', 'food_and_drink')).toBe('');

@@ -1,5 +1,5 @@
 /**
- * Enterable POIs (SGODOT-313; the user 11-03 "POI 提前"; q(279) eaf3edc1, pending the user; plan
+ * Enterable POIs (SGODOT-313; the user 11-03 "POI 提前"; q(279), the user's "279 ok" (302 b1cbc904); plan
  * pm/plans/poi-enter-plan-2026-11-03.md): a map POI the template table picks a kit for opens a room of its own,
  * `poi:<template>@<city cluster>:<12 hex>`. The hex is poiRoomKey: the first 12 lowercase hex of the SHA-256 of the
  * client's POI id as UTF-8 — `tile:<feature id>`, or for a feature without one `tile:<name>:<lon>:<lat>` with lon / lat
@@ -24,7 +24,8 @@ export interface PoiTemplate { art: string; door: string; sign: string; bounds: 
 export interface PoiTable { capacity: number; templates: Record<string, PoiTemplate>; maki: Record<string, string>; class: Record<string, string>;
   /** The class name by maki (q(279) ⑥); a maki without one, or a POI picked by its class, takes its template's `door`. */
   names: Record<string, string>;
-  /** Makis with no Go in whatever their class (q(279) ③: post offices wait for E9; religious ones, a card only); `*` ends a prefix. */
+  /** Makis with no Go in whatever their class (q(279) ③: post offices wait for E9; prisons and cemeteries would fall to
+   * Service Hall and Park; religious ones, a card only); `*` ends a prefix. */
   skip: string[] }
 export interface PoiRoom { template: string; cluster: string; key: string }
 

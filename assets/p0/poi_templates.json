@@ -1,5 +1,5 @@
 {
- "_note": "Enterable POIs (SGODOT-313; q(279) eaf3edc1, pending the user; plan pm/plans/poi-enter-plan-2026-11-03.md). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the anchor its door words go on, `sign`). Pick: the POI's maki with any -JP cut off, else its class, else no Go in; a maki in `skip` has none whatever its class (post offices wait for E9, religious ones are a card only; `*` ends a prefix); `medical` is no class row (dentists, vets, pharmacies). The class name (card subtitle, door, location chip — one word for all three): `names` by maki, else the template's `door` (dog-park has none: Park). A POI's room is `poi:<template>@<city cluster>:<hex>`, the hex the first 12 of the SHA-256 of the client's POI id (`tile:<feature id>`, or `tile:<name>:<lon>:<lat>` without one) — the feature id changes when Mapbox updates its tiles, so it is a room key only, never saved.",
+ "_note": "Enterable POIs (SGODOT-313; q(279), the user 11-03 \"279 ok\" (李白, 302 b1cbc904; scope A, voice B); plan pm/plans/poi-enter-plan-2026-11-03.md). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the anchor its door words go on, `sign`). Pick: the POI's maki with any -JP cut off, else its class, else no Go in; a maki in `skip` has none whatever its class (post offices wait for E9, prisons and cemeteries would fall to Service Hall and Park, religious ones are a card only; `*` ends a prefix); `medical` is no class row (dentists, vets, pharmacies). The class name (card subtitle, door, location chip — one word for all three): `names` by maki (16 with the class ones, 不知火舞's 220 6737c708), else the template's `door`. A POI's room is `poi:<template>@<city cluster>:<hex>`, the hex the first 12 of the SHA-256 of the client's POI id (`tile:<feature id>`, or `tile:<name>:<lon>:<lat>` without one) — the feature id changes when Mapbox updates its tiles, so it is a room key only, never saved.",
  "capacity": 16,
  "templates": {
   "hotel_lobby": {
@@ -122,10 +122,13 @@
   "park": "Park",
   "garden": "Garden",
   "pitch": "Sports Field",
-  "playground": "Playground"
+  "playground": "Playground",
+  "dog-park": "Dog Park"
  },
  "skip": [
   "post",
+  "prison",
+  "cemetery",
   "place-of-worship",
   "religious-*"
  ]
