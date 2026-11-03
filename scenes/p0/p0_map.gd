@@ -450,11 +450,12 @@ func _process(dt: float) -> void:
 		if city_map and P0WildSites.count() != _wild_count: _set_outpost_places())
 
 ## The box [south, west, north, east] the screen shows around its centre at a zoom, with half a screen's margin each
-## way (Web Mercator, 512-px tiles as the map draws them), kept under the server's 20° each way.
+## way (Web Mercator, 512-px tiles as the map draws them), kept under the server's 20° each way with room for
+## P0WildSites.grid_box's growing it out to the 0.5° grid.
 static func view_box(lat: float, lng: float, z: float, screen: Vector2) -> Array:
 	var deg_px := 360.0 / (512.0 * pow(2.0, z))
-	var half_lng := minf(9.5, screen.x * deg_px)
-	var half_lat := minf(9.5, screen.y * deg_px * cos(deg_to_rad(clampf(lat, -85.0, 85.0))))
+	var half_lng := minf(9.0, screen.x * deg_px)
+	var half_lat := minf(9.0, screen.y * deg_px * cos(deg_to_rad(clampf(lat, -85.0, 85.0))))
 	var west := wrapf(lng - half_lng, -180.0, 180.0)
 	var east := wrapf(lng + half_lng, -180.0, 180.0)
 	return [clampf(lat - half_lat, -85.0, 85.0), west, clampf(lat + half_lat, -85.0, 85.0), east]

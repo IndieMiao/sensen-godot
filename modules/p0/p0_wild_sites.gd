@@ -49,13 +49,16 @@ static func clear() -> void:
 	_mock_sites = []
 
 ## The sites of a box at a zoom: `done(sites)` once they are in (at once when the box was read already, [] below zoom 9);
-## `failed()` when the read does not come back — the next ask reads again. A box is keyed by its corners to 0.5° and
-## the zoom to a whole level, so a camera nudged a little asks nothing new.
+## `failed()` when the read does not come back — the next ask reads again. The box asked for is the given one grown out
+## to the 0.5° grid (grid_box) and keyed by it and the zoom to a whole level: a camera nudged inside it asks nothing
+## new, and a key read means that very box was read (周瑜 on #708: a box keyed rounded but asked exact missed the strip
+## between).
 static func fetch(session: Node, box: Array, zoom: float, done := Callable(), failed := Callable()) -> void:
 	if box.size() != 4 or session == null: return
 	if zoom < MIN_ZOOM:
 		if done.is_valid(): done.call([])
 		return
+	box = grid_box(box)
 	var key := box_key(box, zoom)
 	if _read.has(key):
 		if done.is_valid(): done.call(in_box(box))
@@ -107,6 +110,16 @@ static func fail(key: String) -> void:
 static func remember(view: Dictionary) -> void:
 	var here = view.get("wild", {}).get("here", null) if view.get("wild", null) is Dictionary else null
 	if here is Dictionary and is_wild(str(here.get("id", ""))): _sites[str(here.id)] = here
+
+## A box [south, west, north, east] grown out to the 0.5° grid (south and west down, north and east up), the latitudes
+## kept within ±90° and the longitudes within ±180° (a west past −180° or an east past 180° wraps: across the line).
+static func grid_box(box: Array) -> Array:
+	var down := func(x: float) -> float: return floorf(x * 2.0) / 2.0
+	var up := func(x: float) -> float: return ceilf(x * 2.0) / 2.0
+	var west: float = down.call(float(box[1]))
+	var east: float = up.call(float(box[3]))
+	return [maxf(-90.0, down.call(float(box[0]))), west + 360.0 if west < -180.0 else west,
+		minf(90.0, up.call(float(box[2]))), east - 360.0 if east > 180.0 else east]
 
 static func box_key(box: Array, zoom: float) -> String:
 	var r := func(x): return str(roundi(float(x) * 2.0))
