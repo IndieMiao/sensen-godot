@@ -1,0 +1,35 @@
+[
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1.1_stunned.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1.1_stunned.png",
+    "sha256": "7def193b29878174bf839dd373c0cdd47ae102f24286cea7b569919dbb686108",
+    "bytes": 70865,
+    "mime": "image/png",
+    "size": [
+      592,
+      710
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1.1_mine_red_720.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1.1_mine_red_720.png",
+    "sha256": "88f51801ed2e3b16c88a9d8056b7eeea50f46ff1dbdfca14124d2fa0517ff981",
+    "bytes": 552701,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1.1_mine_purple_720.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1.1_mine_purple_720.png",
+    "sha256": "88ff1aebc5e3e4d2a7659dff94f376ad938fb4572511b686c73cbce45df3827f",
+    "bytes": 535758,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  }
+]

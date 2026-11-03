@@ -1,0 +1,42 @@
+[
+  {
+    "name": "SGODOT-355_mob_rock_beetle_graybox_three_views.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_graybox_three_views.png",
+    "sha256": "29797bcd6e2b3c1ac1de76fa0f89482957ca50befd79d298d8ef7241ff38d749",
+    "bytes": 183784,
+    "size": [
+      1712,
+      710
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_graybox_actions.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_graybox_actions.png",
+    "sha256": "03b5e0c6ccbd0a20a79fe1db947f2a5535ae9b9e2e521ee257f79b1837063fb5",
+    "bytes": 640160,
+    "size": [
+      2272,
+      1910
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_graybox_mine_360.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_graybox_mine_360.png",
+    "sha256": "b4fe8efc287f2cea3b45c3ac79b9a55c070070c9ebe9a19023fa0468ef1199d3",
+    "bytes": 167722,
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_graybox_mine_720.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_graybox_mine_720.png",
+    "sha256": "b9a762ca366e7974345acbd03e3186be8725a49906d4c31af84e9411cbbff073",
+    "bytes": 534392,
+    "size": [
+      720,
+      1600
+    ]
+  }
+]

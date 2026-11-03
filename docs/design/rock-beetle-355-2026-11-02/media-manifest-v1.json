@@ -1,0 +1,79 @@
+[
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_three_views.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_three_views.png",
+    "sha256": "b03ea530e252f059287a696333bf01b77a17f4c83b9dee298c9b1c8250241049",
+    "bytes": 218584,
+    "mime": "image/png",
+    "size": [
+      1712,
+      710
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_actions.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_actions.png",
+    "sha256": "bbd42542f912d53a7961f1061ce9cfd5aa850238e796b1ad0d7feece6746805d",
+    "bytes": 727679,
+    "mime": "image/png",
+    "size": [
+      2272,
+      1910
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_mine_red_360.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_mine_red_360.png",
+    "sha256": "935b636b6d726a5886e4f396ca4d85a86e0c2f4f114d2262463568538c338d7a",
+    "bytes": 173804,
+    "mime": "image/png",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_mine_red_720.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_mine_red_720.png",
+    "sha256": "bd2903ca996360bcd7f828984fdcd75402a1f04685ccb155bc52083c0762d841",
+    "bytes": 552483,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_mine_purple_360.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_mine_purple_360.png",
+    "sha256": "d11647dfb979349ae851ecac23f1c06354a2165b9d36cc8e74e6d7501ce4c91a",
+    "bytes": 168340,
+    "mime": "image/png",
+    "size": [
+      360,
+      800
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_mine_purple_720.png",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_mine_purple_720.png",
+    "sha256": "343970c26e85859263c8527096b5e407f0113dfbb8aa98f2d3697551cd3641ea",
+    "bytes": 535640,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-355_mob_rock_beetle_v1_motion.mp4",
+    "path": "docs/design/rock-beetle-355-2026-11-02/SGODOT-355_mob_rock_beetle_v1_motion.mp4",
+    "sha256": "4e1cc8c7582561c4d4dfc94c54bdad3572061c901bcef009b39a9c9cae046c1d",
+    "bytes": 164271,
+    "mime": "video/mp4",
+    "size": [
+      720,
+      1600
+    ]
+  }
+]
