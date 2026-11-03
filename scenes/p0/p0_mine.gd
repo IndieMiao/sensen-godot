@@ -204,7 +204,9 @@ func _build_floor(n: int) -> void:
 	var v := _view()
 	var at := P0MaterialLogic.mine_at(v)
 	_day = str(at.get("day", ""))
-	scenery = Art.chamber(n)
+	var type := str(at.get("type", ""))   # the mine type's colours by floor band (contract-efg §10.1, C59)
+	var colours := Art.palette(type, n)
+	scenery = Art.chamber(n, type)
 	add_child(scenery)
 	_room = _walls_box(scenery)
 	objects = Node3D.new()
@@ -235,8 +237,9 @@ func _build_floor(n: int) -> void:
 	_find_facilities(n)
 	# The underground backdrop (SGODOT-257) hangs off the world itself, outside scenery / objects: the camera's walls box
 	# and art edges above never see it, so it frames nothing. Its outer edge fades into the Environment's background.
-	backdrop = MineBackdrop.build(Art.variant_of(n))
+	backdrop = MineBackdrop.build(Art.variant_of(n), type, colours)
 	add_child(backdrop)
+	environment.background_color = colours.get("fog", MineBackdrop.VOID)   # the void the backdrop fades into; no real fog
 	_rebuild_nav(broken)
 
 ## Rocks on this floor (the view's floor_state.rocks): 0 on a guard's floor.
