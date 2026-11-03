@@ -7404,7 +7404,8 @@
   "where": [
    "modules/p0/p0_item_info.gd:462"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "Language": {
   "where": [

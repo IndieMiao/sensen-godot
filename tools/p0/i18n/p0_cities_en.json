@@ -6,7 +6,8 @@
   "country": "Denmark",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Albany": {
   "ids": [
@@ -15,7 +16,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Allentown": {
   "ids": [
@@ -24,7 +26,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Batu Pahat": {
   "ids": [
@@ -33,7 +36,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Bridgeport": {
   "ids": [
@@ -42,7 +46,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Brighton": {
   "ids": [
@@ -51,7 +56,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Cambridge": {
   "ids": [
@@ -60,7 +66,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Cape Coral": {
   "ids": [
@@ -69,7 +76,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Chico": {
   "ids": [
@@ -78,7 +86,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Chongming": {
   "ids": [
@@ -87,7 +96,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Cixi": {
   "ids": [
@@ -96,7 +106,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Concord": {
   "ids": [
@@ -105,7 +116,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Copenhagen": {
   "ids": [
@@ -114,7 +126,8 @@
   "country": "Denmark",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Cuautla": {
   "ids": [
@@ -123,7 +136,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Cuernavaca": {
   "ids": [
@@ -132,7 +146,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Danshui": {
   "ids": [
@@ -141,7 +156,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Dongguan": {
   "ids": [
@@ -150,7 +166,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Dumai": {
   "ids": [
@@ -159,7 +176,8 @@
   "country": "Indonesia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Eastbourne": {
   "ids": [
@@ -168,7 +186,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Fairfield": {
   "ids": [
@@ -177,7 +196,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Fort Lauderdale": {
   "ids": [
@@ -186,7 +206,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Fuji": {
   "ids": [
@@ -195,7 +216,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Gothenburg": {
   "ids": [
@@ -205,7 +227,8 @@
   "homes": [
    "Stockholm",
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Guangzhou": {
   "ids": [
@@ -214,7 +237,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Hartford": {
   "ids": [
@@ -223,7 +247,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Hayward": {
   "ids": [
@@ -232,7 +257,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Helsingborg": {
   "ids": [
@@ -241,7 +267,8 @@
   "country": "Sweden",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Helsinki": {
   "ids": [
@@ -251,7 +278,8 @@
   "homes": [
    "Stockholm",
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Hiratsuka": {
   "ids": [
@@ -260,7 +288,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Hong Kong": {
   "ids": [
@@ -269,7 +298,8 @@
   "country": "",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Huizhou": {
   "ids": [
@@ -278,7 +308,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Huzhou": {
   "ids": [
@@ -287,7 +318,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Iguala de la Independencia": {
   "ids": [
@@ -296,7 +328,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Ipswich": {
   "ids": [
@@ -305,7 +338,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Jiangmen": {
   "ids": [
@@ -314,7 +348,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Jiangyin": {
   "ids": [
@@ -323,7 +358,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Jiaxing": {
   "ids": [
@@ -332,7 +368,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Jinshan": {
   "ids": [
@@ -341,7 +378,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Jyväskylä": {
   "ids": [
@@ -350,7 +388,8 @@
   "country": "Finland",
   "homes": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Jönköping": {
   "ids": [
@@ -360,7 +399,8 @@
   "homes": [
    "Stockholm",
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Kiel": {
   "ids": [
@@ -369,7 +409,8 @@
   "country": "Germany",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Kluang": {
   "ids": [
@@ -378,7 +419,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Kofu": {
   "ids": [
@@ -387,7 +429,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Kuantan": {
   "ids": [
@@ -396,7 +439,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Kuopio": {
   "ids": [
@@ -405,7 +449,8 @@
   "country": "Finland",
   "homes": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Lahti": {
   "ids": [
@@ -414,7 +459,8 @@
   "country": "Finland",
   "homes": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Lakeland": {
   "ids": [
@@ -423,7 +469,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Lancaster": {
   "ids": [
@@ -432,7 +479,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Linköping": {
   "ids": [
@@ -441,7 +489,8 @@
   "country": "Sweden",
   "homes": [
    "Stockholm"
-  ]
+  ],
+  "done": true
  },
  "London": {
   "ids": [
@@ -450,7 +499,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Long Beach": {
   "ids": [
@@ -459,7 +509,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Los Angeles": {
   "ids": [
@@ -479,7 +530,8 @@
   "country": "Germany",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Maidstone": {
   "ids": [
@@ -488,7 +540,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Malacca": {
   "ids": [
@@ -497,7 +550,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Maran": {
   "ids": [
@@ -506,7 +560,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Matanzas": {
   "ids": [
@@ -515,7 +570,8 @@
   "country": "Cuba",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Mexico City": {
   "ids": [
@@ -524,7 +580,8 @@
   "country": "",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Miami": {
   "ids": [
@@ -533,7 +590,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Milton Keynes": {
   "ids": [
@@ -542,7 +600,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Mito": {
   "ids": [
@@ -551,7 +610,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Modesto": {
   "ids": [
@@ -560,7 +620,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Muar": {
   "ids": [
@@ -569,7 +630,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Nantong": {
   "ids": [
@@ -578,7 +640,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Nassau": {
   "ids": [
@@ -587,7 +650,8 @@
   "country": "Bahamas",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "New York City": {
   "ids": [
@@ -596,7 +660,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Ningbo": {
   "ids": [
@@ -605,7 +670,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Oceanside": {
   "ids": [
@@ -614,7 +680,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Odense": {
   "ids": [
@@ -623,7 +690,8 @@
   "country": "Denmark",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Orlando": {
   "ids": [
@@ -632,7 +700,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Oxford": {
   "ids": [
@@ -641,7 +710,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Oxnard": {
   "ids": [
@@ -650,7 +720,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Oyama": {
   "ids": [
@@ -659,7 +730,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Pachuca de Soto": {
   "ids": [
@@ -668,7 +740,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Palm Bay": {
   "ids": [
@@ -677,7 +750,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Pekanbaru": {
   "ids": [
@@ -686,7 +760,8 @@
   "country": "Indonesia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Philadelphia": {
   "ids": [
@@ -695,7 +770,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Pingshan": {
   "ids": [
@@ -704,7 +780,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Pomona": {
   "ids": [
@@ -713,7 +790,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Port Saint Lucie": {
   "ids": [
@@ -722,7 +800,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Providence": {
   "ids": [
@@ -731,7 +810,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Pskov": {
   "ids": [
@@ -740,7 +820,8 @@
   "country": "Russia",
   "homes": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Puebla": {
   "ids": [
@@ -749,7 +830,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Reading": {
   "ids": [
@@ -758,7 +840,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Riga": {
   "ids": [
@@ -767,7 +850,8 @@
   "country": "Latvia",
   "homes": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Riverside": {
   "ids": [
@@ -776,7 +860,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Rostock": {
   "ids": [
@@ -785,7 +870,8 @@
   "country": "Germany",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Sacramento": {
   "ids": [
@@ -794,7 +880,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Saint Peters": {
   "ids": [
@@ -803,7 +890,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Saint Petersburg": {
   "ids": [
@@ -812,7 +900,8 @@
   "country": "Russia",
   "homes": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Sakura": {
   "ids": [
@@ -821,7 +910,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Salinas": {
   "ids": [
@@ -830,7 +920,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "San Francisco": {
   "ids": [
@@ -850,7 +941,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "San Juan del Río": {
   "ids": [
@@ -859,7 +951,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "San Martin Texmelucan de Labastida": {
   "ids": [
@@ -868,7 +961,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Santa Clarita": {
   "ids": [
@@ -877,7 +971,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Santa Rosa": {
   "ids": [
@@ -886,7 +981,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Santiago de Querétaro": {
   "ids": [
@@ -895,7 +991,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Seremban": {
   "ids": [
@@ -904,7 +1001,8 @@
   "country": "Malaysia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Shanghai": {
   "ids": [
@@ -913,7 +1011,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Shanwei": {
   "ids": [
@@ -922,7 +1021,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Shenzhen": {
   "ids": [
@@ -931,7 +1031,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Singapore": {
   "ids": [
@@ -940,7 +1041,8 @@
   "country": "",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Southend-on-Sea": {
   "ids": [
@@ -949,7 +1051,8 @@
   "country": "United Kingdom",
   "homes": [
    "London"
-  ]
+  ],
+  "done": true
  },
  "Springfield": {
   "ids": [
@@ -958,7 +1061,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Stamford": {
   "ids": [
@@ -967,7 +1071,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Stockholm": {
   "ids": [
@@ -977,7 +1082,8 @@
   "homes": [
    "Stockholm",
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Stockton": {
   "ids": [
@@ -986,7 +1092,8 @@
   "country": "United States",
   "homes": [
    "San Francisco"
-  ]
+  ],
+  "done": true
  },
  "Suzhou": {
   "ids": [
@@ -995,7 +1102,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Szczecin": {
   "ids": [
@@ -1004,7 +1112,8 @@
   "country": "Poland",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Takasaki": {
   "ids": [
@@ -1013,7 +1122,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Tallinn": {
   "ids": [
@@ -1023,7 +1133,8 @@
   "homes": [
    "Stockholm",
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Tampa": {
   "ids": [
@@ -1032,7 +1143,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Tampere": {
   "ids": [
@@ -1042,7 +1154,8 @@
   "homes": [
    "Stockholm",
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Tanjung Pinang": {
   "ids": [
@@ -1051,7 +1164,8 @@
   "country": "Indonesia",
   "homes": [
    "Singapore"
-  ]
+  ],
+  "done": true
  },
  "Temecula": {
   "ids": [
@@ -1060,7 +1174,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Thousand Oaks": {
   "ids": [
@@ -1069,7 +1184,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Tokyo": {
   "ids": [
@@ -1078,7 +1194,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Toluca": {
   "ids": [
@@ -1087,7 +1204,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Tsukuba": {
   "ids": [
@@ -1096,7 +1214,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Tulancingo": {
   "ids": [
@@ -1105,7 +1224,8 @@
   "country": "Mexico",
   "homes": [
    "Mexico City"
-  ]
+  ],
+  "done": true
  },
  "Turku": {
   "ids": [
@@ -1115,7 +1235,8 @@
   "homes": [
    "Stockholm",
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Uppsala": {
   "ids": [
@@ -1124,7 +1245,8 @@
   "country": "Sweden",
   "homes": [
    "Stockholm"
-  ]
+  ],
+  "done": true
  },
  "Utsunomiya": {
   "ids": [
@@ -1133,7 +1255,8 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  },
  "Victorville": {
   "ids": [
@@ -1142,7 +1265,8 @@
   "country": "United States",
   "homes": [
    "Los Angeles"
-  ]
+  ],
+  "done": true
  },
  "Västerås": {
   "ids": [
@@ -1151,7 +1275,8 @@
   "country": "Sweden",
   "homes": [
    "Stockholm"
-  ]
+  ],
+  "done": true
  },
  "Waterbury": {
   "ids": [
@@ -1160,7 +1285,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "West Palm Beach": {
   "ids": [
@@ -1169,7 +1295,8 @@
   "country": "United States",
   "homes": [
    "Miami"
-  ]
+  ],
+  "done": true
  },
  "Worcester": {
   "ids": [
@@ -1178,7 +1305,8 @@
   "country": "United States",
   "homes": [
    "New York City"
-  ]
+  ],
+  "done": true
  },
  "Wuxi": {
   "ids": [
@@ -1187,7 +1315,8 @@
   "country": "China",
   "homes": [
    "Shanghai"
-  ]
+  ],
+  "done": true
  },
  "Zhongshan": {
   "ids": [
@@ -1196,7 +1325,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Zhuhai": {
   "ids": [
@@ -1205,7 +1335,8 @@
   "country": "China",
   "homes": [
    "Hong Kong"
-  ]
+  ],
+  "done": true
  },
  "Århus": {
   "ids": [
@@ -1214,7 +1345,8 @@
   "country": "Denmark",
   "homes": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Örebro": {
   "ids": [
@@ -1223,7 +1355,8 @@
   "country": "Sweden",
   "homes": [
    "Stockholm"
-  ]
+  ],
+  "done": true
  },
  "Ōta": {
   "ids": [
@@ -1232,6 +1365,7 @@
   "country": "Japan",
   "homes": [
    "Tokyo"
-  ]
+  ],
+  "done": true
  }
 }
