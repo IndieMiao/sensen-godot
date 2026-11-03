@@ -199,7 +199,11 @@ func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() 
 	assert_str(TranslationServer.get_locale()).is_equal("zh_CN")   # before_test's; select does not switch now
 	assert_str(loc.p0_language(path)).is_equal("zh_CN")
 	TranslationServer.set_locale("en")
+	# the pick alone: a run with SENSEN_LANGUAGE (the QA override use_p0 honours) set would win over it
+	var override := OS.get_environment("SENSEN_LANGUAGE")
+	OS.unset_environment("SENSEN_LANGUAGE")
 	loc.use_p0(path)   # the next start: P0's table in, Journey's (this instance's) out, the picked locale
+	if override != "": OS.set_environment("SENSEN_LANGUAGE", override)
 	assert_str(TranslationServer.get_locale()).is_equal("zh_CN")
 	assert_object(loc._journey).is_null()
 	assert_object(loc.p0_translation).is_not_null()
