@@ -19,7 +19,8 @@ func test_the_support_code_is_the_shared_function_of_the_id() -> void:
 		assert_bool(c in "ILOU").override_failure_message(c).is_false()
 
 func test_the_privacy_policy_opens_by_platform_once_live() -> void:
-	assert_str(P0Legal.privacy_url("iOS")).is_equal("")   # PRIVACY_LIVE false until the pages are up: no row
+	assert_str(P0Legal.privacy_url("iOS")).is_equal("https://gensen.app/privacy")   # PRIVACY_LIVE: the pages are up
+	assert_str(P0Legal.privacy_url("iOS", false)).is_equal("")   # not live: no row
 	assert_str(P0Legal.privacy_url("iOS", true)).is_equal("https://gensen.app/privacy")
 	assert_str(P0Legal.privacy_url("Android", true)).is_equal("https://gensen.app/privacy-android")
 
