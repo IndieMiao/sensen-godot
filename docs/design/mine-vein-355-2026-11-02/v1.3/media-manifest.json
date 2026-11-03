@@ -1,0 +1,30 @@
+[
+  {
+    "file": "SGODOT-355_mine_vein_v1.3_bands.jpg",
+    "bytes": 869077,
+    "sha256": "109a927869d81575f166cc5ba83e309cf6aa7bed2bb355a0f1e7c9889c0ba3f8",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1.3_band_21_30.jpg",
+    "bytes": 197161,
+    "sha256": "eb21e2a6e46ee4304b6ef9c635d0478ec70653bacb0bb4f8d49af67d200d1515",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1.3_band_31_40.jpg",
+    "bytes": 193565,
+    "sha256": "e2dd6ef165057dc5faebc40e5abe81f263c00a6e8924cdcfd6a3e8cc7f100bfe",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1.3_validation.json",
+    "bytes": 489789,
+    "sha256": "320c9b9f511c9ff5d3c1089a8c6d87a1faf81918c752128c10652b267e5fe273",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

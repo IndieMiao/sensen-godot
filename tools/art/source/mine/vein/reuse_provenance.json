@@ -1,0 +1,64 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "stage": "v1.2",
+  "source": "assets/mine/backdrop/source/mine_backdrop.blend",
+  "source_sha256": "11fa87714ac6ff77a2abf6a659b1980607691615e4826e4a08185a83d70d14aa",
+  "removed_exterior_details": [
+    "02_Rock_Mass_41",
+    "02_Rock_Mass_42",
+    "02_Rock_Mass_43",
+    "02_Rock_Mass_44",
+    "02_Rock_Mass_45",
+    "02_Rock_Mass_46",
+    "02_Rock_Mass_47",
+    "02_Rock_Mass_48",
+    "02_Rock_Mass_49",
+    "02_Rock_Mass_50",
+    "02_Rock_Mass_51",
+    "02_Rock_Mass_52",
+    "02_Rock_Mass_53",
+    "02_Rock_Mass_54",
+    "02_Rock_Mass_55",
+    "02_Rock_Mass_56",
+    "03_Embedded_Stone_00",
+    "03_Embedded_Stone_02",
+    "03_Embedded_Stone_04",
+    "03_Embedded_Stone_09",
+    "03_Embedded_Stone_10",
+    "03_Embedded_Stone_11",
+    "03_Embedded_Stone_12",
+    "03_Embedded_Stone_13",
+    "03_Embedded_Stone_17",
+    "04_Dead_Root_00",
+    "04_Dead_Root_01",
+    "04_Dead_Root_02"
+  ],
+  "depth_only_clamped_vertices": 8,
+  "triangles": 3595,
+  "surfaces": 1,
+  "runtime_sha256": "1b25eaef77880ab795d286d5e6501fbc4a5209afce099484b2c736f0d2b55aca",
+  "axes": {
+    "N": [
+      0.1831163465976715,
+      0.6819983720779419,
+      0.7080583572387695
+    ],
+    "R": [
+      0.9681476354598999,
+      0.0,
+      -0.2503800094127655
+    ],
+    "U": [
+      -0.17075875401496887,
+      0.7313537001609802,
+      -0.6602751016616821
+    ]
+  },
+  "changes": [
+    "Retain protected inner footprint and camera-space alignment; runtime retains the 1m forward offset.",
+    "Variable-width kinked mineral vein runs diagonally behind the mine, exposed in upper and lower background.",
+    "UV2.x retains edge fade; UV2.y is 1 only for un-tinted mineral color; remaining rock is grayscale.",
+    "v1.2: quartz RGB reduced to pale lavender sRGB luma .55-.65 with existing facet shading; rust, shape, position, UV and UID retained. Only F21-40 ground palette entries brighten to cool blue for ore separation."
+  ]
+}

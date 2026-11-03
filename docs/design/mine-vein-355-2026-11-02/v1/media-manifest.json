@@ -1,0 +1,51 @@
+[
+  {
+    "file": "SGODOT-355_mine_vein_v1_bands.jpg",
+    "bytes": 868803,
+    "sha256": "020e7cf5fcc275d39ce732be34436df5e862634278eff552ed89bd8bcbed0c0e",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1_band_01_10.jpg",
+    "bytes": 206893,
+    "sha256": "3e325f0a7c7cc306b7a4bdfffe8f61b758cdf7b697fb568a1b50c949bf3cdc80",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1_band_11_20.jpg",
+    "bytes": 200460,
+    "sha256": "48cd540fdcb942a9173941e3daad97304489f7441aa4946c7c598996ddcf7937",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1_band_21_30.jpg",
+    "bytes": 195121,
+    "sha256": "b5266cbabf3cbbad93b2ba1771bb28a7a3992fd7a25109fafb22e9b63398d4f7",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1_band_31_40.jpg",
+    "bytes": 193174,
+    "sha256": "f44072a76c22e53113e5e2dc641cc01a4ea5f311ff4ddb31d9c9c66b0b65cfc2",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1_guard_40.jpg",
+    "bytes": 196783,
+    "sha256": "7957ae6fcdf184cd0264445c2c81e28ec55630ea82302f9489e991ee0be74ecd",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_mine_vein_v1_validation.json",
+    "bytes": 481393,
+    "sha256": "01fe58f1612bd2a7c7ea9af5d4e28a29d480e0f7f61755d59fc7edef6a5d534c",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
