@@ -1,0 +1,16 @@
+[
+  {
+    "file": "SGODOT-325_skin_B_v1.1_N2_sign_Service_Hall.jpg",
+    "bytes": 199059,
+    "sha256": "b4b909802c8f5ae51bc5103a2ccb2024982861ffb342ad9cabd9e2294214dc39",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-325_skin_B_v1.1_validation.json",
+    "bytes": 55464,
+    "sha256": "1f8836c7fc0c3588ef24daaaec78b148954fad2cf86e455dbbe4c777a1f4ef1d",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

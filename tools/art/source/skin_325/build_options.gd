@@ -145,8 +145,8 @@ func build_sign(room, prefix, anchor):
 	node.material_override = mat
 	option.add_child(node)
 	save_scene(option, prefix + "variants/b/sign_patch.tscn")
-	evidence.signs[room] = {"patch_size_m":[size.x,size.y], "writing_size_m":anchor.size,
-		"writing_anchor":"sign_name", "writing_offset_m":[0,0,.009], "baked_text":false}
+	evidence.signs[room] = {"patch_size_m":[size.x,size.y], "writing_size_m":anchor.size if n1 else [.66,.23],
+		"writing_anchor":"sign_name", "writing_offset_m":[0 if n1 else .10,0,.009], "baked_text":false}
 	option.free()
 	return {"parent":".","hide_meshes":[],"scene":"variants/b/sign_patch.tscn"}
 
@@ -171,7 +171,8 @@ func build():
 			"material_source_atlas":a_atlas,"options":options,
 			"variants":{"A":{"atlas":a_atlas,"enabled_options":[],"sign":{"anchor":"sign_name","size_m":anchor.size,"offset_m":[0,0,0]}},
 			"B":{"atlas":"room_albedo_ao_b.png","enabled_options":enabled,
-				"sign":{"anchor":"sign_name","size_m":anchor.size,"offset_m":[0,0,.009],"baked_text":false}}}}
+				"sign":{"anchor":"sign_name","size_m":anchor.size if room=="poi_hotel_lobby" else [.66,.23],
+					"offset_m":[0 if room=="poi_hotel_lobby" else .10,0,.009],"baked_text":false}}}}
 		write_json(prefix + "variants.json",manifest)
 	evidence.passed = evidence.checks.all(func(c):return c.passed)
 	write_json("res://../options-validation.json", evidence)

@@ -60,7 +60,9 @@ for room in ['poi_hotel_lobby', 'poi_service_hall']:
             check(np.array_equal(a[y:y+128,x:x+128],b[y:y+128,x:x+128]), 'N2 plant tile ' + str([x,y]))
     check(manifest['variants']['A']['atlas'] == a_name and manifest['default_variant'] == 'A', room + ': A is still default')
     check(manifest['variants']['A']['enabled_options'] == [], room + ': no B options in A')
-    check(manifest['variants']['A']['sign']['size_m'] == manifest['variants']['B']['sign']['size_m'], room + ': writing area not reduced')
+    expected_sign = [1.6,.22] if room == 'poi_hotel_lobby' else [.66,.23]
+    check(manifest['variants']['B']['sign']['size_m'] == expected_sign, room + ': approved v1.1 writing area')
+    check(manifest['variants']['B']['sign']['offset_m'] == ([0,0,.009] if room == 'poi_hotel_lobby' else [.1,0,.009]), room + ': approved room-space text offset')
     for option in manifest['options'].values():
         check((kit/option['scene']).is_file(), room + ': switch resource exists ' + option['scene'])
     for name in ['room_albedo_ao_b.png','sign_b.png']:
@@ -68,19 +70,21 @@ for room in ['poi_hotel_lobby', 'poi_service_hall']:
         imported = (kit/(name+'.import')).read_text()
         uid = re.search(r'uid="([^"]+)"', imported)[1]
         uids.append(uid)
-        check(imported.split('[params]',1)[1].strip() == source.split('[params]',1)[1].strip(), room + ': inherited import params for ' + name)
+        expected_params = source.split('[params]',1)[1].strip()
+        if name == 'sign_b.png':expected_params = re.sub(r'detect_3d/compress_to=\d+', 'detect_3d/compress_to=2', expected_params)
+        check(imported.split('[params]',1)[1].strip() == expected_params, room + ': inherited import params with approved sign compression for ' + name)
         check(uid != re.search(r'uid="([^"]+)"',source)[1], room + ': independent texture uid ' + name)
         report['images'][str((kit/name).relative_to(ROOT))] = {'sha256':digest((kit/name).read_bytes()),'uid':uid}
     sign = np.array(Image.open(kit/'sign_b.png').convert('RGB'))
     if room == 'poi_hotel_lobby':
         check(np.unique(sign.reshape(-1,3),axis=0).shape[0] == 1, 'N1 entire sign has no baked text or marks')
     else:
-        check(np.unique(sign[35:265,360:1240].reshape(-1,3),axis=0).tolist() == [[247,251,247]], 'N2 0.88 x 0.23 m writing region is completely blank')
+        check(np.unique(sign[35:265,570:1230].reshape(-1,3),axis=0).tolist() == [[247,251,247]], 'N2 0.66 x 0.23 m writing region at +X .10 is completely blank')
         check(np.unique(sign.reshape(-1,3),axis=0).tolist() == [[62,158,106],[247,251,247]], 'N2 sign contains only white and approved green cross')
 check(len(uids) == len(set(uids)), 'All four new texture UIDs are distinct')
 options = json.loads((OUT/'options-validation.json').read_text())
 check(options['passed'], 'Offline option geometry checks passed')
-report['options'] = options
+report['options_geometry'] = {key:options[key] for key in ['niches','checks','passed']}
 report['passed'] = all(c['passed'] for c in report['checks'])
 (OUT/'preservation-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(len(report['checks']), 'checks; preserved', len(files), 'files /', report['original_glbs'], 'GLBs; passed:', report['passed'])

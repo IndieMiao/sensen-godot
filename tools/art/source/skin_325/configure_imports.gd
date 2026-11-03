@@ -11,6 +11,7 @@ func _initialize():
 			assert(config.load(prefix + name + ".import") == OK)
 			for key in original.get_section_keys("params"):
 				config.set_value("params", key, original.get_value("params", key))
+			if name == "sign_b.png":config.set_value("params", "detect_3d/compress_to", 2)
 			assert(config.has_section_key("remap", "uid"))
 			assert(config.save(prefix + name + ".import") == OK)
 	print("B texture imports inherit their room A settings; unique UIDs retained")

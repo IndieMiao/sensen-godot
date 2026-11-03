@@ -120,7 +120,8 @@ func apply_variant(id):
 		for path in option.hide_meshes:
 			check(room.get_node(path) is MeshInstance3D,"Switch hides only mesh, keeps collision: "+path)
 			room.get_node(path).visible=false
-	check(variant.sign.size_m==manifest.variants.A.sign.size_m,room_id+": writing area matches A")
+	var expected_size=[.66,.23] if room_id=="poi_service_hall" and id=="B" else manifest.variants.A.sign.size_m
+	check(variant.sign.size_m==expected_size,room_id+": approved writing area "+id)
 	report.rooms[room_id]["variant_"+id]={"atlas":variant.atlas,"surfaces":count,"enabled_options":variant.enabled_options,"sign":variant.sign}
 func structural_signature():
 	var result={}
@@ -163,9 +164,39 @@ func run_room(id):
 	for node in room.find_children("*","MeshInstance3D",true,false):
 		check(node.visible,prefix+": A original mesh visible "+str(room.get_path_to(node)))
 	vp.queue_free();await get_tree().process_frame;await get_tree().process_frame
+func sign_detail():
+	setup("poi_service_hall");apply_variant("B")
+	var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://assets/rooms/poi_service_hall/variants.json"))
+	var spec=manifest.variants.B.sign;var anchor=room.get_node(spec.anchor)
+	var label=Label3D.new();label.name="RuntimeSignProof";label.text="Service Hall"
+	label.font=ThemeDB.fallback_font;label.font_size=64;label.outline_size=0
+	label.modulate=Color("37564A");label.shaded=true
+	label.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var font_width=label.font.get_string_size(label.text,HORIZONTAL_ALIGNMENT_LEFT,-1,label.font_size).x
+	label.pixel_size=minf(spec.size_m[0]*.94/font_width,spec.size_m[1]*.94/label.font.get_height(label.font_size))
+	room.add_child(label);label.position=anchor.position+vec(spec.offset_m)
+	# The legacy marker points -Z; Label3D's visible face points +Z.
+	label.rotation_degrees.y=fposmod(anchor.rotation_degrees.y+180.,360.)
+	vp.size=Vector2i(1600,800);camera.size=1.9;camera.rotation_degrees=Vector3(-15,15,0)
+	camera.position=anchor.position+Vector3(-.12,0,0)+camera.basis.z*22
+	for i in 8:await RenderingServer.frame_post_draw
+	var bounds=label.get_aabb();var left=label.position.x+bounds.position.x
+	var right=left+bounds.size.x;var cross_right=anchor.position.x-.8+.235
+	check(is_zero_approx(label.rotation_degrees.y),"Text faces same +Z side as green cross at marker yaw 180")
+	check(bounds.size.x>0 and bounds.size.x<=spec.size_m[0] and bounds.size.y<=spec.size_m[1],"Actual runtime text fits .66 x .23m writing area")
+	check(left>cross_right+.02,"Runtime Service Hall is physically to the right of the green cross")
+	check(left>=anchor.position.x+.1-.33 and right<=anchor.position.x+.1+.33,"Runtime text remains inside the offset B writing area")
+	report.sign={"text":label.text,"anchor_yaw":anchor.rotation_degrees.y,"text_yaw":label.rotation_degrees.y,
+		"size_m":spec.size_m,"room_space_offset_m":spec.offset_m,"actual_text_size_m":[bounds.size.x,bounds.size.y],
+		"text_x_range_m":[left,right],"cross_right_x_m":cross_right,"clear_gap_m":left-cross_right,"baked_text":false}
+	await capture("N2_sign_Service_Hall")
+	vp.queue_free();await get_tree().process_frame
 func run():
-	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
-	for id in ["poi_hotel_lobby","poi_service_hall"]:await run_room(id)
+	var detail=OS.get_cmdline_user_args().has("--sign-detail")
+	output=ProjectSettings.globalize_path("res://../captures-v1.1" if detail else "res://../captures");DirAccess.make_dir_recursive_absolute(output)
+	if detail:await sign_detail()
+	else:
+		for id in ["poi_hotel_lobby","poi_service_hall"]:await run_room(id)
 	report.passed=report.checks.all(func(c):return c.passed)
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	var file=FileAccess.open(output+"/godot-validation.json",FileAccess.WRITE);file.store_string(JSON.stringify(report,"\t")+"\n");file.close()

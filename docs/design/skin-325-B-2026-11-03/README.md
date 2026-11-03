@@ -1,5 +1,7 @@
 # SGODOT-325 N1 / N2 B 皮肤 v1
 
+最新增量为 **v1.1**，见 `v1.1/README.md`：按 325 fa8c70a2，N2 B 可写区收为 0.66 × 0.23 m、沿房间 +X 偏 0.10 m；下文和 v1 图是原交付记录。
+
 【黄忠】按 C61（325 d1e61761）及色板 v0.1 正式制作。
 分支 `wp-3d-scene-huangzhong-skin-325`，目标 `wp-3d-scene`，草稿 PR，未合并。
 

@@ -7,7 +7,7 @@
 ## 复现
 
 在仓库根目录执行。只在 `output/skin-325-v1/project` 导入，避免编辑器回写原资产。
-首次生成新图片的 `.import` 后，`configure_imports.gd` 逐项复制对应 A 图集的参数，保留新 UID。
+首次生成新图片的 `.import` 后，`configure_imports.gd` 逐项复制对应 A 图集的参数，保留新 UID；两张门头图的 `detect_3d/compress_to` 按 v1.1 统一为 2。
 后续运行先复制仓库现有 B `.import`，因此 UID 保持。
 
 ```bash
@@ -38,7 +38,7 @@ output/art-setup/venv/bin/python tools/art/source/skin_325/package_review.py
 - `options.<id>.scene`：静态 PackedScene；挂在 `parent` 所指的原房间节点下，保持资源内的局部变换。
 - `options.<id>.hide_meshes`：仅隐藏这些 MeshInstance3D；不能隐藏父节点或碰撞。路径相对房间根。
 - 切换款式先移除前一款的选项实例、恢复被隐藏的原 mesh，再换图集并启用新选项。
-- `sign.anchor` 和 `size_m`：原 `sign_name` 挂点及可写区。`offset_m` 是**房间坐标系**下的贴片前移量，保留原挂点朝向约定，文字面朝房间 +Z。
+- `sign.anchor` 和 `size_m`：原 `sign_name` 挂点及可写区。`offset_m` 是**房间坐标系**下的写字区中心偏移，保留原挂点朝向约定，文字面朝房间 +Z。原 marker yaw=180 指向 -Z；使用正面 +Z 的 Label3D 时相对 marker 再转 180°，不能把房间坐标的偏移再次乘 marker basis。
 
 `review.gd` 演示以上约定，并验证 A -> B -> A。它只存在美术工具目录，不是已接入客户端的加载器。
 
@@ -46,7 +46,14 @@ output/art-setup/venv/bin/python tools/art/source/skin_325/package_review.py
 
 N1 贴片 1.60 × 0.22 m，纯 `#F3ECE2`，没有字或标记；保留壁炉。
 N2 贴片 1.28 × 0.30 m，相对原写字区向左扩出绿十字，白底 `#F7FBF7`、十字 `#3E9E6A`。
-贴片中心相对原字区左移 0.16 m；原 0.88 × 0.23 m 的字区完整保留，中心不动，右侧不烤字。
+贴片中心相对原挂点左移 0.16 m。按上官婉儿 v1.1 指示，B 可写区改为 0.66 × 0.23 m，中心相对原挂点沿房间 +X 偏 0.10 m；A 仍为原 0.88 × 0.23 m。两张 PNG 本身不烤字。
+
+门头文字近景单独运行（不用重出全套图）：
+
+```bash
+godot --path output/skin-325-v1/project --rendering-method mobile --rendering-driver vulkan -- --sign-detail
+output/art-setup/venv/bin/python tools/art/source/skin_325/package_sign_review.py
+```
 
 N2 原龛框和陈列合在一个 mesh，因此不能直接开关单独陈列节点。
 `build_options.gd` 离线按已批小样同一位置/UV 条件去掉陈列三角形，保留框架的顶点、UV、颜色和变换，
