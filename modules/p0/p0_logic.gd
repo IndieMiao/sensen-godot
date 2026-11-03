@@ -2155,8 +2155,10 @@ static func market_sell_line(view: Dictionary) -> String:
 	if bool(d.get("home", true)): return "I'll take your %s. Same price as your stall." % things
 	return "%s? I'll take them, though home pays better." % (things.left(1).to_upper() + things.substr(1))
 
-## Small counts in keeper speech ("sows three plots"), digits from ten up.
+## Small counts in keeper speech ("sows three plots"), digits from ten up; digits under 中文 (「一次能播 3 块田」, 0.2.23 —
+## the English word stayed in the Chinese line).
 static func _count_word(n: int) -> String:
+	if TranslationServer.get_locale() == "zh_CN": return str(n)
 	var words := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 	return words[n] if n >= 0 and n < words.size() else str(n)
 

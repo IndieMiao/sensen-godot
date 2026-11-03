@@ -90,8 +90,7 @@ static func _home_outposts(h: Dictionary) -> Array:
 ## A pond's best bite today: the Bite Board keeper's sentence for that pond's fish (q(119): the landable fish with the
 ## highest factor now and today, its time and weather words), without the bait — `Rainbow Trout bite in the rain`.
 static func bite_line(place: Dictionary, level: int, caught: Dictionary) -> String:
-	var said := Board.line(place.get("fish", []), str(place.get("weather", "")), level, caught)
-	return said.split(". ")[0].trim_suffix(".")
+	return Board.line(place.get("fish", []), str(place.get("weather", "")), level, caught, false)
 
 static func _before(a: Dictionary, b: Dictionary) -> bool:
 	if a._first != b._first: return a._first
