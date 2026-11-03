@@ -3621,7 +3621,7 @@ func open_settings(back := Callable(), read := true) -> void:
 		safe_top(), safe_bottom(), load("res://modules/p0/p0_home_pick.gd").settings_row(view, P0Travel.now_ms(view)),
 		("On" if notify.switch_on() else "Off") if notify != null and notify.available() else "",
 		(_blocked.size() if _blocked_read else P0SettingsPage.BLOCKED_UNREAD) if _privacy_shown else P0SettingsPage.BLOCKED_NONE,
-		_voice_offered, LANGUAGE_NAMES.get(Localization.p0_language(), "English"))
+		_voice_offered, LANGUAGE_NAMES.get(TranslationServer.get_locale(), "English"))   # the language on screen (不知火舞 A6), not a pick for the next start
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
 	page.open_pressed.connect(func(what: String):
