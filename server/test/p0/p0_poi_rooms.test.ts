@@ -1,7 +1,7 @@
 /** Enterable POIs (SGODOT-313, plan poi-enter-plan-2026-11-03): the template table, POI room ids, a room's spec. */
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
-import { loadPoiTemplates, parsePoiRoom, poiPassPlace, poiRoomSpec, templateFor } from '../../src/p0/online/poi.js';
+import { loadPoiTemplates, parsePoiRoom, poiName, poiPassPlace, poiRoomKey, poiRoomSpec, templateFor } from '../../src/p0/online/poi.js';
 import { freshState } from '../../src/p0/state.js';
 import { requirePass } from '../../src/p0/travel.js';
 
@@ -18,12 +18,35 @@ describe('enterable POI rooms (SGODOT-313)', () => {
     expect(table.templates.service_hall.sign).toBe('sign_name');
     expect(table.templates.city_park.bounds).toEqual([-4, 4, -4, 4]);
   });
-  it('picks by maki, else class, else none', () => {
+  it('picks by maki (any -JP cut off), else class, else none (q(279) ③)', () => {
     expect(templateFor(table, 'lodging', '')).toBe('hotel_lobby');
     expect(templateFor(table, 'bank', 'commercial_services')).toBe('service_hall');
     expect(templateFor(table, 'library', 'education')).toBe('classroom');
+    expect(templateFor(table, 'dog-park', '')).toBe('city_park');
+    expect(templateFor(table, 'hospital-JP', 'medical')).toBe('service_hall');   // Japan's tiles
+    expect(templateFor(table, 'school-JP', '')).toBe('classroom');
     expect(templateFor(table, 'picnic-site', 'park_like')).toBe('city_park');   // no maki row: its class's
+    expect(templateFor(table, '', 'public_facilities')).toBe('service_hall');   // a community centre, a courthouse
+    expect(templateFor(table, '', 'education')).toBe('classroom');
+    expect(templateFor(table, 'dentist', 'medical')).toBe('');                  // medical is no class row: doctor / hospital only
+    expect(templateFor(table, 'post', 'public_facilities')).toBe('');            // post offices wait for E9, whatever their class
+    expect(templateFor(table, 'religious-christian', 'public_facilities')).toBe('');
+    expect(templateFor(table, 'place-of-worship', '')).toBe('');
     expect(templateFor(table, 'restaurant', 'food_and_drink')).toBe('');        // no Go in
+  });
+  it("one class name for card, door and chip: by maki, else the template's (q(279) ⑥)", () => {
+    expect(poiName(table, 'doctor', 'medical')).toBe('Clinic');
+    expect(poiName(table, 'hospital-JP', 'medical')).toBe('Hospital');
+    expect(poiName(table, 'pitch', 'park_like')).toBe('Sports Field');
+    expect(poiName(table, 'dog-park', 'park_like')).toBe('Park');               // no name of its own
+    expect(poiName(table, '', 'public_facilities')).toBe('Service Hall');
+    expect(poiName(table, '', 'education')).toBe('School');
+    expect(poiName(table, 'cafe', 'food_and_drink')).toBe('');
+  });
+  it("a POI's room key: the first 12 hex of the SHA-256 of its id, as every phone works it out (亚瑟, D)", () => {
+    expect(poiRoomKey('tile:1086226316')).toBe('3c0834443165');                       // a tile feature id
+    expect(poiRoomKey('tile:Fern Pond Café:-122.4194:37.7749')).toBe('fb9518b82257');   // none: name and place, UTF-8
+    expect(parsePoiRoom(`poi:hotel_lobby@${SF}:${poiRoomKey('tile:1086226316')}`)?.key).toBe('3c0834443165');
   });
   it('a room id names a template, a city and 12 hex of the tile id; anything else is no POI room', () => {
     expect(parsePoiRoom('poi:hotel_lobby@gn-5391959:0123456789ab')).toEqual({ template: 'hotel_lobby', cluster: 'gn-5391959', key: '0123456789ab' });

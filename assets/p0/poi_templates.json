@@ -1,5 +1,5 @@
 {
- "_note": "Enterable POIs (SGODOT-313; the user 11-03 \"POI 提前\", 奕星 via terminal, no message id; plan pm/plans/poi-enter-plan-2026-11-03.md; q row pending — the maki / class rows below are the plan's proposal until 李白's q row settles them). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the door's words and the anchor they go on, `sign`). A POI's room is `poi:<template>@<city cluster>:<tile id>` — the tile feature id changes when Mapbox updates its tiles, so it is a room key only, never saved. Pick: the POI's maki, else its class, else no Go in.",
+ "_note": "Enterable POIs (SGODOT-313; q(279) eaf3edc1, pending the user; plan pm/plans/poi-enter-plan-2026-11-03.md). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the anchor its door words go on, `sign`). Pick: the POI's maki with any -JP cut off, else its class, else no Go in; a maki in `skip` has none whatever its class (post offices wait for E9, religious ones are a card only; `*` ends a prefix); `medical` is no class row (dentists, vets, pharmacies). The class name (card subtitle, door, location chip — one word for all three): `names` by maki, else the template's `door` (dog-park has none: Park). A POI's room is `poi:<template>@<city cluster>:<hex>`, the hex the first 12 of the SHA-256 of the client's POI id (`tile:<feature id>`, or `tile:<name>:<lon>:<lat>` without one) — the feature id changes when Mapbox updates its tiles, so it is a room key only, never saved.",
  "capacity": 16,
  "templates": {
   "hotel_lobby": {
@@ -46,7 +46,7 @@
   },
   "city_park": {
    "art": "poi_city_park",
-   "door": "City Park",
+   "door": "Park",
    "sign": "sign_name",
    "bounds": [
     -4.0,
@@ -67,7 +67,7 @@
   },
   "classroom": {
    "art": "poi_classroom",
-   "door": "Library",
+   "door": "School",
    "sign": "sign_door",
    "bounds": [
     -3.4,
@@ -90,19 +90,43 @@
   "bank": "service_hall",
   "town-hall": "service_hall",
   "fire-station": "service_hall",
+  "police": "service_hall",
   "doctor": "service_hall",
   "hospital": "service_hall",
-  "police": "service_hall",
   "school": "classroom",
-  "library": "classroom",
   "college": "classroom",
+  "library": "classroom",
   "park": "city_park",
   "garden": "city_park",
   "pitch": "city_park",
-  "playground": "city_park"
+  "playground": "city_park",
+  "dog-park": "city_park"
  },
  "class": {
   "lodging": "hotel_lobby",
+  "public_facilities": "service_hall",
+  "education": "classroom",
   "park_like": "city_park"
- }
+ },
+ "names": {
+  "lodging": "Hotel",
+  "bank": "Bank",
+  "town-hall": "Town Hall",
+  "fire-station": "Fire Station",
+  "police": "Police",
+  "doctor": "Clinic",
+  "hospital": "Hospital",
+  "school": "School",
+  "college": "College",
+  "library": "Library",
+  "park": "Park",
+  "garden": "Garden",
+  "pitch": "Sports Field",
+  "playground": "Playground"
+ },
+ "skip": [
+  "post",
+  "place-of-worship",
+  "religious-*"
+ ]
 }
