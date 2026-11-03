@@ -24,14 +24,16 @@ def main():
     def check(ok,label):
         checks.append(dict(check=label,passed=bool(ok)))
         if not ok:print("FAIL",label)
-    for key in ["anchors","spawn","exit","camera","rear_clear_band","review_lighting"]:check(plan[key]==baseline[key],"approved "+key+" unchanged")
+    detailed=plan["stage"]=="detail_v1"
+    for key in ["spawn","exit","camera","rear_clear_band","review_lighting"]:check(plan[key]==baseline[key],"approved "+key+" unchanged")
+    check([a for a in plan["anchors"] if a["name"]!="sign_door"]==[a for a in baseline["anchors"] if a["name"]!="sign_door"],"approved seating and navigation anchors unchanged")
     rows={r["name"]:r for r in plan["placements"]}
     for row in baseline["placements"]:
-        if row["owner"]=="huangzhong":check(rows[row["name"]]==row,"pending prop unchanged: "+row["name"])
-        if row["collidable"]:
+        if row["owner"]=="huangzhong" and not detailed:check(rows[row["name"]]==row,"pending prop unchanged: "+row["name"])
+        if row["collidable"] and (not detailed or row["owner"]=="zhaoyun"):
             keys=["position","size","yaw_degrees","shape","collidable"]
             check(all(rows[row["name"]].get(k)==row.get(k) for k in keys),"approved collision unchanged: "+row["name"])
-    check(not (KIT/"props").exists(),"Huangzhong final directory remains untouched")
+    if not detailed:check(not (KIT/"props").exists(),"Huangzhong final directory remains untouched")
     for path in sorted(KIT.glob("blockout_*")):
         check(path.read_bytes()==old(str(path.relative_to(ROOT))),"white asset byte-identical: "+path.name)
     for directory in ["assets/rooms/_shared/shell_hall","scenes/shell_hall","assets/rooms/_shared/plants"]:
@@ -44,7 +46,7 @@ def main():
         check(np.array_equal(a,b),"exact botanical RGBA tile "+str(tile["source_tile"]))
     costs=[];bounds={}
     for spec in plan["assets"]:
-        if spec["name"].startswith("blockout_"):continue
+        if spec["name"].startswith(("blockout_","props/")):continue
         path=KIT/spec["file"];doc,pos,uv=arrays(path);lo,hi=pos.min(0),pos.max(0);bounds[spec["name"]]=(lo,hi)
         check(len(doc["meshes"])==1 and doc["meshes"][0]["name"]==spec["name"]+"_mobile",spec["name"]+" named single mesh")
         check(len(doc["meshes"][0]["primitives"])==1,spec["name"]+" single surface")
@@ -76,7 +78,7 @@ def main():
     check(all_match,"every exported Monstera vertex preserves scaled/quarter-turned source position and remapped UV")
     mat=doc["materials"][0];check(mat.get("alphaMode")=="MASK" and mat.get("alphaCutoff")==.45 and mat.get("doubleSided"),"Monstera alpha scissor .45 and double-sided")
     report=dict(passed=all(c["passed"] for c in checks),checks=checks,costs=costs,botanical_max_uv_error=max_error,botanical_wainscot_clearance_m=wall_clearance,
-        scope="Independent reuse subset only; all approved display placeholders, anchors, collisions and opening camera preserved.")
+        scope="Independent shell skin, seats, lamps and botanical source checks; display kit is audited separately for detail_v1.")
     (QA/"reuse-assets.json").write_text(json.dumps(report,indent=2)+"\n")
     print("CULTURE_REUSE_AUDIT",report["passed"],len(checks),"checks, botanical UV error",max_error)
     if not report["passed"]:raise SystemExit(1)

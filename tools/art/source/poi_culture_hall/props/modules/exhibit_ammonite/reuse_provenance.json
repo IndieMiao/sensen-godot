@@ -1,0 +1,14 @@
+{
+  "asset": "exhibit_ammonite",
+  "module": "M14",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "new authored geometry",
+  "reference": "SGODOT-318 R3 main and director 323 dimensions; rear 2m layout belongs to scene owner",
+  "source_script": "tools/art/source/poi_culture_hall/props/build_props.py",
+  "source_blend": "tools/art/source/poi_culture_hall/props/culture_props.blend",
+  "changes": [
+    "Upright original ammonite study on a small foot"
+  ],
+  "material": "matte vertex colour; cabinet glass is a separate transparent surface"
+}

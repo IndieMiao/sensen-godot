@@ -10,6 +10,23 @@ func run() -> void:
 	var art=load("res://scenes/poi_culture_hall/poi_culture_hall_art.tscn").instantiate();root.add_child(art)
 	for row in data.plan.placements:
 		check(art.has_node(str(row.name)),"assembled module exists: "+str(row.name))
+		if row.has("colliders"):
+			var bodies: Array=art.get_node(row.name).find_children("*","StaticBody3D",true,false)
+			check(bodies.size()==row.colliders.size(),row.name+" exact collider count")
+			for i in row.colliders.size():
+				var expected: Dictionary=row.colliders[i]
+				var body: StaticBody3D=art.get_node(row.name+"/Collider_%02d"%i)
+				var shape: BoxShape3D=body.get_child(0).shape
+				check(body.position.is_equal_approx(vec(expected.position)) and shape.size.is_equal_approx(vec(expected.size)),row.name+" collider matches manifest")
+	var shell: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/rooms/_shared/shell_hall/layout.json"))
+	for spec in shell.assets:
+		for i in spec.colliders.size():
+			var body: StaticBody3D=art.get_node(spec.name+"/Collider_%02d"%i)
+			var shape: BoxShape3D=body.get_child(0).shape
+			check(body.position.is_equal_approx(vec(spec.colliders[i].at)) and shape.size.is_equal_approx(vec(spec.colliders[i].size)),spec.name+" shared shell collision retained")
+	for spec in shell.boundaries:
+		var body: StaticBody3D=art.get_node(spec.name)
+		check(body.position.is_equal_approx(vec(spec.at)),spec.name+" open-edge containment retained")
 	check(art.find_children("seat_*","Marker3D",true,false).size()==4,"assembly completed all four seat anchors")
 	for i in 3:await physics_frame
 	var space:=root.get_world_3d().direct_space_state

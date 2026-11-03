@@ -11,7 +11,13 @@ from shapely.affinity import rotate
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];QA=ROOT/"output/culture-hall-323"
 def shape(row):
     x,_,z=row["position"];w,h,d=row["size"]
-    geometry=Point(x,z).buffer(w/2,quad_segs=48) if row.get("shape")=="circle" else box(x-w/2,z-d/2,x+w/2,z+d/2)
+    if row.get("colliders"):
+        geometry=unary_union([box(x+c["position"][0]-c["size"][0]/2,z+c["position"][2]-c["size"][2]/2,
+                                 x+c["position"][0]+c["size"][0]/2,z+c["position"][2]+c["size"][2]/2) for c in row["colliders"]])
+    elif row.get("shape")=="circle":geometry=Point(x,z).buffer(w/2,quad_segs=48)
+    elif row.get("bounds"):
+        lo,hi=row["bounds"];geometry=box(x+lo[0],z+lo[2],x+hi[0],z+hi[2])
+    else:geometry=box(x-w/2,z-d/2,x+w/2,z+d/2)
     return rotate(geometry,-row.get("yaw_degrees",0),origin=(x,z))
 def component(region,point):return next((p for p in getattr(region,"geoms",[region]) if p.covers(point)),None)
 def main():

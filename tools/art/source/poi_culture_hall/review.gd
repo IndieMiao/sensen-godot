@@ -1,6 +1,6 @@
 extends Node
 const KIT:="res://assets/rooms/poi_culture_hall/"
-const OUT:="res://../captures/"
+const OUT:="res://../captures-v1/"
 const OUTPOST=preload("res://scenes/p0/p0_outpost.gd")
 var vp: SubViewport
 var room
@@ -32,6 +32,21 @@ func rect(node: Node3D) -> Rect2:
 			lo=lo.min(q);hi=hi.max(q)
 	return Rect2(lo,hi-lo)
 func row_rect(r: Rect2) -> Array:return [r.position.x,r.position.y,r.size.x,r.size.y]
+func artwork_rects() -> Array:
+	var result:=[]
+	var manifest: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(KIT+"props/prop_manifest.json"))
+	var group: Node3D=room.art.get_node("artwork_set")
+	for spec in manifest.assets:
+		if spec.name!="artwork_set":continue
+		for component in spec.components:
+			var lo:=Vector2(INF,INF);var hi:=Vector2(-INF,-INF)
+			var bounds:=AABB(vec(component.bounds[0]),vec(component.bounds[1])-vec(component.bounds[0]))
+			for i in 8:
+				var q: Vector2=room.cam.unproject_position(group.to_global(vec(component.position)+bounds.get_endpoint(i)))
+				lo=lo.min(q);hi=hi.max(q)
+			var r:=Rect2(lo,hi-lo)
+			result.append({"name":component.name,"rect":row_rect(r),"visible_fraction":r.intersection(Rect2(0,100,360,610)).get_area()/r.get_area()})
+	return result
 func validate() -> void:
 	var stats: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(KIT+"asset_stats.json"))
 	var triangles:=0;var surfaces:=0
@@ -57,10 +72,21 @@ func validate() -> void:
 	check(display.position.y>=100 and display.end.y<=710,"front exhibit clears top 100 / bottom 90 safe bands")
 	check(display.position.x>=0 and display.end.x<=360,"front exhibit fully inside default view")
 	check(display.intersection(player).get_area()<.01,"front exhibit does not overlap entering player")
-	report.artwork_visibility=[]
-	for i in range(1,7):
-		var bounds:=rect(room.art.get_node("artwork_%d"%i))
-		report.artwork_visibility.append({"name":"artwork_%d"%i,"rect":row_rect(bounds),"visible_fraction":bounds.intersection(Rect2(0,100,360,610)).get_area()/bounds.get_area()})
+	report.artwork_visibility=artwork_rects()
+	check(report.artwork_visibility.size()==6,"one artwork group contains six authored frames")
+	check(room.art.get_node_or_null("artwork_1")==null and room.art.get_node_or_null("case_1_exhibit_1")==null,"old per-frame and per-exhibit placeholders removed")
+	for case_name in ["glass_case_1","glass_case_2"]:
+		var glass:=0;var opaque:=0
+		for mesh in room.art.get_node(case_name).find_children("*","MeshInstance3D",true,false):
+			for surface in mesh.mesh.get_surface_count():
+				var material:=mesh.get_active_material(surface) as StandardMaterial3D
+				check(material!=null and material.vertex_color_use_as_albedo and not material.vertex_color_is_srgb,case_name+" linear vertex colours")
+				check(mesh.get_surface_override_material(surface)==null and mesh.material_override==null,case_name+" supplier surface material retained")
+				if material.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA:
+					glass+=1
+					check(absf(material.albedo_color.a-.16)<.001,case_name+" glass alpha .16")
+				else:opaque+=1
+		check(glass==1 and opaque==1,case_name+" one glass plus one opaque surface")
 	for spec in room.layout.assets:
 		var config:=ConfigFile.new();check(config.load(KIT+spec.file+".import")==OK and str(config.get_value("remap","uid","")).begins_with("uid://"),spec.name+" import UID")
 		check(config.get_value("params","gltf/texture_map_mode",0)==1,spec.name+" texture_map_mode=1")
@@ -111,10 +137,8 @@ func run() -> void:
 	for lamp in room.art.find_children("*","OmniLight3D",true,false):lamp.visible=true
 	var entering_position: Vector3=room.actor.position
 	vp.size=Vector2i(360,800);room.actor.position=room.room.position+Vector3(.65,.08,-1.70);room.frame_all()
-	report.viewing_area={"fixture_player_local":[.65,.08,-1.70],"camera_transform":str(room.cam.global_transform),"artworks":[]}
-	for i in range(1,7):
-		var bounds:=rect(room.art.get_node("artwork_%d"%i))
-		report.viewing_area.artworks.append({"name":"artwork_%d"%i,"rect":row_rect(bounds),"visible_fraction":bounds.intersection(Rect2(0,100,360,610)).get_area()/bounds.get_area()})
+	report.viewing_area={"fixture_player_local":[.65,.08,-1.70],"camera_transform":str(room.cam.global_transform),"artworks":artwork_rects()}
+	for art in report.viewing_area.artworks:check(art.visible_fraction>.99,art.name+" visible from approved viewing area")
 	await capture("viewing_area_720",Vector2i(720,1600))
 	vp.size=Vector2i(360,800);room.actor.position=entering_position;room.frame_all();room.cam.global_transform=native
 	await populate_seats();room.cam.global_transform=native;room.cam.size=6.72
@@ -123,6 +147,13 @@ func run() -> void:
 	await capture("seated_overview",Vector2i(1200,1000))
 	for rig in seated:rig.visible=false
 	room.actor.visible=false;await capture("overview",Vector2i(1200,1000))
+	# Main-image floor edge slopes imply approximately 35 degrees at yaw 45.
+	# This comparison camera is separate from the unchanged 43-degree entry.
+	var overview_transform: Transform3D=room.cam.global_transform
+	room.cam.rotation_degrees=Vector3(-35.264,45,0)
+	room.cam.global_position=room.room.global_position+Vector3(0,1.70,0)+room.cam.global_basis.z*20;room.cam.size=10.8
+	await capture("reference_camera",Vector2i(1200,1100))
+	room.cam.global_transform=overview_transform;room.cam.size=11.5
 	for lamp in room.art.find_children("*","SpotLight3D",true,false):lamp.visible=false
 	await capture("spots_off",Vector2i(1200,1000))
 	for lamp in room.art.find_children("*","SpotLight3D",true,false):lamp.visible=true

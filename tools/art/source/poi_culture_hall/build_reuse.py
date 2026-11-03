@@ -213,4 +213,8 @@ def main():
     p.start("poi_culture_hall","SGODOT-318 R3 / approved 323 white / authorized independent reuse subset")
     p.b.PALETTE.update({k:v["hex_srgb"] for k,v in PALETTE.items()})
     seats();lighting();botanical();uv_materials();assets=[export(name) for name in p.KITS];assembly(assets)
+    if (OUT/"props/prop_manifest.json").exists():
+        sys.path.insert(0,str(HERE))
+        from assemble_v1 import assemble
+        assemble()
 if __name__=="__main__":main()

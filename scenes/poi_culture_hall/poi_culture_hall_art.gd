@@ -1,6 +1,6 @@
 @tool
 extends Node3D
-## N3 independent reuse subset; the consumer owns environment, sun and camera.
+## N3 assembled art; the consumer owns environment, sun and camera.
 const KIT:="res://assets/rooms/poi_culture_hall/"
 var layout: Dictionary
 func vec(a: Array) -> Vector3:return Vector3(a[0],a[1],a[2])
@@ -18,14 +18,12 @@ func _ready() -> void:
 		var model=load(KIT+str(row.model)+".glb").instantiate();holder.add_child(model)
 		model.scale=vec(row.model_scale) if row.has("model_scale") else vec(row.size)/vec(layout.models.get(row.model,[1,1,1]))
 		if row.has("target"):holder.look_at(to_global(vec(row.target)))
-		if row.collidable:
-			var body:=StaticBody3D.new();body.name="BlockoutCollision";body.position.y=float(row.size[1])/2;holder.add_child(body)
-			var collider:=CollisionShape3D.new()
-			if row.get("shape","")=="circle":
-				var shape:=CylinderShape3D.new();shape.radius=float(row.size[0])/2;shape.height=float(row.size[1]);collider.shape=shape
-			else:
-				var shape:=BoxShape3D.new();shape.size=vec(row.size);collider.shape=shape
-			body.add_child(collider)
+		if row.has("colliders"):
+			for i in row.colliders.size():
+				var spec: Dictionary=row.colliders[i]
+				add_collision(holder,spec.position,spec.size,"box","Collider_%02d"%i)
+		elif row.collidable:
+			add_collision(holder,[0,float(row.size[1])/2,0],row.size,row.get("shape","box"),"Collision")
 	for row in layout.local_lights:
 		var lamp: Light3D
 		if row.get("kind","spot")=="omni":
@@ -40,3 +38,12 @@ func _ready() -> void:
 		for key in ["module","stand","size","pitch_degrees","orthographic_width"]:
 			if row.has(key):marker.set_meta(key,row[key])
 		add_child(marker)
+
+func add_collision(parent: Node3D,at: Array,size_: Array,kind: String,node_name: String) -> void:
+	var body:=StaticBody3D.new();body.name=node_name;body.position=vec(at);parent.add_child(body)
+	var collider:=CollisionShape3D.new()
+	if kind=="circle":
+		var shape:=CylinderShape3D.new();shape.radius=float(size_[0])/2;shape.height=float(size_[1]);collider.shape=shape
+	else:
+		var shape:=BoxShape3D.new();shape.size=vec(size_);collider.shape=shape
+	body.add_child(collider)
