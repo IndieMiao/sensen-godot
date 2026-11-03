@@ -19,7 +19,8 @@ What reads as copy (SGODOT-385, 亚瑟's first-round shots 385 7d6077a4: names, 
 
 Cities (#649 第二批 ④, 口径「城市用通行中文名」): only the open home cities and each one's fallback ten (about 140, as the
 server's homeCities / fallbackOf reach them: server/tools/i18n_city_names.ts) go to their own list,
-tools/p0/i18n/p0_cities_en.json {name: {"ids", "country", "homes", "done"?, "also_line"?}}, for 李白; their Chinese goes in
+tools/p0/i18n/p0_cities_en.json {name: {"ids", "country", "homes", "done"?, "also_line"?}}, and the states / provinces the
+Nearby rows write after them to p0_admins_en.json {admin: {"cities", "done"?}} (0.2.23), for 李白; their Chinese goes in
 the main table like any line. `also_line`: the name is also a line in the code (San Francisco): one key for both, so a city named like a word would read it.
 """
 import json, re, subprocess, sys
@@ -138,6 +139,14 @@ def cities(lines: dict, done: dict) -> None:
         if name in lines: e["also_line"] = True
     dest = ROOT / 'tools/p0/i18n/p0_cities_en.json'
     dest.write_text(json.dumps(dict(sorted(out.items())), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    admins: dict = {}   # the states and provinces the Nearby rows write after these cities (`Salinas · California`)
+    for r in rows:
+        if r.get('admin'): admins.setdefault(r['admin'], {"cities": []})["cities"].append(r['name'])
+    for a, e in admins.items():
+        if a in done: e["done"] = True
+    adest = ROOT / 'tools/p0/i18n/p0_admins_en.json'
+    adest.write_text(json.dumps(dict(sorted(admins.items())), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    print(f'{len(admins)} states / provinces, {sum(1 for e in admins.values() if e.get("done"))} done → {adest.relative_to(ROOT)}')
     homes = sorted({h for e in out.values() for h in e["homes"]})
     print(f'{len(out)} cities ({len(homes)} home cities and their fallback ten), {sum(1 for e in out.values() if e.get("done"))} done, '
           f'{sum(1 for e in out.values() if e.get("also_line"))} also lines the code shows → {dest.relative_to(ROOT)}')

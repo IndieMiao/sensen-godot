@@ -373,3 +373,60 @@ func test_p0_a_list_reads_its_last_and_or_or() -> void:
 	assert_str(String(t.get_message("Try Carrot or Herb"))).is_equal("试试 胡萝卜 或 香草")   # the template's own
 	assert_str(String(t.get_message("Carrot, Herb"))).is_equal("胡萝卜、香草")
 	assert_str(String(t.get_message("Salt and pepper"))).is_equal("")   # not every item known: English
+	t.set_table({"Rods and bait": "鱼竿和鱼饵", "Herb": "香草", "Carrot": "胡萝卜"})
+	assert_str(String(t.get_message("Herb, Rods and bait"))).is_equal("香草、鱼竿和鱼饵")   # an item's own ` and `: the `, ` list
+	assert_str(String(t.get_message("Rods and bait, Carrot and Herb"))).is_equal("鱼竿和鱼饵、胡萝卜和香草")
+
+## 0.2.23 (李元芳 385 3c62ae6d, 不知火舞 15f1d114): lines pieced in code read whole — the Notice Board's bite clause
+## without its bait, the Bite Board's sentence translated inside its quotes, `Change once · %d day%s left`, a keeper's
+## small count in digits under 中文.
+const BiteBoardScript := preload("res://modules/p0/p0_bite_board.gd")
+func test_p0_pieced_lines_read_whole_under_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"%s bite": "%s正在咬钩", "%s bite %s": "%s%s咬钩", "%s bite. %s": "%s正在咬钩。%s", "Bring worms.": "带上蚯蚓。",
+		"Common Carp": "鲤鱼", "in the rain": "在雨天", "Change once · %d day%s left": "可改一次 · 还剩 {1} 天"})
+	TranslationServer.add_translation(t)
+	assert_str(String(t.get_message(BiteBoardScript.CLAUSE[0] % "Common Carp"))).is_equal("鲤鱼正在咬钩")
+	assert_str(String(t.get_message(BiteBoardScript.CLAUSE[1] % ["Common Carp", "in the rain"]))).is_equal("鲤鱼在雨天咬钩")
+	assert_str(P0Logic.shown("Common Carp bite. Bring worms.")).is_equal("鲤鱼正在咬钩。带上蚯蚓。")   # before the quotes go round it
+	assert_str(String(t.get_message("Change once · %d day%s left" % [6, "s"]))).is_equal("可改一次 · 还剩 6 天")
+	assert_str(String(t.get_message("Change once · %d day%s left" % [1, ""]))).is_equal("可改一次 · 还剩 1 天")
+	assert_str(P0Logic._count_word(3)).is_equal("3")
+	TranslationServer.set_locale("en")
+	assert_str(P0Logic._count_word(3)).is_equal("three")
+	TranslationServer.remove_translation(t)
+
+## 0.2.23 (不知火舞 385 fd216262): a Nearby row's name and ` · state` are measured as they show — 「费尔菲尔德」 was cut at
+## Fairfield's English width and the gap before 「· 加州」 followed the English.
+const CityRowScript := preload("res://scenes/p0/panels/p0_city_row.gd")
+func test_p0_a_city_rows_name_is_measured_in_chinese() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"Fairfield": "费尔菲尔德", "California": "加州"})
+	TranslationServer.add_translation(t)
+	var first := HBoxContainer.new()
+	first.theme = UiKit.theme()
+	first.size = Vector2(300, 24)
+	add_child(first)
+	var city := UiKit.label("Fairfield", UiTokens.STYLE_ROW_TITLE_XB15)
+	var region := UiKit.label(" · California", UiTokens.STYLE_C13_B)
+	first.add_child(city)
+	first.add_child(region)
+	CityRowScript._fit_first(first, city, region)
+	var font := city.get_theme_font(&"font")
+	var zh_w := ceilf(font.get_string_size("费尔菲尔德", HORIZONTAL_ALIGNMENT_LEFT, -1, city.get_theme_font_size(&"font_size")).x)
+	assert_float(city.custom_minimum_size.x).is_equal(zh_w)
+	assert_bool(region.visible).is_true()
+	assert_str(String(region.atr(region.text))).is_equal(" · 加州")
+	first.queue_free()
+	TranslationServer.remove_translation(t)
+
+## 0.2.23 (不知火舞 385 bd107de1): 中文 has no italic — a Bold Italic line (the Bite Board keeper's, a Kindred line) is
+## the upright bold there; English keeps its slant.
+func test_p0_bold_italic_is_upright_bold_under_chinese() -> void:
+	assert_object(UiKit.bold_italic()).is_same(UiKit.font(&"bold"))   # before_test's zh_CN
+	assert_bool(UiKit.bold_italic().variation_transform == Transform2D.IDENTITY).is_true()
+	TranslationServer.set_locale("en")
+	assert_object(UiKit.bold_italic()).is_not_same(UiKit.font(&"bold"))
+	assert_float(UiKit.bold_italic().variation_transform.x.y).is_not_equal(0.0)   # slanted

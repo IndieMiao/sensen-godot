@@ -268,13 +268,13 @@ class P0Translation extends Translation:
 			return head + count.get_string() if head != "" else ""
 		# a list: only when every item is known, joined the Chinese way — `Carrot, Herb` 胡萝卜、香草; with its last item
 		# after ` and ` / ` or ` (`Carrot and Herb`, `A, B and C`, `Grilled or Soup`) 和 / 或 before it (#649 第二批 ⑩).
-		# A template has had the whole line first (`Try %s or %s`); a sentence with an unknown word stays English.
+		# A template has had the whole line first (`Try %s or %s`); a sentence with an unknown word stays English. An item
+		# with its own ` and ` (`Rods and bait`) fails the split: the plain `, ` list is tried then (亚瑟 on #704).
 		for conj in LIST_LAST:
 			var at := s.rfind(conj)
 			if at <= 0: continue
 			var items := _list_items(s.left(at).split(", ") + PackedStringArray([s.substr(at + conj.length())]))
-			if items.is_empty(): return ""
-			return "、".join(items.slice(0, -1)) + str(LIST_LAST[conj]) + str(items[-1])
+			if not items.is_empty(): return "、".join(items.slice(0, -1)) + str(LIST_LAST[conj]) + str(items[-1])
 		if s.contains(", "):
 			return "、".join(_list_items(s.split(", ")))
 		return ""

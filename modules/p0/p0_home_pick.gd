@@ -109,7 +109,7 @@ static func settings_row(view: Dictionary, now_ms: float) -> Dictionary:
 	var open := bool(ch.get("open", false)) and not bool(h.get("pending", false))
 	var days := maxi(1, ceili((float(ch.get("until", 0)) - now_ms) / 86400000.0))
 	return {name = str(h.get("name", "")), open = open,
-		line = ("Change once · %d %s left" % [days, "day" if days == 1 else "days"]) if open else "Set for good"}
+		line = ("Change once · %d day%s left" % [days, "" if days == 1 else "s"]) if open else "Set for good"}   # a plural's ending, dropped in Chinese (0.2.23)
 
 ## The change confirm card's day line (HOME-CHANGE-CONFIRM, q(173)): `Your day resets Thu 4 AM, Tokyo time.` from the
 ## spots read's resets_day (the new home's calendar); "" without one.
