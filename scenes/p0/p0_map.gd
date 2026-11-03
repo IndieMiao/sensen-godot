@@ -1153,7 +1153,7 @@ static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Di
 	if local == "": local = "–"
 	return {
 		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before traveling.",
-		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]],
+		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%s · %s" % [Localization.ctx("%d", "trip") % int(trip.get("trip", 1)), str(trip.get("name", ""))]],   # 「第 6 档 · 洲际」 (#649 第二批 ⑧)
 			["Fare", P0Travel.fare_text(P0Travel.fare(view, cluster))], ["Local time", local]],   # q(257) ⑥: the first-visit fare
 		"rows": [
 			{"icon": P0Logic.icon("pond"), "title": "Ponds", "effect": "Basic and regional fishing", "quantity": count.call("ponds"), "unit": "ponds"},
@@ -1188,7 +1188,7 @@ static func travel_card(view: Dictionary, cluster: String, preview: Dictionary, 
 	if preview.has("trip"): trip = {km = int(preview.get("km", trip.get("km", 0))), trip = int(preview.trip), name = str(preview.get("trip_name", trip.get("name", "")))}
 	var f := P0Travel.fare(view, cluster)
 	var parts: Array = [P0Clusters.country_part(c)]
-	parts.append(local_time(view, preview.get("utc_offset_min", null)) + " local" if preview.get("utc_offset_min", null) != null else "")
+	parts.append("%s local" % local_time(view, preview.get("utc_offset_min", null)) if preview.get("utc_offset_min", null) != null else "")
 	parts.append("%d online" % online if online > 0 else "")
 	var facts: Array = [["Distance", "%s · Trip %d" % [P0PlaceSheet.distance_text(float(trip.get("km", 0))), int(trip.get("trip", 1))]]]
 	if bool(f.free): facts.append(["Cost", "Free"])

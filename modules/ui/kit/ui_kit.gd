@@ -23,6 +23,9 @@ static func font(weight: StringName = &"regular") -> Font:
 const ITALIC_SKEW := 0.2
 static var _bold_italic: FontVariation
 static func bold_italic() -> FontVariation:
+	# 中文 has no italic: a Bold Italic line (the Bite Board keeper's, a Kindred line) is upright Bold there — the bold
+	# weight, which draws Chinese through Noto Sans SC (Localization.set_cjk_fonts); 不知火舞 385 bd107de1, 0.2.23
+	if TranslationServer.get_locale() == "zh_CN": return font(&"bold") as FontVariation
 	if _bold_italic == null:
 		var bold := font(&"bold") as FontVariation
 		_bold_italic = FontVariation.new()

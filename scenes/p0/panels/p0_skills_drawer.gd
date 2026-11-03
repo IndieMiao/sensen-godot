@@ -74,7 +74,7 @@ static func skills_data(view: Dictionary) -> Dictionary:
 		var next := "Top level"
 		if not top:
 			var opens := P0Logic.level_unlocks(view, key, lv + 1)
-			next = ("Next: " + P0Logic.and_list(opens)) if not opens.is_empty() else "Next: Lv%d · %d XP to go" % [lv + 1, maxi(0, need - xp)]
+			next = ("Next: %s" % P0Logic.and_list(opens)) if not opens.is_empty() else "Next: Lv%d · %d XP to go" % [lv + 1, maxi(0, need - xp)]
 		var rows: Array = []
 		for l in range(2, th.size() + 1):
 			var opens := P0Logic.level_unlocks(view, key, l)
@@ -101,7 +101,7 @@ static func skills_data(view: Dictionary) -> Dictionary:
 func _track_row(t: Dictionary) -> Control:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", int(_ROW_GAP))
-	col.add_child(UiKit.label(str(t.name), UiTokens.STYLE_C12_XB))
+	col.add_child(UiKit.label(Localization.ctx(str(t.name), "skill"), UiTokens.STYLE_C12_XB))   # Cooking@skill 烹饪, not the stove's 烹饪中
 	col.add_child(UiKit.label("Level %d" % int(t.level), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	var next := UiKit.label(str(t.next), UiTokens.STYLE_C11_B)
 	next.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
