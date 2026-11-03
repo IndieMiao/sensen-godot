@@ -511,6 +511,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 - **口径**（坐标都是层里的米，原点和 `mine_layout.gd` 一样）：
   - 守关场地 `guard_arena.glb`：摆在 (4.9, 0, −3.8)，即 `ROCK_BOUNDS` 的中心；外框不超过 `ROCK_BOUNDS` 的 7.0 × 4.5；整个只当装饰、不带碰撞；后沿的高物放在 x 2.7–6.8（离电梯 (1.25, 0, −6.75) 和下行梯 (8.25, 0, −6.75) 都 ≥ 1.6 m，实测 x 3.15–6.51）；≤ 3000 面。
   - 电梯站 `elevator_station.glb`：换掉代码拼的电梯，摆在 `Layout.ELEVATOR` (1.25, 0, −6.75)，+Z 朝镜头；底座 1.45 × 1.3，平台顶面 0.17，总高 ≤ 2.3；≤ 2500 面。两个空节点：`PlateAnchor` (0, 0.99, 0.515) 挂 Label3D 写层号（只写数字或 `F10` 这样的短号，深色粗体，字高约占牌子的七成），`LampAnchor` (0.8, 0.73, 0.47) 挂锁定 / 解锁灯（锁定琥珀 `#dba158`、解锁绿 `#a5e3bc`，照现在代码的颜色）。
+  - 岩块（不知火舞 11-03 定，上官婉儿同意）：**每座矿统一用它主矿的岩块**：铁矿脉 `rock_iron_ore`、石英矿脉 `rock_quartz`、浅坑 `rock_copper_ore`；煤块这批不用。岩石掉什么按发牌定（第 5 节），敲开前看不出，所以不按矿种随机画，以免给错误提示。每块绕竖轴随机转一个角度、大小在 0.9–1.1 倍之间随机，同一块固定（按岩石的序号和本层的种子算）。
   - 守关层的王出生在 `mine_combat.SPAWNS[0]` (4.75, 0, −5.0)，会满层追，跳扑约 2.5 m（占位数，F 的数值为准）。
   - 配色：每段四个键 `ground` / `wall` / `backdrop_tint` / `fog`，按 `from ≤ 层 ≤ to` 查，超出最后一段就用最后一段；第 1 段和现在线上的颜色一样。`backdrop_tint` 是背景的 floor_tint；`fog` 同时给背景的 void_tint 和 `Environment.background_color`（不开真正的雾）。`vein_tint` 已撤回，不加。
   - 背景 shader 加 `uniform float vein_mask = 0.0`，只有 `types/<type>/backdrop.glb` 设 1（老的 mine_backdrop.glb 在 Godot 里 UV2.y 全是 1.0，不开关会整片不套色）；UV2.y 以 Godot 读到的值为准（Blender 导出时 v 会翻成 1 − v）。
