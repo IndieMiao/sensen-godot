@@ -531,7 +531,7 @@ func _fly_to_wild(id: String) -> void:
 	var key := P0Session.ui_key(cmd)
 	var settled := [false, false]   # [taken, landed]
 	var both := func():
-		if settled[0] and settled[1] and rt != null and P0Travel.here(_view()) == id: open_mine_card(id)
+		if settled[0] and settled[1] and rt != null and P0Travel.here(_view()) == id: _select_wild(id)
 	# heard once: let go at its own key's settling (周瑜 on #710: a refused trip flown again within the old wait — the same
 	# key — had the first listener open the card mid-air), else after 30 s (the reply never came)
 	var listener: Array = [Callable()]
@@ -1059,7 +1059,14 @@ func open_wild_card(site_id: String) -> void:
 	if not P0WildSites.has_site(site_id): return
 	var s := P0WildSites.site(site_id)
 	_show_target = site_id
-	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), WILD_ZOOM, open_mine_card.bind(site_id))
+	_fly("wild:" + site_id, float(s.get("lat", center_lat)), float(s.get("lng", center_lng)), WILD_ZOOM, _select_wild.bind(site_id))
+
+## A wild site's mouth card opened as a tap on its pin opens it: the pin raised and in front while the card is up
+## (_on_entry_selected → open_mine_card; _open_live_card lets it go on close), as Show's landing does — not the card
+## alone over a pin left at its size (不知火舞 on E6, 周瑜 11-04). No map drawn (a test's): the card alone.
+func _select_wild(site_id: String) -> void:
+	if city_map != null and P0WildSites.has_site(site_id): city_map.select(wild_entry(P0WildSites.site(site_id)))
+	else: open_mine_card(site_id)
 
 ## Without the native map (desktop, tests holding the map in a SubViewport) the map drawn is the viewport: the camera
 ## follows its height as on a phone. map_poc takes the window's, which can be taller — the desktop's 1280 override, a
@@ -2252,6 +2259,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"fareboard": rt.ui.open_fare_board()   # the Travel Post's Fare Board (q(257) ① shots)
 		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
 			open_city_card(step[1])
+		"wildcard":   # wildcard:wd-254-115 — back at a wild site (a knock-out's Close, the Entrance): the flight and its mouth card
+			open_wild_card(step[1])
 		"arrivalcard":   # arrivalcard:gn-1850147 — the first visit's card (MAP-7-FREE) for that city
 			open_arrival_card(step[1])
 		"arrivalgo":   # the arrival card's Visit the outpost, as a tap on it

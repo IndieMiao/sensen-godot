@@ -125,6 +125,12 @@ func test_a_place_sheet_can_have_no_key() -> void:
 	var holder := P0PlaceSheet.open(ui, {"title": "Glimmer Geode", "subtitle": "Geode mine · near San Jose", "line": "Not open yet",
 		"no_primary": true}, func(): pass)
 	assert_object(holder.find_child("Primary", true, false)).is_null()
+	# E4 329:182456: `Not open yet` is the state said, in secondary grey (不知火舞 355 850d2fc2), not the ink of a fact
+	var said: Label = null
+	for l in holder.find_children("*", "Label", true, false):
+		if (l as Label).text == "Not open yet": said = l
+	assert_object(said).is_not_null()
+	assert_that(said.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
 
 # ---- on the map
 
@@ -192,6 +198,21 @@ func test_a_wild_pin_opens_its_mouth_card_and_go_opens_its_travel_card() -> void
 	m._on_entry_selected(P0Map.wild_entry(GEODE))
 	assert_str(m.rt.ui.modal_kind).is_equal("mine_card")
 	assert_object(m._live_card.find_child("Primary", true, false)).is_null()
+
+## 不知火舞 on E6 (周瑜 11-04): a mouth card opened on landing (back from the mine, a wild flight) is a tap on the pin —
+## the pin selected (raised, in front) under the card, and let go when the card closes.
+func test_a_landing_opens_the_mouth_card_with_its_pin_selected() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	P0WildSites.accept("t", {"sites": [VEIN]})
+	while m.rt.ui.has_modal(): m.rt.ui.close_modal()
+	m._select_wild(VEIN.id)
+	assert_str(m.rt.ui.modal_kind).is_equal("mine_card")
+	assert_str(str(m.city_map.selected.get("id", ""))).is_equal(VEIN.id)
+	m.rt.ui.close_modal()
+	for i in 2: await get_tree().process_frame   # the card's closed hook is its tree_exiting, at the free
+	assert_bool(m.city_map.selected.is_empty()).is_true()
 
 ## 周瑜 on #710: the flight's listener lets go as its own key settles — a refused trip flown again (the same key) is
 ## heard by the new flight alone, and nothing is left connected.
