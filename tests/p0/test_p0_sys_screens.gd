@@ -21,7 +21,7 @@ func before_test() -> void:
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 
-func _view() -> Dictionary: return {"seq": 1, "energy": {"value": 100, "max": 200}, "coins": 50, "bag": {"capacity": 25, "slots": []}}
+func _view() -> Dictionary: return {"seq": 1, "save_version": 7, "energy": {"value": 100, "max": 200}, "coins": 50, "bag": {"capacity": 25, "slots": []}}
 
 ## The server's answer to the request on the wire, through the session as an HTTP reply would come.
 func _reply(code: int, body: Dictionary) -> void:

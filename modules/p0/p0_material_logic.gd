@@ -415,7 +415,7 @@ static func material_source(view: Dictionary, id: String) -> Dictionary:
 	if parts.is_empty(): return {}
 	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
 	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
-	return {"text": text, "go": ""}
+	return {"text": text, "go": str(P0Logic._home_material_go(view, id).go)}   # Show: the spot or mine Today points at (355 C2)
 
 ## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
 ## mine content opens (content.mine.types: quarry and vein in the first batch), in that order — [{type, word}], the

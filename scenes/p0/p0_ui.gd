@@ -2942,6 +2942,9 @@ static func show_label(go: String, here: String, camera_here: bool, here_place :
 	if go == "inbox": return "Show"   # the Inbox opens anywhere: its Parcels page (q(254) ①, Pip's seeds)
 	if go == "bag": return "Show"     # and the bag: S8's dish to eat (SGODOT-368)
 	if here == "outpost" and here_place != "" and go == "outpost:" + here_place: return "Show" if camera_here else ""
+	# 355 C2: a wild mine (`mine:<site>`) the player is down: nothing to show (the row stays, without a button); a
+	# gathering spot (`gather:<id>`) or another mine is a map pin as any (Show on the map, Show on map elsewhere)
+	if here == "mine" and here_place != "" and go == "mine:" + here_place: return ""
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if home_target(go) and here in ["home", "farm"]: return "Show" if camera_here else ""
