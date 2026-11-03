@@ -39,7 +39,8 @@ func validate() -> void:
 		for surface in mesh.mesh.get_surface_count():
 			triangles+=mesh.mesh.surface_get_arrays(surface)[Mesh.ARRAY_INDEX].size()/3;surfaces+=1
 	report.triangles=triangles;report.surfaces=surfaces
-	check(triangles==stats.scene_triangles and surfaces==stats.static_draw_surfaces,"actual white mesh budget matches manifest")
+	check(triangles==stats.scene_triangles and surfaces==stats.static_draw_surfaces,"actual assembled mesh budget matches manifest")
+	report.stage=room.layout.stage
 	check(triangles<=150000 and surfaces<=50,"within POI scene budget")
 	check(room.art.find_children("seat_*","Marker3D",true,false).size()==4,"exactly four seat anchors")
 	check(room.art.find_children("npc_*","Marker3D",true,false).is_empty() and room.art.find_children("use_*","Marker3D",true,false).is_empty(),"no NPC or service anchors")
@@ -64,6 +65,13 @@ func validate() -> void:
 		var config:=ConfigFile.new();check(config.load(KIT+spec.file+".import")==OK and str(config.get_value("remap","uid","")).begins_with("uid://"),spec.name+" import UID")
 		check(config.get_value("params","gltf/texture_map_mode",0)==1,spec.name+" texture_map_mode=1")
 	var nav: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://../navigation.json"));check(nav.passed,"actual assembly navigation checks passed")
+	var plant=room.art.get_node("plant_pot")
+	for mesh in plant.find_children("*","MeshInstance3D",true,false):
+		var material:=mesh.get_active_material(0) as StandardMaterial3D
+		check(material.transparency==BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR and absf(material.alpha_scissor_threshold-.45)<.001,"runtime Monstera alpha scissor .45")
+		check(material.cull_mode==BaseMaterial3D.CULL_DISABLED,"runtime Monstera double-sided")
+		check(material.albedo_texture.resource_path==KIT+"room_albedo_ao.png","runtime Monstera uses the sole room atlas")
+	check(room.art.find_children("*","Light3D",true,false).size()==5,"three track spots plus two wall lights")
 func populate_seats() -> void:
 	for spec in room.layout.anchors:
 		if not str(spec.name).begins_with("seat_"):continue
@@ -98,6 +106,9 @@ func run() -> void:
 	animation.seek(.3,true);animation.advance(0);animation.pause();runtime.ui.visible=false
 	validate();var native: Transform3D=room.cam.global_transform
 	await capture("default_clean_360",Vector2i(360,800));await capture("default_clean_720",Vector2i(720,1600))
+	for lamp in room.art.find_children("*","OmniLight3D",true,false):lamp.visible=false
+	await capture("wall_lights_off",Vector2i(720,1600))
+	for lamp in room.art.find_children("*","OmniLight3D",true,false):lamp.visible=true
 	var entering_position: Vector3=room.actor.position
 	vp.size=Vector2i(360,800);room.actor.position=room.room.position+Vector3(.65,.08,-1.70);room.frame_all()
 	report.viewing_area={"fixture_player_local":[.65,.08,-1.70],"camera_transform":str(room.cam.global_transform),"artworks":[]}
@@ -115,6 +126,9 @@ func run() -> void:
 	for lamp in room.art.find_children("*","SpotLight3D",true,false):lamp.visible=false
 	await capture("spots_off",Vector2i(1200,1000))
 	for lamp in room.art.find_children("*","SpotLight3D",true,false):lamp.visible=true
+	for view in [{"name":"seating_plant_detail","at":Vector3(-2.5,.9,1.35),"size":3.6},{"name":"track_detail","at":Vector3(1.85,2.95,-2.70),"size":3.6}]:
+		room.cam.global_position=room.room.global_position+view.at+room.cam.global_basis.z*20;room.cam.size=view.size
+		await capture(view.name,Vector2i(1000,850))
 	room.cam.rotation_degrees=Vector3(-90,0,0);room.cam.global_position=room.room.global_position+Vector3(0,20,0);room.cam.size=8
 	await capture("topdown",Vector2i(1200,1200))
 	report.renderer=RenderingServer.get_current_rendering_method();report.adapter=RenderingServer.get_video_adapter_name();report.passed=report.checks.all(func(c):return c.passed)

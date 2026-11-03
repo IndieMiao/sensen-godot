@@ -1,0 +1,42 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/clothing_store_a/clothing_store_a.blend",
+  "changes": [
+    "Retain four source legs and base frame; omit steel end runners and tiny stitches.",
+    "Source continuous cushion adapted into three olive pads. Footprint .68 x 1.728 m and seat top .715 m match approved blockout."
+  ],
+  "retained_parts": [
+    "Black steel bench leg",
+    "Black steel bench leg.001",
+    "Black steel bench leg.002",
+    "Black steel bench leg.003",
+    "Bench black steel frame",
+    "Leather continuous cushion",
+    "Leather continuous cushion",
+    "Leather continuous cushion"
+  ],
+  "source_sha256": "ffc65e5f782d83a09e89f7751b53d415e1210cdbbf64e2c67f616dc31a1b1ef0",
+  "source_collection": "KIT_black_tufted_bench",
+  "name": "gallery_bench",
+  "file": "gallery_bench.glb",
+  "triangles": 864,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.3400000035762787,
+      0.0,
+      -0.8639999628067017
+    ],
+    [
+      0.3400000035762787,
+      0.7149999737739563,
+      0.8639999628067017
+    ]
+  ],
+  "dimensions_m": [
+    0.6800000071525574,
+    0.7149999737739563,
+    1.7279999256134033
+  ],
+  "sha256": "3046a9f06219fa7d6d03d1da4df4b3c6d5ef6000d2ed24710c4a608e995a712d"
+}

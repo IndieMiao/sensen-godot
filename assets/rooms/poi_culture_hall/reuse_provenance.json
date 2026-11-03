@@ -1,0 +1,252 @@
+{
+  "gallery_bench": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/clothing_store_a/clothing_store_a.blend",
+    "changes": [
+      "Retain four source legs and base frame; omit steel end runners and tiny stitches.",
+      "Source continuous cushion adapted into three olive pads. Footprint .68 x 1.728 m and seat top .715 m match approved blockout."
+    ],
+    "retained_parts": [
+      "Black steel bench leg",
+      "Black steel bench leg.001",
+      "Black steel bench leg.002",
+      "Black steel bench leg.003",
+      "Bench black steel frame",
+      "Leather continuous cushion",
+      "Leather continuous cushion",
+      "Leather continuous cushion"
+    ],
+    "source_sha256": "ffc65e5f782d83a09e89f7751b53d415e1210cdbbf64e2c67f616dc31a1b1ef0",
+    "source_collection": "KIT_black_tufted_bench",
+    "name": "gallery_bench",
+    "file": "gallery_bench.glb",
+    "triangles": 864,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.3400000035762787,
+        0.0,
+        -0.8639999628067017
+      ],
+      [
+        0.3400000035762787,
+        0.7149999737739563,
+        0.8639999628067017
+      ]
+    ],
+    "dimensions_m": [
+      0.6800000071525574,
+      0.7149999737739563,
+      1.7279999256134033
+    ],
+    "sha256": "3046a9f06219fa7d6d03d1da4df4b3c6d5ef6000d2ed24710c4a608e995a712d"
+  },
+  "round_stool": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+    "changes": [
+      "Retain the round seat and three splayed legs; normalize full bounds to .48 x .715 x .48 m."
+    ],
+    "retained_parts": [
+      "Round stool seat",
+      "Splayed stool leg",
+      "Splayed stool leg.001",
+      "Splayed stool leg.002"
+    ],
+    "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+    "source_collection": "KIT_bar_stool",
+    "name": "round_stool",
+    "file": "round_stool.glb",
+    "triangles": 176,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.24000000953674316,
+        0.0,
+        -0.24000000953674316
+      ],
+      [
+        0.24000000953674316,
+        0.7149999737739563,
+        0.24000000953674316
+      ]
+    ],
+    "dimensions_m": [
+      0.48000001907348633,
+      0.7149999737739563,
+      0.48000001907348633
+    ],
+    "sha256": "02de6017ebb8e43c275fce47fc7fb080ba4620087fac452b199aa32d0c789186"
+  },
+  "spot_track": {
+    "author": "ZHAOYUN",
+    "source": "new simple fixture",
+    "changes": [
+      "One continuous 2.80 m rail matching the approved white placement; three lamp heads remain separate instances."
+    ],
+    "retained_parts": [],
+    "name": "spot_track",
+    "file": "spot_track.glb",
+    "triangles": 432,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -1.399999976158142,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        1.399999976158142,
+        0.05999999865889549,
+        0.03999999910593033
+      ]
+    ],
+    "dimensions_m": [
+      2.799999952316284,
+      0.05999999865889549,
+      0.07999999821186066
+    ],
+    "sha256": "15723377f87b29a7e10f6f9669d3045ba68d7a12d40a9e4fbc0ea98052f55be6"
+  },
+  "spot_head": {
+    "author": "ZHAOYUN",
+    "source": "new simple fixture",
+    "changes": [
+      "Low-poly brass gallery spotlight; local -Z points toward the existing light target. No new light behaviour."
+    ],
+    "retained_parts": [],
+    "name": "spot_head",
+    "file": "spot_head.glb",
+    "triangles": 604,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.07199999690055847,
+        -0.0650000050663948,
+        -0.11900000274181366
+      ],
+      [
+        0.07199999690055847,
+        0.0650000050663948,
+        0.125
+      ]
+    ],
+    "dimensions_m": [
+      0.14399999380111694,
+      0.1300000101327896,
+      0.24400000274181366
+    ],
+    "sha256": "210c654896a5774c531199e124934c45f6192e6e51f13342162c41ef2ef247b6"
+  },
+  "wall_sconce": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/clothing_store_b/clothing_store_b.blend",
+    "changes": [
+      "Retain original opal/brass sconce geometry and back-centre pivot; remap to the room atlas."
+    ],
+    "retained_parts": [
+      "Wall lamp backplate",
+      "Opal wall sconce",
+      "Sconce metal waist"
+    ],
+    "source_sha256": "53870c7e0c1108983ae66a6c0f00e8c97f0e58481e687a2e19404f6620c7b140",
+    "source_collection": "KIT_wall_sconce",
+    "name": "wall_sconce",
+    "file": "wall_sconce.glb",
+    "triangles": 292,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.07000000029802322,
+        -0.2800000011920929,
+        -0.017500000074505806
+      ],
+      [
+        0.07000000029802322,
+        0.2800000011920929,
+        0.1420000195503235
+      ]
+    ],
+    "dimensions_m": [
+      0.14000000059604645,
+      0.5600000023841858,
+      0.1595000196248293
+    ],
+    "sha256": "06162cf180c8c37c2c231916122fca6af894e8689ac8e7fb9ffad6abc1f85cd6"
+  },
+  "monstera": {
+    "author": "ZHAOYUN",
+    "source": "assets/rooms/_shared/plants/source/plants.blend",
+    "changes": [
+      "Uniform .62 scale and 90-degree internal Y rotation retain leaf proportions and keep cards clear of the projecting wainscot.",
+      "Original 128px tile RGBA values and split-leaf masks copied exactly into the room atlas; alpha scissor .45, double-sided.",
+      "Approved conservative pot collision remains .4864 m diameter / .43 m high; no shared library edits."
+    ],
+    "retained_parts": [
+      "Ceramic planter",
+      "Potting soil",
+      "Soft ceramic flute",
+      "Soft ceramic flute.001",
+      "Soft ceramic flute.002",
+      "Soft ceramic flute.003",
+      "Soft ceramic flute.004",
+      "Soft ceramic flute.005",
+      "Soft ceramic flute.006",
+      "Soft ceramic flute.007",
+      "Soft ceramic flute.008",
+      "Soft ceramic flute.009",
+      "Soft ceramic flute.010",
+      "Soft ceramic flute.011",
+      "Soft ceramic flute.012",
+      "Soft ceramic flute.013",
+      "Soft ceramic flute.014",
+      "Soft ceramic flute.015",
+      "Monstera petiole",
+      "Monstera deeply split leaf 00",
+      "Monstera petiole.001",
+      "Monstera deeply split leaf 01",
+      "Monstera petiole.002",
+      "Monstera deeply split leaf 02",
+      "Monstera petiole.003",
+      "Monstera deeply split leaf 03",
+      "Monstera petiole.004",
+      "Monstera deeply split leaf 04",
+      "Monstera petiole.005",
+      "Monstera deeply split leaf 05",
+      "Monstera petiole.006",
+      "Monstera deeply split leaf 06",
+      "Monstera petiole.007",
+      "Monstera deeply split leaf 07",
+      "Monstera petiole.008",
+      "Monstera deeply split leaf 08",
+      "Monstera petiole.009",
+      "Monstera deeply split leaf 09",
+      "Monstera petiole.010",
+      "Monstera deeply split leaf 10"
+    ],
+    "source_sha256": "aec387199dc3c34be2e4e8d0a012d1ffa23dd6445d72ef70693d664333527a60",
+    "source_collection": "KIT_monstera",
+    "name": "monstera",
+    "file": "monstera.glb",
+    "triangles": 910,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.26654309034347534,
+        0.0,
+        -0.479591965675354
+      ],
+      [
+        0.40955784916877747,
+        1.176116943359375,
+        0.4527807831764221
+      ]
+    ],
+    "dimensions_m": [
+      0.6761009395122528,
+      1.176116943359375,
+      0.9323727488517761
+    ],
+    "sha256": "0f1e6cb693a37725ee37ca5ebe7c56172cff965788b98146c42e4dee433582b5"
+  }
+}

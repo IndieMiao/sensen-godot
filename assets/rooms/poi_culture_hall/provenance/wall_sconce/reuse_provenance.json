@@ -1,0 +1,36 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/clothing_store_b/clothing_store_b.blend",
+  "changes": [
+    "Retain original opal/brass sconce geometry and back-centre pivot; remap to the room atlas."
+  ],
+  "retained_parts": [
+    "Wall lamp backplate",
+    "Opal wall sconce",
+    "Sconce metal waist"
+  ],
+  "source_sha256": "53870c7e0c1108983ae66a6c0f00e8c97f0e58481e687a2e19404f6620c7b140",
+  "source_collection": "KIT_wall_sconce",
+  "name": "wall_sconce",
+  "file": "wall_sconce.glb",
+  "triangles": 292,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.07000000029802322,
+      -0.2800000011920929,
+      -0.017500000074505806
+    ],
+    [
+      0.07000000029802322,
+      0.2800000011920929,
+      0.1420000195503235
+    ]
+  ],
+  "dimensions_m": [
+    0.14000000059604645,
+    0.5600000023841858,
+    0.1595000196248293
+  ],
+  "sha256": "06162cf180c8c37c2c231916122fca6af894e8689ac8e7fb9ffad6abc1f85cd6"
+}

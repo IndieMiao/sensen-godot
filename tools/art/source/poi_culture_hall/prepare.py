@@ -10,9 +10,10 @@ parser=argparse.ArgumentParser();parser.add_argument("--runtime",required=True);
 runtime=Path(args.runtime).resolve();project=QA/"project";kit="assets/rooms/poi_culture_hall"
 if args.sync_import:
     for asset in json.loads((ROOT/kit/"layout.json").read_text())["assets"]:
-        if asset["name"].startswith("props/"):continue
+        if asset["name"].startswith(("props/","blockout_")):continue
         name=asset["file"]+".import"
         shutil.copy2(project/kit/name,ROOT/kit/name)
+    shutil.copy2(project/kit/"room_albedo_ao.png.import",ROOT/kit/"room_albedo_ao.png.import")
     for file in (project/kit).glob("*.gd.uid"):shutil.copy2(file,ROOT/kit/file.name)
     for file in (project/"scenes/poi_culture_hall").glob("*.uid"):shutil.copy2(file,ROOT/"scenes/poi_culture_hall"/file.name)
     raise SystemExit(0)

@@ -1,69 +1,202 @@
 {
-  "stage": "white_blockout",
+  "stage": "reuse_preassembly",
   "assets": [
     {
-      "name": "blockout_box",
-      "file": "blockout_box.glb",
-      "triangles": 12,
-      "surfaces": 1
+      "name": "gallery_bench",
+      "file": "gallery_bench.glb",
+      "triangles": 864,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.3400000035762787,
+          0.0,
+          -0.8639999628067017
+        ],
+        [
+          0.3400000035762787,
+          0.7149999737739563,
+          0.8639999628067017
+        ]
+      ],
+      "dimensions_m": [
+        0.6800000071525574,
+        0.7149999737739563,
+        1.7279999256134033
+      ],
+      "sha256": "3046a9f06219fa7d6d03d1da4df4b3c6d5ef6000d2ed24710c4a608e995a712d"
+    },
+    {
+      "name": "round_stool",
+      "file": "round_stool.glb",
+      "triangles": 176,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.24000000953674316,
+          0.0,
+          -0.24000000953674316
+        ],
+        [
+          0.24000000953674316,
+          0.7149999737739563,
+          0.24000000953674316
+        ]
+      ],
+      "dimensions_m": [
+        0.48000001907348633,
+        0.7149999737739563,
+        0.48000001907348633
+      ],
+      "sha256": "02de6017ebb8e43c275fce47fc7fb080ba4620087fac452b199aa32d0c789186"
+    },
+    {
+      "name": "spot_track",
+      "file": "spot_track.glb",
+      "triangles": 432,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -1.399999976158142,
+          0.0,
+          -0.03999999910593033
+        ],
+        [
+          1.399999976158142,
+          0.05999999865889549,
+          0.03999999910593033
+        ]
+      ],
+      "dimensions_m": [
+        2.799999952316284,
+        0.05999999865889549,
+        0.07999999821186066
+      ],
+      "sha256": "15723377f87b29a7e10f6f9669d3045ba68d7a12d40a9e4fbc0ea98052f55be6"
+    },
+    {
+      "name": "spot_head",
+      "file": "spot_head.glb",
+      "triangles": 604,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.07199999690055847,
+          -0.0650000050663948,
+          -0.11900000274181366
+        ],
+        [
+          0.07199999690055847,
+          0.0650000050663948,
+          0.125
+        ]
+      ],
+      "dimensions_m": [
+        0.14399999380111694,
+        0.1300000101327896,
+        0.24400000274181366
+      ],
+      "sha256": "210c654896a5774c531199e124934c45f6192e6e51f13342162c41ef2ef247b6"
+    },
+    {
+      "name": "wall_sconce",
+      "file": "wall_sconce.glb",
+      "triangles": 292,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.07000000029802322,
+          -0.2800000011920929,
+          -0.017500000074505806
+        ],
+        [
+          0.07000000029802322,
+          0.2800000011920929,
+          0.1420000195503235
+        ]
+      ],
+      "dimensions_m": [
+        0.14000000059604645,
+        0.5600000023841858,
+        0.1595000196248293
+      ],
+      "sha256": "06162cf180c8c37c2c231916122fca6af894e8689ac8e7fb9ffad6abc1f85cd6"
+    },
+    {
+      "name": "monstera",
+      "file": "monstera.glb",
+      "triangles": 910,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -0.26654309034347534,
+          0.0,
+          -0.479591965675354
+        ],
+        [
+          0.40955784916877747,
+          1.176116943359375,
+          0.4527807831764221
+        ]
+      ],
+      "dimensions_m": [
+        0.6761009395122528,
+        1.176116943359375,
+        0.9323727488517761
+      ],
+      "sha256": "0f1e6cb693a37725ee37ca5ebe7c56172cff965788b98146c42e4dee433582b5"
     },
     {
       "name": "blockout_ball",
       "file": "blockout_ball.glb",
       "triangles": 224,
-      "surfaces": 1
+      "surfaces": 1,
+      "stage": "unchanged placeholder"
     },
     {
-      "name": "blockout_cylinder",
-      "file": "blockout_cylinder.glb",
-      "triangles": 124,
-      "surfaces": 1
-    },
-    {
-      "name": "blockout_bench",
-      "file": "blockout_bench.glb",
-      "triangles": 84,
-      "surfaces": 1
-    },
-    {
-      "name": "blockout_stool",
-      "file": "blockout_stool.glb",
-      "triangles": 172,
-      "surfaces": 1
+      "name": "blockout_box",
+      "file": "blockout_box.glb",
+      "triangles": 12,
+      "surfaces": 1,
+      "stage": "unchanged placeholder"
     },
     {
       "name": "blockout_case",
       "file": "blockout_case.glb",
       "triangles": 120,
-      "surfaces": 2
-    },
-    {
-      "name": "blockout_frame",
-      "file": "blockout_frame.glb",
-      "triangles": 60,
-      "surfaces": 2
-    },
-    {
-      "name": "blockout_mosaic",
-      "file": "blockout_mosaic.glb",
-      "triangles": 190,
-      "surfaces": 2
-    },
-    {
-      "name": "blockout_vase",
-      "file": "blockout_vase.glb",
-      "triangles": 472,
-      "surfaces": 1
+      "surfaces": 2,
+      "stage": "unchanged placeholder"
     },
     {
       "name": "blockout_fossil",
       "file": "blockout_fossil.glb",
       "triangles": 384,
-      "surfaces": 2
+      "surfaces": 2,
+      "stage": "unchanged placeholder"
+    },
+    {
+      "name": "blockout_frame",
+      "file": "blockout_frame.glb",
+      "triangles": 60,
+      "surfaces": 2,
+      "stage": "unchanged placeholder"
+    },
+    {
+      "name": "blockout_mosaic",
+      "file": "blockout_mosaic.glb",
+      "triangles": 190,
+      "surfaces": 2,
+      "stage": "unchanged placeholder"
+    },
+    {
+      "name": "blockout_vase",
+      "file": "blockout_vase.glb",
+      "triangles": 472,
+      "surfaces": 1,
+      "stage": "unchanged placeholder"
     }
   ],
-  "scene_triangles": 17424,
-  "static_draw_surfaces": 48,
+  "scene_triangles": 21102,
+  "static_draw_surfaces": 47,
   "shared_shell": {
     "atlas": {
       "file": "hall_albedo_ao.png",
@@ -128,5 +261,13 @@
       "static_draw_surfaces": 50
     }
   },
-  "scope": "White proxies only; final geometry and atlas await approval and Huangzhong's assets"
+  "atlas": {
+    "file": "room_albedo_ao.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "botanical_alpha_scissor": 0.45
+  },
+  "pending": "Huangzhong's final display kit; proxy cost is still included"
 }
