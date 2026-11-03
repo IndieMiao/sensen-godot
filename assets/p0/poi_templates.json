@@ -1,0 +1,83 @@
+{
+ "_note": "Enterable POIs (SGODOT-313; the user 11-03 \"POI 提前\", 奕星 via terminal, no message id; plan pm/plans/poi-enter-plan-2026-11-03.md; q row pending — the maki / class rows below are the plan's proposal until 李白's q row settles them). Read by the server (the room of a POI: capacity, walls, seats) and the client (which POI shows Go in, which kit it opens, the door's words). A POI's room is `poi:<template>@<city cluster>:<tile id>` — the tile feature id changes when Mapbox updates its tiles, so it is a room key only, never saved. Pick: the POI's maki, else its class, else no Go in.",
+ "capacity": 16,
+ "templates": {
+  "hotel_lobby": {
+   "art": "poi_hotel_lobby",
+   "door": "Hotel",
+   "bounds": [
+    -3.4,
+    3.4,
+    -3.2,
+    3.0
+   ],
+   "seats": [
+    "seat_sofa_1",
+    "seat_sofa_2",
+    "seat_sofa_3",
+    "seat_sofa_4",
+    "seat_sofa_5",
+    "seat_sofa_6",
+    "seat_armchair_1",
+    "seat_armchair_2"
+   ]
+  },
+  "service_hall": {
+   "art": "poi_service_hall",
+   "door": "Service Hall",
+   "bounds": [
+    -3.4,
+    3.4,
+    -3.2,
+    3.0
+   ],
+   "seats": [
+    "seat_sofa_1",
+    "seat_sofa_2",
+    "seat_sofa_3",
+    "seat_sofa_4",
+    "seat_sofa_5",
+    "seat_sofa_6",
+    "seat_armchair_1",
+    "seat_armchair_2"
+   ]
+  },
+  "city_park": {
+   "art": "poi_city_park",
+   "door": "City Park",
+   "bounds": [
+    -4.0,
+    4.0,
+    -4.0,
+    4.0
+   ],
+   "seats": [
+    "seat_bench_1",
+    "seat_bench_2",
+    "seat_bench_3",
+    "seat_bench_4",
+    "seat_bench_5",
+    "seat_bench_6",
+    "seat_bench_7",
+    "seat_bench_8"
+   ]
+  }
+ },
+ "maki": {
+  "lodging": "hotel_lobby",
+  "bank": "service_hall",
+  "town-hall": "service_hall",
+  "fire-station": "service_hall",
+  "doctor": "service_hall",
+  "hospital": "service_hall",
+  "police": "service_hall",
+  "park": "city_park",
+  "garden": "city_park",
+  "pitch": "city_park",
+  "playground": "city_park"
+ },
+ "class": {
+  "lodging": "hotel_lobby",
+  "park_like": "city_park"
+ }
+}
