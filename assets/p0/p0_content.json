@@ -1,12 +1,11 @@
 {
   "version": "p0-m3b-s5-2026-10-08",
-  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials. M3a (SGODOT-228): Homestead Lv1–3 (§8.1–8.3), farm storage (§10.4.8), materials and their buyback (§9.13.1, sources come with SGODOT-162/163), Bag Upgrade I, drinks (§3.4.4, §9.12), counters by role and buyback quotas (§9.11, §9.13.1), compost (§9.11.1, §17.2.1), Row Hoe and the Shanghai Postcard (§9.11.2, §9.11.5), residents Pip and Old Kai with affinity, gifts and gift meals (§3.4.5, §9.4.3–9.4.4, §7.6.3), and the Stall / Market boards (§9.6, §9.13.2). Numbers and copy per Li Bai on SGODOT-228 (b7d8b665, v1.1, 719ce953). Outpost names and keepers live in p0_outposts.json. q(40): Wild Herb is a material and a seasoning like Herb; the Fishing Lv2 gift gives Wild Herb ×3. q(41): Rest needs 2 h since the player last left the homestead (rest_away_h). S1 (SGODOT-232): first cast and first landed fish 10 / 10, first catch in a city +10 (q(37), the city comes from the server's fishing site); the Cooking Lv2 gift is the Fresh Fish Soup recipe (§4.6.3). S6 (SGODOT-232): fishing.sites are the Pond / River templates; fishing.places map each catalog pond to its template by point, not shape (q(36): Shanghai Reed Pond is the beginner pond, Reed / Willow / Fern = Pond, Pebble / Blossom / Clover = River); skill_daily_cap is the per-skill anti-script limit (§4.3.4). S5 (SGODOT-232): cooking.recipes are the 14 P0 pages of §7.14.0 (q(39)) with their Cookbook page number n, style and how they can be learned; cooking.pages are the other 34 pages as silhouettes (rarity, the family of each slot), not cookable in P0.",
+  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials. M3a (SGODOT-228): Homestead Lv1–3 (§8.1–8.3), farm storage (§10.4.8), materials and their buyback (§9.13.1, sources come with SGODOT-162/163), Bag Upgrade I, drinks (§3.4.4, §9.12), counters by role and buyback quotas (§9.11, §9.13.1), compost (§9.11.1, §17.2.1), Row Hoe and the Shanghai Postcard (§9.11.2, §9.11.5), residents Pip and Old Kai with affinity, gifts and gift meals (§3.4.5, §9.4.3–9.4.4, §7.6.3), and the Stall / Market boards (§9.6, §9.13.2). Numbers and copy per Li Bai on SGODOT-228 (b7d8b665, v1.1, 719ce953). Outpost names and keepers live in p0_outposts.json. q(40): Wild Herb is a material and a seasoning like Herb; the Fishing Lv2 gift gives Wild Herb ×3. q(41): Rest needed 2 h since the player last left the homestead; q(269) (SGODOT-377) retired it: once a player day, at home. S1 (SGODOT-232): first cast and first landed fish 10 / 10, first catch in a city +10 (q(37), the city comes from the server's fishing site); the Cooking Lv2 gift is the Fresh Fish Soup recipe (§4.6.3). S6 (SGODOT-232): fishing.sites are the Pond / River templates; fishing.places map each catalog pond to its template by point, not shape (q(36): Shanghai Reed Pond is the beginner pond, Reed / Willow / Fern = Pond, Pebble / Blossom / Clover = River); skill_daily_cap is the per-skill anti-script limit (§4.3.4). S5 (SGODOT-232): cooking.recipes are the 14 P0 pages of §7.14.0 (q(39)) with their Cookbook page number n, style and how they can be learned; cooking.pages are the other 34 pages as silhouettes (rarity, the family of each slot), not cookable in P0.",
   "energy": {
     "max_base": 200,
     "regen_ms": 240000,
     "bonus_zone": 50,
-    "rest_amount": 60,
-    "rest_away_h": 2
+    "rest_amount": 60
   },
   "day": {
     "utc_offset_hours": 8,
@@ -1853,7 +1852,7 @@
       "coins": 14,
       "where": "any pond"
     },
-    "done_refill_h": 4,
+    "done_refill_h": 0,
     "drop_refill_h": 8,
     "expire_h": 72,
     "track_max": 3,
@@ -2757,6 +2756,12 @@
     },
     "request_bonus": {
       "cap": 100,
+      "by_homestead": [
+        [
+          1,
+          100
+        ]
+      ],
       "scope": "all requests"
     },
     "sys_requests": {
@@ -2813,9 +2818,9 @@
       "portrait": "pip",
       "likes": "Dessert",
       "gift_meal": "dish_carrot_cake",
-      "one_per_day": true,
+      "one_per_day": false,
       "lines": {
-        "Stranger": "Hi! I'm Pip. I carry letters all over San Francisco.",
+        "Stranger": "Hi! I'm Pip. I carry letters from city to city.",
         "Acquainted": "You again! Got anything sweet?",
         "Familiar": "I saved you something. Don't tell the others.",
         "mystery": "Um… thanks? I'll save it for later."
@@ -2863,7 +2868,7 @@
       "portrait": "kai",
       "likes": "Grilled",
       "gift_meal": "dish_grilled_crucian",
-      "one_per_day": true,
+      "one_per_day": false,
       "lines": {
         "Stranger": "Hm. You fish?",
         "Acquainted": "Fish bite early here.",

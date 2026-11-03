@@ -7,7 +7,6 @@ extends Node
 
 const ACCOUNT := "user://e2e_account.json"
 const CACHE := "user://e2e_city_cache.json"
-const TOKYO := {"lat": 35.6812, "lng": 139.7671}
 var failures := 0
 
 func _ready() -> void:
@@ -18,7 +17,7 @@ func _ready() -> void:
 	# 1. Guest boot: read-only.
 	_check("guest boot", await Net.boot())
 	_check("starts as guest", Net.is_guest())
-	var guest_farm := await Net.session.ensure_generated_farm("gn-1850147", TOKYO)
+	var guest_farm := await Net.session.ensure_farm("los_angeles", "la_a", 2)
 	_check("guest cannot create a farm", not guest_farm and Net.session.last_error_code == "LOGIN_REQUIRED")
 	# 2. Register + verify with the QA code.
 	var email := "client-e2e-%d@qa.sensen.test" % Time.get_unix_time_from_system()
@@ -28,11 +27,11 @@ func _ready() -> void:
 	_check("no longer a guest", not Net.is_guest())
 	var verified := await AccountSession.verify(Net.client, "424242")
 	_check("verify email", verified.ok and bool(verified.body.get("email_verified", false)))
-	# 3. Global city: create a farm in Tokyo from real map data.
-	var created := await Net.session.ensure_generated_farm("gn-1850147", TOKYO)
-	_check("create Tokyo farm (%s)" % Net.session.last_error_code, created)
-	_check("server resolved Tokyo", Net.session.region_id == "gn-1850147")
-	var region := await Net.ensure_city(Net.session.region_id)
+	# 3. A farm on a curated template (farms generated from map data are retired, SGODOT-342), then a global city.
+	var created := await Net.session.ensure_farm("los_angeles", "la_a", 2)
+	_check("create farm (%s)" % Net.session.last_error_code, created)
+	_check("farm in Los Angeles", Net.session.region_id == "los_angeles")
+	var region := await Net.ensure_city("gn-1850147")
 	_check("city cached for the map", str(region.get("name", "")) == "Tokyo" and FarmRegions.load_default().region("gn-1850147").timezone == "Asia/Tokyo")
 	_check("generated city map", CityMapData.has_city("gn-1850147") and CityMapData.city("gn-1850147").residents.size() == 3)
 	var farm_id := Net.session.farm_id

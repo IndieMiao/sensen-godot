@@ -1,0 +1,3273 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Gensen 玩法设定 v4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #F7F8F3; --surface: #FFFFFF; --surface-2: #EEF2EA; --ink: #24302A; --ink-2: #55635C; --ink-3: #7E8B84;
+  --line: #CFD8CC; --line-2: #E2E8DF; --accent: #2E7D77; --accent-ink: #1F5F5A; --accent-soft: #DCEEEB;
+  --warm: #D9823B; --warm-soft: #FBEADB; --code-bg: #EEF2EA; --thead: #E9EFE6; --row: #F8FAF6; --shadow: 0 1px 2px rgba(36,48,42,.08);
+  --serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #141A17; --surface: #1C2420; --surface-2: #222C27; --ink: #E6EBE4; --ink-2: #AEBBB3; --ink-3: #7F8D86;
+    --line: #2C3731; --line-2: #26302B; --accent: #6FC2BA; --accent-ink: #8FD6CF; --accent-soft: #1E3733;
+    --warm: #E9A35F; --warm-soft: #3A2A1B; --code-bg: #222C27; --thead: #243029; --row: #1F2924; --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141A17; --surface: #1C2420; --surface-2: #222C27; --ink: #E6EBE4; --ink-2: #AEBBB3; --ink-3: #7F8D86;
+  --line: #2C3731; --line-2: #26302B; --accent: #6FC2BA; --accent-ink: #8FD6CF; --accent-soft: #1E3733;
+  --warm: #E9A35F; --warm-soft: #3A2A1B; --code-bg: #222C27; --thead: #243029; --row: #1F2924; --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.75; -webkit-text-size-adjust: 100%; }
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+.topbar-in { max-width: 1360px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.topbar .name { font-family: var(--serif); font-weight: 700; font-size: 17px; letter-spacing: .01em; }
+.topbar .meta { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .02em; }
+.topbar .meta span + span::before { content: "·"; margin: 0 8px; color: var(--line); }
+
+.shell { max-width: 1360px; margin: 0 auto; padding: 24px 20px 80px; display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 36px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 58px); align-self: start; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 8px; font-size: 13px; line-height: 1.5; }
+.toc .label { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px 2px; }
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li.c1 { margin: 0 0 6px; }
+.toc li.c1 > a { display: block; font-weight: 700; color: var(--ink); padding: 4px 8px; border-radius: 6px; }
+.toc li.c1 > ul { display: none; margin: 2px 0 6px 10px; border-left: 2px solid var(--line-2); }
+.toc li.c1.open > ul { display: block; }
+.toc li.c2 > a { display: block; color: var(--ink-2); padding: 3px 10px; border-left: 2px solid transparent; margin-left: -2px; }
+.toc a.active { color: var(--accent-ink); }
+.toc li.c2 > a.active { border-left-color: var(--accent); }
+.toc li.c1 > a.active { background: var(--accent-soft); }
+.toc-mobile { display: none; }
+
+article { min-width: 0; }
+.hero { padding: 8px 0 28px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 10px; }
+.hero h1.title { font-family: var(--serif); font-size: clamp(26px, 3.4vw, 40px); line-height: 1.25; margin: 0 0 14px; text-wrap: balance; font-weight: 700; }
+.hero .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+.hero .facts b { color: var(--ink); font-weight: 500; }
+
+article h1 { font-family: var(--serif); font-size: 28px; line-height: 1.3; margin: 64px 0 18px; padding-top: 18px; border-top: 3px solid var(--accent); text-wrap: balance; scroll-margin-top: 80px; }
+article h2 { font-family: var(--serif); font-size: 21px; line-height: 1.35; margin: 40px 0 12px; text-wrap: balance; scroll-margin-top: 80px; }
+article h3 { font-size: 16.5px; font-weight: 700; margin: 28px 0 8px; scroll-margin-top: 80px; }
+article h4 { font-size: 15px; font-weight: 700; margin: 20px 0 6px; color: var(--ink-2); scroll-margin-top: 80px; }
+article p, article li { max-width: 76ch; }
+article p { margin: 0 0 12px; }
+article ul, article ol { padding-left: 1.4em; margin: 0 0 14px; }
+article li { margin: 0 0 4px; }
+article hr { border: 0; border-top: 1px solid var(--line-2); margin: 28px 0; }
+article strong { font-weight: 700; }
+article blockquote { margin: 16px 0; padding: 10px 16px; border-left: 3px solid var(--warm); background: var(--warm-soft); border-radius: 0 6px 6px 0; color: var(--ink); }
+article blockquote p { margin: 0; }
+article code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; color: var(--accent-ink); }
+article pre { background: var(--code-bg); border: 1px solid var(--line-2); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.55; }
+article pre code { background: none; padding: 0; color: inherit; }
+
+.tbl { overflow-x: auto; margin: 12px 0 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.5; }
+thead th { background: var(--thead); color: var(--ink); text-align: left; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid var(--line); position: sticky; top: 0; white-space: nowrap; }
+tbody td { padding: 7px 10px; border-top: 1px solid var(--line-2); vertical-align: top; min-width: 60px; }
+tbody tr:nth-child(even) td { background: var(--row); }
+td code, th code { white-space: nowrap; }
+td { font-variant-numeric: tabular-nums; }
+
+.diagram { margin: 16px 0 22px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+.diagram pre.mermaid { background: none; border: 0; padding: 0; margin: 0; font-family: var(--mono); font-size: 12px; white-space: pre; }
+.diagram svg { max-width: 100%; height: auto; }
+
+.totop { position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); z-index: 20; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font: 500 12px var(--sans); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.totop.show { opacity: 1; pointer-events: auto; }
+
+@media (max-width: 1023px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 16px 16px 72px; }
+  .toc { display: none; }
+  .toc-mobile { display: block; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .toc-mobile summary { cursor: pointer; padding: 10px 14px; font-weight: 700; list-style: none; }
+  .toc-mobile summary::-webkit-details-marker { display: none; }
+  .toc-mobile summary::after { content: "目录"; float: right; font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--ink-3); }
+  .toc-mobile .toc { display: block; position: static; max-height: 60vh; padding: 0 12px 12px; }
+  .toc-mobile .toc li.c1 > ul { display: block; }
+  article h1 { font-size: 24px; margin-top: 48px; }
+  article h2 { font-size: 19px; }
+}
+</style>
+
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <span class="name">Gensen 玩法设定 v4</span>
+  <span class="meta"><span>2026-10-02</span><span>11 章</span><span>33 张表</span><span>独立完整版</span></span>
+</div></header>
+
+<div class="shell">
+  <nav class="toc" id="toc" aria-label="目录">
+    <p class="label">Contents</p>
+    <ul><li class="c2"><a href="#s0-1">0.1 一句话</a></li>
+<li class="c2"><a href="#s0-2">0.2 关键数字</a></li>
+<li class="c2"><a href="#s0-3">0.3 系统地图</a></li>
+<li class="c2"><a href="#s0-4">0.4 和 v3 草案相比推翻或改掉的</a></li>
+<li class="c1"><a href="#ch1">第 1 章 世界与地域</a><ul>
+<li class="c2"><a href="#s1-1">1.1 七条原则（v4）</a></li>
+<li class="c2"><a href="#s1-2">1.2 世界四层</a></li>
+<li class="c2"><a href="#s1-3">1.3 地域、档位、季节</a></li>
+<li class="c2"><a href="#s1-4">1.4 野外地点的生成（审查 v4-3 #11）</a></li>
+<li class="c2"><a href="#s1-5">1.5 免费的近处（第 36 条）</a></li>
+<li class="c2"><a href="#s1-6">1.6 每档出门理由（第 14 条；30 分钟玩家）</a></li>
+<li class="c2"><a href="#s1-7">1.7 不做的</a></li>
+</ul></li>
+<li class="c1"><a href="#ch2">第 2 章 Homestead 主线</a><ul>
+<li class="c2"><a href="#s2-1">2.1 一份时间、一份体力（第 45 条）</a></li>
+<li class="c2"><a href="#s2-2">2.2 节奏（「中」档，第 23 条）</a></li>
+<li class="c2"><a href="#s2-3">2.3 三十级表</a></li>
+<li class="c2"><a href="#s2-4">2.4 门槛</a></li>
+<li class="c2"><a href="#s2-5">2.5 田和领地（第 17、32 条）</a></li>
+<li class="c2"><a href="#s2-6">2.6 升级回体力和体力池（第 40 条）</a></li>
+<li class="c2"><a href="#s2-7">2.7 每级看得见的后果（第一批 Lv1–17；〔 〕里是之后的批次加的）</a></li>
+<li class="c2"><a href="#s2-8">2.8 第一周（30 分钟玩家，第一批的机制）</a></li>
+<li class="c2"><a href="#s2-9">2.9 存档</a></li>
+</ul></li>
+<li class="c1"><a href="#ch3">第 3 章 矿井</a><ul>
+<li class="c2"><a href="#s3-1">3.1 原则</a></li>
+<li class="c2"><a href="#s3-2">3.2 往下走：清完怪就开（第 51 条）</a></li>
+<li class="c2"><a href="#s3-3">3.3 五种矿型</a></li>
+<li class="c2"><a href="#s3-4">3.4 主产起始层往浅挪（第 50 条）</a></li>
+<li class="c2"><a href="#s3-5">3.5 怪物与守关表（审查 v4-3 #2：E、F 两条 q 行照这张做）</a></li>
+<li class="c2"><a href="#s3-6">3.6 进度、电梯、钻地机、首杀</a></li>
+<li class="c2"><a href="#s3-7">3.7 第一次去新矿的开销（30 分钟玩家，pacing_r9.py 表 F）</a></li>
+<li class="c2"><a href="#s3-8">3.8 保留的规则（第 10 轮第 1 件、第 49 条）</a></li>
+<li class="c2"><a href="#s3-9">3.9 季节和矿脉新闻</a></li>
+<li class="c2"><a href="#s3-10">3.10 气候：险境和怪物变体</a></li>
+<li class="c2"><a href="#s3-11">3.11 矿口卡</a></li>
+<li class="c2"><a href="#s3-12">3.12 分批</a></li>
+</ul></li>
+<li class="c1"><a href="#ch4">第 4 章 采集与旅行</a><ul>
+<li class="c2"><a href="#s4-1">4.1 采集</a></li>
+<li class="c2"><a href="#s4-2">4.2 背包（第 36 条）</a></li>
+<li class="c2"><a href="#s4-3">4.3 路费</a></li>
+<li class="c2"><a href="#s4-4">4.4 第二故乡：这一轮不做（第 48 条）</a></li>
+<li class="c2"><a href="#s4-5">4.5 许可和长途票（第 41 条，收费第二档，3 期）</a></li>
+<li class="c2"><a href="#s4-6">4.6 极端地理（第 39 条）</a></li>
+</ul></li>
+<li class="c1"><a href="#ch5">第 5 章 经济与收入</a><ul>
+<li class="c2"><a href="#s5-1">5.1 收入曲线（30 分钟玩家，每天净金币，设计目标）</a></li>
+<li class="c2"><a href="#s5-2">5.2 收入构成（档末，pacing_r9-out.txt 表 A）</a></li>
+<li class="c2"><a href="#s5-3">5.3 ② 地域作物和鱼（第 22 条）</a></li>
+<li class="c2"><a href="#s5-4">5.4 ③ 世界动态 World News（第 22、26 条）</a></li>
+<li class="c2"><a href="#s5-5">5.5 委托体系（第 31 条，含跨城 H）</a></li>
+<li class="c2"><a href="#s5-6">5.6 金币去向（30 分钟玩家，占档期收入，pacing_r9-out.txt 表 E）</a></li>
+<li class="c2"><a href="#s5-7">5.7 换料移除（第 38 条）</a></li>
+</ul></li>
+<li class="c1"><a href="#ch6">第 6 章 制作线与家园建造</a><ul>
+<li class="c2"><a href="#s6-1">6.1 六条线</a></li>
+<li class="c2"><a href="#s6-2">6.2 v4 的改动</a></li>
+<li class="c2"><a href="#s6-3">6.3 定价规则（重出全表用）</a></li>
+<li class="c2"><a href="#s6-4">6.4 顶级物品要有用处（第 50 条）</a></li>
+</ul></li>
+<li class="c1"><a href="#ch7">第 7 章 成就与收藏</a><ul>
+</ul></li>
+<li class="c1"><a href="#ch8">第 8 章 版本与长尾</a><ul>
+<li class="c2"><a href="#s8-1">8.1 大版本</a></li>
+<li class="c2"><a href="#s8-2">8.2 版本之间接住满级玩家的长尾</a></li>
+</ul></li>
+<li class="c1"><a href="#ch9">第 9 章 分期与工作量</a><ul>
+<li class="c2"><a href="#s9-1">9.1 1b 第一批（第一周和前三周；Homestead 到 Lv17，第 47 条范围保留）</a></li>
+<li class="c2"><a href="#s9-2">9.2 之后各期（人日按审查 v4-3 的单价推算）</a></li>
+<li class="c2"><a href="#s9-3">9.3 每期之间的等级墙（审查 v4-2 #2、v4-3 #9）</a></li>
+<li class="c2"><a href="#s9-4">9.4 平行的专题</a></li>
+</ul></li>
+<li class="c1"><a href="#ch10">第 10 章 交付清单</a><ul>
+<li class="c2"><a href="#s10-1">10.1 方案（docs/product/gameplay-plan-v2-2026-10-02.md）要回写的章节</a></li>
+<li class="c2"><a href="#s10-2">10.2 q 行拆分建议（1b 第一批）</a></li>
+<li class="c2"><a href="#s10-3">10.3 要李白用模拟器校准的</a></li>
+<li class="c2"><a href="#s10-4">10.4 第 52 条已定的 9 件（用户「全按建议」）</a></li>
+<li class="c2"><a href="#s10-5">10.5 防作弊专题</a></li>
+</ul></li>
+<li class="c1"><a href="#ch11">第 11 章 审查处理记录（11-01 深夜）</a><ul>
+<li class="c2"><a href="#s11-1">11.1 用户第 14 轮的 7 条</a></li>
+<li class="c2"><a href="#s11-2">11.2 数值（v4-1）</a></li>
+<li class="c2"><a href="#s11-3">11.3 结论落实与体验（v4-2）</a></li>
+<li class="c2"><a href="#s11-4">11.4 一致性与实现（v4-3）</a></li>
+<li class="c2"><a href="#appB">附录 B：v3 作废行清单（v4 引用 v3 时以这里为准）</a></li>
+</ul></li></ul>
+  </nav>
+  <article>
+    <details class="toc-mobile"><summary>Gensen 玩法设定 v4</summary><nav class="toc" aria-label="目录"><ul><li class="c2"><a href="#s0-1">0.1 一句话</a></li>
+<li class="c2"><a href="#s0-2">0.2 关键数字</a></li>
+<li class="c2"><a href="#s0-3">0.3 系统地图</a></li>
+<li class="c2"><a href="#s0-4">0.4 和 v3 草案相比推翻或改掉的</a></li>
+<li class="c1"><a href="#ch1">第 1 章 世界与地域</a><ul>
+<li class="c2"><a href="#s1-1">1.1 七条原则（v4）</a></li>
+<li class="c2"><a href="#s1-2">1.2 世界四层</a></li>
+<li class="c2"><a href="#s1-3">1.3 地域、档位、季节</a></li>
+<li class="c2"><a href="#s1-4">1.4 野外地点的生成（审查 v4-3 #11）</a></li>
+<li class="c2"><a href="#s1-5">1.5 免费的近处（第 36 条）</a></li>
+<li class="c2"><a href="#s1-6">1.6 每档出门理由（第 14 条；30 分钟玩家）</a></li>
+<li class="c2"><a href="#s1-7">1.7 不做的</a></li>
+</ul></li>
+<li class="c1"><a href="#ch2">第 2 章 Homestead 主线</a><ul>
+<li class="c2"><a href="#s2-1">2.1 一份时间、一份体力（第 45 条）</a></li>
+<li class="c2"><a href="#s2-2">2.2 节奏（「中」档，第 23 条）</a></li>
+<li class="c2"><a href="#s2-3">2.3 三十级表</a></li>
+<li class="c2"><a href="#s2-4">2.4 门槛</a></li>
+<li class="c2"><a href="#s2-5">2.5 田和领地（第 17、32 条）</a></li>
+<li class="c2"><a href="#s2-6">2.6 升级回体力和体力池（第 40 条）</a></li>
+<li class="c2"><a href="#s2-7">2.7 每级看得见的后果（第一批 Lv1–17；〔 〕里是之后的批次加的）</a></li>
+<li class="c2"><a href="#s2-8">2.8 第一周（30 分钟玩家，第一批的机制）</a></li>
+<li class="c2"><a href="#s2-9">2.9 存档</a></li>
+</ul></li>
+<li class="c1"><a href="#ch3">第 3 章 矿井</a><ul>
+<li class="c2"><a href="#s3-1">3.1 原则</a></li>
+<li class="c2"><a href="#s3-2">3.2 往下走：清完怪就开（第 51 条）</a></li>
+<li class="c2"><a href="#s3-3">3.3 五种矿型</a></li>
+<li class="c2"><a href="#s3-4">3.4 主产起始层往浅挪（第 50 条）</a></li>
+<li class="c2"><a href="#s3-5">3.5 怪物与守关表（审查 v4-3 #2：E、F 两条 q 行照这张做）</a></li>
+<li class="c2"><a href="#s3-6">3.6 进度、电梯、钻地机、首杀</a></li>
+<li class="c2"><a href="#s3-7">3.7 第一次去新矿的开销（30 分钟玩家，pacing_r9.py 表 F）</a></li>
+<li class="c2"><a href="#s3-8">3.8 保留的规则（第 10 轮第 1 件、第 49 条）</a></li>
+<li class="c2"><a href="#s3-9">3.9 季节和矿脉新闻</a></li>
+<li class="c2"><a href="#s3-10">3.10 气候：险境和怪物变体</a></li>
+<li class="c2"><a href="#s3-11">3.11 矿口卡</a></li>
+<li class="c2"><a href="#s3-12">3.12 分批</a></li>
+</ul></li>
+<li class="c1"><a href="#ch4">第 4 章 采集与旅行</a><ul>
+<li class="c2"><a href="#s4-1">4.1 采集</a></li>
+<li class="c2"><a href="#s4-2">4.2 背包（第 36 条）</a></li>
+<li class="c2"><a href="#s4-3">4.3 路费</a></li>
+<li class="c2"><a href="#s4-4">4.4 第二故乡：这一轮不做（第 48 条）</a></li>
+<li class="c2"><a href="#s4-5">4.5 许可和长途票（第 41 条，收费第二档，3 期）</a></li>
+<li class="c2"><a href="#s4-6">4.6 极端地理（第 39 条）</a></li>
+</ul></li>
+<li class="c1"><a href="#ch5">第 5 章 经济与收入</a><ul>
+<li class="c2"><a href="#s5-1">5.1 收入曲线（30 分钟玩家，每天净金币，设计目标）</a></li>
+<li class="c2"><a href="#s5-2">5.2 收入构成（档末，pacing_r9-out.txt 表 A）</a></li>
+<li class="c2"><a href="#s5-3">5.3 ② 地域作物和鱼（第 22 条）</a></li>
+<li class="c2"><a href="#s5-4">5.4 ③ 世界动态 World News（第 22、26 条）</a></li>
+<li class="c2"><a href="#s5-5">5.5 委托体系（第 31 条，含跨城 H）</a></li>
+<li class="c2"><a href="#s5-6">5.6 金币去向（30 分钟玩家，占档期收入，pacing_r9-out.txt 表 E）</a></li>
+<li class="c2"><a href="#s5-7">5.7 换料移除（第 38 条）</a></li>
+</ul></li>
+<li class="c1"><a href="#ch6">第 6 章 制作线与家园建造</a><ul>
+<li class="c2"><a href="#s6-1">6.1 六条线</a></li>
+<li class="c2"><a href="#s6-2">6.2 v4 的改动</a></li>
+<li class="c2"><a href="#s6-3">6.3 定价规则（重出全表用）</a></li>
+<li class="c2"><a href="#s6-4">6.4 顶级物品要有用处（第 50 条）</a></li>
+</ul></li>
+<li class="c1"><a href="#ch7">第 7 章 成就与收藏</a><ul>
+</ul></li>
+<li class="c1"><a href="#ch8">第 8 章 版本与长尾</a><ul>
+<li class="c2"><a href="#s8-1">8.1 大版本</a></li>
+<li class="c2"><a href="#s8-2">8.2 版本之间接住满级玩家的长尾</a></li>
+</ul></li>
+<li class="c1"><a href="#ch9">第 9 章 分期与工作量</a><ul>
+<li class="c2"><a href="#s9-1">9.1 1b 第一批（第一周和前三周；Homestead 到 Lv17，第 47 条范围保留）</a></li>
+<li class="c2"><a href="#s9-2">9.2 之后各期（人日按审查 v4-3 的单价推算）</a></li>
+<li class="c2"><a href="#s9-3">9.3 每期之间的等级墙（审查 v4-2 #2、v4-3 #9）</a></li>
+<li class="c2"><a href="#s9-4">9.4 平行的专题</a></li>
+</ul></li>
+<li class="c1"><a href="#ch10">第 10 章 交付清单</a><ul>
+<li class="c2"><a href="#s10-1">10.1 方案（docs/product/gameplay-plan-v2-2026-10-02.md）要回写的章节</a></li>
+<li class="c2"><a href="#s10-2">10.2 q 行拆分建议（1b 第一批）</a></li>
+<li class="c2"><a href="#s10-3">10.3 要李白用模拟器校准的</a></li>
+<li class="c2"><a href="#s10-4">10.4 第 52 条已定的 9 件（用户「全按建议」）</a></li>
+<li class="c2"><a href="#s10-5">10.5 防作弊专题</a></li>
+</ul></li>
+<li class="c1"><a href="#ch11">第 11 章 审查处理记录（11-01 深夜）</a><ul>
+<li class="c2"><a href="#s11-1">11.1 用户第 14 轮的 7 条</a></li>
+<li class="c2"><a href="#s11-2">11.2 数值（v4-1）</a></li>
+<li class="c2"><a href="#s11-3">11.3 结论落实与体验（v4-2）</a></li>
+<li class="c2"><a href="#s11-4">11.4 一致性与实现（v4-3）</a></li>
+<li class="c2"><a href="#appB">附录 B：v3 作废行清单（v4 引用 v3 时以这里为准）</a></li>
+</ul></li></ul></nav></details>
+    <div class="hero">
+      <p class="eyebrow">Game Design Document · Prototype Stage</p>
+      <h1 class="title">Gensen 玩法设定 v4（完整方案，诸葛亮 2026-11-01）</h1>
+      <div class="facts"><span><b>Energy</b> 200 · +1/4 min</span><span><b>Skills</b> Farming / Fishing ×10 Lv</span><span><b>Trips</b> 1–7</span><span><b>Crops</b> 20 · <b>Fish</b> 20 · <b>Dishes</b> 29</span></div>
+    </div>
+<blockquote>
+<p><strong>仓库版</strong>：SGODOT-355 v4 方案定稿（用户 2026-11-02「全按建议」），由诸葛亮的定稿快照 <code>/Volumes/ACASIS/tmp/gensen-ui-review/pm/plans/355-gameplay-v4-2026-11-02.md</code> 原样存入；本文的相对路径（<code>../v3/</code>、<code>pacing_r9.py</code> 等）都相对于 <code>/Volumes/ACASIS/tmp/zhuge-355/v4/</code>，交接清单见 <code>/Volumes/ACASIS/tmp/gensen-ui-review/pm/plans/355-conclusions-2026-11-02.md</code>。之后正文只按改动清单 <code>docs/product/gameplay-v4-q-2026-11-02.md</code>（v4q）回写；数字以 v4q 行为准。</p>
+<p>来源：SGODOT-355 讨论第 1–15 轮，用户 53 条结论（<code>../conclusions-2026-10-30.md</code>，带原话）。v4 = v3 草案（<code>../v3/</code>）按第 16–53 条修订后的整合稿，<strong>按系统 / 模块组织</strong>（用户 11-01：「为了方便我和团队同步，建议定稿的 html 也按照系统 / 模块重新输出」）。
+状态：<strong>定稿（2026-11-02）</strong>。三路对抗性审查（<code>review-v4-1-numbers.md</code>、<code>review-v4-2-ux.md</code>、<code>review-v4-3-build.md</code>）共 71 条，逐条处理记录在第 11 章；第 14 轮的 7 条（第 45–51 条）已并入；第 15 轮用户「全按建议」（第 52 条），并说明现在是免费删档测试、所有玩家都是测试玩家（第 53 条）。交奕星排执行节奏的定稿：<code>/Volumes/ACASIS/tmp/gensen-ui-review/pm/plans/355-conclusions-2026-11-02.md</code>。
+数字口径：全部是设计初值，没有经过模拟器校准；要李白校准的地方在第 10 章单列。节奏脚本 <code>pacing_r9.py</code>（输出 <code>pacing_r9-out.txt</code>，表 <code>level-table.md</code>），收入和技能门槛来自 sim354 按 v4 体力分配的实测（<code>r9/</code>）。审查前的版本留在 <code>_v4-pre-review/</code>。
+<strong>v3 的表不能直接拿来用</strong>：v4 引用的 v3 章节里有一批被推翻的行，作废清单见第 11 章附录 B。</p>
+</blockquote>
+<h2 id="s0-1">0.1 一句话</h2>
+<p><strong>低级各地一样，高级各地不同，顶级要跨洲；每座城、每座矿都不一样。</strong> 家城只有种田、钓鱼和入门采集；矿和高档材料在城市之间的野外。Homestead 30 级，T3 起每级要去更多不同的地方；收入靠地域作物、世界动态的行情和委托，随档位放大；成就靠怪物志、首杀和收集。</p>
+<h2 id="s0-2">0.2 关键数字</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>值</th>
+<th>章</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homestead</td>
+<td>30 级 6 档；第一周每天一级（Lv10 第 7 天）；满级：30 分钟玩家约第 127 天，重度约第 60 天，5 分钟玩家约第 357 天</td>
+<td>2</td>
+</tr>
+<tr>
+<td>30 分钟玩家的一天</td>
+<td>种 4 分钟、钓 17 分钟（25 竿）、材料和路上 9 分钟；体力用约 250，<strong>缺的是时间，不是体力</strong>（sim354：满条每天还浪费约 200）</td>
+<td>2、5</td>
+</tr>
+<tr>
+<td>门槛</td>
+<td>Lv2–20 看 Farming / Fishing / Cooking 各自等级（按模拟下调）；Lv16 起加城市签章、去过的地域和大洲</td>
+<td>2</td>
+</tr>
+<tr>
+<td>田 / 领地</td>
+<td>田 8 块起，Lv15 36、Lv30 74；领地 256 格起，Lv30 约 1,270 格</td>
+<td>2</td>
+</tr>
+<tr>
+<td>矿</td>
+<td>五种矿型，每座矿各算进度；<strong>清完本层的怪就开下一层，岩石想敲才敲</strong>；钻地机花钱省时间；季节按真实日期、南北半球相反</td>
+<td>3</td>
+</tr>
+<tr>
+<td>收入</td>
+<td>30 分钟玩家每天约 160（第一周）→ 235（Lv15）→ 430（Lv19）→ 1,060（Lv27）→ 1,300（Lv30）</td>
+<td>5</td>
+</tr>
+<tr>
+<td>委托</td>
+<td>驿站板、按城的集市板、具名居民、外城掌柜本地委托；完成奖上限按档 100 → 280</td>
+<td>5</td>
+</tr>
+<tr>
+<td>旅行</td>
+<td>固定路费；最近 3 座城和 3 个野外地点永远免费；许可和长途票越用越贵；第二故乡这一轮不做</td>
+<td>4</td>
+</tr>
+<tr>
+<td>成就</td>
+<td>怪物志；守关个人 / 家城 / 全球首杀；材料全收集；护照与签章</td>
+<td>7</td>
+</tr>
+<tr>
+<td>版本</td>
+<td>V1 = 30 级全开；之后每版 +5 级 + 一个新地域类型，目标约 2 个月；落后两个版本的玩家，Lv16 以后的等级降价追赶</td>
+<td>8</td>
+</tr>
+<tr>
+<td>分期</td>
+<td>1b 第一批：Homestead 到 Lv17（Lv16–17 过渡行）+ 野外 + 矿外移 + 新怪守关 + 武器 + 清档，约 150–225 人日、日历 6–8 周（不含审批）</td>
+<td>9</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s0-3">0.3 系统地图</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>章</th>
+<th>系统</th>
+<th>主要结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>世界与地域</td>
+<td>3、4、9、10、14、15、29、30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Homestead 主线</td>
+<td>11、15、17、18、19、21、23、24、32、40、45、46</td>
+</tr>
+<tr>
+<td>3</td>
+<td>矿井</td>
+<td>9、10、28、29、30、49、50、51</td>
+</tr>
+<tr>
+<td>4</td>
+<td>采集与旅行</td>
+<td>3、5、7、35、36、39、41、48、49</td>
+</tr>
+<tr>
+<td>5</td>
+<td>经济与收入</td>
+<td>6、8、16、22、26、31、38、45</td>
+</tr>
+<tr>
+<td>6</td>
+<td>制作线与家园建造</td>
+<td>8、12、15、17、27、28、37、50</td>
+</tr>
+<tr>
+<td>7</td>
+<td>成就与收藏</td>
+<td>8、34、42、44</td>
+</tr>
+<tr>
+<td>8</td>
+<td>版本与长尾</td>
+<td>18、33</td>
+</tr>
+<tr>
+<td>9</td>
+<td>分期与工作量</td>
+<td>13、20、25、27、28、46、47</td>
+</tr>
+<tr>
+<td>10</td>
+<td>交付清单</td>
+<td>方案回写、q 行拆分、要校准的、第 52 条已定的 9 件、以后再议的、防作弊专题（43）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>审查处理记录</td>
+<td>三路审查 71 条怎么处理；v3 作废行清单</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s0-4">0.4 和 v3 草案相比推翻或改掉的</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>v3 写的</th>
+<th>v4</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lv15 后收入持平</td>
+<td>收入随档位放大</td>
+<td>16</td>
+</tr>
+<tr>
+<td>30 分钟玩家每天 200 → 330，材料另拿 120 体力</td>
+<td>一份时间、一份体力：按 sim354 实测，第一周约 160、Lv15 约 235；材料每天约 9 分钟</td>
+<td>45</td>
+</tr>
+<tr>
+<td>重度 40 天满级</td>
+<td>重度约 60 天；T1–T2 快、T3 起放慢加深</td>
+<td>18、21、23</td>
+</tr>
+<tr>
+<td>技能和门槛</td>
+<td>每技能各自等级（含 Cooking），按模拟下调</td>
+<td>19、24、45</td>
+</tr>
+<tr>
+<td>T4 / T5 点名地域「2 选 1 / 3 选 2」</td>
+<td>点名的都要；跳过自家地域；T6 每级点名一个外洲</td>
+<td>21</td>
+</tr>
+<tr>
+<td>最深纪录所有矿口通用</td>
+<td>每座矿各算 + 资历 + 钻地机</td>
+<td>29、30</td>
+</tr>
+<tr>
+<td>敲完全部岩石才开下一层（现行 1–4 层）</td>
+<td>清完本层的怪就开</td>
+<td>51</td>
+</tr>
+<tr>
+<td>矿每天 2 局、Express</td>
+<td>取消，靠体力和时间封顶</td>
+<td>49</td>
+</tr>
+<tr>
+<td>农场里 6 个采集点</td>
+<td>搬出农场，改成城里采集点</td>
+<td>49</td>
+</tr>
+<tr>
+<td>订单系统</td>
+<td>并进委托体系（H）</td>
+<td>22、31</td>
+</tr>
+<tr>
+<td>野外章</td>
+<td>不做；改成就和收藏</td>
+<td>34</td>
+</tr>
+<tr>
+<td>第二故乡常客永久免费</td>
+<td>这一轮不做（以后做要明显比再访划算）</td>
+<td>35、48</td>
+</tr>
+<tr>
+<td>最近 3 个「每天第一次免费」（第 10 轮建议）</td>
+<td>照旧永远免费</td>
+<td>36</td>
+</tr>
+<tr>
+<td>换料保留到 Lv15</td>
+<td>换料移除</td>
+<td>38</td>
+</tr>
+<tr>
+<td>升级回满（现行 Lv5–10）</td>
+<td>Lv2–15 每级回 50</td>
+<td>40</td>
+</tr>
+<tr>
+<td>许可 / 长途票每周硬上限</td>
+<td>越用越贵</td>
+<td>41</td>
+</tr>
+<tr>
+<td>田 30 块起、庭院扩地</td>
+<td>田 8 块起、格子领地</td>
+<td>17、32</td>
+</tr>
+<tr>
+<td>老号迁移、补偿</td>
+<td>测试期清档</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Homestead 金币「不低于上一级 × 1.05」</td>
+<td>去掉，第一周按收入的 50% 定价（每级 80–90）</td>
+<td>45（审查）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h1 id="ch1">第 1 章 世界与地域</h1>
+<blockquote>
+<p>结论 3、4、9、10、14、15、29、30。地域名、材料总表沿用 <code>../v3/01-framework.md</code>，但其中 1.1 野外章、1.3 的层段、1.4.2 表头层号、1.4.4 掉落层号、1.4.5 背包三选一、1.6 整节、1.7 守关层号<strong>已作废</strong>（第 11 章附录 B）。本章只写 v4 的规则。</p>
+</blockquote>
+<h2 id="s1-1">1.1 七条原则（v4）</h2>
+<ol>
+<li>低级一样，基础类似，高级差异，顶级跨洲（第 9、15 条）。</li>
+<li>不做拍卖行，东西要自己去产地拿（第 2 条）。玩家之间的交换先不做，等社交（333）再议（第 52 条）。</li>
+<li>不追求各家城公平：住得远的人多花一点可以接受（第 4 条；第 39 条：先接受、上线看数据）。</li>
+<li>位置全服一致，状态每人一份（采集冷却、矿的布局和进度、委托、新闻份额都按人；第 3、30、31 条）。</li>
+<li>每个系统都写清「玩家为什么出门」（第 14 条）：本章 1.6 是总表，第 2–8 章每章末尾一行。</li>
+<li>家城没有矿（第 10 条）。</li>
+<li>每座城、每座矿都不一样（第 29 条）。</li>
+</ol>
+<h2 id="s1-2">1.2 世界四层</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>层</th>
+<th>是什么</th>
+<th>有什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>家城</td>
+<td>玩家选定的城</td>
+<td>农场、驿站板、具名居民；城里采集点；没有矿（城里的 Mine Hut 保留为居民 Ivo 的家，不是矿口）</td>
+</tr>
+<tr>
+<td>城市</td>
+<td>其他城市簇</td>
+<td>据点（集市、渔具铺、茶馆、驿站）、当地掌柜（外城发本地委托）、按城的集市板、城里采集点、具名居民</td>
+</tr>
+<tr>
+<td>野外</td>
+<td>城市之间的地点（世界生成，只增不删）</td>
+<td>矿口（五种矿型）、林地 / 草甸、水边钓点、盛放花田；Mira 的商队偶尔停靠</td>
+</tr>
+<tr>
+<td>大洲</td>
+<td>6 个</td>
+<td>大洲遗珍、遗迹矿、大洲守护者</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s1-3">1.3 地域、档位、季节</h2>
+<ul>
+<li><strong>8 个地域</strong> = 4 气候带 × 沿海 / 内陆（v3 1.2）。要新增海岸线数据（离海岸 ≤ 50 km 算沿海），2 期做；第一批只用现有的气候带字段（<code>city_clusters.json</code> 的 climate）。</li>
+<li><strong>6 档</strong>：T1 Lv1–7、T2 Lv8–15、T3 Lv16–19、T4 Lv20–23、T5 Lv24–27、T6 Lv28–30。T1–T2 材料各地一样；T3 地域木材 / 金属；T4 地域草药 / 宝石；T5 盛放奇珍 / 地域晶核；T6 大洲遗珍（v3 1.4 材料总表，48 种地域材料 + 6 种遗珍；表头的层号按第 3 章改）。</li>
+<li><strong>季节</strong>（第 30 条）：按地点所在半球、气候带和真实日期；温带、冷带四季，亚热带雨季 / 旱季，热带湿季 / 干季；南北半球相反。影响矿（第 3 章）、盛放、世界动态。</li>
+</ul>
+<h2 id="s1-4">1.4 野外地点的生成（审查 v4-3 #11）</h2>
+<ul>
+<li><strong>第一批一次分好所有类型</strong>：野外地点只增不删，每座矿又各记进度，所以第一批生成时就把浅坑、矿脉、晶洞、深渊、遗迹、林地、钓点、花田的配额一次算完、冻结成目录（同鱼塘目录的冻结做法）。还没开放的类型照样占位，矿口卡写 <em>Not open yet</em>。按 v3 的格点（0.5° 一格、离城中心 ≥ 30 km）约 5–6 万个点。</li>
+<li>分布约束都是相对城市的（3.2「多常见」列），要离线一次算完。矿脉第一批只分铁 / 石英；「当地 T3 金属」矿脉 2 期用新点，不改已有矿。</li>
+<li>服务端按视口范围下发，客户端不带全量；每屏图钉封顶。内容里那段没人读的 <code>wild</code> 配置（world_gen.json）和本章对齐或删掉。</li>
+</ul>
+<h2 id="s1-5">1.5 免费的近处（第 36 条）</h2>
+<ul>
+<li>离家最近的 3 座城、最近的 3 个野外地点：<strong>永远免费</strong>（q(256) 兜底口径）；最近 10 座 ≤ Trip 2。</li>
+<li>「最近 3 个野外地点」= <strong>选家城、改家城时按家城基点算、冻结</strong>的 3 个（同 q(184)），保证是<strong>浅坑、铁矿脉、石英矿脉各一座</strong>，不够就把最近的那种换进来（<strong>以 v4q(3) ③ 为准，用户 2026-11-02 批，庚3</strong>；原写「建档时按农场点、至少 1 座浅坑、1 座矿脉」）。</li>
+<li>家附近（Trip 2 以内）保证至少 2 座浅坑、2 座矿脉，主产 / 副产互不相同（审查 v4-2 #10）。（<strong>以 v4q(3) ③a 为准</strong>：改成计价保证——离家最近的铁矿脉、石英矿脉各一座加 2 座浅坑路费 ≤ Trip 2；野外点离城中心下限 20 km，用户定。）</li>
+</ul>
+<h2 id="s1-6">1.6 每档出门理由（第 14 条；30 分钟玩家）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>档</th>
+<th>档期</th>
+<th>必须出门做的事</th>
+<th>顺带的理由</th>
+<th>在家能不能替代</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1（Lv1–7）</td>
+<td>约 3 天</td>
+<td>城里采集点（木、石、芦苇、黏土）；最近的浅坑（铜、岩盐、煤）</td>
+<td>第一枚签章、外城本地委托</td>
+<td>不能：家城没有矿，农场没有采集点</td>
+</tr>
+<tr>
+<td>T2（Lv8–15）</td>
+<td>约 12 天</td>
+<td>矿脉（铁、石英）；硬木、亚麻（城里采集点）</td>
+<td>签章、本地委托、世界动态的小新闻</td>
+<td>不能</td>
+</tr>
+<tr>
+<td>T3（Lv16–19）</td>
+<td>约 15 天</td>
+<td>本地域野外采 T3 木材、矿脉 T3 金属；去过 1–3 个别的地域</td>
+<td>② 育种料（每周点名的地域）、世界动态、外地货单</td>
+<td>不能</td>
+</tr>
+<tr>
+<td>T4（Lv20–23）</td>
+<td>约 25 天</td>
+<td>每级点名 2 个地域都要去：野外稀有草药 + 当地晶洞</td>
+<td>新闻、新闻委托、怪物志的招牌怪</td>
+<td>不能</td>
+</tr>
+<tr>
+<td>T5（Lv24–27）</td>
+<td>约 37 天</td>
+<td>每级点名：盛放奇珍 + 深渊晶核（隔一级在外洲）</td>
+<td>同上，加深渊守关</td>
+<td>不能</td>
+</tr>
+<tr>
+<td>T6（Lv28–30）</td>
+<td>约 35 天</td>
+<td>每级点名一个外洲的遗迹 + 本洲遗迹</td>
+<td>大洲守护者、纪念廊、全收集</td>
+<td>不能</td>
+</tr>
+<tr>
+<td>满级 / 版本间</td>
+<td>—</td>
+<td>世界动态、矿、收集</td>
+<td>星级、大件、装扮</td>
+<td>部分可以（种田、做菜）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s1-7">1.7 不做的</h2>
+<ul>
+<li>不做野外章（第 34 条）：野外入口上千个，名字记不住。</li>
+<li>不做「采完就消失」的全服共享刷新、不做共享矿层状态（第 3、30 条）。全服限时事件（盛放、商队、新闻）照做。</li>
+</ul>
+<p><strong>出门理由（本章）</strong>：家城只有种田、钓鱼和入门采集；矿和高档材料都在城外。</p>
+<hr />
+<h1 id="ch2">第 2 章 Homestead 主线</h1>
+<blockquote>
+<p>结论 11、15、17、18、19、21、23、24、32、40、45、46；数据由 <code>pacing_r9.py</code> 生成（下表 = <code>level-table.md</code>，生成器 <code>make_level_table.py</code>）。</p>
+</blockquote>
+<h2 id="s2-1">2.1 一份时间、一份体力（第 45 条）</h2>
+<p>审查发现 v4 初稿的体力用了两次：收入曲线是旧画像挣出来的（每天种约 100、钓约 150 体力），材料预算又另拿 120。改法按用户选的 a：<strong>按 v4 的分配在 sim354 里重跑，收入、价格、门槛跟着降</strong>。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>30 分钟玩家的一天（一次上线）</th>
+<th>时间</th>
+<th>体力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>种田（收、种）</td>
+<td>约 4 分钟</td>
+<td>约 60</td>
+</tr>
+<tr>
+<td>钓鱼 25 竿（每竿约 40 秒）</td>
+<td>约 17 分钟</td>
+<td>约 105</td>
+</tr>
+<tr>
+<td>材料和路上（城里采集点、下矿、飞行）</td>
+<td>约 9 分钟</td>
+<td>约 45–75</td>
+</tr>
+<tr>
+<td>合计</td>
+<td>30 分钟</td>
+<td>约 210–240</td>
+</tr>
+</tbody>
+</table></div>
+<p>sim354 里这个画像每天满条还要浪费约 200 体力：<strong>30 分钟玩家缺的是时间，不是体力</strong>。所以 r9 的材料预算按分钟算（每天 9 分钟，第一周 80% 给 Homestead，之后 50%，其余给制作线），体力跟着报；重度玩家才是被体力封顶的。升级回的 50 体力（第 40 条）对 30 分钟玩家不进预算，主要帮第 1 天两次上线和重度。</p>
+<h2 id="s2-2">2.2 节奏（「中」档，第 23 条）</h2>
+<ul>
+<li><strong>T1–T2 快</strong>：第 1 天首会话到 Lv3、当晚 Lv4；之后每天一级，<strong>第 7 天 Lv10</strong>；Lv15 约第 16 天。</li>
+<li><strong>T3 起放慢、加深</strong>：每级间隔 T3 3–4.5 天、T4 5.5–7 天、T5 8–9.5 天、T6 11–12 天。</li>
+<li><strong>到达日</strong>（建号后第几天；已算上材料取整多出来的天数和技能门槛）：</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>画像</th>
+<th>Lv4</th>
+<th>Lv7</th>
+<th>Lv10</th>
+<th>Lv15</th>
+<th>Lv17</th>
+<th>Lv19</th>
+<th>Lv23</th>
+<th>Lv27</th>
+<th>Lv30</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5 分钟</td>
+<td>1.1</td>
+<td>12.3</td>
+<td>21.4</td>
+<td>47.1</td>
+<td>65.4</td>
+<td>89.1</td>
+<td>160.4</td>
+<td>260.5</td>
+<td>356.5</td>
+</tr>
+<tr>
+<td>30 分钟</td>
+<td>0.4</td>
+<td>3.4</td>
+<td>6.7</td>
+<td>15.9</td>
+<td>22.5</td>
+<td>31.0</td>
+<td>56.7</td>
+<td>92.8</td>
+<td>127.3</td>
+</tr>
+<tr>
+<td>重度</td>
+<td>0.2</td>
+<td>1.9</td>
+<td>3.6</td>
+<td>8.1</td>
+<td>11.3</td>
+<td>15.4</td>
+<td>27.5</td>
+<td>44.1</td>
+<td>59.6</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>30 分钟约第 127 天、重度约第 60 天满级，和第 23 条「中」档（125 / 59）一致。</li>
+<li><strong>5 分钟玩家约第 357 天</strong>（v4 初稿写 280，审查算出 317–487）：sim354 里一次上线 9 分钟，10 竿就占掉 7 分钟，每天几乎没有时间采集下矿；收入是 30 分钟玩家的 0.38，材料按「每三天下一次矿」约 0.33，取 0.36。这是每天只玩 5 分钟的代价；先不加便利，上线后看数据（第 52 条）。</li>
+<li>只上线一次的玩家（没有当晚那次）：第 1 天到 Lv3，Lv4 挪到第 2 天，之后整体晚半天到一天，Lv10 约第 7–8 天。</li>
+</ul>
+<h2 id="s2-3">2.3 三十级表</h2>
+<blockquote>
+<p><strong>以 v4q(1) 为准（用户 2026-11-02 批）</strong>：Lv3 门槛 1 / 1（丁1）、Lv12 门槛 4 / 6 / 6（庚1）、Lv3 材料石 4 木 2、Lv4 石 10（庚2），下表已改；其余第一批口径见 v4q(1)。
+金币 = 档期天数 × 上一级的日收入（第 5 章 5.1）× 份额（第一周 50%，之后 40%），只要求不低于上一级，<strong>去掉了「× 1.05」的下限</strong>；Lv2–4 由开局钱包 180 和第 1 天卖货付。材料 = 档期天数 × 每天 9 分钟 × 份额 − 路上的时间 − 第一次去新矿的时间（记一半，第 3 章 3.7），按每件要几分钟折成件数；晶核、遗珍四舍五入，超出预算的部分折成天数加进到达日。</p>
+</blockquote>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>档</th>
+<th>30 分钟目标天</th>
+<th>金币</th>
+<th>材料</th>
+<th>技能门槛 Farming / Fishing / Cooking</th>
+<th>出门门槛（只算城市签章）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>T1</td>
+<td>0.1</td>
+<td>40</td>
+<td>木材 6、石料 4、芦苇 3</td>
+<td>1 / 1 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3</td>
+<td>T1</td>
+<td>0.1</td>
+<td>60</td>
+<td>石料 4、木材 2、黏土 2</td>
+<td>1 / 1 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td>T1</td>
+<td>0.4</td>
+<td>70</td>
+<td>木材 8、芦苇 4、石料 10、黏土 3、铜矿石 3、岩盐 1</td>
+<td>2 / 2 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td>T1</td>
+<td>1.4</td>
+<td>80</td>
+<td>木材 8、芦苇 4、石料 5、黏土 3、铜矿石 3、岩盐 1、煤 2</td>
+<td>3 / 2 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td>T1</td>
+<td>2.4</td>
+<td>80</td>
+<td>木材 8、芦苇 4、石料 5、黏土 3、铜矿石 3、岩盐 1、煤 2</td>
+<td>3 / 3 / 2</td>
+<td>—</td>
+</tr>
+<tr>
+<td>7</td>
+<td>T1</td>
+<td>3.4</td>
+<td>80</td>
+<td>木材 8、芦苇 4、石料 5、黏土 3、铜矿石 3、岩盐 1、煤 2</td>
+<td>4 / 3 / 3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td>T2</td>
+<td>4.4</td>
+<td>80</td>
+<td>木材 3、芦苇 2、石料 3、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>4 / 4 / 4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>T2</td>
+<td>5.4</td>
+<td>85</td>
+<td>木材 3、芦苇 2、石料 3、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>4 / 5 / 4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>10</td>
+<td>T2</td>
+<td>6.4</td>
+<td>90</td>
+<td>木材 3、芦苇 2、石料 3、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>4 / 5 / 5</td>
+<td>—</td>
+</tr>
+<tr>
+<td>11</td>
+<td>T2</td>
+<td>7.9</td>
+<td>115</td>
+<td>木材 3、芦苇 2、石料 2、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 1、石英 1、煤 1</td>
+<td>4 / 6 / 5</td>
+<td>—</td>
+</tr>
+<tr>
+<td>12</td>
+<td>T2</td>
+<td>9.4</td>
+<td>120</td>
+<td>木材 3、芦苇 2、石料 2、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 1、石英 1、煤 1</td>
+<td>4 / 6 / 6</td>
+<td>—</td>
+</tr>
+<tr>
+<td>13</td>
+<td>T2</td>
+<td>11.2</td>
+<td>150</td>
+<td>木材 4、芦苇 2、石料 3、黏土 2、硬木 4、亚麻 3、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>5 / 6 / 6</td>
+<td>—</td>
+</tr>
+<tr>
+<td>14</td>
+<td>T2</td>
+<td>13.2</td>
+<td>175</td>
+<td>木材 4、芦苇 3、石料 3、黏土 2、硬木 4、亚麻 3、铜矿石 1、铁矿石 2、石英 1、煤 2</td>
+<td>5 / 6 / 7</td>
+<td>—</td>
+</tr>
+<tr>
+<td>15</td>
+<td>T2</td>
+<td>15.6</td>
+<td>220</td>
+<td>木材 5、芦苇 3、石料 4、黏土 3、硬木 5、亚麻 4、铜矿石 2、铁矿石 2、石英 1、煤 2</td>
+<td>6 / 7 / 7</td>
+<td>—</td>
+</tr>
+<tr>
+<td>16</td>
+<td>T3</td>
+<td>18.6</td>
+<td>280</td>
+<td>硬木 5、亚麻 4、铁矿石 1、石英 1、地域 T3 木材 8、地域 T3 金属 3</td>
+<td>6 / 7 / 8</td>
+<td>签章 6，去过 1 个地域</td>
+</tr>
+<tr>
+<td>17</td>
+<td>T3</td>
+<td>22.1</td>
+<td>400</td>
+<td>硬木 6、亚麻 4、铁矿石 2、石英 1、地域 T3 木材 9、地域 T3 金属 3</td>
+<td>7 / 8 / 8</td>
+<td>签章 8，去过 2 个地域</td>
+</tr>
+<tr>
+<td>18</td>
+<td>T3</td>
+<td>26.1</td>
+<td>530</td>
+<td>硬木 6、亚麻 4、铁矿石 2、石英 1、地域 T3 木材 10、地域 T3 金属 3</td>
+<td>7 / 8 / 8</td>
+<td>签章 10，去过 2 个地域</td>
+</tr>
+<tr>
+<td>19</td>
+<td>T3</td>
+<td>30.6</td>
+<td>680</td>
+<td>硬木 7、亚麻 5、铁矿石 2、石英 1、地域 T3 木材 11、地域 T3 金属 4</td>
+<td>8 / 8 / 9</td>
+<td>签章 13，去过 3 个地域</td>
+</tr>
+<tr>
+<td>20</td>
+<td>T4</td>
+<td>36.1</td>
+<td>940</td>
+<td>铁矿石 1、地域 T3 木材 6、地域 T3 金属 2、点名地域 T4 草药 4、点名地域 T4 宝石 3</td>
+<td>8 / 9 / 9</td>
+<td>签章 16，去过 4 个地域</td>
+</tr>
+<tr>
+<td>21</td>
+<td>T4</td>
+<td>42.1</td>
+<td>1,170</td>
+<td>铁矿石 1、地域 T3 木材 7、地域 T3 金属 2、点名地域 T4 草药 4、点名地域 T4 宝石 3</td>
+<td>—</td>
+<td>签章 19，去过 4 个地域</td>
+</tr>
+<tr>
+<td>22</td>
+<td>T4</td>
+<td>48.6</td>
+<td>1,420</td>
+<td>铁矿石 1、地域 T3 木材 7、地域 T3 金属 3、点名地域 T4 草药 4、点名地域 T4 宝石 3</td>
+<td>—</td>
+<td>签章 22，去过 5 个地域</td>
+</tr>
+<tr>
+<td>23</td>
+<td>T4</td>
+<td>55.6</td>
+<td>1,690</td>
+<td>铁矿石 1、地域 T3 木材 8、地域 T3 金属 3、点名地域 T4 草药 5、点名地域 T4 宝石 4</td>
+<td>—</td>
+<td>签章 25，去过 5 个地域</td>
+</tr>
+<tr>
+<td>24</td>
+<td>T5</td>
+<td>63.6</td>
+<td>2,150</td>
+<td>地域 T3 金属 2、点名地域 T4 草药 2、点名地域 T4 宝石 2、点名地域 T5 奇珍 3、点名地域 T5 晶核 2</td>
+<td>—</td>
+<td>签章 29，去过 6 个地域，2 个大洲</td>
+</tr>
+<tr>
+<td>25</td>
+<td>T5</td>
+<td>72.1</td>
+<td>2,600</td>
+<td>地域 T3 金属 2、点名地域 T4 草药 2、点名地域 T4 宝石 2、点名地域 T5 奇珍 3、点名地域 T5 晶核 3</td>
+<td>—</td>
+<td>签章 33，去过 6 个地域，2 个大洲</td>
+</tr>
+<tr>
+<td>26</td>
+<td>T5</td>
+<td>81.1</td>
+<td>3,100</td>
+<td>地域 T3 金属 2、点名地域 T4 草药 3、点名地域 T4 宝石 2、点名地域 T5 奇珍 3、点名地域 T5 晶核 3</td>
+<td>—</td>
+<td>签章 37，去过 7 个地域，2 个大洲</td>
+</tr>
+<tr>
+<td>27</td>
+<td>T5</td>
+<td>90.6</td>
+<td>3,650</td>
+<td>地域 T3 金属 2、点名地域 T4 草药 3、点名地域 T4 宝石 2、点名地域 T5 奇珍 3、点名地域 T5 晶核 3</td>
+<td>—</td>
+<td>签章 41，去过 7 个地域，2 个大洲</td>
+</tr>
+<tr>
+<td>28</td>
+<td>T6</td>
+<td>101.6</td>
+<td>4,650</td>
+<td>点名地域 T4 宝石 1、点名地域 T5 奇珍 1、点名地域 T5 晶核 2、点名大洲遗珍 2</td>
+<td>—</td>
+<td>签章 46，去过 8 个地域，3 个大洲</td>
+</tr>
+<tr>
+<td>29</td>
+<td>T6</td>
+<td>113.1</td>
+<td>5,250</td>
+<td>点名地域 T4 宝石 2、点名地域 T5 奇珍 2、点名地域 T5 晶核 2、点名大洲遗珍 2</td>
+<td>—</td>
+<td>签章 51，去过 8 个地域，3 个大洲</td>
+</tr>
+<tr>
+<td>30</td>
+<td>T6</td>
+<td>125.1</td>
+<td>5,850</td>
+<td>点名地域 T4 宝石 2、点名地域 T5 奇珍 2、点名地域 T5 晶核 2、点名大洲遗珍 2</td>
+<td>—</td>
+<td>签章 56，去过 8 个地域，4 个大洲</td>
+</tr>
+</tbody>
+</table></div>
+<p>30 级金币合计 35,805。</p>
+<p><strong>第一批的 Lv16–17 过渡行</strong>（第 46 条；只用 T2 材料，出门门槛按气候带；2 期上 8 地域和 T3 材料时换回上表）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>金币</th>
+<th>材料</th>
+<th>技能门槛</th>
+<th>出门门槛</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>16</td>
+<td>280</td>
+<td>硬木 13、亚麻 9、铁矿石 4、石英 2</td>
+<td>6 / 7 / 8</td>
+<td>签章 6，去过 1 个别的气候带</td>
+</tr>
+<tr>
+<td>17</td>
+<td>400</td>
+<td>硬木 16、亚麻 11、铁矿石 5、石英 3</td>
+<td>7 / 8 / 8</td>
+<td>签章 8，去过 2 个别的气候带</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>点名规则落到材料</strong>（审查 v4-1 #16）：T4 每级点名 A、B 两个地域，<strong>草药来自 A、宝石来自 B 的晶洞</strong>；「地域 T3 金属 / 木材」来自任一非自家地域（可以复用 T3 开过的矿脉）。T5 点名 A、B：<strong>奇珍来自 A 的盛放、晶核来自 B 的深渊</strong>，B 在 Lv24、26 是外洲，在 Lv25、27 是本洲；T4 草药 / 宝石来自任一非自家地域。T6 每级点名一个外洲（轮换、跳过本洲，三级合计 3 个外洲）：<strong>遗珍至少 1 件来自点名外洲的遗迹</strong>，其余可来自本洲遗迹。点名都跳过自家地域（第 21 条）。</li>
+<li>第一周的金币 80–90 一级，占当天收入的一半（初稿 150–200，占 80% 以上；审查 v4-1 #9、v4-2 #4）。Lv4 从 145 降到 70（145 用户没批过）。</li>
+<li>第一周每天要做的材料活（30 分钟玩家）：约 7 分钟、采集 4–5 次、敲 14–16 块岩石（Lv8 起其中约 11 块在矿脉），见 <code>pacing_r9-out.txt</code> 表 D。</li>
+</ul>
+<h2 id="s2-4">2.4 门槛</h2>
+<ul>
+<li><strong>技能门槛</strong>（第 19、24、45 条）：Lv2–20 看 Farming、Fishing、Cooking 各自的等级（上表）。Lv8 以后按 sim354 在第一批机制下重定（v4 分配、田 8 块起、采集花体力、升级回 50）：30 分钟玩家在目标日达标 75–100%（<code>r9/persona_r9-out.txt</code>），比初稿降了 1–2 级（Farming）和 1 级（Fishing）。Lv20 的 10 / 10 在约 36 天内达不到，改成 8 / 9 / 9；Lv21 起没有技能门槛。</li>
+<li><strong>出门门槛</strong>（Lv16 起）：城市签章数（不含野外，第 34 条）、去过几个地域、几个大洲（上表）。签章每天首访最多计 2 枚（旧方案 §11.9.4）。地域的多样由「去过 N 个地域」和点名承担，签章数只管「去过多少座城」。</li>
+<li>「去过一个地域」= 在该地域的城市或野外地点上过岸（有一次到达记录）。第一批没有地域数据，Lv16–17 用「去过 N 个别的气候带」。</li>
+</ul>
+<h2 id="s2-5">2.5 田和领地（第 17、32 条）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>5</th>
+<th>7</th>
+<th>10</th>
+<th>15</th>
+<th>19</th>
+<th>23</th>
+<th>27</th>
+<th>30</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>田（块，2×2）</td>
+<td>8</td>
+<td>10</td>
+<td>12</td>
+<td>16</td>
+<td>20</td>
+<td>26</td>
+<td>36</td>
+<td>46</td>
+<td>56</td>
+<td>66</td>
+<td>74</td>
+</tr>
+<tr>
+<td>领地（格）</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>320</td>
+<td>352</td>
+<td>436</td>
+<td>576</td>
+<td>736</td>
+<td>912</td>
+<td>1,104</td>
+<td>1,272</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>田：Lv1–15 每级 +2；Lv16–30 交替 +3 / +2。田数只算一年生作物；果树、洒水器不占田数。</li>
+<li>领地：开局 16×16；每级按档发格子（T1 16、T2 28、T3 40、T4 44、T5 48、T6 56），玩家自选贴着已有领地往哪扩；可走范围 40×40。</li>
+<li>田数上限第一批就上；格子领地放第二批。<strong>新号起步田要重排网格</strong>（现在新档是 20 块熟地 + 10 块荒地，0–7 号田不成形；一键收获、温室、洒水器都按 48 格网格），算进第一批（第 9 章）。</li>
+</ul>
+<h2 id="s2-6">2.6 升级回体力和体力池（第 40 条）</h2>
+<ul>
+<li>Lv2–15 每升一级回 50 体力；Lv16 起不回（替代现行 Lv5–10 回满）。</li>
+<li>体力池：Lv1–10 = 200 + 10 ×（Lv − 1），Lv11 起每级 +5，Lv30 = 390。<strong>每日饭量上限用同一个公式</strong>（现在 rules.ts 和 view.ts 各有一份，一起改）。</li>
+</ul>
+<h2 id="s2-7">2.7 每级看得见的后果（第一批 Lv1–17；〔 〕里是之后的批次加的）</h2>
+<p>第一批没有熔炉、药剂台、织布机、展示馆，所以把现有的 28 个解锁重新铺到 17 级，再加第一批的新东西（矿、武器、回血药），保证每级都有一样新东西（审查 v4-2 #3、v4-3 #4）。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>新东西</th>
+<th>田</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>工作台、Basic Room、土灶 1 口</td>
+<td>8</td>
+</tr>
+<tr>
+<td>2</td>
+<td>调味架；城里采集点（引导带你去家城最近的那个）</td>
+<td>10</td>
+</tr>
+<tr>
+<td>3</td>
+<td>背包扩容 I（30）、保温柜 6 份、委托板第 3 槽、外观阶段 1（篱笆与信箱）；<strong>Pip「第一次下矿」委托</strong>（奖励铜剑，开武器槽）</td>
+<td>12</td>
+</tr>
+<tr>
+<td>4</td>
+<td>第二口灶；驿站上架回血药〔第二批：熔炉 T1〕</td>
+<td>14</td>
+</tr>
+<tr>
+<td>5</td>
+<td>外观阶段 2（门廊 · Standard Room）；布告栏（世界动态以后在这里）</td>
+<td>16</td>
+</tr>
+<tr>
+<td>6</td>
+<td>大锅（一锅双份）〔第二批：药剂台 T1〕</td>
+<td>18</td>
+</tr>
+<tr>
+<td>7</td>
+<td>背包扩容 II（35）；果树 8 / 洒水器 10 上限</td>
+<td>20</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>进 T2</strong>：矿脉出现在地图上、工作台可做铁剑；外观阶段 3（灶房扩建）· 第三口灶〔第二批：工坊可升 T2〕</td>
+<td>22</td>
+</tr>
+<tr>
+<td>9</td>
+<td>保温柜 12 份、摊位升级〔第二批：织布机 T2〕</td>
+<td>24</td>
+</tr>
+<tr>
+<td>10</td>
+<td>名厨招牌 Chef's Sign（门口访客可见）</td>
+<td>26</td>
+</tr>
+<tr>
+<td>11</td>
+<td>背包扩容 III（40）</td>
+<td>28</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Deluxe Room〔第二批：展示馆一厅〕</td>
+<td>30</td>
+</tr>
+<tr>
+<td>13</td>
+<td>新摆件一批〔第二批：仓库分类货架〕</td>
+<td>32</td>
+</tr>
+<tr>
+<td>14</td>
+<td>新摆件一批；果树 10 / 洒水器 12 上限</td>
+<td>34</td>
+</tr>
+<tr>
+<td>15</td>
+<td>外观阶段 4（大师农舍）；称号 Homestead Master（拆 <code>TITLE_LEVEL</code>）</td>
+<td>36</td>
+</tr>
+<tr>
+<td>16</td>
+<td>背包扩容 IV（45）；出门门槛开始〔2 期：工坊可升 T3、瞭望台〕</td>
+<td>39</td>
+</tr>
+<tr>
+<td>17</td>
+<td>第四口灶</td>
+<td>41</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Lv18–30 沿用 v3 6.3，改四处：「庭院扩地 +1 块」（Lv13、17、21、25、29）改成领地格子（每级都有）；Lv21 改为展示馆三厅（从 22 挪来），Lv22 果树 12 / 洒水器 14 上限，Lv25 第五口灶，Lv29 地域风格摆件一批；「第二故乡 +1 槽」（Lv20、28）去掉，Lv20 的私人驿站用处等第二故乡定了再定；背包 IV 从 Lv15 挪到 Lv16。</li>
+<li>摆件商店的 11 个门槛、外观阶段（3 / 5 / 8 / 10 → 3 / 5 / 8 / 15）、背包升级的材料按新等级重排，清单在第 9 章第一批补丁行。</li>
+<li>背包扩容价格按新收入降：I 60、II 150、III 300、IV 600（现价 150 / 400 / 1,000；第 6 章 6.3）。</li>
+<li>依赖还没实现的 P2 功能（密友、帮工、长途票、Trip 7 资格）的后果，在对应功能上线前不显示。</li>
+</ul>
+<h2 id="s2-8">2.8 第一周（30 分钟玩家，第一批的机制）</h2>
+<blockquote>
+<p><strong>以 v4q(1) ⑨ 为准（用户 2026-11-02 批方向，庚5）</strong>：矿脉开局就能去（丁12），第 3、4 天各开一座矿脉（铁、石英各走到 F10），第一只守关挪到第 2 天或第 5 天；Today / Pip 的带路提示见 v4q(9)。下表是原稿；<strong>逐日表、一周结算和第一只守关（第 2 天）以 v4q(10) 为准</strong>。
+| 天 | 等级 | 新东西 | 去哪（新地方加粗） |
+|---|---|---|---|
+| 1 · 首会话 | Lv1 → 3 | 调味架、保温柜、篱笆；田 8 → 12；Pip 委托 | 家城：种、钓、做菜；<strong>家城的城里采集点</strong> |
+| 1 · 晚 | Lv4 | 第二口灶；回血药 | <strong>最近的浅坑</strong>（免费）F1–3，拿到铜剑 |
+| 2 | Lv5 | 门廊、布告栏 | <strong>第一座邻城</strong>（免费，第一枚签章，掌柜的本地委托） |
+| 3 | Lv6 | 大锅 | 浅坑 F4–8 |
+| 4 | Lv7 | 背包 II | 浅坑 F10 <strong>第一只守关史莱姆王</strong>（个人首杀） |
+| 5 | Lv8 | 进 T2：矿脉、铁剑配方 | <strong>最近的矿脉</strong>（免费）F1–10 |
+| 6 | Lv9 | 保温柜 12、摊位升级 | <strong>第二座邻城</strong>（第二枚签章） |
+| 7 | Lv10 | 名厨招牌 | 矿脉 F11–20，带铁剑打 F20 守关 |</p>
+</blockquote>
+<p>一周结算：Lv10、2–3 枚签章、浅坑过 F10 守关、矿脉到 F20 左右。每天下矿约 4–5 层（第 51 条以后只要清怪，岩石按需敲）。第二批起加入熔炉、药剂台、织布机后，这张表按 v3 6.7 补齐（以本表为底）。</p>
+<h2 id="s2-9">2.9 存档</h2>
+<p>测试期清档（第 20 条）：不做老号迁移、不做补偿。存档版本 6 → 7（q(270) 已到 v6）。清档前做 P0 备份、约好窗口，执行前再找用户确认。清档同时要清掉设备本地的「已看过」（教学卡、快捷栏、通知已问过，现在按设备存），否则老设备上的新号看不到教学卡。</p>
+<p><strong>出门理由（本章）</strong>：Lv3 起每级都要矿里的东西；Lv16 起门槛直接要签章、地域和大洲。</p>
+<hr />
+<h1 id="ch3">第 3 章 矿井</h1>
+<blockquote>
+<p>结论 9、10、28、29、30、49、50、51；第 10 轮第 1 件里保留的规则。设计稿 <code>../v3/17-r11-mines-v2.md</code>（矿型、季节、钻地机、矿口卡）。<strong><code>../v3/03-mine-monsters.md</code> 的 3.0–3.6 已被本章取代</strong>：只保留 3.3.2 招牌怪的外形描述和 3.4 四种险境 / 抗性药水的名字（第 11 章附录 B）。</p>
+</blockquote>
+<h2 id="s3-1">3.1 原则</h2>
+<p>每座矿都是一个独立的地方：<strong>矿型</strong>决定它多深、主产什么；<strong>地域</strong>决定当地特产和招牌怪；<strong>气候</strong>决定险境和怪物变体；<strong>季节</strong>让同一座矿一年变好几次；<strong>种子</strong>再给每座矿一点个性。玩家去之前就从矿口卡上知道这些。进度按矿算；有积累的玩家用钻地机花钱省时间。家城没有矿。</p>
+<h2 id="s3-2">3.2 往下走：清完怪就开（第 51 条）</h2>
+<ul>
+<li><strong>本层的怪全部打倒，梯子就开</strong>；岩石想敲才敲，敲多少由玩家决定（每块 2 体力）。推翻现行「1–4 层敲完全部岩石才开梯子」。</li>
+<li>守关层：打倒守关才开；精英层：精英也是怪，一起清。没有怪的层（以后可能有的休息层、宝箱层）进来就开。</li>
+<li>每层都有怪（浅坑 F1 起就有史莱姆）；进矿时手里至少有木剑（现行进矿就发）。</li>
+<li>每层第一次进 2 体力（统一，不分矿型）；打怪不花体力。往下走主要花<strong>时间、血和药</strong>，深度看装备。</li>
+<li>第一次去新矿的体力开销因此很小（3.7），主要是时间；钻地机省的是时间。</li>
+</ul>
+<h2 id="s3-3">3.3 五种矿型</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>矿型</th>
+<th>最深</th>
+<th>多常见</th>
+<th>主产（起始层）</th>
+<th>第一批</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浅坑 Quarry</td>
+<td>20–30</td>
+<td>最近 3 个免费野外点里至少 1 座；家附近 Trip 2 内至少 2 座</td>
+<td>石、铜、煤、黏土、岩盐（F1 起）</td>
+<td>有</td>
+</tr>
+<tr>
+<td>矿脉 Vein</td>
+<td>40–60</td>
+<td>最近 3 个免费野外点里至少 1 座；Trip 2 内至少 2 座，主矿不同</td>
+<td>一种主矿 ×2：铁 / 石英（F1 少量，<strong>F10 起多</strong>）；2 期起有当地 T3 金属的矿脉（新点）</td>
+<td>有，开到 F40</td>
+</tr>
+<tr>
+<td>晶洞 Geode</td>
+<td>50–80</td>
+<td>每个地域 Trip 3 左右至少 1 座</td>
+<td>当地 T4 宝石（<strong>F10 起</strong>）；晶簇</td>
+<td>3 期</td>
+</tr>
+<tr>
+<td>深渊 Abyss</td>
+<td>100–150</td>
+<td>每个地域在每个大洲 1–3 座</td>
+<td>当地 T5 晶核（<strong>F20 起，F40 以下多</strong>）；遗珍碎片（<strong>F80 起</strong>）</td>
+<td>3 期开到 F100，4 期到底</td>
+</tr>
+<tr>
+<td>遗迹 Ruin</td>
+<td>固定 30</td>
+<td>每个大洲 1 座</td>
+<td>本大洲遗珍：F10、F20、F30 各一个遗珍宝箱，每周开一次</td>
+<td>4 期</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>每座矿的个性</strong>（审查 v4-2 #10）：同地域、同矿型的两座矿也不一样。种子给每座矿定一种副产（矿口卡上写 <em>Turquoise ★</em> 这样的）、一个特殊层（地下湖、晶洞大厅之类，2 期起）、一种稀有掉落或精英变体。怪物志、收集册里加「在 N 座不同的矿见过」这类计数，不用记矿名。</p>
+<h2 id="s3-4">3.4 主产起始层往浅挪（第 50 条）</h2>
+<ul>
+<li><strong>做法</strong>：矿脉主矿 F10 起多（F1 起少量）、晶洞宝石 F10 起、深渊晶核 F20 起（F40 以下多）、遗珍碎片 F80 起、遗迹宝箱 F10 / F20 / F30。五种矿型的最深层不变。</li>
+<li><strong>理由（改正后的）</strong>：初稿写「不挪 T5、T6 首访开销超过整档预算」是错的（审查 v4-1 #10）。真正的理由有两条：
+  1. <strong>第一次去就有收获</strong>：30 分钟玩家每天只有约 9 分钟给材料。按原层数（晶洞 F20、深渊 F50），第一次去一座深渊要走 50 层（约 75 分钟，8 天的材料时间），或者花三次钻地机的燃料；挪到 F20 后，一次钻地机或一个晚上就能摸到晶核。
+  2. <strong>燃料钱少一半到三分之二</strong>：按 r9 模型，T4 首访的燃料钱 960 对 1,920，T5 1,600 对 4,800（<code>pacing_r9-out.txt</code> 表 F）。</li>
+<li>越深越多：浅层只给少量，想要量就得往下走，深层的意义不变。</li>
+</ul>
+<h2 id="s3-5">3.5 怪物与守关表（审查 v4-3 #2：E、F 两条 q 行照这张做）</h2>
+<p><strong>第一批（浅坑全部、矿脉 F1–40）</strong></p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>矿型</th>
+<th>层</th>
+<th>普通怪</th>
+<th>精英（个位 5 的层）</th>
+<th>守关（档位）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浅坑</td>
+<td>F1–4</td>
+<td>史莱姆 ×2–3</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F5–9</td>
+<td>史莱姆 ×2、蝙蝠 ×1–2</td>
+<td>F5 精英史莱姆（现有）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F10</td>
+<td>—</td>
+<td>—</td>
+<td><strong>史莱姆王</strong>（T1；史莱姆放大换色）</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F11–19</td>
+<td>蝙蝠 ×2、岩甲虫 ×1–2</td>
+<td>F15 精英蝙蝠（蝙蝠换色）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F20</td>
+<td>—</td>
+<td>—</td>
+<td>史莱姆王（T1，血量 ×1.5）</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F21–29</td>
+<td>岩甲虫 ×2、菇菇怪 ×1–2</td>
+<td>F25 精英岩甲虫（换色）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F30（最深 30 的矿）</td>
+<td>—</td>
+<td>—</td>
+<td>史莱姆王（T1，血量 ×2）</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F1–9</td>
+<td>史莱姆 ×1、岩甲虫 ×1–2</td>
+<td>F5 精英岩甲虫</td>
+<td>—</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F10</td>
+<td>两只精英一组（精英岩甲虫 + 精英史莱姆）</td>
+<td>—</td>
+<td>—（电梯站）</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F11–19</td>
+<td>岩甲虫、菇菇怪、蝙蝠，每层 3–4 只</td>
+<td>F15 精英菇菇怪（换色）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F20</td>
+<td>—</td>
+<td>—</td>
+<td><strong>铁背史莱姆王</strong>（T2；史莱姆王换色，第 50 条第 3 件）；第二批换成铁背甲虫王</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F21–39</td>
+<td>同上，每层 4–5 只</td>
+<td>F25、F35 精英</td>
+<td>F30 两只精英一组</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F40</td>
+<td>—</td>
+<td>—</td>
+<td><strong>石英史莱姆王</strong>（T2，换色）；第二批换成菌母</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>怪物行为</strong>（第 28 条：不做要服务端位置的机制）：史莱姆跳扑；蝙蝠快、血少、俯冲；岩甲虫慢、血厚，冲撞后硬直 2 秒，硬直时受伤 ×2（替代 v3 的「正面只吃 1 点」）；菇菇怪被打后缩回 1 秒不受伤，定时放孢子（打中算一次普通命中）。</li>
+<li><strong>守关档位和武器</strong>：浅坑守关算 T1，木剑 / 铜剑都能打；矿脉守关算 T2，要铁剑才打得顺。武器档位低于守关档位时<strong>每下伤害减半</strong>（v3「每下只打 1 点」太硬，改成减半；第 52 条）。</li>
+<li><strong>掉落</strong>（新物品 id，沿用 v3 03 的命名）：蝠翼 <code>drop_t1_bat_wing</code>、甲壳 <code>drop_t2_beetle_shell</code>、荧光孢子 <code>drop_t2_glow_spore</code>；守关：王冠碎片 <code>drop_crown_shard</code>（个人首杀必掉）+ 一包本矿主产。第一批里甲壳进铁剑配方，其余先能卖、进收集册，第二批进药水和饰品配方。</li>
+<li><strong>险境</strong>：第一批不生效（抗性药水的原料要 T4 草药，3 期才有）。矿脉 F30 起的险境从 3 期开始。</li>
+</ul>
+<p><strong>之后（按期补满）</strong>
+| 矿型 | 普通怪 | 守关 | 期 |
+|---|---|---|---|
+| 浅坑 / 矿脉 | 第二批加第 28 条的「其余两种」：铁背甲虫（矿脉精英，F15 / F25 / F35）、菌母（守关）；2 期加石像傀儡（矿脉 F41 以下） | 矿脉 F20 铁背甲虫王（第二批）、F40 菌母（第二批）、F60 石像傀儡（2 期） | 第二批 / 2 期 |
+| 晶洞 | 晶刺蜥、幽影、当地招牌怪 | 晶岩巨像（F20 / F40 / F60）；F80 幽影之门 | 3 期 |
+| 深渊 | 余烬元素、地底龙蜥、虚空怨灵、深层招牌怪 | 地域深渊守护（8 种皮，每 20 层：F20–F100）；F100 余烬古龙；大洲守护者 F120 / F150 | 3 期到 F100，4 期到底 |
+| 遗迹 | 遗迹守卫 + 当地招牌怪 | 大洲守护者（F30） | 4 期 |</p>
+<h2 id="s3-6">3.6 进度、电梯、钻地机、首杀</h2>
+<ul>
+<li>每座矿各自记录两样：<strong>这里的最深纪录</strong>（你亲自走到过的最深层）、<strong>这里打过的守关</strong>。电梯站 = 纪录以上的每个整十层，由纪录推出，不另存。</li>
+<li><strong>资历</strong>（Mining Rank）= 在任何矿里亲自走到过的最深层；显示在名片上，是钻地机的上限。</li>
+<li><strong>钻地机</strong>（熔炉做，2 期起）：I（Lv16）一次 10 层、II（Lv20）15 层、III（Lv24）20 层、IV（Lv28）30 层；最深钻到资历 − 10（IV 为 − 5）；中间的守关要图鉴里打过<strong>同种</strong>才能钻过（同种 = 同一个基础怪，<strong>地域 / 气候变体算同种</strong>）；钻过的层不算到过；落点是整十层的话，算这座矿的电梯站。燃料每份 = <strong>煤 3 + 铁矿石 1 + 20 × 档 金币</strong>（初稿的「当档金属」在 T4 以上不存在，审查 v4-3 #14），每次用 2 / 3 / 4 / 6 份；钻 10 次修一次。遗迹里不能用钻地机。比走下去多花体力和金币，省时间。</li>
+<li><strong>打过才能往下</strong>：按矿（每座矿的守关都要在这座矿打过一次）。</li>
+<li><strong>首杀奖励和成就按种</strong>：个人首杀的必掉和成就，每种守关（地域 / 气候变体各算一种）只给一次；每周重打的奖励按种计次（每种每周一次），不是每座矿一次（审查 v4-3 #16）。家城首杀、全球首杀见第 7 章。</li>
+<li><strong>第一批就记击杀</strong>：服务端从第一批起记「按种的击杀数、每种守关第一次打倒的时间和人」，第二批上成就时回填（审查 v4-3 #17、v4-2 #14）。</li>
+</ul>
+<h2 id="s3-7">3.7 第一次去新矿的开销（30 分钟玩家，<code>pacing_r9.py</code> 表 F）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>档</th>
+<th>一档里要开的新矿</th>
+<th>开销（全额：分钟 / 体力 / 金币）</th>
+<th>记给 Homestead 的一半占档期材料时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T2</td>
+<td>第一座矿脉（免费近处）走到 F10</td>
+<td>10 / 20 / 0</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>2 座矿脉（本地域 + 一个别的地域），钻地机 I</td>
+<td>2 / 80 / 240</td>
+<td>1%</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>4 座晶洞（每级点名的 B），钻地机 II</td>
+<td>4 / 240 / 960</td>
+<td>2%</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>4 座深渊（每级点名的 B），钻地机 III</td>
+<td>4 / 320 / 1,600</td>
+<td>1%</td>
+</tr>
+<tr>
+<td>T6</td>
+<td>遗迹不能钻，走上去本身就是拿遗珍的成本（算在遗珍的单价里）</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>第 51 条以后往下走只花每层 2 体力，钻地机主要省时间。另一半记给制作线（同样用这些矿）。T5 的 T4 宝石可以从任何开过的晶洞拿，不用每级再开新晶洞。</p>
+<h2 id="s3-8">3.8 保留的规则（第 10 轮第 1 件、第 49 条）</h2>
+<ul>
+<li>位置全服一致；<strong>布局和当天状态每人一份</strong>，种子 = 人 + 日期 + 矿口 + 层，按家城 04:00 换（v3 3.5）。当天状态（敲过的岩石、怪的血、地上掉落）日切清掉，不进长期存档。</li>
+<li>取消每天 2 局和 Express（第 49 条用户确认）；靠体力和时间封顶。</li>
+<li>倒地：1–10 层不罚；11 层起丢这次进本层以后捡到的东西的一半。</li>
+<li>守关只在整十层（不是每个整十层都有，见 3.5），精英在个位 5 的层。</li>
+<li>守关击杀的合理性校验并进防作弊专题（第 43 条）。</li>
+</ul>
+<h2 id="s3-9">3.9 季节和矿脉新闻</h2>
+<ul>
+<li>季节按矿所在半球、气候带、真实日期（第 30 条）；影响按矿型（雨季水淹、冬季冻土 / 冰系怪、旱季晶洞大厅开放等，见 v3 17.4）；换季前一周预告。</li>
+<li><strong>季节限定</strong>（审查 v4-2 #15）：冬季晶洞的冰晶 <code>frost_crystal</code>、雨季深渊的潮鳗 <code>tide_eel</code>（只在雨季出现的怪），各进收集册的季节页。以后每个新地域类型加一样。</li>
+<li>世界动态加「矿脉新闻」：某座矿某种矿石 2–5 天 ×2，优先点名玩家家附近不同的矿，让常去的矿轮换（第二批）。</li>
+</ul>
+<h2 id="s3-10">3.10 气候：险境和怪物变体</h2>
+<ul>
+<li>险境沿用 v3 3.4 的四种和四种抗性药水，只在不是你家气候带的矿里出现；从哪层开始按矿型：矿脉 F30、晶洞 F20、深渊 F30，浅坑没有。<strong>3 期起生效</strong>。</li>
+<li>怪物气候变体：同一模型换材质 + 一个特性（热带毒、亚热带雾、温带菌、冷带冰）。模型约 31 个。特性在客户端战斗代码里，服务端只能信客户端，数值进防作弊专题。</li>
+</ul>
+<h2 id="s3-11">3.11 矿口卡</h2>
+<p>地图上点矿口弹出（游戏内英文）：矿型、最深层、主产和起始层、这座矿的副产、怪物和守关、本季状态、相关新闻、你在这里到过第几层、钻地机能送你到第几层；还没开放的矿型写 <em>Not open yet</em>。例见 v3 17.6（守关层号按 3.5 改：大洲守护者 F120、F150）。</p>
+<h2 id="s3-12">3.12 分批</h2>
+<ul>
+<li><strong>第一批</strong>：浅坑 + 矿脉（矿脉开到 F40）；清怪开梯子；每座矿各算进度、电梯、矿口卡；新怪蝙蝠、岩甲虫、菇菇怪 + 史莱姆王，矿脉的两只守关用史莱姆王换色；武器槽 + 铜剑 + 铁剑 + 回血药（第 27 条）；击杀记录。</li>
+<li><strong>第二批</strong>：铁背甲虫（精英）、铁背甲虫王、菌母；矿脉新闻。</li>
+<li><strong>2 期</strong>：矿脉 F41–60、当地 T3 金属矿脉；钻地机 I；季节；气候变体；每座矿的特殊层。</li>
+<li><strong>3 期</strong>：晶洞、深渊（到 F100）；钻地机 II、III；险境和抗性药水。</li>
+<li><strong>4 期</strong>：深渊 F101–150 和大洲守护者；遗迹；钻地机 IV。</li>
+</ul>
+<p><strong>出门理由（本章）</strong>：家城没有矿；每座矿主产、副产、怪、季节都不一样，第一次去就有收获。</p>
+<hr />
+<h1 id="ch4">第 4 章 采集与旅行</h1>
+<blockquote>
+<p>结论 3、5、7、35、36、39、41、48、49；q(256) 收费第一档（已合入 farm-dev）。</p>
+</blockquote>
+<h2 id="s4-1">4.1 采集</h2>
+<ul>
+<li>补给站式：位置全服一致，冷却按人计（第 3 条）；不设采集技能，只受体力和背包限制（第 5 条）。</li>
+<li><strong>农场的 6 个采集点搬出农场</strong>（第 49 条用户确认）。家城和每座城有城里采集点（T1–T2：木、石、芦苇、黏土、硬木、亚麻、香草）；野外地点有 T3 以上的地域采集点。</li>
+<li>每次采集 3 体力，冷却 4 小时（现行 8 小时）。<strong>T1 一次 4 件，T2 一次 3 件</strong>。</li>
+<li><strong>密度</strong>（一次上线的口径，审查 v4-1 #8、v4-2 #5）：家城每种 T1 至少 2 个点，硬木、亚麻各至少 2 个点；亚热带家城硬木不够时，由最近 3 座免费城补足（家城 + 最近 3 城合计每天硬木、亚麻各 ≥ 8 件）。按第 2 章的表，30 分钟玩家第一周每天采集 4–5 次就够（初稿要 11–15 次）。</li>
+<li>第一批给 13 座可选家城和它们的兜底前 10 城建城里采集点（约 140 城）。</li>
+<li><strong>进背包</strong>（审查 v4-3 #20）：家城和外城采集一律先进背包，回到家自动入库（复用现有 storeMaterials）。芦苇岸的蚯蚓（鱼饵）改由城里的芦苇点出。采集命令带采集点 id，服务端核对玩家当前所在地（<code>travel.here</code>），并进防作弊清单。</li>
+<li><strong>引导</strong>：农场没有采集点后，首会话的 Lv2 要去城里采。引导加一步「Pip 带你去家城最近的城里采集点」，在 q 行 D 里出帧（审查 v4-2 #6）。</li>
+</ul>
+<h2 id="s4-2">4.2 背包（第 36 条）</h2>
+<p>不加限制：最近 3 座城和最近 3 个野外地点永远免费，来回不花钱，背包在近处不卡人；背包是远处（要付路费）采集的硬限制。背包扩容 I–VII 照 v3，等级和价格按第 2 章 2.7 改。</p>
+<h2 id="s4-3">4.3 路费</h2>
+<ul>
+<li>q(256) 固定价（Trip 1–7：体力 0–60、金币 0–500），再访半价，不随收入放大。Trip 5 每趟另要 1 张旅行许可，Trip 6–7 每趟 1 张长途票（旧方案 §11.3）。</li>
+<li>最近 3 座城、最近 3 个野外地点永远免费；最近 10 座 ≤ Trip 2。</li>
+<li>按 r9 模型，30 分钟玩家的路费（含许可、长途票，买的口径）占档期收入：T3 4%、T4 8%、T5 11%（自己做票 8%）、T6 8%（<code>pacing_r9-out.txt</code> 表 E）。T5 的点名深渊隔一级在外洲，T6 每级只点名一个外洲，就是为了把这项压在 10% 上下。</li>
+</ul>
+<h2 id="s4-4">4.4 第二故乡：这一轮不做（第 48 条）</h2>
+<ul>
+<li>用户：「提高第二故乡收益（比如一周内免费），或者在这一轮的修改先不做第二故乡」；第 52 条按建议定为<strong>这一轮不做</strong>：</li>
+<li>再访本来就半价、本地人日票本来就 48 小时（审查 v4-2 #7），第 35 条的「半价 + 48 小时」几乎没有好处；要给它真正的好处（例如一周内往返免费），就要重新算它和「越用越贵」、最近 3 座免费、路费收入的关系，值得单独一轮。</li>
+<li>第一批、第二批都不排它，省掉一块工作量。</li>
+<li>连带：等级后果里的「第二故乡 5 槽」「私人驿站 +1 槽」去掉（第 2 章 2.7）；方案 §11.5 先标「待重新设计」。</li>
+<li>以后做时的方向（用户原话）：「提高收益，比如一周内免费」，并且留升级余地（第 35 条）。</li>
+</ul>
+<h2 id="s4-5">4.5 许可和长途票（第 41 条，收费第二档，3 期）</h2>
+<ul>
+<li><strong>不设每周硬上限，同一周里越用越贵</strong>：例如许可每周前 5 张原价，之后每张 +50%（375、560……），长途票同理；自己做始终比买便宜。数字在收费第二档实现时定。</li>
+<li>越用越贵<strong>按出发次数算</strong>，不按消耗的票数算。旧规则里「常客去该城免许可 / 长途票」去掉（常客只保留旅途减半、柜台 −10%），否则重度把常去的远城做成常客就绕过了刹车（审查 v4-2 #23）。</li>
+<li>作用：重度追新闻自然有刹车；Homestead 进度不被卡死。</li>
+</ul>
+<h2 id="s4-6">4.6 极端地理（第 39 条）</h2>
+<p>先接受。澳新家城凑 50 枚签章的首访路费是中位数的 1.6–4 倍；南半球没有冷带城市。上线后要看的数（结论原列 + 审查补的）：各家城到 Lv16 / 20 / 24 / 28 / 30 的天数、印章门槛卡住的天数、路费占收入比例、<strong>许可和长途票用量</strong>、<strong>新闻溢价收入占比</strong>（玩家少的地方新闻也少，见 5.4 的保底）。明显掉队再考虑「Trip 5 以上的签章一枚算 2 枚」。现在 13 座可选家城里没有大洋洲、南美、非洲城市，这些数要等开放选城后才看得到。</p>
+<p><strong>出门理由（本章）</strong>：农场里没有采集点；远处的材料要带着背包去，背包和路费是远行的成本。</p>
+<hr />
+<h1 id="ch5">第 5 章 经济与收入</h1>
+<blockquote>
+<p>结论 6、8、16、22、26、31、38、45。详细稿：<code>../v3/14-r9-income-news.md</code>（世界动态、地域作物；其中「① 订单」各行按第 31 条并入委托体系，已作废）、<code>../v3/18-r12-cross-city-H.md</code>（委托体系）。</p>
+</blockquote>
+<h2 id="s5-1">5.1 收入曲线（30 分钟玩家，每天净金币，设计目标）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>4–7</th>
+<th>10</th>
+<th>15</th>
+<th>19</th>
+<th>23</th>
+<th>27</th>
+<th>30</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每天</td>
+<td>160</td>
+<td>190</td>
+<td>235</td>
+<td>430</td>
+<td>665</td>
+<td>1,060</td>
+<td>1,300</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>T1–T2 是 sim354 的实测</strong>（第 45 条）：按 v4 的分配（种 60、钓 25 竿，田 8 块起，采集花体力）净收入第 2–7 天约 133、第 8–14 天约 157、第 15–28 天约 194；再加 H 第二步外城本地委托约 20、世界动态小新闻 10–20。初稿的 200 → 330 是旧画像（种约 100、钓约 150 体力）挣的，作废。</li>
+<li><strong>T3 起靠三样放大</strong>：进 T3 约 ×1.8，之后每档 ×1.5–1.6，T6 ×1.2（没有新的作物档，只有育种和精通）。Lv30 / Lv4 约 8 倍，金币量级逐档放大（第 16 条）。初稿 Lv30 1,860 作废（审查 v4-1 #2、#5）。</li>
+</ul>
+<h2 id="s5-2">5.2 收入构成（档末，<code>pacing_r9-out.txt</code> 表 A）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>日收入</th>
+<th>现有种钓委托（sim）</th>
+<th>② 地域作物和鱼</th>
+<th>③ 世界动态溢价</th>
+<th>① 委托（多出的部分）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td>160</td>
+<td>130</td>
+<td>—</td>
+<td>10</td>
+<td>20</td>
+</tr>
+<tr>
+<td>15</td>
+<td>235</td>
+<td>195</td>
+<td>—</td>
+<td>20</td>
+<td>20</td>
+</tr>
+<tr>
+<td>19</td>
+<td>430</td>
+<td>205</td>
+<td>120</td>
+<td>55</td>
+<td>45</td>
+</tr>
+<tr>
+<td>23</td>
+<td>665</td>
+<td>210</td>
+<td>260</td>
+<td>115</td>
+<td>80</td>
+</tr>
+<tr>
+<td>27</td>
+<td>1,060</td>
+<td>220</td>
+<td>485</td>
+<td>230</td>
+<td>125</td>
+</tr>
+<tr>
+<td>30</td>
+<td>1,300</td>
+<td>225</td>
+<td>625</td>
+<td>280</td>
+<td>175</td>
+</tr>
+</tbody>
+</table></div>
+<p>后期 ② + ③ 约七成。算法（设计初值，待李白校准）：
+- <strong>②</strong> = 种田体力 60 ×「种地域作物的田的比例」×（地域作物每点体力净值 − 现在约 0.4）+ 钓鱼体力 105 ×「在地域钓点钓的比例」× 地域鱼每点体力多出的值。每点体力净值 T3 3、T4 4.5、T5 6.5、T6 7.5（育种 + 精通）；田的比例 50% → 80%，钓点比例 20% → 45%。
+- <strong>③</strong> = 卖出的货里拿去新闻市场卖的比例（T1–T2 20%、T3 30%、T4 40%、T5–T6 50%）× 实得平均溢价 0.7（份额内价格从峰值回落）。
+- <strong>①</strong> = 完成奖上限（5.5）的 80% 减去「现有」里已有的约 50；T1–T2 是 H 第二步顺路的 1–2 单（约 20）。合计不超过上限（审查 v4-1 #12、v4-3 #15）。</p>
+<h2 id="s5-3">5.3 ② 地域作物和鱼（第 22 条）</h2>
+<p>8 地域 × T3–T5 每档 1 种作物 + 1 种鱼 = 48 种；种子只在本地域集市卖（丰收新闻时打折）；在家种，异地气候生长 ×1.5；鱼只在本地域水边钓点。卖：家城全价、外城按 q(251) 打折、遇新闻按行情。
+- <strong>育种</strong>：T3 以上种子每批要一件别的地域的材料；<strong>哪几个地域的材料能用，每周点名一次</strong>（像新闻一样轮换，每周 2–3 个地域），不能一次囤满一个月（审查 v4-2 #22）。</p>
+<h2 id="s5-4">5.4 ③ 世界动态 World News（第 22、26 条）</h2>
+<ul>
+<li>卖价 = 基础价 × 距离系数（q(251)）× 行情系数（新闻，平时 1.0）。q(251) 不推翻。</li>
+<li>五类新闻：短缺 ↑（×1.6–3.0，2–5 天）、节庆 ↑（×1.5–2.0，1–3 天）、丰收 ↓（×0.5–0.7，同地种子 7 折）、商队（Mira 停野外 2 天）、全球（一个气候带或半球 ×1.3–1.5，每月 1–2 次）；另有矿脉新闻（第 3 章）、新闻委托（5.5）。</li>
+<li>全服同时 8–12 条，每天新增 2–4 条，有预告 → 生效 → 高峰 → 回落。</li>
+<li><strong>每人份额按价值算</strong>（审查 v4-1 #5）：初稿按件数（T1–T2 约 20 件、T5–T6 约 8 件），后期单价高了件数少，③ 撑不起来。改成「每条新闻每人能吃到的溢价上限 = 当档日收入的 30%」，到了上限价格回到正常；30 分钟玩家每天做一条左右。价格随<strong>你自己</strong>卖出的量回落，不抢。</li>
+<li><strong>保底</strong>（审查 v4-2 #12）：每个「大洲 × 气候带」任何时候至少 1 条涨价新闻，玩家少的地方也有近处新闻可做。</li>
+<li>T1 起就有小新闻（普通作物、鱼、通用材料，×1.3–1.8）。</li>
+<li>在农场布告栏、Today、地图 pin 的 ↑ / ↓、卖货卡上看到；个性化提示把新闻和库存、距离连起来。</li>
+<li><strong>不用真实灾难</strong>做起因；运营可一键屏蔽某地区的新闻（默认 7 天）。</li>
+<li>全球首杀、家城首杀也在这里播（第 7 章）。</li>
+</ul>
+<h2 id="s5-5">5.5 委托体系（第 31 条，含跨城 H）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>在哪</th>
+<th>谁发</th>
+<th>多少</th>
+<th>计数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>驿站板</td>
+<td>家</td>
+<td>板</td>
+<td>3 槽</td>
+<td>每天 6 单（和所有集市板合计）；完成奖进上限</td>
+</tr>
+<tr>
+<td>集市板</td>
+<td>每座城一块（H 第一步，q(270) 已合入）</td>
+<td>板</td>
+<td>2 槽；外城只出产出和地区模板</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>家城外地货单（原「订单」并入）</td>
+<td>家城集市板探索类</td>
+<td>板</td>
+<td>T3 起出现</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>具名居民</td>
+<td>角色所在据点</td>
+<td>12 位居民</td>
+<td>各自委托线</td>
+<td>现行规则不变</td>
+</tr>
+<tr>
+<td>外城本地委托（H 第二步，q(272) 已批）</td>
+<td>外城据点</td>
+<td>当地掌柜</td>
+<td>每城每天 3 单，只给金币</td>
+<td>不占 6 单；完成奖进上限</td>
+</tr>
+<tr>
+<td>新闻委托</td>
+<td>有节庆 / 短缺新闻的城</td>
+<td>当地掌柜</td>
+<td>新闻期间 +2–3 单，完成奖 ×1.5</td>
+<td>同上</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>完成奖每日上限按档</strong>：T1–T2 100、T3 120、T4 160、T5 220、T6 280（H1）。q(272) 已把上限做成按 Homestead 等级区间读表，现在全是 100；2 期开 T3 时改表就行。</li>
+<li>野外地点没有集市板和本地委托；按城查板和「当天第一次到这座城」时跳过野外 id。</li>
+<li>本地委托内容随档位：一期通用模板；T3 起加地域货模板（H4）。</li>
+</ul>
+<h2 id="s5-6">5.6 金币去向（30 分钟玩家，占档期收入，<code>pacing_r9-out.txt</code> 表 E）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>档</th>
+<th>Homestead</th>
+<th>路费 + 许可 / 长途票（买）</th>
+<th>首访燃料</th>
+<th>剩给制作线和日常</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1（Lv5–7）</td>
+<td>50%</td>
+<td>0%</td>
+<td>—</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>42%</td>
+<td>0%</td>
+<td>—</td>
+<td>58%</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>40%</td>
+<td>4%</td>
+<td>5%</td>
+<td>51%</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>40%</td>
+<td>8%</td>
+<td>7%</td>
+<td>45%</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>40%</td>
+<td>11%（自己做票 8%）</td>
+<td>6%</td>
+<td>43%</td>
+</tr>
+<tr>
+<td>T6</td>
+<td>40%</td>
+<td>8%</td>
+<td>—</td>
+<td>52%</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Lv2–4 由开局钱包 180 和第 1 天卖货付，不算在 T1 里。</li>
+<li>「剩下的」给制作线（必需的工坊升档、过守关的武器、药水约占收入 15%，其余是可选的大件、建造、装扮）和日常（种子、鱼饵、回血药约 8%）。<strong>必需开销约 75–80%</strong>，「全部」超过 100% 是有意的长尾（v3 第 8 部分口径）。初稿「路费约 10%」没算许可和长途票，「第一周 50%」被 × 1.05 下限抬到了 80%，这两处已改。</li>
+</ul>
+<h2 id="s5-7">5.7 换料移除（第 38 条）</h2>
+<p>移除 Specialty Barter（<code>barter.ts</code>、<code>homestead.barter</code>、集市换料入口、p0_barter.gd、相关 toast 和测试）。矿物只从矿里来，和 q(175)「下矿必经」一致。随第一批一起移除。</p>
+<p><strong>出门理由（本章）</strong>：地域作物的种子和鱼只在产地；新闻在别的城涨价；外城掌柜发本地委托。</p>
+<hr />
+<h1 id="ch6">第 6 章 制作线与家园建造</h1>
+<blockquote>
+<p>结论 8、12、15、17、27、28、37、50。物品全表沿用 <code>../v3/04-equipment.md</code>（装备、工具、背包）、<code>../v3/05-potions-cooking.md</code>（药水、料理）、<code>../v3/07-building-cosmetics.md</code>（建造、装扮）；<strong>这三章的金币、尺寸、「出在哪层」还是旧口径，进 q 行前按 6.3 用 <code>../v3/cost.py</code> 和第 3 章重出</strong>。</p>
+</blockquote>
+<h2 id="s6-1">6.1 六条线</h2>
+<p>武器、道具与工具、药水、烹饪、装扮、家园建造（第 8 条）。前期门槛低，顶级物品要大量金币、巨量体力和多个地域 / 大洲的材料。每条线每一档都被工坊档位门住，工坊升到 Tn 要 Homestead 进入 Tn 档（T2 Lv8、T3 Lv16、T4 Lv20、T5 Lv24、T6 Lv28）。
+- 战斗（第 15 条第 4 款）：武器 + 饰品，<strong>不做整套护甲，不加战斗等级，强弱只看装备</strong>；药水管回血和增益。</p>
+<h2 id="s6-2">6.2 v4 的改动</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>v4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>武器槽、铜剑、铁剑、回血药</td>
+<td>进 1b 第一批（第 27 条）。<strong>铜剑</strong>：Pip「第一次下矿」委托的奖励（Lv3）。<strong>铁剑</strong>：第一批工作台加一个配方（Lv8：铁矿石 6、硬木 4、煤 3、甲壳 2、金币 150；工作台加 <code>to: 'weapon'</code>），第二批熔炉上线后改由熔炉做。<strong>回血药</strong>：第一批驿站卖（每瓶 25），药剂台上线后改为自己做</td>
+</tr>
+<tr>
+<td>钻地机</td>
+<td>新增，熔炉做，I–IV 对应 T3–T6（第 3 章 3.6）；燃料 = 煤 3 + 铁矿石 1 + 20 × 档 金币</td>
+</tr>
+<tr>
+<td>抗性药水</td>
+<td>沿用 v3（药剂台 T3），3 期起生效，只在异地气候的矿里需要</td>
+</tr>
+<tr>
+<td>精通星</td>
+<td>技能 10 级以后经验攒成精通星，每颗 +0.5%（作物卖价 / 稀有鱼 / 出锅品质），最多 10 颗，5、10 颗各一个称号（第 37 条，排在 2 期）</td>
+</tr>
+<tr>
+<td>地域作物入菜</td>
+<td>② 的 48 种作物和鱼进料理配方（v3 第 5 部分的地域菜）</td>
+</tr>
+<tr>
+<td>建筑放在领地里</td>
+<td>工坊约 3×3、大建筑（展示馆二厅起、盛放花圃、大洲纪念廊）约 6×6；「庭院扩地 I–V」改为格子领地（第 2 章 2.5）</td>
+</tr>
+<tr>
+<td>物品 id 前缀</td>
+<td>剑用 <code>sword_*</code>、药用 <code>potion_*</code>，<code>itemKind</code> 要认出来（现在会被当成材料：堆叠 99、能交进材料委托）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s6-3">6.3 定价规则（重出全表用）</h2>
+<ul>
+<li>制作金币 = <code>cost.py</code>，<code>CRAFT_COINS_PER_DAY</code> = 当档日收入 × 35%，收入按第 5 章 5.1 的新曲线（比初稿低约 30–45%，价格同比例降）；主线必需和推荐的物品（工坊升档、过守关的武器和镐、核心四件、背包）按第 6 轮口径缩到 1/4 尺寸；可选大件（XL / XXL 招牌、建造、装扮）保持原尺寸，作为长尾。</li>
+<li>第一批直接用的价格：背包扩容 I 60、II 150、III 300、IV 600；铁剑 150；回血药 25。</li>
+<li>锚点（推算）：过 T3 守关的武器约 2–3 天制作预算；XXL 招牌物品约 3–6 周。</li>
+</ul>
+<h2 id="s6-4">6.4 顶级物品要有用处（第 50 条）</h2>
+<p><strong>规则：每件顶级 / XXL 物品至少占一样——「过某道门的钥匙」或「下一档的底子」。</strong>不做只能摆着看的顶级件。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>线</th>
+<th>顶级物品</th>
+<th>用处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>武器</td>
+<td>T6 武器</td>
+<td>打大洲守护者（守关算 T6，武器低一档伤害减半）；V2 的 T7 武器在它上面升级，投入不作废</td>
+</tr>
+<tr>
+<td>道具与工具</td>
+<td>钻地机 IV、T6 镐</td>
+<td>深渊 F101 以下一钻 30 层；深渊深层的晶核岩要 T6 镐才敲得动</td>
+</tr>
+<tr>
+<td>药水</td>
+<td>顶级抗性药水（两种险境同时抗）</td>
+<td>深渊 F100 以下异地气候叠两种险境，只有它能同时抗</td>
+</tr>
+<tr>
+<td>烹饪</td>
+<td>大洲宴席（每洲一道，用遗珍做）</td>
+<td>打大洲守护者前吃，增益整场；也是家城首杀称号的门面菜</td>
+</tr>
+<tr>
+<td>装扮</td>
+<td>守关套装（由首杀掉落 + 遗珍做）</td>
+<td>全球 / 家城首杀称号的外观，联机房间和名片上可见</td>
+</tr>
+<tr>
+<td>家园建造</td>
+<td>XXL 建筑（传世庄园、大洲纪念廊等）</td>
+<td><strong>家园星级</strong>每升一星要一件 XXL 大件 + 本星点名地域的材料（v3 6.8）；满级后的长尾就落在这里</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>下一个大版本的 T7 物品都在 T6 物品的基础上升级，材料投入不作废。</li>
+<li>这些用处的数值随对应的期次定（大洲守护者、星级在 4 期）。</li>
+</ul>
+<p><strong>出门理由（本章）</strong>：每条线的高档配方都要别的地域 / 大洲的材料；顶级件是打远方守关的钥匙。</p>
+<hr />
+<h1 id="ch7">第 7 章 成就与收藏</h1>
+<blockquote>
+<p>结论 8、34、42、44；细化稿 <code>../v3/19-r13-achievements.md</code>（19.1 只有两级首杀，按本章加家城首杀）。替代野外章。</p>
+</blockquote>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th></th>
+<th>是什么</th>
+<th>从什么时候</th>
+<th>给什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>怪物志</td>
+<td>每种怪 × 气候变体一条；首次遇到点亮剪影，首次打败点亮全图；记录击败数、掉过什么、在<strong>几座不同的矿</strong>见过</td>
+<td>第一次下矿（第一批先在服务端记击杀，第二批上界面）</td>
+<td>每族集齐一个称号，全部集齐大称号；钻地机「打过同种守关才能钻过」读它</td>
+</tr>
+<tr>
+<td>首杀成就</td>
+<td><strong>个人首杀</strong>：每种守关（地域 / 气候变体各算一种）第一次打败；<strong>家城首杀</strong>：同一家城的玩家里第一个；<strong>全球首杀</strong>：全服第一个</td>
+<td>个人、家城：第一只守关（史莱姆王，F10）；全球：<strong>T3 以上的守关</strong>（2 期起）</td>
+<td>个人：成就 + 一次性奖励（按种只给一次）；家城：称号（如 <em>First in Chengdu · Deep Warden</em>），只在本城布告栏播；全球：专属称号，世界动态全服播报，<strong>公开玩家显示名</strong></td>
+</tr>
+<tr>
+<td>材料收集</td>
+<td>所有材料按档、按地域的收集册；稀有材料单列（T4 稀有草药、T5 盛放奇珍、遗珍、守关掉落、季节限定）</td>
+<td>第一件材料</td>
+<td>每个地域、每个大洲、每一档集齐各一个成就；稀有材料全收集给称号</td>
+</tr>
+<tr>
+<td>护照与签章</td>
+<td>城市签章；探索者奖章 3 / 10 / 30 / 100 城（旧方案 §11.9.2），往上加 300 / 1,000 城和「六大洲各 N 城」</td>
+<td>第一枚签章</td>
+<td>奖章和称号；第 8 条「集齐全部签章要非常久」的长尾（审查 v4-2 #17）</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>首杀的几条规则</strong>（审查 v4-2 #14、v4-3 #17）：</li>
+<li>第一批起服务端就记「按种的击杀数、每种守关第一次打倒的时间和人」，第二批上界面时按记录补发个人和家城首杀。</li>
+<li>全球首杀只给 T3 以上的守关：史莱姆王这类第一批的守关太容易，抢到也没有意义（第 52 条）。</li>
+<li><strong>内部账号</strong>（团队成员、开发调试号）不参加家城首杀和全球首杀。现在是免费删档测试、所有玩家都是测试玩家（第 53 条），测试玩家照常参加；测试期的首杀记录随删档清零，正式开服后重新算。</li>
+<li>家城首杀、全球首杀要一份<strong>全服共享、先到先得</strong>的记录；现在的存储只有每人一份，第二批要新做（第 9 章）。</li>
+<li>展示馆一到四厅（本地柜、地域材料柜、怪物厅、盛放奇珍）和大洲纪念廊继续留着，作为实物展示。</li>
+<li>季节限定的怪和材料（第 3 章 3.9）、南北半球相反，全收集就要跨季节、跨半球。</li>
+<li>全球首杀播报前，名字要过敏感词；首杀的作弊防护在防作弊专题里做（第 43 条），功能先上。公开名字默认开，设置里可以关（第 52 条）。</li>
+</ul>
+<p><strong>出门理由（本章）</strong>：怪物志和收集册要去不同的矿、不同的地域、不同的季节；签章要去更多的城。</p>
+<hr />
+<h1 id="ch8">第 8 章 版本与长尾</h1>
+<blockquote>
+<p>结论 18、33。这里的「版本」是给玩家加内容的大版本（V1、V2……），不是 0.2.x 的开发发布。</p>
+</blockquote>
+<h2 id="s8-1">8.1 大版本</h2>
+<ul>
+<li><strong>V1</strong> = 1b 到 4 期做完，30 级全开、8 地域、五种矿型齐全。按审查 v4-3 的推算，V1 约 570–910 人日、19–33 周（第 9 章 9.3），8.1「之后约 2 个月一版」从 V1 上线起算。</li>
+<li>之后每个大版本 = <strong>纵向 +5 级</strong>（新档 T7、T8……）+ <strong>横向一个新地域类型</strong>（V2 山地、V3 荒漠 / 海岛），新地域在 T3 以上每档都加一个变种；配更深的矿、新守关、新装扮。</li>
+<li>目标约 2 个月一个；一个约 70–115 人日，实际看产能。每级间隔接着第 8 轮曲线（30 分钟玩家 Lv31–35 约 68 天，重度约 30 天）。</li>
+<li><strong>追赶</strong>（审查 v4-2 #13 写清楚）：</li>
+<li>只作用于 Lv16 以后的等级；Lv1–15（第一周到第三周）永远不打折，新玩家的节奏不被冲掉。</li>
+<li>按「玩家所在等级落后当前上限两个版本以上」触发；每多落后一个版本再 −20%，最多 −60%。</li>
+<li>只降金币和材料，不降技能、签章、地域、大洲门槛。</li>
+<li>新地域类型只进还没开始的等级的点名轮换；玩家正在攒的那一级不变。</li>
+</ul>
+<h2 id="s8-2">8.2 版本之间接住满级玩家的长尾</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>长尾</th>
+<th>为什么不会做完</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>世界动态</td>
+<td>每天都有新行情；新首杀集中在每个版本上线后的几周</td>
+</tr>
+<tr>
+<td>地域作物、育种</td>
+<td>换季、丰收新闻、每周点名的育种地域、新地域</td>
+</tr>
+<tr>
+<td>矿</td>
+<td>每座矿都不一样，季节在变；深渊、遗迹</td>
+</tr>
+<tr>
+<td>家园星级（v3 6.8）</td>
+<td>满级后反复升星，每星要一件 XXL 大件（第 6 章 6.4），给外观不给产能</td>
+</tr>
+<tr>
+<td>制作线大件、建造、装扮</td>
+<td>一件要几周</td>
+</tr>
+<tr>
+<td>怪物志、首杀、全收集、护照</td>
+<td>跨季节、跨半球、新版本新怪</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>别人在哪里看得到</strong>（审查 v4-2 #25）：称号在城市联机房间的头顶和名片上；家园星级和外观在地图上的农场 pin（Lv30 金框）和访客到访时；首杀在世界动态和本城布告栏。访客、名片、社交关系这部分依赖 333（账号与社交），不在任何一期，要和奕星一起排。</p>
+<p><strong>出门理由（本章）</strong>：每个大版本加一个新地域类型，T3 以上每档都多一个要去的地方。</p>
+<hr />
+<h1 id="ch9">第 9 章 分期与工作量</h1>
+<blockquote>
+<p>结论 13、20、25、27、28、46、47；人日口径同第 4 轮审查 3（熟悉模块的人做完并自测，不含审批等待），清档后去掉迁移。<strong>执行节奏定稿后和奕星排</strong>（用户 10-31）。
+在途状态（11-01 晚，审查 v4-3 #7）：355 A 已随 0.2.16 上线；收费第一档 q(256)/(257) 已合（SGODOT-367）；跨城 H 第一步 q(270) 已合（存档 v6）；地点卡 q(271) 已合；H 第二步 q(272) 已批、开发中。<strong>第一批从 farm-dev 拉分支，排在 q(272) 合入之后</strong>（它也改 reducer、boards、view、travel、地图图钉、Today、委托卡），存档定 v7。</p>
+</blockquote>
+<h2 id="s9-1">9.1 1b 第一批（第一周和前三周；Homestead 到 Lv17，第 47 条范围保留）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>项</th>
+<th>服务端 / 客户端 / 数据 / 美术（人日）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Homestead 上限 10 → 17、新表（含 Lv16–17 过渡行）、每技能门槛（view 下发三项和每项门槛，客户端技能格、缺口文案、Today 行）、田 8 起和新档网格重排、升级回 50、体力池和饭量公式、Master 移到 Lv15、Lv1–17 后果重铺（<code>P1_UNLOCKS</code>、<code>home_moment</code>、<code>MAX_LEVEL</code>）</td>
+<td>5–8 / 5–8 / 4–6 / 0–1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>野外地点生成：陆地掩膜 + 全球网格，<strong>一次分好全部类型</strong>、只增不删；最近 3 个按农场点冻结（保证 1 浅坑 + 1 矿脉）</td>
+<td>7–10 / 0 / 5–7 / 0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>野外地点上地图（视口下发、每屏封顶）、地点卡（在 q(271) 之上加野外分支）、能飞过去</td>
+<td>2–3 / 6–9 / 0 / 1–2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>旅行目的地扩到野外地点：读档不清掉野外日票、路由收野外 id、通行证、<strong>矿里不再算在家</strong>（<code>HOMESTEAD_SPACES</code>）、野外不盖章 / 不给首访 +10 / 不计探险家奖章；最近 3 个永远免费</td>
+<td>4–6 / 2–3 / 0 / 0</td>
+</tr>
+<tr>
+<td>5</td>
+<td>城里采集点（13 座可选家城 + 兜底前 10 城，约 140 城；旧金山手写城的点要走服务端）</td>
+<td>2–3 / 5–7 / 1–2 / 1–2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>采集规则：花体力、冷却 4 小时、离家能采、进背包、蚯蚓改到城里芦苇点、带地点 id 校验</td>
+<td>2–3 / 1–2 / 0.5 / 0</td>
+</tr>
+<tr>
+<td>7</td>
+<td>农场 6 个采集点搬出；<strong>引导改版</strong>（Lv2 去城里采集点；S4 改成「种满剩下的田」；补救步骤；Nadia「Six Radishes」数量；导演表 20 格 → 12 格）——改的是已验收的引导，要走 q 行和 Joey 验收</td>
+<td>1–2 / 5–7 / 2–3 / 1</td>
+</tr>
+<tr>
+<td>8</td>
+<td>矿重写：浅坑 + 矿脉（到 F40）、<strong>清怪开梯子</strong>、每座矿各算进度、电梯按矿、矿口从农场搬到地图、矿口卡、取消每天 2 局和 Express、当天状态日切、倒地代价、守关整十层、击杀记录</td>
+<td>10–14 / 11–15 / 2–3 / 4–7</td>
+</tr>
+<tr>
+<td>9</td>
+<td>新怪：蝙蝠、岩甲虫、菇菇怪（项目里还没有怪物模型，这是第一批带骨骼动画的怪）+ 史莱姆王、换色守关和精英</td>
+<td>1–2 / 6–10 / 0.5 / 6–10</td>
+</tr>
+<tr>
+<td>10</td>
+<td>武器槽 + 铜剑 + 铁剑（工作台 <code>to: 'weapon'</code>）+ 回血药 + 战斗快捷栏 + Pip「第一次下矿」委托（新的需求类型「下到第 N 层」、矿里的进度回调、奖励进武器槽）</td>
+<td>4–6 / 4–6 / 1 / 1–2</td>
+</tr>
+<tr>
+<td>11</td>
+<td>换料移除（含 p0_barter.gd、柜台换料段、toast、调试步骤、测试）</td>
+<td>0.5 / 1 / 0 / 0</td>
+</tr>
+<tr>
+<td>12</td>
+<td>第一批的内容补丁：新物品 id 和 <code>itemKind</code> 前缀；现有门槛按新来源重排（Hardwood Beams「from the old tree」、Copper Order、Quartz Glass、背包升级材料、摆件 11 处、外观阶段）；水面表重跑；遥测白名单</td>
+<td>2–3 / 1–2 / 4–6 / 2–3</td>
+</tr>
+<tr>
+<td>13</td>
+<td>存储与清档：清档脚本（停服 → 备份 → 归档 → 空库起服，玩家首次读档按请求头建新档）和回退手册；采集冷却过期即删、层状态日切；按 1,000 人量一次写盘耗时（现在每条命令整文件重写全服存档）；设备本地「已看过」重置</td>
+<td>4–6 / 1–2 / 0 / 0</td>
+</tr>
+<tr>
+<td>14</td>
+<td>测试改写；q 行和界面稿；走查</td>
+<td>7–10；8–12；5–8</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>合计</strong></td>
+<td><strong>约 150–225 人日</strong>（审查推算 140–215，按行加略高）；客户端约 48–72，是关键路径；日历约 <strong>6–8 周</strong>（不含审批），编制要先和奕星核实</td>
+</tr>
+</tbody>
+</table></div>
+<p>最长的链：陆地掩膜 → 野外地点 → 旅行 → 矿口 → 新怪，单独排一条关键路径。八条 q 行里五条要帧（安其拉出帧、不知火舞审、用户批），审批要和开发并行。</p>
+<h2 id="s9-2">9.2 之后各期（人日按审查 v4-3 的单价推算）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>期</th>
+<th>开到</th>
+<th>主要内容</th>
+<th>人日 / 日历</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一批</td>
+<td>Lv17（Lv16–17 过渡行）</td>
+<td>9.1</td>
+<td>150–225 / 6–8 周</td>
+</tr>
+<tr>
+<td>第二批</td>
+<td>Lv19（Lv18–19 也用 T2 过渡行，第 52 条）</td>
+<td>熔炉、药剂台、织布机和 T1–T2 工坊；武器、工具、饰品、药水 T1–T2；格子领地；<strong>世界动态 v1</strong>（只用现有作物、鱼、T1–T2 材料）；<strong>成就和收藏 v1</strong>（怪物志、首杀三级、收集册、护照）和全服首杀存储；铁背甲虫、铁背甲虫王、菌母；矿脉新闻；展示馆一厅、仓库分类货架；门槛按第一批的真实数据复校</td>
+<td>100–150 / 4–5 周</td>
+</tr>
+<tr>
+<td>2 期</td>
+<td>Lv21（Lv20–21 用 T4 过渡行：点名地域的 T3 材料，不要草药 / 宝石；第 52 条）</td>
+<td>海岸线和 8 地域；Lv16–19 换回正式行；T3 地域木材 / 金属；当地 T3 金属矿脉；矿脉 F41–60、石像傀儡；钻地机 I；② 地域作物和鱼（T3）+ 育种；家城外地货单；完成奖上限 T3 改 120；季节、气候变体、每座矿的特殊层；精通星；瞭望台、展示馆二厅</td>
+<td>110–175 / 4–6 周</td>
+</tr>
+<tr>
+<td>3 期</td>
+<td>Lv27</td>
+<td>晶洞、深渊（到 F100）；T4 草药 / 宝石、T5 奇珍 / 晶核；点名地域；盛放；招牌怪；钻地机 II、III；险境和抗性药水；新闻委托；收费第二档（许可、长途票越用越贵）</td>
+<td>150–250 / 5–9 周</td>
+</tr>
+<tr>
+<td>4 期 = V1</td>
+<td>Lv30</td>
+<td>深渊 F101–150 和大洲守护者；遗迹、大洲遗珍；钻地机 IV；传世庄园、大洲纪念廊；家园星级；顶级物品的用处（第 6 章 6.4）</td>
+<td>70–120 / 3–4 周</td>
+</tr>
+<tr>
+<td>合计</td>
+<td></td>
+<td></td>
+<td>约 580–920 人日、19–33 周</td>
+</tr>
+<tr>
+<td>V2 起</td>
+<td>每版 +5 级</td>
+<td>新档 + 新地域类型（第 8 章）</td>
+<td>70–115 / 版</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s9-3">9.3 每期之间的等级墙（审查 v4-2 #2、v4-3 #9）</h2>
+<p>按各期接连开发、第一批上线那天建号推算（30 分钟玩家；重度每期都会早 2–4 周到顶）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>期</th>
+<th>上线约第几天</th>
+<th>30 分钟玩家到本期上限</th>
+<th>空等</th>
+<th>接住的东西</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一批</td>
+<td>0</td>
+<td>Lv17 约第 23 天</td>
+<td>约 1–2 周</td>
+<td>浅坑 / 矿脉深层、击杀记录、外城本地委托</td>
+</tr>
+<tr>
+<td>第二批</td>
+<td>约 32</td>
+<td>Lv19 约第 41 天</td>
+<td>约 3–4 周</td>
+<td>世界动态、成就和收藏、工坊和 T1–T2 装备</td>
+</tr>
+<tr>
+<td>2 期</td>
+<td>约 67</td>
+<td>Lv21 约第 79 天</td>
+<td>约 5 周</td>
+<td>地域作物、育种、季节、矿脉深层、精通星</td>
+</tr>
+<tr>
+<td>3 期</td>
+<td>约 116</td>
+<td>Lv27 约第 165 天</td>
+<td>—</td>
+<td>4 期已上线</td>
+</tr>
+<tr>
+<td>4 期 = V1</td>
+<td>约 140</td>
+<td>Lv30 约第 200 天</td>
+<td>—</td>
+<td>版本间长尾（第 8 章 8.2）</td>
+</tr>
+</tbody>
+</table></div>
+<p>结论：开发比玩家慢，墙会反复出现。<strong>现在是免费删档测试，所有玩家都是测试玩家</strong>（第 53 条），第一批到 V1 之间只给测试玩家（第 52 条），墙不影响真实玩家；正式开放放在 V1 之后，时间和奕星排。</p>
+<h2 id="s9-4">9.4 平行的专题</h2>
+<ul>
+<li><strong>防作弊专题</strong>（第 43 条）：清单 <code>../v3/20-anticheat-checklist.md</code>，功能先上、日志先记；本次审查加了两项：采集带地点 id 核对所在地、气候变体特性的数值。</li>
+<li><strong>跨城 H 第二步</strong>：q(272) 已批，开发中；第一批排在它之后。</li>
+</ul>
+<p><strong>出门理由（本章）</strong>：第一批就把矿、采集点搬到城外，第一周每天都要出门。</p>
+<hr />
+<h1 id="ch10">第 10 章 交付清单</h1>
+<h2 id="s10-1">10.1 方案（<code>docs/product/gameplay-plan-v2-2026-10-02.md</code>）要回写的章节</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>章节</th>
+<th>改什么</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§3.3.2 体力计费总表</td>
+<td>采集从 0 改为 3 体力 / 次；矿取消每天 2 局；往下走每层 2 体力、打怪 0</td>
+<td>5、49、51</td>
+</tr>
+<tr>
+<td>§4 技能（含 §4.7.4 Homestead 门禁登记）</td>
+<td>每技能门槛（按模拟下调）；10 级以后精通星</td>
+<td>19、24、37、45</td>
+</tr>
+<tr>
+<td>§6.2.4「入菜」行</td>
+<td>地域作物入菜，不再「只能写任一种」</td>
+<td>4</td>
+</tr>
+<tr>
+<td>§8 Homestead 整章</td>
+<td>30 级、6 档、新表（含第一批 Lv16–17 过渡行）、每技能门槛、出门门槛（只算城市签章）、田数和格子领地、升级回 50、体力池和饭量公式、每级后果重排</td>
+<td>第 2 章</td>
+</tr>
+<tr>
+<td>§8.4.5 换料、q(166)</td>
+<td>已移除</td>
+<td>38</td>
+</tr>
+<tr>
+<td>§9.0 第 4 条、§9.1.4、§9.2 R9、§9.3.6、§8.4.6、§13.6、§5.2.3 ③、§15 的 ≤10% 校验</td>
+<td>废除公平口径</td>
+<td>4</td>
+</tr>
+<tr>
+<td>§9.3.5 一致性边界</td>
+<td>位置一致、状态每人一份（采集、矿、新闻份额）</td>
+<td>3、30</td>
+</tr>
+<tr>
+<td>§9.4.1、§9.6.1、§9.6.2 / §9.3.4、§9.6.4、§9.6.5、§9.13.2、§11.5.3</td>
+<td><strong>已由 q(270)/(272) 回写</strong>（7b6f3cfe、d05827c4），只改「完成奖上限按档」的数，别重复回写</td>
+<td>31</td>
+</tr>
+<tr>
+<td>§9.13.1 卖价</td>
+<td>q(251) 保留，加世界动态行情系数</td>
+<td>22、26</td>
+</tr>
+<tr>
+<td>§9.14、§9.16</td>
+<td>收入随档位放大，新旋钮表；30 分钟玩家的一天按时间和体力两本账</td>
+<td>16、45</td>
+</tr>
+<tr>
+<td>§10.3 快捷栏、§10.4.3 背包、§10.5 Gear 页</td>
+<td>喝药；背包扩容等级和价格；武器槽</td>
+<td>5、27</td>
+</tr>
+<tr>
+<td>§11.1 对象与 id、§11.2.5 首访与再访、§11.8 到达仪式、§11.9.2 探险家奖章、§11.10 目的地入口四列表</td>
+<td>目的地加野外地点；野外不盖章、不给首访 +10、不计奖章</td>
+<td>3、34</td>
+</tr>
+<tr>
+<td>§11.2.1–11.2.3</td>
+<td>最近 3 个野外地点永远免费（按农场点冻结）</td>
+<td>36</td>
+</tr>
+<tr>
+<td>§11.2.2 第 8 条、§11.5 第二故乡</td>
+<td>「第二故乡免费」去掉；§11.5 标「待重新设计」</td>
+<td>48</td>
+</tr>
+<tr>
+<td>§11.3.2–11.3.3 许可 / 长途票</td>
+<td>越用越贵（按出发次数）；常客不再免门禁物品（初稿误写 §11.2）</td>
+<td>41</td>
+</tr>
+<tr>
+<td>§11.9 印章</td>
+<td>不做野外章；探险家奖章往上加档</td>
+<td>34</td>
+</tr>
+<tr>
+<td>§13.1 材料总表、§13.4 工作台、§13.5 材料去向与配额</td>
+<td>煤、铁、亚麻；工作台做铁剑；配额按 r9</td>
+<td>25、27</td>
+</tr>
+<tr>
+<td>§13.2 采集</td>
+<td>补给站式、花体力、城里 / 野外采集点、进背包</td>
+<td>3、5、49</td>
+</tr>
+<tr>
+<td>§13.3 矿洞</td>
+<td>矿井 v2；清怪开梯子；怪物与守关表</td>
+<td>9、10、29、30、51</td>
+</tr>
+<tr>
+<td>§14.1.2 起始状态、§14.2 首会话导演表、§14.3 引导、§14.5 Today、§14.6–14.7 七日节奏</td>
+<td>田 8；引导去城里采集点、第一次下矿；第一周表</td>
+<td>32、49</td>
+</tr>
+<tr>
+<td>§15 整章</td>
+<td>数值校验按 30 级和新收入重做（不止 ≤10% 校验项）</td>
+<td>45</td>
+</tr>
+<tr>
+<td>§16.3 界面清单</td>
+<td>H 农场等级、M 矿洞、P 装备、A 地图</td>
+<td>—</td>
+</tr>
+<tr>
+<td>§17 路线图、§17.5「玩家交换 / 邮寄」</td>
+<td>第 9 章分期、大版本；交换先不做，等社交再议</td>
+<td>2、33、52</td>
+</tr>
+<tr>
+<td>§18 待拍板</td>
+<td>按本方案清掉</td>
+<td>1</td>
+</tr>
+<tr>
+<td>附录 A.0 id 索引</td>
+<td>新物品、新怪、野外地点 id</td>
+<td>—</td>
+</tr>
+<tr>
+<td>新增章节</td>
+<td>世界动态、地域作物、成就与收藏、钻地机</td>
+<td>22、26、34、30</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s10-2">10.2 q 行拆分建议（1b 第一批）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>q 行</th>
+<th>内容</th>
+<th>要用户批的</th>
+<th>要推翻 / 复议的已批规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Homestead Lv1–17 表（含过渡行）、每技能门槛、田数、升级回 50、体力池和饭量、Master Lv15、Lv1–17 后果</td>
+<td>数值；升级面板的门槛显示（要帧）</td>
+<td>q(246)（升级回体力）、q(263)（355 A 的数）、q(172)（Lv7 前排田）、§8</td>
+</tr>
+<tr>
+<td>B</td>
+<td>清档上线（存档 v7、备份、窗口、回退）</td>
+<td><strong>必须明确点头</strong></td>
+<td>第 20 条</td>
+</tr>
+<tr>
+<td>C</td>
+<td>野外地点：生成、地图 pin、地点卡、旅行、最近 3 个免费</td>
+<td>地图呈现（要帧）</td>
+<td>LOCK-24 地图图钉（q(137)）、q(204) / q(271) 地点卡</td>
+</tr>
+<tr>
+<td>D</td>
+<td>采集：农场采集点搬出、城里采集点、花体力、冷却、进背包；引导改版</td>
+<td>引导改动（要帧，Joey 验收）</td>
+<td>q(40)、q(44)、q(46)；q(256) ⑥；341 引导的 q(215)、q(217)、q(222)、q(254)、q(260)、q(266)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>矿：浅坑 + 矿脉、清怪开梯子、每矿进度、电梯、矿口卡、取消每天 2 局、倒地、守关、击杀记录</td>
+<td>矿口卡（要帧）</td>
+<td>§13.3、LOCK-21 矿洞、q(175)、q(204)（Mine Hut 保留为 Ivo 的家）</td>
+</tr>
+<tr>
+<td>F</td>
+<td>新怪 3 种 + 史莱姆王和换色守关（按第 3 章 3.5 的表）</td>
+<td>美术</td>
+<td>—</td>
+</tr>
+<tr>
+<td>G</td>
+<td>武器槽、铜剑、铁剑、回血药、战斗快捷栏、Pip 委托</td>
+<td>Gear 页（要帧）</td>
+<td>§10.5</td>
+</tr>
+<tr>
+<td>H</td>
+<td>换料移除</td>
+<td>—</td>
+<td>q(166)</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>能分开批，不能分开合，更不能分开上</strong>（审查 v4-3 #3）：合并顺序 C → E → F / G；D 和 A 同批；A–H 同一个版本上线，带最低版本（gate.ts 的 min_version）一起上。不想同版就加开关：服务端按内容表开关一次切换，开关打开前新逻辑不可达。</li>
+<li>第一批从 farm-dev 拉分支，排在 q(272) 合入之后；存档 v7。</li>
+<li>之后各期按第 9 章 9.2 再拆。</li>
+</ul>
+<h2 id="s10-3">10.3 要李白用模拟器校准的</h2>
+<ol>
+<li>第一批机制下的技能门槛（r9 已按 sim354 下调，见第 2 章 2.4）：用真实的第一批材料活动（城里采集、下矿时间）复核，单列 5 分钟画像的 Lv7–10。</li>
+<li>30 分钟玩家一天的时间账（种 4、钓 17、材料 9 分钟）和第一周收入（r9 用 sim 的 133–194）。</li>
+<li>第一批 Lv4–17 的材料：在「城里采集点 + 浅坑 + 矿脉」下配出第一周每天一级；每天采集 4–5 次、敲 14–16 块岩石、下 4–5 层的假设。</li>
+<li>每件材料要几分钟（r9 的 <code>UNIT</code> 表）和清怪开梯子以后每层要几分钟。</li>
+<li>世界动态的溢价（按价值的份额、每天做几条）、委托上限按档后的收入构成（第 5 章 5.2）。</li>
+<li>首访新矿在真实布点下的开销（第 3 章 3.7），含钻地机落点、同种守关的规则。</li>
+</ol>
+<h2 id="s10-4">10.4 第 52 条已定的 9 件（用户「全按建议」）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>事</th>
+<th>定为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>第二批要不要也开级（第 46 条只定了第一批到 Lv17）</td>
+<td>第二批开到 Lv19（Lv18–19 也用 T2 过渡行），2 期开到 Lv21（Lv20–21 用点名地域的 T3 材料过渡），让每期都有新等级</td>
+</tr>
+<tr>
+<td>2</td>
+<td>第一批到 V1 之间给谁玩（第 9 章 9.3：开发比玩家慢，墙会反复出现）</td>
+<td>只给测试玩家（现在本来就是免费删档测试，第 53 条）；正式开放在 V1 之后</td>
+</tr>
+<tr>
+<td>3</td>
+<td>第二故乡</td>
+<td>这一轮不做；以后按「提高收益，比如一周内免费」重新设计</td>
+</tr>
+<tr>
+<td>4</td>
+<td>矿脉守关的档位和「武器低一档伤害减半」（v3 是「每下只打 1 点」）</td>
+<td>按第 3 章 3.5</td>
+</tr>
+<tr>
+<td>5</td>
+<td>全球首杀的范围；谁不参加；公开名字</td>
+<td>只给 T3 以上的守关；内部账号不参加（测试玩家照常参加，删档清零）；公开名字默认开、设置里可以关</td>
+</tr>
+<tr>
+<td>6</td>
+<td>5 分钟玩家约第 357 天满级，要不要给便利</td>
+<td>先不加；上线后看数据（备选：城里采集点每天第一次双份）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>育种料每周点名地域（防一次囤满）</td>
+<td>照第 5 章 5.3</td>
+</tr>
+<tr>
+<td>8</td>
+<td>常客不再免许可 / 长途票</td>
+<td>照第 4 章 4.5</td>
+</tr>
+<tr>
+<td>9</td>
+<td>玩家之间要不要别的交换形式（第 2 条留的未定）</td>
+<td>先不做；社交（333）时再议</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>以后再议的</strong>（不挡第一批）：第二故乡重新设计；玩家交换；访客 / 名片 / 社交关系（333，外观长尾要它）；正式开放的时间；清档执行窗口（q 行 B 上线前再找用户点头，第 20 条）。</p>
+<h2 id="s10-5">10.5 防作弊专题</h2>
+<p>清单：<code>../v3/20-anticheat-checklist.md</code>（战斗上报、首杀竞争、操作频率、挂机、小游戏、时间、地点、多号、公开名字、旧客户端）；本次加：采集带地点 id 核对所在地、气候变体特性的数值、内部账号不进首杀。</p>
+<hr />
+<h1 id="ch11">第 11 章 审查处理记录（11-01 深夜）</h1>
+<blockquote>
+<p>三路对抗性审查：<code>review-v4-1-numbers.md</code>（数值，挡 3、重要 6、一般 8）、<code>review-v4-2-ux.md</code>（结论落实与体验，挡 1、重要 11、一般 13；44 条里 9 条有偏差）、<code>review-v4-3-build.md</code>（一致性与实现，挡 2、重要 11、一般 8）。用户第 14 轮回了 6 个问题，另加 1 条（第 45–51 条）；第 15 轮「全按建议」（第 52、53 条），10.4 的 9 件都已定。下表「处理」写改在哪一章；「10.4」= 列进待用户确认。</p>
+</blockquote>
+<h2 id="s11-1">11.1 用户第 14 轮的 7 条</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>条</th>
+<th>用户原话</th>
+<th>落在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>45</td>
+<td>1:a</td>
+<td>新脚本 <code>pacing_r9.py</code>：时间、体力两本账；T1–T2 收入用 sim354 实测；金币、材料、门槛重出（第 2、5 章）</td>
+</tr>
+<tr>
+<td>46</td>
+<td>2:17</td>
+<td>第一批到 Lv17，Lv16–17 过渡行（第 2 章 2.3）；第二批开不开级列 10.4 #1</td>
+</tr>
+<tr>
+<td>47</td>
+<td>3:保留</td>
+<td>第 9 章 9.1 范围不砍，人日改为 150–225、6–8 周</td>
+</tr>
+<tr>
+<td>48</td>
+<td>4. 提高第二故乡收益（比如一周内免费），或者这一轮先不做</td>
+<td>选「这一轮不做」（第 4 章 4.4），10.4 #3</td>
+</tr>
+<tr>
+<td>49</td>
+<td>5:确认</td>
+<td>农场采集点搬出、取消每天 2 局：第 3、4 章去掉「待定」；引导加一步（第 4 章 4.1）</td>
+</tr>
+<tr>
+<td>50</td>
+<td>6:你给方案</td>
+<td>主产层前移（理由改正，第 3 章 3.4）；顶级物品用处（第 6 章 6.4）；矿脉守关换色（第 3 章 3.5）</td>
+</tr>
+<tr>
+<td>51</td>
+<td>7: 移除必须全部清除矿点才能开下一关，改为清理完怪物</td>
+<td>第 3 章 3.2；节奏模型每层只算 2 体力 + 打怪时间</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s11-2">11.2 数值（v4-1）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>严重度</th>
+<th>问题</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>挡</td>
+<td>门槛的准时率用的是旧体力分配</td>
+<td>按 sim354 第一批机制重定门槛（review 表 C），r9 复跑准时 75–100%（第 2 章 2.4）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>挡</td>
+<td>收入和材料用了同一份体力</td>
+<td>第 45 条；时间、体力两本账，收入按实测（第 2 章 2.1、第 5 章 5.1）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>挡</td>
+<td>第一批 Lv16–17 没有材料来源</td>
+<td>过渡行（第 2 章 2.3）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>重要</td>
+<td>T5–T6 取整后超预算、首访那一半没扣</td>
+<td>r9 直接从预算算件数，四舍五入，多出的折成天数进到达日（表 G）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>重要</td>
+<td>③ 在 T5–T6 被按件数的份额封顶</td>
+<td>份额改按价值（当档日收入 30%）；③ 目标降到 Lv30 约 280（第 5 章 5.4）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>重要</td>
+<td>路费没算许可、长途票；燃料没单列</td>
+<td>r9 表 E 按档列出；T5 点名深渊隔级外洲、T6 每级一个外洲，路费压到 8–11%（第 4 章 4.3、第 5 章 5.6）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>重要</td>
+<td>首访对没写死的规则很敏感</td>
+<td>写死：同种含变体、燃料定义、落点算电梯站、每层统一 2 体力；NEW 按清单算（第 3 章 3.6–3.7）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>重要</td>
+<td>第一周每天采集 11–15 次、时间装不下</td>
+<td>材料按分钟预算；T2 一次 3 件；密度规则；每天 4–5 次（第 2 章 2.3、第 4 章 4.1）</td>
+</tr>
+<tr>
+<td>9</td>
+<td>重要</td>
+<td>金币的 × 1.05 下限</td>
+<td>去掉；第一周 80–90 一级、占收入 50%（第 2 章 2.3）</td>
+</tr>
+<tr>
+<td>10</td>
+<td>一般</td>
+<td>3.3 的理由写错</td>
+<td>改正（第 3 章 3.4）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>一般</td>
+<td>5 分钟倍数 0.54 没依据</td>
+<td>改 0.36（sim：收入 0.38、材料约 0.33），满级约第 357 天（第 2 章 2.2）</td>
+</tr>
+<tr>
+<td>12</td>
+<td>一般</td>
+<td>委托超过完成奖上限</td>
+<td>① 按上限的 80% 减去已有部分（第 5 章 5.2）</td>
+</tr>
+<tr>
+<td>13</td>
+<td>一般</td>
+<td>「每档 ×1.45」和曲线不符</td>
+<td>按新曲线重写（第 5 章 5.1）</td>
+</tr>
+<tr>
+<td>14</td>
+<td>一般</td>
+<td>升级回 50 没进模型</td>
+<td>写明：30 分钟玩家缺时间不缺体力，回 50 不进预算（第 2 章 2.1）</td>
+</tr>
+<tr>
+<td>15</td>
+<td>一般</td>
+<td>Pip 委托在 Lv4、签章数对不上</td>
+<td>Pip 改 Lv3；第一周表重排，签章 2–3 枚（第 2 章 2.7、2.8）</td>
+</tr>
+<tr>
+<td>16</td>
+<td>一般</td>
+<td>点名地域没绑到材料</td>
+<td>第 2 章 2.3 表注</td>
+</tr>
+<tr>
+<td>17</td>
+<td>一般</td>
+<td>T1–T2 出门成本为 0</td>
+<td>最近 3 个免费野外点保证 1 浅坑 + 1 矿脉；第一座矿脉的爬层进 T2 首访（第 1 章 1.5、第 3 章 3.7）</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s11-3">11.3 结论落实与体验（v4-2）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>严重度</th>
+<th>问题</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>挡</td>
+<td>Lv16–17 过渡写法丢了</td>
+<td>同 11.2 #3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>重要</td>
+<td>分期之间的等级墙</td>
+<td>第 9 章 9.3 墙表；10.4 #1、#2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>重要</td>
+<td>第一周有两天没有新解锁</td>
+<td>第 2 章 2.7 第一批 Lv1–17 后果表；2.8 每天一个新地方</td>
+</tr>
+<tr>
+<td>4</td>
+<td>重要</td>
+<td>第一周金币吃掉 81%</td>
+<td>同 11.2 #9</td>
+</tr>
+<tr>
+<td>5</td>
+<td>重要</td>
+<td>只上线一次的玩家；硬木、亚麻密度</td>
+<td>第 2 章 2.2 末条；第 4 章 4.1 密度</td>
+</tr>
+<tr>
+<td>6</td>
+<td>重要</td>
+<td>农场采集点搬出没批、引导缺一步</td>
+<td>用户第 49 条确认；引导加一步（第 4 章 4.1，q 行 D）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>重要</td>
+<td>第二故乡几乎没好处</td>
+<td>第 48 条：这一轮不做（第 4 章 4.4）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>重要</td>
+<td>第 14 条「出门理由」没落地</td>
+<td>第 1 章 1.6 总表；每章末尾一行</td>
+</tr>
+<tr>
+<td>9</td>
+<td>重要</td>
+<td>沿用的 v3 表带回被推翻的规则；第 28 条后半句漏了</td>
+<td>附录 B 作废清单；岩甲虫改成冲撞后硬直（第 3 章 3.5）</td>
+</tr>
+<tr>
+<td>10</td>
+<td>重要</td>
+<td>同地域矿差别小，前一个月只在 3 座矿转</td>
+<td>每座矿的个性；家附近 2 浅坑 + 2 矿脉；「在 N 座矿见过」（第 1 章 1.5、第 3 章 3.3）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>重要</td>
+<td>5 分钟玩家只按体力缩放</td>
+<td>同 11.2 #11；便利列 10.4 #6</td>
+</tr>
+<tr>
+<td>12</td>
+<td>重要</td>
+<td>偏远家城新闻少</td>
+<td>每个「大洲 × 气候带」保底 1 条；观测加新闻收入占比（第 5 章 5.4、第 4 章 4.6）</td>
+</tr>
+<tr>
+<td>13</td>
+<td>一般</td>
+<td>追赶口径不清</td>
+<td>第 8 章 8.1</td>
+</tr>
+<tr>
+<td>14</td>
+<td>一般</td>
+<td>首杀成就晚于守关；测试号拿全球首杀</td>
+<td>第一批记击杀；全球首杀 T3 起；内部账号不参加，测试期删档清零（第 7 章，第 53 条）</td>
+</tr>
+<tr>
+<td>15</td>
+<td>一般</td>
+<td>长尾说法和设计不符</td>
+<td>8.2 改写；加两样季节限定（第 3 章 3.9）</td>
+</tr>
+<tr>
+<td>16</td>
+<td>一般</td>
+<td>印章门槛是每天点两个近处 pin</td>
+<td>写明签章只管「去过多少城」，多样由地域 / 点名承担（第 2 章 2.4）；不再加规则</td>
+</tr>
+<tr>
+<td>17</td>
+<td>一般</td>
+<td>「集齐签章要非常久」消失</td>
+<td>第 7 章加「护照与签章」</td>
+</tr>
+<tr>
+<td>18</td>
+<td>一般</td>
+<td>T6 遗珍不点名大洲</td>
+<td>每级点名一个外洲（第 2 章 2.3）</td>
+</tr>
+<tr>
+<td>19</td>
+<td>一般</td>
+<td>取消每天 2 局出处不对</td>
+<td>用户第 49 条确认</td>
+</tr>
+<tr>
+<td>20</td>
+<td>一般</td>
+<td>铁剑来源、矿脉守关档位</td>
+<td>工作台配方（第 6 章 6.2）；守关档位（第 3 章 3.5）</td>
+</tr>
+<tr>
+<td>21</td>
+<td>一般</td>
+<td>Pip 委托触发时机</td>
+<td>Lv3（第 2 章 2.7）</td>
+</tr>
+<tr>
+<td>22</td>
+<td>一般</td>
+<td>育种料可以一次囤满</td>
+<td>每周点名地域（第 5 章 5.3，10.4 #7）</td>
+</tr>
+<tr>
+<td>23</td>
+<td>一般</td>
+<td>常客免门禁绕过越用越贵</td>
+<td>去掉常客的这项（第 4 章 4.5，10.4 #8）</td>
+</tr>
+<tr>
+<td>24</td>
+<td>一般</td>
+<td>10.1 漏节</td>
+<td>第 10 章 10.1 补齐</td>
+</tr>
+<tr>
+<td>25</td>
+<td>一般</td>
+<td>外观长尾在哪被看到</td>
+<td>第 8 章 8.2 末段（标 333 依赖）</td>
+</tr>
+<tr>
+<td>44 条对照</td>
+<td>—</td>
+<td>3、8、9、12、14、25、28、35、39 有偏差</td>
+<td>3：1.7 措辞改；8：护照；9、19：第 49 条；12：附录 B；14：1.6；25：矿 1–30 层 → 浅坑全 + 矿脉 F40（矿型重做后浅坑最深 20–30，矿脉给 T2 的铁和石英）；28：3.5；35：第 48 条；39：4.6 观测项</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s11-4">11.4 一致性与实现（v4-3）</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>严重度</th>
+<th>问题</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>挡</td>
+<td>Lv16–17</td>
+<td>同 11.2 #3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>挡</td>
+<td>「沿用 v3 03」和矿井 v2 冲突，缺怪物守关表</td>
+<td>第 3 章 3.5 新表；v3 03 3.0–3.6 作废</td>
+</tr>
+<tr>
+<td>3</td>
+<td>重要</td>
+<td>q 行合并顺序、捆绑、推翻清单</td>
+<td>第 10 章 10.2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>重要</td>
+<td>服务端 / 数据漏项</td>
+<td>第 9 章 9.1 第 1、4、10、12、13 行</td>
+</tr>
+<tr>
+<td>5</td>
+<td>重要</td>
+<td>客户端漏项、引导低估</td>
+<td>第 9 章 9.1 各行客户端数；第 7 行改「引导改版」</td>
+</tr>
+<tr>
+<td>6</td>
+<td>重要</td>
+<td>人日和日历偏乐观</td>
+<td>150–225 人日、6–8 周</td>
+</tr>
+<tr>
+<td>7</td>
+<td>重要</td>
+<td>在途工作状态旧</td>
+<td>第 9 章头注；野外 id 不进按城的板（第 5 章 5.5）</td>
+</tr>
+<tr>
+<td>8</td>
+<td>重要</td>
+<td>铁剑来源、守关档位</td>
+<td>同 11.3 #20</td>
+</tr>
+<tr>
+<td>9</td>
+<td>重要</td>
+<td>分期没排人日和够玩几天</td>
+<td>第 9 章 9.2、9.3</td>
+</tr>
+<tr>
+<td>10</td>
+<td>重要</td>
+<td>一批已定内容不在任何一期</td>
+<td>第 9 章 9.2 逐条排进去</td>
+</tr>
+<tr>
+<td>11</td>
+<td>重要</td>
+<td>野外地点要一次分好类型；最近 3 个从哪算</td>
+<td>第 1 章 1.4、1.5</td>
+</tr>
+<tr>
+<td>12</td>
+<td>重要</td>
+<td>每人状态剪枝、整文件写盘</td>
+<td>第 3 章 3.6、3.8；第 9 章 9.1 第 13 行</td>
+</tr>
+<tr>
+<td>13</td>
+<td>重要</td>
+<td>10.1 漏约 24 节、节号错</td>
+<td>第 10 章 10.1</td>
+</tr>
+<tr>
+<td>14</td>
+<td>一般</td>
+<td>燃料「当档金属」不存在</td>
+<td>煤 3 + 铁 1 + 20 × 档 金币</td>
+</tr>
+<tr>
+<td>15</td>
+<td>一般</td>
+<td>委托列和上限</td>
+<td>同 11.2 #12</td>
+</tr>
+<tr>
+<td>16</td>
+<td>一般</td>
+<td>首杀按矿还是按种</td>
+<td>打过才能往下按矿；奖励和成就按种（第 3 章 3.6）</td>
+</tr>
+<tr>
+<td>17</td>
+<td>一般</td>
+<td>第一批不记击杀</td>
+<td>第一批就记（第 3 章 3.6、第 7 章）</td>
+</tr>
+<tr>
+<td>18</td>
+<td>一般</td>
+<td>Pip 委托时机；Mine Hut / Ivo</td>
+<td>Pip Lv3；Mine Hut 保留为 Ivo 的家（第 1 章 1.2）</td>
+</tr>
+<tr>
+<td>19</td>
+<td>一般</td>
+<td>文字和引用的小错</td>
+<td>0.4 改 Lv5–10；饭量公式（2.6）；碎片 F80（3.4）；深渊守护每 20 层、大洲守护者 F150（3.5、3.11）；网页改读 r9</td>
+</tr>
+<tr>
+<td>20</td>
+<td>一般</td>
+<td>进背包细则</td>
+<td>第 4 章 4.1</td>
+</tr>
+<tr>
+<td>21</td>
+<td>一般</td>
+<td>矿井 v2 后续实现量偏低</td>
+<td>第 9 章 9.2 按审查单价重估</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="appB">附录 B：v3 作废行清单（v4 引用 v3 时以这里为准）</h2>
+<p>各 v3 文件顶部已加一行提示指向本附录。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>v3 位置</th>
+<th>作废的写法</th>
+<th>以 v4 为准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>17 的 17.2 主产列</td>
+<td>晶洞 F20、深渊晶核 F50、碎片 F100、遗迹「每周限量」</td>
+<td>第 3 章 3.3、3.4</td>
+</tr>
+<tr>
+<td>2</td>
+<td>17 的 17.2 守关、17.6 矿口卡</td>
+<td>深渊守关层号没写；大洲守护者 F140</td>
+<td>第 3 章 3.5（每 20 层；F120 / F150）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>17 的 17.9 第 3 条、17.10</td>
+<td>「钻地机、晶洞……第二批起」；工作量不分期</td>
+<td>第 3 章 3.12、第 9 章 9.2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>gensen-v3.html「矿井 v2」节</td>
+<td>起始层、F140</td>
+<td>gensen-v4.html</td>
+</tr>
+<tr>
+<td>5</td>
+<td>01 的 1.1 野外地点行</td>
+<td>Ivo 常驻矿口小屋；野外章；「最近 3 个」从城算</td>
+<td>第 1 章 1.2、1.5；第 7 章</td>
+</tr>
+<tr>
+<td>6</td>
+<td>01 的 1.3 T4–T6 行</td>
+<td>矿 46–70 / 71–100 / 101 层以下</td>
+<td>按矿型（第 3 章）</td>
+</tr>
+<tr>
+<td>7</td>
+<td>01 的 1.4.2 表头</td>
+<td>「矿 26–45」等层段</td>
+<td>按矿型和起始层</td>
+</tr>
+<tr>
+<td>8</td>
+<td>01 的 1.4.4 掉落</td>
+<td>「71–100 层」「每 25 层的大洲守护者」等</td>
+<td>第 3 章 3.5</td>
+</tr>
+<tr>
+<td>9</td>
+<td>01 的 1.4.5</td>
+<td>背包三选一「只免每天第一次」</td>
+<td>第 36 条：永远免费；进背包按第 4 章 4.1</td>
+</tr>
+<tr>
+<td>10</td>
+<td>01 的 1.6 整节</td>
+<td>1–150 层、最深纪录全球共用、险境 46 层以下</td>
+<td>第 3 章</td>
+</tr>
+<tr>
+<td>11</td>
+<td>01 的 1.7</td>
+<td>守关 10 / 25 / 45 / 70 / 100 / 每 25 层</td>
+<td>第 3 章 3.5</td>
+</tr>
+<tr>
+<td>12</td>
+<td>03 顶部、3.0、3.1</td>
+<td>层段 1–10 / 11–25 / …</td>
+<td>第 3 章</td>
+</tr>
+<tr>
+<td>13</td>
+<td>03 的 3.3</td>
+<td>怪的层段、精英层、守关层、「首杀全球通用、所有矿这一层都通」</td>
+<td>第 3 章 3.5、3.6</td>
+</tr>
+<tr>
+<td>14</td>
+<td>03 的 3.3.2 岩甲虫</td>
+<td>正面背甲只吃 1 点</td>
+<td>冲撞后硬直 2 秒、硬直时受伤 ×2</td>
+</tr>
+<tr>
+<td>15</td>
+<td>03 的 3.4</td>
+<td>险境在 71 层以下</td>
+<td>矿脉 F30、晶洞 F20、深渊 F30，3 期起</td>
+</tr>
+<tr>
+<td>16</td>
+<td>03 的 3.5.1</td>
+<td>最深纪录全球共用、任何矿口坐电梯</td>
+<td>按矿 + 资历 + 钻地机（层状态、发牌、倒地等其余行保留）</td>
+</tr>
+<tr>
+<td>17</td>
+<td>03 的 3.6</td>
+<td>第 709 天到 1,000 层等</td>
+<td>删除</td>
+</tr>
+<tr>
+<td>18</td>
+<td>04 正文「出在哪层」、铜剑 / 铁剑配方</td>
+<td>矿 11–30 / 31–70 层；铁剑「熔炉 T2」</td>
+<td>按矿型；第一批铁剑走工作台（第 6 章 6.2）；价格按第 6 章 6.3 重出</td>
+</tr>
+<tr>
+<td>19</td>
+<td>05 抗性药水和药水来源</td>
+<td>「异地 71 层以下」；晶鳞 31–70 层等；旧收入</td>
+<td>按矿型；收入按第 5 章</td>
+</tr>
+<tr>
+<td>20</td>
+<td>06 的 6.0、6.1</td>
+<td>重度第 40 天、250 × 1.0975、技能和、野外章</td>
+<td>第 2 章</td>
+</tr>
+<tr>
+<td>21</td>
+<td>06 的 6.2、6.2b</td>
+<td>30 级表、2 选 1 / 3 选 2</td>
+<td>第 2 章 2.3</td>
+</tr>
+<tr>
+<td>22</td>
+<td>06 的 6.3</td>
+<td>田 30 格、庭院扩地、第二故乡槽、Lv4 熔炉等</td>
+<td>第 2 章 2.7</td>
+</tr>
+<tr>
+<td>23</td>
+<td>06 的 6.4</td>
+<td>印章含野外章；「去过地域」判定</td>
+<td>第 2 章 2.4</td>
+</tr>
+<tr>
+<td>24</td>
+<td>06 的 6.5</td>
+<td>老号迁移</td>
+<td>清档；过渡行在第 2 章 2.3</td>
+</tr>
+<tr>
+<td>25</td>
+<td>06 的 6.7</td>
+<td>Lv4 熔炉、矿 11–25 层、第 6 天过第 25 层守关</td>
+<td>第 2 章 2.8</td>
+</tr>
+<tr>
+<td>26</td>
+<td>06 的 6.8</td>
+<td>V2 矿 151–250 层、每版 5 级的天数</td>
+<td>第 8 章 8.1</td>
+</tr>
+<tr>
+<td>27</td>
+<td>07</td>
+<td>庭院扩地 I–V、旧层号</td>
+<td>格子领地；按矿型</td>
+</tr>
+<tr>
+<td>28</td>
+<td>08</td>
+<td>收入 250 × 1.0975^(Lv−4)</td>
+<td>第 5 章 5.1</td>
+</tr>
+<tr>
+<td>29</td>
+<td>09 整章</td>
+<td>层段、2 选 1、野外章、印章数</td>
+<td>第 1 章 1.6、第 2 章</td>
+</tr>
+<tr>
+<td>30</td>
+<td>14</td>
+<td>「① 订单」各行</td>
+<td>第 31 条：并入委托（第 5 章 5.5）；份额按价值（5.4）</td>
+</tr>
+<tr>
+<td>31</td>
+<td>16 第 4、6、8、11 件</td>
+<td>野外章；每天第一次免费；换料保留；周上限</td>
+<td>第 34、36、38、41 条</td>
+</tr>
+<tr>
+<td>32</td>
+<td>19 的 19.1、19.3</td>
+<td>首杀只有两级；公开名字可关</td>
+<td>第 7 章（三级；10.4 #5）</td>
+</tr>
+<tr>
+<td>33</td>
+<td>cost.py、econ.py、mine.py、pacing.py、pacing_r7.py、v4 的 pacing_r8.py</td>
+<td>旧收入、1,000 层版、× 1.05 下限、体力用两次</td>
+<td><code>pacing_r9.py</code>；cost.py 进 q 行前按第 6 章 6.3 改</td>
+</tr>
+</tbody>
+</table></div>
+  </article>
+</div>
+<button class="totop" id="totop" type="button" aria-label="回到顶部">↑ Top</button>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var targets = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  function setActive(id) {
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + id); });
+    var cur = document.querySelector('#toc a[href="#' + id + '"]');
+    document.querySelectorAll('#toc li.c1').forEach(function (li) { li.classList.remove('open'); });
+    if (cur) { var c1 = cur.closest('li.c1'); if (c1) c1.classList.add('open'); }
+  }
+  if ('IntersectionObserver' in window) {
+    var visible = new Map();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) visible.set(e.target.id, e.boundingClientRect.top); else visible.delete(e.target.id); });
+      var best = null;
+      visible.forEach(function (top, id) { if (best === null || top < visible.get(best)) best = id; });
+      if (best) setActive(best);
+    }, { rootMargin: '-70px 0px -70% 0px' });
+    targets.forEach(function (t) { io.observe(t); });
+  }
+  if (targets.length) setActive(targets[0].id);
+  var btn = document.getElementById('totop');
+  window.addEventListener('scroll', function () { btn.classList.toggle('show', window.scrollY > 800); }, { passive: true });
+  btn.addEventListener('click', function () { window.scrollTo({ top: 0 }); });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  // The artifact viewer renders pre.mermaid natively; this fallback only runs for the local file.
+  function pending() { return Array.prototype.filter.call(document.querySelectorAll('pre.mermaid'), function (p) { return !p.querySelector('svg') && !p.getAttribute('data-processed'); }); }
+  setTimeout(function () {
+    var left = pending();
+    if (!left.length || !window.mermaid) return;
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    try { window.mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', flowchart: { htmlLabels: true } }); window.mermaid.run({ nodes: left }); } catch (e) {}
+  }, 1200);
+})();
+</script>
+
+</body>
+</html>

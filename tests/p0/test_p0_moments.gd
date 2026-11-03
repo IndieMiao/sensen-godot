@@ -54,6 +54,17 @@ func _to_lv4() -> int:
 	var th: Array = P0Logic.content().get("skills", {}).get("fishing", [])
 	return maxi(0, int(th[3]) - 100)
 
+## q(278) (SGODOT-386): after the card, a level gate floats in the card's word and says whose level — `Too strong ·
+## Fishing Lv8` (it read `Got away · Lv8`), the refund as it came back with no + (386 1c3d0416); a rod gate still
+## `Got away · Reed Rod` (q(50)).
+func test_a_second_break_free_floats_too_strong_with_the_fishing_level() -> void:
+	var v := _view()
+	assert_str(P0Logic.break_free_float(v, {"fish": "fish_salmon", "rarity": 4, "need_level": 8, "refund": 3}))\
+		.is_equal("Too strong · Fishing Lv8 · 3 Energy back")
+	assert_str(P0Logic.break_free_float(v, {"fish": "fish_golden_koi", "rarity": 3, "need_level": 4, "refund": 5, "protected_left": 8}))\
+		.is_equal("Too strong · Fishing Lv4 · Energy refunded (8 left today)")
+	assert_str(P0Logic.break_free_float(v, {"fish": "fish_golden_koi", "rarity": 3, "refund": 3})).is_equal("Got away · Reed Rod · 3 Energy back")
+
 func test_a_rod_gate_names_the_rod_and_its_price() -> void:
 	ui.show_got_away({"fish": "fish_golden_koi", "rarity": 3, "refund": 3})
 	await await_idle_frame()

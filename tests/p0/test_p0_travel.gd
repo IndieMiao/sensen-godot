@@ -31,8 +31,8 @@ func test_a_running_day_pass_covers_its_city_and_shows_on_the_chip() -> void:
 	assert_int(P0Travel.visits(v, TOKYO)).is_equal(1)
 	assert_str(P0Travel.pass_text(v, TOKYO)).is_equal("23h")
 	var chip := P0Travel.place(v, {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME, day_pass = ""})
-	# q(108): the free version's chip shows no Day Pass — Tokyo · Arrived
-	assert_dict(chip).is_equal({city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = ""})
+	# q(257) ⑤ (q(108) ③'s free version showed none): Tokyo · Arrived · Day Pass 23h
+	assert_dict(chip).is_equal({city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"})
 	v.travel.passes[TOKYO].until = now + 47 * 60000.0
 	assert_str(P0Travel.pass_text(v, TOKYO)).is_equal("47m")
 	# the homestead's own spaces are home whatever `here` still says (李元芳's cold start, SGODOT-278)

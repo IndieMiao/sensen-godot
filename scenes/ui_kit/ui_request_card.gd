@@ -5,10 +5,16 @@ extends PanelContainer
 ## personal request`) + the request in their own words + `Bring` NEED-TILE(s) + Reward + Deliver to + one
 ## primary (Accept, or Deliver when ready; a reason makes it unavailable, LOCK-10) + `Not now`.
 ## The full lifecycle (Track, Drop, statuses) is WP4. data: {portrait (Texture2D), title, who, line, needs:
-## [{name, have, need, icon}], reward, bonus_note (optional), deliver_to, action, reason}. Emits `action_pressed` / `dismissed`.
+## [{name, have, need, icon}], reward, bonus_note (optional), deliver_to, action, reason, links (optional)}. Emits
+## `action_pressed` / `dismissed`. links: NavigationRows between Deliver to and the button — a keeper's local request's
+## `Drop request ›` and `Bo's other requests · 2 ›` (q(272), 不知火舞 378 77524b0e; a resident's card has none, LOCK-18
+## unchanged); a press emits `link_pressed` with its index. break_dots (a local card's, 周瑜 on #610: a resident's
+## Deliver to stays as it was): Deliver to breaks only after a ` · ` when it runs long (`Wen · Xuhui Tackle Shop` /
+## `Shanghai`, as q(270)).
 
 signal action_pressed
 signal dismissed
+signal link_pressed(index: int)
 
 # ResidentRequestCard main (WP1b, not exported as tokens yet; see UiTokens.PENDING "wp1b"):
 const _PAD := 14.0
@@ -79,6 +85,9 @@ func _init(data_: Dictionary = {}) -> void:
 		var v := UiKit.label(str(data[row[1]]), UiTokens.STYLE_C12_XB)
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		if row[1] == "deliver_to" and bool(data.get("break_dots", false)):
+			v.clip_text = true
+			v.resized.connect(func(): _fit_dots(v, str(data.deliver_to)))
 		if row[1] == "reward":
 			var values := VBoxContainer.new()
 			values.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -95,6 +104,12 @@ func _init(data_: Dictionary = {}) -> void:
 		else:
 			h.add_child(v)
 		col.add_child(h)
+	var links: Array = data.get("links", [])
+	for i in links.size():
+		var link := UiNavButton.new(str(links[i]))
+		link.name = "Link%d" % i
+		link.pressed.connect(func(): link_pressed.emit(i))
+		col.add_child(link)
 	_action = UiCommandButton.new(str(data.get("action", "Accept")))
 	_action.reason = str(data.get("reason", ""))
 	_action.sends = bool(data.get("sends", false))   # Accept / Deliver to the server (§10.7.1 Offline)
@@ -124,6 +139,13 @@ func _fit_reward() -> void:
 	if not is_instance_valid(_reward): return
 	_reward.text = UiKit.break_at_dot(str(data.get("reward", "")), _reward.get_theme_font(&"font"),
 		_reward.get_theme_font_size(&"font_size"), _reward.get_parent().size.x)
+
+## A value broken only after a ` · ` to fit its width (UiKit.break_at_dot); the label grows a line for it.
+func _fit_dots(v: Label, text: String) -> void:
+	var shown := UiKit.break_at_dot(text, v.get_theme_font(&"font"), v.get_theme_font_size(&"font_size"), v.size.x)
+	if v.text == shown: return
+	v.clip_text = not shown.contains("\n")
+	v.text = shown
 
 func _fit_height() -> void:
 	var height := get_combined_minimum_size().y

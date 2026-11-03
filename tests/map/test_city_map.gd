@@ -49,7 +49,7 @@ func test_residents_follow_existing_unlock_rules() -> void:
 	for place in ["nursery", "bistro", "courtyard"]: expected.append_array(ResidentCast.present(place, state))
 	assert_array(actual).contains_exactly(expected)
 
-func test_city_zoom_does_not_expand_relocation_or_change_home() -> void:
+func test_city_zoom_does_not_change_home() -> void:
 	FarmChoice.save("la_c", 2)
 	FarmRegions.save_choice("los_angeles")
 	Net.use_transport(FakeTransport.new([]).callable())
@@ -69,9 +69,6 @@ func test_city_zoom_does_not_expand_relocation_or_change_home() -> void:
 	assert_float(m.center_lat).is_equal_approx(m.home_lat, 0.00001)
 	assert_float(m.center_lng).is_equal_approx(m.home_lng, 0.00001)
 	assert_int(m._pawns.filter(func(p): return p.cohort != "self").size()).is_equal(0)
-	m.enter_relocation_mode(FarmRegions.load_default().region("los_angeles"))
-	assert_object(m.city_map).is_null()
-	assert_float(m._minimum_zoom()).is_equal(m.STREET_ZOOM_MIN)
 	FarmChoice.clear()
 	FarmRegions.clear_choice()
 

@@ -64,10 +64,6 @@ var activity_sheet: PanelContainer
 var _activity_pending := ""
 var _activity_busy := false
 var _activity_args: Dictionary = {}
-var _relocate_button: Button
-var _terrain_stale := false
-var _terrain_refresh_busy := false
-var _terrain_loading: CanvasLayer
 var plot_surface: PlotSurface
 ## 长按刷子沿途命中的格；松手才真正提交。
 ## 当前被木本作物挡住的格；与新状态比对后只翻转差集。
@@ -152,21 +148,16 @@ func _ready() -> void:
 	title.add_theme_color_override("font_color", GameUi.INK)
 	visitor = bool(_args.get("visitor", false))
 	snapshot = _args.get("snapshot", {})
-	var terrain: Dictionary = snapshot.get("farm_terrain", {}) if visitor else {}
 	bp = _args.get("blueprint")
 	# 服务端农场的蓝图优先于本地选的：本地选了 sh_b、服务端农场是 sh_c 时，客户端按 sh_b 进场，
 	# 发出去的每一格都 CELL_NOT_CULTIVABLE，草还画在别的坐标上（2026-09-04 真机）。
 	if not visitor:
 		var s0: FarmSession = _args.get("session", Net.session if Net else null)
 		if s0 and s0.has_farm() and not s0.layout_patch_id.is_empty():
-			terrain = s0.farm_terrain
 			var server_bp := FarmBlueprint.load_choice(s0.farm_choice())
 			if server_bp != null:
 				bp = server_bp
-				# FarmSession owns saving generated choices; do not drop its persisted terrain.
-				if terrain.is_empty(): FarmChoice.save(s0.layout_patch_id, s0.blueprint_revision, s0.location)
-	if visitor and not terrain.is_empty():
-		bp = FarmBlueprint.load_choice(snapshot)
+				FarmChoice.save(s0.layout_patch_id, s0.blueprint_revision, s0.location)
 	if bp == null:
 		bp = FarmBlueprint.load_file(FarmBlueprint.asset_path(
 			str(_args.get("layout_patch_id", "")), int(_args.get("revision", 1))))
@@ -177,11 +168,7 @@ func _ready() -> void:
 	if visitor and snapshot.get("location") is Dictionary:
 		bp = bp.with_location(snapshot.location)
 	geo_blueprint = bp
-	bp = FarmPlot.register_terrain(terrain) if not terrain.is_empty() else FarmPlot.blueprint_for()
-	if bp == null:
-		push_error("Farm: invalid persisted terrain")
-		call_deferred("_leave")
-		return
+	bp = FarmPlot.blueprint_for()
 	grid = BlueprintGrid.new(bp)
 	_frame_field()
 	var lawn := PlaneMesh.new()
@@ -194,7 +181,7 @@ func _ready() -> void:
 	grass.set_shader_parameter("woodland_start", -bp.cell_to_world(bp.anchor("house")).z + 3.75)
 	ground.material_override = grass
 	farm_style = FarmArt.style_for(geo_blueprint.region_id, geo_blueprint.layout_patch_id,
-		str(_args.get("farm_style", terrain.get("farm_style", ""))))
+		str(_args.get("farm_style", "")))
 	_build_props()
 	_build_mine_entrance()
 	scenery = FarmScenery.new()
@@ -234,13 +221,6 @@ func _ready() -> void:
 	camera_pan.hold_ended.connect(_brush_end)
 	camera_pan.hold_canceled.connect(_discard_brush)
 	_attach_session()
-	_relocate_button = GameUi.button("map-pin", L10n.text("Relocate farm"), L10n.text("Choose a new farm location · one chance"))
-	_relocate_button.name = "RelocateFarm"
-	_relocate_button.add_theme_font_size_override("font_size", 12)
-	_relocate_button.pressed.connect(func():
-		hud.close_modal()
-		_begin_relocation())
-	hud.add_farm_action(_relocate_button)
 	title.text = L10n.text("My Farm")
 	title.tooltip_text = title.text
 	hud.set_farm_title(title.text)
@@ -271,66 +251,8 @@ func _ready() -> void:
 	if live_session and live_session.logged_in():
 		var online_args := {"farm_id": str(snapshot.get("farm_id", "")) if visitor else session.farm_id}
 		online_args.merge(_args.get("online_join", {}), true)
-		online_args.terrain_checksum = bp.checksum
 		online = OnlineSpace.attach(self, live_session, "farm", online_args,
 			func(): return mover, func(): return _anim)
-		online.farm_relocated.connect(_on_farm_relocated)
-
-func _begin_relocation() -> void:
-	if visitor or session == null or not session.relocation_available(): return
-	if not party_travel_ready() or session.offline or session.has_unconfirmed_command():
-		hud.show_toast(L10n.text("Finish your current work first"), true)
-		return
-	AppRouter.begin_farm_relocation(session, self)
-
-func _on_farm_relocated() -> void:
-	_terrain_stale = true
-	if online: online.stop()
-	if mover: mover.stop()
-	if runner: runner.cancel_pending()
-	_set_work_mode(false)
-	_reload_relocated_farm.call_deferred()
-
-func _own_terrain_changed() -> bool:
-	if visitor or session == null or geo_blueprint == null: return false
-	return not session.layout_patch_id.is_empty() and session.layout_patch_id != geo_blueprint.layout_patch_id
-
-func _reload_relocated_farm() -> void:
-	if _terrain_refresh_busy or process_mode == Node.PROCESS_MODE_DISABLED or AppRouter.top_instance() != self: return
-	_terrain_refresh_busy = true
-	if _terrain_loading == null:
-		_terrain_loading = preload("res://modules/ui/loading_overlay.gd").new()
-		add_child(_terrain_loading)
-		_terrain_loading.close_button.pressed.connect(_leave)
-	hud.show_toast(L10n.text("This farm has moved. Reloading its new ground…"))
-	var args: Dictionary = {"session": session}
-	var ok := false
-	if visitor:
-		var response := await Net.snapshot(str(snapshot.get("farm_id", "")))
-		if not is_inside_tree(): return
-		ok = bool(response.get("ok", false))
-		if ok:
-			var updated: Dictionary = response.snapshot
-			var blueprint := FarmBlueprint.load_choice(updated)
-			ok = blueprint != null
-			args = {"visitor": true, "snapshot": updated, "blueprint": blueprint}
-	else:
-		ok = await session.refresh()
-		if not is_inside_tree(): return
-		if ok:
-			FarmChoice.save_choice(session.farm_choice())
-			var root_map := get_tree().current_scene
-			if root_map and root_map.has_method("refresh_owned_farm_after_relocation"):
-				root_map.call("refresh_owned_farm_after_relocation", session.farm_choice())
-	if ok:
-		hud.close_modal()
-		# Keep the stale-scene guard until replacement has actually completed. A DTO
-		# adoption emits state_changed and may have queued another reload callback.
-		await AppRouter.replace_farm_instance(self, args)
-		if not is_inside_tree(): return
-	hud.show_toast(L10n.text("Could not connect. Reconnect and try again."), true)
-	_terrain_loading.failed()
-	_terrain_refresh_busy = false
 
 func _leave() -> void:
 	if _activity_busy or (activity_sheet and activity_sheet.is_busy()): return
@@ -491,7 +413,6 @@ func _build_mine_entrance() -> void:
 	add_child(mine_entrance)
 
 func _go_mine() -> void:
-	if _terrain_stale: return
 	if _activity_busy: return
 	var connected: FarmSession = online.session if visitor and online else session
 	if connected == null or (visitor and not Net.online_available): return
@@ -533,11 +454,8 @@ func _play(anim: String) -> void:
 	_anim = anim
 
 func _process(dt: float) -> void:
-	if _focus_button and (_terrain_stale or _world_modal_open()):
+	if _focus_button and _world_modal_open():
 		_focus_button.hide()
-	if _terrain_stale:
-		if mover: mover.stop()
-		return
 	if mover == null:
 		return
 	if online and online.travel_busy:
@@ -673,7 +591,7 @@ func _update_focus_indicator() -> void:
 		if direction.is_zero_approx(): direction = Vector2.DOWN
 		projected = viewport_rect.get_center() + direction.normalized() * viewport_rect.size.length()
 	_focus_button.update_indicator(projected, viewport_rect, _camera_play_area(), behind,
-		_terrain_stale or _world_modal_open())
+		_world_modal_open())
 
 func _place_camera(center: Vector3) -> void:
 	FarmCamera.place(cam, center)
@@ -684,7 +602,7 @@ func _stop_camera_recenter() -> void:
 		_camera_recenter = null
 
 func recenter_on_player() -> void:
-	if player == null or _terrain_stale or _world_modal_open(): return
+	if player == null or _world_modal_open(): return
 	_stop_camera_recenter()
 	_clear_brush()
 	_camera_center += camera_pan.offset
@@ -720,7 +638,6 @@ func _input(e: InputEvent) -> void:
 	if _world_modal_open():
 		_clear_brush()
 		return
-	if _terrain_stale: return
 	if _activity_busy: return
 	if online and (online.travel_busy or is_instance_valid(online.panel)): return
 	if mover == null: return
@@ -730,7 +647,6 @@ func _input(e: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _unhandled_input(e: InputEvent) -> void:
-	if _terrain_stale: return
 	if _activity_busy: return
 	if online and (online.travel_busy or is_instance_valid(online.panel)): return
 	if mover == null or _world_modal_open(): return
@@ -836,7 +752,7 @@ func _cancel_work() -> void:
 	_queued_move = null
 
 func party_travel_ready() -> bool:
-	return not _terrain_stale and not _activity_busy and not (activity_sheet and activity_sheet.is_busy()) and _in_flight == 0 and not runner.is_busy() and not _stall_uncertain and not _connection_recovery_busy
+	return not _activity_busy and not (activity_sheet and activity_sheet.is_busy()) and _in_flight == 0 and not runner.is_busy() and not _stall_uncertain and not _connection_recovery_busy
 
 func is_back_navigation_locked() -> bool:
 	if _activity_busy or (activity_sheet and activity_sheet.visible and activity_sheet.is_busy()): return true
@@ -908,8 +824,7 @@ func suspend() -> void:
 	$WorldEnvironment.environment = null
 
 func resume() -> void:
-	if _own_terrain_changed(): _terrain_stale = true
-	if online and not _terrain_stale: online.resume()
+	if online: online.resume()
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	for child in get_children():
@@ -918,9 +833,6 @@ func resume() -> void:
 	get_viewport().transparent_bg = false
 	$WorldEnvironment.environment = _saved_farm_environment
 	cam.make_current()
-	if _terrain_stale:
-		_reload_relocated_farm.call_deferred()
-		return
 	if _pending_state_refresh and session:
 		_pending_state_refresh = false
 		_on_server_state(session.state, session.version)
@@ -948,7 +860,6 @@ func _action_locked() -> bool:
 
 ## 每格按自己的状态入队下一步。返回入队格数。
 func _queue_plots(cells: Array) -> int:
-	if _terrain_stale: return 0
 	_mine_pending = false
 	if visitor or cells.is_empty() or session == null or session.offline:
 		return 0
@@ -1029,7 +940,6 @@ func _on_seed_selected(crop: String) -> void:
 
 ## 大按钮：对整片田做最该做的那件事。
 func _on_cta() -> void:
-	if _terrain_stale: return
 	if _activity_busy: return
 	if runner.is_busy() or _in_flight > 0 or session == null or session.offline: return
 	var bulk := _last_bulk
@@ -1219,9 +1129,6 @@ func _render() -> void:
 
 ## 把权威状态（叠上预测）刷到 HUD：金币、田况、倒计时、目标、大按钮、种子行。
 func _refresh_hud() -> void:
-	if _relocate_button:
-		_relocate_button.visible = not visitor and session != null and session.relocation_available()
-		_relocate_button.disabled = _terrain_stale or _terrain_refresh_busy or (session != null and (session.offline or session.has_unconfirmed_command()))
 	if hud == null or visitor:
 		return
 	var st := _state()
@@ -1232,7 +1139,7 @@ func _refresh_hud() -> void:
 	hud.set_condition(_field_condition())
 	hud.set_next_ripe(cells, now)
 	hud.set_offline(session.offline if session else false)
-	hud.set_connection_recovery(_terrain_stale or (session != null and (session.offline or (_in_flight == 0 and session.has_unconfirmed_command()))), _connection_recovery_busy or _terrain_refresh_busy)
+	hud.set_connection_recovery(session != null and (session.offline or (_in_flight == 0 and session.has_unconfirmed_command())), _connection_recovery_busy)
 	var chapter := int((st.get("clock", {}) as Dictionary).get("chapter_index", 0))
 	var unlocked := CropUnlocks.unlocked(CropInfo.ORDER, chapter, st)
 	var has_tilled := false
@@ -1319,16 +1226,11 @@ func _attach_session() -> void:
 	session.offline_changed.connect(func(off): if hud: hud.set_offline(off))
 	# 服务端拒绝必须说出来：静默回滚在玩家眼里就是「点了没反应」。
 	session.rejected.connect(func(code, _detail):
-		if code == "FARM_RELOCATED": _on_farm_relocated()
 		if hud: hud.show_toast(FarmHud.reject_text(code), true))
 	_render()
 
 ## 服务端每次回包都整体覆盖预测器；漂移一律以服务端为准（方案 §3 D4）。
 func _on_server_state(state: Dictionary, version: int) -> void:
-	if _own_terrain_changed():
-		_terrain_stale = true
-		if process_mode != Node.PROCESS_MODE_DISABLED: _on_farm_relocated()
-		return
 	if process_mode == Node.PROCESS_MODE_DISABLED:
 		_pending_state_refresh = true
 		return
@@ -1359,7 +1261,6 @@ func _open_stall(crop := "") -> void:
 	if not crop.is_empty(): stall.focus_seed(crop)
 
 func _on_sell(items: Array) -> void:
-	if _terrain_stale: return
 	if session == null or (stall and stall.is_busy()):
 		return
 	if stall: stall.set_busy(true)
@@ -1375,7 +1276,6 @@ func _on_sell(items: Array) -> void:
 	_render()
 
 func _on_sell_fish(stack_id: String, quantity: int) -> void:
-	if _terrain_stale: return
 	if session == null or stall.is_busy(): return
 	stall.set_busy(true)
 	var before := int(session.state.wallet)
@@ -1388,7 +1288,6 @@ func _on_sell_fish(stack_id: String, quantity: int) -> void:
 	_render()
 
 func _on_buy(crop: String, qty: int) -> void:
-	if _terrain_stale: return
 	if session == null or (stall and stall.is_busy()):
 		return
 	if stall: stall.set_busy(true)
@@ -1420,9 +1319,6 @@ func _retry_stall() -> void:
 	_render()
 
 func _recover_connection() -> void:
-	if _terrain_stale:
-		_reload_relocated_farm()
-		return
 	if session == null or _connection_recovery_busy or _in_flight > 0: return
 	_connection_recovery_busy = true
 	_refresh_hud()

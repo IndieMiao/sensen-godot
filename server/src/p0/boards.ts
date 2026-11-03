@@ -16,11 +16,33 @@ import { catalog } from './shops.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
 import { clusterById, clusterOf, homeClimate, homeOf, noteDelivery, rankedCities, writtenCluster } from './travel.js';
 import { homeFacts, type Homed } from './home.js';
-import { homeSetOf } from './home_city.js';
+import { cityOutposts, homeSetOf } from './home_city.js';
 import { cityPlaces, genPonds, type WorldContent } from './world.js';
 
 const H = 3_600_000;
 export const BOARDS: readonly BoardId[] = ['stall', 'market'];
+
+/**
+ * q(270) (SGODOT-378, §9.6.4): a board and the city it hangs in — the Stall Board at home, one Market Board per city
+ * cluster (s.markets), the same board at every market square of that city. A city's board is made the first
+ * time the player is there (settleBoards), so a city never visited takes no room in the save.
+ */
+export interface BoardAt { board: BoardId; city: string; slots: BoardSlot[] }
+export function boardsOf(c: P0Content, s: P0State): BoardAt[] {
+  const home = homeOf(c, s);
+  return [{ board: 'stall', city: home, slots: s.boards.stall }, { board: 'market', city: home, slots: s.boards.market },
+    ...Object.entries(s.markets ?? {}).filter(([city]) => city !== home).map(([city, slots]) => ({ board: 'market' as const, city, slots }))];
+}
+/** A board's slots: the Stall Board, the home Market Board (`market`), or another city's ([] while it has none yet). */
+export function slotsOf(c: P0Content, s: P0State, board: BoardId, city = homeOf(c, s)): BoardSlot[] {
+  return board === 'stall' ? s.boards.stall : city === homeOf(c, s) ? s.boards.market : s.markets?.[city] ?? [];
+}
+/** Whether a city has a Market Board to hang: home always; elsewhere a city with a market square (an S-tier town has none). */
+export function hasMarket(c: P0Content, s: P0State, city: string): boolean {
+  return city === homeOf(c, s) || cityOutposts(c, city).some(o => o.role === 'market');
+}
+/** A city as its board's draw reads it (climate, regional fish, outposts): the save itself at home, else that city as a home. */
+const asHome = (c: P0Content, s: P0State, city: string): Homed => (city === homeOf(c, s) ? s : { travel: { home: city } });
 
 export function slotCount(c: P0Content, s: P0State, board: BoardId): number {
   return board === 'stall' ? boardSlots(c, s) : c.requests.boards.market.slots ?? 2;
@@ -31,24 +53,33 @@ function gateMet(c: P0Content, s: P0State, t: RequestTemplate): boolean {
   return t.gate.length === 0 || t.gate.some(([what, level]) => (what === 'homestead' ? s.homestead.level : skillLevel(c, s, what)) >= level);
 }
 
-/** §9.6.1: regional templates are drawn only where their climate is (P1: the home climate until travel lands). */
-function climateMet(c: P0Content, s: P0State, t: RequestTemplate): boolean {
-  return !t.climate?.length || t.climate.includes(homeClimate(c, s));
+/** §9.6.1: regional templates are drawn only where their climate is — the board's city's (q(270); the home's for the Stall Board). */
+function climateMet(c: P0Content, h: Homed, t: RequestTemplate): boolean {
+  return !t.climate?.length || t.climate.includes(homeClimate(c, h));
 }
 
-export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
-  return c.requests.boards[board].templates.filter(id => {
-    const t = c.requests.templates[id];
-    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, s, t)
-      && (!t.need.regional || regionalPool(c, s, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need))
-      && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
-  });
+/**
+ * The templates a board can draw now. A Market Board elsewhere (q(270) ②) draws from its own city — climate, regional
+ * items and fish, Stamp Run's outposts in that city — and never a `home_only` template (content: those measured from
+ * home, q(128)'s four and the two out-of-zone ones), which stay on the home city's board.
+ */
+export function eligible(c: P0Content, s: P0State, board: BoardId, city = homeOf(c, s)): string[] {
+  return c.requests.boards[board].templates.filter(id => drawable(c, s, id, board, city));
 }
 
-/** An explore template can be drawn: a home outpost to send the player to (Stamp Run), or a city elsewhere with one. */
-function visitOpen(c: P0Content, s: P0State, board: BoardId, need: Need): boolean {
+/** One template can be drawn now for that board in that city (eligible); a keeper's local request (q(272)) asks it as
+ * the city's Market Board would. */
+export function drawable(c: P0Content, s: P0State, id: string, board: BoardId, city = homeOf(c, s)): boolean {
+  const home = city === homeOf(c, s), h = asHome(c, s, city), t = c.requests.templates[id];
+  return !!t && t.enabled !== false && gateMet(c, s, t) && climateMet(c, h, t) && (home || !t.home_only)
+    && (!t.need.regional || regionalPool(c, h, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need, h))
+    && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
+}
+
+/** An explore template can be drawn: one of the board's city's outposts to send the player to (Stamp Run), or a city elsewhere with one. */
+function visitOpen(c: P0Content, s: P0State, board: BoardId, need: Need, h: Homed = s): boolean {
   const v = need.visit;
-  if (!v || v.where === 'same_city') return visitPlaces(c, board, s).length > 0;
+  if (!v || v.where === 'same_city') return visitPlaces(c, board, h).length > 0;
   return crossCities(c, s, v).some(id => crossTarget(c, id, v.role ?? 'market') !== null);
 }
 
@@ -120,25 +151,31 @@ export function visitPlaces(c: P0Content, board: BoardId, s: Homed): string[] {
 }
 
 /** What an empty board shows while no template is open yet: the lowest gate (e.g. Market Basket · Farming Lv4). */
-export function lockedTemplate(c: P0Content, s: P0State, board: BoardId): { template: string; gate: [string, number][] } | null {
+export function lockedTemplate(c: P0Content, s: P0State, board: BoardId, city = homeOf(c, s)): { template: string; gate: [string, number][] } | null {
   // The lowest skill gate (`Dusk Haul · Fishing Lv3`, the first session's Market Board): a regional / explore template
   // that could not draw anything yet, or one gated by the Homestead level, is not named there.
   const closed = c.requests.boards[board].templates.filter(id => {
     const t = c.requests.templates[id];
     return t.enabled !== false && !t.need.regional && t.need.kind !== 'visit' && !t.gate.some(([g]) => g === 'homestead');
   });
-  if (eligible(c, s, board).length || !closed.length) return null;
+  if (eligible(c, s, board, city).length || !closed.length) return null;
   const low = (id: string) => Math.min(...c.requests.templates[id].gate.map(g => g[1]));
   const template = [...closed].sort((a, b) => low(a) - low(b))[0];
   return { template, gate: c.requests.templates[template].gate };
 }
 
-type Rand = () => number;
+export type Rand = () => number;
 
-/** mulberry32 seeded from the slot's identity: the same slot at the same time always draws the same request. */
-function slotRand(s: P0State, board: BoardId, slot: number, at: number): Rand {
+/** mulberry32 seeded from the slot's identity: the same slot at the same time always draws the same request. A Market
+ * Board elsewhere (q(270)) adds its city, so two cities' boards never draw alike; the home boards keep their v5 seed. */
+function slotRand(s: P0State, board: BoardId, slot: number, at: number, away = ''): Rand {
+  return seededRand(`${s.player}:${board}${away ? `@${away}` : ''}:${slot}:${at}`);
+}
+
+/** mulberry32 seeded from a key's FNV-1a hash: its own stream, never shifting the fishing or cooking rolls. */
+export function seededRand(key: string): Rand {
   let h = 2166136261;
-  for (const ch of `${s.player}:${board}:${slot}:${at}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  for (const ch of key) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
   let a = h | 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -162,15 +199,24 @@ function growable(c: P0Content, s: P0State): string[] {
   return c.crops.filter(cr => cr.gate <= level).map(cr => cr.id);
 }
 
-function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at: number): BoardRequest | null {
-  const open = eligible(c, s, board);
+function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at: number, city = homeOf(c, s)): BoardRequest | null {
+  const open = eligible(c, s, board, city);
   if (!open.length) return null;
-  const draw = slotRand(s, board, slot, at);
-  const taken = s.boards[board].map(sl => sl.req?.template);
+  const away = city === homeOf(c, s) ? '' : city;
+  const draw = slotRand(s, board, slot, at, away);
+  const taken = slotsOf(c, s, board, city).map(sl => sl.req?.template);
   const fresh = open.filter(t => !taken.includes(t));
   const pool = fresh.length ? fresh : open;
   const template = pool[Math.floor(draw() * pool.length)];
-  const t = c.requests.templates[template];
+  return requestFor(c, s, template, draw, board, city, `${template}-${board}${slot}-${away ? `${away}-` : ''}${at.toString(36)}`, at);
+}
+
+/** The request one template makes in a city — its items and quantity from the draw's stream, after the template's own
+ * pick (a board slot's, or a keeper's local request, q(272)); null when an explore one finds nowhere to send the player.
+ * `keep`: the regional items it may ask for (a keeper's: only the fish the player can land now). */
+export function requestFor(c: P0Content, s: P0State, template: string, draw: Rand, board: BoardId, city: string, id: string, at: number,
+  keep: (item: string) => boolean = () => true): BoardRequest | null {
+  const h = asHome(c, s, city), t = c.requests.templates[template];
   let items: string[] = [];
   let visit: BoardRequest['visit'];
   if (t.need.kind === 'visit' && t.need.visit && t.need.visit.where !== 'same_city') {   // cross-city: one city, its outpost
@@ -183,10 +229,11 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     }
     if (!visit) return null;
   } else if (t.need.kind === 'visit') {   // explore: one outpost to check in at, no items
-    const places = visitPlaces(c, board, s);
+    const places = visitPlaces(c, board, h);
     visit = { place: places[Math.floor(draw() * places.length)], done: false };
   } else if (t.need.regional) {   // regional: one of the climate's / city's items
-    const pool = regionalPool(c, s, t.need);
+    const pool = regionalPool(c, h, t.need).filter(keep);
+    if (!pool.length) return null;
     items = [pool[Math.floor(draw() * pool.length)]];
   } else if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
   // A crop request by rarity or family takes any such crop the player can grow (李白's Fine Produce, Orchard Basket).
@@ -197,30 +244,42 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     items = crops.slice(0, t.need.distinct ?? 1);
   }
   return {
-    id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity,
+    id, template, items, rarity: t.need.rarity,
     ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: visit ? 1 : qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open', ...(visit ? { visit } : {}),
     ...(t.need.where ? { where: t.need.where } : {}),
   };
 }
 
-/** Bring both boards up to now: slot count follows the Homestead level; empty slots refill; untaken requests expire. */
+/**
+ * Bring the boards the player can reach up to now — the Stall Board, the home city's Market Board and, away, the Market
+ * Board of the city they are in (made here the first time, q(270): its slots date from this stay's arrival, so the view
+ * and the next command draw the same) — slot count follows the Homestead level; empty slots refill; untaken requests
+ * expire. Another city's board waits as it was until the player is back there; its times catch up then.
+ */
 export function settleBoards(c: P0Content, s: P0State, now: number): void {
-  for (const board of BOARDS) {
-    const slots = s.boards[board];
+  const home = homeOf(c, s), here = s.travel?.here || home;
+  s.markets ??= {};
+  s.markets[home] = s.boards.market ??= [];   // `market` is the home board; markets[home] the same array (state.ts P0State.markets)
+  const reach: [BoardId, string][] = [['stall', home], ['market', home]];
+  if (here !== home && hasMarket(c, s, here)) reach.push(['market', here]);
+  for (const [board, city] of reach) {
+    const slots = board === 'stall' ? s.boards.stall : city === home ? s.boards.market : (s.markets[city] ??= []);
+    // a city's board dates from this stay's start: the Day Pass's (q(270) ①), else the arrival (a free Trip 1 city)
+    const made = city === home ? s.created_at : s.travel.passes[city]?.from ?? s.travel.visits[city]?.last_at ?? now;
     // §14.1.2: a Stall Board slot added in the account's first 72 h (slot 2 at creation, slot 3 from a Homestead Lv3
     // reached that early) stays empty until created_at + refill_h, so the first session has one request; a slot added
     // later fills at once.
     while (slots.length < slotCount(c, s, board))
-      slots.push({ req: null, refill_at: board === 'stall' ? s.created_at + c.requests.refill_h * H : s.created_at });
+      slots.push({ req: null, refill_at: board === 'stall' ? s.created_at + c.requests.refill_h * H : made });
     slots.forEach((sl: BoardSlot, i) => {
       // The tutorial request is once per account and never swapped out.
       while (sl.req?.status === 'open' && sl.req.id !== c.requests.tutorial.id && now >= sl.req.drawn_at + c.requests.expire_h * H) {
         const at = sl.req.drawn_at + c.requests.expire_h * H;
-        sl.req = drawRequest(c, s, board, i, at);
+        sl.req = drawRequest(c, s, board, i, at, city);
         sl.refill_at = at;
       }
-      if (!sl.req && now >= sl.refill_at) sl.req = drawRequest(c, s, board, i, sl.refill_at);
+      if (!sl.req && now >= sl.refill_at) sl.req = drawRequest(c, s, board, i, sl.refill_at, city);
     });
   }
 }
@@ -253,7 +312,7 @@ export function releaseFirstStallSlot(c: P0Content, s: P0State, at: number): voi
  */
 export function noteVisit(c: P0Content, s: P0State, space: unknown, place: unknown, now: number, events: P0Event[]): void {
   if (space !== 'outpost' || typeof place !== 'string') return;
-  for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
+  for (const { slots } of boardsOf(c, s)) for (const sl of slots) {
     const r = sl.req;
     if (r?.kind !== 'visit' || r.status !== 'accepted' || !r.visit || r.visit.done || r.visit.place !== place) continue;
     r.visit.done = true;
@@ -328,14 +387,17 @@ export function haveForRequest(c: P0Content, s: P0State, r: BoardRequest): numbe
   return haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
 }
 
-export function findBoardRequest(s: P0State, id: string): { board: BoardId; slot: BoardSlot } | null {
-  for (const board of BOARDS) for (const slot of s.boards[board]) if (slot.req?.id === id) return { board, slot };
+export function findBoardRequest(c: P0Content, s: P0State, id: string): { board: BoardId; city: string; slot: BoardSlot } | null {
+  for (const { board, city, slots } of boardsOf(c, s)) for (const slot of slots) if (slot.req?.id === id) return { board, city, slot };
   return null;
 }
 
-export function tracked(s: P0State): number {
-  return BOARDS.reduce((n, b) => n + s.boards[b].filter(sl => sl.req?.status === 'accepted').length, 0)
-    + Object.values(s.residents).filter(r => r.req).length;
+/** Requests tracked now, every board of every city, the residents' and the keepers' local ones (q(272)) together
+ * (track_max is the account's). */
+export function tracked(c: P0Content, s: P0State): number {
+  return boardsOf(c, s).reduce((n, b) => n + b.slots.filter(sl => sl.req?.status === 'accepted').length, 0)
+    + Object.values(s.residents).filter(r => r.req).length
+    + Object.values(s.locals ?? {}).reduce((n, l) => n + l.slots.filter(sl => sl.req.status === 'accepted').length, 0);
 }
 
 /** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */
@@ -362,13 +424,22 @@ export function payout(c: P0Content, r: BoardRequest, parts: [string, number][])
   return { base: Math.floor(floor * mult + 1e-9), bonus: Math.floor(r.bonus * mult + 1e-9) };
 }
 
-export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver' | 'drop', id: string, now: number, events: P0Event[]): Refusal | null {
-  const found = findBoardRequest(s, id);
+export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver' | 'drop', id: string, now: number, events: P0Event[],
+  at: { space?: unknown; place?: unknown } = {}): Refusal | null {
+  const found = findBoardRequest(c, s, id);
   if (!found) return { code: s.req_done.includes(id) ? 'request_done' : 'bad_request' };
   const { slot } = found, r = slot.req!;
+  // q(270) ①: a city's Market Board request is taken and handed in in that city — the outpost the command comes from
+  // says which (a Day Pass keeps `here` on the map too: no hand-in from afar, §9.3.4); a command without one falls back
+  // to the city the player is in. Only the city is checked, not that the outpost is a market square: the client sends
+  // these from a market's board alone (亚瑟 on #606). A drop goes from anywhere (it hands nothing in).
+  if (found.board === 'market' && type !== 'drop') {
+    const from = at.space === 'outpost' && typeof at.place === 'string' ? clusterOf(c, at.place) : null;
+    if ((from ?? (s.travel?.here || homeOf(c, s))) !== found.city) return { code: 'wrong_city', detail: { city: found.city } };
+  }
   if (type === 'accept') {
     if (r.status === 'accepted') return { code: 'already_accepted' };
-    if (tracked(s) >= c.requests.track_max) return { code: 'track_limit', detail: { max: c.requests.track_max } };
+    if (tracked(c, s) >= c.requests.track_max) return { code: 'track_limit', detail: { max: c.requests.track_max } };
     r.status = 'accepted';
     r.accepted_at = now;   // q(143): Today keeps a row for the latest tracked request
     events.push({ kind: 'request', id, status: 'accepted', coins: 0 });

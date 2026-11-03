@@ -71,7 +71,9 @@ func test_the_veil_holes_the_explored_cities_only_at_every_zoom() -> void:
 	var sf = m.geo_to_screen(37.7749, -122.4194)
 	assert_float((holes[0].at as Vector2).distance_to((sf as Vector2) - m.city_map.global_position)).is_less(40.0)
 	assert_float(float(holes[0].r)).is_greater(2.0)
-	rt.session.view.travel.visits = {LA: {n = 1}}
+	var explored: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	explored.travel.visits = {LA: {n = 1}}
+	rt.session.view = explored
 	assert_int(m.fog_holes().size()).is_equal(2)
 	var fog: ColorRect = m.city_map.fog
 	m.city_map._update_fog()
@@ -235,13 +237,26 @@ func test_a_pin_of_a_city_without_a_pass_opens_its_city_card() -> void:
 	rt.ui.close_modal()
 	assert_bool(m._travel_first({"kind": "pond", "id": "pond_san_francisco_01"})).is_false()   # the home city's: as ever
 	assert_bool(m._travel_first({"kind": "place", "id": "home"})).is_false()
-	rt.session.view.travel.passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}}
+	var passed: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	passed.travel.passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}}
+	rt.session.view = passed
 	# q(212): a pass without a visit is still the fog — its silhouette card, never the place (it went in before)
 	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
 	assert_str(rt.ui.modal_kind).is_equal("city_card")
 	rt.ui.close_modal()
-	rt.session.view.travel.visits = {TOKYO: {n = 1}}
-	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # visited, a pass: go in
+	var visited: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	visited.travel.visits = {TOKYO: {n = 1}}
+	rt.session.view = visited
+	# q(256) ④ (SGODOT-382): visited, a pass, but the player is at home — the way back is a trip at the revisit fare,
+	# its travel card first (it walked in and was refused inside)
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
+	rt.ui.close_modal()
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"}, false)).is_false()   # its tap: its card as ever (q(257) ⑦)
+	var there: Dictionary = rt.session.view.duplicate(true)
+	there.travel.here = TOKYO
+	rt.session.view = there
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # in Tokyo with its pass: go in
+	assert_bool(m._travel_first({"kind": "place", "id": TOKYO + "~market0"})).is_false()
 	rt.session.view = saved
 
 ## 不知火舞 on 279 (6c0377f7): the veil is the design's COLOR_SECONDARY at 40 % (the light blue-grey washed out on the

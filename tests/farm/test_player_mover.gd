@@ -176,3 +176,28 @@ func test_diagonal_slide_stays_inside_world_bounds_and_releases_from_a_corner() 
 	m.set_joystick(Vector2(-1, -1))
 	m.step(0.1)
 	assert_float(corner.distance_to(m.position)).is_greater(0.3)
+
+## SGODOT-306: a joystick step that went nowhere says so (stuck); a walk, a slide along a wall and a path never do.
+func test_a_push_that_goes_nowhere_is_stuck_and_a_walk_or_a_slide_is_not() -> void:
+	var m := _mover()
+	m.set_joystick(Vector2(1, 0))
+	m.step(1.0 / 60.0)
+	assert_bool(m.stuck).is_false()   # open ground
+	m.position = m.bp.cell_to_world(Vector2i(5, 7), m.world_scale)
+	for i in 60: m.step(1.0 / 60.0)   # up against the pond at (6,7)
+	assert_bool(m.stuck).is_true()
+	assert_bool(m.is_moving()).is_true()   # the stick is still held: is_moving keeps its meaning
+	m.set_joystick(Vector2(-1, 0))
+	m.step(1.0 / 60.0)
+	assert_bool(m.stuck).is_false()   # away from it: moving again
+	var s := _mover()
+	s.position = Vector3(5.95, 0, -7.5)
+	s.set_joystick(Vector2(1, 1))
+	for frame in 24:
+		s.step(1.0 / 60.0)
+		assert_bool(s.stuck).is_false()   # one way blocked: the slide is a walk
+	var p := _mover()
+	p.set_joystick(Vector2.ZERO)
+	assert_bool(p.set_target_cell(Vector2i(0, 1))).is_true()
+	p.step(0.2)
+	assert_bool(p.stuck).is_false()

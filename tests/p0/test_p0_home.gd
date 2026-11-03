@@ -278,8 +278,9 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	var rt: P0Runtime = auto_free(P0Runtime.new())
 	add_child(rt)
 	await get_tree().process_frame
-	rt.session.view = _view()
-	rt.session.view["names"] = {"copper_ore": "Copper Ore"}
+	var named := _view()
+	named["names"] = {"copper_ore": "Copper Ore"}
+	rt.session.view = named
 	rt._on_refused("need_material", {"item": "copper_ore", "need": 4, "have": 2}, {"type": "craft", "recipe": "pick_copper"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 2 more Copper Ore")
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
@@ -291,21 +292,24 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
 	add_child(rt)
 	await get_tree().process_frame
-	rt.session.view = _view()
-	rt.session.view["names"] = {"wood": "Timber"}   # the server's names, as in a real view
+	var named := _view()
+	named["names"] = {"wood": "Timber"}   # the server's names, as in a real view
+	rt.session.view = named
 	rt._on_refused("not_home", {}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home\nGoing home is free")   # broken at its " · " (不知火舞 11-02)
 	rt._on_refused("not_home", {}, {"type": "rest"})
 	assert_str(rt.ui.toast_text()).is_equal("At home only")                     # other commands stay short
 	rt.ui.space = "pond"                                                         # HOME-1's line from where the player is
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home\nGoing home is free")   # broken at its " · " (不知火舞 11-02)
 	rt.ui.space = "home"
-	rt.session.view.homestead.next.materials[0].have = 16                        # the view has no gap left
+	var no_gap: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
+	no_gap.homestead.next.materials[0].have = 16                                # the view has no gap left
+	rt.session.view = no_gap
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
 	rt._on_refused("skills_short", {"need": 5, "have": 4}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Skills total 5 needed · now 4")   # never "Can't do that (skills_short)"
+	assert_str(rt.ui.toast_text()).is_equal("Skills total 5 needed\nnow 4")   # never "Can't do that (skills_short)"; broken at its " · "
 	rt._on_refused("max_level", {"level": 3}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Highest level for now")
 

@@ -4,6 +4,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 import { buildApp, plotFor } from '../../src/http/app.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
@@ -12,7 +13,8 @@ import { migrate, truncateAll } from '../../src/db/migrate.js';
 import type { Store } from '../../src/http/store.js';
 import { newInstallKey } from '../../src/http/auth.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
-import { CENTER, fixtureGeography, geographicPoint } from '../geography/fixtures.js';
+import { initialFarmState } from '../../src/domain/farm_factory.js';
+import { tokenHash } from '../../src/http/auth.js';
 import type { FarmLocation } from '../../src/http/farm_location.js';
 import type { Mailer } from '../../src/accounts/mailer.js';
 import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
@@ -29,8 +31,7 @@ const CV = contentVersion(DEFAULT_CONTENT_DIR);
 const ROOT = path.resolve(DEFAULT_CONTENT_DIR, '..', '..', '..');
 const REGIONS = path.join(DEFAULT_CONTENT_DIR, 'regions.json');
 const TOKYO: FarmLocation = { lat: 35.6812, lng: 139.7671 };
-const landAt = (c: FarmLocation) => fixtureGeography([{ id: 'land', kind: 'land', surface: 'soil',
-  polygon: [[-1, -1], [65, -1], [65, 65], [-1, 65], [-1, -1]].map(([x, y]) => geographicPoint(x, y, c)) }]);
+const SHANGHAI: FarmLocation = { lat: 31.2304, lng: 121.4737 };
 
 let pool: pg.Pool | undefined;
 beforeAll(async () => { if (DSN) { pool = new pg.Pool({ connectionString: DSN, max: 5 }); await migrate(pool); } });
@@ -63,8 +64,7 @@ for (const [name, enabled, makeStore] of makers) {
         apple: { audiences: ['app.gensen.maps'], keys: APPLE_KEYS.keys },
         google: { audiences: [GOOGLE_AUD], keys: GOOGLE_KEYS.keys },
         appleRevoker: { exchange: async code => { appleCalls.push('exchange:' + code); return code === 'good-code' ? 'refresh-1' : null; },
-          revoke: async token => { appleCalls.push('revoke:' + token); return true; } },
-        geographyProvider: async location => landAt(location) });
+          revoke: async token => { appleCalls.push('revoke:' + token); return true; } } });
     });
     afterEach(async () => { await app.close(); });
 
@@ -74,8 +74,19 @@ for (const [name, enabled, makeStore] of makers) {
     const login = (email: string, password: string) =>
       app.inject({ method: 'POST', url: '/v1/auth/email/login', payload: { email, password } });
     const guest = async () => (await app.inject({ method: 'POST', url: '/v1/auth/anonymous', payload: { install_key: newInstallKey() } })).json().token as string;
-    const createFarm = (token: string, location: FarmLocation, region_id = '', key = 'farm') => app.inject({ method: 'POST', url: '/v1/farms',
-      headers: bearer(token), payload: { generation_version: 3, idempotency_key: key, region_id, location } });
+    // Map-generated farms are retired (SGODOT-304); farms start from a curated city's street candidate.
+    const createFarm = (token: string, key = 'farm', region_id = 'shanghai', layout_patch_id = 'sh_a') => app.inject({ method: 'POST', url: '/v1/farms',
+      headers: bearer(token), payload: { idempotency_key: key, region_id, layout_patch_id, blueprint_revision: 2 } });
+    // A farm already saved in a non-curated city (created before the retirement).
+    const seedFarmIn = async (token: string, region_id: string) => {
+      const owner = (await store.playerByToken(tokenHash(token), clock))!;
+      const seeded = await store.createFarm({ ownerId: owner.id, idempotencyKey: 'seed', payloadHash: 'seed', regionId: region_id,
+        layoutPatchId: 'sh_a', blueprintRevision: 2, build: async () => ({ id: randomUUID(), owner_id: owner.id, region_id,
+          layout_patch_id: 'sh_a', blueprint_revision: 2, version: 0, location_visible: true, visit_access: 'only_me' as const,
+          state: initialFarmState(content, plotFor(content), 'Asia/Tokyo', clock) }) });
+      if (seeded.kind === 'idempotency_mismatch') throw new Error('seed');
+      return seeded.farm;
+    };
 
     it('registers, logs in on a second device and reaches the same account player', async () => {
       const created = await register('  Ada@Example.com ');
@@ -162,7 +173,7 @@ for (const [name, enabled, makeStore] of makers) {
     it('lets guests browse but not create or play', async () => {
       const token = await guest();
       expect((await app.inject({ method: 'GET', url: '/v1/farms/me', headers: bearer(token) })).json().code).toBe('NO_FARM');
-      const create = await createFarm(token, TOKYO);
+      const create = await createFarm(token);
       expect(create.statusCode).toBe(401);
       expect(create.json().code).toBe('LOGIN_REQUIRED');
       const command = await app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: bearer(token),
@@ -173,33 +184,39 @@ for (const [name, enabled, makeStore] of makers) {
       expect((await app.inject({ method: 'GET', url: '/v1/cities' })).statusCode).toBe(200);
     });
 
-    it('creates a farm in any city, resolved and timed by the server', async () => {
+    it('creates a farm in a curated city and refuses map-generated farms', async () => {
       const { token } = (await register('fay@example.com')).json();
-      const created = await createFarm(token, TOKYO, 'shanghai');
+      const generated = await app.inject({ method: 'POST', url: '/v1/farms', headers: bearer(token),
+        payload: { generation_version: 3, idempotency_key: 'gen', region_id: '', location: TOKYO } });
+      expect(generated.statusCode).toBe(410);
+      expect(generated.json().code).toBe('FARM_GENERATION_RETIRED');
+      const created = await createFarm(token);
       expect(created.statusCode).toBe(201);
-      const farm = created.json();
-      expect(farm.region_id).toMatch(/^gn-\d+$/);
-      expect(farm.farm_terrain.farm_style).toBe('east_asian');
-      const city = (await app.inject({ method: 'GET', url: `/v1/cities/${farm.region_id}` })).json().city;
-      expect(city).toMatchObject({ name: 'Tokyo', timezone: 'Asia/Tokyo', country_code: 'JP', curated: false });
+      expect(created.json()).toMatchObject({ region_id: 'shanghai', layout_patch_id: 'sh_a' });
+      expect(created.json().farm_terrain).toBeUndefined();
       expect((await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(token) })).json().has_farm).toBe(true);
-      // Farm clocks follow the city: Tokyo's day id differs from UTC's at 02:00 UTC only by date math, not by region lookup.
       expect((await app.inject({ method: 'GET', url: '/v1/farms/me', headers: bearer(token) })).statusCode).toBe(200);
-      const curated = await createFarm((await register('gus@example.com')).json().token, CENTER, 'shanghai', 'sh');
-      expect(curated.json().region_id).toBe('shanghai');
-      const sea = await createFarm((await register('hal@example.com')).json().token, { lat: 0, lng: -140 }, '', 'sea');
-      expect(sea.json().code).toBe('LOCATION_OUTSIDE_REGION');
+      const regions = (await app.inject({ method: 'GET', url: '/v1/regions' })).json();
+      expect(regions.farm_generation_version).toBeUndefined();
+      expect(regions.farm_generations).toBeUndefined();
+      const outside = await app.inject({ method: 'POST', url: '/v1/farms', headers: bearer((await register('hal@example.com')).json().token),
+        payload: { idempotency_key: 'out', region_id: 'shanghai', layout_patch_id: 'sh_a', blueprint_revision: 2, location: TOKYO } });
+      expect(outside.json().code).toBe('LOCATION_OUTSIDE_REGION');
+      const inside = await app.inject({ method: 'POST', url: '/v1/farms', headers: bearer((await register('gus@example.com')).json().token),
+        payload: { idempotency_key: 'in', region_id: 'shanghai', layout_patch_id: 'sh_a', blueprint_revision: 2, location: SHANGHAI } });
+      expect(inside.statusCode).toBe(201);
     });
 
     it('lists curated cities first, then cities with public farms, and suggests by IP', async () => {
       const { token } = (await register('ivy@example.com')).json();
-      const farm = (await createFarm(token, TOKYO)).json();
+      const tokyo = (await app.inject({ method: 'POST', url: '/v1/cities/resolve', payload: { location: TOKYO } })).json().city.id;
+      const farm = await seedFarmIn(token, tokyo);
       const opening = await app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: bearer(token),
         payload: { type: 'set_visit_access', idempotency_key: 'open', base_version: farm.version, payload: { access: 'anyone' } } });
       expect(opening.statusCode).toBe(200);
       const list = (await app.inject({ method: 'GET', url: '/v1/cities' })).json().cities;
       expect(list.slice(0, 2).map((c: { id: string }) => c.id)).toEqual(['shanghai', 'los_angeles']);
-      expect(list.find((c: { id: string }) => c.id === farm.region_id)).toMatchObject({ name: 'Tokyo', farm_count: 1 });
+      expect(list.find((c: { id: string }) => c.id === tokyo)).toMatchObject({ name: 'Tokyo', farm_count: 1 });
       const suggested = (await app.inject({ method: 'GET', url: '/v1/cities/suggest', remoteAddress: '203.0.113.9' })).json();
       expect(suggested.city.name).toBe('Tokyo');
       expect((await app.inject({ method: 'GET', url: '/v1/cities/suggest' })).json().city).toBeNull();
@@ -211,7 +228,7 @@ for (const [name, enabled, makeStore] of makers) {
 
     it('deletes the account with its farm after password confirmation, keeping only a tombstone', async () => {
       const body = (await register('jan@example.com')).json();
-      expect((await createFarm(body.token, TOKYO)).statusCode).toBe(201);
+      expect((await createFarm(body.token)).statusCode).toBe(201);
       const refused = await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(body.token), payload: { password: 'nope' } });
       expect(refused.statusCode).toBe(401);
       const gone = await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(body.token), payload: { password: 'correct horse' } });
@@ -283,7 +300,7 @@ for (const [name, enabled, makeStore] of makers) {
 
     it('deletes an account from the web with the password', async () => {
       const body = (await register('oli@example.com')).json();
-      await createFarm(body.token, TOKYO);
+      await createFarm(body.token);
       const del = (payload: object) => app.inject({ method: 'POST', url: '/v1/account/delete', payload });
       expect((await del({ email: 'oli@example.com', password: 'nope nope' })).json().code).toBe('INVALID_CREDENTIALS');
       expect((await del({ email: 'nobody@example.com', password: 'nope nope' })).json().code).toBe('INVALID_CREDENTIALS');
@@ -312,13 +329,13 @@ for (const [name, enabled, makeStore] of makers) {
 
     it('exports the account and farm without secrets', async () => {
       const body = (await register('kim@example.com')).json();
-      await createFarm(body.token, TOKYO);
+      await createFarm(body.token);
       const exported = await app.inject({ method: 'GET', url: '/v1/users/me/export', headers: bearer(body.token) });
       expect(exported.statusCode).toBe(200);
       const text = exported.body;
       expect(text).not.toContain('scrypt$');
       expect(text).not.toContain(body.token);
-      expect(exported.json().farm.city_id).toMatch(/^gn-/);
+      expect(exported.json().farm.city_id).toBe('shanghai');
     });
     const appleToken = (sub: string, over: Record<string, unknown> = {}) => {
       const s = Math.floor(clock / 1000);

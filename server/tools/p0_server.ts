@@ -13,8 +13,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
-import { generatedOutpostSpec, loadOutposts } from '../src/p0/online/outposts.js';
-import { roomPlace } from '../src/p0/world.js';
+import { P0Voice, p0VoiceFromEnv, registerP0Voice } from '../src/p0/online/voice.js';
+import { generatedOutpostSpec, loadOutposts, pondOfRoom, pondRoomSpec } from '../src/p0/online/outposts.js';
+import { placeOf, roomPlace } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
@@ -68,7 +69,9 @@ const log = new P0EventLog(eventDir === '' ? undefined : eventDir, undefined, un
 // Generated outposts (SGODOT-280) get a room on first join, sized and walled like the room their art stands in for.
 const outpostTable = loadOutposts();
 const generatedRoom = generatedOutpostSpec(outpostTable, id => roomPlace(content, id));
-const rooms = new OutpostRooms(outpostTable, Date.now, generatedRoom);
+// Ponds (11-02, pond multiplayer): `pond:<id>`, a room of 8 for a pond the content knows, made on first join.
+const pondRoom = pondRoomSpec(id => !!placeOf(content, id));
+const rooms = new OutpostRooms(outpostTable, Date.now, id => pondRoom(id) ?? generatedRoom(id));
 // q(188) ① `Near you`: the address table made from DB-IP City Lite at image build (tools/ip_near_table.ts); none, no guess.
 let ipNear: IpNear | undefined;
 if (process.env.P0_IP_NEAR_TABLE) {
@@ -78,13 +81,24 @@ if (process.env.P0_IP_NEAR_TABLE) {
 registerP0Routes(app, { content, store, now: Date.now, dev, log, rooms, ipNear });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
-const pass = (player: string, outpost: string) => {
+// A pond's room checks the pond's city as entering the pond does (its city from the pond, never `pond:…`; home's are free).
+const pass = (player: string, room: string) => {
   const s = store.peek(player);
   if (!s) return null;
-  const r = requirePass(content, s, 'outpost', outpost, Date.now() + s.clock_ms, s.presence.entered === outpost ? 'rejoin' : undefined);
+  const pond = pondOfRoom(room), place = pond || room;
+  const r = requirePass(content, s, pond ? 'pond' : 'outpost', place, Date.now() + s.clock_ms, s.presence.entered === place ? 'rejoin' : undefined);
   return r ? r.code.toUpperCase() : null;
 };
-registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')) });
+// Voice in the rooms (SGODOT-383): off unless P0_VOICE=on with the LiveKit keys; its blocks, 13+ answers and reports in
+// their own files beside the save, never in it.
+const voiceDir = path.dirname(stateFile);
+const voice = new P0Voice(p0VoiceFromEnv(process.env), rooms, { blocks: path.join(voiceDir, 'voice_blocks.json'),
+  ages: path.join(voiceDir, 'voice_ages.json'), reports: path.join(voiceDir, 'voice_reports.jsonl') });
+registerP0Voice(app, voice);
+const hub = registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/avatar')),
+  joined: o => voice.joined(o), departed: o => voice.departed(o), hides: (a, b) => voice.hides(a, b) });
+voice.tell = (player, payload) => hub.tell(player, payload);
+voice.seen = (a, b) => hub.seenChanged(a, b);
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
@@ -95,7 +109,7 @@ const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFil
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
-console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null }));
+console.log(JSON.stringify({ ready: true, port, content: content.version, dev, blackjack_table: bjTableOn(), key: guard.keys.length > 0, admin: !!process.env.P0_ADMIN_KEY && Number(process.env.P0_ADMIN_PORT ?? 0) > 0, ip_near: !!ipNear, event_keep_days: eventKeepDays ?? null, voice: !!voice.config }));
 // SGODOT-150 observer tools (q(53)): admin routes on 127.0.0.1 inside the container only, with their own key.
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;

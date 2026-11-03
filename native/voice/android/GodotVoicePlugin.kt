@@ -5,12 +5,18 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import io.livekit.android.ConnectOptions
 import io.livekit.android.LiveKit
 import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
 import io.livekit.android.room.Room
+import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
+import io.livekit.android.room.participant.ParticipantTrackPermission
+import io.livekit.android.room.participant.RemoteParticipant
 import io.livekit.android.room.track.RemoteAudioTrack
+import io.livekit.android.room.track.RemoteTrackPublication
+import io.livekit.android.room.track.Track
 import io.livekit.android.util.LoggingLevel
 import com.twilio.audioswitch.AudioDevice
 import com.sensen.permission.PermissionActivity
@@ -41,6 +47,13 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     private var expiresAt = 0L
     private var desiredMic = false
     private var listening = true
+    // P0 rooms (2026-11-02): per person, by LiveKit identity (the hub's peer id) — Mute is this phone's volume only,
+    // Block never subscribes to them. Both last one session; Godot sets them again after each connect.
+    private val muted = mutableSetOf<String>()
+    private val blocked = mutableSetOf<String>()
+    // SGODOT-384: whom this phone's own tracks are kept from — LiveKit refuses them the subscription (a changed client
+    // cannot take it either); everyone else in the room is allowed, the list renewed as people come and go.
+    private val denied = mutableSetOf<String>()
     private val decodedFrames = AtomicLong()
     private val decodedEnergy = AtomicLong()
     private val watchdog = object : Runnable {
@@ -51,7 +64,9 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     }
     override fun getPluginName() = "GodotVoice"
     override fun getPluginSignals() = setOf(SignalInfo("voice_event", String::class.java))
-    @UsedByGodot fun capabilities(): String = JSONObject().put("protocol", 1).put("supported", true).put("platform", "android").toString()
+    @UsedByGodot fun capabilities(): String = JSONObject().put("protocol", 1).put("supported", true).put("platform", "android")
+        .put("per_participant", true)   // set_participant_volume / _subscribed (P0 Mute and Block, 2026-11-02)
+        .put("publish_permissions", true).toString()   // set_publish_allowed (SGODOT-384)
     @UsedByGodot fun diagnostics(): String = JSONObject().put("decoded_frames", decodedFrames.get()).put("audio_energy", decodedEnergy.get()).toString()
     private fun emit(kind: String, id: String = session, body: JSONObject = JSONObject()) {
         body.put("event", kind).put("session", id)
@@ -83,7 +98,7 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     @UsedByGodot fun connect_voice(id: String, url: String, token: String) = runOnUiThread {
         finish("REPLACED", false)
         if (!foreground) return@runOnUiThread emit("disconnected", id, JSONObject().put("reason", "BACKGROUND"))
-        session = id; desiredMic = false; listening = true
+        session = id; desiredMic = false; listening = true; muted.clear(); blocked.clear(); denied.clear()
         decodedFrames.set(0); decodedEnergy.set(0)
         LiveKit.loggingLevel = LoggingLevel.OFF
         val current = LiveKit.create(activity!!.applicationContext)
@@ -95,14 +110,34 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
             current.events.collect { event ->
                 if (room !== current || session != id) return@collect
                 when (event) {
-                    is RoomEvent.Connected, is RoomEvent.Reconnected -> snapshot("connected")
+                    // nothing is taken by itself (autoSubscribe off): everyone not blocked, here and after a full
+                    // reconnect, which builds every publication anew unsubscribed (SGODOT-384; 亚瑟 on 2.28.2)
+                    is RoomEvent.Connected, is RoomEvent.Reconnected -> { applyPermissions(); takeAllowed(); snapshot("connected") }
                     is RoomEvent.Reconnecting -> emit("reconnecting")
                     is RoomEvent.Disconnected -> finish("DISCONNECTED")
-                    is RoomEvent.ParticipantConnected, is RoomEvent.ParticipantDisconnected,
-                    is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted -> snapshot("participants")
+                    is RoomEvent.ParticipantConnected -> {
+                        applyPermissions()   // a newcomer allowed unless denied (SGODOT-384)
+                        // and taken unless blocked, should its first info carry tracks whose TrackPublished is lost (亚瑟);
+                        // the newcomer's alone, not everyone's again at each arrival (周瑜 on #661)
+                        takeAllowed(event.participant)
+                        snapshot("participants")
+                    }
+                    is RoomEvent.ParticipantDisconnected -> { applyPermissions(); snapshot("participants") }
+                    is RoomEvent.ActiveSpeakersChanged, is RoomEvent.TrackMuted, is RoomEvent.TrackUnmuted,
+                    is RoomEvent.TrackUnsubscribed, is RoomEvent.TrackSubscriptionPermissionChanged -> snapshot("participants")
+                    is RoomEvent.TrackPublished -> {
+                        // our own microphone out: say so (383 6372bffe); someone's new track taken unless blocked (P0 Block)
+                        if (event.participant is LocalParticipant) snapshot("microphone")
+                        else (event.publication as? RemoteTrackPublication)?.setSubscribed(event.participant.identity?.value !in blocked)
+                    }
                     is RoomEvent.TrackSubscribed -> {
+                        val who = event.participant.identity?.value
+                        if (who != null && who in blocked) {
+                            (event.publication as? RemoteTrackPublication)?.setSubscribed(false)
+                            return@collect
+                        }
                         (event.track as? RemoteAudioTrack)?.let { track ->
-                            track.setVolume(if (listening) 1.0 else 0.0)
+                            track.setVolume(volumeFor(who))
                             // Counters only: no recording, retention or transport of PCM.
                             track.addSink { data, bits, _, _, _, _ ->
                                 decodedFrames.incrementAndGet()
@@ -125,8 +160,11 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
         }
         connectJob = scope.launch {
             try {
-                current.connect(url, token)
+                // SGODOT-384: LiveKit took the blocked one's tracks for some 200 ms before Block could drop them (李元芳 on
+                // 384 046f7b43); Godot sets the blocks right after connect_voice, Connected takes the rest
+                current.connect(url, token, ConnectOptions(autoSubscribe = false))
                 if (room === current && session == id) {
+                    takeAllowed()   // again here, in case Connected came before the participants did (亚瑟)
                     snapshot("connected")
                 }
             } catch (_: CancellationException) { }
@@ -157,10 +195,57 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     @UsedByGodot fun set_listening(id: String, enabled: Boolean) = runOnUiThread {
         if (id != session) return@runOnUiThread
         listening = enabled
-        room?.remoteParticipants?.values?.forEach { participant ->
-            participant.trackPublications.values.forEach { (it.track as? RemoteAudioTrack)?.setVolume(if (enabled) 1.0 else 0.0) }
-        }
+        applyVolumes()
         snapshot("listening")
+    }
+    /** P0 Mute (2026-11-02): one person's volume on this phone only, 0 or 1; they still hear us. */
+    @UsedByGodot fun set_participant_volume(id: String, identity: String, volume: Double) = runOnUiThread {
+        if (id != session || identity.isEmpty()) return@runOnUiThread
+        if (volume <= 0.0) muted.add(identity) else muted.remove(identity)
+        applyVolumes()
+        snapshot("participants")
+    }
+    /** P0 Block (2026-11-02): stop (or start again) taking one person's tracks; the server lists both ways' blocks. */
+    @UsedByGodot fun set_participant_subscribed(id: String, identity: String, subscribed: Boolean) = runOnUiThread {
+        if (id != session || identity.isEmpty()) return@runOnUiThread
+        if (subscribed) blocked.remove(identity) else blocked.add(identity)
+        room?.remoteParticipants?.values?.filter { it.identity?.value == identity }?.forEach { participant ->
+            participant.trackPublications.values.forEach { (it as? RemoteTrackPublication)?.setSubscribed(subscribed) }
+        }
+        snapshot("participants")
+    }
+    /** SGODOT-384 Block: keep (or stop keeping) this phone's tracks from one person — LiveKit refuses their subscription. */
+    @UsedByGodot fun set_publish_allowed(id: String, identity: String, allowed: Boolean) = runOnUiThread {
+        if (id != session || identity.isEmpty()) return@runOnUiThread
+        if (allowed) denied.remove(identity) else denied.add(identity)
+        applyPermissions()
+    }
+    /** Every track of everyone here not blocked (TrackPublished is not to be counted on for those already in the room),
+     *  or of one person only. */
+    private fun takeAllowed(only: Participant? = null) {
+        val people = if (only != null) listOf(only) else room?.remoteParticipants?.values ?: return
+        people.forEach { participant ->
+            val allow = participant.identity?.value !in blocked
+            participant.trackPublications.values.forEach { (it as? RemoteTrackPublication)?.setSubscribed(allow) }
+        }
+    }
+    /** Nobody denied: everyone may subscribe. Otherwise only the room's others not denied, each by identity. */
+    private fun applyPermissions() {
+        val current = room ?: return
+        if (denied.isEmpty()) {
+            current.localParticipant.setTrackSubscriptionPermissions(true, emptyList())
+            return
+        }
+        val allowed = current.remoteParticipants.values.mapNotNull { it.identity?.value }.filter { it !in denied }
+            .map { ParticipantTrackPermission(it, null, true, emptyList()) }
+        current.localParticipant.setTrackSubscriptionPermissions(false, allowed)
+    }
+    private fun volumeFor(identity: String?): Double = if (!listening || (identity != null && identity in muted)) 0.0 else 1.0
+    private fun applyVolumes() {
+        room?.remoteParticipants?.values?.forEach { participant ->
+            val v = volumeFor(participant.identity?.value)
+            participant.trackPublications.values.forEach { (it.track as? RemoteAudioTrack)?.setVolume(v) }
+        }
     }
     @UsedByGodot fun set_speaker(id: String, enabled: Boolean) = runOnUiThread {
         if (id != session) return@runOnUiThread
@@ -179,14 +264,27 @@ class GodotVoicePlugin(godot: Godot) : GodotPlugin(godot) {
         val users = JSONArray()
         fun add(p: Participant, local: Boolean) {
             val id = p.identity?.value ?: return
+            // SGODOT-384: someone is speaking, or has a microphone on, only as far as this phone takes their audio — LiveKit
+            // still says a blocker speaks to the one they blocked, whose card would light with no sound (and tell them).
+            val heard = local || audible(p)
             users.put(JSONObject().put("id", id).put("name", p.name ?: id.take(8))
-                .put("speaking", p.isSpeaking).put("microphone", p.isMicrophoneEnabled).put("local", local))
+                .put("speaking", p.isSpeaking && heard).put("microphone", micOn(p) && heard).put("local", local)
+                .put("audible", heard).put("muted", id in muted).put("blocked", id in blocked))
         }
         add(current.localParticipant, true)
         current.remoteParticipants.values.forEach { add(it, false) }
-        emit(kind, body = JSONObject().put("participants", users).put("microphone", current.localParticipant.isMicrophoneEnabled)
+        emit(kind, body = JSONObject().put("participants", users).put("microphone", micOn(current.localParticipant))
             .put("listening", listening))
     }
+    /** Whether someone's microphone is out and not muted, read off the publication itself: isMicrophoneEnabled is a flow
+     *  derived from it a beat later, so right after setMicrophoneEnabled a first mic on still read false — the key stayed
+     *  off while the room heard us (383 6372bffe). */
+    private fun micOn(p: Participant): Boolean = p.getTrackPublication(Track.Source.MICROPHONE)?.let { !it.muted } ?: false
+    /** A remote participant whose audio this phone has subscribed to (allowed by them and taken by us). */
+    private fun audible(p: Participant): Boolean = (p as? RemoteParticipant)?.trackPublications?.values?.any {
+        val pub = it as? RemoteTrackPublication
+        pub != null && pub.subscribed && pub.track is RemoteAudioTrack
+    } ?: false
     private fun finish(reason: String, send: Boolean = true) {
         val previous = room; val id = session
         room = null; session = ""; desiredMic = false

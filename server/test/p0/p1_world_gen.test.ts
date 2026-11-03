@@ -314,6 +314,7 @@ describe('global generation (SGODOT-280)', () => {
 
   it('a player with a pass to Tokyo casts in its generated beginner pond', () => {
     let s = freshState(c, 'world-player', T, 7);
+    s.coins = 5000;   // Tokyo's fare (q(256))
     const run = (cmd: P0Command) => { const r = applyP0(c, s, cmd, T); if (!r.ok) throw new Error(r.code); s = r.state; return r; };
     run({ type: 'travel', to: TOKYO });
     const pond = `${TOKYO}~pond0`;

@@ -193,29 +193,6 @@ func entry_pages() -> void:
 		await get_tree().create_timer(0.8).timeout
 		await page("06-map-farm-selected", "地图选中农场", "附近列表 → 选择农场", "选中角色旁显示农场微缩模型和拜访入口。", map_scene)
 	map_scene._set_nearby_open(false)
-	map_scene.enter_relocation_mode(map_scene.region, model)
-	map_scene.select_panel.hide()
-	map_scene.side_toolbar.hide()
-	if map_scene._placement_pin: map_scene._placement_pin.hide()
-	var relocation := FarmRelocationPreview.new()
-	map_scene.get_node("HUD/SafeArea/Root").add_child(relocation)
-	map_scene._relocation_preview = relocation
-	relocation.configure({"preview_id": "presentation", "base_version": int(model.version), "expires_at": 9999999999, "farm_terrain": model.farm_terrain.duplicate(true), "moved_cells": 2, "moved_decorations": 1}, str(model.region_id))
-	map_scene._layout_relocation_card()
-	await page("06-relocation-preview", "农场重新选址预览", "旧农场 → 重新选址 → 预览", "真实生成地形预览、作物与摆件迁移说明、重选与明确确认。", map_scene, relocation.find_children("*", "ScrollContainer", true, false), "仅本地展示，不提交重新选址")
-	relocation.set_busy(false, true)
-	await page("06-relocation-pending", "重新选址结果待确认", "确认后回复中断", "等待结果时保留查询入口，禁用取消和重选，避免重复申请。", map_scene, relocation.find_children("*", "ScrollContainer", true, false), "不确定结果展示状态")
-	await clear_screen()
-	FarmChoice.clear()
-	model = fresh()
-	model.farm_id = ""
-	model.state = {}
-	model.last_error_code = "NO_FARM"
-	map_scene = await mount(load(AppRouter.MAP).instantiate())
-	await get_tree().create_timer(3).timeout
-	map_scene._show_farm_selection()
-	await _settle(15)
-	await page("07-farm-selection", "选择农场位置", "新玩家 → 地图 → 选址", "在所选城市自由移动定位，生成真实地理农场；不可用地形需要重新选址。", map_scene, map_scene.find_children("*", "ScrollContainer", true, false), "新账号展示状态，不创建线上农场")
 	await clear_screen()
 	FarmChoice.save("sh_b", 2)
 	var loading = await mount(load("res://modules/ui/loading_overlay.gd").new())
@@ -261,14 +238,6 @@ func farm_pages() -> void:
 		farm._show_activity_panel(activity)
 		await page("26-farm-"+str(spec[1]).validate_filename(), "农场活动", "农场内设施", "真实活动面板的统一游戏化样式。", farm, [farm.activity_sheet._scroll])
 		farm.hud.close_modal()
-	var preview := FarmRelocationPreview.new()
-	farm.hud.add_child(preview)
-	preview.position = Vector2(8, 110)
-	preview.size = Vector2(344, 630)
-	preview.configure({"farm_terrain": model.farm_terrain, "preview_id": "presentation-only", "moved_cells": 3, "moved_decorations": 1}, model.region_id)
-	await page("27-relocation-preview", "新农场预览", "重新选址 → 预览", "本地展示预览；不提交迁居、不改变玩家机会。", farm)
-	preview.queue_free()
-	await _settle(4)
 	farm._open_stall()
 	await _settle(8)
 	await page("21-stall", "摊位 · 种子购买与出售", "农场 → 摊位", "购买各类种子、出售农作物或料理，并显示持有数量与每日结算额度。", farm, farm.hud.find_children("*", "ScrollContainer", true, false))
@@ -418,7 +387,6 @@ func street_pages() -> void:
 	# This archived scene is retained for legacy presentation, not the current farm entry.
 	model.layout_patch_id = "sh_b"
 	model.blueprint_revision = 2
-	model.farm_terrain = {}
 	model.state.journey.facts.append_array(JourneyProgress.data().gatherings.requires)
 	var street = JourneyStreet.new()
 	street.setup({"session": model})

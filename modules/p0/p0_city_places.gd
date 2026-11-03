@@ -48,15 +48,14 @@ static func fetch(session: Node, cluster: String, done := Callable(), failed := 
 	if t is Callable and (t as Callable).is_valid():   # tests answer with accept()
 		(t as Callable).call(HTTPClient.METHOD_GET, path, {}, {"type": "city", "cluster": cluster})
 		return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 	session.add_child(http)
 	http.request_completed.connect(func(result: int, code: int, _h: PackedStringArray, body: PackedByteArray):
 		http.queue_free()
 		var data = JSON.parse_string(body.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code == 200 else null
 		if data is Dictionary and data.get("city") is Dictionary: accept(cluster, data.city)
 		else: fail(cluster))   # failed: the next ask reads again
-	if http.request(str(session.get("base_url")) + path, session.call("_headers")) != OK:
+	if http.send(str(session.get("base_url")) + path, session.call("_headers")) != OK:
 		http.queue_free()
 		fail(cluster)
 
@@ -65,7 +64,7 @@ static func fail(cluster: String) -> void:
 	var told: Array = _failing.get(cluster, [])
 	_pending.erase(cluster)
 	_failing.erase(cluster)
-	for f in told: if (f as Callable).is_valid(): (f as Callable).call()
+	for f in told: if _alive(f): (f as Callable).call()
 
 ## A city's answer (the route's `city`: ponds / outposts ids, residents, fish, detail {ponds, outposts}, preview).
 ## Every caller waiting on it is told, in the order they asked.
@@ -92,7 +91,14 @@ static func accept(cluster: String, city_: Dictionary) -> void:
 		_outposts[entry.id] = entry   # found by id as an outpost is (P0Outposts.find): its room opens in the outpost scene
 		out.huts.append(entry)
 	_cities[cluster] = out
-	for done in waiting: if (done as Callable).is_valid(): (done as Callable).call(out)
+	for done in waiting: if _alive(done): (done as Callable).call(out)
+
+## A waiting callback whose owner is still there: a lambda of a map left before the read came back is valid as a
+## Callable but its object is gone (calling it errs).
+static func _alive(f) -> bool:
+	if not (f is Callable) or not (f as Callable).is_valid(): return false
+	var o: Object = (f as Callable).get_object()
+	return o == null or is_instance_valid(o)
 
 ## A generated pond as a SystemPonds location: registered so SystemPonds.location / site / blueprint know it.
 static func pond_entry(cluster: String, p: Dictionary) -> Dictionary:

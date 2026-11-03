@@ -32,7 +32,7 @@ func after_test() -> void:
 func _panel() -> Control: return ui._toasts._panel
 
 func test_a_refusal_replaces_the_info_toast_in_the_error_tone() -> void:
-	ui.toast("Room 1 is full · you're in Room 2")
+	ui.toast("Layer 1 is full · you're in Layer 2")
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
 	ui.toast_error("Not ready yet")
 	assert_str(ui.toast_text()).is_equal("Not ready yet")
@@ -67,7 +67,7 @@ func test_a_full_creel_says_so_and_its_action_opens_the_bag() -> void:
 	rt.session.view = _view()
 	rt.ui.set_view(_view())
 	rt._on_refused("creel_full", {}, {"type": "cast"})
-	assert_str(rt.ui.toast_text()).is_equal("Creel full · 0 free slots · Sell or cook first")
+	assert_str(rt.ui.toast_text()).is_equal("Creel full · 0 free slots\nSell or cook first")   # two lines at a " · " (不知火舞 11-02)
 	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
 	var tap := InputEventMouseButton.new()
@@ -93,12 +93,12 @@ func test_the_creel_badge_and_the_greyed_cast_say_the_creel_is_full() -> void:
 	assert_str(ui._creel.text).is_equal("Creel 2 · 0 free")
 	assert_int(ui.find_children("*", "Button", true, false).filter(func(b): return (b as Button).text in ["Open Bag", "Go home"]).size()).is_equal(0)
 	ui._creel.pressed.emit()
-	assert_str(ui.toast_text()).is_equal(P0Ui.CREEL_FULL)
+	assert_str(ui.toast_text()).is_equal("Creel full · 0 free slots\nSell or cook first")   # P0Ui.CREEL_FULL, broken at a " · "
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 	assert_str(ui._toasts.current_action()).is_equal("Open bag")
 	ui.clear_toast()
 	ui._fab_pressed()   # the greyed Cast · Creel full
-	assert_str(ui.toast_text()).is_equal(P0Ui.CREEL_FULL)
+	assert_str(ui.toast_text()).is_equal("Creel full · 0 free slots\nSell or cook first")   # P0Ui.CREEL_FULL, broken at a " · "
 	ui._on_toast_action("Open bag")
 	assert_str(ui.modal_kind).is_equal("bag")
 	assert_str(ui._bag.category).is_equal("Fish")
@@ -196,7 +196,7 @@ func test_a_harvest_all_row_the_bag_took_in_part_says_how_far_it_got() -> void:
 	var top: UiFloatText = lines.reduce(func(a, b): return a if a.position.y < b.position.y else b)
 	assert_str(top.text).is_equal("Harvest 3 of 5 · bag full")   # the result is the top line
 	assert_array(texts).contains(["+6 XP · 3 plants"])   # one plant per XP event, not the reply's three each
-	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25 · Sell at Homestead Stall")
+	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25\nSell at Homestead Stall")
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
 	assert_bool(rt.ui.fab_held).is_false()
 
@@ -223,7 +223,7 @@ func test_a_harvest_that_fills_the_bag_says_how_far_it_got() -> void:
 	await get_tree().process_frame
 	var texts := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
 	assert_array(texts).contains(["Harvest 12 of 14 · bag full"])
-	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25 · Sell at Homestead Stall")
+	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25\nSell at Homestead Stall")
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
 	assert_bool(rt.ui.fab_held).is_false()
 
@@ -275,7 +275,8 @@ func test_a_refused_compost_at_its_limit_says_when_it_resets() -> void:
 	assert_str(rt.ui.toast_text()).is_equal("Limit reached · 9h 12m")
 
 ## q(259): away from home the full creel's second part says what its fish fetch here and at home (bag.creel_value from
-## the server's view); at home, with no sums or equal ones, the old sentence. Breaks only after a ` · `, three lines at most.
+## the server's view); at home, with no sums or equal ones, the old sentence. Three lines broken by the text itself, no
+## no-break spaces for a line breaker to honour or not (366 c4560e68: an Android build broke `690 at` / `home`).
 func test_away_the_full_creel_says_what_it_fetches_here_and_at_home() -> void:
 	var v := _view()
 	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)   # home: no creel_value
@@ -284,15 +285,16 @@ func test_away_the_full_creel_says_what_it_fetches_here_and_at_home() -> void:
 	v.bag["creel_value"] = {"here": 304, "home": 304}
 	assert_str(P0Ui.creel_full_text(v)).is_equal(P0Ui.CREEL_FULL)   # equal sums: never half a line
 	v.bag["creel_value"] = {"here": 230, "home": 304}
+	assert_str(P0Ui.creel_full_text(v)).is_equal("Creel full · 0 free slots ·\n230 coins here ·\n304 at home")
+	v.bag["creel_value"] = {"here": 460, "home": 690}
 	var said := P0Ui.creel_full_text(v)
-	assert_str(said.replace(" ", " ")).is_equal("Creel full · 0 free slots · 230 coins here · 304 at home")
-	# the only breakable spaces are the ones after a dot (the first part's own spaces stay as the approved toast has them)
-	assert_str(said.get_slice("slots · ", 1)).is_equal("230 coins here · 304 at home")
+	assert_str(said).is_equal("Creel full · 0 free slots ·\n460 coins here ·\n690 at home")
+	assert_bool(said.contains("\u00a0")).is_false()
 	v.bag["creel_value"] = {"here": 1250, "home": 2080}
-	assert_str(P0Ui.creel_full_text(v).replace(" ", " ")).is_equal("Creel full · 0 free slots · 1,250 coins here · 2,080 at home")
+	assert_str(P0Ui.creel_full_text(v)).is_equal("Creel full · 0 free slots ·\n1,250 coins here ·\n2,080 at home")
 
 func test_the_away_creel_toast_fits_three_lines_and_opens_the_bag_on_its_fish_page() -> void:
-	for worth in [{"here": 230, "home": 304}, {"here": 1250, "home": 2080}, {"here": 12500, "home": 20800}]:
+	for worth in [{"here": 230, "home": 304}, {"here": 460, "home": 690}, {"here": 1250, "home": 2080}, {"here": 12500, "home": 20800}]:
 		var v := _view()
 		v.bag["free"] = 0
 		v.bag["creel_value"] = worth
@@ -300,7 +302,7 @@ func test_the_away_creel_toast_fits_three_lines_and_opens_the_bag_on_its_fish_pa
 		ui.toast_creel_full()
 		await await_idle_frame()
 		var label: Label = ui._toasts.label()
-		assert_int(label.get_line_count()).is_less_equal(3)
+		assert_int(label.get_line_count()).is_equal(3)   # its own three lines, none of them wrapped again at 232
 		assert_float(_panel().size.x).is_equal(float(UiTokens.SIZE_TOAST_W))
 		assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 		assert_str(ui._toasts.current_action()).is_equal("Open bag")
@@ -309,3 +311,18 @@ func test_the_away_creel_toast_fits_three_lines_and_opens_the_bag_on_its_fish_pa
 	ui._on_toast_action("Open bag")
 	assert_str(ui.modal_kind).is_equal("bag")
 	assert_str(ui._bag.category).is_equal("Fish")
+
+## 不知火舞 11-02 (q(103)): an Error toast too breaks its two lines at a " · ", the dot dropped — only a sentence with a
+## " · " that one line cannot hold; one that fits, one without a dot and one that sets its own lines stay as they are.
+func test_an_error_toast_breaks_at_a_dot_only_when_one_line_cannot_hold_it() -> void:
+	var said := "Pond Catch · Deliver to Wen · Shanghai"
+	ui.toast_error(said)
+	assert_str(ui.toast_text()).contains("\n")
+	assert_str(ui.toast_text()).not_contains("·\n")
+	assert_str(ui.toast_text().replace("\n", " · ")).is_equal(said)   # broken at one of its dots, nothing else changed
+	ui.toast_error("Rest used today")
+	assert_str(ui.toast_text()).is_equal("Rest used today")
+	ui.toast_error("Bag full · 1 slot")   # fits one line: as it is
+	assert_str(ui.toast_text()).is_equal("Bag full · 1 slot")
+	ui.toast_error("A first line · its own\nsecond line")   # lines of its own: never broken again
+	assert_str(ui.toast_text()).is_equal("A first line · its own\nsecond line")

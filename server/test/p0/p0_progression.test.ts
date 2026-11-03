@@ -50,6 +50,7 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     (other.fishing.places[BLOSSOM] as { cluster?: string }).cluster = 'gn-1850147';   // v5: a place's city is its cluster
     s.presence.place = BLOSSOM;   // entered before the table changed
     s.travel.passes['gn-1850147'] = { kind: 'day', from: T, until: T + 86_400_000 };
+    s.travel.here = 'gn-1850147';   // q(256) ④: a pass alone no longer lets a new cast in; the player is there
     s = step(s, { type: 'cast' }, T + 60_000, other);
     s = step(s, { type: 'reel', outcome: 'landed' }, T + 60_000 + s.cast!.bite_ms + 10, other);
     expect(s.skills.fishing).toBe(65);

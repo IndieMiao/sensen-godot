@@ -1,6 +1,7 @@
 class_name P0Board
 extends RefCounted
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Titles := preload("res://modules/p0/p0_titles.gd")   # its cut(): a line kept to a width, with …
 ## The counter drawer's board page (SGODOT-224; BOARD-READY / SHORT / DONE 1498:96193 / 96574 / 96382, E-11; the
 ## Stall Board uses the same rows): server facts (view.boards[id].slots, view.quotas) as UiBoardCard data and the
 ## page's fact lines. A request's command follows the frames: ready to hand in → Deliver (taken or not, q(48)); open
@@ -21,10 +22,10 @@ static func facts(view: Dictionary, board: String) -> Array:
 	if not sys.is_empty(): out.append(["Requests today", "%d/%d" % [int(sys.get("used", 0)), int(sys.get("cap", 0))]])
 	var soonest := -1.0
 	for sl in view.get("boards", {}).get(board, {}).get("slots", []):
-		if sl.get("empty", false) and sl.has("refill_in"):
+		if sl.get("empty", false) and sl.has("refill_in") and float(sl.refill_in) > 0.0:   # a slot refilling now says nothing (0 h since 0.2.18)
 			var t := float(sl.refill_in)
 			soonest = t if soonest < 0.0 else minf(soonest, t)
-	if soonest >= 0.0: out.append(["Next request", P0Logic.span(soonest)])
+	if soonest > 0.0: out.append(["Next request", P0Logic.span(soonest)])
 	var bonus: Dictionary = q.get("request_bonus", {})
 	if int(bonus.get("used", 0)) > 0: out.append(["Bonus today", "%d/%d" % [int(bonus.used), int(bonus.get("cap", 0))]])
 	return out
@@ -111,13 +112,17 @@ static func far_tries(view: Dictionary, r: Dictionary) -> String:
 	if names.size() == 1: return "Try %s" % names[0]
 	return "Try %s or %s" % [", ".join(PackedStringArray(names.slice(0, -1))), names[-1]]
 
-const LINE_CHARS := 40   # 李白 / 不知火舞 on q(128): one requirement line; a long outpost name is cut, the city kept
+## 李白 / 不知火舞 on q(128): one requirement line; a long outpost name is cut, the city kept. Measured in the line's
+## C11 Bold as it is drawn (#649 第二批 ⑨: 40 characters were English's; Chinese is twice as wide a character): 230 px
+## is what 40 of English took.
+const LINE_W := 230.0
 
-## `Lotus Tea House · Shanghai`, the name cut with … so the line keeps to LINE_CHARS and the city stays whole.
+## `Lotus Tea House · Shanghai`, the name cut with … so the line keeps to LINE_W and the city stays whole. Both are
+## measured as the label will show them (translated under 中文: `莲花茶馆 · 上海`), and so returned — the label's own
+## translation then has nothing left to do.
 static func place_line(name: String, city: String) -> String:
-	var tail := " · " + city
-	if name.length() + tail.length() <= LINE_CHARS: return name + tail
-	return name.left(maxi(1, LINE_CHARS - tail.length() - 1)).strip_edges() + "…" + tail
+	var tail := " · " + P0Logic.shown(city)
+	return P0Titles.cut(P0Logic.shown(name), LINE_W - P0Logic.text_width(tail), P0Logic.text_width) + tail
 
 ## "2 Pond Crucian", "4 Fine fish · any kind", "3 crops · 6 each", "Visit Oak Tea House".
 static func _what(view: Dictionary, r: Dictionary) -> String:
@@ -160,7 +165,7 @@ static func _any(view: Dictionary, r: Dictionary) -> String:
 	var noun := "fish" if kind == "fish" else _kinds(kind)
 	var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
 	if not styles.is_empty(): noun = "%s %s" % [" or ".join(styles), noun]
-	elif r.get("family", null) != null: noun = "%s %s" % [str(FAMILY_NAMES.get(str(r.family), str(r.family))), noun]
+	elif r.get("family", null) != null: noun = "%s %s" % [Localization.ctx(str(FAMILY_NAMES.get(str(r.family), str(r.family))), "family"), noun]
 	return ("%s %s" % [P0Logic.rarity_name(view, int(rarity)), noun]) if rarity != null and int(rarity) > 0 else noun
 
 static func _kinds(kind: String) -> String:
@@ -178,7 +183,14 @@ static func _name(view: Dictionary, id: String, qty: int) -> String:
 ## request can be dropped; an open one swaps itself after 72 h), noun ("fish", "crops" …), example (Far Pond's
 ## `Try …` line, else "")}; {} once it is gone.
 static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
-	var slots: Array = view.get("boards", {}).get(board, {}).get("slots", [])
+	var from: Dictionary = view.get("boards", {}).get(board, {})
+	var slots: Array = from.get("slots", [])
+	if board == "market" and not slots.any(func(x): return x is Dictionary and str(x.get("id", "")) == id):
+		# another city's tracked request (q(270): view.boards.elsewhere): its sheet opens anywhere, to be dropped
+		for e in view.get("boards", {}).get("elsewhere", []):
+			if e is Dictionary and str(e.get("id", "")) == id:
+				from = e
+				slots = [e]
 	for i in slots.size():
 		var r: Dictionary = slots[i]
 		if r.get("empty", false) or str(r.get("id", "")) != id: continue
@@ -187,22 +199,24 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		# Details › only for a request of one item: "4 Fine fish · any kind" or a mixed basket has no single item.
 		var item := str(items[0]) if items.size() == 1 else ""
 		var noun := _noun(view, r)
-		# 李白 q(68): the stall's own sentence from BOARD-1; the Market Board takes deliveries at any market of the home
-		# city (§9.6.5).
-		var where := "the Homestead Stall" if board == "stall" else "any %s market" % load("res://modules/p0/p0_travel.gd").home_name(view)
+		# 李白 q(68): the stall's own sentence from BOARD-1; the Market Board takes deliveries at any market of the city it
+		# hangs in (§9.6.5; q(270): the board's city, home's when the view names none).
+		var board_city := str(from.get("city", "")) if board == "market" else ""
+		if board_city == "": board_city = load("res://modules/p0/p0_travel.gd").home_name(view)
+		var where := "the Homestead Stall" if board == "stall" else "any %s market" % board_city
 		var d := {title = c.title, state = c.status, needs = c.needs, delivery = c.reward, next = {}, item = item,
 			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, str(items[0]) if not items.is_empty() else ""), example = "",
 			effect = "Bring the required %s to %s." % [noun, where]}
-		if _visit_city(r) != "":   # q(128): `Visit Lotus Tea House in Shanghai, then come back to any San Francisco market.`
+		if _visit_city(r) != "" and _visit_city(r) != board_city:   # q(128): `Visit Lotus Tea House in Shanghai, then come back to any San Francisco market.`
 			d.effect = "Visit %s in %s, then come back to %s." % [_visit_place(r), _visit_city(r), where]
-		elif _visit_place(r) != "":   # Stamp Run: walk in once, then come back to this board
+		elif _visit_place(r) != "":   # Stamp Run: walk in once, then come back to this board (another city's in that city, q(270))
 			d.effect = "Visit %s, then come back to %s." % [_visit_place(r), where]
 		elif _far_pond(r):   # q(128): `Bring 3 fish that San Francisco's ponds don't have to any San Francisco market.`
 			d.effect = "Bring %d fish that %s's ponds don't have to %s." % [int(r.get("qty", 1)), load("res://modules/p0/p0_travel.gd").home_name(view), where]
 			d.example = far_tries(view, r)
 		for j in slots.size():
 			var other: Dictionary = slots[j]
-			if j != i and other.get("empty", false) and other.has("refill_in"):
+			if j != i and other.get("empty", false) and other.has("refill_in") and float(other.refill_in) > 0.0:
 				d.next = {slot = "%s board slot" % ["First", "Second", "Third"][mini(j, 2)], within = P0Logic.span(float(other.refill_in))}
 				break
 		return d

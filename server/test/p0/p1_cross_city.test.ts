@@ -105,9 +105,10 @@ describe('the check-in and the hand-in', () => {
     expect(done.state.travel.visits[city].deliveries).toBe(1);   // the hand-in at home adds none (q(128) ④)
     await app.close();
   });
-  // 周瑜 on #285: the entry read checks in before it settles `here`; a pass bought earlier, home again, then straight into
-  // that outpost still counts that city, not wherever `here` pointed
-  it('a check-in counts its own city\'s Deliveries, whatever city the player was in before', async () => {
+  // 周瑜 on #285: the entry read checks in its own city's Deliveries. Since q(256) ④ (option B) a pass bought earlier
+  // no longer lets the player walk straight back in from home: that entry is refused and checks nothing in; after the
+  // revisit fare the entry counts that city
+  it('a check-in counts its own city\'s Deliveries; with a pass but home again, the way back is a travel first', async () => {
     const c = only('req_sys_explore_city');
     const app = Fastify();
     const store = new P0Store(c);
@@ -115,14 +116,20 @@ describe('the check-in and the hand-in', () => {
     const player = 'cross-city-order';
     let s = store.get(player, T);
     s.homestead.level = 2;
+    s.coins = 5000;   // the fares (q(256))
     settleBoards(c, s, T);
     const r = req(s), city = clusterOf(c, r.visit!.place)!;
     s = step(c, s, { type: 'accept', request: r.id }).state;
     s = step(c, s, { type: 'travel', to: city }).state;   // the pass
     s = step(c, s, { type: 'travel', to: SF }).state;     // home again, the pass kept
     store.put(s);
-    const entered = await app.inject({ method: 'GET', url: `/v1/p0/state?space=outpost&place=${encodeURIComponent(r.visit!.place)}`,
-      headers: { 'x-p0-player': player } });
+    const at = `/v1/p0/state?space=outpost&place=${encodeURIComponent(r.visit!.place)}`;
+    const walked = await app.inject({ method: 'GET', url: at, headers: { 'x-p0-player': player } });
+    expect(walked.json()).toMatchObject({ ok: false, code: 'travel_required', detail: { message: 'Travel first', preview: { cluster: city, revisit: true } } });
+    expect(req(store.get(player, T)).visit!.done).toBeFalsy();
+    s = step(c, store.get(player, T), { type: 'travel', to: city }).state;   // the revisit fare; the pass not re-signed
+    store.put(s);
+    const entered = await app.inject({ method: 'GET', url: at, headers: { 'x-p0-player': player } });
     expect(entered.json().ok).toBe(true);
     s = store.get(player, T);
     expect(req(s).visit!.done).toBe(true);

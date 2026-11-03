@@ -36,15 +36,14 @@ static func _read(session: Node, path: String, done: Callable, failed: Callable)
 		_waiting[path] = [done, failed]
 		(t as Callable).call(HTTPClient.METHOD_GET, path, {}, {"type": "home_pick"})
 		return
-	var http := HTTPRequest.new()
-	http.timeout = 8.0
+	var http := P0HttpRequest.new()   # its wait in live time, not stalls (SGODOT-370)
 	session.add_child(http)
 	http.request_completed.connect(func(result: int, code: int, _h: PackedStringArray, body: PackedByteArray):
 		http.queue_free()
 		var data = JSON.parse_string(body.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code == 200 else null
 		if data is Dictionary and bool(data.get("ok", false)): done.call(data)
 		else: failed.call())
-	if http.request(str(session.get("base_url")) + path, session.call("_headers")) != OK:
+	if http.send(str(session.get("base_url")) + path, session.call("_headers")) != OK:
 		http.queue_free()
 		failed.call()
 
@@ -110,7 +109,7 @@ static func settings_row(view: Dictionary, now_ms: float) -> Dictionary:
 	var open := bool(ch.get("open", false)) and not bool(h.get("pending", false))
 	var days := maxi(1, ceili((float(ch.get("until", 0)) - now_ms) / 86400000.0))
 	return {name = str(h.get("name", "")), open = open,
-		line = ("Change once · %d %s left" % [days, "day" if days == 1 else "days"]) if open else "Set for good"}
+		line = ("Change once · %d day%s left" % [days, "" if days == 1 else "s"]) if open else "Set for good"}   # a plural's ending, dropped in Chinese (0.2.23)
 
 ## The change confirm card's day line (HOME-CHANGE-CONFIRM, q(173)): `Your day resets Thu 4 AM, Tokyo time.` from the
 ## spots read's resets_day (the new home's calendar); "" without one.

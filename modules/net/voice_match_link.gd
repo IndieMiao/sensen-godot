@@ -56,7 +56,7 @@ func open(mode := "solo") -> void:
 	var base := _base_url()
 	var url := url_for(mode, base)
 	if _plugin == null:
-		OS.shell_open(url)
+		ExternalLink.open(url)   # the system browser (never in a test run: ExternalLink.quiet)
 		return
 	_open = true
 	_restore_voice_mic = Voice.state == "connected" and Voice.microphone

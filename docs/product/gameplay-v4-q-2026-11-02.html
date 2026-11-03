@@ -1,0 +1,1218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Gensen 玩法 v4 改动清单</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #F7F8F3; --surface: #FFFFFF; --surface-2: #EEF2EA; --ink: #24302A; --ink-2: #55635C; --ink-3: #7E8B84;
+  --line: #CFD8CC; --line-2: #E2E8DF; --accent: #2E7D77; --accent-ink: #1F5F5A; --accent-soft: #DCEEEB;
+  --warm: #D9823B; --warm-soft: #FBEADB; --code-bg: #EEF2EA; --thead: #E9EFE6; --row: #F8FAF6; --shadow: 0 1px 2px rgba(36,48,42,.08);
+  --serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #141A17; --surface: #1C2420; --surface-2: #222C27; --ink: #E6EBE4; --ink-2: #AEBBB3; --ink-3: #7F8D86;
+    --line: #2C3731; --line-2: #26302B; --accent: #6FC2BA; --accent-ink: #8FD6CF; --accent-soft: #1E3733;
+    --warm: #E9A35F; --warm-soft: #3A2A1B; --code-bg: #222C27; --thead: #243029; --row: #1F2924; --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141A17; --surface: #1C2420; --surface-2: #222C27; --ink: #E6EBE4; --ink-2: #AEBBB3; --ink-3: #7F8D86;
+  --line: #2C3731; --line-2: #26302B; --accent: #6FC2BA; --accent-ink: #8FD6CF; --accent-soft: #1E3733;
+  --warm: #E9A35F; --warm-soft: #3A2A1B; --code-bg: #222C27; --thead: #243029; --row: #1F2924; --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.75; -webkit-text-size-adjust: 100%; }
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+.topbar-in { max-width: 1360px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.topbar .name { font-family: var(--serif); font-weight: 700; font-size: 17px; letter-spacing: .01em; }
+.topbar .meta { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .02em; }
+.topbar .meta span + span::before { content: "·"; margin: 0 8px; color: var(--line); }
+
+.shell { max-width: 1360px; margin: 0 auto; padding: 24px 20px 80px; display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 36px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 58px); align-self: start; max-height: calc(100vh - 90px); overflow-y: auto; padding-right: 8px; font-size: 13px; line-height: 1.5; }
+.toc .label { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px 2px; }
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li.c1 { margin: 0 0 6px; }
+.toc li.c1 > a { display: block; font-weight: 700; color: var(--ink); padding: 4px 8px; border-radius: 6px; }
+.toc li.c1 > ul { display: none; margin: 2px 0 6px 10px; border-left: 2px solid var(--line-2); }
+.toc li.c1.open > ul { display: block; }
+.toc li.c2 > a { display: block; color: var(--ink-2); padding: 3px 10px; border-left: 2px solid transparent; margin-left: -2px; }
+.toc a.active { color: var(--accent-ink); }
+.toc li.c2 > a.active { border-left-color: var(--accent); }
+.toc li.c1 > a.active { background: var(--accent-soft); }
+.toc-mobile { display: none; }
+
+article { min-width: 0; }
+.hero { padding: 8px 0 28px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.hero .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 10px; }
+.hero h1.title { font-family: var(--serif); font-size: clamp(26px, 3.4vw, 40px); line-height: 1.25; margin: 0 0 14px; text-wrap: balance; font-weight: 700; }
+.hero .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+.hero .facts b { color: var(--ink); font-weight: 500; }
+
+article h1 { font-family: var(--serif); font-size: 28px; line-height: 1.3; margin: 64px 0 18px; padding-top: 18px; border-top: 3px solid var(--accent); text-wrap: balance; scroll-margin-top: 80px; }
+article h2 { font-family: var(--serif); font-size: 21px; line-height: 1.35; margin: 40px 0 12px; text-wrap: balance; scroll-margin-top: 80px; }
+article h3 { font-size: 16.5px; font-weight: 700; margin: 28px 0 8px; scroll-margin-top: 80px; }
+article h4 { font-size: 15px; font-weight: 700; margin: 20px 0 6px; color: var(--ink-2); scroll-margin-top: 80px; }
+article p, article li { max-width: 76ch; }
+article p { margin: 0 0 12px; }
+article ul, article ol { padding-left: 1.4em; margin: 0 0 14px; }
+article li { margin: 0 0 4px; }
+article hr { border: 0; border-top: 1px solid var(--line-2); margin: 28px 0; }
+article strong { font-weight: 700; }
+article blockquote { margin: 16px 0; padding: 10px 16px; border-left: 3px solid var(--warm); background: var(--warm-soft); border-radius: 0 6px 6px 0; color: var(--ink); }
+article blockquote p { margin: 0; }
+article code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; color: var(--accent-ink); }
+article pre { background: var(--code-bg); border: 1px solid var(--line-2); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.55; }
+article pre code { background: none; padding: 0; color: inherit; }
+
+.tbl { overflow-x: auto; margin: 12px 0 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.5; }
+thead th { background: var(--thead); color: var(--ink); text-align: left; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid var(--line); position: sticky; top: 0; white-space: nowrap; }
+tbody td { padding: 7px 10px; border-top: 1px solid var(--line-2); vertical-align: top; min-width: 60px; }
+tbody tr:nth-child(even) td { background: var(--row); }
+td code, th code { white-space: nowrap; }
+td { font-variant-numeric: tabular-nums; }
+
+.diagram { margin: 16px 0 22px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+.diagram pre.mermaid { background: none; border: 0; padding: 0; margin: 0; font-family: var(--mono); font-size: 12px; white-space: pre; }
+.diagram svg { max-width: 100%; height: auto; }
+
+.totop { position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); z-index: 20; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font: 500 12px var(--sans); box-shadow: var(--shadow); cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.totop.show { opacity: 1; pointer-events: auto; }
+
+@media (max-width: 1023px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 16px 16px 72px; }
+  .toc { display: none; }
+  .toc-mobile { display: block; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .toc-mobile summary { cursor: pointer; padding: 10px 14px; font-weight: 700; list-style: none; }
+  .toc-mobile summary::-webkit-details-marker { display: none; }
+  .toc-mobile summary::after { content: "目录"; float: right; font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--ink-3); }
+  .toc-mobile .toc { display: block; position: static; max-height: 60vh; padding: 0 12px 12px; }
+  .toc-mobile .toc li.c1 > ul { display: block; }
+  article h1 { font-size: 24px; margin-top: 48px; }
+  article h2 { font-size: 19px; }
+}
+</style>
+
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <span class="name">Gensen 玩法 v4 改动清单</span>
+  <span class="meta"><span>2026-10-02</span><span>3 章</span><span>11 张表</span><span>独立完整版</span></span>
+</div></header>
+
+<div class="shell">
+  <nav class="toc" id="toc" aria-label="目录">
+    <p class="label">Contents</p>
+    <ul><li class="c1"><a href="#ch0">第 0 章 说明</a><ul>
+<li class="c2"><a href="#s0-1">0.1 以哪份为准</a></li>
+<li class="c2"><a href="#s0-2">0.2 编号</a></li>
+<li class="c2"><a href="#s0-3">0.3 流程</a></li>
+</ul></li>
+<li class="c1"><a href="#ch1">第 1 章 改动清单</a><ul>
+<li class="c2"><a href="#s1-1">1.1 索引</a></li>
+<li class="c2"><a href="#h-5cfa7268">v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西</a></li>
+<li class="c2"><a href="#h-e1efbeee">v4q(2) 【规则】清档上线：存档 v7 以下一律清（部署 v7 即清档），不迁移、不补偿；维护中提最低版本、单独备份、两档回退；同时清设备本地的「已看过」</a></li>
+<li class="c2"><a href="#h-2dcc7cd3">v4q(3) 【规则】【界面】野外地点：全球一次生成、冻结目录，第一批开放浅坑和矿脉；地图图钉、地点卡、能飞过去；最近 3 个永远免费</a></li>
+<li class="c2"><a href="#h-cfd467c0">v4q(4) 【规则】【数值】【界面】采集搬出农场：城里采集点（地图图钉 + 卡片）、每次 3 体力、冷却 4 小时、先进背包；新手引导改版</a></li>
+<li class="c2"><a href="#h-e82c2e11">v4q(5) 【规则】【数值】【界面】矿搬出家城：浅坑和矿脉、清完怪就开梯子、每座矿各记进度和电梯、守关整十层、取消每天 2 局和 Express、矿口卡、击杀记录</a></li>
+<li class="c2"><a href="#h-1879c2f5">v4q(6) 【规则】【文案】新怪 3 种（蝙蝠、岩甲虫、菇菇怪）+ 史莱姆王和换色守关、换色精英；行为、掉落、英文名</a></li>
+<li class="c2"><a href="#h-3131a21e">v4q(7) 【规则】【数值】【界面】【文案】武器槽、铜剑（Pip「第一次下矿」委托）、铁剑（工作台）、回血药、战斗快捷栏；武器低一档每下伤害减半</a></li>
+<li class="c2"><a href="#h-1b442e3b">v4q(8) 【规则】【文案】移除特产换料（Specialty Barter）：矿物只从矿里来</a></li>
+<li class="c2"><a href="#h-f8cabdbc">v4q(9) 【规则】【界面】【文案】第一周带人去矿脉：Today 的「开矿脉」行和 Pip 的一句</a></li>
+<li class="c2"><a href="#h-bcca3929">v4q(10) 【数值】第一周逐日表定稿：第一只守关放第 2 天，第 3、4 天开铁、石英矿脉，第一座邻城放第 1 天晚上</a></li>
+</ul></li>
+<li class="c1"><a href="#ch2">第 2 章 旧文档冲突索引</a><ul>
+</ul></li></ul>
+  </nav>
+  <article>
+    <details class="toc-mobile"><summary>Gensen 玩法 v4 改动清单</summary><nav class="toc" aria-label="目录"><ul><li class="c1"><a href="#ch0">第 0 章 说明</a><ul>
+<li class="c2"><a href="#s0-1">0.1 以哪份为准</a></li>
+<li class="c2"><a href="#s0-2">0.2 编号</a></li>
+<li class="c2"><a href="#s0-3">0.3 流程</a></li>
+</ul></li>
+<li class="c1"><a href="#ch1">第 1 章 改动清单</a><ul>
+<li class="c2"><a href="#s1-1">1.1 索引</a></li>
+<li class="c2"><a href="#h-5cfa7268">v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西</a></li>
+<li class="c2"><a href="#h-e1efbeee">v4q(2) 【规则】清档上线：存档 v7 以下一律清（部署 v7 即清档），不迁移、不补偿；维护中提最低版本、单独备份、两档回退；同时清设备本地的「已看过」</a></li>
+<li class="c2"><a href="#h-2dcc7cd3">v4q(3) 【规则】【界面】野外地点：全球一次生成、冻结目录，第一批开放浅坑和矿脉；地图图钉、地点卡、能飞过去；最近 3 个永远免费</a></li>
+<li class="c2"><a href="#h-cfd467c0">v4q(4) 【规则】【数值】【界面】采集搬出农场：城里采集点（地图图钉 + 卡片）、每次 3 体力、冷却 4 小时、先进背包；新手引导改版</a></li>
+<li class="c2"><a href="#h-e82c2e11">v4q(5) 【规则】【数值】【界面】矿搬出家城：浅坑和矿脉、清完怪就开梯子、每座矿各记进度和电梯、守关整十层、取消每天 2 局和 Express、矿口卡、击杀记录</a></li>
+<li class="c2"><a href="#h-1879c2f5">v4q(6) 【规则】【文案】新怪 3 种（蝙蝠、岩甲虫、菇菇怪）+ 史莱姆王和换色守关、换色精英；行为、掉落、英文名</a></li>
+<li class="c2"><a href="#h-3131a21e">v4q(7) 【规则】【数值】【界面】【文案】武器槽、铜剑（Pip「第一次下矿」委托）、铁剑（工作台）、回血药、战斗快捷栏；武器低一档每下伤害减半</a></li>
+<li class="c2"><a href="#h-1b442e3b">v4q(8) 【规则】【文案】移除特产换料（Specialty Barter）：矿物只从矿里来</a></li>
+<li class="c2"><a href="#h-f8cabdbc">v4q(9) 【规则】【界面】【文案】第一周带人去矿脉：Today 的「开矿脉」行和 Pip 的一句</a></li>
+<li class="c2"><a href="#h-bcca3929">v4q(10) 【数值】第一周逐日表定稿：第一只守关放第 2 天，第 3、4 天开铁、石英矿脉，第一座邻城放第 1 天晚上</a></li>
+</ul></li>
+<li class="c1"><a href="#ch2">第 2 章 旧文档冲突索引</a><ul>
+</ul></li></ul></nav></details>
+    <div class="hero">
+      <p class="eyebrow">Game Design Document · Prototype Stage</p>
+      <h1 class="title">Gensen 玩法 v4 改动清单（v4q）</h1>
+      <div class="facts"><span><b>Energy</b> 200 · +1/4 min</span><span><b>Skills</b> Farming / Fishing ×10 Lv</span><span><b>Trips</b> 1–7</span><span><b>Crops</b> 20 · <b>Fish</b> 20 · <b>Dishes</b> 29</span></div>
+    </div>
+<ul>
+<li>状态：<strong>2026-11-02 建档</strong>：355 v4 方案定稿（用户 11-02「全按建议」，53 条）后新起的 q 文档；第一批 A–H 预留 v4q(1)–v4q(8)（台账：Plane「q 行台账（三）」）。 <strong>2026-11-02（v4q(1)，已批）：Homestead 第一批开到 Lv17，三项技能门槛、田开局 8 块、Lv2–15 升级回 50、体力池与饭量同一公式。</strong> <strong>2026-11-02（v4q(2)，已批，用户明确点头）：第一批清档上线，存档 v7 以下一律清，不迁移、不补偿，设备本地「已看过」一起重置。</strong> <strong>2026-11-02（v4q(3)，已批）：野外地点全球一次生成、冻结，第一批开放浅坑和矿脉，能上地图（未开放的矿型灰钉）、能飞过去，最近 3 个永远免费，野外不盖章；离城中心下限 20 km（用户定）；最近 3 个免费是浅坑、铁矿脉、石英矿脉各一。</strong> <strong>2026-11-02（v4q(4)，已批：第一段 11-02，⑥ 引导 11-02 晚）：农场 6 个采集点搬出，改为城里采集点（地图图钉 + 卡片），每次 3 体力、冷却 4 小时、先进背包；新手引导 v4（S6a 采集、S7a 升级、委托 2 改 Four Radishes）。</strong> <strong>2026-11-02（v4q(5)，已批）：矿搬出家城，第一批浅坑和矿脉（到 F40），清完怪就开梯子，每座矿各记进度和电梯，取消每天 2 局和 Express，矿口卡，第一批就记击杀。</strong> <strong>2026-11-02（v4q(6)，已批）：第一批新怪蝙蝠、岩甲虫、菇菇怪，史莱姆王和矿脉的两只换色守关，换色精英，新掉落。</strong> <strong>2026-11-02（v4q(7)，已批）：武器槽第一批上，铜剑由 Pip「第一次下矿」委托给，铁剑工作台做，回血药 Lv4 驿站上架，武器低于守关一档每下伤害减半。</strong> <strong>2026-11-02（v4q(8)，已批）：移除特产换料，矿物只从矿里来。</strong> <strong>2026-11-02（v4q(9)，已批）：第一周带人去矿脉——Today 加「开矿脉」行（<code>Ironvale Vein · Reach Floor 10</code>，引导结束、First Dig 完成、接下来三级里有一级要铁时出现（Lv5 起），到 F10 或 Homestead Lv7 消失，石英同理；排在 Homestead 材料行前面、不被 q(143) 顶），Pip 说一次指向矿脉的话。</strong> <strong>2026-11-02（v4q(10)，已批）：第一周逐日表定稿——第一只守关放第 2 天，第 3、4 天各开一座矿脉，铁剑约第 8 天、F20 守关在第二周，第一座邻城放第 1 天晚上（用户定 B），依据 c7 校准。</strong></li>
+</ul>
+<h1 id="ch0">第 0 章 说明</h1>
+<h2 id="s0-1">0.1 以哪份为准</h2>
+<ul>
+<li><strong>本文件与 355 v4 方案（<code>docs/product/gameplay-v4-2026-11-02.md</code>，用户 11-02「全按建议」定稿）为准。</strong> 旧方案 <code>docs/product/gameplay-plan-v2-2026-10-02.md</code> 及其改动清单 q(1)–q(273) 与本文件或 v4 方案冲突的地方，<strong>一律以本文件为准</strong>；旧文档不删原文，冲突处加注「以 v4 为准，见 gameplay-v4-q v4q(n)」（第 2 章索引）。</li>
+<li>v4 方案里的数字是设计初值；进本文件的数字以本文件的 v4q 行为准（经模拟器校准、复核、用户批过的）。v4 方案正文按 v4q 行回写。</li>
+</ul>
+<h2 id="s0-2">0.2 编号</h2>
+<ul>
+<li>编号 <code>v4q(n)</code>，行文里写「v4q(3)」，和旧文档的 q(1)–q(273) 不重。</li>
+<li>v4q(1)–v4q(8) 预留给 1b 第一批（v4 方案第 10 章 10.2），按字母顺序：v4q(1) A 等级表与门槛、v4q(2) B 清档、v4q(3) C 野外地点、v4q(4) D 采集与引导改版、v4q(5) E 矿、v4q(6) F 新怪、v4q(7) G 武器与 Pip 委托、v4q(8) H 换料移除。之后从 v4q(9) 起顺排。</li>
+<li>标题前标类别：【数值】【规则】【界面】【文案】。</li>
+</ul>
+<h2 id="s0-3">0.3 流程</h2>
+<ul>
+<li>每条 v4q 一个独立提交，叠在最新 farm-dev 上 → 先交不知火舞审（界面、文案附改前改后图）→ 数值、规则类请奕星另做独立复核 → 挂台账卡【待批】→ 用户批 → 奕星推 → 台账记【已批·已推 sha】→ 通知实现。用户批之前不合。</li>
+<li>每条 v4q 一节，固定小标题：状态与来源 / 问题 / 改法 / 改哪 / 推翻 / 画面 / 实现。「推翻」写清推翻或复议的旧 q 行、锁定项（197 LOCK-n）和旧章节。</li>
+</ul>
+<h1 id="ch1">第 1 章 改动清单</h1>
+<h2 id="s1-1">1.1 索引</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>编号</th>
+<th>类别</th>
+<th>标题</th>
+<th>状态</th>
+<th>推翻</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v4q(1)</td>
+<td>【数值】【规则】【界面】</td>
+<td>Homestead 第一批等级表 Lv1–17、三项技能门槛、田、升级回 50、体力池</td>
+<td>已批</td>
+<td>q(246)、q(263)、q(172)、q(248)；旧第 8 章</td>
+</tr>
+<tr>
+<td>v4q(2)</td>
+<td>【规则】</td>
+<td>清档上线：存档 v7（部署即清档），不迁移不补偿；维护中提最低版本、单独备份、两档回退；清设备本地「已看过」</td>
+<td>已批（用户明确点头；执行前再确认窗口）</td>
+<td>第 20 条；q(107)、q(235)–(237) 本机记录加「清档时重置」</td>
+</tr>
+<tr>
+<td>v4q(3)</td>
+<td>【规则】【界面】</td>
+<td>野外地点：一次生成冻结目录，第一批开浅坑、矿脉；地图图钉、地点卡、旅行；最近 3 个免费</td>
+<td>已批</td>
+<td>LOCK-24（q(137)）、LOCK-06 复议；q(204) / q(271) 地点卡加野外分支</td>
+</tr>
+<tr>
+<td>v4q(4)</td>
+<td>【规则】【数值】【界面】</td>
+<td>采集搬出农场：城里采集点（图钉 + 卡）、3 体力、冷却 4 小时、进背包；新手引导改版</td>
+<td>已批（⑥ 引导 11-02 晚）；来源句补注 11-03 已批</td>
+<td>q(44)、q(46)、q(40)；341 引导 q(215) 等</td>
+</tr>
+<tr>
+<td>v4q(5)</td>
+<td>【规则】【数值】【界面】</td>
+<td>矿搬出家城：浅坑和矿脉、清怪开梯子、每矿进度和电梯、守关、取消每天 2 局和 Express、矿口卡、击杀记录</td>
+<td>已批；来源句写法随 v4q(4) 补注 11-03 已批</td>
+<td>§13.3；LOCK-21 复议；q(196)、q(116)；q(102) / q(175) / q(204) 按本条读</td>
+</tr>
+<tr>
+<td>v4q(6)</td>
+<td>【规则】【文案】</td>
+<td>新怪：蝙蝠、岩甲虫、菇菇怪 + 史莱姆王和换色守关、换色精英；掉落与英文名</td>
+<td>已批</td>
+<td>§13.3.4；q(116)</td>
+</tr>
+<tr>
+<td>v4q(7)</td>
+<td>【规则】【数值】【界面】【文案】</td>
+<td>武器槽、铜剑（Pip 委托）、铁剑（工作台）、回血药、战斗快捷栏；低一档伤害减半</td>
+<td>已批</td>
+<td>§10.5；§13.1.2；§13.4；§9.6.2 加例外；q(138) ④；q(170)、q(218) 按本条读</td>
+</tr>
+<tr>
+<td>v4q(8)</td>
+<td>【规则】【文案】</td>
+<td>移除特产换料：矿物只从矿里来</td>
+<td>已批</td>
+<td>q(166)；q(175) ② 后半与 ④；q(181) ②③；q(263) ⑧；q(168) ①</td>
+</tr>
+<tr>
+<td>v4q(9)</td>
+<td>【规则】【界面】【文案】</td>
+<td>第一周带人去矿脉：Today「开矿脉」行 + Pip 一句</td>
+<td>已批</td>
+<td>无</td>
+</tr>
+<tr>
+<td>v4q(10)</td>
+<td>【数值】</td>
+<td>第一周逐日表定稿：第一只守关放第 2 天，第 3、4 天开矿脉，第一座邻城放第 1 天晚上</td>
+<td>已批</td>
+<td>v4 2.8 原表</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="h-5cfa7268">v4q(1) 【数值】【规则】【界面】Homestead 第一批等级表（Lv1–17）：金币、材料、三项技能门槛、田数、升级回 50、体力池，以及每级的新东西</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。标〔用户已定〕的几处是 v4 定稿里没有、这次补定的口径，用户按推荐定了。用户 2026-11-02「全按建议」定 355 v4（结论 11、17、18、19、23、24、32、40、45、46）；v4 方案第 2 章 2.3–2.7、第 10 章 10.2 的 A 行。数字是 v4 的设计初值（<code>pacing_r9.py</code>、sim354 按 v4 分配重跑），<strong>还没经过模拟器按第一批机制校准</strong>（交接第 6 节，排在 A–H 初稿之后），校准后要改数时在批前改本条或另起 v4q。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：现行 Homestead 只有 10 级：Lv5 起一个「技能和」门槛，Lv2–4 升级回 40、Lv5–10 回满（q(246)），Lv5–10 用 355 方案 A 的过渡数（q(263)），开局 30 块田、Lv3 40、Lv7 48（q(172)）。v4 要 30 级、第一周每天一级、门槛改成三项技能各自的等级、田开局 8 块每级 +2；第一批先开到 Lv17。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>等级上限 17</strong>（第一批；第二批开到 Lv19、2 期 Lv21，都用过渡行，第 52 条）。Lv18–30 的表留在 v4 方案 2.3，以后的批次另起 v4q。</p>
+<p>② <strong>Lv2–17 的消耗</strong>（30 分钟玩家的目标天数供参考，按建号后第几天）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>档</th>
+<th>目标天</th>
+<th>金币</th>
+<th>材料</th>
+<th>技能门槛 Farming / Fishing / Cooking</th>
+<th>出门门槛</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>T1</td>
+<td>0.1</td>
+<td>40</td>
+<td>木材 6、石料 4、芦苇 3</td>
+<td>1 / 1 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>3</td>
+<td>T1</td>
+<td>0.1</td>
+<td>60</td>
+<td>石料 4、木材 2、黏土 2</td>
+<td>1 / 1 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td>T1</td>
+<td>0.4</td>
+<td>70</td>
+<td>木材 8、芦苇 4、石料 10、黏土 3、铜矿石 3、岩盐 1</td>
+<td>2 / 2 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td>T1</td>
+<td>1.4</td>
+<td>80</td>
+<td>木材 8、芦苇 4、石料 5、黏土 3、铜矿石 3、岩盐 1、煤 2</td>
+<td>3 / 2 / —</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td>T1</td>
+<td>2.4</td>
+<td>80</td>
+<td>同 Lv5</td>
+<td>3 / 3 / 2</td>
+<td>—</td>
+</tr>
+<tr>
+<td>7</td>
+<td>T1</td>
+<td>3.4</td>
+<td>80</td>
+<td>同 Lv5</td>
+<td>4 / 3 / 3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td>T2</td>
+<td>4.4</td>
+<td>80</td>
+<td>木材 3、芦苇 2、石料 3、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>4 / 4 / 4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>T2</td>
+<td>5.4</td>
+<td>85</td>
+<td>同 Lv8</td>
+<td>4 / 5 / 4</td>
+<td>—</td>
+</tr>
+<tr>
+<td>10</td>
+<td>T2</td>
+<td>6.4</td>
+<td>90</td>
+<td>同 Lv8</td>
+<td>4 / 5 / 5</td>
+<td>—</td>
+</tr>
+<tr>
+<td>11</td>
+<td>T2</td>
+<td>7.9</td>
+<td>115</td>
+<td>木材 3、芦苇 2、石料 2、黏土 2、硬木 3、亚麻 2、铜矿石 1、铁矿石 1、石英 1、煤 1</td>
+<td>4 / 6 / 5</td>
+<td>—</td>
+</tr>
+<tr>
+<td>12</td>
+<td>T2</td>
+<td>9.4</td>
+<td>120</td>
+<td>同 Lv11</td>
+<td>4 / 6 / 6</td>
+<td>—</td>
+</tr>
+<tr>
+<td>13</td>
+<td>T2</td>
+<td>11.2</td>
+<td>150</td>
+<td>木材 4、芦苇 2、石料 3、黏土 2、硬木 4、亚麻 3、铜矿石 1、铁矿石 2、石英 1、煤 1</td>
+<td>5 / 6 / 6</td>
+<td>—</td>
+</tr>
+<tr>
+<td>14</td>
+<td>T2</td>
+<td>13.2</td>
+<td>175</td>
+<td>木材 4、芦苇 3、石料 3、黏土 2、硬木 4、亚麻 3、铜矿石 1、铁矿石 2、石英 1、煤 2</td>
+<td>5 / 6 / 7</td>
+<td>—</td>
+</tr>
+<tr>
+<td>15</td>
+<td>T2</td>
+<td>15.6</td>
+<td>220</td>
+<td>木材 5、芦苇 3、石料 4、黏土 3、硬木 5、亚麻 4、铜矿石 2、铁矿石 2、石英 1、煤 2</td>
+<td>6 / 7 / 7</td>
+<td>—</td>
+</tr>
+<tr>
+<td>16</td>
+<td>T3（过渡）</td>
+<td>18.6</td>
+<td>280</td>
+<td>硬木 13、亚麻 9、铁矿石 4、石英 2</td>
+<td>6 / 7 / 8</td>
+<td>城市签章 6，去过 1 个别的气候带</td>
+</tr>
+<tr>
+<td>17</td>
+<td>T3（过渡）</td>
+<td>22.1</td>
+<td>400</td>
+<td>硬木 16、亚麻 11、铁矿石 5、石英 3</td>
+<td>7 / 8 / 8</td>
+<td>城市签章 8，去过 2 个别的气候带</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>Lv16–17 是第一批的过渡行（第 46 条）：只用 T2 材料，出门门槛按气候带；2 期上 8 地域和 T3 材料时换回 v4 方案 2.3 的正表（另起 v4q）。</li>
+<li><strong>Lv3 / Lv4 材料</strong>（用户批，庚2；偏离 v4 2.3）：Lv3 石 8、木 4 → 石 4、木 2；Lv4 石 6 → 10（木 8 不变）——原表首会话石料 12 正好等于 3 个点 × 4、零余量。</li>
+<li>Lv2–17 金币合计 2,125；第一周每级 80–90，约占当天收入的一半。</li>
+<li>材料的来处：木材、芦苇、黏土、石料、亚麻、硬木走城里采集点（v4q(4)）和矿（v4q(5)）；铜矿石、岩盐、煤、铁矿石、石英走矿：Lv4 起要浅坑、Lv8 起要矿脉（v4q(5)）。家城没有矿（第 9、10 条）。</li>
+</ul>
+<p>③ <strong>技能门槛</strong>：Lv2–17 看 Farming、Fishing、Cooking 各自的等级（上表），三项都到才能升；取代现行的「技能和」（§8.1、q(263)）。Cooking 从 Lv6 起要求。<strong>Lv3 改成 1 / 1</strong>（用户定，丁1；v4 2.3 原 2 / 1：首会话里普通作物熟不了，按 2 / 1 要等第二次上线），Lv4 的 2 / 2 放在当晚。<strong>Lv12 改成 4 / 6 / 6</strong>（用户批，庚1；v4 2.3 原 5 / 6 / 6，校准与复核：Lv12 准时率约 72% → 94%；Lv13 照 v4）。</p>
+<p>④ <strong>出门门槛</strong>（Lv16 起）：城市签章数（只算城市，不算野外地点）和「去过 N 个别的气候带」。「去过」= 在那个气候带的城市或野外地点有过一次到达记录。签章照旧每天首访最多计 2 枚（§11.9.4）。</p>
+<p>⑤ <strong>田</strong>：开局 8 块，Lv1–15 每级 +2（Lv15 36 块），Lv16 39、Lv17 41（Lv16 起交替 +3 / +2）。只算一年生作物；果树、洒水器不占田数。<strong>新号的起步田重排成整齐的网格</strong>（现在新档是 20 块熟地 + 10 块荒地、前 8 块不成形；一键收获、温室、洒水器都按网格算）。格子领地放第二批，本条不改领地。
+<strong>第一批的田网格</strong>（不知火舞、哪吒定：pm/plans/355-b1-field-grid-proposal.md，示意图同目录 355-b1-field-grid-draft.png；第二批做格子领地时整个重做；63 格「一格不富余」，第二批开到 Lv19 要田 46 + 果树 10 + 洒水器 12 = 68 格，所以<strong>第二批的 Lv18–19 和格子领地同批上</strong>（或在它之后）：
+- <strong>网格 9 列 × 7 行 = 63 格</strong>：田块落在 x 2、4 … 18 × y −1、1 … 11，格距照旧（田和田之间隔一格走道，玩家站在走道上干活），全在现有围栏和走路范围里（q(145) x 1–18、y −2–18），不扩院子；出生点 (9, −1)、出口 (9, −2) 在 x 9 走道列上，不挪。比现在 48 格多出的是最左一列 x 2（芦苇岸、黏土岸、老树随 v4q(4) 搬出后空出）和最前一行 y −1。63 = Lv17 的田 41 + 果树 10 + 洒水器 12，一格不富余。
+- <strong>起始 8 块</strong>：2 × 4，正对农舍门（x 8–14 × y 9–11）。<strong>开的顺序</strong>：从农舍往外一行一行开（y 11 → 9 → 7 → 5 → 3 …），同一行先开中间 x 8–14，再按 x 16、6、18、4、2 往两边。Lv5 到 16 块（y 11 整行 + y 9 的 7 块）、Lv10 到 26、Lv15 到 36（y 5–11 四整行）、Lv17 到 41（再加 y 3 中间 5 块）。
+- <strong>新开的田直接是熟地</strong>，升级那一刻（HOME-2）冒出来，不用 Till<strong>〔用户已定，按推荐〕</strong>：v4 没写；现行 Lv3 / Lv7 扩田是荒地（q(59)、q(172) ①）；不知火舞、哪吒推荐熟地。定成荒地的话，v4q(4) ⑥ 引导里 Four Radishes 的「Lv2 再加 2 块，引导结束时正好 4 块能种」要多一步 Till。没开的格画成草地，不能走上去、不能种。
+- <strong>果树、洒水器不占田数</strong>（v4 2.5 原意，不另请用户定）：开出的格子 = 田数 + 已摆的果树和洒水器数。果树、洒水器摆在任何一块已开的空田上，摆下后按顺序再开下一格；拆掉时那一格变回空田，最后开的那一格如果空着就收回成草地，不空就留着。种一年生作物的上限按田数卡；<strong>田满了还想种</strong>（<code>plots_full</code>）照 q(130) ① 的满额写法：灰键只写计数 <code>Plots 8/8</code>，点了出 Info toast <code>Plots 8/8 · Homestead Lv2 adds 2</code>；封顶时灰键和 toast 都只写 <code>Plots 41/41</code>。取代 q(118) ①「树站在田上、占田」的算法（树仍站在田格上、不可通行）。
+- <strong>温室</strong>：规则照旧（盖在 4 × 4 块田上，16 格都要是已开的田、里面不能有果树和洒水器，q(118) ②）。按上面的顺序，不摆果树、洒水器时 Lv13 起放得下第一座（x 8–14 × y 5–11），Lv15 起放得下两座（如 x 2–8 和 x 10–16，都是 y 5–11）；这两个等级只供参考、不是门槛（先摆了树和洒水器，格子会开得早），界面上不写。放置态照 q(130) ④ 不变（小标 <code>Greenhouse · 4×4</code>，放不下一律 <code>Needs 4×4 clear plots</code>、冲突格染红）；只加一种情况：整个院子还没开出完整的 4 × 4 田时，进放置态出 Info toast <code>More plots open as your Homestead grows</code>（不写等级；第一座、第二座同一套）。
+- <strong>Harvest All</strong> 照旧收脚下那一行（q(118) ④），一行最多 9 格。
+- <strong>柱子</strong>照 q(140)（占走道交叉格）原样平移，代码不改。<strong>摆件禁放区</strong>（shops_decor.json 的 <code>decor.yard</code>）：<code>field</code> [3, 2, 17, 11] → [1, −2, 19, 15]（包住 63 格田和走道，前围栏行 y 13 之后不变）；<code>objects</code> 里 6 个农场采集点和矿口删掉（随 v4q(4)、v4q(5) 搬出），其余摆设都在走道上；入口路 <code>paths</code> [9, −2, 2, 4] 只留 x 9 一列（x 10 成了田），取代 q(120) / q(172) ③ 出口路禁放 x 9–10 的那句。
+- <strong>摆件上限</strong><strong>〔用户已定，按推荐〕</strong>（改 q(113) 的数）：禁放区扩到 [1, −2, 19, 15]、矿口随 v4q(5) 拆掉以后（周瑜 #629 13dd572f），院子能摆 1 × 1 的格子是 60 个，长椅前留两格路径格 (6, 15)、(7, 15) 接到牌匾那一格（只留一格会被四面的装饰围住、走不进去，周瑜实算），往这两格放东西被拒时写 <code>Keep the path clear</code>（q(120) 现有句），实际能摆 58 个。原公式 20 + 4 ×（Lv − 1）到 Lv10 是 56、Lv11 是 60，摆满就没有走道。推荐改成 min(20 + 4 ×（Lv − 1），52)：Lv9 到 52 封顶，摆满时还空 6 格当走道，水井、驿站棚、信箱、工作台前面都走得到（封 56 只剩 3 格，太挤）；到顶写法照 q(113) <code>Decor 52/52 · Store one to place this</code>（原 Lv10 封顶 56）；上限数的是件数，2 × 1 等大件占的格更多，放不下时照现有 <code>Space taken</code> 提示；第二批格子领地再放开。（不知火舞、哪吒、周瑜提）
+- <strong>镜头</strong>（不知火舞看过哪吒桌面实拍定，355 17cbb699）：进农场的开场镜头框住所有已开的田、农舍门和人物（引导期间加上 Pip），左右各留 16 px，放不下就拉远，最远到整座岛加一圈边；人一走动就回到默认跟随镜头，跟随镜头不变。引导期间新号第一次进农场，人落在起始田前的走道上，Pip 站在田边；平时进门的出生点 (9, −1) 不变。这条不出 Figma 帧。</p>
+<p>⑥ <strong>升级回体力</strong>：Lv2–15 每升一级回 50 体力（只补到上限）；Lv16 起不回（内容表里 Lv16–17 写 <code>energy: 0</code>）。取代现行 Lv2–4 回 40、Lv5–10 回满（q(246)、§3.4.8）。</p>
+<p>⑦ <strong>体力池和每日饭量上限</strong>：Lv1–10 = 200 + 10 ×（Lv − 1），Lv11 起每级 +5（Lv10 290、Lv17 325）。饭量上限用同一个公式（现在两处各算一份，一起改）。</p>
+<p>⑧ <strong>每级的新东西</strong>（把现有的解锁重新铺到 17 级，保证每级都有一样新东西；〔 〕里是之后的批次）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Lv</th>
+<th>新东西</th>
+<th>田</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>工作台、Basic Room、土灶 1 口</td>
+<td>8</td>
+</tr>
+<tr>
+<td>2</td>
+<td>调味架；引导带你去城里采集点（采集点 Lv1 起就能用，Lv2 的材料就从这里来，v4q(4)；v4 原写在 Lv2，<strong>〔用户已定，按推荐〕</strong>，诸葛亮冲突清单第 2 节第 1 条）</td>
+<td>10</td>
+</tr>
+<tr>
+<td>3</td>
+<td>背包扩容 I（30 格）、保温柜 6 份、委托板第 3 槽、外观阶段 1（篱笆与信箱）；Pip「第一次下矿」委托（奖励铜剑，第一次换武器；木剑开局就装着，v4q(7) ① <strong>〔用户已定，按推荐〕</strong>）</td>
+<td>12</td>
+</tr>
+<tr>
+<td>4</td>
+<td>第二口灶；驿站上架回血药（v4q(7)）〔第二批：熔炉 T1〕</td>
+<td>14</td>
+</tr>
+<tr>
+<td>5</td>
+<td>外观阶段 2（门廊 · Standard Room）；布告栏（世界动态以后在这里）</td>
+<td>16</td>
+</tr>
+<tr>
+<td>6</td>
+<td>大锅（一锅双份）〔第二批：药剂台 T1〕</td>
+<td>18</td>
+</tr>
+<tr>
+<td>7</td>
+<td>背包扩容 II（35 格）；果树 8 / 洒水器 10 上限</td>
+<td>20</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>进 T2</strong>：工作台可做铁剑（v4q(7)）；外观阶段 3（灶房扩建）· 第三口灶。矿脉从哪一级能去见 v4q(5) ②（<strong>〔用户已定，按推荐〕</strong>：推荐开局就能去，否则 Lv8 卡死——Lv8 要铁、石英只有矿脉出）</td>
+<td>22</td>
+</tr>
+<tr>
+<td>9</td>
+<td>保温柜 12 份、摊位升级〔第二批：织布机 T2〕</td>
+<td>24</td>
+</tr>
+<tr>
+<td>10</td>
+<td>名厨招牌 Chef's Sign</td>
+<td>26</td>
+</tr>
+<tr>
+<td>11</td>
+<td>背包扩容 III（40 格）</td>
+<td>28</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Deluxe Room〔第二批：展示馆一厅〕</td>
+<td>30</td>
+</tr>
+<tr>
+<td>13</td>
+<td>新摆件一批</td>
+<td>32</td>
+</tr>
+<tr>
+<td>14</td>
+<td>新摆件一批；果树 10 / 洒水器 12 上限</td>
+<td>34</td>
+</tr>
+<tr>
+<td>15</td>
+<td>外观阶段 4（大师农舍）；称号 Homestead Master（从 Lv10 挪到 Lv15；三项技能的称号仍在技能 Lv10）</td>
+<td>36</td>
+</tr>
+<tr>
+<td>16</td>
+<td>背包扩容 IV（45 格）；出门门槛开始</td>
+<td>39</td>
+</tr>
+<tr>
+<td>17</td>
+<td>第四口灶</td>
+<td>41</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>去掉的解锁：现行 Lv2 黏土岸（<code>clay_bank</code>）、Lv3 老树（<code>old_tree</code>）随农场采集点搬出一起去掉（v4q(4)）；Lv3 / Lv7 的「田 40 / 48」不再是解锁，改成每级加田（⑤）；长途票、Trip 7 资格是 P2，上线前不显示。</li>
+<li>外观阶段 3 / 5 / 8 / 10 → 3 / 5 / 8 / 15。</li>
+<li><strong>背包扩容的材料</strong>：I–III 照现行材料挪到新等级（I Lv3：芦苇 10、木材 6；II Lv7：硬木 4、黏土 6、铜矿石 4；III Lv11：硬木 8、石英 4、铜矿石 8）；IV（Lv16，新）初值硬木 10、亚麻 8、铁矿石 4。都待模拟器校准（IV 叠在 Lv16 升级的硬木 13、亚麻 9、铁 4 上，Lv16 那几天硬木约 23 件，校准时算进去）。城里的硬木、亚麻采集点不按 Homestead 等级开（Lv7 的 II、Lv8 的升级都要硬木）。</li>
+<li><strong>摆件</strong>：摆件商店现有 11 个门槛（7 件 Lv1、Recipe Stand Lv1、Windmill Lv3、Fountain Lv5、Pergola Lv8）第一批照现行不动（v4 2.7 要「按新等级重排」，第一批先取现行这个默认，报批时提一句）。Lv13、Lv14 的「新摆件一批」要新做美术和内容，<strong>第一批不做</strong>，这两级的新东西就是田 +2 和（Lv14）果树 / 洒水器上限——<strong>〔用户已定，按推荐〕</strong>（v4 2.7 要每级都有一样新东西）。</li>
+<li><strong>背包扩容价格降</strong>：I 60、II 150、III 300、IV 600 金币（现价 150 / 400 / 1,000）。</li>
+<li>依赖还没实现的 P2 功能（密友、帮工、长途票、Trip 7 资格）的后果，在那个功能上线前不显示。</li>
+<li><strong>名字一律沿用现有英文</strong>，不另起：<code>Spice Rack</code>、<code>Warming Cabinet</code>、<code>Stall Board · 3rd slot</code>、<code>Bag Upgrade I</code>、<code>Second Stove</code>（<code>Third Stove</code> / <code>Fourth Stove</code> 同一格式）、<code>Big Pot</code>、<code>Chef's Sign</code>、<code>Notice Board</code>、外观阶段 <code>Fence &amp; Mailbox</code> / <code>Porch</code> / <code>Kitchen Wing</code> / <code>Master Farmhouse</code>（q(112)）、<code>Basic Room</code> / <code>Standard Room</code> / <code>Deluxe Room</code>。Lv9 的「摊位升级」（<code>stall_upgrade</code>）现行没有英文行：摊位还是临时木箱、没有升级外观，升级面板和横幅都不写它（不知火舞 282）；第一批照旧不写，等摊位模型再定名（Lv9 仍有 <code>Warming Cabinet · keeps 12 dishes</code>）。回血药的名字归 v4q(7)。</li>
+</ul>
+<p>⑨ <strong>第一周</strong>（30 分钟玩家）：第 1 天首会话到 Lv3、当晚 Lv4，之后每天一级，第 7 天 Lv10；取代旧方案第 14 章的七日节奏表（q(248)）。首会话到 Lv3 的前提：家城木材、石料各 3 个采集点（v4q(4) ②）和 Lv3 门槛 1 / 1（③）。<strong>用户批的方向（庚5）</strong>：矿脉开局就能去（丁12，v4q(5) ②），<strong>第 3、4 天各开一座矿脉</strong>（铁矿脉、石英矿脉各从 F1 走到 F10，开出电梯站），<strong>第一只守关挪到第 2 天或第 5 天</strong>；Today / Pip 带人去矿脉的提示见 v4q(9)；改完按「照表走的玩家」再跑一次校准，再定逐日表（v4 2.8 按本条读）——<strong>校准已跑，逐日表和第一只守关见 v4q(10)</strong>。</p>
+<p>⑩ <strong>存档</strong>：等级表跟着清档上线（v4q(2)，存档 v7），不做老号迁移。</p>
+<p>⑪ <strong>上线</strong>：A–H 可以分开批，但同一个版本上线、带最低版本（v4 方案 10.2）；D 和 A 同批合。</p>
+<p><strong>改哪</strong>：v4 方案第 2 章 2.3–2.8 按本条读；旧方案按诸葛亮冲突清单第 3 节 A 组逐条（已加注，9805c9a7），另含 §3.1.1、§3.1.3、§4.7.4、§4.8.1 / 4.8.6 / 4.8.7、§7.0 / 7.7、§8.0、§8.4、§10.4.3、§13.5.1 / 13.5.2、§14.1.2、§14.5、§16.3 HOME-1 / HOME-2 / BAG-5 / COOK-1；旧方案第 8 章（8.1 升级规则、8.2 十级消耗表、8.3 每级后果、8.5 到达天数、8.6 升级面板）、§3.1.2、§3.4.8（升级回满）、§13.0（九级合计）、第 14 章七日节奏表与 14.6.1 金币流水，以本条为准。</p>
+<p><strong>推翻</strong>：q(246)（Lv2–4 降门槛与回 40 体力、Lv5 技能和）、q(263)（355 方案 A 的 Lv5–10 过渡数）、q(172)（Lv7 田 40 → 48）与 q(118) ⑦ 的田数、q(248)（七日表按 q(246) 读）；q(255) ①（「到 Lv3 为止、Lv4 起不出」）和 ④（「只缺技能时不出」）（用户定，丁5，见画面）、q(255) ②（Show 指农场采集点 / 矿口，改指城里采集点和野外浅坑 / 矿脉，交 v4q(4) / v4q(5)）；q(14)（室内三档 Lv1 / 5 / 10 → Deluxe Lv12）；q(101) 末句「升级回满不变」；q(247) ③④、q(249) ②（横幅和页脚的「Lv5 起 fills Energy」）；q(59)、q(118) ①④、q(172) ③、q(120) 出口路禁放 x 9–10（田网格，见 ⑤；q(118) ② 温室规则、q(130) ①④ 满额和放置态写法不变，按本条读）；q(113) ① 摆件上限 Lv10 封顶 56 → Lv9 封顶 52（用户定，丁22，见 ⑤）；q(253) ②、q(115) ②、q(112) / q(24) 的 Lv10 外观阶段、q(110) ⑥、q(113) ①、q(174) ②④、q(179) / q(180) 的 Lv10 称号卡、q(194) ①、q(200) ③、q(202) ①、q(216) ④ 按本条读；旧方案第 8 章的技能和门槛、「升级回满」。HOME-1 不是锁定组件；技能拆成三格只换 NEED-TILE 的内容、缺口照旧写在按钮上，<strong>LOCK-10 不变</strong>，不用复议。197 记说明两项：<strong>LOCK-12</strong> 背包容量「30 / 35 / 40」加 IV 45；<strong>LOCK-33</strong> 末注 Deluxe Room Lv10 → Lv12。其余以诸葛亮冲突清单第 3 节 A 组为准。</p>
+<p><strong>画面</strong>（不知火舞定；安其拉出稿，不知火舞验收：P1 355 65079ece——改前 Q355-A-BEFORE 310:179618（现行 HOME-1）、A1 Lv8 → 9 310:179667 / 310:180610、A2 Lv16 → 17 311:180478 / 311:180957（金币格分母按 q(10) 改过，355 102d5f08）；P2 355 最新——A4 满级 352:185656、A3a 技能来源句 352:185811、A3b 签章来源句 352:185862、A3c 五句一览 352:186395（第三版 355 48dedfd0：放不下的三句在「 · 」处折行、圆点去掉）；清单 355 f45b01de）：</p>
+<ul>
+<li><strong>Needs</strong>：材料 + Coins 一组；技能另起一行，三格 NEED-TILE <code>Farming 4/4</code>、<code>Fishing 4/5</code>、<code>Cooking 4/4</code>，带技能图标，取代单格 <code>Skills 13/5</code>；Lv6 前 Cooking 没有门槛，只出两格。Lv16 起再起一行出门门槛：<code>Stamps 5/8</code>、<code>Climates 1/2</code>（「去过 N 个别的气候带」）。</li>
+<li><strong>按钮写第一个缺口</strong>，顺序：技能（Farming → Fishing → Cooking）→ 出门（签章 → 气候带）→ 材料 → 金币，和服务端拒绝码（哪吒契约）、拒绝时的 toast、Today 行同一个顺序（新加的技能、签章门槛容易看漏，先说；材料格本身有琥珀环）；写法 <code>Need 6 more Timber</code>（现行）、<code>Need Fishing Lv5</code>、<code>Need 3 more stamps</code>、<code>Need 1 more climate</code>。</li>
+<li><strong>点格子</strong>弹现有的来源一句（UiNeedSource）：<code>Farming Lv4 · Sow and harvest to level up</code>、<code>Fishing Lv5 · Catch fish to level up</code>、<code>Cooking Lv4 · Cook dishes to level up</code>、<code>Stamps · First visit to a city · up to 2 a day</code>、<code>Climates · Visit a city or wild site in another climate</code>；技能格另带 <code>Show</code>（打开那项技能页）。来源句一行放不下时照 q(103) 在「 · 」处折行、<strong>圆点去掉</strong>（<code>UiKit.break_at_dot</code>，#188），不缩短文案：如 <code>Farming Lv4</code> / <code>Sow and harvest to level up</code>。</li>
+<li><strong>What changes</strong> 恢复田数那一行 <code>Plots 24 · now 22</code>（P0 田固定时不列，q(33)；现在每级都变）；体力那一行照旧 <code>Max Energy 280 · Meals 280 a day · now 270</code>。</li>
+<li><strong>底注</strong>照 q(249)：只补一部分体力，所以底注一律只写 <code>Upgrading is free of Energy</code>，实际 +50 写在升级横幅上、写实得；Lv16 起不回体力，横幅也不写。</li>
+<li><strong>Lv17 封顶</strong>：标题下一行用现有的 <code>Highest level for now</code>（中性灰，q(46) 的封顶写法），不用 <code>Max level · Homestead Master</code>（Master 挪到 Lv15，上限以后还会开）；旧方案 §16.3 HOME-1 表里写的 10 级阶梯缩略，现行界面没做，第一批也不做；满级面板照现行满级帧（9:128426）的结构：<code>Homestead Lv17</code> / <code>Highest level for now</code> / Looks / Decorate / Close（帧 A4，不知火舞定）。</li>
+<li><strong>Today 行</strong>每级都出、<strong>只缺技能时也出</strong>，同一项技能的那行技能就不再出（去重），Homestead 行仍是一次只出一行、排序照 q(255) ⑥（推翻 q(255) ① ④；<strong>〔用户已定，按推荐〕</strong>，诸葛亮冲突清单第 2 节第 17 条），沿用 <code>Homestead Lv2 · Timber 6 to go</code> 的格式：技能不够 <code>Homestead Lv9 · Fishing Lv5 needed</code>；签章 <code>Homestead Lv17 · 3 stamps to go</code>；气候带 <code>Homestead Lv17 · 1 climate to go</code>。</li>
+</ul>
+<p><strong>实现</strong>：内容 <code>p0_content.json</code>（homestead、start、bag_upgrades）、<code>homestead_looks.json</code>、<code>farm_garden.json</code>、<code>shops_decor.json</code>、<code>requests_p1.json</code> 的门槛；服务端 homestead.ts、rules.ts（体力池和饭量同一公式）、view.ts、titles.ts（拆 <code>TITLE_LEVEL</code>：Homestead Master 15、技能称号仍 10）、garden.ts（果树 / 洒水器上限 Lv7 8 / 10、Lv14 10 / 12）、state.ts；<strong>灶上限 <code>MAX_STOVES</code> 3 → 4</strong>（Lv17 第四口灶，厨房场景加第四口灶的位置）；客户端升级面板、<code>P1_UNLOCKS</code>、<code>home_moment</code>、<code>MAX_LEVEL</code>、称号、田网格（没开的格画草地）。<strong>田 id 按 ⑤ 的开出顺序重新编号 0–62</strong>，<code>garden.plots</code> 按这个顺序写坐标，代码不写死 48；随清档上线，不迁移。view 字段和拒绝码（<code>skills_short</code> / <code>travel_short</code>、<code>next.skills</code> / <code>next.travel</code> / <code>next.energy_gain</code> / <code>next.plots</code>）按哪吒的契约 pm/plans/355-b1-A-view-contract.md；契约里 Lv2 的 <code>city_gather</code> 只做展示、不当门槛（采集点 Lv1 起能用）；Lv8 的 <code>vein_mines</code> 当不当门槛按 v4q(5) ② 用户定的来（选 A 不当门槛；周瑜接口数据现在默认 <code>gate.homestead: 8</code> 是 B，选 A 要改）。签章门槛数 <code>counted_on ≤ 今天</code> 的、不含家城。奕星排。</p>
+<h2 id="h-e1efbeee">v4q(2) 【规则】清档上线：存档 v7 以下一律清（部署 v7 即清档），不迁移、不补偿；维护中提最低版本、单独备份、两档回退；同时清设备本地的「已看过」</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）——<strong>用户已明确点头「v4q 2 ok」</strong>（第 20 条：测试期可以清档）；执行前约好窗口、<strong>再找用户确认一次</strong>。用户 2026-11-02「全按建议」定 355 v4（结论 20、53）；v4 方案第 2 章 2.9、第 9 章 9.1 第 13 行、第 10 章 10.2 的 B 行；诸葛亮冲突清单第 3 节 B 组。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：第一批改了等级表、田、矿、采集、引导，存档结构从 v6 升到 v7。现在所有玩家都是免费删档测试的测试玩家（第 53 条），给老号做迁移和补偿成本高、意义小。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>清档，不迁移、不补偿</strong>：第一批上线时清空全部玩家存档，<strong>存档版本 7 以下一律清</strong>（线上现在是 v5，0.2.19 / 0.2.20 部署后是 v6）；玩家第一次读档时按请求头建新档（新号进新手引导）。<strong>部署 v7 服务端本身就是清档</strong>（亚瑟 #611：读档时 v7 以下的档不加载、下次读档建新档，原文件自动另存成同一数据卷里的 <code>p0-state.json.v&lt;最低版本&gt;.bak</code>——这份<strong>不算备份</strong>，备份见 ④）。所以 b1 合回 farm-dev 以后，任何一次部署都会清档。旧存档的 <code>guide = legacy</code>、q(270) 的集市板归家城等迁移分支，清档后不会再碰到（只留作历史）。归档只用于整体回退和查询：能按玩家 id 取出单人的旧档来查，但没有迁移、放不回 v7（和「不补偿」一致）。</p>
+<p>② <strong>执行顺序</strong>（不用 q(256) ⑥「新包上架 → 部署 → 提最低版本」：那是新旧互相兼容时的做法，这次中间会有空档——v7 部署后、最低版本提上去前，0.2.19 / 0.2.20 会连进 v7、按旧客户端的请求头建出新档；新包先放出去又会连上 v6 服）：
+1. 新包两端传好、<strong>不发链接</strong>（安卓上 oss2，iOS TestFlight 显示 VALID）；镜像传输和 config 核对提前一天做完。
+2. 开维护（<code>maint-on</code>，带 back_at）。
+3. 停服。
+4. 单独备份并核对（④）；记下数据卷里已有哪些 <code>.bak</code>（#611 每次都另存一份，重名加时间戳，复制失败就不启动）。
+5. 部署 v7。<strong>不换数据卷</strong>（gate.json 存着最低版本和维护状态，换卷最低版本会丢）。
+6. <strong>维护还开着时就设好 min_version 和 update_url</strong>（gate 先判更新、再判维护，旧包直接看到更新卡）。号码规则同 0.2.18：新安卓 versionCode、新 iOS 号都 ≥ min_version，min_version 大于两个平台所有旧包的号。
+7. <code>verify-internal</code>、看启动日志（<code>cleared</code> 数 = 旧号数）。
+8. 关维护（<code>maint-off</code>），马上公网冒烟：新包能建新号、进引导、出选家城；旧版本号回 426 和说明页链接；另测一条不带新特性标记的请求，回更新提示。<code>smoke.sh</code>、写盘压测和 devserver 复演工具都要带上新标记（它们现在不带 <code>x-p0-features</code>，不带就会被第二道兜底挡住）。冒烟号 <code>smoke-*</code> 记进 release-log。
+9. 冒烟过了再发链接（Joey 等外部测试者由用户点名发，手册 3.5 第 6 条）。
+- 窗口按约 60 分钟约，迁移方（美西备份、compose、Caddy 归他们）在场。
+- <strong>两道兜底</strong>：新客户端读到的服务端不是 v7（view 没有 <code>save_version</code>，或者 <code>save_version &lt; 7</code>；#611 加的字段）时显示维护卡、不照常画界面——兜住第 2 步之前和回退之后（也接住 TestFlight 内部组提前自动装上新包的人），客户端亚瑟做；v7 服务端收到不带新特性标记（<code>x-p0-features</code> 加一个新值）的请求<strong>一律</strong>回更新提示（照 gate 的格式回 426 <code>update_required</code> 带 url，旧包才认得出是更新卡），不只是不建档——挡住不带版本号的桌面包和测试包（测试号 <code>g3test-*</code> 在不同包之间共用，只挡建档的话旧桌面包还能读写 v7 档），服务端后裔做。
+- <strong>常驻部署授权暂停</strong>：b1 合回 farm-dev 以后，farm-dev 的服务端部署不再适用「复演通过即可部署」（手册 3.5）；0.2.x 的热修从 release 分支出，或者把合回推迟到发版当天（技术方案写 M4 11-29 合回、发版约 12-01）。
+- 手机上已经排好的「作物熟了」本地通知，旧包被 426 挡住后取消不了，清档后可能还响一次：接受，写进说明页。</p>
+<p>③ <strong>回退手册</strong>（上线前写好，在 devserver 用线上只读副本演练一次、留记录）。<strong>只撤最低版本退不回去</strong>：gate 只有下限，装了新包的人照样连旧服；安卓新包不能覆盖装回旧包，卸载重装会清掉本机玩家 id、大概率对不上旧档（iOS 可以在 TestFlight 里选回旧 build）。所以分两档：
+- <strong>关维护之前发现问题</strong>：整体回退，几乎不影响玩家。
+- <strong>开服以后</strong>：默认往前修（热修服务端）；整体回退只作最后手段，代价写明——清档后新建的号全丢；装了新包的人靠维护卡兜底，或卸载重装。
+- 手册要写全：触发条件和决策人（奕星和用户）；事先记下旧镜像 tag 与 config 摘要、旧 min_version 与 update_url、gate.json 副本、备份文件名 / 位置 / sha256、迁移方联系人、私钥在哪；步骤（开维护 → 停 v7 → 当前 v7 文件另存 → 恢复旧档并核 sha256，<strong>必须在旧镜像起服前换好文件</strong> → 起旧镜像（<code>--expect-config</code>）→ min_version 改回 → 冒烟、抽 3 个旧号核金币和等级 → 关维护 → 请迁移方同步版本响应头）；对外怎么说；回退后 <code>_check_account</code> 会再清一次本机记录，玩家再看一遍教学卡，接受；记 release-log 和发版卡。</p>
+<p>④ <strong>备份</strong>：清档前单独打一份，<strong>只放 <code>p0-state.json</code> 和 <code>gate.json</code>，不放 events/</strong>（带玩家 IP，10-28 定的日志 30 天、备份最长约 60 天）。存两处：迁移方美西 OSS 的独立前缀（不设过期，或请迁移方书面确认保留到哪天），以及 devserver 一份（age 加密，走每版复演拉只读副本的通道；这是一次性拉取，请用户认可，<strong>不等于批了 C42 ①</strong>（C42 ① 是每天拉，11-01 发出至今没回）；用户不认可时，第二份改放用户 Mac 上的 age 加密副本）。两处的 sha256 和线上文件一致。<strong>至少保留到第一批上线后 30 天；之后什么时候删由用户定，奕星执行。</strong>上线前从异地备份解密恢复一次，确认私钥可用。现有的夜间备份 30 天过期、每小时快照和 <code>.bak</code> 都在同一个卷 / 同一个账号里，都不算这份。</p>
+<p>⑤ <strong>同时清设备本地的「已看过」</strong>：口径一句话——<strong>跟存档进度有关的本机记录一律清，只跟设备有关的不清</strong>（不知火舞）。客户端发现是新档时（沿用现成的 <code>_check_account</code>：<code>view.profile.since_ms</code> 变了就清）一起重置：教学卡、Today 红点已看（q(107)）、图鉴新鱼光圈 <code>dex_seen</code>、驿站棚 <code>stall_seen</code>、快捷栏钉住 / 已移除记录（这几样 <code>_check_account</code> 现在就清）；<strong>新代码只补两样</strong>：通知软提示「已问过」（<code>p0_notify.json</code> 的 <code>asked</code>，q(235) ③、q(236) ④、q(237) ③），和每口灶的大锅状态（<strong>〔用户已定，按推荐〕</strong>，推荐清：灶数和大锅解锁都从头来，不清的话新档升到 Lv6 时以前切过大锅的灶直接是大锅、一锅扣两份料；只删 <code>p0_ui.cfg</code> 里本玩家 <code>[big_pot]</code> 那一项，<strong>不删整个文件</strong>——背包排序也存在里面）。<strong>不清</strong>：通知开关选择（<code>choice</code>：清了的话安卓 13 以上会把玩家关掉的作物通知重新打开，12 以下反过来变成关）、背包排序、语言、系统通知权限本身；以后有了音量、「更新说明已看到哪个版本」这类本机记录也不清。牌室首开说明卡（q(240)）存在存档里（<code>bj.intro</code>），服务端清档时自动清。</p>
+<p>⑥ <strong>服务端存储</strong>：上线前按 1,000 人测一次写盘耗时（现在每条命令整文件重写全服存档），通过线（单条命令写盘耗时、1,000 人时文件大小）由后裔测之前定、奕星认可；不过线时由后裔决定分文件写还是延迟合并写。采集冷却过期即删、矿层状态日切（v4q(4)、v4q(5)），不让存档只涨不降。<code>tools/p0_migration_check.ts</code> 跟着 v7 改（现在会把清掉的档算成迁移数）。</p>
+<p>⑦ <strong>以后每次删档</strong>，测试期的首杀等记录一起清零（第 53 条；第一批只有个人击杀记录，全服首杀第二批才有）。</p>
+<p>⑧ <strong>上线前要齐的授权</strong>（一次问齐，写进 <code>pm/demo-&lt;版本&gt;/auth-&lt;版本&gt;.md</code>）：用户对本条明确点头，执行前再确认一次窗口；大锅清不清随本条定；部署 v7 服务端单独批（改存档格式且清档，不在「复演通过即可部署」范围内），并告诉用户 b1 合回后常驻部署授权暂停；提最低版本（写明新安卓 versionCode、新 iOS 号、min_version、update_url 说明页）；说明页和 TestFlight 测试说明加一句「测试期清档，进度从头开始」（文案先过不知火舞，说明页沿不沿用 C38 B 的 oss2 授权要确认）；停服窗口的时间、时长、back_at 和迁移方在场；发 Joey 的时间点（提前说清档、要更新、新引导；发版后再发链接）；备份两处和保留期（④）；DMIT 跳板 11-18 到期，11-15 前确认已续费；Plane 381 标【已批】、发版卡 232 写窗口和回退决策人、release-log 记 <code>cleared</code> 数和 <code>.bak</code> 的 sha256。<strong>演练</strong>（蒙恬在 devserver 用线上只读副本，第 4 周）：起 v7 核 <code>cleared</code> 数、<code>.bak</code> sha256、gate.json 和 min_version 没变；新包建新档 / 进引导 / 出选家城，旧包回 426，不带版本号的请求照实记下；有旧进度的手机装新包，核本机记录该清的清了、背包排序和语言还在；每步计时定窗口；回退演练（③ 的步骤，含新包连旧服时维护卡兜底）；写盘测试过线（⑥）；异地备份解密恢复一次。</p>
+<p><strong>改哪</strong>：v4 方案第 2 章 2.9 按本条读；旧方案 §10.3.3、§10.6.4 ④、§14.1.2、§14.3「谁进引导」与「7 句教学卡」、通知权限、§9.5.3「芯片与红点」以本条为准；§9.18.5、§11.1.1、§17.0 第 4 条不冲突，保留。</p>
+<p><strong>推翻</strong>：q(107)、q(235) ③、q(236) ④、q(237) ③ 里「已看过 / 已问过存本机、重装或换机才回到没问过」加一条：清档时一并重置（通知只重置「已问过」，开关选择不动）。选清大锅时 q(201) ⑥ 加一句「清档时也回到普通锅」。q(256) ⑥ 的上线顺序这次不用（见 ②）。q(228)（老存档写 legacy）、q(270) ⑤（旧集市板归家城）清档后碰不到，保留作历史。</p>
+<p><strong>画面</strong>：无（玩家看到的就是新号进引导）。</p>
+<p><strong>实现</strong>（照亚瑟技术方案 4.2）：清档逻辑（#611 store）、<code>save_version</code>、第二道兜底（不带新标记一律 426）、回退手册、写盘测试（后裔）；devserver 彩排、维护与最低版本操作（蒙恬，第 4 周）；窗口内即时备份（迁移方在场）；客户端 <code>_check_account</code> 补 <code>asked</code> 和大锅（各功能负责人）、读到非 v7 服务端显示维护卡（亚瑟）。执行窗口奕星和用户约。</p>
+<h2 id="h-2dcc7cd3">v4q(3) 【规则】【界面】野外地点：全球一次生成、冻结目录，第一批开放浅坑和矿脉；地图图钉、地点卡、能飞过去；最近 3 个永远免费</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。用户 2026-11-02「全按建议」定 355 v4（结论 3、9、10、15、29、30、34、36）；v4 方案第 1 章 1.2–1.5、第 4 章 4.3、第 9 章 9.1 第 2–4 行、第 10 章 10.2 的 C 行。合并顺序 C → E → F / G（v4 10.2），本条是第一批的关键路径起点（陆地掩膜 → 野外地点 → 旅行 → 矿口 → 新怪）。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：现在世界只有城市簇和城里的据点、鱼塘；矿在家（农场矿口），没有「城外的地方」。v4 把矿和高档材料搬到城外的野外地点（家城没有矿，第 10 条），第一批就要有野外地点能看、能去。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>目录一次生成、冻结</strong>：野外地点按陆地掩膜上的全球格点生成（0.5° 一格，离每个城市中心的下限见 ③a，约 5.4–5.8 万个点），第一批生成时就把所有类型的配额一次分好——浅坑、矿脉、晶洞、深渊、遗迹、林地 / 草甸、水边钓点、盛放花田——冻结成目录（同鱼塘目录的冻结做法），<strong>只增不删</strong>（每座矿各记进度，删了进度就丢）。分布约束按 v4 方案 3.3「多常见」列，相对城市离线一次算完。矿脉第一批只分铁、石英两种主矿；当地 T3 金属的矿脉 2 期用新点，不改已有的矿。<strong>不生成点的地方</strong>：南极（按纬度）；关闭的国家（读 <code>travel.closed_countries</code>，现在是朝鲜）；<strong>格陵兰整片不生成</strong>（<strong>〔用户已定，按推荐〕</strong>，推荐排除：目录里 836 个点几乎都在冰盖上，没人能在那儿「挖矿」；家城在格陵兰的号照 ③ 换入不限距离，最近 3 个照样有）。别处的永久冰雪（高山冰川等）第一批不单独排除（后裔按 Natural Earth 冰川范围数过，只有 229 个点，多在中国、智利、印度）。每个点带国家码。</p>
+<p>② <strong>第一批开放的类型</strong>：浅坑、矿脉（矿里的规则见 v4q(5)）。其余类型在目录里占位；未开放的<strong>矿型</strong>（晶洞、深渊、遗迹）上地图、卡写 <code>Not open yet</code>（见 ⑤），林地、钓点、花田第一批不上地图。</p>
+<p>③ <strong>最近 3 个野外地点永远免费</strong>：<strong>按家城基点</strong>算出离家最近的 3 个，选家城和改家城时冻结（同已批 q(184) 的城市兜底；v4 1.5 写「建档时按农场点」，可建档时还没选城、新号的点都会落在旧金山附近、改家城后还留着——按 q(184) 写，诸葛亮清单第 2 节第 3 条同此，随本条报），其中<strong>浅坑、铁矿脉、石英矿脉各一座</strong>（用户批，庚3；v4 1.5 原写「至少 1 座浅坑、1 座矿脉」——Lv8 起每级同时要铁和石英，原写法下 13 座家城里 6 座第一周要为第二种矿脉付路费），不够就把最近的那种换进来（换掉同类型有重复的那个里最远的，不限距离），保证第一周去两种矿脉都不花钱；只从已开放的类型里取（第一批就是浅坑、矿脉）。家附近的保证见 ③a（计价保证）。浅坑每座都出石、铜、煤、黏土、岩盐五样（v4 3.3），所以 v4 1.5 的「主产 / 副产互不相同」落到：附近的矿脉主矿（铁 / 石英）不同、浅坑之间副产不同（副产第一批推荐不掉，见 v4q(5) ②；「最近 2 座浅坑」保证不了副产不同——实跑香港最近两座 81 km、104 km 都是 3 号——副产上线时改成「最近两座副产不同的浅坑」）；后裔的目录现在给每座浅坑只分一种主产，要照这条改。矿脉从哪一级能去见 v4q(5) ②（<strong>〔用户已定，按推荐〕</strong>）。</p>
+<p>③b <strong>野外和按城的规则分开</strong>：野外地点的 id 不进按城市簇的集市板、本地委托（q(270)、q(272) 的到城抽单）和 30 天清格（q(272) ⑪）；到野外算到访，记进 v4q(1) ④ 的「去过别的气候带」，但不盖章。</p>
+<p>③a <strong>【偏离 v4，用户定 (a)】离城市中心的下限：30 km → 20 km</strong>（丁7）。v4 写 ≥ 30 km（1.4）、Trip 2 内保证 2 浅坑 + 2 矿脉（1.5）。后裔全球实跑（Natural Earth 10m 陆地和湖泊、0.5° 网格、保底规则，结果 houyi-programer-wt/server/output/wild-sites/）发现，「离<strong>每一个</strong>城市中心 ≥ 30 km」和「Trip 2 内 2 浅坑 + 2 矿脉」在大城市周围冲突（卫星城密、靠海）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>下限</th>
+<th>点数</th>
+<th>保底做不到的簇</th>
+<th>其中人口过百万</th>
+<th>13 座可选家城</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30 km（v4 原文）</td>
+<td>54,331</td>
+<td>2,746</td>
+<td>101（东京、香港、新加坡、首尔、孟买、伊斯坦布尔、莫斯科等）</td>
+<td>东京、新加坡、香港 100 km 内没有矿脉；旧金山只有 1 座浅坑；赫尔辛基 1 浅坑 + 1 矿脉</td>
+</tr>
+<tr>
+<td><strong>20 km（推荐）</strong></td>
+<td>58,203</td>
+<td>516</td>
+<td>10（台北、大连、香港、新加坡、金奈、达喀尔、哈瓦那、奥克兰、蒙巴萨、三宝颜，都是海岛或半岛）</td>
+<td>只剩新加坡 100 km 内没有矿脉（最近的在 128 km，仍在最近 3 个免费点里）、香港 100 km 内 1 座浅坑</td>
+</tr>
+<tr>
+<td>15 km</td>
+<td>58,676</td>
+<td>394</td>
+<td>—</td>
+<td>改善有限</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>两种选法，都加「计价保证」</strong>（复核建议把「Trip 2 内 2 + 2」从数量保证改成计价保证，做法同城市的「最近 10 座 ≤ Trip 2」）：<strong>离家最近的铁矿脉、石英矿脉各一座，加 2 座浅坑，路费一律按不超过 Trip 2 收</strong>；另外<strong>最近 3 个之外的野外地点最低按 Trip 2 收</strong>（不然离城中心 20–30 km 的点会落进 Trip 1 自动免费，13 座家城里 8 座有这种点）。Lv8 起每级同时要铁和石英，所以两种主矿都要在保证里（20 km 下新加坡的石英矿脉在 130 km，不保证就按 Trip 3 收）。计价保证的这几座和免费 3 个一样，<strong>选家城、改家城时冻结</strong>（目录只增不删，不冻结的话以后加点会把玩家常去、有进度的那座挤出保证）；同档距离相等时按 id 排。
+- <strong>(a) 20 km + 计价保证（推荐）</strong>：点数 58,203，缺口 516 个簇（10 座过百万，都是海岛 / 半岛），缺口都由计价保证兜住；地图上野外点更密、离家更近。
+- <strong>(b) 保持 30 km + 计价保证</strong>：照 v4 原文的距离，缺口 2,746 个簇（东京、香港、新加坡等 101 座过百万）全靠计价保证兜，玩家要飞得更远（路上时间更多），东京、香港、新加坡 100 km 内没有矿脉。</p>
+<p>那 10 座海岛、半岛城市（20 km 实跑，100 km 内）：台北 1 浅坑 + 1 矿脉、香港 1 浅坑、金奈 / 哈瓦那 / 奥克兰 / 蒙巴萨各 1 矿脉，大连、新加坡、达喀尔 0 矿脉，三宝颜 1 浅坑 + 0 矿脉；离家最近的矿脉大连 119 km、达喀尔 117 km、三宝颜 172 km、新加坡 128 km（30 km 方案下 131 / 140 / 159 / 120 km），计价保证下都按 Trip 2 收。最近 3 个换入后 13 座家城每座都有 1 浅坑 + 1 矿脉（东京、新加坡的矿脉是换入的）。各类型的份额（后裔初值：浅坑 22%、矿脉 18%、晶洞 4%、林地 30%、钓点 16%、花田 10%；保底后实际浅坑 26%、矿脉 23%、林地 36%）冻结前用模拟器核（交接第 6 节）。</p>
+<p>④ <strong>旅行</strong>：野外地点是旅行的目的地，和城市同一套——路费按离家距离的 Trip 档（q(256)：再访半价、日票），最近 3 个免费；地图上点图钉 → 地点卡 → <code>Go</code>。和城市不同的三处：<strong>野外不盖章</strong>（第 34 条：不做野外章，出门门槛只算城市签章，v4q(1) ④）、<strong>不给首访 +10 体力</strong>、<strong>不计探险家奖章</strong>，也不出城市首访卡。到达时位置芯片写 <code>Ironvale Vein · Day Pass 23h</code>（不写城市），进矿后写 <code>Ironvale Vein · Floor 3</code>；过场胶囊写地点全名和公里数。芯片这条改 <strong>LOCK-06</strong>。野外的日票读档时不清掉；人在矿里不再算「在家」（Rest 等按「离家」判断的规则照离家算）。服务端核对玩家当前所在地（命令带地点 id），并进防作弊清单。</p>
+<p>⑤ <strong>地图</strong>：
+（不知火舞定）
+- 服务端按视口范围下发野外地点，客户端不带全量。
+- <strong>图钉</strong>：浅坑、矿脉各一种图标；未开放的矿型（晶洞、深渊、遗迹）也上地图——灰圆盘加锁角标、灰字短名，点开只有类型行和 <code>Not open yet</code>，没有 <code>Go</code>（在家附近看到一座晶洞，本身就是往后玩的目标）。林地、钓点、花田第一批不上地图（这是本条定的，随 197 复议一起批，不算偏离 v4）。标签照 q(137) 只写短名。
+- <strong>让位</strong>：接在 q(137) ⑤ 的类别顺序后面——…渔具铺 &gt; 城里采集点（v4q(4)）&gt; 野外开放的（浅坑、矿脉同一档，离家城基点近的先）&gt; 野外没开放的；都排在地标、POI 前面。选中、所在地、带标记三种始终显示，不变。
+- <strong>每屏封顶</strong>只数野外钉（城里的钉不算）；先留：选中 &gt; 所在地 &gt; 带标记 &gt; 离家最近的 3 个免费野外地点 &gt; 其余开放的 &gt; 没开放的。同一档里<strong>按离家城基点的距离</strong>排（结果固定、平移不跳，符合 q(137)；不知火舞确认）。具体封顶数由实现定。
+- <strong>缩放</strong>：城市级和州级都画野外钉；拉到国家级不画（那一级只剩城市点）。
+- <strong>和城市气泡谁让谁</strong>：野外钉让城市气泡和城市点，被压时整枚收起；选中的、所在地、带标记的、离家最近的 3 个免费野外地点始终显示。q(153) 气泡之间的顺序不变。
+- <strong>迷雾</strong>：野外钉照常画在迷雾灰层上面，可以点、可以去（玩家能提前看到远处的矿、规划出门）；没开放的矿型照旧画灰钉。
+- <strong>名字</strong>：地名词 + 类型词，类型词 <code>Quarry</code> / <code>Vein</code> / <code>Geode</code> / <code>Abyss</code> / <code>Ruins</code>；地名词按气候带分词池（照 q(125) 塘名的做法），只用拉丁字母，≤ 12 个字符，全名 ≤ 24（q(32)），不用真实品牌或真实地名。地图短名只留地名词，最宽 96 px（q(137)）。卡上类型行带最近的<strong>开放</strong>城市：<code>Vein mine · near Chengdu</code>。
+- <strong>野外词池</strong>（李白拟，每带 40 个，放 <code>world_gen.json</code> 的 <code>wild.words</code>；不知火舞审定，换过 35 个；按奕星复核再换 13 个和 v3 以后物品 / 怪重名的）：和塘、茶馆、掌柜名字、地形词池都不重名，四带之间也不重；<strong>不用游戏里的物品名，不用矿物、宝石、金属名</strong>（免得 <code>Garnet Vein</code> 被读成出石榴石、<code>Torch Quarry</code> 撞上火把），<strong>不用 v3 已起名的以后物品、怪的名字</strong>（如 <code>Permafrost Core</code>、<code>Ember Elemental</code>；深渊主产是 T5 晶核，<code>Permafrost Abyss</code> 会被读成出永冻晶核），<strong>不用能吃、能入药的植物名</strong>（以后的地域作物、草药会用到），不用撞品牌或调性不对的词，避开常见的真实地名。<strong>同一个城市簇里地名词不重复</strong>（地图短名只剩地名词，重了分不出）；簇里点数超过 40 时才允许重，重的两个类型不同；同一类型就超过 40 个点的大簇（全在北极、西伯利亚，如黄刀镇 1,593 个点，后裔实跑 8,309 簇里有 53 个），放宽成「150 km 内同类型不重名」。tropical：Sundown · Cinder · Sunfall · Scarlet · Dawn · Jaguar · Tiger · Anteater · Aardvark · Baobab · Lemur · Cyclone · Mirage · Zenith · Capybara · Sunbeam · Mongoose · Pangolin · Tapir · Okapi · Marimba · Marmoset · Sunburst · Cobra · Chameleon · Kinkajou · Kudu · Armadillo · Sunshower · Warthog · Gazelle · Ocelot · Mamba · Tamarin · Lightning · Sloth · Equinox · Weaverbird · Antelope · Meerkat；subtropical：Bonsai · Comet · Moonrise · Cricket · Lacquer · Pinwheel · Kite · Gong · Drum · Monkey · Pheasant · Starlight · Dewdrop · Cloud · Swiftlet · Drizzle · Typhoon · Parasol · Gibbon · Civet · Salamander · Newt · Umbrella · Compass · Sundial · Treefrog · Viper · Firecracker · Abacus · Lute · Panda · Macaque · Muntjac · Hoopoe · Bulbul · Cymbal · Zither · Teapot · Moonflower · Inkbrush；temperate：Badger · Fox · Wolf · Haystack · Stag · Hawk · Falcon · Buzzard · Crow · Magpie · Jackdaw · Nightfall · Thicket · Dormouse · Toad · Shrew · Pitchfork · Gorse · Anvil · Kettle · Lamplight · Wagon · Harrow · Bellows · Cartwheel · Candle · Hearth · Mole · Weasel · Ferret · Squirrel · Stoat · Polecat · Woodpecker · Nightjar · Cuckoo · Thimble · Spindle · Saddle · Horseshoe；cool：Icicle · Sleet · Hail · Blizzard · Snowfall · Midnight · Wolverine · Ermine · Sable · Marten · Muskox · Lemming · Bison · Moonlight · Icefall · Sedge · Cottongrass · Saxifrage · Sledge · Snowshoe · Harpoon · Kayak · Snowmelt · Longship · Antler · Cairn · Gale · Squall · Longnight · Snowcap · Fulmar · Skua · Guillemot · Snowbunting · Sleighbell · Whiteout · Husky · Northwind · Northlight · Snowdrift。
+- 野外图钉、让位是改 <strong>LOCK-24</strong>（地图图钉，q(137)），位置芯片是改 <strong>LOCK-06</strong>；不知火舞已在 197 发复议 125a71e4（两项一起，随本条批）。</p>
+<p>⑥ <strong>地点卡</strong>：在 q(204) / q(271) 的地点卡之上加野外分支。浅坑、矿脉的卡就是矿口卡，内容（矿型、最深层、主产和起始层、副产、怪和守关、你在这里到过第几层）在 v4q(5) 定；本条只管卡的入口、Distance 行和 <code>Go</code>（付费照 q(256) 的 Travel 面板）。</p>
+<p>⑦ <strong>内容</strong>：<code>world_gen.json</code> 里没人读的 <code>wild</code> 配置段和本条<strong>对齐</strong>。</p>
+<p><strong>改哪</strong>：v4 方案第 1 章 1.4–1.5、第 4 章 4.3 按本条读；旧方案 §11.1（对象与 id）、§11.2.1–11.2.3（最近 3 个免费）、§11.2.5（首访与再访）、§11.8（到达仪式）、§11.9（印章；不做野外章）、§11.9.2（探险家奖章）、§11.10（目的地入口四列表）、§10.6.1 地图 pin 卡，以本条为准。</p>
+<p><strong>推翻</strong>：LOCK-24 地图图钉（q(137)）、LOCK-06 位置芯片复议（197 125a71e4，随本条批）；q(204) / q(271) 的地点卡加野外分支（据点、矿口小屋的卡不变）；§11.9 的「每个地方都有章」对野外不适用。其余以诸葛亮冲突清单第 3 节 C 组为准（q(256) 首访 +10 只算城市、q(270) / q(272) 跳过野外 id、q(147)、q(153)、q(165)、q(184)、q(189) 等）。</p>
+<p><strong>画面</strong>（安其拉出稿，不知火舞验收；地点名是示意、正式名从词池取，底图是拉远的旧金山，图标是草稿）：C1 野外图钉 320:181216（灰钉 Glimmer = 未开放的晶洞）、C1b 区域级让位示意 317:181187（355 65079ece）；C2 到达野外 326:182063（芯片 <code>Ironvale Vein · Day Pass 23h</code>，外城图标沿用 App 的 showmap）；C3 野外旅行确认 354:186011（P2，355 最新：类型行 <code>Vein mine · Floors 1–40 · near San Jose</code>，Distance 行，最近 3 个免费时 Energy / Coins 都写 <code>Free</code>，主键 <code>Fly</code>，底注照现有旅行卡）。矿口卡本体 E1 随 v4q(5)。改前：现行地图上没有野外地点。</p>
+<p><strong>实现</strong>：陆地掩膜离线工具与冻结目录、world.ts、clusters.ts（最近 3 个野外地点）、travel.ts（目的地、日票、<code>HOMESTEAD_SPACES</code>、不盖章 / 不给首访）、routes.ts、view.ts（视口下发）；客户端 p0_map.gd 图钉与地点卡；<code>world_gen.json</code> 的 <code>wild</code> 段。奕星排。</p>
+<h2 id="h-cfd467c0">v4q(4) 【规则】【数值】【界面】采集搬出农场：城里采集点（地图图钉 + 卡片）、每次 3 体力、冷却 4 小时、先进背包；新手引导改版</h2>
+<p><strong>状态与来源</strong>：第一段已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。标〔用户已定〕的几处是 v4 定稿里没有、这次补定的口径，用户按推荐定了。用户 2026-11-02「全按建议」定 355 v4（结论 3、5、49）；v4 方案第 4 章 4.1、第 2 章 2.7–2.8，第 9 章 9.1 第 5–7 行，第 10 章 10.2 的 D 行。城里采集点做成「地图图钉 + 卡片」（复用 q(271) 的地点卡）、不做城里场景，是亚瑟、哪吒的实现建议，奕星转；<strong>v4 只写了「家城和每座城有城里采集点」，没写怎么呈现，所以这里是补定，不是偏离</strong>。D 和 v4q(1) A 同批合。<strong>引导改版</strong>动的是已验收的引导：规格不知火舞 355 f6b4bdb3（已补进 ⑥）。<strong>不给 Joey 验收</strong>：用户 11-02 晚「不用发joey, 他只针对发版后的体验反馈」（奕星 -51 转），原「报批前要 Joey 验收」（早报乙3）收回，⑥ 直接报用户。<strong>本条分两段批</strong>：<strong>第一段 ①–⑤ 已批</strong>（规则、数值、呈现 A、Lv1 起能用、满包不采、手套去掉：丁3、丁9、丁10、丁11 按推荐）；<strong>第二段 ⑥ 引导已批</strong>：用户 2026-11-02 晚在奕星终端回「v4q 4 引导 ok」（奕星 -51 转，无消息 id；报批包 /Volumes/ACASIS/tmp/libai-tools/v4q4-guide-package.md），丁20、丁21、戊1 一起按 ⑥ 定。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：现在农场里有 6 个采集点（Timber Grove、Rock Pile、Reed Bank、Herb Patch、Clay Bank、Old Tree），0 体力，每个点 8 小时一次，产出直接进仓库（§13.2、q(44)、q(46)）。v4 要农场里没有采集点（第 49 条），采集搬到城里、花体力（第 5 条），让玩家第一周每天都出门；首会话 Lv2 的材料因此要去城里采。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>农场的 6 个采集点搬出</strong>：Timber Grove、Rock Pile、Reed Bank、Herb Patch、Clay Bank、Old Tree 从农场拿掉；Homestead 的 <code>clay_bank</code>（Lv2）、<code>old_tree</code>（Lv3）两个解锁一起去掉（v4q(1) ⑧）。</p>
+<p>② <strong>城里采集点</strong>：家城和其他城市里有采集点，出 T1–T2 的材料——木材、石料、芦苇、黏土、硬木、亚麻、香草（野外地点 T3 以上的地域采集点以后的批次做）。
+- <strong>补给站式</strong>（第 3 条）：位置全服一致，冷却按人；<strong>Lv1 起就能用</strong>（Lv2 的材料从这里来；v4 2.7 把它写在 Lv2 的「新东西」里，照写 Lv1 升不了 Lv2——报成 v4 2.7 的更正，<strong>〔用户已定，按推荐〕</strong>，诸葛亮冲突清单第 2 节第 1 条同）。
+- <strong>呈现</strong><strong>〔用户已定，按推荐〕</strong>（不知火舞 355 f6b4bdb3）：地图上的图钉 + 卡片（复用 q(271) 的地点卡版式），<strong>不做城里场景</strong>。<strong>在农场能不能采</strong>：人在农场时服务端认为人在家城（<code>travel.here</code> = 家城），照这个写法，在农场打开地图就能把家城的点采完，家城采集不再让人出门（碰到 v4 1.6 和第 14 条「写清为什么出门」）。复核推荐：图钉 + 卡、<strong>允许在农场采</strong>（家城采集是入门，出门的理由由矿、外城和野外承担）。备选（诸葛亮清单第 2 节第 8 条）：采集点放在集市广场里，要进集市广场用主行动键 <code>Gather · 3 Energy</code> 采，在农场采不了——要出门，但要做场景摆放，<code>Gather</code> 还要归进 LOCK-02 的四种行动之一或复议。
+  - 图钉：圆盘里放材料的物品图标，照 q(137) 只写短名；冷却中照常显示；让位排在渔具铺后面、野外前面；一座家城 16 个采集点，所以<strong>采集点图钉只在比城市概览更近一级的缩放下显示</strong>（具体缩放值由实现定），引导的当前目标和 Today <code>Show on map</code> 指向的那一个任何缩放都显示（LOCK-24 复议补充 197 0a2baa5a，随本条报）。
+  - 名字：不沿用农场的原名（一座城同一种有好几个点），改成「地名词 + 类型词」：Grove（木材）、Rocks（石料）、Reed Bank、Clay Pit、Woods（硬木）、Flax Field、Herb Patch；例 <code>Maple Grove</code>，短名 <code>Maple</code>（例名示意），全名 ≤ 24 字符。<strong>地名词用 v4q(3) 的野外词池</strong>（按气候带，规矩同那里：不撞物品、矿物、塘和茶馆的词）；地图短名只剩地名词，所以<strong>同一个城市簇里，采集点和野外地点合起来地名词不重复</strong>，同城的采集点之间也不重；簇里不够分时采集点优先，野外点按 v4q(3) 的「150 km 内同类型不重名」放宽。
+  - 卡：标题 <code>Maple Grove</code>，类型行 <code>Gathering spot · Timber</code>，事实行 <code>Gives</code> <code>4 Timber</code>（芦苇点写 <code>4 Reeds · Worm Bait</code>）。主键五态：人在这座城、能采 <code>Gather · 3 Energy</code>；不在这座城 <code>Go</code>；冷却中灰键 <code>Ready in 3h 12m</code>；背包放不下灰键 <code>No room · free a slot first</code>（沿用满包写法）；体力不够琥珀 <code>Gather · Need 3 Energy</code>。采完卡不关，主键变 <code>Ready in 4h</code>，飘字 <code>+4 Timber</code>，不出 toast、不加教学卡。
+- <strong>范围</strong>：第一批给 13 座可选家城和它们的兜底前 10 城建（约 140 城）；旧金山手写城的点也要走服务端。
+- <strong>密度</strong>（和后裔对，目录照野外目录的做法冻结——位置全服一致、冷却按点 id 记——并过陆地掩膜）：
+  - <strong>家城</strong>：木材、石料各 <strong>3</strong> 个点；芦苇、黏土、香草各 2 个点。理由：第 1 天 Lv2–4 合计要木 18、石 18（v4q(1) ②），每种 2 个点上线两次只有 16，3 个点有 24；芦苇、黏土、香草 2 个点就够（v4 写「至少 2 个」，3 也在范围里）。
+  - <strong>硬木、亚麻</strong>：家城各 ≥ 2 个点（v4 4.1）；另外「家城 + 最近 3 座免费城」合计各 ≥ 3 个点（一次上线 ≥ 9 件）。按一次上线算，家城 2 个点 × 3 件只有 6，所以邻城至少各补 1 个，13 座家城都要，不只亚热带（v4 只写亚热带由邻城补，这里放宽到全部家城，是加严、不是偏离）。
+  - <strong>其余约 127 座城</strong>（兜底前 10 城里不是家城的）：每种 T1 ≥ 1 个点，硬木、亚麻 0–2 个按气候带，满足上一条。
+  - 香草是 T1，一次 4 件（现行 Herb Patch 2 件）；芦苇点每次另出蚯蚓 2 条（照现行）。一座家城 16 个点（木、石各 3，芦苇、黏土、香草、硬木、亚麻各 2）。内容表 <code>materials</code> 初值：<code>flax</code> Flax price null、floor 4（同为 T2 采集物，照硬木现行 null / 4：不回收，委托里交按影子价 4）。首会话的石料：3 个点 × 4 件 = 12，正好等于 Lv2 + Lv3 要的 12，没有余量（漏采一个点就到不了 Lv3），模拟器校准时一起看。</p>
+<p>③ <strong>采一次</strong>：一点就采，<strong>3 体力</strong>；<strong>冷却 4 小时</strong>（现行 8 小时），从采的那一刻算；<strong>T1 一次 4 件，T2（硬木、亚麻）一次 3 件</strong>。体力不够照现行写缺口。不设采集技能，只受体力和背包限制（第 5 条）。</p>
+<p>④ <strong>先进背包</strong>：家城和外城采到的一律先进背包，回到家自动入库（复用现有的入库逻辑）；背包放不下就采不了（<code>No room · free a slot first</code>；不扣体力、不进冷却）——<strong>〔用户已定，按推荐〕</strong>（诸葛亮冲突清单第 2 节第 8 条）；细则：按整份主材料判断（一次 4 件放不下就不采）；蚯蚓放不下进农场仓库（照现行 q(44)）；引导的采集步骤背包满时跳过。如果呈现定成「在农场也能采」，人在农场采家城的点直接入库、不看背包（人在家，「回到家入库」那一步本来就是即时的）。<strong>采集手套</strong>（Gather Gloves，现行每次 +1，已上线、有批过的文案和帧）v4 没写，两个选项，<strong>〔用户已定，按推荐〕</strong>：<strong>去掉</strong>（复核推荐：第一批去掉、第二批随工具线重做；影响很小，到 Lv17 少采 18 次、到达日早 0.3–0.5 天）；或<strong>照旧 +1</strong>（诸葛亮清单第 2 节第 8 条；每次 T1 5 件、T2 4 件）。芦苇点照旧顺带出蚯蚓（鱼饵），从农场的 Reed Bank 搬到城里的芦苇点。</p>
+<p>⑤ <strong>服务端核对</strong>：采集命令带采集点 id，服务端核对玩家当前所在地（<code>travel.here</code>）是这座城；进防作弊清单。</p>
+<p>⑥ <strong>新手引导 v4</strong>（不知火舞 355 f6b4bdb3；蒙恬实现）。引导按到 Lv2 写，不依赖首会话到 Lv3：
+- <strong>起始</strong>：8 块网格田，农场里没有采集点和矿口。
+- <strong>S4</strong> 改成 <code>Sow 6 Lettuce · 12 Energy</code>（种满剩下的 6 块），原「首畦 20 格」作废。
+- <strong>S5</strong> Pip 改说 <code>They're ready! Take one to Nadia at the market, and grab some timber while you're in town.</code>（就是「Pip 带你去采集点」）。
+- <strong>新 S6a <code>t_gather</code></strong>（Nadia 之后、钓鱼之前，人正好在城里）：采够 Lv2 的木材 6、石料 4、芦苇 3。Today 一次写一种 <code>Gather Timber · Maple Grove</code>，目标点挂 <code>!</code>，原因行沿用 <code>Homestead Lv2 · Timber 2 to go</code>；缺的那种每个点都在冷却就跳过。
+- <strong>新 S7a <code>t_upgrade</code></strong>（<strong>排在做汤 S9 之后、送汤 S10 之前</strong>——原排在 S8 吃饭前，升完体力到上限 210，S8 <code>t_meal</code> 碰到 energy_full 就跳过，「中间要有一顿吃」（338 用户底线）就没了；新顺序：Nadia → 采集 → 钓鱼 → 做饭吃 → 做汤 → 升级 → 送汤 → 下一单；升级回 50 体力和 S8 条件都不改，不知火舞 11-02 定，随本段报）：Today <code>Upgrade to Homestead Lv2</code>（q(255) 现有写法），门牌挂 <code>!</code>，Pip <code>You've got everything! Tap the Homestead sign by the door.</code>；条件不够就跳过。
+- <strong>委托 2</strong> 改成 <code>Four Radishes</code>（<strong>〔用户已定〕</strong>丁20，诸葛亮冲突清单第 2 节第 16 条），台词 <code>Radish buns for market day. Could you grow me four?</code>（快熟萝卜收完空出 2 块，Lv2 再加 2 块，引导结束时正好 4 块能种）。补救步骤照新田数和采集点改。
+- <strong>教学卡</strong> <code>Travel costs Energy and coins.</code>：第一次打开要花钱或花体力的旅行确认卡时出，引导期间不出。q(256) ⑥ <strong>改写</strong>：前半句「新手引导期间不出城」保留（引导去的是家城里的采集点，不算出城；v4 10.2 原把 q(256) ⑥ 列在要复议里，依据诸葛亮冲突清单第 2 节第 28 条，<strong>〔用户已定〕</strong>丁21）；后半句「教学卡不用改」改成上面的时机。<strong>地图 TipCard 只留前半句</strong>（11-02 补记，丁21 的连带；蒙恬实现时问出，不知火舞定，没有新英文，不出帧）：现在第一次开地图的 TipCard 是一整句 <code>Browse the map for free. Travel costs Energy and coins.</code>（<code>p0_guide.gd</code> 的 <code>map</code>），q(256) ⑥ / 丁21 说的教学卡就是它的后半句；后半句挪到旅行确认卡以后，地图卡只留 <code>Browse the map for free.</code>，同一句不出两次（第一次开地图时最近的城和野外点都免费，这时说 Travel costs 也误导）。TipCard 由 7 句变 8 句：地图一句、旅行确认卡一句。
+- <strong>开局种子礼</strong>改成快熟 ×2 + 小萝卜 ×12 + 生菜 ×6（原快熟 ×2 + 小萝卜 ×20 + 生菜 ×10，是配 30 块田的；开局只有 8 块）——用户 11-02 回「戊1 ok」，随本段一起报（q(217) ② 的新数）。
+- <strong>Pip 第一次下矿</strong>是 Lv3 的委托（v4q(7)），不在引导步骤里。
+- <strong>硬指标</strong>：首卖约 8 分钟（不变）；钓 → 做 → 吃约 17 分钟；送礼并接委托 2 约 22 分钟，都在原窗口内。</p>
+<p><strong>改哪</strong>：v4 方案第 4 章 4.1 按本条读；旧方案 D 组冲突（355-conflicts 第 3 节 D 组，已加注）以本条为准，另含 §10.4.7 满包表（加采集一行）、§10.7 服务端规则表、§13.1.1 / §13.1.2 来源列与蚯蚓、§13.2 采集、§3.3.2 体力计费总表（采集 0 → 3 体力）、§14.1.2 起始状态、§14.2 首会话导演表、§14.3 引导、§14.5 Today 的采集行，以本条为准；第 16 章 TUT-2 与附录 B.14 教学卡行的「P0 共 7 句」按 ⑥ 读成 8 句（已加注）。</p>
+<p><strong>来源句补注（11-03，已批：用户在奕星终端回「来源句 ok」，没有消息 id；已推 eb1d7c20）</strong>（亚瑟做 C 第 2 部分时问出，不知火舞定 355 3b2c6a43，按奕星复核 pm/q-review/v4q45-source-lines-review-2026-11-03.md 更正 10529501 / 38005c12；本地 /Volumes/ACASIS/tmp/huowu-a/355/c2-six-answers.md；采集点和矿一起写在这里，v4q(5) 的「矿型加起始层」也按这里）：材料进度格点开的来源句（UiNeedSource）照 q(65) 的格式 <code>&lt;材料&gt; · &lt;来源&gt; · or &lt;来源&gt;</code>，已开放的在前；采集点用地点卡标题（全名）里的类型词，矿只写矿型；起始层只在不是第 1 层时写，写主产变多的那一层（和 Today 矿脉行 <code>Reach Floor 10</code> 一致），Floor 首字母大写（同矿口卡 <code>Floors 1–40</code>）。新英文 12 句：<code>Timber · Groves in town</code>、<code>Stone · Rocks in town · or any mine</code>、<code>Reeds · Reed Banks in town</code>、<code>Wild Herb · Herb Patches in town</code>（香草丛采到的是 Wild Herb；作物 Herb 的来源句照旧 <code>Herb · Grow it on your plots</code>）、<code>Clay · Clay Pits in town · or Quarries</code>、<code>Hardwood · Woods in some towns</code>（家城各 2 个，外城大多没有）、<code>Flax · Flax Fields in some towns</code>、<code>Copper Ore · Quarries</code>、<code>Coal · Quarries</code>、<code>Rock Salt · Quarries</code>（浅坑第 1 层起就出，不写层）、<code>Iron Ore · Iron veins from Floor 10</code>、<code>Quartz · Quartz veins from Floor 10</code>（第 1 层起少量、第 10 层起多，写玩家该去的那一层；veins 小写）。<strong>折行</strong>：一行放不下时只在 <code>·</code> 处折，折开处的圆点去掉；先在 <code>· or</code> 前折，没有 or 的句子在材料名后折；最多两行，不在词中间断（同 v4q(1) / q(103) 的 <code>UiKit.break_at_dot</code>），如 <code>Clay · Clay Pits in town</code> / <code>or Quarries</code>。q(65)「只在 <code>· or</code> 前折」照这条改写。<strong>Show</strong>：指最近的、现在能采的那一处；都在冷却时指最近的那一处。「最近」按家城基点算（同 v4q(3) ③、v4q(9)）；人在外城时，采集点类所在城有就按所在城的基点指那座城里的，没有才指家城，矿一律按家城基点。黏土是特例：所有 Clay Pit 都在冷却时指最近的浅坑。q(65) 的旧样例 <code>Clay · Mine floor 1 · or Clay Bank from Homestead Lv2</code> 和 <code>Stone · Rock Pile · or the mine</code> 作废。<strong>画面</strong>（安其拉出稿 381 01a14638，不知火舞验收通过 381 0074f3ba；第一版作废，撤回 81f5b804）：Figma 页面 14 · Review row 130 415:189268，底图 A1 HOME-1 Lv8 → Lv9；气泡一律整列宽 328、带 <code>Show</code>、离被点的格子 6 px（同 ui_need_source.gd）。改前 415:189322（q(65) 旧样例，带 Show）；改后 Clay 415:189710（<code>Clay · Clay Pits in town</code> / <code>or Quarries</code> 两行）；改后 Iron Ore 415:190094（一行）；改后 Quartz 416:190083（一行，文字区 231 px 余量 0）。</p>
+<p><strong>推翻</strong>（其余以诸葛亮冲突清单第 3 节 D 组为准）：q(256) ⑥ 改写（见 ⑥）；q(218)（Six Radishes → Four Radishes）、q(217) ②（开局种子礼按新田数）、q(253)、q(255)（Today 的采集与升级行）、q(45)、q(65)（来源句）、q(215)（首会话 v3 的步骤与地图教学卡时机）按本条读；q(272) ④ 不出三个 0 体力材料模板的理由（「0 体力回收口子」）随采集花体力不再成立，三个模板放不放开另报（诸葛亮清单第 2 节第 26 条）；q(44)（采集 0 体力、8 小时、产出进仓库、蚯蚓进背包）、q(46)（调料进背包与调味架的口径，按「先进背包、回家入库」重读）、q(40)（材料自动入库的口径按本条读）；341 引导的 q(215)、q(217)、q(222)、q(254)、q(260)、q(266) 里涉及农场采集点、首畦 20 格、S4、Six Radishes 数量、补救步骤的部分，按引导规格改。</p>
+<p><strong>画面</strong>（安其拉出稿，不知火舞验收通过 355 98f88afe，页面 14 Review row 120 331:182792）：<strong>第一段</strong>（①–⑤）D2 采集点卡六态——能采 332:183026（<code>Gather · 3 Energy</code>）、不在这座城 332:183338（<code>Go</code>，带 Distance 行）、冷却 332:183596（<code>Ready in 3h 12m</code>）、满包 332:183824（<code>No room · free a slot first</code>）、体力不够 332:184052（琥珀 <code>Gather · Need 3 Energy</code>）、采完 332:184280（<code>Ready in 4h</code>，飘字 <code>+4 Timber</code>）；图钉见 D1。<strong>第二段</strong>（⑥ 引导）：D1 引导 S6a 331:182793（<code>Gather Timber · Badger Grove</code>，采集点挂 <code>!</code>）、D3 新号农场 S4 334:184225（8 块田，农场里没有采集点和矿口，<code>Sow 6 Lettuce · 12 Energy</code>；快捷栏 <code>Radish Seeds ×12</code> / <code>Lettuce Seeds ×6</code>（戊1），11-02 17:25 更新，355 96009776）、D4a 引导 S7a 336:184649（<code>Upgrade to Homestead Lv2</code>，门牌挂 <code>!</code>；S7a 挪到做汤之后，体力 187/200、<code>Lettuce ready in 7h 45m</code>，11-02 17:25 更新，355 96009776）、D4b 升级面板 Lv1 → Lv2 336:184306（<code>Timber 8/6</code>、<code>Stone 4/4</code>、<code>Reeds 4/3</code>、<code>Coins 200/80</code>（金币格分母 = 价格 + 40 地板，照 q(10)）、<code>Farming 1/1</code>、<code>Fishing 1/1</code>；<code>Max Energy 210</code>、<code>Spice Rack</code>、<code>Plots 10</code>）。体力和金币按新引导推算：S4 前 196 → S6 交完单 186 → 采 4 次 175 → 钓 2 竿 167 → S8 吃烤鲫鱼 187（一档菜回 20）→ S9 做汤 187（做饭、做汤不花体力）→ S7a 升 Lv2 后 210（实得 +23，横幅写实得）；金币 180 → 200 → 升级后 160。改前：现行农场里 6 个采集点（0 体力、产出进仓库），没有城里采集点。<strong>改前实拍</strong>（李元芳，安卓 0.2.20 正式包；381 a27ccbe1、e33fd0a2）：农场里的 Rock Pile 标签（<code>✓ Rock Pile</code>，点一下直接采、不弹卡）、Timber Grove 采完（<code>+6 Timber · Stored</code> / <code>Timber Grove · Ready in 8h</code>）；S4 <code>Sow your first plot</code>，快捷栏 <code>Radish Seeds ×20</code> / <code>Lettuce Seeds ×10</code>；S11 Nadia 的 <code>Six Radishes</code>（<code>Radish 0/6</code>、<code>+5 Friendship · 20 coins</code>；为了快，李元芳在本地服用调试接口把引导设到 S11，卡是现行界面）。D3 底图是旧截图修出来的。报批用拼图 guide-v4-flow@2x（17:25 版）和 gathering-spot-card-states@2x。</p>
+<p><strong>实现</strong>：服务端 gathering.ts（花体力、冷却 4 小时、按点 id 核对所在地、进背包）、world.ts（城里采集点生成和密度）、guide.ts；内容 <code>gather</code>、<code>mine_p1.json</code>（old_tree）、<code>guide_steps.json</code>、<code>residents_p1.json</code>（Nadia）；客户端地图图钉和地点卡（亚瑟）、农场去掉采集点和引导（哪吒、蒙恬）。存档随 v4q(2) 清档。奕星排。</p>
+<h2 id="h-e82c2e11">v4q(5) 【规则】【数值】【界面】矿搬出家城：浅坑和矿脉、清完怪就开梯子、每座矿各记进度和电梯、守关整十层、取消每天 2 局和 Express、矿口卡、击杀记录</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。标<strong>〔用户已定，按推荐〕</strong>的几处是 v4 定稿里没有、这次补定的口径，没经用户看过，跟本条一起报批；另外这几处 v4 没写或和 v4 引的 v3 不同，报批稿里单列：倒地回矿口和血量（⑧，和 v4 引的 v3 3.5.1 不同）；Combat 从 F1 起；⑫ 逐项（火把发牌、满包不挡进层、掉落放不下掉在地上、第一批没有炸药）；⑥ 日切时人留在原层（<strong>〔用户已定，按推荐〕</strong>）。用户 2026-11-02「全按建议」定 355 v4（结论 9、10、28、29、30、49、50、51、52）；v4 方案第 3 章 3.1–3.8、3.11–3.12，第 9 章 9.1 第 8 行，第 10 章 10.2 的 E 行。怪的行为、掉落和美术在 v4q(6)；武器、回血药、Pip 的「第一次下矿」委托在 v4q(7)；野外地点本身（目录、地图、旅行）在 v4q(3)。合并顺序 C → E → F / G。不知火舞审、奕星复核后挂 SGODOT-381。 <strong>校准 11-02</strong>（李白，/Volumes/ACASIS/tmp/libai-tools/calib/report-2026-11-02.md）：矿脉 F1–9 主矿权重初值 10 → 25（第一次到 F10 要一口气走完，F1–9 主矿太少的话，每天材料时间少或手慢时 Lv8–10 明显变晚；百分比只当量级看，时长没在真机掐过，奕星复核 pm/q-review/calib-2026-11-02-review.md 第 4.5 节列了矿层能跑后要掐的 5 个时长）；其余数值初值不变。</p>
+<p><strong>问题</strong>：现在只有一座矿，在农场里：5 层，1–4 层敲完 6 块岩石才开梯子，3–5 层才有怪，第 5 层精英局终；每天最多 2 局，有 Express 直达第 5 层、New run / Continue run（§13.3、LOCK-21、q(196)）。v4 要家城没有矿，矿在城外的野外地点，每座矿都不一样、各记进度，往下走看装备。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>家城没有矿</strong>：农场里的矿口拆掉；矿口在地图上的野外地点（v4q(3)）。城里的 Mine Hut 仍是居民 Ivo 的家，不是矿口（q(204)）。</p>
+<p>② <strong>第一批两种矿型</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>矿型</th>
+<th>最深</th>
+<th>主产（起始层）</th>
+<th>多常见（v4q(3)）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浅坑 Quarry</td>
+<td>20–30（每座矿由种子定）</td>
+<td>石、铜、煤、黏土、岩盐（F1 起）</td>
+<td>最近 3 个免费野外点里至少 1 座；家附近的保证见 v4q(3) ③a（计价保证）</td>
+</tr>
+<tr>
+<td>矿脉 Vein</td>
+<td>第一批开到 F40（满深 40–60，F41 起 2 期）</td>
+<td>一种主矿 ×2：铁或石英（F1 起少量，<strong>F10 起多</strong>）</td>
+<td>最近 3 个免费野外点里至少 1 座；家附近的保证见 v4q(3) ③a（计价保证）</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>浅坑每座都出五样（石、铜、煤、黏土、岩盐，F1 起），不是每座只出一种；矿脉每座一种主矿。</li>
+<li><strong>副产</strong><strong>〔用户已定，按推荐〕</strong>：v4 3.3 写种子给每座矿定一种副产，第一批落不落有三种说法（周瑜接口默认第一批不掉；诸葛亮清单第 2 节第 29 条② 建议第一批掉；矿口卡上原写 <code>Also</code>）。<strong>推荐第一批不掉、矿口卡不出 <code>Also</code> 行</strong>，第二批有了对应物品再上（原例 Turquoise 是 T4 宝石，第一批没有这个物品）。后裔的目录（#616）里浅坑没有单一主产（<code>main</code> 为空），副产只存序号 0–7（附近两座浅坑按副产区分）：第一批不掉就不用给物品；要掉的话，内容表 <code>types.&lt;type&gt;.sides</code> 要给「序号 → 物品」的表，随副产物品一起定。稀有掉落、精英变体、特殊层 2 期起。</li>
+<li><strong>矿脉从哪一级能去</strong><strong>〔用户已定，按推荐〕</strong>：v4 2.7 写 Lv8 矿脉才出现在地图上，可升 Lv8 本身就要铁 2、石英 1，只有矿脉出——v4 自相矛盾。<strong>A（推荐；v4q(1)、v4q(3)、v4q(5) 三份复核和诸葛亮清单第 2 节第 2 条都推荐；校准 11-02：选 B 要玩家在 Lv8 之前就提前备好铁和石英，第一周表更难走，不提前备料的话 Lv9、Lv10 各晚约一天）</strong>：矿脉开局就能去（最近 3 个免费点里保证有一座，v4q(3) ③），第一周表跟着挪。<strong>B</strong>：矿脉 Lv8 起能去（之前图钉灰、卡上写 <code>Opens at Homestead Lv8</code>），把 v4q(1) Lv8 的铁、石英换成铜、煤（只换 Lv8；Lv9–10 在表里是「同 Lv8」，选 B 时展开、照写铁 2、石英 1——Lv8 起矿脉已开，满足「第 N 级的材料 Lv N−1 能拿到」；v4q(1) 实现里 <code>vein_mines</code> 当不当门槛也按这里定）。v4q(1) ⑧、v4q(3) 都按这一处读。</li>
+<li>产出「低级一样、高级差异」：T1–T2 的主产各地一样。</li>
+</ul>
+<p>③ <strong>往下走：清完本层的怪就开梯子</strong>（第 51 条）：
+- 本层的怪全部打倒，梯子就开；<strong>岩石想敲才敲</strong>，敲多少由玩家决定（每块 2 体力）。推翻现行「1–4 层敲完全部岩石才开梯子」。
+- 守关层打倒守关才开；精英层精英也是怪，一起清。<strong>守关打过以后</strong>：这座矿的守关打过一次，以后进这一层没有守关、进来就开梯子（周瑜接口默认）；守关层没有岩石。每周重打放第二批（⑨）。
+- <strong>离开这一层，没打倒的守关和精英回满血</strong>：玩家离开这一层（倒地、出矿、上下楼、坐电梯）以后，这一层还没打倒的守关和精英回满血；<strong>已经打倒的精英和普通怪当天都不复活</strong>（精英打倒就算打倒，今天不再出现——不然上下楼一趟就能 0 体力再刷一只精英）。否则出矿回满血再坐电梯回来，能把守关一点点磨死，v4q(7) 的「低一档伤害减半」就失效了。
+- <strong>数值初值</strong>：每层岩石数、各层掉落权重、矿脉主矿权重、守关给几个主产，照周瑜接口（仓库 <code>docs/tech/355-b1-contract-efg.md</code>）第 2 节——浅坑每层 4–6 块岩石，F1–9 权重石 30 / 铜 25 / 煤 15 / 黏土 15 / 岩盐 15；矿脉主矿权重 <strong>F1 起 25</strong>（校准 11-02，原初值 10）、F10 起 40；守关包浅坑铜 ×5、矿脉主矿 ×5（同 v4q(6) ③、接口 v0.5）。都待模拟器校准（交接第 6 节）。新材料的内容表 <code>materials</code> 初值：<code>coal</code> Coal price 4（T1，同铜矿石）；<code>iron_ore</code> Iron Ore price null、floor 5（T2，同石英 null / 5、硬木 null / 4：T2 不回收，委托里交按影子价）。旧 §13.3.3 分层掉落表作废。
+- 每层都有怪（浅坑 F1 起就有史莱姆），所以 Combat 从 F1 起就能用（现行 1–2 层 Combat 置灰作废）；木剑开局就装着（v4q(7) ①，<strong>〔用户已定，按推荐〕</strong>；v4q(1) Lv3 行同一说法）。
+- <strong>每层当天第一次进 2 体力</strong>（统一，不分矿型；「当天」按家城 04:00 换，和 ⑥ 的日切一起；v4 只写「每层第一次进」，「当天」是补定，<strong>〔用户已定，按推荐〕</strong>，诸葛亮冲突清单第 2 节第 7 条）。移动本身不花体力——打怪、走梯子、坐电梯都 0；进当天没进过的层收这一层的 2 体力，坐电梯到当天还没进过的站也照收（同现行 LOCK-21 电梯面板 <code>Floor 3 · 2 Energy</code>）。往下走主要花时间、血和药，深度看装备。</p>
+<p>④ <strong>怪和守关的排布</strong>（第一批；怪的行为、数值、掉落、美术见 v4q(6)）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>矿型</th>
+<th>层</th>
+<th>普通怪</th>
+<th>精英（个位 5 的层）</th>
+<th>守关（档位）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>浅坑</td>
+<td>F1–4</td>
+<td>史莱姆 ×2–3</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F5–9</td>
+<td>史莱姆 ×2、蝙蝠 ×1–2</td>
+<td>F5 精英史莱姆</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F10</td>
+<td>—</td>
+<td>—</td>
+<td>史莱姆王（T1）</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F11–19</td>
+<td>蝙蝠 ×2、岩甲虫 ×1–2</td>
+<td>F15 精英蝙蝠</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F20</td>
+<td>—</td>
+<td>—</td>
+<td>史莱姆王（T1，血量 ×1.5）</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F21–29</td>
+<td>岩甲虫 ×2、菇菇怪 ×1–2</td>
+<td>F25 精英岩甲虫</td>
+<td>—</td>
+</tr>
+<tr>
+<td>浅坑</td>
+<td>F30（最深 30 的矿）</td>
+<td>—</td>
+<td>—</td>
+<td>史莱姆王（T1，血量 ×2）</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F1–9</td>
+<td>史莱姆 ×1、岩甲虫 ×1–2</td>
+<td>F5 精英岩甲虫</td>
+<td>—</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F10</td>
+<td>两只精英一组（精英岩甲虫 + 精英史莱姆）</td>
+<td>—</td>
+<td>—（电梯站）</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F11–19</td>
+<td>岩甲虫、菇菇怪、蝙蝠，每层 3–4 只</td>
+<td>F15 精英菇菇怪</td>
+<td>—</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F20</td>
+<td>—</td>
+<td>—</td>
+<td>铁史莱姆王（T2；第二批换成铁背甲虫王）</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F21–39</td>
+<td>同上，每层 4–5 只</td>
+<td>F25、F35 精英</td>
+<td>F30 两只精英一组</td>
+</tr>
+<tr>
+<td>矿脉</td>
+<td>F40</td>
+<td>—</td>
+<td>—</td>
+<td>石英史莱姆王（T2；第二批换成菌母）</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>守关只在整十层（不是每个整十层都有），精英在个位 5 的层。守关档位和武器档位的规则（武器低一档每下伤害减半）在 v4q(7)。</li>
+<li>险境第一批不生效（3 期起）。</li>
+</ul>
+<p>⑤ <strong>进度按矿</strong>：每座矿各记两样——<strong>这里的最深纪录</strong>（亲自走到过的最深层）和<strong>这里打过的守关</strong>。电梯站 = 纪录以上的每个整十层，由纪录推出、不另存；电梯只在这座矿里用。<strong>打过才能往下</strong>：每座矿的守关都要在这座矿打过一次。<strong>资历</strong>（Mining Rank）= 在任何矿里亲自走到过的最深层，第一批只记下（以后是钻地机的上限，钻地机 2 期起）。</p>
+<p>⑥ <strong>布局和当天状态每人一份</strong>：位置全服一致；种子 = 人 + 日期 + 矿口 + 层，按家城 04:00 换。当天状态（敲过的岩石、怪的血、地上的掉落）日切清掉，不进长期存档。<strong>日切时人在矿里</strong><strong>〔用户已定，按推荐〕</strong>（v4 3.8 没写；现行是 <code>Run ended at daily reset</code> 把人踢出去）：推荐人留在当前这一层、放回这层的落脚点（楼梯口），这一层不再收一次层费（不知火舞定；周瑜按实现也选留在原层——送回矿口要重新走或坐电梯、再交层费、再清怪，对玩家更差，技术上也没省多少）。血量不变（不算出矿）；这一层按新一天重新生成，怪、岩石、掉落全刷，守关和精英自然满血，打过的守关照旧不出现；不算「离开一层」。日切那一刻还在路上的旧命令（挥刀、敲岩石）不落到新一天的层上：矿里的命令带当天日期，对不上服务端什么也不做、直接回新层，客户端照常重建，不弹错误。日切后「本层捡到的」（倒地丢一半的基数）重新算。留在原层以后，付一次远处路费可以在矿里连住几天：第一批 T1–T2 各地一样、没有收益，先不限；2 期有了地域金属再补一句（日切后往下走新的一层要有效日票，或日票过期时日切送回矿口）。</p>
+<p>⑦ <strong>取消每天 2 局和 Express</strong>（第 49 条）：没有「局」了——不再有 <code>Runs today</code>、<code>New run</code>、<code>Continue run</code>、Express 直达第 5 层、「重开须清完第 2 层」；靠体力和时间封顶。现行「第 5 层精英的石英每天只在第一次击败时可能掉」（q(116) ①②）随 5 层结构一起作废；q(116) ③「同一次结算里怪被打死、玩家也被打倒，按打赢算」保留，并扩到守关。</p>
+<p>⑧ <strong>倒地</strong>：1–10 层不罚；11 层起丢掉这次进本层以后捡到的东西的一半。「丢一半」每样向下取整（只捡到 1 个的不丢）。倒地后人在矿外（地图上这座矿的矿口），这座矿的纪录不变，再进从 F1 或已开的电梯站。<strong>血量</strong>：进矿满血，倒地或出矿后下次进矿也满血；HP 只在矿里有意义、料理不回 HP，喝药见 v4q(7)。这是按现行补的，和 v4 引的 v3 3.5.1（倒地回 30%、出矿不回满）不同，报批时单列。</p>
+<p>⑨ <strong>首杀与击杀记录</strong>：个人首杀的必掉（王冠碎片，v4q(6)）和成就<strong>按种</strong>给，每种守关一次（变体以后各算一种）；每周重打（奖励按种计次，每种每周一次）<strong>放第二批</strong>，第一批打过的守关不再出现（③）。击杀记录带上当时的家城（第二批回填家城首杀要用）。<strong>第一批服务端就记</strong>：按种的击杀数、每种守关第一次打倒的时间和人；成就第二批上时回填。守关击杀的合理性校验进防作弊专题。</p>
+<p>⑩ <strong>矿口卡</strong>：在地图上点矿口弹出（地点卡的野外分支，v4q(3)），游戏内英文，各行写法见 ⑪。第一批卡上有：矿型和最近的城市（<code>Vein mine · near Chengdu</code>）、最深层、主产和起始层、怪物和守关（副产行见 ②）、<strong>你在这里到过第几层</strong>、Distance、<code>Go</code>。本季状态、相关新闻、钻地机能送到第几层随以后的批次加；未开放的矿型只写类型行和 <code>Not open yet</code>（v4q(3) ⑤）。</p>
+<p>⑪ <strong>文案</strong>（不知火舞定，照 LOCK-21 复议，尽量沿用现有写法）：
+- 入口在矿口卡上：<code>Enter mine · 2 Energy</code> / 当天进过第 1 层 <code>Enter mine · Free</code>。
+- 楼梯：<code>Floor 4 · Clear Floor 3 first</code>（现有句式，意思从「敲完岩石」变成「打完怪」）/ <code>Floor 4 · 2 Energy</code> / <code>Floor 4 · Free</code>；守关层下面那层同样写 <code>Floor 11 · Clear Floor 10 first</code>。
+- 电梯：面板标题 <code>Elevator · Ironvale Vein</code>（写这座矿的全名，取代 <code>Elevator · stops this run</code>）；行 <code>Entrance · Free</code> / <code>Floor 10 · Free</code> / <code>Floor 20 · 2 Energy</code> / <code>Here</code>。
+- 出口：F1 的上行梯名字条从 <code>Farm</code> 改成 <code>Entrance</code>；电梯最上一站 <code>Entrance · Free</code>。两处都是出矿，回到地图上这座矿的矿口，地图打开、矿口卡弹出，主键 <code>Enter mine · Free</code>。不用 <code>Exit mine · Free</code>。
+- 最深处：矿脉 F40 打完以后往下的楼梯是灰牌 <code>Floor 41 · Not open yet</code>，不能下；浅坑到最深层没有往下的楼梯，什么都不写。守关打过以后，守关层就是普通层，楼梯照常 <code>2 Energy</code> / <code>Free</code>，不另写字。
+- 日切时人在矿里：Info toast <code>New day · Floor 12 has changed</code>，取代 <code>Run ended at daily reset</code>。
+- <strong>矿里的状态行</strong>保留，<strong>放在玩家 HP 卡下面、左对齐</strong>（就是守关卡的位置；守关战时守关卡占住这个位置，状态行藏起来；放在 HP 卡右边 360 宽下放不下），进矿时的 <code>Run 1/2 today</code> 去掉；写法 <code>Rocks 2/6 · 3 monsters left</code> / <code>Rocks 2/6 · 1 monster left</code>（不再写 Slime，精英也算进去；<code>N monsters left</code> 是新句，不知火舞 E2 规格）；没有岩石的层只写怪那半句，怪清完只剩 <code>Rocks 2/6</code>；守关战开始前写守关名（如 <code>Iron Slime King</code>），打起来照旧藏起来。
+- 玩家 HP 卡在矿里<strong>每一层都显示</strong>（E5 已定，E2 帧漏画）。
+- 岩石敲完：沿用现有灰键 <code>Mine · No rocks here</code>（q(62)，代码 p0_material_logic.gd 已有），不新起。
+- 火把照出本层牌堆全是石料：<code>Floor 12 · Stone only</code>（新句，格式同 <code>Floor 12 · Copper Ore ×2 · Iron Ore ×1</code>）。
+- 倒地卡和矿口卡<strong>先后弹</strong>：先倒地卡，<code>Close</code> 后再弹矿口卡，不叠在一起。
+- 守关首杀：飘字 <code>First kill · Iron Slime King</code>（<code>First kill · &lt;守关名&gt;</code>，帧 E5 329:182895，不知火舞定）；守关血条用现有 UiHpBar 的 ELITE 卡，标题写守关名。
+- 掉落放不下：飘字 <code>Bag full · Iron Ore left on the floor</code>，东西留在原地，本层内走过去自动捡。
+- 火把：Info toast 一次写全层 <code>Floor 12 · Copper Ore ×2 · Iron Ore ×1</code>，太长在「 · 」后换行；不再画每块岩石上的图标（MINE-1 图 2 ① 作废）。
+- 位置芯片：<code>Ironvale Vein · Floor 3</code>，下面不再有局数。
+- 矿口卡各行：类型行 <code>Vein mine · Floors 1–40 · near Chengdu</code>（开放到哪层写到哪层）、<code>Main ore</code> <code>Iron Ore · from F10</code>、<code>Also</code> 行第一批不出（副产第一批不掉，用户定，丁13；出的话写 <code>&lt;副产名&gt;</code>，★ 先不写）、<code>Monsters</code> 最多列 3 种、<code>Boss</code> <code>&lt;守关名&gt; · F10, F20</code>、<code>You</code> <code>Best here F12</code> / <code>Not visited</code>。两只换色守关的英文名在 v4q(6) 定（<code>Iron Slime King</code>、<code>Quartz Slime King</code>）。
+- <strong>倒地卡</strong>（新）：标题 <code>Knocked out</code>；第一行 <code>You're back at the entrance.</code>；第二行 F1–10 <code>You kept everything.</code>，F11 起 <code>You dropped half of what you found on this floor:</code> 后面列丢掉的东西（图标 + 数量），F11 起算下来一样都不丢（每样一半向下取整）时也写 <code>You kept everything.</code>；第三行 <code>Your best here is still Floor 14.</code>（句子里写 Floor，F14 只用在卡片事实行）；按钮 <code>Close</code>（同 BOARD-DROPPED 等结果卡）；卡关了停在地图上，打开这座矿的矿口卡。</p>
+<p>⑫ <strong>和 v3 3.5.1 逐项</strong>（v4 第 3 章头注说 v3 03 的 3.0–3.6 作废，附录 B #16 又说 3.5.1 其余行保留，这里逐项写死）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>第一批</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技能经验</td>
+<td>矿里不给，照现行</td>
+</tr>
+<tr>
+<td>火把</td>
+<td>用 v4 引的 v3 写法：岩石按「发牌」掉（第 k 块拿这一层牌堆的第 k 张），火把只照出本层牌堆有什么（如 <code>Copper ×2 · Iron ×1</code>），不照每块岩石。现行火把把每块掉什么都亮出来，加上岩石可选，玩家只敲铁和石英，材料账会少一半多</td>
+</tr>
+<tr>
+<td>炸药</td>
+<td>第一批没有（现行游戏里也没有）</td>
+</tr>
+<tr>
+<td>背包满（q(44)、q(48)）</td>
+<td>只管敲岩石：满包时岩石置灰（<code>Mine · Bag full</code>）；<strong>不挡进层</strong>，满包也能下楼</td>
+</tr>
+<tr>
+<td>掉落放不下</td>
+<td>掉在地上，本层之内能回来捡，离开本层就没了（v3 写法）；不进农场仓库（矿里不算在家，背包是远处的硬限制，v4 4.2）</td>
+</tr>
+<tr>
+<td>倒地、血量</td>
+<td>见 ⑧</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>改哪</strong>：v4 方案第 3 章 3.1–3.8、3.11–3.12 按本条读；旧方案 §13.3 全节（13.3.1 规则表、13.3.2 楼层结构、13.3.3 分层岩石掉落表、13.3.5 每局期望产出、13.3.7 每日上界、13.3.9 楼梯电梯与重置）、§3.3.2 体力计费总表的矿洞行、§16.3 M 矿洞界面、附录 B 矿洞文案，以本条为准。</p>
+<p><strong>推翻</strong>（其余以诸葛亮冲突清单第 3 节 E 组 103 条为准）：§13.3（农场矿洞、5 层、敲完岩石开梯子、每天 2 局、Express、局）；q(62)（<code>Combat · Mine floors 3–5</code>）、q(108) ①（Express 小字）、q(110) ②（<code>Mine five floors. Slimes from Floor 3.</code>）作废；q(43) / q(47) / q(59) 旧掉落表旋钮作废；q(44) 的矿洞款（<code>No runs left</code>、<code>Run ended at daily reset</code>、P0 电梯）作废、满包整层灰显保留；q(48) 改为只管敲岩石；q(55)、q(122)、q(173) ① 的局数举例删掉、规则保留；q(35)、q(120) ④、q(145) ③ 给农场矿口留的缺口改写；q(193) ②「挖矿仍在自家农场」改写；q(39)（首周岩盐来自农场矿洞 1–2 层）改成来自最近的浅坑；q(255) ②（材料 Show 指向农场矿口）改成指向最近产这种矿的浅坑 / 矿脉；q(65) 与 §8.6 的来源句 <code>Clay · Mine floor 1</code> 改写成矿型加起始层（写法见 v4q(4) 的来源句补注，11-03 已批：如 <code>Copper Ore · Quarries</code>、<code>Iron Ore · Iron veins from Floor 10</code>）；<strong>LOCK-21</strong> 矿洞按层计费与按键文案复议（197 cb585675，随本条批；层费 2 保留；<code>Runs today</code>、Express、<code>New run</code> / <code>Continue run</code> 去掉；敲岩不再是开梯子的条件）；q(196)（入口卡局数）、q(116) ①②（精英石英每天一次）作废，q(116) ③ 保留并扩到守关；q(102) 的矿口点击触发改为地图矿口；q(175)（下矿必经）按本条读，矿换了地方；q(204) Mine Hut 仍是 Ivo 的家、不是矿口。</p>
+<p><strong>画面</strong>（安其拉出稿，不知火舞验收通过，页面 14 Review row 119；怪和守关是占位剪影，E2 矿脉 F3 场景里的蝙蝠 11-02 已更正为 Rock Beetle（④；v4q(9) 补注），图钉和物品图标是草稿，地图底图是拉远的旧金山）：<strong>P1</strong>（355 65079ece）E1 矿口卡 321:181190、E1-HERE 321:181494（<code>Enter mine · 2 Energy</code>）、当天进过 321:181671（<code>Enter mine · Free</code>）；E2 矿层 323:181423（第三版 355 968d58dd：HP 卡照主件原宽，状态行 <code>Rocks 2/6 · 2 monsters left</code> 在 HP 卡下面、左对齐）、名字条三态 323:181572（<code>Floor 4 · Clear Floor 3 first</code> 灰牌 / <code>2 Energy</code> / <code>Free</code>，F1 上行梯 <code>Entrance</code>）、四瓣环 E2-RING 325:181641（LOCK-21 复议 197 cb585675）；E3 电梯 326:181733（<code>Elevator · Ironvale Vein</code>，<code>Entrance · Free</code> / <code>Floor 10 · Here</code> / <code>Floor 20 · 2 Energy</code>）。<strong>P2</strong>（355 5f1a9c95）E4 未开放矿口卡 329:182456（<code>Glimmer Geode</code> / <code>Geode mine · near San Jose</code> / <code>Not open yet</code>，没有 <code>Go</code>）；E5 守关层 329:182739（玩家 HP 卡在 HUD 下，守关用现有 UiHpBar ELITE 卡 <code>Iron Slime King</code>，楼梯灰牌 <code>Floor 21 · Clear Floor 20 first</code>，主键 <code>Attack</code>，快捷栏 <code>Healing Potion ×2</code>），首杀飘字 329:182895 <code>First kill · Iron Slime King</code>；E6 倒地卡 F11 起 328:182082（<code>You dropped half of what you found on this floor:</code> 列出丢的东西）/ F1–10 328:182298（<code>You kept everything.</code>）/ 关掉后停在地图上的矿口卡 328:182498（<code>Enter mine · Free</code>）。改前：现行 MINE-1 9:108033、MINE-ELEV-EXPRESS 9:126458（<code>Run 1/2 today</code>、Express）。</p>
+<p><strong>实现</strong>：数值和字段照周瑜接口（仓库 <code>docs/tech/355-b1-contract-efg.md</code>，PR #614 / #617）。服务端 mine.ts 基本重写、state.ts（删 <code>day.mine_runs</code>，加 <code>kills</code>、<code>guard_firsts</code>）、reducer.ts（删 <code>mine_new_run</code> / <code>mine_express</code>）、view.ts（<code>view.mine</code>）、content.ts、progress.ts（新事件）、travel.ts（<code>HOMESTEAD_SPACES</code>，随 v4q(3)）；新内容表 <code>mine_b1.json</code>；客户端 p0_mine.gd、modules/mining/<em>、农场矿口（p0_farm.gd、p0_farm_materials.gd、p0_garden.gd 的 <code>mine</code> 锚点）、p0_material_logic.gd（电梯面板行、楼梯牌、Combat 置灰、快捷栏）、p0_world_prompts.gd、p0_ui.gd、panels/p0_material_cards.gd、ui_kit 的 ui_entry_card / ui_elevator_panel 与快照、p0_logic.gd 的 Show 路由、p0_guide.gd 的 <code>Mine run · Continue</code>；测试 server/test/p0/p0_mine_deep、p0_material_chain 与 tests/p0/test_p0_mine_</em>；docs/qa 文案核对清单；遥测白名单。存档随 v4q(2) 清档到 v7，不迁移旧矿进度。奕星排。</p>
+<h2 id="h-1879c2f5">v4q(6) 【规则】【文案】新怪 3 种（蝙蝠、岩甲虫、菇菇怪）+ 史莱姆王和换色守关、换色精英；行为、掉落、英文名</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。用户 2026-11-02「全按建议」定 355 v4（结论 28、50、52）；v4 方案第 3 章 3.5、3.12，第 9 章 9.1 第 9 行，第 10 章 10.2 的 F 行；诸葛亮冲突清单第 3 节 F 组。在哪层出什么怪、守关在哪，排布表在 v4q(5) ④；本条管怪本身。不知火舞审（英文名）、奕星复核后挂 SGODOT-381。<strong>偏离 v4 一处，标〔用户已定，按推荐〕</strong>：v4 第 3 章 3.5「第一批里甲壳进铁剑配方，其余先能卖、进收集册」，王冠碎片在「其余」里，本条推荐不卖（见 ④）。</p>
+<p><strong>问题</strong>：现在只有史莱姆（3–4 层）和精英史莱姆（5 层），掉落是铜、盐、蚯蚓、石英（§13.3.4、q(116)）。v4 每层都有怪、浅坑和矿脉要守关，第一批要先有 3 种新怪和守关。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>第一批的怪</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>怪</th>
+<th>行为（第 28 条：不做要服务端位置的机制）</th>
+<th>出现（见 v4q(5) ④）</th>
+<th>掉落</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>史莱姆（现有）</td>
+<td>跳扑</td>
+<td>浅坑 F1–9、矿脉 F1–9</td>
+<td>照现行（铜、盐、蚯蚓），不掉石英（④）</td>
+</tr>
+<tr>
+<td>蝙蝠</td>
+<td>快、血少；平时飞高、打不到，俯冲下来时才打得到，打完回到空中</td>
+<td>浅坑 F5–19、矿脉 F11 起</td>
+<td>蝠翼 <code>drop_t1_bat_wing</code></td>
+</tr>
+<tr>
+<td>岩甲虫</td>
+<td>慢、血厚；每次冲撞后都硬直 2 秒（撞没撞到都一样），硬直时受伤 ×2</td>
+<td>浅坑 F11 起、矿脉 F1 起</td>
+<td>甲壳 <code>drop_t2_beetle_shell</code></td>
+</tr>
+<tr>
+<td>菇菇怪</td>
+<td>每挨一下就缩回 1 秒、缩回时不受伤（所以每秒最多挨 1 下）；定时放孢子（打中算一次普通命中）</td>
+<td>浅坑 F21 起、矿脉 F11 起</td>
+<td>荧光孢子 <code>drop_t2_glow_spore</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>② <strong>精英</strong>（个位 5 的层）：同一模型换色、血量和伤害高一档——精英史莱姆（现有）、精英蝙蝠、精英岩甲虫、精英菇菇怪。掉落 = 本怪的掉落 ×2、每次必掉（精英史莱姆见 ④）。</p>
+<p>③ <strong>守关</strong>（整十层）：<strong>史莱姆王</strong>（史莱姆放大换色，T1；浅坑 F10，F20 血量 ×1.5，F30 血量 ×2）；矿脉的两只用史莱姆王换色（第 50 条第 3 件）：<strong>铁史莱姆王</strong>（T2，矿脉 F20；第二批换成铁背甲虫王）、<strong>石英史莱姆王</strong>（T2，矿脉 F40；第二批换成菌母）。守关掉：王冠碎片 <code>drop_crown_shard</code>（个人首杀必掉，按种一次，v4q(5) ⑨）+ 一包本矿主产（初值：矿脉主矿 ×5，铁矿脉铁矿石、石英矿脉石英；浅坑五样都出、没有单一主产，固定铜矿石 ×5；周瑜接口 v0.5 已照此改，待校准）。浅坑 F10 / F20 / F30 是同一种守关（史莱姆王），王冠碎片只在第一次给；矿脉的两只各算一种，所以第一批每人最多 3 片。守关打过就不再出现（v4q(5) ③），主产包每座矿每个守关层也只有一次。</p>
+<p>④ <strong>掉落的用处</strong>：甲壳进铁剑配方（v4q(7)）；蝠翼、荧光孢子第一批先能卖，算材料、走每天 30 的材料回收额度；<strong>王冠碎片卖不卖</strong><strong>〔用户已定，按推荐〕</strong>：<strong>不卖（推荐）</strong>——每人第一批最多 3 片、拿不回来，第二批饰品配方要用；或者照 v4 3.5 先能卖；甲壳不卖（进铁剑配方，同硬木、石英的做法）。内容表 <code>materials</code> 初值（<code>price</code> = 回收价，<code>null</code> = 不能卖；<code>floor</code> = 委托里交它时按的影子价）：<code>drop_t1_bat_wing</code> Bat Wing price 4；<code>drop_t2_glow_spore</code> Glow Spores price 5；<code>drop_t2_beetle_shell</code> Beetle Shell price null、floor 5；<code>drop_crown_shard</code> Crown Shard price null（按推荐先填，用户选「先能卖」再改；不进委托，不设 floor）——都待校准。收集册第二批才有（v4 9.2），上线时和击杀记录一起回填——第一批就在 <code>firsts</code> 里记下新掉落第一次拿到（<code>loot:&lt;id&gt;</code>，现在只记收获 / 钓到 / 做菜），回填才有依据；第二批进药水和饰品配方。<strong>浅坑精英史莱姆不掉石英</strong>（v4 3.3：石英是矿脉主产；q(116) ①② 已随 v4q(5) ⑦ 作废），改掉铜矿石 ×2、每次必掉（初值，同其他精英「本怪掉落 ×2、必掉」）。</p>
+<p>⑤ <strong>数值</strong>：各怪和守关的血量、伤害、攻击间隔，v4 没给，由实现先给初值，和武器伤害（v4q(7)）一起做模拟器校准（交接第 6 节）。险境、气候变体第一批不做（3 期起）。</p>
+<p>⑥ <strong>英文名</strong>（不知火舞审定）：<code>Cave Bat</code>、<code>Rock Beetle</code>、<code>Shroomling</code>、<code>Slime King</code>（和设定图一致）、<code>Iron Slime King</code>、<code>Quartz Slime King</code>（按材质起名；不用 Ironback，第二批的铁背甲虫王会用到）；精英在名字前加 <code>Elite</code>（同现有 <code>Elite Slime</code>，如 <code>Elite Cave Bat</code>）；掉落 <code>Bat Wing</code>、<code>Beetle Shell</code>、<code>Glow Spores</code>、<code>Crown Shard</code>。</p>
+<p>⑦ <strong>美术</strong>：蝙蝠、岩甲虫、菇菇怪是项目里第一批带骨骼动画的怪（3D 是大头）；史莱姆王、精英、矿脉守关用现有模型放大 / 换色，三只王另加头饰 glb（王冠、铁甲片、石英晶簇）。保底：先用灰模 glb 占位，正式版 11-20 前替换（上官婉儿 3D 计划第 4 节；计划本身还等用户批）。动作名照 3D 接口 v1（idle / move / windup / attack / recover / hit / die，加 fly_high / stunned / hide / spore）。</p>
+<p><strong>改哪</strong>：v4 方案第 3 章 3.5 按本条读（正文「铁背史莱姆王」按 ⑥ 读作铁史莱姆王）；旧方案 §13.3.4 怪物与掉落、§16.3 MINE-1、§16.4.8、§9.13.1 与 §13.1.1（新掉落先能卖）、附录 A.0.4 <code>mob_slime</code> / <code>mob_elite_slime</code> 与新怪、新掉落 id、附录 B.13「怪物」行，以本条为准。</p>
+<p><strong>推翻</strong>：§13.3.4（3–5 层才有怪、两种怪、掉落表）；q(116) ①②（精英石英当天第一次 20%）随 5 层结构作废（v4q(5) ⑦；③ 保留并扩到守关）；浅坑精英的掉落见 ④。</p>
+<p><strong>画面</strong>：三种怪、史莱姆王、换色精英和守关的模型与动画（3D），守关层的帧随 v4q(5) E5。</p>
+<p><strong>实现</strong>：客户端战斗（modules/mining/*，怪物行为写在客户端，服务端只信客户端，守关击杀的合理性校验进防作弊专题）；内容 <code>mine_p1.json</code>、<code>mining.json</code> 的怪物和掉落表；3D 模型与动画。奕星排。</p>
+<h2 id="h-3131a21e">v4q(7) 【规则】【数值】【界面】【文案】武器槽、铜剑（Pip「第一次下矿」委托）、铁剑（工作台）、回血药、战斗快捷栏；武器低一档每下伤害减半</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。用户 2026-11-02「全按建议」定 355 v4（结论 27、50、52）；v4 方案第 2 章 2.7–2.8、第 3 章 3.5、第 6 章 6.2–6.3，第 9 章 9.1 第 10、12 行，第 10 章 10.2 的 G 行；诸葛亮冲突清单第 3 节 G 组。标<strong>〔用户已定，按推荐〕</strong>的几处是 v4 没写或和现行不一致、这次补定的，跟本条一起报批。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：现在只有一把木剑（<code>Wooden Sword · Attack 3</code>），「更高武器为矿洞掉落预留」；工作台不做武器；治疗药水只在矿洞 3–5 层能喝（§10.5、§13.1.2、§13.3.8）。v4 每层都有怪、矿脉守关算 T2，第一批要有能换的武器和药。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>武器槽</strong>：就是 Gear 页现有的 Combat 槽（LOCK-13 不加新槽）。<strong>开局就装着木剑</strong>（<strong>〔用户已定，按推荐〕</strong>，推荐开局：v4 2.7 写「Lv3 开武器槽」，3.2 又写「进矿时手里至少有木剑」，前后不一；浅坑没有等级门槛，Lv3 前就能进、F1 就有史莱姆；Gear 页的槽本来就画着木剑。选开局，Lv3 就是「第一次换武器」，v4q(1) ⑧ Lv3 行已按此写）；以后换上铜剑、铁剑，Gear 页 Combat 槽列出已有的武器。挥刀时手里出现的是当前装上的武器（q(138) ④ 的「只在挥刀时出现」保留）。</p>
+<p>② <strong>武器和档位</strong>：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>武器</th>
+<th>档位</th>
+<th>来源</th>
+<th>解锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>木剑 <code>Wooden Sword</code>（现有）</td>
+<td>T1</td>
+<td>开局自带</td>
+<td>—</td>
+</tr>
+<tr>
+<td>铜剑 <code>Copper Sword</code></td>
+<td>T1</td>
+<td>Pip「第一次下矿」委托的奖励</td>
+<td>Homestead Lv3</td>
+</tr>
+<tr>
+<td>铁剑 <code>Iron Sword</code></td>
+<td>T2</td>
+<td>工作台配方：铁矿石 6、硬木 4、煤 3、<code>Beetle Shell</code> 2、150 金币（工作台加 <code>to: 'weapon'</code>；第二批熔炉上线后改由熔炉做）</td>
+<td>Homestead Lv8</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>武器档位低于守关档位时，每下伤害减半，向上取整</strong>（第 52 条；替代 v3 的「每下只打 1 点」）：木剑 3 → 2、铜剑 5 → 3。浅坑守关 T1，木剑、铜剑都能打；矿脉守关 T2，要铁剑才打得顺（按校准 11-02 的量级：普通玩家铁剑打铁史莱姆王约 20 下、1 瓶药；铜剑约 54 下、4 瓶（回满），能打但贵；向下取整的话还要多得多，等于打不过）。只对守关生效。</li>
+<li><strong>伤害数值</strong>：v4 没给；推荐木剑 3（现有）、铜剑 5、铁剑 8 作初值（<strong>〔用户已定，按推荐〕</strong>，配向上取整），和怪的数值（v4q(6) ⑤）一起做模拟器校准。</li>
+<li>铁剑按节奏脚本 30 分钟玩家第 8 天左右做得出，比 v4 2.8「第 7 天带铁剑打 F20」晚约 1 天；矿脉 F20 守关不卡 Lv1–17 的材料，配方不改，第一周表在模拟器校准时一起看。</li>
+<li>不做整套护甲、不加战斗等级，强弱只看装备（§1.2 P7 保留）。</li>
+</ul>
+<p>③ <strong>Pip「第一次下矿」委托</strong>（Lv3）：像 q(218) 的教学委托那样<strong>单列在 Pip 的委托线之外，但用独立的槽</strong>（不受现有 intro 机制「委托线还没开始（<code>r.next = 0</code>）」「和委托线共用一个槽」「要交」「只给新引导档」的限制）：Homestead 升到 Lv3 就出现，不等前面的委托、不看好感阶段；Pip 原来三条新手委托和 P1 的 <code>req_res_pip_4</code> Sweet Delivery、<code>req_res_pip_5</code> Pip's Big Route 都不动，不动 <code>r.next</code>。新需求类型「<strong>下到第 N 层</strong>」（任何一座矿走到第 3 层，N = 3）；进度按资历算（v4q(5) ⑤：Lv3 之前已经到过第 3 层的，出现就完成）。<strong>升到 Lv3 自动接、直接进 Today</strong>，不用去驿站接、也不用回去交，走到第 3 层当场完成（<strong>〔用户已定，按推荐〕</strong>，推荐：铜剑只此一个来源，又是 v4 2.8「第 1 天当晚 F1–3 拿到铜剑」的钩子）；这条不占追踪名额（<code>track_max</code> 3）。奖励 +5 好感和铜剑，<strong>铜剑直接装进武器槽</strong>（木剑留在 Gear 列表里）；手上已经是铁剑的（Lv8 以后才完成的）不换。文案（不知火舞审定）：标题 <code>Pip's First Dig</code>（对照 <code>Pip's First Fish</code>；Dive 读起来像下水），台词 <code>Ever been down a mine? Reach Floor 3 and tell me what's down there!</code>，奖励行 <code>+5 Friendship · Copper Sword</code>；委托卡 Bring 格换成目标行 <code>Reach Floor 3 · any mine</code>；Today <code>Pip's First Dig · Floor 1/3</code>；完成飘字 <code>Copper Sword · equipped</code>；手上已经是铁剑、铜剑没换上时只写 <code>Copper Sword</code>（同其他奖励物品的飘字，不知火舞定）。</p>
+<p>④ <strong>回血药</strong> <code>potion_heal</code> Healing Potion：旧方案文档里有，<strong>从没上线过</strong>（服务端没有药、驿站货架没有、Combat 快捷栏一直空着），下面「旧方案文档写的」都不是现行。Homestead <strong>Lv4 起农场驿站上架</strong>；矿里每层都有怪，任何一层都能喝（旧方案文档写只在 3–5 层）。价格每瓶 <strong>25</strong>（v4 6.2、6.3；旧方案文档写 20）。日库存 v4 没写，取旧方案文档的 5。效果回满 HP（<strong>〔用户已定，按推荐〕</strong>，推荐回满：HP 上限固定 100、没有护甲，出矿再进就回满（v4q(5) ⑧），药主要用在守关战；按校准 11-02，铜剑硬打铁史莱姆王回满要 4 瓶，在日库存 5 瓶以内；改成回 50 HP 要 6 瓶，超过日库存）。两次喝药间隔 3 秒（初值，同周瑜接口）。第二批药剂台上线后改成自己做。料理照旧不回 HP。</p>
+<p>⑤ <strong>战斗快捷栏</strong>：第一批就上；Combat 快捷栏放药，幽灵格加 Potion；喝药按主行动键 <code>Drink</code>（§13.3.8）。Potion 幽灵格（q(44)）和 <code>Drink</code>（§13.3.8）方案里本来就有（没上线），只是可用的层数从 3–5 层放宽到每层，LOCK-04 / LOCK-02 不用复议，不知火舞在 197 记说明。197 另记两句说明：LOCK-12 药水仍在 Materials Tab，七个 Tab 不变；LOCK-15 驿站 Buy 加一行药，行数规则照旧。</p>
+<p>⑥ <strong>物品种类</strong>：剑用 <code>weapon_*</code>、药用 <code>potion_*</code>，<code>itemKind</code> 单独认出来（现在药按 <code>material</code> 算，会堆到 99、能交进材料委托）。v4 6.2 写剑用 <code>sword_*</code>，按本条改成 <code>weapon_*</code>（旧方案 §16.3 P 节和附录 A.0.4 本来就是 <code>weapon_wooden_sword</code>，和周瑜接口一致）。新 id <code>weapon_copper_sword</code>、<code>weapon_iron_sword</code>；现有木剑 <code>sword_wooden</code> 随 v4q(2) 清档到 v7 改名 <code>weapon_wooden_sword</code>，不迁移。武器不进背包、进 Gear；<code>itemKind</code> 的 weapon 给奖励和包裹用。药水堆叠 10（<code>bag.stack</code> 加 potion 一档）；武器、药不能交进材料委托。名字照现有：药 <code>Healing Potion</code>；Gear 页槽名 <code>Weapon</code>，效果句照 <code>Attack 3</code> 的格式（<code>Attack 5</code>、<code>Attack 8</code>，数值等校准）。</p>
+<p><strong>改哪</strong>：v4 方案第 6 章 6.2–6.3 按本条读；旧方案 §1.4「战斗 / 装备」「建造」行、§9.4.3 Pip 行、§9.4.4、§9.6.2（委托加「下到第 N 层」的例外）、§9.11.1、§9.13.2 角色委托行、§9.15、§10.3.2、§10.4.2、§10.5、§13.0、§13.1.2–13.1.3、§13.3.8、§13.4、§13.5.1、§14.1.2 Tools &amp; Gear、§14.6.1 第 3 天、§14.8.3、§16.0.1、§16.1.3、§16.3（FARM-5、P 节）、§16.4.5 BAG-2、§4.9 第 10 条、§9.0 第 8 条、§9.9 第 8 条、§9.16.1 表下、§10.8 Gear 页文案、§13.8 #3、§17.2.1 操作层「P0 不做」、附录 A.0.4 / A.9、附录 B.9 / B.10 / B.13，以本条为准。v4 方案 2.7 Lv3 行、2.8 第一周表、3.2、6.2「物品 id 前缀」行按本条读；v4q(1) ⑧ Lv3 行跟本条一致。</p>
+<p><strong>推翻</strong>：§10.5（武器只有木剑、靠掉落）；§13.1.2「药水只在 3–5 层能用、没有配方也不掉落是故意的」；§13.4 / §13.8 #7「工作台不做武器」；§9.6.2「委托只收农场产出」加例外（Pip 的「下到第 N 层」）；q(138) ④ 木剑改为当前武器；§9.4.4 和 q(170) 里 Pip 的 P1 两条（Sweet Delivery、Pip's Big Route）按本条读（不动）；q(218) 的教学委托机制按本条读（Pip's First Dig 不走它）。</p>
+<p><strong>画面</strong>（安其拉出稿，不知火舞验收通过 355 5813fc1e）：G1 BAG-2-WEAPON 342:184617（Gear 页 Weapon 槽列表：<code>Wooden Sword · Owned · Attack 3</code> 带 <code>Equip</code>、<code>Copper Sword · ✓ Equipped · Attack 5</code>、<code>Iron Sword · Workbench · Attack 8</code> 灰键 <code>Homestead Lv8</code>；底注 <code>Gear does not use Bag slots.</code> 是现有句）；G2 WORKBENCH-IRON 343:184859（Tools 页铁剑卡 <code>Iron Sword · Attack 8</code>，材料 Iron Ore / Hardwood / Coal / Beetle Shell，按钮写第一个缺口 <code>Need 2 more Coal</code>；<strong>金币写在键上</strong>：<code>Craft · 150 coins</code>，钱不够 <code>Need N more coins</code>，N = 价格 + 40 − 钱包，照 q(10)；帧里同页的 Gather Gloves 卡是「手套照旧」那个选项的画法，v4q(4) ④ 选去掉的话这张卡不出）；G3 Pip's First Dig 344:185082（委托卡照下面的画法）；G3b Today 行 346:185441；G3c 完成飘字 344:185250；G3-ALT 驿站接单备选 344:185421（③ 不按推荐时用）；G4 MINE-POTION 344:185539（矿脉 F3 场景里的蝙蝠 11-02 已更正为 Rock Beetle（v4q(5) ④），G3c 同；v4q(9) 补注；不知火舞 355 968d58dd：快捷栏选中 <code>Healing Potion ×2</code>，主键 <code>Drink</code>，HP 卡 40%，状态行 <code>Rocks 2/6 · 2 monsters left</code> 在 HP 卡下面）。G 组全部通过。改前：现行 Gear 页只有木剑，工作台不做武器。不知火舞界面上赞成「木剑开局就在武器槽」（Gear 页本来就画着它）和「Pip 委托升到 Lv3 直接出现在 Today」，两处仍报用户定。
+- <strong>Pip's First Dig 委托卡</strong>（不知火舞定，安其拉 G3 照画）：按推荐（Lv3 自动接），从 Today 打开的是已接的卡——目标行是 NEED-TILE <code>Reach Floor 3 · any mine</code> 1/3，<strong>不带 <code>Bring</code> 标签</strong>（现在 <code>scenes/ui_kit/ui_request_card.gd</code> 把 <code>Bring</code> 写死了，实现时这一类需求不显示这个标签）；Reward <code>+5 Friendship · Copper Sword</code>；不画 Deliver to；底部只有全宽次键 <code>Close</code>，不出 Accept、也不出灰键。③ 不按推荐时：从驿站打开、没接的卡照现有，底部 <code>Accept</code> / <code>Not now</code>。没有新英文（<code>Close</code> 是现成写法，倒地卡、BOARD-DROPPED 都用它）。</p>
+<p><strong>实现</strong>：服务端 state.ts、reducer.ts、workbench.ts（<code>to: 'weapon'</code>）、content.ts（<code>itemKind</code>、新需求类型）、residents.ts（Pip 委托与矿里进度回调）、parcels.ts；客户端 Gear 页、物品卡、战斗快捷栏、combat_art；内容表武器、配方、驿站货架。奕星排。</p>
+<h2 id="h-1b442e3b">v4q(8) 【规则】【文案】移除特产换料（Specialty Barter）：矿物只从矿里来</h2>
+<p><strong>状态与来源</strong>：已批：用户 2026-11-02 在奕星终端回早报清单「全按推荐」「v4q 2 ok」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md，待定项丁1–丁19、丁22、丁23 全按推荐）。用户 2026-11-02「全按建议」定 355 v4（结论 38）；v4 方案第 5 章 5.7、第 9 章 9.1 第 11 行、第 10 章 10.2 的 H 行；诸葛亮冲突清单第 3 节 H 组。不知火舞审、奕星复核后挂 SGODOT-381。</p>
+<p><strong>问题</strong>：现在集市可以用 2 件本气候带特产换 1 件石料 / 黏土 / 铜 / 石英，每级每种最多替一半、每天 6 次（§8.4.5、q(166)），给少下矿的玩家一条路。v4 把矿搬到城外、每天都要出门，矿物只从矿里来（第 38 条），和 q(175)「下矿必经」一致。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>移除特产换料</strong>：服务端 <code>barter.ts</code> 和引用、内容 <code>homestead.barter</code>、集市柜台的换料入口与换料段、<code>p0_barter.gd</code>、相关 toast、调试步骤和测试一起去掉；随第一批上线，不单独发（v4 10.2）。<strong>存档</strong>：<code>homestead.bartered</code>、<code>day.barters</code> 两个可选字段不再写，引导计数键 <code>barter</code> 去掉；随 v7 清档（v4q(2)），不迁移。</p>
+<p>② <strong>文案去掉</strong>：升级面板材料格的 <code>or Barter 2 Sweet Potato → 1</code>、缺口行与「换料」行（<code>Barter · 2 Sweet Potato → 1 Copper Ore</code> / <code>Barter today 4/6</code> / <code>Up to half of this level by barter</code>）、集市 Buy 页的 Barter 一组（q(168) ① 的顺序里删掉 Barter）。升级面板这几句代码里本来就没有，只在旧方案 §8.6 里，这一项只改文档。</p>
+<p>③ <strong>不变</strong>：q(175)「下矿必经」保留；回收价和每天回收额度不变（§13.3.6 里「每局影子金币」那部分随局作废，见 v4q(5)）；不做拍卖行。</p>
+<p><strong>改哪</strong>：v4 方案第 5 章 5.7 按本条读；旧方案 §8.4.5 整节、§8.0 第 3–4 条、§8.4.4、§8.5.2、§8.6.1–8.6.2、§9.0 第 11 条、§9.11 / §9.11.2、§9.16.3 换料旋钮、§13.5.2、§13.6、§15（换料次数等）、§17.3.1、附录 A.9 <code>barter_specialty</code>、附录 B.9「换料」行，以本条为准；§1.3.3（m2）、§1.4「画板下半」行、§2.0 第 2 条、§2.2 成长链图 X3 节点「兑换：异城特产 2 比 1 换矿物」（Travel Permit 配方保留）、§2.6 第 2 条、§5.2.7「总规则」里的「特产换料」以本条为准（9805c9a7 已在这 6 节加注）；§9.11.2 地区配方卡行「与回收、换料同一口径」读作「与回收同一口径」，§8.4.6「换料规则与地区种子日额度按气候带一致」前半句失效，第 5 行状态栏 q(166)、q(175) 两段按本条读。另：docs/qa/p0-copy-checklist-2026-10-08.md「特产换料（P1）」行标作废；Figma 帧 BARTER-1 2567:131803、BARTER-2 2570:132291、BARTER-LIST 2569:132290 由不知火舞标作废。</p>
+<p><strong>推翻</strong>：q(166) 整行作废；q(175) ② 后半（「换料每级每种最多替一半……」）和 ④ 作废，「下矿必经」保留；q(181) ②③ 作废；q(263) ⑧（换料上限按当级需求一半）作废；q(168) ① 删 Barter。只是顺带提到换料的 q(182)、q(217)、q(245)、q(251)（§8.4.5 换料「不计入」）、q(252)、q(268)、q(270) 裁决不变，提到换料的半句失效。</p>
+<p><strong>画面</strong>：无新帧（只删入口和文案）。</p>
+<p><strong>实现</strong>：服务端 barter.ts 及引用、内容 <code>homestead.barter</code>；客户端 p0_barter.gd、柜台换料段、toast、测试。奕星排。</p>
+<h2 id="h-f8cabdbc">v4q(9) 【规则】【界面】【文案】第一周带人去矿脉：Today 的「开矿脉」行和 Pip 的一句</h2>
+<p><strong>状态与来源</strong>：<strong>已批，校准已跑</strong>：用户 2026-11-02 17:05 飞书「v4q 9 ok，加 Lv9 终止，校准跑完再并」（om_x100b61b169e34484de84dc3cfd40b7e，奕星回读核过是用户本人）；校准跑完后，用户 18:15 飞书「v4q 9 选 ab」（om_x100b61b263ada4a8c01ac7164a01a50，奕星回读核过）：<strong>a 终止从 Lv9 提前到 Lv7</strong>、<strong>b 矿脉行排在 Homestead 材料行前面、不被 q(143) 的保底顶掉</strong>，都写进 ①。同一时段另有一条经他人代发的飞书回复（「石英改 F5」），不算数、不做。用户 2026-11-02 批庚5「同意方向」（奕星 -51 转，无消息 id；清单 pm/plans/355-b1-approvals-2026-11-02.md 庚5：第 3、4 天各开一座矿脉，「Today 现在只写下一级缺什么，玩家第 3 天不会想到去开矿脉，要加 Today 或引导的提示……另起 q 行报你」）和丁12 选 A（矿脉开局就能去，v4q(5) ②）。v4q(1) ⑨ 写「Today / Pip 带人去矿脉的提示另起 v4q」，就是这一条。规格是不知火舞 2026-11-02 定稿、和蒙恬对过的（/Volumes/ACASIS/tmp/huowu-a/355/vein-guide/spec-2026-11-02.md）；依据还有李白校准 11-02 第 10 条（不提前开矿脉，Lv8 准时率 17%）。Pip 那一句由李白定。<strong>不知火舞 2026-11-02 审过</strong>（按钮、Pip 一句照本稿；出现条件放宽到「接下来三级」、红点、图标、人在矿里不带按钮、和 Homestead 行去重、同档先后、改家城也是她定的；审核记录 381 f5e74657、355 af8bb80d）。奕星复核（pm/plans/v4q9-review-2026-11-02.md）退回的三处已改。挂 SGODOT-381。</p>
+<p><strong>校准</strong>（11-02，李白；报告 /Volumes/ACASIS/tmp/libai-tools/calib/report-2026-11-02-v4q9.md，脚本 c7_vein_guide.py，固定种子可重跑，文末有李白复核；奕星看过）：a + b 下，每天材料 9 分钟的玩家铁 / 石英矿脉在第 3 / 4 天前到 F10 的 98 / 95%，Lv5–12 准时 99–100%；7.2 分钟档 Lv8 / 9 / 10 准时 96 / 99 / 99%（没这一行时 93 / 96 / 97），但铁第 3 天前只有 56%；手慢档 9 分钟里推不下一趟 F1→F10。照原写（Homestead 行在前、Lv9 终止）：从上往下做的玩家准时率不降、带路几乎没用（铁第 3 天前 28%）；看到就先推的玩家 Lv8 降到 92%（7.2 分钟档 55%）。另：主矿 F1–9 权重 25 下，第一周推不推 F10 对升级材料几乎没差，推 F10 的价值在电梯站、F20 铁史莱姆王和铁剑。第一只守关放第 2 天、第一周逐日表另起（改 v4q(1) ⑨ / v4 2.8）。不确定：Today 上别的行按概率抽、F1→F10 的时长没真机掐。</p>
+<p><strong>问题</strong>：v4q(1) ⑨ 要第 3、4 天各开一座矿脉（铁、石英各从 F1 走到 F10），可现在 Today 的 Homestead 行只看下一级（v4q(1) 每级都出，丁5）：Lv5、Lv6（第 2、3 天）的下一级都不要铁和石英，要到 Lv7（第 4 天）才会指向矿脉，玩家第 3 天不会想到去开矿脉。不提前开，Lv8 准时率只有 17%（校准 11-02 第 10 条）。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>Today 加「开矿脉」行</strong>（主）：
+- <strong>服务端给字段、客户端加行，不进引导</strong>（Today 行在客户端拼，同 q(128) 外城签到行不进引导的做法）。「这里的最深纪录」读矿的存档（v4q(5) ⑤）。
+- <strong>出现条件（四条都满足）</strong>：引导已经结束（<code>guide.step</code> 为空；不进引导的号同样适用）；Pip's First Dig 已完成（v4q(7) ③）；离家最近的免费铁矿脉（v4q(3) ③ 的那一座），玩家在那里的最深纪录 &lt; 10；<strong>接下来三级里有一级要用 Iron Ore</strong>（v4q(1) 等级表）。按 v4q(1) 的表，Lv8 起每级都要铁，所以 <strong>Lv5 起</strong>满足最后一条，照 v4q(1) ⑨ 的节奏就是第 2 天升到 Lv5 之后出现，第 3 天开矿脉之前已经在了（不知火舞定：原稿写「接下来两级」，要到 Lv6、第 3 天升级以后才出来，太晚；校准：两级 Lv8 准时率 68%，「三级」不用改）。连同下面的 Lv7 终止，这一行只在 <strong>Lv5、Lv6</strong> 出现（第 2 天升 Lv5 后到第 4 天升 Lv7 前）。
+- <strong>写法</strong>：<code>Ironvale Vein · Reach Floor 10</code>（新格式；矿名是那座矿的全名，<code>Ironvale Vein</code> 是示意名，同 v4q(3)）。不加 <code>· Elevator</code>。按钮照 §14.5 现有规则，客户端自动选写法（<code>p0_ui</code> 的 <code>show_label</code>）：人在地图页写 <code>Show</code>，在别处写 <code>Show on map</code>；点了打开地图、镜头移到那座矿的图钉、弹矿口卡（E1，v4q(5)），玩家自己点 <code>Go</code>。<strong>人已经在这座矿里时</strong>，这一行照样显示（到 F10 前一直在），但不带按钮（不知火舞定）。
+- <strong>红点</strong>：亮，照 q(107)「新解锁、还没看过的行」：第一次出现时亮一次，打开 Today 就灭，之后不再亮（不知火舞定；按 q(107)「类型 + 对象」记已看，每座矿亮一次。q(255) 的 Homestead 行只有 <code>Upgrade to Homestead</code> 那一行亮、材料行不亮，这一类另算）。
+- <strong>消失</strong>：这座矿的最深纪录到 10，这一行就消失。铁矿脉开完以后，石英矿脉照同样的四条出一行（第四条换成「接下来三级里有一级要 Quartz」，矿取离家最近的免费石英矿脉）；两座都到过 F10 就不再出。<strong>任何一座铁矿脉的最深纪录到过 10 就不出铁的这一行</strong>（改家城以后，新的最近铁矿脉从 0 起，也不再出），石英同理（不知火舞定）。<strong>Homestead 到 Lv7 起，铁矿脉、石英矿脉两行都不再出</strong>，就算还没到过 F10（用户定 a；原写 Lv9）：到 Lv7 时下一级 Lv8 本身就要铁和石英，交给 Homestead 行带（它的 Show 也指最近产这种矿的矿脉，v4q(5)）。校准：Lv9 才终止时，第 3、4 天没赶上的人会在第 5、6 天（Lv8、Lv9 到期那天）被这一行拉去推 F10，挤掉当天的料。
+- <strong>和 Homestead 行去重</strong>（不知火舞定）：Homestead 行（v4q(1)，每级都出，丁5）的第一个缺口是 Iron Ore / Quartz、Show 指的正是这一行要指的那座矿时，<strong>只留 Homestead 行，不出矿脉行</strong>（已批的行优先；Homestead 行写着升级还差什么，Show 一样带过去，F10 的目标 Lv5–7 已经由矿脉行讲过）。两行指不同的矿时（铁矿脉已到过 F10、矿脉行换成石英，Homestead 行还缺铁）两行都出。（Lv7 终止以后，Lv5、Lv6 的下一级不要铁和石英，这条实际碰不到，留作口径。）
+- <strong>一次只出一行</strong>矿脉行（先铁后石英；铁矿脉已经到过 F10、石英没到时只出石英那一行）。
+- <strong>排序</strong>（用户定 b）：算可立即做；在可立即做一组里<strong>排在 Homestead 材料行前面</strong>（q(255) ⑥、q(258) 的同类先后：可交付的委托行 &gt; <code>Upgrade to Homestead</code> &gt; 收获、浇水等其它可立即做 &gt; <strong>矿脉行</strong> &gt; Homestead 材料行），不压在可交付的委托行和 Upgrade 行前面；<strong>不被 q(143) 的保底顶掉</strong>：q(143) 排满时替换第 3 行，矿脉行在第 3 行时同交付行一样不让，这一次保底行不出。人在这座矿里、不带按钮时仍算可立即做（不知火舞定）。图标用矿脉图钉那枚（<code>vein.svg</code>，第 1 批正式图标，不知火舞定）。</p>
+<p>② <strong>Pip 的一句</strong>（辅）：
+- Pip's First Dig 完成后，<strong>下一次和 Pip 说话</strong>换成指向矿脉的一句，<strong>只说一次</strong>（存档里记一下说过，换设备也不再说；随 v7 清档，不迁移，v4q(2)）。说完以后照原来按好感阶段的台词（q(273) 等）。和 Pip 说话前已经到过那座铁矿脉的 F10，就不说这一句。<strong>和引导台词撞上时</strong>（11-03 补注，<strong>用户已批</strong>：随 q(279) 报，用户在奕星终端回「279 ok」、无消息 id；不知火舞定，周瑜服务端 #697 按此改）：引导进行中 Pip 有引导台词时先说引导台词；矿脉这句等引导结束（<code>guide.step</code> 为空）后、下一次和 Pip 说话时再说，只说一次，不因为撞上而丢掉——和 ① Today 矿脉行同一个条件，引导期间不插别的提示。只在玩家引导结束前就升到 Lv3、还走到 F3 时才会撞上。
+- 台词：<code>Copper's a start! There's iron at Ironvale Vein. Get down to Floor 10!</code>（矿名取玩家那座铁矿脉）。（不知火舞审定）。她的候选原是 <code>Copper's a start. The iron is deeper. Try Ironvale Vein!</code>，李白改了两处：正式矿名从词池取、不一定带 Iron，所以把「铁」写明；铁在另一座矿、不是这座矿更深的地方，<code>deeper</code> 会读成「这座矿往下走」，改成和 Today 行同一个目标 <code>Floor 10</code>。对话条照 LOCK-18，字数和 First Dig 的台词差不多。
+- 不做成委托，不占追踪名额，不给奖励。</p>
+<p>③ <strong>不做</strong>：不加引导步骤、不弹教学卡；不改矿的规则和数值。不给 Joey 验收（Joey 11-18 那版走不到第 3 天，奕星定）。</p>
+<p><strong>新英文</strong>：<code>&lt;矿名&gt; · Reach Floor 10</code>（Today 行格式）、Pip 一句 1 句。<code>Show</code> / <code>Show on map</code> 是现成写法。</p>
+<p><strong>改哪</strong>：v4q(1) ⑨「Today / Pip 带人去矿脉的提示另起 v4q」读作本条；v4 方案 2.8 引注同。旧方案 §14.5「来源」列、§9.5.3 Today 行写法和 q(258) 的同类先后清单加这一类行（以本条为准）。逐日表等用户定、「照表走」重跑校准后再改 v4q(1) ⑨ / v4 2.8，这一条的出现条件跟着核。</p>
+<p><strong>推翻</strong>：无。</p>
+<p><strong>画面</strong>（安其拉出稿 355 6b407248，不知火舞验收通过 355 1e9965c0，VG3 / VG4 第二版 355 8359ee99；页面 14 Review row 125 382:187179；矿名是示意，地图底图是拉远的旧金山）：<strong>VG1</strong> 农场里的 Today 382:187180（Lv5，Today 芯片亮红点；三行依次是可交付的 <code>Tea Trail · Deliver at Mission Market Square</code>、<code>Ironvale Vein · Reach Floor 10</code>（vein 图标）、<code>Homestead Lv6 · Timber 3 to go</code>，都带 <code>Show on map</code>，在 · 处折成两行；<strong>VG1 按 b 对调第 2、3 行（安其拉 355 294a4dfa，不知火舞重验 355 6985ab89）</strong>）；<strong>VG2</strong> 点了以后 382:187345（第二版 355 988293c6：地图停在 Ironvale 钉上，弹矿口卡，<code>You · Not visited</code>、<code>Cost · Free</code>，Monsters 按内容表从浅到深最多 3 种 <code>Slime · Rock Beetle · Shroomling</code>）；<strong>VG3</strong> Pip 一句 384:187616（LOCK-18 对话条，好感 Stranger 5/15）；<strong>VG4</strong> 人在这座矿里 384:187745（第二版：芯片 <code>Ironvale Vein · Floor 3</code>，F3 只有史莱姆和岩甲虫；矿脉行在、不带按钮）。改前：现行 Today 实拍（李元芳，安卓 0.2.20 正式包，人在农场，三行 <code>Sow your first plot</code> / <code>Deliver 2 Pond Crucian · Stall</code> / <code>Cook it: Grilled Crucian</code>，没有矿脉行；381 附件 e33fd0a2）。</p>
+<p>另：v4q(5) 的 E2 323:181423、v4q(7) 的 G4 344:185539 和 G3c 344:185250（都已批）在矿脉 F3 的场景里画了蝙蝠，和 v4q(5) ④ 不符（矿脉 F1–9 只有史莱姆和岩甲虫）；11-02 已把这三张里的蝙蝠换成 Rock Beetle（换占位图，不知火舞定），免得照帧实现时画进 F3。</p>
+<p><strong>实现</strong>：服务端给字段——最近 3 个免费野外点带类型和名字（现在 <code>view.wild.near3</code> 只给 id）、First Dig 完成状态（客户端读 <code>view.first_dig.done</code>，服务端还没有）；最深纪录现成（<code>view.mine.records[id].deepest</code>）。客户端在 <code>_today_rows</code> 加这一行，按钮去向（地图 + 矿口卡，<code>open_wild_card</code>；Today 指向野外点亚瑟 C 第 2 部分在做），红点键 <code>vein:&lt;id&gt;</code>；Pip 一句进内容表，存档加「说过」的记号。奕星排。</p>
+<h2 id="h-bcca3929">v4q(10) 【数值】第一周逐日表定稿：第一只守关放第 2 天，第 3、4 天开铁、石英矿脉，第一座邻城放第 1 天晚上</h2>
+<p><strong>状态与来源</strong>：<strong>已批</strong>：用户 2026-11-02 18:44 飞书「v4q(10) B」（om_x100b61b2d6e68ca4dd757b346f25b32，奕星回读核过）——整条批，第一座邻城选 B（第 1 天晚上）。用户 2026-11-02 批庚5「同意方向」（第 3、4 天各开一座矿脉；第一只守关挪到第 2 天或第 5 天；改完按「照表走的玩家」再跑一次校准，再定逐日表；清单 pm/plans/355-b1-approvals-2026-11-02.md 庚5），v4q(1) ⑨ 写「再定逐日表（v4 2.8 按本条读）」，就是这一条。依据是 v4q(9) 的校准（11-02，李白；/Volumes/ACASIS/tmp/libai-tools/calib/report-2026-11-02-v4q9.md，脚本 c7_vein_guide.py 第 6、7 节，固定种子可重跑，李白复核），口径是 v4q(9) 定稿（bd9676dc：Lv7 终止、矿脉行排在 Homestead 材料行前面、不被 q(143) 顶）。不涉及界面、没有新英文。奕星独立复核（pm/plans/v4q10-review-2026-11-02.md，复跑在 /Volumes/ACASIS/tmp/yixing-review-v4q10/）退回的两处已改：第 7 天铁剑照 v4q(7) ②、F20 挪第二周；第一座邻城的位置报用户定（定 B）。挂 SGODOT-381。</p>
+<p><strong>问题</strong>：v4 2.8 的第一周表是原稿：矿脉 Lv8 才去、第一只守关在第 4 天、第 3 天浅坑 F4–8。用户批了矿脉开局就能去（丁12）、第 3、4 天各开一座矿脉（庚5），原表的第 3–7 天都不成立；第一只守关放第 2 天还是第 5 天，庚5 留待校准后定。</p>
+<p><strong>改法</strong></p>
+<p>① <strong>第一只守关（最近的浅坑 F10 史莱姆王）放第 2 天</strong>。校准（每天材料 9 分钟的中档玩家，c7 第 6 节）：第 2 天只要 Lv5 的料（约 3.1 分钟），是第一周最空的一天；推浅坑 F1→F10 顺路敲 Lv5 的煤、铜、盐，当天材料合计 8.0 分钟（8% 的人超 9 分钟），铜剑打史莱姆王约 22 秒、不用药，守关包铜 ×5 进库存；Lv5–10 准时率不受影响。放第 5 天：第 5 天是 Lv8 第一次要铁、石英、硬木、亚麻的那天，再塞 5 分钟浅坑就挤掉当天的料，Lv8 准时率掉到 62%（7.2 分钟档 7%，手慢档 0%；按已批 v4q(9) 组合重跑，奕星复核；这组是「先打守关、再做 Homestead 的料」的排法）。</p>
+<p>② <strong>第一周逐日表</strong>（取代 v4 2.8 原表；30 分钟玩家，每天材料约 9 分钟；「材料活」是 c7 第 7 节 9 分钟中档的中位 / 平均分钟数）：</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>天</th>
+<th>等级</th>
+<th>新东西（v4q(1) ⑧）</th>
+<th>去哪（新地方加粗）</th>
+<th>材料活</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 · 首会话</td>
+<td>Lv1 → 3</td>
+<td>调味架、保温柜、篱笆；田 8 → 12；Pip「第一次下矿」委托</td>
+<td>家城：种、钓、做菜；<strong>家城的城里采集点</strong>（v4q(4)）</td>
+<td>0.8 分钟</td>
+</tr>
+<tr>
+<td>1 · 晚</td>
+<td>Lv4</td>
+<td>第二口灶；回血药</td>
+<td><strong>最近的浅坑</strong>（免费）F1→F3：Pip's First Dig 走到 F3 当场完成，铜剑直接装上（v4q(7) ③）；<strong>第一座邻城</strong>（免费，第一枚签章，掌柜的本地委托）</td>
+<td>3.8 分钟</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Lv5</td>
+<td>门廊、布告栏</td>
+<td>浅坑 F1→F10，<strong>第一只守关史莱姆王</strong>（个人首杀，铜 ×5）</td>
+<td>8.0 分钟</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Lv6</td>
+<td>大锅</td>
+<td><strong>最近的铁矿脉</strong>（免费）F1→F10，开出电梯站（Today 矿脉行带去，v4q(9)）</td>
+<td>8.8 分钟</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Lv7</td>
+<td>背包 II</td>
+<td><strong>最近的石英矿脉</strong>（免费）F1→F10，开出电梯站</td>
+<td>8.9 分钟</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Lv8</td>
+<td>进 T2：工作台可做铁剑</td>
+<td>从铁、石英矿脉的 F10 电梯站往下，每天合计约 2 层（去 1–2 座矿），浅坑补铜、盐、煤</td>
+<td>3.3 分钟</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Lv9</td>
+<td>保温柜 12、摊位升级</td>
+<td>同上；<strong>第二座邻城</strong>（第二枚签章）</td>
+<td>3.4 分钟</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Lv10</td>
+<td>名厨招牌</td>
+<td>同上；料够就在工作台做铁剑（v4q(7) ②，约第 8 天）</td>
+<td>3.6 分钟</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>第一座邻城放第 1 天晚上</strong>（用户定 B）：原表第 2 天去第一座邻城，现在第 2 天给了守关（8.0 分钟），挪到首会话之后的晚上（材料只用 3.8 分钟）。第一枚签章和外城本地委托还在 T1，v4 1.6、5.1 / 5.2 不用动；引导已经结束，不违反「引导期间不出城」（q(256) ⑥）。没选的 A 是放第 5 天（第一周前 4 天不进外城）。进城的往返和签到时间没校准（③）。第二座邻城仍在第 6 天。</li>
+<li><strong>一周结算</strong>（取代原「Lv10、2–3 枚签章、浅坑过 F10 守关、矿脉到 F20 左右；每天下矿约 4–5 层」）：Lv10；2 枚签章；浅坑 F10 守关（第 2 天）；铁、石英矿脉各到 F10、开出电梯站（第 3、4 天）；第 5 天起从电梯站往下，每天合计约 2 层（c7：平常日 3.4–4.4 次采集、7–8 块岩石，第 7 天晚最深中位铁 F11、石英 F10）；铁剑约第 8 天（v4q(7) ②），F20 铁史莱姆王在第二周。</li>
+<li><strong>校准到的程度</strong>（c7，9 分钟中档，「照表走」的玩家）：铁 / 石英矿脉第 3 / 4 天前到 F10 的 98 / 95%，浅坑 F10 第 2 天 98%（模型里玩家照表推，第 2 天没有提示，见 ④）；Lv5–12 准时率 99–100%。7.2 分钟档：第 2 天当天到浅坑 F10 的只有一半、铁矿脉第 3 天前 56%，Lv8 / 9 / 10 准时 96 / 99 / 99%；手慢档 9 分钟里推不下一趟 F1→F10，照表走不了（Lv8 准时约 70%，和没有矿脉行时一样）。</li>
+</ul>
+<p>③ <strong>没校准的部分</strong>（表里照写、不当承诺，第二批校准时补）：邻城的往返和签到时间不在 c7 的材料分钟里；铁剑（v4q(7) ②：铁矿石 6、硬木 4、煤 3、<code>Beetle Shell</code> 2、150 金币）、背包 II（Lv7：硬木 4、黏土 6、铜 4、150 金币）这些制作线 c7 没算，第 2–4 天已用 8.0–8.9 分钟，留给制作的余地很小；F20 铁史莱姆王挪到第二周，<strong>未校准</strong>（奕星复核粗估：从 F10 带铁剑推到 F20 打完，中档约 7.0 分钟、手慢约 10.9 分钟，加上当天的料会超 9 分钟；铁剑中位在第 7 天下线时才做出，硬塞进第一周 Lv9 准时率掉到 86%）；时长都没在真机掐（一趟 F1→F10 中档按约 5.6 分钟算，差 1 分钟 7.2 分钟档的结论就会变；奕星复核 pm/q-review/calib-2026-11-02-review.md 第 4.5 节那 5 个时长掐完要重跑）。</p>
+<p>④ <strong>不改</strong>：规则和数值一条不动——等级表、门槛、矿、守关、武器都照 v4q(1)(5)(6)(7)。第 2 天打守关<strong>不加新提示</strong>：Pip's First Dig 只带到 F3，第 2 天推浅坑 F10 靠玩家自己（浅坑 F10 守关层在矿口卡上看得到）；要不要加带路，等真机或实测数据再议。这张表是「照表走的玩家」的目标节奏，是校准和验收的口径，不是强制路线。</p>
+<p><strong>改哪</strong>：v4 方案 2.8 的表和一周结算按本条读（已加注）；v4q(1) ⑨「再定逐日表」读作本条；旧方案第 14 章七日节奏表早已由 v4q(1) ⑨ 取代（q(248)）。</p>
+<p><strong>推翻</strong>：v4 2.8 原表（第 3 天浅坑 F4–8、第 4 天守关、第 5 天才去矿脉、第 2 天邻城、第 7 天矿脉 F20）。</p>
+<p><strong>画面</strong>：无（节奏表，没有界面）。</p>
+<p><strong>实现</strong>：本条只定节奏，没有新功能。相关：v4q(9) 要的「First Dig 完成状态」由服务端给（亚瑟提：客户端读 <code>view.first_dig.done</code>，服务端现在还没有），随 v4q(9) 实现；以后的模拟器复跑和真机验收照本表的天数核。奕星排。</p>
+<h1 id="ch2">第 2 章 旧文档冲突索引</h1>
+<p>旧方案的章节和已批 q 行里和 v4 冲突的地方，按诸葛亮的冲突清单逐条列出：旧位置 → 以哪条 v4q 为准。清单到了以后补。</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>旧位置</th>
+<th>旧写法</th>
+<th>以此为准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+  </article>
+</div>
+<button class="totop" id="totop" type="button" aria-label="回到顶部">↑ Top</button>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var targets = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  function setActive(id) {
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + id); });
+    var cur = document.querySelector('#toc a[href="#' + id + '"]');
+    document.querySelectorAll('#toc li.c1').forEach(function (li) { li.classList.remove('open'); });
+    if (cur) { var c1 = cur.closest('li.c1'); if (c1) c1.classList.add('open'); }
+  }
+  if ('IntersectionObserver' in window) {
+    var visible = new Map();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) visible.set(e.target.id, e.boundingClientRect.top); else visible.delete(e.target.id); });
+      var best = null;
+      visible.forEach(function (top, id) { if (best === null || top < visible.get(best)) best = id; });
+      if (best) setActive(best);
+    }, { rootMargin: '-70px 0px -70% 0px' });
+    targets.forEach(function (t) { io.observe(t); });
+  }
+  if (targets.length) setActive(targets[0].id);
+  var btn = document.getElementById('totop');
+  window.addEventListener('scroll', function () { btn.classList.toggle('show', window.scrollY > 800); }, { passive: true });
+  btn.addEventListener('click', function () { window.scrollTo({ top: 0 }); });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  // The artifact viewer renders pre.mermaid natively; this fallback only runs for the local file.
+  function pending() { return Array.prototype.filter.call(document.querySelectorAll('pre.mermaid'), function (p) { return !p.querySelector('svg') && !p.getAttribute('data-processed'); }); }
+  setTimeout(function () {
+    var left = pending();
+    if (!left.length || !window.mermaid) return;
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    try { window.mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', flowchart: { htmlLabels: true } }); window.mermaid.run({ nodes: left }); } catch (e) {}
+  }, 1200);
+})();
+</script>
+
+</body>
+</html>

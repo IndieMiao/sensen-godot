@@ -9,7 +9,6 @@ import type { FishingPresenceReader } from '../domain/fishing.js';
 import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { FarmRow } from './dto.js';
 import type { RealtimePersistence } from '../realtime/model.js';
-import type { RelocationConfirm, RelocationDraft, RelocationOutcome } from '../domain/farm_relocation.js';
 
 /** `user_id` 为空就是游客（install_key 匿名身份）：只能浏览，不能建农场或写入（决定 2）。 */
 export interface PlayerRow { id: string; install_key_hmac: string; user_id?: string | null }
@@ -97,8 +96,6 @@ export interface Store extends RealtimePersistence {
   deletion(userId: string): Promise<DeletionRecord | null>;
 
   farmByOwner(ownerId: string): Promise<FarmRow | null>;
-  saveRelocationPreview(ownerId: string, draft: RelocationDraft): Promise<{ code?: string }>;
-  confirmFarmRelocation(ownerId: string, input: RelocationConfirm): Promise<RelocationOutcome>;
   createFarm(args: {
     ownerId: string; idempotencyKey: string; payloadHash: string;
     regionId: string; layoutPatchId: string; blueprintRevision: number;

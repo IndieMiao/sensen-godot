@@ -61,13 +61,22 @@ func _fly_home(m: Node) -> float:
 	await _card(m)
 	return (Time.get_ticks_msec() - started) / 1000.0 if m.rt.ui.modal_kind == "place_card" else -1.0
 
-func _landed(m: Node) -> void:   # the map's own flight has landed, at most 2 s
-	var until := Time.get_ticks_msec() + 2000
+## The waits below are real time while the flight is a 0.6–1.2 s tween: 4 s leaves a loaded full run room (SGODOT-260:
+## once in a full run, and once in fifteen alone, the 2 s wait ran out with nothing selected — alone the session has no
+## view, so nothing of the view's timing was in it). Running out says what the map was doing.
+const WAIT_MS := 4000
+
+func _landed(m: Node) -> void:   # the map's own flight has landed, at most WAIT_MS
+	var until := Time.get_ticks_msec() + WAIT_MS
 	while m._flight != null and m._flight.is_running() and Time.get_ticks_msec() < until: await get_tree().process_frame
 
-func _card(m: Node) -> void:   # until a card opens, at most 2 s
-	var until := Time.get_ticks_msec() + 2000
+func _card(m: Node) -> void:   # until a card opens, at most WAIT_MS
+	var until := Time.get_ticks_msec() + WAIT_MS
 	while m.rt.ui.modal_kind != "place_card" and Time.get_ticks_msec() < until: await get_tree().process_frame
+	if m.rt.ui.modal_kind != "place_card":
+		push_warning("home key: no card after %d ms — flight %s (%s) running %s, modal '%s', centre %.6f,%.6f home %.6f,%.6f zoom %.2f" % [
+			WAIT_MS, m._flight_kind, m._flight, m._flight != null and m._flight.is_running(), m.rt.ui.modal_kind,
+			m.center_lat, m.center_lng, m.home_lat, m.home_lng, m.zoom])
 
 ## From an outpost or a pond, back on the map: the camera is where the player is; the home key flies it home and on
 ## landing selects the Homestead pin — its card, as a tap on the pin. While it flies nothing is selected.

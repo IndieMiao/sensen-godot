@@ -118,12 +118,12 @@ describe('titles (q(180))', () => {
     expect(s.title).toBe('req:req_gone');
   });
 
-  it('an old save gets no field at load; the save version stays 5', () => {
+  it('an old save gets no field at load; the save version is the current one (6 since q(270), not raised for titles)', () => {
     const old = structuredClone(fresh()) as P0State & { title?: string };
     delete old.title;
     const s = upgradeState(c, JSON.parse(JSON.stringify(old)), T0);
     expect('title' in s).toBe(false);
-    expect(s.v).toBe(5);
+    expect(s.v).toBe(6);
     expect('title' in step(s, { type: 'read_inbox', keys: [] })).toBe(false);
   });
 

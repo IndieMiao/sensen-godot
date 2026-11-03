@@ -5,7 +5,7 @@
       "stage": "Familiar",
       "every_days": 7
     },
-    "next_request_h": 24,
+    "next_request_h": 0,
     "kindred": {"postcard": "Postcard from {name}", "title": "{name}'s Best Friend"}
   },
   "residents": {

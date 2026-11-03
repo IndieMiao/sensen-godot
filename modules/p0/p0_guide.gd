@@ -395,11 +395,14 @@ static func door_badge(view: Dictionary) -> bool:
 ## else "". A badge from the board opens the drawer on the Stall Board page; the finger card still says Tap to shop.
 ## While the new-player guide is on, none: the guide marks only its current step's targets and the stall is never one
 ## (q(215) ④ ⑥, 不知火舞 on #496 — the first slot refilled before the guide ends waits for it, a ✓ too).
-static func stall_badge(view: Dictionary) -> String:
+## `mark`: the stall's own mark in the world, which hangs no ✓ once today's 6 are done, as the map's pins (q(270));
+## the drawer still opens on the board, where the hand-in reads Limit reached.
+static func stall_badge(view: Dictionary, mark := false) -> String:
 	if guide_on(view): return ""
+	var full := mark and P0Logic.sys_requests_full(view)
 	var open := false
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
-		if int(r.get("have", 0)) >= int(r.get("qty", 1)): return "deliver"
+		if int(r.get("have", 0)) >= int(r.get("qty", 1)) and not full: return "deliver"
 		if str(r.get("status", "")) == "open": open = true
 	return "request" if open else ""
 

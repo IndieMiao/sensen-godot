@@ -2,7 +2,9 @@
 
 Usage (from the repo root; needs the `markdown` package):
 
-    python3 docs/product/tools/build_plan_html.py [plan.md] [out.html]
+    python3 docs/product/tools/build_plan_html.py [plan.md] [out.html] [short name]
+
+The short name goes in the page <title> and the header (default "Gensen 玩法方案 v2").
 
 Heading ids are derived from the section number in the heading text
 (`### 4.8.6 …` -> `s4-8-6`, `# 第 4 章 …` -> `ch4`, `# 附录 B …` -> `appB`,
@@ -18,6 +20,7 @@ import markdown
 ROOT = Path(__file__).resolve().parents[1]
 SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'gameplay-plan-v2-2026-10-02.md'
 OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / 'gameplay-plan-v2-2026-10-02.html'
+NAME = sys.argv[3] if len(sys.argv) > 3 else 'Gensen 玩法方案 v2'
 
 src = SRC.read_text(encoding='utf-8')
 title_line = src.split('\n', 1)[0].lstrip('# ').strip()
@@ -95,7 +98,7 @@ n_tables = body.count('<table>')
 n_chapters = sum(1 for l, _, _ in toc if l == '1')
 
 page = f'''<meta charset="utf-8">
-<title>Gensen 玩法方案 v2</title>
+<title>{html.escape(NAME)}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -203,7 +206,7 @@ td {{ font-variant-numeric: tabular-nums; }}
 </style>
 
 <header class="topbar"><div class="topbar-in">
-  <span class="name">Gensen 玩法方案 v2</span>
+  <span class="name">{html.escape(NAME)}</span>
   <span class="meta"><span>2026-10-02</span><span>{n_chapters} 章</span><span>{n_tables} 张表</span><span>独立完整版</span></span>
 </div></header>
 
@@ -213,7 +216,7 @@ td {{ font-variant-numeric: tabular-nums; }}
     <ul>{toc_html}</ul>
   </nav>
   <article>
-    <details class="toc-mobile"><summary>Gensen 玩法方案 v2</summary><nav class="toc" aria-label="目录"><ul>{toc_html}</ul></nav></details>
+    <details class="toc-mobile"><summary>{html.escape(NAME)}</summary><nav class="toc" aria-label="目录"><ul>{toc_html}</ul></nav></details>
     <div class="hero">
       <p class="eyebrow">Game Design Document · Prototype Stage</p>
       <h1 class="title">{html.escape(title_line)}</h1>
