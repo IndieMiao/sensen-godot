@@ -1,0 +1,23 @@
+[
+  {
+    "file": "SGODOT-322_props_v1_lineup.jpg",
+    "bytes": 236072,
+    "sha256": "b16aeb5338a364d0d3b6034d9370196a009d61b1531397ef6e1fa5d6786f127e",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-322_props_v1_scale_43deg.jpg",
+    "bytes": 195724,
+    "sha256": "1d10b629372e5f1d60952c1f3740f1d308bee3128ef67a3c9fd6326b02f3bd9e",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-322_props_v1_validation.json",
+    "bytes": 36935,
+    "sha256": "e6bcc5cdeefeafb147457e4751b4149abc8367244c3c1e8cca96163bba7020f1",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "asset": "reading_cushion",
+  "module": "M13",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "new authored geometry",
+  "reference": "SGODOT-317 R3 approved main and prop/module lists",
+  "source_blend": "tools/art/source/poi_classroom/props/classroom_props.blend",
+  "source_script": "tools/art/source/poi_classroom/props/build_props.py",
+  "changes": [
+    "Soft sage reading cushion; decoration only, no seat anchor"
+  ],
+  "material": "one matte vertex-color material, no texture"
+}
