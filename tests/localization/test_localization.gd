@@ -421,3 +421,12 @@ func test_p0_a_city_rows_name_is_measured_in_chinese() -> void:
 	assert_str(String(region.atr(region.text))).is_equal(" · 加州")
 	first.queue_free()
 	TranslationServer.remove_translation(t)
+
+## 0.2.23 (不知火舞 385 bd107de1): 中文 has no italic — a Bold Italic line (the Bite Board keeper's, a Kindred line) is
+## the upright bold there; English keeps its slant.
+func test_p0_bold_italic_is_upright_bold_under_chinese() -> void:
+	assert_object(UiKit.bold_italic()).is_same(UiKit.font(&"bold"))   # before_test's zh_CN
+	assert_bool(UiKit.bold_italic().variation_transform == Transform2D.IDENTITY).is_true()
+	TranslationServer.set_locale("en")
+	assert_object(UiKit.bold_italic()).is_not_same(UiKit.font(&"bold"))
+	assert_float(UiKit.bold_italic().variation_transform.x.y).is_not_equal(0.0)   # slanted
