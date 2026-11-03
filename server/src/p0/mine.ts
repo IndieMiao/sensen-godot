@@ -15,8 +15,9 @@ export type MineCommand =
   | { type: 'mine_rock'; day: string; floor: number; rock: number }
   | { type: 'mine_torch'; day: string; floor: number }
   | { type: 'mine_pick'; day: string; floor: number; ground: number }
-  | { type: 'mine_attack'; day: string; floor: number; targets?: number[]; hurt_by?: number; stunned?: number[] };
-const TYPES = new Set(['mine_enter', 'mine_floor', 'mine_rock', 'mine_torch', 'mine_attack', 'mine_pick']);
+  | { type: 'mine_attack'; day: string; floor: number; targets?: number[]; hurt_by?: number; stunned?: number[] }
+  | { type: 'mine_drink'; day: string; item: string };   // 355 G §9.4: no floor, the one the player stands on
+const TYPES = new Set(['mine_enter', 'mine_floor', 'mine_rock', 'mine_torch', 'mine_attack', 'mine_pick', 'mine_drink']);
 export const isMineCommand = (cmd: { type: string }): cmd is MineCommand => TYPES.has(cmd.type);
 
 // Catalogue first; development fixtures never replace an authored wild site.
@@ -174,6 +175,7 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
   if (!day || !at || (cmd.space !== undefined && cmd.space !== 'mine')) return { code: 'not_in_mine' };
   const site = mineSite(c, at.mine);
   if (!site) return { code: 'unknown_place' };
+  if (cmd.type === 'mine_drink') return drinkPotion(c, s, day, cmd, now, events);
   const state = floorState(c, s, site, at.floor);
   if (cmd.type === 'mine_floor') {
     const n = cmd.to, stops = stations(s.mine.records[site.id]);
@@ -308,6 +310,32 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
   return null;
 }
 
+/** 355 G (contract-efg §9.4): a potion from the bag on a floor it allows, never past full HP, then its cooldown. In
+ * refusal order: not a potion, the floor, none in the bag, HP full, the cooldown. */
+function drinkPotion(c: P0Content, s: P0State, day: MineB1Day, cmd: { item?: unknown }, now: number, events: P0Event[]): Refusal | null {
+  const id = String(cmd.item ?? ''), potion = Object.hasOwn(c.mine.potions, id) ? c.mine.potions[id] : undefined;
+  if (!potion) return { code: 'bad_item' };
+  if (potion.floors !== 'any' && !potion.floors.includes(day.at!.floor)) return { code: 'not_here' };
+  if (count(s.bag, id) < 1) return { code: 'no_potion' };
+  const max = c.mine.combat.hp;
+  if (day.hp >= max) return { code: 'hp_full' };
+  const wait = potionReadyIn(c, day, now);
+  if (wait > 0) return { code: 'potion_cooldown', detail: { ready_in: wait } };
+  take(s.bag, id, 1); events.push({ kind: 'item', id, delta: -1 });
+  day.hp = potion.heal === 'full' ? max : Math.min(max, day.hp + potion.heal);
+  day.drink_at = now;   // the day's own field: gone with it at the rollover
+  events.push({ kind: 'heal', hp: day.hp, item: id });
+  return null;
+}
+
+/** Milliseconds until a potion may be drunk (view.mine.at.potion_ready_in), 0 when it may: one cooldown for every
+ * potion, the longest (batch 1 has one potion; a second would need the drink's own kept). */
+export function potionReadyIn(c: P0Content, day: MineB1Day, now: number): number {
+  if (day.drink_at === undefined) return 0;
+  const cooldown = Math.max(0, ...Object.values(c.mine.potions).map(p => p.cooldown_ms));
+  return Math.max(0, day.drink_at + cooldown - now);
+}
+
 export function mineView(c: P0Content, s: P0State, now: number) {
   settleMine(c, s, now);
   const day = s.mine.day, at = day?.at, site = at ? mineSite(c, at.mine) : undefined;
@@ -325,6 +353,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
     const cleared = state.mobs.every(hp => hp <= 0), next = at.floor + 1, prev = at.floor - 1;
     here = {
       mine: site.id, type: site.type, name: site.name, max: cap(site), floor: at.floor, hp: day.hp, day: day.key,
+      potion_ready_in: potionReadyIn(c, day, now),   // 355 G: what #636's set_potion_cooldown reads
       stations: stops.map(floor => ({ floor, paid: day.floors[floorKey(site.id, floor)]?.paid ?? false })),
       floor_state: { floor: at.floor, paid: state.paid, cleared, rocks: spec.rocks, left: spec.rocks - state.broken.length,
         broken: Array.from({ length: spec.rocks }, (_, i) => state.broken.includes(i)), lit: state.lit,
