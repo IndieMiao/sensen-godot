@@ -450,13 +450,14 @@ static func _rod(view: Dictionary, item_id: String) -> Dictionary:
 	return {}
 
 ## "Lands up to Fine fish · Bite window 2.2 s": the window is absolute, the content's hook window plus the rod's bonus
-## (安其拉 225 walkthrough 76834e35), so the Starter Rod has a line too.
+## (安其拉 225 walkthrough 76834e35), so the Starter Rod has a line too. One sentence a translation reads whole (#649
+## 第二批 ⑥, zh-11): built of parts, the place line's `%s to %s · %s` took it (「距 上品鱼 Lands up · 咬钩窗口 2.2 秒」).
 static func _rod_effect(view: Dictionary, rod: Dictionary) -> String:
 	if rod.is_empty() or not rod.has("reach"): return ""
-	var line := "Lands up to %s fish" % P0Logic.rarity_name(view, int(rod.get("reach", 1)))
+	var reach := P0Logic.rarity_name(view, int(rod.get("reach", 1)))
 	var window := int(P0Logic.content().get("fishing", {}).get("hook_window_ms", 0))
-	if window > 0: line += SEP + "Bite window %.1f s" % (float(window + int(rod.get("hook_bonus_ms", 0))) / 1000.0)
-	return line
+	if window <= 0: return "Lands up to %s fish" % reach
+	return "Lands up to %s fish · Bite window %.1f s" % [reach, float(window + int(rod.get("hook_bonus_ms", 0))) / 1000.0]
 
 ## q(278) (SGODOT-386; 不知火舞's spec, 李白's words): the top tier a rod lands and the Fishing levels its fish need, from
 ## the content's fish, lowest to highest (`LvX` when one) — Carbon Rod `Legendary needs Fishing Lv7–9`, Reed Rod `Rare

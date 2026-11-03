@@ -313,11 +313,13 @@ func set_online(v: int) -> void:
 
 ## The name's size for `text` before any pin exists (the city map packs pins by it). A plate's: Compact/10 Bold, 6 / 2
 ## padding, never cut. A short name's (q(137)): 11 Bold, 2 over and under, at most 96 wide. Matches label_size() of a
-## built pin. Measured once per name: the city map asks for every pin it packs, every frame.
+## built pin. Measured once per name: the city map asks for every pin it packs, every frame. Measured as the label
+## shows it, translated under 中文 (#649 第二批 ⑨; the locale is set at start, so the cache holds).
 static func label_size_for(text: String, plated := true) -> Vector2:
 	if text == "": return Vector2.ZERO
 	var key := text + ("|p" if plated else "|s")
 	if _label_sizes.has(key): return _label_sizes[key]
+	text = String(TranslationServer.translate(text))
 	var style := UiTokens.STYLE_C10_B if plated else UiTokens.STYLE_C11_B
 	var th := UiKit.theme()   # the name's own style (the city map gives the pin this theme)
 	var f := th.get_font(&"font", style)

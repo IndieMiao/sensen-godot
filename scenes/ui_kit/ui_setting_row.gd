@@ -6,6 +6,8 @@ extends PanelContainer
 ##          credit (SET-LICENSES) has its attribution under the title, word for word and wrapping, and its licence 6
 ##          below it as its own line (q(129): so it never reads as the attribution's last line). A value given shows
 ##          before the › as VALUE's does (`Notifications` · `On ›`, SGODOT-350).
+##          `chevron` false (q(281) `Support code`): a LINK without its ›, the value alone on the right — the row still
+##          takes the tap (it copies, it does not go anywhere).
 ##   VALUE  title and its value on the right (Bold 14 secondary), read-only without › (`Version` · `0.2.1 (…)`).
 ##   TOGGLE title, an optional line, the 48 × 28 Toggle on the right (Gensen Refactor/Toggle 1236:107861: green track
 ##          on, neutral off); the whole row switches it (q(133) v3 `Share anonymous map usage`).
@@ -37,7 +39,7 @@ const _GROUP_GAP := 1
 
 var kind: Kind
 
-func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "") -> void:
+func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "", chevron_ := true) -> void:
 	kind = kind_
 	custom_minimum_size.y = _MIN_H
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -87,12 +89,13 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 		set_on(on)
 	else:
 		if value != "": row.add_child(_value(value))
-		var chevron := UiKit.label("›", UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_SECONDARY)
-		chevron.name = "Chevron"
-		chevron.add_theme_font_size_override(&"font_size", _CHEVRON_SIZE)
-		chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		row.add_child(chevron)
+		if chevron_:
+			var chevron := UiKit.label("›", UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_SECONDARY)
+			chevron.name = "Chevron"
+			chevron.add_theme_font_size_override(&"font_size", _CHEVRON_SIZE)
+			chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			row.add_child(chevron)
 	# The whole row is the target, edge to edge: a flat button over the content (a drag in a TouchScrollContainer cancels it).
 	var hit := Button.new()
 	hit.name = "Hit"

@@ -425,6 +425,16 @@ const DISH_STANDIN := {
 
 const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "bag_upgrade_4": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
+## A line as the player will read it: P0's table's Chinese under 中文 (Localization.use_p0), else the English as it is
+## (#649 第二批 ⑨: what a width is measured on, never the English a label is given).
+static func shown(text: String) -> String: return String(TranslationServer.translate(text))
+
+## `text`'s width in a UiKit style's font and size (the theme the panels draw with): the cuts that keep a line to a
+## width measure with it.
+static func text_width(text: String, style: StringName = UiTokens.STYLE_C11_B) -> float:
+	var th := UiKit.theme()
+	return th.get_font(&"font", style).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, th.get_font_size(&"font_size", style)).x
+
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
 	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now
@@ -2287,8 +2297,10 @@ static func market_sell_line(view: Dictionary) -> String:
 	if bool(d.get("home", true)): return "I'll take your %s. Same price as your stall." % things
 	return "%s? I'll take them, though home pays better." % (things.left(1).to_upper() + things.substr(1))
 
-## Small counts in keeper speech ("sows three plots"), digits from ten up.
+## Small counts in keeper speech ("sows three plots"), digits from ten up; digits under 中文 (「一次能播 3 块田」, 0.2.23 —
+## the English word stayed in the Chinese line).
 static func _count_word(n: int) -> String:
+	if TranslationServer.get_locale() == "zh_CN": return str(n)
 	var words := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 	return words[n] if n >= 0 and n < words.size() else str(n)
 

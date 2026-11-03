@@ -1,6 +1,7 @@
 class_name P0Board
 extends RefCounted
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Titles := preload("res://modules/p0/p0_titles.gd")   # its cut(): a line kept to a width, with …
 ## The counter drawer's board page (SGODOT-224; BOARD-READY / SHORT / DONE 1498:96193 / 96574 / 96382, E-11; the
 ## Stall Board uses the same rows): server facts (view.boards[id].slots, view.quotas) as UiBoardCard data and the
 ## page's fact lines. A request's command follows the frames: ready to hand in → Deliver (taken or not, q(48)); open
@@ -111,13 +112,17 @@ static func far_tries(view: Dictionary, r: Dictionary) -> String:
 	if names.size() == 1: return "Try %s" % names[0]
 	return "Try %s or %s" % [", ".join(PackedStringArray(names.slice(0, -1))), names[-1]]
 
-const LINE_CHARS := 40   # 李白 / 不知火舞 on q(128): one requirement line; a long outpost name is cut, the city kept
+## 李白 / 不知火舞 on q(128): one requirement line; a long outpost name is cut, the city kept. Measured in the line's
+## C11 Bold as it is drawn (#649 第二批 ⑨: 40 characters were English's; Chinese is twice as wide a character): 230 px
+## is what 40 of English took.
+const LINE_W := 230.0
 
-## `Lotus Tea House · Shanghai`, the name cut with … so the line keeps to LINE_CHARS and the city stays whole.
+## `Lotus Tea House · Shanghai`, the name cut with … so the line keeps to LINE_W and the city stays whole. Both are
+## measured as the label will show them (translated under 中文: `莲花茶馆 · 上海`), and so returned — the label's own
+## translation then has nothing left to do.
 static func place_line(name: String, city: String) -> String:
-	var tail := " · " + city
-	if name.length() + tail.length() <= LINE_CHARS: return name + tail
-	return name.left(maxi(1, LINE_CHARS - tail.length() - 1)).strip_edges() + "…" + tail
+	var tail := " · " + P0Logic.shown(city)
+	return P0Titles.cut(P0Logic.shown(name), LINE_W - P0Logic.text_width(tail), P0Logic.text_width) + tail
 
 ## "2 Pond Crucian", "4 Fine fish · any kind", "3 crops · 6 each", "Visit Oak Tea House".
 static func _what(view: Dictionary, r: Dictionary) -> String:
@@ -160,7 +165,7 @@ static func _any(view: Dictionary, r: Dictionary) -> String:
 	var noun := "fish" if kind == "fish" else _kinds(kind)
 	var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
 	if not styles.is_empty(): noun = "%s %s" % [" or ".join(styles), noun]
-	elif r.get("family", null) != null: noun = "%s %s" % [str(FAMILY_NAMES.get(str(r.family), str(r.family))), noun]
+	elif r.get("family", null) != null: noun = "%s %s" % [Localization.ctx(str(FAMILY_NAMES.get(str(r.family), str(r.family))), "family"), noun]
 	return ("%s %s" % [P0Logic.rarity_name(view, int(rarity)), noun]) if rarity != null and int(rarity) > 0 else noun
 
 static func _kinds(kind: String) -> String:
