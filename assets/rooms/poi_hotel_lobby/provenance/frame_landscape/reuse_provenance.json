@@ -1,0 +1,25 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
+  "changes": [
+    "Geometry, normals and game scale retained; only palette UV/color and scalar local AO added."
+  ],
+  "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+  "source_collection": "KIT_frame_landscape",
+  "retained_parts": [
+    "Picture backing.002",
+    "Picture vertical frame.004",
+    "Picture vertical frame.005",
+    "Picture horizontal frame.004",
+    "Picture horizontal frame.005",
+    "Artwork.001"
+  ],
+  "removed_parts": [],
+  "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+  "source_asset": "frame_landscape",
+  "locked_scale": true,
+  "triangles": 542,
+  "surfaces": 2,
+  "exported_sha256": "7df9af347d03ebaed85e63a83283e82f493e232a2d7f5b0582edeeb6fe776908"
+}

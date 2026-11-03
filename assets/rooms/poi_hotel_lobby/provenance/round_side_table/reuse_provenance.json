@@ -1,0 +1,28 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "output/hotel-lobby-319/deps/tools/art/source/hallkit_324/hallkit_324.blend",
+  "changes": [
+    "N1-only copy scaled to .70 m diameter and .90 m table height per Huowu 319 1db13376; original 324 files unchanged."
+  ],
+  "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+  "source_collection": "KIT_round_side_table",
+  "retained_parts": [
+    "Splayed wood table leg.003",
+    "Splayed wood table leg.004",
+    "Splayed wood table leg.005",
+    "Ivory cafe tabletop.001"
+  ],
+  "removed_parts": [],
+  "source_commit": "104446a2a995c8a0269d12d27308b3d547b29f6e",
+  "source_asset": "round_side_table",
+  "locked_scale": false,
+  "scale_xyz": [
+    0.6363636363636362,
+    0.793475865109103,
+    0.6363636363636362
+  ],
+  "triangles": 240,
+  "surfaces": 1,
+  "exported_sha256": "9ab94878a3b96aaf7e893185170b94b9a9bf7bad02d6915b9fd43c5bb8d76658"
+}

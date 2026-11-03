@@ -1,0 +1,841 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "SGODOT-315 approved R3 / SGODOT-319 5fe1b06c"
+  },
+  "assets": [
+    {
+      "name": "ring_sofa",
+      "file": "ring_sofa.glb",
+      "position": [
+        1.1,
+        0.08,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "radius": 1.215,
+          "height": 1.08
+        }
+      ]
+    },
+    {
+      "name": "central_planter",
+      "file": "central_planter.glb",
+      "position": [
+        1.1,
+        0.08,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "central_foliage",
+      "file": "central_foliage.glb",
+      "position": [
+        1.1,
+        0.08,
+        0.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cream_armchair",
+      "file": "cream_armchair.glb",
+      "position": [
+        -2.35,
+        0.08,
+        -1.25
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.663,
+            0
+          ],
+          "size": [
+            1.5,
+            1.326,
+            0.89
+          ]
+        }
+      ]
+    },
+    {
+      "name": "round_side_table",
+      "file": "round_side_table.glb",
+      "position": [
+        -0.493,
+        0.08,
+        1.62
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.45,
+            0
+          ],
+          "radius": 0.35,
+          "height": 0.9
+        }
+      ]
+    },
+    {
+      "name": "frame_landscape",
+      "file": "frame_landscape.glb",
+      "position": [
+        2.55,
+        2.43,
+        -2.99
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "green_table_lamp",
+      "file": "green_table_lamp.glb",
+      "position": [
+        -0.493,
+        0.98,
+        1.62
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hearth",
+      "file": "hearth.glb",
+      "position": [
+        -2.54,
+        0.08,
+        0.1
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.0425,
+            0.045
+          ],
+          "size": [
+            1.13,
+            2.085,
+            1.05
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hearth_mantel",
+      "file": "hearth_mantel.glb",
+      "position": [
+        -2.54,
+        1.61,
+        0.1
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "mantel_decor",
+      "file": "mantel_decor.glb",
+      "position": [
+        -2.54,
+        1.6,
+        0.1
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "elevator",
+      "file": "elevator.glb",
+      "position": [
+        -1.3,
+        0.08,
+        -2.81
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.3,
+            0
+          ],
+          "size": [
+            1.4,
+            2.6,
+            0.16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "key_rack",
+      "file": "key_rack.glb",
+      "position": [
+        0.62,
+        0.88,
+        -2.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.65,
+            0
+          ],
+          "size": [
+            2.21,
+            1.3,
+            0.36
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wall_clock",
+      "file": "wall_clock.glb",
+      "position": [
+        -0.28,
+        2.61,
+        -2.955
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "blank_name_plaque",
+      "file": "blank_name_plaque.glb",
+      "position": [
+        0.62,
+        3.2,
+        -2.95
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "luggage_cart",
+      "file": "luggage_cart.glb",
+      "position": [
+        2.65,
+        0.08,
+        -2.08
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.875,
+            0
+          ],
+          "size": [
+            0.95,
+            1.75,
+            0.77
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_bookshelf",
+      "file": "low_bookshelf.glb",
+      "position": [
+        -2.77,
+        0.08,
+        2.65
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            0.9,
+            1.1,
+            0.42
+          ]
+        }
+      ]
+    },
+    {
+      "name": "floor_lamp",
+      "file": "floor_lamp.glb",
+      "position": [
+        -1.9,
+        0.08,
+        2.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "kind": "cylinder",
+          "at": [
+            0,
+            0.95,
+            0
+          ],
+          "radius": 0.28,
+          "height": 1.9
+        }
+      ]
+    },
+    {
+      "name": "green_rug",
+      "file": "green_rug.glb",
+      "position": [
+        1.05,
+        0.081,
+        0.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cowhide_rug",
+      "file": "cowhide_rug.glb",
+      "position": [
+        -1.43,
+        0.081,
+        0.1
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "armchair_front",
+      "asset": "cream_armchair",
+      "position": [
+        -2.35,
+        0.08,
+        1.45
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "table_sofa_right",
+      "asset": "round_side_table",
+      "position": [
+        2.693,
+        0.08,
+        1.47
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_sofa_back",
+      "asset": "round_side_table",
+      "position": [
+        1.16,
+        0.08,
+        -1.2
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_armchair",
+      "asset": "round_side_table",
+      "position": [
+        -0.7,
+        0.08,
+        -1.2
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lamp_table_sofa_right",
+      "asset": "green_table_lamp",
+      "position": [
+        2.693,
+        0.98,
+        1.47
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lamp_table_sofa_back",
+      "asset": "green_table_lamp",
+      "position": [
+        1.16,
+        0.98,
+        -1.2
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_clock_2",
+      "asset": "wall_clock",
+      "position": [
+        0.62,
+        2.61,
+        -2.955
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_clock_3",
+      "asset": "wall_clock",
+      "position": [
+        1.52,
+        2.61,
+        -2.955
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10.3429,
+      15.64,
+      10.3429
+    ],
+    "target": [
+      0,
+      2,
+      0
+    ],
+    "size": 11,
+    "pitch_degrees": 43,
+    "yaw_degrees": 45,
+    "near": 0.1,
+    "far": 40
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "background": "B5A18B",
+    "ambient_color": "FFF1DC",
+    "ambient": 0.4,
+    "sun_color": "FFF2DA",
+    "sun": 1.2,
+    "sun_position": [
+      -6,
+      4,
+      -1
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.15,
+    "shadow_normal_bias": 0.8,
+    "shadow_mode": "orthogonal_single",
+    "shadow_distance": 30,
+    "angular_distance": 0.4
+  },
+  "floor_y": 0.08,
+  "footprint": [
+    6.8,
+    6.4
+  ],
+  "revision": "SGODOT-319 N1 v1.1",
+  "lighting": {
+    "angular_distance": 0.4
+  },
+  "shared_shell": "res://scenes/shell_hall/shell_hall_art.tscn",
+  "shell_atlas": "res://assets/rooms/poi_hotel_lobby/room_albedo_ao.png",
+  "anchors": [
+    {
+      "name": "seat_sofa_1",
+      "module": "ring_sofa",
+      "position": [
+        1.57,
+        0.795,
+        1.3940638795573723
+      ],
+      "yaw_degrees": 210,
+      "stand": [
+        1.9075,
+        0.08,
+        1.9786310271118683
+      ]
+    },
+    {
+      "name": "seat_sofa_2",
+      "module": "ring_sofa",
+      "position": [
+        2.04,
+        0.795,
+        0.5800000000000001
+      ],
+      "yaw_degrees": 270,
+      "stand": [
+        2.715,
+        0.08,
+        0.5800000000000001
+      ]
+    },
+    {
+      "name": "seat_sofa_3",
+      "module": "ring_sofa",
+      "position": [
+        1.57,
+        0.795,
+        -0.2340638795573724
+      ],
+      "yaw_degrees": 330,
+      "stand": [
+        1.9075,
+        0.08,
+        -0.8186310271118685
+      ]
+    },
+    {
+      "name": "seat_sofa_4",
+      "module": "ring_sofa",
+      "position": [
+        0.63,
+        0.795,
+        -0.2340638795573723
+      ],
+      "yaw_degrees": 30,
+      "stand": [
+        0.29249999999999987,
+        0.08,
+        -0.8186310271118683
+      ]
+    },
+    {
+      "name": "seat_sofa_5",
+      "module": "ring_sofa",
+      "position": [
+        0.16000000000000014,
+        0.795,
+        0.5799999999999997
+      ],
+      "yaw_degrees": 90,
+      "stand": [
+        -0.5149999999999999,
+        0.08,
+        0.5799999999999996
+      ]
+    },
+    {
+      "name": "seat_sofa_6",
+      "module": "ring_sofa",
+      "position": [
+        0.6299999999999997,
+        0.795,
+        1.3940638795573719
+      ],
+      "yaw_degrees": 150,
+      "stand": [
+        0.2924999999999994,
+        0.08,
+        1.978631027111868
+      ]
+    },
+    {
+      "name": "seat_armchair_1",
+      "module": "cream_armchair",
+      "position": [
+        -2.13,
+        0.795,
+        -1.25
+      ],
+      "yaw_degrees": 270,
+      "stand": [
+        -1.55,
+        0.08,
+        -1.25
+      ]
+    },
+    {
+      "name": "seat_armchair_2",
+      "module": "armchair_front",
+      "position": [
+        -2.13,
+        0.795,
+        1.45
+      ],
+      "yaw_degrees": 270,
+      "stand": [
+        -1.55,
+        0.08,
+        1.45
+      ]
+    },
+    {
+      "name": "spawn",
+      "position": [
+        2.85,
+        0.08,
+        2.35
+      ],
+      "yaw_degrees": 180,
+      "module": "hall_floor"
+    },
+    {
+      "name": "cam_default",
+      "position": [
+        2.85,
+        0.08,
+        2.35
+      ],
+      "yaw_degrees": 45,
+      "module": "hall_floor",
+      "role": "camera_follow_target",
+      "pitch_degrees": 43,
+      "orthographic_width": 6.72,
+      "near": 0.1,
+      "far": 40
+    },
+    {
+      "name": "exit",
+      "position": [
+        2.85,
+        0.08,
+        2.88
+      ],
+      "yaw_degrees": 180,
+      "module": "hall_floor"
+    },
+    {
+      "name": "badge_exit",
+      "position": [
+        2.85,
+        0.55,
+        3.0
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    },
+    {
+      "name": "sign_name",
+      "position": [
+        0.62,
+        3.2,
+        -2.92
+      ],
+      "yaw_degrees": 180,
+      "module": "blank_name_plaque",
+      "size": [
+        1.6,
+        0.22
+      ]
+    }
+  ],
+  "standing_16": [
+    [
+      2.85,
+      0.08,
+      2.35
+    ],
+    [
+      -1.52,
+      0.08,
+      -2.23
+    ],
+    [
+      -1.52,
+      0.08,
+      2.09
+    ],
+    [
+      1.99,
+      0.08,
+      -1.15
+    ],
+    [
+      -0.44,
+      0.08,
+      -0.07
+    ],
+    [
+      0.64,
+      0.08,
+      2.63
+    ],
+    [
+      2.8,
+      0.08,
+      0.47
+    ],
+    [
+      0.37,
+      0.08,
+      -1.96
+    ],
+    [
+      -1.52,
+      0.08,
+      -0.88
+    ],
+    [
+      -1.52,
+      0.08,
+      0.74
+    ],
+    [
+      1.72,
+      0.08,
+      2.09
+    ],
+    [
+      -0.44,
+      0.08,
+      2.36
+    ],
+    [
+      0.37,
+      0.08,
+      -0.88
+    ],
+    [
+      1.45,
+      0.08,
+      -1.96
+    ],
+    [
+      -0.71,
+      0.08,
+      -1.96
+    ],
+    [
+      -0.71,
+      0.08,
+      1.01
+    ]
+  ],
+  "shared_plants": [
+    {
+      "name": "plant_elevator",
+      "file": "olive_tree.glb",
+      "position": [
+        -2.58,
+        0.08,
+        -2.34
+      ],
+      "yaw_degrees": 30,
+      "collision_radius": 0.31
+    },
+    {
+      "name": "plant_cart",
+      "file": "olive_tree.glb",
+      "position": [
+        2.95,
+        0.08,
+        -0.55
+      ],
+      "yaw_degrees": 125,
+      "collision_radius": 0.31
+    }
+  ],
+  "shared_fire": {
+    "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+    "position": [
+      -2.23,
+      0.38,
+      0.1
+    ],
+    "yaw_degrees": 90,
+    "emission_box": [
+      0.23,
+      0.015,
+      0.055
+    ],
+    "flame_height": 0.52,
+    "flame_count": 16,
+    "spark_count": 4,
+    "light_energy": 1.4,
+    "light_range": 1.7
+  },
+  "local_lights": [
+    {
+      "name": "warm_table_sofa_left",
+      "kind": "spot",
+      "position": [
+        -0.493,
+        1.24575,
+        1.62
+      ],
+      "target": [
+        -0.493,
+        0.97575,
+        1.62
+      ],
+      "color": "FFD3A0",
+      "energy": 0.35,
+      "range": 1.1,
+      "angle_degrees": 65
+    },
+    {
+      "name": "warm_table_sofa_right",
+      "kind": "spot",
+      "position": [
+        2.693,
+        1.24575,
+        1.47
+      ],
+      "target": [
+        2.693,
+        0.97575,
+        1.47
+      ],
+      "color": "FFD3A0",
+      "energy": 0.35,
+      "range": 1.1,
+      "angle_degrees": 65
+    },
+    {
+      "name": "warm_table_sofa_back",
+      "kind": "spot",
+      "position": [
+        1.16,
+        1.24575,
+        -1.2
+      ],
+      "target": [
+        1.16,
+        0.97575,
+        -1.2
+      ],
+      "color": "FFD3A0",
+      "energy": 0.35,
+      "range": 1.1,
+      "angle_degrees": 65
+    },
+    {
+      "name": "floor_lamp_warmth",
+      "kind": "omni",
+      "position": [
+        -1.9,
+        1.61,
+        2.7
+      ],
+      "color": "FFD5A6",
+      "energy": 0.65,
+      "range": 2.1
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "base_shell_commit": "8804d7500077c2228846eb0d581c92181f54426c",
+  "same_shell_uv_layout": true,
+  "overrides": {
+    "plaster": "EBCAA8",
+    "panel": "D3BEA3",
+    "skirting": "C4B098",
+    "window": "E7D2B5",
+    "plaster_solid": "EBCAA8",
+    "wainscot_solid": "D3BEA3",
+    "window_solid": "E7D2B5",
+    "floor_solid": "DFD1B4",
+    "cloth_green": "435B76",
+    "print_landscape": "6180A3",
+    "print_portrait": "BC4536",
+    "sky": "78A8C9"
+  },
+  "floor": {
+    "base": "DFD1B4",
+    "path": "6180A3",
+    "path_half_width_m": 0.35,
+    "ring_radii_m": [
+      0.96,
+      1.66
+    ],
+    "world_uv_affine": [
+      [
+        8.383602037834645e-07,
+        -12.800000516829932
+      ],
+      [
+        13.62580709308534,
+        9.106052547558363e-07
+      ],
+      [
+        -3.4064517798210385,
+        3.199999931358508
+      ]
+    ],
+    "tiles_m": 0.6
+  },
+  "plant_tiles": [
+    {
+      "source": [
+        0,
+        14
+      ],
+      "target_px": [
+        0,
+        1024
+      ]
+    },
+    {
+      "source": [
+        0,
+        15
+      ],
+      "target_px": [
+        128,
+        1024
+      ]
+    },
+    {
+      "source": [
+        1,
+        14
+      ],
+      "target_px": [
+        0,
+        1152
+      ]
+    },
+    {
+      "source": [
+        1,
+        15
+      ],
+      "target_px": [
+        128,
+        1152
+      ]
+    },
+    {
+      "source": [
+        2,
+        14
+      ],
+      "target_px": [
+        768,
+        1280
+      ]
+    },
+    {
+      "source": [
+        2,
+        15
+      ],
+      "target_px": [
+        896,
+        1280
+      ]
+    },
+    {
+      "source": [
+        3,
+        14
+      ],
+      "target_px": [
+        768,
+        1408
+      ]
+    },
+    {
+      "source": [
+        4,
+        14
+      ],
+      "target_px": [
+        896,
+        1408
+      ]
+    },
+    {
+      "source": [
+        12,
+        15
+      ],
+      "target_px": [
+        1280,
+        1792
+      ]
+    },
+    {
+      "source": [
+        13,
+        15
+      ],
+      "target_px": [
+        1408,
+        1792
+      ]
+    },
+    {
+      "source": [
+        14,
+        15
+      ],
+      "target_px": [
+        1280,
+        1920
+      ]
+    },
+    {
+      "source": [
+        15,
+        15
+      ],
+      "target_px": [
+        1408,
+        1920
+      ]
+    }
+  ],
+  "plant_reserved_slots": [
+    "wood_dark",
+    "sage_dark",
+    "leather"
+  ],
+  "note": "Unused furniture slots only. Shared shell UVs, geometry and source atlas are unchanged."
+}

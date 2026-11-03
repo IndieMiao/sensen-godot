@@ -1,0 +1,323 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "SGODOT-315 R3 approved main 2026-10-31"
+  },
+  "assets": [
+    {
+      "name": "hall_floor",
+      "file": "hall_floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.1,
+            0
+          ],
+          "size": [
+            6.8,
+            0.36,
+            6.4
+          ]
+        }
+      ],
+      "material": "opaque",
+      "cast_shadow": false
+    },
+    {
+      "name": "hall_left_wall",
+      "file": "hall_left_wall.glb",
+      "position": [
+        -3.3,
+        0.08,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.85,
+            0
+          ],
+          "size": [
+            6.4,
+            3.7,
+            0.2
+          ]
+        }
+      ],
+      "material": "opaque",
+      "cast_shadow": true
+    },
+    {
+      "name": "hall_back_wall",
+      "file": "hall_back_wall.glb",
+      "position": [
+        0.1,
+        0.08,
+        -3.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.85,
+            0
+          ],
+          "size": [
+            6.6,
+            3.7,
+            0.2
+          ]
+        }
+      ],
+      "material": "opaque",
+      "cast_shadow": true
+    },
+    {
+      "name": "hall_window_frame",
+      "file": "hall_window_frame.glb",
+      "position": [
+        -3.2,
+        2.2199999999999998,
+        -1.78
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "opaque",
+      "cast_shadow": true
+    },
+    {
+      "name": "hall_window_grid",
+      "file": "hall_window_grid.glb",
+      "position": [
+        -3.2,
+        2.2199999999999998,
+        -1.78
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "opaque",
+      "cast_shadow": true
+    },
+    {
+      "name": "hall_window_glass",
+      "file": "hall_window_glass.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "glass",
+      "cast_shadow": false
+    }
+  ],
+  "instances": [
+    {
+      "name": "hall_window_frame_front",
+      "asset": "hall_window_frame",
+      "position": [
+        -3.2,
+        2.2199999999999998,
+        1.78
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "hall_window_grid_front",
+      "asset": "hall_window_grid",
+      "position": [
+        -3.2,
+        2.2199999999999998,
+        1.78
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      10.342903137207031,
+      15.63996696472168,
+      10.342903137207031
+    ],
+    "target": [
+      0.0,
+      2.0,
+      0.0
+    ],
+    "size": 11.0,
+    "pitch_degrees": 43,
+    "yaw_degrees": 45,
+    "near": 0.1,
+    "far": 40.0
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "background": "B5A18B",
+    "ambient_color": "FFF1DC",
+    "ambient": 0.4,
+    "sun_color": "FFF2DA",
+    "sun": 1.2,
+    "sun_position": [
+      -6,
+      4,
+      -1
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.15,
+    "shadow_normal_bias": 0.8,
+    "shadow_mode": "orthogonal_single",
+    "shadow_distance": 30,
+    "angular_distance": 0.4
+  },
+  "floor_y": 0.08,
+  "footprint": [
+    6.8,
+    6.4
+  ],
+  "wall_height": 3.7,
+  "texture": "hall_albedo_ao.png",
+  "palette": "hall_palette.json",
+  "revision": "SGODOT-319 shell v1",
+  "dimensions": {
+    "source": "Formal shell dimensions approved by art director, SGODOT-319 5fe1b06c",
+    "window_aperture_width": 1.24,
+    "window_aperture_height": 2.04,
+    "window_sill_y": 1.2,
+    "window_centers_z": [
+      -1.78,
+      1.78
+    ],
+    "window_panes": [
+      3,
+      4
+    ],
+    "wainscot_top_y": 1.1525,
+    "cornice_bottom_y": 3.4625,
+    "cornice_top_y": 3.746,
+    "plank_size": [
+      0.64,
+      0.16
+    ],
+    "wall_top_y": 3.78,
+    "wall_thickness": 0.2,
+    "floor_top_y": 0.08
+  },
+  "anchors": [
+    {
+      "name": "spawn",
+      "position": [
+        0,
+        0.08,
+        2.5
+      ],
+      "yaw_degrees": 180,
+      "module": "hall_floor"
+    },
+    {
+      "name": "exit",
+      "position": [
+        0,
+        0.08,
+        2.88
+      ],
+      "yaw_degrees": 180,
+      "module": "hall_floor"
+    },
+    {
+      "name": "badge_exit",
+      "position": [
+        0,
+        0.55,
+        3.0
+      ],
+      "yaw_degrees": 0,
+      "module": "hall_floor"
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "cut_right",
+      "at": [
+        3.38,
+        1.08,
+        0
+      ],
+      "size": [
+        0.04,
+        2,
+        6.4
+      ]
+    },
+    {
+      "name": "cut_front",
+      "at": [
+        0,
+        1.08,
+        3.18
+      ],
+      "size": [
+        6.8,
+        2,
+        0.04
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "name": "window_1",
+      "position": [
+        -3.3,
+        2.2199999999999998,
+        -1.78
+      ],
+      "size": [
+        0.2,
+        2.04,
+        1.24
+      ],
+      "frame": "hall_window_frame",
+      "grid": "hall_window_grid"
+    },
+    {
+      "name": "window_2",
+      "position": [
+        -3.3,
+        2.2199999999999998,
+        1.78
+      ],
+      "size": [
+        0.2,
+        2.04,
+        1.24
+      ],
+      "frame": "hall_window_frame",
+      "grid": "hall_window_grid"
+    }
+  ],
+  "contract_notes": [
+    "No front wall, door or wall-end square columns.",
+    "Cut-edge colliders are invisible containment; exit anchor is inside the front edge.",
+    "No hotel-specific furniture, sign, light, camera or environment in reusable art."
+  ]
+}
