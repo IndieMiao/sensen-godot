@@ -12,8 +12,8 @@ const ENGINE := "engine"   # a row's text: Godot's own license and its third-par
 static var _data := {}
 
 ## q(281) ① (SGODOT-390): the Privacy Policy, by platform — Legal's first row opens it in the system browser. The row
-## shows only once the pages are up: PRIVACY_LIVE stays false until they are (奕星 / 后裔 say so), then one line flips.
-const PRIVACY_LIVE := false
+## shows only once the pages are up: PRIVACY_LIVE was false until they were; both up 11-03 21:46 (奕星), so true.
+const PRIVACY_LIVE := true
 const PRIVACY_IOS := "https://gensen.app/privacy"
 const PRIVACY_ANDROID := "https://gensen.app/privacy-android"
 static func privacy_url(os_name: String, live := PRIVACY_LIVE) -> String:
