@@ -1,0 +1,32 @@
+{
+  "author": "ZHAOYUN",
+  "source": "assets/rooms/_shared/plants/source/plants.blend",
+  "changes": [
+    "Peace lily uniformly scaled .30; geometric leaf outlines retained, no alpha-cut silhouette.",
+    "Source botanical colours remapped into classroom atlas; two-sided leaf surface."
+  ],
+  "source_sha256": "aec387199dc3c34be2e4e8d0a012d1ffa23dd6445d72ef70693d664333527a60",
+  "source_collection": "KIT_peace_lily",
+  "name": "small_plant",
+  "file": "small_plant.glb",
+  "triangles": 946,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.12711367011070251,
+      0.0,
+      -0.11059348285198212
+    ],
+    [
+      0.1290000081062317,
+      0.3720000088214874,
+      0.10735911875963211
+    ]
+  ],
+  "dimensions_m": [
+    0.2561136782169342,
+    0.3720000088214874,
+    0.21795260161161423
+  ],
+  "sha256": "adec5f1e5e070e91019e4f2c135f9a6fe081f9786b559cc18e2487bf78b4bd87"
+}

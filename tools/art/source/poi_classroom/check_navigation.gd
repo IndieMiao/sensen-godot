@@ -8,6 +8,9 @@ func check(ok: bool,label: String) -> void:
 func run() -> void:
 	var data: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://navigation-fixture.json"))
 	var art=load("res://scenes/poi_classroom/poi_classroom_art.tscn").instantiate();root.add_child(art)
+	for row in data.plan.placements:
+		check(art.has_node(str(row.name)),"assembled module exists: "+str(row.name))
+	check(art.find_children("seat_*","Marker3D",true,false).size()==6,"assembly completed all six seat anchors")
 	for i in 3:await physics_frame
 	var space:=root.get_world_3d().direct_space_state
 	var cfg: Dictionary=data.grid

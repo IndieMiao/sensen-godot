@@ -1,0 +1,112 @@
+[
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_default_clean.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_default_clean.png",
+    "sha256": "4c51b3189d334e82f31a3b53d43fb2b33bc9a29f5f04f07ef6eac16211d3b955",
+    "bytes": 668384,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_default_safe.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_default_safe.png",
+    "sha256": "f06e577ed5c75ad213c3558faff728dc64111d865dbbe9f5196be6a350330c6d",
+    "bytes": 696713,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_overview.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_overview.png",
+    "sha256": "7d2fc6e85d9ef82508933ccda0a56b08b06161cd1ac47599a60a57ed492c4c00",
+    "bytes": 785199,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_six_seats.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_six_seats.png",
+    "sha256": "dee6a4080b82d10040f76172353a495fc17baf89c000d02d3fa6a567ccc6b658",
+    "bytes": 798335,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_topdown_ruler.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_topdown_ruler.png",
+    "sha256": "90dd0e05c91be5a75ebc26e411448abeff445ca1f516c121bbaccf9b31ccfabd",
+    "bytes": 1011692,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1270
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_stark_comparison.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_stark_comparison.png",
+    "sha256": "9761e13aec9e6519e3eba546524a95b10c776b073bf2965a83883cf483e6dfeb",
+    "bytes": 2370777,
+    "mime": "image/png",
+    "size": [
+      2362,
+      1195
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_reading_detail.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_reading_detail.png",
+    "sha256": "b8c17f87f8af4dc5b7c2454e0dd77b42ba6db278e91746aabfa5cc64d1ce423a",
+    "bytes": 846868,
+    "mime": "image/png",
+    "size": [
+      1000,
+      920
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_teaching_detail.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_teaching_detail.png",
+    "sha256": "86a762d61849bd0a0a94ad9c9f2f332006f22a9c6724af4973cae2707dad2fe1",
+    "bytes": 692077,
+    "mime": "image/png",
+    "size": [
+      1000,
+      920
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_local_lights.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_local_lights.png",
+    "sha256": "c560857bb7f58bb03349ce32e7ed3b30f812ab800bc74f16c9481db1dc36b6c2",
+    "bytes": 1018491,
+    "mime": "image/png",
+    "size": [
+      1440,
+      1670
+    ]
+  },
+  {
+    "name": "SGODOT-322_POI_CLASSROOM_v1_clip_comparison.png",
+    "path": "docs/design/poi-classroom-322-2026-11-03/SGODOT-322_POI_CLASSROOM_v1_clip_comparison.png",
+    "sha256": "9c892528ad8e7db29acdf1cb641e9d34142a00ca84a38a788f03f38222290ecc",
+    "bytes": 1361836,
+    "mime": "image/png",
+    "size": [
+      1440,
+      1670
+    ]
+  }
+]

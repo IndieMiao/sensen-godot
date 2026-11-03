@@ -77,7 +77,7 @@ func validate() -> void:
 			triangles+=arrays[Mesh.ARRAY_INDEX].size()/3;surfaces+=1
 	report.triangles=triangles;report.surfaces=surfaces
 	var stats: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(KIT+"asset_stats.json"))
-	check(triangles==stats.placed_proxy_triangles+stats.shared_shell_stats.scene_triangles and surfaces==stats.placed_proxy_surfaces+stats.shared_shell_stats.static_draw_surfaces,"actual shared shell and white proxy budget matches asset stats")
+	check(triangles==stats.scene_triangles and surfaces==stats.static_draw_surfaces,"assembled room budget matches asset stats")
 	check(triangles<=150000 and surfaces<=50,"room budget below 150k triangles / 50 surfaces")
 	check(room.art.find_children("seat_*","Marker3D",true,false).size()==6,"six art seat anchors")
 	check(room.art.find_children("npc_*","Marker3D",true,false).is_empty() and room.art.find_children("use_*","Marker3D",true,false).is_empty(),"no NPC or service anchors")
@@ -90,7 +90,7 @@ func validate() -> void:
 		"yaw":room.cam.rotation_degrees.y,"transform":str(room.cam.global_transform),"room_offset":str(room.room.position),"source":"Unmodified P0Room.frame_all with P0Ui bag-only layout"}
 	check(actual.distance_to(spawn)<.12,"native spawn snaps less than .12m")
 	report.subject_screen_bounds={}
-	for name_ in ["desk_1","desk_2","desk_3","desk_4","desk_5","desk_6","proxy_teacher_desk","proxy_blackboard","proxy_sign"]:
+	for name_ in ["desk_1","desk_2","desk_3","desk_4","desk_5","desk_6","teacher_desk","blackboard","name_sign"]:
 		var rect:=screen_bounds(room.art.get_node(name_))
 		report.subject_screen_bounds[name_]={"rect":[rect.position.x,rect.position.y,rect.size.x,rect.size.y],"hud_bag_clear":rect.position.y>=100 and rect.end.y<=710}
 		check(rect.position.y>=100 and rect.end.y<=710,"HUD/Bag vertical clearance: "+name_)
@@ -98,9 +98,17 @@ func validate() -> void:
 	var nav: Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://../navigation.json"))
 	check(nav.passed,"actual scene capsule sweeps passed")
 	var config:=ConfigFile.new()
-	for name_ in ["blockout_student_desk","blockout_student_stool","blockout_box","blockout_cylinder","blockout_ball"]:
+	for asset in room.layout.assets:
+		var name_: String=asset.name
 		check(config.load(KIT+name_+".glb.import")==OK and str(config.get_value("remap","uid","")).begins_with("uid://"),name_+" import UID")
 		check(config.get_value("params","gltf/texture_map_mode",0)==1,name_+" texture map mode one")
+	var globe: Node3D=room.art.get_node("globe")
+	var mount: Node3D=room.art.get_node("teacher_desk").find_child("globe_mount",true,false)
+	check(globe.global_position.distance_to(mount.global_position)<.0001,"globe uses approved teacher desk mount")
+	var books:=screen_bounds(room.art.get_node("reading_books"))
+	check(books.intersects(Rect2(0,100,360,610)),"reading books visible in default safe view")
+	report.reading_books_screen_rect=[books.position.x,books.position.y,books.size.x,books.size.y]
+	check(room.art.find_children("*","OmniLight3D",true,false).size()<=6,"at most six unshadowed local lights")
 
 func run() -> void:
 	if DisplayServer.get_name()=="headless":get_tree().quit(2);return
@@ -121,6 +129,9 @@ func run() -> void:
 	while room.actor.rig.is_busy() and frames<240:
 		frames+=1;await get_tree().process_frame
 	room.frame_all();room.set_process(false);room.actor.set_process(false);room.actor.set_physics_process(false)
+	report.native_clip_before=[room.cam.near,room.cam.far]
+	room.cam.near=float(room.layout.camera.near);room.cam.far=float(room.layout.camera.far)
+	report.review_clip=[room.cam.near,room.cam.far]
 	room.actor.rig.play_motion("idle")
 	var animation: AnimationPlayer=room.actor.rig.get_node("AnimationPlayer");animation.seek(.3,true);animation.advance(0);animation.pause()
 	runtime.ui.visible=false
@@ -128,6 +139,14 @@ func run() -> void:
 	var native: Transform3D=room.cam.global_transform
 	await capture("default_clean_360",Vector2i(360,800))
 	await capture("default_clean_720",Vector2i(720,1600))
+	var projected_before: Vector2=room.cam.unproject_position(room.actor.global_position)
+	room.cam.near=float(report.native_clip_before[0]);room.cam.far=float(report.native_clip_before[1])
+	await capture("default_native_clip_720",Vector2i(720,1600))
+	check(projected_before.distance_to(room.cam.unproject_position(room.actor.global_position))<.001,"clip adjustment preserves native camera framing")
+	room.cam.near=float(room.layout.camera.near);room.cam.far=float(room.layout.camera.far)
+	for lamp in room.art.find_children("*","OmniLight3D",true,false):lamp.visible=false
+	await capture("local_lights_off",Vector2i(720,1600))
+	for lamp in room.art.find_children("*","OmniLight3D",true,false):lamp.visible=true
 	await populate_seats()
 	room.cam.global_transform=native;room.cam.size=6.72
 	await capture("default_seated_720",Vector2i(720,1600))
@@ -136,6 +155,15 @@ func run() -> void:
 	await capture("seated_overview",Vector2i(1200,1000))
 	for rig in seats:rig.visible=false
 	room.actor.visible=false
+	await capture("overview",Vector2i(1200,1000))
+	# R3 roof edges rise 0.574 px per horizontal pixel: asin(.574) ~= 35 deg.
+	room.cam.rotation_degrees=Vector3(-35,45,0)
+	room.cam.global_position=room.room.global_position+Vector3(0,1.75,0)+room.cam.global_basis.z*20;room.cam.size=10.8
+	await capture("reference_view",Vector2i(1181,1079))
+	room.cam.rotation_degrees=Vector3(-43,45,0)
+	for entry in [{"name":"reading_detail","at":Vector3(-2.1,1.1,-.3),"size":4.3}, {"name":"teaching_detail","at":Vector3(.4,2.0,-2.5),"size":4.8}]:
+		room.cam.global_position=room.room.global_position+entry.at+room.cam.global_basis.z*20;room.cam.size=entry.size
+		await capture(entry.name,Vector2i(1000,850))
 	room.cam.rotation_degrees=Vector3(-90,0,0);room.cam.global_position=room.room.global_position+Vector3(0,20,0);room.cam.size=8.0
 	await capture("topdown",Vector2i(1200,1200))
 	report.topdown_projection={}

@@ -1,0 +1,31 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/coffee_shop/coffee_shop.blend",
+  "changes": [
+    "Catalogue cream bell pendant adapted to .40 m shade; brass cable and stem."
+  ],
+  "source_sha256": "5ef9c0675f426dc5038d27e48b4b4bebc4c395a1333eb9197fa9e4247c341921",
+  "source_collection": "KIT_pendant",
+  "name": "pendant",
+  "file": "pendant.glb",
+  "triangles": 904,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.19994999468326569,
+      -0.007999995723366737,
+      -0.19994999468326569
+    ],
+    [
+      0.19994999468326569,
+      0.6959999799728394,
+      0.19994999468326569
+    ]
+  ],
+  "dimensions_m": [
+    0.39989998936653137,
+    0.7039999756962061,
+    0.39989998936653137
+  ],
+  "sha256": "082fc99a6f89f8c0d229e38b1909fb37664fa64df83e5ebe67997e3ffe1eaa4e"
+}

@@ -1,0 +1,32 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/basic_room/basic_room.blend",
+  "changes": [
+    "Basic Room shelf board rebuilt into named case panels, shelves and back.",
+    "Original low-poly book blocks added; no object above tall bookcase top."
+  ],
+  "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+  "source_collection": "KIT_wall_shelf",
+  "name": "low_cabinet",
+  "file": "low_cabinet.glb",
+  "triangles": 3948,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.4000000059604645,
+      -1.1920929132713809e-08,
+      -0.23999999463558197
+    ],
+    [
+      0.4000000059604645,
+      0.8999999761581421,
+      0.23999999463558197
+    ]
+  ],
+  "dimensions_m": [
+    0.800000011920929,
+    0.8999999880790712,
+    0.47999998927116394
+  ],
+  "sha256": "6a8fa24c6cad2206c0cf7de0769571ca5166658ecb302d966239572dc2e3df2b"
+}

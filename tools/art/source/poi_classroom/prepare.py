@@ -9,8 +9,12 @@ HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];QA=ROOT/"output/classr
 parser=argparse.ArgumentParser();parser.add_argument("--runtime",required=True);parser.add_argument("--sync-import",action="store_true");args=parser.parse_args()
 runtime=Path(args.runtime).resolve();project=QA/"project";kit="assets/rooms/poi_classroom"
 if args.sync_import:
-    for name in ["blockout_student_desk","blockout_student_stool","blockout_box","blockout_cylinder","blockout_ball"]:
-        shutil.copy2(project/kit/(name+".glb.import"),ROOT/kit/(name+".glb.import"))
+    for asset in json.loads((ROOT/kit/"layout.json").read_text())["assets"]:
+        if asset["name"].startswith("props/"):continue
+        name=asset["file"]+".import"
+        shutil.copy2(project/kit/name,ROOT/kit/name)
+    shutil.copy2(project/kit/"room_albedo_ao.png.import",ROOT/kit/"room_albedo_ao.png.import")
+    for file in (project/kit).glob("*.gd.uid"):shutil.copy2(file,ROOT/kit/file.name)
     for file in (project/"scenes/poi_classroom").glob("*.uid"):shutil.copy2(file,ROOT/"scenes/poi_classroom"/file.name)
     raise SystemExit(0)
 project.mkdir(parents=True,exist_ok=True)
@@ -28,9 +32,9 @@ for name in ["review.gd","configure.gd","check_navigation.gd"]:
 shutil.copy2(QA/"navigation-fixture.json",project/"navigation-fixture.json")
 (project/"review.tscn").write_text('[gd_scene load_steps=2 format=3]\n[ext_resource type="Script" path="res://review.gd" id="1"]\n[node name="Classroom322Review" type="Node"]\nscript=ExtResource("1")\n')
 (project/"override.cfg").write_text('''[application]
-config/name="Classroom322WhiteQA"
+config/name="Classroom322DetailQA"
 config/use_custom_user_dir=true
-config/custom_user_dir_name="Classroom322WhiteQA"
+config/custom_user_dir_name="Classroom322DetailQA"
 run/main_scene="res://review.tscn"
 [editor_plugins]
 enabled=PackedStringArray()
@@ -42,6 +46,8 @@ window/size/window_height_override=800
 [rendering]
 renderer/rendering_method="mobile"
 renderer/rendering_method.mobile="mobile"
+lights_and_shadows/directional_shadow/size=4096
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
 [sensen]
 network/base_url="http://127.0.0.1:9/v1"
 network/mobile_base_url="http://127.0.0.1:9/v1"

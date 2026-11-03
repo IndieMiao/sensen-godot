@@ -11,7 +11,7 @@ from shapely.affinity import rotate
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];QA=ROOT/"output/classroom-322"
 def shape(row):
     x,_,z=row["position"];w,h,d=row["size"]
-    geometry=Point(x,z).buffer(w/2,quad_segs=48) if row["model"] in ["blockout_student_stool","blockout_cylinder"] else box(x-w/2,z-d/2,x+w/2,z+d/2)
+    geometry=Point(x,z).buffer(w/2,quad_segs=48) if row.get("shape")=="circle" or row["model"] in ["blockout_student_stool","blockout_cylinder"] else box(x-w/2,z-d/2,x+w/2,z+d/2)
     return rotate(geometry,-row.get("yaw_degrees",0),origin=(x,z))
 def component(region,point):
     return next((p for p in getattr(region,"geoms",[region]) if p.covers(point)),None)
@@ -54,11 +54,11 @@ def main():
         if min(math.dist(p,q) for q in chosen)<.55:break
         chosen.append(p);candidates.remove(p)
     corridors={"central":shapes["desk_2"].bounds[0]-shapes["desk_1"].bounds[2],
-        "reading_corner":shapes["desk_1"].bounds[0]-shapes["proxy_cushion_2"].bounds[2],
+        "reading_corner":shapes["desk_1"].bounds[0]-shapes["reading_cushion_2" if "reading_cushion_2" in shapes else "proxy_cushion_2"].bounds[2],
         "left_longitudinal":shapes["desk_3"].bounds[0]-shapes["low_cabinet_1"].bounds[2],
         "right_longitudinal":floor.bounds[2]-shapes["desk_4"].bounds[2],
         "front_cross":floor.bounds[3]-shapes["stool_5"].bounds[3],
-        "teaching_cross":shapes["desk_1"].bounds[1]-shapes["proxy_teacher_desk"].bounds[3]}
+        "teaching_cross":shapes["desk_1"].bounds[1]-shapes["teacher_desk" if "teacher_desk" in shapes else "proxy_teacher_desk"].bounds[3]}
     report={"passed":not overlap and all(r["reachable"] for r in results) and all(r["passed"] for r in support) and len(chosen)==16 and min(corridors.values())>=.7,
         "method":"Full-height furniture footprints, Shapely capsule-centre buffers; main aisles .35m radius",
         "overlap":overlap,"support":support,"routes":results,"main_corridors_m":corridors,
