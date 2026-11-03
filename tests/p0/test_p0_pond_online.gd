@@ -119,3 +119,18 @@ func test_layer_2_says_so_once() -> void:
 	var pond := _pond()
 	var o := _online(pond)
 	assert_bool(o.joined.is_connected(pond._on_joined)).is_true()
+
+## 周瑜 on #646: a reconnect's join has no line of ours on the server: the one out goes again on the next frame.
+func test_a_reconnect_sends_the_line_out_again() -> void:
+	var pond := _pond()
+	var o := _online(pond)
+	pond.panel.show()
+	pond.panel.phase = "waiting"
+	pond.panel.landing = Vector3(5, 0, -4)
+	pond._tell_line(0.016)
+	var n := _lines().size()
+	pond._tell_line(0.016)
+	assert_int(_lines().size()).is_equal(n)   # nothing new
+	o._message(JSON.stringify({"t": "joined", "outpost": "pond:pond_san_francisco_03", "room": 1, "capacity": 8, "rejoined": true, "self": 2, "epoch": 5}))
+	pond._tell_line(0.016)
+	assert_dict(_lines()[-1]).contains_key_value("phase", "waiting").contains_key_value("epoch", 5)

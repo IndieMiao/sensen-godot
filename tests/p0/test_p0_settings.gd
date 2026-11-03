@@ -299,7 +299,7 @@ func test_a_long_text_fills_in_over_frames() -> void:
 ## language in use in its own words; its page lists English and 中文 untranslated, a ✓ on the pick, and while the pick is
 ## not the language on screen a line says a restart applies it. The three UiKit weights draw Chinese (Noto Sans SC).
 func test_settings_offers_language_between_notifications_and_test_options() -> void:
-	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("0.2.21 (2026110301)", 0.0, 0.0, {}, "On", "English"))
+	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("0.2.21 (2026110301)", 0.0, 0.0, {}, "On", P0SettingsPage.BLOCKED_NONE, false, "English"))
 	add_child(page)
 	await await_idle_frame()
 	assert_array(_labels(page.body)).is_equal(["Notifications", "On", "›", "General", "Language", "English", "›",

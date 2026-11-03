@@ -15,6 +15,7 @@ extends Node
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
 const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
+const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")   # Settings › Blocked players: the account's voice (SGODOT-384)
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
@@ -155,6 +156,11 @@ func _init() -> void:
 	ui.notify.came_back()
 	if ui.notify.available(): ui.notify.native.connect("permission", func(_granted): ui.notify_changed())
 	ui.test_account_requested.connect(_switch_test_account)
+	# Settings › Blocked players (SGODOT-384): the account's voice, status and blocks, with no room
+	var voice_account := P0VoiceRoom.new()
+	voice_account.session = session
+	add_child(voice_account)
+	ui.voice_account = voice_account
 	add_child(ui)
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
@@ -421,6 +427,8 @@ func _process(dt: float) -> void:
 	_dev_shot(dt)
 	_dev_mem(dt)
 	_tick_screens(dt)
+	# the room's voice for the HUD's mic key and people drawer (SGODOT-383): an outpost's or a pond's, else none
+	ui.set_voice_room(world.get("voice_room") if is_instance_valid(world) else null)
 	if ui.offline:
 		_probe_left -= dt
 		if _probe_left <= 0.0: _probe()
@@ -1058,7 +1066,7 @@ func _show_guide_resend(resend: Dictionary) -> void:
 	UiItemFly.launch(ui.root, at, bag, P0Logic.icon(id), n, 0.0, func(): UiItemFly.bump(bag))
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
-## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
+## ones a float; a gate break-free gets the four-line card once per species, then "Too strong · Fishing Lv4" (q(278));
 ## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
 ## floats rise (over the player's head for a landed fish, the cast point for an escape, when the pond knows
 ## them); `card_after` holds the Caught! card that long after the reply's floats there (不知火舞 on 231 / #154).
@@ -1083,10 +1091,8 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
 				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
-			else:   # second time on: `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back` (q(50))
-				var rod := P0Logic.rod_for(v, int(ev.get("rarity", 2)))
-				var what := ("Lv%d" % int(ev.need_level)) if ev.has("need_level") else (str(rod.name) if not rod.is_empty() else "rod too light")
-				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, UiFloatText.Tone.ENERGY_GAIN)
+			else:   # second time on: `Too strong · Fishing Lv8 · 3 Energy back` (q(278)) / `Got away · Reed Rod · …` (q(50))
+				ui.float_text(P0Logic.break_free_float(v, ev), where, UiFloatText.Tone.ENERGY_GAIN)
 		"escaped":
 			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
@@ -1104,6 +1110,16 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	_dex_energy.erase(id)
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
+## q(270) ⑥'s toast for a Market Board request taken or handed in in the wrong city (379 6760e0f8, no new copy): its
+## hand-in row as Today writes it (`Deliver at Shibuya Market Square · Tokyo`, P0PinReason.market_at); a view that no
+## longer has the request names the server's city as that row does without a square's name (`Deliver at the market ·
+## Tokyo`), never the code.
+static func wrong_city_line(view: Dictionary, request: String, city: String) -> String:
+	var r := PinReason.request_of(view, request)
+	if str(r.get("deliver", "")) != "": return str(r.deliver)
+	var name := str(P0Clusters.get_cluster(city).get("name", "")) if city != "" else ""
+	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
+
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
@@ -1115,12 +1131,16 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
 	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
-	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥). An Error toast, as
+	# every refused command's but Energy's (§4.8.6; 不知火舞 11-02: wrong_place and wrong_city alike)
 	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
 		var r := PinReason.request_of(session.view, str(cmd.request))
 		if not r.is_empty():
-			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
+		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
+		return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -2017,6 +2037,11 @@ func _dev_shot(dt: float) -> void:
 				var gone := {"fish": step[1], "rarity": int(P0Logic.item(session.current(), step[1]).get("rarity", 3)), "refund": 5, "protected_left": 8}
 				if step.size() < 3 or step[2] == "level": gone["need_level"] = 4
 				ui.show_got_away(gone)
+			"rowinfo":   # rowinfo:rod_carbon — the open counter's row › card (q(278) shots)
+				for d in ui.find_children("*", "P0CounterDrawer", true, false): ui.counter_info(d, step[1])
+			"breakfloat":   # breakfloat:8 — a gate fish breaking free again, its float (q(278) shots)
+				ui.float_text(P0Logic.break_free_float(session.current(), {"rarity": 4, "need_level": int(step[1]), "refund": 3}),
+					anchor(), UiFloatText.Tone.ENERGY_GAIN)
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
