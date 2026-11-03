@@ -264,3 +264,15 @@ func test_p0_widths_are_measured_on_the_chinese() -> void:
 	assert_bool(cut.ends_with("… · 上海")).override_failure_message(cut).is_true()
 	assert_float(P0Logic.text_width(cut)).is_less_equal(P0Board.LINE_W)
 	TranslationServer.remove_translation(t)
+
+## #649 第二批 ②: `%s XP` is a skill's (「种植经验」, no space) or a number's (「+20 经验」, a space): as long a literal, the
+## template with fewer %s goes first, so a number finds `%d XP` / `%+d XP` and a name `%s XP`, whatever the table's order.
+func test_p0_a_number_template_goes_before_a_name_one_as_long() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"%s XP": "%s经验", "%d XP": "%d 经验", "Farming": "种植"})
+	assert_str(String(t.get_message("+20 XP"))).is_equal("+20 经验")
+	assert_str(String(t.get_message("1,200 XP"))).is_equal("1,200 经验")
+	assert_str(String(t.get_message("Farming XP"))).is_equal("种植经验")
+	t.set_table({"%d XP": "%d 经验", "%s XP": "%s经验", "Farming": "种植"})
+	assert_str(String(t.get_message("+20 XP"))).is_equal("+20 经验")
+	assert_str(String(t.get_message("Farming XP"))).is_equal("种植经验")
