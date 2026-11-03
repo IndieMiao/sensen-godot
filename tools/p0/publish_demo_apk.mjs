@@ -101,8 +101,11 @@ assert.equal(health.ok, true);
 assert.equal(health.maintenance?.on, false, 'the P0 server is in maintenance');
 // The image this APK goes out against: the live server's own word when it gives one (see --backend above).
 const liveRelease = healthResponse.headers.get('x-p0-release');
-const sameImage = (a, b) => /^[0-9a-f]{7,40}$/.test(a) && /^[0-9a-f]{7,40}$/.test(b) && (a.startsWith(b) || b.startsWith(a));
+const IMAGE = /^[0-9a-f]{7,40}$/;
+const sameImage = (a, b) => IMAGE.test(a) && IMAGE.test(b) && (a.startsWith(b) || b.startsWith(a));
 let backend = arg('--backend');
+// A typo, or `--backend` with its value left off (the next flag read as one), never goes into the manifest (后裔 on #719).
+if (has('--backend')) assert(IMAGE.test(backend ?? ''), `--backend wants an image sha (7–40 hex), not ${JSON.stringify(backend)}`);
 if (liveRelease) {
   if (backend) assert(sameImage(backend, liveRelease), `--backend ${backend} is not the image the server runs (X-P0-Release ${liveRelease}): leave it out, or deploy first`);
   else backend = liveRelease;
