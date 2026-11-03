@@ -61,7 +61,7 @@ func _ready() -> void:
 	# under their feet) and a POI's shadow is its artwork's silhouette — yet the sun drew four shadow cascades a frame.
 	$Sun.shadow_enabled = false
 	rt.attach(self)
-	_load_city_places(P0Travel.home(_view()))   # a generated home's own places (SGODOT-303); the written city's are in the client
+	_load_city_places(P0Travel.home(_view()))   # home's places (SGODOT-303) and gathering spots (v4q(4))
 	for child in $HUD/SafeArea/Root.get_children():
 		if child.name == "AccountButton" or child is LanguageButton: child.hide()
 
@@ -1513,12 +1513,13 @@ func _switch_city(r: Dictionary) -> void:
 
 ## Another city's ponds and outposts (SGODOT-280, the server's generator): read once per city when the camera city
 ## becomes it (or the player arrives there), then pinned like the home city's. A pin of a city without a pass still
-## opens its travel card (_travel_first). The home city keeps its hand-written pins.
+## opens its travel card (_travel_first). The home city keeps its hand-written ponds and outposts; it is read for its
+## gathering spots (v4q(4)).
 var _shown_cities: Array = []
 const SHOWN_CITIES := 6   # the cities whose pins stay on the map, the latest last
 
 func _load_city_places(cluster: String) -> void:
-	if cluster == "" or rt == null or cluster == P0Travel.written(): return   # hand-written: in the client already
+	if cluster == "" or rt == null: return   # the hand-written city too: its gathering spots are the server's (v4q(4))
 	P0CityPlaces.fetch(rt.session, cluster, _show_city_places.bind(cluster))
 
 func _show_city_places(_city: Dictionary, cluster: String) -> void:

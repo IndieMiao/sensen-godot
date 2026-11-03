@@ -56,8 +56,9 @@ func test_the_runtime_reads_the_home_city_once() -> void:
 	P0CityPlaces.accept(TOKYO, HomeSet.CITY)
 	rt._read_home_places(rt.session.view)   # in: never again
 	assert_int(asked.size()).is_equal(1)
-	rt._read_home_places({"travel": {"home": "gn-5391959"}})   # San Francisco's are the client's own
-	assert_int(asked.size()).is_equal(1)
+	# San Francisco's ponds and outposts are the client's own, its gathering spots the server's (v4q(4)): read too
+	rt._read_home_places({"travel": {"home": "gn-5391959"}})
+	assert_array(asked).is_equal(["/p0/city/" + TOKYO, "/p0/city/gn-5391959"])
 
 ## PR-3: the map opens over the home city, the Homestead pin on the spot picked with it, and home is flown to there.
 func test_the_map_opens_over_the_home_city_with_the_farm_on_its_spot() -> void:
