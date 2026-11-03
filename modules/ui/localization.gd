@@ -103,14 +103,19 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## P0's zh_CN table (assets/localization/p0_zh_CN.json: English source → Chinese). A line not in it is tried as a
 ## template — a source with format specs (%d, %s, %+d, %.1f; %% a percent sign: `Need %d more %s` → `还差 %d 个%s`;
 ## `{1}` / `{2}` in the Chinese to reorder) — with each %s it caught translated again (an item's name, a weekday) and a
-## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts. Nothing found: "" (the
-## English stays). Answers are cached: labels ask again on every redraw.
+## plural ending (`dish%s` → s / es) dropped; then line by line, then by its ` · ` parts; a link's ` ›` (`Edit look ›`) and
+## a list whose every item it knows (`Carrot, Herb` → `胡萝卜、香草`) are read around. Nothing found: "" (the English
+## stays). Answers are cached: labels ask again on every redraw. P0_I18N_MISSES=<file> (QA): every line drawn that found
+## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
 	var _templates: Array = []   # [RegEx, Chinese, literal length] — the longest literal tried first
 	var _cache := {}
 	const CACHE_MAX := 4096
 	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
+	const LINK := " ›"   # a row or key that opens something: the arrow stays, the words before it are translated
+	var _misses := {}
+	var _miss_file: FileAccess
 	static var SPEC := _spec_re()
 
 	static func _spec_re() -> RegEx:
@@ -169,7 +174,21 @@ class P0Translation extends Translation:
 		var out := translate_line(s)
 		if _cache.size() >= CACHE_MAX: _cache.clear()
 		_cache[s] = out
+		if out == "": _miss(s)
 		return out
+
+	## QA only (P0_I18N_MISSES): a line no part of which is in the table, once per run.
+	func _miss(s: String) -> void:
+		if _misses.has(s): return
+		_misses[s] = true
+		if _miss_file == null:
+			var path := OS.get_environment("P0_I18N_MISSES")
+			if path == "": return
+			_miss_file = FileAccess.open(path, FileAccess.READ_WRITE if FileAccess.file_exists(path) else FileAccess.WRITE)
+			if _miss_file == null: return
+			_miss_file.seek_end()
+		_miss_file.store_line(s.c_escape())
+		_miss_file.flush()
 
 	## The Chinese for one line, or "" when no part of it is known.
 	func translate_line(s: String) -> String:
@@ -194,6 +213,16 @@ class P0Translation extends Translation:
 				any = any or z != ""
 				parts.append(z if z != "" else seg)
 			return " · ".join(parts) if any else ""
+		if s.ends_with(LINK) and s.length() > LINK.length():
+			var head := translate_line(s.left(s.length() - LINK.length()))
+			return head + LINK if head != "" else ""
+		if s.contains(", "):   # a list: only when every item is known, joined the Chinese way
+			var items: Array = []
+			for item in s.split(", "):
+				var z := translate_line(item)
+				if z == "": return ""
+				items.append(z)
+			return "、".join(items)
 		return ""
 
 	func _template(s: String) -> String:

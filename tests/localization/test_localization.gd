@@ -157,6 +157,18 @@ func test_p0_table_translates_lines_templates_parts_and_leaves_the_rest() -> voi
 	assert_str(String(t.get_message("270/270"))).is_equal("")   # no letters: nothing to translate
 	assert_str(String(t.get_message("_note"))).is_equal("")   # notes are no lines
 
+## B 档 shots (SGODOT-385, 11-03): a link's ` ›` and a list of known items are read around; a list with one unknown
+## item stays English whole (a sentence with a comma is no list).
+func test_p0_table_reads_a_links_arrow_and_a_list_of_known_items() -> void:
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.locale = "zh_CN"
+	t.set_table({"Edit look": "修改形象", "Carrot": "胡萝卜", "Herb": "香草", "Decorate": "布置"})
+	assert_str(String(t.get_message("Edit look ›"))).is_equal("修改形象 ›")
+	assert_str(String(t.get_message("Carrot, Herb"))).is_equal("胡萝卜、香草")
+	assert_str(String(t.get_message("Carrot, Herb · Decorate ›"))).is_equal("胡萝卜、香草 · 布置 ›")
+	assert_str(String(t.get_message("Carrot, Kale"))).is_equal("")   # Kale unknown: the whole list stays
+	assert_str(String(t.get_message("Unknown ›"))).is_equal("")
+
 func test_p0_language_is_english_until_picked_and_applies_from_the_next_start() -> void:
 	var path := "user://p0-language-test-%d.cfg" % Time.get_ticks_usec()
 	var loc: Node = LocalizationScript.new()
