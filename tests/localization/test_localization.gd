@@ -203,3 +203,19 @@ func test_p0_table_reads_percent_signs_signed_and_decimal_numbers_and_drops_plur
 	assert_str(String(t.get_message("3 dishes in bag"))).is_equal("背包里有 3 份料理")
 	assert_str(String(t.get_message("2 slots free"))).is_equal("空 2 格")   # {1} alone: the ending left out
 	assert_str(String(t.get_message("Your day resets Mon 4 AM"))).is_equal("每天周一凌晨 4 点重置")
+
+## #649 第二批 ①: one English word, two Chinese ones — `Cooking@skill` 烹饪 for the skill, the stove's plain `Cooking`
+## 烹饪中; a word with no such key (and English, always) comes back as it is.
+func test_p0_ctx_reads_a_words_context_key_under_chinese_only() -> void:
+	var kept = Localization.p0_translation
+	var t: Translation = LocalizationScript.P0Translation.new()
+	t.set_table({"Cooking": "烹饪中", "Cooking@skill": "烹饪", "Water": "浇水", "Water@family": "水"})
+	Localization.p0_translation = t
+	assert_str(Localization.ctx("Cooking", "skill")).is_equal("烹饪")
+	assert_str(Localization.ctx("Water", "family")).is_equal("水")
+	assert_str(Localization.ctx("Farming", "skill")).is_equal("Farming")   # no key: the label's plain one reads it
+	assert_str(String(t.get_message("Cooking"))).is_equal("烹饪中")   # the stove's is unchanged
+	assert_str(String(t.get_message(Localization.ctx("Cooking", "skill")))).is_equal("")   # drawn again: stays 烹饪
+	TranslationServer.set_locale("en")
+	assert_str(Localization.ctx("Cooking", "skill")).is_equal("Cooking")
+	Localization.p0_translation = kept

@@ -160,7 +160,7 @@ static func _any(view: Dictionary, r: Dictionary) -> String:
 	var noun := "fish" if kind == "fish" else _kinds(kind)
 	var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
 	if not styles.is_empty(): noun = "%s %s" % [" or ".join(styles), noun]
-	elif r.get("family", null) != null: noun = "%s %s" % [str(FAMILY_NAMES.get(str(r.family), str(r.family))), noun]
+	elif r.get("family", null) != null: noun = "%s %s" % [Localization.ctx(str(FAMILY_NAMES.get(str(r.family), str(r.family))), "family"), noun]
 	return ("%s %s" % [P0Logic.rarity_name(view, int(rarity)), noun]) if rarity != null and int(rarity) > 0 else noun
 
 static func _kinds(kind: String) -> String:

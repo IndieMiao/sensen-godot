@@ -122,7 +122,7 @@ func refresh(view_: Dictionary) -> void:
 	var skills := HBoxContainer.new()
 	skills.add_theme_constant_override(&"separation", int(_SKILL_GAP))
 	for s in d.skills:
-		var card := UiSkillCard.new(str(s.name), int(s.level), float(s.progress), P0Logic.icon(str(s.icon)))
+		var card := UiSkillCard.new(Localization.ctx(str(s.name), "skill"), int(s.level), float(s.progress), P0Logic.icon(str(s.icon)))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var key: String = s.key
 		card.pressed.connect(func(): skill_pressed.emit(key))

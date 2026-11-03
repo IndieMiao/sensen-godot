@@ -62,6 +62,14 @@ func use_p0(path := P0_SETTINGS_PATH) -> void:
 		set_cjk_fonts(true)
 	TranslationServer.set_locale(locale)
 
+## One English word, two Chinese ones (李白's notes §三 #8 / #9, 不知火舞 385 B): the skill `Cooking` 烹饪 vs the stove's
+## `Cooking` 烹饪中, the family `Water` 水 vs the button's `Water` 浇水. Under P0's 中文 the table's `"<src>@<context>"`
+## (`Cooking@skill`, `Water@family`) when it has one, else `src` as it is — English always `src`. The label keeps
+## translating: the Chinese has no letters (P0Translation passes it), and a word with no such key reads its plain one.
+func ctx(src: String, context: String) -> String:
+	if p0_translation == null or TranslationServer.get_locale() != "zh_CN": return src
+	return str(p0_translation.exact("%s@%s" % [src, context], src))
+
 ## UiKit's three weights (nunito_w400 / 700 / 800) draw Chinese through Noto Sans SC, 700 and 800 emboldened (Journey's
 ## GameUi.theme did 0.45; 不知火舞 sets the values from shots). Only under 中文: a fallback adds its ascent and descent to
 ## every line's height, which would move the English layouts measured to the frames.
@@ -189,6 +197,9 @@ class P0Translation extends Translation:
 			_miss_file.seek_end()
 		_miss_file.store_line(s.c_escape())
 		_miss_file.flush()
+
+	## The table's own line for `s`, nothing pieced together (Localization.ctx's `<src>@<context>` keys).
+	func exact(s: String, otherwise := "") -> String: return str(_exact.get(s, otherwise))
 
 	## The Chinese for one line, or "" when no part of it is known.
 	func translate_line(s: String) -> String:
