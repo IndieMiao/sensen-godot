@@ -1,0 +1,34 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+  "changes": [
+    "Only mantel shelf selected; thin from .15 to .08 m while retaining its top and supported decor; warm mid-grey stone palette."
+  ],
+  "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+  "source_collection": "KIT_hearth_mantel_details",
+  "retained_parts": [
+    "Deep oak mantel shelf"
+  ],
+  "removed_parts": [
+    "Brass candlestick",
+    "Cream wax candle",
+    "Brass candlestick.001",
+    "Cream wax candle.001",
+    "Picture backing.002",
+    "Picture vertical frame.003",
+    "Picture vertical frame.004",
+    "Picture horizontal frame.003",
+    "Picture horizontal frame.004",
+    "Landscape sky",
+    "Landscape distant hills",
+    "Landscape foreground",
+    "Lamp brass foot.001",
+    "Lamp stem.001",
+    "Curved wall light bracket",
+    "Wall lamp black shade"
+  ],
+  "triangles": 108,
+  "surfaces": 1,
+  "exported_sha256": "331582e4b2f2c73a96cadca4a001333dc5b6f821c0e370fd40cbb0bf3a911b28"
+}

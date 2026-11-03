@@ -1,0 +1,542 @@
+{
+  "revision": "v1",
+  "phase": "Independent props included in user-approved B room",
+  "author": "Huangzhong",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "axes": "metres; Y up; +Z front",
+  "atlas": "hall_albedo_ao_n2.png",
+  "palette_overrides": {
+    "cloth_green": "435B76",
+    "print_landscape": "6180A3",
+    "print_portrait": "BC4536",
+    "sky": "78A8C9"
+  },
+  "assets": [
+    {
+      "name": "sculpture_base",
+      "file": "sculpture_base.glb",
+      "description": "Separate stone flower-ring plinth; total planted height .40m",
+      "nominal_dimensions_m": [
+        1.86,
+        0.4,
+        1.86
+      ],
+      "quantity": 1,
+      "colliders": [
+        {
+          "size": [
+            1.3,
+            0.4,
+            1.3
+          ],
+          "at": [
+            0,
+            0.2,
+            0
+          ]
+        },
+        {
+          "size": [
+            1.84,
+            0.4,
+            0.26
+          ],
+          "at": [
+            0,
+            0.2,
+            0
+          ]
+        },
+        {
+          "size": [
+            0.26,
+            0.4,
+            1.84
+          ],
+          "at": [
+            0,
+            0.2,
+            0
+          ]
+        }
+      ],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 7956,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/sculpture_base/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.9300000071525574,
+            0.0,
+            -0.9300000071525574
+          ],
+          [
+            0.9300000071525574,
+            0.4000000059604645,
+            0.9300000071525574
+          ]
+        ],
+        "dimensions_m": [
+          1.8600000143051147,
+          0.4000000059604645,
+          1.8600000143051147
+        ],
+        "triangles": 7956,
+        "surfaces": 1,
+        "sha256": "f6c011877eedccbe9d0c61d82eb6ed6c9a370f0a2265afffdf60414473030210",
+        "mesh_names": [
+          "sculpture_base_mobile"
+        ]
+      }
+    },
+    {
+      "name": "sculpture_body",
+      "file": "sculpture_body.glb",
+      "description": "Open asymmetric spiral ribbons and pearl; local height 1.20m on .40m base",
+      "nominal_dimensions_m": [
+        0.6,
+        1.2,
+        0.24
+      ],
+      "quantity": 1,
+      "colliders": [],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 2072,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/sculpture_body/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.2769845426082611,
+            0.0,
+            -0.06698445975780487
+          ],
+          [
+            0.30150508880615234,
+            1.1999999284744263,
+            0.1300000250339508
+          ]
+        ],
+        "dimensions_m": [
+          0.5784896612167358,
+          1.1999999284744263,
+          0.19698448479175568
+        ],
+        "triangles": 2072,
+        "surfaces": 1,
+        "sha256": "ade28de0129fbbe7f0411aba3f57c689249063ce344c0812888f633d61b7dc24",
+        "mesh_names": [
+          "sculpture_body_mobile"
+        ]
+      }
+    },
+    {
+      "name": "display_niche_1",
+      "file": "display_niche_1.glb",
+      "description": "Applied arch niche with deep blue back and visible display set; no wall opening",
+      "nominal_dimensions_m": [
+        1.1,
+        2.4,
+        0.35
+      ],
+      "quantity": 1,
+      "colliders": [
+        {
+          "size": [
+            1.1,
+            2.4,
+            0.35
+          ],
+          "at": [
+            0,
+            1.2,
+            0.175
+          ]
+        }
+      ],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 3321,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/display_niche_1/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.5500001907348633,
+            0.0,
+            -0.0
+          ],
+          [
+            0.5500001907348633,
+            2.4000000953674316,
+            0.3499999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.1000003814697266,
+          2.4000000953674316,
+          0.3499999940395355
+        ],
+        "triangles": 3321,
+        "surfaces": 1,
+        "sha256": "d1d1b5e98dcfb4c63afb3a3eea5f9a08c21d2099e0e7e939d876bb9f2896a0c3",
+        "mesh_names": [
+          "display_niche_1_mobile"
+        ]
+      }
+    },
+    {
+      "name": "display_niche_2",
+      "file": "display_niche_2.glb",
+      "description": "Applied arch niche with deep blue back and visible display set; no wall opening",
+      "nominal_dimensions_m": [
+        1.1,
+        2.4,
+        0.35
+      ],
+      "quantity": 1,
+      "colliders": [
+        {
+          "size": [
+            1.1,
+            2.4,
+            0.35
+          ],
+          "at": [
+            0,
+            1.2,
+            0.175
+          ]
+        }
+      ],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 3153,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/display_niche_2/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.5500001907348633,
+            0.0,
+            -0.0
+          ],
+          [
+            0.5500001907348633,
+            2.4000000953674316,
+            0.3499999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.1000003814697266,
+          2.4000000953674316,
+          0.3499999940395355
+        ],
+        "triangles": 3153,
+        "surfaces": 1,
+        "sha256": "d50889e47f5d1b6b13431ce0102325b468f7c38bf9dc1027dca42715d21596c9",
+        "mesh_names": [
+          "display_niche_2_mobile"
+        ]
+      }
+    },
+    {
+      "name": "brochure_rack",
+      "file": "brochure_rack.glb",
+      "description": "Three inclined rows with nine blank brochures",
+      "nominal_dimensions_m": [
+        0.71,
+        1.1,
+        0.48
+      ],
+      "quantity": 1,
+      "colliders": [
+        {
+          "size": [
+            0.71,
+            1.1,
+            0.48
+          ],
+          "at": [
+            0,
+            0.55,
+            0
+          ]
+        }
+      ],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 2056,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/brochure_rack/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.35500001907348633,
+            0.0,
+            -0.23999999463558197
+          ],
+          [
+            0.35500001907348633,
+            1.100000023841858,
+            0.23999999463558197
+          ]
+        ],
+        "dimensions_m": [
+          0.7100000381469727,
+          1.100000023841858,
+          0.47999998927116394
+        ],
+        "triangles": 2056,
+        "surfaces": 1,
+        "sha256": "2a91d5947a46dacdbf8a37e8fc12bb24e9535fb978e964e8c13d95e7a696974e",
+        "mesh_names": [
+          "brochure_rack_mobile"
+        ]
+      }
+    },
+    {
+      "name": "water_dispenser",
+      "file": "water_dispenser.glb",
+      "description": "Rounded dispenser and blue refill bottle; no markings",
+      "nominal_dimensions_m": [
+        0.44,
+        1.3,
+        0.54
+      ],
+      "quantity": 1,
+      "colliders": [
+        {
+          "size": [
+            0.44,
+            1.3,
+            0.54
+          ],
+          "at": [
+            0,
+            0.65,
+            0
+          ]
+        }
+      ],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 2176,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/water_dispenser/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.2199999988079071,
+            0.0,
+            -0.23999999463558197
+          ],
+          [
+            0.2199999988079071,
+            1.2999999523162842,
+            0.29999998211860657
+          ]
+        ],
+        "dimensions_m": [
+          0.4399999976158142,
+          1.2999999523162842,
+          0.5399999618530273
+        ],
+        "triangles": 2176,
+        "surfaces": 1,
+        "sha256": "8c70a5c62346d0f10bd910c94294bf3b1184ecc3d640f3db6d079b9e2fd53378",
+        "mesh_names": [
+          "water_dispenser_mobile"
+        ]
+      }
+    },
+    {
+      "name": "call_screen",
+      "file": "call_screen.glb",
+      "description": "Exactly three coloured dots on blue screen; centre mounting at 1.75m",
+      "nominal_dimensions_m": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "quantity": 1,
+      "colliders": [],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 588,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/call_screen/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.4000000059604645,
+            -0.25,
+            -0.02500000037252903
+          ],
+          [
+            0.4000000059604645,
+            0.25,
+            0.04200011119246483
+          ]
+        ],
+        "dimensions_m": [
+          0.800000011920929,
+          0.5,
+          0.06700011342763901
+        ],
+        "triangles": 588,
+        "surfaces": 1,
+        "sha256": "256b6d5cb2bcdc603ff5c46ee04de69c9e93a923c5eafbc9d0bb038686e6a08e",
+        "mesh_names": [
+          "call_screen_mobile"
+        ]
+      }
+    },
+    {
+      "name": "notice_board",
+      "file": "notice_board.glb",
+      "description": "Four blank paper sheets; centre mounting at 1.55m",
+      "nominal_dimensions_m": [
+        0.7,
+        0.9,
+        0.055
+      ],
+      "quantity": 1,
+      "colliders": [],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 972,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/notice_board/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.3500000834465027,
+            -0.44999998807907104,
+            -0.019999999552965164
+          ],
+          [
+            0.3500000834465027,
+            0.44999998807907104,
+            0.04549988731741905
+          ]
+        ],
+        "dimensions_m": [
+          0.7000001668930054,
+          0.8999999761581421,
+          0.06549988687038422
+        ],
+        "triangles": 972,
+        "surfaces": 1,
+        "sha256": "61c20a440a3144ba366efec27767475a33df3da498eaab619dd9820c9984a723",
+        "mesh_names": [
+          "notice_board_mobile"
+        ]
+      }
+    },
+    {
+      "name": "name_plaque",
+      "file": "name_plaque.glb",
+      "description": "Blank plaque; runtime sign_name usable area .88 x .23m",
+      "nominal_dimensions_m": [
+        1.0,
+        0.35,
+        0.045
+      ],
+      "quantity": 1,
+      "colliders": [],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "anchors": [
+        {
+          "name": "sign_name",
+          "position": [
+            0,
+            0,
+            0.035
+          ],
+          "size": [
+            0.88,
+            0.23
+          ]
+        }
+      ],
+      "triangles": 540,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/name_plaque/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.5,
+            -0.17500001192092896,
+            -0.017500000074505806
+          ],
+          [
+            0.5,
+            0.17500001192092896,
+            0.03249998018145561
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          0.3500000238418579,
+          0.04999998211860657
+        ],
+        "triangles": 540,
+        "surfaces": 1,
+        "sha256": "d961f76dba10b30ebd9351df70b4d4c03a847cd795ac9d40f06cda20f7c33e84",
+        "mesh_names": [
+          "name_plaque_mobile"
+        ]
+      }
+    },
+    {
+      "name": "window_flowerbox",
+      "file": "window_flowerbox.glb",
+      "description": "Shallow stone window box with red and cream flowers",
+      "nominal_dimensions_m": [
+        1.0,
+        0.2,
+        0.22
+      ],
+      "quantity": 2,
+      "colliders": [],
+      "pivot": "local floor or mounting centre; Y up, front +Z",
+      "triangles": 1944,
+      "surfaces": 1,
+      "provenance": "tools/art/source/poi_service_hall/modules/window_flowerbox/reuse_provenance.json",
+      "measured": {
+        "bounds": [
+          [
+            -0.5,
+            0.0,
+            -0.10999999940395355
+          ],
+          [
+            0.5,
+            0.2004999965429306,
+            0.10999999940395355
+          ]
+        ],
+        "dimensions_m": [
+          1.0,
+          0.2004999965429306,
+          0.2199999988079071
+        ],
+        "triangles": 1944,
+        "surfaces": 1,
+        "sha256": "2e0523728673954a62a66fb674a8a0a3030692c373a35cc88c655ed246bc5dd0",
+        "mesh_names": [
+          "window_flowerbox_mobile"
+        ]
+      }
+    }
+  ],
+  "sculpture_assembly": {
+    "sculpture_base": [
+      0,
+      0,
+      0
+    ],
+    "sculpture_body": [
+      0,
+      0.4,
+      0
+    ],
+    "total_height_m": 1.6
+  }
+}

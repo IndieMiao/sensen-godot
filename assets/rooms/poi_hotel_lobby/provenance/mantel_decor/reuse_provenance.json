@@ -1,0 +1,34 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+  "changes": [
+    "Original two candlesticks and candles retained; new oval mirror and small frame; no original room lamps."
+  ],
+  "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+  "source_collection": "KIT_hearth_mantel_details",
+  "retained_parts": [
+    "Brass candlestick",
+    "Cream wax candle",
+    "Brass candlestick.001",
+    "Cream wax candle.001"
+  ],
+  "removed_parts": [
+    "Deep oak mantel shelf",
+    "Picture backing.002",
+    "Picture vertical frame.003",
+    "Picture vertical frame.004",
+    "Picture horizontal frame.003",
+    "Picture horizontal frame.004",
+    "Landscape sky",
+    "Landscape distant hills",
+    "Landscape foreground",
+    "Lamp brass foot.001",
+    "Lamp stem.001",
+    "Curved wall light bracket",
+    "Wall lamp black shade"
+  ],
+  "triangles": 1622,
+  "surfaces": 1,
+  "exported_sha256": "2e4fc4b6e1a5457971757bac13d457146f675c25f79ffd47829f4286f632c02d"
+}

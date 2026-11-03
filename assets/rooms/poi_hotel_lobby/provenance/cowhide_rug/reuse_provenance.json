@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "New 316-triangle flat contoured hide, not the 7,838-triangle Mine Hut rug."
+  ],
+  "triangles": 316,
+  "surfaces": 1,
+  "exported_sha256": "9c27c80ef234a1bfcf357fbac123903ef6b8abee9140b20e2701d4692c9703b3"
+}

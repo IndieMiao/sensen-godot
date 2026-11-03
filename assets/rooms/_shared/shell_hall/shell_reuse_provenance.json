@@ -1,0 +1,83 @@
+{
+  "hall_floor": {
+    "module": "hall_floor",
+    "author": "ZHAOYUN",
+    "task": "SGODOT-319",
+    "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+    "source": "tools/art/source/mine_hut/mine_hut.blend",
+    "source_module": "room_shell",
+    "retained_object": "Honey timber foundation",
+    "source_sha256": "da501ebc507794dac073afb0f333e53a14579a5be020fa895a6a87231720d9f8",
+    "changes": [
+      "Retain 6.8 x 6.4 footprint and editable bevelled foundation",
+      "Lower foundation top to .04 m",
+      "Replace straight planks with authored 0.64 x 0.16 m herringbone",
+      "Remap all UVs to HallAtlas"
+    ]
+  },
+  "hall_left_wall": {
+    "module": "hall_left_wall",
+    "author": "ZHAOYUN",
+    "task": "SGODOT-319",
+    "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+    "source": "tools/art/build_basic_room.py + scene_room_pipeline.py",
+    "reuse_kind": "Construction helpers; new hall geometry",
+    "changes": [
+      "Two 3.7 m walls without end columns",
+      "Rectangular true window apertures; casing and grille are separate local-pivot modules",
+      "Semantic HallAtlas UVs"
+    ]
+  },
+  "hall_back_wall": {
+    "module": "hall_back_wall",
+    "author": "ZHAOYUN",
+    "task": "SGODOT-319",
+    "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+    "source": "tools/art/build_basic_room.py + scene_room_pipeline.py",
+    "reuse_kind": "Construction helpers; new hall geometry",
+    "changes": [
+      "Two 3.7 m walls without end columns",
+      "Rectangular true window apertures; casing and grille are separate local-pivot modules",
+      "Semantic HallAtlas UVs"
+    ]
+  },
+  "hall_window_frame": {
+    "module": "hall_window_frame",
+    "author": "ZHAOYUN",
+    "task": "SGODOT-319",
+    "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+    "source": "tools/art/build_basic_room.py + scene_room_pipeline.py",
+    "reuse_kind": "Construction helpers; new hall geometry",
+    "changes": [
+      "Two 3.7 m walls without end columns",
+      "Rectangular true window apertures; casing and grille are separate local-pivot modules",
+      "Semantic HallAtlas UVs"
+    ]
+  },
+  "hall_window_grid": {
+    "module": "hall_window_grid",
+    "author": "ZHAOYUN",
+    "task": "SGODOT-319",
+    "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+    "source": "tools/art/build_basic_room.py + scene_room_pipeline.py",
+    "reuse_kind": "Construction helpers; new hall geometry",
+    "changes": [
+      "Two 3.7 m walls without end columns",
+      "Rectangular true window apertures; casing and grille are separate local-pivot modules",
+      "Semantic HallAtlas UVs"
+    ]
+  },
+  "hall_window_glass": {
+    "module": "hall_window_glass",
+    "author": "ZHAOYUN",
+    "task": "SGODOT-319",
+    "reference": "SGODOT-315_Hotel_Lobby_Main_2026-10-31.png",
+    "source": "tools/art/build_basic_room.py + scene_room_pipeline.py",
+    "reuse_kind": "Construction helpers; new hall geometry",
+    "changes": [
+      "Two 3.7 m walls without end columns",
+      "Rectangular true window apertures; casing and grille are separate local-pivot modules",
+      "Semantic HallAtlas UVs"
+    ]
+  }
+}

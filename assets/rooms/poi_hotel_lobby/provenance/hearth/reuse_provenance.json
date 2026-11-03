@@ -1,0 +1,48 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+  "changes": [
+    "Source footprint and logs retained; replace blank chimney breast with four staggered stone courses, thin cooking ledge to .08 m, warm mid-grey N1 palette.",
+    "Use shared SGODOT-178 fire, not new flames."
+  ],
+  "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+  "source_collection": "KIT_hearth",
+  "retained_parts": [
+    "Broad rounded hearth foot",
+    "Rounded lime plaster stove",
+    "Thick rounded plaster firebox arch",
+    "Warm red firebox lining",
+    "Hearth rounded cooking ledge",
+    "Crossed charred firebox log",
+    "Visible charred log end",
+    "Visible charred log end.001",
+    "Crossed charred firebox log.001",
+    "Visible charred log end.002",
+    "Visible charred log end.003",
+    "Crossed charred firebox log.002",
+    "Visible charred log end.004",
+    "Visible charred log end.005",
+    "Dark red ember bed",
+    "Dark red ember bed.001",
+    "Dark red ember bed.002",
+    "Dark red ember bed.003",
+    "Dark red ember bed.004",
+    "Dark red ember bed.005",
+    "Dark red ember bed.006",
+    "Dark red ember bed.007",
+    "Dark red ember bed.008",
+    "Dark red ember bed.009",
+    "Dark red ember bed.010",
+    "Dark red ember bed.011",
+    "Dark red ember bed.012",
+    "Dark red ember bed.013",
+    "Dark red ember bed.014"
+  ],
+  "removed_parts": [
+    "Underloft rounded plaster breast"
+  ],
+  "triangles": 6100,
+  "surfaces": 1,
+  "exported_sha256": "dc1bed52953fad6a3e9a27a169f4d7964594b1ea7b5428c30a17364559981edf"
+}

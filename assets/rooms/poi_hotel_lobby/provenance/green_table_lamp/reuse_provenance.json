@@ -1,0 +1,21 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/post_215/post_215.blend",
+  "changes": [
+    "Post Office lamp geometry retained at .493 m high; warm shade recolored green, brass retained."
+  ],
+  "source_sha256": "c5ed6a5732ed7a5bd09a46a207cce53c604ace55ca4356839dbfd2991590850c",
+  "source_collection": "post_table_lamp",
+  "retained_parts": [
+    "Desk lamp / dark foot",
+    "Desk lamp / brass stem",
+    "Desk lamp / warm shade",
+    "Desk lamp / brass shade edge",
+    "Desk lamp / finial"
+  ],
+  "removed_parts": [],
+  "triangles": 696,
+  "surfaces": 1,
+  "exported_sha256": "e9ca9f47d2baf8ba9e2b68153103a77a90f671ee5beae7a7f5869388b02c45af"
+}

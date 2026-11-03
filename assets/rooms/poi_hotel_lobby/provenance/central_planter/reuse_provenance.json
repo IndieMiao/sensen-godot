@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "New 1.09 m central planter, separate from two shared floor plants."
+  ],
+  "triangles": 2068,
+  "surfaces": 1,
+  "exported_sha256": "6a36de594e85b56af01842df75911c5c974b73f5ec4a00e1a9af456e02c999a6"
+}

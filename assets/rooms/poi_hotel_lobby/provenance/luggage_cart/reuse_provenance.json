@@ -1,0 +1,11 @@
+{
+  "task": "SGODOT-319",
+  "author": "ZHAOYUN",
+  "source": "new",
+  "changes": [
+    "New .95 x .77 m cart with three leather cases inside its footprint."
+  ],
+  "triangles": 2712,
+  "surfaces": 1,
+  "exported_sha256": "08315af2055d41829cf4da8d5741b6c9050a0b197a2707b6c4f5cafac78a06a2"
+}
