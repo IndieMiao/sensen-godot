@@ -311,7 +311,12 @@ function attack(c: P0Content, s: P0State, site: MineSite, saved: MineB1FloorStat
 export function mineView(c: P0Content, s: P0State, now: number) {
   settleMine(c, s, now);
   const day = s.mine.day, at = day?.at, site = at ? mineSite(c, at.mine) : undefined;
-  const records = Object.fromEntries(Object.entries(s.mine.records).map(([id, r]) => [id, { deepest: r.deepest, guards: [...r.guards] }]));
+  // type / main: the mine's own (catalogue or dev site), so a client tells which vein a record is without having read
+  // its site (v4q(9) ①: any iron vein's F10 ends the iron row; 亚瑟 on #711); null for one no longer known
+  const records = Object.fromEntries(Object.entries(s.mine.records).map(([id, r]) => {
+    const site = mineSite(c, id);
+    return [id, { deepest: r.deepest, guards: [...r.guards], type: site?.type ?? null, main: site?.mine.main ?? null }];
+  }));
   const rank = mineRank(s);
   let here = null;
   if (day && at && site) {
