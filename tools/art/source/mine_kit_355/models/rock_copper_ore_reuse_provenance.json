@@ -1,0 +1,14 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "rock_copper_ore",
+  "source_blend": "tools/art/source/mine_kit_355/models/rock_copper_ore.blend",
+  "runtime_sha256": "db81c71622bfd14584dec6cca4d57df0c68c35d048ab6f251ddd4cbc4d6e4778",
+  "changes": [
+    "Fixed rock variant with exposed mineral colour patches; no texture or collision.",
+    "v1.1 vertex colours only: deep rust and silver iron, bright copper with minor patina, white and lavender quartz."
+  ],
+  "reference": "mine_art.gd _ore: four seven-sided tiers at r=.36/.47/.34/.15 and top Y=.63"
+}

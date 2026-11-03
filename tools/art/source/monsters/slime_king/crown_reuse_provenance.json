@@ -1,0 +1,13 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "crown",
+  "source_blend": "tools/art/source/monsters/slime_king/crown.blend",
+  "runtime_sha256": "a75f75cb5689d0999bc50a3d522cbd480d4c2db5a4a7cb3ecd208ebde6109252",
+  "changes": [
+    "Original gold crown with five rounded lobes and a front round jewel; bottom conforms to radius-one slime."
+  ],
+  "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
+}

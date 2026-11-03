@@ -1,0 +1,44 @@
+[
+  {
+    "file": "SGODOT-355_slime_king_crown_v1_three_views.png",
+    "sha256": "780292a09c95a16d48172e8e11026e3aa880a6f92a9579a2b3a3b6775a56aba3",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_crown_v1_mounted_43deg.png",
+    "sha256": "6b85454e3efda9739a87d30934ce18fb15a7c656d102d85590934895afa2bcc7",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_ironback_plates_v1_three_views.png",
+    "sha256": "5ce93d4aee0563f9d8347854376d8262f45ae599f2bca8e1395934c63a5267bb",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_ironback_plates_v1_mounted_43deg.png",
+    "sha256": "39cab09daa0ad823b9249beff5432a627eb452902cb277cfe6db58088e9988ef",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_quartz_cluster_v1_three_views.png",
+    "sha256": "4ddda27966a71914cfad7560d1a2ebddaccfb12a8d78c5275728da2b6b0b9c87",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_quartz_cluster_v1_mounted_43deg.png",
+    "sha256": "8d2f0860507c55040f8940def8fcf9f0750286e121aa946e5d7d5cd3dae3a86b",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1_validation.json",
+    "sha256": "630d42b94ac15b9985941cda79798ee2c7e55cc56a005dca48efa4f6e637d107",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

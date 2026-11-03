@@ -1,0 +1,14 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "quartz_cluster",
+  "source_blend": "tools/art/source/monsters/slime_king/quartz_cluster.blend",
+  "runtime_sha256": "eb9d20fa0bf63cef8ace28d89ada4503bf56968ceee50f3bdb3e751ecf001ae7",
+  "changes": [
+    "v1.2: enlarge the v1.1 five-column cluster by 1.3 and refit its enlarged bases to the same radius-one head.",
+    "Shape, faceted white/lavender colours, 280 triangles and attachment origin retained; runtime scales with king radius."
+  ],
+  "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
+}

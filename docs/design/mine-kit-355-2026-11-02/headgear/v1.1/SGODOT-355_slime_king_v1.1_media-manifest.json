@@ -1,0 +1,62 @@
+[
+  {
+    "file": "SGODOT-355_slime_king_v1.1_crown_three_views.png",
+    "sha256": "46de7fb1e7392a7465d3519716fa7578d706cc71695fa7a10b1c9375eb835c88",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_crown_mounted_43deg.png",
+    "sha256": "134b0308bbd7e6d00a4b193b5995711be713389911275aed17809d3e069a7a87",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_crown_two_mines_43deg.png",
+    "sha256": "9d6224f65fee7490b82a12400341a321abb40f9ae0045c3173ebe6753c90452f",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_ironback_plates_three_views.png",
+    "sha256": "1c7ac7b59b4feb3837a4cef662a186b59d0ac4e3b8c3dfc58bd9708074a76c93",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_ironback_plates_mounted_43deg.png",
+    "sha256": "273253686b2045be895bb8ab9edcbdc8333d7b8940fa3e997874fa88cac24632",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_ironback_plates_two_mines_43deg.png",
+    "sha256": "d69572b61cf2f8e0f25d46876c3e9c30d85e63f5ca6a1e408fcf698da1c26880",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_quartz_cluster_three_views.png",
+    "sha256": "ae23fb184673cf21b059bb234461263adc5baafec6c351595d2f273f2f5fb65c",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_quartz_cluster_mounted_43deg.png",
+    "sha256": "d30f95d1c77adc6ce3d3f246b18ecb62b33b432be7aa3666ed8e045fe932ee0a",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_quartz_cluster_two_mines_43deg.png",
+    "sha256": "aeabac4bafb1a1111e44aa97b0c5d68c4439ca49485ea1f52029773a1f63754c",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-355_slime_king_v1.1_validation.json",
+    "sha256": "9ac4c976345db2be985a33d8066d61974b19106c85289760d63e5bb2d1a26c0b",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]

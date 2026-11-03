@@ -1,0 +1,14 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "task": "SGODOT-355",
+  "kind": "original procedural geometry",
+  "asset": "ironback_plates",
+  "source_blend": "tools/art/source/monsters/slime_king/ironback_plates.blend",
+  "runtime_sha256": "4fdbe9f204181745675a86fd7a519889210f92faeafce8b5bcdd2b02b4ac31ff",
+  "changes": [
+    "v1.1: wide contiguous blue-grey helmet shell with a forehead guard wider than the eyes.",
+    "Darker iron centre, warm worn edges and eight bright rivets; same attachment origin and UID."
+  ],
+  "reference": "mine_combat.gd _slime_body / director dispatch-huangzhong-2.txt"
+}
