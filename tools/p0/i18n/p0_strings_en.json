@@ -1,7 +1,7 @@
 {
  "%+d Friendship": {
   "where": [
-   "modules/p0/p0_runtime.gd:898"
+   "modules/p0/p0_runtime.gd:899"
   ],
   "kind": "template",
   "done": true
@@ -443,14 +443,14 @@
  },
  "%s Cooking XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:794"
+   "modules/p0/p0_runtime.gd:795"
   ],
   "kind": "template",
   "done": true
  },
  "%s Energy": {
   "where": [
-   "modules/p0/p0_runtime.gd:769"
+   "modules/p0/p0_runtime.gd:770"
   ],
   "kind": "template",
   "done": true
@@ -482,7 +482,7 @@
  "%s Lv%d · %d XP to go": {
   "where": [
    "modules/p0/p0_logic.gd:1738",
-   "modules/p0/p0_runtime.gd:1193"
+   "modules/p0/p0_runtime.gd:1194"
   ],
   "kind": "template",
   "done": true
@@ -504,8 +504,8 @@
  "%s XP": {
   "where": [
    "modules/p0/p0_logic.gd:190",
-   "modules/p0/p0_runtime.gd:790",
-   "modules/p0/p0_runtime.gd:794"
+   "modules/p0/p0_runtime.gd:791",
+   "modules/p0/p0_runtime.gd:795"
   ],
   "kind": "template",
   "done": true
@@ -569,7 +569,7 @@
  "%s coins": {
   "where": [
    "modules/p0/p0_item_info.gd:552",
-   "modules/p0/p0_runtime.gd:829"
+   "modules/p0/p0_runtime.gd:830"
   ],
   "kind": "template",
   "done": true
@@ -627,7 +627,7 @@
  },
  "%s gave you %s · in your bag": {
   "where": [
-   "modules/p0/p0_runtime.gd:917"
+   "modules/p0/p0_runtime.gd:918"
   ],
   "kind": "template",
   "done": true
@@ -783,7 +783,7 @@
    "modules/p0/p0_guide.gd:152",
    "modules/p0/p0_logic.gd:798",
    "modules/p0/p0_logic.gd:1666",
-   "scenes/p0/panels/p0_profile_page.gd:241"
+   "scenes/p0/panels/p0_profile_page.gd:244"
   ],
   "kind": "template",
   "done": true
@@ -792,7 +792,7 @@
   "where": [
    "modules/p0/p0_logic.gd:788",
    "modules/p0/p0_notify.gd:41",
-   "scenes/p0/panels/p0_profile_page.gd:240"
+   "scenes/p0/panels/p0_profile_page.gd:243"
   ],
   "kind": "template",
   "done": true
@@ -976,7 +976,7 @@
  },
  "%s · Layer %d": {
   "where": [
-   "scenes/p0/p0_ui.gd:4634"
+   "scenes/p0/p0_ui.gd:4642"
   ],
   "kind": "template",
   "done": true
@@ -1076,7 +1076,7 @@
  },
  "%s · back in Farm Storage": {
   "where": [
-   "modules/p0/p0_runtime.gd:854"
+   "modules/p0/p0_runtime.gd:855"
   ],
   "kind": "template",
   "done": true
@@ -1097,7 +1097,7 @@
  },
  "%s · moved beside the Workbench": {
   "where": [
-   "modules/p0/p0_runtime.gd:852"
+   "modules/p0/p0_runtime.gd:853"
   ],
   "kind": "template",
   "done": true
@@ -1266,7 +1266,7 @@
  },
  "+%d %s XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:712"
+   "modules/p0/p0_runtime.gd:713"
   ],
   "kind": "template",
   "done": true
@@ -1298,7 +1298,7 @@
  },
  "+%d Energy · Meals today %d/%d": {
   "where": [
-   "modules/p0/p0_runtime.gd:878"
+   "modules/p0/p0_runtime.gd:879"
   ],
   "kind": "template",
   "done": true
@@ -1458,7 +1458,7 @@
  },
  "2nd today": {
   "where": [
-   "modules/p0/p0_runtime.gd:795"
+   "modules/p0/p0_runtime.gd:796"
   ],
   "kind": "line",
   "done": true
@@ -1930,7 +1930,7 @@
  "Apr": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -1980,7 +1980,7 @@
  },
  "At home only": {
   "where": [
-   "modules/p0/p0_runtime.gd:1205",
+   "modules/p0/p0_runtime.gd:1206",
    "modules/p0/item_info_rules.json#label",
    "modules/p0/item_info_rules.json#label",
    "modules/p0/item_info_rules.json#label",
@@ -2025,14 +2025,14 @@
  },
  "Attribution": {
   "where": [
-   "scenes/ui_kit/ui_setting_row.gd:70"
+   "scenes/ui_kit/ui_setting_row.gd:72"
   ],
   "kind": "line"
  },
  "Aug": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -2078,7 +2078,7 @@
  },
  "Back": {
   "where": [
-   "scenes/p0/p0_ui.gd:4321",
+   "scenes/p0/p0_ui.gd:4329",
    "scenes/p0/panels/p0_back_pill.gd:7",
    "scenes/p0/panels/p0_board_request.gd:26",
    "scenes/p0/panels/p0_home_flow.gd:114",
@@ -2089,7 +2089,7 @@
  },
  "Back online": {
   "where": [
-   "modules/p0/p0_runtime.gd:1318"
+   "modules/p0/p0_runtime.gd:1319"
   ],
   "kind": "line",
   "done": true
@@ -2166,7 +2166,7 @@
  },
  "Bag %d/%d · Sell at Homestead Stall": {
   "where": [
-   "modules/p0/p0_runtime.gd:1282"
+   "modules/p0/p0_runtime.gd:1283"
   ],
   "kind": "template",
   "done": true
@@ -2246,7 +2246,7 @@
  "Bag full · free a slot first": {
   "where": [
    "modules/p0/p0_material_logic.gd:154",
-   "modules/p0/p0_runtime.gd:1198",
+   "modules/p0/p0_runtime.gd:1199",
    "modules/p0/p0_trap.gd:86",
    "modules/p0/p0_trap.gd:152"
   ],
@@ -2299,7 +2299,7 @@
  },
  "Barbary Card Room": {
   "where": [
-   "modules/p0/p0_runtime.gd:2103",
+   "modules/p0/p0_runtime.gd:2104",
    "scenes/p0/panels/p0_blackjack_page.gd:299",
    "assets/p0/p0_outposts.json#name"
   ],
@@ -2552,7 +2552,7 @@
  },
  "Block": {
   "where": [
-   "scenes/p0/p0_ui.gd:4660",
+   "scenes/p0/p0_ui.gd:4668",
    "scenes/p0/panels/p0_people_drawer.gd:120",
    "scenes/ui_kit/ui_profile_more_menu.gd:19"
   ],
@@ -2561,15 +2561,15 @@
  },
  "Block %s?": {
   "where": [
-   "scenes/p0/p0_ui.gd:4658"
+   "scenes/p0/p0_ui.gd:4666"
   ],
   "kind": "template",
   "done": true
  },
  "Blocked players": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:134",
-   "scenes/p0/panels/p0_settings_page.gd:212"
+   "scenes/p0/panels/p0_settings_page.gd:138",
+   "scenes/p0/panels/p0_settings_page.gd:235"
   ],
   "kind": "line",
   "done": true
@@ -2942,9 +2942,9 @@
  },
  "Can't do that (%s)": {
   "where": [
-   "modules/p0/p0_runtime.gd:1172",
-   "modules/p0/p0_runtime.gd:1217",
-   "modules/p0/p0_runtime.gd:1251"
+   "modules/p0/p0_runtime.gd:1173",
+   "modules/p0/p0_runtime.gd:1218",
+   "modules/p0/p0_runtime.gd:1252"
   ],
   "kind": "template",
   "done": true
@@ -3053,7 +3053,7 @@
   "where": [
    "modules/p0/p0_logic.gd:1181",
    "modules/p0/p0_logic.gd:1188",
-   "modules/p0/p0_runtime.gd:1190",
+   "modules/p0/p0_runtime.gd:1191",
    "scenes/p0/p0_pond.gd:204",
    "scenes/p0/p0_pond.gd:231"
   ],
@@ -3163,7 +3163,7 @@
  },
  "Caught!": {
   "where": [
-   "scenes/p0/p0_ui.gd:4077"
+   "scenes/p0/p0_ui.gd:4085"
   ],
   "kind": "line",
   "done": true
@@ -3362,7 +3362,7 @@
   "where": [
    "scenes/map/city_map_view.gd:2074",
    "scenes/p0/panels/p0_passport_drawer.gd:18",
-   "scenes/p0/panels/p0_profile_page.gd:203"
+   "scenes/p0/panels/p0_profile_page.gd:206"
   ],
   "kind": "line",
   "done": true
@@ -3522,7 +3522,7 @@
  },
  "Clock +%dh (dev)": {
   "where": [
-   "modules/p0/p0_runtime.gd:171"
+   "modules/p0/p0_runtime.gd:172"
   ],
   "kind": "template"
  },
@@ -3779,10 +3779,10 @@
  },
  "Control": {
   "where": [
-   "modules/p0/p0_runtime.gd:1715",
-   "modules/p0/p0_runtime.gd:1810",
-   "modules/p0/p0_runtime.gd:1823",
-   "modules/p0/p0_runtime.gd:1831",
+   "modules/p0/p0_runtime.gd:1716",
+   "modules/p0/p0_runtime.gd:1811",
+   "modules/p0/p0_runtime.gd:1824",
+   "modules/p0/p0_runtime.gd:1832",
    "scenes/p0/p0_map.gd:135"
   ],
   "kind": "line"
@@ -4143,7 +4143,7 @@
  },
  "Credits": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:295"
+   "scenes/p0/panels/p0_settings_page.gd:318"
   ],
   "kind": "line",
   "done": true
@@ -4185,7 +4185,7 @@
  },
  "Creel full · the fish slipped away": {
   "where": [
-   "modules/p0/p0_runtime.gd:1147"
+   "modules/p0/p0_runtime.gd:1148"
   ],
   "kind": "line",
   "done": true
@@ -4238,7 +4238,7 @@
  "Crops ready": {
   "where": [
    "modules/p0/p0_notify.gd:8",
-   "scenes/p0/panels/p0_settings_page.gd:202"
+   "scenes/p0/panels/p0_settings_page.gd:225"
   ],
   "kind": "line",
   "done": true
@@ -4308,7 +4308,7 @@
  },
  "Current account": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:160"
+   "scenes/p0/panels/p0_settings_page.gd:183"
   ],
   "kind": "line",
   "done": true
@@ -4354,7 +4354,7 @@
  },
  "Day Pass ended · Re-entry\n%s": {
   "where": [
-   "modules/p0/p0_runtime.gd:458"
+   "modules/p0/p0_runtime.gd:459"
   ],
   "kind": "template",
   "done": true
@@ -4402,7 +4402,7 @@
  "Dec": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -4495,14 +4495,14 @@
  },
  "Deliver at the market": {
   "where": [
-   "modules/p0/p0_runtime.gd:1121"
+   "modules/p0/p0_runtime.gd:1122"
   ],
   "kind": "line",
   "done": true
  },
  "Deliver at the market · %s": {
   "where": [
-   "modules/p0/p0_runtime.gd:1121"
+   "modules/p0/p0_runtime.gd:1122"
   ],
   "kind": "template",
   "done": true
@@ -4560,10 +4560,10 @@
  "Didn't go through · try again": {
   "where": [
    "modules/p0/p0_runtime.gd:130",
-   "modules/p0/p0_runtime.gd:1306",
+   "modules/p0/p0_runtime.gd:1307",
    "scenes/p0/p0_map.gd:1049",
    "scenes/p0/p0_map.gd:1762",
-   "scenes/p0/p0_ui.gd:3709"
+   "scenes/p0/p0_ui.gd:3717"
   ],
   "kind": "line",
   "done": true
@@ -4741,7 +4741,7 @@
  },
  "Edit look": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:327"
+   "scenes/p0/panels/p0_profile_page.gd:330"
   ],
   "kind": "line",
   "done": true
@@ -4864,7 +4864,7 @@
  "Energy full · eat later": {
   "where": [
    "modules/p0/p0_logic.gd:1227",
-   "modules/p0/p0_runtime.gd:1219"
+   "modules/p0/p0_runtime.gd:1220"
   ],
   "kind": "line",
   "done": true
@@ -4886,9 +4886,9 @@
  "English": {
   "where": [
    "modules/ui/language_button.gd:20",
-   "scenes/p0/p0_ui.gd:3624",
-   "scenes/p0/p0_ui.gd:3739",
-   "scenes/p0/panels/p0_settings_page.gd:358"
+   "scenes/p0/p0_ui.gd:3627",
+   "scenes/p0/p0_ui.gd:3747",
+   "scenes/p0/panels/p0_settings_page.gd:381"
   ],
   "kind": "line"
  },
@@ -5276,7 +5276,7 @@
  "Feb": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -5425,22 +5425,22 @@
  },
  "First cast · +%d XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:743"
+   "modules/p0/p0_runtime.gd:744"
   ],
   "kind": "template",
   "done": true
  },
  "First catch in %s · +%d XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:746"
+   "modules/p0/p0_runtime.gd:747"
   ],
   "kind": "template",
   "done": true
  },
  "First catch! +%d XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:739",
-   "scenes/p0/p0_ui.gd:4086"
+   "modules/p0/p0_runtime.gd:740",
+   "scenes/p0/p0_ui.gd:4094"
   ],
   "kind": "template",
   "done": true
@@ -5454,7 +5454,7 @@
  },
  "First cooked · +%d Cooking XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:705"
+   "modules/p0/p0_runtime.gd:706"
   ],
   "kind": "template",
   "done": true
@@ -5468,14 +5468,14 @@
  },
  "First fish landed · +%d XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:742"
+   "modules/p0/p0_runtime.gd:743"
   ],
   "kind": "template",
   "done": true
  },
  "First harvest": {
   "where": [
-   "modules/p0/p0_runtime.gd:969"
+   "modules/p0/p0_runtime.gd:970"
   ],
   "kind": "line",
   "done": true
@@ -5489,8 +5489,8 @@
  },
  "First harvest! +%d XP · %s": {
   "where": [
-   "modules/p0/p0_runtime.gd:709",
-   "modules/p0/p0_runtime.gd:972"
+   "modules/p0/p0_runtime.gd:710",
+   "modules/p0/p0_runtime.gd:973"
   ],
   "kind": "template",
   "done": true
@@ -5581,7 +5581,7 @@
  },
  "Fish from a pond · open one from the map": {
   "where": [
-   "modules/p0/p0_runtime.gd:1229"
+   "modules/p0/p0_runtime.gd:1230"
   ],
   "kind": "line",
   "done": true
@@ -5616,7 +5616,7 @@
  },
  "Fish-dex %d/%d": {
   "where": [
-   "scenes/p0/p0_ui.gd:4094",
+   "scenes/p0/p0_ui.gd:4102",
    "scenes/p0/panels/p0_fish_dex.gd:181"
   ],
   "kind": "template",
@@ -5722,7 +5722,7 @@
  },
  "Fishing Lv2 reward": {
   "where": [
-   "modules/p0/p0_runtime.gd:1641"
+   "modules/p0/p0_runtime.gd:1642"
   ],
   "kind": "line",
   "done": true
@@ -5913,7 +5913,7 @@
  },
  "For new test accounts": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:155"
+   "scenes/p0/panels/p0_settings_page.gd:178"
   ],
   "kind": "line",
   "done": true
@@ -5981,7 +5981,7 @@
  },
  "Fresh Fish Soup": {
   "where": [
-   "modules/p0/p0_runtime.gd:2004",
+   "modules/p0/p0_runtime.gd:2005",
    "assets/p0/p0_content.json#name"
   ],
   "kind": "line",
@@ -6094,7 +6094,7 @@
  "Full belly · Meals reset in": {
   "where": [
    "modules/p0/p0_logic.gd:1228",
-   "modules/p0/p0_runtime.gd:876"
+   "modules/p0/p0_runtime.gd:877"
   ],
   "kind": "line",
   "done": true
@@ -6151,7 +6151,7 @@
  },
  "General": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:127"
+   "scenes/p0/panels/p0_settings_page.gd:131"
   ],
   "kind": "line",
   "done": true
@@ -6529,7 +6529,7 @@
  },
  "HBoxContainer": {
   "where": [
-   "modules/p0/p0_runtime.gd:2060"
+   "modules/p0/p0_runtime.gd:2061"
   ],
   "kind": "line"
  },
@@ -6626,7 +6626,7 @@
  },
  "Harvest %d of %d · bag full": {
   "where": [
-   "modules/p0/p0_runtime.gd:1277"
+   "modules/p0/p0_runtime.gd:1278"
   ],
   "kind": "template",
   "done": true
@@ -6691,7 +6691,7 @@
  },
  "HeadEnd_M": {
   "where": [
-   "modules/p0/p0_runtime.gd:1695"
+   "modules/p0/p0_runtime.gd:1696"
   ],
   "kind": "line"
  },
@@ -6718,7 +6718,7 @@
  },
  "Helps Mapbox improve its maps": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:299"
+   "scenes/p0/panels/p0_settings_page.gd:322"
   ],
   "kind": "line",
   "done": true
@@ -6803,7 +6803,7 @@
  "Highest level for now": {
   "where": [
    "modules/p0/p0_logic.gd:2318",
-   "modules/p0/p0_runtime.gd:1216"
+   "modules/p0/p0_runtime.gd:1217"
   ],
   "kind": "line",
   "done": true
@@ -6854,8 +6854,8 @@
  "Home": {
   "where": [
    "modules/p0/p0_travel.gd:281",
-   "scenes/p0/p0_ui.gd:4298",
-   "scenes/p0/panels/p0_settings_page.gd:117"
+   "scenes/p0/p0_ui.gd:4306",
+   "scenes/p0/panels/p0_settings_page.gd:121"
   ],
   "kind": "line",
   "done": true
@@ -6883,7 +6883,7 @@
  },
  "Home city": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:112"
+   "scenes/p0/panels/p0_settings_page.gd:116"
   ],
   "kind": "line",
   "done": true
@@ -7100,7 +7100,7 @@
  },
  "Improve this map": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:296"
+   "scenes/p0/panels/p0_settings_page.gd:319"
   ],
   "kind": "line",
   "done": true
@@ -7208,7 +7208,7 @@
  },
  "It got away": {
   "where": [
-   "modules/p0/p0_runtime.gd:1097"
+   "modules/p0/p0_runtime.gd:1098"
   ],
   "kind": "line",
   "done": true
@@ -7230,7 +7230,7 @@
  "Jan": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -7239,7 +7239,7 @@
  "Jul": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -7248,7 +7248,7 @@
  "Jun": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -7412,7 +7412,7 @@
  },
  "Label": {
   "where": [
-   "modules/p0/p0_runtime.gd:2061",
+   "modules/p0/p0_runtime.gd:2062",
    "modules/ui/game_ui.gd:172",
    "modules/ui/game_ui.gd:173",
    "scenes/map/city_map_view.gd:644",
@@ -7445,8 +7445,8 @@
  "Language": {
   "where": [
    "modules/ui/language_button.gd:8",
-   "scenes/p0/panels/p0_settings_page.gd:124",
-   "scenes/p0/panels/p0_settings_page.gd:356"
+   "scenes/p0/panels/p0_settings_page.gd:128",
+   "scenes/p0/panels/p0_settings_page.gd:379"
   ],
   "kind": "line",
   "done": true
@@ -7495,7 +7495,7 @@
  },
  "Layer %d": {
   "where": [
-   "scenes/p0/p0_ui.gd:4634"
+   "scenes/p0/p0_ui.gd:4642"
   ],
   "kind": "template",
   "done": true
@@ -7509,7 +7509,7 @@
  },
  "Learned · %s": {
   "where": [
-   "modules/p0/p0_runtime.gd:930"
+   "modules/p0/p0_runtime.gd:931"
   ],
   "kind": "template",
   "done": true
@@ -7523,7 +7523,7 @@
  },
  "Legal": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:149"
+   "scenes/p0/panels/p0_settings_page.gd:167"
   ],
   "kind": "line",
   "done": true
@@ -7560,7 +7560,7 @@
  },
  "Let me show you a dish.": {
   "where": [
-   "modules/p0/p0_runtime.gd:923"
+   "modules/p0/p0_runtime.gd:924"
   ],
   "kind": "line",
   "done": true
@@ -7583,7 +7583,7 @@
  },
  "Level %d": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:196",
+   "scenes/p0/panels/p0_profile_page.gd:199",
    "scenes/p0/panels/p0_skills_drawer.gd:105"
   ],
   "kind": "template",
@@ -7612,9 +7612,9 @@
  },
  "Licenses": {
   "where": [
-   "modules/p0/p0_legal.gd:43",
-   "scenes/p0/panels/p0_settings_page.gd:144",
-   "scenes/p0/panels/p0_settings_page.gd:274"
+   "modules/p0/p0_legal.gd:71",
+   "scenes/p0/panels/p0_settings_page.gd:154",
+   "scenes/p0/panels/p0_settings_page.gd:297"
   ],
   "kind": "line",
   "done": true
@@ -7659,7 +7659,7 @@
  "Limit reached · %s": {
   "where": [
    "modules/p0/p0_barter.gd:8",
-   "modules/p0/p0_runtime.gd:1245"
+   "modules/p0/p0_runtime.gd:1246"
   ],
   "kind": "template",
   "done": true
@@ -7683,8 +7683,8 @@
  },
  "Line": {
   "where": [
-   "scenes/ui_kit/ui_setting_row.gd:71",
-   "scenes/ui_kit/ui_setting_row.gd:74"
+   "scenes/ui_kit/ui_setting_row.gd:73",
+   "scenes/ui_kit/ui_setting_row.gd:76"
   ],
   "kind": "line"
  },
@@ -7711,7 +7711,7 @@
  },
  "Line in · Energy back": {
   "where": [
-   "modules/p0/p0_runtime.gd:1099"
+   "modules/p0/p0_runtime.gd:1100"
   ],
   "kind": "line",
   "done": true
@@ -7822,7 +7822,7 @@
  },
  "Look_*": {
   "where": [
-   "modules/p0/p0_runtime.gd:2060"
+   "modules/p0/p0_runtime.gd:2061"
   ],
   "kind": "line"
  },
@@ -7844,7 +7844,7 @@
  },
  "Lou": {
   "where": [
-   "modules/p0/p0_runtime.gd:2103",
+   "modules/p0/p0_runtime.gd:2104",
    "scenes/p0/panels/p0_counter_drawer.gd:60",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_outposts.json#name"
@@ -7932,7 +7932,7 @@
  },
  "MICROPHONE_DENIED": {
   "where": [
-   "scenes/p0/p0_ui.gd:4625"
+   "scenes/p0/p0_ui.gd:4633"
   ],
   "kind": "line"
  },
@@ -7952,7 +7952,7 @@
  },
  "Main": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:160"
+   "scenes/p0/panels/p0_settings_page.gd:183"
   ],
   "kind": "line",
   "done": true
@@ -7966,7 +7966,7 @@
  },
  "Make room · 1 slot": {
   "where": [
-   "modules/p0/p0_runtime.gd:1198"
+   "modules/p0/p0_runtime.gd:1199"
   ],
   "kind": "line",
   "done": true
@@ -7989,7 +7989,7 @@
  },
  "Map data": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:288"
+   "scenes/p0/panels/p0_settings_page.gd:311"
   ],
   "kind": "line",
   "done": true
@@ -8027,7 +8027,7 @@
  "Mar": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -8190,7 +8190,7 @@
  "May": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -8251,7 +8251,7 @@
  },
  "Mic on · others here can hear you": {
   "where": [
-   "scenes/p0/p0_ui.gd:4561"
+   "scenes/p0/p0_ui.gd:4569"
   ],
   "kind": "line",
   "done": true
@@ -8384,7 +8384,7 @@
  "Missing ingredients": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:319",
-   "modules/p0/p0_runtime.gd:1241"
+   "modules/p0/p0_runtime.gd:1242"
   ],
   "kind": "line",
   "done": true
@@ -8658,8 +8658,8 @@
    "modules/p0/p0_logic.gd:879",
    "modules/p0/p0_logic.gd:2363",
    "modules/p0/p0_material_logic.gd:612",
-   "modules/p0/p0_runtime.gd:1170",
-   "modules/p0/p0_runtime.gd:1195"
+   "modules/p0/p0_runtime.gd:1171",
+   "modules/p0/p0_runtime.gd:1196"
   ],
   "kind": "template",
   "done": true
@@ -8701,7 +8701,7 @@
  },
  "Need 1 more Copper Ore": {
   "where": [
-   "modules/p0/p0_runtime.gd:2070"
+   "modules/p0/p0_runtime.gd:2071"
   ],
   "kind": "line",
   "done": true
@@ -8741,7 +8741,7 @@
  "Needs a main ingredient": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:498",
-   "modules/p0/p0_runtime.gd:1237"
+   "modules/p0/p0_runtime.gd:1238"
   ],
   "kind": "line",
   "done": true
@@ -8790,7 +8790,7 @@
  },
  "New city! +%d XP": {
   "where": [
-   "scenes/p0/p0_ui.gd:4087"
+   "scenes/p0/p0_ui.gd:4095"
   ],
   "kind": "template",
   "done": true
@@ -8834,7 +8834,7 @@
  },
  "New recipe · %s": {
   "where": [
-   "modules/p0/p0_runtime.gd:928"
+   "modules/p0/p0_runtime.gd:929"
   ],
   "kind": "template",
   "done": true
@@ -8855,7 +8855,7 @@
  },
  "New recipe! · First cooked · +%d Cooking XP": {
   "where": [
-   "modules/p0/p0_runtime.gd:741"
+   "modules/p0/p0_runtime.gd:742"
   ],
   "kind": "template",
   "done": true
@@ -8925,14 +8925,14 @@
  "New title · %s": {
   "where": [
    "modules/p0/p0_kindred.gd:26",
-   "modules/p0/p0_runtime.gd:940"
+   "modules/p0/p0_runtime.gd:941"
   ],
   "kind": "template",
   "done": true
  },
  "New-player guide": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:155"
+   "scenes/p0/panels/p0_settings_page.gd:178"
   ],
   "kind": "line",
   "done": true
@@ -9105,7 +9105,7 @@
  },
  "No XP · %s today": {
   "where": [
-   "modules/p0/p0_runtime.gd:786"
+   "modules/p0/p0_runtime.gd:787"
   ],
   "kind": "template",
   "done": true
@@ -9126,7 +9126,7 @@
  },
  "No bait left": {
   "where": [
-   "modules/p0/p0_runtime.gd:1227"
+   "modules/p0/p0_runtime.gd:1228"
   ],
   "kind": "line",
   "done": true
@@ -9355,7 +9355,7 @@
  },
  "Not for cooking": {
   "where": [
-   "modules/p0/p0_runtime.gd:1239",
+   "modules/p0/p0_runtime.gd:1240",
    "scenes/p0/kitchen/p0_kitchen.gd:442"
   ],
   "kind": "line",
@@ -9388,7 +9388,7 @@
  },
  "Not ready yet": {
   "where": [
-   "modules/p0/p0_runtime.gd:1221"
+   "modules/p0/p0_runtime.gd:1222"
   ],
   "kind": "line",
   "done": true
@@ -9418,15 +9418,15 @@
  },
  "Notifications": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:119",
-   "scenes/p0/panels/p0_settings_page.gd:194"
+   "scenes/p0/panels/p0_settings_page.gd:123",
+   "scenes/p0/panels/p0_settings_page.gd:217"
   ],
   "kind": "line",
   "done": true
  },
  "Notifications are off for %s": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:196"
+   "scenes/p0/panels/p0_settings_page.gd:219"
   ],
   "kind": "template",
   "done": true
@@ -9434,7 +9434,7 @@
  "Nov": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -9480,7 +9480,7 @@
  "Oct": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -9488,7 +9488,7 @@
  },
  "Off": {
   "where": [
-   "scenes/p0/p0_ui.gd:3622"
+   "scenes/p0/p0_ui.gd:3625"
   ],
   "kind": "line",
   "done": true
@@ -9514,7 +9514,7 @@
  },
  "Offline · Reconnecting…": {
   "where": [
-   "modules/p0/p0_runtime.gd:1301",
+   "modules/p0/p0_runtime.gd:1302",
    "scenes/ui_kit/ui_sys_banner.gd:32"
   ],
   "kind": "line",
@@ -9580,7 +9580,7 @@
  },
  "On": {
   "where": [
-   "scenes/p0/p0_ui.gd:3622"
+   "scenes/p0/p0_ui.gd:3625"
   ],
   "kind": "line",
   "done": true
@@ -9645,7 +9645,7 @@
  "Open bag": {
   "where": [
    "modules/p0/p0_logic.gd:854",
-   "modules/p0/p0_runtime.gd:1282",
+   "modules/p0/p0_runtime.gd:1283",
    "scenes/p0/p0_ui.gd:1743",
    "scenes/p0/p0_ui.gd:1819"
   ],
@@ -9654,7 +9654,7 @@
  },
  "Open system settings": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:196"
+   "scenes/p0/panels/p0_settings_page.gd:219"
   ],
   "kind": "line",
   "done": true
@@ -9829,26 +9829,26 @@
  },
  "P0CounterDrawer": {
   "where": [
-   "modules/p0/p0_runtime.gd:2041"
+   "modules/p0/p0_runtime.gd:2042"
   ],
   "kind": "line"
  },
  "P0FishDex": {
   "where": [
-   "modules/p0/p0_runtime.gd:1841"
+   "modules/p0/p0_runtime.gd:1842"
   ],
   "kind": "line"
  },
  "P0KitchenDrawer": {
   "where": [
    "scenes/p0/p0_ui.gd:231",
-   "scenes/p0/p0_ui.gd:4018"
+   "scenes/p0/p0_ui.gd:4026"
   ],
   "kind": "line"
  },
  "P0LookPick": {
   "where": [
-   "modules/p0/p0_runtime.gd:2054",
+   "modules/p0/p0_runtime.gd:2055",
    "scenes/p0/p0_farm.gd:1291",
    "scenes/p0/p0_farm.gd:1294"
   ],
@@ -9856,13 +9856,13 @@
  },
  "P0Online": {
   "where": [
-   "modules/p0/p0_runtime.gd:1551"
+   "modules/p0/p0_runtime.gd:1552"
   ],
   "kind": "line"
  },
  "P0Runtime: the pick map is not on top; left to the stack": {
   "where": [
-   "modules/p0/p0_runtime.gd:1466"
+   "modules/p0/p0_runtime.gd:1467"
   ],
   "kind": "line"
  },
@@ -9881,7 +9881,7 @@
  },
  "P0_AUTO": {
   "where": [
-   "modules/p0/p0_runtime.gd:206"
+   "modules/p0/p0_runtime.gd:207"
   ],
   "kind": "line"
  },
@@ -9961,13 +9961,13 @@
  },
  "P0_LOOK_UI": {
   "where": [
-   "modules/p0/p0_runtime.gd:2063"
+   "modules/p0/p0_runtime.gd:2064"
   ],
   "kind": "line"
  },
  "P0_MEASURE": {
   "where": [
-   "modules/p0/p0_runtime.gd:2081"
+   "modules/p0/p0_runtime.gd:2082"
   ],
   "kind": "line"
  },
@@ -10003,26 +10003,26 @@
  },
  "P0_SHOT": {
   "where": [
-   "modules/p0/p0_runtime.gd:1762",
+   "modules/p0/p0_runtime.gd:1763",
    "scenes/p0/rooms/p0_farmhouse.gd:575"
   ],
   "kind": "line"
  },
  "P0_SHOT saved": {
   "where": [
-   "modules/p0/p0_runtime.gd:2150"
+   "modules/p0/p0_runtime.gd:2151"
   ],
   "kind": "line"
  },
  "P0_SHOT: unknown step": {
   "where": [
-   "modules/p0/p0_runtime.gd:2143"
+   "modules/p0/p0_runtime.gd:2144"
   ],
   "kind": "line"
  },
  "P0_SHOT_FRAMES": {
   "where": [
-   "modules/p0/p0_runtime.gd:1769",
+   "modules/p0/p0_runtime.gd:1770",
    "scenes/p0/p0_map.gd:1162",
    "scenes/p0/p0_map.gd:1268"
   ],
@@ -10030,13 +10030,13 @@
  },
  "P0_SHOT_LIMIT_MS": {
   "where": [
-   "modules/p0/p0_runtime.gd:1772"
+   "modules/p0/p0_runtime.gd:1773"
   ],
   "kind": "line"
  },
  "P0_SHOT_STEPS": {
   "where": [
-   "modules/p0/p0_runtime.gd:1764"
+   "modules/p0/p0_runtime.gd:1765"
   ],
   "kind": "line"
  },
@@ -10054,7 +10054,7 @@
  },
  "P0_UI_TEXTS": {
   "where": [
-   "modules/p0/p0_runtime.gd:1814",
+   "modules/p0/p0_runtime.gd:1815",
    "scenes/p0/rooms/p0_farmhouse.gd:705"
   ],
   "kind": "line"
@@ -10068,7 +10068,7 @@
  },
  "Pages": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:201"
+   "scenes/p0/panels/p0_profile_page.gd:204"
   ],
   "kind": "line",
   "done": true
@@ -10297,8 +10297,8 @@
  },
  "Pip": {
   "where": [
-   "modules/p0/p0_runtime.gd:1638",
-   "modules/p0/p0_runtime.gd:1642",
+   "modules/p0/p0_runtime.gd:1639",
+   "modules/p0/p0_runtime.gd:1643",
    "scenes/p0/p0_farm_guide.gd:35",
    "assets/p0/outpost_npcs.json#name",
    "assets/p0/p0_content.json#name"
@@ -10321,8 +10321,8 @@
  },
  "Pip's gift meal": {
   "where": [
-   "modules/p0/p0_runtime.gd:1638",
-   "modules/p0/p0_runtime.gd:1642"
+   "modules/p0/p0_runtime.gd:1639",
+   "modules/p0/p0_runtime.gd:1643"
   ],
   "kind": "line",
   "done": true
@@ -10445,7 +10445,7 @@
  },
  "Plots": {
   "where": [
-   "modules/p0/p0_runtime.gd:546"
+   "modules/p0/p0_runtime.gd:547"
   ],
   "kind": "line",
   "done": true
@@ -10609,7 +10609,14 @@
  },
  "Privacy": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:143"
+   "scenes/p0/panels/p0_settings_page.gd:147"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Privacy Policy": {
+  "where": [
+   "scenes/p0/panels/p0_settings_page.gd:150"
   ],
   "kind": "line",
   "done": true
@@ -10923,7 +10930,7 @@
  },
  "Recipe Card · %s": {
   "where": [
-   "modules/p0/p0_runtime.gd:930"
+   "modules/p0/p0_runtime.gd:931"
   ],
   "kind": "template",
   "done": true
@@ -11111,7 +11118,7 @@
  },
  "Report sent": {
   "where": [
-   "scenes/p0/p0_ui.gd:4563"
+   "scenes/p0/p0_ui.gd:4571"
   ],
   "kind": "line",
   "done": true
@@ -11127,15 +11134,15 @@
  },
  "Request complete · +%d coins": {
   "where": [
-   "modules/p0/p0_runtime.gd:873"
+   "modules/p0/p0_runtime.gd:874"
   ],
   "kind": "template",
   "done": true
  },
  "Request reward · Stall Board": {
   "where": [
-   "modules/p0/p0_runtime.gd:1639",
-   "modules/p0/p0_runtime.gd:1640"
+   "modules/p0/p0_runtime.gd:1640",
+   "modules/p0/p0_runtime.gd:1641"
   ],
   "kind": "line",
   "done": true
@@ -11205,7 +11212,7 @@
  },
  "Rest used today": {
   "where": [
-   "modules/p0/p0_runtime.gd:1202"
+   "modules/p0/p0_runtime.gd:1203"
   ],
   "kind": "line",
   "done": true
@@ -11219,7 +11226,7 @@
  },
  "Restart the app to use the new language": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:367"
+   "scenes/p0/panels/p0_settings_page.gd:390"
   ],
   "kind": "line",
   "done": true
@@ -11250,7 +11257,7 @@
   "where": [
    "scenes/p0/panels/p0_home_pick_page.gd:181",
    "scenes/p0/panels/p0_home_pin_page.gd:252",
-   "scenes/p0/panels/p0_settings_page.gd:252",
+   "scenes/p0/panels/p0_settings_page.gd:275",
    "scenes/p0/panels/p0_sys_screen.gd:168",
    "scenes/p0/panels/p0_sys_screen.gd:178"
   ],
@@ -11266,8 +11273,8 @@
  },
  "Return to main account": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:169",
-   "scenes/p0/panels/p0_settings_page.gd:181"
+   "scenes/p0/panels/p0_settings_page.gd:192",
+   "scenes/p0/panels/p0_settings_page.gd:204"
   ],
   "kind": "line",
   "done": true
@@ -11604,7 +11611,7 @@
  "Same dish · no Energy today": {
   "where": [
    "modules/p0/p0_logic.gd:1231",
-   "modules/p0/p0_runtime.gd:876"
+   "modules/p0/p0_runtime.gd:877"
   ],
   "kind": "line",
   "done": true
@@ -11747,7 +11754,7 @@
  },
  "Seed Saver · +%d %s": {
   "where": [
-   "modules/p0/p0_runtime.gd:481"
+   "modules/p0/p0_runtime.gd:482"
   ],
   "kind": "template",
   "done": true
@@ -11861,6 +11868,13 @@
   "kind": "line",
   "done": true
  },
+ "Send this code with any request about your data.": {
+  "where": [
+   "scenes/p0/panels/p0_settings_page.gd:169"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Send us a postcard. Check in at a Market in another city.": {
   "where": [
    "assets/p0/content/requests_p1.json#text"
@@ -11879,7 +11893,7 @@
  "Sep": {
   "where": [
    "modules/p0/p0_logic.gd:2382",
-   "modules/p0/p0_runtime.gd:1629",
+   "modules/p0/p0_runtime.gd:1630",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
   "kind": "line",
@@ -11906,7 +11920,7 @@
   "where": [
    "scenes/p0/panels/p0_home_pick_page.gd:73",
    "scenes/p0/panels/p0_settings_page.gd:65",
-   "scenes/p0/panels/p0_settings_page.gd:110"
+   "scenes/p0/panels/p0_settings_page.gd:114"
   ],
   "kind": "line",
   "done": true
@@ -11927,7 +11941,7 @@
  },
  "Share anonymous map usage": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:299"
+   "scenes/p0/panels/p0_settings_page.gd:322"
   ],
   "kind": "line",
   "done": true
@@ -12044,7 +12058,7 @@
  },
  "Since %s": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:180"
+   "scenes/p0/panels/p0_profile_page.gd:183"
   ],
   "kind": "template",
   "done": true
@@ -12100,7 +12114,7 @@
  },
  "Skeleton3D": {
   "where": [
-   "modules/p0/p0_runtime.gd:1694"
+   "modules/p0/p0_runtime.gd:1695"
   ],
   "kind": "line"
  },
@@ -12116,7 +12130,7 @@
  "Skills total %d needed · now %d": {
   "where": [
    "modules/p0/p0_logic.gd:2364",
-   "modules/p0/p0_runtime.gd:1215"
+   "modules/p0/p0_runtime.gd:1216"
   ],
   "kind": "template",
   "done": true
@@ -12172,7 +12186,7 @@
  },
  "Sold out today · %d left": {
   "where": [
-   "modules/p0/p0_runtime.gd:1243"
+   "modules/p0/p0_runtime.gd:1244"
   ],
   "kind": "template",
   "done": true
@@ -12344,8 +12358,8 @@
  },
  "Sow ×1": {
   "where": [
-   "modules/p0/p0_runtime.gd:1190",
-   "modules/p0/p0_runtime.gd:1818",
+   "modules/p0/p0_runtime.gd:1191",
+   "modules/p0/p0_runtime.gd:1819",
    "scenes/p0/p0_farm.gd:957"
   ],
   "kind": "line",
@@ -12496,14 +12510,14 @@
  },
  "Start": {
   "where": [
-   "scenes/p0/p0_ui.gd:3776"
+   "scenes/p0/p0_ui.gd:3784"
   ],
   "kind": "line",
   "done": true
  },
  "Start a new test account?": {
   "where": [
-   "scenes/p0/p0_ui.gd:3774"
+   "scenes/p0/p0_ui.gd:3782"
   ],
   "kind": "line",
   "done": true
@@ -12524,7 +12538,7 @@
  },
  "Start new test account": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:163"
+   "scenes/p0/panels/p0_settings_page.gd:186"
   ],
   "kind": "line",
   "done": true
@@ -12797,7 +12811,7 @@
  },
  "Subtitle": {
   "where": [
-   "modules/p0/p0_runtime.gd:2057"
+   "modules/p0/p0_runtime.gd:2058"
   ],
   "kind": "line"
  },
@@ -12823,6 +12837,20 @@
  "Supplies": {
   "where": [
    "scenes/p0/panels/p0_workbench_drawer.gd:23"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Support code": {
+  "where": [
+   "scenes/p0/panels/p0_settings_page.gd:162"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Support code copied": {
+  "where": [
+   "scenes/p0/p0_ui.gd:3642"
   ],
   "kind": "line",
   "done": true
@@ -13015,6 +13043,13 @@
   "kind": "line",
   "done": true
  },
+ "Tap to copy": {
+  "where": [
+   "scenes/p0/panels/p0_settings_page.gd:162"
+  ],
+  "kind": "line",
+  "done": true
+ },
  "Tap to skip": {
   "where": [
    "scenes/p0/p0_travel_cover.gd:104"
@@ -13140,23 +13175,23 @@
  },
  "Test": {
   "where": [
-   "scenes/p0/p0_ui.gd:3619",
-   "scenes/p0/panels/p0_settings_page.gd:160"
+   "scenes/p0/p0_ui.gd:3622",
+   "scenes/p0/panels/p0_settings_page.gd:183"
   ],
   "kind": "line",
   "done": true
  },
  "Test accounts are separate. Your main farm is kept.": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:174"
+   "scenes/p0/panels/p0_settings_page.gd:197"
   ],
   "kind": "line",
   "done": true
  },
  "Test options": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:128",
-   "scenes/p0/panels/p0_settings_page.gd:154"
+   "scenes/p0/panels/p0_settings_page.gd:132",
+   "scenes/p0/panels/p0_settings_page.gd:177"
   ],
   "kind": "line",
   "done": true
@@ -13333,7 +13368,7 @@
  },
  "The stove is busy · %s left": {
   "where": [
-   "modules/p0/p0_runtime.gd:1235"
+   "modules/p0/p0_runtime.gd:1236"
   ],
   "kind": "template",
   "done": true
@@ -13390,7 +13425,7 @@
  },
  "Third-party components": {
   "where": [
-   "modules/p0/p0_legal.gd:37"
+   "modules/p0/p0_legal.gd:65"
   ],
   "kind": "line",
   "done": true
@@ -13411,7 +13446,7 @@
  },
  "This parcel is no longer waiting": {
   "where": [
-   "modules/p0/p0_runtime.gd:1200"
+   "modules/p0/p0_runtime.gd:1201"
   ],
   "kind": "line",
   "done": true
@@ -13536,7 +13571,7 @@
  },
  "Title": {
   "where": [
-   "scenes/ui_kit/ui_setting_row.gd:64"
+   "scenes/ui_kit/ui_setting_row.gd:66"
   ],
   "kind": "line"
  },
@@ -13548,7 +13583,7 @@
  },
  "Title_": {
   "where": [
-   "modules/p0/p0_runtime.gd:1860",
+   "modules/p0/p0_runtime.gd:1861",
    "scenes/p0/panels/p0_titles_drawer.gd:56"
   ],
   "kind": "line"
@@ -13682,14 +13717,14 @@
  },
  "Too heavy for your rod": {
   "where": [
-   "scenes/p0/p0_ui.gd:4153"
+   "scenes/p0/p0_ui.gd:4161"
   ],
   "kind": "line",
   "done": true
  },
  "Too strong": {
   "where": [
-   "scenes/p0/p0_ui.gd:4153"
+   "scenes/p0/p0_ui.gd:4161"
   ],
   "kind": "line",
   "done": true
@@ -13754,7 +13789,7 @@
  },
  "Tracking · it shows in Today": {
   "where": [
-   "modules/p0/p0_runtime.gd:870"
+   "modules/p0/p0_runtime.gd:871"
   ],
   "kind": "line",
   "done": true
@@ -13864,7 +13899,7 @@
  },
  "Travel to %s first": {
   "where": [
-   "modules/p0/p0_runtime.gd:1188"
+   "modules/p0/p0_runtime.gd:1189"
   ],
   "kind": "template",
   "done": true
@@ -14075,7 +14110,7 @@
  "Unblock": {
   "where": [
    "scenes/p0/panels/p0_people_drawer.gd:120",
-   "scenes/p0/panels/p0_settings_page.gd:221"
+   "scenes/p0/panels/p0_settings_page.gd:244"
   ],
   "kind": "line",
   "done": true
@@ -14339,7 +14374,7 @@
  },
  "Version": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:147"
+   "scenes/p0/panels/p0_settings_page.gd:158"
   ],
   "kind": "line",
   "done": true
@@ -14482,23 +14517,31 @@
  },
  "Voice Profile": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:159"
+   "scenes/p0/p0_ui.gd:4706",
+   "scenes/p0/panels/p0_profile_page.gd:162"
+  ],
+  "kind": "line",
+  "done": true
+ },
+ "Voice Profile isn't available": {
+  "where": [
+   "scenes/p0/p0_ui.gd:4696"
   ],
   "kind": "line",
   "done": true
  },
  "Voice chat": {
   "where": [
-   "scenes/p0/p0_ui.gd:3678",
+   "scenes/p0/p0_ui.gd:3686",
    "scenes/p0/panels/p0_age_card.gd:16",
-   "scenes/p0/panels/p0_settings_page.gd:139"
+   "scenes/p0/panels/p0_settings_page.gd:143"
   ],
   "kind": "line",
   "done": true
  },
  "Voice chat isn't available": {
   "where": [
-   "scenes/p0/p0_ui.gd:4562"
+   "scenes/p0/p0_ui.gd:4570"
   ],
   "kind": "line",
   "done": true
@@ -14685,14 +14728,14 @@
  },
  "Welcome gift": {
   "where": [
-   "modules/p0/p0_runtime.gd:1637"
+   "modules/p0/p0_runtime.gd:1638"
   ],
   "kind": "line",
   "done": true
  },
  "Welcome home": {
   "where": [
-   "modules/p0/p0_runtime.gd:1404",
+   "modules/p0/p0_runtime.gd:1405",
    "scenes/p0/p0_map.gd:1489"
   ],
   "kind": "line",
@@ -14749,7 +14792,7 @@
  },
  "When a plot is ready to harvest": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:202"
+   "scenes/p0/panels/p0_settings_page.gd:225"
   ],
   "kind": "line",
   "done": true
@@ -14930,7 +14973,7 @@
  },
  "You": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:191"
+   "scenes/p0/panels/p0_profile_page.gd:194"
   ],
   "kind": "line",
   "done": true
@@ -14944,7 +14987,7 @@
  },
  "You already reported this": {
   "where": [
-   "scenes/p0/p0_ui.gd:4564"
+   "scenes/p0/p0_ui.gd:4572"
   ],
   "kind": "line",
   "done": true
@@ -15042,7 +15085,7 @@
  },
  "You won't hear each other.\nThey won't be told.": {
   "where": [
-   "scenes/p0/p0_ui.gd:4659"
+   "scenes/p0/p0_ui.gd:4667"
   ],
   "kind": "line",
   "done": true
@@ -15085,7 +15128,7 @@
  },
  "Your Homestead": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:195"
+   "scenes/p0/panels/p0_profile_page.gd:198"
   ],
   "kind": "line",
   "done": true
@@ -15166,14 +15209,14 @@
  },
  "Your line is already in the water": {
   "where": [
-   "modules/p0/p0_runtime.gd:1225"
+   "modules/p0/p0_runtime.gd:1226"
   ],
   "kind": "line",
   "done": true
  },
  "Your main farm is kept.": {
   "where": [
-   "scenes/p0/p0_ui.gd:3775"
+   "scenes/p0/p0_ui.gd:3783"
   ],
   "kind": "line",
   "done": true
@@ -15351,7 +15394,7 @@
  },
  "first frame": {
   "where": [
-   "modules/p0/p0_runtime.gd:256"
+   "modules/p0/p0_runtime.gd:257"
   ],
   "kind": "line"
  },
@@ -15572,7 +15615,7 @@
  },
  "second frame": {
   "where": [
-   "modules/p0/p0_runtime.gd:258"
+   "modules/p0/p0_runtime.gd:259"
   ],
   "kind": "line"
  },
@@ -15614,7 +15657,7 @@
  },
  "that city": {
   "where": [
-   "modules/p0/p0_runtime.gd:1188"
+   "modules/p0/p0_runtime.gd:1189"
   ],
   "kind": "line",
   "done": true
@@ -15689,7 +15732,7 @@
  },
  "© Mapbox": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:290"
+   "scenes/p0/panels/p0_settings_page.gd:313"
   ],
   "kind": "line"
  },
@@ -15703,7 +15746,7 @@
  },
  "© OpenStreetMap contributors": {
   "where": [
-   "scenes/p0/panels/p0_settings_page.gd:290"
+   "scenes/p0/panels/p0_settings_page.gd:313"
   ],
   "kind": "line",
   "done": true
