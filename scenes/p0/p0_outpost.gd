@@ -168,9 +168,10 @@ func _room_frame(_view: Dictionary, dt: float) -> void:
 
 # ---------------------------------------------------------------- keeper and residents
 # ---------------------------------------------------------------- the name sign (SGODOT-216; 不知火舞 216 5759f002)
-## The kit's sign_name board, written at run time: the outpost's name as the place chip has it, Nunito ExtraBold in
-## walnut ink (#4A3424; #FFF6E5 when the anchor says `ink: light`), no outline, shadow or glow, flat on the board 2 mm
-## in front of it, one-sided. Read up close, not from the opening view.
+## The kit's sign_name board, written at run time: the place's own word, as its map pin's label has it (P0Map.short_name,
+## q(137) ①: `Oak`, `Union Square` — about 45 px wide on a phone, the whole name would not read; 不知火舞 216 ce290834),
+## Nunito ExtraBold in walnut ink (#4A3424; #FFF6E5 when the anchor says `ink: light`), no outline, shadow or glow, flat
+## on the board 2 mm in front of it, one-sided. Read up close, not from the opening view.
 const SIGN_INK := Color("4A3424")
 const SIGN_INK_LIGHT := Color("FFF6E5")
 const SIGN_CAP := 0.55        # cap height, of the board's writable height
@@ -179,8 +180,7 @@ const SIGN_SIDE := 0.06       # clear at each side, of its width
 const SIGN_FONT_PX := 96      # the glyphs' raster; pixel_size scales them to metres
 const CAP_OF_EM := 0.7        # Nunito's cap height, of its font size
 const SIGN_FRONT_M := 0.002
-## The kind words a name may end with (world.ts named / placeWord): dropped when the whole name does not fit.
-const TYPE_WORDS := [" Tea House", " Tackle Shop", " Market Square", " Travel Post", " Trading Post", " Mine Hut"]
+const P0MapScript := preload("res://scenes/p0/p0_map.gd")   # its pins' short names
 
 func _write_sign() -> void:
 	var m := anchor("sign_name")
@@ -206,23 +206,26 @@ func _write_sign() -> void:
 	label.position = Vector3(0, 0, -SIGN_FRONT_M)  # on the board, just in front
 	m.add_child(label)
 
-## The sign's words and cap height (metres) for a board `size` (writable width × height): one line at SIGN_CAP of the
-## height, shrunk to fit the width less SIGN_SIDE a side, down to SIGN_CAP_MIN; then without the kind word (`Willowbrook`);
-## then the place word in two lines at the space nearest the middle, at the smallest size — never cut.
+## The sign's words and cap height (metres) for a board `size` (writable width × height): the place's own word in one
+## line at SIGN_CAP of the height, shrunk to fit the width less SIGN_SIDE a side, down to SIGN_CAP_MIN; then in two lines
+## at the space nearest the middle at the smallest size, or smaller where the two lines would not fit the board (周瑜 on
+## #692: two lines at 35 % stood 136 % of its height) — never cut.
 static func sign_fit(name: String, font: Font, size: Vector2) -> Dictionary:
 	var room_w := size.x * (1.0 - 2.0 * SIGN_SIDE)
-	var tries := [name]
-	for w in TYPE_WORDS:
-		if name.ends_with(w) and name.length() > w.length(): tries.append(name.trim_suffix(w))
-	for t in tries:
-		var em_w := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, SIGN_FONT_PX).x / (SIGN_FONT_PX * CAP_OF_EM)   # width per metre of cap
-		var cap := minf(size.y * SIGN_CAP, room_w / maxf(em_w, 0.0001))
-		if cap >= size.y * SIGN_CAP_MIN - 0.00001: return {"text": t, "cap": cap}
-	var place: String = tries[-1]
+	var place := P0MapScript.short_name(name)
+	var em_w := font.get_string_size(place, HORIZONTAL_ALIGNMENT_LEFT, -1, SIGN_FONT_PX).x / (SIGN_FONT_PX * CAP_OF_EM)   # width per metre of cap
+	var cap := minf(size.y * SIGN_CAP, room_w / maxf(em_w, 0.0001))
+	if cap >= size.y * SIGN_CAP_MIN - 0.00001: return {"text": place, "cap": cap}
 	var best := -1
 	for i in place.length():
 		if place[i] == " " and (best < 0 or absf(i - place.length() / 2.0) < absf(best - place.length() / 2.0)): best = i
-	return {"text": place if best < 0 else place.substr(0, best) + "\n" + place.substr(best + 1), "cap": size.y * SIGN_CAP_MIN}
+	var text := place if best < 0 else place.substr(0, best) + "\n" + place.substr(best + 1)
+	var lines := text.split("\n")
+	var widest := 0.0
+	for l in lines: widest = maxf(widest, font.get_string_size(l, HORIZONTAL_ALIGNMENT_LEFT, -1, SIGN_FONT_PX).x)
+	var per_cap := 1.0 / (SIGN_FONT_PX * CAP_OF_EM)   # metres per glyph px at a cap height of 1 m
+	var tall := lines.size() * font.get_height(SIGN_FONT_PX) * per_cap   # the lines' height per metre of cap
+	return {"text": text, "cap": minf(size.y * SIGN_CAP_MIN, minf(size.y / maxf(tall, 0.0001), room_w / maxf(widest * per_cap, 0.0001)))}
 
 func _spawn_npcs() -> void:
 	var data := P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {}) as Dictionary

@@ -6,6 +6,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## seats walk to the nearest free one, sit, skip seats other players hold, and the joystick stands up.
 
 const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
+const P0MapScript := preload("res://scenes/p0/p0_map.gd")
 const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 const ShopArt := preload("res://scenes/coffee_shop/coffee_shop_art.gd")
 
@@ -517,7 +518,8 @@ func test_the_tea_house_opens_on_its_own_kit() -> void:
 	var r := _room("sh_tea_1")
 	assert_str(r.layout_path).is_equal("res://assets/rooms/tea_house/layout.json")
 	assert_str((r.art.get_script() as Script).resource_path).is_equal("res://scenes/tea_house/tea_house_art.gd")
-	assert_str(r.environment.background_color.to_html(false)).is_equal(str(r.review_lighting().background).to_lower())
+	var clear := r.environment.background_color.srgb_to_linear()   # its signed render's plate, as it shows on screen (上官婉儿)
+	assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).is_equal("dde8e7")
 	for a in _anchors_of(P0Outposts.find("sh_tea_1")):
 		assert_object(r.anchor(str(a.name))).override_failure_message(str(a.name)).is_not_null()
 	for s in ["seat_table3_3", "seat_bench_3", "sign_name"]: assert_object(r.anchor(s)).override_failure_message(s).is_not_null()
@@ -605,9 +607,12 @@ func test_the_tea_house_lights_as_its_kit_was_signed() -> void:
 		var p: Array = review.points[i].position
 		assert_vector((lamps[i] as OmniLight3D).global_position).is_equal_approx(r.room.position + Vector3(p[0], p[1], p[2]), Vector3.ONE * 0.001)
 	assert_array(r.room.find_children("HearthGlow", "OmniLight3D", false, false)).is_empty()   # no hearth here
-	# no sampled two-colour plate yet (SGODOT-216): the kit's review background, inside the 40 m far plane
+	# the plate sampled from its signed 43° render (上官婉儿: one colour, DDE8E7), inside the 40 m far plane
 	var plate := r.cam.get_node("Backdrop") as MeshInstance3D
-	assert_object(plate.material_override as StandardMaterial3D).is_not_null()
+	var mat := plate.material_override as ShaderMaterial
+	assert_object(mat).is_not_null()
+	assert_str(P0Room.aces_screen(mat.get_shader_parameter("top_input")).to_html(false)).is_equal("dde8e7")
+	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("dde8e7")
 	assert_float(-plate.position.z).is_less(r.cam.far)
 
 ## Scene integration (SGODOT-227): every outpost opens on its own kit with every anchor of its file and the background
@@ -624,10 +629,7 @@ func test_every_outpost_opens_on_its_kit() -> void:
 		for a in _anchors_of(o):
 			assert_object(r.anchor(str(a.name))).override_failure_message("%s %s" % [id, a.name]).is_not_null()
 		var clear := r.environment.background_color.srgb_to_linear()
-		if o.has("backdrop"):   # sampled from its signed render
-			assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).override_failure_message(id).is_equal(str(o.backdrop.top).to_lower())
-		else:   # the tea house's kit (SGODOT-216): its review background
-			assert_str(r.environment.background_color.to_html(false)).override_failure_message(id).is_equal(str(r.review_lighting().background).to_lower())
+		assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).override_failure_message(id).is_equal(str(o.backdrop.top).to_lower())
 		_assert_player_scale_framing(r, id)
 		r.frame_all()   # back to the opening view for the door check
 		# The door's prompt keeps off the player at spawn: below the feet at a front door, above the head at a back one.
@@ -1032,13 +1034,13 @@ func test_a_kits_camera_planes_come_from_its_layout() -> void:
 	assert_vector(P0Room.camera_clip({"size": 6.72}, review)).is_equal(P0Room.review_clip(review))
 	assert_vector(P0Room.camera_clip({}, {})).is_equal(P0Room.review_clip({}))
 
-## The name sign (SGODOT-216; 不知火舞 216 5759f002): the outpost's name on the kit's sign_name board, walnut ink, no
-## outline, one-sided, alpha cut; the tackle shop's board too (奕星). One line at 55 % of the board's height, shrunk to
-## fit the width less 6 % a side, down to 35 %; then without the kind word; then two lines at the middle space.
+## The name sign (SGODOT-216; 不知火舞 216 5759f002, ce290834): the place's own word as its map pin has it, on the kit's
+## sign_name board, walnut ink, no outline, one-sided, alpha cut; the tackle shop's board too (奕星). One line at 55 % of
+## the board's height, shrunk to fit the width less 6 % a side, down to 35 %; then two lines at the middle space.
 func test_the_name_sign_is_written_on_its_board() -> void:
 	var r := _room("sh_tea_1")
 	var label := r.anchor("sign_name").get_node("SignText") as Label3D
-	assert_str(label.text.replace("\n", " ")).is_equal(OutpostScript.sign_fit("Oak Tea House", label.font, Vector2(1.04, 0.26)).text.replace("\n", " "))
+	assert_str(label.text).is_equal("Oak")
 	assert_str(label.modulate.to_html(false)).is_equal("4a3424")
 	assert_int(label.outline_size).is_equal(0)
 	assert_bool(label.double_sided).is_false()
@@ -1046,17 +1048,20 @@ func test_the_name_sign_is_written_on_its_board() -> void:
 	assert_object(_room("sh_tackle_1").anchor("sign_name").get_node_or_null("SignText")).is_not_null()
 	var font: Font = label.font
 	var board := Vector2(1.04, 0.26)
-	assert_float(float(OutpostScript.sign_fit("Oak", font, board).cap)).is_equal_approx(0.26 * 0.55, 0.0001)   # short: full size
-	for name in ["Oak Tea House", "Lotus Tea House", "Willowbrook Tea House"]:
+	assert_float(float(OutpostScript.sign_fit("Oak Tea House", font, board).cap)).is_equal_approx(0.26 * 0.55, 0.0001)   # `Oak`: full size
+	assert_str(str(OutpostScript.sign_fit("Union Square Travel Post", font, board).text)).is_equal("Union Square")   # the pin's
+	for name in ["Lotus Tea House", "Willowbrook Tea House", "Stonebridge Tackle Shop"]:
 		var fit := OutpostScript.sign_fit(name, font, board)
 		var cap := float(fit.cap)
 		assert_float(cap).override_failure_message(name).is_between(0.26 * 0.35 - 0.0001, 0.26 * 0.55 + 0.0001)
-		assert_bool(name.begins_with(str(fit.text))).override_failure_message(name + " → " + str(fit.text)).is_true()
+		assert_str(str(fit.text)).override_failure_message(name).is_equal(P0MapScript.short_name(name))
 		var wide := font.get_string_size(str(fit.text), HORIZONTAL_ALIGNMENT_LEFT, -1, OutpostScript.SIGN_FONT_PX).x * cap / (OutpostScript.SIGN_FONT_PX * OutpostScript.CAP_OF_EM)
 		assert_float(wide).override_failure_message(name).is_less_equal(1.04 * 0.88 + 0.0001)
-	var two := OutpostScript.sign_fit("Grand Old Willowbrook Tea House", font, board)   # too long even without the kind word
+	var two := OutpostScript.sign_fit("Grand Old Willowbrook Tea House", font, board)   # its own words too long for one line
 	assert_str(str(two.text)).is_equal("Grand Old\nWillowbrook")
-	assert_float(float(two.cap)).is_equal_approx(0.26 * 0.35, 0.0001)
+	assert_float(float(two.cap)).is_less_equal(0.26 * 0.35 + 0.0001)
+	var per_cap := 1.0 / (OutpostScript.SIGN_FONT_PX * OutpostScript.CAP_OF_EM)
+	assert_float(2.0 * font.get_height(OutpostScript.SIGN_FONT_PX) * per_cap * float(two.cap)).is_less_equal(0.26 + 0.0001)   # both lines on the board (周瑜 on #692)
 
 ## The S-tier trading post keeps the Coffee Shop (不知火舞 216 5759f002), which no hand-written outpost is on any more:
 ## its walls, seats and backdrop are world.room.cabin's; a tea house from a server still naming the old kit opens the
