@@ -665,7 +665,7 @@
   "where": [
    "modules/p0/p0_item_info.gd:590",
    "modules/p0/p0_travel.gd:142",
-   "scenes/p0/panels/p0_city_row.gd:251"
+   "scenes/p0/panels/p0_city_row.gd:252"
   ],
   "kind": "template",
   "done": true

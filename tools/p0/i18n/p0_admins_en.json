@@ -23,27 +23,32 @@
    "Victorville",
    "Temecula",
    "Oceanside"
-  ]
+  ],
+  "done": true
  },
  "Capital Region": {
   "cities": [
    "Copenhagen"
-  ]
+  ],
+  "done": true
  },
  "Central Finland": {
   "cities": [
    "Jyväskylä"
-  ]
+  ],
+  "done": true
  },
  "Central Jutland": {
   "cities": [
    "Århus"
-  ]
+  ],
+  "done": true
  },
  "Chiba": {
   "cities": [
    "Sakura"
-  ]
+  ],
+  "done": true
  },
  "Connecticut": {
   "cities": [
@@ -51,7 +56,8 @@
    "Bridgeport",
    "Waterbury",
    "Hartford"
-  ]
+  ],
+  "done": true
  },
  "England": {
   "cities": [
@@ -66,7 +72,8 @@
    "Eastbourne",
    "Ipswich",
    "Saint Peters"
-  ]
+  ],
+  "done": true
  },
  "Florida": {
   "cities": [
@@ -79,7 +86,8 @@
    "Lakeland",
    "Orlando",
    "Tampa"
-  ]
+  ],
+  "done": true
  },
  "Guangdong": {
   "cities": [
@@ -93,35 +101,41 @@
    "Jiangmen",
    "Shanwei",
    "Guangzhou"
-  ]
+  ],
+  "done": true
  },
  "Guerrero": {
   "cities": [
    "Iguala de la Independencia"
-  ]
+  ],
+  "done": true
  },
  "Gunma": {
   "cities": [
    "Ōta",
    "Takasaki"
-  ]
+  ],
+  "done": true
  },
  "Harjumaa": {
   "cities": [
    "Tallinn"
-  ]
+  ],
+  "done": true
  },
  "Hidalgo": {
   "cities": [
    "Pachuca de Soto",
    "Tulancingo"
-  ]
+  ],
+  "done": true
  },
  "Ibaraki": {
   "cities": [
    "Tsukuba",
    "Mito"
-  ]
+  ],
+  "done": true
  },
  "Jiangsu": {
   "cities": [
@@ -129,14 +143,16 @@
    "Nantong",
    "Wuxi",
    "Jiangyin"
-  ]
+  ],
+  "done": true
  },
  "Johor": {
   "cities": [
    "Kluang",
    "Batu Pahat",
    "Muar"
-  ]
+  ],
+  "done": true
  },
  "Jönköping": {
   "cities": [
@@ -147,28 +163,33 @@
  "Kanagawa": {
   "cities": [
    "Hiratsuka"
-  ]
+  ],
+  "done": true
  },
  "Massachusetts": {
   "cities": [
    "Springfield",
    "Worcester"
-  ]
+  ],
+  "done": true
  },
  "Matanzas Province": {
   "cities": [
    "Matanzas"
-  ]
+  ],
+  "done": true
  },
  "Mecklenburg-Vorpommern": {
   "cities": [
    "Rostock"
-  ]
+  ],
+  "done": true
  },
  "Melaka": {
   "cities": [
    "Malacca"
-  ]
+  ],
+  "done": true
  },
  "Mexico City": {
   "cities": [
@@ -180,65 +201,77 @@
   "cities": [
    "Cuernavaca",
    "Cuautla"
-  ]
+  ],
+  "done": true
  },
  "México": {
   "cities": [
    "Toluca"
-  ]
+  ],
+  "done": true
  },
  "Negeri Sembilan": {
   "cities": [
    "Seremban"
-  ]
+  ],
+  "done": true
  },
  "New Providence": {
   "cities": [
    "Nassau"
-  ]
+  ],
+  "done": true
  },
  "New York": {
   "cities": [
    "New York City",
    "Albany"
-  ]
+  ],
+  "done": true
  },
  "North Denmark": {
   "cities": [
    "Aalborg"
-  ]
+  ],
+  "done": true
  },
  "North Savo": {
   "cities": [
    "Kuopio"
-  ]
+  ],
+  "done": true
  },
  "Pahang": {
   "cities": [
    "Maran",
    "Kuantan"
-  ]
+  ],
+  "done": true
  },
  "Paijat-Hame": {
   "cities": [
    "Lahti"
-  ]
+  ],
+  "done": true
  },
  "Pennsylvania": {
   "cities": [
    "Allentown",
    "Philadelphia"
-  ]
+  ],
+  "done": true
  },
  "Pirkanmaa": {
   "cities": [
    "Tampere"
-  ]
+  ],
+  "done": true
  },
  "Pskov Oblast": {
   "cities": [
    "Pskov"
-  ]
+  ],
+  "done": true
  },
  "Puebla": {
   "cities": [
@@ -251,23 +284,27 @@
   "cities": [
    "San Juan del Río",
    "Santiago de Querétaro"
-  ]
+  ],
+  "done": true
  },
  "Rhode Island": {
   "cities": [
    "Providence"
-  ]
+  ],
+  "done": true
  },
  "Riau": {
   "cities": [
    "Dumai",
    "Pekanbaru"
-  ]
+  ],
+  "done": true
  },
  "Riau Islands": {
   "cities": [
    "Tanjung Pinang"
-  ]
+  ],
+  "done": true
  },
  "Riga": {
   "cities": [
@@ -279,7 +316,8 @@
   "cities": [
    "Kiel",
    "Lübeck"
-  ]
+  ],
+  "done": true
  },
  "Shanghai": {
   "cities": [
@@ -291,27 +329,32 @@
  "Shizuoka": {
   "cities": [
    "Fuji"
-  ]
+  ],
+  "done": true
  },
  "Skåne": {
   "cities": [
    "Helsingborg"
-  ]
+  ],
+  "done": true
  },
  "South Denmark": {
   "cities": [
    "Odense"
-  ]
+  ],
+  "done": true
  },
  "Southwest Finland": {
   "cities": [
    "Turku"
-  ]
+  ],
+  "done": true
  },
  "St.-Petersburg": {
   "cities": [
    "Saint Petersburg"
-  ]
+  ],
+  "done": true
  },
  "Stockholm": {
   "cities": [
@@ -323,7 +366,8 @@
   "cities": [
    "Oyama",
    "Utsunomiya"
-  ]
+  ],
+  "done": true
  },
  "Tokyo": {
   "cities": [
@@ -340,27 +384,32 @@
  "Uusimaa": {
   "cities": [
    "Helsinki"
-  ]
+  ],
+  "done": true
  },
  "Västmanland": {
   "cities": [
    "Västerås"
-  ]
+  ],
+  "done": true
  },
  "Västra Götaland": {
   "cities": [
    "Gothenburg"
-  ]
+  ],
+  "done": true
  },
  "West Pomerania": {
   "cities": [
    "Szczecin"
-  ]
+  ],
+  "done": true
  },
  "Yamanashi": {
   "cities": [
    "Kofu"
-  ]
+  ],
+  "done": true
  },
  "Zhejiang": {
   "cities": [
@@ -368,7 +417,8 @@
    "Cixi",
    "Huzhou",
    "Ningbo"
-  ]
+  ],
+  "done": true
  },
  "Örebro": {
   "cities": [
@@ -379,6 +429,7 @@
  "Östergötland": {
   "cities": [
    "Linköping"
-  ]
+  ],
+  "done": true
  }
 }
