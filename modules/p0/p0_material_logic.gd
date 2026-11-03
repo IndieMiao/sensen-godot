@@ -388,6 +388,49 @@ static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
 		if str(it[2]) == "storage": out.append("+%d %s · Stored" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return out
 
+## How many more of a material the bag takes (the server's bag.ts room): its plain stacks' gaps and the free slots,
+## a stack of content.bag.stack.material (99); gifts never take more.
+static func bag_room(view: Dictionary, id: String) -> int:
+	var limit := int(P0Logic.content().get("bag", {}).get("stack", {}).get("material", 99))
+	var bag: Dictionary = view.get("bag", {})
+	var room := int(bag.get("free", 0)) * limit
+	for b in bag.get("slots", []):
+		if b is Dictionary and str(b.get("id", "")) == id and not bool(b.get("gifted", false)): room += maxi(0, limit - int(b.get("qty", 0)))
+	return room
+
+## A city gathering spot's card (D2, 不知火舞 f6b4bdb3 / 355 3b2c6a43; frames 332:183026–184280): the spot's name, `Gathering
+## spot · Timber`, `Gives 4 Timber` (a Reed Bank `4 Reeds · Worm Bait`), `Distance` when the player is not in its city,
+## and one key in the server's order (gathering.ts): not in its city `Go`; cooling down grey `Ready in 3h 12m`; short of
+## Energy amber `Gather · Need 3 Energy`; the main yield not fitting the bag grey `No room · free a slot first` (never on
+## the farm: there it goes to Farm Storage); else `Gather · 3 Energy`. `ready_ms`: what is left of its cooldown now
+## (view.gather.city_ready, counted down since the view came). {state: go | ready | cooling | energy | room, …the
+## P0PlaceSheet spec}.
+static func gather_card(view: Dictionary, spot: Dictionary, here: bool, ready_ms: float, km := -1.0, on_farm := false) -> Dictionary:
+	var yields: Array = spot.get("yield", [])
+	var main: Array = yields[0] if not yields.is_empty() else ["", 0]
+	var main_name := P0Logic.item_name(view, str(main[0]))
+	var gives := "%d %s" % [int(main[1]), main_name]
+	for y in yields.slice(1): gives += " · " + P0Logic.item_name(view, str(y[0]))
+	var facts: Array = [["Gives", gives]]
+	if not here and km >= 0.0: facts.append(["Distance", P0PlaceSheet.distance_text(km)])
+	var cost := int(spot.get("energy", 0))
+	var out := {"title": str(spot.get("name", "")), "subtitle": "Gathering spot · " + main_name, "facts": facts,
+		"primary": "Gather · %d Energy" % cost, "state": "ready"}
+	if not here:
+		out.primary = "Go"
+		out.state = "go"
+	elif ready_ms > 0.0:
+		out.blocked = "Ready in %s" % P0Logic.span(ready_ms)
+		out.state = "cooling"
+	elif int(view.get("energy", {}).get("value", 0)) < cost:
+		out.blocked = "Gather · Need %d Energy" % cost
+		out.blocked_energy = true
+		out.state = "energy"
+	elif not on_farm and str(main[0]) != "" and bag_room(view, str(main[0])) < int(main[1]):
+		out.blocked = "No room · free a slot first"
+		out.state = "room"
+	return out
+
 ## Coming home (q(40)): "Stored · 12 Stone · 3 Copper Ore" once per new storage.auto.at (number first, appendix B).
 static func stored_notice(view: Dictionary, shown_at: float) -> String:
 	var auto = view.get("storage", {}).get("auto", null)
