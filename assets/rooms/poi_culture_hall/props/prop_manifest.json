@@ -52,7 +52,7 @@
           ]
         }
       ],
-      "triangles": 282,
+      "triangles": 414,
       "surfaces": 2,
       "bounds": [
         [
@@ -71,7 +71,7 @@
         1.5,
         1.7999999523162842
       ],
-      "sha256": "715291700eb16790a04451659d80ceab62dd2e924b64db4d6d85e33a50b171f1",
+      "sha256": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/display_cabinet/reuse_provenance.json"
     },
     {
@@ -98,26 +98,26 @@
           ]
         }
       ],
-      "triangles": 176,
+      "triangles": 308,
       "surfaces": 1,
       "bounds": [
         [
           -0.3499999940395355,
           0.0,
-          -0.3499999940395355
+          -0.3500000238418579
         ],
         [
           0.3499999940395355,
           1.100000023841858,
-          0.3499999940395355
+          0.3500000238418579
         ]
       ],
       "dimensions_m": [
         0.699999988079071,
         1.100000023841858,
-        0.699999988079071
+        0.7000000476837158
       ],
-      "sha256": "f69fb43b0e31757c5211cad7ef725eb1c47a5e13c3aaf5173276d02c711802f4",
+      "sha256": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_plinth/reuse_provenance.json"
     },
     {
@@ -201,7 +201,7 @@
         0.550000011920929,
         0.04999999701976776
       ],
-      "sha256": "c64151f5e2b94eeec3f810a9cacb8ca845379541a74f4710fb7b941aad45bffe",
+      "sha256": "56369b959d6cd39b77e94d0b4945271c8c0fcdf3d8c8e6b62bb8682e74304adf",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_02/reuse_provenance.json"
     },
     {
@@ -369,7 +369,7 @@
         0.550000011920929,
         0.04999992251396179
       ],
-      "sha256": "8dc05dd1c4bfbf58cdc83c3b6b0c1143ef8fe2140a782f33d0a0d2121936dd60",
+      "sha256": "1ff92248034c039382f58dba446af18174947ce705302b727b737d9c468d6e0a",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/abstract_frame_06/reuse_provenance.json"
     },
     {
@@ -498,7 +498,7 @@
         0.06656506657600403,
         0.23999999463558197
       ],
-      "sha256": "00872b1cf2560f2a02282568d44527294d78bb7f41ded214b767641373728dc7",
+      "sha256": "e2515b82cc0da4c239e855f504a7263f0f465ff62a0e640fd0609fa563afa181",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_leaf_fossil/reuse_provenance.json"
     },
     {
@@ -753,8 +753,8 @@
       "provenance": "tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json"
     }
   ],
-  "unique_triangles": 4718,
-  "placed_triangles": 5000,
+  "unique_triangles": 4982,
+  "placed_triangles": 5396,
   "unique_surfaces": 18,
   "placed_surfaces": 20
 }

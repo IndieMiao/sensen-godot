@@ -40,7 +40,9 @@ def cabinet():
     source_glass.surface_render_method='DITHERED'
     box('Deep green floor plinth',(0,.06,0),(.95,.12,1.80),'green',.018)
     box('Ivory cabinet body',(0,.52,0),(.91,.80,1.76),'ivory',.02)
-    box('Deep green display rim',(0,.96,0),(.95,.08,1.80),'green',.012)
+    for side in [-1,1]:
+        box('Deep green long rim '+str(side),(side*.46,.96,0),(.03,.08,1.80),'green',.012)
+        box('Deep green short rim '+str(side),(0,.96,side*.885),(.89,.08,.03),'green',.012)
     box('Ivory display bed',(0,.993,0),(.89,.014,1.74),'bed',.004)
     for x in [-.445,.445]:
         for z in [-.865,.865]:box('Slim glass corner '+str((x,z)),(x,1.25,z),(.009,.5,.009),'glass_edge',0)
@@ -62,11 +64,20 @@ def plinth():
     begin('exhibit_plinth','M05','Ivory and deep-green square plinth for the upright ammonite')
     box('Green plinth foot',(0,.07,0),(.70,.14,.70),'green',.014)
     box('Ivory plinth body',(0,.595,0),(.66,.91,.66),'ivory',.018)
-    box('Green top border',(0,1.065,0),(.70,.07,.70),'green',.01)
+    for side in [-1,1]:
+        box('Green long top border '+str(side),(side*.33,1.065,0),(.04,.07,.70),'green',.01)
+        box('Green short top border '+str(side),(0,1.065,side*.33),(.62,.07,.04),'green',.01)
     box('Ivory exhibit surface',(0,1.094,0),(.62,.012,.62),'bed',.003)
     SPECS['exhibit_plinth'].update(display_height_m=1.10,colliders=[{'position':[0,.55,0],'size':[.70,1.10,.70]}])
 
-def polygon(name,points,color,z=.041):return p.mesh(name,[(x,y,z) for x,y in points],[tuple(range(len(points)))],color)
+def polygon(name,points,color,z=.041):
+    # The generic closed-mesh normal pass is ambiguous for open canvas overlays.
+    obj=p.mesh(name,[(x,y,z) for x,y in points],[tuple(range(len(points)))],color)
+    bm=bmesh.new();bm.from_mesh(obj.data)
+    for face in bm.faces:
+        if face.normal.y>0:face.normal_flip()
+    bm.to_mesh(obj.data);bm.free()
+    return obj
 def rect(name,x,y,w,h,color,z=.041):return polygon(name,[(x-w/2,y-h/2),(x+w/2,y-h/2),(x+w/2,y+h/2),(x-w/2,y+h/2)],color,z)
 def disk(name,x,y,rx,ry,color,z=.042):
     return polygon(name,[(x+rx*math.cos(i*math.tau/16),y+ry*math.sin(i*math.tau/16)) for i in range(16)],color,z)

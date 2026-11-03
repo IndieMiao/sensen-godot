@@ -15,7 +15,7 @@ for c in collections:
     check(sum(o.type=='EMPTY' for o in c.objects)==1,c.name+': one local module root')
 case=bpy.data.collections['KIT_display_cabinet'];panes=[o for o in case.objects if o.get('surface_role')=='glass']
 check(len(panes)==5,'Five independently editable glass panels')
-check(all(abs(o.data.materials[0].diffuse_color.a-.16)<.001 for o in panes),'Source glass transparency visible in Blender')
+check(all(abs(o.data.materials[0].diffuse_color[3]-.16)<.001 for o in panes),'Source glass transparency visible in Blender')
 for name,prefix,wanted in [('display_cabinet','Ivory display bed',1.0),('exhibit_plinth','Ivory exhibit surface',1.10)]:
     c=bpy.data.collections['KIT_'+name];root=next(o for o in c.objects if o.type=='EMPTY');obj=next(o for o in c.objects if o.name.startswith(prefix))
     evaluated=obj.evaluated_get(graph);mesh=evaluated.to_mesh()

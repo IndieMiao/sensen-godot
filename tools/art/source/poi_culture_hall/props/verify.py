@@ -43,6 +43,11 @@ for name,spec in specs.items():
             if name in ['display_cabinet','exhibit_plinth']:
                 bed=np.max(abs(colors[:,:3]-linear('F4E8CE')),axis=1)<.00004
                 check(bed.any() and abs(points[bed,1].max()-spec['display_height_m'])<1e-5,name+': actual display support height')
+                green=np.max(abs(colors[:,:3]-linear('465823')),axis=1)<.00004
+                rim_triangles=idx[np.all(green[idx],axis=1)&np.all(abs(points[idx,1]-spec['display_height_m'])<1e-5,axis=1)]
+                centers=points[rim_triangles].mean(axis=1)
+                aperture=[.445,.87] if name=='display_cabinet' else [.31,.31]
+                check(not np.any((abs(centers[:,0])<aperture[0]-.001)&(abs(centers[:,2])<aperture[1]-.001)),name+': no coplanar green top faces inside ivory display bed')
         if name=='floor_mosaic':check(np.all(normals[points[:,1]>.007,1]>.999),'Mosaic stone faces point upward')
         if name.startswith('abstract_frame'):
             art=(abs(points[:,0])<.3131)&(abs(points[:,1])<.239)&(points[:,2]>.037)&(points[:,2]<.043)
