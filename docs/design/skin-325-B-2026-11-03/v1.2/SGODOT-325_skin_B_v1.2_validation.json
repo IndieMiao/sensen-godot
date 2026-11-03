@@ -1,0 +1,1170 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "instruction": "325 db90ab66",
+  "godot": {
+    "captures": [
+      {
+        "camera": "[X: (0.965926, 0.0, -0.258819), Y: (-0.066987, 0.965926, -0.25), Z: (0.25, 0.258819, 0.933013), O: (5.38, 8.774019, 17.60128)]",
+        "name": "N2_sign_Service_Hall",
+        "pitch": -15.0,
+        "pixels": [
+          1600,
+          800
+        ],
+        "width": 1.89999997615814
+      }
+    ],
+    "checks": [
+      {
+        "check": "poi_service_hall: B atlas assigned to shell and furniture",
+        "passed": true
+      },
+      {
+        "check": "Switch hides only mesh, keeps collision: display_niche_1/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "Switch hides only mesh, keeps collision: display_niche_2/Export temporary/Body",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: approved writing area B",
+        "passed": true
+      },
+      {
+        "check": "N2 patch matches plaque inner size .88 x .23m",
+        "passed": true
+      },
+      {
+        "check": "N2 patch centered inside original plaque",
+        "passed": true
+      },
+      {
+        "check": "Runtime lettering stays inside inset patch",
+        "passed": true
+      },
+      {
+        "check": "Text faces same +Z side as green cross at marker yaw 180",
+        "passed": true
+      },
+      {
+        "check": "Actual runtime text fits .66 x .23m writing area",
+        "passed": true
+      },
+      {
+        "check": "Runtime Service Hall is physically to the right of the green cross",
+        "passed": true
+      },
+      {
+        "check": "Runtime text remains inside the offset B writing area",
+        "passed": true
+      },
+      {
+        "check": "Capture N2_sign_Service_Hall",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "rooms": {
+      "poi_service_hall": {
+        "formal_resources": true,
+        "lighting": {
+          "ambient": 0.550000011920929,
+          "sun": 1.0,
+          "tonemap": 0
+        },
+        "variant_B": {
+          "atlas": "room_albedo_ao_b.png",
+          "enabled_options": [
+            "sign_b",
+            "display_niche_1_medicine",
+            "display_niche_2_medicine"
+          ],
+          "sign": {
+            "anchor": "sign_name",
+            "baked_text": false,
+            "offset_m": [
+              0.1,
+              0.0,
+              0.009
+            ],
+            "size_m": [
+              0.66,
+              0.23
+            ]
+          },
+          "surfaces": 34
+        }
+      }
+    },
+    "sign": {
+      "actual_text_size_m": [
+        0.620400011539459,
+        0.152500554919243
+      ],
+      "anchor_yaw": 180.0,
+      "baked_text": false,
+      "clear_gap_m": 0.0547999957203865,
+      "cross_right_x_m": -0.265,
+      "patch_center_room": [
+        0.0,
+        3.07999992370605,
+        -2.91700005531311
+      ],
+      "patch_size_m": [
+        0.879999995231628,
+        0.230000004172325
+      ],
+      "room_space_offset_m": [
+        0.1,
+        0.0,
+        0.009
+      ],
+      "size_m": [
+        0.66,
+        0.23
+      ],
+      "text": "Service Hall",
+      "text_x_range_m": [
+        -0.210200004279613,
+        0.410200007259846
+      ],
+      "text_yaw": 0.0
+    }
+  },
+  "preservation": {
+    "base_commit": "0edd0fc1d3bacdc2ec7657c895da66488f70ddfb",
+    "checks": [
+      {
+        "check": "Every original room/shared asset, scene and layout remains byte-identical to branch base",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: delivered resources match the actual rendered project bytes",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: 2048 square B atlas",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: atlas alpha unchanged",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: exact approved v0.1 atlas bytes",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained linen",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained porcelain",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained print_portrait",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained print_landscape",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained sky",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained glass",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained leaf",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained leaf_light",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: retained leaf_dark",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: A is still default",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: no B options in A",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: approved v1.1 writing area",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: approved room-space text offset",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: switch resource exists variants/b/sign_patch.tscn",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: inherited import params with approved sign compression for room_albedo_ao_b.png",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: independent texture uid room_albedo_ao_b.png",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: inherited import params with approved sign compression for sign_b.png",
+        "passed": true
+      },
+      {
+        "check": "poi_hotel_lobby: independent texture uid sign_b.png",
+        "passed": true
+      },
+      {
+        "check": "N1 entire sign has no baked text or marks",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: delivered resources match the actual rendered project bytes",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: 2048 square B atlas",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: atlas alpha unchanged",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: exact approved v0.1 atlas bytes",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: retained print_portrait",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: retained linen_green",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: retained accent_gold",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: retained terra_light",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: retained glass",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [0, 1024]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [128, 1024]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [0, 1152]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [128, 1152]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [768, 1280]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [896, 1280]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [768, 1408]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [896, 1408]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [1280, 1792]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [1408, 1792]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [1280, 1920]",
+        "passed": true
+      },
+      {
+        "check": "N2 plant tile [1408, 1920]",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: A is still default",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: no B options in A",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: approved v1.1 writing area",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: approved room-space text offset",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: switch resource exists variants/b/display_niche_1.tscn",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: switch resource exists variants/b/display_niche_2.tscn",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: switch resource exists variants/b/sign_patch.tscn",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: inherited import params with approved sign compression for room_albedo_ao_b.png",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: independent texture uid room_albedo_ao_b.png",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: inherited import params with approved sign compression for sign_b.png",
+        "passed": true
+      },
+      {
+        "check": "poi_service_hall: independent texture uid sign_b.png",
+        "passed": true
+      },
+      {
+        "check": "N2 patch aspect matches .88 x .23m plaque interior",
+        "passed": true
+      },
+      {
+        "check": "N2 0.66 x 0.23 m writing region at +X .10 is completely blank",
+        "passed": true
+      },
+      {
+        "check": "N2 sign contains only white and approved green cross",
+        "passed": true
+      },
+      {
+        "check": "All four new texture UIDs are distinct",
+        "passed": true
+      },
+      {
+        "check": "Offline option geometry checks passed",
+        "passed": true
+      }
+    ],
+    "original_files": {
+      "assets/rooms/_shared/plants/README.md": {
+        "base_sha256": "ef61ea7828e40e072ac215082ed3929e52364118ea6b5369e3827d9b777d3296",
+        "current_sha256": "ef61ea7828e40e072ac215082ed3929e52364118ea6b5369e3827d9b777d3296"
+      },
+      "assets/rooms/_shared/plants/asset_stats.json": {
+        "base_sha256": "0840cfd371b1888a82b299e7cdbe7a330bfd1a31dafd23c5c15c614039177040",
+        "current_sha256": "0840cfd371b1888a82b299e7cdbe7a330bfd1a31dafd23c5c15c614039177040"
+      },
+      "assets/rooms/_shared/plants/catalogue.jpg": {
+        "base_sha256": "89cf40edc9bfb4193fe8f2c18bd5806e2bcb5ef3d421a9596230d54135a9cf2a",
+        "current_sha256": "89cf40edc9bfb4193fe8f2c18bd5806e2bcb5ef3d421a9596230d54135a9cf2a"
+      },
+      "assets/rooms/_shared/plants/flower_shrub.glb": {
+        "base_sha256": "f59ffe36bd83a6d4ce01a0a70d0b1ce55ebb9d145662b26f5747fe23cf8b925d",
+        "current_sha256": "f59ffe36bd83a6d4ce01a0a70d0b1ce55ebb9d145662b26f5747fe23cf8b925d"
+      },
+      "assets/rooms/_shared/plants/fruit_tree.glb": {
+        "base_sha256": "3230f14039e40ba13f56eaa94fa13ce1dc3a619b6122879f1ff5b5b604c364e4",
+        "current_sha256": "3230f14039e40ba13f56eaa94fa13ce1dc3a619b6122879f1ff5b5b604c364e4"
+      },
+      "assets/rooms/_shared/plants/ivy_long.glb": {
+        "base_sha256": "a6c648bd64bf4dd5ae8b42b8b2913c793b3836dcaaa538d7be97a8ddc4cb0a93",
+        "current_sha256": "a6c648bd64bf4dd5ae8b42b8b2913c793b3836dcaaa538d7be97a8ddc4cb0a93"
+      },
+      "assets/rooms/_shared/plants/ivy_medium.glb": {
+        "base_sha256": "31ef8a31299811dda145daea7afd704e3bf944119ecda47bc0c3e84a2006b6e9",
+        "current_sha256": "31ef8a31299811dda145daea7afd704e3bf944119ecda47bc0c3e84a2006b6e9"
+      },
+      "assets/rooms/_shared/plants/ivy_short.glb": {
+        "base_sha256": "8079403096201f2f934bd8842ebba578834893f4dddbf3cdb0d288f247da7a35",
+        "current_sha256": "8079403096201f2f934bd8842ebba578834893f4dddbf3cdb0d288f247da7a35"
+      },
+      "assets/rooms/_shared/plants/layout.json": {
+        "base_sha256": "2a6771c87f678e705fff26324225ea16ec87364f02ec638f15df6188cffecd82",
+        "current_sha256": "2a6771c87f678e705fff26324225ea16ec87364f02ec638f15df6188cffecd82"
+      },
+      "assets/rooms/_shared/plants/material.tres": {
+        "base_sha256": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
+        "current_sha256": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b"
+      },
+      "assets/rooms/_shared/plants/monstera.glb": {
+        "base_sha256": "121c5e310388bfefb9e63e53b37e6101192f5fded30b13d0b496a22d445d3eac",
+        "current_sha256": "121c5e310388bfefb9e63e53b37e6101192f5fded30b13d0b496a22d445d3eac"
+      },
+      "assets/rooms/_shared/plants/monstera_woven.glb": {
+        "base_sha256": "d130e2ddb7f5b1dfb31f2d1327ce6b743758c60787aa77d5b299ce7721027ab4",
+        "current_sha256": "d130e2ddb7f5b1dfb31f2d1327ce6b743758c60787aa77d5b299ce7721027ab4"
+      },
+      "assets/rooms/_shared/plants/olive_tree.glb": {
+        "base_sha256": "f2aa7fd237588d9fa720182977bf8ee7b13fd07f9765fa06d50ccfb376c77870",
+        "current_sha256": "f2aa7fd237588d9fa720182977bf8ee7b13fd07f9765fa06d50ccfb376c77870"
+      },
+      "assets/rooms/_shared/plants/peace_lily.glb": {
+        "base_sha256": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
+        "current_sha256": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21"
+      },
+      "assets/rooms/_shared/plants/pot_terracotta.glb": {
+        "base_sha256": "2f182c751ffd0da50b10c9b92a14f78054da52ab8009b8906ea54fa8289dd171",
+        "current_sha256": "2f182c751ffd0da50b10c9b92a14f78054da52ab8009b8906ea54fa8289dd171"
+      },
+      "assets/rooms/_shared/plants/pot_woven.glb": {
+        "base_sha256": "07b8232a3038ad4464bae747dfb64950886b2ba6deb467e8fe01bd74488f6e43",
+        "current_sha256": "07b8232a3038ad4464bae747dfb64950886b2ba6deb467e8fe01bd74488f6e43"
+      },
+      "assets/rooms/_shared/plants/pothos.glb": {
+        "base_sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+        "current_sha256": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1"
+      },
+      "assets/rooms/_shared/plants/room_albedo_ao.png": {
+        "base_sha256": "713c9f88ad08d91fccb6f2b0f1969162cbb6381367e632919ec8159ccf810b4a",
+        "current_sha256": "713c9f88ad08d91fccb6f2b0f1969162cbb6381367e632919ec8159ccf810b4a"
+      },
+      "assets/rooms/_shared/plants/room_albedo_ao.png.import": {
+        "base_sha256": "4b24f8811e94ca342d3d49309b53bbddfcab4f7d0c74b103cfccc03ace73717d",
+        "current_sha256": "4b24f8811e94ca342d3d49309b53bbddfcab4f7d0c74b103cfccc03ace73717d"
+      },
+      "assets/rooms/_shared/plants/source/.gdignore": {
+        "base_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "current_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "assets/rooms/_shared/plants/source/build_plants.py": {
+        "base_sha256": "5aff279cb6b41ce800ef61a54ea4ff5fef982ffa6dea44ce3439e86c65383ff9",
+        "current_sha256": "5aff279cb6b41ce800ef61a54ea4ff5fef982ffa6dea44ce3439e86c65383ff9"
+      },
+      "assets/rooms/_shared/plants/source/export_atlas.py": {
+        "base_sha256": "bf38b608e04729e007b3a75cd74532511b401601e1c2d5659b327517bd8d7498",
+        "current_sha256": "bf38b608e04729e007b3a75cd74532511b401601e1c2d5659b327517bd8d7498"
+      },
+      "assets/rooms/_shared/plants/source/plants.blend": {
+        "base_sha256": "aec387199dc3c34be2e4e8d0a012d1ffa23dd6445d72ef70693d664333527a60",
+        "current_sha256": "aec387199dc3c34be2e4e8d0a012d1ffa23dd6445d72ef70693d664333527a60"
+      },
+      "assets/rooms/_shared/plants/source/render_library.gd": {
+        "base_sha256": "419dafe21bd7bcca3b25bcd9f68e836d8652c5515f615fe2f4157ffbab82937f",
+        "current_sha256": "419dafe21bd7bcca3b25bcd9f68e836d8652c5515f615fe2f4157ffbab82937f"
+      },
+      "assets/rooms/_shared/shell_hall/README_shell.md": {
+        "base_sha256": "f3e14c9a37fe57b363a990bd83cf3146e1849ac52927a09c0e79d03799cb2f43",
+        "current_sha256": "f3e14c9a37fe57b363a990bd83cf3146e1849ac52927a09c0e79d03799cb2f43"
+      },
+      "assets/rooms/_shared/shell_hall/hall_albedo_ao.png": {
+        "base_sha256": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab",
+        "current_sha256": "d4056944cff7feeb486961e0520ed86c23b91c4284849f26ce518fef711153ab"
+      },
+      "assets/rooms/_shared/shell_hall/hall_albedo_ao.png.import": {
+        "base_sha256": "b100c3e1fb288599539cc96d469b9dd485147d732784e001f38676dded41f802",
+        "current_sha256": "b100c3e1fb288599539cc96d469b9dd485147d732784e001f38676dded41f802"
+      },
+      "assets/rooms/_shared/shell_hall/hall_back_wall.glb": {
+        "base_sha256": "13fbf2361b7b8b3aeb71a0d1eefda149cac5e4db1536da56f5f2e8510199e387",
+        "current_sha256": "13fbf2361b7b8b3aeb71a0d1eefda149cac5e4db1536da56f5f2e8510199e387"
+      },
+      "assets/rooms/_shared/shell_hall/hall_back_wall.glb.import": {
+        "base_sha256": "cf113c9a0e7f0492c27c09a1d0808879098ef248c47e0739ffe271d57195aec6",
+        "current_sha256": "cf113c9a0e7f0492c27c09a1d0808879098ef248c47e0739ffe271d57195aec6"
+      },
+      "assets/rooms/_shared/shell_hall/hall_floor.glb": {
+        "base_sha256": "c524275fa5e93d8020dd10749bddec7c45f8d05ab71d1436004354183ca603c8",
+        "current_sha256": "c524275fa5e93d8020dd10749bddec7c45f8d05ab71d1436004354183ca603c8"
+      },
+      "assets/rooms/_shared/shell_hall/hall_floor.glb.import": {
+        "base_sha256": "baa7c96fe978a973255055e3e7f587f5d9f4484200a76bd2e2663eeec9d2cd17",
+        "current_sha256": "baa7c96fe978a973255055e3e7f587f5d9f4484200a76bd2e2663eeec9d2cd17"
+      },
+      "assets/rooms/_shared/shell_hall/hall_left_wall.glb": {
+        "base_sha256": "77f448abe91cc4691c079bef3fd2904dd0f79f033e6474c1f9673c828444dd0b",
+        "current_sha256": "77f448abe91cc4691c079bef3fd2904dd0f79f033e6474c1f9673c828444dd0b"
+      },
+      "assets/rooms/_shared/shell_hall/hall_left_wall.glb.import": {
+        "base_sha256": "8f4dfac085142177c7bae166cde7ada3ca0a8f8c67e33b39c0ec6fe4870ef4a6",
+        "current_sha256": "8f4dfac085142177c7bae166cde7ada3ca0a8f8c67e33b39c0ec6fe4870ef4a6"
+      },
+      "assets/rooms/_shared/shell_hall/hall_palette.json": {
+        "base_sha256": "38741c55e0362b0744e6c56dbe83699604bfb7dc83c61c4df5788d2b990704e1",
+        "current_sha256": "38741c55e0362b0744e6c56dbe83699604bfb7dc83c61c4df5788d2b990704e1"
+      },
+      "assets/rooms/_shared/shell_hall/hall_window_frame.glb": {
+        "base_sha256": "d0b5e6547d0e366f60011609410b14bb1cc7c53e4129d4f481bfa536d027f3e5",
+        "current_sha256": "d0b5e6547d0e366f60011609410b14bb1cc7c53e4129d4f481bfa536d027f3e5"
+      },
+      "assets/rooms/_shared/shell_hall/hall_window_frame.glb.import": {
+        "base_sha256": "9db079adc27c49b7f89c1a5256093f5e71285392e0086fb7428c9881fc151167",
+        "current_sha256": "9db079adc27c49b7f89c1a5256093f5e71285392e0086fb7428c9881fc151167"
+      },
+      "assets/rooms/_shared/shell_hall/hall_window_glass.glb": {
+        "base_sha256": "0849913751ed7fb1978952137f67128cd33624921efcff01096061287b1af7ba",
+        "current_sha256": "0849913751ed7fb1978952137f67128cd33624921efcff01096061287b1af7ba"
+      },
+      "assets/rooms/_shared/shell_hall/hall_window_glass.glb.import": {
+        "base_sha256": "ac47d519332a2e8e696ef7246674320f131c19779fe2c64e4d6c0c5132e32f05",
+        "current_sha256": "ac47d519332a2e8e696ef7246674320f131c19779fe2c64e4d6c0c5132e32f05"
+      },
+      "assets/rooms/_shared/shell_hall/hall_window_grid.glb": {
+        "base_sha256": "c5d7b21964439870e575529e2efe36717ce417b1285f9fd9775a6b4c61c0844a",
+        "current_sha256": "c5d7b21964439870e575529e2efe36717ce417b1285f9fd9775a6b4c61c0844a"
+      },
+      "assets/rooms/_shared/shell_hall/hall_window_grid.glb.import": {
+        "base_sha256": "19def99f1be9a7d0ca525186bba7f50f96c94f9a4317e48e2a0c99ca520a26e8",
+        "current_sha256": "19def99f1be9a7d0ca525186bba7f50f96c94f9a4317e48e2a0c99ca520a26e8"
+      },
+      "assets/rooms/_shared/shell_hall/layout.json": {
+        "base_sha256": "b7901f3b0ff9f32190a846d4eaeb09057935b65247a3063230bdf336fbb51d6d",
+        "current_sha256": "b7901f3b0ff9f32190a846d4eaeb09057935b65247a3063230bdf336fbb51d6d"
+      },
+      "assets/rooms/_shared/shell_hall/provenance/hall_back_wall/reuse_provenance.json": {
+        "base_sha256": "8063a63168312accbc53411ae0be31d3839b44d04cb1a46129b11fc7394dd749",
+        "current_sha256": "8063a63168312accbc53411ae0be31d3839b44d04cb1a46129b11fc7394dd749"
+      },
+      "assets/rooms/_shared/shell_hall/provenance/hall_floor/reuse_provenance.json": {
+        "base_sha256": "7d1df3e92c6d915b1f08b2c6fca98db2f2c20e88e193fe3799ec8b7a8288c07b",
+        "current_sha256": "7d1df3e92c6d915b1f08b2c6fca98db2f2c20e88e193fe3799ec8b7a8288c07b"
+      },
+      "assets/rooms/_shared/shell_hall/provenance/hall_left_wall/reuse_provenance.json": {
+        "base_sha256": "73ac6190741e59180c0c236bac8f90d4c60a810b686b45cf02d657e68f80ddd9",
+        "current_sha256": "73ac6190741e59180c0c236bac8f90d4c60a810b686b45cf02d657e68f80ddd9"
+      },
+      "assets/rooms/_shared/shell_hall/provenance/hall_window_frame/reuse_provenance.json": {
+        "base_sha256": "b37cde858e4d8053013aecba2f1d0f65786dc513cb32cacfd57468e3432454cd",
+        "current_sha256": "b37cde858e4d8053013aecba2f1d0f65786dc513cb32cacfd57468e3432454cd"
+      },
+      "assets/rooms/_shared/shell_hall/provenance/hall_window_glass/reuse_provenance.json": {
+        "base_sha256": "82b9eba224e2fedd99ecc83bab1771d96679affa728884f20e692acd31948f45",
+        "current_sha256": "82b9eba224e2fedd99ecc83bab1771d96679affa728884f20e692acd31948f45"
+      },
+      "assets/rooms/_shared/shell_hall/provenance/hall_window_grid/reuse_provenance.json": {
+        "base_sha256": "af16b3c2a41199121d6c46894a9f924d2e8d4cfec30d8fa3b6582eca88269933",
+        "current_sha256": "af16b3c2a41199121d6c46894a9f924d2e8d4cfec30d8fa3b6582eca88269933"
+      },
+      "assets/rooms/_shared/shell_hall/shell_asset_stats.json": {
+        "base_sha256": "2a465aeb323bb6aeafdf00b38580ef3d3d8830f4cb86f3a80e714ab6812c1f4c",
+        "current_sha256": "2a465aeb323bb6aeafdf00b38580ef3d3d8830f4cb86f3a80e714ab6812c1f4c"
+      },
+      "assets/rooms/_shared/shell_hall/shell_reuse_provenance.json": {
+        "base_sha256": "39e47e3b3e42517e3c16c276df0984a9aa979e0a8708d8b942df3f5f1e38cba0",
+        "current_sha256": "39e47e3b3e42517e3c16c276df0984a9aa979e0a8708d8b942df3f5f1e38cba0"
+      },
+      "assets/rooms/poi_hotel_lobby/asset_stats.json": {
+        "base_sha256": "883132abc5986ea325e00c12affcde279f49f97059e8e483cb2d4ab2bfdd35b7",
+        "current_sha256": "883132abc5986ea325e00c12affcde279f49f97059e8e483cb2d4ab2bfdd35b7"
+      },
+      "assets/rooms/poi_hotel_lobby/atlas_skin.json": {
+        "base_sha256": "c043fa3bb4519c63bae736fbfc01bac6534b7eea53415498197a235107feb4ab",
+        "current_sha256": "c043fa3bb4519c63bae736fbfc01bac6534b7eea53415498197a235107feb4ab"
+      },
+      "assets/rooms/poi_hotel_lobby/blank_name_plaque.glb": {
+        "base_sha256": "823cd6c144728e8ddd78ee7ca10b997913ae1d55e47b68f74a32a53e5e8835b9",
+        "current_sha256": "823cd6c144728e8ddd78ee7ca10b997913ae1d55e47b68f74a32a53e5e8835b9"
+      },
+      "assets/rooms/poi_hotel_lobby/blank_name_plaque.glb.import": {
+        "base_sha256": "bb555100aefd6c7a867bb1a3c41273340624ae589c6b1cdc7f285df9b5acf15d",
+        "current_sha256": "bb555100aefd6c7a867bb1a3c41273340624ae589c6b1cdc7f285df9b5acf15d"
+      },
+      "assets/rooms/poi_hotel_lobby/central_foliage.glb": {
+        "base_sha256": "2878663694a35a5dfb185cff59cfce8ecec628cb9ba14439b1d47422c59c30b0",
+        "current_sha256": "2878663694a35a5dfb185cff59cfce8ecec628cb9ba14439b1d47422c59c30b0"
+      },
+      "assets/rooms/poi_hotel_lobby/central_foliage.glb.import": {
+        "base_sha256": "67678258c80d85ef2ad06cf008e83c9f1e6c1b25e1d0b55d01771bbb5942d6eb",
+        "current_sha256": "67678258c80d85ef2ad06cf008e83c9f1e6c1b25e1d0b55d01771bbb5942d6eb"
+      },
+      "assets/rooms/poi_hotel_lobby/central_planter.glb": {
+        "base_sha256": "6a36de594e85b56af01842df75911c5c974b73f5ec4a00e1a9af456e02c999a6",
+        "current_sha256": "6a36de594e85b56af01842df75911c5c974b73f5ec4a00e1a9af456e02c999a6"
+      },
+      "assets/rooms/poi_hotel_lobby/central_planter.glb.import": {
+        "base_sha256": "0320007868ca58eda49b240038792d50a5fc0caf6e393f1bf9718457fe3fc89a",
+        "current_sha256": "0320007868ca58eda49b240038792d50a5fc0caf6e393f1bf9718457fe3fc89a"
+      },
+      "assets/rooms/poi_hotel_lobby/cowhide_rug.glb": {
+        "base_sha256": "9c27c80ef234a1bfcf357fbac123903ef6b8abee9140b20e2701d4692c9703b3",
+        "current_sha256": "9c27c80ef234a1bfcf357fbac123903ef6b8abee9140b20e2701d4692c9703b3"
+      },
+      "assets/rooms/poi_hotel_lobby/cowhide_rug.glb.import": {
+        "base_sha256": "116bbfc4a070928f6ecfb910d595739d5bb924a0d329d8dcc3c472dbcecc1491",
+        "current_sha256": "116bbfc4a070928f6ecfb910d595739d5bb924a0d329d8dcc3c472dbcecc1491"
+      },
+      "assets/rooms/poi_hotel_lobby/cream_armchair.glb": {
+        "base_sha256": "ddc852ee949cdb0d1b059101cd19200778d472de85061cffa03e73b222007d75",
+        "current_sha256": "ddc852ee949cdb0d1b059101cd19200778d472de85061cffa03e73b222007d75"
+      },
+      "assets/rooms/poi_hotel_lobby/cream_armchair.glb.import": {
+        "base_sha256": "9295c13ea8af6502af8932c27e3f9af365543682398d14df914eb614ebfb2b30",
+        "current_sha256": "9295c13ea8af6502af8932c27e3f9af365543682398d14df914eb614ebfb2b30"
+      },
+      "assets/rooms/poi_hotel_lobby/elevator.glb": {
+        "base_sha256": "d5771ee146c755573c67c919fa30655594cf032ae1326f68ef43f2c012d810c8",
+        "current_sha256": "d5771ee146c755573c67c919fa30655594cf032ae1326f68ef43f2c012d810c8"
+      },
+      "assets/rooms/poi_hotel_lobby/elevator.glb.import": {
+        "base_sha256": "0050623d3ee7fb6bdedf64fb8f36654d035ed326abbc406a94041c5283fb3391",
+        "current_sha256": "0050623d3ee7fb6bdedf64fb8f36654d035ed326abbc406a94041c5283fb3391"
+      },
+      "assets/rooms/poi_hotel_lobby/floor_lamp.glb": {
+        "base_sha256": "1a1e1ce55bd3d0c9559e21f99394bfa23d981438f12e477909c52b97dcb038b8",
+        "current_sha256": "1a1e1ce55bd3d0c9559e21f99394bfa23d981438f12e477909c52b97dcb038b8"
+      },
+      "assets/rooms/poi_hotel_lobby/floor_lamp.glb.import": {
+        "base_sha256": "43d5cb15a295af52cf8a45b505994f5ae5c8eaac4d9051d888c2b70fa20945f5",
+        "current_sha256": "43d5cb15a295af52cf8a45b505994f5ae5c8eaac4d9051d888c2b70fa20945f5"
+      },
+      "assets/rooms/poi_hotel_lobby/frame_landscape.glb": {
+        "base_sha256": "7df9af347d03ebaed85e63a83283e82f493e232a2d7f5b0582edeeb6fe776908",
+        "current_sha256": "7df9af347d03ebaed85e63a83283e82f493e232a2d7f5b0582edeeb6fe776908"
+      },
+      "assets/rooms/poi_hotel_lobby/frame_landscape.glb.import": {
+        "base_sha256": "11607a8dfd74e2f1ecd11d80cde8517ab322084c1e31d738fa255326eb4530c6",
+        "current_sha256": "11607a8dfd74e2f1ecd11d80cde8517ab322084c1e31d738fa255326eb4530c6"
+      },
+      "assets/rooms/poi_hotel_lobby/green_rug.glb": {
+        "base_sha256": "8bc02feb048b80753559b931260ac93cd29d60f5301c5c87a307cc1669b14401",
+        "current_sha256": "8bc02feb048b80753559b931260ac93cd29d60f5301c5c87a307cc1669b14401"
+      },
+      "assets/rooms/poi_hotel_lobby/green_rug.glb.import": {
+        "base_sha256": "542aa2c237d7b0065a174e7c26fb36db5ca329c8187a0747cbe9b8887533d769",
+        "current_sha256": "542aa2c237d7b0065a174e7c26fb36db5ca329c8187a0747cbe9b8887533d769"
+      },
+      "assets/rooms/poi_hotel_lobby/green_table_lamp.glb": {
+        "base_sha256": "e9ca9f47d2baf8ba9e2b68153103a77a90f671ee5beae7a7f5869388b02c45af",
+        "current_sha256": "e9ca9f47d2baf8ba9e2b68153103a77a90f671ee5beae7a7f5869388b02c45af"
+      },
+      "assets/rooms/poi_hotel_lobby/green_table_lamp.glb.import": {
+        "base_sha256": "13a6f3b5471d4a7180ad5aa9561b0646ba569bdca9fb1ef197424fb3897268a5",
+        "current_sha256": "13a6f3b5471d4a7180ad5aa9561b0646ba569bdca9fb1ef197424fb3897268a5"
+      },
+      "assets/rooms/poi_hotel_lobby/hearth.glb": {
+        "base_sha256": "dc1bed52953fad6a3e9a27a169f4d7964594b1ea7b5428c30a17364559981edf",
+        "current_sha256": "dc1bed52953fad6a3e9a27a169f4d7964594b1ea7b5428c30a17364559981edf"
+      },
+      "assets/rooms/poi_hotel_lobby/hearth.glb.import": {
+        "base_sha256": "5cee4fdde7719529d6be991eb54d7d9fe723b782d5cbede22c1566b014265bba",
+        "current_sha256": "5cee4fdde7719529d6be991eb54d7d9fe723b782d5cbede22c1566b014265bba"
+      },
+      "assets/rooms/poi_hotel_lobby/hearth_mantel.glb": {
+        "base_sha256": "331582e4b2f2c73a96cadca4a001333dc5b6f821c0e370fd40cbb0bf3a911b28",
+        "current_sha256": "331582e4b2f2c73a96cadca4a001333dc5b6f821c0e370fd40cbb0bf3a911b28"
+      },
+      "assets/rooms/poi_hotel_lobby/hearth_mantel.glb.import": {
+        "base_sha256": "335ea97f2fb2b5583cca45847ebb3b070f93c494e42040bcd44ff3eb19fd64b6",
+        "current_sha256": "335ea97f2fb2b5583cca45847ebb3b070f93c494e42040bcd44ff3eb19fd64b6"
+      },
+      "assets/rooms/poi_hotel_lobby/key_rack.glb": {
+        "base_sha256": "e12428184411e1601f68871a14fa6e9d25d26c26136f9354424b666190aff888",
+        "current_sha256": "e12428184411e1601f68871a14fa6e9d25d26c26136f9354424b666190aff888"
+      },
+      "assets/rooms/poi_hotel_lobby/key_rack.glb.import": {
+        "base_sha256": "72f641751fcef459c923841837b012de8b476af90bfb960658abd6a9722a27cf",
+        "current_sha256": "72f641751fcef459c923841837b012de8b476af90bfb960658abd6a9722a27cf"
+      },
+      "assets/rooms/poi_hotel_lobby/layout.json": {
+        "base_sha256": "008dafc2dac6910c99d53eb000778a1f9f3f621983eaecd52a71189fef2b50c0",
+        "current_sha256": "008dafc2dac6910c99d53eb000778a1f9f3f621983eaecd52a71189fef2b50c0"
+      },
+      "assets/rooms/poi_hotel_lobby/low_bookshelf.glb": {
+        "base_sha256": "c5f91a00df15c208c7d646a178504df2653878a49faceeacc5241d7b37c2bf4f",
+        "current_sha256": "c5f91a00df15c208c7d646a178504df2653878a49faceeacc5241d7b37c2bf4f"
+      },
+      "assets/rooms/poi_hotel_lobby/low_bookshelf.glb.import": {
+        "base_sha256": "59a377c813b727b5fc3dde6bb77b05ae5cd35501848e12fcb563b52445253de8",
+        "current_sha256": "59a377c813b727b5fc3dde6bb77b05ae5cd35501848e12fcb563b52445253de8"
+      },
+      "assets/rooms/poi_hotel_lobby/luggage_cart.glb": {
+        "base_sha256": "08315af2055d41829cf4da8d5741b6c9050a0b197a2707b6c4f5cafac78a06a2",
+        "current_sha256": "08315af2055d41829cf4da8d5741b6c9050a0b197a2707b6c4f5cafac78a06a2"
+      },
+      "assets/rooms/poi_hotel_lobby/luggage_cart.glb.import": {
+        "base_sha256": "25d0d208ac9a830e39c72a9ca192b9c22e387b6446405cc2d66a44b9df5a30fb",
+        "current_sha256": "25d0d208ac9a830e39c72a9ca192b9c22e387b6446405cc2d66a44b9df5a30fb"
+      },
+      "assets/rooms/poi_hotel_lobby/mantel_decor.glb": {
+        "base_sha256": "2e4fc4b6e1a5457971757bac13d457146f675c25f79ffd47829f4286f632c02d",
+        "current_sha256": "2e4fc4b6e1a5457971757bac13d457146f675c25f79ffd47829f4286f632c02d"
+      },
+      "assets/rooms/poi_hotel_lobby/mantel_decor.glb.import": {
+        "base_sha256": "6e17ddb9e61f85e0c85ebec6373866239aab99c48366c82e00556d1c17bf12fc",
+        "current_sha256": "6e17ddb9e61f85e0c85ebec6373866239aab99c48366c82e00556d1c17bf12fc"
+      },
+      "assets/rooms/poi_hotel_lobby/material_import.gd": {
+        "base_sha256": "4d169a444edc8aaf1d074e7f25483b2732558d78fef17cdc35b63ae7ad4dff09",
+        "current_sha256": "4d169a444edc8aaf1d074e7f25483b2732558d78fef17cdc35b63ae7ad4dff09"
+      },
+      "assets/rooms/poi_hotel_lobby/material_import.gd.uid": {
+        "base_sha256": "91b41317e0471b6441cec9261a1ec3a688e05df8410830dc6069195aab61fc3b",
+        "current_sha256": "91b41317e0471b6441cec9261a1ec3a688e05df8410830dc6069195aab61fc3b"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/blank_name_plaque/reuse_provenance.json": {
+        "base_sha256": "f77653cad635d9fe35029c95ab3200c53140c237968691b8d1c3afbf602b6d65",
+        "current_sha256": "f77653cad635d9fe35029c95ab3200c53140c237968691b8d1c3afbf602b6d65"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/central_foliage/reuse_provenance.json": {
+        "base_sha256": "d08f6b608e1707f7f3f7200d1b52d7605ada6df2d41f27528b9d4d27698f95d9",
+        "current_sha256": "d08f6b608e1707f7f3f7200d1b52d7605ada6df2d41f27528b9d4d27698f95d9"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/central_planter/reuse_provenance.json": {
+        "base_sha256": "b420fe999829b20c3765a49cc380fab3dad7254074e6a05e5dec082d97f3ad44",
+        "current_sha256": "b420fe999829b20c3765a49cc380fab3dad7254074e6a05e5dec082d97f3ad44"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/cowhide_rug/reuse_provenance.json": {
+        "base_sha256": "08201764601f1cc42b9cdf1c80387d88d5f66f5f675752c8b5624dae1baeda5a",
+        "current_sha256": "08201764601f1cc42b9cdf1c80387d88d5f66f5f675752c8b5624dae1baeda5a"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/cream_armchair/reuse_provenance.json": {
+        "base_sha256": "3e8c82419b231ca1a49260457338d9b93ebaa76cedda1141a4697f92c2cc294b",
+        "current_sha256": "3e8c82419b231ca1a49260457338d9b93ebaa76cedda1141a4697f92c2cc294b"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/elevator/reuse_provenance.json": {
+        "base_sha256": "2ba15c698081e4f77bcd0f24af1645a95d7251905728de765c385ebd97c7e997",
+        "current_sha256": "2ba15c698081e4f77bcd0f24af1645a95d7251905728de765c385ebd97c7e997"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/floor_lamp/reuse_provenance.json": {
+        "base_sha256": "4dd3d36558782b731164016f541d7a13e9b3b6015d224e4e68758b4ee4cfe85c",
+        "current_sha256": "4dd3d36558782b731164016f541d7a13e9b3b6015d224e4e68758b4ee4cfe85c"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/frame_landscape/reuse_provenance.json": {
+        "base_sha256": "6e72de18a3e43fcc4bae7f1e9737d56e7424a903480b31da9e59c0d6f39055f9",
+        "current_sha256": "6e72de18a3e43fcc4bae7f1e9737d56e7424a903480b31da9e59c0d6f39055f9"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/green_rug/reuse_provenance.json": {
+        "base_sha256": "2fc30df52b1c3fe198b095085e3d54b51ef7170107cd09ffd7d87d2721b5a392",
+        "current_sha256": "2fc30df52b1c3fe198b095085e3d54b51ef7170107cd09ffd7d87d2721b5a392"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/green_table_lamp/reuse_provenance.json": {
+        "base_sha256": "cbb7efb748f99b53c797c9680ea2b643beaa6fd3b37802d1bc8490598cb2ca6e",
+        "current_sha256": "cbb7efb748f99b53c797c9680ea2b643beaa6fd3b37802d1bc8490598cb2ca6e"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/hearth/reuse_provenance.json": {
+        "base_sha256": "a59b1e17280d7370755db26ed04dba550eb4abbff6abbff93af9108b9b31311c",
+        "current_sha256": "a59b1e17280d7370755db26ed04dba550eb4abbff6abbff93af9108b9b31311c"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/hearth_mantel/reuse_provenance.json": {
+        "base_sha256": "bb99c2ffc8fa90014863058e6267daba7978101cfe727598cbc12b39d9b2bacc",
+        "current_sha256": "bb99c2ffc8fa90014863058e6267daba7978101cfe727598cbc12b39d9b2bacc"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/key_rack/reuse_provenance.json": {
+        "base_sha256": "d3427b7dbf66f8674a7d3c50737fd8d41ffe7a0340056db9bce3fced0c9f0475",
+        "current_sha256": "d3427b7dbf66f8674a7d3c50737fd8d41ffe7a0340056db9bce3fced0c9f0475"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/low_bookshelf/reuse_provenance.json": {
+        "base_sha256": "f8919c0e83dbc6ac4e3d093d8c24223765d391bbe009ba479ef641e2465efebd",
+        "current_sha256": "f8919c0e83dbc6ac4e3d093d8c24223765d391bbe009ba479ef641e2465efebd"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/luggage_cart/reuse_provenance.json": {
+        "base_sha256": "ddc2e87c0f4973e3057f2b58ad2b3dd23e5de7c4d8141c43cc51e912489a6307",
+        "current_sha256": "ddc2e87c0f4973e3057f2b58ad2b3dd23e5de7c4d8141c43cc51e912489a6307"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/mantel_decor/reuse_provenance.json": {
+        "base_sha256": "292bfde03ff1c186298052478a8e675133748651468747de1c0868f5678ab24d",
+        "current_sha256": "292bfde03ff1c186298052478a8e675133748651468747de1c0868f5678ab24d"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/ring_sofa/reuse_provenance.json": {
+        "base_sha256": "358af5512691f05587b5a8a0939f6fe64d24037858bd0ab96b816b4aeadc6f67",
+        "current_sha256": "358af5512691f05587b5a8a0939f6fe64d24037858bd0ab96b816b4aeadc6f67"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/round_side_table/reuse_provenance.json": {
+        "base_sha256": "61cdd1a68114b9f50c4dbed1b9afe7592e39687a24597efb554a2bd0ce160748",
+        "current_sha256": "61cdd1a68114b9f50c4dbed1b9afe7592e39687a24597efb554a2bd0ce160748"
+      },
+      "assets/rooms/poi_hotel_lobby/provenance/wall_clock/reuse_provenance.json": {
+        "base_sha256": "cee796f003d3af0235f4c2c373e225d1c94d80d8aa9695b57420532a96681d15",
+        "current_sha256": "cee796f003d3af0235f4c2c373e225d1c94d80d8aa9695b57420532a96681d15"
+      },
+      "assets/rooms/poi_hotel_lobby/reuse_provenance.json": {
+        "base_sha256": "d325390f1f74cc8e280c6c20eb64f25120f76aec457b66cbbd747bc7a54fa819",
+        "current_sha256": "d325390f1f74cc8e280c6c20eb64f25120f76aec457b66cbbd747bc7a54fa819"
+      },
+      "assets/rooms/poi_hotel_lobby/ring_sofa.glb": {
+        "base_sha256": "740d7426bd5094596e91203fda582c3d2e5a10b6b49bc4cb84e5565bd8d3c86a",
+        "current_sha256": "740d7426bd5094596e91203fda582c3d2e5a10b6b49bc4cb84e5565bd8d3c86a"
+      },
+      "assets/rooms/poi_hotel_lobby/ring_sofa.glb.import": {
+        "base_sha256": "81b5c70e65a76316c38ffb6b1ab4d24f86bd0369d4f5d00d29c0b65cc43533f6",
+        "current_sha256": "81b5c70e65a76316c38ffb6b1ab4d24f86bd0369d4f5d00d29c0b65cc43533f6"
+      },
+      "assets/rooms/poi_hotel_lobby/room_albedo_ao.png": {
+        "base_sha256": "0df498ac3dadd225850dd282b07efa4700e870b64cb671276b6e0514f4779534",
+        "current_sha256": "0df498ac3dadd225850dd282b07efa4700e870b64cb671276b6e0514f4779534"
+      },
+      "assets/rooms/poi_hotel_lobby/room_albedo_ao.png.import": {
+        "base_sha256": "352ed19187d844dae15993ccb40d962089a365aa0330e232ebc5724551bc9c0d",
+        "current_sha256": "352ed19187d844dae15993ccb40d962089a365aa0330e232ebc5724551bc9c0d"
+      },
+      "assets/rooms/poi_hotel_lobby/round_side_table.glb": {
+        "base_sha256": "9ab94878a3b96aaf7e893185170b94b9a9bf7bad02d6915b9fd43c5bb8d76658",
+        "current_sha256": "9ab94878a3b96aaf7e893185170b94b9a9bf7bad02d6915b9fd43c5bb8d76658"
+      },
+      "assets/rooms/poi_hotel_lobby/round_side_table.glb.import": {
+        "base_sha256": "a8b75512405c9b1da2e63405154dcbdbe8bad08570b33d8c3b06140990e192c2",
+        "current_sha256": "a8b75512405c9b1da2e63405154dcbdbe8bad08570b33d8c3b06140990e192c2"
+      },
+      "assets/rooms/poi_hotel_lobby/wall_clock.glb": {
+        "base_sha256": "fc24ffbcd5520bc5ea635b01187f945e11fe15d5e077a9b6d8c772b97f6c15f1",
+        "current_sha256": "fc24ffbcd5520bc5ea635b01187f945e11fe15d5e077a9b6d8c772b97f6c15f1"
+      },
+      "assets/rooms/poi_hotel_lobby/wall_clock.glb.import": {
+        "base_sha256": "2acbe031593d7fdd43d2d4afa8a8c7aa190dea7d187baeb910d83e0492c7a33b",
+        "current_sha256": "2acbe031593d7fdd43d2d4afa8a8c7aa190dea7d187baeb910d83e0492c7a33b"
+      },
+      "assets/rooms/poi_service_hall/armchair.glb": {
+        "base_sha256": "db5a9130ee230b8b1d3cfbdd59ff8ace81f9d7c3641e634eec7746507abcda03",
+        "current_sha256": "db5a9130ee230b8b1d3cfbdd59ff8ace81f9d7c3641e634eec7746507abcda03"
+      },
+      "assets/rooms/poi_service_hall/armchair.glb.import": {
+        "base_sha256": "a89637971df727d19dfca181fb9da6a853e77775f1e282d5e75a51fc9ab278bd",
+        "current_sha256": "a89637971df727d19dfca181fb9da6a853e77775f1e282d5e75a51fc9ab278bd"
+      },
+      "assets/rooms/poi_service_hall/asset_stats.json": {
+        "base_sha256": "c08566dcaf1ab540e49b85941d3ba470ef7d40704a3586c6fd23fd491d92de42",
+        "current_sha256": "c08566dcaf1ab540e49b85941d3ba470ef7d40704a3586c6fd23fd491d92de42"
+      },
+      "assets/rooms/poi_service_hall/brochure_rack.glb": {
+        "base_sha256": "2a91d5947a46dacdbf8a37e8fc12bb24e9535fb978e964e8c13d95e7a696974e",
+        "current_sha256": "2a91d5947a46dacdbf8a37e8fc12bb24e9535fb978e964e8c13d95e7a696974e"
+      },
+      "assets/rooms/poi_service_hall/brochure_rack.glb.import": {
+        "base_sha256": "a9c20f4ac3962b9695518f910116b5e2506c68a5f8cca6576ba67c682b4342d0",
+        "current_sha256": "a9c20f4ac3962b9695518f910116b5e2506c68a5f8cca6576ba67c682b4342d0"
+      },
+      "assets/rooms/poi_service_hall/call_screen.glb": {
+        "base_sha256": "256b6d5cb2bcdc603ff5c46ee04de69c9e93a923c5eafbc9d0bb038686e6a08e",
+        "current_sha256": "256b6d5cb2bcdc603ff5c46ee04de69c9e93a923c5eafbc9d0bb038686e6a08e"
+      },
+      "assets/rooms/poi_service_hall/call_screen.glb.import": {
+        "base_sha256": "4ee938443caa41cc752cbd484d94a94b0735eb0605aef32edd19491356e251df",
+        "current_sha256": "4ee938443caa41cc752cbd484d94a94b0735eb0605aef32edd19491356e251df"
+      },
+      "assets/rooms/poi_service_hall/display_niche_1.glb": {
+        "base_sha256": "d1d1b5e98dcfb4c63afb3a3eea5f9a08c21d2099e0e7e939d876bb9f2896a0c3",
+        "current_sha256": "d1d1b5e98dcfb4c63afb3a3eea5f9a08c21d2099e0e7e939d876bb9f2896a0c3"
+      },
+      "assets/rooms/poi_service_hall/display_niche_1.glb.import": {
+        "base_sha256": "b165d781872d0e2bb2f8b24318be0102de8ee9b4487283cf71e769b5456f848e",
+        "current_sha256": "b165d781872d0e2bb2f8b24318be0102de8ee9b4487283cf71e769b5456f848e"
+      },
+      "assets/rooms/poi_service_hall/display_niche_2.glb": {
+        "base_sha256": "d50889e47f5d1b6b13431ce0102325b468f7c38bf9dc1027dca42715d21596c9",
+        "current_sha256": "d50889e47f5d1b6b13431ce0102325b468f7c38bf9dc1027dca42715d21596c9"
+      },
+      "assets/rooms/poi_service_hall/display_niche_2.glb.import": {
+        "base_sha256": "2761aec157272dcc4bc38350bda8e98b2d7a8ce095169fa2c371a430af98ce70",
+        "current_sha256": "2761aec157272dcc4bc38350bda8e98b2d7a8ce095169fa2c371a430af98ce70"
+      },
+      "assets/rooms/poi_service_hall/hall_albedo_ao_n2.png": {
+        "base_sha256": "79067b0b25e6f07abd962ee77554de9d4836af6c4244672c6bb2f4af1e172651",
+        "current_sha256": "79067b0b25e6f07abd962ee77554de9d4836af6c4244672c6bb2f4af1e172651"
+      },
+      "assets/rooms/poi_service_hall/hall_albedo_ao_n2.png.import": {
+        "base_sha256": "057fd5f3b3a3c73b3e1dfcae55e1e3ed5a3e8a0d69929306ad22399ae216c019",
+        "current_sha256": "057fd5f3b3a3c73b3e1dfcae55e1e3ed5a3e8a0d69929306ad22399ae216c019"
+      },
+      "assets/rooms/poi_service_hall/layout.json": {
+        "base_sha256": "1ab8d2aadfc325d4c1cceba31eadfa8cee7c4e78a852a2b737aac7f43e401a01",
+        "current_sha256": "1ab8d2aadfc325d4c1cceba31eadfa8cee7c4e78a852a2b737aac7f43e401a01"
+      },
+      "assets/rooms/poi_service_hall/name_plaque.glb": {
+        "base_sha256": "d961f76dba10b30ebd9351df70b4d4c03a847cd795ac9d40f06cda20f7c33e84",
+        "current_sha256": "d961f76dba10b30ebd9351df70b4d4c03a847cd795ac9d40f06cda20f7c33e84"
+      },
+      "assets/rooms/poi_service_hall/name_plaque.glb.import": {
+        "base_sha256": "78bc0e2a96d02c88735068cae85718dd8a101cc6834c0c4514a67a3fbd724ffc",
+        "current_sha256": "78bc0e2a96d02c88735068cae85718dd8a101cc6834c0c4514a67a3fbd724ffc"
+      },
+      "assets/rooms/poi_service_hall/notice_board.glb": {
+        "base_sha256": "61c20a440a3144ba366efec27767475a33df3da498eaab619dd9820c9984a723",
+        "current_sha256": "61c20a440a3144ba366efec27767475a33df3da498eaab619dd9820c9984a723"
+      },
+      "assets/rooms/poi_service_hall/notice_board.glb.import": {
+        "base_sha256": "7e0f3a4df81fe6929eeade9086bcfdd349fc07a85188d8dd7620c7849a416be7",
+        "current_sha256": "7e0f3a4df81fe6929eeade9086bcfdd349fc07a85188d8dd7620c7849a416be7"
+      },
+      "assets/rooms/poi_service_hall/peace_lily.glb": {
+        "base_sha256": "48ada69389daddee93f743b42c22662523b6982ca5da548128c532ca292daef0",
+        "current_sha256": "48ada69389daddee93f743b42c22662523b6982ca5da548128c532ca292daef0"
+      },
+      "assets/rooms/poi_service_hall/peace_lily.glb.import": {
+        "base_sha256": "37c8f75b51063692b59192a9a71d175428cc883d025683d2788df9aa40e9fccf",
+        "current_sha256": "37c8f75b51063692b59192a9a71d175428cc883d025683d2788df9aa40e9fccf"
+      },
+      "assets/rooms/poi_service_hall/prop_manifest.json": {
+        "base_sha256": "11d668625559580c59caf632f7bab9492e7d1b06ff79cdd2e2aea4ef90fc4ffe",
+        "current_sha256": "11d668625559580c59caf632f7bab9492e7d1b06ff79cdd2e2aea4ef90fc4ffe"
+      },
+      "assets/rooms/poi_service_hall/prop_palette.json": {
+        "base_sha256": "d102f870eac71598e03ace43a4da554ccb8c8027e5b1acef4d5dd95c9fc97772",
+        "current_sha256": "d102f870eac71598e03ace43a4da554ccb8c8027e5b1acef4d5dd95c9fc97772"
+      },
+      "assets/rooms/poi_service_hall/room_skin.json": {
+        "base_sha256": "eb2f5347189c89cfb7c657b657aa0e4a739c4fed3cf3c7a134bbfa0a7a02fc1e",
+        "current_sha256": "eb2f5347189c89cfb7c657b657aa0e4a739c4fed3cf3c7a134bbfa0a7a02fc1e"
+      },
+      "assets/rooms/poi_service_hall/sculpture_base.glb": {
+        "base_sha256": "f6c011877eedccbe9d0c61d82eb6ed6c9a370f0a2265afffdf60414473030210",
+        "current_sha256": "f6c011877eedccbe9d0c61d82eb6ed6c9a370f0a2265afffdf60414473030210"
+      },
+      "assets/rooms/poi_service_hall/sculpture_base.glb.import": {
+        "base_sha256": "325cf302bd182813d955ec5a941d8a47532a614ac6207bbe7f6bfc5e890001fc",
+        "current_sha256": "325cf302bd182813d955ec5a941d8a47532a614ac6207bbe7f6bfc5e890001fc"
+      },
+      "assets/rooms/poi_service_hall/sculpture_body.glb": {
+        "base_sha256": "ade28de0129fbbe7f0411aba3f57c689249063ce344c0812888f633d61b7dc24",
+        "current_sha256": "ade28de0129fbbe7f0411aba3f57c689249063ce344c0812888f633d61b7dc24"
+      },
+      "assets/rooms/poi_service_hall/sculpture_body.glb.import": {
+        "base_sha256": "2f6fa2be7976961fcbfaf316a5d7bb794aad7796ed67b89ae9f674712e12471f",
+        "current_sha256": "2f6fa2be7976961fcbfaf316a5d7bb794aad7796ed67b89ae9f674712e12471f"
+      },
+      "assets/rooms/poi_service_hall/small_round_table.glb": {
+        "base_sha256": "139b6beb2de93962a9055087c770674ff5683ff60a0b528aa43d701d5e24fd17",
+        "current_sha256": "139b6beb2de93962a9055087c770674ff5683ff60a0b528aa43d701d5e24fd17"
+      },
+      "assets/rooms/poi_service_hall/small_round_table.glb.import": {
+        "base_sha256": "1c00f82a86a7a4b5e8e2e09e0a9cf5683a677bc6263a1725b714540abdb98c60",
+        "current_sha256": "1c00f82a86a7a4b5e8e2e09e0a9cf5683a677bc6263a1725b714540abdb98c60"
+      },
+      "assets/rooms/poi_service_hall/sofa_three_seat.glb": {
+        "base_sha256": "6a6b0eba3bf25e8ab202ca5b6f9b3e4729b31ddcad62c44d22e8a2beee94ef89",
+        "current_sha256": "6a6b0eba3bf25e8ab202ca5b6f9b3e4729b31ddcad62c44d22e8a2beee94ef89"
+      },
+      "assets/rooms/poi_service_hall/sofa_three_seat.glb.import": {
+        "base_sha256": "1ac682f7cf3c7fe7615e50a6211b274664b8400e87ebb3b0308b46f3cae306d5",
+        "current_sha256": "1ac682f7cf3c7fe7615e50a6211b274664b8400e87ebb3b0308b46f3cae306d5"
+      },
+      "assets/rooms/poi_service_hall/wall_clock.glb": {
+        "base_sha256": "189fa1924293e0fe308aeb1264a474a18eac01d74c70a7cbc5061d0464b3ec7b",
+        "current_sha256": "189fa1924293e0fe308aeb1264a474a18eac01d74c70a7cbc5061d0464b3ec7b"
+      },
+      "assets/rooms/poi_service_hall/wall_clock.glb.import": {
+        "base_sha256": "46dbc1defa1926eee00534bcbf172566f257707482056c32320c552213f412ed",
+        "current_sha256": "46dbc1defa1926eee00534bcbf172566f257707482056c32320c552213f412ed"
+      },
+      "assets/rooms/poi_service_hall/wall_sconce.glb": {
+        "base_sha256": "8f2b913f10fabe420956bc6fdf0209c1912003b5eac140ff7d2c432ef6508590",
+        "current_sha256": "8f2b913f10fabe420956bc6fdf0209c1912003b5eac140ff7d2c432ef6508590"
+      },
+      "assets/rooms/poi_service_hall/wall_sconce.glb.import": {
+        "base_sha256": "c876436bc14239fb1cc8cee29d6d6cdc1d1a3dd5fe4e63864eaa379b66bb9246",
+        "current_sha256": "c876436bc14239fb1cc8cee29d6d6cdc1d1a3dd5fe4e63864eaa379b66bb9246"
+      },
+      "assets/rooms/poi_service_hall/water_dispenser.glb": {
+        "base_sha256": "8c70a5c62346d0f10bd910c94294bf3b1184ecc3d640f3db6d079b9e2fd53378",
+        "current_sha256": "8c70a5c62346d0f10bd910c94294bf3b1184ecc3d640f3db6d079b9e2fd53378"
+      },
+      "assets/rooms/poi_service_hall/water_dispenser.glb.import": {
+        "base_sha256": "1b65c3d44246b86ba3a6bf80ef08732dffa9134d30004a5110d3036f0ad1fc4e",
+        "current_sha256": "1b65c3d44246b86ba3a6bf80ef08732dffa9134d30004a5110d3036f0ad1fc4e"
+      },
+      "assets/rooms/poi_service_hall/window_flowerbox.glb": {
+        "base_sha256": "2e0523728673954a62a66fb674a8a0a3030692c373a35cc88c655ed246bc5dd0",
+        "current_sha256": "2e0523728673954a62a66fb674a8a0a3030692c373a35cc88c655ed246bc5dd0"
+      },
+      "assets/rooms/poi_service_hall/window_flowerbox.glb.import": {
+        "base_sha256": "dd6ff5f24f0929116363fece77ef918850aa95871590a3347b1129121cbdeee7",
+        "current_sha256": "dd6ff5f24f0929116363fece77ef918850aa95871590a3347b1129121cbdeee7"
+      },
+      "scenes/poi_hotel_lobby/poi_hotel_lobby_art.gd": {
+        "base_sha256": "0051723ad2522e1b3cb494b43ce0a8ef8b00b8952f6b089c24f2beb4bf95f7e8",
+        "current_sha256": "0051723ad2522e1b3cb494b43ce0a8ef8b00b8952f6b089c24f2beb4bf95f7e8"
+      },
+      "scenes/poi_hotel_lobby/poi_hotel_lobby_art.gd.uid": {
+        "base_sha256": "18655f1b1a986241ce662dde995a400d6ff2e1dcbf70a0c55882dcb4a592d189",
+        "current_sha256": "18655f1b1a986241ce662dde995a400d6ff2e1dcbf70a0c55882dcb4a592d189"
+      },
+      "scenes/poi_hotel_lobby/poi_hotel_lobby_art.tscn": {
+        "base_sha256": "b96ee259903f99e7e475699f0cd83cf0aa1e663e8694f93d1fade2901f6589da",
+        "current_sha256": "b96ee259903f99e7e475699f0cd83cf0aa1e663e8694f93d1fade2901f6589da"
+      },
+      "scenes/poi_service_hall/poi_service_hall_art.gd": {
+        "base_sha256": "834b4265e161049b2482f2e4cf3497cc523dd28ad556ebdc0d97909cfcb4ef87",
+        "current_sha256": "834b4265e161049b2482f2e4cf3497cc523dd28ad556ebdc0d97909cfcb4ef87"
+      },
+      "scenes/poi_service_hall/poi_service_hall_art.gd.uid": {
+        "base_sha256": "dd8d2b7b2cfd1ce6d16bca69af4dc083cb8ca68afa0b16f8ee07c5597f4f9f74",
+        "current_sha256": "dd8d2b7b2cfd1ce6d16bca69af4dc083cb8ca68afa0b16f8ee07c5597f4f9f74"
+      },
+      "scenes/poi_service_hall/poi_service_hall_art.tscn": {
+        "base_sha256": "28734aad1fd9d2051537b7fff6145279b4d5fba735ebc1f638918f7e673c5d7e",
+        "current_sha256": "28734aad1fd9d2051537b7fff6145279b4d5fba735ebc1f638918f7e673c5d7e"
+      },
+      "scenes/shell_hall/shell_hall_art.gd": {
+        "base_sha256": "09626759f40f234004d50f0bf70cdde6b1873f52be90948d7828fbd6ea13d697",
+        "current_sha256": "09626759f40f234004d50f0bf70cdde6b1873f52be90948d7828fbd6ea13d697"
+      },
+      "scenes/shell_hall/shell_hall_art.gd.uid": {
+        "base_sha256": "3d06749b4ddc46b7104119a564cc4402f55e854fe972f0716295f2d3534c9d04",
+        "current_sha256": "3d06749b4ddc46b7104119a564cc4402f55e854fe972f0716295f2d3534c9d04"
+      },
+      "scenes/shell_hall/shell_hall_art.tscn": {
+        "base_sha256": "6d58f3752750ae7bf93e9f6c4f28b80458c4342403b9de012bcddc98116ab51d",
+        "current_sha256": "6d58f3752750ae7bf93e9f6c4f28b80458c4342403b9de012bcddc98116ab51d"
+      }
+    },
+    "images": {
+      "assets/rooms/poi_hotel_lobby/room_albedo_ao_b.png": {
+        "sha256": "204a72715a138ea481fcd4952960d97b71d025d63822206fc26f7e2ab7bab0e5",
+        "uid": "uid://dst3jmya700ws"
+      },
+      "assets/rooms/poi_hotel_lobby/sign_b.png": {
+        "sha256": "d4835e9e213c664d5f00e47f9f42b65aed7a47b2b328c991584f55ef5fe6d9dd",
+        "uid": "uid://d1f6k1ltaxlad"
+      },
+      "assets/rooms/poi_service_hall/room_albedo_ao_b.png": {
+        "sha256": "f035524a52c193d86bb5b7ec2a847b30810f9a6c60319675bfc31a75b0a10f5b",
+        "uid": "uid://dentyxnqygfi5"
+      },
+      "assets/rooms/poi_service_hall/sign_b.png": {
+        "sha256": "cf6a591367e89a53c0eaa0e0aeb7160031935a4daaac96abce856f44a974bf45",
+        "uid": "uid://durgxj5r3il1u"
+      }
+    },
+    "original_glbs": 53,
+    "options_geometry": {
+      "niches": {
+        "display_niche_1": {
+          "hidden_mesh": "display_niche_1/Export temporary/Body",
+          "normal_max_error": 0.000104779377579689,
+          "removed_triangles": 620,
+          "retained_triangles": 2701,
+          "scene": "variants/b/display_niche_1.tscn",
+          "source_sha256": "d1d1b5e98dcfb4c63afb3a3eea5f9a08c21d2099e0e7e939d876bb9f2896a0c3"
+        },
+        "display_niche_2": {
+          "hidden_mesh": "display_niche_2/Export temporary/Body",
+          "normal_max_error": 0.000104779377579689,
+          "removed_triangles": 452,
+          "retained_triangles": 2701,
+          "scene": "variants/b/display_niche_2.tscn",
+          "source_sha256": "d50889e47f5d1b6b13431ce0102325b468f7c38bf9dc1027dca42715d21596c9"
+        }
+      },
+      "checks": [
+        {
+          "check": "Pack res://assets/rooms/poi_hotel_lobby/variants/b/sign_patch.tscn",
+          "passed": true
+        },
+        {
+          "check": "Save res://assets/rooms/poi_hotel_lobby/variants/b/sign_patch.tscn",
+          "passed": true
+        },
+        {
+          "check": "Pack res://assets/rooms/poi_service_hall/variants/b/sign_patch.tscn",
+          "passed": true
+        },
+        {
+          "check": "Save res://assets/rooms/poi_service_hall/variants/b/sign_patch.tscn",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 has one merged mesh",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 removes only approved mock exhibits",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 frame array retained 0",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 frame array retained 4",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 frame array retained 3",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 frame array retained 12",
+          "passed": true
+        },
+        {
+          "check": "display_niche_1 normal encoding tolerance",
+          "passed": true
+        },
+        {
+          "check": "Pack res://assets/rooms/poi_service_hall/variants/b/display_niche_1.tscn",
+          "passed": true
+        },
+        {
+          "check": "Save res://assets/rooms/poi_service_hall/variants/b/display_niche_1.tscn",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 has one merged mesh",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 removes only approved mock exhibits",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 frame array retained 0",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 frame array retained 4",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 frame array retained 3",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 frame array retained 12",
+          "passed": true
+        },
+        {
+          "check": "display_niche_2 normal encoding tolerance",
+          "passed": true
+        },
+        {
+          "check": "Pack res://assets/rooms/poi_service_hall/variants/b/display_niche_2.tscn",
+          "passed": true
+        },
+        {
+          "check": "Save res://assets/rooms/poi_service_hall/variants/b/display_niche_2.tscn",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "passed": true
+  }
+}
