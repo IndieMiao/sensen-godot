@@ -22,9 +22,10 @@
 > - 补了 q 行的文案（第 7.4 节）。
 > **v0.8（11-03）**：G 服务端的 v4q(9) 两件（周瑜，奕星 11-02 派）：
 > - 第 9.2 节：First Dig **完成以后 `view.first_dig` 照样给**（`done: true`、`have` = `floor`），Lv3 以前才是 null（v4q(9) 的矿脉行要分清「完成了」和「还没出现」，和亚瑟、刘邦对过，#636 评论 6574856129）；写明完成时的事件（`first_dig`、`gear`、`affinity`）；
-> - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，补注待用户批）；第 7.4 节补台词；
+> - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，用户已批）；第 7.4 节补台词；
 > - 试玩路由 `/v1/p0/dev/blackjack` 改 Homestead 等级时也结算 First Dig（后裔审 #697 时提的）；
-> - 第 10.1 节补矿层资源的口径（守关场地、电梯站、守关层王的出生点、配色的键），资产已进 b1。
+> - 第 10.1 节补矿层资源的口径（守关场地、电梯站、守关层王的出生点、配色的键），资产已进 b1；
+> - 第 7.1 节加 `view.mine.paid_today`（今天各矿交过费的层，出矿后照样给），矿口卡的 `Enter mine · Free` 照它写（亚瑟 11-03）。
 > **v0.7+（11-02 晚）**：第 10 节补怪物导入的后处理脚本（上官婉儿 11-02）：导入时顶点色当底色、关投影；运行时换材质、选模型时要注意的两点。
 > **v0.7（11-02 15:xx）用户批复**：用户 14:4x 批了 355 待批清单「全按推荐」、v4q 八条整条批（奕星转）。E / F / G 原来标〔待用户定〕的都按推荐定了，本文件里对应的地方改成已定：
 > - 丁12 矿脉开局就能去：删掉 `types.vein.gate`（内容改动归苏烈，亚瑟对账时分的）；
@@ -356,10 +357,12 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
     },
     "next": { "floor": 13, "paid": false, "fee": 2, "open": false, "locked": null }
   },
-  "records": { "wd-254-114": { "deepest": 23, "guards": [20] } }
+  "records": { "wd-254-114": { "deepest": 23, "guards": [20] } },
+  "paid_today": { "wd-254-114": [1, 2, 10] }
 }
 ```
 - `at` 只在人在矿里时有；`floor_state` 只给当前层。换层以后看命令返回的 view。
+- `paid_today`（v0.8，亚瑟要给矿口卡用）：今天每座矿交过层费的层，从小到大；出了矿也照样给。人在矿外时，日切以后清空；日切时人如果在矿里，当前这一层按新的一天记成已付（丁15：留在原层、不再收层费），所以那时是 `{当前矿: [当前层]}`，不是空的（后裔审 #705 时提的）。矿口卡的主键照它写：这座矿的 F1 在里面就写 `Enter mine · Free`，不在就写 `Enter mine · 2 Energy`（LOCK-21）。没进过任何矿时是 `{}`。
 - 按周瑜355评论a5b58542补 `at.prev: null | {floor, paid, fee}`：F1为null；其余为上一层，paid读当天该矿该层记录，已付fee=0，否则为floor_energy。用于电梯到深层后向上进入未付费层的名字条和收费卡；不含next的清怪限制。
 - `mobs` 的顺序就是 targets / hurt_by 的下标。`tier` 只有守关有，其余是 0。
 - `deck`：点了火把以后才有，是本层牌堆按物品的合计，敲掉的牌不算；没点火把是 null。`bag_ok`：下一张牌整份放得下，只影响岩石是否置灰。
@@ -420,7 +423,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - **view**：`view.first_dig: null | { giver, floor, have, done }`。Lv3 以前是 null；出现了、还没完成时 `done: false`，`have` 是资历（不超过 `floor`）；**完成以后照样给，`{ giver, floor, have: floor, done: true }`**（v4q(9) 的矿脉行要分清「完成了」和「还没出现」）。Today 只照 `done: false` 的出一行，第 7.4 节的文案按 q 行。
 - **Pip 一句**（v4q(9) ②）：`view.pip_line: null | { key: 'pip_vein', vein, name }`。条件四条都满足才给：First Dig 已完成；引导已经结束（`guide.step` 为空，不进引导的号同样算）；`seen` 里没有 `line:pip_vein`；那座铁矿脉（`wild.ts` 的 `nearestFreeVein(c, s, 'iron_ore')`，离家最近的免费铁矿脉，和 Today 矿脉行永远指同一座）的 deepest < 10。没有这座矿脉时不给。`name` 是那座矿的全名（地图钉和矿口卡上的同一个），客户端拿它填台词的 `%s`。
   - **记「说过」走现有的 `talk`，不加新命令**：`{type: 'talk', resident: 'res_pip'}` 时 `pip_line` 待说，就往 `seen` 记 `line:pip_vein`，不管当天的聊天好感加没加；之后 view 不再给 `pip_line`。和别的居民说话不记。
-  - **引导台词先说**（**不知火舞定，补注待用户批**：11-03 奕星请她定；李白在 v4q(9) 补注、挂 302，奕星报用户，b1 合回 farm-dev 之前要批）：引导进行中服务端不给 `pip_line`，Pip 照说引导台词，这时和 Pip 说话也不记「说过」；引导结束以后的下一次和 Pip 说话才说矿脉这一句，只说一次，不会因为撞上引导而丢掉。
+  - **引导台词先说**（不知火舞定，**用户已批**：v4q(9) ② 的 11-03 补注随 q(279) 报，用户 11-03 在奕星终端回「279 ok」、无消息 id；补注 3c09a6ce、已批 farm-dev c8a2b4bb，302 记录 b1cbc904）：引导进行中服务端不给 `pip_line`，Pip 照说引导台词，这时和 Pip 说话也不记「说过」；引导结束以后的下一次和 Pip 说话才说矿脉这一句，只说一次，不会因为撞上引导而丢掉。
   - 客户端（刘邦，#636）：打开 Pip 对话时，看到 `pip_line` 就说这一句并留到这轮对话结束，再照常发 `talk`；回包里 `pip_line` 没了也不撤。没有 `pip_line` 就照原来的台词（引导台词或好感阶段的台词）。
   - **存档**：不加新字段（`seen` 是现有字段），v7 清档，不迁移。
 - **奖励** `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
@@ -511,6 +514,7 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 - **口径**（坐标都是层里的米，原点和 `mine_layout.gd` 一样）：
   - 守关场地 `guard_arena.glb`：摆在 (4.9, 0, −3.8)，即 `ROCK_BOUNDS` 的中心；外框不超过 `ROCK_BOUNDS` 的 7.0 × 4.5；整个只当装饰、不带碰撞；后沿的高物放在 x 2.7–6.8（离电梯 (1.25, 0, −6.75) 和下行梯 (8.25, 0, −6.75) 都 ≥ 1.6 m，实测 x 3.15–6.51）；≤ 3000 面。
   - 电梯站 `elevator_station.glb`：换掉代码拼的电梯，摆在 `Layout.ELEVATOR` (1.25, 0, −6.75)，+Z 朝镜头；底座 1.45 × 1.3，平台顶面 0.17，总高 ≤ 2.3；≤ 2500 面。两个空节点：`PlateAnchor` (0, 0.99, 0.515) 挂 Label3D 写层号（只写数字或 `F10` 这样的短号，深色粗体，字高约占牌子的七成），`LampAnchor` (0.8, 0.73, 0.47) 挂锁定 / 解锁灯（锁定琥珀 `#dba158`、解锁绿 `#a5e3bc`，照现在代码的颜色）。
+  - 岩块（不知火舞 11-03 定，上官婉儿同意）：**每座矿统一用它主矿的岩块**：铁矿脉 `rock_iron_ore`、石英矿脉 `rock_quartz`、浅坑 `rock_copper_ore`；煤块这批不用。岩石掉什么按发牌定（第 5 节），敲开前看不出，所以不按矿种随机画，以免给错误提示。每块绕竖轴随机转一个角度、大小在 0.9–1.1 倍之间随机，同一块固定（按岩石的序号和本层的种子算）。
   - 守关层的王出生在 `mine_combat.SPAWNS[0]` (4.75, 0, −5.0)，会满层追，跳扑约 2.5 m（占位数，F 的数值为准）。
   - 配色：每段四个键 `ground` / `wall` / `backdrop_tint` / `fog`，按 `from ≤ 层 ≤ to` 查，超出最后一段就用最后一段；第 1 段和现在线上的颜色一样。`backdrop_tint` 是背景的 floor_tint；`fog` 同时给背景的 void_tint 和 `Environment.background_color`（不开真正的雾）。`vein_tint` 已撤回，不加。
   - 背景 shader 加 `uniform float vein_mask = 0.0`，只有 `types/<type>/backdrop.glb` 设 1（老的 mine_backdrop.glb 在 Godot 里 UV2.y 全是 1.0，不开关会整片不套色）；UV2.y 以 Godot 读到的值为准（Blender 导出时 v 会翻成 1 − v）。

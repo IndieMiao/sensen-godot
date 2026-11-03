@@ -403,3 +403,25 @@ describe('355 E v0.5 rock deck, ground and first acquisitions (cases 5,14,15a,15
     expect(count(x.s.bag, pack[0])).toBe(pack[1]);
   });
 });
+
+describe('view.mine.paid_today: the floors paid for today, out of the mine too (LOCK-21, 亚瑟 for the mine card)', () => {
+  it('lists each mine\'s paid floors, keeps them after leaving, makes F1 free again, and empties at the rollover', () => {
+    const x = scenario();
+    const paid = () => (viewOf(x.c, x.s, x.now).mine as unknown as { paid_today: Record<string, number[]> }).paid_today;
+    expect(paid()).toEqual({});
+    x.start();
+    expect(paid()).toEqual({ [Q]: [1] });
+    for (let i = 0; i < x.state().mobs.length; i++) x.kill(i);
+    x.send({ type: 'mine_floor', floor: 1, to: 2 });
+    expect(paid()).toEqual({ [Q]: [1, 2] });
+    x.send({ type: 'talk', resident: 'res_pip', space: 'home' });   // out of the mine
+    expect(x.s.mine.day!.at).toBeNull();
+    expect(paid()).toEqual({ [Q]: [1, 2] });
+    const energy = x.s.energy.value;
+    const again = x.send({ type: 'mine_enter', mine: Q });
+    expect(again.events.some(e => e.kind === 'energy' && e.delta < 0)).toBe(false);   // `Enter mine · Free`
+    expect(x.s.energy.value).toBeGreaterThanOrEqual(energy);
+    x.send({ type: 'talk', resident: 'res_pip', space: 'home' });
+    expect((viewOf(x.c, x.s, x.now + DAY).mine as unknown as { paid_today: Record<string, number[]> }).paid_today).toEqual({});
+  });
+});

@@ -32,11 +32,11 @@ describe('the wild sites a save freezes (v4q(3))', () => {
 
   it('near3_sites: the free 3 in near3\'s order with type, main and name; the nearest free iron and quartz veins (v4q(9))', () => {
     const s = freshState(c, 'wild-frozen-sites', T0);
-    const sites = (viewOf(c, s, T0) as { wild: { near3_sites: { id: string; type: string; main: string | null; name: string }[] } }).wild.near3_sites;
+    const sites = (viewOf(c, s, T0) as { wild: { near3_sites: { id: string; type: string; main: string | null; name: string; lat: number; lng: number }[] } }).wild.near3_sites;
     expect(sites.map(x => x.id)).toEqual(s.travel.wild_near3);
     for (const x of sites) {
       const site = wildById(c, x.id)!;
-      expect(x).toEqual({ id: site.id, type: site.type, main: site.mine?.main ?? null, name: site.name });
+      expect(x).toEqual({ id: site.id, type: site.type, main: site.mine?.main ?? null, name: site.name, lat: site.lat, lng: site.lng });   // lat / lng for Show (亚瑟)
       expect(x.name).toBe(siteFor(c, s, site, T0).name);   // the pin's and the mine card's name
     }
     expect(sites.map(x => x.type === 'quarry' ? 'quarry' : x.main).sort()).toEqual(['iron_ore', 'quarry', 'quartz']);   // 庚3: one of each
