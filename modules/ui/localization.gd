@@ -62,6 +62,15 @@ func use_p0(path := P0_SETTINGS_PATH) -> void:
 		set_cjk_fonts(true)
 	TranslationServer.set_locale(locale)
 
+## One English word, two Chinese ones (李白's notes §三 #8 / #9, 不知火舞 385 B): the skill `Cooking` 烹饪 vs the stove's
+## `Cooking` 烹饪中, the family `Water` 水 vs the button's `Water` 浇水. Under P0's 中文 the table's `"<src>@<context>"`
+## (`Cooking@skill`, `Water@family`) when it has one, else `src` as it is — English always `src`. The label keeps
+## translating: the Chinese has no letters (P0Translation passes it), and a word with no such key reads its plain one.
+## A format too: `ctx("%d", "trip") % 6` is `6` in English, 「第 6 档」 by `%d@trip` (the city card's `6 · Continental`).
+func ctx(src: String, context: String) -> String:
+	if p0_translation == null or TranslationServer.get_locale() != "zh_CN": return src
+	return str(p0_translation.exact("%s@%s" % [src, context], src))
+
 ## UiKit's three weights (nunito_w400 / 700 / 800) draw Chinese through Noto Sans SC, 700 and 800 emboldened (Journey's
 ## GameUi.theme did 0.45; 不知火舞 sets the values from shots). Only under 中文: a fallback adds its ascent and descent to
 ## every line's height, which would move the English layouts measured to the frames.
@@ -116,11 +125,12 @@ func select_p0_language(locale: String, path := P0_SETTINGS_PATH) -> Error:
 ## nothing is written there once, for the translators.
 class P0Translation extends Translation:
 	var _exact := {}
-	var _templates: Array = []   # [RegEx, Chinese, literal length] — the longest literal tried first
+	var _templates: Array = []   # [RegEx, Chinese, literal length, %s count, has ` · `] — the longest literal tried first
 	var _cache := {}
 	const CACHE_MAX := 4096
 	const PLURAL_ENDINGS := ["s", "es"]   # `%d dish%s`: English's plural, nothing in Chinese (李白's notes, q(275))
 	const LINK := " ›"   # a row or key that opens something: the arrow stays, the words before it are translated
+	const LIST_LAST := {" and ": "和", " or ": "或"}   # a list's last item: `Carrot and Herb` 胡萝卜和香草
 	var _misses := {}
 	var _miss_file: FileAccess
 	static var SPEC := _spec_re()
@@ -151,13 +161,15 @@ class P0Translation extends Translation:
 			var en := str(source)
 			var zh = data[source]
 			if en.begins_with("_") or not zh is String or str(zh).is_empty(): continue
-			if SPEC.search(en) != null:
+			if SPEC.search(en) != null and not en.contains("@"):   # a context key (`%d@trip`) is Localization.ctx's, whole
 				var re := RegEx.new()
 				if re.compile(_pattern(en)) == OK:
-					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length()])
+					_templates.append([re, str(zh), en.replace("%d", "").replace("%s", "").length(), en.count("%s"), en.contains(" · ")])
 			else:
 				_exact[en] = str(zh)
-		_templates.sort_custom(func(a, b): return int(a[2]) > int(b[2]))
+		# as long: the one with fewer %s first — `%d XP` takes `+20 XP` (「+20 经验」), `%s XP` the skill's `Farming XP`
+		# (「种植经验」), #649 第二批 ②
+		_templates.sort_custom(func(a, b): return int(a[2]) > int(b[2]) or (int(a[2]) == int(b[2]) and int(a[3]) < int(b[3])))
 
 	static func _pattern(en: String) -> String:
 		var out := "^"
@@ -203,11 +215,17 @@ class P0Translation extends Translation:
 		_miss_file.store_line(s.c_escape())
 		_miss_file.flush()
 
+	## The table's own line for `s`, nothing pieced together (Localization.ctx's `<src>@<context>` keys).
+	func exact(s: String, otherwise := "") -> String: return str(_exact.get(s, otherwise))
+
 	## The Chinese for one line, or "" when no part of it is known.
 	func translate_line(s: String) -> String:
 		if _exact.has(s): return _exact[s]
 		var t := _template(s)
 		if t != "": return t
+		if s.ends_with(" · ") and s.length() > 3:   # a line's first half drawn on its own (the HUD's `San Francisco · `)
+			var head := translate_line(s.left(s.length() - 3))
+			return head + " · " if head != "" else ""
 		var bare := s.strip_edges()
 		if bare != s and bare != "":   # a label padded with spaces (`Muscle Memory `): the spaces stay where they were
 			var z := translate_line(bare)
@@ -244,19 +262,35 @@ class P0Translation extends Translation:
 		if count != null and count.get_start() > 0:
 			var head := translate_line(s.left(count.get_start()))
 			return head + count.get_string() if head != "" else ""
-		if s.contains(", "):   # a list: only when every item is known, joined the Chinese way
-			var items: Array = []
-			for item in s.split(", "):
-				var z := translate_line(item)
-				if z == "": return ""
-				items.append(z)
-			return "、".join(items)
+		# a list: only when every item is known, joined the Chinese way — `Carrot, Herb` 胡萝卜、香草; with its last item
+		# after ` and ` / ` or ` (`Carrot and Herb`, `A, B and C`, `Grilled or Soup`) 和 / 或 before it (#649 第二批 ⑩).
+		# A template has had the whole line first (`Try %s or %s`); a sentence with an unknown word stays English.
+		for conj in LIST_LAST:
+			var at := s.rfind(conj)
+			if at <= 0: continue
+			var items := _list_items(s.left(at).split(", ") + PackedStringArray([s.substr(at + conj.length())]))
+			if items.is_empty(): return ""
+			return "、".join(items.slice(0, -1)) + str(LIST_LAST[conj]) + str(items[-1])
+		if s.contains(", "):
+			return "、".join(_list_items(s.split(", ")))
 		return ""
+
+	## Each item's Chinese, or [] when one is not known.
+	func _list_items(parts: PackedStringArray) -> Array:
+		var items: Array = []
+		for item in parts:
+			var z := translate_line(item)
+			if z == "": return []
+			items.append(z)
+		return items
 
 	func _template(s: String) -> String:
 		for entry in _templates:
 			var m: RegExMatch = (entry[0] as RegEx).search(s)
 			if m == null: continue
+			# a template with no ` · ` of its own is one part: `%s XP` does not take `Common · First cook +10 XP` whole,
+			# the line's parts go one by one (`First cook +%d XP` the second) — #649 第二批 ⑦
+			if not bool(entry[4]) and s.contains(" · "): continue
 			var values: Array = []
 			for g in range(1, m.get_group_count() + 1):
 				var v := m.get_string(g)

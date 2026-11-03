@@ -16,6 +16,11 @@ What reads as copy (SGODOT-385, 亚瑟's first-round shots 385 7d6077a4: names, 
 - content: the text keys (TEXT_KEYS) and everything under a text dict (TEXT_DICTS: a resident's `lines` by stage, the
   tools' `names` by id). Place-name pools stay English (city_clusters, pond / tea / keeper / terrain words,
   landmarks, country names), and world_gen's overrides are notes.
+
+Cities (#649 第二批 ④, 口径「城市用通行中文名」): only the open home cities and each one's fallback ten (about 140, as the
+server's homeCities / fallbackOf reach them: server/tools/i18n_city_names.ts) go to their own list,
+tools/p0/i18n/p0_cities_en.json {name: {"ids", "country", "homes", "done"?, "also_line"?}}, for 李白; their Chinese goes in
+the main table like any line. `also_line`: the name is also a line in the code (San Francisco): one key for both, so a city named like a word would read it.
 """
 import json, re, subprocess, sys
 from pathlib import Path
@@ -118,6 +123,24 @@ def main() -> None:
     dest.write_text(json.dumps(dict(sorted(out.items())), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     kinds = {k: sum(1 for e in out.values() if e["kind"] == k) for k in ("line", "template")}
     print(f'{len(out)} lines ({kinds["line"]} lines, {kinds["template"]} templates), {sum(1 for e in out.values() if e.get("done"))} done → {dest.relative_to(ROOT)}')
+    cities(out, done)
+
+def cities(lines: dict, done: dict) -> None:
+    rows = json.loads(subprocess.run(['node', '--import', 'tsx', 'tools/i18n_city_names.ts'], capture_output=True, text=True,
+                                     cwd=ROOT / 'server', check=True).stdout)
+    out: dict = {}
+    for r in rows:
+        e = out.setdefault(r['name'], {"ids": [], "country": r['country'], "homes": []})
+        e["ids"].append(r['id'])
+        e["homes"] += [h for h in r['homes'] if h not in e["homes"]]
+    for name, e in out.items():
+        if name in done: e["done"] = True
+        if name in lines: e["also_line"] = True
+    dest = ROOT / 'tools/p0/i18n/p0_cities_en.json'
+    dest.write_text(json.dumps(dict(sorted(out.items())), ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    homes = sorted({h for e in out.values() for h in e["homes"]})
+    print(f'{len(out)} cities ({len(homes)} home cities and their fallback ten), {sum(1 for e in out.values() if e.get("done"))} done, '
+          f'{sum(1 for e in out.values() if e.get("also_line"))} also lines the code shows → {dest.relative_to(ROOT)}')
 
 if __name__ == '__main__':
     sys.exit(main())

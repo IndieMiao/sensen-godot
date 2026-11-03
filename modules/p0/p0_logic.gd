@@ -425,6 +425,16 @@ const DISH_STANDIN := {
 
 const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
+## A line as the player will read it: P0's table's Chinese under 中文 (Localization.use_p0), else the English as it is
+## (#649 第二批 ⑨: what a width is measured on, never the English a label is given).
+static func shown(text: String) -> String: return String(TranslationServer.translate(text))
+
+## `text`'s width in a UiKit style's font and size (the theme the panels draw with): the cuts that keep a line to a
+## width measure with it.
+static func text_width(text: String, style: StringName = UiTokens.STYLE_C11_B) -> float:
+	var th := UiKit.theme()
+	return th.get_font(&"font", style).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, th.get_font_size(&"font_size", style)).x
+
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
 	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now

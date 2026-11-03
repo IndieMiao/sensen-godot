@@ -14,27 +14,27 @@
  },
  "%[+-]?[0-9]*(\\\\.[0-9]+)?[dsf]": {
   "where": [
-   "modules/ui/localization.gd:131"
+   "modules/ui/localization.gd:141"
   ],
   "kind": "line"
  },
  "%d %s around %s right now.": {
   "where": [
-   "modules/p0/p0_logic.gd:2067"
+   "modules/p0/p0_logic.gd:2077"
   ],
   "kind": "template",
   "done": true
  },
  "%d %s · %d each": {
   "where": [
-   "modules/p0/p0_board.gd:130"
+   "modules/p0/p0_board.gd:135"
   ],
   "kind": "template",
   "done": true
  },
  "%d %s · any kind": {
   "where": [
-   "modules/p0/p0_board.gd:132"
+   "modules/p0/p0_board.gd:137"
   ],
   "kind": "template",
   "done": true
@@ -48,10 +48,10 @@
  },
  "%d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:644",
-   "modules/p0/p0_logic.gd:698",
-   "modules/p0/p0_logic.gd:711",
-   "modules/p0/p0_logic.gd:1171",
+   "modules/p0/p0_logic.gd:654",
+   "modules/p0/p0_logic.gd:708",
+   "modules/p0/p0_logic.gd:721",
+   "modules/p0/p0_logic.gd:1181",
    "modules/p0/p0_material_logic.gd:188"
   ],
   "kind": "template",
@@ -88,7 +88,7 @@
  },
  "%d XP to go": {
   "where": [
-   "modules/p0/p0_item_info.gd:542",
+   "modules/p0/p0_item_info.gd:543",
    "modules/p0/p0_logic.gd:192",
    "scenes/p0/panels/p0_skills_drawer.gd:84"
   ],
@@ -104,8 +104,8 @@
  },
  "%d coins": {
   "where": [
-   "modules/p0/p0_board.gd:85",
-   "modules/p0/p0_board.gd:87",
+   "modules/p0/p0_board.gd:86",
+   "modules/p0/p0_board.gd:88",
    "scenes/p0/p0_ui.gd:3461",
    "scenes/p0/panels/p0_counter_drawer.gd:492",
    "scenes/p0/panels/p0_local_request.gd:87"
@@ -129,7 +129,7 @@
  },
  "%d coins · Bonus resets in %s": {
   "where": [
-   "modules/p0/p0_board.gd:88"
+   "modules/p0/p0_board.gd:89"
   ],
   "kind": "template",
   "done": true
@@ -143,7 +143,7 @@
  },
  "%d dish%s in bag": {
   "where": [
-   "modules/p0/p0_logic.gd:844"
+   "modules/p0/p0_logic.gd:854"
   ],
   "kind": "template",
   "done": true
@@ -174,14 +174,14 @@
  },
  "%d fish in creel": {
   "where": [
-   "modules/p0/p0_logic.gd:821"
+   "modules/p0/p0_logic.gd:831"
   ],
   "kind": "template",
   "done": true
  },
  "%d fish not found in %s": {
   "where": [
-   "modules/p0/p0_board.gd:126"
+   "modules/p0/p0_board.gd:131"
   ],
   "kind": "template",
   "done": true
@@ -268,7 +268,7 @@
  },
  "%d refund%s left today": {
   "where": [
-   "modules/p0/p0_logic.gd:1156"
+   "modules/p0/p0_logic.gd:1166"
   ],
   "kind": "template",
   "done": true
@@ -296,7 +296,7 @@
  },
  "%d today": {
   "where": [
-   "modules/p0/p0_logic.gd:2186"
+   "modules/p0/p0_logic.gd:2196"
   ],
   "kind": "template",
   "done": true
@@ -310,7 +310,7 @@
  },
  "%d × %s coins": {
   "where": [
-   "modules/p0/p0_item_info.gd:552"
+   "modules/p0/p0_item_info.gd:553"
   ],
   "kind": "template",
   "done": true
@@ -324,7 +324,7 @@
  },
  "%d%% of home price": {
   "where": [
-   "modules/p0/p0_item_info.gd:588"
+   "modules/p0/p0_item_info.gd:589"
   ],
   "kind": "template",
   "done": true
@@ -332,14 +332,14 @@
  "%d/%d today": {
   "where": [
    "modules/p0/p0_barter.gd:24",
-   "modules/p0/p0_logic.gd:862"
+   "modules/p0/p0_logic.gd:872"
   ],
   "kind": "template",
   "done": true
  },
  "%d/%d today · %d coins": {
   "where": [
-   "modules/p0/p0_logic.gd:872"
+   "modules/p0/p0_logic.gd:882"
   ],
   "kind": "template",
   "done": true
@@ -359,9 +359,9 @@
  },
  "%dh": {
   "where": [
-   "modules/p0/p0_board.gd:243",
+   "modules/p0/p0_board.gd:248",
    "modules/p0/p0_item_info.gd:281",
-   "modules/p0/p0_logic.gd:452",
+   "modules/p0/p0_logic.gd:462",
    "modules/p0/p0_travel.gd:97"
   ],
   "kind": "template",
@@ -370,8 +370,8 @@
  "%dh %dm": {
   "where": [
    "modules/p0/p0_item_info.gd:281",
-   "modules/p0/p0_logic.gd:444",
-   "modules/p0/p0_logic.gd:453"
+   "modules/p0/p0_logic.gd:454",
+   "modules/p0/p0_logic.gd:463"
   ],
   "kind": "template",
   "done": true
@@ -385,7 +385,7 @@
  },
  "%dh left": {
   "where": [
-   "modules/p0/p0_logic.gd:882"
+   "modules/p0/p0_logic.gd:892"
   ],
   "kind": "template",
   "done": true
@@ -393,7 +393,7 @@
  "%dm": {
   "where": [
    "modules/p0/p0_item_info.gd:280",
-   "modules/p0/p0_logic.gd:451",
+   "modules/p0/p0_logic.gd:461",
    "modules/p0/p0_travel.gd:97"
   ],
   "kind": "template",
@@ -408,14 +408,14 @@
  },
  "%dm left": {
   "where": [
-   "modules/p0/p0_logic.gd:882"
+   "modules/p0/p0_logic.gd:892"
   ],
   "kind": "template",
   "done": true
  },
  "%ds": {
   "where": [
-   "modules/p0/p0_item_info.gd:533"
+   "modules/p0/p0_item_info.gd:534"
   ],
   "kind": "template",
   "done": true
@@ -457,8 +457,8 @@
  },
  "%s Lv%d": {
   "where": [
-   "modules/p0/p0_logic.gd:1321",
-   "modules/p0/p0_logic.gd:1407",
+   "modules/p0/p0_logic.gd:1331",
+   "modules/p0/p0_logic.gd:1417",
    "modules/p0/p0_material_logic.gd:601"
   ],
   "kind": "template",
@@ -481,7 +481,7 @@
  },
  "%s Lv%d · %d XP to go": {
   "where": [
-   "modules/p0/p0_logic.gd:1728",
+   "modules/p0/p0_logic.gd:1738",
    "modules/p0/p0_runtime.gd:1193"
   ],
   "kind": "template",
@@ -496,7 +496,7 @@
  },
  "%s Postcard": {
   "where": [
-   "modules/p0/p0_logic.gd:545"
+   "modules/p0/p0_logic.gd:555"
   ],
   "kind": "template",
   "done": true
@@ -533,21 +533,21 @@
  },
  "%s board slot": {
   "where": [
-   "modules/p0/p0_board.gd:215"
+   "modules/p0/p0_board.gd:220"
   ],
   "kind": "template",
   "done": true
  },
  "%s buy-back today %d/%d": {
   "where": [
-   "modules/p0/p0_item_info.gd:596"
+   "modules/p0/p0_item_info.gd:597"
   ],
   "kind": "template",
   "done": true
  },
  "%s coins": {
   "where": [
-   "modules/p0/p0_item_info.gd:551",
+   "modules/p0/p0_item_info.gd:552",
    "modules/p0/p0_runtime.gd:829"
   ],
   "kind": "template",
@@ -571,7 +571,7 @@
  },
  "%s dishes and up": {
   "where": [
-   "modules/p0/p0_logic.gd:1972"
+   "modules/p0/p0_logic.gd:1982"
   ],
   "kind": "template",
   "done": true
@@ -585,7 +585,7 @@
  },
  "%s fish now stay on the hook": {
   "where": [
-   "modules/p0/p0_logic.gd:1483"
+   "modules/p0/p0_logic.gd:1493"
   ],
   "kind": "template",
   "done": true
@@ -613,14 +613,14 @@
  },
  "%s has a request for you.": {
   "where": [
-   "modules/p0/p0_logic.gd:2074"
+   "modules/p0/p0_logic.gd:2084"
   ],
   "kind": "template",
   "done": true
  },
  "%s is closest.": {
   "where": [
-   "modules/p0/p0_logic.gd:2086"
+   "modules/p0/p0_logic.gd:2096"
   ],
   "kind": "template",
   "done": true
@@ -642,7 +642,7 @@
  },
  "%s km · Trip %d · %s": {
   "where": [
-   "modules/p0/p0_item_info.gd:589",
+   "modules/p0/p0_item_info.gd:590",
    "modules/p0/p0_travel.gd:142",
    "scenes/p0/panels/p0_city_row.gd:251"
   ],
@@ -673,28 +673,28 @@
  },
  "%s need Fishing Lv%d.": {
   "where": [
-   "modules/p0/p0_logic.gd:2087"
+   "modules/p0/p0_logic.gd:2097"
   ],
   "kind": "template",
   "done": true
  },
  "%s needs %d Energy · you have %d": {
   "where": [
-   "modules/p0/p0_logic.gd:820"
+   "modules/p0/p0_logic.gd:830"
   ],
   "kind": "template",
   "done": true
  },
  "%s needs Fishing %s": {
   "where": [
-   "modules/p0/p0_item_info.gd:477"
+   "modules/p0/p0_item_info.gd:478"
   ],
   "kind": "template",
   "done": true
  },
  "%s now %s on the hook": {
   "where": [
-   "modules/p0/p0_logic.gd:1485"
+   "modules/p0/p0_logic.gd:1495"
   ],
   "kind": "template",
   "done": true
@@ -737,8 +737,8 @@
  },
  "%s ready at the stove": {
   "where": [
-   "modules/p0/p0_logic.gd:782",
-   "modules/p0/p0_logic.gd:1682"
+   "modules/p0/p0_logic.gd:792",
+   "modules/p0/p0_logic.gd:1692"
   ],
   "kind": "template",
   "done": true
@@ -746,18 +746,18 @@
  "%s ready in %s": {
   "where": [
    "modules/p0/p0_guide.gd:152",
-   "modules/p0/p0_logic.gd:788",
-   "modules/p0/p0_logic.gd:1656",
-   "scenes/p0/panels/p0_profile_page.gd:238"
+   "modules/p0/p0_logic.gd:798",
+   "modules/p0/p0_logic.gd:1666",
+   "scenes/p0/panels/p0_profile_page.gd:241"
   ],
   "kind": "template",
   "done": true
  },
  "%s ready to harvest": {
   "where": [
-   "modules/p0/p0_logic.gd:778",
+   "modules/p0/p0_logic.gd:788",
    "modules/p0/p0_notify.gd:41",
-   "scenes/p0/panels/p0_profile_page.gd:237"
+   "scenes/p0/panels/p0_profile_page.gd:240"
   ],
   "kind": "template",
   "done": true
@@ -785,7 +785,7 @@
  },
  "%s title": {
   "where": [
-   "modules/p0/p0_logic.gd:1394"
+   "modules/p0/p0_logic.gd:1404"
   ],
   "kind": "template",
   "done": true
@@ -813,7 +813,7 @@
  },
  "%s · %d/%d fish": {
   "where": [
-   "modules/p0/p0_logic.gd:1827"
+   "modules/p0/p0_logic.gd:1837"
   ],
   "kind": "template",
   "done": true
@@ -827,8 +827,8 @@
  },
  "%s · %s left at the stove": {
   "where": [
-   "modules/p0/p0_logic.gd:783",
-   "modules/p0/p0_logic.gd:1683"
+   "modules/p0/p0_logic.gd:793",
+   "modules/p0/p0_logic.gd:1693"
   ],
   "kind": "template",
   "done": true
@@ -842,7 +842,7 @@
  },
  "%s · %s · local request": {
   "where": [
-   "modules/p0/p0_locals.gd:78"
+   "modules/p0/p0_locals.gd:79"
   ],
   "kind": "template",
   "done": true
@@ -885,7 +885,7 @@
  },
  "%s · Checked in": {
   "where": [
-   "modules/p0/p0_logic.gd:1967"
+   "modules/p0/p0_logic.gd:1977"
   ],
   "kind": "template",
   "done": true
@@ -899,14 +899,14 @@
  },
  "%s · Cook it at the stove": {
   "where": [
-   "modules/p0/p0_logic.gd:947"
+   "modules/p0/p0_logic.gd:957"
   ],
   "kind": "template",
   "done": true
  },
  "%s · Deliver at the Stall": {
   "where": [
-   "modules/p0/p0_logic.gd:776"
+   "modules/p0/p0_logic.gd:786"
   ],
   "kind": "template",
   "done": true
@@ -920,7 +920,7 @@
  },
  "%s · Grow it on your plots": {
   "where": [
-   "modules/p0/p0_logic.gd:945"
+   "modules/p0/p0_logic.gd:955"
   ],
   "kind": "template",
   "done": true
@@ -934,7 +934,7 @@
  },
  "%s · Homestead Stall": {
   "where": [
-   "modules/p0/p0_logic.gd:944"
+   "modules/p0/p0_logic.gd:954"
   ],
   "kind": "template",
   "done": true
@@ -948,7 +948,7 @@
  },
  "%s · Limit reached · %s": {
   "where": [
-   "modules/p0/p0_logic.gd:1600"
+   "modules/p0/p0_logic.gd:1610"
   ],
   "kind": "template",
   "done": true
@@ -984,7 +984,7 @@
  },
  "%s · Ponds on the map": {
   "where": [
-   "modules/p0/p0_logic.gd:946"
+   "modules/p0/p0_logic.gd:956"
   ],
   "kind": "template",
   "done": true
@@ -1013,7 +1013,7 @@
  },
  "%s · Timber or Stone": {
   "where": [
-   "modules/p0/p0_logic.gd:2335"
+   "modules/p0/p0_logic.gd:2345"
   ],
   "kind": "template",
   "done": true
@@ -1055,7 +1055,7 @@
  },
  "%s · local request": {
   "where": [
-   "modules/p0/p0_locals.gd:78"
+   "modules/p0/p0_locals.gd:79"
   ],
   "kind": "template",
   "done": true
@@ -1083,7 +1083,7 @@
  },
  "%s · when %s %s ready": {
   "where": [
-   "modules/p0/p0_logic.gd:1710"
+   "modules/p0/p0_logic.gd:1720"
   ],
   "kind": "template",
   "done": true
@@ -1216,7 +1216,7 @@
  },
  "%s? I'll take them, though home pays better.": {
   "where": [
-   "modules/p0/p0_logic.gd:2146"
+   "modules/p0/p0_logic.gd:2156"
   ],
   "kind": "template",
   "done": true
@@ -1249,7 +1249,7 @@
    "modules/p0/p0_kitchen_logic.gd:485",
    "modules/p0/p0_kitchen_logic.gd:656",
    "modules/p0/p0_kitchen_logic.gd:1019",
-   "modules/p0/p0_logic.gd:1324"
+   "modules/p0/p0_logic.gd:1334"
   ],
   "kind": "template",
   "done": true
@@ -1277,7 +1277,7 @@
  },
  "+%d bag slots": {
   "where": [
-   "modules/p0/p0_item_info.gd:487"
+   "modules/p0/p0_item_info.gd:488"
   ],
   "kind": "template",
   "done": true
@@ -1303,10 +1303,10 @@
  "+%d more": {
   "where": [
    "modules/p0/p0_bite_board.gd:161",
-   "modules/p0/p0_item_info.gd:498",
+   "modules/p0/p0_item_info.gd:499",
    "modules/p0/p0_kitchen_logic.gd:954",
    "modules/p0/p0_logic.gd:396",
-   "modules/p0/p0_logic.gd:536"
+   "modules/p0/p0_logic.gd:546"
   ],
   "kind": "template",
   "done": true
@@ -1335,29 +1335,29 @@
  },
  "+1 in": {
   "where": [
-   "modules/p0/p0_logic.gd:920"
+   "modules/p0/p0_logic.gd:930"
   ],
   "kind": "line"
  },
  "+1 in %s": {
   "where": [
-   "modules/p0/p0_logic.gd:810",
-   "modules/p0/p0_logic.gd:839",
-   "modules/p0/p0_logic.gd:1886"
+   "modules/p0/p0_logic.gd:820",
+   "modules/p0/p0_logic.gd:849",
+   "modules/p0/p0_logic.gd:1896"
   ],
   "kind": "template",
   "done": true
  },
  "+1 slot": {
   "where": [
-   "modules/p0/p0_logic.gd:2215"
+   "modules/p0/p0_logic.gd:2225"
   ],
   "kind": "line",
   "done": true
  },
  "+1 sprinkler": {
   "where": [
-   "modules/p0/p0_logic.gd:2216"
+   "modules/p0/p0_logic.gd:2226"
   ],
   "kind": "line",
   "done": true
@@ -1402,7 +1402,7 @@
  },
  "10 more to till": {
   "where": [
-   "modules/p0/p0_logic.gd:2217"
+   "modules/p0/p0_logic.gd:2227"
   ],
   "kind": "line",
   "done": true
@@ -1437,7 +1437,7 @@
  },
  "3-day Forecast": {
   "where": [
-   "modules/p0/p0_logic.gd:1376"
+   "modules/p0/p0_logic.gd:1386"
   ],
   "kind": "line",
   "done": true
@@ -1451,7 +1451,7 @@
  },
  "3rd slot": {
   "where": [
-   "modules/p0/p0_logic.gd:1342"
+   "modules/p0/p0_logic.gd:1352"
   ],
   "kind": "line",
   "done": true
@@ -1479,14 +1479,14 @@
  },
  "8 more to till": {
   "where": [
-   "modules/p0/p0_logic.gd:2218"
+   "modules/p0/p0_logic.gd:2228"
   ],
   "kind": "line",
   "done": true
  },
  "A 3rd pot slot · three-family dishes": {
   "where": [
-   "modules/p0/p0_logic.gd:1285"
+   "modules/p0/p0_logic.gd:1295"
   ],
   "kind": "line",
   "done": true
@@ -1762,7 +1762,7 @@
  },
  "All quiet.": {
   "where": [
-   "modules/p0/p0_logic.gd:2076"
+   "modules/p0/p0_logic.gd:2086"
   ],
   "kind": "line",
   "done": true
@@ -1805,7 +1805,7 @@
  },
  "Any %s %s": {
   "where": [
-   "modules/p0/p0_logic.gd:1233"
+   "modules/p0/p0_logic.gd:1243"
   ],
   "kind": "template",
   "done": true
@@ -1819,14 +1819,14 @@
  },
  "Any news in town?": {
   "where": [
-   "modules/p0/p0_logic.gd:2040"
+   "modules/p0/p0_logic.gd:2050"
   ],
   "kind": "line",
   "done": true
  },
  "Any seasoning": {
   "where": [
-   "modules/p0/p0_logic.gd:1232"
+   "modules/p0/p0_logic.gd:1242"
   ],
   "kind": "line",
   "done": true
@@ -1894,7 +1894,7 @@
  },
  "Apr": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -1903,7 +1903,7 @@
  },
  "Arctic": {
   "where": [
-   "modules/p0/p0_logic.gd:2121"
+   "modules/p0/p0_logic.gd:2131"
   ],
   "kind": "line"
  },
@@ -1937,8 +1937,8 @@
  },
  "At home": {
   "where": [
-   "modules/p0/p0_logic.gd:835",
-   "modules/p0/p0_logic.gd:2344"
+   "modules/p0/p0_logic.gd:845",
+   "modules/p0/p0_logic.gd:2354"
   ],
   "kind": "line",
   "done": true
@@ -1963,7 +1963,7 @@
  },
  "Atlantic": {
   "where": [
-   "modules/p0/p0_logic.gd:2121"
+   "modules/p0/p0_logic.gd:2131"
   ],
   "kind": "line"
  },
@@ -1996,7 +1996,7 @@
  },
  "Aug": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -2005,15 +2005,15 @@
  },
  "Available": {
   "where": [
-   "modules/p0/p0_logic.gd:824",
-   "modules/p0/p0_logic.gd:2185"
+   "modules/p0/p0_logic.gd:834",
+   "modules/p0/p0_logic.gd:2195"
   ],
   "kind": "line",
   "done": true
  },
  "Available again in": {
   "where": [
-   "modules/p0/p0_logic.gd:2193"
+   "modules/p0/p0_logic.gd:2203"
   ],
   "kind": "line",
   "done": true
@@ -2084,7 +2084,7 @@
  },
  "Bag": {
   "where": [
-   "modules/p0/p0_logic.gd:2237",
+   "modules/p0/p0_logic.gd:2247",
    "scenes/p0/panels/p0_compost_drawer.gd:54",
    "scenes/p0/panels/p0_counter_drawer.gd:201",
    "scenes/ui_kit/ui_bag_header.gd:39",
@@ -2095,15 +2095,15 @@
  },
  "Bag %d · after %s": {
   "where": [
-   "modules/p0/p0_logic.gd:2237"
+   "modules/p0/p0_logic.gd:2247"
   ],
   "kind": "template",
   "done": true
  },
  "Bag %d → %d": {
   "where": [
-   "modules/p0/p0_logic.gd:2233",
-   "modules/p0/p0_logic.gd:2236"
+   "modules/p0/p0_logic.gd:2243",
+   "modules/p0/p0_logic.gd:2246"
   ],
   "kind": "template",
   "done": true
@@ -2145,8 +2145,8 @@
  },
  "Bag Upgrade I · 150 coins": {
   "where": [
-   "modules/p0/p0_logic.gd:2328",
-   "modules/p0/p0_logic.gd:2391"
+   "modules/p0/p0_logic.gd:2338",
+   "modules/p0/p0_logic.gd:2401"
   ],
   "kind": "line",
   "done": true
@@ -2160,7 +2160,7 @@
  },
  "Bag Upgrade II · 400 coins": {
   "where": [
-   "modules/p0/p0_logic.gd:2207"
+   "modules/p0/p0_logic.gd:2217"
   ],
   "kind": "line",
   "done": true
@@ -2174,7 +2174,7 @@
  },
  "Bag Upgrade III · 1,000 coins": {
   "where": [
-   "modules/p0/p0_logic.gd:2209"
+   "modules/p0/p0_logic.gd:2219"
   ],
   "kind": "line",
   "done": true
@@ -2227,7 +2227,7 @@
  },
  "Bag ×%d": {
   "where": [
-   "modules/p0/p0_item_info.gd:541"
+   "modules/p0/p0_item_info.gd:542"
   ],
   "kind": "template",
   "done": true
@@ -2321,7 +2321,7 @@
  },
  "Batch Cook": {
   "where": [
-   "modules/p0/p0_logic.gd:1292"
+   "modules/p0/p0_logic.gd:1302"
   ],
   "kind": "line",
   "done": true
@@ -2406,7 +2406,7 @@
  },
  "Big Pot · 2 servings on any stove": {
   "where": [
-   "modules/p0/p0_logic.gd:2206"
+   "modules/p0/p0_logic.gd:2216"
   ],
   "kind": "line",
   "done": true
@@ -2420,14 +2420,14 @@
  },
  "Bigger Creel": {
   "where": [
-   "modules/p0/p0_logic.gd:1377"
+   "modules/p0/p0_logic.gd:1387"
   ],
   "kind": "line",
   "done": true
  },
  "Bigger Provisions": {
   "where": [
-   "modules/p0/p0_logic.gd:1292"
+   "modules/p0/p0_logic.gd:1302"
   ],
   "kind": "line",
   "done": true
@@ -2462,13 +2462,6 @@
   "kind": "template",
   "done": true
  },
- "Bite window %.1f s": {
-  "where": [
-   "modules/p0/p0_item_info.gd:460"
-  ],
-  "kind": "template",
-  "done": true
- },
  "Bites come faster": {
   "where": [
    "modules/p0/p0_item_info.gd:362"
@@ -2485,7 +2478,7 @@
  },
  "Biting now": {
   "where": [
-   "modules/p0/p0_logic.gd:1376",
+   "modules/p0/p0_logic.gd:1386",
    "modules/p0/p0_pond_card.gd:31"
   ],
   "kind": "line",
@@ -2569,7 +2562,7 @@
  },
  "Board's empty.": {
   "where": [
-   "modules/p0/p0_logic.gd:2103"
+   "modules/p0/p0_logic.gd:2113"
   ],
   "kind": "line",
   "done": true
@@ -2598,7 +2591,7 @@
  },
  "Bonus +%d": {
   "where": [
-   "modules/p0/p0_logic.gd:919"
+   "modules/p0/p0_logic.gd:929"
   ],
   "kind": "template",
   "done": true
@@ -2613,7 +2606,7 @@
  },
  "Bonus today": {
   "where": [
-   "modules/p0/p0_board.gd:29"
+   "modules/p0/p0_board.gd:30"
   ],
   "kind": "line",
   "done": true
@@ -2634,7 +2627,7 @@
  },
  "Bring %d fish that %s's ponds don't have to %s.": {
   "where": [
-   "modules/p0/p0_board.gd:210"
+   "modules/p0/p0_board.gd:215"
   ],
   "kind": "template",
   "done": true
@@ -2683,7 +2676,7 @@
  },
  "Bring the required %s to %s.": {
   "where": [
-   "modules/p0/p0_board.gd:204"
+   "modules/p0/p0_board.gd:209"
   ],
   "kind": "template",
   "done": true
@@ -3023,8 +3016,8 @@
  },
  "Cast": {
   "where": [
-   "modules/p0/p0_logic.gd:1171",
-   "modules/p0/p0_logic.gd:1178",
+   "modules/p0/p0_logic.gd:1181",
+   "modules/p0/p0_logic.gd:1188",
    "modules/p0/p0_runtime.gd:1190",
    "scenes/p0/p0_pond.gd:204",
    "scenes/p0/p0_pond.gd:231"
@@ -3107,7 +3100,7 @@
  },
  "Catch protection %d left today": {
   "where": [
-   "modules/p0/p0_logic.gd:1205"
+   "modules/p0/p0_logic.gd:1215"
   ],
   "kind": "template",
   "done": true
@@ -3231,14 +3224,14 @@
  },
  "Chef": {
   "where": [
-   "modules/p0/p0_logic.gd:1390"
+   "modules/p0/p0_logic.gd:1400"
   ],
   "kind": "line",
   "done": true
  },
  "Chef's Sign": {
   "where": [
-   "modules/p0/p0_logic.gd:2210",
+   "modules/p0/p0_logic.gd:2220",
    "modules/p0/p0_world_prompts.gd:58",
    "scenes/p0/p0_farm.gd:1154"
   ],
@@ -3247,7 +3240,7 @@
  },
  "Chef's Touch": {
   "where": [
-   "modules/p0/p0_logic.gd:1293"
+   "modules/p0/p0_logic.gd:1303"
   ],
   "kind": "line",
   "done": true
@@ -3399,8 +3392,8 @@
  },
  "Claim a parcel first": {
   "where": [
-   "modules/p0/p0_logic.gd:1113",
-   "modules/p0/p0_logic.gd:1132"
+   "modules/p0/p0_logic.gd:1123",
+   "modules/p0/p0_logic.gd:1142"
   ],
   "kind": "line",
   "done": true
@@ -3428,7 +3421,7 @@
  },
  "Clay Bank": {
   "where": [
-   "modules/p0/p0_logic.gd:2325",
+   "modules/p0/p0_logic.gd:2335",
    "assets/p0/p0_content.json#name"
   ],
   "kind": "line",
@@ -3436,7 +3429,7 @@
  },
  "Clay Bank opened": {
   "where": [
-   "modules/p0/p0_logic.gd:2389"
+   "modules/p0/p0_logic.gd:2399"
   ],
   "kind": "line",
   "done": true
@@ -3457,7 +3450,7 @@
  },
  "Clay next to the Reed Bank": {
   "where": [
-   "modules/p0/p0_logic.gd:2325"
+   "modules/p0/p0_logic.gd:2335"
   ],
   "kind": "line",
   "done": true
@@ -3500,7 +3493,7 @@
  },
  "Close": {
   "where": [
-   "modules/p0/p0_logic.gd:2193",
+   "modules/p0/p0_logic.gd:2203",
    "scenes/p0/home/p0_home_panel.gd:113",
    "scenes/p0/panels/p0_blackjack_page.gd:330",
    "scenes/p0/panels/p0_board_request.gd:83",
@@ -3556,14 +3549,14 @@
  },
  "Coffee's fresh. %d %s left today.": {
   "where": [
-   "modules/p0/p0_logic.gd:2073"
+   "modules/p0/p0_logic.gd:2083"
   ],
   "kind": "template",
   "done": true
  },
  "Coffee's fresh. %s's been asking for a hand.": {
   "where": [
-   "modules/p0/p0_logic.gd:2072"
+   "modules/p0/p0_logic.gd:2082"
   ],
   "kind": "template",
   "done": true
@@ -3571,7 +3564,7 @@
  "Coins": {
   "where": [
    "modules/p0/p0_logic.gd:168",
-   "modules/p0/p0_logic.gd:2316",
+   "modules/p0/p0_logic.gd:2326",
    "modules/p0/p0_material_logic.gd:571",
    "scenes/p0/p0_map.gd:933"
   ],
@@ -3580,7 +3573,7 @@
  },
  "Coins · sell crops and fish at the Homestead Stall": {
   "where": [
-   "modules/p0/p0_logic.gd:2362"
+   "modules/p0/p0_logic.gd:2372"
   ],
   "kind": "line",
   "done": true
@@ -3646,8 +3639,8 @@
  "Common": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:9",
-   "modules/p0/p0_logic.gd:1142",
-   "modules/p0/p0_logic.gd:1497"
+   "modules/p0/p0_logic.gd:1152",
+   "modules/p0/p0_logic.gd:1507"
   ],
   "kind": "line",
   "done": true
@@ -3762,7 +3755,7 @@
  "Cook": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:295",
-   "modules/p0/p0_logic.gd:821",
+   "modules/p0/p0_logic.gd:831",
    "scenes/p0/kitchen/p0_cook_confirm.gd:15",
    "scenes/p0/kitchen/p0_cook_confirm.gd:18",
    "scenes/p0/kitchen/p0_kitchen.gd:496"
@@ -3773,7 +3766,7 @@
  "Cook Again": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:755",
-   "modules/p0/p0_logic.gd:1290"
+   "modules/p0/p0_logic.gd:1300"
   ],
   "kind": "line",
   "done": true
@@ -3795,8 +3788,8 @@
  },
  "Cook with %d fish": {
   "where": [
-   "modules/p0/p0_logic.gd:787",
-   "modules/p0/p0_logic.gd:1689"
+   "modules/p0/p0_logic.gd:797",
+   "modules/p0/p0_logic.gd:1699"
   ],
   "kind": "template",
   "done": true
@@ -4129,14 +4122,14 @@
  },
  "Creel %d · %d free": {
   "where": [
-   "modules/p0/p0_logic.gd:1201"
+   "modules/p0/p0_logic.gd:1211"
   ],
   "kind": "template",
   "done": true
  },
  "Creel full": {
   "where": [
-   "modules/p0/p0_logic.gd:1178"
+   "modules/p0/p0_logic.gd:1188"
   ],
   "kind": "line",
   "done": true
@@ -4202,7 +4195,7 @@
  },
  "Crops & fish · no daily limit": {
   "where": [
-   "modules/p0/p0_item_info.gd:586"
+   "modules/p0/p0_item_info.gd:587"
   ],
   "kind": "line",
   "done": true
@@ -4217,7 +4210,7 @@
  },
  "Crops ready %d%% sooner": {
   "where": [
-   "modules/p0/p0_item_info.gd:526"
+   "modules/p0/p0_item_info.gd:527"
   ],
   "kind": "template",
   "done": true
@@ -4366,14 +4359,14 @@
  },
  "Deals the cards": {
   "where": [
-   "modules/p0/p0_logic.gd:2044"
+   "modules/p0/p0_logic.gd:2054"
   ],
   "kind": "line",
   "done": true
  },
  "Dec": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -4412,11 +4405,11 @@
  },
  "Deliver": {
   "where": [
-   "modules/p0/p0_board.gd:58",
-   "modules/p0/p0_board.gd:61",
-   "modules/p0/p0_board.gd:64",
-   "modules/p0/p0_board.gd:67",
-   "modules/p0/p0_locals.gd:51"
+   "modules/p0/p0_board.gd:59",
+   "modules/p0/p0_board.gd:62",
+   "modules/p0/p0_board.gd:65",
+   "modules/p0/p0_board.gd:68",
+   "modules/p0/p0_locals.gd:52"
   ],
   "kind": "line",
   "done": true
@@ -4582,7 +4575,7 @@
  },
  "Done": {
   "where": [
-   "modules/p0/p0_board.gd:40",
+   "modules/p0/p0_board.gd:41",
    "scenes/p0/p0_farm_decor.gd:414"
   ],
   "kind": "line",
@@ -4598,7 +4591,7 @@
  },
  "Double Clue": {
   "where": [
-   "modules/p0/p0_logic.gd:1290"
+   "modules/p0/p0_logic.gd:1300"
   ],
   "kind": "line",
   "done": true
@@ -4673,7 +4666,7 @@
  },
  "Eat": {
   "where": [
-   "modules/p0/p0_logic.gd:844"
+   "modules/p0/p0_logic.gd:854"
   ],
   "kind": "line",
   "done": true
@@ -4699,7 +4692,7 @@
  "Eat · +%d Energy": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:544",
-   "modules/p0/p0_logic.gd:1222"
+   "modules/p0/p0_logic.gd:1232"
   ],
   "kind": "template",
   "done": true
@@ -4713,7 +4706,7 @@
  },
  "Edit look": {
   "where": [
-   "scenes/p0/panels/p0_profile_page.gd:324"
+   "scenes/p0/panels/p0_profile_page.gd:327"
   ],
   "kind": "line",
   "done": true
@@ -4788,7 +4781,7 @@
    "modules/p0/p0_trap.gd:76",
    "scenes/p0/panels/p0_bag_drawer.gd:297",
    "scenes/p0/rooms/p0_farmhouse.gd:442",
-   "scenes/ui_kit/ui_item_cell.gd:573"
+   "scenes/ui_kit/ui_item_cell.gd:602"
   ],
   "kind": "line",
   "done": true
@@ -4810,7 +4803,7 @@
  },
  "Energy %d/%d%s": {
   "where": [
-   "modules/p0/p0_logic.gd:838"
+   "modules/p0/p0_logic.gd:848"
   ],
   "kind": "template",
   "done": true
@@ -4826,16 +4819,16 @@
   "where": [
    "modules/p0/p0_kitchen_logic.gd:539",
    "modules/p0/p0_kitchen_logic.gd:539",
-   "modules/p0/p0_logic.gd:831",
-   "modules/p0/p0_logic.gd:865",
-   "modules/p0/p0_logic.gd:2195"
+   "modules/p0/p0_logic.gd:841",
+   "modules/p0/p0_logic.gd:875",
+   "modules/p0/p0_logic.gd:2205"
   ],
   "kind": "line",
   "done": true
  },
  "Energy full · eat later": {
   "where": [
-   "modules/p0/p0_logic.gd:1217",
+   "modules/p0/p0_logic.gd:1227",
    "modules/p0/p0_runtime.gd:1219"
   ],
   "kind": "line",
@@ -4850,7 +4843,7 @@
  },
  "Energy returns %s× faster · Meals %d a day": {
   "where": [
-   "modules/p0/p0_logic.gd:902"
+   "modules/p0/p0_logic.gd:912"
   ],
   "kind": "template",
   "done": true
@@ -5034,14 +5027,14 @@
  "Expires in": {
   "where": [
    "modules/p0/p0_item_info.gd:370",
-   "modules/p0/p0_logic.gd:1131"
+   "modules/p0/p0_logic.gd:1141"
   ],
   "kind": "line",
   "done": true
  },
  "Expires in 24h": {
   "where": [
-   "modules/p0/p0_logic.gd:1113"
+   "modules/p0/p0_logic.gd:1123"
   ],
   "kind": "line",
   "done": true
@@ -5184,7 +5177,7 @@
  },
  "Farming %d + Fishing %d · Cooking not counted": {
   "where": [
-   "modules/p0/p0_logic.gd:2364"
+   "modules/p0/p0_logic.gd:2374"
   ],
   "kind": "template",
   "done": true
@@ -5205,14 +5198,14 @@
  },
  "Farming Lv%d at your first harvest": {
   "where": [
-   "modules/p0/p0_logic.gd:1704"
+   "modules/p0/p0_logic.gd:1714"
   ],
   "kind": "template",
   "done": true
  },
  "Farming Lv%d with this harvest": {
   "where": [
-   "modules/p0/p0_logic.gd:1670"
+   "modules/p0/p0_logic.gd:1680"
   ],
   "kind": "template",
   "done": true
@@ -5226,7 +5219,7 @@
  },
  "Fast Mastery": {
   "where": [
-   "modules/p0/p0_logic.gd:1292"
+   "modules/p0/p0_logic.gd:1302"
   ],
   "kind": "line",
   "done": true
@@ -5247,7 +5240,7 @@
  },
  "Feb": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -5300,16 +5293,16 @@
  },
  "Fertilize": {
   "where": [
-   "modules/p0/p0_logic.gd:603",
-   "modules/p0/p0_logic.gd:606",
-   "modules/p0/p0_logic.gd:619"
+   "modules/p0/p0_logic.gd:613",
+   "modules/p0/p0_logic.gd:616",
+   "modules/p0/p0_logic.gd:629"
   ],
   "kind": "line",
   "done": true
  },
  "Field": {
   "where": [
-   "modules/p0/p0_board.gd:155"
+   "modules/p0/p0_board.gd:160"
   ],
   "kind": "line",
   "done": true
@@ -5331,8 +5324,8 @@
  "Fine": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:9",
-   "modules/p0/p0_logic.gd:1142",
-   "modules/p0/p0_logic.gd:1497"
+   "modules/p0/p0_logic.gd:1152",
+   "modules/p0/p0_logic.gd:1507"
   ],
   "kind": "line",
   "done": true
@@ -5376,21 +5369,21 @@
  },
  "First": {
   "where": [
-   "modules/p0/p0_board.gd:215"
+   "modules/p0/p0_board.gd:220"
   ],
   "kind": "line",
   "done": true
  },
  "First %s dish! +%d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:1499"
+   "modules/p0/p0_logic.gd:1509"
   ],
   "kind": "template",
   "done": true
  },
  "First %s fish! +%d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:1498"
+   "modules/p0/p0_logic.gd:1508"
   ],
   "kind": "template",
   "done": true
@@ -5515,7 +5508,7 @@
  },
  "Fish Trap": {
   "where": [
-   "modules/p0/p0_logic.gd:1460",
+   "modules/p0/p0_logic.gd:1470",
    "modules/p0/p0_trap.gd:9",
    "assets/p0/content/fishing_p1.json#name"
   ],
@@ -5596,7 +5589,7 @@
  },
  "Fish-dex %s kinds · +%d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:1501"
+   "modules/p0/p0_logic.gd:1511"
   ],
   "kind": "template",
   "done": true
@@ -5650,9 +5643,9 @@
  },
  "Fishing Lv%d needed": {
   "where": [
-   "modules/p0/p0_logic.gd:1845",
-   "modules/p0/p0_logic.gd:2023",
-   "modules/p0/p0_logic.gd:2025"
+   "modules/p0/p0_logic.gd:1855",
+   "modules/p0/p0_logic.gd:2033",
+   "modules/p0/p0_logic.gd:2035"
   ],
   "kind": "template",
   "done": true
@@ -5719,7 +5712,7 @@
  },
  "Fishing…": {
   "where": [
-   "modules/p0/p0_logic.gd:1174"
+   "modules/p0/p0_logic.gd:1184"
   ],
   "kind": "line",
   "done": true
@@ -5935,11 +5928,11 @@
  },
  "Free": {
   "where": [
-   "modules/p0/p0_logic.gd:606",
-   "modules/p0/p0_logic.gd:619",
-   "modules/p0/p0_logic.gd:626",
-   "modules/p0/p0_logic.gd:647",
-   "modules/p0/p0_logic.gd:655"
+   "modules/p0/p0_logic.gd:616",
+   "modules/p0/p0_logic.gd:629",
+   "modules/p0/p0_logic.gd:636",
+   "modules/p0/p0_logic.gd:657",
+   "modules/p0/p0_logic.gd:665"
   ],
   "kind": "line",
   "done": true
@@ -5982,7 +5975,7 @@
  },
  "Fresh off the board: %s.": {
   "where": [
-   "modules/p0/p0_logic.gd:2102"
+   "modules/p0/p0_logic.gd:2112"
   ],
   "kind": "template",
   "done": true
@@ -5996,7 +5989,7 @@
  },
  "From %s": {
   "where": [
-   "modules/p0/p0_logic.gd:1133"
+   "modules/p0/p0_logic.gd:1143"
   ],
   "kind": "template",
   "done": true
@@ -6049,7 +6042,7 @@
   "where": [
    "modules/p0/p0_kitchen_logic.gd:671",
    "modules/p0/p0_kitchen_logic.gd:749",
-   "modules/p0/p0_logic.gd:918",
+   "modules/p0/p0_logic.gd:928",
    "modules/p0/p0_trap.gd:101",
    "scenes/ui_kit/ui_hud.gd:58"
   ],
@@ -6065,7 +6058,7 @@
  },
  "Full belly · Meals reset in": {
   "where": [
-   "modules/p0/p0_logic.gd:1218",
+   "modules/p0/p0_logic.gd:1228",
    "modules/p0/p0_runtime.gd:876"
   ],
   "kind": "line",
@@ -6159,7 +6152,7 @@
  },
  "Get closer to 21 than me without going over. You bet with your own coins.": {
   "where": [
-   "modules/p0/p0_logic.gd:2110"
+   "modules/p0/p0_logic.gd:2120"
   ],
   "kind": "line",
   "done": true
@@ -6182,14 +6175,14 @@
  },
  "Gift Clues": {
   "where": [
-   "modules/p0/p0_logic.gd:1376"
+   "modules/p0/p0_logic.gd:1386"
   ],
   "kind": "line",
   "done": true
  },
  "Gift already given today": {
   "where": [
-   "modules/p0/p0_logic.gd:1925",
+   "modules/p0/p0_logic.gd:1935",
    "modules/p0/item_info_rules.json#label",
    "modules/p0/item_info_rules.json#label"
   ],
@@ -6249,7 +6242,7 @@
  },
  "Globetrotter": {
   "where": [
-   "modules/p0/p0_logic.gd:1391"
+   "modules/p0/p0_logic.gd:1401"
   ],
   "kind": "line",
   "done": true
@@ -6290,7 +6283,7 @@
  },
  "Goes to your Farm Storage": {
   "where": [
-   "modules/p0/p0_item_info.gd:482"
+   "modules/p0/p0_item_info.gd:483"
   ],
   "kind": "line",
   "done": true
@@ -6452,8 +6445,8 @@
  },
  "Growing": {
   "where": [
-   "modules/p0/p0_logic.gd:650",
-   "modules/p0/p0_logic.gd:705"
+   "modules/p0/p0_logic.gd:660",
+   "modules/p0/p0_logic.gd:715"
   ],
   "kind": "line",
   "done": true
@@ -6474,7 +6467,7 @@
  },
  "Grows faster": {
   "where": [
-   "modules/p0/p0_item_info.gd:527"
+   "modules/p0/p0_item_info.gd:528"
   ],
   "kind": "line",
   "done": true
@@ -6563,35 +6556,35 @@
  },
  "Hardwood · 1 per round": {
   "where": [
-   "modules/p0/p0_logic.gd:2212"
+   "modules/p0/p0_logic.gd:2222"
   ],
   "kind": "line",
   "done": true
  },
  "Harvest": {
   "where": [
-   "modules/p0/p0_logic.gd:657"
+   "modules/p0/p0_logic.gd:667"
   ],
   "kind": "line",
   "done": true
  },
  "Harvest %d %s": {
   "where": [
-   "modules/p0/p0_logic.gd:1662"
+   "modules/p0/p0_logic.gd:1672"
   ],
   "kind": "template",
   "done": true
  },
  "Harvest %d crops": {
   "where": [
-   "modules/p0/p0_logic.gd:1668"
+   "modules/p0/p0_logic.gd:1678"
   ],
   "kind": "template",
   "done": true
  },
  "Harvest %d more %s": {
   "where": [
-   "modules/p0/p0_logic.gd:2012"
+   "modules/p0/p0_logic.gd:2022"
   ],
   "kind": "template",
   "done": true
@@ -6621,7 +6614,7 @@
  },
  "Harvest All": {
   "where": [
-   "modules/p0/p0_logic.gd:1373"
+   "modules/p0/p0_logic.gd:1383"
   ],
   "kind": "line",
   "done": true
@@ -6642,7 +6635,7 @@
  },
  "Harvest ×%d": {
   "where": [
-   "modules/p0/p0_logic.gd:655"
+   "modules/p0/p0_logic.gd:665"
   ],
   "kind": "template",
   "done": true
@@ -6676,7 +6669,7 @@
  },
  "Hearty Mishap": {
   "where": [
-   "modules/p0/p0_logic.gd:1290"
+   "modules/p0/p0_logic.gd:1300"
   ],
   "kind": "line",
   "done": true
@@ -6774,7 +6767,7 @@
  },
  "Highest level for now": {
   "where": [
-   "modules/p0/p0_logic.gd:2306",
+   "modules/p0/p0_logic.gd:2316",
    "modules/p0/p0_runtime.gd:1216"
   ],
   "kind": "line",
@@ -6818,7 +6811,7 @@
  },
  "Hmm… not a dish. Try another mix.": {
   "where": [
-   "modules/p0/p0_logic.gd:1151"
+   "modules/p0/p0_logic.gd:1161"
   ],
   "kind": "line",
   "done": true
@@ -6841,7 +6834,7 @@
  },
  "Home Cook · %s recipes · +%d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:1500"
+   "modules/p0/p0_logic.gd:1510"
   ],
   "kind": "template",
   "done": true
@@ -6869,7 +6862,7 @@
  },
  "Home price": {
   "where": [
-   "modules/p0/p0_item_info.gd:587"
+   "modules/p0/p0_item_info.gd:588"
   ],
   "kind": "line",
   "done": true
@@ -6887,9 +6880,9 @@
  },
  "Homestead Lv%d": {
   "where": [
-   "modules/p0/p0_logic.gd:2287",
    "modules/p0/p0_logic.gd:2297",
-   "modules/p0/p0_logic.gd:2399",
+   "modules/p0/p0_logic.gd:2307",
+   "modules/p0/p0_logic.gd:2409",
    "modules/p0/p0_material_logic.gd:160",
    "modules/p0/p0_material_logic.gd:477"
   ],
@@ -6912,7 +6905,7 @@
  },
  "Homestead Lv%d adds 1": {
   "where": [
-   "modules/p0/p0_logic.gd:694",
+   "modules/p0/p0_logic.gd:704",
    "modules/p0/p0_material_logic.gd:608"
   ],
   "kind": "template",
@@ -6927,21 +6920,21 @@
  },
  "Homestead Lv%d · %d coins to go": {
   "where": [
-   "modules/p0/p0_logic.gd:1776"
+   "modules/p0/p0_logic.gd:1786"
   ],
   "kind": "template",
   "done": true
  },
  "Homestead Lv%d · %s %d to go": {
   "where": [
-   "modules/p0/p0_logic.gd:1771"
+   "modules/p0/p0_logic.gd:1781"
   ],
   "kind": "template",
   "done": true
  },
  "Homestead Lv%d → Lv%d": {
   "where": [
-   "modules/p0/p0_logic.gd:2308"
+   "modules/p0/p0_logic.gd:2318"
   ],
   "kind": "template",
   "done": true
@@ -6956,8 +6949,8 @@
  },
  "Homestead Master": {
   "where": [
-   "modules/p0/p0_logic.gd:1391",
-   "modules/p0/p0_logic.gd:2211"
+   "modules/p0/p0_logic.gd:1401",
+   "modules/p0/p0_logic.gd:2221"
   ],
   "kind": "line",
   "done": true
@@ -6981,7 +6974,7 @@
  },
  "How does it work?": {
   "where": [
-   "modules/p0/p0_logic.gd:2044"
+   "modules/p0/p0_logic.gd:2054"
   ],
   "kind": "line",
   "done": true
@@ -7037,7 +7030,7 @@
  },
  "I'll take your %s. Same price as your stall.": {
   "where": [
-   "modules/p0/p0_logic.gd:2145"
+   "modules/p0/p0_logic.gd:2155"
   ],
   "kind": "template",
   "done": true
@@ -7094,7 +7087,7 @@
  },
  "In pot": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:629"
+   "scenes/ui_kit/ui_item_cell.gd:658"
   ],
   "kind": "line",
   "done": true
@@ -7122,8 +7115,8 @@
  },
  "Inbox full · waiting": {
   "where": [
-   "modules/p0/p0_logic.gd:1112",
-   "modules/p0/p0_logic.gd:1134"
+   "modules/p0/p0_logic.gd:1122",
+   "modules/p0/p0_logic.gd:1144"
   ],
   "kind": "line",
   "done": true
@@ -7152,7 +7145,7 @@
  },
  "Ingredients back (%s)": {
   "where": [
-   "modules/p0/p0_logic.gd:1150"
+   "modules/p0/p0_logic.gd:1160"
   ],
   "kind": "template",
   "done": true
@@ -7201,7 +7194,7 @@
  },
  "Jan": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -7210,7 +7203,7 @@
  },
  "Jul": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -7219,7 +7212,7 @@
  },
  "Jun": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -7270,7 +7263,7 @@
  },
  "Keep those coins for seeds. Come back with a few more.": {
   "where": [
-   "modules/p0/p0_logic.gd:2109"
+   "modules/p0/p0_logic.gd:2119"
   ],
   "kind": "line",
   "done": true
@@ -7292,7 +7285,7 @@
  },
  "Keeps the stall": {
   "where": [
-   "modules/p0/p0_logic.gd:2043"
+   "modules/p0/p0_logic.gd:2053"
   ],
   "kind": "line",
   "done": true
@@ -7402,7 +7395,14 @@
  "Lands up to %s fish": {
   "where": [
    "modules/p0/p0_item_info.gd:383",
-   "modules/p0/p0_item_info.gd:458"
+   "modules/p0/p0_item_info.gd:461"
+  ],
+  "kind": "template",
+  "done": true
+ },
+ "Lands up to %s fish · Bite window %.1f s": {
+  "where": [
+   "modules/p0/p0_item_info.gd:462"
   ],
   "kind": "template",
   "done": true
@@ -7503,8 +7503,8 @@
  "Legendary": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:9",
-   "modules/p0/p0_logic.gd:1142",
-   "modules/p0/p0_logic.gd:1497"
+   "modules/p0/p0_logic.gd:1152",
+   "modules/p0/p0_logic.gd:1507"
   ],
   "kind": "line",
   "done": true
@@ -7570,7 +7570,7 @@
  },
  "Levels unlock gear, fish and seeds. Basics never lock.": {
   "where": [
-   "modules/p0/p0_logic.gd:1294"
+   "modules/p0/p0_logic.gd:1304"
   ],
   "kind": "line",
   "done": true
@@ -7601,7 +7601,7 @@
  },
  "Liked by": {
   "where": [
-   "modules/p0/p0_logic.gd:535"
+   "modules/p0/p0_logic.gd:545"
   ],
   "kind": "line",
   "done": true
@@ -7669,7 +7669,7 @@
  },
  "Line in the water": {
   "where": [
-   "modules/p0/p0_logic.gd:1174"
+   "modules/p0/p0_logic.gd:1184"
   ],
   "kind": "line",
   "done": true
@@ -7825,7 +7825,7 @@
  },
  "Lucky Double": {
   "where": [
-   "modules/p0/p0_logic.gd:1293"
+   "modules/p0/p0_logic.gd:1303"
   ],
   "kind": "line",
   "done": true
@@ -7839,17 +7839,17 @@
  },
  "Lv%d": {
   "where": [
-   "modules/p0/p0_item_info.gd:477",
+   "modules/p0/p0_item_info.gd:478",
    "modules/p0/p0_kitchen_logic.gd:164",
    "modules/p0/p0_kitchen_logic.gd:218",
    "modules/p0/p0_kitchen_logic.gd:233",
-   "modules/p0/p0_logic.gd:2377"
+   "modules/p0/p0_logic.gd:2387"
   ],
   "kind": "template"
  },
  "Lv%d look · %s": {
   "where": [
-   "modules/p0/p0_logic.gd:2313",
+   "modules/p0/p0_logic.gd:2323",
    "scenes/p0/home/p0_look_pick.gd:56"
   ],
   "kind": "template",
@@ -7872,7 +7872,7 @@
  },
  "Lv%d–%d": {
   "where": [
-   "modules/p0/p0_item_info.gd:477"
+   "modules/p0/p0_item_info.gd:478"
   ],
   "kind": "template",
   "done": true
@@ -7991,7 +7991,7 @@
  },
  "Mar": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -8068,7 +8068,7 @@
  },
  "Master Angler": {
   "where": [
-   "modules/p0/p0_logic.gd:1390"
+   "modules/p0/p0_logic.gd:1400"
   ],
   "kind": "line",
   "done": true
@@ -8089,7 +8089,7 @@
  },
  "Master Gardener": {
   "where": [
-   "modules/p0/p0_logic.gd:1390"
+   "modules/p0/p0_logic.gd:1400"
   ],
   "kind": "line",
   "done": true
@@ -8112,7 +8112,7 @@
  },
  "Materials ready": {
   "where": [
-   "modules/p0/p0_item_info.gd:495"
+   "modules/p0/p0_item_info.gd:496"
   ],
   "kind": "line",
   "done": true
@@ -8133,28 +8133,28 @@
  },
  "Max Energy %d": {
   "where": [
-   "modules/p0/p0_logic.gd:2399"
+   "modules/p0/p0_logic.gd:2409"
   ],
   "kind": "template",
   "done": true
  },
  "Max Energy %d · Meals %d a day": {
   "where": [
-   "modules/p0/p0_logic.gd:2319"
+   "modules/p0/p0_logic.gd:2329"
   ],
   "kind": "template",
   "done": true
  },
  "Max level · Homestead Master": {
   "where": [
-   "modules/p0/p0_logic.gd:2258"
+   "modules/p0/p0_logic.gd:2268"
   ],
   "kind": "line",
   "done": true
  },
  "May": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -8170,7 +8170,7 @@
  },
  "Meals": {
   "where": [
-   "modules/p0/p0_logic.gd:893"
+   "modules/p0/p0_logic.gd:903"
   ],
   "kind": "line",
   "done": true
@@ -8230,7 +8230,7 @@
  },
  "Minds the tackle": {
   "where": [
-   "modules/p0/p0_logic.gd:2042"
+   "modules/p0/p0_logic.gd:2052"
   ],
   "kind": "line",
   "done": true
@@ -8377,7 +8377,7 @@
  },
  "Morning! Row Hoes just came in — sows %s plots at once, Farming Lv%d. Anything I can get you?": {
   "where": [
-   "modules/p0/p0_logic.gd:2092"
+   "modules/p0/p0_logic.gd:2102"
   ],
   "kind": "template",
   "done": true
@@ -8489,7 +8489,7 @@
  "Mystery Dish": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:603",
-   "modules/p0/p0_logic.gd:1151",
+   "modules/p0/p0_logic.gd:1161",
    "assets/p0/p0_content.json#name"
   ],
   "kind": "line",
@@ -8583,10 +8583,10 @@
  },
  "Need %d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:639",
-   "modules/p0/p0_logic.gd:696",
-   "modules/p0/p0_logic.gd:709",
-   "modules/p0/p0_logic.gd:1182",
+   "modules/p0/p0_logic.gd:649",
+   "modules/p0/p0_logic.gd:706",
+   "modules/p0/p0_logic.gd:719",
+   "modules/p0/p0_logic.gd:1192",
    "modules/p0/p0_material_logic.gd:233"
   ],
   "kind": "template",
@@ -8594,34 +8594,34 @@
  },
  "Need %d more": {
   "where": [
-   "modules/p0/p0_locals.gd:54",
-   "modules/p0/p0_logic.gd:2030"
+   "modules/p0/p0_locals.gd:55",
+   "modules/p0/p0_logic.gd:2040"
   ],
   "kind": "template",
   "done": true
  },
  "Need %d more %s": {
   "where": [
-   "modules/p0/p0_board.gd:70",
+   "modules/p0/p0_board.gd:71",
    "modules/p0/p0_kitchen_logic.gd:756",
-   "modules/p0/p0_logic.gd:2014",
-   "modules/p0/p0_logic.gd:2019",
-   "modules/p0/p0_logic.gd:2020"
+   "modules/p0/p0_logic.gd:2024",
+   "modules/p0/p0_logic.gd:2029",
+   "modules/p0/p0_logic.gd:2030"
   ],
   "kind": "template",
   "done": true
  },
  "Need %d more %s dish%s": {
   "where": [
-   "modules/p0/p0_logic.gd:2016"
+   "modules/p0/p0_logic.gd:2026"
   ],
   "kind": "template",
   "done": true
  },
  "Need %d more coins": {
   "where": [
-   "modules/p0/p0_logic.gd:869",
-   "modules/p0/p0_logic.gd:2351",
+   "modules/p0/p0_logic.gd:879",
+   "modules/p0/p0_logic.gd:2361",
    "modules/p0/p0_material_logic.gd:612",
    "modules/p0/p0_runtime.gd:1170",
    "modules/p0/p0_runtime.gd:1195"
@@ -8631,14 +8631,14 @@
  },
  "Need %d more dish%s": {
   "where": [
-   "modules/p0/p0_logic.gd:2017"
+   "modules/p0/p0_logic.gd:2027"
   ],
   "kind": "template",
   "done": true
  },
  "Need %d more fish": {
   "where": [
-   "modules/p0/p0_board.gd:65"
+   "modules/p0/p0_board.gd:66"
   ],
   "kind": "template",
   "done": true
@@ -8762,8 +8762,8 @@
  },
  "New for you": {
   "where": [
-   "modules/p0/p0_logic.gd:1334",
-   "modules/p0/p0_logic.gd:1340",
+   "modules/p0/p0_logic.gd:1344",
+   "modules/p0/p0_logic.gd:1350",
    "modules/p0/p0_pin_reason.gd:69"
   ],
   "kind": "line",
@@ -8827,7 +8827,7 @@
  },
  "New recipe:": {
   "where": [
-   "modules/p0/p0_logic.gd:1344"
+   "modules/p0/p0_logic.gd:1354"
   ],
   "kind": "line",
   "done": true
@@ -8873,7 +8873,7 @@
  },
  "New seeds at the Homestead Stall:": {
   "where": [
-   "modules/p0/p0_logic.gd:1283"
+   "modules/p0/p0_logic.gd:1293"
   ],
   "kind": "line",
   "done": true
@@ -8881,7 +8881,7 @@
  "New title": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:1006",
-   "modules/p0/p0_logic.gd:1407",
+   "modules/p0/p0_logic.gd:1417",
    "scenes/p0/p0_ui.gd:3468"
   ],
   "kind": "line",
@@ -8904,21 +8904,21 @@
  },
  "Newcomer Blessing · %d day%s left": {
   "where": [
-   "modules/p0/p0_logic.gd:901"
+   "modules/p0/p0_logic.gd:911"
   ],
   "kind": "template",
   "done": true
  },
  "Newcomer Blessing · %d day%s left · faster Energy, Meals %d": {
   "where": [
-   "modules/p0/p0_logic.gd:1509"
+   "modules/p0/p0_logic.gd:1519"
   ],
   "kind": "template",
   "done": true
  },
  "Next Lv%d%s · %d XP": {
   "where": [
-   "modules/p0/p0_logic.gd:1493"
+   "modules/p0/p0_logic.gd:1503"
   ],
   "kind": "template",
   "done": true
@@ -8939,14 +8939,14 @@
  },
  "Next regrow time −%d%%": {
   "where": [
-   "modules/p0/p0_item_info.gd:525"
+   "modules/p0/p0_item_info.gd:526"
   ],
   "kind": "template",
   "done": true
  },
  "Next request": {
   "where": [
-   "modules/p0/p0_board.gd:27",
+   "modules/p0/p0_board.gd:28",
    "scenes/p0/panels/p0_board_request.gd:42",
    "scenes/p0/panels/p0_board_request.gd:86"
   ],
@@ -8962,21 +8962,21 @@
  },
  "Next request at": {
   "where": [
-   "modules/p0/p0_logic.gd:1944"
+   "modules/p0/p0_logic.gd:1954"
   ],
   "kind": "line",
   "done": true
  },
  "Next request in": {
   "where": [
-   "modules/p0/p0_logic.gd:1942"
+   "modules/p0/p0_logic.gd:1952"
   ],
   "kind": "line",
   "done": true
  },
  "Next request in %s.": {
   "where": [
-   "modules/p0/p0_logic.gd:2103"
+   "modules/p0/p0_logic.gd:2113"
   ],
   "kind": "template",
   "done": true
@@ -8990,7 +8990,7 @@
  },
  "Next: Lv%d": {
   "where": [
-   "modules/p0/p0_logic.gd:1528"
+   "modules/p0/p0_logic.gd:1538"
   ],
   "kind": "template",
   "done": true
@@ -9004,28 +9004,28 @@
  },
  "Next: Lv%d · %s": {
   "where": [
-   "modules/p0/p0_logic.gd:1525"
+   "modules/p0/p0_logic.gd:1535"
   ],
   "kind": "template",
   "done": true
  },
  "Next: Lv%d · %s seeds": {
   "where": [
-   "modules/p0/p0_logic.gd:1519"
+   "modules/p0/p0_logic.gd:1529"
   ],
   "kind": "template",
   "done": true
  },
  "Next: Lv%d · more XP from every new page": {
   "where": [
-   "modules/p0/p0_logic.gd:1528"
+   "modules/p0/p0_logic.gd:1538"
   ],
   "kind": "template",
   "done": true
  },
  "Next: Lv4 · 3rd ingredient slot": {
   "where": [
-   "modules/p0/p0_logic.gd:1527"
+   "modules/p0/p0_logic.gd:1537"
   ],
   "kind": "line",
   "done": true
@@ -9106,21 +9106,21 @@
  "No dish this time": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:597",
-   "modules/p0/p0_logic.gd:1150"
+   "modules/p0/p0_logic.gd:1160"
   ],
   "kind": "line",
   "done": true
  },
  "No dishes in bag": {
   "where": [
-   "modules/p0/p0_logic.gd:844"
+   "modules/p0/p0_logic.gd:854"
   ],
   "kind": "line",
   "done": true
  },
  "No dishes in your bag": {
   "where": [
-   "modules/p0/p0_logic.gd:1926"
+   "modules/p0/p0_logic.gd:1936"
   ],
   "kind": "line",
   "done": true
@@ -9142,7 +9142,7 @@
  },
  "No fish to cook": {
   "where": [
-   "modules/p0/p0_logic.gd:821"
+   "modules/p0/p0_logic.gd:831"
   ],
   "kind": "line",
   "done": true
@@ -9177,7 +9177,7 @@
  },
  "No more requests": {
   "where": [
-   "modules/p0/p0_logic.gd:1946"
+   "modules/p0/p0_logic.gd:1956"
   ],
   "kind": "line",
   "done": true
@@ -9241,15 +9241,15 @@
  },
  "No tree here": {
   "where": [
-   "modules/p0/p0_logic.gd:603",
-   "modules/p0/p0_logic.gd:604"
+   "modules/p0/p0_logic.gd:613",
+   "modules/p0/p0_logic.gd:614"
   ],
   "kind": "line",
   "done": true
  },
  "No trees in the greenhouse": {
   "where": [
-   "modules/p0/p0_logic.gd:612"
+   "modules/p0/p0_logic.gd:622"
   ],
   "kind": "line",
   "done": true
@@ -9313,7 +9313,7 @@
  },
  "Not for\ncooking": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:629"
+   "scenes/ui_kit/ui_item_cell.gd:658"
   ],
   "kind": "line",
   "done": true
@@ -9335,7 +9335,7 @@
  },
  "Not now": {
   "where": [
-   "modules/p0/p0_logic.gd:2188",
+   "modules/p0/p0_logic.gd:2198",
    "scenes/p0/kitchen/p0_cook_confirm.gd:39",
    "scenes/ui_kit/ui_dismiss_button.gd:6",
    "scenes/ui_kit/ui_request_card.gd:119",
@@ -9374,7 +9374,7 @@
  },
  "Notice Board": {
   "where": [
-   "modules/p0/p0_logic.gd:2205",
+   "modules/p0/p0_logic.gd:2215",
    "modules/p0/p0_notice_board.gd:59",
    "modules/p0/p0_world_prompts.gd:62"
   ],
@@ -9398,7 +9398,7 @@
  },
  "Nov": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -9414,7 +9414,7 @@
  },
  "Now you can land": {
   "where": [
-   "modules/p0/p0_logic.gd:1279"
+   "modules/p0/p0_logic.gd:1289"
   ],
   "kind": "line",
   "done": true
@@ -9444,7 +9444,7 @@
  },
  "Oct": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -9537,7 +9537,7 @@
  },
  "Old Tree": {
   "where": [
-   "modules/p0/p0_logic.gd:2212",
+   "modules/p0/p0_logic.gd:2222",
    "assets/p0/content/mine_p1.json#name"
   ],
   "kind": "line",
@@ -9581,7 +9581,7 @@
  },
  "Only +%d of %d · Eat anyway?": {
   "where": [
-   "modules/p0/p0_logic.gd:1225"
+   "modules/p0/p0_logic.gd:1235"
   ],
   "kind": "template",
   "done": true
@@ -9595,7 +9595,7 @@
  },
  "Open": {
   "where": [
-   "modules/p0/p0_board.gd:51"
+   "modules/p0/p0_board.gd:52"
   ],
   "kind": "line",
   "done": true
@@ -9609,7 +9609,7 @@
  },
  "Open bag": {
   "where": [
-   "modules/p0/p0_logic.gd:844",
+   "modules/p0/p0_logic.gd:854",
    "modules/p0/p0_runtime.gd:1282",
    "scenes/p0/p0_ui.gd:1743",
    "scenes/p0/p0_ui.gd:1819"
@@ -9633,22 +9633,22 @@
  },
  "Orchard": {
   "where": [
-   "modules/p0/p0_board.gd:155"
+   "modules/p0/p0_board.gd:160"
   ],
   "kind": "line",
   "done": true
  },
  "Orchard %d/%d": {
   "where": [
-   "modules/p0/p0_logic.gd:693",
-   "modules/p0/p0_logic.gd:694"
+   "modules/p0/p0_logic.gd:703",
+   "modules/p0/p0_logic.gd:704"
   ],
   "kind": "template",
   "done": true
  },
  "Orchard 8/8": {
   "where": [
-   "modules/p0/p0_logic.gd:2215"
+   "modules/p0/p0_logic.gd:2225"
   ],
   "kind": "line",
   "done": true
@@ -9729,7 +9729,7 @@
  },
  "Outside only": {
   "where": [
-   "modules/p0/p0_logic.gd:611"
+   "modules/p0/p0_logic.gd:621"
   ],
   "kind": "line",
   "done": true
@@ -9908,7 +9908,7 @@
  },
  "P0_I18N_MISSES": {
   "where": [
-   "modules/ui/localization.gd:198"
+   "modules/ui/localization.gd:210"
   ],
   "kind": "line"
  },
@@ -10163,8 +10163,8 @@
  },
  "Pick": {
   "where": [
-   "modules/p0/p0_logic.gd:709",
-   "modules/p0/p0_logic.gd:711"
+   "modules/p0/p0_logic.gd:719",
+   "modules/p0/p0_logic.gd:721"
   ],
   "kind": "line",
   "done": true
@@ -10178,10 +10178,10 @@
  },
  "Pick a seed": {
   "where": [
-   "modules/p0/p0_logic.gd:595",
-   "modules/p0/p0_logic.gd:622",
-   "modules/p0/p0_logic.gd:631",
-   "modules/p0/p0_logic.gd:686"
+   "modules/p0/p0_logic.gd:605",
+   "modules/p0/p0_logic.gd:632",
+   "modules/p0/p0_logic.gd:641",
+   "modules/p0/p0_logic.gd:696"
   ],
   "kind": "line",
   "done": true
@@ -10349,17 +10349,17 @@
  },
  "Plant": {
   "where": [
-   "modules/p0/p0_logic.gd:611",
-   "modules/p0/p0_logic.gd:693",
-   "modules/p0/p0_logic.gd:696",
-   "modules/p0/p0_logic.gd:698"
+   "modules/p0/p0_logic.gd:621",
+   "modules/p0/p0_logic.gd:703",
+   "modules/p0/p0_logic.gd:706",
+   "modules/p0/p0_logic.gd:708"
   ],
   "kind": "line",
   "done": true
  },
  "Plant %d more plot%s": {
   "where": [
-   "modules/p0/p0_logic.gd:2008"
+   "modules/p0/p0_logic.gd:2018"
   ],
   "kind": "template",
   "done": true
@@ -10387,7 +10387,7 @@
  },
  "Play": {
   "where": [
-   "modules/p0/p0_logic.gd:2115"
+   "modules/p0/p0_logic.gd:2125"
   ],
   "kind": "line",
   "done": true
@@ -10417,14 +10417,14 @@
  },
  "Plots 40": {
   "where": [
-   "modules/p0/p0_logic.gd:2217"
+   "modules/p0/p0_logic.gd:2227"
   ],
   "kind": "line",
   "done": true
  },
  "Plots 48": {
   "where": [
-   "modules/p0/p0_logic.gd:2218"
+   "modules/p0/p0_logic.gd:2228"
   ],
   "kind": "line",
   "done": true
@@ -10560,7 +10560,7 @@
  },
  "Pours the tea": {
   "where": [
-   "modules/p0/p0_logic.gd:2040"
+   "modules/p0/p0_logic.gd:2050"
   ],
   "kind": "line",
   "done": true
@@ -10598,7 +10598,7 @@
  },
  "Pull up a chair. Care for a hand?": {
   "where": [
-   "modules/p0/p0_logic.gd:2109"
+   "modules/p0/p0_logic.gd:2119"
   ],
   "kind": "line",
   "done": true
@@ -10675,7 +10675,7 @@
  },
  "Queue ×2": {
   "where": [
-   "modules/p0/p0_logic.gd:1291"
+   "modules/p0/p0_logic.gd:1301"
   ],
   "kind": "line",
   "done": true
@@ -10689,7 +10689,7 @@
  },
  "Quick Fire": {
   "where": [
-   "modules/p0/p0_logic.gd:1291"
+   "modules/p0/p0_logic.gd:1301"
   ],
   "kind": "line",
   "done": true
@@ -10718,14 +10718,14 @@
  },
  "Quick Recast": {
   "where": [
-   "modules/p0/p0_logic.gd:1377"
+   "modules/p0/p0_logic.gd:1387"
   ],
   "kind": "line",
   "done": true
  },
  "Quiet day.": {
   "where": [
-   "modules/p0/p0_logic.gd:2066"
+   "modules/p0/p0_logic.gd:2076"
   ],
   "kind": "line",
   "done": true
@@ -10746,7 +10746,7 @@
  },
  "Rack": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:476"
+   "scenes/ui_kit/ui_item_cell.gd:505"
   ],
   "kind": "line",
   "done": true
@@ -10812,8 +10812,8 @@
  "Rare": {
   "where": [
    "modules/p0/p0_kitchen_logic.gd:9",
-   "modules/p0/p0_logic.gd:1142",
-   "modules/p0/p0_logic.gd:1497"
+   "modules/p0/p0_logic.gd:1152",
+   "modules/p0/p0_logic.gd:1507"
   ],
   "kind": "line",
   "done": true
@@ -10842,8 +10842,8 @@
  },
  "Ready in": {
   "where": [
-   "modules/p0/p0_item_info.gd:537",
-   "modules/p0/p0_logic.gd:459"
+   "modules/p0/p0_item_info.gd:538",
+   "modules/p0/p0_logic.gd:469"
   ],
   "kind": "line",
   "done": true
@@ -10858,7 +10858,7 @@
  "Ready to deliver": {
   "where": [
    "modules/map/city_map_data.gd:105",
-   "modules/p0/p0_board.gd:51",
+   "modules/p0/p0_board.gd:52",
    "modules/p0/p0_pin_reason.gd:59",
    "scenes/map/city_map_view.gd:630"
   ],
@@ -10910,7 +10910,7 @@
  },
  "Recover or do something free": {
   "where": [
-   "modules/p0/p0_logic.gd:820"
+   "modules/p0/p0_logic.gd:830"
   ],
   "kind": "line",
   "done": true
@@ -10939,7 +10939,7 @@
  },
  "Reed Rod": {
   "where": [
-   "modules/p0/p0_logic.gd:1524",
+   "modules/p0/p0_logic.gd:1534",
    "assets/p0/p0_content.json#name"
   ],
   "kind": "line",
@@ -10947,7 +10947,7 @@
  },
  "Reed Rod's in. %d coins, lands up to %s.": {
   "where": [
-   "modules/p0/p0_logic.gd:2080"
+   "modules/p0/p0_logic.gd:2090"
   ],
   "kind": "template",
   "done": true
@@ -11076,8 +11076,8 @@
  },
  "Request": {
   "where": [
-   "modules/p0/p0_locals.gd:52",
-   "modules/p0/p0_logic.gd:1927",
+   "modules/p0/p0_locals.gd:53",
+   "modules/p0/p0_logic.gd:1937",
    "scenes/ui_kit/ui_resident_bar.gd:46"
   ],
   "kind": "line",
@@ -11107,7 +11107,7 @@
  },
  "Requests today": {
   "where": [
-   "modules/p0/p0_board.gd:21"
+   "modules/p0/p0_board.gd:22"
   ],
   "kind": "line",
   "done": true
@@ -11145,11 +11145,11 @@
  },
  "Rest": {
   "where": [
-   "modules/p0/p0_logic.gd:824",
-   "modules/p0/p0_logic.gd:826",
-   "modules/p0/p0_logic.gd:826",
-   "modules/p0/p0_logic.gd:894",
-   "modules/p0/p0_logic.gd:2187"
+   "modules/p0/p0_logic.gd:834",
+   "modules/p0/p0_logic.gd:836",
+   "modules/p0/p0_logic.gd:836",
+   "modules/p0/p0_logic.gd:904",
+   "modules/p0/p0_logic.gd:2197"
   ],
   "kind": "line",
   "done": true
@@ -11170,7 +11170,7 @@
  },
  "Rest · +%d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:2187"
+   "modules/p0/p0_logic.gd:2197"
   ],
   "kind": "template",
   "done": true
@@ -11191,7 +11191,7 @@
  },
  "Rested today": {
   "where": [
-   "modules/p0/p0_logic.gd:828",
+   "modules/p0/p0_logic.gd:838",
    "modules/p0/p0_world_prompts.gd:74"
   ],
   "kind": "line",
@@ -11199,7 +11199,7 @@
  },
  "Restores up to %d Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:2185"
+   "modules/p0/p0_logic.gd:2195"
   ],
   "kind": "template",
   "done": true
@@ -11424,7 +11424,7 @@
  },
  "Row Hoe's %d coins. Farming Lv%d to use.": {
   "where": [
-   "modules/p0/p0_logic.gd:2094"
+   "modules/p0/p0_logic.gd:2104"
   ],
   "kind": "template",
   "done": true
@@ -11473,7 +11473,7 @@
  },
  "Runs the post": {
   "where": [
-   "modules/p0/p0_logic.gd:2041"
+   "modules/p0/p0_logic.gd:2051"
   ],
   "kind": "line",
   "done": true
@@ -11554,14 +11554,14 @@
  },
  "Same dish again · +%d (half)": {
   "where": [
-   "modules/p0/p0_logic.gd:1223"
+   "modules/p0/p0_logic.gd:1233"
   ],
   "kind": "template",
   "done": true
  },
  "Same dish · no Energy today": {
   "where": [
-   "modules/p0/p0_logic.gd:1221",
+   "modules/p0/p0_logic.gd:1231",
    "modules/p0/p0_runtime.gd:876"
   ],
   "kind": "line",
@@ -11647,7 +11647,7 @@
  },
  "Seasoning": {
   "where": [
-   "modules/p0/p0_board.gd:155",
+   "modules/p0/p0_board.gd:160",
    "modules/p0/p0_kitchen_logic.gd:8",
    "modules/p0/p0_kitchen_logic.gd:10",
    "modules/p0/p0_kitchen_logic.gd:686"
@@ -11657,14 +11657,14 @@
  },
  "Second": {
   "where": [
-   "modules/p0/p0_board.gd:215"
+   "modules/p0/p0_board.gd:220"
   ],
   "kind": "line",
   "done": true
  },
  "Second Stove": {
   "where": [
-   "modules/p0/p0_logic.gd:2204"
+   "modules/p0/p0_logic.gd:2214"
   ],
   "kind": "line",
   "done": true
@@ -11692,13 +11692,13 @@
  },
  "Seed": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:326"
+   "scenes/ui_kit/ui_item_cell.gd:336"
   ],
   "kind": "line"
  },
  "Seed Saver": {
   "where": [
-   "modules/p0/p0_logic.gd:1373"
+   "modules/p0/p0_logic.gd:1383"
   ],
   "kind": "line",
   "done": true
@@ -11769,14 +11769,14 @@
  },
  "Sell %d%s%d coins": {
   "where": [
-   "modules/p0/p0_item_info.gd:509"
+   "modules/p0/p0_item_info.gd:510"
   ],
   "kind": "template",
   "done": true
  },
  "Sell All%s%d coins": {
   "where": [
-   "modules/p0/p0_item_info.gd:510"
+   "modules/p0/p0_item_info.gd:511"
   ],
   "kind": "template",
   "done": true
@@ -11828,15 +11828,15 @@
  },
  "Sent to Inbox": {
   "where": [
-   "modules/p0/p0_logic.gd:1112",
-   "modules/p0/p0_logic.gd:1134"
+   "modules/p0/p0_logic.gd:1122",
+   "modules/p0/p0_logic.gd:1144"
   ],
   "kind": "line",
   "done": true
  },
  "Sep": {
   "where": [
-   "modules/p0/p0_logic.gd:2370",
+   "modules/p0/p0_logic.gd:2380",
    "modules/p0/p0_runtime.gd:1629",
    "scenes/p0/panels/p0_profile_page.gd:32"
   ],
@@ -11930,7 +11930,7 @@
  },
  "Show Workbench": {
   "where": [
-   "modules/p0/p0_logic.gd:1303"
+   "modules/p0/p0_logic.gd:1313"
   ],
   "kind": "line",
   "done": true
@@ -11944,14 +11944,14 @@
  },
  "Show bench": {
   "where": [
-   "modules/p0/p0_logic.gd:824"
+   "modules/p0/p0_logic.gd:834"
   ],
   "kind": "line",
   "done": true
  },
  "Show kitchen": {
   "where": [
-   "modules/p0/p0_logic.gd:821"
+   "modules/p0/p0_logic.gd:831"
   ],
   "kind": "line",
   "done": true
@@ -11972,7 +11972,7 @@
  },
  "Show on map": {
   "where": [
-   "modules/p0/p0_logic.gd:858",
+   "modules/p0/p0_logic.gd:868",
    "scenes/p0/p0_ui.gd:2948"
   ],
   "kind": "line",
@@ -12000,11 +12000,12 @@
   "kind": "line",
   "done": true
  },
- "Since": {
+ "Since %s": {
   "where": [
    "scenes/p0/panels/p0_profile_page.gd:180"
   ],
-  "kind": "line"
+  "kind": "template",
+  "done": true
  },
  "Sing with me! No? Then eat with me.": {
   "where": [
@@ -12015,7 +12016,7 @@
  },
  "Sit a minute. Hot tea, %d Energy a cup.": {
   "where": [
-   "modules/p0/p0_logic.gd:2065"
+   "modules/p0/p0_logic.gd:2075"
   ],
   "kind": "template",
   "done": true
@@ -12064,7 +12065,7 @@
  "Skills": {
   "where": [
    "modules/p0/p0_logic.gd:176",
-   "modules/p0/p0_logic.gd:2317",
+   "modules/p0/p0_logic.gd:2327",
    "scenes/p0/panels/p0_skills_drawer.gd:32"
   ],
   "kind": "line",
@@ -12072,7 +12073,7 @@
  },
  "Skills total %d needed · now %d": {
   "where": [
-   "modules/p0/p0_logic.gd:2352",
+   "modules/p0/p0_logic.gd:2362",
    "modules/p0/p0_runtime.gd:1215"
   ],
   "kind": "template",
@@ -12234,8 +12235,8 @@
  },
  "Sow": {
   "where": [
-   "modules/p0/p0_logic.gd:593",
-   "modules/p0/p0_logic.gd:686"
+   "modules/p0/p0_logic.gd:603",
+   "modules/p0/p0_logic.gd:696"
   ],
   "kind": "line",
   "done": true
@@ -12249,7 +12250,7 @@
  },
  "Sow %d %s%s": {
   "where": [
-   "modules/p0/p0_logic.gd:1873"
+   "modules/p0/p0_logic.gd:1883"
   ],
   "kind": "template",
   "done": true
@@ -12285,16 +12286,16 @@
  },
  "Sow your first plot": {
   "where": [
-   "modules/p0/p0_logic.gd:790",
-   "modules/p0/p0_logic.gd:1881"
+   "modules/p0/p0_logic.gd:800",
+   "modules/p0/p0_logic.gd:1891"
   ],
   "kind": "line",
   "done": true
  },
  "Sow ×%d": {
   "where": [
-   "modules/p0/p0_logic.gd:639",
-   "modules/p0/p0_logic.gd:644"
+   "modules/p0/p0_logic.gd:649",
+   "modules/p0/p0_logic.gd:654"
   ],
   "kind": "template",
   "done": true
@@ -12324,7 +12325,7 @@
  },
  "Spice Rack": {
   "where": [
-   "modules/p0/p0_logic.gd:2324",
+   "modules/p0/p0_logic.gd:2334",
    "scenes/p0/kitchen/p0_storage_sheet.gd:78",
    "scenes/p0/rooms/p0_farmhouse.gd:425"
   ],
@@ -12333,7 +12334,7 @@
  },
  "Spice Rack · seasonings off your bag": {
   "where": [
-   "modules/p0/p0_logic.gd:2388"
+   "modules/p0/p0_logic.gd:2398"
   ],
   "kind": "line",
   "done": true
@@ -12392,7 +12393,7 @@
  },
  "Sprinklers 10/10": {
   "where": [
-   "modules/p0/p0_logic.gd:2216"
+   "modules/p0/p0_logic.gd:2226"
   ],
   "kind": "line",
   "done": true
@@ -12414,7 +12415,7 @@
  },
  "Stall Board · 3rd slot": {
   "where": [
-   "modules/p0/p0_logic.gd:2333"
+   "modules/p0/p0_logic.gd:2343"
   ],
   "kind": "line",
   "done": true
@@ -12436,8 +12437,8 @@
  },
  "Stamp Run": {
   "where": [
-   "modules/p0/p0_logic.gd:1965",
-   "modules/p0/p0_logic.gd:1965",
+   "modules/p0/p0_logic.gd:1975",
+   "modules/p0/p0_logic.gd:1975",
    "assets/p0/content/requests_p1.json#title"
   ],
   "kind": "line",
@@ -12552,14 +12553,14 @@
  },
  "Steady Hand I": {
   "where": [
-   "modules/p0/p0_logic.gd:1291"
+   "modules/p0/p0_logic.gd:1301"
   ],
   "kind": "line",
   "done": true
  },
  "Steady Hand II": {
   "where": [
-   "modules/p0/p0_logic.gd:1292"
+   "modules/p0/p0_logic.gd:1302"
   ],
   "kind": "line",
   "done": true
@@ -12591,7 +12592,7 @@
  },
  "Stock %d/%d%s%s": {
   "where": [
-   "modules/p0/p0_item_info.gd:543"
+   "modules/p0/p0_item_info.gd:544"
   ],
   "kind": "template",
   "done": true
@@ -12708,7 +12709,7 @@
  },
  "Stranger": {
   "where": [
-   "modules/p0/p0_logic.gd:1922",
+   "modules/p0/p0_logic.gd:1932",
    "assets/p0/p0_content.json#stages",
    "assets/p0/p0_content.json#stage",
    "assets/p0/p0_content.json#stage",
@@ -12996,7 +12997,7 @@
  },
  "Tea": {
   "where": [
-   "modules/p0/p0_logic.gd:855",
+   "modules/p0/p0_logic.gd:865",
    "modules/ui/l10n.gd:19",
    "scenes/p0/panels/p0_counter_drawer.gd:43",
    "assets/p0/p0_content.json#style",
@@ -13134,7 +13135,7 @@
  },
  "That's three cups today. Come back tomorrow.": {
   "where": [
-   "modules/p0/p0_logic.gd:2046"
+   "modules/p0/p0_logic.gd:2056"
   ],
   "kind": "line",
   "done": true
@@ -13162,14 +13163,14 @@
  },
  "The Market Board has %d %s today.": {
   "where": [
-   "modules/p0/p0_logic.gd:2154"
+   "modules/p0/p0_logic.gd:2164"
   ],
   "kind": "template",
   "done": true
  },
  "The Market Board refills in %s.": {
   "where": [
-   "modules/p0/p0_logic.gd:2076"
+   "modules/p0/p0_logic.gd:2086"
   ],
   "kind": "template",
   "done": true
@@ -13333,14 +13334,14 @@
  },
  "Third": {
   "where": [
-   "modules/p0/p0_board.gd:215"
+   "modules/p0/p0_board.gd:220"
   ],
   "kind": "line",
   "done": true
  },
  "Third Stove": {
   "where": [
-   "modules/p0/p0_logic.gd:2208"
+   "modules/p0/p0_logic.gd:2218"
   ],
   "kind": "line",
   "done": true
@@ -13403,7 +13404,7 @@
  },
  "Three-ingredient dishes now possible": {
   "where": [
-   "modules/p0/p0_logic.gd:1343"
+   "modules/p0/p0_logic.gd:1353"
   ],
   "kind": "line",
   "done": true
@@ -13424,7 +13425,7 @@
  },
  "Till": {
   "where": [
-   "modules/p0/p0_logic.gd:626"
+   "modules/p0/p0_logic.gd:636"
   ],
   "kind": "line",
   "done": true
@@ -13526,63 +13527,63 @@
  },
  "Today changes: 3-ingredient dishes": {
   "where": [
-   "modules/p0/p0_logic.gd:1297"
+   "modules/p0/p0_logic.gd:1307"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: Coast is your water now": {
   "where": [
-   "modules/p0/p0_logic.gd:1300"
+   "modules/p0/p0_logic.gd:1310"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: River is your water now": {
   "where": [
-   "modules/p0/p0_logic.gd:1299"
+   "modules/p0/p0_logic.gd:1309"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: eels bite at night": {
   "where": [
-   "modules/p0/p0_logic.gd:1301"
+   "modules/p0/p0_logic.gd:1311"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: fruit every two days": {
   "where": [
-   "modules/p0/p0_logic.gd:1298"
+   "modules/p0/p0_logic.gd:1308"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: grow any climate's crops": {
   "where": [
-   "modules/p0/p0_logic.gd:1298"
+   "modules/p0/p0_logic.gd:1308"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: no more watering": {
   "where": [
-   "modules/p0/p0_logic.gd:1297"
+   "modules/p0/p0_logic.gd:1307"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: traps fish for you": {
   "where": [
-   "modules/p0/p0_logic.gd:1299"
+   "modules/p0/p0_logic.gd:1309"
   ],
   "kind": "line",
   "done": true
  },
  "Today changes: two traps to check": {
   "where": [
-   "modules/p0/p0_logic.gd:1300"
+   "modules/p0/p0_logic.gd:1310"
   ],
   "kind": "line",
   "done": true
@@ -13681,7 +13682,7 @@
  },
  "Top level": {
   "where": [
-   "modules/p0/p0_logic.gd:1513",
+   "modules/p0/p0_logic.gd:1523",
    "scenes/p0/panels/p0_skills_drawer.gd:74"
   ],
   "kind": "line",
@@ -13697,14 +13698,14 @@
  },
  "Track": {
   "where": [
-   "modules/p0/p0_board.gd:73"
+   "modules/p0/p0_board.gd:74"
   ],
   "kind": "line",
   "done": true
  },
  "Tracked": {
   "where": [
-   "modules/p0/p0_board.gd:51"
+   "modules/p0/p0_board.gd:52"
   ],
   "kind": "line",
   "done": true
@@ -13718,7 +13719,7 @@
  },
  "Trade": {
   "where": [
-   "modules/p0/p0_logic.gd:2115"
+   "modules/p0/p0_logic.gd:2125"
   ],
   "kind": "line",
   "done": true
@@ -13915,14 +13916,14 @@
  },
  "Try %s": {
   "where": [
-   "modules/p0/p0_board.gd:111"
+   "modules/p0/p0_board.gd:112"
   ],
   "kind": "template",
   "done": true
  },
  "Try %s or %s": {
   "where": [
-   "modules/p0/p0_board.gd:112"
+   "modules/p0/p0_board.gd:113"
   ],
   "kind": "template",
   "done": true
@@ -13944,7 +13945,7 @@
  },
  "Try it": {
   "where": [
-   "scenes/ui_kit/ui_item_cell.gd:486"
+   "scenes/ui_kit/ui_item_cell.gd:515"
   ],
   "kind": "line",
   "done": true
@@ -14163,7 +14164,7 @@
  },
  "Upgrade": {
   "where": [
-   "modules/p0/p0_logic.gd:2297"
+   "modules/p0/p0_logic.gd:2307"
   ],
   "kind": "line",
   "done": true
@@ -14178,28 +14179,28 @@
  },
  "Upgrade at home · Going home is free": {
   "where": [
-   "modules/p0/p0_logic.gd:2199"
+   "modules/p0/p0_logic.gd:2209"
   ],
   "kind": "line",
   "done": true
  },
  "Upgrade to Homestead Lv%d": {
   "where": [
-   "modules/p0/p0_logic.gd:1779"
+   "modules/p0/p0_logic.gd:1789"
   ],
   "kind": "template",
   "done": true
  },
  "Upgrading is free of Energy": {
   "where": [
-   "modules/p0/p0_logic.gd:2309"
+   "modules/p0/p0_logic.gd:2319"
   ],
   "kind": "line",
   "done": true
  },
  "Upgrading is free of Energy · fills Energy to the new max": {
   "where": [
-   "modules/p0/p0_logic.gd:2298"
+   "modules/p0/p0_logic.gd:2308"
   ],
   "kind": "line",
   "done": true
@@ -14213,21 +14214,21 @@
  },
  "Use bait": {
   "where": [
-   "modules/p0/p0_logic.gd:1349"
+   "modules/p0/p0_logic.gd:1359"
   ],
   "kind": "line",
   "done": true
  },
  "Used today": {
   "where": [
-   "modules/p0/p0_logic.gd:2191"
+   "modules/p0/p0_logic.gd:2201"
   ],
   "kind": "line",
   "done": true
  },
  "Uses": {
   "where": [
-   "modules/p0/p0_logic.gd:2192"
+   "modules/p0/p0_logic.gd:2202"
   ],
   "kind": "line",
   "done": true
@@ -14255,7 +14256,7 @@
  },
  "Uses left": {
   "where": [
-   "modules/p0/p0_logic.gd:2186"
+   "modules/p0/p0_logic.gd:2196"
   ],
   "kind": "line",
   "done": true
@@ -14341,28 +14342,28 @@
  },
  "Visit %s": {
   "where": [
-   "modules/p0/p0_board.gd:125"
+   "modules/p0/p0_board.gd:130"
   ],
   "kind": "template",
   "done": true
  },
  "Visit %s first": {
   "where": [
-   "modules/p0/p0_board.gd:62"
+   "modules/p0/p0_board.gd:63"
   ],
   "kind": "template",
   "done": true
  },
  "Visit %s in %s, then come back to %s.": {
   "where": [
-   "modules/p0/p0_board.gd:206"
+   "modules/p0/p0_board.gd:211"
   ],
   "kind": "template",
   "done": true
  },
  "Visit %s, then come back to %s.": {
   "where": [
-   "modules/p0/p0_board.gd:208"
+   "modules/p0/p0_board.gd:213"
   ],
   "kind": "template",
   "done": true
@@ -14462,14 +14463,14 @@
  },
  "Wait · Full in %s": {
   "where": [
-   "modules/p0/p0_logic.gd:842"
+   "modules/p0/p0_logic.gd:852"
   ],
   "kind": "template",
   "done": true
  },
  "Wait · Full now": {
   "where": [
-   "modules/p0/p0_logic.gd:842"
+   "modules/p0/p0_logic.gd:852"
   ],
   "kind": "line",
   "done": true
@@ -14483,7 +14484,7 @@
  },
  "Walk to a plot": {
   "where": [
-   "modules/p0/p0_logic.gd:593"
+   "modules/p0/p0_logic.gd:603"
   ],
   "kind": "line",
   "done": true
@@ -14505,15 +14506,15 @@
  },
  "Wanderer": {
   "where": [
-   "modules/p0/p0_logic.gd:1391"
+   "modules/p0/p0_logic.gd:1401"
   ],
   "kind": "line",
   "done": true
  },
  "Warming Cabinet": {
   "where": [
-   "modules/p0/p0_logic.gd:2326",
-   "modules/p0/p0_logic.gd:2390",
+   "modules/p0/p0_logic.gd:2336",
+   "modules/p0/p0_logic.gd:2400",
    "scenes/p0/kitchen/p0_storage_sheet.gd:90",
    "scenes/p0/rooms/p0_farmhouse.gd:427"
   ],
@@ -14536,14 +14537,14 @@
  },
  "Warming Cabinet 12": {
   "where": [
-   "modules/p0/p0_logic.gd:2219"
+   "modules/p0/p0_logic.gd:2229"
   ],
   "kind": "line",
   "done": true
  },
  "Warming Cabinet keeps 12": {
   "where": [
-   "modules/p0/p0_logic.gd:2208"
+   "modules/p0/p0_logic.gd:2218"
   ],
   "kind": "line",
   "done": true
@@ -14557,22 +14558,22 @@
  },
  "Water": {
   "where": [
-   "modules/p0/p0_board.gd:155",
-   "modules/p0/p0_logic.gd:647"
+   "modules/p0/p0_board.gd:160",
+   "modules/p0/p0_logic.gd:657"
   ],
   "kind": "line",
   "done": true
  },
  "Water %d sown plot%s": {
   "where": [
-   "modules/p0/p0_logic.gd:1671"
+   "modules/p0/p0_logic.gd:1681"
   ],
   "kind": "template",
   "done": true
  },
  "Water what you sowed": {
   "where": [
-   "modules/p0/p0_logic.gd:789"
+   "modules/p0/p0_logic.gd:799"
   ],
   "kind": "line",
   "done": true
@@ -14699,7 +14700,7 @@
  },
  "What's fresh today?": {
   "where": [
-   "modules/p0/p0_logic.gd:2043"
+   "modules/p0/p0_logic.gd:2053"
   ],
   "kind": "line",
   "done": true
@@ -14713,7 +14714,7 @@
  },
  "Where are they biting?": {
   "where": [
-   "modules/p0/p0_logic.gd:2042"
+   "modules/p0/p0_logic.gd:2052"
   ],
   "kind": "line",
   "done": true
@@ -14735,7 +14736,7 @@
  },
  "Who needs help today?": {
   "where": [
-   "modules/p0/p0_logic.gd:2041"
+   "modules/p0/p0_logic.gd:2051"
   ],
   "kind": "line",
   "done": true
@@ -14852,7 +14853,7 @@
  },
  "Worm Bait": {
   "where": [
-   "modules/p0/p0_logic.gd:1523",
+   "modules/p0/p0_logic.gd:1533",
    "assets/p0/p0_content.json#name"
   ],
   "kind": "line",
@@ -14860,7 +14861,7 @@
  },
  "Worms are %d coins. %d left today.": {
   "where": [
-   "modules/p0/p0_logic.gd:2082"
+   "modules/p0/p0_logic.gd:2092"
   ],
   "kind": "template",
   "done": true
@@ -14915,7 +14916,7 @@
  },
  "You can land everything there.": {
   "where": [
-   "modules/p0/p0_logic.gd:2087"
+   "modules/p0/p0_logic.gd:2097"
   ],
   "kind": "line",
   "done": true
@@ -14957,7 +14958,7 @@
  },
  "You look rested. Tea's here when you need it.": {
   "where": [
-   "modules/p0/p0_logic.gd:2064"
+   "modules/p0/p0_logic.gd:2074"
   ],
   "kind": "line",
   "done": true
@@ -15077,8 +15078,8 @@
  },
  "Your dish": {
   "where": [
-   "modules/p0/p0_logic.gd:781",
-   "modules/p0/p0_logic.gd:1680"
+   "modules/p0/p0_logic.gd:791",
+   "modules/p0/p0_logic.gd:1690"
   ],
   "kind": "line",
   "done": true
@@ -15221,7 +15222,7 @@
  },
  "any %s market": {
   "where": [
-   "modules/p0/p0_board.gd:201"
+   "modules/p0/p0_board.gd:206"
   ],
   "kind": "template",
   "done": true
@@ -15249,7 +15250,7 @@
  },
  "at the Homestead Stall": {
   "where": [
-   "modules/p0/p0_logic.gd:2205"
+   "modules/p0/p0_logic.gd:2215"
   ],
   "kind": "line",
   "done": true
@@ -15274,7 +15275,7 @@
  },
  "dawn & dusk": {
   "where": [
-   "modules/p0/p0_logic.gd:1379",
+   "modules/p0/p0_logic.gd:1389",
    "scenes/p0/panels/p0_fish_dex.gd:39"
   ],
   "kind": "line",
@@ -15282,7 +15283,7 @@
  },
  "every dish's gold zone +5": {
   "where": [
-   "modules/p0/p0_logic.gd:2210"
+   "modules/p0/p0_logic.gd:2220"
   ],
   "kind": "line",
   "done": true
@@ -15370,14 +15371,14 @@
  },
  "keeps 12 dishes": {
   "where": [
-   "modules/p0/p0_logic.gd:2219"
+   "modules/p0/p0_logic.gd:2229"
   ],
   "kind": "line",
   "done": true
  },
  "keeps 6 dishes by the stove": {
   "where": [
-   "modules/p0/p0_logic.gd:2326"
+   "modules/p0/p0_logic.gd:2336"
   ],
   "kind": "line",
   "done": true
@@ -15405,7 +15406,7 @@
  "needs %d Energy": {
   "where": [
    "modules/p0/p0_guide.gd:327",
-   "modules/p0/p0_logic.gd:1886"
+   "modules/p0/p0_logic.gd:1896"
   ],
   "kind": "template",
   "done": true
@@ -15426,15 +15427,15 @@
  },
  "not native": {
   "where": [
-   "modules/p0/p0_item_info.gd:538"
+   "modules/p0/p0_item_info.gd:539"
   ],
   "kind": "line",
   "done": true
  },
  "now %d": {
   "where": [
-   "modules/p0/p0_logic.gd:2320",
-   "modules/p0/p0_logic.gd:2333"
+   "modules/p0/p0_logic.gd:2330",
+   "modules/p0/p0_logic.gd:2343"
   ],
   "kind": "template",
   "done": true
@@ -15473,7 +15474,7 @@
  },
  "pick one": {
   "where": [
-   "modules/p0/p0_logic.gd:2257"
+   "modules/p0/p0_logic.gd:2267"
   ],
   "kind": "line",
   "done": true
@@ -15494,7 +15495,7 @@
  },
  "resets in": {
   "where": [
-   "modules/p0/p0_item_info.gd:599",
+   "modules/p0/p0_item_info.gd:600",
    "scenes/p0/panels/p0_compost_drawer.gd:137"
   ],
   "kind": "line",
@@ -15522,7 +15523,7 @@
  },
  "seasonings off your bag": {
   "where": [
-   "modules/p0/p0_logic.gd:2324"
+   "modules/p0/p0_logic.gd:2334"
   ],
   "kind": "line",
   "done": true
@@ -15578,7 +15579,7 @@
  },
  "the Homestead Stall": {
   "where": [
-   "modules/p0/p0_board.gd:201"
+   "modules/p0/p0_board.gd:206"
   ],
   "kind": "line",
   "done": true
@@ -15600,14 +15601,14 @@
  },
  "third ingredient slot": {
   "where": [
-   "modules/p0/p0_logic.gd:1470"
+   "modules/p0/p0_logic.gd:1480"
   ],
   "kind": "line",
   "done": true
  },
  "two dishes at once": {
   "where": [
-   "modules/p0/p0_logic.gd:2204"
+   "modules/p0/p0_logic.gd:2214"
   ],
   "kind": "line",
   "done": true
@@ -15667,7 +15668,7 @@
  },
  "◆ New for you": {
   "where": [
-   "modules/p0/p0_item_info.gd:513"
+   "modules/p0/p0_item_info.gd:514"
   ],
   "kind": "line",
   "done": true
