@@ -129,7 +129,7 @@ func niche(id, prefix):
 
 func build_sign(room, prefix, anchor):
 	var n1 = room == "poi_hotel_lobby"
-	var size = Vector2(1.6,.22) if n1 else Vector2(1.28,.30)
+	var size = Vector2(1.6,.22) if n1 else Vector2(.88,.23)
 	var option = Node3D.new()
 	option.name = "SignPatchB"
 	option.position = Vector3(anchor.position[0],anchor.position[1],anchor.position[2]+.008)
@@ -138,7 +138,6 @@ func build_sign(room, prefix, anchor):
 	var mesh = QuadMesh.new()
 	mesh.size = size
 	node.mesh = mesh
-	node.position.x = 0. if n1 else -.16
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var mat = material("FFFFFF")
 	mat.albedo_texture = load(prefix + "sign_b.png")

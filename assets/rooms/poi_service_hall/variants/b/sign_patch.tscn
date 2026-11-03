@@ -8,13 +8,12 @@ metallic_specular = 0.15
 roughness = 0.9
 
 [sub_resource type="QuadMesh" id="QuadMesh_gixc8"]
-size = Vector2(1.28, 0.3)
+size = Vector2(0.88, 0.23)
 
 [node name="SignPatchB" type="Node3D" unique_id=1396806933]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.08, -2.917)
 
 [node name="GreenCrossSign" type="MeshInstance3D" parent="." unique_id=620287134]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0, 0)
 material_override = SubResource("StandardMaterial3D_n1y7j")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_gixc8")

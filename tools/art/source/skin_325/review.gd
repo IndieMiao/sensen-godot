@@ -181,19 +181,25 @@ func sign_detail():
 	camera.position=anchor.position+Vector3(-.12,0,0)+camera.basis.z*22
 	for i in 8:await RenderingServer.frame_post_draw
 	var bounds=label.get_aabb();var left=label.position.x+bounds.position.x
-	var right=left+bounds.size.x;var cross_right=anchor.position.x-.8+.235
+	var right=left+bounds.size.x;var cross_right=anchor.position.x-.44+.175
+	var patch:MeshInstance3D=room.get_node("VariantOption_sign_b/GreenCrossSign")
+	var patch_bounds=patch.get_aabb();var patch_center=room.to_local(patch.global_position)
+	check(patch_bounds.size.distance_to(Vector3(.88,.23,0))<.00001,"N2 patch matches plaque inner size .88 x .23m")
+	check(absf(patch_center.x-anchor.position.x)<.00001 and absf(patch_center.y-anchor.position.y)<.00001,"N2 patch centered inside original plaque")
+	check(left>=patch_center.x-.44 and right<=patch_center.x+.44,"Runtime lettering stays inside inset patch")
 	check(is_zero_approx(label.rotation_degrees.y),"Text faces same +Z side as green cross at marker yaw 180")
 	check(bounds.size.x>0 and bounds.size.x<=spec.size_m[0] and bounds.size.y<=spec.size_m[1],"Actual runtime text fits .66 x .23m writing area")
 	check(left>cross_right+.02,"Runtime Service Hall is physically to the right of the green cross")
 	check(left>=anchor.position.x+.1-.33 and right<=anchor.position.x+.1+.33,"Runtime text remains inside the offset B writing area")
 	report.sign={"text":label.text,"anchor_yaw":anchor.rotation_degrees.y,"text_yaw":label.rotation_degrees.y,
+		"patch_size_m":[patch_bounds.size.x,patch_bounds.size.y],"patch_center_room":[patch_center.x,patch_center.y,patch_center.z],
 		"size_m":spec.size_m,"room_space_offset_m":spec.offset_m,"actual_text_size_m":[bounds.size.x,bounds.size.y],
 		"text_x_range_m":[left,right],"cross_right_x_m":cross_right,"clear_gap_m":left-cross_right,"baked_text":false}
 	await capture("N2_sign_Service_Hall")
 	vp.queue_free();await get_tree().process_frame
 func run():
 	var detail=OS.get_cmdline_user_args().has("--sign-detail")
-	output=ProjectSettings.globalize_path("res://../captures-v1.1" if detail else "res://../captures");DirAccess.make_dir_recursive_absolute(output)
+	output=ProjectSettings.globalize_path("res://../captures-v1.2" if detail else "res://../captures");DirAccess.make_dir_recursive_absolute(output)
 	if detail:await sign_detail()
 	else:
 		for id in ["poi_hotel_lobby","poi_service_hall"]:await run_room(id)

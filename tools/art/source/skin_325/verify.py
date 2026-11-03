@@ -79,7 +79,8 @@ for room in ['poi_hotel_lobby', 'poi_service_hall']:
     if room == 'poi_hotel_lobby':
         check(np.unique(sign.reshape(-1,3),axis=0).shape[0] == 1, 'N1 entire sign has no baked text or marks')
     else:
-        check(np.unique(sign[35:265,570:1230].reshape(-1,3),axis=0).tolist() == [[247,251,247]], 'N2 0.66 x 0.23 m writing region at +X .10 is completely blank')
+        check(sign.shape == (230,880,3), 'N2 patch aspect matches .88 x .23m plaque interior')
+        check(np.unique(sign[:,210:870].reshape(-1,3),axis=0).tolist() == [[247,251,247]], 'N2 0.66 x 0.23 m writing region at +X .10 is completely blank')
         check(np.unique(sign.reshape(-1,3),axis=0).tolist() == [[62,158,106],[247,251,247]], 'N2 sign contains only white and approved green cross')
 check(len(uids) == len(set(uids)), 'All four new texture UIDs are distinct')
 options = json.loads((OUT/'options-validation.json').read_text())

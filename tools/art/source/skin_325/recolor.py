@@ -57,8 +57,8 @@ for room in ['poi_hotel_lobby','poi_service_hall']:
 
 sign=Image.new('RGBA',(1024,192),'#F3ECE2')
 sign.save(ROOT/'assets/rooms/poi_hotel_lobby/sign_b.png')
-sign=Image.new('RGBA',(1280,300),'#F7FBF7');draw=ImageDraw.Draw(sign)
-draw.rectangle((85,120,235,180),fill='#3E9E6A');draw.rectangle((130,75,190,225),fill='#3E9E6A')
+sign=Image.new('RGBA',(880,230),'#F7FBF7');draw=ImageDraw.Draw(sign)
+draw.rectangle((35,91,175,139),fill='#3E9E6A');draw.rectangle((81,45,129,185),fill='#3E9E6A')
 sign.save(ROOT/'assets/rooms/poi_service_hall/sign_b.png')
 (OUT/'palette-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print('Two approved 2048px B atlases and blank sign patches ready')
