@@ -1127,7 +1127,8 @@
   "where": [
    "modules/p0/p0_inbox.gd:110"
   ],
-  "kind": "template"
+  "kind": "template",
+  "done": true
  },
  "%s's neighbourhood": {
   "where": [
@@ -1606,7 +1607,8 @@
   "where": [
    "modules/p0/p0_inbox.gd:110"
   ],
-  "kind": "line"
+  "kind": "line",
+  "done": true
  },
  "A glassblower is in town. Quartz from the mine.": {
   "where": [
