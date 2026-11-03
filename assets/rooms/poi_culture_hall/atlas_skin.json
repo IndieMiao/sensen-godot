@@ -39,7 +39,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "plaster": {
-      "hex_srgb": "F5DAC0",
+      "hex_srgb": "FFCCA8",
       "rect_px_top_left": [
         1024,
         0,
@@ -68,7 +68,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "panel": {
-      "hex_srgb": "E1BE9A",
+      "hex_srgb": "F3C498",
       "rect_px_top_left": [
         1024,
         512,
@@ -706,7 +706,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "plaster_solid": {
-      "hex_srgb": "F5DAC0",
+      "hex_srgb": "FFCCA8",
       "rect_px_top_left": [
         512,
         1536,
@@ -735,7 +735,7 @@
       "recolor": "Replace base RGB in this fixed region; preserve local AO modulation."
     },
     "wainscot_solid": {
-      "hex_srgb": "E1BE9A",
+      "hex_srgb": "F3C498",
       "rect_px_top_left": [
         768,
         1536,
@@ -1175,7 +1175,7 @@
     "cloth_green",
     "accent_gold"
   ],
-  "stage": "reuse_preassembly",
+  "stage": "detail_v1.1",
   "author": "ZHAOYUN",
   "task": "SGODOT-323",
   "reference_palette": {
@@ -1372,6 +1372,7 @@
     "Bench albedo 6E7C46 compensates the unchanged shaded seating area toward the reference appearance 465823; other lighting is not brightened globally.",
     "Monstera's ten used 128px tiles are copied byte-for-byte with their original 12px guards and alpha silhouette.",
     "Botanical tiles occupy leaf/leaf_light/leaf_dark reserved regions; opaque furniture never samples these slots.",
-    "Huangzhong's cases, art, plinth, exhibits, mosaic and sign remain unchanged gray placeholders."
+    "v1.1 wall albedo FFCCA8 and wainscot F3C498 compensate the unchanged lighting toward the warm apricot reference F5DAC0. Only four wall/panel atlas slots change from a5ffdae1; floor and other regions remain byte-identical.",
+    "Huangzhong's display props use their own authored vertex colours; this atlas edit does not recolour them."
   ]
 }

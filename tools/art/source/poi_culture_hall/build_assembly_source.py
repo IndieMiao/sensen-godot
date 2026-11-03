@@ -74,6 +74,15 @@ def main():
     # Swap only copied shell materials/images; the shared source is read-only.
     atlas = bpy.data.images.load(str(KIT / "room_albedo_ao.png"))
     atlas.pack()
+    for name in own:
+        for obj in templates[name].objects:
+            if obj.type != "MESH":
+                continue
+            for material in obj.data.materials:
+                if material and material.use_nodes:
+                    for node in material.node_tree.nodes:
+                        if node.type == "TEX_IMAGE":
+                            node.image = atlas
     material_map = {}
     for spec in shell["assets"] + shell["instances"]:
         col = place(spec["name"], spec.get("asset", spec["name"]), spec["position"], spec["yaw_degrees"])

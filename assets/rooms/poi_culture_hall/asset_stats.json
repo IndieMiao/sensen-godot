@@ -1,5 +1,5 @@
 {
-  "stage": "detail_v1",
+  "stage": "detail_v1.1",
   "assets": [
     {
       "name": "gallery_bench",
@@ -304,7 +304,7 @@
       "name": "props/floor_mosaic",
       "file": "props/floor_mosaic.glb",
       "module": "M03",
-      "description": "Thin concentric beige stone medallion; no collision",
+      "description": "Four alternating warm cream / light terracotta rings and darker center; no collision",
       "quantity": 1,
       "origin": "bottom_center",
       "front": "+Z",
@@ -329,8 +329,53 @@
         0.00800000037997961,
         1.940000057220459
       ],
-      "sha256": "0d5b41e95c3e713da207c39553aed5351fc8000c55928c717b6955b8b2d5fa97",
+      "sha256": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688",
       "provenance": "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json",
+      "color_pattern": {
+        "revision": "v1.2",
+        "colors": {
+          "mosaic_cream": "F1DDBC",
+          "mosaic_terracotta": "E2A77A",
+          "mosaic_center": "D39A6E",
+          "mosaic_grout": "D3BB9A"
+        },
+        "row_roles": [
+          "mosaic_center",
+          "mosaic_cream",
+          "mosaic_terracotta",
+          "mosaic_terracotta",
+          "mosaic_cream",
+          "mosaic_cream",
+          "mosaic_terracotta"
+        ],
+        "bands": [
+          {
+            "radius_min": 0.0,
+            "radius_max": 0.14,
+            "role": "mosaic_center"
+          },
+          {
+            "radius_min": 0.14,
+            "radius_max": 0.3,
+            "role": "mosaic_cream"
+          },
+          {
+            "radius_min": 0.3,
+            "radius_max": 0.62,
+            "role": "mosaic_terracotta"
+          },
+          {
+            "radius_min": 0.62,
+            "radius_max": 0.9,
+            "role": "mosaic_cream"
+          },
+          {
+            "radius_min": 0.9,
+            "radius_max": 0.97,
+            "role": "mosaic_terracotta"
+          }
+        ]
+      },
       "supplier_asset": "floor_mosaic"
     },
     {
@@ -1040,10 +1085,11 @@
   },
   "props_dependency": {
     "branch": "wp-3d-scene-huangzhong-culture-323",
-    "commit": "85b0656588f7f2cea516f42e677c47ab466e1295",
+    "commit": "c46e8e374867bb083032d519776b6614bd74a674",
     "manifest": "props/prop_manifest.json",
-    "technical_approval": "323 8d679529 / 7aa982a6",
-    "revision": "v1.1",
-    "notes": "Enlarged exhibits with .06 m pedestals; unchanged display-surface origins"
+    "technical_approval": "Base display kit: 323 8d679529 / 7aa982a6",
+    "integration_authorization": "Director v1.1 dispatch: integrate Huangzhong's recoloured mosaic after push; supplier delivery 443e7292",
+    "revision": "v1.2",
+    "notes": "1.4x exhibits with .06 m pedestals; mosaic v1.2 warm cream/terracotta concentric colour rings, geometry unchanged"
   }
 }

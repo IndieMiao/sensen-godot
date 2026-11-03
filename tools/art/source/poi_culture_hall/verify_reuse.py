@@ -24,7 +24,7 @@ def main():
     def check(ok,label):
         checks.append(dict(check=label,passed=bool(ok)))
         if not ok:print("FAIL",label)
-    detailed=plan["stage"]=="detail_v1"
+    detailed=plan["stage"].startswith("detail_")
     for key in ["spawn","exit","camera","rear_clear_band","review_lighting"]:check(plan[key]==baseline[key],"approved "+key+" unchanged")
     check([a for a in plan["anchors"] if a["name"]!="sign_door"]==[a for a in baseline["anchors"] if a["name"]!="sign_door"],"approved seating and navigation anchors unchanged")
     rows={r["name"]:r for r in plan["placements"]}

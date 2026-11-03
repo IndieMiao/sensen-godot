@@ -1,6 +1,6 @@
 extends Node
 const KIT:="res://assets/rooms/poi_culture_hall/"
-const OUT:="res://../captures-v1/"
+var output_dir:="res://../captures-v1/"
 const OUTPOST=preload("res://scenes/p0/p0_outpost.gd")
 var vp: SubViewport
 var room
@@ -8,7 +8,9 @@ var runtime
 var seated: Array=[]
 var report:={"checks":[],"captures":[],"seats":[]}
 var elapsed:=0.0
-func _ready() -> void:run.call_deferred()
+func _ready() -> void:
+	if "--v11" in OS.get_cmdline_user_args():output_dir="res://../captures-v11/"
+	run.call_deferred()
 func _process(dt: float) -> void:
 	elapsed+=dt
 	if elapsed>180:get_tree().quit(2)
@@ -21,7 +23,7 @@ func capture(name_: String,size_: Vector2i) -> void:
 	for i in 8:
 		await get_tree().process_frame
 		RenderingServer.force_draw(true)
-	var image:=vp.get_texture().get_image();check(image.save_png(OUT+name_+".png")==OK,name_+" capture")
+	var image:=vp.get_texture().get_image();check(image.save_png(output_dir+name_+".png")==OK,name_+" capture")
 	report.captures.append({"name":name_,"size":[size_.x,size_.y],"width_m":room.cam.size,"transform":str(room.cam.global_transform)})
 func rect(node: Node3D) -> Rect2:
 	var lo:=Vector2(INF,INF);var hi:=Vector2(-INF,-INF)
@@ -32,6 +34,13 @@ func rect(node: Node3D) -> Rect2:
 			lo=lo.min(q);hi=hi.max(q)
 	return Rect2(lo,hi-lo)
 func row_rect(r: Rect2) -> Array:return [r.position.x,r.position.y,r.size.x,r.size.y]
+func wall_probes() -> Array:
+	var probes:=[]
+	for probe in [{"name":"left_wall","position":Vector3(-3.198,2.75,0)}, {"name":"right_wall","position":Vector3(-.3,2.1,-2.998)},
+		{"name":"left_panel","position":Vector3(-3.085,.65,-.9)}, {"name":"right_panel","position":Vector3(-.3,.65,-2.885)}]:
+		var pixel: Vector2=room.cam.unproject_position(room.room.to_global(probe.position))
+		probes.append({"name":probe.name,"world_local":str(probe.position),"pixel":[pixel.x,pixel.y]})
+	return probes
 func artwork_rects() -> Array:
 	var result:=[]
 	var manifest: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(KIT+"props/prop_manifest.json"))
@@ -56,6 +65,7 @@ func validate() -> void:
 	report.triangles=triangles;report.surfaces=surfaces
 	check(triangles==stats.scene_triangles and surfaces==stats.static_draw_surfaces,"actual assembled mesh budget matches manifest")
 	report.stage=room.layout.stage
+	report.input_sha256={"layout":FileAccess.get_sha256(KIT+"layout.json"),"atlas":FileAccess.get_sha256(KIT+"room_albedo_ao.png"),"mosaic":FileAccess.get_sha256(KIT+"props/floor_mosaic.glb")}
 	check(triangles<=150000 and surfaces<=50,"within POI scene budget")
 	check(room.art.find_children("seat_*","Marker3D",true,false).size()==4,"exactly four seat anchors")
 	check(room.art.find_children("npc_*","Marker3D",true,false).is_empty() and room.art.find_children("use_*","Marker3D",true,false).is_empty(),"no NPC or service anchors")
@@ -115,7 +125,7 @@ func populate_seats() -> void:
 		seated.append(rig);report.seats.append({"name":spec.name,"surface_y":spec.position[1],"root_y":rig.position.y,"yaw_degrees":spec.yaw_degrees,"animation":"sit_idle"})
 func run() -> void:
 	if DisplayServer.get_name()=="headless":get_tree().quit(2);return
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output_dir))
 	vp=SubViewport.new();vp.size=Vector2i(360,800);vp.own_world_3d=true;vp.msaa_3d=Viewport.MSAA_4X;vp.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(vp)
 	var preview:=TextureRect.new();preview.texture=vp.get_texture();preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;preview.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(preview)
@@ -147,12 +157,14 @@ func run() -> void:
 	await capture("seated_overview",Vector2i(1200,1000))
 	for rig in seated:rig.visible=false
 	room.actor.visible=false;await capture("overview",Vector2i(1200,1000))
+	report.wall_probes=wall_probes()
 	# Main-image floor edge slopes imply approximately 35 degrees at yaw 45.
 	# This comparison camera is separate from the unchanged 43-degree entry.
 	var overview_transform: Transform3D=room.cam.global_transform
 	room.cam.rotation_degrees=Vector3(-35.264,45,0)
 	room.cam.global_position=room.room.global_position+Vector3(0,1.70,0)+room.cam.global_basis.z*20;room.cam.size=10.8
 	await capture("reference_camera",Vector2i(1200,1100))
+	report.reference_wall_probes=wall_probes()
 	room.cam.global_transform=overview_transform;room.cam.size=11.5
 	for lamp in room.art.find_children("*","SpotLight3D",true,false):lamp.visible=false
 	await capture("spots_off",Vector2i(1200,1000))
@@ -163,6 +175,6 @@ func run() -> void:
 	room.cam.rotation_degrees=Vector3(-90,0,0);room.cam.global_position=room.room.global_position+Vector3(0,20,0);room.cam.size=8
 	await capture("topdown",Vector2i(1200,1200))
 	report.renderer=RenderingServer.get_current_rendering_method();report.adapter=RenderingServer.get_video_adapter_name();report.passed=report.checks.all(func(c):return c.passed)
-	FileAccess.open(OUT+"validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+	FileAccess.open(output_dir+"validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
 	print("CULTURE_RENDER ",report.passed," checks=",report.checks.size())
 	room.queue_free();runtime.queue_free();await get_tree().process_frame;get_tree().quit(0 if report.passed else 1)

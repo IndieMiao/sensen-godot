@@ -9,7 +9,7 @@ import sys
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 KIT = ROOT / "assets/rooms/poi_culture_hall"
-APPROVED_PROPS_COMMIT = "85b0656588f7f2cea516f42e677c47ab466e1295"
+APPROVED_PROPS_COMMIT = "c46e8e374867bb083032d519776b6614bd74a674"
 sys.path.insert(0, str(ROOT / "tools/art"))
 from verify_chef_sign import load_glb
 
@@ -84,12 +84,13 @@ def assemble():
     own_assets = [a for a in plan["assets"] if not a["name"].startswith(("props/", "blockout_"))]
     prop_assets = [dict(a, name="props/" + a["name"], file="props/" + a["file"],
                         supplier_asset=a["name"]) for a in manifest["assets"]]
-    plan.update(stage="detail_v1", placements=rows, assets=own_assets + prop_assets, models={},
+    plan.update(stage="detail_v1.1", placements=rows, assets=own_assets + prop_assets, models={},
                 source_ownership=dict(zhaoyun="Hall skin, six reusable modules, assembly and validation",
                                       huangzhong="Approved props and editable sources copied byte-for-byte; individual glass materials retained"),
                 props_dependency=dict(branch="wp-3d-scene-huangzhong-culture-323", commit=APPROVED_PROPS_COMMIT,
-                                      manifest="props/prop_manifest.json", technical_approval="323 8d679529 / 7aa982a6",
-                                      revision=manifest["revision"], notes="Enlarged exhibits with .06 m pedestals; unchanged display-surface origins"),
+                                      manifest="props/prop_manifest.json", technical_approval="Base display kit: 323 8d679529 / 7aa982a6",
+                                      integration_authorization="Director v1.1 dispatch: integrate Huangzhong's recoloured mosaic after push; supplier delivery 443e7292",
+                                      revision=manifest["revision"], notes="1.4x exhibits with .06 m pedestals; mosaic v1.2 warm cream/terracotta concentric colour rings, geometry unchanged"),
                 height_assumptions=dict(case_top=1.50, case_display_surface=1.00, plinth_top=1.10,
                                         artwork_group_center_y=centre[1], artwork_group_height=1.25,
                                         sign_center_y=sign["position"][1], track_y=3.49))
@@ -103,7 +104,7 @@ def assemble():
         assert all(asset[k] == raw[k] for k in raw), (asset["name"], raw)
         costs[asset["name"]] = raw
     shell = json.loads((ROOT / "assets/rooms/_shared/shell_hall/shell_asset_stats.json").read_text())
-    stats = dict(stage="detail_v1", assets=plan["assets"], shared_shell=shell,
+    stats = dict(stage="detail_v1.1", assets=plan["assets"], shared_shell=shell,
                  scene_triangles=shell["scene_triangles"] + sum(costs[r["model"]]["triangles"] for r in rows),
                  static_draw_surfaces=shell["static_draw_surfaces"] + sum(costs[r["model"]]["surfaces"] for r in rows),
                  atlas=dict(file="room_albedo_ao.png", size=[2048, 2048], botanical_alpha_scissor=.45,

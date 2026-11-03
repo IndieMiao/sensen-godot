@@ -10,8 +10,8 @@ HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3];OUT=ROOT/"assets/rooms
 HALL=ROOT/"assets/rooms/_shared/shell_hall";PLANTS=ROOT/"assets/rooms/_shared/plants"
 sys.path.insert(0,str(ROOT/"tools/art"))
 from verify_chef_sign import load_glb,accessor
-COLORS={"parquet":"D88E56","floor_solid":"D88E56","plaster":"F5DAC0","plaster_solid":"F5DAC0",
-    "panel":"E1BE9A","wainscot_solid":"E1BE9A","cornice":"E9C5A0","cornice_solid":"E9C5A0",
+COLORS={"parquet":"D88E56","floor_solid":"D88E56","plaster":"FFCCA8","plaster_solid":"FFCCA8",
+    "panel":"F3C498","wainscot_solid":"F3C498","cornice":"E9C5A0","cornice_solid":"E9C5A0",
     "skirting":"D3AA85","window":"F0D3AE","window_solid":"F0D3AE","wood_mid":"AE6F45",
     "wood_dark":"694528","oak":"9F683F","oak_light":"BB8758","oak_edge":"9B633C",
     "brass":"B98D42","porcelain":"FFF0D4","linen":"EFDFBD","cloth_green":"6E7C46",
@@ -49,14 +49,15 @@ def main():
         palette["slots"][key]["recolor"]="Preserve the copied RGBA tiles and alpha masks; this is not a solid swatch."
     palette["reserved_for_furniture"]=[key for key in palette["reserved_for_furniture"] if key not in ["leaf","leaf_light","leaf_dark"]]
     atlas.save(OUT/"room_albedo_ao.png")
-    palette.update(atlas="room_albedo_ao.png",stage="reuse_preassembly",author="ZHAOYUN",task="SGODOT-323",
+    palette.update(atlas="room_albedo_ao.png",stage="detail_v1.1",author="ZHAOYUN",task="SGODOT-323",
         reference_palette=dict(wall="F5DAC0",floor="D88E56",furniture="EFDFBD",accent="465823"),
         botanical_tiles=mapping,botanical_source_sha256=hashlib.sha256((PLANTS/"room_albedo_ao.png").read_bytes()).hexdigest(),
         notes=["Shared hall geometry/UV unchanged. Terracotta tile bitmap replaces parquet region only; floor UV remains rotated 90 degrees.",
             "Bench albedo 6E7C46 compensates the unchanged shaded seating area toward the reference appearance 465823; other lighting is not brightened globally.",
             "Monstera's ten used 128px tiles are copied byte-for-byte with their original 12px guards and alpha silhouette.",
             "Botanical tiles occupy leaf/leaf_light/leaf_dark reserved regions; opaque furniture never samples these slots.",
-            "Huangzhong's cases, art, plinth, exhibits, mosaic and sign remain unchanged gray placeholders."])
+            "v1.1 wall albedo FFCCA8 and wainscot F3C498 compensate the unchanged lighting toward the warm apricot reference F5DAC0. Only four wall/panel atlas slots change from a5ffdae1; floor and other regions remain byte-identical.",
+            "Huangzhong's display props use their own authored vertex colours; this atlas edit does not recolour them."])
     (OUT/"atlas_skin.json").write_text(json.dumps(palette,indent=2)+"\n")
     print("CULTURE_ATLAS",len(mapping),"botanical tiles; one 2048 RGBA image")
 if __name__=="__main__":main()

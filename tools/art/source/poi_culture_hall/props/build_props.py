@@ -20,6 +20,8 @@ COLORS={'ivory':'EFDFBD','bed':'F4E8CE','green':'465823','glass':'C2D8D3','glass
     'sage':'83916D','sage_dark':'536746','ochre':'C1A16C','beige':'DCC9A6','grout':'C7B48E',
     'stone':'B9A27E','stone_light':'D5C09C','stone_dark':'927C5C','fossil':'C7AC82','groove':'93734E',
     'clay':'B86742','clay_light':'D68B5C','clay_inner':'8D4E36','pedestal':'E4D7BF'}
+MOSAIC=json.loads((SRC/'mosaic_palette.json').read_text())
+COLORS.update(MOSAIC['colors'])
 
 def write(path,value):
     path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
@@ -214,8 +216,8 @@ def ammonites():
     ammonite_geometry(.18,.20,True)
 
 def mosaic():
-    begin('floor_mosaic','M03','Thin concentric beige stone medallion; no collision')
-    p.cylinder('Thin grout backing',(0,.002,0),.97,.004,'grout',vertices=48)
+    begin('floor_mosaic','M03','Four alternating warm cream / light terracotta rings and darker center; no collision')
+    p.cylinder('Thin grout backing',(0,.002,0),.97,.004,'mosaic_grout',vertices=48)
     radii=[.0,.14,.30,.46,.62,.78,.90,.97];counts=[12,12,18,24,30,36,42]
     for ring,segments in enumerate(counts):
         for i in range(segments):
@@ -226,12 +228,13 @@ def mosaic():
                 verts=[(0,.008,0),(outer*math.cos(start+.02),.008,outer*math.sin(start+.02)),(outer*math.cos(end-.02),.008,outer*math.sin(end-.02))]
             else:
                 verts=[(r*math.cos(a),.008,r*math.sin(a)) for r,a in [(inner,start+da),(outer,start+da),(outer,end-da),(inner,end-da)]]
-            obj=p.mesh('Ring %d stone %02d'%(ring+1,i+1),verts,[tuple(range(len(verts)))],['ivory','beige','paper'][(i+ring*3)%3])
+            obj=p.mesh('Ring %d stone %02d'%(ring+1,i+1),verts,[tuple(range(len(verts)))],MOSAIC['row_roles'][ring])
             bm=bmesh.new();bm.from_mesh(obj.data)
             for face in bm.faces:
                 if face.normal.z<0:face.normal_flip()
             bm.to_mesh(obj.data);bm.free()
     SPECS['floor_mosaic']['colliders']=[]
+    SPECS['floor_mosaic']['color_pattern']=MOSAIC
 
 def sign():
     begin('name_sign','M15','Blank light-wood runtime sign',wall=True)
@@ -367,7 +370,7 @@ def export():
         write(SRC/'modules'/name/'reuse_provenance.json',provenance);spec['provenance']=str((SRC/'modules'/name/'reuse_provenance.json').relative_to(ROOT))
         print('PROP',name,spec['triangles'],spec['dimensions_m'],flush=True)
     bpy.data.scenes.remove(temp);bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'culture_props.blend'))
-    manifest={'revision':'v1.1','author':'黄忠','virtual_user_id':AUTHOR,'baseline_height_m':1.745,'axes':'metres; Y up; +Z front',
+    manifest={'revision':'v1.2','author':'黄忠','virtual_user_id':AUTHOR,'baseline_height_m':1.745,'axes':'metres; Y up; +Z front',
         'scope':'8 grouped GLBs, 9 placed instances; 17 authored components. Scene layout owned by Zhaoyun.',
         'gallery':{'layout':'two rows of three','local_width_m':2.40,'local_height_m':1.25},'assets':list(SPECS.values()),
         'unique_triangles':sum(s['triangles'] for s in SPECS.values()),'placed_triangles':sum(s['triangles']*s['quantity'] for s in SPECS.values()),
