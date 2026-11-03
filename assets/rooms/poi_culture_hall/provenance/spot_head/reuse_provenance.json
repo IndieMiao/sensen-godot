@@ -1,0 +1,30 @@
+{
+  "author": "ZHAOYUN",
+  "source": "new simple fixture",
+  "changes": [
+    "Low-poly brass gallery spotlight; local -Z points toward the existing light target. No new light behaviour."
+  ],
+  "retained_parts": [],
+  "name": "spot_head",
+  "file": "spot_head.glb",
+  "triangles": 604,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.07199999690055847,
+      -0.0650000050663948,
+      -0.11900000274181366
+    ],
+    [
+      0.07199999690055847,
+      0.0650000050663948,
+      0.125
+    ]
+  ],
+  "dimensions_m": [
+    0.14399999380111694,
+    0.1300000101327896,
+    0.24400000274181366
+  ],
+  "sha256": "210c654896a5774c531199e124934c45f6192e6e51f13342162c41ef2ef247b6"
+}

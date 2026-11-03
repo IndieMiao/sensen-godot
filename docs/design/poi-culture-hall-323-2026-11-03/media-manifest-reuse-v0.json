@@ -1,0 +1,79 @@
+[
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_default_clean.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_default_clean.png",
+    "sha256": "7975343553954c25a3c5a1a1d6644d1e3682bdc2561299474915c8c2c96d4131",
+    "bytes": 335277,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_viewing_area.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_viewing_area.png",
+    "sha256": "f7eb4cca6aa672ab2f11ba4c2ab226a98e7e7ee501a825527d41b741b26b2420",
+    "bytes": 378683,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_overview.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_overview.png",
+    "sha256": "69d1d58a3c7b9c8dcc08426621235c5502b68d9ab3f1ae52ae803d4edf0614f1",
+    "bytes": 476429,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_four_seats.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_four_seats.png",
+    "sha256": "b45878aad6d7a1ab67772a3e3b13bddd85d4099ff9a474e93cbe046814f9149b",
+    "bytes": 514724,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_seating_plant_detail.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_seating_plant_detail.png",
+    "sha256": "8d9b60e49200fcceb5a0efab4af39d0f47b4e6d2272bb06c4c3116180d98dccc",
+    "bytes": 295357,
+    "mime": "image/png",
+    "size": [
+      1000,
+      920
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_track_detail.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_track_detail.png",
+    "sha256": "de771fc0ac7706273b4ea8f5e9dc640a756d398b49a738ec1ca9465ed3c2ff02",
+    "bytes": 354701,
+    "mime": "image/png",
+    "size": [
+      1000,
+      920
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_REUSE_v0_wall_lights.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_REUSE_v0_wall_lights.png",
+    "sha256": "0bcbb2a6c99e9770fa15d14555b471da137074c177c934ec69400cc09bb7ad65",
+    "bytes": 400782,
+    "mime": "image/png",
+    "size": [
+      1440,
+      1670
+    ]
+  }
+]

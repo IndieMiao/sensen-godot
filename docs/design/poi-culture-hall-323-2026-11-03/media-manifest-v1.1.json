@@ -1,0 +1,35 @@
+[
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_v1.1_default_clean.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1.1_default_clean.png",
+    "sha256": "6a5e960081b5208295860946daceaf0989d9763c8d89e4b9ab0bba0b3cc5be13",
+    "bytes": 358705,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_v1.1_four_seats.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1.1_four_seats.png",
+    "sha256": "e97f06184619d459101bd8f07e3ffd6b0097bf497a7587a9fbb78526e5ff784a",
+    "bytes": 545864,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_v1.1_stark_comparison.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_v1.1_stark_comparison.png",
+    "sha256": "c090b3835900e5fe9d3d7d1dcd2d83e22d15e3e14c405232b055187854af5dcb",
+    "bytes": 2271934,
+    "mime": "image/png",
+    "size": [
+      2400,
+      1250
+    ]
+  }
+]

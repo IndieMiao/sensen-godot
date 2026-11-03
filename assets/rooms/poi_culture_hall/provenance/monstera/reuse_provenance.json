@@ -1,0 +1,75 @@
+{
+  "author": "ZHAOYUN",
+  "source": "assets/rooms/_shared/plants/source/plants.blend",
+  "changes": [
+    "Uniform .62 scale and 90-degree internal Y rotation retain leaf proportions and keep cards clear of the projecting wainscot.",
+    "Original 128px tile RGBA values and split-leaf masks copied exactly into the room atlas; alpha scissor .45, double-sided.",
+    "Approved conservative pot collision remains .4864 m diameter / .43 m high; no shared library edits."
+  ],
+  "retained_parts": [
+    "Ceramic planter",
+    "Potting soil",
+    "Soft ceramic flute",
+    "Soft ceramic flute.001",
+    "Soft ceramic flute.002",
+    "Soft ceramic flute.003",
+    "Soft ceramic flute.004",
+    "Soft ceramic flute.005",
+    "Soft ceramic flute.006",
+    "Soft ceramic flute.007",
+    "Soft ceramic flute.008",
+    "Soft ceramic flute.009",
+    "Soft ceramic flute.010",
+    "Soft ceramic flute.011",
+    "Soft ceramic flute.012",
+    "Soft ceramic flute.013",
+    "Soft ceramic flute.014",
+    "Soft ceramic flute.015",
+    "Monstera petiole",
+    "Monstera deeply split leaf 00",
+    "Monstera petiole.001",
+    "Monstera deeply split leaf 01",
+    "Monstera petiole.002",
+    "Monstera deeply split leaf 02",
+    "Monstera petiole.003",
+    "Monstera deeply split leaf 03",
+    "Monstera petiole.004",
+    "Monstera deeply split leaf 04",
+    "Monstera petiole.005",
+    "Monstera deeply split leaf 05",
+    "Monstera petiole.006",
+    "Monstera deeply split leaf 06",
+    "Monstera petiole.007",
+    "Monstera deeply split leaf 07",
+    "Monstera petiole.008",
+    "Monstera deeply split leaf 08",
+    "Monstera petiole.009",
+    "Monstera deeply split leaf 09",
+    "Monstera petiole.010",
+    "Monstera deeply split leaf 10"
+  ],
+  "source_sha256": "aec387199dc3c34be2e4e8d0a012d1ffa23dd6445d72ef70693d664333527a60",
+  "source_collection": "KIT_monstera",
+  "name": "monstera",
+  "file": "monstera.glb",
+  "triangles": 910,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.26654309034347534,
+      0.0,
+      -0.479591965675354
+    ],
+    [
+      0.40955784916877747,
+      1.176116943359375,
+      0.4527807831764221
+    ]
+  ],
+  "dimensions_m": [
+    0.6761009395122528,
+    1.176116943359375,
+    0.9323727488517761
+  ],
+  "sha256": "0f1e6cb693a37725ee37ca5ebe7c56172cff965788b98146c42e4dee433582b5"
+}

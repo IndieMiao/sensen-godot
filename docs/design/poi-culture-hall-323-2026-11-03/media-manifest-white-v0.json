@@ -1,0 +1,57 @@
+[
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_WHITE_v0_default_clean.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_WHITE_v0_default_clean.png",
+    "sha256": "a3a9553011fe5a3debc3a2639ce776323b0d51adbcfc0e6cca1fb02913b7eb30",
+    "bytes": 132834,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_WHITE_v0_default_43_safe.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_WHITE_v0_default_43_safe.png",
+    "sha256": "75fc2da85a522c88061d1b59e0c10c7003a2979e6314d6c8c7c18a0c3f46fc9d",
+    "bytes": 161055,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_WHITE_v0_four_seats.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_WHITE_v0_four_seats.png",
+    "sha256": "a96f8737273f349ea724ea8810165e521fcd3dd1f556a3e5175144fddd4c648d",
+    "bytes": 262102,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1070
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_WHITE_v0_topdown_ruler.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_WHITE_v0_topdown_ruler.png",
+    "sha256": "f1c7bd36da7b8bf9805b2dfe52bb78efe6649b3604acac083a3815faa1c5cf75",
+    "bytes": 243308,
+    "mime": "image/png",
+    "size": [
+      1200,
+      1270
+    ]
+  },
+  {
+    "name": "SGODOT-323_POI_CULTURE_HALL_WHITE_v0_viewing_area_not_entry.png",
+    "path": "docs/design/poi-culture-hall-323-2026-11-03/SGODOT-323_POI_CULTURE_HALL_WHITE_v0_viewing_area_not_entry.png",
+    "sha256": "087650d6715b3a26bff9a8b7779a0f88880190a82b1b4822ecc5cd03da5ae38c",
+    "bytes": 191393,
+    "mime": "image/png",
+    "size": [
+      720,
+      1600
+    ]
+  }
+]

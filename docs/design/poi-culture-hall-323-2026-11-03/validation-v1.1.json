@@ -1,0 +1,3562 @@
+{
+  "passed": true,
+  "baseline": "a5ffdae1",
+  "colour_slots": {
+    "plaster": {
+      "rect_px_top_left": [
+        1024,
+        0,
+        1024,
+        512
+      ],
+      "hex_srgb": "FFCCA8"
+    },
+    "plaster_solid": {
+      "rect_px_top_left": [
+        512,
+        1536,
+        256,
+        256
+      ],
+      "hex_srgb": "FFCCA8"
+    },
+    "panel": {
+      "rect_px_top_left": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "hex_srgb": "F3C498"
+    },
+    "wainscot_solid": {
+      "rect_px_top_left": [
+        768,
+        1536,
+        256,
+        256
+      ],
+      "hex_srgb": "F3C498"
+    }
+  },
+  "changed_atlas_pixels": 917504,
+  "outside_slots_identical": true,
+  "alpha_identical": true,
+  "retained_glbs": [
+    "assets/rooms/poi_culture_hall/gallery_bench.glb",
+    "assets/rooms/poi_culture_hall/round_stool.glb",
+    "assets/rooms/poi_culture_hall/spot_track.glb",
+    "assets/rooms/poi_culture_hall/spot_head.glb",
+    "assets/rooms/poi_culture_hall/wall_sconce.glb",
+    "assets/rooms/poi_culture_hall/monstera.glb",
+    "assets/rooms/poi_culture_hall/props/display_cabinet.glb",
+    "assets/rooms/poi_culture_hall/props/exhibit_plinth.glb",
+    "assets/rooms/poi_culture_hall/props/exhibit_ammonite.glb",
+    "assets/rooms/poi_culture_hall/props/name_sign.glb",
+    "assets/rooms/poi_culture_hall/props/artwork_set.glb",
+    "assets/rooms/poi_culture_hall/props/case_exhibits_1.glb",
+    "assets/rooms/poi_culture_hall/props/case_exhibits_2.glb"
+  ],
+  "mosaic_unchanged_arrays": [
+    "NORMAL",
+    "POSITION",
+    "oriented triangle topology (index numbering may differ)"
+  ],
+  "layout_invariants": [
+    "anchors",
+    "spawn",
+    "exit",
+    "camera",
+    "local_lights",
+    "review_lighting",
+    "rear_clear_band"
+  ],
+  "placements_unchanged_except": "floor_mosaic.role descriptive text, now identifies the warm colour rings",
+  "samples": [
+    {
+      "name": "left_wall",
+      "pixel": [
+        378.792327880859,
+        264.140380859375
+      ],
+      "world_local": "(-3.198, 2.75, 0.0)",
+      "patch_size_px": 9,
+      "before": {
+        "hex": "#F3DFC8",
+        "hue_deg": 32.09302325581397,
+        "saturation": 0.17695473251028804,
+        "value": 0.9529411764705882
+      },
+      "after": {
+        "hex": "#F8D9B5",
+        "hue_deg": 32.238805970149244,
+        "saturation": 0.2701612903225806,
+        "value": 0.9725490196078431
+      }
+    },
+    {
+      "name": "right_wall",
+      "pixel": [
+        813.829162597656,
+        308.713043212891
+      ],
+      "world_local": "(-0.3, 2.1, -2.998)",
+      "patch_size_px": 9,
+      "before": {
+        "hex": "#D1BEAE",
+        "hue_deg": 27.428571428571438,
+        "saturation": 0.16746411483253584,
+        "value": 0.8196078431372549
+      },
+      "after": {
+        "hex": "#D6B698",
+        "hue_deg": 29.032258064516128,
+        "saturation": 0.28971962616822433,
+        "value": 0.8392156862745098
+      }
+    },
+    {
+      "name": "left_panel",
+      "pixel": [
+        453.536712646484,
+        384.799438476562
+      ],
+      "world_local": "(-3.085, 0.65, -0.9)",
+      "patch_size_px": 9,
+      "before": {
+        "hex": "#BE9E81",
+        "hue_deg": 28.524590163934434,
+        "saturation": 0.3210526315789474,
+        "value": 0.7450980392156863
+      },
+      "after": {
+        "hex": "#C9A680",
+        "hue_deg": 31.23287671232877,
+        "saturation": 0.36318407960199006,
+        "value": 0.788235294117647
+      }
+    },
+    {
+      "name": "right_panel",
+      "pixel": [
+        805.491394042969,
+        425.056457519531
+      ],
+      "world_local": "(-0.3, 0.65, -2.885)",
+      "patch_size_px": 9,
+      "before": {
+        "hex": "#B89C7E",
+        "hue_deg": 31.034482758620697,
+        "saturation": 0.3152173913043478,
+        "value": 0.7215686274509804
+      },
+      "after": {
+        "hex": "#C8A47B",
+        "hue_deg": 31.948051948051962,
+        "saturation": 0.385,
+        "value": 0.7843137254901961
+      }
+    }
+  ],
+  "sample_note": "Same projected points and median 9x9 patches in unedited 1200x1000 overview; different from director's unspecified sample points",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "supplier file inventory: assets/rooms/poi_culture_hall/props",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/artwork_set.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/artwork_set.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/case_exhibits_1.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/case_exhibits_1.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/case_exhibits_2.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/case_exhibits_2.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/display_cabinet.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/display_cabinet.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/exhibit_ammonite.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/exhibit_ammonite.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/exhibit_plinth.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/exhibit_plinth.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/floor_mosaic.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/floor_mosaic.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/material_import.gd",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/material_import.gd.uid",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/name_sign.glb",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/name_sign.glb.import",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: assets/rooms/poi_culture_hall/props/prop_manifest.json",
+        "passed": true
+      },
+      {
+        "check": "supplier file inventory: tools/art/source/poi_culture_hall/props",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/.gdignore",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/README.md",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/build_props.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/configure_imports.gd",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/culture_props.blend",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/abstract_frame_01/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/abstract_frame_02/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/abstract_frame_03/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/abstract_frame_04/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/abstract_frame_05/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/abstract_frame_06/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/artwork_set/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/case_exhibits_1/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/case_exhibits_2/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/display_cabinet/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_ammonite/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_fossil_rock/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_leaf_fossil/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_plinth/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_shallow_bowl/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_shell_fragment/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_spiral_fossil/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/exhibit_terracotta_jar/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/mosaic_palette.json",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/mosaic_review.gd",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/package_exhibits_review.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/package_mosaic_review.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/package_review.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/prepare_mosaic_review.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/prepare_review.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/recolor_mosaic.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/reference/SGODOT-318_Culture_Hall_Main_2026-10-31.png",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_Module_List.md",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_palette.md",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_props.md",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/reference/SGODOT-323_N3_layout_proposal_v0.png",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/review.gd",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/verify.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/verify_exhibits_revision.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/verify_mosaic_revision.py",
+        "passed": true
+      },
+      {
+        "check": "supplier byte-identical: tools/art/source/poi_culture_hall/props/verify_source.py",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: bench",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: stool",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: plant_pot",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: spot_track",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: spot_head_1",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: spot_head_2",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: spot_head_3",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: wall_sconce_1",
+        "passed": true
+      },
+      {
+        "check": "approved independent placement unchanged: wall_sconce_2",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: gallery_bench.glb",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: gallery_bench.glb.import",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: round_stool.glb",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: round_stool.glb.import",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: spot_track.glb",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: spot_track.glb.import",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: spot_head.glb",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: spot_head.glb.import",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: wall_sconce.glb",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: wall_sconce.glb.import",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: monstera.glb",
+        "passed": true
+      },
+      {
+        "check": "approved independent file unchanged: monstera.glb.import",
+        "passed": true
+      },
+      {
+        "check": "no gray proxy instances",
+        "passed": true
+      },
+      {
+        "check": "old six-frame and six-exhibit placements removed",
+        "passed": true
+      },
+      {
+        "check": "nine supplier instances",
+        "passed": true
+      },
+      {
+        "check": "six individual cabinet exhibits inside two groups",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench finite vertices",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench raw cost",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench unique import UID",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool finite vertices",
+        "passed": true
+      },
+      {
+        "check": "round_stool named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "round_stool raw cost",
+        "passed": true
+      },
+      {
+        "check": "round_stool raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "round_stool unique import UID",
+        "passed": true
+      },
+      {
+        "check": "round_stool texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "spot_track finite vertices",
+        "passed": true
+      },
+      {
+        "check": "spot_track named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "spot_track raw cost",
+        "passed": true
+      },
+      {
+        "check": "spot_track raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "spot_track unique import UID",
+        "passed": true
+      },
+      {
+        "check": "spot_track texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "spot_head finite vertices",
+        "passed": true
+      },
+      {
+        "check": "spot_head named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "spot_head raw cost",
+        "passed": true
+      },
+      {
+        "check": "spot_head raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "spot_head unique import UID",
+        "passed": true
+      },
+      {
+        "check": "spot_head texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce finite vertices",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce raw cost",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce unique import UID",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "monstera finite vertices",
+        "passed": true
+      },
+      {
+        "check": "monstera named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "monstera raw cost",
+        "passed": true
+      },
+      {
+        "check": "monstera raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "monstera unique import UID",
+        "passed": true
+      },
+      {
+        "check": "monstera texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 finite vertices",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 named single mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 raw cost",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 raw bounds match manifest",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 vertex colour without extra textures",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 authored vertex colours",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 unique import UID",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "plinth_exhibit supplier local mount",
+        "passed": true
+      },
+      {
+        "check": "plinth_exhibit supplier size retained",
+        "passed": true
+      },
+      {
+        "check": "plinth_exhibit bottom rests on actual display surface",
+        "passed": true
+      },
+      {
+        "check": "plinth_exhibit supported within plinth",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1 supplier local mount",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1 supplier size retained",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1 bottom rests on actual display surface",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_1 inside glass hood",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2 supplier local mount",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2 supplier size retained",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2 bottom rests on actual display surface",
+        "passed": true
+      },
+      {
+        "check": "case_exhibits_2 inside glass hood",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 exact supplier colliders",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 approved floor pivot and facing unchanged",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 exact supplier colliders",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 approved floor pivot and facing unchanged",
+        "passed": true
+      },
+      {
+        "check": "display_plinth exact supplier colliders",
+        "passed": true
+      },
+      {
+        "check": "display_plinth approved floor pivot and facing unchanged",
+        "passed": true
+      },
+      {
+        "check": "actual case2 mesh clears actual back-wall skirting by 2 m",
+        "passed": true
+      },
+      {
+        "check": "artwork_set clears wall plane and ends",
+        "passed": true
+      },
+      {
+        "check": "artwork_set between wainscot and cornice",
+        "passed": true
+      },
+      {
+        "check": "name_sign clears wall plane and ends",
+        "passed": true
+      },
+      {
+        "check": "name_sign between wainscot and cornice",
+        "passed": true
+      },
+      {
+        "check": "runtime sign mount and writable area match supplier",
+        "passed": true
+      },
+      {
+        "check": "total instanced budget from raw GLB indices",
+        "passed": true
+      }
+    ],
+    "measurements": {
+      "rear_clearance": {
+        "skirting_front_z": -2.8899999618530274,
+        "case2_back_z": -0.8839999761581414,
+        "net_m": 2.005999985694886
+      },
+      "artwork_set_world_bounds": [
+        [
+          0.6659994754791265,
+          1.505,
+          -2.98
+        ],
+        [
+          3.0660005245208746,
+          2.755,
+          -2.92999960064888
+        ]
+      ],
+      "name_sign_world_bounds": [
+        [
+          -1.3739999976158144,
+          3.0599999982118606,
+          -2.975
+        ],
+        [
+          0.0059999976158140456,
+          3.4000000017881393,
+          -2.93099976927042
+        ]
+      ]
+    },
+    "support": [
+      {
+        "name": "case_exhibits_1",
+        "clearance_to_hood_xyz": [
+          0.1706800138950348,
+          0.0,
+          0.040680031776428205
+        ]
+      },
+      {
+        "name": "case_exhibits_2",
+        "clearance_to_hood_xyz": [
+          0.18916329503059387,
+          0.0,
+          0.05916331291198729
+        ]
+      }
+    ],
+    "totals": {
+      "triangles": 23884,
+      "surfaces": 28
+    },
+    "import_uids": {
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/gallery_bench.glb.import": "uid://bxjsrl88j3uiy",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/round_stool.glb.import": "uid://bpby6ye14hqtv",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/spot_track.glb.import": "uid://cv4wraf7c4epe",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/spot_head.glb.import": "uid://dwyfsvdvn25ol",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/wall_sconce.glb.import": "uid://c7mjm0kmxmcjd",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/monstera.glb.import": "uid://bcnn38cu52jd2",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/display_cabinet.glb.import": "uid://d34jvuek38sg5",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/exhibit_plinth.glb.import": "uid://ovtgs1g70eoc",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/exhibit_ammonite.glb.import": "uid://b6g513olvj7fm",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/floor_mosaic.glb.import": "uid://bck6xfpy6n36n",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/name_sign.glb.import": "uid://cqa2or7tfml8q",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/artwork_set.glb.import": "uid://cf0tlj688mlng",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/case_exhibits_1.glb.import": "uid://dg54o53djd7il",
+      "/home/zhangshaoji/.herdr/worktrees/sensen-godot/zy-wp-3d-scene/assets/rooms/poi_culture_hall/props/case_exhibits_2.glb.import": "uid://can6egwr6yo38"
+    },
+    "approved_supplier_commit": "c46e8e374867bb083032d519776b6614bd74a674",
+    "supplier_files_sha256": {
+      "assets/rooms/poi_culture_hall/props/artwork_set.glb": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5",
+      "assets/rooms/poi_culture_hall/props/artwork_set.glb.import": "d9a8160ca253d7068c172f4409caad8b6b8cedf693fe09b3231f5c593c0eb919",
+      "assets/rooms/poi_culture_hall/props/case_exhibits_1.glb": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2",
+      "assets/rooms/poi_culture_hall/props/case_exhibits_1.glb.import": "2068b03e8176c8162ce9a4f1353396ee64bf646ce1b9a57e5abf10db53c5d806",
+      "assets/rooms/poi_culture_hall/props/case_exhibits_2.glb": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b",
+      "assets/rooms/poi_culture_hall/props/case_exhibits_2.glb.import": "e8cb5e8e00c5dd154d942b5043e4eff52d6db0de2406e304a07205a4c17b3680",
+      "assets/rooms/poi_culture_hall/props/display_cabinet.glb": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c",
+      "assets/rooms/poi_culture_hall/props/display_cabinet.glb.import": "4e9f38b1f041177254d7b4e6f896be5285ebd521efb1cf83331094eec7889219",
+      "assets/rooms/poi_culture_hall/props/exhibit_ammonite.glb": "f0628167601f24f2b6158dcaa2d2c8cf9e28eb2204b72b707df768a488e07f00",
+      "assets/rooms/poi_culture_hall/props/exhibit_ammonite.glb.import": "1202601600725d6500856ad516d43d6ecd73f850195c3dc1b7ec9309dbaf8b55",
+      "assets/rooms/poi_culture_hall/props/exhibit_plinth.glb": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9",
+      "assets/rooms/poi_culture_hall/props/exhibit_plinth.glb.import": "acdc769a9422a1783af40ffc3a9ef05933e0875b3a653b36d5f0c1323ae91097",
+      "assets/rooms/poi_culture_hall/props/floor_mosaic.glb": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688",
+      "assets/rooms/poi_culture_hall/props/floor_mosaic.glb.import": "6c00a239045e3224a73fdb7d7f4a581798da3eab3041a0bbe0d3eef78667fb28",
+      "assets/rooms/poi_culture_hall/props/material_import.gd": "308ed43029bd176a85ea6d792eeac218a18b8fac75a0e6bf1b42ea0d4d354ec7",
+      "assets/rooms/poi_culture_hall/props/material_import.gd.uid": "99a68ed3c2a54506f694dd4f0cf8e3f4c61535e3e31bd9e509c06a44abe58c85",
+      "assets/rooms/poi_culture_hall/props/name_sign.glb": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992",
+      "assets/rooms/poi_culture_hall/props/name_sign.glb.import": "93832deb3d2cb9f9430788d4e5f751d6c68abae9dc6c4d52681b5ee48317f6ed",
+      "assets/rooms/poi_culture_hall/props/prop_manifest.json": "48f5feab412ed867856e0810cb56c90a43f0cf3fe20b674c8968b76eef5a61ef",
+      "tools/art/source/poi_culture_hall/props/.gdignore": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "tools/art/source/poi_culture_hall/props/README.md": "958b2aef3f88ef6885548dc579cf58c9989f9c253e8ba1692f79dc7e2f7d2bdd",
+      "tools/art/source/poi_culture_hall/props/build_props.py": "63aa13faab3b7c852d06279def1b8091fbe77d63ec87d994bb25e348070638e4",
+      "tools/art/source/poi_culture_hall/props/configure_imports.gd": "92def55b788ab11f1a2246a1d799fc59a7a5d107d428dc382d11d7c302a4855a",
+      "tools/art/source/poi_culture_hall/props/culture_props.blend": "8435ea5c886059a7236ecf13ba281d5ca727d08c4fa331c715901584bb79784b",
+      "tools/art/source/poi_culture_hall/props/modules/abstract_frame_01/reuse_provenance.json": "e2e68dbf97bb482e354596ebca60854a20937fdd6881f7b72e887bab312166cc",
+      "tools/art/source/poi_culture_hall/props/modules/abstract_frame_02/reuse_provenance.json": "a5e90df4a1128989a225c5b341c19d477101f53fb31c6193ae12327eeb68550e",
+      "tools/art/source/poi_culture_hall/props/modules/abstract_frame_03/reuse_provenance.json": "adfa56405067684088b61fd644182d72f09d02a77719041beb8d7ab3d7a20ae0",
+      "tools/art/source/poi_culture_hall/props/modules/abstract_frame_04/reuse_provenance.json": "eaa7943d0637a74a8469cdc985ace317212acb86b374382507fe2858377c2900",
+      "tools/art/source/poi_culture_hall/props/modules/abstract_frame_05/reuse_provenance.json": "446ffe3f047f7bbf73c193ad132ec97052e92eee8e469be66ff788464a886709",
+      "tools/art/source/poi_culture_hall/props/modules/abstract_frame_06/reuse_provenance.json": "16726a3086f9eaaf828aa113c3550167daf64b555df7f76f5dcbc86b19fe1902",
+      "tools/art/source/poi_culture_hall/props/modules/artwork_set/reuse_provenance.json": "21414070a806f7b544fcce7b137aae3bd256e825a038613610898fd932f37681",
+      "tools/art/source/poi_culture_hall/props/modules/case_exhibits_1/reuse_provenance.json": "2b82d55e37357d19f696db6630060acb33b02de138b421b69af8693eaa978a91",
+      "tools/art/source/poi_culture_hall/props/modules/case_exhibits_2/reuse_provenance.json": "941140259036faca54e4c8a3cb46d4a9a7b488bf387bcd91117cf8f4dfbcc535",
+      "tools/art/source/poi_culture_hall/props/modules/display_cabinet/reuse_provenance.json": "65355a9b740678c00a94fba7a3b96cd65e85089de048f3f70630f4736ed79ff8",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_ammonite/reuse_provenance.json": "b0987a0130a796cb6f75fa3974e89910c5937fdb32369833b42512d4a9b19226",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_fossil_rock/reuse_provenance.json": "e9e39b1677e068d20a260326753ed44cd210180534319e9f644ee17c66308b1d",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_leaf_fossil/reuse_provenance.json": "32d2c8b164199652ee9210758df11d3a90be6e493549b96d3b6c7639cec7ec72",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_plinth/reuse_provenance.json": "8af89aab3dc296ff4da98e3bcd0c6480145e1fb6168b374eb50140489b1c4d02",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_shallow_bowl/reuse_provenance.json": "95ec8657537076d41612f68eb4769e2f9830535f12bf69335034912bd59b927d",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_shell_fragment/reuse_provenance.json": "b612f817a9cf538e7b6607b517f80dd183929ef475de75e92a44ef9acd4802cf",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_spiral_fossil/reuse_provenance.json": "8aaac1b0d1958ace4ed274d52780a2ef7728c11e9c595fc5008086081ef5c921",
+      "tools/art/source/poi_culture_hall/props/modules/exhibit_terracotta_jar/reuse_provenance.json": "ccc496b5aaed97d4bc18b6e6423add7cf68534e1da01f2639ed964ca6e210b8c",
+      "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json": "ae21af623b758fe49cf8c8f66e8b895d600f972e2f331efb26ba1dbb0856469f",
+      "tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json": "c173aebd6e541ed96335c40f01e05371805a6f304f5c0d8c108eda1955c917ae",
+      "tools/art/source/poi_culture_hall/props/mosaic_palette.json": "0ad43b747776d1a594d55e6588a28e7139c1689c9c0ceccb4f69bb9599ba6a40",
+      "tools/art/source/poi_culture_hall/props/mosaic_review.gd": "a5344fb6deb98ac018115ed706358f96536a6f574553c31cb1ae7e9c4d55b6f8",
+      "tools/art/source/poi_culture_hall/props/package_exhibits_review.py": "0d27152b5ff5e983b6fe55f4021ceac67f54fd75762b118fcc74bdbac7ebb037",
+      "tools/art/source/poi_culture_hall/props/package_mosaic_review.py": "6c8decb7dc2dcffafbbe9fd6827470386453edbac67bfc25c8d90ed8cbab9b13",
+      "tools/art/source/poi_culture_hall/props/package_review.py": "5234a5613de5b1189d79f1b7d50d04d88c2e629ad27e93c94695f0295ae4912b",
+      "tools/art/source/poi_culture_hall/props/prepare_mosaic_review.py": "7e4d85a446c2b0132b717decac6713d2ea986e8d47c143573533b2bbc0647d13",
+      "tools/art/source/poi_culture_hall/props/prepare_review.py": "d2966d82ee5539e71dae9d28365b4a0d3711f9a3359d4618cc5fd64b3bf331a0",
+      "tools/art/source/poi_culture_hall/props/recolor_mosaic.py": "51c854629856f7a80529fb336027bbbbe7fc87157fae980b637652ea2ef408fc",
+      "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_Culture_Hall_Main_2026-10-31.png": "8609be557a72138aaa597741fb8d9af2dce5acb6162ef107c5b31ad77bf5b8cb",
+      "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_Module_List.md": "1a0f17a0dc06b97b612ae142fd4a6018a3657f1f3bf1fa9099a3adde23d9f0a2",
+      "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_palette.md": "be545e233124e217349b8e2b4a52c34b66806c8932dae3f8a04599a845e7b166",
+      "tools/art/source/poi_culture_hall/props/reference/SGODOT-318_R3_props.md": "2cec13a0cf1008a15c9b9fbedf78a846fbd626fe47eb494cbc4eab8e4052334a",
+      "tools/art/source/poi_culture_hall/props/reference/SGODOT-323_N3_layout_proposal_v0.png": "8018dc7b123e64933c190bfc240deda46ab22658587e428e974be1f5de3d558c",
+      "tools/art/source/poi_culture_hall/props/review.gd": "68d9864f2bfef8f8d6e56ecde018a8f7261d44833fdd7bfc6a7ce2e1ecf03b85",
+      "tools/art/source/poi_culture_hall/props/verify.py": "106f27aeb0ea5330f669a3ed09fb0377cf8aab4cb1725ae2536b4ef0280a96fb",
+      "tools/art/source/poi_culture_hall/props/verify_exhibits_revision.py": "addc9b36fe0a15b22af94b2177c356bc2e7963282e8487e00b82cbaef5253e6d",
+      "tools/art/source/poi_culture_hall/props/verify_mosaic_revision.py": "a53ec0aab7e62ba9e74b698941b70d1239a35e868626c3feb155818e7474aacb",
+      "tools/art/source/poi_culture_hall/props/verify_source.py": "974c628fdd595d777bc81ddf3ac27cf47c729b52d273345693aeb4b1c9c18003"
+    }
+  },
+  "independent": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "approved spawn unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved exit unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved camera unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved rear_clear_band unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved review_lighting unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved seating and navigation anchors unchanged",
+        "passed": true
+      },
+      {
+        "check": "approved collision unchanged: bench",
+        "passed": true
+      },
+      {
+        "check": "approved collision unchanged: stool",
+        "passed": true
+      },
+      {
+        "check": "approved collision unchanged: plant_pot",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_ball.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_ball.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_bench.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_bench.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_box.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_box.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_case.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_case.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_cylinder.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_cylinder.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_fossil.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_fossil.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_frame.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_frame.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_mosaic.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_mosaic.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_stool.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_stool.glb.import",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_vase.glb",
+        "passed": true
+      },
+      {
+        "check": "white asset byte-identical: blockout_vase.glb.import",
+        "passed": true
+      },
+      {
+        "check": "read-only library: assets/rooms/_shared/shell_hall",
+        "passed": true
+      },
+      {
+        "check": "read-only library: scenes/shell_hall",
+        "passed": true
+      },
+      {
+        "check": "read-only library: assets/rooms/_shared/plants",
+        "passed": true
+      },
+      {
+        "check": "single 2048 RGBA room atlas",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [0, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [1, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [2, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [3, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [4, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [5, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [6, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [7, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [8, 15]",
+        "passed": true
+      },
+      {
+        "check": "exact botanical RGBA tile [9, 15]",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench named single mesh",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench single surface",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench sole external room atlas",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench finite geometry and atlas UV",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench raw triangle cost",
+        "passed": true
+      },
+      {
+        "check": "round_stool named single mesh",
+        "passed": true
+      },
+      {
+        "check": "round_stool single surface",
+        "passed": true
+      },
+      {
+        "check": "round_stool sole external room atlas",
+        "passed": true
+      },
+      {
+        "check": "round_stool finite geometry and atlas UV",
+        "passed": true
+      },
+      {
+        "check": "round_stool raw triangle cost",
+        "passed": true
+      },
+      {
+        "check": "spot_track named single mesh",
+        "passed": true
+      },
+      {
+        "check": "spot_track single surface",
+        "passed": true
+      },
+      {
+        "check": "spot_track sole external room atlas",
+        "passed": true
+      },
+      {
+        "check": "spot_track finite geometry and atlas UV",
+        "passed": true
+      },
+      {
+        "check": "spot_track raw triangle cost",
+        "passed": true
+      },
+      {
+        "check": "spot_head named single mesh",
+        "passed": true
+      },
+      {
+        "check": "spot_head single surface",
+        "passed": true
+      },
+      {
+        "check": "spot_head sole external room atlas",
+        "passed": true
+      },
+      {
+        "check": "spot_head finite geometry and atlas UV",
+        "passed": true
+      },
+      {
+        "check": "spot_head raw triangle cost",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce named single mesh",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce single surface",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce sole external room atlas",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce finite geometry and atlas UV",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce raw triangle cost",
+        "passed": true
+      },
+      {
+        "check": "monstera named single mesh",
+        "passed": true
+      },
+      {
+        "check": "monstera single surface",
+        "passed": true
+      },
+      {
+        "check": "monstera sole external room atlas",
+        "passed": true
+      },
+      {
+        "check": "monstera finite geometry and atlas UV",
+        "passed": true
+      },
+      {
+        "check": "monstera raw triangle cost",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench approved seat dimensions",
+        "passed": true
+      },
+      {
+        "check": "round_stool approved seat dimensions",
+        "passed": true
+      },
+      {
+        "check": "foliage clears left wall and open front",
+        "passed": true
+      },
+      {
+        "check": "all Monstera card vertices clear actual projecting wainscot",
+        "passed": true
+      },
+      {
+        "check": "every exported Monstera vertex preserves scaled/quarter-turned source position and remapped UV",
+        "passed": true
+      },
+      {
+        "check": "Monstera alpha scissor .45 and double-sided",
+        "passed": true
+      }
+    ],
+    "costs": [
+      {
+        "name": "gallery_bench",
+        "triangles": 864,
+        "bounds": [
+          [
+            -0.3400000035762787,
+            0.0,
+            -0.8639999628067017
+          ],
+          [
+            0.3400000035762787,
+            0.7149999737739563,
+            0.8639999628067017
+          ]
+        ],
+        "sha256": "3046a9f06219fa7d6d03d1da4df4b3c6d5ef6000d2ed24710c4a608e995a712d"
+      },
+      {
+        "name": "round_stool",
+        "triangles": 176,
+        "bounds": [
+          [
+            -0.24000000953674316,
+            0.0,
+            -0.24000000953674316
+          ],
+          [
+            0.24000000953674316,
+            0.7149999737739563,
+            0.24000000953674316
+          ]
+        ],
+        "sha256": "02de6017ebb8e43c275fce47fc7fb080ba4620087fac452b199aa32d0c789186"
+      },
+      {
+        "name": "spot_track",
+        "triangles": 432,
+        "bounds": [
+          [
+            -1.399999976158142,
+            0.0,
+            -0.03999999910593033
+          ],
+          [
+            1.399999976158142,
+            0.05999999865889549,
+            0.03999999910593033
+          ]
+        ],
+        "sha256": "15723377f87b29a7e10f6f9669d3045ba68d7a12d40a9e4fbc0ea98052f55be6"
+      },
+      {
+        "name": "spot_head",
+        "triangles": 604,
+        "bounds": [
+          [
+            -0.07199999690055847,
+            -0.0650000050663948,
+            -0.11900000274181366
+          ],
+          [
+            0.07199999690055847,
+            0.0650000050663948,
+            0.125
+          ]
+        ],
+        "sha256": "210c654896a5774c531199e124934c45f6192e6e51f13342162c41ef2ef247b6"
+      },
+      {
+        "name": "wall_sconce",
+        "triangles": 292,
+        "bounds": [
+          [
+            -0.07000000029802322,
+            -0.2800000011920929,
+            -0.017500000074505806
+          ],
+          [
+            0.07000000029802322,
+            0.2800000011920929,
+            0.1420000195503235
+          ]
+        ],
+        "sha256": "06162cf180c8c37c2c231916122fca6af894e8689ac8e7fb9ffad6abc1f85cd6"
+      },
+      {
+        "name": "monstera",
+        "triangles": 910,
+        "bounds": [
+          [
+            -0.26654309034347534,
+            0.0,
+            -0.479591965675354
+          ],
+          [
+            0.40955784916877747,
+            1.176116943359375,
+            0.4527807831764221
+          ]
+        ],
+        "sha256": "0f1e6cb693a37725ee37ca5ebe7c56172cff965788b98146c42e4dee433582b5"
+      }
+    ],
+    "botanical_max_uv_error": 0.0,
+    "botanical_wainscot_clearance_m": 0.12845686137676182,
+    "scope": "Independent shell skin, seats, lamps and botanical source checks; display kit is audited separately for detail_v1."
+  },
+  "editable_source": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "bench",
+        "bounds_max_error_m": 0.0,
+        "passed": true
+      },
+      {
+        "name": "stool",
+        "bounds_max_error_m": 0.0,
+        "passed": true
+      },
+      {
+        "name": "plant_pot",
+        "bounds_max_error_m": 0.0,
+        "passed": true
+      },
+      {
+        "name": "spot_track",
+        "bounds_max_error_m": 6.705522537231445e-08,
+        "passed": true
+      },
+      {
+        "name": "spot_head_1",
+        "bounds_max_error_m": 5.960464477539063e-08,
+        "passed": true
+      },
+      {
+        "name": "spot_head_2",
+        "bounds_max_error_m": 1.341104507446289e-07,
+        "passed": true
+      },
+      {
+        "name": "spot_head_3",
+        "bounds_max_error_m": 2.5331974029541016e-07,
+        "passed": true
+      },
+      {
+        "name": "wall_sconce_1",
+        "bounds_max_error_m": 2.9802322387695312e-08,
+        "passed": true
+      },
+      {
+        "name": "wall_sconce_2",
+        "bounds_max_error_m": 2.9802322387695312e-08,
+        "passed": true
+      },
+      {
+        "name": "glass_case_1",
+        "bounds_max_error_m": 2.9802322387695312e-08,
+        "passed": true
+      },
+      {
+        "name": "glass_case_2",
+        "bounds_max_error_m": 2.9802322387695312e-08,
+        "passed": true
+      },
+      {
+        "name": "display_plinth",
+        "bounds_max_error_m": 2.9802322387695312e-08,
+        "passed": true
+      },
+      {
+        "name": "plinth_exhibit",
+        "bounds_max_error_m": 1.3969838619232178e-08,
+        "passed": true
+      },
+      {
+        "name": "case_exhibits_1",
+        "bounds_max_error_m": 5.960464477539063e-08,
+        "passed": true
+      },
+      {
+        "name": "case_exhibits_2",
+        "bounds_max_error_m": 5.960464477539063e-08,
+        "passed": true
+      },
+      {
+        "name": "floor_mosaic",
+        "bounds_max_error_m": 3.4924596548080444e-09,
+        "passed": true
+      },
+      {
+        "name": "artwork_set",
+        "bounds_max_error_m": 1.909211277961731e-07,
+        "passed": true
+      },
+      {
+        "name": "name_sign",
+        "bounds_max_error_m": 2.086162567138672e-07,
+        "passed": true
+      },
+      {
+        "name": "hall_floor",
+        "bounds_max_error_m": 0.0,
+        "passed": true
+      },
+      {
+        "name": "hall_left_wall",
+        "bounds_max_error_m": 2.384185791015625e-07,
+        "passed": true
+      },
+      {
+        "name": "hall_back_wall",
+        "bounds_max_error_m": 2.384185791015625e-07,
+        "passed": true
+      },
+      {
+        "name": "hall_window_frame",
+        "bounds_max_error_m": 1.1920928955078125e-07,
+        "passed": true
+      },
+      {
+        "name": "hall_window_grid",
+        "bounds_max_error_m": 5.960464477539063e-08,
+        "passed": true
+      },
+      {
+        "name": "hall_window_glass",
+        "bounds_max_error_m": 0.0,
+        "passed": true
+      },
+      {
+        "name": "hall_window_frame_front",
+        "bounds_max_error_m": 2.682209014892578e-07,
+        "passed": true
+      },
+      {
+        "name": "hall_window_grid_front",
+        "bounds_max_error_m": 2.086162567138672e-07,
+        "passed": true
+      }
+    ],
+    "scope": "Evaluate editable source meshes in each placed local pivot and compare with approved GLB bounds"
+  },
+  "godot": {
+    "adapter": "NVIDIA GeForce RTX 2060",
+    "artwork_visibility": [
+      {
+        "name": "abstract_frame_01",
+        "rect": [
+          404.231842041016,
+          337.843170166016,
+          28.4105529785156,
+          40.9247436523438
+        ],
+        "visible_fraction": 0.0
+      },
+      {
+        "name": "abstract_frame_02",
+        "rect": [
+          436.430450439453,
+          359.802581787109,
+          28.4105529785156,
+          40.9247436523438
+        ],
+        "visible_fraction": 0.0
+      },
+      {
+        "name": "abstract_frame_03",
+        "rect": [
+          468.629058837891,
+          381.761962890625,
+          28.4105834960938,
+          40.9247741699219
+        ],
+        "visible_fraction": 0.0
+      },
+      {
+        "name": "abstract_frame_04",
+        "rect": [
+          404.231842041016,
+          365.268920898438,
+          28.4105529785156,
+          40.9247741699219
+        ],
+        "visible_fraction": 0.0
+      },
+      {
+        "name": "abstract_frame_05",
+        "rect": [
+          436.430450439453,
+          387.228332519531,
+          28.4105224609375,
+          40.9247741699219
+        ],
+        "visible_fraction": 0.0
+      },
+      {
+        "name": "abstract_frame_06",
+        "rect": [
+          468.629058837891,
+          409.187744140625,
+          28.4105834960938,
+          40.9247741699219
+        ],
+        "visible_fraction": 0.0
+      }
+    ],
+    "captures": [
+      {
+        "name": "default_clean_360",
+        "size": [
+          360,
+          800
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (10.59877, 13.71997, 6.322192)]",
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "default_clean_720",
+        "size": [
+          720,
+          1600
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (10.59877, 13.71997, 6.322192)]",
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "wall_lights_off",
+        "size": [
+          720,
+          1600
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (10.59877, 13.71997, 6.322192)]",
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "viewing_area_720",
+        "size": [
+          720,
+          1600
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (12.92219, 13.71997, 3.998774)]",
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "default_seated_720",
+        "size": [
+          720,
+          1600
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (10.59877, 13.71997, 6.322192)]",
+        "width_m": 6.71999979019165
+      },
+      {
+        "name": "seated_overview",
+        "size": [
+          1200,
+          1000
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.7429, 15.53997, 7.342903)]",
+        "width_m": 11.5
+      },
+      {
+        "name": "overview",
+        "size": [
+          1200,
+          1000
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.7429, 15.53997, 7.342903)]",
+        "width_m": 11.5
+      },
+      {
+        "name": "reference_camera",
+        "size": [
+          1200,
+          1100
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.408244, 0.816501, -0.408244), Z: (0.577353, 0.577345, 0.577353), O: (14.94706, 13.24689, 8.347061)]",
+        "width_m": 10.8000001907349
+      },
+      {
+        "name": "spots_off",
+        "size": [
+          1200,
+          1000
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (13.7429, 15.53997, 7.342903)]",
+        "width_m": 11.5
+      },
+      {
+        "name": "seating_plant_detail",
+        "size": [
+          1000,
+          850
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (11.2429, 14.53997, 8.492903)]",
+        "width_m": 3.59999990463257
+      },
+      {
+        "name": "track_detail",
+        "size": [
+          1000,
+          850
+        ],
+        "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (15.5929, 16.58997, 4.442903)]",
+        "width_m": 3.59999990463257
+      },
+      {
+        "name": "topdown",
+        "size": [
+          1200,
+          1200
+        ],
+        "transform": "[X: (1.0, 0.0, 0.0), Y: (0.0, -0.0, -1.0), Z: (0.0, 1.0, -0.0), O: (3.4, 20.0, -3.2)]",
+        "width_m": 8.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "actual assembled mesh budget matches manifest",
+        "passed": true
+      },
+      {
+        "check": "within POI scene budget",
+        "passed": true
+      },
+      {
+        "check": "exactly four seat anchors",
+        "passed": true
+      },
+      {
+        "check": "no NPC or service anchors",
+        "passed": true
+      },
+      {
+        "check": "blank runtime sign anchor exists",
+        "passed": true
+      },
+      {
+        "check": "native default 43 degree / 6.72 m",
+        "passed": true
+      },
+      {
+        "check": "native spawn snaps within .12 m",
+        "passed": true
+      },
+      {
+        "check": "front exhibit clears top 100 / bottom 90 safe bands",
+        "passed": true
+      },
+      {
+        "check": "front exhibit fully inside default view",
+        "passed": true
+      },
+      {
+        "check": "front exhibit does not overlap entering player",
+        "passed": true
+      },
+      {
+        "check": "one artwork group contains six authored frames",
+        "passed": true
+      },
+      {
+        "check": "old per-frame and per-exhibit placeholders removed",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 linear vertex colours",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 supplier surface material retained",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 linear vertex colours",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 supplier surface material retained",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 glass alpha .16",
+        "passed": true
+      },
+      {
+        "check": "glass_case_1 one glass plus one opaque surface",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 linear vertex colours",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 supplier surface material retained",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 linear vertex colours",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 supplier surface material retained",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 glass alpha .16",
+        "passed": true
+      },
+      {
+        "check": "glass_case_2 one glass plus one opaque surface",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench import UID",
+        "passed": true
+      },
+      {
+        "check": "gallery_bench texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "round_stool import UID",
+        "passed": true
+      },
+      {
+        "check": "round_stool texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "spot_track import UID",
+        "passed": true
+      },
+      {
+        "check": "spot_track texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "spot_head import UID",
+        "passed": true
+      },
+      {
+        "check": "spot_head texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce import UID",
+        "passed": true
+      },
+      {
+        "check": "wall_sconce texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "monstera import UID",
+        "passed": true
+      },
+      {
+        "check": "monstera texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet import UID",
+        "passed": true
+      },
+      {
+        "check": "props/display_cabinet texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth import UID",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_plinth texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite import UID",
+        "passed": true
+      },
+      {
+        "check": "props/exhibit_ammonite texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic import UID",
+        "passed": true
+      },
+      {
+        "check": "props/floor_mosaic texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign import UID",
+        "passed": true
+      },
+      {
+        "check": "props/name_sign texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set import UID",
+        "passed": true
+      },
+      {
+        "check": "props/artwork_set texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 import UID",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_1 texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 import UID",
+        "passed": true
+      },
+      {
+        "check": "props/case_exhibits_2 texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "actual assembly navigation checks passed",
+        "passed": true
+      },
+      {
+        "check": "runtime Monstera alpha scissor .45",
+        "passed": true
+      },
+      {
+        "check": "runtime Monstera double-sided",
+        "passed": true
+      },
+      {
+        "check": "runtime Monstera uses the sole room atlas",
+        "passed": true
+      },
+      {
+        "check": "three track spots plus two wall lights",
+        "passed": true
+      },
+      {
+        "check": "default_clean_360 capture",
+        "passed": true
+      },
+      {
+        "check": "default_clean_720 capture",
+        "passed": true
+      },
+      {
+        "check": "wall_lights_off capture",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_01 visible from approved viewing area",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_02 visible from approved viewing area",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_03 visible from approved viewing area",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_04 visible from approved viewing area",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_05 visible from approved viewing area",
+        "passed": true
+      },
+      {
+        "check": "abstract_frame_06 visible from approved viewing area",
+        "passed": true
+      },
+      {
+        "check": "viewing_area_720 capture",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1 actor assembled",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1 native sitting animation",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_1 seat .715 m above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2 actor assembled",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2 native sitting animation",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_2 seat .715 m above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3 actor assembled",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3 native sitting animation",
+        "passed": true
+      },
+      {
+        "check": "seat_bench_3 seat .715 m above floor",
+        "passed": true
+      },
+      {
+        "check": "seat_stool_1 actor assembled",
+        "passed": true
+      },
+      {
+        "check": "seat_stool_1 native sitting animation",
+        "passed": true
+      },
+      {
+        "check": "seat_stool_1 seat .715 m above floor",
+        "passed": true
+      },
+      {
+        "check": "default_seated_720 capture",
+        "passed": true
+      },
+      {
+        "check": "seated_overview capture",
+        "passed": true
+      },
+      {
+        "check": "overview capture",
+        "passed": true
+      },
+      {
+        "check": "reference_camera capture",
+        "passed": true
+      },
+      {
+        "check": "spots_off capture",
+        "passed": true
+      },
+      {
+        "check": "seating_plant_detail capture",
+        "passed": true
+      },
+      {
+        "check": "track_detail capture",
+        "passed": true
+      },
+      {
+        "check": "topdown capture",
+        "passed": true
+      }
+    ],
+    "entry_exhibit": {
+      "display_rect": [
+        253.996917724609,
+        547.911682128906,
+        53.0329895019531,
+        82.916259765625
+      ],
+      "overlap_px2": 0.0,
+      "player_rect": [
+        143.006393432617,
+        494.989166259766,
+        68.185302734375,
+        106.120391845703
+      ]
+    },
+    "input_sha256": {
+      "atlas": "f531191e1f04525b6046ca92f403cf2f342d9bf94efbb72b58aebdf319f53d5a",
+      "layout": "5afb2db643ed209f4fc03914938efad7681413ed9730409aefaa31504c7d30d9",
+      "mosaic": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688"
+    },
+    "native_camera": {
+      "actual_spawn_local": "(0.275, 0.08, 2.675)",
+      "pitch": -43.0,
+      "scope": "Original P0Room.frame_all and player, hall near/far contract",
+      "spawn": [
+        0.2,
+        0.08,
+        2.75
+      ],
+      "transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (10.59877, 13.71997, 6.322192)]",
+      "width_m": 6.71999979019165,
+      "yaw": 45.0
+    },
+    "native_clip": [
+      0.0500000007450581,
+      4000.0
+    ],
+    "passed": true,
+    "reference_wall_probes": [
+      {
+        "name": "left_wall",
+        "pixel": [
+          348.741271972656,
+          309.6787109375
+        ],
+        "world_local": "(-3.198, 2.75, 0.0)"
+      },
+      {
+        "name": "right_wall",
+        "pixel": [
+          811.974853515625,
+          364.112213134766
+        ],
+        "world_local": "(-0.3, 2.1, -2.998)"
+      },
+      {
+        "name": "left_panel",
+        "pixel": [
+          428.330261230469,
+          464.496856689453
+        ],
+        "world_local": "(-3.085, 0.65, -0.9)"
+      },
+      {
+        "name": "right_panel",
+        "pixel": [
+          803.096801757812,
+          500.785278320312
+        ],
+        "world_local": "(-0.3, 0.65, -2.885)"
+      }
+    ],
+    "renderer": "mobile",
+    "review_clip": [
+      0.1,
+      40
+    ],
+    "seats": [
+      {
+        "animation": "sit_idle",
+        "name": "seat_bench_1",
+        "root_y": 0.455000013113022,
+        "surface_y": 0.795,
+        "yaw_degrees": -90.0
+      },
+      {
+        "animation": "sit_idle",
+        "name": "seat_bench_2",
+        "root_y": 0.455000013113022,
+        "surface_y": 0.795,
+        "yaw_degrees": -90.0
+      },
+      {
+        "animation": "sit_idle",
+        "name": "seat_bench_3",
+        "root_y": 0.455000013113022,
+        "surface_y": 0.795,
+        "yaw_degrees": -90.0
+      },
+      {
+        "animation": "sit_idle",
+        "name": "seat_stool_1",
+        "root_y": 0.455000013113022,
+        "surface_y": 0.795,
+        "yaw_degrees": -90.0
+      }
+    ],
+    "stage": "detail_v1.1",
+    "surfaces": 28,
+    "triangles": 23884,
+    "viewing_area": {
+      "artworks": [
+        {
+          "name": "abstract_frame_01",
+          "rect": [
+            228.206344604492,
+            337.843200683594,
+            28.4105682373047,
+            40.9247436523438
+          ],
+          "visible_fraction": 1.0
+        },
+        {
+          "name": "abstract_frame_02",
+          "rect": [
+            260.404998779297,
+            359.802612304688,
+            28.4105224609375,
+            40.9247131347656
+          ],
+          "visible_fraction": 1.0
+        },
+        {
+          "name": "abstract_frame_03",
+          "rect": [
+            292.603607177734,
+            381.761993408203,
+            28.4105224609375,
+            40.9247436523438
+          ],
+          "visible_fraction": 1.0
+        },
+        {
+          "name": "abstract_frame_04",
+          "rect": [
+            228.206344604492,
+            365.268981933594,
+            28.4105682373047,
+            40.9247131347656
+          ],
+          "visible_fraction": 1.0
+        },
+        {
+          "name": "abstract_frame_05",
+          "rect": [
+            260.404998779297,
+            387.228363037109,
+            28.4104919433594,
+            40.9247131347656
+          ],
+          "visible_fraction": 1.0
+        },
+        {
+          "name": "abstract_frame_06",
+          "rect": [
+            292.603607177734,
+            409.187774658203,
+            28.4105224609375,
+            40.9247436523438
+          ],
+          "visible_fraction": 1.0
+        }
+      ],
+      "camera_transform": "[X: (0.707107, 0.0, -0.707107), Y: (-0.482246, 0.731354, -0.482246), Z: (0.517145, 0.681998, 0.517145), O: (12.92219, 13.71997, 3.998774)]",
+      "fixture_player_local": [
+        0.65,
+        0.08,
+        -1.7
+      ]
+    },
+    "wall_probes": [
+      {
+        "name": "left_wall",
+        "pixel": [
+          378.792327880859,
+          264.140380859375
+        ],
+        "world_local": "(-3.198, 2.75, 0.0)"
+      },
+      {
+        "name": "right_wall",
+        "pixel": [
+          813.829162597656,
+          308.713043212891
+        ],
+        "world_local": "(-0.3, 2.1, -2.998)"
+      },
+      {
+        "name": "left_panel",
+        "pixel": [
+          453.536712646484,
+          384.799438476562
+        ],
+        "world_local": "(-3.085, 0.65, -0.9)"
+      },
+      {
+        "name": "right_panel",
+        "pixel": [
+          805.491394042969,
+          425.056457519531
+        ],
+        "world_local": "(-0.3, 0.65, -2.885)"
+      }
+    ]
+  },
+  "stats": {
+    "stage": "detail_v1.1",
+    "assets": [
+      {
+        "name": "gallery_bench",
+        "file": "gallery_bench.glb",
+        "triangles": 864,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.3400000035762787,
+            0.0,
+            -0.8639999628067017
+          ],
+          [
+            0.3400000035762787,
+            0.7149999737739563,
+            0.8639999628067017
+          ]
+        ],
+        "dimensions_m": [
+          0.6800000071525574,
+          0.7149999737739563,
+          1.7279999256134033
+        ],
+        "sha256": "3046a9f06219fa7d6d03d1da4df4b3c6d5ef6000d2ed24710c4a608e995a712d"
+      },
+      {
+        "name": "round_stool",
+        "file": "round_stool.glb",
+        "triangles": 176,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.24000000953674316,
+            0.0,
+            -0.24000000953674316
+          ],
+          [
+            0.24000000953674316,
+            0.7149999737739563,
+            0.24000000953674316
+          ]
+        ],
+        "dimensions_m": [
+          0.48000001907348633,
+          0.7149999737739563,
+          0.48000001907348633
+        ],
+        "sha256": "02de6017ebb8e43c275fce47fc7fb080ba4620087fac452b199aa32d0c789186"
+      },
+      {
+        "name": "spot_track",
+        "file": "spot_track.glb",
+        "triangles": 432,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.399999976158142,
+            0.0,
+            -0.03999999910593033
+          ],
+          [
+            1.399999976158142,
+            0.05999999865889549,
+            0.03999999910593033
+          ]
+        ],
+        "dimensions_m": [
+          2.799999952316284,
+          0.05999999865889549,
+          0.07999999821186066
+        ],
+        "sha256": "15723377f87b29a7e10f6f9669d3045ba68d7a12d40a9e4fbc0ea98052f55be6"
+      },
+      {
+        "name": "spot_head",
+        "file": "spot_head.glb",
+        "triangles": 604,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.07199999690055847,
+            -0.0650000050663948,
+            -0.11900000274181366
+          ],
+          [
+            0.07199999690055847,
+            0.0650000050663948,
+            0.125
+          ]
+        ],
+        "dimensions_m": [
+          0.14399999380111694,
+          0.1300000101327896,
+          0.24400000274181366
+        ],
+        "sha256": "210c654896a5774c531199e124934c45f6192e6e51f13342162c41ef2ef247b6"
+      },
+      {
+        "name": "wall_sconce",
+        "file": "wall_sconce.glb",
+        "triangles": 292,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.07000000029802322,
+            -0.2800000011920929,
+            -0.017500000074505806
+          ],
+          [
+            0.07000000029802322,
+            0.2800000011920929,
+            0.1420000195503235
+          ]
+        ],
+        "dimensions_m": [
+          0.14000000059604645,
+          0.5600000023841858,
+          0.1595000196248293
+        ],
+        "sha256": "06162cf180c8c37c2c231916122fca6af894e8689ac8e7fb9ffad6abc1f85cd6"
+      },
+      {
+        "name": "monstera",
+        "file": "monstera.glb",
+        "triangles": 910,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.26654309034347534,
+            0.0,
+            -0.479591965675354
+          ],
+          [
+            0.40955784916877747,
+            1.176116943359375,
+            0.4527807831764221
+          ]
+        ],
+        "dimensions_m": [
+          0.6761009395122528,
+          1.176116943359375,
+          0.9323727488517761
+        ],
+        "sha256": "0f1e6cb693a37725ee37ca5ebe7c56172cff965788b98146c42e4dee433582b5"
+      },
+      {
+        "name": "props/display_cabinet",
+        "file": "props/display_cabinet.glb",
+        "module": "M04",
+        "description": "Ivory display cabinet, deep-green plinth and clear five-panel hood",
+        "quantity": 2,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "display_height_m": 1.0,
+        "glass_top_m": 1.5,
+        "instance_ids": [
+          "glass_case_1",
+          "glass_case_2"
+        ],
+        "interior_bounds": [
+          [
+            -0.435,
+            1.0,
+            -0.855
+          ],
+          [
+            0.435,
+            1.485,
+            0.855
+          ]
+        ],
+        "colliders": [
+          {
+            "position": [
+              0,
+              0.75,
+              0
+            ],
+            "size": [
+              0.95,
+              1.5,
+              1.8
+            ]
+          }
+        ],
+        "triangles": 414,
+        "surfaces": 2,
+        "bounds": [
+          [
+            -0.4749999940395355,
+            0.0,
+            -0.8999999761581421
+          ],
+          [
+            0.4749999940395355,
+            1.5,
+            0.8999999761581421
+          ]
+        ],
+        "dimensions_m": [
+          0.949999988079071,
+          1.5,
+          1.7999999523162842
+        ],
+        "sha256": "d8e5f00d596f68d000d64a85635e1e52810e4d48129996641a0a443357a5d21c",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/display_cabinet/reuse_provenance.json",
+        "supplier_asset": "display_cabinet"
+      },
+      {
+        "name": "props/exhibit_plinth",
+        "file": "props/exhibit_plinth.glb",
+        "module": "M05",
+        "description": "Ivory and deep-green square plinth for the upright ammonite",
+        "quantity": 1,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "display_height_m": 1.1,
+        "colliders": [
+          {
+            "position": [
+              0,
+              0.55,
+              0
+            ],
+            "size": [
+              0.7,
+              1.1,
+              0.7
+            ]
+          }
+        ],
+        "triangles": 308,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.3499999940395355,
+            0.0,
+            -0.3500000238418579
+          ],
+          [
+            0.3499999940395355,
+            1.100000023841858,
+            0.3500000238418579
+          ]
+        ],
+        "dimensions_m": [
+          0.699999988079071,
+          1.100000023841858,
+          0.7000000476837158
+        ],
+        "sha256": "0fd5dfbd83d14e55b268ca4d16f51d8a4f37508ed338375816b3649f1e7a56f9",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_plinth/reuse_provenance.json",
+        "supplier_asset": "exhibit_plinth"
+      },
+      {
+        "name": "props/exhibit_ammonite",
+        "file": "props/exhibit_ammonite.glb",
+        "module": "M14",
+        "description": "Upright original ammonite study on a small foot",
+        "quantity": 1,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "display_assignment": {
+          "container": "display_plinth",
+          "container_asset": "exhibit_plinth",
+          "instance_name": "plinth_exhibit",
+          "slot": "center",
+          "position": [
+            0,
+            1.1,
+            0
+          ],
+          "yaw_degrees": 0
+        },
+        "triangles": 486,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.18000000715255737,
+            0.0,
+            -0.08500000089406967
+          ],
+          [
+            0.18000000715255737,
+            0.3799999952316284,
+            0.08500000089406967
+          ]
+        ],
+        "dimensions_m": [
+          0.36000001430511475,
+          0.3799999952316284,
+          0.17000000178813934
+        ],
+        "sha256": "f0628167601f24f2b6158dcaa2d2c8cf9e28eb2204b72b707df768a488e07f00",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/exhibit_ammonite/reuse_provenance.json",
+        "supplier_asset": "exhibit_ammonite"
+      },
+      {
+        "name": "props/floor_mosaic",
+        "file": "props/floor_mosaic.glb",
+        "module": "M03",
+        "description": "Four alternating warm cream / light terracotta rings and darker center; no collision",
+        "quantity": 1,
+        "origin": "bottom_center",
+        "front": "+Z",
+        "anchors": [],
+        "colliders": [],
+        "triangles": 524,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.9700000286102295,
+            0.0,
+            -0.9700000286102295
+          ],
+          [
+            0.9700000286102295,
+            0.00800000037997961,
+            0.9700000286102295
+          ]
+        ],
+        "dimensions_m": [
+          1.940000057220459,
+          0.00800000037997961,
+          1.940000057220459
+        ],
+        "sha256": "fbd562a0a090e8494d9848ff448a0fd9c67842acb9e637cf5d0319c121f0c688",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/floor_mosaic/reuse_provenance.json",
+        "color_pattern": {
+          "revision": "v1.2",
+          "colors": {
+            "mosaic_cream": "F1DDBC",
+            "mosaic_terracotta": "E2A77A",
+            "mosaic_center": "D39A6E",
+            "mosaic_grout": "D3BB9A"
+          },
+          "row_roles": [
+            "mosaic_center",
+            "mosaic_cream",
+            "mosaic_terracotta",
+            "mosaic_terracotta",
+            "mosaic_cream",
+            "mosaic_cream",
+            "mosaic_terracotta"
+          ],
+          "bands": [
+            {
+              "radius_min": 0.0,
+              "radius_max": 0.14,
+              "role": "mosaic_center"
+            },
+            {
+              "radius_min": 0.14,
+              "radius_max": 0.3,
+              "role": "mosaic_cream"
+            },
+            {
+              "radius_min": 0.3,
+              "radius_max": 0.62,
+              "role": "mosaic_terracotta"
+            },
+            {
+              "radius_min": 0.62,
+              "radius_max": 0.9,
+              "role": "mosaic_cream"
+            },
+            {
+              "radius_min": 0.9,
+              "radius_max": 0.97,
+              "role": "mosaic_terracotta"
+            }
+          ]
+        },
+        "supplier_asset": "floor_mosaic"
+      },
+      {
+        "name": "props/name_sign",
+        "file": "props/name_sign.glb",
+        "module": "M15",
+        "description": "Blank light-wood runtime sign",
+        "quantity": 1,
+        "origin": "back_center",
+        "front": "+Z",
+        "anchors": [
+          {
+            "name": "sign_door",
+            "position": [
+              0.0,
+              0.0,
+              0.05200020968914032
+            ],
+            "size": [
+              1.24,
+              0.28
+            ],
+            "module": "name_sign",
+            "yaw_degrees": 0,
+            "text": ""
+          }
+        ],
+        "triangles": 220,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6899999976158142,
+            -0.17000000178813934,
+            0.0
+          ],
+          [
+            0.6899999976158142,
+            0.17000000178813934,
+            0.044000230729579926
+          ]
+        ],
+        "dimensions_m": [
+          1.3799999952316284,
+          0.3400000035762787,
+          0.044000230729579926
+        ],
+        "sha256": "01252e9aa56d2f2ecedc70626d00df3ae1c40e6ad1562acf49ec7afac3967992",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/name_sign/reuse_provenance.json",
+        "supplier_asset": "name_sign"
+      },
+      {
+        "name": "props/artwork_set",
+        "file": "props/artwork_set.glb",
+        "module": "M06",
+        "description": "Baked single-surface group; named editable components retained",
+        "quantity": 1,
+        "origin": "back_center",
+        "front": "+Z",
+        "anchors": [],
+        "components": [
+          {
+            "name": "abstract_frame_01",
+            "module": "M06",
+            "description": "Original abstract color blocks; no copied artwork or lettering",
+            "origin": "back_center",
+            "front": "+Z",
+            "anchors": [],
+            "art_palette_srgb": {
+              "paper": "F2E5CA",
+              "sage": "83916D",
+              "ochre": "C1A16C",
+              "orange": "C66F3F"
+            },
+            "position": [
+              -0.85,
+              0.35,
+              0
+            ],
+            "bounds": [
+              [
+                -0.35000017285346985,
+                -0.2750000059604645,
+                0.0
+              ],
+              [
+                0.35000017285346985,
+                0.2750000059604645,
+                0.04999999701976776
+              ]
+            ],
+            "triangles": 239
+          },
+          {
+            "name": "abstract_frame_02",
+            "module": "M06",
+            "description": "Original abstract color blocks; no copied artwork or lettering",
+            "origin": "back_center",
+            "front": "+Z",
+            "anchors": [],
+            "art_palette_srgb": {
+              "beige": "E3CFAB",
+              "paper": "F3E8D1",
+              "sage_dark": "4F674D",
+              "orange_light": "E1A36B"
+            },
+            "position": [
+              0.0,
+              0.35,
+              0
+            ],
+            "bounds": [
+              [
+                -0.35000017285346985,
+                -0.2750000059604645,
+                0.0
+              ],
+              [
+                0.35000017285346985,
+                0.2750000059604645,
+                0.04999999701976776
+              ]
+            ],
+            "triangles": 231
+          },
+          {
+            "name": "abstract_frame_03",
+            "module": "M06",
+            "description": "Original abstract color blocks; no copied artwork or lettering",
+            "origin": "back_center",
+            "front": "+Z",
+            "anchors": [],
+            "art_palette_srgb": {
+              "paper": "EEDFC0",
+              "orange": "B8653E",
+              "sage": "738166",
+              "ochre": "D5BF95"
+            },
+            "position": [
+              0.85,
+              0.35,
+              0
+            ],
+            "bounds": [
+              [
+                -0.35000017285346985,
+                -0.2750000059604645,
+                0.0
+              ],
+              [
+                0.35000017285346985,
+                0.2750000059604645,
+                0.04999999701976776
+              ]
+            ],
+            "triangles": 228
+          },
+          {
+            "name": "abstract_frame_04",
+            "module": "M06",
+            "description": "Original abstract color blocks; no copied artwork or lettering",
+            "origin": "back_center",
+            "front": "+Z",
+            "anchors": [],
+            "art_palette_srgb": {
+              "beige": "E7D8BA",
+              "sage_dark": "687A56",
+              "orange_light": "C88B59",
+              "paper": "F2E7D1"
+            },
+            "position": [
+              -0.85,
+              -0.35,
+              0
+            ],
+            "bounds": [
+              [
+                -0.35000017285346985,
+                -0.2750000059604645,
+                0.0
+              ],
+              [
+                0.35000017285346985,
+                0.2750000059604645,
+                0.04999999701976776
+              ]
+            ],
+            "triangles": 227
+          },
+          {
+            "name": "abstract_frame_05",
+            "module": "M06",
+            "description": "Original abstract color blocks; no copied artwork or lettering",
+            "origin": "back_center",
+            "front": "+Z",
+            "anchors": [],
+            "art_palette_srgb": {
+              "paper": "F0E7D3",
+              "sage": "8D9C7A",
+              "ochre": "BA9559",
+              "orange": "D69461"
+            },
+            "position": [
+              0.0,
+              -0.35,
+              0
+            ],
+            "bounds": [
+              [
+                -0.3499999940395355,
+                -0.2750000059604645,
+                0.0
+              ],
+              [
+                0.3499999940395355,
+                0.2750000059604645,
+                0.04999992251396179
+              ]
+            ],
+            "triangles": 240
+          },
+          {
+            "name": "abstract_frame_06",
+            "module": "M06",
+            "description": "Original abstract color blocks; no copied artwork or lettering",
+            "origin": "back_center",
+            "front": "+Z",
+            "anchors": [],
+            "art_palette_srgb": {
+              "beige": "DCC9A6",
+              "sage": "5F7255",
+              "orange": "A85F42",
+              "paper": "E8D6B2"
+            },
+            "position": [
+              0.85,
+              -0.35,
+              0
+            ],
+            "bounds": [
+              [
+                -0.3499999940395355,
+                -0.2750000059604645,
+                0.0
+              ],
+              [
+                0.3499999940395355,
+                0.2750000059604645,
+                0.04999992251396179
+              ]
+            ],
+            "triangles": 229
+          }
+        ],
+        "gallery_offset": [
+          0,
+          0,
+          0
+        ],
+        "triangles": 1394,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -1.200000524520874,
+            -0.625,
+            0.0
+          ],
+          [
+            1.200000524520874,
+            0.625,
+            0.050000399351119995
+          ]
+        ],
+        "dimensions_m": [
+          2.400001049041748,
+          1.25,
+          0.050000399351119995
+        ],
+        "sha256": "f6f5855531382c16fb1893d8db0bfc01956e079b91d2373723892d855ac18ee5",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/artwork_set/reuse_provenance.json",
+        "supplier_asset": "artwork_set"
+      },
+      {
+        "name": "props/case_exhibits_1",
+        "file": "props/case_exhibits_1.glb",
+        "module": "M14",
+        "description": "Baked single-surface group; named editable components retained",
+        "quantity": 1,
+        "origin": "display_surface_center",
+        "front": "+Z",
+        "anchors": [],
+        "components": [
+          {
+            "name": "exhibit_shallow_bowl",
+            "module": "M14",
+            "description": "Low open terracotta bowl",
+            "origin": "bottom_center",
+            "front": "+Z",
+            "anchors": [],
+            "slot": "rear",
+            "source_instance_name": "case_1_exhibit_1",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.24284399980306623,
+            "exhibit_bounds": [
+              [
+                -0.20579999685287476,
+                0.05999999865889549,
+                -0.20579999685287476
+              ],
+              [
+                0.20579999685287476,
+                0.21400000154972076,
+                0.20579999685287476
+              ]
+            ],
+            "position": [
+              0,
+              0,
+              -0.55
+            ],
+            "bounds": [
+              [
+                -0.24284400045871735,
+                0.0,
+                -0.24284400045871735
+              ],
+              [
+                0.24284400045871735,
+                0.21400000154972076,
+                0.24284400045871735
+              ]
+            ],
+            "triangles": 376
+          },
+          {
+            "name": "exhibit_leaf_fossil",
+            "module": "M14",
+            "description": "Small stone slab with original plant impression",
+            "origin": "bottom_center",
+            "front": "+Z",
+            "anchors": [],
+            "slot": "front",
+            "source_instance_name": "case_1_exhibit_3",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.2643199940919876,
+            "exhibit_bounds": [
+              [
+                -0.2239999920129776,
+                0.05999999865889549,
+                -0.1679999977350235
+              ],
+              [
+                0.2239999920129776,
+                0.15319108963012695,
+                0.1679999977350235
+              ]
+            ],
+            "position": [
+              0,
+              0,
+              0.55
+            ],
+            "bounds": [
+              [
+                -0.2643199861049652,
+                0.0,
+                -0.2643199861049652
+              ],
+              [
+                0.2643199861049652,
+                0.15319108963012695,
+                0.2643199861049652
+              ]
+            ],
+            "triangles": 410
+          },
+          {
+            "name": "exhibit_shell_fragment",
+            "module": "M14",
+            "description": "Small fan-shaped shell impression in a pale stone",
+            "origin": "bottom_center",
+            "front": "+Z",
+            "anchors": [],
+            "slot": "middle",
+            "source_instance_name": "case_1_exhibit_2",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.2312800009846687,
+            "exhibit_bounds": [
+              [
+                -0.19599999487400055,
+                0.05999999865889549,
+                -0.17499999701976776
+              ],
+              [
+                0.19599999487400055,
+                0.17554710805416107,
+                0.17499999701976776
+              ]
+            ],
+            "position": [
+              0,
+              0,
+              0
+            ],
+            "bounds": [
+              [
+                -0.23127999901771545,
+                0.0,
+                -0.23127999901771545
+              ],
+              [
+                0.23127999901771545,
+                0.17554710805416107,
+                0.23127999901771545
+              ]
+            ],
+            "triangles": 384
+          }
+        ],
+        "display_assignment": {
+          "container": "glass_case_1",
+          "container_asset": "display_cabinet",
+          "instance_name": "case_exhibits_1",
+          "slot": "three baked exhibits",
+          "position": [
+            0,
+            1.0,
+            0
+          ],
+          "yaw_degrees": 0
+        },
+        "triangles": 1170,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.2643199861049652,
+            0.0,
+            -0.7928439974784851
+          ],
+          [
+            0.2643199861049652,
+            0.21400000154972076,
+            0.8143199682235718
+          ]
+        ],
+        "dimensions_m": [
+          0.5286399722099304,
+          0.21400000154972076,
+          1.607163906097412
+        ],
+        "sha256": "908864ed96ee873fa5c9fea68a7f20549eb06c1b05d354e66b3439cb0cc090c2",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/case_exhibits_1/reuse_provenance.json",
+        "supplier_asset": "case_exhibits_1"
+      },
+      {
+        "name": "props/case_exhibits_2",
+        "file": "props/case_exhibits_2.glb",
+        "module": "M14",
+        "description": "Baked single-surface group; named editable components retained",
+        "quantity": 1,
+        "origin": "display_surface_center",
+        "front": "+Z",
+        "anchors": [],
+        "components": [
+          {
+            "name": "exhibit_terracotta_jar",
+            "module": "M14",
+            "description": "Open necked terracotta jar",
+            "origin": "bottom_center",
+            "front": "+Z",
+            "anchors": [],
+            "slot": "middle",
+            "source_instance_name": "case_2_exhibit_2",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.18998000344634053,
+            "exhibit_bounds": [
+              [
+                -0.16099999845027924,
+                0.05999999865889549,
+                -0.16099999845027924
+              ],
+              [
+                0.16099999845027924,
+                0.48000001907348633,
+                0.16099999845027924
+              ]
+            ],
+            "position": [
+              0,
+              0,
+              0
+            ],
+            "bounds": [
+              [
+                -0.18998000025749207,
+                0.0,
+                -0.18998000025749207
+              ],
+              [
+                0.18998000025749207,
+                0.48000001907348633,
+                0.18998000025749207
+              ]
+            ],
+            "triangles": 440
+          },
+          {
+            "name": "exhibit_fossil_rock",
+            "module": "M14",
+            "description": "Faceted warm stone study with a stable flat contact face",
+            "origin": "bottom_center",
+            "front": "+Z",
+            "anchors": [],
+            "slot": "rear",
+            "source_instance_name": "case_2_exhibit_1",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.24583670347929,
+            "exhibit_bounds": [
+              [
+                -0.20833618938922882,
+                0.05999999865889549,
+                -0.18199999630451202
+              ],
+              [
+                0.20833618938922882,
+                0.3373960256576538,
+                0.18199999630451202
+              ]
+            ],
+            "position": [
+              0,
+              0,
+              -0.55
+            ],
+            "bounds": [
+              [
+                -0.24583670496940613,
+                0.0,
+                -0.24583670496940613
+              ],
+              [
+                0.24583670496940613,
+                0.3373960256576538,
+                0.24583670496940613
+              ]
+            ],
+            "triangles": 204
+          },
+          {
+            "name": "exhibit_spiral_fossil",
+            "module": "M14",
+            "description": "Flat ammonite fossil for the front of cabinet two",
+            "origin": "bottom_center",
+            "front": "+Z",
+            "anchors": [],
+            "slot": "front",
+            "source_instance_name": "case_2_exhibit_3",
+            "exhibit_scale": 1.4,
+            "pedestal_height_m": 0.06,
+            "pedestal_radius_m": 0.23953999310731885,
+            "exhibit_bounds": [
+              [
+                -0.2029999941587448,
+                0.05999999865889549,
+                -0.2029999941587448
+              ],
+              [
+                0.2029999941587448,
+                0.19695881009101868,
+                0.2029999941587448
+              ]
+            ],
+            "position": [
+              0,
+              0,
+              0.55
+            ],
+            "bounds": [
+              [
+                -0.2395399957895279,
+                0.0,
+                -0.2395399957895279
+              ],
+              [
+                0.2395399957895279,
+                0.19695881009101868,
+                0.2395399957895279
+              ]
+            ],
+            "triangles": 566
+          }
+        ],
+        "display_assignment": {
+          "container": "glass_case_2",
+          "container_asset": "display_cabinet",
+          "instance_name": "case_exhibits_2",
+          "slot": "three baked exhibits",
+          "position": [
+            0,
+            1.0,
+            0
+          ],
+          "yaw_degrees": 0
+        },
+        "triangles": 1210,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.24583670496940613,
+            0.0,
+            -0.7958366870880127
+          ],
+          [
+            0.24583670496940613,
+            0.48000001907348633,
+            0.7895399928092957
+          ]
+        ],
+        "dimensions_m": [
+          0.49167340993881226,
+          0.48000001907348633,
+          1.5853767395019531
+        ],
+        "sha256": "127fcbb091507249ace2b408397670e42b258c661fcb22e4738fb3fd3c5ba64b",
+        "provenance": "tools/art/source/poi_culture_hall/props/modules/case_exhibits_2/reuse_provenance.json",
+        "supplier_asset": "case_exhibits_2"
+      }
+    ],
+    "shared_shell": {
+      "atlas": {
+        "file": "hall_albedo_ao.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "purpose": "Authored color + shell-local contact AO; no baked direct light or furniture AO"
+      },
+      "assets": [
+        {
+          "name": "hall_floor",
+          "triangles": 634,
+          "surfaces": 1,
+          "vertices": 332,
+          "bytes": 15940
+        },
+        {
+          "name": "hall_left_wall",
+          "triangles": 4552,
+          "surfaces": 1,
+          "vertices": 2352,
+          "bytes": 161456
+        },
+        {
+          "name": "hall_back_wall",
+          "triangles": 4752,
+          "surfaces": 1,
+          "vertices": 2464,
+          "bytes": 165216
+        },
+        {
+          "name": "hall_window_frame",
+          "triangles": 864,
+          "surfaces": 1,
+          "vertices": 448,
+          "bytes": 31292
+        },
+        {
+          "name": "hall_window_grid",
+          "triangles": 648,
+          "surfaces": 1,
+          "vertices": 336,
+          "bytes": 23848
+        },
+        {
+          "name": "hall_window_glass",
+          "triangles": 4,
+          "surfaces": 1,
+          "vertices": 8,
+          "bytes": 1784
+        }
+      ],
+      "unique_triangles": 11454,
+      "scene_triangles": 12966,
+      "static_draw_surfaces": 8,
+      "materials": 2,
+      "glass_surfaces": 1,
+      "placed_instances": 8,
+      "reference_budget": {
+        "scene_triangles": 150000,
+        "static_draw_surfaces": 50
+      }
+    },
+    "scene_triangles": 23884,
+    "static_draw_surfaces": 28,
+    "atlas": {
+      "file": "room_albedo_ao.png",
+      "size": [
+        2048,
+        2048
+      ],
+      "botanical_alpha_scissor": 0.45,
+      "supplier_props": "linear vertex colours; no additional textures"
+    },
+    "props_dependency": {
+      "branch": "wp-3d-scene-huangzhong-culture-323",
+      "commit": "c46e8e374867bb083032d519776b6614bd74a674",
+      "manifest": "props/prop_manifest.json",
+      "technical_approval": "Base display kit: 323 8d679529 / 7aa982a6",
+      "integration_authorization": "Director v1.1 dispatch: integrate Huangzhong's recoloured mosaic after push; supplier delivery 443e7292",
+      "revision": "v1.2",
+      "notes": "1.4x exhibits with .06 m pedestals; mosaic v1.2 warm cream/terracotta concentric colour rings, geometry unchanged"
+    }
+  },
+  "navigation": {
+    "source": "validation-v1.json",
+    "passed": true,
+    "basis": "Same mesh geometry, placement, collision declarations and assembly script as accepted a5ffdae1"
+  },
+  "source_blend_sha256": "743de374bb56743e024e32c7bd9a6d0464c7cc9e475c5968291bb195231b8c11",
+  "scope": "Colour-only art review; existing native camera, lighting, geometry and navigation retained"
+}

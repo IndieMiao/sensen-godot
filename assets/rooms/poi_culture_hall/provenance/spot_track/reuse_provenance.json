@@ -1,0 +1,30 @@
+{
+  "author": "ZHAOYUN",
+  "source": "new simple fixture",
+  "changes": [
+    "One continuous 2.80 m rail matching the approved white placement; three lamp heads remain separate instances."
+  ],
+  "retained_parts": [],
+  "name": "spot_track",
+  "file": "spot_track.glb",
+  "triangles": 432,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -1.399999976158142,
+      0.0,
+      -0.03999999910593033
+    ],
+    [
+      1.399999976158142,
+      0.05999999865889549,
+      0.03999999910593033
+    ]
+  ],
+  "dimensions_m": [
+    2.799999952316284,
+    0.05999999865889549,
+    0.07999999821186066
+  ],
+  "sha256": "15723377f87b29a7e10f6f9669d3045ba68d7a12d40a9e4fbc0ea98052f55be6"
+}

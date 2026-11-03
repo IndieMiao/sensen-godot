@@ -1,0 +1,37 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/deluxe_room_10/deluxe_room_10.blend",
+  "changes": [
+    "Retain the round seat and three splayed legs; normalize full bounds to .48 x .715 x .48 m."
+  ],
+  "retained_parts": [
+    "Round stool seat",
+    "Splayed stool leg",
+    "Splayed stool leg.001",
+    "Splayed stool leg.002"
+  ],
+  "source_sha256": "cbee591de14ce0aa19409bd9a0ac75aba2e7cb47767dc353915ddaecb573d1bc",
+  "source_collection": "KIT_bar_stool",
+  "name": "round_stool",
+  "file": "round_stool.glb",
+  "triangles": 176,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.24000000953674316,
+      0.0,
+      -0.24000000953674316
+    ],
+    [
+      0.24000000953674316,
+      0.7149999737739563,
+      0.24000000953674316
+    ]
+  ],
+  "dimensions_m": [
+    0.48000001907348633,
+    0.7149999737739563,
+    0.48000001907348633
+  ],
+  "sha256": "02de6017ebb8e43c275fce47fc7fb080ba4620087fac452b199aa32d0c789186"
+}
