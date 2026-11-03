@@ -1,0 +1,32 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/basic_room/basic_room.blend",
+  "changes": [
+    "Chair front legs duplicated to four; back and original planked seat omitted.",
+    "New softened round seat diameter .48 m, top .715 m; adapted stretchers."
+  ],
+  "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+  "source_collection": "KIT_chair",
+  "name": "student_stool",
+  "file": "student_stool.glb",
+  "triangles": 1232,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.23999999463558197,
+      -2.38418573772492e-09,
+      -0.23999999463558197
+    ],
+    [
+      0.23999999463558197,
+      0.7149999737739563,
+      0.23999999463558197
+    ]
+  ],
+  "dimensions_m": [
+    0.47999998927116394,
+    0.714999976158142,
+    0.47999998927116394
+  ],
+  "sha256": "43d8762d46109a21dc2906cd10778961e1ea20cba36a48e6695fc0cdbf8dd298"
+}

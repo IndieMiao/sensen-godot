@@ -1,0 +1,347 @@
+{
+  "student_desk": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Dining table resized to 1.02 x .58 m; top 1.13425 m.",
+      "Original four tapered legs and four aprons retained; one original board widened into a .075 m desk slab, other four boards omitted."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_dining_table",
+    "name": "student_desk",
+    "file": "student_desk.glb",
+    "triangles": 972,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.5099999904632568,
+        0.0,
+        -0.28999999165534973
+      ],
+      [
+        0.5099999904632568,
+        1.1342500448226929,
+        0.28999999165534973
+      ]
+    ],
+    "dimensions_m": [
+      1.0199999809265137,
+      1.1342500448226929,
+      0.5799999833106995
+    ],
+    "sha256": "28c0e127f743ac9f93dbed3dd83de2d7f7ffe03224351aed61898b8a7100b5a3"
+  },
+  "student_stool": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Chair front legs duplicated to four; back and original planked seat omitted.",
+      "New softened round seat diameter .48 m, top .715 m; adapted stretchers."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_chair",
+    "name": "student_stool",
+    "file": "student_stool.glb",
+    "triangles": 1232,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.23999999463558197,
+        -2.38418573772492e-09,
+        -0.23999999463558197
+      ],
+      [
+        0.23999999463558197,
+        0.7149999737739563,
+        0.23999999463558197
+      ]
+    ],
+    "dimensions_m": [
+      0.47999998927116394,
+      0.714999976158142,
+      0.47999998927116394
+    ],
+    "sha256": "43d8762d46109a21dc2906cd10778961e1ea20cba36a48e6695fc0cdbf8dd298"
+  },
+  "rear_bookcase": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Basic Room shelf board rebuilt into named case panels, shelves and back.",
+      "v1.1 rear case lowered to 1.50 m with three book tiers and a separate shared potted plant."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_wall_shelf",
+    "name": "rear_bookcase",
+    "file": "rear_bookcase.glb",
+    "triangles": 10548,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.44999998807907104,
+        -5.662441071585533e-10,
+        -0.32499998807907104
+      ],
+      [
+        0.44999998807907104,
+        1.5,
+        0.32499998807907104
+      ]
+    ],
+    "dimensions_m": [
+      0.8999999761581421,
+      1.5000000005662442,
+      0.6499999761581421
+    ],
+    "sha256": "a24a358d25c8253932d2c262cfae756b1b60ae5ae7e536493b6fcc1751968f61"
+  },
+  "right_storage": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Basic Room shelf board rebuilt into named case panels, shelves and back.",
+      "Original low-poly book blocks added; no object above tall bookcase top."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_wall_shelf",
+    "name": "right_storage",
+    "file": "right_storage.glb",
+    "triangles": 11916,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.550000011920929,
+        -1.668930060816365e-08,
+        -0.25
+      ],
+      [
+        0.550000011920929,
+        1.159999966621399,
+        0.25
+      ]
+    ],
+    "dimensions_m": [
+      1.100000023841858,
+      1.1599999833106995,
+      0.5
+    ],
+    "sha256": "13c72d934150a6d63e1e61f53dcfe20ea6f6138fdfef64b4a2525289132359e0"
+  },
+  "low_cabinet": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Basic Room shelf board rebuilt into named case panels, shelves and back.",
+      "Original low-poly book blocks added; no object above tall bookcase top."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_wall_shelf",
+    "name": "low_cabinet",
+    "file": "low_cabinet.glb",
+    "triangles": 3948,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.4000000059604645,
+        -1.1920929132713809e-08,
+        -0.23999999463558197
+      ],
+      [
+        0.4000000059604645,
+        0.8999999761581421,
+        0.23999999463558197
+      ]
+    ],
+    "dimensions_m": [
+      0.800000011920929,
+      0.8999999880790712,
+      0.47999998927116394
+    ],
+    "sha256": "6a8fa24c6cad2206c0cf7de0769571ca5166658ecb302d966239572dc2e3df2b"
+  },
+  "display_shelf": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Kitchen shelf and corbels resized; upper shelf has two wordless miniature prints, lower shelf has books."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_wall_shelf",
+    "name": "display_shelf",
+    "file": "display_shelf.glb",
+    "triangles": 564,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.5600000023841858,
+        -0.019999999552965164,
+        -0.1599999964237213
+      ],
+      [
+        0.5600000023841858,
+        0.5,
+        0.1599999964237213
+      ]
+    ],
+    "dimensions_m": [
+      1.1200000047683716,
+      0.5199999995529652,
+      0.3199999928474426
+    ],
+    "sha256": "fba2416787b2609e319d84df9a2c83a4d59a562bb74490c251673aaa84ceb941"
+  },
+  "book_shelf": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/basic_room/basic_room.blend",
+    "changes": [
+      "Kitchen shelf and corbels resized; upper shelf has two wordless miniature prints, lower shelf has books."
+    ],
+    "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+    "source_collection": "KIT_wall_shelf",
+    "name": "book_shelf",
+    "file": "book_shelf.glb",
+    "triangles": 2604,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.5600000023841858,
+        -0.019999999552965164,
+        -0.1599999964237213
+      ],
+      [
+        0.5600000023841858,
+        0.38999998569488525,
+        0.1599999964237213
+      ]
+    ],
+    "dimensions_m": [
+      1.1200000047683716,
+      0.4099999852478504,
+      0.3199999928474426
+    ],
+    "sha256": "90a39105854dd0e633eedeb616e670a37cf4ba2a7709406c11f6334450aa2a51"
+  },
+  "reading_books": {
+    "author": "ZHAOYUN",
+    "source": "new accessory",
+    "changes": [
+      "Three closed books at the visible inner reading edge, outside the .74 m aisle."
+    ],
+    "name": "reading_books",
+    "file": "reading_books.glb",
+    "triangles": 1296,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.17000000178813934,
+        -0.000499999150633812,
+        -0.12999999523162842
+      ],
+      [
+        0.17000000178813934,
+        0.16449999809265137,
+        0.1339999884366989
+      ]
+    ],
+    "dimensions_m": [
+      0.3400000035762787,
+      0.16499999724328518,
+      0.26399998366832733
+    ],
+    "sha256": "e454800b4be21d7813a7029bb6e03f3645e93f1e1c109c86ec0d0f93346bd9a0"
+  },
+  "pendant": {
+    "author": "ZHAOYUN",
+    "source": "tools/art/source/coffee_shop/coffee_shop.blend",
+    "changes": [
+      "Catalogue cream bell pendant adapted to .40 m shade; brass cable and stem."
+    ],
+    "source_sha256": "5ef9c0675f426dc5038d27e48b4b4bebc4c395a1333eb9197fa9e4247c341921",
+    "source_collection": "KIT_pendant",
+    "name": "pendant",
+    "file": "pendant.glb",
+    "triangles": 904,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.19994999468326569,
+        -0.007999995723366737,
+        -0.19994999468326569
+      ],
+      [
+        0.19994999468326569,
+        0.6959999799728394,
+        0.19994999468326569
+      ]
+    ],
+    "dimensions_m": [
+      0.39989998936653137,
+      0.7039999756962061,
+      0.39989998936653137
+    ],
+    "sha256": "082fc99a6f89f8c0d229e38b1909fb37664fa64df83e5ebe67997e3ffe1eaa4e"
+  },
+  "wall_sconce": {
+    "author": "ZHAOYUN",
+    "source": "SGODOT-324 hallkit_324.blend",
+    "changes": [
+      "Shared opal/brass sconce; unchanged local geometry, room palette mapping."
+    ],
+    "source_sha256": "0f842bca62be3eb7cdd6399fc1f49eb1b53c6b6bcc210b359a2810541c64fd5d",
+    "source_collection": "KIT_wall_sconce",
+    "name": "wall_sconce",
+    "file": "wall_sconce.glb",
+    "triangles": 292,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.07000000029802322,
+        -0.2800000011920929,
+        0.0
+      ],
+      [
+        0.07000000029802322,
+        0.2800000011920929,
+        0.15949998795986176
+      ]
+    ],
+    "dimensions_m": [
+      0.14000000059604645,
+      0.5600000023841858,
+      0.15949998795986176
+    ],
+    "sha256": "88d7dddbaf8370a2aac0c215c2b1d214c8c66d889346e6d1af089e7b79f0f3e6"
+  },
+  "small_plant": {
+    "author": "ZHAOYUN",
+    "source": "assets/rooms/_shared/plants/source/plants.blend",
+    "changes": [
+      "Peace lily uniformly scaled .30; geometric leaf outlines retained, no alpha-cut silhouette.",
+      "Source botanical colours remapped into classroom atlas; two-sided leaf surface."
+    ],
+    "source_sha256": "aec387199dc3c34be2e4e8d0a012d1ffa23dd6445d72ef70693d664333527a60",
+    "source_collection": "KIT_peace_lily",
+    "name": "small_plant",
+    "file": "small_plant.glb",
+    "triangles": 946,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.12711367011070251,
+        0.0,
+        -0.11059348285198212
+      ],
+      [
+        0.1290000081062317,
+        0.3720000088214874,
+        0.10735911875963211
+      ]
+    ],
+    "dimensions_m": [
+      0.2561136782169342,
+      0.3720000088214874,
+      0.21795260161161423
+    ],
+    "sha256": "adec5f1e5e070e91019e4f2c135f9a6fe081f9786b559cc18e2487bf78b4bd87"
+  }
+}

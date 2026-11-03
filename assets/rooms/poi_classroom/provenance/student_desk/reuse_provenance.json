@@ -1,0 +1,32 @@
+{
+  "author": "ZHAOYUN",
+  "source": "tools/art/source/basic_room/basic_room.blend",
+  "changes": [
+    "Dining table resized to 1.02 x .58 m; top 1.13425 m.",
+    "Original four tapered legs and four aprons retained; one original board widened into a .075 m desk slab, other four boards omitted."
+  ],
+  "source_sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139",
+  "source_collection": "KIT_dining_table",
+  "name": "student_desk",
+  "file": "student_desk.glb",
+  "triangles": 972,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.5099999904632568,
+      0.0,
+      -0.28999999165534973
+    ],
+    [
+      0.5099999904632568,
+      1.1342500448226929,
+      0.28999999165534973
+    ]
+  ],
+  "dimensions_m": [
+    1.0199999809265137,
+    1.1342500448226929,
+    0.5799999833106995
+  ],
+  "sha256": "28c0e127f743ac9f93dbed3dd83de2d7f7ffe03224351aed61898b8a7100b5a3"
+}
