@@ -61,6 +61,7 @@ describe('P0 voice (SGODOT-383)', () => {
     voice.setAge('player-aaaa', true);
     await expect(voice.join('player-aaaa')).resolves.toMatchObject({ code: 'NOT_IN_ROOM' });
     expect(NO_VOICE_ROLES.has('market')).toBe(true);
+    expect(NO_VOICE_ROLES.has('poi')).toBe(true);   // POI rooms off until the user says yes (#699)
     enter('player-aaaa', 'sh_market_1');
     await expect(voice.join('player-aaaa')).resolves.toMatchObject({ code: 'VOICE_NOT_HERE' });
   });
