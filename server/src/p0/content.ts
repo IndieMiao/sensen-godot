@@ -332,6 +332,10 @@ export interface P0Content {
     potions: Record<string, { name: string; price: number; stock: number; sold_at: string; gate: { homestead: number };
       heal: number | 'full'; floors: 'any' | number[]; cooldown_ms: number }>;
     rules: { rock_tempo_ms: number; attack_tempo_factor: number; max_targets: number; guard_fast_factor: number };
+    /** 355 G (contract-efg §9.2): Pip's First Dig, its own slot beside the request line; lines.pip_vein is Pip's one
+     * line toward the iron vein (v4q(9) ②), `%s` the vein's name filled in by the client. Absent = not in this build. */
+    first_dig?: { giver: string; floor: number; gate: { homestead: number }; reward: { weapon?: string; affinity?: number };
+      lines?: Record<string, string> };
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
@@ -361,6 +365,9 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const mainFrom = (worldOf(c) as { wild?: { mines?: { vein?: { main_from: number } } } } | undefined)?.wild?.mines?.vein?.main_from;
   if (!Number.isInteger(mainFrom) || c.mine.types.vein.main_weight?.[1]?.[0] !== mainFrom)
     throw new Error('p0 content: mine.types.vein.main_weight[1].from must equal world.wild.mines.vein.main_from');
+  const dig = c.mine.first_dig;
+  if (dig && (!c.residents[dig.giver] || (dig.reward.weapon !== undefined && !c.mine.combat.weapons[dig.reward.weapon])))
+    throw new Error('p0 content: mine.first_dig names a resident or a weapon the table does not have');
   checkHomestead(c);
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {

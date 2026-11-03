@@ -58,6 +58,9 @@ export type P0Event =
   | { kind: 'mob_down'; index: number; mob: string }
   | { kind: 'guard_down'; mob: string; floor: number; first: boolean }
   | { kind: 'mine_ko'; floor: number; lost: [string, number][] }
+  // 355 G (contract-efg §9.2): Pip's First Dig done (weapon: its reward, equipped: now in hand), and a weapon into the slot
+  | { kind: 'first_dig'; done: true; weapon: string | null; equipped: boolean }
+  | { kind: 'gear'; item: string; equipped: boolean }
   | { kind: 'mine'; action: 'torch' | 'rock' | 'hit' | 'hurt'; mine: string; floor: number; cost: number;
       rock?: number; drop?: string | null;
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }

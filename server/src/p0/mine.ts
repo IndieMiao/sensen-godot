@@ -26,6 +26,8 @@ export function mineSite(c: P0Content, id: string): MineSite | undefined {
 }
 const cap = (site: MineSite) => Math.min(site.mine.floors, site.mine.open_to ?? site.mine.floors);
 const floorKey = (mine: string, floor: number) => `${mine}:${floor}`;
+/** The deepest floor of any mine: the view's rank, and Pip's First Dig's count (contract-efg §9.2). */
+export const mineRank = (s: P0State): number => Math.max(0, ...Object.values(s.mine.records).map(r => r.deepest));
 export const stations = (record?: MineB1Record): number[] =>
   Array.from({ length: Math.floor((record?.deepest ?? 0) / 10) }, (_, i) => (i + 1) * 10);
 
@@ -310,7 +312,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
   settleMine(c, s, now);
   const day = s.mine.day, at = day?.at, site = at ? mineSite(c, at.mine) : undefined;
   const records = Object.fromEntries(Object.entries(s.mine.records).map(([id, r]) => [id, { deepest: r.deepest, guards: [...r.guards] }]));
-  const rank = Math.max(0, ...Object.values(s.mine.records).map(r => r.deepest));
+  const rank = mineRank(s);
   let here = null;
   if (day && at && site) {
     const state = floorState(c, s, site, at.floor), spec = currentSpec(c, s, site, at.floor);
