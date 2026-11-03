@@ -122,7 +122,7 @@ func refresh(view_: Dictionary) -> void:
 	var skills := HBoxContainer.new()
 	skills.add_theme_constant_override(&"separation", int(_SKILL_GAP))
 	for s in d.skills:
-		var card := UiSkillCard.new(str(s.name), int(s.level), float(s.progress), P0Logic.icon(str(s.icon)))
+		var card := UiSkillCard.new(Localization.ctx(str(s.name), "skill"), int(s.level), float(s.progress), P0Logic.icon(str(s.icon)))
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var key: String = s.key
 		card.pressed.connect(func(): skill_pressed.emit(key))
@@ -177,7 +177,7 @@ static func profile_data(view: Dictionary, pending := {}) -> Dictionary:
 	var home := []
 	for k in ["city", "climate"]:
 		if str(p.get(k, "")) != "": home.append(str(p[k]))
-	if p.get("since_ms", null) != null: home.append("Since " + since_text(float(p.since_ms)))
+	if p.get("since_ms", null) != null: home.append("Since %s" % since_text(float(p.since_ms)))   # one line a translation orders (「10 月 27 日加入」)
 	var sk: Dictionary = view.get("skills", {})
 	var skills := SKILLS.map(func(k: String) -> Dictionary:
 		var s: Dictionary = sk.get(k, {})
@@ -216,10 +216,13 @@ static func skill_progress(s: Dictionary) -> float:
 	if s.is_empty() or s.get("next", null) == null: return 1.0
 	return clampf(float(int(s.get("xp", 0)) - int(s.get("floor", 0))) / maxf(1.0, float(int(s.next) - int(s.get("floor", 0)))), 0.0, 1.0)
 
-## `Oct 2` (`Oct 2, 2025` when not this year).
+## `Oct 2` (`Oct 2, 2025` when not this year); under 中文 `10 月 2 日` (`2025 年 10 月 2 日`).
 static func since_text(ms: float, now_ms := -1.0) -> String:
 	var d := Time.get_datetime_dict_from_unix_time(int(ms / 1000.0))
 	var now := Time.get_datetime_dict_from_unix_time(int((now_ms if now_ms >= 0.0 else Time.get_unix_time_from_system() * 1000.0) / 1000.0))
+	if TranslationServer.get_locale() == "zh_CN":   # the language on screen, not the pick for the next start (#649 第二批 ③)
+		var zh := "%d 月 %d 日" % [int(d.month), int(d.day)]
+		return zh if int(d.year) == int(now.year) else "%d 年 %s" % [int(d.year), zh]
 	var text := "%s %d" % [_MONTHS[int(d.month) - 1], int(d.day)]
 	return text if int(d.year) == int(now.year) else "%s, %d" % [text, int(d.year)]
 

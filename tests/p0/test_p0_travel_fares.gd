@@ -155,3 +155,11 @@ func test_need_energy_keeps_fit_and_inset() -> void:
 		assert_float((box as UiStyleBox).inset.x).is_equal(6.0)
 		assert_that((box as UiStyleBox).bg_color).is_equal(UiTokens.COLOR_WARNING_TINT)
 	assert_that(b.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)
+
+## The Fare Board's bounds as whole sentences (SGODOT-385: a translation can order them), the English as it was.
+func test_the_bounds_read_as_before() -> void:
+	var lines: Array = P0Travel.fares().map(func(f): return str(f.line))
+	assert_str(lines[0]).is_equal("Up to 30 km, or the 3 nearest cities")
+	assert_str(lines[1]).is_equal("Up to 100 km, or the 10 nearest cities")
+	assert_str(lines[2]).is_equal("Up to 500 km")
+	assert_str(lines[-1]).is_equal("Over 10,000 km")

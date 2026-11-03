@@ -106,7 +106,8 @@ static func update_rows(view: Dictionary, now_ms: float) -> Array:
 			var from := str((u.get("gift", {}) if u.get("gift", null) is Dictionary else {}).get("from", "")).strip_edges()
 			var who := P0Logic.resident_name(from)
 			if who == "": who = from
-			title = "%s gift meal went back · unclaimed" % (("%s's" % who) if who != "" else "A")
+			# whole sentences, so a translation never meets a lone "A" (李白 on the 中文版, SGODOT-385)
+			title = ("%s's gift meal went back · unclaimed" % who) if who != "" else "A gift meal went back · unclaimed"
 			sub = thing
 		elif int(u.get("coins", 0)) > 0:
 			title = "Parcel expired · +%d coins" % int(u.coins)
