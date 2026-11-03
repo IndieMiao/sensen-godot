@@ -5,6 +5,8 @@ extends RefCounted
 ## the Version row's words. Map data rows are added by hand there: no dependency list carries them (q(129) ④).
 
 const DATA := "res://assets/p0/legal/licenses.json"
+## Settings › Privacy › Voice chat (q(277), 李白 5b8090b1; 不知火舞's words): where voice goes and that nothing keeps it.
+const VOICE_CHAT := "Your voice is relayed live by LiveKit, a US-based service. Only people in your layer hear it, and only while your mic is on. We don't record it, and we keep LiveKit's recording off."
 const ENGINE := "engine"   # a row's text: Godot's own license and its third-party notices, from the engine itself
 
 static var _data := {}

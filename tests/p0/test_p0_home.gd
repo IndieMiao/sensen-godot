@@ -295,12 +295,12 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 	named["names"] = {"wood": "Timber"}   # the server's names, as in a real view
 	rt.session.view = named
 	rt._on_refused("not_home", {}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home\nGoing home is free")   # broken at its " · " (不知火舞 11-02)
 	rt._on_refused("not_home", {}, {"type": "rest"})
 	assert_str(rt.ui.toast_text()).is_equal("At home only")                     # other commands stay short
 	rt.ui.space = "pond"                                                         # HOME-1's line from where the player is
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home\nGoing home is free")   # broken at its " · " (不知火舞 11-02)
 	rt.ui.space = "home"
 	var no_gap: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
 	no_gap.homestead.next.materials[0].have = 16                                # the view has no gap left
