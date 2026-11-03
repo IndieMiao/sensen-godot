@@ -10,6 +10,7 @@
 
 | 版本 | versionCode | 日期 | 源码 | 服务端 | 状态 |
 |---|---|---|---|---|---|
+| 0.2.23 | 2026110401 | 2026-11-04 | cfb41949 | p0-server:bec4b0cde（不变，不部署；存档 v6，美西；语音开着） | 已上 OSS（oss2） |
 | 0.2.22 | 2026110302 | 2026-11-03 | bec4b0cd | p0-server:bec4b0cde（存档 v6，11-03 15:03，美西；语音开着） | 已上 OSS（oss2） |
 | 0.2.21 | 2026110301 | 2026-11-03 | 1113f3ab | p0-server:1113f3abf（存档 v6，11-03 10:4x，美西；10:47 开语音） | 已上 OSS（oss2） |
 | 0.2.20 | 2026110202 | 2026-11-02 | d2dee66e | p0-server:29fed3d56（存档 v6，11-02 13:25，美西） | 已上 OSS（oss2） |
@@ -38,6 +39,47 @@
 | 0.1.1 | 2026100903 | 2026-10-09 23:31 | 00e4d5f7 | p0-server:c4811381 | 最低版本（到 11-01 0.2.18 为止） |
 | 0.1.0 | 2026100902 | 2026-10-09 17:42 | 73affb93 | p0-server:1eda1055 → c2f43801 → 73a350d0 | 0.1.1 上线后强制更新 |
 | 0.1.0（作废） | 2026100901 | 2026-10-09 16:33 | 9f96f9a3 | p0-server:1eda1055 | 包里没有 Mapbox，地图全黑，只装过用户手机 |
+
+---
+
+## 0.2.23（2026-11-04）— 设置里的隐私政策和支持码、安卓 Voice Profile 先问年龄、中文版第二批修正
+
+- APK SHA-256 `11b8e47788a9cea2486cba5702fbec562b050769686e971b50fba5972b884434`，327,714,927 字节；versionCode `2026110401`，名称 0.2.23。
+- OSS：`https://oss2.sensenjoy.cn/p0/demo/releases/p0-demo-20261104-11b8e47788a9/sensen-p0-demo-0.2.23.apk`，回读校验全部通过（整包下载、断点续传、清单、校验和）。
+- 源码 farm-dev `cfb41949`（冻结头，11-04 06:00 冻结，最后合入的是 #716）。证书 `38771d94…`，和 0.2.22 一致。
+- `release.json` 里的 `backend_image` 写的是 `p0-server:cfb41949`：发布工具按客户端源码填这一项。这次服务端没有部署，线上实际跑的是 `p0-server:bec4b0cde`，以本表为准。
+- 测试：tests/p0 1,792 例、ui_kit 336 例、localization 27 例全过（冻结头上跑）。
+- 冒烟（模拟器，本地服 `cfb41949`）：在 0.2.22 上覆盖安装，旧档直接进，默认英文；设置 › Legal 的 Privacy Policy 用系统浏览器打开 `https://gensen.app/privacy-android`；Version 显示 0.2.23 (2026110401)；支持码点按后复制到剪贴板；Profile › Voice Profile 先出年龄卡；切到中文后核了 5 处：「还剩 6 天」「一次能播 3 块田」「Ama 的茶台」「Finn 的渔具柜」「费尔菲尔德 · 加州」，都显示正确（看完已切回英文）。
+
+服务端：**不部署，线上继续是 `p0-server:bec4b0cde`**（11-03 15:03 起，存档 v6，最低版本 `2026110201`，语音开着）。`bec4b0cd..cfb41949` 里打进服务端镜像的文件只改了 `server/tools/i18n_city_names.ts`：这是给翻译表抽城市名用的离线工具，服务运行时不调用；`assets/p0/p0_content.json` 没变。
+
+iOS（2026-11-04，SGODOT-356）：
+
+- 传 TestFlight：Gensen App（`app.gensen.maps`），版本 0.2.23 build 1，显示名 Gensen，源码 `cfb41949`（和安卓同一个冻结头），x-p0-version `2026110451`。06:03 上传，06:07 Apple 处理完成（VALID），**只给内部测试组**。没有加进外部测试组，也没有提交 Beta 审核；外部测试组里还是 0.2.22 (1)，在等审核。
+- 用打包专用钥匙串签名。这次归档时登录钥匙串又正好开着，所以登录钥匙串锁着时能不能过，还是没有实测。
+- Info.plist 里的定位用途说明照旧带 Journey 字样。这一条不能删：地图 SDK 引用了系统定位接口，没有它 Apple 会报 ITMS-90683（见 [iOS 定位用途说明修复](../qa/ios-location-purpose-2026-09-24.md)）。措辞改成 Gensen，放下一版单独改。P0 不请求定位，玩家看不到这句话。
+- iOS 包没有做冒烟。iOS 上 Privacy Policy 打开 `https://gensen.app/privacy`、不显示 Voice Profile 卡，这两条有单元测试覆盖，没有在 iOS 设备上看过。
+
+内容（自 0.2.22）：
+
+- **设置里的隐私政策**（q(281)，SGODOT-390，#715 #716）：
+  - Settings › Legal 第一行 `Privacy Policy ›`，用系统浏览器打开：iOS 是 `https://gensen.app/privacy`，安卓是 `https://gensen.app/privacy-android`。
+  - Legal 最后一行 `Support code`（副行 `Tap to copy`），点按整行就复制，并提示 `Support code copied`；卡下面一行说明 `Send this code with any request about your data.`。码是 10 位（`XXXXX-XXXXX`），由玩家 id 在本机算出来，离线也能显示。申请删除数据时把这个码一起发来。
+  - iOS 不显示 Voice Profile 卡。
+  - 安卓的 Voice Profile 和语音聊天共用同一个年龄答案：答过且通过，照旧打开；没通过，提示 `Voice Profile isn't available`；没答过，先在个人页上叠出年龄卡，答完或关掉只关这张卡，个人页不动。
+- **中文版第二批修正**（SGODOT-385，#713；默认仍是英文，英文玩家不受影响）：
+  - 中文表 2,472 条译文（2,473 个键，多出的一个是说明）；新增的有 `%d people`、需求来源句的片段、Flax / Coal / Iron Ore、附近城市行后面的州名和省名、隐私界面的 6 句。
+  - 附近城市行写成「费尔菲尔德 · 加州」：量宽改按中文名来算，中文名不再被截断。
+  - 拼接句改成整句翻译：设置里的家城行「可改一次 · 还剩 6 天」，Mei 的「一次能播 3 块田」，布告板「鲤鱼正在咬钩」，鱼情板「“鲤鱼正在咬钩。带上蚯蚓。” — Finn」，家园卡「返回家园」。
+  - 柜台标题不再重复：「Ama 的茶台」「Finn 的渔具柜」。
+  - 中文不用斜体：鱼情板掌柜那句、Postcards 的 Kindred 台词改用正体粗体；英文照旧是斜体。
+  - 列表里某一项本身带 and（如 `Rods and bait`）时不再整行英文：先按逗号拆开再翻译，显示成「香草、鱼竿和鱼饵」。
+
+已知问题：
+
+1. 中文版第二轮完整走查还缺 15 张补拍，这一版没有包含。
+2. 地图钉上的短名、没有通行中文名的地标都保留英文（Oak、Mission、Painted Ladies），这是定好的，不是漏翻。
+3. iOS 的定位用途说明里还写着 Journey（见上），下一版改。
 
 ---
 
