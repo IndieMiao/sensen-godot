@@ -61,6 +61,7 @@ export type P0Event =
   // 355 G (contract-efg §9.2): Pip's First Dig done (weapon: its reward, equipped: now in hand), and a weapon into the slot
   | { kind: 'first_dig'; done: true; weapon: string | null; equipped: boolean }
   | { kind: 'gear'; item: string; equipped: boolean }
+  | { kind: 'heal'; hp: number; item: string }   // 355 G §9.4: a potion drunk in the mine, hp after it
   | { kind: 'mine'; action: 'torch' | 'rock' | 'hit' | 'hurt'; mine: string; floor: number; cost: number;
       rock?: number; drop?: string | null;
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
