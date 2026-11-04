@@ -830,7 +830,11 @@ func _process(_dt: float) -> void:
 			_ring.width = float(h.width)
 			_ring.grow = clampf(1.0 - (float(h.at) - e) / RING_EARLY_MS, 0.0, 1.0)
 			_ring.turn = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
-			_ring.ring = float(h.get("turn", 0.0)) * minf(float(_judged_turn.get(active, _ring.turn)), _ring.turn)   # stops with the needle once judged (419)
+			# q(288): the needle from `from`, the ring drifting `drift` °/s anticlockwise from its entrance on (it is placed for
+			# τ = 0), stopping with the needle once judged (SGODOT-419)
+			_ring.start = float(h.get("from", 0.0)) / 360.0
+			var tau := minf(e - float(h.at), float(_judged_turn[active]) * float(h.spin)) if _judged_turn.has(active) else e - float(h.at)
+			_ring.ring = -float(h.get("drift", 0.0)) * tau / 360000.0
 			_ring.result = (1 if _judged[active] else 0) if _judged.has(active) else -1
 			_ring.mark_turn = float(_judged_turn.get(active, -1.0))
 			_ring.position = _ring_center() - _ring.size * 0.5
