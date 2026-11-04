@@ -1,0 +1,17 @@
+{
+  "asset": "fish_trap_marker",
+  "task": "SGODOT-402",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "kind": "new authored geometry",
+  "concept": "402 b82ebef9, selected A by 0331ee23; director dispatch 2026-11-04",
+  "references": ["reference/SGODOT-402_fish_trap_marker_concept_v1.jpg", "reference/trap_fish.svg", "reference/bobber.png"],
+  "changes": [
+    "Final game dimensions with waterline-centre pivot; no legacy 1.6 trap scaling",
+    "0.30m wide coral/cream buoy, short stem, two rope turns and short tail",
+    "0.45m wide visible woven crown, raised strips over dark recesses, only .05m submerged skirt",
+    "One opaque matte vertex-colour surface, 500 triangles, no bones, animation or shadow casting"
+  ],
+  "source_blend": "tools/art/source/fish_trap_marker_402/fish_trap_marker.blend",
+  "generator": "tools/art/source/fish_trap_marker_402/build.py"
+}
