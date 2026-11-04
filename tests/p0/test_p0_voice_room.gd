@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## P0VoiceRoom (SGODOT-383; the user, 11-02 via 奕星, q(274)): the online room's voice. Nothing goes to the server before
 ## the player wants voice; the 13+ gate comes first; the mic starts off and toggles; Mute is this phone's own, by the
 ## person's public handle, put back on their peer id in every layer; Block and Report go to the server; Market Square
-## has none.
+## has it too since q(286) (SGODOT-415).
 
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
 
@@ -74,7 +74,7 @@ func test_nothing_goes_out_before_the_player_wants_voice_and_the_gate_comes_firs
 	room.toggle_mic()
 	assert_array(f[1].calls[-1]).is_equal(["mic", false])   # the key again: off, still in the room's voice
 
-func test_a_no_hides_voice_and_market_square_has_none() -> void:
+func test_a_no_hides_voice_and_market_square_has_it_since_q286() -> void:
 	var f := _room()
 	var room: P0VoiceRoom = f[0]
 	await room.fetch_status()
@@ -82,8 +82,9 @@ func test_a_no_hides_voice_and_market_square_has_none() -> void:
 	await room.answer_age(false)
 	assert_bool(room.offered()).is_false()
 	var m := _room("market")
+	answers["status"] = {"ok": true, "available": true, "age": "ok"}
 	await m[0].fetch_status()
-	assert_bool(m[0].offered()).is_false()
+	assert_bool(m[0].offered()).is_true()   # q(286): Market Square's whole layer has voice (SGODOT-415)
 
 func test_mute_is_kept_by_handle_and_put_on_the_new_peer_in_another_layer() -> void:
 	var f := _room()

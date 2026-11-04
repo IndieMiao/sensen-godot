@@ -182,3 +182,35 @@ func test_no_room_no_keys() -> void:
 	var ui := await _ui()
 	ui.set_voice_room(null)
 	assert_object(ui._voice_keys).is_null()
+
+## q(286) (Market Square's voice, SGODOT-415; 不知火舞's M1-b 476:195818): a long title breaks at its ` · ` into two lines,
+## `Mute all` at the first, the drawer 173 over its rows (447 − 173 = 274 at most); the rows scroll as Today's — a fade
+## at an edge with rows past it, a 3 px bar at the right while they overflow. A short one stays one line (154).
+func test_a_long_title_breaks_at_its_dot_and_the_rows_scroll_as_todays() -> void:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var rows := []
+	for i in 12: rows.append({"peer": i + 2, "name": "Traveller %02d" % i})
+	var d = load("res://scenes/p0/panels/p0_people_drawer.gd").new("Mission Market Square · Layer 1", rows)
+	d.size = Vector2(360, 447)
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	assert_str(d.title.text).is_equal("Mission Market Square\nLayer 1")
+	assert_int(d.all_key.size_flags_vertical).is_equal(Control.SIZE_SHRINK_BEGIN)
+	assert_float(d.height).is_equal(447.0)
+	assert_float(d._held.custom_minimum_size.y).is_equal(274.0)
+	assert_bool(d._bar.visible).is_true()
+	assert_bool(d._fade_bottom.visible).is_true()
+	assert_bool(d._fade_top.visible).is_false()
+	d._scroll.scroll_vertical = 100
+	for i in 2: await get_tree().process_frame
+	assert_bool(d._fade_top.visible).is_true()
+	var short = load("res://scenes/p0/panels/p0_people_drawer.gd").new("Fern Pond · Layer 1", rows.slice(0, 2))
+	short.size = Vector2(360, 300)
+	host.add_child(short)
+	for i in 3: await get_tree().process_frame
+	assert_str(short.title.text).is_equal("Fern Pond · Layer 1")
+	assert_float(short.height).is_equal(154.0 + 2 * 45.0)
+	assert_bool(short._bar.visible).is_false()

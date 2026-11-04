@@ -9,7 +9,7 @@ extends P0Room
 const P0Locals := preload("res://modules/p0/p0_locals.gd")   # the keeper's local requests (q(272))
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
-var voice_room: Node   # P0VoiceRoom: this room's voice (SGODOT-383; none in Market Square), for the HUD's mic key and drawer
+var voice_room: Node   # P0VoiceRoom: this room's voice (SGODOT-383; Market Square's too since q(286)), for the HUD's mic key and drawer
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
 ## The Tackle Shop's board is the Bite Board since P1 (SGODOT-283), and the Travel Post's Stamp Desk and Fare Board are
