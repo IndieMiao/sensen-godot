@@ -112,7 +112,7 @@ static func first_dig_row(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)
 	if d.is_empty(): return {}
 	return {line = "Pip's First Dig · Floor %d/%d" % [int(d.get("have", 0)), int(d.floor)],
-		icon = "ladder", go = "", dot = "", first_dig = true}
+		icon = "ladder", go = "", dot = P0Logic.PIP_DOT + "first_dig", first_dig = true}
 
 static func first_dig_card(view: Dictionary) -> Dictionary:
 	var d := first_dig(view)

@@ -164,14 +164,14 @@ func test_first_dig_reads_its_own_view_and_content_without_tracking_mutation() -
 	v.first_dig = null
 	assert_dict(Gear.first_dig_card(v)).is_empty()
 
-func test_first_dig_today_is_tappable_progress_without_red_dot() -> void:
+func test_first_dig_today_is_tappable_with_its_once_only_pip_dot() -> void:
 	var v := _view()
 	v.plots = [{state = "growing", crop = "crop_radish", ready_in = 600000}]
 	var rows := P0Logic.today_rows(v)
 	var dig := rows.filter(func(r): return bool(r.get("first_dig", false)))
 	assert_int(dig.size()).is_equal(1)
 	assert_str(dig[0].line).is_equal("Pip's First Dig · Floor 2/6")
-	assert_str(dig[0].dot).is_empty()
+	assert_str(dig[0].dot).is_equal("pip:first_dig")
 	v.first_dig = null
 	assert_bool(P0Logic.today_rows(v).any(func(r): return bool(r.get("first_dig", false)))).is_false()
 
@@ -374,3 +374,20 @@ func test_potions_never_offer_or_send_farm_storage_in_either_build() -> void:
 		assert_bool(Gear.command_allowed({type = "store", item = POTION})).is_false()
 	for id in ["healing_potion", POTION]:
 		assert_str(P0Logic.P1_UNLOCKS[id].note).is_equal("at the Homestead Stall")
+
+func test_first_dig_with_taken_requests_follows_limit_and_precedes_newest_progress() -> void:
+	var v := _view()
+	v.guide = {step = null}
+	v.names = {crop_radish = "Radish"}
+	v.quotas = {sys_requests = {used = 6, cap = 6, resets_in = 3600000}}
+	v.boards = {stall = {slots = [
+		{id = "old", title = "Old crate", kind = "crop", items = ["crop_radish"], qty = 5, have = 1, ready = false, status = "accepted", accepted_at = 1000},
+		{id = "new", title = "New crate", kind = "crop", items = ["crop_radish"], qty = 5, have = 1, ready = false, status = "accepted", accepted_at = 2000},
+		{id = "ready", title = "Ready crate", kind = "crop", items = ["crop_radish"], qty = 1, have = 1, ready = true, status = "accepted", accepted_at = 3000}]}}
+	var rows := P0Logic.today_rows(v)
+	assert_array(rows.map(func(r): return str(r.line).get_slice(" · ", 0))).is_equal(["Ready crate", "Pip's First Dig", "New crate", "Old crate"])
+	assert_str(rows[0].line).contains("Limit reached")
+	assert_str(rows[1].dot).is_equal("pip:first_dig")
+	assert_bool(rows[1].first_dig).is_true()
+	v.guide.step = "t_water"
+	assert_bool(P0Logic.today_rows(v).any(func(r): return bool(r.get("first_dig", false)))).is_false()

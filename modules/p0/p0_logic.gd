@@ -1662,10 +1662,8 @@ static func _today_rows(view: Dictionary) -> Array:
 	var rows: Array = lead.duplicate()
 	var later: Array = []   # after Upgrade: hand-ins away, `Limit reached`
 	var progress: Array = []
-	var dig := GearLogic.first_dig_row(view)
-	if not dig.is_empty() and not P0Guide.guide_on(view): progress.append(dig)
-	# Taken requests (q(104)): preserve the latest b1 selection and sorting.
-
+	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's, the keepers' and the residents'; untaken
+	# ones stay on their boards. The first session shows its tutorial request alone (the guide's row).
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		var away: Array = []   # q(270) / 奕星's review ⑦: another city's hand-in can't be done here; it follows what can
@@ -1711,10 +1709,11 @@ static func _today_rows(view: Dictionary) -> Array:
 		else:
 			hr.dot = PIP_HOME_DOT   # lights once, the first time it is there (the guide just over), never each level
 			pip.append(hr)
-	# the vein one ahead of the Homestead gap row (v4q(9) b, the user 11-02; q(284) review ④); Pip's First Dig goes here
-	# too once it is a Today row (#636)
+	# Pip's order (q(284) spec ③ v3): First Dig, vein, then the Homestead gap; not sorted by request acceptance time.
 	var vein := vein_row(view)
 	if not vein.is_empty(): pip.push_front(vein)
+	var dig := GearLogic.first_dig_row(view)
+	if not dig.is_empty() and not P0Guide.guide_on(view): pip.push_front(dig)
 	rows.append_array(later + pip)
 	# the newest taken first (spec ①, over q(143)'s latest-on-the-third-row)
 	progress.sort_custom(func(a, b): return float(a._at) > float(b._at) or float(a._at) == float(b._at) and int(a._i) < int(b._i))
