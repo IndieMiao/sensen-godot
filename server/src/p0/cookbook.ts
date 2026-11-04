@@ -135,7 +135,12 @@ export function goldWidth(c: P0Content, s: P0State, page: string | null, base: n
   if (hasConvenience(c, s, 'steady_hand_2')) width += c.cooking.steady_hand_gold;   // Lv7: another +5, same cap
   if (page && pageState(c, s, page) === 'mastered') width += c.cooking.mastered.gold;
   // Chef's Sign (Homestead Lv10, §7.7): +5 points on every dish, on top of the cap the skills reach.
-  return Math.min(c.cooking.gold_cap + chefSignGold(c, s), Math.round((width + chefSignGold(c, s)) * 1000) / 1000);
+  return Math.min(goldCap(c, s), Math.round((width + chefSignGold(c, s)) * 1000) / 1000);
+}
+
+/** The most gold arc a ring may have: gold_cap, + Chef's Sign above it (q(288)'s ×0.8–1.2 per ring caps here too). */
+export function goldCap(c: P0Content, s: P0State): number {
+  return c.cooking.gold_cap + chefSignGold(c, s);
 }
 
 /** Cooking time and heat times: × quick_fire from Cooking Lv6 (Quick Fire); the needle speed stays the same. */

@@ -10,6 +10,13 @@ import { cookable, fits, ingredientsFor, servingPicks } from '../../src/p0/cooki
 import { ingredientStock } from '../../src/p0/kitchen_storage.js';
 
 const c = loadP0Content();
+
+/** q(288) (SGODOT-419) draws each ring's width ×0.8–1.2; the gold-arc bonuses are read with that draw held at ×1. */
+function steadyWidths<T>(fn: () => T): T {
+  const was = c.cooking.heat_vary;
+  c.cooking.heat_vary = was && { ...was, width_mul: [1, 1] };
+  try { return fn(); } finally { c.cooking.heat_vary = was; }
+}
 const T0 = Date.UTC(2026, 9, 10, 2);
 const S = 1000, H = 3_600_000;
 const veteran = (): P0State => ({ ...freshState(c, 'kitchen-p1', T0, 7), created_at: T0 - 8 * 24 * H, fires: 1 });
@@ -182,7 +189,7 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
     expect([count(r.s.bag, 'fish_crucian'), count(r.s.bag, 'fish_carp')]).toEqual([0, 0]);
   });
 
-  it("Chef's Sign (Lv10) widens every dish's gold zone by 5 points", () => {
+  it("Chef's Sign (Lv10) widens every dish's gold zone by 5 points", () => steadyWidths(() => {
     const width = (lv: number) => {
       const s = at(lv);
       s.bag.push({ id: 'fish_crucian', qty: 1 });
@@ -190,7 +197,7 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
     };
     expect(Math.round((width(10) - width(9)) * 1000) / 1000).toBe(0.05);
     expect(viewOf(c, at(10), T0).homestead.unlocks).toMatchObject({ chefs_sign: true, stoves: 3, cabinet: 12, big_pot: true, notice_board: true });
-  });
+  }));
 });
 
 describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
@@ -201,9 +208,9 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     return step(s, { type: 'cook', items: ['fish_crucian'] }).s.stove!.heats[0].width;
   };
 
-  it('Steady Hand II (Lv7) adds another 5 points to the gold zone', () => {
+  it('Steady Hand II (Lv7) adds another 5 points to the gold zone', () => steadyWidths(() => {
     expect(Math.round((firstWidth(cook(7)) - firstWidth(cook(6))) * 1000) / 1000).toBe(0.05);
-  });
+  }));
 
   it('Fast Mastery (Lv7): a page is Mastered after 7 pots instead of 10', () => {
     const page = (s: P0State) => viewOf(c, s, T0).cooking.cookbook.find(p => p.id === 'dish_grilled_crucian')!;
