@@ -1527,6 +1527,226 @@
       "nozzle_dot": "one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh",
       "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap",
       "integration_note": "On integration change P0FarmFacilities.HEAD from (0, 0.55, 0) to (0, 0.42, 0); no gameplay edit in this art branch."
+    },
+    "flax_patch": {
+      "generator": "tools/art/source/flax_408/build.py",
+      "source": "tools/art/source/flax_408/flax_patch.blend",
+      "task": "SGODOT-408",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "triangles": 894,
+      "triangle_limit": 900,
+      "surfaces": 1,
+      "bytes": 66116,
+      "bounds": [
+        [
+          -0.6499999761581421,
+          0.0,
+          -0.6299999952316284
+        ],
+        [
+          0.6499999761581421,
+          0.6868833303451538,
+          0.6299999952316284
+        ]
+      ],
+      "bounds_blender": [
+        [
+          -0.6499999761581421,
+          -0.6299999952316284,
+          0.0
+        ],
+        [
+          0.6499999761581421,
+          0.6299999952316284,
+          0.6868833303451538
+        ]
+      ],
+      "dimensions_xyz": [
+        1.2999999523162842,
+        0.6868833303451538,
+        1.2599999904632568
+      ],
+      "origin": "bottom / footprint centre; Y up, +Z front; metres",
+      "mesh": "flax_patch_mobile",
+      "material": "Farm vertex paint / FarmArt.material(); linear vertex colour, matte, no textures",
+      "palette_srgb": {
+        "stem": "799973",
+        "leaf": "90AC7F",
+        "leaf_light": "A1B88B",
+        "blue": "85ACE6",
+        "blue_light": "A0C3EE",
+        "blue_shade": "6E98D7",
+        "pollen": "E6D6A1",
+        "soil": "B4946D",
+        "soil_edge": "C3A57D",
+        "soil_dark": "9E805F"
+      },
+      "flowers": [
+        {
+          "center": [
+            0.4654505252838135,
+            0.5552332997322083,
+            0.0
+          ],
+          "diameter_m": 0.20849423194284403
+        },
+        {
+          "center": [
+            0.322452187538147,
+            0.5548312067985535,
+            0.322452187538147
+          ],
+          "diameter_m": 0.19057984954948218
+        },
+        {
+          "center": [
+            2.8409849010378757e-17,
+            0.5624570250511169,
+            0.46396803855895996
+          ],
+          "diameter_m": 0.1993159551389731
+        },
+        {
+          "center": [
+            -0.3279455900192261,
+            0.5409637689590454,
+            0.3279455900192261
+          ],
+          "diameter_m": 0.20223057047742757
+        },
+        {
+          "center": [
+            -0.4702951908111572,
+            0.5247381925582886,
+            5.759454787903799e-17
+          ],
+          "diameter_m": 0.18860454816634967
+        },
+        {
+          "center": [
+            -0.3072527050971985,
+            0.537680983543396,
+            -0.3072527050971985
+          ],
+          "diameter_m": 0.19947486698574776
+        },
+        {
+          "center": [
+            -8.300076511889379e-17,
+            0.5527176260948181,
+            -0.45183512568473816
+          ],
+          "diameter_m": 0.20509187589726552
+        },
+        {
+          "center": [
+            0.3064042329788208,
+            0.5760074853897095,
+            -0.3064042329788208
+          ],
+          "diameter_m": 0.18580606137820407
+        },
+        {
+          "center": [
+            0.18065515160560608,
+            0.6100000143051147,
+            0.09204839169979095
+          ],
+          "diameter_m": 0.20433214414253426
+        },
+        {
+          "center": [
+            -0.09339745342731476,
+            0.6299999952316284,
+            0.18330281972885132
+          ],
+          "diameter_m": 0.19750554976134926
+        },
+        {
+          "center": [
+            -0.17742547392845154,
+            0.6499999761581421,
+            -0.09040279686450958
+          ],
+          "diameter_m": 0.19843000838342756
+        },
+        {
+          "center": [
+            0.08818492293357849,
+            0.6150000095367432,
+            -0.1730726659297943
+          ],
+          "diameter_m": 0.19789767995664162
+        }
+      ],
+      "source_parts_triangles": {
+        "Soft light-brown soil border": 94,
+        "Stem 01": 12,
+        "Stem 01 / lanceolate leaf 1": 4,
+        "Stem 01 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 01": 40,
+        "Stem 02": 12,
+        "Stem 02 / lanceolate leaf 1": 4,
+        "Stem 02 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 02": 40,
+        "Stem 03": 12,
+        "Stem 03 / lanceolate leaf 1": 4,
+        "Stem 03 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 03": 40,
+        "Stem 04": 12,
+        "Stem 04 / lanceolate leaf 1": 4,
+        "Stem 04 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 04": 40,
+        "Stem 05": 12,
+        "Stem 05 / lanceolate leaf 1": 4,
+        "Stem 05 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 05": 40,
+        "Stem 06": 12,
+        "Stem 06 / lanceolate leaf 1": 4,
+        "Stem 06 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 06": 40,
+        "Stem 07": 12,
+        "Stem 07 / lanceolate leaf 1": 4,
+        "Stem 07 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 07": 40,
+        "Stem 08": 12,
+        "Stem 08 / lanceolate leaf 1": 4,
+        "Stem 08 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 08": 40,
+        "Stem 09": 12,
+        "Stem 09 / lanceolate leaf 1": 4,
+        "Stem 09 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 09": 40,
+        "Stem 10": 12,
+        "Stem 10 / lanceolate leaf 1": 4,
+        "Stem 10 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 10": 40,
+        "Stem 11": 12,
+        "Stem 11 / lanceolate leaf 1": 4,
+        "Stem 11 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 11": 40,
+        "Stem 12": 12,
+        "Stem 12 / lanceolate leaf 1": 4,
+        "Stem 12 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 12": 40,
+        "Young stem 1": 12,
+        "Young stem 1 / leaf 1": 4,
+        "Young stem 1 / leaf 2": 4,
+        "Young stem 2": 12,
+        "Young stem 2 / leaf 1": 4,
+        "Young stem 2 / leaf 2": 4,
+        "Young stem 3": 12,
+        "Young stem 3 / leaf 1": 4,
+        "Young stem 3 / leaf 2": 4,
+        "Young stem 4": 12,
+        "Young stem 4 / leaf 1": 4,
+        "Young stem 4 / leaf 2": 4
+      },
+      "animations": [],
+      "skeleton": false,
+      "sha256": "fb6404ba43a2e70bcb5e2d416fffb6f6e6da410ecbf059b09994d23bbf29c80a"
     }
   }
 }

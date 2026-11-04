@@ -1,0 +1,452 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "One named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "One surface",
+        "passed": true
+      },
+      {
+        "check": "894 triangles within 900 budget",
+        "passed": true
+      },
+      {
+        "check": "Measured footprint / height meet brief",
+        "passed": true
+      },
+      {
+        "check": "Manifest matches actual vertex bounds",
+        "passed": true
+      },
+      {
+        "check": "Bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "No texture channels or skin weights",
+        "passed": true
+      },
+      {
+        "check": "No textures",
+        "passed": true
+      },
+      {
+        "check": "No skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "Finite geometry and unit normals",
+        "passed": true
+      },
+      {
+        "check": "No degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Opaque vertex colors",
+        "passed": true
+      },
+      {
+        "check": "Only documented linear palette values",
+        "passed": true
+      },
+      {
+        "check": "Blue flower crowns distributed across upper patch, not hidden at roots",
+        "passed": true
+      },
+      {
+        "check": "Baked unit node transform",
+        "passed": true
+      },
+      {
+        "check": "One material",
+        "passed": true
+      },
+      {
+        "check": "GLB material matches sign.glb exactly",
+        "passed": true
+      },
+      {
+        "check": "Unique GLB importer UID",
+        "passed": true
+      },
+      {
+        "check": "Importer parameters match sign.glb.import (Godot omits null fields), including light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "Manifest SHA-256 matches actual GLB",
+        "passed": true
+      },
+      {
+        "check": "Manifest appends flax only; all prior entries unchanged",
+        "passed": true
+      },
+      {
+        "check": "No existing farm meshes or imports changed",
+        "passed": true
+      },
+      {
+        "check": "Review uses exact delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "Private review preserves b1 scenes/p0/p0_pond.gd",
+        "passed": true
+      },
+      {
+        "check": "Private review preserves b1 scenes/p0/p0_ui.gd",
+        "passed": true
+      },
+      {
+        "check": "Private review preserves b1 modules/farm/farm_art.gd",
+        "passed": true
+      },
+      {
+        "check": "Private review preserves b1 modules/farm/crop_plant_mesh.gd",
+        "passed": true
+      },
+      {
+        "check": "Private review preserves b1 modules/mining/mine_mesh.gd",
+        "passed": true
+      }
+    ],
+    "triangles": 894,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.6499999761581421,
+        0.0,
+        -0.6299999952316284
+      ],
+      [
+        0.6499999761581421,
+        0.6868833303451538,
+        0.6299999952316284
+      ]
+    ],
+    "dimensions_xyz": [
+      1.2999999523162842,
+      0.6868833303451538,
+      1.2599999904632568
+    ],
+    "sha256": "fb6404ba43a2e70bcb5e2d416fffb6f6e6da410ecbf059b09994d23bbf29c80a",
+    "runtime": {
+      "runtime_commit": "174bf1a1027e3bd753f79e41df493d2b3ead3dfa",
+      "art_base": "caef42a073ce20a7bb16b9414b9026316c9587f6"
+    },
+    "runtime_unchanged_files_sha256": {
+      "scenes/p0/p0_pond.gd": "ff5329d10f06d8daea2ef8f7b3136ed43c4e12077606f5a58d64e014c5add9b2",
+      "scenes/p0/p0_ui.gd": "ef7be95690535a3cef5c4850b076754cbad34e0fadda069434df6d4910e370fd",
+      "modules/farm/farm_art.gd": "c389f99b08eca2702126783716fcba626121dc62c72fa01eb4b920045f53b6f4",
+      "modules/farm/crop_plant_mesh.gd": "89eba86807820275c79de31de0b7ac93615a81fe895d2afedff2a1118f966b90",
+      "modules/mining/mine_mesh.gd": "0937de580a0676695679549bf90a2d28d0a849b5e40477dae614ba1e2ca4725e"
+    },
+    "passed": true
+  },
+  "godot": {
+    "captures": [
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+        "name": "F2_default_43deg",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.125, 27.27993, 25.4395)]",
+        "name": "F2_default_art_only",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 14.33997, 26.62708)]",
+        "name": "resources_comparison_43deg",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          1600,
+          700
+        ],
+        "width_m": 11.5
+      }
+    ],
+    "checks": [
+      {
+        "check": "Requested actual SF pond 01",
+        "passed": true
+      },
+      {
+        "check": "Native player assembled",
+        "passed": true
+      },
+      {
+        "check": "Native opening camera; no pan, park, zoom or teleport",
+        "passed": true
+      },
+      {
+        "check": "Original entry spawn (6.125, 0, -1.625)",
+        "passed": true
+      },
+      {
+        "check": "Native camera pitch 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "F2 coordinates and unit scale",
+        "passed": true
+      },
+      {
+        "check": "Actual imported flax <=900 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "Footprint in 1.2–1.4 m range",
+        "passed": true
+      },
+      {
+        "check": "Height in 0.6–0.7 m range",
+        "passed": true
+      },
+      {
+        "check": "Bottom origin Y=0",
+        "passed": true
+      },
+      {
+        "check": "Entire F2 model in screen, >=16px side margin",
+        "passed": true
+      },
+      {
+        "check": "Projected triangles clear actual circular switch and main-key shapes",
+        "passed": true
+      },
+      {
+        "check": "Exact FarmArt shared linear vertex-colour material",
+        "passed": true
+      },
+      {
+        "check": "Matte .9, no texture",
+        "passed": true
+      },
+      {
+        "check": "light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "Godot import UID present",
+        "passed": true
+      },
+      {
+        "check": "Saved F2_default_43deg",
+        "passed": true
+      },
+      {
+        "check": "Saved F2_default_art_only",
+        "passed": true
+      },
+      {
+        "check": "Saved resources_comparison_43deg",
+        "passed": true
+      },
+      {
+        "check": "Godot Mobile renderer",
+        "passed": true
+      },
+      {
+        "check": "Transport stub intercepted startup only; no network dispatch or gameplay actions",
+        "passed": true
+      }
+    ],
+    "comparison": [
+      {
+        "bounds": [
+          [
+            -0.988515138626099,
+            -0.0194999799132347,
+            -1.10963380336761
+          ],
+          [
+            1.04612803459167,
+            2.12198996543884,
+            1.21462345123291
+          ]
+        ],
+        "name": "spot_grove",
+        "position": [
+          2.25,
+          0.0,
+          12.0
+        ],
+        "size": [
+          2.03464317321777,
+          2.14148998260498,
+          2.32425737380981
+        ],
+        "surfaces": 3,
+        "triangles": 4872
+      },
+      {
+        "bounds": [
+          [
+            -0.601259589195251,
+            -0.0125000001862645,
+            -0.453788459300995
+          ],
+          [
+            0.542118430137634,
+            0.908761143684387,
+            0.519576370716095
+          ]
+        ],
+        "name": "spot_reed_bank",
+        "position": [
+          4.75,
+          0.0,
+          12.0
+        ],
+        "size": [
+          1.14337801933289,
+          0.921261131763458,
+          0.97336483001709
+        ],
+        "surfaces": 1,
+        "triangles": 1296
+      },
+      {
+        "bounds": [
+          [
+            -0.594043910503387,
+            -0.618538379669189,
+            -0.59141993522644
+          ],
+          [
+            0.554043471813202,
+            0.498837888240814,
+            0.674043357372284
+          ]
+        ],
+        "name": "spot_herb_patch",
+        "position": [
+          7.25,
+          0.0,
+          12.0
+        ],
+        "size": [
+          1.14808738231659,
+          1.11737632751465,
+          1.26546335220337
+        ],
+        "surfaces": 4,
+        "triangles": 6252
+      },
+      {
+        "bounds": [
+          [
+            -0.649999976158142,
+            0.0,
+            -0.629999995231628
+          ],
+          [
+            0.649999976158142,
+            0.686883330345154,
+            0.629999995231628
+          ]
+        ],
+        "name": "flax_patch",
+        "position": [
+          9.75,
+          0.0,
+          12.0
+        ],
+        "size": [
+          1.29999995231628,
+          0.686883330345154,
+          1.25999999046326
+        ],
+        "surfaces": 1,
+        "triangles": 894
+      }
+    ],
+    "intercepted_requests": [
+      {
+        "method": 0,
+        "path": "/p0/state?space=pond&place=pond_san_francisco_01",
+        "type": ""
+      }
+    ],
+    "model": {
+      "bounds": [
+        [
+          -0.649999976158142,
+          0.0,
+          -0.629999995231628
+        ],
+        [
+          0.649999976158142,
+          0.686883330345154,
+          0.629999995231628
+        ]
+      ],
+      "size": [
+        1.29999995231628,
+        0.686883330345154,
+        1.25999999046326
+      ],
+      "surfaces": 1,
+      "triangles": 894
+    },
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "slot": {
+      "main_key": {
+        "circle_center": [
+          300.0,
+          624.0
+        ],
+        "mesh_gap_px": 61.2887573242188,
+        "radius_px": 44.0
+      },
+      "name": "F2",
+      "player": [
+        6.125,
+        0.0,
+        -1.625
+      ],
+      "position": [
+        7.90000009536743,
+        0.0,
+        -1.10000002384186
+      ],
+      "screen_rect": [
+        240.267852783203,
+        456.419067382812,
+        69.6428833007812,
+        65.1138305664062
+      ],
+      "switch_key": {
+        "circle_center": [
+          300.0,
+          544.0
+        ],
+        "mesh_gap_px": 3.52130508422852,
+        "radius_px": 24.0
+      }
+    }
+  },
+  "scope": "Private desktop Godot art verification; no runtime integration or phone test"
+}
