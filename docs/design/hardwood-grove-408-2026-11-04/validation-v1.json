@@ -1,0 +1,300 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "single named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "one surface",
+        "passed": true
+      },
+      {
+        "check": "triangle budget <=1200",
+        "passed": true
+      },
+      {
+        "check": "entire canopy and accessories fit 1.5m slot",
+        "passed": true
+      },
+      {
+        "check": "height 2.30m",
+        "passed": true
+      },
+      {
+        "check": "bottom-centre origin",
+        "passed": true
+      },
+      {
+        "check": "finite geometry",
+        "passed": true
+      },
+      {
+        "check": "no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "unit normals",
+        "passed": true
+      },
+      {
+        "check": "opaque vertex colours",
+        "passed": true
+      },
+      {
+        "check": "no textures",
+        "passed": true
+      },
+      {
+        "check": "no skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "named editable part costs sum to runtime",
+        "passed": true
+      },
+      {
+        "check": "three original tree_0 crown volumes retained",
+        "passed": true
+      },
+      {
+        "check": "three stacked wood billets",
+        "passed": true
+      },
+      {
+        "check": "separate ringed stump cap",
+        "passed": true
+      },
+      {
+        "check": "actual tree_0 provenance",
+        "passed": true
+      },
+      {
+        "check": "source blend digest",
+        "passed": true
+      },
+      {
+        "check": "healthy standing tree; no harvested-state model",
+        "passed": true
+      },
+      {
+        "check": "all 156 growth-ring triangles face upwards",
+        "passed": true
+      },
+      {
+        "check": "Godot-generated import UID",
+        "passed": true
+      },
+      {
+        "check": "requested texture mode and light baking",
+        "passed": true
+      },
+      {
+        "check": "unique import UID",
+        "passed": true
+      },
+      {
+        "check": "only one manifest append, previous entries/order retained",
+        "passed": true
+      },
+      {
+        "check": "original tree_0 unchanged",
+        "passed": true
+      },
+      {
+        "check": "original tree_1 unchanged",
+        "passed": true
+      },
+      {
+        "check": "original tree_2 unchanged",
+        "passed": true
+      },
+      {
+        "check": "original sign unchanged",
+        "passed": true
+      },
+      {
+        "check": "manifest digest matches GLB",
+        "passed": true
+      }
+    ],
+    "triangles": 1042,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.7117500305175781,
+        0.0,
+        -0.6487270593643188
+      ],
+      [
+        0.7117500305175781,
+        2.299999952316284,
+        0.6487269997596741
+      ]
+    ],
+    "dimensions_m": [
+      1.4235000610351562,
+      2.299999952316284,
+      1.297454059123993
+    ],
+    "uid": "uid://cbsp854xyhutr",
+    "asset_sha256": "dcce17e71732b957e67f90a1955d0fca1487f061b2d4ac2722e3f526e3961af1",
+    "minimum_triangle_area": 5.542537432228545e-05
+  },
+  "godot": {
+    "asset_sha256": "dcce17e71732b957e67f90a1955d0fca1487f061b2d4ac2722e3f526e3961af1",
+    "checks": [
+      {
+        "check": "P0_SCENE selects requested Fern Pond",
+        "passed": true
+      },
+      {
+        "check": "native player fully assembled",
+        "passed": true
+      },
+      {
+        "check": "requested native goto debug step accepted",
+        "passed": true
+      },
+      {
+        "check": "player at requested stand",
+        "passed": true
+      },
+      {
+        "check": "player stand remains walkable",
+        "passed": true
+      },
+      {
+        "check": "native default 43 degree / 6.72 m zoom",
+        "passed": true
+      },
+      {
+        "check": "hardwood centred on L2",
+        "passed": true
+      },
+      {
+        "check": "native model scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "whole canopy and timber fit slot / height",
+        "passed": true
+      },
+      {
+        "check": "linear vertex colour in actual imported material",
+        "passed": true
+      },
+      {
+        "check": "farm matte material",
+        "passed": true
+      },
+      {
+        "check": "actual imported triangle and surface budget",
+        "passed": true
+      },
+      {
+        "check": "static asset, no skeleton",
+        "passed": true
+      },
+      {
+        "check": "light_baking=1 / texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "whole hardwood in native viewport",
+        "passed": true
+      },
+      {
+        "check": "native pond screenshot saved",
+        "passed": true
+      },
+      {
+        "check": "four resource comparison saved",
+        "passed": true
+      }
+    ],
+    "comparison": [
+      {
+        "bounds": "[P: (-0.71175, 0.0, -0.648727), S: (1.4235, 2.3, 1.297454)]",
+        "name": "Hardwood",
+        "position": "(-4.5, 0.0, 0.0)"
+      },
+      {
+        "bounds": "[P: (-1.179572, -0.0195, -1.263431), S: (2.517219, 2.14149, 2.604846)]",
+        "name": "Timber Grove",
+        "position": "(-1.5, 0.0, 0.0)"
+      },
+      {
+        "bounds": "[P: (-0.60126, -0.0125, -0.453788), S: (1.143378, 0.921261, 0.973365)]",
+        "name": "Reed Bank",
+        "position": "(1.5, 0.0, 0.0)"
+      },
+      {
+        "bounds": "[P: (-0.594044, -0.618538, -0.59142), S: (1.148087, 1.117376, 1.265463)]",
+        "name": "Herb Patch",
+        "position": "(4.5, 0.0, 0.0)"
+      }
+    ],
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "passed": true,
+    "pond": {
+      "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.95, 27.27993, 18.66451)]",
+      "id": "pond_san_francisco_03",
+      "mesh_bounds": "[P: (-0.71175, 0.0, -0.648727), S: (1.4235, 2.3, 1.297454)]",
+      "pixels": "(450, 1000)",
+      "screen_rect": "[P: (74.90624, 344.2637), S: (76.25893, 137.5165)]",
+      "slot": "(-0.3, 0.0, -9.0)",
+      "stand": "(0.95, 0.0, -8.4)",
+      "template": "crescent",
+      "view_width": 6.71999979019165
+    },
+    "renderer": "mobile",
+    "surfaces": 1,
+    "triangles": 1042
+  },
+  "stage": {
+    "runtime_head": "2d481d66efd5d69f11101736db0799109c991218",
+    "pond": "pond_san_francisco_03",
+    "slot": "L2",
+    "slot_xz": [
+      -0.3,
+      -9
+    ],
+    "goto_xz": [
+      0.95,
+      -8.4
+    ],
+    "preview_edit": "Only temporary PondScenery placement plus filtering large scatter in a 2.1m square at L2 after RNG draws; navigation, water, camera limits and spawn unchanged",
+    "scope": "Isolated b1 copy; no game integration or network service changes committed"
+  },
+  "source_blend_sha256": "4bf854afc2c29e0ed1cebf1041fa40be19046d1bf9c148f21bb46db95a8d333f",
+  "old_spot_source_sha256": "7c6bda2430ea955bd6ee201591889cac8a5e6d20e96ec1b14b87a244eb6450ed",
+  "images": [
+    {
+      "name": "SGODOT-408_HARDWOOD_v1_pond_L2_43.png",
+      "path": "docs/design/hardwood-grove-408-2026-11-04/SGODOT-408_HARDWOOD_v1_pond_L2_43.png",
+      "sha256": "3b8e636c96f92d5b63ed7496286c51a093d96139ab6223657a0a34b181cff791",
+      "bytes": 478047,
+      "mime": "image/png",
+      "size": [
+        450,
+        1078
+      ]
+    },
+    {
+      "name": "SGODOT-408_HARDWOOD_v1_resource_comparison.png",
+      "path": "docs/design/hardwood-grove-408-2026-11-04/SGODOT-408_HARDWOOD_v1_resource_comparison.png",
+      "sha256": "dce170f59b9c688ae0cfe89c3be5f41c7cb86c7cb5477d9ad3e6b7eef58c70ac",
+      "bytes": 1593085,
+      "mime": "image/png",
+      "size": [
+        1800,
+        1100
+      ]
+    }
+  ],
+  "scope": "Hardwood asset only. Temporary local PondScenery insertion and scatter exclusion for review; no navigation/fishing/camera or gathered-state integration committed."
+}
