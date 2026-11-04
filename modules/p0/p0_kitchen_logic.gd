@@ -784,6 +784,13 @@ static func save_big_stoves(player: String, stoves: Array) -> void:
 	cfg.set_value("big_pot", player if player != "" else "_", sorted)
 	cfg.save(PREFS)
 
+## A new save under the same player (v4q(2) wipe, a reset; SGODOT-397): the old save's Big Pot stoves go.
+static func forget_big_stoves(player: String) -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(PREFS) != OK or not cfg.has_section_key("big_pot", player if player != "" else "_"): return
+	cfg.erase_section_key("big_pot", player if player != "" else "_")
+	cfg.save(PREFS)
+
 ## Where a batch's pots go (the server's nextSpot): the current stove when empty, then the empty stoves by number, then
 ## the queue slots by number (Queue ×2); a stove fired by the batch can take a queued pot too. [{stove, queued}].
 static func batch_spots(view: Dictionary, current: int, n: int) -> Array:

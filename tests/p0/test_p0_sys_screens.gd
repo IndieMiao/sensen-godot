@@ -189,6 +189,18 @@ func test_the_outpost_handshake_carries_the_version() -> void:
 	assert_bool(Array(o.socket.handshake_headers).any(func(h): return str(h).begins_with("x-p0-version"))).is_false()
 	o.stop()
 
+## SGODOT-397 / 396 (后裔): the handshake carries the requests' x-p0-features, save_v7 in it — without it the server
+## turns the join away with 426 like the version gate.
+func test_the_handshake_carries_the_features_with_save_v7() -> void:
+	assert_bool(P0Session.FEATURES.split(",").has("save_v7")).is_true()
+	var o := P0Online.new()
+	add_child(auto_free(o))
+	o.player_id = "p0-test"
+	o.features = P0Session.FEATURES
+	o._connect()
+	assert_array(Array(o.socket.handshake_headers)).contains(["x-p0-features: " + P0Session.FEATURES])
+	o.stop()
+
 ## 不知火舞 233 walkthrough: a place that would not open stays on the blurred screen being left (no launch backdrop,
 ## no wordmark); Can't connect's card plus Go back. Retry opens the same place again; Go back (and Back) stays put.
 func test_a_failed_place_offers_retry_and_the_way_back() -> void:

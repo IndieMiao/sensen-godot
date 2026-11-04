@@ -339,9 +339,8 @@ func _ask_presence() -> void:
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
-	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
-	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.send(session.base_url + "/p0/presence", headers)
+	# the requests' own headers: the demo key, the version and the features (save_v7, or 426 once the wipe is on: 397)
+	_presence.send(session.base_url + "/p0/presence", session._headers())
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
