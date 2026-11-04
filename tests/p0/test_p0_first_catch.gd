@@ -98,9 +98,14 @@ func test_the_model_floor_and_timeout_only_change_with_sure() -> void:
 	assert_str(str(plain.outcome)).is_equal("escaped")
 	tier["sure"] = true
 	var sure := FishingModel.initial(7)
-	for i in int(FishingModel.data().max_steps) * 2: FishingModel.step(sure, false, tier)
+	var least := 1.0
+	for i in int(FishingModel.data().max_steps) * 2:
+		FishingModel.step(sure, false, tier)
+		least = minf(least, float(sure.progress))
 	assert_str(str(sure.outcome)).is_equal("playing")
-	assert_float(float(sure.progress)).is_equal_approx(FishingModel.SURE_FLOOR, 0.0001)
+	# down to the floor and never under it (the fish passing through the idle bar lifts it now and then: q(282)'s band)
+	assert_float(least).is_equal_approx(FishingModel.SURE_FLOOR, 0.0001)
+	assert_float(float(sure.progress)).is_greater_equal(FishingModel.SURE_FLOOR)
 
 func after_test() -> void:
 	P0FishingPanel.auto_play = false
