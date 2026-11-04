@@ -1,0 +1,28 @@
+[
+  {
+    "file": "SGODOT-408_flax_v1_F2_43deg.png",
+    "sha256": "ac5e30e94c75ecb934a12665c197e061a86a3dcd7e71c47cbc71d7417d33cdc0",
+    "pixels": [
+      760,
+      1830
+    ],
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-408_flax_v1_resource_comparison.png",
+    "sha256": "38211c2f03f18b767d4eb47fa24118a4dba6b08443dd400fbec3eba02145cfca",
+    "pixels": [
+      1600,
+      940
+    ],
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "validation.json",
+    "sha256": "53644acdf2dfdcd86f5d35a673728b7ec8b3ce33a8cab44afcd83ad5e3bb88c4",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
