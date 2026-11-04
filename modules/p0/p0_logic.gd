@@ -141,9 +141,9 @@ const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 ## q(58): crop names that keep their form in the plural, or take another; every plural reads it (Today, the chip, the
 ## waiting line, harvest amounts; 李白 q(98): `Lettuces ready in` was written where Lettuce stays Lettuce). The materials
 ## are mass nouns, the same in the plural: `7 Clay`, `Need 3 more Timber` — not `7 Claies` (不知火舞 on the Stall Board,
-## 奕星 11-04); Reeds is a plural already.
+## 奕星 11-04); Reeds and Grapes are plurals already (李白 on b1: `harvest 9 grapeses`).
 const PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies",
-	"Cress": "Cress", "Pea Shoots": "Pea Shoots", "Baby Spinach": "Baby Spinach", "Bok Choy": "Bok Choy",
+	"Cress": "Cress", "Pea Shoots": "Pea Shoots", "Baby Spinach": "Baby Spinach", "Bok Choy": "Bok Choy", "Grapes": "Grapes",
 	"Timber": "Timber", "Stone": "Stone", "Clay": "Clay", "Flax": "Flax", "Hardwood": "Hardwood", "Coal": "Coal",
 	"Rock Salt": "Rock Salt", "Copper Ore": "Copper Ore", "Iron Ore": "Iron Ore", "Quartz": "Quartz"}
 
