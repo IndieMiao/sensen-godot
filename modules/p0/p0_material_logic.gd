@@ -555,6 +555,7 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 	var out: Array = []
 	for r in view.get("workbench", {}).get("recipes", []):
 		if str(r.get("tab", "")) != tab: continue
+		if str(r.get("to", "")) == "weapon" and not P0Logic.GearLogic.weapon_actions_enabled: continue
 		var item := str(r.get("item", ""))
 		var card := {
 			"id": str(r.get("id", "")), "item": item, "name": str(r.get("name", "")), "effect": str(EFFECTS.get(item, "")),
@@ -594,13 +595,13 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 	if block == null:
 		if field: return {"label": "Build", "kind": "primary", "cmd": {"type": "place_start", "recipe": str(r.get("id", ""))}}
 		if str(r.get("to", "")) == "weapon":
-			var coins := int(P0Logic.GearLogic.weapon_recipe(str(r.get("item", ""))).get("coins", 0))
+			var coins := int(r.get("coins", P0Logic.GearLogic.weapon_recipe(str(r.get("item", ""))).get("coins", 0)))
 			return {"label": "Craft · %d coins" % coins if coins > 0 else "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 		return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 	var d: Dictionary = block.get("detail", {})
 	match str(block.get("code", "")):
 		"homestead_level":
-			return {"label": "Homestead Lv%d" % int(d.get("level", 1)), "kind": "unavailable", "cmd": {}}
+			return {"label": "Homestead Lv%d" % int(d.get("need", d.get("level", 1))), "kind": "unavailable", "cmd": {}}
 		"locked":
 			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
 		"skill_level_required":   # q(59) §5: `Farming Lv6 needed`

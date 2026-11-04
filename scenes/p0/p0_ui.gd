@@ -455,7 +455,8 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
-	if v.get("mine", {}).get("at", null) == null: _potion_until_ms = -1
+	var mine_at = v.get("mine", {}).get("at", null)
+	set_potion_cooldown(float(mine_at.get("potion_ready_in", -1)) if mine_at is Dictionary else -1.0)
 	if modal_kind == "first_dig" and JSON.stringify(P0Logic.GearLogic.first_dig(v)) != _first_dig_sig:
 		if P0Logic.GearLogic.first_dig(v).is_empty(): close_modal()
 		else: open_first_dig()
@@ -721,7 +722,7 @@ func _refresh_bar() -> void:
 	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
 	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
 	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
-	if not counts.any(func(n): return int(n) > 0) and (bar_mode != "combat" or surface == "mine"):
+	if not counts.any(func(n): return int(n) > 0) and (bar_mode != "combat" or (surface == "mine" and P0Logic.GearLogic.potion_actions_enabled)):
 		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
 		var gap := slots.find({})
 		if gap >= 0: slots[gap] = ghost
@@ -732,6 +733,7 @@ func _refresh_bar() -> void:
 	_bar.bag_open = sig[6]
 
 func _on_slot_tapped(id: String) -> void:
+	if id.begins_with("potion_") and not P0Logic.GearLogic.potion_actions_enabled: return
 	# A slot at 0 can't be picked; a light buzz says so (李白 q(44) ③), and a toast too: the release Journey build
 	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
 	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
@@ -949,7 +951,7 @@ func set_action(a: Dictionary) -> void:
 	if bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and view.get("gear", {}).has("weapon"):
 		a = a.duplicate()
 		a.tool = str(view.gear.weapon)
-	if surface == "mine" and bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and selected_seed.begins_with("potion_"):
+	if P0Logic.GearLogic.potion_actions_enabled and surface == "mine" and bar_mode == "combat" and str(a.get("verb", "")) == "Attack" and selected_seed.begins_with("potion_"):
 		a = P0Logic.GearLogic.drink_action(view, selected_seed, potion_cooldown())
 	# SYS-OFFLINE (WP6, §10.7.1): offline every action key is Unavailable with `Offline` as its second line (`Sow ·
 	# Offline`, the verb follows the action); a tap says nothing more than the banner already does.
@@ -2412,6 +2414,8 @@ func _bag_unavailable(action: StringName, id: String, _reason: String) -> void:
 
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
 func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
+	if not P0Logic.GearLogic.command_allowed({type = str(action), item = id}): return
+	if id.begins_with("potion_") and action in [&"pin", &"unpin"] and not P0Logic.GearLogic.potion_actions_enabled: return
 	match action:
 		&"bag_room":   # BAG-5: Bag Upgrade I is a homestead matter; Show the house (or the homestead on the map)
 			close_modal()

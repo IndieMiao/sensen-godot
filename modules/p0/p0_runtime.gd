@@ -166,7 +166,8 @@ func _init() -> void:
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
 	ui.action_pressed.connect(_on_action)
-	ui.command.connect(func(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
+	ui.command.connect(func(cmd):
+		if P0Logic.GearLogic.command_allowed(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
 	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
@@ -461,6 +462,7 @@ func _watch_day_pass(v: Dictionary) -> void:
 	ui.toast_in_city("Day Pass ended · Re-entry\n%s" % P0Travel.fare_text(P0Travel.fare(v, here)), here)
 
 func _on_action(cmd: Dictionary) -> void:
+	if not P0Logic.GearLogic.command_allowed(cmd): return
 	if str(cmd.get("type", "")) == "energy_card":
 		var verb = _call("p0_energy_verb", [])
 		energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
@@ -1151,6 +1153,16 @@ static func wrong_city_line(view: Dictionary, request: String, city: String) -> 
 	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "mine_drink":
+		if code == "potion_cooldown":
+			ui.set_potion_cooldown(float(detail.get("ready_in", -1)))
+			return
+		if code == "hp_full":
+			ui.toast("HP full")
+			return
+		if code == "no_potion":
+			ui.toast("Buy at Homestead Stall")
+			return
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
 		return

@@ -7,8 +7,14 @@ const COPPER := "weapon_copper_sword"
 const IRON := "weapon_iron_sword"
 const POTION := "potion_heal"
 var _content: Dictionary
+var _weapon_actions: bool
+var _potion_actions: bool
 
 func before_test() -> void:
+	_weapon_actions = Gear.weapon_actions_enabled
+	_potion_actions = Gear.potion_actions_enabled
+	Gear.weapon_actions_enabled = true
+	Gear.potion_actions_enabled = true
 	_content = P0Logic.content()
 	P0Logic._content = _content.duplicate(true)
 	P0Logic._content.mine.combat.weapons = {
@@ -17,9 +23,12 @@ func before_test() -> void:
 		IRON: {name = "Iron Sword", attack = 12, tier = 2}}
 	P0Logic._content.mine.potions = {POTION: {name = "Healing Potion", heal = "full", floors = "any", cooldown_ms = 1700}}
 	P0Logic._content.mine.first_dig = {giver = "res_pip", floor = 6, gate = {homestead = 4}, reward = {weapon = COPPER, affinity = 9}}
-	P0Logic._content.workbench.recipes.append({id = "craft_test", out = IRON, to = "weapon", coins = 137, gate = {homestead = 9}})
+	P0Logic._content.workbench.recipes = P0Logic._content.workbench.recipes.filter(func(r): return str(r.get("out", "")) != IRON)
+	P0Logic._content.workbench.recipes.append({id = "craft_test", out = IRON, to = "weapon", coins = 137, homestead = 9})
 
 func after_test() -> void:
+	Gear.weapon_actions_enabled = _weapon_actions
+	Gear.potion_actions_enabled = _potion_actions
 	P0Logic._content = _content
 	for suffix in ["tips", "bar"]:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_355_g_%d_%s.json" % [OS.get_process_id(), suffix]))
@@ -276,3 +285,92 @@ func test_first_dig_today_opens_card_and_refreshes_until_server_completion() -> 
 	v.first_dig = null
 	ui.set_view(v)
 	assert_bool(ui.has_modal()).is_false()
+
+func test_potions_off_hide_every_entry_and_old_selection_cannot_send_drink() -> void:
+	Gear.potion_actions_enabled = false
+	var v := _view()
+	v.storage = {items = []}
+	v.shops = {homestead = {buy = [{id = POTION, price = 25}, {id = "seed_radish", price = 2}]}}
+	assert_array(P0ItemInfo.spec(v, POTION, &"bag", {place = "home"}).buttons).is_empty()
+	assert_array(P0Logic.quick_bar(v, [POTION], "combat", [POTION])).is_empty()
+	assert_str(P0Logic.bar_action_of(POTION)).is_empty()
+	var counter: P0CounterDrawer = auto_free(P0CounterDrawer.new())
+	counter.view = v
+	counter.role = "homestead"
+	assert_array(counter.offers().map(func(o): return o.id)).is_equal(["seed_radish"])
+	var ui := await _ui()
+	ui.selected_seed = POTION
+	ui.set_action({verb = "Attack", enabled = true, cmd = {type = "mine_swing"}})
+	assert_str(ui.fab_state().verb).is_equal("Attack")
+	assert_array(ui.quick_bar_node().slots).is_empty()
+	var sent := []
+	ui.command.connect(func(c): sent.append(c))
+	ui._bag_action(&"pin", POTION, {})
+	ui._bag_action(&"store", POTION, {})
+	assert_array(sent).is_empty()
+	assert_bool(Gear.command_allowed({type = "mine_drink", item = POTION})).is_false()
+	assert_bool(Gear.command_allowed({type = "buy", item = POTION})).is_false()
+	assert_bool(Gear.command_allowed({type = "equip", item = COPPER})).is_true()
+	assert_bool(Gear.command_allowed({type = "talk", resident = "res_pip"})).is_true()
+
+func test_weapon_switch_is_independent_and_keeps_first_dig_and_display() -> void:
+	Gear.weapon_actions_enabled = false
+	var v := _view()
+	var rows := P0BagDrawer.gear_rows(v, "combat")
+	assert_int(rows.size()).is_equal(3)
+	assert_dict(rows[1].action).is_empty()
+	assert_dict(rows[2].action).is_empty()
+	v.workbench = {recipes = [{id = "craft_test", item = IRON, to = "weapon", tab = "tools", cost = []}]}
+	assert_array(P0MaterialLogic.workbench_model(v, "tools")).is_empty()
+	assert_bool(Gear.command_allowed({type = "equip", item = COPPER})).is_false()
+	assert_bool(Gear.command_allowed({type = "craft", recipe = "craft_test"})).is_false()
+	assert_bool(Gear.command_allowed({type = "equip", item = "rod_starter"})).is_true()
+	assert_bool(Gear.drink_action(v, POTION, 0).enabled).is_true()
+	assert_bool(Gear.first_dig_card(v).is_empty()).is_false()
+
+func test_server_cooldown_projects_without_mutating_hp_items_or_source() -> void:
+	var v := _view()
+	v.mine.at.potion_ready_in = 3000
+	var before := v.duplicate(true)
+	assert_float(P0Logic.project(v, 1250).mine.at.potion_ready_in).is_equal(1750.0)
+	assert_float(P0Logic.project(v, 3500).mine.at.potion_ready_in).is_equal(0.0)
+	assert_dict(v).is_equal(before)
+	v.mine.at = null
+	assert_that(P0Logic.project(v, 1250).mine.at).is_null()
+
+func test_fresh_view_resets_cooldown_on_reconnect_new_day_and_leaving() -> void:
+	var ui := await _ui()
+	var v := _view()
+	v.mine.at.potion_ready_in = 3000
+	ui.set_view(v)
+	assert_float(ui.potion_cooldown()).is_between(2900.0, 3000.0)
+	ui.set_view(P0Logic.project(v, 1500))
+	assert_float(ui.potion_cooldown()).is_between(1400.0, 1500.0)
+	v.mine.at.day = "2026-11-03"
+	v.mine.at.potion_ready_in = 0
+	ui.set_view(v)
+	assert_float(ui.potion_cooldown()).is_equal(0.0)
+	v.mine.at.erase("potion_ready_in")
+	ui.set_view(v)
+	assert_float(ui.potion_cooldown()).is_equal(-1.0)
+	v.mine.at = null
+	ui.set_view(v)
+	assert_float(ui.potion_cooldown()).is_equal(-1.0)
+
+func test_weapon_recipe_reads_server_homestead_need_and_coin_price() -> void:
+	var v := _view()
+	v.workbench = {recipes = [{id = "craft_test", item = IRON, name = "Iron Sword", to = "weapon", tab = "tools", cost = [], coins = 211,
+		block = {code = "homestead_level", detail = {need = 9}}}]}
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Homestead Lv9")
+	v.workbench.recipes[0].block = null
+	assert_str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label).is_equal("Craft · 211 coins")
+
+func test_potions_never_offer_or_send_farm_storage_in_either_build() -> void:
+	var v := _view()
+	v.storage = {items = []}
+	for enabled in [false, true]:
+		Gear.potion_actions_enabled = enabled
+		assert_bool(P0ItemInfo.spec(v, POTION, &"bag", {place = "home"}).buttons.any(func(b): return b.id == &"store")).is_false()
+		assert_bool(Gear.command_allowed({type = "store", item = POTION})).is_false()
+	for id in ["healing_potion", POTION]:
+		assert_str(P0Logic.P1_UNLOCKS[id].note).is_equal("at the Homestead Stall")

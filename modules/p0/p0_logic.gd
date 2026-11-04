@@ -766,12 +766,14 @@ const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_", "trap_"], "comb
 
 ## The action whose bar takes this item ("farm" / "fish"), or "" when no bar does.
 static func bar_action_of(id: String) -> String:
+	if id.begins_with("potion_") and not GearLogic.potion_actions_enabled: return ""
 	for mode in BAR_POOL:
 		for prefix in BAR_POOL[mode]:
 			if id.begins_with(prefix): return mode
 	return ""
 
 static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
+	if mode == "combat" and not GearLogic.potion_actions_enabled: return []
 	var prefix := "potion_" if mode == "combat" else "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
@@ -1025,6 +1027,10 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		d[key] = sub
 		return sub
 	var e = v.get("energy", null)
+	var mine = v.get("mine", null)
+	var mine_at = mine.get("at", null) if mine is Dictionary else null
+	if mine_at is Dictionary and mine_at.get("potion_ready_in", null) != null:
+		own.call(own.call(v, "mine"), "at")["potion_ready_in"] = maxf(0.0, float(mine_at.potion_ready_in) - elapsed_ms)
 	var next_in = e.get("next_in", null) if e is Dictionary else null
 	if next_in != null:
 		e = own.call(v, "energy")
@@ -2300,8 +2306,8 @@ const P1_UNLOCKS := {
 	"bag_upgrade_4": {"icon": "bag", "text": "Bag Upgrade IV"},
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
-	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
-	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
+	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Homestead Stall"},
+	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Homestead Stall"},
 	"decor_set_1": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
 	"decor_set_2": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
 	"orchard_10": {"icon": "crop_apple", "text": "Orchard 10/10", "note": "+1 slot"},

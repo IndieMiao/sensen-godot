@@ -1,6 +1,22 @@
 extends RefCounted
 ## SGODOT-355 G: display facts from content and authoritative view; no local rewards or HP settlement.
 
+## Independent integration switches (392). No player preference/save field: enable each in a reviewed build.
+static var weapon_actions_enabled := true
+static var potion_actions_enabled := false
+
+static func command_allowed(cmd: Dictionary) -> bool:
+	var type := str(cmd.get("type", ""))
+	var id := str(cmd.get("item", ""))
+	if id.begins_with("potion_") and type in ["store", "take_out"]: return false
+	if not potion_actions_enabled and (type == "mine_drink" or (type == "buy" and id.begins_with("potion_"))): return false
+	if not weapon_actions_enabled:
+		if type == "equip" and id.begins_with("weapon_"): return false
+		if type == "craft":
+			for recipe in P0Logic.content().get("workbench", {}).get("recipes", []):
+				if str(recipe.get("id", "")) == str(cmd.get("recipe", "")) and str(recipe.get("to", "")) == "weapon": return false
+	return true
+
 static func weapon(id: String) -> Dictionary:
 	return P0Logic.content().get("mine", {}).get("combat", {}).get("weapons", {}).get(id, {})
 
@@ -25,7 +41,7 @@ static func weapon_recipe(id: String) -> Dictionary:
 static func weapon_gate(view: Dictionary, id: String) -> String:
 	var recipe := weapon_recipe(id)
 	if recipe.is_empty(): return ""
-	var lv := int(recipe.get("gate", {}).get("homestead", 0))
+	var lv := int(recipe.get("homestead", 0))
 	return "Homestead Lv%d" % lv if int(view.get("homestead", {}).get("level", 1)) < lv else "Craft at Workbench"
 
 static func weapon_source(view: Dictionary, id: String) -> String:
@@ -46,6 +62,7 @@ static func potion_effect(id: String) -> String:
 ## E supplies authoritative remaining cooldown. Unknown (-1) must not enable a drink.
 static func drink_action(view: Dictionary, id: String, cooldown_ms: float) -> Dictionary:
 	var k := {icon = "heart", tool = id, verb = "Drink", sub = "", enabled = false, amber = false, cmd = {}, need = 0, once = true}
+	if not potion_actions_enabled: return k
 	var d := potion(id)
 	var mine: Dictionary = view.get("mine", {})
 	var at = mine.get("at", null)

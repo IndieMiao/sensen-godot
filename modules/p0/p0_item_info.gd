@@ -127,6 +127,10 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		var text := fill(str(line), t)
 		if text != "": out.facts.append(text)
 	out.buttons = _buttons(rule, f, t)
+	if kind == "potion":
+		out.buttons = out.buttons.filter(func(b): return str(b.id) != "store" and (P0Logic.GearLogic.potion_actions_enabled or str(b.id) not in ["pin", "unpin", "buy"]))
+	if kind == "weapon" and not P0Logic.GearLogic.weapon_actions_enabled:
+		out.buttons = out.buttons.filter(func(b): return str(b.id) == "equipped")
 	for b in out.buttons: b.sends = sends(b, context)
 	if rule.get("price", false): out.price = _price(view, item_id, opts)
 	# STALL-NEW-2 (E-04): a buy row unlocked since the stall was last opened reads `◆ New for you` in newInk.
