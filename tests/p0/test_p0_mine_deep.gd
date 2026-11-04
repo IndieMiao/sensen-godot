@@ -498,3 +498,46 @@ func test_the_lunge_stops_at_the_players_body() -> void:
 	while str(e2.phase) in ["windup", "dash"]: c2.step(0.016, mover, false)
 	assert_float((e2.mover.position as Vector3).z - start.z).is_greater(2.0)   # past where the player stood (stopped there: ~1.0)
 	mover.position = aside
+
+## 李元芳's first F1 on preview A (232 34d109f4, 蒙恬's event log): Attack held down swung once at the touch-down and then
+## stood there — ten hurts in 20 s, not one swing reached the server. Held, it keeps swinging as the weapon's tempo
+## allows, as Mine keeps digging; let go, it stops.
+func test_attack_held_keeps_swinging_until_let_go() -> void:
+	P0Runtime.free_instance_for_tests()
+	var rt := P0Runtime.ensure()
+	rt.ui.quick_store = "user://test_p0_mine_deep_hold.json"
+	rt.session.transport = func(_m, _p, _b, _c): pass
+	var sent: Array = []
+	rt.session.sent.connect(func(cmd): sent.append(cmd))
+	await get_tree().process_frame
+	rt.session.view = _v(4)
+	var mine = load("res://scenes/p0/p0_mine.tscn").instantiate()
+	mine.setup({"mine": Fx.MINE, "floor": 4})
+	add_child(mine)
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.bar_mode).is_equal("combat")
+	var slime: Dictionary = mine.combat.enemies.values()[0]
+	mine.actor.teleport(slime.node.position + Vector3(0.9, 0, 0))   # right beside it, in reach
+	await get_tree().process_frame
+	var swings := [0]   # a swing sets the weapon's whole tempo (0.55 s): the cooldown jumping up counts one
+	var held := func(seconds: float) -> void:
+		var end := Time.get_ticks_msec() + int(seconds * 1000.0)
+		var was := 0.0
+		while Time.get_ticks_msec() < end:
+			rt.session.busy = false   # no server here: each swing's command settles at once
+			if mine.combat.cooldown > was + 0.3: swings[0] += 1
+			was = mine.combat.cooldown
+			await get_tree().process_frame
+	rt.ui.fab_held = true
+	rt.ui._fab_pressed()   # the touch-down: one swing
+	await held.call(1.5)
+	assert_int(swings[0]).is_greater_equal(2)   # and more while it is held (about one each 0.55 s)
+	assert_int(sent.filter(func(c): return str(c.get("type", "")) == "mine_attack" and c.has("targets")).size()).is_greater_equal(2)
+	rt.ui.fab_held = false
+	var after: int = swings[0]
+	await held.call(0.8)
+	assert_int(swings[0]).is_equal(after)   # let go: no more
+	mine.queue_free()
+	P0Runtime.free_instance_for_tests()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p0_mine_deep_hold.json"))
+	await get_tree().process_frame

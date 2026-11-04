@@ -545,12 +545,15 @@ func _selected_item() -> String:
 	return rt.ui.selected_seed if rt.ui.bar_mode == "mine" else ""
 
 ## Hold the key to keep mining (the farm's hold-to-repeat): the same verb, one labour beat apart.
+## Holding the main key keeps it going: Mine on the next rock as the old mine's dig beat allows, Attack again as the
+## weapon's tempo allows (a held Attack swung once at the touch-down and then stood there taking hits — 李元芳's first
+## F1 on preview A: ten hurts in 20 s, not one swing reached the server; 232 34d109f4, 蒙恬's event log).
 func _hold_repeat() -> void:
 	if not rt.ui.fab_held or rt.ui.has_modal() or actor.busy() or rt.session.busy: return
 	if Time.get_ticks_msec() < _hold_until: return
 	var a: Dictionary = rt.ui.fab_state()
 	var cmd: Dictionary = a.get("cmd", {})
-	if not a.get("enabled", false) or str(cmd.get("type", "")) != "mine_rock": return
+	if not a.get("enabled", false) or not str(cmd.get("type", "")) in ["mine_rock", "mine_swing"]: return
 	if rt.ui.fab_verb == "": rt.ui.fab_verb = str(a.get("verb", ""))
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
 	p0_action(cmd)
