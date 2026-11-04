@@ -5,6 +5,7 @@ const POT := "res://assets/props/stove_pot/stove_pot.glb"
 const LID := "PotRig/StovePot/pot_big/lid"
 const REST := Vector3(0, .181, -.107)
 const PERIOD := 1.8
+const LID_GAIN := .6 # v1.1: complete front-edge lift < 1.8 cm at the larger overlay scale.
 var root_node: Node3D
 var matte: StandardMaterial3D
 var uids := {}
@@ -116,11 +117,11 @@ func make_steam(lid: Node) -> void:
 	var size_texture := CurveTexture.new()
 	size_texture.curve = size_curve
 	var process := ParticleProcessMaterial.new()
-	process.direction = Vector3(.08,1,0)
-	process.spread = 8
-	process.gravity = Vector3(.003,.009,0)
-	process.initial_velocity_min = .048
-	process.initial_velocity_max = .061
+	process.direction = Vector3(0,1,0)
+	process.spread = 5
+	process.gravity = Vector3(0,.006,0)
+	process.initial_velocity_min = .040
+	process.initial_velocity_max = .052
 	process.scale_min = .75
 	process.scale_max = 1.1
 	process.scale_curve = size_texture
@@ -130,8 +131,8 @@ func make_steam(lid: Node) -> void:
 	steam.position = Vector3(.062,.032,.146)
 	steam.local_coords = true
 	steam.amount = 5
-	steam.lifetime = 1.3
-	steam.preprocess = 1.3
+	steam.lifetime = 1.2
+	steam.preprocess = 1.2
 	steam.fixed_fps = 30
 	steam.use_fixed_seed = true
 	steam.seed = 419
@@ -204,8 +205,8 @@ func build() -> void:
 	var lid_positions: Array = []
 	var lid_rotations: Array = []
 	for i in times.size():
-		lid_positions.append(REST + Vector3(0,lifts[i],0))
-		lid_rotations.append(Vector3(tilts[i],0,sin(i*2.0)*.008 if i>1 and i<9 else 0.0))
+		lid_positions.append(REST + Vector3(0,lifts[i]*LID_GAIN,0))
+		lid_rotations.append(Vector3(tilts[i],0,sin(i*2.0)*.008 if i>1 and i<9 else 0.0)*LID_GAIN)
 	track(tumble,LID+":position",times,lid_positions)
 	track(tumble,LID+":rotation",times,lid_rotations)
 	track(tumble,"PotRig:position",[0,.50,.67,.82,.94,1.09,1.21,1.8], [Vector3.ZERO,Vector3.ZERO,Vector3(0,.002,0),Vector3.ZERO,Vector3(0,.001,0),Vector3.ZERO,Vector3.ZERO,Vector3.ZERO])

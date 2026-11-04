@@ -14,9 +14,10 @@ SENSEN_OFFLINE=1 godot --headless --path output/cookpot-419/project --script ver
 不复制任何 b1 运行时代码。`prepare.py` 固定 b1 提交，验证原锅 GLB 的 SHA-256 与美术分支一致。
 
 渲染前查看 `nvidia-smi`，与其他美工错开。白底预览入口 `review.gd`；
-360×800 厨房预览入口 `review_phone.gd`，临时更换隔离工程 `review.tscn` 的脚本路径。
+v1.1 叠层预览入口 `review_overlay.gd`，临时更换隔离工程 `review.tscn` 的脚本路径。
 两者使用桌面 Mobile/Vulkan、固定 30 fps，每帧由 Godot 渲染后保存；ffmpeg 按 30 fps 编码。
-厨房使用 b1 的 P0Room、Basic Room 灯光/资产以及 UiHeatRing，计时与进度条只是可见性审阅控件。
+v1.1 使用独立透明 200×180 SubViewport 和宿主左上暖光，显示在 360×800 画布的 `(80,150)`；圆环只是半径 60 px 的细线占位。
+不带倒计时或进度条。旧 `review_phone.gd` 是 v1 取景记录，已经被叠层方案取代。
 不运行账号、后端或料理交互，也不修改 b1 源文件。
 
 `verify.gd` 核对原锅实例、隐藏小锅、面数、尺寸、两个动画、首尾、根节点不动、

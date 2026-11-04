@@ -89,7 +89,7 @@ func run() -> void:
 				check(scene.get_node("PotRig/Soup/"+b).scale.x<=.00011,"Idle hides "+b)
 			player.play("tumble")
 			player.pause()
-	check(max_lift>=.02 and max_front_lift<=.03,"Lid maximum lift is 2–3 cm including tilt")
+	check(max_lift>0 and max_front_lift<=.01801,"Lid maximum lift including tilt <= 1.8 cm")
 	check(max_body<=.00201,"Body bounce at most 2 mm")
 	check(1-pow(1-.17*.7,5)<.5,"Steam theoretical alpha with all five overlapping below 0.5")
 	var output := {"checks":checks,"errors":errors,"check_count":checks.size(),"triangles_excluding_steam":tri,"steam_triangles":10,"surfaces_excluding_steam":surfaces,"opaque_materials":mats.values(),"added_render_materials":2,"bounds_rest":{"position":[bounds.position.x,bounds.position.y,bounds.position.z],"size":[bounds.size.x,bounds.size.y,bounds.size.z]},"max_lid_pivot_lift_m":max_lift,"max_lid_front_lift_m":max_front_lift,"max_body_bounce_m":max_body,"steam_peak_single_particle_alpha":.17*.7,"steam_all_five_overlap_bound":1-pow(1-.17*.7,5)}

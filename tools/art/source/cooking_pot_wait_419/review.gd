@@ -2,6 +2,7 @@ extends Node
 ## Offline b1 fixture; no account, gameplay or runtime files are modified.
 const PROP := preload("res://assets/props/cooking_pot_wait/cooking_pot_wait.tscn")
 const OUT := "res://../renders/"
+const STUDIO_PREFIX := "SGODOT-419_cooking_pot_v1.1_"
 var viewport: SubViewport
 var prop: Node3D
 var camera: Camera3D
@@ -55,7 +56,7 @@ func snap(filename: String) -> void:
 	assert(viewport.get_texture().get_image().save_png(OUT+filename)==OK)
 
 func run() -> void:
-	DirAccess.make_dir_recursive_absolute(OUT+"frames")
+	DirAccess.make_dir_recursive_absolute(OUT+"studio_v11_frames")
 	var world := make_view(Vector2i(720,720))
 	lighting(world)
 	prop = PROP.instantiate()
@@ -71,17 +72,17 @@ func run() -> void:
 	for shot in [["closed",.12],["lifted",.88],["settled",1.28]]:
 		player.seek(shot[1],true)
 		await get_tree().process_frame
-		await snap("SGODOT-419_cooking_pot_v1_"+shot[0]+".png")
+		await snap(STUDIO_PREFIX+shot[0]+".png")
 	player.play("idle")
 	player.advance(0)
 	player.pause()
 	await get_tree().process_frame
-	await snap("SGODOT-419_cooking_pot_v1_idle.png")
+	await snap(STUDIO_PREFIX+"idle.png")
 	player.play("tumble")
 	player.pause()
 	for i in 108:
 		player.seek(fmod(i/30.0,1.8),true)
 		await get_tree().process_frame
-		await snap("frames/%04d.png"%i)
+		await snap("studio_v11_frames/%04d.png"%i)
 	print("RENDERED_STUDIO_108_FRAMES")
 	get_tree().quit()
