@@ -101,6 +101,13 @@ static func place_of(pond_id: String) -> Dictionary:
 	var gen: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(pond_id)
 	return {} if gen.is_empty() else {"name": gen.name, "site": gen.site, "beginner": gen.beginner, "city": gen.cluster}
 
+## The map pin's icon by the pond's site (SGODOT-406, 安其拉's B set, 不知火舞 9b2d28ae): still water, a stream, a cove.
+## By the site, not content.fishing.sites' template: `coast` has no template there yet (it reads as Pond), the server's
+## generator gives coastal cities coast ponds all the same (world.ts Site). A pond not known: the still water.
+const PIN_ICONS := {"pond": "pond", "river": "pond_river", "coast": "pond_coast"}
+static func pin_icon(pond_id: String) -> String:
+	return str(PIN_ICONS.get(str(place_of(pond_id).get("site", "pond")), "pond"))
+
 ## Where the Details sheet may reach up to: below the HUD's two rows and the place chip (SGODOT-283).
 const FISH_SHEET_TOP := 150.0
 
