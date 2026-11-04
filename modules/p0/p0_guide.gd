@@ -49,6 +49,8 @@ static func tip_seconds(text: String) -> float:
 ## time Energy runs out (the first level-up teaches in its banner instead).
 static func tip_for_surface(surface: String) -> String:
 	return {"farm": "sow", "pond": "creel", "map": "map", "stove": "cook"}.get(surface, "")
+## The surface a tip belongs to, for the ones asked for on arriving there (the stove's `cook` is a drawer's, not a world's).
+const SURFACE_OF_TIP := {"sow": "farm", "creel": "pond", "map": "map"}
 
 ## before / after: the views either side of the response carrying ev ("the account's first fire" is the pot started
 ## while before.cooking.first_fire was still true).
@@ -88,12 +90,24 @@ class TipQueue:
 		seen[showing] = true
 		return showing
 
-	## The player did something: a tip that teaches it closes. Returns true when it closed one.
+	## The player did something: a tip that teaches it closes. Returns true when it closed one. One still waiting for it
+	## (a dialog was up) goes too, as seen: done already, it would teach nothing (q(26)).
 	func did(action: String) -> bool:
+		for key in waiting.duplicate():
+			if str(P0Guide.TAUGHT_BY.get(key, "")) == action:
+				waiting.erase(key)
+				seen[key] = true
 		if showing != "" and str(P0Guide.TAUGHT_BY.get(showing, "")) == action:
 			showing = ""
 			return true
 		return false
+
+	## A new surface (the farm, a pond, the map): a waiting tip of another surface's (P0Guide.SURFACE_TIPS) goes unseen —
+	## it is asked for again there, never shown here (the map's `Browse the map for free.` in an outpost).
+	func leave_surface(surface: String) -> void:
+		for key in waiting.duplicate():
+			var own := str(P0Guide.SURFACE_OF_TIP.get(key, ""))
+			if own != "" and own != surface: waiting.erase(key)
 
 	## Timed out or tapped.
 	func close() -> void: showing = ""

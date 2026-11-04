@@ -1224,8 +1224,9 @@ func _mailbox_prop(at: Vector3) -> Node3D:
 	root.add_child(model)
 	return root
 
+## The landing's teaching card (q(215): `Pick a seed…`). Asked for even under a dialog (Pip's opening line): the TipQueue
+## holds it until the dialog closes (方案 §10.3 ⑥, 不知火舞 355 G01); a Sow meanwhile takes it off the queue (TipQueue.did).
 func _teaching(v: Dictionary) -> void:
-	if rt.ui.has_modal(): return
 	var firsts: Array = v.get("firsts", [])
 	if not firsts.any(func(f): return str(f).begins_with("harvest:")) and not v.get("plots", []).any(func(p): return str(p.state) in ["sown", "growing", "ready"]):
 		rt.ui.teach("sow")   # copy in P0Guide.TIPS (q(44))

@@ -83,6 +83,28 @@ func test_tip_queue_waits_for_moments_and_shows_each_tip_once() -> void:
 	assert_bool(q.did("cast")).is_true()                      # doing what it teaches closes it
 	assert_that(q.seen.keys()).contains_exactly_in_any_order(["sow", "creel", "cast"])
 
+## 不知火舞 355 G01 / G04 (方案 §10.3 ⑥): a tip asked for under a dialog waits for it — the landing's `sow` under Pip's
+## opening line; a Sow meanwhile takes it off the queue, seen (done, it teaches nothing); a surface's own tip still
+## waiting when the player leaves for another world goes unseen (asked for again there), never shown in the next one.
+func test_a_waiting_tip_goes_when_done_or_when_its_surface_is_left() -> void:
+	var q = Guide.TipQueue.new({})
+	assert_bool(q.request("sow")).is_true()                  # under Pip's line: waits
+	assert_bool(q.did("sow")).is_false()                      # nothing on screen closed…
+	assert_str(q.next()).is_equal("")                         # …but the waiting one went
+	assert_bool(q.seen.has("sow")).is_true()
+	assert_bool(q.request("sow")).is_false()
+	assert_bool(q.request("map")).is_true()                   # on the map, a place card up
+	q.leave_surface("map")
+	assert_str(q.next()).is_equal("map")                      # still the map: it comes up as the card closes
+	q.close()
+	var r = Guide.TipQueue.new({})
+	r.request("map")
+	r.request("meal")
+	r.leave_surface("outpost")                                # off to Mission before the card closed
+	assert_str(r.next()).is_equal("meal")                     # an event's tip stays; the map's went
+	assert_bool(r.seen.has("map")).is_false()                 # unseen: the map asks again next time
+	assert_bool(r.request("map")).is_true()
+
 # ---------------------------------------------------------------- Today rows (§14.2)
 
 func test_first_session_rows_follow_the_director_table() -> void:

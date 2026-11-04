@@ -593,6 +593,7 @@ func set_status_line(text: String) -> void:
 func set_surface(name: String) -> void:
 	if placing(): end_placement()   # a world change ends placement (nothing was sent)
 	surface = name
+	if tips: tips.leave_surface(name)   # the map's tip waiting under a card never comes up in the next world
 	if not is_node_ready():
 		_pending["surface"] = name
 		return
