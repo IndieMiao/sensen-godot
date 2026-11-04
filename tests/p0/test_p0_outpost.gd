@@ -859,8 +859,11 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 ## the keeper's portrait agree.
 func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
-	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41_npc_auburn")   # Lena's style, in auburn: still hers
-	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")
+	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41_npc_auburn")   # Lena now wears the hairhat51 rain hat
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_0")
+	assert_str(P0CityPlaces.hair_style("hairhat51_npc_lena")).is_equal("hairhat51")
+	assert_str(P0CityPlaces.keeper_look("tea_tropical_1", ["res_lena"])).is_equal("tea_tropical_0")
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_2", ["res_hana", "res_lena"])).is_equal("tea_subtropical_0")
 	assert_str(str(looks.market_subtropical_0.hairHat)).is_equal("hairhat0")   # Tomo's style (his is the darker variant)
 	assert_str(P0CityPlaces.hair_style("hairhat0_npc_tomo")).is_equal("hairhat0")
 	assert_str(P0CityPlaces.hair_style("hairhat41")).is_equal("hairhat41")
@@ -871,9 +874,9 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo", "res_nadia"])).is_equal("market_subtropical_2")
 	P0CityPlaces.accept("gn-testlena", {"detail": {"outposts": [{"id": "gn-testlena~tea0", "role": "tea", "name": "Test Tea House",
 		"art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
-		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_0"},
+		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_2"},
 		"residents": ["res_hana", "res_lena"]}]}})
-	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_1")
+	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_0")
 
 ## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair style and
 ## cloth are theirs, no keeper set wears both (a hair colour variant is the same style); no cloth28 (the uniform) and
