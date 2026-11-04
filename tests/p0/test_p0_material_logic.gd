@@ -333,6 +333,17 @@ func test_a_quarrys_rows_have_no_main_ore() -> void:
 		["You", "Best here F7"]])
 	assert_str(P0MaterialLogic.wild_mine_floors(_site("quarry", QUARRY))).is_equal("Floors 1–26")
 
+## The viewport's best_floor is from the box read the session made once; down to F2 since, the view's record says so
+## (李元芳 on preview B: Jackdaw's card still read Best here F1). The higher of the two; a record under it changes nothing.
+func test_the_best_floor_follows_the_views_record() -> void:
+	var v := _view()
+	v["mine"] = {"records": {"wd-254-114": {"deepest": 2, "guards": []}}}
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 1)).back()).is_equal(["You", "Best here F2"])
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY)).back()).is_equal(["You", "Best here F2"])   # read before the first visit
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 7)).back()).is_equal(["You", "Best here F7"])
+	v["mine"] = {"records": {"wd-1-1": {"deepest": 9}}}   # another mine's record
+	assert_that(P0MaterialLogic.wild_mine_rows(v, _site("quarry", QUARRY, 1)).back()).is_equal(["You", "Best here F1"])
+
 ## A grey pin (a mine type not open yet, E4 329:182456) has no rows: the card says Not open yet itself.
 func test_a_mine_not_open_yet_has_no_rows() -> void:
 	var grey := _site("geode", {"floors": 60, "main": "gem", "main_from": 10, "side": null, "open_to": 0}, 0, false)
