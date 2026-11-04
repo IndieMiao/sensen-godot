@@ -5,6 +5,8 @@ extends GdUnitTestSuite
 
 const STORE := "user://test_p0_account_reset_quick.json"
 const TIPS := "user://test_p0_account_reset_tips.json"
+const NOTIFY := "user://test_p0_account_reset_notify.json"
+const PLAYER := "p0-test-account-reset"
 
 var ui: P0Ui
 
@@ -28,15 +30,18 @@ func _ui() -> P0Ui:
 	ui = P0Ui.new()
 	ui.quick_store = STORE
 	ui.tips_path = TIPS
+	ui.notify = P0Notify.new(NOTIFY)
+	ui.player_of = func() -> String: return PLAYER
 	add_child(auto_free(ui))
 	await await_idle_frame()
 	return ui
 
 func before_test() -> void:
-	for f in [STORE, TIPS]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
+	for f in [STORE, TIPS, NOTIFY]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
 
 func after_test() -> void:
-	for f in [STORE, TIPS]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
+	for f in [STORE, TIPS, NOTIFY]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
+	P0KitchenLogic.forget_big_stoves(PLAYER)
 
 func test_a_new_account_under_the_same_id_clears_the_tips_and_the_quick_bar() -> void:
 	var old := int(Time.get_unix_time_from_system() * 1000) - 86_400_000
@@ -77,3 +82,22 @@ func test_a_fresh_install_records_the_account_and_a_view_without_profile_changes
 	assert_bool(FileAccess.file_exists(TIPS)).is_false()
 	ui.set_view(_view(1_791_550_000_000))
 	assert_dict(_read(TIPS)).is_equal({"account_since": 1_791_550_000_000})
+
+## v4q(2) ⑥ (SGODOT-397, the wipe): the notification prompt's answer and this player's Big Pot stoves go with the rest;
+## the prompt's choice waits for the next answer, another player's stoves stay.
+func test_a_new_account_also_forgets_the_notification_prompt_and_its_big_pot_stoves() -> void:
+	var old := int(Time.get_unix_time_from_system() * 1000) - 86_400_000
+	_write(TIPS, {"sow": true, "account_since": old})
+	_write(NOTIFY, {"asked": true, "choice": "off"})
+	P0KitchenLogic.save_big_stoves(PLAYER, [0, 2])
+	P0KitchenLogic.save_big_stoves(PLAYER + "-other", [1])
+	await _ui()
+	ui.set_view(_view(old))   # the same account: kept
+	assert_bool(ui.notify.asked()).is_true()
+	assert_array(P0KitchenLogic.load_big_stoves(PLAYER)).is_equal([0, 2])
+	ui.set_view(_view(old + 86_000_000))
+	assert_bool(ui.notify.asked()).is_false()
+	assert_dict(_read(NOTIFY)).is_equal({"choice": "off"})
+	assert_array(P0KitchenLogic.load_big_stoves(PLAYER)).is_empty()
+	assert_array(P0KitchenLogic.load_big_stoves(PLAYER + "-other")).is_equal([1])
+	P0KitchenLogic.forget_big_stoves(PLAYER + "-other")

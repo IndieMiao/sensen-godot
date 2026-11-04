@@ -28,6 +28,7 @@ var url := ""
 var player_id := ""
 var access_key := ""   # the demo server's key (P0Session.access_key, SGODOT-232 D1); "" for local playtests
 var version := 0       # P0Session.version, sent as x-p0-version: an old build's handshake gets 426 like its requests (q(74))
+var features := ""     # P0Session.features(), sent as x-p0-features: without save_v7 the handshake gets 426 (SGODOT-397)
 var outpost := ""
 var spawn_at := Vector2.ZERO
 var appearance: Dictionary = {}
@@ -145,6 +146,7 @@ func _connect() -> void:
 	var headers := PackedStringArray(["x-p0-player: " + player_id])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
+	if features != "": headers.append("x-p0-features: " + features)
 	socket.handshake_headers = headers
 	if socket.connect_to_url(url) != OK: _retry()
 
