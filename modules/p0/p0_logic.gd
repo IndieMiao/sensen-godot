@@ -1590,6 +1590,7 @@ static func today_dots(rows: Array) -> Array:
 ## this changes (不知火舞 on 232), not when "Radishes ready in 3h 48m" ticks to 3h 47m.
 static func today_chip_key(rows: Array) -> String:
 	for r in rows:
+		if bool(r.get("empty", false)): return ""   # nothing taken (TODAY_EMPTY): nothing to point at, no pulse
 		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
 	return ""
 
@@ -1604,41 +1605,35 @@ static func sys_requests_full(view: Dictionary) -> bool:
 static func today_lines(view: Dictionary) -> Array:
 	return today_rows(view).map(func(r): return r.line)
 
-## Today rows (§14.5, LOCK-06 TodayRow): {line, icon, go, state, tail}. Now-lines first, then countdowns, then
-## the nearest skill level; at most 3. `go` is a camera-only Show target ("" hides Show, LOCK-08).
-## The first-session guide's rows lead (P0Guide.lead_rows, §14.2 / q(58)): the tutorial request and the first dish replace
-## their generic rows; only the first row still to do has the focus.
-## The generic Sow row leaves a crop to a request's Sow row only when Today really shows that row (q(258) ①, 不知火舞
-## on 341 a658c638): one pushed off the three says nothing, so the generic row comes back for its crop.
+## Today (A 包反馈 1–3, the user 11-04; 不知火舞's spec, q(284)): tasks only — the guide's rows while it runs, then the
+## requests the player has taken: hand-ins here, `Limit reached`, hand-ins in another city, then the ones still short,
+## the newest taken first. No crops, stove, trap, skill, Homestead or vein rows (the field, the stove, the profile's farm
+## line and the push say those). No cap: the panel shows 5 and scrolls (UiTodayPanel), requests stop at 25 (track_max).
+## {line, icon, go, state, tail} rows (LOCK-06 TodayRow); `go` is a camera-only Show target ("" hides Show, LOCK-08).
+## One row with nothing to do (TODAY_EMPTY, no button) when there is no task.
 static func today_rows(view: Dictionary) -> Array:
-	var rows := _today_rows(view, null)
-	var asked := request_sow_crops(view)
-	if asked.is_empty(): return rows
-	var shown: Array = rows.filter(func(r): return r.has("sow_crop")).map(func(r): return str(r.sow_crop))
-	return rows if shown.size() == asked.size() else _today_rows(view, shown)
+	return _today_rows(view)
 
-## `leave`: the crops the generic Sow row leaves to a request's row (null: every crop a request says to sow).
-static func _today_rows(view: Dictionary, leave: Variant) -> Array:
-	var now_rows: Array = []
-	var timed: Array = []    # [ms, row]
-	var lead := P0Guide.lead_rows(view, leave)
-	var guided_stove := lead.any(func(r): return str(r.go) == "stove" and str(r.state) != "done")
-	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
-		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
-	if not farmed and not P0Guide.guide_on(view):   # the guide's own row says what to do first (SGODOT-341)
-		var first_sow := _first_sow_row(view)
-		first_sow.dot = "sow:first"   # the fallback row at the end (nothing else to say) lights nothing
-		now_rows.append(first_sow)
-	now_rows.append_array(lead)
-	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's and the residents'; untaken ones stay
-	# on their boards. One ready to hand in can be done now and leads; one still short follows what else can be done now,
-	# before the countdowns. The first session shows its tutorial request alone (the guide's row).
+const TODAY_EMPTY := "No requests · Look for ! on the map"
+## Red-dot keys of Pip's requests (spec ③ v3): seen once for good, not forgotten when the row leaves (P0Ui._today_unseen) —
+## the Homestead one lights when it first comes (the guide over), not again at each level; a vein's once a vein.
+const PIP_DOT := "pip:"
+const PIP_HOME_DOT := "pip:home"   # spec ①: untaken requests are found by the map's `!` (q(104))
+
+static func _today_rows(view: Dictionary) -> Array:
+	# the guide's rows while it runs; on an account it never ran, only its tutorial request (Pond Catch) — not Cook it, a
+	# new recipe, the 3rd slot or the generic Sow row (spec ①: requests only)
+	var lead := P0Guide.lead_rows(view)
+	if not P0Guide.guide_on(view): lead = lead.filter(func(r): return bool(r.get("tutorial", false)))
+	var rows: Array = lead.duplicate()
+	var later: Array = []   # after Upgrade: hand-ins away, `Limit reached`
 	var progress: Array = []
-	var latest = null   # q(143): the short request tracked last keeps a row (Tracking · it shows in Today)
-	var latest_at := -1.0
+	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's, the keepers' and the residents'; untaken
+	# ones stay on their boards. The first session shows its tutorial request alone (the guide's row).
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		var away: Array = []   # q(270) / 奕星's review ⑦: another city's hand-in can't be done here; it follows what can
+		var capped_rows: Array = []   # spec ①: `Limit reached` follows every hand-in that can be done, before the short ones
 		var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
 		var full := sys_requests_full(view)
 		for r in PinReason.taken(view):
@@ -1647,7 +1642,7 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 			if bool(r.ready) and full and r.has("away") and not r.get("local", false):   # a keeper's local one is not of the 6 (q(272))
 				var capped := "%s · Limit reached · %s" % [str(r.title), span(float(sys.get("resets_in", 0)))]
 				if str(r.get("city", "")) != "": capped += " · " + str(r.city)
-				deliveries.append(_row(capped, "board", ""))
+				capped_rows.append(_row(capped, "board", ""))
 			elif bool(r.ready):
 				var hand := _row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id))
 				# `Dusk Haul · Deliver at Shibuya Market Square · Tokyo`, `Pond Catch · Deliver to Wen · Shanghai`: broken before
@@ -1663,138 +1658,42 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 				var row := _request_row(view, r)
 				if r.get("local", false): row.local_request = str(r.id)
 				elif str(r.get("city", "")) != "": row.board_request = str(r.id)
+				row["_at"] = float(r.get("accepted_at", 0))
+				row["_i"] = progress.size()   # board order breaks a tie (0: an older server or save knows no time)
 				progress.append(row)
-				# the latest accepted_at; none known (0, an older server or save): the first in board order
-				if float(r.accepted_at) > latest_at:
-					latest_at = float(r.accepted_at)
-					latest = row
-		now_rows = deliveries + now_rows + away
-	# q(255) (order: 不知火舞 on 341 bbdef20e): after the guide and below Homestead Lv3, the first gap for the next level,
-	# one row. Upgrade follows the hand-ins; a material its Show can gather now follows the other things to do now,
-	# before the short requests; coins, or a material cooling down, goes with `still to go for the next level`.
+		rows = deliveries + rows
+		later = away + capped_rows
+	# Pip's requests (spec ③ v3, eval-B; taken by themselves, never on a board): the Homestead one — `Upgrade to
+	# Homestead Lv{n}` after the hand-ins here (the first session's own Pond Catch is one of them), its gap row ahead of the
+	# short ones — and the vein one after it
 	var home_row := homestead_row(view)
-	if not home_row.is_empty() and str(home_row.row.go) == "sign":
-		# after every row handing something in — a taken request's and the first session's own (Pond Catch, P0Guide
-		# lead rows on an account the new guide never ran; 刘邦 on #542)
-		var handed := 0
-		for i in now_rows.size():
-			if str(now_rows[i].get("dot", "")).begins_with("deliver:"): handed = i + 1
-		now_rows.insert(handed, home_row.row)
-	var ready := {}
-	var sown := 0
-	# One countdown per crop, its soonest plot's (q(227) ①, as the Quick Radish's since q(217) ④): batches sown minutes
-	# apart no longer take two of the three rows. The plot's crop is the kind, so a Quick Radish and a Radish are two
-	# (④). One plot left says it in the singular, `Radish ready in 3h 55m` (②); a crop with ripe plots shows only its
-	# Harvest row until they are picked (③).
-	var growing := {}   # crop → plots growing
-	var soonest := {}   # crop → its soonest plot's ms
-	for p in view.get("plots", []):
-		var st := str(p.get("state", ""))
-		var c := str(p.get("crop", ""))
-		if not fast_crop(view, c).is_empty() and st != "growing": continue   # q(245): countdowns only, no target rows
-		if st == "ready": ready[c] = int(ready.get(c, 0)) + 1
-		elif st == "sown": sown += 1
-		elif st == "growing":
-			growing[c] = int(growing.get(c, 0)) + 1
-			if not soonest.has(c) or float(p.get("ready_in", 0)) < float(soonest[c]): soonest[c] = float(p.get("ready_in", 0))
-	for c in soonest:
-		if ready.has(c): continue
-		var ms := float(soonest[c])
-		var name := item_name(view, c) if int(growing[c]) == 1 else plural(item_name(view, c))
-		timed.append([ms, _row("%s ready in %s" % [name, ripe_in(view, c, ms)], harvest_of(view, c), "plots")])
-	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
-	# follows it as an info row (`Farming Lv2 with this harvest`, no button — §14.5's exception: it goes with its source).
-	var level := P0Guide.harvest_level(view)
-	if ready.size() == 1:
-		var c: String = ready.keys()[0]
-		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], harvest_of(view, c), "plots", "harvest:" + c))
-	elif ready.size() > 1:
-		var n := 0
-		for c in ready: n += int(ready[c])
-		var crops: Array = ready.keys()
-		crops.sort()
-		now_rows.append(_row("Harvest %d crops" % n, harvest_of(view, str(ready.keys()[0])), "plots", "harvest:" + "+".join(crops)))
-	if not ready.is_empty() and bool(level.get("now", false)):
-		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
-	if sown > 0: now_rows.append(_row("Water %d sown plot%s" % [sown, "" if sown == 1 else "s"], "water", "plots"))
-	# Decorate (SGODOT-284, q(111)): pieces waiting in Farm Storage, a free thing to do; never the red dot (q(107)).
-	var decor := P0Decor.today_row(view)
-	if not decor.is_empty(): now_rows.append(_row(str(decor.line), str(decor.icon), ""))
-	# A known recipe waiting on one crop in the ground (A3 / q(95)) keeps the fish it needs: the stove-free line counts
-	# only the rest, and none when the soup takes them all.
-	var wait := P0KitchenLogic.waiting_on_crops(view)
-	var stove = view.get("cooking", {}).get("stove", null)
-	if stove is Dictionary:
-		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
-		var dish_icon := str(stove.dish) if stove.get("dish", null) != null else "pot"
-		if float(stove.get("ready_in", 0)) <= 0.0: now_rows.append(_row("%s ready at the stove" % dish, dish_icon, "stove", "stove:" + dish_icon))
-		else: timed.append([float(stove.ready_in), _row("%s · %s left at the stove" % [dish, duration(float(stove.ready_in))], dish_icon, "stove")])
-	else:
-		var fish := 0
-		for st in view.get("bag", {}).get("slots", []):
-			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-		fish -= int(wait.get("fish", 0))
-		if fish > 0 and not guided_stove: now_rows.append(_row("Cook with %d fish" % fish, "pot", "stove"))
-	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
-	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
-	# v4q(9) ① (user b): the vein row follows the other things to do now, before the Homestead material row
+	var pip: Array = []
+	if not home_row.is_empty():
+		var hr: Dictionary = home_row.row
+		hr.home_request = true   # a tap off its Show opens HOME-1, this request's card
+		if str(hr.dot).begins_with("homestead:"): rows.append(hr)
+		else:
+			hr.dot = PIP_HOME_DOT   # lights once, the first time it is there (the guide just over), never each level
+			pip.append(hr)
+	# the vein one ahead of the Homestead gap row (v4q(9) b, the user 11-02; q(284) review ④); Pip's First Dig goes here
+	# too once it is a Today row (#636)
 	var vein := vein_row(view, home_row)
-	if not vein.is_empty(): now_rows.append(vein)
-	if not home_row.is_empty() and bool(home_row.now) and str(home_row.row.go) != "sign": now_rows.append(home_row.row)
-	now_rows.append_array(progress)
-	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
-	var rows: Array = now_rows.duplicate()
-	for t in timed:
-		if rows.size() < 3 and not rows.any(func(r): return r.line == t[1].line): rows.append(t[1])
-	# Not harvested yet, the growing crops bring the level: the info row follows the soonest crop's row (q(69), the old
-	# tail on that row read as that crop's own level, §14.2 end).
-	if not level.is_empty() and not bool(level.now) and not P0Guide.first_phase(view):
-		var at := -1
-		for i in rows.size():
-			if str(rows[i].go) == "plots" and at < 0: at = i
-		if at >= 0: rows.insert(at + 1, _row("Farming Lv%d at your first harvest" % int(level.level), "hoe", ""))
-	# The waiting recipe's line (§14.2 end, §14.5; 李白 A3 / q(95)): `Fresh Fish Soup · when radishes are ready`, the first
-	# session's closing hook. Like the level's info row it goes with its source (q(69)): right after its crop's countdown
-	# and that crop's level row, so it is the third line at the end of the first session.
-	if not wait.is_empty():
-		var crop_name := item_name(view, str(wait.crop))
-		var line := "%s · when %s %s ready" % [str(wait.name), plural(crop_name).to_lower(), "is" if uncountable(crop_name) else "are"]
-		if not rows.any(func(r): return r.line == line):
-			var at := -1
-			for i in rows.size():
-				if str(rows[i].icon) == str(wait.crop) and str(rows[i].go) == "plots": at = i
-			if at >= 0 and at + 1 < rows.size() and str(rows[at + 1].icon) == "hoe" and str(rows[at + 1].go) == "": at += 1
-			var row := _row(line, str(wait.page), "plots")
-			if at >= 0: rows.insert(at + 1, row)
-			elif rows.size() < 3: rows.append(row)
-	var best := ""
-	var best_gap := 1 << 30
-	for key in ["farming", "fishing", "cooking"]:
-		if not home_row.is_empty() and str(home_row.get("skill", "")) == key: continue
-		var sk: Dictionary = view.get("skills", {}).get(key, {})
-		if sk.get("next", null) == null: continue
-		if key == "farming" and not level.is_empty(): continue   # already said by the harvest's info row
-		var gap := int(sk.next) - int(sk.get("xp", 0))
-		if gap < best_gap:
-			best_gap = gap
-			best = "%s Lv%d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
-	# q(255) ⑥: a coins gap, or a material whose sources are all cooling down, is `still to go for the next level`
-	if not home_row.is_empty() and not bool(home_row.now) and rows.size() < 3: rows.append(home_row.row)
-	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
-	if rows.is_empty(): rows.append(_first_sow_row(view))
-	# q(143) ①②: on the final three, the latest tracked short request takes the 3rd row when it is not there — over an
-	# info or waiting-recipe row too — unless that row hands something in (three deliveries: one handed in frees a row)
-	# or is Upgrade to Homestead (不知火舞 on 341, A′: a moment, as a hand-in is pay; a material row still gives way).
-	var keeps := func(r: Dictionary) -> bool:
-		var dot := str(r.get("dot", ""))
-		return dot.begins_with("deliver:") or dot.begins_with("homestead:") or dot.begins_with("vein:")   # v4q(9) ①: nor the vein row
-	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
-			and not keeps.call(rows[2]):
-		rows[2] = latest
+	if not vein.is_empty(): pip.push_front(vein)
+	rows.append_array(later + pip)
+	# the newest taken first (spec ①, over q(143)'s latest-on-the-third-row)
+	progress.sort_custom(func(a, b): return float(a._at) > float(b._at) or float(a._at) == float(b._at) and int(a._i) < int(b._i))
+	for row in progress:
+		row.erase("_at")
+		row.erase("_i")
+	rows.append_array(progress)
 	# q(215): even a ready ordinary delivery cannot displace the current guide goal. Other rows keep their order.
 	if P0Guide.guide_on(view) and not lead.is_empty():
 		rows = lead + rows.filter(func(r): return str(r.get("dot", "")) != str(lead[0].dot) and str(r.line) != str(lead[0].line))
-	return P0Guide.focus_first(rows.slice(0, 3))
+	if rows.is_empty():
+		var none := _row(TODAY_EMPTY, "board", "")
+		none.empty = true   # grey, no button (UiTodayPanel)
+		return [none]
+	return P0Guide.focus_first(rows)
 
 ## v4q(9) ① (SGODOT-355; 不知火舞 / the user a+b, 11-02): `Ironvale Vein · Reach Floor 10`, Show to the nearest free iron
 ## vein (view.wild.near3_sites, the very one Pip's line and the server's nearestFreeVein name) — when the guide is over,
@@ -1828,7 +1727,11 @@ static func vein_row(view: Dictionary, home_row := {}) -> Dictionary:
 		if not home_row.is_empty() and str(home_row.get("row", {}).get("go", "")) == go: return {}   # the Homestead row says it
 		# down that mine (VG4 384:187745): the row stays, with no button (周瑜 on #711: not left to show_label)
 		var down := str(view.get("mine", {}).get("at", {}).get("mine", "")) == str(site.id) if view.get("mine", null) is Dictionary and view.mine.get("at") is Dictionary else false
-		return _row("%s · Reach Floor %d" % [str(site.get("name", "")), VEIN_FLOOR], "vein", "" if down else go, "vein:" + str(site.id))
+		# Pip's vein request (spec ③ v3, eval-B): `Ironvale Vein · Floor 4/10`, as `Pip's First Dig · Floor 1/3`
+		var deepest := mini(VEIN_FLOOR, int(records.get(str(site.id), {}).get("deepest", 0)) if records.get(str(site.id)) is Dictionary else 0)
+		var row := _row("%s · Floor %d/%d" % [str(site.get("name", "")), deepest, VEIN_FLOOR], "vein", "" if down else go, PIP_DOT + "vein:" + str(site.id))
+		row.vein_request = str(site.id)
+		return row
 	return {}
 
 ## Whether a vein of this main has been gone down to Floor 10 (不知火舞: any iron vein's F10 ends the iron row, a new

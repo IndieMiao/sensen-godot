@@ -1855,7 +1855,7 @@
     "done_refill_h": 0,
     "drop_refill_h": 8,
     "expire_h": 72,
-    "track_max": 3,
+    "track_max": 25,
     "qty": [
       [
         1,

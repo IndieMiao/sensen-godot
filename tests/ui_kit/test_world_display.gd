@@ -229,7 +229,7 @@ func test_hud_sits_at_the_main_position_and_exposes_chip_rects() -> void:
 
 # ---------------------------------------------------------------- Today panel
 
-func test_today_panel_has_at_most_three_rows_and_show_only_where_given() -> void:
+func test_today_panel_shows_every_row_and_show_only_where_given() -> void:
 	var rows := [
 		{line = "Radishes ready in 1h 12m", action = "Show"},
 		{line = "Sow your first plot", tail = "needs 2 Energy · +1 in 2:41", action = "Show", state = "short"},
@@ -238,8 +238,9 @@ func test_today_panel_has_at_most_three_rows_and_show_only_where_given() -> void
 	]
 	var p: UiTodayPanel = _host(UiTodayPanel.new(rows))
 	await _settle()
-	assert_int(p.row_count()).is_equal(UiTodayPanel.MAX_ROWS)
-	assert_array(_labels(p)).not_contains(["Fourth line"])
+	assert_int(p.row_count()).is_equal(4)                 # no cap of three (A 包反馈 2): up to 5 without scrolling
+	assert_bool(p.scrolls()).is_false()
+	assert_array(_labels(p)).contains(["Fourth line"])
 	assert_array(_labels(p)).contains(["needs 2 Energy · +1 in 2:41"])
 	var pills := p.find_children("*", "UiShowPill", true, false)
 	assert_int(pills.size()).is_equal(2)                  # a done row shows its tick, not Show
@@ -250,6 +251,64 @@ func test_today_panel_has_at_most_three_rows_and_show_only_where_given() -> void
 	(pills[1] as UiShowPill).pressed.emit()
 	assert_array(picked).is_equal([1])
 	assert_float(p.size.x).is_equal(float(UiTokens.SIZE_TODAY_PANEL_W))
+
+## A 包反馈 2 (不知火舞's spec ②): past 5 rows the panel is as tall as its first 5 and the rest scroll inside it — the
+## bottom fades while rows are below, the top once scrolled, a 3 px bar at the right; a drag scrolls and never fires a Show.
+func test_today_panel_past_five_rows_scrolls_with_fades_and_a_bar() -> void:
+	var rows := []
+	for i in 8: rows.append({line = "Request %d · 1/2" % (i + 1), action = "Show"})
+	var p: UiTodayPanel = _host(UiTodayPanel.new(rows))
+	await _settle()
+	assert_int(p.row_count()).is_equal(8)
+	assert_bool(p.scrolls()).is_true()
+	var scroll := p.find_child("Scroll", true, false) as ScrollContainer
+	var list_rows := p.find_children("*", "HBoxContainer", true, false).filter(func(c): return c.get_parent().get_parent() == scroll)
+	var fifth: Control = list_rows[4]
+	assert_float(scroll.size.y).is_equal_approx(fifth.position.y + fifth.size.y, 1.0)   # the first five, no more
+	var fade_top := p.find_child("FadeTop", true, false) as Control
+	var fade_bottom := p.find_child("FadeBottom", true, false) as Control
+	var bar := p.find_child("Bar", true, false) as Control
+	assert_bool(fade_bottom.visible).is_true()
+	assert_bool(fade_top.visible).is_false()
+	assert_bool(bar.visible).is_true()
+	assert_float(bar.size.x).is_equal(3.0)
+	scroll.scroll_vertical = 10000
+	await _settle()
+	assert_bool(fade_top.visible).is_true()
+	assert_bool(fade_bottom.visible).is_false()
+	# a drag begun on a Show pill scrolls; its release fires no Show
+	scroll.scroll_vertical = 0
+	await _settle()
+	var picked := []
+	p.show_pressed.connect(func(i): picked.append(i))
+	var pill := p.find_children("*", "UiShowPill", true, false)[0] as UiShowPill
+	var at := pill.get_global_rect().get_center()
+	var down := InputEventMouseButton.new()
+	down.button_index = MOUSE_BUTTON_LEFT
+	down.pressed = true
+	down.position = at
+	p._input(down)
+	var move := InputEventMouseMotion.new()
+	move.position = at + Vector2(0, -40)
+	move.relative = Vector2(0, -40)
+	move.button_mask = MOUSE_BUTTON_MASK_LEFT
+	p._input(move)
+	assert_int(scroll.scroll_vertical).is_greater(0)
+	var up := InputEventMouseButton.new()
+	up.button_index = MOUSE_BUTTON_LEFT
+	up.pressed = false
+	up.position = move.position
+	p._input(up)
+	pill.pressed.emit()                                    # the pill's own release, before the drag is let go
+	assert_array(picked).is_empty()
+
+## Nothing taken (spec ①): one grey line, no button (P0Logic.TODAY_EMPTY).
+func test_an_empty_today_is_one_grey_line_without_a_button() -> void:
+	var p: UiTodayPanel = _host(UiTodayPanel.new([{line = "No requests · Look for ! on the map", action = "Show", empty = true, tap = true}]))
+	await _settle()
+	assert_int(p.find_children("*", "UiShowPill", true, false).size()).is_equal(0)
+	var line := p.find_child("Line", true, false) as Label
+	assert_that(line.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
 
 ## A row too long for its line breaks at a " · " (不知火舞 on #201, UiKit.break_at_dot): `Catch 2 Pond Crucian` / `Fern Pond`
 ## beside Show on map, not `Catch 2 Pond Crucian ·` / `Fern Pond`; one that fits is left alone.

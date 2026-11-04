@@ -406,7 +406,8 @@ func test_a_prompt_tap_cannot_start_a_double_tap() -> void:
 	assert_int(recentred[0]).is_equal(0)
 
 ## §3.7.4 / SGODOT-232 U6: Free to do now closes the Energy card and Today lists what costs no Energy now.
-func test_free_to_do_now_opens_today_with_the_free_list() -> void:
+## LOCK-09: `Free to do now` closes the Energy card — it no longer opens Today on the free things (A 包 spec ①).
+func test_free_to_do_now_only_closes_the_card() -> void:
 	var v := _view()
 	v.plots = [{"id": 0, "state": "ready", "crop": "crop_radish"}]
 	v.cooking = {"stove": null, "cookbook": []}
@@ -414,10 +415,7 @@ func test_free_to_do_now_opens_today_with_the_free_list() -> void:
 	ui.open_energy_card(2, "Sow ×1")
 	var card: UiEnergyCard = ui._modal.find_children("*", "UiEnergyCard", true, false)[0]
 	card.free_pressed.emit()
-	assert_str(ui.modal_kind).is_equal("today")
-	var labels := ui._modal.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
-	assert_that(labels).contains(["Harvest 1 ready", "Browse the map"])
-	ui.close_modal()
+	assert_bool(ui.has_modal()).is_false()
 
 ## SGODOT-232 D2: the demo APK is a debug export that carries the demo server config; it gets no +1h / +4h buttons
 ## (李元芳 int6: they covered the Toast's end, and the demo server has no dev routes anyway).
@@ -428,20 +426,23 @@ func test_the_clock_buttons_are_for_test_builds_only() -> void:
 
 ## 不知火舞 on 232: the Today chip pulses once when its focus row changes; not on the first view or a countdown tick.
 func test_the_today_chip_pulses_once_when_its_focus_row_changes() -> void:
-	ui.set_view(_view())                                                # "Sow your first plot"
+	ui.set_view(_view())                                                # nothing taken: the empty line, no focus
 	assert_int(ui.hud.today_pulses).is_equal(0)
-	var sown := _view()
-	sown.plots = [{"id": 0, "state": "growing", "crop": "crop_radish", "ready_in": 14000000, "xp_pct": 100}]
-	ui.set_view(sown)                                                   # the radish timer leads now
+	var taken := _view()
+	taken["boards"] = {"stall": {"slots": [{"id": "crate", "title": "Crate", "kind": "crop", "items": ["crop_radish"], "have": 0,
+		"qty": 2, "status": "accepted"}]}}
+	ui.set_view(taken)                                                  # a request taken leads now
 	assert_int(ui.hud.today_pulses).is_equal(1)
-	var later := sown.duplicate(true)
-	later.plots[0].ready_in = 13000000
-	ui.set_view(later)                                                  # the countdown ticks: no pulse
+	var later := taken.duplicate(true)
+	later.boards.stall.slots[0].have = 1
+	ui.set_view(later)                                                  # its count goes up: no pulse
 	assert_int(ui.hud.today_pulses).is_equal(1)
 	var pulses := ui.hud.find_children("*", "UiGuidePulse", true, false)
 	assert_int(pulses.size()).is_equal(1)                                # GuidePulse Shape=Pill on the chip
 	await await_millis(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS + 120)
 	assert_int(ui.hud.find_children("*", "UiGuidePulse", true, false).size()).is_equal(0)   # once, then gone
+	ui.set_view(_view())                                                # handed in, nothing left: no pulse for that
+	assert_int(ui.hud.today_pulses).is_equal(1)
 
 ## PR-2b: no HUD over the home pick (its pages lie on the real map: HOME-WELCOME), back once it closes; a new view
 ## while it is open does not bring it back.
