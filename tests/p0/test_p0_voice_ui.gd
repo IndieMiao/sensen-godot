@@ -214,3 +214,17 @@ func test_a_long_title_breaks_at_its_dot_and_the_rows_scroll_as_todays() -> void
 	assert_str(short.title.text).is_equal("Fern Pond · Layer 1")
 	assert_float(short.height).is_equal(154.0 + 2 * 45.0)
 	assert_bool(short._bar.visible).is_false()
+
+## 李元芳 on 415 (232 f8ecefed): the first in a layer sees the people pill count the next one coming in, and going.
+func test_the_people_pill_counts_someone_coming_in_after() -> void:
+	var ui := await _ui()
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	var online: P0Online = f[2]
+	ui.set_voice_room(room)
+	await room.fetch_status()
+	var before := int(ui._voice_keys.people.text)
+	online._message(JSON.stringify({"t": "peer", "member": {"id": 9, "player": "cccc3333cccc3333"}}))
+	assert_int(int(ui._voice_keys.people.text)).is_equal(before + 1)
+	online._message(JSON.stringify({"t": "left", "id": 9}))
+	assert_int(int(ui._voice_keys.people.text)).is_equal(before)

@@ -36,7 +36,11 @@ func setup(p_session: P0Session, p_online: P0Online, _role: String) -> void:
 	_mutes = _load_mutes()
 	_room = online.room if online.epoch > 0 else -1   # joined already (the HUD comes after the room's first join)
 	online.joined.connect(_on_room)
-	online.roster_changed.connect(_apply_mutes)
+	# someone in or out: their mute put back, and the HUD's count and an open drawer read the room again (李元芳 on 415, 232
+	# f8ecefed: the first in kept 0 while the drawer showed the second)
+	online.roster_changed.connect(func():
+		_apply_mutes()
+		changed.emit())
 	online.voice_blocks.connect(func(ids: Array): if voice: voice.call("set_blocked", ids))
 	if voice and voice.has_signal("changed"): voice.connect("changed", func(): changed.emit())
 

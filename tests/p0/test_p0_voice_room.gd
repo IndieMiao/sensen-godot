@@ -142,3 +142,16 @@ func test_a_new_layer_with_voice_on_asks_again() -> void:
 	f[1].is_active = true
 	f[2]._message(JSON.stringify({"t": "joined", "outpost": "sh_tea_1", "room": 2, "capacity": 12, "rejoined": false, "self": 1, "epoch": 3}))
 	assert_bool(f[1].calls.has(["invalidate"])).is_true()
+
+## 李元芳 on 415 (232 f8ecefed): the first in a layer sees the count go up when the next comes in, and down when they go —
+## the room's `changed` on every roster change, not only on the voice's own.
+func test_the_room_says_changed_when_someone_comes_in_or_goes() -> void:
+	var f := _room()
+	var room: P0VoiceRoom = f[0]
+	var online: P0Online = f[2]
+	var said := []
+	room.changed.connect(func(): said.append(room.people().size()))
+	online._message(JSON.stringify({"t": "peer", "member": {"id": 4, "player": "bbbb2222bbbb2222"}}))
+	assert_array(said).is_equal([1])
+	online._message(JSON.stringify({"t": "left", "id": 4}))
+	assert_array(said).is_equal([1, 0])
