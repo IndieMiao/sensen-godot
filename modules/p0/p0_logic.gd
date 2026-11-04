@@ -1611,6 +1611,17 @@ static func today_lines(view: Dictionary) -> Array:
 ## line and the push say those). No cap: the panel shows 5 and scrolls (UiTodayPanel), requests stop at 25 (track_max).
 ## {line, icon, go, state, tail} rows (LOCK-06 TodayRow); `go` is a camera-only Show target ("" hides Show, LOCK-08).
 ## One row with nothing to do (TODAY_EMPTY, no button) when there is no task.
+## `Requests 25/25` while the requests tracked are at track_max, else "" (spec ③): the greyed key's reason on every way to
+## take one — a board's Track, a resident's Request and Accept, a keeper's Accept. Pip's own requests are not counted.
+static func track_full_reason(view: Dictionary) -> String:
+	var cap := int(content().get("requests", {}).get("track_max", 0))
+	var n := PinReason.taken(view).size()   # the boards', the keepers' and the residents' taken, as the server's tracked()
+	return "Requests %d/%d" % [n, cap] if cap > 0 and n >= cap else ""
+
+## The toast for a greyed key's tap: the track-full one says what to do (spec ③), any other its reason.
+static func blocked_toast(reason: String) -> String:
+	return TRACK_FULL_TOAST if reason.begins_with("Requests ") and reason.contains("/") else reason
+
 static func today_rows(view: Dictionary) -> Array:
 	return _today_rows(view)
 
@@ -1618,6 +1629,9 @@ const TODAY_EMPTY := "No requests · Look for ! on the map"
 ## Red-dot keys of Pip's requests (spec ③ v3): seen once for good, not forgotten when the row leaves (P0Ui._today_unseen) —
 ## the Homestead one lights when it first comes (the guide over), not again at each level; a vein's once a vein.
 const PIP_DOT := "pip:"
+## A 包反馈 3 (spec ③): requests tracked at once stop at content requests.track_max (25); the key to take another greys with
+## `Requests 25/25` as its reason (LOCK-10, the key's own name kept: Track / Request / Accept), a tap says this.
+const TRACK_FULL_TOAST := "Finish or drop a request first"
 const PIP_HOME_DOT := "pip:home"   # spec ①: untaken requests are found by the map's `!` (q(104))
 
 static func _today_rows(view: Dictionary) -> Array:
@@ -1990,7 +2004,8 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 	if state == "wait" and (next_in == null or float(next_in) <= 0.0): state = "open"   # no wait left to say (no cooldown since 0.2.18)
 	match state:
 		"open":
-			cmd = {"type": "accept", "request": str(req.id)}
+			reason = track_full_reason(view)   # spec ③: tracking 25 already
+			if reason == "": cmd = {"type": "accept", "request": str(req.id)}
 		"accepted":
 			label = "Deliver"
 			if req.get("ready", false): cmd = {"type": "deliver", "request": str(req.id)}

@@ -27,7 +27,7 @@ static func open(ui: P0Ui, id: String, back: Callable, ring: Array = []) -> void
 	data["links"] = links
 	data["break_dots"] = true   # Deliver to breaks after a ` · ` (· Shanghai away)
 	var cmd := {}
-	if not tracked: cmd = {"type": "accept", "request": id}
+	if not tracked and str(data.get("reason", "")) == "": cmd = {"type": "accept", "request": id}
 	elif bool(r.get("ready", false)): cmd = {"type": "deliver", "request": id}   # away too: the server's wrong_place toasts where (⑦)
 	data["sends"] = not cmd.is_empty()
 	var card := UiRequestCard.new(data)
@@ -41,6 +41,7 @@ static func open(ui: P0Ui, id: String, back: Callable, ring: Array = []) -> void
 	card.action_pressed.connect(func():
 		ui.close_modal()
 		if not cmd.is_empty(): ui.command.emit(cmd))
+	card.unavailable_pressed.connect(func(reason: String): ui.toast_error(P0Logic.blocked_toast(reason)))
 	card.dismissed.connect(func(): back.call())
 	card.link_pressed.connect(func(i: int):
 		if str(links[i]) == "Drop request":
@@ -67,6 +68,7 @@ static func card_data(view: Dictionary, r: Dictionary) -> Dictionary:
 	var tracked := str(r.get("status", "")) == "accepted"
 	# LOCK-10: a tracked one still short shows its gap on the button, here or away (不知火舞 on 378: no new line away)
 	var reason := P0Locals.gap_text(view, r) if tracked and not bool(r.get("ready", false)) else ""
+	if not tracked: reason = P0Logic.track_full_reason(view)   # spec ③: tracking 25 already, `Accept · Requests 25/25`
 	var data := {"portrait": P0Locals.portrait(r),
 		"title": str(r.get("title", "")), "who": P0Locals.who(r), "line": P0Locals.line(r), "needs": needs,
 		"deliver_to": P0Locals.deliver_to(r), "action": "Deliver" if tracked else "Accept", "reason": reason, "item": item}

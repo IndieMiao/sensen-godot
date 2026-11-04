@@ -2708,7 +2708,9 @@ func _board(d: P0CounterDrawer, facts: Array, cards: Array) -> void:
 		var cmd: Dictionary = c.cmd
 		var id := str(c.id)
 		card.command_pressed.connect(func(): if not cmd.is_empty(): command.emit(cmd))
-		card.unavailable_pressed.connect(func(r: String): toast(r))
+		card.unavailable_pressed.connect(func(r: String):   # spec ③: tracking 25, an Error toast saying what to do
+			if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r))
+			else: toast(r))
 		card.need_pressed.connect(func(item: String, tile: UiNeedTile): _show_need_source(tile, item))
 		card.info_pressed.connect(func(): open_board_request(d.role, id))
 		d.board.add_child(card)
@@ -3225,6 +3227,7 @@ func _show_resident(d: Dictionary) -> void:
 	var id := str(d.id)
 	bar.gift_pressed.connect(func(): open_gift(id))
 	bar.request_pressed.connect(func(): open_resident_request(id))
+	bar.request_unavailable.connect(func(r: String): if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r)))   # spec ③
 	bar.identity_pressed.connect(func(): open_resident_profile(id))
 	bar.meal_pressed.connect(func(): _open_todays_meal(id))
 	bar.lesson_pressed.connect(func(): command.emit({"type": "learn", "resident": id}))   # §7.5.3: the server picks the page
@@ -3405,6 +3408,7 @@ func open_resident_request(id: String) -> void:
 	card.action_pressed.connect(func():
 		close_modal()
 		if not cmd.is_empty(): command.emit(cmd))
+	card.unavailable_pressed.connect(func(r: String): toast_error(P0Logic.blocked_toast(r)))
 	card.dismissed.connect(func(): open_resident(id))
 	_open_modal(card, 0.0, true)
 	modal_kind = "resident_request"
