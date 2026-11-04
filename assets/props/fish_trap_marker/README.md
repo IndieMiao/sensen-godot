@@ -1,15 +1,17 @@
-# Fish Trap Marker · SGODOT-402 · v1
+# Fish Trap Marker · SGODOT-402 · v1.1
 
 Approved concept A: a coral/cream buoy on a short sage stem, tied with rope to a visible woven cage crown.
 Instantiate `fish_trap_marker.glb` at **scale 1**. Metres, Y up, +Z front; the origin is the water-surface centre.
+User approval C64 (2026-11-04 13:55) requested a larger cage. The **1.35× enlargement is baked into every vertex**,
+including the Blender source. Style, vertex colours, triangle count and the waterline pivot are retained.
 
 | Measurement | Value |
 |---|---:|
-| Full bounds X × Y × Z | 0.45 × 0.43 × 0.45 m |
-| Above the water origin | 0.38 m |
-| Submerged skirt | 0.05 m |
-| Cage crown above the origin | 0.10 m |
-| Buoy body width / height | 0.30 / 0.22 m |
+| Full bounds X × Y × Z | 0.6075 × 0.5805 × 0.6075 m |
+| Above the water origin | 0.513 m |
+| Submerged skirt | 0.0675 m |
+| Cage crown above the origin | 0.135 m |
+| Buoy body width / height | 0.405 / 0.297 m |
 | Triangles / surfaces | 500 / 1 |
 
 The sole opaque matte material uses linear vertex colours, roughness 0.9 and metallic 0. Coral is authored from
@@ -23,10 +25,12 @@ Integration contract:
 
 - Replace only the old trap factory. Remove its `root.scale = Vector3.ONE * FLOAT_SCALE`; the marker already has final dimensions.
 - The fishing presentation still uses its existing 1.6 bobber scale. Its actual Godot vertex width is approximately 0.21838 m;
-  the marker's 0.30 m buoy is 37.4% wider. The nominal sphere-parameter width 0.224 m is not the tessellated result.
-- Keep the existing origin position at water Y=0.055 and its ±0.012 m program motion. The cage crown stays 0.088 m above water at the low point.
-- Icons and text remain program UI. At a 360×800 logical viewport, the current 0.6 m prompt anchor covers the upper buoy.
-  The review includes a **0.9 m anchor proposal** that clears it; this is for the integrator to review, with no runtime code change in this PR.
+  the marker's 0.405 m buoy is approximately 85.5% wider. The nominal sphere-parameter width 0.224 m is not the tessellated result.
+- Keep the existing origin position at water Y=0.055 and its ±0.012 m program motion. The cage crown stays 0.123 m above water at the low point.
+- **Approved name-bar anchor: 1.15 m above the marker origin.** At integration, change
+  `p0_pond.gd:606` from `Vector3(0, 0.6, 0)` to `Vector3(0, 1.15, 0)` in `_trap_frame`.
+  This supersedes the earlier 1.0 m decision. The review applies this exact change only in a private b1 copy;
+  runtime scene code is not part of this art PR. Icons and text remain program UI.
 
 Editable source and reproduction: `tools/art/source/fish_trap_marker_402/README.md`.
 Review and measured results: `docs/design/fish-trap-marker-402-2026-11-04/README.md`.

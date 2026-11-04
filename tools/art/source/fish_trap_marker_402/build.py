@@ -1,4 +1,4 @@
-"""SGODOT-402 approved A: a coral/cream buoy tied to a visible woven cage crown."""
+"""SGODOT-402 approved A / C64: v1.1 bakes a uniform 1.35 enlargement into geometry."""
 from pathlib import Path
 import hashlib
 import json
@@ -12,6 +12,7 @@ KIT=ROOT/'assets/props/fish_trap_marker';KIT.mkdir(parents=True,exist_ok=True)
 COLORS={'coral':'E07A5F','cream':'FFF2D1','pole':'6E7B74','rope':'EBDCB7',
         'wicker_recess':'805736','wicker_strip':'B98A5E','wicker_band':'C99A6B','wicker_rim':'9A6F47'}
 PARTS=[];MATERIALS={}
+MODEL_SCALE=1.35
 PROFILE=[(-.05,.215),(0,.2235),(.04,.205),(.075,.145),(.095,.05),(.10,0)]
 def linear(value):
     return tuple(c/12.92 if c<=.04045 else ((c+.055)/1.055)**2.4 for c in [x/255 for x in bytes.fromhex(value)])
@@ -105,7 +106,6 @@ source_stats={}
 for obj in PARTS:
     obj.data.calc_loop_triangles();source_stats[obj.name]=len(obj.data.loop_triangles)
 source_scene=bpy.context.scene
-bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'fish_trap_marker.blend'))
 
 export_scene=bpy.data.scenes.new('Temporary mobile export');copies=[]
 flat=bpy.data.materials.new('FishTrapMarkerMatteVertex');flat.use_nodes=True
@@ -129,7 +129,11 @@ for obj in copies:obj.select_set(True)
 bpy.context.view_layer.objects.active=copies[0];bpy.ops.object.join()
 body=bpy.context.object;body.name='Body';body.data.name='fish_trap_marker_mobile'
 bm=bmesh.new();bm.from_mesh(body.data);bmesh.ops.triangulate(bm,faces=list(bm.faces))
-bm.to_mesh(body.data);bm.free();body.data.calc_loop_triangles()
+bm.to_mesh(body.data);bm.free()
+# Triangulate at the approved original size first, then bake the enlargement.
+# This retains the exact v1 triangle indices, including near-tie quad diagonals.
+for vertex in body.data.vertices:vertex.co*=MODEL_SCALE
+body.data.calc_loop_triangles()
 triangles=len(body.data.loop_triangles);assert triangles<=500,triangles
 path=KIT/'fish_trap_marker.glb'
 bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,use_active_scene=True,
@@ -137,22 +141,29 @@ bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=T
     export_normals=True,export_texcoords=False,export_animations=False,export_cameras=False,export_lights=False)
 points=[Vector((v.co.x,v.co.z,-v.co.y)) for v in body.data.vertices]
 lo=[min(v[i] for v in points) for i in range(3)];hi=[max(v[i] for v in points) for i in range(3)]
-manifest={'task':'SGODOT-402','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
+manifest={'task':'SGODOT-402','revision':'v1.1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
+    'approval':'C64 / 2026-11-04 13:55; Plane 402 67b2649f',
+    'baked_scale_from_v1':MODEL_SCALE,
     'file':'fish_trap_marker.glb','mesh':'fish_trap_marker_mobile','units':'metres; Y up; +Z front',
     'origin':'water-surface centre, Y=0','scale':[1,1,1],'waterline_y':0,'bounds':[lo,hi],
     'dimensions_xyz':[hi[i]-lo[i] for i in range(3)],'triangles':triangles,'triangle_limit':500,'surfaces':1,
     'material':'opaque matte linear vertex colour; roughness .9, metallic 0; no textures',
     'cast_shadow':False,'skeleton':False,'animations':[],
-    'buoy':{'diameter_m':.30,'body_height_m':.22,'center':[0,.255,0],'coral_srgb':'E07A5F',
-        'existing_cast_bobber_width_m':.218383863842247,'width_ratio':.30/.218383863842247,
+    'buoy':{'diameter_m':.30*MODEL_SCALE,'body_height_m':.22*MODEL_SCALE,'center':[0,.255*MODEL_SCALE,0],'coral_srgb':'E07A5F',
+        'existing_cast_bobber_width_m':.218383863842247,'width_ratio':.30*MODEL_SCALE/.218383863842247,
         'comparison_measurement':'Native Godot SphereMesh vertices at b1 FLOAT_SCALE=1.6; parameter-only diameter .224m is not the final tessellated width'},
-    'basket':{'width_m':.45,'crown_y_m':.10,'underwater_depth_m':.05,'visible_crown_at_low_bob_m':.088,
+    'basket':{'width_m':.45*MODEL_SCALE,'crown_y_m':.10*MODEL_SCALE,'underwater_depth_m':.05*MODEL_SCALE,'visible_crown_at_low_bob_m':.10*MODEL_SCALE-.012,
         'weave':'Raised meridian strips and two cross bands over dark recess dome; no separate water mesh'},
     'runtime':{'remove_legacy_trap_float_scale':1.6,'motion':'Consumer bobs origin +/- .012m; no baked animation',
-        'water_y_m':.055,'existing_prompt_height_above_origin_m':.6},
+        'water_y_m':.055,'existing_prompt_height_above_origin_m':.6,
+        'prompt_height_above_origin_m':1.15,
+        'integration_note':'Instantiate at scale 1. In p0_pond.gd:606 change the trap prompt offset from Vector3(0, 0.6, 0) to Vector3(0, 1.15, 0). Replaces the earlier 1.0m decision; runtime edit is not part of this art PR.'},
     'palette_srgb':COLORS,'source_parts_triangles':source_stats,
     'source':'tools/art/source/fish_trap_marker_402/fish_trap_marker.blend',
     'generator':'tools/art/source/fish_trap_marker_402/build.py','sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 (KIT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 bpy.context.window.scene=source_scene;bpy.data.scenes.remove(export_scene)
+for obj in PARTS:
+    for vertex in obj.data.vertices:vertex.co*=MODEL_SCALE
+bpy.ops.wm.save_as_mainfile(filepath=str(SRC/'fish_trap_marker.blend'))
 print('FISH_TRAP_MARKER_READY',triangles,lo,hi,flush=True)

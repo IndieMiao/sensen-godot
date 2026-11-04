@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 import bpy
 
-SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/trap-402'
+SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/trap-402-v11'
 spec=json.loads((ROOT/'assets/props/fish_trap_marker/manifest.json').read_text())
 bpy.ops.wm.open_mainfile(filepath=str(SRC/'fish_trap_marker.blend'))
 checks=[]

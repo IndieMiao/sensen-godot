@@ -1,29 +1,15 @@
 [
   {
-    "file": "SGODOT-402_fish_trap_marker_v1_bank_43deg_comparison.jpg",
-    "bytes": 367446,
-    "sha256": "f581fbcb201eec8d25ce4907fb53d026d4b36768b4f45fe15f634cf3e9428ce0",
+    "file": "SGODOT-402_fish_trap_marker_v1.1_bank_43deg_prompt_115m.png",
+    "bytes": 501015,
+    "sha256": "df77d607bf859d061e6d5334f16139cde8a1377f89cbc1b0ce81476d1eb1ff20",
     "author": "黄忠",
     "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
   },
   {
-    "file": "SGODOT-402_fish_trap_marker_v1_marker_closeup.jpg",
-    "bytes": 207319,
-    "sha256": "0f0f47cd0f123000c2b4d64630d760ae2f6cb9e3f934a70331dde6344322797e",
-    "author": "黄忠",
-    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
-  },
-  {
-    "file": "SGODOT-402_fish_trap_marker_v1_native_prompt_comparison.jpg",
-    "bytes": 689732,
-    "sha256": "c123825bc8df0e3fe8d6276948c9147a158eb99c28f2127a1eb946f81129ff1a",
-    "author": "黄忠",
-    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
-  },
-  {
-    "file": "SGODOT-402_fish_trap_marker_v1_validation.json",
-    "bytes": 22363,
-    "sha256": "b54849f5ea7cf68aea32548bfa1ee141bfccdae6d9b46650612a70f812d689f7",
+    "file": "SGODOT-402_fish_trap_marker_v1.1_validation.json",
+    "bytes": 21368,
+    "sha256": "c96c12b49341c33c52e5ed9c7c362d2a375e674afc3524e3be4737a7a3227f78",
     "author": "黄忠",
     "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
   }

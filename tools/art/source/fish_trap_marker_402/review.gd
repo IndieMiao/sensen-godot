@@ -41,7 +41,7 @@ func capture(name):
 	print("TRAP_CAPTURE ",name)
 func run():
 	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
-	vp=SubViewport.new();vp.size=Vector2i(720,1600);vp.own_world_3d=true;vp.msaa_3d=Viewport.MSAA_4X
+	vp=SubViewport.new();vp.size=Vector2i(360,800);vp.own_world_3d=true;vp.msaa_3d=Viewport.MSAA_4X
 	vp.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(vp)
 	runtime=P0Runtime.new();P0Runtime._instance=runtime
 	runtime.session.transport=func(_method,_path,_body,_meta):report.transport_calls+=1
@@ -67,12 +67,11 @@ func run():
 	fishing.set_process(false);fishing._water=pond.get_node(str(pond.entry.id));fishing.step(0)
 	pond._focus=(spot.origin+spot.target+target)/3+Vector3.UP*.65
 	pond._opening=false;pond._parked=true;pond._update_camera()
-	var default_transform=pond.cam.transform;var default_size=pond.cam.size
 	check(absf(pond.cam.rotation_degrees.x+43)<.001,"Native pond camera pitch 43 degrees")
 	var model_stats=mesh_bounds(pond._trap_float);report.model=model_stats
 	check(model_stats.triangles==500 and model_stats.surfaces==1,"Actual imported marker 500 triangles / one surface")
-	check(absf(model_stats.bounds[0][1]+.05)<.00001 and absf(model_stats.bounds[1][1]-.38)<.00001,"Actual marker waterline origin: -.05 to +.38m")
-	check(absf(model_stats.size[0]-.45)<.00001 and absf(model_stats.size[2]-.45)<.00001,"Actual cage width .45m")
+	check(absf(model_stats.bounds[0][1]+.0675)<.00001 and absf(model_stats.bounds[1][1]-.513)<.00001,"Actual marker waterline origin: -.0675 to +.513m")
+	check(absf(model_stats.size[0]-.6075)<.00001 and absf(model_stats.size[2]-.6075)<.00001,"Actual cage width .6075m; 1.35 baked into vertices")
 	for mesh in pond._trap_float.find_children("*","MeshInstance3D",true,false):
 		check(mesh.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,"Marker casts no shadow")
 		var mat=mesh.get_active_material(0)
@@ -82,21 +81,13 @@ func run():
 	var cast_width=bobber.size[0]*fishing._bobber.scale.x
 	check(absf(cast_width-.218383863842247)<.00001,"Native cast bobber measured vertex width .21838m at original 1.6 scale")
 	report.comparison={"native_bobber":bobber,"bobber_scale":fishing._bobber.scale.x,"bobber_width_m":cast_width,
-		"trap_buoy_width_m":.30,"width_ratio":.30/cast_width,"trap_origin":xyz(pond._trap_float.position),"cast_target":xyz(target),"player":xyz(pond.actor.position)}
-	runtime.ui.root.visible=false
-	await capture("bank_43deg_comparison")
-	fishing.visible=false
-	pond.cam.size=1.15;pond.cam.rotation_degrees=Vector3(-25,25,0)
-	pond.cam.position=pond._trap_float.position+Vector3.UP*.17+pond.cam.basis.z*8
-	vp.size=Vector2i(1200,1000);await capture("marker_closeup")
-	vp.size=Vector2i(360,800);pond.cam.transform=default_transform;pond.cam.size=default_size
-	fishing.visible=true
+		"trap_buoy_width_m":.405,"width_ratio":.405/cast_width,"trap_origin":xyz(pond._trap_float.position),"cast_target":xyz(target),"player":xyz(pond.actor.position)}
 	for i in 3:await get_tree().process_frame
 	runtime.ui.root.visible=true;pond._trap_frame(fixture)
-	pond._trap_float.position.y=.055
-	var mark=pond.cam.unproject_position(pond._trap_float.position+Vector3(0,.6,0))
-	var prompt=pond.P0Trap.prompt(fixture,pond.p0_place())
-	runtime.ui.name_bar(pond.TRAP_ID,P0Logic.icon(pond.TRAP_ID),prompt.text,prompt.fact,mark,true,-1,false,-1,mark)
+	# _trap_frame itself uses the approved 1.15m offset in the private b1 source copy.
+	var mark=pond._trap_mark
+	check(mark.is_equal_approx(pond.cam.unproject_position(pond._trap_float.position+Vector3(0,1.15,0))),"Native trap frame uses approved 1.15m name-bar anchor")
+	report.comparison.trap_origin=xyz(pond._trap_float.position)
 	for i in 30:await get_tree().process_frame
 	var bar=runtime.ui._name_bars.get(pond.TRAP_ID)
 	check(bar!=null and bar.visible and bar.text=="Fish Trap" and bar.fact=="0/3" and bar.icon==P0Logic.icon(pond.TRAP_ID),"Native b1 trap icon/name strip visible with real prompt")
@@ -106,23 +97,15 @@ func run():
 	for node in runtime.ui._kit.get_children():
 		if node is CanvasItem and node!=bar:node.visible=false
 	var bar_rect=bar.get_global_rect()
-	report.prompt={"text":bar.text,"fact":bar.fact,"world_height_above_origin_m":.6,"screen": [mark.x,mark.y],
+	report.prompt={"text":bar.text,"fact":bar.fact,"world_height_above_origin_m":1.15,"screen": [mark.x,mark.y],
 		"logical_viewport":[360,800],"bar_rect":[bar_rect.position.x,bar_rect.position.y,bar_rect.size.x,bar_rect.size.y],
-		"source":"native P0Trap.prompt / P0Ui.name_bar"}
-	await capture("native_icon_name_bar")
+		"source":"native patched _trap_frame / P0Trap.prompt / P0Ui.name_bar; output copy only"}
 	var trap_rect=screen_rect(pond._trap_float)
 	var projected=Rect2(trap_rect[0],trap_rect[1],trap_rect[2],trap_rect[3])
 	report.prompt["model_bounds_overlap_px2"]=bar_rect.intersection(projected).get_area()
-	# A separate, explicitly labelled integration proposal; retain the original .6m capture above.
-	var proposed=pond.cam.unproject_position(pond._trap_float.position+Vector3(0,.9,0))
-	runtime.ui.name_bar(pond.TRAP_ID,P0Logic.icon(pond.TRAP_ID),prompt.text,prompt.fact,proposed,true,-1,false,-1,proposed)
-	for i in 12:await get_tree().process_frame
-	var proposed_rect=bar.get_global_rect()
-	report.prompt_proposal={"height_m":.9,"runtime_change_committed":false,
-		"bar_rect":[proposed_rect.position.x,proposed_rect.position.y,proposed_rect.size.x,proposed_rect.size.y],
-		"model_bounds_overlap_px2":proposed_rect.intersection(projected).get_area(),"gap_px":projected.position.y-proposed_rect.end.y}
-	check(proposed_rect.intersection(projected).get_area()<.01,"Review-only .9m prompt proposal clears actual model vertex projection")
-	await capture("prompt_height_proposal_090m")
+	report.prompt["gap_px"]=projected.position.y-bar_rect.end.y
+	check(bar_rect.intersection(projected).get_area()<.01 and report.prompt.gap_px>0,"Approved 1.15m prompt clears enlarged buoy")
+	await capture("bank_43deg_prompt_115m")
 	report.renderer={"method":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
 	check(report.renderer.method=="mobile","Actual Mobile renderer")
 	report.passed=report.checks.all(func(c):return c.passed)
