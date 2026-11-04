@@ -138,9 +138,13 @@ const CAST_XP := [2.7, 3.8, 4.9, 5.1, 6.7, 6.7, 5.2, 3.8, 3.2, 2.1]
 const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 ## Crop names that read the same in the plural ("harvest 30 corn").
 ## q(58): crop names that keep their form in the plural, or take another; every plural reads it (Today, the chip, the
-## waiting line, harvest amounts; 李白 q(98): `Lettuces ready in` was written where Lettuce stays Lettuce).
+## waiting line, harvest amounts; 李白 q(98): `Lettuces ready in` was written where Lettuce stays Lettuce). The materials
+## are mass nouns, the same in the plural: `7 Clay`, `Need 3 more Timber` — not `7 Claies` (不知火舞 on the Stall Board,
+## 奕星 11-04); Reeds is a plural already.
 const PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies",
-	"Cress": "Cress", "Pea Shoots": "Pea Shoots", "Baby Spinach": "Baby Spinach", "Bok Choy": "Bok Choy"}
+	"Cress": "Cress", "Pea Shoots": "Pea Shoots", "Baby Spinach": "Baby Spinach", "Bok Choy": "Bok Choy",
+	"Timber": "Timber", "Stone": "Stone", "Clay": "Clay", "Flax": "Flax", "Hardwood": "Hardwood", "Coal": "Coal",
+	"Rock Salt": "Rock Salt", "Copper Ore": "Copper Ore", "Iron Ore": "Iron Ore", "Quartz": "Quartz"}
 
 ## The four things on the gate card (§4.8.7): what is locked, which level, how far, what crossing it does. One sheet
 ## spec for UiInfoSheet (SKILL-2 482:169): the title with the lock, `Locked` (or the rarity), the lead line
@@ -803,7 +807,8 @@ static func plural(name: String) -> String:
 	if PLURALS.has(name): return str(PLURALS[name])
 	if name.ends_with("ss") or name.ends_with("sh") or name.ends_with("ch") or name.ends_with("x") or name.ends_with("o"): return name + "es"
 	if name.ends_with("s"): return name
-	if name.ends_with("y"): return name.substr(0, name.length() - 1) + "ies"
+	# a consonant's y only (Strawberry → Strawberries); a vowel's takes an s (Day → Days), as crop_plural
+	if name.ends_with("y") and not (name.length() > 1 and name[-2].to_lower() in "aeiou"): return name.substr(0, name.length() - 1) + "ies"
 	return name + "s"
 
 ## A name that is the same in the plural (Lettuce, Chamomile, Corn): `when lettuce is ready`, not `are` (q(98)).
