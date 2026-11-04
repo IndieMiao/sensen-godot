@@ -4235,7 +4235,8 @@ func first_time(key: String) -> bool:
 
 ## A server-side reset starts a new account under the same player id (SGODOT-270: Joey's account starts over in San
 ## Francisco). The teaching tips, "seen" lists and quick-bar pins on this device belonged to the old account, so they go
-## and the first session teaches again. The account is known by its creation time (view.profile.since_ms), kept with the
+## and the first session teaches again (with the notification prompt's answer and the Big Pot stoves, SGODOT-397).
+## The account is known by its creation time (view.profile.since_ms), kept with the
 ## tips; a tips file written before this build kept that is judged by its age: last written before the account was made.
 func _check_account(v: Dictionary) -> void:
 	var since := int(v.get("profile", {}).get("since_ms", 0))
@@ -4253,6 +4254,9 @@ func _check_account(v: Dictionary) -> void:
 		_hide_tip()
 		_quick = {}
 		_save_quick()
+		# v4q(2) ⑥ (SGODOT-397): the notification prompt's answer and the Big Pot stoves were the old save's too
+		if notify != null: notify.forget_asked()
+		P0KitchenLogic.forget_big_stoves(str(player_of.call()))
 	_taught["account_since"] = since
 	_save_tips()
 

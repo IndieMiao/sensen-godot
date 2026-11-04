@@ -734,6 +734,7 @@ func _go_online(session: P0Session) -> void:
 	o.player_id = session.player_id
 	o.access_key = session.access_key
 	o.version = session.version
+	o.features = session.features()
 	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
 	attach_online(o)
 	voice_room = P0VoiceRoom.new()

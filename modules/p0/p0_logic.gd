@@ -2553,7 +2553,7 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 		if not next is Dictionary: return {"text": "", "go": ""}
 		for skill in next.get("skills", []):
 			if str(skill.skill) == key:
-				return {"text": "%s Lv%d · %s" % [key.capitalize(), int(skill.need), HOME_SKILL_HOW[key]], "go": "skills"}
+				return {"text": "%s Lv%d · %s" % [key.capitalize(), int(skill.need), HOME_SKILL_HOW.get(key, "")], "go": "skills"}
 		return {"text": "", "go": ""}
 	match id:
 		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
