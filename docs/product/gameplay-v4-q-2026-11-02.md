@@ -524,7 +524,7 @@
 - 台词：`Copper's a start! There's iron at Ironvale Vein. Get down to Floor 10!`（矿名取玩家那座铁矿脉）。（不知火舞审定）。她的候选原是 `Copper's a start. The iron is deeper. Try Ironvale Vein!`，李白改了两处：正式矿名从词池取、不一定带 Iron，所以把「铁」写明；铁在另一座矿、不是这座矿更深的地方，`deeper` 会读成「这座矿往下走」，改成和 Today 行同一个目标 `Floor 10`。对话条照 LOCK-18，字数和 First Dig 的台词差不多。
 - 不做成委托，不占追踪名额，不给奖励。
 
-**q(284) 补注（2026-11-04，用户「全按推荐」，待批，随 q(284) 报）**：① 的「开矿脉」行改成 **Pip 自动发的矿脉委托**（照 Pip's First Dig 的「下到第 N 层」，N = 10，限这座矿；出现 / 消失条件、去重、一次一行照 ①）：Today 写 `Ironvale Vein · Floor 4/10`（替掉 `· Reach Floor 10`），Show 照 ①；点行开委托卡（照 First Dig 的卡：标题用矿名、who 行 `Pip · Courier Kid · personal request`、铁矿脉卡的台词用 ② 那句（石英矿脉卡不放台词行，不另起新英文）、目标格 `Reach Floor 10 · Ironvale Vein` 4/10、不带 Bring、底部只有 `Close`）；不占追踪名额、不能放弃、不给奖励；红点照 ① 第一次出现亮一次；到 Lv7 还没到 F10 时照 ① 撤掉，这一行直接消失、不打勾、不算完成；排序照 q(284)：仍**排在家园委托缺口行前面**（① 的 b 不变），① 里只有「不被 q(143) 顶」随 q(143) 作废。② Pip 那一句不变。旧方案 `docs/product/gameplay-plan-v2-2026-10-02.md` q(284)。
+**q(284) 补注（2026-11-04，用户「全按推荐」；**已批**：随 q(284)，用户 11:01 bot 单聊「284ok」，已推 1382ad18）**：① 的「开矿脉」行改成 **Pip 自动发的矿脉委托**（照 Pip's First Dig 的「下到第 N 层」，N = 10，限这座矿；出现 / 消失条件、去重、一次一行照 ①）：Today 写 `Ironvale Vein · Floor 4/10`（替掉 `· Reach Floor 10`），Show 照 ①；点行开委托卡（照 First Dig 的卡：标题用矿名、who 行 `Pip · Courier Kid · personal request`、铁矿脉卡的台词用 ② 那句（石英矿脉卡不放台词行，不另起新英文）、目标格 `Reach Floor 10 · Ironvale Vein` 4/10、不带 Bring、底部只有 `Close`）；不占追踪名额、不能放弃、不给奖励；红点照 ① 第一次出现亮一次；到 Lv7 还没到 F10 时照 ① 撤掉，这一行直接消失、不打勾、不算完成；排序照 q(284)：仍**排在家园委托缺口行前面**（① 的 b 不变），① 里只有「不被 q(143) 顶」随 q(143) 作废。② Pip 那一句不变。旧方案 `docs/product/gameplay-plan-v2-2026-10-02.md` q(284)。
 
 ③ **不做**：不加引导步骤、不弹教学卡；不改矿的规则和数值。不给 Joey 验收（Joey 11-18 那版走不到第 3 天，奕星定）。
 
