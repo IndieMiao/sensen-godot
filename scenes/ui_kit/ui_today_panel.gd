@@ -48,6 +48,8 @@ func _init(rows: Array = []) -> void:
 	_scroll.name = "Scroll"
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED   # SHOW_NEVER once rows pass VISIBLE_ROWS (_fit)
+	# the panel's own drag only (_input): the scroll's touch drag would add its own coast to _COAST on a phone (周瑜 on #738)
+	_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_scroll)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override(&"separation", _ROW_SEP)
@@ -57,6 +59,7 @@ func _init(rows: Array = []) -> void:
 	_over.name = "Over"
 	_over.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_over)
+	_over.resized.connect(_mark)
 	_fade_top = _fade(true)
 	_fade_bottom = _fade(false)
 	_bar = Panel.new()
@@ -114,16 +117,17 @@ func _mark() -> void:
 	_fade_top.visible = scrolls and at > 0.5
 	_fade_bottom.visible = scrolls and at < list_h - view_h - 0.5
 	_bar.visible = scrolls
-	var top := _scroll.position.y
+	# in _over's own frame: it is the panel's content rect, the scroll's (the padding already counted; 周瑜 on #738)
 	for f in [_fade_top, _fade_bottom]:
-		(f as TextureRect).position.x = _scroll.position.x
-		(f as TextureRect).size = Vector2(_scroll.size.x, _FADE)
-	_fade_top.position.y = top
-	_fade_bottom.position.y = top + view_h - _FADE
+		(f as TextureRect).position.x = 0.0
+		(f as TextureRect).size = Vector2(_over.size.x, _FADE)
+	_fade_top.position.y = 0.0
+	_fade_bottom.position.y = view_h - _FADE
 	if scrolls:
 		var h := maxf(12.0, view_h * view_h / list_h)
 		_bar.size = Vector2(_BAR_W, h)
-		_bar.position = Vector2(size.x - _BAR_INSET - _BAR_W, top + (view_h - h) * at / maxf(1.0, list_h - view_h))
+		# 4 px in from the panel's inner edge (its border's), out in the right padding
+		_bar.position = Vector2(_over.size.x + _PAD.x - UiTokens.STROKE_DEFAULT - _BAR_INSET - _BAR_W, (view_h - h) * at / maxf(1.0, list_h - view_h))
 
 func scrolls() -> bool:
 	return _scroll.vertical_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED

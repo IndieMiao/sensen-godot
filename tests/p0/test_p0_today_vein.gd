@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## Pip's vein request (spec ③ v3 / eval-B, over v4q(9) ①'s row; its conditions unchanged): `<vein> · Floor n/10` — after
 ## the guide and Pip's First Dig, at Homestead Lv5 and Lv6, iron first then quartz, one at a time, gone at Floor 10 of any
-## vein of that main, none when the Homestead request points at the same mine; after Pip's Homestead request, before the
+## vein of that main, kept when the Homestead request points at the same mine; after Pip's Homestead request, before the
 ## other short ones. Its red dot lights once a vein (`pip:vein:<id>`, seen for good).
 
 const P0WildSites := preload("res://modules/p0/p0_wild_sites.gd")
@@ -48,11 +48,16 @@ func test_any_iron_vein_down_to_ten_ends_the_iron_row() -> void:
 	# a quarry down to ten ends nothing
 	assert_str(str(P0Logic.vein_row(_view(5, {"wd-255-116": {"deepest": 30}})).line)).is_equal("Ironvale Vein · Floor 0/10")
 
-func test_none_when_the_homestead_row_points_at_the_same_mine() -> void:
-	var home := {"row": {"line": "Homestead Lv8 · Iron Ore 4 to go", "go": "mine:wd-254-115"}, "now": true}
-	assert_dict(P0Logic.vein_row(_view(5), home)).is_empty()
-	var other := {"row": {"line": "Homestead Lv6 · Timber 3 to go", "go": "gather:gn-5391959~wood0"}, "now": true}
-	assert_str(str(P0Logic.vein_row(_view(5), other).go)).is_equal("mine:wd-254-115")
+## 不知火舞 on #738 (405 e8fb3ea4): Pip's vein request stays when the Homestead gap is that ore with its Show on that
+## very mine — not one row for the other; the vein ahead (v4q(9) b), both Shows on the same mine.
+func test_kept_ahead_of_the_homestead_gap_that_points_at_the_same_mine() -> void:
+	var v := _view(5, {}, {"homestead": {"level": 5, "next": {"level": 6, "skills": [], "coins": {"need": 0, "have": 0},
+		"materials": [{"id": "iron_ore", "name": "Iron Ore", "need": 4, "have": 0}]}}})
+	var home := P0Logic.homestead_row(v)
+	assert_str(str(home.row.go)).is_equal("mine:wd-254-115")
+	assert_str(str(P0Logic.vein_row(v).go)).is_equal("mine:wd-254-115")
+	var lines: Array = P0Logic.today_rows(v).map(func(r): return str(r.line))
+	assert_array(lines).is_equal(["Ironvale Vein · Floor 0/10", "Homestead Lv6 · Iron Ore 4 to go"])
 
 func test_in_today_it_is_pips_request_before_the_other_short_ones() -> void:
 	var v := _view(5, {}, {"plots": [{"state": "ready", "crop": "crop_radish"}, {"state": "sown", "crop": "crop_radish"}],

@@ -3408,7 +3408,7 @@ func open_resident_request(id: String) -> void:
 	card.action_pressed.connect(func():
 		close_modal()
 		if not cmd.is_empty(): command.emit(cmd))
-	card.unavailable_pressed.connect(func(r: String): toast_error(P0Logic.blocked_toast(r)))
+	card.unavailable_pressed.connect(func(r: String): if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r)))   # spec ③: only tracking 25
 	card.dismissed.connect(func(): open_resident(id))
 	_open_modal(card, 0.0, true)
 	modal_kind = "resident_request"

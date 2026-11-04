@@ -1691,7 +1691,7 @@ static func _today_rows(view: Dictionary) -> Array:
 			pip.append(hr)
 	# the vein one ahead of the Homestead gap row (v4q(9) b, the user 11-02; q(284) review ④); Pip's First Dig goes here
 	# too once it is a Today row (#636)
-	var vein := vein_row(view, home_row)
+	var vein := vein_row(view)
 	if not vein.is_empty(): pip.push_front(vein)
 	rows.append_array(later + pip)
 	# the newest taken first (spec ①, over q(143)'s latest-on-the-third-row)
@@ -1713,13 +1713,13 @@ static func _today_rows(view: Dictionary) -> Array:
 ## vein (view.wild.near3_sites, the very one Pip's line and the server's nearestFreeVein name) — when the guide is over,
 ## Pip's First Dig is done (view.first_dig.done), nobody has reached its Floor 10 (view.mine.records: that vein's, and any
 ## other vein of the same main the client knows), one of the next three Homestead levels needs Iron Ore, and Homestead
-## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. None when the
-## Homestead row already points at that very mine (its first gap is that ore, its Show that mine). Red dot `vein:<id>`,
-## once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
+## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. Kept when the
+## Homestead row points at that very mine too (不知火舞 on #738, 405 e8fb3ea4: Pip's request, it goes by its own ends
+## only — v4q(9) ①'s dedupe retired with q(284)). Red dot `vein:<id>`, once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
 const VEIN_MAINS := ["iron_ore", "quartz"]
 const VEIN_UNTIL_LEVEL := 7
 const VEIN_FLOOR := 10
-static func vein_row(view: Dictionary, home_row := {}) -> Dictionary:
+static func vein_row(view: Dictionary) -> Dictionary:
 	if P0Guide.guide_on(view): return {}
 	var dig = view.get("first_dig", null)
 	if not dig is Dictionary or not bool(dig.get("done", false)): return {}
@@ -1738,7 +1738,6 @@ static func vein_row(view: Dictionary, home_row := {}) -> Dictionary:
 				break
 		if site.is_empty() or _vein_reached(records, sites, main): continue
 		var go := "mine:" + str(site.id)
-		if not home_row.is_empty() and str(home_row.get("row", {}).get("go", "")) == go: return {}   # the Homestead row says it
 		# down that mine (VG4 384:187745): the row stays, with no button (周瑜 on #711: not left to show_label)
 		var down := str(view.get("mine", {}).get("at", {}).get("mine", "")) == str(site.id) if view.get("mine", null) is Dictionary and view.mine.get("at") is Dictionary else false
 		# Pip's vein request (spec ③ v3, eval-B): `Ironvale Vein · Floor 4/10`, as `Pip's First Dig · Floor 1/3`

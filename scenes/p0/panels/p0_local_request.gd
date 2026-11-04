@@ -41,7 +41,8 @@ static func open(ui: P0Ui, id: String, back: Callable, ring: Array = []) -> void
 	card.action_pressed.connect(func():
 		ui.close_modal()
 		if not cmd.is_empty(): ui.command.emit(cmd))
-	card.unavailable_pressed.connect(func(reason: String): ui.toast_error(P0Logic.blocked_toast(reason)))
+	card.unavailable_pressed.connect(func(reason: String):   # spec ③: only tracking 25 (a gap stays silent, as before)
+		if P0Logic.blocked_toast(reason) != reason: ui.toast_error(P0Logic.blocked_toast(reason)))
 	card.dismissed.connect(func(): back.call())
 	card.link_pressed.connect(func(i: int):
 		if str(links[i]) == "Drop request":

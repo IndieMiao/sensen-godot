@@ -272,10 +272,25 @@ func test_today_panel_past_five_rows_scrolls_with_fades_and_a_bar() -> void:
 	assert_bool(fade_top.visible).is_false()
 	assert_bool(bar.visible).is_true()
 	assert_float(bar.size.x).is_equal(3.0)
+	# all inside the panel's border (周瑜 on #738: the padding was counted twice — the bar out past the right edge, the
+	# fade over the bottom border); the fades as wide as the rows, the bottom one ending where they end
+	var inner := p.get_global_rect().grow(-UiTokens.STROKE_DEFAULT)
+	var view := scroll.get_global_rect()
+	assert_bool(inner.encloses(bar.get_global_rect())).is_true()
+	assert_float(inner.end.x - bar.get_global_rect().end.x).is_equal_approx(4.0, 0.01)   # 4 px in from the inner edge
+	assert_bool(view.encloses(fade_bottom.get_global_rect())).is_true()
+	assert_float(fade_bottom.get_global_rect().position.x).is_equal_approx(view.position.x, 0.01)
+	assert_float(fade_bottom.get_global_rect().size.x).is_equal_approx(view.size.x, 0.01)
+	assert_float(fade_bottom.get_global_rect().end.y).is_equal_approx(view.end.y, 0.01)
+	assert_float(bar.get_global_rect().position.y).is_equal_approx(view.position.y, 0.01)   # at the top of the list
+	assert_int(scroll.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # only the panel's drag and coast (#738)
 	scroll.scroll_vertical = 10000
 	await _settle()
 	assert_bool(fade_top.visible).is_true()
 	assert_bool(fade_bottom.visible).is_false()
+	assert_float(fade_top.get_global_rect().position.y).is_equal_approx(view.position.y, 0.01)
+	assert_float(bar.get_global_rect().end.y).is_equal_approx(view.end.y, 0.01)   # at the foot of the list
+	assert_bool(inner.encloses(bar.get_global_rect())).is_true()
 	# a drag begun on a Show pill scrolls; its release fires no Show
 	scroll.scroll_vertical = 0
 	await _settle()
