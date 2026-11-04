@@ -306,9 +306,12 @@ func test_the_waiting_line_goes_once_its_crop_is_ripe_and_the_stove_line_comes_b
 	assert_bool(_lines(P0Logic.today_rows(v)).any(func(l): return str(l).contains("· when "))).is_false()   # it can cook
 
 ## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies) and `is` for a crop that stays.
+## The materials stay too (奕星 11-04: `7 Claies` on the Stall Board); a y takes -ies after a consonant only.
 func test_q58_plurals_and_an_uncountable_crop_is_ready() -> void:
 	for pair in [["Lettuce", "Lettuce"], ["Chamomile", "Chamomile"], ["Corn", "Corn"], ["Chili", "Chilies"], ["Radish", "Radishes"],
-			["Carrot", "Carrots"], ["Tomato", "Tomatoes"]]:
+			["Carrot", "Carrots"], ["Tomato", "Tomatoes"], ["Strawberry", "Strawberries"], ["Bok Choy", "Bok Choy"], ["Day", "Days"],
+			["Timber", "Timber"], ["Stone", "Stone"], ["Clay", "Clay"], ["Flax", "Flax"], ["Hardwood", "Hardwood"], ["Coal", "Coal"],
+			["Rock Salt", "Rock Salt"], ["Copper Ore", "Copper Ore"], ["Iron Ore", "Iron Ore"], ["Quartz", "Quartz"], ["Reeds", "Reeds"]]:
 		assert_str(P0Logic.plural(pair[0])).is_equal(pair[1])
 	assert_str(P0Logic.crop_plural("Chili", 12)).is_equal("chilies")
 	assert_str(P0Logic.crop_plural("Lettuce", 10)).is_equal("lettuce")

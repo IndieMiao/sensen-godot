@@ -105,8 +105,12 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## row with › alone (not read this launch); BLOCKED_NONE no such row. `voice_chat`: under it in the same card
 ## `Voice chat ›`, no value (q(277); only while this phone is offered voice, 不知火舞). Neither: no Privacy group.
 ## `language` (0.2.22 中文版): the row's value, the language in use in its own words (`English` / `中文`); "" for none.
+## q(281) (SGODOT-390, 不知火舞's spec 302 e92f4ff9 + 18f24a30, row 131): `privacy_url` "" or the policy's address —
+## Legal's first row `Privacy Policy ›` ("privacy"); `support_code` "" or `XXXXX-XXXXX` — Legal's last row after Version,
+## `Support code` / `Tap to copy` with the code on the right and no ›, the whole row copying it ("support_code"), and
+## under the card `Send this code with any request about your data.`
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
-		blocked := BLOCKED_NONE, voice_chat := false, language := "") -> P0SettingsPage:
+		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -141,12 +145,31 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		row.pressed.connect(func(): page.open_pressed.emit("voice_chat"))
 		privacy.append(row)
 	if not privacy.is_empty(): page._group("Privacy", privacy)
+	var legal: Array = []
+	if privacy_url != "":
+		var policy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Privacy Policy")
+		policy.name = "PrivacyPolicy"
+		policy.pressed.connect(func(): page.open_pressed.emit("privacy"))
+		legal.append(policy)
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
+	legal.append(licenses)
 	var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
 	ver.name = "Version"
-	page._group("Legal", [licenses, ver])
+	legal.append(ver)
+	if support_code != "":
+		var code := UiSettingRow.new(UiSettingRow.Kind.LINK, "Support code", "Tap to copy", support_code, "", false)
+		code.name = "SupportCode"
+		(code.find_child("Value", true, false) as Node).auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a code, no words
+		code.pressed.connect(func(): page.open_pressed.emit("support_code"))
+		legal.append(code)
+	page._group("Legal", legal)
+	if support_code != "":
+		var note := UiKit.label("Send this code with any request about your data.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		note.name = "SupportNote"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(note)
 	return page
 
 ## Visible test settings (341 d559585e), retaining the approved B page layout and copy (aa0e971b).
