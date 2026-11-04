@@ -727,6 +727,12 @@ func _refresh_quick(s: State) -> void:
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
 	var ghost := s == State.GHOST
+	_qty.remove_theme_font_size_override(&"font_size")
+	if quantity.contains(" · "):
+		var base := _qty.get_theme_font_size(&"font_size")
+		var width := _qty.get_theme_font(&"font").get_string_size(quantity, HORIZONTAL_ALIGNMENT_LEFT, -1, base).x
+		var available := UiTokens.SIZE_QUICK_SLOT_W - _QUICK_PAD * 2.0
+		_qty.add_theme_font_size_override(&"font_size", mini(base, maxi(1, floori(base * available / maxf(1.0, width)))))
 	_qty.visible = quantity != "" and not empty and not ghost
 	# The ghost's "Icon · dimmed" is the same 35 % as the ×0 icon (no separate token yet).
 	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s in [State.ZERO, State.GHOST] else 1.0

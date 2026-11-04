@@ -10,6 +10,7 @@ const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a pond's f
 const P0Trap := preload("res://modules/p0/p0_trap.gd")   # Fish Trap (SGODOT-283)
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
+const GearLogic := preload("res://modules/p0/p0_gear_logic.gd")
 
 static var _content: Dictionary = {}
 ## Problems found merging the content fragments (tests read it; the server refuses to start on the same ones).
@@ -441,6 +442,9 @@ static func text_width(text: String, style: StringName = UiTokens.STYLE_C11_B) -
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
+	if id.begins_with("weapon_") or id.begins_with("potion_"):
+		if ResourceLoader.exists(ICON_DIR % id): return load(ICON_DIR % id)
+		id = "heart" if id.begins_with("potion_") else "sword_wooden" if id == "weapon_wooden_sword" else "sword"
 	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	if ResourceLoader.exists(path): return load(path)
@@ -551,6 +555,8 @@ static func liked_by_line(view: Dictionary, item_id: String) -> String:
 
 static func item_name(view: Dictionary, id: String) -> String:
 	var names: Dictionary = view.get("names", {})
+	if not names.has(id) and id.begins_with("weapon_"): return str(GearLogic.weapon(id).get("name", id))
+	if not names.has(id) and id.begins_with("potion_"): return str(GearLogic.potion(id).get("name", id))
 	var fast := fast_crop(view, id)
 	if not names.has(id) and not fast.is_empty(): return str(fast.get("seed_name" if id == str(fast.get("seed")) else "name", id))
 	if not names.has(id) and P0Decor.is_decor(id): return P0Decor.name_of(id)   # Decorate's pieces (SGODOT-284)
@@ -760,17 +766,19 @@ static func _tree_action(view: Dictionary, plot: Dictionary) -> Dictionary:
 ## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
 ## What each action's quick bar holds (§10.3.2): Farming seeds and fertiliser, Fishing bait. Anything in the pool
 ## stays where it was put or pinned; the bar fills its free end only with the first family (seeds / bait).
-const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_", "trap_"]}   # trap_fish: P1's Fish Trap (SGODOT-283)
+const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_", "trap_"], "combat": ["potion_"]}
 
 ## The action whose bar takes this item ("farm" / "fish"), or "" when no bar does.
 static func bar_action_of(id: String) -> String:
+	if id.begins_with("potion_") and not GearLogic.potion_actions_enabled: return ""
 	for mode in BAR_POOL:
 		for prefix in BAR_POOL[mode]:
 			if id.begins_with(prefix): return mode
 	return ""
 
 static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
-	var prefix := "bait_" if mode == "fish" else "seed_"
+	if mode == "combat" and not GearLogic.potion_actions_enabled: return []
+	var prefix := "potion_" if mode == "combat" else "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
 		var id := str(s.get("id", ""))
@@ -1024,6 +1032,10 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		d[key] = sub
 		return sub
 	var e = v.get("energy", null)
+	var mine = v.get("mine", null)
+	var mine_at = mine.get("at", null) if mine is Dictionary else null
+	if mine_at is Dictionary and mine_at.get("potion_ready_in", null) != null:
+		own.call(own.call(v, "mine"), "at")["potion_ready_in"] = maxf(0.0, float(mine_at.potion_ready_in) - elapsed_ms)
 	var next_in = e.get("next_in", null) if e is Dictionary else null
 	if next_in != null:
 		e = own.call(v, "energy")
@@ -1702,10 +1714,11 @@ static func _today_rows(view: Dictionary) -> Array:
 		else:
 			hr.dot = PIP_HOME_DOT   # lights once, the first time it is there (the guide just over), never each level
 			pip.append(hr)
-	# the vein one ahead of the Homestead gap row (v4q(9) b, the user 11-02; q(284) review ④); Pip's First Dig goes here
-	# too once it is a Today row (#636)
+	# Pip's order (q(284) spec ③ v3): First Dig, vein, then the Homestead gap; not sorted by request acceptance time.
 	var vein := vein_row(view)
 	if not vein.is_empty(): pip.push_front(vein)
+	var dig := GearLogic.first_dig_row(view)
+	if not dig.is_empty() and not P0Guide.guide_on(view): pip.push_front(dig)
 	rows.append_array(later + pip)
 	# the newest taken first (spec ①, over q(143)'s latest-on-the-third-row)
 	progress.sort_custom(func(a, b): return float(a._at) > float(b._at) or float(a._at) == float(b._at) and int(a._i) < int(b._i))
@@ -2297,8 +2310,8 @@ const P1_UNLOCKS := {
 	"bag_upgrade_4": {"icon": "bag", "text": "Bag Upgrade IV"},
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
-	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
-	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Post"},
+	"healing_potion": {"icon": "star", "text": "Healing Potion", "note": "at the Homestead Stall"},
+	"potion_heal": {"icon": "star", "text": "Healing Potion", "note": "at the Homestead Stall"},
 	"decor_set_1": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
 	"decor_set_2": {"icon": "wood", "text": "New decor", "note": "at the Homestead Stall"},
 	"orchard_10": {"icon": "crop_apple", "text": "Orchard 10/10", "note": "+1 slot"},

@@ -284,6 +284,8 @@ func refresh(view_: Dictionary, force := false) -> void:
 ## the Buy shelf — everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
+	if not P0Logic.GearLogic.potion_actions_enabled:
+		all = all.filter(func(o): return not str(o.get("id", "")).begins_with("potion_"))
 	# Today's Recipe Cards close the Buy page (§9.11.1 the Stall's daily two, §9.11.2 the Market's regional cards; 282).
 	if section == "buy" and role in ["homestead", "market"]:
 		all = all + (view.get("shops", {}).get(role, {}).get("cards", []) as Array)
