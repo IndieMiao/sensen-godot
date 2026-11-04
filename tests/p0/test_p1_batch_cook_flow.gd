@@ -270,6 +270,10 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000, "heats": []}, {}, {}]
 	_set_view(v)
 	k.on_pot(v.cooking.stoves[0])
+	# 419 (不知火舞 bd102c55): watching, the pot shows in the middle — the stove's hidden, its steam waiting; walked away
+	# from the watch, the stove's pot and its steam come back, the lid as below
+	assert_bool(pot.visible).override_failure_message("one pot on the screen: the layer's").is_false()
+	k.stop_watching()
 	frame.call()
 	k.stage.call("_process", 0.0)
 	var steam: CPUParticles3D = k.stage.get("_steam")

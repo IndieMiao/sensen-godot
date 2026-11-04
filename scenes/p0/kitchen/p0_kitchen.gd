@@ -18,12 +18,12 @@ extends Node
 ## The server owns the stove (`view.cooking.stove`): leaving and coming back shows Ready, collect happens once.
 
 const BAND_TOP_DRAWER := 0.29     # engineering default, WP7 v2: pot band ends above the slot bar
-const BAND_TOP_WATCH := 0.42      # COOK-3: the pot sits high, under the HUD, above the watch sheet (0.40 → 0.42, 419 v1)
+const BAND_TOP_WATCH := 0.40      # COOK-3: the pot sits high, under the HUD, above the watch sheet
 ## The queue drawer (Queue next ›) keeps the heat ring over the pot: the pot sits this much lower than in the cooking
 ## drawer, so HUD + 8 ≤ the ring's top, its foot + 8 ≤ the pot card and the card + 8 ≤ the drawer (不知火舞 on #142).
 const QUEUE_DROP := 14.0
 const FOCUS_SIZE := 0.42          # pushed-in view: 42 % of the room's accepted width
-const WATCH_FOCUS_SIZE := 0.28    # COOK-3 pushes in further on the pot (0.34 → 0.28: the pot's box, 不知火舞 419 v1)
+const WATCH_FOCUS_SIZE := 0.34    # COOK-3 pushes in further on the pot (approved kitchen camera ×1.85)
 ## The countdown and its bar under the ring (P0CookTimer; 419 v1: the plate's middle at y 362, the ring's at 235).
 const TIMER_BELOW_RING := 127.0
 const OVERLAY_GAP := 8.0          # the pot card's foot above the drawer top (row 53: 326 → 334)
@@ -63,6 +63,7 @@ var _pot_card: UiPotCard
 var _point_at_remove := false      # the pot is full and a bag cell was tapped: ✕ wears its gold-brown ring (q(64))
 var _ring: UiHeatRing
 var _timer: P0CookTimer   # the countdown and its bar in the middle (419)
+var _wait_pot: P0WaitPot  # the pot in the middle, a 3D layer (419, 不知火舞 bd102c55 (b)); the stove's hidden meanwhile
 var _stove: Dictionary = {}
 ## The stove this kitchen works (SGODOT-282: Homestead Lv4 / Lv8 bring stoves 2 and 3), 0-based. The drawer, the
 ## watch, serve and the 3D stage all follow it; P0Farmhouse picks it when a stove is tapped.
@@ -262,8 +263,8 @@ func open_queue() -> void:
 	_band = _heat_band()
 	_wrap.add_child(_band)
 	_wrap.move_child(_band, 0)   # under the drawer, the slot bar and the preview: they keep their own taps
-	if _ring: rt.ui.root.move_child(_ring, -1)   # over the drawer's layer
-	if _timer: rt.ui.root.move_child(_timer, -1)   # the countdown and its bar too, down with the pot (419 v1)
+	if _wait_pot: rt.ui.root.move_child(_wait_pot, -1)   # the pot and its ring over the drawer's layer (419 bd102c55)
+	if _ring: rt.ui.root.move_child(_ring, -1)
 
 ## The pot band's heat taps while the queue drawer is open: in a ring's window a tap judges it; while a ring shows
 ## (growing 1 s before its turn, the 350 ms it stays after) a tap outside the window does nothing, as tap() swallows it
@@ -673,6 +674,7 @@ func watch(stove: Dictionary) -> void:
 		_timer.theme = UiKit.theme()
 		rt.ui.root.add_child(_timer)
 	_timer.visible = false
+	_show_wait_pot()
 	if _queue_badge == null:
 		_queue_badge = UiWorldIconButton.new()   # display only: taps on it are heat taps like the rest of the scene
 		_queue_badge.theme = UiKit.theme()
@@ -748,12 +750,48 @@ func stop_watching() -> void:
 	phase = "idle"
 	_hide_ring()
 	_hide_sheet()
+	_hide_wait_pot()
 	room.release_focus()
 	_hide_player(false)
 
 func _hide_ring() -> void:
 	if _ring: _ring.visible = false
 	if _timer: _timer.visible = false
+
+## The watched pot in the middle (419): the stove's held out of sight, the layer flying in from where it stood on the
+## screen and at its size. Already there (back from the queue drawer, the next pot): it stays.
+func _show_wait_pot() -> void:
+	if not room.has_method("hold_pot"): return
+	if _wait_pot == null:
+		_wait_pot = P0WaitPot.new()
+		_wait_pot.theme = UiKit.theme()
+		_wait_pot.visible = false
+		rt.ui.root.add_child(_wait_pot)
+		rt.ui.root.move_child(_wait_pot, _ring.get_index() if _ring and _ring.get_parent() == rt.ui.root else -1)   # under the ring
+	if _wait_pot.visible: return
+	var pot: Node3D = room.call("stove_pot", stove_index)
+	var screen_k := room.get_viewport().get_screen_transform().get_scale().x
+	_wait_pot.setup(room.cam.global_transform.basis, pot.global_transform.basis.orthonormalized() if pot else Basis(),
+		str(room.call("pot_variant", stove_index)), maxf(1.0, screen_k))
+	room.call("hold_pot", stove_index, true)
+	_wait_pot.fly_in(_stove_pot_screen(), _stove_pot_scale())
+
+## Back onto the stove (served, walked away): the layer flies back to the stove pot's place and size, then the stove's
+## pot shows again.
+func _hide_wait_pot() -> void:
+	if _wait_pot == null or not _wait_pot.visible: return
+	var i := stove_index
+	_wait_pot.fly_out(_stove_pot_screen(), _stove_pot_scale(), func(): if is_instance_valid(room): room.call("hold_pot", i, false))
+
+## The stove pot's mouth on the screen, and its size there ÷ the layer's pot (P0WaitPot.POT_W_PX).
+func _stove_pot_screen() -> Vector2:
+	var mouth := room.anchor(drop_name())
+	return room.cam.unproject_position(mouth.global_position) if mouth else P0WaitPot.MOUTH
+func _stove_pot_scale() -> float:
+	var mouth := room.anchor(drop_name())
+	if mouth == null: return 1.0
+	var r := room.cam.global_transform.basis.x * P0WaitPot.POT_W_M * 0.5
+	return room.cam.unproject_position(mouth.global_position + r).distance_to(room.cam.unproject_position(mouth.global_position - r)) / P0WaitPot.POT_W_PX
 
 func elapsed() -> float: return float(Time.get_ticks_msec() - _start_ms)
 
@@ -814,6 +852,7 @@ func ring_center() -> Vector2: return _ring_center()
 
 ## The ring sits on the pot (COOK-3: the whole pot is the target, §7.2.4).
 func _ring_center() -> Vector2:
+	if _wait_pot and _wait_pot.visible: return _wait_pot.mouth_screen()   # the pot in the middle (419)
 	var mouth := room.anchor(drop_name())
 	if mouth == null: return room.get_viewport().get_visible_rect().size * 0.5
 	return room.cam.unproject_position(mouth.global_position)
@@ -849,7 +888,7 @@ func _process(_dt: float) -> void:
 			_ring.mark_turn = float(_judged_turn.get(active, -1.0))
 			_ring.position = _ring_center() - _ring.size * 0.5
 	if _timer:
-		_timer.visible = true
+		_timer.visible = phase == "watch"   # the queue drawer: the pot and its ring stay, the countdown goes (419 bd102c55)
 		_timer.total_ms = total
 		_timer.elapsed_ms = minf(e, total)
 		_timer.heat_at = heats.map(func(h): return float(h.at))
@@ -894,6 +933,7 @@ func serve(taps: Array, from_stove := false) -> void:
 	_events.clear()
 	_hide_ring()
 	_hide_sheet()
+	_hide_wait_pot()   # back onto the stove: the plate comes out of it there
 	var dish = st.get("dish", null)
 	var rarity := int(st.get("rarity", 1))
 	var glow: Color = UiItemCell.RARITY_COLORS[clampi(rarity - 1, 0, 3)]
@@ -1168,5 +1208,7 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 
 func _exit_tree() -> void:
 	if _ring and is_instance_valid(_ring): _ring.queue_free()
+	if _timer and is_instance_valid(_timer): _timer.queue_free()
+	if _wait_pot and is_instance_valid(_wait_pot): _wait_pot.queue_free()
 	if _queue_badge and is_instance_valid(_queue_badge): _queue_badge.queue_free()
 	_hide_sheet()
