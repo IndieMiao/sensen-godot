@@ -1,0 +1,683 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "no skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "one matte vertex-colour material; no texture",
+        "passed": true
+      },
+      {
+        "check": "all node scales 1.0",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze_mobile name",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze one surface",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze only position/normal/colour",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze 0.80 m diameter",
+        "passed": true
+      },
+      {
+        "check": "Tier_bronze 0.65 m blank coloured face",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold_mobile name",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold one surface",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold only position/normal/colour",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold 0.80 m diameter",
+        "passed": true
+      },
+      {
+        "check": "Tier_gold 0.65 m blank coloured face",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver_mobile name",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver one surface",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver only position/normal/colour",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver 0.80 m diameter",
+        "passed": true
+      },
+      {
+        "check": "Tier_silver 0.65 m blank coloured face",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood_mobile name",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood one surface",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood only position/normal/colour",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood 0.80 m diameter",
+        "passed": true
+      },
+      {
+        "check": "Tier_wood 0.65 m blank coloured face",
+        "passed": true
+      },
+      {
+        "check": "Common_mobile name",
+        "passed": true
+      },
+      {
+        "check": "Common one surface",
+        "passed": true
+      },
+      {
+        "check": "Common only position/normal/colour",
+        "passed": true
+      },
+      {
+        "check": "Common no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Common winding agrees with normals",
+        "passed": true
+      },
+      {
+        "check": "total file, including all four variants, <=900 triangles",
+        "passed": true
+      },
+      {
+        "check": "base grounded and overall footprint <=1 m",
+        "passed": true
+      },
+      {
+        "check": "root at base-centre origin with Y up",
+        "passed": true
+      },
+      {
+        "check": "centre 1.0 m and +Z tilted up 25 degrees",
+        "passed": true
+      },
+      {
+        "check": "BadgeNumber at face centre plus 3 mm",
+        "passed": true
+      },
+      {
+        "check": "BadgeLv above number, same face",
+        "passed": true
+      },
+      {
+        "check": "all existing manifest entries unchanged",
+        "passed": true
+      },
+      {
+        "check": "manifest only appends the badge",
+        "passed": true
+      },
+      {
+        "check": "real UID / texture_map_mode 1 / light_baking 1",
+        "passed": true
+      },
+      {
+        "check": "import hook retains Marker3D and default tier visibility",
+        "passed": true
+      },
+      {
+        "check": "source manifest matches exact exported file",
+        "passed": true
+      }
+    ],
+    "triangles": 896,
+    "stored_surfaces": 5,
+    "visible_triangles": 332,
+    "visible_surfaces": 2,
+    "per_node_triangles": {
+      "Tier_bronze": 188,
+      "Tier_gold": 188,
+      "Tier_silver": 188,
+      "Tier_wood": 188,
+      "Common": 144
+    },
+    "bounds": [
+      [
+        -0.4000000059604645,
+        0.0,
+        -0.23686912655830383
+      ],
+      [
+        0.4000000059604645,
+        1.3790052282080871,
+        0.2115265339703452
+      ]
+    ],
+    "uid": "uid://b56qpo5b7x0fp",
+    "asset_sha256": "915758a8532b3c8649a3825154d5cc1c1563224f5290213be6bca86261dbe4ae"
+  },
+  "godot": {
+    "asset_sha256": "915758a8532b3c8649a3825154d5cc1c1563224f5290213be6bca86261dbe4ae",
+    "checks": [
+      {
+        "check": "visible badge at runtime scale 1.0",
+        "passed": true
+      },
+      {
+        "check": "PLAQUE_CELL (7,14) retained",
+        "passed": true
+      },
+      {
+        "check": "farm yaw 14.5 degrees",
+        "passed": true
+      },
+      {
+        "check": "player assembled",
+        "passed": true
+      },
+      {
+        "check": "both sockets import as Marker3D",
+        "passed": true
+      },
+      {
+        "check": "badge centre 1.0 m / tilt -25 degrees",
+        "passed": true
+      },
+      {
+        "check": "socket positions on face, +3 mm",
+        "passed": true
+      },
+      {
+        "check": "socket +Z inherits the face normal",
+        "passed": true
+      },
+      {
+        "check": "mobile mesh name: Tier_bronze",
+        "passed": true
+      },
+      {
+        "check": "farm matte vertex paint: Tier_bronze",
+        "passed": true
+      },
+      {
+        "check": "mobile mesh name: Tier_gold",
+        "passed": true
+      },
+      {
+        "check": "farm matte vertex paint: Tier_gold",
+        "passed": true
+      },
+      {
+        "check": "mobile mesh name: Tier_silver",
+        "passed": true
+      },
+      {
+        "check": "farm matte vertex paint: Tier_silver",
+        "passed": true
+      },
+      {
+        "check": "mobile mesh name: Tier_wood",
+        "passed": true
+      },
+      {
+        "check": "farm matte vertex paint: Tier_wood",
+        "passed": true
+      },
+      {
+        "check": "mobile mesh name: Common",
+        "passed": true
+      },
+      {
+        "check": "farm matte vertex paint: Common",
+        "passed": true
+      },
+      {
+        "check": "all tiers <=900 triangles / shared base + one tier <=2 visible surfaces",
+        "passed": true
+      },
+      {
+        "check": "no skeleton / added collision",
+        "passed": true
+      },
+      {
+        "check": "saved opening_3",
+        "passed": true
+      },
+      {
+        "check": "saved opening_7",
+        "passed": true
+      },
+      {
+        "check": "saved opening_10",
+        "passed": true
+      },
+      {
+        "check": "saved opening_17",
+        "passed": true
+      },
+      {
+        "check": "walked native follow camera: zoom 1 / 6.72 m / 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "saved follow_3",
+        "passed": true
+      },
+      {
+        "check": "two-digit line width fits face, Lv3",
+        "passed": true
+      },
+      {
+        "check": "saved control_no_digits_3",
+        "passed": true
+      },
+      {
+        "check": "saved follow_7",
+        "passed": true
+      },
+      {
+        "check": "two-digit line width fits face, Lv7",
+        "passed": true
+      },
+      {
+        "check": "saved control_no_digits_7",
+        "passed": true
+      },
+      {
+        "check": "saved follow_10",
+        "passed": true
+      },
+      {
+        "check": "two-digit line width fits face, Lv10",
+        "passed": true
+      },
+      {
+        "check": "saved control_no_digits_10",
+        "passed": true
+      },
+      {
+        "check": "saved follow_17",
+        "passed": true
+      },
+      {
+        "check": "two-digit line width fits face, Lv17",
+        "passed": true
+      },
+      {
+        "check": "saved control_no_digits_17",
+        "passed": true
+      },
+      {
+        "check": "saved four_tiers",
+        "passed": true
+      }
+    ],
+    "close_camera": {
+      "image_size": [
+        1600,
+        820
+      ],
+      "transform": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.062564, 8.221982, 5.556978)]",
+      "width": 4.69999980926514
+    },
+    "follow_camera": {
+      "actor": "(5.048285, 0.0, -4.031663)",
+      "logical_size": "(360.0, 800.0)",
+      "opening_zoom": false,
+      "pitch": -43.0,
+      "size": 6.71999979019165,
+      "transform": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (7.583666, 10.14277, 5.77193)]",
+      "zoom": 1.0
+    },
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "opening_camera": {
+      "actor": "(6.175, 0.0, 0.325)",
+      "logical_size": "(360.0, 800.0)",
+      "opening_zoom": true,
+      "pitch": -43.0,
+      "size": 10.9268341064453,
+      "transform": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (11.25191, 13.56131, 7.129247)]",
+      "zoom": 0.614999741935838
+    },
+    "passed": true,
+    "renderer": "mobile",
+    "stored_surfaces": 5,
+    "tiers": [
+      {
+        "disc_left": [
+          221.926010131836,
+          196.749252319336
+        ],
+        "disc_right": [
+          264.783142089844,
+          196.749252319336
+        ],
+        "font_size": 223,
+        "label_aabb": "[P: (-0.134, -0.305, 0.0), S: (0.268, 0.61, 0.0)]",
+        "level": 3,
+        "number_centre": [
+          243.354568481445,
+          196.798919677734
+        ],
+        "number_corners": [
+          [
+            236.176010131836,
+            212.338485717773
+          ],
+          [
+            250.533142089844,
+            181.259399414062
+          ]
+        ],
+        "physical_image_size": [
+          360,
+          800
+        ],
+        "tier": "wood"
+      },
+      {
+        "disc_left": [
+          221.926010131836,
+          196.749252319336
+        ],
+        "disc_right": [
+          264.783142089844,
+          196.749252319336
+        ],
+        "font_size": 223,
+        "label_aabb": "[P: (-0.134, -0.305, 0.0), S: (0.268, 0.61, 0.0)]",
+        "level": 7,
+        "number_centre": [
+          243.354568481445,
+          196.798919677734
+        ],
+        "number_corners": [
+          [
+            236.176010131836,
+            212.338485717773
+          ],
+          [
+            250.533142089844,
+            181.259399414062
+          ]
+        ],
+        "physical_image_size": [
+          360,
+          800
+        ],
+        "tier": "bronze"
+      },
+      {
+        "disc_left": [
+          221.926010131836,
+          196.749252319336
+        ],
+        "disc_right": [
+          264.783142089844,
+          196.749252319336
+        ],
+        "font_size": 223,
+        "label_aabb": "[P: (-0.268, -0.305, 0.0), S: (0.536, 0.61, 0.0)]",
+        "level": 10,
+        "number_centre": [
+          243.354568481445,
+          196.798919677734
+        ],
+        "number_corners": [
+          [
+            228.997436523438,
+            212.338500976562
+          ],
+          [
+            257.711730957031,
+            181.259338378906
+          ]
+        ],
+        "physical_image_size": [
+          360,
+          800
+        ],
+        "tier": "silver"
+      },
+      {
+        "disc_left": [
+          221.926010131836,
+          196.749252319336
+        ],
+        "disc_right": [
+          264.783142089844,
+          196.749252319336
+        ],
+        "font_size": 223,
+        "label_aabb": "[P: (-0.268, -0.305, 0.0), S: (0.536, 0.61, 0.0)]",
+        "level": 17,
+        "number_centre": [
+          243.354568481445,
+          196.798919677734
+        ],
+        "number_corners": [
+          [
+            228.997436523438,
+            212.338500976562
+          ],
+          [
+            257.711730957031,
+            181.259338378906
+          ]
+        ],
+        "physical_image_size": [
+          360,
+          800
+        ],
+        "tier": "gold"
+      }
+    ],
+    "triangles": 896,
+    "visible_surfaces": 2,
+    "visible_triangles": 332
+  },
+  "pixels": [
+    {
+      "level": 3,
+      "diameter_logical_px": 42.85713195800798,
+      "digit_cap_logical_px": 17.0,
+      "digit_ink_physical_bounds": [
+        237,
+        188,
+        249,
+        205
+      ],
+      "logical_width": 360,
+      "physical_scale": 1.0,
+      "threshold_rgb_delta": 35,
+      "source_sha256": "23ffc31f19e35d50fb54bea1d0c12e899ab46484cd6da6ffb03aa3f0fd07ec6d",
+      "control_sha256": "5397c4aa8bdbdf14ce88fb1578260ad31dc21d29e987ba7819be298aaac0c392"
+    },
+    {
+      "level": 7,
+      "diameter_logical_px": 42.85713195800798,
+      "digit_cap_logical_px": 16.0,
+      "digit_ink_physical_bounds": [
+        237,
+        188,
+        250,
+        204
+      ],
+      "logical_width": 360,
+      "physical_scale": 1.0,
+      "threshold_rgb_delta": 35,
+      "source_sha256": "a2c485681556f750381dcd0d248ef2f54a293e86c845ace845d5e5d269e623ef",
+      "control_sha256": "b7a6689705a28532d9c903ba5a9b06b622ef56fc0d19172b2f09247bfac84a36"
+    },
+    {
+      "level": 10,
+      "diameter_logical_px": 42.85713195800798,
+      "digit_cap_logical_px": 17.0,
+      "digit_ink_physical_bounds": [
+        231,
+        188,
+        257,
+        205
+      ],
+      "logical_width": 360,
+      "physical_scale": 1.0,
+      "threshold_rgb_delta": 35,
+      "source_sha256": "510670db56bb1f2c2fe00dff1b67631fa513029109376cad5bc052206b24c5a6",
+      "control_sha256": "a4c3636460818c871376ca83f9ccf79907b820d813e0cc71fc5dbdd12b7e0eab"
+    },
+    {
+      "level": 17,
+      "diameter_logical_px": 42.85713195800798,
+      "digit_cap_logical_px": 16.0,
+      "digit_ink_physical_bounds": [
+        231,
+        188,
+        257,
+        204
+      ],
+      "logical_width": 360,
+      "physical_scale": 1.0,
+      "threshold_rgb_delta": 35,
+      "source_sha256": "3914a8a974e79ebd3669734512cf52dca0bd6a52e4eb0f158cb5218aedb73df1",
+      "control_sha256": "a6f69f2ba08b3ba4e7c2e4ecd747809783359d6e611ff9b38622eac36e41d1ab"
+    }
+  ],
+  "stage": {
+    "runtime_head": "dfe937a14738f194a3b1e60b5a8bd3fc8862fb9f",
+    "scope": "Isolated copied b1; temporary placeholder substitution only; real game farm/camera/UI/movement; no committed client edits"
+  },
+  "source_blend_sha256": "04e03c82ad178643636acd5842782b6255e841941c00451b484e3a9f378e9874",
+  "images": [
+    {
+      "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv3.png",
+      "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv3.png",
+      "sha256": "80e8202b03de7f70cd3d2259c631c6759e7b669e2d29a8ba32f45cba573067fa",
+      "bytes": 313529,
+      "mime": "image/png",
+      "size": [
+        760,
+        900
+      ]
+    },
+    {
+      "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv7.png",
+      "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv7.png",
+      "sha256": "ae7cd9d0e13a1bff6e1f3dbe92a4c8524d126596bd0a9113c8a318929ce65dca",
+      "bytes": 313448,
+      "mime": "image/png",
+      "size": [
+        760,
+        900
+      ]
+    },
+    {
+      "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv10.png",
+      "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv10.png",
+      "sha256": "069a76a8ace83e01225b2165dcdc0fc1c7d1be15b0d8fb9c9491c30db8e5ce32",
+      "bytes": 313751,
+      "mime": "image/png",
+      "size": [
+        760,
+        900
+      ]
+    },
+    {
+      "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv17.png",
+      "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv17.png",
+      "sha256": "0cf888e877387b308ef688c862a037125b5079bce6635323172ab5eede77adf3",
+      "bytes": 313520,
+      "mime": "image/png",
+      "size": [
+        760,
+        900
+      ]
+    },
+    {
+      "name": "SGODOT-401_HOMESTEAD_BADGE_v1_four_tiers_close.png",
+      "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_four_tiers_close.png",
+      "sha256": "b89d43ee7d6a379712f95fbc711bca5a550ed73814248df4b19c7f0268817327",
+      "bytes": 405880,
+      "mime": "image/png",
+      "size": [
+        1600,
+        940
+      ]
+    },
+    {
+      "name": "SGODOT-401_HOMESTEAD_BADGE_v1_opening_tier_comparison.png",
+      "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_opening_tier_comparison.png",
+      "sha256": "8206e7f1e3af3ce8e701d950d83fbbaa459bdb1768ebab290103ecbc0eb64032",
+      "bytes": 319761,
+      "mime": "image/png",
+      "size": [
+        1440,
+        910
+      ]
+    }
+  ],
+  "budget_note": "896 triangles includes all four hidden/visible tiers. Five stored mesh surfaces, two simultaneously visible (common base + one selected tier); one material. Label3D cost excluded from asset mesh budget.",
+  "scope": "Only new art, import hook, manifest append and review sources are committed. Game fixture and scene substitution stay under output; no b1 integration or save changes."
+}
