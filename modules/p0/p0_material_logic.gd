@@ -340,7 +340,12 @@ static func wild_mine_rows(view: Dictionary, site: Dictionary) -> Array:
 		if g != "" and f <= last: guards[g] = guards.get(g, []) + ["F%d" % f]
 	if not guards.is_empty():
 		rows.append(["Boss", "\n".join(guards.keys().map(func(g): return "%s · %s" % [monster_name(g), ", ".join(guards[g])]))])
+	# the viewport's best_floor is kept from the box read the session made (P0WildSites reads a box once); the view's
+	# record is this command's (李元芳 on preview B: back up from F2, the card still said F1)
 	var best := int(site.get("best_floor", 0))
+	var records = view.get("mine", {}).get("records", {}) if view.get("mine", null) is Dictionary else {}
+	if records is Dictionary and records.get(str(site.get("id", ""))) is Dictionary:
+		best = maxi(best, int(records[str(site.id)].get("deepest", 0)))
 	rows.append(["You", "Best here F%d" % best if best > 0 else "Not visited"])
 	return rows
 
