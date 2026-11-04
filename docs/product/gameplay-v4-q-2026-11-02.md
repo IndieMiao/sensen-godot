@@ -120,7 +120,7 @@
 - 依赖还没实现的 P2 功能（密友、帮工、长途票、Trip 7 资格）的后果，在那个功能上线前不显示。
 - **名字一律沿用现有英文**，不另起：`Spice Rack`、`Warming Cabinet`、`Stall Board · 3rd slot`、`Bag Upgrade I`、`Second Stove`（`Third Stove` / `Fourth Stove` 同一格式）、`Big Pot`、`Chef's Sign`、`Notice Board`、外观阶段 `Fence & Mailbox` / `Porch` / `Kitchen Wing` / `Master Farmhouse`（q(112)）、`Basic Room` / `Standard Room` / `Deluxe Room`。Lv9 的「摊位升级」（`stall_upgrade`）现行没有英文行：摊位还是临时木箱、没有升级外观，升级面板和横幅都不写它（不知火舞 282）；第一批照旧不写，等摊位模型再定名（Lv9 仍有 `Warming Cabinet · keeps 12 dishes`）。回血药的名字归 v4q(7)。
 
-⑨ **第一周**（30 分钟玩家）：第 1 天首会话到 Lv3、当晚 Lv4，之后每天一级，第 7 天 Lv10；取代旧方案第 14 章的七日节奏表（q(248)）。首会话到 Lv3 的前提：家城木材、石料各 3 个采集点（v4q(4) ②）和 Lv3 门槛 1 / 1（③）。**用户批的方向（庚5）**：矿脉开局就能去（丁12，v4q(5) ②），**第 3、4 天各开一座矿脉**（铁矿脉、石英矿脉各从 F1 走到 F10，开出电梯站），**第一只守关挪到第 2 天或第 5 天**；Today / Pip 带人去矿脉的提示见 v4q(9)；改完按「照表走的玩家」再跑一次校准，再定逐日表（v4 2.8 按本条读）——**校准已跑，逐日表和第一只守关见 v4q(10)**。
+⑨ **第一周**（30 分钟玩家）：第 1 天首会话到 Lv3、当晚 Lv4，之后每天一级，第 7 天 Lv10；取代旧方案第 14 章的七日节奏表（q(248)）。首会话到 Lv3 的前提：家城木材、石料各 3 个采集点（v4q(4) ②）和 Lv3 门槛 1 / 1（③）。**用户批的方向（庚5）**：矿脉开局就能去（丁12，v4q(5) ②），**第 3、4 天各开一座矿脉**（铁矿脉、石英矿脉各从 F1 走到 F10，开出电梯站），**第一只守关挪到第 2 天或第 5 天**；Today / Pip 带人去矿脉的提示见 v4q(9)（q(284) 起是 Pip 的矿脉委托）；**Today 的 Homestead 行 q(284) 起是 Pip 自动发的「家园委托」**（引导结束起每级自动接、HOME-1 当卡、不占追踪名额、不另给奖励；写法和缺口顺序照本条，旧方案 q(284)）；改完按「照表走的玩家」再跑一次校准，再定逐日表（v4 2.8 按本条读）——**校准已跑，逐日表和第一只守关见 v4q(10)**。
 
 ⑩ **存档**：等级表跟着清档上线（v4q(2)，存档 v7），不做老号迁移。
 
@@ -138,7 +138,7 @@
 - **What changes** 恢复田数那一行 `Plots 24 · now 22`（P0 田固定时不列，q(33)；现在每级都变）；体力那一行照旧 `Max Energy 280 · Meals 280 a day · now 270`。
 - **底注**照 q(249)：只补一部分体力，所以底注一律只写 `Upgrading is free of Energy`，实际 +50 写在升级横幅上、写实得；Lv16 起不回体力，横幅也不写。
 - **Lv17 封顶**：标题下一行用现有的 `Highest level for now`（中性灰，q(46) 的封顶写法），不用 `Max level · Homestead Master`（Master 挪到 Lv15，上限以后还会开）；旧方案 §16.3 HOME-1 表里写的 10 级阶梯缩略，现行界面没做，第一批也不做；满级面板照现行满级帧（9:128426）的结构：`Homestead Lv17` / `Highest level for now` / Looks / Decorate / Close（帧 A4，不知火舞定）。
-- **Today 行**每级都出、**只缺技能时也出**，同一项技能的那行技能就不再出（去重），Homestead 行仍是一次只出一行、排序照 q(255) ⑥（推翻 q(255) ① ④；**〔用户已定，按推荐〕**，诸葛亮冲突清单第 2 节第 17 条），沿用 `Homestead Lv2 · Timber 6 to go` 的格式：技能不够 `Homestead Lv9 · Fishing Lv5 needed`；签章 `Homestead Lv17 · 3 stamps to go`；气候带 `Homestead Lv17 · 1 climate to go`。
+- **Today 行**每级都出、**只缺技能时也出**，同一项技能的那行技能就不再出（去重），Homestead 行仍是一次只出一行、排序照 q(255) ⑥（**q(284) 起是 Pip 的家园委托，排序照 q(284)**；推翻 q(255) ① ④；**〔用户已定，按推荐〕**，诸葛亮冲突清单第 2 节第 17 条），沿用 `Homestead Lv2 · Timber 6 to go` 的格式：技能不够 `Homestead Lv9 · Fishing Lv5 needed`；签章 `Homestead Lv17 · 3 stamps to go`；气候带 `Homestead Lv17 · 1 climate to go`。
 
 **实现**：内容 `p0_content.json`（homestead、start、bag_upgrades）、`homestead_looks.json`、`farm_garden.json`、`shops_decor.json`、`requests_p1.json` 的门槛；服务端 homestead.ts、rules.ts（体力池和饭量同一公式）、view.ts、titles.ts（拆 `TITLE_LEVEL`：Homestead Master 15、技能称号仍 10）、garden.ts（果树 / 洒水器上限 Lv7 8 / 10、Lv14 10 / 12）、state.ts；**灶上限 `MAX_STOVES` 3 → 4**（Lv17 第四口灶，厨房场景加第四口灶的位置）；客户端升级面板、`P1_UNLOCKS`、`home_moment`、`MAX_LEVEL`、称号、田网格（没开的格画草地）。**田 id 按 ⑤ 的开出顺序重新编号 0–62**，`garden.plots` 按这个顺序写坐标，代码不写死 48；随清档上线，不迁移。view 字段和拒绝码（`skills_short` / `travel_short`、`next.skills` / `next.travel` / `next.energy_gain` / `next.plots`）按哪吒的契约 pm/plans/355-b1-A-view-contract.md；契约里 Lv2 的 `city_gather` 只做展示、不当门槛（采集点 Lv1 起能用）；Lv8 的 `vein_mines` 当不当门槛按 v4q(5) ② 用户定的来（选 A 不当门槛；周瑜接口数据现在默认 `gate.homestead: 8` 是 B，选 A 要改）。签章门槛数 `counted_on ≤ 今天` 的、不含家城。奕星排。
 
@@ -523,6 +523,8 @@
 - Pip's First Dig 完成后，**下一次和 Pip 说话**换成指向矿脉的一句，**只说一次**（存档里记一下说过，换设备也不再说；随 v7 清档，不迁移，v4q(2)）。说完以后照原来按好感阶段的台词（q(273) 等）。和 Pip 说话前已经到过那座铁矿脉的 F10，就不说这一句。**和引导台词撞上时**（11-03 补注，**用户已批**：随 q(279) 报，用户在奕星终端回「279 ok」、无消息 id；不知火舞定，周瑜服务端 #697 按此改）：引导进行中 Pip 有引导台词时先说引导台词；矿脉这句等引导结束（`guide.step` 为空）后、下一次和 Pip 说话时再说，只说一次，不因为撞上而丢掉——和 ① Today 矿脉行同一个条件，引导期间不插别的提示。只在玩家引导结束前就升到 Lv3、还走到 F3 时才会撞上。
 - 台词：`Copper's a start! There's iron at Ironvale Vein. Get down to Floor 10!`（矿名取玩家那座铁矿脉）。（不知火舞审定）。她的候选原是 `Copper's a start. The iron is deeper. Try Ironvale Vein!`，李白改了两处：正式矿名从词池取、不一定带 Iron，所以把「铁」写明；铁在另一座矿、不是这座矿更深的地方，`deeper` 会读成「这座矿往下走」，改成和 Today 行同一个目标 `Floor 10`。对话条照 LOCK-18，字数和 First Dig 的台词差不多。
 - 不做成委托，不占追踪名额，不给奖励。
+
+**q(284) 补注（2026-11-04，用户「全按推荐」，待批，随 q(284) 报）**：① 的「开矿脉」行改成 **Pip 自动发的矿脉委托**（照 Pip's First Dig 的「下到第 N 层」，N = 10，限这座矿；出现 / 消失条件、去重、一次一行照 ①）：Today 写 `Ironvale Vein · Floor 4/10`（替掉 `· Reach Floor 10`），Show 照 ①；点行开委托卡（照 First Dig 的卡：标题用矿名、who 行 `Pip · Courier Kid · personal request`、铁矿脉卡的台词用 ② 那句（石英矿脉卡不放台词行，不另起新英文）、目标格 `Reach Floor 10 · Ironvale Vein` 4/10、不带 Bring、底部只有 `Close`）；不占追踪名额、不能放弃、不给奖励；红点照 ① 第一次出现亮一次；到 Lv7 还没到 F10 时照 ① 撤掉，这一行直接消失、不打勾、不算完成；排序照 q(284)：仍**排在家园委托缺口行前面**（① 的 b 不变），① 里只有「不被 q(143) 顶」随 q(143) 作废。② Pip 那一句不变。旧方案 `docs/product/gameplay-plan-v2-2026-10-02.md` q(284)。
 
 ③ **不做**：不加引导步骤、不弹教学卡；不改矿的规则和数值。不给 Joey 验收（Joey 11-18 那版走不到第 3 天，奕星定）。
 
