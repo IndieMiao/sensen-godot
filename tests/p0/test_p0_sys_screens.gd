@@ -21,7 +21,7 @@ func before_test() -> void:
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 
-func _view() -> Dictionary: return {"seq": 1, "energy": {"value": 100, "max": 200}, "coins": 50, "bag": {"capacity": 25, "slots": []}}
+func _view() -> Dictionary: return {"seq": 1, "save_version": 7, "energy": {"value": 100, "max": 200}, "coins": 50, "bag": {"capacity": 25, "slots": []}}
 
 ## The server's answer to the request on the wire, through the session as an HTTP reply would come.
 func _reply(code: int, body: Dictionary) -> void:
@@ -187,6 +187,18 @@ func test_the_outpost_handshake_carries_the_version() -> void:
 	o.version = 0
 	o._connect()
 	assert_bool(Array(o.socket.handshake_headers).any(func(h): return str(h).begins_with("x-p0-version"))).is_false()
+	o.stop()
+
+## SGODOT-397 / 396 (后裔): the handshake carries the requests' x-p0-features, save_v7 in it — without it the server
+## turns the join away with 426 like the version gate.
+func test_the_handshake_carries_the_features_with_save_v7() -> void:
+	assert_bool(P0Session.FEATURES.split(",").has("save_v7")).is_true()
+	var o := P0Online.new()
+	add_child(auto_free(o))
+	o.player_id = "p0-test"
+	o.features = P0Session.FEATURES
+	o._connect()
+	assert_array(Array(o.socket.handshake_headers)).contains(["x-p0-features: " + P0Session.FEATURES])
 	o.stop()
 
 ## 不知火舞 233 walkthrough: a place that would not open stays on the blurred screen being left (no launch backdrop,

@@ -120,25 +120,27 @@ describe('P0 snapshot frame v1 fixture (shared with tests/p0/test_p0_online.gd)'
   });
 });
 
-describe('the tea house on the Coffee Shop kit (SGODOT-227 scene integration)', () => {
-  // A client still on the Basic Room build keeps sending its old room metres and seat names after the server
-  // redeploy: positions are clamped onto the new floor and the old bench seats are refused, never trusted.
-  it('clamps old Basic Room coordinates into the new floor and refuses the old bench seats', async () => {
+describe('the tea house on its own kit (SGODOT-216)', () => {
+  // 上官婉儿's tea house (#598): three tea tables of three and the window bench, a landing out to the exit. Positions
+  // past it are clamped onto the room; every seat of the kit is one, none other.
+  it('has the kit\'s twelve seats and walls out to the landing', async () => {
     const { loadOutposts } = await import('../../src/p0/online/outposts.js');
     const tea = loadOutposts().find(o => o.id === 'sh_tea_1')!;
-    expect(tea.art).toBe('coffee_shop');
-    expect(tea.seats).toEqual(['seat_table1_1', 'seat_table1_2', 'seat_table2_1', 'seat_table2_2']);
+    expect(tea.art).toBe('tea_house');
+    expect(tea.seats).toEqual(['seat_table1_1', 'seat_table1_2', 'seat_table1_3', 'seat_table2_1', 'seat_table2_2', 'seat_table2_3',
+      'seat_table3_1', 'seat_table3_2', 'seat_table3_3', 'seat_bench_1', 'seat_bench_2', 'seat_bench_3']);
     const clock = { t: 1_000_000 };
     const r = new OutpostRooms(loadOutposts(), () => clock.t);
-    r.join('old-client-001', 'sh_tea_1', [0.0, 3.1]);   // the old room's front edge, past the Coffee Shop floor
-    const [, x1, , z1] = tea.bounds;
-    expect(r.occupant('old-client-001')).toMatchObject({ x: 0, z: z1 });
+    r.join('tea-client-001', 'sh_tea_1', [0.3, 4.6]);   // past the landing's end
+    const [x0, x1, , z1] = tea.bounds;
+    expect(r.occupant('tea-client-001')).toMatchObject({ x: 0.3, z: z1 });
+    expect(z1).toBeGreaterThanOrEqual(3.8);             // the exit (0.3, 3.8) is inside
     clock.t += 1000;
-    r.move('old-client-001', 3.0, 3.2, 0, 'walk');
-    expect(r.occupant('old-client-001')!.x).toBeLessThanOrEqual(x1);
-    expect(r.occupant('old-client-001')!.z).toBeLessThanOrEqual(z1);
-    expect(r.sit('old-client-001', 'seat_bench_1')).toBe('NO_SEAT');
-    expect(r.occupant('old-client-001')).toMatchObject({ seat: '', action: 'walk' });
-    expect(r.sit('old-client-001', 'seat_table2_1')).toBe('ok');
+    r.move('tea-client-001', -4, 3.5, 0, 'walk');
+    expect(r.occupant('tea-client-001')!.x).toBeGreaterThanOrEqual(x0);
+    expect(r.sit('tea-client-001', 'seat_bench_1')).toBe('ok');
+    expect(r.occupant('tea-client-001')).toMatchObject({ seat: 'seat_bench_1' });
+    expect(r.sit('tea-client-001', 'seat_table4_1')).toBe('NO_SEAT');
+    expect(x1).toBeGreaterThan(0);
   });
 });

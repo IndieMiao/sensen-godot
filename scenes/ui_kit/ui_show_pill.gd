@@ -46,10 +46,12 @@ func _fit() -> void:
 	var s: Dictionary = _SPEC[kind]
 	var m := _label.get_combined_minimum_size()
 	custom_minimum_size = Vector2(roundf(m.x + s.left + s.right + s.stroke * 2.0), s.h)
+	_label.size = m   # a label never shrinks by itself: measured in the fallback font first, it would keep that width
 	_label.position = Vector2(s.left + s.stroke, (s.h - m.y) * 0.5)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_THEME_CHANGED: _fit()
+	# deferred: the pill hears a new theme before its label does, so the label still measures in the old font now
+	if what == NOTIFICATION_THEME_CHANGED: _fit.call_deferred()
 
 ## The touch area: the pill grown to at least 44 × 44 around its centre.
 func _has_point(point: Vector2) -> bool:

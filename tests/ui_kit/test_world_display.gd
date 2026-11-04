@@ -62,6 +62,20 @@ func test_need_tiles_wrap_instead_of_a_fixed_grid() -> void:
 	var g: HFlowContainer = auto_free(UiNeedTile.group([UiNeedTile.new("A", 1, 2), UiNeedTile.new("B", 1, 2)]))
 	assert_object(g).is_instanceof(HFlowContainer)
 
+## The callers set the theme on the popup's layer after it is made (HOME-1, the workbench): Show is first measured in the
+## fallback font (77 wide) and must come back to the main's 65 once the theme is on (SGODOT-394: Fishing's line fits).
+func test_need_source_show_keeps_its_size_when_the_theme_comes_after() -> void:
+	var host: Control = auto_free(Control.new())
+	host.size = Vector2(360, 800)
+	add_child(host)
+	var layer := UiNeedSource.popup(host, Rect2(140, 400, 78, 86), "Fishing Lv5 · Catch fish to level up", func(): pass)
+	layer.theme = UiKit.theme()
+	await _settle()
+	var pill: UiNeedSource = layer.get_child(0)
+	var show_btn: UiShowPill = pill.find_children("*", "UiShowPill", true, false)[0]
+	assert_float(show_btn.size.x).is_equal_approx(65.0, 1.0)
+	assert_str((pill.find_children("*", "Label", true, false)[0] as Label).text).is_equal("Fishing Lv5 · Catch fish to level up")   # one line
+
 func test_need_source_pops_above_the_tile_and_show_only_runs_the_guide() -> void:
 	var host := Control.new()
 	host.size = Vector2(360, 800)

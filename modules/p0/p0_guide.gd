@@ -134,6 +134,10 @@ static func guide_rows(view: Dictionary) -> Array:
 	var row = g.get("row", null)
 	if not row is Dictionary or str(row.get("line", "")) == "": return []
 	var r := _row(str(row.line), str(row.get("icon", "")), guide_go(view, str(row.go) if row.get("go") != null else ""), "guide:" + guide_shown_id(view))
+	# S6a (v4q(4) ⑥, 355 C2): the row's `map` is the spot view.guide.target names — Show / Show on map flies to it
+	var target = g.get("target", null)
+	if r.go == "map" and target is Dictionary and str(target.get("kind", "")) == "gather" and str(target.get("spot", "")) != "":
+		r.go = "gather:" + str(target.spot)
 	# s2 d17b83a4: page is resolved on a cook mark; home is its map destination, stove is its local Show target.
 	var marks = g.get("marks", [])
 	if marks is Array:

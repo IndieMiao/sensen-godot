@@ -175,6 +175,23 @@ static func mine_facility(view: Dictionary, n: int, kind: String) -> Dictionary:
 static func _fee_card(label: String) -> Dictionary:
 	return {"card": true, "label": label, "enabled": false, "amber": false, "cmd": {}, "toast": label}
 
+## The ore block this mine's rocks are drawn as (contract-efg §10.1, 不知火舞 11-03): a vein its main ore's (`iron_ore` /
+## `quartz`, view.mine.records' main), a quarry Copper Ore's; "" when not known (the code-built rock then).
+static func rock_ore(view: Dictionary) -> String:
+	var at := mine_at(view)
+	if str(at.get("type", "")) == "quarry": return "copper_ore"
+	var main = view.get("mine", {}).get("records", {}).get(str(at.get("mine", "")), {}).get("main", null)
+	return str(main) if main is String else ""
+
+## Whether floor n of this mine is a guard's (content mine.types[type].floors: a quarry's F10 / 20 / 30, a vein's F20 /
+## 40), its guard down or not: the arena stands either way (contract-efg §10.1). The view's floor_state.guard is null once
+## the guard is beaten on an earlier day (server mine.ts currentSpec), so the content says.
+static func guard_floor(view: Dictionary, n: int) -> bool:
+	if _floor(view, n).get("guard", null) != null: return true
+	var type: Dictionary = P0Logic.content().get("mine", {}).get("types", {}).get(str(mine_at(view).get("type", "")), {})
+	var special = type.get("floors", {}).get(str(n), null)
+	return special is Dictionary and special.get("guard", null) != null
+
 ## Whether floor n has the elevator: Floor 1 and every stop (contract-efg §4 ⑤; F1 is no stop, the machine is there).
 static func has_elevator(view: Dictionary, n: int) -> bool:
 	return n == 1 or bool(_floor(view, n).get("station", false))
@@ -327,6 +344,46 @@ static func wild_mine_rows(view: Dictionary, site: Dictionary) -> Array:
 	rows.append(["You", "Best here F%d" % best if best > 0 else "Not visited"])
 	return rows
 
+## A wild site's type word as its name ends (v4q(3) ④): the mouth card's type line says `<word> mine`.
+const WILD_TYPE_WORDS := {"quarry": "Quarry", "vein": "Vein", "geode": "Geode", "abyss": "Abyss", "ruin": "Ruins"}
+
+## A wild site's mouth card (E1 321:181190 / E1-HERE 321:181494 / 321:181671, E4 329:182456; v4q(5) ⑩ ⑪, LOCK-21): the
+## name, `Vein mine · Floors 1–40 · near San Jose`, the mine's rows (wild_mine_rows) and, away from it, `Distance` and
+## `Cost` (the viewport's `cost`, #706: `Free` for the nearest three) with `Go` (the wild travel card). At the site:
+## `Enter mine · 2 Energy` (content.mine.floor_energy), `Enter mine · Free` once Floor 1 is paid today
+## (view.mine.paid_today, #705: its 1 in the list), amber `Enter mine · Need 2 Energy` short of it. A type not open yet
+## (E4): the type line and `Not open yet`, no key. {state: go | enter | energy | closed, …the P0PlaceSheet spec}.
+static func mine_card(view: Dictionary, site: Dictionary, here: bool, km := -1.0) -> Dictionary:
+	var type_line := "%s mine" % str(WILD_TYPE_WORDS.get(str(site.get("type", "")), str(site.get("type", "")).capitalize()))
+	var floors := wild_mine_floors(site)
+	if floors != "": type_line += " · " + floors
+	if str(site.get("near_name", "")) != "": type_line += " · near " + str(site.near_name)
+	var out := {"title": str(site.get("name", "")), "subtitle": type_line, "state": "closed"}
+	if not bool(site.get("open", false)):
+		out.line = "Not open yet"
+		out.no_primary = true
+		return out
+	var facts: Array = wild_mine_rows(view, site)
+	if not here:
+		if km >= 0.0: facts.append(["Distance", P0PlaceSheet.distance_text(km)])
+		var cost: Dictionary = site.get("cost", {}) if site.get("cost", null) is Dictionary else {}
+		if not cost.is_empty():
+			facts.append(["Cost", load("res://modules/p0/p0_travel.gd").fare_text({"free": int(cost.get("energy", 0)) == 0 and int(cost.get("coins", 0)) == 0,
+				"energy": int(cost.get("energy", 0)), "coins": int(cost.get("coins", 0))})])
+		out.merge({"facts": facts, "primary": "Go", "state": "go"}, true)
+		return out
+	var paid: Array = (view.get("mine", {}).get("paid_today", {}) as Dictionary).get(str(site.get("id", "")), []) if view.get("mine") is Dictionary and view.mine.get("paid_today") is Dictionary else []
+	var cost := int(P0Logic.content().get("mine", {}).get("floor_energy", 2))
+	out.merge({"facts": facts, "state": "enter"}, true)
+	if paid.has(1) or paid.has(1.0): out.primary = "Enter mine · Free"
+	elif int(view.get("energy", {}).get("value", 0)) < cost:
+		out.primary = "Enter mine"
+		out.blocked = "Enter mine · Need %d Energy" % cost
+		out.blocked_energy = true
+		out.state = "energy"
+	else: out.primary = "Enter mine · %d Energy" % cost
+	return out
+
 ## The deepest floor open in a wild site's mine: a vein's open_to (40; F41 on is `Not open yet`), else its floors.
 static func wild_mine_last(site: Dictionary) -> int:
 	var mine: Dictionary = site.get("mine", {}) if site.get("mine", null) is Dictionary else {}
@@ -388,6 +445,49 @@ static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
 		if str(it[2]) == "storage": out.append("+%d %s · Stored" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return out
 
+## How many more of a material the bag takes (the server's bag.ts room): its plain stacks' gaps and the free slots,
+## a stack of content.bag.stack.material (99); gifts never take more.
+static func bag_room(view: Dictionary, id: String) -> int:
+	var limit := int(P0Logic.content().get("bag", {}).get("stack", {}).get("material", 99))
+	var bag: Dictionary = view.get("bag", {})
+	var room := int(bag.get("free", 0)) * limit
+	for b in bag.get("slots", []):
+		if b is Dictionary and str(b.get("id", "")) == id and not bool(b.get("gifted", false)): room += maxi(0, limit - int(b.get("qty", 0)))
+	return room
+
+## A city gathering spot's card (D2, 不知火舞 f6b4bdb3 / 355 3b2c6a43; frames 332:183026–184280): the spot's name, `Gathering
+## spot · Timber`, `Gives 4 Timber` (a Reed Bank `4 Reeds · Worm Bait`), `Distance` when the player is not in its city,
+## and one key in the server's order (gathering.ts): not in its city `Go`; cooling down grey `Ready in 3h 12m`; short of
+## Energy amber `Gather · Need 3 Energy`; the main yield not fitting the bag grey `No room · free a slot first` (never on
+## the farm: there it goes to Farm Storage); else `Gather · 3 Energy`. `ready_ms`: what is left of its cooldown now
+## (view.gather.city_ready, counted down since the view came). {state: go | ready | cooling | energy | room, …the
+## P0PlaceSheet spec}.
+static func gather_card(view: Dictionary, spot: Dictionary, here: bool, ready_ms: float, km := -1.0, on_farm := false) -> Dictionary:
+	var yields: Array = spot.get("yield", [])
+	var main: Array = yields[0] if not yields.is_empty() else ["", 0]
+	var main_name := P0Logic.item_name(view, str(main[0]))
+	var gives := "%d %s" % [int(main[1]), main_name]
+	for y in yields.slice(1): gives += " · " + P0Logic.item_name(view, str(y[0]))
+	var facts: Array = [["Gives", gives]]
+	if not here and km >= 0.0: facts.append(["Distance", P0PlaceSheet.distance_text(km)])
+	var cost := int(spot.get("energy", 0))
+	var out := {"title": str(spot.get("name", "")), "subtitle": "Gathering spot · " + main_name, "facts": facts,
+		"primary": "Gather · %d Energy" % cost, "state": "ready"}
+	if not here:
+		out.primary = "Go"
+		out.state = "go"
+	elif ready_ms > 0.0:
+		out.blocked = "Ready in %s" % P0Logic.span(ready_ms)
+		out.state = "cooling"
+	elif int(view.get("energy", {}).get("value", 0)) < cost:
+		out.blocked = "Gather · Need %d Energy" % cost
+		out.blocked_energy = true
+		out.state = "energy"
+	elif not on_farm and str(main[0]) != "" and bag_room(view, str(main[0])) < int(main[1]):
+		out.blocked = "No room · free a slot first"
+		out.state = "room"
+	return out
+
 ## Coming home (q(40)): "Stored · 12 Stone · 3 Copper Ore" once per new storage.auto.at (number first, appendix B).
 static func stored_notice(view: Dictionary, shown_at: float) -> String:
 	var auto = view.get("storage", {}).get("auto", null)
@@ -399,23 +499,26 @@ static func stored_notice(view: Dictionary, shown_at: float) -> String:
 # --- Material sources (NeedSource) ---
 
 ## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08), shared
-## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `: the mine types that
-## yield it (355 b1: a quarry's mains, a vein's; every rock gives Stone: `Stone · the mine`). The farm's gathering spots
-## were the first sources (`Clay · Clay Bank`) until they left with v4q(4) ① (the user, 11-02); a city's points are the
-## map's (亚瑟's C), not listed here yet.
-## `go` (Show, 不知火舞 on 228): none while every source is a mine (no mouth to show, 355 b1). {} for anything that is
-## not a material (content.materials) or that nothing here yields.
-## Two lines at most (不知火舞 on 228): the label may break only before ` · or `, so every other space is a no-break
-## space — `Copper Ore · Quarry` / `· or Vein`.
+## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: `<material> · <source>`, sources joined by ` · or `.
+## The words are 不知火舞's (355 3b2c6a43, 李白's note 547a1962, pending the user's word): the city's gathering spots
+## for what they yield, the mines for ores (`Quarries`, `Iron veins from Floor 10`); every rock gives Stone, a Quarry Clay.
+## `go` (Show, 不知火舞 on 228): the spot or mine Today points at (P0Logic._home_material_go, 355 C2). {} for anything
+## no source names (a seed, bait — the tackle shop's — or a geode's gem not open in the first batch).
+## Two lines at most (eb1d7c20, as UiKit.break_at_dot): only at a ` · `, the dot dropped, before ` · or ` first, else
+## after the material — `Clay · Clay Pits in town` / `or Quarries`; every space within a part is a no-break one.
+const SOURCES := {
+	"wood": ["Groves in town"], "stone": ["Rocks in town", "any mine"], "fiber": ["Reed Banks in town"],
+	"wild_herb": ["Herb Patches in town"], "clay": ["Clay Pits in town", "Quarries"],
+	"hardwood": ["Woods in some towns"], "flax": ["Flax Fields in some towns"],
+	"copper_ore": ["Quarries"], "coal": ["Quarries"], "rock_salt": ["Quarries"],
+	"iron_ore": ["Iron veins from Floor 10"], "quartz": ["Quartz veins from Floor 10"],
+}
 static func material_source(view: Dictionary, id: String) -> Dictionary:
-	var c := P0Logic.content()
-	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
-	# every rock gives Stone (Li Bai on 228); no Show target for a mine yet: C will give the nearest mouth (亚瑟 on #629)
-	var parts: Array = ["the mine"] if id == "stone" else mine_types_yielding(id).map(func(t): return str(t.word))
+	var parts: Array = SOURCES.get(id, [])
 	if parts.is_empty(): return {}
-	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
-	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
-	return {"text": text, "go": ""}
+	var text := _nowrap(P0Logic.item_name(view, id)) + " · " + _nowrap(parts[0])
+	for i in range(1, parts.size()): text += " · " + _nowrap("or %s" % parts[i])   # UiNeedSource breaks only at a ` · `
+	return {"text": text, "go": str(P0Logic._home_material_go(view, id).go)}   # Show: the spot or mine Today points at (355 C2)
 
 ## The open mine types that yield a material as a main (355 b1): world_gen's wild.mines[type].mains, for the types the
 ## mine content opens (content.mine.types: quarry and vein in the first batch), in that order — [{type, word}], the

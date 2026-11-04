@@ -1,0 +1,1371 @@
+{
+ "Aalborg": {
+  "ids": [
+   "gn-2624886"
+  ],
+  "country": "Denmark",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Albany": {
+  "ids": [
+   "gn-5106834"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Allentown": {
+  "ids": [
+   "gn-5178127"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Batu Pahat": {
+  "ids": [
+   "gn-1732687"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Bridgeport": {
+  "ids": [
+   "gn-5282804"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Brighton": {
+  "ids": [
+   "gn-2654710"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Cambridge": {
+  "ids": [
+   "gn-2653941"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Cape Coral": {
+  "ids": [
+   "gn-4149962"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Chico": {
+  "ids": [
+   "gn-5336269"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Chongming": {
+  "ids": [
+   "gn-13608003"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Cixi": {
+  "ids": [
+   "gn-1806602"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Concord": {
+  "ids": [
+   "gn-5339111"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Copenhagen": {
+  "ids": [
+   "gn-2618425"
+  ],
+  "country": "Denmark",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Cuautla": {
+  "ids": [
+   "gn-3529982"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Cuernavaca": {
+  "ids": [
+   "gn-3529947"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Danshui": {
+  "ids": [
+   "gn-1813812"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Dongguan": {
+  "ids": [
+   "gn-1812545"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Dumai": {
+  "ids": [
+   "gn-1645133"
+  ],
+  "country": "Indonesia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Eastbourne": {
+  "ids": [
+   "gn-2650497"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Fairfield": {
+  "ids": [
+   "gn-5347335"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Fort Lauderdale": {
+  "ids": [
+   "gn-4155966"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Fuji": {
+  "ids": [
+   "gn-1864134"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Gothenburg": {
+  "ids": [
+   "gn-2711537"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm",
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Guangzhou": {
+  "ids": [
+   "gn-1809858"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Hartford": {
+  "ids": [
+   "gn-4835797"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Hayward": {
+  "ids": [
+   "gn-5355933"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Helsingborg": {
+  "ids": [
+   "gn-2706767"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Helsinki": {
+  "ids": [
+   "gn-658225"
+  ],
+  "country": "Finland",
+  "homes": [
+   "Stockholm",
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Hiratsuka": {
+  "ids": [
+   "gn-1862462"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Hong Kong": {
+  "ids": [
+   "gn-1819729"
+  ],
+  "country": "",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Huizhou": {
+  "ids": [
+   "gn-1806776"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Huzhou": {
+  "ids": [
+   "gn-1806535"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Iguala de la Independencia": {
+  "ids": [
+   "gn-3526798"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Ipswich": {
+  "ids": [
+   "gn-2646057"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Jiangmen": {
+  "ids": [
+   "gn-1806299"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Jiangyin": {
+  "ids": [
+   "gn-1815251"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Jiaxing": {
+  "ids": [
+   "gn-1805953"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Jinshan": {
+  "ids": [
+   "gn-13608000"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Jyväskylä": {
+  "ids": [
+   "gn-655194"
+  ],
+  "country": "Finland",
+  "homes": [
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Jönköping": {
+  "ids": [
+   "gn-2702979"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm",
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Kiel": {
+  "ids": [
+   "gn-2891122"
+  ],
+  "country": "Germany",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Kluang": {
+  "ids": [
+   "gn-1732811"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Kofu": {
+  "ids": [
+   "gn-1859100"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Kuantan": {
+  "ids": [
+   "gn-1735227"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Kuopio": {
+  "ids": [
+   "gn-650224"
+  ],
+  "country": "Finland",
+  "homes": [
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Lahti": {
+  "ids": [
+   "gn-649360"
+  ],
+  "country": "Finland",
+  "homes": [
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Lakeland": {
+  "ids": [
+   "gn-4161438"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Lancaster": {
+  "ids": [
+   "gn-5364940"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Linköping": {
+  "ids": [
+   "gn-2694762"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm"
+  ],
+  "done": true
+ },
+ "London": {
+  "ids": [
+   "gn-2643743"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Long Beach": {
+  "ids": [
+   "gn-5367929"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Los Angeles": {
+  "ids": [
+   "gn-5368361"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true,
+  "also_line": true
+ },
+ "Lübeck": {
+  "ids": [
+   "gn-2875601"
+  ],
+  "country": "Germany",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Maidstone": {
+  "ids": [
+   "gn-2643179"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Malacca": {
+  "ids": [
+   "gn-1734759"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Maran": {
+  "ids": [
+   "gn-1732637"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Matanzas": {
+  "ids": [
+   "gn-3547398"
+  ],
+  "country": "Cuba",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Mexico City": {
+  "ids": [
+   "gn-3530597"
+  ],
+  "country": "",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Miami": {
+  "ids": [
+   "gn-4164138"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Milton Keynes": {
+  "ids": [
+   "gn-2642465"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Mito": {
+  "ids": [
+   "gn-2111901"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Modesto": {
+  "ids": [
+   "gn-5373900"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Muar": {
+  "ids": [
+   "gn-1732869"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Nantong": {
+  "ids": [
+   "gn-1799722"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Nassau": {
+  "ids": [
+   "gn-3571824"
+  ],
+  "country": "Bahamas",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "New York City": {
+  "ids": [
+   "gn-5128581"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Ningbo": {
+  "ids": [
+   "gn-1799397"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Oceanside": {
+  "ids": [
+   "gn-5378771"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Odense": {
+  "ids": [
+   "gn-2615876"
+  ],
+  "country": "Denmark",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Orlando": {
+  "ids": [
+   "gn-4167147"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Oxford": {
+  "ids": [
+   "gn-2640729"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Oxnard": {
+  "ids": [
+   "gn-5380184"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Oyama": {
+  "ids": [
+   "gn-1853483"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Pachuca de Soto": {
+  "ids": [
+   "gn-3522210"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Palm Bay": {
+  "ids": [
+   "gn-4167499"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Pekanbaru": {
+  "ids": [
+   "gn-1631761"
+  ],
+  "country": "Indonesia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Philadelphia": {
+  "ids": [
+   "gn-4560349"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Pingshan": {
+  "ids": [
+   "gn-1798713"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Pomona": {
+  "ids": [
+   "gn-5384170"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Port Saint Lucie": {
+  "ids": [
+   "gn-4169171"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Providence": {
+  "ids": [
+   "gn-5224151"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Pskov": {
+  "ids": [
+   "gn-504341"
+  ],
+  "country": "Russia",
+  "homes": [
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Puebla": {
+  "ids": [
+   "gn-3521081"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Reading": {
+  "ids": [
+   "gn-2639577"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Riga": {
+  "ids": [
+   "gn-456172"
+  ],
+  "country": "Latvia",
+  "homes": [
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Riverside": {
+  "ids": [
+   "gn-5387877"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Rostock": {
+  "ids": [
+   "gn-2844588"
+  ],
+  "country": "Germany",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Sacramento": {
+  "ids": [
+   "gn-5389489"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Saint Peters": {
+  "ids": [
+   "gn-2638703"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Saint Petersburg": {
+  "ids": [
+   "gn-498817"
+  ],
+  "country": "Russia",
+  "homes": [
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Sakura": {
+  "ids": [
+   "gn-2111220"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Salinas": {
+  "ids": [
+   "gn-5391295"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "San Francisco": {
+  "ids": [
+   "gn-5391959"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true,
+  "also_line": true
+ },
+ "San Jose": {
+  "ids": [
+   "gn-5392171"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "San Juan del Río": {
+  "ids": [
+   "gn-3518692"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "San Martin Texmelucan de Labastida": {
+  "ids": [
+   "gn-3518407"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Santa Clarita": {
+  "ids": [
+   "gn-5393049"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Santa Rosa": {
+  "ids": [
+   "gn-5393287"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Santiago de Querétaro": {
+  "ids": [
+   "gn-3991164"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Seremban": {
+  "ids": [
+   "gn-1734810"
+  ],
+  "country": "Malaysia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Shanghai": {
+  "ids": [
+   "gn-1796236"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Shanwei": {
+  "ids": [
+   "gn-1795928"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Shenzhen": {
+  "ids": [
+   "gn-1795565"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Singapore": {
+  "ids": [
+   "gn-1880252"
+  ],
+  "country": "",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Southend-on-Sea": {
+  "ids": [
+   "gn-2637433"
+  ],
+  "country": "United Kingdom",
+  "homes": [
+   "London"
+  ],
+  "done": true
+ },
+ "Springfield": {
+  "ids": [
+   "gn-4951788"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Stamford": {
+  "ids": [
+   "gn-4843564"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Stockholm": {
+  "ids": [
+   "gn-2673730"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm",
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Stockton": {
+  "ids": [
+   "gn-5399020"
+  ],
+  "country": "United States",
+  "homes": [
+   "San Francisco"
+  ],
+  "done": true
+ },
+ "Suzhou": {
+  "ids": [
+   "gn-1886760"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Szczecin": {
+  "ids": [
+   "gn-3083829"
+  ],
+  "country": "Poland",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Takasaki": {
+  "ids": [
+   "gn-1851002"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Tallinn": {
+  "ids": [
+   "gn-588409"
+  ],
+  "country": "Estonia",
+  "homes": [
+   "Stockholm",
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Tampa": {
+  "ids": [
+   "gn-4174757"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Tampere": {
+  "ids": [
+   "gn-634963"
+  ],
+  "country": "Finland",
+  "homes": [
+   "Stockholm",
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Tanjung Pinang": {
+  "ids": [
+   "gn-1624863"
+  ],
+  "country": "Indonesia",
+  "homes": [
+   "Singapore"
+  ],
+  "done": true
+ },
+ "Temecula": {
+  "ids": [
+   "gn-5401395"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Thousand Oaks": {
+  "ids": [
+   "gn-5402405"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Tokyo": {
+  "ids": [
+   "gn-1850147"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Toluca": {
+  "ids": [
+   "gn-3515302"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Tsukuba": {
+  "ids": [
+   "gn-2110681"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Tulancingo": {
+  "ids": [
+   "gn-3515062"
+  ],
+  "country": "Mexico",
+  "homes": [
+   "Mexico City"
+  ],
+  "done": true
+ },
+ "Turku": {
+  "ids": [
+   "gn-633679"
+  ],
+  "country": "Finland",
+  "homes": [
+   "Stockholm",
+   "Helsinki"
+  ],
+  "done": true
+ },
+ "Uppsala": {
+  "ids": [
+   "gn-2666199"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm"
+  ],
+  "done": true
+ },
+ "Utsunomiya": {
+  "ids": [
+   "gn-1849053"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ },
+ "Victorville": {
+  "ids": [
+   "gn-5406222"
+  ],
+  "country": "United States",
+  "homes": [
+   "Los Angeles"
+  ],
+  "done": true
+ },
+ "Västerås": {
+  "ids": [
+   "gn-2664454"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm"
+  ],
+  "done": true
+ },
+ "Waterbury": {
+  "ids": [
+   "gn-4845193"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "West Palm Beach": {
+  "ids": [
+   "gn-4177887"
+  ],
+  "country": "United States",
+  "homes": [
+   "Miami"
+  ],
+  "done": true
+ },
+ "Worcester": {
+  "ids": [
+   "gn-4956184"
+  ],
+  "country": "United States",
+  "homes": [
+   "New York City"
+  ],
+  "done": true
+ },
+ "Wuxi": {
+  "ids": [
+   "gn-1790923"
+  ],
+  "country": "China",
+  "homes": [
+   "Shanghai"
+  ],
+  "done": true
+ },
+ "Zhongshan": {
+  "ids": [
+   "gn-6986104"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Zhuhai": {
+  "ids": [
+   "gn-1790437"
+  ],
+  "country": "China",
+  "homes": [
+   "Hong Kong"
+  ],
+  "done": true
+ },
+ "Århus": {
+  "ids": [
+   "gn-2624652"
+  ],
+  "country": "Denmark",
+  "homes": [
+   "Copenhagen"
+  ],
+  "done": true
+ },
+ "Örebro": {
+  "ids": [
+   "gn-2686657"
+  ],
+  "country": "Sweden",
+  "homes": [
+   "Stockholm"
+  ],
+  "done": true
+ },
+ "Ōta": {
+  "ids": [
+   "gn-1853677"
+  ],
+  "country": "Japan",
+  "homes": [
+   "Tokyo"
+  ],
+  "done": true
+ }
+}

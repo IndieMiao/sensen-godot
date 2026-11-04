@@ -3329,7 +3329,7 @@
       "gift_meal": "dish_carrot_cake",
       "one_per_day": false,
       "lines": {
-        "Stranger": "Hi! I'm Pip. I carry letters all over San Francisco.",
+        "Stranger": "Hi! I'm Pip. I carry letters from city to city.",
         "Acquainted": "You again! Got anything sweet?",
         "Familiar": "I saved you something. Don't tell the others.",
         "mystery": "Um… thanks? I'll save it for later."

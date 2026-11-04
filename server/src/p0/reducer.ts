@@ -14,6 +14,7 @@ import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
+import { notePipLine, settleFirstDig } from './first_dig.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
 import { addPlots, compost, cropGrowH, facilityAt, fieldCap, fieldsUsed, moveFacility, place, ripenMs, seedSaver, wateredPlots } from './garden.js';
@@ -322,6 +323,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (s.gear.rods.includes(id) && rodById(c, id)) s.gear.rod = id;
       else if (s.gear.hoes.includes(id)) s.gear.hoe = id;
       else if (s.gear.picks.includes(id)) s.gear.pick = id;
+      else if (s.gear.weapons.includes(id) && c.mine.combat.weapons[id]) s.gear.weapon = id;   // 355 G §9.1: the weapon slot
       else return fail('not_owned');
       break;
     }
@@ -338,6 +340,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : cmd.type === 'learn' ? learn(c, s, cmd, now, events)
         : giftResident(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (cmd.type === 'talk') notePipLine(c, s, cmd.resident);   // v4q(9) ②: Pip's vein line, if due, is said in this talk
       break;
     }
     case 'cabinet_take': {
@@ -358,6 +361,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      settleFirstDig(c, s, now, events);   // 355 G: First Dig shows at Lv3, done at once for one who already reached its floor
       break;
     }
     case 'chop': {
@@ -465,6 +469,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (!isMineCommand(cmd)) return fail('unknown_command');
       const refusal = mineCommand(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (events.some(e => e.kind === 'mine_record')) settleFirstDig(c, s, now, events);   // 355 G: a new deepest may finish First Dig
     }
   }
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in

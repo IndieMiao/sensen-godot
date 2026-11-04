@@ -30,7 +30,7 @@ export function stageIndex(c: P0Content, points: number): number {
 const stageAt = (c: P0Content, name: string) => Math.max(0, c.affinity.stages.findIndex(([n]) => n === name));
 
 /** Points change, never below the floor of the current stage (q(33): a stage never goes back). */
-function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason: string, now: number, events: P0Event[], verdict?: string,
+export function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason: string, now: number, events: P0Event[], verdict?: string,
   first?: boolean): void {
   const r = residentState(s, id);
   const floor = c.affinity.stages[stageIndex(c, r.affinity)][1];

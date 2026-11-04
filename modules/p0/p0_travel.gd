@@ -115,6 +115,14 @@ static func place(view: Dictionary, info: Dictionary, space := "") -> Dictionary
 		mine["day_pass"] = ""
 		return mine
 	if not away(view) or space in HOMESTEAD_SPACES: return home_chip(view, info)
+	if here(view).begins_with("wd-"):   # at a wild site (C2 326:182063): its name and its Day Pass, `Ironvale Vein · Day Pass 23h`
+		var site = view.get("wild", {}).get("here", null) if view.get("wild", null) is Dictionary else null
+		var at := info.duplicate()
+		at["city"] = str(site.get("name", "")) if site is Dictionary else str(info.get("city", ""))
+		at["space"] = ""
+		at["kind"] = UiHud.PlaceKind.FOREIGN
+		at["day_pass"] = pass_text(view, here(view))
+		return at
 	var c := P0Clusters.get_cluster(here(view))
 	var out := info.duplicate()
 	var city := str(c.name) if not c.is_empty() else str(info.get("city", ""))
@@ -222,7 +230,8 @@ static func fares(view := {}) -> Array:
 	var out := []
 	for i in P0Clusters.TRIP_NAMES.size():
 		var line := ("Up to %s km" % grouped(int(km[i]))) if i < km.size() else ("Over %s km" % grouped(int(km[-1])))
-		if nearest.has(i): line += ", or the %d nearest cities" % int(nearest[i])
+		# the whole sentence a translation can order (SGODOT-385): `Up to 30 km, or the 3 nearest cities`
+		if nearest.has(i): line = "Up to %s km, or the %d nearest cities" % [grouped(int(km[i])), int(nearest[i])]
 		var e := int(table.energy[i]) if i < (table.get("energy", []) as Array).size() else 0
 		var c := int(table.coins[i]) if i < (table.get("coins", []) as Array).size() else 0
 		out.append({title = "Trip %d · %s" % [i + 1, P0Clusters.TRIP_NAMES[i]], line = line, free = e == 0 and c == 0,

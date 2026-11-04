@@ -29,11 +29,11 @@
       "capacity": 12,
       "keeper": {"role": "Tea Host", "name": "Ama"},
       "residents": ["res_hana", "res_lena"],
-      "art": "coffee_shop",
-      "backdrop": {"top": "E6F5F1", "bottom": "FFFBEE", "blend": [0.5, 0.85]},
-      "anchors": "res://assets/p0/outposts/tea.anchors.json",
-      "bounds": [-3.1, 3.1, -2.85, 2.85],
-      "seats": ["seat_table1_1", "seat_table1_2", "seat_table2_1", "seat_table2_2"]
+      "art": "tea_house",
+      "backdrop": {"top": "DDE8E7", "bottom": "DDE8E7", "blend": [0.5, 0.85]},
+      "anchors": "res://assets/p0/outposts/tea_house.anchors.json",
+      "bounds": [-3.4, 3.4, -3.2, 3.9],
+      "seats": ["seat_table1_1", "seat_table1_2", "seat_table1_3", "seat_table2_1", "seat_table2_2", "seat_table2_3", "seat_table3_1", "seat_table3_2", "seat_table3_3", "seat_bench_1", "seat_bench_2", "seat_bench_3"]
     },
     {
       "id": "sh_post_1", "cluster": "gn-5391959",

@@ -425,6 +425,16 @@ const DISH_STANDIN := {
 
 const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "bag_upgrade_4": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
+## A line as the player will read it: P0's table's Chinese under 中文 (Localization.use_p0), else the English as it is
+## (#649 第二批 ⑨: what a width is measured on, never the English a label is given).
+static func shown(text: String) -> String: return String(TranslationServer.translate(text))
+
+## `text`'s width in a UiKit style's font and size (the theme the panels draw with): the cuts that keep a line to a
+## width measure with it.
+static func text_width(text: String, style: StringName = UiTokens.STYLE_C11_B) -> float:
+	var th := UiKit.theme()
+	return th.get_font(&"font", style).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, th.get_font_size(&"font_size", style)).x
+
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
 	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now
@@ -1030,6 +1040,14 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 			plots.append(p)
 		v["plots"] = plots
+	# a city gathering spot's cooldown (v4q(4): view.gather.city_ready, ms left): counted down, gone once ready
+	var g = v.get("gather", null)
+	if g is Dictionary and g.get("city_ready") is Dictionary and not (g.city_ready as Dictionary).is_empty():
+		var left := {}
+		for id in g.city_ready:
+			var ms := float(g.city_ready[id]) - elapsed_ms
+			if ms > 0.0: left[id] = ms
+		own.call(v, "gather")["city_ready"] = left
 	var guide = v.get("guide", null)
 	var row = guide.get("row", null) if guide is Dictionary else null
 	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:
@@ -1719,6 +1737,9 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 		if fish > 0 and not guided_stove: now_rows.append(_row("Cook with %d fish" % fish, "pot", "stove"))
 	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
 	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
+	# v4q(9) ① (user b): the vein row follows the other things to do now, before the Homestead material row
+	var vein := vein_row(view, home_row)
+	if not vein.is_empty(): now_rows.append(vein)
 	if not home_row.is_empty() and bool(home_row.now) and str(home_row.row.go) != "sign": now_rows.append(home_row.row)
 	now_rows.append_array(progress)
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
@@ -1766,7 +1787,7 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	# or is Upgrade to Homestead (不知火舞 on 341, A′: a moment, as a hand-in is pay; a material row still gives way).
 	var keeps := func(r: Dictionary) -> bool:
 		var dot := str(r.get("dot", ""))
-		return dot.begins_with("deliver:") or dot.begins_with("homestead:")
+		return dot.begins_with("deliver:") or dot.begins_with("homestead:") or dot.begins_with("vein:")   # v4q(9) ①: nor the vein row
 	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
 			and not keeps.call(rows[2]):
 		rows[2] = latest
@@ -1774,6 +1795,62 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 	if P0Guide.guide_on(view) and not lead.is_empty():
 		rows = lead + rows.filter(func(r): return str(r.get("dot", "")) != str(lead[0].dot) and str(r.line) != str(lead[0].line))
 	return P0Guide.focus_first(rows.slice(0, 3))
+
+## v4q(9) ① (SGODOT-355; 不知火舞 / the user a+b, 11-02): `Ironvale Vein · Reach Floor 10`, Show to the nearest free iron
+## vein (view.wild.near3_sites, the very one Pip's line and the server's nearestFreeVein name) — when the guide is over,
+## Pip's First Dig is done (view.first_dig.done), nobody has reached its Floor 10 (view.mine.records: that vein's, and any
+## other vein of the same main the client knows), one of the next three Homestead levels needs Iron Ore, and Homestead
+## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. None when the
+## Homestead row already points at that very mine (its first gap is that ore, its Show that mine). Red dot `vein:<id>`,
+## once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
+const VEIN_MAINS := ["iron_ore", "quartz"]
+const VEIN_UNTIL_LEVEL := 7
+const VEIN_FLOOR := 10
+static func vein_row(view: Dictionary, home_row := {}) -> Dictionary:
+	if P0Guide.guide_on(view): return {}
+	var dig = view.get("first_dig", null)
+	if not dig is Dictionary or not bool(dig.get("done", false)): return {}
+	var lv := int(view.get("homestead", {}).get("level", 1))
+	if lv >= VEIN_UNTIL_LEVEL: return {}
+	var levels: Array = content().get("homestead", {}).get("levels", [])
+	var sites = view.get("wild", {}).get("near3_sites", []) if view.get("wild", null) is Dictionary else []
+	var records: Dictionary = view.get("mine", {}).get("records", {}) if view.get("mine", null) is Dictionary and view.mine.get("records") is Dictionary else {}
+	for main in VEIN_MAINS:
+		if not levels.any(func(l): return int(l.get("level", 0)) in range(lv + 1, lv + 4) \
+				and (l.get("materials", []) as Array).any(func(m): return str(m[0]) == main)): continue
+		var site := {}
+		for x in sites if sites is Array else []:
+			if x is Dictionary and str(x.get("type", "")) == "vein" and str(x.get("main", "")) == main:
+				site = x
+				break
+		if site.is_empty() or _vein_reached(records, sites, main): continue
+		var go := "mine:" + str(site.id)
+		if not home_row.is_empty() and str(home_row.get("row", {}).get("go", "")) == go: return {}   # the Homestead row says it
+		# down that mine (VG4 384:187745): the row stays, with no button (周瑜 on #711: not left to show_label)
+		var down := str(view.get("mine", {}).get("at", {}).get("mine", "")) == str(site.id) if view.get("mine", null) is Dictionary and view.mine.get("at") is Dictionary else false
+		return _row("%s · Reach Floor %d" % [str(site.get("name", "")), VEIN_FLOOR], "vein", "" if down else go, "vein:" + str(site.id))
+	return {}
+
+## Whether a vein of this main has been gone down to Floor 10 (不知火舞: any iron vein's F10 ends the iron row, a new
+## home's too): a record's own type / main (周瑜 #712: the server's, every mine the player has been down), else — a
+## server before it — one of the free three's or a site the map has read (P0WildSites).
+static func _vein_reached(records: Dictionary, near3: Variant, main: String) -> bool:
+	for id in records:
+		var rec: Dictionary = records[id]
+		if int(rec.get("deepest", 0)) < VEIN_FLOOR: continue
+		if rec.has("type"):
+			if str(rec.get("type", "")) == "vein" and str(rec.get("main", "")) == main: return true
+			continue
+		var x := {}
+		for n in near3 if near3 is Array else []:
+			if n is Dictionary and str(n.get("id", "")) == str(id): x = n
+		if x.is_empty():
+			var wild = load("res://modules/p0/p0_wild_sites.gd")
+			if wild.has_site(str(id)):
+				var s: Dictionary = wild.site(str(id))
+				x = {"type": str(s.get("type", "")), "main": s.get("mine", {}).get("main", null) if s.get("mine") is Dictionary else null}
+		if str(x.get("type", "")) == "vein" and str(x.get("main", "")) == main: return true
+	return false
 
 ## The order q(255) ① takes a Homestead level's materials in: Timber, Stone, Reeds, Copper Ore, Clay, Rock Salt.
 const HOME_MATERIAL_ORDER := ["wood", "stone", "fiber", "copper_ore", "clay", "rock_salt"]
@@ -1817,11 +1894,66 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
 	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
 
-## Where a Homestead material's Show goes (q(255) ②) — {go, now}, now = it can be gathered there at once. The farm's
-## spots were the targets until they left with v4q(4) ① (the user, 11-02); a city's point or a mine on the map is C's
-## (亚瑟: the nearest point / mouth), so none for now.
-static func _home_material_go(_view: Dictionary, _id: String) -> Dictionary:
+## Where a Homestead material's Show goes (q(255) ②, 355 C2; 李白's v4q(4) / (5) addendum eb1d7c20) — {go, now}, now = it
+## can be had there at once. A gathered material: the spot gather_spot_for picks (`gather:<id>`), now when it is ready.
+## Iron Ore / Quartz: the free vein of that main (view.wild.near3_sites, from home); Copper Ore / Coal / Rock Salt: the
+## free quarry (`mine:<id>`), now while the player is down it. Clay: a ready Clay Pit, else (every pit cooling) the
+## quarry, else the pit. A spot cooling down still points (now false: q(255) ⑥ lists it with what is still to go); the
+## city's spots not read yet (P0Runtime._read_home_places), or no such site: no target.
+const GATHERED := ["wood", "stone", "fiber", "clay", "wild_herb", "hardwood", "flax"]   # the yields of world_gen gather_points
+const VEIN_ORES := ["iron_ore", "quartz"]
+const QUARRY_ORES := ["copper_ore", "coal", "rock_salt"]
+static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
+	var spot := gather_spot_for(view, id) if id in GATHERED else {}
+	if not spot.is_empty() and (bool(spot.ready) or id != "clay"): return {"go": "gather:" + str(spot.id), "now": bool(spot.ready)}
+	var site := ""
+	if id in VEIN_ORES: site = near3_site(view, "vein", id)
+	elif id in QUARRY_ORES or id == "clay": site = near3_site(view, "quarry")
+	if site != "":
+		var at = view.get("mine", {}).get("at", null)   # null while the player is not down a mine (the server's view)
+		return {"go": "mine:" + site, "now": at is Dictionary and str(at.get("mine", "")) == site}
+	if not spot.is_empty(): return {"go": "gather:" + str(spot.id), "now": false}
 	return {"go": "", "now": false}
+
+## The gathering spot for `item` (eb1d7c20): in the city the player is in when it has one (another town's spots first),
+## else in the home city — of the spots whose first yield is it, the nearest that can be gathered now (not in
+## view.gather.city_ready) {id, ready: true}; every one cooling: the nearest {id, ready: false}. Nearest to the city's
+## base point (P0Clusters; the farm when the city is not in the table), the table's order breaking a tie. {} when no
+## spot of it is read.
+static func gather_spot_for(view: Dictionary, item: String) -> Dictionary:
+	var places = load("res://modules/p0/p0_city_places.gd")
+	var home := str(load("res://modules/p0/p0_travel.gd").home(view))
+	var here := str(view.get("travel", {}).get("here", ""))
+	var yields := func(p: Dictionary) -> bool:
+		var y: Array = p.get("yield", [])
+		return not y.is_empty() and str(y[0][0]) == item
+	var city := home
+	var spots: Array = (places.gather(here) as Array).filter(yields) if here != "" and here != home else []
+	if spots.is_empty(): spots = (places.gather(home) as Array).filter(yields)
+	else: city = here
+	if spots.is_empty(): return {}
+	var cl := P0Clusters.get_cluster(city)
+	var farm: Dictionary = view.get("home", {}).get("farm", {}) if view.get("home", {}).get("farm") is Dictionary else {}
+	var base := Vector2(float(cl.lat), float(cl.lng)) if not cl.is_empty() else (Vector2(float(farm.get("lat", 0.0)), float(farm.get("lng", 0.0))) if not farm.is_empty() else Vector2.INF)
+	var far := func(p: Dictionary) -> float:
+		if base == Vector2.INF: return 0.0
+		return pow(float(p.lat) - base.x, 2.0) + pow((float(p.lng) - base.y) * cos(deg_to_rad(base.x)), 2.0)
+	var cooling: Dictionary = view.get("gather", {}).get("city_ready", {}) if view.get("gather", {}).get("city_ready") is Dictionary else {}
+	var best := {}
+	var any := {}
+	for p in spots:
+		if any.is_empty() or float(far.call(p)) < float(far.call(any)): any = p
+		if int(cooling.get(str(p.id), 0)) > 0: continue
+		if best.is_empty() or float(far.call(p)) < float(far.call(best)): best = p
+	return {"id": str(best.id), "ready": true} if not best.is_empty() else {"id": str(any.id), "ready": false}
+
+## One of the free three wild sites (view.wild.near3_sites, nearest first) of `type` — a vein of `main`, or the quarry —
+## its id, "" when none.
+static func near3_site(view: Dictionary, type: String, main := "") -> String:
+	var sites = view.get("wild", {}).get("near3_sites", [])
+	for x in sites if sites is Array else []:
+		if x is Dictionary and str(x.get("type", "")) == type and (main == "" or str(x.get("main", "")) == main): return str(x.get("id", ""))
+	return ""
 
 ## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.
 static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:
@@ -2167,8 +2299,10 @@ static func market_sell_line(view: Dictionary) -> String:
 	if bool(d.get("home", true)): return "I'll take your %s. Same price as your stall." % things
 	return "%s? I'll take them, though home pays better." % (things.left(1).to_upper() + things.substr(1))
 
-## Small counts in keeper speech ("sows three plots"), digits from ten up.
+## Small counts in keeper speech ("sows three plots"), digits from ten up; digits under 中文 (「一次能播 3 块田」, 0.2.23 —
+## the English word stayed in the Chinese line).
 static func _count_word(n: int) -> String:
+	if TranslationServer.get_locale() == "zh_CN": return str(n)
 	var words := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 	return words[n] if n >= 0 and n < words.size() else str(n)
 
@@ -2408,6 +2542,10 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 
 ## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places, the
 ## same line as the workbench (P0MaterialLogic.material_source, Li Bai q(65)).
+## v4q(1) (frames A3a–c, 355 48dedfd0; SGODOT-394): a skill's line says how it levels (and Shows its Skills), the travel
+## gates how they count.
+const HOME_SKILL_HOW := {"farming": "Sow and harvest to level up", "fishing": "Catch fish to level up",
+	"cooking": "Cook dishes to level up"}
 static func home_source(view: Dictionary, id: String) -> Dictionary:
 	if id.begins_with("skill_"):
 		var key := id.trim_prefix("skill_")
@@ -2415,11 +2553,13 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 		if not next is Dictionary: return {"text": "", "go": ""}
 		for skill in next.get("skills", []):
 			if str(skill.skill) == key:
-				return {"text": "%s Lv%d · now %d" % [key.capitalize(), int(skill.need), int(skill.have)], "go": "skills"}
+				return {"text": "%s Lv%d · %s" % [key.capitalize(), int(skill.need), HOME_SKILL_HOW.get(key, "")], "go": "skills"}
 		return {"text": "", "go": ""}
 	match id:
 		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
-		"stamps", "climates": return {"text": "Stamps · visit new cities", "go": "map"}
+		# no Show on the travel gates (A3b / A3c: only a skill's line has one), so they fit as drawn
+		"stamps": return {"text": "Stamps · First visit to a city · up to 2 a day", "go": ""}
+		"climates": return {"text": "Climates · Visit a city or wild site in another climate", "go": ""}
 	return need_source(view, id)
 
 ## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the
