@@ -1,0 +1,94 @@
+{
+  "triangles": 896,
+  "visible_triangles": 332,
+  "surfaces": 2,
+  "surfaces_scope": "simultaneously visible: shared base + exactly one tier",
+  "stored_surfaces": 5,
+  "materials": 1,
+  "common_triangles": 144,
+  "tier_triangles": {
+    "wood": 188,
+    "bronze": 188,
+    "silver": 188,
+    "gold": 188
+  },
+  "bytes": 53520,
+  "sha256": "915758a8532b3c8649a3825154d5cc1c1563224f5290213be6bca86261dbe4ae",
+  "generator": "tools/art/build_homestead_badge.py",
+  "source": "tools/art/source/homestead_badge_401/homestead_badge.blend",
+  "units": "metres",
+  "front": "+Z",
+  "pivot": "stone base bottom centre",
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "palette_srgb": {
+    "post": "B58551",
+    "stone": "BFB8A5",
+    "stone_light": "CEC6B3",
+    "wood_ring": "AA713D",
+    "wood_face": "F6E6CB",
+    "bronze_ring": "D68A47",
+    "bronze_face": "F9E8CC",
+    "silver_ring": "ABB3BC",
+    "silver_face": "F9F8F3",
+    "gold_ring": "D9AC36",
+    "gold_face": "F0D45A"
+  },
+  "diameter_m": 0.8,
+  "clear_face_diameter_m": 0.65,
+  "disc_centre_y_m": 1.0,
+  "tilt_x_degrees": -25,
+  "timber_height_m": 0.6,
+  "tier_levels": {
+    "wood": [
+      2,
+      4
+    ],
+    "bronze": [
+      5,
+      9
+    ],
+    "silver": [
+      10,
+      14
+    ],
+    "gold": [
+      15,
+      17
+    ]
+  },
+  "default_tier": "wood",
+  "material_contract": {
+    "roughness": 0.9,
+    "metallic": 0,
+    "specular": 0.18,
+    "vertex_color_is_srgb": false
+  },
+  "sockets": {
+    "BadgeNumber": {
+      "parent": "BadgeFace",
+      "position": [
+        0,
+        0,
+        0.055
+      ],
+      "type": "Marker3D",
+      "surface_offset_m": 0.003
+    },
+    "BadgeLv": {
+      "parent": "BadgeFace",
+      "position": [
+        0,
+        0.238,
+        0.055
+      ],
+      "type": "Marker3D",
+      "surface_offset_m": 0.003
+    }
+  },
+  "provenance": {
+    "timber": "upgrade_plaque #746 / 2761ba4c single timber post, resized; geometry regenerated",
+    "stone": "New five-pebble base from approved concept A",
+    "medallion": "New C63 A model; four blank vertex-colour variants"
+  }
+}

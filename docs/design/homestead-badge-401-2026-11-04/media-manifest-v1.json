@@ -1,0 +1,68 @@
+[
+  {
+    "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv3.png",
+    "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv3.png",
+    "sha256": "80e8202b03de7f70cd3d2259c631c6759e7b669e2d29a8ba32f45cba573067fa",
+    "bytes": 313529,
+    "mime": "image/png",
+    "size": [
+      760,
+      900
+    ]
+  },
+  {
+    "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv7.png",
+    "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv7.png",
+    "sha256": "ae7cd9d0e13a1bff6e1f3dbe92a4c8524d126596bd0a9113c8a318929ce65dca",
+    "bytes": 313448,
+    "mime": "image/png",
+    "size": [
+      760,
+      900
+    ]
+  },
+  {
+    "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv10.png",
+    "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv10.png",
+    "sha256": "069a76a8ace83e01225b2165dcdc0fc1c7d1be15b0d8fb9c9491c30db8e5ce32",
+    "bytes": 313751,
+    "mime": "image/png",
+    "size": [
+      760,
+      900
+    ]
+  },
+  {
+    "name": "SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv17.png",
+    "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_follow_Lv17.png",
+    "sha256": "0cf888e877387b308ef688c862a037125b5079bce6635323172ab5eede77adf3",
+    "bytes": 313520,
+    "mime": "image/png",
+    "size": [
+      760,
+      900
+    ]
+  },
+  {
+    "name": "SGODOT-401_HOMESTEAD_BADGE_v1_four_tiers_close.png",
+    "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_four_tiers_close.png",
+    "sha256": "b89d43ee7d6a379712f95fbc711bca5a550ed73814248df4b19c7f0268817327",
+    "bytes": 405880,
+    "mime": "image/png",
+    "size": [
+      1600,
+      940
+    ]
+  },
+  {
+    "name": "SGODOT-401_HOMESTEAD_BADGE_v1_opening_tier_comparison.png",
+    "path": "docs/design/homestead-badge-401-2026-11-04/SGODOT-401_HOMESTEAD_BADGE_v1_opening_tier_comparison.png",
+    "sha256": "8206e7f1e3af3ce8e701d950d83fbbaa459bdb1768ebab290103ecbc0eb64032",
+    "bytes": 319761,
+    "mime": "image/png",
+    "size": [
+      1440,
+      910
+    ]
+  }
+]
