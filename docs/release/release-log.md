@@ -51,11 +51,11 @@
 - 测试：tests/p0 1,799 例、ui_kit 336 例、localization 28 例全过（冻结头上跑）。
 - 冒烟（模拟器，本地服 `f976f9ab`）：在 0.2.23 上覆盖安装，旧档直接进，默认英文；正式包里没有测试用的 +1h / +4h / Legend 按钮。亮片在渔具铺和背包卡上的说明对；家园面板写 `Need 3 more Reeds`，材料复数里不再出现 -ies（这个号身上没有 Clay 的委托，`7 Clay` 没直接看到）；Nadia、Lena、Lou 的新装扮和 Lou 的手绘头像卡都正常，没有发黑、发白、发紫或缺贴图（Rafa 这次没遇到）；中文抽查「还差 3 个芦苇」「黏土岸」。传说鱼的收线手感在正式包里没法造出来，是在 #714 的测试包上对比的。
 
-服务端：**不部署，线上继续是 `p0-server:bec4b0cde`**（11-03 15:03 起，存档 v6，最低版本 `2026110201`，语音开着）。`bec4b0cd..f976f9ab` 里打进服务端镜像的文件改了 3 个，都不影响运行：
+服务端：**不部署，线上继续是 `p0-server:bec4b0cde`**（11-03 15:03 起，存档 v6，最低版本 `2026110201`，语音开着）。P0 镜像按 `server/deploy/p0/Dockerfile` 打。`bec4b0cd..f976f9ab` 里拷进镜像的文件改了 3 个，都不影响运行：
 
 - `server/tools/i18n_city_names.ts`：离线工具，0.2.23 时已说明。
-- `assets/farm/data/fishing.json`（#714）：服务端只有 Journey 的旧代码（`server/src/domain`）在读，P0 服务端不引用它；收线小游戏在客户端算，这一改随客户端包生效。
-- `assets/avatar/parts_manifest.json`（C40 第三批）：P0 在线房间的外观白名单会读它。新加的 6 个部件全在 `npc_only.json` 里，玩家本来就不能穿，所以新旧服务端的白名单一样。已有部件没有改动。
+- `assets/avatar/parts_manifest.json` 和 `assets/avatar/npc_only.json`（C40 第三批）：两份都只加了同样 6 个部件。P0 在线房间的外观白名单 = 清单 − denylist − npc_only，所以这 6 个玩家都穿不了，新旧服务端的白名单一样。已有部件没有改动。
+- #714 改的 `assets/farm/data/fishing.json` 不拷进 P0 镜像；收线小游戏在客户端算，这一改随客户端包生效。
 
 iOS（2026-11-04，SGODOT-356）：
 
@@ -69,7 +69,7 @@ iOS（2026-11-04，SGODOT-356）：
 - **传说鱼好钓一些**（q(282)，#714）：收线时绿条宽一点（0.22），鱼游得慢一点（0.47），变向间隔拉长（每 20 步），鱼跑出绿条时进度掉得慢一点（0.13），回到 q(282) 定的成功率目标，约 62%。
 - **亮片让稀有鱼游得慢**（q(282)，#714）：钩上挂着亮片（Spinner Lure）时，咬钩的 Rare 和 Legendary 鱼游速变成 ×0.8。渔具铺和背包卡上的说明写 `More Rare fish` / `Rare and Legendary swim slower`。
 - **材料复数用它自己的名字**（#741）：`7 Clay`、`Need 3 more Timber`，不再拼出 `7 Claies` 这类词。
-- **第三批 NPC 装扮**（C40，#653 #574 #575）：Nadia 戴上烘焙帽、系上围裙；Lena 换了发型，Rafa 换了发型和衣服；Lou 穿荷官装，头像卡换成手绘的；牌室后墙的阴影也修了。Lena、Rafa、Nadia 的居民卡一起更新。
+- **第三批 NPC 装扮**（C40，#653 #574 #575）：Nadia 戴上烘焙帽、系上围裙；Lena 戴上芥末黄雨帽，Rafa 换成白顶帽、藏青横条衫；Lou 穿荷官装，头像卡换成手绘的；牌室后墙的阴影也修了。Lena、Rafa、Nadia 的居民卡一起更新。
 
 已知问题：
 
