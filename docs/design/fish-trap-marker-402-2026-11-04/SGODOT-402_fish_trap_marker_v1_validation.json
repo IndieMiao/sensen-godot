@@ -1,0 +1,794 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "concept": "402 b82ebef9; approved A / 0331ee23",
+  "manifest": {
+    "task": "SGODOT-402",
+    "revision": "v1",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "file": "fish_trap_marker.glb",
+    "mesh": "fish_trap_marker_mobile",
+    "units": "metres; Y up; +Z front",
+    "origin": "water-surface centre, Y=0",
+    "scale": [
+      1,
+      1,
+      1
+    ],
+    "waterline_y": 0,
+    "bounds": [
+      [
+        -0.22499999403953552,
+        -0.05000000074505806,
+        -0.22499999403953552
+      ],
+      [
+        0.22499999403953552,
+        0.3799999952316284,
+        0.22499999403953552
+      ]
+    ],
+    "dimensions_xyz": [
+      0.44999998807907104,
+      0.4299999959766865,
+      0.44999998807907104
+    ],
+    "triangles": 500,
+    "triangle_limit": 500,
+    "surfaces": 1,
+    "material": "opaque matte linear vertex colour; roughness .9, metallic 0; no textures",
+    "cast_shadow": false,
+    "skeleton": false,
+    "animations": [],
+    "buoy": {
+      "diameter_m": 0.3,
+      "body_height_m": 0.22,
+      "center": [
+        0,
+        0.255,
+        0
+      ],
+      "coral_srgb": "E07A5F",
+      "existing_cast_bobber_width_m": 0.218383863842247,
+      "width_ratio": 1.373727869457927,
+      "comparison_measurement": "Native Godot SphereMesh vertices at b1 FLOAT_SCALE=1.6; parameter-only diameter .224m is not the final tessellated width"
+    },
+    "basket": {
+      "width_m": 0.45,
+      "crown_y_m": 0.1,
+      "underwater_depth_m": 0.05,
+      "visible_crown_at_low_bob_m": 0.088,
+      "weave": "Raised meridian strips and two cross bands over dark recess dome; no separate water mesh"
+    },
+    "runtime": {
+      "remove_legacy_trap_float_scale": 1.6,
+      "motion": "Consumer bobs origin +/- .012m; no baked animation",
+      "water_y_m": 0.055,
+      "existing_prompt_height_above_origin_m": 0.6
+    },
+    "palette_srgb": {
+      "coral": "E07A5F",
+      "cream": "FFF2D1",
+      "pole": "6E7B74",
+      "rope": "EBDCB7",
+      "wicker_recess": "805736",
+      "wicker_strip": "B98A5E",
+      "wicker_band": "C99A6B",
+      "wicker_rim": "9A6F47"
+    },
+    "source_parts_triangles": {
+      "Cage recess dome and five-centimetre submerged skirt": 108,
+      "Woven meridian 01": 6,
+      "Woven meridian 02": 6,
+      "Woven meridian 03": 6,
+      "Woven meridian 04": 6,
+      "Woven meridian 05": 6,
+      "Woven meridian 06": 6,
+      "Woven meridian 07": 6,
+      "Woven meridian 08": 6,
+      "Woven meridian 09": 6,
+      "Woven meridian 10": 6,
+      "Woven meridian 11": 6,
+      "Woven meridian 12": 6,
+      "Woven cross band 1 segment 01": 2,
+      "Woven cross band 1 segment 02": 2,
+      "Woven cross band 1 segment 03": 2,
+      "Woven cross band 1 segment 04": 2,
+      "Woven cross band 1 segment 05": 2,
+      "Woven cross band 1 segment 06": 2,
+      "Woven cross band 1 segment 07": 2,
+      "Woven cross band 1 segment 08": 2,
+      "Woven cross band 1 segment 09": 2,
+      "Woven cross band 1 segment 10": 2,
+      "Woven cross band 1 segment 11": 2,
+      "Woven cross band 1 segment 12": 2,
+      "Woven cross band 2 segment 01": 2,
+      "Woven cross band 2 segment 02": 2,
+      "Woven cross band 2 segment 03": 2,
+      "Woven cross band 2 segment 04": 2,
+      "Woven cross band 2 segment 05": 2,
+      "Woven cross band 2 segment 06": 2,
+      "Woven cross band 2 segment 07": 2,
+      "Woven cross band 2 segment 08": 2,
+      "Woven cross band 2 segment 09": 2,
+      "Woven cross band 2 segment 10": 2,
+      "Woven cross band 2 segment 11": 2,
+      "Woven cross band 2 segment 12": 2,
+      "Waterline wicker rim": 24,
+      "Short sage-green stem": 12,
+      "Large coral upper and cream lower buoy": 120,
+      "Small coral top button": 12,
+      "Two rope turns tying stem to cage crown": 84,
+      "Short rope tail resting on weave": 20
+    },
+    "source": "tools/art/source/fish_trap_marker_402/fish_trap_marker.blend",
+    "generator": "tools/art/source/fish_trap_marker_402/build.py",
+    "sha256": "eafbc896d2db95a8cd51813c58b57c3dd0db828ee8b863b7cb13d7c51529ae10"
+  },
+  "reference_sha256": {
+    "SGODOT-402_fish_trap_marker_concept_v1.jpg": "0f8e0c924322cf03a6cbdca3a3d53fbd4c2d3d6d27e4f92010a27105d6c91cb4",
+    "bobber.png": "b4a4f442118684c5e8c37b65cfe42db0d5f30692cb19c6174fb8c4f8a4603ddb",
+    "trap_fish.svg": "e4a54ac2be48f662a9922323e6cdeec6ce12a8544afe63cf2e3d2a053b4fd637"
+  },
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "One named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "One surface",
+        "passed": true
+      },
+      {
+        "check": "Actual 500 triangles, within 500 budget",
+        "passed": true
+      },
+      {
+        "check": "Actual bounds retain final .45m width / .38m above / .05m below water",
+        "passed": true
+      },
+      {
+        "check": "Manifest matches actual vertex bounds",
+        "passed": true
+      },
+      {
+        "check": "Waterline origin horizontally centered",
+        "passed": true
+      },
+      {
+        "check": "Only positions, normals and vertex colors; no texture channels or skin weights",
+        "passed": true
+      },
+      {
+        "check": "No textures",
+        "passed": true
+      },
+      {
+        "check": "No skeleton or baked animation",
+        "passed": true
+      },
+      {
+        "check": "Finite geometry and unit normals",
+        "passed": true
+      },
+      {
+        "check": "No degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "Opaque linear vertex color payload",
+        "passed": true
+      },
+      {
+        "check": "Only documented palette colors",
+        "passed": true
+      },
+      {
+        "check": "Coral matches i-trap #E07A5F in linear values",
+        "passed": true
+      },
+      {
+        "check": "Actual coral buoy width .30m, 37 percent wider than native .21838m bobber",
+        "passed": true
+      },
+      {
+        "check": "Woven dome stays at least .088m above water at bottom of existing bob",
+        "passed": true
+      },
+      {
+        "check": "Baked unit node transform",
+        "passed": true
+      },
+      {
+        "check": "One material",
+        "passed": true
+      },
+      {
+        "check": "Opaque matte, non-metallic material",
+        "passed": true
+      },
+      {
+        "check": "Correct exterior winding, no blanket two-sided material",
+        "passed": true
+      },
+      {
+        "check": "GLB importer UID present",
+        "passed": true
+      },
+      {
+        "check": "texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "Static asset; no shadow mesh import",
+        "passed": true
+      },
+      {
+        "check": "Delivered colour/no-shadow import hook assigned",
+        "passed": true
+      },
+      {
+        "check": "Import script UID delivered",
+        "passed": true
+      },
+      {
+        "check": "Manifest SHA-256 matches actual GLB",
+        "passed": true
+      },
+      {
+        "check": "Critical b1 pond, bobber, water and UI files are unchanged in isolated project",
+        "passed": true
+      },
+      {
+        "check": "Render fixture uses exact delivered model bytes",
+        "passed": true
+      }
+    ],
+    "triangles": 500,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.22499999403953552,
+        -0.05000000074505806,
+        -0.22499999403953552
+      ],
+      [
+        0.22499999403953552,
+        0.3799999952316284,
+        0.22499999403953552
+      ]
+    ],
+    "buoy_width_m": 0.30000001192092896,
+    "dome_above_low_bob_m": 0.08800000149011612,
+    "sha256": "eafbc896d2db95a8cd51813c58b57c3dd0db828ee8b863b7cb13d7c51529ae10",
+    "runtime": {
+      "runtime_commit": "6cf0bcb2a89dc7aa807291975402ab2a6d5fa6a0",
+      "art_base": "caef42a073ce20a7bb16b9414b9026316c9587f6",
+      "files": {
+        "scenes/p0/p0_pond.gd": "ff5329d10f06d8daea2ef8f7b3136ed43c4e12077606f5a58d64e014c5add9b2",
+        "scenes/p0/p0_ui.gd": "ef7be95690535a3cef5c4850b076754cbad34e0fadda069434df6d4910e370fd",
+        "modules/p0/p0_trap.gd": "c3097210cbbbb8db29a6876041d0188358c3ef66441245b282204bfd931bee53",
+        "modules/fishing/fishing_presentation.gd": "bcc62508f504502b18b2e1d90ea646db819e7a72e79d7e03b2c2c3aa93db458f",
+        "modules/fishing/fishing_water.gd": "6a260e1888767591b9d67c75ffdc91e127208f3f65d2759fefc174df923141b1",
+        "assets/p0/icons/trap_fish.svg": "e4a54ac2be48f662a9922323e6cdeec6ce12a8544afe63cf2e3d2a053b4fd637",
+        "assets/p0/icons/bobber.svg": "8313d28b601d85fc404a71b25aa1a5e04e527f5aedc74158081ebd667f0f4dd0"
+      }
+    },
+    "passed": true
+  },
+  "source": {
+    "checks": [
+      {
+        "check": "Editable waterline pivot is zero at unit scale",
+        "passed": true
+      },
+      {
+        "check": "Every exported part has a named editable source object",
+        "passed": true
+      },
+      {
+        "check": "No temporary export scene or armature in saved source",
+        "passed": true
+      },
+      {
+        "check": "Cage recess dome and five-centimetre submerged skirt: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Large coral upper and cream lower buoy: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Short rope tail resting on weave: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Short sage-green stem: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Small coral top button: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Two rope turns tying stem to cage crown: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Waterline wicker rim: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 01: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 02: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 03: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 04: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 05: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 06: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 07: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 08: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 09: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 10: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 11: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 1 segment 12: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 01: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 02: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 03: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 04: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 05: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 06: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 07: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 08: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 09: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 10: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 11: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven cross band 2 segment 12: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 01: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 02: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 03: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 04: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 05: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 06: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 07: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 08: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 09: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 10: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 11: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Woven meridian 12: named parent and triangle budget",
+        "passed": true
+      },
+      {
+        "check": "Editable source contains 500 triangles",
+        "passed": true
+      },
+      {
+        "check": "Editable source bounds match exported GLB",
+        "passed": true
+      }
+    ],
+    "parts": 43,
+    "triangles": 500,
+    "bounds": [
+      [
+        -0.22499999403953552,
+        -0.05000000074505806,
+        -0.22499999403953552
+      ],
+      [
+        0.22499999403953552,
+        0.3799999952316284,
+        0.22499999403953552
+      ]
+    ],
+    "passed": true
+  },
+  "godot": {
+    "captures": [
+      {
+        "bobber_screen_rect": [
+          404.983917236328,
+          732.13818359375,
+          23.3982543945312,
+          35.09716796875
+        ],
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.283084, 27.92993, 24.9577)]",
+        "name": "bank_43deg_comparison",
+        "pitch": -42.9999961853027,
+        "pixels": [
+          720,
+          1600
+        ],
+        "trap_screen_rect": [
+          296.147338867188,
+          724.370910644531,
+          48.2142639160156,
+          53.4120483398438
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "bobber_screen_rect": [],
+        "camera": "[X: (0.906308, 0.0, -0.422618), Y: (-0.178606, 0.906308, -0.383022), Z: (0.383022, 0.422618, 0.821394), O: (8.976304, 3.605946, 1.063981)]",
+        "name": "marker_closeup",
+        "pitch": -24.9999980926514,
+        "pixels": [
+          1200,
+          1000
+        ],
+        "trap_screen_rect": [
+          365.275207519531,
+          296.574768066406,
+          469.449096679688,
+          505.934875488281
+        ],
+        "width_m": 1.14999997615814
+      },
+      {
+        "bobber_screen_rect": [
+          202.491958618164,
+          366.069091796875,
+          11.6991271972656,
+          17.548583984375
+        ],
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.283084, 27.92993, 24.9577)]",
+        "name": "native_icon_name_bar",
+        "pitch": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "trap_screen_rect": [
+          148.073669433594,
+          362.185455322266,
+          24.1071319580078,
+          26.7060241699219
+        ],
+        "width_m": 6.71999979019165
+      },
+      {
+        "bobber_screen_rect": [
+          202.491958618164,
+          366.069091796875,
+          11.6991271972656,
+          17.548583984375
+        ],
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.283084, 27.92993, 24.9577)]",
+        "name": "prompt_height_proposal_090m",
+        "pitch": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "trap_screen_rect": [
+          148.073669433594,
+          362.185455322266,
+          24.1071319580078,
+          26.7060241699219
+        ],
+        "width_m": 6.71999979019165
+      }
+    ],
+    "checks": [
+      {
+        "check": "Native b1 player assembled",
+        "passed": true
+      },
+      {
+        "check": "Native pond trap placement plan exists",
+        "passed": true
+      },
+      {
+        "check": "Formal marker imported at unit scale; no legacy 1.6 multiplier",
+        "passed": true
+      },
+      {
+        "check": "Comparison cast bobber is inside actual pond water",
+        "passed": true
+      },
+      {
+        "check": "Native pond camera pitch 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "Actual imported marker 500 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "Actual marker waterline origin: -.05 to +.38m",
+        "passed": true
+      },
+      {
+        "check": "Actual cage width .45m",
+        "passed": true
+      },
+      {
+        "check": "Marker casts no shadow",
+        "passed": true
+      },
+      {
+        "check": "Matte linear vertex colour material",
+        "passed": true
+      },
+      {
+        "check": "Marker has no texture",
+        "passed": true
+      },
+      {
+        "check": "Native cast bobber measured vertex width .21838m at original 1.6 scale",
+        "passed": true
+      },
+      {
+        "check": "Capture bank_43deg_comparison",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for FishTrap",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for Float",
+        "passed": true
+      },
+      {
+        "check": "Capture marker_closeup",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for FishTrap",
+        "passed": true
+      },
+      {
+        "check": "Native b1 trap icon/name strip visible with real prompt",
+        "passed": true
+      },
+      {
+        "check": "Capture native_icon_name_bar",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for FishTrap",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for Float",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for FishTrap",
+        "passed": true
+      },
+      {
+        "check": "Review-only .9m prompt proposal clears actual model vertex projection",
+        "passed": true
+      },
+      {
+        "check": "Capture prompt_height_proposal_090m",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for FishTrap",
+        "passed": true
+      },
+      {
+        "check": "Finite screen bounds for Float",
+        "passed": true
+      },
+      {
+        "check": "Actual Mobile renderer",
+        "passed": true
+      }
+    ],
+    "comparison": {
+      "bobber_scale": 1.60000002384186,
+      "bobber_width_m": 0.218383863842247,
+      "cast_target": [
+        6.81212615966797,
+        0.0,
+        -5.50716924667358
+      ],
+      "native_bobber": {
+        "bounds": [
+          [
+            -0.068244956433773,
+            -0.109999999403954,
+            -0.068244956433773
+          ],
+          [
+            0.068244956433773,
+            0.135000005364418,
+            0.068244956433773
+          ]
+        ],
+        "size": [
+          0.136489912867546,
+          0.245000004768372,
+          0.136489912867546
+        ],
+        "surfaces": 2,
+        "triangles": 336
+      },
+      "player": [
+        6.125,
+        0.0,
+        -1.875
+      ],
+      "trap_buoy_width_m": 0.3,
+      "trap_origin": [
+        5.91212606430054,
+        0.0549999997019768,
+        -5.50716924667358
+      ],
+      "width_ratio": 1.37372786945793
+    },
+    "model": {
+      "bounds": [
+        [
+          -0.224999994039536,
+          -0.0500000007450581,
+          -0.224999994039536
+        ],
+        [
+          0.224999994039536,
+          0.379999995231628,
+          0.224999994039536
+        ]
+      ],
+      "size": [
+        0.449999988079071,
+        0.430000007152557,
+        0.449999988079071
+      ],
+      "surfaces": 1,
+      "triangles": 500
+    },
+    "passed": true,
+    "prompt": {
+      "bar_rect": [
+        144.127227783203,
+        339.569427490234,
+        132.0,
+        32.0
+      ],
+      "fact": "0/3",
+      "logical_viewport": [
+        360,
+        800
+      ],
+      "model_bounds_overlap_px2": 226.220657348633,
+      "screen": [
+        160.127227783203,
+        355.569427490234
+      ],
+      "source": "native P0Trap.prompt / P0Ui.name_bar",
+      "text": "Fish Trap",
+      "world_height_above_origin_m": 0.6
+    },
+    "prompt_proposal": {
+      "bar_rect": [
+        144.127227783203,
+        327.815643310547,
+        132.0,
+        32.0
+      ],
+      "gap_px": 2.36981201171875,
+      "height_m": 0.9,
+      "model_bounds_overlap_px2": 0.0,
+      "runtime_change_committed": false
+    },
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    },
+    "transport_calls": 1
+  },
+  "integration_note": "Existing .6m prompt overlap is retained as evidence; .9m image is a temporary review proposal only."
+}

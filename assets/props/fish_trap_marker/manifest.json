@@ -1,0 +1,128 @@
+{
+  "task": "SGODOT-402",
+  "revision": "v1.1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "approval": "C64 / 2026-11-04 13:55; Plane 402 67b2649f",
+  "baked_scale_from_v1": 1.35,
+  "file": "fish_trap_marker.glb",
+  "mesh": "fish_trap_marker_mobile",
+  "units": "metres; Y up; +Z front",
+  "origin": "water-surface centre, Y=0",
+  "scale": [
+    1,
+    1,
+    1
+  ],
+  "waterline_y": 0,
+  "bounds": [
+    [
+      -0.30375000834465027,
+      -0.06750000268220901,
+      -0.30375000834465027
+    ],
+    [
+      0.30375000834465027,
+      0.5130000114440918,
+      0.30375000834465027
+    ]
+  ],
+  "dimensions_xyz": [
+    0.6075000166893005,
+    0.5805000141263008,
+    0.6075000166893005
+  ],
+  "triangles": 500,
+  "triangle_limit": 500,
+  "surfaces": 1,
+  "material": "opaque matte linear vertex colour; roughness .9, metallic 0; no textures",
+  "cast_shadow": false,
+  "skeleton": false,
+  "animations": [],
+  "buoy": {
+    "diameter_m": 0.405,
+    "body_height_m": 0.29700000000000004,
+    "center": [
+      0,
+      0.34425000000000006,
+      0
+    ],
+    "coral_srgb": "E07A5F",
+    "existing_cast_bobber_width_m": 0.218383863842247,
+    "width_ratio": 1.8545326237682016,
+    "comparison_measurement": "Native Godot SphereMesh vertices at b1 FLOAT_SCALE=1.6; parameter-only diameter .224m is not the final tessellated width"
+  },
+  "basket": {
+    "width_m": 0.6075,
+    "crown_y_m": 0.135,
+    "underwater_depth_m": 0.0675,
+    "visible_crown_at_low_bob_m": 0.12300000000000001,
+    "weave": "Raised meridian strips and two cross bands over dark recess dome; no separate water mesh"
+  },
+  "runtime": {
+    "remove_legacy_trap_float_scale": 1.6,
+    "motion": "Consumer bobs origin +/- .012m; no baked animation",
+    "water_y_m": 0.055,
+    "existing_prompt_height_above_origin_m": 0.6,
+    "prompt_height_above_origin_m": 1.15,
+    "integration_note": "Instantiate at scale 1. In p0_pond.gd:606 change the trap prompt offset from Vector3(0, 0.6, 0) to Vector3(0, 1.15, 0). Replaces the earlier 1.0m decision; runtime edit is not part of this art PR."
+  },
+  "palette_srgb": {
+    "coral": "E07A5F",
+    "cream": "FFF2D1",
+    "pole": "6E7B74",
+    "rope": "EBDCB7",
+    "wicker_recess": "805736",
+    "wicker_strip": "B98A5E",
+    "wicker_band": "C99A6B",
+    "wicker_rim": "9A6F47"
+  },
+  "source_parts_triangles": {
+    "Cage recess dome and five-centimetre submerged skirt": 108,
+    "Woven meridian 01": 6,
+    "Woven meridian 02": 6,
+    "Woven meridian 03": 6,
+    "Woven meridian 04": 6,
+    "Woven meridian 05": 6,
+    "Woven meridian 06": 6,
+    "Woven meridian 07": 6,
+    "Woven meridian 08": 6,
+    "Woven meridian 09": 6,
+    "Woven meridian 10": 6,
+    "Woven meridian 11": 6,
+    "Woven meridian 12": 6,
+    "Woven cross band 1 segment 01": 2,
+    "Woven cross band 1 segment 02": 2,
+    "Woven cross band 1 segment 03": 2,
+    "Woven cross band 1 segment 04": 2,
+    "Woven cross band 1 segment 05": 2,
+    "Woven cross band 1 segment 06": 2,
+    "Woven cross band 1 segment 07": 2,
+    "Woven cross band 1 segment 08": 2,
+    "Woven cross band 1 segment 09": 2,
+    "Woven cross band 1 segment 10": 2,
+    "Woven cross band 1 segment 11": 2,
+    "Woven cross band 1 segment 12": 2,
+    "Woven cross band 2 segment 01": 2,
+    "Woven cross band 2 segment 02": 2,
+    "Woven cross band 2 segment 03": 2,
+    "Woven cross band 2 segment 04": 2,
+    "Woven cross band 2 segment 05": 2,
+    "Woven cross band 2 segment 06": 2,
+    "Woven cross band 2 segment 07": 2,
+    "Woven cross band 2 segment 08": 2,
+    "Woven cross band 2 segment 09": 2,
+    "Woven cross band 2 segment 10": 2,
+    "Woven cross band 2 segment 11": 2,
+    "Woven cross band 2 segment 12": 2,
+    "Waterline wicker rim": 24,
+    "Short sage-green stem": 12,
+    "Large coral upper and cream lower buoy": 120,
+    "Small coral top button": 12,
+    "Two rope turns tying stem to cage crown": 84,
+    "Short rope tail resting on weave": 20
+  },
+  "source": "tools/art/source/fish_trap_marker_402/fish_trap_marker.blend",
+  "generator": "tools/art/source/fish_trap_marker_402/build.py",
+  "sha256": "b3d9cceee9fb40050a339b19f512e51365965d537cc2e39f64491c269250b0f7"
+}
