@@ -50,3 +50,11 @@ FBX files that name missing textures (scanned 2026-10-08, missing textures per f
 | `shoes5/SK_dt_skin05.fbx` | 5 |
 
 Any other error during import is real and worth a look.
+
+C40 exception (2026-11-04): the three `cloth1_1_npc_nadia`, `cloth1_1_npc_rafa`
+and `cloth1_npc_lou` sources now have their obsolete texture filename strings
+cleared. Their geometry, skin and animation data stay intact; the extractor
+still binds each recipe's albedo. These three must import without the former
+42 missing-image errors. See `README_batch3.md` and
+`tools/pipeline/clear_c40_fbx_texture_refs.py`; the older sources listed above
+are outside that cleanup.

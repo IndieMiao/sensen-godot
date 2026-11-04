@@ -4,6 +4,32 @@
 最终由用户批准。运行时分支 `art/npc-parts-batch3` 基于 farm-dev
 `f0cde4aa`；仅推分支，整合 PR 由上官婉儿后续开。
 
+## 11-04：C40 源 FBX 的过期贴图引用清理
+
+本批已通过 #653 / #574 / #575 整合。Nadia、Rafa、Lou 三件衣服的源 FBX
+各有 7 个旧 Unity 贴图引用；Godot 4.7.2 对每个缺失文件记两条 ERROR，
+合计 42 条。`fbx/embedded_image_handling=0`（Discard Textures）仍会先读这些
+文件，不能消除报错；不使用丢弃网格/材质的模式，以免破坏源部件提取。
+
+已只清空这三份 FBX 的 Texture / Video 中过期 Filename、RelativeFilename、
+Path / RelPath 字符串。保留对象、材质、Connections、几何、UV、压缩数组、
+骨架、蒙皮和动画；文件缩短后仅重算二进制节点偏移。`.import` 及 uid 不变。
+源 FBX 用于取几何，材质仍由 `recipes_batch3.json` 指定的新 PNG 绑定。
+本次不重建或修改 `parts/` 的运行时 `.res`、贴图、manifest 或 recipe。
+
+可复现工具（默认只读，`--write` 才写；已清理文件再次运行逐字节不变）：
+
+```sh
+python3 tools/pipeline/clear_c40_fbx_texture_refs.py
+python3 tools/pipeline/clear_c40_fbx_texture_refs.py --write
+```
+
+工具先验证原文件可逐字节往返，再只清上述字符串；不重导出整个模型。
+实际 Godot FBXDocument 前后解析：每件 14 ERROR → 0 ERROR / 0 WARNING，
+每件仍为 11 个场景节点、7 个网格、8 个 skin；节点变换、mesh 数组（含
+UV / 法线 / 权重）、skin bind 和动画快照完全相同。下面制作时“FBX 字节
+不变”的描述为原美术交付记录，本次差异仅限这段说明的源纹理引用。
+
 ## 第一段：SGODOT-362
 
 | ID | 底件 | 改动 | 三角形 | 增量 |
@@ -45,8 +71,8 @@ GODOT_BIN="$(command -v godot)" ./addons/gdUnit4/runtest.sh \
 ```
 
 再次 `--append` 会跳过已注册 ID。重做某件时只移除该件 manifest 条目再追加，
-不要省略 `--append`。源 FBX 保留旧纹理引用，提取器按 recipe 显式绑定新 PNG；
-原始 FBX 导入时找不到旧纹理的警告不代表 runtime 材质缺失，验证已检查实际纹理绑定。
+不要省略 `--append`。提取器按 recipe 显式绑定新 PNG；本批三件衣服的旧纹理
+路径已按上方 11-04 清理，导入不应再报这 42 条缺图错误。验证已检查实际纹理绑定。
 
 第一段验证：115 项源文件 / 导入 / 提取 / 皮肤绑定 / 材质 / NPC 隔离检查通过；
 catalog、pipeline、socket 共 38 项原测试通过。渲染在此 farm-dev checkout 的独立
