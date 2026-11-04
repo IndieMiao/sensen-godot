@@ -1,0 +1,263 @@
+{
+  "author": "赵云",
+  "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+  "assets": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "one surface",
+        "passed": true
+      },
+      {
+        "check": "triangle limit 600",
+        "passed": true
+      },
+      {
+        "check": "dimensions .50 x .70 x .112 m",
+        "passed": true
+      },
+      {
+        "check": "finite positions and normals",
+        "passed": true
+      },
+      {
+        "check": "no degenerate triangles",
+        "passed": true
+      },
+      {
+        "check": "unit normals",
+        "passed": true
+      },
+      {
+        "check": "vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "no skeleton or animation",
+        "passed": true
+      },
+      {
+        "check": "opaque vertex colours (RGB implies alpha one)",
+        "passed": true
+      },
+      {
+        "check": "bottom post contact is centred on origin",
+        "passed": true
+      },
+      {
+        "check": "PlaqueText position",
+        "passed": true
+      },
+      {
+        "check": "PlaqueText identity axes and scale",
+        "passed": true
+      },
+      {
+        "check": "blank front faces +Z",
+        "passed": true
+      },
+      {
+        "check": "marker is two millimetres outside front face",
+        "passed": true
+      },
+      {
+        "check": "uniform warm ivory front; no baked lettering",
+        "passed": true
+      },
+      {
+        "check": "Godot-generated import UID",
+        "passed": true
+      },
+      {
+        "check": "texture_map_mode=1",
+        "passed": true
+      },
+      {
+        "check": "Marker3D and matte material importer attached",
+        "passed": true
+      },
+      {
+        "check": "unique UID across existing assets",
+        "passed": true
+      },
+      {
+        "check": "manifest only appends upgrade_plaque; existing entries/order retained",
+        "passed": true
+      },
+      {
+        "check": "manifest raw cost matches",
+        "passed": true
+      },
+      {
+        "check": "manifest asset digest matches",
+        "passed": true
+      },
+      {
+        "check": "original reference door sign unchanged",
+        "passed": true
+      }
+    ],
+    "triangles": 486,
+    "surfaces": 1,
+    "bounds": [
+      [
+        -0.25,
+        0.0,
+        -0.035999998450279236
+      ],
+      [
+        0.25,
+        0.6999999284744263,
+        0.07599999755620956
+      ]
+    ],
+    "uid": "uid://dln378d6gexjw",
+    "minimum_triangle_area": 7.2939864241325774e-06,
+    "asset_sha256": "f969718f65d7581b3cf9ba9738362ff3603a526074e330dc244ac84c04e8980c"
+  },
+  "godot": {
+    "asset_sha256": "f969718f65d7581b3cf9ba9738362ff3603a526074e330dc244ac84c04e8980c",
+    "checks": [
+      {
+        "check": "Upgrade Plaque visible after first upgrade",
+        "passed": true
+      },
+      {
+        "check": "runtime 1.0 scale",
+        "passed": true
+      },
+      {
+        "check": "existing PLAQUE_CELL placement retained",
+        "passed": true
+      },
+      {
+        "check": "native player fully assembled",
+        "passed": true
+      },
+      {
+        "check": "PlaqueText is an imported Marker3D",
+        "passed": true
+      },
+      {
+        "check": "text centre .002 m outside .076 m face",
+        "passed": true
+      },
+      {
+        "check": "text mount identity basis / +Z front",
+        "passed": true
+      },
+      {
+        "check": "clear writable area .38 x .24 m",
+        "passed": true
+      },
+      {
+        "check": "runtime mobile mesh name (Godot prefixes its node name)",
+        "passed": true
+      },
+      {
+        "check": "linear farm vertex colours",
+        "passed": true
+      },
+      {
+        "check": "one matte farm material; nails are not metallic",
+        "passed": true
+      },
+      {
+        "check": "runtime <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "no skeleton or animations",
+        "passed": true
+      },
+      {
+        "check": "no new plaque collision",
+        "passed": true
+      },
+      {
+        "check": "original 43 degree opening camera; b1 fits the open beds",
+        "passed": true
+      },
+      {
+        "check": "two runtime example lines fit the clear writing area",
+        "passed": true
+      },
+      {
+        "check": "default farm capture saved",
+        "passed": true
+      },
+      {
+        "check": "paired signs in actual farm close-up saved",
+        "passed": true
+      }
+    ],
+    "close_camera": {
+      "pitch": -43.0,
+      "pixels": "(1400, 1000)",
+      "size": 4.0,
+      "transform": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (8.18928, 8.251982, -1.736359)]"
+    },
+    "default_camera": {
+      "actor": "(6.175, 0.0, 0.325)",
+      "logical_size": "(360.0, 800.0)",
+      "native_zoom": 0.614999741935838,
+      "opening_zoom": true,
+      "pixels": "(450, 1000)",
+      "size": 10.9268341064453,
+      "transform": "[X: (0.968148, 0.0, -0.25038), Y: (-0.170759, 0.731354, -0.660275), Z: (0.183116, 0.681998, 0.708058), O: (11.25191, 13.56131, 7.129247)]"
+    },
+    "example_text_aabb": "[P: (-0.13, -0.068, 0.0), S: (0.26, 0.136, 0.0)]",
+    "gpu": "NVIDIA GeForce RTX 2060",
+    "marker_global": "(4.901746, 0.43, -9.351729)",
+    "merge_demo": "Two-line runtime Label3D only; no letters exported in GLB",
+    "mesh_resource_name": "upgrade_plaque_upgrade_plaque_mobile",
+    "passed": true,
+    "renderer": "mobile",
+    "surfaces": 1,
+    "triangles": 486
+  },
+  "stage": {
+    "runtime_head": "6cf0bcb2a89dc7aa807291975402ab2a6d5fa6a0",
+    "scope": "Isolated copied b1; temporary placeholder substitution only; real game farm/camera/UI/movement; no committed client edits"
+  },
+  "source_blend_sha256": "51f47561dc7ccf20b49d9c36f2d2516746f5f5594d6083eb11b01fe6c261988d",
+  "integration_note": "Review-only substitution in an isolated b1 copy, retained PLAQUE_CELL and .35 rad rotation. No game scene changes committed. Use PackedScene to retain PlaqueText; FarmArt.instance extracts only mesh.",
+  "bounds_note": "Origin is the centre of the post footprint at Y=0. Header/face project toward +Z, so full object Z bounds are asymmetric.",
+  "camera_note": "b1 native Lv3 opening fits the 12 open beds at 43 degrees, effective width about 10.927 m. Close-up is separate, 43 degrees / 4m width; full default camera retained.",
+  "images": [
+    {
+      "name": "SGODOT-401_UPGRADE_PLAQUE_v1_default_43.png",
+      "path": "docs/design/upgrade-plaque-401-2026-11-04/SGODOT-401_UPGRADE_PLAQUE_v1_default_43.png",
+      "sha256": "1b1695038a2accb9deab276c54a2aa85b6b4343767574278064748246018e7e4",
+      "bytes": 367566,
+      "mime": "image/png",
+      "size": [
+        450,
+        1072
+      ],
+      "native_image_size": [
+        450,
+        1000
+      ]
+    },
+    {
+      "name": "SGODOT-401_UPGRADE_PLAQUE_v1_paired_signs.png",
+      "path": "docs/design/upgrade-plaque-401-2026-11-04/SGODOT-401_UPGRADE_PLAQUE_v1_paired_signs.png",
+      "sha256": "8b5c758ba9d41e78f1360a560c6c9e25969c984a9c1c0ce5d5e22a38ca94830f",
+      "bytes": 768338,
+      "mime": "image/png",
+      "size": [
+        1400,
+        1090
+      ],
+      "native_image_size": [
+        1400,
+        1000
+      ]
+    }
+  ]
+}

@@ -1527,6 +1527,104 @@
       "nozzle_dot": "one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh",
       "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap",
       "integration_note": "On integration change P0FarmFacilities.HEAD from (0, 0.55, 0) to (0, 0.42, 0); no gameplay edit in this art branch."
+    },
+    "upgrade_plaque": {
+      "triangles": 486,
+      "surfaces": 1,
+      "bytes": 40776,
+      "bounds_blender": [
+        [
+          -0.25,
+          -0.076,
+          0.0
+        ],
+        [
+          0.25,
+          0.036,
+          0.7
+        ]
+      ],
+      "bounds": [
+        [
+          -0.25,
+          0.0,
+          -0.036
+        ],
+        [
+          0.25,
+          0.7,
+          0.076
+        ]
+      ],
+      "generator": "tools/art/build_upgrade_plaque.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 600,
+      "pivot": "post foot bottom centre",
+      "sockets": {
+        "PlaqueText": {
+          "position": [
+            0,
+            0.43,
+            0.078
+          ],
+          "front": "+Z",
+          "node_type": "Marker3D",
+          "size": [
+            0.38,
+            0.24
+          ],
+          "surface_offset_m": 0.002
+        }
+      },
+      "front": "+Z",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "target_size_m": [
+        0.5,
+        0.7
+      ],
+      "face_size_m": [
+        0.4,
+        0.28
+      ],
+      "face_center": [
+        0,
+        0.43,
+        0.076
+      ],
+      "writable_size_m": [
+        0.38,
+        0.24
+      ],
+      "runtime_scale": 1.0,
+      "placement_cell": [
+        7,
+        14
+      ],
+      "collision": "none; integration must retain the current non-blocking plaque",
+      "sha256": "f969718f65d7581b3cf9ba9738362ff3603a526074e330dc244ac84c04e8980c",
+      "source": "tools/art/source/upgrade_plaque_401/upgrade_plaque.blend",
+      "palette_srgb": {
+        "wood": "A87948",
+        "wood_light": "CBA067",
+        "wood_edge": "B88E59",
+        "ivory": "FFF0D5",
+        "ivory_edge": "E4CBA4",
+        "nail": "806747",
+        "laurel": "97A45F",
+        "laurel_light": "AFBA75",
+        "stem": "87944D"
+      },
+      "laurel_note": "Two shallow sprigs; eight small leaves remain below the timber top and outside the blank panel",
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18
+      }
     }
   }
 }

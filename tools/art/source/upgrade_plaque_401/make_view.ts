@@ -1,0 +1,12 @@
+import { writeFileSync } from 'node:fs';
+import { loadP0Content } from '../../../../output/plaque-401/project/server/src/p0/content.ts';
+import { freshState, upgradeState } from '../../../../output/plaque-401/project/server/src/p0/state.ts';
+import { viewOf } from '../../../../output/plaque-401/project/server/src/p0/view.ts';
+const content = loadP0Content();
+const now = Date.now();
+let state = freshState(content, 'zhaoyun-plaque-401-isolated', now, 401, { guide: false });
+state.homestead.level = 3;
+state.homestead.plaque = [{ level: 2, at: now - 86400000 }, { level: 3, at: now }];
+state = upgradeState(content, state, now);
+writeFileSync(new URL('../../../../output/plaque-401/project/view-lv3.json', import.meta.url), JSON.stringify(viewOf(content, state, now)));
+console.log('Isolated Lv3 view with two upgrade records; no production state');

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "SGODOT-401_UPGRADE_PLAQUE_v1_default_43.png",
+    "path": "docs/design/upgrade-plaque-401-2026-11-04/SGODOT-401_UPGRADE_PLAQUE_v1_default_43.png",
+    "sha256": "1b1695038a2accb9deab276c54a2aa85b6b4343767574278064748246018e7e4",
+    "bytes": 367566,
+    "mime": "image/png",
+    "size": [
+      450,
+      1072
+    ],
+    "native_image_size": [
+      450,
+      1000
+    ]
+  },
+  {
+    "name": "SGODOT-401_UPGRADE_PLAQUE_v1_paired_signs.png",
+    "path": "docs/design/upgrade-plaque-401-2026-11-04/SGODOT-401_UPGRADE_PLAQUE_v1_paired_signs.png",
+    "sha256": "8b5c758ba9d41e78f1360a560c6c9e25969c984a9c1c0ce5d5e22a38ca94830f",
+    "bytes": 768338,
+    "mime": "image/png",
+    "size": [
+      1400,
+      1090
+    ],
+    "native_image_size": [
+      1400,
+      1000
+    ]
+  }
+]
