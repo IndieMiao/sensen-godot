@@ -152,6 +152,22 @@ func test_the_player_near_stops_him_until_past_the_hysteresis() -> void:
 	_run(g, 8.0)
 	assert_bool(g.pip_root.position.is_equal_approx(stood)).is_false()
 
+## Only while the guide has him here (the user's A): the guide over with the player still on the farm (the model kept
+## till leave()), he stops mid-walk where he is and stands, the player well away (亚瑟 on #739).
+func test_the_guide_over_he_stops_where_he_is() -> void:
+	var host := _host()
+	_far(host)
+	var g = _pip(host)
+	while g._route.is_empty(): g._stroll({"here": true}, DT)
+	g._stroll({"here": true}, DT)
+	var walked_from: Vector3 = g.pip_root.position
+	g._stroll({"here": true}, DT)
+	assert_bool(g.pip_root.position.is_equal_approx(walked_from)).is_false()   # walking while the guide has him
+	var stood: Vector3 = g.pip_root.position
+	for i in int(20.0 / DT): g._stroll({}, DT)   # P0Guide.pip: here false once the guide ends
+	assert_vector(g.pip_root.position).is_equal(stood)
+	assert_bool(g._route.is_empty()).is_true()
+
 ## He turns smoothly: a half turn takes TURN_S, never a snap.
 func test_he_turns_at_most_a_half_turn_per_quarter_second() -> void:
 	var host := _host()

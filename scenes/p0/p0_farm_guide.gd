@@ -68,7 +68,7 @@ func frame(view: Dictionary, dt: float) -> void:
 		if here and visible_head and not farm.rt.ui.has_modal() and not _waved and not rig.is_busy():
 			_waved = true
 			_wave()
-		_wander(info, dt)
+		_stroll(info, dt)
 	_highlight(view)
 	_water_marks(view)
 	_growth_marks(view)
@@ -105,6 +105,15 @@ func _wave() -> void:
 	if player != null and player.has_animation("emote_wave"):
 		rig.play_motion("emote_wave")
 		_wave_left = player.get_animation("emote_wave").length
+
+## His stroll this frame, only while the guide has him here (P0Guide.pip here: the user's A). The guide over with the
+## player still on the farm (the model kept till leave()), he stops where he is and stands (亚瑟 on #739).
+func _stroll(info: Dictionary, dt: float) -> void:
+	if bool(info.get("here", false)):
+		_wander(info, dt)
+		return
+	_route.clear()
+	_stand()
 
 ## One frame of his stroll. Held — talking to the player, a panel up, or the player within NEAR_M (until past AWAY_M) —
 ## he stands where he is and turns to the player, the route dropped; RESUME_S after a talk or a panel he picks a new stop
