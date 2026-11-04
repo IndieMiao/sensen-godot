@@ -29,7 +29,7 @@ const CITY := {
 				"residents": ["res_nadia"], "art": "fruit_shop", "anchors": "res://assets/p0/outposts/market.anchors.json", "capacity": 30},
 			{"id": "gn-1850147~tea0", "role": "tea", "name": "Maple Tea House", "lat": 35.70, "lng": 139.72,
 				"category": "Tea house · Hot tea", "keeper": {"role": "Tea Host", "name": "Hana", "look": "tea_temperate_0"},
-				"residents": [], "art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "capacity": 12},
+				"residents": [], "art": "tea_house", "anchors": "res://assets/p0/outposts/tea_house.anchors.json", "capacity": 12},
 			{"id": "gn-1850147~tackle0", "role": "tackle", "name": "Willow Tackle Shop", "lat": 35.6840, "lng": 139.7170,
 				"category": "Tackle shop · Bait", "keeper": {"role": "Tackle Keeper", "name": "Ren", "look": "tackle_temperate_0"},
 				"residents": [], "art": "farm_tools_store", "anchors": "res://assets/p0/outposts/tackle.anchors.json", "capacity": 12,

@@ -534,12 +534,17 @@ export function generateCity(c: P0Content, cl: CityCluster, opts: { water?: bool
 }
 
 /** A generated outpost or Mine Hut by id, for its online room (p0_server, online/outposts.ts generatedOutpostSpec): a
- * hut carries its room's own walls and seats (world.room.mine_hut), there being no hand-written room for its art. */
+ * hut carries its room's own walls and seats (world.room.mine_hut), there being no hand-written room for its art; so
+ * does the S-tier trading post (world.room.cabin), whose Coffee Shop kit no hand-written outpost is on since the tea
+ * house moved to its own (SGODOT-216). */
 export function roomPlace(c: P0Content, id: string): { role: string; art: string; capacity: number; bounds?: [number, number, number, number]; seats?: string[] } | undefined {
   const cut = id.indexOf('~');
   const city = cut > 0 ? cityPlaces(c, id.slice(0, cut)) : null;
   const outpost = city?.detail.outposts.find(o => o.id === id);
-  if (outpost) return outpost;
+  if (outpost) {
+    const own = worldOf(c)?.room[outpost.cabin ? 'cabin' : outpost.role as Role];
+    return own?.bounds ? { ...outpost, bounds: own.bounds, seats: own.seats ?? [] } : outpost;
+  }
   const hut = city?.detail.huts.find(h => h.id === id), room = worldOf(c)?.room.mine_hut;
   return hut && room?.bounds ? { ...hut, bounds: room.bounds, seats: room.seats ?? [] } : undefined;
 }

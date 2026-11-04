@@ -2111,6 +2111,11 @@ func _dev_shot(dt: float) -> void:
 					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
 					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"measure": print("P0_MEASURE ", JSON.stringify(measure_actor()))   # the player's height on screen (camera unification)
+			"goto":   # goto:stand_lena — a room's player stood at that anchor, facing its way (SGODOT-216 shots)
+				if is_instance_valid(world) and world.has_method("anchor") and world.call("anchor", step[1]) != null:
+					var m: Marker3D = world.call("anchor", step[1])
+					world.actor.teleport(m.global_position)
+					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
