@@ -304,9 +304,12 @@ func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
 	assert_str(str(P0KitchenLogic.waiting_on_crops(v).name)).is_equal("Fresh Fish Soup")
 
 ## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies).
+## The materials stay too (奕星 11-04: `7 Claies` on the Stall Board); a y takes -ies after a consonant only.
 func test_q58_plurals() -> void:
 	for pair in [["Lettuce", "Lettuce"], ["Chamomile", "Chamomile"], ["Corn", "Corn"], ["Chili", "Chilies"], ["Radish", "Radishes"],
-			["Carrot", "Carrots"], ["Tomato", "Tomatoes"]]:
+			["Carrot", "Carrots"], ["Tomato", "Tomatoes"], ["Strawberry", "Strawberries"], ["Bok Choy", "Bok Choy"], ["Day", "Days"],
+			["Timber", "Timber"], ["Stone", "Stone"], ["Clay", "Clay"], ["Flax", "Flax"], ["Hardwood", "Hardwood"], ["Coal", "Coal"],
+			["Rock Salt", "Rock Salt"], ["Copper Ore", "Copper Ore"], ["Iron Ore", "Iron Ore"], ["Quartz", "Quartz"], ["Reeds", "Reeds"]]:
 		assert_str(P0Logic.plural(pair[0])).is_equal(pair[1])
 	assert_str(P0Logic.crop_plural("Chili", 12)).is_equal("chilies")
 	assert_str(P0Logic.crop_plural("Lettuce", 10)).is_equal("lettuce")
