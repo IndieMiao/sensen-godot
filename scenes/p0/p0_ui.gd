@@ -145,6 +145,7 @@ var _teach: UiTipCard
 var _teach_until_ms := 0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
+var _tip_over: Control = null   # the dialog an OVER_DIALOG tip is up over (P0Guide.OVER_DIALOG); it goes with it
 var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
 ## The toasts and the system line draw over every card, the ones raised by z too: the move confirm card sits over the
 ## map's pin names (UiMapDestination.NAME_Z + 1), and a refusal or `Didn't go through` said while it is up must not
@@ -201,9 +202,17 @@ func _process(dt: float) -> void:
 	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed). A dialog is always over
 	# the TipCard, whichever opened first (不知火舞 on 341): while one is open — a result card (the farmhouse's COOK-4
 	# too), the gate card, a confirm, a page — the tip waits; over a drawer (the stove's, the bag) it comes up.
-	if tips and not dialog_open() and not _tips_held():
-		var key := tips.next()
-		if key != "": _show_tip(P0Guide.tip_text(key), key)
+	# A tip about the dialog it was asked for with (P0Guide.OVER_DIALOG: the travel card's) comes up over it, and goes
+	# with it: the dialog closed (Fly, ✕) or another over it (the Energy card) — 不知火舞 355, G19.
+	if tips and not _tips_held():
+		var up := dialog_open()
+		var key := tips.next(up)
+		if key != "":
+			_show_tip(P0Guide.tip_text(key), key)
+			_tip_over = _modal if up else null
+	if _tip_over != null and (not is_instance_valid(_tip_over) or _modal != _tip_over):
+		_tip_over = null
+		if tip_on_screen(): _hide_tip()
 	if _teach and _teach.visible: _place_tip()
 	_tick_ask(dt)
 	if _notice and _notice.visible: _place_notice()
@@ -593,6 +602,7 @@ func set_status_line(text: String) -> void:
 func set_surface(name: String) -> void:
 	if placing(): end_placement()   # a world change ends placement (nothing was sent)
 	surface = name
+	if tips: tips.leave_surface(name)   # the map's tip waiting under a card never comes up in the next world
 	if not is_node_ready():
 		_pending["surface"] = name
 		return
@@ -3979,7 +3989,15 @@ func close_tip() -> void:
 
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
-	if tips and tips.did(action): _hide_tip(false)
+	if tips == null: return
+	var before := tips.seen.size()
+	if tips.did(action): _hide_tip(false)
+	# a tip taken off the queue as done (TipQueue.did) is seen now, not at the next card: kept on disk at once, so an app
+	# closed before another tip comes up never shows it again (哪吒 on #733)
+	if tips.seen.size() != before:
+		for k in tips.seen:
+			if P0Guide.tip_text(k) != "": _taught[k] = true
+		_save_tips()
 
 func _hide_tip(close_queue := true) -> void:
 	_teach_until_ms = 0

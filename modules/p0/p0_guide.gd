@@ -49,6 +49,12 @@ static func tip_seconds(text: String) -> float:
 ## time Energy runs out (the first level-up teaches in its banner instead).
 static func tip_for_surface(surface: String) -> String:
 	return {"farm": "sow", "pond": "creel", "map": "map", "stove": "cook"}.get(surface, "")
+## The tips about the dialog they are asked for with, shown over it while it is up (不知火舞 355, G19): v4q(4) ⑥ has
+## `Travel costs Energy and coins.` on the first paid travel card's opening — after Fly it would teach nothing. They go
+## with that dialog: Fly, ✕ or a card over it (the Energy card) takes it away, seen. Every other tip waits for dialogs.
+const OVER_DIALOG := {"travel": true}
+## The surface a tip belongs to, for the ones asked for on arriving there (the stove's `cook` is a drawer's, not a world's).
+const SURFACE_OF_TIP := {"sow": "farm", "creel": "pond", "map": "map"}
 
 ## before / after: the views either side of the response carrying ev ("the account's first fire" is the pot started
 ## while before.cooking.first_fire was still true).
@@ -81,19 +87,45 @@ class TipQueue:
 	func moment_opened() -> void: moments += 1
 	func moment_closed() -> void: moments = maxi(0, moments - 1)
 
-	## The next tip to put on screen, or "" (one is up, a Moment is up, or none waits). Marks it seen.
-	func next() -> String:
+	## The next tip to put on screen, or "" (one is up, a Moment is up, or none waits). Marks it seen. Under a dialog
+	## (dialog_up) only a tip about that dialog comes up (P0Guide.OVER_DIALOG: the travel card's own); the rest wait.
+	func next(dialog_up := false) -> String:
 		if showing != "" or moments > 0 or waiting.is_empty(): return ""
-		showing = str(waiting.pop_front())
+		if not dialog_up:   # a dialog's own tip that missed it (a Moment held it, the card closed meanwhile) goes, unseen:
+			for key in waiting.duplicate():   # the next paid card asks again (哪吒 on #733)
+				if P0Guide.OVER_DIALOG.has(str(key)): waiting.erase(key)
+			if waiting.is_empty(): return ""
+		var at := 0
+		if dialog_up:
+			at = -1
+			for i in waiting.size():
+				if P0Guide.OVER_DIALOG.has(str(waiting[i])):
+					at = i
+					break
+			if at < 0: return ""
+		showing = str(waiting[at])
+		waiting.remove_at(at)
 		seen[showing] = true
 		return showing
 
-	## The player did something: a tip that teaches it closes. Returns true when it closed one.
+	## The player did something: a tip that teaches it closes. Returns true when it closed one. One still waiting for it
+	## (a dialog was up) goes too, as seen: done already, it would teach nothing (q(26)).
 	func did(action: String) -> bool:
+		for key in waiting.duplicate():
+			if str(P0Guide.TAUGHT_BY.get(key, "")) == action:
+				waiting.erase(key)
+				seen[key] = true
 		if showing != "" and str(P0Guide.TAUGHT_BY.get(showing, "")) == action:
 			showing = ""
 			return true
 		return false
+
+	## A new surface (the farm, a pond, the map): a waiting tip of another surface's (P0Guide.SURFACE_OF_TIP) goes unseen —
+	## it is asked for again there, never shown here (the map's `Browse the map for free.` in an outpost).
+	func leave_surface(surface: String) -> void:
+		for key in waiting.duplicate():
+			var own := str(P0Guide.SURFACE_OF_TIP.get(key, ""))
+			if own != "" and own != surface: waiting.erase(key)
 
 	## Timed out or tapped.
 	func close() -> void: showing = ""
