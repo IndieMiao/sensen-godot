@@ -18,7 +18,7 @@ const LAND := Vector2i(9, 8)
 ## the player near: he stands and turns to the player.
 const TETHER := 4.0
 const TETHER_BANG := 2.0
-const WALK_SPEED := 1.0           # m/s, under the player's walk; the walk clip's own stride at his 0.88 (上官婉儿 checks it)
+const WALK_SPEED := 0.68          # m/s: the walk clip's own ground speed at his 0.88 (上官婉儿 measured 0.67; 1.0 slid)
 const TURN_S := 0.25              # a half turn
 const STOP_S := Vector2(3.0, 6.0)
 const HOP_M := Vector2(1.5, 4.0)  # the next stop this far from where he is

@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## SGODOT-411 (the user, 11-04; 不知火舞's spec 2026-11-04): while the guide has Pip on the farm he wanders by the starting
 ## beds — walkable cells in no one's way within TETHER of STAND (TETHER_BANG with his `!`), never on a bed — at about
-## 1 m/s, stopping a while at each; the player near, a talk or a panel: he stands and turns to the player, and walks on
+## WALK_SPEED (his walk clip's own ground speed), stopping a while at each; the player near, a talk or a panel: he stands and turns to the player, and walks on
 ## (RESUME_S after a talk or a panel) once that is over. On the real farm's blueprint; the farm host is a stand-in.
 
 const FarmGuide := preload("res://scenes/p0/p0_farm_guide.gd")
