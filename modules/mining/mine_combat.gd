@@ -4,7 +4,11 @@ signal contact(monster_id: String)
 
 const Layout = preload("res://modules/mining/mine_layout.gd")
 const Meshes = preload("res://modules/mining/mine_mesh.gd")
-const SPAWNS := [Vector3(4.75, 0, -5.0), Vector3(2.0, 0, -4.5), Vector3(7.5, 0, -5.5)]
+## Where a floor's monsters stand on arrival (snapped to a free cell, _spawn_point). Each within 4.6 m of Layout.SPAWN,
+## under the slime's and the shroomling's 5 m aggro: the third stood at (7.5, −5.5), 5.49 m off, and never came — the floor
+## sat on `1 monster left` with the stairs shut while it waited at the screen's right edge (李元芳's preview A, P12;
+## 李白 on 399: a data fix, no q row).
+const SPAWNS := [Vector3(4.75, 0, -5.0), Vector3(2.0, 0, -4.5), Vector3(6.3, 0, -4.9)]
 ## A chasing slime finds its path to the player again this often, and at most one slime a frame does it (perf Q6,
 ## SGODOT-260): an A* and its smoothing over the floor's blocked cells each, so slimes due together wait a frame or two
 ## instead of all landing in one frame (fights at floor 4 jerked about 4 times a second).

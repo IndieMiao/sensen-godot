@@ -498,3 +498,27 @@ func test_the_lunge_stops_at_the_players_body() -> void:
 	while str(e2.phase) in ["windup", "dash"]: c2.step(0.016, mover, false)
 	assert_float((e2.mover.position as Vector3).z - start.z).is_greater(2.0)   # past where the player stood (stopped there: ~1.0)
 	mover.position = aside
+
+## Every monster of a three-slime floor comes for a player who stays at the landing (李元芳's preview A, P12: the third
+## stood 5.49 m off, past the slime's 5 m aggro, and the floor sat on `1 monster left`; 李白 on 399). On any floor's
+## rocks — a spawn spot under a rock moves to the nearest free cell — each stands within its aggro of Layout.SPAWN.
+func test_every_slime_of_a_floor_comes_for_a_player_at_the_landing() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var L = load("res://modules/mining/mine_layout.gd")
+	for spawn in Combat.SPAWNS: assert_float((spawn as Vector3).distance_to(L.SPAWN)).is_less(5.0)   # the slime's and the shroomling's aggro
+	for i in 40:
+		var floor_seed := "%s:%d:2026-11-%02d" % [Fx.MINE, 1 + i % 9, 1 + i % 28]
+		var nodes: Array = []
+		var positions: Array = L.p0_rocks(4 + i % 3, floor_seed)
+		for r in positions.size(): nodes.append({"id": str(r), "position": positions[r]})
+		var bp = L._navigation(nodes, [])
+		var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+		mover.position = L.SPAWN
+		var c: Node3D = auto_free(Combat.new())
+		add_child(c)
+		c.sync_p0(Fx.view(3, {"mobs": [_slime(), _slime(), _slime()], "rocks": positions.size()}), 3, mover)
+		assert_int(c.enemies.size()).is_equal(3)
+		for e in c.enemies.values():
+			assert_float((e.node.position as Vector3).distance_to(L.SPAWN)).override_failure_message(
+				"%s on %s stands %.2f m off" % [e.id, floor_seed, (e.node.position as Vector3).distance_to(L.SPAWN)]) \
+				.is_less_equal(float(e.spec.aggro_range))

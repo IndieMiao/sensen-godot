@@ -93,7 +93,7 @@ export function initialExpedition(content: Content, run = 0): Expedition {
     const floor: Floor = { rocks, monsters: [], cleared: false };
     const nav = mineNavigation(floor);
     floor.monsters = content.mining.combat.floors[String(f)].map((kind, i) => {
-      const [x, z] = nearest(nav, [[4.75, -5], [2, -4.5], [7.5, -5.5]][i] as Point);
+      const [x, z] = nearest(nav, [[4.75, -5], [2, -4.5], [6.3, -4.9]][i] as Point);
       return { id: `slime_${i + 1}`, kind, x, z, hp: content.mining.combat.monsters[kind].hp,
         phase: 'idle', timer: 0, direction: [0, 1], contributors: [] };
     });
