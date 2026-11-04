@@ -1909,7 +1909,9 @@ static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
 	var site := ""
 	if id in VEIN_ORES: site = near3_site(view, "vein", id)
 	elif id in QUARRY_ORES or id == "clay": site = near3_site(view, "quarry")
-	if site != "": return {"go": "mine:" + site, "now": str(view.get("mine", {}).get("at", {}).get("mine", "")) == site}
+	if site != "":
+		var at = view.get("mine", {}).get("at", null)   # null while the player is not down a mine (the server's view)
+		return {"go": "mine:" + site, "now": at is Dictionary and str(at.get("mine", "")) == site}
 	if not spot.is_empty(): return {"go": "gather:" + str(spot.id), "now": false}
 	return {"go": "", "now": false}
 
@@ -2540,6 +2542,10 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 
 ## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places, the
 ## same line as the workbench (P0MaterialLogic.material_source, Li Bai q(65)).
+## v4q(1) (frames A3a–c, 355 48dedfd0; SGODOT-394): a skill's line says how it levels (and Shows its Skills), the travel
+## gates how they count.
+const HOME_SKILL_HOW := {"farming": "Sow and harvest to level up", "fishing": "Catch fish to level up",
+	"cooking": "Cook dishes to level up"}
 static func home_source(view: Dictionary, id: String) -> Dictionary:
 	if id.begins_with("skill_"):
 		var key := id.trim_prefix("skill_")
@@ -2547,11 +2553,13 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 		if not next is Dictionary: return {"text": "", "go": ""}
 		for skill in next.get("skills", []):
 			if str(skill.skill) == key:
-				return {"text": "%s Lv%d · now %d" % [key.capitalize(), int(skill.need), int(skill.have)], "go": "skills"}
+				return {"text": "%s Lv%d · %s" % [key.capitalize(), int(skill.need), HOME_SKILL_HOW[key]], "go": "skills"}
 		return {"text": "", "go": ""}
 	match id:
 		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
-		"stamps", "climates": return {"text": "Stamps · visit new cities", "go": "map"}
+		# no Show on the travel gates (A3b / A3c: only a skill's line has one), so they fit as drawn
+		"stamps": return {"text": "Stamps · First visit to a city · up to 2 a day", "go": ""}
+		"climates": return {"text": "Climates · Visit a city or wild site in another climate", "go": ""}
 	return need_source(view, id)
 
 ## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the
