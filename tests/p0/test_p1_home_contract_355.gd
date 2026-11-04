@@ -170,20 +170,18 @@ func test_four_column_centres_and_group_rows_and_skill_source_navigation() -> vo
 	fishing.pressed.emit()
 	await await_idle_frame()
 	var source: UiNeedSource=ui.root.find_children("*","UiNeedSource",true,false)[0]
-	assert_str(source.text).is_equal("Fishing Lv3 · now 2")
+	assert_str(source.text).is_equal("Fishing Lv3 · Catch fish to level up")
 	source.show_pressed.emit()
 	assert_str(ui.modal_kind).is_equal("skills")
 	ui.back_modal()
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("homestead")
-	var maps := []
-	ui.show_on_map.connect(func(target): maps.append(target))
 	var stamps = ui.find_children("*","UiNeedTile",true,false).filter(func(t):return t.item_name=="Stamps" and not t.is_queued_for_deletion())[-1]
 	stamps.pressed.emit()
 	await await_idle_frame()
-	source=ui.root.find_children("*","UiNeedSource",true,false)[0]
-	source.show_pressed.emit()
-	assert_array(maps).is_equal(["map"])
+	source=ui.root.find_children("*","UiNeedSource",true,false).filter(func(s):return not s.is_queued_for_deletion())[-1]
+	assert_str(source.text).is_equal("Stamps · First visit to a city · up to 2 a day")
+	assert_bool(source._show.visible).is_false()   # A3b / A3c: no Show on the travel gates
 
 func test_skills_back_keeps_home_panels_original_return_destination() -> void:
 	var ui := _ui(view())
@@ -202,10 +200,17 @@ func test_skills_back_keeps_home_panels_original_return_destination() -> void:
 	ui.back_modal()
 	assert_array(returned).is_equal(["profile"])
 
-func test_travel_sources_show_map_and_refusal_details_have_readable_copy() -> void:
+func test_skill_sources_say_how_each_skill_levels() -> void:   # v4q(1) A3a–c (SGODOT-394)
+	var v := {"homestead": {"next": {"skills": [{"skill": "farming", "need": 4, "have": 3},
+		{"skill": "fishing", "need": 5, "have": 4}, {"skill": "cooking", "need": 4, "have": 4}]}}}
+	assert_dict(P0Logic.home_source(v, "skill_farming")).is_equal({text="Farming Lv4 · Sow and harvest to level up", go="skills"})
+	assert_dict(P0Logic.home_source(v, "skill_fishing")).is_equal({text="Fishing Lv5 · Catch fish to level up", go="skills"})
+	assert_dict(P0Logic.home_source(v, "skill_cooking")).is_equal({text="Cooking Lv4 · Cook dishes to level up", go="skills"})
+
+func test_travel_sources_have_no_show_and_refusal_details_have_readable_copy() -> void:
 	var v := view(16)
-	assert_dict(P0Logic.home_source(v,"stamps")).is_equal({text="Stamps · visit new cities",go="map"})
-	assert_str(P0Logic.home_source(v,"climates").go).is_equal("map")
+	assert_dict(P0Logic.home_source(v,"stamps")).is_equal({text="Stamps · First visit to a city · up to 2 a day",go=""})
+	assert_dict(P0Logic.home_source(v,"climates")).is_equal({text="Climates · Visit a city or wild site in another climate",go=""})
 	var rt: P0Runtime=auto_free(P0Runtime.new())
 	rt.ui.quick_store="user://test_355_home_bar.json"
 	rt.ui.tips_path="user://test_355_home_tips.json"

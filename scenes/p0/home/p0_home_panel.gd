@@ -223,21 +223,20 @@ static func _look_row(ui: P0Ui, r: Dictionary) -> Control:
 			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed: P0LookPick.open(ui, id))
 	return row
 
-## A tapped tile's source: materials point at the world; 355 A's skill and travel gates open Skills / the map.
+## A tapped tile's source: materials point at the world; 355 A's skill gates open Skills, the travel gates have no Show (A3c).
 static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 	var src := P0Logic.home_source(ui.view, id)
 	var go := str(src.go)
 	# 355 C2: a city's spot or a wild mine (`gather:` / `mine:`) is a map pin, as Today's rows go (P0Ui.show_label)
 	var pin := go.begins_with("gather:") or go.begins_with("mine:")
 	var label := P0Ui.show_label(go, ui.space_here(), ui.spot_reachable(), ui.place) if pin else ""
-	if not (go in ["skills", "map"] or (label != "" if pin else ui.spot_reachable())): go = ""
+	if not (go == "skills" or (label != "" if pin else ui.spot_reachable())): go = ""
 	var home_back := ui._modal_back
 	var on_show := Callable() if go == "" else func():
 		if go == "skills": ui.open_skills(func(): ui.open_home_panel(home_back))
 		else:
 			ui.close_modal()
-			if go == "map": ui.show_on_map.emit("map")
-			elif pin and label != "Show": ui.show_on_map.emit(go)
+			if pin and label != "Show": ui.show_on_map.emit(go)
 			else: ui.show_spot.emit(go)
 	var layer := UiNeedSource.popup(ui.root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
