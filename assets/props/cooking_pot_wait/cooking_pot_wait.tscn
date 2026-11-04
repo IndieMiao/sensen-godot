@@ -1,0 +1,281 @@
+[gd_scene format=3 uid="uid://he82a7bnpw1i"]
+
+[ext_resource type="PackedScene" path="res://assets/props/stove_pot/stove_pot.glb" id="1_yl4yl"]
+[ext_resource type="ArrayMesh" path="res://assets/props/cooking_pot_wait/pot_body_colours.res" id="2_a75m5"]
+[ext_resource type="ArrayMesh" path="res://assets/props/cooking_pot_wait/pot_lid_colours.res" id="3_po516"]
+[ext_resource type="Material" path="res://assets/props/cooking_pot_wait/steam.tres" id="4_jh8qm"]
+[ext_resource type="ArrayMesh" path="res://assets/props/cooking_pot_wait/soup_surface.res" id="5_fwx60"]
+[ext_resource type="ArrayMesh" path="res://assets/props/cooking_pot_wait/soup_bubble.res" id="6_3lh51"]
+[ext_resource type="ArrayMesh" path="res://assets/props/cooking_pot_wait/rim_foam.res" id="7_jw44w"]
+
+[sub_resource type="Gradient" id="Gradient_011xv"]
+offsets = PackedFloat32Array(0, 0.15, 0.6, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.17, 1, 1, 1, 0.11, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_p5wds"]
+gradient = SubResource("Gradient_011xv")
+
+[sub_resource type="Curve" id="Curve_ub2jq"]
+_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(0.5, 0.85), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_vjn37"]
+curve = SubResource("Curve_ub2jq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xclje"]
+direction = Vector3(0.08, 1, 0)
+spread = 8.0
+initial_velocity_min = 0.048
+initial_velocity_max = 0.061
+gravity = Vector3(0.003, 0.009, 0)
+scale_min = 0.75
+scale_max = 1.1
+scale_curve = SubResource("CurveTexture_vjn37")
+color_ramp = SubResource("GradientTexture1D_p5wds")
+
+[sub_resource type="QuadMesh" id="QuadMesh_r7biw"]
+material = ExtResource("4_jh8qm")
+size = Vector2(0.038, 0.048)
+
+[sub_resource type="Animation" id="Animation_wnf0o"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PotRig/StovePot/pot_big/lid:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0.181, -0.107), Vector3(0, 0.181, -0.107)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PotRig/StovePot/pot_big/lid:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PotRig:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PotRig/Soup/Bubble1:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("PotRig/Soup/Bubble2:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("PotRig/Soup/Bubble3:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("PotRig/Soup/RimFoam:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+
+[sub_resource type="Animation" id="Animation_ufv7c"]
+resource_name = "tumble"
+length = 1.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PotRig/StovePot/pot_big/lid:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.52, 0.72, 0.88, 1.02, 1.12, 1.2, 1.28, 1.37, 1.49, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.181, -0.107), Vector3(0, 0.181, -0.107), Vector3(0, 0.18699999, -0.107), Vector3(0, 0.20099999, -0.107), Vector3(0, 0.205, -0.107), Vector3(0, 0.198, -0.107), Vector3(0, 0.18499999, -0.107), Vector3(0, 0.181, -0.107), Vector3(0, 0.18499999, -0.107), Vector3(0, 0.181, -0.107), Vector3(0, 0.181, -0.107), Vector3(0, 0.181, -0.107)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PotRig/StovePot/pot_big/lid:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.52, 0.72, 0.88, 1.02, 1.12, 1.2, 1.28, 1.37, 1.49, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(-0.008, 0, -0.00605442), Vector3(-0.018, 0, -0.002235324), Vector3(-0.022, 0, 0.007914866), Vector3(-0.014, 0, -0.004352169), Vector3(0, 0, -0.0042925836), Vector3(0, 0, 0.0079248585), Vector3(0.008, 0, -0.0023032266), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PotRig:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.67, 0.82, 0.94, 1.09, 1.21, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0.002, 0), Vector3(0, 0, 0), Vector3(0, 0.001, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("PotRig/Soup/Bubble1:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.53, 0.69, 0.78, 0.84, 0.89, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0042, 0.0014, 0.0042), Vector3(0.014, 0.0098, 0.014), Vector3(0.01484, 0.014, 0.01484), Vector3(0.01568, 0.0021, 0.01568), Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("PotRig/Soup/Bubble2:scale")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.66, 0.82, 0.91, 0.97, 1.02, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.00375, 0.00125, 0.00375), Vector3(0.0125, 0.00875, 0.0125), Vector3(0.01325, 0.0125, 0.01325), Vector3(0.014, 0.001875, 0.014), Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("PotRig/Soup/Bubble3:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.79, 0.95, 1.04, 1.1, 1.15, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0033, 0.0011, 0.0033), Vector3(0.011, 0.0077, 0.011), Vector3(0.01166, 0.011, 0.01166), Vector3(0.01232, 0.00165, 0.01232), Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("PotRig/Soup/RimFoam:scale")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.62, 0.88, 1.09, 1.19, 1.34, 1.46, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001), Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.95, 0.95, 0.95), Vector3(0.0001, 0.0001, 0.0001), Vector3(0.65, 0.65, 0.65), Vector3(0.0001, 0.0001, 0.0001), Vector3(0.0001, 0.0001, 0.0001)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cbjou"]
+_data = {
+&"idle": SubResource("Animation_wnf0o"),
+&"tumble": SubResource("Animation_ufv7c")
+}
+
+[node name="CookingPotWait" type="Node3D" unique_id=289579368]
+
+[node name="PotRig" type="Node3D" parent="." unique_id=1163150081]
+
+[node name="StovePot" parent="PotRig" unique_id=699015236 instance=ExtResource("1_yl4yl")]
+
+[node name="big_body" parent="PotRig/StovePot/pot_big" parent_id_path=PackedInt32Array(699015236, 207040317) index="0" unique_id=978154696]
+mesh = ExtResource("2_a75m5")
+
+[node name="lid_mesh" parent="PotRig/StovePot/pot_big/lid" parent_id_path=PackedInt32Array(699015236, 444717255) index="0" unique_id=480513717]
+mesh = ExtResource("3_po516")
+
+[node name="Steam" type="GPUParticles3D" parent="PotRig/StovePot/pot_big/lid" parent_id_path=PackedInt32Array(699015236, 444717255) index="1" unique_id=475151764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.062, 0.032, 0.146)
+cast_shadow = 0
+amount = 5
+lifetime = 1.3
+preprocess = 1.3
+use_fixed_seed = true
+seed = 419
+visibility_aabb = AABB(-0.05, -0.03, -0.05, 0.12, 0.19, 0.12)
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_xclje")
+draw_pass_1 = SubResource("QuadMesh_r7biw")
+
+[node name="pot_normal" parent="PotRig/StovePot" index="1" unique_id=1645261212]
+visible = false
+
+[node name="Soup" type="Node3D" parent="PotRig" unique_id=777519016]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.177, 0)
+
+[node name="Surface" type="MeshInstance3D" parent="PotRig/Soup" unique_id=1083048946]
+cast_shadow = 0
+mesh = ExtResource("5_fwx60")
+
+[node name="Bubble1" type="MeshInstance3D" parent="PotRig/Soup" unique_id=687302631]
+transform = Transform3D(0.0001, 0, 0, 0, 0.0001, 0, 0, 0, 0.0001, -0.044, 0.003, 0.064)
+cast_shadow = 0
+mesh = ExtResource("6_3lh51")
+
+[node name="Bubble2" type="MeshInstance3D" parent="PotRig/Soup" unique_id=2023712106]
+transform = Transform3D(0.0001, 0, 0, 0, 0.0001, 0, 0, 0, 0.0001, 0.009, 0.004, 0.077)
+cast_shadow = 0
+mesh = ExtResource("6_3lh51")
+
+[node name="Bubble3" type="MeshInstance3D" parent="PotRig/Soup" unique_id=1058038104]
+transform = Transform3D(0.0001, 0, 0, 0, 0.0001, 0, 0, 0, 0.0001, 0.05, 0.003, 0.047)
+cast_shadow = 0
+mesh = ExtResource("6_3lh51")
+
+[node name="RimFoam" type="MeshInstance3D" parent="PotRig/Soup" unique_id=1581520834]
+transform = Transform3D(0.0001, 0, 0, 0, 0.0001, 0, 0, 0, 0.0001, 0, 0.004, 0)
+cast_shadow = 0
+mesh = ExtResource("7_jw44w")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=127446328]
+libraries/ = SubResource("AnimationLibrary_cbjou")
+
+[editable path="PotRig/StovePot"]

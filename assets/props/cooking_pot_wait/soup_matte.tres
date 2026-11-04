@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b3368i8gxbjyb"]
+
+[resource]
+resource_name = "SoupAndFoam_MatteVertexColour"
+vertex_color_use_as_albedo = true
+metallic_specular = 0.15
+roughness = 0.95

@@ -1,0 +1,44 @@
+{
+  "added_render_materials": 2,
+  "bounds_rest": {
+    "position": [
+      -0.140000000596046,
+      0.0,
+      -0.10700000077486
+    ],
+    "size": [
+      0.280000001192093,
+      0.241999998688698,
+      0.21399998664856
+    ]
+  },
+  "check_count": 312,
+  "errors": [],
+  "max_body_bounce_m": 0.00200000032782555,
+  "max_lid_front_lift_m": 0.0287076177597046,
+  "max_lid_pivot_lift_m": 0.0239999982118607,
+  "opaque_materials": [
+    "SoupAndFoam_MatteVertexColour"
+  ],
+  "steam_all_five_overlap_bound": 0.469262783931599,
+  "steam_peak_single_particle_alpha": 0.119,
+  "steam_triangles": 10,
+  "surfaces_excluding_steam": 8,
+  "triangles_excluding_steam": 2028,
+  "animations": {
+    "tumble": {
+      "duration_s": 1.8,
+      "loop": true
+    },
+    "idle": {
+      "duration_s": 1.0,
+      "loop": true
+    }
+  },
+  "origin": "bottom centre; Y up; +Z front; metres",
+  "render_materials": 2,
+  "source_glb": "../stove_pot/stove_pot.glb",
+  "source_glb_sha256": "04f6faee84c5f25629ce57d4bb884763ca3897dc87df9ac58b04bfc70a5d78ab",
+  "steam_node": "PotRig/StovePot/pot_big/lid/Steam",
+  "autoplay": ""
+}

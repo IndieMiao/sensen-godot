@@ -1,0 +1,23 @@
+# SGODOT-419 源与复现
+
+使用已配置的 Godot 4.7.2、私有 ADB 5097；不需要 Blender 或导入新 GLB。
+汤面和圆泡采用可编辑的 Godot 原生资源，动画关键帧保存在运行时场景内。
+
+```bash
+source ~/.codex-huangzhong/env.sh
+python3 tools/art/source/cooking_pot_wait_419/prepare.py
+SENSEN_OFFLINE=1 godot --headless --path output/cookpot-419/project --script build.gd
+SENSEN_OFFLINE=1 godot --headless --path output/cookpot-419/project --script verify.gd
+```
+
+生成在隔离工程的 `assets/props/cooking_pot_wait/`。复核后将该目录的新原生资源复制回仓库，
+不复制任何 b1 运行时代码。`prepare.py` 固定 b1 提交，验证原锅 GLB 的 SHA-256 与美术分支一致。
+
+渲染前查看 `nvidia-smi`，与其他美工错开。白底预览入口 `review.gd`；
+360×800 厨房预览入口 `review_phone.gd`，临时更换隔离工程 `review.tscn` 的脚本路径。
+两者使用桌面 Mobile/Vulkan、固定 30 fps，每帧由 Godot 渲染后保存；ffmpeg 按 30 fps 编码。
+厨房使用 b1 的 P0Room、Basic Room 灯光/资产以及 UiHeatRing，计时与进度条只是可见性审阅控件。
+不运行账号、后端或料理交互，也不修改 b1 源文件。
+
+`verify.gd` 核对原锅实例、隐藏小锅、面数、尺寸、两个动画、首尾、根节点不动、
+任意翻滚阶段切 idle 的恢复、蒸汽位置和预算。`review_phone.gd` 从实际顶点投影量取像素尺寸与位移。
