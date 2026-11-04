@@ -1,0 +1,2664 @@
+{
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "concept": "417 e4c7afdd / interface 410 924d6611",
+  "original_metrics": {
+    "clay_pit": {
+      "bounds": [
+        [
+          -0.589999973773956,
+          0.0,
+          -0.54617440700531
+        ],
+        [
+          0.589999973773956,
+          0.483999997377396,
+          0.54617440700531
+        ]
+      ],
+      "dimensions_xyz": [
+        1.17999994754791,
+        0.483999997377396,
+        1.09234881401062
+      ],
+      "source": "assets/farm/art/clay_pit.glb",
+      "surfaces": 1,
+      "triangles": 552
+    },
+    "flax_patch": {
+      "bounds": [
+        [
+          -0.649999976158142,
+          0.0,
+          -0.629999995231628
+        ],
+        [
+          0.649999976158142,
+          0.686883330345154,
+          0.629999995231628
+        ]
+      ],
+      "dimensions_xyz": [
+        1.29999995231628,
+        0.686883330345154,
+        1.25999999046326
+      ],
+      "source": "assets/farm/art/flax_patch.glb",
+      "surfaces": 1,
+      "triangles": 894
+    },
+    "grove": {
+      "bounds": [
+        [
+          -0.988515138626099,
+          -0.0194999799132347,
+          -1.10963344573975
+        ],
+        [
+          1.04612803459167,
+          2.12198996543884,
+          1.21462321281433
+        ]
+      ],
+      "dimensions_xyz": [
+        2.03464317321777,
+        2.14148998260498,
+        2.32425665855408
+      ],
+      "source": "original attachment factory spot_grove",
+      "surfaces": 3,
+      "triangles": 4872
+    },
+    "hardwood_grove": {
+      "bounds": [
+        [
+          -0.711750030517578,
+          0.0,
+          -0.648727059364319
+        ],
+        [
+          0.711750030517578,
+          2.29999995231628,
+          0.648727059364319
+        ]
+      ],
+      "dimensions_xyz": [
+        1.42350006103516,
+        2.29999995231628,
+        1.29745411872864
+      ],
+      "source": "assets/farm/art/hardwood_grove.glb",
+      "surfaces": 1,
+      "triangles": 1042
+    },
+    "herb_patch": {
+      "bounds": [
+        [
+          -0.594043731689453,
+          -0.618538379669189,
+          -0.591419577598572
+        ],
+        [
+          0.554043710231781,
+          0.498837888240814,
+          0.674043715000153
+        ]
+      ],
+      "dimensions_xyz": [
+        1.14808750152588,
+        1.11737632751465,
+        1.26546335220337
+      ],
+      "source": "original attachment factory spot_herb_patch",
+      "surfaces": 4,
+      "triangles": 6252
+    },
+    "reed_bank": {
+      "bounds": [
+        [
+          -0.600000023841858,
+          0.0,
+          -0.577053546905518
+        ],
+        [
+          0.600000023841858,
+          0.990000009536743,
+          0.577053546905518
+        ]
+      ],
+      "dimensions_xyz": [
+        1.20000004768372,
+        0.990000009536743,
+        1.15410709381104
+      ],
+      "source": "assets/farm/art/reed_bank.glb",
+      "surfaces": 1,
+      "triangles": 890
+    },
+    "rock_pile": {
+      "bounds": [
+        [
+          -0.536698043346405,
+          -0.058817271143198,
+          -0.597915053367615
+        ],
+        [
+          0.565392971038818,
+          0.492817223072052,
+          0.465803503990173
+        ]
+      ],
+      "dimensions_xyz": [
+        1.10209107398987,
+        0.55163449048996,
+        1.06371855735779
+      ],
+      "source": "original attachment factory spot_rock_pile",
+      "surfaces": 5,
+      "triangles": 1300
+    }
+  },
+  "uid_generation": {
+    "generated_by": "Godot scene importer, missing uid before initial import",
+    "uids": {
+      "clay_pit": "uid://ptw85h8qkuvw",
+      "flax_patch": "uid://0diyj1vopaym",
+      "grove": "uid://ceolumr60s4fv",
+      "hardwood_grove": "uid://dpgj8d8eabcth",
+      "herb_patch": "uid://0ogw3sl04lnr",
+      "reed_bank": "uid://mwecqlocsfnq",
+      "rock_pile": "uid://646b6yhqex1p"
+    }
+  },
+  "scenery_review_only": {
+    "path": "modules/ponds/pond_scenery.gd",
+    "reason": "416 accepted 1aa399b8: decorative crowns must clear resource slots; review-only 1.5m low-decoration / 3m trunk exclusion at L1/L2",
+    "original_sha256": "04726292d1b06c94c113794a65c8bb643d841031f3c56987ee325eecd59888e1",
+    "review_sha256": "aba3a928623b4dde3947ac1fb56cd7cd8d57dcc9aee7cc19828319d570fd38af"
+  },
+  "geometry": {
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+    "checks": [
+      {
+        "check": "grove_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "grove_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Grove: clearly small tree, two pale stumps",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "rock_pile_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Rock: .15m-high broad flat stone and four pebbles",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "reed_bank_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Reed: one-third-height cuts and no cattails",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "clay_pit_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Clay: empty, low pit and flat spade; no mound or bricks",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "herb_patch_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Herb: remaining pale leaf clump at least half original width",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Hardwood: no crown or lumber",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: one named mobile mesh",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: one surface",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: actual triangle budget <=600",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: manifest bounds match actual vertices",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: inside original X/Z footprint at unchanged origin",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: lower than original and grounded at Y=0",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: zero translation, unit scale and rotation",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: no animation, bones, camera or light",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: vertex colours only, no textures",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: exact sign.glb matte material payload",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: finite positions and unit normals",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: no degenerate triangles, opaque paint",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: visibility patch consists of real exported vertices",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: sign import params including tangents/LOD/light_baking=1",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: unique Godot-generated UID, valid alphabet",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: manifest SHA-256",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: exact delivered model rendered",
+        "passed": true
+      },
+      {
+        "check": "flax_patch_gathered: shared regrowth only on the four approved plant kinds",
+        "passed": true
+      },
+      {
+        "check": "Flax: original stem centres, no blue flower paint",
+        "passed": true
+      },
+      {
+        "check": "Manifest appends seven gathered entries; every original entry preserved",
+        "passed": true
+      },
+      {
+        "check": "All original runtime art and imports unchanged",
+        "passed": true
+      },
+      {
+        "check": "Native b1 unchanged: scenes/p0/p0_pond.gd",
+        "passed": true
+      },
+      {
+        "check": "Native b1 unchanged: scenes/p0/p0_ui.gd",
+        "passed": true
+      },
+      {
+        "check": "Native b1 unchanged: modules/farm/farm_art.gd",
+        "passed": true
+      },
+      {
+        "check": "Native b1 unchanged: modules/farm/crop_plant_mesh.gd",
+        "passed": true
+      },
+      {
+        "check": "Native b1 unchanged: modules/mining/mine_mesh.gd",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "grove": {
+        "triangles": 558,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.75,
+            0.0,
+            -0.75
+          ],
+          [
+            0.75,
+            0.9500000476837158,
+            0.75
+          ]
+        ],
+        "uid": "uid://ceolumr60s4fv",
+        "sha256": "51169deb559df27d379de646ac0758c676216480848c7f2fa2f8bd0cc2c02169"
+      },
+      "rock_pile": {
+        "triangles": 340,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.443665474653244,
+            0.0,
+            -0.4721066951751709
+          ],
+          [
+            0.4099999964237213,
+            0.15000000596046448,
+            0.40827882289886475
+          ]
+        ],
+        "uid": "uid://646b6yhqex1p",
+        "sha256": "5d70e468dbc1e5290b937dca42e3082e2e6a36882136f1b9343ebaed0995936a"
+      },
+      "reed_bank": {
+        "triangles": 502,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6000000238418579,
+            0.0,
+            -0.5479837656021118
+          ],
+          [
+            0.6000000238418579,
+            0.33000001311302185,
+            0.556016206741333
+          ]
+        ],
+        "uid": "uid://mwecqlocsfnq",
+        "sha256": "82184a05b338dec6e568fbb00902c46774b9d64164bceaa7461b3fed812322c9"
+      },
+      "clay_pit": {
+        "triangles": 352,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.5899999737739563,
+            0.0,
+            -0.5461744070053101
+          ],
+          [
+            0.5899999737739563,
+            0.1171269565820694,
+            0.5461744070053101
+          ]
+        ],
+        "uid": "uid://ptw85h8qkuvw",
+        "sha256": "9a6f504f4bb7b3fb7b1823a5e7b68e609ee4d942058ad1277700271077aaac48"
+      },
+      "herb_patch": {
+        "triangles": 298,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.4399999976158142,
+            0.0,
+            -0.4099999964237213
+          ],
+          [
+            0.4399999976158142,
+            0.15000000596046448,
+            0.4099999964237213
+          ]
+        ],
+        "uid": "uid://0ogw3sl04lnr",
+        "sha256": "a15ce7dd786032bf251658b8a0c712e7d90fab708b6fe4f8985eb329cc0ca248"
+      },
+      "hardwood_grove": {
+        "triangles": 542,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            0.0,
+            -0.6000000238418579
+          ],
+          [
+            0.6499999761581421,
+            0.34299999475479126,
+            0.6000000238418579
+          ]
+        ],
+        "uid": "uid://dpgj8d8eabcth",
+        "sha256": "0453ca151174de3f4629631cec5915e46e9c1090ca1fd3aaabfd3aa3efc251c4"
+      },
+      "flax_patch": {
+        "triangles": 406,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            0.0,
+            -0.6299999952316284
+          ],
+          [
+            0.6499999761581421,
+            0.23345166444778442,
+            0.6299999952316284
+          ]
+        ],
+        "uid": "uid://0diyj1vopaym",
+        "sha256": "e3f4ba4fb2df3232daf178af6456232c9871477f3da3f2ea04520fe9be145e54"
+      }
+    },
+    "runtime": {
+      "runtime_commit": "67116c6df4f69062ce658c50581e72ab1779a1b4",
+      "art_base": "4d662915bab25d468d729a13522446f87e41675a",
+      "files": {
+        "scenes/p0/p0_pond.gd": "ff5329d10f06d8daea2ef8f7b3136ed43c4e12077606f5a58d64e014c5add9b2",
+        "scenes/p0/p0_ui.gd": "a95d0402b458d71bbf8c5dbc0dcf926a6eb76536caf70a824a8c2b0a965f6a83",
+        "modules/farm/farm_art.gd": "c389f99b08eca2702126783716fcba626121dc62c72fa01eb4b920045f53b6f4",
+        "modules/farm/crop_plant_mesh.gd": "89eba86807820275c79de31de0b7ac93615a81fe895d2afedff2a1118f966b90",
+        "modules/mining/mine_mesh.gd": "0937de580a0676695679549bf90a2d28d0a849b5e40477dae614ba1e2ca4725e"
+      }
+    },
+    "passed": true
+  },
+  "source": {
+    "checks": [
+      {
+        "check": "grove: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "grove: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "grove: Quiet grove ground",
+        "passed": true
+      },
+      {
+        "check": "grove: Remaining small tree trunk",
+        "passed": true
+      },
+      {
+        "check": "grove: Light growth-ring stump 1",
+        "passed": true
+      },
+      {
+        "check": "grove: Light growth-ring stump 2",
+        "passed": true
+      },
+      {
+        "check": "grove: Regrowth sprout 1 / stem",
+        "passed": true
+      },
+      {
+        "check": "grove: Regrowth sprout 2 / stem",
+        "passed": true
+      },
+      {
+        "check": "grove: Remaining small round canopy",
+        "passed": true
+      },
+      {
+        "check": "grove: Regrowth sprout 1 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "grove: Regrowth sprout 1 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "grove: Regrowth sprout 2 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "grove: Regrowth sprout 2 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "grove: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: Large remaining flat stone",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: Tidy pebble 1",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: Tidy pebble 2",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: Tidy pebble 3",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: Tidy pebble 4",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Small dark wet-mud footprint",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Small bank pebble 1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Small bank pebble 2",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 01",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 02",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 03",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 04",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 05",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 06",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 07",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 08",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 09",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 10",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 11",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 12",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 13",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 14",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 15",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 16",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 17",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 18",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 19",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 20",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 21",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Even cut reed 22",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Regrowth sprout 1 / stem",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Regrowth sprout 2 / stem",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Regrowth sprout 1 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Regrowth sprout 1 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Regrowth sprout 2 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: Regrowth sprout 2 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: unchanged reused geometry / origin: Small dark wet-mud footprint",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: unchanged reused geometry / origin: Small bank pebble 1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: unchanged reused geometry / origin: Small bank pebble 2",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: Low grassy rim and shallow ochre pit",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: Thin spade blade in clay",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: Slender wooden spade shaft",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: Open wooden spade grip",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: Thin remaining red-ochre clay",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: unchanged reused geometry / origin: Low grassy rim and shallow ochre pit",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Pale clipped herb ground",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Clipped herb stem 1",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Clipped herb stem 2",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Clipped herb stem 3",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 1",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 2",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 3",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 4",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 5",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 6",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 7",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: Low remaining mint leaf 8",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Independent ringed stump / walnut bark",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Stump cut / three visible growth rings",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Quiet walnut grove ground",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Large walnut growth-ring stump",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Regrowth sprout 1 / stem",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Regrowth sprout 2 / stem",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Regrowth sprout 1 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Regrowth sprout 1 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Regrowth sprout 2 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: Regrowth sprout 2 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: unchanged reused geometry / origin: Independent ringed stump / walnut bark",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: unchanged reused geometry / origin: Stump cut / three visible growth rings",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: original resource-point origin at zero, scale one",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: editable named parts match manifest",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Soft light-brown soil border",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 01",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 02",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 03",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 04",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 05",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 06",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 07",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 08",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 09",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 10",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 11",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 12",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 13",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 14",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 15",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Cut flax stem 16",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Regrowth sprout 1 / stem",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Regrowth sprout 2 / stem",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Regrowth sprout 1 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Regrowth sprout 1 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Regrowth sprout 2 / leaf -1",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: Regrowth sprout 2 / leaf +1",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: editable source agrees with actual GLB bounds/budget",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: unchanged reused geometry / origin: Soft light-brown soil border",
+        "passed": true
+      },
+      {
+        "check": "All eight sprouts share geometry/scale within 1e-6m float precision and identical colour",
+        "passed": true
+      }
+    ],
+    "assets": {
+      "grove": {
+        "parts": 11,
+        "triangles": 558,
+        "bounds": [
+          [
+            -0.75,
+            0.0,
+            -0.75
+          ],
+          [
+            0.75,
+            0.9500000476837158,
+            0.75
+          ]
+        ]
+      },
+      "rock_pile": {
+        "parts": 5,
+        "triangles": 340,
+        "bounds": [
+          [
+            -0.443665474653244,
+            0.0,
+            -0.4721066951751709
+          ],
+          [
+            0.4099999964237213,
+            0.15000000596046448,
+            0.40827882289886475
+          ]
+        ]
+      },
+      "reed_bank": {
+        "parts": 31,
+        "triangles": 502,
+        "bounds": [
+          [
+            -0.6000000238418579,
+            0.0,
+            -0.5479837656021118
+          ],
+          [
+            0.6000000238418579,
+            0.33000001311302185,
+            0.556016206741333
+          ]
+        ]
+      },
+      "clay_pit": {
+        "parts": 5,
+        "triangles": 352,
+        "bounds": [
+          [
+            -0.5899999737739563,
+            0.0,
+            -0.5461744070053101
+          ],
+          [
+            0.5899999737739563,
+            0.1171269565820694,
+            0.5461744070053101
+          ]
+        ]
+      },
+      "herb_patch": {
+        "parts": 12,
+        "triangles": 298,
+        "bounds": [
+          [
+            -0.4399999976158142,
+            0.0,
+            -0.4099999964237213
+          ],
+          [
+            0.4399999976158142,
+            0.15000000596046448,
+            0.4099999964237213
+          ]
+        ]
+      },
+      "hardwood_grove": {
+        "parts": 10,
+        "triangles": 542,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            0.0,
+            -0.6000000238418579
+          ],
+          [
+            0.6499999761581421,
+            0.34299999475479126,
+            0.6000000238418579
+          ]
+        ]
+      },
+      "flax_patch": {
+        "parts": 23,
+        "triangles": 406,
+        "bounds": [
+          [
+            -0.6499999761581421,
+            0.0,
+            -0.6299999952316284
+          ],
+          [
+            0.6499999761581421,
+            0.23345166444778442,
+            0.6299999952316284
+          ]
+        ]
+      }
+    },
+    "shared_sprout_instances": 8,
+    "sprout_max_coordinate_error_m": 4.52995300159742e-08,
+    "passed": true
+  },
+  "godot": {
+    "assets": {
+      "clay_pit": {
+        "bounds": [
+          [
+            -0.589999973773956,
+            0.0,
+            -0.54617440700531
+          ],
+          [
+            0.589999973773956,
+            0.117126956582069,
+            0.54617440700531
+          ]
+        ],
+        "dimensions_xyz": [
+          1.17999994754791,
+          0.117126956582069,
+          1.09234881401062
+        ],
+        "surfaces": 1,
+        "triangles": 352
+      },
+      "flax_patch": {
+        "bounds": [
+          [
+            -0.649999976158142,
+            0.0,
+            -0.629999995231628
+          ],
+          [
+            0.649999976158142,
+            0.233451664447784,
+            0.629999995231628
+          ]
+        ],
+        "dimensions_xyz": [
+          1.29999995231628,
+          0.233451664447784,
+          1.25999999046326
+        ],
+        "surfaces": 1,
+        "triangles": 406
+      },
+      "grove": {
+        "bounds": [
+          [
+            -0.75,
+            0.0,
+            -0.75
+          ],
+          [
+            0.75,
+            0.950000047683716,
+            0.75
+          ]
+        ],
+        "dimensions_xyz": [
+          1.5,
+          0.950000047683716,
+          1.5
+        ],
+        "surfaces": 1,
+        "triangles": 558
+      },
+      "hardwood_grove": {
+        "bounds": [
+          [
+            -0.649999976158142,
+            0.0,
+            -0.600000023841858
+          ],
+          [
+            0.649999976158142,
+            0.342999994754791,
+            0.600000023841858
+          ]
+        ],
+        "dimensions_xyz": [
+          1.29999995231628,
+          0.342999994754791,
+          1.20000004768372
+        ],
+        "surfaces": 1,
+        "triangles": 542
+      },
+      "herb_patch": {
+        "bounds": [
+          [
+            -0.439999997615814,
+            0.0,
+            -0.409999996423721
+          ],
+          [
+            0.439999997615814,
+            0.150000005960464,
+            0.409999996423721
+          ]
+        ],
+        "dimensions_xyz": [
+          0.879999995231628,
+          0.150000005960464,
+          0.819999992847443
+        ],
+        "surfaces": 1,
+        "triangles": 298
+      },
+      "reed_bank": {
+        "bounds": [
+          [
+            -0.600000023841858,
+            0.0,
+            -0.547983765602112
+          ],
+          [
+            0.600000023841858,
+            0.330000013113022,
+            0.556016206741333
+          ]
+        ],
+        "dimensions_xyz": [
+          1.20000004768372,
+          0.330000013113022,
+          1.10399997234344
+        ],
+        "surfaces": 1,
+        "triangles": 502
+      },
+      "rock_pile": {
+        "bounds": [
+          [
+            -0.443665474653244,
+            0.0,
+            -0.472106695175171
+          ],
+          [
+            0.409999996423721,
+            0.150000005960464,
+            0.408278822898865
+          ]
+        ],
+        "dimensions_xyz": [
+          0.853665471076965,
+          0.150000005960464,
+          0.880385518074036
+        ],
+        "surfaces": 1,
+        "triangles": 340
+      }
+    },
+    "captures": [
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          222.857147216797,
+          378.647979736328,
+          80.3571472167969,
+          79.3924560546875
+        ],
+        "name": "pair_grove",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          44.0081176757812,
+          328.590911865234,
+          108.998748779297,
+          130.277893066406
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          239.267929077148,
+          412.691589355469,
+          45.7320709228516,
+          33.0815124511719
+        ],
+        "name": "pair_rock_pile",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          68.2125778198242,
+          398.889221191406,
+          59.0406036376953,
+          46.3927001953125
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          230.892868041992,
+          403.909881591797,
+          64.2857208251953,
+          47.0429077148438
+        ],
+        "name": "pair_reed_bank",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          64.8214263916016,
+          382.809967041016,
+          64.2857055664062,
+          68.142822265625
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          231.428573608398,
+          410.409332275391,
+          63.2143096923828,
+          40.2276916503906
+        ],
+        "name": "pair_clay_pit",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          65.3571395874023,
+          406.861755371094,
+          63.2142868041992,
+          43.7752685546875
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          239.464294433594,
+          414.153991699219,
+          47.1428527832031,
+          31.4639892578125
+        ],
+        "name": "pair_herb_patch",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          65.140495300293,
+          400.965484619141,
+          61.5046691894531,
+          68.8876037597656
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          228.214294433594,
+          405.909454345703,
+          69.6428527832031,
+          47.3140563964844
+        ],
+        "name": "pair_hardwood_grove",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          58.8348121643066,
+          332.581207275391,
+          76.2589225769043,
+          122.180511474609
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.0, 28.07993, 41.25415)]",
+        "gathered_screen_rect": [
+          228.214294433594,
+          407.660095214844,
+          69.6428527832031,
+          46.0349731445312
+        ],
+        "name": "pair_flax_patch",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.125,
+          0.0,
+          -1.625
+        ],
+        "ready_screen_rect": [
+          62.1428451538086,
+          388.58154296875,
+          69.6428604125977,
+          65.1138305664062
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          76.6071472167969,
+          348.035247802734,
+          80.3571319580078,
+          79.3923645019531
+        ],
+        "name": "follow_grove",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          63.8295478820801,
+          210.292633056641,
+          108.9987449646,
+          130.277801513672
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          93.0179214477539,
+          382.078643798828,
+          45.7320785522461,
+          33.0815124511719
+        ],
+        "name": "follow_rock_pile",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          88.0340347290039,
+          280.5908203125,
+          59.0405960083008,
+          46.392822265625
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          84.6428527832031,
+          373.296936035156,
+          64.2857208251953,
+          47.0429992675781
+        ],
+        "name": "follow_reed_bank",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          84.6428527832031,
+          264.511657714844,
+          64.2857208251953,
+          68.1427307128906
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          85.1785659790039,
+          379.79638671875,
+          63.2142868041992,
+          40.2278137207031
+        ],
+        "name": "follow_clay_pit",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          85.1785659790039,
+          288.563354492188,
+          63.2142868041992,
+          43.7752990722656
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          93.2142868041992,
+          383.541137695312,
+          47.1428604125977,
+          31.4638977050781
+        ],
+        "name": "follow_herb_patch",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          84.9619445800781,
+          282.667205810547,
+          61.5046844482422,
+          68.8875122070312
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          81.9642944335938,
+          375.296600341797,
+          69.6428527832031,
+          47.31396484375
+        ],
+        "name": "follow_hardwood_grove",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          78.65625,
+          214.282836914062,
+          76.2589263916016,
+          122.180480957031
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (0.88, 27.27993, 22.63415)]",
+        "gathered_screen_rect": [
+          81.9642944335938,
+          377.047241210938,
+          69.6428527832031,
+          46.0348815917969
+        ],
+        "name": "follow_flax_patch",
+        "pitch_degrees": -43.0,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          0.879999995231628,
+          0.0,
+          -6.61999988555908
+        ],
+        "ready_screen_rect": [
+          81.9642944335938,
+          270.283081054688,
+          69.6428527832031,
+          65.1138916015625
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      },
+      {
+        "camera": "[X: (1.0, 0.0, 0.0), Y: (0.0, 0.731354, -0.681998), Z: (0.0, 0.681998, 0.731354), O: (6.88, 27.27993, 27.87415)]",
+        "gathered_screen_rect": [
+          186.964263916016,
+          378.334899902344,
+          63.2142791748047,
+          40.2277221679688
+        ],
+        "name": "pond_cooldown",
+        "pitch_degrees": -42.9999961853027,
+        "pixels": [
+          360,
+          800
+        ],
+        "player": [
+          6.88000011444092,
+          0.0,
+          -1.37999999523163
+        ],
+        "width_m": 6.71999979019165,
+        "zoom": 1.0
+      }
+    ],
+    "checks": [
+      {
+        "check": "pond_san_francisco_03: native player assembled",
+        "passed": true
+      },
+      {
+        "check": "grove: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "grove: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "grove: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "grove: lower than original",
+        "passed": true
+      },
+      {
+        "check": "grove: unit scale",
+        "passed": true
+      },
+      {
+        "check": "grove: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "grove: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_grove",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: lower than original",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: unit scale",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_rock_pile",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: lower than original",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: unit scale",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_reed_bank",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: lower than original",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: unit scale",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_clay_pit",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: lower than original",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: unit scale",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_herb_patch",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: lower than original",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: unit scale",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_hardwood_grove",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: <=600 triangles / one surface",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: imported triangle count matches delivered GLB",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: contained in original X/Z bounds",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: lower than original",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: unit scale",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: shared farm vertex material",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: no rig/animation",
+        "passed": true
+      },
+      {
+        "check": "Saved pair_flax_patch",
+        "passed": true
+      },
+      {
+        "check": "Native following camera zoom 1, width 6.72m, pitch 43 degrees",
+        "passed": true
+      },
+      {
+        "check": "grove: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "grove: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_grove",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "rock_pile: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_rock_pile",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "reed_bank: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_reed_bank",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "clay_pit: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_clay_pit",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "herb_patch: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_herb_patch",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "hardwood_grove: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_hardwood_grove",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: actual ground/flat-stone patch >=20px at follow zoom 1",
+        "passed": true
+      },
+      {
+        "check": "flax_patch: full gathered mesh in frame",
+        "passed": true
+      },
+      {
+        "check": "Saved follow_flax_patch",
+        "passed": true
+      },
+      {
+        "check": "pond_san_francisco_01: native player assembled",
+        "passed": true
+      },
+      {
+        "check": "Visible-state swap preserves resource-point model transform",
+        "passed": true
+      },
+      {
+        "check": "Native name-bar hit anchor unchanged during cooldown swap",
+        "passed": true
+      },
+      {
+        "check": "Native name bar dimmed with cooldown fact",
+        "passed": true
+      },
+      {
+        "check": "Native Dimmed icon opacity .45",
+        "passed": true
+      },
+      {
+        "check": "Saved pond_cooldown",
+        "passed": true
+      },
+      {
+        "check": "Godot Mobile renderer",
+        "passed": true
+      },
+      {
+        "check": "Only offline startup reads/telemetry intercepted, no gameplay requests",
+        "passed": true
+      }
+    ],
+    "cooldown": {
+      "dimmed": true,
+      "fact": "Ready in 3h 12m",
+      "fixture": true,
+      "full_cooldown_seconds": 14400,
+      "remaining_seconds": 11520,
+      "resource_origin": [
+        7.59999990463257,
+        0.0,
+        -1.39999997615814
+      ],
+      "stand": [
+        6.88000011444092,
+        0.0,
+        -1.37999999523163
+      ],
+      "text": "Clay Pit",
+      "unchanged_anchor_world": [
+        7.59999990463257,
+        0.833999991416931,
+        -1.39999997615814
+      ],
+      "unchanged_hit_screen": [
+        218.571411132812,
+        392.216888427734
+      ]
+    },
+    "intercepted_requests": [
+      {
+        "method": 0,
+        "path": "/p0/state?space=pond&place=pond_san_francisco_03",
+        "type": ""
+      }
+    ],
+    "passed": true,
+    "pixel_widths": {
+      "clay_pit": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Low grassy rim and shallow ochre pit"
+        ],
+        "patch_screen_rect": [
+          85.1785659790039,
+          379.79638671875,
+          63.2142868041992,
+          40.2281188964844
+        ],
+        "patch_width_px": 63.2142868041992,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          85.1785659790039,
+          379.79638671875,
+          63.2142868041992,
+          40.2278137207031
+        ]
+      },
+      "flax_patch": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Soft light-brown soil border"
+        ],
+        "patch_screen_rect": [
+          81.9642944335938,
+          377.047149658203,
+          69.6428527832031,
+          46.0348815917969
+        ],
+        "patch_width_px": 69.6428527832031,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          81.9642944335938,
+          377.047241210938,
+          69.6428527832031,
+          46.0348815917969
+        ]
+      },
+      "grove": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Quiet grove ground"
+        ],
+        "patch_screen_rect": [
+          76.6071472167969,
+          372.623687744141,
+          80.3571319580078,
+          54.8034973144531
+        ],
+        "patch_width_px": 80.3571319580078,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          76.6071472167969,
+          348.035247802734,
+          80.3571319580078,
+          79.3923645019531
+        ]
+      },
+      "hardwood_grove": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Quiet walnut grove ground"
+        ],
+        "patch_screen_rect": [
+          81.9642944335938,
+          378.104095458984,
+          69.6428527832031,
+          43.8427124023438
+        ],
+        "patch_width_px": 69.6428527832031,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          81.9642944335938,
+          375.296600341797,
+          69.6428527832031,
+          47.31396484375
+        ]
+      },
+      "herb_patch": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Pale clipped herb ground"
+        ],
+        "patch_screen_rect": [
+          93.2142868041992,
+          385.045837402344,
+          47.1428604125977,
+          29.9591979980469
+        ],
+        "patch_width_px": 47.1428604125977,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          93.2142868041992,
+          383.541137695312,
+          47.1428604125977,
+          31.4638977050781
+        ]
+      },
+      "reed_bank": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Small dark wet-mud footprint"
+        ],
+        "patch_screen_rect": [
+          84.6428527832031,
+          380.004516601562,
+          64.2857208251953,
+          40.3353271484375
+        ],
+        "patch_width_px": 64.2857208251953,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          84.6428527832031,
+          373.296936035156,
+          64.2857208251953,
+          47.0429992675781
+        ]
+      },
+      "rock_pile": {
+        "gathered_position": [
+          -0.300000011920929,
+          0.0,
+          -6.59999990463257
+        ],
+        "patch_parts": [
+          "Large remaining flat stone"
+        ],
+        "patch_screen_rect": [
+          94.8214263916016,
+          384.017608642578,
+          43.9285736083984,
+          24.6262512207031
+        ],
+        "patch_width_px": 43.9285736083984,
+        "ready_position": [
+          -0.300000011920929,
+          0.0,
+          -9.0
+        ],
+        "whole_screen_rect": [
+          93.0179214477539,
+          382.078643798828,
+          45.7320785522461,
+          33.0815124511719
+        ]
+      }
+    },
+    "renderer": {
+      "gpu": "NVIDIA GeForce RTX 2060",
+      "method": "mobile"
+    }
+  }
+}

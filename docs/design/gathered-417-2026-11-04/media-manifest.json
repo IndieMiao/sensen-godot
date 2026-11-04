@@ -1,0 +1,30 @@
+[
+  {
+    "file": "SGODOT-417_gathered_v1_before_after.jpg",
+    "bytes": 758651,
+    "sha256": "5332dd66d986d97edc1caf097abd030bdf81e6de419976d6215e09b5ff5211dc",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-417_gathered_v1_pond_cooldown.png",
+    "bytes": 445449,
+    "sha256": "e7590734a858a1324bde8a5530c1b4967e67ea4d532261ce4e1b34b248294d5d",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-417_gathered_v1_follow_visibility.jpg",
+    "bytes": 1091660,
+    "sha256": "5d61714be18d7e70a2b603558cd3174551f3a46a1418dac39bb4c2ad31d415c4",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-417_gathered_v1_validation.json",
+    "bytes": 68068,
+    "sha256": "9285ce17de896197523ec62bcc448c594787e0b4dfa087f684357a06d7860715",
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
