@@ -823,6 +823,168 @@
 			"thumb": "res://assets/avatar/thumbs/hairhat43_npc_black.png",
 			"tier": 0,
 			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat51_npc_lena",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat51_npc_lena.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat51_npc_lena.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat36_npc_rafa",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat36_npc_rafa.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat36_npc_rafa.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1_1_npc_rafa",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1_1_npc_rafa.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1_1_npc_rafa.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat41_npc_nadia_baker",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat41_npc_nadia_baker.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat41_npc_nadia_baker.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1_1_npc_nadia",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1_1_npc_nadia.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1_1_npc_nadia.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1_npc_lou",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1_npc_lou.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1_npc_lou.png",
+			"tier": 0,
+			"unity_guid": ""
 		}
 	],
 	"version": 1
