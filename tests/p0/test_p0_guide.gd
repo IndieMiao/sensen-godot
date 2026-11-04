@@ -105,6 +105,16 @@ func test_a_waiting_tip_goes_when_done_or_when_its_surface_is_left() -> void:
 	assert_bool(r.seen.has("map")).is_false()                 # unseen: the map asks again next time
 	assert_bool(r.request("map")).is_true()
 
+## 不知火舞 355 G19: under a dialog only the tip about it comes up (the paid travel card's `travel`); the others wait.
+func test_under_a_dialog_only_its_own_tip_comes_up() -> void:
+	var q = Guide.TipQueue.new({})
+	q.request("meal")
+	q.request("travel")
+	assert_str(q.next(true)).is_equal("travel")              # over the travel card, ahead of the waiting meal tip
+	q.close()
+	assert_str(q.next(true)).is_equal("")                    # the meal tip waits for the dialog
+	assert_str(q.next()).is_equal("meal")
+
 # ---------------------------------------------------------------- Today rows (§14.2)
 
 func test_first_session_rows_follow_the_director_table() -> void:

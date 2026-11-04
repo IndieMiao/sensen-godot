@@ -49,6 +49,10 @@ static func tip_seconds(text: String) -> float:
 ## time Energy runs out (the first level-up teaches in its banner instead).
 static func tip_for_surface(surface: String) -> String:
 	return {"farm": "sow", "pond": "creel", "map": "map", "stove": "cook"}.get(surface, "")
+## The tips about the dialog they are asked for with, shown over it while it is up (不知火舞 355, G19): v4q(4) ⑥ has
+## `Travel costs Energy and coins.` on the first paid travel card's opening — after Fly it would teach nothing. They go
+## with that dialog: Fly, ✕ or a card over it (the Energy card) takes it away, seen. Every other tip waits for dialogs.
+const OVER_DIALOG := {"travel": true}
 ## The surface a tip belongs to, for the ones asked for on arriving there (the stove's `cook` is a drawer's, not a world's).
 const SURFACE_OF_TIP := {"sow": "farm", "creel": "pond", "map": "map"}
 
@@ -83,10 +87,20 @@ class TipQueue:
 	func moment_opened() -> void: moments += 1
 	func moment_closed() -> void: moments = maxi(0, moments - 1)
 
-	## The next tip to put on screen, or "" (one is up, a Moment is up, or none waits). Marks it seen.
-	func next() -> String:
+	## The next tip to put on screen, or "" (one is up, a Moment is up, or none waits). Marks it seen. Under a dialog
+	## (dialog_up) only a tip about that dialog comes up (P0Guide.OVER_DIALOG: the travel card's own); the rest wait.
+	func next(dialog_up := false) -> String:
 		if showing != "" or moments > 0 or waiting.is_empty(): return ""
-		showing = str(waiting.pop_front())
+		var at := 0
+		if dialog_up:
+			at = -1
+			for i in waiting.size():
+				if P0Guide.OVER_DIALOG.has(str(waiting[i])):
+					at = i
+					break
+			if at < 0: return ""
+		showing = str(waiting[at])
+		waiting.remove_at(at)
 		seen[showing] = true
 		return showing
 
