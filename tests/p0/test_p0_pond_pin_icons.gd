@@ -82,7 +82,9 @@ func test_the_new_icons_are_imported_with_a_uid_of_their_own() -> void:
 		var cfg := ConfigFile.new()
 		assert_int(cfg.load(path + ".import")).is_equal(OK)
 		var uid := str(cfg.get_value("remap", "uid", ""))
-		assert_str(uid).starts_with("uid://")
+		# Godot's own form, base 34: a–y and 0–8 (ResourceUID::id_to_text) — a z or a 9 is rewritten by every import (亚瑟 on #740)
+		var form := RegEx.create_from_string("^uid://[a-y0-8]+$")
+		assert_object(form.search(uid)).override_failure_message("%s: %s is no uid Godot writes" % [name, uid]).is_not_null()
 		assert_bool(uids.has(uid)).is_false()
 		uids[uid] = true
 		assert_str(str(cfg.get_value("deps", "source_file", ""))).is_equal(path)
