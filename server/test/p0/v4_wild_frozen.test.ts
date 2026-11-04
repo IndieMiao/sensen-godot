@@ -5,7 +5,8 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
-import { near3Sites, nearestFreeVein, parseBbox, siteFor, viewport, wildById, wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
+import { catalogue, near3Sites, nearestFreeVein, parseBbox, siteFor, viewport, wildById, wildNearOf, wildPricedOf } from '../../src/p0/wild.js';
+import { siteContinent } from '../../src/p0/clusters.js';
 import type { WorldContent } from '../../src/p0/world.js';
 
 const c: P0Content = loadP0Content();
@@ -87,5 +88,26 @@ describe('the wild sites a save freezes (v4q(3))', () => {
     expect(viewport(c, s, box, 10, T0).sites.find(x => x.id === id)?.best_floor).toBe(14);
     s.travel.here = id;
     expect((viewOf(c, s, T0) as { wild: { here: { id: string; best_floor: number } } }).wild.here).toMatchObject({ id, best_floor: 14 });
+  });
+});
+
+describe('the catalogue as made (v4 3.3; 李白\'s c6v4 count, 11-04)', () => {
+  const c = loadP0Content();
+  const sites = [...catalogue(c)!.byId.values()];
+  it('a ruin on each continent, one each — Siberia counts as Asia, so Europe has its own', () => {
+    expect(siteContinent('europe', 'RU', 162.7)).toBe('asia');   // Chukotka
+    expect(siteContinent('europe', 'RU', 37.6)).toBe('europe');   // Moscow's side of the Urals
+    expect(siteContinent('europe', 'FI', 25)).toBe('europe');
+    const ruins = sites.filter(s => s.type === 'ruin').map(s => s.continent).sort();
+    expect(ruins).toEqual(['africa', 'asia', 'europe', 'north_america', 'oceania', 'south_america']);
+  });
+  it('every region (continent × climate × coast) holds 1–3 abyss', () => {
+    const all = new Map<string, number>(), abyss = new Map<string, number>();
+    for (const s of sites) {
+      const k = `${s.continent}|${s.climate}|${s.coastal}`;
+      all.set(k, (all.get(k) ?? 0) + 1);
+      if (s.type === 'abyss') abyss.set(k, (abyss.get(k) ?? 0) + 1);
+    }
+    for (const k of all.keys()) expect([1, 2, 3], k).toContain(abyss.get(k) ?? 0);
   });
 });

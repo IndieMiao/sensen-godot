@@ -9,7 +9,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { distanceKm, tripByKm } from './clusters.js';
+import { distanceKm, siteContinent, tripByKm } from './clusters.js';
 import type { P0Content } from './content.js';
 import { clusterById, homeBase, homeOf } from './home.js';
 import type { P0State } from './state.js';
@@ -50,7 +50,8 @@ export function catalogueOf(c: P0Content, table: WildTable): Catalogue {
     const t = table.types[r[type] as number], cl = clusterById(c, r[near] as string), id = `${WILD_PREFIX}${r[row]}-${r[col]}`;
     const s: WildSite = { id, type: t, lat: r[lat] as number, lng: r[lng] as number, name: `${r[word]} ${rules.type_words[t]}`,
       short: r[word] as string, near: r[near] as string, near_name: cl?.name ?? '', climate: cl?.climate ?? '',
-      continent: cl?.continent ?? '', country: country >= 0 ? (r[country] as string) : '', coastal: r[coastal] === 1, open: rules.open.includes(t) };
+      continent: siteContinent(cl?.continent ?? '', country >= 0 ? (r[country] as string) : '', r[lng] as number), country: country >= 0 ? (r[country] as string) : '',
+      coastal: r[coastal] === 1, open: rules.open.includes(t) };
     const rule = rules.mines[t];
     if (rule) {
       const m = (r[main] as string | null) ?? null;
