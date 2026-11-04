@@ -15,11 +15,9 @@ const BEGINNER_LINE := "A nearby pond for your first catch."
 
 ## {} for a pond the content does not know (another city's pond).
 static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
-	var fishing: Dictionary = P0Logic.content().get("fishing", {})
 	var place := place_of(pond_id)
 	if place.is_empty(): return {}
-	var site: Dictionary = fishing.get("sites", {}).get(str(place.get("site", "pond")), {})
-	var template := str(site.get("template", "Pond"))
+	var template := template_of(pond_id)
 	var beginner := bool(place.get("beginner", false))
 	var distance := P0PlaceSheet.distance_text(km)
 	var facts: Array = [["Distance", distance], ["Recommended", "Outleveled" if outleveled(view, pond_id) else str(RECOMMENDED.get(template, ""))]]
@@ -101,12 +99,17 @@ static func place_of(pond_id: String) -> Dictionary:
 	var gen: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(pond_id)
 	return {} if gen.is_empty() else {"name": gen.name, "site": gen.site, "beginner": gen.beginner, "city": gen.cluster}
 
-## The map pin's icon by the pond's site (SGODOT-406, 安其拉's B set, 不知火舞 9b2d28ae): still water, a stream, a cove.
-## By the site, not content.fishing.sites' template: `coast` has no template there yet (it reads as Pond), the server's
-## generator gives coastal cities coast ponds all the same (world.ts Site). A pond not known: the still water.
-const PIN_ICONS := {"pond": "pond", "river": "pond_river", "coast": "pond_coast"}
+## A pond's fishing template, content.fishing.sites[its site].template (Pond when none): the card's subtitle, its
+## Recommended and the map pin's icon go by it alike.
+static func template_of(pond_id: String) -> String:
+	var site := str(place_of(pond_id).get("site", "pond"))
+	return str(P0Logic.content().get("fishing", {}).get("sites", {}).get(site, {}).get("template", "Pond"))
+
+## The map pin's icon by the pond's fishing template (SGODOT-406, 安其拉's B set; 不知火舞 9b2d28ae, and by the template
+## as the card says it, on #740): still water, a stream, a cove. Any other: the still water.
+const PIN_ICONS := {"Pond": "pond", "River": "pond_river", "Coast": "pond_coast"}
 static func pin_icon(pond_id: String) -> String:
-	return str(PIN_ICONS.get(str(place_of(pond_id).get("site", "pond")), "pond"))
+	return str(PIN_ICONS.get(template_of(pond_id), "pond"))
 
 ## Where the Details sheet may reach up to: below the HUD's two rows and the place chip (SGODOT-283).
 const FISH_SHEET_TOP := 150.0
