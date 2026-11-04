@@ -271,7 +271,7 @@
     },
     "runtime": {
       "runtime_commit": "67116c6df4f69062ce658c50581e72ab1779a1b4",
-      "art_base": "f11b4e81b002b6dd64a2d7f53d2236586fe8bd9d",
+      "art_base": "e7469d07390c7a75bc56fa18a7fec69a3b41bbb9",
       "files": {
         "scenes/p0/p0_pond.gd": "ff5329d10f06d8daea2ef8f7b3136ed43c4e12077606f5a58d64e014c5add9b2",
         "scenes/p0/p0_ui.gd": "a95d0402b458d71bbf8c5dbc0dcf926a6eb76536caf70a824a8c2b0a965f6a83",
@@ -561,6 +561,7 @@
   },
   "colour": {
     "baseline": "10bf406e1f64f9f701f367cffe3b1344f351c6ea",
+    "merged_main": "e7469d07390c7a75bc56fa18a7fec69a3b41bbb9",
     "checks": [
       {
         "check": "All GLB JSON, nodes, materials, accessors and bounds identical to v1",
@@ -639,7 +640,7 @@
         "passed": true
       },
       {
-        "check": "Manifest changes only clay colour, revision and SHA; reed/other entries unchanged",
+        "check": "Manifest changes only clay colour, revision and SHA; reed and approved upstream entries preserved",
         "passed": true
       }
     ],

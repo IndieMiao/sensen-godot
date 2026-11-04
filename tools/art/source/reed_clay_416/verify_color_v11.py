@@ -49,12 +49,15 @@ for path in ['assets/farm/art/clay_pit.glb.import','assets/farm/art/reed_bank.gl
              'tools/art/source/reed_clay_416/reed_bank.blend']:
     check((ROOT/path).read_bytes()==original(path),'Byte-identical protected file: '+path)
 old_manifest=json.loads(original('assets/farm/art/manifest.json'));now=json.loads((KIT/'manifest.json').read_text())
-expected=json.loads(json.dumps(old_manifest));entry=expected['assets']['clay_pit'];entry['revision']='v1.1'
+snapshot=json.loads((OUT/'runtime-base.json').read_text())
+expected=json.loads(subprocess.check_output(['git','show',snapshot['art_base']+':assets/farm/art/manifest.json'],cwd=ROOT))
+for name in ['reed_bank','clay_pit']:expected['assets'][name]=old_manifest['assets'][name]
+entry=expected['assets']['clay_pit'];entry['revision']='v1.1'
 for role,c in PATCH['changes'].items():entry['palette_srgb'][role]=c['after']
 entry['sha256']=hashlib.sha256(new_raw).hexdigest()
 entry['clay_palette_note']='Muted red-ochre; HSV saturation reduced 17.7–18.6%, value reduced 8.7–9.2% from v1. Wood and grass unchanged.'
-check(now==expected,'Manifest changes only clay colour, revision and SHA; reed/other entries unchanged')
-report={'baseline':BASE,'checks':checks,'changes':changes,'changed_bytes':len(diff),'painted_vertices':int(selected.sum()),
+check(now==expected,'Manifest changes only clay colour, revision and SHA; reed and approved upstream entries preserved')
+report={'baseline':BASE,'merged_main':snapshot['art_base'],'checks':checks,'changes':changes,'changed_bytes':len(diff),'painted_vertices':int(selected.sum()),
         'protected_colour_vertices':int((~selected).sum()),'clay_sha256':entry['sha256'],'passed':all(c['passed'] for c in checks)}
 (OUT/'color-validation-v11.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print('CLAY_COLOR_VERIFY',report['passed'],len(checks));raise SystemExit(0 if report['passed'] else 1)

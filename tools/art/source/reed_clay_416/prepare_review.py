@@ -7,7 +7,7 @@ import subprocess
 import tarfile
 
 SRC=Path(__file__).resolve().parent;ROOT=SRC.parents[3];OUT=ROOT/'output/reed-clay-416';PROJECT=OUT/'project'
-BASE='67116c6df4f69062ce658c50581e72ab1779a1b4';ART_BASE='f11b4e81b002b6dd64a2d7f53d2236586fe8bd9d'
+BASE='67116c6df4f69062ce658c50581e72ab1779a1b4';ART_BASE='e7469d07390c7a75bc56fa18a7fec69a3b41bbb9'
 FLAX='c017910220cc74c51e54834806b2e915b330d8a1';HARDWOOD='aee148bfd72fe1874063e3048d0d67152dea3b3f'
 PROJECT.mkdir(parents=True,exist_ok=True)
 stamp=OUT/'runtime-base.json'
