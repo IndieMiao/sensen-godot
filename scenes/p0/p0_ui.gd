@@ -81,7 +81,7 @@ const GHOST_FAMILY := {
 var _potion_until_ms := -1
 var _potion_second := -1
 
-## E/session supplies the remaining server cooldown once its view contract is available.
+## The projected server view supplies potion_ready_in; a refused drink can resync from ready_in.
 func set_potion_cooldown(remaining_ms: float) -> void:
 	_potion_until_ms = Time.get_ticks_msec() + ceili(remaining_ms) if remaining_ms >= 0 else -1
 	if is_node_ready(): _refresh_bar()

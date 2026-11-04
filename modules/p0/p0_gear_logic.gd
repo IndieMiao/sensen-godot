@@ -3,7 +3,7 @@ extends RefCounted
 
 ## Independent integration switches (392). No player preference/save field: enable each in a reviewed build.
 static var weapon_actions_enabled := true
-static var potion_actions_enabled := false
+static var potion_actions_enabled := true
 
 static func command_allowed(cmd: Dictionary) -> bool:
 	var type := str(cmd.get("type", ""))
