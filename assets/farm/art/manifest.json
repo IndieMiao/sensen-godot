@@ -1687,6 +1687,481 @@
         "light_baking": 1
       }
     },
+    "flax_patch": {
+      "generator": "tools/art/source/flax_408/build.py",
+      "source": "tools/art/source/flax_408/flax_patch.blend",
+      "task": "SGODOT-408",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "triangles": 894,
+      "triangle_limit": 900,
+      "surfaces": 1,
+      "bytes": 66116,
+      "bounds": [
+        [
+          -0.6499999761581421,
+          0.0,
+          -0.6299999952316284
+        ],
+        [
+          0.6499999761581421,
+          0.6868833303451538,
+          0.6299999952316284
+        ]
+      ],
+      "bounds_blender": [
+        [
+          -0.6499999761581421,
+          -0.6299999952316284,
+          0.0
+        ],
+        [
+          0.6499999761581421,
+          0.6299999952316284,
+          0.6868833303451538
+        ]
+      ],
+      "dimensions_xyz": [
+        1.2999999523162842,
+        0.6868833303451538,
+        1.2599999904632568
+      ],
+      "origin": "bottom / footprint centre; Y up, +Z front; metres",
+      "mesh": "flax_patch_mobile",
+      "material": "Farm vertex paint / FarmArt.material(); linear vertex colour, matte, no textures",
+      "palette_srgb": {
+        "stem": "799973",
+        "leaf": "90AC7F",
+        "leaf_light": "A1B88B",
+        "blue": "85ACE6",
+        "blue_light": "A0C3EE",
+        "blue_shade": "6E98D7",
+        "pollen": "E6D6A1",
+        "soil": "B4946D",
+        "soil_edge": "C3A57D",
+        "soil_dark": "9E805F"
+      },
+      "flowers": [
+        {
+          "center": [
+            0.4654505252838135,
+            0.5552332997322083,
+            0.0
+          ],
+          "diameter_m": 0.20849423194284403
+        },
+        {
+          "center": [
+            0.322452187538147,
+            0.5548312067985535,
+            0.322452187538147
+          ],
+          "diameter_m": 0.19057984954948218
+        },
+        {
+          "center": [
+            2.8409849010378757e-17,
+            0.5624570250511169,
+            0.46396803855895996
+          ],
+          "diameter_m": 0.1993159551389731
+        },
+        {
+          "center": [
+            -0.3279455900192261,
+            0.5409637689590454,
+            0.3279455900192261
+          ],
+          "diameter_m": 0.20223057047742757
+        },
+        {
+          "center": [
+            -0.4702951908111572,
+            0.5247381925582886,
+            5.759454787903799e-17
+          ],
+          "diameter_m": 0.18860454816634967
+        },
+        {
+          "center": [
+            -0.3072527050971985,
+            0.537680983543396,
+            -0.3072527050971985
+          ],
+          "diameter_m": 0.19947486698574776
+        },
+        {
+          "center": [
+            -8.300076511889379e-17,
+            0.5527176260948181,
+            -0.45183512568473816
+          ],
+          "diameter_m": 0.20509187589726552
+        },
+        {
+          "center": [
+            0.3064042329788208,
+            0.5760074853897095,
+            -0.3064042329788208
+          ],
+          "diameter_m": 0.18580606137820407
+        },
+        {
+          "center": [
+            0.18065515160560608,
+            0.6100000143051147,
+            0.09204839169979095
+          ],
+          "diameter_m": 0.20433214414253426
+        },
+        {
+          "center": [
+            -0.09339745342731476,
+            0.6299999952316284,
+            0.18330281972885132
+          ],
+          "diameter_m": 0.19750554976134926
+        },
+        {
+          "center": [
+            -0.17742547392845154,
+            0.6499999761581421,
+            -0.09040279686450958
+          ],
+          "diameter_m": 0.19843000838342756
+        },
+        {
+          "center": [
+            0.08818492293357849,
+            0.6150000095367432,
+            -0.1730726659297943
+          ],
+          "diameter_m": 0.19789767995664162
+        }
+      ],
+      "source_parts_triangles": {
+        "Soft light-brown soil border": 94,
+        "Stem 01": 12,
+        "Stem 01 / lanceolate leaf 1": 4,
+        "Stem 01 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 01": 40,
+        "Stem 02": 12,
+        "Stem 02 / lanceolate leaf 1": 4,
+        "Stem 02 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 02": 40,
+        "Stem 03": 12,
+        "Stem 03 / lanceolate leaf 1": 4,
+        "Stem 03 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 03": 40,
+        "Stem 04": 12,
+        "Stem 04 / lanceolate leaf 1": 4,
+        "Stem 04 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 04": 40,
+        "Stem 05": 12,
+        "Stem 05 / lanceolate leaf 1": 4,
+        "Stem 05 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 05": 40,
+        "Stem 06": 12,
+        "Stem 06 / lanceolate leaf 1": 4,
+        "Stem 06 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 06": 40,
+        "Stem 07": 12,
+        "Stem 07 / lanceolate leaf 1": 4,
+        "Stem 07 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 07": 40,
+        "Stem 08": 12,
+        "Stem 08 / lanceolate leaf 1": 4,
+        "Stem 08 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 08": 40,
+        "Stem 09": 12,
+        "Stem 09 / lanceolate leaf 1": 4,
+        "Stem 09 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 09": 40,
+        "Stem 10": 12,
+        "Stem 10 / lanceolate leaf 1": 4,
+        "Stem 10 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 10": 40,
+        "Stem 11": 12,
+        "Stem 11 / lanceolate leaf 1": 4,
+        "Stem 11 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 11": 40,
+        "Stem 12": 12,
+        "Stem 12 / lanceolate leaf 1": 4,
+        "Stem 12 / lanceolate leaf 2": 4,
+        "Blue five-petal bloom 12": 40,
+        "Young stem 1": 12,
+        "Young stem 1 / leaf 1": 4,
+        "Young stem 1 / leaf 2": 4,
+        "Young stem 2": 12,
+        "Young stem 2 / leaf 1": 4,
+        "Young stem 2 / leaf 2": 4,
+        "Young stem 3": 12,
+        "Young stem 3 / leaf 1": 4,
+        "Young stem 3 / leaf 2": 4,
+        "Young stem 4": 12,
+        "Young stem 4 / leaf 1": 4,
+        "Young stem 4 / leaf 2": 4
+      },
+      "animations": [],
+      "skeleton": false,
+      "sha256": "fb6404ba43a2e70bcb5e2d416fffb6f6e6da410ecbf059b09994d23bbf29c80a"
+    },
+    "reed_bank": {
+      "task": "SGODOT-416",
+      "revision": "v1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "generator": "tools/art/source/reed_clay_416/build.py",
+      "source": "tools/art/source/reed_clay_416/reed_bank.blend",
+      "triangles": 890,
+      "triangle_limit": 900,
+      "surfaces": 1,
+      "bytes": 23260,
+      "mesh": "reed_bank_mobile",
+      "bounds": [
+        [
+          -0.6000000238418579,
+          0.0,
+          -0.5770535469055176
+        ],
+        [
+          0.6000000238418579,
+          0.9900000095367432,
+          0.5770535469055176
+        ]
+      ],
+      "bounds_blender": [
+        [
+          -0.6000000238418579,
+          -0.5770535469055176,
+          0.0
+        ],
+        [
+          0.6000000238418579,
+          0.5770535469055176,
+          0.9900000095367432
+        ]
+      ],
+      "dimensions_xyz": [
+        1.2000000476837158,
+        0.9900000095367432,
+        1.1541070938110352
+      ],
+      "origin": "bottom footprint centre; Y up, +Z front; metres",
+      "material": "Farm vertex paint / FarmArt.material(), linear vertex colour, matte .9, no textures",
+      "palette_srgb": {
+        "reed": "92AA4F",
+        "reed_light": "A9BD62",
+        "reed_dark": "768D3B",
+        "stem": "75823B",
+        "cattail": "916139",
+        "cattail_light": "A27346",
+        "mud": "68523B",
+        "mud_edge": "806448",
+        "pebble": "ADA68B",
+        "grass": "A4BC5E",
+        "grass_edge": "8CA149",
+        "clay": "C48A4D",
+        "clay_light": "D5A063",
+        "clay_shade": "AC713E",
+        "pit_wall": "98663D",
+        "wood": "BD935A",
+        "wood_light": "D3AC73",
+        "spade": "A49C85"
+      },
+      "source_parts_triangles": {
+        "Small dark wet-mud footprint": 70,
+        "Reed leaf 1-01": 22,
+        "Reed leaf 1-02": 22,
+        "Reed leaf 1-03": 22,
+        "Reed leaf 1-04": 22,
+        "Reed leaf 1-05": 22,
+        "Reed leaf 1-06": 22,
+        "Reed leaf 1-07": 22,
+        "Reed leaf 1-08": 22,
+        "Reed leaf 2-01": 22,
+        "Reed leaf 2-02": 22,
+        "Reed leaf 2-03": 22,
+        "Reed leaf 2-04": 22,
+        "Reed leaf 2-05": 22,
+        "Reed leaf 2-06": 22,
+        "Reed leaf 2-07": 22,
+        "Reed leaf 2-08": 22,
+        "Reed leaf 3-01": 22,
+        "Reed leaf 3-02": 22,
+        "Reed leaf 3-03": 22,
+        "Reed leaf 3-04": 22,
+        "Reed leaf 3-05": 22,
+        "Reed leaf 3-06": 22,
+        "Cattail 1 / slender stem": 12,
+        "Cattail 1 / rounded brown head": 36,
+        "Cattail 2 / slender stem": 12,
+        "Cattail 2 / rounded brown head": 36,
+        "Cattail 3 / slender stem": 12,
+        "Cattail 3 / rounded brown head": 36,
+        "Cattail 4 / slender stem": 12,
+        "Cattail 4 / rounded brown head": 36,
+        "Cattail 5 / slender stem": 12,
+        "Cattail 5 / rounded brown head": 36,
+        "Cattail 6 / slender stem": 12,
+        "Cattail 6 / rounded brown head": 36,
+        "Small bank pebble 1": 24,
+        "Small bank pebble 2": 24
+      },
+      "sha256": "1ab948530a582215b2afe78178a23aa6ebdc1b5b5c1ee389425919cc70509c66",
+      "cattail_count": 6,
+      "cattail_heads": [
+        {
+          "center": [
+            -0.31,
+            0.785,
+            0.10401619076728821
+          ],
+          "top_m": 0.88,
+          "diameter_m": 0.09
+        },
+        {
+          "center": [
+            -0.2,
+            0.845,
+            -0.20598380923271178
+          ],
+          "top_m": 0.94,
+          "diameter_m": 0.09
+        },
+        {
+          "center": [
+            0.04,
+            0.895,
+            -0.2559838092327118
+          ],
+          "top_m": 0.99,
+          "diameter_m": 0.09
+        },
+        {
+          "center": [
+            0.27,
+            0.845,
+            -0.11598380923271179
+          ],
+          "top_m": 0.94,
+          "diameter_m": 0.09
+        },
+        {
+          "center": [
+            0.31,
+            0.785,
+            0.1540161907672882
+          ],
+          "top_m": 0.88,
+          "diameter_m": 0.09
+        },
+        {
+          "center": [
+            0.02,
+            0.755,
+            0.2540161907672882
+          ],
+          "top_m": 0.85,
+          "diameter_m": 0.09
+        }
+      ],
+      "leaf_count": 22,
+      "placement": "Bank L / R / B only; not F2",
+      "footprint_limit_m": [
+        1.4,
+        1.4
+      ],
+      "height_range_m": [
+        0.8,
+        1.0
+      ]
+    },
+    "clay_pit": {
+      "task": "SGODOT-416",
+      "revision": "v1.1",
+      "author": "黄忠",
+      "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+      "generator": "tools/art/source/reed_clay_416/build.py",
+      "source": "tools/art/source/reed_clay_416/clay_pit.blend",
+      "triangles": 552,
+      "triangle_limit": 900,
+      "surfaces": 1,
+      "bytes": 22544,
+      "mesh": "clay_pit_mobile",
+      "bounds": [
+        [
+          -0.5899999737739563,
+          0.0,
+          -0.5461744070053101
+        ],
+        [
+          0.5899999737739563,
+          0.48399999737739563,
+          0.5461744070053101
+        ]
+      ],
+      "bounds_blender": [
+        [
+          -0.5899999737739563,
+          -0.5461744070053101,
+          0.0
+        ],
+        [
+          0.5899999737739563,
+          0.5461744070053101,
+          0.48399999737739563
+        ]
+      ],
+      "dimensions_xyz": [
+        1.1799999475479126,
+        0.48399999737739563,
+        1.0923488140106201
+      ],
+      "origin": "bottom footprint centre; Y up, +Z front; metres",
+      "material": "Farm vertex paint / FarmArt.material(), linear vertex colour, matte .9, no textures",
+      "palette_srgb": {
+        "reed": "92AA4F",
+        "reed_light": "A9BD62",
+        "reed_dark": "768D3B",
+        "stem": "75823B",
+        "cattail": "916139",
+        "cattail_light": "A27346",
+        "mud": "68523B",
+        "mud_edge": "806448",
+        "pebble": "ADA68B",
+        "grass": "A4BC5E",
+        "grass_edge": "8CA149",
+        "clay": "B27A5A",
+        "clay_light": "C28D6D",
+        "clay_shade": "9D674B",
+        "pit_wall": "8A5D46",
+        "wood": "BD935A",
+        "wood_light": "D3AC73",
+        "spade": "A49C85"
+      },
+      "source_parts_triangles": {
+        "Low grassy rim and shallow ochre pit": 178,
+        "Smooth raw clay mound": 126,
+        "Small raw clay lobe": 32,
+        "Small clay block 1": 44,
+        "Small clay block 2": 44,
+        "Thin spade blade in clay": 44,
+        "Slender wooden spade shaft": 20,
+        "Open wooden spade grip": 64
+      },
+      "sha256": "be7fc431e2cb9dfadcfbbce01380b4a5052e4bc0511d689cbf0b8414fabf463f",
+      "clay_blocks": 2,
+      "footprint_limit_m": [
+        1.2,
+        1.2
+      ],
+      "height_limit_m": 0.5,
+      "placement": "F2 (7.6, -1.4); verify >=12px clearance to the switch outer ring",
+      "shallow_pit": "Interior at .008m, rim .065m; no negative vertices or terrain shader changes",
+      "clay_palette_note": "Muted red-ochre; HSV saturation reduced 17.7–18.6%, value reduced 8.7–9.2% from v1. Wood and grass unchanged."
+    },
     "homestead_badge": {
       "triangles": 896,
       "visible_triangles": 332,
