@@ -498,3 +498,37 @@ func test_the_lunge_stops_at_the_players_body() -> void:
 	while str(e2.phase) in ["windup", "dash"]: c2.step(0.016, mover, false)
 	assert_float((e2.mover.position as Vector3).z - start.z).is_greater(2.0)   # past where the player stood (stopped there: ~1.0)
 	mover.position = aside
+
+## Every monster of a floor comes for a player who stays at the landing (李元芳's preview A, P12: the third stood 5.49 m
+## off, past the slime's 5 m aggro, and the floor sat on `1 monster left`; 李白 on 399: every spot within 4.6 m, one
+## spot a monster). On any floor's rocks — a spot under a rock moves to the nearest free cell — each of five stands within
+## 4.6 m of Layout.SPAWN, and no floor of the content has more monsters than spots.
+func test_every_monster_of_a_floor_comes_for_a_player_at_the_landing() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var L = load("res://modules/mining/mine_layout.gd")
+	for spawn in Combat.SPAWNS: assert_float((spawn as Vector3).distance_to(L.SPAWN)).is_less_equal(4.6)
+	for i in Combat.SPAWNS.size():
+		for j in range(i + 1, Combat.SPAWNS.size()):
+			assert_float((Combat.SPAWNS[i] as Vector3).distance_to(Combat.SPAWNS[j])).is_greater_equal(1.2)
+	var most := 0
+	for type in P0Logic.content().get("mine", {}).get("types", {}).values():
+		for band in type.get("bands", []):
+			most = maxi(most, (band.get("mobs", []) as Array).reduce(func(n, m): return n + int(m[2]), 0))
+	assert_int(most).is_less_equal(Combat.SPAWNS.size())
+	for i in 40:
+		var floor_seed := "%s:%d:2026-11-%02d" % [Fx.MINE, 1 + i % 39, 1 + i % 28]
+		var nodes: Array = []
+		var positions: Array = L.p0_rocks(4 + i % 3, floor_seed)
+		for r in positions.size(): nodes.append({"id": str(r), "position": positions[r]})
+		var bp = L._navigation(nodes, [])
+		var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+		mover.position = L.SPAWN
+		var c: Node3D = auto_free(Combat.new())
+		add_child(c)
+		var mobs: Array = []
+		for k in Combat.SPAWNS.size(): mobs.append(_slime())
+		c.sync_p0(Fx.view(3, {"mobs": mobs, "rocks": positions.size()}), 3, mover)
+		assert_int(c.enemies.size()).is_equal(Combat.SPAWNS.size())
+		for e in c.enemies.values():
+			var d := (e.node.position as Vector3).distance_to(L.SPAWN)
+			assert_float(d).override_failure_message("%s on %s stands %.2f m off" % [e.id, floor_seed, d]).is_less_equal(4.6)
