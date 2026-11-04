@@ -293,9 +293,11 @@ static func lead_rows(view: Dictionary, leave: Variant = null) -> Array:
 		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall", "deliver:" + TUTORIAL))
 		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, home_pond(view))], str(t.item),
 			"pond:" + home_pond(view), "catch:" + TUTORIAL))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
+		rows[-1].tutorial = true   # a request: Today keeps it on an account the guide never ran (A 包 spec ①)
 	elif first:
 		var done := _row("Deliver 2 %s · Stall" % P0Logic.item_name(view, "fish_crucian"), "fish_crucian", "stall")
 		done.state = "done"
+		done.tutorial = true
 		rows.append(done)
 	# Cook it: Grilled Crucian — through the first session (ticked once cooked), and after it until the first dish is made
 	if not grill.is_empty() and (first or not grill.get("cooked", false)):
@@ -446,35 +448,6 @@ static func stall_badge(view: Dictionary, mark := false) -> String:
 		if int(r.get("have", 0)) >= int(r.get("qty", 1)) and not full: return "deliver"
 		if str(r.get("status", "")) == "open": open = true
 	return "request" if open else ""
-
-# ---------------------------------------------------------------- Free to do now (§3.7.4)
-
-## The rows after `Free to do now` closes the Energy card: what costs no Energy now, at most 3, in this order —
-## crops to harvest, a dish the stove can make, 10+ of one thing to sell, a request to hand in, an unfinished mine
-## run, then `Browse the map` (always possible). Only P0 features (no Plot Marks, social or decorating).
-static func free_now(view: Dictionary) -> Array:
-	var rows: Array = []
-	var ready := (view.get("plots", []) as Array).filter(func(p): return str(p.get("state", "")) == "ready").size()
-	if ready > 0: rows.append(_row("Harvest %d ready" % ready, "harvest", "plots"))
-	var stove = view.get("cooking", {}).get("stove", null)
-	if stove == null and (view.get("cooking", {}).get("cookbook", []) as Array).any(func(p): return p.get("can_cook", false)):
-		var fish := 0
-		for s in view.get("bag", {}).get("slots", []):
-			if str(s.get("id", "")).begins_with("fish_") and P0Logic.item(view, str(s.id)).get("cook", true): fish += int(s.get("qty", 0))
-		rows.append(_row("Cook · %d fish in creel" % fish if fish > 0 else "Cook · ingredients in bag", "pot", "stove"))
-	var best := {}
-	for s in view.get("bag", {}).get("slots", []):
-		var info := P0Logic.item(view, str(s.get("id", "")))
-		if info.get("sell", null) == null or s.get("locked", false) or s.get("gifted", false): continue
-		if int(s.get("qty", 0)) >= 10 and int(s.get("qty", 0)) > int(best.get("qty", 0)): best = s
-	if not best.is_empty(): rows.append(_row("Sell %d at Homestead Stall" % int(best.qty), str(best.id), "stall"))
-	for r in view.get("stall", {}).get("board", {}).get("requests", []):
-		if int(r.get("have", 0)) >= int(r.get("qty", 1)):
-			rows.append(_row("Deliver %s" % str(r.get("title", "")), "board", "stall"))
-			break
-	rows = rows.slice(0, 3)
-	if rows.size() < 3: rows.append(_row("Browse the map", "map", "map"))   # the fallback, always possible
-	return rows
 
 # ---------------------------------------------------------------- quick bar
 

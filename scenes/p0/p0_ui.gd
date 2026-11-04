@@ -2708,7 +2708,9 @@ func _board(d: P0CounterDrawer, facts: Array, cards: Array) -> void:
 		var cmd: Dictionary = c.cmd
 		var id := str(c.id)
 		card.command_pressed.connect(func(): if not cmd.is_empty(): command.emit(cmd))
-		card.unavailable_pressed.connect(func(r: String): toast(r))
+		card.unavailable_pressed.connect(func(r: String):   # spec ③: tracking 25, an Error toast saying what to do
+			if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r))
+			else: toast(r))
 		card.need_pressed.connect(func(item: String, tile: UiNeedTile): _show_need_source(tile, item))
 		card.info_pressed.connect(func(): open_board_request(d.role, id))
 		d.board.add_child(card)
@@ -2721,9 +2723,9 @@ func open_energy_card(need: int, verb: String) -> void:
 	for t in f.tiles: t.icon = P0Logic.icon(str(t.icon))
 	var card := UiEnergyCard.card(f)
 	card.theme = UiKit.theme()
-	card.free_pressed.connect(func():   # §3.7.4: closes the card, then Today lists what costs no Energy now
-		close_modal()
-		open_today(P0Guide.free_now(view)))
+	# LOCK-09: `Free to do now` closes the card — no longer opening Today on the free things (Today holds requests only,
+	# 不知火舞's spec ①; §3.7.4's second half retired)
+	card.free_pressed.connect(close_modal)
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
@@ -2863,7 +2865,7 @@ func open_radial() -> void:
 var cook_page_from_today := ""
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
-## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
+## rows: Today's own (P0Logic.today_rows) unless given.
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
 var _today_panel: UiTodayPanel
 var _today_rows: Array = []
@@ -2887,7 +2889,10 @@ func open_today(given: Array = []) -> void:
 			P0LocalRequest.open(self, str(_today_rows[i].local_request), func(): open_today(given))
 		# another city's tracked request (q(270)): its BOARD-1, to drop it from here; Back / Close come back to Today
 		elif str(_today_rows[i].get("board_request", "")) != "":
-			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given)))
+			P0BoardRequest.open(self, "market", str(_today_rows[i].board_request), func(): open_today(given))
+		# Pip's Homestead request (spec ③ v3): HOME-1 is its card; closing it comes back to Today
+		elif bool(_today_rows[i].get("home_request", false)):
+			open_home_panel(func(): open_today(given)))
 	_open_modal(panel, 0.0)
 	_today_panel = panel
 	modal_kind = "today"
@@ -2912,7 +2917,8 @@ func _refresh_today(force := true) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable(), place)
-		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != ""
+		d.tap = str(r.get("gate", "")) != "" or str(r.get("board_request", "")) != "" or str(r.get("local_request", "")) != "" \
+			or bool(r.get("home_request", false))
 		if str(r.get("dot", "")).begins_with("guide:") and str(r.get("tail", "")) != "":
 			var line := str(r.line)
 			var at := line.find(" · ")
@@ -3221,6 +3227,7 @@ func _show_resident(d: Dictionary) -> void:
 	var id := str(d.id)
 	bar.gift_pressed.connect(func(): open_gift(id))
 	bar.request_pressed.connect(func(): open_resident_request(id))
+	bar.request_unavailable.connect(func(r: String): if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r)))   # spec ③
 	bar.identity_pressed.connect(func(): open_resident_profile(id))
 	bar.meal_pressed.connect(func(): _open_todays_meal(id))
 	bar.lesson_pressed.connect(func(): command.emit({"type": "learn", "resident": id}))   # §7.5.3: the server picks the page
@@ -3401,6 +3408,7 @@ func open_resident_request(id: String) -> void:
 	card.action_pressed.connect(func():
 		close_modal()
 		if not cmd.is_empty(): command.emit(cmd))
+	card.unavailable_pressed.connect(func(r: String): if P0Logic.blocked_toast(r) != r: toast_error(P0Logic.blocked_toast(r)))   # spec ③: only tracking 25
 	card.dismissed.connect(func(): open_resident(id))
 	_open_modal(card, 0.0, true)
 	modal_kind = "resident_request"
@@ -3460,7 +3468,9 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
 		"line": text, "needs": [need] if kind != "" else [],
 		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
-		"reason": str(bar.get("request_reason", ""))}
+		# the bar's `Request · Requests 25/25` is the card's `Accept · Requests 25/25` (spec ③, T4)
+		"reason": P0Logic.track_full_reason(view_, "Accept") if P0Logic.is_track_full(str(bar.get("request_reason", ""))) \
+			else str(bar.get("request_reason", ""))}
 	data.merge(_request_rewards(view_, req, q))
 	return data
 
@@ -4285,7 +4295,10 @@ func _save_tips() -> void:
 const TODAY_SEEN := "today:"
 func _today_unseen(keys: Array) -> bool:
 	_load_tips()
-	var gone := _taught.keys().filter(func(k): return str(k).begins_with(TODAY_SEEN) and not keys.has(str(k).trim_prefix(TODAY_SEEN)))
+	# a row gone is forgotten, so the same thing coming back lights again (q(107)) — but Pip's requests are seen once for
+	# good (P0Logic.PIP_DOT, spec ③ v3)
+	var gone := _taught.keys().filter(func(k): return str(k).begins_with(TODAY_SEEN) and not keys.has(str(k).trim_prefix(TODAY_SEEN)) \
+		and not str(k).trim_prefix(TODAY_SEEN).begins_with(P0Logic.PIP_DOT))
 	for k in gone: _taught.erase(k)
 	if not gone.is_empty(): _save_tips()
 	return keys.any(func(k): return not _taught.has(TODAY_SEEN + str(k)))

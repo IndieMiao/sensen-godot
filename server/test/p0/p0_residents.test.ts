@@ -187,13 +187,17 @@ describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => 
     expect(refuse(r.s, { type: 'drop', request: 'req_res_kai_1' })).toMatchObject({ ok: false, code: 'cannot_drop' });
   });
 
-  it('resident requests count towards the 3 tracked requests', () => {
-    let s = fresh();
-    s.boards.stall[1] = { req: { id: 'b1', template: 'req_sys_crop_basic', items: ['crop_radish'], kind: 'crop', qty: 2, bonus: 10, drawn_at: T0, status: 'open' }, refill_at: 0 };
-    s = step(s, { type: 'accept', request: 'req_pond_catch' }).s;
-    s = step(s, { type: 'accept', request: 'b1' }).s;
-    s = step(s, { type: 'accept', request: 'req_res_pip_1' }).s;
-    expect(refuse(s, { type: 'accept', request: 'req_res_kai_1' })).toMatchObject({ ok: false, code: 'track_limit' });
+  it('resident requests count towards the tracked requests (track_max, 3 here)', () => {
+    const was = c.requests.track_max;
+    c.requests.track_max = 3;   // the mechanism at a small number: the content's is 25 (A 包反馈 3)
+    try {
+      let s = fresh();
+      s.boards.stall[1] = { req: { id: 'b1', template: 'req_sys_crop_basic', items: ['crop_radish'], kind: 'crop', qty: 2, bonus: 10, drawn_at: T0, status: 'open' }, refill_at: 0 };
+      s = step(s, { type: 'accept', request: 'req_pond_catch' }).s;
+      s = step(s, { type: 'accept', request: 'b1' }).s;
+      s = step(s, { type: 'accept', request: 'req_res_pip_1' }).s;
+      expect(refuse(s, { type: 'accept', request: 'req_res_kai_1' })).toMatchObject({ ok: false, code: 'track_limit' });
+    } finally { c.requests.track_max = was; }
   });
 });
 

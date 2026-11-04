@@ -53,22 +53,12 @@ func test_the_key_counts_down_in_minutes_and_seconds() -> void:
 	# the view ages it on the client clock: 30 s later
 	assert_str(str(P0Logic.main_action(P0Logic.project(v, 30000.0), P0Logic.project(v, 30000.0).plots[0], "").sub)).is_equal("Ready in 0:15")
 
-## ④ Today: one row for the Quick Radishes, the soonest plot's, plural for two, singular for the last one.
-func test_today_says_quick_radishes_ready_in_m_ss() -> void:
-	var lines := func(v: Dictionary) -> Array: return P0Logic.today_rows(v).map(func(r): return str(r.line))
-	var two := _view([_growing(0, 45000.0), _growing(1, 43000.0)])
-	var rows: Array = lines.call(two)
-	assert_array(rows).contains(["Quick Radishes ready in 0:43"])
-	assert_array(rows.filter(func(l): return str(l).begins_with("Quick Radish"))).has_size(1)
-	assert_array(lines.call(_view([_growing(0, 22000.0)]))).contains(["Quick Radish ready in 0:22"])
-	var row: Dictionary = P0Logic.today_rows(two).filter(func(r): return str(r.line).begins_with("Quick"))[0]
-	assert_str(str(row.icon)).is_equal("crop_radish")   # a radish, not the field sprout
-	# ripe: the harvest row names the Quick Radishes (§14.3 S5), with the radish's icon
-	var ripe := _view([{"id": 0, "state": "ready", "crop": "crop_quick_radish"}, {"id": 1, "state": "ready", "crop": "crop_quick_radish"}])
-	var harvest: Dictionary = P0Logic.today_rows(ripe).filter(func(r): return str(r.line).begins_with("Harvest"))[0]
-	assert_str(str(harvest.line)).is_equal("Harvest 2 Quick Radishes")
-	assert_str(str(harvest.icon)).is_equal("crop_radish")
+## ④ The one-line farm status (P0Logic.today_line, the profile's farm line): the Quick Radishes' countdown in m:ss. Today
+## has no crop rows any more (A 包 spec ①).
+func test_the_farm_line_says_quick_radishes_ready_in_m_ss() -> void:
 	assert_str(P0Logic.today_line(_view([_growing(0, 45000.0)]))).is_equal("Quick Radishes ready in 0:45")
+	var two := _view([_growing(0, 45000.0), _growing(1, 43000.0)])
+	assert_bool(P0Logic.today_rows(two).any(func(r): return str(r.line).begins_with("Quick"))).is_false()
 
 ## ① No Compost on it: with Compost selected the key goes by the plot's state (Water, Growing), nothing about Compost.
 func test_compost_does_not_take_a_quick_radish() -> void:
@@ -120,20 +110,3 @@ func test_the_field_grows_it_over_45_seconds() -> void:
 	var cells := P0Garden.cells(_view([_growing(0, 15000.0)]), 1000000)
 	var slot: Dictionary = cells[P0Garden.cell_id(P0Garden.cell_of(0))]
 	assert_int(int(slot.ready_at) - int(slot.watered_at)).is_equal(45000)
-
-## q(227): one countdown per crop, its soonest plot's (①); singular for one plot left, plural for more (②); a crop with
-## ripe plots shows only its Harvest row (③); a Quick Radish and a Radish are two crops (④).
-func test_today_has_one_countdown_per_crop() -> void:
-	var lines := func(v: Dictionary) -> Array:   # the crop rows only (the level's info row still follows the first, q(69))
-		return P0Logic.today_rows(v).map(func(r): return str(r.line)).filter(func(l): return not str(l).begins_with("Farming"))
-	var plots: Array = []
-	for i in 6: plots.append(_growing(i, 14_280_000.0, "crop_radish"))        # sown first: 3h 58m
-	for i in 14: plots.append(_growing(6 + i, 14_100_000.0, "crop_radish"))   # a few minutes later: 3h 55m
-	assert_array(lines.call(_view(plots))).is_equal(["Radishes ready in 3h 55m"])
-	assert_array(lines.call(_view([_growing(0, 14_100_000.0, "crop_radish")]))).is_equal(["Radish ready in 3h 55m"])
-	var mixed := _view([{"id": 0, "state": "ready", "crop": "crop_lettuce"}, {"id": 1, "state": "ready", "crop": "crop_lettuce"},
-		_growing(2, 1_860_000.0, "crop_lettuce"), _growing(3, 1_860_000.0, "crop_lettuce"),
-		_growing(4, 38_000.0), _growing(5, 14_100_000.0, "crop_radish")])
-	assert_array(lines.call(mixed)).is_equal(["Harvest 2 Lettuce", "Quick Radish ready in 0:38", "Radish ready in 3h 55m"])
-	var ripe_quick := _view([{"id": 0, "state": "ready", "crop": "crop_quick_radish"}, _growing(1, 14_100_000.0, "crop_radish")])
-	assert_array(lines.call(ripe_quick)).contains(["Harvest 1 Quick Radish", "Radish ready in 3h 55m"])   # ④: not the same crop

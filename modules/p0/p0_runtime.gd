@@ -1166,6 +1166,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if not r.is_empty():
 			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "track_limit":   # A 包 spec ③: tracking 25 already (a key greyed too late, another device)
+		ui.toast_error(P0Logic.TRACK_FULL_TOAST)
+		return
 	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
 		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
 		return
