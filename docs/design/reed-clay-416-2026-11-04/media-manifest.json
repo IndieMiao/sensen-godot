@@ -1,0 +1,30 @@
+[
+  {
+    "file": "SGODOT-416_reed_clay_v1_reed_L1_43deg.png",
+    "sha256": "4ca4065f553f263fccd6df6aaa803143d6e748304f315f861e56d16dc44b9d30",
+    "bytes": 344493,
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-416_reed_clay_v1_clay_F2_43deg.png",
+    "sha256": "1a2e95b96e3c5f735edd037e61ea6712ff64a794c8d8ab4ebece92a490f6e67c",
+    "bytes": 338276,
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-416_reed_clay_v1_seven_resources_43deg.jpg",
+    "sha256": "5f8e33588ab663175e4cdd496c83df08a984193d3ef2bec491c73586adfca5db",
+    "bytes": 733216,
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  },
+  {
+    "file": "SGODOT-416_reed_clay_v1_validation.json",
+    "sha256": "5c545322df79cb3dd6cc04dc400f106b6eb5af5cc2b7366a6dc64ee3dfdaa958",
+    "bytes": 26314,
+    "author": "黄忠",
+    "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80"
+  }
+]
