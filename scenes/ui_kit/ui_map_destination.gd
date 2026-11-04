@@ -57,6 +57,15 @@ const SILHOUETTE_DISC := 32.0
 const SILHOUETTE_ICON := 18.0
 const SILHOUETTE_ALPHA := 0.55
 
+## A place not open yet (SGODOT-355 first batch, 197 MapDestination Kind=Not open; C1 320:181216 `Glimmer`): the full
+## disc in color/disabled with a border-colour edge, the glyph in one colour as a silhouette's, a lock badge over the
+## disc's top-right corner and the short name kept, in color/disabled-ink. Tappable as ever (its card says Not open yet).
+var locked := false: set = set_locked
+const LOCK_BADGE := 18.0
+const LOCK_GLYPH := 12.0
+const _LOCK_OVERHANG := 6.0
+var _lock: Panel
+
 var _pin: Control
 var _disc: Panel
 var _sil_disc: TextureRect   # a silhouette's disc (made on first use)
@@ -146,7 +155,7 @@ func set_silhouette(v: bool) -> void:
 	_icon.custom_minimum_size = Vector2(side, side)   # first: a size under the old minimum would be clamped back up
 	_icon.size = Vector2(side, side)
 	_icon.position = Vector2.ONE * (DISC - side) * 0.5
-	_icon.material = _ink() if v else null   # the glyph as a one-colour silhouette
+	_icon.material = _ink() if v or locked else null   # the glyph as a one-colour silhouette
 	if v and _sil_disc == null:
 		_sil_disc = TextureRect.new()
 		_sil_disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -164,6 +173,28 @@ func set_silhouette(v: bool) -> void:
 	if _badge: _badge.position = _mark_at()
 	_label_box.visible = text != "" and name_shown and not v
 	_layout()
+
+func set_locked(v: bool) -> void:
+	if v == locked: return
+	locked = v
+	if _disc == null: return
+	_disc.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_DISABLED if v else UiTokens.COLOR_SURFACE,
+		DISC * 0.5, UiTokens.COLOR_BORDER if v else UiTokens.COLOR_PRIMARY, UiTokens.STROKE_DEFAULT))
+	_icon.material = _ink() if v or silhouette else null
+	_label.add_theme_color_override(&"font_color", UiTokens.COLOR_DISABLED_INK if v else UiTokens.COLOR_TEXT)
+	if v and _lock == null:
+		_lock = Panel.new()
+		_lock.name = "Lock"
+		_lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_lock.size = Vector2(LOCK_BADGE, LOCK_BADGE)
+		_lock.position = Vector2(DISC - LOCK_BADGE + _LOCK_OVERHANG, -_LOCK_OVERHANG)
+		_lock.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, LOCK_BADGE * 0.5,
+			UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
+		var glyph := UiKit.icon(load("res://assets/p0/icons/lock.svg"), LOCK_GLYPH)
+		glyph.position = Vector2.ONE * (LOCK_BADGE - LOCK_GLYPH) * 0.5
+		_lock.add_child(glyph)
+		_pin.add_child(_lock)
+	if _lock: _lock.visible = v
 
 ## The silhouette's disc, drawn once at SIL_DISC_SCALE × its 32 px (mipmapped, so it stays smooth on a 3× phone
 ## screen): color/surface inside a STROKE_DEFAULT edge in color/border, each edge one sub-pixel soft.
@@ -282,11 +313,13 @@ func set_online(v: int) -> void:
 
 ## The name's size for `text` before any pin exists (the city map packs pins by it). A plate's: Compact/10 Bold, 6 / 2
 ## padding, never cut. A short name's (q(137)): 11 Bold, 2 over and under, at most 96 wide. Matches label_size() of a
-## built pin. Measured once per name: the city map asks for every pin it packs, every frame.
+## built pin. Measured once per name: the city map asks for every pin it packs, every frame. Measured as the label
+## shows it, translated under 中文 (#649 第二批 ⑨; the locale is set at start, so the cache holds).
 static func label_size_for(text: String, plated := true) -> Vector2:
 	if text == "": return Vector2.ZERO
 	var key := text + ("|p" if plated else "|s")
 	if _label_sizes.has(key): return _label_sizes[key]
+	text = String(TranslationServer.translate(text))
 	var style := UiTokens.STYLE_C10_B if plated else UiTokens.STYLE_C11_B
 	var th := UiKit.theme()   # the name's own style (the city map gives the pin this theme)
 	var f := th.get_font(&"font", style)

@@ -53,9 +53,56 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	add_child(Art.instance("sign", Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0.93))
 	var shrubs: Array = []
 	for p in [Vector3(house.x - 1.75, 0, house.z - 0.9), Vector3(house.x + 1.85, 0, house.z - 1.0), Vector3(12.2, 0, -6.3),
-		Vector3(0.9, 0, -4.2), Vector3(12.7, 0, -1.4), Vector3(1.0, 0, -0.6)]:
+		Vector3(12.7, 0, -1.4)]:
 		shrubs.append(_xf(p, p.x, 0.72))
 	add_child(Art.batch("bush", shrubs))
+	# The yard's west edge and the west end of its front (SGODOT-371, 不知火舞 59ea8ecc): a loose hedge just outside the
+	# walk line (x 0.65 / z +1.3) and the Lv3+ ring (x 0.38), every level the same — it shows the edge, the walk rect stops you.
+	for layer in [["bush", true, [
+		[Vector3(3.5, 0, 1.97), 2.57, 0.7],
+		[Vector3(2.62, 0, 1.88), 6.03, 0.94],
+		[Vector3(1.58, 0, 1.92), 0.26, 0.96],
+		[Vector3(0.73, 0, 1.89), 4.27, 0.81],
+		[Vector3(0.08, 0, 1.92), 6.1, 0.84],
+		[Vector3(0.02, 0, 1.06), 0.11, 0.87],
+		[Vector3(0.08, 0, 0.14), 1.88, 0.83],
+		[Vector3(0.02, 0, -0.62), 1.06, 0.93],
+		[Vector3(0.1, 0, -0.98), 0.42, 0.71],
+		[Vector3(0.05, 0, -1.99), 6.27, 0.98],
+		[Vector3(0.01, 0, -3.08), 2.35, 0.9],
+		[Vector3(0.01, 0, -4.06), 2.15, 0.89],
+		[Vector3(0.01, 0, -4.9), 1.84, 0.86],
+		[Vector3(0.08, 0, -5.83), 2.29, 0.82],
+		[Vector3(0.01, 0, -6.87), 3.49, 0.81],
+		[Vector3(0.03, 0, -7.93), 3.78, 0.84],
+		[Vector3(0.09, 0, -8.29), 2.58, 0.71],
+		[Vector3(-0.0, 0, -9.3), 2.04, 0.84],
+		[Vector3(0.09, 0, -10.36), 0.41, 0.89],
+		[Vector3(0.04, 0, -11.21), 5.48, 0.75],
+		[Vector3(0.1, 0, -12.22), 6.22, 0.79]]],
+		["daisy", false, [
+		[Vector3(2.5, 0.01, 1.69), 0.0, 0.82],
+		[Vector3(0.3, 0.01, -0.08), 2.6, 0.82],
+		[Vector3(0.31, 0.01, -3.88), 5.2, 0.82],
+		[Vector3(0.33, 0.01, -8.18), 7.8, 0.82],
+		[Vector3(0.29, 0.01, -11.88), 10.4, 0.82],
+		[Vector3(3.66, 0.01, 1.72), 11.7, 0.82],
+		[Vector3(3.52, 0.01, 2.14), 14.3, 0.82]]],
+		["pink_flower", false, [
+		[Vector3(0.4, 0.01, 1.63), 0.9, 0.78],
+		[Vector3(0.31, 0.01, -1.98), 2.7, 0.78],
+		[Vector3(0.3, 0.01, -6.08), 4.5, 0.78],
+		[Vector3(0.34, 0.01, -10.08), 6.3, 0.78],
+		[Vector3(3.8, 0.01, 1.98), 9.0, 0.78]]],
+		["rock", true, [
+		[Vector3(0.28, 0, 0.45), 1.71, 0.57],
+		[Vector3(0.24, 0, -4.4), 5.04, 0.58],
+		[Vector3(0.3, 0, -8.3), 5.75, 0.68],
+		[Vector3(0.28, 0, -11.6), 4.37, 0.61],
+		[Vector3(1.95, 0, 1.7), 1.1, 0.6]]]]:
+		var xfs: Array = []
+		for e in layer[2]: xfs.append(_xf(e[0], e[1], e[2]))
+		add_child(Art.batch(layer[0], xfs, layer[1]))
 	# Small foliage: dense at the woodland edge, sparse on the lawn, never on beds, paths or the yard spots.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 910

@@ -13,6 +13,7 @@ extends PanelContainer
 ## `Shanghai`, as q(270)).
 
 signal action_pressed
+signal unavailable_pressed(reason: String)   # the key greyed with its reason (LOCK-10), tapped
 signal dismissed
 signal link_pressed(index: int)
 
@@ -123,6 +124,7 @@ func _init(data_: Dictionary = {}) -> void:
 	_action.sends = bool(data.get("sends", false))   # Accept / Deliver to the server (§10.7.1 Offline)
 	_action.fit_text = true
 	_action.activated.connect(func(): action_pressed.emit())
+	_action.unavailable_pressed.connect(func(r: String): unavailable_pressed.emit(r))
 	col.add_child(_action)
 	var later := UiDismissButton.new("Not now")
 	later.pressed.connect(func(): dismissed.emit())

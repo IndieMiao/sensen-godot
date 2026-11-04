@@ -1224,8 +1224,9 @@ func _mailbox_prop(at: Vector3) -> Node3D:
 	root.add_child(model)
 	return root
 
+## The landing's teaching card (q(215): `Pick a seed…`). Asked for even under a dialog (Pip's opening line): the TipQueue
+## holds it until the dialog closes (方案 §10.3 ⑥, 不知火舞 355 G01); a Sow meanwhile takes it off the queue (TipQueue.did).
 func _teaching(v: Dictionary) -> void:
-	if rt.ui.has_modal(): return
 	var firsts: Array = v.get("firsts", [])
 	if not firsts.any(func(f): return str(f).begins_with("harvest:")) and not v.get("plots", []).any(func(p): return str(p.state) in ["sown", "growing", "ready"]):
 		rt.ui.teach("sow")   # copy in P0Guide.TIPS (q(44))
@@ -1241,6 +1242,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"yaw": _dev_yaw = float(step[1])
 		"goto":
+			_dev_aim = Vector3.INF   # a teleport ends any aimed walk (it would walk the player back)
+			p0_joystick(Vector2.ZERO)
 			actor.teleport(Vector3(float(step[1]), 0, float(step[2])))
 			_focus = actor.position
 		"plotface":   # plotface:<id> — stand on the walkway in front of a plot, facing it (P1 tree review shots)
@@ -1249,6 +1252,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 			actor.face(bed)
 			_focus = actor.position
 		"gocell":
+			_dev_aim = Vector3.INF   # a teleport ends any aimed walk (it would walk the player back)
+			p0_joystick(Vector2.ZERO)
 			actor.teleport(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))))
 			_focus = actor.position
 		"face":
@@ -1287,6 +1292,13 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_sync_t = 9999.0
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
+		"pip":   # a tap on the guide's Pip where he is now (SGODOT-411 shots: he stops and turns to the player)
+			if _guide != null and _guide.pip_root != null: p0_tap(cam.unproject_position(_guide.pip_root.to_global(Vector3(0, 0.8, 0))))
+		"topip":   # walk straight up to 1.2 m short of where Pip is now (SGODOT-411 shots: near him he stands and turns)
+			if _guide != null and _guide.pip_root != null:
+				var pip: Vector3 = _guide.pip_root.position
+				var back := Vector3(actor.position.x - pip.x, 0, actor.position.z - pip.z)
+				_dev_aim = pip + (back.normalized() * 1.2 if back.length() > 1.2 else back)
 		"chefsign": p0_tap(cam.unproject_position(_chef_sign + CHEF_SIGN_HIT))   # the Chef's Sign's card (282 shots)
 		"noticetap": p0_tap(cam.unproject_position(_notice + NOTICE_HIT))   # the Notice Board through its own tap (q(164) shots)
 		"chefsignprobe":   # where the Chef's Sign and its neighbours are on screen (282 shots: placement by numbers)

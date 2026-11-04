@@ -258,6 +258,10 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	if typeof(data) != TYPE_DICTIONARY:
 		connection_failed.emit("Unexpected server reply", cmd)
 		return {ok = false, code = "network", network = true}
+	if data.has("state") and save_too_old(data.state):   # an old server's or an unmigrated save's: maintenance, not the world
+		var held := {"code": "maintenance"}
+		blocked.emit("maintenance", held)
+		return {ok = false, code = "maintenance", network = true}
 	if data.has("state"):
 		var state: Dictionary = data.state
 		if bj_mock != null: bj_mock.decorate(state)   # before it becomes the (read-only) view
@@ -271,6 +275,13 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	refused.emit(str(data.get("code", "")), data.get("detail", {}), cmd)
 	if data.has("state"): state_changed.emit(view, [])
 	return {ok = false, code = str(data.get("code", "")), network = false}
+
+## v4q(2) ② (355 b1's two guards, 381 66475c4d): a state with no save_version, or one before SAVE_VERSION, is an old
+## server's or a save not migrated yet — it never becomes the view; the runtime shows SYS-MAINT without a time
+## (`We'll be back soon.` · Check again, which reads again, as for the server's own 503).
+const SAVE_VERSION := 7
+static func save_too_old(state) -> bool:
+	return not state is Dictionary or state.get("save_version", null) == null or int(state.save_version) < SAVE_VERSION
 
 ## The server's whole-screen refusals (q(74)): 426 {code: "update_required", url} and 503 {code: "maintenance",
 ## back_at}. Both the status and the body's code must match, so a proxy's plain 503 stays a network failure.
@@ -294,15 +305,21 @@ static func boot_wanted() -> bool:
 # keeps the choice latched when Test options created it (aa0e971b): Off still makes a legacy test account.
 const GUIDE_V3_READY := true
 ## locals: this client shows the keepers' local requests (q(272)): the server sends their map marks only then.
-const FEATURES := "choose_home,guide_v3,locals" if GUIDE_V3_READY else "choose_home,locals"
+## save_v7: this client reads the v7 save (v4q(2) wipe, SGODOT-397 / 396): without it the server answers 426 like its
+## version gate, so a build from before the wipe asks to be updated instead of playing on the new saves.
+const FEATURES := "choose_home,guide_v3,locals,save_v7" if GUIDE_V3_READY else "choose_home,locals,save_v7"
 
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	if version > 0: headers.append("x-p0-version: %d" % version)
-	var test: bool = test_accounts.is_test()
-	headers.append("x-p0-features: " + (("choose_home,guide_v3,locals" if test_accounts.guide_enabled() else "choose_home,locals") if test else FEATURES))
+	headers.append("x-p0-features: " + features())
 	return headers
+
+## The x-p0-features this build sends, on its requests and the online handshake alike (P0Online.features).
+func features() -> String:
+	if not test_accounts.is_test(): return FEATURES
+	return "choose_home,guide_v3,locals,save_v7" if test_accounts.guide_enabled() else "choose_home,locals,save_v7"
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is
 ## written for that export only. The demo is exported as a debug build, so OS.is_debug_build() alone can't tell it

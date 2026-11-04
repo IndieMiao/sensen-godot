@@ -23,6 +23,13 @@ export const DEFAULT_MEMBERS = path.join(ROOT, 'server/data/city_cluster_members
 /** Trip 1–7 distance bounds in km (§11.2.1): Trip n is ≤ BOUNDS[n-1]; beyond the last is Trip 7. */
 export const TRIP_KM = [30, 100, 500, 1600, 4000, 10000] as const;
 export const TRIP_NAMES = ['Local', 'Nearby', 'Regional', 'Long Haul', 'Continental', 'Intercontinental', 'Antipodal'] as const;
+/** The continent a point of land is on: its nearest city's, except Russia east of the Urals (60°E), which is Asia — the
+ * clusters take Russia's continent whole (Europe), so a wild site in Siberia read as Europe and Europe's one ruin went to
+ * Chukotka (李白's c6v4 count, 11-04). For wild sites only (the generator and src/p0/wild.ts); cities keep theirs. */
+export function siteContinent(continent: string, country: string, lng: number): string {
+  return country === 'RU' && lng > 60 ? 'asia' : continent;
+}
+
 /** §11.2.3: the fallback lists count clusters of at least this population outside the home cluster. */
 export const FALLBACK_MIN_POP = 100_000;
 

@@ -9,7 +9,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { distanceKm, tripByKm } from './clusters.js';
+import { distanceKm, siteContinent, tripByKm } from './clusters.js';
 import type { P0Content } from './content.js';
 import { clusterById, homeBase, homeOf } from './home.js';
 import type { P0State } from './state.js';
@@ -50,7 +50,8 @@ export function catalogueOf(c: P0Content, table: WildTable): Catalogue {
     const t = table.types[r[type] as number], cl = clusterById(c, r[near] as string), id = `${WILD_PREFIX}${r[row]}-${r[col]}`;
     const s: WildSite = { id, type: t, lat: r[lat] as number, lng: r[lng] as number, name: `${r[word]} ${rules.type_words[t]}`,
       short: r[word] as string, near: r[near] as string, near_name: cl?.name ?? '', climate: cl?.climate ?? '',
-      continent: cl?.continent ?? '', country: country >= 0 ? (r[country] as string) : '', coastal: r[coastal] === 1, open: rules.open.includes(t) };
+      continent: siteContinent(cl?.continent ?? '', country >= 0 ? (r[country] as string) : '', r[lng] as number), country: country >= 0 ? (r[country] as string) : '',
+      coastal: r[coastal] === 1, open: rules.open.includes(t) };
     const rule = rules.mines[t];
     if (rule) {
       const m = (r[main] as string | null) ?? null;
@@ -138,12 +139,14 @@ export const wildNear3 = (c: P0Content, s: P0State): string[] => {
   return kept?.length ? kept : wildNearOf(c, homeOf(c, s));
 };
 
-/** The free 3 as Today's vein row reads them (v4q(9), 亚瑟): near3's order (nearest first), each `{id, type, main, name}` —
- * `main` a vein's one main (`iron_ore` / `quartz`), null for a quarry; `name` the site's full name, the very field its pin
- * and its mine card show (`siteFor`'s, the viewport's). */
-export function near3Sites(c: P0Content, s: P0State, near3 = wildNear3(c, s)): { id: string; type: string; main: string | null; name: string }[] {
+/** The free 3 as Today's vein row reads them (v4q(9), 亚瑟): near3's order (nearest first), each `{id, type, main, name,
+ * lat, lng}` — `main` a vein's one main (`iron_ore` / `quartz`), null for a quarry; `name` the site's full name, the very
+ * field its pin and its mine card show (`siteFor`'s, the viewport's); lat / lng for a Show that flies to a site the
+ * viewport has not read yet (亚瑟, C part 2). */
+export function near3Sites(c: P0Content, s: P0State, near3 = wildNear3(c, s)):
+  { id: string; type: string; main: string | null; name: string; lat: number; lng: number }[] {
   return near3.map(id => wildById(c, id)).filter((x): x is WildSite => !!x)
-    .map(x => ({ id: x.id, type: x.type, main: x.mine?.main ?? null, name: x.name }));
+    .map(x => ({ id: x.id, type: x.type, main: x.mine?.main ?? null, name: x.name, lat: x.lat, lng: x.lng }));
 }
 
 /** The nearest free vein of one main (`iron_ore`, `quartz`) — from the save's frozen 3, which hold one of each (庚3): the one

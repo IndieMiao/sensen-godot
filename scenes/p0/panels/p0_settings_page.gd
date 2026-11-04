@@ -34,7 +34,7 @@ signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, BLOCKED }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, BLOCKED, LANGUAGE }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -104,8 +104,13 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## `Privacy` group before Legal, one row `Blocked players` with how many ›, 0 too (BP1, SGODOT-384); BLOCKED_UNREAD the
 ## row with › alone (not read this launch); BLOCKED_NONE no such row. `voice_chat`: under it in the same card
 ## `Voice chat ›`, no value (q(277); only while this phone is offered voice, 不知火舞). Neither: no Privacy group.
+## `language` (0.2.22 中文版): the row's value, the language in use in its own words (`English` / `中文`); "" for none.
+## q(281) (SGODOT-390, 不知火舞's spec 302 e92f4ff9 + 18f24a30, row 131): `privacy_url` "" or the policy's address —
+## Legal's first row `Privacy Policy ›` ("privacy"); `support_code` "" or `XXXXX-XXXXX` — Legal's last row after Version,
+## `Support code` / `Tap to copy` with the code on the right and no ›, the whole row copying it ("support_code"), and
+## under the card `Send this code with any request about your data.`
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
-		blocked := BLOCKED_NONE, voice_chat := false) -> P0SettingsPage:
+		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -119,6 +124,11 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		notif.name = "Notifications"
 		notif.pressed.connect(func(): page.open_pressed.emit("notifications"))
 		page._group("", [notif])
+	if language != "":   # General · Language › between Home and Legal (不知火舞 on the 中文版, 11-02)
+		var lang := UiSettingRow.new(UiSettingRow.Kind.LINK, "Language", "", language)
+		lang.name = "Language"
+		lang.pressed.connect(func(): page.open_pressed.emit("language"))
+		page._group("General", [lang])
 	var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
@@ -135,12 +145,31 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		row.pressed.connect(func(): page.open_pressed.emit("voice_chat"))
 		privacy.append(row)
 	if not privacy.is_empty(): page._group("Privacy", privacy)
+	var legal: Array = []
+	if privacy_url != "":
+		var policy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Privacy Policy")
+		policy.name = "PrivacyPolicy"
+		policy.pressed.connect(func(): page.open_pressed.emit("privacy"))
+		legal.append(policy)
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
+	legal.append(licenses)
 	var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
 	ver.name = "Version"
-	page._group("Legal", [licenses, ver])
+	legal.append(ver)
+	if support_code != "":
+		var code := UiSettingRow.new(UiSettingRow.Kind.LINK, "Support code", "Tap to copy", support_code, "", false)
+		code.name = "SupportCode"
+		(code.find_child("Value", true, false) as Node).auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a code, no words
+		code.pressed.connect(func(): page.open_pressed.emit("support_code"))
+		legal.append(code)
+	page._group("Legal", legal)
+	if support_code != "":
+		var note := UiKit.label("Send this code with any request about your data.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		note.name = "SupportNote"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(note)
 	return page
 
 ## Visible test settings (341 d559585e), retaining the approved B page layout and copy (aa0e971b).
@@ -342,3 +371,24 @@ func _group(title: String, rows: Array) -> void:
 		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		body.add_child(gap)
 	body.add_child(UiSettingRow.group(rows))
+
+## Settings › Language (0.2.21 中文版): `English` and `中文`, each in its own words (never translated), a ✓ on the one
+## picked; a pick is kept for the next start — the line under says so (the user's pick: a restart applies it).
+## `current` the language picked (P0_SUPPORTED's), `running` the one this start shows.
+static func language(current: String, running: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.LANGUAGE, "Language", safe_top, safe_bottom)
+	var rows: Array = []
+	for pair in [["en", "English"], ["zh_CN", "简体中文"]]:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, str(pair[1]), "", "✓" if current == pair[0] else "")
+		row.name = "Language_" + str(pair[0])
+		row.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a language's own name, in its own words
+		var locale := str(pair[0])
+		row.pressed.connect(func(): page.open_pressed.emit("language:" + locale))
+		rows.append(row)
+	page._group("", rows)
+	if current != running:
+		var note := UiKit.label("Restart the app to use the new language", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		note.name = "RestartNote"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(note)
+	return page

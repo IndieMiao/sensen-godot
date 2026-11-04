@@ -41,25 +41,18 @@ func test_place_info_reads_the_scene_place_and_the_farmhouse_override() -> void:
 	assert_int(int(p.kind)).is_equal(UiHud.PlaceKind.HOME)
 	assert_str(str(P0Logic.place_info("San Francisco · Homestead", "Farmhouse").space)).is_equal("Farmhouse")
 
+## Pip's Homestead request at Upgrade (A 包 spec ③ v3): the row Today shows with a Show to the sign.
+static func _with_upgrade(v: Dictionary) -> Dictionary:
+	v["homestead"] = {"level": 1, "next": {"level": 2, "coins": {"need": 0, "have": 230}, "skills": [], "materials": [], "can_upgrade": true}}
+	return v
+
 func test_today_rows_keep_the_lines_and_add_icons_and_show_targets() -> void:
-	var v := _view()
+	var v := _with_upgrade(_view())
 	var rows := P0Logic.today_rows(v)
 	assert_that(rows.map(func(r): return r.line)).is_equal(P0Logic.today_lines(v))
-	assert_str(str(rows[0].line)).is_equal("Radish ready in 1h 12m")   # one plot (q(227) ②)
-	assert_str(str(rows[0].icon)).is_equal("crop_radish")
-	assert_str(str(rows[0].go)).is_equal("plots")
-	assert_str(str(rows[1].icon)).is_equal("xp")
-	assert_str(str(rows[1].go)).is_equal("")   # no camera target: no Show pill
-
-func test_first_sow_row_is_short_when_energy_cannot_pay_for_it() -> void:
-	var v := _view()
-	v.plots = []
-	v.firsts = []
-	v.energy = {"value": 1, "max": 200, "next_in": 161000}
-	var row: Dictionary = P0Logic.today_rows(v)[0]
-	assert_str(str(row.line)).is_equal("Sow your first plot")
-	assert_str(str(row.state)).is_equal("short")
-	assert_str(str(row.tail)).is_equal("needs 2 Energy · +1 in 2:41")
+	assert_that(rows.map(func(r): return r.line)).is_equal(["Upgrade to Homestead Lv2"])   # no crop or skill row (spec ①)
+	assert_str(str(rows[0].icon)).is_equal("level_up")
+	assert_str(str(rows[0].go)).is_equal("sign")
 
 func test_energy_card_away_from_home_greys_cook_and_rest_with_at_home() -> void:
 	var v := _view()
@@ -99,7 +92,7 @@ func _ui(reachable: bool) -> P0Ui:
 	var ui: P0Ui = auto_free(P0Ui.new())
 	ui.can_show_spot = func() -> bool: return reachable
 	add_child(ui)
-	ui.set_view(_view())
+	ui.set_view(_with_upgrade(_view()))   # Today's row: Upgrade, its Show to the sign
 	return ui
 
 func _today_actions(ui: P0Ui) -> Array:

@@ -9,6 +9,8 @@ extends RefCounted
 const FarmCamera := preload("res://modules/farm/farm_camera.gd")
 const SCENE := preload("res://assets/mine/backdrop/mine_backdrop.glb")
 const SHADER := preload("res://modules/mining/mine_backdrop.gdshader")
+const MineArt := preload("res://modules/mining/mine_art.gd")
+const TYPE_SCENE := "res://assets/mine/types/%s/backdrop.glb"
 ## The mine Environment's background colour (P0Mine), which the backdrop's outer edge fades into.
 const VOID := Color("242125")
 ## Floor tints as the asset was verified with (README): floor 1 #B85E43 darkened 45 % (≈ #653425), floor 2 #A59A77
@@ -33,14 +35,21 @@ static func toward_camera() -> Vector3:
 static func tint(floor_n: int) -> Color:
 	return TINTS.get(floor_n, TINTS[2])
 
-static func build(floor_n: int) -> Node3D:
-	var root: Node3D = SCENE.instantiate()
+## A floor's backdrop. With a mine `type` (355, contract-efg §10.1): that type's own relief (assets/mine/types/<type>/
+## backdrop.glb, the old one's origin, facing and scale), its veins left in their colour (vein_mask) — the old relief where
+## it is not imported; and with the floor's `colours` (MineArt.palette) its backdrop_tint and fog for the floor and the
+## void. Without either, as before: the old relief in the variant's tint.
+static func build(floor_n: int, type := "", colours := {}) -> Node3D:
+	var root: Node3D = MineArt.kit(TYPE_SCENE % type) if type != "" else null
+	var veins := root != null
+	if root == null: root = SCENE.instantiate()
 	root.name = "MineBackdrop"
 	root.position = toward_camera() * FORWARD_M
 	var mat := ShaderMaterial.new()
 	mat.shader = SHADER
-	mat.set_shader_parameter("floor_tint", tint(floor_n))
-	mat.set_shader_parameter("void_tint", VOID)
+	mat.set_shader_parameter("floor_tint", colours.get("backdrop_tint", tint(floor_n)))
+	mat.set_shader_parameter("void_tint", colours.get("fog", VOID))
+	mat.set_shader_parameter("vein_mask", 1.0 if veins else 0.0)
 	for node in root.find_children("*", "GeometryInstance3D", true, false):
 		var g := node as GeometryInstance3D
 		g.material_override = mat

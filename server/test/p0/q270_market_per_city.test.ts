@@ -160,16 +160,20 @@ describe('q(270) Market Board per city', () => {
     expect(mapMarkers(c, s, T).find(m => m.place === HAYWARD_MARKET)).toBeUndefined();
   });
 
-  it('Track ≤ 3 counts every city\'s boards together', () => {
-    let s = player(HAYWARD);
-    settleBoards(c, s, T);
-    for (const sl of hayward(s)) s = step(s, { type: 'accept', request: sl.req!.id, ...atMarket(HAYWARD_MARKET) } as P0Command);
-    s.travel.here = SF;
-    settleBoards(c, s, T);
-    const home = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).filter(Boolean)[0]!;
-    s = step(s, { type: 'accept', request: home.id, ...atMarket('sh_market_1') } as P0Command);
-    expect(tracked(c, s)).toBe(3);
-    const next = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).find(x => x && x.status === 'open')!;
-    expect(applyP0(c, s, { type: 'accept', request: next.id, ...atMarket('sh_market_1') } as P0Command, T)).toMatchObject({ ok: false, code: 'track_limit' });
+  it('Track ≤ track_max (3 here) counts every city\'s boards together', () => {
+    const was = c.requests.track_max;
+    c.requests.track_max = 3;   // the mechanism at a small number: the content's is 25 (A 包反馈 3)
+    try {
+      let s = player(HAYWARD);
+      settleBoards(c, s, T);
+      for (const sl of hayward(s)) s = step(s, { type: 'accept', request: sl.req!.id, ...atMarket(HAYWARD_MARKET) } as P0Command);
+      s.travel.here = SF;
+      settleBoards(c, s, T);
+      const home = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).filter(Boolean)[0]!;
+      s = step(s, { type: 'accept', request: home.id, ...atMarket('sh_market_1') } as P0Command);
+      expect(tracked(c, s)).toBe(3);
+      const next = boardsOf(c, s).find(b => b.board === 'market' && b.city === SF)!.slots.map(sl => sl.req).find(x => x && x.status === 'open')!;
+      expect(applyP0(c, s, { type: 'accept', request: next.id, ...atMarket('sh_market_1') } as P0Command, T)).toMatchObject({ ok: false, code: 'track_limit' });
+    } finally { c.requests.track_max = was; }
   });
 });

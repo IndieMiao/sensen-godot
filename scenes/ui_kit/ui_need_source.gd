@@ -40,6 +40,13 @@ func set_text(v: String) -> void:
 	text = v
 	if _label != null: _label.text = v
 
+## Two lines at a ` · ` (李白's addendum eb1d7c20, as Today and the toasts: UiKit.break_at_dot): at the card's `width`,
+## the line breaks after the last ` · ` whose first part fits, the dot dropped — `Clay · Clay Pits in town` /
+## `or Quarries`, `Iron Ore` / `Iron veins from Floor 10`; one that fits stays one line.
+func fit_to(width: float) -> void:
+	var room := width - _PAD.x - _PAD.z - ((_GAP + _show.get_combined_minimum_size().x) if _show.visible else 0.0)
+	_label.text = UiKit.break_at_dot(text, _label.get_theme_font(&"font"), _label.get_theme_font_size(&"font_size"), room)
+
 ## Pops a source line just above `anchor` (global rect) inside `host`; a tap anywhere else closes it.
 ## Returns the popup layer (free it to close); `on_show` runs after Show, then the popup closes.
 static func popup(host: Control, anchor: Rect2, source: String, on_show: Callable = Callable()) -> Control:
@@ -58,6 +65,7 @@ static func popup(host: Control, anchor: Rect2, source: String, on_show: Callabl
 	var place := func() -> void:
 		var area := host.get_global_rect()
 		var w := minf(pill.get_combined_minimum_size().x, area.size.x - UiTokens.SPACE_PAGE * 2.0)
+		pill.fit_to(w)
 		var h := pill.get_combined_minimum_size().y
 		var x := clampf(anchor.get_center().x - w * 0.5, area.position.x + UiTokens.SPACE_PAGE, area.end.x - UiTokens.SPACE_PAGE - w)
 		var y := maxf(area.position.y, anchor.position.y - h - UiTokens.SPACE_WITHIN)

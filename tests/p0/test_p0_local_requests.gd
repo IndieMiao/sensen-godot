@@ -50,7 +50,10 @@ func test_a_long_gap_drops_the_items_name() -> void:
 	var r := _loc("req_loc_e", {"status": "accepted", "kind": "material", "items": ["copper_ore"], "qty": 12, "have": 0})
 	var gap := P0Locals.gap_text(_view([r]), r)
 	var key := P0Locals.key(_view([r]), TACKLE)
-	assert_str(str(key.reason)).is_equal(gap if gap.length() <= P0Locals.KEY_CHARS else "Need 12 more")
+	assert_str(str(key.reason)).is_equal(gap if P0Logic.text_width(gap, UiTokens.BUTTON_CMD_BLOCKED) <= P0Locals.KEY_W else "Need 12 more")
+	# #649 第二批 ⑨: measured, not counted — 28 characters of English fit as before, a wider line does not
+	assert_float(P0Logic.text_width("Need 2 more Willow Pond Carp", UiTokens.BUTTON_CMD_BLOCKED)).is_less_equal(P0Locals.KEY_W)
+	assert_float(P0Logic.text_width("Need 3 more Rare Rainbow Trout", UiTokens.BUTTON_CMD_BLOCKED)).is_greater(P0Locals.KEY_W)
 
 func test_the_card_says_who_the_keepers_line_coins_only_and_deliver_to_with_the_city_away() -> void:
 	var r := _loc("req_loc_f")

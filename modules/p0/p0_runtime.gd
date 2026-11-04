@@ -141,12 +141,14 @@ func _switch_test_account(action: String) -> void:
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:
-	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
-	TranslationServer.set_locale("en")
+	# English by default, 中文 when the player picked it in Settings (0.2.21, the user 11-02; it was English-only from
+	# 2026-09-04): P0's own table, never Journey's (Localization.use_p0).
+	Localization.use_p0()
 	session = P0Session.new()
 	add_child(session)
 	ui = P0Ui.new()
 	ui.test_accounts = session.test_accounts
+	ui.player_of = func() -> String: return session.player_id   # Settings' support code (q(281))
 	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
 	# Crop-ready notifications (SGODOT-350 / 356): Android's GodotNotify or iOS's LocalNotify, per account on this phone.
@@ -337,9 +339,8 @@ func _ask_presence() -> void:
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
-	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
-	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.send(session.base_url + "/p0/presence", headers)
+	# the requests' own headers: the demo key, the version and the features (save_v7, or 426 once the wipe is on: 397)
+	_presence.send(session.base_url + "/p0/presence", session._headers())
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
@@ -595,13 +596,14 @@ func release_travel() -> void:
 ## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
 const TREE_XP := "tree_xp"
 
-## A generated home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home
-## set (P0Outposts.home: names, Show on map, Today) has them; the written city's are the client's own tables.
+## Home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home set
+## (P0Outposts.home: names, Show on map, Today) has them; the written city's ponds and outposts are the client's own
+## tables, but its gathering spots are the server's (v4q(4)) — the guide's S6a and Today point at them before the map.
 func _read_home_places(v: Dictionary) -> void:
 	var travel = load("res://modules/p0/p0_travel.gd")
 	var home := str(travel.home(v))
 	var places = load("res://modules/p0/p0_city_places.gd")
-	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
+	if home == "" or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
 ## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
@@ -1166,6 +1168,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if not r.is_empty():
 			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "track_limit":   # A 包 spec ③: tracking 25 already (a key greyed too late, another device)
+		ui.toast_error(P0Logic.TRACK_FULL_TOAST)
+		return
 	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
 		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
 		return
@@ -2111,6 +2116,11 @@ func _dev_shot(dt: float) -> void:
 					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
 					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"measure": print("P0_MEASURE ", JSON.stringify(measure_actor()))   # the player's height on screen (camera unification)
+			"goto":   # goto:stand_lena — a room's player stood at that anchor, facing its way (SGODOT-216 shots)
+				if is_instance_valid(world) and world.has_method("anchor") and world.call("anchor", step[1]) != null:
+					var m: Marker3D = world.call("anchor", step[1])
+					world.actor.teleport(m.global_position)
+					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)

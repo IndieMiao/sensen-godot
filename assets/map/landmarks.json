@@ -41,7 +41,7 @@
   {
    "id": "painted_ladies",
    "name": "Painted Ladies",
-   "zh": "彩绘女士",
+   "zh": "Painted Ladies",
    "lat": 37.7763,
    "lng": -122.4328,
    "category": "Landmark",
@@ -89,7 +89,7 @@
   {
    "id": "powells_books",
    "name": "Powell's Books",
-   "zh": "鲍威尔书城",
+   "zh": "Powell's Books",
    "lat": 45.5231,
    "lng": -122.6813,
    "category": "Bookstore",
@@ -125,7 +125,7 @@
   {
    "id": "crater_lake",
    "name": "Crater Lake",
-   "zh": "火山口湖国家公园",
+   "zh": "火山口湖",
    "lat": 42.9446,
    "lng": -122.109,
    "category": "National Park",
@@ -161,7 +161,7 @@
   {
    "id": "chihuly_garden_glass",
    "name": "Chihuly Garden and Glass",
-   "zh": "奇胡利玻璃艺术园",
+   "zh": "Chihuly Garden and Glass",
    "lat": 47.6206,
    "lng": -122.3504,
    "category": "Museum",
@@ -329,7 +329,7 @@
   {
    "id": "cloud_gate",
    "name": "Cloud Gate",
-   "zh": "云门豆子",
+   "zh": "云门",
    "lat": 41.8827,
    "lng": -87.6233,
    "category": "Landmark",
