@@ -8,7 +8,7 @@
  * Deterministic: every draw is hash32(seed, site id, topic), and the guarantees walk the clusters in a fixed order, so
  * the same land, clusters and config give the same catalogue.
  */
-import { distanceKm, type CityCluster } from '../src/p0/clusters.js';
+import { distanceKm, siteContinent, type CityCluster } from '../src/p0/clusters.js';
 import { hash32 } from '../src/p0/world.js';
 
 export const TYPES = ['quarry', 'vein', 'geode', 'abyss', 'ruin', 'woodland', 'waterside', 'bloom'] as const;
@@ -190,7 +190,7 @@ export function placeSites(cfg: WildConfig, seed: string, land: Raster, lakes: R
         const coastal = land.within(lat, lng, cfg.coastal_km, 0);
         out.push({ id, row, col, lat, lng, type: 'woodland', main: null, side: null, floors: null, coastal,
           wet: coastal || lakes.within(lat, lng, cfg.lake_near_km, 1), near: near.id, climate: near.climate,
-          continent: near.continent, country, word: '', locked: false });
+          continent: siteContinent(near.continent, country, lng), country, word: '', locked: false });
         break;
       }
     }

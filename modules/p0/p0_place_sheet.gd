@@ -153,7 +153,8 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 	if not now.is_empty(): col.add_child(conditions_row(now))
 	var why: Dictionary = spec.get("reason", {}) if spec.get("reason", {}) is Dictionary else {}
 	if not why.is_empty(): col.add_child(reason_row(why))
-	if str(spec.get("line", "")) != "": col.add_child(UiKit.label(str(spec.line), UiTokens.STYLE_C14_B))
+	# a state said, not a fact: secondary grey (E4 329:182456 `Not open yet`, 不知火舞 355 850d2fc2)
+	if str(spec.get("line", "")) != "": col.add_child(UiKit.label(str(spec.line), UiTokens.STYLE_C14_B, UiTokens.COLOR_SECONDARY))
 	for f in spec.get("facts", []):
 		col.add_child(forecast_row(str(f[0]), f[1]) if f[1] is Array else UiFactRow.new(str(f[0]), str(f[1])))
 	if details.is_valid():
@@ -172,15 +173,16 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 		link.add_child(row)
 		link.pressed.connect(details)
 		col.add_child(link)
-	var primary := UiCommandButton.new(str(spec.get("primary", "Go")))
-	primary.name = "Primary"
-	primary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	primary.activated.connect(go)
-	if str(spec.get("blocked", "")) != "":
-		primary.reason = str(spec.blocked)
-		primary.need_energy = bool(spec.get("blocked_energy", false))
-		if spec.get("on_blocked") is Callable: primary.unavailable_pressed.connect(func(_r): (spec.on_blocked as Callable).call())
-	col.add_child(primary)
+	if not bool(spec.get("no_primary", false)):   # spec.no_primary: no key at all (a wild mine not open yet, E4)
+		var primary := UiCommandButton.new(str(spec.get("primary", "Go")))
+		primary.name = "Primary"
+		primary.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		primary.activated.connect(go)
+		if str(spec.get("blocked", "")) != "":
+			primary.reason = str(spec.blocked)
+			primary.need_energy = bool(spec.get("blocked_energy", false))
+			if spec.get("on_blocked") is Callable: primary.unavailable_pressed.connect(func(_r): (spec.on_blocked as Callable).call())
+		col.add_child(primary)
 	if str(spec.get("footer", "")) != "":
 		var foot := UiKit.label(str(spec.footer), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 		foot.name = "Footer"

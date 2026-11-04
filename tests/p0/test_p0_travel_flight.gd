@@ -46,6 +46,7 @@ func _ready_to_arrive(m: Node, here := SF) -> Dictionary:
 	var saved: Dictionary = rt.session.view
 	var v := saved.duplicate(true)
 	v["now"] = 1_000_000_000.0
+	v["save_version"] = 7   # a b1 server's (an older one's reply is maintenance, P0Session.save_too_old)
 	v["travel"] = {home = SF, here = here, passes = {}, visits = {LA: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
 	rt.session.view = v
 	rt.ui.set_view(v)
@@ -98,7 +99,7 @@ static func _moved(v: Dictionary, cluster: String) -> Dictionary:
 
 ## The held travel's reply, through the session as from the server: taken with `events`, or refused with `code`.
 func _answer(rt: P0Runtime, view: Dictionary, events := [], code := "") -> void:
-	var body := {"ok": code == "", "state": view}
+	var body := {"ok": code == "", "state": view.merged({"save_version": 7})}   # a b1 server's (P0Session.save_too_old)
 	if code == "": body["events"] = events
 	else: body["code"] = code
 	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify(body).to_utf8_buffer(), _wire.pop_front())

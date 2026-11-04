@@ -640,7 +640,8 @@ func test_gear_row_states() -> void:
 	var eq: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Starter Rod", state = &"equipped", effect = "Lands up to Fine fish"}))
 	var owned: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish",
 		action = {id = &"equip", label = "Equip", kind = &"secondary"}}))
-	var locked: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish"}))
+	var locked: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish",
+		note = "Legendary needs Fishing Lv7–9"}))
 	await _settle()
 	assert_array(_texts(eq)).contains(["✓ Equipped"])
 	assert_object(eq.action_button()).is_null()
@@ -650,6 +651,13 @@ func test_gear_row_states() -> void:
 	owned.action_button().activated.emit()
 	assert_array(got).is_equal([&"equip"])
 	assert_array(_texts(locked)).contains(["Fishing Lv5 · Tackle Shop"])
+	# q(278): the note its own line under the effect, as muted (the tier a rod lands)
+	var effect: Label = locked.find_child("Effect", true, false)
+	var tier: Label = locked.find_child("Note", true, false)
+	assert_str(tier.text).is_equal("Legendary needs Fishing Lv7–9")
+	assert_int(tier.get_index()).is_equal(effect.get_index() + 1)
+	assert_str(str(tier.theme_type_variation)).is_equal(str(effect.theme_type_variation))
+	assert_object(eq.find_child("Note", true, false)).is_null()
 	assert_object(locked.action_button()).is_null()
 	assert_float(locked._icon.modulate.a).is_equal_approx(UiTokens.OPACITY_UNAVAILABLE_ICON, 0.001)
 

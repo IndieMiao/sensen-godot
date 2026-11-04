@@ -28,11 +28,16 @@ export function shopOf(raw: unknown): ShopId | null {
  * the regional seed of its city's climate (§5.2.3: Pumpkin in San Francisco), between its goods and the City Specialty
  * shelf: the place's city, else the one the player is in, else home. */
 export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown): string[] {
-  if (shop === 'homestead') return [...c.stall.buy, ...(c.fast_crops ?? []).map(x => x.seed), ...c.bag_upgrades.map(u => u.id),
-    ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
-  if (shop === 'tackle') return c.tackle.buy;
-  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...specialtyAt(c, s, place)];
+  if (shop === 'homestead') return [...c.stall.buy, ...(c.fast_crops ?? []).map(x => x.seed), ...potionsAt(c, shop),
+    ...c.bag_upgrades.map(u => u.id), ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
+  if (shop === 'tackle') return [...c.tackle.buy, ...potionsAt(c, shop)];
+  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...specialtyAt(c, s, place), ...potionsAt(c, shop)];
   return [];
+}
+
+/** 355 G (contract-efg §9.4): the mine's potions on the counter their `sold_at` names (Healing Potion: the Homestead Stall). */
+function potionsAt(c: P0Content, shop: ShopId): string[] {
+  return Object.entries(c.mine.potions ?? {}).filter(([, p]) => p.sold_at === shop).map(([id]) => id);
 }
 
 /** A city sells its postcard (SGODOT-296) from M tier up: home always, a generated city unless it is an S-tier town. */
@@ -101,6 +106,9 @@ export function offerOf(c: P0Content, id: string): Offer | null {
   // §9.11.1: decor 1 a day each, straight into Farm Storage (q(29)), from its Homestead level; never sold back.
   const deco = decorOf(c)?.items[id];
   if (deco) return { price: deco.price, skill: null, gate: 0, daily: 1, to: 'storage', once: false, floor: true, homestead: deco.homestead, pieces: deco.pieces };
+  // 355 G §9.4: a potion — its daily stock, from its Homestead level, into the bag, the 40 floor kept
+  const potion = Object.hasOwn(c.mine.potions ?? {}, id) ? c.mine.potions[id] : undefined;
+  if (potion) return { price: potion.price, skill: null, gate: 0, daily: potion.stock, to: 'bag', once: false, floor: true, homestead: potion.gate.homestead };
   const sp = c.specialty[id];
   if (sp) return { price: sp.price, skill: null, gate: 0, daily: 0, to: 'storage', once: true, floor: true };
   // SGODOT-296: another city's postcard, once per account into Farm Storage (catalog decides where it is sold)

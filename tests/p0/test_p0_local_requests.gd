@@ -50,7 +50,10 @@ func test_a_long_gap_drops_the_items_name() -> void:
 	var r := _loc("req_loc_e", {"status": "accepted", "kind": "material", "items": ["copper_ore"], "qty": 12, "have": 0})
 	var gap := P0Locals.gap_text(_view([r]), r)
 	var key := P0Locals.key(_view([r]), TACKLE)
-	assert_str(str(key.reason)).is_equal(gap if gap.length() <= P0Locals.KEY_CHARS else "Need 12 more")
+	assert_str(str(key.reason)).is_equal(gap if P0Logic.text_width(gap, UiTokens.BUTTON_CMD_BLOCKED) <= P0Locals.KEY_W else "Need 12 more")
+	# #649 第二批 ⑨: measured, not counted — 28 characters of English fit as before, a wider line does not
+	assert_float(P0Logic.text_width("Need 2 more Willow Pond Carp", UiTokens.BUTTON_CMD_BLOCKED)).is_less_equal(P0Locals.KEY_W)
+	assert_float(P0Logic.text_width("Need 3 more Rare Rainbow Trout", UiTokens.BUTTON_CMD_BLOCKED)).is_greater(P0Locals.KEY_W)
 
 func test_the_card_says_who_the_keepers_line_coins_only_and_deliver_to_with_the_city_away() -> void:
 	var r := _loc("req_loc_f")
@@ -135,7 +138,8 @@ func test_a_local_request_refused_wrong_place_toasts_its_hand_in_row() -> void:
 	await get_tree().process_frame
 	rt.session.view = _view([_loc("req_loc_w", {"status": "accepted", "ready": true, "have": 3})])
 	rt._on_refused("wrong_place", {}, {"type": "deliver", "request": "req_loc_w"})
-	assert_str(rt.ui.toast_text()).is_equal("Pond Catch · Deliver to Wen · Shanghai")
+	assert_str(rt.ui.toast_text()).is_equal("Pond Catch\nDeliver to Wen · Shanghai")   # an Error toast breaks at a " · " (#666)
+	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)   # a refused command's (§4.8.6, 不知火舞 11-02)
 
 func _ui() -> P0Ui:
 	var u := P0Ui.new()

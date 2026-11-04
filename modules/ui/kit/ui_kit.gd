@@ -23,6 +23,9 @@ static func font(weight: StringName = &"regular") -> Font:
 const ITALIC_SKEW := 0.2
 static var _bold_italic: FontVariation
 static func bold_italic() -> FontVariation:
+	# 中文 has no italic: a Bold Italic line (the Bite Board keeper's, a Kindred line) is upright Bold there — the bold
+	# weight, which draws Chinese through Noto Sans SC (Localization.set_cjk_fonts); 不知火舞 385 bd107de1, 0.2.23
+	if TranslationServer.get_locale() == "zh_CN": return font(&"bold") as FontVariation
 	if _bold_italic == null:
 		var bold := font(&"bold") as FontVariation
 		_bold_italic = FontVariation.new()
@@ -57,9 +60,10 @@ static func icon(texture: Texture2D, side: float) -> TextureRect:
 ## Two lines break at a " · " (不知火舞 on #188, q(103)): a text wider than `width` goes to the next line after the last
 ## " · " that still leaves the first line inside it, the dot dropped — `Pond Catch` / `Pond Crucian 1/2`,
 ## `Catch 2 Pond Crucian` / `Fern Pond`. A text that fits, has no " · " or no first part that fits stays as it is
-## (the label still wraps by words). Toasts that opt in and Today's rows use it, each with its own label's font.
+## (the label still wraps by words), and so does one that sets its own lines (a "\n": the away creel's three). Toasts
+## (Error toasts all, 不知火舞 11-02) and Today's rows use it, each with its own label's font.
 static func break_at_dot(text: String, font: Font, font_size: int, width: float) -> String:
-	if font == null or width <= 0.0 or not text.contains(" · "): return text
+	if font == null or width <= 0.0 or not text.contains(" · ") or text.contains("\n"): return text
 	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= width
 	if fits.call(text): return text
 	var parts := text.split(" · ")

@@ -10,16 +10,18 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, clusterOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
+import { cityInfo, clusterById, clusterOf, fareOf, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { gatherPointsOf } from './gather_points.js';
 import { catalogue, parseBbox, viewport } from './wild.js';
 import { changeOpen, dayHoldFor, homeCities, homeSpots, homeStatus, pinArea } from './home_city.js';
 import type { IpNear } from './ip_city.js';
 import type { OutpostRooms } from './online/rooms.js';
+import { pondOfRoom } from './online/outposts.js';
 import { placeOf } from './world.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 import { guideKeys, settleGuide, setGuide } from './guide.js';
+import { settleFirstDig } from './first_dig.js';
 
 /** rooms: who is in the outpost rooms right now (SGODOT-227 OutpostRooms), for the Tea Host's count by town (q(206));
  * log: the observation log (S7). */
@@ -54,7 +56,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (!deps.rooms) return null;
     const here = st.travel.here;
     let n = 0;
-    for (const [id, p] of Object.entries(deps.rooms.presence())) if (clusterOf(c, id) === here) n += p.online;
+    for (const [id, p] of Object.entries(deps.rooms.presence())) if (!pondOfRoom(id) && clusterOf(c, id) === here) n += p.online;   // its outposts' rooms, not its ponds'
     const entered = st.presence.entered;
     // an outpost of this town, not a pond (presence.entered keeps either; 周瑜 on #448)
     if (!deps.rooms.occupant(st.player) && entered && !placeOf(c, entered) && clusterOf(c, entered) === here) n += 1;
@@ -105,7 +107,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
   });
 
   /** v4q(3) (contract-c §4): the open wild sites in the map's viewport, at most VIEWPORT_CAP, with what they are to the
-   * player (free, visited, Trip, a pass); none below the continent zoom. The catalogue's revision rides along. */
+   * player (free, visited, Trip, a pass, and `cost` — the fare as travel takes it now, the travel card's own (fareOf),
+   * so the card needs no second read; 亚瑟, C part 2); none below the continent zoom. The catalogue's revision rides along. */
   app.get('/v1/p0/wild', async (req, reply) => {
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
@@ -116,8 +119,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const box = parseBbox(bbox);
     if (!box) return reply.code(400).send({ ok: false, code: 'bad_bbox' });
     const s = stateOf(player, req.headers);
-    const got = viewport(c, s, box, Number(zoom), clock(s.clock_ms));
-    return reply.header('x-wild-revision', String(got.revision)).send({ ok: true, sites: got.sites, capped: got.capped, total: got.total });
+    const now = clock(s.clock_ms), got = viewport(c, s, box, Number(zoom), now);
+    const sites = got.sites.map(x => { const f = fareOf(c, s, x.id, now); return { ...x, cost: { energy: f.energy, coins: f.coins } }; });
+    return reply.header('x-wild-revision', String(got.revision)).send({ ok: true, sites, capped: got.capped, total: got.total });
   });
 
   /** The home pick page (SGODOT-303, q(160) ④): the open cities, and with ?q= the cities by name with why one is grey. */
@@ -252,7 +256,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     if (level !== undefined && (!Number.isInteger(level) || level < 1 || level > c.homestead.levels.length)) return reply.code(400).send({ ok: false, code: 'bad_level' });
     if (coins !== undefined && (!Number.isInteger(coins) || coins < 0 || coins > 1_000_000)) return reply.code(400).send({ ok: false, code: 'bad_qty' });
     const s = stateOf(player, req.headers);
-    if (level !== undefined) s.homestead.level = level;
+    if (level !== undefined) { s.homestead.level = level; settleFirstDig(c, s, clock(s.clock_ms), []); }   // 355 G: as the upgrade would (后裔 on #697)
     if (coins !== undefined) s.coins = coins;
     store.put(s);
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms), req.headers) });

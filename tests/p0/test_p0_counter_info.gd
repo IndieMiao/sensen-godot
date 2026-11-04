@@ -82,3 +82,27 @@ func test_a_seeds_card_has_no_materials_and_its_buy_is_the_rows() -> void:
 	await get_tree().process_frame
 	assert_array(sent).is_equal([[&"buy", "seed_radish", {qty = 1}]])
 	assert_bool(sheet.is_open() if is_instance_valid(sheet) else false).is_false()
+
+## q(278) (SGODOT-386): a rod's card says which Fishing levels its top tier needs, its own line under the reach — once
+## the rod can be bought, as the row's line 3 (the Buy key says the gate till then).
+func test_a_rods_card_says_its_tier_once_it_can_be_bought() -> void:
+	var v := _view()
+	v.skills.fishing = {"level": 3, "xp": 230, "floor": 220, "next": 480}
+	for o in v.shops.tackle.buy + v.tackle.buy: if str(o.id) == "rod_reed": o.unlocked = true
+	var ui := _ui(v)
+	await await_idle_frame()
+	ui.open_counter("tackle")
+	for i in 3: await get_tree().process_frame
+	var d := _drawer(ui)
+	assert_array(d.row_of("rod_reed").spec().facts).is_equal(["Lands up to Rare fish", "Rare needs Fishing Lv4–6"])
+	var sheet := ui.counter_info(d, "rod_reed")
+	await get_tree().process_frame
+	assert_that([sheet.spec().rarity_text, sheet.spec().facts]).is_equal(["Lands up to Rare fish", ["Rare needs Fishing Lv4–6", "80 coins"]])
+	ui.close_top_layer()
+	ui.close_modal()
+	for o in v.shops.tackle.buy + v.tackle.buy: if str(o.id) == "rod_reed": o.unlocked = false
+	v.skills.fishing.level = 2
+	ui.set_view(v)
+	ui.open_counter("tackle")
+	for i in 3: await get_tree().process_frame
+	assert_that(ui.counter_info(_drawer(ui), "rod_reed").spec().facts).is_equal(["80 coins"])   # Fishing Lv3 needed

@@ -17,14 +17,24 @@ extends Control
 ##             switch `Crops ready` (`When a plot is ready to harvest`); when the system has said no, above it the Info
 ##             toast card `Notifications are off for <the app's name>` with `Open system settings ›` (不知火舞 350
 ##             7bffafd7) — and the switch reads off whatever the frame drew (dbd8d596).
+##   BLOCKED   (SGODOT-384; q(28) §12.1.6; 不知火舞's spec 383, BP2 / BP3 row 127) from Settings' `Blocked players ›`:
+##             the voice blocks, the only way to lift one now that the two never see each other in a room. A row each in
+##             one card, the name as their name tag writes it (`Traveller 5dd4`) and the people drawer's text key
+##             `Unblock`; a tap takes the row away at once — no card, no toast — and emits open_pressed(handle). No one:
+##             `No one blocked`, secondary, centred — only once the list has been read. Never read this launch and
+##             the read failed: in the list's place the empty state (wifi_off, `Check your connection and try again.`)
+##             and `Retry` (Compact secondary), as the home pick's error (不知火舞 384 6e014af3); Retry emits
+##             open_pressed("retry"), nothing retries by itself. No date under a name: the server keeps none (后裔 #661).
 ## Emits back_pressed, open_pressed(what): "licenses", a row id, or a Map data row ("mapbox_site", "osm_site",
-## "improve", "notifications", "system_settings"); toggled(what, on): "telemetry", "crops_ready".
+## "improve", "notifications", "system_settings", "blocked_players", "voice_chat"), a blocked player's handle or
+## "retry" on BLOCKED;
+## toggled(what, on): "telemetry", "crops_ready".
 
 signal back_pressed
 signal open_pressed(what: String)
 signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA, TEST_OPTIONS, NOTIFICATIONS, BLOCKED, LANGUAGE }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -34,6 +44,12 @@ const _CONTENT_GAP := 12    # header → content (SET-LICENSES: 64 → 76)
 const _GROUP_GAP := 8       # group title → its card → the next title
 const _BODY_SIZE := 13      # the licence text: Regular 13 (Caption R12 a step up; no 13 Regular style exported)
 const _PARAGRAPH_GAP := 8
+const _EMPTY_TOP := 15      # BLOCKED's `No one blocked` under the header: 68 from its middle (BP3)
+const NO_ONE_BLOCKED := "No one blocked"
+const READ_FAILED := "Check your connection and try again."
+## settings(blocked): no Privacy group, or the row with no number (the list not read this launch)
+const BLOCKED_NONE := -1
+const BLOCKED_UNREAD := -2
 ## A long text (Mapbox's LICENSE.md: 660 paragraphs, about 0.3 s laid out at once on a desktop) opens with its first
 ## screens and fills in the rest a batch a frame, so the page is up at once.
 const _FIRST_PARAGRAPHS := 30
@@ -84,8 +100,17 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## Legal group (Licenses and Version) (341 d559585e, corrected by 0d94c10d: Home → Notifications → Test options → Legal). `home` {name, line, open}: while the change is open, `Home city · Tokyo` ›
 ## with `Change once · 5 days left` under it, opening the change ("home"); once it is not, the same row read-only with
 ## `Set for good`. No home (a view not in yet): no Home group. `notifications` "On" / "Off": one row, `Notifications`
-## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group.
-static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "") -> P0SettingsPage:
+## with that value › (SGODOT-350, 不知火舞 7bffafd7); "" (no phone side): no Notifications group. `blocked` ≥ 0: the
+## `Privacy` group before Legal, one row `Blocked players` with how many ›, 0 too (BP1, SGODOT-384); BLOCKED_UNREAD the
+## row with › alone (not read this launch); BLOCKED_NONE no such row. `voice_chat`: under it in the same card
+## `Voice chat ›`, no value (q(277); only while this phone is offered voice, 不知火舞). Neither: no Privacy group.
+## `language` (0.2.22 中文版): the row's value, the language in use in its own words (`English` / `中文`); "" for none.
+## q(281) (SGODOT-390, 不知火舞's spec 302 e92f4ff9 + 18f24a30, row 131): `privacy_url` "" or the policy's address —
+## Legal's first row `Privacy Policy ›` ("privacy"); `support_code` "" or `XXXXX-XXXXX` — Legal's last row after Version,
+## `Support code` / `Tap to copy` with the code on the right and no ›, the whole row copying it ("support_code"), and
+## under the card `Send this code with any request about your data.`
+static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
+		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "") -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if not home.is_empty():
 		var title := "Home city · " + str(home.get("name", ""))
@@ -99,16 +124,52 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		notif.name = "Notifications"
 		notif.pressed.connect(func(): page.open_pressed.emit("notifications"))
 		page._group("", [notif])
+	if language != "":   # General · Language › between Home and Legal (不知火舞 on the 中文版, 11-02)
+		var lang := UiSettingRow.new(UiSettingRow.Kind.LINK, "Language", "", language)
+		lang.name = "Language"
+		lang.pressed.connect(func(): page.open_pressed.emit("language"))
+		page._group("General", [lang])
 	var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
 	tests.name = "TestOptions"
 	tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
 	page._group("", [tests])
+	var privacy: Array = []
+	if blocked != BLOCKED_NONE:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, "Blocked players", "", str(blocked) if blocked >= 0 else "")
+		row.name = "BlockedPlayers"
+		row.pressed.connect(func(): page.open_pressed.emit("blocked_players"))
+		privacy.append(row)
+	if voice_chat:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, "Voice chat")
+		row.name = "VoiceChat"
+		row.pressed.connect(func(): page.open_pressed.emit("voice_chat"))
+		privacy.append(row)
+	if not privacy.is_empty(): page._group("Privacy", privacy)
+	var legal: Array = []
+	if privacy_url != "":
+		var policy := UiSettingRow.new(UiSettingRow.Kind.LINK, "Privacy Policy")
+		policy.name = "PrivacyPolicy"
+		policy.pressed.connect(func(): page.open_pressed.emit("privacy"))
+		legal.append(policy)
 	var licenses := UiSettingRow.new(UiSettingRow.Kind.LINK, "Licenses")
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
+	legal.append(licenses)
 	var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
 	ver.name = "Version"
-	page._group("Legal", [licenses, ver])
+	legal.append(ver)
+	if support_code != "":
+		var code := UiSettingRow.new(UiSettingRow.Kind.LINK, "Support code", "Tap to copy", support_code, "", false)
+		code.name = "SupportCode"
+		(code.find_child("Value", true, false) as Node).auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a code, no words
+		code.pressed.connect(func(): page.open_pressed.emit("support_code"))
+		legal.append(code)
+	page._group("Legal", legal)
+	if support_code != "":
+		var note := UiKit.label("Send this code with any request about your data.", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		note.name = "SupportNote"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(note)
 	return page
 
 ## Visible test settings (341 d559585e), retaining the approved B page layout and copy (aa0e971b).
@@ -167,6 +228,68 @@ static func notifications(on: bool, refused_for: String, safe_top := 0.0, safe_b
 	crops.toggled.connect(func(value: bool): page.toggled.emit("crops_ready", value))
 	page._group("", [crops])
 	return page
+
+## BLOCKED: `rows` [{handle, name}] in the server's order; `read` "ok" (as last read), "reading" (not yet: nothing
+## shown, never `No one blocked`) or "failed" (never read this launch: the empty state and Retry).
+static func blocked_players(rows: Array, safe_top := 0.0, safe_bottom := 0.0, read := "ok") -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.BLOCKED, "Blocked players", safe_top, safe_bottom)
+	var list: Array = []
+	for r in rows:
+		var handle := str(r.get("handle", ""))
+		var row := UiSettingRow.new(UiSettingRow.Kind.VALUE, str(r.get("name", "")))
+		row.name = "Blocked_" + handle
+		var none := row.find_child("Value", true, false)   # VALUE's value slot, empty here: the key takes its place
+		none.get_parent().remove_child(none)
+		none.free()
+		var key := UiNavButton.new("Unblock", true)
+		key.name = "Unblock"
+		key.chevron = false
+		key.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		key.pressed.connect(func(): page._unblocked(row, handle))
+		row.find_child("Row", true, false).add_child(key)
+		list.append(row)
+	if not list.is_empty(): page._group("", list)
+	elif read == "ok": page._no_one()
+	elif read == "failed": page._read_failed()
+	return page
+
+## BLOCKED: the row goes at once, the card closing up; the last one leaves `No one blocked`.
+func _unblocked(row: Control, handle: String) -> void:
+	var card := row.get_parent()
+	row.get_parent().remove_child(row)
+	row.queue_free()
+	if card.get_child_count() == 0:
+		for c in body.get_children(): c.queue_free()
+		_no_one()
+	open_pressed.emit(handle)
+
+func _read_failed() -> void:
+	var gap := Control.new()
+	gap.custom_minimum_size.y = _EMPTY_TOP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(gap)
+	var box := VBoxContainer.new()
+	box.name = "Error"
+	box.add_theme_constant_override(&"separation", 4)
+	box.add_child(UiEmptyState.new(READ_FAILED, preload("res://assets/ui/kit_icons/wifi_off.svg")))
+	var retry := UiCommandButton.new("Retry", UiCommandButton.Kind.SECONDARY, true)
+	retry.name = "Retry"
+	retry.fit_text = true
+	retry.min_width = 68   # Compact/Command: hugs its label, at least 68
+	retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	retry.activated.connect(func(): open_pressed.emit("retry"))
+	box.add_child(retry)
+	body.add_child(box)
+
+func _no_one() -> void:
+	var gap := Control.new()
+	gap.custom_minimum_size.y = _EMPTY_TOP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(gap)
+	var none := UiKit.label(NO_ONE_BLOCKED, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	none.name = "NoOneBlocked"
+	none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body.add_child(none)
 
 ## LICENSES: one group per P0Legal group, a row per credit (`MIT License` under it; a data credit's attribution, then
 ## its licence), each row › to its text.
@@ -248,3 +371,24 @@ func _group(title: String, rows: Array) -> void:
 		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		body.add_child(gap)
 	body.add_child(UiSettingRow.group(rows))
+
+## Settings › Language (0.2.21 中文版): `English` and `中文`, each in its own words (never translated), a ✓ on the one
+## picked; a pick is kept for the next start — the line under says so (the user's pick: a restart applies it).
+## `current` the language picked (P0_SUPPORTED's), `running` the one this start shows.
+static func language(current: String, running: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.LANGUAGE, "Language", safe_top, safe_bottom)
+	var rows: Array = []
+	for pair in [["en", "English"], ["zh_CN", "简体中文"]]:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, str(pair[1]), "", "✓" if current == pair[0] else "")
+		row.name = "Language_" + str(pair[0])
+		row.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED   # a language's own name, in its own words
+		var locale := str(pair[0])
+		row.pressed.connect(func(): page.open_pressed.emit("language:" + locale))
+		rows.append(row)
+	page._group("", rows)
+	if current != running:
+		var note := UiKit.label("Restart the app to use the new language", UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		note.name = "RestartNote"
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		page.body.add_child(note)
+	return page

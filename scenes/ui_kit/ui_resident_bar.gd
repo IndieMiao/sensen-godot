@@ -15,6 +15,7 @@ extends UiDialogueCard
 
 signal gift_pressed
 signal request_pressed
+signal request_unavailable(reason: String)   # Request greyed with its reason (LOCK-10), tapped
 signal meal_pressed
 signal lesson_pressed
 
@@ -46,6 +47,7 @@ func _init(data_: Dictionary = {}) -> void:
 		_request = UiCommandButton.new(str(data.get("request_label", "Request")), UiCommandButton.Kind.SECONDARY)
 		_request.reason = str(data.get("request_reason", ""))
 		_request.activated.connect(func(): request_pressed.emit())
+		_request.unavailable_pressed.connect(func(r: String): request_unavailable.emit(r))
 		buttons.append(_request)
 	for b in buttons:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL

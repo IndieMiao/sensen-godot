@@ -130,6 +130,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	if context == &"counter_buy" and _new_offer(item_id, opts) and out.facts.has(NEW_FOR_YOU): out.gate_tone = &"new"
 	if rule.get("quota", false): out.quota = _quota(view, item_id, kind, opts)
 	if rule.has("fact_note"): out.fact_note = fill(str(rule.fact_note), t)   # muted, under the fact beside the buttons
+	if rule.has("card_note"): out.card_note = fill(str(rule.card_note), t)   # muted, its own line in a buy row's › card
 	return out
 
 ## Fills {tokens}. Segments are " · "-separated: a segment whose token is empty drops out, and a line with no
@@ -380,6 +381,11 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		rod_effect = _rod_effect(view, rod),
 		# A buy row has room for the reach only (NPC-2-2 `Lands up to Rare fish`); the card says the bite window too.
 		rod_reach = ("Lands up to %s fish" % P0Logic.rarity_name(view, int(rod.reach))) if rod.has("reach") else "",
+		# q(278): `Legendary needs Fishing Lv7–9`, its own muted line under the effect — in Gear for a rod the player has
+		# (不知火舞 386 1c3d0416: not under a greyed gate row); on the shelf and its › card once the rod can be bought (the
+		# Buy key says `Fishing Lv6 needed` till then) and while it is not in Gear (`In Gear` takes the row's line)
+		rod_tier = rod_tier(view, rod) if rod.get("owned", false) else "",
+		rod_tier_shelf = rod_tier(view, rod) if bool(offer.get("unlocked", true)) and not rod.get("owned", false) else "",
 		rod_gate = "" if rod.get("owned", false) or rod.is_empty() else "Fishing Lv%d · Tackle Shop" % int(rod.get("level", 1)),
 		owned_line = "In Gear" if rod.get("owned", false) else "",
 		# Row Hoe (market, LOCK-15 / 李白 q(46)): what it does, from view.gear.hoes.
@@ -444,13 +450,30 @@ static func _rod(view: Dictionary, item_id: String) -> Dictionary:
 	return {}
 
 ## "Lands up to Fine fish · Bite window 2.2 s": the window is absolute, the content's hook window plus the rod's bonus
-## (安其拉 225 walkthrough 76834e35), so the Starter Rod has a line too.
+## (安其拉 225 walkthrough 76834e35), so the Starter Rod has a line too. One sentence a translation reads whole (#649
+## 第二批 ⑥, zh-11): built of parts, the place line's `%s to %s · %s` took it (「距 上品鱼 Lands up · 咬钩窗口 2.2 秒」).
 static func _rod_effect(view: Dictionary, rod: Dictionary) -> String:
 	if rod.is_empty() or not rod.has("reach"): return ""
-	var line := "Lands up to %s fish" % P0Logic.rarity_name(view, int(rod.get("reach", 1)))
+	var reach := P0Logic.rarity_name(view, int(rod.get("reach", 1)))
 	var window := int(P0Logic.content().get("fishing", {}).get("hook_window_ms", 0))
-	if window > 0: line += SEP + "Bite window %.1f s" % (float(window + int(rod.get("hook_bonus_ms", 0))) / 1000.0)
-	return line
+	if window <= 0: return "Lands up to %s fish" % reach
+	return "Lands up to %s fish · Bite window %.1f s" % [reach, float(window + int(rod.get("hook_bonus_ms", 0))) / 1000.0]
+
+## q(278) (SGODOT-386; 不知火舞's spec, 李白's words): the top tier a rod lands and the Fishing levels its fish need, from
+## the content's fish, lowest to highest (`LvX` when one) — Carbon Rod `Legendary needs Fishing Lv7–9`, Reed Rod `Rare
+## needs Fishing Lv4–6`, Starter Rod `Fine needs Fishing Lv2–3` — while some are above the rod's own level (it lands
+## the tier, its fish still break free below theirs) and the player is short of the highest; "" otherwise.
+static func rod_tier(view: Dictionary, rod: Dictionary) -> String:
+	if not rod.has("reach"): return ""
+	var reach := int(rod.reach)
+	var levels: Array = []
+	for f in P0Logic.content().get("fish", []):
+		if int(f.get("rarity", 0)) == reach: levels.append(int(f.get("level", 1)))
+	if levels.is_empty(): return ""
+	var lo: int = levels.min()
+	var hi: int = levels.max()
+	if hi <= int(rod.get("level", 1)) or int(view.get("skills", {}).get("fishing", {}).get("level", 1)) >= hi: return ""
+	return "%s needs Fishing %s" % [P0Logic.rarity_name(view, reach), ("Lv%d" % lo) if lo == hi else ("Lv%d–%d" % [lo, hi])]
 
 ## Line 2 of a buy row for goods that aren't seeds / bait / fertilizer: where they go (view.shops[role].buy `to`).
 static func _offer_use(view: Dictionary, offer: Dictionary) -> String:

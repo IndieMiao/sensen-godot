@@ -247,7 +247,16 @@ func test_a_pin_of_a_city_without_a_pass_opens_its_city_card() -> void:
 	var visited: Dictionary = rt.session.view.duplicate(true)   # the session's view is read-only (SGODOT-260 Q3): a changed copy in its place
 	visited.travel.visits = {TOKYO: {n = 1}}
 	rt.session.view = visited
-	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # visited, a pass: go in
+	# q(256) ④ (SGODOT-382): visited, a pass, but the player is at home — the way back is a trip at the revisit fare,
+	# its travel card first (it walked in and was refused inside)
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
+	rt.ui.close_modal()
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"}, false)).is_false()   # its tap: its card as ever (q(257) ⑦)
+	var there: Dictionary = rt.session.view.duplicate(true)
+	there.travel.here = TOKYO
+	rt.session.view = there
+	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # in Tokyo with its pass: go in
+	assert_bool(m._travel_first({"kind": "place", "id": TOKYO + "~market0"})).is_false()
 	rt.session.view = saved
 
 ## 不知火舞 on 279 (6c0377f7): the veil is the design's COLOR_SECONDARY at 40 % (the light blue-grey washed out on the

@@ -41,8 +41,9 @@ static func of_keeper(view: Dictionary, place: String) -> Array:
 ## The greeting card's key under Trade (091a3ae9 ①): {} when this keeper has none for the player (home, all handed in or
 ## dropped) — no key, no placeholder; else {id, text, reason, kind: "deliver" | "request" | "gap"}: `Deliver` hands in at
 ## once, `Request` opens the card, the gap opens it too — a grey Deliver whose reason the button shows, as a resident's
-## (`Need 2 more Pond Crucian`, LOCK-10; `Need 12 more` where that does not fit).
-const KEY_CHARS := 28
+## (`Need 2 more Pond Crucian`, LOCK-10; `Need 12 more` where that does not fit). Fits: KEY_W in the grey key's font,
+## measured on the line as it shows (translated under 中文, #649 第二批 ⑨); 228 px is what 28 characters of English took.
+const KEY_W := 228.0
 static func key(view: Dictionary, place: String) -> Dictionary:
 	var mine := of_keeper(view, place)
 	if mine.is_empty(): return {}
@@ -50,8 +51,8 @@ static func key(view: Dictionary, place: String) -> Dictionary:
 	match stage(r):
 		0: return {"id": str(r.id), "text": "Deliver", "reason": "", "kind": "deliver"}
 		1: return {"id": str(r.id), "text": "Request", "reason": "", "kind": "request"}
-	var gap := gap_text(view, r)
-	if gap.length() > KEY_CHARS: gap = "Need %d more" % maxi(0, int(r.get("qty", 0)) - int(r.get("have", 0)))
+	var gap := P0Logic.shown(gap_text(view, r))
+	if P0Logic.text_width(gap, UiTokens.BUTTON_CMD_BLOCKED) > KEY_W: gap = "Need %d more" % maxi(0, int(r.get("qty", 0)) - int(r.get("have", 0)))
 	return {"id": str(r.id), "text": "Deliver", "reason": gap, "kind": "gap"}
 
 ## What a tracked one still needs, as a resident's button says it (P0Logic._request_gap).

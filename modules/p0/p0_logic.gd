@@ -106,6 +106,16 @@ static func break_free_need(view: Dictionary, ev: Dictionary) -> String:
 	var rod := rod_for(view, int(ev.get("rarity", 2)))
 	return "" if rod.is_empty() else "%s · Fishing Lv%d · %d coins" % [str(rod.name), int(rod.level), int(rod.price)]
 
+## The float of a gate fish breaking free again, after its card (§6.1.1), the refund as it came back with no + (q(50)):
+## a level gate in the card's word and whose level it is — `Too strong · Fishing Lv8 · 3 Energy back`, `Too strong ·
+## Fishing Lv4 · Energy refunded (8 left today)` (q(278); it read `Got away · Lv8`; 不知火舞 386 1c3d0416: no +) —
+## a rod gate as before, `Got away · Reed Rod · 3 Energy back`.
+static func break_free_float(view: Dictionary, ev: Dictionary) -> String:
+	var refund := refund_line(view, ev).trim_prefix("+")
+	if ev.has("need_level"): return "Too strong · Fishing Lv%d · %s" % [int(ev.need_level), refund]
+	var rod := rod_for(view, int(ev.get("rarity", 2)))
+	return "Got away · %s · %s" % [str(rod.name) if not rod.is_empty() else "rod too light", refund]
+
 ## The Energy a failed catch gave back, as it really came back (q(55)): inside the daily protection
 ## `Energy refunded (8 left today)`, else `+3 Energy back`.
 static func refund_line(view: Dictionary, ev: Dictionary) -> String:
@@ -414,6 +424,16 @@ const DISH_STANDIN := {
 	"dish_sweet_potato_cakes": "dish_carrot_cake", "dish_pumpkin_chowder": "dish_fisher_stew", "dish_beet_fish_soup": "dish_fish_soup"}
 
 const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "bag_upgrade_4": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
+
+## A line as the player will read it: P0's table's Chinese under 中文 (Localization.use_p0), else the English as it is
+## (#649 第二批 ⑨: what a width is measured on, never the English a label is given).
+static func shown(text: String) -> String: return String(TranslationServer.translate(text))
+
+## `text`'s width in a UiKit style's font and size (the theme the panels draw with): the cuts that keep a line to a
+## width measure with it.
+static func text_width(text: String, style: StringName = UiTokens.STYLE_C11_B) -> float:
+	var th := UiKit.theme()
+	return th.get_font(&"font", style).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, th.get_font_size(&"font_size", style)).x
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
@@ -1020,6 +1040,14 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 				if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 			plots.append(p)
 		v["plots"] = plots
+	# a city gathering spot's cooldown (v4q(4): view.gather.city_ready, ms left): counted down, gone once ready
+	var g = v.get("gather", null)
+	if g is Dictionary and g.get("city_ready") is Dictionary and not (g.city_ready as Dictionary).is_empty():
+		var left := {}
+		for id in g.city_ready:
+			var ms := float(g.city_ready[id]) - elapsed_ms
+			if ms > 0.0: left[id] = ms
+		own.call(v, "gather")["city_ready"] = left
 	var guide = v.get("guide", null)
 	var row = guide.get("row", null) if guide is Dictionary else null
 	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:
@@ -1562,6 +1590,7 @@ static func today_dots(rows: Array) -> Array:
 ## this changes (不知火舞 on 232), not when "Radishes ready in 3h 48m" ticks to 3h 47m.
 static func today_chip_key(rows: Array) -> String:
 	for r in rows:
+		if bool(r.get("empty", false)): return ""   # nothing taken (TODAY_EMPTY): nothing to point at, no pulse
 		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
 	return ""
 
@@ -1576,41 +1605,57 @@ static func sys_requests_full(view: Dictionary) -> bool:
 static func today_lines(view: Dictionary) -> Array:
 	return today_rows(view).map(func(r): return r.line)
 
-## Today rows (§14.5, LOCK-06 TodayRow): {line, icon, go, state, tail}. Now-lines first, then countdowns, then
-## the nearest skill level; at most 3. `go` is a camera-only Show target ("" hides Show, LOCK-08).
-## The first-session guide's rows lead (P0Guide.lead_rows, §14.2 / q(58)): the tutorial request and the first dish replace
-## their generic rows; only the first row still to do has the focus.
-## The generic Sow row leaves a crop to a request's Sow row only when Today really shows that row (q(258) ①, 不知火舞
-## on 341 a658c638): one pushed off the three says nothing, so the generic row comes back for its crop.
-static func today_rows(view: Dictionary) -> Array:
-	var rows := _today_rows(view, null)
-	var asked := request_sow_crops(view)
-	if asked.is_empty(): return rows
-	var shown: Array = rows.filter(func(r): return r.has("sow_crop")).map(func(r): return str(r.sow_crop))
-	return rows if shown.size() == asked.size() else _today_rows(view, shown)
+## Today (A 包反馈 1–3, the user 11-04; 不知火舞's spec, q(284)): tasks only — the guide's rows while it runs, then the
+## requests the player has taken: hand-ins here, `Limit reached`, hand-ins in another city, then the ones still short,
+## the newest taken first. No crops, stove, trap, skill, Homestead or vein rows (the field, the stove, the profile's farm
+## line and the push say those). No cap: the panel shows 5 and scrolls (UiTodayPanel), requests stop at 25 (track_max).
+## {line, icon, go, state, tail} rows (LOCK-06 TodayRow); `go` is a camera-only Show target ("" hides Show, LOCK-08).
+## One row with nothing to do (TODAY_EMPTY, no button) when there is no task.
+## `<key> · Requests 25/25` while the requests tracked are at track_max, else "" (spec ③, T4): the greyed key's reason on
+## every way to take one, its own name kept ahead of it as `Fly · Need 30 Energy` (不知火舞 on #738) — a board's Track, a
+## resident's Request and Accept, a keeper's Accept. Pip's own requests are not counted.
+static func track_full_reason(view: Dictionary, key := "") -> String:
+	var cap := int(content().get("requests", {}).get("track_max", 0))
+	var n := PinReason.taken(view).size()   # the boards', the keepers' and the residents' taken, as the server's tracked()
+	if cap <= 0 or n < cap: return ""
+	var why := "Requests %d/%d" % [n, cap]
+	return why if key == "" else "%s · %s" % [key, why]
 
-## `leave`: the crops the generic Sow row leaves to a request's row (null: every crop a request says to sow).
-static func _today_rows(view: Dictionary, leave: Variant) -> Array:
-	var now_rows: Array = []
-	var timed: Array = []    # [ms, row]
-	var lead := P0Guide.lead_rows(view, leave)
-	var guided_stove := lead.any(func(r): return str(r.go) == "stove" and str(r.state) != "done")
-	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
-		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
-	if not farmed and not P0Guide.guide_on(view):   # the guide's own row says what to do first (SGODOT-341)
-		var first_sow := _first_sow_row(view)
-		first_sow.dot = "sow:first"   # the fallback row at the end (nothing else to say) lights nothing
-		now_rows.append(first_sow)
-	now_rows.append_array(lead)
-	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's and the residents'; untaken ones stay
-	# on their boards. One ready to hand in can be done now and leads; one still short follows what else can be done now,
-	# before the countdowns. The first session shows its tutorial request alone (the guide's row).
+## A track-full reason, with its key's name or without (track_full_reason).
+static func is_track_full(reason: String) -> bool:
+	var last := reason.get_slice(" · ", reason.get_slice_count(" · ") - 1)
+	return last.begins_with("Requests ") and last.contains("/")
+
+## The toast for a greyed key's tap: the track-full one says what to do (spec ③), any other its reason.
+static func blocked_toast(reason: String) -> String:
+	return TRACK_FULL_TOAST if is_track_full(reason) else reason
+
+static func today_rows(view: Dictionary) -> Array:
+	return _today_rows(view)
+
+const TODAY_EMPTY := "No requests · Look for ! on the map"
+## Red-dot keys of Pip's requests (spec ③ v3): seen once for good, not forgotten when the row leaves (P0Ui._today_unseen) —
+## the Homestead one lights when it first comes (the guide over), not again at each level; a vein's once a vein.
+const PIP_DOT := "pip:"
+## A 包反馈 3 (spec ③): requests tracked at once stop at content requests.track_max (25); the key to take another greys with
+## `Requests 25/25` as its reason (LOCK-10, the key's own name kept: Track / Request / Accept), a tap says this.
+const TRACK_FULL_TOAST := "Finish or drop a request first"
+const PIP_HOME_DOT := "pip:home"   # spec ①: untaken requests are found by the map's `!` (q(104))
+
+static func _today_rows(view: Dictionary) -> Array:
+	# the guide's rows while it runs; on an account it never ran, only its tutorial request (Pond Catch) — not Cook it, a
+	# new recipe, the 3rd slot or the generic Sow row (spec ①: requests only)
+	var lead := P0Guide.lead_rows(view)
+	if not P0Guide.guide_on(view): lead = lead.filter(func(r): return bool(r.get("tutorial", false)))
+	var rows: Array = lead.duplicate()
+	var later: Array = []   # after Upgrade: hand-ins away, `Limit reached`
 	var progress: Array = []
-	var latest = null   # q(143): the short request tracked last keeps a row (Tracking · it shows in Today)
-	var latest_at := -1.0
+	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's, the keepers' and the residents'; untaken
+	# ones stay on their boards. The first session shows its tutorial request alone (the guide's row).
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		var away: Array = []   # q(270) / 奕星's review ⑦: another city's hand-in can't be done here; it follows what can
+		var capped_rows: Array = []   # spec ①: `Limit reached` follows every hand-in that can be done, before the short ones
 		var sys: Dictionary = view.get("quotas", {}).get("sys_requests", {})
 		var full := sys_requests_full(view)
 		for r in PinReason.taken(view):
@@ -1619,9 +1664,15 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 			if bool(r.ready) and full and r.has("away") and not r.get("local", false):   # a keeper's local one is not of the 6 (q(272))
 				var capped := "%s · Limit reached · %s" % [str(r.title), span(float(sys.get("resets_in", 0)))]
 				if str(r.get("city", "")) != "": capped += " · " + str(r.city)
-				deliveries.append(_row(capped, "board", ""))
+				capped_rows.append(_row(capped, "board", ""))
 			elif bool(r.ready):
 				var hand := _row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id))
+				# `Dusk Haul · Deliver at Shibuya Market Square · Tokyo`, `Pond Catch · Deliver to Wen · Shanghai`: broken before
+				# the city as the progress rows are, nothing dropped — the place is where to go (q(276) ⑥ ⑦)
+				var at := str(r.get("city", ""))
+				if at != "" and str(hand.line).ends_with(" · " + at):
+					hand.line = str(hand.line).trim_suffix(" · " + at)
+					_city_row(hand, at)
 				if r.get("local", false): hand.local_request = str(r.id)   # q(272): the row opens its card (Drop request ›)
 				elif str(r.get("city", "")) != "": hand.board_request = str(r.id)   # q(270): the row opens its sheet (Drop)
 				(away if bool(r.get("away", false)) else deliveries).append(hand)
@@ -1629,135 +1680,102 @@ static func _today_rows(view: Dictionary, leave: Variant) -> Array:
 				var row := _request_row(view, r)
 				if r.get("local", false): row.local_request = str(r.id)
 				elif str(r.get("city", "")) != "": row.board_request = str(r.id)
+				row["_at"] = float(r.get("accepted_at", 0))
+				row["_i"] = progress.size()   # board order breaks a tie (0: an older server or save knows no time)
 				progress.append(row)
-				# the latest accepted_at; none known (0, an older server or save): the first in board order
-				if float(r.accepted_at) > latest_at:
-					latest_at = float(r.accepted_at)
-					latest = row
-		now_rows = deliveries + now_rows + away
-	# q(255) (order: 不知火舞 on 341 bbdef20e): after the guide and below Homestead Lv3, the first gap for the next level,
-	# one row. Upgrade follows the hand-ins; a material its Show can gather now follows the other things to do now,
-	# before the short requests; coins, or a material cooling down, goes with `still to go for the next level`.
+		rows = deliveries + rows
+		later = away + capped_rows
+	# Pip's requests (spec ③ v3, eval-B; taken by themselves, never on a board): the Homestead one — `Upgrade to
+	# Homestead Lv{n}` after the hand-ins here (the first session's own Pond Catch is one of them), its gap row ahead of the
+	# short ones — and the vein one after it
 	var home_row := homestead_row(view)
-	if not home_row.is_empty() and str(home_row.row.go) == "sign":
-		# after every row handing something in — a taken request's and the first session's own (Pond Catch, P0Guide
-		# lead rows on an account the new guide never ran; 刘邦 on #542)
-		var handed := 0
-		for i in now_rows.size():
-			if str(now_rows[i].get("dot", "")).begins_with("deliver:"): handed = i + 1
-		now_rows.insert(handed, home_row.row)
-	var ready := {}
-	var sown := 0
-	# One countdown per crop, its soonest plot's (q(227) ①, as the Quick Radish's since q(217) ④): batches sown minutes
-	# apart no longer take two of the three rows. The plot's crop is the kind, so a Quick Radish and a Radish are two
-	# (④). One plot left says it in the singular, `Radish ready in 3h 55m` (②); a crop with ripe plots shows only its
-	# Harvest row until they are picked (③).
-	var growing := {}   # crop → plots growing
-	var soonest := {}   # crop → its soonest plot's ms
-	for p in view.get("plots", []):
-		var st := str(p.get("state", ""))
-		var c := str(p.get("crop", ""))
-		if not fast_crop(view, c).is_empty() and st != "growing": continue   # q(245): countdowns only, no target rows
-		if st == "ready": ready[c] = int(ready.get(c, 0)) + 1
-		elif st == "sown": sown += 1
-		elif st == "growing":
-			growing[c] = int(growing.get(c, 0)) + 1
-			if not soonest.has(c) or float(p.get("ready_in", 0)) < float(soonest[c]): soonest[c] = float(p.get("ready_in", 0))
-	for c in soonest:
-		if ready.has(c): continue
-		var ms := float(soonest[c])
-		var name := item_name(view, c) if int(growing[c]) == 1 else plural(item_name(view, c))
-		timed.append([ms, _row("%s ready in %s" % [name, ripe_in(view, c, ms)], harvest_of(view, c), "plots")])
-	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
-	# follows it as an info row (`Farming Lv2 with this harvest`, no button — §14.5's exception: it goes with its source).
-	var level := P0Guide.harvest_level(view)
-	if ready.size() == 1:
-		var c: String = ready.keys()[0]
-		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], harvest_of(view, c), "plots", "harvest:" + c))
-	elif ready.size() > 1:
-		var n := 0
-		for c in ready: n += int(ready[c])
-		var crops: Array = ready.keys()
-		crops.sort()
-		now_rows.append(_row("Harvest %d crops" % n, harvest_of(view, str(ready.keys()[0])), "plots", "harvest:" + "+".join(crops)))
-	if not ready.is_empty() and bool(level.get("now", false)):
-		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
-	if sown > 0: now_rows.append(_row("Water %d sown plot%s" % [sown, "" if sown == 1 else "s"], "water", "plots"))
-	# Decorate (SGODOT-284, q(111)): pieces waiting in Farm Storage, a free thing to do; never the red dot (q(107)).
-	var decor := P0Decor.today_row(view)
-	if not decor.is_empty(): now_rows.append(_row(str(decor.line), str(decor.icon), ""))
-	# A known recipe waiting on one crop in the ground (A3 / q(95)) keeps the fish it needs: the stove-free line counts
-	# only the rest, and none when the soup takes them all.
-	var wait := P0KitchenLogic.waiting_on_crops(view)
-	var stove = view.get("cooking", {}).get("stove", null)
-	if stove is Dictionary:
-		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
-		var dish_icon := str(stove.dish) if stove.get("dish", null) != null else "pot"
-		if float(stove.get("ready_in", 0)) <= 0.0: now_rows.append(_row("%s ready at the stove" % dish, dish_icon, "stove", "stove:" + dish_icon))
-		else: timed.append([float(stove.ready_in), _row("%s · %s left at the stove" % [dish, duration(float(stove.ready_in))], dish_icon, "stove")])
-	else:
-		var fish := 0
-		for st in view.get("bag", {}).get("slots", []):
-			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-		fish -= int(wait.get("fish", 0))
-		if fish > 0 and not guided_stove: now_rows.append(_row("Cook with %d fish" % fish, "pot", "stove"))
-	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
-	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
-	if not home_row.is_empty() and bool(home_row.now) and str(home_row.row.go) != "sign": now_rows.append(home_row.row)
-	now_rows.append_array(progress)
-	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
-	var rows: Array = now_rows.duplicate()
-	for t in timed:
-		if rows.size() < 3 and not rows.any(func(r): return r.line == t[1].line): rows.append(t[1])
-	# Not harvested yet, the growing crops bring the level: the info row follows the soonest crop's row (q(69), the old
-	# tail on that row read as that crop's own level, §14.2 end).
-	if not level.is_empty() and not bool(level.now) and not P0Guide.first_phase(view):
-		var at := -1
-		for i in rows.size():
-			if str(rows[i].go) == "plots" and at < 0: at = i
-		if at >= 0: rows.insert(at + 1, _row("Farming Lv%d at your first harvest" % int(level.level), "hoe", ""))
-	# The waiting recipe's line (§14.2 end, §14.5; 李白 A3 / q(95)): `Fresh Fish Soup · when radishes are ready`, the first
-	# session's closing hook. Like the level's info row it goes with its source (q(69)): right after its crop's countdown
-	# and that crop's level row, so it is the third line at the end of the first session.
-	if not wait.is_empty():
-		var crop_name := item_name(view, str(wait.crop))
-		var line := "%s · when %s %s ready" % [str(wait.name), plural(crop_name).to_lower(), "is" if uncountable(crop_name) else "are"]
-		if not rows.any(func(r): return r.line == line):
-			var at := -1
-			for i in rows.size():
-				if str(rows[i].icon) == str(wait.crop) and str(rows[i].go) == "plots": at = i
-			if at >= 0 and at + 1 < rows.size() and str(rows[at + 1].icon) == "hoe" and str(rows[at + 1].go) == "": at += 1
-			var row := _row(line, str(wait.page), "plots")
-			if at >= 0: rows.insert(at + 1, row)
-			elif rows.size() < 3: rows.append(row)
-	var best := ""
-	var best_gap := 1 << 30
-	for key in ["farming", "fishing", "cooking"]:
-		if not home_row.is_empty() and str(home_row.get("skill", "")) == key: continue
-		var sk: Dictionary = view.get("skills", {}).get(key, {})
-		if sk.get("next", null) == null: continue
-		if key == "farming" and not level.is_empty(): continue   # already said by the harvest's info row
-		var gap := int(sk.next) - int(sk.get("xp", 0))
-		if gap < best_gap:
-			best_gap = gap
-			best = "%s Lv%d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
-	# q(255) ⑥: a coins gap, or a material whose sources are all cooling down, is `still to go for the next level`
-	if not home_row.is_empty() and not bool(home_row.now) and rows.size() < 3: rows.append(home_row.row)
-	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
-	if rows.is_empty(): rows.append(_first_sow_row(view))
-	# q(143) ①②: on the final three, the latest tracked short request takes the 3rd row when it is not there — over an
-	# info or waiting-recipe row too — unless that row hands something in (three deliveries: one handed in frees a row)
-	# or is Upgrade to Homestead (不知火舞 on 341, A′: a moment, as a hand-in is pay; a material row still gives way).
-	var keeps := func(r: Dictionary) -> bool:
-		var dot := str(r.get("dot", ""))
-		return dot.begins_with("deliver:") or dot.begins_with("homestead:")
-	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
-			and not keeps.call(rows[2]):
-		rows[2] = latest
+	var pip: Array = []
+	if not home_row.is_empty():
+		var hr: Dictionary = home_row.row
+		hr.home_request = true   # a tap off its Show opens HOME-1, this request's card
+		if str(hr.dot).begins_with("homestead:"): rows.append(hr)
+		else:
+			hr.dot = PIP_HOME_DOT   # lights once, the first time it is there (the guide just over), never each level
+			pip.append(hr)
+	# the vein one ahead of the Homestead gap row (v4q(9) b, the user 11-02; q(284) review ④); Pip's First Dig goes here
+	# too once it is a Today row (#636)
+	var vein := vein_row(view)
+	if not vein.is_empty(): pip.push_front(vein)
+	rows.append_array(later + pip)
+	# the newest taken first (spec ①, over q(143)'s latest-on-the-third-row)
+	progress.sort_custom(func(a, b): return float(a._at) > float(b._at) or float(a._at) == float(b._at) and int(a._i) < int(b._i))
+	for row in progress:
+		row.erase("_at")
+		row.erase("_i")
+	rows.append_array(progress)
 	# q(215): even a ready ordinary delivery cannot displace the current guide goal. Other rows keep their order.
 	if P0Guide.guide_on(view) and not lead.is_empty():
 		rows = lead + rows.filter(func(r): return str(r.get("dot", "")) != str(lead[0].dot) and str(r.line) != str(lead[0].line))
-	return P0Guide.focus_first(rows.slice(0, 3))
+	if rows.is_empty():
+		var none := _row(TODAY_EMPTY, "board", "")
+		none.empty = true   # grey, no button (UiTodayPanel)
+		return [none]
+	return P0Guide.focus_first(rows)
+
+## v4q(9) ① (SGODOT-355; 不知火舞 / the user a+b, 11-02): `Ironvale Vein · Reach Floor 10`, Show to the nearest free iron
+## vein (view.wild.near3_sites, the very one Pip's line and the server's nearestFreeVein name) — when the guide is over,
+## Pip's First Dig is done (view.first_dig.done), nobody has reached its Floor 10 (view.mine.records: that vein's, and any
+## other vein of the same main the client knows), one of the next three Homestead levels needs Iron Ore, and Homestead
+## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. Kept when the
+## Homestead row points at that very mine too (不知火舞 on #738, 405 e8fb3ea4: Pip's request, it goes by its own ends
+## only — v4q(9) ①'s dedupe retired with q(284)). Red dot `pip:vein:<id>`, once a mine; the vein's pin icon. Down
+## that mine the row stays, without a button (P0Ui.show_label). {} for none.
+const VEIN_MAINS := ["iron_ore", "quartz"]
+const VEIN_UNTIL_LEVEL := 7
+const VEIN_FLOOR := 10
+static func vein_row(view: Dictionary) -> Dictionary:
+	if P0Guide.guide_on(view): return {}
+	var dig = view.get("first_dig", null)
+	if not dig is Dictionary or not bool(dig.get("done", false)): return {}
+	var lv := int(view.get("homestead", {}).get("level", 1))
+	if lv >= VEIN_UNTIL_LEVEL: return {}
+	var levels: Array = content().get("homestead", {}).get("levels", [])
+	var sites = view.get("wild", {}).get("near3_sites", []) if view.get("wild", null) is Dictionary else []
+	var records: Dictionary = view.get("mine", {}).get("records", {}) if view.get("mine", null) is Dictionary and view.mine.get("records") is Dictionary else {}
+	for main in VEIN_MAINS:
+		if not levels.any(func(l): return int(l.get("level", 0)) in range(lv + 1, lv + 4) \
+				and (l.get("materials", []) as Array).any(func(m): return str(m[0]) == main)): continue
+		var site := {}
+		for x in sites if sites is Array else []:
+			if x is Dictionary and str(x.get("type", "")) == "vein" and str(x.get("main", "")) == main:
+				site = x
+				break
+		if site.is_empty() or _vein_reached(records, sites, main): continue
+		var go := "mine:" + str(site.id)
+		# down that mine (VG4 384:187745): the row stays, with no button (周瑜 on #711: not left to show_label)
+		var down := str(view.get("mine", {}).get("at", {}).get("mine", "")) == str(site.id) if view.get("mine", null) is Dictionary and view.mine.get("at") is Dictionary else false
+		# Pip's vein request (spec ③ v3, eval-B): `Ironvale Vein · Floor 4/10`, as `Pip's First Dig · Floor 1/3`
+		var deepest := mini(VEIN_FLOOR, int(records.get(str(site.id), {}).get("deepest", 0)) if records.get(str(site.id)) is Dictionary else 0)
+		var row := _row("%s · Floor %d/%d" % [str(site.get("name", "")), deepest, VEIN_FLOOR], "vein", "" if down else go, PIP_DOT + "vein:" + str(site.id))
+		row.vein_request = str(site.id)
+		return row
+	return {}
+
+## Whether a vein of this main has been gone down to Floor 10 (不知火舞: any iron vein's F10 ends the iron row, a new
+## home's too): a record's own type / main (周瑜 #712: the server's, every mine the player has been down), else — a
+## server before it — one of the free three's or a site the map has read (P0WildSites).
+static func _vein_reached(records: Dictionary, near3: Variant, main: String) -> bool:
+	for id in records:
+		var rec: Dictionary = records[id]
+		if int(rec.get("deepest", 0)) < VEIN_FLOOR: continue
+		if rec.has("type"):
+			if str(rec.get("type", "")) == "vein" and str(rec.get("main", "")) == main: return true
+			continue
+		var x := {}
+		for n in near3 if near3 is Array else []:
+			if n is Dictionary and str(n.get("id", "")) == str(id): x = n
+		if x.is_empty():
+			var wild = load("res://modules/p0/p0_wild_sites.gd")
+			if wild.has_site(str(id)):
+				var s: Dictionary = wild.site(str(id))
+				x = {"type": str(s.get("type", "")), "main": s.get("mine", {}).get("main", null) if s.get("mine") is Dictionary else null}
+		if str(x.get("type", "")) == "vein" and str(x.get("main", "")) == main: return true
+	return false
 
 ## The order q(255) ① takes a Homestead level's materials in: Timber, Stone, Reeds, Copper Ore, Clay, Rock Salt.
 const HOME_MATERIAL_ORDER := ["wood", "stone", "fiber", "copper_ore", "clay", "rock_salt"]
@@ -1801,15 +1819,79 @@ static func homestead_row(view: Dictionary) -> Dictionary:
 		return {"row": _row("Homestead Lv%d · %d coins to go" % [lv, short_coins], "level_up", "stall"), "now": false}
 	return {"row": _row("Upgrade to Homestead Lv%d" % lv, "level_up", "sign", "homestead:%d" % lv), "now": true}
 
-## Where a Homestead material's Show goes (q(255) ②) — {go, now}, now = it can be gathered there at once. The farm's
-## spots were the targets until they left with v4q(4) ① (the user, 11-02); a city's point or a mine on the map is C's
-## (亚瑟: the nearest point / mouth), so none for now.
-static func _home_material_go(_view: Dictionary, _id: String) -> Dictionary:
+## Where a Homestead material's Show goes (q(255) ②, 355 C2; 李白's v4q(4) / (5) addendum eb1d7c20) — {go, now}, now = it
+## can be had there at once. A gathered material: the spot gather_spot_for picks (`gather:<id>`), now when it is ready.
+## Iron Ore / Quartz: the free vein of that main (view.wild.near3_sites, from home); Copper Ore / Coal / Rock Salt: the
+## free quarry (`mine:<id>`), now while the player is down it. Clay: a ready Clay Pit, else (every pit cooling) the
+## quarry, else the pit. A spot cooling down still points (now false: q(255) ⑥ lists it with what is still to go); the
+## city's spots not read yet (P0Runtime._read_home_places), or no such site: no target.
+const GATHERED := ["wood", "stone", "fiber", "clay", "wild_herb", "hardwood", "flax"]   # the yields of world_gen gather_points
+const VEIN_ORES := ["iron_ore", "quartz"]
+const QUARRY_ORES := ["copper_ore", "coal", "rock_salt"]
+static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
+	var spot := gather_spot_for(view, id) if id in GATHERED else {}
+	if not spot.is_empty() and (bool(spot.ready) or id != "clay"): return {"go": "gather:" + str(spot.id), "now": bool(spot.ready)}
+	var site := ""
+	if id in VEIN_ORES: site = near3_site(view, "vein", id)
+	elif id in QUARRY_ORES or id == "clay": site = near3_site(view, "quarry")
+	if site != "":
+		var at = view.get("mine", {}).get("at", null)   # null while the player is not down a mine (the server's view)
+		return {"go": "mine:" + site, "now": at is Dictionary and str(at.get("mine", "")) == site}
+	if not spot.is_empty(): return {"go": "gather:" + str(spot.id), "now": false}
 	return {"go": "", "now": false}
+
+## The gathering spot for `item` (eb1d7c20): in the city the player is in when it has one (another town's spots first),
+## else in the home city — of the spots whose first yield is it, the nearest that can be gathered now (not in
+## view.gather.city_ready) {id, ready: true}; every one cooling: the nearest {id, ready: false}. Nearest to the city's
+## base point (P0Clusters; the farm when the city is not in the table), the table's order breaking a tie. {} when no
+## spot of it is read.
+static func gather_spot_for(view: Dictionary, item: String) -> Dictionary:
+	var places = load("res://modules/p0/p0_city_places.gd")
+	var home := str(load("res://modules/p0/p0_travel.gd").home(view))
+	var here := str(view.get("travel", {}).get("here", ""))
+	var yields := func(p: Dictionary) -> bool:
+		var y: Array = p.get("yield", [])
+		return not y.is_empty() and str(y[0][0]) == item
+	var city := home
+	var spots: Array = (places.gather(here) as Array).filter(yields) if here != "" and here != home else []
+	if spots.is_empty(): spots = (places.gather(home) as Array).filter(yields)
+	else: city = here
+	if spots.is_empty(): return {}
+	var cl := P0Clusters.get_cluster(city)
+	var farm: Dictionary = view.get("home", {}).get("farm", {}) if view.get("home", {}).get("farm") is Dictionary else {}
+	var base := Vector2(float(cl.lat), float(cl.lng)) if not cl.is_empty() else (Vector2(float(farm.get("lat", 0.0)), float(farm.get("lng", 0.0))) if not farm.is_empty() else Vector2.INF)
+	var far := func(p: Dictionary) -> float:
+		if base == Vector2.INF: return 0.0
+		return pow(float(p.lat) - base.x, 2.0) + pow((float(p.lng) - base.y) * cos(deg_to_rad(base.x)), 2.0)
+	var cooling: Dictionary = view.get("gather", {}).get("city_ready", {}) if view.get("gather", {}).get("city_ready") is Dictionary else {}
+	var best := {}
+	var any := {}
+	for p in spots:
+		if any.is_empty() or float(far.call(p)) < float(far.call(any)): any = p
+		if int(cooling.get(str(p.id), 0)) > 0: continue
+		if best.is_empty() or float(far.call(p)) < float(far.call(best)): best = p
+	return {"id": str(best.id), "ready": true} if not best.is_empty() else {"id": str(any.id), "ready": false}
+
+## One of the free three wild sites (view.wild.near3_sites, nearest first) of `type` — a vein of `main`, or the quarry —
+## its id, "" when none.
+static func near3_site(view: Dictionary, type: String, main := "") -> String:
+	var sites = view.get("wild", {}).get("near3_sites", [])
+	for x in sites if sites is Array else []:
+		if x is Dictionary and str(x.get("type", "")) == type and (main == "" or str(x.get("main", "")) == main): return str(x.get("id", ""))
+	return ""
 
 ## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.
 static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:
 	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false, "dot": dot}
+
+## A row that ends with ` · <city>` (q(276)): `city` tells Today where to break when the line runs long, `line_short` (when
+## given) the first line without the need's name, for when even that runs long — `Pond Catch · Pond Crucian 1/2` /
+## `Rio de Janeiro`, `Big Market Order · 1/2` / `Mexico City`.
+static func _city_row(row: Dictionary, city: String, short := "") -> Dictionary:
+	row.line = str(row.line) + " · " + city
+	row.city = city
+	if short != "": row.line_short = short + " · " + city
+	return row
 
 ## A taken request still short (李白 4ac4a4e7): `An Old Man's Catch · Rare fish 0/1`, what it takes as its card says it.
 ## A fish one shows on the map the pond its ! hangs on; one the player cannot land yet (q(104)) has no Show, a small line
@@ -1830,13 +1912,11 @@ static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
 		var sowing := _row("%s · %s" % [str(r.title), sow], icon_id, "plots")   # Show (on map): the farm
 		sowing.sow_crop = str(items[0])   # the generic Sow row leaves this crop to it while Today shows it (today_rows)
 		return sowing
-	# another city's request ends with its city (q(270) ⑥), the need's name dropped first when the line runs long
+	# another city's request ends with its city (q(270) ⑥), a keeper's local one too (q(272) ⑧): Today measures it and
+	# breaks before the city, the need's name dropped only when the first line still runs long (q(276), `line_short`)
 	var city := str(r.get("city", ""))
-	var line := "%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)]
-	if city != "":
-		line += " · " + city
-		if line.length() > P0Board.LINE_CHARS: line = "%s · %d/%d · %s" % [str(r.title), int(r.have), int(r.qty), city]
-	var row := _row(line, icon_id, "")
+	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
+	if city != "": _city_row(row, city, "%s · %d/%d" % [str(r.title), int(r.have), int(r.qty)])
 	if kind != "fish": return row
 	var gate := fish_level_gate(view, items, r.get("rarity", null))
 	if not gate.is_empty():
@@ -1932,7 +2012,8 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 	if state == "wait" and (next_in == null or float(next_in) <= 0.0): state = "open"   # no wait left to say (no cooldown since 0.2.18)
 	match state:
 		"open":
-			cmd = {"type": "accept", "request": str(req.id)}
+			reason = track_full_reason(view, label)   # spec ③: tracking 25 already, `Request · Requests 25/25`
+			if reason == "": cmd = {"type": "accept", "request": str(req.id)}
 		"accepted":
 			label = "Deliver"
 			if req.get("ready", false): cmd = {"type": "deliver", "request": str(req.id)}
@@ -2144,8 +2225,10 @@ static func market_sell_line(view: Dictionary) -> String:
 	if bool(d.get("home", true)): return "I'll take your %s. Same price as your stall." % things
 	return "%s? I'll take them, though home pays better." % (things.left(1).to_upper() + things.substr(1))
 
-## Small counts in keeper speech ("sows three plots"), digits from ten up.
+## Small counts in keeper speech ("sows three plots"), digits from ten up; digits under 中文 (「一次能播 3 块田」, 0.2.23 —
+## the English word stayed in the Chinese line).
 static func _count_word(n: int) -> String:
+	if TranslationServer.get_locale() == "zh_CN": return str(n)
 	var words := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 	return words[n] if n >= 0 and n < words.size() else str(n)
 
@@ -2385,6 +2468,10 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 
 ## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places, the
 ## same line as the workbench (P0MaterialLogic.material_source, Li Bai q(65)).
+## v4q(1) (frames A3a–c, 355 48dedfd0; SGODOT-394): a skill's line says how it levels (and Shows its Skills), the travel
+## gates how they count.
+const HOME_SKILL_HOW := {"farming": "Sow and harvest to level up", "fishing": "Catch fish to level up",
+	"cooking": "Cook dishes to level up"}
 static func home_source(view: Dictionary, id: String) -> Dictionary:
 	if id.begins_with("skill_"):
 		var key := id.trim_prefix("skill_")
@@ -2392,11 +2479,13 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 		if not next is Dictionary: return {"text": "", "go": ""}
 		for skill in next.get("skills", []):
 			if str(skill.skill) == key:
-				return {"text": "%s Lv%d · now %d" % [key.capitalize(), int(skill.need), int(skill.have)], "go": "skills"}
+				return {"text": "%s Lv%d · %s" % [key.capitalize(), int(skill.need), HOME_SKILL_HOW.get(key, "")], "go": "skills"}
 		return {"text": "", "go": ""}
 	match id:
 		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
-		"stamps", "climates": return {"text": "Stamps · visit new cities", "go": "map"}
+		# no Show on the travel gates (A3b / A3c: only a skill's line has one), so they fit as drawn
+		"stamps": return {"text": "Stamps · First visit to a city · up to 2 a day", "go": ""}
+		"climates": return {"text": "Climates · Visit a city or wild site in another climate", "go": ""}
 	return need_source(view, id)
 
 ## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the

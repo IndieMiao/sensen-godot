@@ -14,6 +14,7 @@ extends Node
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
+const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")   # Settings › Blocked players: the account's voice (SGODOT-384)
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 const FARM_SCENE := "res://scenes/p0/p0_farm.tscn"
@@ -140,12 +141,14 @@ func _switch_test_account(action: String) -> void:
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:
-	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
-	TranslationServer.set_locale("en")
+	# English by default, 中文 when the player picked it in Settings (0.2.21, the user 11-02; it was English-only from
+	# 2026-09-04): P0's own table, never Journey's (Localization.use_p0).
+	Localization.use_p0()
 	session = P0Session.new()
 	add_child(session)
 	ui = P0Ui.new()
 	ui.test_accounts = session.test_accounts
+	ui.player_of = func() -> String: return session.player_id   # Settings' support code (q(281))
 	ui.quick_store = session.test_accounts.profile_file("p0_quickbar.json")
 	ui.tips_path = session.test_accounts.profile_file("p0_tips.json")
 	# Crop-ready notifications (SGODOT-350 / 356): Android's GodotNotify or iOS's LocalNotify, per account on this phone.
@@ -154,6 +157,11 @@ func _init() -> void:
 	ui.notify.came_back()
 	if ui.notify.available(): ui.notify.native.connect("permission", func(_granted): ui.notify_changed())
 	ui.test_account_requested.connect(_switch_test_account)
+	# Settings › Blocked players (SGODOT-384): the account's voice, status and blocks, with no room
+	var voice_account := P0VoiceRoom.new()
+	voice_account.session = session
+	add_child(voice_account)
+	ui.voice_account = voice_account
 	add_child(ui)
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
@@ -331,9 +339,8 @@ func _ask_presence() -> void:
 		add_child(_presence)
 		_presence.request_completed.connect(_on_presence)
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
-	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
-	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
-	_presence.send(session.base_url + "/p0/presence", headers)
+	# the requests' own headers: the demo key, the version and the features (save_v7, or 426 once the wipe is on: 397)
+	_presence.send(session.base_url + "/p0/presence", session._headers())
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
@@ -423,6 +430,8 @@ func _process(dt: float) -> void:
 	_dev_shot(dt)
 	_dev_mem(dt)
 	_tick_screens(dt)
+	# the room's voice for the HUD's mic key and people drawer (SGODOT-383): an outpost's or a pond's, else none
+	ui.set_voice_room(world.get("voice_room") if is_instance_valid(world) else null)
 	if ui.offline:
 		_probe_left -= dt
 		if _probe_left <= 0.0: _probe()
@@ -587,13 +596,14 @@ func release_travel() -> void:
 ## A tree pick's XP line's key (all its farming XP in one part; see tree_pick).
 const TREE_XP := "tree_xp"
 
-## A generated home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home
-## set (P0Outposts.home: names, Show on map, Today) has them; the written city's are the client's own tables.
+## Home's places (SGODOT-303/311), read once from the server like any city's (P0CityPlaces), so the home set
+## (P0Outposts.home: names, Show on map, Today) has them; the written city's ponds and outposts are the client's own
+## tables, but its gathering spots are the server's (v4q(4)) — the guide's S6a and Today point at them before the map.
 func _read_home_places(v: Dictionary) -> void:
 	var travel = load("res://modules/p0/p0_travel.gd")
 	var home := str(travel.home(v))
 	var places = load("res://modules/p0/p0_city_places.gd")
-	if home == "" or travel.home_is_written(v) or places.has_city(home) or session == null: return
+	if home == "" or places.has_city(home) or session == null: return
 	places.fetch(session, home)
 
 ## Into a mine (355 b1, contract-efg §5 ①): mine_enter from where the player is — the map's mouth card (`Enter mine`,
@@ -1084,7 +1094,7 @@ func _show_guide_resend(resend: Dictionary) -> void:
 	UiItemFly.launch(ui.root, at, bag, P0Logic.icon(id), n, 0.0, func(): UiItemFly.bump(bag))
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
-## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
+## ones a float; a gate break-free gets the four-line card once per species, then "Too strong · Fishing Lv4" (q(278));
 ## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
 ## floats rise (over the player's head for a landed fish, the cast point for an escape, when the pond knows
 ## them); `card_after` holds the Caught! card that long after the reply's floats there (不知火舞 on 231 / #154).
@@ -1109,10 +1119,8 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
 				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
-			else:   # second time on: `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back` (q(50))
-				var rod := P0Logic.rod_for(v, int(ev.get("rarity", 2)))
-				var what := ("Lv%d" % int(ev.need_level)) if ev.has("need_level") else (str(rod.name) if not rod.is_empty() else "rod too light")
-				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, UiFloatText.Tone.ENERGY_GAIN)
+			else:   # second time on: `Too strong · Fishing Lv8 · 3 Energy back` (q(278)) / `Got away · Reed Rod · …` (q(50))
+				ui.float_text(P0Logic.break_free_float(v, ev), where, UiFloatText.Tone.ENERGY_GAIN)
 		"escaped":
 			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
@@ -1130,6 +1138,16 @@ func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	_dex_energy.erase(id)
 	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
+## q(270) ⑥'s toast for a Market Board request taken or handed in in the wrong city (379 6760e0f8, no new copy): its
+## hand-in row as Today writes it (`Deliver at Shibuya Market Square · Tokyo`, P0PinReason.market_at); a view that no
+## longer has the request names the server's city as that row does without a square's name (`Deliver at the market ·
+## Tokyo`), never the code.
+static func wrong_city_line(view: Dictionary, request: String, city: String) -> String:
+	var r := PinReason.request_of(view, request)
+	if str(r.get("deliver", "")) != "": return str(r.deliver)
+	var name := str(P0Clusters.get_cluster(city).get("name", "")) if city != "" else ""
+	return "Deliver at the market · %s" % name if name != "" else "Deliver at the market"
+
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("bj_"):   # the Blackjack table says it in its own keys (SGODOT-351)
 		ui.blackjack_refused(code, detail)
@@ -1141,12 +1159,19 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
 	# q(272) ⑦: a keeper's local request handed in elsewhere says where it goes in the existing toast — its hand-in row
-	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥)
+	# (`Home Cooking · Deliver to Ola · Hayward`), as another city's Market Board request (q(270) ⑥). An Error toast, as
+	# every refused command's but Energy's (§4.8.6; 不知火舞 11-02: wrong_place and wrong_city alike)
 	if code == "wrong_place" and str(cmd.get("request", "")).begins_with("req_loc_"):
 		var r := PinReason.request_of(session.view, str(cmd.request))
 		if not r.is_empty():
-			ui.toast("%s · %s" % [str(r.title), str(r.deliver)])
+			ui.toast_error("%s · %s" % [str(r.title), str(r.deliver)])
 			return
+	if code == "track_limit":   # A 包 spec ③: tracking 25 already (a key greyed too late, another device)
+		ui.toast_error(P0Logic.TRACK_FULL_TOAST)
+		return
+	if code == "wrong_city":   # q(270) ⑥: a Market Board request taken or handed in in another city (379 6760e0f8)
+		ui.toast_error(wrong_city_line(session.view, str(cmd.get("request", "")), str(detail.get("city", ""))))
+		return
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -1180,7 +1205,17 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		# but the player is not in that city — the same card, at the return fare
 		"pass_required", "trip_expired", "travel_required":
 			var preview: Dictionary = detail.get("preview", {})
-			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
+			var to := str(preview.get("cluster", ""))
+			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(to, preview)
+			# a pond or a room the player should not be in (SGODOT-382): back to the map, where the city's travel card
+			# opens at the fare the server named, as a room that refused the join does. No back lock is asked: the
+			# pond's would only close its fishing panel and keep the player there (周瑜 on #642)
+			elif to != "" and is_instance_valid(world):
+				after_leave = "travel:" + to
+				# not a place to go back to: the map's chip names where the player is (LOCK-06; 不知火舞 on #642: it kept
+				# `Hayward · Acorn Creek` with the home icon after a pass ran out there and the server had them home)
+				return_to = "farm"
+				leave_to_map()
 			else: ui.toast_error("Travel to %s first" % str(preview.get("name", "that city")))   # fares (q(256)): not free now
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
@@ -1245,7 +1280,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			var cur := session.current()
 			var at := {"homestead": cur.get("homestead", {}),
 				"garden": {"fields": {"used": int(detail.get("used", 0)), "cap": int(detail.get("cap", 0))}}}
-			ui.toast_error(str(P0Logic.fields_full_action(at).toast), "", true)   # broken at a « · » as the grey key's
+			ui.toast_error(str(P0Logic.fields_full_action(at).toast))   # broken at its « · » as the grey key's (toast_error always does, 11-02)
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state", "guide_not_now":
@@ -1576,16 +1611,20 @@ func _begin_arrival(w: Node) -> void:
 	# AppRouter gives a load 30 s; a cover older than that belonged to a trip that never arrived.
 	if _launch_s >= 0.0 or session.view.is_empty() or w.scene_file_path != str(_arrive.path) \
 			or Time.get_ticks_msec() - int(_arrive.t0) > 35000:
-		_arrive = {}
+		# not this trip's world (a room that refused the join sent the player back to the map, SGODOT-382): the trip is
+		# over — its clock stops too, or 20 s later Couldn't get there would open over the map with nothing to undo
+		_end_arrival()
 		return
 	_arrive_s = 0.0
 
 func _end_arrival() -> void:
-	if _arrive.is_empty(): return
+	var had := not _arrive.is_empty()
 	_arrive = {}
 	_arrive_s = -1.0
+	# the covers go whatever is left of the trip: Go back on a Couldn't get there whose trip was already dropped must
+	# still close it (SGODOT-382: it stayed up over the map, Back and Go back dead)
 	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
-	_flush_arrival_toast()
+	if had: _flush_arrival_toast()
 
 ## A toast for the place being opened (Go home's `Welcome home`, 司空震 on 286): said once its loading cover is gone, not
 ## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S.
@@ -2033,6 +2072,11 @@ func _dev_shot(dt: float) -> void:
 				var gone := {"fish": step[1], "rarity": int(P0Logic.item(session.current(), step[1]).get("rarity", 3)), "refund": 5, "protected_left": 8}
 				if step.size() < 3 or step[2] == "level": gone["need_level"] = 4
 				ui.show_got_away(gone)
+			"rowinfo":   # rowinfo:rod_carbon — the open counter's row › card (q(278) shots)
+				for d in ui.find_children("*", "P0CounterDrawer", true, false): ui.counter_info(d, step[1])
+			"breakfloat":   # breakfloat:8 — a gate fish breaking free again, its float (q(278) shots)
+				ui.float_text(P0Logic.break_free_float(session.current(), {"rarity": 4, "need_level": int(step[1]), "refund": 3}),
+					anchor(), UiFloatText.Tone.ENERGY_GAIN)
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
@@ -2070,6 +2114,11 @@ func _dev_shot(dt: float) -> void:
 					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
 					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"measure": print("P0_MEASURE ", JSON.stringify(measure_actor()))   # the player's height on screen (camera unification)
+			"goto":   # goto:stand_lena — a room's player stood at that anchor, facing its way (SGODOT-216 shots)
+				if is_instance_valid(world) and world.has_method("anchor") and world.call("anchor", step[1]) != null:
+					var m: Marker3D = world.call("anchor", step[1])
+					world.actor.teleport(m.global_position)
+					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)

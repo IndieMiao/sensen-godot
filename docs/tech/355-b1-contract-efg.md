@@ -1,4 +1,4 @@
-# 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.7（周瑜 11-02）
+# 355 第一批 E / F / G：矿、新怪、武器 · 接口约定 v0.9（周瑜 11-04）
 
 > **#620 审核修订**：矿脉第二档按 #625 读 C 的 `main_from`，加载时校验表内第二档 `from` 相等（后裔9e80a761已撤回直接读表的建议）；首杀的 `home` 快照不随换家或重复击杀改写。
 
@@ -20,6 +20,21 @@
 > - 电梯站不含 F1，最上一站是 Entrance（出矿）；
 > - 第 7.1 节的 view 加了 `day`、站点今天付没付、下一层的 `locked`；
 > - 补了 q 行的文案（第 7.4 节）。
+> **v0.9（11-04）**：G 服务端剩下的四件（周瑜，奕星 11-03 派；亚瑟 11-04 拆成两段：换武器和铁剑一段，回血药售卖和喝药一段）：
+> - 第 9.1 节：`equip` 认武器，写清不动别的槽、不发事件；
+> - 第 9.3 节：铁剑配方按服务端现有的 schema 写：材料是 `cost`（不是 `in`）；Homestead 门槛用单独的 `homestead: 8`，不写成 `gate: { homestead }`，因为客户端 p0_logic.gd 把配方的 `gate` 当 `[技能, 等级]` 数组读，放字典会报错。补了拒绝的先后顺序（`homestead_level {need}` 和商店一样）、craft 扣 coins、做好**不自动装上**、配方行 view 的新字段、加载时的校验；
+> - 第 9.4 节：写全 `mine_drink` 的字段、拒绝的先后顺序、事件，以及售卖（Homestead Stall、Lv4、日库存）；
+> - 第 7.1 节：`view.mine.at.potion_ready_in`（喝药的剩余冷却，毫秒，0 表示可以喝；人不在矿里时没有 `at`，也就没有这一项）。#636 的 `set_potion_cooldown(remaining_ms)` 照它读，拒绝码 `potion_cooldown` 也带 `ready_in`；
+> - 第 10 节：`stunned_seconds`（岩甲虫硬直 2 秒）是玩法的数，只放占位 json（#627 接口复核时补）。
+> **v0.9++（11-04，SGODOT-395）**：第 9.4 节补背包：药自己算一类（`itemKind` 是 `potion`），一格叠 10（`bag.stack.potion`，v4q(7) ⑥）。
+> **v0.9+（11-04）**：矿层摆件和岩块接入（周瑜，原排 11-05，提前）：第 10.1 节补了三处做法：守关层按内容表判断（打过以后也摆场地）；牌子上的层号同时受高度和宽度限制；glb 是否已导入，看导入文件在不在。
+> **v0.8（11-03）**：G 服务端的 v4q(9) 两件（周瑜，奕星 11-02 派）：
+> - 第 9.2 节：First Dig **完成以后 `view.first_dig` 照样给**（`done: true`、`have` = `floor`），Lv3 以前才是 null（v4q(9) 的矿脉行要分清「完成了」和「还没出现」，和亚瑟、刘邦对过，#636 评论 6574856129）；写明完成时的事件（`first_dig`、`gear`、`affinity`）；
+> - 第 9.2 节新增 **Pip 一句**：`view.pip_line`，台词模板在 `mine.first_dig.lines.pip_vein`，`talk` 时记「说过」（`seen` 里的 `line:pip_vein`），不加新命令、不加存档字段；引导进行中不给，引导台词先说（不知火舞定，用户已批）；第 7.4 节补台词；
+> - 试玩路由 `/v1/p0/dev/blackjack` 改 Homestead 等级时也结算 First Dig（后裔审 #697 时提的）；
+> - 第 10.1 节补矿层资源的口径（守关场地、电梯站、守关层王的出生点、配色的键），资产已进 b1；
+> - 第 7.1 节 `view.mine.records[id]` 加 `type`、`main`（亚瑟 11-03，给 Today 矿脉行判断用）；
+> - 第 7.1 节加 `view.mine.paid_today`（今天各矿交过费的层，出矿后照样给），矿口卡的 `Enter mine · Free` 照它写（亚瑟 11-03）。
 > **v0.7+（11-02 晚）**：第 10 节补怪物导入的后处理脚本（上官婉儿 11-02）：导入时顶点色当底色、关投影；运行时换材质、选模型时要注意的两点。
 > **v0.7（11-02 15:xx）用户批复**：用户 14:4x 批了 355 待批清单「全按推荐」、v4q 八条整条批（奕星转）。E / F / G 原来标〔待用户定〕的都按推荐定了，本文件里对应的地方改成已定：
 > - 丁12 矿脉开局就能去：删掉 `types.vein.gate`（内容改动归苏烈，亚瑟对账时分的）；
@@ -84,7 +99,7 @@
 | 人 | 写 | 文件（只有他改，别人要改先说） |
 |---|---|---|
 | 苏烈 | E 服务端（第 2–7 节）+ F 服务端（第 8 节）+ G 服务端（第 9 节） | server/src/p0/mine.ts（重写）、state.ts 的矿和装备字段、content.ts 的矿和武器类型、reducer.ts 的矿和装备分支、workbench.ts、residents.ts 的新需求类型、`assets/p0/content/mine_b1.json`（新）、server/test/p0/mine_b1*.test.ts |
-| 周瑜 | 第 10 节的接口落地 PR（先只移植史莱姆），然后写 E 客户端 | scenes/p0/p0_mine.gd、modules/mining/p0_mine_combat.gd、mine_combat.gd、mine_layout.gd、mine_art.gd；modules/mining/monsters/ 下的 monster_art.gd、monster_view.gd、monster_brain.gd 三个基类 |
+| 周瑜 | 第 10 节的接口落地 PR（先只移植史莱姆），然后写 E 客户端；11-03 起接了 E 服务端后来的几件和 G 服务端剩下的四件（换武器、铁剑、回血药售卖、喝药；奕星 11-03 派，苏烈没在做），第 9 节服务端那几处文件这几件由周瑜改 | scenes/p0/p0_mine.gd、modules/mining/p0_mine_combat.gd、mine_combat.gd、mine_layout.gd、mine_art.gd；modules/mining/monsters/ 下的 monster_art.gd、monster_view.gd、monster_brain.gd 三个基类 |
 | 刘邦 | F 客户端（第 10 节的三种新怪、守关、精英）+ G 客户端（第 9.6 节） | modules/mining/monsters/ 下的 bat_*、beetle_*、shroom_*、slime_king_*；G 的 Gear 页、快捷栏、物品卡、Pip 委托卡的文件（帧到了以后）|
 | 亚瑟 | 矿口卡（地点卡的野外矿分支），读第 7.3 节的数据 | p0_map.gd、地点卡 |
 | 后裔 | C：travel.here 认野外 id；`HOMESTEAD_SPACES` 去掉 `mine`；`best_floor` 的叠加字段从第 7.3 节取 | travel.ts、routes.ts、world.ts |
@@ -307,10 +322,10 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 | `mine_torch` | `floor`, `day` | 照出本层牌堆（`floor_state.deck`） |
 | `mine_pick` | `floor`, `ground`, `day` | 捡地上的掉落（第 5 节第 5a 条） |
 | `mine_attack` | `floor`, `targets?: number[]`, `hurt_by?: number`, `stunned?: number[]` | `stunned` 是这一下打中的、处在硬直里的岩甲虫下标（第 8 节） |
-| `mine_drink` | `item` | 在矿里喝药 |
+| `mine_drink` | `item`, `day` | 在矿里喝药（第 9.4 节）；不带 `floor`，喝的是人在的那一层 |
 | `equip` | `item` | 沿用，加上武器 |
 
-拒绝码（新的）：`unknown_place`、`not_open`、`not_here`（C 已有）；`bad_floor {max}`（层号超出、不是电梯站、不是相邻层；超过 `open_to` 时 detail 带 `not_open: true`）；`floor_locked {left}`；`not_in_mine`；`new_day`（命令的 `day` 不是今天，第 5 节第 10 条）；`no_potion`；`potion_cooldown {ready_in}`；`hp_full`。
+拒绝码（新的）：`unknown_place`、`not_open`、`not_here`（C 已有）；工作台的 `homestead_level {need}`（铁剑，和商店同一个码，第 9.3 节）；`bad_floor {max}`（层号超出、不是电梯站、不是相邻层；超过 `open_to` 时 detail 带 `not_open: true`）；`floor_locked {left}`；`not_in_mine`；`new_day`（命令的 `day` 不是今天，第 5 节第 10 条）；`no_potion`；`potion_cooldown {ready_in}`；`hp_full`。
 
 矿里的命令（`mine_floor`、`mine_rock`、`mine_torch`、`mine_attack`、`mine_drink`）都带 `day`（`view.mine.at.day`）。沿用的：`need_energy`、`bag_full`、`not_owned`。
 
@@ -342,6 +357,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
   "notice": null,
   "at": null | {
     "mine": "wd-254-114", "type": "vein", "name": "Ash Vein", "max": 40, "floor": 12, "hp": 76, "day": "2026-11-02",
+    "potion_ready_in": 0,
     "stations": [ { "floor": 10, "paid": true }, { "floor": 20, "paid": false } ],
     "floor_state": {
       "floor": 12, "paid": true, "cleared": false, "rocks": 5, "left": 3, "broken": [true, false, …], "lit": false,
@@ -351,10 +367,14 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
     },
     "next": { "floor": 13, "paid": false, "fee": 2, "open": false, "locked": null }
   },
-  "records": { "wd-254-114": { "deepest": 23, "guards": [20] } }
+  "records": { "wd-254-114": { "deepest": 23, "guards": [20], "type": "vein", "main": "iron_ore" } },
+  "paid_today": { "wd-254-114": [1, 2, 10] }
 }
 ```
 - `at` 只在人在矿里时有；`floor_state` 只给当前层。换层以后看命令返回的 view。
+- `at.potion_ready_in`（v0.9）：喝药还要等多少毫秒，0 表示可以喝。服务端用今天最后一次喝药的时间（`day.drink_at`）加上药的 `cooldown_ms`，再减去现在的时间算出来，不小于 0；今天还没喝过就是 0。给剩余时间、不给 `drink_at`，是因为手机时钟和服务端时钟对不齐。刚喝完的回包里，它等于 `cooldown_ms`。第一批只有一种药，冷却按所有药里最长的 `cooldown_ms` 算；以后有第二种药时再按药分开记。人不在矿里时没有 `at`，也就没有这一项。
+- `records[id].type` / `.main`（v0.8，亚瑟审 #711 时要的）：这条纪录是哪种矿（`quarry` / `vein`）、主矿是什么（矿脉写 `iron_ore` / `quartz`，浅坑写 null）。服务端按目录或开发矿查出来给，存档里不存；查不到这座矿时两项都是 null。客户端判断「任何一座铁矿脉到过 F10」（v4q(9) ①）时只看 records，不用另外读这座矿。
+- `paid_today`（v0.8，亚瑟要给矿口卡用）：今天每座矿交过层费的层，从小到大；出了矿也照样给。人在矿外时，日切以后清空；日切时人如果在矿里，当前这一层按新的一天记成已付（丁15：留在原层、不再收层费），所以那时是 `{当前矿: [当前层]}`，不是空的（后裔审 #705 时提的）。矿口卡的主键照它写：这座矿的 F1 在里面就写 `Enter mine · Free`，不在就写 `Enter mine · 2 Energy`（LOCK-21）。没进过任何矿时是 `{}`。
 - 按周瑜355评论a5b58542补 `at.prev: null | {floor, paid, fee}`：F1为null；其余为上一层，paid读当天该矿该层记录，已付fee=0，否则为floor_energy。用于电梯到深层后向上进入未付费层的名字条和收费卡；不含next的清怪限制。
 - `mobs` 的顺序就是 targets / hurt_by 的下标。`tier` 只有守关有，其余是 0。
 - `deck`：点了火把以后才有，是本层牌堆按物品的合计，敲掉的牌不算；没点火把是 null。`bag_ok`：下一张牌整份放得下，只影响岩石是否置灰。
@@ -382,6 +402,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
   - 委托卡目标行 `Reach Floor 3 · any mine`；
   - Today `Pip's First Dig · Floor 1/3`（分子是资历）；
   - 完成飘字 `Copper Sword · equipped`。手上是铁剑、没换装时的写法 q 行没给，先只写 `Copper Sword`，走查时请不知火舞定。
+- Pip 一句（v4q(9) ②，李白定稿、不知火舞审定）：`Copper's a start! There's iron at <铁矿脉名>. Get down to Floor 10!`。模板在内容表 `mine.first_dig.lines.pip_vein`，`%s` 由客户端填 `view.pip_line.name`。
 - 背包满：岩石置灰 `Mine · Bag full`；掉落放不下飘字 `Bag full · Iron Ore left on the floor`，东西留在原地，本层内走过去自动捡。
 - 矿脉 F40 下面的楼梯：灰牌 `Floor 41 · Not open yet`；浅坑最深层没有往下的楼梯。
 - 倒地卡：标题 `Knocked out`；第一行 `You're back at the entrance.`；第二行 F1–10 写 `You kept everything.`，F11 起写 `You dropped half of what you found on this floor:` 加上掉落列表；第三行 `Your best here is still Floor 14.`；按钮 `Close`。
@@ -400,28 +421,41 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 
 ## 9. G 武器
 ### 9.1 装备
-- **Gear 页现有的 Combat 槽变成可换**（结论第 4 节修订的说法）：存档里是 `gear.weapons` 和 `gear.weapon`；`equip {item}` 加一个分支：`weapons` 里有它就换成它。
+- **Gear 页现有的 Combat 槽变成可换**（结论第 4 节修订的说法）：存档里是 `gear.weapons` 和 `gear.weapon`；`equip {item}` 加一个分支：`weapons` 里有它、而且 `content.mine.combat.weapons` 里也有，就换成它；不然回 `not_owned`（v0.9）。不动竿、锄、镐三个槽；和换竿一样不发事件，客户端看回包 view 的 `gear.weapon`。
 - 战斗读 `gear.weapon`，不再读 `tools.combat`（`tools.combat` 删掉）。武器槽开局就装着木剑，Lv3 只是给铜剑。这一条是 v4q(7) ①，**开局**（丁16，用户 11-02 批）：浅坑没有门槛、F1 就有史莱姆。数据上就是 #611 的 START_WEAPON。
 
 ### 9.2 铜剑：Pip 的 First Dig（单列、独立的槽，v4q(7) ③ 340e4c4e）
 - **不走居民委托，也不走 `intro_requests`**：那套机制有 `r.next = 0`、和委托线共用一个槽、要交、只给新引导档这几道限制，都不适用。First Dig 是自己的一条：
-  - **内容**：`mine.first_dig: { "giver": "res_pip", "floor": 3, "gate": { "homestead": 3 }, "reward": { "weapon": "weapon_copper_sword", "affinity": 5 } }`。文案见第 7.4 节（v4q(7) ③，不知火舞审定）。
+  - **内容**：`mine.first_dig: { "giver": "res_pip", "floor": 3, "gate": { "homestead": 3 }, "reward": { "weapon": "weapon_copper_sword", "affinity": 5 }, "lines": { "pip_vein": "Copper's a start! There's iron at %s. Get down to Floor 10!" } }`（在 `mine_b1.json`；服务端加载时校验 `giver` 和 `reward.weapon` 在表里）。文案见第 7.4 节（v4q(7) ③，不知火舞审定）。
   - **存档**：不加新字段。完成以后在 `s.rewards` 里记 `first_dig`（现有的一次性奖励列表）。
   - **出现**：`homestead.level >= gate.homestead` 且 `rewards` 里没有 `first_dig`。不看好感、不看 Pip 的委托线、Pip 手上有委托也出现；**不占 `track_max`**。
   - **进度** = 资历（所有矿的 deepest 取最大）。
   - **完成**：资历 ≥ `floor` 就直接完成，不用交。两个时刻都要结算：`mine_record` 事件那一刻；还有它出现的那一刻，即升到 Lv3 的那条 `homestead_upgrade` 命令里，Lv3 前就到过第 3 层的当场完成。
-  - 完成时：记 `rewards: first_dig`，发事件 `{kind: 'first_dig', done: true}` 和奖励：铜剑，加上 Pip 的好感 +5（走现有的好感加点，阶段照常升）。
-- **view**：`view.first_dig: null | { giver, floor, have, done: false }`，出现了、还没完成时才有；Today 照它出一行，第 7.4 节的文案按 q 行。
+  - 完成时：记 `rewards: first_dig`，发事件 `{kind: 'first_dig', done: true, weapon: 'weapon_copper_sword', equipped}`（`equipped`：铜剑换到了手上）和奖励：铜剑（事件 `{kind: 'gear', item, equipped}`），加上 Pip 的好感 +5（走现有的好感加点，事件 `affinity` 的 `reason` 是 `first_dig`，阶段照常升）。同一个回包里先是 `mine_record`（或 `homestead`），再是这三条。
+- **view**：`view.first_dig: null | { giver, floor, have, done }`。Lv3 以前是 null；出现了、还没完成时 `done: false`，`have` 是资历（不超过 `floor`）；**完成以后照样给，`{ giver, floor, have: floor, done: true }`**（v4q(9) 的矿脉行要分清「完成了」和「还没出现」）。Today 只照 `done: false` 的出一行，第 7.4 节的文案按 q 行。
+- **Pip 一句**（v4q(9) ②）：`view.pip_line: null | { key: 'pip_vein', vein, name }`。条件四条都满足才给：First Dig 已完成；引导已经结束（`guide.step` 为空，不进引导的号同样算）；`seen` 里没有 `line:pip_vein`；那座铁矿脉（`wild.ts` 的 `nearestFreeVein(c, s, 'iron_ore')`，离家最近的免费铁矿脉，和 Today 矿脉行永远指同一座）的 deepest < 10。没有这座矿脉时不给。`name` 是那座矿的全名（地图钉和矿口卡上的同一个），客户端拿它填台词的 `%s`。
+  - **记「说过」走现有的 `talk`，不加新命令**：`{type: 'talk', resident: 'res_pip'}` 时 `pip_line` 待说，就往 `seen` 记 `line:pip_vein`，不管当天的聊天好感加没加；之后 view 不再给 `pip_line`。和别的居民说话不记。
+  - **引导台词先说**（不知火舞定，**用户已批**：v4q(9) ② 的 11-03 补注随 q(279) 报，用户 11-03 在奕星终端回「279 ok」、无消息 id；补注 3c09a6ce、已批 farm-dev c8a2b4bb，302 记录 b1cbc904）：引导进行中服务端不给 `pip_line`，Pip 照说引导台词，这时和 Pip 说话也不记「说过」；引导结束以后的下一次和 Pip 说话才说矿脉这一句，只说一次，不会因为撞上引导而丢掉。
+  - 客户端（刘邦，#636）：打开 Pip 对话时，看到 `pip_line` 就说这一句并留到这轮对话结束，再照常发 `talk`；回包里 `pip_line` 没了也不撤。没有 `pip_line` 就照原来的台词（引导台词或好感阶段的台词）。
+  - **存档**：不加新字段（`seen` 是现有字段），v7 清档，不迁移。
 - **奖励** `reward.weapon: "weapon_copper_sword"`：放进 `gear.weapons`，**并且装上，除非手上已经是铁剑**（按攻击比：新武器比当前高就装；木剑 3 → 铜剑 5 会装，铁剑 8 不换下）；发事件 `gear`；只给一次。
 - 和 D 的引导改版（「第一次下矿」那一步）会交叉，我和蒙恬对步骤。
 
 ### 9.3 铁剑：工作台
-- 配方 `{ id: "craft_iron_sword", out: "weapon_iron_sword", to: "weapon", gate: { homestead: 8 }, in: [["iron_ore", 6], ["hardwood", 4], ["coal", 3], ["drop_t2_beetle_shell", 2]], coins: 150 }`（照 q 行，v4q(6)(7) 复核 ①）。数值是初值；配方的 Lv8 照 v4 2.7。矿脉开局就能去（丁12）以后，这个门槛还没人改过，q 行另有定就照 q 行。
-- `to: 'weapon'`：做好放进 `gear.weapons`，照 `to: 'gear'` 的写法；已经有了就不能再做（`owned`）。
+- 配方（在 `mine_b1.json` 的 `workbench.recipes`，按 id 合进主表）：`{ "id": "craft_iron_sword", "tab": "tools", "out": "weapon_iron_sword", "qty": 1, "to": "weapon", "cost": [["iron_ore", 6], ["hardwood", 4], ["coal", 3], ["drop_t2_beetle_shell", 2]], "homestead": 8, "coins": 150 }`（照 q 行，v4q(6)(7) 复核 ①）。数值是初值；配方的 Lv8 照 v4 2.7。矿脉开局就能去（丁12）以后，这个门槛还没人改过，q 行另有定就照 q 行。
+  - v0.9 和 v0.8 写法的差别：材料叫 `cost`（工作台现有的键）；Homestead 门槛是单独的 `homestead`，和商店商品、背包升级的写法一样。`gate` 仍然只放 `[技能, 等级]`：客户端 p0_logic.gd 的技能解锁列表把每个配方的 `gate` 当数组读，放 `{ homestead }` 字典会报错。客户端读门槛用 `recipe.homestead`。
+  - 服务端加载内容表时校验：`to: 'weapon'` 的配方，`out` 必须在 `mine.combat.weapons` 里。
+- **拒绝的先后**（照工作台现有的顺序，按钮上写第一条）：已经有了 `owned` → 技能门槛 `locked`（铁剑没有）→ `homestead_level {need: 8}`（和商店同一个码、同一个 detail）→ 材料不够 `need_material {item, need, have}` → 钱不够 `no_coins {need}`（要价格加 40 保底，即 190，`need` 是还差多少，和温室一样）。
+- **做好**：材料先从 Farm Storage 扣、不够再扣背包（`item` 事件），扣 150 coins（`coins` 事件），`weapon_iron_sword` 放进 `gear.weapons`，**不自动装上**（照 `to: 'gear'` 的写法，铜镐也不自动装），在 Gear 页或工作台上发 `equip {item}` 装上；发 `{kind: 'craft', recipe, item, qty: 1, to: 'weapon'}`。已经有了就不能再做（`owned`），什么都不扣。
+- **配方行的 view**（`view.workbench.recipes[]`）：沿用现有字段，`to: 'weapon'`；`owned` 看 `gear.weapons`，`equipped` 看 `gear.weapon`；另外加 `homestead: { level: 8, ok }`（只有带门槛的配方才有），以及 `coins: 150`、`coins_need: 190`、`coins_have`（和温室同一组字段）；`block` 是上面的拒绝码之一，可以做时是 null。
 
 ### 9.4 回血药
 - `mine_drink {item}`：只能在矿里（`day.at` 不为空），而且层号在 `potions[item].floors` 允许的范围内；扣 1 瓶；回血 `heal`（`"full"` 表示回满，数字表示回多少），不超过上限；冷却 `cooldown_ms`；血满时回 `hp_full`；层不允许时回 `not_here`。售卖处、价格、库存、能喝的层、回血量（回满，丁19）都已定。全读 `content.mine.potions`。
-- 售卖：照 `sold_at`（现行是 `homestead`，即 Homestead Stall），日库存 `stock`，门槛 `gate`（v4 2.7：Lv4）。挂进柜台的写法照现有商品。
+- **字段**（v0.9）：`{type: 'mine_drink', item, day, space: 'mine', place}`，和别的矿里命令一样带 `day`，`space` / `place` 照第 6 节；不带 `floor`，喝的是人在的那一层（#636 的 p0_gear_logic.gd 就是这样发的）。
+- **拒绝的先后**（v0.9）：`day` 不是今天 → `new_day`；人不在矿里 → `not_in_mine`；`item` 不是 `potions` 里的药 → `bad_item`；这一层不能喝（`floors` 是层号数组、又不含这一层；`"any"` 哪层都行）→ `not_here`；背包里没有这种药 → `no_potion`（只看背包，不看 Farm Storage）；血满 → `hp_full`；还在冷却 → `potion_cooldown {ready_in}`（毫秒，和 `at.potion_ready_in` 同一个数）。
+- **喝了**：背包扣 1 瓶（`{kind: 'item', id, delta: -1}`）；血加 `heal`（`"full"` 就加满），不超过 `combat.hp`；`day.drink_at = now`（存档里现成的字段，日切时跟着 `day` 清掉，不加存档版本）；发 `{kind: 'heal', hp, item}`，`hp` 是喝完以后的血。
+- 背包（v0.9++，v4q(7) ⑥）：`itemKind` 把 `potion_*` 认作 `potion`，一格叠 `bag.stack.potion` = 10（写在 `mine_b1.json`，合进主表的 `bag.stack`），不按材料的 99。药不是材料，交不进材料委托，也放不进 Farm Storage。客户端的背包格子照服务端给的分，不用自己算。
+- 售卖：照 `sold_at`（现行是 `homestead`，即 Homestead Stall），日库存 `stock`，门槛 `gate`（v4 2.7：Lv4）。挂进柜台的写法照现有商品：价格要加 40 保底（`no_coins {need}`），日库存记在 `day.bought`，卖完回 `sold_out {left}`，Homestead 不到等级回 `homestead_level {need: 4}`，买到的放进背包（放不下回 `bag_full`）。
 
 ### 9.5 起始状态
 新档的 `gear.weapons = ['weapon_wooden_sword']`、`weapon = 'weapon_wooden_sword'`。
@@ -438,7 +472,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 目录 `modules/mining/monsters/`。**占位体、灰模、正式模型走同一个接口，换模型只换资源路径**（上官婉儿的接口 v1；亚瑟要求写明）：
 - **占位怪从第一天起就走 `play(动作名)`**：动作名照 3D 约定（idle / move / windup / attack / recover / hit / die，加上 fly_high / stunned / hide / spore）。占位体用代码 tween 实现同名动作，不直接改变换。
 - **时长和命中时刻从 json 读**：占位体也带一份同样格式的 json，放在 `modules/mining/monsters/placeholder/<id>.json`，键和 `assets/monsters/<id>/<id>.json` 完全一样（radius、hit_point、durations、hit_at、spore_at）。brain 只读 `view.meta`，不写死数字。
-- 有 `assets/monsters/<id>/<id>.glb` 就用 glb，没有就用占位体。json **占位的打底、模型的盖在上面**（11-02 蝙蝠灰模起）：模型 json 管美术的数（radius、hit_point、durations、hit_at、spore_at），占位 json 另外带玩法的数（move、contact_range、stun_resistant、knockback_resistance、visual 等），模型 json 里没有的键照用占位的；`durations` 这类字典按键逐个盖。动作的循环方式由程序按动作名设置（idle、move、fly_high、stunned 循环，其余单次），模型 json 里的 `anims` / `loop` 客户端不读。模型 json 的键名只认上面五个（蝙蝠灰模的 `hurt_point`、`anims.*.length` 已请上官婉儿改成 `hit_point`、`durations`、顶层 `hit_at`）。
+- 有 `assets/monsters/<id>/<id>.glb` 就用 glb，没有就用占位体。json **占位的打底、模型的盖在上面**（11-02 蝙蝠灰模起）：模型 json 管美术的数（radius、hit_point、durations、hit_at、spore_at），占位 json 另外带玩法的数（move、contact_range、stunned_seconds、stun_resistant、knockback_resistance、visual 等；岩甲虫的硬直 2 秒 `stunned_seconds` 是玩法的数，和模型 1 秒循环的 stunned 动作分开，v0.9），模型 json 里没有的键照用占位的；`durations` 这类字典按键逐个盖。动作的循环方式由程序按动作名设置（idle、move、fly_high、stunned 循环，其余单次），模型 json 里的 `anims` / `loop` 客户端不读。模型 json 的键名只认上面五个（蝙蝠灰模的 `hurt_point`、`anims.*.length` 已请上官婉儿改成 `hit_point`、`durations`、顶层 `hit_at`）。
 - 头饰 glb 的原点在接触面中心，挂到史莱姆头顶，位置是 `meta.hit_point` 往上到身体顶，由 `attach()` 做。
 
 ```gdscript
@@ -490,12 +524,21 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 - **导出**：json 不是资源，导出包默认不带。接口落地 PR 已在 export_presets.cfg 的 include_filter 加了 `modules/mining/monsters/placeholder/*.json,assets/monsters/*.json`。
 - 发命令（客户端）：挥一下时，把命中的怪里 `can_be_hit()` 的放进 targets，其中 `stunned()` 的再放进 stunned；hurt 管线照现在的 `mine_hurt` 键。
 
-## 10.1 矿层资源（3D 交，第一批继续用 mine_art.gd 代码拼，11-14 交，周瑜接）
+## 10.1 矿层资源（3D 交，资产已进 b1、不知火舞验过 355 dc6d4110；周瑜 11-05 接摆件和岩块、11-06 接配色和背景）
 - 配色：`assets/mine/types/<quarry|vein>/palette.json`，格式 `{"bands": [{"from": 1, "to": 9, "ground": "#rrggbb", "wall": "#rrggbb", "backdrop_tint": "#rrggbb", "fog": "#rrggbb"}, …]}`，按层段逐渐变深。
 - 背景：`assets/mine/types/<type>/backdrop.glb`，在现有 `assets/mine/backdrop/mine_backdrop.glb` 上改，原点、朝向、尺度照现有的。没有这个文件就用现有背景加配色。
 - 新矿石岩块：`assets/mine/rocks/rock_<iron_ore|quartz|coal|copper_ore>.glb`。原点在底面中心，Y 向上；尺寸照现在代码拼的岩石（半径约 0.47 m、高约 0.63 m，假影半径 0.52）；单个 surface，顶点色；≤ 400 三角面；不带动作（敲碎的抖动和缩小由程序做）。
 - 摆件：`assets/mine/props/guard_arena.glb`（守关层）、`assets/mine/props/elevator_station.glb`（电梯站）。原点在地面中心，单位米。
 - .import 必须带 uid。
+- 本机没导入的 glb 以 `load()` 拿得到为准，拿不到就退回 mine_art.gd 代码拼的，测试和截图不因此挂。判断方法（v0.9+，`MineArt.kit`）：读 `<glb>.import` 里 `[remap] path` 指向的导入文件，它存在才 `load()`。不能用 `ResourceLoader.exists`：只要有 .import 它就返回 true，没导入时照样 true，接着 `load()` 会报错。
+- **口径**（坐标都是层里的米，原点和 `mine_layout.gd` 一样）：
+  - 守关场地 `guard_arena.glb`：只摆在守关层，按内容表 `mine.types[type].floors[层].guard` 判断（v0.9+，`P0MaterialLogic.guard_floor`）：守关在前一天打过以后，服务端的 `floor_state.guard` 是 null，这一层照样摆场地。摆在 (4.9, 0, −3.8)，即 `ROCK_BOUNDS` 的中心；两支火把的光由程序加，位置是从 glb 里量出来的火苗处，即场地坐标 (−1.65, 1.42, −2.01) 和 (1.5, 1.42, −2.01)；外框不超过 `ROCK_BOUNDS` 的 7.0 × 4.5；整个只当装饰、不带碰撞；后沿的高物放在 x 2.7–6.8（离电梯 (1.25, 0, −6.75) 和下行梯 (8.25, 0, −6.75) 都 ≥ 1.6 m，实测 x 3.15–6.51）；≤ 3000 面。
+  - 电梯站 `elevator_station.glb`：换掉代码拼的电梯，摆在 `Layout.ELEVATOR` (1.25, 0, −6.75)，+Z 朝镜头；底座 1.45 × 1.3，平台顶面 0.17，总高 ≤ 2.3；≤ 2500 面。两个空节点：`PlateAnchor` (0, 0.99, 0.515) 挂 Label3D 写层号（只写数字或 `F10` 这样的短号，深色粗体，字高约占牌子的七成；v0.9+ 写成 `F` 加层号。`F10`–`F40` 三个字按七成高排会超出 0.5 m 的牌宽，所以字的大小取两者里小的那个：字高不超过牌高的七成，字宽不超过牌宽的 86%），`LampAnchor` (0.8, 0.73, 0.47) 挂锁定 / 解锁灯（锁定琥珀 `#dba158`、解锁绿 `#a5e3bc`，照现在代码的颜色）。
+  - 岩块（不知火舞 11-03 定，上官婉儿同意）：**每座矿统一用它主矿的岩块**：铁矿脉 `rock_iron_ore`、石英矿脉 `rock_quartz`、浅坑 `rock_copper_ore`；煤块这批不用。岩石掉什么按发牌定（第 5 节），敲开前看不出，所以不按矿种随机画，以免给错误提示。每块绕竖轴随机转一个角度、大小在 0.9–1.1 倍之间随机，同一块固定（按岩石的序号和本层的种子算）。v0.9+：本层的种子和摆岩石位置用的是同一个（`<矿 id>:<层>:<day>`）；转角和缩放放在里面的 `Rock` 节点上，不放在根节点上，因为敲碎时的抖动和缩小作用在根节点。主矿从 `view.mine.records[矿].main` 读（浅坑一律用铜矿石）；读不到时，或者岩块没导入，就退回代码拼的岩石，转角和缩放照样加。
+  - 守关层的王出生在 `mine_combat.SPAWNS[0]` (4.75, 0, −5.0)，会满层追，跳扑约 2.5 m（占位数，F 的数值为准）。
+  - 配色：每段四个键 `ground` / `wall` / `backdrop_tint` / `fog`，按 `from ≤ 层 ≤ to` 查，超出最后一段就用最后一段；第 1 段和现在线上的颜色一样。`backdrop_tint` 是背景的 floor_tint；`fog` 同时给背景的 void_tint 和 `Environment.background_color`（不开真正的雾）。`vein_tint` 已撤回，不加。
+  - 背景 shader 加 `uniform float vein_mask = 0.0`，只有 `types/<type>/backdrop.glb` 设 1（老的 mine_backdrop.glb 在 Godot 里 UV2.y 全是 1.0，不开关会整片不套色）；UV2.y 以 Godot 读到的值为准（Blender 导出时 v 会翻成 1 − v）。
+  - `export_presets.cfg` 三个预设的 include_filter 都要加 `assets/mine/types/*/palette.json`（亚瑟提醒；现在只有 `assets/monsters/*.json`）。
 
 ## 11. 开发用矿（接 C 之前）
 - 服务端解析矿 id：先查 C 的目录；查不到再查 `content.mine.dev_sites`。开发矿不检查 `travel.here`，其余规则和真矿一样。
@@ -523,8 +566,8 @@ func on_hit(enemy, stun_s: float) -> void       # 挥刀打中时（按下那一
 15. 不能进：不在那座矿（`not_here`）、目录里没有（`unknown_place`）、类型没开（`not_open`）、体力不够（`need_energy`）。**背包满不挡进矿、不挡下楼**；满包时 `mine_rock` 回 `bag_full`。
 15a. 掉在地上：背包满时打倒怪，放不下的部分进本层 `ground`；`mine_pick` 有空位就进背包，没有就留着；上下楼、坐电梯、出矿、倒地、日切以后 `ground` 清空。
 15b. 打倒的精英当天不回来：打倒以后上楼再下来，这一层的精英还是 0 血、不出现。
-16. 回血药：只能在矿里喝，任何一层都能喝；扣 1 瓶；回血量、价格、库存都**从 `content.mine.potions` 读**，不写死数字（回血量是回满，丁19）；回血不超过上限；冷却中回 `potion_cooldown`；血满回 `hp_full`；没有药回 `no_potion`。
-17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 First Dig（`mine.first_dig`，不走 intro_requests）：Lv3 出现、不占 track_max、Pip 手上有委托也出现；资历到 3 的那一下直接完成；Lv3 前已到过第 3 层的，升 Lv3 那条命令里当场完成；完成记 `rewards: first_dig`，得到铜剑并装上（手上是铁剑时不换）；只给一次；`view.first_dig` 只在出现、未完成时有。
+16. 回血药（`server/test/p0/mine_b1_potion.test.ts`）：只能在矿里喝，任何一层都能喝；扣 1 瓶；回血量、价格、库存都**从 `content.mine.potions` 读**，不写死数字（回血量是回满，丁19）；回血不超过上限；冷却中回 `potion_cooldown`；血满回 `hp_full`；没有药回 `no_potion`。
+17. 武器（id 都是 `weapon_*`）：新档只有木剑并已装上；`equip` 能换成拥有的武器，没有的回 `not_owned`；工作台做铁剑进 `weapons`（Homestead 不到门槛不能做），有了不能再做；Pip 的 First Dig（`mine.first_dig`，不走 intro_requests）：Lv3 出现、不占 track_max、Pip 手上有委托也出现；资历到 3 的那一下直接完成；Lv3 前已到过第 3 层的，升 Lv3 那条命令里当场完成；完成记 `rewards: first_dig`，得到铜剑并装上（手上是铁剑时不换）；只给一次；`view.first_dig` Lv3 以前是 null，出现以后一直有（完成后 `done: true`、`have` = `floor`）；`view.pip_line` 只在 First Dig 已完成、引导已结束、没说过、那座铁矿脉没到 F10 时有，`talk res_pip` 记「说过」，和别人说话不记，引导进行中和 Pip 说话也不记（`server/test/p0/mine_b1_first_dig.test.ts`）；换武器和铁剑在 `server/test/p0/mine_b1_gear.test.ts`（铁剑：Homestead 不到门槛回 `homestead_level`、材料或 coins 不够、做好不扣第二次、不自动装上、配方行 view）。
 18. 旧命令 `mine_new_run`、`mine_express` 回 `unknown_command`（reducer 现有的码）。
 19. 开发矿：`wd-dev-quarry`、`wd-dev-vein` 不检查 here；没有 `dev_sites` 时回 `unknown_place`。
 

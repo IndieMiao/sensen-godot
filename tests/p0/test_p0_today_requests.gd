@@ -50,7 +50,7 @@ func test_a_request_ready_to_hand_in_leads() -> void:
 	v["plots"] = [{"state": "sown", "crop": "crop_radish"}]
 	var rows := P0Logic.today_rows(v)
 	assert_that([rows[0].line, rows[0].go]).is_equal(["An Old Man's Catch · Deliver to Old Kai", "outpost:tackle"])
-	assert_str(rows[1].line).is_equal("Water 1 sown plot")
+	assert_int(rows.size()).is_equal(1)   # requests only (A 包反馈 1): the sown plot is the field's, not Today's
 
 ## The Market Board's taken requests too (a rarity: `Fine fish`), handed in at the market square; the Stall Board's at
 ## the stall; untaken ones are not in Today.
@@ -68,13 +68,14 @@ func test_market_and_stall_requests_taken_and_untaken() -> void:
 	v.boards.stall.slots[0].merge({"have": 10, "ready": true}, true)
 	assert_array(_lines(v)).contains(["Crate of Radishes · Deliver at the Stall"])
 
-## A request still short comes after what else can be done now and before the countdowns; a plot request reads `Plots`.
-func test_a_short_request_follows_the_now_rows_and_precedes_the_countdowns() -> void:
+## Requests only (A 包反馈 1, spec ①): a request still short is the row; the plots' watering and countdown are not in
+## Today. A plot request reads `Plots`.
+func test_a_short_request_is_in_today_without_the_fields_rows() -> void:
 	var v := _view(4)
 	v.residents["res_pip"] = {"request": {"id": "req_res_pip_2", "kind": "sow", "have": 3, "qty": 5, "ready": false}, "request_state": "accepted"}
 	v.residents.erase("res_old_kai")
 	v["plots"] = [{"state": "sown", "crop": "crop_radish"}, {"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
-	assert_array(_lines(v)).is_equal(["Water 1 sown plot", "Five Little Plots · Plots 3/5", "Radish ready in 1h"])   # one plot: singular (q(227) ②)
+	assert_array(_lines(v)).is_equal(["Five Little Plots · Plots 3/5"])
 
 ## The first session shows its tutorial request alone (the guide's own row).
 func test_the_first_session_keeps_its_tutorial_request_alone() -> void:
@@ -127,9 +128,8 @@ func test_a_tap_on_a_tap_row_presses_it() -> void:
 			row.gui_input.emit(e)
 	assert_array(got).is_equal([0])
 
-## q(143) (不知火舞, 奕星): the short request tracked last keeps a row in Today, so `Tracking · it shows in Today` holds.
-## Three rows that can be done now: it takes the 3rd. Fewer: it stays where it was. Several short: the latest by
-## accepted_at; none known (an older server or save): the first in board order. Three deliveries keep their rows.
+## Spec ① (over q(143)'s latest-on-the-third-row): the list scrolls, so every short request is there, the newest taken
+## first — `Tracking · it shows in Today` holds; none known (an older server or save): board order. Hand-ins lead.
 func _full(pip_at, dusk_at) -> Dictionary:
 	var v := _view(4)
 	v["firsts"] = ["harvest:crop_radish"]
@@ -142,47 +142,23 @@ func _full(pip_at, dusk_at) -> Dictionary:
 		"items": [], "have": 1, "qty": 4, "status": "accepted", "accepted_at": dusk_at}]}}
 	return v
 
-func test_the_latest_tracked_short_request_keeps_the_third_row() -> void:
-	# Pip's tracked after Dusk Haul: Pip's row takes the 3rd (the stove's), Dusk Haul does not fit
-	assert_array(_lines(_full(2000, 1000))).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Five Little Plots · Plots 3/5"])
-	# Dusk Haul's tracked last: it does
-	assert_array(_lines(_full(1000, 2000))).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Dusk Haul · Fine fish 1/4"])
-	# no time from the server (an older server, or a save from before it): the first in board order, the Market Board's
-	assert_array(_lines(_full(null, null))).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Dusk Haul · Fine fish 1/4"])
+func test_short_requests_come_newest_taken_first() -> void:
+	# Pip's taken after Dusk Haul: Pip's first; the harvest, watering and countdown are not in Today
+	assert_array(_lines(_full(2000, 1000))).is_equal(["Five Little Plots · Plots 3/5", "Dusk Haul · Fine fish 1/4"])
+	assert_array(_lines(_full(1000, 2000))).is_equal(["Dusk Haul · Fine fish 1/4", "Five Little Plots · Plots 3/5"])
+	# no time from the server (an older server, or a save from before it): board order, the Market Board's first
+	assert_array(_lines(_full(null, null))).is_equal(["Dusk Haul · Fine fish 1/4", "Five Little Plots · Plots 3/5"])
 	var v := _full(null, 5000)
 	v.residents.res_pip.request.erase("accepted_at")
-	assert_array(_lines(v)).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Dusk Haul · Fine fish 1/4"])
+	assert_array(_lines(v)).is_equal(["Dusk Haul · Fine fish 1/4", "Five Little Plots · Plots 3/5"])
 
-func test_with_room_the_rows_keep_their_places() -> void:
-	var v := _full(2000, 1000)
-	v.plots = [{"state": "sown", "crop": "crop_radish"}]
-	v.bag.slots = []
-	# both short rows fit after the now row, in board order (Market Board, then the residents'), whatever was tracked last
-	assert_array(_lines(v)).is_equal(["Water 1 sown plot", "Dusk Haul · Fine fish 1/4", "Five Little Plots · Plots 3/5"])
-
-## An info row in the 3rd place (`Farming Lv3 at your first harvest`, after the row it comes from) gives way too: it goes
-## with its source and is no task (不知火舞).
-func test_an_info_row_in_the_third_place_gives_way() -> void:
-	var v := _full(2000, 1000)
-	v.firsts = []
-	v.skills.farming = {"level": 2, "xp": 95, "next": 100}
-	v.bag.slots = []
-	v.plots = [{"state": "sown", "crop": "crop_radish"}, {"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
-	v.boards.stall.slots = [{"id": "a", "title": "Crate A", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2,
-		"ready": true, "status": "accepted", "accepted_at": 1}]
-	assert_array(_lines(v)).is_equal(["Crate A · Deliver at the Stall", "Water 1 sown plot", "Five Little Plots · Plots 3/5"])
-	# without the rule the 3rd would be the info row (the same view with nothing tracked short)
-	v.residents = {}
-	v.boards.market.slots = []
-	assert_str(str(_lines(v)[2])).is_equal("Farming Lv3 at your first harvest")
-
-## Three rows handing something in: none gives way (handing one in frees a row).
-func test_three_deliveries_keep_their_rows() -> void:
+## Hand-ins lead, then the short ones: nothing gives way any more (the list scrolls).
+func test_hand_ins_lead_and_the_short_request_follows() -> void:
 	var v := _full(9000, 1000)
 	v.boards.stall.slots = [
 		{"id": "a", "title": "Crate A", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 1},
 		{"id": "b", "title": "Crate B", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 2}]
 	v.boards.market.slots[0].merge({"have": 4, "ready": true}, true)
 	var rows := P0Logic.today_rows(v)
-	assert_array(rows.map(func(r): return str(r.dot).begins_with("deliver:"))).is_equal([true, true, true])
-	assert_bool(rows.any(func(r): return r.line.begins_with("Five Little Plots"))).is_false()
+	assert_array(rows.map(func(r): return str(r.dot).begins_with("deliver:"))).is_equal([true, true, true, false])
+	assert_str(str(rows[3].line)).is_equal("Five Little Plots · Plots 3/5")
