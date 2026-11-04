@@ -1,0 +1,14 @@
+{
+  "_note": "F development placeholder; hide is q(6)'s one-second immunity. Spore cadence/range are tuning data.",
+  "radius": 0.32,
+  "hit_point": [0, 0.4, 0],
+  "durations": {"idle": 1.2, "move": 0.8, "windup": 0.6, "attack": 1.0, "spore": 1.0, "hide": 1.0, "recover": 0.7, "hit": 0.18, "die": 0.55},
+  "hit_at": 0.3,
+  "spore_at": 0.3,
+  "spore_interval": 3.0,
+  "spore_range": 2.3,
+  "move": {"speed": 0.8, "aggro": 5.0, "reach": 2.1, "dash_speed": 0.0},
+  "stun_resistant": false,
+  "knockback_resistance": 0.2,
+  "visual": {"color": "db6b6b", "elite_color": "a56bb8", "accent": "fff0cf", "top": 0.74, "spore_color": "d4efa0"}
+}
