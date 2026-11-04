@@ -41,7 +41,8 @@ async function server(gate: P0Gate) {
 describe('the gate rules', () => {
   it('lets everything through by default', () => {
     const g = new P0Gate(undefined, {});
-    expect(g.state()).toEqual({ maintenance: { on: false }, min_version: 0, update_url: '', update_on: false });
+    expect(g.state()).toEqual({ maintenance: { on: false }, min_version: 0, update_url: '', update_on: false, features: [], features_on: false });
+    expect(g.check({})).toBeNull();   // no x-p0-features either: nothing is required unless P0_REQUIRE_FEATURES says so
     expect(g.check({ 'x-p0-version': '1' })).toBeNull();
   });
 
@@ -59,6 +60,24 @@ describe('the gate rules', () => {
     const g = new P0Gate(undefined, { P0_MIN_VERSION: '9' });
     expect(g.state()).toMatchObject({ min_version: 9, update_url: '', update_on: false });
     expect(g.check({ 'x-p0-version': '1' })).toBeNull();
+  });
+
+  it("the wipe's second guard (396 ①): without every required feature, 426 like the minimum; no header is no feature", () => {
+    const g = new P0Gate(undefined, { P0_REQUIRE_FEATURES: ' save_v7 ', P0_UPDATE_URL: 'https://example.test/p0.apk' });
+    const refused = { status: 426, body: { ok: false, code: 'update_required', url: 'https://example.test/p0.apk' } };
+    expect(g.state()).toMatchObject({ features: ['save_v7'], features_on: true, update_on: false });
+    expect(g.check({})).toEqual(refused);                                                       // a build from before features
+    expect(g.check({ 'x-p0-features': 'choose_home,guide_v3,locals' })).toEqual(refused);       // 0.2.x before the wipe
+    expect(g.check({ 'x-p0-features': 'choose_home,guide_v3,locals,save_v7' })).toBeNull();     // 397's
+    expect(g.check({ 'x-p0-features': 'choose_home, save_v7 ,locals' })).toBeNull();
+    expect(g.check({ 'x-p0-features': ['choose_home', 'save_v7'] as unknown as string })).toBeNull();
+    expect(g.check({ 'x-p0-features': 'save_v70' })).toEqual(refused);                         // a name, not a prefix
+  });
+
+  it('no download url, the features are not enforced either: the start-up warns instead (as the minimum)', () => {
+    const g = new P0Gate(undefined, { P0_REQUIRE_FEATURES: 'save_v7' });
+    expect(g.state()).toMatchObject({ features: ['save_v7'], features_on: false });
+    expect(g.check({})).toBeNull();
   });
 
   it('503 while in maintenance, back_at in UTC ISO to the second, absent when unknown', () => {
@@ -82,7 +101,8 @@ describe('the gate rules', () => {
     g.setMinVersion(7, 'https://example.test/new.apk');
     expect(JSON.parse(readFileSync(file, 'utf8'))).toMatchObject({ maintenance: { on: true, back_at: '2026-10-09T06:30:00Z' }, min_version: 7 });
     const again = new P0Gate(file, { P0_MIN_VERSION: '3' });
-    expect(again.state()).toEqual({ maintenance: { on: true, back_at: '2026-10-09T06:30:00Z' }, min_version: 7, update_url: 'https://example.test/new.apk', update_on: true });
+    expect(again.state()).toEqual({ maintenance: { on: true, back_at: '2026-10-09T06:30:00Z' }, min_version: 7, update_url: 'https://example.test/new.apk', update_on: true,
+      features: [], features_on: false });
     again.setMinVersion(1);
     expect(again.state().min_version).toBe(3);                                // the environment's floor stays
     again.setMaintenance(false);
@@ -128,6 +148,19 @@ describe('the gated server', () => {
     expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers: H })).statusCode).toBe(200);
   });
 
+  it("refuses a request without save_v7 with 426 on every /v1/p0 route, presence too; the health check stays open (396 ①)", async () => {
+    const app = await server(new P0Gate(undefined, { P0_REQUIRE_FEATURES: 'save_v7', P0_UPDATE_URL: 'https://example.test/p0.apk' }));
+    const old = await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { ...H, 'x-p0-features': 'choose_home,guide_v3,locals' } });
+    expect(old.statusCode).toBe(426);
+    expect(old.json()).toEqual({ ok: false, code: 'update_required', url: 'https://example.test/p0.apk' });
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/presence', headers: H })).statusCode).toBe(426);
+    expect((await app.inject({ method: 'POST', url: '/v1/p0/commands', headers: H, payload: { type: 'noop' } })).statusCode).toBe(426);
+    const now = { ...H, 'x-p0-features': 'choose_home,guide_v3,locals,save_v7' };
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers: now })).statusCode).toBe(200);
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/presence', headers: now })).statusCode).toBe(200);
+    expect((await app.inject({ method: 'GET', url: '/v1/healthz' })).statusCode).toBe(200);
+  });
+
   it('refuses the outpost WebSocket upgrade with the same 503 / 426 and JSON body', async () => {
     const gate = new P0Gate(undefined, {});
     const app = await server(gate);
@@ -150,6 +183,22 @@ describe('the gated server', () => {
     expect(await attempt({ 'x-p0-player': 'gate-ws-player', 'x-p0-key': KEY, 'x-p0-version': '8' }))
       .toEqual({ status: 426, body: JSON.stringify({ ok: false, code: 'update_required', url: 'https://example.test/p0.apk' }) });
     expect(await attempt({ 'x-p0-player': 'gate-ws-player', 'x-p0-key': KEY, 'x-p0-version': '9' })).toBe('open');
+  });
+
+  it('refuses the outpost WebSocket upgrade without save_v7 with the same 426 (396 ①: P0Online sends the features, 397)', async () => {
+    const app = await server(new P0Gate(undefined, { P0_REQUIRE_FEATURES: 'save_v7', P0_UPDATE_URL: 'https://example.test/p0.apk' }));
+    await app.listen({ port: 0, host: '127.0.0.1' });
+    const port = (app.server.address() as { port: number }).port;
+    const attempt = (headers: Record<string, string>) => new Promise<number | 'open'>(resolve => {
+      const ws = new WebSocket(`ws://127.0.0.1:${port}/v1/p0/online`, { headers });
+      ws.once('open', () => { ws.close(); resolve('open'); });
+      ws.once('unexpected-response', (_req, res) => { res.resume(); resolve(res.statusCode ?? 0); });
+      ws.once('error', () => undefined);
+    });
+    const base = { 'x-p0-player': 'gate-ws-player', 'x-p0-key': KEY };
+    expect(await attempt(base)).toBe(426);
+    expect(await attempt({ ...base, 'x-p0-features': 'choose_home,locals' })).toBe(426);
+    expect(await attempt({ ...base, 'x-p0-features': 'choose_home,locals,save_v7' })).toBe('open');
   });
 });
 
@@ -174,7 +223,7 @@ describe('the admin routes', () => {
     expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: 2026100901, url: 'https://example.test/p0.apk' } })).json())
       .toMatchObject({ ok: true, min_version: 2026100901, update_url: 'https://example.test/p0.apk' });
     expect((await admin.inject({ method: 'GET', url: '/admin/gate', headers: A })).json()).toEqual({ ok: true, maintenance: { on: false }, min_version: 2026100901,
-      update_url: 'https://example.test/p0.apk', update_on: true, env: { min_version: 0, maintenance: false } });
+      update_url: 'https://example.test/p0.apk', update_on: true, features: [], features_on: false, env: { min_version: 0, maintenance: false } });
     expect(lines.map(l => JSON.parse(l).admin)).toEqual(['maintenance', 'maintenance', 'min_version']);
   });
 

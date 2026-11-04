@@ -85,6 +85,12 @@ export function storeMaterials(c: P0Content, s: P0State, now: number, events: P0
   events?.push({ kind: 'stored', items, reason });
 }
 
+/** A point's cooldown is kept only while it runs (SGODOT-396 ④): one gone by is the same as none — ready, as every
+ * reader takes a missing one — so the save does not grow with every point of every city the player ever gathered at. */
+export function pruneGather(s: P0State, now: number): void {
+  for (const [id, at] of Object.entries(s.gather.ready_at)) if (at <= now) delete s.gather.ready_at[id];
+}
+
 /** city_ready: the city points still cooling down, id → ms until ready (v4q(4); 亚瑟 on #659: in the view, which every
  * command brings back, not the city read, which the client keeps per city). The farm's spots left with v4q(4) ①. */
 export function gatherView(_c: P0Content, s: P0State, now: number) {
