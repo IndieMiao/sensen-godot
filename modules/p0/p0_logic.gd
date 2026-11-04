@@ -1723,7 +1723,8 @@ static func _today_rows(view: Dictionary) -> Array:
 ## other vein of the same main the client knows), one of the next three Homestead levels needs Iron Ore, and Homestead
 ## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. Kept when the
 ## Homestead row points at that very mine too (不知火舞 on #738, 405 e8fb3ea4: Pip's request, it goes by its own ends
-## only — v4q(9) ①'s dedupe retired with q(284)). Red dot `pip:vein:<id>`, once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
+## only — v4q(9) ①'s dedupe retired with q(284)). Red dot `pip:vein:<id>`, once a mine; the vein's pin icon. Down
+## that mine the row stays, without a button (P0Ui.show_label). {} for none.
 const VEIN_MAINS := ["iron_ore", "quartz"]
 const VEIN_UNTIL_LEVEL := 7
 const VEIN_FLOOR := 10
