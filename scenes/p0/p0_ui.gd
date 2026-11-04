@@ -3468,7 +3468,9 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
 		"line": text, "needs": [need] if kind != "" else [],
 		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
-		"reason": str(bar.get("request_reason", ""))}
+		# the bar's `Request · Requests 25/25` is the card's `Accept · Requests 25/25` (spec ③, T4)
+		"reason": P0Logic.track_full_reason(view_, "Accept") if P0Logic.is_track_full(str(bar.get("request_reason", ""))) \
+			else str(bar.get("request_reason", ""))}
 	data.merge(_request_rewards(view_, req, q))
 	return data
 

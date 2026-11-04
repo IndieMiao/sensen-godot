@@ -1611,16 +1611,24 @@ static func today_lines(view: Dictionary) -> Array:
 ## line and the push say those). No cap: the panel shows 5 and scrolls (UiTodayPanel), requests stop at 25 (track_max).
 ## {line, icon, go, state, tail} rows (LOCK-06 TodayRow); `go` is a camera-only Show target ("" hides Show, LOCK-08).
 ## One row with nothing to do (TODAY_EMPTY, no button) when there is no task.
-## `Requests 25/25` while the requests tracked are at track_max, else "" (spec ③): the greyed key's reason on every way to
-## take one — a board's Track, a resident's Request and Accept, a keeper's Accept. Pip's own requests are not counted.
-static func track_full_reason(view: Dictionary) -> String:
+## `<key> · Requests 25/25` while the requests tracked are at track_max, else "" (spec ③, T4): the greyed key's reason on
+## every way to take one, its own name kept ahead of it as `Fly · Need 30 Energy` (不知火舞 on #738) — a board's Track, a
+## resident's Request and Accept, a keeper's Accept. Pip's own requests are not counted.
+static func track_full_reason(view: Dictionary, key := "") -> String:
 	var cap := int(content().get("requests", {}).get("track_max", 0))
 	var n := PinReason.taken(view).size()   # the boards', the keepers' and the residents' taken, as the server's tracked()
-	return "Requests %d/%d" % [n, cap] if cap > 0 and n >= cap else ""
+	if cap <= 0 or n < cap: return ""
+	var why := "Requests %d/%d" % [n, cap]
+	return why if key == "" else "%s · %s" % [key, why]
+
+## A track-full reason, with its key's name or without (track_full_reason).
+static func is_track_full(reason: String) -> bool:
+	var last := reason.get_slice(" · ", reason.get_slice_count(" · ") - 1)
+	return last.begins_with("Requests ") and last.contains("/")
 
 ## The toast for a greyed key's tap: the track-full one says what to do (spec ③), any other its reason.
 static func blocked_toast(reason: String) -> String:
-	return TRACK_FULL_TOAST if reason.begins_with("Requests ") and reason.contains("/") else reason
+	return TRACK_FULL_TOAST if is_track_full(reason) else reason
 
 static func today_rows(view: Dictionary) -> Array:
 	return _today_rows(view)
@@ -1715,7 +1723,7 @@ static func _today_rows(view: Dictionary) -> Array:
 ## other vein of the same main the client knows), one of the next three Homestead levels needs Iron Ore, and Homestead
 ## is below Lv7 (user a): so at Lv5 and Lv6. Then the same for quartz; one row at a time, iron first. Kept when the
 ## Homestead row points at that very mine too (不知火舞 on #738, 405 e8fb3ea4: Pip's request, it goes by its own ends
-## only — v4q(9) ①'s dedupe retired with q(284)). Red dot `vein:<id>`, once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
+## only — v4q(9) ①'s dedupe retired with q(284)). Red dot `pip:vein:<id>`, once a mine; the vein's pin icon. Down that mine the row stays, without a button (P0Ui.show_label). {} for none.
 const VEIN_MAINS := ["iron_ore", "quartz"]
 const VEIN_UNTIL_LEVEL := 7
 const VEIN_FLOOR := 10
@@ -2003,7 +2011,7 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 	if state == "wait" and (next_in == null or float(next_in) <= 0.0): state = "open"   # no wait left to say (no cooldown since 0.2.18)
 	match state:
 		"open":
-			reason = track_full_reason(view)   # spec ③: tracking 25 already
+			reason = track_full_reason(view, label)   # spec ③: tracking 25 already, `Request · Requests 25/25`
 			if reason == "": cmd = {"type": "accept", "request": str(req.id)}
 		"accepted":
 			label = "Deliver"

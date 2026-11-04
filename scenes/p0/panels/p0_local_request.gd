@@ -69,7 +69,7 @@ static func card_data(view: Dictionary, r: Dictionary) -> Dictionary:
 	var tracked := str(r.get("status", "")) == "accepted"
 	# LOCK-10: a tracked one still short shows its gap on the button, here or away (不知火舞 on 378: no new line away)
 	var reason := P0Locals.gap_text(view, r) if tracked and not bool(r.get("ready", false)) else ""
-	if not tracked: reason = P0Logic.track_full_reason(view)   # spec ③: tracking 25 already, `Accept · Requests 25/25`
+	if not tracked: reason = P0Logic.track_full_reason(view, "Accept")   # spec ③: tracking 25 already, `Accept · Requests 25/25`
 	var data := {"portrait": P0Locals.portrait(r),
 		"title": str(r.get("title", "")), "who": P0Locals.who(r), "line": P0Locals.line(r), "needs": needs,
 		"deliver_to": P0Locals.deliver_to(r), "action": "Deliver" if tracked else "Accept", "reason": reason, "item": item}
