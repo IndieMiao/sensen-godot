@@ -402,7 +402,7 @@ func test_the_rows_keys_keep_their_44_touch_row_in_the_drawer() -> void:
 		assert_float(top + sb.visual_height).is_less(row.size.y - UiTokens.STROKE_DEFAULT)   # 55, above the hairline
 
 ## SGODOT-300: a generated city's keeper has no painted art; the greeting card and the counter's keeper bar get a
-## portrait drawn from the keeper's look preset (blank until drawn: headless tests draw nothing). The four painted
+## portrait drawn from the keeper's look preset (blank until drawn: headless tests draw nothing). The five painted
 ## P0 keepers keep their art.
 func test_keeper_portraits_fall_back_to_the_look() -> void:
 	var painted := P0CounterDrawer.keeper_portrait("Mei", true, "market_temperate_0")
@@ -416,10 +416,30 @@ func test_keeper_portraits_fall_back_to_the_look() -> void:
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")).is_same(card)   # drawn once
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "")).is_null()   # no look, no art: as before
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "no_such_look")).is_null()
-	# Lou (SGODOT-351) has no painted card and no look preset: drawn in his outpost_npcs.json outfit
-	var lou := P0CounterDrawer.keeper_portrait("Lou", true)
-	assert_bool(lou is ImageTexture).is_true()
-	assert_object(P0CounterDrawer.keeper_portrait("Lou", true, "")).is_same(lou)
+
+## SGODOT-357: merge with the painted Lou assets; a missing import must not silently revert to the 3D placeholder.
+func test_lou_uses_the_painted_card_and_head_instead_of_runtime_rendering() -> void:
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	var queued := (portraits._queue as Array).size()
+	for card in [true, false]:
+		var path := "res://assets/p0/art/keepers/lou_%s.jpg" % ("card" if card else "head")
+		var texture := P0CounterDrawer.keeper_portrait("Lou", card, "npc:lou")
+		assert_object(texture).is_not_null()
+		if texture == null: continue
+		assert_str(texture.resource_path).is_equal(path)
+		assert_vector(Vector2(texture.get_size())).is_equal(Vector2(300, 660) if card else Vector2(132, 132))
+		assert_object(P0CounterDrawer.keeper_portrait("Lou", card)).is_same(texture)
+	assert_int((portraits._queue as Array).size()).is_equal(queued)
+
+func test_lou_greeting_shows_the_painted_card() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.open_keeper_greeting("casino", {"keeper": "Lou", "place": "Barbary Card Room"})
+	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	assert_object(card.portrait).is_not_null()
+	if card.portrait != null:
+		assert_str(card.portrait.resource_path).is_equal("res://assets/p0/art/keepers/lou_card.jpg")
 
 func test_greeting_card_and_keeper_bar_take_the_keepers_look() -> void:
 	var ui := _ui()
