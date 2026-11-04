@@ -197,15 +197,18 @@ func stops(tether: float) -> Array[Vector2i]:
 	return out
 
 ## The next stop, HOP_M from where he is, CLEAR_M off the player, not the last one, and a way to it over stop cells only
-## (never across a bed); none: he stands another while.
+## (never across a bed); none: he stands another while. With his `!` the tether (2 cells, 1.3 m) is under HOP_M's 1.5 m:
+## the shortest hop is the tether then, or he would never leave STAND.
 func _pick_stop(info: Dictionary, player: Vector3) -> void:
-	var cells := stops(TETHER_BANG if bool(info.get("bang", false)) else TETHER)
+	var tether := TETHER_BANG if bool(info.get("bang", false)) else TETHER
+	var cells := stops(tether)
 	var here: Vector2i = farm.bp.world_to_cell(pip_root.position)
+	var shortest := minf(HOP_M.x, tether * farm.bp.cell_m)
 	var options: Array[Vector2i] = []
 	for c in cells:
 		var at: Vector3 = farm.bp.cell_to_world(c)
 		var hop := P0FarmMaterials.flat(at, pip_root.position)
-		if c == _last_stop or c == here or hop < HOP_M.x or hop > HOP_M.y: continue
+		if c == _last_stop or c == here or hop < shortest - 0.001 or hop > HOP_M.y: continue
 		if P0FarmMaterials.flat(at, player) < CLEAR_M: continue
 		options.append(c)
 	_stop_left = rng.randf_range(STOP_S.x, STOP_S.y)

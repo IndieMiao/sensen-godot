@@ -86,14 +86,19 @@ func test_he_strolls_from_stop_to_stop_never_onto_a_bed_at_a_walk() -> void:
 	assert_int(visited.size()).is_greater_equal(4)   # 60 s: stops of 3–6 s and the walks between
 	assert_float(fastest).is_less_equal(FarmGuide.WALK_SPEED * 1.01)
 
-func test_with_his_bang_he_keeps_within_two_cells() -> void:
+## With his `!` he keeps within two cells — and still strolls: the shortest hop is the tether then (the spec's 1.5 m is
+## over a 2-cell tether's 1.3 m; a first cut stood him at STAND for good).
+func test_with_his_bang_he_keeps_within_two_cells_and_still_strolls() -> void:
 	var host := _host()
 	_far(host)
 	var g = _pip(host)
+	var visited := {}
 	for i in int(40.0 / DT):
 		g._wander({bang = true}, DT)
 		var cell: Vector2i = host.bp.world_to_cell(g.pip_root.position)
 		assert_float(Vector2(cell - FarmGuide.STAND).length()).is_less_equal(FarmGuide.TETHER_BANG)
+		if g._route.is_empty(): visited[cell] = true
+	assert_int(visited.size()).is_greater_equal(3)
 
 ## A talk stops him where he is — mid-walk too — turned to the player; RESUME_S after it closes he walks on.
 func test_a_talk_stops_him_turned_to_the_player_and_he_walks_on_after_it() -> void:

@@ -1288,6 +1288,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_sync_t = 9999.0
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
+		"pip":   # a tap on the guide's Pip where he is now (SGODOT-411 shots: he stops and turns to the player)
+			if _guide != null and _guide.pip_root != null: p0_tap(cam.unproject_position(_guide.pip_root.to_global(Vector3(0, 0.8, 0))))
+		"topip":   # walk straight toward where Pip is now (SGODOT-411 shots: near him he stands and turns)
+			if _guide != null and _guide.pip_root != null: _dev_aim = _guide.pip_root.position
 		"chefsign": p0_tap(cam.unproject_position(_chef_sign + CHEF_SIGN_HIT))   # the Chef's Sign's card (282 shots)
 		"noticetap": p0_tap(cam.unproject_position(_notice + NOTICE_HIT))   # the Notice Board through its own tap (q(164) shots)
 		"chefsignprobe":   # where the Chef's Sign and its neighbours are on screen (282 shots: placement by numbers)
