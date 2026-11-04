@@ -69,6 +69,21 @@ func test_heat_preview_matches_the_server_window() -> void:
 	assert_bool(P0Logic.heat_hit(h, 2500 + 0.5 * 1600 - 140)).is_true()
 	assert_bool(P0Logic.heat_hit(h, 2500 + 0.5 * 1600 - 200)).is_false()
 
+## SGODOT-419: a turning ring (`turn` laps of it a needle lap; + with the needle). The needle gains k = 1 − turn laps a
+## lap, so the gold's window in time is its share ÷ k; without `turn` the window is as before (k = 1).
+func test_a_turning_rings_window_is_its_gold_over_k() -> void:
+	var h := {"at": 2500, "spin": 1600, "gold": 0.4, "width": 0.2, "turn": 0.2}   # k 0.8: gold 800–1200 ms in
+	assert_float(P0Logic.heat_k(h)).is_equal_approx(0.8, 0.0001)
+	assert_bool(P0Logic.heat_hit(h, 2500 + 1000, 0.0)).is_true()
+	assert_bool(P0Logic.heat_hit(h, 2500 + 0.4 * 1600 + 10, 0.0)).is_false()   # a still ring's gold, not this one's
+	assert_bool(P0Logic.heat_hit(h, 2500 + 790, 0.0)).is_false()
+	assert_bool(P0Logic.heat_hit(h, 2500 + 1199, 0.0)).is_true()
+	h.turn = -0.25   # against the needle: k 1.25, the gold comes sooner — 512–832 ms in
+	assert_bool(P0Logic.heat_hit(h, 2500 + 520, 0.0)).is_true()
+	assert_bool(P0Logic.heat_hit(h, 2500 + 840, 0.0)).is_false()
+	h.erase("turn")
+	assert_float(P0Logic.heat_k(h)).is_equal(1.0)
+
 func test_quick_bar_holds_bait_at_the_pond() -> void:
 	var v := _view()
 	assert_that(P0Logic.quick_bar(v, [], "fish")).is_equal(["bait_worm"])

@@ -816,7 +816,7 @@ func _process(_dt: float) -> void:
 	var active := -1
 	for i in heats.size():
 		var h: Dictionary = heats[i]
-		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin): _judge_tap()
+		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin) / P0Logic.heat_k(h): _judge_tap()
 		if not _judged.has(i) and e > float(h.at) + float(h.spin):
 			_judged[i] = false
 			_judged_turn[i] = 1.0   # the needle went round untouched: its dot where it stopped
@@ -830,6 +830,7 @@ func _process(_dt: float) -> void:
 			_ring.width = float(h.width)
 			_ring.grow = clampf(1.0 - (float(h.at) - e) / RING_EARLY_MS, 0.0, 1.0)
 			_ring.turn = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
+			_ring.ring = float(h.get("turn", 0.0)) * minf(float(_judged_turn.get(active, _ring.turn)), _ring.turn)   # stops with the needle once judged (419)
 			_ring.result = (1 if _judged[active] else 0) if _judged.has(active) else -1
 			_ring.mark_turn = float(_judged_turn.get(active, -1.0))
 			_ring.position = _ring_center() - _ring.size * 0.5

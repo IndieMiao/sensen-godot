@@ -7,6 +7,7 @@ extends Control
 ## needle was when it was judged (`mark_turn`, 0–1 like `turn`; -1 = where it is now), not at a fixed spot (用户 int10c,
 ## SGODOT-256 ⑩), and the needle stops on it until the ring folds away (不知火舞 on #131): a hit is gold-deep, a miss
 ## the disabled ink, both with a 2 px surface edge, the track's width + 6 across.
+## `ring` (SGODOT-419): the laps the ring itself has turned, its gold zone with it (the needle's 12 o'clock does not move).
 ## Display only: the whole pot takes the tap.
 
 const _SIDE := 120.0
@@ -24,6 +25,7 @@ var turn := 0.0: set = set_turn
 var grow := 1.0: set = set_grow
 var result := -1: set = set_result
 var mark_turn := -1.0: set = set_mark_turn
+var ring := 0.0: set = set_ring
 
 func _init() -> void:
 	custom_minimum_size = Vector2(_SIDE, _SIDE)
@@ -39,6 +41,7 @@ func set_grow(v: float) -> void:
 	scale = Vector2.ONE * lerpf(0.4, 1.0, grow)
 func set_result(v: int) -> void: result = v; queue_redraw()
 func set_mark_turn(v: float) -> void: mark_turn = v; queue_redraw()
+func set_ring(v: float) -> void: ring = v; queue_redraw()
 
 ## Where the needle points (0–1): on its dot once the ring is judged, else turning.
 func needle_turn() -> float:
@@ -54,7 +57,7 @@ func _draw() -> void:
 	var c := Vector2(_SIDE, _SIDE) * 0.5
 	var r := _OUTER - _TRACK * 0.5
 	draw_arc(c, r, 0.0, TAU, _SEGMENTS, UiTokens.COLOR_BORDER, _TRACK, true)
-	var g0 := -PI * 0.5 + TAU * gold
+	var g0 := -PI * 0.5 + TAU * (gold + ring)
 	draw_arc(c, r, g0, g0 + TAU * width, _SEGMENTS, UiTokens.COLOR_GOLD, _TRACK, true)
 	var ang := -PI * 0.5 + TAU * needle_turn()
 	var dir := Vector2(cos(ang), sin(ang))
