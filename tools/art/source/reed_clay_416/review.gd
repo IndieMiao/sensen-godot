@@ -80,21 +80,12 @@ func validate_asset(node,name,limit,height_min,height_max):
 	check(cfg.get_value("params","meshes/light_baking")==1 and cfg.get_value("params","meshes/ensure_tangents")==true and cfg.get_value("params","meshes/generate_lods")==true,name+": sign-compatible importer")
 	check(str(cfg.get_value("remap","uid","")).begins_with("uid://"),name+": import UID")
 func run():
-	output=ProjectSettings.globalize_path("res://../captures");DirAccess.make_dir_recursive_absolute(output)
+	output=ProjectSettings.globalize_path("res://../captures-v11");DirAccess.make_dir_recursive_absolute(output)
 	vp=SubViewport.new();vp.size=Vector2i(360,800);vp.own_world_3d=true;vp.msaa_3d=Viewport.MSAA_4X
 	vp.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(vp)
 	runtime=P0Runtime.new();P0Runtime._instance=runtime
 	runtime.session.transport=func(method,path,_body,meta):report.intercepted_requests.append({"method":method,"path":path,"type":meta.get("type","")})
 	vp.add_child(runtime);runtime.set_process(false);runtime.session.set_process(false)
-	await load_pond("pond_san_francisco_03")
-	pond.actor.teleport(Vector3(.88,0,-6.62));pond.actor.set_process(false);pond.actor.set_physics_process(false)
-	pond._opening=false;pond.p0_recenter();pond._update_camera()
-	var reed=pond.get_node("Scenery/ReedBank")
-	validate_asset(reed,"reed_bank",1.4,.8,1)
-	check(reed.position.is_equal_approx(Vector3(-.3,0,-6.6)),"Reed occupies L1 (-.3, -6.6)")
-	check(pond.actor.position.is_equal_approx(Vector3(.88,0,-6.62)),"Reed player at supplied L1 stand (.88, -6.62)")
-	check(absf(pond.cam.rotation_degrees.x+43)<.001,"Reed native 43-degree camera")
-	await capture("reed_L1_43deg",reed)
 	await load_pond("pond_san_francisco_01")
 	check(pond._opening and not pond._parked,"Clay uses untouched native opening camera")
 	check(pond.actor.position.is_equal_approx(Vector3(6.125,0,-1.625)),"Clay uses original spawn")

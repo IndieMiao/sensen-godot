@@ -139,10 +139,14 @@ def clay():
     return {'clay_blocks':2,'footprint_limit_m':[1.2,1.2],'height_limit_m':.5,
             'placement':'F2 (7.6, -1.4); verify >=12px clearance to the switch outer ring',
             'shallow_pit':'Interior at .008m, rim .065m; no negative vertices or terrain shader changes',
-            'clay_palette_note':'Ochre orange-brown; separated from fish-trap coral #E07A5F and dark farm soil'}
+            'clay_palette_note':'Muted red-ochre; HSV saturation reduced 17.7–18.6%, value reduced 8.7–9.2% from v1. Wood and grass unchanged.'}
 
 def export_asset(name,builder):
     global PARTS,MATS,PIVOT
+    original_colors=dict(COLORS)
+    if name=='clay_pit':
+        patch=json.loads((SRC/'clay_palette_v11.json').read_text())
+        COLORS.update({role:colors['after'] for role,colors in patch['changes'].items()})
     bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
     PARTS=[];MATS={};PIVOT=bpy.data.objects.new(name+' / bottom-centre pivot',None);bpy.context.scene.collection.objects.link(PIVOT)
     PIVOT['task']='SGODOT-416';PIVOT['author']='黄忠';meta=builder();bpy.context.view_layer.update()
@@ -185,17 +189,21 @@ def export_asset(name,builder):
         export_normals=True,export_texcoords=False,export_animations=False,export_cameras=False,export_lights=False)
     coords=[(p.co.x,p.co.z,-p.co.y) for p in body.data.vertices]
     lo=[min(p[i] for p in coords) for i in range(3)];hi=[max(p[i] for p in coords) for i in range(3)]
-    result={'task':'SGODOT-416','revision':'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
+    result={'task':'SGODOT-416','revision':'v1.1' if name=='clay_pit' else 'v1','author':'黄忠','virtual_user_id':'5281cd25-6a49-4df8-9802-f3e534956e80',
         'generator':'tools/art/source/reed_clay_416/build.py','source':f'tools/art/source/reed_clay_416/{name}.blend',
         'triangles':tri,'triangle_limit':900,'surfaces':1,'bytes':path.stat().st_size,'mesh':name+'_mobile',
         'bounds':[lo,hi],'bounds_blender':[[lo[0],-hi[2],lo[1]],[hi[0],-lo[2],hi[1]]],
         'dimensions_xyz':[hi[i]-lo[i] for i in range(3)],'origin':'bottom footprint centre; Y up, +Z front; metres',
         'material':'Farm vertex paint / FarmArt.material(), linear vertex colour, matte .9, no textures',
-        'palette_srgb':COLORS,'source_parts_triangles':parts_stats,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),**meta}
+        'palette_srgb':dict(COLORS),'source_parts_triangles':parts_stats,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),**meta}
     bpy.context.window.scene=source;bpy.data.scenes.remove(exp)
+    COLORS.clear();COLORS.update(original_colors)
     print('ASSET_READY',name,tri,lo,hi,flush=True);return result
 
 bpy.context.preferences.filepaths.save_version=0
 manifest=KIT/'manifest.json';content=json.loads(manifest.read_text())
-for name,build in [('reed_bank',reed),('clay_pit',clay)]:content['assets'][name]=export_asset(name,build)
+import sys
+selection=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+for name,build in [('reed_bank',reed),('clay_pit',clay)]:
+    if not selection or name in selection:content['assets'][name]=export_asset(name,build)
 manifest.write_text(json.dumps(content,ensure_ascii=False,indent=2)+'\n')

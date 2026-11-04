@@ -1860,7 +1860,7 @@
     },
     "clay_pit": {
       "task": "SGODOT-416",
-      "revision": "v1",
+      "revision": "v1.1",
       "author": "黄忠",
       "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
       "generator": "tools/art/source/reed_clay_416/build.py",
@@ -1913,10 +1913,10 @@
         "pebble": "ADA68B",
         "grass": "A4BC5E",
         "grass_edge": "8CA149",
-        "clay": "C48A4D",
-        "clay_light": "D5A063",
-        "clay_shade": "AC713E",
-        "pit_wall": "98663D",
+        "clay": "B27A5A",
+        "clay_light": "C28D6D",
+        "clay_shade": "9D674B",
+        "pit_wall": "8A5D46",
         "wood": "BD935A",
         "wood_light": "D3AC73",
         "spade": "A49C85"
@@ -1931,7 +1931,7 @@
         "Slender wooden spade shaft": 20,
         "Open wooden spade grip": 64
       },
-      "sha256": "f37eec466172273161f34bff9953074a2a19d4bac2aa71c5b1bbc1db1843b09b",
+      "sha256": "be7fc431e2cb9dfadcfbbce01380b4a5052e4bc0511d689cbf0b8414fabf463f",
       "clay_blocks": 2,
       "footprint_limit_m": [
         1.2,
@@ -1940,7 +1940,7 @@
       "height_limit_m": 0.5,
       "placement": "F2 (7.6, -1.4); verify >=12px clearance to the switch outer ring",
       "shallow_pit": "Interior at .008m, rim .065m; no negative vertices or terrain shader changes",
-      "clay_palette_note": "Ochre orange-brown; separated from fish-trap coral #E07A5F and dark farm soil"
+      "clay_palette_note": "Muted red-ochre; HSV saturation reduced 17.7–18.6%, value reduced 8.7–9.2% from v1. Wood and grass unchanged."
     }
   }
 }

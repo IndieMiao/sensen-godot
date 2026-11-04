@@ -1,5 +1,9 @@
 # SGODOT-416 芦苇滩 / 黏土坑 A 款
 
+当前黏土颜色为 v1.1，芦苇仍为通过的 v1。色表见 `clay_palette_v11.json`。
+`recolor_clay.py` 的普通 Python 路径只改现有 GLB 的指定 RGB 字节和 manifest 颜色 / SHA；
+Blender 路径只改 clay_pit.blend 的四种源材质颜色。木铲、草边和几何不变。
+
 【黄忠】Plane `5281cd25-6a49-4df8-9802-f3e534956e80`。
 按上官婉儿派活、不知火舞 `e061cf13` 定的 A / A 制作。
 `reference/` 保留所给单张设定、clay.svg、槽位和临时摆件 / 旧件代码。
@@ -23,18 +27,22 @@
 
 ```bash
 source ~/.codex-huangzhong/env.sh
-blender --background --factory-startup --threads 3 --python "$PWD/tools/art/source/reed_clay_416/build.py"
+python3 tools/art/source/reed_clay_416/recolor_clay.py
+blender --background --threads 3 --python "$PWD/tools/art/source/reed_clay_416/recolor_clay.py"
 python3 tools/art/source/reed_clay_416/prepare_review.py
 SENSEN_OFFLINE=1 godot --headless --path output/reed-clay-416/project --editor --import
 SENSEN_OFFLINE=1 godot --headless --path output/reed-clay-416/project --script res://configure_imports.gd -- "$PWD"
 output/art-setup/venv/bin/python tools/art/source/reed_clay_416/verify.py
+output/art-setup/venv/bin/python tools/art/source/reed_clay_416/verify_color_v11.py
 blender --background --threads 3 --python "$PWD/tools/art/source/reed_clay_416/verify_source.py"
 nvidia-smi
-SENSEN_OFFLINE=1 godot --path output/reed-clay-416/project --rendering-method mobile --rendering-driver vulkan
-output/art-setup/venv/bin/python tools/art/source/reed_clay_416/package_review.py
+SENSEN_OFFLINE=1 godot --path output/reed-clay-416/project --rendering-method mobile --rendering-driver vulkan > output/reed-clay-416/render-v11.log 2>&1
+output/art-setup/venv/bin/python tools/art/source/reed_clay_416/package_review_v11.py
 ```
 
 先确认 GPU 空闲再渲染；脚本拍完自动退出。所有暂存源、缓存、日志和原始截图在 `output/reed-clay-416/`。
+本轮只拍 F2 和七件并排，原始图写入 `captures-v11/`，渲染日志保存为 `render-v11.log`。
+需要完整重建黏土时运行 `build.py -- clay_pit`（Blender 的 `--` 后参数），该路径也读取 v1.1 色表。
 
 隔离审阅从 b1 `67116c6d` 导出，采用提供的 `pond_scenery.mock2.gd` 和本地 zz_slots.json 临时替换工厂：
 芦苇放 Fern Pond L1 `(-0.3,-6.6)`，人物移到 stand `(0.88,-6.62)`，用原生 p0_recenter / 默认 43°；

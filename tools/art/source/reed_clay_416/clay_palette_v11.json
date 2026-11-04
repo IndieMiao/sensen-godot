@@ -1,0 +1,10 @@
+{
+  "baseline": "10bf406e1f64f9f701f367cffe3b1344f351c6ea",
+  "revision": "v1.1",
+  "changes": {
+    "clay": {"before": "C48A4D", "after": "B27A5A"},
+    "clay_light": {"before": "D5A063", "after": "C28D6D"},
+    "clay_shade": {"before": "AC713E", "after": "9D674B"},
+    "pit_wall": {"before": "98663D", "after": "8A5D46"}
+  }
+}
