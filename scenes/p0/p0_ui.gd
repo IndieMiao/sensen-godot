@@ -4607,8 +4607,8 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	return sheet
 
 # ---------------------------------------------------------------- voice (SGODOT-383, q(274); 不知火舞's spec 383 6d206dfb)
-## The room's voice, from the world (an outpost's or a pond's P0VoiceRoom; null with none — the map, the farm, Market
-## Square still has one with here = false). P0Runtime hands it over every frame; the keys follow its `changed`.
+## The room's voice, from the world (an outpost's or a pond's P0VoiceRoom, Market Square's too since q(286); null with
+## none — the map, the farm, a POI's room). P0Runtime hands it over every frame; the keys follow its `changed`.
 const VoiceKeys := preload("res://scenes/p0/panels/p0_voice_keys.gd")
 const PeopleDrawer := preload("res://scenes/p0/panels/p0_people_drawer.gd")
 const AgeCard := preload("res://scenes/p0/panels/p0_age_card.gd")

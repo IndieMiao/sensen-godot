@@ -8,6 +8,9 @@ extends UiDrawer
 ## keys (Block asks first, Unblock does not) and calls refresh with the room's new rows.
 ## As 安其拉's V3 has it (383 50108c43, Figma row 124): the keys are plain text keys (the compact navigation look, no
 ## chevron), a 1 px line under the title and between rows, and `Close` under the last row — no ✕ over the drawer.
+## q(286) (Market Square's voice, SGODOT-415; 不知火舞's M1-b 476:195818, 302 3085a574): a title too long for its row
+## breaks at its ` · ` into two lines (`Mission Market Square` / `Layer 1`), `Mute all` at the first; the rows scroll as
+## Today's do — a 16 px fade at an edge with rows past it, a 3 px bar at the right while they overflow.
 
 signal mute_pressed(peer: int, on: bool)
 signal mute_all_pressed(on: bool)
@@ -17,6 +20,10 @@ signal report_pressed(peer: int)
 const HEIGHT := 447.0      # the titles drawer's most (MAP-8)
 const ROW_H := 44.0       # a touch high, and the line under it
 const _CHROME := 154.0    # handle, title row, its line, Close
+const _CHROME_2 := 173.0  # … the title in two lines (q(286))
+const _FADE := 16.0       # Today's (UiTodayPanel): the fade at an edge with rows past it
+const _BAR_W := 3.0       # … and its bar, 4 px in from the drawer's edge
+const _BAR_INSET := 4.0
 const DOT := 8.0
 const EMPTY := "No one else here"
 
@@ -26,32 +33,55 @@ var close: UiNavButton
 var list: VBoxContainer
 var rows: Array = []
 var _scroll: TouchScrollContainer
+var _held: Control          # the scroll and, over it, its fades and bar
+var _fade_top: TextureRect
+var _fade_bottom: TextureRect
+var _bar: Panel
+var _raw_title := ""
+var _two := false           # the title in two lines
 
 func _init(title_: String = "", rows_: Array = []) -> void:
 	super(height_for(rows_.size()))
 	pad = UiTokens.SPACE_PAGE
 	var head := HBoxContainer.new()
 	head.name = "Head"
+	_raw_title = title_
 	title = UiKit.label(title_, UiTokens.STYLE_TITLE_XB20)
 	title.name = "Title"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title.clip_text = true
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART   # two lines at its ` · ` (_fit_title), never cut
+	title.resized.connect(_fit_title)
 	head.add_child(title)
 	all_key = _key("Mute all")
 	all_key.name = "MuteAll"
+	all_key.size_flags_vertical = Control.SIZE_SHRINK_BEGIN   # at the title's first line
 	all_key.pressed.connect(func(): mute_all_pressed.emit(not _all_muted()))
 	head.add_child(all_key)
 	body.add_child(head)
 	body.add_child(_line())
+	_held = Control.new()
+	_held.name = "Rows"
+	body.add_child(_held)   # as tall as its rows (refresh), Close right under them
 	_scroll = TouchScrollContainer.new()
 	_scroll.name = "Scroll"
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(_scroll)   # as tall as its rows (refresh), Close right under them
+	_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_held.add_child(_scroll)
+	_fade_top = _fade(true)
+	_fade_bottom = _fade(false)
+	_bar = Panel.new()
+	_bar.name = "Bar"
+	_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bar.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_BORDER, _BAR_W * 0.5))
+	_held.add_child(_bar)
+	_scroll.get_v_scroll_bar().value_changed.connect(func(_v): _mark())
+	_held.resized.connect(_mark)
 	list = VBoxContainer.new()
 	list.name = "People"
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override(&"separation", 0)
 	_scroll.add_child(list)
+	list.resized.connect(_mark)
 	close = _key("Close")
 	close.name = "Close"
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -63,8 +93,9 @@ func _init(title_: String = "", rows_: Array = []) -> void:
 	body.add_child(rest)
 	refresh(rows_)
 
-static func height_for(n: int) -> float:
-	return minf(HEIGHT, _CHROME + maxi(1, n) * (ROW_H + 1.0))
+## The drawer for n rows, the title in one line or two (q(286): 173 then, the rows' most 447 − 173 = 274).
+static func height_for(n: int, two_lines := false) -> float:
+	return minf(HEIGHT, (_CHROME_2 if two_lines else _CHROME) + maxi(1, n) * (ROW_H + 1.0))
 
 ## The rows again (the room's `changed`): rebuilt, the drawer as tall as they need.
 func refresh(rows_: Array) -> void:
@@ -83,8 +114,60 @@ func refresh(rows_: Array) -> void:
 		list.add_child(_row(r))
 	all_key.visible = not rows.is_empty()
 	all_key.label = "Unmute all" if _all_muted() else "Mute all"
-	height = height_for(rows.size())
-	_scroll.custom_minimum_size.y = minf(HEIGHT - _CHROME, maxi(1, rows.size()) * (ROW_H + 1.0) - 1.0)
+	_size_rows()
+
+## The drawer and its rows as tall as the rows need, under the title as it is broken now.
+func _size_rows() -> void:
+	height = height_for(rows.size(), _two)
+	_held.custom_minimum_size.y = minf(HEIGHT - (_CHROME_2 if _two else _CHROME), maxi(1, rows.size()) * (ROW_H + 1.0) - 1.0)
+
+## The title in one line when it fits the room left of `Mute all`, else in two at a ` · ` (UiKit.break_at_dot, its dot
+## dropped); the drawer follows (_CHROME_2).
+func _fit_title() -> void:
+	if title.size.x <= 0.0: return
+	var text := UiKit.break_at_dot(_raw_title, title.get_theme_font(&"font"), title.get_theme_font_size(&"font_size"), title.size.x)
+	if text != title.text: title.text = text
+	var two := text.contains("\n")
+	if two != _two:
+		_two = two
+		_size_rows()
+
+## Rows past the top or the bottom: that edge fades; the bar shows, while they overflow, where the view is (UiTodayPanel).
+func _mark() -> void:
+	if not is_instance_valid(_bar): return
+	var view_h := _held.size.y
+	var list_h := list.size.y
+	var at := float(_scroll.scroll_vertical)
+	var scrolls := list_h > view_h + 0.5
+	_fade_top.visible = scrolls and at > 0.5
+	_fade_bottom.visible = scrolls and at < list_h - view_h - 0.5
+	_bar.visible = scrolls
+	for f in [_fade_top, _fade_bottom]: (f as TextureRect).size = Vector2(_held.size.x, _FADE)
+	_fade_top.position = Vector2.ZERO
+	_fade_bottom.position = Vector2(0.0, view_h - _FADE)
+	if scrolls:
+		var h := maxf(12.0, view_h * view_h / list_h)
+		_bar.size = Vector2(_BAR_W, h)
+		# out in the right padding, 4 px in from the drawer's edge (its border's), as Today's
+		_bar.position = Vector2(_held.size.x + pad - UiTokens.STROKE_DEFAULT - _BAR_INSET - _BAR_W, (view_h - h) * at / maxf(1.0, list_h - view_h))
+
+func _fade(top: bool) -> TextureRect:
+	var g := Gradient.new()
+	g.set_color(0, UiTokens.COLOR_SURFACE)
+	g.set_color(1, Color(UiTokens.COLOR_SURFACE, 0.0))
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill_from = Vector2(0, 0) if top else Vector2(0, 1)
+	tex.fill_to = Vector2(0, 1) if top else Vector2(0, 0)
+	var r := TextureRect.new()
+	r.name = "FadeTop" if top else "FadeBottom"
+	r.texture = tex
+	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r.stretch_mode = TextureRect.STRETCH_SCALE
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.visible = false
+	_held.add_child(r)
+	return r
 
 ## Everyone not blocked is muted (Unmute all then); with nobody to mute it stays Mute all.
 func _all_muted() -> bool:

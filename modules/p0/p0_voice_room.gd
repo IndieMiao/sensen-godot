@@ -21,17 +21,17 @@ var session: P0Session
 var online: P0Online
 var available := false   # the server has voice (P0_VOICE) and this phone can do it (Voice.supported())
 var age := "unknown"     # "ok" / "no" / "unknown", the server's
-var here := true         # this room has voice (not Market Square: the user, 11-02)
+var here := true         # this room has voice: every outpost room and pond, Market Square too since q(286) (SGODOT-415)
 var voice: Node          # the Voice autoload (tests give their own)
 ## Tests replace the HTTP call: request.call(method, path, body) -> {ok, json}, awaited.
 var request := Callable()
 var _mutes: Array = []   # public handles muted on this phone
 var _room := -1
 
-func setup(p_session: P0Session, p_online: P0Online, role: String) -> void:
+## `_role`: the room's (P0Outpost.role); none is left without voice since q(286) opened Market Square's (SGODOT-415).
+func setup(p_session: P0Session, p_online: P0Online, _role: String) -> void:
 	session = p_session
 	online = p_online
-	here = role != "market"
 	if voice == null: voice = get_node_or_null("/root/Voice")
 	_mutes = _load_mutes()
 	_room = online.room if online.epoch > 0 else -1   # joined already (the HUD comes after the room's first join)
