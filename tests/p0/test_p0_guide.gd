@@ -313,6 +313,9 @@ func test_q58_plurals() -> void:
 		assert_str(P0Logic.plural(pair[0])).is_equal(pair[1])
 	assert_str(P0Logic.crop_plural("Chili", 12)).is_equal("chilies")
 	assert_str(P0Logic.crop_plural("Lettuce", 10)).is_equal("lettuce")
+	# a name already plural (李白 on b1: `harvest 9 grapeses`); Citrus takes -es as English does
+	assert_str(P0Logic.crop_plural("Grapes", 9)).is_equal("grapes")
+	assert_str(P0Logic.crop_plural("Citrus", 2)).is_equal("citruses")
 
 func test_the_today_focus_is_the_first_row_still_to_do_not_a_ticked_one() -> void:
 	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked). The chip
