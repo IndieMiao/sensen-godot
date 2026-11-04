@@ -270,6 +270,20 @@ func test_p1_rows_name_styles_and_families() -> void:
 	assert_array(rows[1].facts).is_equal(["4 Orchard crops · any kind"])
 	assert_array(rows[2].facts).is_equal(["4 Fine crops · any kind"])
 
+## A material is a mass noun (奕星 11-04, 不知火舞 on the Stall Board): `7 Clay` on the row and its button's gap, never
+## `7 Claies` — the row reads it as the item card and the Chinese table do (黏土).
+func test_material_rows_keep_the_materials_name_in_the_plural() -> void:
+	var v := _view()
+	v.names.merge({"clay": "Clay", "wood": "Timber", "flax": "Flax", "coal": "Coal"})
+	v.boards.stall.slots = [
+		{"id": "s1", "title": "Clay for Pots", "kind": "material", "items": ["clay"], "rarity": null, "icon": "clay", "qty": 7,
+			"have": 0, "ready": false, "coins": 30, "status": "accepted"},
+		{"id": "s2", "title": "Timber Order", "kind": "material", "items": ["wood"], "rarity": null, "icon": "wood", "qty": 5,
+			"have": 2, "ready": false, "coins": 30, "status": "accepted"}]
+	var rows := P0Board.cards(v, "stall")
+	assert_array([rows[0].facts, rows[0].reason]).is_equal([["7 Clay"], "Need 7 more Clay"])
+	assert_array([rows[1].facts, rows[1].reason]).is_equal([["5 Timber"], "Need 3 more Timber"])
+
 ## SGODOT-284 Stamp Run: a check-in, not items — the row says where, the gap until the player has been there.
 func test_p1_stamp_run_reads_visit_and_the_gap_is_the_check_in() -> void:
 	var v := _view()
