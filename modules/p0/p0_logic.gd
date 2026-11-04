@@ -2388,16 +2388,21 @@ static func look_rows(view: Dictionary, at_home := true) -> Array:
 			"value": (str(l.get(look, "")) + (" ›" if at_home else "")) if reached else "Homestead Lv%d" % int(l.level)})
 	return out if out.any(func(r): return bool(r.reached)) else []
 
+## A resident's request card's who line: `Pip · Courier Kid · personal request` (the content's name and role).
+static func request_who(id: String) -> String:
+	var def: Dictionary = content().get("residents", {}).get(id, {})
+	return "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))] if not def.is_empty() else ""
+
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills → travel, what changes, and the first gap on the button (355 A view contract).
-## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, tap, footer, max}
+## {title, who, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, tap, footer, max}
 static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var level := int(h.get("level", 1))
 	var next = h.get("next", null)
 	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
 		"reason": "", "tap": "", "footer": "Upgrading is free of Energy", "max": next == null,
-		"subtitle": "", "button": true, "looks": look_rows(view, at_home)}
+		"subtitle": "", "who": "", "button": true, "looks": look_rows(view, at_home)}
 	if next == null:
 		if level >= homestead_max(view):
 			out.subtitle = MAX_LEVEL_LINE
@@ -2406,6 +2411,9 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 			out.reason = "Highest level for now"
 		return out
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
+	# Pip's Homestead request (spec ③ v3, U3 445:193191): HOME-1 is its card, so it says whose, under the title as a
+	# request card's who line — while there is one (the guide over: homestead_row)
+	out.who = request_who("res_pip") if not homestead_row(view).is_empty() else ""
 	var unlocks: Array = next.get("unlocks", [])
 	for u in unlocks:   # look stages and their levels come from content, never inferred from the current cap
 		var stage := look_stage(str(u))

@@ -3465,7 +3465,7 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	# Li Bai q(46): a request's own need line wins (`1 Rare fish · Golden Koi · Pond`); the tile shows the count itself.
 	if need_line != "": need.name = need_line.trim_prefix("%d " % int(need.need))
 	var data := {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
-		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
+		"who": P0Logic.request_who(id),
 		"line": text, "needs": [need] if kind != "" else [],
 		"deliver_to": _deliver_to(view_, id, str(def.get("name", ""))), "action": "Accept",
 		# the bar's `Request · Requests 25/25` is the card's `Accept · Requests 25/25` (spec ③, T4)

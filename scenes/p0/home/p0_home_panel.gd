@@ -56,6 +56,8 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		scroll.add_child(body)
 		frame.add_child(_fade(scroll))
 	body.add_child(UiKit.label(str(model.title), UiTokens.STYLE_C14_XB))
+	if str(model.get("who", "")) != "":   # Pip's request (U3): the request card's who line under the title
+		body.add_child(UiKit.label(str(model.who), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	if str(model.subtitle) != "":   # the current content cap, independent of the Master title
 		body.add_child(UiKit.label(str(model.subtitle), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
 	if str(model.look) != "":

@@ -480,3 +480,15 @@ func _move(vp: Viewport, at: Vector2, rel: Vector2) -> void:
 	m.relative = rel
 	m.button_mask = MOUSE_BUTTON_MASK_LEFT
 	vp.push_input(m, true)
+
+## U3 (445:193191, spec ③ v3): HOME-1 is Pip's Homestead request's card, so it says whose under the title — `Pip · Courier
+## Kid · personal request`, a request card's who line — while the request is there: not during the guide, not at the top.
+func test_home_1_says_whose_request_it_is() -> void:
+	var v := _view()
+	assert_str(str(P0Logic.home_panel(v).who)).is_equal("Pip · Courier Kid · personal request")
+	assert_str(str(P0Logic.home_panel(v, false).who)).is_equal("Pip · Courier Kid · personal request")   # away too
+	v["guide"] = {"step": "first_sow"}
+	assert_str(str(P0Logic.home_panel(v).who)).is_empty()
+	v.erase("guide")
+	v.homestead.next = null
+	assert_str(str(P0Logic.home_panel(v).who)).is_empty()
