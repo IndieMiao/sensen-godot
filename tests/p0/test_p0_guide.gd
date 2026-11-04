@@ -114,6 +114,16 @@ func test_under_a_dialog_only_its_own_tip_comes_up() -> void:
 	q.close()
 	assert_str(q.next(true)).is_equal("")                    # the meal tip waits for the dialog
 	assert_str(q.next()).is_equal("meal")
+	# 哪吒 on #733: a Moment held `travel` until its card had closed — it goes, unseen, never up over nothing
+	var r = Guide.TipQueue.new({})
+	r.moment_opened()
+	r.request("travel")
+	assert_str(r.next(true)).is_equal("")                    # the Moment holds it
+	r.moment_closed()
+	assert_str(r.next()).is_equal("")                         # the card closed meanwhile: gone
+	assert_bool(r.waiting.is_empty()).is_true()
+	assert_bool(r.seen.has("travel")).is_false()             # the next paid card asks again
+	assert_bool(r.request("travel")).is_true()
 
 # ---------------------------------------------------------------- Today rows (§14.2)
 

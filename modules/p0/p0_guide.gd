@@ -91,6 +91,10 @@ class TipQueue:
 	## (dialog_up) only a tip about that dialog comes up (P0Guide.OVER_DIALOG: the travel card's own); the rest wait.
 	func next(dialog_up := false) -> String:
 		if showing != "" or moments > 0 or waiting.is_empty(): return ""
+		if not dialog_up:   # a dialog's own tip that missed it (a Moment held it, the card closed meanwhile) goes, unseen:
+			for key in waiting.duplicate():   # the next paid card asks again (哪吒 on #733)
+				if P0Guide.OVER_DIALOG.has(str(key)): waiting.erase(key)
+			if waiting.is_empty(): return ""
 		var at := 0
 		if dialog_up:
 			at = -1
