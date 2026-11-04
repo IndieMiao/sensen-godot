@@ -183,6 +183,22 @@ func test_four_column_centres_and_group_rows_and_skill_source_navigation() -> vo
 	assert_str(source.text).is_equal("Stamps · First visit to a city · up to 2 a day")
 	assert_bool(source._show.visible).is_false()   # A3b / A3c: no Show on the travel gates
 
+func test_a_skill_tile_reads_the_skill_word_not_the_stoves() -> void:   # Cooking@skill 烹饪, not 烹饪中 (李白 / 不知火舞)
+	var kept = Localization.p0_translation
+	var locale := TranslationServer.get_locale()
+	var t: Translation = preload("res://modules/ui/localization.gd").P0Translation.new()
+	t.set_table({"Cooking": "烹饪中", "Cooking@skill": "烹饪"})
+	Localization.p0_translation = t
+	TranslationServer.set_locale("zh_CN")
+	var ui := _ui(view())
+	ui.open_home_panel(func(): pass)
+	await await_idle_frame()
+	var names: Array = ui.find_children("*","UiNeedTile",true,false).map(func(n): return n.item_name)
+	TranslationServer.set_locale(locale)
+	Localization.p0_translation = kept
+	assert_bool(names.has("烹饪")).is_true()
+	assert_bool(names.has("烹饪中")).is_false()
+
 func test_skills_back_keeps_home_panels_original_return_destination() -> void:
 	var ui := _ui(view())
 	var returned := []

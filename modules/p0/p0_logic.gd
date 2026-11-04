@@ -1909,7 +1909,9 @@ static func _home_material_go(view: Dictionary, id: String) -> Dictionary:
 	var site := ""
 	if id in VEIN_ORES: site = near3_site(view, "vein", id)
 	elif id in QUARRY_ORES or id == "clay": site = near3_site(view, "quarry")
-	if site != "": return {"go": "mine:" + site, "now": str(view.get("mine", {}).get("at", {}).get("mine", "")) == site}
+	if site != "":
+		var at = view.get("mine", {}).get("at", null)   # null while the player is not down a mine (the server's view)
+		return {"go": "mine:" + site, "now": at is Dictionary and str(at.get("mine", "")) == site}
 	if not spot.is_empty(): return {"go": "gather:" + str(spot.id), "now": false}
 	return {"go": "", "now": false}
 

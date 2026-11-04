@@ -69,6 +69,9 @@ func test_ores_go_to_the_free_vein_or_quarry_and_clay_falls_back_to_the_quarry()
 	for ore in ["copper_ore", "coal", "rock_salt"]:
 		assert_dict(P0Logic._home_material_go(_view(), ore)).override_failure_message(ore).is_equal({"go": "mine:wq1", "now": false})
 	assert_dict(P0Logic._home_material_go(_view({"mine": {"at": {"mine": "wv1"}}}), "iron_ore")).is_equal({"go": "mine:wv1", "now": true})
+	# the server's view out of a mine: `at` null (SGODOT-394: the HOME-1 line for an ore came back as the bare name)
+	assert_dict(P0Logic._home_material_go(_view({"mine": {"at": null}}), "iron_ore")).is_equal({"go": "mine:wv1", "now": false})
+	assert_str(str(P0MaterialLogic.material_source(_view({"mine": {"at": null}}), "quartz").text).replace("\u00a0", " ")).ends_with(" · Quartz veins from Floor 10")
 	assert_dict(P0Logic._home_material_go(_view(), "clay")).is_equal({"go": "gather:" + HOME + "~clay0", "now": true})   # the Clay Pit first
 	var pit_cooling := _view({"gather": {"city_ready": {HOME + "~clay0": 5000}}})
 	assert_dict(P0Logic._home_material_go(pit_cooling, "clay")).is_equal({"go": "mine:wq1", "now": false})   # then the quarry

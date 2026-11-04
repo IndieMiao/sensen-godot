@@ -66,8 +66,10 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		needs.add_child(UiKit.label("Needs", UiTokens.STYLE_C12_XB))
 		var groups := [[], [], []]
 		for t in model.tiles:
-			var tile := HomeNeedTile.new(str(t.name), int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
 			var id := str(t.id)
+			# a skill's name as the Skills page writes it (Cooking@skill 烹饪, not the stove's 烹饪中)
+			var tile_name := Localization.ctx(str(t.name), "skill") if id.begins_with("skill_") else str(t.name)
+			var tile := HomeNeedTile.new(tile_name, int(t.have), int(t.need), UiNeedTile.Size.L, P0Logic.icon(str(t.icon)))
 			tile.pressed.connect(func(): _source(ui, tile, id))
 			groups[1 if id.begins_with("skill_") else 2 if id in ["stamps", "climates"] else 0].append(tile)
 		for tiles in groups:
