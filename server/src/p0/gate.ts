@@ -8,6 +8,11 @@
  *    player, so the admin route refuses a minimum without one and a start-up minimum without one only warns.
  *  - Maintenance: while on, every /v1/p0/* request (state, commands, presence, telemetry, the outpost WebSocket
  *    upgrade) gets HTTP 503 {ok:false, code:"maintenance", back_at?} — back_at is UTC ISO, absent when unknown.
+ *  - Features (SGODOT-396 ①, the wipe's second guard; 397 the client side): with P0_REQUIRE_FEATURES (comma-separated,
+ *    e.g. `save_v7`), a request whose `x-p0-features` lacks one of them gets the same 426 {ok:false,
+ *    code:"update_required", url} — a build from before the wipe asks to be updated instead of playing on the new saves,
+ *    through the Update card it already has. Unlike the version, no header is no feature: refused. Off when unset (dev,
+ *    tests, tools); like the minimum, not enforced without a download url, and the server says so at start.
  * /v1/healthz and the admin app (127.0.0.1 inside the container) are never gated.
  *
  * Settings: P0_MIN_VERSION / P0_UPDATE_URL and P0_MAINT=1 / P0_MAINT_UNTIL at start, changed at run time through the
@@ -19,7 +24,9 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { IncomingHttpHeaders } from 'node:http';
 
 /** update_on: a minimum is in force (min_version > 0 and a download url). */
-export interface GateState { maintenance: { on: boolean; back_at?: string }; min_version: number; update_url: string; update_on: boolean }
+export interface GateState { maintenance: { on: boolean; back_at?: string }; min_version: number; update_url: string; update_on: boolean;
+  /** P0_REQUIRE_FEATURES (396 ①); features_on: they are enforced (some, and a download url). */
+  features: string[]; features_on: boolean }
 export type GateRefusal = { status: 426 | 503; body: { ok: false; code: 'update_required' | 'maintenance'; url?: string; back_at?: string } };
 interface GateFile { maintenance?: { on?: boolean; back_at?: string | null }; min_version?: number; update_url?: string }
 
@@ -32,7 +39,7 @@ export function isoMinute(raw: unknown): string | undefined {
 
 export class P0Gate {
   private file: GateFile = {};
-  private readonly env: { maint: boolean; until?: string; min: number; url: string };
+  private readonly env: { maint: boolean; until?: string; min: number; url: string; features: string[] };
   /** Why gate.json could not be read (it is then ignored); tools/p0_server.ts prints it. */
   readonly loadError?: string;
 
@@ -40,7 +47,7 @@ export class P0Gate {
   constructor(private readonly path?: string, env: NodeJS.ProcessEnv = process.env) {
     const min = Number(env.P0_MIN_VERSION ?? 0);
     this.env = { maint: env.P0_MAINT === '1', until: isoMinute(env.P0_MAINT_UNTIL), min: Number.isInteger(min) && min > 0 ? min : 0,
-      url: String(env.P0_UPDATE_URL ?? '') };
+      url: String(env.P0_UPDATE_URL ?? ''), features: featureList(env.P0_REQUIRE_FEATURES) };
     if (path && existsSync(path)) {
       try { this.file = JSON.parse(readFileSync(path, 'utf8')) as GateFile; } catch (e) { this.file = {}; this.loadError = String(e); }
     }
@@ -57,6 +64,8 @@ export class P0Gate {
       min_version: minVersion,
       update_url: updateUrl,
       update_on: minVersion > 0 && updateUrl !== '',
+      features: [...this.env.features],
+      features_on: this.env.features.length > 0 && updateUrl !== '',
     };
   }
 
@@ -88,6 +97,10 @@ export class P0Gate {
       const v = /^\d+$/.test(sent.trim()) ? Number(sent.trim()) : 0;   // unreadable = too old
       if (v < st.min_version) return { status: 426, body: { ok: false, code: 'update_required', url: st.update_url } };
     }
+    if (st.features_on) {
+      const has = new Set(featureList(headers['x-p0-features']));
+      if (st.features.some(f => !has.has(f))) return { status: 426, body: { ok: false, code: 'update_required', url: st.update_url } };
+    }
     if (st.maintenance.on) {
       return { status: 503, body: { ok: false, code: 'maintenance', ...(st.maintenance.back_at ? { back_at: st.maintenance.back_at } : {}) } };
     }
@@ -100,6 +113,11 @@ export class P0Gate {
     writeFileSync(tmp, JSON.stringify(this.file, null, 2));
     renameSync(tmp, this.path);
   }
+}
+
+/** `a, b,c` (or a repeated header) as its names, trimmed, empties dropped. */
+function featureList(raw: string | string[] | undefined): string[] {
+  return (Array.isArray(raw) ? raw.join(',') : raw ?? '').split(',').map(f => f.trim()).filter(Boolean);
 }
 
 /** The raw HTTP answer for a refused WebSocket upgrade: same status and JSON body as the routes. */

@@ -48,6 +48,8 @@ if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', e
   const g = gate.state();
   // A minimum without a download url is not enforced (gate.ts): say so loudly at start rather than strand players.
   if (g.min_version > 0 && !g.update_on) console.log(JSON.stringify({ warn: 'min_version_without_update_url', min_version: g.min_version }));
+  // 396 ①: the wipe's second guard likewise, not enforced without one
+  if (g.features.length && !g.features_on) console.log(JSON.stringify({ warn: 'require_features_without_update_url', features: g.features }));
 }
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
@@ -103,7 +105,7 @@ const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
   return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000),
-    maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0 };
+    maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0, require_features: g.features_on ? g.features : [] };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
