@@ -1,0 +1,24 @@
+[
+  {
+    "name": "SGODOT-408_HARDWOOD_v1_pond_L2_43.png",
+    "path": "docs/design/hardwood-grove-408-2026-11-04/SGODOT-408_HARDWOOD_v1_pond_L2_43.png",
+    "sha256": "3b8e636c96f92d5b63ed7496286c51a093d96139ab6223657a0a34b181cff791",
+    "bytes": 478047,
+    "mime": "image/png",
+    "size": [
+      450,
+      1078
+    ]
+  },
+  {
+    "name": "SGODOT-408_HARDWOOD_v1_resource_comparison.png",
+    "path": "docs/design/hardwood-grove-408-2026-11-04/SGODOT-408_HARDWOOD_v1_resource_comparison.png",
+    "sha256": "dce170f59b9c688ae0cfe89c3be5f41c7cb86c7cb5477d9ad3e6b7eef58c70ac",
+    "bytes": 1593085,
+    "mime": "image/png",
+    "size": [
+      1800,
+      1100
+    ]
+  }
+]

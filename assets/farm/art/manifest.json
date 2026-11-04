@@ -1527,6 +1527,165 @@
       "nozzle_dot": "one coplanar vertex-colour centre dot per nozzle; no drilled geometry or separate mesh",
       "runtime_note": "head static by default; consumer may rotate around Y for 2-3 s on watering / tap",
       "integration_note": "On integration change P0FarmFacilities.HEAD from (0, 0.55, 0) to (0, 0.42, 0); no gameplay edit in this art branch."
+    },
+    "hardwood_grove": {
+      "triangles": 1042,
+      "surfaces": 1,
+      "bytes": 50212,
+      "bounds_blender": [
+        [
+          -0.71175,
+          -0.648727,
+          0.0
+        ],
+        [
+          0.71175,
+          0.648727,
+          2.3
+        ]
+      ],
+      "bounds": [
+        [
+          -0.71175,
+          0.0,
+          -0.648727
+        ],
+        [
+          0.71175,
+          2.3,
+          0.648727
+        ]
+      ],
+      "generator": "tools/art/build_hardwood_grove.py",
+      "triangle_limit": 1200,
+      "pivot": "whole footprint bottom centre",
+      "sockets": {},
+      "front": "+Z",
+      "author": "赵云",
+      "virtual_user_id": "8ea32e40-c0ba-4a31-864f-374a6bcbc554",
+      "slot_limit_m": [
+        1.5,
+        1.5
+      ],
+      "height_target_m": 2.3,
+      "placement_preview": {
+        "pond": "pond_san_francisco_03",
+        "slot": "L2",
+        "xz": [
+          -0.3,
+          -9.0
+        ],
+        "player_xz": [
+          0.95,
+          -8.4
+        ]
+      },
+      "harvested_variant": false,
+      "collision": "none in GLB; runtime resource system owns navigation",
+      "sha256": "dcce17e71732b957e67f90a1955d0fca1487f061b2d4ac2722e3f526e3961af1",
+      "palette_srgb": {
+        "walnut": "78472F",
+        "walnut_edge": "613827",
+        "walnut_light": "945B3D",
+        "cut": "BD895C",
+        "cut_light": "D0A575",
+        "growth_ring": "855235",
+        "olive": "7D9145",
+        "olive_light": "96A954",
+        "olive_shade": "657635"
+      },
+      "source": "tools/art/source/hardwood_grove_408/hardwood_grove.blend",
+      "parts": [
+        {
+          "name": "tree_0 / Tapered tree trunk",
+          "triangles": 36
+        },
+        {
+          "name": "tree_0 / Tree branch",
+          "triangles": 44
+        },
+        {
+          "name": "tree_0 / Tree branch.001",
+          "triangles": 44
+        },
+        {
+          "name": "tree_0 / Tree branch.002",
+          "triangles": 44
+        },
+        {
+          "name": "tree_0 / Rounded orchard canopy / reduced 12x8 crown",
+          "triangles": 168
+        },
+        {
+          "name": "tree_0 / Rounded orchard canopy.001 / reduced 12x8 crown",
+          "triangles": 168
+        },
+        {
+          "name": "tree_0 / Rounded orchard canopy.002 / reduced 12x8 crown",
+          "triangles": 168
+        },
+        {
+          "name": "Walnut root buttress 0",
+          "triangles": 8
+        },
+        {
+          "name": "Walnut root buttress 1",
+          "triangles": 8
+        },
+        {
+          "name": "Walnut root buttress 2",
+          "triangles": 8
+        },
+        {
+          "name": "Independent ringed stump / walnut bark",
+          "triangles": 58
+        },
+        {
+          "name": "Stump cut / three visible growth rings",
+          "triangles": 156
+        },
+        {
+          "name": "Stacked walnut billet 1",
+          "triangles": 44
+        },
+        {
+          "name": "Stacked walnut billet 2",
+          "triangles": 44
+        },
+        {
+          "name": "Stacked walnut billet 3",
+          "triangles": 44
+        }
+      ],
+      "reuse_provenance": {
+        "source": "tools/art/source/farm_reference_kit.blend",
+        "source_sha256": "876bf39bfe5ea5800bd17241c2b8096af6091510f9ae342c3650dcc9052f19bf",
+        "source_asset": "tree_0",
+        "source_triangles": 1624,
+        "retained_parts": [
+          "Tapered tree trunk",
+          "Tree branch",
+          "Tree branch.001",
+          "Tree branch.002",
+          "Rounded orchard canopy",
+          "Rounded orchard canopy.001",
+          "Rounded orchard canopy.002"
+        ],
+        "removed_root_grass": [
+          "Grass at tree roots",
+          "Grass at tree roots.001",
+          "Grass at tree roots.002",
+          "Grass at tree roots.003"
+        ],
+        "adaptation": "Retain trunk and branch meshes; reduce branch bevel to one segment. Crown ellipsoids retain source centres/scales but use 12x8 tessellation. X .78 / Z .82, height 2.30 m; roots replaced by small buttresses."
+      },
+      "material_contract": {
+        "vertex_color_is_srgb": false,
+        "roughness": 0.9,
+        "metallic": 0,
+        "specular": 0.18,
+        "light_baking": 1
+      }
     }
   }
 }
