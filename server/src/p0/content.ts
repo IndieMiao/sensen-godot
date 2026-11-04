@@ -508,7 +508,7 @@ export function cityPostcardCluster(c: P0Content, id: string): { id: string; nam
 
 export function itemKind(id: string): string {
   if (id.startsWith('weapon_')) return 'weapon';
-  if (id.startsWith('potion_')) return 'consumable';
+  if (id.startsWith('potion_')) return 'potion';   // v4q(7) ⑥: its own bag.stack tier (10), never a material's
   const head = id.split('_')[0];
   return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
 }

@@ -26,6 +26,7 @@
 > - 第 9.4 节：写全 `mine_drink` 的字段、拒绝的先后顺序、事件，以及售卖（Homestead Stall、Lv4、日库存）；
 > - 第 7.1 节：`view.mine.at.potion_ready_in`（喝药的剩余冷却，毫秒，0 表示可以喝；人不在矿里时没有 `at`，也就没有这一项）。#636 的 `set_potion_cooldown(remaining_ms)` 照它读，拒绝码 `potion_cooldown` 也带 `ready_in`；
 > - 第 10 节：`stunned_seconds`（岩甲虫硬直 2 秒）是玩法的数，只放占位 json（#627 接口复核时补）。
+> **v0.9++（11-04，SGODOT-395）**：第 9.4 节补背包：药自己算一类（`itemKind` 是 `potion`），一格叠 10（`bag.stack.potion`，v4q(7) ⑥）。
 > **v0.9+（11-04）**：矿层摆件和岩块接入（周瑜，原排 11-05，提前）：第 10.1 节补了三处做法：守关层按内容表判断（打过以后也摆场地）；牌子上的层号同时受高度和宽度限制；glb 是否已导入，看导入文件在不在。
 > **v0.8（11-03）**：G 服务端的 v4q(9) 两件（周瑜，奕星 11-02 派）：
 > - 第 9.2 节：First Dig **完成以后 `view.first_dig` 照样给**（`done: true`、`have` = `floor`），Lv3 以前才是 null（v4q(9) 的矿脉行要分清「完成了」和「还没出现」，和亚瑟、刘邦对过，#636 评论 6574856129）；写明完成时的事件（`first_dig`、`gear`、`affinity`）；
@@ -453,6 +454,7 @@ stations(record: MineRecord | undefined) -> number[]   // 10 的倍数且 ≤ de
 - **字段**（v0.9）：`{type: 'mine_drink', item, day, space: 'mine', place}`，和别的矿里命令一样带 `day`，`space` / `place` 照第 6 节；不带 `floor`，喝的是人在的那一层（#636 的 p0_gear_logic.gd 就是这样发的）。
 - **拒绝的先后**（v0.9）：`day` 不是今天 → `new_day`；人不在矿里 → `not_in_mine`；`item` 不是 `potions` 里的药 → `bad_item`；这一层不能喝（`floors` 是层号数组、又不含这一层；`"any"` 哪层都行）→ `not_here`；背包里没有这种药 → `no_potion`（只看背包，不看 Farm Storage）；血满 → `hp_full`；还在冷却 → `potion_cooldown {ready_in}`（毫秒，和 `at.potion_ready_in` 同一个数）。
 - **喝了**：背包扣 1 瓶（`{kind: 'item', id, delta: -1}`）；血加 `heal`（`"full"` 就加满），不超过 `combat.hp`；`day.drink_at = now`（存档里现成的字段，日切时跟着 `day` 清掉，不加存档版本）；发 `{kind: 'heal', hp, item}`，`hp` 是喝完以后的血。
+- 背包（v0.9++，v4q(7) ⑥）：`itemKind` 把 `potion_*` 认作 `potion`，一格叠 `bag.stack.potion` = 10（写在 `mine_b1.json`，合进主表的 `bag.stack`），不按材料的 99。药不是材料，交不进材料委托，也放不进 Farm Storage。客户端的背包格子照服务端给的分，不用自己算。
 - 售卖：照 `sold_at`（现行是 `homestead`，即 Homestead Stall），日库存 `stock`，门槛 `gate`（v4 2.7：Lv4）。挂进柜台的写法照现有商品：价格要加 40 保底（`no_coins {need}`），日库存记在 `day.bought`，卖完回 `sold_out {left}`，Homestead 不到等级回 `homestead_level {need: 4}`，买到的放进背包（放不下回 `bag_full`）。
 
 ### 9.5 起始状态

@@ -2,8 +2,8 @@
  * level with a daily stock, drunk in the mine (mine_drink) on a floor it allows, never past full HP, then its cooldown,
  * which view.mine.at.potion_ready_in counts down. Every number from content.mine.potions. */
 import { describe, expect, it } from 'vitest';
-import { count } from '../../src/p0/bag.js';
-import { loadP0Content } from '../../src/p0/content.js';
+import { add, count, room, stackLimit } from '../../src/p0/bag.js';
+import { itemKind, loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { dayKey } from '../../src/p0/rules.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
@@ -176,5 +176,29 @@ describe('355 G mine_drink (§9.4)', () => {
       expect(t.s.mine.day!.drink_at).toBe(next);
       expect(t.s.mine.day!.hp).toBe(MAX);
     });
+  });
+});
+
+describe('355 G the potion\'s bag tier (v4q(7) ⑥)', () => {
+  it('a potion is its own kind, a slot of it holds bag.stack.potion (10), not a material\'s 99', () => {
+    expect(itemKind(ID)).toBe('potion');
+    expect(c.bag.stack.potion).toBe(10);
+    expect(stackLimit(c, ID)).toBe(c.bag.stack.potion);
+    expect(stackLimit(c, ID)).toBeLessThan(stackLimit(c, 'iron_ore'));
+  });
+
+  it('twelve potions take two slots; the room counts a slot as ten', () => {
+    const t = scenario();
+    const free = t.s.bag_cap - t.s.bag.length;
+    add(c, t.s, ID, 12);
+    expect(t.s.bag.filter(b => b.id === ID).map(b => b.qty).sort((a, b) => b - a)).toEqual([10, 2]);
+    expect(room(c, t.s, ID)).toBe(8 + (free - 2) * 10);
+  });
+
+  it('the view says its kind is potion', () => {
+    const t = scenario();
+    t.s.bag.push({ id: ID, qty: 1 });
+    const items = (viewOf(c, t.s, t.now) as unknown as { items: Record<string, { kind: string }> }).items;
+    expect(items[ID].kind).toBe('potion');
   });
 });
