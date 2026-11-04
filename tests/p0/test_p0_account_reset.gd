@@ -77,3 +77,17 @@ func test_a_fresh_install_records_the_account_and_a_view_without_profile_changes
 	assert_bool(FileAccess.file_exists(TIPS)).is_false()
 	ui.set_view(_view(1_791_550_000_000))
 	assert_dict(_read(TIPS)).is_equal({"account_since": 1_791_550_000_000})
+
+## 哪吒 on #733: a tip taken off the queue as done (a Sow before Pip's opening line closed) is kept on disk at once —
+## an app closed before the next card never shows it again.
+func test_a_waiting_tip_done_is_kept_on_disk_at_once() -> void:
+	var since := 1_791_539_492_778
+	_write(TIPS, {"account_since": since})
+	await _ui()
+	ui.set_view(_view(since))
+	P0PlaceSheet.open(ui, {"title": "Pip"}, func(): pass)   # a dialog up, as Pip's opening line
+	ui.teach("sow")
+	await await_idle_frame()
+	assert_bool(ui.tips.waiting.has("sow")).is_true()          # waits under the dialog
+	ui.tip_did("sow")
+	assert_bool(bool(_read(TIPS).get("sow", false))).is_true()

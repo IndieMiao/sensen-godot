@@ -102,7 +102,7 @@ class TipQueue:
 			return true
 		return false
 
-	## A new surface (the farm, a pond, the map): a waiting tip of another surface's (P0Guide.SURFACE_TIPS) goes unseen —
+	## A new surface (the farm, a pond, the map): a waiting tip of another surface's (P0Guide.SURFACE_OF_TIP) goes unseen —
 	## it is asked for again there, never shown here (the map's `Browse the map for free.` in an outpost).
 	func leave_surface(surface: String) -> void:
 		for key in waiting.duplicate():

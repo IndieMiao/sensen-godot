@@ -3980,7 +3980,15 @@ func close_tip() -> void:
 
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
-	if tips and tips.did(action): _hide_tip(false)
+	if tips == null: return
+	var before := tips.seen.size()
+	if tips.did(action): _hide_tip(false)
+	# a tip taken off the queue as done (TipQueue.did) is seen now, not at the next card: kept on disk at once, so an app
+	# closed before another tip comes up never shows it again (哪吒 on #733)
+	if tips.seen.size() != before:
+		for k in tips.seen:
+			if P0Guide.tip_text(k) != "": _taught[k] = true
+		_save_tips()
 
 func _hide_tip(close_queue := true) -> void:
 	_teach_until_ms = 0
