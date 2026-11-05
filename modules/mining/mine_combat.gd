@@ -10,7 +10,8 @@ const Meshes = preload("res://modules/mining/mine_mesh.gd")
 ## floor sat on `1 monster left` with the stairs shut while it waited at the screen's right edge (李元芳's preview A, P12);
 ## the second was 4.65 m; a fourth and fifth took the first two's spots, pushed further off (李白 on 399: data fixes, no
 ## q row).
-const SPAWNS := [Vector3(4.75, 0, -5.0), Vector3(3.4, 0, -4.3), Vector3(6.3, 0, -4.9), Vector3(1.6, 0, -3.2), Vector3(7.8, 0, -3.3)]
+## q(292), 421 v2: all five stay in the fighting area, off the nine perimeter rock candidates.
+const SPAWNS := [Vector3(4.75, 0, -5.0), Vector3(3.4, 0, -4.85), Vector3(6.0, 0, -4.9), Vector3(3.9, 0, -3.65), Vector3(5.9, 0, -3.65)]
 ## A chasing slime finds its path to the player again this often, and at most one slime a frame does it (perf Q6,
 ## SGODOT-260): an A* and its smoothing over the floor's blocked cells each, so slimes due together wait a frame or two
 ## instead of all landing in one frame (fights at floor 4 jerked about 4 times a second).

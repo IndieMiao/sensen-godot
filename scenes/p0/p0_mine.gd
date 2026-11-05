@@ -224,7 +224,7 @@ func _build_floor(n: int) -> void:
 	var ore := P0MaterialLogic.rock_ore(v)
 	for i in _positions.size():
 		if broken[i]: continue
-		var rock := Art.rock(_positions[i], i, Art.variant_of(n), ore, floor_seed)
+		var rock := Art.rock(_positions[i], i, Art.variant_of(n), ore, floor_seed, Layout.ROCK_SCALE if _positions.size() <= 3 else 1.0)
 		rock.name = "Rock%d" % i
 		objects.add_child(rock)
 		_rocks[i] = rock
@@ -251,7 +251,7 @@ func _rebuild_nav(broken: Array) -> void:
 	for i in _positions.size():
 		nodes.append({"id": str(i), "position": _positions[i]})
 		if broken[i]: gone.append(str(i))
-	bp = Layout._navigation(nodes, gone)
+	bp = Layout._navigation(nodes, gone, Layout.ROCK_RADIUS if _positions.size() <= 3 else 0.65)
 	grid = BlueprintGrid.new(bp)
 	if actor and actor.mover:
 		var at := actor.mover.position
