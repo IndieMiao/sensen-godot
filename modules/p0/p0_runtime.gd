@@ -1390,7 +1390,7 @@ var _block_url := ""
 var _maint_left := 0.0
 var _resume_ms := -1          # a state read on return to the foreground is in flight since then; -1 none
 ## Getting to a place (q(78)): the scene cover AppRouter showed for a P0 world stays until that world's first read
-## answers. {path, place, shot, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
+## answers. {path, place, icon, progress, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
 const ARRIVE_FAIL_S := 20.0
 var _arrive := {}
 var _arrive_s := -1.0
@@ -1730,10 +1730,14 @@ func _dev_screen(which: String) -> void:
 			var at := Time.get_datetime_string_from_unix_time(int(Time.get_unix_time_from_system()) + 5400) + "Z"
 			_on_blocked("maintenance", {"back_at": at})
 		"update": _on_blocked("update_required", {"url": "https://example.test/p0demo.apk"})
-		"scene", "placefail":
-			var layer := _scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
+		"scene", "sceneslow", "placefail":   # the town map: a pond at 40 %, a mine slow at 70 % (L123v2 L1 / L2 / L3)
+			var slow := which == "sceneslow"
+			var path := "res://scenes/p0/p0_mine.tscn" if slow else "res://scenes/p0/p0_pond.tscn"
+			var layer := _scene_overlay(path, {"mine": "wd-dev-vein", "floor": 3} if slow else {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
 			add_child(layer)
 			layer.screen.modulate.a = 1.0
+			layer.screen.progress = 0.7 if slow else 0.4
+			if slow: layer.screen.taking_longer()
 			if which == "placefail": layer.failed()
 
 ## AppRouter.open_instance into a P0 world: SYS-LOADING-SCENE over the screen being left; anything else keeps
@@ -1741,9 +1745,9 @@ func _dev_screen(which: String) -> void:
 func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
 	var place := P0LoadingLayer.destination(path, args)
 	if place == "": return null
-	var shot := P0SysScreen.blurred_screen(get_viewport())
-	_arrive = {path = path, place = place, shot = shot, t0 = Time.get_ticks_msec()}
-	return P0LoadingLayer.new(place, shot, path, args)
+	# The town map stands in for the screen being left (the user 11-06): no read back of the screen from the GPU.
+	_arrive = {path = path, place = place, icon = P0LoadingLayer.icon_for(path, args), progress = 1.0, t0 = Time.get_ticks_msec()}
+	return P0LoadingLayer.new(place, null, path, args)
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
@@ -2148,7 +2152,7 @@ func _dev_shot(dt: float) -> void:
 					world.actor.teleport(m.global_position)
 					world.actor.face(m.global_position + P0Room.yaw_dir(rad_to_deg(m.rotation.y)))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
-			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
+			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|sceneslow|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()
