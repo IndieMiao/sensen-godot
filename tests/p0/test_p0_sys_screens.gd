@@ -343,10 +343,10 @@ func _screen_on(size: Vector2, status := 0.0) -> P0SysScreen:
 	return s
 
 ## One formula, her six measured screens: the art's bottom on the screen's, centred; covering while the wordmark's top
-## (row 79) stays 8 under the status bar (20:9, an iPhone's 19.5:9, 21:9), else fitted to it (18:9, 16:9, an iPad).
+## (row 85 on the v2 art) stays 8 under the status bar (20:9, an iPhone's 19.5:9, 21:9), else fitted to it (18:9, 16:9, an iPad).
 func test_the_splash_covers_or_fits_as_the_six_measured_screens() -> void:
 	for c in [[Vector2(360, 800), 24.0, 0.985, false], [Vector2(390, 844), 47.0, 1.040, false], [Vector2(360, 840), 24.0, 1.034, false],
-			[Vector2(360, 720), 24.0, 0.939, true], [Vector2(360, 640), 24.0, 0.829, true], [Vector2(600, 800), 24.0, 1.048, true]]:
+			[Vector2(360, 720), 24.0, 0.946, true], [Vector2(360, 640), 24.0, 0.836, true], [Vector2(600, 800), 24.0, 1.056, true]]:
 		var l := P0SysScreen.splash_layout(c[0], c[1])
 		var screen: Vector2 = c[0]
 		assert_float(float(l.scale)).override_failure_message("%s" % screen).is_equal_approx(c[2], 0.001)
@@ -355,10 +355,10 @@ func test_the_splash_covers_or_fits_as_the_six_measured_screens() -> void:
 		var o: Vector2 = l.origin
 		assert_float(o.y + 812.0 * s).is_equal_approx(screen.y, 0.01)   # its bottom on the screen's
 		assert_float(o.x * 2.0 + 375.0 * s).is_equal_approx(screen.x, 0.01)   # centred
-		assert_bool(o.y + 79.0 * s >= float(c[1]) + 8.0 - 0.01).is_true()   # the wordmark under the status bar
-	# 21:9 cuts 14 off each side; 16:9 shows 24 of the blurred copy each side
+		assert_bool(o.y + P0SysScreen.SPLASH_MARK_TOP * s >= float(c[1]) + 8.0 - 0.01).is_true()   # the wordmark under the status bar
+	# 21:9 cuts 14 off each side; 16:9 shows 23 of the blurred copy each side
 	assert_float(roundf(-float(P0SysScreen.splash_layout(Vector2(360, 840), 24.0).origin.x))).is_equal(14.0)
-	assert_float(roundf(float(P0SysScreen.splash_layout(Vector2(360, 640), 24.0).origin.x))).is_equal(24.0)
+	assert_float(roundf(float(P0SysScreen.splash_layout(Vector2(360, 640), 24.0).origin.x))).is_equal(23.0)
 
 ## The launch cover is the splash on the sky colour, no farm backdrop and no wordmark over it; Can't connect is the same
 ## art under the scrim with its card; maintenance keeps its backdrop and wordmark (not in q(290)).
@@ -369,7 +369,7 @@ func test_the_launch_and_cant_connect_show_the_splash_and_nothing_over_it() -> v
 	assert_that(s._bg.color).is_equal(P0SysScreen.SPLASH_SKY)
 	assert_that([s._splash.visible, s._splash_blur.visible, s._art.visible, s._mark.visible, s._scrim.visible, s._slow_card.visible]).is_equal(
 		[true, true, false, false, false, false])
-	assert_vector(s._splash.size).is_equal((P0SysScreen.SPLASH_SIZE * 0.939).round())
+	assert_vector(s._splash.size).is_equal((P0SysScreen.SPLASH_SIZE * (688.0 / 727.0)).round())
 	s.show_kind(K.FAIL)
 	await get_tree().process_frame
 	assert_that([s._splash.visible, s._mark.visible, s._art.visible, s._scrim.visible, s.card.visible]).is_equal([true, false, false, true, true])
