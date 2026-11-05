@@ -329,3 +329,87 @@ func test_go_back_and_back_leave_for_where_the_player_came_from() -> void:
 	assert_bool(rt.ui.close_top_layer()).is_true()   # Back is Go back
 	assert_int(rt.ui.screen_kind()).is_equal(-1)
 	assert_int(left[0]).is_equal(2)
+
+# ---------------------------------------------------------------- q(290) the splash (不知火舞's spec v1, 302 c9986a33)
+
+## A screen on a phone-sized host (it fills its parent).
+func _screen_on(size: Vector2, status := 0.0) -> P0SysScreen:
+	var host: Control = auto_free(Control.new())
+	host.size = size
+	add_child(host)
+	var s := P0SysScreen.new()
+	s.status_top = status
+	host.add_child(s)
+	return s
+
+## One formula, her six measured screens: the art's bottom on the screen's, centred; covering while the wordmark's top
+## (row 79) stays 8 under the status bar (20:9, an iPhone's 19.5:9, 21:9), else fitted to it (18:9, 16:9, an iPad).
+func test_the_splash_covers_or_fits_as_the_six_measured_screens() -> void:
+	for c in [[Vector2(360, 800), 24.0, 0.985, false], [Vector2(390, 844), 47.0, 1.040, false], [Vector2(360, 840), 24.0, 1.034, false],
+			[Vector2(360, 720), 24.0, 0.939, true], [Vector2(360, 640), 24.0, 0.829, true], [Vector2(600, 800), 24.0, 1.048, true]]:
+		var l := P0SysScreen.splash_layout(c[0], c[1])
+		var screen: Vector2 = c[0]
+		assert_float(float(l.scale)).override_failure_message("%s" % screen).is_equal_approx(c[2], 0.001)
+		assert_bool(bool(l.fit)).override_failure_message("%s" % screen).is_equal(c[3])
+		var s := float(l.scale)
+		var o: Vector2 = l.origin
+		assert_float(o.y + 812.0 * s).is_equal_approx(screen.y, 0.01)   # its bottom on the screen's
+		assert_float(o.x * 2.0 + 375.0 * s).is_equal_approx(screen.x, 0.01)   # centred
+		assert_bool(o.y + 79.0 * s >= float(c[1]) + 8.0 - 0.01).is_true()   # the wordmark under the status bar
+	# 21:9 cuts 14 off each side; 16:9 shows 24 of the blurred copy each side
+	assert_float(roundf(-float(P0SysScreen.splash_layout(Vector2(360, 840), 24.0).origin.x))).is_equal(14.0)
+	assert_float(roundf(float(P0SysScreen.splash_layout(Vector2(360, 640), 24.0).origin.x))).is_equal(24.0)
+
+## The launch cover is the splash on the sky colour, no farm backdrop and no wordmark over it; Can't connect is the same
+## art under the scrim with its card; maintenance keeps its backdrop and wordmark (not in q(290)).
+func test_the_launch_and_cant_connect_show_the_splash_and_nothing_over_it() -> void:
+	var s := _screen_on(Vector2(360, 720), 24.0)   # an 18:9: fitted, the blurred sides showing
+	s.show_kind(K.LAUNCH)
+	await get_tree().process_frame
+	assert_that(s._bg.color).is_equal(P0SysScreen.SPLASH_SKY)
+	assert_that([s._splash.visible, s._splash_blur.visible, s._art.visible, s._mark.visible, s._scrim.visible, s._slow_card.visible]).is_equal(
+		[true, true, false, false, false, false])
+	assert_vector(s._splash.size).is_equal((P0SysScreen.SPLASH_SIZE * 0.939).round())
+	s.show_kind(K.FAIL)
+	await get_tree().process_frame
+	assert_that([s._splash.visible, s._mark.visible, s._art.visible, s._scrim.visible, s.card.visible]).is_equal([true, false, false, true, true])
+	s.show_kind(K.MAINT)
+	await get_tree().process_frame
+	assert_that([s._splash.visible, s._mark.visible, s._art.visible]).is_equal([false, true, true])
+	assert_that(s._bg.color).is_equal(UiTokens.COLOR_SURFACE)
+	(s.get_parent() as Control).size = Vector2(360, 800)   # a 20:9 covers: no blurred sides
+	s.show_kind(K.LAUNCH)
+	await get_tree().process_frame
+	assert_bool(s._splash_blur.visible).is_false()
+
+## 8 s in: the spinner and `Taking longer than usual…` on a 90 % surface card, centred, ending 16 above the art's small
+## Gensen mark (row 752) — not over a face.
+func test_taking_longer_sits_on_a_card_above_the_arts_gensen_mark() -> void:
+	var s := _screen_on(Vector2(360, 800))
+	s.show_kind(K.LAUNCH)
+	s.taking_longer()
+	await get_tree().process_frame
+	var l := P0SysScreen.splash_layout(s.size, 0.0)
+	var card := s._slow_card.get_rect()
+	assert_bool(s._slow_card.visible).is_true()
+	assert_float(card.end.y).is_equal_approx(roundf(float((l.origin as Vector2).y) + 752.0 * float(l.scale) - 16.0), 1.0)
+	assert_float(card.get_center().x).is_equal_approx(180.0, 1.0)
+	assert_bool(card.encloses(s.spinner.get_rect())).is_true()
+	assert_float(s._caption.position.y + s._caption.get_combined_minimum_size().y).is_less_equal(card.end.y)
+	var box := s._slow_card.get_theme_stylebox(&"panel") as UiStyleBox
+	assert_float(box.bg_color.a).is_equal_approx(0.9, 0.001)
+
+## Taken down, the launch cover is gone at once for everything that asks (screen_kind), and still fades into the scene
+## under it: at least 0.8 s after it showed, then 300 ms, its layer freed after.
+func test_the_splash_fades_into_the_scene_after_its_least_time() -> void:
+	rt.cover_launch()
+	var layer := rt.ui._screen_layer
+	var screen := rt.ui.screen()
+	rt.ui.hide_screen([K.LAUNCH])
+	assert_int(rt.ui.screen_kind()).is_equal(-1)
+	assert_bool(is_instance_valid(layer)).is_true()   # still drawn
+	assert_int(screen.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # takes no touch now
+	await get_tree().create_timer(0.5).timeout
+	assert_bool(is_instance_valid(layer)).is_true()   # under its 0.8 s
+	await get_tree().create_timer(0.9).timeout
+	assert_bool(is_instance_valid(layer)).is_false()
