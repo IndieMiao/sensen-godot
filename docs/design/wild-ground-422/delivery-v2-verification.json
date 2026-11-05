@@ -1,0 +1,111 @@
+{
+  "verified_at_utc": "2026-11-05T15:55:35.154180+00:00",
+  "project": "SGODOT",
+  "work_item": "SGODOT-422",
+  "work_item_id": "1589379c-919f-43dc-95d5-71a84c649214",
+  "pull_request": "https://github.com/IndieMiao/sensen-godot/pull/791",
+  "art_commit": "23309d96a8d961ca993831e587265c59c70a6263",
+  "all_readbacks_equal": true,
+  "all_visible_authors_verified": true,
+  "attachments": [
+    {
+      "source_name": "three_openings.png",
+      "attachment_id": "9f248012-b66e-44c0-b751-620e7355f4c1",
+      "name": "liubei-422-water-preserved-v2-three_openings.png",
+      "bytes": 730500,
+      "sha256": "9d8414784877260ca6f465922bcc51d7c08fdd75a402abd0aa71f7f63e8c8b58",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "crescent_comparison.png",
+      "attachment_id": "2b922466-6d63-4548-a6a9-9ed7fcdff436",
+      "name": "liubei-422-water-preserved-v2-crescent_comparison.png",
+      "bytes": 443782,
+      "sha256": "11eb37ecbebeb5479fccb2574ea02ede4ba84d2fc21a6714bcd23b215e4bb78e",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gourd_comparison.png",
+      "attachment_id": "b4932bc0-53bf-47be-a69c-0343a6185758",
+      "name": "liubei-422-water-preserved-v2-gourd_comparison.png",
+      "bytes": 427567,
+      "sha256": "68b35e1f0146e1bf3d34c301178ada0db03e1def7d5d19b54288d8a95331a746",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "meander_comparison.png",
+      "attachment_id": "502e7d01-9774-4ed7-b093-b4b666a926d4",
+      "name": "liubei-422-water-preserved-v2-meander_comparison.png",
+      "bytes": 424351,
+      "sha256": "08df6e9b21d72234a507da2db97b367a64e11baf7112d2ef9c54b4a194cda576",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "crescent_after_360x800.png",
+      "attachment_id": "daa65675-1f5f-4923-af8a-241b059385c8",
+      "name": "liubei-422-water-preserved-v2-crescent_after_360x800.png",
+      "bytes": 310268,
+      "sha256": "3c4585232e6a8272a21f0e32b2f00f10b4894a8c289406524bb0b40bda9a9ef5",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gourd_after_360x800.png",
+      "attachment_id": "8be9e2b9-c519-4758-ad27-0c2f941cc0a5",
+      "name": "liubei-422-water-preserved-v2-gourd_after_360x800.png",
+      "bytes": 312608,
+      "sha256": "67a5e47567c3f07cafd34db790fcab9142deb8efc009b0d5d37ba99d3dbdd1eb",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "meander_after_360x800.png",
+      "attachment_id": "3014b657-aeb6-46e4-b3d5-a06edd1b0c19",
+      "name": "liubei-422-water-preserved-v2-meander_after_360x800.png",
+      "bytes": 310782,
+      "sha256": "0b361d318a341164c2a82f1e59ac1e617376dd652eda2314f2b8109c11419c3f",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "gourd_overhead.png",
+      "attachment_id": "a65e9215-40cf-4907-9b17-2bfe53582e5d",
+      "name": "liubei-422-water-preserved-v2-gourd_overhead.png",
+      "bytes": 1331521,
+      "sha256": "540fbc96769058cca0db2437ac5317d1c9d031659eb1ca38df4ec6af80628cde",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "layout_constraints.png",
+      "attachment_id": "65904f7f-8780-4cc6-8040-e248ac06c900",
+      "name": "liubei-422-water-preserved-v2-layout_constraints.png",
+      "bytes": 54933,
+      "sha256": "80d26ea00c172366568d0f2feb3638f0deab5377e28512b4b2dbdd4ce832f90a",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "android_v2_smoke.png",
+      "attachment_id": "18161e15-5ec8-4331-95de-d080d82f2d69",
+      "name": "liubei-422-water-preserved-v2-android_v2_smoke.png",
+      "bytes": 734733,
+      "sha256": "6dfc62c2dbfc6c48d04da45be4e35b1b4c8b4346aa6bb7fbf27e787766e9255c",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "preservation-validation.json",
+      "attachment_id": "221e84b3-0d56-4cd1-b70f-418c2a44b784",
+      "name": "liubei-422-water-preserved-v2-preservation-validation.json",
+      "bytes": 14882,
+      "sha256": "b7fa7e6f8038b515d8f5838e964f9f364a6a507562cf4dca135d45bfd3e2a3f0",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    },
+    {
+      "source_name": "README.md",
+      "attachment_id": "0f6de74a-e59b-4274-8d98-ddef7547c4f7",
+      "name": "liubei-422-water-preserved-v2-ground-handoff.md",
+      "bytes": 10175,
+      "sha256": "fd0ec4e10371d42b74685eb3d98df369e14f12cf8b23a061ba1a7b4825a100c2",
+      "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260"
+    }
+  ],
+  "comment_id": "987ce49b-6d60-44c3-b7cc-7cd95c1af6e8",
+  "comment_readback_verified": true,
+  "comment_actor": "0fb1de1f-ead5-443b-9537-54cbac113260"
+}
