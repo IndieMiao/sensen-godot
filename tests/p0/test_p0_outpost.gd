@@ -889,7 +889,7 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo", "res_nadia"])).is_equal("market_subtropical_2")
 	P0CityPlaces.accept("gn-testlena", {"detail": {"outposts": [{"id": "gn-testlena~tea0", "role": "tea", "name": "Test Tea House",
 		"art": "tea_house", "anchors": "res://assets/p0/outposts/tea_house.anchors.json", "category": "Tea house", "lat": 1.0,
-		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_0"},
+		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_2"},
 		"residents": ["res_hana", "res_lena"]}]}})
 	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_0")
 
