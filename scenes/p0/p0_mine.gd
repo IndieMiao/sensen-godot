@@ -392,8 +392,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 func _fight(v: Dictionary, dt: float) -> void:
 	if combat == null: return
 	combat.sync_p0(v, floor_n, actor.mover)
-	# Knocked out: the fight holds still until the player is out (the server has already refilled HP, so the bar keeps 0 %
-	# for the moment instead of jumping to 100 % — 不知火舞 on 288 78d0f863)
+	# Knocked out: the fight holds still until the player is out (the server has the player out already, with 30 HP since
+	# q(291), so the bar keeps 0 % for the moment instead of jumping — 不知火舞 on 288 78d0f863)
 	combat.step(dt, actor.mover, rt.ui.has_modal() or _ko)
 	_slash_t += dt
 	_hold_sword(str(v.get("mine", {}).get("weapon", {}).get("id", "")))

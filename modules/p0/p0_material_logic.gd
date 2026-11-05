@@ -347,7 +347,20 @@ static func wild_mine_rows(view: Dictionary, site: Dictionary) -> Array:
 	if records is Dictionary and records.get(str(site.get("id", ""))) is Dictionary:
 		best = maxi(best, int(records[str(site.id)].get("deepest", 0)))
 	rows.append(["You", "Best here F%d" % best if best > 0 else "Not visited"])
+	var hp := mine_hp_line(view)
+	if hp != "": rows.append(["HP", hp])
 	return rows
+
+## q(291) (不知火舞 421 3f328435): out of the mine and not full, the mine card's line under `You` — `40% · Full in 36m`
+## (view.mine.hp / hp_max / hp_full_in, refilling 0 to full in 60 minutes); "" when full, in the mine, or from a server
+## before q(291). No toast on leaving: the card opens anyway with this on it.
+static func mine_hp_line(view: Dictionary) -> String:
+	var mine = view.get("mine", null)
+	if not (mine is Dictionary) or mine.get("at", null) != null or not mine.has("hp_full_in"): return ""
+	var hp := int(mine.get("hp", 0))
+	var top := int(mine.get("hp_max", 100))
+	if top <= 0 or hp >= top: return ""
+	return "%d%% · Full in %s" % [roundi(100.0 * hp / top), P0Logic.span(float(mine.hp_full_in))]
 
 ## A wild site's type word as its name ends (v4q(3) ④): the mouth card's type line says `<word> mine`.
 const WILD_TYPE_WORDS := {"quarry": "Quarry", "vein": "Vein", "geode": "Geode", "abyss": "Abyss", "ruin": "Ruins"}
