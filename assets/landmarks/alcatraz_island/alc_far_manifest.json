@@ -1,0 +1,235 @@
+{
+  "task": "SGODOT-424",
+  "revision": "v1",
+  "author": "黄忠",
+  "virtual_user_id": "5281cd25-6a49-4df8-9802-f3e534956e80",
+  "units": "metres; Y up; +Z front; bottom-centre origin",
+  "palette_srgb": {
+    "white": "EEE8D6",
+    "white_light": "FFF5E1",
+    "white_shadow": "D6D2C2",
+    "stone": "B4AE9B",
+    "window": "88B1BB",
+    "window_dark": "547981",
+    "lantern": "F5D994",
+    "roof": "B8AB8C",
+    "rust": "A86C48",
+    "rust_light": "C48C5E",
+    "rust_dark": "80513B",
+    "hoop": "765344",
+    "bridge": "C97454",
+    "bridge_light": "DE8A62",
+    "bridge_shade": "AD604A",
+    "hills": "9DAE9B",
+    "hills_light": "B2BA9B",
+    "hill_shadow": "839D9A",
+    "city": "D3CBC0",
+    "city_light": "E8DACA",
+    "city_blue": "AABDC6",
+    "city_mid": "B9BEBB",
+    "city_shadow": "9FB1BD"
+  },
+  "assets": {
+    "alc_lighthouse": {
+      "file": "alc_lighthouse.glb",
+      "triangles": 3262,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.1500000953674316,
+          0.0,
+          -2.1500000953674316
+        ],
+        [
+          2.1500000953674316,
+          15.0,
+          2.1500000953674316
+        ]
+      ],
+      "dimensions_m": [
+        4.300000190734863,
+        15.0,
+        4.300000190734863
+      ],
+      "sha256": "61cac63d1c1be7b8583e8dfd1692e958ee66a1dbad116cb4375fc6ac95dce9b9",
+      "source": "tools/art/source/alcatraz_far_424/alc_lighthouse.blend",
+      "height_m": 15,
+      "style": "White visitor lighthouse, warm lantern, no bars or watchtower details"
+    },
+    "alc_lighthouse_far": {
+      "file": "alc_lighthouse_far.glb",
+      "triangles": 830,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.1500000953674316,
+          0.0,
+          -2.1500000953674316
+        ],
+        [
+          2.1500000953674316,
+          15.0,
+          2.1500000953674316
+        ]
+      ],
+      "dimensions_m": [
+        4.300000190734863,
+        15.0,
+        4.300000190734863
+      ],
+      "sha256": "bdbd5677a996fc2808a8cb41db5846d6580d0a62d0eb7dd7b2f5df167e36aefb",
+      "source": "tools/art/source/alcatraz_far_424/alc_lighthouse_far.blend",
+      "height_m": 15,
+      "style": "White visitor lighthouse, warm lantern, no bars or watchtower details"
+    },
+    "alc_watertower": {
+      "file": "alc_watertower.glb",
+      "triangles": 3546,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.0199999809265137,
+          0.0,
+          -2.0199999809265137
+        ],
+        [
+          2.0199999809265137,
+          12.0,
+          2.0199999809265137
+        ]
+      ],
+      "dimensions_m": [
+        4.039999961853027,
+        12.0,
+        4.039999961853027
+      ],
+      "sha256": "92aaf9ffd5facab3c261180cae8dcb05bb46edea0345856acdd4cc9b5815cb11",
+      "source": "tools/art/source/alcatraz_far_424/alc_watertower.blend",
+      "height_m": 12,
+      "style": "Rust timber and iron support structure; open X bracing retained in far LOD"
+    },
+    "alc_watertower_far": {
+      "file": "alc_watertower_far.glb",
+      "triangles": 774,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.0199999809265137,
+          0.0,
+          -2.0199999809265137
+        ],
+        [
+          2.0199999809265137,
+          12.0,
+          2.0199999809265137
+        ]
+      ],
+      "dimensions_m": [
+        4.039999961853027,
+        12.0,
+        4.039999961853027
+      ],
+      "sha256": "d37fd1ad196f152abb1a2cc754f000f11e82779bd6022cb6c31fddc17536c452",
+      "source": "tools/art/source/alcatraz_far_424/alc_watertower_far.blend",
+      "height_m": 12,
+      "style": "Rust timber and iron support structure; open X bracing retained in far LOD"
+    },
+    "alc_far_goldengate": {
+      "file": "alc_far_goldengate.glb",
+      "triangles": 1524,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -2.405808687210083,
+          0.0,
+          -0.11500000208616257
+        ],
+        [
+          2.405808687210083,
+          1.277500033378601,
+          0.11500000208616257
+        ]
+      ],
+      "dimensions_m": [
+        4.811617374420166,
+        1.277500033378601,
+        0.23000000417232513
+      ],
+      "sha256": "5e3ff7d772df06a5ed82629e6babbb15c7014a0df4edb4b68f96212dae88514e",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_goldengate.blend",
+      "scenic_card": true,
+      "real_scale_structure": false,
+      "style": "Orange-red Golden Gate silhouette; two towers, broad roadway, continuous sagging cables",
+      "default_shadow": false
+    },
+    "alc_far_skyline": {
+      "file": "alc_far_skyline.glb",
+      "triangles": 1201,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -6.0520453453063965,
+          0.0,
+          -0.19999998807907104
+        ],
+        [
+          6.0520453453063965,
+          3.700000047683716,
+          0.19999998807907104
+        ]
+      ],
+      "dimensions_m": [
+        12.104090690612793,
+        3.700000047683716,
+        0.3999999761581421
+      ],
+      "sha256": "ce6c233c8c03f1127297007f22fc7a7cf0f2e54ebf095c4f78ad1fe71e9707df",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_skyline.blend",
+      "scenic_card": true,
+      "landmark_silhouettes": [
+        "Salesforce Tower",
+        "Transamerica Pyramid"
+      ],
+      "default_shadow": false,
+      "style": "Pastel low-relief skyline, no lettering or photo texture"
+    },
+    "alc_far_hills": {
+      "file": "alc_far_hills.glb",
+      "triangles": 120,
+      "surfaces": 1,
+      "bounds": [
+        [
+          -10.0,
+          0.0,
+          -0.1899999976158142
+        ],
+        [
+          10.0,
+          2.4881391525268555,
+          0.1899999976158142
+        ]
+      ],
+      "dimensions_m": [
+        20.0,
+        2.4881391525268555,
+        0.3799999952316284
+      ],
+      "sha256": "f434454d315a20c8e888c9a562931ff45efbe4ca62eb5cfd3851d3ccdd9cdd68",
+      "source": "tools/art/source/alcatraz_far_424/alc_far_hills.blend",
+      "scenic_card": true,
+      "default_shadow": false,
+      "style": "Three broad low-contrast hill layers, deliberately sparse silhouette"
+    }
+  },
+  "placement_status": "pending v2 coordinate/camera confirmation with Marco Polo",
+  "lod_pairs": [
+    [
+      "alc_lighthouse",
+      "alc_lighthouse_far"
+    ],
+    [
+      "alc_watertower",
+      "alc_watertower_far"
+    ]
+  ]
+}

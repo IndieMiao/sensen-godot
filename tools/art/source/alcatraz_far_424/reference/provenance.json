@@ -1,0 +1,12 @@
+{
+  "task": "SGODOT-424",
+  "reference_files": {
+    "landmark_alcatraz_v2.jpg": "e25388b6e3be3af6e0815e269cd29090c00f1aae9e1f46707b7b10f026255932",
+    "c_alc2.png": "408027a23724ebaa5a0388f493c198b89f5a7c157f363d34b5470b032ef455d1"
+  },
+  "main_branch_last_seen": "wp-3d-scene-makeboluo-alcatraz-424",
+  "main_branch_head": "d93763c31636fe254a29b035e2b2e4219bda386a",
+  "coordinate_request_comment": "a1b86c07-14db-419e-8699-3a6e6998a418",
+  "projection_question_comment": "ae4cdbf8-b214-4f76-9a59-75a44fc8d86e",
+  "placement_status": "awaiting v2 coordinate / camera confirmation"
+}
