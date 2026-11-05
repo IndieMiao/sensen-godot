@@ -80,6 +80,7 @@ func before_test() -> void:
 	mini.start()
 	line = auto_free(P0Line.new())
 	line.off = false   # whatever this machine's switch says
+	line._for_good = false
 	add_child(line)
 	replies = []
 
@@ -193,6 +194,75 @@ func test_a_reply_between_failures_starts_the_count_again() -> void:
 	await _wait(3)
 	assert_array(replies.map(func(r): return r.result)).is_equal([HTTPRequest.RESULT_CONNECTION_ERROR,
 		HTTPRequest.RESULT_SUCCESS, HTTPRequest.RESULT_CONNECTION_ERROR])
+	assert_bool(line.off).is_false()
+
+## Off after failures (no signal at launch, a tunnel), the line again once the old way has an answer — if it had
+## answered in this run, at most three times a run (奕星 11-05).
+func _fail_twice() -> void:
+	var before := replies.size()
+	_send()
+	await _wait(before + 1)
+	_send()
+	await _wait(before + 2)
+
+func test_the_line_comes_back_once_the_old_way_answers() -> void:
+	mini.answer = func(n): return {"cut": n != 0}
+	_send()
+	await _wait(1)
+	await _fail_twice()
+	assert_bool(line.off).is_true()
+	assert_str(line.off_why).is_equal("2 failures in a row")
+	line.old_way_answered(PackedStringArray())
+	assert_bool(line.off).is_false()
+	mini.answer = func(_n): return {}
+	assert_int(_send()).is_equal(OK)
+	await _wait(4)
+	assert_int(replies[3].code).is_equal(200)
+	assert_str(line.last_via).is_equal("new")
+
+func test_a_line_that_never_answered_stays_the_old_way() -> void:
+	mini.stop()
+	await _fail_twice()
+	assert_bool(line.off).is_true()
+	line.old_way_answered(PackedStringArray())
+	assert_bool(line.off).is_true()
+
+func test_three_comebacks_a_run_at_most() -> void:
+	mini.answer = func(n): return {"cut": n != 0}
+	_send()
+	await _wait(1)
+	for i in 3:
+		await _fail_twice()
+		line.old_way_answered(PackedStringArray())
+		assert_bool(line.off).override_failure_message("comeback %d" % (i + 1)).is_false()
+	await _fail_twice()
+	line.old_way_answered(PackedStringArray())
+	assert_bool(line.off).is_true()
+
+func test_the_switches_stay_whatever_the_old_way_says() -> void:
+	mini.answer = func(n): return {"cut": n != 0}
+	_send()
+	await _wait(1)
+	await _fail_twice()
+	line.old_way_answered(PackedStringArray(["x-p0-line: close"]))   # the server's switch, on the old way's answer
+	assert_bool(line.off).is_true()
+	line.old_way_answered(PackedStringArray())
+	assert_bool(line.off).is_true()
+	var device: P0Line = auto_free(P0Line.new())   # the device's switch
+	device._turn_off("switched off on this device", true)
+	device._ever = true
+	device.old_way_answered(PackedStringArray())
+	assert_bool(device.off).is_true()
+
+func test_the_session_tells_the_line_when_the_old_way_answers() -> void:
+	var s: P0Session = auto_free(P0Session.new())
+	s.line = line
+	line.off = true
+	line._ever = true
+	var body := JSON.stringify({"ok": true, "state": {"seq": 3, "save_version": 7}}).to_utf8_buffer()
+	s._on_done(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray(), auto_free(P0HttpRequest.new()), {})
+	assert_bool(line.off).is_true()   # no answer: still the old way
+	s._on_done(HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body, auto_free(P0HttpRequest.new()), {})
 	assert_bool(line.off).is_false()
 
 func test_no_answer_waits_its_live_seconds() -> void:

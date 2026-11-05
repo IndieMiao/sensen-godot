@@ -246,8 +246,10 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 		http.queue_free()
 		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
 
-func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
+func _on_done(result: int, code: int, headers: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
 	http.queue_free()
+	# an answer the old way: the line, off after failures, may come back (P0Line.old_way_answered)
+	if line != null and result == HTTPRequest.RESULT_SUCCESS and code > 0: line.old_way_answered(headers)
 	_finish(result, code, raw, cmd)
 
 ## One response, in order: handle it while still busy (so commands sent from signal handlers queue behind
