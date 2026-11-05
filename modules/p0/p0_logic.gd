@@ -1065,6 +1065,17 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 			var ms := float(g.city_ready[id]) - elapsed_ms
 			if ms > 0.0: left[id] = ms
 		own.call(v, "gather")["city_ready"] = left
+	# a pond's points (409 / 410: view.gather.pond.points[].ready_in, ms left) counted down the same way
+	var gp = v.get("gather", {}).get("pond", null) if v.get("gather") is Dictionary else null
+	if gp is Dictionary and gp.get("points") is Array and (gp.points as Array).any(func(p): return float(p.get("ready_in", 0)) > 0.0):
+		var pts: Array = []
+		for p in gp.points:
+			var q: Dictionary = (p as Dictionary).duplicate()
+			q["ready_in"] = maxf(0.0, float(q.get("ready_in", 0)) - elapsed_ms)
+			pts.append(q)
+		var pond_g: Dictionary = (own.call(v, "gather")["pond"] as Dictionary).duplicate()
+		pond_g["points"] = pts
+		own.call(v, "gather")["pond"] = pond_g
 	var guide = v.get("guide", null)
 	var row = guide.get("row", null) if guide is Dictionary else null
 	if row is Dictionary and row.get("countdown") is String and row.get("ready_in") != null:

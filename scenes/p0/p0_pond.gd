@@ -33,6 +33,12 @@ const P0City := preload("res://modules/p0/p0_city.gd")
 const OnlineCrowd := preload("res://modules/net/online_crowd.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
 const P0VoiceRoom := preload("res://modules/p0/p0_voice_room.gd")
+const PondGather := preload("res://scenes/p0/p0_pond_gather.gd")   # the pond's gathering points (SGODOT-410)
+var gather: Node3D       # PondGather: the pieces, their name bar and the Gather key
+var _gather_tag := ""    # the point whose name bar is up
+var _gather_marked := "" # the point the guide's `!` is on
+var _scenery: Node3D
+var _scenery_clear: Array = []   # the points the bank's scenery was built keeping off
 ## The farthest pinch: the farm's 0.8 widened so the open-water ponds (SGODOT-374, 不知火舞: up to 9.7 m across) still
 ## fit one view whole; the opening and the walk stay at 1.0, the farm's player scale.
 const FAR_ZOOM := 0.68
@@ -125,7 +131,10 @@ func _ready() -> void:
 	cam.far = 80
 	add_child(cam)
 	cam.make_current()
-	add_child(PondScenery.build(entry))
+	_build_scenery(PondGather.clear_points(P0Runtime.ensure().session.current()))   # 410: the bank keeps off the points
+	gather = PondGather.new()
+	gather.name = "Gather"
+	add_child(gather)
 	var water := FishingWater.build(str(entry.id), site_spec)
 	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	add_child(water)
@@ -191,7 +200,13 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		if _at(plan.origin): _open_panel(plan)
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
-	rt.ui.set_action(_action_state(v))
+	gather.sync(v)
+	var clear := PondGather.clear_points(v)
+	if not clear.is_empty() and clear != _scenery_clear: _build_scenery(clear)   # the points came with the reply after the scene was built
+	var near: Dictionary = PondGather.nearest(gather.points, actor.position)
+	var reach := not near.is_empty() and _plan.is_empty() and PondGather._flat(PondGather.stand_of(near), actor.position) <= PondGather.REACH_M
+	rt.ui.set_action(PondGather.key(v, near, gather.pond) if reach else _action_state(v))   # 410: Gather at a point, else Cast
+	_gather_marks(v, near)
 	_trap_frame(v)
 	rt.ui.set_trap_slots(P0Trap.slots_line(v) if rt.ui.selected_bait == TRAP_ID else "")   # TRAP-2 (B7 on 286)
 	# At the pond: "Your creel is your bag…" (§14.2 minute 5–9); "Casting uses 5 Energy" comes with the first cast (P0Guide).
@@ -209,6 +224,10 @@ func _action_state(v: Dictionary) -> Dictionary:
 func p0_action(cmd: Dictionary) -> void:
 	match str(cmd.get("type", "")):
 		"cast": _go_cast(Vector3.INF)
+		"gather":   # 410: the gather clip toward the piece, the command now (its reply floats `+4 Timber`)
+			var p: Dictionary = gather.point(str(cmd.get("spot", "")))
+			if not p.is_empty(): actor.labour("gather", Vector3(float(p.x), 0, float(p.z)))
+			rt.session.send(cmd, P0Session.ui_key(cmd))
 		"set_trap", "collect_trap": rt.session.send(cmd, P0Session.ui_key(cmd))
 
 func _go_cast(point: Vector3) -> void:
@@ -229,6 +248,47 @@ func _at(origin: Vector3) -> bool:
 	return Vector2(actor.position.x - origin.x, actor.position.z - origin.z).length() < ARRIVE_M
 
 func p0_energy_verb() -> String: return "Cast"
+
+## 410: the nearest point's name bar (within TAG_M; the item's name, cooling dimmed with `Ready in …`), the previous one
+## folded; the guide's `!` on the point its target names (view.guide.target.spot), whichever point is nearest.
+## The bank's scenery, its trees and bushes off `clear` (410); built again when the pond's points first come or change.
+func _build_scenery(clear: Array) -> void:
+	if _scenery: _scenery.free()
+	_scenery_clear = clear
+	_scenery = PondScenery.build(entry, clear)
+	add_child(_scenery)
+	move_child(_scenery, cam.get_index() + 1)
+
+func _gather_marks(v: Dictionary, near: Dictionary) -> void:
+	var id := str(near.get("id", "")) if not near.is_empty() and PondGather._flat(PondGather.stand_of(near), actor.position) <= PondGather.TAG_M else ""
+	if _gather_tag != "" and _gather_tag != id: rt.ui.name_bar("gather:" + _gather_tag, null, "", "", Vector2.ZERO, false)
+	_gather_tag = id
+	if id != "":
+		var t := PondGather.tag(v, near)
+		rt.ui.name_bar("gather:" + id, P0Logic.icon(str(t.icon)), str(t.text), str(t.fact), _gather_screen(near), true, -1, bool(t.dimmed))
+	var target = v.get("guide", {}).get("target", null) if v.get("guide") is Dictionary else null
+	var marked := str(target.get("spot", "")) if target is Dictionary and str(target.get("kind", "")) == "gather" else ""
+	if gather.point(marked).is_empty(): marked = ""
+	if _gather_marked != "" and _gather_marked != marked: rt.ui.badge("gather_mark:" + _gather_marked, UiStatusBadge.State.REQUEST, Vector2.ZERO, false)
+	_gather_marked = marked
+	if marked != "": rt.ui.badge("gather_mark:" + marked, UiStatusBadge.State.REQUEST, _gather_screen(gather.point(marked)) + Vector2(0, -28), true)
+
+## A point's mark on the screen: over its piece (a grove stands tall).
+func _gather_screen(p: Dictionary) -> Vector2:
+	var tall := 2.2 if str(p.get("kind", "")) in ["wood", "hardwood"] else 1.0
+	return cam.unproject_position(Vector3(float(p.get("x", 0)), tall, float(p.get("z", 0))))
+
+## Today's / a source line's Show while the player is at this pond (亚瑟's map half): `gather:<point id>` — the camera
+## over that piece, its name bar nudged (LOCK-08: the camera only, nobody walks).
+func p0_has_spot(where: String) -> bool:
+	return where.begins_with("gather:") and not gather.point(where.trim_prefix("gather:")).is_empty()
+
+func p0_show_spot(where: String) -> void:
+	var p: Dictionary = gather.point(where.trim_prefix("gather:"))
+	if p.is_empty(): return
+	_focus = Vector3(float(p.x), 0, float(p.z))
+	_cam_follow.hold()
+	rt.ui.pulse_marker("gather:" + str(p.id))
 
 func _open_panel(plan: Dictionary) -> void:
 	actor.face(plan.target)
