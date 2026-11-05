@@ -270,6 +270,10 @@ func test_the_big_pots_lid_follows_the_cook() -> void:
 	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000, "heats": []}, {}, {}]
 	_set_view(v)
 	k.on_pot(v.cooking.stoves[0])
+	# 419 (不知火舞 bd102c55): watching, the pot shows in the middle — the stove's hidden, its steam waiting; walked away
+	# from the watch, the stove's pot and its steam come back, the lid as below
+	assert_bool(pot.visible).override_failure_message("one pot on the screen: the layer's").is_false()
+	k.stop_watching()
 	frame.call()
 	k.stage.call("_process", 0.0)
 	var steam: CPUParticles3D = k.stage.get("_steam")
@@ -379,3 +383,26 @@ func test_a_common_cook_asks_nothing() -> void:
 	assert_object(k.confirm_sheet).is_null()
 	assert_array(sent.map(func(c): return c.type)).is_equal(["cook"])
 	await _close()
+
+## 419 (不知火舞 bd102c55, (b)): watching, the pot is a layer in the middle — its mouth at (180, 235) with the ring on it,
+## the stove's pot hidden (one pot on the screen); it flies in from the stove pot and, walked away, back to it, the
+## stove's pot then showing again.
+func test_the_watched_pot_is_a_layer_in_the_middle() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var pot := r.art.get_node("stove_pots/stove_pot_1") as Node3D
+	var v := _view()
+	v.cooking.stoves = [{"id": 9, "dish": "dish_grilled_crucian", "ms": 60000, "elapsed": 1000, "ready_in": 59000,
+		"heats": [{"at": 3000, "spin": 1600, "gold": 0.4, "width": 0.3, "from": 90, "drift": 12}]}, {}, {}]
+	_set_view(v)
+	k.watch(v.cooking.stoves[0])
+	var layer: P0WaitPot = k.get("_wait_pot")
+	assert_bool(layer.visible).is_true()
+	assert_bool(pot.visible).is_false()
+	await get_tree().create_timer(P0WaitPot.FLY_S + 0.1).timeout
+	assert_vector(layer.mouth_screen()).is_equal_approx(P0WaitPot.MOUTH, Vector2.ONE * 0.5)
+	assert_vector(k.call("_ring_center")).is_equal_approx(P0WaitPot.MOUTH, Vector2.ONE * 0.5)
+	k.stop_watching()
+	await get_tree().create_timer(P0WaitPot.FLY_S + 0.1).timeout
+	assert_bool(layer.visible).is_false()
+	assert_bool(pot.visible).is_true()

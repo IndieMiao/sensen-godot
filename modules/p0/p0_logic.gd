@@ -1304,7 +1304,14 @@ static func heat_hit(heat: Dictionary, tap_ms: float, tolerance := 150.0) -> boo
 	var spin := float(heat.get("spin", 1600))
 	var gold := float(heat.get("gold", 0.3))
 	var width := float(heat.get("width", 0.3))
-	return tap_ms >= at + gold * spin - tolerance and tap_ms <= at + (gold + width) * spin + tolerance
+	var k := heat_k(heat)
+	return tap_ms >= at + gold * spin / k - tolerance and tap_ms <= at + (gold + width) * spin / k + tolerance
+
+## The ring drifts too (q(288), SGODOT-419): `drift` degrees a second against the needle (anticlockwise; none without it).
+## The needle then meets the gold k = 1 + drift ÷ the needle's speed laps a lap, so the gold's window in time is its
+## share ÷ k — the server's heatHits the same way (周瑜).
+static func heat_k(heat: Dictionary) -> float:
+	return maxf(0.05, 1.0 + float(heat.get("drift", 0.0)) * float(heat.get("spin", 1600)) / 360000.0)
 
 ## Which known Cookbook page these ingredients make (§7.2.3: specific pages before tag pages, fewest
 ## wildcards first). Unknown pages hide their ingredients, so experiments still discover them.

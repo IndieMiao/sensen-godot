@@ -24,8 +24,10 @@ const BAND_TOP_WATCH := 0.40      # COOK-3: the pot sits high, under the HUD, ab
 const QUEUE_DROP := 14.0
 const FOCUS_SIZE := 0.42          # pushed-in view: 42 % of the room's accepted width
 const WATCH_FOCUS_SIZE := 0.34    # COOK-3 pushes in further on the pot (approved kitchen camera ×1.85)
+## The countdown and its bar under the ring (P0CookTimer; 419 v1: the plate's middle at y 362, the ring's at 235).
+const TIMER_BELOW_RING := 127.0
 const OVERLAY_GAP := 8.0          # the pot card's foot above the drawer top (row 53: 326 → 334)
-const WATCH_SHEET_H := 196.0      # COOK-3 sheet: dish, Cooking, m:ss remaining, the heat hint
+const WATCH_SHEET_H := 196.0      # COOK-3 sheet: dish, Cooking, the heat hint (the countdown is P0CookTimer's, 419)
 const CLOSE_GAP := 6.0            # × sits this far above the sheet's top edge (COOK-3: 554 → 604)
 const QUEUE_BADGE_AT := Vector2(59, 33)   # COOK-QUEUE-1c 1758:103247: the next pot's dish beside the pot (design px)
 const CARD_TOP := 0.425           # RewardMoment top at 340 of 800 (COOK-4)
@@ -60,6 +62,8 @@ var _overlay: Control
 var _pot_card: UiPotCard
 var _point_at_remove := false      # the pot is full and a bag cell was tapped: ✕ wears its gold-brown ring (q(64))
 var _ring: UiHeatRing
+var _timer: P0CookTimer   # the countdown and its bar in the middle (419)
+var _wait_pot: P0WaitPot  # the pot in the middle, a 3D layer (419, 不知火舞 bd102c55 (b)); the stove's hidden meanwhile
 var _stove: Dictionary = {}
 ## The stove this kitchen works (SGODOT-282: Homestead Lv4 / Lv8 bring stoves 2 and 3), 0-based. The drawer, the
 ## watch, serve and the 3D stage all follow it; P0Farmhouse picks it when a stove is tapped.
@@ -252,6 +256,7 @@ func _cycle_stove() -> void:
 func open_queue() -> void:
 	if phase != "watch" or not P0KitchenLogic.can_queue(rt.session.current(), stove_index): return
 	_hide_sheet()
+	_hide_wait_pot()   # 419 (1): back onto the stove, which drops as before (#142), the ring over it; out again after
 	phase = "idle"
 	_queue_mode = true
 	open("cookbook")
@@ -664,6 +669,12 @@ func watch(stove: Dictionary) -> void:
 		_ring.theme = UiKit.theme()
 		rt.ui.root.add_child(_ring)
 	_ring.visible = false
+	if _timer == null:
+		_timer = P0CookTimer.new()
+		_timer.theme = UiKit.theme()
+		rt.ui.root.add_child(_timer)
+	_timer.visible = false
+	_show_wait_pot()
 	if _queue_badge == null:
 		_queue_badge = UiWorldIconButton.new()   # display only: taps on it are heat taps like the rest of the scene
 		_queue_badge.theme = UiKit.theme()
@@ -674,7 +685,8 @@ func watch(stove: Dictionary) -> void:
 const HEAT_HINT := "Tap when the needle hits gold!"
 var _hint: Label
 
-## COOK-3 bottom sheet: ObjectHeader (dish · Cooking · m:ss remaining) and the heat hint, × above it. Not modal:
+## COOK-3 bottom sheet: ObjectHeader (dish · Cooking; the countdown left it for the middle, 419) and the heat hint, ×
+## above it. Not modal:
 ## taps on the scene above stay heat taps.
 func _show_sheet(stove: Dictionary) -> void:
 	if _sheet == null:
@@ -699,7 +711,8 @@ func _show_sheet(stove: Dictionary) -> void:
 		rt.ui.set_toast_over(_close)   # a toast while watching (the turn-over, q(71)) sits above the sheet and its ×
 	var dish = stove.get("dish", null)
 	_sheet_header.title = P0Logic.item_name(rt.session.current(), str(dish)) if dish != null else "Unknown dish"
-	_sheet_header.quantity_label = "remaining"
+	_sheet_header.quantity = ""   # the countdown is in the middle now, with its bar (P0CookTimer, 419 v1)
+	_sheet_header.quantity_label = ""
 	_refresh_watch(rt.session.current())
 	_update_sheet()
 
@@ -720,8 +733,6 @@ func _update_sheet() -> void:
 	# The first fire's TipCard says the same sentence (P0Guide.TIPS.heat): one on screen at a time, the hint's place kept
 	# so Queue next does not move (不知火舞 on 341)
 	if is_instance_valid(_hint): _hint.modulate.a = 0.0 if rt.ui.tip_showing("heat") else 1.0
-	var left := maxf(0.0, float(_stove.get("ms", 0)) - elapsed())
-	_sheet_header.quantity = "%d:%02d" % [int(left / 60000.0), int(left / 1000.0) % 60]
 	var top := rt.ui.root.size.y - WATCH_SHEET_H - _sheet.safe_bottom
 	_close.position = Vector2(rt.ui.root.size.x - UiTokens.SPACE_PAGE - UiTokens.SIZE_CLOSE, top - CLOSE_GAP - UiTokens.SIZE_CLOSE)
 
@@ -739,11 +750,49 @@ func stop_watching() -> void:
 	phase = "idle"
 	_hide_ring()
 	_hide_sheet()
+	_hide_wait_pot()
 	room.release_focus()
 	_hide_player(false)
 
 func _hide_ring() -> void:
 	if _ring: _ring.visible = false
+	if _timer: _timer.visible = false
+
+## The watched pot in the middle (419): the stove's held out of sight, the layer flying in from where it stood on the
+## screen and at its size. Already there (back from the queue drawer, the next pot): it stays.
+func _show_wait_pot() -> void:
+	# a farmhouse on its way out (the queue drawer closing as the room goes) has no screen to put it on
+	if not room.has_method("hold_pot") or not room.is_inside_tree() or rt == null: return
+	if _wait_pot == null:
+		_wait_pot = P0WaitPot.new()
+		_wait_pot.theme = UiKit.theme()
+		_wait_pot.visible = false
+		_wait_pot.z_index = -1   # a backdrop: the ring, its tick and its dot always over it, the HUD too (不知火舞 on 419)
+		rt.ui.root.add_child(_wait_pot)
+	if _wait_pot.visible: return
+	var pot: Node3D = room.call("stove_pot", stove_index)
+	var screen_k := room.get_viewport().get_screen_transform().get_scale().x
+	_wait_pot.setup(room.cam.global_transform.basis, pot.global_transform.basis.orthonormalized() if pot else Basis(),
+		str(room.call("pot_variant", stove_index)), maxf(1.0, screen_k))
+	room.call("hold_pot", stove_index, true)
+	_wait_pot.fly_in(_stove_pot_screen(), _stove_pot_scale())
+
+## Back onto the stove (served, walked away): the layer flies back to the stove pot's place and size, then the stove's
+## pot shows again.
+func _hide_wait_pot() -> void:
+	if _wait_pot == null or not _wait_pot.visible: return
+	var i := stove_index
+	_wait_pot.fly_out(_stove_pot_screen(), _stove_pot_scale(), func(): if is_instance_valid(room): room.call("hold_pot", i, false))
+
+## The stove pot's mouth on the screen, and its size there ÷ the layer's pot (P0WaitPot.POT_W_PX).
+func _stove_pot_screen() -> Vector2:
+	var mouth := room.anchor(drop_name())
+	return room.cam.unproject_position(mouth.global_position) if mouth else P0WaitPot.MOUTH
+func _stove_pot_scale() -> float:
+	var mouth := room.anchor(drop_name())
+	if mouth == null: return 1.0
+	var r := room.cam.global_transform.basis.x * P0WaitPot.POT_W_M * 0.5
+	return room.cam.unproject_position(mouth.global_position + r).distance_to(room.cam.unproject_position(mouth.global_position - r)) / P0WaitPot.POT_W_PX
 
 func elapsed() -> float: return float(Time.get_ticks_msec() - _start_ms)
 
@@ -804,6 +853,7 @@ func ring_center() -> Vector2: return _ring_center()
 
 ## The ring sits on the pot (COOK-3: the whole pot is the target, §7.2.4).
 func _ring_center() -> Vector2:
+	if _wait_pot and _wait_pot.visible: return _wait_pot.mouth_screen()   # the pot in the middle (419)
 	var mouth := room.anchor(drop_name())
 	if mouth == null: return room.get_viewport().get_visible_rect().size * 0.5
 	return room.cam.unproject_position(mouth.global_position)
@@ -816,7 +866,7 @@ func _process(_dt: float) -> void:
 	var active := -1
 	for i in heats.size():
 		var h: Dictionary = heats[i]
-		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin): _judge_tap()
+		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin) / P0Logic.heat_k(h): _judge_tap()
 		if not _judged.has(i) and e > float(h.at) + float(h.spin):
 			_judged[i] = false
 			_judged_turn[i] = 1.0   # the needle went round untouched: its dot where it stopped
@@ -830,9 +880,23 @@ func _process(_dt: float) -> void:
 			_ring.width = float(h.width)
 			_ring.grow = clampf(1.0 - (float(h.at) - e) / RING_EARLY_MS, 0.0, 1.0)
 			_ring.turn = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
+			# q(288): the needle from `from`, the ring drifting `drift` °/s anticlockwise from its entrance on (it is placed for
+			# τ = 0), stopping with the needle once judged (SGODOT-419)
+			_ring.start = float(h.get("from", 0.0)) / 360.0
+			var tau := minf(e - float(h.at), float(_judged_turn[active]) * float(h.spin)) if _judged_turn.has(active) else e - float(h.at)
+			_ring.ring = -float(h.get("drift", 0.0)) * tau / 360000.0
 			_ring.result = (1 if _judged[active] else 0) if _judged.has(active) else -1
 			_ring.mark_turn = float(_judged_turn.get(active, -1.0))
 			_ring.position = _ring_center() - _ring.size * 0.5
+	if _timer:
+		_timer.visible = phase == "watch"   # the queue drawer: the ring on the stove's pot again, no countdown (419)
+		_timer.total_ms = total
+		_timer.elapsed_ms = minf(e, total)
+		_timer.heat_at = heats.map(func(h): return float(h.at))
+		_timer.results = _judged
+		_timer.place(rt.ui.root.size.x * 0.5, _ring_center().y + TIMER_BELOW_RING)
+		# the first fire's `heat` TipCard over it: the card first, the countdown's plate out of its way (419 v1)
+		_timer.plate.visible = not (rt.ui.tip_showing("heat") and rt.ui.tip_rect().intersects(_timer.plate.get_global_rect()))
 	if phase != "watch": return   # the queue drawer: no sheet; a pot done meanwhile is served when the watch resumes
 	if _queue_badge and _queue_badge.visible: _queue_badge.place_at(_ring_center() + QUEUE_BADGE_AT)
 	_update_sheet()
@@ -870,6 +934,7 @@ func serve(taps: Array, from_stove := false) -> void:
 	_events.clear()
 	_hide_ring()
 	_hide_sheet()
+	_hide_wait_pot()   # back onto the stove: the plate comes out of it there
 	var dish = st.get("dish", null)
 	var rarity := int(st.get("rarity", 1))
 	var glow: Color = UiItemCell.RARITY_COLORS[clampi(rarity - 1, 0, 3)]
@@ -1144,5 +1209,7 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 
 func _exit_tree() -> void:
 	if _ring and is_instance_valid(_ring): _ring.queue_free()
+	if _timer and is_instance_valid(_timer): _timer.queue_free()
+	if _wait_pot and is_instance_valid(_wait_pot): _wait_pot.queue_free()
 	if _queue_badge and is_instance_valid(_queue_badge): _queue_badge.queue_free()
 	_hide_sheet()

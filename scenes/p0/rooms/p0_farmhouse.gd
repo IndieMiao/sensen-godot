@@ -365,7 +365,7 @@ func show_pots() -> void:
 func _apply_pots(n: int, big: Array) -> void:
 	for i in _pots.get_child_count():
 		var pot := _pots.get_child(i) as Node3D
-		pot.visible = i < n
+		pot.visible = i < n and not _held.get(i, false)
 		var variant := "pot_big" if big.has(i) else "pot_normal"
 		if pot.visible and _variants.get(i, variant) != variant: _swap_bounce(pot, variant)
 		_variants[i] = variant
@@ -402,6 +402,19 @@ func _restart_tween(n: Node) -> Tween:
 	_tweens[n] = t
 	return t
 
+## Stove i's pot held out of sight while the watch's pot layer shows it in the middle (SGODOT-419, 不知火舞 bd102c55:
+## one pot on the screen), and back.
+var _held := {}
+func hold_pot(i: int, held: bool) -> void:
+	_held[i] = held
+	var pot := _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
+	if pot: pot.visible = not held and i < _stove_count()
+
+## Stove i's pot: its node (null without), the variant it shows.
+func stove_pot(i: int) -> Node3D:
+	return _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
+func pot_variant(i: int) -> String: return str(_variants.get(i, "pot_normal"))
+
 ## Where stove i's steam rises: the Big Pot's vent while its lid is on, else the pot's mouth (drop_pot).
 func steam_from(i: int) -> Node3D:
 	var vent := _vent(i)
@@ -416,7 +429,7 @@ func _lid_moving(i: int) -> bool:
 ## Stove i's Big Pot vent while its lid is on; null otherwise.
 func _vent(i: int) -> Node3D:
 	var pot := _pots.get_node_or_null("stove_pot_%d" % (i + 1)) as Node3D if _pots else null
-	if pot and pot.visible and (pot.get_node("pot_big") as Node3D).visible and not _lids_up.get(i, false): return pot.get_node("pot_big/vent")
+	if pot and (pot.visible or _held.get(i, false)) and (pot.get_node("pot_big") as Node3D).visible and not _lids_up.get(i, false): return pot.get_node("pot_big/vent")
 	return null
 
 ## The Big Pot's lid (282 v1.1 / 5d6fcf56, LOCK-20: ingredients are seen landing in the pot): on while empty; up once
@@ -576,7 +589,9 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	show_pots()   # a stove opened (Lv4 / Lv8) or switched to the Big Pot
 	_update_lids(v)
 	kitchen.stage.steam_point = _vent(kitchen.stove_index)   # null: just above the mouth, as before
-	kitchen.stage.steam_hold = _lid_moving(kitchen.stove_index) or bool(_lids_up.get(kitchen.stove_index, false))   # the steam waits until the lid is down
+	# the steam waits until the lid is down, and while the watch's layer shows the pot in the middle (419: no steam over an
+	# empty stove)
+	kitchen.stage.steam_hold = _lid_moving(kitchen.stove_index) or bool(_lids_up.get(kitchen.stove_index, false)) or bool(_held.get(kitchen.stove_index, false))
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0

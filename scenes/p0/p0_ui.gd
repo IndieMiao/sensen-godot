@@ -4030,6 +4030,10 @@ func tip_pending() -> bool:
 func tip_showing(key: String) -> bool:
 	return tips != null and tips.showing == key and _teach != null and _teach.visible
 
+## The TipCard on screen (global rect), an empty one when none: what it must not have under it (the kitchen's countdown, 419).
+func tip_rect() -> Rect2:
+	return _teach.get_global_rect() if _teach != null and _teach.visible else Rect2()
+
 ## Any TipCard is on screen: the pond's fishing status card waits under it (q(49), SGODOT-376).
 func tip_on_screen() -> bool:
 	return _teach != null and _teach.visible
