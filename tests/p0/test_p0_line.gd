@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const P0Line := preload("res://modules/p0/p0_line.gd")
 ## P0Line (421, preview B, 奕星 11-05): P0's requests on one connection kept open; a request lost on a kept connection
 ## goes once more on a new one; gzip as HTTPRequest takes it; back to a new request each for the rest of the run on
 ## the server's `x-p0-line: close` or two failures in a row.

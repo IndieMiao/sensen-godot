@@ -53,7 +53,11 @@ var _inflight := {}           # the {cmd, key} on the wire; {} for state refresh
 var _sent_ms := 0
 var _via := ""
 ## 421: commands and reads on one connection kept open (P0Line); a request each (P0HttpRequest) when it is off or out.
+const P0Line := preload("res://modules/p0/p0_line.gd")
 var line: P0Line
+## false: never the line, every request a new one (tests that put in their transport after the runtime's first read
+## went out: they were written for its failing a few frames on, as P0HttpRequest's does).
+var use_line := true
 ## Tests replace the HTTP call: transport.call(method, path, body, cmd), then answer with _finish().
 var transport := Callable()
 ## Development only (SGODOT-351): the Blackjack's bj_* commands answered locally until the server has them, its table
@@ -226,10 +230,10 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 		transport.call(method, path, body, cmd)
 		return
 	var payload := "" if method == HTTPClient.METHOD_GET else JSON.stringify(body)
-	if line == null and is_inside_tree():
+	if use_line and line == null and is_inside_tree():
 		line = P0Line.new()
 		add_child(line)
-	if line != null and line.send(base_url + path, _headers(), method, payload, func(r: int, c: int, _h, raw: PackedByteArray):
+	if use_line and line != null and line.send(base_url + path, _headers(), method, payload, func(r: int, c: int, _h, raw: PackedByteArray):
 			_via = line.last_via if r == HTTPRequest.RESULT_SUCCESS else "line"
 			_finish(r, c, raw, cmd)) == OK:
 		return

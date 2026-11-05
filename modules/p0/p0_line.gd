@@ -1,4 +1,5 @@
-class_name P0Line extends Node
+extends Node
+## P0Line (no class_name: preloaded where used, so a machine that never imported runs its tests — 亚瑟 on #771).
 ## 421 (preview B, 奕星 11-05): P0's commands and reads on one connection kept open. From China to the US-west server a
 ## new HTTPS request took 0.66–2.8 s (its TCP and TLS handshakes; 0.9 s typical), one on a connection kept open 0.2 s
 ## (周瑜, 蒙恬 0.64 / 0.20); P0Session sends one at a time, so the swings queued and the ladder waited behind them.
