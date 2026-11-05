@@ -33,7 +33,7 @@ func _init() -> void:
 	view.own_world_3d = true
 	view.transparent_bg = true
 	view.msaa_3d = Viewport.MSAA_4X
-	view.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	view.render_target_update_mode = SubViewport.UPDATE_WHEN_PARENT_VISIBLE   # hidden on the stove: not drawn (周瑜 on #764)
 	add_child(view)
 	_tex = TextureRect.new()
 	_tex.name = "Pot"
