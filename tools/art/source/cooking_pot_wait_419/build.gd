@@ -1,5 +1,6 @@
 extends SceneTree
-## Offline generator. Runtime scene has no script, lights, camera or autoplay.
+## Offline generator. Only Steam has a local visual-clearance script;
+## no gameplay script, lights, camera or autoplay are included.
 const DIR := "res://assets/props/cooking_pot_wait/"
 const POT := "res://assets/props/stove_pot/stove_pot.glb"
 const LID := "PotRig/StovePot/pot_big/lid"
@@ -82,64 +83,44 @@ func track(anim: Animation, path: String, times: Array, values: Array) -> void:
 	for k in times.size(): anim.track_insert_key(i, times[k], values[k])
 
 func make_steam(lid: Node) -> void:
-	var radial := Gradient.new()
-	radial.offsets = PackedFloat32Array([0, .3, 1])
-	radial.colors = PackedColorArray([Color(1,1,1,.7), Color(1,1,1,.36), Color(1,1,1,0)])
-	var texture := GradientTexture2D.new()
-	texture.gradient = radial
-	texture.width = 32
-	texture.height = 32
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(.5,.5)
-	texture.fill_to = Vector2(1,.5)
-	var steam_mat := StandardMaterial3D.new()
-	steam_mat.resource_name = "SoftSteam_AlphaCapped"
-	steam_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	steam_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	steam_mat.vertex_color_use_as_albedo = true
-	steam_mat.albedo_texture = texture
-	steam_mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
-	steam_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	steam_mat.no_depth_test = false
+	var steam_mat := ShaderMaterial.new()
+	steam_mat.resource_name = "WarmWhiteSteam_ClearLid"
+	steam_mat.shader = load(DIR+"steam_clear_lid.gdshader")
+	steam_mat.set_shader_parameter("steam_colour",Color("FFF8F0"))
+	steam_mat.set_shader_parameter("lid_top_uv",0.0)
 	save(steam_mat,"steam.tres")
 	var quad := QuadMesh.new()
 	quad.size = Vector2(.038, .048)
 	quad.material = steam_mat
 	var gradient := Gradient.new()
-	gradient.offsets = PackedFloat32Array([0,.15,.6,1])
-	gradient.colors = PackedColorArray([Color(1,1,1,0),Color(1,1,1,.17),Color(1,1,1,.11),Color(1,1,1,0)])
+	gradient.offsets = PackedFloat32Array([0,.5,.65,.78,.9,1])
+	gradient.colors = PackedColorArray([Color(1,1,1,0),Color(1,1,1,0),Color(1,1,1,.35),Color(1,1,1,.24),Color(1,1,1,.1),Color(1,1,1,0)])
 	var ramp := GradientTexture1D.new()
 	ramp.gradient = gradient
-	var size_curve := Curve.new()
-	size_curve.add_point(Vector2(0,.5))
-	size_curve.add_point(Vector2(.5,.85))
-	size_curve.add_point(Vector2(1,1))
-	var size_texture := CurveTexture.new()
-	size_texture.curve = size_curve
 	var process := ParticleProcessMaterial.new()
 	process.direction = Vector3(0,1,0)
-	process.spread = 5
-	process.gravity = Vector3(0,.006,0)
-	process.initial_velocity_min = .040
-	process.initial_velocity_max = .052
-	process.scale_min = .75
-	process.scale_max = 1.1
-	process.scale_curve = size_texture
+	process.spread = 0
+	process.gravity = Vector3.ZERO
+	process.initial_velocity_min = .11
+	process.initial_velocity_max = .11
+	process.scale_min = 1
+	process.scale_max = 1
 	process.color_ramp = ramp
 	var steam := child(GPUParticles3D.new(), lid, "Steam") as GPUParticles3D
 	# Original vent is a sibling of lid; use its lid-local rest coordinates.
 	steam.position = Vector3(.062,.032,.146)
 	steam.local_coords = true
 	steam.amount = 5
-	steam.lifetime = 1.2
-	steam.preprocess = 1.2
+	steam.lifetime = 1.8
+	steam.preprocess = 1.8
 	steam.fixed_fps = 30
 	steam.use_fixed_seed = true
 	steam.seed = 419
 	steam.process_material = process
 	steam.draw_pass_1 = quad
+	steam.set_script(load(DIR+"steam_lid_clearance.gd"))
 	steam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	steam.visibility_aabb = AABB(Vector3(-.05,-.03,-.05),Vector3(.12,.19,.12))
+	steam.visibility_aabb = AABB(Vector3(-.06,-.04,-.06),Vector3(.12,.28,.12))
 
 func build() -> void:
 	DirAccess.make_dir_recursive_absolute(DIR)

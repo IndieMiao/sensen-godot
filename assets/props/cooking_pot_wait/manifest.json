@@ -12,7 +12,7 @@
       0.21399998664856
     ]
   },
-  "check_count": 312,
+  "check_count": 319,
   "errors": [],
   "max_body_bounce_m": 0.00200000032782555,
   "max_lid_front_lift_m": 0.0172247233390808,
@@ -20,8 +20,8 @@
   "opaque_materials": [
     "SoupAndFoam_MatteVertexColour"
   ],
-  "steam_all_five_overlap_bound": 0.469262783931599,
-  "steam_peak_single_particle_alpha": 0.119,
+  "steam_all_five_overlap_bound": 0.454083288447724,
+  "steam_peak_single_particle_alpha": 0.35,
   "steam_triangles": 10,
   "surfaces_excluding_steam": 8,
   "triangles_excluding_steam": 2028,
@@ -41,8 +41,18 @@
   "source_glb_sha256": "04f6faee84c5f25629ce57d4bb884763ca3897dc87df9ac58b04bfc70a5d78ab",
   "steam_node": "PotRig/StovePot/pot_big/lid/Steam",
   "autoplay": "",
-  "revision": "v1.1 / independent overlay; full lid front lift <= 0.018 m",
-  "overlay_review": {
+  "revision": "v1.2 / Steam only; invisible on lid, warm white above lid",
+  "steam_lifetime_s": 1.8,
+  "steam_spread_degrees": 0,
+  "steam_initial_velocity_m_s": [
+    0.11,
+    0.11
+  ],
+  "steam_colour_srgb": "#FFF8F0",
+  "steam_fade_start_rise_m": 0.0989999994635582,
+  "steam_screen_mask": "alpha is zero at/below projected lid upper edge",
+  "steam_total_rise_m": 0.197999998927116,
+  "overlay_review_v11_historical": {
     "camera_horizontal_fov_degrees": 39.9252510070801,
     "camera_pitch_degrees": 62,
     "camera_position_m": [
@@ -80,10 +90,6 @@
       153.992584228516
     ]
   },
-  "steam_lifetime_s": 1.2,
-  "steam_spread_degrees": 5,
-  "steam_initial_velocity_m_s": [
-    0.04,
-    0.052
-  ]
+  "steam_visual_script": "steam_lid_clearance.gd",
+  "steam_material": "steam.tres / steam_clear_lid.gdshader"
 }

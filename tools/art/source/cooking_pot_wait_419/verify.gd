@@ -91,8 +91,37 @@ func run() -> void:
 			player.pause()
 	check(max_lift>0 and max_front_lift<=.01801,"Lid maximum lift including tilt <= 1.8 cm")
 	check(max_body<=.00201,"Body bounce at most 2 mm")
-	check(1-pow(1-.17*.7,5)<.5,"Steam theoretical alpha with all five overlapping below 0.5")
-	var output := {"checks":checks,"errors":errors,"check_count":checks.size(),"triangles_excluding_steam":tri,"steam_triangles":10,"surfaces_excluding_steam":surfaces,"opaque_materials":mats.values(),"added_render_materials":2,"bounds_rest":{"position":[bounds.position.x,bounds.position.y,bounds.position.z],"size":[bounds.size.x,bounds.size.y,bounds.size.z]},"max_lid_pivot_lift_m":max_lift,"max_lid_front_lift_m":max_front_lift,"max_body_bounce_m":max_body,"steam_peak_single_particle_alpha":.17*.7,"steam_all_five_overlap_bound":1-pow(1-.17*.7,5)}
+	var process := steam.process_material as ParticleProcessMaterial
+	var steam_mat := steam.draw_pass_1.material as ShaderMaterial
+	var gradient := (process.color_ramp as GradientTexture1D).gradient
+	check(steam.explosiveness==0 and steam.randomness==0 and process.lifetime_randomness==0,"Five evenly spaced particle ages for compositing bound")
+	check(process.direction==Vector3.UP and process.spread==0 and process.gravity==Vector3.ZERO and process.initial_velocity_min==process.initial_velocity_max,"Fixed local upward travel")
+	check(process.scale_min==1 and process.scale_max==1 and process.scale_curve==null,"Particle matrix scale remains emitter scale")
+	var travel := steam.lifetime*process.initial_velocity_max
+	check(abs(travel-.198)<.000001,"Steam travel 19.8 cm")
+	check((steam_mat.get_shader_parameter("steam_colour") as Color).is_equal_approx(Color("FFF8F0")),"Warm white #FFF8F0")
+	var max_alpha := 0.0
+	var max_slope := 0.0
+	for k in gradient.get_point_count()-1:
+		max_slope=maxf(max_slope,absf(gradient.get_color(k+1).a-gradient.get_color(k).a)/(gradient.get_offset(k+1)-gradient.get_offset(k)))
+	for i in 10001:
+		var phase := i/10000.0
+		var transmission := 1.0
+		for j in steam.amount: transmission*=1-gradient.sample(fmod(phase+j/float(steam.amount),1.0)).a
+		max_alpha=maxf(max_alpha,1-transmission)
+	# Add a full sample-step Lipschitz margin: this bounds the continuous curve,
+	# even if all five quads were artificially placed on the same screen pixel.
+	var alpha_bound := max_alpha+steam.amount*max_slope/10000.0
+	check(alpha_bound<.5,"All-particle composite alpha bound < 0.5")
+	var initial_max_alpha := 0.0
+	for i in 501: initial_max_alpha=maxf(initial_max_alpha,gradient.sample(i*.001).a)
+	check(initial_max_alpha==0,"First 50% of travel is completely invisible")
+	var other := (load(PATH) as PackedScene).instantiate()
+	get_root().add_child(other)
+	var other_steam := other.find_child("Steam",true,false) as GPUParticles3D
+	check(steam.material_override is ShaderMaterial and steam.material_override!=other_steam.material_override,"Lid cutoff uniform is isolated per pot instance")
+	other.free()
+	var output := {"checks":checks,"errors":errors,"check_count":checks.size(),"triangles_excluding_steam":tri,"steam_triangles":10,"surfaces_excluding_steam":surfaces,"opaque_materials":mats.values(),"added_render_materials":2,"bounds_rest":{"position":[bounds.position.x,bounds.position.y,bounds.position.z],"size":[bounds.size.x,bounds.size.y,bounds.size.z]},"max_lid_pivot_lift_m":max_lift,"max_lid_front_lift_m":max_front_lift,"max_body_bounce_m":max_body,"steam_peak_single_particle_alpha":.35,"steam_all_five_overlap_bound":alpha_bound,"steam_fade_start_rise_m":travel*.5,"steam_total_rise_m":travel,"steam_colour_srgb":"#FFF8F0","steam_screen_mask":"alpha is zero at/below projected lid upper edge"}
 	FileAccess.open("res://../validation.json",FileAccess.WRITE).store_string(JSON.stringify(output,"\t")+"\n")
 	print("VERIFY ",checks.size()," checks; errors=",errors,"; triangles=",tri)
 	quit(0 if errors.is_empty() else 1)
