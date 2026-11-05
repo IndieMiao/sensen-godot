@@ -7,13 +7,16 @@ extends Node
 ## session's order), with P0HttpRequest's 8 s of live time and gzip as HTTPRequest takes it.
 ##
 ## Back to a new request each (P0HttpRequest, as before) for the rest of the run: user://p0_line_off or P0_LINE=0 at
-## the start; the server's `x-p0-line: close` (its P0_LINE=close, the switch on the server); two failures in a row on
-## the line. A request sent on a kept connection and lost before any reply (closed by the server or a NAT while idle)
+## the start; the server's `x-p0-line: close` (its P0_LINE=close, the switch on the server). Two failures in a row on
+## the line send it the old way too, until the old way has an answer (the network is back: no signal at launch, a
+## tunnel) — then the line again, if it had answered in this run, at most COMEBACKS times a run (奕星 11-05).
+## A request sent on a kept connection and lost before any reply (closed by the server or a NAT while idle)
 ## goes once more on a new one: every command carries expect_seq, so one that had gone through comes back
 ## stale_state with the state, never twice.
 
 const IDLE_S := 45.0     # a connection idle longer is closed before the next request (Caddy keeps one 5 min)
-const FAILS_OFF := 2     # failures in a row on the line before the run goes back to a request each
+const FAILS_OFF := 2     # failures in a row on the line before it goes back to a request each
+const COMEBACKS := 3     # times a run takes the line again after failures (old_way_answered)
 
 var wait_s := 8.0        # live seconds before a request with no answer is given up (RESULT_TIMEOUT), as P0HttpRequest
 var off := false
@@ -27,13 +30,16 @@ var _tls := false
 var _job := {}           # the request on the line; {} none
 var _idle := 0.0         # live seconds the open connection has waited since its last reply
 var _fails := 0
+var _ever := false       # the line has answered in this run
+var _for_good := false   # off for the rest of the run: the device's switch, the server's close
+var _comebacks := 0
 
 ## Whether this run may use the line at all (a switch for a device: user://p0_line_off, P0_LINE=0 on desktop).
 static func wanted() -> bool:
 	return not FileAccess.file_exists("user://p0_line_off") and OS.get_environment("P0_LINE") != "0"
 
 func _init() -> void:
-	if not wanted(): _turn_off("switched off on this device")
+	if not wanted(): _turn_off("switched off on this device", true)
 
 ## A request on the line; done.call(result, code, headers, body) once, as HTTPRequest's request_completed. ERR_BUSY
 ## while one is out, ERR_UNAVAILABLE when off: the caller sends it the old way.
@@ -156,22 +162,37 @@ func _failed(result: int) -> void:
 func _done() -> void:
 	_fails = 0
 	_idle = 0.0
+	_ever = true
 	var headers: PackedStringArray = _job.reply_headers
 	var data: PackedByteArray = _job.data
 	if header(headers, "content-encoding") == "gzip": data = data.decompress_dynamic(-1, FileAccess.COMPRESSION_GZIP)
-	if header(headers, "x-p0-line") == "close": _turn_off("the server says close")
+	if header(headers, "x-p0-line") == "close": _turn_off("the server says close", true)
 	last_via = "kept" if _job.kept else "new"
 	var done: Callable = _job.done
 	var code: int = _job.code
 	_job = {}
 	done.call(HTTPRequest.RESULT_SUCCESS, code, headers, data)
 
-func _turn_off(why: String) -> void:
+func _turn_off(why: String, for_good := false) -> void:
+	_for_good = _for_good or for_good
 	if off: return
 	off = true
 	off_why = why
 	_client.close()
 	print("P0 net: line off (%s), a new request each from now" % why)
+
+## The old way (P0HttpRequest) had an answer: with the line off after failures, the network is back, so the line
+## again — if it had answered in this run, at most COMEBACKS times a run; the device's switch and the server's close
+## stay. The answer's headers: a server's `x-p0-line: close` turns it off for good here too.
+func old_way_answered(headers: PackedStringArray) -> void:
+	if header(headers, "x-p0-line") == "close": _turn_off("the server says close", true)
+	if not off or _for_good or not _ever or _comebacks >= COMEBACKS: return
+	_comebacks += 1
+	off = false
+	off_why = ""
+	_fails = 0
+	_client.close()
+	print("P0 net: line back (%d of %d)" % [_comebacks, COMEBACKS])
 
 ## Back from the background (Android): the open connection is likely gone with the app's sockets; an idle one is
 ## closed so the next request connects anew instead of waiting out a dead one.

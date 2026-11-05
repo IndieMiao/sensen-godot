@@ -398,7 +398,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
       mine: site.id, type: site.type, name: site.name, max: cap(site), floor: at.floor, hp: day.hp, day: day.key,
       potion_ready_in: potionReadyIn(c, day, now),   // 355 G: what #636's set_potion_cooldown reads
       stations: stops.map(floor => ({ floor, paid: day.floors[floorKey(site.id, floor)]?.paid ?? false })),
-      floor_state: { floor: at.floor, paid: state.paid, cleared, rocks: spec.rocks, left: spec.rocks - state.broken.length,
+      floor_state: { floor: at.floor, paid: state.paid, cleared, rocks: spec.rocks, left: Math.max(0, spec.rocks - state.broken.length),
         broken: Array.from({ length: spec.rocks }, (_, i) => state.broken.includes(i)), lit: state.lit,
         deck: state.lit ? deckCounts(spec.deck.slice(state.broken.length * rockCards(c))) : null,
         ground: state.ground.map(g => ({ ...g })),
